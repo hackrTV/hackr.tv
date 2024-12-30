@@ -1,0 +1,51 @@
+:root {
+  --textColor: #efe;
+  --accentColor: #3f6;
+  --secondAccentColor: #cf0;
+  --thirdAccentColor: #0f0;
+  --delay: .3s;
+}
+
+html, body {
+  height:100%;
+  font-family: "Terminus";
+  font-size: 18px;
+  background-color: black;
+  color: var(--textColor);
+}
+
+@font-face {
+  font-family: "Terminus";
+  src:url("/fonts/terminus.woff2") format("woff2"),
+    url("/fonts/terminus.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+#logo {
+  font-size: 30px;
+}
+
+a:link {
+  color: var(--accentColor);
+  text-decoration: none;
+}
+
+a:visited {
+  color: var(--accentColor);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--secondAccentColor);
+  text-decoration: underline;
+}
+
+a:active {
+  color: var(--thirdAccentColor);
+  text-decoration: none;
+}
+
+h2 {
+  color: var(--accentColor);
+}

@@ -1,0 +1,30 @@
+!!!
+%html
+  %head
+    %title= "X E R A E N"
+    %meta{name: "viewport", content: "width=device-width,initial-scale=1"}
+    %meta{name: "apple-mobile-web-app-capable", content: "yes"}
+
+    -# != yield :head
+
+    %link{rel: "stylesheet", href: url("/css/xeraen.css")}
+    -# %link{rel: "stylesheet", href: "https://use.fontawesome.com/releases/v5.15.4/css/all.css"}
+    -# %link{rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Share+Tech+Mono"}
+    -# %link{rel: "icon", href: "/assets/images/profile.jpg", type: "image/x-icon"}
+
+  %body
+    #logo
+      %a{href: "/xeraen"}
+        X E R A E N
+    %br
+    %div
+      \- part of
+      %a{href: "https://hackr.tv"}= "The.CyberPul.se"
+    %div
+      %br
+      %a{href: "https://x.com/XERAEN", target: "_blank"}
+        x.com/xeraen
+      %br
+      %br
+
+    != yield
