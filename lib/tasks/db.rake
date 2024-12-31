@@ -5,7 +5,7 @@ namespace :db do
   task :drop do
     environment = ENV["APP_ENV"] || "development"
     data_path = "./db/data/#{environment}.db"
-    execute_drop = ENV["DOUBLE_CONFIRM"] == "true"
+    execute_drop = ENV["CONFIRM"] == "true"
     database_exists = File.exist?(data_path)
 
     unless execute_drop
@@ -53,24 +53,34 @@ namespace :db do
       # NOTE: We want `.first.first` as the query result is `[[0]]`
       database_version = db.execute("PRAGMA user_version;").first.first
 
-      Dir.glob("db/migrate/*").each do |filepath|
-        # Turn db/migration/42_my_migration.rb into 42
-        version = filepath.split("/").last.split(".").first.split("_").first
+      Dir
+        .glob("db/migrate/*")
+        .map do |filepath|
+          # Turn db/migration/0042_my_migration.rb into "0042"
+          version = filepath.split("/").last.split(".").first.split("_").first
 
-        # Don't attempt to migrate the migration template.
-        next if version == "template"
+          # Don't attempt to migrate the migration template.
+          next if version == "template"
 
-        if version.to_i <= database_version
-          puts " >> Database already includes version #{version}."
-          next
+          {version:, filepath:}
         end
+        .compact
+        .sort { |a, b| a[:version].to_i <=> b[:version].to_i }
+        .each do |version_hash|
+          version = version_hash[:version]
+          filepath = version_hash[:filepath]
 
-        load filepath
+          if version.to_i <= database_version
+            puts " >> Database already includes version #{version.to_i}."
+            next
+          end
 
-        puts " >> Migrating database to version #{version}."
+          load filepath
 
-        Object.const_get("Migration#{version}").new.migrate(data_path)
-      end
+          puts " >> Migrating database to version #{version.to_i}."
+
+          Object.const_get("Migration#{version}").new.migrate(data_path)
+        end
     else
       puts ""
       puts ""
@@ -106,7 +116,7 @@ namespace :db do
         .last
         .to_i
 
-    version = latest_version + 1
+    version = (latest_version + 1).to_s.rjust(4, "0")
     filepath = "db/migrate/#{version}_#{name}.rb"
 
     puts " /------------------------------------------------------------------\\"
@@ -117,7 +127,7 @@ namespace :db do
     migration_file_data =
       File
         .read("db/migrate/template.rb")
-        .gsub("~~~VERSION~~~", version.to_s)
+        .gsub("~~~VERSION~~~", version)
 
     File.write(filepath, migration_file_data)
   end
