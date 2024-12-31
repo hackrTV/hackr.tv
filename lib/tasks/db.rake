@@ -6,7 +6,6 @@ namespace :db do
     environment = ENV["APP_ENV"] || "development"
     data_path = "./db/data/#{environment}.db"
     execute_drop = ENV["CONFIRM"] == "true"
-    database_exists = File.exist?(data_path)
 
     unless execute_drop
       puts ""
