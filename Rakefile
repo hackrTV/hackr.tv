@@ -1,3 +1,3 @@
-require 'rake'
+require "rake"
 
-Dir.glob('lib/tasks/**/*.rake').each { |task| load task }
+Dir.glob("lib/tasks/**/*.rake").each { |task| load task }

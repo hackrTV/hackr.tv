@@ -3,7 +3,7 @@ require "sinatra"
 
 set(:public_folder, __dir__ + "/public")
 
-DEFAULT_LAYOUT = :"layouts/application".freeze
+DEFAULT_LAYOUT = :"layouts/application"
 LAYOUTS = {xeraen: :"layouts/xeraen"}.freeze
 
 DEFAULT_RESCUE_PATH = "/".freeze
@@ -18,10 +18,10 @@ end
 
 ["/*", "/**/*"].each do |glob|
   get glob do
-    haml (LAYOUTS[@site_key] || DEFAULT_LAYOUT) do
+    haml(LAYOUTS[@site_key] || DEFAULT_LAYOUT) do
       haml @template
     end
   rescue
-    redirect (RESCUE_PATHS[@site_key] || DEFAULT_RESCUE_PATH)
+    redirect(RESCUE_PATHS[@site_key] || DEFAULT_RESCUE_PATH)
   end
 end
