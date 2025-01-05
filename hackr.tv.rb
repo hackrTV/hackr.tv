@@ -9,15 +9,44 @@ LAYOUTS = {xeraen: :"layouts/xeraen"}.freeze
 DEFAULT_RESCUE_PATH = "/".freeze
 RESCUE_PATHS = {xeraen: "/xeraen"}.freeze
 
+ASHLINN_REDIRECTS = {
+  "/" => "https://youtube.com/AshlinnSnow"
+}.freeze
+XERAEN_REDIRECTS = {
+  "/" => "/xeraen",
+  "/twitter" => "https://x.com/xeraen",
+  "/youtube" => "https://youtube.com/@xeraen"
+}.freeze
+
+# This hash will accept full-domain keys as well as @site_key keys.
+REDIRECTS = {
+  "ashlinn.net"   => ASHLINN_REDIRECTS,
+  "rockerboy.net" => XERAEN_REDIRECTS,
+  "xeraen.com"    => XERAEN_REDIRECTS,
+  "xeraen.net"    => XERAEN_REDIRECTS,
+  "xeraen"        => XERAEN_REDIRECTS
+}
+
 before do
   template_by_url =
-    request.path.to_s.split("/").compact.delete_if(&:empty?).join("/").to_sym
-  @template = [template_by_url, :index].delete_if(&:empty?).first
+    request.path.to_s.split("/").compact.delete_if(&:empty?).join("/")
+  @template = [template_by_url.to_sym, :index].delete_if(&:empty?).first
   @site_key = request.path.to_s.split("/")[1].to_s.to_sym
+  @redirect_map =
+    REDIRECTS[request.host.to_s.downcase] ||
+    REDIRECTS[@site_key.to_s.downcase] ||
+    {}
+
+  # @context_path turns a symbol like :"xeraen/twitter" into "/twitter"
+  @context_path = @template.to_s.gsub(@site_key.to_s, "")
+
+  @redirect_url = @redirect_map[@context_path]
 end
 
 ["/*", "/**/*"].each do |glob|
   get glob do
+    break redirect(@redirect_url) unless @redirect_url.nil?
+
     haml(LAYOUTS[@site_key] || DEFAULT_LAYOUT) do
       haml @template
     end

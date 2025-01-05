@@ -106,7 +106,7 @@ namespace :db do
       Dir
         .glob("db/migrate/*")
         .map do |filepath|
-          # Turn db/migration/42_my_migration.rb into 42
+          # Turn db/migration/0042_my_migration.rb into 0042
           version = filepath.split("/").last.split(".").first.split("_").first
           next nil if version == "template"
           version
