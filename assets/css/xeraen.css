@@ -16,8 +16,8 @@ html, body {
 
 @font-face {
   font-family: "Terminus";
-  src:url("/fonts/terminus.woff2") format("woff2"),
-    url("/fonts/terminus.woff") format("woff");
+  src:url("/fonts/~~~CACHE_BUSTING_TOKEN~~~_terminus.woff2") format("woff2"),
+    url("/fonts/~~~CACHE_BUSTING_TOKEN~~~_terminus.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }

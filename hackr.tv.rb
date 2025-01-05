@@ -1,7 +1,30 @@
 require "haml"
 require "sinatra"
 
+FileUtils.rm_rf("public")
+FileUtils.mkdir("public")
 set(:public_folder, __dir__ + "/public")
+
+# BEGIN Cache-busting
+CACHE_BUSTING_TOKEN = DateTime.now.new_offset(0).strftime("%s").freeze
+
+# We'll assume only one level of asset directories for now.
+Dir.glob("assets/*").each do |assets_glob|
+  Dir.glob(assets_glob).each do |glob|
+    dir = glob.split("/")[1]
+    FileUtils.mkdir_p "public/#{dir}"
+    Dir.glob(glob + "/*").each do |filepath|
+      next if File.directory?(filepath)
+      filename = filepath.split("/").last
+      file_data =
+        File
+          .read(filepath)
+          .gsub("~~~CACHE_BUSTING_TOKEN~~~", CACHE_BUSTING_TOKEN)
+      File.write("public/#{dir}/#{CACHE_BUSTING_TOKEN}_#{filename}", file_data)
+    end
+  end
+end
+# END Cache-busting
 
 DEFAULT_LAYOUT = :"layouts/application"
 LAYOUTS = {xeraen: :"layouts/xeraen"}.freeze
@@ -20,11 +43,11 @@ XERAEN_REDIRECTS = {
 
 # This hash will accept full-domain keys as well as @site_key keys.
 REDIRECTS = {
-  "ashlinn.net"   => ASHLINN_REDIRECTS,
+  "ashlinn.net" => ASHLINN_REDIRECTS,
   "rockerboy.net" => XERAEN_REDIRECTS,
-  "xeraen.com"    => XERAEN_REDIRECTS,
-  "xeraen.net"    => XERAEN_REDIRECTS,
-  "xeraen"        => XERAEN_REDIRECTS
+  "xeraen.com" => XERAEN_REDIRECTS,
+  "xeraen.net" => XERAEN_REDIRECTS,
+  "xeraen" => XERAEN_REDIRECTS
 }
 
 before do
