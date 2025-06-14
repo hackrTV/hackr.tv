@@ -1,3 +1,30 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Flexbox container to center content */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Center column styling */
+.center-column {
+  max-width: 600px;
+  width: 100%;
+  padding: 2rem;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  text-align: center;
+}
+
 :root {
   --textColor: #efe;
   --accentColor: #3f6;
@@ -7,11 +34,17 @@
 }
 
 html, body {
-  height:100%;
+  height: 100%;
+  width: 100%;
   font-family: "Terminus";
   font-size: 18px;
   background-color: black;
   color: var(--textColor);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
 }
 
 @font-face {
@@ -24,6 +57,10 @@ html, body {
 
 #logo {
   font-size: 30px;
+}
+
+#main {
+  flex-grow: 1;
 }
 
 a:link {

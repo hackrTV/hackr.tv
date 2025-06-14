@@ -1,4 +1,4 @@
-require "haml"
+require "erb"
 require "sinatra"
 
 FileUtils.rm_rf("public")
@@ -52,7 +52,14 @@ REDIRECTS = {
 
 before do
   template_by_url =
-    request.path.to_s.split("/").compact.delete_if(&:empty?).join("/")
+    request
+      .path
+      .to_s
+      .split("/")
+      .compact
+      .delete_if(&:empty?)
+      .join("/")
+
   @template = [template_by_url.to_sym, :index].delete_if(&:empty?).first
   @site_key = request.path.to_s.split("/")[1].to_s.to_sym
   @redirect_map =
@@ -70,8 +77,8 @@ end
   get glob do
     break redirect(@redirect_url) unless @redirect_url.nil?
 
-    haml(LAYOUTS[@site_key] || DEFAULT_LAYOUT) do
-      haml @template
+    erb(LAYOUTS[@site_key] || DEFAULT_LAYOUT) do
+      erb @template
     end
   rescue
     redirect(RESCUE_PATHS[@site_key] || DEFAULT_RESCUE_PATH)

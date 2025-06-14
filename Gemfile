@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 ruby "3.3.6"
 
-gem "haml"
+gem "erb"
 gem "puma"
 gem "rackup"
 gem "rake"

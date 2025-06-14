@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>X E R A E N</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <%# <link %>
+    <%#   rel="stylesheet" %>
+    <%#   href="<%= url("https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-normalize.min.css?#{CACHE_BUSTING_TOKEN}") %1>" %>
+    <%# /> %>
+    <%# <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_xeraen.css") %1>" /> %>
+    <link rel="stylesheet" href="<%= url("/tui/#{CACHE_BUSTING_TOKEN}_tuicss.min.css") %>" />
+    <script src="<%= url("/tui/#{CACHE_BUSTING_TOKEN}_tuicss.min.js") %>"></script>
+  </head>
+
+  <body class="black-255 green-255-text">
+    <div id="logo">
+      <a href="/xeraen">
+        X E R A E N
+      </a>
+      <small>
+        of
+        <a href="https://hackr.tv">
+          The.CyberPul.se
+        </a>
+      </small>
+    </div>
+
+    <div class="container">
+      <div class="center-column">
+        <br>
+        <a href="https://x.com/XERAEN" target="_blank">
+          x.com/xeraen
+        </a>
+        <br>
+        <br>
+      </div>
+    </div>
+
+    <%= yield %>
+  </body>
+</html>

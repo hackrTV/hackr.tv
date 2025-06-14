@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>hackr.tv</title>
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_application.css") %>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+  <head>
+
+  <body>
+    <div id="logo">
+      <a href="/">
+        hackr.tv
+      </a>
+    </div>
+
+    <br>
+
+    <nav>
+      <a href="https://www.youtube.com/watch?v=YgD4oNPpGv4&list=PLLRgY_tjdreyU4_WtrQnkZ6D8ur41GrpC">
+        Streamz
+      </a>
+      &nbsp;|&nbsp;
+      <a href="https://www.youtube.com/@TheCyberPulse/videos">
+        Vidz
+      </a>
+      &nbsp;|&nbsp;
+      <a href="/linkz">
+        Linkz
+      </a>
+    </nav>
+
+    <hr>
+    <br>
+
+    <%= yield %>
+  </body>
+</html>
