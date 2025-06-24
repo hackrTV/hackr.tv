@@ -1,0 +1,6 @@
+ignore:
+  - "db/migrate/*"
+  - "views/*"
+  - "Gemfile.lock"
+  - "README.md"
+  - "UNLICENSE"

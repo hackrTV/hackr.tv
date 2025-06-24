@@ -1,0 +1,87 @@
+/* /1* Reset and base styles *1/ */
+/* * { */
+/*   box-sizing: border-box; */
+/*   margin: 0; */
+/*   padding: 0; */
+/* } */
+
+/* /1* Flexbox container to center content *1/ */
+/* .container { */
+/*   display: flex; */
+/*   justify-content: center; */
+/*   align-items: center; */
+/*   height: 100vh; */
+/*   background-color: #f5f5f5; */
+/* } */
+
+/* /1* Center column styling *1/ */
+/* .center-column { */
+/*   max-width: 600px; */
+/*   width: 100%; */
+/*   padding: 2rem; */
+/*   background-color: white; */
+/*   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+/*   border-radius: 8px; */
+/*   text-align: center; */
+/* } */
+
+/* :root { */
+/*   --textColor: #efe; */
+/*   --accentColor: #3f6; */
+/*   --secondAccentColor: #cf0; */
+/*   --thirdAccentColor: #0f0; */
+/*   --delay: .3s; */
+/* } */
+
+@font-face {
+  font-family: "Terminus";
+  src:url("/fonts/~~~CACHE_BUSTING_TOKEN~~~_terminus.woff2") format("woff2"),
+    url("/fonts/~~~CACHE_BUSTING_TOKEN~~~_terminus.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: "Terminus";
+  font-size: 18px;
+  background-color: black;
+  color: var(--textColor);
+}
+
+/* body { */
+/*   display: flex; */
+/*   flex-direction: column; */
+/* } */
+
+/* #logo { */
+/*   font-size: 30px; */
+/* } */
+
+/* #main { */
+/*   flex-grow: 1; */
+/* } */
+
+/* a:link { */
+/*   color: var(--accentColor); */
+/*   text-decoration: none; */
+/* } */
+
+/* a:visited { */
+/*   color: var(--accentColor); */
+/*   text-decoration: none; */
+/* } */
+
+/* a:hover { */
+/*   color: var(--secondAccentColor); */
+/* } */
+
+/* a:active { */
+/*   color: var(--thirdAccentColor); */
+/*   text-decoration: none; */
+/* } */
+
+/* h2 { */
+/*   color: var(--accentColor); */
+/* } */

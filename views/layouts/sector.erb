@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>hackr.tv</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_tuicss.css") %>" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_default.css") %>" />
+    <script src="<%= url("/javascripts/#{CACHE_BUSTING_TOKEN}_tuicss.js") %>"></script>
+  <head>
+
+  <body class="black-168">
+    <%= erb(:"shared/_header_menu") %>
+
+    <br>
+    <br>
+
+    <%= erb(:"shared/_footer_menu") %>
+
+    <div>
+      <%= yield %>
+    <div>
+
+  </body>
+</html>

@@ -1,0 +1,38 @@
+html {
+  background-color: #000;
+  color: #aaa;
+}
+
+.inconsolata {
+  font-family: "Inconsolata", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
+#hackrtv-banner a, #hackrtv-banner a:visited {
+  color: #0f0;
+  text-decoration: none;
+}
+
+.menu {
+  margin-top: 25px;
+}
+
+hr {
+  color: #0f0;
+}
+
+a {
+  color: #0f0;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #080;
+}
+
+ul {
+}

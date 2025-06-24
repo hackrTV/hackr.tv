@@ -1,0 +1,49 @@
+.mb-15 {
+  margin-bottom: 15px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.ml-5 {
+  margin-left: 5px;
+}
+.ml-10 {
+  margin-left: 10px;
+}
+.ml-25 {
+  margin-left: 25px;
+}
+
+.mt-40 {
+  margin-top: 40px;
+}
+
+.pa-25 {
+  padding: 25px 25px 25px 25px;
+}
+
+.pb-3 {
+  padding-bottom: 15px;
+}
+
+.pl-5 {
+  padding-left: 5px;
+}
+.pl-10 {
+  padding-left: 10px;
+}
+.pl-15 {
+  padding-left: 15px;
+}
+.pl-15 {
+  padding-left: 25px;
+}
+
+.pr-15 {
+  padding-right: 15px;
+}
+
+.pt-5 {
+  padding-top: 5px;
+}

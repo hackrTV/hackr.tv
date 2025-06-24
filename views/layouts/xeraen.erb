@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>X E R A E N</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_tuicss.css") %>" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_main.css") %>" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_xeraen.css") %>" />
+    <script src="<%= url("/javascripts/#{CACHE_BUSTING_TOKEN}_tuicss.js") %>"></script>
+  <head>
+
+  <body class="black-168">
+    <%= erb(:"shared/_header_menu") %>
+
+    <a href="/xeraen">
+      <img src="<%= url("/images/#{CACHE_BUSTING_TOKEN}_xeraen-logo-350.png") %>" class="mt-30 ml-5" />
+    </a>
+
+    <br>
+
+    <%= erb(:"shared/_footer_menu") %>
+
+    <div class="ml-10">
+      <%= yield %>
+    <div>
+
+  </body>
+</html>

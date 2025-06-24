@@ -1,0 +1,16 @@
+@font-face {
+  font-family: "Terminus";
+  src:url("/fonts/~~~CACHE_BUSTING_TOKEN~~~_terminus.woff2") format("woff2"),
+    url("/fonts/~~~CACHE_BUSTING_TOKEN~~~_terminus.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: "Terminus";
+  font-size: 18px;
+  background-color: black;
+  color: var(--textColor);
+}

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# We ignore assets/* instead of public/* here because Guard is watching assets/*
+# to run assets:precompile which will update the files in public/* triggering
+# rerun to rerun the application.
+rerun --ignore 'assets/*' -- rackup
