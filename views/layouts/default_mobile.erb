@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>hackr.tv</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_tuicss.css") %>" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_main.css") %>" />
+    <script src="<%= url("/javascripts/#{CACHE_BUSTING_TOKEN}_tuicss.js") %>"></script>
+  <head>
+
+  <body class="black-168">
+    <%= erb(:"shared/_header_menu_mobile") %>
+
+    <br>
+
+<div class="pl-5 white-168-text">
+  <a href="/">
+    <pre id="greetings" style="font-size: 11px;">&nbsp;__  __                   __            ______  __  __
+/\ \/\ \                 /\ \          /\__  _\/\ \/\ \
+\ \ \_\ \     __      ___\ \ \/'\   _ _\/_/\ \/\ \ \ \ \
+ \ \  _  \  /'__`\   /'___\ \ , &lt;  /\`'__\\ \ \ \ \ \ \ \
+  \ \ \ \ \/\ \L\.\_/\ \__/\ \ \\`\\ \ \/ _\ \ \ \ \ \_/ \
+   \ \_\ \_\ \__/.\_\ \____\\ \_\ \_\ \_\/\_\ \_\ \ `\___/
+    \/_/\/_/\/__/\/_/\/____/ \/_/\/_/\/_/\/_/\/_/  `\/__/</pre>
+  </a>
+</div>
+
+    <br>
+
+    <div>
+      <%= yield %>
+    </div>
+
+  </body>
+</html>

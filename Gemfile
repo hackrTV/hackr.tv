@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 ruby "3.4.4"
 
+gem "browser"
 gem "erb"
 gem "guard-rake"
 gem "puma"
