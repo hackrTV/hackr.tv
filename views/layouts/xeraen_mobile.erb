@@ -11,15 +11,28 @@
   <head>
 
   <body class="black-168">
-    <%= erb(:"shared/_header_menu") %>
+    <%= erb(:"shared/_header_menu_mobile") %>
 
     <a href="/xeraen">
-      <img src="<%= url("/images/#{CACHE_BUSTING_TOKEN}_xeraen-logo-350.png") %>" class="mt-30 ml-5 mb-10" />
+      <img src="<%= url("/images/#{CACHE_BUSTING_TOKEN}_xeraen-logo-350.png") %>" class="mt-30 ml-5" />
     </a>
 
-    <%= erb(:"shared/_footer_menu") %>
+    <br>
 
-    <div class="ml-10">
+    <div class="tui-window ml-20 mb-20">
+      <fieldset class="tui-fieldset">
+        <legend>Menu</legend>
+        <div class="mb-20 pl-5 pr-15">
+        <a href="/xeraen/trackz" class="tui-button">Trackz</a>
+        <a href="https://www.youtube.com/watch?v=GYSH0mDteR4&list=PLnBws134IvTRZCeazlMukr-gq24eIWCf4" class="tui-button" target="_blank">Vidz</a>
+        <a href="/xeraen/linkz" class="tui-button">Linkz</a>
+        </div>
+      </fieldset>
+    </div>
+
+    <br>
+
+    <div>
       <%= yield %>
     <div>
 

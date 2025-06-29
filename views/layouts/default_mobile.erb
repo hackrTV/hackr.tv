@@ -10,7 +10,7 @@
   <head>
 
   <body class="black-168">
-    <%= erb(:"shared/_header_menu") %>
+    <%= erb(:"shared/_header_menu_mobile") %>
 
     <br>
 
@@ -28,7 +28,19 @@
 
     <br>
 
-    <%= erb(:"shared/_footer_menu") %>
+    <div class="tui-window ml-20 mb-20">
+      <fieldset class="tui-fieldset">
+        <legend>Menu</legend>
+        <div class="mb-20 pl-5 pr-15">
+        <a href="/trackz" class="tui-button">Trackz</a>
+        <a href="https://www.youtube.com/watch?v=YgD4oNPpGv4&list=PLLRgY_tjdreyU4_WtrQnkZ6D8ur41GrpC" class="tui-button" target="_blank">Streamz</a>
+        <a href="https://www.youtube.com/@TheCyberPulse/videos" class="tui-button" target="_blank">Vidz</a>
+        <a href="/linkz" class="tui-button">Linkz</a>
+        </div>
+      </fieldset>
+    </div>
+
+    <br>
 
     <div class="ml-10">
       <%= yield %>

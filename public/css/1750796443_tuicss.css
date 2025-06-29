@@ -23,8 +23,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   /* font-family: "DOS"; */
   /* src: url("./fonts/Perfect DOS VGA 437 Win.ttf"); */
   font-family: "Terminus";
-  src:url("/fonts/1750304583_terminus.woff2") format("woff2"),
-    url("/fonts/1750304583_terminus.woff") format("woff");
+  src:url("/fonts/1750796443_terminus.woff2") format("woff2"),
+    url("/fonts/1750796443_terminus.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
