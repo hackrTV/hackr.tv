@@ -9,7 +9,10 @@ set(
     permitted_hosts: [
       "ashlinn.net",
       "cyberpul.se",
+      "git.xeraen.net",
       "hackr.tv",
+      "links.xeraen.com",
+      "links.xeraen.net",
       "localhost",
       "rockerboy.net",
       "rockerboy.stream",
@@ -51,7 +54,10 @@ LAYOUTS = {
 }.freeze
 
 DEFAULT_RESCUE_PATH = "/".freeze
-RESCUE_PATHS = {xeraen: "/xeraen"}.freeze
+RESCUE_PATHS = {
+  xeraen: "/xeraen",
+  sector: "/"
+}.freeze
 
 ###############################################################################
 # BEGIN REDIRECTS
@@ -117,7 +123,6 @@ end
 
     break redirect(@redirect_url) unless @redirect_url.nil?
 
-    # erb(@mobile_layout || LAYOUTS[@site_key] || DEFAULT_LAYOUT) do
     erb(@request_analysis.layout || LAYOUTS[@site_key] || DEFAULT_LAYOUT) do
       erb @request_analysis.template
     end
@@ -127,10 +132,7 @@ end
 end
 
 class RequestAnalysis
-  attr_reader(
-    :request,
-    :template
-  )
+  attr_reader :request
 
   def initialize(req)
     @request = req
@@ -178,7 +180,7 @@ class RequestAnalysis
   end
 
   def mobile?
-    !@browser.device.mobile?
+    @browser.device.mobile?
   end
 
   def sector_x?
@@ -191,11 +193,6 @@ class RequestAnalysis
     @template = [@template_by_url.to_sym, :index].delete_if(&:empty?).first
     @template = :"mobile/#{@template}" if mobile?
 
-    p ""
-    p ""
-    p @template
-    p ""
-    p ""
     @template
   end
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_tuicss.css") %>" />
-    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_main.css") %>" />
+    <link rel="stylesheet" href="<%= url("/css/#{CACHE_BUSTING_TOKEN}_default.css") %>" />
     <script src="<%= url("/javascripts/#{CACHE_BUSTING_TOKEN}_tuicss.js") %>"></script>
   <head>
 
@@ -14,7 +14,7 @@
 
     <br>
 
-<div class="pl-5 white-168-text">
+<div class="ml-10 pl-5 white-168-text">
   <a href="/">
     <pre id="greetings" style="font-size: 11px;">&nbsp;__  __                   __            ______  __  __
 /\ \/\ \                 /\ \          /\__  _\/\ \/\ \
@@ -28,7 +28,21 @@
 
     <br>
 
-    <div>
+    <div class="tui-window ml-20 mb-20">
+      <fieldset class="tui-fieldset">
+        <legend>Menu</legend>
+        <div class="mb-20 pl-5 pr-15">
+        <a href="/trackz" class="tui-button">Trackz</a>
+        <a href="https://www.youtube.com/watch?v=YgD4oNPpGv4&list=PLLRgY_tjdreyU4_WtrQnkZ6D8ur41GrpC" class="tui-button" target="_blank">Streamz</a>
+        <a href="https://www.youtube.com/@TheCyberPulse/videos" class="tui-button" target="_blank">Vidz</a>
+        <a href="/linkz" class="tui-button">Linkz</a>
+        </div>
+      </fieldset>
+    </div>
+
+    <br>
+
+    <div class="ml-10">
       <%= yield %>
     </div>
 
