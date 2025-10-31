@@ -1,0 +1,52 @@
+<div class="tui-window ml-10">
+  <fieldset class="tui-fieldset">
+    <legend><%= @artist.name == "XERAEN" ? "XERAEN" : "The.CyberPul.se" %> - Trackz</legend>
+    <div class="pl-5 pt-5">
+      <% if @tracks.empty? %>
+        <p class="white-168-text">No trackz available yet. Check back soon for new releases!</p>
+      <% else %>
+        <% @tracks.each do |track| %>
+          <div class="mb-11">
+            <div class="tui-divider"></div>
+            <div class="mt-6">
+              <h2 class="black-168-text green-168">
+                <%= link_to(@artist.slug == "xeraen" ? xeraen_track_path(track) : track_path(track), class: "tui-link") do %>
+                  <%= track.title %>
+                  <% if track.featured %>
+                    <span class="white-168-text black-168">
+                      &nbsp;
+                      Featured Release!
+                      &nbsp;
+                    </span>
+                  <% end %>
+                  &nbsp;
+                <% end %>
+              </h2>
+              <p class="gray-168-text">
+                <%= track.album %>
+                <% if track.album_type %>
+                  (<%= track.album_type.upcase %>)
+                <% end %>
+                <% if track.release_date %>
+                  • <%= track.release_date.strftime("%Y-%m-%d") %>
+                <% end %>
+                <% if track.duration %>
+                  • <%= track.duration %>
+                <% end %>
+              </p>
+              <% if track.streaming_links && !track.streaming_links.empty? %>
+                <div class="mt-5">
+                  <% track.streaming_links.each do |platform, url| %>
+                    <%= link_to url, target: "_blank", class: "tui-button mr-5" do %>
+                      <%= platform.to_s.tr('_', ' ').split.map(&:capitalize).join(' ') %>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

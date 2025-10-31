@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>XERAEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "xeraen", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
+  </head>
+
+  <body class="black-168">
+    <div class="ml-2 pl-2 white-168-text">
+      <a href="/xeraen">
+        <pre style="font-size: 8px;">XERAEN</pre>
+      </a>
+    </div>
+
+    <div class="ml-2 mb-10 pb-20">
+      <%= yield %>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<div class="tui-window white-168-text">
+  <fieldset class="tui-fieldset">
+    <legend><%= @track.title %></legend>
+
+    <p><strong>Artist:</strong> <%= @track.artist.name %></p>
+
+    <% if @track.album.present? %>
+      <p><strong>Album:</strong> <%= @track.album %></p>
+    <% end %>
+
+    <% if @track.album_type.present? %>
+      <p><strong>Album Type:</strong> <%= @track.album_type.upcase %></p>
+    <% end %>
+
+    <% if @track.release_date.present? %>
+      <p><strong>Release Date:</strong> <%= @track.release_date.strftime("%Y-%m-%d") %></p>
+    <% end %>
+
+    <% if @track.duration.present? %>
+      <p><strong>Duration:</strong> <%= @track.duration %></p>
+    <% end %>
+
+    <% if @track.streaming_links.present? && @track.streaming_links.any? %>
+      <br>
+      <p><strong>Streaming Links:</strong></p>
+      <ul>
+        <% @track.streaming_links.each do |platform, url| %>
+          <li><%= link_to platform.titleize, url, class: "tui-link", target: "_blank" %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @track.videos.present? && @track.videos.any? %>
+      <br>
+      <p><strong>Videos:</strong></p>
+      <ul>
+        <% @track.videos.each do |type, url| %>
+          <li><%= link_to "#{type.titleize} Video", url, class: "tui-link", target: "_blank" %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @track.lyrics.present? %>
+      <br>
+      <p><strong>Lyrics:</strong></p>
+      <pre class="white-168-text"><%= @track.lyrics %></pre>
+    <% end %>
+
+    <br>
+    <p><%= link_to "← Back to all tracks", (@artist.slug == "xeraen" ? xeraen_tracks_path : tracks_path), class: "tui-link" %></p>
+  </fieldset>
+</div>
