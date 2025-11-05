@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Run Rails server bound to 0.0.0.0 for remote access (e.g., from mobile devices)
+
+set -e
+
+# Get local IP address
+if command -v ip &> /dev/null; then
+  LOCAL_IP=$(ip route get 1 | awk '{print $7; exit}')
+elif command -v ipconfig &> /dev/null; then
+  # macOS fallback
+  LOCAL_IP=$(ipconfig getifaddr en0 || ipconfig getifaddr en1)
+else
+  LOCAL_IP="your-local-ip"
+fi
+
+echo ""
+echo "=================================================="
+echo "Starting Rails server on 0.0.0.0:3000"
+echo "=================================================="
+echo ""
+echo "Access from this computer:"
+echo "  → http://localhost:3000"
+echo ""
+echo "Access from your phone/network:"
+echo "  → http://${LOCAL_IP}:3000"
+echo ""
+echo "=================================================="
+echo ""
+
+bin/rails server -b 0.0.0.0
