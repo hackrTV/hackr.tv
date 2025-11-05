@@ -12,13 +12,30 @@
   </head>
 
   <body class="black-168">
-    <div class="ml-2 pl-2 white-168-text">
-      <a href="/xeraen">
-        <pre style="font-size: 8px;">XERAEN</pre>
-      </a>
+    <%= render "shared/header_menu_mobile" %>
+
+    <br>
+
+    <a href="/xeraen">
+      <%= image_tag "xeraen-logo-350.png", class: "mt-30 ml-5" %>
+    </a>
+
+    <br>
+
+    <div class="tui-window ml-20 mb-20">
+      <fieldset class="tui-fieldset">
+        <legend>Menu</legend>
+        <div class="mb-20 pl-5 pr-15">
+          <%= link_to "Trackz", xeraen_tracks_path, class: "tui-button" %>
+          <%= link_to "Vidz", "https://www.youtube.com/watch?v=GYSH0mDteR4&list=PLnBws134IvTRZCeazlMukr-gq24eIWCf4", class: "tui-button", target: "_blank" %>
+          <%= link_to "Linkz", xeraen_linkz_path, class: "tui-button" %>
+        </div>
+      </fieldset>
     </div>
 
-    <div class="ml-2 mb-10 pb-20">
+    <br>
+
+    <div class="ml-10 mb-20 pb-50">
       <%= yield %>
     </div>
 
