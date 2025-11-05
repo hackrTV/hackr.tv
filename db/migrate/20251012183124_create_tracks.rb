@@ -17,7 +17,7 @@ class CreateTracks < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :tracks, [ :artist_id, :slug ], unique: true
+    add_index :tracks, [:artist_id, :slug], unique: true
     add_index :tracks, :featured
     add_index :tracks, :release_date
   end

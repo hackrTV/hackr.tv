@@ -19,8 +19,8 @@ namespace :import do
     puts "\n--- Importing Artists ---\n"
 
     artists_data = [
-      { name: "The.CyberPul.se", slug: "thecyberpulse" },
-      { name: "XERAEN", slug: "xeraen" }
+      {name: "The.CyberPul.se", slug: "thecyberpulse"},
+      {name: "XERAEN", slug: "xeraen"}
     ]
 
     created_count = 0
@@ -34,14 +34,12 @@ namespace :import do
         artist.save!
         created_count += 1
         puts "  ✓ Created artist: #{artist.name} (#{artist.slug})"
+      elsif artist.name != artist_data[:name]
+        artist.update!(name: artist_data[:name])
+        updated_count += 1
+        puts "  ↻ Updated artist: #{artist.name} (#{artist.slug})"
       else
-        if artist.name != artist_data[:name]
-          artist.update!(name: artist_data[:name])
-          updated_count += 1
-          puts "  ↻ Updated artist: #{artist.name} (#{artist.slug})"
-        else
-          puts "  ✓ Artist exists: #{artist.name} (#{artist.slug})"
-        end
+        puts "  ✓ Artist exists: #{artist.name} (#{artist.slug})"
       end
     end
 
@@ -51,15 +49,15 @@ namespace :import do
     puts "  Total:   #{Artist.count}"
   end
 
-  desc "Import track data from YAML files in ../hackr.tv/data directory"
+  desc "Import track data from YAML files in data directory"
   task tracks: :environment do
     puts "\n--- Importing Tracks from YAML ---\n"
 
-    source_dir = File.join(Rails.root, "..", "hackr.tv", "data")
+    source_dir = File.join(Rails.root, "data")
 
     unless Dir.exist?(source_dir)
       puts "  ✗ Error: Source directory #{source_dir} not found"
-      puts "  Please ensure the Sinatra app is located at ~/dev/hackr.tv"
+      puts "  Please ensure the data directory exists at the project root"
       next
     end
 
@@ -68,7 +66,7 @@ namespace :import do
     skipped_count = 0
     error_count = 0
 
-    artists = [ "xeraen", "thecyberpulse" ]
+    artists = ["xeraen", "thecyberpulse"]
 
     artists.each do |artist_slug|
       artist_dir = File.join(source_dir, artist_slug)
@@ -184,16 +182,16 @@ namespace :import do
     # Map domains to their redirect sets
     redirect_mappings = [
       # Ashlinn redirects
-      { domain: "ashlinn.net", redirects: ashlinn_redirects },
+      {domain: "ashlinn.net", redirects: ashlinn_redirects},
 
       # XERAEN/Rockerboy redirects
-      { domain: "xeraen.com", redirects: xeraen_redirects },
-      { domain: "xeraen.net", redirects: xeraen_redirects },
-      { domain: "rockerboy.net", redirects: xeraen_redirects },
-      { domain: "rockerboy.stream", redirects: xeraen_redirects },
+      {domain: "xeraen.com", redirects: xeraen_redirects},
+      {domain: "xeraen.net", redirects: xeraen_redirects},
+      {domain: "rockerboy.net", redirects: xeraen_redirects},
+      {domain: "rockerboy.stream", redirects: xeraen_redirects},
 
       # Sector X redirects
-      { domain: "sectorx.media", redirects: sector_x_redirects }
+      {domain: "sectorx.media", redirects: sector_x_redirects}
     ]
 
     redirect_mappings.each do |mapping|
@@ -208,15 +206,13 @@ namespace :import do
           redirect.save!
           created_count += 1
           puts "  ✓ Created: #{domain}#{path} → #{destination_url}"
+        elsif redirect.destination_url != destination_url
+          redirect.update!(destination_url: destination_url)
+          updated_count += 1
+          puts "  ↻ Updated: #{domain}#{path} → #{destination_url}"
         else
-          if redirect.destination_url != destination_url
-            redirect.update!(destination_url: destination_url)
-            updated_count += 1
-            puts "  ↻ Updated: #{domain}#{path} → #{destination_url}"
-          else
-            skipped_count += 1
-            puts "  ✓ Exists: #{domain}#{path} → #{destination_url}"
-          end
+          skipped_count += 1
+          puts "  ✓ Exists: #{domain}#{path} → #{destination_url}"
         end
       end
     end
@@ -231,7 +227,7 @@ namespace :import do
   desc "Clear all imported data (DANGEROUS - use with caution)"
   task clear: :environment do
     print "\n⚠️  WARNING: This will delete ALL artists, tracks, and redirects. Continue? (y/N): "
-    response = STDIN.gets.chomp.downcase
+    response = $stdin.gets.chomp.downcase
 
     if response == "y"
       puts "\nClearing data..."
