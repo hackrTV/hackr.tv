@@ -8,6 +8,6 @@ class CreateRedirects < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :redirects, [:domain, :path], unique: true
+    add_index :redirects, [ :domain, :path ], unique: true
   end
 end

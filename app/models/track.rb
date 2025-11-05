@@ -6,7 +6,7 @@ class Track < ApplicationRecord
   serialize :videos, coder: JSON
 
   validates :title, presence: true
-  validates :slug, presence: true, uniqueness: {scope: :artist_id}
+  validates :slug, presence: true, uniqueness: { scope: :artist_id }
 
   # Scopes matching Sinatra logic
   scope :featured, -> { where(featured: true) }

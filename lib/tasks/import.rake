@@ -68,7 +68,7 @@ namespace :import do
     skipped_count = 0
     error_count = 0
 
-    artists = ["xeraen", "thecyberpulse"]
+    artists = [ "xeraen", "thecyberpulse" ]
 
     artists.each do |artist_slug|
       artist_dir = File.join(source_dir, artist_slug)
