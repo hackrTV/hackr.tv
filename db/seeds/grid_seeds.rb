@@ -3,10 +3,11 @@ puts "Seeding THE PULSE GRID..."
 # Clear existing data
 GridMessage.destroy_all
 GridItem.destroy_all
-GridNpc.destroy_all
+GridMob.destroy_all
 GridExit.destroy_all
 GridHackr.destroy_all
 GridRoom.destroy_all
+GridZone.destroy_all
 GridFaction.destroy_all
 
 # Create factions
@@ -140,24 +141,24 @@ GridItem.create!(
 
 puts "Created 3 items"
 
-# Create NPCs
-GridNpc.create!(
+# Create Mobs
+GridMob.create!(
   grid_room: hackr_tv,
   grid_faction: cyberpulse_faction,
   name: "Resistance Coordinator",
   description: "A tired but determined operative managing the hackr.tv station.",
-  npc_type: "quest_giver"
+  mob_type: "quest_giver"
 )
 
-GridNpc.create!(
+GridMob.create!(
   grid_room: xeraen_base,
   grid_faction: xeraen_faction,
   name: "Temporal Theorist",
   description: "A scientist studying the paradoxes of time travel and resistance.",
-  npc_type: "lore"
+  mob_type: "lore"
 )
 
-puts "Created 2 NPCs"
+puts "Created 2 mobs"
 
 # Create admin hackrs
 GridHackr.create!(

@@ -77,11 +77,11 @@ module Grid
         output << "Items: #{items.map(&:name).join(", ")}"
       end
 
-      # Show NPCs
-      npcs = room.grid_npcs
-      if npcs.any?
+      # Show Mobs
+      mobs = room.grid_mobs
+      if mobs.any?
         output << ""
-        output << "NPCs: #{npcs.map(&:name).join(", ")}"
+        output << "Mobs: #{mobs.map(&:name).join(", ")}"
       end
 
       # Show other hackrs
@@ -170,9 +170,9 @@ module Grid
       item = hackr.grid_items.find_by("LOWER(name) = ?", target.downcase)
       return item.description if item
 
-      # Check NPCs
-      npc = room.grid_npcs.find_by("LOWER(name) = ?", target.downcase)
-      return npc.description if npc
+      # Check Mobs
+      mob = room.grid_mobs.find_by("LOWER(name) = ?", target.downcase)
+      return mob.description if mob
 
       "You don't see '#{target}' here."
     end

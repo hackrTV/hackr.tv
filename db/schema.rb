@@ -73,11 +73,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_06_033629) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "grid_npcs", force: :cascade do |t|
+  create_table "grid_mobs", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.integer "grid_room_id"
-    t.string "npc_type"
+    t.string "mob_type"
     t.json "dialogue_tree"
     t.integer "grid_faction_id"
     t.datetime "created_at", null: false

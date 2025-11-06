@@ -4,7 +4,7 @@ class GridRoom < ApplicationRecord
   has_many :exits_from, class_name: "GridExit", foreign_key: :from_room_id, dependent: :destroy
   has_many :exits_to, class_name: "GridExit", foreign_key: :to_room_id, dependent: :destroy
   has_many :grid_items, foreign_key: :room_id
-  has_many :grid_npcs
+  has_many :grid_mobs
   has_many :grid_hackrs, foreign_key: :current_room_id
 
   validates :name, presence: true
