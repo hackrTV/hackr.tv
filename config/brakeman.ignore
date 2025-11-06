@@ -1,0 +1,29 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "3265b244d0b7f747e576938d16f0421d18cf4ec48d763ab50a9e0f7d8a71859b",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/application_controller.rb",
+      "line": 16,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Redirect.find_for(request.host, request.path).destination_url, :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ApplicationController",
+        "method": "check_for_redirect"
+      },
+      "user_input": "Redirect.find_for(request.host, request.path).destination_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "This redirect is intentional and safe. The destination URLs come from our controlled database (Redirect model), not from user input. We use allow_other_host: true because we intentionally redirect to external domains (e.g., YouTube for artist pages). The Redirect.find_for method only queries our database with sanitized inputs."
+    }
+  ],
+  "updated": "2025-11-06 00:00:00 +0000",
+  "brakeman_version": "7.1.1"
+}

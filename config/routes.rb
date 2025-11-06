@@ -18,6 +18,15 @@ Rails.application.routes.draw do
   get "trackz", to: "tracks#index", as: :tracks
   get "trackz/:id", to: "tracks#show", as: :track
 
+  # THE PULSE GRID routes
+  get "grid", to: "grid#index", as: :grid
+  get "grid/login", to: "grid#login", as: :grid_login
+  post "grid/login", to: "grid#create_session"
+  get "grid/register", to: "grid#register", as: :grid_register
+  post "grid/register", to: "grid#create_hackr"
+  delete "grid/logout", to: "grid#logout", as: :grid_logout
+  post "grid/command", to: "grid#command", as: :grid_command
+
   # Development-only error page testing routes
   if Rails.env.development?
     get "test/404", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }
