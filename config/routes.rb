@@ -17,4 +17,13 @@ Rails.application.routes.draw do
   # The Cyber Pulse tracks (default artist)
   get "trackz", to: "tracks#index", as: :tracks
   get "trackz/:id", to: "tracks#show", as: :track
+
+  # Development-only error page testing routes
+  if Rails.env.development?
+    get "test/404", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }
+    get "test/500", to: proc { |env| [500, {}, [File.read(Rails.public_path.join("500.html"))]] }
+  end
+
+  # Catch-all route for 404s (must be last)
+  match "*path", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }, via: :all
 end

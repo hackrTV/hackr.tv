@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
 
   def check_for_redirect
     redirect_record = Redirect.find_for(request.host, request.path)
-    redirect_to redirect_record.destination_url if redirect_record
+    redirect_to redirect_record.destination_url, allow_other_host: true if redirect_record
   end
 
   def check_for_domain_redirect
