@@ -1,0 +1,49 @@
+<div class="tui-window cyan-168 white-text" style="max-width: 600px; margin: 50px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">THE PULSE GRID :: ACCESS</legend>
+
+    <% if flash[:error] %>
+      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p class="red-255-text" style="margin: 0; font-weight: bold;">⚠ ERROR</p>
+        <p class="white-text" style="margin: 5px 0 0 0;"><%= flash[:error] %></p>
+      </div>
+    <% end %>
+
+    <% if flash[:notice] %>
+      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p class="green-255-text" style="margin: 0; font-weight: bold;">ℹ NOTICE</p>
+        <p class="white-text" style="margin: 5px 0 0 0;"><%= flash[:notice] %></p>
+      </div>
+    <% end %>
+
+    <div class="center" style="margin: 30px 0;">
+      <h1 class="cyan-255-text" style="font-size: 2.5em; letter-spacing: 0.1em; margin: 0;">
+        THE GRID
+      </h1>
+      <p style="margin: 10px 0; font-size: 1.2em;">RESISTANCE LOGIN</p>
+    </div>
+
+    <%= form_with url: grid_login_path, method: :post, local: true do |f| %>
+      <div style="margin-bottom: 20px;">
+        <%= f.label :hackr_alias, "HACKR ALIAS", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.05em;" %>
+        <%= f.text_field :hackr_alias, class: "tui-input", placeholder: "Enter your alias", required: true, autofocus: true, style: "width: 100%;" %>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <%= f.label :password, "PASSWORD", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.05em;" %>
+        <%= f.password_field :password, class: "tui-input", placeholder: "Enter password", required: true, style: "width: 100%;" %>
+      </div>
+
+      <div class="center" style="margin: 30px 0;">
+        <%= f.submit "CONNECT", class: "tui-button purple-168", style: "font-size: 1.1em; padding: 10px 30px;" %>
+      </div>
+    <% end %>
+
+    <hr style="border-color: #00ffff; margin: 30px 0;">
+
+    <div class="center" style="margin: 20px 0;">
+      <p class="white-text" style="margin-bottom: 10px;">NEW TO THE RESISTANCE?</p>
+      <%= link_to "REGISTER AS HACKR", grid_register_path, class: "tui-button green-168" %>
+    </div>
+  </fieldset>
+</div>

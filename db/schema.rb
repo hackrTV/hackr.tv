@@ -10,13 +10,99 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_12_183131) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_06_033629) do
   create_table "artists", force: :cascade do |t|
     t.string "name"
     t.string "slug"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_artists_on_slug", unique: true
+  end
+
+  create_table "grid_exits", force: :cascade do |t|
+    t.integer "from_room_id"
+    t.integer "to_room_id"
+    t.string "direction"
+    t.boolean "locked"
+    t.integer "requires_item_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["from_room_id"], name: "index_grid_exits_on_from_room_id"
+    t.index ["to_room_id"], name: "index_grid_exits_on_to_room_id"
+  end
+
+  create_table "grid_factions", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.text "description"
+    t.string "color_scheme"
+    t.integer "artist_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "grid_hackrs", force: :cascade do |t|
+    t.string "hackr_alias"
+    t.string "password_digest"
+    t.integer "current_room_id"
+    t.string "role"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hackr_alias"], name: "index_grid_hackrs_on_hackr_alias", unique: true
+    t.index ["role"], name: "index_grid_hackrs_on_role"
+  end
+
+  create_table "grid_items", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "item_type"
+    t.integer "room_id"
+    t.integer "grid_hackr_id"
+    t.json "properties"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "grid_messages", force: :cascade do |t|
+    t.integer "grid_hackr_id"
+    t.integer "room_id"
+    t.string "message_type"
+    t.text "content"
+    t.integer "target_hackr_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "grid_npcs", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.integer "grid_room_id"
+    t.string "npc_type"
+    t.json "dialogue_tree"
+    t.integer "grid_faction_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "grid_rooms", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.integer "grid_zone_id", null: false
+    t.string "room_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_zone_id"], name: "index_grid_rooms_on_grid_zone_id"
+  end
+
+  create_table "grid_zones", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.text "description"
+    t.string "zone_type"
+    t.string "color_scheme"
+    t.integer "grid_faction_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "redirects", force: :cascade do |t|

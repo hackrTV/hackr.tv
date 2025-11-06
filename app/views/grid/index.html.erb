@@ -1,0 +1,86 @@
+<div class="tui-window purple-168 white-text" style="max-width: 1200px; margin: 20px auto;">
+  <fieldset class="purple-168-border">
+    <legend class="center">THE PULSE GRID :: <%= current_hackr.hackr_alias.upcase %></legend>
+
+    <div class="tui-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <span class="purple-255-text">HACKR:</span> <%= current_hackr.hackr_alias %>
+          <% if current_hackr.admin? %>
+            <span class="red-255-text">[ADMIN]</span>
+          <% end %>
+        </div>
+        <div>
+          <%= button_to "DISCONNECT", grid_logout_path, method: :delete, class: "tui-button red-168", data: { confirm: "Disconnect from THE PULSE GRID?" } %>
+        </div>
+      </div>
+
+      <hr class="purple-168" />
+
+      <!-- Game Output Window -->
+      <div class="tui-fieldset">
+        <legend>GRID STATUS</legend>
+        <div id="game-output" style="font-family: monospace; white-space: pre-wrap; min-height: 400px; max-height: 600px; overflow-y: auto; padding: 10px; background: black;">
+          <% if flash[:command_output] %>
+            <%= flash[:command_output] %>
+          <% elsif @current_room %>
+            <%= Grid::CommandParser.new(current_hackr, "look").execute %>
+          <% else %>
+            <span class="red-255-text">ERROR: No current room assigned. Contact system admin.</span>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Command Input -->
+      <div class="tui-fieldset" style="margin-top: 20px;">
+        <legend>COMMAND INPUT</legend>
+        <%= form_with url: grid_command_path, method: :post, id: "command-form", data: { remote: true } do |f| %>
+          <div style="display: flex; gap: 10px;">
+            <%= f.text_field :input, class: "tui-input", placeholder: "Enter command (type 'help' for commands)", autofocus: true, autocomplete: "off", style: "flex: 1;" %>
+            <%= f.submit "EXECUTE", class: "tui-button purple-168" %>
+          </div>
+        <% end %>
+        <div style="margin-top: 10px;">
+          <small class="gray-text">
+            Quick commands: look, go [direction], take [item], drop [item], say [message], inventory, who, help
+          </small>
+        </div>
+      </div>
+
+      <!-- Recent Messages (if available) -->
+      <% if @messages&.any? %>
+        <div class="tui-fieldset" style="margin-top: 20px;">
+          <legend>RECENT TRANSMISSIONS</legend>
+          <div style="font-family: monospace; font-size: 0.9em; max-height: 150px; overflow-y: auto; padding: 10px; background: black;">
+            <% @messages.reverse.each do |message| %>
+              <div class="<%= message.message_type == 'system' ? 'cyan-255-text' : 'white-text' %>">
+                [<%= message.created_at.strftime("%H:%M") %>]
+                <% if message.grid_hackr %>
+                  <span class="purple-255-text"><%= message.grid_hackr.hackr_alias %></span>:
+                <% end %>
+                <%= message.content %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<script>
+  // Handle AJAX command submission
+  document.getElementById('command-form').addEventListener('ajax:success', function(event) {
+    const [data, status, xhr] = event.detail;
+    const output = document.getElementById('game-output');
+    output.textContent = data.output;
+    output.scrollTop = output.scrollHeight;
+
+    // Clear input
+    document.querySelector('#command-form input[name="input"]').value = '';
+  });
+
+  document.getElementById('command-form').addEventListener('ajax:error', function(event) {
+    alert('Command execution failed. Please try again.');
+  });
+</script>
