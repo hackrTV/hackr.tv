@@ -21,11 +21,13 @@ module GridAuthentication
 
   def log_in(hackr)
     session[:grid_hackr_id] = hackr.id
+    cookies.encrypted[:grid_hackr_id] = hackr.id  # For Action Cable authentication
     @current_hackr = hackr
   end
 
   def log_out
     session.delete(:grid_hackr_id)
+    cookies.delete(:grid_hackr_id)
     @current_hackr = nil
   end
 

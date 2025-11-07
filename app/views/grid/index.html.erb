@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/npm/@rails/actioncable@7.1.0/app/assets/javascripts/actioncable.min.js"></script>
+
 <div class="tui-window" style="max-width: 1200px; margin: 20px auto; background: #1a1a1a; color: #d0d0d0; border: 2px solid #8b5cf6;">
   <fieldset style="border-color: #8b5cf6;">
     <legend class="center" style="color: #a78bfa;">THE PULSE GRID :: <%= current_hackr.hackr_alias.upcase %></legend>
@@ -24,7 +26,15 @@
           <% if flash[:command_output] %>
             <%= flash[:command_output] %>
           <% elsif @current_room %>
-            <%= Grid::CommandParser.new(current_hackr, "look").execute %>
+            <div style="color: #a78bfa; margin-bottom: 1em;">
+════════════════════════════════════════════════════════════════
+  WELCOME TO THE PULSE GRID
+════════════════════════════════════════════════════════════════
+Connection established. Output will scroll continuously.
+Type 'help' for commands. Type 'clear' to clear the screen.
+════════════════════════════════════════════════════════════════
+            </div>
+            <%= Grid::CommandParser.new(current_hackr, "look").execute[:output] %>
           <% else %>
             <span style="color: #f87171;">ERROR: No current room assigned. Contact system admin.</span>
           <% end %>
@@ -34,7 +44,7 @@
       <!-- Command Input -->
       <div class="tui-fieldset" style="margin-top: 20px; border-color: #4b5563;">
         <legend style="color: #a78bfa;">COMMAND INPUT</legend>
-        <%= form_with url: grid_command_path, method: :post, id: "command-form", data: { remote: true } do |f| %>
+        <%= form_with url: grid_command_path, method: :post, id: "command-form" do |f| %>
           <div style="display: flex; gap: 10px;">
             <%= f.text_field :input, class: "tui-input", placeholder: "Enter command (type 'help' for commands)", autofocus: true, autocomplete: "off", style: "flex: 1; background: #262626; color: #e0e0e0; border: 1px solid #4b5563;" %>
             <%= f.submit "EXECUTE", class: "tui-button", style: "background: #7c3aed; color: white;" %>
@@ -42,7 +52,7 @@
         <% end %>
         <div style="margin-top: 10px;">
           <small style="color: #9ca3af;">
-            Quick commands: look, go [direction], take [item], drop [item], say [message], inventory, who, help
+            Quick commands: look, go [direction], take [item], drop [item], say [message], inventory, who, clear, help
           </small>
         </div>
       </div>
@@ -69,18 +79,167 @@
 </div>
 
 <script>
-  // Handle AJAX command submission
-  document.getElementById('command-form').addEventListener('ajax:success', function(event) {
-    const [data, status, xhr] = event.detail;
-    const output = document.getElementById('game-output');
-    output.textContent = data.output;
-    output.scrollTop = output.scrollHeight;
+  // Global variables for Action Cable
+  let cable;
+  let currentSubscription;
+  let currentRoomId = <%= current_hackr.current_room&.id || 'null' %>;
+  const currentHackr = '<%= current_hackr.hackr_alias %>';
 
-    // Clear input
-    document.querySelector('#command-form input[name="input"]').value = '';
-  });
+  // Helper function to get opposite direction
+  function oppositeDirection(dir) {
+    const opposites = {
+      'north': 'south',
+      'south': 'north',
+      'east': 'west',
+      'west': 'east',
+      'up': 'down',
+      'down': 'up'
+    };
+    return opposites[dir] || dir;
+  }
 
-  document.getElementById('command-form').addEventListener('ajax:error', function(event) {
-    alert('Command execution failed. Please try again.');
+  // Function to subscribe to GridChannel
+  function subscribeToRoom() {
+    // Unsubscribe from previous subscription if exists
+    if (currentSubscription) {
+      console.log("Unsubscribing from previous room");
+      cable.subscriptions.remove(currentSubscription);
+    }
+
+    // Create new subscription
+    currentSubscription = cable.subscriptions.create("GridChannel", {
+      connected() {
+        console.log("Connected to GridChannel for room " + currentRoomId);
+      },
+
+      disconnected() {
+        console.log("Disconnected from GridChannel");
+      },
+
+      received(data) {
+        console.log("Received Action Cable data:", data);
+
+        // Don't show your own events
+        if (data.hackr_alias === currentHackr) {
+          console.log("Skipping own event");
+          return;
+        }
+
+        const output = document.getElementById('game-output');
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+        let message = '';
+
+        // Handle different event types
+        switch(data.type) {
+          case 'say':
+            console.log("Handling say event:", data.message);
+            message = `\n<span style="color: #a78bfa;">[${data.hackr_alias}]</span>: ${data.message}`;
+            break;
+
+          case 'movement':
+            // Check if hackr entered or left current room
+            if (data.to_room_id === currentRoomId) {
+              message = `\n<span style="color: #22d3ee;">[${timestamp}] ${data.hackr_alias} enters from the ${oppositeDirection(data.direction)}.</span>`;
+            } else if (data.from_room_id === currentRoomId) {
+              message = `\n<span style="color: #22d3ee;">[${timestamp}] ${data.hackr_alias} leaves to the ${data.direction}.</span>`;
+            }
+            break;
+
+          case 'take':
+            message = `\n<span style="color: #fbbf24;">[${timestamp}] ${data.hackr_alias} takes the ${data.item_name}.</span>`;
+            break;
+
+          case 'drop':
+            message = `\n<span style="color: #fbbf24;">[${timestamp}] ${data.hackr_alias} drops the ${data.item_name}.</span>`;
+            break;
+        }
+
+        // Append message if not empty
+        if (message) {
+          const messageDiv = document.createElement('div');
+          messageDiv.innerHTML = message;
+          output.appendChild(messageDiv);
+          output.scrollTop = output.scrollHeight;
+        }
+      }
+    });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create Action Cable consumer
+    cable = ActionCable.createConsumer();
+
+    // Subscribe to initial room
+    subscribeToRoom();
+
+    // Handle form submission manually for AJAX
+    document.getElementById('command-form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent normal form submission
+
+      const form = event.target;
+      const output = document.getElementById('game-output');
+      const inputField = form.querySelector('input[name="input"]');
+      const command = inputField.value;
+
+      // Check if this is a clear command
+      if (command.trim().toLowerCase() === 'clear' || command.trim().toLowerCase() === 'cls') {
+        output.innerHTML = '';
+        inputField.value = '';
+        return;
+      }
+
+      // Echo the command in cyan
+      if (command.trim()) {
+        const commandEcho = document.createElement('div');
+        commandEcho.innerHTML = `<span style="color: #22d3ee;">&gt; ${command}</span>`;
+        output.appendChild(commandEcho);
+      }
+
+      // Get CSRF token
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+      // Submit via fetch
+      fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ input: command })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Append the output (if not empty)
+        if (data.output && data.output.trim()) {
+          const resultDiv = document.createElement('div');
+          resultDiv.textContent = data.output;
+          resultDiv.style.marginBottom = '1em';
+          output.appendChild(resultDiv);
+        }
+
+        // Auto-scroll to bottom
+        output.scrollTop = output.scrollHeight;
+
+        // Check if room changed and resubscribe if needed
+        if (data.room_id && data.room_id !== currentRoomId) {
+          console.log("Room changed from " + currentRoomId + " to " + data.room_id + " - resubscribing...");
+          currentRoomId = data.room_id;
+          subscribeToRoom();
+        }
+
+        // Clear input
+        inputField.value = '';
+        inputField.focus();
+      })
+      .catch(error => {
+        console.error('Command execution failed:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.innerHTML = '<span style="color: #f87171;">Error: Command execution failed. Please try again.</span>';
+        output.appendChild(errorDiv);
+        output.scrollTop = output.scrollHeight;
+      });
+    });
   });
 </script>
