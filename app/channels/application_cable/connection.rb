@@ -9,7 +9,7 @@ module ApplicationCable
     private
 
     def find_verified_hackr
-      if verified_hackr = GridHackr.find_by(id: cookies.encrypted[:grid_hackr_id])
+      if (verified_hackr = GridHackr.find_by(id: cookies.encrypted[:grid_hackr_id]))
         verified_hackr
       else
         reject_unauthorized_connection
