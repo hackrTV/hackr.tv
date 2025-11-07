@@ -64,12 +64,32 @@ class GridController < ApplicationController
 
   # POST /grid/command - Execute game command
   def command
+    Rails.logger.info "=== COMMAND RECEIVED: #{params[:input]} from #{current_hackr.hackr_alias} ==="
+
     result = Grid::CommandParser.new(current_hackr, params[:input]).execute
+    output = result[:output]
+    event = result[:event]
+
+    Rails.logger.info "=== EVENT: #{event.inspect} ==="
+
+    # Broadcast event to affected rooms
+    if event
+      case event[:type]
+      when "movement"
+        # Broadcast to both old and new rooms
+        broadcast_event(GridRoom.find(event[:from_room_id]), event) if event[:from_room_id]
+        broadcast_event(GridRoom.find(event[:to_room_id]), event) if event[:to_room_id]
+      when "say", "take", "drop"
+        # Broadcast to current room
+        Rails.logger.info "=== Broadcasting #{event[:type]} to room #{current_hackr.current_room&.id} ==="
+        broadcast_event(current_hackr.current_room, event)
+      end
+    end
 
     respond_to do |format|
-      format.json { render json: {output: result, success: true} }
+      format.json { render json: {output: output, success: true, room_id: current_hackr.current_room&.id} }
       format.html do
-        flash.now[:command_output] = result
+        flash.now[:command_output] = output
         render :index
       end
     end
@@ -79,5 +99,13 @@ class GridController < ApplicationController
 
   def hackr_params
     params.require(:grid_hackr).permit(:hackr_alias, :password, :password_confirmation)
+  end
+
+  def broadcast_event(room, event)
+    return unless room
+
+    Rails.logger.info "=== BROADCASTING to room #{room.id} (#{room.name}): #{event.inspect} ==="
+    GridChannel.broadcast_to(room, event)
+    Rails.logger.info "=== BROADCAST COMPLETE ==="
   end
 end

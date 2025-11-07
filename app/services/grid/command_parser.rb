@@ -1,18 +1,22 @@
 module Grid
   class CommandParser
-    attr_reader :hackr, :input
+    attr_reader :hackr, :input, :event
 
     def initialize(hackr, input)
       @hackr = hackr
       @input = input.to_s.strip
+      @event = nil
     end
 
     def execute
-      return "Please enter a command." if input.empty?
+      return {output: "Please enter a command.", event: nil} if input.empty?
 
-      command, *args = input.downcase.split
+      # Split input but preserve case in arguments
+      parts = input.split
+      command = parts.first&.downcase
+      args = parts[1..]
 
-      case command
+      result = case command
       when "look", "l"
         look_command
       when "go", "move"
@@ -43,9 +47,14 @@ module Grid
         help_command
       when "who"
         who_command
+      when "clear", "cls"
+        clear_command
       else
         "Unknown command: #{command}. Type 'help' for a list of commands."
       end
+
+      # Normalize result to hash format
+      result.is_a?(Hash) ? result : {output: result, event: nil}
     end
 
     private
@@ -97,18 +106,29 @@ module Grid
     def go_command(direction)
       return "Go where? Specify a direction: north, south, east, west, up, down" unless direction
 
-      room = hackr.current_room
-      return "You are nowhere!" unless room
+      old_room = hackr.current_room
+      return "You are nowhere!" unless old_room
 
-      exit = room.exits_from.find_by(direction: direction)
+      exit = old_room.exits_from.find_by(direction: direction)
       return "You can't go #{direction} from here." unless exit
 
       if exit.locked
         return "The exit is locked." unless exit.requires_item && hackr.grid_items.exists?(exit.requires_item_id)
       end
 
-      hackr.update!(current_room: exit.to_room)
-      look_command
+      new_room = exit.to_room
+      hackr.update!(current_room: new_room)
+
+      {
+        output: look_command,
+        event: {
+          type: "movement",
+          hackr_alias: hackr.hackr_alias,
+          direction: direction,
+          from_room_id: old_room.id,
+          to_room_id: new_room.id
+        }
+      }
     end
 
     def say_command(message)
@@ -121,7 +141,15 @@ module Grid
         content: message
       )
 
-      "[#{hackr.hackr_alias}]: #{message}"
+      {
+        output: "[#{hackr.hackr_alias}]: #{message}",
+        event: {
+          type: "say",
+          hackr_alias: hackr.hackr_alias,
+          message: message,
+          room_id: hackr.current_room&.id
+        }
+      }
     end
 
     def inventory_command
@@ -143,7 +171,16 @@ module Grid
       return "You don't see '#{item_name}' here." unless item
 
       item.update!(grid_hackr: hackr, room: nil)
-      "You take the #{item.name}."
+
+      {
+        output: "You take the #{item.name}.",
+        event: {
+          type: "take",
+          hackr_alias: hackr.hackr_alias,
+          item_name: item.name,
+          room_id: room.id
+        }
+      }
     end
 
     def drop_command(item_name)
@@ -152,8 +189,18 @@ module Grid
       item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
       return "You don't have '#{item_name}'." unless item
 
-      item.update!(room: hackr.current_room, grid_hackr: nil)
-      "You drop the #{item.name}."
+      room = hackr.current_room
+      item.update!(room: room, grid_hackr: nil)
+
+      {
+        output: "You drop the #{item.name}.",
+        event: {
+          type: "drop",
+          hackr_alias: hackr.hackr_alias,
+          item_name: item.name,
+          room_id: room.id
+        }
+      }
     end
 
     def examine_command(target)
@@ -198,7 +245,8 @@ module Grid
           say <message>           - Say something in the room
           who                     - See who's online
 
-        Help:
+        Utility:
+          clear, cls              - Clear the screen
           help, ?                 - Show this help message
       HELP
     end
@@ -210,6 +258,13 @@ module Grid
       else
         "No hackrs are currently online."
       end
+    end
+
+    def clear_command
+      {
+        output: "",
+        event: {type: "clear"}
+      }
     end
   end
 end
