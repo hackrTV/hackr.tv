@@ -1,47 +1,47 @@
-<div class="tui-window purple-168 white-text" style="max-width: 1200px; margin: 20px auto;">
-  <fieldset class="purple-168-border">
-    <legend class="center">THE PULSE GRID :: <%= current_hackr.hackr_alias.upcase %></legend>
+<div class="tui-window" style="max-width: 1200px; margin: 20px auto; background: #1a1a1a; color: #d0d0d0; border: 2px solid #8b5cf6;">
+  <fieldset style="border-color: #8b5cf6;">
+    <legend class="center" style="color: #a78bfa;">THE PULSE GRID :: <%= current_hackr.hackr_alias.upcase %></legend>
 
     <div class="tui-panel">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div>
-          <span class="purple-255-text">HACKR:</span> <%= current_hackr.hackr_alias %>
+          <span style="color: #a78bfa;">HACKR:</span> <span style="color: #e0e0e0;"><%= current_hackr.hackr_alias %></span>
           <% if current_hackr.admin? %>
-            <span class="red-255-text">[ADMIN]</span>
+            <span style="color: #f87171;">[ADMIN]</span>
           <% end %>
         </div>
         <div>
-          <%= button_to "DISCONNECT", grid_logout_path, method: :delete, class: "tui-button red-168", data: { confirm: "Disconnect from THE PULSE GRID?" } %>
+          <%= button_to "DISCONNECT", grid_logout_path, method: :delete, class: "tui-button", style: "background: #dc2626; color: white;", data: { confirm: "Disconnect from THE PULSE GRID?" } %>
         </div>
       </div>
 
-      <hr class="purple-168" />
+      <hr style="border-color: #4b5563;" />
 
       <!-- Game Output Window -->
-      <div class="tui-fieldset">
-        <legend>GRID STATUS</legend>
-        <div id="game-output" style="font-family: monospace; white-space: pre-wrap; min-height: 400px; max-height: 600px; overflow-y: auto; padding: 10px; background: black;">
+      <div class="tui-fieldset" style="border-color: #4b5563;">
+        <legend style="color: #a78bfa;">GRID STATUS</legend>
+        <div id="game-output" style="font-family: monospace; white-space: pre-wrap; min-height: 400px; max-height: 600px; overflow-y: auto; padding: 15px; background: #0d0d0d; color: #d0d0d0; border-radius: 4px;">
           <% if flash[:command_output] %>
             <%= flash[:command_output] %>
           <% elsif @current_room %>
             <%= Grid::CommandParser.new(current_hackr, "look").execute %>
           <% else %>
-            <span class="red-255-text">ERROR: No current room assigned. Contact system admin.</span>
+            <span style="color: #f87171;">ERROR: No current room assigned. Contact system admin.</span>
           <% end %>
         </div>
       </div>
 
       <!-- Command Input -->
-      <div class="tui-fieldset" style="margin-top: 20px;">
-        <legend>COMMAND INPUT</legend>
+      <div class="tui-fieldset" style="margin-top: 20px; border-color: #4b5563;">
+        <legend style="color: #a78bfa;">COMMAND INPUT</legend>
         <%= form_with url: grid_command_path, method: :post, id: "command-form", data: { remote: true } do |f| %>
           <div style="display: flex; gap: 10px;">
-            <%= f.text_field :input, class: "tui-input", placeholder: "Enter command (type 'help' for commands)", autofocus: true, autocomplete: "off", style: "flex: 1;" %>
-            <%= f.submit "EXECUTE", class: "tui-button purple-168" %>
+            <%= f.text_field :input, class: "tui-input", placeholder: "Enter command (type 'help' for commands)", autofocus: true, autocomplete: "off", style: "flex: 1; background: #262626; color: #e0e0e0; border: 1px solid #4b5563;" %>
+            <%= f.submit "EXECUTE", class: "tui-button", style: "background: #7c3aed; color: white;" %>
           </div>
         <% end %>
         <div style="margin-top: 10px;">
-          <small class="gray-text">
+          <small style="color: #9ca3af;">
             Quick commands: look, go [direction], take [item], drop [item], say [message], inventory, who, help
           </small>
         </div>
@@ -49,14 +49,14 @@
 
       <!-- Recent Messages (if available) -->
       <% if @messages&.any? %>
-        <div class="tui-fieldset" style="margin-top: 20px;">
-          <legend>RECENT TRANSMISSIONS</legend>
-          <div style="font-family: monospace; font-size: 0.9em; max-height: 150px; overflow-y: auto; padding: 10px; background: black;">
+        <div class="tui-fieldset" style="margin-top: 20px; border-color: #4b5563;">
+          <legend style="color: #a78bfa;">RECENT TRANSMISSIONS</legend>
+          <div style="font-family: monospace; font-size: 0.9em; max-height: 150px; overflow-y: auto; padding: 10px; background: #0d0d0d; border-radius: 4px;">
             <% @messages.reverse.each do |message| %>
-              <div class="<%= message.message_type == 'system' ? 'cyan-255-text' : 'white-text' %>">
+              <div style="color: <%= message.message_type == 'system' ? '#22d3ee' : '#d0d0d0' %>;">
                 [<%= message.created_at.strftime("%H:%M") %>]
                 <% if message.grid_hackr %>
-                  <span class="purple-255-text"><%= message.grid_hackr.hackr_alias %></span>:
+                  <span style="color: #a78bfa;"><%= message.grid_hackr.hackr_alias %></span>:
                 <% end %>
                 <%= message.content %>
               </div>
