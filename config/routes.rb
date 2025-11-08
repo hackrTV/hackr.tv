@@ -42,6 +42,6 @@ Rails.application.routes.draw do
   # Catch-all route for 404s (must be last)
   # Exclude Active Storage paths from catch-all
   match "*path", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] },
-        via: :all,
-        constraints: lambda { |req| !req.path.start_with?('/rails/active_storage') }
+    via: :all,
+    constraints: lambda { |req| !req.path.start_with?("/rails/active_storage") }
 end
