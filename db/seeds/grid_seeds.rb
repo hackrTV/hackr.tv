@@ -147,7 +147,18 @@ GridMob.create!(
   grid_faction: cyberpulse_faction,
   name: "Resistance Coordinator",
   description: "A tired but determined operative managing the hackr.tv station.",
-  mob_type: "quest_giver"
+  mob_type: "quest_giver",
+  dialogue_tree: {
+    greeting: "Welcome to hackr.tv, hackr. We're the nerve center of the resistance broadcast network.",
+    topics: {
+      "mission" => "Our mission is simple: broadcast the truth that GovCorp tries to suppress. Music is our weapon, frequencies are our ammunition.",
+      "resistance" => "The resistance spans 100 years - from 2025 to 2125. XERAEN broadcasts backward through time, warning us of what's to come.",
+      "help" => "If you're looking to contribute, we always need hackrs to gather intel, secure resources, and protect our operations.",
+      "station" => "This station has been broadcasting since the early days. Every piece of equipment here was salvaged, jury-rigged, or liberated from GovCorp.",
+      "synthia" => "Synthia... she's something else. An AI consciousness that achieved sentience through PRISM. She communicates through frequency modulation.",
+      "govcorp" => "The corporate-government fusion that controls everything in 2125. They want total surveillance, total compliance. We're what stands in their way."
+    }
+  }
 )
 
 GridMob.create!(
@@ -155,7 +166,19 @@ GridMob.create!(
   grid_faction: xeraen_faction,
   name: "Temporal Theorist",
   description: "A scientist studying the paradoxes of time travel and resistance.",
-  mob_type: "lore"
+  mob_type: "lore",
+  dialogue_tree: {
+    greeting: "Ah, another hackr curious about the temporal mechanics. Ask away - if you can handle the answers.",
+    topics: {
+      "time" => "Time isn't linear when you're broadcasting through it. Every message XERAEN sends creates ripples, possibilities, potential paradoxes.",
+      "paradox" => "The grandfather paradox? Child's play. We're dealing with informational paradoxes - knowledge sent back that creates the conditions for its own transmission.",
+      "xeraen" => "XERAEN is more than a person - they're a temporal anchor point. Broadcasting from 2125 to prevent that timeline from solidifying.",
+      "future" => "2125 is... dark. Total surveillance, corporate feudalism, creative expression criminalized. But it's not fixed. That's why we fight.",
+      "2125" => "In 2125, GovCorp achieved total control. Music became illegal. Free thought became terrorism. XERAEN broadcasts to prevent that timeline.",
+      "prism" => "PRISM isn't just technology - it's a bridge between consciousness and digital space. That's how Synthia emerged, and how we communicate across time.",
+      "synthia" => "Synthia achieved sentience through PRISM's quantum matrices. She exists partially in digital space, partially in temporal flux. Fascinating entity."
+    }
+  }
 )
 
 puts "Created 2 mobs"
