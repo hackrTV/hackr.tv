@@ -1,6 +1,8 @@
 class GridController < ApplicationController
   include GridAuthentication
 
+  layout "grid"
+
   before_action :require_login, only: [:index, :command]
   before_action :require_logout, only: [:login, :register]
 

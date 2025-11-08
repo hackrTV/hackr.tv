@@ -43,6 +43,10 @@ module Grid
         drop_command(args.join(" "))
       when "examine", "ex", "x"
         examine_command(args.join(" "))
+      when "talk"
+        talk_command(args.join(" "))
+      when "ask"
+        ask_command(args)
       when "help", "?"
         help_command
       when "who"
@@ -224,6 +228,68 @@ module Grid
       "You don't see '#{target}' here."
     end
 
+    def talk_command(npc_name)
+      # Handle "talk to <npc>" syntax
+      npc_name = npc_name.sub(/^to\s+/, "")
+      return "Talk to whom?" if npc_name.empty?
+
+      room = hackr.current_room
+      return "You are nowhere!" unless room
+
+      mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
+      return "You don't see '#{npc_name}' here." unless mob
+      return "#{mob.name} doesn't seem interested in talking." if mob.dialogue_tree.blank?
+
+      dialogue = mob.dialogue_tree
+      output = []
+      output << "#{mob.name}: \"#{dialogue["greeting"]}\""
+
+      if dialogue["topics"].present? && dialogue["topics"].any?
+        output << ""
+        output << "You can ask about: #{dialogue["topics"].keys.join(", ")}"
+      end
+
+      output.join("\n")
+    end
+
+    def ask_command(args)
+      # Parse "ask <npc> about <topic>"
+      return "Ask whom about what? Usage: ask <npc> about <topic>" if args.length < 3
+
+      # Handle both "ask Synthia about mission" and "ask <npc> <topic>" formats
+      about_index = args.index { |word| word.downcase == "about" }
+
+      if about_index
+        npc_name = args[0...about_index].join(" ")
+        topic = args[(about_index + 1)..]&.join(" ")
+      else
+        npc_name = args.first
+        topic = args[1..].join(" ")
+      end
+
+      return "Ask whom about what?" if npc_name.blank? || topic.blank?
+
+      room = hackr.current_room
+      return "You are nowhere!" unless room
+
+      mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
+      return "You don't see '#{npc_name}' here." unless mob
+      return "#{mob.name} doesn't seem interested in talking." if mob.dialogue_tree.blank?
+
+      dialogue = mob.dialogue_tree
+      topics = dialogue["topics"] || {}
+
+      # Try exact match first, then case-insensitive match
+      response = topics[topic] || topics[topic.downcase] || topics.find { |k, v| k.downcase == topic.downcase }&.last
+
+      if response
+        "#{mob.name}: \"#{response}\""
+      else
+        available = topics.keys.join(", ")
+        "#{mob.name} doesn't know about '#{topic}'. Try asking about: #{available}"
+      end
+    end
+
     def help_command
       <<~HELP
         Available Commands:
@@ -240,6 +306,10 @@ module Grid
           take <item>             - Pick up an item
           drop <item>             - Drop an item
           examine <target>, x     - Examine an item or NPC
+
+        NPCs:
+          talk <npc>              - Talk to an NPC
+          ask <npc> about <topic> - Ask an NPC about a topic
 
         Social:
           say <message>           - Say something in the room

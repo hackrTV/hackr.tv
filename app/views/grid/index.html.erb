@@ -1,81 +1,57 @@
 <script src="https://cdn.jsdelivr.net/npm/@rails/actioncable@7.1.0/app/assets/javascripts/actioncable.min.js"></script>
 
-<div class="tui-window" style="max-width: 1200px; margin: 20px auto; background: #1a1a1a; color: #d0d0d0; border: 2px solid #8b5cf6;">
-  <fieldset style="border-color: #8b5cf6;">
-    <legend class="center" style="color: #a78bfa;">THE PULSE GRID :: <%= current_hackr.hackr_alias.upcase %></legend>
+<div style="max-width: 1000px; margin: 10px auto; background: #1a1a1a; color: #d0d0d0; padding: 10px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #4b5563;">
+    <div style="font-size: 0.9em;">
+      <span style="color: #a78bfa; font-weight: bold;">THE PULSE GRID</span>
+      <span style="color: #666; margin: 0 8px;">|</span>
+      <span style="color: #e0e0e0;"><%= current_hackr.hackr_alias %></span>
+      <% if current_hackr.admin? %>
+        <span style="color: #f87171; font-size: 0.85em; margin-left: 5px;">[ADMIN]</span>
+      <% end %>
+    </div>
+    <div>
+      <%= button_to "DISCONNECT", grid_logout_path, method: :delete, style: "background: #dc2626; color: white; border: none; padding: 4px 12px; font-size: 0.85em; cursor: pointer; border-radius: 3px;", data: { confirm: "Disconnect from THE PULSE GRID?" } %>
+    </div>
+  </div>
 
-    <div class="tui-panel">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div>
-          <span style="color: #a78bfa;">HACKR:</span> <span style="color: #e0e0e0;"><%= current_hackr.hackr_alias %></span>
-          <% if current_hackr.admin? %>
-            <span style="color: #f87171;">[ADMIN]</span>
-          <% end %>
-        </div>
-        <div>
-          <%= button_to "DISCONNECT", grid_logout_path, method: :delete, class: "tui-button", style: "background: #dc2626; color: white;", data: { confirm: "Disconnect from THE PULSE GRID?" } %>
-        </div>
-      </div>
-
-      <hr style="border-color: #4b5563;" />
-
-      <!-- Game Output Window -->
-      <div class="tui-fieldset" style="border-color: #4b5563;">
-        <legend style="color: #a78bfa;">GRID STATUS</legend>
-        <div id="game-output" style="font-family: monospace; white-space: pre-wrap; min-height: 400px; max-height: 600px; overflow-y: auto; padding: 15px; background: #0d0d0d; color: #d0d0d0; border-radius: 4px;">
-          <% if flash[:command_output] %>
-            <%= flash[:command_output] %>
-          <% elsif @current_room %>
-            <div style="color: #a78bfa; margin-bottom: 1em;">
+  <!-- Game Output Window -->
+  <div id="game-output" style="font-family: monospace; font-size: 0.75em; line-height: 1.2; white-space: pre-wrap; height: 700px; overflow-y: auto; padding: 10px; background: #0d0d0d; color: #d0d0d0; border: 1px solid #4b5563; border-radius: 3px; margin-bottom: 8px;">
+    <% if flash[:command_output] %>
+      <%= flash[:command_output] %>
+    <% elsif @current_room %>
+      <div style="color: #a78bfa; font-size: 0.9em;">
 ════════════════════════════════════════════════════════════════
   WELCOME TO THE PULSE GRID
 ════════════════════════════════════════════════════════════════
-Connection established. Output will scroll continuously.
-Type 'help' for commands. Type 'clear' to clear the screen.
+Connection established. Type 'help' for commands.
 ════════════════════════════════════════════════════════════════
-            </div>
-            <%= Grid::CommandParser.new(current_hackr, "look").execute[:output] %>
-          <% else %>
-            <span style="color: #f87171;">ERROR: No current room assigned. Contact system admin.</span>
-          <% end %>
-        </div>
+   !! <span style="color:#f87171;">WARNING</span> !!
+     ~~ THE PULSE GRID IS IN PRE-ALPHA.
+     ~~ FREQUENT DATABASE FLUSHES _WILL_ OCCUR!
+     ~~ JUST RE-CREATE YOUR ACCOUNT IF YOU CANNOT LOGIN LATER
+   !! <span style="color:#f87171;">WARNING</span> !!
+════════════════════════════════════════════════════════════════
       </div>
+      <%= Grid::CommandParser.new(current_hackr, "look").execute[:output] %>
+    <% else %>
+      <span style="color: #f87171;">ERROR: No current room assigned. Contact system admin.</span>
+    <% end %>
+  </div>
 
-      <!-- Command Input -->
-      <div class="tui-fieldset" style="margin-top: 20px; border-color: #4b5563;">
-        <legend style="color: #a78bfa;">COMMAND INPUT</legend>
-        <%= form_with url: grid_command_path, method: :post, id: "command-form" do |f| %>
-          <div style="display: flex; gap: 10px;">
-            <%= f.text_field :input, class: "tui-input", placeholder: "Enter command (type 'help' for commands)", autofocus: true, autocomplete: "off", style: "flex: 1; background: #262626; color: #e0e0e0; border: 1px solid #4b5563;" %>
-            <%= f.submit "EXECUTE", class: "tui-button", style: "background: #7c3aed; color: white;" %>
-          </div>
-        <% end %>
-        <div style="margin-top: 10px;">
-          <small style="color: #9ca3af;">
-            Quick commands: look, go [direction], take [item], drop [item], say [message], inventory, who, clear, help
-          </small>
-        </div>
-      </div>
-
-      <!-- Recent Messages (if available) -->
-      <% if @messages&.any? %>
-        <div class="tui-fieldset" style="margin-top: 20px; border-color: #4b5563;">
-          <legend style="color: #a78bfa;">RECENT TRANSMISSIONS</legend>
-          <div style="font-family: monospace; font-size: 0.9em; max-height: 150px; overflow-y: auto; padding: 10px; background: #0d0d0d; border-radius: 4px;">
-            <% @messages.reverse.each do |message| %>
-              <div style="color: <%= message.message_type == 'system' ? '#22d3ee' : '#d0d0d0' %>;">
-                [<%= message.created_at.strftime("%H:%M") %>]
-                <% if message.grid_hackr %>
-                  <span style="color: #a78bfa;"><%= message.grid_hackr.hackr_alias %></span>:
-                <% end %>
-                <%= message.content %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
+  <!-- Command Input -->
+  <%= form_with url: grid_command_path, method: :post, id: "command-form" do |f| %>
+    <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+      <%= f.text_field :input, placeholder: "Enter command (type 'help' for commands)", autofocus: true, autocomplete: "off", style: "flex: 1; background: #262626; color: #e0e0e0; border: 1px solid #4b5563; padding: 6px 10px; font-family: monospace; font-size: 0.9em; border-radius: 3px;" %>
+      <%= f.submit "EXECUTE", style: "background: #7c3aed; color: white; border: none; padding: 6px 16px; font-size: 0.85em; cursor: pointer; border-radius: 3px; font-weight: bold;" %>
     </div>
-  </fieldset>
+  <% end %>
+  <div style="font-size: 0.75em; color: #9ca3af; line-height: 1.3;">
+    Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear
+    <span style="margin-left: 10px; color: #666;">|</span>
+    <span style="margin-left: 10px;">↑/↓ for history</span>
+  </div>
+
 </div>
 
 <script>
@@ -84,6 +60,49 @@ Type 'help' for commands. Type 'clear' to clear the screen.
   let currentSubscription;
   let currentRoomId = <%= current_hackr.current_room&.id || 'null' %>;
   const currentHackr = '<%= current_hackr.hackr_alias %>';
+
+  // Command history
+  let commandHistory = [];
+  let historyIndex = -1;
+  let currentDraft = ''; // Store current input when navigating history
+
+  // Load command history from sessionStorage
+  try {
+    const stored = sessionStorage.getItem('grid_command_history');
+    if (stored) {
+      commandHistory = JSON.parse(stored);
+    }
+  } catch (e) {
+    console.log('Could not load command history');
+  }
+
+  // Helper function to save command to history
+  function addToHistory(command) {
+    if (!command || !command.trim()) return;
+
+    // Don't add duplicate of last command
+    if (commandHistory.length > 0 && commandHistory[commandHistory.length - 1] === command) {
+      return;
+    }
+
+    commandHistory.push(command);
+
+    // Limit history to 100 commands
+    if (commandHistory.length > 100) {
+      commandHistory.shift();
+    }
+
+    // Save to sessionStorage
+    try {
+      sessionStorage.setItem('grid_command_history', JSON.stringify(commandHistory));
+    } catch (e) {
+      console.log('Could not save command history');
+    }
+
+    // Reset history navigation
+    historyIndex = -1;
+    currentDraft = '';
+  }
 
   // Helper function to get opposite direction
   function oppositeDirection(dir) {
@@ -173,14 +192,59 @@ Type 'help' for commands. Type 'clear' to clear the screen.
     // Subscribe to initial room
     subscribeToRoom();
 
+    const inputField = document.querySelector('input[name="input"]');
+
+    // Handle keyboard navigation for command history
+    inputField.addEventListener('keydown', function(event) {
+      // Arrow Up - go back in history
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+
+        if (commandHistory.length === 0) return;
+
+        // Store current input as draft when starting to navigate
+        if (historyIndex === -1) {
+          currentDraft = inputField.value;
+        }
+
+        // Navigate backwards in history
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          const historyCommand = commandHistory[commandHistory.length - 1 - historyIndex];
+          inputField.value = historyCommand;
+        }
+      }
+      // Arrow Down - go forward in history
+      else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+
+        if (historyIndex === -1) return; // Not navigating history
+
+        // Navigate forwards in history
+        historyIndex--;
+
+        if (historyIndex === -1) {
+          // Restore the draft
+          inputField.value = currentDraft;
+        } else {
+          const historyCommand = commandHistory[commandHistory.length - 1 - historyIndex];
+          inputField.value = historyCommand;
+        }
+      }
+    });
+
     // Handle form submission manually for AJAX
     document.getElementById('command-form').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent normal form submission
 
       const form = event.target;
       const output = document.getElementById('game-output');
-      const inputField = form.querySelector('input[name="input"]');
       const command = inputField.value;
+
+      // Add command to history
+      if (command.trim()) {
+        addToHistory(command.trim());
+      }
 
       // Check if this is a clear command
       if (command.trim().toLowerCase() === 'clear' || command.trim().toLowerCase() === 'cls') {
