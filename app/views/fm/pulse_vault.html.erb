@@ -1,0 +1,347 @@
+<div class="tui-window white-text" style="max-width: 1400px; background: #1a1a1a; border: 2px solid #666;">
+  <fieldset style="border-color: #666;">
+    <legend class="center" style="color: #a78bfa;">hackr.fm :: PULSE VAULT</legend>
+
+    <div>
+      <h2 style="text-align: center; margin-bottom: 15px; color: #a78bfa;">
+        [:: MUSIC DISCOVERY :: ALL TRACKS ::]
+      </h2>
+
+      <div style="margin-bottom: 30px; padding: 15px; background: #0a0a0a; border: 1px solid #444;">
+        <p style="color: #999; text-align: center;">
+          <%= @tracks.count %> tracks available for streaming | Browse by artist, discover by genre, experience the resistance
+        </p>
+      </div>
+
+      <% if @tracks.any? %>
+        <div class="tui-fieldset" style="border-color: #555;">
+          <legend style="color: #888;">TRACK LIBRARY</legend>
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left; color: #888;">Track</th>
+                <th style="text-align: left; color: #888;">Artist</th>
+                <th style="text-align: left; color: #888;">Album</th>
+                <th style="text-align: center; color: #888;">Released</th>
+                <th style="text-align: center; color: #888;">Stream</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @tracks.each do |track| %>
+                <tr data-track-id="<%= track.id %>" class="track-row" style="<%= track.audio_file.attached? ? '' : 'opacity: 0.4;' %>">
+                  <td>
+                    <% if track.audio_file.attached? %>
+                      <strong class="track-title-clickable"
+                              data-track-url="<%= url_for(track.audio_file) %>"
+                              data-track-title="<%= track.title %>"
+                              data-track-artist="<%= track.artist.name %>"
+                              data-track-id="<%= track.id %>"
+                              style="color: #ccc; cursor: pointer;">
+                        <span class="now-playing-indicator" style="display: none;">★ </span><%= track.title %>
+                      </strong>
+                    <% else %>
+                      <strong style="color: #666;">
+                        <%= track.title %>
+                      </strong>
+                    <% end %>
+                  </td>
+                  <td style="color: <%= track.audio_file.attached? ? '#aaa' : '#555' %>;"><%= track.artist.name %></td>
+                  <td style="color: <%= track.audio_file.attached? ? '#999' : '#555' %>;"><%= track.album || '—' %></td>
+                  <td style="text-align: center; color: <%= track.audio_file.attached? ? '#888' : '#555' %>;">
+                    <%= track.release_date&.strftime('%Y-%m-%d') || '—' %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if track.audio_file.attached? %>
+                      <button class="tui-button play-track-btn"
+                              data-track-url="<%= url_for(track.audio_file) %>"
+                              data-track-title="<%= track.title %>"
+                              data-track-artist="<%= track.artist.name %>"
+                              data-track-id="<%= track.id %>"
+                              style="padding: 2px 12px; font-size: 0.85em; background: #7c3aed; color: white;">
+                        ► PLAY
+                      </button>
+                    <% else %>
+                      <span style="color: #555;">—</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a;">
+          <p style="color: #999; font-size: 1.2em;">No tracks available yet. The vault is empty.</p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<!-- Audio Player -->
+<div id="audio-player" style="position: fixed; bottom: 0; left: 0; right: 0; background: #0a0a0a; border-top: 2px solid #7c3aed; padding: 15px 20px; display: none; z-index: 1000;">
+  <div style="max-width: 1400px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <button id="play-pause-btn" class="tui-button" style="background: #7c3aed; color: white; min-width: 80px;">
+        ► PLAY
+      </button>
+
+      <div style="flex: 1;">
+        <div style="margin-bottom: 5px;">
+          <span id="track-title" style="color: #a78bfa; font-weight: bold;">No track loaded</span>
+          <span style="color: #666;"> — </span>
+          <span id="track-artist" style="color: #888;">—</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span id="current-time" style="color: #666; font-size: 0.9em; min-width: 45px;">0:00</span>
+          <input type="range" id="seek-bar" min="0" max="100" value="0"
+                 style="flex: 1; height: 6px; background: #333; border-radius: 3px; outline: none; -webkit-appearance: none;">
+          <span id="duration" style="color: #666; font-size: 0.9em; min-width: 45px;">0:00</span>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="color: #888; font-size: 0.9em;">Volume:</span>
+        <input type="range" id="volume-control" min="0" max="100" value="70"
+               style="width: 100px; height: 6px; background: #333; border-radius: 3px; outline: none; -webkit-appearance: none;">
+      </div>
+
+      <button id="close-player-btn" class="tui-button" style="background: #444; color: #aaa;">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <audio id="audio-element"></audio>
+</div>
+
+<style>
+#seek-bar::-webkit-slider-thumb,
+#volume-control::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #7c3aed;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+#seek-bar::-moz-range-thumb,
+#volume-control::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #7c3aed;
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+}
+</style>
+
+<script>
+(function() {
+  const player = document.getElementById('audio-player');
+  const audio = document.getElementById('audio-element');
+  const playPauseBtn = document.getElementById('play-pause-btn');
+  const seekBar = document.getElementById('seek-bar');
+  const volumeControl = document.getElementById('volume-control');
+  const currentTimeEl = document.getElementById('current-time');
+  const durationEl = document.getElementById('duration');
+  const trackTitleEl = document.getElementById('track-title');
+  const trackArtistEl = document.getElementById('track-artist');
+  const closePlayerBtn = document.getElementById('close-player-btn');
+
+  let currentTrackUrl = null;
+  let currentTrackId = null;
+
+  // Format time helper
+  function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  // Update now playing UI
+  function updateNowPlayingUI(trackId, isPlaying) {
+    // Clear all previous highlighting and reset all buttons
+    document.querySelectorAll('.track-row').forEach(function(row) {
+      row.style.background = '';
+      const titleEl = row.querySelector('.track-title-clickable');
+      if (titleEl) {
+        titleEl.style.color = '#ccc';
+        const indicator = titleEl.querySelector('.now-playing-indicator');
+        if (indicator) indicator.style.display = 'none';
+      }
+      const playBtn = row.querySelector('.play-track-btn');
+      if (playBtn) playBtn.textContent = '► PLAY';
+    });
+
+    // Highlight the current track
+    if (trackId) {
+      const currentRow = document.querySelector('.track-row[data-track-id="' + trackId + '"]');
+      if (currentRow) {
+        currentRow.style.background = 'rgba(124, 58, 237, 0.15)';
+        const titleEl = currentRow.querySelector('.track-title-clickable');
+        if (titleEl) {
+          titleEl.style.color = '#a78bfa';
+          const indicator = titleEl.querySelector('.now-playing-indicator');
+          if (indicator) indicator.style.display = 'inline';
+        }
+        const playBtn = currentRow.querySelector('.play-track-btn');
+        if (playBtn) {
+          playBtn.textContent = isPlaying ? '❚❚ PAUSE' : '► PLAY';
+        }
+      }
+    }
+  }
+
+  // Load and play track
+  function loadTrack(url, title, artist, trackId) {
+    currentTrackUrl = url;
+    currentTrackId = trackId;
+    audio.src = url;
+    trackTitleEl.textContent = title;
+    trackArtistEl.textContent = artist;
+    player.style.display = 'block';
+    audio.play();
+    playPauseBtn.textContent = '❚❚ PAUSE';
+    updateNowPlayingUI(trackId, true);
+  }
+
+  // Play/Pause button in player bar
+  playPauseBtn.addEventListener('click', function() {
+    if (audio.paused) {
+      audio.play();
+      playPauseBtn.textContent = '❚❚ PAUSE';
+      updateNowPlayingUI(currentTrackId, true);
+    } else {
+      audio.pause();
+      playPauseBtn.textContent = '► PLAY';
+      updateNowPlayingUI(currentTrackId, false);
+    }
+  });
+
+  // Update seek bar as track plays
+  audio.addEventListener('timeupdate', function() {
+    if (audio.duration) {
+      const progress = (audio.currentTime / audio.duration) * 100;
+      seekBar.value = progress;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    }
+  });
+
+  // Update duration when metadata loads
+  audio.addEventListener('loadedmetadata', function() {
+    durationEl.textContent = formatTime(audio.duration);
+    seekBar.value = 0;
+  });
+
+  // Seek when user drags the seek bar
+  seekBar.addEventListener('input', function() {
+    if (audio.duration) {
+      const seekTime = (seekBar.value / 100) * audio.duration;
+      audio.currentTime = seekTime;
+    }
+  });
+
+  // Volume control
+  volumeControl.addEventListener('input', function() {
+    audio.volume = volumeControl.value / 100;
+  });
+
+  // Set initial volume
+  audio.volume = 0.7;
+
+  // Close player
+  closePlayerBtn.addEventListener('click', function() {
+    audio.pause();
+    player.style.display = 'none';
+    currentTrackUrl = null;
+    currentTrackId = null;
+    updateNowPlayingUI(null, false);
+  });
+
+  // Track ended - auto-play next track
+  audio.addEventListener('ended', function() {
+    // Find all playable tracks (with audio files)
+    const playableTracks = Array.from(document.querySelectorAll('.track-title-clickable'));
+
+    if (playableTracks.length === 0) {
+      playPauseBtn.textContent = '► PLAY';
+      updateNowPlayingUI(null, false);
+      currentTrackId = null;
+      return;
+    }
+
+    // Find current track index
+    let currentIndex = -1;
+    for (let i = 0; i < playableTracks.length; i++) {
+      if (playableTracks[i].dataset.trackId === currentTrackId) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    // Get next track (wrap around to start if at end)
+    let nextIndex = (currentIndex + 1) % playableTracks.length;
+    const nextTrack = playableTracks[nextIndex];
+
+    // Load and play the next track
+    const url = nextTrack.dataset.trackUrl;
+    const title = nextTrack.dataset.trackTitle;
+    const artist = nextTrack.dataset.trackArtist;
+    const trackId = nextTrack.dataset.trackId;
+    loadTrack(url, title, artist, trackId);
+  });
+
+  // Attach click handlers to all play/pause buttons
+  document.querySelectorAll('.play-track-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const trackId = btn.dataset.trackId;
+
+      // If clicking the currently playing track's button, toggle play/pause
+      if (trackId === currentTrackId && !audio.paused) {
+        audio.pause();
+        playPauseBtn.textContent = '► PLAY';
+        updateNowPlayingUI(currentTrackId, false);
+      } else if (trackId === currentTrackId && audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = '❚❚ PAUSE';
+        updateNowPlayingUI(currentTrackId, true);
+      } else {
+        // Load and play a different track
+        const url = btn.dataset.trackUrl;
+        const title = btn.dataset.trackTitle;
+        const artist = btn.dataset.trackArtist;
+        loadTrack(url, title, artist, trackId);
+      }
+    });
+  });
+
+  // Attach click handlers to all clickable track titles
+  document.querySelectorAll('.track-title-clickable').forEach(function(titleEl) {
+    titleEl.addEventListener('click', function() {
+      const trackId = titleEl.dataset.trackId;
+
+      // If clicking the currently playing track's title, toggle play/pause
+      if (trackId === currentTrackId && !audio.paused) {
+        audio.pause();
+        playPauseBtn.textContent = '► PLAY';
+        updateNowPlayingUI(currentTrackId, false);
+      } else if (trackId === currentTrackId && audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = '❚❚ PAUSE';
+        updateNowPlayingUI(currentTrackId, true);
+      } else {
+        // Load and play a different track
+        const url = titleEl.dataset.trackUrl;
+        const title = titleEl.dataset.trackTitle;
+        const artist = titleEl.dataset.trackArtist;
+        loadTrack(url, title, artist, trackId);
+      }
+    });
+  });
+})();
+</script>

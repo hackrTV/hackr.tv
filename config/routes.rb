@@ -27,6 +27,12 @@ Rails.application.routes.draw do
   delete "grid/logout", to: "grid#logout", as: :grid_logout
   post "grid/command", to: "grid#command", as: :grid_command
 
+  # hackr.fm routes
+  get "fm", to: "fm#index", as: :fm
+  get "fm/radio", to: "fm#radio", as: :fm_radio
+  get "fm/pulse-vault", to: "fm#pulse_vault", as: :fm_pulse_vault
+  get "fm/bands", to: "fm#bands", as: :fm_bands
+
   # Development-only error page testing routes
   if Rails.env.development?
     get "test/404", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }
@@ -34,5 +40,8 @@ Rails.application.routes.draw do
   end
 
   # Catch-all route for 404s (must be last)
-  match "*path", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }, via: :all
+  # Exclude Active Storage paths from catch-all
+  match "*path", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] },
+    via: :all,
+    constraints: lambda { |req| !req.path.start_with?("/rails/active_storage") }
 end

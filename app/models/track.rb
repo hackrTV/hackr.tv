@@ -1,5 +1,6 @@
 class Track < ApplicationRecord
   belongs_to :artist
+  has_one_attached :audio_file
 
   # Serialize JSON fields
   serialize :streaming_links, coder: JSON
