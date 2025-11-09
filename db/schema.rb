@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_08_041401) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_08_200726) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -133,6 +133,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_08_041401) do
     t.string "zone_type"
   end
 
+  create_table "hackr_logs", force: :cascade do |t|
+    t.integer "author_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.boolean "published", default: false, null: false
+    t.datetime "published_at"
+    t.string "slug", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_hackr_logs_on_author_id"
+    t.index ["slug"], name: "index_hackr_logs_on_slug", unique: true
+  end
+
   create_table "redirects", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "destination_url"
@@ -165,5 +178,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_08_041401) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "hackr_logs", "grid_hackrs", column: "author_id"
   add_foreign_key "tracks", "artists"
 end

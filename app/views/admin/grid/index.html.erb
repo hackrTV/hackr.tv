@@ -1,0 +1,156 @@
+<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/grid :: PULSE GRID ADMIN</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Broadcast Section -->
+      <div style="margin-bottom: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SYSTEM BROADCAST ::]</h3>
+        <div class="tui-window white-text" style="background: #0a0a0a; padding: 20px;">
+          <%= form_with url: admin_grid_broadcast_path, method: :post, local: true do |f| %>
+            <div style="margin-bottom: 15px;">
+              <%= label_tag :message, "MESSAGE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+              <%= text_area_tag :message, nil, class: "tui-input", placeholder: "Type your broadcast message...", style: "width: 100%; min-height: 80px; font-family: monospace;" %>
+              <small style="color: #888;">This will be sent to all online hackrs across all rooms</small>
+            </div>
+            <%= submit_tag "📢 BROADCAST", class: "tui-button red-168", style: "padding: 10px 20px; font-weight: bold;", data: { confirm: "Send broadcast to all rooms?" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Online Hackrs Section -->
+      <div style="margin-bottom: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ONLINE HACKRS (<%= @online_hackrs.count %>) ::]</h3>
+        <% if @online_hackrs.any? %>
+          <div class="tui-window white-text" style="background: #0a0a0a;">
+            <table class="tui-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Hackr Alias</th>
+                  <th style="text-align: left;">Role</th>
+                  <th style="text-align: left;">Current Room</th>
+                  <th style="text-align: center;">Room ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @online_hackrs.each do |hackr| %>
+                  <tr>
+                    <td>
+                      <%= hackr.hackr_alias %>
+                      <% if hackr.id == current_hackr.id %>
+                        <span style="color: #888;">(you)</span>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if hackr.admin? %>
+                        <span class="red-255-text">[ADMIN]</span>
+                      <% else %>
+                        <span style="color: #888;">operative</span>
+                      <% end %>
+                    </td>
+                    <td><%= hackr.current_room&.name || "—" %></td>
+                    <td style="text-align: center; font-family: monospace; color: #666;">
+                      <%= hackr.current_room_id || "—" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+            <p style="color: #666;">No hackrs currently online</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Recent Messages Section -->
+      <div style="margin-bottom: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT MESSAGES (Last 50) ::]</h3>
+        <div class="tui-window white-text" style="background: #0a0a0a;">
+          <% if @recent_messages.any? %>
+            <div style="max-height: 400px; overflow-y: auto; padding: 15px; font-family: monospace; font-size: 0.9em;">
+              <% @recent_messages.reverse.each do |message| %>
+                <div style="margin-bottom: 8px; padding: 5px; border-left: 2px solid <%= message.message_type == 'system' ? '#ff0000' : '#00ff00' %>; padding-left: 10px;">
+                  <span style="color: #666;">[<%= message.created_at.strftime("%H:%M:%S") %>]</span>
+                  <span style="color: #888;">[<%= message.room&.name || "Unknown" %>]</span>
+                  <% if message.message_type == "system" %>
+                    <span class="red-255-text">[SYSTEM]</span>
+                  <% else %>
+                    <span class="green-255-text">&lt;<%= message.grid_hackr&.hackr_alias || "Unknown" %>&gt;</span>
+                  <% end %>
+                  <span style="color: #ccc;"><%= message.content %></span>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div style="padding: 40px; text-align: center;">
+              <p style="color: #666;">No messages yet</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- All Hackrs Section -->
+      <div style="margin-bottom: 20px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ALL HACKRS (<%= @all_hackrs.count %>) ::]</h3>
+        <div class="tui-window white-text" style="background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">ID</th>
+                <th style="text-align: left;">Hackr Alias</th>
+                <th style="text-align: left;">Role</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center;">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @all_hackrs.each do |hackr| %>
+                <tr>
+                  <td style="font-family: monospace; color: #666;"><%= hackr.id %></td>
+                  <td><%= hackr.hackr_alias %></td>
+                  <td>
+                    <% if hackr.admin? %>
+                      <span class="red-255-text">[ADMIN]</span>
+                    <% else %>
+                      <span style="color: #888;">operative</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if hackr.current_room_id.present? %>
+                      <span class="green-255-text">● Online</span>
+                    <% else %>
+                      <span style="color: #444;">○ Offline</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center; color: #666;"><%= hackr.created_at.strftime("%Y-%m-%d") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

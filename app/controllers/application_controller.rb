@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   include RequestAnalysis
+  include GridAuthentication
 
   before_action :check_for_redirect
   before_action :check_for_domain_redirect

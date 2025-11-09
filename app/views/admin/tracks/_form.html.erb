@@ -1,0 +1,134 @@
+<%# Flash Messages %>
+<% if flash[:error] %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+    <p class="red-255-text">⚠ ERROR</p>
+    <p class="white-text"><%= flash[:error] %></p>
+  </div>
+<% end %>
+
+<%# Track Form %>
+<%= form_with model: [:admin, track], local: true do |f| %>
+  <%# Basic Info Section %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: BASIC INFO ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :artist_id, "ARTIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.select :artist_id, options_from_collection_for_select(@artists, :id, :name, track.artist_id),
+        { include_blank: "Select an artist..." },
+        class: "tui-input", style: "width: 100%;" %>
+    <% if track.errors[:artist_id].any? %>
+      <small class="red-255-text"><%= track.errors[:artist_id].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+      <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :title, class: "tui-input", placeholder: "Song Title", style: "width: 100%;" %>
+      <% if track.errors[:title].any? %>
+        <small class="red-255-text"><%= track.errors[:title].join(", ") %></small>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", placeholder: "song-title", style: "width: 100%; font-family: monospace;" %>
+      <% if track.errors[:slug].any? %>
+        <small class="red-255-text"><%= track.errors[:slug].join(", ") %></small>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+      <%= f.label :album, "ALBUM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :album, class: "tui-input", placeholder: "Album Name", style: "width: 100%;" %>
+    </div>
+
+    <div>
+      <%= f.label :album_type, "TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :album_type, class: "tui-input", placeholder: "single/EP/album", style: "width: 100%;" %>
+    </div>
+
+    <div>
+      <%= f.label :release_date, "RELEASE DATE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.date_field :release_date, class: "tui-input", style: "width: 100%;" %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+      <%= f.label :duration, "DURATION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :duration, class: "tui-input", placeholder: "3:45", style: "width: 100%;" %>
+    </div>
+
+    <div>
+      <%= f.label :cover_image, "COVER IMAGE URL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :cover_image, class: "tui-input", placeholder: "https://...", style: "width: 100%;" %>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label class="white-text" style="display: flex; align-items: center; gap: 10px;">
+      <%= f.check_box :featured, style: "width: auto;" %>
+      <span style="font-weight: bold;">FEATURED TRACK</span>
+      <span style="color: #888;">(appears first in listings with ★)</span>
+    </label>
+  </div>
+
+  <%# Audio File Section %>
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: AUDIO FILE ::]</h3>
+
+  <% if track.audio_file.attached? %>
+    <div style="padding: 15px; background: #0a0a0a; border: 1px solid #00ff00; margin-bottom: 15px;">
+      <p class="green-255-text" style="margin-bottom: 5px;">✓ Audio file attached</p>
+      <p style="color: #aaa; font-size: 0.9em;"><%= track.audio_file.filename %></p>
+      <label class="red-255-text" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+        <%= check_box_tag "track[remove_audio_file]", "1", false, style: "width: auto;" %>
+        <span>Remove current audio file</span>
+      </label>
+    </div>
+  <% end %>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :audio_file, "UPLOAD NEW AUDIO FILE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.file_field :audio_file, accept: "audio/*", class: "tui-input", style: "width: 100%;" %>
+    <small style="color: #888;">Supported: MP3, WAV, FLAC, M4A</small>
+  </div>
+
+  <%# Streaming Links Section %>
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: STREAMING LINKS ::]</h3>
+
+  <% streaming_links = track.streaming_links || {} %>
+  <% %w[spotify youtube soundcloud bandcamp apple_music].each do |platform| %>
+    <div style="margin-bottom: 15px;">
+      <%= label_tag "track[streaming_links_json][#{platform}]", platform.upcase.gsub("_", " "), class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= text_field_tag "track[streaming_links_json][#{platform}]", streaming_links[platform] || streaming_links[platform.to_sym], class: "tui-input", placeholder: "https://...", style: "width: 100%;" %>
+    </div>
+  <% end %>
+
+  <%# Videos Section %>
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: VIDEOS ::]</h3>
+
+  <% videos = track.videos || {} %>
+  <% %w[music lyric official live].each do |video_type| %>
+    <div style="margin-bottom: 15px;">
+      <%= label_tag "track[videos_json][#{video_type}]", "#{video_type.upcase} VIDEO", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= text_field_tag "track[videos_json][#{video_type}]", videos[video_type] || videos[video_type.to_sym], class: "tui-input", placeholder: "https://youtube.com/...", style: "width: 100%;" %>
+    </div>
+  <% end %>
+
+  <%# Lyrics Section %>
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: LYRICS ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.text_area :lyrics, class: "tui-input", placeholder: "Enter lyrics here...", style: "width: 100%; min-height: 200px; font-family: monospace; line-height: 1.6;" %>
+    <small style="color: #888;">Markdown supported</small>
+  </div>
+
+  <%# Submit Buttons %>
+  <div class="center" style="margin: 30px 0;">
+    <%= f.submit (track.new_record? ? "Create Track" : "Update Track"), class: "tui-button purple-168", style: "font-size: 1.1em; padding: 10px 30px;" %>
+    <%= link_to "Cancel", admin_tracks_path, class: "tui-button green-168", style: "font-size: 1.1em; padding: 10px 30px; margin-left: 10px;" %>
+  </div>
+<% end %>

@@ -1,0 +1,78 @@
+<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/hackr_logs :: MANAGE LOGS</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Actions -->
+      <div style="margin-bottom: 20px;">
+        <%= link_to "➕ New Log Entry", new_admin_hackr_log_path, class: "tui-button purple-168", style: "padding: 8px 20px;" %>
+        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px; margin-left: 10px;" %>
+      </div>
+
+      <!-- Logs Table -->
+      <% if @hackr_logs.any? %>
+        <div class="tui-window white-text" style="background: #0a0a0a; margin-top: 20px;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Title</th>
+                <th style="text-align: left;">Author</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center;">Published</th>
+                <th style="text-align: center; width: 200px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @hackr_logs.each do |log| %>
+                <tr>
+                  <td>
+                    <strong><%= log.title %></strong>
+                    <br>
+                    <small style="color: #666; font-family: monospace;">/<%= log.slug %></small>
+                  </td>
+                  <td><%= log.author.hackr_alias %></td>
+                  <td style="text-align: center;">
+                    <% if log.published? %>
+                      <span class="green-255-text">✓ Published</span>
+                    <% else %>
+                      <span style="color: #888;">⊗ Draft</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= log.published_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
+                  </td>
+                  <td style="text-align: center; width: 200px; white-space: nowrap;">
+                    <%= link_to "✎ Edit", edit_admin_hackr_log_path(log), class: "tui-button cyan-168", style: "padding: 4px 12px; margin: 0 3px; font-size: 0.9em;" %>
+                    <%= button_to "✗ Delete", admin_hackr_log_path(log), method: :delete,
+                        data: { confirm: "Delete log '#{log.title}'?" },
+                        class: "tui-button red-168",
+                        style: "padding: 4px 12px; font-size: 0.9em; display: inline-block;" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No log entries yet. Write your first one!</p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
