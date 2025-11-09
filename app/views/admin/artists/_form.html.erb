@@ -1,0 +1,35 @@
+<%# Flash Messages %>
+<% if flash[:error] %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+    <p class="red-255-text">⚠ ERROR</p>
+    <p class="white-text"><%= flash[:error] %></p>
+  </div>
+<% end %>
+
+<%# Artist Form %>
+<%= form_with model: [:admin, artist], local: true do |f| %>
+  <div style="margin-bottom: 20px;">
+    <%= f.label :name, "ARTIST NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :name, class: "tui-input", placeholder: "The Cyber Pulse", style: "width: 100%;" %>
+    <% if artist.errors[:name].any? %>
+      <small class="red-255-text"><%= artist.errors[:name].join(", ") %></small>
+    <% else %>
+      <small style="color: #888;">Full name of the artist or band</small>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :slug, class: "tui-input", placeholder: "thecyberpulse", style: "width: 100%; font-family: monospace;" %>
+    <% if artist.errors[:slug].any? %>
+      <small class="red-255-text"><%= artist.errors[:slug].join(", ") %></small>
+    <% else %>
+      <small style="color: #888;">URL-friendly identifier (lowercase, no spaces)</small>
+    <% end %>
+  </div>
+
+  <div class="center" style="margin: 30px 0;">
+    <%= f.submit (artist.new_record? ? "Create Artist" : "Update Artist"), class: "tui-button purple-168", style: "font-size: 1.1em; padding: 10px 30px;" %>
+    <%= link_to "Cancel", admin_artists_path, class: "tui-button green-168", style: "font-size: 1.1em; padding: 10px 30px; margin-left: 10px;" %>
+  </div>
+<% end %>

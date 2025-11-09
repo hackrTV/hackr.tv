@@ -4,5 +4,13 @@
     <%= render "shared/xeraen_header_menu", index: 1 %>
     <%= render "shared/hackr_fm_header_menu", index: 2 %>
     <%= render "shared/pulse_grid_header_menu", index: 3 %>
+    <%= render "shared/hackr_logs_header_menu", index: 4 %>
+    <% if admin_hackr? %>
+      <li>
+        <a href="/root">
+          <span class="red-255-text">5</span> /root <span class="red-255-text">[ADMIN]</span>
+        </a>
+      </li>
+    <% end %>
   </ul>
 </nav>

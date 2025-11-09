@@ -33,6 +33,24 @@ Rails.application.routes.draw do
   get "fm/pulse-vault", to: "fm#pulse_vault", as: :fm_pulse_vault
   get "fm/bands", to: "fm#bands", as: :fm_bands
 
+  # HackrLogs (blog) routes
+  get "logs", to: "hackr_logs#index", as: :hackr_logs
+  get "logs/:id", to: "hackr_logs#show", as: :hackr_log
+
+  # Admin routes (accessible at /root)
+  namespace :admin, path: "root" do
+    root "dashboard#index"
+    resources :artists
+    resources :tracks do
+      collection do
+        post :import
+      end
+    end
+    resources :hackr_logs
+    get "grid", to: "grid#index", as: :grid
+    post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
+  end
+
   # Development-only error page testing routes
   if Rails.env.development?
     get "test/404", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }

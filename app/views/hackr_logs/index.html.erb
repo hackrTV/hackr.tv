@@ -1,0 +1,44 @@
+<div style="max-width: 900px; margin: 30px auto; background: #1a1a1a; color: #d0d0d0; padding: 20px; border: 1px solid #333;">
+  <div style="margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #4b5563;">
+    <h1 style="margin: 0; font-size: 1.4em; color: #a78bfa;">HACKR LOGS</h1>
+    <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #888;">Transmissions from the resistance</p>
+  </div>
+
+  <% if @hackr_logs.any? %>
+    <% @hackr_logs.each do |log| %>
+      <div style="background: #0d0d0d; margin-bottom: 25px; padding: 25px; border-left: 3px solid #6366f1;">
+        <!-- Title -->
+        <h2 style="margin: 0 0 12px 0;">
+          <%= link_to log.title, hackr_log_path(log), style: "color: #a78bfa; text-decoration: none; font-size: 1.3em;" %>
+        </h2>
+
+        <!-- Metadata -->
+        <div style="margin-bottom: 18px; font-size: 0.85em;">
+          <span style="color: #6b7280;">Published:</span>
+          <span style="color: #9ca3af;"><%= future_date(log.published_at)&.strftime("%B %d, %Y") %></span>
+          <span style="color: #4b5563; margin: 0 8px;">•</span>
+          <span style="color: #6b7280;">By:</span>
+          <span style="color: #9ca3af;"><%= log.author.hackr_alias %></span>
+        </div>
+
+        <!-- Excerpt -->
+        <div style="color: #9ca3af; line-height: 1.7; margin-bottom: 15px;">
+          <%= markdown_excerpt(log.body, length: 300) %>
+        </div>
+
+        <!-- Read More Link -->
+        <div>
+          <%= link_to "Read more →", hackr_log_path(log), style: "color: #818cf8; text-decoration: none; font-size: 0.9em;" %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div style="padding: 60px; text-align: center; background: #0d0d0d; border: 1px solid #333;">
+      <p style="color: #6b7280; font-size: 1.1em; line-height: 1.8;">
+        No transmissions available yet.
+        <br>
+        <span style="font-size: 0.9em;">Check back soon for updates from the resistance...</span>
+      </p>
+    </div>
+  <% end %>
+</div>

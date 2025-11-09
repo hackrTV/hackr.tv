@@ -1,0 +1,163 @@
+<%= render "admin/shared/nav" %>
+
+<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root :: ADMIN DASHBOARD</legend>
+
+    <div style="padding: 20px;">
+      <!-- Quick Stats -->
+      <h2 class="cyan-255-text" style="margin-bottom: 20px;">[:: SYSTEM STATS ::]</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
+        <div class="tui-window purple-168 white-text">
+          <fieldset class="purple-168-border">
+            <legend>Artists</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:artists_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window purple-168 white-text">
+          <fieldset class="purple-168-border">
+            <legend>Tracks</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:tracks_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window purple-168 white-text">
+          <fieldset class="purple-168-border">
+            <legend>Hackr Logs</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:hackr_logs_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window green-168 white-text">
+          <fieldset class="green-168-border">
+            <legend>Online Hackrs</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:online_hackrs_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <h2 class="cyan-255-text" style="margin-bottom: 20px;">[:: QUICK ACTIONS ::]</h2>
+      <div style="display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;">
+        <%= link_to "➕ New Artist", new_admin_artist_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "🎵 New Track", new_admin_track_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "📝 New Log", new_admin_hackr_log_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "🎮 GRID Admin", admin_grid_path, class: "tui-button green-168", style: "padding: 10px 20px;" %>
+      </div>
+
+      <!-- Recent Activity -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <!-- Recent Tracks -->
+        <div>
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT TRACKS ::]</h3>
+          <div class="tui-window white-text" style="background: #0a0a0a;">
+            <% if @recent_tracks.any? %>
+              <table class="tui-table" style="width: 100%;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">Track</th>
+                    <th style="text-align: left;">Artist</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @recent_tracks.each do |track| %>
+                    <tr>
+                      <td>
+                        <%= link_to track.title, edit_admin_track_path(track), class: "purple-168-text" %>
+                        <%= "★" if track.featured %>
+                      </td>
+                      <td><%= track.artist.name %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            <% else %>
+              <p style="padding: 20px; text-align: center; color: #666;">No tracks yet</p>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div>
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT LOGS ::]</h3>
+          <div class="tui-window white-text" style="background: #0a0a0a;">
+            <% if @recent_logs.any? %>
+              <table class="tui-table" style="width: 100%;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">Title</th>
+                    <th style="text-align: center;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @recent_logs.each do |log| %>
+                    <tr>
+                      <td>
+                        <%= link_to log.title, edit_admin_hackr_log_path(log), class: "purple-168-text" %>
+                      </td>
+                      <td style="text-align: center;">
+                        <% if log.published? %>
+                          <span class="green-255-text">✓</span>
+                        <% else %>
+                          <span style="color: #666;">⊗</span>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            <% else %>
+              <p style="padding: 20px; text-align: center; color: #666;">No logs yet</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID Activity -->
+      <div>
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ONLINE HACKRS ::]</h3>
+        <div class="tui-window white-text" style="background: #0a0a0a;">
+          <% if @online_hackrs.any? %>
+            <table class="tui-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Hackr</th>
+                  <th style="text-align: left;">Room</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @online_hackrs.each do |hackr| %>
+                  <tr>
+                    <td>
+                      <%= hackr.hackr_alias %>
+                      <% if hackr.admin? %>
+                        <span class="red-255-text">[ADMIN]</span>
+                      <% end %>
+                    </td>
+                    <td><%= hackr.current_room&.name || "—" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% else %>
+            <p style="padding: 20px; text-align: center; color: #666;">No hackrs online</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Back to Site", root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>
