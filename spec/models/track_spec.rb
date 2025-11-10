@@ -6,6 +6,11 @@ RSpec.describe Track, type: :model do
       association = Track.reflect_on_association(:artist)
       expect(association.macro).to eq(:belongs_to)
     end
+
+    it "belongs to an album" do
+      association = Track.reflect_on_association(:album)
+      expect(association.macro).to eq(:belongs_to)
+    end
   end
 
   describe "validations" do
@@ -30,6 +35,11 @@ RSpec.describe Track, type: :model do
 
     it "is invalid without an artist" do
       track = build(:track, artist: nil)
+      expect(track).not_to be_valid
+    end
+
+    it "is invalid without an album" do
+      track = build(:track, album: nil)
       expect(track).not_to be_valid
     end
 
@@ -116,6 +126,32 @@ RSpec.describe Track, type: :model do
         expect(ordered.last).to eq(track2)
       end
     end
+
+    describe ".album_order" do
+      it "orders by track_number ascending" do
+        album = create(:album)
+        track3 = create(:track, album: album, track_number: 3, title: "C")
+        track1 = create(:track, album: album, track_number: 1, title: "A")
+        track2 = create(:track, album: album, track_number: 2, title: "B")
+
+        ordered = Track.album_order.to_a
+        expect(ordered[0]).to eq(track1)
+        expect(ordered[1]).to eq(track2)
+        expect(ordered[2]).to eq(track3)
+      end
+
+      it "falls back to title when track_number is same or nil" do
+        album = create(:album)
+        track_c = create(:track, album: album, track_number: nil, title: "C Track")
+        track_a = create(:track, album: album, track_number: nil, title: "A Track")
+        track_b = create(:track, album: album, track_number: nil, title: "B Track")
+
+        ordered = Track.album_order.to_a
+        expect(ordered[0]).to eq(track_a)
+        expect(ordered[1]).to eq(track_b)
+        expect(ordered[2]).to eq(track_c)
+      end
+    end
   end
 
   describe "#to_param" do
@@ -128,12 +164,13 @@ RSpec.describe Track, type: :model do
   describe "full track lifecycle" do
     it "creates a track with all attributes" do
       artist = create(:artist, :xeraen)
+      album = create(:album, artist: artist, name: "Best Album", album_type: "album")
       track = Track.create!(
         artist: artist,
+        album: album,
         title: "Epic Song",
         slug: "epic-song",
-        album: "Best Album",
-        album_type: "album",
+        track_number: 3,
         release_date: Date.new(2024, 1, 15),
         duration: "4:20",
         featured: true,
@@ -151,6 +188,8 @@ RSpec.describe Track, type: :model do
 
       expect(track).to be_persisted
       expect(track.artist).to eq(artist)
+      expect(track.album).to eq(album)
+      expect(track.track_number).to eq(3)
       expect(track.featured).to be true
       expect(track.streaming_links["spotify"]).to eq("https://spotify.com/track/123")
     end

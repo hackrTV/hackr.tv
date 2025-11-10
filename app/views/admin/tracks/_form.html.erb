@@ -39,15 +39,21 @@
     </div>
   </div>
 
-  <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+  <div style="display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 20px; margin-bottom: 20px;">
     <div>
-      <%= f.label :album, "ALBUM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :album, class: "tui-input", placeholder: "Album Name", style: "width: 100%;" %>
+      <%= f.label :album_id, "ALBUM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :album_id,
+          grouped_options_for_select(@albums_by_artist, track.album_id),
+          { include_blank: "Select an album..." },
+          class: "tui-input", style: "width: 100%;" %>
+      <% if track.errors[:album_id].any? %>
+        <small class="red-255-text"><%= track.errors[:album_id].join(", ") %></small>
+      <% end %>
     </div>
 
     <div>
-      <%= f.label :album_type, "TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :album_type, class: "tui-input", placeholder: "single/EP/album", style: "width: 100%;" %>
+      <%= f.label :track_number, "TRACK #", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :track_number, class: "tui-input", placeholder: "1", min: 1, style: "width: 100%;" %>
     </div>
 
     <div>

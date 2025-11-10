@@ -2,12 +2,13 @@ class Admin::TracksController < Admin::ApplicationController
   before_action :set_track, only: [:edit, :update, :destroy]
 
   def index
-    @tracks = Track.includes(:artist).ordered
+    @tracks = Track.includes(:artist, :album).ordered
   end
 
   def new
     @track = Track.new
     @artists = Artist.order(:name)
+    @albums_by_artist = load_albums_by_artist
   end
 
   def create
@@ -19,6 +20,7 @@ class Admin::TracksController < Admin::ApplicationController
       redirect_to admin_tracks_path
     else
       @artists = Artist.order(:name)
+      @albums_by_artist = load_albums_by_artist
       flash.now[:error] = "Failed to create track: #{@track.errors.full_messages.join(", ")}"
       render :new, status: :unprocessable_entity
     end
@@ -26,6 +28,7 @@ class Admin::TracksController < Admin::ApplicationController
 
   def edit
     @artists = Artist.order(:name)
+    @albums_by_artist = load_albums_by_artist
   end
 
   def update
@@ -36,6 +39,7 @@ class Admin::TracksController < Admin::ApplicationController
       redirect_to admin_tracks_path
     else
       @artists = Artist.order(:name)
+      @albums_by_artist = load_albums_by_artist
       flash.now[:error] = "Failed to update track: #{@track.errors.full_messages.join(", ")}"
       render :edit, status: :unprocessable_entity
     end
@@ -75,8 +79,8 @@ class Admin::TracksController < Admin::ApplicationController
       :title,
       :slug,
       :artist_id,
-      :album,
-      :album_type,
+      :album_id,
+      :track_number,
       :release_date,
       :featured,
       :duration,
@@ -85,6 +89,12 @@ class Admin::TracksController < Admin::ApplicationController
       :audio_file,
       :remove_audio_file
     )
+  end
+
+  def load_albums_by_artist
+    Artist.includes(:albums).order(:name).map do |artist|
+      [artist.name, artist.albums.order(:name).map { |a| [a.name, a.id] }]
+    end
   end
 
   def process_json_fields

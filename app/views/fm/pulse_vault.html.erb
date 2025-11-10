@@ -9,59 +9,83 @@
 
       <div style="margin-bottom: 30px; padding: 15px; background: #0a0a0a; border: 1px solid #444;">
         <p style="color: #999; text-align: center;">
-          <%= @tracks.count %> tracks available for streaming | Browse by artist, discover by genre, experience the resistance
+          <span id="visible-count"><%= @tracks.count %></span> / <%= @tracks.count %> tracks available for streaming | Browse by artist, discover by genre, experience the resistance
         </p>
       </div>
 
       <% if @tracks.any? %>
+        <div style="margin-bottom: 20px;">
+          <label for="track-search" style="color: #888; display: block; margin-bottom: 8px;">
+            SEARCH TRACKS :: Filter by track, artist, album, or genre
+          </label>
+          <input type="text"
+                 id="track-search"
+                 placeholder="Type to filter tracks..."
+                 style="width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #555; color: #ccc; font-family: monospace; font-size: 1em;">
+        </div>
+
         <div class="tui-fieldset" style="border-color: #555;">
           <legend style="color: #888;">TRACK LIBRARY</legend>
-          <table class="tui-table" style="width: 100%;">
+          <table class="tui-table" style="width: 100%; border-collapse: separate; border-spacing: 0 2px;">
             <thead>
               <tr>
-                <th style="text-align: left; color: #888;">Track</th>
-                <th style="text-align: left; color: #888;">Artist</th>
-                <th style="text-align: left; color: #888;">Album</th>
-                <th style="text-align: center; color: #888;">Released</th>
+                <th style="text-align: left; color: #888;">&nbsp;Track</th>
+                <th style="text-align: left; color: #888;">&nbsp;Artist</th>
+                <th style="text-align: left; color: #888;">&nbsp;Album</th>
+                <th style="text-align: left; color: #888;">&nbsp;Genre</th>
                 <th style="text-align: center; color: #888;">Stream</th>
               </tr>
             </thead>
             <tbody>
               <% @tracks.each do |track| %>
-                <tr data-track-id="<%= track.id %>" class="track-row" style="<%= track.audio_file.attached? ? '' : 'opacity: 0.4;' %>">
+                <tr data-track-id="<%= track.id %>"
+                    data-track-name="<%= track.title.downcase %>"
+                    data-artist-name="<%= track.artist.name.downcase %>"
+                    data-album-name="<%= track.album.name.downcase %>"
+                    data-genre="<%= track.artist.genre&.downcase || '' %>"
+                    class="track-row"
+                    style="<%= track.audio_file.attached? ? '' : 'opacity: 0.4;' %>">
                   <td>
                     <% if track.audio_file.attached? %>
+                      &nbsp;
                       <strong class="track-title-clickable"
                               data-track-url="<%= url_for(track.audio_file) %>"
                               data-track-title="<%= track.title %>"
                               data-track-artist="<%= track.artist.name %>"
                               data-track-id="<%= track.id %>"
+                              data-cover-url="<%= track.album.cover_image.attached? ? url_for(track.album.cover_image) : '' %>"
                               style="color: #ccc; cursor: pointer;">
                         <span class="now-playing-indicator" style="display: none;">★ </span><%= track.title %>
                       </strong>
+                      &nbsp;
                     <% else %>
+                      &nbsp;
                       <strong style="color: #666;">
                         <%= track.title %>
                       </strong>
+                      &nbsp;
                     <% end %>
                   </td>
-                  <td style="color: <%= track.audio_file.attached? ? '#aaa' : '#555' %>;"><%= track.artist.name %></td>
-                  <td style="color: <%= track.audio_file.attached? ? '#999' : '#555' %>;"><%= track.album || '—' %></td>
-                  <td style="text-align: center; color: <%= track.audio_file.attached? ? '#888' : '#555' %>;">
-                    <%= track.release_date&.strftime('%Y-%m-%d') || '—' %>
-                  </td>
+                  <td style="color: <%= track.audio_file.attached? ? '#aaa' : '#555' %>;">&nbsp;<%= track.artist.name %>&nbsp;</td>
+                  <td style="color: <%= track.audio_file.attached? ? '#999' : '#555' %>;">&nbsp;<%= track.album.name || '—' %>&nbsp;</td>
+                  <td style="color: <%= track.audio_file.attached? ? '#999' : '#555' %>;">&nbsp;<%= track.artist.genre || '—' %>&nbsp;</td>
                   <td style="text-align: center;">
                     <% if track.audio_file.attached? %>
+                      &nbsp;
                       <button class="tui-button play-track-btn"
                               data-track-url="<%= url_for(track.audio_file) %>"
                               data-track-title="<%= track.title %>"
                               data-track-artist="<%= track.artist.name %>"
                               data-track-id="<%= track.id %>"
+                              data-cover-url="<%= track.album.cover_image.attached? ? url_for(track.album.cover_image) : '' %>"
                               style="padding: 2px 12px; font-size: 0.85em; background: #7c3aed; color: white;">
                         ► PLAY
                       </button>
+                      &nbsp;
                     <% else %>
+                      &nbsp;
                       <span style="color: #555;">—</span>
+                      &nbsp;
                     <% end %>
                   </td>
                 </tr>
@@ -82,6 +106,8 @@
 <div id="audio-player" style="position: fixed; bottom: 0; left: 0; right: 0; background: #0a0a0a; border-top: 2px solid #7c3aed; padding: 15px 20px; display: none; z-index: 1000;">
   <div style="max-width: 1400px; margin: 0 auto;">
     <div style="display: flex; align-items: center; gap: 20px;">
+      <img id="player-cover" src="" alt="Album Cover" style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #7c3aed; display: none;">
+
       <button id="play-pause-btn" class="tui-button" style="background: #7c3aed; color: white; min-width: 80px;">
         ► PLAY
       </button>
@@ -116,6 +142,11 @@
   <audio id="audio-element"></audio>
 </div>
 
+<!-- Cover Image Overlay -->
+<div id="cover-overlay" style="position: fixed; bottom: 100px; left: 20px; display: none; z-index: 1001; pointer-events: none;">
+  <img id="cover-overlay-img" src="" alt="Album Cover" style="width: 300px; height: 300px; object-fit: cover; border: 3px solid #7c3aed; box-shadow: 0 8px 32px rgba(124, 58, 237, 0.5);">
+</div>
+
 <style>
 #seek-bar::-webkit-slider-thumb,
 #volume-control::-webkit-slider-thumb {
@@ -137,6 +168,11 @@
   border-radius: 50%;
   border: none;
 }
+
+.track-row:hover {
+  background: rgba(124, 58, 237, 0.08) !important;
+  cursor: pointer;
+}
 </style>
 
 <script>
@@ -151,6 +187,9 @@
   const trackTitleEl = document.getElementById('track-title');
   const trackArtistEl = document.getElementById('track-artist');
   const closePlayerBtn = document.getElementById('close-player-btn');
+  const playerCover = document.getElementById('player-cover');
+  const coverOverlay = document.getElementById('cover-overlay');
+  const coverOverlayImg = document.getElementById('cover-overlay-img');
 
   let currentTrackUrl = null;
   let currentTrackId = null;
@@ -198,12 +237,21 @@
   }
 
   // Load and play track
-  function loadTrack(url, title, artist, trackId) {
+  function loadTrack(url, title, artist, trackId, coverUrl) {
     currentTrackUrl = url;
     currentTrackId = trackId;
     audio.src = url;
     trackTitleEl.textContent = title;
     trackArtistEl.textContent = artist;
+
+    // Update cover image
+    if (coverUrl) {
+      playerCover.src = coverUrl;
+      playerCover.style.display = 'block';
+    } else {
+      playerCover.style.display = 'none';
+    }
+
     player.style.display = 'block';
     audio.play();
     playPauseBtn.textContent = '❚❚ PAUSE';
@@ -293,7 +341,8 @@
     const title = nextTrack.dataset.trackTitle;
     const artist = nextTrack.dataset.trackArtist;
     const trackId = nextTrack.dataset.trackId;
-    loadTrack(url, title, artist, trackId);
+    const coverUrl = nextTrack.dataset.coverUrl;
+    loadTrack(url, title, artist, trackId, coverUrl);
   });
 
   // Attach click handlers to all play/pause buttons
@@ -315,7 +364,8 @@
         const url = btn.dataset.trackUrl;
         const title = btn.dataset.trackTitle;
         const artist = btn.dataset.trackArtist;
-        loadTrack(url, title, artist, trackId);
+        const coverUrl = btn.dataset.coverUrl;
+        loadTrack(url, title, artist, trackId, coverUrl);
       }
     });
   });
@@ -339,9 +389,93 @@
         const url = titleEl.dataset.trackUrl;
         const title = titleEl.dataset.trackTitle;
         const artist = titleEl.dataset.trackArtist;
-        loadTrack(url, title, artist, trackId);
+        const coverUrl = titleEl.dataset.coverUrl;
+        loadTrack(url, title, artist, trackId, coverUrl);
       }
     });
+  });
+
+  // Attach click handlers to entire track rows
+  document.querySelectorAll('.track-row').forEach(function(row) {
+    row.addEventListener('click', function(e) {
+      // Don't trigger if clicking the button directly (it has its own handler)
+      if (e.target.closest('.play-track-btn')) {
+        return;
+      }
+
+      const titleEl = row.querySelector('.track-title-clickable');
+      if (!titleEl) return; // Skip rows without audio files
+
+      const trackId = titleEl.dataset.trackId;
+
+      // Toggle play/pause if clicking the currently playing track
+      if (trackId === currentTrackId && !audio.paused) {
+        audio.pause();
+        playPauseBtn.textContent = '► PLAY';
+        updateNowPlayingUI(currentTrackId, false);
+      } else if (trackId === currentTrackId && audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = '❚❚ PAUSE';
+        updateNowPlayingUI(currentTrackId, true);
+      } else {
+        // Load and play a different track
+        const url = titleEl.dataset.trackUrl;
+        const title = titleEl.dataset.trackTitle;
+        const artist = titleEl.dataset.trackArtist;
+        const coverUrl = titleEl.dataset.coverUrl;
+        loadTrack(url, title, artist, trackId, coverUrl);
+      }
+    });
+  });
+
+  // Track search/filter functionality
+  const searchInput = document.getElementById('track-search');
+  const visibleCountEl = document.getElementById('visible-count');
+  const allRows = document.querySelectorAll('.track-row');
+
+  searchInput.addEventListener('input', function() {
+    const query = searchInput.value.toLowerCase().trim();
+    let visibleCount = 0;
+
+    allRows.forEach(function(row) {
+      const trackName = row.dataset.trackName || '';
+      const artistName = row.dataset.artistName || '';
+      const albumName = row.dataset.albumName || '';
+      const genre = row.dataset.genre || '';
+
+      // Check if query matches track, artist, album name, or genre
+      const matches = trackName.includes(query) ||
+                     artistName.includes(query) ||
+                     albumName.includes(query) ||
+                     genre.includes(query);
+
+      if (matches || query === '') {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    // Update visible count
+    visibleCountEl.textContent = visibleCount;
+  });
+
+  // Cover image hover overlay
+  playerCover.addEventListener('mouseenter', function() {
+    if (playerCover.src && playerCover.style.display !== 'none') {
+      coverOverlayImg.src = playerCover.src;
+      coverOverlay.style.display = 'block';
+    }
+  });
+
+  playerCover.addEventListener('mouseleave', function() {
+    coverOverlay.style.display = 'none';
+  });
+
+  // Also hide overlay when mouse moves away from the general player area
+  player.addEventListener('mouseleave', function() {
+    coverOverlay.style.display = 'none';
   });
 })();
 </script>

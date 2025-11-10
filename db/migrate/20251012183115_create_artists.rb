@@ -3,6 +3,7 @@ class CreateArtists < ActiveRecord::Migration[8.0]
     create_table :artists do |t|
       t.string :name
       t.string :slug
+      t.string :genre
 
       t.timestamps
     end

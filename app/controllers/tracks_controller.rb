@@ -2,11 +2,11 @@ class TracksController < ApplicationController
   before_action :set_artist
 
   def index
-    @tracks = @artist.tracks.ordered
+    @tracks = @artist.tracks.includes(:album).ordered
   end
 
   def show
-    @track = @artist.tracks.find_by!(slug: params[:id])
+    @track = @artist.tracks.includes(:album).find_by!(slug: params[:id])
   end
 
   private

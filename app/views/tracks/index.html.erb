@@ -23,9 +23,9 @@
                 <% end %>
               </h2>
               <p class="gray-168-text">
-                <%= track.album %>
-                <% if track.album_type %>
-                  (<%= track.album_type.upcase %>)
+                <%= track.album&.name %>
+                <% if track.album&.album_type %>
+                  (<%= track.album.album_type.upcase %>)
                 <% end %>
                 <% if track.release_date %>
                   • <%= track.release_date.strftime("%Y-%m-%d") %>
