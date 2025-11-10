@@ -5,11 +5,11 @@
     <p><strong>Artist:</strong> <%= @track.artist.name %></p>
 
     <% if @track.album.present? %>
-      <p><strong>Album:</strong> <%= @track.album %></p>
+      <p><strong>Album:</strong> <%= @track.album.name %></p>
     <% end %>
 
-    <% if @track.album_type.present? %>
-      <p><strong>Album Type:</strong> <%= @track.album_type.upcase %></p>
+    <% if @track.album&.album_type.present? %>
+      <p><strong>Album Type:</strong> <%= @track.album.album_type.upcase %></p>
     <% end %>
 
     <% if @track.release_date.present? %>

@@ -1,10 +1,10 @@
 FactoryBot.define do
   factory :track do
     association :artist
+    association :album
     title { "Test Track" }
     sequence(:slug) { |n| "test-track-#{n}" }
-    album { "Test Album" }
-    album_type { "single" }
+    track_number { 1 }
     release_date { Date.today }
     duration { "3:45" }
     featured { false }
@@ -29,13 +29,12 @@ FactoryBot.define do
     end
 
     trait :minimal do
-      album { nil }
-      album_type { nil }
       release_date { nil }
       duration { nil }
       streaming_links { nil }
       videos { nil }
       lyrics { nil }
+      track_number { nil }
     end
   end
 end

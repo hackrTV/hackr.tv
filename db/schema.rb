@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_08_200726) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_09_053830) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -39,8 +39,22 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_08_200726) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "albums", force: :cascade do |t|
+    t.string "album_type"
+    t.integer "artist_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.date "release_date"
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["artist_id", "slug"], name: "index_albums_on_artist_id_and_slug", unique: true
+    t.index ["artist_id"], name: "index_albums_on_artist_id"
+  end
+
   create_table "artists", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "genre"
     t.string "name"
     t.string "slug"
     t.datetime "updated_at", null: false
@@ -156,8 +170,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_08_200726) do
   end
 
   create_table "tracks", force: :cascade do |t|
-    t.string "album"
-    t.string "album_type"
+    t.integer "album_id", null: false
     t.integer "artist_id", null: false
     t.string "cover_image"
     t.datetime "created_at", null: false
@@ -168,8 +181,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_08_200726) do
     t.string "slug"
     t.text "streaming_links"
     t.string "title"
+    t.integer "track_number"
     t.datetime "updated_at", null: false
     t.text "videos"
+    t.index ["album_id"], name: "index_tracks_on_album_id"
     t.index ["artist_id", "slug"], name: "index_tracks_on_artist_id_and_slug", unique: true
     t.index ["artist_id"], name: "index_tracks_on_artist_id"
     t.index ["featured"], name: "index_tracks_on_featured"
@@ -178,6 +193,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_08_200726) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "albums", "artists"
   add_foreign_key "hackr_logs", "grid_hackrs", column: "author_id"
+  add_foreign_key "tracks", "albums"
   add_foreign_key "tracks", "artists"
 end

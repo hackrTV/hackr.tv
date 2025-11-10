@@ -48,7 +48,7 @@
                     <small style="color: #666; font-family: monospace;">/<%= track.slug %></small>
                   </td>
                   <td><%= track.artist.name %></td>
-                  <td><%= track.album || "—" %></td>
+                  <td><%= track.album&.name || "—" %></td>
                   <td style="text-align: center;">
                     <% if track.featured %>
                       <span class="purple-255-text">★</span>

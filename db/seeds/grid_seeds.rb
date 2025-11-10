@@ -13,7 +13,7 @@ GridFaction.destroy_all
 # Create factions
 cyberpulse_faction = GridFaction.create!(
   name: "The.CyberPul.se",
-  slug: "the_cyberpulse",
+  slug: "thecyberpulse",
   description: "The primary broadcast entity. XERAEN, Ryker, and Synthia unite the resistance through music.",
   color_scheme: "purple",
   artist: Artist.find_by(slug: "thecyberpulse")
