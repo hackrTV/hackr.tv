@@ -37,4 +37,42 @@ RSpec.describe Artist, type: :model do
       expect(artist.to_param).to eq("test-artist")
     end
   end
+
+  describe "genre field" do
+    it "is valid with a genre" do
+      artist = create(:artist, genre: "Synthwave/Cyberpunk")
+      expect(artist).to be_valid
+      expect(artist.genre).to eq("Synthwave/Cyberpunk")
+    end
+
+    it "is valid without a genre" do
+      artist = create(:artist, genre: nil)
+      expect(artist).to be_valid
+      expect(artist.genre).to be_nil
+    end
+
+    it "can be updated" do
+      artist = create(:artist, genre: "Rock")
+      artist.update(genre: "Electronic")
+      expect(artist.genre).to eq("Electronic")
+    end
+
+    it "persists genre across reloads" do
+      artist = create(:artist, genre: "Industrial/Dark Synth")
+      artist.reload
+      expect(artist.genre).to eq("Industrial/Dark Synth")
+    end
+
+    describe "factory traits" do
+      it "thecyberpulse trait sets genre to Synthwave/Cyberpunk" do
+        artist = create(:artist, :thecyberpulse)
+        expect(artist.genre).to eq("Synthwave/Cyberpunk")
+      end
+
+      it "xeraen trait sets genre to Industrial/Dark Synth" do
+        artist = create(:artist, :xeraen)
+        expect(artist.genre).to eq("Industrial/Dark Synth")
+      end
+    end
+  end
 end

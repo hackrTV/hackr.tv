@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Album, type: :model do
   describe "associations" do
@@ -88,7 +88,7 @@ RSpec.describe Album, type: :model do
       album = create(:album, artist: artist)
       track3 = create(:track, artist: artist, album: album, track_number: 3, title: "Third Track")
       track1 = create(:track, artist: artist, album: album, track_number: 1, title: "First Track")
-      track2 = create(:track, artist: artist, album: album, track_number: 2, title: "Second Track")
+      create(:track, artist: artist, album: album, track_number: 2, title: "Second Track")
 
       expect(album.tracks.pluck(:track_number)).to eq([1, 2, 3])
       expect(album.tracks.first).to eq(track1)
@@ -98,9 +98,9 @@ RSpec.describe Album, type: :model do
     it "orders tracks by title when track_number is nil" do
       artist = create(:artist)
       album = create(:album, artist: artist)
-      track_c = create(:track, artist: artist, album: album, track_number: nil, title: "C Track")
-      track_a = create(:track, artist: artist, album: album, track_number: nil, title: "A Track")
-      track_b = create(:track, artist: artist, album: album, track_number: nil, title: "B Track")
+      create(:track, artist: artist, album: album, track_number: nil, title: "C Track")
+      create(:track, artist: artist, album: album, track_number: nil, title: "A Track")
+      create(:track, artist: artist, album: album, track_number: nil, title: "B Track")
 
       expect(album.tracks.pluck(:title)).to eq(["A Track", "B Track", "C Track"])
     end
@@ -123,6 +123,78 @@ RSpec.describe Album, type: :model do
       expect(album.name).to eq("Power-On Self-Test")
       expect(album.album_type).to eq("album")
       expect(album.cover_image.attached?).to be false
+    end
+  end
+
+  describe "Active Storage cover_image" do
+    let(:artist) { create(:artist) }
+
+    it "can attach a cover image" do
+      album = create(:album, artist: artist)
+      album.cover_image.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_cover.jpg")),
+        filename: "test_cover.jpg",
+        content_type: "image/jpeg"
+      )
+
+      expect(album.cover_image).to be_attached
+    end
+
+    it "can have no cover image" do
+      album = create(:album, artist: artist)
+      expect(album.cover_image).not_to be_attached
+    end
+
+    it "returns the correct content type" do
+      album = create(:album, artist: artist)
+      album.cover_image.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_cover.jpg")),
+        filename: "test_cover.jpg",
+        content_type: "image/jpeg"
+      )
+
+      expect(album.cover_image.content_type).to eq("image/jpeg")
+    end
+
+    it "returns the correct filename" do
+      album = create(:album, artist: artist)
+      album.cover_image.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_cover.jpg")),
+        filename: "test_cover.jpg",
+        content_type: "image/jpeg"
+      )
+
+      expect(album.cover_image.filename.to_s).to eq("test_cover.jpg")
+    end
+
+    it "can be purged" do
+      album = create(:album, artist: artist)
+      album.cover_image.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_cover.jpg")),
+        filename: "test_cover.jpg",
+        content_type: "image/jpeg"
+      )
+
+      expect(album.cover_image).to be_attached
+      album.cover_image.purge
+      expect(album.cover_image).not_to be_attached
+    end
+
+    describe ":with_cover factory trait" do
+      it "creates an album with attached cover image" do
+        album = create(:album, :with_cover, artist: artist)
+
+        expect(album.cover_image).to be_attached
+        expect(album.cover_image.filename.to_s).to eq("test_cover.jpg")
+        expect(album.cover_image.content_type).to eq("image/jpeg")
+      end
+
+      it "can be used with build strategy" do
+        album = build(:album, :with_cover, artist: artist)
+        album.save!
+
+        expect(album.cover_image).to be_attached
+      end
     end
   end
 end

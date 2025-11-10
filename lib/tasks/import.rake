@@ -100,30 +100,27 @@ namespace :import do
 
       # First pass: collect unique albums from all tracks
       Dir.glob(File.join(tracks_path, "*.yml")).each do |file_path|
-        begin
-          yaml_data = YAML.load_file(file_path)
-          album_name = yaml_data["album"]
-          next if album_name.blank?
+        yaml_data = YAML.load_file(file_path)
+        album_name = yaml_data["album"]
+        next if album_name.blank?
 
-          album_key = [artist.id, album_name]
-          next if albums_seen.key?(album_key)
+        album_key = [artist.id, album_name]
+        next if albums_seen.key?(album_key)
 
-          albums_seen[album_key] = {
-            album_type: yaml_data["album_type"],
-            release_date: yaml_data["release_date"]
-          }
-        rescue => e
-          puts "    ✗ Error reading #{file_path}: #{e.message}"
-        end
+        albums_seen[album_key] = {
+          album_type: yaml_data["album_type"],
+          release_date: yaml_data["release_date"]
+        }
+      rescue => e
+        puts "    ✗ Error reading #{file_path}: #{e.message}"
       end
 
       # Create albums
       albums_seen.each do |(artist_id, album_name), album_data|
         slug = album_name.downcase
-                        .gsub(/[^a-z0-9\s-]/, '')
-                        .gsub(/\s+/, '-')
-                        .gsub(/-+/, '-')
-                        .strip
+          .gsub(/[^a-z0-9\s-]/, "")
+          .gsub(/\s+/, "-").squeeze("-")
+          .strip
 
         album = artist.albums.find_or_initialize_by(slug: slug)
         was_new = album.new_record?
@@ -219,10 +216,9 @@ namespace :import do
           end
 
           album_slug = album_name.downcase
-                                 .gsub(/[^a-z0-9\s-]/, '')
-                                 .gsub(/\s+/, '-')
-                                 .gsub(/-+/, '-')
-                                 .strip
+            .gsub(/[^a-z0-9\s-]/, "")
+            .gsub(/\s+/, "-").squeeze("-")
+            .strip
 
           album = artist.albums.find_by(slug: album_slug)
           unless album
@@ -437,7 +433,7 @@ namespace :import do
       # Parse release date
       release_date = nil
       if album_data["release_date"].present? &&
-         !["TBA", "TBD", ""].include?(album_data["release_date"].to_s.strip)
+          !["TBA", "TBD", ""].include?(album_data["release_date"].to_s.strip)
         begin
           release_date = Date.parse(album_data["release_date"])
         rescue ArgumentError
@@ -552,133 +548,128 @@ namespace :import do
       next unless Dir.exist?(trackz_dir)
 
       Dir.glob(trackz_dir.join("*.yml")).each do |track_file|
-        begin
-          track_data = YAML.load_file(track_file)
-          # Set slug from filename if not present
-          track_data["slug"] ||= File.basename(track_file, ".yml")
-          all_track_data << track_data
-        rescue => e
-          puts "  ⚠ Error loading #{track_file}: #{e.message}"
-        end
+        track_data = YAML.load_file(track_file)
+        # Set slug from filename if not present
+        track_data["slug"] ||= File.basename(track_file, ".yml")
+        all_track_data << track_data
+      rescue => e
+        puts "  ⚠ Error loading #{track_file}: #{e.message}"
       end
     end
 
     puts "  Found #{all_track_data.size} tracks to process\n"
 
     all_track_data.each do |track_data|
-      begin
-        # Find artist (case-insensitive)
-        artist = Artist.find_by("LOWER(name) = ?", track_data["artist"].to_s.downcase)
-        unless artist
-          puts "  ✗ Artist not found for track '#{track_data["title"]}': #{track_data["artist"]}"
-          skipped_count += 1
-          next
-        end
-
-        # Find album (case-insensitive)
-        album = artist.albums.find_by("LOWER(name) = ?", track_data["album"].to_s.downcase)
-        unless album
-          puts "  ✗ Album not found for track '#{track_data["title"]}': #{track_data["album"]} (artist: #{artist.name})"
-          skipped_count += 1
-          next
-        end
-
-        # Find or create track
-        track = artist.tracks.find_or_initialize_by(slug: track_data["slug"])
-
-        # Parse release date
-        release_date = nil
-        if track_data["release_date"].present? && track_data["release_date"] != "TBA" && track_data["release_date"] != "TBA Release"
-          begin
-            release_date = Date.parse(track_data["release_date"])
-          rescue ArgumentError
-            # Invalid date, keep as nil
-          end
-        end
-
-        # Process lyrics - remove section markers (lines starting with [)
-        lyrics = nil
-        if track_data["lyrics"].present?
-          lyrics = track_data["lyrics"].split("\n").reject { |line| line.strip.start_with?("[") }.join("\n").strip
-          lyrics = nil if lyrics.blank?
-        end
-
-        # Auto-assign track number if not specified
-        track_number = track_data["track_number"]
-        if track_number.nil?
-          # Get the max track number for this album, default to 0 if none exist
-          max_track_number = album.tracks.maximum(:track_number) || 0
-          track_number = max_track_number + 1
-        end
-
-        # Prepare track attributes
-        track_attributes = {
-          title: track_data["title"],
-          album: album,
-          track_number: track_number,
-          release_date: release_date,
-          duration: track_data["duration"] == "TBA" ? nil : track_data["duration"],
-          featured: track_data["featured"] || false,
-          streaming_links: track_data["streaming_links"]&.compact&.presence,
-          videos: track_data["videos"]&.compact&.presence,
-          lyrics: lyrics
-        }
-
-        if track.new_record?
-          track.assign_attributes(track_attributes)
-          track.save!
-          created_count += 1
-          puts "  ✓ Created track: #{track.title} (#{artist.name} - #{album.name})"
-        else
-          # Check if update is needed
-          needs_update = false
-          track_attributes.each do |key, value|
-            if track.send(key) != value
-              needs_update = true
-              break
-            end
-          end
-
-          if needs_update
-            track.update!(track_attributes)
-            updated_count += 1
-            puts "  ↻ Updated track: #{track.title} (#{artist.name} - #{album.name})"
-          else
-            puts "  ✓ Track exists: #{track.title} (#{artist.name} - #{album.name})"
-          end
-        end
-
-        # Attach audio file if specified and not already attached
-        if track_data["audio_file"].present? && !track.audio_file.attached?
-          # Try multiple possible paths in artist directory
-          filename = File.basename(track_data["audio_file"])
-          possible_paths = [
-            Rails.root.join("data", artist.slug, filename),
-            Rails.root.join("data", artist.slug, "audio", filename),
-            Rails.root.join("data", artist.slug, "trackz", filename),
-            Rails.root.join("data", artist.slug, "tracks", filename),
-            Rails.root.join("data", track_data["audio_file"])  # Fallback to full path
-          ]
-
-          audio_path = possible_paths.find { |path| File.exist?(path) }
-
-          if audio_path
-            track.audio_file.attach(
-              io: File.open(audio_path),
-              filename: filename
-            )
-            audio_attached_count += 1
-            puts "    → Attached audio file: #{filename}"
-          else
-            audio_missing_count += 1
-            puts "    ⚠ Audio file not found in: data/#{artist.slug}/"
-          end
-        end
-
-      rescue => e
-        error_count += 1
-        puts "  ✗ Error processing track '#{track_data["title"]}': #{e.message}"
+      # Find artist (case-insensitive)
+      artist = Artist.find_by("LOWER(name) = ?", track_data["artist"].to_s.downcase)
+      unless artist
+        puts "  ✗ Artist not found for track '#{track_data["title"]}': #{track_data["artist"]}"
+        skipped_count += 1
+        next
       end
+
+      # Find album (case-insensitive)
+      album = artist.albums.find_by("LOWER(name) = ?", track_data["album"].to_s.downcase)
+      unless album
+        puts "  ✗ Album not found for track '#{track_data["title"]}': #{track_data["album"]} (artist: #{artist.name})"
+        skipped_count += 1
+        next
+      end
+
+      # Find or create track
+      track = artist.tracks.find_or_initialize_by(slug: track_data["slug"])
+
+      # Parse release date
+      release_date = nil
+      if track_data["release_date"].present? && track_data["release_date"] != "TBA" && track_data["release_date"] != "TBA Release"
+        begin
+          release_date = Date.parse(track_data["release_date"])
+        rescue ArgumentError
+          # Invalid date, keep as nil
+        end
+      end
+
+      # Process lyrics - remove section markers (lines starting with [)
+      lyrics = nil
+      if track_data["lyrics"].present?
+        lyrics = track_data["lyrics"].split("\n").reject { |line| line.strip.start_with?("[") }.join("\n").strip
+        lyrics = nil if lyrics.blank?
+      end
+
+      # Auto-assign track number if not specified
+      track_number = track_data["track_number"]
+      if track_number.nil?
+        # Get the max track number for this album, default to 0 if none exist
+        max_track_number = album.tracks.maximum(:track_number) || 0
+        track_number = max_track_number + 1
+      end
+
+      # Prepare track attributes
+      track_attributes = {
+        title: track_data["title"],
+        album: album,
+        track_number: track_number,
+        release_date: release_date,
+        duration: (track_data["duration"] == "TBA") ? nil : track_data["duration"],
+        featured: track_data["featured"] || false,
+        streaming_links: track_data["streaming_links"]&.compact&.presence,
+        videos: track_data["videos"]&.compact&.presence,
+        lyrics: lyrics
+      }
+
+      if track.new_record?
+        track.assign_attributes(track_attributes)
+        track.save!
+        created_count += 1
+        puts "  ✓ Created track: #{track.title} (#{artist.name} - #{album.name})"
+      else
+        # Check if update is needed
+        needs_update = false
+        track_attributes.each do |key, value|
+          if track.send(key) != value
+            needs_update = true
+            break
+          end
+        end
+
+        if needs_update
+          track.update!(track_attributes)
+          updated_count += 1
+          puts "  ↻ Updated track: #{track.title} (#{artist.name} - #{album.name})"
+        else
+          puts "  ✓ Track exists: #{track.title} (#{artist.name} - #{album.name})"
+        end
+      end
+
+      # Attach audio file if specified and not already attached
+      if track_data["audio_file"].present? && !track.audio_file.attached?
+        # Try multiple possible paths in artist directory
+        filename = File.basename(track_data["audio_file"])
+        possible_paths = [
+          Rails.root.join("data", artist.slug, filename),
+          Rails.root.join("data", artist.slug, "audio", filename),
+          Rails.root.join("data", artist.slug, "trackz", filename),
+          Rails.root.join("data", artist.slug, "tracks", filename),
+          Rails.root.join("data", track_data["audio_file"])  # Fallback to full path
+        ]
+
+        audio_path = possible_paths.find { |path| File.exist?(path) }
+
+        if audio_path
+          track.audio_file.attach(
+            io: File.open(audio_path),
+            filename: filename
+          )
+          audio_attached_count += 1
+          puts "    → Attached audio file: #{filename}"
+        else
+          audio_missing_count += 1
+          puts "    ⚠ Audio file not found in: data/#{artist.slug}/"
+        end
+      end
+    rescue => e
+      error_count += 1
+      puts "  ✗ Error processing track '#{track_data["title"]}': #{e.message}"
     end
 
     puts "\nTrack import summary:"

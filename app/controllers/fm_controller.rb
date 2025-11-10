@@ -27,7 +27,7 @@ class FmController < ApplicationController
         albums.release_date DESC,
         tracks.track_number ASC
       SQL
-      )
+              )
     ).joins(:artist, :album)
   end
 

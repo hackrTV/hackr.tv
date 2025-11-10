@@ -194,4 +194,56 @@ RSpec.describe Track, type: :model do
       expect(track.streaming_links["spotify"]).to eq("https://spotify.com/track/123")
     end
   end
+
+  describe "Active Storage audio_file" do
+    let(:artist) { create(:artist) }
+    let(:album) { create(:album, artist: artist) }
+    let(:track) { create(:track, artist: artist, album: album) }
+
+    it "can attach an audio file" do
+      track.audio_file.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_audio.mp3")),
+        filename: "test_audio.mp3",
+        content_type: "audio/mpeg"
+      )
+
+      expect(track.audio_file).to be_attached
+    end
+
+    it "can have no audio file" do
+      expect(track.audio_file).not_to be_attached
+    end
+
+    it "returns the correct content type" do
+      track.audio_file.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_audio.mp3")),
+        filename: "test_audio.mp3",
+        content_type: "audio/mpeg"
+      )
+
+      expect(track.audio_file.content_type).to eq("audio/mpeg")
+    end
+
+    it "returns the correct filename" do
+      track.audio_file.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_audio.mp3")),
+        filename: "test_audio.mp3",
+        content_type: "audio/mpeg"
+      )
+
+      expect(track.audio_file.filename.to_s).to eq("test_audio.mp3")
+    end
+
+    it "can be purged" do
+      track.audio_file.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_audio.mp3")),
+        filename: "test_audio.mp3",
+        content_type: "audio/mpeg"
+      )
+
+      expect(track.audio_file).to be_attached
+      track.audio_file.purge
+      expect(track.audio_file).not_to be_attached
+    end
+  end
 end
