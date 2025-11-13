@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe BandProfileComponent, type: :component do
   include ViewComponent::TestHelpers
+
   let(:artist) { create(:artist, name: "Test Artist", slug: "test_artist") }
   let(:album) { create(:album, artist: artist, name: "Test Album") }
   let(:track) { create(:track, artist: artist, album: album, title: "Test Track") }
@@ -30,7 +31,7 @@ RSpec.describe BandProfileComponent, type: :component do
     it "uses the border color from color scheme" do
       render_inline(described_class.new(artist: artist, tracks: tracks, color_scheme: color_scheme))
 
-      expect(rendered_content).to include('border: 2px solid #00ff00')
+      expect(rendered_content).to include("border: 2px solid #00ff00")
     end
 
     it "uses default filter_name based on artist name" do
