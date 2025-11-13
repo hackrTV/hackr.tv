@@ -1,0 +1,24 @@
+<div class="tui-window white-text" style="max-width: 1200px; <%= background_style %> border: 2px solid <%= border_color %>;">
+  <fieldset style="border-color: <%= border_color %>;">
+    <legend class="center" style="color: <%= legend_color %>; <%= color_scheme[:legend_style] %>"><%= artist.name.upcase %></legend>
+
+    <div>
+      <% if intro %>
+        <%= intro %>
+      <% end %>
+
+      <% if album_section %>
+        <%= album_section %>
+      <% end %>
+
+      <% if philosophy_section %>
+        <%= philosophy_section %>
+      <% end %>
+
+      <div style="display: flex; gap: 15px; margin-top: 30px;">
+        <%= link_to "← BACK TO BANDS", fm_bands_path, class: "tui-button", style: "background: #{color_scheme[:back_button] || '#222'}; color: #888; border: 1px solid #{color_scheme[:back_border] || '#444'};" %>
+        <%= link_to "LISTEN IN THE PULSE VAULT →", fm_pulse_vault_path(filter: filter_name), class: "tui-button", style: button_style %>
+      </div>
+    </div>
+  </fieldset>
+</div>

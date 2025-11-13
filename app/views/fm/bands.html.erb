@@ -36,6 +36,14 @@
                       <%= link_to "VIEW PROFILE", xeraen_path, class: "tui-button purple-168", style: "flex: 1; text-align: center;" %>
                     <% elsif artist.slug == 'thecyberpulse' %>
                       <%= link_to "VIEW PROFILE", root_path, class: "tui-button purple-168", style: "flex: 1; text-align: center;" %>
+                    <% elsif artist.slug == 'system_rot' %>
+                      <%= link_to "VIEW PROFILE", system_rot_path, class: "tui-button purple-168", style: "flex: 1; text-align: center;" %>
+                    <% elsif artist.slug == 'wavelength_zero' %>
+                      <%= link_to "VIEW PROFILE", wavelength_zero_path, class: "tui-button purple-168", style: "flex: 1; text-align: center;" %>
+                    <% elsif artist.slug == 'voiceprint' %>
+                      <%= link_to "VIEW PROFILE", voiceprint_path, class: "tui-button purple-168", style: "flex: 1; text-align: center;" %>
+                    <% elsif artist.slug == 'temporal_blue_drift' %>
+                      <%= link_to "VIEW PROFILE", temporal_blue_drift_path, class: "tui-button purple-168", style: "flex: 1; text-align: center;" %>
                     <% else %>
                       <button class="tui-button" style="flex: 1; opacity: 0.5; cursor: not-allowed;" disabled>
                         COMING SOON
@@ -43,11 +51,7 @@
                     <% end %>
 
                     <% if artist.tracks.any? %>
-                      <% if artist.slug == 'xeraen' %>
-                        <%= link_to "TRACKS", xeraen_tracks_path, class: "tui-button cyan-168", style: "flex: 1; text-align: center;" %>
-                      <% else %>
-                        <%= link_to "TRACKS", tracks_path, class: "tui-button cyan-168", style: "flex: 1; text-align: center;" %>
-                      <% end %>
+                      <%= link_to "TRACKS", fm_pulse_vault_path(filter: artist.name.downcase), class: "tui-button cyan-168", style: "flex: 1; text-align: center;" %>
                     <% end %>
                   </div>
                 </div>
@@ -64,9 +68,9 @@
       <div style="margin-top: 30px; padding: 20px; background: #0a0a0a; border: 1px solid #333;">
         <h3 style="margin-bottom: 10px; color: #10b981;">[:: ABOUT SECTOR X MEDIA ::]</h3>
         <p style="line-height: 1.6; color: #888;">
-          Sector X Media represents the underground music collective broadcasting resistance through sound.
-          Every artist here is part of THE PULSE GRID universe, fighting corporate control through
-          creativity, collaboration, and uncompromising artistic vision. From 2025 to 2125, the signal
+          Sector X Media represents the underground music collective broadcasting resistance through time.
+          Every artist here is part of THE PULSE GRID universe, fighting GovCorp control through
+          creativity, collaboration, and uncompromising artistic vision. From <%= Time.now.year %> to <%= Time.now.year + 100 %>, the signal
           continues.
         </p>
       </div>

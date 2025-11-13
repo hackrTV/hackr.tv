@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Connect to Rails database, development by default, use `ENV` to set.
+
+# Get the directory where this script lives
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the project root (parent of bin directory)
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Default to development environment
+ENV="${1:-development}"
+
+# Construct the database path
+DB_PATH="$PROJECT_ROOT/storage/${ENV}.sqlite3"
+
+# Check if the database file exists
+if [ ! -f "$DB_PATH" ]; then
+  echo "Error: Database file not found at $DB_PATH"
+  echo "Usage: $0 [environment]"
+  echo "  environment: development (default), test, production, etc."
+  exit 1
+fi
+
+# Check if litecli is installed
+if ! command -v litecli &> /dev/null; then
+  echo "Error: litecli is not installed"
+  echo "Install it with: pip install litecli"
+  exit 1
+fi
+
+# Connect to the database
+echo "Connecting to $ENV database at $DB_PATH"
+litecli "$DB_PATH"

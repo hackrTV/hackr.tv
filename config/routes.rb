@@ -11,6 +11,18 @@ Rails.application.routes.draw do
   get "xeraen/trackz", to: "tracks#index", as: :xeraen_tracks
   get "xeraen/trackz/:id", to: "tracks#show", as: :xeraen_track
 
+  # System Rot routes
+  get "system_rot", to: "pages#system_rot", as: :system_rot
+
+  # Wavelength Zero routes
+  get "wavelength_zero", to: "pages#wavelength_zero", as: :wavelength_zero
+
+  # Voiceprint routes
+  get "voiceprint", to: "pages#voiceprint", as: :voiceprint
+
+  # Temporal Blue Drift routes
+  get "temporal_blue_drift", to: "pages#temporal_blue_drift", as: :temporal_blue_drift
+
   # Sector X routes
   get "sector/x", to: "pages#sector_x", as: :sector_x
 
@@ -30,7 +42,7 @@ Rails.application.routes.draw do
   # hackr.fm routes
   get "fm", to: "fm#index", as: :fm
   get "fm/radio", to: "fm#radio", as: :fm_radio
-  get "fm/pulse-vault", to: "fm#pulse_vault", as: :fm_pulse_vault
+  get "fm/pulse_vault", to: "fm#pulse_vault", as: :fm_pulse_vault
   get "fm/bands", to: "fm#bands", as: :fm_bands
 
   # HackrLogs (blog) routes

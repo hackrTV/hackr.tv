@@ -1,0 +1,121 @@
+<%= render BandProfileComponent.new(
+  artist: @artist,
+  tracks: @tracks,
+  color_scheme: {
+    primary: '#39ff14',
+    border: '#39ff14',
+    legend: '#39ff14',
+    background: '#0a0a0a',
+    button: '#39ff14',
+    button_text: '#000',
+    back_button: '#222',
+    back_border: '#444'
+  },
+  filter_name: 'system rot'
+) do |component| %>
+
+  <% component.with_intro do %>
+    <div style="margin-bottom: 30px; padding: 20px; background: #000000; border: 1px solid #39ff14;">
+      <h2 style="text-align: center; margin-bottom: 15px; color: #39ff14;">
+        [:: WE WERE HERE ::]
+      </h2>
+      <p style="color: #ccc; line-height: 1.6; margin-bottom: 15px;">
+        You want beautiful resistance? Go elsewhere.
+      </p>
+      <p style="color: #ccc; line-height: 1.6; margin-bottom: 15px;">
+        You want code and theory? Not here.
+      </p>
+      <p style="color: #ccc; line-height: 1.6;">
+        We operate in abandoned buildings. We claim concrete spaces GovCorp forgot. We paint their walls.
+        We break their cameras. You'll know where we've been by the neon green glow in the dark.
+      </p>
+    </div>
+  <% end %>
+
+  <% component.with_album_section do %>
+    <% if @artist && @artist.albums.any? %>
+      <div class="tui-window white-text" style="margin-bottom: 30px; background: #000000; border: 1px solid #39ff14;">
+        <fieldset style="border-color: #39ff14;">
+          <legend style="color: #39ff14;">STREET LEVEL EP</legend>
+
+          <div style="padding: 20px;">
+            <div style="margin-bottom: 20px;">
+              <p style="color: #ccc; margin-bottom: 10px;">
+                Five tracks. No polish. Get in, make your statement, get out.
+              </p>
+              <p style="color: #888; margin-bottom: 10px;">
+                We don't care if you like it. This isn't for you anyway—it's for everyone who's tired of waiting
+                for someone else to fix this mess.
+              </p>
+            </div>
+
+            <% if @tracks.any? %>
+              <div class="tui-fieldset" style="border-color: #39ff14;">
+                <legend style="color: #39ff14;">TRACKS</legend>
+                <table class="tui-table" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left; color: #39ff14;">#</th>
+                      <th style="text-align: left; color: #39ff14;">Track</th>
+                      <th style="text-align: left; color: #39ff14;">Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @tracks.each_with_index do |track, index| %>
+                      <tr>
+                        <td style="color: #888;"><%= index + 1 %></td>
+                        <td style="color: #ccc;"><strong><%= track.title %></strong></td>
+                        <td style="color: #888;"><%= track.duration || "—" %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% end %>
+          </div>
+        </fieldset>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% component.with_philosophy_section do %>
+    <div class="tui-window white-text" style="margin-bottom: 30px; background: #000000; border: 1px solid #39ff14;">
+      <fieldset style="border-color: #39ff14;">
+        <legend style="color: #39ff14;">WHAT WE BELIEVE</legend>
+
+        <div style="padding: 20px;">
+          <div style="margin-bottom: 25px;">
+            <h3 style="color: #39ff14; margin-bottom: 10px; text-transform: uppercase;">Unplug</h3>
+            <p style="color: #ccc; line-height: 1.7;">
+              They track everything. Your phone. Your credit card. Every click, every search, every movement.
+              Going offline isn't hiding—it's reclaiming yourself. Invisible to their systems means free to act.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px;">
+            <h3 style="color: #39ff14; margin-bottom: 10px; text-transform: uppercase;">Occupy</h3>
+            <p style="color: #ccc; line-height: 1.7;">
+              The streets are ours. The abandoned buildings are ours. Every blank wall is a canvas waiting for truth.
+              Smash their cameras. Paint their lies over. Make them see us everywhere they look.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px;">
+            <h3 style="color: #39ff14; margin-bottom: 10px; text-transform: uppercase;">Let It Rot</h3>
+            <p style="color: #ccc; line-height: 1.7;">
+              Their system is already dying. Don't try to save it. Don't reform it. Let it collapse under its own
+              corruption and build something human from the ruins. The rot started long before us—we're just here
+              to watch it burn.
+            </p>
+          </div>
+
+          <p style="color: #39ff14; margin-top: 30px; padding: 15px; background: #000000; border-left: 3px solid #39ff14; line-height: 1.7;">
+            No reform. No compromise. No waiting for someone else to fix this.<br>
+            Just rage, solidarity, and the will to act.
+          </p>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+
+<% end %>
