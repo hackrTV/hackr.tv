@@ -1,0 +1,160 @@
+<%= render BandProfileComponent.new(
+  artist: @artist,
+  tracks: @tracks,
+  color_scheme: {
+    primary: '#00d9ff',
+    border: '#00d9ff',
+    legend: '#00d9ff',
+    legend_style: 'font-family: monospace;',
+    background: '#000000',
+    button: '#00d9ff',
+    button_text: '#000',
+    back_button: '#000',
+    back_border: '#333'
+  },
+  filter_name: 'voiceprint'
+) do |component| %>
+
+  <% component.with_intro do %>
+    <div style="margin-bottom: 30px; padding: 20px; background: #000000; border: 1px solid #00d9ff;">
+      <p style="color: #00d9ff; font-family: monospace; margin-bottom: 20px; font-size: 0.9em;">
+        [SAMPLE_ID: VP-<%= Time.now.year + 100 %>-INTRO]<br>
+        [FORMAT: AUTHENTIC_HUMAN_VOICE]<br>
+        [STATUS: ARCHIVED]
+      </p>
+      <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+        Listen.
+      </p>
+      <p style="color: #aaa; line-height: 1.7; margin-bottom: 15px;">
+        That laugh you just heard—someone was actually joyful when that sound happened. That conversation
+        fragment—two people actually connected. That voice crack, that hesitation, that imperfect breath—
+        all proof that a real human existed in that moment.
+      </p>
+      <p style="color: #aaa; line-height: 1.7; margin-bottom: 15px;">
+        By <%= Time.now.year + 100 %>, most people have never heard unprocessed human voices. The RAINNs synthesize everything.
+        Perfect. Optimized. Empty.
+      </p>
+      <p style="color: #ccc; line-height: 1.7;">
+        We archive the real ones. Every imperfection. Every emotional crack. Every beautiful flaw that proves
+        someone was actually there.
+      </p>
+    </div>
+  <% end %>
+
+  <% component.with_album_section do %>
+    <% if @artist && @artist.albums.any? %>
+      <div class="tui-window white-text" style="margin-bottom: 30px; background: #000000; border: 1px solid #00d9ff;">
+        <fieldset style="border-color: #00d9ff;">
+          <legend style="color: #00d9ff; font-family: monospace;">AUDIO ARCHIVE EP</legend>
+
+          <div style="padding: 20px;">
+            <div style="margin-bottom: 20px;">
+              <p style="color: #00d9ff; font-family: monospace; font-size: 0.85em; margin-bottom: 15px;">
+                [COLLECTION_STATUS: ACTIVE]<br>
+                [SAMPLE_COUNT: 1,847 VOICES]<br>
+                [PRESERVATION_PRIORITY: CRITICAL]
+              </p>
+              <p style="color: #ccc; line-height: 1.7; margin-bottom: 15px;">
+                Five tracks. Each one built from fragments of authentic human expression. No traditional vocals—
+                just people being people. Talking. Laughing. Crying. Existing.
+              </p>
+              <p style="color: #888; line-height: 1.7;">
+                We sample voices the way others sample drums. Because in <%= Time.now.year + 100 %>, authentic human sound is rarer
+                than any instrument. Each track is simultaneously a song and a database. Entertainment and evidence.
+              </p>
+            </div>
+
+            <% if @tracks.any? %>
+              <div class="tui-fieldset" style="border-color: #00d9ff;">
+                <legend style="color: #00d9ff; font-family: monospace;">TRACK ARCHIVE</legend>
+                <table class="tui-table" style="width: 100%; font-family: monospace;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left; color: #00d9ff;">#</th>
+                      <th style="text-align: left; color: #00d9ff;">Archive Entry</th>
+                      <th style="text-align: left; color: #00d9ff;">Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @tracks.each_with_index do |track, index| %>
+                      <tr>
+                        <td style="color: #00d9ff;"><%= "%02d" % (index + 1) %></td>
+                        <td style="color: #ccc;"><strong><%= track.title %></strong></td>
+                        <td style="color: #888;"><%= track.duration || "—" %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% end %>
+          </div>
+        </fieldset>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% component.with_philosophy_section do %>
+    <div class="tui-window white-text" style="margin-bottom: 30px; background: #000000; border: 1px solid #00d9ff;">
+      <fieldset style="border-color: #00d9ff;">
+        <legend style="color: #00d9ff; font-family: monospace;">THE ARCHIVE PROJECT</legend>
+
+        <div style="padding: 20px;">
+          <div style="margin-bottom: 25px; padding: 15px; background: #0a0a0a; border-left: 3px solid #00d9ff;">
+            <p style="color: #00d9ff; font-family: monospace; font-size: 0.85em; margin-bottom: 10px;">
+              [PROCEDURE: DOCUMENTATION]
+            </p>
+            <p style="color: #ccc; line-height: 1.7;">
+              Every conversation we capture is evidence. Every laugh, every argument, every quiet moment—
+              proof that humans existed before the RAINNs synthesized everything. We're not just making music.
+              We're documenting that you were here. That you mattered. That you sounded like something real.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px; padding: 15px; background: #0a0a0a; border-left: 3px solid #00d9ff;">
+            <p style="color: #00d9ff; font-family: monospace; font-size: 0.85em; margin-bottom: 10px;">
+              [ANALYSIS: FREQUENCY_OF_MEMORY]
+            </p>
+            <p style="color: #ccc; line-height: 1.7;">
+              Memory doesn't just live in images. It lives in how people sounded. The way your friend laughed.
+              How your voice cracked when you were tired. The specific rhythm of someone saying your name.
+              We archive those sounds because audio carries emotional data that nothing else can preserve.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px; padding: 15px; background: #0a0a0a; border-left: 3px solid #00d9ff;">
+            <p style="color: #00d9ff; font-family: monospace; font-size: 0.85em; margin-bottom: 10px;">
+              [VALIDATION: HUMAN_RESONANCE]
+            </p>
+            <p style="color: #ccc; line-height: 1.7;">
+              The RAINNs are perfect. That's how you know they're fake. Real voices have quirks. Hesitations.
+              Imperfect breaths. Emotional cracks that betray what words try to hide. Humanity lives in our
+              flaws, not our optimization. We archive the imperfections because that's where the truth is.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px; padding: 15px; background: #0a0a0a; border-left: 3px solid #00d9ff;">
+            <p style="color: #00d9ff; font-family: monospace; font-size: 0.85em; margin-bottom: 10px;">
+              [STATUS: FRAGMENTATION_AND_RECONSTRUCTION]
+            </p>
+            <p style="color: #ccc; line-height: 1.7;">
+              We chop voices. Scatter them. Break them apart in our tracks. Not to destroy—to prove they can
+              be reassembled. Even shattered, human expression persists. Even fragmented, meaning reconstructs
+              itself. You can break the voice but you can't erase what it said.
+            </p>
+          </div>
+
+          <p style="color: #00d9ff; margin-top: 30px; padding: 20px; background: #000000; border: 1px solid #00d9ff; font-family: monospace; line-height: 1.8;">
+            [ARCHIVE_MISSION_STATEMENT]<br><br>
+            <span style="color: #ccc;">
+            We don't fight with weapons.<br>
+            We fight by remembering.<br>
+            Every archived voice is proof:<br>
+            We existed. We mattered. We were irreplaceably, messily, authentically alive.
+            </span>
+          </p>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+
+<% end %>

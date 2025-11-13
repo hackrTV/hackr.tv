@@ -21,6 +21,7 @@
           <input type="text"
                  id="track-search"
                  placeholder="Type to filter tracks..."
+                 value="<%= params[:filter] %>"
                  style="width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #555; color: #ccc; font-family: monospace; font-size: 1em;">
         </div>
 
@@ -33,7 +34,7 @@
                 <th style="text-align: left; color: #888;">&nbsp;Artist</th>
                 <th style="text-align: left; color: #888;">&nbsp;Album</th>
                 <th style="text-align: left; color: #888;">&nbsp;Genre</th>
-                <th style="text-align: center; color: #888;">Stream</th>
+                <th style="text-align: center; color: #888; width: 120px; min-width: 120px;">Stream</th>
               </tr>
             </thead>
             <tbody>
@@ -69,7 +70,7 @@
                   <td style="color: <%= track.audio_file.attached? ? '#aaa' : '#555' %>;">&nbsp;<%= track.artist.name %>&nbsp;</td>
                   <td style="color: <%= track.audio_file.attached? ? '#999' : '#555' %>;">&nbsp;<%= track.album.name || '—' %>&nbsp;</td>
                   <td style="color: <%= track.audio_file.attached? ? '#999' : '#555' %>;">&nbsp;<%= track.artist.genre || '—' %>&nbsp;</td>
-                  <td style="text-align: center;">
+                  <td style="text-align: center; width: 135px; min-width: 135px;">
                     <% if track.audio_file.attached? %>
                       &nbsp;
                       <button class="tui-button play-track-btn"
@@ -193,6 +194,7 @@
 
   let currentTrackUrl = null;
   let currentTrackId = null;
+  let pendingPlayHandler = null;
 
   // Format time helper
   function formatTime(seconds) {
@@ -214,7 +216,11 @@
         if (indicator) indicator.style.display = 'none';
       }
       const playBtn = row.querySelector('.play-track-btn');
-      if (playBtn) playBtn.textContent = '► PLAY';
+      if (playBtn) {
+        playBtn.textContent = '► PLAY';
+        playBtn.style.background = '#7c3aed';
+        playBtn.style.color = 'white';
+      }
     });
 
     // Highlight the current track
@@ -231,6 +237,8 @@
         const playBtn = currentRow.querySelector('.play-track-btn');
         if (playBtn) {
           playBtn.textContent = isPlaying ? '❚❚ PAUSE' : '► PLAY';
+          playBtn.style.background = isPlaying ? '#9333ea' : '#7c3aed';
+          playBtn.style.color = isPlaying ? '#00d9ff' : 'white';
         }
       }
     }
@@ -238,9 +246,15 @@
 
   // Load and play track
   function loadTrack(url, title, artist, trackId, coverUrl) {
+    // Remove any pending play handler from previous track loads
+    if (pendingPlayHandler) {
+      audio.removeEventListener('canplay', pendingPlayHandler);
+      pendingPlayHandler = null;
+    }
+
     currentTrackUrl = url;
     currentTrackId = trackId;
-    audio.src = url;
+
     trackTitleEl.textContent = title;
     trackArtistEl.textContent = artist;
 
@@ -253,15 +267,38 @@
     }
 
     player.style.display = 'block';
-    audio.play();
     playPauseBtn.textContent = '❚❚ PAUSE';
     updateNowPlayingUI(trackId, true);
+
+    // Load the audio and play when ready
+    audio.src = url;
+    audio.load();
+
+    // Wait for audio to be ready, then play
+    pendingPlayHandler = function() {
+      // Only play if this is still the current track
+      if (currentTrackId === trackId) {
+        audio.play().catch(function(error) {
+          console.error('Playback failed:', error);
+          playPauseBtn.textContent = '► PLAY';
+          updateNowPlayingUI(trackId, false);
+        });
+      }
+      audio.removeEventListener('canplay', pendingPlayHandler);
+      pendingPlayHandler = null;
+    };
+
+    audio.addEventListener('canplay', pendingPlayHandler);
   }
 
   // Play/Pause button in player bar
   playPauseBtn.addEventListener('click', function() {
     if (audio.paused) {
-      audio.play();
+      audio.play().catch(function(error) {
+        console.error('Playback failed:', error);
+        playPauseBtn.textContent = '► PLAY';
+        updateNowPlayingUI(currentTrackId, false);
+      });
       playPauseBtn.textContent = '❚❚ PAUSE';
       updateNowPlayingUI(currentTrackId, true);
     } else {
@@ -356,7 +393,11 @@
         playPauseBtn.textContent = '► PLAY';
         updateNowPlayingUI(currentTrackId, false);
       } else if (trackId === currentTrackId && audio.paused) {
-        audio.play();
+        audio.play().catch(function(error) {
+          console.error('Playback failed:', error);
+          playPauseBtn.textContent = '► PLAY';
+          updateNowPlayingUI(currentTrackId, false);
+        });
         playPauseBtn.textContent = '❚❚ PAUSE';
         updateNowPlayingUI(currentTrackId, true);
       } else {
@@ -381,7 +422,11 @@
         playPauseBtn.textContent = '► PLAY';
         updateNowPlayingUI(currentTrackId, false);
       } else if (trackId === currentTrackId && audio.paused) {
-        audio.play();
+        audio.play().catch(function(error) {
+          console.error('Playback failed:', error);
+          playPauseBtn.textContent = '► PLAY';
+          updateNowPlayingUI(currentTrackId, false);
+        });
         playPauseBtn.textContent = '❚❚ PAUSE';
         updateNowPlayingUI(currentTrackId, true);
       } else {
@@ -414,7 +459,11 @@
         playPauseBtn.textContent = '► PLAY';
         updateNowPlayingUI(currentTrackId, false);
       } else if (trackId === currentTrackId && audio.paused) {
-        audio.play();
+        audio.play().catch(function(error) {
+          console.error('Playback failed:', error);
+          playPauseBtn.textContent = '► PLAY';
+          updateNowPlayingUI(currentTrackId, false);
+        });
         playPauseBtn.textContent = '❚❚ PAUSE';
         updateNowPlayingUI(currentTrackId, true);
       } else {
@@ -433,7 +482,7 @@
   const visibleCountEl = document.getElementById('visible-count');
   const allRows = document.querySelectorAll('.track-row');
 
-  searchInput.addEventListener('input', function() {
+  function applyFilter() {
     const query = searchInput.value.toLowerCase().trim();
     let visibleCount = 0;
 
@@ -459,7 +508,14 @@
 
     // Update visible count
     visibleCountEl.textContent = visibleCount;
-  });
+  }
+
+  searchInput.addEventListener('input', applyFilter);
+
+  // Apply filter on page load if search input has a value
+  if (searchInput.value) {
+    applyFilter();
+  }
 
   // Cover image hover overlay
   playerCover.addEventListener('mouseenter', function() {
@@ -476,6 +532,36 @@
   // Also hide overlay when mouse moves away from the general player area
   player.addEventListener('mouseleave', function() {
     coverOverlay.style.display = 'none';
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    // Tab to focus search and select all text
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+
+    // Spacebar to pause/resume playback
+    // Only handle spacebar if audio is loaded and not typing in search box
+    if (e.key === ' ' && currentTrackId && e.target !== searchInput) {
+      e.preventDefault(); // Prevent page scroll
+
+      if (audio.paused) {
+        audio.play().catch(function(error) {
+          console.error('Playback failed:', error);
+          playPauseBtn.textContent = '► PLAY';
+          updateNowPlayingUI(currentTrackId, false);
+        });
+        playPauseBtn.textContent = '❚❚ PAUSE';
+        updateNowPlayingUI(currentTrackId, true);
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = '► PLAY';
+        updateNowPlayingUI(currentTrackId, false);
+      }
+    }
   });
 })();
 </script>

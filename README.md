@@ -93,7 +93,7 @@
    - Main site: http://localhost:3000
    - THE PULSE GRID: http://localhost:3000/grid
    - hackr.fm Radio: http://localhost:3000/fm/radio
-   - Pulse Vault: http://localhost:3000/fm/pulse-vault
+   - Pulse Vault: http://localhost:3000/fm/pulse_vault
 
 ---
 

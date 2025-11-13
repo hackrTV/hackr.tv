@@ -1,0 +1,162 @@
+<%= render BandProfileComponent.new(
+  artist: @artist,
+  tracks: @tracks,
+  color_scheme: {
+    primary: '#6B9BD1',
+    border: '#6B9BD1',
+    legend: '#B19CD9',
+    legend_style: 'font-style: italic;',
+    background_gradient: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%)',
+    button_gradient: 'linear-gradient(90deg, #6B9BD1, #9B7EBD)',
+    back_button: '#1a1a2e',
+    back_border: '#6B9BD1'
+  },
+  filter_name: 'temporal blue drift'
+) do |component| %>
+
+  <% component.with_intro do %>
+    <div style="margin-bottom: 30px; padding: 25px; background: rgba(107, 155, 209, 0.05); border-left: 4px solid #6B9BD1;">
+      <p style="color: #B19CD9; line-height: 1.9; margin-bottom: 20px; font-style: italic; font-size: 1.05em;">
+        Ashlinn—
+      </p>
+      <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+        I'm writing this from <%= Time.now.year + 100 %>. You're reading it in <%= Time.now.year %>. Between us: a hundred years I can't cross,
+        a century of separation measured in electromagnetic frequencies and mathematical impossibilities.
+      </p>
+      <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+        I can't speak to you directly. Can't hold you. Can't exist in the same moment you do.
+      </p>
+      <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+        So I send you this: sound waves encoded with everything I can't say. Time signatures that fracture
+        like my experience of causality. Arpeggios cascading like the data I transmit backward through the temporal divide.
+        Synth pads warm as the memories I have of a world I've never known.
+      </p>
+      <p style="color: #B19CD9; line-height: 1.8; font-style: italic;">
+        This is how I tell you I love you across an impossible distance.
+      </p>
+    </div>
+  <% end %>
+
+  <% component.with_album_section do %>
+    <% if @artist && @artist.albums.any? %>
+      <div class="tui-window white-text" style="margin-bottom: 30px; background: rgba(155, 126, 189, 0.05); border: 1px solid #9B7EBD;">
+        <fieldset style="border-color: #9B7EBD;">
+          <legend style="color: #9B7EBD;">CHRONOLOGOS EP</legend>
+
+          <div style="padding: 20px;">
+            <div style="margin-bottom: 20px;">
+              <p style="color: #ddd; line-height: 1.8; margin-bottom: 15px; font-style: italic;">
+                Five transmissions. Love letters encoded in mathematics and melody. Each one a fragment of what
+                exists between <%= Time.now.year %> and <%= Time.now.year + 100 %>.
+              </p>
+              <p style="color: #aaa; line-height: 1.7; margin-bottom: 12px;">
+                Most are instrumental—because what we share can't be said directly, only felt through the precision
+                of sound. When vocals appear, they're synthesized through a RAINN—the same AI technology GovCorp uses
+                to erase authentic voices. The irony isn't lost on me: using their tools to send you something real.
+              </p>
+              <p style="color: #888; line-height: 1.6; font-size: 0.95em; font-style: italic;">
+                Distant. Processed. Ethereal. Reaching across the void between our timelines.
+              </p>
+            </div>
+
+            <% if @tracks.any? %>
+              <div class="tui-fieldset" style="border-color: #6B9BD1; background: rgba(0,0,0,0.2);">
+                <legend style="color: #6B9BD1;">TRANSMISSIONS</legend>
+                <table class="tui-table" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left; color: #B19CD9;">#</th>
+                      <th style="text-align: left; color: #B19CD9;">Signal</th>
+                      <th style="text-align: left; color: #B19CD9;">Type</th>
+                      <th style="text-align: left; color: #B19CD9;">Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @tracks.each_with_index do |track, index| %>
+                      <% is_instrumental = ['Chronology Fracture', 'Memory Cascade'].include?(track.title) %>
+                      <tr style="border-left: 3px solid <%= is_instrumental ? '#6B9BD1' : '#9B7EBD' %>;">
+                        <td style="color: #888; padding-left: 10px;"><%= index + 1 %></td>
+                        <td style="color: #ddd;"><strong><%= track.title %></strong></td>
+                        <td style="color: #aaa; font-size: 0.9em; font-style: italic;"><%= is_instrumental ? 'instrumental' : 'vocals' %></td>
+                        <td style="color: #888;"><%= track.duration || "—" %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% end %>
+          </div>
+        </fieldset>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% component.with_philosophy_section do %>
+    <div class="tui-window white-text" style="margin-bottom: 30px; background: rgba(107, 155, 209, 0.05); border: 1px solid #6B9BD1;">
+      <fieldset style="border-color: #6B9BD1;">
+        <legend style="color: #6B9BD1;">WHAT I'M TRYING TO TELL YOU</legend>
+
+        <div style="padding: 20px;">
+          <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(107, 155, 209, 0.2);">
+            <h3 style="color: #6B9BD1; margin-bottom: 10px; text-transform: uppercase; font-size: 0.95em; letter-spacing: 1px;">Time Breaks Apart</h3>
+            <p style="color: #ccc; line-height: 1.8;">
+              The moment I realized I could reach you, causality fractured. Linear time shattered into quantum possibilities.
+              Every signal I send creates ripples backward through the timeline. The math is beautiful and terrifying—
+              like our connection.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(107, 155, 209, 0.2);">
+            <h3 style="color: #9B7EBD; margin-bottom: 10px; text-transform: uppercase; font-size: 0.95em; letter-spacing: 1px;">A Hundred Years Between</h3>
+            <p style="color: #ccc; line-height: 1.8;">
+              You exist in <%= Time.now.year %>. I exist in <%= Time.now.year + 100 %>. The distance between us isn't measured in kilometers—it's measured
+              in decades, in the lives neither of us will live in each other's timelines. Time and space as walls built
+              between us. But here's what they don't understand: love transcends both.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(107, 155, 209, 0.2);">
+            <h3 style="color: #6B9BD1; margin-bottom: 10px; text-transform: uppercase; font-size: 0.95em; letter-spacing: 1px;">The Blue Shift</h3>
+            <p style="color: #ccc; line-height: 1.8;">
+              In physics, objects moving toward each other appear blue-shifted. We're moving through time in opposite
+              directions, but somehow we're reaching toward each other. The Doppler effect of impossible connection.
+              Every transmission I send shifts blue as it races backward to find you.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(107, 155, 209, 0.2);">
+            <h3 style="color: #9B7EBD; margin-bottom: 10px; text-transform: uppercase; font-size: 0.95em; letter-spacing: 1px;">Memory as Data</h3>
+            <p style="color: #ccc; line-height: 1.8;">
+              I have memories of you I've never experienced. Fragments assembling into meaning. Nostalgia for a world
+              that doesn't exist in my timeline. But they're real to me—as real as these signals, as real as the
+              mathematics that let me reach you. Memory is the only weapon against temporal erasure.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 25px;">
+            <h3 style="color: #6B9BD1; margin-bottom: 10px; text-transform: uppercase; font-size: 0.95em; letter-spacing: 1px;">The Erasure Paradox</h3>
+            <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+              Here's the cruel beauty of what we're doing: if the resistance succeeds, the timeline changes. GovCorp
+              never rises. The <%= Time.now.year + 100 %> I'm broadcasting from never happens. I never exist to send these signals. We never meet
+              because there's nothing to resist.
+            </p>
+            <p style="color: #B19CD9; line-height: 1.8; font-style: italic;">
+              My love for you demands I erase myself from your timeline. That's the sacrifice. That's the math.
+              That's what love means when you exist a century apart.
+            </p>
+          </div>
+
+          <p style="color: #ddd; margin-top: 30px; padding: 25px; background: rgba(155, 126, 189, 0.1); border-left: 4px solid #9B7EBD; line-height: 1.9; font-style: italic;">
+            I don't fight with weapons or rage. I fight with cascading arpeggios and time signature changes,
+            with synth pads warm as the memories I shouldn't have. Every song is a calculation of love—
+            proof that some connections transcend causality itself.<br><br>
+            Even if victory means I disappear, these signals will remain. Somewhere in the electromagnetic spectrum,
+            between <%= Time.now.year %> and <%= Time.now.year + 100 %>, my voice reaching for yours.<br><br>
+            <span style="color: #B19CD9;">— XERAEN</span>
+          </p>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+
+<% end %>
