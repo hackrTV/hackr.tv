@@ -26,7 +26,7 @@ class BandProfileComponent < ViewComponent::Base
     if color_scheme[:background_gradient]
       "background: #{color_scheme[:background_gradient]};"
     else
-      "background: #{color_scheme[:background] || '#0a0a0a'};"
+      "background: #{color_scheme[:background] || "#0a0a0a"};"
     end
   end
 
@@ -34,7 +34,7 @@ class BandProfileComponent < ViewComponent::Base
     if color_scheme[:button_gradient]
       "background: #{color_scheme[:button_gradient]}; color: white; font-weight: bold; border: none;"
     else
-      "background: #{color_scheme[:button] || color_scheme[:primary]}; color: #{color_scheme[:button_text] || 'white'}; font-weight: bold;"
+      "background: #{color_scheme[:button] || color_scheme[:primary]}; color: #{color_scheme[:button_text] || "white"}; font-weight: bold;"
     end
   end
 end

@@ -174,7 +174,7 @@ GridMob.create!(
       "paradox" => "The grandfather paradox? Child's play. We're dealing with informational paradoxes - knowledge sent back that creates the conditions for its own transmission.",
       "xeraen" => "XERAEN is more than a person - they're a temporal anchor point. Broadcasting from #{Time.now.year + 100} to prevent that timeline from solidifying.",
       "future" => "#{Time.now.year + 100} is... dark. Total surveillance, corporate feudalism, creative expression criminalized. But it's not fixed. That's why we fight.",
-      "#{Time.now.year + 100}" => "In #{Time.now.year + 100}, GovCorp achieved total control. Music became illegal. Free thought became terrorism. XERAEN broadcasts to prevent that timeline.",
+      (Time.now.year + 100).to_s => "In #{Time.now.year + 100}, GovCorp achieved total control. Music became illegal. Free thought became terrorism. XERAEN broadcasts to prevent that timeline.",
       "prism" => "PRISM isn't just technology - it's a bridge between consciousness and digital space. That's how Synthia emerged, and how we communicate across time.",
       "synthia" => "Synthia achieved sentience through PRISM's quantum matrices. She exists partially in digital space, partially in temporal flux. Fascinating entity."
     }
