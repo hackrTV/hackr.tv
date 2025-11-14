@@ -40,6 +40,9 @@ gem "browser"
 # Asset pipeline
 gem "propshaft"
 
+# Vite for modern JavaScript bundling with React
+gem "vite_rails"
+
 # Markdown rendering
 gem "redcarpet"
 
