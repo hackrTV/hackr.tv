@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 interface AlbumCoverProps {
   coverUrl: string;
 }
 
 export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl }) => {
-  const [showOverlay, setShowOverlay] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false)
 
-  if (!coverUrl) return null;
+  if (!coverUrl) return null
 
   return (
     <>
@@ -22,7 +22,7 @@ export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl }) => {
           height: '60px',
           objectFit: 'cover',
           border: '1px solid #7c3aed',
-          cursor: 'pointer',
+          cursor: 'pointer'
         }}
       />
       {showOverlay && (
@@ -33,7 +33,7 @@ export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl }) => {
             bottom: '100px',
             left: '20px',
             zIndex: 1001,
-            pointerEvents: 'none',
+            pointerEvents: 'none'
           }}
         >
           <img
@@ -44,11 +44,11 @@ export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl }) => {
               height: '300px',
               objectFit: 'cover',
               border: '3px solid #7c3aed',
-              boxShadow: '0 8px 32px rgba(124, 58, 237, 0.5)',
+              boxShadow: '0 8px 32px rgba(124, 58, 237, 0.5)'
             }}
           />
         </div>
       )}
     </>
-  );
-};
+  )
+}

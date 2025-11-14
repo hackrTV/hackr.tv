@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 interface PlayPauseButtonProps {
   isPlaying: boolean;
@@ -15,5 +15,5 @@ export const PlayPauseButton: React.FC<PlayPauseButtonProps> = ({ isPlaying, onC
     >
       {isPlaying ? '❚❚ PAUSE' : '► PLAY'}
     </button>
-  );
-};
+  )
+}

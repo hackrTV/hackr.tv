@@ -1,9 +1,9 @@
-import React from 'react';
-import { AlbumCover } from './AlbumCover.tsx';
-import { PlayPauseButton } from './PlayPauseButton.tsx';
-import { TrackInfo } from './TrackInfo.tsx';
-import { SeekBar } from './SeekBar.tsx';
-import { VolumeControl } from './VolumeControl.tsx';
+import React from 'react'
+import { AlbumCover } from './AlbumCover.tsx'
+import { PlayPauseButton } from './PlayPauseButton.tsx'
+import { TrackInfo } from './TrackInfo.tsx'
+import { SeekBar } from './SeekBar.tsx'
+import { VolumeControl } from './VolumeControl.tsx'
 
 interface PlayerBarProps {
   isPlaying: boolean;
@@ -34,7 +34,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onSeek,
   onSeekEnd,
   onVolumeChange,
-  onClose,
+  onClose
 }) => {
   return (
     <div
@@ -47,7 +47,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         background: '#0a0a0a',
         borderTop: '2px solid #7c3aed',
         padding: '15px 20px',
-        zIndex: 1000,
+        zIndex: 1000
       }}
     >
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
@@ -83,5 +83,5 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 interface VolumeControlProps {
   volume: number;
@@ -7,12 +7,14 @@ interface VolumeControlProps {
 
 export const VolumeControl: React.FC<VolumeControlProps> = ({ volume, onVolumeChange }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onVolumeChange(Number(e.target.value) / 100);
-  };
+    onVolumeChange(Number(e.target.value) / 100)
+  }
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-      <span style={{ color: '#888', fontSize: '0.9em' }}>Volume:</span>
+      <label htmlFor="volume-control" style={{ color: '#888', fontSize: '0.9em' }}>
+        Volume:
+      </label>
       <input
         type="range"
         id="volume-control"
@@ -26,9 +28,9 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({ volume, onVolumeCh
           background: '#333',
           borderRadius: '3px',
           outline: 'none',
-          WebkitAppearance: 'none',
+          WebkitAppearance: 'none'
         }}
       />
     </div>
-  );
-};
+  )
+}

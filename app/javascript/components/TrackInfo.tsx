@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 interface TrackInfoProps {
   title: string;
@@ -16,5 +16,5 @@ export const TrackInfo: React.FC<TrackInfoProps> = ({ title, artist }) => {
         {artist}
       </span>
     </div>
-  );
-};
+  )
+}

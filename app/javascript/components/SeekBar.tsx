@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 interface SeekBarProps {
   currentTime: number;
@@ -8,11 +8,11 @@ interface SeekBarProps {
   onSeekEnd: () => void;
 }
 
-function formatTime(seconds: number): string {
-  if (!seconds || isNaN(seconds)) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+function formatTime (seconds: number): string {
+  if (!seconds || isNaN(seconds)) return '0:00'
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
 export const SeekBar: React.FC<SeekBarProps> = ({
@@ -20,14 +20,14 @@ export const SeekBar: React.FC<SeekBarProps> = ({
   duration,
   onSeekStart,
   onSeek,
-  onSeekEnd,
+  onSeekEnd
 }) => {
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement> | React.FormEvent<HTMLInputElement>) => {
-    const seekTime = (Number(e.currentTarget.value) / 100) * duration;
-    onSeek(seekTime);
-  };
+    const seekTime = (Number(e.currentTarget.value) / 100) * duration
+    onSeek(seekTime)
+  }
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -52,12 +52,12 @@ export const SeekBar: React.FC<SeekBarProps> = ({
           background: '#333',
           borderRadius: '3px',
           outline: 'none',
-          WebkitAppearance: 'none',
+          WebkitAppearance: 'none'
         }}
       />
       <span id="duration" style={{ color: '#666', fontSize: '0.9em', minWidth: '45px' }}>
         {formatTime(duration)}
       </span>
     </div>
-  );
-};
+  )
+}
