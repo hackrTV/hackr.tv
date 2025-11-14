@@ -8,7 +8,9 @@
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "audio_player", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
+    <%= javascript_include_tag "audio_player", "data-turbo-track": "reload", type: "module" %>
   </head>
 
   <body class="black-168">
@@ -20,6 +22,51 @@
 
     <div class="ml-10 mb-20 pb-50 mt-30">
       <%= yield %>
+    </div>
+
+    <!-- Global Audio Player -->
+    <div id="audio-player" style="position: fixed; bottom: 0; left: 0; right: 0; background: #0a0a0a; border-top: 2px solid #7c3aed; padding: 15px 20px; display: none; z-index: 1000;">
+      <div style="max-width: 1400px; margin: 0 auto;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <img id="player-cover" src="" alt="Album Cover" style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #7c3aed; display: none;">
+
+          <button id="play-pause-btn" class="tui-button" style="background: #7c3aed; color: white; min-width: 80px;">
+            ► PLAY
+          </button>
+
+          <div style="flex: 1;">
+            <div style="margin-bottom: 5px;">
+              <span id="track-title" style="color: #a78bfa; font-weight: bold;">No track loaded</span>
+              <span style="color: #666;"> — </span>
+              <span id="track-artist" style="color: #888;">—</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span id="current-time" style="color: #666; font-size: 0.9em; min-width: 45px;">0:00</span>
+              <input type="range" id="seek-bar" min="0" max="100" value="0"
+                     style="flex: 1; height: 6px; background: #333; border-radius: 3px; outline: none; -webkit-appearance: none;">
+              <span id="duration" style="color: #666; font-size: 0.9em; min-width: 45px;">0:00</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="color: #888; font-size: 0.9em;">Volume:</span>
+            <input type="range" id="volume-control" min="0" max="100" value="70"
+                   style="width: 100px; height: 6px; background: #333; border-radius: 3px; outline: none; -webkit-appearance: none;">
+          </div>
+
+          <button id="close-player-btn" class="tui-button" style="background: #444; color: #aaa;">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <audio id="audio-element"></audio>
+    </div>
+
+    <!-- Cover Image Overlay -->
+    <div id="cover-overlay" style="position: fixed; bottom: 100px; left: 20px; display: none; z-index: 1001; pointer-events: none;">
+      <img id="cover-overlay-img" src="" alt="Album Cover" style="width: 300px; height: 300px; object-fit: cover; border: 3px solid #7c3aed; box-shadow: 0 8px 32px rgba(124, 58, 237, 0.5);">
     </div>
 
   </body>
