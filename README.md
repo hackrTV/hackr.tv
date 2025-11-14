@@ -6,12 +6,17 @@
 
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.0.3-red.svg)](https://rubyonrails.org/)
-[![Tests](https://img.shields.io/badge/Tests-271%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-302%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
 
 ## 🎵 Features
+
+### hackr.tv Platform
+- **Animated Terminal Homepage** - Retro terminal-style interface with typing animation and keyboard skip
+- **Menu System** - Dynamic navigation with artist profiles, services, and conditional admin access
+- **Multi-Artist Showcases** - Dedicated pages for The.CyberPul.se, XERAEN, and more
 
 ### hackr.fm Music Platform
 - **Radio Streaming** - Live web radio with multiple stations (The.CyberPul.se, XERAEN, Sector X Underground, GovCorp Official)
@@ -90,7 +95,8 @@
    ```
 
 7. **Visit the application**
-   - Main site: http://localhost:3000
+   - hackr.tv Home: http://localhost:3000
+   - The.CyberPul.se: http://localhost:3000/thecyberpulse
    - THE PULSE GRID: http://localhost:3000/grid
    - hackr.fm Radio: http://localhost:3000/fm/radio
    - Pulse Vault: http://localhost:3000/fm/pulse_vault
@@ -105,19 +111,23 @@
 
 **Available Commands:**
 ```
-look (l)              - Examine your surroundings
-go [direction]        - Move in a direction (north, south, east, west, up, down)
-inventory (inv, i)    - Check your items
-take [item]           - Pick up an item
-drop [item]           - Drop an item
-examine [item]        - Inspect an item closely
-talk [npc]            - Initiate conversation with an NPC
+look (l)               - Examine your surroundings
+go [direction]         - Move in a direction (north, south, east, west, up, down)
+inventory (inv, i)     - Check your items
+take [item]            - Pick up an item
+drop [item]            - Drop an item
+examine [item]         - Inspect an item closely
+talk [npc]             - Initiate conversation with an NPC
 ask [npc] about [topic] - Ask an NPC about a specific topic
-say [message]         - Chat with other players in the room
-who                   - List online players
-help                  - Show command reference
-clear (cls)           - Clear the screen
+say [message]          - Chat with other players in the room
+who                    - List online players
+help                   - Show command reference
+clear (cls)            - Clear the screen
 ```
+
+**Navigation:**
+- Use `/disconnect` menu item or type logout command to disconnect from THE PULSE GRID
+- Arrow keys (↑/↓) navigate through command history
 
 **NPCs with Dialogue:**
 - **Resistance Coordinator** (hackr.tv Broadcast Station) - Topics: mission, resistance, help, station, synthia, govcorp
@@ -133,6 +143,7 @@ hackr.tv/
 │   ├── controllers/
 │   │   ├── fm_controller.rb           # hackr.fm music platform
 │   │   ├── grid_controller.rb         # THE PULSE GRID MUD
+│   │   ├── pages_controller.rb        # Static pages (hackr.tv, thecyberpulse)
 │   │   ├── tracks_controller.rb       # Track showcases
 │   │   └── admin/                     # Admin CRUD
 │   ├── models/
@@ -148,8 +159,13 @@ hackr.tv/
 │   │   │   ├── xeraen*.html.erb       # XERAEN artist layouts
 │   │   │   ├── fm.html.erb            # hackr.fm layout
 │   │   │   └── grid.html.erb          # THE PULSE GRID layout
+│   │   ├── pages/
+│   │   │   ├── hackr_tv.html.erb      # Animated terminal home
+│   │   │   └── thecyberpulse.html.erb # The.CyberPul.se page
 │   │   ├── fm/                        # Music platform views
 │   │   └── grid/                      # MUD game views
+│   ├── components/
+│   │   └── band_profile_component.rb  # Reusable band profile
 │   └── channels/
 │       └── grid_channel.rb            # Real-time multiplayer
 ├── data/                              # YAML data for import
@@ -159,7 +175,7 @@ hackr.tv/
 │   └── [artist_slug]/                 # Artist-specific files
 ├── lib/tasks/
 │   └── import.rake                    # Data import scripts
-├── spec/                              # RSpec test suite (271 examples)
+├── spec/                              # RSpec test suite (302 examples)
 └── config/
     ├── routes.rb                      # Multi-domain routing
     └── radio_stations.yml             # Radio station config
@@ -182,9 +198,10 @@ bundle exec rspec spec/services/
 ```
 
 **Test Coverage:**
-- 271 examples, 0 failures
+- 302 examples, 0 failures
 - Models: Artist, Album, Track, GridHackr, GridRoom, HackrLog, Redirect
 - Controllers: Grid, FM, Tracks, Pages, HackrLogs
+- Components: BandProfileComponent
 - Services: Grid::CommandParser
 - Concerns: GridAuthentication, RequestAnalysis
 
@@ -288,6 +305,8 @@ bin/rails import:yaml_tracks        # Tracks only
 ## 🎯 Roadmap
 
 ### Completed ✅
+- [x] Animated terminal homepage with typing effect & keyboard skip
+- [x] ViewComponent architecture for band profiles
 - [x] Album model with Active Storage cover images
 - [x] Comprehensive YAML import system
 - [x] hackr.fm Radio with 4 stations
@@ -298,6 +317,8 @@ bin/rails import:yaml_tracks        # Tracks only
 - [x] Command history navigation
 - [x] Album cover hover overlay
 - [x] Click-anywhere row playback
+- [x] Dynamic menu system with conditional admin access
+- [x] Route reorganization (The.CyberPul.se → /thecyberpulse)
 
 ### In Progress 🚧
 - [ ] Faction reputation system
