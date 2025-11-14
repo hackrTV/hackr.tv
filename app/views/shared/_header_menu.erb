@@ -1,14 +1,15 @@
 <nav class="tui-nav">
   <ul>
-    <%= render "shared/the_cyberpulse_header_menu", index: 0 %>
-    <%= render "shared/xeraen_header_menu", index: 1 %>
-    <%= render "shared/hackr_fm_header_menu", index: 2 %>
-    <%= render "shared/pulse_grid_header_menu", index: 3 %>
-    <%= render "shared/hackr_logs_header_menu", index: 4 %>
+    <%= render "shared/hackr_tv_header_menu", index: 0 %>
+    <%= render "shared/the_cyberpulse_header_menu", index: 1 %>
+    <%= render "shared/xeraen_header_menu", index: 2 %>
+    <%= render "shared/hackr_fm_header_menu", index: 3 %>
+    <%= render "shared/pulse_grid_header_menu", index: 4 %>
+    <%= render "shared/hackr_logs_header_menu", index: 5 %>
     <% if admin_hackr? %>
       <li>
         <a href="/root">
-          <span class="red-255-text">5</span> /root <span class="red-255-text">[ADMIN]</span>
+          <span class="red-255-text">6</span> /root <span class="red-255-text">[ADMIN]</span>
         </a>
       </li>
     <% end %>

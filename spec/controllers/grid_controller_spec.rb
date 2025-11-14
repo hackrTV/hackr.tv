@@ -223,21 +223,21 @@ RSpec.describe GridController, type: :controller do
     end
   end
 
-  describe "DELETE #logout" do
+  describe "DELETE #disconnect" do
     before { session[:grid_hackr_id] = hackr.id }
 
     it "logs out the hackr" do
-      delete :logout
+      delete :disconnect
       expect(session[:grid_hackr_id]).to be_nil
     end
 
     it "redirects to login page" do
-      delete :logout
+      delete :disconnect
       expect(response).to redirect_to(grid_login_path)
     end
 
     it "sets a notice flash message" do
-      delete :logout
+      delete :disconnect
       expect(flash[:notice]).to match(/disconnected/)
     end
   end

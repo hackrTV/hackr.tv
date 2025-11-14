@@ -1,6 +1,10 @@
 class PagesController < ApplicationController
-  def index
-    render "mobile/index" if mobile?
+  def hackr_tv
+    # hackr.tv home page
+  end
+
+  def thecyberpulse
+    render "mobile/thecyberpulse" if mobile?
   end
 
   def xeraen
