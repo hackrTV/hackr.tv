@@ -10,7 +10,7 @@
             <div class="tui-divider"></div>
             <div class="mt-6">
               <h2 class="black-168-text green-168">
-                <%= link_to(@artist.slug == "xeraen" ? xeraen_track_path(track) : track_path(track), class: "tui-link") do %>
+                <%= link_to(@artist.slug == "xeraen" ? xeraen_track_path(track) : thecyberpulse_track_path(track), class: "tui-link") do %>
                   <%= track.title %>
                   <% if track.featured %>
                     <span class="white-168-text black-168">

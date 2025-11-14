@@ -9,16 +9,24 @@
             <span class="purple-168-text">/</span>grid
           </a>
         </li>
-        <li>
-          <a href="/grid/login">
-            <span class="purple-168-text">/</span>login
-          </a>
-        </li>
-        <li>
-          <a href="/grid/register">
-            <span class="purple-168-text">/</span>register
-          </a>
-        </li>
+        <% if logged_in? %>
+          <li>
+            <%= button_to grid_disconnect_path, method: :delete, form: { style: "display: inline;" }, style: "background: none; border: none; color: inherit; font: inherit; cursor: pointer; padding: 0; text-align: left; width: 100%;" do %>
+              <span class="purple-168-text">/</span>disconnect
+            <% end %>
+          </li>
+        <% else %>
+          <li>
+            <a href="/grid/login">
+              <span class="purple-168-text">/</span>login
+            </a>
+          </li>
+          <li>
+            <a href="/grid/register">
+              <span class="purple-168-text">/</span>register
+            </a>
+          </li>
+        <% end %>
       </ul>
   </div>
 </li>

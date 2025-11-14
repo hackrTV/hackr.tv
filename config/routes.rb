@@ -2,8 +2,13 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   get "up" => "rails/health#show", :as => :rails_health_check
 
-  # Root route
-  root "pages#index"
+  # Root route - hackr.tv home
+  root "pages#hackr_tv"
+
+  # The.CyberPul.se routes (nested under /thecyberpulse)
+  get "thecyberpulse", to: "pages#thecyberpulse", as: :thecyberpulse
+  get "thecyberpulse/trackz", to: "tracks#index", as: :thecyberpulse_tracks
+  get "thecyberpulse/trackz/:id", to: "tracks#show", as: :thecyberpulse_track
 
   # XERAEN routes
   get "xeraen", to: "pages#xeraen"
@@ -26,9 +31,9 @@ Rails.application.routes.draw do
   # Sector X routes
   get "sector/x", to: "pages#sector_x", as: :sector_x
 
-  # The Cyber Pulse tracks (default artist)
-  get "trackz", to: "tracks#index", as: :tracks
-  get "trackz/:id", to: "tracks#show", as: :track
+  # Legacy routes for backward compatibility (redirects to new paths)
+  get "trackz", to: "tracks#legacy_redirect", as: :legacy_tracks
+  get "trackz/:id", to: "tracks#legacy_redirect_show", as: :legacy_track
 
   # THE PULSE GRID routes
   get "grid", to: "grid#index", as: :grid
@@ -36,7 +41,7 @@ Rails.application.routes.draw do
   post "grid/login", to: "grid#create_session"
   get "grid/register", to: "grid#register", as: :grid_register
   post "grid/register", to: "grid#create_hackr"
-  delete "grid/logout", to: "grid#logout", as: :grid_logout
+  delete "grid/disconnect", to: "grid#disconnect", as: :grid_disconnect
   post "grid/command", to: "grid#command", as: :grid_command
 
   # hackr.fm routes

@@ -18,7 +18,7 @@
     <br>
 
     <div class="ml-10 pl-5 white-168-text">
-      <a href="/">
+      <%= link_to root_path do %>
         <pre id="greetings" style="font-size: 11px;">&nbsp;__  __                   __            ______  __  __
 /\ \/\ \                 /\ \          /\__  _\/\ \/\ \
 \ \ \_\ \     __      ___\ \ \/'\   _ _\/_/\ \/\ \ \ \ \
@@ -26,7 +26,7 @@
   \ \ \ \ \/\ \L\.\_/\ \__/\ \ \\`\\ \ \/ _\ \ \ \ \ \_/ \
    \ \_\ \_\ \__/.\_\ \____\\ \_\ \_\ \_\/\_\ \_\ \ `\___/
     \/_/\/_/\/__/\/_/\/____/ \/_/\/_/\/_/\/_/\/_/  `\/__/</pre>
-      </a>
+      <% end %>
     </div>
 
     <br>
@@ -35,7 +35,7 @@
       <fieldset class="tui-fieldset">
         <legend>Menu</legend>
         <div class="mb-20 pl-5 pr-15">
-          <%= link_to "Trackz", tracks_path, class: "tui-button" %>
+          <%= link_to "Trackz", thecyberpulse_tracks_path, class: "tui-button" %>
           <%= link_to "Streamz", "https://www.youtube.com/watch?v=YgD4oNPpGv4&list=PLLRgY_tjdreyU4_WtrQnkZ6D8ur41GrpC", class: "tui-button", target: "_blank" %>
           <%= link_to "Vidz", "https://www.youtube.com/@TheCyberPulse/videos", class: "tui-button", target: "_blank" %>
         </div>

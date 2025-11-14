@@ -56,8 +56,8 @@ class GridController < ApplicationController
     end
   end
 
-  # DELETE /grid/logout - Log out
-  def logout
+  # DELETE /grid/disconnect - Disconnect from THE PULSE GRID
+  def disconnect
     hackr_alias = current_hackr&.hackr_alias
     log_out
     flash[:notice] = "#{hackr_alias} disconnected from THE PULSE GRID."

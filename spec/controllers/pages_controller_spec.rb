@@ -7,8 +7,20 @@ RSpec.describe PagesController, type: :request do
       expect(response).to have_http_status(:success)
     end
 
-    it "displays content" do
+    it "displays hackr.tv home content" do
       get "/"
+      expect(response.body).to include("Welcome to hackr.tv")
+    end
+  end
+
+  describe "GET /thecyberpulse" do
+    it "returns http success" do
+      get "/thecyberpulse"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "displays The.CyberPul.se content" do
+      get "/thecyberpulse"
       expect(response.body).to include("What is The.CyberPul.se?")
     end
   end
