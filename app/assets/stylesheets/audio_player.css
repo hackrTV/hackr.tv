@@ -1,0 +1,29 @@
+/* Audio Player Styles */
+
+/* Seek bar and volume control slider customization */
+#seek-bar::-webkit-slider-thumb,
+#volume-control::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #7c3aed;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+#seek-bar::-moz-range-thumb,
+#volume-control::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #7c3aed;
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+}
+
+/* Track row hover effect */
+.track-row:hover {
+  background: rgba(124, 58, 237, 0.08) !important;
+  cursor: pointer;
+}
