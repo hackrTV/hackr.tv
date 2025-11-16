@@ -37,20 +37,20 @@ module GridAuthentication
     return if logged_in?
 
     flash[:error] = "Access denied. Please log in to THE PULSE GRID."
-    redirect_to grid_login_path
+    redirect_to grid_login_path(no_layout: params[:no_layout])
   end
 
   def require_admin
     return if admin_hackr?
 
     flash[:error] = "Access denied. Admin privileges required."
-    redirect_to grid_path
+    redirect_to grid_path(no_layout: params[:no_layout])
   end
 
   def require_logout
     return unless logged_in?
 
     flash[:notice] = "You are already logged into THE PULSE GRID."
-    redirect_to grid_path
+    redirect_to grid_path(no_layout: params[:no_layout])
   end
 end

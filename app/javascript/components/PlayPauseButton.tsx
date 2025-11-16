@@ -11,6 +11,7 @@ export const PlayPauseButton: React.FC<PlayPauseButtonProps> = ({ isPlaying, onC
       id="play-pause-btn"
       className="tui-button"
       onClick={onClick}
+      tabIndex={-1}
       style={{ background: '#7c3aed', color: 'white', minWidth: '80px' }}
     >
       {isPlaying ? '❚❚ PAUSE' : '► PLAY'}

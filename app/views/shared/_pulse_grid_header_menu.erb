@@ -11,9 +11,9 @@
         </li>
         <% if logged_in? %>
           <li>
-            <%= button_to grid_disconnect_path, method: :delete, form: { style: "display: inline;" }, style: "background: none; border: none; color: inherit; font: inherit; cursor: pointer; padding: 0; text-align: left; width: 100%;" do %>
+            <a href="#" onclick="handleGridDisconnect(event)">
               <span class="purple-168-text">/</span>disconnect
-            <% end %>
+            </a>
           </li>
         <% else %>
           <li>

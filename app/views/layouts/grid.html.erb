@@ -9,6 +9,31 @@
     <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
+    <%= vite_client_tag %>
+    <%= vite_typescript_tag 'application.tsx' %>
+    <script>
+      function handleGridDisconnect(event) {
+        event.preventDefault();
+        if (confirm('Disconnect from THE PULSE GRID?')) {
+          fetch('/api/grid/disconnect', {
+            method: 'DELETE',
+            credentials: 'include'
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              window.location.href = '/grid/login';
+            } else {
+              alert('Failed to disconnect: ' + (data.error || 'Unknown error'));
+            }
+          })
+          .catch(error => {
+            console.error('Disconnect failed:', error);
+            alert('Network error. Please try again.');
+          });
+        }
+      }
+    </script>
   </head>
 
   <body class="black-168" style="background: #0a0a0a;">
@@ -18,7 +43,7 @@
 
     <%= render "shared/footer_menu" %>
 
-    <div class="ml-10 mb-20 pb-50">
+    <div id="main-content" class="ml-10 mb-20 pb-50">
       <%= yield %>
     </div>
 

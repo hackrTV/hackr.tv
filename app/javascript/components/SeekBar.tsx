@@ -46,6 +46,7 @@ export const SeekBar: React.FC<SeekBarProps> = ({
         onInput={handleSeek}
         onMouseUp={onSeekEnd}
         onTouchEnd={onSeekEnd}
+        tabIndex={-1}
         style={{
           flex: 1,
           height: '6px',

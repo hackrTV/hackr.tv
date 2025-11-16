@@ -8,9 +8,25 @@ class ApplicationController < ActionController::Base
   before_action :check_for_redirect
   before_action :check_for_domain_redirect
 
-  layout :current_layout
+  layout :determine_layout
+
+  helper_method :domain_stylesheet
 
   private
+
+  def determine_layout
+    # Skip layout for AJAX content requests
+    return false if params[:no_layout] == '1'
+    current_layout
+  end
+
+  def domain_stylesheet
+    return "grid" if request.path.start_with?("/grid")
+    return "fm" if request.path.start_with?("/fm")
+    return "xeraen" if request.path.start_with?("/xeraen")
+    return "sector" if request.path.start_with?("/sector")
+    "default"
+  end
 
   def check_for_redirect
     redirect_record = Redirect.find_for(request.host, request.path)

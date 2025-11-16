@@ -2,57 +2,73 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   get "up" => "rails/health#show", :as => :rails_health_check
 
-  # Root route - hackr.tv home
-  root "pages#hackr_tv"
+  # Root route (SPA)
+  root "pages#spa_root"
 
-  # The.CyberPul.se routes (nested under /thecyberpulse)
-  get "thecyberpulse", to: "pages#thecyberpulse", as: :thecyberpulse
-  get "thecyberpulse/trackz", to: "tracks#index", as: :thecyberpulse_tracks
-  get "thecyberpulse/trackz/:id", to: "tracks#show", as: :thecyberpulse_track
+  # The.CyberPul.se routes (nested under /thecyberpulse) - SPA
+  get "thecyberpulse", to: "pages#spa_root", as: :thecyberpulse
+  get "thecyberpulse/trackz", to: "pages#spa_root", as: :thecyberpulse_tracks
+  get "thecyberpulse/trackz/:id", to: "pages#spa_root", as: :thecyberpulse_track
 
-  # XERAEN routes
-  get "xeraen", to: "pages#xeraen"
-  get "xeraen/linkz", to: "pages#xeraen_linkz", as: :xeraen_linkz
-  get "xeraen/trackz", to: "tracks#index", as: :xeraen_tracks
-  get "xeraen/trackz/:id", to: "tracks#show", as: :xeraen_track
+  # XERAEN routes - SPA
+  get "xeraen", to: "pages#spa_root"
+  get "xeraen/linkz", to: "pages#spa_root", as: :xeraen_linkz
+  get "xeraen/trackz", to: "pages#spa_root", as: :xeraen_tracks
+  get "xeraen/trackz/:id", to: "pages#spa_root", as: :xeraen_track
 
-  # System Rot routes
-  get "system_rot", to: "pages#system_rot", as: :system_rot
+  # System Rot routes - SPA
+  get "system_rot", to: "pages#spa_root", as: :system_rot
 
-  # Wavelength Zero routes
-  get "wavelength_zero", to: "pages#wavelength_zero", as: :wavelength_zero
+  # Wavelength Zero routes - SPA
+  get "wavelength_zero", to: "pages#spa_root", as: :wavelength_zero
 
-  # Voiceprint routes
-  get "voiceprint", to: "pages#voiceprint", as: :voiceprint
+  # Voiceprint routes - SPA
+  get "voiceprint", to: "pages#spa_root", as: :voiceprint
 
-  # Temporal Blue Drift routes
-  get "temporal_blue_drift", to: "pages#temporal_blue_drift", as: :temporal_blue_drift
+  # Temporal Blue Drift routes - SPA
+  get "temporal_blue_drift", to: "pages#spa_root", as: :temporal_blue_drift
 
-  # Sector X routes
-  get "sector/x", to: "pages#sector_x", as: :sector_x
+  # Sector X routes - SPA
+  get "sector/x", to: "pages#spa_root", as: :sector_x
 
   # Legacy routes for backward compatibility (redirects to new paths)
   get "trackz", to: "tracks#legacy_redirect", as: :legacy_tracks
   get "trackz/:id", to: "tracks#legacy_redirect_show", as: :legacy_track
 
-  # THE PULSE GRID routes
-  get "grid", to: "grid#index", as: :grid
-  get "grid/login", to: "grid#login", as: :grid_login
-  post "grid/login", to: "grid#create_session"
-  get "grid/register", to: "grid#register", as: :grid_register
-  post "grid/register", to: "grid#create_hackr"
-  delete "grid/disconnect", to: "grid#disconnect", as: :grid_disconnect
-  post "grid/command", to: "grid#command", as: :grid_command
+  # THE PULSE GRID routes (SPA)
+  get "grid", to: "pages#spa_root", as: :grid
+  get "grid/login", to: "pages#spa_root", as: :grid_login
+  get "grid/register", to: "pages#spa_root", as: :grid_register
 
-  # hackr.fm routes
-  get "fm", to: "fm#index", as: :fm
-  get "fm/radio", to: "fm#radio", as: :fm_radio
-  get "fm/pulse_vault", to: "fm#pulse_vault", as: :fm_pulse_vault
-  get "fm/bands", to: "fm#bands", as: :fm_bands
+  # hackr.fm routes - SPA
+  get "fm", to: "pages#spa_root", as: :fm
+  get "fm/radio", to: "pages#spa_root", as: :fm_radio
+  get "fm/pulse_vault", to: "pages#spa_root", as: :fm_pulse_vault
+  get "fm/bands", to: "pages#spa_root", as: :fm_bands
 
-  # HackrLogs (blog) routes
-  get "logs", to: "hackr_logs#index", as: :hackr_logs
-  get "logs/:id", to: "hackr_logs#show", as: :hackr_log
+  # HackrLogs (blog) routes - SPA
+  get "logs", to: "pages#spa_root", as: :hackr_logs
+  get "logs/:id", to: "pages#spa_root", as: :hackr_log
+
+  # API routes (for SPA)
+  namespace :api, defaults: {format: :json} do
+    resources :artists, only: [:index, :show] do
+      resources :tracks, only: [:index]
+    end
+    resources :tracks, only: [:index, :show]
+    resources :albums, only: [:index, :show]
+    get "radio_stations", to: "radio#index"
+
+    # Grid API routes
+    get "grid/current_hackr", to: "grid#current_hackr_info"
+    post "grid/login", to: "grid#login"
+    post "grid/register", to: "grid#register"
+    delete "grid/disconnect", to: "grid#disconnect"
+    post "grid/command", to: "grid#command"
+
+    # Hackr Logs API routes
+    resources :logs, only: [:index, :show]
+  end
 
   # Admin routes (accessible at /root)
   namespace :admin, path: "root" do

@@ -1,15 +1,15 @@
 stations:
-  - name: "The.CyberPul.se Station"
+  - name: "The.CyberPul.se Trans-Temporal Broadcast"
     slug: "cyberpulse"
     description: "The official resistance broadcast. Music from The.CyberPul.se cutting through the digital noise."
-    genre: "Synthwave / Electronic"
+    genre: "Hackr Metal"
     color: "green-168"
     stream_url: ""  # To be configured with actual stream URL
 
   - name: "XERAEN Frequency"
     slug: "xeraen"
     description: "Temporal broadcasts from 2125. XERAEN's warning signals echoing backward through time."
-    genre: "Industrial / Dark Synth"
+    genre: "Omniwave Hackrcore"
     color: "purple-168"
     stream_url: ""  # To be configured
 
@@ -22,7 +22,7 @@ stations:
 
   - name: "GovCorp Official Radio"
     slug: "govcorp"
-    description: "Mandatory corporate broadcasting. Compliance is voluntary. Non-compliance is noted. (Parody station)"
-    genre: "Propaganda / Ironic"
+    description: "Mandatory corporate broadcasting. Compliance is voluntary. Non-compliance is noted."
+    genre: "Propaganda"
     color: "red-168"
     stream_url: ""  # To be configured

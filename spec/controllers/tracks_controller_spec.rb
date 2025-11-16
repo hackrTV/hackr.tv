@@ -1,64 +1,59 @@
 require "rails_helper"
 
 RSpec.describe TracksController, type: :request do
-  let(:artist) { create(:artist, :thecyberpulse) }
-  let(:xeraen_artist) { create(:artist, :xeraen) }
+  # TracksController now only handles legacy redirects
+  # All track viewing is handled by React SPA via pages#spa_root
 
-  describe "GET /thecyberpulse/trackz" do
-    let!(:track1) { create(:track, artist: artist, title: "Track 1", featured: true, release_date: Date.today) }
-    let!(:track2) { create(:track, artist: artist, title: "Track 2", featured: false, release_date: Date.yesterday) }
-
-    it "returns http success" do
-      get "/thecyberpulse/trackz"
-      expect(response).to have_http_status(:success)
+  describe "Legacy redirects" do
+    describe "GET /trackz" do
+      it "redirects to thecyberpulse trackz path" do
+        get "/trackz"
+        expect(response).to redirect_to("/thecyberpulse/trackz")
+        expect(response).to have_http_status(301)
+      end
     end
 
-    it "displays tracks for The.CyberPul.se" do
-      get "/thecyberpulse/trackz"
-      expect(response.body).to include("Track 1")
-      expect(response.body).to include("Track 2")
-    end
-  end
-
-  describe "GET /xeraen/trackz" do
-    let!(:track1) { create(:track, artist: xeraen_artist, title: "XERAEN Track 1") }
-
-    it "returns http success" do
-      get "/xeraen/trackz"
-      expect(response).to have_http_status(:success)
-    end
-
-    it "displays tracks for XERAEN" do
-      get "/xeraen/trackz"
-      expect(response.body).to include("XERAEN Track 1")
+    describe "GET /trackz/:id" do
+      it "redirects to thecyberpulse track path" do
+        get "/trackz/test-track"
+        expect(response).to redirect_to("/thecyberpulse/trackz/test-track")
+        expect(response).to have_http_status(301)
+      end
     end
   end
 
-  describe "GET /thecyberpulse/trackz/:id" do
-    let!(:track) { create(:track, artist: artist, slug: "test-track", title: "Test Track") }
-
-    it "returns http success" do
-      get "/thecyberpulse/trackz/test-track"
-      expect(response).to have_http_status(:success)
+  # SPA routes - all track routes now render the React SPA shell
+  describe "SPA routes" do
+    describe "GET /thecyberpulse/trackz" do
+      it "renders the SPA root" do
+        get "/thecyberpulse/trackz"
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include('<div id="root">')
+      end
     end
 
-    it "displays the track details" do
-      get "/thecyberpulse/trackz/test-track"
-      expect(response.body).to include("Test Track")
-    end
-  end
-
-  describe "GET /xeraen/trackz/:id" do
-    let!(:track) { create(:track, artist: xeraen_artist, slug: "xeraen-track", title: "XERAEN Track") }
-
-    it "returns http success" do
-      get "/xeraen/trackz/xeraen-track"
-      expect(response).to have_http_status(:success)
+    describe "GET /xeraen/trackz" do
+      it "renders the SPA root" do
+        get "/xeraen/trackz"
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include('<div id="root">')
+      end
     end
 
-    it "displays the track details" do
-      get "/xeraen/trackz/xeraen-track"
-      expect(response.body).to include("XERAEN Track")
+    describe "GET /thecyberpulse/trackz/:id" do
+      it "renders the SPA root" do
+        get "/thecyberpulse/trackz/test-track"
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include('<div id="root">')
+      end
+    end
+
+    describe "GET /xeraen/trackz/:id" do
+      it "renders the SPA root" do
+        get "/xeraen/trackz/xeraen-track"
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include('<div id="root">')
+      end
     end
   end
 end
