@@ -84,8 +84,28 @@ const TrackDetailPage: React.FC = () => {
     )
   }
 
+  const platformOrder = ['bandcamp', 'youtube', 'spotify', 'apple_music', 'soundcloud']
+
   const titleize = (str: string) => {
+    // Special case for YouTube
+    if (str.toLowerCase() === 'youtube') {
+      return 'YouTube'
+    }
     return str.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  }
+
+  const sortStreamingLinks = (links: Record<string, string>) => {
+    return Object.entries(links).sort((a, b) => {
+      const indexA = platformOrder.indexOf(a[0].toLowerCase())
+      const indexB = platformOrder.indexOf(b[0].toLowerCase())
+
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB
+      }
+      if (indexA !== -1) return -1
+      if (indexB !== -1) return 1
+      return 0
+    })
   }
 
   return (
@@ -116,15 +136,28 @@ const TrackDetailPage: React.FC = () => {
             <>
               <br />
               <p><strong>Streaming Links:</strong></p>
-              <ul>
-                {Object.entries(track.streaming_links).map(([platform, url]) => (
-                  <li key={platform}>
-                    <a href={url} className="tui-link" target="_blank" rel="noopener noreferrer">
-                      {titleize(platform)}
+              <div style={{ marginTop: '10px', marginBottom: '15px' }}>
+                <Link
+                  to={`/fm/pulse_vault?filter=${encodeURIComponent(track.title)}`}
+                  className="tui-button"
+                >
+                  Pulse Vault
+                </Link>
+                {' '}
+                {sortStreamingLinks(track.streaming_links).map(([platform, url], index, array) => (
+                  <React.Fragment key={platform}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="tui-button"
+                    >
+                      → {titleize(platform)}
                     </a>
-                  </li>
+                    {index < array.length - 1 && ' '}
+                  </React.Fragment>
                 ))}
-              </ul>
+              </div>
             </>
           )}
 
@@ -132,15 +165,21 @@ const TrackDetailPage: React.FC = () => {
             <>
               <br />
               <p><strong>Videos:</strong></p>
-              <ul>
-                {Object.entries(track.videos).map(([type, url]) => (
-                  <li key={type}>
-                    <a href={url} className="tui-link" target="_blank" rel="noopener noreferrer">
-                      {titleize(type)} Video
+              <div style={{ marginTop: '10px', marginBottom: '15px' }}>
+                {Object.entries(track.videos).map(([type, url], index, array) => (
+                  <React.Fragment key={type}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="tui-button"
+                    >
+                      ▶ {titleize(type)} Video
                     </a>
-                  </li>
+                    {index < array.length - 1 && ' '}
+                  </React.Fragment>
                 ))}
-              </ul>
+              </div>
             </>
           )}
 
