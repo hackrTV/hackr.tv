@@ -79,10 +79,38 @@ const TrackListPage: React.FC = () => {
   const tracks = artist.tracks || []
   const artistDisplayName = artist.name === 'XERAEN' ? 'XERAEN' : 'The.CyberPul.se'
 
+  const platformOrder = ['bandcamp', 'youtube', 'spotify', 'apple_music', 'soundcloud']
+
   const formatPlatformName = (platform: string) => {
+    // Special case for YouTube
+    if (platform.toLowerCase() === 'youtube') {
+      return 'YouTube'
+    }
+
     return platform.replace('_', ' ').split(' ').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ')
+  }
+
+  const sortStreamingLinks = (links: Record<string, string>) => {
+    return Object.entries(links).sort((a, b) => {
+      const indexA = platformOrder.indexOf(a[0].toLowerCase())
+      const indexB = platformOrder.indexOf(b[0].toLowerCase())
+
+      // If both platforms are in the order array, sort by their position
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB
+      }
+
+      // If only A is in the order array, it comes first
+      if (indexA !== -1) return -1
+
+      // If only B is in the order array, it comes first
+      if (indexB !== -1) return 1
+
+      // If neither is in the order array, maintain original order
+      return 0
+    })
   }
 
   return (
@@ -119,21 +147,32 @@ const TrackListPage: React.FC = () => {
                       {track.album?.release_date && ` • ${track.album.release_date}`}
                       {track.duration && ` • ${track.duration}`}
                     </p>
-                    {track.streaming_links && Object.keys(track.streaming_links).length > 0 && (
-                      <div className="mt-5">
-                        {Object.entries(track.streaming_links).map(([platform, url]) => (
-                          <a
-                            key={platform}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="tui-button mr-5"
-                          >
-                            {formatPlatformName(platform)}
-                          </a>
-                        ))}
-                      </div>
-                    )}
+                    <div className="mt-5 mb-15">
+                      <Link
+                        to={`/fm/pulse_vault?filter=${encodeURIComponent(track.title)}`}
+                        className="tui-button"
+                      >
+                        Pulse Vault
+                      </Link>
+                      {track.streaming_links && Object.keys(track.streaming_links).length > 0 && (
+                        <>
+                          {' '}
+                          {sortStreamingLinks(track.streaming_links).map(([platform, url], index, array) => (
+                            <React.Fragment key={platform}>
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="tui-button"
+                              >
+                                {formatPlatformName(platform)}
+                              </a>
+                              {index < array.length - 1 && ' '}
+                            </React.Fragment>
+                          ))}
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))

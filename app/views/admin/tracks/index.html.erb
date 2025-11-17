@@ -27,6 +27,24 @@
         </div>
       </div>
 
+      <!-- Search Filter -->
+      <% if @tracks.any? %>
+        <div style="margin-bottom: 20px;">
+          <label for="track-search" style="color: #888; display: block; margin-bottom: 8px;">
+            SEARCH TRACKS :: Filter by track title, artist, or album
+          </label>
+          <input
+            type="text"
+            id="track-search"
+            placeholder="Type to filter tracks..."
+            style="width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace; font-size: 1em;"
+          />
+          <div style="margin-top: 8px; color: #666; font-size: 0.9em;">
+            <span id="track-count"><%= @tracks.count %></span> / <%= @tracks.count %> tracks visible
+          </div>
+        </div>
+      <% end %>
+
       <!-- Tracks Table -->
       <% if @tracks.any? %>
         <div class="tui-window white-text" style="background: #0a0a0a; margin-top: 20px;">
@@ -43,7 +61,10 @@
             </thead>
             <tbody>
               <% @tracks.each do |track| %>
-                <tr>
+                <tr class="track-row"
+                    data-track-title="<%= track.title.downcase %>"
+                    data-artist-name="<%= track.artist.name.downcase %>"
+                    data-album-name="<%= track.album&.name&.downcase || '' %>">
                   <td>
                     <strong><%= track.title %></strong>
                     <br>
@@ -85,3 +106,49 @@
     </div>
   </fieldset>
 </div>
+
+<% if @tracks.any? %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('track-search');
+      const trackRows = document.querySelectorAll('.track-row');
+      const trackCountEl = document.getElementById('track-count');
+      const totalTracks = trackRows.length;
+
+      function filterTracks() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        trackRows.forEach(row => {
+          const trackTitle = row.dataset.trackTitle || '';
+          const artistName = row.dataset.artistName || '';
+          const albumName = row.dataset.albumName || '';
+
+          const matches = trackTitle.includes(searchTerm) ||
+                         artistName.includes(searchTerm) ||
+                         albumName.includes(searchTerm);
+
+          if (matches) {
+            row.style.display = '';
+            visibleCount++;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        trackCountEl.textContent = visibleCount;
+      }
+
+      searchInput.addEventListener('input', filterTracks);
+
+      // Focus search on Tab key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab' && !e.shiftKey && document.activeElement !== searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.select();
+        }
+      });
+    });
+  </script>
+<% end %>
