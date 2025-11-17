@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { PlayerBar } from './PlayerBar.tsx'
-import type { TrackData, AudioPlayerAPI } from '~/types/track.ts'
+import type { TrackData, AudioPlayerAPI, StationContext } from '~/types/track.ts'
 
 interface AudioPlayerProps {
   onReady?: (api: AudioPlayerAPI) => void
@@ -15,7 +15,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   const [volume, setVolume] = useState(0.7)
   const [isVisible, setIsVisible] = useState(false)
   const [isSeeking, setIsSeeking] = useState(false)
+  const [stationContext, setStationContext] = useState<StationContext | null>(null)
   const playlistRef = useRef<TrackData[]>([]) // Store playlist in memory
+  const stationContextRef = useRef<StationContext | null>(null) // Store station context
 
   // Handle play/pause
   const handlePlayPause = useCallback(() => {
@@ -163,13 +165,20 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   }, [currentTrack, isPlaying])
 
   // Set playlist from React component
-  const setPlaylist = useCallback((tracks: TrackData[]) => {
+  const setPlaylist = useCallback((tracks: TrackData[], stationCtx?: StationContext) => {
     playlistRef.current = tracks
+    stationContextRef.current = stationCtx || null
+    setStationContext(stationCtx || null)
   }, [])
 
   // Get current playlist
   const getPlaylist = useCallback(() => {
     return playlistRef.current
+  }, [])
+
+  // Get station context
+  const getStationContext = useCallback(() => {
+    return stationContextRef.current
   }, [])
 
   // Expose API to vanilla JS and React context
@@ -181,6 +190,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       isPlaying: () => isPlaying,
       setPlaylist,
       getPlaylist,
+      getStationContext,
       refreshPlaylist,
       refreshUI
     }
@@ -194,7 +204,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     return () => {
       delete window.audioPlayer
     }
-  }, [loadTrack, handlePlayPause, currentTrack, isPlaying, setPlaylist, getPlaylist, onReady, refreshPlaylist, refreshUI])
+  }, [loadTrack, handlePlayPause, currentTrack, isPlaying, setPlaylist, getPlaylist, getStationContext, onReady, refreshPlaylist, refreshUI])
 
   // Update track table UI when current track or playing state changes
   useEffect(() => {
@@ -318,6 +328,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
           currentTime={currentTime}
           duration={duration}
           volume={volume}
+          stationContext={stationContext}
           onPlayPause={handlePlayPause}
           onSeekStart={handleSeekStart}
           onSeek={handleSeek}

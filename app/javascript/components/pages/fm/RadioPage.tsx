@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import type { TrackData } from '~/types/track'
+
+interface Playlist {
+  id: number
+  name: string
+  track_count: number
+}
 
 interface RadioStation {
+  id: number
   name: string
   slug: string
   description: string
   genre: string
   stream_url: string
   color: string
+  playlists: Playlist[]
 }
 
 export const RadioPage: React.FC = () => {
@@ -19,6 +28,8 @@ export const RadioPage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = React.useRef<HTMLAudioElement>(null)
   const [volume, setVolume] = useState(70)
+  const [playingStationId, setPlayingStationId] = useState<number | null>(null)
+  const [audioPlayerIsPlaying, setAudioPlayerIsPlaying] = useState(false)
 
   useEffect(() => {
     fetch('/api/radio_stations')
@@ -36,7 +47,115 @@ export const RadioPage: React.FC = () => {
       })
   }, [])
 
+  // Poll audio player for current station context
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (window.audioPlayer) {
+        const stationContext = window.audioPlayer.getStationContext()
+        const isCurrentlyPlaying = window.audioPlayer.isPlaying()
+        setPlayingStationId(stationContext?.id || null)
+        setAudioPlayerIsPlaying(isCurrentlyPlaying)
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [])
+
   const currentYear = new Date().getFullYear()
+
+  const playStationPlaylists = async (station: RadioStation) => {
+    // If this station is already playing, just toggle play/pause
+    if (playingStationId === station.id && window.audioPlayer) {
+      window.audioPlayer.togglePlayPause()
+      return
+    }
+
+    if (!station.playlists || station.playlists.length === 0) {
+      alert('This station has no playlists configured yet.')
+      return
+    }
+
+    try {
+      // Fetch all playlists for this radio station (public endpoint)
+      const response = await fetch(`/api/radio_stations/${station.id}/playlists`)
+
+      if (!response.ok) {
+        throw new Error('Failed to load station playlists')
+      }
+
+      const playlists = await response.json()
+
+      if (!playlists || playlists.length === 0) {
+        alert('No playlists found for this station.')
+        return
+      }
+
+      // Collect all tracks from all playlists in order
+      const allTracks: TrackData[] = []
+
+      for (const playlist of playlists) {
+        if (playlist.tracks && playlist.tracks.length > 0) {
+          const playlistTracks = playlist.tracks
+            .map((track: any) => ({
+              id: String(track.track_id),
+              url: track.audio_url || '',
+              title: track.title,
+              artist: track.artist.name,
+              coverUrl: track.album?.cover_url || '',
+              duration: track.duration
+            }))
+            .filter((track: TrackData) => track.url) // Only include tracks with audio
+
+          allTracks.push(...playlistTracks)
+        }
+      }
+
+      if (allTracks.length === 0) {
+        alert('No playable tracks found in station playlists.')
+        return
+      }
+
+      // Pick a random track to simulate tuning into a live radio station
+      const randomIndex = Math.floor(Math.random() * allTracks.length)
+      const randomTrack = allTracks[randomIndex]
+
+      // Set playlist and play random track using the global audio player
+      if (window.audioPlayer) {
+        window.audioPlayer.setPlaylist(allTracks, {
+          id: station.id,
+          name: station.name
+        })
+
+        // Get audio element and set up listener for when metadata loads
+        const audio = document.getElementById('audio-element') as HTMLAudioElement
+        if (audio) {
+          // Pause immediately to prevent playback
+          audio.pause()
+
+          // Listen for loadedmetadata event to know when duration is available
+          const onMetadataLoaded = () => {
+            if (audio.duration && !isNaN(audio.duration)) {
+              // Seek to random position (between 0% and 70% of the track)
+              const randomPosition = Math.random() * audio.duration * 0.7
+              audio.currentTime = randomPosition
+
+              // Now play from the random position
+              audio.play()
+            }
+            audio.removeEventListener('loadedmetadata', onMetadataLoaded)
+          }
+
+          audio.addEventListener('loadedmetadata', onMetadataLoaded)
+        }
+
+        // Load the track (this will trigger metadata loading)
+        window.audioPlayer.loadTrack(randomTrack)
+      }
+    } catch (error) {
+      console.error('Error loading station playlists:', error)
+      alert('Failed to load station playlists. Please try again.')
+    }
+  }
 
   const tuneIn = (streamUrl: string, stationName: string, genre: string) => {
     if (!audioRef.current) return
@@ -101,14 +220,38 @@ export const RadioPage: React.FC = () => {
                           <legend style={{ color: '#14b8a6' }}>{station.name}</legend>
 
                           <div style={{ padding: '15px' }}>
-                            <p style={{ marginBottom: '10px', color: '#888' }}>
-                              <strong>Genre:</strong> <span style={{ color: '#aaa' }}>{station.genre}</span>
-                            </p>
+                            {station.playlists && station.playlists.length > 0 && (
+                              <div style={{ marginBottom: '10px' }}>
+                                <span className="live-indicator" style={{ color: '#14b8a6', fontWeight: 'bold', fontSize: '0.9em', marginRight: '10px' }}>● LIVE</span>
+                                <span style={{ color: '#888' }}>
+                                  <strong>Genre:</strong> <span style={{ color: '#aaa' }}>{station.genre}</span>
+                                </span>
+                              </div>
+                            )}
+                            {(!station.playlists || station.playlists.length === 0) && (
+                              <p style={{ marginBottom: '10px', color: '#888' }}>
+                                <strong>Genre:</strong> <span style={{ color: '#aaa' }}>{station.genre}</span>
+                              </p>
+                            )}
                             <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#999' }}>
                               {station.description.replace('2125', (currentYear + 100).toString())}
                             </p>
 
-                            {station.stream_url ? (
+                            {station.playlists && station.playlists.length > 0 ? (
+                              <button
+                                className="tui-button tune-in-btn"
+                                onClick={() => playStationPlaylists(station)}
+                                style={{
+                                  width: '100%',
+                                  background: playingStationId === station.id ? '#0d9488' : '#14b8a6',
+                                  color: 'white'
+                                }}
+                              >
+                                {playingStationId === station.id
+                                  ? (audioPlayerIsPlaying ? '❚❚ PAUSE' : '▶ RESUME')
+                                  : '▶ PLAY STATION'}
+                              </button>
+                            ) : station.stream_url ? (
                               <button
                                 className="tui-button tune-in-btn"
                                 onClick={() => tuneIn(station.stream_url, station.name, station.genre)}
@@ -137,14 +280,37 @@ export const RadioPage: React.FC = () => {
                         <legend>{station.name}</legend>
 
                         <div style={{ padding: '15px' }}>
-                          <p style={{ marginBottom: '10px' }}>
-                            <strong>Genre:</strong> {station.genre}
-                          </p>
+                          {station.playlists && station.playlists.length > 0 && (
+                            <div style={{ marginBottom: '10px' }}>
+                              <span className="live-indicator" style={{ color: '#00d9ff', fontWeight: 'bold', fontSize: '0.9em', marginRight: '10px' }}>● LIVE</span>
+                              <span>
+                                <strong>Genre:</strong> {station.genre}
+                              </span>
+                            </div>
+                          )}
+                          {(!station.playlists || station.playlists.length === 0) && (
+                            <p style={{ marginBottom: '10px' }}>
+                              <strong>Genre:</strong> {station.genre}
+                            </p>
+                          )}
                           <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
                             {station.description.replace('2125', (currentYear + 100).toString())}
                           </p>
 
-                          {station.stream_url ? (
+                          {station.playlists && station.playlists.length > 0 ? (
+                            <button
+                              className={`tui-button tune-in-btn ${station.color}`}
+                              onClick={() => playStationPlaylists(station)}
+                              style={{
+                                width: '100%',
+                                background: playingStationId === station.id ? '#9333ea' : undefined
+                              }}
+                            >
+                              {playingStationId === station.id
+                                ? (audioPlayerIsPlaying ? '❚❚ PAUSE' : '▶ RESUME')
+                                : '▶ PLAY STATION'}
+                            </button>
+                          ) : station.stream_url ? (
                             <button
                               className={`tui-button tune-in-btn ${station.color}`}
                               onClick={() => tuneIn(station.stream_url, station.name, station.genre)}
@@ -249,6 +415,19 @@ export const RadioPage: React.FC = () => {
       <audio ref={audioRef} preload="none" />
 
       <style>{`
+        @keyframes livePulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.3;
+          }
+        }
+
+        .live-indicator {
+          animation: livePulse 4s ease-in-out infinite;
+        }
+
         input[type="range"]::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;

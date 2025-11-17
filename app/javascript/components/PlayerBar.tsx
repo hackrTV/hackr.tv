@@ -8,7 +8,7 @@ import { QueuePanel } from './QueuePanel.tsx'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useAudio } from '~/contexts/AudioContext'
 import { AddToPlaylistDropdown } from '~/components/playlists/AddToPlaylistDropdown'
-import type { TrackData } from '~/types/track'
+import type { TrackData, StationContext } from '~/types/track'
 
 interface PlayerBarProps {
   isPlaying: boolean;
@@ -21,6 +21,7 @@ interface PlayerBarProps {
   currentTime: number;
   duration: number;
   volume: number;
+  stationContext: StationContext | null;
   onPlayPause: () => void;
   onSeekStart: () => void;
   onSeek: (time: number) => void;
@@ -35,6 +36,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   currentTime,
   duration,
   volume,
+  stationContext,
   onPlayPause,
   onSeekStart,
   onSeek,
@@ -116,6 +118,13 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} />
 
             <div style={{ flex: 1 }}>
+              {stationContext && (
+                <div style={{ marginBottom: '2px' }}>
+                  <span style={{ color: '#00d9ff', fontSize: '0.85em', fontWeight: 'bold' }}>
+                    📻 {stationContext.name}
+                  </span>
+                </div>
+              )}
               <TrackInfo
                 title={currentTrack?.title || 'No track loaded'}
                 artist={currentTrack?.artist || '—'}
@@ -153,7 +162,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                 }}
                 title="Show queue"
               >
-                ☰ Queue ({playlist.length})
+                {stationContext ? '☰ Queue' : `☰ Queue (${playlist.length})`}
               </button>
 
               {showQueue && (
@@ -199,6 +208,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                     playlist={playlist}
                     currentTrackId={currentTrack?.id || null}
                     onTrackClick={handleQueueTrackClick}
+                    stationContext={stationContext}
                   />
                 </div>
               )}

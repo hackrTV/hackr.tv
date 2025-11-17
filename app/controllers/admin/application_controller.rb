@@ -1,7 +1,7 @@
 class Admin::ApplicationController < ApplicationController
   include GridAuthentication
 
-  layout "grid"
+  layout "admin"
 
   before_action :require_admin
 
