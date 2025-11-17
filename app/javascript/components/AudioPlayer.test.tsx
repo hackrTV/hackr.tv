@@ -1,7 +1,28 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AudioPlayer } from './AudioPlayer'
+
+// Mock the hooks needed by PlayerBar
+vi.mock('~/hooks/useGridAuth', () => ({
+  useGridAuth: () => ({
+    isLoggedIn: false,
+    hackr: null,
+    loading: false,
+    disconnect: vi.fn()
+  })
+}))
+
+vi.mock('~/contexts/AudioContext', () => ({
+  useAudio: () => ({
+    audioPlayerAPI: {
+      current: {
+        getPlaylist: () => [],
+        loadTrack: vi.fn()
+      }
+    }
+  })
+}))
 
 describe('AudioPlayer', () => {
   const mockTrack = {
