@@ -5,33 +5,62 @@
 **hackr.tv** is a multi-domain music streaming and discovery platform featuring **THE PULSE GRID** - a playable multiplayer MUD (Multi-User Dungeon) set in 2125. Explore the resistance movement through music, lore, and interactive gameplay.
 
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
-[![Rails](https://img.shields.io/badge/Rails-8.0.3-red.svg)](https://rubyonrails.org/)
-[![Tests](https://img.shields.io/badge/Tests-302%20passing-brightgreen.svg)](#testing)
+[![Rails](https://img.shields.io/badge/Rails-8.1.1-red.svg)](https://rubyonrails.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
+[![Tests](https://img.shields.io/badge/Tests-351%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
 
 ## 🎵 Features
 
+### React SPA Architecture
+- **Full Single Page Application** - Built with React 19, TypeScript, and React Router v7
+- **Persistent Audio Player** - Music continues playing across all navigation
+- **Code Splitting** - Lazy loading for optimal performance
+- **Error Boundaries** - Graceful error handling with custom 404 page
+- **Server-Rendered Admin** - Admin section remains traditional Rails for simplicity
+
 ### hackr.tv Platform
 - **Animated Terminal Homepage** - Retro terminal-style interface with typing animation and keyboard skip
 - **Menu System** - Dynamic navigation with artist profiles, services, and conditional admin access
 - **Multi-Artist Showcases** - Dedicated pages for The.CyberPul.se, XERAEN, and more
+- **Band Profile Pages** - 4 custom band pages (System Rot, Wavelength Zero, Voiceprint, Temporal Blue Drift)
+- **ViewComponent Architecture** - Reusable BandProfileComponent with flexible color schemes
+- **Hackr Logs** - Blog platform with Markdown support (remark-gfm, rehype-sanitize)
 
 ### hackr.fm Music Platform
-- **Radio Streaming** - Live web radio with multiple stations (The.CyberPul.se, XERAEN, Sector X Underground, GovCorp Official)
-- **Pulse Vault** - Music discovery interface with 66+ tracks, real-time search/filtering, and full-featured HTML5 audio player
-- **Auto-play & Playlists** - Automatic track progression with loop functionality
-- **Album Art** - Cover image display with hover zoom overlay
+- **Radio Stations** - Database-backed with full CRUD admin interface
+  - 4 configurable stations (The.CyberPul.se, XERAEN, Sector X Underground, GovCorp Official)
+  - Playlist management per station with manual position ordering
+  - Live web radio streaming with HTML5 audio player
+- **User Playlists** - Full playlist system with Grid Hackr authentication
+  - Create/edit/delete playlists
+  - Add tracks from Pulse Vault and PlayerBar
+  - Manual drag-and-drop ordering
+  - Public sharing via unique share tokens
+  - Queue panel showing current + next 3 tracks
+  - Playlist context preservation across navigation
+- **Pulse Vault** - Music discovery interface with 66+ tracks
+  - Real-time search/filter by track, artist, album, genre
+  - Click-anywhere playback (any cell in row plays/pauses)
+  - Row hover highlighting with dynamic now-playing indicators
+  - Album covers with hover zoom overlay (300x300px)
+  - Custom SQL ordering (The.CyberPul.se → XERAEN → alphabetical)
+  - Keyboard shortcuts (Tab to search, Spacebar to play/pause)
+- **Auto-play & Queue** - Automatic track progression with loop functionality
 - **Bands Directory** - Artist profiles with track counts and genre information
 
 ### THE PULSE GRID - MUD Game
 - **Real-time Multiplayer** - Live chat and movement tracking via Action Cable
 - **Interactive NPCs** - Rich dialogue trees with lore-heavy conversations
-- **Command History** - Arrow key navigation through previous commands
+  - Resistance Coordinator (6 topics: mission, resistance, help, station, synthia, govcorp)
+  - Temporal Theorist (7 topics: time, paradox, xeraen, future, 2125, prism, synthia)
+- **Command History** - Arrow key navigation through previous commands (up to 100 stored)
 - **Room Navigation** - Explore zones controlled by resistance factions
 - **Inventory System** - Collect and manage items
 - **Optimized UI** - Clean terminal-style interface with comfortable dark theme
+- **Dedicated Grid Layout** - 700px output window, compact design, no page scrolling
 
 ### Multi-Domain Architecture
 - Domain-specific routing and layouts (hackr.tv, xeraen.com, rockerboy.net, ashlinn.net, sectorx.media)
@@ -43,13 +72,15 @@
 
 ## 🛠 Tech Stack
 
-- **Backend:** Ruby 3.4.7, Rails 8.0.3, Puma
+- **Frontend:** React 19, TypeScript, React Router v7, Vite
+- **Backend:** Ruby 3.4.7, Rails 8.1.1, Puma
 - **Database:** SQLite3 (development), Active Storage for file attachments
-- **Real-time:** Action Cable with Solid Cable adapter
-- **Testing:** RSpec, FactoryBot, Faker
+- **Real-time:** Action Cable 8.1.100 with Solid Cable adapter
+- **Testing:** RSpec (backend), Vitest (frontend), FactoryBot, Faker
 - **Code Quality:** StandardRB
 - **Assets:** Propshaft, TuiCSS (terminal UI framework)
-- **Authentication:** bcrypt for password hashing
+- **Authentication:** bcrypt for password hashing (Grid Hackr accounts)
+- **Markdown:** react-markdown, remark-gfm, rehype-sanitize
 
 ---
 
@@ -59,6 +90,8 @@
 - Ruby 3.4.7
 - Bundler
 - SQLite3
+- Node.js (for React frontend)
+- pnpm (package manager)
 
 ### Installation
 
@@ -71,6 +104,7 @@
 2. **Install dependencies**
    ```bash
    bundle install
+   pnpm install
    ```
 
 3. **Setup database**
@@ -100,6 +134,8 @@
    - THE PULSE GRID: http://localhost:3000/grid
    - hackr.fm Radio: http://localhost:3000/fm/radio
    - Pulse Vault: http://localhost:3000/fm/pulse_vault
+   - Playlists: http://localhost:3000/fm/playlists (requires Grid login)
+   - Admin Dashboard: http://localhost:3000/root (requires Grid admin account)
 
 ---
 
@@ -140,45 +176,61 @@ clear (cls)            - Clear the screen
 ```
 hackr.tv/
 ├── app/
+│   ├── javascript/                    # React SPA (TypeScript)
+│   │   ├── entrypoints/
+│   │   │   └── application.tsx        # React app entry point
+│   │   ├── components/
+│   │   │   ├── layouts/               # AppLayout, Header, Footer
+│   │   │   ├── pages/                 # React pages (HomePage, PulseVaultPage, etc.)
+│   │   │   ├── audio/                 # PlayerBar, SeekBar, QueuePanel
+│   │   │   └── playlists/             # CreatePlaylistModal, AddToPlaylistDropdown
+│   │   ├── contexts/
+│   │   │   └── AudioContext.tsx       # Global audio player state
+│   │   └── hooks/                     # useGridAuth, useAudio, useActionCable
 │   ├── controllers/
-│   │   ├── fm_controller.rb           # hackr.fm music platform
-│   │   ├── grid_controller.rb         # THE PULSE GRID MUD
-│   │   ├── pages_controller.rb        # Static pages (hackr.tv, thecyberpulse)
-│   │   ├── tracks_controller.rb       # Track showcases
-│   │   └── admin/                     # Admin CRUD
+│   │   ├── api/                       # JSON API for React SPA
+│   │   │   ├── radio_controller.rb    # Radio stations & playlists endpoint
+│   │   │   ├── playlists_controller.rb # User playlist CRUD
+│   │   │   └── grid_controller.rb     # Grid game API
+│   │   ├── admin/                     # Server-rendered admin CRUD
+│   │   │   ├── radio_stations_controller.rb
+│   │   │   ├── tracks_controller.rb
+│   │   │   └── hackr_logs_controller.rb
+│   │   └── application_controller.rb  # Multi-domain routing
 │   ├── models/
 │   │   ├── artist.rb                  # Music artists
 │   │   ├── album.rb                   # Albums with cover images
 │   │   ├── track.rb                   # Tracks with audio files
-│   │   ├── grid_hackr.rb              # Player accounts
+│   │   ├── playlist.rb                # User playlists
+│   │   ├── playlist_track.rb          # Playlist tracks (join table)
+│   │   ├── radio_station.rb           # Radio stations
+│   │   ├── radio_station_playlist.rb  # Station playlists (join table)
+│   │   ├── grid_hackr.rb              # Player accounts (owns playlists)
 │   │   ├── grid_room.rb               # MUD locations
 │   │   └── ...                        # Other Grid models
 │   ├── views/
 │   │   ├── layouts/
-│   │   │   ├── default*.html.erb      # Main site layouts
-│   │   │   ├── xeraen*.html.erb       # XERAEN artist layouts
-│   │   │   ├── fm.html.erb            # hackr.fm layout
-│   │   │   └── grid.html.erb          # THE PULSE GRID layout
-│   │   ├── pages/
-│   │   │   ├── hackr_tv.html.erb      # Animated terminal home
-│   │   │   └── thecyberpulse.html.erb # The.CyberPul.se page
-│   │   ├── fm/                        # Music platform views
-│   │   └── grid/                      # MUD game views
+│   │   │   ├── application.html.erb   # React SPA shell
+│   │   │   └── admin.html.erb         # Admin layout
+│   │   └── admin/                     # Admin views (server-rendered)
 │   ├── components/
-│   │   └── band_profile_component.rb  # Reusable band profile
+│   │   └── band_profile_component.rb  # Reusable band profile (ViewComponent)
 │   └── channels/
-│       └── grid_channel.rb            # Real-time multiplayer
+│       └── grid_channel.rb            # Real-time multiplayer (Action Cable)
 ├── data/                              # YAML data for import
 │   ├── artists.yml                    # 13 artists
-│   ├── albums.yml                     # Album metadata
+│   ├── albums.yml                     # 14 albums
 │   ├── tracks.yml                     # 66+ tracks
 │   └── [artist_slug]/                 # Artist-specific files
 ├── lib/tasks/
 │   └── import.rake                    # Data import scripts
-├── spec/                              # RSpec test suite (302 examples)
+├── spec/                              # Test suite (351 examples)
+│   ├── models/                        # Model specs (backend)
+│   ├── controllers/                   # Controller specs (backend)
+│   ├── components/                    # Component specs (frontend Vitest)
+│   └── services/                      # Service specs
 └── config/
-    ├── routes.rb                      # Multi-domain routing
-    └── radio_stations.yml             # Radio station config
+    └── routes.rb                      # Multi-domain routing
 ```
 
 ---
@@ -187,7 +239,11 @@ hackr.tv/
 
 Run the full test suite:
 ```bash
+# Backend tests
 bundle exec rspec
+
+# Frontend tests
+pnpm test
 ```
 
 Run specific test files:
@@ -195,15 +251,20 @@ Run specific test files:
 bundle exec rspec spec/models/
 bundle exec rspec spec/controllers/
 bundle exec rspec spec/services/
+bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- 302 examples, 0 failures
-- Models: Artist, Album, Track, GridHackr, GridRoom, HackrLog, Redirect
-- Controllers: Grid, FM, Tracks, Pages, HackrLogs
-- Components: BandProfileComponent
-- Services: Grid::CommandParser
-- Concerns: GridAuthentication, RequestAnalysis
+- **Backend:** 351 examples, 0 failures, 7 pending
+- **Frontend:** 37 examples (Vitest)
+- **Total:** 388 passing tests
+
+**Tested Components:**
+- **Models:** Artist, Album, Track, Playlist, PlaylistTrack, RadioStation, RadioStationPlaylist, GridHackr, GridRoom, HackrLog, Redirect
+- **Controllers:** Grid, API (Radio, Playlists, PlaylistTracks, SharedPlaylists), Admin (RadioStations, Tracks, HackrLogs), FM, Tracks, Pages
+- **Components:** BandProfileComponent (ViewComponent), AudioPlayer, PlayerBar, SeekBar (React/Vitest)
+- **Services:** Grid::CommandParser
+- **Concerns:** GridAuthentication, RequestAnalysis
 
 ---
 
@@ -239,13 +300,15 @@ bin/rails import:yaml_tracks        # Tracks only
 2. Create directory: `data/[artist-slug]/`
 3. Add albums to `data/albums.yml`
 4. Add tracks to `data/tracks.yml` or `data/[artist-slug]/trackz/`
-5. Place audio files in `data/[artist-slug]/`
+5. Place audio files and cover images in `data/[artist-slug]/`
 6. Run `bin/rails import:from_yaml`
 
 **Add a Radio Station:**
-1. Edit `config/radio_stations.yml`
-2. Add station metadata (name, slug, description, stream_url)
-3. Restart server
+1. Login to admin at `/root` with Grid admin account
+2. Navigate to Radio Stations → New
+3. Fill in station details (name, description, genre, stream_url, color)
+4. Add playlists to the station
+5. Reorder playlists as needed via drag-and-drop
 
 ---
 
@@ -273,16 +336,23 @@ bin/rails import:yaml_tracks        # Tracks only
 - **artists** - name, slug, genre
 - **albums** - name, slug, album_type, release_date, description, cover_image (Active Storage)
 - **tracks** - title, slug, track_number, release_date, duration, featured, streaming_links (JSON), videos (JSON), lyrics, audio_file (Active Storage)
+- **playlists** - name, description, is_public, share_token, belongs_to :grid_hackr
+- **playlist_tracks** - position (1+), belongs_to :playlist, belongs_to :track
+- **radio_stations** - name, slug, description, genre, color, stream_url, position
+- **radio_station_playlists** - position (1+), belongs_to :radio_station, belongs_to :playlist
 
 ### THE PULSE GRID
-- **grid_hackrs** - player accounts with bcrypt authentication
+- **grid_hackrs** - player accounts with bcrypt authentication (role: operative/admin), has_many :playlists
 - **grid_rooms** - locations in the game world
 - **grid_zones** - areas grouping rooms (faction_base, govcorp, transit)
 - **grid_factions** - resistance factions (The.CyberPul.se, XERAEN, GovCorp)
 - **grid_exits** - directional connections between rooms
 - **grid_items** - objects in rooms or inventories
-- **grid_mobs** - NPCs with dialogue trees
+- **grid_mobs** - NPCs with dialogue trees (dialogue_tree JSON column)
 - **grid_messages** - chat and system messages
+
+### Blog
+- **hackr_logs** - blog posts with Markdown content, published status
 
 ---
 
@@ -305,35 +375,39 @@ bin/rails import:yaml_tracks        # Tracks only
 ## 🎯 Roadmap
 
 ### Completed ✅
-- [x] Animated terminal homepage with typing effect & keyboard skip
-- [x] ViewComponent architecture for band profiles
-- [x] Album model with Active Storage cover images
-- [x] Comprehensive YAML import system
-- [x] hackr.fm Radio with 4 stations
-- [x] Pulse Vault music player with search/filter
-- [x] Auto-play next track with loop
-- [x] THE PULSE GRID real-time multiplayer
-- [x] NPC dialogue system
-- [x] Command history navigation
-- [x] Album cover hover overlay
-- [x] Click-anywhere row playback
-- [x] Dynamic menu system with conditional admin access
-- [x] Route reorganization (The.CyberPul.se → /thecyberpulse)
+- [x] **React SPA Migration** - Full SPA with React 19, TypeScript, React Router v7
+- [x] **Database-Backed Radio Stations** - Full CRUD admin interface with playlist management
+- [x] **User Playlists** - Create/edit/delete with Grid Hackr auth and public sharing
+- [x] **Queue Panel** - Current + next 3 tracks display with click-to-jump
+- [x] **Animated terminal homepage** - Typing effect & keyboard skip
+- [x] **ViewComponent architecture** - Reusable band profiles with flexible color schemes
+- [x] **Band profile pages** - System Rot, Wavelength Zero, Voiceprint, Temporal Blue Drift
+- [x] **Album model** - Active Storage cover images with hover zoom
+- [x] **Comprehensive YAML import** - Idempotent, multi-document support
+- [x] **hackr.fm Radio** - 4 stations with live streaming
+- [x] **Pulse Vault** - Search/filter, click-anywhere playback, custom ordering
+- [x] **Auto-play next track** - Queue management with loop functionality
+- [x] **THE PULSE GRID** - Real-time multiplayer MUD game
+- [x] **NPC dialogue system** - 2 NPCs with 13 total topics
+- [x] **Command history** - Arrow key navigation (100 commands)
+- [x] **Hackr Logs** - Blog platform with Markdown support
+- [x] **Comprehensive test suite** - 351 backend + 37 frontend tests (100% passing)
 
 ### In Progress 🚧
 - [ ] Faction reputation system
-- [ ] Mission/quest system
-- [ ] Hacking system
-- [ ] Combat mechanics
+- [ ] Mission/quest system for THE PULSE GRID
+- [ ] Hacking system (core gameplay mechanic)
+- [ ] Combat mechanics (physical/cyber)
 - [ ] Synthia frequency tuning mechanic
 
 ### Future Enhancements 🔮
-- [ ] Shuffle mode
-- [ ] User playlists
+- [ ] Shuffle mode for playlists
 - [ ] Previous/Skip buttons in player
-- [ ] Band profile pages with expanded bios
+- [ ] Playlist drag-and-drop reordering UI
 - [ ] More zones and rooms for THE PULSE GRID
 - [ ] Persistent inventory between sessions
+- [ ] Expanded band profile pages with photos and extended bios
+- [ ] Upload remaining audio files (64 of 66 tracks need audio)
 
 ---
 
@@ -360,9 +434,11 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/rails server` | Start development server |
 | `bin/rails console` | Interactive Rails console |
 | `bin/rails db:migrate` | Run database migrations |
-| `bin/rails import:from_yaml` | Import all YAML data |
-| `bundle exec rspec` | Run test suite |
-| `bundle exec standardrb` | Lint code |
+| `bin/rails import:from_yaml` | Import all YAML data (artists, albums, tracks) |
+| `bundle exec rspec` | Run backend test suite (351 tests) |
+| `pnpm test` | Run frontend test suite (37 tests) |
+| `bundle exec standardrb` | Lint backend code |
+| `pnpm install` | Install frontend dependencies |
 
 ---
 
