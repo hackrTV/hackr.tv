@@ -47,7 +47,9 @@ Rails.application.routes.draw do
   get "fm/bands", to: "pages#spa_root", as: :fm_bands
   get "fm/playlists", to: "pages#spa_root", as: :fm_playlists
   get "fm/playlists/:id", to: "pages#spa_root", as: :fm_playlist
-  get "fm/shared/:token", to: "pages#spa_root", as: :fm_shared_playlist
+
+  # Shared playlist - public (SPA)
+  get "shared/:token", to: "pages#spa_root", as: :shared_playlist
 
   # HackrLogs (blog) routes - SPA
   get "logs", to: "pages#spa_root", as: :hackr_logs

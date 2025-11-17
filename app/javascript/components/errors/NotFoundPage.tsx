@@ -3,65 +3,103 @@ import { Link } from 'react-router-dom'
 
 export const NotFoundPage: React.FC = () => {
   return (
-    <div className="tui-window cyan-255-border" style={{ margin: '2rem auto', maxWidth: '800px' }}>
-      <fieldset className="tui-fieldset">
-        <legend>404 NOT FOUND</legend>
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <pre style={{ fontSize: '1.5em', marginBottom: '1.5rem' }}>
-            {`    ___   ___   ___
-   /   \\ /   \\ /   \\
-  | 4 | | 0 | | 4 |
-   \\___/ \\___/ \\___/`}
-          </pre>
-
-          <p className="cyan-255-text" style={{ marginBottom: '1rem', fontSize: '1.2em' }}>
-            <strong>SIGNAL LOST</strong>
-          </p>
-
-          <p style={{ marginBottom: '2rem' }}>
-            The requested resource could not be found in the grid.
-            <br />
-            It may have been moved, deleted, or never existed.
-          </p>
-
-          <div className="tui-divider"></div>
-
-          <p style={{ margin: '2rem 0 1rem 0' }}>
-            <strong>SUGGESTED ACTIONS:</strong>
-          </p>
-
-          <div style={{ textAlign: 'left', maxWidth: '500px', margin: '0 auto' }}>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <Link to="/" className="cyan-255-text">
-                  → Return to Home
-                </Link>
-              </li>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <Link to="/fm/pulse-vault" className="cyan-255-text">
-                  → Browse Pulse Vault
-                </Link>
-              </li>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <Link to="/fm/radio" className="cyan-255-text">
-                  → Listen to Radio
-                </Link>
-              </li>
-              <li style={{ marginBottom: '0.5rem' }}>
-                <Link to="/grid" className="cyan-255-text">
-                  → Enter THE PULSE GRID
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="tui-divider" style={{ marginTop: '2rem' }}></div>
-
-          <p style={{ marginTop: '1.5rem', fontSize: '0.85em', opacity: 0.7 }}>
-            Error Code: 404 | Resource Not Found
-          </p>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        backgroundColor: '#000000'
+      }}
+    >
+      <div
+        style={{
+          border: '2px solid #00ff00',
+          padding: '20px',
+          maxWidth: '800px',
+          width: '100%',
+          boxShadow: '0 0 20px rgba(0, 255, 0, 0.3)'
+        }}
+      >
+        <div
+          style={{
+            borderBottom: '2px solid #00ff00',
+            paddingBottom: '10px',
+            marginBottom: '20px',
+            color: '#ffffff',
+            fontWeight: 'bold'
+          }}
+        >
+          hackr.tv:~$ cat /var/log/errors/404.log
         </div>
-      </fieldset>
+
+        <pre
+          style={{
+            color: '#00ff00',
+            lineHeight: 1.2,
+            overflowX: 'auto',
+            margin: '20px 0'
+          }}
+        >
+          {` _  _    ___  _  _
+| || |  / _ \\| || |
+| || |_| | | | || |_
+|__   _| | | |__   _|
+   | | | |_| |  | |
+   |_|  \\___/   |_|
+`}
+        </pre>
+
+        <div
+          style={{
+            color: '#ff0000',
+            fontSize: '0.9em',
+            margin: '20px 0'
+          }}
+        >
+          [ERROR] HTTP 404 - Resource Not Found
+        </div>
+
+        <div
+          style={{
+            color: '#ffffff',
+            lineHeight: 1.6,
+            margin: '20px 0'
+          }}
+        >
+          The requested page does not exist on this server.
+          <br /><br />
+          Possible causes:
+          <br />
+          &nbsp;&nbsp;• URL may be mistyped
+          <br />
+          &nbsp;&nbsp;• Resource may have been moved or deleted
+          <br />
+          &nbsp;&nbsp;• Link may be outdated
+          <br /><br />
+          Quick navigation:
+          <br />
+          &nbsp;&nbsp;• <Link to="/" style={{ color: '#00ff00', textDecoration: 'underline' }}>Return to hackr.tv origin</Link>
+          <br />
+          &nbsp;&nbsp;• <Link to="/fm/pulse_vault" style={{ color: '#00ff00', textDecoration: 'underline' }}>Plumb the Pulse Vault</Link>
+          <br />
+          &nbsp;&nbsp;• <Link to="/fm/radio" style={{ color: '#00ff00', textDecoration: 'underline' }}>Listen to Hackr Radio Chronocasts</Link>
+          <br />
+          &nbsp;&nbsp;• <Link to="/grid" style={{ color: '#00ff00', textDecoration: 'underline' }}>Enter THE PULSE GRID</Link>
+        </div>
+
+        <div style={{ marginTop: '20px', color: '#00ff00' }}>
+          hackr.tv:~$ <span style={{ animation: 'blink 1s infinite' }}>█</span>
+        </div>
+
+        <style>{`
+          @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+          }
+        `}</style>
+      </div>
     </div>
   )
 }

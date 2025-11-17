@@ -33,7 +33,7 @@ export const FooterMenu: React.FC = () => {
           </li>
           <span className="tui-statusbar-divider"></span>
           <li>
-            <Link to="/fm">
+            <Link to="/fm/radio">
               <span className="purple-168-text">3</span> hackr.fm&nbsp;
             </Link>
           </li>

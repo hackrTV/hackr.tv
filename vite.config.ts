@@ -9,6 +9,14 @@ export default defineConfig({
   plugins: [
     RubyPlugin(),
   ],
+  server: {
+    host: '0.0.0.0', // Listen on all network interfaces
+    hmr: {
+      host: process.env.VITE_HMR_HOST || 'localhost',
+      clientPort: 3036,
+      protocol: 'ws',
+    },
+  },
   esbuild: {
     jsx: 'automatic',
     jsxImportSource: 'react',
