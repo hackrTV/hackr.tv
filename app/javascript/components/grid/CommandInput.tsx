@@ -55,7 +55,7 @@ export const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, disabled =
               padding: '6px 10px',
               fontFamily: 'monospace',
               fontSize: '0.9em',
-              borderRadius: '3px',
+              borderRadius: '3px'
             }}
           />
           <button
@@ -70,7 +70,7 @@ export const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, disabled =
               cursor: disabled ? 'not-allowed' : 'pointer',
               borderRadius: '3px',
               fontWeight: 'bold',
-              opacity: disabled ? 0.5 : 1,
+              opacity: disabled ? 0.5 : 1
             }}
           >
             EXECUTE
@@ -81,7 +81,7 @@ export const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, disabled =
         style={{
           fontSize: '0.75em',
           color: '#9ca3af',
-          lineHeight: '1.3',
+          lineHeight: '1.3'
         }}
       >
         Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear

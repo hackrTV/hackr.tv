@@ -38,13 +38,15 @@ module Api
             slug: track.artist.slug,
             genre: track.artist.genre
           },
-          album: track.album ? {
-            id: track.album.id,
-            name: track.album.name,
-            slug: track.album.slug,
-            release_date: track.album.release_date,
-            cover_url: track.album.cover_image.attached? ? url_for(track.album.cover_image) : nil
-          } : nil,
+          album: if track.album
+                   {
+                     id: track.album.id,
+                     name: track.album.name,
+                     slug: track.album.slug,
+                     release_date: track.album.release_date,
+                     cover_url: track.album.cover_image.attached? ? url_for(track.album.cover_image) : nil
+                   }
+                 end,
           audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil
         }
       }
@@ -71,15 +73,17 @@ module Api
           slug: @track.artist.slug,
           genre: @track.artist.genre
         },
-        album: @track.album ? {
-          id: @track.album.id,
-          name: @track.album.name,
-          slug: @track.album.slug,
-          album_type: @track.album.album_type,
-          release_date: @track.album.release_date,
-          description: @track.album.description,
-          cover_url: @track.album.cover_image.attached? ? url_for(@track.album.cover_image) : nil
-        } : nil,
+        album: if @track.album
+                 {
+                   id: @track.album.id,
+                   name: @track.album.name,
+                   slug: @track.album.slug,
+                   album_type: @track.album.album_type,
+                   release_date: @track.album.release_date,
+                   description: @track.album.description,
+                   cover_url: @track.album.cover_image.attached? ? url_for(@track.album.cover_image) : nil
+                 }
+               end,
         audio_url: @track.audio_file.attached? ? url_for(@track.audio_file) : nil
       }
     end

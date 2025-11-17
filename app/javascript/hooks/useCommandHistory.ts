@@ -4,24 +4,23 @@ const STORAGE_KEY = 'grid_command_history'
 const MAX_HISTORY = 100
 
 export const useCommandHistory = () => {
-  const [history, setHistory] = useState<string[]>([])
-  const [historyIndex, setHistoryIndex] = useState<number>(-1)
-  const [currentDraft, setCurrentDraft] = useState<string>('')
-
-  // Load history from sessionStorage on mount
-  useEffect(() => {
+  // Initialize history from sessionStorage on mount (lazy initialization)
+  const [history, setHistory] = useState<string[]>(() => {
     const stored = sessionStorage.getItem(STORAGE_KEY)
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
         if (Array.isArray(parsed)) {
-          setHistory(parsed)
+          return parsed
         }
       } catch (err) {
-        console.error('Failed to parse command history:', err)
+        console.error('Failed to parse command history from storage:', err)
       }
     }
-  }, [])
+    return []
+  })
+  const [historyIndex, setHistoryIndex] = useState<number>(-1)
+  const [currentDraft, setCurrentDraft] = useState<string>('')
 
   // Save history to sessionStorage whenever it changes
   useEffect(() => {
@@ -99,6 +98,6 @@ export const useCommandHistory = () => {
     addCommand,
     navigateUp,
     navigateDown,
-    clearHistory,
+    clearHistory
   }
 }

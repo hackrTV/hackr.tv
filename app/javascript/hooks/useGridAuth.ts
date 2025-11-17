@@ -41,7 +41,7 @@ export const useGridAuth = () => {
   const checkAuth = useCallback(async () => {
     try {
       const response = await fetch('/api/grid/current_hackr', {
-        credentials: 'include', // Include cookies for session
+        credentials: 'include' // Include cookies for session
       })
 
       if (response.ok) {
@@ -54,8 +54,8 @@ export const useGridAuth = () => {
       } else {
         setHackr(null)
       }
-    } catch (err) {
-      console.error('Auth check failed:', err)
+    } catch (_err) {
+      console.error('Auth check failed:', _err)
       setHackr(null)
     } finally {
       setLoading(false)
@@ -72,10 +72,10 @@ export const useGridAuth = () => {
       const response = await fetch('/api/grid/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ hackr_alias, password }),
+        body: JSON.stringify({ hackr_alias, password })
       })
 
       const data: LoginResponse = await response.json()
@@ -88,6 +88,7 @@ export const useGridAuth = () => {
         return data
       }
     } catch (err) {
+      console.error('Login failed:', err)
       const errorMsg = 'Network error. Please try again.'
       setError(errorMsg)
       return { success: false, error: errorMsg }
@@ -104,10 +105,10 @@ export const useGridAuth = () => {
       const response = await fetch('/api/grid/register', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ hackr_alias, password, password_confirmation }),
+        body: JSON.stringify({ hackr_alias, password, password_confirmation })
       })
 
       const data: RegisterResponse = await response.json()
@@ -120,6 +121,7 @@ export const useGridAuth = () => {
         return data
       }
     } catch (err) {
+      console.error('Registration failed:', err)
       const errorMsg = 'Network error. Please try again.'
       setError(errorMsg)
       return { success: false, error: errorMsg }
@@ -131,7 +133,7 @@ export const useGridAuth = () => {
     try {
       const response = await fetch('/api/grid/disconnect', {
         method: 'DELETE',
-        credentials: 'include',
+        credentials: 'include'
       })
 
       if (response.ok) {
@@ -143,6 +145,7 @@ export const useGridAuth = () => {
         return { success: false, error: errorMsg }
       }
     } catch (err) {
+      console.error('Disconnect failed:', err)
       const errorMsg = 'Network error. Please try again.'
       setError(errorMsg)
       return { success: false, error: errorMsg }
@@ -157,6 +160,6 @@ export const useGridAuth = () => {
     login,
     register,
     disconnect,
-    checkAuth,
+    checkAuth
   }
 }

@@ -6,6 +6,8 @@ interface LoadingSpinnerProps {
   color?: string
 }
 
+const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   message = 'Loading...',
   size = 'medium',
@@ -16,13 +18,11 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     medium: { fontSize: '1.5em', padding: '2rem' },
     large: { fontSize: '2em', padding: '3rem' }
   }
-
-  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
   const [frameIndex, setFrameIndex] = React.useState(0)
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setFrameIndex((prev) => (prev + 1) % frames.length)
+      setFrameIndex((prev) => (prev + 1) % SPINNER_FRAMES.length)
     }, 80)
 
     return () => clearInterval(interval)
@@ -36,7 +36,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       }}
     >
       <span className={color} style={{ marginRight: '0.5rem' }}>
-        {frames[frameIndex]}
+        {SPINNER_FRAMES[frameIndex]}
       </span>
       <span>{message}</span>
     </div>

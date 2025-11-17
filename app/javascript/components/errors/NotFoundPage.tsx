@@ -8,7 +8,7 @@ export const NotFoundPage: React.FC = () => {
         <legend>404 NOT FOUND</legend>
         <div style={{ padding: '2rem', textAlign: 'center' }}>
           <pre style={{ fontSize: '1.5em', marginBottom: '1.5rem' }}>
-{`    ___   ___   ___
+            {`    ___   ___   ___
    /   \\ /   \\ /   \\
   | 4 | | 0 | | 4 |
    \\___/ \\___/ \\___/`}

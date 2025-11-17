@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -42,7 +42,6 @@ const formatFutureDate = (dateStr: string, includeTime: boolean = false): string
 
 export const LogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
-  const navigate = useNavigate()
   const { hackr } = useGridAuth()
   const [log, setLog] = useState<HackrLog | null>(null)
   const [loading, setLoading] = useState(true)

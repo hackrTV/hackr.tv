@@ -34,6 +34,6 @@ class Api::LogsController < ApplicationController
       }
     }
   rescue ActiveRecord::RecordNotFound
-    render json: { error: "Log not found or not yet published." }, status: :not_found
+    render json: {error: "Log not found or not yet published."}, status: :not_found
   end
 end

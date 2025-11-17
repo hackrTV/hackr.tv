@@ -42,16 +42,16 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
 
   const buttonStyle = colorScheme.button_gradient
     ? {
-        background: colorScheme.button_gradient,
-        color: 'white',
-        fontWeight: 'bold' as const,
-        border: 'none'
-      }
+      background: colorScheme.button_gradient,
+      color: 'white',
+      fontWeight: 'bold' as const,
+      border: 'none'
+    }
     : {
-        background: colorScheme.button || colorScheme.primary,
-        color: colorScheme.button_text || 'white',
-        fontWeight: 'bold' as const
-      }
+      background: colorScheme.button || colorScheme.primary,
+      color: colorScheme.button_text || 'white',
+      fontWeight: 'bold' as const
+    }
 
   const backButtonStyle = {
     background: colorScheme.back_button || '#222',

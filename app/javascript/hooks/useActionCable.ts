@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { createConsumer, Cable, Channel } from '@rails/actioncable'
 
 export interface GridEvent {
@@ -20,6 +20,7 @@ interface UseActionCableOptions {
 export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptions) => {
   const cableRef = useRef<Cable | null>(null)
   const channelRef = useRef<Channel | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
 
   const connect = useCallback(() => {
     if (!enabled || !roomId) {
@@ -43,16 +44,18 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
     channelRef.current = cableRef.current.subscriptions.create(
       { channel: 'GridChannel' },
       {
-        connected() {
+        connected () {
           console.log('GridChannel: Connected to WebSocket')
+          setIsConnected(true)
         },
-        disconnected() {
+        disconnected () {
           console.log('GridChannel: Disconnected from WebSocket')
+          setIsConnected(false)
         },
-        received(data: GridEvent) {
+        received (data: GridEvent) {
           console.log('GridChannel: Received event:', data)
           onEvent(data)
-        },
+        }
       }
     )
   }, [roomId, onEvent, enabled])
@@ -66,6 +69,7 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
       cableRef.current.disconnect()
       cableRef.current = null
     }
+    setIsConnected(false)
   }, [])
 
   // Connect when roomId changes or when enabled
@@ -73,6 +77,7 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
     if (enabled && roomId) {
       connect()
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       disconnect()
     }
 
@@ -82,7 +87,7 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
   }, [roomId, enabled, connect, disconnect])
 
   return {
-    isConnected: !!channelRef.current,
-    reconnect: connect,
+    isConnected,
+    reconnect: connect
   }
 }

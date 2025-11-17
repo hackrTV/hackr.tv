@@ -27,7 +27,7 @@ const oppositeDirection = (dir: string): string => {
     east: 'west',
     west: 'east',
     up: 'down',
-    down: 'up',
+    down: 'up'
   }
   return opposites[dir] || dir
 }
@@ -60,10 +60,10 @@ export const GridGamePage: React.FC = () => {
           const response = await fetch('/api/grid/command', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json'
             },
             credentials: 'include',
-            body: JSON.stringify({ input: 'look' }),
+            body: JSON.stringify({ input: 'look' })
           })
 
           if (response.ok) {
@@ -89,31 +89,31 @@ export const GridGamePage: React.FC = () => {
     const timestamp = new Date().toLocaleTimeString('en-US', {
       hour12: false,
       hour: '2-digit',
-      minute: '2-digit',
+      minute: '2-digit'
     })
 
     let message = ''
 
     switch (event.type) {
-      case 'say':
-        message = `\n<span style="color: #a78bfa;">[${event.hackr_alias}]</span>: ${event.message}`
-        break
+    case 'say':
+      message = `\n<span style="color: #a78bfa;">[${event.hackr_alias}]</span>: ${event.message}`
+      break
 
-      case 'movement':
-        if (event.to_room_id === currentRoomId) {
-          message = `\n<span style="color: #22d3ee;">[${timestamp}] ${event.hackr_alias} enters from the ${oppositeDirection(event.direction || '')}.</span>`
-        } else if (event.from_room_id === currentRoomId) {
-          message = `\n<span style="color: #22d3ee;">[${timestamp}] ${event.hackr_alias} leaves to the ${event.direction}.</span>`
-        }
-        break
+    case 'movement':
+      if (event.to_room_id === currentRoomId) {
+        message = `\n<span style="color: #22d3ee;">[${timestamp}] ${event.hackr_alias} enters from the ${oppositeDirection(event.direction || '')}.</span>`
+      } else if (event.from_room_id === currentRoomId) {
+        message = `\n<span style="color: #22d3ee;">[${timestamp}] ${event.hackr_alias} leaves to the ${event.direction}.</span>`
+      }
+      break
 
-      case 'take':
-        message = `\n<span style="color: #fbbf24;">[${timestamp}] ${event.hackr_alias} takes the ${event.item_name}.</span>`
-        break
+    case 'take':
+      message = `\n<span style="color: #fbbf24;">[${timestamp}] ${event.hackr_alias} takes the ${event.item_name}.</span>`
+      break
 
-      case 'drop':
-        message = `\n<span style="color: #fbbf24;">[${timestamp}] ${event.hackr_alias} drops the ${event.item_name}.</span>`
-        break
+    case 'drop':
+      message = `\n<span style="color: #fbbf24;">[${timestamp}] ${event.hackr_alias} drops the ${event.item_name}.</span>`
+      break
     }
 
     if (message) {
@@ -125,7 +125,7 @@ export const GridGamePage: React.FC = () => {
   useActionCable({
     roomId: currentRoomId,
     onEvent: handleEvent,
-    enabled: !!hackr && !!currentRoomId,
+    enabled: !!hackr && !!currentRoomId
   })
 
   // Handle command execution
@@ -145,10 +145,10 @@ export const GridGamePage: React.FC = () => {
       const response = await fetch('/api/grid/command', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ input: command }),
+        body: JSON.stringify({ input: command })
       })
 
       if (response.ok) {
@@ -219,7 +219,7 @@ export const GridGamePage: React.FC = () => {
                 padding: '4px 12px',
                 fontSize: '0.85em',
                 cursor: 'pointer',
-                borderRadius: '3px',
+                borderRadius: '3px'
               }}
             >
               DISCONNECT

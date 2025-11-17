@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
-import ReactMarkdown from 'react-markdown'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 
 interface HackrLog {

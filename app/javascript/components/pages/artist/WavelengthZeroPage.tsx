@@ -17,18 +17,15 @@ interface Artist {
 
 const WavelengthZeroPage: React.FC = () => {
   const [artist, setArtist] = useState<Artist | null>(null)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/artists/wavelength_zero')
       .then(res => res.json())
       .then(data => {
         setArtist(data)
-        setLoading(false)
       })
       .catch(error => {
         console.error('Error fetching artist:', error)
-        setLoading(false)
       })
   }, [])
 

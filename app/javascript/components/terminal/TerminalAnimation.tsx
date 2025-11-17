@@ -26,7 +26,7 @@ export const TerminalAnimation: React.FC = () => {
     { text: `> YEAR: ${currentYear} (Origin Point)`, delay: 200, class: 'terminal-prompt' },
     { text: `> SIGNAL RANGE: ${currentYear} - ${currentYear + 100}`, delay: 200, class: 'terminal-prompt' },
     { text: '', delay: 500 },
-    { text: `Welcome to hackr.tv - the multimedia resistance platform broadcasting`, delay: 100 },
+    { text: 'Welcome to hackr.tv - the multimedia resistance platform broadcasting', delay: 100 },
     { text: `cyberpunk transmissions across time and space from ${currentYear + 100}.`, delay: 100 },
     { text: '', delay: 500 },
     { text: '─────────────────────────────────────────────────────────────────', delay: 200 },
@@ -165,6 +165,7 @@ export const TerminalAnimation: React.FC = () => {
       if (timeoutId) clearTimeout(timeoutId)
       document.removeEventListener('keydown', handleKeyDown)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Render links after animation is done

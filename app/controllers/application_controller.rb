@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
 
   def determine_layout
     # Skip layout for AJAX content requests
-    return false if params[:no_layout] == '1'
+    return false if params[:no_layout] == "1"
     current_layout
   end
 

@@ -30,7 +30,7 @@ export const GameOutput: React.FC<GameOutputProps> = ({ output }) => {
         color: '#d0d0d0',
         border: '1px solid #4b5563',
         borderRadius: '3px',
-        marginBottom: '8px',
+        marginBottom: '8px'
       }}
     >
       {output.map((line, index) => (
