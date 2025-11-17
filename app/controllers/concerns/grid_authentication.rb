@@ -40,6 +40,12 @@ module GridAuthentication
     redirect_to grid_login_path(no_layout: params[:no_layout])
   end
 
+  def require_login_api
+    return if logged_in?
+
+    render json: {error: "Authentication required. Please log in to THE PULSE GRID."}, status: :unauthorized
+  end
+
   def require_admin
     return if admin_hackr?
 

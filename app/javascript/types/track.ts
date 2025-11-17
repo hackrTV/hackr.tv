@@ -12,6 +12,7 @@ export interface AudioPlayerAPI {
   getCurrentTrackId: () => string | null;
   isPlaying: () => boolean;
   setPlaylist: (tracks: TrackData[]) => void;
+  getPlaylist: () => TrackData[];
   refreshPlaylist: () => void;
   refreshUI: () => void;
 }

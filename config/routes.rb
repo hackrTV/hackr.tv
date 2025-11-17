@@ -45,6 +45,9 @@ Rails.application.routes.draw do
   get "fm/radio", to: "pages#spa_root", as: :fm_radio
   get "fm/pulse_vault", to: "pages#spa_root", as: :fm_pulse_vault
   get "fm/bands", to: "pages#spa_root", as: :fm_bands
+  get "fm/playlists", to: "pages#spa_root", as: :fm_playlists
+  get "fm/playlists/:id", to: "pages#spa_root", as: :fm_playlist
+  get "fm/shared/:token", to: "pages#spa_root", as: :fm_shared_playlist
 
   # HackrLogs (blog) routes - SPA
   get "logs", to: "pages#spa_root", as: :hackr_logs
@@ -68,6 +71,13 @@ Rails.application.routes.draw do
 
     # Hackr Logs API routes
     resources :logs, only: [:index, :show]
+
+    # Playlists API routes
+    resources :playlists do
+      post "reorder", on: :member
+      resources :tracks, controller: "playlist_tracks", only: [:create, :destroy]
+    end
+    get "shared_playlists/:share_token", to: "shared_playlists#show"
   end
 
   # Admin routes (accessible at /root)

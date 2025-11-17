@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useAudio } from '~/contexts/AudioContext'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { AddToPlaylistDropdown } from '~/components/playlists/AddToPlaylistDropdown'
 
 interface Track {
   id: number
@@ -16,6 +18,7 @@ interface TrackTableProps {
 
 export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = '' }) => {
   const { audioPlayerAPI } = useAudio()
+  const { isLoggedIn } = useGridAuth()
   const [filter, setFilter] = useState(initialFilter)
   const [currentTrackId, setCurrentTrackId] = useState<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -35,22 +38,6 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
     )
   })
 
-  // Update playlist in audio player when tracks or filter changes
-  React.useEffect(() => {
-    if (audioPlayerAPI.current) {
-      const playableFilteredTracks = filteredTracks
-        .filter(track => track.audio_url)
-        .map(track => ({
-          id: track.id.toString(),
-          url: track.audio_url!,
-          title: track.title,
-          artist: track.artist.name,
-          coverUrl: track.album.cover_url || ''
-        }))
-      audioPlayerAPI.current.setPlaylist(playableFilteredTracks)
-    }
-  }, [filteredTracks, audioPlayerAPI])
-
   const handlePlayTrack = (track: Track) => {
     if (!track.audio_url || !audioPlayerAPI.current) return
 
@@ -60,7 +47,21 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
     if (currentTrackId === track.id) {
       audioPlayerAPI.current.togglePlayPause()
     } else {
-      // Load and play a different track
+      // Build playlist from current filtered tracks
+      const playableFilteredTracks = filteredTracks
+        .filter(track => track.audio_url)
+        .map(track => ({
+          id: track.id.toString(),
+          url: track.audio_url!,
+          title: track.title,
+          artist: track.artist.name,
+          coverUrl: track.album.cover_url || ''
+        }))
+
+      // Set the playlist ONLY when user clicks to play a track
+      audioPlayerAPI.current.setPlaylist(playableFilteredTracks)
+
+      // Load and play the selected track
       audioPlayerAPI.current.loadTrack({
         id: trackIdStr,
         url: track.audio_url,
@@ -123,6 +124,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
               <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Album</th>
               <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Genre</th>
               <th style={{ textAlign: 'center', color: '#888', width: '120px', minWidth: '120px' }}>Stream</th>
+              {isLoggedIn && <th style={{ textAlign: 'center', color: '#888', width: '60px', minWidth: '60px' }}>&nbsp;</th>}
             </tr>
           </thead>
           <tbody>
@@ -194,6 +196,17 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                       <span style={{ color: '#555' }}>—</span>
                     )}
                   </td>
+                  {isLoggedIn && (
+                    <td style={{ textAlign: 'center', width: '60px', minWidth: '60px' }}>
+                      <div onClick={(e) => { e.stopPropagation() }}>
+                        <AddToPlaylistDropdown
+                          trackId={track.id}
+                          trackTitle={track.title}
+                          buttonText="+"
+                        />
+                      </div>
+                    </td>
+                  )}
                 </tr>
               )
             })}

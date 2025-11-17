@@ -4,6 +4,7 @@ class GridHackr < ApplicationRecord
   belongs_to :current_room, class_name: "GridRoom", optional: true
   has_many :grid_items
   has_many :grid_messages
+  has_many :playlists, dependent: :destroy
 
   validates :hackr_alias, presence: true, uniqueness: true
   validates :role, inclusion: {in: %w[operative admin], message: "%{value} is not a valid role"}
