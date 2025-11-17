@@ -1279,7 +1279,7 @@
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
-  audio_file: "static-feed.mp3"
+  audio_file: "static-feed.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1337,7 +1337,7 @@
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
-  audio_file: "no-signal.mp3"
+  audio_file: "no-signal.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1401,7 +1401,7 @@
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
-  audio_file: "concrete-and-rage.mp3"
+  audio_file: "concrete-and-rage.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -1471,7 +1471,7 @@
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
-  audio_file: "rot-from-within.mp3"
+  audio_file: "rot-from-within.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1539,7 +1539,7 @@
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
-  audio_file: "burn-the-blueprint.mp3"
+  audio_file: "burn-the-blueprint.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2355,7 +2355,7 @@
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
-  audio_file: "archivists-procedure.mp3"
+  audio_file: "archivists-procedure.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2378,7 +2378,7 @@
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
-  audio_file: "frequency-of-memory.mp3"
+  audio_file: "frequency-of-memory.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2401,7 +2401,7 @@
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
-  audio_file: "human-resonance.mp3"
+  audio_file: "human-resonance.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2424,7 +2424,7 @@
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
-  audio_file: "breakpoint.mp3"
+  audio_file: "breakpoint.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2447,7 +2447,7 @@
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
-  audio_file: "cracks-in-the-echo-chamber.mp3"
+  audio_file: "cracks-in-the-echo-chamber.ogg"
   featured: true
   streaming_links:
     # spotify: ""
