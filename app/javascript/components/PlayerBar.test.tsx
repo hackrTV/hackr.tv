@@ -3,8 +3,30 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PlayerBar } from './PlayerBar'
 
+// Mock the hooks
+vi.mock('~/hooks/useGridAuth', () => ({
+  useGridAuth: () => ({
+    isLoggedIn: false,
+    hackr: null,
+    loading: false,
+    disconnect: vi.fn()
+  })
+}))
+
+vi.mock('~/contexts/AudioContext', () => ({
+  useAudio: () => ({
+    audioPlayerAPI: {
+      current: {
+        getPlaylist: () => [],
+        loadTrack: vi.fn()
+      }
+    }
+  })
+}))
+
 describe('PlayerBar', () => {
   const mockTrack = {
+    id: '1',
     title: 'Test Track',
     artist: 'Test Artist',
     coverUrl: 'https://example.com/cover.jpg'

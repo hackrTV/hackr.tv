@@ -109,6 +109,13 @@ export const HeaderMenu: React.FC = () => {
                   <span className="purple-168-text">/</span>bands
                 </Link>
               </li>
+              {isLoggedIn && (
+                <li>
+                  <Link to="/fm/playlists">
+                    <span className="purple-168-text">/</span>playlists
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </li>

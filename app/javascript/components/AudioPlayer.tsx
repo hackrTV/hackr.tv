@@ -167,6 +167,11 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     playlistRef.current = tracks
   }, [])
 
+  // Get current playlist
+  const getPlaylist = useCallback(() => {
+    return playlistRef.current
+  }, [])
+
   // Expose API to vanilla JS and React context
   useEffect(() => {
     const api: AudioPlayerAPI = {
@@ -175,6 +180,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       getCurrentTrackId: () => currentTrack?.id || null,
       isPlaying: () => isPlaying,
       setPlaylist,
+      getPlaylist,
       refreshPlaylist,
       refreshUI
     }
@@ -188,7 +194,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     return () => {
       delete window.audioPlayer
     }
-  }, [loadTrack, handlePlayPause, currentTrack, isPlaying, setPlaylist, onReady, refreshPlaylist, refreshUI])
+  }, [loadTrack, handlePlayPause, currentTrack, isPlaying, setPlaylist, getPlaylist, onReady, refreshPlaylist, refreshUI])
 
   // Update track table UI when current track or playing state changes
   useEffect(() => {

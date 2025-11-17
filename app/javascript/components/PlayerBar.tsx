@@ -1,13 +1,19 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { AlbumCover } from './AlbumCover.tsx'
 import { PlayPauseButton } from './PlayPauseButton.tsx'
 import { TrackInfo } from './TrackInfo.tsx'
 import { SeekBar } from './SeekBar.tsx'
 import { VolumeControl } from './VolumeControl.tsx'
+import { QueuePanel } from './QueuePanel.tsx'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useAudio } from '~/contexts/AudioContext'
+import { AddToPlaylistDropdown } from '~/components/playlists/AddToPlaylistDropdown'
+import type { TrackData } from '~/types/track'
 
 interface PlayerBarProps {
   isPlaying: boolean;
   currentTrack: {
+    id: string;
     title: string;
     artist: string;
     coverUrl: string;
@@ -36,6 +42,46 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onVolumeChange,
   onClose
 }) => {
+  const { isLoggedIn } = useGridAuth()
+  const { audioPlayerAPI } = useAudio()
+  const [showQueue, setShowQueue] = useState(false)
+  const [playlist, setPlaylist] = useState<TrackData[]>([])
+  const queueRef = useRef<HTMLDivElement>(null)
+
+  // Update playlist when it changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (audioPlayerAPI.current) {
+        const currentPlaylist = audioPlayerAPI.current.getPlaylist()
+        setPlaylist(currentPlaylist)
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [audioPlayerAPI])
+
+  // Close queue when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (queueRef.current && !queueRef.current.contains(event.target as Node)) {
+        setShowQueue(false)
+      }
+    }
+
+    if (showQueue) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
+  }, [showQueue])
+
+  const handleQueueTrackClick = (track: TrackData) => {
+    if (audioPlayerAPI.current) {
+      audioPlayerAPI.current.loadTrack(track)
+    }
+  }
+
   return (
     <>
       <style>{`
@@ -85,12 +131,85 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
             <VolumeControl volume={volume} onVolumeChange={onVolumeChange} />
 
+            {isLoggedIn && currentTrack && (
+              <div style={{ marginLeft: '10px' }}>
+                <AddToPlaylistDropdown
+                  trackId={parseInt(currentTrack.id)}
+                  trackTitle={currentTrack.title}
+                  direction="up"
+                />
+              </div>
+            )}
+
+            <div ref={queueRef} style={{ position: 'relative' }}>
+              <button
+                className="tui-button"
+                onClick={() => setShowQueue(!showQueue)}
+                tabIndex={-1}
+                style={{
+                  background: showQueue ? '#7c3aed' : '#444',
+                  color: showQueue ? '#fff' : '#aaa',
+                  marginLeft: '10px'
+                }}
+                title="Show queue"
+              >
+                ☰ Queue ({playlist.length})
+              </button>
+
+              {showQueue && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '100%',
+                    right: 0,
+                    marginBottom: '10px',
+                    background: '#0a0a0a',
+                    border: '2px solid #7c3aed',
+                    borderRadius: '4px',
+                    minWidth: '350px',
+                    maxWidth: '450px',
+                    zIndex: 2000,
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.7)'
+                  }}
+                >
+                  <div style={{
+                    padding: '12px 15px',
+                    borderBottom: '2px solid #7c3aed',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{ color: '#00d9ff', fontWeight: 'bold', fontSize: '0.95em' }}>
+                      Up Next
+                    </div>
+                    <button
+                      onClick={() => setShowQueue(false)}
+                      className="tui-button"
+                      style={{
+                        background: 'transparent',
+                        color: '#aaa',
+                        padding: '2px 8px',
+                        fontSize: '0.9em'
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <QueuePanel
+                    playlist={playlist}
+                    currentTrackId={currentTrack?.id || null}
+                    onTrackClick={handleQueueTrackClick}
+                  />
+                </div>
+              )}
+            </div>
+
             <button
               id="close-player-btn"
               className="tui-button"
               onClick={onClose}
               tabIndex={-1}
-              style={{ background: '#444', color: '#aaa' }}
+              style={{ background: '#444', color: '#aaa', marginLeft: '10px' }}
             >
               ✕
             </button>
