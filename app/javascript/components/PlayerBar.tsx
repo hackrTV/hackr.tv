@@ -37,20 +37,32 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onClose
 }) => {
   return (
-    <div
-      id="audio-player"
-      tabIndex={-1}
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: '#0a0a0a',
-        borderTop: '2px solid #7c3aed',
-        padding: '15px 20px',
-        zIndex: 1000
-      }}
-    >
+    <>
+      <style>{`
+        @keyframes slideInFromLeft {
+          from {
+            transform: translateX(-100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+      <div
+        id="audio-player"
+        tabIndex={-1}
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: '#0a0a0a',
+          borderTop: '2px solid #7c3aed',
+          padding: '15px 20px',
+          zIndex: 1000,
+          animation: 'slideInFromLeft 0.3s ease-out'
+        }}
+      >
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           {currentTrack?.coverUrl && <AlbumCover coverUrl={currentTrack.coverUrl} />}
@@ -85,5 +97,6 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         </div>
       </div>
     </div>
+    </>
   )
 }
