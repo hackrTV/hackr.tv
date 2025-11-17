@@ -63,40 +63,40 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           animation: 'slideInFromLeft 0.3s ease-out'
         }}
       >
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          {currentTrack?.coverUrl && <AlbumCover coverUrl={currentTrack.coverUrl} />}
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            {currentTrack?.coverUrl && <AlbumCover coverUrl={currentTrack.coverUrl} />}
 
-          <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} />
+            <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} />
 
-          <div style={{ flex: 1 }}>
-            <TrackInfo
-              title={currentTrack?.title || 'No track loaded'}
-              artist={currentTrack?.artist || '—'}
-            />
-            <SeekBar
-              currentTime={currentTime}
-              duration={duration}
-              onSeekStart={onSeekStart}
-              onSeek={onSeek}
-              onSeekEnd={onSeekEnd}
-            />
+            <div style={{ flex: 1 }}>
+              <TrackInfo
+                title={currentTrack?.title || 'No track loaded'}
+                artist={currentTrack?.artist || '—'}
+              />
+              <SeekBar
+                currentTime={currentTime}
+                duration={duration}
+                onSeekStart={onSeekStart}
+                onSeek={onSeek}
+                onSeekEnd={onSeekEnd}
+              />
+            </div>
+
+            <VolumeControl volume={volume} onVolumeChange={onVolumeChange} />
+
+            <button
+              id="close-player-btn"
+              className="tui-button"
+              onClick={onClose}
+              tabIndex={-1}
+              style={{ background: '#444', color: '#aaa' }}
+            >
+              ✕
+            </button>
           </div>
-
-          <VolumeControl volume={volume} onVolumeChange={onVolumeChange} />
-
-          <button
-            id="close-player-btn"
-            className="tui-button"
-            onClick={onClose}
-            tabIndex={-1}
-            style={{ background: '#444', color: '#aaa' }}
-          >
-            ✕
-          </button>
         </div>
       </div>
-    </div>
     </>
   )
 }
