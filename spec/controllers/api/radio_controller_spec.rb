@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Api::RadioController, type: :controller do
   describe "GET #index" do
@@ -18,15 +18,14 @@ RSpec.describe Api::RadioController, type: :controller do
     end
 
     it "includes station attributes in response" do
-      station = create(:radio_station,
+      create(:radio_station,
         name: "Test Station",
         slug: "test-station",
         description: "Test description",
         genre: "Electronic",
         color: "purple-168",
         stream_url: "http://example.com/stream",
-        position: 0
-      )
+        position: 0)
 
       get :index, format: :json
 
@@ -83,7 +82,7 @@ RSpec.describe Api::RadioController, type: :controller do
     end
 
     it "returns playlists for a station in position order" do
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
@@ -94,13 +93,13 @@ RSpec.describe Api::RadioController, type: :controller do
 
     it "does not require authentication" do
       # No session setup - should still work
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       expect(response).to have_http_status(:ok)
     end
 
     it "includes playlist metadata" do
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       expect(json["name"]).to eq(playlist1.name)
@@ -110,7 +109,7 @@ RSpec.describe Api::RadioController, type: :controller do
     end
 
     it "includes tracks with full details" do
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       track_json = json["tracks"].first
@@ -124,7 +123,7 @@ RSpec.describe Api::RadioController, type: :controller do
     end
 
     it "includes artist information in tracks" do
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       track_json = json["tracks"].first
@@ -139,7 +138,7 @@ RSpec.describe Api::RadioController, type: :controller do
       album = create(:album, artist: track1.artist)
       track1.update(album: album)
 
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       track_json = json["tracks"].first
@@ -154,7 +153,7 @@ RSpec.describe Api::RadioController, type: :controller do
     it "includes audio_url when track has audio file" do
       # Track factory should handle audio file attachment
       # This test verifies the URL is included in response
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       track_json = json["tracks"].first
@@ -167,7 +166,7 @@ RSpec.describe Api::RadioController, type: :controller do
       album = create(:album, artist: track1.artist)
       track1.update(album: album)
 
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       track_json = json["tracks"].first
@@ -181,7 +180,7 @@ RSpec.describe Api::RadioController, type: :controller do
       track3 = create(:track)
       create(:playlist_track, playlist: playlist1, track: track3, position: 2)
 
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       tracks = json["tracks"]
@@ -192,7 +191,7 @@ RSpec.describe Api::RadioController, type: :controller do
     end
 
     it "returns 404 for non-existent station" do
-      get :station_playlists, params: { id: 99999 }, format: :json
+      get :station_playlists, params: {id: 99999}, format: :json
 
       expect(response).to have_http_status(:not_found)
       json = JSON.parse(response.body)
@@ -202,7 +201,7 @@ RSpec.describe Api::RadioController, type: :controller do
     it "returns empty array for station with no playlists" do
       empty_station = create(:radio_station)
 
-      get :station_playlists, params: { id: empty_station.id }, format: :json
+      get :station_playlists, params: {id: empty_station.id}, format: :json
 
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
@@ -213,7 +212,7 @@ RSpec.describe Api::RadioController, type: :controller do
       private_playlist = create(:playlist, grid_hackr: hackr, is_public: false)
       create(:radio_station_playlist, radio_station: station, playlist: private_playlist, position: 3)
 
-      get :station_playlists, params: { id: station.id }, format: :json
+      get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body)
       expect(json.length).to eq(3) # 2 original + 1 private

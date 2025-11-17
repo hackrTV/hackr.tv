@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Admin::RadioStationsController, type: :controller do
   let(:admin_hackr) { create(:grid_hackr, role: "admin") }
@@ -38,12 +38,12 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
     let(:station) { create(:radio_station) }
 
     it "returns success" do
-      get :show, params: { id: station.id }
+      get :show, params: {id: station.id}
       expect(response).to have_http_status(:ok)
     end
 
     it "loads the correct station" do
-      get :show, params: { id: station.id }
+      get :show, params: {id: station.id}
       expect(assigns(:radio_station)).to eq(station)
     end
 
@@ -51,7 +51,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
       my_playlist = create(:playlist, grid_hackr: admin_hackr)
       other_playlist = create(:playlist, grid_hackr: create(:grid_hackr))
 
-      get :show, params: { id: station.id }
+      get :show, params: {id: station.id}
 
       expect(assigns(:available_playlists)).to include(my_playlist)
       expect(assigns(:available_playlists)).not_to include(other_playlist)
@@ -63,7 +63,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
 
       create(:radio_station_playlist, radio_station: station, playlist: assigned_playlist)
 
-      get :show, params: { id: station.id }
+      get :show, params: {id: station.id}
 
       expect(assigns(:available_playlists)).to include(unassigned_playlist)
       expect(assigns(:available_playlists)).not_to include(assigned_playlist)
@@ -117,7 +117,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
     end
 
     it "renders new template on failure" do
-      invalid_params = { radio_station: { name: "" } }
+      invalid_params = {radio_station: {name: ""}}
       post :create, params: invalid_params
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response).to render_template(:new)
@@ -128,12 +128,12 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
     let(:station) { create(:radio_station) }
 
     it "returns success" do
-      get :edit, params: { id: station.id }
+      get :edit, params: {id: station.id}
       expect(response).to have_http_status(:ok)
     end
 
     it "loads the correct station" do
-      get :edit, params: { id: station.id }
+      get :edit, params: {id: station.id}
       expect(assigns(:radio_station)).to eq(station)
     end
   end
@@ -144,7 +144,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
     it "updates the station" do
       patch :update, params: {
         id: station.id,
-        radio_station: { name: "New Name" }
+        radio_station: {name: "New Name"}
       }
 
       station.reload
@@ -154,7 +154,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
     it "redirects to show page on success" do
       patch :update, params: {
         id: station.id,
-        radio_station: { name: "New Name" }
+        radio_station: {name: "New Name"}
       }
 
       expect(response).to redirect_to(admin_radio_station_path(station))
@@ -163,7 +163,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
     it "renders edit template on failure" do
       patch :update, params: {
         id: station.id,
-        radio_station: { name: "" }
+        radio_station: {name: ""}
       }
 
       expect(response).to have_http_status(:unprocessable_entity)
@@ -176,12 +176,12 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
 
     it "destroys the station" do
       expect {
-        delete :destroy, params: { id: station.id }
+        delete :destroy, params: {id: station.id}
       }.to change(RadioStation, :count).by(-1)
     end
 
     it "redirects to index" do
-      delete :destroy, params: { id: station.id }
+      delete :destroy, params: {id: station.id}
       expect(response).to redirect_to(admin_radio_stations_path)
     end
 
@@ -190,7 +190,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
       create(:radio_station_playlist, radio_station: station, playlist: playlist)
 
       expect {
-        delete :destroy, params: { id: station.id }
+        delete :destroy, params: {id: station.id}
       }.to change(RadioStationPlaylist, :count).by(-1)
     end
   end
@@ -201,7 +201,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
 
     it "adds playlist to station" do
       expect {
-        post :add_playlist, params: { id: station.id, playlist_id: playlist.id }
+        post :add_playlist, params: {id: station.id, playlist_id: playlist.id}
       }.to change(station.radio_station_playlists, :count).by(1)
     end
 
@@ -209,21 +209,21 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
       existing_playlist = create(:playlist, grid_hackr: admin_hackr)
       create(:radio_station_playlist, radio_station: station, playlist: existing_playlist, position: 1)
 
-      post :add_playlist, params: { id: station.id, playlist_id: playlist.id }
+      post :add_playlist, params: {id: station.id, playlist_id: playlist.id}
 
       rsp = station.radio_station_playlists.find_by(playlist: playlist)
       expect(rsp.position).to eq(2)
     end
 
     it "redirects to station show page" do
-      post :add_playlist, params: { id: station.id, playlist_id: playlist.id }
+      post :add_playlist, params: {id: station.id, playlist_id: playlist.id}
       expect(response).to redirect_to(admin_radio_station_path(station))
     end
 
     it "handles duplicate playlist error" do
       create(:radio_station_playlist, radio_station: station, playlist: playlist)
 
-      post :add_playlist, params: { id: station.id, playlist_id: playlist.id }
+      post :add_playlist, params: {id: station.id, playlist_id: playlist.id}
 
       expect(response).to redirect_to(admin_radio_station_path(station))
       expect(flash[:alert]).to include("Failed to add playlist")

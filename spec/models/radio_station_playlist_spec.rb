@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe RadioStationPlaylist, type: :model do
   describe "associations" do
@@ -28,7 +28,7 @@ RSpec.describe RadioStationPlaylist, type: :model do
       station1 = create(:radio_station)
       station2 = create(:radio_station)
 
-      rsp1 = create(:radio_station_playlist, radio_station: station1, playlist: playlist)
+      create(:radio_station_playlist, radio_station: station1, playlist: playlist)
       rsp2 = build(:radio_station_playlist, radio_station: station2, playlist: playlist)
 
       expect(rsp2).to be_valid

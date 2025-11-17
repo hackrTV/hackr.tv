@@ -10,8 +10,8 @@ module Admin
       # Show all playlists owned by the current admin user (public or private)
       # that are not already assigned to this station
       @available_playlists = Playlist.where(grid_hackr_id: current_hackr.id)
-                                     .where.not(id: @radio_station.playlists.pluck(:id))
-                                     .order(:name)
+        .where.not(id: @radio_station.playlists.pluck(:id))
+        .order(:name)
     end
 
     def new
