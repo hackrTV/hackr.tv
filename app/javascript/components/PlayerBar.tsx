@@ -37,53 +37,66 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   onClose
 }) => {
   return (
-    <div
-      id="audio-player"
-      tabIndex={-1}
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: '#0a0a0a',
-        borderTop: '2px solid #7c3aed',
-        padding: '15px 20px',
-        zIndex: 1000
-      }}
-    >
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          {currentTrack?.coverUrl && <AlbumCover coverUrl={currentTrack.coverUrl} />}
+    <>
+      <style>{`
+        @keyframes slideInFromLeft {
+          from {
+            transform: translateX(-100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+      <div
+        id="audio-player"
+        tabIndex={-1}
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: '#0a0a0a',
+          borderTop: '2px solid #7c3aed',
+          padding: '15px 20px',
+          zIndex: 1000,
+          animation: 'slideInFromLeft 0.3s ease-out'
+        }}
+      >
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            {currentTrack?.coverUrl && <AlbumCover coverUrl={currentTrack.coverUrl} />}
 
-          <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} />
+            <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} />
 
-          <div style={{ flex: 1 }}>
-            <TrackInfo
-              title={currentTrack?.title || 'No track loaded'}
-              artist={currentTrack?.artist || '—'}
-            />
-            <SeekBar
-              currentTime={currentTime}
-              duration={duration}
-              onSeekStart={onSeekStart}
-              onSeek={onSeek}
-              onSeekEnd={onSeekEnd}
-            />
+            <div style={{ flex: 1 }}>
+              <TrackInfo
+                title={currentTrack?.title || 'No track loaded'}
+                artist={currentTrack?.artist || '—'}
+              />
+              <SeekBar
+                currentTime={currentTime}
+                duration={duration}
+                onSeekStart={onSeekStart}
+                onSeek={onSeek}
+                onSeekEnd={onSeekEnd}
+              />
+            </div>
+
+            <VolumeControl volume={volume} onVolumeChange={onVolumeChange} />
+
+            <button
+              id="close-player-btn"
+              className="tui-button"
+              onClick={onClose}
+              tabIndex={-1}
+              style={{ background: '#444', color: '#aaa' }}
+            >
+              ✕
+            </button>
           </div>
-
-          <VolumeControl volume={volume} onVolumeChange={onVolumeChange} />
-
-          <button
-            id="close-player-btn"
-            className="tui-button"
-            onClick={onClose}
-            tabIndex={-1}
-            style={{ background: '#444', color: '#aaa' }}
-          >
-            ✕
-          </button>
         </div>
       </div>
-    </div>
+    </>
   )
 }
