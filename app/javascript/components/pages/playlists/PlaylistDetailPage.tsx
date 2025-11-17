@@ -1,13 +1,88 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useSearchParams } from 'react-router-dom'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { usePlaylist } from '~/hooks/usePlaylist'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { Playlist } from '~/types/playlist'
 import type { TrackData } from '~/types/track'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
+// Sortable Track Row Component
+interface SortableTrackRowProps {
+  track: Playlist['tracks'][0]
+  index: number
+  onRemove: (id: number, title: string) => void
+  formatDuration: (duration: string | null) => string
+}
+
+const SortableTrackRow: React.FC<SortableTrackRowProps> = ({ track, index, onRemove, formatDuration }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: track.track_id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+    borderBottom: '1px solid #333'
+  }
+
+  return (
+    <tr ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <td style={{ padding: '10px', color: '#666' }}>
+        <span style={{ marginRight: '8px' }}>☰</span>
+        {index + 1}
+      </td>
+      <td style={{ padding: '10px', color: '#ccc' }}>{track.title}</td>
+      <td style={{ padding: '10px', color: '#aaa' }}>{track.artist.name}</td>
+      <td style={{ padding: '10px', color: '#aaa' }}>{track.album?.name || '—'}</td>
+      <td style={{ padding: '10px', color: '#aaa' }}>{formatDuration(track.duration)}</td>
+      <td style={{ padding: '10px', textAlign: 'center' }}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onRemove(track.id, track.title)
+          }}
+          className="tui-button"
+          style={{
+            background: '#444',
+            color: '#ff6b6b',
+            fontSize: '0.8em',
+            padding: '4px 8px'
+          }}
+        >
+          Remove
+        </button>
+      </td>
+    </tr>
+  )
+}
 
 export const PlaylistDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { updatePlaylist, removeTrackFromPlaylist } = usePlaylist()
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [loading, setLoading] = useState(true)
@@ -16,6 +91,13 @@ export const PlaylistDetailPage: React.FC = () => {
   const [editName, setEditName] = useState('')
   const [editDescription, setEditDescription] = useState('')
   const [editIsPublic, setEditIsPublic] = useState(false)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  )
 
   const fetchPlaylist = useCallback(async () => {
     setLoading(true)
@@ -50,11 +132,47 @@ export const PlaylistDetailPage: React.FC = () => {
     }
   }, [id])
 
+  const handlePlayPlaylist = useCallback(() => {
+    if (!playlist || !playlist.tracks || playlist.tracks.length === 0) {
+      return
+    }
+
+    // Convert tracks to TrackData format for audio player
+    const trackDataList: TrackData[] = playlist.tracks.map((track) => ({
+      id: String(track.id),
+      url: track.audio_url || '',
+      title: track.title,
+      artist: track.artist.name,
+      coverUrl: track.album?.cover_url || ''
+    })).filter(track => track.url) // Only include tracks with audio files
+
+    if (trackDataList.length === 0) {
+      alert('No playable tracks in this playlist')
+      return
+    }
+
+    // Set playlist and play first track
+    if (window.audioPlayer) {
+      window.audioPlayer.setPlaylist(trackDataList)
+      window.audioPlayer.loadTrack(trackDataList[0])
+    }
+  }, [playlist])
+
   useEffect(() => {
     if (id) {
       fetchPlaylist()
     }
   }, [id, fetchPlaylist])
+
+  // Handle autoplay if ?autoplay=true in URL
+  useEffect(() => {
+    if (playlist && searchParams.get('autoplay') === 'true') {
+      // Remove the autoplay param from URL
+      setSearchParams({})
+      // Auto-play the playlist
+      handlePlayPlaylist()
+    }
+  }, [playlist, searchParams, setSearchParams, handlePlayPlaylist])
 
   const handleSaveEdit = async () => {
     if (!playlist) return
@@ -91,41 +209,100 @@ export const PlaylistDetailPage: React.FC = () => {
     }
   }
 
-  const handlePlayPlaylist = () => {
-    if (!playlist || !playlist.tracks || playlist.tracks.length === 0) {
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || !playlist || !playlist.tracks) {
       return
     }
 
-    // Convert tracks to TrackData format for audio player
-    const trackDataList: TrackData[] = playlist.tracks.map((track) => ({
-      id: String(track.id),
-      url: track.audio_url || '',
-      title: track.title,
-      artist: track.artist.name,
-      coverUrl: track.album?.cover_url || ''
-    })).filter(track => track.url) // Only include tracks with audio files
+    if (active.id !== over.id) {
+      const oldIndex = playlist.tracks.findIndex((track) => track.track_id === active.id)
+      const newIndex = playlist.tracks.findIndex((track) => track.track_id === over.id)
 
-    if (trackDataList.length === 0) {
-      alert('No playable tracks in this playlist')
-      return
-    }
+      if (oldIndex === -1 || newIndex === -1) {
+        return
+      }
 
-    // Set playlist and play first track
-    if (window.audioPlayer) {
-      window.audioPlayer.setPlaylist(trackDataList)
-      window.audioPlayer.loadTrack(trackDataList[0])
+      // Optimistically update UI
+      const newTracks = arrayMove(playlist.tracks, oldIndex, newIndex)
+      setPlaylist({
+        ...playlist,
+        tracks: newTracks
+      })
+
+      // Call API to persist the new order
+      const trackIds = newTracks.map((track) => track.track_id)
+
+      try {
+        const response = await fetch(`/api/playlists/${playlist.id}/reorder`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ track_ids: trackIds })
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to reorder tracks')
+        }
+
+        // Refresh to get updated positions from server
+        fetchPlaylist()
+      } catch (err) {
+        console.error('Failed to reorder tracks:', err)
+        alert('Failed to save new track order')
+        // Revert to original order on error
+        fetchPlaylist()
+      }
     }
   }
 
   const copyShareLink = () => {
     if (!playlist) return
 
-    const shareUrl = `${window.location.origin}/fm/shared/${playlist.share_token}`
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      alert('Share link copied to clipboard!')
-    }).catch(() => {
-      alert(`Share link: ${shareUrl}`)
-    })
+    const shareUrl = `${window.location.origin}/shared/${playlist.share_token}`
+
+    // Try modern clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl)
+        .then(() => {
+          alert('Share link copied to clipboard!')
+        })
+        .catch(() => {
+          fallbackCopy(shareUrl)
+        })
+    } else {
+      // Fallback for older browsers or insecure contexts
+      fallbackCopy(shareUrl)
+    }
+  }
+
+  const fallbackCopy = (text: string) => {
+    // Create a temporary textarea
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+
+    try {
+      const successful = document.execCommand('copy')
+      document.body.removeChild(textarea)
+
+      if (successful) {
+        alert('Share link copied to clipboard!')
+      } else {
+        // If copy failed, show the URL for manual copying
+        prompt('Copy this share link:', text)
+      }
+    } catch {
+      document.body.removeChild(textarea)
+      // If everything fails, show the URL in a prompt
+      prompt('Copy this share link:', text)
+    }
   }
 
   const formatDuration = (duration: string | null) => {
@@ -176,7 +353,7 @@ export const PlaylistDetailPage: React.FC = () => {
         </div>
 
         {/* Playlist Info */}
-        <div className="tui-window" style={{ marginBottom: '20px' }}>
+        <div className="tui-window" style={{ marginBottom: '20px', display: 'block', width: '100%' }}>
           <fieldset className="tui-fieldset">
             <legend style={{ color: '#7c3aed' }}>
               {playlist.is_public ? '🔓 PUBLIC PLAYLIST' : '🔒 PRIVATE PLAYLIST'}
@@ -295,7 +472,7 @@ export const PlaylistDetailPage: React.FC = () => {
 
         {/* Tracks */}
         {!playlist.tracks || playlist.tracks.length === 0 ? (
-          <div className="tui-window">
+          <div className="tui-window" style={{ display: 'block', width: '100%' }}>
             <fieldset className="tui-fieldset">
               <legend>EMPTY PLAYLIST</legend>
               <div style={{ padding: '40px 20px', textAlign: 'center' }}>
@@ -313,47 +490,44 @@ export const PlaylistDetailPage: React.FC = () => {
             </fieldset>
           </div>
         ) : (
-          <div className="tui-window">
+          <div className="tui-window" style={{ display: 'block', width: '100%' }}>
             <fieldset className="tui-fieldset">
-              <legend>TRACKS ({playlist.tracks.length})</legend>
+              <legend>TRACKS ({playlist.tracks.length}) - Drag to reorder</legend>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #7c3aed' }}>
-                      <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>#</th>
-                      <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Track</th>
-                      <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Artist</th>
-                      <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Album</th>
-                      <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Duration</th>
-                      <th style={{ padding: '10px', textAlign: 'center', color: '#00d9ff' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {playlist.tracks.map((track, index) => (
-                      <tr key={track.id} style={{ borderBottom: '1px solid #333' }}>
-                        <td style={{ padding: '10px', color: '#666' }}>{index + 1}</td>
-                        <td style={{ padding: '10px', color: '#ccc' }}>{track.title}</td>
-                        <td style={{ padding: '10px', color: '#aaa' }}>{track.artist.name}</td>
-                        <td style={{ padding: '10px', color: '#aaa' }}>{track.album?.name || '—'}</td>
-                        <td style={{ padding: '10px', color: '#aaa' }}>{formatDuration(track.duration)}</td>
-                        <td style={{ padding: '10px', textAlign: 'center' }}>
-                          <button
-                            onClick={() => { handleRemoveTrack(track.id, track.title) }}
-                            className="tui-button"
-                            style={{
-                              background: '#444',
-                              color: '#ff6b6b',
-                              fontSize: '0.8em',
-                              padding: '4px 8px'
-                            }}
-                          >
-                          Remove
-                          </button>
-                        </td>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #7c3aed' }}>
+                        <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>#</th>
+                        <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Track</th>
+                        <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Artist</th>
+                        <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Album</th>
+                        <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Duration</th>
+                        <th style={{ padding: '10px', textAlign: 'center', color: '#00d9ff' }}>Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <SortableContext
+                      items={playlist.tracks.map((track) => track.track_id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <tbody>
+                        {playlist.tracks.map((track, index) => (
+                          <SortableTrackRow
+                            key={track.track_id}
+                            track={track}
+                            index={index}
+                            onRemove={handleRemoveTrack}
+                            formatDuration={formatDuration}
+                          />
+                        ))}
+                      </tbody>
+                    </SortableContext>
+                  </table>
+                </DndContext>
               </div>
             </fieldset>
           </div>

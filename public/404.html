@@ -8,8 +8,8 @@
   <style>
     @font-face {
       font-family: "Terminus";
-      src: url("/assets/fonts/terminus.woff2") format("woff2"),
-           url("/assets/fonts/terminus.woff") format("woff");
+      src: url("/terminus.woff2") format("woff2"),
+           url("/terminus.woff") format("woff");
       font-weight: normal;
       font-style: normal;
     }
@@ -21,7 +21,7 @@
     }
 
     html {
-      font-family: "Terminus", "Lucida Console", Monaco, monospace;
+      font-family: "Terminus", "Courier New", Courier, monospace;
       font-size: 18px;
     }
 
@@ -56,6 +56,9 @@
       line-height: 1.2;
       overflow-x: auto;
       margin: 20px 0;
+      font-weight: normal;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .error-code {
@@ -109,15 +112,13 @@
       hackr.tv:~$ cat /var/log/errors/404.log
     </div>
 
-    <pre>
- _  _    ___  _  _
+    <pre> _  _    ___  _  _
 | || |  / _ \| || |
 | || |_| | | | || |_
 |__   _| | | |__   _|
    | | | |_| |  | |
    |_|  \___/   |_|
-
-    </pre>
+</pre>
 
     <div class="error-code">
 [ERROR] HTTP 404 - Resource Not Found
@@ -134,7 +135,15 @@ Possible causes:
 <br>
 &nbsp;&nbsp;• Link may be outdated
 <br><br>
-<a href="/">← Return to hackr.tv home</a>
+Quick navigation:
+<br>
+&nbsp;&nbsp;• <a href="/">Return to hackr.tv origin</a>
+<br>
+&nbsp;&nbsp;• <a href="/fm/pulse_vault">Plumb the Pulse Vault</a>
+<br>
+&nbsp;&nbsp;• <a href="/fm/radio">Listen to Hackr Radio Chronocasts</a>
+<br>
+&nbsp;&nbsp;• <a href="/grid">Enter THE PULSE GRID</a>
     </div>
 
     <div style="margin-top: 20px; color: #00ff00;">

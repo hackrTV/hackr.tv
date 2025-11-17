@@ -9,4 +9,12 @@ fi
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
+# Auto-detect local IP address for Vite HMR
+# Try to get the first non-loopback IP address
+LOCAL_IP=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v '127.0.0.1' | head -n 1)
+if [ -n "$LOCAL_IP" ]; then
+  export VITE_HMR_HOST="$LOCAL_IP"
+  echo "Setting VITE_HMR_HOST to $LOCAL_IP"
+fi
+
 exec foreman start -f Procfile.dev "$@"

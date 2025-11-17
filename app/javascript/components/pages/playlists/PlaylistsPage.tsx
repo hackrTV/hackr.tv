@@ -117,12 +117,11 @@ export const PlaylistsPage: React.FC = () => {
                       <div>Created {formatDate(playlist.created_at)}</div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
                       <Link
-                        to={`/fm/playlists/${playlist.id}`}
+                        to={`/fm/playlists/${playlist.id}?autoplay=true`}
                         className="tui-button"
                         style={{
-                          flex: 1,
                           textAlign: 'center',
                           textDecoration: 'none',
                           background: '#7c3aed',
@@ -130,20 +129,37 @@ export const PlaylistsPage: React.FC = () => {
                           fontSize: '0.85em'
                         }}
                       >
-                      View
+                        ▶ Play
                       </Link>
-                      <button
-                        onClick={() => { handleDelete(playlist.id, playlist.name) }}
-                        disabled={deletingId === playlist.id}
-                        className="tui-button"
-                        style={{
-                          background: '#444',
-                          color: '#ff6b6b',
-                          fontSize: '0.85em'
-                        }}
-                      >
-                        {deletingId === playlist.id ? 'Deleting...' : 'Delete'}
-                      </button>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <Link
+                          to={`/fm/playlists/${playlist.id}`}
+                          className="tui-button"
+                          style={{
+                            flex: 1,
+                            textAlign: 'center',
+                            textDecoration: 'none',
+                            background: '#444',
+                            color: '#fff',
+                            fontSize: '0.85em'
+                          }}
+                        >
+                          View
+                        </Link>
+                        <button
+                          onClick={() => { handleDelete(playlist.id, playlist.name) }}
+                          disabled={deletingId === playlist.id}
+                          className="tui-button"
+                          style={{
+                            flex: 1,
+                            background: '#444',
+                            color: '#ff6b6b',
+                            fontSize: '0.85em'
+                          }}
+                        >
+                          {deletingId === playlist.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </fieldset>

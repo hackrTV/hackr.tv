@@ -1,5 +1,5 @@
 import React, { useEffect, lazy, Suspense } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { HomePage } from '~/components/pages/HomePage'
 import { LoadingPage } from '~/components/shared/LoadingSpinner'
 
@@ -9,6 +9,7 @@ const RadioPage = lazy(() => import('~/components/pages/fm/RadioPage').then(m =>
 const BandsPage = lazy(() => import('~/components/pages/fm/BandsPage').then(m => ({ default: m.BandsPage })))
 const PlaylistsPage = lazy(() => import('~/components/pages/playlists/PlaylistsPage').then(m => ({ default: m.PlaylistsPage })))
 const PlaylistDetailPage = lazy(() => import('~/components/pages/playlists/PlaylistDetailPage').then(m => ({ default: m.PlaylistDetailPage })))
+const SharedPlaylistPage = lazy(() => import('~/components/pages/playlists/SharedPlaylistPage').then(m => ({ default: m.SharedPlaylistPage })))
 const TheCyberPulsePage = lazy(() => import('~/components/pages/artist/TheCyberPulsePage'))
 const XeraenPage = lazy(() => import('~/components/pages/artist/XeraenPage'))
 const XeraenLinkzPage = lazy(() => import('~/components/pages/artist/XeraenLinkzPage'))
@@ -39,12 +40,16 @@ export const AppLayout: React.FC = () => {
     <Suspense fallback={<LoadingPage message="Loading page..." />}>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        {/* Redirect /fm to /fm/radio */}
+        <Route path="/fm" element={<Navigate to="/fm/radio" replace />} />
         <Route path="/fm/pulse_vault" element={<PulseVaultPage />} />
         <Route path="/fm/radio" element={<RadioPage />} />
         <Route path="/fm/bands" element={<BandsPage />} />
         {/* Playlist routes - protected */}
         <Route path="/fm/playlists" element={<ProtectedRoute><PlaylistsPage /></ProtectedRoute>} />
         <Route path="/fm/playlists/:id" element={<ProtectedRoute><PlaylistDetailPage /></ProtectedRoute>} />
+        {/* Shared playlist - public */}
+        <Route path="/shared/:token" element={<SharedPlaylistPage />} />
         <Route path="/thecyberpulse" element={<TheCyberPulsePage />} />
         <Route path="/thecyberpulse/trackz" element={<TrackListPage />} />
         <Route path="/thecyberpulse/trackz/:trackSlug" element={<TrackDetailPage />} />
