@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_17_175844) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_17_211619) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -187,7 +187,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_175844) do
   create_table "radio_station_playlists", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "playlist_id", null: false
-    t.integer "position", default: 0, null: false
+    t.integer "position", null: false
     t.integer "radio_station_id", null: false
     t.datetime "updated_at", null: false
     t.index ["playlist_id"], name: "index_radio_station_playlists_on_playlist_id"

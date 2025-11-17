@@ -68,7 +68,7 @@ module Admin
 
       playlist_ids.each_with_index do |playlist_id, index|
         rsp = @radio_station.radio_station_playlists.find_by(playlist_id: playlist_id)
-        rsp&.update(position: index)
+        rsp&.update(position: index + 1)  # Positions start at 1, not 0
       end
 
       head :ok

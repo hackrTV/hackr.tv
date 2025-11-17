@@ -14,7 +14,8 @@ module Api
           color: station.color,
           stream_url: station.stream_url,
           position: station.position,
-          playlists: station.playlists.map { |playlist|
+          playlists: station.radio_station_playlists.order(position: :asc).map { |rsp|
+            playlist = rsp.playlist
             {
               id: playlist.id,
               name: playlist.name,
