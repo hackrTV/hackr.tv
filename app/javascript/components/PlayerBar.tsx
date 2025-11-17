@@ -39,6 +39,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   return (
     <div
       id="audio-player"
+      tabIndex={-1}
       style={{
         position: 'fixed',
         bottom: 0,
@@ -76,6 +77,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             id="close-player-btn"
             className="tui-button"
             onClick={onClose}
+            tabIndex={-1}
             style={{ background: '#444', color: '#aaa' }}
           >
             ✕

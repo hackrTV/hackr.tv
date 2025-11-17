@@ -1,4 +1,9 @@
 class PagesController < ApplicationController
+  def spa_root
+    # SPA root - renders minimal shell for React
+    render layout: "application"
+  end
+
   def hackr_tv
     # hackr.tv home page
   end

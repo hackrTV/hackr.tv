@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { PlayerBar } from './PlayerBar.tsx'
 import type { TrackData, AudioPlayerAPI } from '~/types/track.ts'
 
-export const AudioPlayer: React.FC = () => {
+interface AudioPlayerProps {
+  onReady?: (api: AudioPlayerAPI) => void
+}
+
+export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [currentTrack, setCurrentTrack] = useState<TrackData | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -11,6 +15,7 @@ export const AudioPlayer: React.FC = () => {
   const [volume, setVolume] = useState(0.7)
   const [isVisible, setIsVisible] = useState(false)
   const [isSeeking, setIsSeeking] = useState(false)
+  const playlistRef = useRef<TrackData[]>([]) // Store playlist in memory
 
   // Handle play/pause
   const handlePlayPause = useCallback(() => {
@@ -41,6 +46,31 @@ export const AudioPlayer: React.FC = () => {
     setCurrentTrack(track)
     setIsVisible(true)
 
+    // Build playlist from DOM if we don't have one yet or if it's empty
+    // This captures all visible tracks when first playing
+    if (playlistRef.current.length === 0) {
+      const trackElements = document.querySelectorAll('.track-title-clickable')
+      const tracks: TrackData[] = []
+
+      trackElements.forEach((el) => {
+        const trackEl = el as HTMLElement
+        const row = trackEl.closest('.track-row') as HTMLElement
+
+        // Only include visible tracks
+        if (row && row.style.display !== 'none') {
+          tracks.push({
+            id: trackEl.dataset.trackId || '',
+            url: trackEl.dataset.trackUrl || '',
+            title: trackEl.dataset.trackTitle || '',
+            artist: trackEl.dataset.trackArtist || '',
+            coverUrl: trackEl.dataset.coverUrl || ''
+          })
+        }
+      })
+
+      playlistRef.current = tracks
+    }
+
     // Set the new source
     audio.src = track.url
     audio.load() // Explicitly load the new source
@@ -63,22 +93,32 @@ export const AudioPlayer: React.FC = () => {
     audio.addEventListener('canplay', onCanPlay)
   }, [])
 
-  // Expose API to vanilla JS
-  useEffect(() => {
-    const api: AudioPlayerAPI = {
-      loadTrack,
-      togglePlayPause: handlePlayPause,
-      getCurrentTrackId: () => currentTrack?.id || null
-    }
-    window.audioPlayer = api
+  // Refresh playlist from current DOM (called when navigating to pulse vault)
+  const refreshPlaylist = useCallback(() => {
+    const trackElements = document.querySelectorAll('.track-title-clickable')
+    const tracks: TrackData[] = []
 
-    return () => {
-      delete window.audioPlayer
-    }
-  }, [loadTrack, handlePlayPause, currentTrack])
+    trackElements.forEach((el) => {
+      const trackEl = el as HTMLElement
+      const row = trackEl.closest('.track-row') as HTMLElement
 
-  // Update track table UI when current track or playing state changes
-  useEffect(() => {
+      // Only include visible tracks
+      if (row && row.style.display !== 'none') {
+        tracks.push({
+          id: trackEl.dataset.trackId || '',
+          url: trackEl.dataset.trackUrl || '',
+          title: trackEl.dataset.trackTitle || '',
+          artist: trackEl.dataset.trackArtist || '',
+          coverUrl: trackEl.dataset.coverUrl || ''
+        })
+      }
+    })
+
+    playlistRef.current = tracks
+  }, [])
+
+  // Refresh UI highlighting (called when navigating back to pulse vault)
+  const refreshUI = useCallback(() => {
     // Clear all previous highlighting and reset all buttons
     document.querySelectorAll('.track-row').forEach((row) => {
       const rowEl = row as HTMLElement
@@ -120,6 +160,40 @@ export const AudioPlayer: React.FC = () => {
         }
       }
     }
+  }, [currentTrack, isPlaying])
+
+  // Set playlist from React component
+  const setPlaylist = useCallback((tracks: TrackData[]) => {
+    playlistRef.current = tracks
+  }, [])
+
+  // Expose API to vanilla JS and React context
+  useEffect(() => {
+    const api: AudioPlayerAPI = {
+      loadTrack,
+      togglePlayPause: handlePlayPause,
+      getCurrentTrackId: () => currentTrack?.id || null,
+      isPlaying: () => isPlaying,
+      setPlaylist,
+      refreshPlaylist,
+      refreshUI
+    }
+    window.audioPlayer = api
+
+    // Notify parent component that API is ready
+    if (onReady) {
+      onReady(api)
+    }
+
+    return () => {
+      delete window.audioPlayer
+    }
+  }, [loadTrack, handlePlayPause, currentTrack, isPlaying, setPlaylist, onReady, refreshPlaylist, refreshUI])
+
+  // Update track table UI when current track or playing state changes
+  useEffect(() => {
+    refreshUI()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTrack, isPlaying])
 
   // Handle seek start (when user starts dragging)
@@ -194,40 +268,23 @@ export const AudioPlayer: React.FC = () => {
     const handleEnded = () => {
       setIsPlaying(false)
 
-      // Auto-play next track
-      // Find all playable tracks from the DOM, but only visible ones (not filtered out)
-      const allPlayableTracks = Array.from(document.querySelectorAll('.track-title-clickable'))
+      // Auto-play next track from stored playlist
+      const playlist = playlistRef.current
 
-      // Filter to only visible tracks (parent row is not hidden)
-      const visibleTracks = allPlayableTracks.filter((el) => {
-        const row = (el as HTMLElement).closest('.track-row') as HTMLElement
-        return row && row.style.display !== 'none'
-      })
+      if (playlist.length === 0) return
 
-      if (visibleTracks.length === 0) return
-
-      // Find current track index in visible tracks
+      // Find current track index in playlist
       let currentIndex = -1
-      for (let i = 0; i < visibleTracks.length; i++) {
-        const el = visibleTracks[i] as HTMLElement
-        if (el.dataset.trackId === currentTrack?.id) {
+      for (let i = 0; i < playlist.length; i++) {
+        if (playlist[i].id === currentTrack?.id) {
           currentIndex = i
           break
         }
       }
 
       // Get next track (wrap around to start if at end)
-      const nextIndex = (currentIndex + 1) % visibleTracks.length
-      const nextTrackEl = visibleTracks[nextIndex] as HTMLElement
-
-      // Extract track data and load it
-      const nextTrack: TrackData = {
-        id: nextTrackEl.dataset.trackId || '',
-        url: nextTrackEl.dataset.trackUrl || '',
-        title: nextTrackEl.dataset.trackTitle || '',
-        artist: nextTrackEl.dataset.trackArtist || '',
-        coverUrl: nextTrackEl.dataset.coverUrl || ''
-      }
+      const nextIndex = (currentIndex + 1) % playlist.length
+      const nextTrack = playlist[nextIndex]
 
       loadTrack(nextTrack)
     }
@@ -248,7 +305,7 @@ export const AudioPlayer: React.FC = () => {
 
   return (
     <>
-      {isVisible && (
+      {(isVisible || currentTrack) && (
         <PlayerBar
           isPlaying={isPlaying}
           currentTrack={currentTrack}

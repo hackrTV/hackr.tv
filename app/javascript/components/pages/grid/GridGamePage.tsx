@@ -1,0 +1,235 @@
+import React, { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { GridLayout } from '~/components/layouts/GridLayout'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useActionCable, GridEvent } from '~/hooks/useActionCable'
+import { GameOutput } from '~/components/grid/GameOutput'
+import { CommandInput } from '~/components/grid/CommandInput'
+
+const WELCOME_MESSAGE = `<div style="color: #a78bfa; font-size: 0.9em;">
+════════════════════════════════════════════════════════════════
+  WELCOME TO THE PULSE GRID
+════════════════════════════════════════════════════════════════
+Connection established. Type 'help' for commands.
+════════════════════════════════════════════════════════════════
+   !! <span style="color:#f87171;">WARNING</span> !!
+     ~~ THE PULSE GRID IS IN PRE-ALPHA.
+     ~~ FREQUENT DATABASE FLUSHES _WILL_ OCCUR!
+     ~~ JUST RE-CREATE YOUR ACCOUNT IF YOU CANNOT LOGIN LATER
+   !! <span style="color:#f87171;">WARNING</span> !!
+════════════════════════════════════════════════════════════════
+</div>`
+
+const oppositeDirection = (dir: string): string => {
+  const opposites: Record<string, string> = {
+    north: 'south',
+    south: 'north',
+    east: 'west',
+    west: 'east',
+    up: 'down',
+    down: 'up'
+  }
+  return opposites[dir] || dir
+}
+
+export const GridGamePage: React.FC = () => {
+  const { hackr, loading: authLoading, disconnect } = useGridAuth()
+  const [output, setOutput] = useState<string[]>([])
+  const [currentRoomId, setCurrentRoomId] = useState<number | null>(null)
+  const [executing, setExecuting] = useState(false)
+  const navigate = useNavigate()
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !hackr) {
+      navigate('/grid/login')
+    }
+  }, [hackr, authLoading, navigate])
+
+  // Set initial room ID and load initial output
+  useEffect(() => {
+    if (hackr?.current_room) {
+      setCurrentRoomId(hackr.current_room.id)
+
+      // Add welcome message and initial look command
+      const loadInitialOutput = async () => {
+        setOutput([WELCOME_MESSAGE])
+
+        // Execute initial look command
+        try {
+          const response = await fetch('/api/grid/command', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ input: 'look' })
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            if (data.output && data.output.trim()) {
+              setOutput(prev => [...prev, data.output])
+            }
+            if (data.room_id) {
+              setCurrentRoomId(data.room_id)
+            }
+          }
+        } catch (err) {
+          console.error('Failed to load initial room:', err)
+        }
+      }
+
+      loadInitialOutput()
+    }
+  }, [hackr])
+
+  // Handle real-time events from Action Cable
+  const handleEvent = useCallback((event: GridEvent) => {
+    const timestamp = new Date().toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+
+    let message = ''
+
+    switch (event.type) {
+    case 'say':
+      message = `\n<span style="color: #a78bfa;">[${event.hackr_alias}]</span>: ${event.message}`
+      break
+
+    case 'movement':
+      if (event.to_room_id === currentRoomId) {
+        message = `\n<span style="color: #22d3ee;">[${timestamp}] ${event.hackr_alias} enters from the ${oppositeDirection(event.direction || '')}.</span>`
+      } else if (event.from_room_id === currentRoomId) {
+        message = `\n<span style="color: #22d3ee;">[${timestamp}] ${event.hackr_alias} leaves to the ${event.direction}.</span>`
+      }
+      break
+
+    case 'take':
+      message = `\n<span style="color: #fbbf24;">[${timestamp}] ${event.hackr_alias} takes the ${event.item_name}.</span>`
+      break
+
+    case 'drop':
+      message = `\n<span style="color: #fbbf24;">[${timestamp}] ${event.hackr_alias} drops the ${event.item_name}.</span>`
+      break
+    }
+
+    if (message) {
+      setOutput(prev => [...prev, message])
+    }
+  }, [currentRoomId])
+
+  // Set up Action Cable subscription
+  useActionCable({
+    roomId: currentRoomId,
+    onEvent: handleEvent,
+    enabled: !!hackr && !!currentRoomId
+  })
+
+  // Handle command execution
+  const handleCommand = async (command: string) => {
+    // Handle clear command locally
+    if (command.toLowerCase() === 'clear' || command.toLowerCase() === 'cls') {
+      setOutput([])
+      return
+    }
+
+    // Echo the command in cyan
+    setOutput(prev => [...prev, `<span style="color: #22d3ee;">&gt; ${command}</span>`])
+
+    setExecuting(true)
+
+    try {
+      const response = await fetch('/api/grid/command', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ input: command })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+
+        // Append command output
+        if (data.output && data.output.trim()) {
+          setOutput(prev => [...prev, data.output])
+        }
+
+        // Update room if it changed (and resubscribe will happen automatically)
+        if (data.room_id && data.room_id !== currentRoomId) {
+          console.log(`Room changed from ${currentRoomId} to ${data.room_id}`)
+          setCurrentRoomId(data.room_id)
+        }
+      } else {
+        setOutput(prev => [...prev, '<span style="color: #f87171;">Error: Command execution failed. Please try again.</span>'])
+      }
+    } catch (err) {
+      console.error('Command execution failed:', err)
+      setOutput(prev => [...prev, '<span style="color: #f87171;">Error: Network error. Please try again.</span>'])
+    } finally {
+      setExecuting(false)
+    }
+  }
+
+  // Handle disconnect
+  const handleDisconnect = async () => {
+    if (confirm('Disconnect from THE PULSE GRID?')) {
+      await disconnect()
+      navigate('/grid/login')
+    }
+  }
+
+  if (authLoading) {
+    return (
+      <GridLayout>
+        <div style={{ textAlign: 'center', color: '#a78bfa', marginTop: '50px' }}>
+          Loading THE PULSE GRID...
+        </div>
+      </GridLayout>
+    )
+  }
+
+  if (!hackr) {
+    return null // Will redirect to login
+  }
+
+  return (
+    <GridLayout>
+      <div style={{ maxWidth: '1000px', margin: '10px auto', background: '#1a1a1a', color: '#d0d0d0', padding: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #4b5563' }}>
+          <div style={{ fontSize: '0.9em' }}>
+            <span style={{ color: '#a78bfa', fontWeight: 'bold' }}>THE PULSE GRID</span>
+            <span style={{ color: '#666', margin: '0 8px' }}>|</span>
+            <span style={{ color: '#e0e0e0' }}>{hackr.hackr_alias}</span>
+            {hackr.role === 'admin' && (
+              <a href="/root" style={{ color: '#f87171', fontSize: '0.85em', marginLeft: '5px', textDecoration: 'none' }}>[ADMIN]</a>
+            )}
+          </div>
+          <div>
+            <button
+              onClick={handleDisconnect}
+              style={{
+                background: '#dc2626',
+                color: 'white',
+                border: 'none',
+                padding: '4px 12px',
+                fontSize: '0.85em',
+                cursor: 'pointer',
+                borderRadius: '3px'
+              }}
+            >
+              DISCONNECT
+            </button>
+          </div>
+        </div>
+
+        <GameOutput output={output} />
+        <CommandInput onSubmit={handleCommand} disabled={executing} />
+      </div>
+    </GridLayout>
+  )
+}

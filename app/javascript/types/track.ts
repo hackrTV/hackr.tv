@@ -10,6 +10,10 @@ export interface AudioPlayerAPI {
   loadTrack: (track: TrackData) => void;
   togglePlayPause: () => void;
   getCurrentTrackId: () => string | null;
+  isPlaying: () => boolean;
+  setPlaylist: (tracks: TrackData[]) => void;
+  refreshPlaylist: () => void;
+  refreshUI: () => void;
 }
 
 declare global {

@@ -1,17 +1,29 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { AudioPlayer } from '~/components/AudioPlayer.tsx'
+import { BrowserRouter } from 'react-router-dom'
+import { AudioProvider } from '~/contexts/AudioContext'
+import { AppLayout } from '~/components/layouts/AppLayout'
+import { ErrorBoundary } from '~/components/errors/ErrorBoundary'
 
-// Mount React AudioPlayer component when DOM is ready
+// Mount React SPA when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  const rootElement = document.getElementById('react-audio-player-root')
-
-  if (rootElement) {
-    const root = createRoot(rootElement)
-    root.render(
-      <React.StrictMode>
-        <AudioPlayer />
-      </React.StrictMode>
-    )
+  // Find or create root element
+  let appRoot = document.getElementById('root')
+  if (!appRoot) {
+    appRoot = document.createElement('div')
+    appRoot.id = 'root'
+    document.body.appendChild(appRoot)
   }
+
+  createRoot(appRoot).render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <AudioProvider>
+            <AppLayout />
+          </AudioProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
+    </React.StrictMode>
+  )
 })

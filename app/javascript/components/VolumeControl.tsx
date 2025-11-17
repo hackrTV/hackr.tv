@@ -22,6 +22,7 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({ volume, onVolumeCh
         max="100"
         value={volume * 100}
         onChange={handleChange}
+        tabIndex={-1}
         style={{
           width: '100px',
           height: '6px',
