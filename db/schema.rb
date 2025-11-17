@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_17_043727) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_17_175844) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -184,6 +184,32 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_043727) do
     t.index ["share_token"], name: "index_playlists_on_share_token", unique: true
   end
 
+  create_table "radio_station_playlists", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "playlist_id", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "radio_station_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["playlist_id"], name: "index_radio_station_playlists_on_playlist_id"
+    t.index ["radio_station_id", "playlist_id"], name: "index_radio_station_playlists_unique", unique: true
+    t.index ["radio_station_id", "position"], name: "index_radio_station_playlists_position"
+    t.index ["radio_station_id"], name: "index_radio_station_playlists_on_radio_station_id"
+  end
+
+  create_table "radio_stations", force: :cascade do |t|
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "genre"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.string "stream_url"
+    t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_radio_stations_on_position"
+    t.index ["slug"], name: "index_radio_stations_on_slug", unique: true
+  end
+
   create_table "redirects", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "destination_url"
@@ -222,6 +248,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_043727) do
   add_foreign_key "playlist_tracks", "playlists"
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "grid_hackrs"
+  add_foreign_key "radio_station_playlists", "playlists"
+  add_foreign_key "radio_station_playlists", "radio_stations"
   add_foreign_key "tracks", "albums"
   add_foreign_key "tracks", "artists"
 end

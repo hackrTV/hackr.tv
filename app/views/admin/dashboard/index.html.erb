@@ -1,5 +1,3 @@
-<%= render "admin/shared/nav" %>
-
 <div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
   <fieldset class="cyan-168-border">
     <legend class="center">/root :: ADMIN DASHBOARD</legend>
@@ -35,6 +33,15 @@
           </fieldset>
         </div>
 
+        <div class="tui-window purple-168 white-text">
+          <fieldset class="purple-168-border">
+            <legend>Radio Stations</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:radio_stations_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+
         <div class="tui-window green-168 white-text">
           <fieldset class="green-168-border">
             <legend>Online Hackrs</legend>
@@ -51,6 +58,7 @@
         <%= link_to "➕ New Artist", new_admin_artist_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "🎵 New Track", new_admin_track_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "📝 New Log", new_admin_hackr_log_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "📻 Radio Stations", admin_radio_stations_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "🎮 GRID Admin", admin_grid_path, class: "tui-button green-168", style: "padding: 10px 20px;" %>
       </div>
 

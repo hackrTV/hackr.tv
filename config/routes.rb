@@ -63,6 +63,7 @@ Rails.application.routes.draw do
     resources :tracks, only: [:index, :show]
     resources :albums, only: [:index, :show]
     get "radio_stations", to: "radio#index"
+    get "radio_stations/:id/playlists", to: "radio#station_playlists"
 
     # Grid API routes
     get "grid/current_hackr", to: "grid#current_hackr_info"
@@ -92,6 +93,13 @@ Rails.application.routes.draw do
       end
     end
     resources :hackr_logs
+    resources :radio_stations do
+      member do
+        post :add_playlist
+        delete :remove_playlist
+        post :reorder_playlists
+      end
+    end
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
   end

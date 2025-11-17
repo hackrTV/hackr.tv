@@ -1,16 +1,18 @@
 import React from 'react'
-import type { TrackData } from '~/types/track'
+import type { TrackData, StationContext } from '~/types/track'
 
 interface QueuePanelProps {
   playlist: TrackData[]
   currentTrackId: string | null
   onTrackClick: (track: TrackData) => void
+  stationContext?: StationContext | null
 }
 
 export const QueuePanel: React.FC<QueuePanelProps> = ({
   playlist,
   currentTrackId,
-  onTrackClick
+  onTrackClick,
+  stationContext
 }) => {
   if (playlist.length === 0) {
     return (
@@ -46,21 +48,22 @@ export const QueuePanel: React.FC<QueuePanelProps> = ({
       {queueTracks.map(({ track, position }, index) => (
         <div
           key={`${track.id}-${index}`}
-          onClick={() => onTrackClick(track)}
+          onClick={() => !stationContext && onTrackClick(track)}
           style={{
             padding: '10px 15px',
             borderBottom: '1px solid #333',
-            cursor: 'pointer',
+            cursor: stationContext ? 'default' : 'pointer',
             background: position === 'current' ? 'rgba(124, 58, 237, 0.15)' : 'transparent',
-            transition: 'background 0.2s'
+            transition: 'background 0.2s',
+            opacity: stationContext && position === 'next' ? 0.6 : 1
           }}
           onMouseEnter={(e) => {
-            if (position !== 'current') {
+            if (position !== 'current' && !stationContext) {
               e.currentTarget.style.background = 'rgba(124, 58, 237, 0.08)'
             }
           }}
           onMouseLeave={(e) => {
-            if (position !== 'current') {
+            if (position !== 'current' && !stationContext) {
               e.currentTarget.style.background = 'transparent'
             }
           }}
@@ -113,7 +116,7 @@ export const QueuePanel: React.FC<QueuePanelProps> = ({
                 NOW PLAYING
               </div>
             )}
-            {position === 'next' && index <= 3 && (
+            {!stationContext && position === 'next' && index <= 3 && (
               <div style={{ color: '#666', fontSize: '0.75em' }}>
                 UP NEXT
               </div>
@@ -122,7 +125,7 @@ export const QueuePanel: React.FC<QueuePanelProps> = ({
         </div>
       ))}
 
-      {playlist.length > 4 && (
+      {!stationContext && playlist.length > 4 && (
         <div style={{ padding: '10px 15px', color: '#666', fontSize: '0.85em', textAlign: 'center', borderBottom: '1px solid #333' }}>
           + {playlist.length - Math.min(4, queueTracks.length)} more tracks in queue
         </div>

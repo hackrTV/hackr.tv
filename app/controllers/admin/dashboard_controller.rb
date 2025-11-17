@@ -4,6 +4,7 @@ class Admin::DashboardController < Admin::ApplicationController
       artists_count: Artist.count,
       tracks_count: Track.count,
       hackr_logs_count: HackrLog.count,
+      radio_stations_count: RadioStation.count,
       online_hackrs_count: GridHackr.online.count
     }
 

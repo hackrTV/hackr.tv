@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title><%= content_for(:title) || "/root :: Admin" %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
+    <script>
+      // Rails UJS confirmation handler
+      document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('submit', function(event) {
+          const form = event.target;
+          const confirmMessage = form.querySelector('[data-confirm]')?.getAttribute('data-confirm') ||
+                                 form.getAttribute('data-confirm');
+
+          if (confirmMessage && !confirm(confirmMessage)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        }, true);
+      });
+    </script>
+  </head>
+
+  <body class="black-168" style="background: #0a0a0a;">
+    <%= render "admin/shared/nav" %>
+    <%= yield %>
+  </body>
+</html>

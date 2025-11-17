@@ -1,0 +1,16 @@
+<div class="tui-window cyan-168 white-text" style="max-width: 900px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">EDIT RADIO STATION</legend>
+
+    <div style="padding: 20px;">
+      <%= form_with model: @radio_station, url: admin_radio_station_path(@radio_station), local: true do |f| %>
+        <%= render 'form', f: f %>
+
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+          <%= f.submit "Update Radio Station", class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+          <%= link_to "Cancel", admin_radio_station_path(@radio_station), class: "tui-button", style: "background: #444; color: #aaa; padding: 10px 20px;" %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

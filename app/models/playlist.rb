@@ -2,6 +2,8 @@ class Playlist < ApplicationRecord
   belongs_to :grid_hackr
   has_many :playlist_tracks, -> { order(position: :asc) }, dependent: :destroy
   has_many :tracks, through: :playlist_tracks
+  has_many :radio_station_playlists, dependent: :destroy
+  has_many :radio_stations, through: :radio_station_playlists
 
   validates :name, presence: true
   validates :share_token, presence: true, uniqueness: true

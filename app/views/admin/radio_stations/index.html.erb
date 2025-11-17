@@ -1,0 +1,58 @@
+<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">RADIO STATIONS</legend>
+
+    <div style="padding: 20px;">
+      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <%= link_to "➕ New Radio Station", new_admin_radio_station_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "← Back to Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 10px 20px;" %>
+      </div>
+
+      <% if @radio_stations.empty? %>
+        <div class="tui-window yellow-168 white-text" style="margin: 20px 0;">
+          <fieldset class="yellow-168-border">
+            <legend>No Stations</legend>
+            <div style="padding: 20px; text-align: center;">
+              No radio stations found. <%= link_to "Create one now", new_admin_radio_station_path, class: "purple-168-text" %>.
+            </div>
+          </fieldset>
+        </div>
+      <% else %>
+        <div class="tui-window white-text" style="background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr style="border-bottom: 2px solid #00ffff;">
+                <th style="padding: 10px; text-align: left;">Position</th>
+                <th style="padding: 10px; text-align: left;">Name</th>
+                <th style="padding: 10px; text-align: left;">Slug</th>
+                <th style="padding: 10px; text-align: left;">Genre</th>
+                <th style="padding: 10px; text-align: center;">Playlists</th>
+                <th style="padding: 10px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @radio_stations.each do |station| %>
+                <tr style="border-bottom: 1px solid #333;">
+                  <td style="padding: 10px;"><%= station.position %></td>
+                  <td style="padding: 10px;"><%= station.name %></td>
+                  <td style="padding: 10px;"><code class="cyan-168-text"><%= station.slug %></code></td>
+                  <td style="padding: 10px;"><%= station.genre %></td>
+                  <td style="padding: 10px; text-align: center;"><%= station.playlists.count %></td>
+                  <td style="padding: 10px; text-align: center;">
+                    <%= link_to "View", admin_radio_station_path(station), class: "tui-button", style: "background: #0066cc; color: #fff; padding: 5px 10px; margin: 0 5px;" %>
+                    <%= link_to "Edit", edit_admin_radio_station_path(station), class: "tui-button", style: "background: #ff9900; color: #000; padding: 5px 10px; margin: 0 5px;" %>
+                    <%= button_to "Delete", admin_radio_station_path(station),
+                                  method: :delete,
+                                  class: "tui-button",
+                                  style: "background: #cc0000; color: #fff; padding: 5px 10px;",
+                                  data: { confirm: "Are you sure? This will remove all playlist associations." } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
