@@ -9,6 +9,7 @@ namespace :import do
     Rake::Task["import:yaml_albums"].invoke
     Rake::Task["import:yaml_tracks"].invoke
     Rake::Task["import:redirects"].invoke
+    Rake::Task["import:radio_stations"].invoke
 
     puts "\n" + "=" * 80
     puts "IMPORT COMPLETE"
@@ -680,6 +681,52 @@ namespace :import do
     puts "  Audio files attached: #{audio_attached_count}"
     puts "  Audio files missing: #{audio_missing_count}"
     puts "  Total tracks: #{Track.count}"
+  end
+
+  desc "Import radio stations from YAML to database"
+  task radio_stations: :environment do
+    puts "\n--- Importing Radio Stations from YAML ---\n"
+
+    yaml_file = Rails.root.join("config", "radio_stations.yml")
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      return
+    end
+
+    data = YAML.load_file(yaml_file)
+    created_count = 0
+    updated_count = 0
+
+    data["stations"].each_with_index do |station_data, index|
+      station = RadioStation.find_or_initialize_by(slug: station_data["slug"])
+      was_new_record = station.new_record?
+
+      station.assign_attributes(
+        name: station_data["name"],
+        description: station_data["description"],
+        genre: station_data["genre"],
+        color: station_data["color"],
+        stream_url: station_data["stream_url"],
+        position: index
+      )
+
+      if was_new_record
+        station.save!
+        created_count += 1
+        puts "  ✓ Created radio station: #{station.name} (position: #{station.position})"
+      elsif station.changed?
+        station.save!
+        updated_count += 1
+        puts "  ↻ Updated radio station: #{station.name} (position: #{station.position})"
+      else
+        puts "  ✓ Radio station exists: #{station.name}"
+      end
+    end
+
+    puts "\nRadio station import summary:"
+    puts "  Created: #{created_count}"
+    puts "  Updated: #{updated_count}"
+    puts "  Total:   #{RadioStation.count}"
   end
 
   desc "Clear all imported data (DANGEROUS - use with caution)"
