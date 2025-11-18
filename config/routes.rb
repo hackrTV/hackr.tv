@@ -16,17 +16,18 @@ Rails.application.routes.draw do
   get "xeraen/trackz", to: "pages#spa_root", as: :xeraen_tracks
   get "xeraen/trackz/:id", to: "pages#spa_root", as: :xeraen_track
 
-  # System Rot routes - SPA
+  # Band profile routes - SPA
   get "system_rot", to: "pages#spa_root", as: :system_rot
-
-  # Wavelength Zero routes - SPA
   get "wavelength_zero", to: "pages#spa_root", as: :wavelength_zero
-
-  # Voiceprint routes - SPA
   get "voiceprint", to: "pages#spa_root", as: :voiceprint
-
-  # Temporal Blue Drift routes - SPA
   get "temporal_blue_drift", to: "pages#spa_root", as: :temporal_blue_drift
+  get "injection_vector", to: "pages#spa_root", as: :injection_vector
+  get "cipher_protocol", to: "pages#spa_root", as: :cipher_protocol
+  get "blitzbeam", to: "pages#spa_root", as: :blitzbeam
+  get "apex_overdrive", to: "pages#spa_root", as: :apex_overdrive
+  get "ethereality", to: "pages#spa_root", as: :ethereality
+  get "neon_hearts", to: "pages#spa_root", as: :neon_hearts
+  get "offline", to: "pages#spa_root", as: :offline
 
   # Sector X routes - SPA
   get "sector/x", to: "pages#spa_root", as: :sector_x

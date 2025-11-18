@@ -41,9 +41,36 @@ export const BandsPage: React.FC = () => {
       'system_rot': '/system_rot',
       'wavelength_zero': '/wavelength_zero',
       'voiceprint': '/voiceprint',
-      'temporal_blue_drift': '/temporal_blue_drift'
+      'temporal_blue_drift': '/temporal_blue_drift',
+      'injection_vector': '/injection_vector',
+      'cipher_protocol': '/cipher_protocol',
+      'blitzbeam': '/blitzbeam',
+      'apex_overdrive': '/apex_overdrive',
+      'ethereality': '/ethereality',
+      'neon_hearts': '/neon_hearts',
+      'offline': '/offline'
     }
     return profilePaths[slug] || ''
+  }
+
+  const getBandDescription = (slug: string): string => {
+    const futureYear = currentYear + 100
+    const descriptions: { [key: string]: string } = {
+      'thecyberpulse': `The original resistance band, forging metal manifestos from ${futureYear} with brutal precision.`,
+      'xeraen': 'Raw, unfiltered rage against GovCorp tyranny delivered at breakneck hackrcore speed.',
+      'injection_vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
+      'wavelength_zero': 'Where technical precision meets raw emotion in perfect destructive atmospheric harmony.',
+      'cipher_protocol': 'Data couriers wielding djent as encryption. No vocals. Pure instrumental algorithmic assault.',
+      'system_rot': 'Decay is the message. Entropy is the method. Hardcore punk collapse is inevitable.',
+      'temporal_blue_drift': 'Math rock time travelers proving complexity is the most beautiful form of resistance.',
+      'offline': 'Unplugged, authentic, and gloriously disconnected from the grid. Analog hearts never die.',
+      'apex_overdrive': 'Euphoric hardstyle as a weapon. Unity as power. Victory coded into every beat.',
+      'voiceprint': 'Liquid DnB resistance. Your voice is your weapon, your identity eternally unbreakable.',
+      'neon_hearts': 'Kawaii camouflage hiding radical resistance. J-Pop cuteness is the ultimate Trojan horse.',
+      'ethereality': 'Consciousness expansion through classic vocal trance. Inner freedom transcends all control.',
+      'blitzbeam': 'Maximum velocity hypertrance. SPEED IS LIFE! Physics are merely suggestions.'
+    }
+    return descriptions[slug] || 'Broadcasting resistance through sound.'
   }
 
   return (
@@ -81,14 +108,16 @@ export const BandsPage: React.FC = () => {
                           <legend style={{ color: '#10b981' }}>{artist.name.toUpperCase()}</legend>
 
                           <div style={{ padding: '15px' }}>
-                            <div style={{ marginBottom: '15px' }}>
-                              <p style={{ color: '#888', fontWeight: 'bold', marginBottom: '5px' }}>SLUG</p>
-                              <p style={{ fontFamily: 'monospace', color: '#aaa' }}>/{artist.slug}</p>
+                            <div style={{ marginBottom: '20px' }}>
+                              <p style={{ color: '#aaa', lineHeight: '1.6', fontStyle: 'italic' }}>
+                                {getBandDescription(artist.slug)}
+                              </p>
                             </div>
 
-                            <div style={{ marginBottom: '15px' }}>
-                              <p style={{ color: '#888', fontWeight: 'bold', marginBottom: '5px' }}>TRACK COUNT</p>
-                              <p style={{ color: '#aaa' }}>{artist.track_count} tracks available</p>
+                            <div style={{ marginBottom: '15px', padding: '10px', background: '#0a0a0a', border: '1px solid #333' }}>
+                              <p style={{ color: '#666', fontSize: '0.85em' }}>
+                                <span style={{ color: '#888', fontWeight: 'bold' }}>{artist.genre}</span> • {artist.track_count} tracks
+                              </p>
                             </div>
 
                             <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
