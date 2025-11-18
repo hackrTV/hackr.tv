@@ -699,35 +699,27 @@ namespace :import do
 
     data["stations"].each_with_index do |station_data, index|
       station = RadioStation.find_or_initialize_by(slug: station_data["slug"])
+      was_new_record = station.new_record?
 
-      if station.new_record?
-        station.assign_attributes(
-          name: station_data["name"],
-          description: station_data["description"],
-          genre: station_data["genre"],
-          color: station_data["color"],
-          stream_url: station_data["stream_url"],
-          position: index
-        )
+      station.assign_attributes(
+        name: station_data["name"],
+        description: station_data["description"],
+        genre: station_data["genre"],
+        color: station_data["color"],
+        stream_url: station_data["stream_url"],
+        position: index
+      )
+
+      if was_new_record
         station.save!
         created_count += 1
         puts "  ✓ Created radio station: #{station.name} (position: #{station.position})"
+      elsif station.changed?
+        station.save!
+        updated_count += 1
+        puts "  ↻ Updated radio station: #{station.name} (position: #{station.position})"
       else
-        station.assign_attributes(
-          name: station_data["name"],
-          description: station_data["description"],
-          genre: station_data["genre"],
-          color: station_data["color"],
-          stream_url: station_data["stream_url"],
-          position: index
-        )
-        if station.changed?
-          station.save!
-          updated_count += 1
-          puts "  ↻ Updated radio station: #{station.name} (position: #{station.position})"
-        else
-          puts "  ✓ Radio station exists: #{station.name}"
-        end
+        puts "  ✓ Radio station exists: #{station.name}"
       end
     end
 
