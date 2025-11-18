@@ -566,7 +566,7 @@
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
-  audio_file: "refracted-light.mp3"
+  audio_file: "refracted-light.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -675,7 +675,7 @@
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
-  audio_file: "phantom-sensation.mp3"
+  audio_file: "phantom-sensation.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -792,7 +792,7 @@
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
-  audio_file: "nostalgia-weapon.mp3"
+  audio_file: "nostalgia-weapon.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -918,7 +918,7 @@
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
-  audio_file: "monochrome-collapse.mp3"
+  audio_file: "monochrome-collapse.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1038,7 +1038,7 @@
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
-  audio_file: "prism-break.mp3"
+  audio_file: "prism-break.ogg"
   featured: true
   streaming_links:
     # spotify: ""

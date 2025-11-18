@@ -135,6 +135,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                 onSeekStart={onSeekStart}
                 onSeek={onSeek}
                 onSeekEnd={onSeekEnd}
+                disabled={!!stationContext}
               />
             </div>
 
