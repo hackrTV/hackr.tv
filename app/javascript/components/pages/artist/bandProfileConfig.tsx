@@ -507,7 +507,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                         'Entropy reconstruction'
                       ]
                       return (
-                        <tr key={track.id} style={{ borderLeft: `2px solid #00ff9f` }}>
+                        <tr key={track.id} style={{ borderLeft: '2px solid #00ff9f' }}>
                           <td style={{ color: '#00ff9f', paddingLeft: '10px' }}>{String(index + 1).padStart(2, '0')}</td>
                           <td style={{ color: '#ccc' }}><strong>{track.title}</strong></td>
                           <td style={{ color: '#00ff9f', fontSize: '0.85em' }}>{functions[index] || '—'}</td>
@@ -818,7 +818,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                         'Victory achieved'
                       ]
                       return (
-                        <tr key={track.id} style={{ borderLeft: `3px solid #1e90ff` }}>
+                        <tr key={track.id} style={{ borderLeft: '3px solid #1e90ff' }}>
                           <td style={{ color: '#ffd700', paddingLeft: '10px', fontWeight: 'bold' }}>{index + 1}</td>
                           <td style={{ color: '#fff' }}><strong>{track.title}</strong></td>
                           <td style={{ color: '#1e90ff', fontSize: '0.9em', fontStyle: 'italic' }}>{journeyStages[index] || '—'}</td>
@@ -975,7 +975,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                         'Infinite liberation'
                       ]
                       return (
-                        <tr key={track.id} style={{ borderLeft: `2px solid rgba(230, 230, 250, 0.5)` }}>
+                        <tr key={track.id} style={{ borderLeft: '2px solid rgba(230, 230, 250, 0.5)' }}>
                           <td style={{ color: '#b8c5f2', paddingLeft: '10px' }}>{index + 1}</td>
                           <td style={{ color: '#fff' }}><strong>{track.title}</strong></td>
                           <td style={{ color: '#e6e6fa', fontSize: '0.9em', fontStyle: 'italic' }}>{consciousnessStates[index] || '—'}</td>
@@ -1298,7 +1298,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                         'Total disappearance'
                       ]
                       return (
-                        <tr key={track.id} style={{ borderLeft: `3px solid #8b7355` }}>
+                        <tr key={track.id} style={{ borderLeft: '3px solid #8b7355' }}>
                           <td style={{ color: '#cd7f32', paddingLeft: '10px' }}>{index + 1}</td>
                           <td style={{ color: '#ddd' }}><strong>{track.title}</strong></td>
                           <td style={{ color: '#8b7355', fontSize: '0.9em', fontStyle: 'italic' }}>{stages[index] || '—'}</td>
