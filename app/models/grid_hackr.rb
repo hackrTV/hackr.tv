@@ -16,6 +16,7 @@ class GridHackr < ApplicationRecord
   scope :operatives, -> { where(role: "operative") }
   scope :online, -> { where.not(current_room_id: nil) }
   scope :in_room, ->(room) { where(current_room: room) }
+  scope :recently_active, ->(since: 15.minutes.ago) { where("last_activity_at > ?", since) }
 
   # Role checks
   def admin?
@@ -24,6 +25,11 @@ class GridHackr < ApplicationRecord
 
   def operative?
     role == "operative"
+  end
+
+  # Update last activity timestamp without triggering callbacks
+  def touch_activity!
+    update_column(:last_activity_at, Time.current)
   end
 
   private

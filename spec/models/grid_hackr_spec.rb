@@ -103,6 +103,30 @@ RSpec.describe GridHackr, type: :model do
         expect(GridHackr.in_room(room)).not_to include(offline_hackr)
       end
     end
+
+    describe ".recently_active" do
+      it "returns hackrs with activity within the specified time" do
+        active_hackr = create(:grid_hackr)
+        active_hackr.update_column(:last_activity_at, 5.minutes.ago)
+
+        inactive_hackr = create(:grid_hackr)
+        inactive_hackr.update_column(:last_activity_at, 20.minutes.ago)
+
+        expect(GridHackr.recently_active(since: 10.minutes.ago)).to include(active_hackr)
+        expect(GridHackr.recently_active(since: 10.minutes.ago)).not_to include(inactive_hackr)
+      end
+
+      it "defaults to 15 minutes ago" do
+        recent_hackr = create(:grid_hackr)
+        recent_hackr.update_column(:last_activity_at, 10.minutes.ago)
+
+        old_hackr = create(:grid_hackr)
+        old_hackr.update_column(:last_activity_at, 20.minutes.ago)
+
+        expect(GridHackr.recently_active).to include(recent_hackr)
+        expect(GridHackr.recently_active).not_to include(old_hackr)
+      end
+    end
   end
 
   describe "role checks" do
@@ -127,6 +151,23 @@ RSpec.describe GridHackr, type: :model do
       it "returns false for admin role" do
         expect(admin.operative?).to be false
       end
+    end
+  end
+
+  describe "#touch_activity!" do
+    it "updates last_activity_at timestamp" do
+      hackr = create(:grid_hackr)
+      hackr.update_column(:last_activity_at, 1.hour.ago)
+
+      expect {
+        hackr.touch_activity!
+      }.to change { hackr.reload.last_activity_at }
+    end
+
+    it "sets last_activity_at to current time" do
+      hackr = create(:grid_hackr)
+      hackr.touch_activity!
+      expect(hackr.reload.last_activity_at).to be_within(1.second).of(Time.current)
     end
   end
 end
