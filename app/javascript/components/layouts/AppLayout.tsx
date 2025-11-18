@@ -61,6 +61,13 @@ export const AppLayout: React.FC = () => {
         <Route path="/system_rot" element={<BandProfilePage />} />
         <Route path="/voiceprint" element={<BandProfilePage />} />
         <Route path="/temporal_blue_drift" element={<BandProfilePage />} />
+        <Route path="/injection_vector" element={<BandProfilePage />} />
+        <Route path="/cipher_protocol" element={<BandProfilePage />} />
+        <Route path="/blitzbeam" element={<BandProfilePage />} />
+        <Route path="/apex_overdrive" element={<BandProfilePage />} />
+        <Route path="/ethereality" element={<BandProfilePage />} />
+        <Route path="/neon_hearts" element={<BandProfilePage />} />
+        <Route path="/offline" element={<BandProfilePage />} />
         <Route path="/wavelength_zero" element={<WavelengthZeroPage />} />
         {/* THE PULSE GRID routes */}
         <Route path="/grid" element={<GridGamePage />} />

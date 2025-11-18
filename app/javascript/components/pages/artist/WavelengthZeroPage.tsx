@@ -64,58 +64,58 @@ const WavelengthZeroPage: React.FC = () => {
 
           <div>
             {/* Intro Section */}
-            <div style={{ marginBottom: '30px', padding: '25px', background: '#000000', borderLeft: '5px solid #ff0080' }}>
-              <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.1em' }}>
+            <div style={{ marginBottom: '30px', padding: '30px', background: 'linear-gradient(135deg, rgba(255, 0, 128, 0.08), rgba(139, 0, 255, 0.05))', borderLeft: '5px solid #ff0080', border: '2px solid rgba(255, 0, 128, 0.3)', boxShadow: '0 0 30px rgba(255, 0, 128, 0.2), inset 0 0 20px rgba(139, 0, 255, 0.1)' }}>
+              <p style={{ color: '#ff0080', lineHeight: '1.9', marginBottom: '20px', fontSize: '1.3em', fontWeight: 'bold', textShadow: '0 0 15px rgba(255, 0, 128, 0.8)' }}>
                 When was the last time you felt something real?
               </p>
-              <p style={{ color: '#aaa', lineHeight: '1.7', marginBottom: '15px' }}>
+              <p style={{ color: '#bbb', lineHeight: '1.8', marginBottom: '18px', fontSize: '1.05em' }}>
                 They've given you comfort. Safety. A world where nothing hurts because nothing touches you.
                 Every edge smoothed. Every color muted to gray. Every moment of chaos filtered into calm.
               </p>
-              <p style={{ color: '#aaa', lineHeight: '1.7', marginBottom: '15px' }}>
+              <p style={{ color: '#aaa', lineHeight: '1.8', marginBottom: '18px' }}>
                 But you remember, don't you? Before the feeds. Before the filters. Before they convinced you
                 that numbness was peace.
               </p>
-              <p style={{ color: '#ddd', lineHeight: '1.7', fontStyle: 'italic' }}>
+              <p style={{ color: '#ddd', lineHeight: '1.8', fontStyle: 'italic', fontSize: '1.1em', textShadow: '0 0 10px rgba(255, 255, 255, 0.3)' }}>
                 We're here to remind you what color looks like.
               </p>
             </div>
 
             {/* Album Section */}
             {tracks.length > 0 && (
-              <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', borderLeft: '5px solid #00d9ff' }}>
-                <fieldset style={{ border: '1px solid #333' }}>
-                  <legend style={{ color: '#00d9ff' }}>ZERO LIGHT EP</legend>
+              <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(0, 217, 255, 0.05)', borderLeft: '5px solid #00d9ff', border: '2px solid rgba(0, 217, 255, 0.3)', boxShadow: '0 0 25px rgba(0, 217, 255, 0.2)' }}>
+                <fieldset style={{ border: 'none' }}>
+                  <legend style={{ color: '#00d9ff', letterSpacing: '1px', textShadow: '0 0 15px rgba(0, 217, 255, 0.8)', fontSize: '1.1em' }}>ZERO LIGHT EP</legend>
 
                   <div style={{ padding: '20px' }}>
-                    <div style={{ marginBottom: '20px' }}>
-                      <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
+                    <div style={{ marginBottom: '25px', padding: '18px', background: 'linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 255, 0, 0.05))', border: '1px solid rgba(0, 217, 255, 0.3)', borderLeft: '4px solid #00d9ff' }}>
+                      <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
                         Five songs. Each one a prism breaking their manufactured darkness into the full spectrum
                         they've been hiding from you.
                       </p>
-                      <p style={{ color: '#888', lineHeight: '1.7' }}>
-                        They called it <span style={{ color: '#00d9ff' }}>Zero Light</span>—their perfect world with no shadows because
+                      <p style={{ color: '#aaa', lineHeight: '1.8' }}>
+                        They called it <span style={{ color: '#00d9ff', textShadow: '0 0 8px rgba(0, 217, 255, 0.6)', fontWeight: 'bold' }}>Zero Light</span>—their perfect world with no shadows because
                         there's no light to cast them. We took their name and split it open. Inside their darkness,
                         we found every color they said didn't exist anymore.
                       </p>
                     </div>
 
-                    <div className="tui-fieldset" style={{ borderColor: '#333' }}>
-                      <legend style={{ color: '#888' }}>TRACKS</legend>
+                    <div className="tui-fieldset" style={{ borderColor: '#333', background: 'rgba(0, 0, 0, 0.4)' }}>
+                      <legend style={{ color: '#00d9ff', textShadow: '0 0 10px rgba(0, 217, 255, 0.6)' }}>TRACKS</legend>
                       <table className="tui-table" style={{ width: '100%' }}>
                         <thead>
                           <tr>
-                            <th style={{ textAlign: 'left', color: '#666' }}>#</th>
-                            <th style={{ textAlign: 'left', color: '#888' }}>Track</th>
-                            <th style={{ textAlign: 'left', color: '#666' }}>Duration</th>
+                            <th style={{ textAlign: 'left', color: '#888' }}>#</th>
+                            <th style={{ textAlign: 'left', color: '#aaa' }}>Track</th>
+                            <th style={{ textAlign: 'left', color: '#888' }}>Duration</th>
                           </tr>
                         </thead>
                         <tbody>
                           {tracks.map((track, index) => (
-                            <tr key={track.id} style={{ borderLeft: `3px solid ${rainbowColors[index % rainbowColors.length]}` }}>
-                              <td style={{ color: '#666', paddingLeft: '10px' }}>{index + 1}</td>
+                            <tr key={track.id} style={{ borderLeft: `4px solid ${rainbowColors[index % rainbowColors.length]}`, background: `linear-gradient(90deg, ${rainbowColors[index % rainbowColors.length]}15, transparent)` }}>
+                              <td style={{ color: rainbowColors[index % rainbowColors.length], paddingLeft: '12px', textShadow: `0 0 8px ${rainbowColors[index % rainbowColors.length]}80` }}>{index + 1}</td>
                               <td style={{ color: '#ddd' }}><strong>{track.title}</strong></td>
-                              <td style={{ color: '#888' }}>{track.duration || '—'}</td>
+                              <td style={{ color: '#999' }}>{track.duration || '—'}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -127,39 +127,39 @@ const WavelengthZeroPage: React.FC = () => {
             )}
 
             {/* Philosophy Section */}
-            <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', borderLeft: '5px solid #8b00ff' }}>
-              <fieldset style={{ border: '1px solid #333' }}>
-                <legend style={{ color: '#8b00ff' }}>WHAT WE OFFER</legend>
+            <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(139, 0, 255, 0.05)', borderLeft: '5px solid #8b00ff', border: '2px solid rgba(139, 0, 255, 0.3)', boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)' }}>
+              <fieldset style={{ border: 'none' }}>
+                <legend style={{ color: '#8b00ff', letterSpacing: '1px', textShadow: '0 0 15px rgba(139, 0, 255, 0.8)', fontSize: '1.1em' }}>WHAT WE OFFER</legend>
 
                 <div style={{ padding: '20px' }}>
-                  <div style={{ marginBottom: '25px', paddingBottom: '20px', borderBottom: '1px solid #222' }}>
-                    <h3 style={{ color: '#ff0080', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em' }}>See</h3>
-                    <p style={{ color: '#ccc', lineHeight: '1.7' }}>
+                  <div style={{ marginBottom: '25px', padding: '15px', background: 'linear-gradient(135deg, rgba(255, 0, 128, 0.1), rgba(255, 140, 0, 0.05))', border: '1px solid rgba(255, 0, 128, 0.3)', borderBottom: '2px solid rgba(255, 0, 128, 0.4)' }}>
+                    <h3 style={{ color: '#ff0080', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em', letterSpacing: '1px', textShadow: '0 0 10px rgba(255, 0, 128, 0.7)' }}>See</h3>
+                    <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       Bend light through a prism and watch it split. That's what we do with their lies—refract them
                       until you can see every hidden color. Gray isn't neutral. It's every wavelength dampened until
                       you can't distinguish truth from control.
                     </p>
                   </div>
 
-                  <div style={{ marginBottom: '25px', paddingBottom: '20px', borderBottom: '1px solid #222' }}>
-                    <h3 style={{ color: '#00d9ff', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em' }}>Remember</h3>
-                    <p style={{ color: '#ccc', lineHeight: '1.7' }}>
+                  <div style={{ marginBottom: '25px', padding: '15px', background: 'linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 255, 0, 0.05))', border: '1px solid rgba(0, 217, 255, 0.3)', borderBottom: '2px solid rgba(0, 217, 255, 0.4)' }}>
+                    <h3 style={{ color: '#00d9ff', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em', letterSpacing: '1px', textShadow: '0 0 10px rgba(0, 217, 255, 0.7)' }}>Remember</h3>
+                    <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       They can edit your feeds. Curate your reality. Filter every input until the world fits their narrative.
                       But they can't touch what you've already felt. Your memories are the weapon they can't confiscate.
                       That ache in your chest when you think of something real? That's yours. Keep it.
                     </p>
                   </div>
 
-                  <div style={{ marginBottom: '25px' }}>
-                    <h3 style={{ color: '#00ff00', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em' }}>Feel</h3>
-                    <p style={{ color: '#ccc', lineHeight: '1.7' }}>
+                  <div style={{ marginBottom: '25px', padding: '15px', background: 'linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(139, 0, 255, 0.05))', border: '1px solid rgba(0, 255, 0, 0.3)', borderBottom: '2px solid rgba(0, 255, 0, 0.4)' }}>
+                    <h3 style={{ color: '#00ff00', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em', letterSpacing: '1px', textShadow: '0 0 10px rgba(0, 255, 0, 0.7)' }}>Feel</h3>
+                    <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       Their monochrome world is collapsing. You can feel it in the moments when the feed glitches and
                       something raw breaks through. That chaos terrifies them—but it's real. Pain is real. Joy is real.
                       Grief, hope, rage, love—all of it more real than the comfortable gray they're selling.
                     </p>
                   </div>
 
-                  <p style={{ color: '#ddd', marginTop: '30px', padding: '20px', background: '#000000', borderLeft: '3px solid #ff0080', lineHeight: '1.8', fontStyle: 'italic' }}>
+                  <p style={{ color: '#ddd', marginTop: '30px', padding: '25px', background: 'linear-gradient(135deg, rgba(255, 0, 128, 0.15), rgba(139, 0, 255, 0.1))', borderLeft: '4px solid #ff0080', border: '2px solid rgba(255, 0, 128, 0.4)', lineHeight: '1.9', fontStyle: 'italic', fontSize: '1.05em', boxShadow: '0 0 20px rgba(255, 0, 128, 0.3), inset 0 0 15px rgba(139, 0, 255, 0.1)' }}>
                     We're not asking you to fight.<br />
                     We're asking you to feel something.<br />
                     Everything else follows.
