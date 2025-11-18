@@ -25,6 +25,7 @@ class Api::GridController < ApplicationController
 
     if hackr&.authenticate(params[:password])
       log_in(hackr)
+      hackr.touch_activity!
       render json: {
         success: true,
         message: "Welcome back to THE PULSE GRID, #{hackr.hackr_alias}.",
@@ -57,6 +58,7 @@ class Api::GridController < ApplicationController
 
     if @hackr.save
       log_in(@hackr)
+      @hackr.touch_activity!
       render json: {
         success: true,
         message: "Welcome to THE PULSE GRID, #{@hackr.hackr_alias}. Your resistance begins now.",
@@ -88,6 +90,9 @@ class Api::GridController < ApplicationController
   # POST /api/grid/command - Execute game command
   def command
     Rails.logger.info "=== API COMMAND RECEIVED: #{params[:input]} from #{current_hackr.hackr_alias} ==="
+
+    # Update last activity timestamp
+    current_hackr.touch_activity!
 
     result = Grid::CommandParser.new(current_hackr, params[:input]).execute
     output = result[:output]
