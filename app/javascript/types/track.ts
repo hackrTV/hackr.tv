@@ -14,6 +14,8 @@ export interface StationContext {
 export interface AudioPlayerAPI {
   loadTrack: (track: TrackData) => void;
   togglePlayPause: () => void;
+  playNext: () => void;
+  playPrevious: () => void;
   getCurrentTrackId: () => string | null;
   isPlaying: () => boolean;
   setPlaylist: (tracks: TrackData[], stationContext?: StationContext) => void;
@@ -21,6 +23,8 @@ export interface AudioPlayerAPI {
   getStationContext: () => StationContext | null;
   refreshPlaylist: () => void;
   refreshUI: () => void;
+  toggleShuffle: () => void;
+  isShuffle: () => boolean;
 }
 
 declare global {

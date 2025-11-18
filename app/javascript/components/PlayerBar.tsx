@@ -22,11 +22,15 @@ interface PlayerBarProps {
   duration: number;
   volume: number;
   stationContext: StationContext | null;
+  shuffle: boolean;
   onPlayPause: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
   onSeekStart: () => void;
   onSeek: (time: number) => void;
   onSeekEnd: () => void;
   onVolumeChange: (volume: number) => void;
+  onToggleShuffle: () => void;
   onClose: () => void;
 }
 
@@ -37,11 +41,15 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   duration,
   volume,
   stationContext,
+  shuffle,
   onPlayPause,
+  onNext,
+  onPrevious,
   onSeekStart,
   onSeek,
   onSeekEnd,
   onVolumeChange,
+  onToggleShuffle,
   onClose
 }) => {
   const { isLoggedIn } = useGridAuth()
@@ -116,6 +124,56 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             {currentTrack?.coverUrl && <AlbumCover coverUrl={currentTrack.coverUrl} />}
 
             <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} />
+
+            {!stationContext && (
+              <>
+                <button
+                  className="tui-button"
+                  onClick={onPrevious}
+                  tabIndex={-1}
+                  style={{
+                    background: '#444',
+                    color: '#aaa',
+                    padding: '0',
+                    fontSize: '1.3em',
+                    minWidth: '25px'
+                  }}
+                  title="Previous track"
+                >
+                  ⏮
+                </button>
+                <button
+                  className="tui-button"
+                  onClick={onNext}
+                  tabIndex={-1}
+                  style={{
+                    background: '#444',
+                    color: '#aaa',
+                    padding: '0',
+                    fontSize: '1.3em',
+                    minWidth: '25px'
+                  }}
+                  title="Next track"
+                >
+                  ⏭
+                </button>
+                <button
+                  className="tui-button"
+                  onClick={onToggleShuffle}
+                  tabIndex={-1}
+                  style={{
+                    background: shuffle ? '#7c3aed' : '#444',
+                    color: shuffle ? '#fff' : '#aaa',
+                    padding: '0',
+                    fontSize: '0.9em',
+                    minWidth: '25px'
+                  }}
+                  title={shuffle ? 'Shuffle: On' : 'Shuffle: Off'}
+                >
+                  ⤮
+                </button>
+              </>
+            )}
 
             <div style={{ flex: 1 }}>
               {stationContext && (

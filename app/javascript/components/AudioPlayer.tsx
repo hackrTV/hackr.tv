@@ -16,8 +16,10 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [isSeeking, setIsSeeking] = useState(false)
   const [stationContext, setStationContext] = useState<StationContext | null>(null)
+  const [shuffle, setShuffle] = useState(false)
   const playlistRef = useRef<TrackData[]>([]) // Store playlist in memory
   const stationContextRef = useRef<StationContext | null>(null) // Store station context
+  const shuffledPlaylistRef = useRef<TrackData[]>([]) // Store shuffled playlist
 
   // Handle play/pause
   const handlePlayPause = useCallback(() => {
@@ -34,6 +36,40 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       setIsPlaying(true)
     }
   }, [isPlaying])
+
+  // Shuffle array using Fisher-Yates algorithm
+  const shuffleArray = useCallback((array: TrackData[]): TrackData[] => {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }, [])
+
+  // Generate shuffled playlist, keeping current track first if playing
+  const generateShuffledPlaylist = useCallback(() => {
+    const playlist = playlistRef.current
+    if (playlist.length === 0) return []
+
+    // If no current track, just shuffle the whole playlist
+    if (!currentTrack) {
+      return shuffleArray(playlist)
+    }
+
+    // Find current track in playlist
+    const currentIndex = playlist.findIndex((track) => track.id === currentTrack.id)
+
+    if (currentIndex === -1) {
+      return shuffleArray(playlist)
+    }
+
+    // Create array without current track, shuffle it, then put current track first
+    const otherTracks = playlist.filter((track) => track.id !== currentTrack.id)
+    const shuffledOthers = shuffleArray(otherTracks)
+
+    return [currentTrack, ...shuffledOthers]
+  }, [currentTrack, shuffleArray])
 
   // Load and play track
   const loadTrack = useCallback((track: TrackData) => {
@@ -181,18 +217,82 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     return stationContextRef.current
   }, [])
 
+  // Play next track in playlist
+  const playNext = useCallback(() => {
+    // Use shuffled playlist if shuffle is enabled, otherwise use normal playlist
+    const playlist = shuffle ? shuffledPlaylistRef.current : playlistRef.current
+    if (playlist.length === 0) return
+
+    // Find current track index
+    let currentIndex = -1
+    for (let i = 0; i < playlist.length; i++) {
+      if (playlist[i].id === currentTrack?.id) {
+        currentIndex = i
+        break
+      }
+    }
+
+    // Get next track (wrap around to start if at end)
+    const nextIndex = (currentIndex + 1) % playlist.length
+    const nextTrack = playlist[nextIndex]
+
+    loadTrack(nextTrack)
+  }, [currentTrack, loadTrack, shuffle])
+
+  // Play previous track in playlist
+  const playPrevious = useCallback(() => {
+    // Use shuffled playlist if shuffle is enabled, otherwise use normal playlist
+    const playlist = shuffle ? shuffledPlaylistRef.current : playlistRef.current
+    if (playlist.length === 0) return
+
+    // Find current track index
+    let currentIndex = -1
+    for (let i = 0; i < playlist.length; i++) {
+      if (playlist[i].id === currentTrack?.id) {
+        currentIndex = i
+        break
+      }
+    }
+
+    // Get previous track (wrap around to end if at start)
+    const previousIndex = currentIndex <= 0 ? playlist.length - 1 : currentIndex - 1
+    const previousTrack = playlist[previousIndex]
+
+    loadTrack(previousTrack)
+  }, [currentTrack, loadTrack, shuffle])
+
+  // Toggle shuffle mode
+  const toggleShuffle = useCallback(() => {
+    const newShuffleState = !shuffle
+    setShuffle(newShuffleState)
+
+    // If enabling shuffle, generate shuffled playlist
+    if (newShuffleState) {
+      shuffledPlaylistRef.current = generateShuffledPlaylist()
+    }
+  }, [shuffle, generateShuffledPlaylist])
+
+  // Check if shuffle is enabled
+  const isShuffle = useCallback(() => {
+    return shuffle
+  }, [shuffle])
+
   // Expose API to vanilla JS and React context
   useEffect(() => {
     const api: AudioPlayerAPI = {
       loadTrack,
       togglePlayPause: handlePlayPause,
+      playNext,
+      playPrevious,
       getCurrentTrackId: () => currentTrack?.id || null,
       isPlaying: () => isPlaying,
       setPlaylist,
       getPlaylist,
       getStationContext,
       refreshPlaylist,
-      refreshUI
+      refreshUI,
+      toggleShuffle,
+      isShuffle
     }
     window.audioPlayer = api
 
@@ -204,7 +304,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     return () => {
       delete window.audioPlayer
     }
-  }, [loadTrack, handlePlayPause, currentTrack, isPlaying, setPlaylist, getPlaylist, getStationContext, onReady, refreshPlaylist, refreshUI])
+  }, [loadTrack, handlePlayPause, playNext, playPrevious, currentTrack, isPlaying, setPlaylist, getPlaylist, getStationContext, onReady, refreshPlaylist, refreshUI, toggleShuffle, isShuffle])
 
   // Update track table UI when current track or playing state changes
   useEffect(() => {
@@ -284,8 +384,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     const handleEnded = () => {
       setIsPlaying(false)
 
-      // Auto-play next track from stored playlist
-      const playlist = playlistRef.current
+      // Auto-play next track from stored playlist (use shuffled if shuffle is enabled)
+      const playlist = shuffle ? shuffledPlaylistRef.current : playlistRef.current
 
       if (playlist.length === 0) return
 
@@ -317,7 +417,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [volume, isSeeking, currentTrack, loadTrack])
+  }, [volume, isSeeking, currentTrack, loadTrack, shuffle])
 
   return (
     <>
@@ -329,11 +429,15 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
           duration={duration}
           volume={volume}
           stationContext={stationContext}
+          shuffle={shuffle}
           onPlayPause={handlePlayPause}
+          onNext={playNext}
+          onPrevious={playPrevious}
           onSeekStart={handleSeekStart}
           onSeek={handleSeek}
           onSeekEnd={handleSeekEnd}
           onVolumeChange={handleVolumeChange}
+          onToggleShuffle={toggleShuffle}
           onClose={handleClose}
         />
       )}
