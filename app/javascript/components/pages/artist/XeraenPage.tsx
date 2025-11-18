@@ -1,5 +1,6 @@
 import React from 'react'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
+import { YouTubePlayer } from '~/components/YouTubePlayer'
 
 const XeraenPage: React.FC = () => {
   return (
@@ -26,17 +27,8 @@ const XeraenPage: React.FC = () => {
       <div className="tui-window ml-10 mt-10">
         <fieldset className="tui-fieldset">
           <legend>Latest Video!</legend>
-          <div>
-            <iframe
-              width="560"
-              height="315"
-              src="https://www.youtube.com/embed/GYSH0mDteR4?si=zvFKx_qoVLzmV3kZ"
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
+          <div className="pl-5 pt-5">
+            <YouTubePlayer videoId="GYSH0mDteR4" width={560} height={315} />
           </div>
         </fieldset>
       </div>
