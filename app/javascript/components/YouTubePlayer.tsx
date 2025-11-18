@@ -6,10 +6,27 @@ interface YouTubePlayerProps {
   height?: number
 }
 
+// YouTube Player types
+interface YTPlayer {
+  playVideo: () => void
+  pauseVideo: () => void
+  destroy: () => void
+}
+
+interface YTPlayerEvent {
+  target: YTPlayer
+}
+
 // Extend Window interface to include YouTube API
 declare global {
   interface Window {
-    YT: any
+    YT: {
+      Player: new (element: HTMLElement, config: Record<string, unknown>) => YTPlayer
+      PlayerState?: {
+        PLAYING: number
+        PAUSED: number
+      }
+    }
     onYouTubeIframeAPIReady: () => void
   }
 }
@@ -20,15 +37,15 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   height = 315
 }) => {
   const playerRef = useRef<HTMLDivElement>(null)
-  const [player, setPlayer] = useState<any>(null)
+  const [player, setPlayer] = useState<YTPlayer | null>(null)
   const [showThumbnail, setShowThumbnail] = useState(true)
-  const [isAPIReady, setIsAPIReady] = useState(false)
+  const isAPIReadyRef = useRef(false)
 
   // Load YouTube IFrame API
   useEffect(() => {
     // Check if API is already loaded
     if (window.YT && window.YT.Player) {
-      setIsAPIReady(true)
+      isAPIReadyRef.current = true
       return
     }
 
@@ -40,7 +57,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
 
     // Set up callback for when API is ready
     window.onYouTubeIframeAPIReady = () => {
-      setIsAPIReady(true)
+      isAPIReadyRef.current = true
     }
 
     return () => {
@@ -51,7 +68,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
 
   // Create player when API is ready and user clicks play
   const initializePlayer = () => {
-    if (!isAPIReady || !playerRef.current || player) return
+    if (!isAPIReadyRef.current || !playerRef.current || player) return
 
     const newPlayer = new window.YT.Player(playerRef.current, {
       height: String(height),
@@ -64,7 +81,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
         rel: 0
       },
       events: {
-        onReady: (event: any) => {
+        onReady: (event: YTPlayerEvent) => {
           event.target.playVideo()
         }
       }
