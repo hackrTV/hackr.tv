@@ -271,6 +271,8 @@ describe('AudioPlayer', () => {
   it('handles auto-play next track on end', async () => {
     render(<AudioPlayer />)
 
+    // Populate playlist from DOM before loading track
+    window.audioPlayer?.refreshPlaylist()
     window.audioPlayer?.loadTrack(mockTrack)
 
     await waitFor(() => {
@@ -295,6 +297,8 @@ describe('AudioPlayer', () => {
     const track2Row = document.querySelector('.track-row[data-track-id="track-2"]') as HTMLElement
     track2Row.style.display = 'none'
 
+    // Refresh playlist to respect the filter
+    window.audioPlayer?.refreshPlaylist()
     window.audioPlayer?.loadTrack(mockTrack)
 
     await waitFor(() => {
