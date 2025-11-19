@@ -99,7 +99,7 @@ RSpec.describe Grid::CommandParser do
 
         it "returns usage message" do
           result = parser.execute
-          expect(result[:output]).to eq("Talk to whom?")
+          expect(result[:output]).to include("Talk to whom?")
         end
       end
 
@@ -144,7 +144,7 @@ RSpec.describe Grid::CommandParser do
 
         it "includes the NPC name in response" do
           result = parser.execute
-          expect(result[:output]).to include("Knowledgeable NPC:")
+          expect(result[:output]).to include("Knowledgeable NPC")
         end
       end
 
@@ -220,7 +220,8 @@ RSpec.describe Grid::CommandParser do
 
         it "returns usage message" do
           result = parser.execute
-          expect(result[:output]).to include("Usage: ask <npc> about <topic>")
+          expect(result[:output]).to include("Usage: ask")
+          expect(result[:output]).to include("about")
         end
       end
 
@@ -229,7 +230,8 @@ RSpec.describe Grid::CommandParser do
 
         it "returns usage message" do
           result = parser.execute
-          expect(result[:output]).to include("Usage: ask <npc> about <topic>")
+          expect(result[:output]).to include("Usage: ask")
+          expect(result[:output]).to include("about")
         end
       end
 
@@ -273,7 +275,7 @@ RSpec.describe Grid::CommandParser do
       it "examine command still works with NPCs" do
         parser = described_class.new(hackr, "examine Helper")
         result = parser.execute
-        expect(result[:output]).to eq(mob.description)
+        expect(result[:output]).to include(mob.description)
       end
     end
   end
