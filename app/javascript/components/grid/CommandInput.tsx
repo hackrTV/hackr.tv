@@ -1,4 +1,4 @@
-import React, { useState, useRef, KeyboardEvent } from 'react'
+import React, { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { useCommandHistory } from '~/hooks/useCommandHistory'
 
 interface CommandInputProps {
@@ -10,6 +10,13 @@ export const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, disabled =
   const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const { addCommand, navigateUp, navigateDown } = useCommandHistory()
+
+  // Auto-focus input when it becomes enabled again after command execution
+  useEffect(() => {
+    if (!disabled && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [disabled])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowUp') {

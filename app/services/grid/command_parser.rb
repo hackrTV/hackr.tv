@@ -9,7 +9,7 @@ module Grid
     end
 
     def execute
-      return {output: "Please enter a command.", event: nil} if input.empty?
+      return {output: "<span style='color: #fbbf24;'>Please enter a command.</span>", event: nil} if input.empty?
 
       # Split input but preserve case in arguments
       parts = input.split
@@ -54,7 +54,7 @@ module Grid
       when "clear", "cls"
         clear_command
       else
-        "Unknown command: #{command}. Type 'help' for a list of commands."
+        "<span style='color: #f87171;'>Unknown command: #{command}. Type 'help' for a list of commands.</span>"
       end
 
       # Normalize result to hash format
@@ -65,59 +65,59 @@ module Grid
 
     def look_command
       room = hackr.current_room
-      return "You are nowhere. This shouldn't happen!" unless room
+      return "<span style='color: #f87171;'>You are nowhere. This shouldn't happen!</span>" unless room
 
       output = []
-      output << "\n#{room.name.upcase}"
-      output << "[#{room.color_scheme}]" if room.color_scheme
+      output << "\n<span style='color: #22d3ee; font-weight: bold;'>#{room.name.upcase}</span>"
+      output << "<span style='color: #9ca3af;'>[#{room.color_scheme}]</span>" if room.color_scheme
       output << ""
-      output << room.description if room.description
+      output << "<span style='color: #d0d0d0;'>#{room.description}</span>" if room.description
       output << ""
 
       # Show exits
       exits = room.exits_from.includes(:to_room)
       if exits.any?
-        exit_list = exits.map { |e| "#{e.direction} (#{e.to_room.name})" }.join(", ")
-        output << "Exits: #{exit_list}"
+        exit_list = exits.map { |e| "<span style='color: #22d3ee;'>#{e.direction}</span> <span style='color: #9ca3af;'>(#{e.to_room.name})</span>" }.join(", ")
+        output << "<span style='color: #fbbf24;'>Exits:</span> #{exit_list}"
       else
-        output << "Exits: none"
+        output << "<span style='color: #fbbf24;'>Exits:</span> <span style='color: #6b7280;'>none</span>"
       end
 
       # Show items
       items = room.grid_items.in_room(room)
       if items.any?
         output << ""
-        output << "Items: #{items.map(&:name).join(", ")}"
+        output << "<span style='color: #fbbf24;'>Items:</span> <span style='color: #34d399;'>#{items.map(&:name).join(", ")}</span>"
       end
 
       # Show Mobs
       mobs = room.grid_mobs
       if mobs.any?
         output << ""
-        output << "Mobs: #{mobs.map(&:name).join(", ")}"
+        output << "<span style='color: #fbbf24;'>Mobs:</span> <span style='color: #c084fc;'>#{mobs.map(&:name).join(", ")}</span>"
       end
 
       # Show other hackrs
       other_hackrs = room.grid_hackrs.where.not(id: hackr.id)
       if other_hackrs.any?
         output << ""
-        output << "Hackrs: #{other_hackrs.map(&:hackr_alias).join(", ")}"
+        output << "<span style='color: #fbbf24;'>Hackrs:</span> <span style='color: #a78bfa;'>#{other_hackrs.map(&:hackr_alias).join(", ")}</span>"
       end
 
       output.join("\n")
     end
 
     def go_command(direction)
-      return "Go where? Specify a direction: north, south, east, west, up, down" unless direction
+      return "<span style='color: #fbbf24;'>Go where? Specify a direction: north, south, east, west, up, down</span>" unless direction
 
       old_room = hackr.current_room
-      return "You are nowhere!" unless old_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless old_room
 
       exit = old_room.exits_from.find_by(direction: direction)
-      return "You can't go #{direction} from here." unless exit
+      return "<span style='color: #f87171;'>You can't go #{direction} from here.</span>" unless exit
 
       if exit.locked
-        return "The exit is locked." unless exit.requires_item && hackr.grid_items.exists?(exit.requires_item_id)
+        return "<span style='color: #f87171;'>The exit is locked.</span>" unless exit.requires_item && hackr.grid_items.exists?(exit.requires_item_id)
       end
 
       new_room = exit.to_room
@@ -136,7 +136,7 @@ module Grid
     end
 
     def say_command(message)
-      return "Say what?" if message.empty?
+      return "<span style='color: #fbbf24;'>Say what?</span>" if message.empty?
 
       GridMessage.create!(
         grid_hackr: hackr,
@@ -146,7 +146,7 @@ module Grid
       )
 
       {
-        output: "[#{hackr.hackr_alias}]: #{message}",
+        output: "<span style='color: #a78bfa;'>[#{hackr.hackr_alias}]</span>: #{message}",
         event: {
           type: "say",
           hackr_alias: hackr.hackr_alias,
@@ -159,25 +159,25 @@ module Grid
     def inventory_command
       items = hackr.grid_items
       if items.any?
-        "Inventory:\n" + items.map { |item| "  - #{item.name}" }.join("\n")
+        "<span style='color: #fbbf24;'>Inventory:</span>\n" + items.map { |item| "  - <span style='color: #34d399;'>#{item.name}</span>" }.join("\n")
       else
-        "Your inventory is empty."
+        "<span style='color: #9ca3af;'>Your inventory is empty.</span>"
       end
     end
 
     def take_command(item_name)
-      return "Take what?" if item_name.empty?
+      return "<span style='color: #fbbf24;'>Take what?</span>" if item_name.empty?
 
       room = hackr.current_room
-      return "You are nowhere!" unless room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", item_name.downcase)
-      return "You don't see '#{item_name}' here." unless item
+      return "<span style='color: #f87171;'>You don't see '#{item_name}' here.</span>" unless item
 
       item.update!(grid_hackr: hackr, room: nil)
 
       {
-        output: "You take the #{item.name}.",
+        output: "<span style='color: #34d399;'>You take the #{item.name}.</span>",
         event: {
           type: "take",
           hackr_alias: hackr.hackr_alias,
@@ -188,16 +188,16 @@ module Grid
     end
 
     def drop_command(item_name)
-      return "Drop what?" if item_name.empty?
+      return "<span style='color: #fbbf24;'>Drop what?</span>" if item_name.empty?
 
       item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
-      return "You don't have '#{item_name}'." unless item
+      return "<span style='color: #f87171;'>You don't have '#{item_name}'.</span>" unless item
 
       room = hackr.current_room
       item.update!(room: room, grid_hackr: nil)
 
       {
-        output: "You drop the #{item.name}.",
+        output: "<span style='color: #34d399;'>You drop the #{item.name}.</span>",
         event: {
           type: "drop",
           hackr_alias: hackr.hackr_alias,
@@ -208,45 +208,45 @@ module Grid
     end
 
     def examine_command(target)
-      return "Examine what?" if target.empty?
+      return "<span style='color: #fbbf24;'>Examine what?</span>" if target.empty?
 
       room = hackr.current_room
-      return "You are nowhere!" unless room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       # Check items in room
       item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", target.downcase)
-      return item.description if item
+      return "<span style='color: #d0d0d0;'>#{item.description}</span>" if item
 
       # Check items in inventory
       item = hackr.grid_items.find_by("LOWER(name) = ?", target.downcase)
-      return item.description if item
+      return "<span style='color: #d0d0d0;'>#{item.description}</span>" if item
 
       # Check Mobs
       mob = room.grid_mobs.find_by("LOWER(name) = ?", target.downcase)
-      return mob.description if mob
+      return "<span style='color: #d0d0d0;'>#{mob.description}</span>" if mob
 
-      "You don't see '#{target}' here."
+      "<span style='color: #f87171;'>You don't see '#{target}' here.</span>"
     end
 
     def talk_command(npc_name)
       # Handle "talk to <npc>" syntax
       npc_name = npc_name.sub(/^to\s+/, "")
-      return "Talk to whom?" if npc_name.empty?
+      return "<span style='color: #fbbf24;'>Talk to whom?</span>" if npc_name.empty?
 
       room = hackr.current_room
-      return "You are nowhere!" unless room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
-      return "You don't see '#{npc_name}' here." unless mob
-      return "#{mob.name} doesn't seem interested in talking." if mob.dialogue_tree.blank?
+      return "<span style='color: #f87171;'>You don't see '#{npc_name}' here.</span>" unless mob
+      return "<span style='color: #9ca3af;'>#{mob.name} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
       dialogue = mob.dialogue_tree
       output = []
-      output << "#{mob.name}: \"#{dialogue["greeting"]}\""
+      output << "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{dialogue["greeting"]}\"</span>"
 
       if dialogue["topics"].present? && dialogue["topics"].any?
         output << ""
-        output << "You can ask about: #{dialogue["topics"].keys.join(", ")}"
+        output << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{dialogue["topics"].keys.join(", ")}</span>"
       end
 
       output.join("\n")
@@ -254,7 +254,7 @@ module Grid
 
     def ask_command(args)
       # Parse "ask <npc> about <topic>"
-      return "Ask whom about what? Usage: ask <npc> about <topic>" if args.length < 3
+      return "<span style='color: #fbbf24;'>Ask whom about what? Usage: ask &lt;npc&gt; about &lt;topic&gt;</span>" if args.length < 3
 
       # Handle both "ask Synthia about mission" and "ask <npc> <topic>" formats
       about_index = args.index { |word| word.downcase == "about" }
@@ -267,14 +267,14 @@ module Grid
         topic = args[1..].join(" ")
       end
 
-      return "Ask whom about what?" if npc_name.blank? || topic.blank?
+      return "<span style='color: #fbbf24;'>Ask whom about what?</span>" if npc_name.blank? || topic.blank?
 
       room = hackr.current_room
-      return "You are nowhere!" unless room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
-      return "You don't see '#{npc_name}' here." unless mob
-      return "#{mob.name} doesn't seem interested in talking." if mob.dialogue_tree.blank?
+      return "<span style='color: #f87171;'>You don't see '#{npc_name}' here.</span>" unless mob
+      return "<span style='color: #9ca3af;'>#{mob.name} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
       dialogue = mob.dialogue_tree
       topics = dialogue["topics"] || {}
@@ -283,50 +283,50 @@ module Grid
       response = topics[topic] || topics[topic.downcase] || topics.find { |k, v| k.downcase == topic.downcase }&.last
 
       if response
-        "#{mob.name}: \"#{response}\""
+        "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{response}\"</span>"
       else
         available = topics.keys.join(", ")
-        "#{mob.name} doesn't know about '#{topic}'. Try asking about: #{available}"
+        "<span style='color: #c084fc;'>#{mob.name}</span> doesn't know about '#{topic}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
       end
     end
 
     def help_command
       <<~HELP
-        Available Commands:
+        <span style='color: #22d3ee; font-weight: bold;'>Available Commands:</span>
 
-        Navigation:
-          look, l                 - Look around the room
-          go <direction>          - Move in a direction
-          north, n / south, s     - Move north/south
-          east, e / west, w       - Move east/west
-          up, u / down, d         - Move up/down
+        <span style='color: #fbbf24;'>Navigation:</span>
+          <span style='color: #34d399;'>look, l</span>                 - Look around the room
+          <span style='color: #34d399;'>go &lt;direction&gt;</span>          - Move in a direction
+          <span style='color: #34d399;'>north, n / south, s</span>     - Move north/south
+          <span style='color: #34d399;'>east, e / west, w</span>       - Move east/west
+          <span style='color: #34d399;'>up, u / down, d</span>         - Move up/down
 
-        Items:
-          inventory, inv, i       - View your inventory
-          take <item>             - Pick up an item
-          drop <item>             - Drop an item
-          examine <target>, x     - Examine an item or NPC
+        <span style='color: #fbbf24;'>Items:</span>
+          <span style='color: #34d399;'>inventory, inv, i</span>       - View your inventory
+          <span style='color: #34d399;'>take &lt;item&gt;</span>             - Pick up an item
+          <span style='color: #34d399;'>drop &lt;item&gt;</span>             - Drop an item
+          <span style='color: #34d399;'>examine &lt;target&gt;, x</span>     - Examine an item or NPC
 
-        NPCs:
-          talk <npc>              - Talk to an NPC
-          ask <npc> about <topic> - Ask an NPC about a topic
+        <span style='color: #fbbf24;'>NPCs:</span>
+          <span style='color: #34d399;'>talk &lt;npc&gt;</span>              - Talk to an NPC
+          <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span> - Ask an NPC about a topic
 
-        Social:
-          say <message>           - Say something in the room
-          who                     - See who's online
+        <span style='color: #fbbf24;'>Social:</span>
+          <span style='color: #34d399;'>say &lt;message&gt;</span>           - Say something in the room
+          <span style='color: #34d399;'>who</span>                     - See who's online
 
-        Utility:
-          clear, cls              - Clear the screen
-          help, ?                 - Show this help message
+        <span style='color: #fbbf24;'>Utility:</span>
+          <span style='color: #34d399;'>clear, cls</span>              - Clear the screen
+          <span style='color: #34d399;'>help, ?</span>                 - Show this help message
       HELP
     end
 
     def who_command
       online = GridHackr.where.not(current_room: nil).order(:hackr_alias)
       if online.any?
-        "Online Hackrs:\n" + online.map { |h| "  - #{h.hackr_alias} (#{h.current_room&.name || "nowhere"})" }.join("\n")
+        "<span style='color: #fbbf24;'>Online Hackrs:</span>\n" + online.map { |h| "  - <span style='color: #a78bfa;'>#{h.hackr_alias}</span> <span style='color: #9ca3af;'>(#{h.current_room&.name || "nowhere"})</span>" }.join("\n")
       else
-        "No hackrs are currently online."
+        "<span style='color: #9ca3af;'>No hackrs are currently online.</span>"
       end
     end
 
