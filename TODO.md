@@ -15,8 +15,8 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 
 ### Content & Media
 
-- [ ] Upload audio files for all 66 tracks (currently only 2 albums have audio)
-- [ ] Add cover images for all 14 albums (currently only 2 albums have covers)
+- [ ] Upload audio files for all 66 tracks (currently 30 tracks have audio across 6 albums)
+- [ ] Add cover images for all 14 albums (currently 4 albums have covers)
 - [ ] Manually review and polish all band profile bios
 - [ ] Create missing routes/views: `/streamz`, `/vidz`, `/xeraen/vidz`, `/xeraen/albums/xordium`
 
@@ -34,9 +34,9 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 
 ### Band Profiles
 
-- [ ] Expand band profile pages for remaining artists (currently 4 of 13 have custom profiles)
-- [ ] Add more lore and backstory to existing band profiles
+- [ ] Add more lore and backstory to existing band profiles (all 13 artists have pages)
 - [ ] Create artist-specific album showcase pages
+- [ ] Enhance bandProfileConfig.tsx with more detailed content for each band
 
 ## Long-term / Ideas
 
