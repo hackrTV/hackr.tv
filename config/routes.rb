@@ -56,6 +56,10 @@ Rails.application.routes.draw do
   get "logs", to: "pages#spa_root", as: :hackr_logs
   get "logs/:id", to: "pages#spa_root", as: :hackr_log
 
+  # Codex (wiki) routes - SPA
+  get "codex", to: "pages#spa_root", as: :codex
+  get "codex/:slug", to: "pages#spa_root", as: :codex_entry
+
   # API routes (for SPA)
   namespace :api, defaults: {format: :json} do
     resources :artists, only: [:index, :show] do
@@ -63,6 +67,8 @@ Rails.application.routes.draw do
     end
     resources :tracks, only: [:index, :show]
     resources :albums, only: [:index, :show]
+    get "codex", to: "codex#index"
+    get "codex/:slug", to: "codex#show"
     get "radio_stations", to: "radio#index"
     get "radio_stations/:id/playlists", to: "radio#station_playlists"
 
@@ -93,6 +99,7 @@ Rails.application.routes.draw do
         post :import
       end
     end
+    resources :codex_entries
     resources :hackr_logs
     resources :radio_stations do
       member do

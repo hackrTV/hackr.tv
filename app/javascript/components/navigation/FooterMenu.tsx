@@ -45,8 +45,14 @@ export const FooterMenu: React.FC = () => {
           </li>
           <span className="tui-statusbar-divider"></span>
           <li>
+            <Link to="/codex">
+              <span className="purple-168-text">5</span> The Codex&nbsp;
+            </Link>
+          </li>
+          <span className="tui-statusbar-divider"></span>
+          <li>
             <Link to="/logs">
-              <span className="purple-168-text">5</span> Hackr Logs&nbsp;
+              <span className="purple-168-text">6</span> Hackr Logs&nbsp;
             </Link>
           </li>
           {hackr?.role === 'admin' && (
@@ -54,7 +60,7 @@ export const FooterMenu: React.FC = () => {
               <span className="tui-statusbar-divider"></span>
               <li>
                 <a href="/root">
-                  <span className="red-255-text">6</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                  <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
                 </a>
               </li>
             </>
@@ -62,13 +68,13 @@ export const FooterMenu: React.FC = () => {
           <span className="tui-statusbar-divider"></span>
           <li>
             <a href="https://ashlinn.net" target="_blank" rel="noopener noreferrer">
-              <span className="purple-168-text">{hackr?.role === 'admin' ? '7' : '6'}</span> Ashlinn&nbsp;
+              <span className="purple-168-text">{hackr?.role === 'admin' ? '8' : '7'}</span> Ashlinn&nbsp;
             </a>
           </li>
           <span className="tui-statusbar-divider"></span>
           <li>
             <a href="https://michaelk.net" target="_blank" rel="noopener noreferrer">
-              <span className="purple-168-text">{hackr?.role === 'admin' ? '8' : '7'}</span> MichaelK&nbsp;
+              <span className="purple-168-text">{hackr?.role === 'admin' ? '9' : '8'}</span> MichaelK&nbsp;
             </a>
           </li>
         </ul>

@@ -161,18 +161,25 @@ export const HeaderMenu: React.FC = () => {
           </div>
         </li>
 
-        {/* 5: Hackr Logs */}
+        {/* 5: The Codex */}
         <li>
-          <Link to="/logs">
-            <span className="purple-168-text">5</span> Hackr Logs&nbsp;
+          <Link to="/codex">
+            <span className="purple-168-text">5</span> The Codex&nbsp;
           </Link>
         </li>
 
-        {/* 6: Admin (only show if user is admin) */}
+        {/* 6: Hackr Logs */}
+        <li>
+          <Link to="/logs">
+            <span className="purple-168-text">6</span> Hackr Logs&nbsp;
+          </Link>
+        </li>
+
+        {/* 7: Admin (only show if user is admin) */}
         {hackr?.role === 'admin' && (
           <li>
             <a href="/root">
-              <span className="red-255-text">6</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+              <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
             </a>
           </li>
         )}

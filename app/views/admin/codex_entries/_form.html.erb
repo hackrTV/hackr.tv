@@ -1,0 +1,151 @@
+<%# Flash Messages %>
+<% if flash[:error] %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+    <p class="red-255-text">⚠ ERROR</p>
+    <p class="white-text"><%= flash[:error] %></p>
+  </div>
+<% end %>
+
+<%# Codex Entry Form %>
+<%= form_with model: [:admin, codex_entry], local: true do |f| %>
+  <%# Basic Info Section %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: BASIC INFO ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", placeholder: "Entry Name", style: "width: 100%;" %>
+      <% if codex_entry.errors[:name].any? %>
+        <small class="red-255-text"><%= codex_entry.errors[:name].join(", ") %></small>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.label :entry_type, "TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :entry_type,
+          options_for_select(CodexEntry::ENTRY_TYPES.map { |t| [t.titleize, t] }, codex_entry.entry_type),
+          { include_blank: "Select type..." },
+          class: "tui-input", style: "width: 100%;" %>
+      <% if codex_entry.errors[:entry_type].any? %>
+        <small class="red-255-text"><%= codex_entry.errors[:entry_type].join(", ") %></small>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", placeholder: "auto-generated from name if left blank", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">Leave blank to auto-generate from name</small>
+      <% if codex_entry.errors[:slug].any? %>
+        <br><small class="red-255-text"><%= codex_entry.errors[:slug].join(", ") %></small>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :position, class: "tui-input", placeholder: "Optional", min: 0, style: "width: 100%;" %>
+      <small style="color: #888;">For manual ordering</small>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :summary, "SUMMARY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :summary, class: "tui-input", placeholder: "Brief 1-2 sentence overview for listings...", rows: 3, style: "width: 100%; font-family: monospace;" %>
+    <small style="color: #888;">Brief description shown in listings</small>
+  </div>
+
+  <%# Content Section %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: CONTENT ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :content, "FULL CONTENT (Markdown)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :content, class: "tui-input", placeholder: "Full markdown content...\n\nSupports:\n- Markdown formatting\n- [[Entry Name]] for auto-linking to other entries", rows: 20, style: "width: 100%; font-family: monospace; font-size: 0.95em;" %>
+    <small style="color: #888;">Use [[Entry Name]] to create links to other codex entries</small>
+  </div>
+
+  <%# Metadata Section %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: METADATA ::]</h3>
+  <p style="color: #888; margin-bottom: 15px;">Add custom metadata fields (key-value pairs). Useful for structured data like dates, affiliations, etc.</p>
+
+  <div id="metadata-fields" style="margin-bottom: 20px;">
+    <% metadata = codex_entry.metadata || {} %>
+    <% if metadata.any? %>
+      <% metadata.each_with_index do |(key, value), index| %>
+        <div class="metadata-field" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
+          <input type="text" name="codex_entry[metadata_json][<%= key %>]" value="<%= key %>" placeholder="Key" class="tui-input" style="font-family: monospace;" data-is-key="true">
+          <input type="text" name="codex_entry[metadata_json][<%= key %>]" value="<%= value %>" placeholder="Value" class="tui-input" style="font-family: monospace;">
+          <button type="button" class="tui-button red-168 remove-metadata" style="padding: 5px 15px;">✗</button>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="metadata-field" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
+        <input type="text" name="codex_entry[metadata_json][]" placeholder="Key (e.g., birth_year, faction)" class="tui-input" style="font-family: monospace;" data-is-key="true">
+        <input type="text" name="codex_entry[metadata_json][]" placeholder="Value" class="tui-input" style="font-family: monospace;">
+        <button type="button" class="tui-button red-168 remove-metadata" style="padding: 5px 15px;">✗</button>
+      </div>
+    <% end %>
+  </div>
+
+  <button type="button" id="add-metadata" class="tui-button yellow-168" style="padding: 8px 20px; margin-bottom: 20px;">
+    ➕ Add Metadata Field
+  </button>
+
+  <%# Publishing Section %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: PUBLISHING ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <label class="white-text" style="display: flex; align-items: center; gap: 10px;">
+      <%= f.check_box :published, style: "width: auto;" %>
+      <span style="font-weight: bold;">PUBLISHED (Visible to public)</span>
+    </label>
+    <small style="color: #888; margin-left: 30px;">Uncheck to keep as draft</small>
+  </div>
+
+  <%# Submit Buttons %>
+  <div style="margin-top: 30px; display: flex; gap: 15px;">
+    <%= f.submit codex_entry.new_record? ? "Create Entry" : "Update Entry",
+        class: "tui-button purple-168", style: "padding: 10px 30px; font-weight: bold;" %>
+    <%= link_to "Cancel", admin_codex_entries_path, class: "tui-button grey-168", style: "padding: 10px 30px;" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const metadataContainer = document.getElementById('metadata-fields');
+    const addButton = document.getElementById('add-metadata');
+
+    // Add new metadata field
+    addButton.addEventListener('click', function() {
+      const newField = document.createElement('div');
+      newField.className = 'metadata-field';
+      newField.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px;';
+      newField.innerHTML = `
+        <input type="text" name="codex_entry[metadata_json][]" placeholder="Key" class="tui-input" style="font-family: monospace;" data-is-key="true">
+        <input type="text" name="codex_entry[metadata_json][]" placeholder="Value" class="tui-input" style="font-family: monospace;">
+        <button type="button" class="tui-button red-168 remove-metadata" style="padding: 5px 15px;">✗</button>
+      `;
+      metadataContainer.appendChild(newField);
+    });
+
+    // Remove metadata field
+    metadataContainer.addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-metadata')) {
+        e.target.closest('.metadata-field').remove();
+      }
+    });
+
+    // Auto-update name attribute when key changes
+    metadataContainer.addEventListener('input', function(e) {
+      if (e.target.dataset.isKey === 'true') {
+        const field = e.target.closest('.metadata-field');
+        const valueInput = field.querySelector('input[data-is-key]:not([data-is-key="true"])') || field.querySelectorAll('input')[1];
+        const key = e.target.value;
+        e.target.name = `codex_entry[metadata_json][${key}]`;
+        if (valueInput) {
+          valueInput.name = `codex_entry[metadata_json][${key}]`;
+        }
+      }
+    });
+  });
+</script>
