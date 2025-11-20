@@ -1,15 +1,18 @@
 title: "Power To The Hackrs"
+slug: "power-to-the-hackrs"
 artist: "XERAEN"
 album: "XORDIUM"
 album_type: "ep"
 release_date: "2124-10-17"
+audio_file: "power-to-the-hackrs.ogg"
 duration: "2:46"
 # cover_image: "cover.jpg"
 featured: false
 streaming_links:
-  # spotify: "https://open.spotify.com/track/neon-runner"
-  # youtube: "https://youtube.com/watch?v=neon-runner"
-  # soundcloud: "https://soundcloud.com/xeraen/neon-runner"
+  spotify: "https://open.spotify.com/track/2HPhxQQ2arfMTVbuZnhILK"
+  apple_music: "https://www.youtube.com/watch?v=glsL6PMNedk"
+  youtube: "https://www.youtube.com/watch?v=glsL6PMNedk"
+  # soundcloud: ""
 videos:
   # music: "https://youtube.com/watch?v=neon-runner-mv"
   # lyric: "https://youtube.com/watch?v=neon-runner-lyrics"

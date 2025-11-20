@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 
 interface Album {
   id: number
@@ -132,9 +133,10 @@ const TrackDetailPage: React.FC = () => {
             <p><strong>Duration:</strong> {track.duration}</p>
           )}
 
+          <EmbeddedTrack trackId={track.slug} />
+
           {track.streaming_links && Object.keys(track.streaming_links).length > 0 && (
             <>
-              <br />
               <p><strong>Streaming Links:</strong></p>
               <div style={{ marginTop: '10px', marginBottom: '15px' }}>
                 <Link

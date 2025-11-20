@@ -54,7 +54,13 @@ module Api
 
     # GET /api/tracks/:id
     def show
-      @track = Track.includes(:artist, :album).find_by(slug: params[:id]) || Track.includes(:artist, :album).find(params[:id])
+      @track = Track.includes(:artist, :album).find_by(slug: params[:id])
+      @track ||= Track.includes(:artist, :album).find_by(id: params[:id]) if params[:id].to_i.to_s == params[:id]
+
+      if @track.nil?
+        render json: {error: "Track not found"}, status: :not_found
+        return
+      end
 
       render json: {
         id: @track.id,

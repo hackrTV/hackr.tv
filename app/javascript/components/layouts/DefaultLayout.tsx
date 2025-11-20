@@ -17,7 +17,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
 
       {/* ASCII Art Header */}
       <div className="ml-10 pl-5 white-168-text">
-        <Link to="/">
+        <Link to="/" style={{ display: 'inline-block' }}>
           <pre id="greetings" style={{ fontSize: '11px' }}>
             {` __  __                   __            ______  __  __
 /\\ \\/\\ \\                 /\\ \\          /\\__  _\\/\\ \\/\\ \\
