@@ -50,6 +50,7 @@ export const GridGamePage: React.FC = () => {
     return saved ? parseFloat(saved) : 0.35
   })
   const commandInputRef = useRef<CommandInputHandle>(null)
+  const currentPlaylistIdRef = useRef<number | null>(null)
   const navigate = useNavigate()
 
   // Redirect to login if not authenticated
@@ -90,8 +91,9 @@ export const GridGamePage: React.FC = () => {
             // Only update playlist if it's a different one (by ID)
             if (data.current_room?.ambient_playlist) {
               const newPlaylistId = data.current_room.ambient_playlist.id
-              if (!ambientPlaylist || ambientPlaylist.id !== newPlaylistId) {
+              if (currentPlaylistIdRef.current !== newPlaylistId) {
                 setAmbientPlaylist(data.current_room.ambient_playlist)
+                currentPlaylistIdRef.current = newPlaylistId
               }
             }
           }
@@ -188,8 +190,9 @@ export const GridGamePage: React.FC = () => {
         // Only update playlist if it's a different one (by ID)
         if (data.current_room?.ambient_playlist) {
           const newPlaylistId = data.current_room.ambient_playlist.id
-          if (!ambientPlaylist || ambientPlaylist.id !== newPlaylistId) {
+          if (currentPlaylistIdRef.current !== newPlaylistId) {
             setAmbientPlaylist(data.current_room.ambient_playlist)
+            currentPlaylistIdRef.current = newPlaylistId
           }
         }
       } else {
