@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GridLayout } from '~/components/layouts/GridLayout'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useActionCable, GridEvent } from '~/hooks/useActionCable'
 import { GameOutput } from '~/components/grid/GameOutput'
-import { CommandInput } from '~/components/grid/CommandInput'
+import { CommandInput, CommandInputHandle } from '~/components/grid/CommandInput'
+import { GridAmbientPlayer } from '~/components/grid/GridAmbientPlayer'
+import { ZonePlaylistData, TrackData } from '~/types/track'
 
 const WELCOME_MESSAGE = `<div style="color: #a78bfa; font-size: 0.9em;">
 ════════════════════════════════════════════════════════════════
@@ -37,6 +39,18 @@ export const GridGamePage: React.FC = () => {
   const [output, setOutput] = useState<string[]>([])
   const [currentRoomId, setCurrentRoomId] = useState<number | null>(null)
   const [executing, setExecuting] = useState(false)
+  const [ambientPlaylist, setAmbientPlaylist] = useState<ZonePlaylistData | null>(null)
+  const [currentTrack, setCurrentTrack] = useState<TrackData | null>(null)
+  const [ambientMuted, setAmbientMuted] = useState(() => {
+    const saved = localStorage.getItem('grid_ambient_muted')
+    return saved === 'true'
+  })
+  const [ambientVolume, setAmbientVolume] = useState(() => {
+    const saved = localStorage.getItem('grid_ambient_volume')
+    return saved ? parseFloat(saved) : 0.35
+  })
+  const commandInputRef = useRef<CommandInputHandle>(null)
+  const currentPlaylistIdRef = useRef<number | null>(null)
   const navigate = useNavigate()
 
   // Redirect to login if not authenticated
@@ -73,6 +87,14 @@ export const GridGamePage: React.FC = () => {
             }
             if (data.room_id) {
               setCurrentRoomId(data.room_id)
+            }
+            // Only update playlist if it's a different one (by ID)
+            if (data.current_room?.ambient_playlist) {
+              const newPlaylistId = data.current_room.ambient_playlist.id
+              if (currentPlaylistIdRef.current !== newPlaylistId) {
+                setAmbientPlaylist(data.current_room.ambient_playlist)
+                currentPlaylistIdRef.current = newPlaylistId
+              }
             }
           }
         } catch (err) {
@@ -164,6 +186,15 @@ export const GridGamePage: React.FC = () => {
           console.log(`Room changed from ${currentRoomId} to ${data.room_id}`)
           setCurrentRoomId(data.room_id)
         }
+
+        // Only update playlist if it's a different one (by ID)
+        if (data.current_room?.ambient_playlist) {
+          const newPlaylistId = data.current_room.ambient_playlist.id
+          if (currentPlaylistIdRef.current !== newPlaylistId) {
+            setAmbientPlaylist(data.current_room.ambient_playlist)
+            currentPlaylistIdRef.current = newPlaylistId
+          }
+        }
       } else {
         setOutput(prev => [...prev, '<span style="color: #f87171;">Error: Command execution failed. Please try again.</span>'])
       }
@@ -182,6 +213,11 @@ export const GridGamePage: React.FC = () => {
       navigate('/grid/login')
     }
   }
+
+  // Handle output click - focus command input
+  const handleOutputClick = useCallback(() => {
+    commandInputRef.current?.focus()
+  }, [])
 
   if (authLoading) {
     return (
@@ -209,7 +245,44 @@ export const GridGamePage: React.FC = () => {
               <a href="/root" style={{ color: '#f87171', fontSize: '0.85em', marginLeft: '5px', textDecoration: 'none' }}>[ADMIN]</a>
             )}
           </div>
-          <div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {ambientPlaylist && (
+              <div style={{ fontSize: '0.85em', color: '#888', marginRight: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#a78bfa' }}>🎵</span>
+                <span>{currentTrack?.title || ambientPlaylist.name}</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={ambientVolume * 100}
+                  onChange={(e) => {
+                    const newVolume = parseInt(e.target.value) / 100
+                    setAmbientVolume(newVolume)
+                    localStorage.setItem('grid_ambient_volume', String(newVolume))
+                  }}
+                  className="grid-volume-slider"
+                  title={`Volume: ${Math.round(ambientVolume * 100)}%`}
+                />
+                <button
+                  onClick={() => {
+                    const newMuted = !ambientMuted
+                    setAmbientMuted(newMuted)
+                    localStorage.setItem('grid_ambient_muted', String(newMuted))
+                  }}
+                  style={{
+                    background: 'transparent',
+                    color: ambientMuted ? '#666' : '#34d399',
+                    border: 'none',
+                    padding: '0 4px',
+                    fontSize: '1.1em',
+                    cursor: 'pointer'
+                  }}
+                  title={ambientMuted ? 'Unmute ambient music' : 'Mute ambient music'}
+                >
+                  {ambientMuted ? '🔇' : '🔊'}
+                </button>
+              </div>
+            )}
             <button
               onClick={handleDisconnect}
               style={{
@@ -227,9 +300,24 @@ export const GridGamePage: React.FC = () => {
           </div>
         </div>
 
-        <GameOutput output={output} />
-        <CommandInput onSubmit={handleCommand} disabled={executing} />
+        <GameOutput output={output} onOutputClick={handleOutputClick} />
+        <CommandInput ref={commandInputRef} onSubmit={handleCommand} disabled={executing} />
       </div>
+
+      <GridAmbientPlayer
+        playlist={ambientPlaylist}
+        muted={ambientMuted}
+        volume={ambientVolume}
+        onMutedChange={(muted) => {
+          setAmbientMuted(muted)
+          localStorage.setItem('grid_ambient_muted', String(muted))
+        }}
+        onVolumeChange={(volume) => {
+          setAmbientVolume(volume)
+          localStorage.setItem('grid_ambient_volume', String(volume))
+        }}
+        onTrackChange={setCurrentTrack}
+      />
     </GridLayout>
   )
 }

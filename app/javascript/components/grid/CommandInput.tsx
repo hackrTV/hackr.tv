@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, KeyboardEvent } from 'react'
+import React, { useState, useRef, useEffect, KeyboardEvent, forwardRef, useImperativeHandle } from 'react'
 import { useCommandHistory } from '~/hooks/useCommandHistory'
 
 interface CommandInputProps {
@@ -6,10 +6,21 @@ interface CommandInputProps {
   disabled?: boolean
 }
 
-export const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, disabled = false }) => {
+export interface CommandInputHandle {
+  focus: () => void
+}
+
+export const CommandInput = forwardRef<CommandInputHandle, CommandInputProps>(({ onSubmit, disabled = false }, ref) => {
   const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const { addCommand, navigateUp, navigateDown } = useCommandHistory()
+
+  // Expose focus method to parent
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus()
+    }
+  }))
 
   // Auto-focus input when it becomes enabled again after command execution
   useEffect(() => {
@@ -97,4 +108,6 @@ export const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, disabled =
       </div>
     </>
   )
-}
+})
+
+CommandInput.displayName = 'CommandInput'

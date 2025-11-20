@@ -9,6 +9,8 @@ GridHackr.destroy_all
 GridRoom.destroy_all
 GridZone.destroy_all
 GridFaction.destroy_all
+ZonePlaylistTrack.destroy_all
+ZonePlaylist.destroy_all
 
 # Create factions
 cyberpulse_faction = GridFaction.create!(
@@ -75,6 +77,83 @@ govcorp_zone = GridZone.create!(
 )
 
 puts "Created 4 zones"
+
+# Create zone playlists for ambient music
+# Find atmospheric artists and their tracks
+wavelength_zero = Artist.find_by(slug: "wavelength_zero")
+cipher_protocol = Artist.find_by(slug: "cipher_protocol")
+temporal_blue_drift = Artist.find_by(slug: "temporal_blue_drift")
+
+# Create playlists if we have the artists
+if wavelength_zero
+  resistance_playlist = ZonePlaylist.create!(
+    name: "Resistance Ambience",
+    description: "Atmospheric music for resistance zones",
+    crossfade_duration_ms: 5000,
+    default_volume: 0.35
+  )
+
+  # Add all Wavelength Zero tracks to this playlist
+  wavelength_zero.tracks.each_with_index do |track, index|
+    ZonePlaylistTrack.create!(
+      zone_playlist: resistance_playlist,
+      track: track,
+      position: index + 1
+    )
+  end
+
+  # Assign to hackr.tv zone and XERAEN base zone
+  hackr_tv_zone.update(ambient_playlist: resistance_playlist)
+  sector_x.update(ambient_playlist: resistance_playlist)
+
+  puts "Created 'Resistance Ambience' playlist with #{resistance_playlist.tracks.count} tracks"
+end
+
+if cipher_protocol
+  transit_playlist = ZonePlaylist.create!(
+    name: "Transit Network Ambience",
+    description: "Instrumental ambience for neutral zones",
+    crossfade_duration_ms: 3000,
+    default_volume: 0.30
+  )
+
+  # Add Cipher Protocol tracks
+  cipher_protocol.tracks.each_with_index do |track, index|
+    ZonePlaylistTrack.create!(
+      zone_playlist: transit_playlist,
+      track: track,
+      position: index + 1
+    )
+  end
+
+  # Assign to transit zone
+  transit_zone.update(ambient_playlist: transit_playlist)
+
+  puts "Created 'Transit Network Ambience' playlist with #{transit_playlist.tracks.count} tracks"
+end
+
+if temporal_blue_drift
+  govcorp_playlist = ZonePlaylist.create!(
+    name: "GovCorp Surveillance Ambience",
+    description: "Unsettling atmospheric music for GovCorp zones",
+    crossfade_duration_ms: 6000,
+    default_volume: 0.25
+  )
+
+  # Add Temporal Blue Drift tracks
+  temporal_blue_drift.tracks.each_with_index do |track, index|
+    ZonePlaylistTrack.create!(
+      zone_playlist: govcorp_playlist,
+      track: track,
+      position: index + 1
+    )
+  end
+
+  # Assign to GovCorp zone
+  govcorp_zone.update(ambient_playlist: govcorp_playlist)
+
+  puts "Created 'GovCorp Surveillance Ambience' playlist with #{govcorp_playlist.tracks.count} tracks"
+end
 
 # Create rooms
 hackr_tv = GridRoom.create!(

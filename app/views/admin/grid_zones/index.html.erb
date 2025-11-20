@@ -1,0 +1,71 @@
+<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/grid_zones :: MANAGE GRID ZONES</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Actions -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <!-- Zones Table -->
+      <% if @zones.any? %>
+        <div class="tui-window white-text" style="background: #0a0a0a; margin-top: 20px;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Zone Name</th>
+                <th style="text-align: left;">Slug</th>
+                <th style="text-align: left;">Type</th>
+                <th style="text-align: left;">Faction</th>
+                <th style="text-align: left;">Ambient Playlist</th>
+                <th style="text-align: center;">Rooms</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @zones.each do |zone| %>
+                <tr>
+                  <td><strong><%= zone.name %></strong></td>
+                  <td style="font-family: monospace; color: #666;">/<%= zone.slug %></td>
+                  <td><%= zone.zone_type || "—" %></td>
+                  <td><%= zone.grid_faction&.name || "—" %></td>
+                  <td>
+                    <% if zone.ambient_playlist %>
+                      <span class="purple-255-text">🎵 <%= zone.ambient_playlist.name %></span>
+                    <% else %>
+                      <span style="color: #666;">—</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;"><%= zone.grid_rooms.count %></td>
+                  <td style="text-align: center;">
+                    <%= link_to "✎ Edit", edit_admin_grid_zone_path(zone), class: "tui-button cyan-168", style: "padding: 2px 10px; margin: 0 5px; font-size: 0.9em;" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No zones yet.</p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

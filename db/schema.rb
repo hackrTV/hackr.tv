@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_17_224740) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_19_164923) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -128,16 +128,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_224740) do
   end
 
   create_table "grid_rooms", force: :cascade do |t|
+    t.integer "ambient_playlist_id"
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_zone_id", null: false
     t.string "name"
     t.string "room_type"
     t.datetime "updated_at", null: false
+    t.index ["ambient_playlist_id"], name: "index_grid_rooms_on_ambient_playlist_id"
     t.index ["grid_zone_id"], name: "index_grid_rooms_on_grid_zone_id"
   end
 
   create_table "grid_zones", force: :cascade do |t|
+    t.integer "ambient_playlist_id"
     t.string "color_scheme"
     t.datetime "created_at", null: false
     t.text "description"
@@ -146,6 +149,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_224740) do
     t.string "slug"
     t.datetime "updated_at", null: false
     t.string "zone_type"
+    t.index ["ambient_playlist_id"], name: "index_grid_zones_on_ambient_playlist_id"
   end
 
   create_table "hackr_logs", force: :cascade do |t|
@@ -229,6 +233,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_224740) do
     t.boolean "featured", default: false
     t.text "lyrics"
     t.date "release_date"
+    t.boolean "show_in_pulse_vault", default: true, null: false
     t.string "slug"
     t.text "streaming_links"
     t.string "title"
@@ -242,9 +247,31 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_224740) do
     t.index ["release_date"], name: "index_tracks_on_release_date"
   end
 
+  create_table "zone_playlist_tracks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "position", null: false
+    t.integer "track_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "zone_playlist_id", null: false
+    t.index ["track_id"], name: "index_zone_playlist_tracks_on_track_id"
+    t.index ["zone_playlist_id", "track_id"], name: "index_zone_playlist_tracks_on_playlist_and_track", unique: true
+    t.index ["zone_playlist_id"], name: "index_zone_playlist_tracks_on_zone_playlist_id"
+  end
+
+  create_table "zone_playlists", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "crossfade_duration_ms", default: 5000, null: false
+    t.decimal "default_volume", precision: 3, scale: 2, default: "0.35", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "albums", "artists"
+  add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
+  add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_logs", "grid_hackrs", column: "author_id"
   add_foreign_key "playlist_tracks", "playlists"
   add_foreign_key "playlist_tracks", "tracks"
@@ -253,4 +280,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_224740) do
   add_foreign_key "radio_station_playlists", "radio_stations"
   add_foreign_key "tracks", "albums"
   add_foreign_key "tracks", "artists"
+  add_foreign_key "zone_playlist_tracks", "tracks"
+  add_foreign_key "zone_playlist_tracks", "zone_playlists"
 end

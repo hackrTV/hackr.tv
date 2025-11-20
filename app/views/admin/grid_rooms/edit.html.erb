@@ -1,0 +1,70 @@
+<div class="tui-window cyan-168 white-text" style="max-width: 900px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/grid_rooms/<%= @room.id %> :: EDIT ROOM</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Room Info -->
+      <div class="tui-window white-text" style="background: #0a0a0a; margin-bottom: 20px; padding: 20px;">
+        <h3 class="cyan-255-text" style="margin-top: 0;">ROOM INFO</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+          <div>
+            <p style="color: #888; margin-bottom: 5px;">NAME</p>
+            <p><%= @room.name %></p>
+          </div>
+          <div>
+            <p style="color: #888; margin-bottom: 5px;">ZONE</p>
+            <p class="cyan-255-text"><%= @room.grid_zone.name %></p>
+          </div>
+          <div>
+            <p style="color: #888; margin-bottom: 5px;">TYPE</p>
+            <p><%= @room.room_type || "—" %></p>
+          </div>
+          <div>
+            <p style="color: #888; margin-bottom: 5px;">ZONE'S PLAYLIST</p>
+            <% if @room.grid_zone.ambient_playlist %>
+              <p class="cyan-255-text">🎵 <%= @room.grid_zone.ambient_playlist.name %></p>
+            <% else %>
+              <p style="color: #666;">None</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Form -->
+      <%= form_with model: [:admin, @room], local: true do |f| %>
+        <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: ROOM AMBIENT PLAYLIST (OVERRIDE) ::]</h3>
+
+        <div style="margin-bottom: 20px;">
+          <%= f.label :ambient_playlist_id, "AMBIENT PLAYLIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.select :ambient_playlist_id,
+              options_from_collection_for_select(@zone_playlists, :id, :name, @room.ambient_playlist_id),
+              { include_blank: "None (use zone's playlist)" },
+              class: "tui-input", style: "width: 100%;" %>
+          <small style="color: #888;">
+            If set, this playlist will override the zone's playlist for this specific room.
+            <% if @room.grid_zone.ambient_playlist %>
+              <br>
+              Currently, this room uses the zone's playlist: <span class="cyan-255-text"><%= @room.grid_zone.ambient_playlist.name %></span>
+            <% else %>
+              <br>
+              The zone has no playlist, so this room will have no ambient music unless you assign one here.
+            <% end %>
+          </small>
+        </div>
+
+        <div class="center" style="margin: 30px 0;">
+          <%= f.submit "Update Room", class: "tui-button purple-168", style: "font-size: 1.1em; padding: 10px 30px;" %>
+          <%= link_to "Cancel", admin_grid_rooms_path, class: "tui-button green-168", style: "font-size: 1.1em; padding: 10px 30px; margin-left: 10px;" %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

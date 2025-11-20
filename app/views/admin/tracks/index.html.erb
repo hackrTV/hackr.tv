@@ -56,6 +56,7 @@
                 <th style="text-align: left;">Album</th>
                 <th style="text-align: center;">Featured</th>
                 <th style="text-align: center;">Audio</th>
+                <th style="text-align: center;">Pulse Vault</th>
                 <th style="text-align: center;">Actions</th>
               </tr>
             </thead>
@@ -84,6 +85,13 @@
                       <span class="green-255-text">✓</span>
                     <% else %>
                       <span style="color: #666;">✗</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if track.show_in_pulse_vault %>
+                      <span class="green-255-text">✓</span>
+                    <% else %>
+                      <span style="color: #f87171;">✗</span>
                     <% end %>
                   </td>
                   <td style="text-align: center;">

@@ -101,6 +101,15 @@ Rails.application.routes.draw do
         post :reorder_playlists
       end
     end
+    resources :zone_playlists do
+      member do
+        post :add_track
+        delete "remove_track/:track_id", action: :remove_track, as: :remove_track
+        patch :reorder_tracks
+      end
+    end
+    resources :grid_zones, only: [:index, :edit, :update]
+    resources :grid_rooms, only: [:index, :edit, :update]
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
   end

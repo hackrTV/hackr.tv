@@ -11,6 +11,15 @@ export interface StationContext {
   name: string;
 }
 
+export interface ZonePlaylistData {
+  id: number;
+  name: string;
+  description: string | null;
+  crossfade_duration_ms: number;
+  default_volume: number;
+  tracks: TrackData[];
+}
+
 export interface AudioPlayerAPI {
   loadTrack: (track: TrackData) => void;
   togglePlayPause: () => void;
