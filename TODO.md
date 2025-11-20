@@ -1,0 +1,100 @@
+# TODO
+
+**Last Updated:** 2025-11-20
+
+This file tracks planned features, enhancements, and tasks for hackr.tv. Items move from this list to the "Completed" section in CLAUDE.md once implemented.
+
+## High Priority
+
+### The Codex - Future Enhancements
+
+- [ ] **Global inline linking** - Enable `[[Entry Name]]` syntax anywhere in the app (artist bios, track descriptions, logs, Grid room descriptions) to auto-link to Codex entries
+- [ ] **Reverse references** - Show "Referenced in" section on Codex entries listing all places that link to them
+- [ ] **Inline tooltips** - Hover over Codex links to see entry summary in a tooltip
+- [ ] **More entries** - Expand to cover all bands, Grid locations, key items, and timeline events
+
+### Content & Media
+
+- [ ] Upload audio files for all 66 tracks (currently only 2 albums have audio)
+- [ ] Add cover images for all 14 albums (currently only 2 albums have covers)
+- [ ] Manually review and polish all band profile bios
+- [ ] Create missing routes/views: `/streamz`, `/vidz`, `/xeraen/vidz`, `/xeraen/albums/xordium`
+
+## Medium Priority
+
+### THE PULSE GRID - Game Features
+
+- [ ] **Synthia frequency tuning** - Interactive audio puzzle system
+- [ ] **Faction reputation system** - Track player standing with The Resistance, GovCorp, and other factions
+- [ ] **Mission/quest system** - Structured objectives and storylines
+- [ ] **Hacking system** - Mini-games for breaking into systems
+- [ ] **Combat system** - Turn-based or real-time combat mechanics
+- [ ] **World expansion** - Add more zones, rooms, NPCs, and items
+- [ ] **Persistent progression** - Save player state, inventory, and achievements
+
+### Band Profiles
+
+- [ ] Expand band profile pages for remaining artists (currently 4 of 13 have custom profiles)
+- [ ] Add more lore and backstory to existing band profiles
+- [ ] Create artist-specific album showcase pages
+
+## Long-term / Ideas
+
+### PulseWire - In-World Social Network
+
+**Status:** Planned (detailed spec in CLAUDE.md)
+
+A micro-broadcast social network for GridHackr users functioning like Twitter/X within THE.CYBERPUL.SE universe.
+
+**Core Features:**
+- [ ] Pulse model (256 char posts)
+- [ ] Echo system (rebroadcasts)
+- [ ] Splice threading (replies)
+- [ ] Hotwire timeline (global feed)
+- [ ] Real-time updates via Action Cable
+- [ ] SignalDrop moderation system
+- [ ] User pulse history pages
+
+**Implementation Steps:**
+1. [ ] Generate models/migrations (Pulse, Echo)
+2. [ ] Model validations + associations + tests
+3. [ ] Admin CRUD (Root::PulseWireController)
+4. [ ] API endpoints (PulsesController, EchoesController)
+5. [ ] Action Cable setup (PulseWireChannel)
+6. [ ] React components (HotwirePage, PulseComposer, PulseCard, ThreadView, EchoButton)
+7. [ ] Real-time subscription hookup
+8. [ ] TUI styling with glitch effects
+9. [ ] Seed sample pulses
+10. [ ] Tests (model, controller, component)
+
+### Future PulseWire Enhancements
+
+- [ ] User follows/followers
+- [ ] Filtered feeds (following only)
+- [ ] @mentions with notifications
+- [ ] Hashtag/topic tracking
+- [ ] Media attachments (micro-audio, micro-vids)
+- [ ] Encrypted pulses (PRISM-resistant)
+- [ ] Pulse search
+- [ ] Trending threads
+- [ ] User blocking/muting
+
+### Other Ideas
+
+- [ ] Live streaming integration for concerts/events
+- [ ] Merch store integration
+- [ ] Fan artwork gallery
+- [ ] Community forums or discussion boards
+- [ ] Achievement/badge system for Grid hackrs
+- [ ] Mobile apps (iOS/Android)
+- [ ] API for third-party integrations
+
+## Completed
+
+See CLAUDE.md "Development Roadmap - ✅ Completed" section for full implementation history.
+
+**Recent completions:**
+- [x] The Codex wiki (2025-11-20)
+- [x] Playlists feature (2025-11-16)
+- [x] React SPA migration (2025-11-16)
+- [x] THE PULSE GRID colorful output (2025-11-19)
