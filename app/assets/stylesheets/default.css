@@ -59,3 +59,56 @@
 .pt-5 {
   padding-top: 5px;
 }
+
+/* Grid Ambient Volume Slider */
+.grid-volume-slider {
+  width: 80px;
+  height: 4px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  outline: none;
+}
+
+.grid-volume-slider::-webkit-slider-track {
+  width: 100%;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+}
+
+.grid-volume-slider::-moz-range-track {
+  width: 100%;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+}
+
+.grid-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #666;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.grid-volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #666;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.grid-volume-slider:hover::-webkit-slider-thumb {
+  background: #888;
+}
+
+.grid-volume-slider:hover::-moz-range-thumb {
+  background: #888;
+}

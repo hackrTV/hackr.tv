@@ -9,7 +9,7 @@ module Api
         @tracks = artist.tracks.includes(:album).order("albums.release_date DESC NULLS LAST, tracks.track_number ASC").joins(:album)
       else
         # Get all tracks with Pulse Vault ordering
-        @tracks = Track.includes(:artist, :album).order(
+        @tracks = Track.visible_in_pulse_vault.includes(:artist, :album).order(
           Arel.sql(<<-SQL.squish
             CASE
               WHEN artists.name = 'The.CyberPul.se' THEN 0

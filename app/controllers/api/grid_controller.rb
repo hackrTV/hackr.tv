@@ -150,10 +150,33 @@ class Api::GridController < ApplicationController
   end
 
   def room_json(room)
+    # Get ambient playlist - room's playlist overrides zone's playlist
+    ambient_playlist = room.ambient_playlist || room.grid_zone.ambient_playlist
+
     {
       id: room.id,
       name: room.name,
-      description: room.description
+      description: room.description,
+      ambient_playlist: ambient_playlist ? playlist_json(ambient_playlist) : nil
+    }
+  end
+
+  def playlist_json(playlist)
+    {
+      id: playlist.id,
+      name: playlist.name,
+      description: playlist.description,
+      crossfade_duration_ms: playlist.crossfade_duration_ms,
+      default_volume: playlist.default_volume.to_f,
+      tracks: playlist.ordered_tracks.includes(:artist, album: :cover_image_attachment).map do |track|
+        {
+          id: track.id.to_s,
+          title: track.title,
+          artist: track.artist.name,
+          url: track.audio_file.attached? ? url_for(track.audio_file) : nil,
+          coverUrl: track.album&.cover_image&.attached? ? url_for(track.album.cover_image) : ""
+        }
+      end
     }
   end
 end

@@ -78,7 +78,15 @@
     <label class="white-text" style="display: flex; align-items: center; gap: 10px;">
       <%= f.check_box :featured, style: "width: auto;" %>
       <span style="font-weight: bold;">FEATURED TRACK</span>
-      <span style="color: #888;">(appears first in listings with ★)</span>
+      <span style="color: #ccc;">(appears first in listings with ★)</span>
+    </label>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label class="white-text" style="display: flex; align-items: center; gap: 10px;">
+      <%= f.check_box :show_in_pulse_vault, style: "width: auto;" %>
+      <span style="font-weight: bold;">SHOW IN PULSE VAULT</span>
+      <span style="color: #ccc;">(uncheck to hide event/OST tracks until ready)</span>
     </label>
   </div>
 

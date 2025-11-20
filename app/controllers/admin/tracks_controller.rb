@@ -83,6 +83,7 @@ class Admin::TracksController < Admin::ApplicationController
       :track_number,
       :release_date,
       :featured,
+      :show_in_pulse_vault,
       :duration,
       :cover_image,
       :lyrics,

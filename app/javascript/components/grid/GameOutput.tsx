@@ -2,9 +2,10 @@ import React, { useRef, useEffect } from 'react'
 
 interface GameOutputProps {
   output: string[]
+  onOutputClick?: () => void
 }
 
-export const GameOutput: React.FC<GameOutputProps> = ({ output }) => {
+export const GameOutput: React.FC<GameOutputProps> = ({ output, onOutputClick }) => {
   const outputRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom when new output is added
@@ -18,7 +19,9 @@ export const GameOutput: React.FC<GameOutputProps> = ({ output }) => {
     <div
       ref={outputRef}
       id="game-output"
+      onClick={onOutputClick}
       style={{
+        cursor: onOutputClick ? 'text' : 'default',
         fontFamily: 'monospace',
         fontSize: '0.75em',
         lineHeight: '1.2',

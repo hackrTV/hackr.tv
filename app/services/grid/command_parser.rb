@@ -68,7 +68,8 @@ module Grid
       return "<span style='color: #f87171;'>You are nowhere. This shouldn't happen!</span>" unless room
 
       output = []
-      output << "\n<span style='color: #22d3ee; font-weight: bold;'>#{room.name.upcase}</span>"
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output << "<span style='color: #22d3ee; font-weight: bold;'>#{room.name.upcase}</span> <span style='color: #666;'>::</span> <span style='color: #fbbf24;'>#{room.grid_zone.name}</span>"
       output << "<span style='color: #9ca3af;'>[#{room.color_scheme}]</span>" if room.color_scheme
       output << ""
       output << "<span style='color: #d0d0d0;'>#{room.description}</span>" if room.description
@@ -241,15 +242,15 @@ module Grid
       return "<span style='color: #9ca3af;'>#{mob.name} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
       dialogue = mob.dialogue_tree
-      output = []
-      output << "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{dialogue["greeting"]}\"</span>"
+      content = []
+      content << "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{dialogue["greeting"]}\"</span>"
 
       if dialogue["topics"].present? && dialogue["topics"].any?
-        output << ""
-        output << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{dialogue["topics"].keys.join(", ")}</span>"
+        content << ""
+        content << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{dialogue["topics"].keys.join(", ")}</span>"
       end
 
-      output.join("\n")
+      dialogue_box(content.join("\n"))
     end
 
     def ask_command(args)
@@ -283,10 +284,12 @@ module Grid
       response = topics[topic] || topics[topic.downcase] || topics.find { |k, v| k.downcase == topic.downcase }&.last
 
       if response
-        "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{response}\"</span>"
+        content = "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{response}\"</span>"
+        dialogue_box(content)
       else
         available = topics.keys.join(", ")
-        "<span style='color: #c084fc;'>#{mob.name}</span> doesn't know about '#{topic}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
+        content = "<span style='color: #c084fc;'>#{mob.name}</span> doesn't know about '#{topic}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
+        dialogue_box(content)
       end
     end
 
@@ -335,6 +338,12 @@ module Grid
         output: "",
         event: {type: "clear"}
       }
+    end
+
+    def dialogue_box(content)
+      # Create a thin-bordered box around dialogue content
+      # Add blank line before box, strip content to avoid blank lines inside
+      "\n<div style='border: 1px solid #666; padding: 10px; margin: 5px 0; background: #0d0d0d;'>#{content.strip}</div>"
     end
   end
 end
