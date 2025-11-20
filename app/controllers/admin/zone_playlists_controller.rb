@@ -80,7 +80,7 @@ class Admin::ZonePlaylistsController < Admin::ApplicationController
 
     positions.each do |track_id, position|
       zone_playlist_track = @zone_playlist.zone_playlist_tracks.find_by(track_id: track_id)
-      zone_playlist_track.update(position: position.to_i) if zone_playlist_track
+      zone_playlist_track&.update(position: position.to_i)
     end
 
     respond_to do |format|

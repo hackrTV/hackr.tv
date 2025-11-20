@@ -285,12 +285,11 @@ module Grid
 
       if response
         content = "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{response}\"</span>"
-        dialogue_box(content)
       else
         available = topics.keys.join(", ")
         content = "<span style='color: #c084fc;'>#{mob.name}</span> doesn't know about '#{topic}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
-        dialogue_box(content)
       end
+      dialogue_box(content)
     end
 
     def help_command
