@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
@@ -26,7 +26,6 @@ const ENTRY_TYPE_ICONS: Record<string, string> = {
 
 export const CodexIndexPage: React.FC = () => {
   const [entries, setEntries] = useState<CodexEntrySummary[]>([])
-  const [filteredEntries, setFilteredEntries] = useState<CodexEntrySummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedType, setSelectedType] = useState<string>('all')
@@ -37,7 +36,6 @@ export const CodexIndexPage: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         setEntries(data)
-        setFilteredEntries(data)
         setLoading(false)
       })
       .catch(err => {
@@ -47,7 +45,7 @@ export const CodexIndexPage: React.FC = () => {
       })
   }, [])
 
-  useEffect(() => {
+  const filteredEntries = useMemo(() => {
     let filtered = entries
 
     // Filter by type
@@ -64,7 +62,7 @@ export const CodexIndexPage: React.FC = () => {
       )
     }
 
-    setFilteredEntries(filtered)
+    return filtered
   }, [entries, selectedType, searchQuery])
 
   if (loading) {

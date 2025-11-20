@@ -45,8 +45,7 @@ export const CodexEntryPage: React.FC = () => {
   useEffect(() => {
     if (!slug) return
 
-    setLoading(true)
-    setError(null)
+    let isMounted = true
 
     fetch(`/api/codex/${slug}`)
       .then(res => {
@@ -56,14 +55,22 @@ export const CodexEntryPage: React.FC = () => {
         return res.json()
       })
       .then(data => {
-        setEntry(data)
-        setLoading(false)
+        if (isMounted) {
+          setEntry(data)
+          setLoading(false)
+        }
       })
       .catch(err => {
-        console.error('Failed to load codex entry:', err)
-        setError(err.message || 'Failed to load codex entry')
-        setLoading(false)
+        if (isMounted) {
+          console.error('Failed to load codex entry:', err)
+          setError(err.message || 'Failed to load codex entry')
+          setLoading(false)
+        }
       })
+
+    return () => {
+      isMounted = false
+    }
   }, [slug])
 
   if (loading) {
@@ -202,11 +209,11 @@ export const CodexEntryPage: React.FC = () => {
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeSanitize]}
                     components={{
-                      h1: ({node, ...props}) => <h1 style={{ color: typeColor, marginTop: '30px', marginBottom: '15px', fontSize: '1.8em' }} {...props} />,
-                      h2: ({node, ...props}) => <h2 style={{ color: typeColor, marginTop: '25px', marginBottom: '12px', fontSize: '1.5em' }} {...props} />,
-                      h3: ({node, ...props}) => <h3 style={{ color: typeColor, marginTop: '20px', marginBottom: '10px', fontSize: '1.3em' }} {...props} />,
-                      p: ({node, ...props}) => <p style={{ marginBottom: '15px' }} {...props} />,
-                      a: ({node, ...props}) => (
+                      h1: ({ _node, ...props }) => <h1 style={{ color: typeColor, marginTop: '30px', marginBottom: '15px', fontSize: '1.8em' }} {...props} />,
+                      h2: ({ _node, ...props }) => <h2 style={{ color: typeColor, marginTop: '25px', marginBottom: '12px', fontSize: '1.5em' }} {...props} />,
+                      h3: ({ _node, ...props }) => <h3 style={{ color: typeColor, marginTop: '20px', marginBottom: '10px', fontSize: '1.3em' }} {...props} />,
+                      p: ({ _node, ...props }) => <p style={{ marginBottom: '15px' }} {...props} />,
+                      a: ({ _node, ...props }) => (
                         <a
                           style={{
                             color: '#60a5fa',
@@ -219,11 +226,11 @@ export const CodexEntryPage: React.FC = () => {
                           {...props}
                         />
                       ),
-                      ul: ({node, ...props}) => <ul style={{ marginLeft: '20px', marginBottom: '15px' }} {...props} />,
-                      ol: ({node, ...props}) => <ol style={{ marginLeft: '20px', marginBottom: '15px' }} {...props} />,
-                      li: ({node, ...props}) => <li style={{ marginBottom: '8px' }} {...props} />,
-                      strong: ({node, ...props}) => <strong style={{ color: '#fff' }} {...props} />,
-                      code: ({node, ...props}) => (
+                      ul: ({ _node, ...props }) => <ul style={{ marginLeft: '20px', marginBottom: '15px' }} {...props} />,
+                      ol: ({ _node, ...props }) => <ol style={{ marginLeft: '20px', marginBottom: '15px' }} {...props} />,
+                      li: ({ _node, ...props }) => <li style={{ marginBottom: '8px' }} {...props} />,
+                      strong: ({ _node, ...props }) => <strong style={{ color: '#fff' }} {...props} />,
+                      code: ({ _node, ...props }) => (
                         <code
                           style={{
                             background: '#0a0a0a',
@@ -236,7 +243,7 @@ export const CodexEntryPage: React.FC = () => {
                           {...props}
                         />
                       ),
-                      pre: ({node, ...props}) => (
+                      pre: ({ _node, ...props }) => (
                         <pre
                           style={{
                             background: '#0a0a0a',
