@@ -3,7 +3,6 @@ import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
 
-
 const XeraenPage: React.FC = () => {
   return (
     <DefaultLayout>
