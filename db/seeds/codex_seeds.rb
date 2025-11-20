@@ -9,7 +9,7 @@ def seed_codex_entry(attributes)
   entry.assign_attributes(attributes)
   if entry.changed?
     entry.save!
-    puts "  ✓ #{entry.published ? 'Published' : 'Draft'}: #{entry.name} (#{entry.entry_type})"
+    puts "  ✓ #{entry.published ? "Published" : "Draft"}: #{entry.name} (#{entry.entry_type})"
   else
     puts "  - Exists: #{entry.name} (#{entry.entry_type})"
   end

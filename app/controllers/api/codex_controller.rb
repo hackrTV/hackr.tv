@@ -47,7 +47,7 @@ module Api
         updated_at: @entry.updated_at
       }
     rescue ActiveRecord::RecordNotFound
-      render json: { error: "Codex entry not found" }, status: :not_found
+      render json: {error: "Codex entry not found"}, status: :not_found
     end
   end
 end

@@ -3,7 +3,7 @@ class CodexEntry < ApplicationRecord
 
   # Validations
   validates :name, presence: true
-  validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9\-]+\z/, message: "must be lowercase alphanumeric with hyphens"}
+  validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/, message: "must be lowercase alphanumeric with hyphens"}
   validates :entry_type, presence: true, inclusion: {in: ENTRY_TYPES}
   validates :position, numericality: {only_integer: true, greater_than_or_equal_to: 0}, allow_nil: true
 
@@ -23,6 +23,6 @@ class CodexEntry < ApplicationRecord
   private
 
   def generate_slug
-    self.slug = name.downcase.gsub(/[^a-z0-9\s\-]/, "").gsub(/\s+/, "-").squeeze("-").strip
+    self.slug = name.downcase.gsub(/[^a-z0-9\s-]/, "").gsub(/\s+/, "-").squeeze("-").strip
   end
 end
