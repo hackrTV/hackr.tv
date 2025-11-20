@@ -1,6 +1,8 @@
 import React from 'react'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
+import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
+
 
 const XeraenPage: React.FC = () => {
   return (
@@ -9,14 +11,7 @@ const XeraenPage: React.FC = () => {
         <fieldset className="tui-fieldset">
           <legend>Latest Release!</legend>
           <div>
-            <iframe
-              style={{ border: 0, width: '350px', height: '442px' }}
-              src="https://bandcamp.com/EmbeddedPlayer/track=331007821/size=large/bgcol=333333/linkcol=9a64ff/tracklist=false/transparent=true/"
-              seamless
-              title="XERAEN - Encrypted Shroud on Bandcamp"
-            >
-              <a href="https://xeraen.bandcamp.com/track/encrypted-shroud">Encrypted Shroud by ＸＥＲＡＥＮ</a>
-            </iframe>
+            <EmbeddedTrack trackId="encrypted-shroud" />
           </div>
         </fieldset>
       </div>
