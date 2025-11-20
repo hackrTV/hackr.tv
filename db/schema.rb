@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_19_164923) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_20_153243) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -59,6 +59,22 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_19_164923) do
     t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_artists_on_slug", unique: true
+  end
+
+  create_table "codex_entries", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.string "entry_type", null: false
+    t.json "metadata", default: {}
+    t.string "name", null: false
+    t.integer "position"
+    t.boolean "published", default: false, null: false
+    t.string "slug", null: false
+    t.text "summary"
+    t.datetime "updated_at", null: false
+    t.index ["entry_type"], name: "index_codex_entries_on_entry_type"
+    t.index ["published"], name: "index_codex_entries_on_published"
+    t.index ["slug"], name: "index_codex_entries_on_slug", unique: true
   end
 
   create_table "grid_exits", force: :cascade do |t|

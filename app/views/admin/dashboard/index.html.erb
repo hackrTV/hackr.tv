@@ -42,6 +42,15 @@
           </fieldset>
         </div>
 
+        <div class="tui-window purple-168 white-text">
+          <fieldset class="purple-168-border">
+            <legend>Codex Entries</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:codex_entries_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+
         <div class="tui-window green-168 white-text">
           <fieldset class="green-168-border">
             <legend>Online Hackrs</legend>
@@ -58,6 +67,7 @@
         <%= link_to "➕ New Artist", new_admin_artist_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "🎵 New Track", new_admin_track_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "📝 New Log", new_admin_hackr_log_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "📖 Codex", admin_codex_entries_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "📻 Radio Stations", admin_radio_stations_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "🎶 Zone Playlists", admin_zone_playlists_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "🗺️ Grid Zones", admin_grid_zones_path, class: "tui-button yellow-168", style: "padding: 10px 20px;" %>

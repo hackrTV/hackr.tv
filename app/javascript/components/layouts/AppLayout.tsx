@@ -23,6 +23,8 @@ const GridLoginPage = lazy(() => import('~/components/pages/grid/GridLoginPage')
 const GridRegisterPage = lazy(() => import('~/components/pages/grid/GridRegisterPage').then(m => ({ default: m.GridRegisterPage })))
 const LogsIndexPage = lazy(() => import('~/components/pages/logs/LogsIndexPage').then(m => ({ default: m.LogsIndexPage })))
 const LogDetailPage = lazy(() => import('~/components/pages/logs/LogDetailPage').then(m => ({ default: m.LogDetailPage })))
+const CodexIndexPage = lazy(() => import('~/components/pages/codex/CodexIndexPage').then(m => ({ default: m.CodexIndexPage })))
+const CodexEntryPage = lazy(() => import('~/components/pages/codex/CodexEntryPage').then(m => ({ default: m.CodexEntryPage })))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 // Auth components
@@ -76,6 +78,9 @@ export const AppLayout: React.FC = () => {
         {/* Hackr Logs routes */}
         <Route path="/logs" element={<LogsIndexPage />} />
         <Route path="/logs/:slug" element={<LogDetailPage />} />
+        {/* Codex routes */}
+        <Route path="/codex" element={<CodexIndexPage />} />
+        <Route path="/codex/:slug" element={<CodexEntryPage />} />
         {/* 404 catch-all - must be last */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
