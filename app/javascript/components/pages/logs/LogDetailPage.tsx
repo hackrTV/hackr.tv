@@ -6,6 +6,8 @@ import remarkGfm from 'remark-gfm'
 import rehypeSanitize from 'rehype-sanitize'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import { transformMarkdownLinks } from '~/utils/codexLinks'
+import { useCodexMappings } from '~/hooks/useCodexMappings'
 
 interface HackrLog {
   id: number
@@ -43,6 +45,7 @@ const formatFutureDate = (dateStr: string, includeTime: boolean = false): string
 export const LogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const { hackr } = useGridAuth()
+  const { mappings } = useCodexMappings()
   const [log, setLog] = useState<HackrLog | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -120,7 +123,7 @@ export const LogDetailPage: React.FC = () => {
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeSanitize]}
             >
-              {log.body}
+              {transformMarkdownLinks(log.body, mappings)}
             </ReactMarkdown>
           </div>
         </div>

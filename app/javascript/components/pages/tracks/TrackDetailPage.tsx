@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation, Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeSanitize from 'rehype-sanitize'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
+import { transformMarkdownLinks } from '~/utils/codexLinks'
+import { useCodexMappings } from '~/hooks/useCodexMappings'
 
 interface Album {
   id: number
@@ -41,6 +46,7 @@ const TrackDetailPage: React.FC = () => {
   const location = useLocation()
   const [track, setTrack] = useState<Track | null>(null)
   const [loading, setLoading] = useState(true)
+  const { mappings } = useCodexMappings()
 
   // Extract artist slug and track slug from pathname
   // e.g., /xeraen/trackz/encrypted-shroud -> artistSlug: xeraen, trackSlug: encrypted-shroud
@@ -189,7 +195,29 @@ const TrackDetailPage: React.FC = () => {
             <>
               <br />
               <p><strong>Lyrics:</strong></p>
-              <pre className="white-168-text">{track.lyrics}</pre>
+              <div className="white-168-text" style={{
+                whiteSpace: 'pre-wrap',
+                fontFamily: 'monospace',
+                lineHeight: '1.6'
+              }}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeSanitize]}
+                  components={{
+                    a: ({ _node, ...props }) => (
+                      <a
+                        style={{
+                          color: '#60a5fa',
+                          textDecoration: 'underline'
+                        }}
+                        {...props}
+                      />
+                    )
+                  }}
+                >
+                  {transformMarkdownLinks(track.lyrics, mappings)}
+                </ReactMarkdown>
+              </div>
             </>
           )}
 

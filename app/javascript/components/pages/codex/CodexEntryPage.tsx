@@ -6,6 +6,8 @@ import rehypeSanitize from 'rehype-sanitize'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { CodexEntry } from '~/types/codex'
+import { transformMarkdownLinks } from '~/utils/codexLinks'
+import { useCodexMappings } from '~/hooks/useCodexMappings'
 
 const ENTRY_TYPE_COLORS: Record<string, string> = {
   person: '#a78bfa',
@@ -27,20 +29,12 @@ const ENTRY_TYPE_ICONS: Record<string, string> = {
   item: '📦'
 }
 
-// Custom component to handle [[Entry Name]] links
-const transformMarkdown = (content: string): string => {
-  // Convert [[Entry Name]] to [Entry Name](/codex/entry-name)
-  return content.replace(/\[\[([^\]]+)\]\]/g, (match, name) => {
-    const slug = name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')
-    return `[${name}](/codex/${slug})`
-  })
-}
-
 export const CodexEntryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const [entry, setEntry] = useState<CodexEntry | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { mappings } = useCodexMappings()
 
   useEffect(() => {
     if (!slug) return
@@ -258,7 +252,7 @@ export const CodexEntryPage: React.FC = () => {
                       )
                     }}
                   >
-                    {transformMarkdown(entry.content)}
+                    {transformMarkdownLinks(entry.content, mappings)}
                   </ReactMarkdown>
                 </div>
               )}

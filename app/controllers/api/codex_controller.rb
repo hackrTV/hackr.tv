@@ -1,5 +1,17 @@
 module Api
   class CodexController < ApplicationController
+    # GET /api/codex/mappings
+    # Returns a simple slug->name mapping for all published entries
+    # Used for canonical name lookups in wiki-style links
+    def mappings
+      entries = CodexEntry.published.select(:slug, :name)
+      mapping = entries.each_with_object({}) do |entry, hash|
+        hash[entry.slug] = entry.name
+      end
+
+      render json: mapping
+    end
+
     # GET /api/codex
     # Returns all published codex entries with optional type filtering
     def index

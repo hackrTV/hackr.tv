@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeSanitize from 'rehype-sanitize'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { Playlist } from '~/types/playlist'
 import type { TrackData } from '~/types/track'
+import { transformMarkdownLinks } from '~/utils/codexLinks'
+import { useCodexMappings } from '~/hooks/useCodexMappings'
 
 export const SharedPlaylistPage: React.FC = () => {
   const { token } = useParams<{ token: string }>()
+  const { mappings } = useCodexMappings()
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -117,7 +123,20 @@ export const SharedPlaylistPage: React.FC = () => {
                 {playlist.name}
               </h1>
               {playlist.description && (
-                <p style={{ color: '#aaa', margin: '0 0 15px 0' }}>{playlist.description}</p>
+                <div style={{ color: '#aaa', margin: '0 0 15px 0' }}>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeSanitize]}
+                    components={{
+                      a: ({ _node, ...props }) => (
+                        <a style={{ color: '#60a5fa', textDecoration: 'underline' }} {...props} />
+                      ),
+                      p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />
+                    }}
+                  >
+                    {transformMarkdownLinks(playlist.description, mappings)}
+                  </ReactMarkdown>
+                </div>
               )}
               <div style={{ color: '#666', fontSize: '0.9em', marginBottom: '20px' }}>
                 {playlist.track_count} {playlist.track_count === 1 ? 'track' : 'tracks'}
