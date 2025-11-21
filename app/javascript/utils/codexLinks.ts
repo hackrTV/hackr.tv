@@ -1,0 +1,137 @@
+/**
+ * Codex Entry Auto-Linking Utilities
+ *
+ * Enables [[Entry Name]] wiki-style syntax to auto-link to Codex entries
+ * throughout the application. Works in markdown content, plain text, and HTML.
+ *
+ * When mappings are provided, links always display the canonical entry name
+ * from the database (e.g., [[xeraen]], [[the-pulse-grid]], [[XERAEN]] will all
+ * display as "XERAEN" and "The Pulse Grid" respectively).
+ */
+
+/**
+ * Codex slug->name mapping type
+ * e.g., { "xeraen": "XERAEN", "the-pulse-grid": "The Pulse Grid" }
+ */
+export type CodexMappings = Record<string, string>
+
+/**
+ * Generates a slug from an entry name using the same algorithm as CodexEntry model
+ *
+ * @param name - The entry name to convert to a slug
+ * @returns URL-safe slug (lowercase, alphanumeric + hyphens only)
+ *
+ * @example
+ * generateSlug("The Fracture Network") // => "the-fracture-network"
+ * generateSlug("XERAEN") // => "xeraen"
+ * generateSlug("[[Entry Name]]") // => "entry-name"
+ */
+export const generateSlug = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove non-alphanumeric (except spaces/hyphens)
+    .replace(/\s+/g, '-')          // Replace spaces with hyphens
+    .replace(/-+/g, '-')           // Squeeze multiple hyphens
+    .replace(/^-|-$/g, '')        // Strip leading/trailing hyphens
+}
+
+/**
+ * Transforms [[Entry Name]] syntax in markdown to standard markdown links
+ *
+ * Converts: [[Entry Name]] → [Canonical Name](/codex/entry-name)
+ * When mappings are provided, always displays the canonical entry name from the database.
+ * Use this for content that will be processed by ReactMarkdown or other markdown parsers.
+ *
+ * @param content - Markdown content containing [[Entry Name]] syntax
+ * @param mappings - Optional slug->name mapping for canonical names
+ * @returns Markdown with wiki-style links converted to standard link syntax
+ *
+ * @example
+ * // Without mappings (displays typed text)
+ * transformMarkdownLinks("Read about [[xeraen]]")
+ * // => "Read about [xeraen](/codex/xeraen)"
+ *
+ * // With mappings (displays canonical name)
+ * const mappings = { "xeraen": "XERAEN", "the-pulse-grid": "The Pulse Grid" }
+ * transformMarkdownLinks("Read about [[xeraen]] and [[the-pulse-grid]]", mappings)
+ * // => "Read about [XERAEN](/codex/xeraen) and [The Pulse Grid](/codex/the-pulse-grid)"
+ */
+export const transformMarkdownLinks = (content: string, mappings?: CodexMappings): string => {
+  return content.replace(/\[\[([^\]]+)\]\]/g, (_match, typedText) => {
+    const slug = generateSlug(typedText)
+    // Use canonical name from mappings, or fall back to typed text
+    const displayName = (mappings && mappings[slug]) || typedText
+    return `[${displayName}](/codex/${slug})`
+  })
+}
+
+/**
+ * Transforms [[Entry Name]] syntax in plain text to HTML anchor tags
+ *
+ * Converts: [[Entry Name]] → <a href="/codex/entry-name">Canonical Name</a>
+ * When mappings are provided, always displays the canonical entry name from the database.
+ * Use this for plain text content that will be rendered as HTML (not markdown).
+ *
+ * @param content - Plain text content containing [[Entry Name]] syntax
+ * @param mappings - Optional slug->name mapping for canonical names
+ * @param className - Optional CSS class to apply to generated links
+ * @returns HTML string with wiki-style links converted to anchor tags
+ *
+ * @example
+ * // Without mappings (displays typed text)
+ * transformHtmlLinks("Connected to [[the-pulse-grid]]")
+ * // => "Connected to <a href=\"/codex/the-pulse-grid\">the-pulse-grid</a>"
+ *
+ * // With mappings (displays canonical name)
+ * const mappings = { "xeraen": "XERAEN" }
+ * transformHtmlLinks("See [[xeraen]]", mappings, "codex-link")
+ * // => "See <a href=\"/codex/xeraen\" class=\"codex-link\">XERAEN</a>"
+ */
+export const transformHtmlLinks = (
+  content: string,
+  mappings?: CodexMappings,
+  className?: string
+): string => {
+  return content.replace(/\[\[([^\]]+)\]\]/g, (_match, typedText) => {
+    const slug = generateSlug(typedText)
+    // Use canonical name from mappings, or fall back to typed text
+    const displayName = (mappings && mappings[slug]) || typedText
+    const classAttr = className ? ` class="${className}"` : ''
+    return `<a href="/codex/${slug}"${classAttr}>${displayName}</a>`
+  })
+}
+
+/**
+ * Extracts all [[Entry Name]] references from content
+ *
+ * Useful for:
+ * - Building "Referenced in" sections on Codex entries
+ * - Validating that all referenced entries exist
+ * - Generating dependency graphs
+ *
+ * @param content - Content containing [[Entry Name]] syntax
+ * @returns Array of entry names (deduplicated)
+ *
+ * @example
+ * extractCodexReferences("[[XERAEN]] works with [[The Fracture Network]] and [[XERAEN]]")
+ * // => ["XERAEN", "The Fracture Network"]
+ */
+export const extractCodexReferences = (content: string): string[] => {
+  const matches = content.matchAll(/\[\[([^\]]+)\]\]/g)
+  const names = Array.from(matches, match => match[1])
+  return [...new Set(names)] // Deduplicate
+}
+
+/**
+ * Checks if content contains any [[Entry Name]] syntax
+ *
+ * @param content - Content to check
+ * @returns true if content contains at least one [[Entry Name]] reference
+ *
+ * @example
+ * hasCodexLinks("See [[XERAEN]]") // => true
+ * hasCodexLinks("No links here") // => false
+ */
+export const hasCodexLinks = (content: string): boolean => {
+  return /\[\[([^\]]+)\]\]/.test(content)
+}

@@ -1,5 +1,7 @@
 module Grid
   class CommandParser
+    include CodexHelper
+
     attr_reader :hackr, :input, :event
 
     def initialize(hackr, input)
@@ -72,7 +74,7 @@ module Grid
       output << "<span style='color: #22d3ee; font-weight: bold;'>#{room.name.upcase}</span> <span style='color: #666;'>::</span> <span style='color: #fbbf24;'>#{room.grid_zone.name}</span>"
       output << "<span style='color: #9ca3af;'>[#{room.color_scheme}]</span>" if room.color_scheme
       output << ""
-      output << "<span style='color: #d0d0d0;'>#{room.description}</span>" if room.description
+      output << "<span style='color: #d0d0d0;'>#{codex_linkify(room.description)}</span>" if room.description
       output << ""
 
       # Show exits
@@ -216,15 +218,15 @@ module Grid
 
       # Check items in room
       item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", target.downcase)
-      return "<span style='color: #d0d0d0;'>#{item.description}</span>" if item
+      return "<span style='color: #d0d0d0;'>#{codex_linkify(item.description)}</span>" if item
 
       # Check items in inventory
       item = hackr.grid_items.find_by("LOWER(name) = ?", target.downcase)
-      return "<span style='color: #d0d0d0;'>#{item.description}</span>" if item
+      return "<span style='color: #d0d0d0;'>#{codex_linkify(item.description)}</span>" if item
 
       # Check Mobs
       mob = room.grid_mobs.find_by("LOWER(name) = ?", target.downcase)
-      return "<span style='color: #d0d0d0;'>#{mob.description}</span>" if mob
+      return "<span style='color: #d0d0d0;'>#{codex_linkify(mob.description)}</span>" if mob
 
       "<span style='color: #f87171;'>You don't see '#{target}' here.</span>"
     end

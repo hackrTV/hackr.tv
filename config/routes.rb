@@ -67,6 +67,7 @@ Rails.application.routes.draw do
     end
     resources :tracks, only: [:index, :show]
     resources :albums, only: [:index, :show]
+    get "codex/mappings", to: "codex#mappings"
     get "codex", to: "codex#index"
     get "codex/:slug", to: "codex#show"
     get "radio_stations", to: "radio#index"

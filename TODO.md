@@ -9,7 +9,6 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 ### The Codex - Future Enhancements
 
 - [ ] **Update codex seed entries** - Review and correct all 7 seed entries (XERAEN, Ashlinn, The Fracture Network, GovCorp, Chronology Fracture, The Pulse Grid, PRISM) with accurate lore information
-- [ ] **Global inline linking** - Enable `[[Entry Name]]` syntax anywhere in the app (artist bios, track descriptions, logs, Grid room descriptions) to auto-link to Codex entries
 - [ ] **Reverse references** - Show "Referenced in" section on Codex entries listing all places that link to them
 - [ ] **Inline tooltips** - Hover over Codex links to see entry summary in a tooltip
 - [ ] **More entries** - Expand to cover all bands, Grid locations, key items, and timeline events
@@ -95,6 +94,7 @@ A micro-broadcast social network for GridHackr users functioning like Twitter/X 
 See CLAUDE.md "Development Roadmap - ✅ Completed" section for full implementation history.
 
 **Recent completions:**
+- [x] Global inline linking with canonical names (2025-11-20) - `[[Entry Name]]` syntax works everywhere with database lookup for display names
 - [x] The Codex wiki (2025-11-20)
 - [x] Playlists feature (2025-11-16)
 - [x] React SPA migration (2025-11-16)
