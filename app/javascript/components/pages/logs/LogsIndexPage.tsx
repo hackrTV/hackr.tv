@@ -86,7 +86,7 @@ export const LogsIndexPage: React.FC = () => {
       <div style={{ maxWidth: '900px', margin: '30px auto', background: '#1a1a1a', color: '#d0d0d0', padding: '20px', border: '1px solid #333' }}>
         <div style={{ marginBottom: '30px', paddingBottom: '15px', borderBottom: '1px solid #4b5563' }}>
           <h1 style={{ margin: 0, fontSize: '1.4em', color: '#a78bfa' }}>HACKR LOGS</h1>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9em', color: '#888' }}>Transmissions from the resistance</p>
+          <p style={{ margin: '5px 0 0 0', fontSize: '0.9em', color: '#888' }}>Transmissions from the Fracture Network</p>
         </div>
 
         {logs.length > 0 ? (
@@ -126,7 +126,7 @@ export const LogsIndexPage: React.FC = () => {
             <p style={{ color: '#6b7280', fontSize: '1.1em', lineHeight: '1.8' }}>
               No transmissions available yet.
               <br />
-              <span style={{ fontSize: '0.9em' }}>Check back soon for updates from the resistance...</span>
+              <span style={{ fontSize: '0.9em' }}>Check back soon for updates from the Fracture Network...</span>
             </p>
           </div>
         )}

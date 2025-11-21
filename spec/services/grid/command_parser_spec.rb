@@ -165,11 +165,11 @@ RSpec.describe Grid::CommandParser do
             dialogue_tree: {
               "greeting" => "Hello.",
               "topics" => {
-                "the resistance" => "We fight for freedom."
+                "fracture network" => "We fight for freedom."
               }
             })
         end
-        let(:input) { "ask Guide about the resistance" }
+        let(:input) { "ask Guide about fracture network" }
 
         it "handles multi-word topics" do
           result = parser.execute

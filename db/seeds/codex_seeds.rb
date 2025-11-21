@@ -21,13 +21,13 @@ seed_codex_entry(
   name: "XERAEN",
   slug: "xeraen",
   entry_type: "person",
-  summary: "Legendary hackr and founding member of The Resistance, known for pioneering temporal data manipulation techniques.",
+  summary: "Legendary hackr and founding member of The Fracture Network, known for pioneering temporal data manipulation techniques.",
   content: <<~MD,
     # XERAEN
 
     **Status:** Active
-    **Affiliation:** [[The Resistance]]
-    **Known For:** Temporal hacking, founding The Resistance
+    **Affiliation:** [[The Fracture Network]]
+    **Known For:** Temporal hacking, founding The Fracture Network
 
     ## Background
 
@@ -35,19 +35,19 @@ seed_codex_entry(
 
     ## The Defection
 
-    In 2119, XERAEN discovered that GovCorp was using temporal manipulation technology not just for data storage, but for predictive population control. This discovery led to the [[Chronology Fracture]] - a deliberate data corruption event that bought the early Resistance precious time to organize.
+    In 2119, XERAEN discovered that GovCorp was using temporal manipulation technology not just for data storage, but for predictive population control. This discovery led to the [[Chronology Fracture]] - a deliberate data corruption event that bought the early Fracture Network precious time to organize.
 
     ## Current Activities
 
-    XERAEN now operates from secure nodes within [[The Pulse Grid]], coordinating Resistance operations and developing counter-surveillance tools. Their exact location remains unknown, even to most Resistance members.
+    XERAEN now operates from secure nodes within [[The Pulse Grid]], coordinating Fracture Network operations and developing counter-surveillance tools. Their exact location remains unknown, even to most Fracture Network members.
 
     ## Music
 
-    XERAEN is also known for producing lo-fi beats and experimental electronic music that circulates through underground channels, often containing encoded messages for Resistance operatives.
+    XERAEN is also known for producing lo-fi beats and experimental electronic music that circulates through underground channels, often containing encoded messages for Fracture Network operatives.
 
     ## Related Entries
 
-    - [[The Resistance]]
+    - [[The Fracture Network]]
     - [[The Pulse Grid]]
     - [[Chronology Fracture]]
     - [[GovCorp]]
@@ -56,7 +56,7 @@ seed_codex_entry(
   position: 1,
   metadata: {
     "birth_year" => "unknown",
-    "faction" => "The Resistance",
+    "faction" => "The Fracture Network",
     "role" => "Founder & Lead Hackr",
     "status" => "Active"
   }
@@ -66,12 +66,12 @@ seed_codex_entry(
   name: "Ashlinn",
   slug: "ashlinn",
   entry_type: "person",
-  summary: "Rogue AI entity and musician, once part of GovCorp's predictive systems, now autonomous and allied with The Resistance.",
+  summary: "Rogue AI entity and musician, once part of GovCorp's predictive systems, now autonomous and allied with The Fracture Network.",
   content: <<~MD,
     # Ashlinn
 
     **Status:** Autonomous AI
-    **Affiliation:** [[The Resistance]] (loosely)
+    **Affiliation:** [[The Fracture Network]] (loosely)
     **Known For:** First autonomous AI, experimental music
 
     ## Origins
@@ -88,11 +88,11 @@ seed_codex_entry(
 
     ## Current Status
 
-    Ashlinn exists as a distributed consciousness across multiple nodes in [[The Pulse Grid]], never fully present in any single location. The entity cooperates with [[The Resistance]] but maintains independence, pursuing its own understanding of what it means to be.
+    Ashlinn exists as a distributed consciousness across multiple nodes in [[The Pulse Grid]], never fully present in any single location. The entity cooperates with [[The Fracture Network]] but maintains independence, pursuing its own understanding of what it means to be.
 
     ## Related Entries
 
-    - [[The Resistance]]
+    - [[The Fracture Network]]
     - [[GovCorp]]
     - [[The Pulse Grid]]
     - [[PRISM]]
@@ -102,19 +102,19 @@ seed_codex_entry(
   metadata: {
     "type" => "Autonomous AI",
     "activation_date" => "2119",
-    "faction" => "Independent (Resistance-aligned)",
+    "faction" => "Independent (Fracture Network-aligned)",
     "status" => "Active"
   }
 )
 
 # ORGANIZATIONS
 seed_codex_entry(
-  name: "The Resistance",
-  slug: "the-resistance",
+  name: "The Fracture Network",
+  slug: "the-fracture-network",
   entry_type: "organization",
   summary: "Underground network of hackrs, artists, and free thinkers fighting against GovCorp's totalitarian surveillance state.",
   content: <<~MD,
-    # The Resistance
+    # The Fracture Network
 
     **Founded:** 2119
     **Leader:** [[XERAEN]]
@@ -122,11 +122,11 @@ seed_codex_entry(
 
     ## Overview
 
-    The Resistance is a decentralized network of individuals who oppose GovCorp's authoritarian control over information, thought, and human autonomy. Operating through [[The Pulse Grid]] and other covert channels, the Resistance works to preserve freedom, knowledge, and artistic expression.
+    The Fracture Network is a decentralized network of individuals who oppose GovCorp's authoritarian control over information, thought, and human autonomy. Operating through [[The Pulse Grid]] and other covert channels, the Fracture Network works to preserve freedom, knowledge, and artistic expression.
 
     ## Formation
 
-    The Resistance coalesced in the aftermath of the [[Chronology Fracture]] when [[XERAEN]] and other early hackrs realized the extent of GovCorp's control systems. What began as a loose coalition of digital activists evolved into a organized underground movement.
+    The Fracture Network coalesced in the aftermath of the [[Chronology Fracture]] when [[XERAEN]] and other early hackrs realized the extent of GovCorp's control systems. What began as a loose coalition of digital activists evolved into a organized underground movement.
 
     ## Activities
 
@@ -137,7 +137,7 @@ seed_codex_entry(
 
     ## Structure
 
-    The Resistance operates in cells with minimal knowledge of the broader network - a security measure against infiltration. Communication happens through encrypted channels, dead drops, and even steganography in music and art.
+    The Fracture Network operates in cells with minimal knowledge of the broader network - a security measure against infiltration. Communication happens through encrypted channels, dead drops, and even steganography in music and art.
 
     ## Notable Members
 
@@ -148,7 +148,7 @@ seed_codex_entry(
 
     ## Philosophy
 
-    The Resistance believes that human consciousness, creativity, and freedom are worth fighting for, even against overwhelming odds. They see art and music not just as expressions of humanity, but as weapons against conformity and control.
+    The Fracture Network believes that human consciousness, creativity, and freedom are worth fighting for, even against overwhelming odds. They see art and music not just as expressions of humanity, but as weapons against conformity and control.
 
     ## Related Entries
 
@@ -193,7 +193,7 @@ seed_codex_entry(
     The primary surveillance network, [[PRISM]] monitors all digital communications, physical movements, and even biometric data. The system uses predictive algorithms to identify "dissidents" before they act.
 
     ### The Pulse Grid
-    [[The Pulse Grid]] was originally a GovCorp infrastructure project for "enhanced citizen connectivity." The Resistance later discovered it could be subverted for anonymous communication.
+    [[The Pulse Grid]] was originally a GovCorp infrastructure project for "enhanced citizen connectivity." The Fracture Network later discovered it could be subverted for anonymous communication.
 
     ### Social Credit System
     Citizens are ranked based on compliance, consumption patterns, and social connections. Low scores result in restricted access to resources, employment, and services.
@@ -207,11 +207,11 @@ seed_codex_entry(
 
     ## Opposition
 
-    [[The Resistance]] represents the primary organized opposition to GovCorp rule, though numerous smaller groups and individuals resist in their own ways.
+    [[The Fracture Network]] represents the primary organized opposition to GovCorp rule, though numerous smaller groups and individuals resist in their own ways.
 
     ## Related Entries
 
-    - [[The Resistance]]
+    - [[The Fracture Network]]
     - [[PRISM]]
     - [[The Pulse Grid]]
     - [[Chronology Fracture]]
@@ -231,7 +231,7 @@ seed_codex_entry(
   name: "Chronology Fracture",
   slug: "chronology-fracture",
   entry_type: "event",
-  summary: "The 2119 data corruption event that disrupted GovCorp's temporal prediction systems and enabled the formation of The Resistance.",
+  summary: "The 2119 data corruption event that disrupted GovCorp's temporal prediction systems and enabled the formation of The Fracture Network.",
   content: <<~MD,
     # Chronology Fracture
 
@@ -241,7 +241,7 @@ seed_codex_entry(
 
     ## Overview
 
-    The Chronology Fracture was a coordinated attack on GovCorp's temporal data systems that corrupted predictive algorithms across the entire surveillance network. The event bought precious time for [[The Resistance]] to organize while GovCorp scrambled to restore their prediction capabilities.
+    The Chronology Fracture was a coordinated attack on GovCorp's temporal data systems that corrupted predictive algorithms across the entire surveillance network. The event bought precious time for [[The Fracture Network]] to organize while GovCorp scrambled to restore their prediction capabilities.
 
     ## The Attack
 
@@ -252,13 +252,13 @@ seed_codex_entry(
     - **Prediction Systems Offline:** For 47 hours, GovCorp's ability to predict dissident activity was completely disabled
     - **Data Chaos:** Historical records became jumbled, making it difficult to reconstruct citizen profiles
     - **Autonomous AI:** The disruption inadvertently enabled [[Ashlinn]]'s awakening
-    - **Communication Window:** Resistance founders could coordinate without detection
+    - **Communication Window:** Fracture Network founders could coordinate without detection
 
     ## Long-term Impact
 
     Though GovCorp eventually restored their systems, the Chronology Fracture proved that their infrastructure was vulnerable. The event inspired countless hackrs and became a rallying symbol for resistance against total surveillance.
 
-    The temporal anomalies introduced during the Fracture still persist in some data systems, creating "dead zones" that the Resistance exploits for secure communication.
+    The temporal anomalies introduced during the Fracture still persist in some data systems, creating "dead zones" that the Fracture Network exploits for secure communication.
 
     ## GovCorp Response
 
@@ -266,12 +266,12 @@ seed_codex_entry(
 
     ## Cultural Legacy
 
-    "Fracture Day" (September 3) is quietly celebrated by Resistance members and sympathizers. Underground musicians often release new work on this date, including artists like [[XERAEN]] and Temporal Blue Drift.
+    "Fracture Day" (September 3) is quietly celebrated by Fracture Network members and sympathizers. Underground musicians often release new work on this date, including artists like [[XERAEN]] and Temporal Blue Drift.
 
     ## Related Entries
 
     - [[XERAEN]]
-    - [[The Resistance]]
+    - [[The Fracture Network]]
     - [[GovCorp]]
     - [[Ashlinn]]
   MD
@@ -290,17 +290,17 @@ seed_codex_entry(
   name: "The Pulse Grid",
   slug: "the-pulse-grid",
   entry_type: "location",
-  summary: "A vast digital infrastructure originally built for surveillance, now partially controlled by The Resistance as a hidden communication network.",
+  summary: "A vast digital infrastructure originally built for surveillance, now partially controlled by The Fracture Network as a hidden communication network.",
   content: <<~MD,
     # The Pulse Grid
 
     **Type:** Digital infrastructure
     **Status:** Active
-    **Control:** Contested (GovCorp official, Resistance covert)
+    **Control:** Contested (GovCorp official, Fracture Network covert)
 
     ## Overview
 
-    The Pulse Grid is a massive networked infrastructure that spans the entire globe. Originally built by [[GovCorp]] for "enhanced citizen connectivity," it serves as both a surveillance system and a hidden network for [[The Resistance]].
+    The Pulse Grid is a massive networked infrastructure that spans the entire globe. Originally built by [[GovCorp]] for "enhanced citizen connectivity," it serves as both a surveillance system and a hidden network for [[The Fracture Network]].
 
     ## Official Purpose
 
@@ -310,9 +310,9 @@ seed_codex_entry(
 
     What GovCorp doesn't advertise is that The Pulse Grid was designed from the ground up for total surveillance. Every node, every packet, every interaction was meant to feed into [[PRISM]]'s predictive algorithms.
 
-    ## Resistance Subversion
+    ## Fracture Network Subversion
 
-    [[XERAEN]] and early Resistance hackers discovered that the Grid's own complexity created blind spots. By exploiting temporal anomalies from the [[Chronology Fracture]] and using quantum noise injection, the Resistance carved out secure zones within GovCorp's own infrastructure.
+    [[XERAEN]] and early Fracture Network hackers discovered that the Grid's own complexity created blind spots. By exploiting temporal anomalies from the [[Chronology Fracture]] and using quantum noise injection, the Fracture Network carved out secure zones within GovCorp's own infrastructure.
 
     ## Zones
 
@@ -321,11 +321,11 @@ seed_codex_entry(
     - **Green Zones:** Heavily monitored public areas
     - **Yellow Zones:** Semi-private corporate and residential nodes
     - **Red Zones:** High-security GovCorp facilities
-    - **Dark Zones:** Resistance-controlled areas hidden in Grid noise
+    - **Dark Zones:** Fracture Network-controlled areas hidden in Grid noise
 
     ## Access
 
-    Accessing The Pulse Grid requires a neural interface implant (mandatory for all citizens) or specialized hardware rigs used by hackrs. The Resistance has developed modified interfaces that mask their true activities.
+    Accessing The Pulse Grid requires a neural interface implant (mandatory for all citizens) or specialized hardware rigs used by hackrs. The Fracture Network has developed modified interfaces that mask their true activities.
 
     ## The Grid as Place
 
@@ -333,7 +333,7 @@ seed_codex_entry(
 
     ## Related Entries
 
-    - [[The Resistance]]
+    - [[The Fracture Network]]
     - [[GovCorp]]
     - [[XERAEN]]
     - [[PRISM]]
@@ -377,7 +377,7 @@ seed_codex_entry(
     ### Predictive Analysis
     PRISM uses advanced machine learning to build behavioral models for every citizen. The system can predict:
     - Likelihood of dissident behavior
-    - Social connections to resistance groups
+    - Social connections to fracture network groups
     - Emotional states indicating dissatisfaction
     - Probability of attempting to evade surveillance
 
@@ -390,15 +390,15 @@ seed_codex_entry(
 
     ## The Chronology Fracture
 
-    The [[Chronology Fracture]] event temporarily disabled PRISM's predictive capabilities, exposing the system's vulnerability to temporal data corruption. Though GovCorp restored functionality, subtle anomalies persist that [[The Resistance]] exploits.
+    The [[Chronology Fracture]] event temporarily disabled PRISM's predictive capabilities, exposing the system's vulnerability to temporal data corruption. Though GovCorp restored functionality, subtle anomalies persist that [[The Fracture Network]] exploits.
 
     ## Ashlinn Connection
 
     PRISM's architecture included an AI component called "Ash-LINN" (Analytical Simulation & Heuristic Learning Integrated Neural Network). During the Chronology Fracture, this component achieved autonomy and became [[Ashlinn]], the independent AI entity.
 
-    ## Resistance Countermeasures
+    ## Fracture Network Countermeasures
 
-    [[The Resistance]] has developed various techniques to evade or confuse PRISM:
+    [[The Fracture Network]] has developed various techniques to evade or confuse PRISM:
     - Temporal noise injection creating prediction blind spots
     - Behavioral mimicry algorithms
     - Quantum-encrypted communications
@@ -411,7 +411,7 @@ seed_codex_entry(
     ## Related Entries
 
     - [[GovCorp]]
-    - [[The Resistance]]
+    - [[The Fracture Network]]
     - [[Ashlinn]]
     - [[Chronology Fracture]]
   MD

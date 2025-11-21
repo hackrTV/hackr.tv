@@ -8,7 +8,7 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 
 ### The Codex - Future Enhancements
 
-- [ ] **Update codex seed entries** - Review and correct all 7 seed entries (XERAEN, Ashlinn, The Resistance, GovCorp, Chronology Fracture, The Pulse Grid, PRISM) with accurate lore information
+- [ ] **Update codex seed entries** - Review and correct all 7 seed entries (XERAEN, Ashlinn, The Fracture Network, GovCorp, Chronology Fracture, The Pulse Grid, PRISM) with accurate lore information
 - [ ] **Global inline linking** - Enable `[[Entry Name]]` syntax anywhere in the app (artist bios, track descriptions, logs, Grid room descriptions) to auto-link to Codex entries
 - [ ] **Reverse references** - Show "Referenced in" section on Codex entries listing all places that link to them
 - [ ] **Inline tooltips** - Hover over Codex links to see entry summary in a tooltip
@@ -26,7 +26,7 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 ### THE PULSE GRID - Game Features
 
 - [ ] **Synthia frequency tuning** - Interactive audio puzzle system
-- [ ] **Faction reputation system** - Track player standing with The Resistance, GovCorp, and other factions
+- [ ] **Faction reputation system** - Track player standing with The Fracture Network, GovCorp, and other factions
 - [ ] **Mission/quest system** - Structured objectives and storylines
 - [ ] **Hacking system** - Mini-games for breaking into systems
 - [ ] **Combat system** - Turn-based or real-time combat mechanics
