@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 interface TerminalLine {
   text: string
@@ -12,9 +13,11 @@ interface TerminalLine {
 export const TerminalAnimation: React.FC = () => {
   const outputRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLSpanElement>(null)
-  const [isSkipped, setIsSkipped] = useState(false)
+  const navigate = useNavigate()
+  const { isMobile } = useMobileDetect()
 
   const currentYear = new Date().getFullYear()
+  const speedMultiplier = 5
 
   const lines: TerminalLine[] = [
     { text: '════════════════════════════════════════════════════════════════', delay: 0 },
@@ -33,51 +36,77 @@ export const TerminalAnimation: React.FC = () => {
     { text: 'FEATURED ARTISTS:', delay: 300, class: 'terminal-header' },
     { text: '─────────────────────────────────────────────────────────────────', delay: 100 },
     { text: '', delay: 300 },
-    { text: '[0] The.CyberPul.se', delay: 200, html: true },
+    { text: '[0] <a href="/thecyberpulse" data-route="/thecyberpulse" class="terminal-link">The.CyberPul.se</a>', delay: 200, html: true },
     { text: '    Flagship Standard Bearers of the Hackrs of CyberSpace,', delay: 100 },
     { text: '    sending pirate broadcasts across time and space', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[1] XERAEN', delay: 200, html: true },
+    { text: '[1] <a href="/xeraen" data-route="/xeraen" class="terminal-link">XERAEN</a>', delay: 200, html: true },
     { text: '    Trans-Temporal Operations from the future', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[2] System Rot', delay: 200, html: true },
+    { text: '[2] <a href="/system_rot" data-route="/system_rot" class="terminal-link">System Rot</a>', delay: 200, html: true },
     { text: '    Street-level resistance', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[3] Wavelength Zero', delay: 200, html: true },
+    { text: '[3] <a href="/wavelength_zero" data-route="/wavelength_zero" class="terminal-link">Wavelength Zero</a>', delay: 200, html: true },
     { text: '    Signal disruption collective', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[4] Voiceprint', delay: 200, html: true },
+    { text: '[4] <a href="/voiceprint" data-route="/voiceprint" class="terminal-link">Voiceprint</a>', delay: 200, html: true },
     { text: '    Archival resistance records', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[5] Temporal Blue Drift', delay: 200, html: true },
+    { text: '[5] <a href="/temporal_blue_drift" data-route="/temporal_blue_drift" class="terminal-link">Temporal Blue Drift</a>', delay: 200, html: true },
     { text: '    Love letters across time', delay: 100 },
     { text: '', delay: 500 },
     { text: '─────────────────────────────────────────────────────────────────', delay: 200 },
     { text: 'PLATFORM SERVICES:', delay: 300, class: 'terminal-header' },
     { text: '─────────────────────────────────────────────────────────────────', delay: 100 },
     { text: '', delay: 300 },
-    { text: '[FM] hackr.fm', delay: 200, html: true },
-    { text: '     Radio & music streaming platform', delay: 100 },
+    { text: '[FM___] <a href="/fm" data-route="/fm" class="terminal-link">hackr.fm</a>', delay: 200, html: true },
+    { text: '        Radio & music streaming platform', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[GRID] THE PULSE GRID', delay: 200, html: true },
-    { text: '       Text-based multiplayer game', delay: 100 },
+    { text: '[GRID_] <a href="/grid" data-route="/grid" class="terminal-link">THE PULSE GRID</a>', delay: 200, html: true },
+    { text: '        Text-based multiplayer game', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[LOGS] Hackr Logs', delay: 200, html: true },
-    { text: '       Updates from the resistance', delay: 100 },
+    { text: '[CODEX] <a href="/codex" data-route="/codex" class="terminal-link">The Codex</a>', delay: 200, html: true },
+    { text: '        Lore archive & wiki', delay: 100 },
+    { text: '', delay: 200 },
+    { text: '[LOGS_] <a href="/logs" data-route="/logs" class="terminal-link">Hackr Logs</a>', delay: 200, html: true },
+    { text: '        Updates from the resistance', delay: 100 },
     { text: '', delay: 500 },
     { text: '════════════════════════════════════════════════════════════════', delay: 200 },
     { text: '  TRANSMISSION READY. SELECT YOUR DESTINATION.', delay: 100 },
     { text: '════════════════════════════════════════════════════════════════', delay: 100 },
     { text: '', delay: 100 },
-    { text: '> _', delay: 0, class: 'terminal-prompt', keepCursor: true }
+    { text: '> ', delay: 0, class: 'terminal-prompt', keepCursor: true }
   ]
 
   useEffect(() => {
     if (!outputRef.current || !cursorRef.current) return
 
+    // On mobile, skip animation entirely and show all text immediately
+    if (isMobile) {
+      outputRef.current.innerHTML = ''
+      lines.forEach((line, index) => {
+        const lineElement = document.createElement('div')
+        if (line.html) {
+          lineElement.innerHTML = line.text
+        } else {
+          lineElement.textContent = line.text
+        }
+        if (line.class) {
+          lineElement.className = line.class
+        }
+        outputRef.current?.appendChild(lineElement)
+
+        // Append cursor to the last line
+        if (index === lines.length - 1 && cursorRef.current) {
+          lineElement.appendChild(cursorRef.current)
+        }
+      })
+      return
+    }
+
     let lineIndex = 0
     let charIndex = 0
-    let typingSpeed = 8
+    let typingSpeed = Math.max(1, Math.floor(8 / speedMultiplier))
     let isTyping = true
     let timeoutId: number | null = null
 
@@ -88,7 +117,7 @@ export const TerminalAnimation: React.FC = () => {
 
       if (outputRef.current) {
         outputRef.current.innerHTML = ''
-        lines.forEach(line => {
+        lines.forEach((line, index) => {
           const lineElement = document.createElement('div')
           if (line.html) {
             lineElement.innerHTML = line.text
@@ -99,13 +128,14 @@ export const TerminalAnimation: React.FC = () => {
             lineElement.className = line.class
           }
           outputRef.current?.appendChild(lineElement)
+
+          // Append cursor to the last line
+          if (index === lines.length - 1 && cursorRef.current) {
+            lineElement.appendChild(cursorRef.current)
+          }
         })
       }
 
-      if (cursorRef.current) {
-        cursorRef.current.style.display = 'none'
-      }
-      setIsSkipped(true)
     }
 
     const typeWriter = () => {
@@ -114,7 +144,7 @@ export const TerminalAnimation: React.FC = () => {
         const line = lines[lineIndex]
 
         if (charIndex === 0 && line.delay > 0) {
-          timeoutId = window.setTimeout(typeWriter, line.delay)
+          timeoutId = window.setTimeout(typeWriter, line.delay / speedMultiplier)
           charIndex++
           return
         }
@@ -144,12 +174,17 @@ export const TerminalAnimation: React.FC = () => {
         } else {
           lineIndex++
           charIndex = 0
-          timeoutId = window.setTimeout(typeWriter, 50)
+          timeoutId = window.setTimeout(typeWriter, 50 / speedMultiplier)
         }
       } else {
         isTyping = false
-        if (cursorRef.current) {
-          cursorRef.current.style.display = 'none'
+        // Keep cursor visible and blinking after animation completes
+        // Append cursor to the last line element
+        if (cursorRef.current && outputRef.current) {
+          const lastLine = outputRef.current.lastChild as HTMLElement
+          if (lastLine) {
+            lastLine.appendChild(cursorRef.current)
+          }
         }
       }
     }
@@ -159,32 +194,36 @@ export const TerminalAnimation: React.FC = () => {
     }
 
     document.addEventListener('keydown', handleKeyDown, { once: true })
-    timeoutId = window.setTimeout(typeWriter, 500)
+    timeoutId = window.setTimeout(typeWriter, 500 / speedMultiplier)
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId)
       document.removeEventListener('keydown', handleKeyDown)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [speedMultiplier, isMobile])
 
-  // Render links after animation is done
-  const renderContent = () => {
-    if (!isSkipped) return null
+  // Add click handlers for links to use React Router navigation
+  useEffect(() => {
+    if (!outputRef.current) return
 
-    return (
-      <div className="terminal-links" style={{ marginTop: '20px' }}>
-        <p className="terminal-header">Quick Links:</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginTop: '10px' }}>
-          <Link to="/thecyberpulse" className="terminal-link">The.CyberPul.se</Link>
-          <Link to="/xeraen" className="terminal-link">XERAEN</Link>
-          <Link to="/fm" className="terminal-link">hackr.fm</Link>
-          <Link to="/grid" className="terminal-link">THE PULSE GRID</Link>
-          <Link to="/logs" className="terminal-link">Hackr Logs</Link>
-        </div>
-      </div>
-    )
-  }
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'A' && target.hasAttribute('data-route')) {
+        e.preventDefault()
+        const route = target.getAttribute('data-route')
+        if (route) {
+          navigate(route)
+        }
+      }
+    }
+
+    outputRef.current.addEventListener('click', handleLinkClick)
+
+    return () => {
+      outputRef.current?.removeEventListener('click', handleLinkClick)
+    }
+  }, [navigate])
 
   return (
     <>
@@ -200,6 +239,15 @@ export const TerminalAnimation: React.FC = () => {
           min-height: calc(100vh - 400px);
           max-width: 1200px;
           box-shadow: 0 0 15px rgba(51, 170, 51, 0.2);
+          pointer-events: auto;
+        }
+
+        @media (max-width: 767px) {
+          .terminal-container {
+            margin: 10px;
+            padding: 10px;
+            overflow-x: auto;
+          }
         }
 
         .terminal-output {
@@ -213,7 +261,8 @@ export const TerminalAnimation: React.FC = () => {
           height: 18px;
           background: #33cc33;
           animation: blink 1s infinite;
-          margin-left: 2px;
+          margin-left: 0;
+          vertical-align: -2px;
         }
 
         @keyframes blink {
@@ -243,7 +292,6 @@ export const TerminalAnimation: React.FC = () => {
       <div className="terminal-container">
         <div ref={outputRef} className="terminal-output"></div>
         <span ref={cursorRef} className="terminal-cursor"></span>
-        {renderContent()}
       </div>
     </>
   )

@@ -2,6 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AudioProvider } from '~/contexts/AudioContext'
+import { MobileMenuProvider } from '~/contexts/MobileMenuContext'
 import { AppLayout } from '~/components/layouts/AppLayout'
 import { ErrorBoundary } from '~/components/errors/ErrorBoundary'
 
@@ -19,9 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
     <React.StrictMode>
       <ErrorBoundary>
         <BrowserRouter>
-          <AudioProvider>
-            <AppLayout />
-          </AudioProvider>
+          <MobileMenuProvider>
+            <AudioProvider>
+              <AppLayout />
+            </AudioProvider>
+          </MobileMenuProvider>
         </BrowserRouter>
       </ErrorBoundary>
     </React.StrictMode>

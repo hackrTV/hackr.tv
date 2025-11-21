@@ -51,10 +51,16 @@ export const useGridAuth = () => {
         } else {
           setHackr(null)
         }
+      } else if (response.status === 401) {
+        // 401 is expected when not logged in - silently set hackr to null
+        setHackr(null)
       } else {
+        // Other errors might be unexpected
+        console.warn('Grid auth check returned unexpected status:', response.status)
         setHackr(null)
       }
     } catch (_err) {
+      // Only log actual network errors, not 401s
       console.error('Auth check failed:', _err)
       setHackr(null)
     } finally {
