@@ -1,9 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 export const FooterMenu: React.FC = () => {
   const { hackr } = useGridAuth()
+  const { isMobile } = useMobileDetect()
+
+  // Don't render footer menu on mobile
+  if (isMobile) return null
 
   return (
     <>
@@ -65,18 +70,6 @@ export const FooterMenu: React.FC = () => {
               </li>
             </>
           )}
-          <span className="tui-statusbar-divider"></span>
-          <li>
-            <a href="https://ashlinn.net" target="_blank" rel="noopener noreferrer">
-              <span className="purple-168-text">{hackr?.role === 'admin' ? '8' : '7'}</span> Ashlinn&nbsp;
-            </a>
-          </li>
-          <span className="tui-statusbar-divider"></span>
-          <li>
-            <a href="https://michaelk.net" target="_blank" rel="noopener noreferrer">
-              <span className="purple-168-text">{hackr?.role === 'admin' ? '9' : '8'}</span> MichaelK&nbsp;
-            </a>
-          </li>
         </ul>
       </div>
     </>
