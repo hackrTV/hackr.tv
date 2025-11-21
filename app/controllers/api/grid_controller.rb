@@ -61,7 +61,7 @@ class Api::GridController < ApplicationController
       @hackr.touch_activity!
       render json: {
         success: true,
-        message: "Welcome to THE PULSE GRID, #{@hackr.hackr_alias}. Your resistance begins now.",
+        message: "Welcome to THE PULSE GRID, #{@hackr.hackr_alias}. Your journey with the Fracture Network begins now.",
         hackr: {
           id: @hackr.id,
           hackr_alias: @hackr.hackr_alias,

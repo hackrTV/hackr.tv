@@ -44,7 +44,7 @@ export const GridLoginPage: React.FC = () => {
             <h1 className="cyan-255-text" style={{ fontSize: '2.5em', letterSpacing: '0.1em', margin: 0 }}>
               THE PULSE GRID
             </h1>
-            <p style={{ margin: '10px 0', fontSize: '1.2em' }}>RESISTANCE LOGIN</p>
+            <p style={{ margin: '10px 0', fontSize: '1.2em' }}>FRACTURE NETWORK LOGIN</p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -98,7 +98,7 @@ export const GridLoginPage: React.FC = () => {
           <hr style={{ borderColor: '#00ffff', margin: '30px 0' }} />
 
           <div className="center" style={{ margin: '20px 0' }}>
-            <p className="white-text" style={{ marginBottom: '10px' }}>NEW TO THE RESISTANCE?</p>
+            <p className="white-text" style={{ marginBottom: '10px' }}>NEW TO THE FRACTURE NETWORK?</p>
             <Link to="/grid/register" className="tui-button green-168">REGISTER AS HACKR</Link>
           </div>
         </fieldset>

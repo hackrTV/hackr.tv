@@ -202,7 +202,7 @@ export const RadioPage: React.FC = () => {
 
           <div>
             <h2 className="cyan-255-text" style={{ textAlign: 'center', marginBottom: '15px' }}>
-              [:: RESISTANCE RADIO STATIONS ::]
+              [:: FRACTURE NETWORK RADIO STATIONS ::]
             </h2>
 
             {loading && <LoadingSpinner message="Tuning radio frequencies..." color="cyan-255-text" />}
@@ -339,7 +339,7 @@ export const RadioPage: React.FC = () => {
               <h3 className="cyan-255-text" style={{ marginBottom: '10px' }}>[:: BROADCAST INFO ::]</h3>
               <p style={{ lineHeight: '1.6', color: '#ccc' }}>
                 hackr.fm Radio transmits 24/7 from undisclosed locations across THE PULSE GRID.
-                Each station is a beacon of resistance, broadcasting truth through the digital noise.
+                Each station is a beacon of the Fracture Network, broadcasting truth through the digital noise.
                 Select a station above to begin streaming.
               </p>
             </div>

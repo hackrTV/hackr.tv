@@ -45,7 +45,7 @@ export const GridRegisterPage: React.FC = () => {
             <h1 className="cyan-255-text" style={{ fontSize: '2.5em', letterSpacing: '0.1em', margin: 0 }}>
               REGISTER
             </h1>
-            <p style={{ margin: '10px 0', fontSize: '1.2em' }}>JOIN THE RESISTANCE</p>
+            <p style={{ margin: '10px 0', fontSize: '1.2em' }}>JOIN THE FRACTURE NETWORK</p>
           </div>
 
           <form onSubmit={handleSubmit}>

@@ -54,10 +54,10 @@
 ### THE PULSE GRID - MUD Game
 - **Real-time Multiplayer** - Live chat and movement tracking via Action Cable
 - **Interactive NPCs** - Rich dialogue trees with lore-heavy conversations
-  - Resistance Coordinator (6 topics: mission, resistance, help, station, synthia, govcorp)
+  - Fracture Network Coordinator (6 topics: mission, fracture, help, station, synthia, govcorp)
   - Temporal Theorist (7 topics: time, paradox, xeraen, future, 2125, prism, synthia)
 - **Command History** - Arrow key navigation through previous commands (up to 100 stored)
-- **Room Navigation** - Explore zones controlled by resistance factions
+- **Room Navigation** - Explore zones controlled by Fracture Network factions
 - **Inventory System** - Collect and manage items
 - **Optimized UI** - Clean terminal-style interface with comfortable dark theme
 - **Dedicated Grid Layout** - 700px output window, compact design, no page scrolling
@@ -166,7 +166,7 @@ clear (cls)            - Clear the screen
 - Arrow keys (↑/↓) navigate through command history
 
 **NPCs with Dialogue:**
-- **Resistance Coordinator** (hackr.tv Broadcast Station) - Topics: mission, resistance, help, station, synthia, govcorp
+- **Fracture Network Coordinator** (hackr.tv Broadcast Station) - Topics: mission, fracture, help, station, synthia, govcorp
 - **Temporal Theorist** (XERAEN Operations Center) - Topics: time, paradox, xeraen, future, 2125, prism, synthia
 
 ---
@@ -345,7 +345,7 @@ bin/rails import:yaml_tracks        # Tracks only
 - **grid_hackrs** - player accounts with bcrypt authentication (role: operative/admin), has_many :playlists
 - **grid_rooms** - locations in the game world
 - **grid_zones** - areas grouping rooms (faction_base, govcorp, transit)
-- **grid_factions** - resistance factions (The.CyberPul.se, XERAEN, GovCorp)
+- **grid_factions** - Fracture Network factions (The.CyberPul.se, XERAEN, GovCorp)
 - **grid_exits** - directional connections between rooms
 - **grid_items** - objects in rooms or inventories
 - **grid_mobs** - NPCs with dialogue trees (dialogue_tree JSON column)

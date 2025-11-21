@@ -309,7 +309,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
         <p style={{ color: '#ccc', lineHeight: '1.6', marginBottom: '15px' }}>
           In computer security terms, an "injection vector" is the method by which malicious code enters a system.
-          In The.CyberPul.se's resistance, Injection Vector is that malicious code—human, brutal, and unstoppable.
+          In The.CyberPul.se's Fracture Network, Injection Vector is that malicious code—human, brutal, and unstoppable.
         </p>
         <p style={{ color: '#888', lineHeight: '1.6' }}>
           Orange is the color of warning systems, emergency protocols, thermal signatures, and controlled explosions.
@@ -452,8 +452,8 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           &gt; STEGANOGRAPHY_MODE: ENABLED
         </p>
         <p style={{ color: '#ccc', lineHeight: '1.6', marginBottom: '15px' }}>
-          Cipher Protocol operates in the most abstract and perhaps most crucial domain of the resistance: pure information warfare.
-          They are the resistance's data couriers, hiding operational code within music so complex that GovCorp's analysis systems
+          Cipher Protocol operates in the most abstract and perhaps most crucial domain of the Fracture Network: pure information warfare.
+          They are the Fracture Network's data couriers, hiding operational code within music so complex that GovCorp's analysis systems
           see only noise.
         </p>
         <p style={{ color: '#888', lineHeight: '1.6' }}>
@@ -534,7 +534,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               </p>
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
                 Hiding operational codes in music files that pass GovCorp's content filters. Instructions embedded in frequency patterns,
-                rhythms, and mathematical structures. Creating the encryption methods other resistance cells use. When Injection Vector
+                rhythms, and mathematical structures. Creating the encryption methods other Fracture Network cells use. When Injection Vector
                 needs building schematics, they're hidden in polyrhythmic patterns. When Temporal Blue Drift needs transmission frequencies,
                 they're encoded in harmonic progressions.
               </p>
@@ -571,7 +571,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               </p>
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
                 Even when signals degrade, even when entropy threatens to destroy information, the fight is to reconstruct, rebuild,
-                persist. Information wants to survive. The resistance's knowledge will outlast attempts to destroy it. There's a cold
+                persist. Information wants to survive. The Fracture Network's knowledge will outlast attempts to destroy it. There's a cold
                 beauty to perfect mathematical precision, the satisfaction of watching complex systems lock into place, the elegance
                 of encryption algorithms expressed as polyrhythmic guitar patterns.
               </p>
@@ -765,7 +765,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           THE SUMMIT • THE PEAK • THE VICTORY
         </p>
         <p style={{ color: '#ddd', lineHeight: '1.7', marginBottom: '15px' }}>
-          Apex Overdrive serves as the rally music of the resistance—the sonic embodiment of triumph, unity, and the radical
+          Apex Overdrive serves as the rally music of the Fracture Network—the sonic embodiment of triumph, unity, and the radical
           act of experiencing joy under totalitarian control. In a world where GovCorp manufactures calm and suppresses authentic
           emotion, Apex Overdrive offers something dangerous: genuine euphoria, collective celebration, and the powerful energy
           of people united at their peak.
@@ -854,7 +854,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <h3 style={{ color: '#ffd700', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '1.1em' }}>🤝 UNITY AS POWER</h3>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                 When thousands of people jump together to the same kick drum, move together to the same drop, sing together the
-                same anthem, they become a unified force greater than the sum of its parts. In a resistance fighting isolation and
+                same anthem, they become a unified force greater than the sum of its parts. In a Fracture Network fighting isolation and
                 disconnection, we create moments of powerful togetherness. "Anthemic" is literally designed as a unity anthem with
                 call-and-response: <em style={{ color: '#1e90ff' }}>"Who are we?" (We are one!) "What do we fight?" (Till it's done!)</em>
               </p>
@@ -922,7 +922,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           Consciousness Unbound • Inner Sovereignty • Transcendent Freedom
         </p>
         <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-          Ethereality offers the resistance something profoundly subversive: access to altered states of consciousness that
+          Ethereality offers the Fracture Network something profoundly subversive: access to altered states of consciousness that
           GovCorp cannot control. In a world where every perception is filtered, every emotion is managed, and every thought
           is monitored, Ethereality proves that genuine trance states—musical, spiritual, transcendent—remain beyond
           totalitarian reach.
@@ -1011,7 +1011,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <h3 style={{ color: '#b8c5f2', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ Inner Sovereignty</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9' }}>
                 When GovCorp controls external reality, internal reality becomes the battleground. We serve as the spiritual and
-                consciousness-liberation wing of the resistance—meditation soundtracks for achieving genuine altered states,
+                consciousness-liberation wing of the Fracture Network—meditation soundtracks for achieving genuine altered states,
                 consciousness training for accessing mental states beyond monitoring, transcendent experiences that remind fighters
                 what freedom feels like. The inner sanctuary that GovCorp cannot infiltrate.
               </p>
@@ -1080,7 +1080,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           ✨ Kawaii Camouflage • Memetic Warfare • The Glitch in Cute Packaging ✨
         </p>
         <p style={{ color: '#ddd', lineHeight: '1.7', marginBottom: '15px' }}>
-          Neon Hearts executes perhaps the resistance's most subversive strategy: hiding revolutionary messaging inside
+          Neon Hearts executes perhaps the Fracture Network's most subversive strategy: hiding revolutionary messaging inside
           irresistibly catchy J-Pop. In a world where GovCorp's content filters flag aggressive music and scan for explicit
           resistance themes, Neon Hearts slips through by sounding completely harmless—bright, cute, radio-friendly pop.
           But every candy-coated hook carries encoded resistance.
@@ -1178,7 +1178,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                 about color, unity, and overcoming challenges
               </p>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                <strong style={{ color: '#ff69b4' }}>Deep Level (Resistance members):</strong> Encoded operational codes, memetic
+                <strong style={{ color: '#ff69b4' }}>Deep Level (Fracture Network members):</strong> Encoded operational codes, memetic
                 programming, revolutionary concepts packaged for viral spread
               </p>
             </div>
@@ -1197,7 +1197,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <h3 style={{ color: '#00bfff', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em' }}>💫 Filter Evasion</h3>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                 Hot pink and electric blue are strategic camouflage. These colors signal "safe entertainment for young consumers"
-                to GovCorp's systems. We reach audiences other resistance bands cannot access—playing on GovCorp-approved platforms,
+                to GovCorp's systems. We reach audiences other Fracture Network bands cannot access—playing on GovCorp-approved platforms,
                 appearing on sanctioned media, spreading through the very channels designed for control. We're the band that sounds
                 exactly like what the system expects while meaning something entirely different. Every play is an infection. Every
                 catchy hook is an encoded message.
@@ -1246,7 +1246,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           Pull the Plug • Analog Heart • The Freedom of Dead Signals
         </p>
         <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-          Offline represents the resistance's disillusioned disconnectors—fighters who've realized the only way to win against
+          Offline represents the Fracture Network's disillusioned disconnectors—fighters who've realized the only way to win against
           a system built on connectivity and surveillance is to refuse to play the game entirely. In a world where GovCorp controls
           every digital touchpoint, Offline's radical solution is simple: pull the plug, go analog, disappear into the static.
         </p>
@@ -1322,7 +1322,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05))', borderLeft: '4px solid #cd7f32' }}>
               <h3 style={{ color: '#cd7f32', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Complete Withdrawal</h3>
               <p style={{ color: '#ccc', lineHeight: '1.9' }}>
-                We're the only resistance band advocating complete disengagement. You cannot beat a system designed around
+                We're the only Fracture Network band advocating complete disengagement. You cannot beat a system designed around
                 connectivity by remaining connected. The only winning move is not to play. No digital communication GovCorp can
                 intercept. No online presence to track or analyze. No algorithmic profile to manipulate. Total analog existence
                 in a digital world. We create off-grid networks, teach digital detox, maintain disconnected safe houses where
@@ -1518,7 +1518,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             <div style={{ marginBottom: '25px', padding: '15px', background: 'linear-gradient(135deg, rgba(107, 155, 209, 0.1), rgba(155, 126, 189, 0.05))', border: '1px solid rgba(107, 155, 209, 0.3)', borderBottom: '2px solid rgba(107, 155, 209, 0.4)' }}>
               <h3 style={{ color: '#6B9BD1', marginBottom: '10px', textTransform: 'uppercase', fontSize: '0.95em', letterSpacing: '1px', textShadow: '0 0 8px rgba(107, 155, 209, 0.6)' }}>The Erasure Paradox</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9', marginBottom: '15px' }}>
-                Here's the cruel beauty of what we're doing: if the resistance succeeds, the timeline changes. GovCorp
+                Here's the cruel beauty of what we're doing: if the Fracture Network succeeds, the timeline changes. GovCorp
                 never rises. The {futureYear} I'm broadcasting from never happens. I never exist to send these signals. We never meet
                 because there's nothing to resist.
               </p>

@@ -56,7 +56,7 @@ export const BandsPage: React.FC = () => {
   const getBandDescription = (slug: string): string => {
     const futureYear = currentYear + 100
     const descriptions: { [key: string]: string } = {
-      'thecyberpulse': `The original resistance band, forging metal manifestos from ${futureYear} with brutal precision.`,
+      'thecyberpulse': `The original Fracture Network band, forging metal manifestos from ${futureYear} with brutal precision.`,
       'xeraen': 'Raw, unfiltered rage against GovCorp tyranny delivered at breakneck hackrcore speed.',
       'injection_vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
       'wavelength_zero': 'Where technical precision meets raw emotion in perfect destructive atmospheric harmony.',

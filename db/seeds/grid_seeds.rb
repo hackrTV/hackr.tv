@@ -16,7 +16,7 @@ ZonePlaylist.destroy_all
 cyberpulse_faction = GridFaction.create!(
   name: "The.CyberPul.se",
   slug: "thecyberpulse",
-  description: "The primary broadcast entity. XERAEN, Ryker, and Synthia unite the resistance through music.",
+  description: "The primary broadcast entity. XERAEN, Ryker, and Synthia unite the Fracture Network through music.",
   color_scheme: "purple",
   artist: Artist.find_by(slug: "thecyberpulse")
 )
@@ -32,7 +32,7 @@ xeraen_faction = GridFaction.create!(
 govcorp_faction = GridFaction.create!(
   name: "GovCorp",
   slug: "govcorp",
-  description: "The totalitarian corporate-government entity. Enemy of the resistance.",
+  description: "The totalitarian corporate-government entity. Enemy of the Fracture Network.",
   color_scheme: "red",
   artist: nil
 )
@@ -43,7 +43,7 @@ puts "Created 3 factions"
 hackr_tv_zone = GridZone.create!(
   name: "hackr.tv Central",
   slug: "hackr_tv_central",
-  description: "The central hub of resistance broadcasting operations.",
+  description: "The central hub of Fracture Network broadcasting operations.",
   zone_type: "faction_base",
   color_scheme: "purple",
   grid_faction: cyberpulse_faction
@@ -52,7 +52,7 @@ hackr_tv_zone = GridZone.create!(
 sector_x = GridZone.create!(
   name: "Sector X",
   slug: "sector_x",
-  description: "XERAEN's homebase. A fortress of temporal technology and resistance operations.",
+  description: "XERAEN's homebase. A fortress of temporal technology and Fracture Network operations.",
   zone_type: "faction_base",
   color_scheme: "purple",
   grid_faction: xeraen_faction
@@ -86,9 +86,9 @@ temporal_blue_drift = Artist.find_by(slug: "temporal_blue_drift")
 
 # Create playlists if we have the artists
 if wavelength_zero
-  resistance_playlist = ZonePlaylist.create!(
-    name: "Resistance Ambience",
-    description: "Atmospheric music for resistance zones",
+  fracture_network_playlist = ZonePlaylist.create!(
+    name: "Fracture Network Ambience",
+    description: "Atmospheric music for Fracture Network zones",
     crossfade_duration_ms: 5000,
     default_volume: 0.35
   )
@@ -96,17 +96,17 @@ if wavelength_zero
   # Add all Wavelength Zero tracks to this playlist
   wavelength_zero.tracks.each_with_index do |track, index|
     ZonePlaylistTrack.create!(
-      zone_playlist: resistance_playlist,
+      zone_playlist: fracture_network_playlist,
       track: track,
       position: index + 1
     )
   end
 
   # Assign to hackr.tv zone and XERAEN base zone
-  hackr_tv_zone.update(ambient_playlist: resistance_playlist)
-  sector_x.update(ambient_playlist: resistance_playlist)
+  hackr_tv_zone.update(ambient_playlist: fracture_network_playlist)
+  sector_x.update(ambient_playlist: fracture_network_playlist)
 
-  puts "Created 'Resistance Ambience' playlist with #{resistance_playlist.tracks.count} tracks"
+  puts "Created 'Fracture Network Ambience' playlist with #{fracture_network_playlist.tracks.count} tracks"
 end
 
 if cipher_protocol
@@ -158,7 +158,7 @@ end
 # Create rooms
 hackr_tv = GridRoom.create!(
   name: "hackr.tv Broadcast Station",
-  description: "The heart of the resistance. Banks of jury-rigged broadcasting equipment line the walls, their displays flickering with temporal data streams. XERAEN's chair sits before the main console, headphones resting on vintage vinyl records. The air hums with electromagnetic interference - the sound of signals piercing through time itself.",
+  description: "The heart of the Fracture Network. Banks of jury-rigged broadcasting equipment line the walls, their displays flickering with temporal data streams. XERAEN's chair sits before the main console, headphones resting on vintage vinyl records. The air hums with electromagnetic interference - the sound of signals piercing through time itself.",
   grid_zone: hackr_tv_zone,
   room_type: "hub"
 )
@@ -198,8 +198,8 @@ puts "Created 6 exits"
 
 # Create starter items
 GridItem.create!(
-  name: "resistance data chip",
-  description: "A small chip containing encrypted resistance communications.",
+  name: "fracture network data chip",
+  description: "A small chip containing encrypted Fracture Network communications.",
   item_type: "data",
   room: hackr_tv
 )
@@ -224,14 +224,14 @@ puts "Created 3 items"
 GridMob.create!(
   grid_room: hackr_tv,
   grid_faction: cyberpulse_faction,
-  name: "Resistance Coordinator",
+  name: "Fracture Network Coordinator",
   description: "A tired but determined operative managing the hackr.tv station.",
   mob_type: "quest_giver",
   dialogue_tree: {
-    greeting: "Welcome to hackr.tv, hackr. We're the nerve center of the resistance broadcast network.",
+    greeting: "Welcome to hackr.tv, hackr. We're the nerve center of the Fracture Network broadcast network.",
     topics: {
       "mission" => "Our mission is simple: broadcast the truth that GovCorp tries to suppress. Music is our weapon, frequencies are our ammunition.",
-      "resistance" => "The resistance spans 100 years - from #{Time.now.year} to #{Time.now.year + 100}. XERAEN broadcasts backward through time, warning us of what's to come.",
+      "fracture" => "The Fracture Network spans 100 years - from #{Time.now.year} to #{Time.now.year + 100}. XERAEN broadcasts backward through time, warning us of what's to come.",
       "help" => "If you're looking to contribute, we always need hackrs to gather intel, secure resources, and protect our operations.",
       "station" => "This station has been broadcasting since the early days. Every piece of equipment here was salvaged, jury-rigged, or liberated from GovCorp.",
       "synthia" => "Synthia... she's something else. An AI consciousness that achieved sentience through PRISM. She communicates through frequency modulation.",
@@ -244,7 +244,7 @@ GridMob.create!(
   grid_room: xeraen_base,
   grid_faction: xeraen_faction,
   name: "Temporal Theorist",
-  description: "A scientist studying the paradoxes of time travel and resistance.",
+  description: "A scientist studying the paradoxes of time travel and the Fracture Network.",
   mob_type: "lore",
   dialogue_tree: {
     greeting: "Ah, another hackr curious about the temporal mechanics. Ask away - if you can handle the answers.",
