@@ -76,6 +76,35 @@ RSpec.describe CodexHelper, type: :helper do
       result = helper.codex_linkify("No links here")
       expect(result).to eq("No links here")
     end
+
+    it "converts [[Entry|custom text]] to HTML link with custom display text" do
+      result = helper.codex_linkify("See [[XERAEN|the legendary hackr]] for details")
+      expect(result).to include('<a href="/codex/xeraen">the legendary hackr</a>')
+    end
+
+    it "handles multiple links with custom text" do
+      result = helper.codex_linkify("[[XERAEN|the hackr]] works with [[The Fracture Network|the network]]")
+      expect(result).to include('<a href="/codex/xeraen">the hackr</a>')
+      expect(result).to include('<a href="/codex/the-fracture-network">the network</a>')
+    end
+
+    it "handles mix of standard and custom text links" do
+      result = helper.codex_linkify("[[XERAEN|custom text]] and [[The Fracture Network]]")
+      expect(result).to include('<a href="/codex/xeraen">custom text</a>')
+      expect(result).to include('<a href="/codex/the-fracture-network">The Fracture Network</a>')
+    end
+
+    it "escapes HTML in custom text" do
+      result = helper.codex_linkify("See [[XERAEN|<script>alert('xss')</script>]]")
+      expect(result).not_to include("<script>")
+      expect(result).to include("&lt;script&gt;")
+    end
+
+    it "adds CSS class to links with custom text" do
+      result = helper.codex_linkify("See [[XERAEN|custom]]", css_class: "codex-link")
+      expect(result).to include('class="codex-link"')
+      expect(result).to include(">custom</a>")
+    end
   end
 
   describe "#markdown_codex_links" do
@@ -100,6 +129,21 @@ RSpec.describe CodexHelper, type: :helper do
     it "preserves text without links" do
       result = helper.markdown_codex_links("No links here")
       expect(result).to eq("No links here")
+    end
+
+    it "converts [[Entry|custom text]] to markdown link with custom display text" do
+      result = helper.markdown_codex_links("See [[XERAEN|the legendary hackr]] for details")
+      expect(result).to eq("See [the legendary hackr](/codex/xeraen) for details")
+    end
+
+    it "handles multiple links with custom text" do
+      result = helper.markdown_codex_links("[[XERAEN|the hackr]] and [[The Fracture Network|the network]]")
+      expect(result).to eq("[the hackr](/codex/xeraen) and [the network](/codex/the-fracture-network)")
+    end
+
+    it "handles mix of standard and custom text links" do
+      result = helper.markdown_codex_links("[[XERAEN|custom text]] and [[The Fracture Network]]")
+      expect(result).to eq("[custom text](/codex/xeraen) and [The Fracture Network](/codex/the-fracture-network)")
     end
   end
 
