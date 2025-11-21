@@ -92,7 +92,7 @@ Line 3 without links`
     })
 
     it('uses canonical names from mappings with CSS class', () => {
-      const mappings = { "xeraen": "XERAEN", "the-pulse-grid": "The Pulse Grid" }
+      const mappings = { xeraen: 'XERAEN', 'the-pulse-grid': 'The Pulse Grid' }
       const result = transformHtmlLinks('See [[xeraen]]', mappings, 'codex-link')
       expect(result).toBe('See <a href="/codex/xeraen" class="codex-link">XERAEN</a>')
     })

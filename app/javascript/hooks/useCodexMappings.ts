@@ -14,7 +14,7 @@ let fetchPromise: Promise<CodexMappings> | null = null
  * Fetches the slug->name mapping for all published Codex entries
  * Results are cached globally to avoid redundant API calls
  */
-async function fetchCodexMappings(): Promise<CodexMappings> {
+async function fetchCodexMappings (): Promise<CodexMappings> {
   // Return cached data if available
   if (cachedMappings !== null) {
     return cachedMappings
@@ -63,16 +63,14 @@ async function fetchCodexMappings(): Promise<CodexMappings> {
  *   const canonicalName = mappings['xeraen'] || 'xeraen' // "XERAEN"
  * }
  */
-export function useCodexMappings() {
-  const [mappings, setMappings] = useState<CodexMappings>(cachedMappings || {})
-  const [loading, setLoading] = useState(!cachedMappings)
+export function useCodexMappings () {
+  const [mappings, setMappings] = useState<CodexMappings>(() => cachedMappings || {})
+  const [loading, setLoading] = useState(() => !cachedMappings)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     // Skip fetch if already cached
     if (cachedMappings !== null) {
-      setMappings(cachedMappings)
-      setLoading(false)
       return
     }
 
@@ -96,6 +94,6 @@ export function useCodexMappings() {
  * Preloads the Codex mappings before they're needed
  * Call this on app initialization to avoid loading delays
  */
-export function preloadCodexMappings(): void {
+export function preloadCodexMappings (): void {
   fetchCodexMappings()
 }

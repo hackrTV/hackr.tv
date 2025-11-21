@@ -32,8 +32,8 @@ export const generateSlug = (name: string): string => {
     .replace(/[^a-z0-9\s-]/g, '') // Remove non-alphanumeric (except spaces/hyphens)
     .replace(/\s+/g, '-')          // Replace spaces with hyphens
     .replace(/-+/g, '-')           // Squeeze multiple hyphens
-    .replace(/^-|-$/g, '');        // Strip leading/trailing hyphens
-};
+    .replace(/^-|-$/g, '')        // Strip leading/trailing hyphens
+}
 
 /**
  * Transforms [[Entry Name]] syntax in markdown to standard markdown links
@@ -58,12 +58,12 @@ export const generateSlug = (name: string): string => {
  */
 export const transformMarkdownLinks = (content: string, mappings?: CodexMappings): string => {
   return content.replace(/\[\[([^\]]+)\]\]/g, (_match, typedText) => {
-    const slug = generateSlug(typedText);
+    const slug = generateSlug(typedText)
     // Use canonical name from mappings, or fall back to typed text
-    const displayName = (mappings && mappings[slug]) || typedText;
-    return `[${displayName}](/codex/${slug})`;
-  });
-};
+    const displayName = (mappings && mappings[slug]) || typedText
+    return `[${displayName}](/codex/${slug})`
+  })
+}
 
 /**
  * Transforms [[Entry Name]] syntax in plain text to HTML anchor tags
@@ -93,13 +93,13 @@ export const transformHtmlLinks = (
   className?: string
 ): string => {
   return content.replace(/\[\[([^\]]+)\]\]/g, (_match, typedText) => {
-    const slug = generateSlug(typedText);
+    const slug = generateSlug(typedText)
     // Use canonical name from mappings, or fall back to typed text
-    const displayName = (mappings && mappings[slug]) || typedText;
-    const classAttr = className ? ` class="${className}"` : '';
-    return `<a href="/codex/${slug}"${classAttr}>${displayName}</a>`;
-  });
-};
+    const displayName = (mappings && mappings[slug]) || typedText
+    const classAttr = className ? ` class="${className}"` : ''
+    return `<a href="/codex/${slug}"${classAttr}>${displayName}</a>`
+  })
+}
 
 /**
  * Extracts all [[Entry Name]] references from content
@@ -117,10 +117,10 @@ export const transformHtmlLinks = (
  * // => ["XERAEN", "The Fracture Network"]
  */
 export const extractCodexReferences = (content: string): string[] => {
-  const matches = content.matchAll(/\[\[([^\]]+)\]\]/g);
-  const names = Array.from(matches, match => match[1]);
-  return [...new Set(names)]; // Deduplicate
-};
+  const matches = content.matchAll(/\[\[([^\]]+)\]\]/g)
+  const names = Array.from(matches, match => match[1])
+  return [...new Set(names)] // Deduplicate
+}
 
 /**
  * Checks if content contains any [[Entry Name]] syntax
@@ -133,5 +133,5 @@ export const extractCodexReferences = (content: string): string[] => {
  * hasCodexLinks("No links here") // => false
  */
 export const hasCodexLinks = (content: string): boolean => {
-  return /\[\[([^\]]+)\]\]/.test(content);
-};
+  return /\[\[([^\]]+)\]\]/.test(content)
+}
