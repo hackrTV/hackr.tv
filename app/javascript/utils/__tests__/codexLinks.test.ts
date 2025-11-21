@@ -73,6 +73,35 @@ Line 3 without links`
       const result = transformMarkdownLinks('See [[PRISM 2.0: The System]]')
       expect(result).toBe('See [PRISM 2.0: The System](/codex/prism-20-the-system)')
     })
+
+    it('converts [[Entry|custom text]] to markdown link with custom display text', () => {
+      const result = transformMarkdownLinks('See [[XERAEN|the legendary hackr]] for details')
+      expect(result).toBe('See [the legendary hackr](/codex/xeraen) for details')
+    })
+
+    it('handles multiple links with custom text', () => {
+      const result = transformMarkdownLinks('[[XERAEN|the hackr]] works with [[The Fracture Network|the network]]')
+      expect(result).toBe('[the hackr](/codex/xeraen) works with [the network](/codex/the-fracture-network)')
+    })
+
+    it('handles mix of standard and custom text links', () => {
+      const result = transformMarkdownLinks('[[XERAEN|custom text]] and [[The Fracture Network]]')
+      expect(result).toBe('[custom text](/codex/xeraen) and [The Fracture Network](/codex/the-fracture-network)')
+    })
+
+    it('custom text overrides mappings', () => {
+      const mappings = { xeraen: 'XERAEN (Official)' }
+      const result = transformMarkdownLinks('See [[xeraen|the hackr]]', mappings)
+      expect(result).toBe('See [the hackr](/codex/xeraen)')
+    })
+
+    it('handles multiline content with custom text', () => {
+      const content = `Line 1 with [[XERAEN|custom name]]
+Line 2 with [[The Fracture Network]]`
+      const expected = `Line 1 with [custom name](/codex/xeraen)
+Line 2 with [The Fracture Network](/codex/the-fracture-network)`
+      expect(transformMarkdownLinks(content)).toBe(expected)
+    })
   })
 
   describe('transformHtmlLinks', () => {
@@ -110,6 +139,46 @@ Line 3 without links`
       const content = `Line 1 with [[XERAEN]]
 Line 2 with [[The Fracture Network]]`
       const expected = `Line 1 with <a href="/codex/xeraen">XERAEN</a>
+Line 2 with <a href="/codex/the-fracture-network">The Fracture Network</a>`
+      expect(transformHtmlLinks(content)).toBe(expected)
+    })
+
+    it('converts [[Entry|custom text]] to HTML anchor with custom display text', () => {
+      const result = transformHtmlLinks('See [[XERAEN|the legendary hackr]] for details')
+      expect(result).toBe('See <a href="/codex/xeraen">the legendary hackr</a> for details')
+    })
+
+    it('handles multiple links with custom text', () => {
+      const result = transformHtmlLinks('[[XERAEN|the hackr]] works with [[The Fracture Network|the network]]')
+      expect(result).toBe('<a href="/codex/xeraen">the hackr</a> works with <a href="/codex/the-fracture-network">the network</a>')
+    })
+
+    it('handles mix of standard and custom text links', () => {
+      const result = transformHtmlLinks('[[XERAEN|custom text]] and [[The Fracture Network]]')
+      expect(result).toBe('<a href="/codex/xeraen">custom text</a> and <a href="/codex/the-fracture-network">The Fracture Network</a>')
+    })
+
+    it('adds CSS class to links with custom text', () => {
+      const result = transformHtmlLinks('See [[XERAEN|custom]]', undefined, 'codex-link')
+      expect(result).toBe('See <a href="/codex/xeraen" class="codex-link">custom</a>')
+    })
+
+    it('custom text overrides mappings', () => {
+      const mappings = { xeraen: 'XERAEN (Official)' }
+      const result = transformHtmlLinks('See [[xeraen|the hackr]]', mappings)
+      expect(result).toBe('See <a href="/codex/xeraen">the hackr</a>')
+    })
+
+    it('custom text with mappings and CSS class', () => {
+      const mappings = { xeraen: 'XERAEN' }
+      const result = transformHtmlLinks('See [[xeraen|custom]]', mappings, 'link')
+      expect(result).toBe('See <a href="/codex/xeraen" class="link">custom</a>')
+    })
+
+    it('handles multiline content with custom text', () => {
+      const content = `Line 1 with [[XERAEN|custom name]]
+Line 2 with [[The Fracture Network]]`
+      const expected = `Line 1 with <a href="/codex/xeraen">custom name</a>
 Line 2 with <a href="/codex/the-fracture-network">The Fracture Network</a>`
       expect(transformHtmlLinks(content)).toBe(expected)
     })

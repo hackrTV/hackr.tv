@@ -40,7 +40,9 @@ module CodexHelper
   # Transforms [[Entry Name]] syntax in text to HTML anchor tags
   #
   # Converts: [[Entry Name]] → <a href="/codex/entry-name">Canonical Name</a>
-  # Always displays the canonical entry name from the database.
+  # Converts: [[Entry Name|custom text]] → <a href="/codex/entry-name">custom text</a>
+  # By default, displays the canonical entry name from the database.
+  # Use pipe syntax to override display text while preserving the link target.
   # Automatically marks output as html_safe.
   #
   # @param content [String] Text content containing [[Entry Name]] syntax
@@ -53,15 +55,23 @@ module CodexHelper
   #
   #   codex_linkify("See [[xeraen]]", css_class: "codex-link")
   #   #=> "See <a href=\"/codex/xeraen\" class=\"codex-link\">XERAEN</a>"
+  #
+  #   codex_linkify("Read about [[XERAEN|the legendary hackr]]")
+  #   #=> "Read about <a href=\"/codex/xeraen\">the legendary hackr</a>"
   def codex_linkify(content, css_class: nil)
     return "" if content.blank?
 
-    html_content = content.gsub(/\[\[([^\]]+)\]\]/) do |_match|
-      typed_text = ::Regexp.last_match(1)
-      slug = generate_slug(typed_text)
+    html_content = content.gsub(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/) do |_match|
+      entry_name = ::Regexp.last_match(1)
+      custom_text = ::Regexp.last_match(2)
+      slug = generate_slug(entry_name)
 
-      # Look up canonical name from database (falls back to typed text if not found)
-      display_name = lookup_entry_name(slug) || typed_text
+      # Use custom text if provided, otherwise look up canonical name from database
+      display_name = if custom_text.present?
+        custom_text
+      else
+        lookup_entry_name(slug) || entry_name
+      end
 
       class_attr = css_class.present? ? %( class="#{ERB::Util.html_escape(css_class)}") : ""
       %(<a href="/codex/#{ERB::Util.html_escape(slug)}"#{class_attr}>#{ERB::Util.html_escape(display_name)}</a>)
@@ -73,7 +83,9 @@ module CodexHelper
   # Transforms [[Entry Name]] syntax in markdown to standard markdown links
   #
   # Converts: [[Entry Name]] → [Canonical Name](/codex/entry-name)
-  # Always displays the canonical entry name from the database.
+  # Converts: [[Entry Name|custom text]] → [custom text](/codex/entry-name)
+  # By default, displays the canonical entry name from the database.
+  # Use pipe syntax to override display text while preserving the link target.
   # Use this for content that will be processed by a markdown parser.
   #
   # @param content [String] Markdown content containing [[Entry Name]] syntax
@@ -82,15 +94,23 @@ module CodexHelper
   # @example
   #   markdown_codex_links("Read about [[xeraen]] and [[the-fracture-network]]")
   #   #=> "Read about [XERAEN](/codex/xeraen) and [The Fracture Network](/codex/the-fracture-network)"
+  #
+  #   markdown_codex_links("Learn from [[XERAEN|the best hackr in the grid]]")
+  #   #=> "Learn from [the best hackr in the grid](/codex/xeraen)"
   def markdown_codex_links(content)
     return "" if content.blank?
 
-    content.gsub(/\[\[([^\]]+)\]\]/) do |_match|
-      typed_text = ::Regexp.last_match(1)
-      slug = generate_slug(typed_text)
+    content.gsub(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/) do |_match|
+      entry_name = ::Regexp.last_match(1)
+      custom_text = ::Regexp.last_match(2)
+      slug = generate_slug(entry_name)
 
-      # Look up canonical name from database (falls back to typed text if not found)
-      display_name = lookup_entry_name(slug) || typed_text
+      # Use custom text if provided, otherwise look up canonical name from database
+      display_name = if custom_text.present?
+        custom_text
+      else
+        lookup_entry_name(slug) || entry_name
+      end
 
       "[#{display_name}](/codex/#{slug})"
     end

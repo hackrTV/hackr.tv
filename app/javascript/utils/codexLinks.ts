@@ -39,7 +39,9 @@ export const generateSlug = (name: string): string => {
  * Transforms [[Entry Name]] syntax in markdown to standard markdown links
  *
  * Converts: [[Entry Name]] → [Canonical Name](/codex/entry-name)
- * When mappings are provided, always displays the canonical entry name from the database.
+ * Converts: [[Entry Name|custom text]] → [custom text](/codex/entry-name)
+ * When mappings are provided, displays the canonical entry name from the database.
+ * Use pipe syntax to override display text while preserving the link target.
  * Use this for content that will be processed by ReactMarkdown or other markdown parsers.
  *
  * @param content - Markdown content containing [[Entry Name]] syntax
@@ -55,12 +57,16 @@ export const generateSlug = (name: string): string => {
  * const mappings = { "xeraen": "XERAEN", "the-pulse-grid": "The Pulse Grid" }
  * transformMarkdownLinks("Read about [[xeraen]] and [[the-pulse-grid]]", mappings)
  * // => "Read about [XERAEN](/codex/xeraen) and [The Pulse Grid](/codex/the-pulse-grid)"
+ *
+ * // With custom text (overrides mappings)
+ * transformMarkdownLinks("Learn from [[XERAEN|the legendary hackr]]", mappings)
+ * // => "Learn from [the legendary hackr](/codex/xeraen)"
  */
 export const transformMarkdownLinks = (content: string, mappings?: CodexMappings): string => {
-  return content.replace(/\[\[([^\]]+)\]\]/g, (_match, typedText) => {
-    const slug = generateSlug(typedText)
-    // Use canonical name from mappings, or fall back to typed text
-    const displayName = (mappings && mappings[slug]) || typedText
+  return content.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_match, entryName, customText) => {
+    const slug = generateSlug(entryName)
+    // Use custom text if provided, otherwise use canonical name from mappings, or fall back to entry name
+    const displayName = customText || (mappings && mappings[slug]) || entryName
     return `[${displayName}](/codex/${slug})`
   })
 }
@@ -69,7 +75,9 @@ export const transformMarkdownLinks = (content: string, mappings?: CodexMappings
  * Transforms [[Entry Name]] syntax in plain text to HTML anchor tags
  *
  * Converts: [[Entry Name]] → <a href="/codex/entry-name">Canonical Name</a>
- * When mappings are provided, always displays the canonical entry name from the database.
+ * Converts: [[Entry Name|custom text]] → <a href="/codex/entry-name">custom text</a>
+ * When mappings are provided, displays the canonical entry name from the database.
+ * Use pipe syntax to override display text while preserving the link target.
  * Use this for plain text content that will be rendered as HTML (not markdown).
  *
  * @param content - Plain text content containing [[Entry Name]] syntax
@@ -86,16 +94,20 @@ export const transformMarkdownLinks = (content: string, mappings?: CodexMappings
  * const mappings = { "xeraen": "XERAEN" }
  * transformHtmlLinks("See [[xeraen]]", mappings, "codex-link")
  * // => "See <a href=\"/codex/xeraen\" class=\"codex-link\">XERAEN</a>"
+ *
+ * // With custom text (overrides mappings)
+ * transformHtmlLinks("Learn from [[XERAEN|the best]]", mappings, "codex-link")
+ * // => "Learn from <a href=\"/codex/xeraen\" class=\"codex-link\">the best</a>"
  */
 export const transformHtmlLinks = (
   content: string,
   mappings?: CodexMappings,
   className?: string
 ): string => {
-  return content.replace(/\[\[([^\]]+)\]\]/g, (_match, typedText) => {
-    const slug = generateSlug(typedText)
-    // Use canonical name from mappings, or fall back to typed text
-    const displayName = (mappings && mappings[slug]) || typedText
+  return content.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_match, entryName, customText) => {
+    const slug = generateSlug(entryName)
+    // Use custom text if provided, otherwise use canonical name from mappings, or fall back to entry name
+    const displayName = customText || (mappings && mappings[slug]) || entryName
     const classAttr = className ? ` class="${className}"` : ''
     return `<a href="/codex/${slug}"${classAttr}>${displayName}</a>`
   })
