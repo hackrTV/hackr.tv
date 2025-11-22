@@ -9,6 +9,19 @@ interface Playlist {
   track_count: number
 }
 
+interface PlaylistTrack {
+  track_id: number
+  audio_url: string
+  title: string
+  artist: {
+    name: string
+  }
+  album?: {
+    cover_url: string | null
+  }
+  duration: string | null
+}
+
 interface RadioStation {
   id: number
   name: string
@@ -96,7 +109,7 @@ export const RadioPage: React.FC = () => {
       for (const playlist of playlists) {
         if (playlist.tracks && playlist.tracks.length > 0) {
           const playlistTracks = playlist.tracks
-            .map((track: any) => ({
+            .map((track: PlaylistTrack) => ({
               id: String(track.track_id),
               url: track.audio_url || '',
               title: track.title,
