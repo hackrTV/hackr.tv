@@ -7,9 +7,19 @@ interface Track {
   duration: string | null
 }
 
+interface ColorScheme {
+  primary: string
+  border?: string
+  legend?: string
+  background?: string
+  button?: string
+  buttonBorder?: string
+  gradient?: string
+}
+
 interface BandProfileConfig {
   name: string
-  colorScheme: any
+  colorScheme: ColorScheme
   filterName: string
   renderIntro: () => React.ReactNode
   renderAlbumSection: (tracks: Track[]) => React.ReactNode

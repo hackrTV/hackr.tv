@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -17,13 +17,7 @@ export const SharedPlaylistPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (token) {
-      fetchSharedPlaylist()
-    }
-  }, [token])
-
-  const fetchSharedPlaylist = async () => {
+  const fetchSharedPlaylist = useCallback(async () => {
     setLoading(true)
     setError(null)
 
@@ -46,7 +40,13 @@ export const SharedPlaylistPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    if (token) {
+      fetchSharedPlaylist()
+    }
+  }, [token, fetchSharedPlaylist])
 
   const handlePlayPlaylist = () => {
     if (!playlist || !playlist.tracks || playlist.tracks.length === 0) {

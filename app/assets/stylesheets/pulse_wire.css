@@ -1,0 +1,484 @@
+/* PulseWire - The Wire TUI Styling */
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #444;
+  color: #a78bfa;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn:hover {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.2);
+  color: #c4b5fd;
+}
+
+.btn:active {
+  background: rgba(124, 58, 237, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #333;
+  color: #666;
+}
+
+.btn:disabled:hover {
+  background: transparent;
+  border-color: #333;
+}
+
+.btn-primary {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.2);
+}
+
+.btn-primary:hover {
+  border-color: #a78bfa;
+  background: rgba(124, 58, 237, 0.4);
+  color: #e9d5ff;
+}
+
+.alert {
+  padding: 12px;
+  margin-top: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  border: 1px solid;
+}
+
+.alert-error {
+  color: #fca5a5;
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  background: #000;
+  border: 1px solid #444;
+  color: #fff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.5);
+}
+
+/* Headers */
+.hotwire-header,
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #7c3aed;
+}
+
+.hotwire-header h1,
+.user-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #a78bfa;
+}
+
+.wire-status {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+}
+
+.status-connected {
+  color: #34d399;
+  animation: pulse-glow 2s infinite;
+}
+
+.status-disconnected {
+  color: #666;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.user-stats {
+  color: #60a5fa;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Pulse Composer */
+.pulse-composer {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid #7c3aed;
+}
+
+.pulse-composer .form-group {
+  margin: 0;
+}
+
+.pulse-input {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  background: #000;
+  border: 1px solid #444;
+  color: #fff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.pulse-input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.5);
+}
+
+.pulse-composer-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.char-count {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.char-count.warning {
+  color: #fbbf24;
+}
+
+.char-count.over-limit {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+/* Pulse Cards */
+.pulse-card {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 3px solid #7c3aed;
+  transition: all 0.2s;
+}
+
+.pulse-card:hover {
+  background: rgba(0, 0, 0, 0.5);
+  border-left-color: #a78bfa;
+}
+
+.pulse-card.is-splice {
+  border-left-color: #60a5fa;
+  margin-left: 20px;
+}
+
+.pulse-card.signal-dropped {
+  border-left-color: #f87171;
+  background: rgba(128, 0, 0, 0.2);
+}
+
+.pulse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.hackr-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #a78bfa;
+}
+
+.hackr-link:hover {
+  color: #c4b5fd;
+  text-decoration: underline;
+}
+
+.hackr-alias {
+  font-weight: bold;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.admin-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background: #f87171;
+  color: #000;
+  font-weight: bold;
+}
+
+.pulse-timestamp {
+  font-size: 0.85rem;
+  color: #888;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.pulse-content {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.pulse-content p {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Signal Dropped */
+.signal-dropped-notice {
+  color: #f87171;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  padding: 15px;
+  border: 1px dashed #f87171;
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.signal-dropped-notice .glitch {
+  display: inline-block;
+  animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+.dropped-timestamp {
+  font-size: 0.8rem;
+  color: #fca5a5;
+  margin-top: 8px;
+}
+
+/* Pulse Actions */
+.pulse-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.echo-button,
+.splice-button,
+.delete-button {
+  background: transparent;
+  border: 1px solid #444;
+  color: #a78bfa;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.echo-button:hover,
+.splice-button:hover {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.2);
+}
+
+.echo-button.echoed {
+  color: #60a5fa;
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.echo-button.animating {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(96, 165, 250, 0);
+  }
+}
+
+.echo-icon,
+.splice-icon {
+  font-size: 1.1rem;
+}
+
+.echo-count,
+.splice-count {
+  font-size: 0.85rem;
+  color: #60a5fa;
+}
+
+.delete-button {
+  color: #f87171;
+  border-color: #444;
+  margin-left: auto;
+  font-size: 1.2rem;
+  padding: 4px 10px;
+}
+
+.delete-button:hover {
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.2);
+}
+
+.thread-link {
+  color: #60a5fa;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.thread-link:hover {
+  text-decoration: underline;
+  color: #93c5fd;
+}
+
+/* Reply Form */
+.pulse-reply-form {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #333;
+}
+
+/* Thread View */
+.thread-view {
+  margin-bottom: 30px;
+}
+
+.thread-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #7c3aed;
+}
+
+.thread-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: #a78bfa;
+}
+
+.thread-stats {
+  font-family: 'Courier New', Courier, monospace;
+  color: #60a5fa;
+}
+
+.thread-container {
+  position: relative;
+}
+
+.thread-item {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.thread-connector {
+  position: absolute;
+  left: -15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, #7c3aed 0%, transparent 100%);
+}
+
+.thread-replies {
+  position: relative;
+}
+
+/* Back Link */
+.back-link {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.back-link a {
+  color: #a78bfa;
+  text-decoration: none;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+  color: #c4b5fd;
+}
+
+/* Empty States & Loading */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.loading-more {
+  text-align: center;
+  padding: 20px;
+  color: #60a5fa;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.end-of-feed {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+  font-family: 'Courier New', Courier, monospace;
+  border-top: 1px dashed #444;
+  margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pulse-card.is-splice {
+    margin-left: 10px;
+  }
+
+  .thread-connector {
+    left: -8px;
+  }
+
+  .pulse-actions {
+    flex-wrap: wrap;
+  }
+
+  .delete-button {
+    margin-left: 0;
+    order: -1;
+  }
+}

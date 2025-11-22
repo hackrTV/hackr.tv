@@ -5,8 +5,10 @@ class GridHackr < ApplicationRecord
   has_many :grid_items
   has_many :grid_messages
   has_many :playlists, dependent: :destroy
+  has_many :pulses, dependent: :destroy
+  has_many :echoes, dependent: :destroy
 
-  validates :hackr_alias, presence: true, uniqueness: true
+  validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :role, inclusion: {in: %w[operative admin], message: "%{value} is not a valid role"}
 
   after_initialize :set_default_role, if: :new_record?

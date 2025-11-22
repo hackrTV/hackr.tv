@@ -218,10 +218,11 @@ export const TerminalAnimation: React.FC = () => {
       }
     }
 
-    outputRef.current.addEventListener('click', handleLinkClick)
+    const currentOutput = outputRef.current
+    currentOutput.addEventListener('click', handleLinkClick)
 
     return () => {
-      outputRef.current?.removeEventListener('click', handleLinkClick)
+      currentOutput?.removeEventListener('click', handleLinkClick)
     }
   }, [navigate])
 

@@ -197,6 +197,9 @@ export const HeaderMenu: React.FC = () => {
                     <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>grid
                     </Link>
+                    <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                      <span className="purple-168-text">/</span>wire
+                    </Link>
                     <a
                       href="#"
                       className="mobile-menu-item"
@@ -212,6 +215,9 @@ export const HeaderMenu: React.FC = () => {
                   <>
                     <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>grid
+                    </Link>
+                    <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                      <span className="purple-168-text">/</span>wire
                     </Link>
                     <Link to="/grid/login" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>login
@@ -364,6 +370,11 @@ export const HeaderMenu: React.FC = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link to="/wire">
+                      <span className="purple-168-text">/</span>wire
+                    </Link>
+                  </li>
+                  <li>
                     <a href="#" onClick={handleDisconnect}>
                       <span className="purple-168-text">/</span>disconnect
                     </a>
@@ -374,6 +385,11 @@ export const HeaderMenu: React.FC = () => {
                   <li>
                     <Link to="/grid">
                       <span className="purple-168-text">/</span>grid
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/wire">
+                      <span className="purple-168-text">/</span>wire
                     </Link>
                   </li>
                   <li>

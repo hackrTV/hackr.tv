@@ -9,6 +9,7 @@ interface Album {
   slug: string
   release_date: string | null
   cover_url: string | null
+  album_type?: string
 }
 
 interface Track {
@@ -143,7 +144,7 @@ const TrackListPage: React.FC = () => {
                     <p className="gray-168-text">
                       {track.album?.name}
                       {track.album?.name && ' '}
-                      {track.album && `(${(track.album as any).album_type?.toUpperCase() || 'ALBUM'})`}
+                      {track.album && `(${track.album.album_type?.toUpperCase() || 'ALBUM'})`}
                       {track.album?.release_date && ` • ${track.album.release_date}`}
                       {track.duration && ` • ${track.duration}`}
                     </p>

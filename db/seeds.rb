@@ -7,3 +7,6 @@ load Rails.root.join("db", "seeds", "grid_seeds.rb")
 
 # Load Codex seed data
 load Rails.root.join("db", "seeds", "codex_seeds.rb")
+
+# Load PulseWire seed data
+load Rails.root.join("db", "seeds", "pulse_wire_seeds.rb")
