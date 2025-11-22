@@ -30,7 +30,7 @@ export const GridRegisterPage: React.FC = () => {
 
   return (
     <GridLayout>
-      <div className="tui-window cyan-168 white-text" style={{ maxWidth: '600px', margin: '50px auto' }}>
+      <div className="tui-window cyan-168 white-text" style={{ maxWidth: '600px', margin: '50px auto', display: 'block' }}>
         <fieldset className="cyan-168-border">
           <legend className="center">THE PULSE GRID :: REGISTRATION</legend>
 

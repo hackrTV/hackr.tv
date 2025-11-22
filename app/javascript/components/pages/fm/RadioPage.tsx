@@ -196,7 +196,7 @@ export const RadioPage: React.FC = () => {
 
   return (
     <FmLayout>
-      <div className="tui-window cyan-168 white-text" style={{ maxWidth: '1200px' }}>
+      <div className="tui-window cyan-168 white-text" style={{ maxWidth: '1200px', margin: '0 auto', display: 'block' }}>
         <fieldset className="cyan-168-border">
           <legend className="center">hackr.fm :: RADIO</legend>
 

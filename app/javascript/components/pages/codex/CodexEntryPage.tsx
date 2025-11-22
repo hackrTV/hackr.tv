@@ -69,7 +69,7 @@ export const CodexEntryPage: React.FC = () => {
 
   if (loading) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '900px', margin: '30px auto' }}>
           <LoadingSpinner message="Loading entry..." color="cyan-168-text" size="large" />
         </div>
@@ -79,7 +79,7 @@ export const CodexEntryPage: React.FC = () => {
 
   if (error || !entry) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '900px', margin: '30px auto' }}>
           <div className="tui-window red-168 white-text">
             <fieldset className="red-168-border">
@@ -103,7 +103,7 @@ export const CodexEntryPage: React.FC = () => {
   const typeIcon = ENTRY_TYPE_ICONS[entry.entry_type] || '📄'
 
   return (
-    <DefaultLayout>
+    <DefaultLayout showAsciiArt={false}>
       <div style={{ maxWidth: '900px', margin: '30px auto' }}>
         {/* Back Link */}
         <div style={{ marginBottom: '20px' }}>

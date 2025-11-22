@@ -95,6 +95,18 @@ export const GridAmbientPlayer: React.FC<GridAmbientPlayerProps> = ({
 
     // Only restart if this is a different playlist
     if (playlistRef.current?.id !== playlist.id) {
+      // IMPORTANT: Stop and clean up old playlist before starting new one
+      // This prevents multiple playlists from playing simultaneously
+      faderRef.current.destroy()
+      if (audioARef.current) {
+        audioARef.current.pause()
+        audioARef.current.src = ''
+      }
+      if (audioBRef.current) {
+        audioBRef.current.pause()
+        audioBRef.current.src = ''
+      }
+
       playlistRef.current = playlist
       const randomIndex = Math.floor(Math.random() * playlist.tracks.length)
       // eslint-disable-next-line react-hooks/set-state-in-effect

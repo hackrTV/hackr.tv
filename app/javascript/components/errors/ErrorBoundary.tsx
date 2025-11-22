@@ -49,7 +49,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="tui-window red-255-border" style={{ margin: '2rem auto', maxWidth: '800px' }}>
+        <div className="tui-window red-255-border" style={{ margin: '2rem auto', maxWidth: '800px', display: 'block' }}>
           <fieldset className="tui-fieldset">
             <legend>ERROR</legend>
             <div style={{ padding: '1rem' }}>

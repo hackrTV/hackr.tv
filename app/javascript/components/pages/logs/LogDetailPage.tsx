@@ -73,7 +73,7 @@ export const LogDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '800px', margin: '30px auto' }}>
           <LoadingSpinner message="Loading transmission..." color="purple-168-text" size="large" />
         </div>
@@ -83,7 +83,7 @@ export const LogDetailPage: React.FC = () => {
 
   if (error || !log) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '800px', margin: '30px auto', textAlign: 'center', color: '#f87171' }}>
           {error || 'Log not found'}
         </div>
@@ -92,7 +92,7 @@ export const LogDetailPage: React.FC = () => {
   }
 
   return (
-    <DefaultLayout>
+    <DefaultLayout showAsciiArt={false}>
       <div style={{ maxWidth: '800px', margin: '30px auto', background: '#1a1a1a', color: '#d0d0d0', padding: '30px', border: '1px solid #333' }}>
         {/* Title */}
         <h1 style={{ margin: '0 0 20px 0', fontSize: '1.8em', color: '#a78bfa', lineHeight: '1.3' }}>
