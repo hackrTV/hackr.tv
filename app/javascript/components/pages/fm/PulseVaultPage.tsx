@@ -39,7 +39,7 @@ export const PulseVaultPage: React.FC = () => {
 
   return (
     <FmLayout>
-      <div className="tui-window white-text" style={{ maxWidth: '1400px', background: '#1a1a1a', border: '2px solid #666' }}>
+      <div className="tui-window white-text" style={{ maxWidth: '1400px', margin: '0 auto', display: 'block', background: '#1a1a1a', border: '2px solid #666' }}>
         <fieldset style={{ borderColor: '#666' }}>
           <legend className="center" style={{ color: '#a78bfa' }}>hackr.fm :: PULSE VAULT</legend>
 

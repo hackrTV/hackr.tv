@@ -63,7 +63,7 @@ export const LogsIndexPage: React.FC = () => {
 
   if (loading) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '900px', margin: '30px auto' }}>
           <LoadingSpinner message="Loading Hackr Logs transmissions..." color="purple-168-text" size="large" />
         </div>
@@ -73,7 +73,7 @@ export const LogsIndexPage: React.FC = () => {
 
   if (error) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '900px', margin: '30px auto', textAlign: 'center', color: '#f87171' }}>
           {error}
         </div>
@@ -82,7 +82,7 @@ export const LogsIndexPage: React.FC = () => {
   }
 
   return (
-    <DefaultLayout>
+    <DefaultLayout showAsciiArt={false}>
       <div style={{ maxWidth: '900px', margin: '30px auto', background: '#1a1a1a', color: '#d0d0d0', padding: '20px', border: '1px solid #333' }}>
         <div style={{ marginBottom: '30px', paddingBottom: '15px', borderBottom: '1px solid #4b5563' }}>
           <h1 style={{ margin: 0, fontSize: '1.4em', color: '#a78bfa' }}>HACKR LOGS</h1>

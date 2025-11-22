@@ -67,7 +67,7 @@ export const CodexIndexPage: React.FC = () => {
 
   if (loading) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '1200px', margin: '30px auto' }}>
           <LoadingSpinner message="Loading Codex..." color="cyan-168-text" size="large" />
         </div>
@@ -77,7 +77,7 @@ export const CodexIndexPage: React.FC = () => {
 
   if (error) {
     return (
-      <DefaultLayout>
+      <DefaultLayout showAsciiArt={false}>
         <div style={{ maxWidth: '1200px', margin: '30px auto', textAlign: 'center', color: '#f87171' }}>
           {error}
         </div>
@@ -88,7 +88,7 @@ export const CodexIndexPage: React.FC = () => {
   const entryTypes = Array.from(new Set(entries.map(e => e.entry_type)))
 
   return (
-    <DefaultLayout>
+    <DefaultLayout showAsciiArt={false}>
       <div style={{ maxWidth: '1200px', margin: '30px auto' }}>
         {/* Header */}
         <div className="tui-window cyan-168 white-text">

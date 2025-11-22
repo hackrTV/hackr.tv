@@ -49,7 +49,7 @@ interface LoadingPageProps {
 
 export const LoadingPage: React.FC<LoadingPageProps> = ({ message = 'Loading...' }) => {
   return (
-    <div className="tui-window" style={{ margin: '2rem auto', maxWidth: '600px' }}>
+    <div className="tui-window" style={{ margin: '2rem auto', maxWidth: '600px', display: 'block' }}>
       <fieldset className="tui-fieldset">
         <legend>LOADING</legend>
         <LoadingSpinner message={message} size="large" />

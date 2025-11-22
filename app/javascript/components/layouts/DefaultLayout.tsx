@@ -7,9 +7,10 @@ import { useMobileMenu } from '~/contexts/MobileMenuContext'
 
 interface DefaultLayoutProps {
   children: ReactNode
+  showAsciiArt?: boolean
 }
 
-export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
+export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsciiArt = true }) => {
   const { isMobile } = useMobileDetect()
   const { setMobileMenuOpen } = useMobileMenu()
 
@@ -21,21 +22,25 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
       {!isMobile && <br />}
 
       {/* ASCII Art Header */}
-      <div className="ml-10 pl-5 white-168-text">
-        <Link to="/" style={{ display: 'inline-block' }}>
-          <pre id="greetings" style={{ fontSize: '11px' }}>
-            {` __  __                   __            ______  __  __
+      {showAsciiArt && (
+        <>
+          <div className="ml-10 pl-5 white-168-text">
+            <Link to="/" style={{ display: 'inline-block' }}>
+              <pre id="greetings" style={{ fontSize: '11px' }}>
+                {` __  __                   __            ______  __  __
 /\\ \\/\\ \\                 /\\ \\          /\\__  _\\/\\ \\/\\ \\
 \\ \\ \\_\\ \\     __      ___\\ \\ \\/'\\   _ _\\/_/\\ \\/\\ \\ \\ \\ \\
  \\ \\  _  \\  /'__\`\\   /'___\\ \\ , <  /\\\`'__\\\\ \\ \\ \\ \\ \\ \\ \\
   \\ \\ \\ \\ \\/\\ \\L\\._/\\ \\__/\\ \\ \\\\\`\\\\ \\ \\/ _\\ \\ \\ \\ \\ \\_/ \\
    \\ \\_\\ \\_\\ \\__/.\\_\\ \\____\\\\ \\_\\ \\_\\ \\_\\/\\_\\ \\_\\ \\ \`\\___/
     \\/_/\\/_/\\/__/\\/_/\\/____/ \\/_/\\/_/\\/_/\\/_/\\/_/  \`\\/__/`}
-          </pre>
-        </Link>
-      </div>
+              </pre>
+            </Link>
+          </div>
 
-      <br />
+          <br />
+        </>
+      )}
 
       {/* Footer Navigation Menu */}
       <FooterMenu />

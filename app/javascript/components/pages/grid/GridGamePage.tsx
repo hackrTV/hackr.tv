@@ -51,6 +51,7 @@ export const GridGamePage: React.FC = () => {
   })
   const commandInputRef = useRef<CommandInputHandle>(null)
   const currentPlaylistIdRef = useRef<number | null>(null)
+  const initialLoadDoneRef = useRef(false) // Track if initial load has completed
   const navigate = useNavigate()
 
   // Redirect to login if not authenticated
@@ -62,7 +63,9 @@ export const GridGamePage: React.FC = () => {
 
   // Set initial room ID and load initial output
   useEffect(() => {
-    if (hackr?.current_room) {
+    if (hackr?.current_room && !initialLoadDoneRef.current) {
+      // Mark initial load as starting IMMEDIATELY to prevent duplicate runs
+      initialLoadDoneRef.current = true
       setCurrentRoomId(hackr.current_room.id)
 
       // Add welcome message and initial look command
@@ -210,6 +213,7 @@ export const GridGamePage: React.FC = () => {
   const handleDisconnect = async () => {
     if (confirm('Disconnect from THE PULSE GRID?')) {
       await disconnect()
+      initialLoadDoneRef.current = false // Reset for next login
       navigate('/grid/login')
     }
   }
