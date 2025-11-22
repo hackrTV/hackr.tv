@@ -613,6 +613,7 @@ namespace :import do
         release_date: release_date,
         duration: (track_data["duration"] == "TBA") ? nil : track_data["duration"],
         featured: track_data["featured"] || false,
+        show_in_pulse_vault: track_data.key?("show_in_pulse_vault") ? track_data["show_in_pulse_vault"] : true,
         streaming_links: track_data["streaming_links"]&.compact&.presence,
         videos: track_data["videos"]&.compact&.presence,
         lyrics: lyrics

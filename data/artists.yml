@@ -1,4 +1,7 @@
 artists:
+  - name: "THE PULSE GRID"
+    slug: "the_pulse_grid"
+    genre: "Sountrack"
   - name: "The.CyberPul.se"
     slug: "thecyberpulse"
     genre: "Hackr Metal"

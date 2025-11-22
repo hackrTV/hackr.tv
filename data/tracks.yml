@@ -1,4 +1,123 @@
 # HACKR.FM - COMPLETE SONG CATALOG METADATA
+---
+# THE PULSE GRID OST
+
+- title: "[ZONE] Sector X (ALPHA)"
+  slug: "zone-sector-x-alpha"
+  audio_file: "zone-sector-x-alpha.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 1
+  duration: "TBA"
+  genre: "Sountrack"
+
+- title: "[ZONE] Sector X (BETA)"
+  slug: "zone-sector-x-beta"
+  audio_file: "zone-sector-x-beta.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 2
+  duration: "TBA"
+  genre: "Sountrack"
+
+- title: "[ZONE] Sector X (GAMMA)"
+  slug: "zone-sector-x-gamma"
+  audio_file: "zone-sector-x-gamma.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 3
+  duration: "TBA"
+  genre: "Sountrack"
+
+- title: "[ZONE] Sector X (DELTA)"
+  slug: "zone-sector-x-delta"
+  audio_file: "zone-sector-x-delta.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 4
+  duration: "TBA"
+  genre: "Sountrack"
+
+- title: "[ZONE] Sector X (EPSILON)"
+  slug: "zone-sector-x-epsilon"
+  audio_file: "zone-sector-x-epsilon.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 5
+  duration: "TBA"
+  genre: "Sountrack"
+
+- title: "[ZONE] Sector X (ZETA)"
+  slug: "zone-sector-x-zeta"
+  audio_file: "zone-sector-x-zeta.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 6
+  duration: "TBA"
+  genre: "Sountrack"
+
+- title: "[ZONE] The Hackr Hangar (ALPHA)"
+  slug: "zone-the-hackr-hangar-alpha"
+  audio_file: "zone-the-hackr-hangar-alpha.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 7
+  duration: "TBA"
+  genre: "Sountrack"
+
+- title: "[ZONE] The Hackr Hangar (BETA)"
+  slug: "zone-the-hackr-hangar-beta"
+  audio_file: "zone-the-hackr-hangar-beta.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 8
+  duration: "TBA"
+
+- title: "[ZONE] The Hackr Hangar (GAMMA)"
+  slug: "zone-the-hackr-hangar-gamma"
+  audio_file: "zone-the-hackr-hangar-gamma.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 9
+  duration: "TBA"
+
+- title: "[ZONE] The Hackr Hangar (DELTA)"
+  slug: "zone-the-hackr-hangar-delta"
+  audio_file: "zone-the-hackr-hangar-delta.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 10
+  duration: "TBA"
+
+- title: "[ZONE] The Hackr Hangar (EPSILON)"
+  slug: "zone-the-hackr-hangar-epsilon"
+  audio_file: "zone-the-hackr-hangar-epsilon.ogg"
+  artist: "THE PULSE GRID"
+  album: "OST"
+  album_type: "lp"
+  release_date: "2125-11-21"
+  track_number: 11
+  duration: "TBA"
 
 ---
 # INJECTION VECTOR - Physical Layer EP
@@ -1616,7 +1735,7 @@
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
-  audio_file: "chronology-fracture.mp3"
+  audio_file: "chronology-fracture.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1639,7 +1758,7 @@
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
-  audio_file: "a-hundred-years-between.mp3"
+  audio_file: "a-hundred-years-between.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -1685,7 +1804,7 @@
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
-  audio_file: "the-blue-shift.mp3"
+  audio_file: "the-blue-shift.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1725,7 +1844,7 @@
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
-  audio_file: "memory-cascade.mp3"
+  audio_file: "memory-cascade.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1748,7 +1867,7 @@
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
-  audio_file: "erasure-paradox.mp3"
+  audio_file: "erasure-paradox.ogg"
   featured: true
   streaming_links:
     # spotify: ""
