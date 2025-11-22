@@ -1,0 +1,71 @@
+<%# Flash Messages %>
+<% if flash[:error] %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+    <p class="red-255-text">⚠ ERROR</p>
+    <p class="white-text"><%= flash[:error] %></p>
+  </div>
+<% end %>
+
+<%# Stream Form %>
+<%= form_with model: [:admin, hackr_stream], local: true do |f| %>
+  <%# Basic Info Section %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: STREAM CONFIGURATION ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :artist_id, "ARTIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.select :artist_id,
+        options_for_select(@artists.map { |a| [a.name, a.id] }, hackr_stream.artist_id),
+        { include_blank: "Select artist..." },
+        class: "tui-input", style: "width: 100%; max-width: 400px;" %>
+    <% if hackr_stream.errors[:artist_id].any? %>
+      <br><small class="red-255-text"><%= hackr_stream.errors[:artist_id].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :title, "STREAM TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :title, class: "tui-input", placeholder: "e.g., Live Performance - The Fracture Tour", style: "width: 100%;" %>
+    <small style="color: #888;">Optional - describe what's being streamed</small>
+    <% if hackr_stream.errors[:title].any? %>
+      <br><small class="red-255-text"><%= hackr_stream.errors[:title].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :url, "STREAM URL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :url, class: "tui-input", placeholder: "YouTube watch or embed URL, Twitch embed URL, etc.", style: "width: 100%; font-family: monospace;" %>
+    <small style="color: #888;">YouTube URLs are automatically converted to embed format - Required when going live</small>
+    <% if hackr_stream.errors[:url].any? %>
+      <br><small class="red-255-text"><%= hackr_stream.errors[:url].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <%# Live Status (only show for existing records) %>
+  <% if hackr_stream.persisted? %>
+    <div style="margin-bottom: 20px;">
+      <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">CURRENT STATUS</label>
+      <div style="padding: 15px; background: <%= hackr_stream.is_live ? '#001a00' : '#1a1a1a' %>; border: 2px solid <%= hackr_stream.is_live ? '#00ff00' : '#444' %>;">
+        <% if hackr_stream.is_live %>
+          <p class="green-255-text" style="font-size: 1.2em;">⚡ LIVE</p>
+          <p style="color: #888;">Started: <%= hackr_stream.started_at&.strftime("%Y-%m-%d %H:%M") %></p>
+        <% else %>
+          <p style="color: #888;">⚫ Offline</p>
+          <% if hackr_stream.ended_at.present? %>
+            <p style="color: #666;">Last ended: <%= hackr_stream.ended_at.strftime("%Y-%m-%d %H:%M") %></p>
+          <% end %>
+        <% end %>
+      </div>
+      <small style="color: #888;">Use "Go Live" / "End Stream" buttons on the streams list to change status</small>
+    </div>
+  <% end %>
+
+  <%# Actions %>
+  <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <%= f.submit hackr_stream.persisted? ? "💾 Update Stream" : "➕ Create Stream",
+        class: "tui-button purple-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= link_to "✗ Cancel", admin_hackr_streams_path,
+        class: "tui-button grey-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+  </div>
+<% end %>

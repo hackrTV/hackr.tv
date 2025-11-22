@@ -77,6 +77,7 @@ Rails.application.routes.draw do
     get "codex/:slug", to: "codex#show"
     get "radio_stations", to: "radio#index"
     get "radio_stations/:id/playlists", to: "radio#station_playlists"
+    get "hackr_stream", to: "hackr_streams#show"
 
     # Grid API routes
     get "grid/current_hackr", to: "grid#current_hackr_info"
@@ -139,6 +140,12 @@ Rails.application.routes.draw do
       member do
         post "signal_drop"
         post "restore"
+      end
+    end
+    resources :hackr_streams do
+      member do
+        post :go_live
+        post :end_stream
       end
     end
   end

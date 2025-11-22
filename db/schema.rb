@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_22_043042) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_22_195403) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -193,6 +193,18 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_22_043042) do
     t.index ["slug"], name: "index_hackr_logs_on_slug", unique: true
   end
 
+  create_table "hackr_streams", force: :cascade do |t|
+    t.integer "artist_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "ended_at"
+    t.boolean "is_live", default: false, null: false
+    t.datetime "started_at"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.index ["artist_id"], name: "index_hackr_streams_on_artist_id"
+  end
+
   create_table "playlist_tracks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "playlist_id", null: false
@@ -322,6 +334,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_22_043042) do
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_logs", "grid_hackrs", column: "author_id"
+  add_foreign_key "hackr_streams", "artists"
   add_foreign_key "playlist_tracks", "playlists"
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "grid_hackrs"
