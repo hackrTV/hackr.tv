@@ -1,11 +1,73 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { TerminalAnimation } from '~/components/terminal/TerminalAnimation'
+import { LiveStreamEmbed } from '~/components/LiveStreamEmbed'
+
+interface StreamData {
+  is_live: boolean
+  artist?: {
+    id: number
+    name: string
+    slug: string
+  }
+  title?: string
+  url?: string
+  started_at?: string
+}
 
 export const HomePage: React.FC = () => {
+  const [streamData, setStreamData] = useState<StreamData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchStreamStatus = async () => {
+    try {
+      const response = await fetch('/api/hackr_stream')
+      const data = await response.json()
+      setStreamData(data)
+    } catch (error) {
+      console.error('Failed to fetch stream status:', error)
+      setStreamData({ is_live: false })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchStreamStatus()
+
+    // Poll every 30 seconds to check for stream changes
+    const interval = setInterval(fetchStreamStatus, 30000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  if (loading) {
+    return (
+      <DefaultLayout>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '60vh',
+          color: '#888'
+        }}>
+          Loading...
+        </div>
+      </DefaultLayout>
+    )
+  }
+
   return (
     <DefaultLayout>
-      <TerminalAnimation />
+      {streamData?.is_live && streamData.url ? (
+        <LiveStreamEmbed
+          url={streamData.url}
+          title={streamData.title}
+          artistName={streamData.artist?.name}
+        />
+      ) : (
+        <TerminalAnimation />
+      )}
     </DefaultLayout>
   )
 }
