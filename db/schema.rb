@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_20_153243) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_22_043042) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -75,6 +75,18 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_20_153243) do
     t.index ["entry_type"], name: "index_codex_entries_on_entry_type"
     t.index ["published"], name: "index_codex_entries_on_published"
     t.index ["slug"], name: "index_codex_entries_on_slug", unique: true
+  end
+
+  create_table "echoes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "echoed_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "pulse_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["echoed_at"], name: "index_echoes_on_echoed_at"
+    t.index ["grid_hackr_id"], name: "index_echoes_on_grid_hackr_id"
+    t.index ["pulse_id", "grid_hackr_id"], name: "index_echoes_on_pulse_id_and_grid_hackr_id", unique: true
+    t.index ["pulse_id"], name: "index_echoes_on_pulse_id"
   end
 
   create_table "grid_exits", force: :cascade do |t|
@@ -205,6 +217,25 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_20_153243) do
     t.index ["share_token"], name: "index_playlists_on_share_token", unique: true
   end
 
+  create_table "pulses", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.integer "echo_count", default: 0, null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "parent_pulse_id"
+    t.datetime "pulsed_at", null: false
+    t.boolean "signal_dropped", default: false, null: false
+    t.datetime "signal_dropped_at"
+    t.integer "splice_count", default: 0, null: false
+    t.integer "thread_root_id"
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id"], name: "index_pulses_on_grid_hackr_id"
+    t.index ["parent_pulse_id"], name: "index_pulses_on_parent_pulse_id"
+    t.index ["pulsed_at"], name: "index_pulses_on_pulsed_at"
+    t.index ["signal_dropped"], name: "index_pulses_on_signal_dropped"
+    t.index ["thread_root_id"], name: "index_pulses_on_thread_root_id"
+  end
+
   create_table "radio_station_playlists", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "playlist_id", null: false
@@ -286,12 +317,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_20_153243) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "albums", "artists"
+  add_foreign_key "echoes", "grid_hackrs"
+  add_foreign_key "echoes", "pulses"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_logs", "grid_hackrs", column: "author_id"
   add_foreign_key "playlist_tracks", "playlists"
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "grid_hackrs"
+  add_foreign_key "pulses", "grid_hackrs"
+  add_foreign_key "pulses", "pulses", column: "parent_pulse_id"
+  add_foreign_key "pulses", "pulses", column: "thread_root_id"
   add_foreign_key "radio_station_playlists", "playlists"
   add_foreign_key "radio_station_playlists", "radio_stations"
   add_foreign_key "tracks", "albums"

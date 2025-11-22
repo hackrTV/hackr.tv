@@ -50,6 +50,12 @@ export const FooterMenu: React.FC = () => {
           </li>
           <span className="tui-statusbar-divider"></span>
           <li>
+            <Link to="/wire">
+              <span className="purple-168-text">4b</span> The Wire&nbsp;
+            </Link>
+          </li>
+          <span className="tui-statusbar-divider"></span>
+          <li>
             <Link to="/codex">
               <span className="purple-168-text">5</span> The Codex&nbsp;
             </Link>

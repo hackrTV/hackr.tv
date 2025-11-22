@@ -25,6 +25,9 @@ const LogsIndexPage = lazy(() => import('~/components/pages/logs/LogsIndexPage')
 const LogDetailPage = lazy(() => import('~/components/pages/logs/LogDetailPage').then(m => ({ default: m.LogDetailPage })))
 const CodexIndexPage = lazy(() => import('~/components/pages/codex/CodexIndexPage').then(m => ({ default: m.CodexIndexPage })))
 const CodexEntryPage = lazy(() => import('~/components/pages/codex/CodexEntryPage').then(m => ({ default: m.CodexEntryPage })))
+const HotwirePage = lazy(() => import('~/components/pulsewire/HotwirePage').then(m => ({ default: m.HotwirePage })))
+const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage').then(m => ({ default: m.UserPulsesPage })))
+const SinglePulsePage = lazy(() => import('~/components/pulsewire/SinglePulsePage').then(m => ({ default: m.SinglePulsePage })))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 // Auth components
@@ -81,6 +84,10 @@ export const AppLayout: React.FC = () => {
         {/* Codex routes */}
         <Route path="/codex" element={<CodexIndexPage />} />
         <Route path="/codex/:slug" element={<CodexEntryPage />} />
+        {/* PulseWire routes */}
+        <Route path="/wire" element={<HotwirePage />} />
+        <Route path="/wire/:username" element={<UserPulsesPage />} />
+        <Route path="/wire/pulse/:id" element={<SinglePulsePage />} />
         {/* 404 catch-all - must be last */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

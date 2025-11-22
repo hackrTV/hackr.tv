@@ -60,6 +60,11 @@ Rails.application.routes.draw do
   get "codex", to: "pages#spa_root", as: :codex
   get "codex/:slug", to: "pages#spa_root", as: :codex_entry
 
+  # PulseWire routes - SPA
+  get "wire", to: "pages#spa_root", as: :wire
+  get "wire/:username", to: "pages#spa_root", as: :wire_user
+  get "wire/pulse/:id", to: "pages#spa_root", as: :wire_pulse
+
   # API routes (for SPA)
   namespace :api, defaults: {format: :json} do
     resources :artists, only: [:index, :show] do
@@ -89,6 +94,13 @@ Rails.application.routes.draw do
       resources :tracks, controller: "playlist_tracks", only: [:create, :destroy]
     end
     get "shared_playlists/:share_token", to: "shared_playlists#show"
+
+    # PulseWire API routes
+    resources :pulses, only: [:index, :show, :create, :destroy] do
+      post "signal_drop", on: :member
+      post "echo", to: "echoes#create"
+      get "echoes", to: "echoes#index"
+    end
   end
 
   # Admin routes (accessible at /root)
@@ -120,6 +132,15 @@ Rails.application.routes.draw do
     resources :grid_rooms, only: [:index, :edit, :update]
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
+    resources :pulse_wire, only: [:index] do
+      collection do
+        get "signal_drops"
+      end
+      member do
+        post "signal_drop"
+        post "restore"
+      end
+    end
   end
 
   # Development-only error page testing routes
