@@ -1,4 +1,11 @@
 albums:
+  - artist: "THE PULSE GRID"
+    title: "OST"
+    slug: "ost"
+    album_type: "lp"
+    release_date: "2125-11-21"
+    description: ""
+    cover_image: "ost.png"
   - artist: "The.CyberPul.se"
     title: "Power-On Self-Test"
     slug: "power-on-self-test"
