@@ -13,7 +13,7 @@ interface ThreadViewProps {
 
 export const ThreadView: React.FC<ThreadViewProps> = ({
   thread,
-  rootPulse,
+  rootPulse: _rootPulse,
   onEchoToggle,
   onPulseCreated,
   onPulseDeleted

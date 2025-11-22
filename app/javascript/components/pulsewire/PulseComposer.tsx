@@ -11,7 +11,7 @@ interface PulseComposerProps {
 export const PulseComposer: React.FC<PulseComposerProps> = ({
   onPulseCreated,
   parentPulseId = null,
-  placeholder = "Broadcast to the Wire...",
+  placeholder = 'Broadcast to the Wire...',
   autoFocus = false
 }) => {
   const [content, setContent] = useState('')
@@ -43,7 +43,7 @@ export const PulseComposer: React.FC<PulseComposerProps> = ({
       const response = await fetch('/api/pulses', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -77,7 +77,8 @@ export const PulseComposer: React.FC<PulseComposerProps> = ({
     // Cmd/Ctrl + Enter to submit
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault()
-      handleSubmit(e as any)
+      const formEvent = new Event('submit', { bubbles: true, cancelable: true })
+      e.currentTarget.form?.dispatchEvent(formEvent)
     }
   }
 

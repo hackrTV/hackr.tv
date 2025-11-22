@@ -87,7 +87,7 @@ RSpec.describe Pulse, type: :model do
       it "returns only non-signal-dropped pulses" do
         active1 = create(:pulse)
         active2 = create(:pulse)
-        dropped = create(:pulse, :signal_dropped)
+        create(:pulse, :signal_dropped)
 
         expect(Pulse.active).to contain_exactly(active1, active2)
       end
@@ -95,7 +95,7 @@ RSpec.describe Pulse, type: :model do
 
     describe ".dropped" do
       it "returns only signal-dropped pulses" do
-        active = create(:pulse)
+        create(:pulse)
         dropped1 = create(:pulse, :signal_dropped)
         dropped2 = create(:pulse, :signal_dropped)
 
@@ -117,7 +117,7 @@ RSpec.describe Pulse, type: :model do
       it "returns only pulses without parents" do
         root1 = create(:pulse)
         root2 = create(:pulse)
-        splice = create(:pulse, parent_pulse: root1)
+        create(:pulse, parent_pulse: root1)
 
         expect(Pulse.roots).to contain_exactly(root1, root2)
       end
@@ -128,7 +128,7 @@ RSpec.describe Pulse, type: :model do
         root = create(:pulse)
         splice1 = create(:pulse, parent_pulse: root, pulsed_at: 2.hours.ago)
         splice2 = create(:pulse, parent_pulse: root, pulsed_at: 1.hour.ago)
-        other_splice = create(:pulse, parent_pulse: create(:pulse))
+        create(:pulse, parent_pulse: create(:pulse))
 
         expect(Pulse.splices_for(root.id)).to eq([splice1, splice2])
       end

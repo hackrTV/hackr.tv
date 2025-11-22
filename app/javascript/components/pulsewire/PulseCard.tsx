@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import type { Pulse } from '../../types/pulse'
 import { EchoButton } from './EchoButton'
@@ -84,7 +84,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
     }
   }
 
-  const fetchReplies = async () => {
+  const fetchReplies = useCallback(async () => {
     if (isLoadingReplies || replies.length > 0) return
 
     setIsLoadingReplies(true)
@@ -104,7 +104,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
     } finally {
       setIsLoadingReplies(false)
     }
-  }
+  }, [pulse.id, isLoadingReplies, replies.length])
 
   // Auto-load replies only at the first nesting level
   useEffect(() => {
@@ -112,7 +112,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
       setShowRepliesSection(true)
       fetchReplies()
     }
-  }, [pulse.splice_count, nestLevel])
+  }, [pulse.splice_count, nestLevel, showReplies, showRepliesSection, fetchReplies])
 
   const handleToggleReplies = () => {
     if (!showRepliesSection) {

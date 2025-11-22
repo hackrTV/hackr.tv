@@ -34,15 +34,15 @@ export const usePulseWire = ({ onMessage, enabled = true }: UsePulseWireOptions)
     channelRef.current = cableRef.current.subscriptions.create(
       { channel: 'PulseWireChannel' },
       {
-        connected() {
+        connected () {
           console.log('PulseWire: Connected to the Wire')
           setIsConnected(true)
         },
-        disconnected() {
+        disconnected () {
           console.log('PulseWire: Disconnected from the Wire')
           setIsConnected(false)
         },
-        received(data: PulseWireMessage) {
+        received (data: PulseWireMessage) {
           console.log('PulseWire: Received message:', data)
           onMessage(data)
         }
@@ -66,14 +66,20 @@ export const usePulseWire = ({ onMessage, enabled = true }: UsePulseWireOptions)
   useEffect(() => {
     if (enabled) {
       connect()
-    } else {
-      disconnect()
     }
 
     return () => {
-      disconnect()
+      if (channelRef.current) {
+        channelRef.current.unsubscribe()
+        channelRef.current = null
+      }
+      if (cableRef.current) {
+        cableRef.current.disconnect()
+        cableRef.current = null
+      }
+      setIsConnected(false)
     }
-  }, [enabled, connect, disconnect])
+  }, [enabled, connect])
 
   return {
     isConnected,

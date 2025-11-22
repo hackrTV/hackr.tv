@@ -62,31 +62,31 @@ export const HotwirePage: React.FC = () => {
   // Real-time updates via Action Cable
   const handleWireMessage = useCallback((message: PulseWireMessage) => {
     switch (message.type) {
-      case 'new_pulse':
-        if (message.pulse && !loadedPulseIds.current.has(message.pulse.id)) {
-          setPulses(prev => [message.pulse!, ...prev])
-          loadedPulseIds.current.add(message.pulse.id)
-        }
-        break
+    case 'new_pulse':
+      if (message.pulse && !loadedPulseIds.current.has(message.pulse.id)) {
+        setPulses(prev => [message.pulse!, ...prev])
+        loadedPulseIds.current.add(message.pulse.id)
+      }
+      break
 
-      case 'pulse_deleted':
-      case 'pulse_dropped':
-        if (message.pulse_id) {
-          setPulses(prev => prev.filter(p => p.id !== message.pulse_id))
-          loadedPulseIds.current.delete(message.pulse_id)
-        }
-        break
+    case 'pulse_deleted':
+    case 'pulse_dropped':
+      if (message.pulse_id) {
+        setPulses(prev => prev.filter(p => p.id !== message.pulse_id))
+        loadedPulseIds.current.delete(message.pulse_id)
+      }
+      break
 
-      case 'echo_created':
-      case 'echo_removed':
-        if (message.pulse_id && message.echo_count !== undefined) {
-          setPulses(prev => prev.map(p =>
-            p.id === message.pulse_id
-              ? { ...p, echo_count: message.echo_count!, is_echoed_by_current_hackr: message.type === 'echo_created' }
-              : p
-          ))
-        }
-        break
+    case 'echo_created':
+    case 'echo_removed':
+      if (message.pulse_id && message.echo_count !== undefined) {
+        setPulses(prev => prev.map(p =>
+          p.id === message.pulse_id
+            ? { ...p, echo_count: message.echo_count!, is_echoed_by_current_hackr: message.type === 'echo_created' }
+            : p
+        ))
+      }
+      break
     }
   }, [])
 
@@ -116,14 +116,14 @@ export const HotwirePage: React.FC = () => {
     loadedPulseIds.current.delete(pulseId)
   }
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (!isLoadingMore && hasMore) {
       setIsLoadingMore(true)
       const nextPage = page + 1
       setPage(nextPage)
       fetchPulses(nextPage)
     }
-  }
+  }, [isLoadingMore, hasMore, page, fetchPulses])
 
   // Infinite scroll detection
   useEffect(() => {
@@ -140,7 +140,7 @@ export const HotwirePage: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [isLoadingMore, hasMore, page])
+  }, [isLoadingMore, hasMore, handleLoadMore])
 
   if (isLoading) {
     return (
@@ -166,65 +166,65 @@ export const HotwirePage: React.FC = () => {
   return (
     <DefaultLayout showAsciiArt={false}>
       <div className="hotwire-page white-168-text" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '30px' }}>
-      <div className="hotwire-header">
-        <h1>The Wire</h1>
-        <div className="wire-status">
-          {isConnected ? (
-            <span className="status-connected">● LIVE</span>
+        <div className="hotwire-header">
+          <h1>The Wire</h1>
+          <div className="wire-status">
+            {isConnected ? (
+              <span className="status-connected">● LIVE</span>
+            ) : (
+              <span className="status-disconnected">○ OFFLINE</span>
+            )}
+          </div>
+        </div>
+
+        <div className="pulse-composer-section">
+          {currentHackr ? (
+            <PulseComposer onPulseCreated={handlePulseCreated} />
           ) : (
-            <span className="status-disconnected">○ OFFLINE</span>
+            <div className="login-prompt" style={{
+              padding: '20px',
+              textAlign: 'center',
+              background: 'rgba(124, 58, 237, 0.1)',
+              border: '1px solid #7c3aed',
+              marginBottom: '30px'
+            }}>
+              <p style={{ margin: '0 0 10px 0', color: '#a78bfa' }}>
+                <Link to="/grid/login" style={{ color: '#60a5fa', textDecoration: 'none' }}>
+                Log in
+                </Link>
+                {' '}to send a pulse across the Wire
+              </p>
+            </div>
           )}
         </div>
-      </div>
 
-      <div className="pulse-composer-section">
-        {currentHackr ? (
-          <PulseComposer onPulseCreated={handlePulseCreated} />
-        ) : (
-          <div className="login-prompt" style={{
-            padding: '20px',
-            textAlign: 'center',
-            background: 'rgba(124, 58, 237, 0.1)',
-            border: '1px solid #7c3aed',
-            marginBottom: '30px'
-          }}>
-            <p style={{ margin: '0 0 10px 0', color: '#a78bfa' }}>
-              <Link to="/grid/login" style={{ color: '#60a5fa', textDecoration: 'none' }}>
-                Log in
-              </Link>
-              {' '}to send a pulse across the Wire
-            </p>
-          </div>
-        )}
-      </div>
+        <div className="hotwire-timeline">
+          {pulses.length === 0 ? (
+            <div className="empty-state">
+              <p>The Wire is silent. Broadcast the first pulse.</p>
+            </div>
+          ) : (
+            <>
+              {pulses.map(pulse => (
+                <PulseCard
+                  key={pulse.id}
+                  pulse={pulse}
+                  onEchoToggle={handleEchoToggle}
+                  onPulseCreated={handlePulseCreated}
+                  onPulseDeleted={handlePulseDeleted}
+                />
+              ))}
 
-      <div className="hotwire-timeline">
-        {pulses.length === 0 ? (
-          <div className="empty-state">
-            <p>The Wire is silent. Broadcast the first pulse.</p>
-          </div>
-        ) : (
-          <>
-            {pulses.map(pulse => (
-              <PulseCard
-                key={pulse.id}
-                pulse={pulse}
-                onEchoToggle={handleEchoToggle}
-                onPulseCreated={handlePulseCreated}
-                onPulseDeleted={handlePulseDeleted}
-              />
-            ))}
+              {isLoadingMore && (
+                <div className="loading-more">Loading more pulses...</div>
+              )}
 
-            {isLoadingMore && (
-              <div className="loading-more">Loading more pulses...</div>
-            )}
-
-            {!hasMore && pulses.length > 0 && (
-              <div className="end-of-feed">End of the Wire</div>
-            )}
-          </>
-        )}
-      </div>
+              {!hasMore && pulses.length > 0 && (
+                <div className="end-of-feed">End of the Wire</div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </DefaultLayout>
   )

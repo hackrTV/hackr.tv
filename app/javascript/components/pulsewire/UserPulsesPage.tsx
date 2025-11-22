@@ -76,38 +76,38 @@ export const UserPulsesPage: React.FC = () => {
   return (
     <DefaultLayout showAsciiArt={false}>
       <div className="user-pulses-page white-168-text" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '30px' }}>
-      <div className="user-header">
-        <h1>@{username}</h1>
-        <div className="user-stats">
-          {pulses.length} {pulses.length === 1 ? 'pulse' : 'pulses'}
-        </div>
-      </div>
-
-      <div className="back-link" style={{ marginBottom: '20px', marginTop: '10px' }}>
-        <Link to="/wire">← Back to the Wire</Link>
-      </div>
-
-      <div className="user-timeline">
-        {pulses.length === 0 ? (
-          <div className="empty-state">
-            <p>@{username} hasn't broadcast any pulses yet.</p>
+        <div className="user-header">
+          <h1>@{username}</h1>
+          <div className="user-stats">
+            {pulses.length} {pulses.length === 1 ? 'pulse' : 'pulses'}
           </div>
-        ) : (
-          pulses.map(pulse => (
-            <PulseCard
-              key={pulse.id}
-              pulse={pulse}
-              onEchoToggle={handleEchoToggle}
-              onPulseCreated={handlePulseCreated}
-              onPulseDeleted={handlePulseDeleted}
-            />
-          ))
-        )}
-      </div>
+        </div>
 
-      <div className="back-link">
-        <Link to="/wire">← Back to the Wire</Link>
-      </div>
+        <div className="back-link" style={{ marginBottom: '20px', marginTop: '10px' }}>
+          <Link to="/wire">← Back to the Wire</Link>
+        </div>
+
+        <div className="user-timeline">
+          {pulses.length === 0 ? (
+            <div className="empty-state">
+              <p>@{username} hasn't broadcast any pulses yet.</p>
+            </div>
+          ) : (
+            pulses.map(pulse => (
+              <PulseCard
+                key={pulse.id}
+                pulse={pulse}
+                onEchoToggle={handleEchoToggle}
+                onPulseCreated={handlePulseCreated}
+                onPulseDeleted={handlePulseDeleted}
+              />
+            ))
+          )}
+        </div>
+
+        <div className="back-link">
+          <Link to="/wire">← Back to the Wire</Link>
+        </div>
       </div>
     </DefaultLayout>
   )

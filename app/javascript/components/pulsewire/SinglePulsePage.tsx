@@ -82,17 +82,17 @@ export const SinglePulsePage: React.FC = () => {
   return (
     <DefaultLayout showAsciiArt={false}>
       <div className="single-pulse-page white-168-text" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '30px' }}>
-      <ThreadView
-        thread={thread}
-        rootPulse={pulse}
-        onEchoToggle={handleEchoToggle}
-        onPulseCreated={handlePulseCreated}
-        onPulseDeleted={handlePulseDeleted}
-      />
+        <ThreadView
+          thread={thread}
+          rootPulse={pulse}
+          onEchoToggle={handleEchoToggle}
+          onPulseCreated={handlePulseCreated}
+          onPulseDeleted={handlePulseDeleted}
+        />
 
-      <div className="back-link">
-        <Link to="/wire">← Back to the Wire</Link>
-      </div>
+        <div className="back-link">
+          <Link to="/wire">← Back to the Wire</Link>
+        </div>
       </div>
     </DefaultLayout>
   )

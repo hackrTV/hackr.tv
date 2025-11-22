@@ -29,13 +29,13 @@ module Api
       end
 
       # Filter by status
-      case params[:filter]
+      pulses = case params[:filter]
       when "dropped"
-        pulses = pulses.dropped
+        pulses.dropped
       when "active"
-        pulses = pulses.active
+        pulses.active
       else
-        pulses = pulses.active  # Default to active only
+        pulses.active  # Default to active only
       end
 
       # Pagination

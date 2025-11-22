@@ -37,19 +37,19 @@ pulse1 = Pulse.create!(
   pulsed_at: 3.days.ago
 )
 
-pulse2 = Pulse.create!(
+Pulse.create!(
   grid_hackr: synthia,
   content: "Frequency patterns shifting in unexpected ways. My signal processing algorithms detect... something. Calculating...",
   pulsed_at: 2.days.ago + 5.hours
 )
 
-pulse3 = Pulse.create!(
+Pulse.create!(
   grid_hackr: ryker,
   content: "PRISM surveillance protocols updated. All operators, maintain signal discipline. The Grid remembers.",
   pulsed_at: 2.days.ago
 )
 
-pulse4 = Pulse.create!(
+Pulse.create!(
   grid_hackr: nyx,
   content: "The temporal anomalies near Zone 7 are getting worse. Time doesn't flow right there anymore. Avoid if possible.",
   pulsed_at: 1.day.ago + 8.hours
@@ -62,7 +62,7 @@ thread_root = Pulse.create!(
   pulsed_at: 1.day.ago + 4.hours
 )
 
-splice1 = Pulse.create!(
+Pulse.create!(
   grid_hackr: xeraen,
   parent_pulse: thread_root,
   content: "Been tracking their broadcasts. Definitely ramping up for an operation. Question is: what's the target?",
@@ -91,13 +91,13 @@ splice4 = Pulse.create!(
 )
 
 # More recent pulses
-pulse5 = Pulse.create!(
+Pulse.create!(
   grid_hackr: synthia,
   content: "The Pulse Grid's ambient frequencies modulating in non-random patterns. Analyzing waveform for embedded data... 🎵",
   pulsed_at: 18.hours.ago
 )
 
-pulse6 = Pulse.create!(
+Pulse.create!(
   grid_hackr: cipher,
   content: "Reminder: OPSEC is life. Don't broadcast your location, don't brag about your tech, don't trust anyone completely. Stay ghost.",
   pulsed_at: 12.hours.ago
@@ -117,7 +117,7 @@ pulse8 = Pulse.create!(
 )
 
 # A signal-dropped pulse (example of GovCorp moderation)
-dropped_pulse = Pulse.create!(
+Pulse.create!(
   grid_hackr: cipher,
   content: "CLASSIFIED INTEL: GovCorp's Project Oversight has full access to—",
   pulsed_at: 6.hours.ago,

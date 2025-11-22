@@ -24,7 +24,7 @@ export const EchoButton: React.FC<EchoButtonProps> = ({ pulse, onEchoToggle }) =
       const response = await fetch(`/api/pulses/${pulse.id}/echo`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         credentials: 'include'
       })

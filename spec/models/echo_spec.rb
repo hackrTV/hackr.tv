@@ -22,7 +22,7 @@ RSpec.describe Echo, type: :model do
       pulse1 = create(:pulse)
       pulse2 = create(:pulse)
 
-      echo1 = create(:echo, pulse: pulse1, grid_hackr: hackr)
+      create(:echo, pulse: pulse1, grid_hackr: hackr)
       echo2 = build(:echo, pulse: pulse2, grid_hackr: hackr)
 
       expect(echo2).to be_valid
@@ -33,7 +33,7 @@ RSpec.describe Echo, type: :model do
       hackr1 = create(:grid_hackr)
       hackr2 = create(:grid_hackr)
 
-      echo1 = create(:echo, pulse: pulse, grid_hackr: hackr1)
+      create(:echo, pulse: pulse, grid_hackr: hackr1)
       echo2 = build(:echo, pulse: pulse, grid_hackr: hackr2)
 
       expect(echo2).to be_valid
