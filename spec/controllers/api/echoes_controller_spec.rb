@@ -128,8 +128,8 @@ RSpec.describe Api::EchoesController, type: :controller do
       before { session[:grid_hackr_id] = hackr.id }
 
       it "returns list of hackrs who echoed the pulse" do
-        echo1 = create(:echo, pulse: pulse, grid_hackr: hackr)
-        echo2 = create(:echo, pulse: pulse, grid_hackr: other_hackr)
+        create(:echo, pulse: pulse, grid_hackr: hackr)
+        create(:echo, pulse: pulse, grid_hackr: other_hackr)
 
         get :index, params: {pulse_id: pulse.id}, format: :json
 
@@ -153,7 +153,7 @@ RSpec.describe Api::EchoesController, type: :controller do
       end
 
       it "includes echoed_at timestamp" do
-        echo = create(:echo, pulse: pulse, grid_hackr: hackr)
+        create(:echo, pulse: pulse, grid_hackr: hackr)
 
         get :index, params: {pulse_id: pulse.id}, format: :json
 

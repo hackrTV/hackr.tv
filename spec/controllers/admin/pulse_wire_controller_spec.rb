@@ -139,9 +139,9 @@ RSpec.describe Admin::PulseWireController, type: :controller do
     end
 
     it "orders by pulsed_at descending" do
-      dropped_pulse2 = create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 3.days.ago)
-      dropped_pulse1 = create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 1.day.ago)
-      dropped_pulse3 = create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 2.days.ago)
+      create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 3.days.ago)
+      create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 1.day.ago)
+      create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 2.days.ago)
 
       get :signal_drops
 

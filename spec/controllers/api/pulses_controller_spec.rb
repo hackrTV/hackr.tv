@@ -8,8 +8,8 @@ RSpec.describe Api::PulsesController, type: :controller do
   describe "GET #index" do
     context "without authentication" do
       it "returns active pulses (no auth required for reading)" do
-        pulse1 = create(:pulse, grid_hackr: hackr)
-        pulse2 = create(:pulse, grid_hackr: other_hackr)
+        create(:pulse, grid_hackr: hackr)
+        create(:pulse, grid_hackr: other_hackr)
 
         get :index, format: :json
 
@@ -47,7 +47,7 @@ RSpec.describe Api::PulsesController, type: :controller do
     context "with hackr filter" do
       it "filters pulses by hackr alias" do
         pulse1 = create(:pulse, grid_hackr: hackr)
-        pulse2 = create(:pulse, grid_hackr: other_hackr)
+        create(:pulse, grid_hackr: other_hackr)
 
         get :index, params: {hackr: hackr.hackr_alias}, format: :json
 
