@@ -6,16 +6,6 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 
 ## High Priority
 
-### PulseWire - Admin Interface
-
-**Status:** Core implementation complete (42 model tests passing). Admin moderation UI is the last missing piece.
-
-- [ ] **Admin moderation dashboard** (`/root/pulsewire`) - View all pulses with moderation tools
-- [ ] **SignalDrop management** (`/root/pulsewire/signal_drops`) - Review removed pulses, restore if needed
-- [ ] **Admin controller** (`Root::PulseWireController`) - Server-rendered Rails views for moderation
-- [ ] **Bulk moderation tools** - Multi-select SignalDrop, filter by user/date
-- [ ] **Admin tests** - Controller specs for moderation features
-
 ### Content & Media
 
 - [ ] **Upload audio files** - 64 tracks missing audio (2/66 tracks have audio across 2/14 albums)
@@ -92,7 +82,8 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 See CLAUDE.md "Development Roadmap - ✅ Completed" section for full implementation history.
 
 **Recent completions:**
-- [x] **PulseWire social network (2025-11-22)** - Core implementation: Pulses/Echoes models, full REST API, real-time Action Cable updates, React SPA (7 components: Hotwire, UserPulses, SinglePulse, PulseComposer, PulseCard, ThreadView, EchoButton), TUI styling with glitch effects, 14 seed pulses, 42 model tests passing. Admin moderation UI pending.
+- [x] **PulseWire admin moderation (2025-11-22)** - Complete admin interface: moderation dashboard (`/root/pulse_wire`), SignalDrop management, filters (status/user/content/date), bulk actions (signal-drop/delete), 35 controller tests passing. PulseWire is now 100% complete!
+- [x] **PulseWire social network (2025-11-22)** - Core implementation: Pulses/Echoes models, full REST API, real-time Action Cable updates, React SPA (7 components: Hotwire, UserPulses, SinglePulse, PulseComposer, PulseCard, ThreadView, EchoButton), TUI styling with glitch effects, 14 seed pulses, 42 model tests passing.
 - [x] **Global inline linking (2025-11-20)** - `[[Entry Name]]` syntax works everywhere with canonical name lookup
 - [x] **The Codex wiki (2025-11-20)** - 7 entry types, markdown with auto-linking, admin CRUD, public SPA with search/filter
 - [x] **Playlists feature (2025-11-16)** - Full CRUD, manual ordering, share tokens, queue panel, auth-gated UI

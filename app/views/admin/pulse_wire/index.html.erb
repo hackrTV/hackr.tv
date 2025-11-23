@@ -1,0 +1,352 @@
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/pulsewire :: MODERATE THE WIRE</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Actions -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <div style="margin-left: auto; display: flex; gap: 10px;">
+          <%= link_to "🗑 SignalDrops", signal_drops_admin_pulse_wire_index_path, class: "tui-button red-168", style: "padding: 8px 20px;" %>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div style="margin-bottom: 20px; background: #1a1a1a; padding: 15px; border: 1px solid #333;">
+        <label style="color: #888; display: block; margin-bottom: 8px; font-weight: bold;">
+          FILTER PULSES
+        </label>
+
+        <%= form_with url: admin_pulse_wire_index_path, method: :get, local: true, style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
+          <!-- Status Filter -->
+          <div style="flex: 0 0 auto;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Status</label>
+            <div style="display: flex; gap: 5px;">
+              <%= link_to "All", admin_pulse_wire_index_path(username: params[:username], search: params[:search], start_date: params[:start_date], end_date: params[:end_date]),
+                  class: "tui-button #{params[:status].blank? ? 'cyan-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+              <%= link_to "Active", admin_pulse_wire_index_path(status: 'active', username: params[:username], search: params[:search], start_date: params[:start_date], end_date: params[:end_date]),
+                  class: "tui-button #{params[:status] == 'active' ? 'green-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+              <%= link_to "Dropped", admin_pulse_wire_index_path(status: 'dropped', username: params[:username], search: params[:search], start_date: params[:start_date], end_date: params[:end_date]),
+                  class: "tui-button #{params[:status] == 'dropped' ? 'red-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+            </div>
+          </div>
+
+          <!-- Username Filter -->
+          <div style="flex: 1 1 200px;">
+            <label for="username" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Username</label>
+            <%= f.text_field :username,
+                value: params[:username],
+                placeholder: "@username",
+                style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          </div>
+
+          <!-- Content Search -->
+          <div style="flex: 1 1 200px;">
+            <label for="search" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Content Search</label>
+            <%= f.text_field :search,
+                value: params[:search],
+                placeholder: "Search pulse content...",
+                style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          </div>
+
+          <!-- Date Range -->
+          <div style="flex: 0 0 auto;">
+            <label for="start_date" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Start Date</label>
+            <%= f.date_field :start_date,
+                value: params[:start_date],
+                style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          </div>
+
+          <div style="flex: 0 0 auto;">
+            <label for="end_date" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">End Date</label>
+            <%= f.date_field :end_date,
+                value: params[:end_date],
+                style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div style="flex: 0 0 auto; display: flex; gap: 5px;">
+            <%= f.submit "Apply Filters", class: "tui-button purple-168", style: "padding: 8px 20px;" %>
+            <%= link_to "Clear", admin_pulse_wire_index_path, class: "tui-button grey-168", style: "padding: 8px 20px;" %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Stats -->
+      <div style="margin-bottom: 20px; color: #666;">
+        <strong><%= @pulses.count %></strong> pulse<%= @pulses.count == 1 ? '' : 's' %> found
+        <% if params[:status].present? || params[:username].present? || params[:search].present? || params[:start_date].present? || params[:end_date].present? %>
+          <span style="color: #888;"> (filtered)</span>
+        <% end %>
+      </div>
+
+      <!-- Bulk Actions -->
+      <% if @pulses.any? %>
+        <div style="margin-bottom: 15px; background: #1a1a1a; padding: 15px; border: 1px solid #333;">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <label style="color: #888;">
+              <input type="checkbox" id="select-all" style="margin-right: 8px;">
+              Select All
+            </label>
+            <span id="selected-count" style="color: #666; margin-left: 10px;">0 selected</span>
+            <div style="margin-left: auto; display: flex; gap: 10px;">
+              <button id="bulk-signal-drop"
+                      class="tui-button orange-168"
+                      style="padding: 8px 20px;"
+                      disabled>
+                Signal-Drop Selected
+              </button>
+              <button id="bulk-delete"
+                      class="tui-button red-168"
+                      style="padding: 8px 20px;"
+                      disabled>
+                Delete Selected
+              </button>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Pulses Table -->
+      <% if @pulses.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; margin-top: 20px;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center; width: 5%;"></th>
+                <th style="text-align: left; width: 13%;">Hackr</th>
+                <th style="text-align: left; width: 42%;">Content</th>
+                <th style="text-align: center; width: 8%;">Echoes</th>
+                <th style="text-align: center; width: 8%;">Splices</th>
+                <th style="text-align: center; width: 10%;">Timestamp</th>
+                <th style="text-align: center; width: 14%;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @pulses.each do |pulse| %>
+                <tr style="<%= 'background: #1a0000;' if pulse.signal_dropped %>">
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="pulse-checkbox" value="<%= pulse.id %>">
+                  </td>
+                  <td>
+                    <strong class="cyan-255-text">@<%= pulse.grid_hackr.hackr_alias %></strong>
+                    <% if pulse.is_splice? %>
+                      <br>
+                      <small style="color: #888;">↪ Splice</small>
+                    <% end %>
+                  </td>
+                  <td>
+                    <div style="font-family: monospace; line-height: 1.5;">
+                      <%= pulse.content %>
+                    </div>
+                    <% if pulse.signal_dropped %>
+                      <div style="margin-top: 8px;">
+                        <span class="red-255-text">⚠ SIGNAL DROPPED</span>
+                        <small style="color: #888;">
+                          <%= time_ago_in_words(pulse.signal_dropped_at) %> ago
+                        </small>
+                      </div>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="purple-255-text"><%= pulse.echo_count %></span>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="purple-255-text"><%= pulse.splice_count %></span>
+                  </td>
+                  <td style="text-align: center;">
+                    <small style="color: #888;">
+                      <%= pulse.pulsed_at.strftime("%Y-%m-%d") %><br>
+                      <%= pulse.pulsed_at.strftime("%H:%M") %>
+                    </small>
+                  </td>
+                  <td style="text-align: center;">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                      <%= link_to "View", wire_pulse_path(pulse.id),
+                          target: "_blank",
+                          class: "tui-button cyan-168",
+                          style: "padding: 2px 8px; font-size: 0.9em;" %>
+
+                      <% if pulse.signal_dropped %>
+                        <%= button_to "Restore", restore_admin_pulse_wire_path(pulse),
+                            method: :post,
+                            class: "tui-button green-168",
+                            style: "padding: 2px 8px; font-size: 0.9em;" %>
+                      <% else %>
+                        <%= button_to "Drop", signal_drop_admin_pulse_wire_path(pulse),
+                            method: :post,
+                            data: { confirm: "Signal-drop this pulse by @#{pulse.grid_hackr.hackr_alias}?" },
+                            class: "tui-button orange-168",
+                            style: "padding: 2px 8px; font-size: 0.9em;" %>
+                      <% end %>
+
+                      <%= button_to "Delete", admin_pulse_wire_path(pulse),
+                          method: :delete,
+                          data: { confirm: "Permanently delete this pulse? This cannot be undone!" },
+                          class: "tui-button red-168",
+                          style: "padding: 2px 8px; font-size: 0.9em;" %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">
+            <% if params[:status].present? || params[:username].present? || params[:search].present? %>
+              No pulses match your filters.
+            <% else %>
+              The Wire is empty. No pulses broadcast yet.
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<% if @pulses.any? %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const selectAllCheckbox = document.getElementById('select-all');
+      const pulseCheckboxes = document.querySelectorAll('.pulse-checkbox');
+      const selectedCount = document.getElementById('selected-count');
+      const bulkSignalDropBtn = document.getElementById('bulk-signal-drop');
+      const bulkDeleteBtn = document.getElementById('bulk-delete');
+
+      function updateSelectedCount() {
+        const checked = document.querySelectorAll('.pulse-checkbox:checked');
+        const count = checked.length;
+        selectedCount.textContent = count + ' selected';
+
+        // Enable/disable bulk action buttons
+        bulkSignalDropBtn.disabled = count === 0;
+        bulkDeleteBtn.disabled = count === 0;
+
+        // Update select-all checkbox state
+        if (count === 0) {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = false;
+        } else if (count === pulseCheckboxes.length) {
+          selectAllCheckbox.checked = true;
+          selectAllCheckbox.indeterminate = false;
+        } else {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = true;
+        }
+      }
+
+      // Select all toggle
+      selectAllCheckbox.addEventListener('change', function() {
+        pulseCheckboxes.forEach(cb => {
+          cb.checked = this.checked;
+        });
+        updateSelectedCount();
+      });
+
+      // Individual checkbox change
+      pulseCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+      });
+
+      // Bulk signal-drop
+      bulkSignalDropBtn.addEventListener('click', function() {
+        const checked = Array.from(document.querySelectorAll('.pulse-checkbox:checked'));
+        const count = checked.length;
+
+        if (count === 0) return;
+
+        if (!confirm(`Signal-drop ${count} pulse${count === 1 ? '' : 's'}?`)) {
+          return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '<%= bulk_signal_drop_admin_pulse_wire_index_path %>';
+
+        // CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'authenticity_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        // Pulse IDs
+        checked.forEach(cb => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'pulse_ids[]';
+          input.value = cb.value;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+      });
+
+      // Bulk delete
+      bulkDeleteBtn.addEventListener('click', function() {
+        const checked = Array.from(document.querySelectorAll('.pulse-checkbox:checked'));
+        const count = checked.length;
+
+        if (count === 0) return;
+
+        if (!confirm(`PERMANENTLY DELETE ${count} pulse${count === 1 ? '' : 's'}? This cannot be undone!`)) {
+          return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '<%= bulk_destroy_admin_pulse_wire_index_path %>';
+
+        // Rails expects DELETE method via _method parameter
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'delete';
+        form.appendChild(methodInput);
+
+        // CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'authenticity_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        // Pulse IDs
+        checked.forEach(cb => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'pulse_ids[]';
+          input.value = cb.value;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+      });
+
+      // Initialize count
+      updateSelectedCount();
+    });
+  </script>
+<% end %>
