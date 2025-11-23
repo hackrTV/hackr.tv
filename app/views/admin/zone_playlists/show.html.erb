@@ -1,4 +1,4 @@
-<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
   <fieldset class="cyan-168-border">
     <legend class="center">/root/zone_playlists/<%= @zone_playlist.id %> :: <%= @zone_playlist.name.upcase %></legend>
 
@@ -25,7 +25,7 @@
       </div>
 
       <!-- Playlist Details -->
-      <div class="tui-window white-text" style="background: #0a0a0a; margin-bottom: 20px; padding: 20px;">
+      <div class="tui-window white-text" style="display: block; background: #0a0a0a; margin-bottom: 20px; padding: 20px;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
           <div>
             <p style="color: #888; margin-bottom: 5px;">DESCRIPTION</p>
@@ -51,7 +51,7 @@
         <h3 style="color: #ccc; margin-bottom: 15px;">CURRENT TRACKS</h3>
 
         <% if @tracks.any? %>
-          <div class="tui-window white-text" style="background: #0a0a0a;">
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
             <table class="tui-table" id="playlist-tracks-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -112,7 +112,7 @@
             />
           </div>
 
-          <div class="tui-window white-text" style="background: #0a0a0a; max-height: 500px; overflow-y: auto;">
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a; max-height: 500px; overflow-y: auto;">
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>

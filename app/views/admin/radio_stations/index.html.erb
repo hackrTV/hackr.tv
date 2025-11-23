@@ -1,4 +1,4 @@
-<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
   <fieldset class="cyan-168-border">
     <legend class="center">RADIO STATIONS</legend>
 
@@ -9,7 +9,7 @@
       </div>
 
       <% if @radio_stations.empty? %>
-        <div class="tui-window yellow-168 white-text" style="margin: 20px 0;">
+        <div class="tui-window yellow-168 white-text" style="display: block; margin: 20px 0;">
           <fieldset class="yellow-168-border">
             <legend>No Stations</legend>
             <div style="padding: 20px; text-align: center;">
@@ -18,7 +18,7 @@
           </fieldset>
         </div>
       <% else %>
-        <div class="tui-window white-text" style="background: #0a0a0a;">
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr style="border-bottom: 2px solid #00ffff;">

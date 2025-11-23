@@ -1,4 +1,4 @@
-<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
   <fieldset class="cyan-168-border">
     <legend class="center">/root/grid :: PULSE GRID ADMIN</legend>
 
@@ -21,7 +21,7 @@
       <!-- Broadcast Section -->
       <div style="margin-bottom: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SYSTEM BROADCAST ::]</h3>
-        <div class="tui-window white-text" style="background: #0a0a0a; padding: 20px;">
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
           <%= form_with url: admin_grid_broadcast_path, method: :post, local: true do |f| %>
             <div style="margin-bottom: 15px;">
               <%= label_tag :message, "MESSAGE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
@@ -37,7 +37,7 @@
       <div style="margin-bottom: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ONLINE HACKRS (<%= @online_hackrs.count %>) ::]</h3>
         <% if @online_hackrs.any? %>
-          <div class="tui-window white-text" style="background: #0a0a0a;">
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -82,7 +82,7 @@
       <!-- Recent Messages Section -->
       <div style="margin-bottom: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT MESSAGES (Last 50) ::]</h3>
-        <div class="tui-window white-text" style="background: #0a0a0a;">
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
           <% if @recent_messages.any? %>
             <div style="max-height: 400px; overflow-y: auto; padding: 15px; font-family: monospace; font-size: 0.9em;">
               <% @recent_messages.reverse.each do |message| %>
@@ -109,7 +109,7 @@
       <!-- All Hackrs Section -->
       <div style="margin-bottom: 20px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ALL HACKRS (<%= @all_hackrs.count %>) ::]</h3>
-        <div class="tui-window white-text" style="background: #0a0a0a;">
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
