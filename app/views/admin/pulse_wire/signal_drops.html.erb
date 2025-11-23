@@ -1,0 +1,127 @@
+<div class="tui-window red-168 white-text" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
+  <fieldset class="red-168-border">
+    <legend class="center">/root/pulsewire/signal_drops :: MODERATION GRAVEYARD</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Actions -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <%= link_to "← Back to All Pulses", admin_pulse_wire_index_path, class: "tui-button cyan-168", style: "padding: 8px 20px;" %>
+        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <!-- Info Banner -->
+      <div style="background: #1a0000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+        <p class="red-255-text" style="margin: 0;">
+          ⚠ SIGNAL-DROPPED PULSES :: These pulses have been removed from The Wire by admin moderation.
+        </p>
+        <p style="color: #888; margin: 10px 0 0 0; font-size: 0.9em;">
+          You can restore pulses to make them visible again, or permanently delete them.
+        </p>
+      </div>
+
+      <!-- Stats -->
+      <div style="margin-bottom: 20px; color: #666;">
+        <strong class="red-255-text"><%= @pulses.count %></strong> signal-dropped pulse<%= @pulses.count == 1 ? '' : 's' %>
+      </div>
+
+      <!-- Pulses Table -->
+      <% if @pulses.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; margin-top: 20px;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left; width: 15%;">Hackr</th>
+                <th style="text-align: left; width: 45%;">Content</th>
+                <th style="text-align: center; width: 10%;">Echoes</th>
+                <th style="text-align: center; width: 10%;">Splices</th>
+                <th style="text-align: center; width: 10%;">Dropped</th>
+                <th style="text-align: center; width: 10%;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @pulses.each do |pulse| %>
+                <tr style="background: #1a0000;">
+                  <td>
+                    <strong class="cyan-255-text">@<%= pulse.grid_hackr.hackr_alias %></strong>
+                    <% if pulse.is_splice? %>
+                      <br>
+                      <small style="color: #888;">↪ Splice</small>
+                    <% end %>
+                  </td>
+                  <td>
+                    <div style="font-family: monospace; line-height: 1.5;">
+                      <%= pulse.content %>
+                    </div>
+                    <div style="margin-top: 8px;">
+                      <span class="red-255-text">⚠ SIGNAL DROPPED</span>
+                    </div>
+                    <div style="margin-top: 5px;">
+                      <small style="color: #666;">
+                        Originally broadcast: <%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M") %>
+                      </small>
+                    </div>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="purple-255-text"><%= pulse.echo_count %></span>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="purple-255-text"><%= pulse.splice_count %></span>
+                  </td>
+                  <td style="text-align: center;">
+                    <small style="color: #888;">
+                      <%= time_ago_in_words(pulse.signal_dropped_at) %> ago
+                    </small>
+                  </td>
+                  <td style="text-align: center;">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                      <%= link_to "View", wire_pulse_path(pulse.id),
+                          target: "_blank",
+                          class: "tui-button cyan-168",
+                          style: "padding: 2px 8px; font-size: 0.9em;" %>
+
+                      <%= button_to "Restore", restore_admin_pulse_wire_path(pulse),
+                          method: :post,
+                          data: { confirm: "Restore this pulse by @#{pulse.grid_hackr.hackr_alias}?" },
+                          class: "tui-button green-168",
+                          style: "padding: 2px 8px; font-size: 0.9em;" %>
+
+                      <%= button_to "Delete", admin_pulse_wire_path(pulse),
+                          method: :delete,
+                          data: { confirm: "Permanently delete this pulse? This cannot be undone!" },
+                          class: "tui-button red-168",
+                          style: "padding: 2px 8px; font-size: 0.9em;" %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">
+            No signal-dropped pulses. The moderation graveyard is empty.
+          </p>
+          <p style="color: #444; margin-top: 10px;">
+            All pulses on The Wire are currently active.
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

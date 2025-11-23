@@ -133,9 +133,11 @@ Rails.application.routes.draw do
     resources :grid_rooms, only: [:index, :edit, :update]
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
-    resources :pulse_wire, only: [:index] do
+    resources :pulse_wire, only: [:index, :destroy] do
       collection do
         get "signal_drops"
+        post "bulk_signal_drop"
+        delete "bulk_destroy"
       end
       member do
         post "signal_drop"
