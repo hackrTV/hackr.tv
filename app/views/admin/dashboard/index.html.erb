@@ -1,4 +1,4 @@
-<div class="tui-window cyan-168 white-text" style="max-width: 1400px; margin: 30px auto;">
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
   <fieldset class="cyan-168-border">
     <legend class="center">/root :: ADMIN DASHBOARD</legend>
 
@@ -80,7 +80,7 @@
         <!-- Recent Tracks -->
         <div>
           <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT TRACKS ::]</h3>
-          <div class="tui-window white-text" style="background: #0a0a0a;">
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
             <% if @recent_tracks.any? %>
               <table class="tui-table" style="width: 100%;">
                 <thead>
@@ -110,7 +110,7 @@
         <!-- Recent Logs -->
         <div>
           <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT LOGS ::]</h3>
-          <div class="tui-window white-text" style="background: #0a0a0a;">
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
             <% if @recent_logs.any? %>
               <table class="tui-table" style="width: 100%;">
                 <thead>
@@ -146,7 +146,7 @@
       <!-- GRID Activity -->
       <div>
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ONLINE HACKRS ::]</h3>
-        <div class="tui-window white-text" style="background: #0a0a0a;">
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
           <% if @online_hackrs.any? %>
             <table class="tui-table" style="width: 100%;">
               <thead>
