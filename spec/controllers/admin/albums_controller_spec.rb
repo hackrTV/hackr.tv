@@ -26,7 +26,7 @@ RSpec.describe Admin::AlbumsController, type: :controller do
       artist_z = create(:artist, name: "Zebra")
       artist_a = create(:artist, name: "Alpha")
 
-      album_z = create(:album, artist: artist_z, release_date: Date.today)
+      create(:album, artist: artist_z, release_date: Date.today)
       album_a = create(:album, artist: artist_a, release_date: Date.today)
 
       get :index
