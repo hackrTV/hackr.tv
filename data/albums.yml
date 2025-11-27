@@ -76,7 +76,7 @@ albums:
     album_type: "ep"
     release_date: "TBA"
     description: ""
-    cover_image: "apex_overdrive/summit.jpg"
+    cover_image: "apex_overdrive/summit.png"
   - artist: "Voiceprint"
     title: "Audio Archive"
     slug: "audio-archive"

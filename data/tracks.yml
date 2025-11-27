@@ -2284,7 +2284,7 @@
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
-  audio_file: "vita-aeterna.mp3"
+  audio_file: "vita-aeterna.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2307,7 +2307,7 @@
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
-  audio_file: "turn-toward-the-light.mp3"
+  audio_file: "turn-toward-the-light.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2329,7 +2329,7 @@
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
-  audio_file: "lift-your-gaze.mp3"
+  audio_file: "lift-your-gaze.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2351,7 +2351,7 @@
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
-  audio_file: "ascension-point.mp3"
+  audio_file: "ascension-point.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2448,7 +2448,7 @@
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
-  audio_file: "melody-of-hope.mp3"
+  audio_file: "melody-of-hope.ogg"
   featured: false
   streaming_links:
     # spotify: ""
