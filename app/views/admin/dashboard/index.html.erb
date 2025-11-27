@@ -17,6 +17,15 @@
 
         <div class="tui-window purple-168 white-text">
           <fieldset class="purple-168-border">
+            <legend>Albums</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:albums_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window purple-168 white-text">
+          <fieldset class="purple-168-border">
             <legend>Tracks</legend>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:tracks_count] %></p>
@@ -65,6 +74,7 @@
       <h2 class="cyan-255-text" style="margin-bottom: 20px;">[:: QUICK ACTIONS ::]</h2>
       <div style="display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;">
         <%= link_to "➕ New Artist", new_admin_artist_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "💿 New Album", new_admin_album_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "🎵 New Track", new_admin_track_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "📝 New Log", new_admin_hackr_log_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "📖 Codex", admin_codex_entries_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>

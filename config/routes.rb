@@ -108,6 +108,7 @@ Rails.application.routes.draw do
   namespace :admin, path: "root" do
     root "dashboard#index"
     resources :artists
+    resources :albums
     resources :tracks do
       collection do
         post :import
