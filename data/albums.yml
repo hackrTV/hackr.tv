@@ -62,7 +62,7 @@ albums:
     album_type: "ep"
     release_date: "TBA"
     description: ""
-    cover_image: "temporal_blue_drift/chronologos.jpg"
+    cover_image: "temporal_blue_drift/chronologos.png"
   - artist: "Offline"
     title: "Unplugged"
     slug: "unplugged"
