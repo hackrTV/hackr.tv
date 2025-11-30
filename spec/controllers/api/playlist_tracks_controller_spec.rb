@@ -41,7 +41,7 @@ RSpec.describe Api::PlaylistTracksController, type: :controller do
 
         post :create, params: {playlist_id: playlist.id, track_id: track.id}, format: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]).to include("already in the playlist")
       end

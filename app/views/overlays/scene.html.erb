@@ -1,0 +1,50 @@
+<% if @scene.fullscreen? %>
+  <%# Full-screen scenes with TUI aesthetic %>
+  <div class="scene-container scene-<%= @scene.slug %>" id="scene-<%= @scene.slug %>">
+    <% case @scene.slug %>
+    <% when 'intro' %>
+      <div class="scene-intro">
+        <div class="scene-title">
+          <span class="glitch-text">GOING LIVE SOON</span>
+        </div>
+        <div class="scene-subtitle">
+          THE.CYBERPUL.SE
+        </div>
+      </div>
+    <% when 'brb' %>
+      <div class="scene-brb">
+        <div class="scene-title">BRB</div>
+        <div class="scene-message">BE RIGHT BACK // STANDBY</div>
+      </div>
+    <% when 'ending' %>
+      <div class="scene-ending">
+        <div class="scene-title">STREAM ENDED</div>
+        <div class="scene-message">THANKS FOR WATCHING</div>
+      </div>
+    <% else %>
+      <%# Custom fullscreen scene - render positioned elements %>
+      <div class="composed-scene">
+        <% @elements.each do |scene_element| %>
+          <%= render partial: "overlays/elements/#{scene_element.overlay_element.element_type}",
+                     locals: {
+                       element: scene_element.overlay_element,
+                       scene_element: scene_element,
+                       settings: scene_element.effective_settings
+                     } %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <%# Composition scenes - render positioned elements %>
+  <div class="composed-scene" id="scene-<%= @scene.slug %>" style="width: <%= @scene.width %>px; height: <%= @scene.height %>px;">
+    <% @elements.each do |scene_element| %>
+      <%= render partial: "overlays/elements/#{scene_element.overlay_element.element_type}",
+                 locals: {
+                   element: scene_element.overlay_element,
+                   scene_element: scene_element,
+                   settings: scene_element.effective_settings
+                 } %>
+    <% end %>
+  </div>
+<% end %>

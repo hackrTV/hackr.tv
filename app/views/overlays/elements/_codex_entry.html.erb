@@ -1,0 +1,37 @@
+<%
+  codex_slug = settings['codex_entry_slug']
+  entry = CodexEntry.published.find_by(slug: codex_slug) if codex_slug.present?
+
+  style = "left: #{scene_element.x}px; top: #{scene_element.y}px;"
+  style += " width: #{scene_element.width}px;" if scene_element.width
+  style += " height: #{scene_element.height}px;" if scene_element.height
+  style += " z-index: #{scene_element.z_index};" if scene_element.z_index
+%>
+<% if entry %>
+  <div class="scene-element overlay-codex" style="<%= style %>" data-element-type="codex_entry">
+    <div class="tui-header">
+      <span class="codex-type"><%= entry.entry_type.upcase %></span>
+    </div>
+    <div class="tui-content">
+      <div class="codex-name">&gt; <%= entry.name %></div>
+      <% if entry.summary.present? %>
+        <div class="codex-summary"><%= entry.summary %></div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="scene-element overlay-codex codex-missing" style="<%= style %>" data-element-type="codex_entry" data-missing-slug="<%= codex_slug %>">
+    <div class="tui-header">
+      <span class="codex-type">CODEX</span>
+    </div>
+    <div class="tui-content">
+      <div class="codex-name" style="color: var(--overlay-gray);">
+        <% if codex_slug.blank? %>
+          &gt; [No entry slug configured]
+        <% else %>
+          &gt; [Entry not found: <%= codex_slug %>]
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

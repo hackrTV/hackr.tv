@@ -21,6 +21,18 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   const stationContextRef = useRef<StationContext | null>(null) // Store station context
   const shuffledPlaylistRef = useRef<TrackData[]>([]) // Store shuffled playlist
 
+  // Update overlay paused state only (without changing track)
+  const updateOverlayPaused = useCallback((paused: boolean) => {
+    fetch('/api/overlay/now-playing', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      },
+      body: JSON.stringify({ paused })
+    }).catch(err => console.warn('Failed to update overlay paused state:', err))
+  }, [])
+
   // Handle play/pause
   const handlePlayPause = useCallback(() => {
     if (!audioRef.current) return
@@ -28,14 +40,16 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     if (isPlaying) {
       audioRef.current.pause()
       setIsPlaying(false)
+      updateOverlayPaused(true)
     } else {
       audioRef.current.play().catch((error) => {
         console.error('Playback failed:', error)
         setIsPlaying(false)
       })
       setIsPlaying(true)
+      updateOverlayPaused(false)
     }
-  }, [isPlaying])
+  }, [isPlaying, updateOverlayPaused])
 
   // Shuffle array using Fisher-Yates algorithm
   const shuffleArray = useCallback((array: TrackData[]): TrackData[] => {
@@ -71,6 +85,19 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     return [currentTrack, ...shuffledOthers]
   }, [currentTrack, shuffleArray])
 
+  // Update overlay Now Playing via API
+  const updateNowPlaying = useCallback((trackId: string | null, paused: boolean = false) => {
+    const body = trackId ? { track_id: trackId, paused } : { clear: true }
+    fetch('/api/overlay/now-playing', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      },
+      body: JSON.stringify(body)
+    }).catch(err => console.warn('Failed to update overlay now playing:', err))
+  }, [])
+
   // Load and play track
   const loadTrack = useCallback((track: TrackData) => {
     const audio = audioRef.current
@@ -83,6 +110,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     // Set new track info
     setCurrentTrack(track)
     setIsVisible(true)
+
+    // Update overlay Now Playing
+    updateNowPlaying(track.id)
 
     // Build playlist from DOM if we don't have one yet or if it's empty
     // This captures all visible tracks when first playing
@@ -129,7 +159,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     }
 
     audio.addEventListener('canplay', onCanPlay)
-  }, [])
+  }, [updateNowPlaying])
 
   // Refresh playlist from current DOM (called when navigating to pulse vault)
   const refreshPlaylist = useCallback(() => {
@@ -346,7 +376,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     setIsVisible(false)
     setIsPlaying(false)
     setCurrentTrack(null)
-  }, [])
+    // Clear overlay Now Playing
+    updateNowPlaying(null)
+  }, [updateNowPlaying])
 
   // Handle keyboard shortcuts
   useEffect(() => {

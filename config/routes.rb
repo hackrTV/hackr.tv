@@ -102,6 +102,9 @@ Rails.application.routes.draw do
       post "echo", to: "echoes#create"
       get "echoes", to: "echoes#index"
     end
+
+    # Overlay API routes
+    post "overlay/now-playing", to: "overlay#set_now_playing"
   end
 
   # Admin routes (accessible at /root)
@@ -151,6 +154,28 @@ Rails.application.routes.draw do
         post :end_stream
       end
     end
+
+    # Overlay admin routes
+    get "overlays", to: "overlays#index", as: :overlays
+    patch "overlays/ticker/:ticker_slug", to: "overlays#update_ticker", as: :update_overlay_ticker
+    post "overlays/alert", to: "overlays#send_alert", as: :send_overlay_alert
+    resources :overlay_scenes, path: "overlays/scenes" do
+      resources :scene_elements, controller: "overlay_scene_elements", only: [:new, :create, :edit, :update, :destroy]
+    end
+    resources :overlay_elements, path: "overlays/elements"
+    resources :overlay_lower_thirds, path: "overlays/lower-thirds"
+  end
+
+  # OBS Overlay routes (Rails server-rendered, NOT SPA)
+  scope :overlays do
+    get "now-playing", to: "overlays#now_playing", as: :overlay_now_playing
+    get "pulsewire", to: "overlays#pulsewire", as: :overlay_pulsewire
+    get "grid-activity", to: "overlays#grid_activity", as: :overlay_grid_activity
+    get "alerts", to: "overlays#alerts", as: :overlay_alerts
+    get "lower-third/:slug", to: "overlays#lower_third", as: :overlay_lower_third
+    get "codex/:slug", to: "overlays#codex", as: :overlay_codex
+    get "ticker/:position", to: "overlays#ticker", as: :overlay_ticker
+    get "scenes/:slug", to: "overlays#scene", as: :overlay_scene
   end
 
   # Development-only error page testing routes

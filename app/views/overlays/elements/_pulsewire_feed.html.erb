@@ -1,0 +1,32 @@
+<%
+  max_items = settings['max_items'] || 5
+  pulses = Pulse.where(signal_dropped: false)
+    .where(parent_pulse_id: nil)
+    .includes(:grid_hackr)
+    .order(pulsed_at: :desc)
+    .limit(max_items)
+
+  style = "left: #{scene_element.x}px; top: #{scene_element.y}px;"
+  style += " width: #{scene_element.width}px;" if scene_element.width
+  style += " height: #{scene_element.height}px;" if scene_element.height
+  style += " z-index: #{scene_element.z_index};" if scene_element.z_index
+%>
+<div class="scene-element overlay-pulsewire" id="pulsewire-overlay" style="<%= style %>" data-element-type="pulsewire_feed">
+  <div class="tui-header">┤ PULSEWIRE :: THE WIRE ├</div>
+  <% pulses.each do |pulse| %>
+    <div class="overlay-pulse" data-pulse-id="<%= pulse.id %>">
+      <div class="overlay-pulse-header">
+        <span class="overlay-pulse-hackr"><%= pulse.grid_hackr.hackr_alias %></span>
+        <span class="overlay-pulse-time">[<%= time_ago_in_words(pulse.pulsed_at) %>]</span>
+      </div>
+      <div class="overlay-pulse-content"><%= pulse.content %></div>
+    </div>
+  <% end %>
+  <% if pulses.empty? %>
+    <div class="overlay-pulse">
+      <div class="overlay-pulse-content" style="color: var(--overlay-gray); text-align: center;">
+        ··· signal quiet ···
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,34 @@
+<%
+  alert = OverlayAlert.pending.order(created_at: :asc).first
+
+  style = "left: #{scene_element.x}px; top: #{scene_element.y}px;"
+  style += " width: #{scene_element.width}px;" if scene_element.width
+  style += " height: #{scene_element.height}px;" if scene_element.height
+  style += " z-index: #{scene_element.z_index};" if scene_element.z_index
+%>
+<div class="scene-element overlay-alert <%= 'active' if alert %>" id="alert-overlay" style="<%= style %>" data-element-type="alert">
+  <% if alert %>
+    <div class="tui-alert-frame">
+      <div class="alert-icon">
+        <% case alert.alert_type %>
+        <% when 'subscriber' %>
+          [★]
+        <% when 'donation' %>
+          [$]
+        <% when 'raid' %>
+          [⚡]
+        <% when 'follow' %>
+          [+]
+        <% else %>
+          [!]
+        <% end %>
+      </div>
+      <% if alert.title.present? %>
+        <div class="alert-title"><%= alert.title %></div>
+      <% end %>
+      <% if alert.message.present? %>
+        <div class="alert-message"><%= alert.message %></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

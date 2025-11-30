@@ -119,7 +119,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
     it "renders new template on failure" do
       invalid_params = {radio_station: {name: ""}}
       post :create, params: invalid_params
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:new)
     end
   end
@@ -166,7 +166,7 @@ RSpec.describe Admin::RadioStationsController, type: :controller do
         radio_station: {name: ""}
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response).to render_template(:edit)
     end
   end

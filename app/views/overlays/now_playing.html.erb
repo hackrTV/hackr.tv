@@ -1,0 +1,54 @@
+<%
+  state_class = if @now_playing.playing?
+    @now_playing.paused? ? 'is-paused' : 'is-playing'
+  else
+    'is-idle'
+  end
+
+  header_text = if @now_playing.playing?
+    @now_playing.paused? ? 'PAUSED' : 'NOW PLAYING'
+  else
+    'STANDBY'
+  end
+
+  label_text = if @now_playing.playing?
+    @now_playing.paused? ? 'PAUSED' : 'PLAYING'
+  else
+    'IDLE'
+  end
+
+  placeholder_char = if @now_playing.playing?
+    @now_playing.paused? ? '║' : '♪'
+  else
+    '·'
+  end
+%>
+<div class="overlay-now-playing <%= state_class %>" id="now-playing-overlay" data-track-id="<%= @now_playing.track_id %>">
+  <div class="tui-frame">
+    <div class="tui-frame-top">┤ <%= header_text %> ├</div>
+    <div class="now-playing-inner">
+      <% if @now_playing.playing? %>
+        <% if @now_playing.album_cover_url %>
+          <img src="<%= @now_playing.album_cover_url %>" alt="" class="now-playing-cover">
+        <% else %>
+          <div class="now-playing-cover-placeholder"><%= placeholder_char %></div>
+        <% end %>
+        <div class="now-playing-info">
+          <span class="now-playing-label"><%= label_text %></span>
+          <span class="now-playing-title"><%= @now_playing.display_title %></span>
+          <span class="now-playing-artist"><%= @now_playing.display_artist %></span>
+          <% if @now_playing.display_album.present? %>
+            <span class="now-playing-album">└─ <%= @now_playing.display_album %></span>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="now-playing-cover-placeholder">·</div>
+        <div class="now-playing-info">
+          <span class="now-playing-label">IDLE</span>
+          <span class="now-playing-title">Awaiting signal...</span>
+        </div>
+      <% end %>
+    </div>
+    <div class="tui-frame-bottom">└──────────────────────────────────────────┘</div>
+  </div>
+</div>

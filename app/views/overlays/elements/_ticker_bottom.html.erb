@@ -1,0 +1,33 @@
+<%
+  ticker_slug = settings['ticker_slug'] || 'bottom'
+  ticker = OverlayTicker.active.find_by(slug: ticker_slug)
+
+  style = "left: #{scene_element.x}px; top: #{scene_element.y}px;"
+  style += " width: #{scene_element.width || 1920}px;"
+  style += " z-index: #{scene_element.z_index};" if scene_element.z_index
+%>
+<% if ticker %>
+  <%
+    char_count = ticker.content.length
+    base_duration = (char_count * 10.0 / ticker.speed).round(1)
+    ticker_duration = [base_duration, 10].max
+  %>
+  <div class="scene-element overlay-ticker ticker-bottom ticker-scroll-<%= ticker.direction %>"
+       id="ticker-<%= ticker_slug %>-overlay"
+       style="<%= style %> --ticker-duration: <%= ticker_duration %>s;"
+       data-element-type="ticker_bottom"
+       data-slug="<%= ticker_slug %>">
+    <div class="ticker-content">
+      <%= ticker.content %><span class="ticker-separator"></span><%= ticker.content %><span class="ticker-separator"></span><%= ticker.content %>
+    </div>
+  </div>
+<% else %>
+  <div class="scene-element overlay-ticker ticker-bottom ticker-missing"
+       style="<%= style %>"
+       data-element-type="ticker_bottom"
+       data-missing-slug="<%= ticker_slug %>">
+    <div class="ticker-content ticker-placeholder">
+      ··· TICKER NOT FOUND: <%= ticker_slug %> ···
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,26 @@
+<div class="overlay-alert <%= 'active' if @alert %>" id="alert-overlay" data-alert-id="<%= @alert&.id %>">
+  <% if @alert %>
+    <div class="tui-alert-frame">
+      <div class="alert-icon">
+        <% case @alert.alert_type %>
+        <% when 'subscriber' %>
+          [★]
+        <% when 'donation' %>
+          [$]
+        <% when 'raid' %>
+          [⚡]
+        <% when 'follow' %>
+          [+]
+        <% else %>
+          [!]
+        <% end %>
+      </div>
+      <% if @alert.title.present? %>
+        <div class="alert-title"><%= @alert.title %></div>
+      <% end %>
+      <% if @alert.message.present? %>
+        <div class="alert-message"><%= @alert.message %></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
