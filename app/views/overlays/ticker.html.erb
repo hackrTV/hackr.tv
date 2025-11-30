@@ -1,0 +1,15 @@
+<%
+  # Calculate animation duration based on content length and speed
+  # Speed is in pixels/second, assume ~10px per character
+  char_count = @ticker.content.length
+  base_duration = (char_count * 10.0 / @ticker.speed).round(1)
+  ticker_duration = [base_duration, 10].max # Minimum 10 seconds
+%>
+<div class="overlay-ticker ticker-<%= @ticker.slug %> ticker-scroll-<%= @ticker.direction %>"
+     id="ticker-<%= @ticker.slug %>-overlay"
+     data-slug="<%= @ticker.slug %>"
+     style="--ticker-duration: <%= ticker_duration %>s;">
+  <div class="ticker-content">
+    <%= @ticker.content %><span class="ticker-separator"></span><%= @ticker.content %><span class="ticker-separator"></span><%= @ticker.content %>
+  </div>
+</div>

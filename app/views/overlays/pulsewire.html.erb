@@ -1,0 +1,22 @@
+<div class="overlay-pulsewire" id="pulsewire-overlay">
+  <div class="tui-header">┤ PULSEWIRE :: THE WIRE ├</div>
+  <% @pulses.each do |pulse| %>
+    <div class="overlay-pulse" data-pulse-id="<%= pulse.id %>">
+      <div class="overlay-pulse-header">
+        <span class="overlay-pulse-hackr"><%= pulse.grid_hackr.hackr_alias %></span>
+        <span class="overlay-pulse-time">[<%= time_ago_in_words(pulse.pulsed_at) %>]</span>
+      </div>
+      <div class="overlay-pulse-content">
+        <%= pulse.content %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @pulses.empty? %>
+    <div class="overlay-pulse">
+      <div class="overlay-pulse-content" style="color: var(--overlay-gray); text-align: center;">
+        ··· signal quiet ···
+      </div>
+    </div>
+  <% end %>
+</div>

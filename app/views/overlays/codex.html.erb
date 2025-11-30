@@ -1,0 +1,11 @@
+<div class="overlay-codex" id="codex-overlay" data-slug="<%= @entry.slug %>">
+  <div class="tui-header">
+    <span class="codex-type"><%= @entry.entry_type.upcase %></span>
+  </div>
+  <div class="tui-content">
+    <div class="codex-name">&gt; <%= @entry.name %></div>
+    <% if @entry.summary.present? %>
+      <div class="codex-summary"><%= @entry.summary %></div>
+    <% end %>
+  </div>
+</div>

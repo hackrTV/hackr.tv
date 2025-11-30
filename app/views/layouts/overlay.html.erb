@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>hackr.tv Overlay</title>
+    <meta name="viewport" content="width=1920, height=1080" />
+    <meta name="robots" content="noindex, nofollow" />
+    <%= csrf_meta_tags %>
+    <%= action_cable_meta_tag %>
+    <%= stylesheet_link_tag "overlay", "data-turbo-track": "reload" %>
+    <script src="https://cdn.jsdelivr.net/npm/@rails/actioncable@7.1.0/app/assets/javascripts/actioncable.min.js"></script>
+  </head>
+
+  <body class="overlay-body">
+    <%= yield %>
+    <%= javascript_include_tag "overlay", "data-turbo-track": "reload" %>
+  </body>
+</html>

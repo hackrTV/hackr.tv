@@ -242,7 +242,7 @@ RSpec.describe Api::PulsesController, type: :controller do
 
         post :create, params: {pulse: {content: long_content}}, format: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["success"]).to be false
         expect(json["error"]).to include("too long")
@@ -251,7 +251,7 @@ RSpec.describe Api::PulsesController, type: :controller do
       it "returns error for blank content" do
         post :create, params: {pulse: {content: ""}}, format: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["success"]).to be false
         expect(json["error"]).to include("can't be blank")

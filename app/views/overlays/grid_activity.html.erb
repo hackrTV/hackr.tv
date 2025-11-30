@@ -1,0 +1,23 @@
+<div class="overlay-grid-activity" id="grid-activity-overlay">
+  <div class="tui-header">
+    <span class="grid-activity-title">THE PULSE GRID</span>
+    <span class="grid-activity-count">[<%= @online_hackrs.count %> ONLINE]</span>
+  </div>
+
+  <div class="grid-online-list">
+    <% @online_hackrs.each do |hackr| %>
+      <div class="grid-online-hackr" data-hackr-id="<%= hackr.id %>">
+        <span class="grid-hackr-name"><%= hackr.hackr_alias %></span>
+        <% if hackr.current_room %>
+          <span class="grid-hackr-location">@ <%= hackr.current_room.name %></span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @online_hackrs.empty? %>
+      <div class="grid-online-hackr">
+        <span class="grid-hackr-name" style="color: var(--overlay-gray);">No hackrs connected</span>
+      </div>
+    <% end %>
+  </div>
+</div>

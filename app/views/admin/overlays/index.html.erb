@@ -1,0 +1,206 @@
+<% content_for(:title) { "/root/overlays :: OBS Overlays" } %>
+
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/overlays :: OBS OVERLAY CONTROL CENTER</legend>
+
+    <% if flash[:success] %>
+      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
+        <p class="green-255-text" style="margin: 0;">✓ SUCCESS</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
+      </div>
+    <% end %>
+
+    <% if flash[:error] %>
+      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+        <p class="red-255-text" style="margin: 0;">✗ ERROR</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
+      </div>
+    <% end %>
+
+    <!-- Navigation -->
+    <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+      <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168" %>
+      <%= link_to "Manage Scenes", admin_overlay_scenes_path, class: "tui-button cyan-168" %>
+      <%= link_to "Manage Elements", admin_overlay_elements_path, class: "tui-button cyan-168" %>
+      <%= link_to "Manage Lower Thirds", admin_overlay_lower_thirds_path, class: "tui-button cyan-168" %>
+    </div>
+
+    <!-- Overlay URLs Section -->
+    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: OVERLAY URLs - Copy for OBS Browser Sources ::]</h3>
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
+      <p style="color: #888; margin-bottom: 15px;">Individual elements (transparent background):</p>
+      <table class="tui-table" style="width: 100%;">
+        <tbody>
+          <tr>
+            <td style="width: 200px;"><strong>Now Playing</strong></td>
+            <td><code class="cyan-168-text"><%= overlay_now_playing_url %></code></td>
+            <td style="width: 100px;"><%= link_to "Open ↗", overlay_now_playing_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+          </tr>
+          <tr>
+            <td><strong>PulseWire Feed</strong></td>
+            <td><code class="cyan-168-text"><%= overlay_pulsewire_url %></code></td>
+            <td><%= link_to "Open ↗", overlay_pulsewire_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+          </tr>
+          <tr>
+            <td><strong>Grid Activity</strong></td>
+            <td><code class="cyan-168-text"><%= overlay_grid_activity_url %></code></td>
+            <td><%= link_to "Open ↗", overlay_grid_activity_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+          </tr>
+          <tr>
+            <td><strong>Alerts</strong></td>
+            <td><code class="cyan-168-text"><%= overlay_alerts_url %></code></td>
+            <td><%= link_to "Open ↗", overlay_alerts_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+          </tr>
+          <tr>
+            <td><strong>Top Ticker</strong></td>
+            <td><code class="cyan-168-text"><%= overlay_ticker_url(position: "top") %></code></td>
+            <td><%= link_to "Open ↗", overlay_ticker_path(position: "top"), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+          </tr>
+          <tr>
+            <td><strong>Bottom Ticker</strong></td>
+            <td><code class="cyan-168-text"><%= overlay_ticker_url(position: "bottom") %></code></td>
+            <td><%= link_to "Open ↗", overlay_ticker_path(position: "bottom"), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="color: #888; margin: 20px 0 15px;">Scenes (1920x1080):</p>
+      <table class="tui-table" style="width: 100%;">
+        <tbody>
+          <% @scenes.each do |scene| %>
+            <tr>
+              <td style="width: 200px;"><strong><%= scene.name %></strong></td>
+              <td><code class="cyan-168-text"><%= overlay_scene_url(slug: scene.slug) %></code></td>
+              <td style="width: 100px;"><%= link_to "Open ↗", overlay_scene_path(slug: scene.slug), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+            </tr>
+          <% end %>
+          <% if @scenes.empty? %>
+            <tr>
+              <td colspan="3" style="color: #666; text-align: center;">No scenes yet. <%= link_to "Create one", new_admin_overlay_scene_path, class: "cyan-168-text" %>.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Ticker Control Section -->
+    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TICKER CONTROL ::]</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+      <% @tickers.each do |ticker| %>
+        <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
+          <h4 class="purple-168-text" style="margin: 0 0 15px;"><%= ticker.name %> (<%= ticker.slug.upcase %>)</h4>
+          <%= form_with url: admin_update_overlay_ticker_path(ticker_slug: ticker.slug), method: :patch, scope: :overlay_ticker, local: true do |f| %>
+            <div style="margin-bottom: 15px;">
+              <%= f.label :content, "CONTENT", style: "display: block; color: #888; margin-bottom: 5px;" %>
+              <%= f.text_area :content, value: ticker.content, class: "tui-input", rows: 3, style: "width: 100%;" %>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+              <div>
+                <%= f.label :speed, "SPEED (px/s)", style: "display: block; color: #888; margin-bottom: 5px;" %>
+                <%= f.number_field :speed, value: ticker.speed, class: "tui-input", style: "width: 100%;" %>
+              </div>
+              <div>
+                <%= f.label :direction, "DIRECTION", style: "display: block; color: #888; margin-bottom: 5px;" %>
+                <%= f.select :direction, [["Left", "left"], ["Right", "right"]], {selected: ticker.direction}, class: "tui-input", style: "width: 100%;" %>
+              </div>
+              <div>
+                <%= f.label :active, "ACTIVE", style: "display: block; color: #888; margin-bottom: 5px;" %>
+                <%= f.select :active, [["Yes", true], ["No", false]], {selected: ticker.active}, class: "tui-input", style: "width: 100%;" %>
+              </div>
+            </div>
+            <%= f.submit "Update Ticker", class: "tui-button cyan-168" %>
+          <% end %>
+        </div>
+      <% end %>
+      <% if @tickers.empty? %>
+        <div style="grid-column: span 2; background: #0a0a0a; border: 1px solid #444; padding: 20px; text-align: center; color: #666;">
+          No tickers configured. Run seeds to create default tickers.
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Alert Control Section -->
+    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SEND ALERT ::]</h3>
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
+      <%= form_with url: admin_send_overlay_alert_path, method: :post, local: true do |f| %>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+          <div>
+            <%= label_tag :alert_type, "TYPE", style: "display: block; color: #888; margin-bottom: 5px;" %>
+            <%= select_tag :alert_type, options_for_select([
+              ["Custom", "custom"],
+              ["Subscriber", "subscriber"],
+              ["Donation", "donation"],
+              ["Raid", "raid"],
+              ["Follow", "follow"]
+            ]), class: "tui-input", style: "width: 100%;" %>
+          </div>
+          <div>
+            <%= label_tag :alert_title, "TITLE", style: "display: block; color: #888; margin-bottom: 5px;" %>
+            <%= text_field_tag :alert_title, nil, class: "tui-input", style: "width: 100%;", placeholder: "Alert Title" %>
+          </div>
+          <div>
+            <%= label_tag :alert_message, "MESSAGE", style: "display: block; color: #888; margin-bottom: 5px;" %>
+            <%= text_field_tag :alert_message, nil, class: "tui-input", style: "width: 100%;", placeholder: "Alert message" %>
+          </div>
+        </div>
+        <%= submit_tag "Send Alert", class: "tui-button purple-168" %>
+        <% if @pending_alerts > 0 %>
+          <span style="margin-left: 15px; color: #fbbf24;"><%= @pending_alerts %> alert(s) pending</span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Now Playing Status -->
+    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: NOW PLAYING STATUS ::]</h3>
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
+      <% if @now_playing.playing? %>
+        <p class="green-255-text" style="margin: 0 0 10px;">▶ CURRENTLY PLAYING</p>
+        <p style="margin: 0; font-size: 1.2rem;"><strong><%= @now_playing.display_title %></strong></p>
+        <p style="margin: 5px 0 0; color: #60a5fa;"><%= @now_playing.display_artist %></p>
+        <% if @now_playing.display_album.present? %>
+          <p style="margin: 5px 0 0; color: #888;"><%= @now_playing.display_album %></p>
+        <% end %>
+      <% else %>
+        <p style="margin: 0; color: #666;">Nothing currently playing. Play a track in the SPA to update.</p>
+      <% end %>
+      <p style="margin: 15px 0 0; color: #888; font-size: 0.9rem;">
+        Note: Now Playing is automatically updated when tracks play in hackr.fm
+      </p>
+    </div>
+
+    <!-- Lower Thirds List -->
+    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: LOWER THIRDS ::]</h3>
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
+      <% if @lower_thirds.any? %>
+        <table class="tui-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Primary Text</th>
+              <th>Secondary Text</th>
+              <th>Status</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @lower_thirds.each do |lt| %>
+              <tr>
+                <td><strong><%= lt.name %></strong></td>
+                <td><%= truncate(lt.primary_text, length: 30) %></td>
+                <td><%= truncate(lt.secondary_text, length: 30) || "-" %></td>
+                <td><%= lt.active ? '<span class="green-255-text">Active</span>'.html_safe : '<span class="red-168-text">Inactive</span>'.html_safe %></td>
+                <td>
+                  <%= link_to "Open ↗", overlay_lower_third_path(slug: lt.slug), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p style="color: #666; text-align: center;">No lower thirds yet. <%= link_to "Create one", new_admin_overlay_lower_third_path, class: "cyan-168-text" %>.</p>
+      <% end %>
+    </div>
+
+  </fieldset>
+</div>

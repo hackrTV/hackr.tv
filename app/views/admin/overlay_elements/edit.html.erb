@@ -1,0 +1,31 @@
+<% content_for(:title) { "/root/overlays/elements/#{@element.slug}/edit :: Edit Element" } %>
+
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 800px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/overlays/elements/<%= @element.slug %>/edit :: EDIT ELEMENT</legend>
+
+    <% if flash[:error] %>
+      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
+      </div>
+    <% end %>
+
+    <div style="margin-bottom: 30px;">
+      <%= link_to "< Back to Elements", admin_overlay_elements_path, class: "tui-button green-168" %>
+    </div>
+
+    <%= form_with model: [:admin, @element], local: true do |form| %>
+      <%= render "form", form: form %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= form.submit "Update Element", class: "tui-button cyan-168" %>
+        <%= link_to "Cancel", admin_overlay_elements_path, class: "tui-button red-168", style: "margin-left: 10px;" %>
+        <% if @element.overlay_scenes.empty? %>
+          <%= link_to "Delete", admin_overlay_element_path(@element), method: :delete, data: { confirm: "Are you sure?" }, class: "tui-button red-168", style: "margin-left: 10px;" %>
+        <% end %>
+      </div>
+    <% end %>
+
+  </fieldset>
+</div>

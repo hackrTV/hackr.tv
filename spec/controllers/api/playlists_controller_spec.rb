@@ -129,7 +129,7 @@ RSpec.describe Api::PlaylistsController, type: :controller do
       it "returns error for invalid data" do
         post :create, params: {playlist: {name: ""}}, format: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["success"]).to be false
         expect(json["error"]).to be_present
@@ -170,7 +170,7 @@ RSpec.describe Api::PlaylistsController, type: :controller do
 
         patch :update, params: {id: playlist.id, playlist: {name: ""}}, format: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 

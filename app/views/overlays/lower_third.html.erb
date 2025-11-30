@@ -1,0 +1,13 @@
+<div class="overlay-lower-third" id="lower-third-overlay" data-slug="<%= @lower_third.slug %>">
+  <% if @lower_third.logo_url.present? %>
+    <img src="<%= @lower_third.logo_url %>" alt="" class="lower-third-logo">
+  <% else %>
+    <span class="lower-third-bracket">├──</span>
+  <% end %>
+  <div class="lower-third-text">
+    <span class="lower-third-primary"><%= @lower_third.primary_text %></span>
+    <% if @lower_third.secondary_text.present? %>
+      <span class="lower-third-secondary"><%= @lower_third.secondary_text %></span>
+    <% end %>
+  </div>
+</div>

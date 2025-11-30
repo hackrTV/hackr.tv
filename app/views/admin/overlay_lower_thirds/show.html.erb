@@ -1,0 +1,38 @@
+<% content_for(:title) { "/root/overlays/lower-thirds/#{@lower_third.slug} :: Lower Third Details" } %>
+
+<div class="tui-window cyan-168 white-text" style="display: block; max-width: 800px; margin: 30px auto;">
+  <fieldset class="cyan-168-border">
+    <legend class="center">/root/overlays/lower-thirds/<%= @lower_third.slug %> :: LOWER THIRD DETAILS</legend>
+
+    <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+      <%= link_to "< Back to Lower Thirds", admin_overlay_lower_thirds_path, class: "tui-button green-168" %>
+      <%= link_to "Edit", edit_admin_overlay_lower_third_path(@lower_third), class: "tui-button cyan-168" %>
+      <%= link_to "Preview", overlay_lower_third_path(slug: @lower_third.slug), target: "_blank", class: "tui-button purple-168" %>
+    </div>
+
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 20px;">
+      <p style="color: #888; margin: 0;">Name</p>
+      <p style="margin: 5px 0 15px; font-size: 1.2rem;"><strong><%= @lower_third.name %></strong></p>
+
+      <p style="color: #888; margin: 0;">Primary Text</p>
+      <p style="margin: 5px 0 15px; font-size: 1.1rem;"><%= @lower_third.primary_text %></p>
+
+      <% if @lower_third.secondary_text.present? %>
+        <p style="color: #888; margin: 0;">Secondary Text</p>
+        <p style="margin: 5px 0 15px; color: #60a5fa;"><%= @lower_third.secondary_text %></p>
+      <% end %>
+
+      <% if @lower_third.logo_url.present? %>
+        <p style="color: #888; margin: 0;">Logo URL</p>
+        <p style="margin: 5px 0 15px;"><code><%= @lower_third.logo_url %></code></p>
+      <% end %>
+
+      <p style="color: #888; margin: 0;">Status</p>
+      <p style="margin: 5px 0 15px;"><%= @lower_third.active ? '<span class="green-255-text">Active</span>'.html_safe : '<span class="red-168-text">Inactive</span>'.html_safe %></p>
+
+      <p style="color: #888; margin: 0;">Overlay URL</p>
+      <p style="margin: 5px 0 0;"><code class="cyan-168-text"><%= overlay_lower_third_url(slug: @lower_third.slug) %></code></p>
+    </div>
+
+  </fieldset>
+</div>

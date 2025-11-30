@@ -1,0 +1,37 @@
+<%
+  lower_third_slug = settings['lower_third_slug']
+  lower_third = OverlayLowerThird.active.find_by(slug: lower_third_slug) if lower_third_slug.present?
+
+  style = "left: #{scene_element.x}px; top: #{scene_element.y}px;"
+  style += " width: #{scene_element.width}px;" if scene_element.width
+  style += " height: #{scene_element.height}px;" if scene_element.height
+  style += " z-index: #{scene_element.z_index};" if scene_element.z_index
+%>
+<% if lower_third %>
+  <div class="scene-element overlay-lower-third" id="lower-third-overlay" style="<%= style %>" data-element-type="lower_third" data-slug="<%= lower_third_slug %>">
+    <% if lower_third.logo_url.present? %>
+      <img src="<%= lower_third.logo_url %>" alt="" class="lower-third-logo">
+    <% else %>
+      <span class="lower-third-bracket">├──</span>
+    <% end %>
+    <div class="lower-third-text">
+      <span class="lower-third-primary"><%= lower_third.primary_text %></span>
+      <% if lower_third.secondary_text.present? %>
+        <span class="lower-third-secondary"><%= lower_third.secondary_text %></span>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="scene-element overlay-lower-third lower-third-missing" style="<%= style %>" data-element-type="lower_third" data-missing-slug="<%= lower_third_slug %>">
+    <span class="lower-third-bracket">├──</span>
+    <div class="lower-third-text">
+      <span class="lower-third-primary" style="color: var(--overlay-gray);">
+        <% if lower_third_slug.blank? %>
+          [LOWER THIRD: No slug configured]
+        <% else %>
+          [LOWER THIRD NOT FOUND: <%= lower_third_slug %>]
+        <% end %>
+      </span>
+    </div>
+  </div>
+<% end %>
