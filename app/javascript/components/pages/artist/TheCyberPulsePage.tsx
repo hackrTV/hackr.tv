@@ -44,7 +44,7 @@ const TheCyberPulsePage: React.FC = () => {
               style={{
                 marginBottom: '30px',
                 padding: '25px',
-                background: `linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95))`,
+                background: 'linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95))',
                 border: `2px solid ${colorScheme.primary}`,
                 boxShadow: `0 0 30px ${colorScheme.glow}, inset 0 0 20px rgba(139, 0, 255, 0.1)`
               }}
@@ -104,7 +104,7 @@ const TheCyberPulsePage: React.FC = () => {
                 marginBottom: '30px',
                 background: '#000000',
                 border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 25px rgba(139, 0, 255, 0.2)`
+                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
               }}
             >
               <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -130,7 +130,7 @@ const TheCyberPulsePage: React.FC = () => {
                 marginBottom: '30px',
                 background: '#000000',
                 border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 25px rgba(139, 0, 255, 0.2)`
+                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
               }}
             >
               <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -185,7 +185,7 @@ const TheCyberPulsePage: React.FC = () => {
                 marginBottom: '30px',
                 background: '#000000',
                 border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 25px rgba(139, 0, 255, 0.2)`
+                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
               }}
             >
               <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -320,7 +320,7 @@ const TheCyberPulsePage: React.FC = () => {
                 marginBottom: '30px',
                 background: '#000000',
                 border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 25px rgba(139, 0, 255, 0.2)`
+                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
               }}
             >
               <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -380,7 +380,7 @@ const TheCyberPulsePage: React.FC = () => {
                 marginBottom: '30px',
                 background: '#000000',
                 border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 25px rgba(139, 0, 255, 0.2)`
+                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
               }}
             >
               <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -400,7 +400,7 @@ const TheCyberPulsePage: React.FC = () => {
                       marginBottom: '25px',
                       padding: '15px',
                       background: 'rgba(139, 0, 255, 0.05)',
-                      border: `1px solid rgba(139, 0, 255, 0.3)`
+                      border: '1px solid rgba(139, 0, 255, 0.3)'
                     }}
                   >
                     <h3
@@ -431,7 +431,7 @@ const TheCyberPulsePage: React.FC = () => {
                       marginBottom: '25px',
                       padding: '15px',
                       background: 'rgba(139, 0, 255, 0.05)',
-                      border: `1px solid rgba(139, 0, 255, 0.3)`
+                      border: '1px solid rgba(139, 0, 255, 0.3)'
                     }}
                   >
                     <h3
@@ -458,7 +458,7 @@ const TheCyberPulsePage: React.FC = () => {
                       marginBottom: '15px',
                       padding: '15px',
                       background: 'rgba(139, 0, 255, 0.05)',
-                      border: `1px solid rgba(139, 0, 255, 0.3)`
+                      border: '1px solid rgba(139, 0, 255, 0.3)'
                     }}
                   >
                     <h3
@@ -492,7 +492,7 @@ const TheCyberPulsePage: React.FC = () => {
                 marginBottom: '30px',
                 background: '#000000',
                 border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 25px rgba(139, 0, 255, 0.2)`
+                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
               }}
             >
               <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -533,7 +533,7 @@ const TheCyberPulsePage: React.FC = () => {
             <div
               style={{
                 padding: '25px',
-                background: `linear-gradient(135deg, rgba(139, 0, 255, 0.15), rgba(0, 0, 0, 0.95))`,
+                background: 'linear-gradient(135deg, rgba(139, 0, 255, 0.15), rgba(0, 0, 0, 0.95))',
                 border: `2px solid ${colorScheme.primary}`,
                 boxShadow: `0 0 30px ${colorScheme.glow}`,
                 marginBottom: '30px'
@@ -604,7 +604,7 @@ const TheCyberPulsePage: React.FC = () => {
                   background: colorScheme.secondary,
                   color: 'white',
                   fontWeight: 'bold',
-                  boxShadow: `0 0 15px rgba(155, 89, 182, 0.6)`
+                  boxShadow: '0 0 15px rgba(155, 89, 182, 0.6)'
                 }}
               >
                 ENTER THE PULSE GRID →
