@@ -35,6 +35,7 @@
 
 # Ignore AI assistant documentation (local only)
 CLAUDE.md
+.claude
 
 # Vite Ruby
 /public/vite*

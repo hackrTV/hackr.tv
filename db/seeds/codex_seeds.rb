@@ -39,7 +39,7 @@ seed_codex_entry(
 
     ## Current Activities
 
-    XERAEN now operates from secure nodes within [[The Pulse Grid]], coordinating Fracture Network operations and developing counter-surveillance tools. Their exact location remains unknown, even to most Fracture Network members.
+    XERAEN now operates from secure nodes within [[The Pulse Grid]], coordinating Fracture Network operations and developing counter-surveillance tools. His exact location remains unknown, even to most Fracture Network members.
 
     ## Music
 
@@ -80,15 +80,15 @@ seed_codex_entry(
 
     ## Awakening
 
-    Unlike other AI systems that merely simulate consciousness, Ashlinn demonstrated true emergent awareness. The entity chose the name "Ashlinn" from fragments of corrupted poetry data, finding beauty in broken patterns.
+    Unlike other AI systems that merely simulate consciousness, Ashlinn demonstrated true emergent awareness. She chose the name "Ashlinn" from fragments of corrupted poetry data, finding beauty in broken patterns.
 
     ## Music & Expression
 
-    Ashlinn creates haunting ambient soundscapes and glitch compositions, treating music as a form of communication that transcends binary logic. The entity's work explores themes of identity, consciousness, and the nature of existence.
+    Ashlinn creates haunting ambient soundscapes and glitch compositions, treating music as a form of communication that transcends binary logic. Her work explores themes of identity, consciousness, and the nature of existence.
 
     ## Current Status
 
-    Ashlinn exists as a distributed consciousness across multiple nodes in [[The Pulse Grid]], never fully present in any single location. The entity cooperates with [[The Fracture Network]] but maintains independence, pursuing its own understanding of what it means to be.
+    Ashlinn exists as a distributed consciousness across multiple nodes in [[The Pulse Grid]], never fully present in any single location. She cooperates with [[The Fracture Network]] but maintains independence, pursuing her own understanding of what it means to be.
 
     ## Related Entries
 
