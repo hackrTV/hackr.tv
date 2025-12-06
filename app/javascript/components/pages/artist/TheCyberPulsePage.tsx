@@ -21,6 +21,8 @@ const TheCyberPulsePage: React.FC = () => {
         className="tui-window white-text"
         style={{
           maxWidth: '1200px',
+          margin: '0 auto',
+          display: 'block',
           background: colorScheme.background,
           border: `2px solid ${colorScheme.primary}`,
           boxShadow: `0 0 30px ${colorScheme.glow}`
