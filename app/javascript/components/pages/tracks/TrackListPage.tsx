@@ -230,7 +230,7 @@ const TrackListPage: React.FC = () => {
                   padding: '30px',
                   textAlign: 'center',
                   background: 'rgba(139, 0, 255, 0.05)',
-                  border: `1px solid rgba(139, 0, 255, 0.3)`
+                  border: '1px solid rgba(139, 0, 255, 0.3)'
                 }}
               >
                 <p style={{ color: '#aaa' }}>No transmissions available yet. Signal frequency is being calibrated...</p>
@@ -394,7 +394,7 @@ const TrackListPage: React.FC = () => {
                   color: 'white',
                   textDecoration: 'none',
                   fontWeight: 'bold',
-                  boxShadow: `0 0 15px rgba(107, 0, 204, 0.6)`
+                  boxShadow: '0 0 15px rgba(107, 0, 204, 0.6)'
                 }}
               >
                 ALL BANDS →

@@ -362,7 +362,7 @@ const TrackDetailPage: React.FC = () => {
                           color: '#fff',
                           textDecoration: 'none',
                           fontWeight: 'bold',
-                          boxShadow: `0 0 15px rgba(107, 0, 204, 0.6)`
+                          boxShadow: '0 0 15px rgba(107, 0, 204, 0.6)'
                         }}
                       >
                         ▶ {titleize(type)} Video
@@ -451,7 +451,7 @@ const TrackDetailPage: React.FC = () => {
                   color: 'white',
                   textDecoration: 'none',
                   fontWeight: 'bold',
-                  boxShadow: `0 0 15px rgba(107, 0, 204, 0.6)`
+                  boxShadow: '0 0 15px rgba(107, 0, 204, 0.6)'
                 }}
               >
                 {artistDisplayName} HOME →
