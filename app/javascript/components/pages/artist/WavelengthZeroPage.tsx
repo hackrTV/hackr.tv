@@ -39,6 +39,8 @@ const WavelengthZeroPage: React.FC = () => {
         className="tui-window white-text"
         style={{
           maxWidth: '1200px',
+          margin: '0 auto',
+          display: 'block',
           background: '#0a0a0a',
           border: '3px solid transparent',
           backgroundImage: 'linear-gradient(#0a0a0a, #0a0a0a), linear-gradient(90deg, #ff0080, #ff8c00, #ffed00, #00ff00, #00d9ff, #8b00ff)',

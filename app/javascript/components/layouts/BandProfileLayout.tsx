@@ -65,6 +65,8 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
         className="tui-window white-text"
         style={{
           maxWidth: '1200px',
+          margin: '0 auto',
+          display: 'block',
           ...backgroundStyle,
           border: `2px solid ${borderColor}`
         }}

@@ -24,7 +24,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
       {/* ASCII Art Header */}
       {showAsciiArt && (
         <>
-          <div className="ml-10 pl-5 white-168-text">
+          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'center' }} className="white-168-text">
             <Link to="/" style={{ display: 'inline-block' }}>
               <pre id="greetings" style={{ fontSize: '11px' }}>
                 {` __  __                   __            ______  __  __
