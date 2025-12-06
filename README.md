@@ -7,7 +7,7 @@
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.1-red.svg)](https://rubyonrails.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Tests-351%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-911%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
@@ -50,6 +50,22 @@
   - Keyboard shortcuts (Tab to search, Spacebar to play/pause)
 - **Auto-play & Queue** - Automatic track progression with loop functionality
 - **Bands Directory** - Artist profiles with track counts and genre information
+
+### The Codex - Lore Wiki
+- **In-World Encyclopedia** - Comprehensive wiki documenting THE.CYBERPUL.SE universe
+- **7 Entry Types** - People, organizations, events, locations, technology, factions, items
+- **Markdown Content** - Rich formatting with auto-linking via `[[Entry Name]]` syntax
+- **Search & Filter** - Find entries by type, search by name/content
+- **Admin Interface** - Full CRUD with draft/publish workflow at `/root/codex`
+
+### PulseWire - Social Network
+- **In-World Micro-Blogging** - Twitter-like platform for Grid Hackr users
+- **Pulses** - 256-character posts with real-time updates via Action Cable
+- **Echoes** - Rebroadcast system (like retweets)
+- **Splices** - Threaded replies for conversations
+- **Hotwire Timeline** - Global feed with infinite scroll
+- **User Profiles** - View any user's pulse history at `/wire/:username`
+- **Admin Moderation** - SignalDrop system for content moderation
 
 ### THE PULSE GRID - MUD Game
 - **Real-time Multiplayer** - Live chat and movement tracking via Action Cable
@@ -133,8 +149,10 @@
    - The.CyberPul.se: http://localhost:3000/thecyberpulse
    - THE PULSE GRID: http://localhost:3000/grid
    - hackr.fm Radio: http://localhost:3000/fm/radio
-   - Pulse Vault: http://localhost:3000/fm/pulse_vault
+   - Pulse Vault: http://localhost:3000/fm/pulse-vault
    - Playlists: http://localhost:3000/fm/playlists (requires Grid login)
+   - The Codex: http://localhost:3000/codex
+   - PulseWire: http://localhost:3000/wire
    - Admin Dashboard: http://localhost:3000/root (requires Grid admin account)
 
 ---
@@ -224,7 +242,7 @@ hackr.tv/
 │   └── [artist_slug]/                 # Artist-specific files
 ├── lib/tasks/
 │   └── import.rake                    # Data import scripts
-├── spec/                              # Test suite (351 examples)
+├── spec/                              # Test suite (827 examples)
 │   ├── models/                        # Model specs (backend)
 │   ├── controllers/                   # Controller specs (backend)
 │   ├── components/                    # Component specs (frontend Vitest)
@@ -255,13 +273,13 @@ bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- **Backend:** 351 examples, 0 failures, 7 pending
-- **Frontend:** 37 examples (Vitest)
-- **Total:** 388 passing tests
+- **Backend:** 827 examples, 0 failures, 9 pending
+- **Frontend:** 84 examples (Vitest)
+- **Total:** 911 passing tests
 
 **Tested Components:**
-- **Models:** Artist, Album, Track, Playlist, PlaylistTrack, RadioStation, RadioStationPlaylist, GridHackr, GridRoom, HackrLog, Redirect
-- **Controllers:** Grid, API (Radio, Playlists, PlaylistTracks, SharedPlaylists), Admin (RadioStations, Tracks, HackrLogs), FM, Tracks, Pages
+- **Models:** Artist, Album, Track, Playlist, PlaylistTrack, RadioStation, RadioStationPlaylist, GridHackr, GridRoom, HackrLog, Redirect, CodexEntry, Pulse, Echo
+- **Controllers:** Grid, API (Radio, Playlists, PlaylistTracks, SharedPlaylists, Codex, Pulses, Echoes), Admin (RadioStations, Tracks, HackrLogs, CodexEntries, PulseWire), FM, Tracks, Pages
 - **Components:** BandProfileComponent (ViewComponent), AudioPlayer, PlayerBar, SeekBar (React/Vitest)
 - **Services:** Grid::CommandParser
 - **Concerns:** GridAuthentication, RequestAnalysis
@@ -354,6 +372,13 @@ bin/rails import:yaml_tracks        # Tracks only
 ### Blog
 - **hackr_logs** - blog posts with Markdown content, published status
 
+### The Codex
+- **codex_entries** - name, slug, entry_type (person/organization/event/location/technology/faction/item), summary, content (markdown), metadata (JSON), published, position
+
+### PulseWire
+- **pulses** - content (256 char max), parent_pulse_id, thread_root_id, echo_count, splice_count, pulsed_at, signal_dropped, belongs_to :grid_hackr
+- **echoes** - echoed_at, belongs_to :pulse (counter_cache), belongs_to :grid_hackr
+
 ---
 
 ## 🌐 Multi-Domain Setup
@@ -391,22 +416,19 @@ bin/rails import:yaml_tracks        # Tracks only
 - [x] **NPC dialogue system** - 2 NPCs with 13 total topics
 - [x] **Command history** - Arrow key navigation (100 commands)
 - [x] **Hackr Logs** - Blog platform with Markdown support
-- [x] **Comprehensive test suite** - 351 backend + 37 frontend tests (100% passing)
+- [x] **Comprehensive test suite** - 827 backend + 84 frontend tests (100% passing)
+- [x] **The Codex wiki** - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
+- [x] **PulseWire social network** - Pulses, Echoes, Splices, real-time updates, admin moderation
+- [x] **OBS Overlay system** - Now Playing, PulseWire, Grid Activity overlays for livestreaming
 
-### In Progress 🚧
+### Future Enhancements 🔮
 - [ ] Faction reputation system
 - [ ] Mission/quest system for THE PULSE GRID
 - [ ] Hacking system (core gameplay mechanic)
 - [ ] Combat mechanics (physical/cyber)
 - [ ] Synthia frequency tuning mechanic
-
-### Future Enhancements 🔮
-- [ ] Shuffle mode for playlists
-- [ ] Previous/Skip buttons in player
-- [ ] Playlist drag-and-drop reordering UI
 - [ ] More zones and rooms for THE PULSE GRID
 - [ ] Persistent inventory between sessions
-- [ ] Expanded band profile pages with photos and extended bios
 - [ ] Upload remaining audio files (64 of 66 tracks need audio)
 
 ---
@@ -435,8 +457,8 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/rails console` | Interactive Rails console |
 | `bin/rails db:migrate` | Run database migrations |
 | `bin/rails import:from_yaml` | Import all YAML data (artists, albums, tracks) |
-| `bundle exec rspec` | Run backend test suite (351 tests) |
-| `pnpm test` | Run frontend test suite (37 tests) |
+| `bundle exec rspec` | Run backend test suite (827 tests) |
+| `pnpm test` | Run frontend test suite (84 tests) |
 | `bundle exec standardrb` | Lint backend code |
 | `pnpm install` | Install frontend dependencies |
 

@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated:** 2025-11-22
+**Last Updated:** 2025-12-06
 
 This file tracks planned features, enhancements, and tasks for hackr.tv. Items move from this list to the "Completed" section in CLAUDE.md once implemented.
 
