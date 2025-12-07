@@ -78,11 +78,11 @@ const TheCyberPulsePage: React.FC = () => {
               </p>
               <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
                 This frequency shouldn't exist. This signal is being broadcast from a timeline GovCorp has spent a
-                century trying to prevent. And yet—here we are. Here <em>you</em> are. Listening.
+                century trying to prevent. And yet - here we are. Here <em>you</em> are. Listening.
               </p>
               <p style={{ color: '#ddd', lineHeight: '1.8', fontSize: '1.05em' }}>
                 The.CyberPul.se is the central nervous system of the Fracture Network. Not a band. Not a channel.
-                A heartbeat transmitted backward through time from {futureYear} to {currentYear}—a hundred years of
+                A heartbeat transmitted backward through time from {futureYear} to {currentYear} - a hundred years of
                 resistance compressed into electromagnetic pulses you're decoding right now.
               </p>
               <p
@@ -215,7 +215,7 @@ const TheCyberPulsePage: React.FC = () => {
                       XERAEN
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                      He broadcasts from {futureYear}—from a future where GovCorp has won, where RAINNs have replaced
+                      He broadcasts from {futureYear} - from a future where GovCorp has won, where RAINNs have replaced
                       authentic human expression, where The Fracture Network fights a war most people don't know is
                       happening.
                     </p>
@@ -224,7 +224,7 @@ const TheCyberPulsePage: React.FC = () => {
                     </p>
                     <p style={{ color: '#aaa', lineHeight: '1.8', marginBottom: '15px' }}>
                       Every transmission you receive has already happened in his timeline. Every attack you witness
-                      is history to him—but to you, it's still possible. Still changeable. The paradox is the point:
+                      is history to him - but to you, it's still possible. Still changeable. The paradox is the point:
                       he's broadcasting from a future he's trying to prevent.
                     </p>
                     <p style={{ color: '#bbb', lineHeight: '1.8', marginBottom: '15px' }}>
@@ -280,7 +280,7 @@ const TheCyberPulsePage: React.FC = () => {
                       that turns broadcasts into rallying cries.
                     </p>
                     <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                      His drums don't keep time—they <em>drive</em> it. Every beat is a countdown. Every rhythm is
+                      His drums don't keep time - they <em>drive</em> it. Every beat is a countdown. Every rhythm is
                       a call to action. When Ryker's voice comes through the signal, it's not a whisper from the
                       future. It's a shout. A challenge. A reminder that resistance isn't passive.
                     </p>
@@ -290,7 +290,7 @@ const TheCyberPulsePage: React.FC = () => {
                     <p style={{ color: '#bbb', lineHeight: '1.8', marginBottom: '15px' }}>
                       Where XERAEN embodies the solitary weight of maintaining hope across impossible distances,
                       Ryker embodies collective defiance. Unity through action. The belief that every small choice
-                      ripples forward—or in their case, backward—shaping futures that haven't been written yet.
+                      ripples forward - or in their case, backward - shaping futures that haven't been written yet.
                     </p>
                     <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
                       He knows the math. He knows that success means erasure. He drums anyway. Louder. Faster.
@@ -353,7 +353,7 @@ const TheCyberPulsePage: React.FC = () => {
                   </div>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     More than a game. Less than a simulation. THE PULSE GRID is how the Fracture Network coordinates
-                    across timelines—a MUD interface where operators train, plan, and execute. What looks like a text
+                    across timelines - a MUD interface where operators train, plan, and execute. What looks like a text
                     adventure is actually resistance infrastructure.
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
@@ -418,7 +418,7 @@ const TheCyberPulsePage: React.FC = () => {
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       Ten frequencies. Ten approaches to resistance. From Injection Vector's kinetic warfare to
-                      Ethereality's transcendent liberation—each band represents a node in the network, a tactic in
+                      Ethereality's transcendent liberation - each band represents a node in the network, a tactic in
                       the arsenal, a way of fighting that speaks to different souls.
                     </p>
                     <p style={{ color: '#aaa', lineHeight: '1.8', marginTop: '10px' }}>
@@ -449,7 +449,7 @@ const TheCyberPulsePage: React.FC = () => {
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       Live attacks against GovCorp systems. Real-time infiltration of corporate infrastructure.
-                      Interactive missions where the audience doesn't just watch—they participate. Every livestream
+                      Interactive missions where the audience doesn't just watch - they participate. Every livestream
                       is an operation. Every viewer is potentially an operator.
                     </p>
                   </div>
@@ -514,7 +514,7 @@ const TheCyberPulsePage: React.FC = () => {
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     If they stop us in {futureYear}, the broadcasts have already been sent to {currentYear}. If they stop
                     the listeners in {currentYear}, the resistance in {futureYear} has already formed. We exist in both
-                    timelines simultaneously—a signal that's already arrived and a future that hasn't happened yet.
+                    timelines simultaneously - a signal that's already arrived and a future that hasn't happened yet.
                   </p>
                   <p
                     style={{

@@ -185,7 +185,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               )}
               <TrackInfo
                 title={currentTrack?.title || 'No track loaded'}
-                artist={currentTrack?.artist || '—'}
+                artist={currentTrack?.artist || '-'}
               />
               <SeekBar
                 currentTime={currentTime}

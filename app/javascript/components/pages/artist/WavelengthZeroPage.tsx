@@ -96,7 +96,7 @@ const WavelengthZeroPage: React.FC = () => {
                         they've been hiding from you.
                       </p>
                       <p style={{ color: '#aaa', lineHeight: '1.8' }}>
-                        They called it <span style={{ color: '#00d9ff', textShadow: '0 0 8px rgba(0, 217, 255, 0.6)', fontWeight: 'bold' }}>Zero Light</span>—their perfect world with no shadows because
+                        They called it <span style={{ color: '#00d9ff', textShadow: '0 0 8px rgba(0, 217, 255, 0.6)', fontWeight: 'bold' }}>Zero Light</span> - their perfect world with no shadows because
                         there's no light to cast them. We took their name and split it open. Inside their darkness,
                         we found every color they said didn't exist anymore.
                       </p>
@@ -137,7 +137,7 @@ const WavelengthZeroPage: React.FC = () => {
                   <div style={{ marginBottom: '25px', padding: '15px', background: 'linear-gradient(135deg, rgba(255, 0, 128, 0.1), rgba(255, 140, 0, 0.05))', border: '1px solid rgba(255, 0, 128, 0.3)', borderBottom: '2px solid rgba(255, 0, 128, 0.4)' }}>
                     <h3 style={{ color: '#ff0080', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em', letterSpacing: '1px', textShadow: '0 0 10px rgba(255, 0, 128, 0.7)' }}>See</h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                      Bend light through a prism and watch it split. That's what we do with their lies—refract them
+                      Bend light through a prism and watch it split. That's what we do with their lies - refract them
                       until you can see every hidden color. Gray isn't neutral. It's every wavelength dampened until
                       you can't distinguish truth from control.
                     </p>
@@ -156,8 +156,8 @@ const WavelengthZeroPage: React.FC = () => {
                     <h3 style={{ color: '#00ff00', marginBottom: '10px', textTransform: 'uppercase', fontSize: '1em', letterSpacing: '1px', textShadow: '0 0 10px rgba(0, 255, 0, 0.7)' }}>Feel</h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       Their monochrome world is collapsing. You can feel it in the moments when the feed glitches and
-                      something raw breaks through. That chaos terrifies them—but it's real. Pain is real. Joy is real.
-                      Grief, hope, rage, love—all of it more real than the comfortable gray they're selling.
+                      something raw breaks through. That chaos terrifies them - but it's real. Pain is real. Joy is real.
+                      Grief, hope, rage, love - all of it more real than the comfortable gray they're selling.
                     </p>
                   </div>
 

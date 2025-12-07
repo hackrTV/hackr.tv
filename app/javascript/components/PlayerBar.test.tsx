@@ -73,8 +73,8 @@ describe('PlayerBar', () => {
     render(<PlayerBar {...defaultProps} currentTrack={null} />)
 
     expect(screen.getByText('No track loaded')).toBeInTheDocument()
-    // There may be multiple "—" in the UI (from time display), just check one exists
-    const dashElements = screen.getAllByText('—')
+    // There may be multiple "-" in the UI (from time display), just check one exists
+    const dashElements = screen.getAllByText('-')
     expect(dashElements.length).toBeGreaterThan(0)
   })
 

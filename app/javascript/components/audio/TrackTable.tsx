@@ -170,10 +170,10 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                     &nbsp;{track.artist.name}&nbsp;
                   </td>
                   <td style={{ color: track.audio_url ? '#999' : '#555' }}>
-                    &nbsp;{track.album.name || '—'}&nbsp;
+                    &nbsp;{track.album.name || '-'}&nbsp;
                   </td>
                   <td style={{ color: track.audio_url ? '#999' : '#555' }}>
-                    &nbsp;{track.artist.genre || '—'}&nbsp;
+                    &nbsp;{track.artist.genre || '-'}&nbsp;
                   </td>
                   <td style={{ textAlign: 'center', width: '135px', minWidth: '135px' }}>
                     {track.audio_url ? (
@@ -193,7 +193,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                         {isCurrentTrack && isPlaying ? '❚❚ PAUSE' : '► PLAY'}
                       </button>
                     ) : (
-                      <span style={{ color: '#555' }}>—</span>
+                      <span style={{ color: '#555' }}>-</span>
                     )}
                   </td>
                   {isLoggedIn && (

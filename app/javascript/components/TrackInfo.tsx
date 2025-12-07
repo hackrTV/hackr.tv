@@ -11,7 +11,7 @@ export const TrackInfo: React.FC<TrackInfoProps> = ({ title, artist }) => {
       <span id="track-title" style={{ color: '#a78bfa', fontWeight: 'bold' }}>
         {title}
       </span>
-      <span style={{ color: '#666' }}> — </span>
+      <span style={{ color: '#666' }}> - </span>
       <span id="track-artist" style={{ color: '#888' }}>
         {artist}
       </span>

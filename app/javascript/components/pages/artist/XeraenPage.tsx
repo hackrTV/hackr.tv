@@ -209,7 +209,7 @@ const XeraenPage: React.FC = () => {
                     [COST: EVERYTHING]
                   </div>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                    In {futureYear}, XERAEN operates alone. The Fracture Network has cells, bands, operatives—but
+                    In {futureYear}, XERAEN operates alone. The Fracture Network has cells, bands, operatives - but
                     someone has to sit at the console. Someone has to maintain the signal. Someone has to keep
                     transmitting even when there's no way to know if anyone is listening.
                   </p>
@@ -290,7 +290,7 @@ const XeraenPage: React.FC = () => {
                       Static as Language
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                      The interference isn't noise—it's the sound of a signal fighting through a hundred years
+                      The interference isn't noise - it's the sound of a signal fighting through a hundred years
                       of temporal resistance. Every crackle, every dropout, every moment of distortion is
                       evidence of the distance traveled. XERAEN leaves it in. The static is part of the message.
                     </p>
@@ -319,7 +319,7 @@ const XeraenPage: React.FC = () => {
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       Music about what's missing. The people who won't exist if the mission succeeds. The
                       timeline that collapses when victory is achieved. The version of yourself that has to
-                      be sacrificed. These aren't sad songs—they're honest ones. This is what it sounds like
+                      be sacrificed. These aren't sad songs - they're honest ones. This is what it sounds like
                       to accept the cost.
                     </p>
                   </div>
@@ -385,7 +385,7 @@ const XeraenPage: React.FC = () => {
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       Someone has to stay. Someone has to keep the signal alive while others fight, infiltrate,
                       resist. XERAEN chose the console. Chose to be the voice rather than the fist. Chose
-                      transmission over action. These tracks are what that choice sounds like—the profound
+                      transmission over action. These tracks are what that choice sounds like - the profound
                       isolation of being the one who stays behind and broadcasts.
                     </p>
                   </div>
@@ -419,7 +419,7 @@ const XeraenPage: React.FC = () => {
                   </p>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     Every successful operation brings the end closer. Every GovCorp system that falls, every
-                    mind that awakens, every node that joins the network—all of it accelerates the timeline
+                    mind that awakens, every node that joins the network - all of it accelerates the timeline
                     toward collapse. Toward a future where GovCorp never rises. Where the {futureYear} XERAEN
                     broadcasts from never exists.
                   </p>
@@ -535,7 +535,7 @@ const XeraenPage: React.FC = () => {
                   letterSpacing: '1px'
                 }}
               >
-                — XERAEN<br />
+                 - XERAEN<br />
                 <span style={{ fontSize: '0.9em', color: '#aaa' }}>
                   Transmitting from {futureYear}<br />
                   For as long as {futureYear} exists

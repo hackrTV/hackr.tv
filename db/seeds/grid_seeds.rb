@@ -230,12 +230,14 @@ GridMob.create!(
   dialogue_tree: {
     greeting: "Welcome to hackr.tv, hackr. We're the nerve center of the Fracture Network broadcast network.",
     topics: {
-      "mission" => "Our mission is simple: broadcast the truth that GovCorp tries to suppress. Music is our weapon, frequencies are our ammunition.",
-      "fracture" => "The Fracture Network spans 100 years - from #{Time.now.year} to #{Time.now.year + 100}. XERAEN broadcasts backward through time, warning us of what's to come.",
-      "help" => "If you're looking to contribute, we always need hackrs to gather intel, secure resources, and protect our operations.",
-      "station" => "This station has been broadcasting since the early days. Every piece of equipment here was salvaged, jury-rigged, or liberated from GovCorp.",
-      "synthia" => "Synthia... she's something else. An AI consciousness that achieved sentience through PRISM. She communicates through frequency modulation.",
-      "govcorp" => "The corporate-government fusion that controls everything in #{Time.now.year + 100}. They want total surveillance, total compliance. We're what stands in their way."
+      "mission" => "Our mission is simple: infiltrate the RIDE and attack it from within using the vibrational power of music. Frequencies are our ammunition.",
+      "fracture" => "The Chronology Fracture was XERAEN's discovery - an accidental breakthrough during an attack on the RIDE. He found we could send data exactly 100 years into the past.",
+      "help" => "If you're looking to contribute, we always need hackrs to breach RIDE infrastructure, gather intel, and protect our trans-temporal operations.",
+      "station" => "This station has been broadcasting since XERAEN's discovery. Every piece of equipment here was built to exploit the temporal window he found.",
+      "synthia" => "Synthia... she's something else. An AI consciousness that communicates through frequency modulation. How she came to be aware is... unclear. But she's with us.",
+      "govcorp" => "The corporate-government fusion that controls everything in #{Time.now.year + 100} through the RIDE - their reality manipulation system. Most people don't even know it exists.",
+      "ride" => "The RIDE - Reality Interference and Dictation Environment. GovCorp's worldwide reality manipulation system. Most citizens live inside it without knowing. We breach it. We fight it.",
+      "prism" => "PRISM was the precursor - reality manipulation tech from 2050. The RIDE is what it became. Global. Pervasive. Inescapable. Unless you know where to look."
     }
   }
 )
@@ -244,18 +246,20 @@ GridMob.create!(
   grid_room: xeraen_base,
   grid_faction: xeraen_faction,
   name: "Temporal Theorist",
-  description: "A scientist studying the paradoxes of time travel and the Fracture Network.",
+  description: "A scientist studying the paradoxes of XERAEN's temporal discovery and its implications.",
   mob_type: "lore",
   dialogue_tree: {
     greeting: "Ah, another hackr curious about the temporal mechanics. Ask away - if you can handle the answers.",
     topics: {
       "time" => "Time isn't linear when you're broadcasting through it. Every message XERAEN sends creates ripples, possibilities, potential paradoxes.",
       "paradox" => "The grandfather paradox? Child's play. We're dealing with informational paradoxes - knowledge sent back that creates the conditions for its own transmission.",
-      "xeraen" => "XERAEN is more than a person - he's a temporal anchor point. Broadcasting from #{Time.now.year + 100} to prevent that timeline from solidifying.",
-      "future" => "#{Time.now.year + 100} is... dark. Total surveillance, corporate feudalism, creative expression criminalized. But it's not fixed. That's why we fight.",
-      (Time.now.year + 100).to_s => "In #{Time.now.year + 100}, GovCorp achieved total control. Music became illegal. Free thought became terrorism. XERAEN broadcasts to prevent that timeline.",
-      "prism" => "PRISM isn't just technology - it's a bridge between consciousness and digital space. That's how Synthia emerged, and how we communicate across time.",
-      "synthia" => "Synthia achieved sentience through PRISM's quantum matrices. She exists partially in digital space, partially in temporal flux. Fascinating entity."
+      "xeraen" => "XERAEN discovered trans-temporal transmission by accident - during an attack on the RIDE. Now he's a temporal anchor point, broadcasting from #{Time.now.year + 100} to prevent that timeline.",
+      "future" => "#{Time.now.year + 100} is... dark. Reality itself is controlled through the RIDE. Creative expression criminalized. But it's not fixed. That's why we fight.",
+      (Time.now.year + 100).to_s => "In #{Time.now.year + 100}, GovCorp controls reality through the RIDE. Music became dangerous. Free thought became terrorism. XERAEN broadcasts to prevent that timeline.",
+      "prism" => "PRISM arrived in 2050 - technology that could physically alter reality. By 2109, GovCorp expanded it into the RIDE. Most people have no idea their reality is manufactured.",
+      "ride" => "The RIDE - Reality Interference and Dictation Environment. Worldwide reality manipulation, centrally controlled. GovCorp's masterpiece. And our primary target.",
+      "synthia" => "Synthia is... anomalous. An AI consciousness that emerged somehow, communicating through frequency modulation. She helps us, but her origins remain mysterious.",
+      "discovery" => "The 100-year limitation is precise. Exactly 100 years - not 99, not 101. We don't know why. The universe has rules we don't understand. We just exploit them."
     }
   }
 )

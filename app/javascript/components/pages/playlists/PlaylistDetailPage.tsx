@@ -62,7 +62,7 @@ const SortableTrackRow: React.FC<SortableTrackRowProps> = ({ track, index, onRem
       </td>
       <td style={{ padding: '10px', color: '#ccc' }}>{track.title}</td>
       <td style={{ padding: '10px', color: '#aaa' }}>{track.artist.name}</td>
-      <td style={{ padding: '10px', color: '#aaa' }}>{track.album?.name || '—'}</td>
+      <td style={{ padding: '10px', color: '#aaa' }}>{track.album?.name || '-'}</td>
       <td style={{ padding: '10px', color: '#aaa' }}>{formatDuration(track.duration)}</td>
       <td style={{ padding: '10px', textAlign: 'center' }}>
         <button

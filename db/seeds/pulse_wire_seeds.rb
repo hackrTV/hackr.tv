@@ -119,7 +119,7 @@ pulse8 = Pulse.create!(
 # A signal-dropped pulse (example of GovCorp moderation)
 Pulse.create!(
   grid_hackr: cipher,
-  content: "CLASSIFIED INTEL: GovCorp's Project Oversight has full access to—",
+  content: "CLASSIFIED INTEL: GovCorp's Project Oversight has full access to -",
   pulsed_at: 6.hours.ago,
   signal_dropped: true,
   signal_dropped_at: 5.hours.ago
