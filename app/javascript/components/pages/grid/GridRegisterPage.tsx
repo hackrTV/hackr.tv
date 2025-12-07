@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GridLayout } from '~/components/layouts/GridLayout'
 import { useGridAuth } from '~/hooks/useGridAuth'
+import { PrereleaseModal } from '~/components/prerelease/PrereleaseModal'
 
 export const GridRegisterPage: React.FC = () => {
   const [hackrAlias, setHackrAlias] = useState('')
@@ -30,6 +31,9 @@ export const GridRegisterPage: React.FC = () => {
 
   return (
     <GridLayout>
+      {/* Prerelease modal overlay - persistent, cannot be dismissed */}
+      <PrereleaseModal />
+
       <div className="tui-window cyan-168 white-text" style={{ maxWidth: '600px', margin: '50px auto', display: 'block' }}>
         <fieldset className="cyan-168-border">
           <legend className="center">THE PULSE GRID :: REGISTRATION</legend>

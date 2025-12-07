@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { HeaderMenu } from '~/components/navigation/HeaderMenu'
 import { FooterMenu } from '~/components/navigation/FooterMenu'
+import { PrereleaseBanner } from '~/components/prerelease/PrereleaseBanner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
 
@@ -16,8 +17,8 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
 
   return (
     <div className="black-168">
-      {/* Header Navigation Menu */}
       <HeaderMenu />
+      <PrereleaseBanner />
 
       {!isMobile && <br />}
 

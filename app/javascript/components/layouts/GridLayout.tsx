@@ -1,6 +1,7 @@
 import React from 'react'
 import { HeaderMenu } from '~/components/navigation/HeaderMenu'
 import { FooterMenu } from '~/components/navigation/FooterMenu'
+import { PrereleaseBanner } from '~/components/prerelease/PrereleaseBanner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
 
@@ -15,6 +16,7 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ children }) => {
   return (
     <>
       <HeaderMenu />
+      <PrereleaseBanner />
       {!isMobile && <br />}
       <FooterMenu />
       <div className="ml-10 mb-20 pb-50">

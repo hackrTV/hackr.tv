@@ -46,6 +46,14 @@ class Api::GridController < ApplicationController
 
   # POST /api/grid/register - Create new hackr account
   def register
+    # Block registration during prerelease mode
+    if APP_SETTINGS[:prerelease_mode].present?
+      return render json: {
+        success: false,
+        error: "Registration is temporarily disabled during #{APP_SETTINGS[:prerelease_mode]} phase. Existing users can still log in."
+      }, status: :forbidden
+    end
+
     @hackr = GridHackr.new(hackr_params)
 
     # Set starting room (hackr.tv Broadcast Station)

@@ -1,0 +1,22 @@
+default: &default
+  prerelease_mode: null
+  prerelease_banner_text: null
+
+development:
+  <<: *default
+  prerelease_mode: alpha
+  prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
+
+test:
+  <<: *default
+
+staging:
+  <<: *default
+  prerelease_mode: alpha
+  prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
+
+production:
+  <<: *default
+  # Uncomment when launching in prerelease mode:
+  # prerelease_mode: alpha
+  # prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
