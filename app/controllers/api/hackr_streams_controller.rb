@@ -12,7 +12,8 @@ class Api::HackrStreamsController < ApplicationController
           slug: @stream.artist.slug
         },
         title: @stream.title,
-        url: @stream.url,
+        live_url: @stream.live_url,
+        vod_url: @stream.vod_url,
         started_at: @stream.started_at
       }
     else

@@ -32,27 +32,54 @@
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :url, "STREAM URL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :url, class: "tui-input", placeholder: "YouTube watch or embed URL, Twitch embed URL, etc.", style: "width: 100%; font-family: monospace;" %>
+    <%= f.label :live_url, "LIVE STREAM URL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :live_url, class: "tui-input", placeholder: "YouTube watch or embed URL, Twitch embed URL, etc.", style: "width: 100%; font-family: monospace;" %>
     <small style="color: #888;">YouTube URLs are automatically converted to embed format - Required when going live</small>
-    <% if hackr_stream.errors[:url].any? %>
-      <br><small class="red-255-text"><%= hackr_stream.errors[:url].join(", ") %></small>
+    <% if hackr_stream.errors[:live_url].any? %>
+      <br><small class="red-255-text"><%= hackr_stream.errors[:live_url].join(", ") %></small>
     <% end %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :vod_url, "VOD URL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :vod_url, class: "tui-input", placeholder: "YouTube watch or embed URL for archived stream", style: "width: 100%; font-family: monospace;" %>
+    <small style="color: #888;">Optional - URL for the video-on-demand version after stream ends</small>
+    <% if hackr_stream.errors[:vod_url].any? %>
+      <br><small class="red-255-text"><%= hackr_stream.errors[:vod_url].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: STREAM TIMING ::]</h3>
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 200px;">
+      <%= f.label :started_at, "STARTED AT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.datetime_local_field :started_at, class: "tui-input", style: "width: 100%;" %>
+      <small style="color: #888;">When the stream started (or will start)</small>
+      <% if hackr_stream.errors[:started_at].any? %>
+        <br><small class="red-255-text"><%= hackr_stream.errors[:started_at].join(", ") %></small>
+      <% end %>
+    </div>
+
+    <div style="flex: 1; min-width: 200px;">
+      <%= f.label :ended_at, "ENDED AT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.datetime_local_field :ended_at, class: "tui-input", style: "width: 100%;" %>
+      <small style="color: #888;">When the stream ended</small>
+      <% if hackr_stream.errors[:ended_at].any? %>
+        <br><small class="red-255-text"><%= hackr_stream.errors[:ended_at].join(", ") %></small>
+      <% end %>
+    </div>
   </div>
 
   <%# Live Status (only show for existing records) %>
   <% if hackr_stream.persisted? %>
-    <div style="margin-bottom: 20px;">
+    <div style="margin-top: 20px;">
       <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">CURRENT STATUS</label>
       <div style="padding: 15px; background: <%= hackr_stream.is_live ? '#001a00' : '#1a1a1a' %>; border: 2px solid <%= hackr_stream.is_live ? '#00ff00' : '#444' %>;">
         <% if hackr_stream.is_live %>
           <p class="green-255-text" style="font-size: 1.2em;">⚡ LIVE</p>
-          <p style="color: #888;">Started: <%= hackr_stream.started_at&.strftime("%Y-%m-%d %H:%M") %></p>
         <% else %>
           <p style="color: #888;">⚫ Offline</p>
-          <% if hackr_stream.ended_at.present? %>
-            <p style="color: #666;">Last ended: <%= hackr_stream.ended_at.strftime("%Y-%m-%d %H:%M") %></p>
-          <% end %>
         <% end %>
       </div>
       <small style="color: #888;">Use "Go Live" / "End Stream" buttons on the streams list to change status</small>

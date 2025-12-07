@@ -52,7 +52,8 @@
               <tr>
                 <th style="text-align: left;">Artist</th>
                 <th style="text-align: left;">Title</th>
-                <th style="text-align: left;">URL</th>
+                <th style="text-align: left;">Live URL</th>
+                <th style="text-align: left;">VOD URL</th>
                 <th style="text-align: center;">Status</th>
                 <th style="text-align: center;">Actions</th>
               </tr>
@@ -68,14 +69,29 @@
                     <% if stream.started_at.present? %>
                       <br>
                       <small style="color: #666;">
-                        Last: <%= stream.started_at.strftime("%Y-%m-%d %H:%M") %>
+                        Started: <%= stream.started_at.strftime("%Y-%m-%d %H:%M") %>
+                      </small>
+                    <% end %>
+                    <% if stream.ended_at.present? %>
+                      <br>
+                      <small style="color: #666;">
+                        Ended: <%= stream.ended_at.strftime("%Y-%m-%d %H:%M") %>
                       </small>
                     <% end %>
                   </td>
                   <td>
-                    <% if stream.url.present? %>
+                    <% if stream.live_url.present? %>
                       <small style="color: #888; font-family: monospace; word-break: break-all;">
-                        <%= truncate(stream.url, length: 50) %>
+                        <%= truncate(stream.live_url, length: 40) %>
+                      </small>
+                    <% else %>
+                      <span style="color: #666;">—</span>
+                    <% end %>
+                  </td>
+                  <td>
+                    <% if stream.vod_url.present? %>
+                      <small style="color: #888; font-family: monospace; word-break: break-all;">
+                        <%= truncate(stream.vod_url, length: 40) %>
                       </small>
                     <% else %>
                       <span style="color: #666;">—</span>
@@ -101,7 +117,7 @@
                               title="Stream already finished. Create a new stream to go live again.">
                           ✓ Finished
                         </span>
-                      <% elsif stream.url.present? %>
+                      <% elsif stream.live_url.present? %>
                         <%= button_to "▶ Go Live", go_live_admin_hackr_stream_path(stream),
                             class: "tui-button green-168",
                             style: "padding: 2px 10px; font-size: 0.9em;",

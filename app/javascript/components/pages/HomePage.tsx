@@ -11,7 +11,8 @@ interface StreamData {
     slug: string
   }
   title?: string
-  url?: string
+  live_url?: string
+  vod_url?: string
   started_at?: string
 }
 
@@ -59,9 +60,9 @@ export const HomePage: React.FC = () => {
 
   return (
     <DefaultLayout>
-      {streamData?.is_live && streamData.url ? (
+      {streamData?.is_live && streamData.live_url ? (
         <LiveStreamEmbed
-          url={streamData.url}
+          url={streamData.live_url}
           title={streamData.title}
           artistName={streamData.artist?.name}
         />
