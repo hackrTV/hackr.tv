@@ -4,6 +4,7 @@ interface YouTubePlayerProps {
   videoId: string
   width?: number
   height?: number
+  responsive?: boolean
 }
 
 // YouTube Player types
@@ -34,7 +35,8 @@ declare global {
 export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   videoId,
   width = 560,
-  height = 315
+  height = 315,
+  responsive = false
 }) => {
   const playerRef = useRef<HTMLDivElement>(null)
   const [player, setPlayer] = useState<YTPlayer | null>(null)
@@ -71,8 +73,8 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     if (!isAPIReadyRef.current || !playerRef.current || player) return
 
     const newPlayer = new window.YT.Player(playerRef.current, {
-      height: String(height),
-      width: String(width),
+      height: responsive ? '100%' : String(height),
+      width: responsive ? '100%' : String(width),
       videoId: videoId,
       playerVars: {
         autoplay: 1,
@@ -104,8 +106,8 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     <div
       style={{
         position: 'relative',
-        width: `${width}px`,
-        height: `${height}px`,
+        width: responsive ? '100%' : `${width}px`,
+        height: responsive ? '100%' : `${height}px`,
         maxWidth: '100%',
         background: '#000'
       }}

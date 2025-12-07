@@ -9,12 +9,16 @@ Rails.application.routes.draw do
   get "thecyberpulse", to: "pages#spa_root", as: :thecyberpulse
   get "thecyberpulse/trackz", to: "pages#spa_root", as: :thecyberpulse_tracks
   get "thecyberpulse/trackz/:id", to: "pages#spa_root", as: :thecyberpulse_track
+  get "thecyberpulse/vidz", to: "pages#spa_root", as: :thecyberpulse_vidz
+  get "thecyberpulse/vidz/:id", to: "pages#spa_root", as: :thecyberpulse_vod
 
   # XERAEN routes - SPA
   get "xeraen", to: "pages#spa_root"
   get "xeraen/linkz", to: "pages#spa_root", as: :xeraen_linkz
   get "xeraen/trackz", to: "pages#spa_root", as: :xeraen_tracks
   get "xeraen/trackz/:id", to: "pages#spa_root", as: :xeraen_track
+  get "xeraen/vidz", to: "pages#spa_root", as: :xeraen_vidz
+  get "xeraen/vidz/:id", to: "pages#spa_root", as: :xeraen_vod
 
   # Band profile routes - SPA
   get "system_rot", to: "pages#spa_root", as: :system_rot
@@ -80,6 +84,8 @@ Rails.application.routes.draw do
     get "radio_stations", to: "radio#index"
     get "radio_stations/:id/playlists", to: "radio#station_playlists"
     get "hackr_stream", to: "hackr_streams#show"
+    get "artists/:artist_slug/vods", to: "hackr_streams#index"
+    get "artists/:artist_slug/vods/:id", to: "hackr_streams#vod_show"
 
     # Grid API routes
     get "grid/current_hackr", to: "grid#current_hackr_info"

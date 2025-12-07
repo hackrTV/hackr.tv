@@ -148,12 +148,9 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/thecyberpulse/trackz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>trackz
                 </Link>
-                <a href="https://www.youtube.com/watch?v=YgD4oNPpGv4&list=PLLRgY_tjdreyU4_WtrQnkZ6D8ur41GrpC" target="_blank" rel="noopener noreferrer" className="mobile-menu-item">
-                  <span className="purple-168-text">/</span>streamz
-                </a>
-                <a href="https://www.youtube.com/@TheCyberPulse/videos" target="_blank" rel="noopener noreferrer" className="mobile-menu-item">
+                <Link to="/thecyberpulse/vidz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>vidz
-                </a>
+                </Link>
               </div>
 
               <div className="mobile-menu-section">
@@ -164,9 +161,9 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/xeraen/trackz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>trackz
                 </Link>
-                <a href="https://www.youtube.com/watch?v=GYSH0mDteR4&list=PLnBws134IvTRZCeazlMukr-gq24eIWCf4" target="_blank" rel="noopener noreferrer" className="mobile-menu-item">
+                <Link to="/xeraen/vidz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>vidz
-                </a>
+                </Link>
                 <Link to="/xeraen/linkz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>linkz
                 </Link>
@@ -284,14 +281,9 @@ export const HeaderMenu: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <a href="https://www.youtube.com/watch?v=YgD4oNPpGv4&list=PLLRgY_tjdreyU4_WtrQnkZ6D8ur41GrpC" target="_blank" rel="noopener noreferrer">
-                  <span className="purple-168-text">/</span>streamz
-                </a>
-              </li>
-              <li>
-                <a href="https://www.youtube.com/@TheCyberPulse/videos" target="_blank" rel="noopener noreferrer">
+                <Link to="/thecyberpulse/vidz">
                   <span className="purple-168-text">/</span>vidz
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -313,9 +305,9 @@ export const HeaderMenu: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <a href="https://www.youtube.com/watch?v=GYSH0mDteR4&list=PLnBws134IvTRZCeazlMukr-gq24eIWCf4" target="_blank" rel="noopener noreferrer">
+                <Link to="/xeraen/vidz">
                   <span className="purple-168-text">/</span>vidz
-                </a>
+                </Link>
               </li>
               <li>
                 <Link to="/xeraen/linkz">

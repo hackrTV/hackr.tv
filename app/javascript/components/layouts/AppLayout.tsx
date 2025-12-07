@@ -13,6 +13,8 @@ const SharedPlaylistPage = lazy(() => import('~/components/pages/playlists/Share
 const TheCyberPulsePage = lazy(() => import('~/components/pages/artist/TheCyberPulsePage'))
 const XeraenPage = lazy(() => import('~/components/pages/artist/XeraenPage'))
 const XeraenLinkzPage = lazy(() => import('~/components/pages/artist/XeraenLinkzPage'))
+const VodzPage = lazy(() => import('~/components/pages/artist/VodzPage'))
+const VodzShowPage = lazy(() => import('~/components/pages/artist/VodzShowPage'))
 const SectorXPage = lazy(() => import('~/components/pages/artist/SectorXPage'))
 const BandProfilePage = lazy(() => import('~/components/pages/artist/BandProfilePage'))
 const WavelengthZeroPage = lazy(() => import('~/components/pages/artist/WavelengthZeroPage'))
@@ -58,9 +60,13 @@ export const AppLayout: React.FC = () => {
         <Route path="/thecyberpulse" element={<TheCyberPulsePage />} />
         <Route path="/thecyberpulse/trackz" element={<TrackListPage />} />
         <Route path="/thecyberpulse/trackz/:trackSlug" element={<TrackDetailPage />} />
+        <Route path="/thecyberpulse/vidz" element={<VodzPage />} />
+        <Route path="/thecyberpulse/vidz/:id" element={<VodzShowPage />} />
         <Route path="/xeraen" element={<XeraenPage />} />
         <Route path="/xeraen/trackz" element={<TrackListPage />} />
         <Route path="/xeraen/trackz/:trackSlug" element={<TrackDetailPage />} />
+        <Route path="/xeraen/vidz" element={<VodzPage />} />
+        <Route path="/xeraen/vidz/:id" element={<VodzShowPage />} />
         <Route path="/xeraen/linkz" element={<XeraenLinkzPage />} />
         <Route path="/sector/x" element={<SectorXPage />} />
         <Route path="/system_rot" element={<BandProfilePage />} />
