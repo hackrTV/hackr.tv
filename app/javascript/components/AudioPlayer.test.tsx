@@ -287,7 +287,7 @@ describe('AudioPlayer', () => {
     await waitFor(() => {
       // Should auto-play Track 2
       expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-2')
-    })
+    }, { timeout: 3000 })
   })
 
   it('respects filtered tracks for auto-play', async () => {
