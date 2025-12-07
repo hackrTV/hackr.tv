@@ -49,7 +49,7 @@ class Admin::HackrStreamsController < Admin::ApplicationController
     # End any currently live streams first
     HackrStream.live.where.not(id: @hackr_stream.id).find_each(&:end_stream!)
 
-    @hackr_stream.go_live!(@hackr_stream.url, @hackr_stream.title)
+    @hackr_stream.go_live!(@hackr_stream.live_url, @hackr_stream.title)
     set_flash_success("Stream is now LIVE!")
   rescue ActiveRecord::RecordInvalid => e
     set_flash_error("Failed to go live: #{e.record.errors.full_messages.join(", ")}")
@@ -73,6 +73,6 @@ class Admin::HackrStreamsController < Admin::ApplicationController
   end
 
   def hackr_stream_params
-    params.require(:hackr_stream).permit(:artist_id, :url, :title, :is_live)
+    params.require(:hackr_stream).permit(:artist_id, :live_url, :vod_url, :title, :is_live, :started_at, :ended_at)
   end
 end

@@ -198,10 +198,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_000007) do
     t.datetime "created_at", null: false
     t.datetime "ended_at"
     t.boolean "is_live", default: false, null: false
+    t.string "live_url"
     t.datetime "started_at"
     t.string "title"
     t.datetime "updated_at", null: false
-    t.string "url"
+    t.string "vod_url"
     t.index ["artist_id"], name: "index_hackr_streams_on_artist_id"
   end
 

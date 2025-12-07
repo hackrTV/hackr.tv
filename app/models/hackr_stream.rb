@@ -1,12 +1,12 @@
 class HackrStream < ApplicationRecord
   belongs_to :artist
 
-  validates :url, presence: true, if: :is_live?
+  validates :live_url, presence: true, if: :is_live?
   validates :title, length: {maximum: 255}
   validate :started_at_before_ended_at
   validate :cannot_restart_stream, on: :update
 
-  before_validation :convert_youtube_url
+  before_validation :convert_youtube_urls
 
   scope :live, -> { where(is_live: true) }
   scope :recent, -> { order(created_at: :desc) }
@@ -20,7 +20,7 @@ class HackrStream < ApplicationRecord
   def go_live!(stream_url, stream_title = nil)
     update!(
       is_live: true,
-      url: stream_url,
+      live_url: stream_url,
       title: stream_title,
       started_at: Time.current
     )
@@ -35,8 +35,13 @@ class HackrStream < ApplicationRecord
 
   private
 
-  def convert_youtube_url
-    return if url.blank?
+  def convert_youtube_urls
+    self.live_url = convert_youtube_url(live_url)
+    self.vod_url = convert_youtube_url(vod_url)
+  end
+
+  def convert_youtube_url(url)
+    return url if url.blank?
 
     # Convert YouTube watch/live URLs to embed URLs
     # Handles: youtube.com/watch?v=VIDEO_ID, youtu.be/VIDEO_ID, youtube.com/live/VIDEO_ID
@@ -49,10 +54,11 @@ class HackrStream < ApplicationRecord
     youtube_patterns.each do |pattern|
       if url.match?(pattern)
         video_id = url.match(pattern)[1]
-        self.url = "https://www.youtube.com/embed/#{video_id}"
-        break
+        return "https://www.youtube.com/embed/#{video_id}"
       end
     end
+
+    url
   end
 
   def started_at_before_ended_at
