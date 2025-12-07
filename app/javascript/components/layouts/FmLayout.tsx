@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 import { HeaderMenu } from '~/components/navigation/HeaderMenu'
 import { FooterMenu } from '~/components/navigation/FooterMenu'
+import { PrereleaseBanner } from '~/components/prerelease/PrereleaseBanner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
 
@@ -14,8 +15,8 @@ export const FmLayout: React.FC<FmLayoutProps> = ({ children }) => {
 
   return (
     <div className="black-168">
-      {/* Header Navigation Menu (no ASCII art) */}
       <HeaderMenu />
+      <PrereleaseBanner />
 
       {!isMobile && <br />}
 

@@ -67,6 +67,8 @@ Rails.application.routes.draw do
 
   # API routes (for SPA)
   namespace :api, defaults: {format: :json} do
+    get "settings", to: "settings#index"
+
     resources :artists, only: [:index, :show] do
       resources :tracks, only: [:index]
     end
