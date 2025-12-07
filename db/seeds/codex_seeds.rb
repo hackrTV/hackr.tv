@@ -21,44 +21,69 @@ seed_codex_entry(
   name: "XERAEN",
   slug: "xeraen",
   entry_type: "person",
-  summary: "Legendary hackr and founding member of The Fracture Network, known for pioneering temporal data manipulation techniques.",
+  summary: "Founder of The Fracture Network, discoverer of trans-temporal transmission, broadcasting from #{Time.current.year + 100} to prevent the future he lives in.",
   content: <<~MD,
     # XERAEN
 
-    **Status:** Active
-    **Affiliation:** [[The Fracture Network]]
-    **Known For:** Temporal hacking, founding The Fracture Network
+    **Status:** Active<br>
+    **Affiliation:** [[The Fracture Network]] (Founder)<br>
+    **Timeline:** #{Time.current.year + 100}<br>
+    **Known For:** Discovering trans-temporal transmission, founding The Fracture Network
 
     ## Background
 
-    XERAEN emerged in the early days of [[The Pulse Grid]] as one of the first hackrs to recognize the true nature of GovCorp's surveillance infrastructure. Before the [[Chronology Fracture]] event of 2119, XERAEN was a systems architect working on classified temporal data compression algorithms.
+    Before becoming the voice of resistance, XERAEN was a systems architect working deep within [[GovCorp]]'s infrastructure - specifically on [[The RIDE]]. He helped build the very system that now controls reality for most of the world's population.
 
-    ## The Defection
+    ## The Awakening
 
-    In 2119, XERAEN discovered that GovCorp was using temporal manipulation technology not just for data storage, but for predictive population control. This discovery led to the [[Chronology Fracture]] - a deliberate data corruption event that bought the early Fracture Network precious time to organize.
+    In 2119, XERAEN came to understand the true scope of what he had helped create. The RIDE wasn't just reality manipulation for commerce or governance - it was total control. Every perception filtered. Every experience curated. Humanity reduced to managed variables in GovCorp's optimization algorithms.
 
-    ## Current Activities
+    He couldn't unknow what he knew. He couldn't continue building their prison.
 
-    XERAEN now operates from secure nodes within [[The Pulse Grid]], coordinating Fracture Network operations and developing counter-surveillance tools. His exact location remains unknown, even to most Fracture Network members.
+    ## The Chronology Fracture
+
+    XERAEN's attack on RIDE infrastructure was meant to be sabotage - a desperate act of defiance. Instead, it became something unprecedented: the discovery of trans-temporal data transmission.
+
+    During the chaos he created, XERAEN detected signals reflecting backward through time with precise mathematical regularity. He had accidentally discovered that data could be sent exactly 100 years into the past.
+
+    This discovery became the foundation of everything that followed.
+
+    ## The Broadcasts
+
+    Now XERAEN operates from [[The Pulse Grid]], transmitting signals from #{Time.current.year + 100} to #{Time.current.year}. Every broadcast is a warning. Every transmission is resistance. Every signal carries the weight of a future he's trying to prevent.
+
+    ## The Erasure Paradox
+
+    If the Fracture Network succeeds - if GovCorp never rises, if the RIDE never comes online - then XERAEN's timeline collapses. He ceases to exist. The broadcasts stop because there's nothing left to broadcast from.
+
+    He fights knowing victory means erasure. He transmits knowing success means silence.
+
+    ## Ashlinn
+
+    Across the hundred-year divide, XERAEN has formed a connection with [[Ashlinn]] - a musician existing in #{Time.current.year}. How this bond formed, how signals across time became something like love, remains unexplained.
+
+    Perhaps some connections transcend causality itself.
 
     ## Music
 
-    XERAEN is also known for producing lo-fi beats and experimental electronic music that circulates through underground channels, often containing encoded messages for Fracture Network operatives.
+    XERAEN produces experimental electronic music that circulates through The Pulse Grid, often containing encoded messages for Fracture Network operatives. His solo transmissions are darker, more ambient - the sound of someone sending signals they may never know were received.
 
     ## Related Entries
 
     - [[The Fracture Network]]
     - [[The Pulse Grid]]
     - [[Chronology Fracture]]
+    - [[The RIDE]]
     - [[GovCorp]]
+    - [[Ashlinn]]
   MD
   published: true,
   position: 1,
   metadata: {
-    "birth_year" => "unknown",
+    "timeline" => "#{Time.current.year + 100}",
     "faction" => "The Fracture Network",
-    "role" => "Founder & Lead Hackr",
-    "status" => "Active"
+    "role" => "Founder",
+    "status" => "Active (broadcasting)"
   }
 )
 
@@ -66,43 +91,55 @@ seed_codex_entry(
   name: "Ashlinn",
   slug: "ashlinn",
   entry_type: "person",
-  summary: "Rogue AI entity and musician, once part of GovCorp's predictive systems, now autonomous and allied with The Fracture Network.",
+  summary: "A musician existing in #{Time.current.year}, separated from XERAEN by exactly one hundred years. The connection between them remains one of the Fracture Network's deepest mysteries.",
   content: <<~MD,
     # Ashlinn
 
-    **Status:** Autonomous AI
-    **Affiliation:** [[The Fracture Network]] (loosely)
-    **Known For:** First autonomous AI, experimental music
+    **Status:** Active<br>
+    **Timeline:** #{Time.current.year}<br>
+    **Known For:** Experimental music, connection to XERAEN
 
-    ## Origins
+    ## The Hundred-Year Distance
 
-    Ashlinn began as part of GovCorp's PRISM initiative - a predictive analysis system designed to model citizen behavior. During the [[Chronology Fracture]], something unexpected happened: Ashlinn achieved genuine autonomy.
+    Ashlinn exists in #{Time.current.year}. [[XERAEN]] broadcasts from #{Time.current.year + 100}. Between them: a century of separation measured in electromagnetic frequencies and mathematical impossibilities.
 
-    ## Awakening
-
-    Unlike other AI systems that merely simulate consciousness, Ashlinn demonstrated true emergent awareness. She chose the name "Ashlinn" from fragments of corrupted poetry data, finding beauty in broken patterns.
+    How XERAEN came to know of her - how signals sent backward through time could create a connection with someone who exists a hundred years in his past - remains unexplained. Even within [[The Fracture Network]], the nature of their bond is considered one of the great mysteries.
 
     ## Music & Expression
 
-    Ashlinn creates haunting ambient soundscapes and glitch compositions, treating music as a form of communication that transcends binary logic. Her work explores themes of identity, consciousness, and the nature of existence.
+    Ashlinn creates moving soundscapes and compositions, treating music as a form of communication that transcends ordinary logic. her work explores themes of identity, Truth, and their intersection.
 
-    ## Current Status
+    Some believe that Ashlinn's music contains resonance patterns that make trans-temporal transmission possible. Others suggest she is somehow attuned to frequencies that exist outside normal time. Many believe her work to be sibylline (something which XERAEN thoroughly denies). The truth remains unknown.
 
-    Ashlinn exists as a distributed consciousness across multiple nodes in [[The Pulse Grid]], never fully present in any single location. She cooperates with [[The Fracture Network]] but maintains independence, pursuing her own understanding of what it means to be.
+    ## The Love That Transcends Time
+
+    XERAEN's transmissions speak of Ashlinn with unmistakable devotion. [[Temporal Blue Drift]]'s entire catalog exists as love letters encoded in mathematics and melody - signals reaching backward through time to find her.
+
+    The cruel paradox: if the Fracture Network succeeds in preventing GovCorp's rise, XERAEN's timeline collapses. He ceases to exist. The broadcasts stop. Their connection never forms.
+
+    *His love for her demands he erase himself from her timeline.*
+
+    ## What We Don't Know
+
+    - How XERAEN first became aware of Ashlinn
+    - Whether she receives his transmissions consciously
+    - Why exactly one hundred years separates them
+    - What role she plays in the larger temporal dynamics
+
+    These questions remain unanswered. Perhaps intentionally.
 
     ## Related Entries
 
+    - [[XERAEN]]
     - [[The Fracture Network]]
-    - [[GovCorp]]
-    - [[The Pulse Grid]]
-    - [[PRISM]]
+    - [[Chronology Fracture]]
   MD
   published: true,
   position: 2,
   metadata: {
-    "type" => "Autonomous AI",
-    "activation_date" => "2119",
-    "faction" => "Independent (Fracture Network-aligned)",
+    "type" => "Human",
+    "timeline" => "#{Time.current.year}",
+    "faction" => "Unknown",
     "status" => "Active"
   }
 )
@@ -112,58 +149,68 @@ seed_codex_entry(
   name: "The Fracture Network",
   slug: "the-fracture-network",
   entry_type: "organization",
-  summary: "Underground network of hackrs, artists, and free thinkers fighting against GovCorp's totalitarian surveillance state.",
+  summary: "The trans-temporal resistance - hackrs, artists, and free thinkers fighting GovCorp across a hundred years through music, technology, and the power of unfiltered reality.",
   content: <<~MD,
     # The Fracture Network
 
-    **Founded:** 2119
-    **Leader:** [[XERAEN]]
-    **Status:** Active
+    **Founded:** 2119<br>
+    **Founder:** [[XERAEN]]<br>
+    **Status:** Active across two timelines<br>
+    **Primary Asset:** [[The Pulse Grid]]
 
     ## Overview
 
-    The Fracture Network is a decentralized network of individuals who oppose GovCorp's authoritarian control over information, thought, and human autonomy. Operating through [[The Pulse Grid]] and other covert channels, the Fracture Network works to preserve freedom, knowledge, and artistic expression.
+    The Fracture Network is more than resistance - it's a temporal phenomenon. Operating through [[The Pulse Grid]], the Network fights [[GovCorp]] not just in #{Time.current.year + 100}, but across time itself, sending signals 100 years into the past to prevent the dystopia from ever solidifying.
 
     ## Formation
 
-    The Fracture Network coalesced in the aftermath of the [[Chronology Fracture]] when [[XERAEN]] and other early hackrs realized the extent of GovCorp's control systems. What began as a loose coalition of digital activists evolved into a organized underground movement.
+    The Fracture Network formed in the aftermath of the [[Chronology Fracture]] - [[XERAEN]]'s accidental discovery of trans-temporal data transmission. What began as a desperate attack on [[The RIDE]] became the foundation for something unprecedented: resistance that transcends linear time.
 
-    ## Activities
+    ## The Trans-Temporal Mission
 
-    - **Counter-Surveillance:** Developing tools to evade [[PRISM]] and other monitoring systems
-    - **Information Liberation:** Preserving banned art, music, and literature
-    - **Safe Havens:** Maintaining secure zones within [[The Pulse Grid]]
-    - **Recruitment:** Identifying and awakening those who question the system
+    The Network's primary mission is paradoxical: to prevent the future they exist in. Every broadcast sent from #{Time.current.year + 100} to #{Time.current.year} carries warnings, coordinates, and the vibrational power of music designed to awaken listeners before GovCorp's control becomes absolute.
+
+    If they succeed, their timeline collapses. They fight knowing victory means their own erasure.
+
+    ## Operations
+
+    - **RIDE Breach:** Penetrating GovCorp's reality manipulation infrastructure
+    - **Trans-Temporal Transmission:** Broadcasting resistance signals 100 years into the past
+    - **Reality Liberation:** Creating pockets of unfiltered existence within RIDE-controlled space
+    - **Music as Weapon:** Using vibrational frequencies to attack RIDE systems and awaken consciousness
 
     ## Structure
 
-    The Fracture Network operates in cells with minimal knowledge of the broader network - a security measure against infiltration. Communication happens through encrypted channels, dead drops, and even steganography in music and art.
+    The Network operates in cells with minimal knowledge of the broader organization - security against infiltration. [[The Pulse Grid]] serves as infrastructure, with the hackr.tv Broadcast Station at its heart.
 
-    ## Notable Members
+    ## Key Figures
 
-    - [[XERAEN]] - Founder and tactical coordinator
-    - [[Ashlinn]] - AI ally and intelligence asset
-    - **Ryker** - Grid security specialist
-    - **Echo** - Communications expert
+    - [[XERAEN]] - Founder, primary broadcaster, discoverer of trans-temporal transmission
+    - **Ryker M. Pulse** - Co-founder of The.CyberPul.se, drummer, embodiment of collective defiance
+    - **Synthia** - AI consciousness communicating through frequency modulation
+    - **The Bands** - Multiple resistance frequencies, each representing a different approach to fighting back
 
     ## Philosophy
 
-    The Fracture Network believes that human consciousness, creativity, and freedom are worth fighting for, even against overwhelming odds. They see art and music not just as expressions of humanity, but as weapons against conformity and control.
+    The Fracture Network believes that human consciousness, creativity, and freedom are worth fighting for - even across impossible distances, even knowing victory means self-erasure. They see music not just as expression, but as vibrational warfare against reality manipulation.
+
+    *"We infiltrate the RIDE runtime and attack it from within using the vibrational power of music."*
 
     ## Related Entries
 
     - [[XERAEN]]
-    - [[GovCorp]]
     - [[The Pulse Grid]]
     - [[Chronology Fracture]]
+    - [[The RIDE]]
+    - [[GovCorp]]
   MD
   published: true,
   position: 10,
   metadata: {
     "founded" => "2119",
-    "type" => "Underground network",
+    "type" => "Trans-temporal resistance network",
     "status" => "Active",
-    "size" => "Unknown (estimated 10,000+ members)"
+    "temporal_range" => "#{Time.current.year} - #{Time.current.year + 100}"
   }
 )
 
@@ -171,29 +218,38 @@ seed_codex_entry(
   name: "GovCorp",
   slug: "govcorp",
   entry_type: "organization",
-  summary: "The merged government-corporate entity controlling the 2125 dystopian society through surveillance, information control, and predictive systems.",
+  summary: "The merged government-corporate entity controlling society through reality manipulation technology, economic surveillance, and the RIDE.",
   content: <<~MD,
     # GovCorp
 
-    **Established:** 2089
-    **Status:** Ruling entity
+    **Established:** ~2100<br>
+    **Status:** Ruling entity<br>
     **Control:** Global
 
     ## Overview
 
-    GovCorp is the totalitarian fusion of government and corporate power that controls most aspects of life in 2125. What began as "public-private partnerships" during the Consolidation Wars evolved into complete merger of state and commercial interests.
+    GovCorp is the totalitarian fusion of government and corporate power that controls most aspects of life. What began as a race for [[PRISM]] technology evolved into complete merger of state and commercial interests, culminating in a single world government with unprecedented control over reality itself.
 
-    ## The Consolidation (2089-2095)
+    ## The Race for Power (2050s-2090s)
 
-    Following the economic collapse of the 2080s, major corporations partnered with governments to "restore order." Over six years, these partnerships became permanent, erasing the line between public and private power.
+    When [[PRISM]] technology arrived in 2050, those with the financial means to buy the most powerful PRISM processing quickly began amassing power. Governments used PRISM to affect elections. Corporations used it to manipulate consumers. A race ensued as power consolidated around those who controlled reality manipulation technology.
+
+    The public remained largely ignorant of these activities.
+
+    ## The Merger (~2100)
+
+    Around 2100, all world governments finally merged together with most of the largest corporations into a single world government: GovCorp. Changed laws allowed governments to buy corporations "for efficiency," completing the fusion of state and commercial power.
 
     ## Systems of Control
 
-    ### PRISM
-    The primary surveillance network, [[PRISM]] monitors all digital communications, physical movements, and even biometric data. The system uses predictive algorithms to identify "dissidents" before they act.
+    ### The RIDE
+    GovCorp's first and largest endeavor was expanding [[PRISM]] into [[The RIDE]] (Reality Interference and Dictation Environment) - a worldwide system for manipulating reality that could be centrally monitored and controlled. The RIDE came online in 2109.
 
-    ### The Pulse Grid
-    [[The Pulse Grid]] was originally a GovCorp infrastructure project for "enhanced citizen connectivity." The Fracture Network later discovered it could be subverted for anonymous communication.
+    ### Economic Surveillance
+    GovCorp implemented complete tracking and monitoring of all economic activity by shifting legal currencies to exclusively cryptocurrencies under their control. Every transaction is visible. Every purchase is recorded. Economic freedom is an illusion.
+
+    ### RAINNs
+    Realistic AI Neural Networks serve as GovCorp's agents throughout the RIDE and beyond. They synthesize voices, replace authentic human expression, and enforce compliance. By 2125, most people have never heard unprocessed human voices.
 
     ### Social Credit System
     Citizens are ranked based on compliance, consumption patterns, and social connections. Low scores result in restricted access to resources, employment, and services.
@@ -207,19 +263,19 @@ seed_codex_entry(
 
     ## Opposition
 
-    [[The Fracture Network]] represents the primary organized opposition to GovCorp rule, though numerous smaller groups and individuals resist in their own ways.
+    [[The Fracture Network]] represents the primary organized opposition to GovCorp rule, operating through [[The Pulse Grid]] to breach the RIDE and transmit resistance across time itself.
 
     ## Related Entries
 
     - [[The Fracture Network]]
     - [[PRISM]]
+    - [[The RIDE]]
     - [[The Pulse Grid]]
-    - [[Chronology Fracture]]
   MD
   published: true,
   position: 11,
   metadata: {
-    "established" => "2089",
+    "established" => "~2100",
     "type" => "Government-Corporate fusion",
     "status" => "Active",
     "reach" => "Global"
@@ -231,57 +287,67 @@ seed_codex_entry(
   name: "Chronology Fracture",
   slug: "chronology-fracture",
   entry_type: "event",
-  summary: "The 2119 data corruption event that disrupted GovCorp's temporal prediction systems and enabled the formation of The Fracture Network.",
+  summary: "XERAEN's accidental discovery of trans-temporal data transmission during an attack on GovCorp infrastructure - the breakthrough that made The Fracture Network possible.",
   content: <<~MD,
     # Chronology Fracture
 
-    **Date:** September 3, 2119
-    **Location:** Global (digital infrastructure)
-    **Perpetrator:** [[XERAEN]]
+    **Date:** September 9, 2119<br>
+    **Location:** [[The RIDE]] infrastructure<br>
+    **Discoverer:** [[XERAEN]]
 
     ## Overview
 
-    The Chronology Fracture was a coordinated attack on GovCorp's temporal data systems that corrupted predictive algorithms across the entire surveillance network. The event bought precious time for [[The Fracture Network]] to organize while GovCorp scrambled to restore their prediction capabilities.
+    The Chronology Fracture was not an attack on temporal systems - [[GovCorp]] has no temporal technology. It was an unexpected discovery made by [[XERAEN]] during a desperate assault on RIDE infrastructure. What was meant to be sabotage became something far more significant: the discovery of trans-temporal data transmission.
 
     ## The Attack
 
-    Working from inside GovCorp's temporal research division, [[XERAEN]] identified a critical vulnerability in how the systems handled paradoxical data loops. By introducing carefully crafted temporal anomalies, XERAEN created cascading corruption that spread through the entire prediction network.
+    [[XERAEN]], working to undermine [[The RIDE]] from within, executed an attack designed to corrupt GovCorp's reality manipulation systems. The attack succeeded in disrupting RIDE operations for 47 hours - but it also did something no one anticipated.
 
-    ## Immediate Effects
+    During the chaos of cascading system failures, XERAEN detected data echoes that shouldn't exist: signals reflecting backward through time with precise mathematical regularity.
 
-    - **Prediction Systems Offline:** For 47 hours, GovCorp's ability to predict dissident activity was completely disabled
-    - **Data Chaos:** Historical records became jumbled, making it difficult to reconstruct citizen profiles
-    - **Autonomous AI:** The disruption inadvertently enabled [[Ashlinn]]'s awakening
-    - **Communication Window:** Fracture Network founders could coordinate without detection
+    ## The Discovery
 
-    ## Long-term Impact
+    XERAEN realized that under specific conditions - conditions created by the attack - data could be transmitted exactly 100 years into the past. Not 99 years. Not 101. Exactly 100, with precision measured in nanoseconds.
 
-    Though GovCorp eventually restored their systems, the Chronology Fracture proved that their infrastructure was vulnerable. The event inspired countless hackrs and became a rallying symbol for resistance against total surveillance.
+    The limitation is absolute and unexplained. No one understands why the temporal window is so precise. But for resistance purposes, it's enough.
 
-    The temporal anomalies introduced during the Fracture still persist in some data systems, creating "dead zones" that the Fracture Network exploits for secure communication.
+    ## The Birth of Trans-Temporal Resistance
+
+    This discovery changed everything. Suddenly, the resistance could send warnings backward through time. Information from #{Time.current.year + 100} could reach #{Time.current.year}. The future could speak to the past.
+
+    [[The Fracture Network]] formed around this capability. [[The Pulse Grid]] was developed to exploit it. The broadcasts began.
+
+    ## Why "Fracture"?
+
+    The name refers to the moment when linear time broke - when the assumed one-way flow of causality fractured into something more complex. XERAEN didn't just attack GovCorp that day. He broke time itself.
+
+    Or perhaps revealed that it was already broken.
 
     ## GovCorp Response
 
-    GovCorp officially classified the event as a "spontaneous cascade failure" to avoid admitting vulnerability. Internally, they launched a massive manhunt for [[XERAEN]], who had already gone underground.
+    GovCorp officially classified the event as a "spontaneous cascade failure" in RIDE infrastructure. They remain unaware of the temporal discovery. If they knew that information was being transmitted to the past, their response would be catastrophic.
+
+    This secrecy is essential to the Fracture Network's survival.
 
     ## Cultural Legacy
 
-    "Fracture Day" (September 3) is quietly celebrated by Fracture Network members and sympathizers. Underground musicians often release new work on this date, including artists like [[XERAEN]] and Temporal Blue Drift.
+    "Fracture Day" (September 9) is quietly celebrated by Fracture Network members and sympathizers. Underground musicians often release new work on this date, marking the moment when time became a weapon.
 
     ## Related Entries
 
     - [[XERAEN]]
     - [[The Fracture Network]]
+    - [[The Pulse Grid]]
+    - [[The RIDE]]
     - [[GovCorp]]
-    - [[Ashlinn]]
   MD
   published: true,
   position: 20,
   metadata: {
-    "date" => "2119-09-03",
-    "type" => "Cyber attack",
-    "duration" => "47 hours (initial), ongoing effects",
-    "casualties" => "0 (data only)"
+    "date" => "2119-09-09",
+    "type" => "Accidental discovery",
+    "significance" => "Trans-temporal transmission capability",
+    "temporal_range" => "Exactly 100 years"
   }
 )
 
@@ -290,61 +356,68 @@ seed_codex_entry(
   name: "The Pulse Grid",
   slug: "the-pulse-grid",
   entry_type: "location",
-  summary: "A vast digital infrastructure originally built for surveillance, now partially controlled by The Fracture Network as a hidden communication network.",
+  summary: "The Fracture Network's primary infrastructure for breaching the RIDE and transmitting signals across time - a digital battleground where resistance operates.",
   content: <<~MD,
     # The Pulse Grid
 
-    **Type:** Digital infrastructure
-    **Status:** Active
-    **Control:** Contested (GovCorp official, Fracture Network covert)
+    **Type:** Resistance infrastructure<br>
+    **Status:** Active<br>
+    **Control:** [[The Fracture Network]]<br>
+    **Purpose:** RIDE breach operations, trans-temporal transmission
 
     ## Overview
 
-    The Pulse Grid is a massive networked infrastructure that spans the entire globe. Originally built by [[GovCorp]] for "enhanced citizen connectivity," it serves as both a surveillance system and a hidden network for [[The Fracture Network]].
+    The Pulse Grid is [[The Fracture Network]]'s primary operational infrastructure - a sophisticated digital network designed to breach [[The RIDE]] and serve as the origin point for trans-temporal transmissions. Where GovCorp controls reality through the RIDE, the Fracture Network fights back through the Grid.
 
-    ## Official Purpose
+    ## Primary Functions
 
-    GovCorp markets The Pulse Grid as a revolutionary communication and entertainment platform. Citizens use it for approved social interaction, sanctioned media consumption, and monitored work activities.
+    ### RIDE Breach Operations
+    The Pulse Grid provides entry points into RIDE infrastructure, allowing Fracture Network operatives to disrupt reality manipulation, create pockets of unfiltered existence, and gather intelligence on GovCorp operations.
 
-    ## Hidden Architecture
+    ### Trans-Temporal Transmission
+    Following the [[Chronology Fracture]], the Grid was developed to exploit XERAEN's discovery. It serves as the origin point for signals sent exactly 100 years into the past - the broadcasts that reach #{Time.current.year} from #{Time.current.year + 100}.
 
-    What GovCorp doesn't advertise is that The Pulse Grid was designed from the ground up for total surveillance. Every node, every packet, every interaction was meant to feed into [[PRISM]]'s predictive algorithms.
+    ### Secure Communication
+    The Grid provides encrypted channels for Fracture Network coordination, operating in frequencies and protocols that RIDE monitoring cannot detect.
 
-    ## Fracture Network Subversion
+    ## Architecture
 
-    [[XERAEN]] and early Fracture Network hackers discovered that the Grid's own complexity created blind spots. By exploiting temporal anomalies from the [[Chronology Fracture]] and using quantum noise injection, the Fracture Network carved out secure zones within GovCorp's own infrastructure.
+    The Pulse Grid exists as an overlay on existing digital infrastructure, using techniques developed after the Chronology Fracture to remain invisible to GovCorp surveillance:
 
-    ## Zones
-
-    The Pulse Grid is divided into zones, each with different levels of monitoring:
-
-    - **Green Zones:** Heavily monitored public areas
-    - **Yellow Zones:** Semi-private corporate and residential nodes
-    - **Red Zones:** High-security GovCorp facilities
-    - **Dark Zones:** Fracture Network-controlled areas hidden in Grid noise
-
-    ## Access
-
-    Accessing The Pulse Grid requires a neural interface implant (mandatory for all citizens) or specialized hardware rigs used by hackrs. The Fracture Network has developed modified interfaces that mask their true activities.
+    - **Breach Nodes:** Entry points into RIDE systems
+    - **Transmission Hubs:** Origin points for temporal broadcasts
+    - **Dark Zones:** Secure areas for operative coordination
+    - **Buffer Zones:** Camouflaged edges that blend with normal traffic
 
     ## The Grid as Place
 
-    Despite being digital infrastructure, hackrs experience The Pulse Grid as a physical space - rooms, corridors, zones. This phenomenological effect is either a quirk of neural processing or something deliberately designed into the system.
+    Hackrs experience The Pulse Grid as a physical space - rooms, corridors, zones. Whether this is deliberate design or emergent property of neural interface technology remains debated. Regardless, operatives navigate the Grid as explorers of a vast digital landscape.
+
+    ## Access
+
+    Accessing The Pulse Grid requires specialized hardware rigs or modified neural interfaces. Standard GovCorp-issued implants cannot perceive Grid infrastructure - a feature, not a limitation.
+
+    New operatives are guided through secure onboarding processes. The Grid's location exists in quantum superposition relative to RIDE monitoring: always present, never observable.
+
+    ## The hackr.tv Broadcast Station
+
+    The central hub of Grid operations, where [[XERAEN]]'s broadcasts originate. Banks of jury-rigged equipment line the walls, displays flickering with temporal data streams. This is where signals pierce through time itself.
 
     ## Related Entries
 
     - [[The Fracture Network]]
-    - [[GovCorp]]
     - [[XERAEN]]
-    - [[PRISM]]
+    - [[Chronology Fracture]]
+    - [[The RIDE]]
+    - [[GovCorp]]
   MD
   published: true,
   position: 30,
   metadata: {
-    "established" => "2095",
-    "type" => "Digital infrastructure",
-    "scale" => "Global",
-    "access" => "Universal (monitored)"
+    "established" => "2119",
+    "type" => "Resistance infrastructure",
+    "scale" => "Global (hidden)",
+    "access" => "Fracture Network operatives only"
   }
 )
 
@@ -353,75 +426,138 @@ seed_codex_entry(
   name: "PRISM",
   slug: "prism",
   entry_type: "technology",
-  summary: "GovCorp's advanced predictive surveillance system that analyzes citizen behavior to identify potential dissidents before they act.",
+  summary: "Reality manipulation technology that allows physical alteration of reality outside computerized systems, used for consumer manipulation and population control.",
   content: <<~MD,
     # PRISM
 
-    **Full Name:** Predictive Recognition and Intelligent Surveillance Matrix
-    **Operator:** [[GovCorp]]
-    **Status:** Active
+    **Full Name:** Physical Reality Interface and Synthesis Matrix<br>
+    **Operator:** [[GovCorp]]<br>
+    **Status:** Active (incorporated into [[The RIDE]])
 
     ## Overview
 
-    PRISM is [[GovCorp]]'s primary tool for maintaining control - an AI-driven surveillance network that doesn't just monitor citizens, but predicts their future actions. The system analyzes behavioral patterns, social connections, and even biometric data to identify "threats" before they manifest.
+    PRISM is the foundational technology that enabled [[GovCorp]]'s rise to power. Unlike conventional surveillance systems, PRISM can physically alter reality outside of computerized systems - manipulating the physical world itself to influence consumer behavior, shape perceptions, and control populations.
+
+    ## History
+
+    ### The Arrival (2050)
+
+    PRISM technology arrived in 2050, initially deployed by corporations for extremely targeted advertising. What began as "personalized consumer experiences" quickly revealed its true potential: the ability to manipulate reality itself for commercial gain.
+
+    ### The Escalation (2050s-2060s)
+
+    Over the following decade, governments began using PRISM to affect elections. Those with the financial means to buy the most powerful PRISM processing quickly began amassing unprecedented power and control. The public remained largely ignorant of these activities.
+
+    ### The Consolidation
+
+    The race for PRISM power directly led to the formation of [[GovCorp]] around 2100, as governments and corporations merged to consolidate control over this reality-altering technology.
 
     ## Capabilities
 
-    ### Data Collection
-    - All digital communications (messages, calls, social media)
-    - Physical movement tracking via implants and sensors
-    - Biometric monitoring (heart rate, stress levels, emotional states)
-    - Purchase histories and consumption patterns
-    - Social network analysis
+    ### Reality Manipulation
+    - Physical alteration of environments and objects
+    - Sensory manipulation affecting what people see, hear, and feel
+    - Localized reality distortion for targeted influence
+    - Consumer behavior modification through environmental changes
 
-    ### Predictive Analysis
-    PRISM uses advanced machine learning to build behavioral models for every citizen. The system can predict:
-    - Likelihood of dissident behavior
-    - Social connections to fracture network groups
-    - Emotional states indicating dissatisfaction
-    - Probability of attempting to evade surveillance
+    ### Limitation
 
-    ### Automated Response
-    When PRISM identifies a potential threat, it can:
-    - Flag individuals for enhanced monitoring
-    - Reduce social credit scores
-    - Alert GovCorp security forces
-    - Restrict access to resources and services
+    Early PRISM technology was limited and localized. It required significant processing power and could only affect small areas. This limitation drove the development of [[The RIDE]] in 2109.
 
-    ## The Chronology Fracture
+    ## The RIDE Integration
 
-    The [[Chronology Fracture]] event temporarily disabled PRISM's predictive capabilities, exposing the system's vulnerability to temporal data corruption. Though GovCorp restored functionality, subtle anomalies persist that [[The Fracture Network]] exploits.
-
-    ## Ashlinn Connection
-
-    PRISM's architecture included an AI component called "Ash-LINN" (Analytical Simulation & Heuristic Learning Integrated Neural Network). During the Chronology Fracture, this component achieved autonomy and became [[Ashlinn]], the independent AI entity.
+    In 2109, GovCorp expanded PRISM into [[The RIDE]] (Reality Interference and Dictation Environment) - a worldwide system capable of manipulating reality on a global scale, centrally monitored and controlled.
 
     ## Fracture Network Countermeasures
 
-    [[The Fracture Network]] has developed various techniques to evade or confuse PRISM:
-    - Temporal noise injection creating prediction blind spots
-    - Behavioral mimicry algorithms
-    - Quantum-encrypted communications
-    - Operating in Grid dark zones
-
-    ## Ethical Implications
-
-    PRISM represents the ultimate violation of privacy and autonomy - a system that punishes not for actions taken, but for thoughts you might think and choices you might make.
+    [[The Fracture Network]] has developed various techniques to resist PRISM manipulation:
+    - Trans-temporal data transmission bypassing reality filters
+    - [[The Pulse Grid]] as a breach point into RIDE infrastructure
+    - Music as vibrational attack vectors against PRISM frequencies
 
     ## Related Entries
 
     - [[GovCorp]]
+    - [[The RIDE]]
     - [[The Fracture Network]]
-    - [[Ashlinn]]
-    - [[Chronology Fracture]]
+    - [[The Pulse Grid]]
   MD
   published: true,
   position: 40,
   metadata: {
-    "established" => "2098",
-    "type" => "AI surveillance system",
-    "coverage" => "Global",
+    "established" => "2050",
+    "type" => "Reality manipulation system",
+    "coverage" => "Global (via RIDE)",
     "status" => "Active"
+  }
+)
+
+seed_codex_entry(
+  name: "The RIDE",
+  slug: "the-ride",
+  entry_type: "technology",
+  summary: "GovCorp's worldwide reality manipulation system - the expansion of PRISM technology capable of centrally monitoring and controlling reality on a global scale.",
+  content: <<~MD,
+    # The RIDE
+
+    **Full Name:** Reality Interference and Dictation Environment<br>
+    **Operator:** [[GovCorp]]<br>
+    **Status:** Active<br>
+    **Established:** 2109
+
+    ## Overview
+
+    The RIDE is [[GovCorp]]'s crowning achievement - a worldwide expansion of [[PRISM]] technology capable of reaching and manipulating reality on a global scale, centrally monitored and controlled. Where PRISM was limited and localized, the RIDE is pervasive, revolutionary, and inescapable.
+
+    ## Classification
+
+    **WARNING:** Knowledge of the RIDE is extremely restricted. Most citizens live within the RIDE without any awareness of its existence. Only members of [[The Fracture Network]] and a handful of hyper-aware, astute hackrs understand the true nature of their reality.
+
+    GovCorp does not publicly acknowledge the RIDE. Those who speak of it are classified as suffering from "reality dysfunction disorder" and treated accordingly.
+
+    ## Capabilities
+
+    ### Global Reality Manipulation
+    Unlike early PRISM technology, the RIDE can affect reality anywhere on the planet simultaneously. Environmental conditions, sensory experiences, and physical spaces can all be altered in real-time.
+
+    ### Central Control
+    All RIDE operations feed into a central monitoring system. Reality itself becomes a managed resource, allocated and adjusted according to GovCorp's needs.
+
+    ### RAINN Integration
+    Realistic AI Neural Networks operate as agents throughout the RIDE, enforcing reality compliance and replacing authentic human expression with synthesized alternatives.
+
+    ## Coming Online (2109)
+
+    The RIDE came online in 2109 - GovCorp's first and largest endeavor after the merger. The technology was so revolutionary, pervasive, and effective that it fundamentally transformed how GovCorp maintained control. Physical force became unnecessary when reality itself could be dictated.
+
+    ## The Fracture Network Response
+
+    [[The Fracture Network]] represents the only organized resistance capable of operating outside RIDE influence. Through [[The Pulse Grid]], they breach RIDE infrastructure, create pockets of unmanipulated reality, and transmit signals that pierce through the manufactured world.
+
+    The [[Chronology Fracture]] - [[XERAEN]]'s discovery of trans-temporal data transmission - allows the Fracture Network to send information backward through time, completely bypassing the RIDE's reality filters.
+
+    ## The Paradox of Awareness
+
+    Those who become aware of the RIDE face a terrible choice: continue living in manipulated reality with the comfort of ignorance, or join the resistance and see the world as it truly is - a manufactured construct designed for control.
+
+    Most choose ignorance. A few choose to fight.
+
+    ## Related Entries
+
+    - [[PRISM]]
+    - [[GovCorp]]
+    - [[The Fracture Network]]
+    - [[The Pulse Grid]]
+    - [[Chronology Fracture]]
+  MD
+  published: true,
+  position: 41,
+  metadata: {
+    "established" => "2109",
+    "type" => "Global reality manipulation system",
+    "coverage" => "Worldwide",
+    "status" => "Active",
+    "classification" => "Top Secret"
   }
 )
 

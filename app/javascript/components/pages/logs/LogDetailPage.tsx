@@ -8,6 +8,7 @@ import { useGridAuth } from '~/hooks/useGridAuth'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
+import { formatFutureDate } from '~/utils/dateUtils'
 
 interface HackrLog {
   id: number
@@ -22,25 +23,6 @@ interface HackrLog {
   }
 }
 
-const formatFutureDate = (dateStr: string, includeTime: boolean = false): string => {
-  const date = new Date(dateStr)
-  // Add 100 years to match the future date helper
-  date.setFullYear(date.getFullYear() + 100)
-
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }
-
-  if (includeTime) {
-    options.hour = '2-digit'
-    options.minute = '2-digit'
-    options.hour12 = false
-  }
-
-  return date.toLocaleDateString('en-US', options) + (includeTime ? ` at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}` : '')
-}
 
 export const LogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()

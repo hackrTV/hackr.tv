@@ -184,7 +184,7 @@ export const SharedPlaylistPage: React.FC = () => {
                         <td style={{ padding: '10px', color: '#666' }}>{index + 1}</td>
                         <td style={{ padding: '10px', color: '#ccc' }}>{track.title}</td>
                         <td style={{ padding: '10px', color: '#aaa' }}>{track.artist.name}</td>
-                        <td style={{ padding: '10px', color: '#aaa' }}>{track.album?.name || '—'}</td>
+                        <td style={{ padding: '10px', color: '#aaa' }}>{track.album?.name || '-'}</td>
                         <td style={{ padding: '10px', color: '#aaa' }}>{formatDuration(track.duration)}</td>
                       </tr>
                     ))}

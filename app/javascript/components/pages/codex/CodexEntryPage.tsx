@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { CodexEntry } from '~/types/codex'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
+import { formatFutureDate } from '~/utils/dateUtils'
 
 const ENTRY_TYPE_COLORS: Record<string, string> = {
   person: '#a78bfa',
@@ -201,7 +203,7 @@ export const CodexEntryPage: React.FC = () => {
                 >
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeSanitize]}
+                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
                     components={{
                       h1: ({ _node, ...props }) => <h1 style={{ color: typeColor, marginTop: '30px', marginBottom: '15px', fontSize: '1.8em' }} {...props} />,
                       h2: ({ _node, ...props }) => <h2 style={{ color: typeColor, marginTop: '25px', marginBottom: '12px', fontSize: '1.5em' }} {...props} />,
@@ -210,6 +212,7 @@ export const CodexEntryPage: React.FC = () => {
                       a: ({ _node, ...props }) => (
                         <a
                           style={{
+                            display: 'inline',
                             color: '#60a5fa',
                             textDecoration: 'none',
                             borderBottom: '1px solid #60a5fa',
@@ -266,11 +269,7 @@ export const CodexEntryPage: React.FC = () => {
                   color: '#666',
                   fontSize: '0.85em'
                 }}>
-                  Last updated: {new Date(entry.updated_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
+                  Last updated: {formatFutureDate(entry.updated_at)}
                 </div>
               )}
             </div>

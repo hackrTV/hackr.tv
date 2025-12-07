@@ -21,60 +21,45 @@ export const FooterMenu: React.FC = () => {
         <ul>
           <li>
             <Link to="/">
-              <span className="purple-168-text">0</span> hackr.tv&nbsp;
+              <span className="purple-168-text">0</span>&nbsp;hackr.tv&nbsp;
             </Link>
           </li>
-          <span className="tui-statusbar-divider"></span>
           <li>
             <Link to="/thecyberpulse">
-              <span className="purple-168-text">1</span> The.CyberPul.se&nbsp;
+              <span className="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;
             </Link>
           </li>
-          <span className="tui-statusbar-divider"></span>
           <li>
             <Link to="/xeraen">
-              <span className="purple-168-text">2</span> XERAEN&nbsp;
+              <span className="purple-168-text">2</span>&nbsp;XERAEN&nbsp;
             </Link>
           </li>
-          <span className="tui-statusbar-divider"></span>
           <li>
             <Link to="/fm/radio">
-              <span className="purple-168-text">3</span> hackr.fm&nbsp;
+              <span className="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;
             </Link>
           </li>
-          <span className="tui-statusbar-divider"></span>
           <li>
             <Link to="/grid">
-              <span className="purple-168-text">4</span> THE PULSE GRID (pre-alpha)&nbsp;
+              <span className="purple-168-text">4</span>&nbsp;THE PULSE GRID (pre-alpha)&nbsp;
             </Link>
           </li>
-          <span className="tui-statusbar-divider"></span>
-          <li>
-            <Link to="/wire">
-              <span className="purple-168-text">4b</span> The Wire&nbsp;
-            </Link>
-          </li>
-          <span className="tui-statusbar-divider"></span>
           <li>
             <Link to="/codex">
-              <span className="purple-168-text">5</span> The Codex&nbsp;
+              <span className="purple-168-text">5</span>&nbsp;The Codex&nbsp;
             </Link>
           </li>
-          <span className="tui-statusbar-divider"></span>
           <li>
             <Link to="/logs">
-              <span className="purple-168-text">6</span> Hackr Logs&nbsp;
+              <span className="purple-168-text">6</span>&nbsp;Hackr Logs&nbsp;
             </Link>
           </li>
           {hackr?.role === 'admin' && (
-            <>
-              <span className="tui-statusbar-divider"></span>
-              <li>
-                <a href="/root">
-                  <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
-                </a>
-              </li>
-            </>
+            <li>
+              <a href="/root">
+                <span className="red-255-text">7</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+              </a>
+            </li>
           )}
         </ul>
       </div>

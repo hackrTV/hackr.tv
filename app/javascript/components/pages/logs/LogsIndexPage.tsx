@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import { formatFutureDate } from '~/utils/dateUtils'
 
 interface HackrLog {
   id: number
@@ -30,17 +31,6 @@ const truncateMarkdown = (markdown: string, maxLength: number = 300): string => 
   return plainText.substring(0, maxLength).trim() + '...'
 }
 
-const formatFutureDate = (dateStr: string): string => {
-  const date = new Date(dateStr)
-  // Add 100 years to match the future date helper
-  date.setFullYear(date.getFullYear() + 100)
-
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
 
 export const LogsIndexPage: React.FC = () => {
   const [logs, setLogs] = useState<HackrLog[]>([])

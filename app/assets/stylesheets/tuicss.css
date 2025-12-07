@@ -1430,6 +1430,8 @@ input[type=button] {
   bottom: 0px;
   z-index: 9;
   position: fixed;
+  white-space: nowrap;
+  overflow-x: auto;
 }
 
 .tui-statusbar ul li {
