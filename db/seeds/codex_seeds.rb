@@ -80,7 +80,7 @@ seed_codex_entry(
   published: true,
   position: 1,
   metadata: {
-    "timeline" => "#{Time.current.year + 100}",
+    "timeline" => (Time.current.year + 100).to_s,
     "faction" => "The Fracture Network",
     "role" => "Founder",
     "status" => "Active (broadcasting)"
@@ -138,7 +138,7 @@ seed_codex_entry(
   position: 2,
   metadata: {
     "type" => "Human",
-    "timeline" => "#{Time.current.year}",
+    "timeline" => Time.current.year.to_s,
     "faction" => "Unknown",
     "status" => "Active"
   }

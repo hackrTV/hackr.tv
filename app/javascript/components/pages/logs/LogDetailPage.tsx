@@ -23,7 +23,6 @@ interface HackrLog {
   }
 }
 
-
 export const LogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const { hackr } = useGridAuth()

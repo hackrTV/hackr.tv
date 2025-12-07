@@ -31,7 +31,6 @@ const truncateMarkdown = (markdown: string, maxLength: number = 300): string => 
   return plainText.substring(0, maxLength).trim() + '...'
 }
 
-
 export const LogsIndexPage: React.FC = () => {
   const [logs, setLogs] = useState<HackrLog[]>([])
   const [loading, setLoading] = useState(true)
