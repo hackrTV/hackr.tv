@@ -1,5 +1,5 @@
-<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
-  <fieldset class="cyan-168-border">
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
     <legend class="center">/root/pulsewire :: MODERATE THE WIRE</legend>
 
     <div style="padding: 20px;">
@@ -139,7 +139,7 @@
             </thead>
             <tbody>
               <% @pulses.each do |pulse| %>
-                <tr style="<%= 'background: #1a0000;' if pulse.signal_dropped %>">
+                <tr class="admin-table-row"<%= " style=\"background: #1a0000;\"".html_safe if pulse.signal_dropped %>>
                   <td style="text-align: center;">
                     <input type="checkbox" class="pulse-checkbox" value="<%= pulse.id %>">
                   </td>

@@ -1,7 +1,7 @@
 <% content_for(:title) { "/root/overlays :: OBS Overlays" } %>
 
-<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto;">
-  <fieldset class="cyan-168-border">
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto;">
+  <fieldset class="admin-panel-border">
     <legend class="center">/root/overlays :: OBS OVERLAY CONTROL CENTER</legend>
 
     <% if flash[:success] %>
@@ -32,32 +32,32 @@
       <p style="color: #888; margin-bottom: 15px;">Individual elements (transparent background):</p>
       <table class="tui-table" style="width: 100%;">
         <tbody>
-          <tr>
+          <tr class="admin-table-row">
             <td style="width: 200px;"><strong>Now Playing</strong></td>
             <td><code class="cyan-168-text"><%= overlay_now_playing_url %></code></td>
             <td style="width: 100px;"><%= link_to "Open ↗", overlay_now_playing_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr>
+          <tr class="admin-table-row">
             <td><strong>PulseWire Feed</strong></td>
             <td><code class="cyan-168-text"><%= overlay_pulsewire_url %></code></td>
             <td><%= link_to "Open ↗", overlay_pulsewire_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr>
+          <tr class="admin-table-row">
             <td><strong>Grid Activity</strong></td>
             <td><code class="cyan-168-text"><%= overlay_grid_activity_url %></code></td>
             <td><%= link_to "Open ↗", overlay_grid_activity_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr>
+          <tr class="admin-table-row">
             <td><strong>Alerts</strong></td>
             <td><code class="cyan-168-text"><%= overlay_alerts_url %></code></td>
             <td><%= link_to "Open ↗", overlay_alerts_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr>
+          <tr class="admin-table-row">
             <td><strong>Top Ticker</strong></td>
             <td><code class="cyan-168-text"><%= overlay_ticker_url(position: "top") %></code></td>
             <td><%= link_to "Open ↗", overlay_ticker_path(position: "top"), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr>
+          <tr class="admin-table-row">
             <td><strong>Bottom Ticker</strong></td>
             <td><code class="cyan-168-text"><%= overlay_ticker_url(position: "bottom") %></code></td>
             <td><%= link_to "Open ↗", overlay_ticker_path(position: "bottom"), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
@@ -69,7 +69,7 @@
       <table class="tui-table" style="width: 100%;">
         <tbody>
           <% @scenes.each do |scene| %>
-            <tr>
+            <tr class="admin-table-row">
               <td style="width: 200px;"><strong><%= scene.name %></strong></td>
               <td><code class="cyan-168-text"><%= overlay_scene_url(slug: scene.slug) %></code></td>
               <td style="width: 100px;"><%= link_to "Open ↗", overlay_scene_path(slug: scene.slug), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
@@ -185,7 +185,7 @@
           </thead>
           <tbody>
             <% @lower_thirds.each do |lt| %>
-              <tr>
+              <tr class="admin-table-row">
                 <td><strong><%= lt.name %></strong></td>
                 <td><%= truncate(lt.primary_text, length: 30) %></td>
                 <td><%= truncate(lt.secondary_text, length: 30) || "-" %></td>

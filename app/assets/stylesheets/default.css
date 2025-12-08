@@ -112,3 +112,16 @@
 .grid-volume-slider:hover::-moz-range-thumb {
   background: #888;
 }
+
+/* Admin Panel Styles */
+.admin-panel {
+  background: #1a1a2e;
+}
+
+.admin-panel-border {
+  border-color: #4a4a6a;
+}
+
+.admin-table-row {
+  border-bottom: 1px solid #333;
+}

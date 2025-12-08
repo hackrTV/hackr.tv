@@ -1,5 +1,5 @@
-<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="cyan-168-border">
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
     <legend class="center">/root/codex :: MANAGE CODEX ENTRIES</legend>
 
     <div style="padding: 20px;">
@@ -72,7 +72,7 @@
             </thead>
             <tbody>
               <% @codex_entries.each do |entry| %>
-                <tr class="entry-row"
+                <tr class="entry-row" class="admin-table-row"
                     data-entry-name="<%= entry.name.downcase %>"
                     data-entry-summary="<%= entry.summary&.downcase || '' %>">
                   <td>

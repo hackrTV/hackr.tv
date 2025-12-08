@@ -1,7 +1,7 @@
 <% content_for(:title) { "/root/overlays/elements :: Manage Elements" } %>
 
-<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1200px; margin: 30px auto;">
-  <fieldset class="cyan-168-border">
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto;">
+  <fieldset class="admin-panel-border">
     <legend class="center">/root/overlays/elements :: ELEMENT MANAGEMENT</legend>
 
     <% if flash[:success] %>
@@ -36,7 +36,7 @@
       </thead>
       <tbody>
         <% @elements.each do |element| %>
-          <tr>
+          <tr class="admin-table-row">
             <td><strong><%= element.name %></strong></td>
             <td><code><%= element.slug %></code></td>
             <td><code><%= element.element_type %></code></td>
