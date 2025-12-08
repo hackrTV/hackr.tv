@@ -1,0 +1,67 @@
+# Past Livestreams / VODs
+# Import with: bin/rails import:yaml_vidz
+#
+# Fields:
+#   - artist: Artist name (must match existing artist)
+#   - title: Stream title
+#   - live_url: Original livestream URL (auto-converts to embed)
+#   - vod_url: YouTube/Twitch VOD URL (auto-converts to embed)
+#   - started_at: When the stream started (ISO 8601 format)
+#   - ended_at: When the stream ended (optional)
+
+vidz:
+  # Example entry:
+  # - artist: "XERAEN"
+  #   title: "Late Night Coding Session"
+  #   live_url: "https://www.youtube.com/live/LIVE_ID"
+  #   vod_url: "https://www.youtube.com/watch?v=VIDEO_ID"
+  #   started_at: "2025-01-15T20:00:00-05:00"
+  #   ended_at: "2025-01-15T23:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Taking off from the Hacker Hangar (2119-05-22)"
+    live_url: "https://www.youtube.com/watch?v=YgD4oNPpGv4"
+    vod_url: "https://www.youtube.com/watch?v=YgD4oNPpGv4"
+    started_at: "2019-05-22T19:00:00-05:00"
+    ended_at: "2019-05-22T21:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Taking off from the Hacker Hangar (2119-05-15)"
+    live_url: "https://www.youtube.com/watch?v=PiXHAxKUYGg"
+    vod_url: "https://www.youtube.com/watch?v=PiXHAxKUYGg"
+    started_at: "2019-05-15T19:00:00-05:00"
+    ended_at: "2019-05-15T21:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Taking off from the Hacker Hangar (2119-05-13)"
+    live_url: "https://www.youtube.com/watch?v=isOyRSIRR9U"
+    vod_url: "https://www.youtube.com/watch?v=isOyRSIRR9U"
+    started_at: "2019-05-13T19:00:00-05:00"
+    ended_at: "2019-05-13T21:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Taking off from the Hacker Hangar (2119-05-08)"
+    live_url: "https://www.youtube.com/watch?v=iFpiaGeFZi4"
+    vod_url: "https://www.youtube.com/watch?v=iFpiaGeFZi4"
+    started_at: "2019-05-08T19:00:00-05:00"
+    ended_at: "2019-05-08T21:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Taking off from the Hacker Hangar (2119-05-06)"
+    live_url: "https://www.youtube.com/watch?v=7sMrvht9XoM"
+    vod_url: "https://www.youtube.com/watch?v=7sMrvht9XoM"
+    started_at: "2019-05-06T19:00:00-05:00"
+    ended_at: "2019-05-06T21:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Across CyberSpace Together Separately .com"
+    live_url: "https://www.youtube.com/watch?v=enGmX-Z5x34"
+    vod_url: "https://www.youtube.com/watch?v=enGmX-Z5x34"
+    started_at: "2019-04-22T19:00:00-05:00"
+    ended_at: "2019-04-22T21:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Enter The Hackr Hangar 2"
+    live_url: "https://www.youtube.com/watch?v=9xq71nFKzmc"
+    vod_url: "https://www.youtube.com/watch?v=9xq71nFKzmc"
+    started_at: "2018-10-10T19:00:00-05:00"
+    ended_at: "2018-10-10T21:30:00-05:00"
+  - artist: "The.CyberPul.se"
+    title: "Enter The Hackr Hangar"
+    live_url: "https://www.youtube.com/watch?v=UxYgHRQ4zrE"
+    vod_url: "https://www.youtube.com/watch?v=UxYgHRQ4zrE"
+    started_at: "2018-10-08T19:00:00-05:00"
+    ended_at: "2018-10-08T21:30:00-05:00"
