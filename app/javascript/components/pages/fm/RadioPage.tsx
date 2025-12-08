@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { TrackData } from '~/types/track'
+import { transformHtmlLinks, hasCodexLinks } from '~/utils/codexLinks'
 
 interface Playlist {
   id: number
@@ -75,6 +76,15 @@ export const RadioPage: React.FC = () => {
   }, [])
 
   const currentYear = new Date().getFullYear()
+
+  // Replace year placeholder and transform codex links in station description
+  const renderDescription = (description: string) => {
+    const withYear = description.replace('2125', (currentYear + 100).toString())
+    if (hasCodexLinks(withYear)) {
+      return transformHtmlLinks(withYear, undefined, 'codex-link')
+    }
+    return withYear
+  }
 
   const playStationPlaylists = async (station: RadioStation) => {
     // If this station is already playing, just toggle play/pause
@@ -246,9 +256,16 @@ export const RadioPage: React.FC = () => {
                                 <strong>Genre:</strong> <span style={{ color: '#aaa' }}>{station.genre}</span>
                               </p>
                             )}
-                            <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#999' }}>
-                              {station.description.replace('2125', (currentYear + 100).toString())}
-                            </p>
+                            {hasCodexLinks(station.description) ? (
+                              <p
+                                style={{ marginBottom: '15px', lineHeight: '1.6', color: '#999' }}
+                                dangerouslySetInnerHTML={{ __html: renderDescription(station.description) }}
+                              />
+                            ) : (
+                              <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#999' }}>
+                                {renderDescription(station.description)}
+                              </p>
+                            )}
 
                             {station.playlists && station.playlists.length > 0 ? (
                               <button
@@ -306,9 +323,16 @@ export const RadioPage: React.FC = () => {
                               <strong>Genre:</strong> {station.genre}
                             </p>
                           )}
-                          <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
-                            {station.description.replace('2125', (currentYear + 100).toString())}
-                          </p>
+                          {hasCodexLinks(station.description) ? (
+                            <p
+                              style={{ marginBottom: '15px', lineHeight: '1.6' }}
+                              dangerouslySetInnerHTML={{ __html: renderDescription(station.description) }}
+                            />
+                          ) : (
+                            <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
+                              {renderDescription(station.description)}
+                            </p>
+                          )}
 
                           {station.playlists && station.playlists.length > 0 ? (
                             <button
