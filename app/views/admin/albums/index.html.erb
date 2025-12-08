@@ -1,5 +1,5 @@
-<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="cyan-168-border">
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
     <legend class="center">/root/albums :: MANAGE ALBUMS</legend>
 
     <div style="padding: 20px;">
@@ -41,7 +41,7 @@
             </thead>
             <tbody>
               <% @albums.each do |album| %>
-                <tr>
+                <tr class="admin-table-row">
                   <td style="text-align: center; padding: 5px;">
                     <% if album.cover_image.attached? %>
                       <%= image_tag album.cover_image, style: "width: 50px; height: 50px; object-fit: cover; border: 1px solid #333;" %>

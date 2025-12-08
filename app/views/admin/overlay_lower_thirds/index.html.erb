@@ -1,7 +1,7 @@
 <% content_for(:title) { "/root/overlays/lower-thirds :: Manage Lower Thirds" } %>
 
-<div class="tui-window cyan-168 white-text" style="display: block; max-width: 1200px; margin: 30px auto;">
-  <fieldset class="cyan-168-border">
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto;">
+  <fieldset class="admin-panel-border">
     <legend class="center">/root/overlays/lower-thirds :: LOWER THIRD MANAGEMENT</legend>
 
     <% if flash[:success] %>
@@ -35,7 +35,7 @@
       </thead>
       <tbody>
         <% @lower_thirds.each do |lt| %>
-          <tr>
+          <tr class="admin-table-row">
             <td><strong><%= lt.name %></strong></td>
             <td><%= truncate(lt.primary_text, length: 40) %></td>
             <td><%= truncate(lt.secondary_text, length: 40) || "-" %></td>

@@ -1,7 +1,7 @@
 <% content_for(:title) { "/root/overlays/scenes/#{@scene.slug}/elements/#{@scene_element.id}/edit :: Edit Element" } %>
 
-<div class="tui-window cyan-168 white-text" style="display: block; max-width: 700px; margin: 30px auto;">
-  <fieldset class="cyan-168-border">
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 700px; margin: 30px auto;">
+  <fieldset class="admin-panel-border">
     <legend class="center">/root/overlays/scenes/<%= @scene.slug %>/elements :: EDIT ELEMENT</legend>
 
     <% if flash[:error] %>
