@@ -35,7 +35,6 @@ const extractVideoId = (url: string): string | null => {
   return null
 }
 
-
 const VodzShowPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()

@@ -40,7 +40,6 @@ const extractVideoId = (url: string): string | null => {
   return null
 }
 
-
 const VodzPage: React.FC = () => {
   const location = useLocation()
   const [data, setData] = useState<VodsResponse | null>(null)
