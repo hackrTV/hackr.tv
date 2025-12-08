@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import type { Pulse } from '../../types/pulse'
 import { EchoButton } from './EchoButton'
 import { PulseComposer } from './PulseComposer'
+import { transformHtmlLinks, hasCodexLinks } from '../../utils/codexLinks'
 
 interface PulseCardProps {
   pulse: Pulse
@@ -145,6 +146,8 @@ export const PulseCard: React.FC<PulseCardProps> = ({
               </div>
             )}
           </div>
+        ) : hasCodexLinks(pulse.content) ? (
+          <p dangerouslySetInnerHTML={{ __html: transformHtmlLinks(pulse.content, undefined, 'codex-link') }} />
         ) : (
           <p>{pulse.content}</p>
         )}

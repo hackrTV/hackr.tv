@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
+import { CodexText } from '~/components/shared/CodexText'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
@@ -77,13 +78,17 @@ const TheCyberPulsePage: React.FC = () => {
                 You're not supposed to be hearing this.
               </p>
               <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
-                This frequency shouldn't exist. This signal is being broadcast from a timeline GovCorp has spent a
-                century trying to prevent. And yet - here we are. Here <em>you</em> are. Listening.
+                <CodexText>
+                  This frequency shouldn't exist. This signal is being broadcast from a timeline [[GovCorp]] has spent a
+                  century trying to prevent. And yet - here we are. Here <em>you</em> are. Listening.
+                </CodexText>
               </p>
               <p style={{ color: '#ddd', lineHeight: '1.8', fontSize: '1.05em' }}>
-                The.CyberPul.se is the central nervous system of the Fracture Network. Not a band. Not a channel.
-                A heartbeat transmitted backward through time from {futureYear} to {currentYear} - a hundred years of
-                resistance compressed into electromagnetic pulses you're decoding right now.
+                <CodexText>
+                  The.CyberPul.se is the central nervous system of the [[The Fracture Network|Fracture Network]]. Not a band. Not a channel.
+                  A heartbeat transmitted backward through time from {futureYear} to {currentYear} - a hundred years of
+                  resistance compressed into electromagnetic pulses you're decoding right now.
+                </CodexText>
               </p>
               <p
                 style={{
@@ -95,7 +100,7 @@ const TheCyberPulsePage: React.FC = () => {
                   textShadow: `0 0 8px ${colorScheme.glow}`
                 }}
               >
-                Welcome to hackr.tv. The signal is live. The pulse is strong.
+                Welcome to hackr.tv. The signal is live. The Pulse is strong.
               </p>
             </div>
 
@@ -158,10 +163,12 @@ const TheCyberPulsePage: React.FC = () => {
                     24/7. No dead air. No commercial breaks. No corporate sponsorship.
                   </p>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                    What you'll find here: ten resistance bands transmitting their frequencies through our signal.
-                    Live operations against GovCorp infrastructure. Interactive coordination through THE PULSE GRID.
-                    A community of listeners who've become operators, viewers who've become fighters, audience members
-                    who've realized they were always part of the show.
+                    <CodexText>
+                      What you'll find here: multiple resistance bands transmitting their frequencies through our signal.
+                      Live operations against [[GovCorp]] infrastructure. Interactive coordination through [[THE PULSE GRID]].
+                      A community of listeners who've become operators, viewers who've become fighters, audience members
+                      who've realized they were always part of the show.
+                    </CodexText>
                   </p>
                   <p
                     style={{
@@ -220,7 +227,9 @@ const TheCyberPulsePage: React.FC = () => {
                       happening.
                     </p>
                     <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                      XERAEN sends signals backward through time. Not to warn you. Not to save you. To <em>activate</em> you.
+                      <CodexText>
+                        [[XERAEN]] sends signals backward through time. Not to warn you. Not to save you. To <em>activate</em> you.
+                      </CodexText>
                     </p>
                     <p style={{ color: '#aaa', lineHeight: '1.8', marginBottom: '15px' }}>
                       Every transmission you receive has already happened in his timeline. Every attack you witness
@@ -228,8 +237,10 @@ const TheCyberPulsePage: React.FC = () => {
                       he's broadcasting from a future he's trying to prevent.
                     </p>
                     <p style={{ color: '#bbb', lineHeight: '1.8', marginBottom: '15px' }}>
-                      If The Fracture Network succeeds, XERAEN's timeline collapses. He ceases to exist. The broadcasts
-                      stop because there's nothing left to broadcast from.
+                      <CodexText>
+                        If [[The Fracture Network]] succeeds, XERAEN's timeline collapses. He ceases to exist. The broadcasts
+                        stop because there's nothing left to broadcast from.
+                      </CodexText>
                     </p>
                     <p
                       style={{
@@ -352,13 +363,17 @@ const TheCyberPulsePage: React.FC = () => {
                     [STATUS: SYNCHRONIZED]
                   </div>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                    More than a game. Less than a simulation. THE PULSE GRID is how the Fracture Network coordinates
-                    across timelines - a MUD interface where operators train, plan, and execute. What looks like a text
-                    adventure is actually resistance infrastructure.
+                    <CodexText>
+                      More than a game. Less than a simulation. [[THE PULSE GRID]] is how [[the Fracture Network]] coordinates
+                      across timelines - a MUD interface where operators train, plan, and execute. What looks like a text
+                      adventure is actually resistance infrastructure.
+                    </CodexText>
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                    Every zone corresponds to real GovCorp territory. Every puzzle mirrors actual security protocols.
-                    Every player who masters the grid becomes capable of navigating its real-world equivalent.
+                    <CodexText>
+                      Every zone corresponds to real [[GovCorp]] territory. Every puzzle mirrors actual security protocols.
+                      Every player who masters the grid becomes capable of navigating its real-world equivalent.
+                    </CodexText>
                   </p>
                   <p
                     style={{
@@ -417,7 +432,7 @@ const TheCyberPulsePage: React.FC = () => {
                       The Bands
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                      Ten frequencies. Ten approaches to resistance. From Injection Vector's kinetic warfare to
+                      Over 10 frequencies. More than a dozen approaches to resistance. From Injection Vector's kinetic warfare to
                       Ethereality's transcendent liberation - each band represents a node in the network, a tactic in
                       the arsenal, a way of fighting that speaks to different souls.
                     </p>
@@ -448,9 +463,11 @@ const TheCyberPulsePage: React.FC = () => {
                       The Operations
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                      Live attacks against GovCorp systems. Real-time infiltration of corporate infrastructure.
-                      Interactive missions where the audience doesn't just watch - they participate. Every livestream
-                      is an operation. Every viewer is potentially an operator.
+                      <CodexText>
+                        Live attacks against [[The RIDE|GovCorp systems]]. Real-time infiltration of corporate infrastructure.
+                        Interactive missions where the audience doesn't just watch - they participate. Every livestream
+                        is an operation. Every viewer is potentially an operator.
+                      </CodexText>
                     </p>
                   </div>
 
@@ -509,7 +526,7 @@ const TheCyberPulsePage: React.FC = () => {
                 </legend>
                 <div style={{ padding: '20px' }}>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                    Here's what keeps GovCorp's strategists awake:
+                    Here's why we're GovCorp's nightmare:
                   </p>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     If they stop us in {futureYear}, the broadcasts have already been sent to {currentYear}. If they stop
@@ -556,7 +573,7 @@ const TheCyberPulsePage: React.FC = () => {
                   You're hearing this broadcast because somewhere in the electromagnetic spectrum between {currentYear} and {futureYear},
                   your frequency matched ours.
                 </p>
-                <p style={{ marginBottom: '10px' }}>The pulse is strong. The signal is live. The network is expanding.</p>
+                <p style={{ marginBottom: '10px' }}>The Pulse is strong. The signal is live. The network is expanding.</p>
               </blockquote>
               <p
                 style={{

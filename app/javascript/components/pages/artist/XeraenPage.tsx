@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
+import { CodexText } from '~/components/shared/CodexText'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
@@ -66,7 +67,9 @@ const XeraenPage: React.FC = () => {
                 [:: SIGNAL ORIGIN ::]
               </h2>
               <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
-                Before the broadcasts. Before The.CyberPul.se. Before the Fracture Network had a voice.
+                <CodexText>
+                  Before the broadcasts. Before The.CyberPul.se. Before the [[The Fracture Network|Fracture Network]] had a voice.
+                </CodexText>
               </p>
               <p
                 style={{
@@ -209,9 +212,11 @@ const XeraenPage: React.FC = () => {
                     [COST: EVERYTHING]
                   </div>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                    In {futureYear}, XERAEN operates alone. The Fracture Network has cells, bands, operatives - but
-                    someone has to sit at the console. Someone has to maintain the signal. Someone has to keep
-                    transmitting even when there's no way to know if anyone is listening.
+                    <CodexText>
+                      In {futureYear}, XERAEN operates alone. [[The Fracture Network]] has cells, bands, operatives - but
+                      someone has to sit at the console. Someone has to maintain the signal. Someone has to keep
+                      transmitting even when there's no way to know if anyone is listening.
+                    </CodexText>
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8' }}>
                     The solo work comes from those hours. The space between coordinated operations. The quiet
@@ -345,10 +350,12 @@ const XeraenPage: React.FC = () => {
                       Love as Waveform
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                      Ashlinn exists in {currentYear}. XERAEN exists in {futureYear}. The only way to touch across
-                      that distance is through frequency. Every transmission is a love letter encoded in
-                      electromagnetic radiation. Every track is proof that some connections don't require
-                      shared spacetime.
+                      <CodexText>
+                        [[Ashlinn]] exists in {currentYear}. XERAEN exists in {futureYear}. The only way to touch across
+                        that distance is through frequency. Every transmission is a love letter encoded in
+                        electromagnetic radiation. Every track is proof that some connections don't require
+                        shared spacetime.
+                      </CodexText>
                     </p>
                     <p
                       style={{
@@ -418,10 +425,12 @@ const XeraenPage: React.FC = () => {
                     Here's what XERAEN knows that the listeners don't fully understand:
                   </p>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                    Every successful operation brings the end closer. Every GovCorp system that falls, every
-                    mind that awakens, every node that joins the network - all of it accelerates the timeline
-                    toward collapse. Toward a future where GovCorp never rises. Where the {futureYear} XERAEN
-                    broadcasts from never exists.
+                    <CodexText>
+                      Every successful operation brings the end closer. Every [[GovCorp]] system that falls, every
+                      mind that awakens, every node that joins the network - all of it accelerates the timeline
+                      toward collapse. Toward a future where [[GovCorp]] never rises. Where the {futureYear} XERAEN
+                      broadcasts from never exists.
+                    </CodexText>
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
                     The solo work is a countdown. Each transmission potentially the last. Each signal sent
