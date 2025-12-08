@@ -8,6 +8,7 @@ namespace :import do
     Rake::Task["import:yaml_artists"].invoke
     Rake::Task["import:yaml_albums"].invoke
     Rake::Task["import:yaml_tracks"].invoke
+    Rake::Task["import:yaml_vidz"].invoke
     Rake::Task["import:redirects"].invoke
     Rake::Task["import:radio_stations"].invoke
 
@@ -682,6 +683,96 @@ namespace :import do
     puts "  Audio files attached: #{audio_attached_count}"
     puts "  Audio files missing: #{audio_missing_count}"
     puts "  Total tracks: #{Track.count}"
+  end
+
+  desc "Import vidz/VODs from data/vidz.yml"
+  task yaml_vidz: :environment do
+    puts "\n--- Importing Vidz/VODs from YAML ---\n"
+
+    yaml_file = Rails.root.join("data", "vidz.yml")
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    yaml_data = YAML.load_file(yaml_file)
+    vidz_data = yaml_data["vidz"] || []
+
+    if vidz_data.empty?
+      puts "  No vidz entries found in #{yaml_file}"
+      puts "\nVidz import summary:"
+      puts "  Created: 0"
+      puts "  Updated: 0"
+      puts "  Total:   #{HackrStream.count}"
+      next
+    end
+
+    created_count = 0
+    updated_count = 0
+    skipped_count = 0
+
+    vidz_data.each do |vid_data|
+      # Find artist (case-insensitive)
+      artist = Artist.find_by("LOWER(name) = ?", vid_data["artist"].to_s.downcase)
+      unless artist
+        puts "  ✗ Artist not found: #{vid_data["artist"]}"
+        skipped_count += 1
+        next
+      end
+
+      # Parse timestamps
+      started_at = nil
+      ended_at = nil
+
+      if vid_data["started_at"].present?
+        begin
+          started_at = Time.parse(vid_data["started_at"])
+        rescue ArgumentError
+          puts "  ⚠ Invalid started_at for '#{vid_data["title"]}': #{vid_data["started_at"]}"
+        end
+      end
+
+      if vid_data["ended_at"].present?
+        begin
+          ended_at = Time.parse(vid_data["ended_at"])
+        rescue ArgumentError
+          puts "  ⚠ Invalid ended_at for '#{vid_data["title"]}': #{vid_data["ended_at"]}"
+        end
+      end
+
+      # Find existing by vod_url or create new
+      stream = HackrStream.find_or_initialize_by(vod_url: vid_data["vod_url"], artist: artist)
+      was_new_record = stream.new_record?
+
+      stream.assign_attributes(
+        title: vid_data["title"],
+        live_url: vid_data["live_url"],
+        is_live: false,
+        started_at: started_at,
+        ended_at: ended_at
+      )
+
+      if was_new_record
+        stream.save!
+        created_count += 1
+        puts "  ✓ Created VOD: #{stream.title} (#{artist.name})"
+      elsif stream.changed?
+        stream.save!
+        updated_count += 1
+        puts "  ↻ Updated VOD: #{stream.title} (#{artist.name})"
+      else
+        puts "  ✓ VOD exists: #{stream.title} (#{artist.name})"
+      end
+    rescue => e
+      puts "  ✗ Error processing '#{vid_data["title"]}': #{e.message}"
+      skipped_count += 1
+    end
+
+    puts "\nVidz import summary:"
+    puts "  Created: #{created_count}"
+    puts "  Updated: #{updated_count}"
+    puts "  Skipped: #{skipped_count}"
+    puts "  Total:   #{HackrStream.count}"
   end
 
   desc "Import radio stations from YAML to database"

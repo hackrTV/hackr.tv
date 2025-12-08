@@ -3,6 +3,7 @@ import { Link, useParams, useLocation } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
+import { formatFutureDate } from '~/utils/dateUtils'
 
 interface Vod {
   id: number
@@ -32,16 +33,6 @@ const extractVideoId = (url: string): string | null => {
     if (match) return match[1]
   }
   return null
-}
-
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return 'Unknown date'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
 }
 
 const VodzShowPage: React.FC = () => {
@@ -181,7 +172,7 @@ const VodzShowPage: React.FC = () => {
 
             {/* Date */}
             <p style={{ margin: '0 0 25px', color: '#888' }}>
-              {formatDate(vod.started_at)}
+              {vod.started_at ? formatFutureDate(vod.started_at) : 'Unknown date'}
             </p>
 
             {/* Video player */}
