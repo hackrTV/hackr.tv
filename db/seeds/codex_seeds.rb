@@ -36,7 +36,7 @@ seed_codex_entry(
 
     ## The Awakening
 
-    In 2119, XERAEN came to understand the true scope of what he had helped create. The RIDE wasn't just reality manipulation for commerce or governance - it was total control. Every perception filtered. Every experience curated. Humanity reduced to managed variables in GovCorp's optimization algorithms.
+    In 2115, XERAEN came to understand the true scope of what he had helped create. The RIDE wasn't just reality manipulation for commerce or governance - it was total control. Every perception filtered. Every experience curated. Humanity reduced to managed variables in GovCorp's optimization algorithms.
 
     He couldn't unknow what he knew. He couldn't continue building their prison.
 
@@ -153,7 +153,7 @@ seed_codex_entry(
   content: <<~MD,
     # The Fracture Network
 
-    **Founded:** 2119<br>
+    **Founded:** 2115<br>
     **Founder:** [[XERAEN]]<br>
     **Status:** Active across two timelines<br>
     **Primary Asset:** [[The Pulse Grid]]
@@ -207,7 +207,7 @@ seed_codex_entry(
   published: true,
   position: 10,
   metadata: {
-    "founded" => "2119",
+    "founded" => "2115",
     "type" => "Trans-temporal resistance network",
     "status" => "Active",
     "temporal_range" => "#{Time.current.year} - #{Time.current.year + 100}"
@@ -291,7 +291,7 @@ seed_codex_entry(
   content: <<~MD,
     # Chronology Fracture
 
-    **Date:** September 9, 2119<br>
+    **Date:** September 9, 2115<br>
     **Location:** [[The RIDE]] infrastructure<br>
     **Discoverer:** [[XERAEN]]
 
@@ -344,7 +344,7 @@ seed_codex_entry(
   published: true,
   position: 20,
   metadata: {
-    "date" => "2119-09-09",
+    "date" => "2115-09-09",
     "type" => "Accidental discovery",
     "significance" => "Trans-temporal transmission capability",
     "temporal_range" => "Exactly 100 years"
@@ -414,7 +414,7 @@ seed_codex_entry(
   published: true,
   position: 30,
   metadata: {
-    "established" => "2119",
+    "established" => "2115",
     "type" => "Resistance infrastructure",
     "scale" => "Global (hidden)",
     "access" => "Fracture Network operatives only"
