@@ -3,7 +3,7 @@ module RequestAnalysis
 
   included do
     before_action :analyze_request
-    helper_method :mobile?, :ashlinn?, :hackr_tv?, :sector_x?, :xeraen?, :current_layout
+    helper_method :mobile?, :ashlinn?, :hackr_tv?, :sector_x?, :xeraen?
   end
 
   private
@@ -31,20 +31,5 @@ module RequestAnalysis
 
   def xeraen?
     @domain.include?("xeraen") || @domain.include?("rockerboy") || request.path.include?("/xeraen")
-  end
-
-  def current_layout
-    layout_name = if hackr_tv?
-      "default"
-    elsif xeraen?
-      "xeraen"
-    elsif sector_x?
-      "sector"
-    elsif ashlinn?
-      "default"
-    end
-
-    layout_name += "_mobile" if mobile? && layout_name
-    layout_name
   end
 end

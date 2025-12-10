@@ -12,7 +12,6 @@ const PlaylistDetailPage = lazy(() => import('~/components/pages/playlists/Playl
 const SharedPlaylistPage = lazy(() => import('~/components/pages/playlists/SharedPlaylistPage').then(m => ({ default: m.SharedPlaylistPage })))
 const TheCyberPulsePage = lazy(() => import('~/components/pages/artist/TheCyberPulsePage'))
 const XeraenPage = lazy(() => import('~/components/pages/artist/XeraenPage'))
-const XeraenLinkzPage = lazy(() => import('~/components/pages/artist/XeraenLinkzPage'))
 const VodzPage = lazy(() => import('~/components/pages/artist/VodzPage'))
 const VodzShowPage = lazy(() => import('~/components/pages/artist/VodzShowPage'))
 const SectorXPage = lazy(() => import('~/components/pages/artist/SectorXPage'))
@@ -67,7 +66,6 @@ export const AppLayout: React.FC = () => {
         <Route path="/xeraen/trackz/:trackSlug" element={<TrackDetailPage />} />
         <Route path="/xeraen/vidz" element={<VodzPage />} />
         <Route path="/xeraen/vidz/:id" element={<VodzShowPage />} />
-        <Route path="/xeraen/linkz" element={<XeraenLinkzPage />} />
         <Route path="/sector/x" element={<SectorXPage />} />
         <Route path="/system_rot" element={<BandProfilePage />} />
         <Route path="/voiceprint" element={<BandProfilePage />} />

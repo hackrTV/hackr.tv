@@ -14,7 +14,6 @@ Rails.application.routes.draw do
 
   # XERAEN routes - SPA
   get "xeraen", to: "pages#spa_root"
-  get "xeraen/linkz", to: "pages#spa_root", as: :xeraen_linkz
   get "xeraen/trackz", to: "pages#spa_root", as: :xeraen_tracks
   get "xeraen/trackz/:id", to: "pages#spa_root", as: :xeraen_track
   get "xeraen/vidz", to: "pages#spa_root", as: :xeraen_vidz

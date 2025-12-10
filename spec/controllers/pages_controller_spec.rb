@@ -29,14 +29,6 @@ RSpec.describe PagesController, type: :request do
       end
     end
 
-    describe "GET /xeraen/linkz" do
-      it "renders the SPA root" do
-        get "/xeraen/linkz"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
-      end
-    end
-
     describe "GET /sector/x" do
       it "renders the SPA root" do
         get "/sector/x"

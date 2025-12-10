@@ -8,17 +8,9 @@ class ApplicationController < ActionController::Base
   before_action :check_for_redirect
   before_action :check_for_domain_redirect
 
-  layout :determine_layout
-
   helper_method :domain_stylesheet
 
   private
-
-  def determine_layout
-    # Skip layout for AJAX content requests
-    return false if params[:no_layout] == "1"
-    current_layout
-  end
 
   def domain_stylesheet
     return "grid" if request.path.start_with?("/grid")

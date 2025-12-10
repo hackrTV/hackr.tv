@@ -16,9 +16,6 @@ class PagesController < ApplicationController
     render "mobile/xeraen" if mobile?
   end
 
-  def xeraen_linkz
-  end
-
   def system_rot
     @artist = Artist.find_by(slug: "system_rot")
     @tracks = @artist.tracks.includes(:album).album_order if @artist
