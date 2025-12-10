@@ -1,26 +1,26 @@
 stations:
   - name: "The.CyberPul.se Trans-Temporal Broadcast"
-    slug: "cyberpulse"
+    slug: "thecyberpulse"
     description: "The official Fracture Network broadcast. Music from The.CyberPul.se cutting through the digital noise."
-    genre: "Hackr Metal"
+    genre: "Hackrcore"
     color: "green-168"
     stream_url: ""  # To be configured with actual stream URL
 
-  - name: "XERAEN Frequency"
+  - name: "XERAEN's Frequency"
     slug: "xeraen"
-    description: "Temporal broadcasts from 2125. XERAEN's warning signals echoing backward through time."
-    genre: "Omniwave Hackrcore"
+    description: "Trans-temporal broadcasts from the timeline that GovCorp controls. XERAEN's warning signals echoing backward through time."
+    genre: "Hackr News and Motivation"
     color: "purple-168"
     stream_url: ""  # To be configured
 
   - name: "Sector X Underground"
     slug: "sector_x"
     description: "The underground mix. All Sector X Media artists broadcasting from the shadows of corporate control."
-    genre: "Multi-Genre Fracture Network"
+    genre: "Various Hackr Styles"
     color: "cyan-168"
     stream_url: ""  # To be configured
 
-  - name: "GovCorp Official Radio"
+  - name: "GovCorp Official Radio (FN Monitoring Relay)"
     slug: "govcorp"
     description: "Mandatory corporate broadcasting. Compliance is voluntary. Non-compliance is noted."
     genre: "Propaganda"
