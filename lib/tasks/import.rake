@@ -550,10 +550,12 @@ namespace :import do
       next unless Dir.exist?(trackz_dir)
 
       Dir.glob(trackz_dir.join("*.yml")).each do |track_file|
-        track_data = YAML.load_file(track_file)
-        # Set slug from filename if not present
-        track_data["slug"] ||= File.basename(track_file, ".yml")
-        all_track_data << track_data
+        YAML.load_stream(File.read(track_file)).each do |track_data|
+          next unless track_data.is_a?(Hash)
+          # Set slug from filename if not present (only for single-track files)
+          track_data["slug"] ||= File.basename(track_file, ".yml")
+          all_track_data << track_data
+        end
       rescue => e
         puts "  ⚠ Error loading #{track_file}: #{e.message}"
       end
@@ -562,6 +564,13 @@ namespace :import do
     puts "  Found #{all_track_data.size} tracks to process\n"
 
     all_track_data.each do |track_data|
+      # Skip tracks with skip flag
+      if track_data["skip"]
+        puts "  ⊘ Skipped track: #{track_data["title"]} (skip flag set)"
+        skipped_count += 1
+        next
+      end
+
       # Find artist (case-insensitive)
       artist = Artist.find_by("LOWER(name) = ?", track_data["artist"].to_s.downcase)
       unless artist
