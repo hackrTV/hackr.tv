@@ -779,7 +779,7 @@ namespace :import do
   task radio_stations: :environment do
     puts "\n--- Importing Radio Stations from YAML ---\n"
 
-    yaml_file = Rails.root.join("config", "radio_stations.yml")
+    yaml_file = Rails.root.join("data", "radio_stations.yml")
     unless File.exist?(yaml_file)
       puts "  ✗ File not found: #{yaml_file}"
       return
