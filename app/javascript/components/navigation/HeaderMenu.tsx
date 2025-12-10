@@ -164,9 +164,6 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/xeraen/vidz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>vidz
                 </Link>
-                <Link to="/xeraen/linkz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">/</span>linkz
-                </Link>
               </div>
 
               <div className="mobile-menu-section">
@@ -307,11 +304,6 @@ export const HeaderMenu: React.FC = () => {
               <li>
                 <Link to="/xeraen/vidz">
                   <span className="purple-168-text">/</span>vidz
-                </Link>
-              </li>
-              <li>
-                <Link to="/xeraen/linkz">
-                  <span className="purple-168-text">/</span>linkz
                 </Link>
               </li>
             </ul>
