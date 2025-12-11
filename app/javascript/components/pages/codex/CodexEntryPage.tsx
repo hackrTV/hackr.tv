@@ -209,20 +209,40 @@ export const CodexEntryPage: React.FC = () => {
                       h2: ({ _node, ...props }) => <h2 style={{ color: typeColor, marginTop: '25px', marginBottom: '12px', fontSize: '1.5em' }} {...props} />,
                       h3: ({ _node, ...props }) => <h3 style={{ color: typeColor, marginTop: '20px', marginBottom: '10px', fontSize: '1.3em' }} {...props} />,
                       p: ({ _node, ...props }) => <p style={{ marginBottom: '15px' }} {...props} />,
-                      a: ({ _node, ...props }) => (
-                        <a
-                          style={{
-                            display: 'inline',
-                            color: '#60a5fa',
-                            textDecoration: 'none',
-                            borderBottom: '1px solid #60a5fa',
-                            transition: 'color 0.2s'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#93c5fd'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#60a5fa'}
-                          {...props}
-                        />
-                      ),
+                      a: ({ _node, href, children, ...props }) => {
+                        const linkStyle = {
+                          display: 'inline' as const,
+                          color: '#60a5fa',
+                          textDecoration: 'none',
+                          borderBottom: '1px solid #60a5fa',
+                          transition: 'color 0.2s'
+                        }
+                        // Use React Router Link for internal /codex/ links
+                        if (href && href.startsWith('/codex/')) {
+                          return (
+                            <Link
+                              to={href}
+                              style={linkStyle}
+                              onMouseEnter={(e) => e.currentTarget.style.color = '#93c5fd'}
+                              onMouseLeave={(e) => e.currentTarget.style.color = '#60a5fa'}
+                            >
+                              {children}
+                            </Link>
+                          )
+                        }
+                        // Use regular anchor for external links
+                        return (
+                          <a
+                            href={href}
+                            style={linkStyle}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#93c5fd'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#60a5fa'}
+                            {...props}
+                          >
+                            {children}
+                          </a>
+                        )
+                      },
                       ul: ({ _node, ...props }) => <ul style={{ marginLeft: '20px', marginBottom: '15px' }} {...props} />,
                       ol: ({ _node, ...props }) => <ol style={{ marginLeft: '20px', marginBottom: '15px' }} {...props} />,
                       li: ({ _node, ...props }) => <li style={{ marginBottom: '8px' }} {...props} />,
