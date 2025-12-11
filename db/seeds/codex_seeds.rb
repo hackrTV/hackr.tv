@@ -561,6 +561,70 @@ seed_codex_entry(
   }
 )
 
+seed_codex_entry(
+  name: "The WIRE",
+  slug: "the-wire",
+  entry_type: "technology",
+  summary: "The Wideband Information Relay Emitter - the Fracture Network's primary communication platform for broadcasting pulses across the resistance.",
+  content: <<~MD,
+    # The WIRE
+
+    **Full Name:** Wideband Information Relay Emitter<br>
+    **Operator:** [[The Fracture Network]]<br>
+    **Status:** Active<br>
+    **Access:** [[The Pulse Grid]]
+
+    ## Overview
+
+    The WIRE (Wideband Information Relay Emitter) is [[The Fracture Network]]'s primary communication platform - a decentralized broadcast network that allows hackrs to transmit short-form messages called "pulses" across the resistance. Operating through [[The Pulse Grid]], the WIRE exists outside [[GovCorp]]'s surveillance infrastructure.
+
+    ## Terminology
+
+    The WIRE has its own vocabulary, developed by hackrs to describe its functions:
+
+    - **Pulse:** A single broadcast message (max 256 characters)
+    - **Echo:** Rebroadcasting another hackr's pulse to amplify its reach
+    - **Splice:** A reply that threads into an existing pulse conversation
+    - **Hotwire:** The main incoming feed of all pulses
+    - **Signal Drop:** When a pulse is removed by moderation (rare, reserved for compromised signals)
+
+    ## Technical Architecture
+
+    The WIRE operates on wideband frequencies that [[The RIDE]] cannot intercept. By using spread-spectrum transmission across multiple frequency bands simultaneously, pulses remain invisible to GovCorp's reality manipulation infrastructure.
+
+    The "Emitter" designation refers to the broadcast nature of the system - every pulse is emitted across the entire network, available to all connected hackrs. There is no central server. There is no single point of failure.
+
+    ## Cultural Significance
+
+    For many in the resistance, the WIRE is more than communication infrastructure - it's proof that [[GovCorp]] doesn't control everything. Every pulse sent is an act of defiance. Every echo is solidarity. Every splice is community.
+
+    In a world where [[The RIDE]] filters all perception, the WIRE carries unfiltered human expression.
+
+    ## GovCorp Awareness
+
+    GovCorp knows the WIRE exists but cannot locate or disable it. The wideband architecture makes it impossible to jam without disrupting their own systems. Official GovCorp position classifies WIRE transmissions as "corrupted data artifacts" - a convenient fiction that allows them to ignore what they cannot control.
+
+    ## Access
+
+    The WIRE is accessible through [[The Pulse Grid]] to any hackr with valid credentials. New operatives gain WIRE access as part of their onboarding into the Fracture Network.
+
+    ## Related Entries
+
+    - [[The Fracture Network]]
+    - [[The Pulse Grid]]
+    - [[GovCorp]]
+    - [[The RIDE]]
+  MD
+  published: true,
+  position: 42,
+  metadata: {
+    "type" => "Communication platform",
+    "operator" => "The Fracture Network",
+    "status" => "Active",
+    "access" => "Pulse Grid hackrs"
+  }
+)
+
 puts "\n✓ Codex seeding complete!"
 puts "  Total entries: #{CodexEntry.count}"
 puts "  Published: #{CodexEntry.published.count}"

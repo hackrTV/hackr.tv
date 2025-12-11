@@ -186,33 +186,22 @@ export const HeaderMenu: React.FC = () => {
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">4. THE PULSE GRID</div>
+                <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">/</span>grid
+                </Link>
                 {isLoggedIn ? (
-                  <>
-                    <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                      <span className="purple-168-text">/</span>grid
-                    </Link>
-                    <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                      <span className="purple-168-text">/</span>wire
-                    </Link>
-                    <a
-                      href="#"
-                      className="mobile-menu-item"
-                      onClick={(e) => {
-                        handleDisconnect(e)
-                        setMobileMenuOpen(false)
-                      }}
-                    >
-                      <span className="purple-168-text">/</span>disconnect
-                    </a>
-                  </>
+                  <a
+                    href="#"
+                    className="mobile-menu-item"
+                    onClick={(e) => {
+                      handleDisconnect(e)
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    <span className="purple-168-text">/</span>disconnect
+                  </a>
                 ) : (
                   <>
-                    <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                      <span className="purple-168-text">/</span>grid
-                    </Link>
-                    <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                      <span className="purple-168-text">/</span>wire
-                    </Link>
                     <Link to="/grid/login" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>login
                     </Link>
@@ -224,16 +213,23 @@ export const HeaderMenu: React.FC = () => {
               </div>
 
               <div className="mobile-menu-section">
+                <div className="mobile-menu-section-title">5. The WIRE</div>
+                <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">/</span>hotwire
+                </Link>
+              </div>
+
+              <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MORE</div>
                 <Link to="/codex" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">5</span> The Codex
+                  <span className="purple-168-text">6</span> The Codex
                 </Link>
                 <Link to="/logs" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">6</span> Hackr Logs
+                  <span className="purple-168-text">7</span> Hackr Logs
                 </Link>
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
-                    <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>
+                    <span className="red-255-text">8</span> /root <span className="red-255-text">[ADMIN]</span>
                   </a>
                 )}
               </div>
@@ -343,39 +339,22 @@ export const HeaderMenu: React.FC = () => {
 
         {/* 4: THE PULSE GRID */}
         <li className="tui-dropdown">
-          <span className="purple-168-text">4</span>&nbsp;THE PULSE GRID (pre-alpha)&nbsp;
+          <span className="purple-168-text">4</span>&nbsp;THE PULSE GRID&nbsp;
           <div className="tui-dropdown-content">
             <ul>
+              <li>
+                <Link to="/grid">
+                  <span className="purple-168-text">/</span>grid
+                </Link>
+              </li>
               {isLoggedIn ? (
-                <>
-                  <li>
-                    <Link to="/grid">
-                      <span className="purple-168-text">/</span>grid
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/wire">
-                      <span className="purple-168-text">/</span>wire
-                    </Link>
-                  </li>
-                  <li>
-                    <a href="#" onClick={handleDisconnect}>
-                      <span className="purple-168-text">/</span>disconnect
-                    </a>
-                  </li>
-                </>
+                <li>
+                  <a href="#" onClick={handleDisconnect}>
+                    <span className="purple-168-text">/</span>disconnect
+                  </a>
+                </li>
               ) : (
                 <>
-                  <li>
-                    <Link to="/grid">
-                      <span className="purple-168-text">/</span>grid
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/wire">
-                      <span className="purple-168-text">/</span>wire
-                    </Link>
-                  </li>
                   <li>
                     <Link to="/grid/login">
                       <span className="purple-168-text">/</span>login
@@ -392,25 +371,32 @@ export const HeaderMenu: React.FC = () => {
           </div>
         </li>
 
-        {/* 5: The Codex */}
+        {/* 5: The WIRE */}
+        <li>
+          <Link to="/wire">
+            <span className="purple-168-text">5</span> The WIRE&nbsp;
+          </Link>
+        </li>
+
+        {/* 6: The Codex */}
         <li>
           <Link to="/codex">
-            <span className="purple-168-text">5</span> The Codex&nbsp;
+            <span className="purple-168-text">6</span> The Codex&nbsp;
           </Link>
         </li>
 
-        {/* 6: Hackr Logs */}
+        {/* 7: Hackr Logs */}
         <li>
           <Link to="/logs">
-            <span className="purple-168-text">6</span> Hackr Logs&nbsp;
+            <span className="purple-168-text">7</span> Hackr Logs&nbsp;
           </Link>
         </li>
 
-        {/* 7: Admin (only show if user is admin) */}
+        {/* 8: Admin (only show if user is admin) */}
         {hackr?.role === 'admin' && (
           <li>
             <a href="/root">
-              <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+              <span className="red-255-text">8</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
             </a>
           </li>
         )}

@@ -10,6 +10,7 @@ interface PulseCardProps {
   showThread?: boolean
   showReplies?: boolean
   nestLevel?: number
+  indentSplice?: boolean
   onEchoToggle?: (pulseId: number, newEchoCount: number, isEchoed: boolean) => void
   onPulseCreated?: (pulse: Pulse) => void
   onPulseDeleted?: (pulseId: number) => void
@@ -20,6 +21,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
   showThread = true,
   showReplies = true,
   nestLevel = 0,
+  indentSplice = true,
   onEchoToggle,
   onPulseCreated,
   onPulseDeleted
@@ -127,7 +129,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
   }
 
   return (
-    <div className={`pulse-card ${pulse.signal_dropped ? 'signal-dropped' : ''} ${pulse.is_splice ? 'is-splice' : ''}`}>
+    <div className={`pulse-card ${pulse.signal_dropped ? 'signal-dropped' : ''} ${pulse.is_splice && indentSplice ? 'is-splice' : ''}`}>
       <div className="pulse-header">
         <Link to={`/wire/${pulse.grid_hackr.hackr_alias}`} className="hackr-link">
           <span className="hackr-alias">@{pulse.grid_hackr.hackr_alias}</span>

@@ -9,13 +9,17 @@ module Api
     before_action :require_admin, only: [:signal_drop]
 
     # GET /api/pulses
-    # Params: page (default 1), per_page (default 50), filter (all/active/dropped), hackr (username), parent_pulse_id (for replies)
+    # Params: page (default 1), per_page (default 50), filter (all/active/dropped), hackr (username), parent_pulse_id (for replies), echoed_by (username)
     def index
       pulses = Pulse.includes(:grid_hackr, :parent_pulse, :echoes)
 
       # Filter by parent_pulse_id if specified (for fetching replies)
       if params[:parent_pulse_id].present?
         pulses = pulses.where(parent_pulse_id: params[:parent_pulse_id])
+      elsif params[:include_splices] != "true"
+        # Default to root pulses only (no splices) to avoid duplication in timeline
+        # Use include_splices=true to show all pulses (e.g., on user profile pages)
+        pulses = pulses.roots
       end
 
       # Filter by hackr if specified (case-insensitive)
@@ -23,6 +27,16 @@ module Api
         hackr = GridHackr.where("LOWER(hackr_alias) = ?", params[:hackr].downcase).first
         if hackr
           pulses = pulses.where(grid_hackr_id: hackr.id)
+        else
+          return render json: {pulses: [], meta: {total: 0, page: 1, per_page: 50}}
+        end
+      end
+
+      # Filter by echoed_by - pulses that a specific user has echoed
+      if params[:echoed_by].present?
+        echoing_hackr = GridHackr.where("LOWER(hackr_alias) = ?", params[:echoed_by].downcase).first
+        if echoing_hackr
+          pulses = pulses.joins(:echoes).where(echoes: {grid_hackr_id: echoing_hackr.id})
         else
           return render json: {pulses: [], meta: {total: 0, page: 1, per_page: 50}}
         end

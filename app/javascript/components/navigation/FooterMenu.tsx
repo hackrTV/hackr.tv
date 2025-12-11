@@ -41,23 +41,28 @@ export const FooterMenu: React.FC = () => {
           </li>
           <li>
             <Link to="/grid">
-              <span className="purple-168-text">4</span>&nbsp;THE PULSE GRID (pre-alpha)&nbsp;
+              <span className="purple-168-text">4</span>&nbsp;THE PULSE GRID&nbsp;
+            </Link>
+          </li>
+          <li>
+            <Link to="/wire">
+              <span className="purple-168-text">5</span>&nbsp;The WIRE&nbsp;
             </Link>
           </li>
           <li>
             <Link to="/codex">
-              <span className="purple-168-text">5</span>&nbsp;The Codex&nbsp;
+              <span className="purple-168-text">6</span>&nbsp;The Codex&nbsp;
             </Link>
           </li>
           <li>
             <Link to="/logs">
-              <span className="purple-168-text">6</span>&nbsp;Hackr Logs&nbsp;
+              <span className="purple-168-text">7</span>&nbsp;Hackr Logs&nbsp;
             </Link>
           </li>
           {hackr?.role === 'admin' && (
             <li>
               <a href="/root">
-                <span className="red-255-text">7</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">8</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

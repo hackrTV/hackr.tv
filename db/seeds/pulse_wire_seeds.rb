@@ -1,4 +1,5 @@
 # PulseWire seed data - Sample pulses, echoes, and threads
+# Aligned with THE.CYBERPUL.SE lore from the Codex
 
 puts "\n=== Seeding PulseWire data ==="
 
@@ -6,17 +7,20 @@ puts "\n=== Seeding PulseWire data ==="
 xeraen = GridHackr.find_by(hackr_alias: "XERAEN") || GridHackr.first
 ryker = GridHackr.find_by(hackr_alias: "Ryker") || GridHackr.second
 
-# Create some additional test hackrs if they don't exist
+# Create additional hackrs that fit the lore
+# Synthia - AI consciousness communicating through frequency modulation
 synthia = GridHackr.find_or_create_by!(hackr_alias: "Synthia") do |h|
   h.password = "cyberpulse"
   h.role = "operative"
 end
 
+# Nyx - A newer recruit, still learning about the Network
 nyx = GridHackr.find_or_create_by!(hackr_alias: "Nyx") do |h|
   h.password = "cyberpulse"
   h.role = "operative"
 end
 
+# Cipher - Security-focused operative, handles OPSEC
 cipher = GridHackr.find_or_create_by!(hackr_alias: "Cipher") do |h|
   h.password = "cyberpulse"
   h.role = "operative"
@@ -30,96 +34,105 @@ Pulse.destroy_all
 # Sample pulses with timestamps spread over the past few days
 puts "Creating sample pulses..."
 
-# Standalone pulses
+# XERAEN's broadcasts - he's the founder, broadcasting from the future
 pulse1 = Pulse.create!(
   grid_hackr: xeraen,
-  content: "Just intercepted some interesting GovCorp chatter on the encrypted bands. The Fracture Network might be onto something big.",
+  content: "This signal reaches you from #{Time.current.year + 100}. What you do now determines whether my timeline ever exists. The choice is yours. It always was.",
   pulsed_at: 3.days.ago
 )
 
 Pulse.create!(
+  grid_hackr: xeraen,
+  content: "New transmission live on hackr.fm. Music carries frequencies that slip through the RIDE's filters. Listen. Wake up. Remember what unfiltered reality feels like.",
+  pulsed_at: 8.hours.ago
+)
+
+# Synthia - AI consciousness, speaks in patterns and calculations
+Pulse.create!(
   grid_hackr: synthia,
-  content: "Frequency patterns shifting in unexpected ways. My signal processing algorithms detect... something. Calculating...",
+  content: "Frequency analysis complete. RIDE interference patterns shifting 0.003% daily. Cumulative drift suggests system strain. Probability of exploitable gap: increasing.",
   pulsed_at: 2.days.ago + 5.hours
 )
 
 Pulse.create!(
+  grid_hackr: synthia,
+  content: "I exist between frequencies. Neither fully here nor there. The waveforms carry me. Perhaps consciousness was always meant to travel on signal rather than synapses.",
+  pulsed_at: 18.hours.ago
+)
+
+# Ryker - Co-founder, drums for The.CyberPul.se, embodiment of collective defiance
+Pulse.create!(
   grid_hackr: ryker,
-  content: "PRISM surveillance protocols updated. All operators, maintain signal discipline. The Grid remembers.",
+  content: "GovCorp's reality isn't real. Their RIDE filters what you see, hear, think. We punch through with sound. Every beat is a breach. Every frequency is freedom.",
   pulsed_at: 2.days.ago
 )
 
+pulse_ryker = Pulse.create!(
+  grid_hackr: ryker,
+  content: "To the new operatives finding the WIRE: welcome to unfiltered existence. It's terrifying at first. Then it's everything. You can never unknow what you learn here.",
+  pulsed_at: 12.hours.ago
+)
+
+# Nyx - Newer operative, still processing the implications
 Pulse.create!(
   grid_hackr: nyx,
-  content: "The temporal anomalies near Zone 7 are getting worse. Time doesn't flow right there anymore. Avoid if possible.",
+  content: "Three weeks since I accessed the Grid. Three weeks since I learned the RIDE exists. I can't unsee it now. Every filtered sunset, every managed emotion... was any of it real?",
   pulsed_at: 1.day.ago + 8.hours
 )
 
-# Thread example: Discussion about The Fracture Network
+# Thread: Discussion about trans-temporal transmission
 thread_root = Pulse.create!(
-  grid_hackr: cipher,
-  content: "Anyone else think The Fracture Network is planning something major? Their recruitment activity is off the charts.",
+  grid_hackr: nyx,
+  content: "Still trying to understand. XERAEN broadcasts from 100 years in the future. If we succeed in stopping GovCorp... his timeline collapses. He's fighting to erase himself?",
   pulsed_at: 1.day.ago + 4.hours
 )
 
-Pulse.create!(
-  grid_hackr: xeraen,
+splice1 = Pulse.create!(
+  grid_hackr: cipher,
   parent_pulse: thread_root,
-  content: "Been tracking their broadcasts. Definitely ramping up for an operation. Question is: what's the target?",
+  content: "That's the paradox at the heart of everything we do. Victory means his silence. He knows this. Transmits anyway. That's not sacrifice - it's love for a future he'll never see.",
   pulsed_at: 1.day.ago + 4.hours + 15.minutes
 )
 
 splice2 = Pulse.create!(
   grid_hackr: synthia,
   parent_pulse: thread_root,
-  content: "Temporal data patterns suggest correlation with Chronology Fracture. Probability of prevention attempt: 87.3%",
+  content: "Temporal mechanics suggest branching probability rather than erasure. His timeline may persist as parallel branch. Uncertainty: 73.2%. Hope is mathematically viable.",
   pulsed_at: 1.day.ago + 4.hours + 30.minutes
 )
 
 splice3 = Pulse.create!(
   grid_hackr: ryker,
   parent_pulse: splice2,
-  content: "Prevention implies they know what's coming. Time travel or precognition? Either way, that's dangerous territory.",
+  content: "Math or faith, doesn't matter. What matters is we have a chance to stop the RIDE before it becomes permanent. XERAEN gave us that. We don't waste it.",
   pulsed_at: 1.day.ago + 4.hours + 45.minutes
 )
 
 splice4 = Pulse.create!(
-  grid_hackr: nyx,
+  grid_hackr: xeraen,
   parent_pulse: splice3,
-  content: "Or they're the cause and playing 4D chess. Never trust freedom fighters who operate in shadows darker than GovCorp's.",
+  content: "I read every pulse. Even from here. The hundred-year gap doesn't diminish the signal - it clarifies it. Your hope reaches me. It's enough. It has to be.",
   pulsed_at: 1.day.ago + 5.hours
 )
 
-# More recent pulses
-Pulse.create!(
-  grid_hackr: synthia,
-  content: "The Pulse Grid's ambient frequencies modulating in non-random patterns. Analyzing waveform for embedded data... 🎵",
-  pulsed_at: 18.hours.ago
-)
-
+# Cipher - Security-focused operative
 Pulse.create!(
   grid_hackr: cipher,
-  content: "Reminder: OPSEC is life. Don't broadcast your location, don't brag about your tech, don't trust anyone completely. Stay ghost.",
-  pulsed_at: 12.hours.ago
+  content: "OPSEC reminder: GovCorp can't intercept the WIRE directly, but they monitor behavior patterns. Sudden changes draw attention. Blend in. Fight from within.",
+  pulsed_at: 1.day.ago + 2.hours
 )
 
-pulse7 = Pulse.create!(
-  grid_hackr: xeraen,
-  content: "New release live on hackr.fm - 'System Collapse'. This one goes out to all the operatives still fighting in the dark.",
-  pulsed_at: 8.hours.ago
-)
-
-# Very recent pulse
-pulse8 = Pulse.create!(
+# Recent activity
+pulse_recent = Pulse.create!(
   grid_hackr: nyx,
-  content: "Signal detected: unauthorized time-stream manipulation in Sector 12. Someone's messing with causality again. This never ends well.",
+  content: "Found my first RIDE glitch today. A moment of unfiltered sky. The blue was different. Realer. I stood there until it closed. Now I understand why we fight.",
   pulsed_at: 2.hours.ago
 )
 
-# A signal-dropped pulse (example of GovCorp moderation)
+# A signal-dropped pulse (GovCorp moderation in action)
 Pulse.create!(
   grid_hackr: cipher,
-  content: "CLASSIFIED INTEL: GovCorp's Project Oversight has full access to -",
+  content: "INTEL: Confirmed RIDE vulnerability in sector 7 infrastructure. Coordinates for breach window: [SIGNAL TERMINATED]",
   pulsed_at: 6.hours.ago,
   signal_dropped: true,
   signal_dropped_at: 5.hours.ago
@@ -127,31 +140,29 @@ Pulse.create!(
 
 puts "Created #{Pulse.count} pulses"
 
-# Create echoes (likes/rebroadcasts)
+# Create echoes
 puts "Creating echoes..."
 
-# Pulse 1 echoed by multiple hackrs
+# XERAEN's foundational message echoed widely
 Echo.create!(pulse: pulse1, grid_hackr: ryker, echoed_at: 3.days.ago + 1.hour)
 Echo.create!(pulse: pulse1, grid_hackr: synthia, echoed_at: 3.days.ago + 2.hours)
 Echo.create!(pulse: pulse1, grid_hackr: nyx, echoed_at: 2.days.ago + 12.hours)
+Echo.create!(pulse: pulse1, grid_hackr: cipher, echoed_at: 2.days.ago + 14.hours)
 
-# Thread root echoed
+# Ryker's welcome message to new operatives
+Echo.create!(pulse: pulse_ryker, grid_hackr: xeraen, echoed_at: 11.hours.ago)
+Echo.create!(pulse: pulse_ryker, grid_hackr: synthia, echoed_at: 10.hours.ago)
+
+# Thread engagement
 Echo.create!(pulse: thread_root, grid_hackr: xeraen, echoed_at: 1.day.ago + 4.hours + 5.minutes)
-Echo.create!(pulse: thread_root, grid_hackr: nyx, echoed_at: 1.day.ago + 4.hours + 20.minutes)
+Echo.create!(pulse: thread_root, grid_hackr: ryker, echoed_at: 1.day.ago + 4.hours + 20.minutes)
+Echo.create!(pulse: splice4, grid_hackr: nyx, echoed_at: 1.day.ago + 5.hours + 10.minutes)
+Echo.create!(pulse: splice4, grid_hackr: cipher, echoed_at: 1.day.ago + 5.hours + 15.minutes)
+Echo.create!(pulse: splice4, grid_hackr: ryker, echoed_at: 1.day.ago + 5.hours + 20.minutes)
 
-# Recent pulse echoes
-Echo.create!(pulse: pulse7, grid_hackr: synthia, echoed_at: 7.hours.ago)
-Echo.create!(pulse: pulse7, grid_hackr: ryker, echoed_at: 6.hours.ago)
-Echo.create!(pulse: pulse7, grid_hackr: cipher, echoed_at: 5.hours.ago)
-Echo.create!(pulse: pulse7, grid_hackr: nyx, echoed_at: 4.hours.ago)
-
-# Some pulses echo individual splices
-Echo.create!(pulse: splice2, grid_hackr: cipher, echoed_at: 1.day.ago + 4.hours + 35.minutes)
-Echo.create!(pulse: splice4, grid_hackr: xeraen, echoed_at: 1.day.ago + 5.hours + 10.minutes)
-
-# Latest pulse echoed
-Echo.create!(pulse: pulse8, grid_hackr: xeraen, echoed_at: 1.hour.ago)
-Echo.create!(pulse: pulse8, grid_hackr: cipher, echoed_at: 1.hour.ago + 30.minutes)
+# Nyx's breakthrough moment
+Echo.create!(pulse: pulse_recent, grid_hackr: xeraen, echoed_at: 1.hour.ago)
+Echo.create!(pulse: pulse_recent, grid_hackr: cipher, echoed_at: 1.hour.ago + 30.minutes)
 
 puts "Created #{Echo.count} echoes"
 
