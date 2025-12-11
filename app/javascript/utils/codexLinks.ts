@@ -36,7 +36,7 @@ export const CODEX_FALLBACK_ROUTES: Record<string, { route: string; displayName:
   'apex-overdrive': { route: '/apex_overdrive', displayName: 'Apex Overdrive' },
   'neon-hearts': { route: '/neon_hearts', displayName: 'Neon Hearts (ネオンハーツ)' },
   'ethereality': { route: '/ethereality', displayName: 'Ethereality' },
-  'blitzbeam': { route: '/blitzbeam', displayName: 'BlitzBeam+' },
+  'blitzbeam': { route: '/blitzbeam', displayName: 'BlitzBeam+' }
 }
 
 /**

@@ -6,8 +6,7 @@ import {
   extractCodexReferences,
   hasCodexLinks,
   getRouteForSlug,
-  getFallbackDisplayName,
-  CODEX_FALLBACK_ROUTES
+  getFallbackDisplayName
 } from '../codexLinks'
 
 describe('codexLinks utilities', () => {
