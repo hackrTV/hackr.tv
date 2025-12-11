@@ -149,15 +149,17 @@ const XeraenPage: React.FC = () => {
                 </legend>
                 <div style={{ padding: '20px' }}>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                    Where The.CyberPul.se broadcasts the resistance, XERAEN's solo work broadcasts something
-                    more personal: the weight of existing in a timeline you're trying to unmake. The loneliness
-                    of sending signals you'll never know were received. The mathematics of loving someone a
-                    hundred years away.
+                    Where The.CyberPul.se broadcasts the resistance, XERAEN's solo work traces an evolution.
+                    The early transmissions burned hot - hardcore punk aggression, metalcore fury, the raw
+                    voltage of someone screaming into the void hoping the past would hear.
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                    Dark ambient soundscapes. Atmospheric drones that feel like static between stations.
-                    Melodies that emerge from noise like voices from the void. Synthesizers processed until
-                    they sound like they've traveled through a century of interference to reach you.
+                    But signals change over distance. What started as sonic assault has transformed into
+                    something XERAEN calls <span style={{ color: colorScheme.primary, fontWeight: 'bold' }}>OMNIWAVE</span> -
+                    an electronic-leaning exploration where rhythmic guitars weave through synthesized
+                    frequencies. Genre boundaries dissolve. The transmissions now include reinterpretations
+                    of other Fracture Network bands, their songs filtered through XERAEN's temporal emanations,
+                    broadcast back as something familiar yet displaced.
                   </p>
                   <p
                     style={{
@@ -168,7 +170,7 @@ const XeraenPage: React.FC = () => {
                       textShadow: `0 0 8px ${colorScheme.glow}`
                     }}
                   >
-                    This is what resistance sounds like when no one else is in the room.
+                    From hardcore fury to OMNIWAVE frequencies - the signal evolves, but never stops transmitting.
                   </p>
                 </div>
               </fieldset>

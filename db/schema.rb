@@ -53,6 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_000007) do
   end
 
   create_table "artists", force: :cascade do |t|
+    t.string "artist_type", default: "band", null: false
     t.datetime "created_at", null: false
     t.string "genre"
     t.string "name"

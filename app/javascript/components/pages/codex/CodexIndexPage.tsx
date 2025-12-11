@@ -96,7 +96,7 @@ export const CodexIndexPage: React.FC = () => {
             <legend className="center">THE CODEX :: Knowledge Archive</legend>
             <div style={{ padding: '20px', background: '#1a1a1a' }}>
               <p style={{ color: '#b0b0b0', margin: 0, textAlign: 'center', fontSize: '1.05em', lineHeight: '1.6' }}>
-                A comprehensive archive of people, organizations, events, and technologies within THE.CYBERPUL.SE universe
+                A comprehensive archive of people, organizations, events, and technologies within the Fracture Network's records
               </p>
             </div>
           </fieldset>

@@ -4,6 +4,7 @@ class CreateArtists < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :slug
       t.string :genre
+      t.string :artist_type, default: "band", null: false
 
       t.timestamps
     end
