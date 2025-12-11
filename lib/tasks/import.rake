@@ -446,14 +446,7 @@ namespace :import do
         end
       end
 
-      # If no valid release date, assign random date between 99 and 100 years in the future
-      if release_date.nil?
-        min_future_date = Date.today + 99.years
-        max_future_date = Date.today + 100.years
-        days_in_range = (max_future_date - min_future_date).to_i
-        random_days = rand(0..days_in_range)
-        release_date = min_future_date + random_days.days
-      end
+      # release_date remains nil for TBA albums (will sort to end with NULLS LAST)
 
       if album.new_record?
         album.name = album_data["title"]
