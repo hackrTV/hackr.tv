@@ -3490,7 +3490,7 @@
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
-  audio_file: "hyperdrive-sequence.mp3"
+  audio_file: "hyperdrive-sequence.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -3513,7 +3513,7 @@
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
-  audio_file: "boundary-rift.mp3"
+  audio_file: "boundary-rift.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -3536,7 +3536,7 @@
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
-  audio_file: "velocity-plus.mp3"
+  audio_file: "velocity-plus.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -3559,7 +3559,7 @@
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
-  audio_file: "axial-acceleration.mp3"
+  audio_file: "axial-acceleration.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -3582,7 +3582,7 @@
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
-  audio_file: "beyond-lightspeed.mp3"
+  audio_file: "beyond-lightspeed.ogg"
   featured: false
   streaming_links:
     # spotify: ""
