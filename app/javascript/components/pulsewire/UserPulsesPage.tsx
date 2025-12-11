@@ -146,7 +146,7 @@ export const UserPulsesPage: React.FC = () => {
                     borderLeft: '3px solid #60a5fa',
                     borderTop: '1px solid rgba(96, 165, 250, 0.3)',
                     borderRight: '1px solid rgba(96, 165, 250, 0.3)',
-                    fontFamily: "'Courier New', Courier, monospace"
+                    fontFamily: '\'Courier New\', Courier, monospace'
                   }}>
                     <span style={{ fontSize: '1.1rem' }}>↻</span>
                     <span>@{username} echoed</span>
@@ -166,7 +166,7 @@ export const UserPulsesPage: React.FC = () => {
                       borderLeft: '3px solid #a78bfa',
                       borderTop: '1px solid rgba(167, 139, 250, 0.3)',
                       borderRight: '1px solid rgba(167, 139, 250, 0.3)',
-                      fontFamily: "'Courier New', Courier, monospace"
+                      fontFamily: '\'Courier New\', Courier, monospace'
                     }}
                   >
                     <span style={{ fontSize: '1.1rem' }}>↩</span>

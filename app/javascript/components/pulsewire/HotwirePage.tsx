@@ -194,7 +194,7 @@ export const HotwirePage: React.FC = () => {
                 </Link>
                 {' '}to broadcast on the WIRE
               </p>
-              <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontFamily: "'Courier New', monospace" }}>
+              <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontFamily: '\'Courier New\', monospace' }}>
                 Wideband Information Relay Emitter
               </p>
             </div>

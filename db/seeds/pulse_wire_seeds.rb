@@ -87,7 +87,7 @@ thread_root = Pulse.create!(
   pulsed_at: 1.day.ago + 4.hours
 )
 
-splice1 = Pulse.create!(
+Pulse.create!(
   grid_hackr: cipher,
   parent_pulse: thread_root,
   content: "That's the paradox at the heart of everything we do. Victory means his silence. He knows this. Transmits anyway. That's not sacrifice - it's love for a future he'll never see.",
