@@ -100,17 +100,31 @@ export const GridAmbientPlayer: React.FC<GridAmbientPlayerProps> = ({
       faderRef.current.destroy()
       if (audioARef.current) {
         audioARef.current.pause()
-        audioARef.current.src = ''
+        audioARef.current.removeAttribute('src')
+        audioARef.current.load() // Reset the audio element
       }
       if (audioBRef.current) {
         audioBRef.current.pause()
-        audioBRef.current.src = ''
+        audioBRef.current.removeAttribute('src')
+        audioBRef.current.load()
       }
 
       playlistRef.current = playlist
-      const randomIndex = Math.floor(Math.random() * playlist.tracks.length)
+
+      // Find a track with audio, starting from a random position
+      const playableTracks = playlist.tracks.filter(t => t.url)
+      if (playableTracks.length === 0) {
+        // No playable tracks in this playlist
+        onTrackChange?.(null)
+        return
+      }
+
+      const randomIndex = Math.floor(Math.random() * playableTracks.length)
+      const startTrack = playableTracks[randomIndex]
+      const actualIndex = playlist.tracks.findIndex(t => t.id === startTrack.id)
+
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCurrentIndex(randomIndex)
+      setCurrentIndex(actualIndex)
       // Set volume to playlist default if user hasn't customized it
       if (volume === 0.35) {
         onVolumeChange(playlist.default_volume)
@@ -118,16 +132,13 @@ export const GridAmbientPlayer: React.FC<GridAmbientPlayerProps> = ({
       setActiveElement('A')
 
       // Start playing the first track
-      if (audioARef.current) {
-        const track = playlist.tracks[randomIndex]
-        if (track.url) {
-          audioARef.current.src = track.url
-          audioARef.current.volume = muted ? 0 : volume
-          audioARef.current.play().catch((e) => {
-            console.error('Failed to start Grid ambient audio:', e)
-          })
-          onTrackChange?.(track)
-        }
+      if (audioARef.current && startTrack.url) {
+        audioARef.current.src = startTrack.url
+        audioARef.current.volume = muted ? 0 : volume
+        audioARef.current.play().catch((e) => {
+          console.error('Failed to start Grid ambient audio:', e)
+        })
+        onTrackChange?.(startTrack)
       }
     }
   }, [playlist, muted, volume, onVolumeChange, onTrackChange])
@@ -150,11 +161,13 @@ export const GridAmbientPlayer: React.FC<GridAmbientPlayerProps> = ({
       fader.destroy()
       if (audioA) {
         audioA.pause()
-        audioA.src = ''
+        audioA.removeAttribute('src')
+        audioA.load()
       }
       if (audioB) {
         audioB.pause()
-        audioB.src = ''
+        audioB.removeAttribute('src')
+        audioB.load()
       }
     }
   }, [])

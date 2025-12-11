@@ -79,81 +79,90 @@ govcorp_zone = GridZone.create!(
 puts "Created 4 zones"
 
 # Create zone playlists for ambient music
-# Find atmospheric artists and their tracks
+# IMPORTANT: Artists must be imported BEFORE running seeds (bin/rails import:from_yaml)
 wavelength_zero = Artist.find_by(slug: "wavelength_zero")
 cipher_protocol = Artist.find_by(slug: "cipher_protocol")
 temporal_blue_drift = Artist.find_by(slug: "temporal_blue_drift")
 
-# Create playlists if we have the artists
-if wavelength_zero
-  fracture_network_playlist = ZonePlaylist.create!(
-    name: "Fracture Network Ambience",
-    description: "Atmospheric music for Fracture Network zones",
-    crossfade_duration_ms: 5000,
-    default_volume: 0.35
-  )
+# Verify artists exist - fail loudly if not
+missing_artists = []
+missing_artists << "wavelength_zero" unless wavelength_zero
+missing_artists << "cipher_protocol" unless cipher_protocol
+missing_artists << "temporal_blue_drift" unless temporal_blue_drift
 
-  # Add all Wavelength Zero tracks to this playlist
-  wavelength_zero.tracks.each_with_index do |track, index|
-    ZonePlaylistTrack.create!(
-      zone_playlist: fracture_network_playlist,
-      track: track,
-      position: index + 1
-    )
-  end
+if missing_artists.any?
+  raise <<~ERROR
+    ❌ Missing required artists for zone playlists: #{missing_artists.join(", ")}
 
-  # Assign to hackr.tv zone and XERAEN base zone
-  hackr_tv_zone.update(ambient_playlist: fracture_network_playlist)
-  sector_x.update(ambient_playlist: fracture_network_playlist)
+    Run 'bin/rails import:from_yaml' before 'bin/rails db:seed' to import artist data.
 
-  puts "Created 'Fracture Network Ambience' playlist with #{fracture_network_playlist.tracks.count} tracks"
+    Correct order:
+      1. bin/rails db:create db:migrate
+      2. bin/rails import:from_yaml
+      3. bin/rails db:seed
+  ERROR
 end
 
-if cipher_protocol
-  transit_playlist = ZonePlaylist.create!(
-    name: "Transit Network Ambience",
-    description: "Instrumental ambience for neutral zones",
-    crossfade_duration_ms: 3000,
-    default_volume: 0.30
+# Fracture Network zones (hackr.tv Central, Sector X)
+fracture_network_playlist = ZonePlaylist.create!(
+  name: "Fracture Network Ambience",
+  description: "Atmospheric music for Fracture Network zones",
+  crossfade_duration_ms: 5000,
+  default_volume: 0.35
+)
+
+wavelength_zero.tracks.each_with_index do |track, index|
+  ZonePlaylistTrack.create!(
+    zone_playlist: fracture_network_playlist,
+    track: track,
+    position: index + 1
   )
-
-  # Add Cipher Protocol tracks
-  cipher_protocol.tracks.each_with_index do |track, index|
-    ZonePlaylistTrack.create!(
-      zone_playlist: transit_playlist,
-      track: track,
-      position: index + 1
-    )
-  end
-
-  # Assign to transit zone
-  transit_zone.update(ambient_playlist: transit_playlist)
-
-  puts "Created 'Transit Network Ambience' playlist with #{transit_playlist.tracks.count} tracks"
 end
 
-if temporal_blue_drift
-  govcorp_playlist = ZonePlaylist.create!(
-    name: "GovCorp Surveillance Ambience",
-    description: "Unsettling atmospheric music for GovCorp zones",
-    crossfade_duration_ms: 6000,
-    default_volume: 0.25
+hackr_tv_zone.update!(ambient_playlist: fracture_network_playlist)
+sector_x.update!(ambient_playlist: fracture_network_playlist)
+
+puts "Created 'Fracture Network Ambience' playlist with #{fracture_network_playlist.tracks.count} tracks"
+
+# Transit Network zones
+transit_playlist = ZonePlaylist.create!(
+  name: "Transit Network Ambience",
+  description: "Instrumental ambience for neutral zones",
+  crossfade_duration_ms: 3000,
+  default_volume: 0.30
+)
+
+cipher_protocol.tracks.each_with_index do |track, index|
+  ZonePlaylistTrack.create!(
+    zone_playlist: transit_playlist,
+    track: track,
+    position: index + 1
   )
-
-  # Add Temporal Blue Drift tracks
-  temporal_blue_drift.tracks.each_with_index do |track, index|
-    ZonePlaylistTrack.create!(
-      zone_playlist: govcorp_playlist,
-      track: track,
-      position: index + 1
-    )
-  end
-
-  # Assign to GovCorp zone
-  govcorp_zone.update(ambient_playlist: govcorp_playlist)
-
-  puts "Created 'GovCorp Surveillance Ambience' playlist with #{govcorp_playlist.tracks.count} tracks"
 end
+
+transit_zone.update!(ambient_playlist: transit_playlist)
+
+puts "Created 'Transit Network Ambience' playlist with #{transit_playlist.tracks.count} tracks"
+
+# GovCorp zones
+govcorp_playlist = ZonePlaylist.create!(
+  name: "GovCorp Surveillance Ambience",
+  description: "Unsettling atmospheric music for GovCorp zones",
+  crossfade_duration_ms: 6000,
+  default_volume: 0.25
+)
+
+temporal_blue_drift.tracks.each_with_index do |track, index|
+  ZonePlaylistTrack.create!(
+    zone_playlist: govcorp_playlist,
+    track: track,
+    position: index + 1
+  )
+end
+
+govcorp_zone.update!(ambient_playlist: govcorp_playlist)
+
+puts "Created 'GovCorp Surveillance Ambience' playlist with #{govcorp_playlist.tracks.count} tracks"
 
 # Create rooms
 hackr_tv = GridRoom.create!(
