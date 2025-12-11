@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { generateSlug } from '../../utils/codexLinks'
+import { generateSlug, getRouteForSlug, getFallbackDisplayName } from '../../utils/codexLinks'
 
 interface CodexTextProps {
   children: React.ReactNode
@@ -45,12 +45,15 @@ export const CodexText: React.FC<CodexTextProps> = ({ children, className, style
       const entryName = match[1]
       const customText = match[2]
       const slug = generateSlug(entryName)
-      const displayText = customText || entryName
+      // Use custom text if provided, otherwise check fallback display names, then fall back to entry name
+      const displayText = customText || getFallbackDisplayName(slug) || entryName
+      // Get route (checks fallbacks for entries without Codex pages)
+      const route = getRouteForSlug(slug)
 
       parts.push(
         <Link
           key={`${keyPrefix}-${slug}-${match.index}`}
-          to={`/codex/${slug}`}
+          to={route}
           className="codex-link"
           style={{ color: 'inherit', textDecoration: 'underline' }}
         >

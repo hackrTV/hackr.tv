@@ -272,6 +272,57 @@ export const CodexEntryPage: React.FC = () => {
                           }}
                           {...props}
                         />
+                      ),
+                      table: ({ _node, ...props }) => (
+                        <table
+                          style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            marginBottom: '20px',
+                            background: '#0a0a0a',
+                            border: `1px solid ${typeColor}`
+                          }}
+                          {...props}
+                        />
+                      ),
+                      thead: ({ _node, ...props }) => (
+                        <thead
+                          style={{
+                            background: typeColor,
+                            color: '#000'
+                          }}
+                          {...props}
+                        />
+                      ),
+                      th: ({ _node, ...props }) => (
+                        <th
+                          style={{
+                            padding: '12px 15px',
+                            textAlign: 'left',
+                            fontWeight: 'bold',
+                            borderBottom: `2px solid ${typeColor}`
+                          }}
+                          {...props}
+                        />
+                      ),
+                      td: ({ _node, ...props }) => (
+                        <td
+                          style={{
+                            padding: '10px 15px',
+                            borderBottom: '1px solid #333'
+                          }}
+                          {...props}
+                        />
+                      ),
+                      tr: ({ _node, ...props }) => (
+                        <tr
+                          style={{
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#1a1a1a'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          {...props}
+                        />
                       )
                     }}
                   >
