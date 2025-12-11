@@ -7,6 +7,9 @@
  * When mappings are provided, links always display the canonical entry name
  * from the database (e.g., [[xeraen]], [[the-pulse-grid]], [[XERAEN]] will all
  * display as "XERAEN" and "The Pulse Grid" respectively).
+ *
+ * For entries without Codex pages (e.g., bands), fallback routes can be
+ * configured to link to band profile pages instead.
  */
 
 /**
@@ -14,6 +17,51 @@
  * e.g., { "xeraen": "XERAEN", "the-pulse-grid": "The Pulse Grid" }
  */
 export type CodexMappings = Record<string, string>
+
+/**
+ * Fallback routes for entries without Codex pages
+ * Maps slug -> { route: string, displayName: string }
+ *
+ * When a [[Entry Name]] reference doesn't have a Codex entry,
+ * check this mapping to link to an alternative page (e.g., band profiles)
+ */
+export const CODEX_FALLBACK_ROUTES: Record<string, { route: string; displayName: string }> = {
+  'voiceprint': { route: '/voiceprint', displayName: 'Voiceprint' },
+  'cipher-protocol': { route: '/cipher_protocol', displayName: 'Cipher Protocol' },
+  'injection-vector': { route: '/injection_vector', displayName: 'Injection Vector' },
+  'wavelength-zero': { route: '/wavelength_zero', displayName: 'Wavelength Zero' },
+  'system-rot': { route: '/system_rot', displayName: 'System Rot' },
+  'temporal-blue-drift': { route: '/temporal_blue_drift', displayName: 'Temporal Blue Drift' },
+  'offline': { route: '/offline', displayName: 'Offline' },
+  'apex-overdrive': { route: '/apex_overdrive', displayName: 'Apex Overdrive' },
+  'neon-hearts': { route: '/neon_hearts', displayName: 'Neon Hearts (ネオンハーツ)' },
+  'ethereality': { route: '/ethereality', displayName: 'Ethereality' },
+  'blitzbeam': { route: '/blitzbeam', displayName: 'BlitzBeam+' },
+}
+
+/**
+ * Gets the route for a given slug, checking fallbacks if no Codex entry exists
+ *
+ * @param slug - The entry slug
+ * @returns The route path (either /codex/{slug} or a fallback route)
+ */
+export const getRouteForSlug = (slug: string): string => {
+  const fallback = CODEX_FALLBACK_ROUTES[slug]
+  if (fallback) {
+    return fallback.route
+  }
+  return `/codex/${slug}`
+}
+
+/**
+ * Gets the display name for a slug from fallback routes
+ *
+ * @param slug - The entry slug
+ * @returns The display name if found in fallbacks, undefined otherwise
+ */
+export const getFallbackDisplayName = (slug: string): string | undefined => {
+  return CODEX_FALLBACK_ROUTES[slug]?.displayName
+}
 
 /**
  * Generates a slug from an entry name using the same algorithm as CodexEntry model
@@ -65,9 +113,11 @@ export const generateSlug = (name: string): string => {
 export const transformMarkdownLinks = (content: string, mappings?: CodexMappings): string => {
   return content.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_match, entryName, customText) => {
     const slug = generateSlug(entryName)
-    // Use custom text if provided, otherwise use canonical name from mappings, or fall back to entry name
-    const displayName = customText || (mappings && mappings[slug]) || entryName
-    return `[${displayName}](/codex/${slug})`
+    // Use custom text if provided, otherwise use canonical name from mappings, then fallbacks, then entry name
+    const displayName = customText || (mappings && mappings[slug]) || getFallbackDisplayName(slug) || entryName
+    // Get route (checks fallbacks for entries without Codex pages)
+    const route = getRouteForSlug(slug)
+    return `[${displayName}](${route})`
   })
 }
 
@@ -106,10 +156,12 @@ export const transformHtmlLinks = (
 ): string => {
   return content.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_match, entryName, customText) => {
     const slug = generateSlug(entryName)
-    // Use custom text if provided, otherwise use canonical name from mappings, or fall back to entry name
-    const displayName = customText || (mappings && mappings[slug]) || entryName
+    // Use custom text if provided, otherwise use canonical name from mappings, then fallbacks, then entry name
+    const displayName = customText || (mappings && mappings[slug]) || getFallbackDisplayName(slug) || entryName
+    // Get route (checks fallbacks for entries without Codex pages)
+    const route = getRouteForSlug(slug)
     const classAttr = className ? ` class="${className}"` : ''
-    return `<a href="/codex/${slug}"${classAttr}>${displayName}</a>`
+    return `<a href="${route}"${classAttr}>${displayName}</a>`
   })
 }
 
