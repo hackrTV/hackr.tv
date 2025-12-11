@@ -57,7 +57,7 @@ export const BandsPage: React.FC = () => {
     const futureYear = currentYear + 100
     const descriptions: { [key: string]: string } = {
       'thecyberpulse': `The original Fracture Network band, forging metal manifestos from ${futureYear} with brutal precision.`,
-      'xeraen': 'Raw, unfiltered rage against GovCorp tyranny delivered at breakneck hackrcore speed.',
+      'xeraen': 'OMNIWAVE Genesis Vector - Electronic exploration with rhythmic guitars',
       'injection_vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
       'wavelength_zero': 'Where technical precision meets raw emotion in perfect destructive atmospheric harmony.',
       'cipher_protocol': 'Data couriers wielding djent as encryption. No vocals. Pure instrumental algorithmic assault.',
@@ -81,10 +81,10 @@ export const BandsPage: React.FC = () => {
 
           <div>
             <h2 style={{ textAlign: 'center', marginBottom: '15px', color: '#10b981' }}>
-              [:: SECTOR X MEDIA ROSTER ::]
+              [:: FRACTURE NETWORK BANDS ::]
             </h2>
 
-            {loading && <LoadingSpinner message="Loading Sector X Media roster..." color="green-255-text" />}
+            {loading && <LoadingSpinner message="Loading Fracture Network bands..." color="green-255-text" />}
 
             {error && (
               <div style={{ padding: '40px', textAlign: 'center' }}>
@@ -161,10 +161,10 @@ export const BandsPage: React.FC = () => {
                 )}
 
                 <div style={{ marginTop: '30px', padding: '20px', background: '#0a0a0a', border: '1px solid #333' }}>
-                  <h3 style={{ marginBottom: '10px', color: '#10b981' }}>[:: ABOUT SECTOR X MEDIA ::]</h3>
+                  <h3 style={{ marginBottom: '10px', color: '#10b981' }}>[:: ABOUT THE FRACTURE NETWORK ::]</h3>
                   <p style={{ lineHeight: '1.6', color: '#888' }}>
-                    Sector X Media represents the underground music collective broadcasting resistance through time.
-                    Every artist here is part of THE PULSE GRID universe, fighting GovCorp control through
+                    These bands broadcast resistance through time under the loose banner of the Fracture Network.
+                    Every artist here is connected to THE PULSE GRID, fighting GovCorp control through
                     creativity, collaboration, and uncompromising artistic vision. From {currentYear} to {currentYear + 100}, the signal
                     continues.
                   </p>

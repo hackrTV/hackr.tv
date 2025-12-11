@@ -376,19 +376,21 @@ namespace :import do
 
     artists_data.each do |artist_data|
       artist = Artist.find_or_initialize_by(slug: artist_data["slug"])
+      artist_type = artist_data["artist_type"] || "band"
 
       if artist.new_record?
         artist.name = artist_data["name"]
         artist.genre = artist_data["genre"]
+        artist.artist_type = artist_type
         artist.save!
         created_count += 1
-        puts "  ✓ Created artist: #{artist.name} (#{artist.slug}) - #{artist.genre}"
-      elsif artist.name != artist_data["name"] || artist.genre != artist_data["genre"]
-        artist.update!(name: artist_data["name"], genre: artist_data["genre"])
+        puts "  ✓ Created artist: #{artist.name} (#{artist.slug}) - #{artist.genre} [#{artist_type}]"
+      elsif artist.name != artist_data["name"] || artist.genre != artist_data["genre"] || artist.artist_type != artist_type
+        artist.update!(name: artist_data["name"], genre: artist_data["genre"], artist_type: artist_type)
         updated_count += 1
-        puts "  ↻ Updated artist: #{artist.name} (#{artist.slug}) - #{artist.genre}"
+        puts "  ↻ Updated artist: #{artist.name} (#{artist.slug}) - #{artist.genre} [#{artist_type}]"
       else
-        puts "  ✓ Artist exists: #{artist.name} (#{artist.slug}) - #{artist.genre}"
+        puts "  ✓ Artist exists: #{artist.name} (#{artist.slug}) - #{artist.genre} [#{artist.artist_type}]"
       end
     end
 

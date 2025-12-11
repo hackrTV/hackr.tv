@@ -1,14 +1,23 @@
 module Api
   class ArtistsController < ApplicationController
     # GET /api/artists
+    # Params: type (band/ost/voiceover) - defaults to "band" for backwards compatibility
     def index
-      @artists = Artist.all.order(:name)
-      render json: @artists.map { |artist|
+      @artists = if params[:type].present? && Artist::ARTIST_TYPES.include?(params[:type])
+        Artist.where(artist_type: params[:type])
+      elsif params[:type] == "all"
+        Artist.all
+      else
+        Artist.bands
+      end
+
+      render json: @artists.order(:name).map { |artist|
         {
           id: artist.id,
           name: artist.name,
           slug: artist.slug,
           genre: artist.genre,
+          artist_type: artist.artist_type,
           track_count: artist.tracks.count
         }
       }
