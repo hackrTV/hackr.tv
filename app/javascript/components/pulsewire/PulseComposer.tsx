@@ -11,7 +11,7 @@ interface PulseComposerProps {
 export const PulseComposer: React.FC<PulseComposerProps> = ({
   onPulseCreated,
   parentPulseId = null,
-  placeholder = 'Broadcast to the Wire...',
+  placeholder = 'Broadcast on the WIRE...',
   autoFocus = false
 }) => {
   const [content, setContent] = useState('')

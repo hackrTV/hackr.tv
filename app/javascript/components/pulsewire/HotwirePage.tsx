@@ -167,7 +167,7 @@ export const HotwirePage: React.FC = () => {
     <DefaultLayout showAsciiArt={false}>
       <div className="hotwire-page white-168-text" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '30px' }}>
         <div className="hotwire-header">
-          <h1>The Wire</h1>
+          <h1 title="Wideband Information Relay Emitter">The WIRE</h1>
           <div className="wire-status">
             {isConnected ? (
               <span className="status-connected">● LIVE</span>
@@ -192,7 +192,10 @@ export const HotwirePage: React.FC = () => {
                 <Link to="/grid/login" style={{ color: '#60a5fa', textDecoration: 'none' }}>
                 Log in
                 </Link>
-                {' '}to send a pulse across the Wire
+                {' '}to broadcast on the WIRE
+              </p>
+              <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontFamily: '\'Courier New\', monospace' }}>
+                Wideband Information Relay Emitter
               </p>
             </div>
           )}
@@ -201,7 +204,10 @@ export const HotwirePage: React.FC = () => {
         <div className="hotwire-timeline">
           {pulses.length === 0 ? (
             <div className="empty-state">
-              <p>The Wire is silent. Broadcast the first pulse.</p>
+              <p>The WIRE is silent. Broadcast the first pulse.</p>
+              <p style={{ color: '#444', fontSize: '0.8rem', marginTop: '10px' }}>
+                Wideband Information Relay Emitter
+              </p>
             </div>
           ) : (
             <>
@@ -220,7 +226,12 @@ export const HotwirePage: React.FC = () => {
               )}
 
               {!hasMore && pulses.length > 0 && (
-                <div className="end-of-feed">End of the Wire</div>
+                <div className="end-of-feed">
+                  <p>End of the WIRE</p>
+                  <p style={{ color: '#444', fontSize: '0.75rem', marginTop: '10px' }}>
+                    W.I.R.E. // Wideband Information Relay Emitter
+                  </p>
+                </div>
               )}
             </>
           )}

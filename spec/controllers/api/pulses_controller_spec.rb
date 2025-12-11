@@ -117,6 +117,44 @@ RSpec.describe Api::PulsesController, type: :controller do
       end
     end
 
+    context "with echoed_by filter" do
+      it "returns pulses that a specific user has echoed" do
+        pulse1 = create(:pulse, grid_hackr: hackr)
+        pulse2 = create(:pulse, grid_hackr: hackr)
+        pulse3 = create(:pulse, grid_hackr: hackr)
+
+        # other_hackr echoes pulse1 and pulse2
+        create(:echo, pulse: pulse1, grid_hackr: other_hackr)
+        create(:echo, pulse: pulse2, grid_hackr: other_hackr)
+
+        get :index, params: {echoed_by: other_hackr.hackr_alias}, format: :json
+
+        json = JSON.parse(response.body)
+        pulse_ids = json["pulses"].map { |p| p["id"] }
+        expect(pulse_ids).to include(pulse1.id, pulse2.id)
+        expect(pulse_ids).not_to include(pulse3.id)
+      end
+
+      it "is case-insensitive" do
+        pulse = create(:pulse, grid_hackr: hackr)
+        create(:echo, pulse: pulse, grid_hackr: other_hackr)
+
+        get :index, params: {echoed_by: other_hackr.hackr_alias.upcase}, format: :json
+
+        json = JSON.parse(response.body)
+        expect(json["pulses"].length).to eq(1)
+        expect(json["pulses"][0]["id"]).to eq(pulse.id)
+      end
+
+      it "returns empty array for non-existent hackr" do
+        get :index, params: {echoed_by: "NonExistent"}, format: :json
+
+        json = JSON.parse(response.body)
+        expect(json["pulses"]).to be_empty
+        expect(json["meta"]["total"]).to eq(0)
+      end
+    end
+
     context "pagination" do
       it "paginates results" do
         create_list(:pulse, 120, grid_hackr: hackr)

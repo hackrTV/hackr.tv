@@ -87,7 +87,7 @@ export const ThreadView: React.FC<ThreadViewProps> = ({
       </div>
 
       <div className="back-link" style={{ marginBottom: '20px', marginTop: '10px' }}>
-        <Link to="/wire">← Back to the Wire</Link>
+        <Link to="/wire">← Back to the WIRE</Link>
       </div>
 
       <div className="thread-container">

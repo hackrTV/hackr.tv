@@ -91,7 +91,7 @@ export const SinglePulsePage: React.FC = () => {
         />
 
         <div className="back-link">
-          <Link to="/wire">← Back to the Wire</Link>
+          <Link to="/wire">← Back to the WIRE</Link>
         </div>
       </div>
     </DefaultLayout>
