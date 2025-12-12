@@ -276,16 +276,26 @@ GridMob.create!(
 puts "Created 2 mobs"
 
 # Create admin hackrs
+# In production, require environment variables for admin passwords
+# In development/test, use defaults for convenience
+if Rails.env.production?
+  xeraen_password = ENV.fetch("XERAEN_PASSWORD") { raise "XERAEN_PASSWORD environment variable required in production" }
+  ryker_password = ENV.fetch("RYKER_PASSWORD") { raise "RYKER_PASSWORD environment variable required in production" }
+else
+  xeraen_password = ENV.fetch("XERAEN_PASSWORD", "hackthefuture")
+  ryker_password = ENV.fetch("RYKER_PASSWORD", "cyberpulse")
+end
+
 GridHackr.create!(
   hackr_alias: "XERAEN",
-  password: "hackthefuture",
+  password: xeraen_password,
   role: "admin",
   current_room: hackr_tv
 )
 
 GridHackr.create!(
   hackr_alias: "Ryker",
-  password: "cyberpulse",
+  password: ryker_password,
   role: "admin",
   current_room: hackr_tv
 )
@@ -293,6 +303,10 @@ GridHackr.create!(
 puts "Created 2 admin hackrs"
 
 puts "\n✓ THE PULSE GRID seeded successfully!"
-puts "Admin accounts:"
-puts "  - XERAEN / hackthefuture"
-puts "  - Ryker / cyberpulse"
+if Rails.env.production?
+  puts "Admin accounts created with passwords from environment variables."
+else
+  puts "Admin accounts (development defaults):"
+  puts "  - XERAEN / hackthefuture"
+  puts "  - Ryker / cyberpulse"
+end
