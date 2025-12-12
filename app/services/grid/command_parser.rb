@@ -10,6 +10,11 @@ module Grid
       @event = nil
     end
 
+    # Escape HTML to prevent XSS attacks from user input
+    def h(text)
+      ERB::Util.html_escape(text.to_s)
+    end
+
     def execute
       return {output: "<span style='color: #fbbf24;'>Please enter a command.</span>", event: nil} if input.empty?
 
@@ -56,7 +61,7 @@ module Grid
       when "clear", "cls"
         clear_command
       else
-        "<span style='color: #f87171;'>Unknown command: #{command}. Type 'help' for a list of commands.</span>"
+        "<span style='color: #f87171;'>Unknown command: #{h(command)}. Type 'help' for a list of commands.</span>"
       end
 
       # Normalize result to hash format
@@ -188,7 +193,7 @@ module Grid
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", item_name.downcase)
-      return "<span style='color: #f87171;'>You don't see '#{item_name}' here.</span>" unless item
+      return "<span style='color: #f87171;'>You don't see '#{h(item_name)}' here.</span>" unless item
 
       item.update!(grid_hackr: hackr, room: nil)
 
@@ -207,7 +212,7 @@ module Grid
       return "<span style='color: #fbbf24;'>Drop what?</span>" if item_name.empty?
 
       item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
-      return "<span style='color: #f87171;'>You don't have '#{item_name}'.</span>" unless item
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       room = hackr.current_room
       item.update!(room: room, grid_hackr: nil)
@@ -241,7 +246,7 @@ module Grid
       mob = room.grid_mobs.find_by("LOWER(name) = ?", target.downcase)
       return "<span style='color: #d0d0d0;'>#{codex_linkify(mob.description)}</span>" if mob
 
-      "<span style='color: #f87171;'>You don't see '#{target}' here.</span>"
+      "<span style='color: #f87171;'>You don't see '#{h(target)}' here.</span>"
     end
 
     def talk_command(npc_name)
@@ -253,16 +258,16 @@ module Grid
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
-      return "<span style='color: #f87171;'>You don't see '#{npc_name}' here.</span>" unless mob
-      return "<span style='color: #9ca3af;'>#{mob.name} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
+      return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
+      return "<span style='color: #9ca3af;'>#{h(mob.name)} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
       dialogue = mob.dialogue_tree
       content = []
-      content << "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{dialogue["greeting"]}\"</span>"
+      content << "<span style='color: #c084fc;'>#{h(mob.name)}</span>: <span style='color: #60a5fa;'>\"#{h(dialogue["greeting"])}\"</span>"
 
       if dialogue["topics"].present? && dialogue["topics"].any?
         content << ""
-        content << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{dialogue["topics"].keys.join(", ")}</span>"
+        content << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{dialogue["topics"].keys.map { |k| h(k) }.join(", ")}</span>"
       end
 
       dialogue_box(content.join("\n"))
@@ -289,8 +294,8 @@ module Grid
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
-      return "<span style='color: #f87171;'>You don't see '#{npc_name}' here.</span>" unless mob
-      return "<span style='color: #9ca3af;'>#{mob.name} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
+      return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
+      return "<span style='color: #9ca3af;'>#{h(mob.name)} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
       dialogue = mob.dialogue_tree
       topics = dialogue["topics"] || {}
@@ -299,10 +304,10 @@ module Grid
       response = topics[topic] || topics[topic.downcase] || topics.find { |k, v| k.downcase == topic.downcase }&.last
 
       if response
-        content = "<span style='color: #c084fc;'>#{mob.name}</span>: <span style='color: #60a5fa;'>\"#{response}\"</span>"
+        content = "<span style='color: #c084fc;'>#{h(mob.name)}</span>: <span style='color: #60a5fa;'>\"#{h(response)}\"</span>"
       else
-        available = topics.keys.join(", ")
-        content = "<span style='color: #c084fc;'>#{mob.name}</span> doesn't know about '#{topic}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
+        available = topics.keys.map { |k| h(k) }.join(", ")
+        content = "<span style='color: #c084fc;'>#{h(mob.name)}</span> doesn't know about '#{h(topic)}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
       end
       dialogue_box(content)
     end

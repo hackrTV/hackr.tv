@@ -159,9 +159,10 @@
 
 ## 🎮 Playing THE PULSE GRID
 
-**Default Login Credentials:**
-- Username: `XERAEN`
-- Password: `hackthefuture`
+**Login:** Create an account at `/grid/register`, or create one via Rails console if running locally:
+```ruby
+GridHackr.create!(hackr_alias: "YourName", password: "yourpassword", role: "admin")
+```
 
 **Available Commands:**
 ```

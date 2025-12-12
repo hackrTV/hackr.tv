@@ -49,6 +49,9 @@ gem "redcarpet"
 # Profanity filtering for user-generated content
 gem "obscenity"
 
+# Rate limiting and request throttling
+gem "rack-attack"
+
 # ViewComponent for reusable components
 gem "view_component"
 
