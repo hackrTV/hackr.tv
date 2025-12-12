@@ -133,7 +133,7 @@
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
-  audio_file: "breach-point.mp3"
+  audio_file: "breach-point.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -242,7 +242,7 @@
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
-  audio_file: "kinetic-strike.mp3"
+  audio_file: "kinetic-strike.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -347,7 +347,7 @@
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
-  audio_file: "ghost-protocol.mp3"
+  audio_file: "ghost-protocol.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -457,7 +457,7 @@
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
-  audio_file: "rust-and-ruin.mp3"
+  audio_file: "rust-and-ruin.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -564,7 +564,7 @@
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
-  audio_file: "we-are-the-injection.mp3"
+  audio_file: "we-are-the-injection.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -1279,7 +1279,7 @@
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
-  audio_file: "encryption-sequence.mp3"
+  audio_file: "encryption-sequence.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1302,7 +1302,7 @@
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
-  audio_file: "harmonic-divergence.mp3"
+  audio_file: "harmonic-divergence.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1325,7 +1325,7 @@
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
-  audio_file: "null-cipher.mp3"
+  audio_file: "null-cipher.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -1348,7 +1348,7 @@
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
-  audio_file: "convolution-waveform.mp3"
+  audio_file: "convolution-waveform.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1360,8 +1360,8 @@
   lyrics: |
     [INSTRUMENTAL TRACK]
 
-- title: "Carrier Wave Collapse"
-  slug: "carrier-wave-collapse"
+- title: "Carrier Signal Collapse"
+  slug: "carrier-signal-collapse"
   artist: "CIPHER PROTOCOL"
   album: "Alpha Algorithm"
   album_type: "ep"
@@ -1371,7 +1371,7 @@
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
-  audio_file: "carrier-wave-collapse.mp3"
+  audio_file: "carrier-signal-collapse.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -1911,7 +1911,7 @@
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
-  audio_file: "disconnect.mp3"
+  audio_file: "disconnect.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -1981,7 +1981,7 @@
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
-  audio_file: "whatever-man.mp3"
+  audio_file: "whatever-man.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2040,8 +2040,8 @@
     Whatever, man
     Whatever
 
-- title: "Analog Heart"
-  slug: "analog-heart"
+- title: "Analog"
+  slug: "analog"
   artist: "OFFLINE"
   album: "Unplugged"
   album_type: "ep"
@@ -2051,7 +2051,7 @@
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
-  audio_file: "analog-heart.mp3"
+  audio_file: "analog.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2128,7 +2128,7 @@
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
-  audio_file: "static-reality.mp3"
+  audio_file: "static-reality.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2198,7 +2198,7 @@
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
-  audio_file: "dead-signal.mp3"
+  audio_file: "dead-signal.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2591,7 +2591,7 @@
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
-  audio_file: "candy-coded.mp3"
+  audio_file: "candy-coded.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2678,7 +2678,7 @@
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
-  audio_file: "kaleidoscopic.mp3"
+  audio_file: "kaleidoscopic.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2767,7 +2767,7 @@
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
-  audio_file: "glitchframe.mp3"
+  audio_file: "glitchframe.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -2855,7 +2855,7 @@
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
-  audio_file: "hearts-in-sync.mp3"
+  audio_file: "hearts-in-sync.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -2942,7 +2942,7 @@
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
-  audio_file: "starlight-rebellion.mp3"
+  audio_file: "starlight-rebellion.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -3037,7 +3037,7 @@
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
-  audio_file: "awakening.mp3"
+  audio_file: "awakening.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -3124,7 +3124,7 @@
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
-  audio_file: "transcendent.mp3"
+  audio_file: "transcendent.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -3212,7 +3212,7 @@
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
-  audio_file: "higher-state.mp3"
+  audio_file: "higher-state.ogg"
   featured: false
   streaming_links:
     # spotify: ""
@@ -3302,7 +3302,7 @@
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
-  audio_file: "eternal-signal.mp3"
+  audio_file: "eternal-signal.ogg"
   featured: true
   streaming_links:
     # spotify: ""
@@ -3393,7 +3393,7 @@
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
-  audio_file: "infinite-horizon.mp3"
+  audio_file: "infinite-horizon.ogg"
   featured: true
   streaming_links:
     # spotify: ""
