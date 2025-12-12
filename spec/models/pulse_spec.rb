@@ -39,6 +39,25 @@ RSpec.describe Pulse, type: :model do
 
       expect(splice).to be_valid
     end
+
+    describe "profanity filtering" do
+      it "allows clean content" do
+        pulse = build(:pulse, content: "Hello world from THE WIRE")
+        expect(pulse).to be_valid
+      end
+
+      it "rejects content with profanity" do
+        pulse = build(:pulse, content: "This is some shit content")
+        expect(pulse).not_to be_valid
+        expect(pulse.errors[:content].first).to start_with("GOVCORP CENSOR:")
+      end
+
+      it "returns GovCorp themed rejection message" do
+        pulse = build(:pulse, content: "What the fuck is this")
+        pulse.valid?
+        expect(pulse.errors[:content].first).to include("GOVCORP CENSOR")
+      end
+    end
   end
 
   describe "callbacks" do

@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :pulse do
     association :grid_hackr
-    content { Faker::Lorem.sentence(word_count: 10) }
+    sequence(:content) { |n| "Pulse transmission #{n} from THE WIRE network" }
     # pulsed_at is auto-set by the model
     echo_count { 0 }
     splice_count { 0 }

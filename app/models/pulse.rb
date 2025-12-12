@@ -1,4 +1,6 @@
 class Pulse < ApplicationRecord
+  include ProfanityFilterable
+
   belongs_to :grid_hackr
   belongs_to :parent_pulse, class_name: "Pulse", optional: true
   belongs_to :thread_root, class_name: "Pulse", optional: true
@@ -9,6 +11,7 @@ class Pulse < ApplicationRecord
   validates :content, presence: true, length: {maximum: 256}
   validates :pulsed_at, presence: true
   validate :cannot_splice_signal_dropped_pulse
+  filter_profanity :content
 
   before_validation :set_pulsed_at, on: :create
   before_save :set_thread_root
