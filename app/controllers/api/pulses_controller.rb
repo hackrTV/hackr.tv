@@ -98,9 +98,11 @@ module Api
           pulse: pulse_json(@pulse)
         }, status: :created
       else
+        # Use content errors directly to avoid "Content" prefix on profanity errors
+        error_message = @pulse.errors[:content].first || @pulse.errors.full_messages.join(", ")
         render json: {
           success: false,
-          error: @pulse.errors.full_messages.join(", ")
+          error: error_message
         }, status: :unprocessable_entity
       end
     end

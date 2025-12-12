@@ -278,5 +278,47 @@ RSpec.describe Grid::CommandParser do
         expect(result[:output]).to include(mob.description)
       end
     end
+
+    describe "say command" do
+      context "with clean message" do
+        let(:input) { "say Hello fellow hackrs!" }
+
+        it "creates a grid message" do
+          expect { parser.execute }.to change(GridMessage, :count).by(1)
+        end
+
+        it "returns hash with nil output and event for broadcast" do
+          result = parser.execute
+          expect(result).to have_key(:output)
+          expect(result).to have_key(:event)
+          # Output is nil because the broadcast handles display
+          expect(result[:output]).to be_nil
+          expect(result[:event][:type]).to eq("say")
+          expect(result[:event][:message]).to eq("Hello fellow hackrs!")
+        end
+      end
+
+      context "with profanity in message" do
+        let(:input) { "say This is some bullshit" }
+
+        it "does not create a grid message" do
+          expect { parser.execute }.not_to change(GridMessage, :count)
+        end
+
+        it "returns GovCorp rejection message" do
+          result = parser.execute
+          expect(result[:output]).to include("GOVCORP CENSOR:")
+        end
+      end
+
+      context "with empty message" do
+        let(:input) { "say" }
+
+        it "returns a prompt message" do
+          result = parser.execute
+          expect(result[:output]).to include("Say what?")
+        end
+      end
+    end
   end
 end

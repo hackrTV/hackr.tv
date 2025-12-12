@@ -139,17 +139,30 @@ module Grid
     end
 
     def say_command(message)
-      return "<span style='color: #fbbf24;'>Say what?</span>" if message.empty?
+      if message.empty?
+        return {
+          output: "<span style='color: #fbbf24;'>Say what?</span>",
+          event: nil
+        }
+      end
 
-      GridMessage.create!(
+      grid_message = GridMessage.new(
         grid_hackr: hackr,
         room: hackr.current_room,
         message_type: "say",
         content: message
       )
 
+      unless grid_message.save
+        return {
+          output: "<span style='color: #ef4444;'>#{grid_message.errors[:content].first || "Transmission failed."}</span>",
+          event: nil
+        }
+      end
+
+      # Don't return output - the broadcast handles displaying the message to everyone including sender
       {
-        output: "<span style='color: #a78bfa;'>[#{hackr.hackr_alias}]</span>: #{message}",
+        output: nil,
         event: {
           type: "say",
           hackr_alias: hackr.hackr_alias,
