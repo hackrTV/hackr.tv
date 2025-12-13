@@ -24,7 +24,7 @@ cyberpulse_faction = GridFaction.create!(
 xeraen_faction = GridFaction.create!(
   name: "XERAEN",
   slug: "xeraen",
-  description: "Temporal guardian broadcasting from #{Time.now.year + 100} to #{Time.now.year}.",
+  description: "Temporal guardian broadcasting from #{Time.current.year + 100} to #{Time.current.year}.",
   color_scheme: "purple",
   artist: Artist.find_by(slug: "xeraen")
 )
@@ -76,7 +76,16 @@ govcorp_zone = GridZone.create!(
   grid_faction: govcorp_faction
 )
 
-puts "Created 4 zones"
+hackr_hangar_zone = GridZone.create!(
+  name: "The Hackr Hangar",
+  slug: "hackr_hangar",
+  description: "Ryker M. Pulse's headquarters and primary broadcast facility. Where the raw signal is created before transmission to Sector X.",
+  zone_type: "faction_base",
+  color_scheme: "purple/cyan",
+  grid_faction: cyberpulse_faction
+)
+
+puts "Created 5 zones"
 
 # Create zone playlists for ambient music
 # IMPORTANT: Artists must be imported BEFORE running seeds (bin/rails import:from_yaml)
@@ -121,6 +130,7 @@ end
 
 hackr_tv_zone.update!(ambient_playlist: fracture_network_playlist)
 sector_x.update!(ambient_playlist: fracture_network_playlist)
+hackr_hangar_zone.update!(ambient_playlist: fracture_network_playlist)
 
 puts "Created 'Fracture Network Ambience' playlist with #{fracture_network_playlist.tracks.count} tracks"
 
@@ -193,7 +203,14 @@ govcorp_sector = GridRoom.create!(
   room_type: "govcorp"
 )
 
-puts "Created 4 rooms"
+rhythm_nexus = GridRoom.create!(
+  name: "The Rhythm Nexus",
+  description: "Ryker's domain. A cavernous space converted into a combination recording studio, performance venue, and resistance headquarters. Drum kits and recording equipment share space with server racks. Vintage analog gear - tape machines, tube amplifiers, physical mixing boards - stands alongside digital systems. Purple and cyan neon cuts through the darkness. The air vibrates with potential energy even when no one's playing.",
+  grid_zone: hackr_hangar_zone,
+  room_type: "faction_base"
+)
+
+puts "Created 5 rooms"
 
 # Create exits
 GridExit.create!(from_room: hackr_tv, to_room: transit_hall, direction: "north")
@@ -202,8 +219,10 @@ GridExit.create!(from_room: transit_hall, to_room: xeraen_base, direction: "west
 GridExit.create!(from_room: xeraen_base, to_room: transit_hall, direction: "east")
 GridExit.create!(from_room: transit_hall, to_room: govcorp_sector, direction: "east", locked: true)
 GridExit.create!(from_room: govcorp_sector, to_room: transit_hall, direction: "west")
+GridExit.create!(from_room: hackr_tv, to_room: rhythm_nexus, direction: "west")
+GridExit.create!(from_room: rhythm_nexus, to_room: hackr_tv, direction: "east")
 
-puts "Created 6 exits"
+puts "Created 8 exits"
 
 # Create starter items
 GridItem.create!(
@@ -244,7 +263,7 @@ GridMob.create!(
       "help" => "If you're looking to contribute, we always need hackrs to breach RIDE infrastructure, gather intel, and protect our trans-temporal operations.",
       "station" => "This station has been broadcasting since XERAEN's discovery. Every piece of equipment here was built to exploit the temporal window he found.",
       "synthia" => "Synthia... she's something else. An AI consciousness that communicates through frequency modulation. How she came to be aware is... unclear. But she's with us.",
-      "govcorp" => "The corporate-government fusion that controls everything in #{Time.now.year + 100} through the RIDE - their reality manipulation system. Most people don't even know it exists.",
+      "govcorp" => "The corporate-government fusion that controls everything in #{Time.current.year + 100} through the RIDE - their reality manipulation system. Most people don't even know it exists.",
       "ride" => "The RIDE - Reality Interference and Dictation Environment. GovCorp's worldwide reality manipulation system. Most citizens live inside it without knowing. We breach it. We fight it.",
       "prism" => "PRISM was the precursor - reality manipulation tech from 2050. The RIDE is what it became. Global. Pervasive. Inescapable. Unless you know where to look."
     }
@@ -262,9 +281,9 @@ GridMob.create!(
     topics: {
       "time" => "Time isn't linear when you're broadcasting through it. Every message XERAEN sends creates ripples, possibilities, potential paradoxes.",
       "paradox" => "The grandfather paradox? Child's play. We're dealing with informational paradoxes - knowledge sent back that creates the conditions for its own transmission.",
-      "xeraen" => "XERAEN discovered trans-temporal transmission by accident - during an attack on the RIDE. Now he's a temporal anchor point, broadcasting from #{Time.now.year + 100} to prevent that timeline.",
-      "future" => "#{Time.now.year + 100} is... dark. Reality itself is controlled through the RIDE. Creative expression criminalized. But it's not fixed. That's why we fight.",
-      (Time.now.year + 100).to_s => "In #{Time.now.year + 100}, GovCorp controls reality through the RIDE. Music became dangerous. Free thought became terrorism. XERAEN broadcasts to prevent that timeline.",
+      "xeraen" => "XERAEN discovered trans-temporal transmission by accident - during an attack on the RIDE. Now he's a temporal anchor point, broadcasting from #{Time.current.year + 100} to prevent that timeline.",
+      "future" => "#{Time.current.year + 100} is... dark. Reality itself is controlled through the RIDE. Creative expression criminalized. But it's not fixed. That's why we fight.",
+      (Time.current.year + 100).to_s => "In #{Time.current.year + 100}, GovCorp controls reality through the RIDE. Music became dangerous. Free thought became terrorism. XERAEN broadcasts to prevent that timeline.",
       "prism" => "PRISM arrived in 2050 - technology that could physically alter reality. By 2109, GovCorp expanded it into the RIDE. Most people have no idea their reality is manufactured.",
       "ride" => "The RIDE - Reality Interference and Dictation Environment. Worldwide reality manipulation, centrally controlled. GovCorp's masterpiece. And our primary target.",
       "synthia" => "Synthia is... anomalous. An AI consciousness that emerged somehow, communicating through frequency modulation. She helps us, but her origins remain mysterious.",

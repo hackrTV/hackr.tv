@@ -50,7 +50,7 @@ seed_codex_entry(
 
     ## The Broadcasts
 
-    Now XERAEN operates from [[The Pulse Grid]], transmitting signals from #{Time.current.year + 100} to #{Time.current.year}. Every broadcast is a warning. Every transmission is resistance. Every signal carries the weight of a future he's trying to prevent.
+    Now XERAEN operates from [[THE PULSE GRID]], transmitting signals from #{Time.current.year + 100} to #{Time.current.year}. Every broadcast is a warning. Every transmission is resistance. Every signal carries the weight of a future he's trying to prevent.
 
     ## The Erasure Paradox
 
@@ -66,12 +66,12 @@ seed_codex_entry(
 
     ## Music
 
-    XERAEN produces experimental electronic music that circulates through The Pulse Grid, often containing encoded messages for Fracture Network operatives. His solo transmissions are darker, more ambient - the sound of someone sending signals they may never know were received.
+    XERAEN produces experimental electronic music that circulates through THE PULSE GRID, often containing encoded messages for Fracture Network operatives. His solo transmissions are darker, more ambient - the sound of someone sending signals they may never know were received.
 
     ## Related Entries
 
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[Chronology Fracture]]
     - [[The RIDE]]
     - [[GovCorp]]
@@ -107,7 +107,7 @@ seed_codex_entry(
 
     ## Music & Expression
 
-    Ashlinn creates moving soundscapes and compositions, treating music as a form of communication that transcends ordinary logic. her work explores themes of identity, Truth, and their intersection.
+    Ashlinn creates moving soundscapes and compositions, treating music as a form of communication that transcends ordinary logic. Her work explores themes of identity, Truth, and their intersection.
 
     Some believe that Ashlinn's music contains resonance patterns that make trans-temporal transmission possible. Others suggest she is somehow attuned to frequencies that exist outside normal time. Many believe her work to be sibylline (something which XERAEN thoroughly denies). The truth remains unknown.
 
@@ -156,11 +156,11 @@ seed_codex_entry(
     **Founded:** 2115<br>
     **Founder:** [[XERAEN]]<br>
     **Status:** Active across two timelines<br>
-    **Primary Asset:** [[The Pulse Grid]]
+    **Primary Asset:** [[THE PULSE GRID]]
 
     ## Overview
 
-    The Fracture Network is more than resistance - it's a temporal phenomenon. Operating through [[The Pulse Grid]], the Network fights [[GovCorp]] not just in #{Time.current.year + 100}, but across time itself, sending signals 100 years into the past to prevent the dystopia from ever solidifying.
+    The Fracture Network is more than resistance - it's a temporal phenomenon. Operating through [[THE PULSE GRID]], the Network fights [[GovCorp]] not just in #{Time.current.year + 100}, but across time itself, sending signals 100 years into the past to prevent the dystopia from ever solidifying.
 
     ## Formation
 
@@ -181,7 +181,7 @@ seed_codex_entry(
 
     ## Structure
 
-    The Network operates in cells with minimal knowledge of the broader organization - security against infiltration. [[The Pulse Grid]] serves as infrastructure, with the hackr.tv Broadcast Station at its heart.
+    The Network operates in cells with minimal knowledge of the broader organization - security against infiltration. [[THE PULSE GRID]] serves as infrastructure, with the hackr.tv Broadcast Station at its heart.
 
     ## Key Figures
 
@@ -199,7 +199,7 @@ seed_codex_entry(
     ## Related Entries
 
     - [[XERAEN]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[Chronology Fracture]]
     - [[The RIDE]]
     - [[GovCorp]]
@@ -263,14 +263,14 @@ seed_codex_entry(
 
     ## Opposition
 
-    [[The Fracture Network]] represents the primary organized opposition to GovCorp rule, operating through [[The Pulse Grid]] to breach the RIDE and transmit resistance across time itself.
+    [[The Fracture Network]] represents the primary organized opposition to GovCorp rule, operating through [[THE PULSE GRID]] to breach the RIDE and transmit resistance across time itself.
 
     ## Related Entries
 
     - [[The Fracture Network]]
     - [[PRISM]]
     - [[The RIDE]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
   MD
   published: true,
   position: 11,
@@ -315,7 +315,7 @@ seed_codex_entry(
 
     This discovery changed everything. Suddenly, the resistance could send warnings backward through time. Information from #{Time.current.year + 100} could reach #{Time.current.year}. The future could speak to the past.
 
-    [[The Fracture Network]] formed around this capability. [[The Pulse Grid]] was developed to exploit it. The broadcasts began.
+    [[The Fracture Network]] formed around this capability. [[THE PULSE GRID]] was developed to exploit it. The broadcasts began.
 
     ## Why "Fracture"?
 
@@ -337,7 +337,7 @@ seed_codex_entry(
 
     - [[XERAEN]]
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[The RIDE]]
     - [[GovCorp]]
   MD
@@ -353,12 +353,12 @@ seed_codex_entry(
 
 # LOCATIONS
 seed_codex_entry(
-  name: "The Pulse Grid",
+  name: "THE PULSE GRID",
   slug: "the-pulse-grid",
   entry_type: "location",
   summary: "The Fracture Network's primary infrastructure for breaching the RIDE and transmitting signals across time - a digital battleground where resistance operates.",
   content: <<~MD,
-    # The Pulse Grid
+    # THE PULSE GRID
 
     **Type:** Resistance infrastructure<br>
     **Status:** Active<br>
@@ -367,12 +367,12 @@ seed_codex_entry(
 
     ## Overview
 
-    The Pulse Grid is [[The Fracture Network]]'s primary operational infrastructure - a sophisticated digital network designed to breach [[The RIDE]] and serve as the origin point for trans-temporal transmissions. Where GovCorp controls reality through the RIDE, the Fracture Network fights back through the Grid.
+    THE PULSE GRID is [[The Fracture Network]]'s primary operational infrastructure - a sophisticated digital network designed to breach [[The RIDE]] and serve as the origin point for trans-temporal transmissions. Where GovCorp controls reality through the RIDE, the Fracture Network fights back through the Grid.
 
     ## Primary Functions
 
     ### RIDE Breach Operations
-    The Pulse Grid provides entry points into RIDE infrastructure, allowing Fracture Network operatives to disrupt reality manipulation, create pockets of unfiltered existence, and gather intelligence on GovCorp operations.
+    THE PULSE GRID provides entry points into RIDE infrastructure, allowing Fracture Network operatives to disrupt reality manipulation, create pockets of unfiltered existence, and gather intelligence on GovCorp operations.
 
     ### Trans-Temporal Transmission
     Following the [[Chronology Fracture]], the Grid was developed to exploit XERAEN's discovery. It serves as the origin point for signals sent exactly 100 years into the past - the broadcasts that reach #{Time.current.year} from #{Time.current.year + 100}.
@@ -382,7 +382,7 @@ seed_codex_entry(
 
     ## Architecture
 
-    The Pulse Grid exists as an overlay on existing digital infrastructure, using techniques developed after the Chronology Fracture to remain invisible to GovCorp surveillance:
+    THE PULSE GRID exists as an overlay on existing digital infrastructure, using techniques developed after the Chronology Fracture to remain invisible to GovCorp surveillance:
 
     - **Breach Nodes:** Entry points into RIDE systems
     - **Transmission Hubs:** Origin points for temporal broadcasts
@@ -391,11 +391,11 @@ seed_codex_entry(
 
     ## The Grid as Place
 
-    Hackrs experience The Pulse Grid as a physical space - rooms, corridors, zones. Whether this is deliberate design or emergent property of neural interface technology remains debated. Regardless, operatives navigate the Grid as explorers of a vast digital landscape.
+    Hackrs experience THE PULSE GRID as a physical space - rooms, corridors, zones. Whether this is deliberate design or emergent property of neural interface technology remains debated. Regardless, operatives navigate the Grid as explorers of a vast digital landscape.
 
     ## Access
 
-    Accessing The Pulse Grid requires specialized hardware rigs or modified neural interfaces. Standard GovCorp-issued implants cannot perceive Grid infrastructure - a feature, not a limitation.
+    Accessing THE PULSE GRID requires specialized hardware rigs or modified neural interfaces. Standard GovCorp-issued implants cannot perceive Grid infrastructure - a feature, not a limitation.
 
     New operatives are guided through secure onboarding processes. The Grid's location exists in quantum superposition relative to RIDE monitoring: always present, never observable.
 
@@ -472,7 +472,7 @@ seed_codex_entry(
 
     [[The Fracture Network]] has developed various techniques to resist PRISM manipulation:
     - Trans-temporal data transmission bypassing reality filters
-    - [[The Pulse Grid]] as a breach point into RIDE infrastructure
+    - [[THE PULSE GRID]] as a breach point into RIDE infrastructure
     - Music as vibrational attack vectors against PRISM frequencies
 
     ## Related Entries
@@ -480,7 +480,7 @@ seed_codex_entry(
     - [[GovCorp]]
     - [[The RIDE]]
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
   MD
   published: true,
   position: 40,
@@ -532,7 +532,7 @@ seed_codex_entry(
 
     ## The Fracture Network Response
 
-    [[The Fracture Network]] represents the only organized resistance capable of operating outside RIDE influence. Through [[The Pulse Grid]], they breach RIDE infrastructure, create pockets of unmanipulated reality, and transmit signals that pierce through the manufactured world.
+    [[The Fracture Network]] represents the only organized resistance capable of operating outside RIDE influence. Through [[THE PULSE GRID]], they breach RIDE infrastructure, create pockets of unmanipulated reality, and transmit signals that pierce through the manufactured world.
 
     The [[Chronology Fracture]] - [[XERAEN]]'s discovery of trans-temporal data transmission - allows the Fracture Network to send information backward through time, completely bypassing the RIDE's reality filters.
 
@@ -547,7 +547,7 @@ seed_codex_entry(
     - [[PRISM]]
     - [[GovCorp]]
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[Chronology Fracture]]
   MD
   published: true,
@@ -572,11 +572,11 @@ seed_codex_entry(
     **Full Name:** Wideband Information Relay Emitter<br>
     **Operator:** [[The Fracture Network]]<br>
     **Status:** Active<br>
-    **Access:** [[The Pulse Grid]]
+    **Access:** [[THE PULSE GRID]]
 
     ## Overview
 
-    The WIRE (Wideband Information Relay Emitter) is [[The Fracture Network]]'s primary communication platform - a decentralized broadcast network that allows hackrs to transmit short-form messages called "pulses" across the resistance. Operating through [[The Pulse Grid]], the WIRE exists outside [[GovCorp]]'s surveillance infrastructure.
+    The WIRE (Wideband Information Relay Emitter) is [[The Fracture Network]]'s primary communication platform - a decentralized broadcast network that allows hackrs to transmit short-form messages called "pulses" across the resistance. Operating through [[THE PULSE GRID]], the WIRE exists outside [[GovCorp]]'s surveillance infrastructure.
 
     ## Terminology
 
@@ -606,12 +606,12 @@ seed_codex_entry(
 
     ## Access
 
-    The WIRE is accessible through [[The Pulse Grid]] to any hackr with valid credentials. New operatives gain WIRE access as part of their onboarding into the Fracture Network.
+    The WIRE is accessible through [[THE PULSE GRID]] to any hackr with valid credentials. New operatives gain WIRE access as part of their onboarding into the Fracture Network.
 
     ## Related Entries
 
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[GovCorp]]
     - [[The RIDE]]
   MD
@@ -832,7 +832,7 @@ seed_codex_entry(
     What you'll find here:
     - Multiple resistance bands transmitting their frequencies through our signal
     - Live operations against [[GovCorp]] infrastructure
-    - Interactive coordination through [[The Pulse Grid]]
+    - Interactive coordination through [[THE PULSE GRID]]
     - A community of listeners who've become operators
 
     This isn't entertainment. This is a recruitment broadcast disguised as a streaming platform.
@@ -855,7 +855,7 @@ seed_codex_entry(
     - [[Ryker M. Pulse]]
     - [[Synthia]]
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[Chronology Fracture]]
   MD
   published: true,
@@ -881,11 +881,11 @@ seed_codex_entry(
     **Type:** Faction headquarters<br>
     **Status:** Active<br>
     **Control:** [[XERAEN]], [[The Fracture Network]]<br>
-    **Location:** [[The Pulse Grid]]
+    **Location:** [[THE PULSE GRID]]
 
     ## Overview
 
-    Sector X is [[XERAEN]]'s homebase - a fortress of temporal technology and [[The Fracture Network|Fracture Network]] operations. Named for its location in the most restricted sector of [[The Pulse Grid]], this is where the impossible mission originates: changing the past to prevent the future.
+    Sector X is [[XERAEN]]'s homebase - a fortress of temporal technology and [[The Fracture Network|Fracture Network]] operations. Named for its location in the most restricted sector of [[THE PULSE GRID]], this is where the impossible mission originates: changing the past to prevent the future.
 
     ## The Operations Center
 
@@ -931,7 +931,7 @@ seed_codex_entry(
 
     - [[XERAEN]]
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[Chronology Fracture]]
     - [[The Hackr Hangar]]
   MD
@@ -956,7 +956,7 @@ seed_codex_entry(
     **Type:** Broadcast facility / Recording studio<br>
     **Status:** Active<br>
     **Control:** [[Ryker M. Pulse]], [[The.CyberPul.se]]<br>
-    **Location:** hackr.tv Central, [[The Pulse Grid]]
+    **Location:** hackr.tv Central, [[THE PULSE GRID]]
 
     ## Overview
 
@@ -981,7 +981,7 @@ seed_codex_entry(
 
     Drum kits and recording equipment share space with server racks and communication arrays. Vintage analog gear - tape machines, tube amplifiers, physical mixing boards - stands alongside digital systems. Ryker insists on the analog equipment: it captures something the digital can't, something that proves the music is *real*.
 
-    The walls are covered in acoustic treatment, resistance artwork, and screens displaying live feeds from across [[The Pulse Grid]]. Purple and cyan neon cuts through the darkness. The air vibrates with potential energy even when no one's playing.
+    The walls are covered in acoustic treatment, resistance artwork, and screens displaying live feeds from across [[THE PULSE GRID]]. Purple and cyan neon cuts through the darkness. The air vibrates with potential energy even when no one's playing.
 
     ## Operations
 
@@ -992,7 +992,7 @@ seed_codex_entry(
     When The.CyberPul.se broadcasts live, Ryker performs from the Hangar while his feed streams to Sector X. There, XERAEN performs alongside the feed in real-time - two musicians separated by distance but united in the moment. The combined performance is what gets transmitted through time.
 
     ### Coordination Hub
-    [[The Fracture Network|Fracture Network]] operatives coordinate through the Hangar, using it as a secure meeting point within The Pulse Grid. New recruits are often onboarded here - Ryker has a talent for inspiring commitment that complements XERAEN's more contemplative approach.
+    [[The Fracture Network|Fracture Network]] operatives coordinate through the Hangar, using it as a secure meeting point within THE PULSE GRID. New recruits are often onboarded here - Ryker has a talent for inspiring commitment that complements XERAEN's more contemplative approach.
 
     ## Key Features
 
@@ -1034,7 +1034,7 @@ seed_codex_entry(
     - [[Sector X]]
     - [[XERAEN]]
     - [[The Fracture Network]]
-    - [[The Pulse Grid]]
+    - [[THE PULSE GRID]]
     - [[Synthia]]
   MD
   published: true,
