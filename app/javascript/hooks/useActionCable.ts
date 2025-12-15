@@ -2,13 +2,14 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import { createConsumer, Cable, Channel } from '@rails/actioncable'
 
 export interface GridEvent {
-  type: 'movement' | 'say' | 'take' | 'drop'
+  type: 'movement' | 'say' | 'take' | 'drop' | 'system_broadcast'
   hackr_alias?: string
   message?: string
   item_name?: string
   direction?: string
   from_room_id?: number
   to_room_id?: number
+  sender?: string
 }
 
 interface UseActionCableOptions {

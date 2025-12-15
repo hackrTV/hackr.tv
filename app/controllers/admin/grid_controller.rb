@@ -26,8 +26,8 @@ class Admin::GridController < Admin::ApplicationController
 
     # Broadcast via ActionCable to all rooms
     GridRoom.find_each do |room|
-      ActionCable.server.broadcast(
-        "grid_room_#{room.id}",
+      GridChannel.broadcast_to(
+        room,
         {
           type: "system_broadcast",
           message: "[SYSTEM BROADCAST] #{message}",
