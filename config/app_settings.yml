@@ -17,6 +17,5 @@ staging:
 
 production:
   <<: *default
-  # Uncomment when launching in prerelease mode:
-  # prerelease_mode: alpha
-  # prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
+  prerelease_mode: alpha
+  prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
