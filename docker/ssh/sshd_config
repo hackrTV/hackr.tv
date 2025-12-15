@@ -1,0 +1,70 @@
+# SSHD configuration for hackr.tv terminal access
+#
+# This config runs a restricted SSH server on port 9915 for the terminal BBS.
+# Only the 'access' user can connect, and they are forced into the hackr-shell.
+
+# Listen on non-standard port
+Port 9915
+
+# Restrict to IPv4 only (IPv6 optional)
+AddressFamily inet
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Authentication settings
+PermitRootLogin no
+MaxAuthTries 3
+MaxSessions 10
+
+# Password authentication only for the 'access' user
+PasswordAuthentication yes
+PubkeyAuthentication no
+ChallengeResponseAuthentication no
+
+# Use custom PAM service
+UsePAM yes
+
+# Disable all forwarding and tunneling
+AllowTcpForwarding no
+AllowAgentForwarding no
+X11Forwarding no
+PermitTunnel no
+GatewayPorts no
+
+# Force terminal allocation
+PermitTTY yes
+
+# Banner for pre-auth (optional)
+# Banner /etc/ssh/banner.txt
+
+# Restrict to only the 'access' user
+AllowUsers access
+
+# Force all 'access' user connections to use hackr-shell
+Match User access
+    ForceCommand /rails/bin/hackr-shell
+    PasswordAuthentication yes
+    PubkeyAuthentication no
+    AllowTcpForwarding no
+    X11Forwarding no
+    PermitTTY yes
+
+# Host keys (will be generated on first run)
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Crypto settings (modern and secure)
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+
+# Connection settings
+ClientAliveInterval 120
+ClientAliveCountMax 3
+LoginGraceTime 30
+
+# Subsystem - disable sftp
+# Subsystem sftp /usr/lib/openssh/sftp-server

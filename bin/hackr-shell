@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# hackr-shell - Restricted shell for SSH terminal access to hackr.tv
+#
+# This script is executed as the shell for the 'access' SSH user.
+# It loads the Rails environment and starts a Terminal::Session.
+#
+# Setup:
+#   1. Create system user: sudo useradd -r -s /path/to/hackr.tv/bin/hackr-shell access
+#   2. Configure SSH in /etc/ssh/sshd_config:
+#      Match User access
+#          ForceCommand /path/to/hackr.tv/bin/hackr-shell
+#          PasswordAuthentication yes
+#          PubkeyAuthentication no
+#          AllowTcpForwarding no
+#          X11Forwarding no
+#          PermitTTY yes
+#   3. Set up PAM or use a wrapper script for password validation
+
+# Change to the application directory
+APP_ROOT = File.expand_path("..", __dir__)
+Dir.chdir(APP_ROOT)
+
+# Set up environment
+ENV["RAILS_ENV"] ||= "production"
+ENV["BUNDLE_GEMFILE"] ||= File.join(APP_ROOT, "Gemfile")
+
+# Disable Rails logging for terminal sessions
+ENV["RAILS_LOG_TO_STDOUT"] = nil
+
+require "bundler/setup"
+require_relative "../config/environment"
+require_relative "../lib/terminal"
+
+# Disable buffering for interactive I/O
+$stdout.sync = true
+$stdin.sync = true
+
+# Set up terminal for raw mode if possible
+begin
+  require "io/console"
+rescue LoadError
+  # io/console not available, continue anyway
+end
+
+# Run the terminal session
+begin
+  Terminal.start(input: $stdin, output: $stdout)
+rescue => e
+  # Log errors but don't expose to user
+  Rails.logger.error "[Terminal] Session error: #{e.message}"
+  Rails.logger.error e.backtrace.join("\n")
+  puts "\e[31mConnection terminated due to an error.\e[0m"
+  exit 1
+end

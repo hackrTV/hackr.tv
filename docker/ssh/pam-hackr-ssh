@@ -1,0 +1,12 @@
+# PAM configuration for hackr.tv SSH terminal access
+# Install as: /etc/pam.d/hackr-ssh
+
+# Use pam_exec to validate password against daily rotating password
+auth       required   pam_exec.so   expose_authtok  /rails/docker/ssh/validate-password.rb
+auth       required   pam_permit.so
+
+# Account - always permit (password was already validated)
+account    required   pam_permit.so
+
+# Session - minimal setup
+session    required   pam_permit.so

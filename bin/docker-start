@@ -1,0 +1,73 @@
+#!/bin/bash
+# docker-start - Smart startup script for hackr.tv Docker container
+#
+# Starts Rails server with or without SSH terminal access based on
+# the TERMINAL_SSH_ENABLED environment variable.
+#
+# Environment Variables:
+#   TERMINAL_SSH_ENABLED - Set to "true" to enable SSH terminal on port 9915
+
+set -e
+
+# Enable jemalloc for reduced memory usage
+if [ -z "${LD_PRELOAD+x}" ]; then
+    LD_PRELOAD=$(find /usr/lib -name libjemalloc.so.2 -print -quit)
+    export LD_PRELOAD
+fi
+
+# Prepare the database
+echo "Preparing database..."
+./bin/rails db:prepare
+
+# Check if SSH terminal is enabled
+if [ "${TERMINAL_SSH_ENABLED}" = "true" ]; then
+    echo "=== SSH Terminal Access ENABLED ==="
+    echo "Terminal will be available on port 9915"
+    echo "Use: ssh access@<host> -p 9915"
+    echo "Password rotates daily - see /terminal page"
+    echo "===================================="
+
+    # Create necessary directories
+    mkdir -p /var/run/sshd
+
+    # Ensure SSH config is in place
+    if [ -f /etc/ssh/sshd_config.hackr ]; then
+        cp /etc/ssh/sshd_config.hackr /etc/ssh/sshd_config
+    fi
+
+    # Generate SSH host keys if they don't exist (should be persisted via volume)
+    if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
+        echo "Generating SSH host keys..."
+        ssh-keygen -A
+    fi
+
+    # Ensure access user exists with correct shell
+    if ! id "access" &>/dev/null; then
+        useradd -r -s /rails/bin/hackr-shell -d /nonexistent access
+    fi
+
+    # Set permissions
+    chmod 755 /rails/bin/hackr-shell
+    chmod 755 /rails/docker/ssh/validate-password.rb
+
+    # Start SSH daemon in background
+    echo "Starting SSH daemon on port 9915..."
+    /usr/sbin/sshd -D -f /etc/ssh/sshd_config &
+    SSHD_PID=$!
+
+    # Trap signals to gracefully shut down both services
+    cleanup() {
+        echo "Shutting down services..."
+        kill $SSHD_PID 2>/dev/null || true
+        exit 0
+    }
+    trap cleanup SIGTERM SIGINT
+
+    # Start Rails server in foreground
+    echo "Starting Rails server on port 3000..."
+    exec ./bin/rails server -b 0.0.0.0 -p 3000
+else
+    echo "SSH Terminal Access disabled (set TERMINAL_SSH_ENABLED=true to enable)"
+    # Start Rails server only
+    exec ./bin/rails server -b 0.0.0.0 -p 3000
+fi
