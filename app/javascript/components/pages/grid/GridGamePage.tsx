@@ -139,6 +139,10 @@ export const GridGamePage: React.FC = () => {
     case 'drop':
       message = `\n<span style="color: #fbbf24;">[${timestamp}] ${event.hackr_alias} drops the ${event.item_name}.</span>`
       break
+
+    case 'system_broadcast':
+      message = `\n<span style="color: #f87171; font-weight: bold;">[${timestamp}] ${event.message}</span>`
+      break
     }
 
     if (message) {
