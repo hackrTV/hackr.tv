@@ -91,9 +91,16 @@ RSpec.describe GridHackr, type: :model do
     end
 
     describe ".online" do
-      it "returns hackrs with a current_room" do
+      it "returns hackrs with a current_room and recent activity" do
+        online_hackr.update_column(:last_activity_at, 5.minutes.ago)
         expect(GridHackr.online).to include(online_hackr)
         expect(GridHackr.online).not_to include(offline_hackr)
+      end
+
+      it "excludes hackrs with stale activity even if they have a room" do
+        stale_hackr = create(:grid_hackr, current_room: room)
+        stale_hackr.update_column(:last_activity_at, 20.minutes.ago)
+        expect(GridHackr.online).not_to include(stale_hackr)
       end
     end
 

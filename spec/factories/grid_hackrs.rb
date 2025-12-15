@@ -11,6 +11,7 @@ FactoryBot.define do
 
     trait :online do
       association :current_room, factory: :grid_room
+      last_activity_at { Time.current }
     end
   end
 end
