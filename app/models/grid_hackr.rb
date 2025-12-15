@@ -16,7 +16,7 @@ class GridHackr < ApplicationRecord
   # Scopes
   scope :admins, -> { where(role: "admin") }
   scope :operatives, -> { where(role: "operative") }
-  scope :online, -> { where.not(current_room_id: nil) }
+  scope :online, -> { recently_active.where.not(current_room_id: nil) }
   scope :in_room, ->(room) { where(current_room: room) }
   scope :recently_active, ->(since: 15.minutes.ago) { where("last_activity_at > ?", since) }
 

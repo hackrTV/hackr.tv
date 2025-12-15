@@ -105,8 +105,8 @@ module Grid
         output << "<span style='color: #fbbf24;'>Mobs:</span> <span style='color: #c084fc;'>#{mobs.map(&:name).join(", ")}</span>"
       end
 
-      # Show other hackrs
-      other_hackrs = room.grid_hackrs.where.not(id: hackr.id)
+      # Show other hackrs (only recently active ones)
+      other_hackrs = room.grid_hackrs.recently_active.where.not(id: hackr.id)
       if other_hackrs.any?
         output << ""
         output << "<span style='color: #fbbf24;'>Hackrs:</span> <span style='color: #a78bfa;'>#{other_hackrs.map(&:hackr_alias).join(", ")}</span>"
@@ -344,7 +344,7 @@ module Grid
     end
 
     def who_command
-      online = GridHackr.where.not(current_room: nil).order(:hackr_alias)
+      online = GridHackr.online.order(:hackr_alias)
       if online.any?
         "<span style='color: #fbbf24;'>Online Hackrs:</span>\n" + online.map { |h| "  - <span style='color: #a78bfa;'>#{h.hackr_alias}</span> <span style='color: #9ca3af;'>(#{h.current_room&.name || "nowhere"})</span>" }.join("\n")
       else
