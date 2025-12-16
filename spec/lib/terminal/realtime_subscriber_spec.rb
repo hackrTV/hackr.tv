@@ -84,6 +84,60 @@ RSpec.describe Terminal::RealtimeSubscriber do
 
       expect(received_events).to be_empty
     end
+
+    it "deduplicates identical pulse messages" do
+      received_events = []
+
+      subscriber.on_wire { |event| received_events << event }
+
+      pulse_message = {
+        type: "new_pulse",
+        pulse: {
+          id: 456,
+          content: "Duplicate test",
+          grid_hackr: {id: other_hackr.id, hackr_alias: other_hackr.hackr_alias},
+          pulsed_at: Time.current
+        }
+      }
+
+      # Broadcast the same pulse twice (simulating solid_cable duplicate delivery)
+      ActionCable.server.broadcast("pulse_wire", pulse_message)
+      ActionCable.server.broadcast("pulse_wire", pulse_message)
+
+      sleep 0.1
+
+      expect(received_events.size).to eq(1)
+    end
+
+    it "allows different pulses through" do
+      received_events = []
+
+      subscriber.on_wire { |event| received_events << event }
+
+      ActionCable.server.broadcast("pulse_wire", {
+        type: "new_pulse",
+        pulse: {
+          id: 789,
+          content: "First pulse",
+          grid_hackr: {id: other_hackr.id, hackr_alias: other_hackr.hackr_alias},
+          pulsed_at: Time.current
+        }
+      })
+
+      ActionCable.server.broadcast("pulse_wire", {
+        type: "new_pulse",
+        pulse: {
+          id: 790,
+          content: "Second pulse",
+          grid_hackr: {id: other_hackr.id, hackr_alias: other_hackr.hackr_alias},
+          pulsed_at: Time.current
+        }
+      })
+
+      sleep 0.1
+
+      expect(received_events.size).to eq(2)
+    end
   end
 
   describe "#on_grid" do
@@ -249,6 +303,53 @@ RSpec.describe Terminal::RealtimeSubscriber do
       expect(ActionCable.server.pubsub).to receive(:unsubscribe).with(old_stream, anything).at_least(:once)
 
       subscriber.monitor_room(other_room.id)
+    end
+
+    it "deduplicates identical grid messages" do
+      received_events = []
+
+      subscriber.on_grid { |event| received_events << event }
+      subscriber.monitor_room(room.id)
+
+      grid_message = {
+        type: "say",
+        hackr_id: other_hackr.id,
+        hackr_alias: other_hackr.hackr_alias,
+        message: "Duplicate message"
+      }
+
+      # Broadcast the same message twice (simulating solid_cable duplicate delivery)
+      GridChannel.broadcast_to(room, grid_message)
+      GridChannel.broadcast_to(room, grid_message)
+
+      sleep 0.1
+
+      expect(received_events.size).to eq(1)
+    end
+
+    it "allows different grid events through" do
+      received_events = []
+
+      subscriber.on_grid { |event| received_events << event }
+      subscriber.monitor_room(room.id)
+
+      GridChannel.broadcast_to(room, {
+        type: "say",
+        hackr_id: other_hackr.id,
+        hackr_alias: other_hackr.hackr_alias,
+        message: "First message"
+      })
+
+      GridChannel.broadcast_to(room, {
+        type: "say",
+        hackr_id: other_hackr.id,
+        hackr_alias: other_hackr.hackr_alias,
+        message: "Second message"
+      })
+
+      sleep 0.1
+
+      expect(received_events.size).to eq(2)
     end
   end
 

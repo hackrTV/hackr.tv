@@ -16,6 +16,8 @@ module Terminal
       @grid_subscription = nil
       @current_room_stream = nil
       @mutex = Mutex.new
+      @seen_pulse_ids = []
+      @seen_grid_events = []
     end
 
     # Register a callback for wire events
@@ -124,6 +126,12 @@ module Terminal
         return unless data[:type] == "new_pulse" && data[:pulse]
 
         pulse_data = data[:pulse]
+        pulse_id = pulse_data[:id]
+
+        # Skip duplicate messages (solid_cable can deliver same message multiple times)
+        return if @seen_pulse_ids.include?(pulse_id)
+        @seen_pulse_ids << pulse_id
+        @seen_pulse_ids.shift if @seen_pulse_ids.size > 50
 
         # Skip our own pulses
         if session.hackr && pulse_data[:grid_hackr]
@@ -132,7 +140,7 @@ module Terminal
 
         event = {
           type: "new_pulse",
-          id: pulse_data[:id],
+          id: pulse_id,
           hackr_alias: pulse_data[:grid_hackr]&.dig(:hackr_alias) || "Unknown",
           content: pulse_data[:content],
           pulsed_at: pulse_data[:pulsed_at]
@@ -151,6 +159,12 @@ module Terminal
 
       begin
         data = JSON.parse(message, symbolize_names: true)
+
+        # Skip duplicate messages (solid_cable can deliver same message multiple times)
+        event_hash = message.hash
+        return if @seen_grid_events.include?(event_hash)
+        @seen_grid_events << event_hash
+        @seen_grid_events.shift if @seen_grid_events.size > 50
 
         # Skip our own events
         if session.hackr && data[:hackr_id]

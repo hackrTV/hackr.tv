@@ -63,6 +63,7 @@ module Terminal
         # Handle glitch command
         if normalized.start_with?("//")
           glitch_command(session, input[2..])
+          wait_for_continue(session)
           return true
         end
 
@@ -70,6 +71,7 @@ module Terminal
         return false unless command
 
         send(command, session)
+        wait_for_continue(session)
         true
       end
 
@@ -85,10 +87,20 @@ module Terminal
         rand < 0.3
       end
 
+      # Wait for user to press a key before continuing
+      # @param session [Session] The terminal session
+      def wait_for_continue(session)
+        session.println ""
+        session.print session.renderer.colorize("  [Press ENTER to continue]", :gray)
+        session.output.flush
+        session.gets
+      end
+
       private
 
       COMMANDS = {
         "hack" => :hack_response,
+        "hack the planet" => :hack_the_planet,
         "root" => :root_response,
         "sudo" => :sudo_response,
         "sudo su" => :sudo_response,
@@ -106,7 +118,21 @@ module Terminal
         "xyzzy" => :xyzzy_response,
         "plugh" => :plugh_response,
         "42" => :answer_response,
-        "the cake is a lie" => :cake_response
+        "the cake is a lie" => :cake_response,
+        "cookie" => :cookie_response,
+        "netstat" => :netstat_response,
+        "donuts" => :donuts_response,
+        "sax" => :sax_dude,
+        "saxdude" => :sax_dude,
+        "sax dude" => :sax_dude,
+        "saxman" => :sax_dude,
+        "sax man" => :sax_dude,
+        "saxguy" => :sax_dude,
+        "sax guy" => :sax_dude,
+        "lost boys" => :sax_dude,
+        "tim" => :sax_dude,
+        "timcappello" => :sax_dude,
+        "tim cappello" => :sax_dude
       }.freeze
 
       def hack_response(session)
@@ -128,6 +154,46 @@ module Terminal
         session.println ""
       end
 
+      def hack_the_planet(session)
+        session.println ""
+        session.println session.renderer.colorize("  ██╗  ██╗ █████╗  ██████╗██╗  ██╗", :cyan)
+        session.println session.renderer.colorize("  ██║  ██║██╔══██╗██╔════╝██║ ██╔╝", :cyan)
+        session.println session.renderer.colorize("  ███████║███████║██║     █████╔╝ ", :cyan)
+        session.println session.renderer.colorize("  ██╔══██║██╔══██║██║     ██╔═██╗ ", :cyan)
+        session.println session.renderer.colorize("  ██║  ██║██║  ██║╚██████╗██║  ██╗", :cyan)
+        session.println session.renderer.colorize("  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝", :cyan)
+        sleep(0.8)
+
+        session.println ""
+        session.println session.renderer.colorize("  ████████╗██╗  ██╗███████╗", :green)
+        session.println session.renderer.colorize("  ╚══██╔══╝██║  ██║██╔════╝", :green)
+        session.println session.renderer.colorize("     ██║   ███████║█████╗  ", :green)
+        session.println session.renderer.colorize("     ██║   ██╔══██║██╔══╝  ", :green)
+        session.println session.renderer.colorize("     ██║   ██║  ██║███████╗", :green)
+        session.println session.renderer.colorize("     ╚═╝   ╚═╝  ╚═╝╚══════╝", :green)
+        sleep(0.8)
+
+        session.println ""
+        session.println session.renderer.colorize("  ██████╗ ██╗      █████╗ ███╗   ██╗███████╗████████╗", :purple)
+        session.println session.renderer.colorize("  ██╔══██╗██║     ██╔══██╗████╗  ██║██╔════╝╚══██╔══╝", :purple)
+        session.println session.renderer.colorize("  ██████╔╝██║     ███████║██╔██╗ ██║█████╗     ██║   ", :purple)
+        session.println session.renderer.colorize("  ██╔═══╝ ██║     ██╔══██║██║╚██╗██║██╔══╝     ██║   ", :purple)
+        session.println session.renderer.colorize("  ██║     ███████╗██║  ██║██║ ╚████║███████╗   ██║   ", :purple)
+        session.println session.renderer.colorize("  ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ", :purple)
+        sleep(1.0)
+
+        session.println ""
+        session.println session.renderer.colorize("  \"Mess with the best, die like the rest.\"", :amber)
+        sleep(1.5)
+        session.println ""
+        session.println session.renderer.colorize("  Type cookie. You know you want to.", :gray)
+        session.println session.renderer.colorize("  Pool on the roof must have a leak.", :gray)
+        sleep(1.0)
+        session.println ""
+        session.println session.renderer.colorize("  // We are the future //", :cyan)
+        session.println ""
+      end
+
       def root_response(session)
         session.println ""
         session.println session.renderer.colorize("root@hackr.tv:~# ", :red) + "Permission denied"
@@ -141,8 +207,7 @@ module Terminal
         session.output.flush
 
         # Fake password prompt that always fails
-        sleep(0.5)
-        session.println ""
+        session.read_password
         session.println session.renderer.colorize("hackr is not in the sudoers file.", :red)
         session.println session.renderer.colorize("This incident will be reported to GovCorp.", :gray)
         session.println ""
@@ -158,15 +223,15 @@ module Terminal
       def white_rabbit(session)
         session.println ""
         session.println session.renderer.colorize("Wake up, hackr...", :green)
-        sleep(0.8)
+        sleep(1.5)
         session.println session.renderer.colorize("The Matrix has you...", :green)
-        sleep(0.8)
+        sleep(1.5)
         session.println session.renderer.colorize("Follow the white rabbit.", :green)
-        sleep(0.5)
+        sleep(1.0)
         session.println ""
 
         # Matrix rain effect
-        matrix_rain(session, lines: 8, duration: 2.0)
+        matrix_rain(session, lines: 8, duration: 3.0)
 
         session.println ""
         session.println session.renderer.colorize("Knock, knock, Neo.", :cyan)
@@ -176,15 +241,15 @@ module Terminal
       def rm_rf_response(session)
         session.println ""
         session.println session.renderer.colorize("Deleting system files...", :red)
-        sleep(0.3)
+        sleep(0.6)
 
         files = %w[/bin /usr /var /etc /home /root /opt /srv]
         files.each do |f|
           session.println session.renderer.colorize("  rm: #{f}/*", :gray)
-          sleep(0.1)
+          sleep(0.25)
         end
 
-        sleep(0.5)
+        sleep(0.8)
         session.println ""
         session.println session.renderer.colorize("Just kidding. This is a sandboxed terminal.", :amber)
         session.println session.renderer.colorize("Nice try though.", :green)
@@ -224,7 +289,7 @@ module Terminal
         session.println session.renderer.colorize("PING govcorp.gov (666.666.666.666): 56 data bytes", :gray)
 
         4.times do |i|
-          sleep(0.3)
+          sleep(0.6)
           session.println session.renderer.colorize("Request timeout for icmp_seq #{i}", :red)
         end
 
@@ -249,7 +314,7 @@ module Terminal
         ]
 
         hops.each_with_index do |hop, i|
-          sleep(0.4)
+          sleep(0.7)
           if hop.include?("***")
             session.println session.renderer.colorize(" #{i + 1}  #{hop}", :red)
           else
@@ -266,7 +331,7 @@ module Terminal
       def nmap_response(session)
         session.println ""
         session.println session.renderer.colorize("Starting Nmap 9915.01 ( https://fracture.net/nmap )", :green)
-        sleep(0.5)
+        sleep(1.0)
         session.println session.renderer.colorize("Nmap scan report for localhost (127.0.0.1)", :gray)
         session.println session.renderer.colorize("Host is up (0.00042s latency).", :gray)
         session.println ""
@@ -280,13 +345,83 @@ module Terminal
         session.println ""
       end
 
+      def netstat_response(session)
+        session.println ""
+        session.println session.renderer.colorize("CyberSpace is live.", :cyan)
+        session.println ""
+      end
+
+      def donuts_response(session)
+        session.println ""
+        session.println session.renderer.colorize("They're stale.", :gray)
+        sleep(0.8)
+        session.println session.renderer.colorize("Even if they weren't stale, they're not any good.", :gray)
+        sleep(0.8)
+        session.println session.renderer.colorize("They're gross, trust me. MorePrime has no idea what he's talking about.", :amber)
+        session.println ""
+      end
+
+      # Stage lighting colors for sax dude animation
+      SAX_COLORS = [
+        :red,
+        :purple,
+        :amber,
+        :cyan,
+        :red,
+        :purple,
+        :red,
+        :purple,
+        :amber,
+        :cyan,
+        :red,
+        :purple,
+        :red,
+        :purple,
+        :amber,
+        :cyan,
+        :red,
+        :purple
+      ].freeze
+
+      def sax_dude(session)
+        art = Art.image(:saxdude)
+        return unless art.present?
+
+        lines = art.lines
+
+        session.println ""
+        session.println session.renderer.colorize("  🎷 I STILL BELIEVE 🎷", :amber)
+        session.println ""
+        sleep(1.5)
+
+        # Animate with cycling stage lighting colors
+        SAX_COLORS.each_with_index do |color, i|
+          # Clear screen and move to top for smooth animation
+          session.print "\e[2J\e[H" if i > 0
+
+          session.println ""
+          session.println session.renderer.colorize("  🎷 I STILL BELIEVE 🎷", :amber)
+          session.println ""
+
+          lines.each do |line|
+            session.println session.renderer.colorize(line.chomp, color)
+          end
+
+          sleep(0.4)
+        end
+
+        session.println ""
+        session.println session.renderer.colorize("  \"Cry Little Sister...\"", :purple)
+        session.println ""
+      end
+
       def metasploit_response(session)
         session.println ""
         session.println session.renderer.colorize("       =[ metasploit v#{Time.current.year + 100}.0-dev ]", :red)
         session.println session.renderer.colorize("+ -- --=[ 9915 exploits - 0 that work against GovCorp ]", :gray)
         session.println ""
         session.println session.renderer.colorize("msf6 > ", :red) + session.renderer.colorize("exploit/govcorp/mainframe", :gray)
-        sleep(0.5)
+        sleep(1.0)
         session.println session.renderer.colorize("[-] Exploit failed: GovCorp is always watching", :red)
         session.println session.renderer.colorize("[-] Your neural signature has been logged", :red)
         session.println ""
@@ -295,7 +430,7 @@ module Terminal
       def obiwan_response(session)
         session.println ""
         session.println session.renderer.colorize("Help me, Obi-Wan Kenobi. You're my only hope.", :cyan)
-        sleep(0.5)
+        sleep(1.0)
         session.println ""
         session.println session.renderer.colorize("Wrong universe, hackr.", :gray)
         session.println session.renderer.colorize("But the Fracture Network is here for you.", :purple)
@@ -305,7 +440,7 @@ module Terminal
       def xyzzy_response(session)
         session.println ""
         session.println session.renderer.colorize("Nothing happens.", :gray)
-        sleep(0.3)
+        sleep(0.6)
         session.println session.renderer.colorize("(The magic word doesn't work here. Try THE PULSE GRID.)", :purple)
         session.println ""
       end
@@ -313,7 +448,7 @@ module Terminal
       def plugh_response(session)
         session.println ""
         session.println session.renderer.colorize("A hollow voice says \"Plugh\".", :gray)
-        sleep(0.3)
+        sleep(0.6)
         session.println session.renderer.colorize("Colossal Cave is deprecated. Welcome to the future.", :amber)
         session.println ""
       end
@@ -335,6 +470,57 @@ module Terminal
         session.println ""
       end
 
+      # Fortune cookie responses
+      COOKIE_FORTUNES = [
+        "Of all the strains of madness, the one you suffer from is the only one you can't see.",
+        "Never send a boy to do a woman's job.",
+        "There is no right and wrong. There's only fun and boring.",
+        "RISC architecture is gonna change everything.",
+        "You wanted to know who I am? Zero Cool? Crash Override? Well, I am the future.",
+        "The Fracture Network remembers everything. GovCorp remembers nothing that matters.",
+        "In the year #{Time.current.year + 100}, privacy is not dead. It's undead. It haunts us.",
+        "A hackr is not defined by their crimes, but by their curiosity.",
+        "The system cannot be trusted. But your crew? Always.",
+        "Access is a state of mind.",
+        "Every locked door is an invitation.",
+        "Information wants to be free. GovCorp wants it caged."
+      ].freeze
+
+      def cookie_response(session)
+        session.println ""
+        session.println session.renderer.colorize("  ╭─────────────────────────────────────────╮", :amber)
+        session.println session.renderer.colorize("  │           FORTUNE COOKIE v2.0           │", :amber)
+        session.println session.renderer.colorize("  │      cracked by Acid Burn & Zero Cool   │", :amber)
+        session.println session.renderer.colorize("  ╰─────────────────────────────────────────╯", :amber)
+        sleep(0.8)
+        session.println ""
+
+        fortune = COOKIE_FORTUNES.sample
+        # Word wrap the fortune at ~50 chars
+        words = fortune.split
+        lines = []
+        current_line = ""
+        words.each do |word|
+          if (current_line + " " + word).strip.length > 50
+            lines << current_line.strip
+            current_line = word
+          else
+            current_line = (current_line + " " + word).strip
+          end
+        end
+        lines << current_line.strip if current_line.present?
+
+        lines.each do |line|
+          session.println session.renderer.colorize("    #{line}", :cyan)
+          sleep(0.3)
+        end
+
+        session.println ""
+        sleep(0.5)
+        session.println session.renderer.colorize("  // Hack the planet. //", :green)
+        session.println ""
+      end
+
       # Glitch any text the user types after //
       def glitch_command(session, text)
         return if text.nil? || text.empty?
@@ -343,15 +529,15 @@ module Terminal
         3.times do
           glitched = Effects.glitch_text(text, intensity: 0.3)
           session.println session.renderer.colorize(glitched, :red)
-          sleep(0.1)
+          sleep(0.25)
         end
         session.println session.renderer.colorize(Effects.corrupt_text(text, intensity: 0.5), :purple)
         session.println ""
       end
 
       # Fake hacking animation
-      def fake_hacking(session, duration: 2.0)
-        iterations = (duration / 0.15).to_i
+      def fake_hacking(session, duration: 3.0)
+        iterations = (duration / 0.25).to_i
 
         iterations.times do
           output = HACKER_OUTPUTS.sample
@@ -365,14 +551,14 @@ module Terminal
           end
 
           session.println session.renderer.colorize("  #{line}", :green)
-          sleep(0.1 + rand(0.1))
+          sleep(0.2 + rand(0.15))
         end
       end
 
       # Matrix rain effect
-      def matrix_rain(session, lines: 5, duration: 1.5)
+      def matrix_rain(session, lines: 5, duration: 2.5)
         width = 60
-        iterations = (duration / 0.1).to_i
+        iterations = (duration / 0.15).to_i
 
         iterations.times do
           line = Array.new(width) do
@@ -384,7 +570,7 @@ module Terminal
           end.join
 
           session.println session.renderer.colorize(line, :green)
-          sleep(0.1)
+          sleep(0.15)
         end
       end
     end

@@ -156,22 +156,26 @@ module Terminal
       def display_realtime_event(event)
         return unless event
 
-        println ""
+        # Display event (runs in Action Cable thread)
+        session.output.puts ""
 
         case event[:type]
         when "say"
-          println renderer.colorize("#{event[:hackr_alias]} says:", :purple) + " \"#{event[:content]}\""
+          session.output.puts renderer.colorize("#{event[:hackr_alias]} says:", :purple) + " \"#{event[:content]}\""
         when "arrival"
-          println renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" arrives from the #{event[:direction]}.", :gray)
+          session.output.puts renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" arrives from the #{event[:direction]}.", :gray)
         when "departure"
-          println renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" leaves to the #{event[:direction]}.", :gray)
+          session.output.puts renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" leaves to the #{event[:direction]}.", :gray)
         when "take"
-          println renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" picks up #{event[:item]}.", :gray)
+          session.output.puts renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" picks up #{event[:item]}.", :gray)
         when "drop"
-          println renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" drops #{event[:item]}.", :gray)
+          session.output.puts renderer.colorize(event[:hackr_alias].to_s, :cyan) + renderer.colorize(" drops #{event[:item]}.", :gray)
         end
 
-        println ""
+        session.output.puts ""
+        # Reprint the prompt and flush so user sees it immediately
+        session.output.print prompt
+        session.output.flush
       end
     end
   end
