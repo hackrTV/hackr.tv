@@ -361,7 +361,7 @@ module Terminal
           line = case rand(3)
           when 0 then "#{output} [#{percent}%]"
           when 1 then "Reading #{file}..."
-          else "0x#{rand(0xFFFFFF).to_s(16).upcase.rjust(6, '0')}: #{Array.new(8) { rand(0..255).to_s(16).rjust(2, '0') }.join(' ')}"
+          else "0x#{rand(0xFFFFFF).to_s(16).upcase.rjust(6, "0")}: #{Array.new(8) { rand(0..255).to_s(16).rjust(2, "0") }.join(" ")}"
           end
 
           session.println session.renderer.colorize("  #{line}", :green)

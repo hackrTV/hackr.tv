@@ -261,11 +261,10 @@ module Terminal
         println renderer.colorize("  ╔════════════════════════════════════════════════════════════╗", :red)
         println renderer.colorize("  ║  #{EasterEggs.random_intercept.center(58)}  ║", :red)
         println renderer.colorize("  ╚════════════════════════════════════════════════════════════╝", :red)
-        println ""
       else
         println renderer.divider("GovCorp monitoring active", width: 65, color: :red)
-        println ""
       end
+      println ""
 
       @last_displayed_state = :connecting
     end

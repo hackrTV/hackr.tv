@@ -16,8 +16,7 @@ RSpec.describe Terminal::Handlers::CodexHandler do
       slug: "test-person",
       entry_type: "person",
       summary: "A test person for specs",
-      content: "Detailed content about the test person."
-    )
+      content: "Detailed content about the test person.")
   end
 
   let!(:location_entry) do
@@ -25,8 +24,7 @@ RSpec.describe Terminal::Handlers::CodexHandler do
       name: "Test Location",
       slug: "test-location",
       summary: "A test location",
-      content: "Details about the location."
-    )
+      content: "Details about the location.")
   end
 
   let!(:draft_entry) do
@@ -34,8 +32,7 @@ RSpec.describe Terminal::Handlers::CodexHandler do
       name: "Draft Entry",
       slug: "draft-entry",
       summary: "This is a draft",
-      published: false
-    )
+      published: false)
   end
 
   after do
@@ -284,8 +281,7 @@ RSpec.describe Terminal::Handlers::CodexHandler do
         name: "Wiki Test",
         slug: "wiki-test",
         summary: "Testing wiki links",
-        content: "See [[Test Person]] for more info. Also check [[Other Link|display text]]."
-      )
+        content: "See [[Test Person]] for more info. Also check [[Other Link|display text]].")
     end
 
     it "converts wiki links to highlighted text" do
@@ -303,8 +299,7 @@ RSpec.describe Terminal::Handlers::CodexHandler do
         name: "Markdown Test",
         slug: "markdown-test",
         summary: "Testing markdown",
-        content: "# Header One\n## Header Two\n**bold text**\n- bullet point"
-      )
+        content: "# Header One\n## Header Two\n**bold text**\n- bullet point")
     end
 
     it "converts markdown headers" do

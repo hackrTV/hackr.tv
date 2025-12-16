@@ -39,8 +39,12 @@ if Terminal::Password.valid?(password)
   exit 0  # PAM_SUCCESS
 else
   # Log failed attempt (optional, for monitoring)
-  File.open("/rails/log/ssh_auth.log", "a") do |f|
-    f.puts "[#{Time.now.utc.iso8601}] Failed SSH auth attempt for user: #{ENV['PAM_USER']}"
-  end rescue nil
+  begin
+    File.open("/rails/log/ssh_auth.log", "a") do |f|
+      f.puts "[#{Time.now.utc.iso8601}] Failed SSH auth attempt for user: #{ENV["PAM_USER"]}"
+    end
+  rescue
+    # Ignore logging errors
+  end
   exit 1  # PAM_AUTH_ERR
 end
