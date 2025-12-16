@@ -13,11 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
+      - name: Install dependencies
+        run: bundle install
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bundle exec brakeman --no-pager
@@ -28,11 +25,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
+      - name: Install dependencies
+        run: bundle install
 
       - name: Lint code for consistent style
         run: bundle exec standardrb
@@ -44,22 +38,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'pnpm'
+      - name: Install Ruby dependencies
+        run: bundle install
 
       - name: Install frontend dependencies
         run: pnpm install
@@ -85,17 +65,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
       - name: Install dependencies
         run: pnpm install
 
@@ -107,4 +76,3 @@ jobs:
 
       - name: Run Vitest tests
         run: pnpm test:run
-
