@@ -101,12 +101,15 @@ module Terminal
       end
 
       def display_realtime_pulse(event)
-        # Display notification above the prompt
-        println ""
-        println renderer.colorize("  ═══ NEW PULSE ═══", :amber)
-        println "  #{renderer.colorize("@#{event[:hackr_alias]}", :purple)}: #{event[:content].truncate(60)}"
-        println renderer.colorize("  Type 'refresh' to see full timeline", :gray)
-        println ""
+        # Display notification above the prompt (runs in Action Cable thread)
+        session.output.puts ""
+        session.output.puts renderer.colorize("  ═══ NEW PULSE ═══", :amber)
+        session.output.puts "  #{renderer.colorize("@#{event[:hackr_alias]}", :purple)}: #{event[:content].truncate(60)}"
+        session.output.puts renderer.colorize("  Type 'refresh' to see full timeline", :gray)
+        session.output.puts ""
+        # Reprint the prompt and flush so user sees it immediately
+        session.output.print prompt
+        session.output.flush
       end
 
       def display_timeline

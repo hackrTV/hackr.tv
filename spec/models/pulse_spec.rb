@@ -99,6 +99,65 @@ RSpec.describe Pulse, type: :model do
         expect(root.thread_root_id).to be_nil
       end
     end
+
+    describe "#broadcast_to_wire" do
+      it "broadcasts to pulse_wire channel after create" do
+        hackr = create(:grid_hackr)
+
+        expect(ActionCable.server).to receive(:broadcast).with(
+          "pulse_wire",
+          hash_including(
+            type: "new_pulse",
+            pulse: hash_including(
+              content: "Test pulse content",
+              grid_hackr: hash_including(
+                id: hackr.id,
+                hackr_alias: hackr.hackr_alias
+              )
+            )
+          )
+        )
+
+        create(:pulse, grid_hackr: hackr, content: "Test pulse content")
+      end
+
+      it "includes pulse id and pulsed_at in broadcast" do
+        hackr = create(:grid_hackr)
+
+        expect(ActionCable.server).to receive(:broadcast) do |channel, data|
+          expect(channel).to eq("pulse_wire")
+          expect(data[:type]).to eq("new_pulse")
+          expect(data[:pulse][:id]).to be_present
+          expect(data[:pulse][:pulsed_at]).to be_present
+        end
+
+        create(:pulse, grid_hackr: hackr)
+      end
+
+      it "includes parent_pulse_id for splices" do
+        parent = create(:pulse)
+
+        expect(ActionCable.server).to receive(:broadcast).with(
+          "pulse_wire",
+          hash_including(
+            pulse: hash_including(parent_pulse_id: parent.id)
+          )
+        )
+
+        create(:pulse, parent_pulse: parent)
+      end
+
+      it "sets parent_pulse_id to nil for root pulses" do
+        expect(ActionCable.server).to receive(:broadcast).with(
+          "pulse_wire",
+          hash_including(
+            pulse: hash_including(parent_pulse_id: nil)
+          )
+        )
+
+        create(:pulse)
+      end
+    end
   end
 
   describe "scopes" do

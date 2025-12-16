@@ -21,6 +21,13 @@ module Terminal
         load_art("frames/#{name}")
       end
 
+      # Load an image by name
+      # @param name [String, Symbol] Image name (without .txt extension)
+      # @return [String] Image content or empty string if not found
+      def image(name)
+        load_art("images/#{name}")
+      end
+
       # Load all frames for an animation
       # @param name [String, Symbol] Animation directory name
       # @return [Array<String>] Array of frame contents in order

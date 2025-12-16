@@ -15,6 +15,7 @@ class Pulse < ApplicationRecord
 
   before_validation :set_pulsed_at, on: :create
   before_save :set_thread_root
+  after_create_commit :broadcast_to_wire
 
   scope :active, -> { where(signal_dropped: false) }
   scope :dropped, -> { where(signal_dropped: true) }
@@ -66,5 +67,21 @@ class Pulse < ApplicationRecord
     if parent_pulse_id.present? && parent_pulse&.signal_dropped?
       errors.add(:parent_pulse_id, "cannot splice a signal-dropped pulse")
     end
+  end
+
+  def broadcast_to_wire
+    ActionCable.server.broadcast("pulse_wire", {
+      type: "new_pulse",
+      pulse: {
+        id: id,
+        content: content,
+        pulsed_at: pulsed_at.iso8601,
+        grid_hackr: {
+          id: grid_hackr_id,
+          hackr_alias: grid_hackr&.hackr_alias
+        },
+        parent_pulse_id: parent_pulse_id
+      }
+    })
   end
 end
