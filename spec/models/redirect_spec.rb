@@ -79,6 +79,15 @@ RSpec.describe Redirect, type: :model do
       result = Redirect.find_for("example.com", "/test")
       expect(result).to eq(global)
     end
+
+    it "matches paths case-insensitively" do
+      redirect = create(:redirect, domain: nil, path: "/xeraen", destination_url: "/xeraen")
+
+      expect(Redirect.find_for("example.com", "/XERAEN")).to eq(redirect)
+      expect(Redirect.find_for("example.com", "/Xeraen")).to eq(redirect)
+      expect(Redirect.find_for("example.com", "/XeRaEn")).to eq(redirect)
+      expect(Redirect.find_for("example.com", "/xeraen")).to eq(redirect)
+    end
   end
 
   describe "redirect scenarios" do
