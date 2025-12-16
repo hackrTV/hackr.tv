@@ -7,7 +7,7 @@ on:
 
 jobs:
   scan_ruby:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -20,10 +20,10 @@ jobs:
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bundle exec brakeman --no-pager
+        run: bin/brakeman --no-pager
 
   lint:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -38,7 +38,7 @@ jobs:
         run: bundle exec standardrb
 
   test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -64,22 +64,19 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Fix node_modules permissions
-        run: chmod -R +x node_modules/.bin
-
       - name: Build frontend assets
         run: pnpm build
 
       - name: Set up database
         run: |
-          bundle exec rails db:create
-          bundle exec rails db:migrate
+          bin/rails db:create
+          bin/rails db:migrate
 
       - name: Run RSpec tests
         run: bundle exec rspec
 
   test_frontend:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -99,12 +96,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Fix node_modules permissions
-        run: chmod -R +x node_modules/.bin
-
       - name: Lint TypeScript/React code
         run: pnpm lint
 
       - name: Run Vitest tests
         run: pnpm test:run
-

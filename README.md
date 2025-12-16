@@ -7,7 +7,7 @@
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.1-red.svg)](https://rubyonrails.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Tests-911%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-1233%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
@@ -25,7 +25,7 @@
 - **Animated Terminal Homepage** - Retro terminal-style interface with typing animation and keyboard skip
 - **Menu System** - Dynamic navigation with artist profiles, services, and conditional admin access
 - **Multi-Artist Showcases** - Dedicated pages for The.CyberPul.se, XERAEN, and more
-- **Band Profile Pages** - 4 custom band pages (System Rot, Wavelength Zero, Voiceprint, Temporal Blue Drift)
+- **Band Profile Pages** - 11 custom band pages with config-based architecture
 - **ViewComponent Architecture** - Reusable BandProfileComponent with flexible color schemes
 - **Hackr Logs** - Blog platform with Markdown support (remark-gfm, rehype-sanitize)
 
@@ -237,13 +237,13 @@ hackr.tv/
 │   └── channels/
 │       └── grid_channel.rb            # Real-time multiplayer (Action Cable)
 ├── data/                              # YAML data for import
-│   ├── artists.yml                    # 13 artists
-│   ├── albums.yml                     # 14 albums
+│   ├── artists.yml                    # 14 artists
+│   ├── albums.yml                     # 15 albums
 │   ├── tracks.yml                     # 66+ tracks
 │   └── [artist_slug]/                 # Artist-specific files
 ├── lib/tasks/
 │   └── import.rake                    # Data import scripts
-├── spec/                              # Test suite (827 examples)
+├── spec/                              # Test suite (1104 examples)
 │   ├── models/                        # Model specs (backend)
 │   ├── controllers/                   # Controller specs (backend)
 │   ├── components/                    # Component specs (frontend Vitest)
@@ -274,9 +274,9 @@ bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- **Backend:** 827 examples, 0 failures, 9 pending
-- **Frontend:** 84 examples (Vitest)
-- **Total:** 911 passing tests
+- **Backend:** 1104 examples, 0 failures (RSpec)
+- **Frontend:** 129 examples (Vitest)
+- **Total:** 1233 passing tests
 
 **Tested Components:**
 - **Models:** Artist, Album, Track, Playlist, PlaylistTrack, RadioStation, RadioStationPlaylist, GridHackr, GridRoom, HackrLog, Redirect, CodexEntry, Pulse, Echo
@@ -417,7 +417,7 @@ bin/rails import:yaml_tracks        # Tracks only
 - [x] **NPC dialogue system** - 2 NPCs with 13 total topics
 - [x] **Command history** - Arrow key navigation (100 commands)
 - [x] **Hackr Logs** - Blog platform with Markdown support
-- [x] **Comprehensive test suite** - 827 backend + 84 frontend tests (100% passing)
+- [x] **Comprehensive test suite** - 1104 backend + 129 frontend tests (100% passing)
 - [x] **The Codex wiki** - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
 - [x] **PulseWire social network** - Pulses, Echoes, Splices, real-time updates, admin moderation
 - [x] **OBS Overlay system** - Now Playing, PulseWire, Grid Activity overlays for livestreaming
@@ -458,8 +458,8 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/rails console` | Interactive Rails console |
 | `bin/rails db:migrate` | Run database migrations |
 | `bin/rails import:from_yaml` | Import all YAML data (artists, albums, tracks) |
-| `bundle exec rspec` | Run backend test suite (827 tests) |
-| `pnpm test` | Run frontend test suite (84 tests) |
+| `bundle exec rspec` | Run backend test suite (1104 tests) |
+| `pnpm test` | Run frontend test suite (129 tests) |
 | `bundle exec standardrb` | Lint backend code |
 | `pnpm install` | Install frontend dependencies |
 
