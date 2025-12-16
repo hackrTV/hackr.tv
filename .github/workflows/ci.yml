@@ -7,72 +7,97 @@ on:
 
 jobs:
   scan_ruby:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install dependencies
-        run: bundle install
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bundle exec brakeman --no-pager
+        run: bin/brakeman --no-pager
 
   lint:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install dependencies
-        run: bundle install
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
 
       - name: Lint code for consistent style
         run: bundle exec standardrb
 
   test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install Ruby dependencies
-        run: bundle install
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Fix node_modules permissions
-        run: find node_modules -type f -name "*.js" -path "*/bin/*" -exec chmod +x {} + && chmod -R +x node_modules/.bin || true
-
       - name: Build frontend assets
-        run: pnpm exec vite build
+        run: pnpm build
 
       - name: Set up database
         run: |
-          bundle exec rails db:create
-          bundle exec rails db:migrate
+          bin/rails db:create
+          bin/rails db:migrate
 
       - name: Run RSpec tests
         run: bundle exec rspec
 
   test_frontend:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
       - name: Install dependencies
         run: pnpm install
 
-      - name: Fix node_modules permissions
-        run: find node_modules -type f -name "*.js" -path "*/bin/*" -exec chmod +x {} + && chmod -R +x node_modules/.bin || true
-
       - name: Lint TypeScript/React code
-        run: pnpm exec eslint .
+        run: pnpm lint
 
       - name: Run Vitest tests
-        run: pnpm exec vitest run
+        run: pnpm test:run
