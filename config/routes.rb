@@ -164,6 +164,7 @@ Rails.application.routes.draw do
         post :end_stream
       end
     end
+    resources :redirects
 
     # Overlay admin routes
     get "overlays", to: "overlays#index", as: :overlays
