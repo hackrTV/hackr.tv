@@ -14,11 +14,12 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages
+# Install base packages (including OpenSSH for terminal access)
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 python3 python3-pip && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 python3 python3-pip openssh-server libpam-modules && \
     pip3 install --no-cache-dir --break-system-packages litecli && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
+    mkdir -p /var/run/sshd
 
 # Set production environment
 ENV RAILS_ENV="production" \
@@ -61,15 +62,27 @@ FROM base
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 
-# Run and own only the runtime files as a non-root user for security
+# Create users and set permissions
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER 1000:1000
+    useradd -r -s /rails/bin/hackr-shell -d /nonexistent access && \
+    chown -R rails:rails db log storage tmp && \
+    chmod +x /rails/bin/hackr-shell /rails/bin/docker-start /rails/docker/ssh/validate-password.rb /rails/docker/ssh/start-services.sh && \
+    cp /rails/docker/ssh/pam-hackr-ssh /etc/pam.d/sshd && \
+    cp /rails/docker/ssh/sshd_config /etc/ssh/sshd_config.hackr
+
+# Generate SSH host keys (or they can be mounted as volumes)
+RUN ssh-keygen -A
+
+# Environment variable to enable/disable SSH terminal access
+ENV TERMINAL_SSH_ENABLED="false"
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-CMD ["./bin/rails", "server"]
+# Expose both web and SSH ports
+EXPOSE 3000 9915
+
+# Smart start script handles both regular and SSH-enabled modes
+# Set TERMINAL_SSH_ENABLED=true to enable SSH terminal on port 9915
+CMD ["/rails/bin/docker-start"]

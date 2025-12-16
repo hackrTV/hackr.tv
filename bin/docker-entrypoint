@@ -11,4 +11,13 @@ if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
 fi
 
+# If running the SSH-enabled start script, prepare database and SSH
+if [ "${@: -1}" == "/rails/docker/ssh/start-services.sh" ]; then
+  # Database will be prepared by the start script
+  # Ensure SSH config is in place
+  if [ -f /etc/ssh/sshd_config.hackr ]; then
+    cp /etc/ssh/sshd_config.hackr /etc/ssh/sshd_config
+  fi
+fi
+
 exec "${@}"

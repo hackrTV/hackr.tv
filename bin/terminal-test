@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# terminal-test - Run the terminal locally for testing without SSH
+#
+# Usage:
+#   ./bin/terminal-test
+#
+# This runs the terminal session directly in your current terminal,
+# allowing you to test all features without setting up SSH.
+
+APP_ROOT = File.expand_path("..", __dir__)
+Dir.chdir(APP_ROOT)
+
+ENV["RAILS_ENV"] ||= "development"
+ENV["BUNDLE_GEMFILE"] ||= File.join(APP_ROOT, "Gemfile")
+
+# Disable Rails logging noise for cleaner terminal output
+ENV["RAILS_LOG_TO_STDOUT"] = nil
+
+require "bundler/setup"
+require_relative "../config/environment"
+require_relative "../lib/terminal"
+
+# Disable buffering for interactive I/O
+$stdout.sync = true
+$stdin.sync = true
+
+# Display startup info
+puts "\e[38;2;156;163;175m"
+puts "┌─────────────────────────────────────────────────────────┐"
+puts "│  hackr.tv Terminal Test Mode                            │"
+puts "│  Today's password: #{Terminal::Password.daily_password.ljust(37)}│"
+puts "│  Press Ctrl+C to exit                                   │"
+puts "└─────────────────────────────────────────────────────────┘"
+puts "\e[0m"
+puts
+
+# Run the terminal session
+begin
+  Terminal.start(input: $stdin, output: $stdout)
+rescue Interrupt
+  puts "\n\e[38;2;156;163;175mSession terminated.\e[0m"
+  exit 0
+rescue => e
+  puts "\e[31mError: #{e.message}\e[0m"
+  puts e.backtrace.first(5).join("\n") if ENV["DEBUG"]
+  exit 1
+end

@@ -68,6 +68,9 @@ Rails.application.routes.draw do
   get "wire/:username", to: "pages#spa_root", as: :wire_user
   get "wire/pulse/:id", to: "pages#spa_root", as: :wire_pulse
 
+  # Terminal SSH access credentials page
+  get "terminal", to: "terminal#index", as: :terminal
+
   # API routes (for SPA)
   namespace :api, defaults: {format: :json} do
     get "settings", to: "settings#index"
