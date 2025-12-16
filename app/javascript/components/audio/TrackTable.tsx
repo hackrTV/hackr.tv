@@ -158,21 +158,21 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                 >
                   <td>
                     {track.audio_url ? (
-                      <strong style={{ color: '#ccc', cursor: 'pointer' }}>
-                        {isCurrentTrack && isPlaying && <span>★ </span>}
+                      <strong style={{ color: isCurrentTrack && isPlaying ? '#00ffff' : '#ccc', cursor: 'pointer' }}>
+                        {isCurrentTrack && isPlaying && <span>► </span>}
                         {track.title}
                       </strong>
                     ) : (
                       <strong style={{ color: '#666' }}>{track.title}</strong>
                     )}
                   </td>
-                  <td style={{ color: track.audio_url ? '#aaa' : '#555' }}>
+                  <td style={{ color: !track.audio_url ? '#555' : isCurrentTrack && isPlaying ? '#00ffff' : '#aaa' }}>
                     &nbsp;{track.artist.name}&nbsp;
                   </td>
-                  <td style={{ color: track.audio_url ? '#999' : '#555' }}>
+                  <td style={{ color: !track.audio_url ? '#555' : isCurrentTrack && isPlaying ? '#00ffff' : '#999' }}>
                     &nbsp;{track.album.name || '-'}&nbsp;
                   </td>
-                  <td style={{ color: track.audio_url ? '#999' : '#555' }}>
+                  <td style={{ color: !track.audio_url ? '#555' : isCurrentTrack && isPlaying ? '#00ffff' : '#999' }}>
                     &nbsp;{track.artist.genre || '-'}&nbsp;
                   </td>
                   <td style={{ textAlign: 'center', width: '135px', minWidth: '135px' }}>
