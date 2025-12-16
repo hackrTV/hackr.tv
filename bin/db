@@ -29,4 +29,4 @@ fi
 
 # Connect to the database
 echo "Connecting to $ENV database at $DB_PATH"
-litecli "$DB_PATH"
+litecli --auto-vertical-output "$DB_PATH"
