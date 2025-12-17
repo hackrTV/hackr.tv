@@ -52,12 +52,19 @@ if [ "${TERMINAL_SSH_ENABLED}" = "true" ]; then
         useradd -r -s /rails/bin/hackr-shell -d /home/access -G rails access
     else
         # User exists (from Dockerfile), ensure they're in the rails group
-        usermod -a -G rails access
+        usermod -a -G rails access 2>/dev/null || true
     fi
+    # Also update home directory if it was set to /nonexistent
+    usermod -d /home/access access 2>/dev/null || true
     chown access:access /home/access
+    echo "access user groups: $(id access)"
 
-    # Grant rails group write access to storage (needed for SQLite)
+    # Grant access user write access to storage (needed for SQLite)
+    # The storage volume may have root ownership from initial creation
+    chown -R rails:rails /rails/storage
     chmod -R g+rw /rails/storage
+    # Also make database files world-writable as fallback (container-only risk)
+    chmod a+rw /rails/storage/*.sqlite3 /rails/storage/*.sqlite3-* 2>/dev/null || true
 
     # Set permissions
     chmod 755 /rails/bin/hackr-shell
