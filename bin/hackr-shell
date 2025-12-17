@@ -22,6 +22,15 @@
 APP_ROOT = File.expand_path("..", __dir__)
 Dir.chdir(APP_ROOT)
 
+# SSH sessions don't inherit Docker's environment variables.
+# Read environment from the main container process (PID 1) to get SECRET_KEY_BASE etc.
+if File.readable?("/proc/1/environ")
+  File.read("/proc/1/environ").split("\0").each do |var|
+    key, value = var.split("=", 2)
+    ENV[key] ||= value if key && value
+  end
+end
+
 # Set up environment for Bundler (PAM/SSH doesn't inherit these)
 ENV["RAILS_ENV"] ||= "production"
 ENV["BUNDLE_GEMFILE"] ||= File.join(APP_ROOT, "Gemfile")
