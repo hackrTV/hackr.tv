@@ -44,10 +44,13 @@ if [ "${TERMINAL_SSH_ENABLED}" = "true" ]; then
         ssh-keygen -t ed25519 -f /etc/ssh/keys/ssh_host_ed25519_key -N ""
     fi
 
-    # Ensure access user exists with correct shell
+    # Ensure access user exists with correct shell and a real home directory
+    # (prevents "Could not chdir to home directory" and Bundler warnings)
+    mkdir -p /home/access
     if ! id "access" &>/dev/null; then
-        useradd -r -s /rails/bin/hackr-shell -d /nonexistent access
+        useradd -r -s /rails/bin/hackr-shell -d /home/access access
     fi
+    chown access:access /home/access
 
     # Set permissions
     chmod 755 /rails/bin/hackr-shell

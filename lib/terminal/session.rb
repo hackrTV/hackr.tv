@@ -266,6 +266,11 @@ module Terminal
       end
       println ""
 
+      # Pause so user can see the banner before menu clears the screen
+      print renderer.colorize("  Press ENTER to continue...", :gray)
+      output.flush
+      gets
+
       @last_displayed_state = :connecting
     end
 

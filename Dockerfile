@@ -65,7 +65,9 @@ COPY --from=build /rails /rails
 # Create users and set permissions
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    useradd -r -s /rails/bin/hackr-shell -d /nonexistent access && \
+    mkdir -p /home/access && \
+    useradd -r -s /rails/bin/hackr-shell -d /home/access access && \
+    chown access:access /home/access && \
     chown -R rails:rails db log storage tmp && \
     chmod +x /rails/bin/hackr-shell /rails/bin/docker-start /rails/docker/ssh/validate-password.rb /rails/docker/ssh/start-services.sh && \
     cp /rails/docker/ssh/pam-hackr-ssh /etc/pam.d/sshd && \
