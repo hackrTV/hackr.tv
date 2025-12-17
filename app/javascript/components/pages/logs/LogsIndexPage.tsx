@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { formatFutureDate } from '~/utils/dateUtils'
@@ -17,6 +17,13 @@ interface HackrLog {
   }
 }
 
+interface PaginationMeta {
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}
+
 const truncateMarkdown = (markdown: string, maxLength: number = 300): string => {
   // Remove markdown formatting and truncate
   const plainText = markdown
@@ -32,23 +39,34 @@ const truncateMarkdown = (markdown: string, maxLength: number = 300): string => 
 }
 
 export const LogsIndexPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [logs, setLogs] = useState<HackrLog[]>([])
-  const [loading, setLoading] = useState(true)
+  const [meta, setMeta] = useState<PaginationMeta | null>(null)
+  const [fetchedPage, setFetchedPage] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const currentPage = parseInt(searchParams.get('page') || '1', 10)
+  const loading = fetchedPage !== currentPage
+
   useEffect(() => {
-    fetch('/api/logs')
+    fetch(`/api/logs?page=${currentPage}`)
       .then(res => res.json())
       .then(data => {
-        setLogs(data)
-        setLoading(false)
+        setLogs(data.logs)
+        setMeta(data.meta)
+        setFetchedPage(currentPage)
       })
       .catch(err => {
         console.error('Failed to load logs:', err)
         setError('Failed to load logs')
-        setLoading(false)
+        setFetchedPage(currentPage)
       })
-  }, [])
+  }, [currentPage])
+
+  const goToPage = (page: number) => {
+    setSearchParams({ page: page.toString() })
+    window.scrollTo(0, 0)
+  }
 
   if (loading) {
     return (
@@ -79,37 +97,78 @@ export const LogsIndexPage: React.FC = () => {
         </div>
 
         {logs.length > 0 ? (
-          logs.map(log => (
-            <div key={log.id} style={{ background: '#0d0d0d', marginBottom: '25px', padding: '25px', borderLeft: '3px solid #6366f1' }}>
-              {/* Title */}
-              <h2 style={{ margin: '0 0 12px 0' }}>
-                <Link to={`/logs/${log.slug}`} style={{ color: '#a78bfa', textDecoration: 'none', fontSize: '1.3em' }}>
-                  {log.title}
-                </Link>
-              </h2>
+          <>
+            {logs.map(log => (
+              <div key={log.id} style={{ background: '#0d0d0d', marginBottom: '25px', padding: '25px', borderLeft: '3px solid #6366f1' }}>
+                {/* Title */}
+                <h2 style={{ margin: '0 0 12px 0' }}>
+                  <Link to={`/logs/${log.slug}`} style={{ color: '#a78bfa', textDecoration: 'none', fontSize: '1.3em' }}>
+                    {log.title}
+                  </Link>
+                </h2>
 
-              {/* Metadata */}
-              <div style={{ marginBottom: '18px', fontSize: '0.85em' }}>
-                <span style={{ color: '#6b7280' }}>Published:</span>{' '}
-                <span style={{ color: '#9ca3af' }}>{formatFutureDate(log.published_at)}</span>
-                <span style={{ color: '#4b5563', margin: '0 8px' }}>•</span>
-                <span style={{ color: '#6b7280' }}>By:</span>{' '}
-                <span style={{ color: '#9ca3af' }}>{log.author.hackr_alias}</span>
-              </div>
+                {/* Metadata */}
+                <div style={{ marginBottom: '18px', fontSize: '0.85em' }}>
+                  <span style={{ color: '#6b7280' }}>Published:</span>{' '}
+                  <span style={{ color: '#9ca3af' }}>{formatFutureDate(log.published_at)}</span>
+                  <span style={{ color: '#4b5563', margin: '0 8px' }}>•</span>
+                  <span style={{ color: '#6b7280' }}>By:</span>{' '}
+                  <span style={{ color: '#9ca3af' }}>{log.author.hackr_alias}</span>
+                </div>
 
-              {/* Excerpt */}
-              <div style={{ color: '#9ca3af', lineHeight: '1.7', marginBottom: '15px' }}>
-                {truncateMarkdown(log.body || '', 300)}
-              </div>
+                {/* Excerpt */}
+                <div style={{ color: '#9ca3af', lineHeight: '1.7', marginBottom: '15px' }}>
+                  {truncateMarkdown(log.body || '', 300)}
+                </div>
 
-              {/* Read More Link */}
-              <div>
-                <Link to={`/logs/${log.slug}`} style={{ color: '#818cf8', textDecoration: 'none', fontSize: '0.9em' }}>
-                  Read more →
-                </Link>
+                {/* Read More Link */}
+                <div>
+                  <Link to={`/logs/${log.slug}`} style={{ color: '#818cf8', textDecoration: 'none', fontSize: '0.9em' }}>
+                    Read more →
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+
+            {/* Pagination */}
+            {meta && meta.total_pages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #333' }}>
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  style={{
+                    background: currentPage <= 1 ? '#2a2a2a' : '#4b5563',
+                    color: currentPage <= 1 ? '#555' : '#d0d0d0',
+                    border: 'none',
+                    padding: '8px 16px',
+                    cursor: currentPage <= 1 ? 'not-allowed' : 'pointer',
+                    fontFamily: 'inherit'
+                  }}
+                >
+                  « Prev
+                </button>
+
+                <span style={{ color: '#9ca3af', fontSize: '0.9em' }}>
+                  Page {meta.page} of {meta.total_pages}
+                </span>
+
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage >= meta.total_pages}
+                  style={{
+                    background: currentPage >= meta.total_pages ? '#2a2a2a' : '#4b5563',
+                    color: currentPage >= meta.total_pages ? '#555' : '#d0d0d0',
+                    border: 'none',
+                    padding: '8px 16px',
+                    cursor: currentPage >= meta.total_pages ? 'not-allowed' : 'pointer',
+                    fontFamily: 'inherit'
+                  }}
+                >
+                  Next »
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div style={{ padding: '60px', textAlign: 'center', background: '#0d0d0d', border: '1px solid #333' }}>
             <p style={{ color: '#6b7280', fontSize: '1.1em', lineHeight: '1.8' }}>
