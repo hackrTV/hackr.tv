@@ -18,10 +18,12 @@ PermitRootLogin no
 MaxAuthTries 3
 MaxSessions 10
 
-# Password authentication only for the 'access' user
-PasswordAuthentication yes
+# Password authentication via PAM
+# KbdInteractiveAuthentication (formerly ChallengeResponseAuthentication) is required
+# for pam_exec to receive the password properly
+PasswordAuthentication no
 PubkeyAuthentication no
-ChallengeResponseAuthentication no
+KbdInteractiveAuthentication yes
 
 # Use custom PAM service
 UsePAM yes
@@ -62,7 +64,6 @@ AllowUsers access
 # NOTE: Match blocks must be at the END of sshd_config
 Match User access
     ForceCommand /rails/bin/hackr-shell
-    PasswordAuthentication yes
     PubkeyAuthentication no
     AllowTcpForwarding no
     X11Forwarding no
