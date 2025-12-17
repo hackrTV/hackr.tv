@@ -1,6 +1,8 @@
 puts "Seeding THE PULSE GRID..."
 
 # Clear existing data
+# HackrLogs must be cleared first due to foreign key on GridHackr
+HackrLog.destroy_all
 GridMessage.destroy_all
 GridItem.destroy_all
 GridMob.destroy_all
@@ -319,13 +321,42 @@ GridHackr.create!(
   current_room: hackr_tv
 )
 
-puts "Created 2 admin hackrs"
+# Additional core hackrs for PulseWire and HackrLogs
+# Cipher - Security specialist, handles OPSEC
+cipher_password = Rails.env.production? ? ENV.fetch("CIPHER_PASSWORD") { raise "CIPHER_PASSWORD required in production" } : ENV.fetch("CIPHER_PASSWORD", "frequency")
+GridHackr.create!(
+  hackr_alias: "Cipher",
+  password: cipher_password,
+  role: "operative",
+  current_room: hackr_tv
+)
+
+# Synthia - AI consciousness, communicates through frequency modulation
+GridHackr.create!(
+  hackr_alias: "Synthia",
+  password: ENV.fetch("SYNTHIA_PASSWORD", "waveform"),
+  role: "operative",
+  current_room: xeraen_base
+)
+
+# Nyx - Newer recruit, still processing the implications
+GridHackr.create!(
+  hackr_alias: "Nyx",
+  password: ENV.fetch("NYX_PASSWORD", "unfiltered"),
+  role: "operative",
+  current_room: hackr_tv
+)
+
+puts "Created 5 core hackrs"
 
 puts "\n✓ THE PULSE GRID seeded successfully!"
 if Rails.env.production?
-  puts "Admin accounts created with passwords from environment variables."
+  puts "Hackr accounts created with passwords from environment variables."
 else
-  puts "Admin accounts (development defaults):"
-  puts "  - XERAEN / hackthefuture"
-  puts "  - Ryker / cyberpulse"
+  puts "Hackr accounts (development defaults):"
+  puts "  - XERAEN / hackthefuture (admin)"
+  puts "  - Ryker / cyberpulse (admin)"
+  puts "  - Cipher / frequency (operative)"
+  puts "  - Synthia / waveform (operative)"
+  puts "  - Nyx / unfiltered (operative)"
 end
