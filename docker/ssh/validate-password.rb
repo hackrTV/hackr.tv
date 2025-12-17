@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/local/bin/ruby
 # frozen_string_literal: true
 
 # PAM password validation script for hackr.tv terminal SSH access
