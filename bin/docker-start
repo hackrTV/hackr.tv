@@ -53,6 +53,15 @@ if [ "${TERMINAL_SSH_ENABLED}" = "true" ]; then
     chmod 755 /rails/bin/hackr-shell
     chmod 755 /rails/docker/ssh/validate-password.rb
 
+    # Write environment variables to a file for hackr-shell to read
+    # (SSH sessions don't inherit Docker's environment)
+    cat > /rails/tmp/terminal_env.sh << ENVEOF
+export SECRET_KEY_BASE="${SECRET_KEY_BASE}"
+export RAILS_ENV="${RAILS_ENV:-production}"
+export DATABASE_URL="${DATABASE_URL:-}"
+ENVEOF
+    chmod 644 /rails/tmp/terminal_env.sh
+
     # Start SSH daemon in background
     echo "Starting SSH daemon on port 9915..."
     /usr/sbin/sshd -D -f /etc/ssh/sshd_config &

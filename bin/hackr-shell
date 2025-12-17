@@ -23,11 +23,15 @@ APP_ROOT = File.expand_path("..", __dir__)
 Dir.chdir(APP_ROOT)
 
 # SSH sessions don't inherit Docker's environment variables.
-# Read environment from the main container process (PID 1) to get SECRET_KEY_BASE etc.
-if File.readable?("/proc/1/environ")
-  File.read("/proc/1/environ").split("\0").each do |var|
-    key, value = var.split("=", 2)
-    ENV[key] ||= value if key && value
+# Read environment from file created by docker-start (readable by access user)
+ENV_FILE = File.join(APP_ROOT, "tmp", "terminal_env.sh")
+if File.readable?(ENV_FILE)
+  File.readlines(ENV_FILE).each do |line|
+    # Parse "export KEY=value" or "export KEY="value""
+    if line =~ /^export\s+(\w+)=["']?(.*)["']?$/
+      key, value = $1, $2.chomp.gsub(/^["']|["']$/, '')
+      ENV[key] ||= value unless value.empty?
+    end
   end
 end
 
