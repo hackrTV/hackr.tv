@@ -71,8 +71,12 @@ RUN groupadd --system --gid 1000 rails && \
     cp /rails/docker/ssh/pam-hackr-ssh /etc/pam.d/sshd && \
     cp /rails/docker/ssh/sshd_config /etc/ssh/sshd_config.hackr
 
-# Generate SSH host keys (or they can be mounted as volumes)
-RUN ssh-keygen -A
+# Generate SSH host keys in /etc/ssh/keys/ (volume-mounted separately from config)
+# This allows sshd_config updates on rebuild while persisting keys
+RUN mkdir -p /etc/ssh/keys && \
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/keys/ssh_host_rsa_key -N "" && \
+    ssh-keygen -t ecdsa -b 521 -f /etc/ssh/keys/ssh_host_ecdsa_key -N "" && \
+    ssh-keygen -t ed25519 -f /etc/ssh/keys/ssh_host_ed25519_key -N ""
 
 # Environment variable to enable/disable SSH terminal access
 ENV TERMINAL_SSH_ENABLED="false"

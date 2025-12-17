@@ -39,10 +39,11 @@ PermitTTY yes
 # Banner for pre-auth (optional)
 # Banner /etc/ssh/banner.txt
 
-# Host keys (will be generated on first run)
-HostKey /etc/ssh/ssh_host_rsa_key
-HostKey /etc/ssh/ssh_host_ecdsa_key
-HostKey /etc/ssh/ssh_host_ed25519_key
+# Host keys - stored in /etc/ssh/keys/ so they can be volume-mounted
+# separately from sshd_config (allowing config updates on rebuild)
+HostKey /etc/ssh/keys/ssh_host_rsa_key
+HostKey /etc/ssh/keys/ssh_host_ecdsa_key
+HostKey /etc/ssh/keys/ssh_host_ed25519_key
 
 # Crypto settings (modern and secure)
 KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256

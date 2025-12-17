@@ -35,10 +35,13 @@ if [ "${TERMINAL_SSH_ENABLED}" = "true" ]; then
         cp /etc/ssh/sshd_config.hackr /etc/ssh/sshd_config
     fi
 
-    # Generate SSH host keys if they don't exist (should be persisted via volume)
-    if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
-        echo "Generating SSH host keys..."
-        ssh-keygen -A
+    # Generate SSH host keys if they don't exist (persisted via volume at /etc/ssh/keys/)
+    if [ ! -f /etc/ssh/keys/ssh_host_rsa_key ]; then
+        echo "Generating SSH host keys in /etc/ssh/keys/..."
+        mkdir -p /etc/ssh/keys
+        ssh-keygen -t rsa -b 4096 -f /etc/ssh/keys/ssh_host_rsa_key -N ""
+        ssh-keygen -t ecdsa -b 521 -f /etc/ssh/keys/ssh_host_ecdsa_key -N ""
+        ssh-keygen -t ed25519 -f /etc/ssh/keys/ssh_host_ed25519_key -N ""
     fi
 
     # Ensure access user exists with correct shell
