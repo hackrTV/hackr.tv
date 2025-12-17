@@ -11,6 +11,16 @@
 #   0 = password valid (PAM_SUCCESS)
 #   1 = password invalid (PAM_AUTH_ERR)
 
+LOG_FILE = "/rails/log/ssh_auth.log"
+
+def log(message)
+  File.open(LOG_FILE, "a") { |f| f.puts "[#{Time.now.utc}] #{message}" }
+rescue
+  # Ignore logging errors
+end
+
+log "PAM script started, PAM_USER=#{ENV["PAM_USER"]}"
+
 APP_ROOT = ENV.fetch("RAILS_ROOT", "/rails")
 
 # Set up minimal environment
@@ -31,20 +41,19 @@ require "date"
 # Load just the password module
 require_relative "#{APP_ROOT}/lib/terminal/password"
 
-# Read password from stdin (PAM sends it this way)
-password = $stdin.gets&.chomp
+# Read password from stdin
+# pam_exec with expose_authtok sends: password + null byte
+# Try multiple read methods to handle different PAM behaviors
+raw_input = $stdin.read
+password = raw_input&.chomp("\0")&.chomp&.strip
+
+log "Password received (length=#{password&.length}), expected=#{Terminal::Password.daily_password}"
 
 # Validate
 if Terminal::Password.valid?(password)
+  log "AUTH SUCCESS for user: #{ENV["PAM_USER"]}"
   exit 0  # PAM_SUCCESS
 else
-  # Log failed attempt (optional, for monitoring)
-  begin
-    File.open("/rails/log/ssh_auth.log", "a") do |f|
-      f.puts "[#{Time.now.utc.iso8601}] Failed SSH auth attempt for user: #{ENV["PAM_USER"]}"
-    end
-  rescue
-    # Ignore logging errors
-  end
+  log "AUTH FAILED for user: #{ENV["PAM_USER"]}"
   exit 1  # PAM_AUTH_ERR
 end
