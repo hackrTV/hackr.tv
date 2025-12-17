@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/local/bin/ruby
 # frozen_string_literal: true
 
 # hackr-shell - Restricted shell for SSH terminal access to hackr.tv
@@ -22,9 +22,12 @@
 APP_ROOT = File.expand_path("..", __dir__)
 Dir.chdir(APP_ROOT)
 
-# Set up environment
+# Set up environment for Bundler (PAM/SSH doesn't inherit these)
 ENV["RAILS_ENV"] ||= "production"
 ENV["BUNDLE_GEMFILE"] ||= File.join(APP_ROOT, "Gemfile")
+ENV["BUNDLE_PATH"] ||= "/usr/local/bundle"
+ENV["BUNDLE_DEPLOYMENT"] ||= "1"
+ENV["BUNDLE_WITHOUT"] ||= "development"
 
 # Disable Rails logging for terminal sessions
 ENV["RAILS_LOG_TO_STDOUT"] = nil
