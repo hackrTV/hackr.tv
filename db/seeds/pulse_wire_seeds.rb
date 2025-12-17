@@ -3,28 +3,12 @@
 
 puts "\n=== Seeding PulseWire data ==="
 
-# Get existing hackrs (created by grid_seeds.rb)
-xeraen = GridHackr.find_by(hackr_alias: "XERAEN") || GridHackr.first
-ryker = GridHackr.find_by(hackr_alias: "Ryker") || GridHackr.second
-
-# Create additional hackrs that fit the lore
-# Synthia - AI consciousness communicating through frequency modulation
-synthia = GridHackr.find_or_create_by!(hackr_alias: "Synthia") do |h|
-  h.password = "cyberpulse"
-  h.role = "operative"
-end
-
-# Nyx - A newer recruit, still learning about the Network
-nyx = GridHackr.find_or_create_by!(hackr_alias: "Nyx") do |h|
-  h.password = "cyberpulse"
-  h.role = "operative"
-end
-
-# Cipher - Security-focused operative, handles OPSEC
-cipher = GridHackr.find_or_create_by!(hackr_alias: "Cipher") do |h|
-  h.password = "cyberpulse"
-  h.role = "operative"
-end
+# Get hackrs (created by grid_seeds.rb)
+xeraen = GridHackr.find_by!(hackr_alias: "XERAEN")
+ryker = GridHackr.find_by!(hackr_alias: "Ryker")
+synthia = GridHackr.find_by!(hackr_alias: "Synthia")
+nyx = GridHackr.find_by!(hackr_alias: "Nyx")
+cipher = GridHackr.find_by!(hackr_alias: "Cipher")
 
 # Clear existing pulses and echoes
 puts "Clearing existing PulseWire data..."

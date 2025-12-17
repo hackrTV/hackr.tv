@@ -11,5 +11,8 @@ load Rails.root.join("db", "seeds", "codex_seeds.rb")
 # Load PulseWire seed data
 load Rails.root.join("db", "seeds", "pulse_wire_seeds.rb")
 
+# Load HackrLogs seed data
+load Rails.root.join("db", "seeds", "hackr_logs_seeds.rb")
+
 # Load Overlay seed data
 load Rails.root.join("db", "seeds", "overlay_seeds.rb")
