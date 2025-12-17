@@ -50,6 +50,9 @@ if [ "${TERMINAL_SSH_ENABLED}" = "true" ]; then
     mkdir -p /home/access
     if ! id "access" &>/dev/null; then
         useradd -r -s /rails/bin/hackr-shell -d /home/access -G rails access
+    else
+        # User exists (from Dockerfile), ensure they're in the rails group
+        usermod -a -G rails access
     fi
     chown access:access /home/access
 
