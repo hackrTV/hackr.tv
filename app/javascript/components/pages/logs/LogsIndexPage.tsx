@@ -42,24 +42,24 @@ export const LogsIndexPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [logs, setLogs] = useState<HackrLog[]>([])
   const [meta, setMeta] = useState<PaginationMeta | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [fetchedPage, setFetchedPage] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10)
+  const loading = fetchedPage !== currentPage
 
   useEffect(() => {
-    setLoading(true)
     fetch(`/api/logs?page=${currentPage}`)
       .then(res => res.json())
       .then(data => {
         setLogs(data.logs)
         setMeta(data.meta)
-        setLoading(false)
+        setFetchedPage(currentPage)
       })
       .catch(err => {
         console.error('Failed to load logs:', err)
         setError('Failed to load logs')
-        setLoading(false)
+        setFetchedPage(currentPage)
       })
   }, [currentPage])
 
