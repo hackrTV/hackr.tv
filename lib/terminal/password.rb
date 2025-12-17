@@ -27,7 +27,9 @@ module Terminal
       # Format: word-word-word (e.g., "neon-cipher-ghost")
       # @return [String] Today's rotating password
       def daily_password
-        generate_password_for_date(Date.current)
+        # Use Date.today (not Date.current) for compatibility with standalone scripts
+        # that don't load ActiveSupport (like the PAM validation script)
+        generate_password_for_date(Date.today)
       end
 
       # Generate password for a specific date (useful for testing)
