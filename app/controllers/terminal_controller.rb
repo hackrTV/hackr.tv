@@ -3,6 +3,8 @@
 # Controller for the terminal access credentials page
 # Displays the daily rotating password for SSH access
 class TerminalController < ApplicationController
+  layout "terminal"
+
   def index
     require_relative "../../lib/terminal/password"
 
