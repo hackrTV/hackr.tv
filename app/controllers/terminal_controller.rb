@@ -9,6 +9,6 @@ class TerminalController < ApplicationController
     @password = Terminal::Password.daily_password
     @next_rotation = Terminal::Password.next_rotation_at
     @countdown = Terminal::Password.rotation_countdown
-    @ssh_command = "ssh access@hackr.tv -p 9915"
+    @ssh_command = "ssh access@terminal.hackr.tv -p 9915"
   end
 end

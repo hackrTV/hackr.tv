@@ -3,7 +3,7 @@
 BBS-style terminal interface providing SSH access to THE.CYBERPUL.SE universe.
 
 ```bash
-ssh access@hackr.tv -p 9915
+ssh access@terminal.hackr.tv -p 9915
 ```
 
 **Status:** Complete ✅
@@ -274,7 +274,7 @@ docker compose build hackr_tv
 docker compose up -d
 
 # Test connection
-ssh access@hackr.tv -p 9915
+ssh access@terminal.hackr.tv -p 9915
 ```
 
 #### Key Features
@@ -381,7 +381,7 @@ echo "TERMINAL_SSH_ENABLED=true" >> .env
 docker compose build hackr_tv && docker compose up -d
 
 # Test connection (password from /terminal page)
-ssh access@hackr.tv -p 9915
+ssh access@terminal.hackr.tv -p 9915
 ```
 
 ### Daily Password

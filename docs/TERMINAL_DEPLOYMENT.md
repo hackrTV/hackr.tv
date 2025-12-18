@@ -4,7 +4,7 @@ This guide covers deploying the hackr.tv terminal SSH access system locally and 
 
 ## Overview
 
-The terminal system provides a BBS-style SSH interface to THE.CYBERPUL.SE at `ssh access@hackr.tv -p 9915`. Features include:
+The terminal system provides a BBS-style SSH interface to THE.CYBERPUL.SE at `ssh access@terminal.hackr.tv -p 9915`. Features include:
 
 - Daily rotating password (displayed at `/terminal` page)
 - Rich ASCII art and cyberpunk aesthetics
@@ -161,7 +161,7 @@ services:
    curl https://hackr.tv/terminal
 
    # Connect via SSH
-   ssh access@hackr.tv -p 9915
+   ssh access@terminal.hackr.tv -p 9915
    ```
 
 ### Disabling SSH Terminal
