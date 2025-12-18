@@ -254,7 +254,7 @@ export const HeaderMenu: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <a href="#" onClick={(e) => { e.preventDefault(); openTerminal(); }}>
+                <a href="#" onClick={(e) => { e.preventDefault(); openTerminal() }}>
                   <span className="purple-168-text">&gt;</span>terminal
                 </a>
               </li>
