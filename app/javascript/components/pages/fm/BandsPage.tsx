@@ -64,7 +64,7 @@ export const BandsPage: React.FC = () => {
       'system_rot': 'Decay is the message. Entropy is the method. Hardcore punk collapse is inevitable.',
       'temporal_blue_drift': 'Math rock time travelers proving complexity is the most beautiful form of resistance.',
       'offline': 'Unplugged, authentic, and gloriously disconnected from the grid. Analog hearts never die.',
-      'apex_overdrive': 'Euphoric hardstyle as a weapon. Unity as power. Victory coded into every beat.',
+      'apex_overdrive': 'Euphoric hardstyle, honed into a weapon. Promoting unity as power. Victory coded into every beat.',
       'voiceprint': 'Liquid DnB resistance. Your voice is your weapon, your identity eternally unbreakable.',
       'neon_hearts': 'Kawaii camouflage hiding radical resistance. J-Pop cuteness is the ultimate Trojan horse.',
       'ethereality': 'Consciousness expansion through classic vocal trance. Inner freedom transcends all control.',

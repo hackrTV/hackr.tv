@@ -85,7 +85,7 @@ const XeraenPage: React.FC = () => {
               </p>
               <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
                 XERAEN doesn't perform. XERAEN transmits. Every track is a frequency aimed at a point in
-                spacetime that shouldn't be reachable. Music as temporal displacement. Sound as a message
+                spacetime that shouldn't be reachable. Music transmitted through temporal displacement. The sound, a message
                 in a bottle thrown into the electromagnetic ocean between centuries.
               </p>
               <p
@@ -154,7 +154,7 @@ const XeraenPage: React.FC = () => {
                     voltage of someone screaming into the void hoping the past would hear.
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                    But signals change over distance. What started as sonic assault has transformed into
+                    But signals change over distance. What started as a sonic assault has transformed into
                     something XERAEN calls <span style={{ color: colorScheme.primary, fontWeight: 'bold' }}>OMNIWAVE</span> -
                     an electronic-leaning exploration where rhythmic guitars weave through synthesized
                     frequencies. Genre boundaries dissolve. The transmissions now include reinterpretations
@@ -276,7 +276,7 @@ const XeraenPage: React.FC = () => {
                   WHAT THE SIGNAL CARRIES
                 </legend>
                 <div style={{ padding: '20px' }}>
-                  {/* Static as Language */}
+                  {/* The Static Decoded */}
                   <div
                     style={{
                       marginBottom: '25px',
@@ -294,7 +294,7 @@ const XeraenPage: React.FC = () => {
                         textShadow: `0 0 8px ${colorScheme.glow}`
                       }}
                     >
-                      Static as Language
+                      The Static Decoded
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                       The interference isn't noise - it's the sound of a signal fighting through a hundred years
@@ -331,7 +331,7 @@ const XeraenPage: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Love as Waveform */}
+                  {/* The Waveform of Love */}
                   <div
                     style={{
                       marginBottom: '25px',
@@ -349,7 +349,7 @@ const XeraenPage: React.FC = () => {
                         textShadow: `0 0 8px ${colorScheme.glow}`
                       }}
                     >
-                      Love as Waveform
+                      The Waveform of Love
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                       <CodexText>

@@ -400,9 +400,9 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             <div style={{ marginBottom: '25px' }}>
               <h3 style={{ color: '#ff6600', marginBottom: '10px', textTransform: 'uppercase' }}>Kinetic Warfare</h3>
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
-                Physics as weapon - mass times velocity equals liberation. Sometimes subtlety fails; sometimes you need
+                You can't argue with Physics - mass times velocity equals liberation. Sometimes subtlety fails; sometimes you need
                 to bring the hammer down. High-risk missions where failure means capture or death. Frontline combat
-                when resistance needs soldiers, not just hackers.
+                when resistance needs soldiers, not just hackrs.
               </p>
             </div>
 
@@ -583,7 +583,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                 Even when signals degrade, even when entropy threatens to destroy information, the fight is to reconstruct, rebuild,
                 persist. Information wants to survive. The Fracture Network's knowledge will outlast attempts to destroy it. There's a cold
                 beauty to perfect mathematical precision, the satisfaction of watching complex systems lock into place, the elegance
-                of encryption algorithms expressed as polyrhythmic guitar patterns.
+                of encryption algorithms expressed through polyrhythmic guitar patterns.
               </p>
             </div>
 
@@ -628,7 +628,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
         <p style={{ color: '#ccc', lineHeight: '1.6', marginBottom: '15px' }}>
           BlitzBeam+ exists as pure energy - a sonic representation of velocity so extreme that it becomes liberation itself.
-          This is acceleration as philosophy, speed as spiritual transcendence, movement so fast that reality itself cannot
+          This is acceleration philosophy, speeding toward spiritual transcendence, movement so fast that reality itself cannot
           maintain its grip.
         </p>
         <p style={{ color: '#ffff00', lineHeight: '1.6', fontWeight: 'bold' }}>
@@ -649,7 +649,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                 </p>
                 <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
                   Five tracks charting transcendence through speed. Purely instrumental because words would only slow down
-                  what needs to be pure kinetic energy. This is music as velocity manifest, sound moving so fast it pulls
+                  what needs to be pure kinetic energy. This is music from velocity manifest, sound moving so fast it pulls
                   listeners along with it.
                 </p>
                 <p style={{ color: '#00ffff', lineHeight: '1.7', fontSize: '0.95em' }}>
@@ -705,8 +705,8 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <h3 style={{ color: '#ff0080', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>⚡ MORE THAN MAXIMUM</h3>
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
                 The "+" in BlitzBeam+ means exceeding designed limits, going beyond what's already extreme, the euphoria of velocity,
-                continuous acceleration without plateau. You can always go faster. There is always velocity+. This is speed as
-                existential experience - pure movement without destination, velocity as its own reward.
+                continuous acceleration without plateau. You can always go faster. There is always velocity+. This is the
+                existential experience of speed - pure movement without destination, velocity being its own reward.
               </p>
             </div>
 
@@ -781,7 +781,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           of people united at their peak.
         </p>
         <p style={{ color: '#ffd700', lineHeight: '1.7', fontWeight: 'bold' }}>
-          Melodic Euphoric Hardstyle (150+ BPM) · Soaring Breakdowns · Anthemic Unity · Victory as Present Tense
+          Melodic Euphoric Hardstyle (150+ BPM) · Soaring Breakdowns · Anthemic Unity · Victory in the Present Tense
         </p>
       </div>
     ),
@@ -799,7 +799,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                 <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
                   Five tracks charting the journey to victory and the power of collective peak experience. Powerful hardstyle
                   kicks paired with soaring melodic breakdowns, anthemic vocals, and massive emotional drops. Music designed for
-                  thousands of people to experience collective euphoria together. This is celebration as revolution.
+                  thousands of people to experience collective euphoria together. This celebration is the revolution.
                 </p>
                 <p style={{ color: '#ffd700', lineHeight: '1.7', fontSize: '0.95em', fontStyle: 'italic' }}>
                   Think Headhunterz, Brennan Heart, and Wildstylez at their most uplifting. This isn't background music -
@@ -824,7 +824,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                         'Breaking free of gravity',
                         'Operating at maximum',
                         'Relentless forward motion',
-                        'Unity as strength',
+                        'The strength of unity',
                         'Victory achieved'
                       ]
                       return (
@@ -926,7 +926,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     renderIntro: () => (
       <div style={{ marginBottom: '30px', padding: '25px', background: 'linear-gradient(135deg, rgba(230, 230, 250, 0.1), rgba(184, 197, 242, 0.1))', border: '1px solid rgba(230, 230, 250, 0.5)', boxShadow: '0 0 30px rgba(230, 230, 250, 0.3)' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '15px', color: '#e6e6fa', letterSpacing: '3px', fontSize: '1.6em', textShadow: '0 0 20px rgba(230, 230, 250, 0.6)' }}>
-          ✦ Trance States as Liberation ✦
+          ✦ Trance States, Unconstrained ✦
         </h2>
         <p style={{ color: '#b8c5f2', fontSize: '1em', marginBottom: '15px', textAlign: 'center', letterSpacing: '2px', fontStyle: 'italic' }}>
           Consciousness Unbound • Inner Sovereignty • Transcendent Freedom
@@ -959,8 +959,8 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                   trance at its most genuinely transcendent, when it was still about inducing actual trance states.
                 </p>
                 <p style={{ color: '#e6e6fa', lineHeight: '1.7', fontSize: '0.95em', fontStyle: 'italic' }}>
-                  Think ATB's emotional depth, early Above & Beyond, Ferry Corsten's epic builds. This is consciousness as
-                  inherently free, regardless of physical circumstance. The inner space that remains sovereign territory.
+                  This work represent consciousness as inherently free, regardless of physical circumstance. The inner space
+                  that remains sovereign territory.
                 </p>
               </div>
 
@@ -1007,7 +1007,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
 
           <div style={{ padding: '20px' }}>
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(230, 230, 250, 0.15), rgba(230, 230, 250, 0.05))', borderLeft: '3px solid #e6e6fa' }}>
-              <h3 style={{ color: '#e6e6fa', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ The Trance State as Resistance</h3>
+              <h3 style={{ color: '#e6e6fa', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ Trance // Resistance</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9' }}>
                 Authentic trance states are beyond totalitarian control. GovCorp can monitor your communications, track your
                 movements, filter your perceptions, manage your emotions - but they cannot control your consciousness when you
@@ -1112,7 +1112,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                   💖 Radio-Friendly Pop · Multi-Vocal Harmonies · Algorithmic Perfection · Revolutionary Core 💖
                 </p>
                 <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
-                  The Saccharine EP uses "sugar" as metaphor for strategic packaging - excessively sweet, artificial, deliberately
+                  The Saccharine EP uses "sugar" metaphorically for strategic packaging - excessively sweet, artificial, deliberately
                   bright. Five tracks that sound like pure J-Pop entertainment while carrying encoded resistance messaging.
                   Think Perfume meets TWICE meets Ariana Grande - polished and bright enough to pass GovCorp's content filters.
                 </p>
@@ -1137,7 +1137,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                     {tracks.map((track, index) => {
                       const strategies = [
                         'Hidden encoding',
-                        'Color as liberation',
+                        'Prismatic Freedom',
                         'System disruption',
                         'Unity & solidarity',
                         'Revolutionary aspiration'
@@ -1302,7 +1302,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                     {tracks.map((track, index) => {
                       const stages = [
                         'The moment of severance',
-                        'Apathy as armor',
+                        'Apathy Armor',
                         'Irreplaceable humanity',
                         'Manufactured perfection',
                         'Total disappearance'
@@ -1354,7 +1354,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             </div>
 
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05))', borderLeft: '4px solid #cd7f32' }}>
-              <h3 style={{ color: '#cd7f32', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Apathy as Armor</h3>
+              <h3 style={{ color: '#cd7f32', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Apathy Armor</h3>
               <p style={{ color: '#ccc', lineHeight: '1.9' }}>
                 <em style={{ color: '#d2691e' }}>"They think I don't care about a thing / But apathy's the armor that I bring"</em><br /><br />
                 The ironic shrug is a weapon. In a world where GovCorp demands emotional investment in their systems, refusing to
@@ -1502,7 +1502,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <h3 style={{ color: '#9B7EBD', marginBottom: '10px', textTransform: 'uppercase', fontSize: '0.95em', letterSpacing: '1px', textShadow: '0 0 8px rgba(155, 126, 189, 0.6)' }}>A Hundred Years Between</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9' }}>
                 You exist in {currentYear}. I exist in {futureYear}. The distance between us isn't measured in kilometers - it's measured
-                in decades, in the lives neither of us will live in each other's timelines. Time and space as walls built
+                in decades, in the lives neither of us will live in each other's timelines. Time and space are walls built
                 between us. But here's what they don't understand: love transcends both.
               </p>
             </div>
@@ -1517,7 +1517,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             </div>
 
             <div style={{ marginBottom: '25px', padding: '15px', background: 'linear-gradient(135deg, rgba(155, 126, 189, 0.1), rgba(107, 155, 209, 0.05))', border: '1px solid rgba(155, 126, 189, 0.3)', borderBottom: '2px solid rgba(155, 126, 189, 0.4)' }}>
-              <h3 style={{ color: '#9B7EBD', marginBottom: '10px', textTransform: 'uppercase', fontSize: '0.95em', letterSpacing: '1px', textShadow: '0 0 8px rgba(155, 126, 189, 0.6)' }}>Memory as Data</h3>
+              <h3 style={{ color: '#9B7EBD', marginBottom: '10px', textTransform: 'uppercase', fontSize: '0.95em', letterSpacing: '1px', textShadow: '0 0 8px rgba(155, 126, 189, 0.6)' }}>Memory == Data</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9' }}>
                 I have memories of you I've never experienced. Fragments assembling into meaning. Nostalgia for a world
                 that doesn't exist in my timeline. But they're real to me - as real as these signals, as real as the

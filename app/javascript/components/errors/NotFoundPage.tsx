@@ -1,7 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useTerminal } from '~/contexts/TerminalContext'
 
 export const NotFoundPage: React.FC = () => {
+  const { openTerminal } = useTerminal()
   return (
     <div
       style={{
@@ -81,6 +83,8 @@ export const NotFoundPage: React.FC = () => {
           Quick navigation:
           <br />
           &nbsp;&nbsp;• <Link to="/" style={{ color: '#00ff00', textDecoration: 'underline' }}>Return to hackr.tv origin</Link>
+          <br />
+          &nbsp;&nbsp;• <a href="#" onClick={(e) => { e.preventDefault(); openTerminal() }} style={{ color: '#22d3ee', textDecoration: 'underline' }}>Access the Terminal</a>
           <br />
           &nbsp;&nbsp;• <Link to="/fm/pulse_vault" style={{ color: '#00ff00', textDecoration: 'underline' }}>Plumb the Pulse Vault</Link>
           <br />
