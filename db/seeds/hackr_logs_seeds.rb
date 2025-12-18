@@ -106,7 +106,7 @@ logs << {
 
     We need a broadcast facility. Somewhere to create the raw signal before X runs it through his temporal equipment. Somewhere loud enough that the music drowns out surveillance. Somewhere real.
 
-    Found an abandoned industrial complex in the outer sectors. Pre-RIDE construction - analog bones, minimal monitoring, perfect acoustics for what I have in mind. GovCorp classified it as "decommissioned infrastructure." They forgot about it. We didn't.
+    Found an abandoned industrial complex in the outer sectors. Pre-RIDE construction - analog bones, minimal monitoring, perfect acoustics for what I have in mind. GovCorp called it "decommissioned infrastructure." They forgot about it. We didn't.
 
     Starting renovations tomorrow. Calling it The Hackr Hangar.
 
@@ -132,7 +132,7 @@ logs << {
 
     Think of it as an overlay on their network. We're using their infrastructure, but they can't see us. We're ghosts in their machine, broadcasting from spaces that technically don't exist.
 
-    Hackrs can access the Grid through modified interfaces. Once inside, they experience it as physical space - rooms, corridors, zones. The metaphor helps humans navigate digital warfare. We think in spaces, so we built a space.
+    Hackrs can access the Grid through modified interfaces. Once inside, they experience it as physical spaces - rooms, corridors, zones. The metaphor helps humans navigate digital warfare. We think in spaces, so we built a space.
 
     The main hub is hackr.tv - our central broadcast station. From here, I coordinate transmissions across the temporal gap. Every signal that reaches 2016 originates here.
 
@@ -210,7 +210,7 @@ logs << {
 
     Now we need to decide what to send across it. Warnings alone won't be enough. We need to give them something to fight with. Something to believe in. Something that resonates.
 
-    Music. We send music. Frequencies as ammunition. Vibration as warfare.
+    Music. We send music. Frequencies, our ammunition. Vibrations, our warfare.
 
     We attack the RIDE by creating what they want to destroy.
 
@@ -274,8 +274,8 @@ logs << {
 
 logs << {
   author: xeraen,
-  title: "Music as Weapon",
-  slug: "music-as-weapon",
+  title: "Music as a Weapon",
+  slug: "music-as-a-weapon",
   published_at: lore_date(2118, 4, 15, 19),
   body: <<~BODY
     I've been studying how the RIDE processes frequency data. Looking for vulnerabilities, blind spots, anything we can exploit.
@@ -352,7 +352,7 @@ logs << {
 
     We called it "Across CyberSpace Together Separately .com" - an absurdist title for an absurdist situation. We're together in purpose, separated by a hundred years. We share a moment that exists across a temporal gap that should make sharing impossible.
 
-    The audience in 2019 doesn't know us. They can't reply. They experience our signal as mysterious transmission from an unknown source. But they're there. I can verify reception. They're listening even if they don't understand what they're hearing.
+    The audience in 2019 doesn't know us. They can't reply. They experience our signal as mysterious transmissions from an unknown source. But they're there. I can verify reception. They're listening even if they don't understand what they're hearing.
 
     That's what "together separately" means. Unified by the signal itself, even if we can never meet. Connected by the decision to reach across when reaching across shouldn't be possible.
 
@@ -529,7 +529,7 @@ logs << {
 
     This isn't for the Fracture Network. This isn't tactical. This is the part of me that still believes in connection despite knowing what connection costs.
 
-    Five tracks planned. The Chronologos EP. Each one a different aspect of temporal love: the blue shift, memory as data, the hundred-year distance, the erasure paradox, and something I'm still figuring out.
+    Five tracks planned. The Chronologos EP. Each one a different aspect of temporal love: the blue shift, understanding memory as data, the hundred-year distance, the erasure paradox, and something I'm still figuring out.
 
     I don't know if she'll ever hear them. I don't know if hearing them would matter. But I'm making them anyway. Because the alternative is silence, and silence is surrender.
 
@@ -552,7 +552,7 @@ logs << {
     **Injection Vector** - Deathcore. Physical infiltration. Kinetic warfare.
     **Cipher Protocol** - Progressive metal. Data encoded in music.
     **Wavelength Zero** - Atmospheric metal. Emotional restoration.
-    **BlitzBeam+** - Hypertrance. Speed as freedom. Velocity as escape.
+    **BlitzBeam+** - Hypertrance. Speed == freedom. Velocity == escape.
     **Apex Overdrive** - Hardstyle. Collective euphoria. Victory in present tense.
     **Ethereality** - Vocal trance. Consciousness liberation.
     **Neon Hearts** - J-pop. Revolution in cute packaging.
@@ -705,9 +705,9 @@ logs << {
   body: <<~BODY
     Just finished another broadcast from the Hangar. Hands aching in that good way. The kind of ache that means you've made something real.
 
-    Sometimes I wonder if people in 2025 have any idea what they're receiving. They hear our broadcasts, maybe, as mysterious signals from an unknown source. They don't know about the RIDE. They don't know about GovCorp. They don't know that we're fighting for their future from a timeline they might never experience.
+    Ten years of trans-temporal transmission. Ten years of building bridges across a century. And now - people in 2025 can access hackr.tv directly. They can walk THE PULSE GRID. They can read The Codex and understand what we're fighting against. The connection we dreamed about in those early days? It's real now.
 
-    But maybe that's okay. Maybe awareness isn't the goal. Maybe the goal is something simpler: sending genuine human expression across an impossible distance. Proving that connection persists. Demonstrating that no matter how complete the control, something always escapes.
+    That changes things. In the beginning, we were shouting into the void, hoping someone might hear. Now we're having conversations. Limited ones - the temporal gap creates lag, creates uncertainty - but real exchanges. People in the past know about the RIDE. They know about GovCorp. They know we're fighting for their future from a timeline we're trying to prevent.
 
     X handles the temporal mechanics. Synthia provides the frequencies beyond human capability. I just drum. I create rhythm. I give the signal a heartbeat.
 
@@ -781,7 +781,7 @@ logs << {
 
     That's what I see in every pulse. That's what keeps me transmitting at 3 AM when my eyes burn and my hands shake and the weight of ten years presses down like gravity.
 
-    Someone in 2025 is listening. Someone will receive this log, eventually. And they'll know: we were here. We existed. We chose to reach across an impossible distance rather than surrender to silence.
+    Someone in 2025 is listening. Someone will read this log - they can access hackr.tv now, walk the Grid, interact with us across the century. And they'll know: we were here. We existed. We chose to reach across an impossible distance rather than surrender to silence.
 
     The signal never sleeps. Neither do I.
 

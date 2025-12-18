@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
+import { useTerminal } from '~/contexts/TerminalContext'
 
 export const HeaderMenu: React.FC = () => {
   const { hackr, isLoggedIn, disconnect } = useGridAuth()
   const navigate = useNavigate()
   const { isMobile } = useMobileDetect()
   const { mobileMenuOpen, setMobileMenuOpen } = useMobileMenu()
+  const { openTerminal } = useTerminal()
 
   const handleDisconnect = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -138,6 +140,16 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">0</span> / hackr.tv
                 </Link>
+                <button
+                  className="mobile-menu-item"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    openTerminal()
+                  }}
+                  style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}
+                >
+                  <span className="purple-168-text">&gt;</span> /terminal
+                </button>
               </div>
 
               <div className="mobile-menu-section">
@@ -154,20 +166,7 @@ export const HeaderMenu: React.FC = () => {
               </div>
 
               <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">2. XERAEN</div>
-                <Link to="/xeraen/" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">/</span>root
-                </Link>
-                <Link to="/xeraen/trackz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">/</span>trackz
-                </Link>
-                <Link to="/xeraen/vidz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">/</span>vidz
-                </Link>
-              </div>
-
-              <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">3. HACKR.FM</div>
+                <div className="mobile-menu-section-title">2. HACKR.FM</div>
                 <Link to="/fm/radio" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>radio
                 </Link>
@@ -185,7 +184,7 @@ export const HeaderMenu: React.FC = () => {
               </div>
 
               <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">4. THE PULSE GRID</div>
+                <div className="mobile-menu-section-title">3. THE PULSE GRID</div>
                 <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>grid
                 </Link>
@@ -213,7 +212,7 @@ export const HeaderMenu: React.FC = () => {
               </div>
 
               <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">5. The WIRE</div>
+                <div className="mobile-menu-section-title">4. The WIRE</div>
                 <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>hotwire
                 </Link>
@@ -222,14 +221,14 @@ export const HeaderMenu: React.FC = () => {
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MORE</div>
                 <Link to="/codex" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">6</span> The Codex
+                  <span className="purple-168-text">5</span> The Codex
                 </Link>
                 <Link to="/logs" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">7</span> Hackr Logs
+                  <span className="purple-168-text">6</span> Hackr Logs
                 </Link>
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
-                    <span className="red-255-text">8</span> /root <span className="red-255-text">[ADMIN]</span>
+                    <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>
                   </a>
                 )}
               </div>
@@ -253,6 +252,11 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/">
                   <span className="purple-168-text">/</span>root
                 </Link>
+              </li>
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); openTerminal(); }}>
+                  <span className="purple-168-text">&gt;</span>terminal
+                </a>
               </li>
             </ul>
           </div>
@@ -282,33 +286,9 @@ export const HeaderMenu: React.FC = () => {
           </div>
         </li>
 
-        {/* 2: XERAEN */}
+        {/* 2: hackr.fm */}
         <li className="tui-dropdown">
-          <span className="purple-168-text">2</span>&nbsp;XERAEN&nbsp;
-          <div className="tui-dropdown-content">
-            <ul>
-              <li>
-                <Link to="/xeraen/">
-                  <span className="purple-168-text">/</span>root
-                </Link>
-              </li>
-              <li>
-                <Link to="/xeraen/trackz">
-                  <span className="purple-168-text">/</span>trackz
-                </Link>
-              </li>
-              <li>
-                <Link to="/xeraen/vidz">
-                  <span className="purple-168-text">/</span>vidz
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </li>
-
-        {/* 3: hackr.fm */}
-        <li className="tui-dropdown">
-          <span className="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;
+          <span className="purple-168-text">2</span>&nbsp;hackr.fm&nbsp;
           <div className="tui-dropdown-content">
             <ul>
               <li>
@@ -337,9 +317,9 @@ export const HeaderMenu: React.FC = () => {
           </div>
         </li>
 
-        {/* 4: THE PULSE GRID */}
+        {/* 3: THE PULSE GRID */}
         <li className="tui-dropdown">
-          <span className="purple-168-text">4</span>&nbsp;THE PULSE GRID&nbsp;
+          <span className="purple-168-text">3</span>&nbsp;THE PULSE GRID&nbsp;
           <div className="tui-dropdown-content">
             <ul>
               <li>
@@ -371,32 +351,32 @@ export const HeaderMenu: React.FC = () => {
           </div>
         </li>
 
-        {/* 5: The WIRE */}
+        {/* 4: The WIRE */}
         <li>
           <Link to="/wire">
-            <span className="purple-168-text">5</span> The WIRE&nbsp;
+            <span className="purple-168-text">4</span> The WIRE&nbsp;
           </Link>
         </li>
 
-        {/* 6: The Codex */}
+        {/* 5: The Codex */}
         <li>
           <Link to="/codex">
-            <span className="purple-168-text">6</span> The Codex&nbsp;
+            <span className="purple-168-text">5</span> The Codex&nbsp;
           </Link>
         </li>
 
-        {/* 7: Hackr Logs */}
+        {/* 6: Hackr Logs */}
         <li>
           <Link to="/logs">
-            <span className="purple-168-text">7</span> Hackr Logs&nbsp;
+            <span className="purple-168-text">6</span> Hackr Logs&nbsp;
           </Link>
         </li>
 
-        {/* 8: Admin (only show if user is admin) */}
+        {/* 7: Admin (only show if user is admin) */}
         {hackr?.role === 'admin' && (
           <li>
             <a href="/root">
-              <span className="red-255-text">8</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+              <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
             </a>
           </li>
         )}

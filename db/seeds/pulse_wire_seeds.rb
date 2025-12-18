@@ -81,7 +81,7 @@ Pulse.create!(
 splice2 = Pulse.create!(
   grid_hackr: synthia,
   parent_pulse: thread_root,
-  content: "Temporal mechanics suggest branching probability rather than erasure. His timeline may persist as parallel branch. Uncertainty: 73.2%. Hope is mathematically viable.",
+  content: "Temporal mechanics suggest branching probability rather than erasure. His timeline may persist as a parallel branch. Uncertainty: 73.2%. Hope is mathematically viable.",
   pulsed_at: 1.day.ago + 4.hours + 30.minutes
 )
 

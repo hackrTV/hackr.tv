@@ -177,7 +177,7 @@ seed_codex_entry(
     - **RIDE Breach:** Penetrating GovCorp's reality manipulation infrastructure
     - **Trans-Temporal Transmission:** Broadcasting resistance signals 100 years into the past
     - **Reality Liberation:** Creating pockets of unfiltered existence within RIDE-controlled space
-    - **Music as Weapon:** Using vibrational frequencies to attack RIDE systems and awaken consciousness
+    - **Using Music as a Weapon:** Employing vibrational frequencies to attack RIDE systems and awaken consciousness
 
     ## Structure
 
@@ -389,9 +389,9 @@ seed_codex_entry(
     - **Dark Zones:** Secure areas for operative coordination
     - **Buffer Zones:** Camouflaged edges that blend with normal traffic
 
-    ## The Grid as Place
+    ## The Grid IS a Place
 
-    Hackrs experience THE PULSE GRID as a physical space - rooms, corridors, zones. Whether this is deliberate design or emergent property of neural interface technology remains debated. Regardless, operatives navigate the Grid as explorers of a vast digital landscape.
+    Hackrs experience THE PULSE GRID as a physical space - rooms, corridors, zones. Whether this is deliberate design or emergent property of neural interface technology remains debated. Regardless, operatives navigate the Grid, explorers of a vast digital landscape.
 
     ## Access
 
@@ -472,8 +472,8 @@ seed_codex_entry(
 
     [[The Fracture Network]] has developed various techniques to resist PRISM manipulation:
     - Trans-temporal data transmission bypassing reality filters
-    - [[THE PULSE GRID]] as a breach point into RIDE infrastructure
-    - Music as vibrational attack vectors against PRISM frequencies
+    - [[THE PULSE GRID]], a breach point into RIDE infrastructure
+    - Using music as vibrational attack vectors against PRISM frequencies
 
     ## Related Entries
 
@@ -513,7 +513,7 @@ seed_codex_entry(
 
     **WARNING:** Knowledge of the RIDE is extremely restricted. Most citizens live within the RIDE without any awareness of its existence. Only members of [[The Fracture Network]] and a handful of hyper-aware, astute hackrs understand the true nature of their reality.
 
-    GovCorp does not publicly acknowledge the RIDE. Those who speak of it are classified as suffering from "reality dysfunction disorder" and treated accordingly.
+    GovCorp does not publicly acknowledge the RIDE. Those who speak of it are said to be suffering from "reality dysfunction disorder" and treated accordingly.
 
     ## Capabilities
 
@@ -606,7 +606,7 @@ seed_codex_entry(
 
     ## Access
 
-    The WIRE is accessible through [[THE PULSE GRID]] to any hackr with valid credentials. New operatives gain WIRE access as part of their onboarding into the Fracture Network.
+    The WIRE is accessible through [[THE PULSE GRID]] to any hackr with valid credentials. New operatives gain WIRE access as a part of their onboarding into the Fracture Network.
 
     ## Related Entries
 

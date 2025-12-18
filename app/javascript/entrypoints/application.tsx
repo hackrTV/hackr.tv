@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { AudioProvider } from '~/contexts/AudioContext'
 import { MobileMenuProvider } from '~/contexts/MobileMenuContext'
 import { AppSettingsProvider } from '~/contexts/AppSettingsContext'
+import { TerminalProvider } from '~/contexts/TerminalContext'
 import { AppLayout } from '~/components/layouts/AppLayout'
 import { ErrorBoundary } from '~/components/errors/ErrorBoundary'
 
@@ -23,9 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         <BrowserRouter>
           <AppSettingsProvider>
             <MobileMenuProvider>
-              <AudioProvider>
-                <AppLayout />
-              </AudioProvider>
+              <TerminalProvider>
+                <AudioProvider>
+                  <AppLayout />
+                </AudioProvider>
+              </TerminalProvider>
             </MobileMenuProvider>
           </AppSettingsProvider>
         </BrowserRouter>
