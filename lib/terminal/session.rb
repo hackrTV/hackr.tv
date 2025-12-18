@@ -258,9 +258,9 @@ module Terminal
       # Random GovCorp intercept message (30% chance)
       if EasterEggs.show_intercept?
         println ""
-        println renderer.colorize("  ╔════════════════════════════════════════════════════════════╗", :red)
-        println renderer.colorize("  ║  #{EasterEggs.random_intercept.center(58)}  ║", :red)
-        println renderer.colorize("  ╚════════════════════════════════════════════════════════════╝", :red)
+        println renderer.colorize("  ╔═════════════════════════════════════════════════════════════════════════════╗", :red)
+        println renderer.colorize("  ║  #{EasterEggs.random_intercept.center(73)}  ║", :red)
+        println renderer.colorize("  ╚═════════════════════════════════════════════════════════════════════════════╝", :red)
       else
         println renderer.divider("GovCorp monitoring active", width: 65, color: :red)
       end
