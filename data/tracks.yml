@@ -3593,3 +3593,65 @@
     # lyric: ""
   lyrics: |
     [INSTRUMENTAL TRACK]
+
+# heartbreak_havoc.sh - ./exeCUTE EP
+
+- title: "heartbreak_havoc.sh"
+  slug: "heartbreak-havoc-sh"
+  artist: "heartbreak_havoc.sh"
+  album: "./exeCUTE"
+  album_type: "ep"
+  release_date: "TBA"
+  track_number: 1
+  duration: "TBA"
+  genre: "Nightcore"
+  audio_file: ""
+  featured: false
+
+- title: "binary_heartbeats.c"
+  slug: "binary-heartbeats-c"
+  artist: "heartbreak_havoc.sh"
+  album: "./exeCUTE"
+  album_type: "ep"
+  release_date: "TBA"
+  track_number: 2
+  duration: "TBA"
+  genre: "Nightcore"
+  audio_file: ""
+  featured: false
+
+- title: "RIDE.corrupt"
+  slug: "ride-corrupt"
+  artist: "heartbreak_havoc.sh"
+  album: "./exeCUTE"
+  album_type: "ep"
+  release_date: "TBA"
+  track_number: 3
+  duration: "TBA"
+  genre: "Nightcore"
+  audio_file: ""
+  featured: false
+
+- title: "fatal_attraction.exe"
+  slug: "fatal-attraction-exe"
+  artist: "heartbreak_havoc.sh"
+  album: "./exeCUTE"
+  album_type: "ep"
+  release_date: "TBA"
+  track_number: 4
+  duration: "TBA"
+  genre: "Nightcore"
+  audio_file: ""
+  featured: false
+
+- title: "./exeCUTE"
+  slug: "execute"
+  artist: "heartbreak_havoc.sh"
+  album: "./exeCUTE"
+  album_type: "ep"
+  release_date: "TBA"
+  track_number: 5
+  duration: "TBA"
+  genre: "Nightcore"
+  audio_file: ""
+  featured: false
