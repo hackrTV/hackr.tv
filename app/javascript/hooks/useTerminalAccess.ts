@@ -1,10 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import type { AudioPlayerAPI } from '~/types/track'
 
 declare global {
   interface Window {
-    audioPlayer?: AudioPlayerAPI
     hackr?: HackrAPI
   }
 }
@@ -12,11 +9,6 @@ declare global {
 interface HackrAPI {
   terminal: () => string
   help: () => string
-}
-
-interface UseTerminalAccessOptions {
-  idleTimeout?: number // milliseconds before idle takeover (default: 120000 = 2 min)
-  enableIdleTakeover?: boolean
 }
 
 // Konami code sequence: ↑ ↑ ↓ ↓ ← → ← → B A
@@ -28,16 +20,12 @@ const KONAMI_CODE = [
   'KeyB', 'KeyA'
 ]
 
-export const useTerminalAccess = (options: UseTerminalAccessOptions = {}) => {
-  const { idleTimeout = 120000, enableIdleTakeover = true } = options
-  const location = useLocation()
-
+export const useTerminalAccess = () => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false)
 
   const konamiIndex = useRef(0)
   const typeBuffer = useRef('')
   const typeTimeout = useRef<number | null>(null)
-  const idleTimer = useRef<number | null>(null)
 
   const openTerminal = useCallback(() => {
     setIsTerminalOpen(true)
@@ -61,28 +49,6 @@ export const useTerminalAccess = (options: UseTerminalAccessOptions = {}) => {
     )
   }, [])
 
-  // Reset idle timer on any activity
-  const resetIdleTimer = useCallback(() => {
-    if (!enableIdleTakeover) return
-
-    if (idleTimer.current) {
-      clearTimeout(idleTimer.current)
-    }
-
-    idleTimer.current = window.setTimeout(() => {
-      // Don't trigger if:
-      // - Terminal is already open
-      // - On grid (don't interrupt gameplay)
-      // - Audio is playing
-      const isOnGrid = location.pathname.startsWith('/grid')
-      const isAudioPlaying = window.audioPlayer?.isPlaying?.() ?? false
-
-      if (!isOnGrid && !isAudioPlaying) {
-        openTerminal()
-      }
-    }, idleTimeout)
-  }, [enableIdleTakeover, idleTimeout, location.pathname, openTerminal])
-
   useEffect(() => {
     // Expose hackr.terminal() in the console
     const hackrApi: HackrAPI = {
@@ -101,7 +67,6 @@ Easter eggs:
 - Press Ctrl+\` to toggle terminal
 - Type "/terminal" anywhere on the page
 - Enter the Konami code (↑↑↓↓←→←→BA)
-- Wait 2 minutes idle for the terminal to drop down
         `.trim()
       }
     }
@@ -110,11 +75,6 @@ Easter eggs:
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const inInput = isInInputField(e.target)
-
-      // Reset idle timer on any keypress (but not if terminal is open)
-      if (!isTerminalOpen) {
-        resetIdleTimer()
-      }
 
       // Ctrl+` shortcut to toggle (works everywhere except inputs)
       if (!inInput && e.key === '`' && e.ctrlKey) {
@@ -168,51 +128,19 @@ Easter eggs:
       }
     }
 
-    const handleMouseMove = () => {
-      if (!isTerminalOpen) {
-        resetIdleTimer()
-      }
-    }
-
-    const handleClick = () => {
-      if (!isTerminalOpen) {
-        resetIdleTimer()
-      }
-    }
-
-    const handleScroll = () => {
-      if (!isTerminalOpen) {
-        resetIdleTimer()
-      }
-    }
-
     document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('click', handleClick)
-    document.addEventListener('scroll', handleScroll)
-
-    // Start idle timer
-    if (!isTerminalOpen) {
-      resetIdleTimer()
-    }
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('click', handleClick)
-      document.removeEventListener('scroll', handleScroll)
 
       if (typeTimeout.current) {
         clearTimeout(typeTimeout.current)
-      }
-      if (idleTimer.current) {
-        clearTimeout(idleTimer.current)
       }
 
       // Clean up global API
       delete window.hackr
     }
-  }, [openTerminal, toggleTerminal, resetIdleTimer, isInInputField, isTerminalOpen])
+  }, [openTerminal, toggleTerminal, isInInputField, isTerminalOpen])
 
   return {
     isTerminalOpen,

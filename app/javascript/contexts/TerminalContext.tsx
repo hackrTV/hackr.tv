@@ -27,21 +27,17 @@ export const useTerminal = () => {
 
 interface TerminalProviderProps {
   children: ReactNode
-  idleTimeout?: number
-  enableIdleTakeover?: boolean
 }
 
 export const TerminalProvider: React.FC<TerminalProviderProps> = ({
-  children,
-  idleTimeout = 120000,
-  enableIdleTakeover = true
+  children
 }) => {
   const {
     isTerminalOpen,
     openTerminal,
     closeTerminal,
     toggleTerminal
-  } = useTerminalAccess({ idleTimeout, enableIdleTakeover })
+  } = useTerminalAccess()
 
   const value: TerminalContextType = {
     isTerminalOpen,
