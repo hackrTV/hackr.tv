@@ -48,12 +48,14 @@ export const TerminalModal: React.FC<TerminalModalProps> = ({ isOpen, onClose })
           z-index: 99998;
           opacity: 0;
           visibility: hidden;
+          pointer-events: none;
           transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
         .terminal-modal-backdrop.open {
           opacity: 1;
           visibility: visible;
+          pointer-events: auto;
         }
 
         .terminal-modal-container {
@@ -65,6 +67,7 @@ export const TerminalModal: React.FC<TerminalModalProps> = ({ isOpen, onClose })
           max-height: 1000px;
           z-index: 99999;
           transform: translateY(-100%);
+          pointer-events: none;
           transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           display: flex;
           flex-direction: column;
@@ -72,6 +75,7 @@ export const TerminalModal: React.FC<TerminalModalProps> = ({ isOpen, onClose })
 
         .terminal-modal-container.open {
           transform: translateY(0);
+          pointer-events: auto;
         }
 
         .terminal-modal-header {
