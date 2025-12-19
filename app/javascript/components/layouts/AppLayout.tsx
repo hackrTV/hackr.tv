@@ -77,6 +77,7 @@ export const AppLayout: React.FC = () => {
         <Route path="/ethereality" element={<BandProfilePage />} />
         <Route path="/neon_hearts" element={<BandProfilePage />} />
         <Route path="/offline" element={<BandProfilePage />} />
+        <Route path="/heartbreak_havoc" element={<BandProfilePage />} />
         <Route path="/wavelength_zero" element={<WavelengthZeroPage />} />
         {/* THE PULSE GRID routes */}
         <Route path="/grid" element={<GridGamePage />} />

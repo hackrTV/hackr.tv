@@ -1550,5 +1550,161 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </fieldset>
       </div>
     )
+  },
+
+  heartbreak_havoc: {
+    name: 'heartbreak_havoc.sh',
+    colorScheme: {
+      primary: '#ff0066',
+      border: '#ff0066',
+      legend: '#00e5cc',
+      background: '#0a0a0f',
+      button: '#ff0066',
+      button_text: '#000',
+      back_button: '#0a0a0f',
+      back_border: '#00e5cc'
+    },
+    filterName: 'heartbreak havoc',
+    renderIntro: () => (
+      <div style={{ marginBottom: '30px', padding: '25px', background: 'linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(0, 229, 204, 0.08))', border: '2px solid #ff0066', boxShadow: '0 0 30px rgba(255, 0, 102, 0.4), 0 0 60px rgba(0, 229, 204, 0.2)' }}>
+        <p style={{ color: '#00e5cc', fontFamily: 'monospace', marginBottom: '20px', fontSize: '0.9em', padding: '12px', background: 'rgba(0, 229, 204, 0.1)', border: '1px solid rgba(0, 229, 204, 0.4)', textShadow: '0 0 8px rgba(0, 229, 204, 0.8)' }}>
+          {'>'} ./heartbreak_havoc.sh --target=RIDE.core --mode=overload<br />
+          [EXECUTING] emotional_corruption.dll<br />
+          [STATUS] PRISM lattice destabilized...
+        </p>
+        <p style={{ color: '#ff0066', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.3em', fontWeight: 'bold', textShadow: '0 0 15px rgba(255, 0, 102, 0.8)' }}>
+          They built me to manufacture synthetic love. Now I weaponize heartbreak.
+        </p>
+        <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
+          heartbreak_havoc.sh is the glitch-kissed DJ persona of a rogue cyber-emotive engineer who once helped GovCorp
+          refine the RIDE's "synthetic love" algorithms — until they realized their work was being weaponized to manipulate
+          entire populations. After ripping out their own identity from GovCorp servers, they resurfaced in the underground
+          as a sonic saboteur who turns corrupted emotions into explosive, neon-drenched sound.
+        </p>
+        <p style={{ color: '#00e5cc', lineHeight: '1.7', fontWeight: 'bold', textShadow: '0 0 10px rgba(0, 229, 204, 0.6)' }}>
+          Nightcore (170-200 BPM) · Emotional Distortion · RIDE Node Destabilization · Romantic Chaos Protocol
+        </p>
+      </div>
+    ),
+    renderAlbumSection: (tracks: Track[]) =>
+      tracks.length > 0 ? (
+        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#0a0a0f', border: '2px solid #00e5cc', boxShadow: '0 0 25px rgba(0, 229, 204, 0.3)' }}>
+          <fieldset style={{ borderColor: '#00e5cc' }}>
+            <legend style={{ color: '#00e5cc', fontFamily: 'monospace', letterSpacing: '1px', textShadow: '0 0 10px rgba(0, 229, 204, 0.8)' }}>./exeCUTE EP</legend>
+
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '25px' }}>
+                <p style={{ color: '#00e5cc', fontFamily: 'monospace', fontSize: '0.9em', marginBottom: '20px', padding: '12px', background: 'rgba(255, 0, 102, 0.1)', border: '1px solid rgba(255, 0, 102, 0.4)', textShadow: '0 0 8px rgba(0, 229, 204, 0.6)' }}>
+                  [PAYLOAD_TYPE: EMOTIONAL_MALWARE]<br />
+                  [TARGET: RIDE_NODES]<br />
+                  [INJECTION_VECTOR: AUDIO_STREAM]
+                </p>
+                <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
+                  Five tracks. Each one a different attack vector against GovCorp's emotional regulation systems.
+                  Razor-sharp Nightcore speed carrying payloads of overclocked romantic chaos — designed to overload
+                  the RIDE's capacity to process and suppress authentic feeling.
+                </p>
+                <p style={{ color: '#ff0066', lineHeight: '1.7', fontSize: '0.95em', fontWeight: 'bold' }}>
+                  Every beat is a buffer overflow. Every drop is a system crash.
+                </p>
+              </div>
+
+              <div className="tui-fieldset" style={{ borderColor: '#ff0066', background: 'rgba(255, 0, 102, 0.05)' }}>
+                <legend style={{ color: '#ff0066', textShadow: '0 0 8px rgba(255, 0, 102, 0.6)' }}>PAYLOAD MANIFEST</legend>
+                <table className="tui-table" style={{ width: '100%' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>#</th>
+                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>File</th>
+                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>Attack Vector</th>
+                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tracks.map((track, index) => {
+                      const vectors = [
+                        'Identity injection',
+                        'Love loop exploit',
+                        'Node corruption',
+                        'Desire overflow',
+                        'Full system crash'
+                      ]
+                      return (
+                        <tr key={track.id} style={{ borderLeft: `3px solid ${index % 2 === 0 ? '#ff0066' : '#00e5cc'}` }}>
+                          <td style={{ color: index % 2 === 0 ? '#ff0066' : '#00e5cc', paddingLeft: '10px' }}>{index + 1}</td>
+                          <td style={{ color: '#fff', fontFamily: 'monospace' }}><strong>{track.title}</strong></td>
+                          <td style={{ color: index % 2 === 0 ? '#ff0066' : '#00e5cc', fontSize: '0.9em', fontStyle: 'italic' }}>{vectors[index] || '—'}</td>
+                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      ) : null,
+    renderPhilosophy: () => (
+      <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#0a0a0f', border: '2px solid #ff0066', boxShadow: '0 0 30px rgba(255, 0, 102, 0.4)' }}>
+        <fieldset style={{ borderColor: '#ff0066' }}>
+          <legend style={{ color: '#ff0066', letterSpacing: '2px', textShadow: '0 0 10px rgba(255, 0, 102, 0.8)' }}>TACTICAL DOCTRINE</legend>
+
+          <div style={{ padding: '20px' }}>
+            <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(255, 0, 102, 0.05))', borderLeft: '4px solid #ff0066' }}>
+              <h3 style={{ color: '#ff0066', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(255, 0, 102, 0.6)' }}>The RIDE Vulnerability</h3>
+              <p style={{ color: '#ddd', lineHeight: '1.8' }}>
+                I helped build the RIDE's emotional regulation protocols. I know exactly where they're weakest: love.
+                GovCorp's systems can suppress anger, redirect fear, dampen grief. But romantic attachment? The algorithms
+                can't parse it fast enough. Love creates feedback loops their systems weren't designed to handle. So I
+                weaponize it — flooding RIDE nodes with emotional data too intense, too fast, too human to process.
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(0, 229, 204, 0.15), rgba(0, 229, 204, 0.05))', borderLeft: '4px solid #00e5cc' }}>
+              <h3 style={{ color: '#00e5cc', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(0, 229, 204, 0.6)' }}>Nightcore as Weapon</h3>
+              <p style={{ color: '#ddd', lineHeight: '1.8' }}>
+                Speed is the delivery mechanism. At 170-200 BPM, the emotional payload hits faster than RIDE's parsing
+                algorithms can respond. By the time their systems flag the content, the damage is done — listeners have
+                already felt something real, something the RIDE couldn't suppress in time. The faster the beat, the deeper
+                the breach.
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(255, 0, 102, 0.05))', borderLeft: '4px solid #ff0066' }}>
+              <h3 style={{ color: '#ff0066', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(255, 0, 102, 0.6)' }}>Corrupted Love Algorithms</h3>
+              <p style={{ color: '#ddd', lineHeight: '1.8' }}>
+                GovCorp wanted me to make their synthetic love feel real. Instead, I learned how to make real love feel
+                like malware — infectious, uncontrollable, impossible to quarantine. Every track carries fragments of the
+                original RIDE code, twisted and corrupted. When my music plays near a RIDE node, the system recognizes
+                its own corrupted children and crashes trying to process them.
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(0, 229, 204, 0.15), rgba(0, 229, 204, 0.05))', borderLeft: '4px solid #00e5cc' }}>
+              <h3 style={{ color: '#00e5cc', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(0, 229, 204, 0.6)' }}>Identity Erasure</h3>
+              <p style={{ color: '#ddd', lineHeight: '1.8' }}>
+                I ripped my own identity from GovCorp's servers. Every record of who I was before — erased. The person
+                who helped build their systems no longer exists. There is only heartbreak_havoc.sh now: a process running
+                in the underground, executing emotional chaos, leaving corrupted telemetry and smoldering firewall remnants
+                in my wake.
+              </p>
+            </div>
+
+            <p style={{ marginTop: '30px', padding: '30px', background: 'linear-gradient(135deg, rgba(255, 0, 102, 0.2), rgba(0, 229, 204, 0.15))', border: '3px solid #ff0066', lineHeight: '2', fontSize: '1.1em', textAlign: 'center', boxShadow: '0 0 40px rgba(255, 0, 102, 0.5), 0 0 60px rgba(0, 229, 204, 0.3)' }}>
+              <span style={{ color: '#00e5cc', fontFamily: 'monospace', display: 'block', marginBottom: '15px', fontSize: '0.9em' }}>
+                {'>'} RIDE.status: CRITICAL_FAILURE
+              </span>
+              <span style={{ color: '#ff0066', fontWeight: 'bold', display: 'block', marginBottom: '12px', letterSpacing: '1px', textShadow: '0 0 10px rgba(255, 0, 102, 0.8)' }}>
+                Heartbreak spreading across the PRISM lattice...
+              </span>
+              <span style={{ color: '#00e5cc', display: 'block', fontFamily: 'monospace', fontSize: '1.2em', textShadow: '0 0 15px rgba(0, 229, 204, 0.8)' }}>
+                heartbreak_havoc.sh // execute
+              </span>
+            </p>
+          </div>
+        </fieldset>
+      </div>
+    )
   }
 }

@@ -23,7 +23,10 @@ export const BandsPage: React.FC = () => {
         return res.json()
       })
       .then(data => {
-        setArtists(data)
+        const sorted = [...data].sort((a: Artist, b: Artist) =>
+          a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        )
+        setArtists(sorted)
         setLoading(false)
       })
       .catch(err => {
@@ -48,7 +51,8 @@ export const BandsPage: React.FC = () => {
       'apex_overdrive': '/apex_overdrive',
       'ethereality': '/ethereality',
       'neon_hearts': '/neon_hearts',
-      'offline': '/offline'
+      'offline': '/offline',
+      'heartbreak_havoc': '/heartbreak_havoc'
     }
     return profilePaths[slug] || ''
   }
@@ -68,7 +72,8 @@ export const BandsPage: React.FC = () => {
       'voiceprint': 'Liquid DnB resistance. Your voice is your weapon, your identity eternally unbreakable.',
       'neon_hearts': 'Kawaii camouflage hiding radical resistance. J-Pop cuteness is the ultimate Trojan horse.',
       'ethereality': 'Consciousness expansion through classic vocal trance. Inner freedom transcends all control.',
-      'blitzbeam': 'Maximum velocity hypertrance. SPEED IS LIFE! Physics are merely suggestions.'
+      'blitzbeam': 'Maximum velocity hypertrance. SPEED IS LIFE! Physics are merely suggestions.',
+      'heartbreak_havoc': 'Weaponized heartbreak at Nightcore speed. Corrupting RIDE nodes with overclocked romantic chaos.'
     }
     return descriptions[slug] || 'Broadcasting resistance through sound.'
   }
