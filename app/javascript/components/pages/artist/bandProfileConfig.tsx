@@ -1569,7 +1569,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
       <div style={{ marginBottom: '30px', padding: '25px', background: 'linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(0, 229, 204, 0.08))', border: '2px solid #ff0066', boxShadow: '0 0 30px rgba(255, 0, 102, 0.4), 0 0 60px rgba(0, 229, 204, 0.2)' }}>
         <p style={{ color: '#00e5cc', fontFamily: 'monospace', marginBottom: '20px', fontSize: '0.9em', padding: '12px', background: 'rgba(0, 229, 204, 0.1)', border: '1px solid rgba(0, 229, 204, 0.4)', textShadow: '0 0 8px rgba(0, 229, 204, 0.8)' }}>
           {'>'} ./heartbreak_havoc.sh --target=RIDE.core --mode=overload<br />
-          [EXECUTING] emotional_corruption.dll<br />
+          [EXECUTING] emotional_corruption.sh<br />
           [STATUS] PRISM lattice destabilized...
         </p>
         <p style={{ color: '#ff0066', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.3em', fontWeight: 'bold', textShadow: '0 0 15px rgba(255, 0, 102, 0.8)' }}>
@@ -1662,7 +1662,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             </div>
 
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(0, 229, 204, 0.15), rgba(0, 229, 204, 0.05))', borderLeft: '4px solid #00e5cc' }}>
-              <h3 style={{ color: '#00e5cc', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(0, 229, 204, 0.6)' }}>Nightcore as Weapon</h3>
+              <h3 style={{ color: '#00e5cc', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(0, 229, 204, 0.6)' }}>Nightcore Assault</h3>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                 Speed is the delivery mechanism. At 170-200 BPM, the emotional payload hits faster than RIDE's parsing
                 algorithms can respond. By the time their systems flag the content, the damage is done — listeners have
@@ -1699,7 +1699,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
                 Heartbreak spreading across the PRISM lattice...
               </span>
               <span style={{ color: '#00e5cc', display: 'block', fontFamily: 'monospace', fontSize: '1.2em', textShadow: '0 0 15px rgba(0, 229, 204, 0.8)' }}>
-                heartbreak_havoc.sh // execute
+                heartbreak_havoc.sh ./exeCUTE
               </span>
             </p>
           </div>
