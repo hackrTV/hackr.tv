@@ -33,6 +33,98 @@ RSpec.describe GridHackr, type: :model do
       hackr = build(:grid_hackr, role: "admin")
       expect(hackr).to be_valid
     end
+
+    describe "reserved aliases" do
+      it "rejects reserved aliases" do
+        %w[admin system synthia root grid].each do |reserved|
+          hackr = build(:grid_hackr, hackr_alias: reserved)
+          expect(hackr).not_to be_valid
+          expect(hackr.errors[:hackr_alias]).to include("is reserved and cannot be used")
+        end
+      end
+
+      it "rejects reserved aliases case-insensitively" do
+        hackr = build(:grid_hackr, hackr_alias: "ADMIN")
+        expect(hackr).not_to be_valid
+        expect(hackr.errors[:hackr_alias]).to include("is reserved and cannot be used")
+      end
+
+      it "rejects reserved aliases with spaces converted to underscores" do
+        hackr = build(:grid_hackr, hackr_alias: "synthia prime")
+        expect(hackr).not_to be_valid
+        expect(hackr.errors[:hackr_alias]).to include("is reserved and cannot be used")
+      end
+
+      it "allows non-reserved aliases" do
+        hackr = build(:grid_hackr, hackr_alias: "XERAEN")
+        expect(hackr).to be_valid
+      end
+
+      it "rejects aliases matching reserved patterns (contains)" do
+        %w[superadmin myadminuser xsystemx govcorp_agent fracture_member].each do |patterned|
+          hackr = build(:grid_hackr, hackr_alias: patterned)
+          expect(hackr).not_to be_valid, "Expected '#{patterned}' to be rejected"
+          expect(hackr.errors[:hackr_alias]).to include("is reserved and cannot be used")
+        end
+      end
+
+      it "rejects aliases matching reserved patterns (ends with)" do
+        %w[helper_bot agent_npc hackr_official super_admin].each do |patterned|
+          hackr = build(:grid_hackr, hackr_alias: patterned)
+          expect(hackr).not_to be_valid, "Expected '#{patterned}' to be rejected"
+          expect(hackr.errors[:hackr_alias]).to include("is reserved and cannot be used")
+        end
+      end
+
+      it "rejects aliases containing thepulse variations" do
+        %w[thepulse the_pulse xthepulsex my_the_pulse_user].each do |patterned|
+          hackr = build(:grid_hackr, hackr_alias: patterned)
+          expect(hackr).not_to be_valid, "Expected '#{patterned}' to be rejected"
+        end
+      end
+
+      it "rejects aliases containing profanity" do
+        hackr = build(:grid_hackr, hackr_alias: "bullshit_user")
+        expect(hackr).not_to be_valid
+        expect(hackr.errors[:hackr_alias].first).to include("GOVCORP CENSOR")
+      end
+
+      it "rejects aliases that are profane words" do
+        hackr = build(:grid_hackr, hackr_alias: "bullshit")
+        expect(hackr).not_to be_valid
+        expect(hackr.errors[:hackr_alias].first).to include("GOVCORP CENSOR")
+      end
+    end
+
+    describe "alias length" do
+      context "when enforce_alias_length is true" do
+        it "rejects aliases shorter than minimum length" do
+          hackr = build(:grid_hackr, hackr_alias: "ABC")
+          hackr.enforce_alias_length = true
+          expect(hackr).not_to be_valid
+          expect(hackr.errors[:hackr_alias]).to include("must be at least #{GridHackr::MINIMUM_ALIAS_LENGTH} characters")
+        end
+
+        it "accepts aliases at minimum length" do
+          hackr = build(:grid_hackr, hackr_alias: "ABCDEF")
+          hackr.enforce_alias_length = true
+          expect(hackr).to be_valid
+        end
+
+        it "accepts aliases longer than minimum length" do
+          hackr = build(:grid_hackr, hackr_alias: "ABCDEFGHIJ")
+          hackr.enforce_alias_length = true
+          expect(hackr).to be_valid
+        end
+      end
+
+      context "when enforce_alias_length is false or nil" do
+        it "allows short aliases for seeded/admin-created accounts" do
+          hackr = build(:grid_hackr, hackr_alias: "ABC")
+          expect(hackr).to be_valid
+        end
+      end
+    end
   end
 
   describe "associations" do

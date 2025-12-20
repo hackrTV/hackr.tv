@@ -54,9 +54,23 @@ module ProfanityFilterable
       value = public_send(attr)
       next if value.blank?
 
-      if Obscenity.profane?(value)
+      if profane_content?(value)
         errors.add(attr, ProfanityFilterable.rejection_message)
       end
     end
+  end
+
+  # Check for profanity in content, including attempts to bypass
+  # the filter using separators between words
+  def profane_content?(value)
+    # Check original value
+    return true if Obscenity.profane?(value)
+
+    # Check with common separator characters replaced by spaces
+    # This catches bypass attempts like "bull_shit", "bull-shit", "bull/shit", etc.
+    normalized = value.gsub(/[_\-.,;:+\/\\]/, " ")
+    return true if Obscenity.profane?(normalized)
+
+    false
   end
 end
