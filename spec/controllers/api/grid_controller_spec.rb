@@ -82,6 +82,32 @@ RSpec.describe Api::GridController, type: :controller do
         expect(json["success"]).to eq(true)
         expect(json["hackr"]["hackr_alias"]).to eq("NewHackr")
       end
+
+      it "rejects aliases shorter than minimum length" do
+        post :register, params: {
+          hackr_alias: "ABC",
+          password: "password123",
+          password_confirmation: "password123"
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(false)
+        expect(json["error"]).to include("must be at least #{GridHackr::MINIMUM_ALIAS_LENGTH} characters")
+      end
+
+      it "rejects reserved aliases" do
+        post :register, params: {
+          hackr_alias: "administrator",
+          password: "password123",
+          password_confirmation: "password123"
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(false)
+        expect(json["error"]).to include("is reserved and cannot be used")
+      end
     end
   end
 

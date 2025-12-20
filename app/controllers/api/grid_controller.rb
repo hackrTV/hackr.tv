@@ -55,6 +55,7 @@ class Api::GridController < ApplicationController
     end
 
     @hackr = GridHackr.new(hackr_params)
+    @hackr.enforce_alias_length = true
 
     # Set starting room (hackr.tv Broadcast Station)
     starting_room = GridRoom.joins(:grid_zone)

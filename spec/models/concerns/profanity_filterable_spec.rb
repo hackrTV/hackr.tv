@@ -47,6 +47,15 @@ RSpec.describe ProfanityFilterable do
       profanity_errors = pulse.errors[:content].select { |e| e.start_with?("GOVCORP CENSOR:") }
       expect(profanity_errors).to be_empty
     end
+
+    it "rejects profanity with separator bypass attempts" do
+      separators = %w[_ - . , ; : + / \\]
+      separators.each do |sep|
+        pulse = build(:pulse, content: "bull#{sep}shit", grid_hackr: hackr)
+        expect(pulse).not_to be_valid, "Expected 'bull#{sep}shit' to be rejected"
+        expect(pulse.errors[:content].first).to start_with("GOVCORP CENSOR:")
+      end
+    end
   end
 
   describe "REJECTION_MESSAGES" do
