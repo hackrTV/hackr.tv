@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
-import { YouTubePlayer } from '~/components/YouTubePlayer'
 import { CodexText } from '~/components/shared/CodexText'
 
 const currentYear = new Date().getFullYear()
@@ -225,32 +224,6 @@ const XeraenPage: React.FC = () => {
                     moments when the only company is the hum of equipment and the impossible distance between
                     now and then.
                   </p>
-                </div>
-              </fieldset>
-            </div>
-
-            {/* Latest Video */}
-            <div
-              className="tui-window white-text"
-              style={{
-                marginBottom: '30px',
-                background: '#000000',
-                border: `2px solid ${colorScheme.primary}`,
-                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
-              }}
-            >
-              <fieldset style={{ borderColor: colorScheme.primary }}>
-                <legend
-                  style={{
-                    color: colorScheme.primary,
-                    textShadow: `0 0 10px ${colorScheme.glowStrong}`,
-                    letterSpacing: '2px'
-                  }}
-                >
-                  VISUAL TRANSMISSION
-                </legend>
-                <div style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
-                  <YouTubePlayer videoId="GYSH0mDteR4" width={560} height={315} />
                 </div>
               </fieldset>
             </div>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
@@ -7,7 +7,48 @@ import { CodexText } from '~/components/shared/CodexText'
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
 
+interface Vod {
+  id: number
+  title: string | null
+  vod_url: string
+  started_at: string | null
+}
+
+const extractVideoId = (url: string): string | null => {
+  const patterns = [
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/
+  ]
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match && match[1]) return match[1]
+  }
+  return null
+}
+
 const TheCyberPulsePage: React.FC = () => {
+  const [latestVod, setLatestVod] = useState<Vod | null>(null)
+
+  useEffect(() => {
+    const fetchLatestVod = async () => {
+      try {
+        const response = await fetch('/api/artists/thecyberpulse/vods')
+        if (response.ok) {
+          const json = await response.json()
+          if (json.vods && json.vods.length > 0) {
+            setLatestVod(json.vods[0])
+          }
+        }
+      } catch {
+        // Silently fail - section just won't show
+      }
+    }
+
+    fetchLatestVod()
+  }, [])
   const colorScheme = {
     primary: '#8B00FF',
     secondary: '#9B59B6',
@@ -104,31 +145,60 @@ const TheCyberPulsePage: React.FC = () => {
               </p>
             </div>
 
-            {/* Video Section */}
-            <div
-              className="tui-window white-text"
-              style={{
-                marginBottom: '30px',
-                background: '#000000',
-                border: `2px solid ${colorScheme.primary}`,
-                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
-              }}
-            >
-              <fieldset style={{ borderColor: colorScheme.primary }}>
-                <legend
-                  style={{
-                    color: colorScheme.primary,
-                    textShadow: `0 0 10px ${colorScheme.glowStrong}`,
-                    letterSpacing: '2px'
-                  }}
-                >
-                  TRANSMISSION
-                </legend>
-                <div style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
-                  <YouTubePlayer videoId="MWSjCJQhr1o" width={560} height={315} />
-                </div>
-              </fieldset>
-            </div>
+            {/* Visual Transmission - Latest VOD */}
+            {latestVod && extractVideoId(latestVod.vod_url) && (
+              <div
+                className="tui-window white-text"
+                style={{
+                  marginBottom: '30px',
+                  background: '#000000',
+                  border: `2px solid ${colorScheme.primary}`,
+                  boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
+                }}
+              >
+                <fieldset style={{ borderColor: colorScheme.primary }}>
+                  <legend
+                    style={{
+                      color: colorScheme.primary,
+                      textShadow: `0 0 10px ${colorScheme.glowStrong}`,
+                      letterSpacing: '2px'
+                    }}
+                  >
+                    VISUAL TRANSMISSION
+                  </legend>
+                  <div style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+                      <YouTubePlayer videoId={extractVideoId(latestVod.vod_url)!} width={560} height={315} />
+                    </div>
+                    {latestVod.title && (
+                      <p
+                        style={{
+                          textAlign: 'center',
+                          color: '#ccc',
+                          marginBottom: '10px',
+                          fontSize: '1.1em'
+                        }}
+                      >
+                        {latestVod.title}
+                      </p>
+                    )}
+                    <div style={{ textAlign: 'center' }}>
+                      <Link
+                        to="/thecyberpulse/vidz"
+                        style={{
+                          color: colorScheme.primary,
+                          textDecoration: 'none',
+                          fontSize: '0.9em',
+                          textShadow: `0 0 8px ${colorScheme.glow}`
+                        }}
+                      >
+                        → View All Transmissions
+                      </Link>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            )}
 
             {/* The Broadcast */}
             <div
@@ -160,11 +230,11 @@ const TheCyberPulsePage: React.FC = () => {
                       textShadow: `0 0 8px ${colorScheme.glow}`
                     }}
                   >
-                    24/7. No dead air. No commercial breaks. No corporate sponsorship.
+                    24/7. No dead air. No corporate sponsorship. No holding back.
                   </p>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     <CodexText>
-                      What you'll find here: multiple resistance bands transmitting their frequencies through our signal.
+                      What you'll find here: multiple [[Fracture Network]] bands transmitting their frequencies through our signal.
                       Live operations against [[GovCorp]] infrastructure. Interactive coordination through [[THE PULSE GRID]].
                       A community of listeners who've become operators, viewers who've become fighters, audience members
                       who've realized they were always part of the show.
@@ -222,9 +292,11 @@ const TheCyberPulsePage: React.FC = () => {
                       XERAEN
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-                      He broadcasts from {futureYear} - from a future where GovCorp has won, where RAINNs have replaced
-                      authentic human expression, where The Fracture Network fights a war most people don't know is
-                      happening.
+                      <CodexText>
+                        He broadcasts from {futureYear} - from a future where [[GovCorp]] has won, where [[rainns|RAINNs]] have replaced
+                        authentic human expression, where [[The Fracture Network]] fights a war most people don't know is
+                        happening.
+                      </CodexText>
                     </p>
                     <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
                       <CodexText>
@@ -319,7 +391,7 @@ const TheCyberPulsePage: React.FC = () => {
                         borderLeft: `4px solid ${colorScheme.primary}`
                       }}
                     >
-                      Some people whisper revolution. Ryker beats it into existence.
+                      Some people whisper about change. Ryker beats it into existence.
                     </p>
                   </div>
                 </div>
@@ -364,9 +436,9 @@ const TheCyberPulsePage: React.FC = () => {
                   </div>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     <CodexText>
-                      More than a game. Less than a simulation. [[THE PULSE GRID]] is how [[the Fracture Network]] coordinates
+                      It's not a game. [[THE PULSE GRID]] is how [[the Fracture Network]] coordinates
                       across timelines - a MUD interface where operators train, plan, and execute. What looks like a text
-                      adventure is actually resistance infrastructure.
+                      adventure is actually FN infrastructure.
                     </CodexText>
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
@@ -432,9 +504,11 @@ const TheCyberPulsePage: React.FC = () => {
                       The Bands
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                      Over 10 frequencies. More than a dozen approaches to resistance. From Injection Vector's kinetic warfare to
-                      Ethereality's transcendent liberation - each band represents a node in the network, a tactic in
-                      the arsenal, a way of fighting that speaks to different souls.
+                      <CodexText>
+                        Over 10 frequencies. More than a dozen approaches to [[GovCorp]] resistance. From Injection Vector's kinetic warfare to
+                        Ethereality's transcendent liberation - each band represents a node in the network, a tactic in
+                        the arsenal, a way of fighting that speaks to different souls.
+                      </CodexText>
                     </p>
                     <p style={{ color: '#aaa', lineHeight: '1.8', marginTop: '10px' }}>
                       We don't tell you which frequency to tune to. We broadcast them all. You find the signal that
@@ -542,7 +616,7 @@ const TheCyberPulsePage: React.FC = () => {
                       textShadow: `0 0 10px ${colorScheme.glow}`
                     }}
                   >
-                    Causality is a prison. We broke out.
+                    Causality is a prison. We picked the lock.
                   </p>
                 </div>
               </fieldset>
@@ -586,8 +660,8 @@ const TheCyberPulsePage: React.FC = () => {
                   letterSpacing: '2px'
                 }}
               >
-                This is The.CyberPul.se.<br />
-                <em>Welcome to the resistance.</em>
+                Broadcasting to the past to stop the future of today.<br />
+                <em>Welcome to The.CyberPul.se.</em>
               </p>
             </div>
 
