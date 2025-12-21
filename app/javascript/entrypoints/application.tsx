@@ -5,6 +5,7 @@ import { AudioProvider } from '~/contexts/AudioContext'
 import { MobileMenuProvider } from '~/contexts/MobileMenuContext'
 import { AppSettingsProvider } from '~/contexts/AppSettingsContext'
 import { TerminalProvider } from '~/contexts/TerminalContext'
+import { GridAuthProvider } from '~/contexts/GridAuthContext'
 import { AppLayout } from '~/components/layouts/AppLayout'
 import { ErrorBoundary } from '~/components/errors/ErrorBoundary'
 import { LowercaseRedirect } from '~/components/routing/LowercaseRedirect'
@@ -25,13 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
         <BrowserRouter>
           <LowercaseRedirect>
             <AppSettingsProvider>
-              <MobileMenuProvider>
-                <TerminalProvider>
-                  <AudioProvider>
-                    <AppLayout />
-                  </AudioProvider>
-                </TerminalProvider>
-              </MobileMenuProvider>
+              <GridAuthProvider>
+                <MobileMenuProvider>
+                  <TerminalProvider>
+                    <AudioProvider>
+                      <AppLayout />
+                    </AudioProvider>
+                  </TerminalProvider>
+                </MobileMenuProvider>
+              </GridAuthProvider>
             </AppSettingsProvider>
           </LowercaseRedirect>
         </BrowserRouter>

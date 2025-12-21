@@ -10,7 +10,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 1
-  duration: "TBA"
+  duration: "3:16"
   genre: "Sountrack"
 
 - title: "[ZONE] Sector X (BETA)"
@@ -21,7 +21,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 2
-  duration: "TBA"
+  duration: "4:35"
   genre: "Sountrack"
 
 - title: "[ZONE] Sector X (GAMMA)"
@@ -32,7 +32,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 3
-  duration: "TBA"
+  duration: "5:35"
   genre: "Sountrack"
 
 - title: "[ZONE] Sector X (DELTA)"
@@ -43,7 +43,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 4
-  duration: "TBA"
+  duration: "3:21"
   genre: "Sountrack"
 
 - title: "[ZONE] Sector X (EPSILON)"
@@ -54,7 +54,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 5
-  duration: "TBA"
+  duration: "5:29"
   genre: "Sountrack"
 
 - title: "[ZONE] Sector X (ZETA)"
@@ -65,7 +65,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 6
-  duration: "TBA"
+  duration: "5:52"
   genre: "Sountrack"
 
 - title: "[ZONE] The Hackr Hangar (ALPHA)"
@@ -76,7 +76,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 7
-  duration: "TBA"
+  duration: "3:42"
   genre: "Sountrack"
 
 - title: "[ZONE] The Hackr Hangar (BETA)"
@@ -87,7 +87,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 8
-  duration: "TBA"
+  duration: "2:16"
 
 - title: "[ZONE] The Hackr Hangar (GAMMA)"
   slug: "zone-the-hackr-hangar-gamma"
@@ -97,7 +97,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 9
-  duration: "TBA"
+  duration: "4:34"
 
 - title: "[ZONE] The Hackr Hangar (DELTA)"
   slug: "zone-the-hackr-hangar-delta"
@@ -107,7 +107,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 10
-  duration: "TBA"
+  duration: "3:12"
 
 - title: "[ZONE] The Hackr Hangar (EPSILON)"
   slug: "zone-the-hackr-hangar-epsilon"
@@ -117,7 +117,7 @@
   album_type: "lp"
   release_date: "2125-11-21"
   track_number: 11
-  duration: "TBA"
+  duration: "4:34"
 
 ---
 # INJECTION VECTOR - Physical Layer EP
@@ -238,7 +238,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "4:00"
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
@@ -343,7 +343,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "4:07"
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
@@ -453,7 +453,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "3:33"
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
@@ -560,7 +560,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "5:40"
   genre: "Deathcore"
   color_scheme: "Orange accent lighting"
   # cover_image: "injection_vector_physical_layer.jpg"
@@ -680,7 +680,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "4:54"
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
@@ -789,7 +789,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "7:12"
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
@@ -906,7 +906,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "6:23"
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
@@ -1032,7 +1032,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "5:01"
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
@@ -1152,7 +1152,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "3:56"
   genre: "Female-fronted Emotional Atmospheric Metal"
   color_scheme: "Prismatic/Multi-color"
   # cover_image: "wavelength_zero_zero_light.jpg"
@@ -1275,7 +1275,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "5:01"
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
@@ -1298,7 +1298,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "3:41"
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
@@ -1321,7 +1321,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "4:08"
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
@@ -1344,7 +1344,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "3:30"
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
@@ -1367,7 +1367,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "3:45"
   genre: "Instrumental Progressive Metal"
   color_scheme: "Monochrome/Blue-Green data colors"
   # cover_image: "cipher_protocol_alpha_algorithm.jpg"
@@ -1393,7 +1393,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "3:58"
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
@@ -1451,7 +1451,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "2:02"
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
@@ -1515,7 +1515,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "1:59"
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
@@ -1585,7 +1585,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "2:08"
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
@@ -1653,7 +1653,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "2:38"
   genre: "Hardcore Punk"
   color_scheme: "Black and neon green"
   # cover_image: "system_rot_street_level.jpg"
@@ -1731,7 +1731,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "3:40"
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
@@ -1754,7 +1754,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "3:26"
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
@@ -1800,7 +1800,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "2:35"
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
@@ -1840,7 +1840,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "3:12"
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
@@ -1863,7 +1863,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "4:34"
   genre: "Indie Math Rock"
   color_scheme: "Soft blues and purples"
   # cover_image: "temporal_blue_drift_chronologos.jpg"
@@ -1907,7 +1907,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "4:15"
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
@@ -1977,7 +1977,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "3:06"
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
@@ -2047,7 +2047,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "3:28"
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
@@ -2124,7 +2124,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "3:51"
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
@@ -2194,7 +2194,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "3:59"
   genre: "Post-Grunge"
   color_scheme: "Browns, grays, rust orange"
   # cover_image: "offline_unplugged.jpg"
@@ -2280,7 +2280,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "4:17"
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
@@ -2303,7 +2303,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "4:40"
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
@@ -2325,7 +2325,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "3:49"
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
@@ -2347,7 +2347,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "3:44"
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
@@ -2444,7 +2444,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "3:27"
   genre: "Melodic Euphoric Hardstyle"
   color_scheme: "Electric blues, whites, gold"
   # cover_image: "apex_overdrive_summit.jpg"
@@ -2469,7 +2469,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "2:38"
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
@@ -2492,7 +2492,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "3:45"
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
@@ -2515,7 +2515,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "3:24"
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
@@ -2538,7 +2538,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "3:50"
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
@@ -2561,7 +2561,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "4:13"
   genre: "Melodic Drum and Bass"
   color_scheme: "Black and cyan"
   # cover_image: "voiceprint_audio_archive.jpg"
@@ -2587,7 +2587,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "3:49"
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
@@ -2674,7 +2674,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "2:19"
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
@@ -2763,7 +2763,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "2:25"
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
@@ -2851,7 +2851,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "2:20"
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
@@ -2938,7 +2938,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "3:07"
   genre: "J-Pop"
   color_scheme: "Hot pink and electric blue"
   # cover_image: "neon_hearts_saccharine.jpg"
@@ -3033,7 +3033,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "3:27"
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
@@ -3120,7 +3120,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "4:11"
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
@@ -3208,7 +3208,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "5:23"
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
@@ -3298,7 +3298,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "4:32"
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
@@ -3389,7 +3389,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "6:05"
   genre: "Classic Vocal Trance"
   color_scheme: "Whites, silvers, lavender, celestial blue"
   # cover_image: "ethereality_transcendency.jpg"
@@ -3486,7 +3486,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "5:54"
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
@@ -3509,7 +3509,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 2
-  duration: "TBA"
+  duration: "2:08"
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
@@ -3532,7 +3532,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 3
-  duration: "TBA"
+  duration: "3:12"
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
@@ -3555,7 +3555,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 4
-  duration: "TBA"
+  duration: "2:43"
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
@@ -3578,7 +3578,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 5
-  duration: "TBA"
+  duration: "3:14"
   genre: "Anime Hypertrance (2000s Style)"
   color_scheme: "Bright yellow, hot pink, electric cyan - strobing/flashing aesthetic"
   # cover_image: "blitzbeam_maximum_velocity.jpg"
@@ -3603,7 +3603,7 @@
   album_type: "ep"
   release_date: "TBA"
   track_number: 1
-  duration: "TBA"
+  duration: "3:13"
   genre: "Nightcore"
   audio_file: ""
   featured: false
