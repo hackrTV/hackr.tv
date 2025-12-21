@@ -43,5 +43,4 @@ class ApplicationController < ActionController::Base
       redirect_to "#{protocol}://#{primary_domain}/sector/x#{request.fullpath}", allow_other_host: true
     end
   end
-
 end

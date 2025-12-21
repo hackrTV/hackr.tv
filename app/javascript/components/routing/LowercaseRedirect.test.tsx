@@ -4,12 +4,6 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { LowercaseRedirect } from './LowercaseRedirect'
 
-// Helper to get current location from MemoryRouter
-const LocationDisplay = () => {
-  const location = window.location
-  return <div data-testid="location">{location.pathname}</div>
-}
-
 // Track navigation calls
 const mockNavigate = vi.fn()
 
@@ -17,7 +11,7 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
   return {
     ...actual,
-    useNavigate: () => mockNavigate,
+    useNavigate: () => mockNavigate
   }
 })
 
