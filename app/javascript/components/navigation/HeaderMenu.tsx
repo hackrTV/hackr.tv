@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
@@ -11,6 +11,22 @@ export const HeaderMenu: React.FC = () => {
   const { isMobile } = useMobileDetect()
   const { mobileMenuOpen, setMobileMenuOpen } = useMobileMenu()
   const { openTerminal } = useTerminal()
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const menuRef = useRef<HTMLElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [openDropdown])
 
   const handleDisconnect = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -18,6 +34,14 @@ export const HeaderMenu: React.FC = () => {
       await disconnect()
       navigate('/grid/login')
     }
+  }
+
+  const toggleDropdown = (name: string) => {
+    setOpenDropdown(openDropdown === name ? null : name)
+  }
+
+  const closeDropdown = () => {
+    setOpenDropdown(null)
   }
 
   // Mobile version - collapsed menu
@@ -239,148 +263,207 @@ export const HeaderMenu: React.FC = () => {
     )
   }
 
-  // Desktop version - full menu with dropdowns
+  // Desktop version - click-based dropdowns
   return (
-    <nav className="tui-nav">
-      <ul>
-        {/* 0: hackr.tv */}
-        <li className="tui-dropdown">
-          <span className="purple-168-text">0</span>&nbsp;hackr.tv&nbsp;
-          <div className="tui-dropdown-content">
-            <ul>
-              <li>
-                <Link to="/">
-                  <span className="purple-168-text">/</span>root
-                </Link>
-              </li>
-              <li>
-                <a href="#" onClick={(e) => { e.preventDefault(); openTerminal() }}>
-                  <span className="purple-168-text">&gt;</span>terminal
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-
-        {/* 1: The.CyberPul.se */}
-        <li className="tui-dropdown">
-          <span className="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;
-          <div className="tui-dropdown-content">
-            <ul>
-              <li>
-                <Link to="/thecyberpulse">
-                  <span className="purple-168-text">/</span>root
-                </Link>
-              </li>
-              <li>
-                <Link to="/thecyberpulse/trackz">
-                  <span className="purple-168-text">/</span>trackz
-                </Link>
-              </li>
-              <li>
-                <Link to="/thecyberpulse/vidz">
-                  <span className="purple-168-text">/</span>vidz
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </li>
-
-        {/* 2: hackr.fm */}
-        <li className="tui-dropdown">
-          <span className="purple-168-text">2</span>&nbsp;hackr.fm&nbsp;
-          <div className="tui-dropdown-content">
-            <ul>
-              <li>
-                <Link to="/fm/radio">
-                  <span className="purple-168-text">/</span>radio
-                </Link>
-              </li>
-              <li>
-                <Link to="/fm/pulse_vault">
-                  <span className="purple-168-text">/</span>pulse_vault
-                </Link>
-              </li>
-              <li>
-                <Link to="/fm/bands">
-                  <span className="purple-168-text">/</span>bands
-                </Link>
-              </li>
-              {isLoggedIn && (
+    <>
+      <style>{`
+        .header-dropdown {
+          position: relative;
+          display: inline-block;
+          cursor: pointer;
+          user-select: none;
+          padding: 1px 3px;
+        }
+        .header-dropdown:hover {
+          background-color: rgb(0, 168, 0);
+        }
+        .header-dropdown-content {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: rgb(168, 168, 168);
+          min-width: 200px;
+          padding: 6px;
+          z-index: 9999;
+        }
+        .header-dropdown-content.open {
+          display: block;
+        }
+        .header-dropdown-content ul {
+          border: 2px black solid;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        .header-dropdown-content ul li {
+          display: block;
+          margin: 6px;
+        }
+        .header-dropdown-content ul li a {
+          display: block;
+          color: black;
+          text-decoration: none;
+          padding: 2px 4px;
+        }
+        .header-dropdown-content ul li a:hover {
+          background-color: rgb(0, 168, 0);
+        }
+        .header-nav-item {
+          display: inline-block;
+          margin-left: 10px;
+          padding: 1px 3px;
+        }
+        .header-nav-item:hover {
+          background-color: rgb(0, 168, 0);
+        }
+        .header-nav-item a {
+          display: block;
+          color: black;
+          text-decoration: none;
+        }
+      `}</style>
+      <nav className="tui-nav" ref={menuRef}>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+          {/* 0: hackr.tv */}
+          <li className="header-dropdown" onClick={() => toggleDropdown('hackrtv')}>
+            <span className="purple-168-text">0</span>&nbsp;hackr.tv&nbsp;
+            <div className={`header-dropdown-content ${openDropdown === 'hackrtv' ? 'open' : ''}`}>
+              <ul>
                 <li>
-                  <Link to="/fm/playlists">
-                    <span className="purple-168-text">/</span>playlists
+                  <Link to="/" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>root
                   </Link>
                 </li>
-              )}
-            </ul>
-          </div>
-        </li>
-
-        {/* 3: THE PULSE GRID */}
-        <li className="tui-dropdown">
-          <span className="purple-168-text">3</span>&nbsp;THE PULSE GRID&nbsp;
-          <div className="tui-dropdown-content">
-            <ul>
-              <li>
-                <Link to="/grid">
-                  <span className="purple-168-text">/</span>grid
-                </Link>
-              </li>
-              {isLoggedIn ? (
                 <li>
-                  <a href="#" onClick={handleDisconnect}>
-                    <span className="purple-168-text">/</span>disconnect
+                  <a href="#" onClick={(e) => { e.preventDefault(); closeDropdown(); openTerminal() }}>
+                    <span className="purple-168-text">&gt;</span>terminal
                   </a>
                 </li>
-              ) : (
-                <>
-                  <li>
-                    <Link to="/grid/login">
-                      <span className="purple-168-text">/</span>login
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/grid/register">
-                      <span className="purple-168-text">/</span>register
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
-        </li>
-
-        {/* 4: The WIRE */}
-        <li>
-          <Link to="/wire">
-            <span className="purple-168-text">4</span> The WIRE&nbsp;
-          </Link>
-        </li>
-
-        {/* 5: The Codex */}
-        <li>
-          <Link to="/codex">
-            <span className="purple-168-text">5</span> The Codex&nbsp;
-          </Link>
-        </li>
-
-        {/* 6: Hackr Logs */}
-        <li>
-          <Link to="/logs">
-            <span className="purple-168-text">6</span> Hackr Logs&nbsp;
-          </Link>
-        </li>
-
-        {/* 7: Admin (only show if user is admin) */}
-        {hackr?.role === 'admin' && (
-          <li>
-            <a href="/root">
-              <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
-            </a>
+              </ul>
+            </div>
           </li>
-        )}
-      </ul>
-    </nav>
+
+          {/* 1: The.CyberPul.se */}
+          <li className="header-dropdown" onClick={() => toggleDropdown('cyberpulse')}>
+            <span className="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;
+            <div className={`header-dropdown-content ${openDropdown === 'cyberpulse' ? 'open' : ''}`}>
+              <ul>
+                <li>
+                  <Link to="/thecyberpulse" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>root
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/thecyberpulse/trackz" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>trackz
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/thecyberpulse/vidz" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>vidz
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          {/* 2: hackr.fm */}
+          <li className="header-dropdown" onClick={() => toggleDropdown('hackrfm')}>
+            <span className="purple-168-text">2</span>&nbsp;hackr.fm&nbsp;
+            <div className={`header-dropdown-content ${openDropdown === 'hackrfm' ? 'open' : ''}`}>
+              <ul>
+                <li>
+                  <Link to="/fm/radio" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>radio
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/fm/pulse_vault" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>pulse_vault
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/fm/bands" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>bands
+                  </Link>
+                </li>
+                {isLoggedIn && (
+                  <li>
+                    <Link to="/fm/playlists" onClick={closeDropdown}>
+                      <span className="purple-168-text">/</span>playlists
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </li>
+
+          {/* 3: THE PULSE GRID */}
+          <li className="header-dropdown" onClick={() => toggleDropdown('grid')}>
+            <span className="purple-168-text">3</span>&nbsp;THE PULSE GRID&nbsp;
+            <div className={`header-dropdown-content ${openDropdown === 'grid' ? 'open' : ''}`}>
+              <ul>
+                <li>
+                  <Link to="/grid" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>grid
+                  </Link>
+                </li>
+                {isLoggedIn ? (
+                  <li>
+                    <a href="#" onClick={(e) => { handleDisconnect(e); closeDropdown() }}>
+                      <span className="purple-168-text">/</span>disconnect
+                    </a>
+                  </li>
+                ) : (
+                  <>
+                    <li>
+                      <Link to="/grid/login" onClick={closeDropdown}>
+                        <span className="purple-168-text">/</span>login
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/grid/register" onClick={closeDropdown}>
+                        <span className="purple-168-text">/</span>register
+                      </Link>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </li>
+
+          {/* 4: The WIRE */}
+          <li className="header-nav-item">
+            <Link to="/wire">
+              <span className="purple-168-text">4</span> The WIRE&nbsp;
+            </Link>
+          </li>
+
+          {/* 5: The Codex */}
+          <li className="header-nav-item">
+            <Link to="/codex">
+              <span className="purple-168-text">5</span> The Codex&nbsp;
+            </Link>
+          </li>
+
+          {/* 6: Hackr Logs */}
+          <li className="header-nav-item">
+            <Link to="/logs">
+              <span className="purple-168-text">6</span> Hackr Logs&nbsp;
+            </Link>
+          </li>
+
+          {/* 7: Admin (only show if user is admin) */}
+          {hackr?.role === 'admin' && (
+            <li className="header-nav-item">
+              <a href="/root">
+                <span className="red-255-text">7</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+              </a>
+            </li>
+          )}
+        </ul>
+      </nav>
+    </>
   )
 }

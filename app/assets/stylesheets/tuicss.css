@@ -1007,10 +1007,12 @@ input[type=button] {
 .tui-dropdown-content {
   display: none;
   position: absolute;
+  top: 100%;
+  left: 0;
   background-color: rgb(168, 168, 168);
   min-width: 200px;
   padding: 6px;
-  z-index: 9;
+  z-index: 2000;
 }
 
 .tui-dropdown-content ul {
@@ -1138,7 +1140,7 @@ input[type=button] {
   width: 100%;
   background-color: rgb(168, 168, 168);
   padding: 0px 2px;
-  z-index: 9;
+  z-index: 3000;
   display: block;
   position: fixed;
 }
