@@ -29,9 +29,10 @@ RSpec.describe Terminal::Password do
 
   describe ".generate_password_for_date" do
     it "generates different passwords for different dates" do
-      today = Date.current
-      tomorrow = Date.current + 1
-      yesterday = Date.current - 1
+      # Use Date.today to match the implementation
+      today = Date.today
+      tomorrow = Date.today + 1
+      yesterday = Date.today - 1
 
       password_today = described_class.generate_password_for_date(today)
       password_tomorrow = described_class.generate_password_for_date(tomorrow)
@@ -92,7 +93,9 @@ RSpec.describe Terminal::Password do
     end
 
     it "returns false for yesterday's password" do
-      yesterday = Date.current - 1
+      # Use Date.today to match the implementation (which uses Date.today for
+      # compatibility with standalone PAM scripts that don't load ActiveSupport)
+      yesterday = Date.today - 1
       old_password = described_class.generate_password_for_date(yesterday)
 
       expect(described_class.valid?(old_password)).to be false

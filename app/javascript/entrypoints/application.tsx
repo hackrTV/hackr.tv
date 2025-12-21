@@ -7,6 +7,7 @@ import { AppSettingsProvider } from '~/contexts/AppSettingsContext'
 import { TerminalProvider } from '~/contexts/TerminalContext'
 import { AppLayout } from '~/components/layouts/AppLayout'
 import { ErrorBoundary } from '~/components/errors/ErrorBoundary'
+import { LowercaseRedirect } from '~/components/routing/LowercaseRedirect'
 
 // Mount React SPA when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,15 +23,17 @@ document.addEventListener('DOMContentLoaded', () => {
     <React.StrictMode>
       <ErrorBoundary>
         <BrowserRouter>
-          <AppSettingsProvider>
-            <MobileMenuProvider>
-              <TerminalProvider>
-                <AudioProvider>
-                  <AppLayout />
-                </AudioProvider>
-              </TerminalProvider>
-            </MobileMenuProvider>
-          </AppSettingsProvider>
+          <LowercaseRedirect>
+            <AppSettingsProvider>
+              <MobileMenuProvider>
+                <TerminalProvider>
+                  <AudioProvider>
+                    <AppLayout />
+                  </AudioProvider>
+                </TerminalProvider>
+              </MobileMenuProvider>
+            </AppSettingsProvider>
+          </LowercaseRedirect>
         </BrowserRouter>
       </ErrorBoundary>
     </React.StrictMode>
