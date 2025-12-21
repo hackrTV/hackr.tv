@@ -26,11 +26,25 @@ class LowercaseRedirect
 
   private
 
+  # Asset file extensions that should not be redirected
+  ASSET_EXTENSIONS = %w[
+    .js .css .map .png .jpg .jpeg .gif .svg .ico .webp .avif
+    .woff .woff2 .ttf .eot .otf
+    .mp3 .wav .ogg .flac .aac .m4a
+    .mp4 .webm .mov
+    .json .xml .txt .pdf
+  ].freeze
+
   def skip_path?(path)
     # Skip /shared/ paths (case-sensitive playlist tokens)
     return true if path.start_with?("/shared/")
     # Skip /api/shared_playlists/ paths
     return true if path.start_with?("/api/shared_playlists/")
+    # Skip asset paths
+    return true if path.start_with?("/assets/")
+    return true if path.start_with?("/vite-dev/")
+    # Skip files with asset extensions (case-insensitive check)
+    return true if ASSET_EXTENSIONS.any? { |ext| path.downcase.end_with?(ext) }
 
     false
   end

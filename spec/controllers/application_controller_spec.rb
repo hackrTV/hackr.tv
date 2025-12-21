@@ -74,6 +74,27 @@ RSpec.describe ApplicationController, type: :request do
         expect(response).to have_http_status(:moved_permanently)
         expect(response).to redirect_to("/wire")
       end
+
+      it "does not redirect /assets/ paths" do
+        # Assets have fingerprinted names with mixed case
+        get "/assets/Application-AbC123.js"
+        expect(response).not_to have_http_status(:moved_permanently)
+      end
+
+      it "does not redirect files with asset extensions" do
+        get "/some/Path/File.JS"
+        expect(response).not_to have_http_status(:moved_permanently)
+      end
+
+      it "does not redirect image files" do
+        get "/images/Logo.PNG"
+        expect(response).not_to have_http_status(:moved_permanently)
+      end
+
+      it "does not redirect audio files" do
+        get "/audio/Track.MP3"
+        expect(response).not_to have_http_status(:moved_permanently)
+      end
     end
   end
 end
