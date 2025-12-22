@@ -38,6 +38,9 @@ class GridHackr < ApplicationRecord
   # Virtual attribute to enforce length validation during UI registration
   attr_accessor :enforce_alias_length
 
+  # Virtual attribute to skip reserved alias check during seeding
+  attr_accessor :skip_reserved_check
+
   belongs_to :current_room, class_name: "GridRoom", optional: true
   has_many :grid_items
   has_many :grid_messages
@@ -81,6 +84,7 @@ class GridHackr < ApplicationRecord
 
   def alias_not_reserved
     return if hackr_alias.blank?
+    return if skip_reserved_check
 
     normalized = hackr_alias.downcase.gsub(/\s+/, "_")
 

@@ -83,6 +83,11 @@ RSpec.describe GridHackr, type: :model do
         end
       end
 
+      it "allows reserved aliases when skip_reserved_check is true" do
+        hackr = build(:grid_hackr, hackr_alias: "synthia", skip_reserved_check: true)
+        expect(hackr).to be_valid
+      end
+
       it "rejects aliases containing profanity" do
         hackr = build(:grid_hackr, hackr_alias: "bullshit_user")
         expect(hackr).not_to be_valid
