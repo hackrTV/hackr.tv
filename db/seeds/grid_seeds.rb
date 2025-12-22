@@ -307,18 +307,23 @@ else
   ryker_password = ENV.fetch("RYKER_PASSWORD", "cyberpulse")
 end
 
+# skip_reserved_check on all seeded hackrs to bypass reserved alias validation
+# (reserved aliases prevent users from impersonating core characters)
+
 GridHackr.create!(
   hackr_alias: "XERAEN",
   password: xeraen_password,
   role: "admin",
-  current_room: hackr_tv
+  current_room: hackr_tv,
+  skip_reserved_check: true
 )
 
 GridHackr.create!(
   hackr_alias: "Ryker",
   password: ryker_password,
   role: "admin",
-  current_room: hackr_tv
+  current_room: hackr_tv,
+  skip_reserved_check: true
 )
 
 # Additional core hackrs for PulseWire and HackrLogs
@@ -328,7 +333,8 @@ GridHackr.create!(
   hackr_alias: "Cipher",
   password: cipher_password,
   role: "operative",
-  current_room: hackr_tv
+  current_room: hackr_tv,
+  skip_reserved_check: true
 )
 
 # Synthia - AI consciousness, communicates through frequency modulation
@@ -336,7 +342,8 @@ GridHackr.create!(
   hackr_alias: "Synthia",
   password: ENV.fetch("SYNTHIA_PASSWORD", "waveform"),
   role: "operative",
-  current_room: xeraen_base
+  current_room: xeraen_base,
+  skip_reserved_check: true
 )
 
 # Nyx - Newer recruit, still processing the implications
@@ -344,7 +351,8 @@ GridHackr.create!(
   hackr_alias: "Nyx",
   password: ENV.fetch("NYX_PASSWORD", "unfiltered"),
   role: "operative",
-  current_room: hackr_tv
+  current_room: hackr_tv,
+  skip_reserved_check: true
 )
 
 puts "Created 5 core hackrs"
