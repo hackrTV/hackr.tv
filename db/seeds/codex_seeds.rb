@@ -149,7 +149,7 @@ seed_codex_entry(
   name: "The Fracture Network",
   slug: "the-fracture-network",
   entry_type: "organization",
-  summary: "The trans-temporal resistance - hackrs, artists, and free thinkers fighting GovCorp across a hundred years through music, technology, and the power of unfiltered reality.",
+  summary: "The trans-temporal resistance - hackrs, artists, and Truth seekers fighting GovCorp across a hundred years through music, technology, and the power of unfiltered reality.",
   content: <<~MD,
     # The Fracture Network
 
