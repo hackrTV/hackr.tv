@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   get "ethereality", to: "pages#spa_root", as: :ethereality
   get "neon_hearts", to: "pages#spa_root", as: :neon_hearts
   get "offline", to: "pages#spa_root", as: :offline
+  get "heartbreak_havoc", to: "pages#spa_root", as: :heartbreak_havoc
 
   # Sector X routes - SPA
   get "sector/x", to: "pages#spa_root", as: :sector_x

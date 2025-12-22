@@ -19,7 +19,7 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ children }) => {
       <PrereleaseBanner />
       {!isMobile && <br />}
       <FooterMenu />
-      <div className="ml-10 mb-20 pb-50">
+      <div className={isMobile ? 'mb-20 pb-50' : 'ml-10 mb-20 pb-50'} style={isMobile ? { padding: '0 5px' } : undefined}>
         {children}
       </div>
 

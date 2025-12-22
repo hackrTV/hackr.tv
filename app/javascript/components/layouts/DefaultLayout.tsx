@@ -22,8 +22,8 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
 
       {!isMobile && <br />}
 
-      {/* ASCII Art Header */}
-      {showAsciiArt && (
+      {/* ASCII Art Header - hidden on mobile */}
+      {showAsciiArt && !isMobile && (
         <>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'center' }} className="white-168-text">
             <Link to="/" style={{ display: 'inline-block' }}>
@@ -43,11 +43,20 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
         </>
       )}
 
+      {/* Mobile Header - simple text logo */}
+      {showAsciiArt && isMobile && (
+        <div style={{ textAlign: 'center', padding: '10px 0' }} className="white-168-text">
+          <Link to="/" style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '2px' }}>
+            HACKR.TV
+          </Link>
+        </div>
+      )}
+
       {/* Footer Navigation Menu */}
       <FooterMenu />
 
       {/* Main Content */}
-      <div className="ml-10 mb-20 pb-50">
+      <div className={isMobile ? 'mb-20 pb-50' : 'ml-10 mb-20 pb-50'} style={isMobile ? { padding: '0 10px' } : undefined}>
         {children}
       </div>
 

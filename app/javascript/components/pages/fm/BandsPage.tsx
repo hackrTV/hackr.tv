@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 interface Artist {
   id: number
@@ -15,6 +16,7 @@ export const BandsPage: React.FC = () => {
   const [artists, setArtists] = useState<Artist[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { isMobile } = useMobileDetect()
 
   useEffect(() => {
     fetch('/api/artists')
@@ -80,9 +82,9 @@ export const BandsPage: React.FC = () => {
 
   return (
     <FmLayout>
-      <div className="tui-window white-text" style={{ maxWidth: '1400px', margin: '0 auto', display: 'block', background: '#1a1a1a', border: '2px solid #666' }}>
+      <div className="tui-window white-text" style={{ maxWidth: isMobile ? '100%' : '1400px', margin: '0 auto', display: 'block', background: '#1a1a1a', border: '2px solid #666' }}>
         <fieldset style={{ borderColor: '#666' }}>
-          <legend className="center" style={{ color: '#10b981' }}>hackr.fm :: BANDS</legend>
+          <legend className="center" style={{ color: '#10b981' }}>{isMobile ? 'BANDS' : 'hackr.fm :: BANDS'}</legend>
 
           <div>
             <h2 style={{ textAlign: 'center', marginBottom: '15px', color: '#10b981' }}>
@@ -106,15 +108,19 @@ export const BandsPage: React.FC = () => {
                 </div>
 
                 {artists.length > 0 ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))',
+                    gap: isMobile ? '15px' : '20px'
+                  }}>
                     {artists.map((artist) => (
                       <div key={artist.id} className="tui-window white-text" style={{ background: '#0d0d0d', border: '1px solid #444' }}>
                         <fieldset style={{ borderColor: '#555' }}>
                           <legend style={{ color: '#10b981' }}>{artist.name.toUpperCase()}</legend>
 
-                          <div style={{ padding: '15px' }}>
-                            <div style={{ marginBottom: '20px' }}>
-                              <p style={{ color: '#aaa', lineHeight: '1.6', fontStyle: 'italic' }}>
+                          <div style={{ padding: isMobile ? '10px' : '15px' }}>
+                            <div style={{ marginBottom: isMobile ? '12px' : '20px' }}>
+                              <p style={{ color: '#aaa', lineHeight: '1.6', fontStyle: 'italic', fontSize: isMobile ? '0.9em' : '1em' }}>
                                 {getBandDescription(artist.slug)}
                               </p>
                             </div>
@@ -125,22 +131,22 @@ export const BandsPage: React.FC = () => {
                               </p>
                             </div>
 
-                            <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                            <div style={{ marginTop: isMobile ? '12px' : '20px', display: 'flex', gap: '10px' }}>
                               {getProfilePath(artist.slug) ? (
                                 <Link
                                   to={getProfilePath(artist.slug)}
                                   className="tui-button purple-168"
-                                  style={{ flex: 1, textAlign: 'center' }}
+                                  style={{ flex: 1, textAlign: 'center', fontSize: isMobile ? '0.85em' : '1em' }}
                                 >
-                                  VIEW PROFILE
+                                  {isMobile ? 'PROFILE' : 'VIEW PROFILE'}
                                 </Link>
                               ) : (
                                 <button
                                   className="tui-button"
-                                  style={{ flex: 1, opacity: 0.5, cursor: 'not-allowed' }}
+                                  style={{ flex: 1, opacity: 0.5, cursor: 'not-allowed', fontSize: isMobile ? '0.85em' : '1em' }}
                                   disabled
                                 >
-                                  COMING SOON
+                                  SOON
                                 </button>
                               )}
 
@@ -148,7 +154,7 @@ export const BandsPage: React.FC = () => {
                                 <Link
                                   to={`/fm/pulse_vault?filter=${encodeURIComponent(artist.name.toLowerCase().trim())}`}
                                   className="tui-button cyan-168"
-                                  style={{ flex: 1, textAlign: 'center' }}
+                                  style={{ flex: 1, textAlign: 'center', fontSize: isMobile ? '0.85em' : '1em' }}
                                 >
                                   TRACKS
                                 </Link>

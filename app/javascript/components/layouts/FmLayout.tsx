@@ -24,7 +24,7 @@ export const FmLayout: React.FC<FmLayoutProps> = ({ children }) => {
       <FooterMenu />
 
       {/* Main Content */}
-      <div className="ml-10 mb-20 pb-50 mt-30">
+      <div className={isMobile ? 'mb-20 pb-50 mt-30' : 'ml-10 mb-20 pb-50 mt-30'} style={isMobile ? { padding: '0 10px' } : undefined}>
         {children}
       </div>
 

@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 
 interface AlbumCoverProps {
   coverUrl: string;
+  size?: number;
 }
 
-export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl }) => {
+export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl, size = 60 }) => {
   const [showOverlay, setShowOverlay] = useState(false)
 
   if (!coverUrl) return null
@@ -18,8 +19,8 @@ export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl }) => {
         onMouseEnter={() => setShowOverlay(true)}
         onMouseLeave={() => setShowOverlay(false)}
         style={{
-          width: '60px',
-          height: '60px',
+          width: `${size}px`,
+          height: `${size}px`,
           objectFit: 'cover',
           border: '1px solid #7c3aed',
           cursor: 'pointer'

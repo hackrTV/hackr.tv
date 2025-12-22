@@ -19,29 +19,45 @@ export const TerminalAnimation: React.FC = () => {
   const currentYear = new Date().getFullYear()
   const speedMultiplier = 5
 
+  // Responsive dividers - shorter for mobile
+  const doubleLine = isMobile ? '══════════════════════════════════' : '════════════════════════════════════════════════════════════════'
+  const singleLine = isMobile ? '──────────────────────────────────' : '─────────────────────────────────────────────────────────────────'
+
   const lines: TerminalLine[] = [
-    { text: '════════════════════════════════════════════════════════════════', delay: 0 },
+    { text: doubleLine, delay: 0 },
     { text: '  HACKR.TV BROADCAST SYSTEM v3.14.1592', delay: 300, class: 'terminal-header' },
     { text: '  INITIALIZING TRANSMISSION...', delay: 200 },
-    { text: '════════════════════════════════════════════════════════════════', delay: 100 },
+    { text: doubleLine, delay: 100 },
     { text: '', delay: 300 },
     { text: '> SYSTEM STATUS: ONLINE', delay: 500, class: 'terminal-prompt' },
     { text: `> YEAR: ${currentYear} (Origin Point)`, delay: 200, class: 'terminal-prompt' },
     { text: `> SIGNAL RANGE: ${currentYear} - ${currentYear + 100}`, delay: 200, class: 'terminal-prompt' },
     { text: '', delay: 500 },
-    { text: 'Welcome to hackr.tv - the multimedia Fracture Network platform broadcasting', delay: 100 },
-    { text: `cyberpunk transmissions across time and space from ${currentYear + 100}.`, delay: 100 },
+    ...(isMobile ? [
+      { text: 'Welcome to hackr.tv - the multimedia', delay: 100 },
+      { text: 'Fracture Network platform broadcasting', delay: 100 },
+      { text: 'cyberpunk transmissions across time', delay: 100 },
+      { text: `and space from ${currentYear + 100}.`, delay: 100 }
+    ] : [
+      { text: 'Welcome to hackr.tv - the multimedia Fracture Network platform broadcasting', delay: 100 },
+      { text: `cyberpunk transmissions across time and space from ${currentYear + 100}.`, delay: 100 }
+    ]),
     { text: '', delay: 500 },
-    { text: '─────────────────────────────────────────────────────────────────', delay: 200 },
+    { text: singleLine, delay: 200 },
     { text: 'FEATURED ARTISTS:', delay: 300, class: 'terminal-header' },
-    { text: '─────────────────────────────────────────────────────────────────', delay: 100 },
+    { text: singleLine, delay: 100 },
     { text: '', delay: 300 },
     { text: '[0] <a href="/thecyberpulse" data-route="/thecyberpulse" class="terminal-link">The.CyberPul.se</a>', delay: 200, html: true },
-    { text: '    Flagship Standard Bearers of the Hackrs of CyberSpace,', delay: 100 },
-    { text: '    sending pirate broadcasts across time and space', delay: 100 },
+    ...(isMobile ? [
+      { text: '    Flagship Standard Bearers of', delay: 100 },
+      { text: '    the Hackrs of CyberSpace', delay: 100 }
+    ] : [
+      { text: '    Flagship Standard Bearers of the Hackrs of CyberSpace,', delay: 100 },
+      { text: '    sending pirate broadcasts across time and space', delay: 100 }
+    ]),
     { text: '', delay: 200 },
     { text: '[1] <a href="/xeraen" data-route="/xeraen" class="terminal-link">XERAEN</a>', delay: 200, html: true },
-    { text: '    Trans-Temporal Operations from the future', delay: 100 },
+    { text: '    Trans-Temporal Operations', delay: 100 },
     { text: '', delay: 200 },
     { text: '[2] <a href="/wavelength_zero" data-route="/wavelength_zero" class="terminal-link">Wavelength Zero</a>', delay: 200, html: true },
     { text: '    Signal disruption collective', delay: 100 },
@@ -52,25 +68,25 @@ export const TerminalAnimation: React.FC = () => {
     { text: '[4] <a href="/temporal_blue_drift" data-route="/temporal_blue_drift" class="terminal-link">Temporal Blue Drift</a>', delay: 200, html: true },
     { text: '    Love letters across time', delay: 100 },
     { text: '', delay: 500 },
-    { text: '─────────────────────────────────────────────────────────────────', delay: 200 },
+    { text: singleLine, delay: 200 },
     { text: 'PLATFORM SERVICES:', delay: 300, class: 'terminal-header' },
-    { text: '─────────────────────────────────────────────────────────────────', delay: 100 },
+    { text: singleLine, delay: 100 },
     { text: '', delay: 300 },
-    { text: '[FM___] <a href="/fm" data-route="/fm" class="terminal-link">hackr.fm</a>', delay: 200, html: true },
-    { text: '        Radio & music streaming platform', delay: 100 },
+    { text: isMobile ? '[FM] <a href="/fm" data-route="/fm" class="terminal-link">hackr.fm</a>' : '[FM___] <a href="/fm" data-route="/fm" class="terminal-link">hackr.fm</a>', delay: 200, html: true },
+    { text: isMobile ? '     Radio & streaming' : '        Radio & music streaming platform', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[GRID_] <a href="/grid" data-route="/grid" class="terminal-link">THE PULSE GRID</a>', delay: 200, html: true },
-    { text: '        Text-based multiplayer game', delay: 100 },
+    { text: isMobile ? '[GRID] <a href="/grid" data-route="/grid" class="terminal-link">THE PULSE GRID</a>' : '[GRID_] <a href="/grid" data-route="/grid" class="terminal-link">THE PULSE GRID</a>', delay: 200, html: true },
+    { text: isMobile ? '       Text-based MUD game' : '        Text-based multiplayer game', delay: 100 },
     { text: '', delay: 200 },
     { text: '[CODEX] <a href="/codex" data-route="/codex" class="terminal-link">The Codex</a>', delay: 200, html: true },
-    { text: '        Lore archive & wiki', delay: 100 },
+    { text: isMobile ? '        Lore wiki' : '        Lore archive & wiki', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[LOGS_] <a href="/logs" data-route="/logs" class="terminal-link">Hackr Logs</a>', delay: 200, html: true },
-    { text: '        Updates from the Fracture Network', delay: 100 },
+    { text: isMobile ? '[LOGS] <a href="/logs" data-route="/logs" class="terminal-link">Hackr Logs</a>' : '[LOGS_] <a href="/logs" data-route="/logs" class="terminal-link">Hackr Logs</a>', delay: 200, html: true },
+    { text: isMobile ? '       Network updates' : '        Updates from the Fracture Network', delay: 100 },
     { text: '', delay: 500 },
-    { text: '════════════════════════════════════════════════════════════════', delay: 200 },
-    { text: '  TRANSMISSION READY. SELECT YOUR DESTINATION.', delay: 100 },
-    { text: '════════════════════════════════════════════════════════════════', delay: 100 },
+    { text: doubleLine, delay: 200 },
+    { text: isMobile ? '  SELECT YOUR DESTINATION.' : '  TRANSMISSION READY. SELECT YOUR DESTINATION.', delay: 100 },
+    { text: doubleLine, delay: 100 },
     { text: '', delay: 100 },
     { text: '> ', delay: 0, class: 'terminal-prompt', keepCursor: true }
   ]
@@ -242,9 +258,13 @@ export const TerminalAnimation: React.FC = () => {
 
         @media (max-width: 767px) {
           .terminal-container {
-            margin: 10px;
-            padding: 10px;
-            overflow-x: auto;
+            margin: 5px;
+            padding: 12px;
+            font-size: 14px;
+            min-height: auto;
+            overflow-x: hidden;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
           }
         }
 

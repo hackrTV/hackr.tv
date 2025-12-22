@@ -38,8 +38,8 @@ export const useMobileDetect = (): MobileDetectResult => {
   })
 
   useEffect(() => {
-    // Skip if window is not available (SSR)
-    if (typeof window === 'undefined') return
+    // Skip if window or matchMedia is not available (SSR or unsupported browser)
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
 
     const mobileQuery = window.matchMedia('(max-width: 767px)')
     const tabletQuery = window.matchMedia('(min-width: 768px) and (max-width: 1023px)')
