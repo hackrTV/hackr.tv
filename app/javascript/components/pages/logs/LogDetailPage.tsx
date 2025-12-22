@@ -99,7 +99,7 @@ export const LogDetailPage: React.FC = () => {
 
         {/* Log Content */}
         <div style={{ background: '#0d0d0d', padding: '30px', marginBottom: '30px', borderLeft: '3px solid #6366f1' }}>
-          <div style={{ color: '#b4b4b4', lineHeight: '1.8', fontSize: '1.05em' }}>
+          <div style={{ color: '#b4b4b4', lineHeight: '1.8', fontSize: '1.05em', textAlign: 'justify' }}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeSanitize]}

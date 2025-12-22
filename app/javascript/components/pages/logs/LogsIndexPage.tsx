@@ -117,7 +117,7 @@ export const LogsIndexPage: React.FC = () => {
                 </div>
 
                 {/* Excerpt */}
-                <div style={{ color: '#9ca3af', lineHeight: '1.7', marginBottom: '15px' }}>
+                <div style={{ color: '#9ca3af', lineHeight: '1.7', marginBottom: '15px', textAlign: 'justify' }}>
                   {truncateMarkdown(log.body || '', 300)}
                 </div>
 
