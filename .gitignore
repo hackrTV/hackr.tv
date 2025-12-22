@@ -45,4 +45,7 @@ node_modules
 *.local
 
 data/*.flac
-data/thecyberpulse/trackz/livestream_archive/
+
+# Audio imports directory (files too large for git, use import:audio_files task)
+/imports/*
+!/imports/.keep
