@@ -45,3 +45,4 @@ node_modules
 *.local
 
 data/*.flac
+data/thecyberpulse/trackz/livestream_archive/
