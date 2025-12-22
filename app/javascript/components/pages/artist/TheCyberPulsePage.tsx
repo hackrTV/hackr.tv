@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
 import { CodexText } from '~/components/shared/CodexText'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
@@ -31,6 +32,7 @@ const extractVideoId = (url: string): string | null => {
 
 const TheCyberPulsePage: React.FC = () => {
   const [latestVod, setLatestVod] = useState<Vod | null>(null)
+  const { isMobile } = useMobileDetect()
 
   useEffect(() => {
     const fetchLatestVod = async () => {
@@ -60,14 +62,14 @@ const TheCyberPulsePage: React.FC = () => {
   return (
     <DefaultLayout>
       <div
-        className="tui-window white-text"
+        className="tui-window white-text band-profile-container"
         style={{
-          maxWidth: '1200px',
+          maxWidth: isMobile ? '100%' : '1200px',
           margin: '0 auto',
           display: 'block',
           background: colorScheme.background,
           border: `2px solid ${colorScheme.primary}`,
-          boxShadow: `0 0 30px ${colorScheme.glow}`
+          boxShadow: isMobile ? 'none' : `0 0 30px ${colorScheme.glow}`
         }}
       >
         <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -76,13 +78,13 @@ const TheCyberPulsePage: React.FC = () => {
             style={{
               color: colorScheme.primary,
               textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-              letterSpacing: '3px'
+              letterSpacing: isMobile ? '1px' : '3px'
             }}
           >
             THE.CYBERPUL.SE
           </legend>
 
-          <div>
+          <div className="band-profile-content">
             {/* Signal Incoming - Intro */}
             <div
               style={{
@@ -166,9 +168,9 @@ const TheCyberPulsePage: React.FC = () => {
                   >
                     VISUAL TRANSMISSION
                   </legend>
-                  <div style={{ padding: '20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-                      <YouTubePlayer videoId={extractVideoId(latestVod.vod_url)!} width={560} height={315} />
+                  <div style={{ padding: isMobile ? '10px' : '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px', maxWidth: '100%', overflow: 'hidden' }}>
+                      <YouTubePlayer videoId={extractVideoId(latestVod.vod_url)!} width={isMobile ? 280 : 560} height={isMobile ? 158 : 315} />
                     </div>
                     {latestVod.title && (
                       <p
@@ -666,14 +668,20 @@ const TheCyberPulsePage: React.FC = () => {
             </div>
 
             {/* Navigation Buttons */}
-            <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '10px' : '15px',
+              marginTop: '30px'
+            }}>
               <Link
                 to="/fm/bands"
                 className="tui-button"
                 style={{
                   background: '#222',
                   color: '#888',
-                  border: '1px solid #444'
+                  border: '1px solid #444',
+                  textAlign: 'center'
                 }}
               >
                 ← BACK TO BANDS
@@ -685,10 +693,11 @@ const TheCyberPulsePage: React.FC = () => {
                   background: colorScheme.primary,
                   color: 'white',
                   fontWeight: 'bold',
-                  boxShadow: `0 0 15px ${colorScheme.glow}`
+                  boxShadow: `0 0 15px ${colorScheme.glow}`,
+                  textAlign: 'center'
                 }}
               >
-                LISTEN IN THE PULSE VAULT →
+                {isMobile ? 'PULSE VAULT →' : 'LISTEN IN THE PULSE VAULT →'}
               </Link>
               <Link
                 to="/grid"
@@ -697,10 +706,11 @@ const TheCyberPulsePage: React.FC = () => {
                   background: colorScheme.secondary,
                   color: 'white',
                   fontWeight: 'bold',
-                  boxShadow: '0 0 15px rgba(155, 89, 182, 0.6)'
+                  boxShadow: '0 0 15px rgba(155, 89, 182, 0.6)',
+                  textAlign: 'center'
                 }}
               >
-                ENTER THE PULSE GRID →
+                {isMobile ? 'PULSE GRID →' : 'ENTER THE PULSE GRID →'}
               </Link>
             </div>
           </div>

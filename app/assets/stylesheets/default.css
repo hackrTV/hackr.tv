@@ -125,3 +125,238 @@
 .admin-table-row {
   border-bottom: 1px solid #333;
 }
+
+/* Mobile Responsive Overrides */
+@media (max-width: 767px) {
+  /* Prevent horizontal overflow on mobile */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Make all containers respect viewport width */
+  #main-content {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Universal box-sizing for all elements on mobile */
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  /* TUI Windows - constrain to viewport (accounting for parent padding) */
+  .tui-window {
+    max-width: calc(100vw - 40px) !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    font-size: 14px;
+    display: block !important;
+    box-shadow: none !important;
+  }
+
+  /* All divs inside tui-window should respect boundaries */
+  .tui-window div {
+    max-width: 100% !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  /* Reduce padding on inner sections */
+  .tui-window div[style*="padding: 25px"],
+  .tui-window div[style*="padding: 20px"],
+  .tui-window div[style*="padding:'25px'"],
+  .tui-window div[style*="padding:'20px'"] {
+    padding: 12px !important;
+  }
+
+  /* Handle pre-formatted text on mobile */
+  pre, code {
+    max-width: 100%;
+    overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  /* Fix input widths on mobile */
+  input, select, textarea {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Tables should scroll horizontally if needed */
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* Fieldsets should not overflow */
+  fieldset {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-left-width: 1px !important;
+    border-right-width: 1px !important;
+  }
+
+  /* Legends should wrap */
+  legend {
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+
+  /* Buttons should wrap on mobile */
+  .tui-button {
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  /* Paragraphs should wrap properly */
+  p {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  /* Blockquotes should fit */
+  blockquote {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 15px;
+    padding-right: 10px;
+  }
+
+  /* Band profile content - reduce padding on mobile */
+  .band-profile-content > div {
+    padding: 12px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .band-profile-content > div > div {
+    padding: 10px !important;
+  }
+
+  /* Nested tui-windows inside band profiles */
+  .band-profile-content .tui-window {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 0 15px 0 !important;
+    box-shadow: none !important;
+    border-width: 1px !important;
+  }
+
+  .band-profile-content .tui-window fieldset {
+    padding: 6px !important;
+    border-width: 1px !important;
+  }
+
+  /* Tables inside band profiles */
+  .band-profile-content table {
+    font-size: 0.85em;
+  }
+
+  .band-profile-content table th,
+  .band-profile-content table td {
+    padding: 4px 6px !important;
+  }
+
+  /* Reduce font sizes slightly on band profiles */
+  .band-profile-container h2,
+  .band-profile-container h3 {
+    font-size: 1.1em !important;
+    letter-spacing: 1px !important;
+  }
+
+  .band-profile-container p {
+    font-size: 0.95em !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Force all elements inside band profiles to respect width */
+  .band-profile-container *,
+  .band-profile-content * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Override inline box-shadows on mobile */
+  .band-profile-container div,
+  .band-profile-content div {
+    box-shadow: none !important;
+  }
+
+  /* Reduce outer container border on mobile */
+  .band-profile-container {
+    border-width: 1px !important;
+  }
+
+  .band-profile-container > fieldset {
+    border-width: 1px !important;
+  }
+
+  /* Force all text in band profiles to wrap on mobile */
+  .band-profile-content p,
+  .band-profile-content span,
+  .band-profile-content td,
+  .band-profile-content th {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Table cells should wrap */
+  .band-profile-content table {
+    table-layout: fixed !important;
+    width: 100% !important;
+  }
+
+  .band-profile-content table td,
+  .band-profile-content table th {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}
+
+/* Hide less important table columns on very small screens */
+@media (max-width: 480px) {
+  .band-profile-content table th:nth-child(3),
+  .band-profile-content table td:nth-child(3) {
+    display: none;
+  }
+}
+
+/* Embedded track player mobile fixes */
+@media (max-width: 767px) {
+  .band-profile-content .embedded-track-player {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
+    padding: 15px !important;
+  }
+
+  .band-profile-content .embedded-track-player > div:first-child {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  /* YouTube player container - force responsive sizing */
+  .band-profile-content div[style*="background: #000"],
+  .band-profile-content div[style*="background:#000"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+  }
+
+  .band-profile-content iframe {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+  }
+}

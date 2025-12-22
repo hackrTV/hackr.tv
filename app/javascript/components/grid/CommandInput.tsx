@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, KeyboardEvent, forwardRef, useImperativeHandle } from 'react'
 import { useCommandHistory } from '~/hooks/useCommandHistory'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 interface CommandInputProps {
   onSubmit: (command: string) => void
@@ -14,6 +15,7 @@ export const CommandInput = forwardRef<CommandInputHandle, CommandInputProps>(({
   const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const { addCommand, navigateUp, navigateDown } = useCommandHistory()
+  const { isMobile } = useMobileDetect()
 
   // Expose focus method to parent
   useImperativeHandle(ref, () => ({
@@ -83,28 +85,35 @@ export const CommandInput = forwardRef<CommandInputHandle, CommandInputProps>(({
               background: '#7c3aed',
               color: 'white',
               border: 'none',
-              padding: '6px 16px',
+              padding: isMobile ? '8px 12px' : '6px 16px',
               fontSize: '0.85em',
               cursor: disabled ? 'not-allowed' : 'pointer',
               borderRadius: '3px',
               fontWeight: 'bold',
-              opacity: disabled ? 0.5 : 1
+              opacity: disabled ? 0.5 : 1,
+              flexShrink: 0
             }}
           >
-            EXECUTE
+            {isMobile ? 'GO' : 'EXECUTE'}
           </button>
         </div>
       </form>
       <div
         style={{
-          fontSize: '0.75em',
+          fontSize: isMobile ? '0.65em' : '0.75em',
           color: '#9ca3af',
           lineHeight: '1.3'
         }}
       >
-        Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear
-        <span style={{ marginLeft: '10px', color: '#666' }}>|</span>
-        <span style={{ marginLeft: '10px' }}>↑/↓ for history</span>
+        {isMobile ? (
+          <>Type &apos;help&apos; for commands</>
+        ) : (
+          <>
+            Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear
+            <span style={{ marginLeft: '10px', color: '#666' }}>|</span>
+            <span style={{ marginLeft: '10px' }}>↑/↓ for history</span>
+          </>
+        )}
       </div>
     </>
   )

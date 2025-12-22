@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 interface ColorScheme {
   primary: string
@@ -33,6 +34,7 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
   albumSection,
   philosophySection
 }) => {
+  const { isMobile } = useMobileDetect()
   const borderColor = colorScheme.border || colorScheme.primary
   const legendColor = colorScheme.legend || colorScheme.primary
 
@@ -62,9 +64,9 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
   return (
     <DefaultLayout>
       <div
-        className="tui-window white-text"
+        className="tui-window white-text band-profile-container"
         style={{
-          maxWidth: '1200px',
+          maxWidth: isMobile ? '100%' : '1200px',
           margin: '0 auto',
           display: 'block',
           ...backgroundStyle,
@@ -82,21 +84,26 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
             {artistName.toUpperCase()}
           </legend>
 
-          <div>
+          <div className="band-profile-content">
             {intro}
             {albumSection}
             {philosophySection}
 
-            <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
-              <Link to="/fm/bands" className="tui-button" style={backButtonStyle}>
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '10px' : '15px',
+              marginTop: '30px'
+            }}>
+              <Link to="/fm/bands" className="tui-button" style={{ ...backButtonStyle, textAlign: 'center' }}>
                 ← BACK TO BANDS
               </Link>
               <Link
                 to={`/fm/pulse_vault?filter=${encodeURIComponent(filterName)}`}
                 className="tui-button"
-                style={buttonStyle}
+                style={{ ...buttonStyle, textAlign: 'center' }}
               >
-                LISTEN IN THE PULSE VAULT →
+                {isMobile ? 'PULSE VAULT →' : 'LISTEN IN THE PULSE VAULT →'}
               </Link>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 interface GameOutputProps {
   output: string[]
@@ -7,6 +8,7 @@ interface GameOutputProps {
 
 export const GameOutput: React.FC<GameOutputProps> = ({ output, onOutputClick }) => {
   const outputRef = useRef<HTMLDivElement>(null)
+  const { isMobile } = useMobileDetect()
 
   // Auto-scroll to bottom when new output is added
   useEffect(() => {
@@ -23,12 +25,17 @@ export const GameOutput: React.FC<GameOutputProps> = ({ output, onOutputClick })
       style={{
         cursor: onOutputClick ? 'text' : 'default',
         fontFamily: 'monospace',
-        fontSize: '0.75em',
+        fontSize: isMobile ? '0.7em' : '0.75em',
         lineHeight: '1.2',
         whiteSpace: 'pre-wrap',
-        height: '700px',
+        wordBreak: 'break-word',
+        overflowWrap: 'break-word',
+        height: isMobile ? 'calc(100vh - 200px)' : '700px',
+        minHeight: isMobile ? '300px' : '700px',
+        maxHeight: isMobile ? '500px' : '700px',
         overflowY: 'auto',
-        padding: '10px',
+        overflowX: 'hidden',
+        padding: isMobile ? '8px' : '10px',
         background: '#0d0d0d',
         color: '#d0d0d0',
         border: '1px solid #4b5563',

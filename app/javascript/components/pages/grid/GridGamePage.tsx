@@ -7,20 +7,27 @@ import { GameOutput } from '~/components/grid/GameOutput'
 import { CommandInput, CommandInputHandle } from '~/components/grid/CommandInput'
 import { GridAmbientPlayer } from '~/components/grid/GridAmbientPlayer'
 import { ZonePlaylistData, TrackData } from '~/types/track'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
-const WELCOME_MESSAGE = `<div style="color: #a78bfa; font-size: 0.9em;">
-════════════════════════════════════════════════════════════════
+const getWelcomeMessage = (isMobile: boolean) => {
+  const divider = isMobile
+    ? '══════════════════════════════════'
+    : '════════════════════════════════════════════════════════════════'
+
+  return `<div style="color: #a78bfa; font-size: 0.9em;">
+${divider}
   WELCOME TO THE PULSE GRID
-════════════════════════════════════════════════════════════════
+${divider}
 Connection established. Type 'help' for commands.
-════════════════════════════════════════════════════════════════
+${divider}
    !! <span style="color:#f87171;">WARNING</span> !!
-     ~~ THE PULSE GRID IS IN PRE-ALPHA.
-     ~~ FREQUENT DATABASE FLUSHES _WILL_ OCCUR!
-     ~~ JUST RE-CREATE YOUR ACCOUNT IF YOU CANNOT LOGIN LATER
+${isMobile ? '     ~~ PRE-ALPHA: DB FLUSHES OCCUR!' : '     ~~ THE PULSE GRID IS IN PRE-ALPHA.'}
+${isMobile ? '     ~~ RE-CREATE ACCOUNT IF NEEDED' : '     ~~ FREQUENT DATABASE FLUSHES _WILL_ OCCUR!'}
+${isMobile ? '' : '     ~~ JUST RE-CREATE YOUR ACCOUNT IF YOU CANNOT LOGIN LATER'}
    !! <span style="color:#f87171;">WARNING</span> !!
-════════════════════════════════════════════════════════════════
+${divider}
 </div>`
+}
 
 const oppositeDirection = (dir: string): string => {
   const opposites: Record<string, string> = {
@@ -36,6 +43,7 @@ const oppositeDirection = (dir: string): string => {
 
 export const GridGamePage: React.FC = () => {
   const { hackr, loading: authLoading, disconnect } = useGridAuth()
+  const { isMobile } = useMobileDetect()
   const [output, setOutput] = useState<string[]>([])
   const [currentRoomId, setCurrentRoomId] = useState<number | null>(null)
   const [executing, setExecuting] = useState(false)
@@ -70,7 +78,7 @@ export const GridGamePage: React.FC = () => {
 
       // Add welcome message and initial look command
       const loadInitialOutput = async () => {
-        setOutput([WELCOME_MESSAGE])
+        setOutput([getWelcomeMessage(isMobile)])
 
         // Execute initial look command
         try {
@@ -107,7 +115,7 @@ export const GridGamePage: React.FC = () => {
 
       loadInitialOutput()
     }
-  }, [hackr])
+  }, [hackr, isMobile])
 
   // Handle real-time events from Action Cable
   const handleEvent = useCallback((event: GridEvent) => {
@@ -243,34 +251,45 @@ export const GridGamePage: React.FC = () => {
 
   return (
     <GridLayout>
-      <div style={{ maxWidth: '1000px', margin: '10px auto', background: '#1a1a1a', color: '#d0d0d0', padding: '10px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #4b5563' }}>
-          <div style={{ fontSize: '0.9em' }}>
-            <span style={{ color: '#a78bfa', fontWeight: 'bold' }}>THE PULSE GRID</span>
+      <div style={{ maxWidth: '1000px', margin: isMobile ? '5px' : '10px auto', background: '#1a1a1a', color: '#d0d0d0', padding: isMobile ? '8px' : '10px' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: isMobile ? '8px' : '0',
+          marginBottom: '8px',
+          paddingBottom: '8px',
+          borderBottom: '1px solid #4b5563'
+        }}>
+          <div style={{ fontSize: isMobile ? '0.85em' : '0.9em' }}>
+            <span style={{ color: '#a78bfa', fontWeight: 'bold' }}>{isMobile ? 'GRID' : 'THE PULSE GRID'}</span>
             <span style={{ color: '#666', margin: '0 8px' }}>|</span>
             <span style={{ color: '#e0e0e0' }}>{hackr.hackr_alias}</span>
             {hackr.role === 'admin' && (
               <a href="/root" style={{ color: '#f87171', fontSize: '0.85em', marginLeft: '5px', textDecoration: 'none' }}>[ADMIN]</a>
             )}
           </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
             {ambientPlaylist && (
-              <div style={{ fontSize: '0.85em', color: '#888', marginRight: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ fontSize: '0.85em', color: '#888', marginRight: isMobile ? '0' : '8px', display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none', overflow: 'hidden' }}>
                 <span style={{ color: '#a78bfa' }}>🎵</span>
-                <span>{currentTrack?.title || ambientPlaylist.name}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={ambientVolume * 100}
-                  onChange={(e) => {
-                    const newVolume = parseInt(e.target.value) / 100
-                    setAmbientVolume(newVolume)
-                    localStorage.setItem('grid_ambient_volume', String(newVolume))
-                  }}
-                  className="grid-volume-slider"
-                  title={`Volume: ${Math.round(ambientVolume * 100)}%`}
-                />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: isMobile ? '100px' : 'none' }}>{currentTrack?.title || ambientPlaylist.name}</span>
+                {!isMobile && (
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={ambientVolume * 100}
+                    onChange={(e) => {
+                      const newVolume = parseInt(e.target.value) / 100
+                      setAmbientVolume(newVolume)
+                      localStorage.setItem('grid_ambient_volume', String(newVolume))
+                    }}
+                    className="grid-volume-slider"
+                    title={`Volume: ${Math.round(ambientVolume * 100)}%`}
+                  />
+                )}
                 <button
                   onClick={() => {
                     const newMuted = !ambientMuted
@@ -300,10 +319,11 @@ export const GridGamePage: React.FC = () => {
                 padding: '4px 12px',
                 fontSize: '0.85em',
                 cursor: 'pointer',
-                borderRadius: '3px'
+                borderRadius: '3px',
+                flexShrink: 0
               }}
             >
-              DISCONNECT
+              {isMobile ? 'EXIT' : 'DISCONNECT'}
             </button>
           </div>
         </div>

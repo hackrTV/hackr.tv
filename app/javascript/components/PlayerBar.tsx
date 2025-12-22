@@ -7,6 +7,7 @@ import { VolumeControl } from './VolumeControl.tsx'
 import { QueuePanel } from './QueuePanel.tsx'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useAudio } from '~/contexts/AudioContext'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { AddToPlaylistDropdown } from '~/components/playlists/AddToPlaylistDropdown'
 import type { TrackData, StationContext } from '~/types/track'
 
@@ -54,6 +55,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 }) => {
   const { isLoggedIn } = useGridAuth()
   const { audioPlayerAPI } = useAudio()
+  const { isMobile } = useMobileDetect()
   const [showQueue, setShowQueue] = useState(false)
   const [playlist, setPlaylist] = useState<TrackData[]>([])
   const queueRef = useRef<HTMLDivElement>(null)
@@ -114,18 +116,24 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           right: 0,
           background: '#0a0a0a',
           borderTop: '2px solid #7c3aed',
-          padding: '15px 20px',
+          padding: isMobile ? '10px 12px' : '15px 20px',
           zIndex: 1000,
           animation: 'slideInFromLeft 0.3s ease-out'
         }}
       >
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            {currentTrack?.coverUrl && <AlbumCover coverUrl={currentTrack.coverUrl} />}
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '20px' }}>
+            {/* Album cover - smaller on mobile */}
+            {currentTrack?.coverUrl && (
+              <div style={{ flexShrink: 0 }}>
+                <AlbumCover coverUrl={currentTrack.coverUrl} size={isMobile ? 40 : undefined} />
+              </div>
+            )}
 
-            <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} />
+            <PlayPauseButton isPlaying={isPlaying} onClick={onPlayPause} size={isMobile ? 'small' : 'normal'} />
 
-            {!stationContext && (
+            {/* Navigation buttons - hidden on mobile */}
+            {!stationContext && !isMobile && (
               <>
                 <button
                   className="tui-button"
@@ -175,10 +183,11 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               </>
             )}
 
-            <div style={{ flex: 1 }}>
+            {/* Track info and seek bar */}
+            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
               {stationContext && (
                 <div style={{ marginBottom: '2px' }}>
-                  <span style={{ color: '#00d9ff', fontSize: '0.85em', fontWeight: 'bold' }}>
+                  <span style={{ color: '#00d9ff', fontSize: isMobile ? '0.75em' : '0.85em', fontWeight: 'bold' }}>
                     📻 {stationContext.name}
                   </span>
                 </div>
@@ -186,6 +195,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               <TrackInfo
                 title={currentTrack?.title || 'No track loaded'}
                 artist={currentTrack?.artist || '-'}
+                compact={isMobile}
               />
               <SeekBar
                 currentTime={currentTime}
@@ -197,9 +207,11 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               />
             </div>
 
-            <VolumeControl volume={volume} onVolumeChange={onVolumeChange} />
+            {/* Volume control - hidden on mobile */}
+            {!isMobile && <VolumeControl volume={volume} onVolumeChange={onVolumeChange} />}
 
-            {isLoggedIn && currentTrack && (
+            {/* Add to playlist - hidden on mobile */}
+            {!isMobile && isLoggedIn && currentTrack && (
               <div style={{ marginLeft: '10px' }}>
                 <AddToPlaylistDropdown
                   trackId={parseInt(currentTrack.id)}
@@ -209,6 +221,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               </div>
             )}
 
+            {/* Queue button - simplified on mobile */}
             <div ref={queueRef} style={{ position: 'relative' }}>
               <button
                 className="tui-button"
@@ -217,11 +230,13 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                 style={{
                   background: showQueue ? '#7c3aed' : '#444',
                   color: showQueue ? '#fff' : '#aaa',
-                  marginLeft: '10px'
+                  marginLeft: isMobile ? '4px' : '10px',
+                  padding: isMobile ? '4px 8px' : undefined,
+                  fontSize: isMobile ? '0.85em' : undefined
                 }}
                 title="Show queue"
               >
-                {stationContext ? '☰ Queue' : `☰ Queue (${playlist.length})`}
+                {isMobile ? '☰' : (stationContext ? '☰ Queue' : `☰ Queue (${playlist.length})`)}
               </button>
 
               {showQueue && (
@@ -229,25 +244,26 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                   style={{
                     position: 'absolute',
                     bottom: '100%',
-                    right: 0,
+                    right: isMobile ? '-50px' : 0,
                     marginBottom: '10px',
                     background: '#0a0a0a',
                     border: '2px solid #7c3aed',
                     borderRadius: '4px',
-                    minWidth: '350px',
-                    maxWidth: '450px',
+                    width: isMobile ? 'calc(100vw - 24px)' : undefined,
+                    minWidth: isMobile ? undefined : '350px',
+                    maxWidth: isMobile ? undefined : '450px',
                     zIndex: 2000,
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.7)'
                   }}
                 >
                   <div style={{
-                    padding: '12px 15px',
+                    padding: isMobile ? '10px 12px' : '12px 15px',
                     borderBottom: '2px solid #7c3aed',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                   }}>
-                    <div style={{ color: '#00d9ff', fontWeight: 'bold', fontSize: '0.95em' }}>
+                    <div style={{ color: '#00d9ff', fontWeight: 'bold', fontSize: isMobile ? '0.85em' : '0.95em' }}>
                       Up Next
                     </div>
                     <button
@@ -278,7 +294,12 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               className="tui-button"
               onClick={onClose}
               tabIndex={-1}
-              style={{ background: '#444', color: '#aaa', marginLeft: '10px' }}
+              style={{
+                background: '#444',
+                color: '#aaa',
+                marginLeft: isMobile ? '4px' : '10px',
+                padding: isMobile ? '4px 8px' : undefined
+              }}
             >
               ✕
             </button>

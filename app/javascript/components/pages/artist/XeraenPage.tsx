@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { CodexText } from '~/components/shared/CodexText'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
 
 const XeraenPage: React.FC = () => {
+  const { isMobile } = useMobileDetect()
   const colorScheme = {
     primary: '#8B00FF',
     secondary: '#6B00CC',
@@ -19,14 +21,14 @@ const XeraenPage: React.FC = () => {
   return (
     <DefaultLayout>
       <div
-        className="tui-window white-text"
+        className="tui-window white-text band-profile-container"
         style={{
-          maxWidth: '1200px',
+          maxWidth: isMobile ? '100%' : '1200px',
           margin: '0 auto',
           display: 'block',
           background: colorScheme.background,
           border: `2px solid ${colorScheme.primary}`,
-          boxShadow: `0 0 30px ${colorScheme.glow}`
+          boxShadow: isMobile ? 'none' : `0 0 30px ${colorScheme.glow}`
         }}
       >
         <fieldset style={{ borderColor: colorScheme.primary }}>
@@ -35,13 +37,13 @@ const XeraenPage: React.FC = () => {
             style={{
               color: colorScheme.primary,
               textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-              letterSpacing: '3px'
+              letterSpacing: isMobile ? '1px' : '3px'
             }}
           >
             XERAEN
           </legend>
 
-          <div>
+          <div className="band-profile-content">
             {/* Signal Origin - Intro */}
             <div
               style={{
@@ -528,14 +530,20 @@ const XeraenPage: React.FC = () => {
             </div>
 
             {/* Navigation Buttons */}
-            <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '10px' : '15px',
+              marginTop: '30px'
+            }}>
               <Link
                 to="/fm/bands"
                 className="tui-button"
                 style={{
                   background: '#222',
                   color: '#888',
-                  border: '1px solid #444'
+                  border: '1px solid #444',
+                  textAlign: 'center'
                 }}
               >
                 ← BACK TO BANDS
@@ -547,10 +555,11 @@ const XeraenPage: React.FC = () => {
                   background: colorScheme.primary,
                   color: 'white',
                   fontWeight: 'bold',
-                  boxShadow: `0 0 15px ${colorScheme.glow}`
+                  boxShadow: isMobile ? 'none' : `0 0 15px ${colorScheme.glow}`,
+                  textAlign: 'center'
                 }}
               >
-                LISTEN IN THE PULSE VAULT →
+                {isMobile ? 'PULSE VAULT →' : 'LISTEN IN THE PULSE VAULT →'}
               </Link>
               <Link
                 to="/thecyberpulse"
@@ -559,7 +568,8 @@ const XeraenPage: React.FC = () => {
                   background: colorScheme.secondary,
                   color: 'white',
                   fontWeight: 'bold',
-                  boxShadow: '0 0 15px rgba(107, 0, 204, 0.6)'
+                  boxShadow: isMobile ? 'none' : '0 0 15px rgba(107, 0, 204, 0.6)',
+                  textAlign: 'center'
                 }}
               >
                 THE.CYBERPUL.SE →
