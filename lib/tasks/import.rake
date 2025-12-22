@@ -984,7 +984,7 @@ namespace :import do
     puts "\n" + "=" * 80
     puts "SIDELOAD SUMMARY"
     puts "=" * 80
-    puts "  Attached: #{attached_count}#{dry_run ? " (dry run)" : ""}"
+    puts "  Attached: #{attached_count}#{" (dry run)" if dry_run}"
     puts "  Skipped (already attached): #{skipped_count}"
     puts "  Not found (artist/track): #{not_found_count}"
     puts "  Errors: #{error_count}"
