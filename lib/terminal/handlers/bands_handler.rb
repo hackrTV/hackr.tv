@@ -147,7 +147,7 @@ module Terminal
         total_tracks = band.tracks.count
         println renderer.divider("#{total_tracks} tracks total", width: 60, color: :gray)
         println ""
-        println renderer.colorize("  Listen at hackr.tv/fm or #{band.slug}.hackr.tv", :gray)
+        println renderer.colorize("  Listen at hackr.tv/fm", :gray)
         println ""
       end
 

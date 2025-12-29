@@ -34,13 +34,15 @@ class ApplicationController < ActionController::Base
 
     # Redirect xeraen/rockerboy domains to hackr.tv/xeraen
     if domain.include?("xeraen") || domain.include?("rockerboy")
-      redirect_to "#{protocol}://#{primary_domain}/xeraen#{request.fullpath}", allow_other_host: true
+      path = request.fullpath.sub(%r{^/xeraen}, "")
+      redirect_to "#{protocol}://#{primary_domain}/xeraen#{path}", allow_other_host: true
     # Redirect ashlinn to YouTube
     elsif domain.include?("ashlinn")
       redirect_to "https://youtube.com/AshlinnSnow", allow_other_host: true
     # Redirect sector domains to hackr.tv/sector/x
     elsif domain.include?("sector")
-      redirect_to "#{protocol}://#{primary_domain}/sector/x#{request.fullpath}", allow_other_host: true
+      path = request.fullpath.sub(%r{^/sector/x}, "")
+      redirect_to "#{protocol}://#{primary_domain}/sector/x#{path}", allow_other_host: true
     end
   end
 end
