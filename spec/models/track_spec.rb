@@ -127,6 +127,16 @@ RSpec.describe Track, type: :model do
       end
     end
 
+    describe ".visible_in_pulse_vault" do
+      it "returns only tracks with show_in_pulse_vault true" do
+        vault_track1 = create(:track, artist: artist, show_in_pulse_vault: true)
+        vault_track2 = create(:track, artist: artist, show_in_pulse_vault: true)
+        create(:track, artist: artist, show_in_pulse_vault: false)
+
+        expect(Track.visible_in_pulse_vault).to contain_exactly(vault_track1, vault_track2)
+      end
+    end
+
     describe ".album_order" do
       it "orders by track_number ascending" do
         album = create(:album)

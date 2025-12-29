@@ -6,7 +6,7 @@ module Api
       if params[:artist_id]
         # Get tracks for specific artist
         artist = Artist.find_by(slug: params[:artist_id]) || Artist.find(params[:artist_id])
-        @tracks = artist.tracks.includes(:album).order("albums.release_date DESC NULLS LAST, tracks.track_number ASC").joins(:album)
+        @tracks = artist.tracks.visible_in_pulse_vault.includes(:album).order("albums.release_date DESC NULLS LAST, tracks.track_number ASC").joins(:album)
       else
         # Get all tracks with Pulse Vault ordering
         @tracks = Track.visible_in_pulse_vault.includes(:artist, :album).order(
