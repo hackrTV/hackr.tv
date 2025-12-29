@@ -43,6 +43,10 @@ class ApplicationController < ActionController::Base
     elsif domain.include?("sector")
       path = request.fullpath.sub(%r{^/sector/x}, "")
       redirect_to "#{protocol}://#{primary_domain}/sector/x#{path}", allow_other_host: true
+    # Redirect cyberpul.se domains to hackr.tv/thecyberpulse
+    elsif domain.include?("cyberpul")
+      path = request.fullpath.sub(%r{^/thecyberpulse}, "")
+      redirect_to "#{protocol}://#{primary_domain}/thecyberpulse#{path}", allow_other_host: true
     end
   end
 end
