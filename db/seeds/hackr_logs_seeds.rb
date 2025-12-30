@@ -372,7 +372,7 @@ logs << {
   body: <<~BODY
     We're running broadcasts almost daily now. The machinery is humming. The rhythm is established.
 
-    "Taking off from the Hacker Hangar" has become our standard format. Each session is a launch - departure from the mundane reality GovCorp manufactures, flight into something authentic. When the stream starts, we lift off. When it ends, we land. What happens in between is territory they can't touch.
+    "Taking off from the Hackr Hangar" has become our standard format. Each session is a launch - departure from the mundane reality GovCorp manufactures, flight into something authentic. When the stream starts, we lift off. When it ends, we land. What happens in between is territory they can't touch.
 
     Last night was the first in what I hope becomes a regular series. Two and a half hours of raw creative output. Music that doesn't exist anywhere else, moments that only happened once, energy that can't be faked because we didn't have time to fake it.
 

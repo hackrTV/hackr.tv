@@ -27,8 +27,8 @@ module Terminal
       "security.log", "access.lst", "decrypt.bin", "exploit.sh", "backdoor.exe"
     ].freeze
 
-    # Hacker movie-style scrolling text
-    HACKER_OUTPUTS = [
+    # Hackr movie-style scrolling text
+    HACKR_OUTPUTS = [
       "Bypassing firewall...",
       "Injecting payload...",
       "Decrypting access tokens...",
@@ -540,7 +540,7 @@ module Terminal
         iterations = (duration / 0.25).to_i
 
         iterations.times do
-          output = HACKER_OUTPUTS.sample
+          output = HACKR_OUTPUTS.sample
           file = FAKE_FILES.sample
           percent = rand(0..100)
 

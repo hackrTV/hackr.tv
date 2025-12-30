@@ -300,7 +300,7 @@ ssh access@terminal.hackr.tv -p 9915
 
 #### Features Implemented
 
-**Hidden Hacker Commands:**
+**Hidden Hackr Commands:**
 - `hack` → Fake hacking animation with humorous denial
 - `root` → Permission denied with incident reporting
 - `sudo` / `sudo su` → Fake password prompt, always fails
