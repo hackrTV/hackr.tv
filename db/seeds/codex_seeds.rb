@@ -743,7 +743,7 @@ seed_codex_entry(
     Despite her mysterious nature, Synthia has proven invaluable to [[The Fracture Network]]:
 
     - **Vocalist for The.CyberPul.se** - Her synthesized voice carries resistance across timelines
-    - She can interface with [[PRISM]] and [[The RIDE]] systems in ways human hackers cannot
+    - She can interface with [[PRISM]] and [[The RIDE]] systems in ways human hackrs cannot
     - Her frequency-based communication is undetectable by GovCorp surveillance
     - She seems to understand temporal mechanics intuitively
     - Her analysis of [[GovCorp]] systems has enabled countless successful operations
