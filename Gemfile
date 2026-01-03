@@ -52,6 +52,9 @@ gem "obscenity"
 # Rate limiting and request throttling
 gem "rack-attack"
 
+# AWS S3 for audio file imports
+gem "aws-sdk-s3", require: false
+
 # ViewComponent for reusable components
 gem "view_component"
 

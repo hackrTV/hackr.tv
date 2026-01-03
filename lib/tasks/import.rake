@@ -825,28 +825,12 @@ namespace :import do
     puts "  Total:   #{RadioStation.count}"
   end
 
-  desc "Sideload audio files from /rails/imports directory (bypasses web upload limits)"
+  desc "Sideload audio files from local imports/ directory or S3 bucket"
   task sideload_audio: :environment do
-    puts "\n" + "=" * 80
-    puts "SIDELOADING AUDIO FILES FROM /rails/imports"
-    puts "=" * 80 + "\n"
-
-    imports_dir = Rails.root.join("imports")
-
-    unless Dir.exist?(imports_dir)
-      puts "  ✗ Import directory not found: #{imports_dir}"
-      puts "  Create it and add audio files with one of these structures:"
-      puts "    imports/{artist-slug}/{track-slug}.mp3"
-      puts "    imports/{artist-slug}--{track-slug}.ogg"
-      next
-    end
-
     dry_run = ENV["DRY_RUN"] == "true"
     cleanup = ENV["CLEANUP"] == "true"
-
-    if dry_run
-      puts "  ⚠ DRY RUN MODE - no files will be attached\n"
-    end
+    s3_bucket = ENV["S3_BUCKET"]
+    s3_prefix = ENV["S3_PREFIX"] || "audio/"
 
     audio_extensions = %w[.mp3 .ogg .wav .flac .m4a .aac]
     attached_count = 0
@@ -854,129 +838,207 @@ namespace :import do
     error_count = 0
     not_found_count = 0
 
-    # Process subdirectory structure: imports/{artist-slug}/{track-slug}.ext
-    Dir.glob(imports_dir.join("*")).each do |artist_dir|
-      next unless File.directory?(artist_dir)
+    # Helper to attach audio to a track
+    attach_audio = lambda do |track, filename, io, ext, source_desc|
+      if track.audio_file.attached?
+        puts "    ⊘ Already attached: #{track.title}"
+        skipped_count += 1
+        return false
+      end
 
-      artist_slug = File.basename(artist_dir)
-      artist = Artist.find_by(slug: artist_slug)
+      if dry_run
+        puts "    → Would attach: #{filename} → #{track.title}"
+        attached_count += 1
+        return true
+      end
 
-      unless artist
-        puts "  ⚠ Artist not found for directory: #{artist_slug}"
+      begin
+        track.audio_file.attach(
+          io: io,
+          filename: filename,
+          content_type: Marcel::MimeType.for(extension: ext)
+        )
+        attached_count += 1
+        puts "    ✓ Attached: #{filename} → #{track.title}"
+        true
+      rescue => e
+        error_count += 1
+        puts "    ✗ Error attaching #{filename}: #{e.message}"
+        false
+      end
+    end
+
+    # Helper to parse artist/track from file path
+    parse_file_path = lambda do |key, artist_slug_from_dir = nil|
+      filename = File.basename(key)
+      ext = File.extname(filename).downcase
+      return nil unless audio_extensions.include?(ext)
+
+      base = File.basename(filename, ".*")
+
+      if artist_slug_from_dir
+        # Subdirectory structure: {artist-slug}/{track-slug}.ext
+        {artist_slug: artist_slug_from_dir, track_slug: base, filename: filename, ext: ext}
+      elsif base.include?("--")
+        # Flat structure: {artist-slug}--{track-slug}.ext
+        parts = base.split("--", 2)
+        {artist_slug: parts[0], track_slug: parts[1], filename: "#{parts[1]}#{ext}", ext: ext}
+      end
+    end
+
+    if s3_bucket
+      # S3 mode
+      require "aws-sdk-s3"
+
+      puts "\n" + "=" * 80
+      puts "SIDELOADING AUDIO FILES FROM S3"
+      puts "  Bucket: #{s3_bucket}"
+      puts "  Prefix: #{s3_prefix}"
+      puts "=" * 80 + "\n"
+
+      if dry_run
+        puts "  ⚠ DRY RUN MODE - no files will be attached\n"
+      end
+
+      s3 = Aws::S3::Client.new
+      artists_seen = {}
+
+      # List all objects under the prefix
+      s3.list_objects_v2(bucket: s3_bucket, prefix: s3_prefix).each do |response|
+        response.contents.each do |object|
+          key = object.key
+          relative_path = key.sub(/^#{Regexp.escape(s3_prefix)}/, "")
+          next if relative_path.empty? || relative_path.end_with?("/")
+
+          # Determine structure from path depth
+          path_parts = relative_path.split("/")
+
+          parsed = if path_parts.length == 2
+            # Subdirectory structure: {artist-slug}/{track-slug}.ext
+            parse_file_path.call(path_parts[1], path_parts[0])
+          elsif path_parts.length == 1
+            # Flat structure: {artist-slug}--{track-slug}.ext
+            parse_file_path.call(path_parts[0])
+          end
+
+          next unless parsed
+
+          artist = Artist.find_by(slug: parsed[:artist_slug])
+          unless artist
+            unless artists_seen[parsed[:artist_slug]]
+              puts "  ⚠ Artist not found: #{parsed[:artist_slug]}"
+              artists_seen[parsed[:artist_slug]] = true
+            end
+            not_found_count += 1
+            next
+          end
+
+          unless artists_seen[artist.slug]
+            puts "\n  Processing artist: #{artist.name} (#{artist.slug})"
+            artists_seen[artist.slug] = true
+          end
+
+          track = artist.tracks.find_by(slug: parsed[:track_slug])
+          unless track
+            puts "    ✗ Track not found: #{parsed[:track_slug]}"
+            not_found_count += 1
+            next
+          end
+
+          # Stream from S3 and attach
+          io = if dry_run
+            StringIO.new
+          else
+            s3.get_object(bucket: s3_bucket, key: key).body
+          end
+
+          attach_audio.call(track, parsed[:filename], io, parsed[:ext], key)
+        end
+      end
+    else
+      # Local mode
+      puts "\n" + "=" * 80
+      puts "SIDELOADING AUDIO FILES FROM /rails/imports"
+      puts "=" * 80 + "\n"
+
+      imports_dir = Rails.root.join("imports")
+
+      unless Dir.exist?(imports_dir)
+        puts "  ✗ Import directory not found: #{imports_dir}"
+        puts "  Create it and add audio files with one of these structures:"
+        puts "    imports/{artist-slug}/{track-slug}.mp3"
+        puts "    imports/{artist-slug}--{track-slug}.ogg"
+        puts "\n  Or use S3_BUCKET to load from S3 instead."
         next
       end
 
-      puts "\n  Processing artist: #{artist.name} (#{artist_slug})"
+      if dry_run
+        puts "  ⚠ DRY RUN MODE - no files will be attached\n"
+      end
 
-      Dir.glob(File.join(artist_dir, "*")).each do |file_path|
+      # Process subdirectory structure: imports/{artist-slug}/{track-slug}.ext
+      Dir.glob(imports_dir.join("*")).each do |artist_dir|
+        next unless File.directory?(artist_dir)
+
+        artist_slug = File.basename(artist_dir)
+        artist = Artist.find_by(slug: artist_slug)
+
+        unless artist
+          puts "  ⚠ Artist not found for directory: #{artist_slug}"
+          next
+        end
+
+        puts "\n  Processing artist: #{artist.name} (#{artist_slug})"
+
+        Dir.glob(File.join(artist_dir, "*")).each do |file_path|
+          next if File.directory?(file_path)
+
+          parsed = parse_file_path.call(file_path, artist_slug)
+          next unless parsed
+
+          track = artist.tracks.find_by(slug: parsed[:track_slug])
+
+          unless track
+            puts "    ✗ Track not found: #{parsed[:track_slug]}"
+            not_found_count += 1
+            next
+          end
+
+          if attach_audio.call(track, parsed[:filename], File.open(file_path), parsed[:ext], file_path)
+            if cleanup && !dry_run
+              File.delete(file_path)
+              puts "      → Cleaned up source file"
+            end
+          end
+        end
+      end
+
+      # Process flat structure: imports/{artist-slug}--{track-slug}.ext
+      Dir.glob(imports_dir.join("*")).each do |file_path|
         next if File.directory?(file_path)
 
-        ext = File.extname(file_path).downcase
-        next unless audio_extensions.include?(ext)
+        parsed = parse_file_path.call(file_path)
+        next unless parsed
 
-        track_slug = File.basename(file_path, ".*")
-        filename = File.basename(file_path)
-
-        track = artist.tracks.find_by(slug: track_slug)
-
-        unless track
-          puts "    ✗ Track not found: #{track_slug}"
+        artist = Artist.find_by(slug: parsed[:artist_slug])
+        unless artist
+          puts "  ✗ Artist not found: #{parsed[:artist_slug]} (from #{File.basename(file_path)})"
           not_found_count += 1
           next
         end
 
-        if track.audio_file.attached?
-          puts "    ⊘ Already attached: #{track.title}"
-          skipped_count += 1
+        track = artist.tracks.find_by(slug: parsed[:track_slug])
+        unless track
+          puts "  ✗ Track not found: #{parsed[:track_slug]} for artist #{artist.name}"
+          not_found_count += 1
           next
         end
 
-        if dry_run
-          puts "    → Would attach: #{filename} → #{track.title}"
-          attached_count += 1
-        else
-          begin
-            track.audio_file.attach(
-              io: File.open(file_path),
-              filename: filename,
-              content_type: Marcel::MimeType.for(extension: ext)
-            )
-            attached_count += 1
-            puts "    ✓ Attached: #{filename} → #{track.title}"
-
-            if cleanup
-              File.delete(file_path)
-              puts "      → Cleaned up source file"
-            end
-          rescue => e
-            error_count += 1
-            puts "    ✗ Error attaching #{filename}: #{e.message}"
-          end
-        end
-      end
-    end
-
-    # Process flat structure: imports/{artist-slug}--{track-slug}.ext
-    Dir.glob(imports_dir.join("*")).each do |file_path|
-      next if File.directory?(file_path)
-
-      ext = File.extname(file_path).downcase
-      next unless audio_extensions.include?(ext)
-
-      filename = File.basename(file_path, ".*")
-
-      # Parse artist--track format
-      unless filename.include?("--")
-        # Skip files that don't match the pattern (they might be READMEs, etc.)
-        next
-      end
-
-      parts = filename.split("--", 2)
-      artist_slug = parts[0]
-      track_slug = parts[1]
-
-      artist = Artist.find_by(slug: artist_slug)
-      unless artist
-        puts "  ✗ Artist not found: #{artist_slug} (from #{File.basename(file_path)})"
-        not_found_count += 1
-        next
-      end
-
-      track = artist.tracks.find_by(slug: track_slug)
-      unless track
-        puts "  ✗ Track not found: #{track_slug} for artist #{artist.name}"
-        not_found_count += 1
-        next
-      end
-
-      if track.audio_file.attached?
-        puts "  ⊘ Already attached: #{track.title} (#{artist.name})"
-        skipped_count += 1
-        next
-      end
-
-      original_filename = "#{track_slug}#{ext}"
-
-      if dry_run
-        puts "  → Would attach: #{File.basename(file_path)} → #{track.title} (#{artist.name})"
-        attached_count += 1
-      else
-        begin
-          track.audio_file.attach(
-            io: File.open(file_path),
-            filename: original_filename,
-            content_type: Marcel::MimeType.for(extension: ext)
-          )
-          attached_count += 1
-          puts "  ✓ Attached: #{File.basename(file_path)} → #{track.title} (#{artist.name})"
-
-          if cleanup
+        if attach_audio.call(track, parsed[:filename], File.open(file_path), parsed[:ext], file_path)
+          if cleanup && !dry_run
             File.delete(file_path)
             puts "    → Cleaned up source file"
           end
-        rescue => e
-          error_count += 1
-          puts "  ✗ Error attaching #{File.basename(file_path)}: #{e.message}"
         end
       end
     end
@@ -984,13 +1046,18 @@ namespace :import do
     puts "\n" + "=" * 80
     puts "SIDELOAD SUMMARY"
     puts "=" * 80
+    puts "  Source: #{s3_bucket ? "s3://#{s3_bucket}/#{s3_prefix}" : "imports/"}"
     puts "  Attached: #{attached_count}#{" (dry run)" if dry_run}"
     puts "  Skipped (already attached): #{skipped_count}"
     puts "  Not found (artist/track): #{not_found_count}"
     puts "  Errors: #{error_count}"
-    puts "\nUsage tips:"
-    puts "  DRY_RUN=true  - Preview without attaching"
-    puts "  CLEANUP=true  - Delete source files after attaching"
+    puts "\nUsage:"
+    puts "  rails import:sideload_audio                      # From local imports/"
+    puts "  S3_BUCKET=bucket rails import:sideload_audio     # From S3 (prefix: audio/)"
+    puts "  S3_PREFIX=path/ S3_BUCKET=bucket rails ...       # Custom S3 prefix"
+    puts "\nOptions:"
+    puts "  DRY_RUN=true   - Preview without attaching"
+    puts "  CLEANUP=true   - Delete local source files after attaching (ignored for S3)"
     puts "=" * 80 + "\n"
   end
 
