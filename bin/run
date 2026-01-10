@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# We'll make this better later
+bin/dev
