@@ -242,6 +242,11 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     return playlistRef.current
   }, [])
 
+  // Get effective playlist (shuffled if shuffle is on, otherwise original)
+  const getEffectivePlaylist = useCallback(() => {
+    return shuffle ? shuffledPlaylistRef.current : playlistRef.current
+  }, [shuffle])
+
   // Get station context
   const getStationContext = useCallback(() => {
     return stationContextRef.current
@@ -318,6 +323,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       isPlaying: () => isPlaying,
       setPlaylist,
       getPlaylist,
+      getEffectivePlaylist,
       getStationContext,
       refreshPlaylist,
       refreshUI,
@@ -334,7 +340,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     return () => {
       delete window.audioPlayer
     }
-  }, [loadTrack, handlePlayPause, playNext, playPrevious, currentTrack, isPlaying, setPlaylist, getPlaylist, getStationContext, onReady, refreshPlaylist, refreshUI, toggleShuffle, isShuffle])
+  }, [loadTrack, handlePlayPause, playNext, playPrevious, currentTrack, isPlaying, setPlaylist, getPlaylist, getEffectivePlaylist, getStationContext, onReady, refreshPlaylist, refreshUI, toggleShuffle, isShuffle])
 
   // Update track table UI when current track or playing state changes
   useEffect(() => {

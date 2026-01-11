@@ -60,11 +60,11 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   const [playlist, setPlaylist] = useState<TrackData[]>([])
   const queueRef = useRef<HTMLDivElement>(null)
 
-  // Update playlist when it changes
+  // Update playlist when it changes (use effective playlist to reflect shuffle order)
   useEffect(() => {
     const interval = setInterval(() => {
       if (audioPlayerAPI.current) {
-        const currentPlaylist = audioPlayerAPI.current.getPlaylist()
+        const currentPlaylist = audioPlayerAPI.current.getEffectivePlaylist()
         setPlaylist(currentPlaylist)
       }
     }, 500)

@@ -60,8 +60,16 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
           coverUrl: track.album.cover_url || ''
         }))
 
+      // Check if switching from radio station before setting new playlist
+      const wasPlayingRadio = audioPlayerAPI.current.getStationContext() !== null
+
       // Set the playlist ONLY when user clicks to play a track
       audioPlayerAPI.current.setPlaylist(playableFilteredTracks)
+
+      // Turn off shuffle only when switching from radio station to Pulse Vault
+      if (wasPlayingRadio && audioPlayerAPI.current.isShuffle()) {
+        audioPlayerAPI.current.toggleShuffle()
+      }
 
       // Load and play the selected track
       audioPlayerAPI.current.loadTrack({
