@@ -20,6 +20,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   const playlistRef = useRef<TrackData[]>([]) // Store playlist in memory
   const stationContextRef = useRef<StationContext | null>(null) // Store station context
   const shuffledPlaylistRef = useRef<TrackData[]>([]) // Store shuffled playlist
+  const lastTimeRef = useRef<number>(0) // Track last known playback time for stall detection
 
   // Update overlay paused state only (without changing track)
   const updateOverlayPaused = useCallback((paused: boolean) => {
@@ -443,9 +444,74 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       loadTrack(nextTrack)
     }
 
+    // Handle stalled playback - browser is trying to fetch media but data is unavailable
+    const handleStalled = () => {
+      console.warn('Audio playback stalled, attempting to recover...')
+      // Store current position to resume from
+      const currentPos = audio.currentTime
+      // Reload from current position
+      audio.load()
+      audio.currentTime = currentPos
+      if (isPlaying) {
+        audio.play().catch((error) => {
+          console.error('Failed to resume after stall:', error)
+        })
+      }
+    }
+
+    // Handle waiting - playback stopped due to temporary lack of data
+    const handleWaiting = () => {
+      console.log('Audio waiting for data...')
+    }
+
+    // Handle error events
+    const handleError = () => {
+      const error = audio.error
+      if (error) {
+        console.error('Audio error:', error.code, error.message)
+        // For network errors (code 2), attempt to reload after a short delay
+        if (error.code === 2) {
+          const currentPos = audio.currentTime
+          setTimeout(() => {
+            console.log('Attempting to recover from network error...')
+            audio.load()
+            audio.currentTime = currentPos
+            if (isPlaying) {
+              audio.play().catch((err) => {
+                console.error('Failed to resume after network error:', err)
+              })
+            }
+          }, 1000)
+        }
+      }
+    }
+
+    // Handle pause events not triggered by user (e.g., browser intervention)
+    const handlePause = () => {
+      // Only react if we think we should be playing
+      if (isPlaying && !audio.ended) {
+        // Check if this was a user-initiated pause or browser intervention
+        // Browser interventions typically happen when the tab is backgrounded
+        // We'll attempt to resume after a brief delay
+        setTimeout(() => {
+          if (isPlaying && audio.paused && !audio.ended) {
+            console.log('Detected unexpected pause, attempting to resume...')
+            audio.play().catch((error) => {
+              console.warn('Could not auto-resume:', error)
+              setIsPlaying(false)
+            })
+          }
+        }, 100)
+      }
+    }
+
     audio.addEventListener('timeupdate', handleTimeUpdate)
     audio.addEventListener('loadedmetadata', handleLoadedMetadata)
     audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('stalled', handleStalled)
+    audio.addEventListener('waiting', handleWaiting)
+    audio.addEventListener('error', handleError)
+    audio.addEventListener('pause', handlePause)
 
     // Set initial volume
     audio.volume = volume
@@ -454,8 +520,48 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
       audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('stalled', handleStalled)
+      audio.removeEventListener('waiting', handleWaiting)
+      audio.removeEventListener('error', handleError)
+      audio.removeEventListener('pause', handlePause)
     }
-  }, [volume, isSeeking, currentTrack, loadTrack, shuffle])
+  }, [volume, isSeeking, currentTrack, loadTrack, shuffle, isPlaying])
+
+  // Watchdog: detect if playback has silently stalled (no events fired)
+  // This catches HTTP connection timeouts that don't trigger browser events
+  useEffect(() => {
+    if (!isPlaying || !currentTrack) return
+
+    const audio = audioRef.current
+    if (!audio) return
+
+    // Check every 5 seconds if playback is progressing
+    const watchdogInterval = setInterval(() => {
+      // If we're supposed to be playing but time hasn't advanced in 5 seconds
+      // and we're not at the end of the track, something is wrong
+      if (isPlaying && !audio.paused && !audio.ended) {
+        const currentPos = audio.currentTime
+        const timeDiff = currentPos - lastTimeRef.current
+
+        // If time hasn't moved at all (or moved backwards, which shouldn't happen)
+        // and we're not near the end, attempt recovery
+        if (timeDiff <= 0 && currentPos < duration - 1) {
+          console.warn('Watchdog: Playback appears stalled, attempting recovery...')
+          // Try to resume from current position
+          audio.load()
+          audio.currentTime = currentPos
+          audio.play().catch((error) => {
+            console.error('Watchdog: Failed to resume playback:', error)
+            setIsPlaying(false)
+          })
+        }
+
+        lastTimeRef.current = currentPos
+      }
+    }, 5000)
+
+    return () => clearInterval(watchdogInterval)
+  }, [isPlaying, currentTrack, duration])
 
   return (
     <>
