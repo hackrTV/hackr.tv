@@ -1,0 +1,40 @@
+playlists:
+  - name: "Sector X Mix"
+    description: "Underground tracks from the Fracture Network. The sound of resistance."
+    owner: "XERAEN"
+    is_public: false
+    radio_station: "sector_x"
+    tracks:
+      # Format: artist_slug/track_slug
+      # - xeraen/xordium
+      # - xeraen/power-to-the-hackrs
+      # - thecyberpulse/some-track
+      - wavelength_zero/refracted-light
+      - wavelength_zero/nostalgia-weapon
+      - wavelength_zero/monochrome-collapse
+      - cipher_protocol/null-cipher
+      - cipher_protocol/carrier-signal-collapse
+      - system_rot/static-feed
+      - system_rot/rot-from-within
+      - system_rot/burn-the-blueprint
+      - temporal_blue_drift/a-hundred-years-between
+      - temporal_blue_drift/the-blue-drift
+      - temporal_blue_drift/erasure-paradox
+      - apex_overdrive/vita-aeterna
+      - apex_overdrive/turn-toward-the-light
+      - apex_overdrive/lift-your-gaze
+      - voiceprint/archivists-procedure
+      - voiceprint/frequency-of-memory
+      - voiceprint/cracks-in-the-echo-chamber
+      - neon_hearts/candy-coded
+      - neon_hearts/starlight-rebellion
+      - ethereality/awakening
+      - ethereality/eternal-signal
+      - blitzbeam/hyperdrive-sequence
+      - blitzbeam/boundary-rift
+      - blitzbeam/axial-acceleration
+      - heartbreak_havoc/heartbreak-havoc-sh
+      - heartbreak_havoc/binary-heartbeats-c
+      - heartbreak_havoc/ride-corrupt
+      - heartbreak_havoc/fatal-attraction-exe
+      - heartbreak_havoc/execute
