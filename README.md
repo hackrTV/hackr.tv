@@ -12,7 +12,7 @@
 
 ---
 
-## 🎵 Features
+## Features
 
 ### React SPA Architecture
 - **Full Single Page Application** - Built with React 19, TypeScript, and React Router v7
@@ -46,7 +46,7 @@
   - Click-anywhere playback (any cell in row plays/pauses)
   - Row hover highlighting with dynamic now-playing indicators
   - Album covers with hover zoom overlay (300x300px)
-  - Custom SQL ordering (The.CyberPul.se → XERAEN → alphabetical)
+  - Custom SQL ordering (The.CyberPul.se, XERAEN, then alphabetical)
   - Keyboard shortcuts (Tab to search, Spacebar to play/pause)
 - **Auto-play & Queue** - Automatic track progression with loop functionality
 - **Bands Directory** - Artist profiles with track counts and genre information
@@ -78,6 +78,12 @@
 - **Optimized UI** - Clean terminal-style interface with comfortable dark theme
 - **Dedicated Grid Layout** - 700px output window, compact design, no page scrolling
 
+### OBS Overlay System
+- **Now Playing Overlay** - Display currently playing track for livestreams
+- **PulseWire Overlay** - Show live social activity during streams
+- **Grid Activity Overlay** - Stream multiplayer game activity
+- **Scene Management** - Lower thirds and alert configuration
+
 ### Multi-Domain Architecture
 - Domain-specific routing and layouts (hackr.tv, xeraen.com, rockerboy.net, ashlinn.net, sectorx.media)
 - Mobile-responsive TUI (Terminal User Interface) design
@@ -86,21 +92,21 @@
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Frontend:** React 19, TypeScript, React Router v7, Vite
 - **Backend:** Ruby 3.4.7, Rails 8.1.1, Puma
 - **Database:** SQLite3 (development), Active Storage for file attachments
-- **Real-time:** Action Cable 8.1.100 with Solid Cable adapter
+- **Real-time:** Action Cable 8.1 with Solid Cable adapter
 - **Testing:** RSpec (backend), Vitest (frontend), FactoryBot, Faker
-- **Code Quality:** StandardRB
+- **Code Quality:** StandardRB, ESLint
 - **Assets:** Propshaft, TuiCSS (terminal UI framework)
 - **Authentication:** bcrypt for password hashing (Grid Hackr accounts)
 - **Markdown:** react-markdown, remark-gfm, rehype-sanitize
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Ruby 3.4.7
@@ -141,7 +147,7 @@
 
 6. **Start the server**
    ```bash
-   bin/rails server
+   bin/dev
    ```
 
 7. **Visit the application**
@@ -157,7 +163,7 @@
 
 ---
 
-## 🎮 Playing THE PULSE GRID
+## Playing THE PULSE GRID
 
 **Login:** Create an account at `/grid/register`, or create one via Rails console if running locally:
 ```ruby
@@ -182,7 +188,7 @@ clear (cls)            - Clear the screen
 
 **Navigation:**
 - Use `/disconnect` menu item or type logout command to disconnect from THE PULSE GRID
-- Arrow keys (↑/↓) navigate through command history
+- Arrow keys navigate through command history
 
 **NPCs with Dialogue:**
 - **Fracture Network Coordinator** (hackr.tv Broadcast Station) - Topics: mission, fracture, help, station, synthia, govcorp
@@ -190,7 +196,7 @@ clear (cls)            - Clear the screen
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 hackr.tv/
@@ -243,7 +249,7 @@ hackr.tv/
 │   └── [artist_slug]/                 # Artist-specific files
 ├── lib/tasks/
 │   └── import.rake                    # Data import scripts
-├── spec/                              # Test suite (1104 examples)
+├── spec/                              # Test suite
 │   ├── models/                        # Model specs (backend)
 │   ├── controllers/                   # Controller specs (backend)
 │   ├── components/                    # Component specs (frontend Vitest)
@@ -254,7 +260,7 @@ hackr.tv/
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Run the full test suite:
 ```bash
@@ -287,7 +293,7 @@ bundle exec rspec spec/components/
 
 ---
 
-## 🔧 Development
+## Development
 
 ### Code Quality
 ```bash
@@ -324,14 +330,14 @@ bin/rails import:yaml_tracks        # Tracks only
 
 **Add a Radio Station:**
 1. Login to admin at `/root` with Grid admin account
-2. Navigate to Radio Stations → New
+2. Navigate to Radio Stations, then New
 3. Fill in station details (name, description, genre, stream_url, color)
 4. Add playlists to the station
 5. Reorder playlists as needed via drag-and-drop
 
 ---
 
-## 🎨 Design System
+## Design System
 
 **TuiCSS Framework:**
 - Monospace fonts with terminal styling
@@ -349,7 +355,7 @@ bin/rails import:yaml_tracks        # Tracks only
 
 ---
 
-## 📊 Database Schema
+## Database Schema
 
 ### Music Platform
 - **artists** - name, slug, genre
@@ -382,7 +388,7 @@ bin/rails import:yaml_tracks        # Tracks only
 
 ---
 
-## 🌐 Multi-Domain Setup
+## Multi-Domain Setup
 
 **Supported Domains:**
 - `hackr.tv` - Main site
@@ -392,49 +398,49 @@ bin/rails import:yaml_tracks        # Tracks only
 - `cyberpul.se`, `the.cyberpul.se` - The.CyberPul.se
 
 **Domain Logic:**
-1. Database-backed redirects (domain + path → destination)
-2. Domain-specific redirects (artist domains → hackr.tv/artist)
+1. Database-backed redirects (domain + path to destination)
+2. Domain-specific redirects (artist domains to hackr.tv/artist)
 3. Automatic mobile detection and layout selection
 
 ---
 
-## 🎯 Roadmap
+## Roadmap
 
-### Completed ✅
-- [x] **React SPA Migration** - Full SPA with React 19, TypeScript, React Router v7
-- [x] **Database-Backed Radio Stations** - Full CRUD admin interface with playlist management
-- [x] **User Playlists** - Create/edit/delete with Grid Hackr auth and public sharing
-- [x] **Queue Panel** - Current + next 3 tracks display with click-to-jump
-- [x] **Animated terminal homepage** - Typing effect & keyboard skip
-- [x] **ViewComponent architecture** - Reusable band profiles with flexible color schemes
-- [x] **Band profile pages** - System Rot, Wavelength Zero, Voiceprint, Temporal Blue Drift
-- [x] **Album model** - Active Storage cover images with hover zoom
-- [x] **Comprehensive YAML import** - Idempotent, multi-document support
-- [x] **hackr.fm Radio** - 4 stations with live streaming
-- [x] **Pulse Vault** - Search/filter, click-anywhere playback, custom ordering
-- [x] **Auto-play next track** - Queue management with loop functionality
-- [x] **THE PULSE GRID** - Real-time multiplayer MUD game
-- [x] **NPC dialogue system** - 2 NPCs with 13 total topics
-- [x] **Command history** - Arrow key navigation (100 commands)
-- [x] **Hackr Logs** - Blog platform with Markdown support
-- [x] **Comprehensive test suite** - 1104 backend + 129 frontend tests (100% passing)
-- [x] **The Codex wiki** - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
-- [x] **PulseWire social network** - Pulses, Echoes, Splices, real-time updates, admin moderation
-- [x] **OBS Overlay system** - Now Playing, PulseWire, Grid Activity overlays for livestreaming
+### Completed
+- React SPA Migration - Full SPA with React 19, TypeScript, React Router v7
+- Database-Backed Radio Stations - Full CRUD admin interface with playlist management
+- User Playlists - Create/edit/delete with Grid Hackr auth and public sharing
+- Queue Panel - Current + next 3 tracks display with click-to-jump
+- Animated terminal homepage - Typing effect & keyboard skip
+- ViewComponent architecture - Reusable band profiles with flexible color schemes
+- Band profile pages - System Rot, Wavelength Zero, Voiceprint, Temporal Blue Drift
+- Album model - Active Storage cover images with hover zoom
+- Comprehensive YAML import - Idempotent, multi-document support
+- hackr.fm Radio - 4 stations with live streaming
+- Pulse Vault - Search/filter, click-anywhere playback, custom ordering
+- Auto-play next track - Queue management with loop functionality
+- THE PULSE GRID - Real-time multiplayer MUD game
+- NPC dialogue system - 2 NPCs with 13 total topics
+- Command history - Arrow key navigation (100 commands)
+- Hackr Logs - Blog platform with Markdown support
+- Comprehensive test suite - 1104 backend + 129 frontend tests (100% passing)
+- The Codex wiki - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
+- PulseWire social network - Pulses, Echoes, Splices, real-time updates, admin moderation
+- OBS Overlay system - Now Playing, PulseWire, Grid Activity overlays for livestreaming
 
-### Future Enhancements 🔮
-- [ ] Faction reputation system
-- [ ] Mission/quest system for THE PULSE GRID
-- [ ] Hacking system (core gameplay mechanic)
-- [ ] Combat mechanics (physical/cyber)
-- [ ] Synthia frequency tuning mechanic
-- [ ] More zones and rooms for THE PULSE GRID
-- [ ] Persistent inventory between sessions
-- [ ] Upload remaining audio files (64 of 66 tracks need audio)
+### Future Enhancements
+- Faction reputation system
+- Mission/quest system for THE PULSE GRID
+- Hacking system (core gameplay mechanic)
+- Combat mechanics (physical/cyber)
+- Synthia frequency tuning mechanic
+- More zones and rooms for THE PULSE GRID
+- Persistent inventory between sessions
+- Upload remaining audio files (64 of 66 tracks need audio)
 
 ---
 
-## 📝 License
+## License
 
 This is free and unencumbered software released into the public domain.
 
@@ -444,17 +450,17 @@ See [UNLICENSE](UNLICENSE) for details.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This project is released into the public domain, so feel free to fork, modify, and use it however you like. If you have an idea for a feature or improvement that would be cool to have merged into the primary codebase, let's discuss in the Issues section!
 
 ---
 
-## ⚡ Quick Reference
+## Quick Reference
 
 | Command | Description |
 |---------|-------------|
-| `bin/rails server` | Start development server |
+| `bin/dev` | Start development server (Rails + Vite) |
 | `bin/rails console` | Interactive Rails console |
 | `bin/rails db:migrate` | Run database migrations |
 | `bin/rails import:from_yaml` | Import all YAML data (artists, albums, tracks) |
@@ -465,6 +471,6 @@ This project is released into the public domain, so feel free to fork, modify, a
 
 ---
 
-**Built with ❤️ for those who turn toward good, the Hackrs of CyberSpace! The future is not lost!**
+**Built for those who turn toward good, the Hackrs of CyberSpace! The future is not lost!**
 
 *hackr.tv - Where music meets THE GRID.*
