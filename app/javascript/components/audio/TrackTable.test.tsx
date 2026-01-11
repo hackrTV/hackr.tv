@@ -24,6 +24,9 @@ const mockSetPlaylist = vi.fn()
 const mockTogglePlayPause = vi.fn()
 const mockGetCurrentTrackId = vi.fn()
 const mockIsPlaying = vi.fn()
+const mockGetStationContext = vi.fn()
+const mockIsShuffle = vi.fn()
+const mockToggleShuffle = vi.fn()
 
 vi.mock('~/hooks/useGridAuth', () => ({
   useGridAuth: () => ({
@@ -41,7 +44,10 @@ vi.mock('~/contexts/AudioContext', () => ({
         setPlaylist: mockSetPlaylist,
         togglePlayPause: mockTogglePlayPause,
         getCurrentTrackId: mockGetCurrentTrackId,
-        isPlaying: mockIsPlaying
+        isPlaying: mockIsPlaying,
+        getStationContext: mockGetStationContext,
+        isShuffle: mockIsShuffle,
+        toggleShuffle: mockToggleShuffle
       }
     }
   })

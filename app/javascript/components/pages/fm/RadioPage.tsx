@@ -146,6 +146,11 @@ export const RadioPage: React.FC = () => {
           name: station.name
         })
 
+        // Radio stations always play in shuffle mode
+        if (!window.audioPlayer.isShuffle()) {
+          window.audioPlayer.toggleShuffle()
+        }
+
         // Get audio element and set up listener for when metadata loads
         const audio = document.getElementById('audio-element') as HTMLAudioElement
         if (audio) {

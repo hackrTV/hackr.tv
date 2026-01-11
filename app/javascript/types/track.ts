@@ -29,6 +29,7 @@ export interface AudioPlayerAPI {
   isPlaying: () => boolean;
   setPlaylist: (tracks: TrackData[], stationContext?: StationContext) => void;
   getPlaylist: () => TrackData[];
+  getEffectivePlaylist: () => TrackData[];
   getStationContext: () => StationContext | null;
   refreshPlaylist: () => void;
   refreshUI: () => void;
