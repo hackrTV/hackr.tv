@@ -1061,6 +1061,240 @@ namespace :import do
     puts "=" * 80 + "\n"
   end
 
+  desc "Create XERAEN's Livestream Archive playlist and add to The.CyberPul.se radio station"
+  task livestream_archive_playlist: :environment do
+    puts "\n--- Creating Livestream Archive Playlist ---\n"
+
+    # Find XERAEN GridHackr (user)
+    xeraen_user = GridHackr.find_by(hackr_alias: "XERAEN")
+    unless xeraen_user
+      puts "  ✗ XERAEN user not found. Run 'bin/rails db:seed' first."
+      next
+    end
+
+    # Find The.CyberPul.se artist
+    thecyberpulse = Artist.find_by(slug: "thecyberpulse")
+    unless thecyberpulse
+      puts "  ✗ The.CyberPul.se artist not found. Run 'bin/rails import:from_yaml' first."
+      next
+    end
+
+    # Find the Livestream Archive album
+    livestream_archive = thecyberpulse.albums.find_by(slug: "livestream-archive")
+    unless livestream_archive
+      puts "  ✗ Livestream Archive album not found. Run 'bin/rails import:from_yaml' first."
+      next
+    end
+
+    # Get tracks from the album that have audio attached
+    tracks_with_audio = livestream_archive.tracks
+      .joins(:audio_file_attachment)
+      .order(:track_number, :title)
+
+    if tracks_with_audio.empty?
+      puts "  ⚠ No tracks with audio found in Livestream Archive album."
+      puts "  Run 'bin/rails import:yaml_tracks' or 'bin/rails import:sideload_audio' to attach audio files."
+      next
+    end
+
+    puts "  Found #{tracks_with_audio.count} tracks with audio in Livestream Archive"
+
+    # Find or create the playlist
+    playlist_name = "TCP Livestream Archive"
+    playlist = xeraen_user.playlists.find_or_initialize_by(name: playlist_name)
+    was_new_playlist = playlist.new_record?
+
+    playlist.description = "Archived recordings from The.CyberPul.se live trans-temporal broadcasts."
+    playlist.is_public = false
+
+    if playlist.save
+      if was_new_playlist
+        puts "  ✓ Created playlist: #{playlist.name}"
+      else
+        puts "  ✓ Playlist exists: #{playlist.name}"
+      end
+    else
+      puts "  ✗ Failed to save playlist: #{playlist.errors.full_messages.join(", ")}"
+      next
+    end
+
+    # Add tracks to playlist (skip duplicates)
+    added_count = 0
+    skipped_count = 0
+
+    tracks_with_audio.each do |track|
+      existing = playlist.playlist_tracks.find_by(track: track)
+      if existing
+        skipped_count += 1
+      else
+        playlist.playlist_tracks.create!(track: track)
+        added_count += 1
+        puts "    + Added: #{track.title}"
+      end
+    end
+
+    puts "  Tracks added: #{added_count}, skipped (already in playlist): #{skipped_count}"
+
+    # Find the radio station
+    radio_station = RadioStation.find_by(slug: "thecyberpulse")
+    unless radio_station
+      puts "  ✗ Radio station 'The.CyberPul.se Trans-Temporal Broadcast' not found."
+      puts "  Run 'bin/rails import:radio_stations' first."
+      next
+    end
+
+    # Add playlist to radio station (skip if already associated)
+    existing_association = radio_station.radio_station_playlists.find_by(playlist: playlist)
+    if existing_association
+      puts "  ✓ Playlist already associated with radio station: #{radio_station.name}"
+    else
+      radio_station.radio_station_playlists.create!(playlist: playlist)
+      puts "  ✓ Added playlist to radio station: #{radio_station.name}"
+    end
+
+    puts "\nLivestream Archive Playlist Summary:"
+    puts "  Playlist: #{playlist.name} (#{playlist.is_public ? "public" : "private"})"
+    puts "  Owner: #{xeraen_user.hackr_alias}"
+    puts "  Tracks: #{playlist.playlist_tracks.count}"
+    puts "  Radio Station: #{radio_station.name}"
+  end
+
+  desc "Import playlists from data/playlists.yml"
+  task yaml_playlists: :environment do
+    puts "\n--- Importing Playlists from YAML ---\n"
+
+    yaml_file = Rails.root.join("data", "playlists.yml")
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      return
+    end
+
+    yaml_data = YAML.load_file(yaml_file)
+    playlists_data = yaml_data["playlists"] || []
+
+    if playlists_data.empty?
+      puts "  No playlists found in #{yaml_file}"
+      return
+    end
+
+    created_count = 0
+    updated_count = 0
+    skipped_count = 0
+
+    playlists_data.each do |playlist_data|
+      playlist_name = playlist_data["name"]
+      owner_alias = playlist_data["owner"]
+      radio_station_slug = playlist_data["radio_station"]
+      track_refs = playlist_data["tracks"] || []
+
+      puts "\n  Processing playlist: #{playlist_name}"
+
+      # Find owner
+      owner = GridHackr.find_by(hackr_alias: owner_alias)
+      unless owner
+        puts "    ✗ Owner not found: #{owner_alias}. Run 'bin/rails db:seed' first."
+        skipped_count += 1
+        next
+      end
+
+      # Find or create playlist
+      playlist = owner.playlists.find_or_initialize_by(name: playlist_name)
+      was_new_playlist = playlist.new_record?
+
+      playlist.description = playlist_data["description"]
+      playlist.is_public = playlist_data["is_public"] || false
+
+      if playlist.save
+        if was_new_playlist
+          created_count += 1
+          puts "    ✓ Created playlist: #{playlist.name}"
+        else
+          updated_count += 1
+          puts "    ✓ Playlist exists: #{playlist.name}"
+        end
+      else
+        puts "    ✗ Failed to save playlist: #{playlist.errors.full_messages.join(", ")}"
+        skipped_count += 1
+        next
+      end
+
+      # Add tracks to playlist
+      tracks_added = 0
+      tracks_skipped = 0
+      tracks_not_found = 0
+
+      track_refs.each do |track_ref|
+        # Skip comments and empty lines
+        next if track_ref.nil? || track_ref.to_s.strip.empty? || track_ref.to_s.strip.start_with?("#")
+
+        # Parse artist_slug/track_slug format
+        parts = track_ref.to_s.split("/", 2)
+        if parts.length != 2
+          puts "      ✗ Invalid track reference format: #{track_ref} (expected: artist_slug/track_slug)"
+          tracks_not_found += 1
+          next
+        end
+
+        artist_slug, track_slug = parts
+
+        # Find artist
+        artist = Artist.find_by(slug: artist_slug)
+        unless artist
+          puts "      ✗ Artist not found: #{artist_slug}"
+          tracks_not_found += 1
+          next
+        end
+
+        # Find track
+        track = artist.tracks.find_by(slug: track_slug)
+        unless track
+          puts "      ✗ Track not found: #{track_slug} (artist: #{artist.name})"
+          tracks_not_found += 1
+          next
+        end
+
+        # Check if track has audio (optional, just warn)
+        unless track.audio_file.attached?
+          puts "      ⚠ Track has no audio: #{track.title}"
+        end
+
+        # Add to playlist if not already present
+        existing = playlist.playlist_tracks.find_by(track: track)
+        if existing
+          tracks_skipped += 1
+        else
+          playlist.playlist_tracks.create!(track: track)
+          tracks_added += 1
+          puts "      + Added: #{track.title} (#{artist.name})"
+        end
+      end
+
+      puts "    Tracks: #{tracks_added} added, #{tracks_skipped} skipped, #{tracks_not_found} not found"
+
+      # Associate with radio station if specified
+      if radio_station_slug.present?
+        radio_station = RadioStation.find_by(slug: radio_station_slug)
+        if radio_station
+          existing_association = radio_station.radio_station_playlists.find_by(playlist: playlist)
+          if existing_association
+            puts "    ✓ Already associated with: #{radio_station.name}"
+          else
+            radio_station.radio_station_playlists.create!(playlist: playlist)
+            puts "    ✓ Added to radio station: #{radio_station.name}"
+          end
+        else
+          puts "    ✗ Radio station not found: #{radio_station_slug}"
+        end
+      end
+    end
+
+    puts "\nPlaylist import summary:"
+    puts "  Created: #{created_count}"
+    puts "  Updated: #{updated_count}"
+    puts "  Skipped: #{skipped_count}"
+    puts "  Total playlists in system: #{Playlist.count}"
+  end
+
   desc "Clear all imported data (DANGEROUS - use with caution)"
   task clear: :environment do
     print "\n⚠️  WARNING: This will delete ALL artists, albums, tracks, and redirects. Continue? (y/N): "
