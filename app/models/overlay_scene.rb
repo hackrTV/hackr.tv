@@ -4,6 +4,8 @@ class OverlayScene < ApplicationRecord
   # Associations
   has_many :overlay_scene_elements, dependent: :destroy
   has_many :overlay_elements, through: :overlay_scene_elements
+  has_many :overlay_scene_group_scenes, dependent: :destroy
+  has_many :overlay_scene_groups, through: :overlay_scene_group_scenes
 
   # Validations
   validates :name, presence: true

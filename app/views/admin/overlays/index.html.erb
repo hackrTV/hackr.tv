@@ -22,6 +22,7 @@
     <div style="margin-bottom: 30px; display: flex; gap: 10px;">
       <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168" %>
       <%= link_to "Manage Scenes", admin_overlay_scenes_path, class: "tui-button cyan-168" %>
+      <%= link_to "Manage Scene Groups", admin_overlay_scene_groups_path, class: "tui-button cyan-168" %>
       <%= link_to "Manage Elements", admin_overlay_elements_path, class: "tui-button cyan-168" %>
       <%= link_to "Manage Lower Thirds", admin_overlay_lower_thirds_path, class: "tui-button cyan-168" %>
     </div>
@@ -29,60 +30,155 @@
     <!-- Overlay URLs Section -->
     <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: OVERLAY URLs - Copy for OBS Browser Sources ::]</h3>
     <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
-      <p style="color: #888; margin-bottom: 15px;">Individual elements (transparent background):</p>
-      <table class="tui-table" style="width: 100%;">
+      <% if @scene_groups.any? %>
+        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+          <label style="color: #888;">Filter by Scene Group:</label>
+          <select id="scene-group-filter" style="padding: 8px 12px; background: #1a1a1a; border: 2px solid #00ffff; color: #fff; font-family: monospace; min-width: 200px;">
+            <option value="all">All Scenes & Elements</option>
+            <% @scene_groups.each do |group| %>
+              <%
+                group_scene_ids = group.overlay_scene_group_scenes.map(&:overlay_scene_id)
+                group_element_types = OverlaySceneElement.where(overlay_scene_id: group_scene_ids).joins(:overlay_element).pluck('overlay_elements.element_type').uniq
+              %>
+              <option value="<%= group.slug %>"
+                      data-scene-ids="<%= group_scene_ids.join(',') %>"
+                      data-element-types="<%= group_element_types.join(',') %>">
+                <%= group.name %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+      <% end %>
+
+      <p id="scenes-header" style="color: #888; margin-bottom: 15px;">Scenes (1920x1080):</p>
+      <table id="scenes-table" class="tui-table" style="width: 100%;">
         <tbody>
-          <tr class="admin-table-row">
+          <% @scenes.each do |scene| %>
+            <tr class="admin-table-row scene-row" data-scene-id="<%= scene.id %>">
+              <td style="width: 200px;"><strong><%= scene.name %></strong></td>
+              <td><code class="cyan-168-text"><%= overlay_scene_url(slug: scene.slug) %></code></td>
+              <td style="width: 100px;"><%= link_to "Open ↗", overlay_scene_path(slug: scene.slug), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <p id="no-scenes-message" style="color: #666; text-align: center; display: none; margin: 15px 0;">No scenes in this group. <%= link_to "Add scenes to this group", admin_overlay_scene_groups_path, class: "cyan-168-text" %>.</p>
+      <% if @scenes.empty? %>
+        <p style="color: #666; text-align: center; margin: 15px 0;">No scenes yet. <%= link_to "Create one", new_admin_overlay_scene_path, class: "cyan-168-text" %>.</p>
+      <% end %>
+
+      <p id="elements-header" style="color: #888; margin: 20px 0 15px;">Individual elements (transparent background):</p>
+      <table id="elements-table" class="tui-table" style="width: 100%;">
+        <tbody>
+          <tr class="admin-table-row element-row" data-element-type="now_playing">
             <td style="width: 200px;"><strong>Now Playing</strong></td>
             <td><code class="cyan-168-text"><%= overlay_now_playing_url %></code></td>
             <td style="width: 100px;"><%= link_to "Open ↗", overlay_now_playing_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr class="admin-table-row">
+          <tr class="admin-table-row element-row" data-element-type="pulsewire_feed">
             <td><strong>PulseWire Feed</strong></td>
             <td><code class="cyan-168-text"><%= overlay_pulsewire_url %></code></td>
             <td><%= link_to "Open ↗", overlay_pulsewire_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr class="admin-table-row">
+          <tr class="admin-table-row element-row" data-element-type="grid_activity">
             <td><strong>Grid Activity</strong></td>
             <td><code class="cyan-168-text"><%= overlay_grid_activity_url %></code></td>
             <td><%= link_to "Open ↗", overlay_grid_activity_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr class="admin-table-row">
+          <tr class="admin-table-row element-row" data-element-type="alert">
             <td><strong>Alerts</strong></td>
             <td><code class="cyan-168-text"><%= overlay_alerts_url %></code></td>
             <td><%= link_to "Open ↗", overlay_alerts_path, target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr class="admin-table-row">
+          <tr class="admin-table-row element-row" data-element-type="ticker_top">
             <td><strong>Top Ticker</strong></td>
             <td><code class="cyan-168-text"><%= overlay_ticker_url(position: "top") %></code></td>
             <td><%= link_to "Open ↗", overlay_ticker_path(position: "top"), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
-          <tr class="admin-table-row">
+          <tr class="admin-table-row element-row" data-element-type="ticker_bottom">
             <td><strong>Bottom Ticker</strong></td>
             <td><code class="cyan-168-text"><%= overlay_ticker_url(position: "bottom") %></code></td>
             <td><%= link_to "Open ↗", overlay_ticker_path(position: "bottom"), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
           </tr>
         </tbody>
       </table>
-
-      <p style="color: #888; margin: 20px 0 15px;">Scenes (1920x1080):</p>
-      <table class="tui-table" style="width: 100%;">
-        <tbody>
-          <% @scenes.each do |scene| %>
-            <tr class="admin-table-row">
-              <td style="width: 200px;"><strong><%= scene.name %></strong></td>
-              <td><code class="cyan-168-text"><%= overlay_scene_url(slug: scene.slug) %></code></td>
-              <td style="width: 100px;"><%= link_to "Open ↗", overlay_scene_path(slug: scene.slug), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %></td>
-            </tr>
-          <% end %>
-          <% if @scenes.empty? %>
-            <tr>
-              <td colspan="3" style="color: #666; text-align: center;">No scenes yet. <%= link_to "Create one", new_admin_overlay_scene_path, class: "cyan-168-text" %>.</td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <p id="no-elements-message" style="color: #666; text-align: center; display: none; margin: 15px 0;">No individual elements used by scenes in this group.</p>
     </div>
+
+    <script nonce="<%= content_security_policy_nonce %>">
+    document.addEventListener('DOMContentLoaded', function() {
+      const filter = document.getElementById('scene-group-filter');
+      if (!filter) return;
+
+      const elementRows = document.querySelectorAll('.element-row');
+      const sceneRows = document.querySelectorAll('.scene-row');
+      const elementsHeader = document.getElementById('elements-header');
+      const elementsTable = document.getElementById('elements-table');
+      const scenesHeader = document.getElementById('scenes-header');
+      const scenesTable = document.getElementById('scenes-table');
+      const noElementsMsg = document.getElementById('no-elements-message');
+      const noScenesMsg = document.getElementById('no-scenes-message');
+
+      filter.addEventListener('change', function() {
+        const selectedOption = filter.options[filter.selectedIndex];
+        const value = selectedOption.value;
+
+        if (value === 'all') {
+          // Show all
+          elementRows.forEach(row => row.style.display = '');
+          sceneRows.forEach(row => row.style.display = '');
+          elementsTable.style.display = '';
+          scenesTable.style.display = '';
+          noElementsMsg.style.display = 'none';
+          noScenesMsg.style.display = 'none';
+        } else {
+          const sceneIds = (selectedOption.dataset.sceneIds || '').split(',').filter(Boolean);
+          const elementTypes = (selectedOption.dataset.elementTypes || '').split(',').filter(Boolean);
+
+          // Filter scenes
+          let visibleScenes = 0;
+          sceneRows.forEach(row => {
+            const sceneId = row.dataset.sceneId;
+            if (sceneIds.includes(sceneId)) {
+              row.style.display = '';
+              visibleScenes++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+
+          // Filter elements
+          let visibleElements = 0;
+          elementRows.forEach(row => {
+            const elementType = row.dataset.elementType;
+            if (elementTypes.includes(elementType)) {
+              row.style.display = '';
+              visibleElements++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+
+          // Show/hide empty messages
+          if (visibleElements === 0) {
+            elementsTable.style.display = 'none';
+            noElementsMsg.style.display = 'block';
+          } else {
+            elementsTable.style.display = '';
+            noElementsMsg.style.display = 'none';
+          }
+
+          if (visibleScenes === 0) {
+            scenesTable.style.display = 'none';
+            noScenesMsg.style.display = 'block';
+          } else {
+            scenesTable.style.display = '';
+            noScenesMsg.style.display = 'none';
+          }
+        }
+      });
+    });
+    </script>
 
     <!-- Ticker Control Section -->
     <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TICKER CONTROL ::]</h3>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_27_000007) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_151701) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -277,6 +277,26 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_000007) do
     t.index ["z_index"], name: "index_overlay_scene_elements_on_z_index"
   end
 
+  create_table "overlay_scene_group_scenes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "overlay_scene_group_id", null: false
+    t.integer "overlay_scene_id", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["overlay_scene_group_id", "overlay_scene_id"], name: "index_scene_group_scenes_unique", unique: true
+    t.index ["overlay_scene_group_id", "position"], name: "index_scene_group_scenes_position"
+    t.index ["overlay_scene_group_id"], name: "index_overlay_scene_group_scenes_on_overlay_scene_group_id"
+    t.index ["overlay_scene_id"], name: "index_overlay_scene_group_scenes_on_overlay_scene_id"
+  end
+
+  create_table "overlay_scene_groups", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_overlay_scene_groups_on_slug", unique: true
+  end
+
   create_table "overlay_scenes", force: :cascade do |t|
     t.boolean "active", default: true
     t.datetime "created_at", null: false
@@ -439,6 +459,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_000007) do
   add_foreign_key "overlay_now_playing", "tracks"
   add_foreign_key "overlay_scene_elements", "overlay_elements"
   add_foreign_key "overlay_scene_elements", "overlay_scenes"
+  add_foreign_key "overlay_scene_group_scenes", "overlay_scene_groups"
+  add_foreign_key "overlay_scene_group_scenes", "overlay_scenes"
   add_foreign_key "playlist_tracks", "playlists"
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "grid_hackrs"

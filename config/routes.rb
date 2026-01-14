@@ -190,6 +190,13 @@ Rails.application.routes.draw do
     end
     resources :overlay_elements, path: "overlays/elements"
     resources :overlay_lower_thirds, path: "overlays/lower-thirds"
+    resources :overlay_scene_groups, path: "overlays/groups" do
+      member do
+        post :add_scene
+        delete :remove_scene
+        post :reorder_scenes
+      end
+    end
   end
 
   # OBS Overlay routes (Rails server-rendered, NOT SPA)
