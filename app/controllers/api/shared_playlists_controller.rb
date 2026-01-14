@@ -1,7 +1,5 @@
 module Api
   class SharedPlaylistsController < ApplicationController
-    skip_before_action :verify_authenticity_token
-
     # GET /api/shared_playlists/:share_token
     def show
       @playlist = Playlist.find_by!(share_token: params[:share_token], is_public: true)
@@ -15,7 +13,7 @@ module Api
         owner: {
           hackr_alias: @playlist.grid_hackr.hackr_alias
         },
-        tracks: @playlist.tracks.includes(:artist, :album).map { |track|
+        tracks: @playlist.tracks.includes(:artist, :album).map do |track|
           {
             id: track.id,
             title: track.title,
@@ -37,7 +35,7 @@ module Api
                    end,
             audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil
           }
-        }
+        end
       }
     rescue ActiveRecord::RecordNotFound
       render json: {

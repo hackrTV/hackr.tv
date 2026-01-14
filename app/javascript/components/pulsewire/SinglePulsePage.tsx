@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import type { Pulse } from '../../types/pulse'
 import { ThreadView } from './ThreadView'
+import { apiJson } from '~/utils/apiClient'
 
 export const SinglePulsePage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -15,15 +16,7 @@ export const SinglePulsePage: React.FC = () => {
     const fetchPulseAndThread = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch(`/api/pulses/${id}`, {
-          credentials: 'include'
-        })
-
-        if (!response.ok) {
-          throw new Error('Pulse not found')
-        }
-
-        const data = await response.json()
+        const data = await apiJson<{ pulse: Pulse; thread: Pulse[] }>(`/api/pulses/${id}`)
         setPulse(data.pulse)
         setThread(data.thread)
         setIsLoading(false)

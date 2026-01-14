@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { apiJson } from '~/utils/apiClient'
 
 /**
  * Codex slug->name mapping for canonical display
@@ -26,13 +27,7 @@ async function fetchCodexMappings (): Promise<CodexMappings> {
   }
 
   // Fetch the mappings
-  fetchPromise = fetch('/api/codex/mappings')
-    .then(res => {
-      if (!res.ok) {
-        throw new Error('Failed to fetch codex mappings')
-      }
-      return res.json()
-    })
+  fetchPromise = apiJson<CodexMappings>('/api/codex/mappings')
     .then(data => {
       cachedMappings = data
       fetchPromise = null

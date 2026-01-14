@@ -1,10 +1,7 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
 
-  # Skip CSRF verification for API endpoints (handled by session cookies)
-  skip_before_action :verify_authenticity_token
-
-  before_action :require_login_api, only: [:current_hackr_info, :command, :disconnect]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect]
 
   # GET /api/grid/current_hackr - Get current logged-in hackr info
   def current_hackr_info
@@ -138,16 +135,6 @@ class Api::GridController < ApplicationController
 
   def hackr_params
     params.permit(:hackr_alias, :password, :password_confirmation)
-  end
-
-  def require_login_api
-    return if logged_in?
-
-    render json: {
-      success: false,
-      error: "Access denied. Please log in to THE PULSE GRID.",
-      logged_in: false
-    }, status: :unauthorized
   end
 
   def broadcast_event(room, event)

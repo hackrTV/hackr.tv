@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { formatFutureDate } from '~/utils/dateUtils'
+import { apiJson } from '~/utils/apiClient'
 
 interface HackrLog {
   id: number
@@ -49,8 +50,7 @@ export const LogsIndexPage: React.FC = () => {
   const loading = fetchedPage !== currentPage
 
   useEffect(() => {
-    fetch(`/api/logs?page=${currentPage}`)
-      .then(res => res.json())
+    apiJson<{ logs: HackrLog[]; meta: PaginationMeta }>(`/api/logs?page=${currentPage}`)
       .then(data => {
         setLogs(data.logs)
         setMeta(data.meta)

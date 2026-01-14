@@ -8,6 +8,7 @@ import { CommandInput, CommandInputHandle } from '~/components/grid/CommandInput
 import { GridAmbientPlayer } from '~/components/grid/GridAmbientPlayer'
 import { ZonePlaylistData, TrackData } from '~/types/track'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
+import { apiJson } from '~/utils/apiClient'
 
 const getWelcomeMessage = (isMobile: boolean) => {
   const divider = isMobile
@@ -27,6 +28,14 @@ ${isMobile ? '' : '     ~~ JUST RE-CREATE YOUR ACCOUNT IF YOU CANNOT LOGIN LATER
    !! <span style="color:#f87171;">WARNING</span> !!
 ${divider}
 </div>`
+}
+
+interface GridCommandResponse {
+  output?: string
+  room_id?: number
+  current_room?: {
+    ambient_playlist?: ZonePlaylistData
+  }
 }
 
 const oppositeDirection = (dir: string): string => {
@@ -82,30 +91,24 @@ export const GridGamePage: React.FC = () => {
 
         // Execute initial look command
         try {
-          const response = await fetch('/api/grid/command', {
+          const data = await apiJson<GridCommandResponse>('/api/grid/command', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include',
             body: JSON.stringify({ input: 'look' })
           })
 
-          if (response.ok) {
-            const data = await response.json()
-            if (data.output && data.output.trim()) {
-              setOutput(prev => [...prev, data.output])
-            }
-            if (data.room_id) {
-              setCurrentRoomId(data.room_id)
-            }
-            // Only update playlist if it's a different one (by ID)
-            if (data.current_room?.ambient_playlist) {
-              const newPlaylistId = data.current_room.ambient_playlist.id
-              if (currentPlaylistIdRef.current !== newPlaylistId) {
-                setAmbientPlaylist(data.current_room.ambient_playlist)
-                currentPlaylistIdRef.current = newPlaylistId
-              }
+          const outputText = data.output?.trim()
+          if (outputText) {
+            setOutput(prev => [...prev, outputText])
+          }
+          if (data.room_id) {
+            setCurrentRoomId(data.room_id)
+          }
+          // Only update playlist if it's a different one (by ID)
+          if (data.current_room?.ambient_playlist) {
+            const newPlaylistId = data.current_room.ambient_playlist.id
+            if (currentPlaylistIdRef.current !== newPlaylistId) {
+              setAmbientPlaylist(data.current_room.ambient_playlist)
+              currentPlaylistIdRef.current = newPlaylistId
             }
           }
         } catch (err) {
@@ -159,7 +162,7 @@ export const GridGamePage: React.FC = () => {
   }, [currentRoomId])
 
   // Set up Action Cable subscription
-  useActionCable({
+  const { connectionStatus } = useActionCable({
     roomId: currentRoomId,
     onEvent: handleEvent,
     enabled: !!hackr && !!currentRoomId
@@ -179,39 +182,30 @@ export const GridGamePage: React.FC = () => {
     setExecuting(true)
 
     try {
-      const response = await fetch('/api/grid/command', {
+      const data = await apiJson<GridCommandResponse>('/api/grid/command', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({ input: command })
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      // Append command output
+      const outputText = data.output?.trim()
+      if (outputText) {
+        setOutput(prev => [...prev, outputText])
+      }
 
-        // Append command output
-        if (data.output && data.output.trim()) {
-          setOutput(prev => [...prev, data.output])
-        }
+      // Update room if it changed (and resubscribe will happen automatically)
+      if (data.room_id && data.room_id !== currentRoomId) {
+        console.log(`Room changed from ${currentRoomId} to ${data.room_id}`)
+        setCurrentRoomId(data.room_id)
+      }
 
-        // Update room if it changed (and resubscribe will happen automatically)
-        if (data.room_id && data.room_id !== currentRoomId) {
-          console.log(`Room changed from ${currentRoomId} to ${data.room_id}`)
-          setCurrentRoomId(data.room_id)
+      // Only update playlist if it's a different one (by ID)
+      if (data.current_room?.ambient_playlist) {
+        const newPlaylistId = data.current_room.ambient_playlist.id
+        if (currentPlaylistIdRef.current !== newPlaylistId) {
+          setAmbientPlaylist(data.current_room.ambient_playlist)
+          currentPlaylistIdRef.current = newPlaylistId
         }
-
-        // Only update playlist if it's a different one (by ID)
-        if (data.current_room?.ambient_playlist) {
-          const newPlaylistId = data.current_room.ambient_playlist.id
-          if (currentPlaylistIdRef.current !== newPlaylistId) {
-            setAmbientPlaylist(data.current_room.ambient_playlist)
-            currentPlaylistIdRef.current = newPlaylistId
-          }
-        }
-      } else {
-        setOutput(prev => [...prev, '<span style="color: #f87171;">Error: Command execution failed. Please try again.</span>'])
       }
     } catch (err) {
       console.error('Command execution failed:', err)
@@ -266,6 +260,13 @@ export const GridGamePage: React.FC = () => {
             <span style={{ color: '#a78bfa', fontWeight: 'bold' }}>{isMobile ? 'GRID' : 'THE PULSE GRID'}</span>
             <span style={{ color: '#666', margin: '0 8px' }}>|</span>
             <span style={{ color: '#e0e0e0' }}>{hackr.hackr_alias}</span>
+            <span style={{ color: '#666', margin: '0 8px' }}>|</span>
+            <span style={{
+              color: connectionStatus === 'connected' ? '#34d399' : connectionStatus === 'reconnecting' ? '#fbbf24' : '#f87171',
+              fontSize: '0.8em'
+            }}>
+              {connectionStatus === 'connected' ? 'LIVE' : connectionStatus === 'reconnecting' ? 'RECONNECTING' : connectionStatus === 'connecting' ? 'CONNECTING' : 'OFFLINE'}
+            </span>
             {hackr.role === 'admin' && (
               <a href="/root" style={{ color: '#f87171', fontSize: '0.85em', marginLeft: '5px', textDecoration: 'none' }}>[ADMIN]</a>
             )}

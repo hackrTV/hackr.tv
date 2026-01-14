@@ -4,6 +4,7 @@ import type { Pulse } from '../../types/pulse'
 import { EchoButton } from './EchoButton'
 import { PulseComposer } from './PulseComposer'
 import { CodexText } from '../shared/CodexText'
+import { apiFetch, apiJson } from '~/utils/apiClient'
 
 interface PulseCardProps {
   pulse: Pulse
@@ -56,15 +57,9 @@ export const PulseCard: React.FC<PulseCardProps> = ({
     setIsDeleting(true)
 
     try {
-      const response = await fetch(`/api/pulses/${pulse.id}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      await apiFetch(`/api/pulses/${pulse.id}`, {
+        method: 'DELETE'
       })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to delete pulse')
-      }
 
       if (onPulseDeleted) {
         onPulseDeleted(pulse.id)
@@ -92,15 +87,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
 
     setIsLoadingReplies(true)
     try {
-      const response = await fetch(`/api/pulses?parent_pulse_id=${pulse.id}&filter=active&per_page=100`, {
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to load replies')
-      }
-
-      const data = await response.json()
+      const data = await apiJson<{ pulses: Pulse[] }>(`/api/pulses?parent_pulse_id=${pulse.id}&filter=active&per_page=100`)
       setReplies(data.pulses)
     } catch (err) {
       console.error('Failed to fetch replies:', err)

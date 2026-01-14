@@ -2,9 +2,8 @@ module Api
   class PulsesController < ApplicationController
     include GridAuthentication
 
-    skip_before_action :verify_authenticity_token
-    before_action :require_login_api, only: [:create, :destroy, :signal_drop]
-    before_action :set_pulse, only: [:show, :destroy, :signal_drop]
+    before_action :require_login_api, only: %i[create destroy signal_drop]
+    before_action :set_pulse, only: %i[show destroy signal_drop]
     before_action :authorize_pulse_owner, only: [:destroy]
     before_action :require_admin, only: [:signal_drop]
 
@@ -25,21 +24,19 @@ module Api
       # Filter by hackr if specified (case-insensitive)
       if params[:hackr].present?
         hackr = GridHackr.where("LOWER(hackr_alias) = ?", params[:hackr].downcase).first
-        if hackr
-          pulses = pulses.where(grid_hackr_id: hackr.id)
-        else
-          return render json: {pulses: [], meta: {total: 0, page: 1, per_page: 50}}
-        end
+        return render json: {pulses: [], meta: {total: 0, page: 1, per_page: 50}} unless hackr
+
+        pulses = pulses.where(grid_hackr_id: hackr.id)
+
       end
 
       # Filter by echoed_by - pulses that a specific user has echoed
       if params[:echoed_by].present?
         echoing_hackr = GridHackr.where("LOWER(hackr_alias) = ?", params[:echoed_by].downcase).first
-        if echoing_hackr
-          pulses = pulses.joins(:echoes).where(echoes: {grid_hackr_id: echoing_hackr.id})
-        else
-          return render json: {pulses: [], meta: {total: 0, page: 1, per_page: 50}}
-        end
+        return render json: {pulses: [], meta: {total: 0, page: 1, per_page: 50}} unless echoing_hackr
+
+        pulses = pulses.joins(:echoes).where(echoes: {grid_hackr_id: echoing_hackr.id})
+
       end
 
       # Filter by status
@@ -49,20 +46,23 @@ module Api
       when "active"
         pulses.active
       else
-        pulses.active  # Default to active only
+        pulses.active # Default to active only
       end
 
       # Pagination
       page = [params[:page].to_i, 1].max
       per_page = [params[:per_page].to_i, 50].max
-      per_page = [per_page, 100].min  # Cap at 100
+      per_page = [per_page, 100].min # Cap at 100
 
       total = pulses.count
       pulses = pulses.timeline.limit(per_page).offset((page - 1) * per_page)
 
       render json: {
         pulses: pulses.map { |pulse| pulse_json(pulse) },
-        current_hackr: logged_in? ? {id: current_hackr.id, hackr_alias: current_hackr.hackr_alias, role: current_hackr.role} : nil,
+        current_hackr: if logged_in?
+                         {id: current_hackr.id, hackr_alias: current_hackr.hackr_alias,
+                          role: current_hackr.role}
+                       end,
         meta: {
           total: total,
           page: page,
@@ -89,9 +89,6 @@ module Api
       @pulse = current_hackr.pulses.build(pulse_params)
 
       if @pulse.save
-        # Broadcast to PulseWire channel
-        broadcast_pulse(@pulse, "new_pulse")
-
         render json: {
           success: true,
           message: "Pulse broadcast successfully",
@@ -157,21 +154,21 @@ module Api
     end
 
     def authorize_pulse_owner
-      unless @pulse.grid_hackr_id == current_hackr.id
-        render json: {
-          success: false,
-          error: "You are not authorized to delete this pulse"
-        }, status: :forbidden
-      end
+      return if @pulse.grid_hackr_id == current_hackr.id
+
+      render json: {
+        success: false,
+        error: "You are not authorized to delete this pulse"
+      }, status: :forbidden
     end
 
     def require_admin
-      unless current_hackr&.admin?
-        render json: {
-          success: false,
-          error: "Admin access required"
-        }, status: :forbidden
-      end
+      return if current_hackr&.admin?
+
+      render json: {
+        success: false,
+        error: "Admin access required"
+      }, status: :forbidden
     end
 
     def pulse_params
@@ -184,7 +181,7 @@ module Api
         content: pulse.content,
         pulsed_at: pulse.pulsed_at,
         echo_count: pulse.echo_count,
-        splice_count: pulse.splices.count,  # Real-time count
+        splice_count: pulse.splices.count, # Real-time count
         signal_dropped: pulse.signal_dropped,
         signal_dropped_at: pulse.signal_dropped_at,
         parent_pulse_id: pulse.parent_pulse_id,

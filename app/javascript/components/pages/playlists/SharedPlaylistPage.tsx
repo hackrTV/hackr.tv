@@ -9,6 +9,7 @@ import type { Playlist } from '~/types/playlist'
 import type { TrackData } from '~/types/track'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
+import { apiJson } from '~/utils/apiClient'
 
 export const SharedPlaylistPage: React.FC = () => {
   const { token } = useParams<{ token: string }>()
@@ -22,16 +23,7 @@ export const SharedPlaylistPage: React.FC = () => {
     setError(null)
 
     try {
-      const response = await fetch(`/api/shared_playlists/${token}`)
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Shared playlist not found')
-        }
-        throw new Error('Failed to load shared playlist')
-      }
-
-      const data = await response.json()
+      const data = await apiJson<Playlist>(`/api/shared_playlists/${token}`)
       setPlaylist(data)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred'

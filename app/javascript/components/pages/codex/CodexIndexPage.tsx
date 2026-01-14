@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { CodexEntrySummary } from '~/types/codex'
+import { apiJson } from '~/utils/apiClient'
 
 const ENTRY_TYPE_COLORS: Record<string, string> = {
   person: '#a78bfa',      // purple
@@ -32,8 +33,7 @@ export const CodexIndexPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   useEffect(() => {
-    fetch('/api/codex')
-      .then(res => res.json())
+    apiJson<CodexEntrySummary[]>('/api/codex')
       .then(data => {
         setEntries(data)
         setLoading(false)

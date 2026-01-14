@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react'
+import { apiJson, ApiError } from '~/utils/apiClient'
 
 export interface GridHackr {
   id: number
@@ -66,27 +67,19 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
   // Check if user is already logged in
   const checkAuth = useCallback(async () => {
     try {
-      const response = await fetch('/api/grid/current_hackr', {
-        credentials: 'include'
-      })
-
-      if (response.ok) {
-        const data: CurrentHackrResponse = await response.json()
-        if (data.logged_in && data.hackr) {
-          setHackr(data.hackr)
-        } else {
-          setHackr(null)
-        }
-      } else if (response.status === 401) {
-        // 401 is expected when not logged in
-        setHackr(null)
+      const data = await apiJson<CurrentHackrResponse>('/api/grid/current_hackr')
+      if (data.logged_in && data.hackr) {
+        setHackr(data.hackr)
       } else {
-        console.warn('Grid auth check returned unexpected status:', response.status)
         setHackr(null)
       }
-    } catch (_err) {
-      console.error('Auth check failed:', _err)
-      setHackr(null)
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        setHackr(null)
+      } else {
+        console.error('Auth check failed:', err)
+        setHackr(null)
+      }
     } finally {
       setLoading(false)
     }
@@ -102,27 +95,21 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
   const login = useCallback(async (hackr_alias: string, password: string): Promise<LoginResponse> => {
     setError(null)
     try {
-      const response = await fetch('/api/grid/login', {
+      const data = await apiJson<LoginResponse>('/api/grid/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({ hackr_alias, password })
       })
-
-      const data: LoginResponse = await response.json()
 
       if (data.success && data.hackr) {
         setHackr(data.hackr)
         return data
-      } else {
-        setError(data.error || 'Login failed')
-        return data
       }
+
+      setError(data.error || 'Login failed')
+      return data
     } catch (err) {
       console.error('Login failed:', err)
-      const errorMsg = 'Network error. Please try again.'
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
       setError(errorMsg)
       return { success: false, error: errorMsg }
     }
@@ -135,27 +122,21 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
   ): Promise<RegisterResponse> => {
     setError(null)
     try {
-      const response = await fetch('/api/grid/register', {
+      const data = await apiJson<RegisterResponse>('/api/grid/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({ hackr_alias, password, password_confirmation })
       })
-
-      const data: RegisterResponse = await response.json()
 
       if (data.success && data.hackr) {
         setHackr(data.hackr)
         return data
-      } else {
-        setError(data.error || 'Registration failed')
-        return data
       }
+
+      setError(data.error || 'Registration failed')
+      return data
     } catch (err) {
       console.error('Registration failed:', err)
-      const errorMsg = 'Network error. Please try again.'
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
       setError(errorMsg)
       return { success: false, error: errorMsg }
     }
@@ -164,22 +145,15 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
   const disconnect = useCallback(async () => {
     setError(null)
     try {
-      const response = await fetch('/api/grid/disconnect', {
-        method: 'DELETE',
-        credentials: 'include'
+      await apiJson('/api/grid/disconnect', {
+        method: 'DELETE'
       })
 
-      if (response.ok) {
-        setHackr(null)
-        return { success: true }
-      } else {
-        const errorMsg = 'Failed to disconnect'
-        setError(errorMsg)
-        return { success: false, error: errorMsg }
-      }
+      setHackr(null)
+      return { success: true }
     } catch (err) {
       console.error('Disconnect failed:', err)
-      const errorMsg = 'Network error. Please try again.'
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
       setError(errorMsg)
       return { success: false, error: errorMsg }
     }

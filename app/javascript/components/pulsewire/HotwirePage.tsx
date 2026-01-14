@@ -5,6 +5,16 @@ import type { Pulse, PulseWireMessage, GridHackr } from '../../types/pulse'
 import { PulseComposer } from './PulseComposer'
 import { PulseCard } from './PulseCard'
 import { usePulseWire } from '../../hooks/usePulseWire'
+import { apiJson } from '~/utils/apiClient'
+
+interface PulseResponse {
+  pulses: Pulse[]
+  current_hackr?: GridHackr | null
+  meta: {
+    page: number
+    total_pages: number
+  }
+}
 
 export const HotwirePage: React.FC = () => {
   const [pulses, setPulses] = useState<Pulse[]>([])
@@ -18,15 +28,7 @@ export const HotwirePage: React.FC = () => {
 
   const fetchPulses = useCallback(async (pageNum: number = 1) => {
     try {
-      const response = await fetch(`/api/pulses?page=${pageNum}&per_page=50&filter=active`, {
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to load pulses')
-      }
-
-      const data = await response.json()
+      const data = await apiJson<PulseResponse>(`/api/pulses?page=${pageNum}&per_page=50&filter=active`)
 
       // Set current hackr on initial load
       if (pageNum === 1 && data.current_hackr !== undefined) {
@@ -56,6 +58,7 @@ export const HotwirePage: React.FC = () => {
 
   // Initial load
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: fetch data on mount
     fetchPulses(1)
   }, [fetchPulses])
 
@@ -90,7 +93,7 @@ export const HotwirePage: React.FC = () => {
     }
   }, [])
 
-  const { isConnected } = usePulseWire({
+  const { isConnected, connectionStatus } = usePulseWire({
     onMessage: handleWireMessage,
     enabled: true
   })
@@ -171,6 +174,10 @@ export const HotwirePage: React.FC = () => {
           <div className="wire-status">
             {isConnected ? (
               <span className="status-connected">● LIVE</span>
+            ) : connectionStatus === 'reconnecting' ? (
+              <span className="status-disconnected">◌ RECONNECTING</span>
+            ) : connectionStatus === 'connecting' ? (
+              <span className="status-disconnected">◌ CONNECTING</span>
             ) : (
               <span className="status-disconnected">○ OFFLINE</span>
             )}

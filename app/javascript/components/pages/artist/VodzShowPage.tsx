@@ -4,6 +4,7 @@ import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
 import { formatFutureDate } from '~/utils/dateUtils'
+import { apiJson } from '~/utils/apiClient'
 
 interface Vod {
   id: number
@@ -56,14 +57,7 @@ const VodzShowPage: React.FC = () => {
     const fetchVod = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/artists/${artistSlug}/vods/${id}`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Video not found')
-          }
-          throw new Error('Failed to fetch video')
-        }
-        const json = await response.json()
+        const json = await apiJson<Vod>(`/api/artists/${artistSlug}/vods/${id}`)
         setVod(json)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error')

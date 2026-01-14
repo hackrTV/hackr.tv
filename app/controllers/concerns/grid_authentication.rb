@@ -21,7 +21,7 @@ module GridAuthentication
 
   def log_in(hackr)
     session[:grid_hackr_id] = hackr.id
-    cookies.encrypted[:grid_hackr_id] = hackr.id  # For Action Cable authentication
+    cookies.encrypted[:grid_hackr_id] = hackr.id # For Action Cable authentication
     @current_hackr = hackr
   end
 
@@ -43,7 +43,12 @@ module GridAuthentication
   def require_login_api
     return if logged_in?
 
-    render json: {error: "Authentication required. Please log in to THE PULSE GRID."}, status: :unauthorized
+    Rails.logger.warn("API auth required: #{request.method} #{request.fullpath}")
+    render json: {
+      success: false,
+      error: "Authentication required. Please log in to THE PULSE GRID.",
+      logged_in: false
+    }, status: :unauthorized
   end
 
   def require_admin

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { apiJson } from '~/utils/apiClient'
 
 interface AppSettings {
   prerelease_mode: string | null
@@ -42,11 +43,8 @@ export const AppSettingsProvider: React.FC<AppSettingsProviderProps> = ({ childr
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('/api/settings')
-        if (response.ok) {
-          const data = await response.json()
-          setSettings(data)
-        }
+        const data = await apiJson<AppSettings>('/api/settings')
+        setSettings(data)
       } catch (error) {
         console.error('Failed to fetch app settings:', error)
       } finally {

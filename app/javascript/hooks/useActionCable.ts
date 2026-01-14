@@ -21,12 +21,40 @@ interface UseActionCableOptions {
 export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptions) => {
   const cableRef = useRef<Cable | null>(null)
   const channelRef = useRef<Channel | null>(null)
+  const reconnectTimeoutRef = useRef<number | null>(null)
+  const reconnectAttemptsRef = useRef(0)
+  const connectRef = useRef<() => void>(() => {})
   const [isConnected, setIsConnected] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'connecting' | 'reconnecting' | 'disconnected'>('disconnected')
+
+  const clearReconnectTimeout = useCallback(() => {
+    if (reconnectTimeoutRef.current !== null) {
+      window.clearTimeout(reconnectTimeoutRef.current)
+      reconnectTimeoutRef.current = null
+    }
+  }, [])
+
+  const scheduleReconnect = useCallback(() => {
+    if (!enabled || !roomId) {
+      return
+    }
+
+    clearReconnectTimeout()
+    reconnectAttemptsRef.current += 1
+    const delay = Math.min(1000 * 2 ** (reconnectAttemptsRef.current - 1), 10000)
+    setConnectionStatus('reconnecting')
+    reconnectTimeoutRef.current = window.setTimeout(() => {
+      connectRef.current()
+    }, delay)
+  }, [clearReconnectTimeout, enabled, roomId])
 
   const connect = useCallback(() => {
     if (!enabled || !roomId) {
       return
     }
+
+    clearReconnectTimeout()
+    setConnectionStatus(reconnectAttemptsRef.current > 0 ? 'reconnecting' : 'connecting')
 
     // Clean up existing connection
     if (channelRef.current) {
@@ -47,11 +75,15 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
       {
         connected () {
           console.log('GridChannel: Connected to WebSocket')
+          reconnectAttemptsRef.current = 0
           setIsConnected(true)
+          setConnectionStatus('connected')
         },
         disconnected () {
           console.log('GridChannel: Disconnected from WebSocket')
           setIsConnected(false)
+          setConnectionStatus('disconnected')
+          scheduleReconnect()
         },
         received (data: GridEvent) {
           console.log('GridChannel: Received event:', data)
@@ -59,9 +91,11 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
         }
       }
     )
-  }, [roomId, onEvent, enabled])
+  }, [roomId, onEvent, enabled, clearReconnectTimeout, scheduleReconnect])
 
   const disconnect = useCallback(() => {
+    clearReconnectTimeout()
+    reconnectAttemptsRef.current = 0
     if (channelRef.current) {
       channelRef.current.unsubscribe()
       channelRef.current = null
@@ -71,14 +105,20 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
       cableRef.current = null
     }
     setIsConnected(false)
-  }, [])
+    setConnectionStatus('disconnected')
+  }, [clearReconnectTimeout])
+
+  useEffect(() => {
+    connectRef.current = connect
+  }, [connect])
 
   // Connect when roomId changes or when enabled
   useEffect(() => {
+    reconnectAttemptsRef.current = 0
     if (enabled && roomId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: establish WebSocket on mount
       connect()
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       disconnect()
     }
 
@@ -87,8 +127,14 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
     }
   }, [roomId, enabled, connect, disconnect])
 
+  const reconnect = useCallback(() => {
+    reconnectAttemptsRef.current = 0
+    connect()
+  }, [connect])
+
   return {
     isConnected,
-    reconnect: connect
+    connectionStatus,
+    reconnect
   }
 }
