@@ -144,7 +144,7 @@
   </fieldset>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 document.addEventListener('DOMContentLoaded', function() {
   const elementSelect = document.getElementById('overlay_scene_element_overlay_element_id');
   const contentSection = document.getElementById('content-options-section');

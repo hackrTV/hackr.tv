@@ -223,7 +223,7 @@
 </div>
 
 <% if @pulses.any? %>
-  <script>
+  <script nonce="<%= content_security_policy_nonce %>">
     document.addEventListener('DOMContentLoaded', function() {
       const selectAllCheckbox = document.getElementById('select-all');
       const pulseCheckboxes = document.querySelectorAll('.pulse-checkbox');

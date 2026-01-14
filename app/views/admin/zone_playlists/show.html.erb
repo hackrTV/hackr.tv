@@ -158,7 +158,7 @@
 </div>
 
 <% if @tracks.any? %>
-  <script>
+  <script nonce="<%= content_security_policy_nonce %>">
     // Drag and drop reordering for zone playlist tracks
     document.addEventListener('DOMContentLoaded', function() {
       const tbody = document.getElementById('sortable-tracks');
@@ -282,7 +282,7 @@
 <% end %>
 
 <% if @available_tracks.any? %>
-  <script>
+  <script nonce="<%= content_security_policy_nonce %>">
     document.addEventListener('DOMContentLoaded', function() {
       const searchInput = document.getElementById('track-search');
       const trackRows = document.querySelectorAll('.track-row');
