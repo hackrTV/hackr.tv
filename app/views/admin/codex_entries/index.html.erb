@@ -119,7 +119,7 @@
 </div>
 
 <% if @codex_entries.any? %>
-  <script>
+  <script nonce="<%= content_security_policy_nonce %>">
     document.addEventListener('DOMContentLoaded', function() {
       const searchInput = document.getElementById('entry-search');
       const entryRows = document.querySelectorAll('.entry-row');

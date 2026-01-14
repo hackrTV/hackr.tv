@@ -9,7 +9,7 @@
     <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       // Rails UJS confirmation handler
       document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('submit', function(event) {
