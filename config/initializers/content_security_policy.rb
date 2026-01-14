@@ -4,28 +4,34 @@
 # See the Securing Rails Applications Guide for more information:
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
 
-Rails.application.configure do
-  config.content_security_policy do |policy|
-    policy.default_src :self
-    policy.font_src :self, :https, :data
-    policy.img_src :self, :https, :data
-    policy.media_src :self, :https, :http, :data
-    policy.object_src :none
-    policy.script_src :self, :https
-    policy.style_src :self, :https
-    policy.connect_src :self, :https, :wss
-    policy.frame_src :self, "https://www.youtube.com", "https://www.youtube-nocookie.com"
+# CSP is only enabled in development/test for now.
+# Production requires adding nonces to inline scripts before enabling.
+# TODO: Add nonce: true to inline scripts in views, then enable CSP in production
+if Rails.env.development? || Rails.env.test?
+  Rails.application.configure do
+    config.content_security_policy do |policy|
+      policy.default_src :self
+      policy.font_src :self, :https, :data
+      policy.img_src :self, :https, :data
+      policy.media_src :self, :https, :http, :data
+      policy.object_src :none
+      policy.script_src :self, :https, :unsafe_inline, :unsafe_eval
+      policy.style_src :self, :https, :unsafe_inline
+      policy.connect_src :self, :https, :wss
+      policy.frame_src :self, "https://www.youtube.com", "https://www.youtube-nocookie.com"
 
-    if Rails.env.development?
-      vite_host = ViteRuby.config.host_with_port
-      policy.script_src(*policy.script_src, :unsafe_eval, "http://#{vite_host}")
-      policy.style_src(*policy.style_src, :unsafe_inline)
-      policy.connect_src(*policy.connect_src, "ws://#{vite_host}", "http://#{vite_host}")
+      if Rails.env.development?
+        vite_host = ViteRuby.config.host_with_port
+        policy.script_src(*policy.script_src, "http://#{vite_host}")
+        policy.connect_src(*policy.connect_src, "ws://#{vite_host}", "http://#{vite_host}")
+      end
+
+      policy.script_src(*policy.script_src, :blob) if Rails.env.test?
     end
 
-    policy.script_src(*policy.script_src, :blob) if Rails.env.test?
+    config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
+    # Note: Don't include style-src in nonce_directives - it breaks inline styles
+    # even with :unsafe_inline set, because nonce presence overrides unsafe-inline
+    config.content_security_policy_nonce_directives = %w[script-src]
   end
-
-  config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-  config.content_security_policy_nonce_directives = %w[script-src style-src]
 end
