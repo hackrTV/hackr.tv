@@ -1,0 +1,16 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">EDIT SCENE GROUP</legend>
+
+    <div style="padding: 20px;">
+      <%= form_with model: @scene_group, url: admin_overlay_scene_group_path(@scene_group), local: true do |f| %>
+        <%= render 'form', f: f %>
+
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+          <%= f.submit "Update Scene Group", class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+          <%= link_to "Cancel", admin_overlay_scene_group_path(@scene_group), class: "tui-button", style: "background: #444; color: #aaa; padding: 10px 20px;" %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

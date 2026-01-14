@@ -1,6 +1,7 @@
 class Admin::OverlaysController < Admin::ApplicationController
   # GET /root/overlays
   def index
+    @scene_groups = OverlaySceneGroup.ordered.includes(overlay_scene_group_scenes: :overlay_scene)
     @scenes = OverlayScene.ordered
     @elements = OverlayElement.order(:element_type, :name)
     @lower_thirds = OverlayLowerThird.order(:name)
