@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import { apiJson } from '~/utils/apiClient'
 
 interface Album {
   id: number
@@ -68,8 +69,7 @@ const TrackListPage: React.FC = () => {
   useEffect(() => {
     if (!artistSlug) return
 
-    fetch(`/api/artists/${artistSlug}`)
-      .then(res => res.json())
+    apiJson<Artist>(`/api/artists/${artistSlug}`)
       .then(data => {
         setArtist(data)
         setLoading(false)

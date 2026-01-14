@@ -10,6 +10,7 @@ import type { Playlist } from '~/types/playlist'
 import type { TrackData } from '~/types/track'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
+import { apiJson } from '~/utils/apiClient'
 import {
   DndContext,
   closestCenter,
@@ -110,21 +111,7 @@ export const PlaylistDetailPage: React.FC = () => {
     setError(null)
 
     try {
-      const response = await fetch(`/api/playlists/${id}`, {
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Playlist not found')
-        }
-        if (response.status === 403) {
-          throw new Error('You do not have permission to view this playlist')
-        }
-        throw new Error('Failed to load playlist')
-      }
-
-      const data = await response.json()
+      const data = await apiJson<Playlist>(`/api/playlists/${id}`)
       setPlaylist(data)
       setEditName(data.name)
       setEditDescription(data.description || '')
@@ -241,18 +228,10 @@ export const PlaylistDetailPage: React.FC = () => {
       const trackIds = newTracks.map((track) => track.track_id)
 
       try {
-        const response = await fetch(`/api/playlists/${playlist.id}/reorder`, {
+        await apiJson(`/api/playlists/${playlist.id}/reorder`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
           body: JSON.stringify({ track_ids: trackIds })
         })
-
-        if (!response.ok) {
-          throw new Error('Failed to reorder tracks')
-        }
 
         // Refresh to get updated positions from server
         fetchPlaylist()

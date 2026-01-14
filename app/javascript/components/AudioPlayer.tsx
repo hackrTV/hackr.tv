@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { PlayerBar } from './PlayerBar.tsx'
 import type { TrackData, AudioPlayerAPI, StationContext } from '~/types/track.ts'
+import { apiFetch } from '~/utils/apiClient'
 
 interface AudioPlayerProps {
   onReady?: (api: AudioPlayerAPI) => void
@@ -24,12 +25,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
 
   // Update overlay paused state only (without changing track)
   const updateOverlayPaused = useCallback((paused: boolean) => {
-    fetch('/api/overlay/now-playing', {
+    apiFetch('/api/overlay/now-playing', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-      },
       body: JSON.stringify({ paused })
     }).catch(err => console.warn('Failed to update overlay paused state:', err))
   }, [])
@@ -89,12 +86,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   // Update overlay Now Playing via API
   const updateNowPlaying = useCallback((trackId: string | null, paused: boolean = false) => {
     const body = trackId ? { track_id: trackId, paused } : { clear: true }
-    fetch('/api/overlay/now-playing', {
+    apiFetch('/api/overlay/now-playing', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-      },
       body: JSON.stringify(body)
     }).catch(err => console.warn('Failed to update overlay now playing:', err))
   }, [])

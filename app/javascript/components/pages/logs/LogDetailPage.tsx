@@ -9,6 +9,7 @@ import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
 import { formatFutureDate } from '~/utils/dateUtils'
+import { apiJson } from '~/utils/apiClient'
 
 interface HackrLog {
   id: number
@@ -34,13 +35,7 @@ export const LogDetailPage: React.FC = () => {
   useEffect(() => {
     if (!slug) return
 
-    fetch(`/api/logs/${slug}`)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Log not found')
-        }
-        return res.json()
-      })
+    apiJson<HackrLog>(`/api/logs/${slug}`)
       .then(data => {
         setLog(data)
         setLoading(false)

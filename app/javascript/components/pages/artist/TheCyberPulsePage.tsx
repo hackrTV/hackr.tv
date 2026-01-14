@@ -4,6 +4,7 @@ import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
 import { CodexText } from '~/components/shared/CodexText'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
+import { apiJson } from '~/utils/apiClient'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
@@ -37,12 +38,9 @@ const TheCyberPulsePage: React.FC = () => {
   useEffect(() => {
     const fetchLatestVod = async () => {
       try {
-        const response = await fetch('/api/artists/thecyberpulse/vods')
-        if (response.ok) {
-          const json = await response.json()
-          if (json.vods && json.vods.length > 0) {
-            setLatestVod(json.vods[0])
-          }
+        const json = await apiJson<{ vods: Vod[] }>('/api/artists/thecyberpulse/vods')
+        if (json.vods && json.vods.length > 0) {
+          setLatestVod(json.vods[0])
         }
       } catch {
         // Silently fail - section just won't show

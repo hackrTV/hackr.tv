@@ -58,13 +58,13 @@ let capturedOnEvent: ((event: unknown) => void) | null = null
 vi.mock('~/hooks/useActionCable', () => ({
   useActionCable: ({ onEvent }: { onEvent: (event: unknown) => void }) => {
     capturedOnEvent = onEvent
-    return { isConnected: true, reconnect: vi.fn() }
+    return { isConnected: true, connectionStatus: 'connected', reconnect: vi.fn() }
   }
 }))
 
 // Mock fetch for API calls
 const mockFetch = vi.fn()
-global.fetch = mockFetch
+globalThis.fetch = mockFetch
 
 describe('GridGamePage', () => {
   beforeEach(() => {
@@ -79,7 +79,8 @@ describe('GridGamePage', () => {
         output: 'You are in Test Room.',
         room_id: 1,
         current_room: { id: 1, name: 'Test Room' }
-      })
+      }),
+      text: () => Promise.resolve('')
     })
   })
 

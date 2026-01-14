@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { TrackTable } from '~/components/audio/TrackTable'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import { apiJson } from '~/utils/apiClient'
 
 interface Track {
   id: number
@@ -22,17 +23,13 @@ export const PulseVaultPage: React.FC = () => {
   const initialFilter = searchParams.get('filter') || ''
 
   useEffect(() => {
-    fetch('/api/tracks')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to load tracks')
-        return res.json()
-      })
+    apiJson<Track[]>('/api/tracks')
       .then(data => {
         setTracks(data)
         setLoading(false)
       })
       .catch(err => {
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Unknown error')
         setLoading(false)
       })
   }, [])

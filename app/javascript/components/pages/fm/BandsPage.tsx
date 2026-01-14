@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
+import { apiJson } from '~/utils/apiClient'
 
 interface Artist {
   id: number
@@ -19,11 +20,7 @@ export const BandsPage: React.FC = () => {
   const { isMobile } = useMobileDetect()
 
   useEffect(() => {
-    fetch('/api/artists')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to load artists')
-        return res.json()
-      })
+    apiJson<Artist[]>('/api/artists')
       .then(data => {
         const sorted = [...data].sort((a: Artist, b: Artist) =>
           a.name.toLowerCase().localeCompare(b.name.toLowerCase())
@@ -32,7 +29,7 @@ export const BandsPage: React.FC = () => {
         setLoading(false)
       })
       .catch(err => {
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Unknown error')
         setLoading(false)
       })
   }, [])

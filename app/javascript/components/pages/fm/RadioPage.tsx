@@ -3,6 +3,7 @@ import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { TrackData } from '~/types/track'
 import { CodexText } from '~/components/shared/CodexText'
+import { apiJson } from '~/utils/apiClient'
 
 interface Playlist {
   id: number
@@ -34,6 +35,12 @@ interface RadioStation {
   playlists: Playlist[]
 }
 
+interface StationPlaylist {
+  id: number
+  name: string
+  tracks?: PlaylistTrack[]
+}
+
 export const RadioPage: React.FC = () => {
   const [stations, setStations] = useState<RadioStation[]>([])
   const [loading, setLoading] = useState(true)
@@ -46,17 +53,13 @@ export const RadioPage: React.FC = () => {
   const [audioPlayerIsPlaying, setAudioPlayerIsPlaying] = useState(false)
 
   useEffect(() => {
-    fetch('/api/radio_stations')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to load stations')
-        return res.json()
-      })
+    apiJson<RadioStation[]>('/api/radio_stations')
       .then(data => {
         setStations(data)
         setLoading(false)
       })
       .catch(err => {
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Failed to load stations')
         setLoading(false)
       })
   }, [])
@@ -97,13 +100,7 @@ export const RadioPage: React.FC = () => {
 
     try {
       // Fetch all playlists for this radio station (public endpoint)
-      const response = await fetch(`/api/radio_stations/${station.id}/playlists`)
-
-      if (!response.ok) {
-        throw new Error('Failed to load station playlists')
-      }
-
-      const playlists = await response.json()
+      const playlists = await apiJson<StationPlaylist[]>(`/api/radio_stations/${station.id}/playlists`)
 
       if (!playlists || playlists.length === 0) {
         alert('No playlists found for this station.')
@@ -136,6 +133,7 @@ export const RadioPage: React.FC = () => {
       }
 
       // Pick a random track to simulate tuning into a live radio station
+      // eslint-disable-next-line react-hooks/purity -- this runs in an event handler, not during render
       const randomIndex = Math.floor(Math.random() * allTracks.length)
       const randomTrack = allTracks[randomIndex]
 

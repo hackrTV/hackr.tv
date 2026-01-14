@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAudio } from '~/contexts/AudioContext'
 import type { TrackData } from '~/types/track'
+import { apiJson } from '~/utils/apiClient'
 
 interface EmbeddedTrackProps {
   trackId: string
@@ -16,21 +17,18 @@ export const EmbeddedTrack: React.FC<EmbeddedTrackProps> = ({ trackId }) => {
 
   // Fetch track data
   useEffect(() => {
+    interface ApiTrack {
+      id: number
+      title: string
+      audio_url: string | null
+      artist: { name: string }
+      album?: { cover_url: string | null }
+    }
+
     const fetchTrack = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/tracks/${trackId}`)
-
-        console.log('Fetch response status:', response.status)
-
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error('API error:', errorText)
-          throw new Error(`Failed to fetch track (${response.status}): ${errorText}`)
-        }
-
-        const data = await response.json()
-        console.log('Track data:', data)
+        const data = await apiJson<ApiTrack>(`/api/tracks/${trackId}`)
 
         // Transform API response to TrackData format
         const track: TrackData = {

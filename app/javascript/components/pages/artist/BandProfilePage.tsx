@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import BandProfileLayout from '~/components/layouts/BandProfileLayout'
 import { bandProfiles } from './bandProfileConfig'
+import { apiJson } from '~/utils/apiClient'
 
 interface Track {
   id: number
@@ -29,8 +30,7 @@ const BandProfilePage: React.FC = () => {
   useEffect(() => {
     if (!config) return
 
-    fetch(`/api/artists/${slug}`)
-      .then(res => res.json())
+    apiJson<Artist>(`/api/artists/${slug}`)
       .then(data => {
         setArtist(data)
         setLoading(false)

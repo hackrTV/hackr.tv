@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
+import { apiJson } from '~/utils/apiClient'
 
 interface Track {
   id: number
@@ -19,8 +20,7 @@ const WavelengthZeroPage: React.FC = () => {
   const [artist, setArtist] = useState<Artist | null>(null)
 
   useEffect(() => {
-    fetch('/api/artists/wavelength_zero')
-      .then(res => res.json())
+    apiJson<Artist>('/api/artists/wavelength_zero')
       .then(data => {
         setArtist(data)
       })

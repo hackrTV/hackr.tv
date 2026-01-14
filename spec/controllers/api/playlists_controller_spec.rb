@@ -257,6 +257,65 @@ RSpec.describe Api::PlaylistsController, type: :controller do
         expect(pt1.position).to eq(2)
         expect(pt2.position).to eq(3)
       end
+
+      it "rejects non-array track_ids" do
+        playlist = create(:playlist, grid_hackr: hackr)
+
+        post :reorder, params: {id: playlist.id, track_ids: "not-an-array"}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_content)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to eq("track_ids must be an array")
+      end
+
+      it "rejects duplicate track_ids" do
+        playlist = create(:playlist, grid_hackr: hackr)
+        track = create(:track, artist: artist)
+        create(:playlist_track, playlist: playlist, track: track)
+
+        post :reorder, params: {
+          id: playlist.id,
+          track_ids: [track.id, track.id]
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_content)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to eq("track_ids must be unique")
+      end
+
+      it "rejects track_ids not in the playlist" do
+        playlist = create(:playlist, grid_hackr: hackr)
+        track_in_playlist = create(:track, artist: artist)
+        track_not_in_playlist = create(:track, artist: artist)
+        create(:playlist_track, playlist: playlist, track: track_in_playlist)
+
+        post :reorder, params: {
+          id: playlist.id,
+          track_ids: [track_in_playlist.id, track_not_in_playlist.id]
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_content)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to eq("track_ids contain tracks not in this playlist")
+      end
+
+      it "updates positions atomically within a transaction" do
+        playlist = create(:playlist, grid_hackr: hackr)
+        track1 = create(:track, artist: artist)
+        track2 = create(:track, artist: artist)
+        pt1 = create(:playlist_track, playlist: playlist, track: track1, position: 1)
+        pt2 = create(:playlist_track, playlist: playlist, track: track2, position: 2)
+
+        # Valid reorder should succeed
+        post :reorder, params: {
+          id: playlist.id,
+          track_ids: [track2.id, track1.id]
+        }, format: :json
+
+        expect(response).to have_http_status(:success)
+        expect(pt1.reload.position).to eq(2)
+        expect(pt2.reload.position).to eq(1)
+      end
     end
 
     context "when trying to reorder another user's playlist" do

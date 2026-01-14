@@ -2,7 +2,6 @@ module Api
   class EchoesController < ApplicationController
     include GridAuthentication
 
-    skip_before_action :verify_authenticity_token
     before_action :require_login_api
     before_action :set_pulse
 
@@ -66,7 +65,7 @@ module Api
       render json: {
         pulse_id: @pulse.id,
         echo_count: @pulse.echo_count,
-        echoes: echoes.map { |echo|
+        echoes: echoes.map do |echo|
           {
             id: echo.id,
             echoed_at: echo.echoed_at,
@@ -76,7 +75,7 @@ module Api
               role: echo.grid_hackr.role
             }
           }
-        }
+        end
       }
     end
 

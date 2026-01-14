@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { formatFutureDate } from '~/utils/dateUtils'
+import { apiJson } from '~/utils/apiClient'
 
 interface Vod {
   id: number
@@ -60,11 +61,7 @@ const VodzPage: React.FC = () => {
     const fetchVods = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/artists/${artistSlug}/vods`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch VODs')
-        }
-        const json = await response.json()
+        const json = await apiJson<VodsResponse>(`/api/artists/${artistSlug}/vods`)
         setData(json)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error')

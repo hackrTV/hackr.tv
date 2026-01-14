@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { TerminalAnimation } from '~/components/terminal/TerminalAnimation'
 import { LiveStreamEmbed } from '~/components/LiveStreamEmbed'
+import { apiJson } from '~/utils/apiClient'
 
 interface StreamData {
   is_live: boolean
@@ -22,8 +23,7 @@ export const HomePage: React.FC = () => {
 
   const fetchStreamStatus = async () => {
     try {
-      const response = await fetch('/api/hackr_stream')
-      const data = await response.json()
+      const data = await apiJson<StreamData>('/api/hackr_stream')
       setStreamData(data)
     } catch (error) {
       console.error('Failed to fetch stream status:', error)

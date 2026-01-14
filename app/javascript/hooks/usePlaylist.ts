@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { Playlist, PlaylistSummary } from '~/types/playlist'
+import { apiJson, ApiError } from '~/utils/apiClient'
 
 interface UsePlaylistReturn {
   playlists: PlaylistSummary[]
@@ -14,6 +15,16 @@ interface UsePlaylistReturn {
   reorderTracks: (playlistId: number, trackIds: number[]) => Promise<{ success: boolean; error?: string }>
 }
 
+interface PlaylistResponse {
+  playlist?: Playlist
+  error?: string
+}
+
+interface StatusResponse {
+  success: boolean
+  error?: string
+}
+
 export const usePlaylist = (): UsePlaylistReturn => {
   const [playlists, setPlaylists] = useState<PlaylistSummary[]>([])
   const [loading, setLoading] = useState(false)
@@ -24,21 +35,15 @@ export const usePlaylist = (): UsePlaylistReturn => {
     setError(null)
 
     try {
-      const response = await fetch('/api/playlists', {
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Please log in to view your playlists')
-        }
-        throw new Error('Failed to fetch playlists')
-      }
-
-      const data = await response.json()
+      const data = await apiJson<PlaylistSummary[]>('/api/playlists')
       setPlaylists(data)
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
+      let errorMessage = 'Failed to fetch playlists'
+      if (err instanceof ApiError && err.status === 401) {
+        errorMessage = 'Please log in to view your playlists'
+      } else if (err instanceof Error) {
+        errorMessage = err.message
+      }
       setError(errorMessage)
       console.error('Failed to fetch playlists:', err)
     } finally {
@@ -51,12 +56,8 @@ export const usePlaylist = (): UsePlaylistReturn => {
     setError(null)
 
     try {
-      const response = await fetch('/api/playlists', {
+      const data = await apiJson<PlaylistResponse>('/api/playlists', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({
           playlist: {
             name,
@@ -65,13 +66,6 @@ export const usePlaylist = (): UsePlaylistReturn => {
         })
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Failed to create playlist' }
-      }
-
-      // Refresh playlists list
       await fetchPlaylists()
 
       return { success: true, playlist: data.playlist }
@@ -89,12 +83,8 @@ export const usePlaylist = (): UsePlaylistReturn => {
     setError(null)
 
     try {
-      const response = await fetch(`/api/playlists/${id}`, {
+      const data = await apiJson<PlaylistResponse>(`/api/playlists/${id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({
           playlist: {
             name,
@@ -104,13 +94,6 @@ export const usePlaylist = (): UsePlaylistReturn => {
         })
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Failed to update playlist' }
-      }
-
-      // Refresh playlists list
       await fetchPlaylists()
 
       return { success: true, playlist: data.playlist }
@@ -128,18 +111,10 @@ export const usePlaylist = (): UsePlaylistReturn => {
     setError(null)
 
     try {
-      const response = await fetch(`/api/playlists/${id}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      await apiJson<StatusResponse>(`/api/playlists/${id}`, {
+        method: 'DELETE'
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Failed to delete playlist' }
-      }
-
-      // Refresh playlists list
       await fetchPlaylists()
 
       return { success: true }
@@ -154,20 +129,10 @@ export const usePlaylist = (): UsePlaylistReturn => {
 
   const addTrackToPlaylist = useCallback(async (playlistId: number, trackId: number) => {
     try {
-      const response = await fetch(`/api/playlists/${playlistId}/tracks`, {
+      await apiJson<StatusResponse>(`/api/playlists/${playlistId}/tracks`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({ track_id: trackId })
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Failed to add track to playlist' }
-      }
 
       return { success: true }
     } catch (err) {
@@ -179,16 +144,9 @@ export const usePlaylist = (): UsePlaylistReturn => {
 
   const removeTrackFromPlaylist = useCallback(async (playlistId: number, playlistTrackId: number) => {
     try {
-      const response = await fetch(`/api/playlists/${playlistId}/tracks/${playlistTrackId}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      await apiJson<StatusResponse>(`/api/playlists/${playlistId}/tracks/${playlistTrackId}`, {
+        method: 'DELETE'
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Failed to remove track from playlist' }
-      }
 
       return { success: true }
     } catch (err) {
@@ -200,20 +158,10 @@ export const usePlaylist = (): UsePlaylistReturn => {
 
   const reorderTracks = useCallback(async (playlistId: number, trackIds: number[]) => {
     try {
-      const response = await fetch(`/api/playlists/${playlistId}/reorder`, {
+      await apiJson<StatusResponse>(`/api/playlists/${playlistId}/reorder`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({ track_ids: trackIds })
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { success: false, error: data.error || 'Failed to reorder tracks' }
-      }
 
       return { success: true }
     } catch (err) {

@@ -10,6 +10,7 @@ import type { CodexEntry } from '~/types/codex'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
 import { formatFutureDate } from '~/utils/dateUtils'
+import { apiJson } from '~/utils/apiClient'
 
 const ENTRY_TYPE_COLORS: Record<string, string> = {
   person: '#a78bfa',
@@ -43,13 +44,7 @@ export const CodexEntryPage: React.FC = () => {
 
     let isMounted = true
 
-    fetch(`/api/codex/${slug}`)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Entry not found')
-        }
-        return res.json()
-      })
+    apiJson<CodexEntry>(`/api/codex/${slug}`)
       .then(data => {
         if (isMounted) {
           setEntry(data)

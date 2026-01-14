@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import type { Pulse } from '../../types/pulse'
+import { apiJson } from '~/utils/apiClient'
 
 interface PulseComposerProps {
   onPulseCreated?: (pulse: Pulse) => void
@@ -40,12 +41,8 @@ export const PulseComposer: React.FC<PulseComposerProps> = ({
     setError(null)
 
     try {
-      const response = await fetch('/api/pulses', {
+      const data = await apiJson<{ pulse: Pulse }>('/api/pulses', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
         body: JSON.stringify({
           pulse: {
             content: content.trim(),
@@ -53,12 +50,6 @@ export const PulseComposer: React.FC<PulseComposerProps> = ({
           }
         })
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to broadcast pulse')
-      }
 
       // Success - clear form and notify parent
       setContent('')

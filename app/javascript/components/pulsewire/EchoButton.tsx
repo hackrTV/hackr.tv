@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { Pulse } from '../../types/pulse'
+import { apiJson } from '~/utils/apiClient'
 
 interface EchoButtonProps {
   pulse: Pulse
@@ -21,19 +22,9 @@ export const EchoButton: React.FC<EchoButtonProps> = ({ pulse, onEchoToggle }) =
     setIsLoading(true)
 
     try {
-      const response = await fetch(`/api/pulses/${pulse.id}/echo`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+      const data = await apiJson<{ echo_count: number; echoed: boolean }>(`/api/pulses/${pulse.id}/echo`, {
+        method: 'POST'
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to echo pulse')
-      }
 
       // Update local state
       const newEchoCount = data.echo_count

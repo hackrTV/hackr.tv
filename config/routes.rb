@@ -6,18 +6,22 @@ Rails.application.routes.draw do
   root "pages#spa_root"
 
   # The.CyberPul.se routes (nested under /thecyberpulse) - SPA
-  get "thecyberpulse", to: "pages#spa_root", as: :thecyberpulse
-  get "thecyberpulse/trackz", to: "pages#spa_root", as: :thecyberpulse_tracks
-  get "thecyberpulse/trackz/:id", to: "pages#spa_root", as: :thecyberpulse_track
-  get "thecyberpulse/vidz", to: "pages#spa_root", as: :thecyberpulse_vidz
-  get "thecyberpulse/vidz/:id", to: "pages#spa_root", as: :thecyberpulse_vod
+  scope "thecyberpulse" do
+    get "/", to: "pages#spa_root", as: :thecyberpulse
+    get "trackz", to: "pages#spa_root", as: :thecyberpulse_tracks
+    get "trackz/:id", to: "pages#spa_root", as: :thecyberpulse_track
+    get "vidz", to: "pages#spa_root", as: :thecyberpulse_vidz
+    get "vidz/:id", to: "pages#spa_root", as: :thecyberpulse_vod
+  end
 
   # XERAEN routes - SPA
-  get "xeraen", to: "pages#spa_root"
-  get "xeraen/trackz", to: "pages#spa_root", as: :xeraen_tracks
-  get "xeraen/trackz/:id", to: "pages#spa_root", as: :xeraen_track
-  get "xeraen/vidz", to: "pages#spa_root", as: :xeraen_vidz
-  get "xeraen/vidz/:id", to: "pages#spa_root", as: :xeraen_vod
+  scope "xeraen" do
+    get "/", to: "pages#spa_root", as: :xeraen
+    get "trackz", to: "pages#spa_root", as: :xeraen_tracks
+    get "trackz/:id", to: "pages#spa_root", as: :xeraen_track
+    get "vidz", to: "pages#spa_root", as: :xeraen_vidz
+    get "vidz/:id", to: "pages#spa_root", as: :xeraen_vod
+  end
 
   # Band profile routes - SPA
   get "system_rot", to: "pages#spa_root", as: :system_rot
@@ -41,33 +45,43 @@ Rails.application.routes.draw do
   get "trackz/:id", to: "tracks#legacy_redirect_show", as: :legacy_track
 
   # THE PULSE GRID routes (SPA)
-  get "grid", to: "pages#spa_root", as: :grid
-  get "grid/login", to: "pages#spa_root", as: :grid_login
-  get "grid/register", to: "pages#spa_root", as: :grid_register
+  scope "grid" do
+    get "/", to: "pages#spa_root", as: :grid
+    get "login", to: "pages#spa_root", as: :grid_login
+    get "register", to: "pages#spa_root", as: :grid_register
+  end
 
   # hackr.fm routes - SPA
-  get "fm", to: "pages#spa_root", as: :fm
-  get "fm/radio", to: "pages#spa_root", as: :fm_radio
-  get "fm/pulse_vault", to: "pages#spa_root", as: :fm_pulse_vault
-  get "fm/bands", to: "pages#spa_root", as: :fm_bands
-  get "fm/playlists", to: "pages#spa_root", as: :fm_playlists
-  get "fm/playlists/:id", to: "pages#spa_root", as: :fm_playlist
+  scope "fm" do
+    get "/", to: "pages#spa_root", as: :fm
+    get "radio", to: "pages#spa_root", as: :fm_radio
+    get "pulse_vault", to: "pages#spa_root", as: :fm_pulse_vault
+    get "bands", to: "pages#spa_root", as: :fm_bands
+    get "playlists", to: "pages#spa_root", as: :fm_playlists
+    get "playlists/:id", to: "pages#spa_root", as: :fm_playlist
+  end
 
   # Shared playlist - public (SPA)
   get "shared/:token", to: "pages#spa_root", as: :shared_playlist
 
   # HackrLogs (blog) routes - SPA
-  get "logs", to: "pages#spa_root", as: :hackr_logs
-  get "logs/:id", to: "pages#spa_root", as: :hackr_log
+  scope "logs" do
+    get "/", to: "pages#spa_root", as: :hackr_logs
+    get ":id", to: "pages#spa_root", as: :hackr_log
+  end
 
   # Codex (wiki) routes - SPA
-  get "codex", to: "pages#spa_root", as: :codex
-  get "codex/:slug", to: "pages#spa_root", as: :codex_entry
+  scope "codex" do
+    get "/", to: "pages#spa_root", as: :codex
+    get ":slug", to: "pages#spa_root", as: :codex_entry
+  end
 
   # PulseWire routes - SPA
-  get "wire", to: "pages#spa_root", as: :wire
-  get "wire/:username", to: "pages#spa_root", as: :wire_user
-  get "wire/pulse/:id", to: "pages#spa_root", as: :wire_pulse
+  scope "wire" do
+    get "/", to: "pages#spa_root", as: :wire
+    get "pulse/:id", to: "pages#spa_root", as: :wire_pulse
+    get ":username", to: "pages#spa_root", as: :wire_user
+  end
 
   # Terminal SSH access credentials page
   get "terminal", to: "terminal#index", as: :terminal
@@ -76,11 +90,11 @@ Rails.application.routes.draw do
   namespace :api, defaults: {format: :json} do
     get "settings", to: "settings#index"
 
-    resources :artists, only: [:index, :show] do
+    resources :artists, only: %i[index show] do
       resources :tracks, only: [:index]
     end
-    resources :tracks, only: [:index, :show]
-    resources :albums, only: [:index, :show]
+    resources :tracks, only: %i[index show]
+    resources :albums, only: %i[index show]
     get "codex/mappings", to: "codex#mappings"
     get "codex", to: "codex#index"
     get "codex/:slug", to: "codex#show"
@@ -98,17 +112,17 @@ Rails.application.routes.draw do
     post "grid/command", to: "grid#command"
 
     # Hackr Logs API routes
-    resources :logs, only: [:index, :show]
+    resources :logs, only: %i[index show]
 
     # Playlists API routes
     resources :playlists do
       post "reorder", on: :member
-      resources :tracks, controller: "playlist_tracks", only: [:create, :destroy]
+      resources :tracks, controller: "playlist_tracks", only: %i[create destroy]
     end
     get "shared_playlists/:share_token", to: "shared_playlists#show"
 
     # PulseWire API routes
-    resources :pulses, only: [:index, :show, :create, :destroy] do
+    resources :pulses, only: %i[index show create destroy] do
       post "signal_drop", on: :member
       post "echo", to: "echoes#create"
       get "echoes", to: "echoes#index"
@@ -144,11 +158,11 @@ Rails.application.routes.draw do
         patch :reorder_tracks
       end
     end
-    resources :grid_zones, only: [:index, :edit, :update]
-    resources :grid_rooms, only: [:index, :edit, :update]
+    resources :grid_zones, only: %i[index edit update]
+    resources :grid_rooms, only: %i[index edit update]
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
-    resources :pulse_wire, only: [:index, :destroy] do
+    resources :pulse_wire, only: %i[index destroy] do
       collection do
         get "signal_drops"
         post "bulk_signal_drop"
@@ -172,7 +186,7 @@ Rails.application.routes.draw do
     patch "overlays/ticker/:ticker_slug", to: "overlays#update_ticker", as: :update_overlay_ticker
     post "overlays/alert", to: "overlays#send_alert", as: :send_overlay_alert
     resources :overlay_scenes, path: "overlays/scenes" do
-      resources :scene_elements, controller: "overlay_scene_elements", only: [:new, :create, :edit, :update, :destroy]
+      resources :scene_elements, controller: "overlay_scene_elements", only: %i[new create edit update destroy]
     end
     resources :overlay_elements, path: "overlays/elements"
     resources :overlay_lower_thirds, path: "overlays/lower-thirds"
@@ -192,13 +206,13 @@ Rails.application.routes.draw do
 
   # Development-only error page testing routes
   if Rails.env.development?
-    get "test/404", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }
-    get "test/500", to: proc { |env| [500, {}, [File.read(Rails.public_path.join("500.html"))]] }
+    get "test/404", to: proc { |_env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }
+    get "test/500", to: proc { |_env| [500, {}, [File.read(Rails.public_path.join("500.html"))]] }
   end
 
   # Catch-all route for 404s (must be last)
   # Exclude Active Storage paths from catch-all
-  match "*path", to: proc { |env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] },
+  match "*path", to: proc { |_env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] },
     via: :all,
-    constraints: lambda { |req| !req.path.start_with?("/rails/active_storage") }
+    constraints: ->(req) { !req.path.start_with?("/rails/active_storage") }
 end

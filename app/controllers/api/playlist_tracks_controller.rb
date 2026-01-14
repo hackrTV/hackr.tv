@@ -2,7 +2,6 @@ module Api
   class PlaylistTracksController < ApplicationController
     include GridAuthentication
 
-    skip_before_action :verify_authenticity_token
     before_action :require_login_api
     before_action :set_playlist
     before_action :authorize_playlist_owner
@@ -109,12 +108,12 @@ module Api
     end
 
     def authorize_playlist_owner
-      unless @playlist.grid_hackr_id == current_hackr.id
-        render json: {
-          success: false,
-          error: "You are not authorized to modify this playlist"
-        }, status: :forbidden
-      end
+      return if @playlist.grid_hackr_id == current_hackr.id
+
+      render json: {
+        success: false,
+        error: "You are not authorized to modify this playlist"
+      }, status: :forbidden
     end
   end
 end

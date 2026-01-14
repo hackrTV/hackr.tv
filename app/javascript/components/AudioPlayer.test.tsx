@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AudioPlayer } from './AudioPlayer'
 
@@ -54,6 +54,11 @@ describe('AudioPlayer', () => {
   }
 
   beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({})
+    } as Response))
+
     // Clear any previous window.audioPlayer
     delete window.audioPlayer
 
@@ -77,6 +82,7 @@ describe('AudioPlayer', () => {
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     delete window.audioPlayer
     document.body.innerHTML = ''
   })
@@ -113,7 +119,9 @@ describe('AudioPlayer', () => {
   it('loads track and shows player bar', async () => {
     render(<AudioPlayer />)
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       const playerBar = document.querySelector('#audio-player')
@@ -129,18 +137,20 @@ describe('AudioPlayer', () => {
 
     expect(window.audioPlayer?.getCurrentTrackId()).toBeNull()
 
-    window.audioPlayer?.loadTrack(mockTrack)
-
-    await waitFor(() => {
-      expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
     })
+
+    expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
   })
 
   it('handles play/pause toggle', async () => {
     const user = userEvent.setup()
     render(<AudioPlayer />)
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       const pauseButton = document.querySelector('#play-pause-btn')
@@ -159,18 +169,24 @@ describe('AudioPlayer', () => {
   it('handles spacebar keyboard shortcut when track is loaded', async () => {
     render(<AudioPlayer />)
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /pause/i })).toBeInTheDocument()
+      const pauseButton = document.querySelector('#play-pause-btn')
+      expect(pauseButton?.textContent).toContain('PAUSE')
     })
 
     // Simulate spacebar press
     const spaceEvent = new KeyboardEvent('keydown', { key: ' ', bubbles: true })
-    document.dispatchEvent(spaceEvent)
+    await act(async () => {
+      document.dispatchEvent(spaceEvent)
+    })
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /play/i })).toBeInTheDocument()
+      const playButton = document.querySelector('#play-pause-btn')
+      expect(playButton?.textContent).toContain('PLAY')
     })
   })
 
@@ -182,7 +198,9 @@ describe('AudioPlayer', () => {
       </>
     )
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       const pauseButton = document.querySelector('#play-pause-btn')
@@ -193,10 +211,12 @@ describe('AudioPlayer', () => {
     input.focus()
 
     // Dispatch event from the input element itself (not document)
-    input.dispatchEvent(new KeyboardEvent('keydown', {
-      key: ' ',
-      bubbles: true
-    }))
+    await act(async () => {
+      input.dispatchEvent(new KeyboardEvent('keydown', {
+        key: ' ',
+        bubbles: true
+      }))
+    })
 
     // Should still be playing (pause button visible) because spacebar in input should not toggle
     const pauseButton = document.querySelector('#play-pause-btn')
@@ -206,14 +226,18 @@ describe('AudioPlayer', () => {
   it('handles volume change', async () => {
     render(<AudioPlayer />)
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       expect(document.querySelector('#volume-control')).toBeInTheDocument()
     })
 
     const volumeControl = document.querySelector('#volume-control') as HTMLInputElement
-    fireEvent.change(volumeControl, { target: { value: '50' } })
+    await act(async () => {
+      fireEvent.change(volumeControl, { target: { value: '50' } })
+    })
 
     await waitFor(() => {
       const audio = document.querySelector('#audio-element') as HTMLAudioElement
@@ -224,7 +248,9 @@ describe('AudioPlayer', () => {
   it('handles seek operations', async () => {
     render(<AudioPlayer />)
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       const seekBar = document.querySelector('#seek-bar')
@@ -241,7 +267,9 @@ describe('AudioPlayer', () => {
     const initialTime = audio.currentTime
 
     // Simulate seeking to 50% using fireEvent
-    fireEvent.change(seekBar, { target: { value: '50' } })
+    await act(async () => {
+      fireEvent.change(seekBar, { target: { value: '50' } })
+    })
 
     // Wait for the seek to be processed
     await waitFor(() => {
@@ -255,7 +283,9 @@ describe('AudioPlayer', () => {
     const user = userEvent.setup()
     render(<AudioPlayer />)
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '✕' })).toBeInTheDocument()
@@ -279,7 +309,9 @@ describe('AudioPlayer', () => {
     const track1Title = document.querySelector('.track-title-clickable[data-track-id="track-1"]') as HTMLElement
     const track1Button = document.querySelector('.play-track-btn[data-track-id="track-1"]') as HTMLElement
 
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       expect(track1Row.style.background).toBe('rgba(124, 58, 237, 0.15)')
@@ -293,7 +325,9 @@ describe('AudioPlayer', () => {
 
     // Populate playlist from DOM before loading track
     window.audioPlayer?.refreshPlaylist()
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Test Track')).toBeInTheDocument()
@@ -302,7 +336,9 @@ describe('AudioPlayer', () => {
     // Simulate track ending
     const audio = document.querySelector('#audio-element') as HTMLAudioElement
     const endEvent = new Event('ended')
-    audio.dispatchEvent(endEvent)
+    await act(async () => {
+      audio.dispatchEvent(endEvent)
+    })
 
     await waitFor(() => {
       // Should auto-play Track 2
@@ -319,7 +355,9 @@ describe('AudioPlayer', () => {
 
     // Refresh playlist to respect the filter
     window.audioPlayer?.refreshPlaylist()
-    window.audioPlayer?.loadTrack(mockTrack)
+    await act(async () => {
+      window.audioPlayer?.loadTrack(mockTrack)
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Test Track')).toBeInTheDocument()
@@ -328,7 +366,9 @@ describe('AudioPlayer', () => {
     // Simulate track ending
     const audio = document.querySelector('#audio-element') as HTMLAudioElement
     const endEvent = new Event('ended')
-    audio.dispatchEvent(endEvent)
+    await act(async () => {
+      audio.dispatchEvent(endEvent)
+    })
 
     await waitFor(() => {
       // Should loop back to track-1 since track-2 is hidden
@@ -364,19 +404,14 @@ describe('AudioPlayer', () => {
       vi.useRealTimers() // Use real timers for this test
       render(<AudioPlayer />)
 
-      window.audioPlayer?.loadTrack(mockTrack)
-
-      await waitFor(() => {
-        expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
       })
 
-      // Wait for play state to be set
-      await waitFor(() => {
-        const pauseBtn = document.querySelector('#play-pause-btn')
-        expect(pauseBtn?.textContent).toContain('PAUSE')
-      })
+      expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
 
       const audio = document.querySelector('#audio-element') as HTMLAudioElement
+
       const loadSpy = vi.spyOn(audio, 'load')
       const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
 
@@ -389,7 +424,9 @@ describe('AudioPlayer', () => {
 
       // Simulate stalled event
       const stalledEvent = new Event('stalled')
-      audio.dispatchEvent(stalledEvent)
+      await act(async () => {
+        audio.dispatchEvent(stalledEvent)
+      })
 
       // Verify recovery attempt
       expect(loadSpy).toHaveBeenCalled()
@@ -402,15 +439,21 @@ describe('AudioPlayer', () => {
     it('handles network error by attempting recovery after delay', async () => {
       render(<AudioPlayer />)
 
-      window.audioPlayer?.loadTrack(mockTrack)
-
-      await vi.waitFor(() => {
-        expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
       })
+
+      expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
 
       const audio = document.querySelector('#audio-element') as HTMLAudioElement
       const loadSpy = vi.spyOn(audio, 'load')
       const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
+
+      await act(async () => {
+        audio.dispatchEvent(new Event('canplay'))
+      })
+
+      playSpy.mockClear()
 
       // Mock a network error
       Object.defineProperty(audio, 'error', {
@@ -420,10 +463,14 @@ describe('AudioPlayer', () => {
 
       // Simulate error event
       const errorEvent = new Event('error')
-      audio.dispatchEvent(errorEvent)
+      await act(async () => {
+        audio.dispatchEvent(errorEvent)
+      })
 
       // Recovery happens after 1000ms delay
-      vi.advanceTimersByTime(1000)
+      await act(async () => {
+        vi.advanceTimersByTime(1000)
+      })
 
       expect(loadSpy).toHaveBeenCalled()
       expect(playSpy).toHaveBeenCalled()
@@ -435,14 +482,21 @@ describe('AudioPlayer', () => {
     it('does not attempt recovery for non-network errors', async () => {
       render(<AudioPlayer />)
 
-      window.audioPlayer?.loadTrack(mockTrack)
-
-      await vi.waitFor(() => {
-        expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
       })
+
+      expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
 
       const audio = document.querySelector('#audio-element') as HTMLAudioElement
       const loadSpy = vi.spyOn(audio, 'load')
+      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
+
+      await act(async () => {
+        audio.dispatchEvent(new Event('canplay'))
+      })
+
+      playSpy.mockClear()
 
       // Mock a decode error (not a network error)
       Object.defineProperty(audio, 'error', {
@@ -452,27 +506,39 @@ describe('AudioPlayer', () => {
 
       // Simulate error event
       const errorEvent = new Event('error')
-      audio.dispatchEvent(errorEvent)
+      await act(async () => {
+        audio.dispatchEvent(errorEvent)
+      })
 
       // Advance time past recovery delay
-      vi.advanceTimersByTime(2000)
+      await act(async () => {
+        vi.advanceTimersByTime(2000)
+      })
 
       // Should not attempt to reload for decode errors
       expect(loadSpy).not.toHaveBeenCalled()
 
       loadSpy.mockRestore()
+      playSpy.mockRestore()
     })
 
     it('attempts to resume when unexpected pause is detected', async () => {
       render(<AudioPlayer />)
 
-      window.audioPlayer?.loadTrack(mockTrack)
-
-      await vi.waitFor(() => {
-        expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
       })
 
+      expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+
       const audio = document.querySelector('#audio-element') as HTMLAudioElement
+      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
+
+      await act(async () => {
+        audio.dispatchEvent(new Event('canplay'))
+      })
+
+      playSpy.mockClear()
 
       // Mock audio as paused but we think it should be playing
       Object.defineProperty(audio, 'paused', {
@@ -484,14 +550,16 @@ describe('AudioPlayer', () => {
         configurable: true
       })
 
-      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
-
       // Simulate pause event (browser intervention)
       const pauseEvent = new Event('pause')
-      audio.dispatchEvent(pauseEvent)
+      await act(async () => {
+        audio.dispatchEvent(pauseEvent)
+      })
 
       // Recovery check happens after 100ms
-      vi.advanceTimersByTime(100)
+      await act(async () => {
+        vi.advanceTimersByTime(100)
+      })
 
       expect(playSpy).toHaveBeenCalled()
 
@@ -501,13 +569,20 @@ describe('AudioPlayer', () => {
     it('does not attempt resume when audio has ended', async () => {
       render(<AudioPlayer />)
 
-      window.audioPlayer?.loadTrack(mockTrack)
-
-      await vi.waitFor(() => {
-        expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
       })
 
+      expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+
       const audio = document.querySelector('#audio-element') as HTMLAudioElement
+      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
+
+      await act(async () => {
+        audio.dispatchEvent(new Event('canplay'))
+      })
+
+      playSpy.mockClear()
 
       // Mock audio as ended
       Object.defineProperty(audio, 'ended', {
@@ -515,13 +590,15 @@ describe('AudioPlayer', () => {
         configurable: true
       })
 
-      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
-
       // Simulate pause event
       const pauseEvent = new Event('pause')
-      audio.dispatchEvent(pauseEvent)
+      await act(async () => {
+        audio.dispatchEvent(pauseEvent)
+      })
 
-      vi.advanceTimersByTime(100)
+      await act(async () => {
+        vi.advanceTimersByTime(100)
+      })
 
       // Should not resume since audio has ended naturally
       expect(playSpy).not.toHaveBeenCalled()
@@ -533,7 +610,9 @@ describe('AudioPlayer', () => {
       vi.useRealTimers()
       render(<AudioPlayer />)
 
-      window.audioPlayer?.loadTrack(mockTrack)
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
+      })
 
       await waitFor(() => {
         expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
@@ -559,7 +638,9 @@ describe('AudioPlayer', () => {
 
       render(<AudioPlayer />)
 
-      window.audioPlayer?.loadTrack(mockTrack)
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
+      })
 
       await waitFor(() => {
         expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
@@ -569,7 +650,9 @@ describe('AudioPlayer', () => {
 
       // Simulate waiting event
       const waitingEvent = new Event('waiting')
-      audio.dispatchEvent(waitingEvent)
+      await act(async () => {
+        audio.dispatchEvent(waitingEvent)
+      })
 
       expect(consoleSpy).toHaveBeenCalledWith('Audio waiting for data...')
 

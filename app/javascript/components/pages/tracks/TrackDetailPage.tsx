@@ -8,6 +8,7 @@ import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
+import { apiJson } from '~/utils/apiClient'
 
 interface Album {
   id: number
@@ -81,8 +82,7 @@ const TrackDetailPage: React.FC = () => {
   useEffect(() => {
     if (!trackSlug) return
 
-    fetch(`/api/tracks/${trackSlug}`)
-      .then(res => res.json())
+    apiJson<Track>(`/api/tracks/${trackSlug}`)
       .then(data => {
         setTrack(data)
         setLoading(false)

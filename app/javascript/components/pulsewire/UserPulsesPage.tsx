@@ -3,9 +3,14 @@ import { useParams, Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import type { Pulse } from '../../types/pulse'
 import { PulseCard } from './PulseCard'
+import { apiJson } from '~/utils/apiClient'
 
 interface ProfilePulse extends Pulse {
   is_echo_on_profile?: boolean
+}
+
+interface PulsesResponse {
+  pulses: Pulse[]
 }
 
 export const UserPulsesPage: React.FC = () => {
@@ -22,22 +27,9 @@ export const UserPulsesPage: React.FC = () => {
         setIsLoading(true)
 
         // Fetch both authored pulses and echoed pulses in parallel
-        const [authoredResponse, echoedResponse] = await Promise.all([
-          fetch(`/api/pulses?hackr=${username}&filter=active&per_page=100&include_splices=true`, {
-            credentials: 'include'
-          }),
-          fetch(`/api/pulses?echoed_by=${username}&filter=active&per_page=100&include_splices=true`, {
-            credentials: 'include'
-          })
-        ])
-
-        if (!authoredResponse.ok || !echoedResponse.ok) {
-          throw new Error('Failed to load pulses')
-        }
-
         const [authoredData, echoedData] = await Promise.all([
-          authoredResponse.json(),
-          echoedResponse.json()
+          apiJson<PulsesResponse>(`/api/pulses?hackr=${username}&filter=active&per_page=100&include_splices=true`),
+          apiJson<PulsesResponse>(`/api/pulses?echoed_by=${username}&filter=active&per_page=100&include_splices=true`)
         ])
 
         // Mark echoed pulses and merge

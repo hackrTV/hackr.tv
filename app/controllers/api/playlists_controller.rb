@@ -2,10 +2,9 @@ module Api
   class PlaylistsController < ApplicationController
     include GridAuthentication
 
-    skip_before_action :verify_authenticity_token
     before_action :require_login_api
-    before_action :set_playlist, only: [:show, :update, :destroy, :reorder]
-    before_action :authorize_playlist_owner, only: [:show, :update, :destroy, :reorder]
+    before_action :set_playlist, only: %i[show update destroy reorder]
+    before_action :authorize_playlist_owner, only: %i[show update destroy reorder]
 
     # GET /api/playlists
     def index
@@ -34,10 +33,10 @@ module Api
         share_token: @playlist.share_token,
         created_at: @playlist.created_at,
         track_count: @playlist.track_count,
-        tracks: @playlist.playlist_tracks.includes(track: [:artist, :album]).map { |playlist_track|
+        tracks: @playlist.playlist_tracks.includes(track: %i[artist album]).map do |playlist_track|
           track = playlist_track.track
           {
-            id: playlist_track.id,  # This is the playlist_track ID we need for deletion
+            id: playlist_track.id, # This is the playlist_track ID we need for deletion
             track_id: track.id,
             title: track.title,
             slug: track.slug,
@@ -59,7 +58,7 @@ module Api
                    end,
             audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil
           }
-        }
+        end
       }
     end
 
@@ -134,16 +133,42 @@ module Api
         return
       end
 
-      # Update positions based on the order in track_ids array
-      track_ids.each_with_index do |track_id, index|
-        playlist_track = @playlist.playlist_tracks.find_by(track_id: track_id)
-        playlist_track&.update(position: index + 1)
+      track_ids = track_ids.map(&:to_i)
+
+      if track_ids.uniq.length != track_ids.length
+        render json: {
+          success: false,
+          error: "track_ids must be unique"
+        }, status: :unprocessable_entity
+        return
+      end
+
+      playlist_track_ids = @playlist.playlist_tracks.where(track_id: track_ids).pluck(:track_id)
+      missing_ids = track_ids - playlist_track_ids
+      if missing_ids.any?
+        render json: {
+          success: false,
+          error: "track_ids contain tracks not in this playlist"
+        }, status: :unprocessable_entity
+        return
+      end
+
+      PlaylistTrack.transaction do
+        track_ids.each_with_index do |track_id, index|
+          playlist_track = @playlist.playlist_tracks.find_by!(track_id: track_id)
+          playlist_track.update!(position: index + 1)
+        end
       end
 
       render json: {
         success: true,
         message: "Playlist reordered successfully"
       }
+    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
+      render json: {
+        success: false,
+        error: e.message
+      }, status: :unprocessable_entity
     end
 
     private
@@ -158,12 +183,12 @@ module Api
     end
 
     def authorize_playlist_owner
-      unless @playlist.grid_hackr_id == current_hackr.id
-        render json: {
-          success: false,
-          error: "You are not authorized to access this playlist"
-        }, status: :forbidden
-      end
+      return if @playlist.grid_hackr_id == current_hackr.id
+
+      render json: {
+        success: false,
+        error: "You are not authorized to access this playlist"
+      }, status: :forbidden
     end
 
     def playlist_params
