@@ -5,7 +5,7 @@
 **hackr.tv** is a multi-domain music streaming and discovery platform featuring **THE PULSE GRID** - a playable multiplayer MUD (Multi-User Dungeon) set in 2125. Explore the resistance movement through music, lore, and interactive gameplay.
 
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
-[![Rails](https://img.shields.io/badge/Rails-8.1.1-red.svg)](https://rubyonrails.org/)
+[![Rails](https://img.shields.io/badge/Rails-8.1.2-red.svg)](https://rubyonrails.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
 [![Tests](https://img.shields.io/badge/Tests-1233%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
@@ -25,7 +25,7 @@
 - **Animated Terminal Homepage** - Retro terminal-style interface with typing animation and keyboard skip
 - **Menu System** - Dynamic navigation with artist profiles, services, and conditional admin access
 - **Multi-Artist Showcases** - Dedicated pages for The.CyberPul.se, XERAEN, and more
-- **Band Profile Pages** - 11 custom band pages with config-based architecture
+- **Band Profile Pages** - 13 custom band pages with config-based architecture
 - **ViewComponent Architecture** - Reusable BandProfileComponent with flexible color schemes
 - **Hackr Logs** - Blog platform with Markdown support (remark-gfm, rehype-sanitize)
 
@@ -82,7 +82,23 @@
 - **Now Playing Overlay** - Display currently playing track for livestreams
 - **PulseWire Overlay** - Show live social activity during streams
 - **Grid Activity Overlay** - Stream multiplayer game activity
-- **Scene Management** - Lower thirds and alert configuration
+- **Scene Management** - Compose multiple overlay elements with positioning
+- **Scene Groups** - Collections of scenes for easy switching during streams
+- **Lower Thirds** - Text overlays with custom slugs and styling
+- **Tickers** - Scrolling marquee text for announcements
+- **Alert System** - Alert notifications via Action Cable
+- **Real-time Updates** - All overlays update via WebSocket broadcasts
+
+### Hackr Streams
+- **Livestream Management** - Go live/end stream functionality for artists
+- **VOD Support** - Video on demand URL storage for past streams
+- **YouTube Integration** - Auto-conversion of YouTube URLs to embed format
+- **Stream Timing** - Track stream start/end times with validation
+
+### Zone Playlists
+- **Ambient Music** - Per-zone background playlists for THE PULSE GRID
+- **Admin Management** - CRUD interface for zone playlist configuration
+- **Track Ordering** - Manual position control within zone playlists
 
 ### Multi-Domain Architecture
 - Domain-specific routing and layouts (hackr.tv, xeraen.com, rockerboy.net, ashlinn.net, sectorx.media)
@@ -95,14 +111,17 @@
 ## Tech Stack
 
 - **Frontend:** React 19, TypeScript, React Router v7, Vite
-- **Backend:** Ruby 3.4.7, Rails 8.1.1, Puma
+- **Backend:** Ruby 3.4.7, Rails 8.1.2, Puma
 - **Database:** SQLite3 (development), Active Storage for file attachments
 - **Real-time:** Action Cable 8.1 with Solid Cable adapter
+- **Background Jobs:** Solid Queue for async processing
+- **Caching:** Solid Cache
 - **Testing:** RSpec (backend), Vitest (frontend), FactoryBot, Faker
 - **Code Quality:** StandardRB, ESLint
 - **Assets:** Propshaft, TuiCSS (terminal UI framework)
 - **Authentication:** bcrypt for password hashing (Grid Hackr accounts)
 - **Markdown:** react-markdown, remark-gfm, rehype-sanitize
+- **Content Safety:** Obscenity gem for profanity filtering
 
 ---
 
@@ -241,7 +260,9 @@ hackr.tv/
 │   ├── components/
 │   │   └── band_profile_component.rb  # Reusable band profile (ViewComponent)
 │   └── channels/
-│       └── grid_channel.rb            # Real-time multiplayer (Action Cable)
+│       ├── grid_channel.rb            # Real-time multiplayer (Action Cable)
+│       ├── pulse_wire_channel.rb      # PulseWire social feed updates
+│       └── overlay_channel.rb         # OBS overlay broadcasts
 ├── data/                              # YAML data for import
 │   ├── artists.yml                    # 14 artists
 │   ├── albums.yml                     # 15 albums
@@ -386,6 +407,23 @@ bin/rails import:yaml_tracks        # Tracks only
 - **pulses** - content (256 char max), parent_pulse_id, thread_root_id, echo_count, splice_count, pulsed_at, signal_dropped, belongs_to :grid_hackr
 - **echoes** - echoed_at, belongs_to :pulse (counter_cache), belongs_to :grid_hackr
 
+### Streaming
+- **hackr_streams** - live_url, vod_url, started_at, ended_at, belongs_to :artist
+
+### Zone Playlists
+- **zone_playlists** - name, belongs_to :grid_zone
+- **zone_playlist_tracks** - position, belongs_to :zone_playlist, belongs_to :track
+
+### OBS Overlays
+- **overlay_scenes** - name, slug, scene_type (fullscreen/composition)
+- **overlay_elements** - element_type, config (JSON)
+- **overlay_scene_elements** - position_x, position_y, width, height, z_index, belongs_to :overlay_scene, belongs_to :overlay_element
+- **overlay_scene_groups** - name, slug, has_many :overlay_scenes
+- **overlay_now_playings** - track metadata singleton
+- **overlay_alerts** - message, alert_type
+- **overlay_tickers** - text, speed
+- **overlay_lower_thirds** - title, subtitle, slug
+
 ---
 
 ## Multi-Domain Setup
@@ -413,28 +451,31 @@ bin/rails import:yaml_tracks        # Tracks only
 - Queue Panel - Current + next 3 tracks display with click-to-jump
 - Animated terminal homepage - Typing effect & keyboard skip
 - ViewComponent architecture - Reusable band profiles with flexible color schemes
-- Band profile pages - System Rot, Wavelength Zero, Voiceprint, Temporal Blue Drift
+- Band profile pages - 13 artists with config-based routing
 - Album model - Active Storage cover images with hover zoom
 - Comprehensive YAML import - Idempotent, multi-document support
 - hackr.fm Radio - 4 stations with live streaming
 - Pulse Vault - Search/filter, click-anywhere playback, custom ordering
 - Auto-play next track - Queue management with loop functionality
-- THE PULSE GRID - Real-time multiplayer MUD game
+- THE PULSE GRID - Real-time multiplayer MUD (5 zones, 5 rooms, 2 NPCs)
 - NPC dialogue system - 2 NPCs with 13 total topics
 - Command history - Arrow key navigation (100 commands)
 - Hackr Logs - Blog platform with Markdown support
 - Comprehensive test suite - 1104 backend + 129 frontend tests (100% passing)
 - The Codex wiki - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
 - PulseWire social network - Pulses, Echoes, Splices, real-time updates, admin moderation
-- OBS Overlay system - Now Playing, PulseWire, Grid Activity overlays for livestreaming
+- OBS Overlay system - Scenes, groups, now playing, lower thirds, tickers, alerts
+- Hackr Streams - Livestream management with go live/VOD support
+- Zone Playlists - Per-zone ambient music for THE PULSE GRID
+- Background infrastructure - Solid Queue, Solid Cache, Solid Cable configured
 
 ### Future Enhancements
+- World expansion - More rooms, NPCs, items (currently only 5 rooms)
 - Faction reputation system
 - Mission/quest system for THE PULSE GRID
 - Hacking system (core gameplay mechanic)
 - Combat mechanics (physical/cyber)
 - Synthia frequency tuning mechanic
-- More zones and rooms for THE PULSE GRID
 - Persistent inventory between sessions
 - Upload remaining audio files (64 of 66 tracks need audio)
 

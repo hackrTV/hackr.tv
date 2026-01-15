@@ -1,8 +1,8 @@
 # TODO
 
-**Last Updated:** 2025-12-06
+**Last Updated:** 2026-01-15
 
-This file tracks planned features, enhancements, and tasks for hackr.tv. Items move from this list to the "Completed" section in CLAUDE.md once implemented.
+This file tracks planned features, enhancements, and tasks for hackr.tv.
 
 ## High Priority
 
@@ -20,6 +20,14 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 - [ ] **Reverse references** - Show "Referenced in" section listing all places that link to each entry
 - [ ] **Inline tooltips** - Hover over `[[Entry Name]]` links to see entry summary without navigation
 
+### Technical Debt (see `tech_debt.md`)
+
+- [ ] **CSRF protection** - Re-enable for session-cookie APIs or migrate to token auth
+- [ ] **Content Security Policy** - Enable baseline CSP and expand for Vite/dev assets
+- [ ] **Standardize JSON errors** - Normalize error responses and log auth failures
+- [ ] **Remove duplicate broadcasts** - Fix PulseWire double-event issue
+- [ ] **Action Cable UX** - Add retry/backoff and connection status indicators
+
 ## Medium Priority
 
 ### THE PULSE GRID - Game Features
@@ -29,7 +37,7 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 - [ ] **Mission/quest system** - Structured objectives, storylines, and rewards
 - [ ] **Hacking system** - Mini-games for breaking into systems (lockpicking for cyberspace)
 - [ ] **Combat system** - Turn-based or real-time mechanics for player vs NPC/player encounters
-- [ ] **World expansion** - Add more zones, rooms, NPCs, items, and interactive objects
+- [ ] **World expansion** - Add more rooms (currently only 5), NPCs, items, and interactive objects
 - [ ] **Persistent progression** - Save player state, inventory, achievements across sessions
 - [ ] **Economy system** - Credits, item trading, shops, black market
 
@@ -57,7 +65,7 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 
 ### Platform Enhancements
 
-- [ ] **Live streaming** - Concerts, events, DJ sets with chat integration
+- [ ] **Live streaming chat** - Real-time chat integration for concerts and events
 - [ ] **Merch store** - In-universe merchandise with Grid Hackr accounts
 - [ ] **Fan artwork gallery** - User-submitted art with moderation
 - [ ] **Community forums** - Long-form discussion boards (complement to PulseWire)
@@ -71,26 +79,91 @@ This file tracks planned features, enhancements, and tasks for hackr.tv. Items m
 
 - [ ] **Performance optimization** - Database indexing, query optimization, caching strategy
 - [ ] **CDN for media** - Move audio/images to CDN for faster delivery
-- [ ] **Background jobs** - Async processing for heavy tasks (Sidekiq/Solid Queue)
 - [ ] **Monitoring/analytics** - Error tracking, performance monitoring, user analytics
 - [ ] **Automated backups** - Database and media file backup strategy
 - [ ] **CI/CD pipeline** - Automated testing and deployment
 - [ ] **Security audit** - Penetration testing, vulnerability scanning
 
+---
+
 ## Completed
 
-See CLAUDE.md "Development Roadmap - ✅ Completed" section for full implementation history.
+### OBS Overlay System (2025-12)
+- [x] **Overlay scenes & groups** - Fullscreen and composition scenes with element positioning
+- [x] **Scene groups** - Collections of scenes for easy switching
+- [x] **Now Playing overlay** - Track metadata display for livestreams
+- [x] **PulseWire overlay** - Real-time social feed overlay
+- [x] **Grid Activity overlay** - Multiplayer game activity feed
+- [x] **Lower thirds** - Text overlays with custom slugs
+- [x] **Tickers** - Scrolling marquee text
+- [x] **Alert system** - Alert notifications via Action Cable
 
-**Recent completions:**
-- [x] **PulseWire admin moderation (2025-11-22)** - Complete admin interface: moderation dashboard (`/root/pulse_wire`), SignalDrop management, filters (status/user/content/date), bulk actions (signal-drop/delete), 35 controller tests passing. PulseWire is now 100% complete!
-- [x] **PulseWire social network (2025-11-22)** - Core implementation: Pulses/Echoes models, full REST API, real-time Action Cable updates, React SPA (7 components: Hotwire, UserPulses, SinglePulse, PulseComposer, PulseCard, ThreadView, EchoButton), TUI styling with glitch effects, 14 seed pulses, 42 model tests passing.
-- [x] **Global inline linking (2025-11-20)** - `[[Entry Name]]` syntax works everywhere with canonical name lookup
-- [x] **The Codex wiki (2025-11-20)** - 7 entry types, markdown with auto-linking, admin CRUD, public SPA with search/filter
-- [x] **Playlists feature (2025-11-16)** - Full CRUD, manual ordering, share tokens, queue panel, auth-gated UI
-- [x] **React SPA migration (2025-11-16)** - Persistent audio, zero auto-scroll, error boundaries, code splitting
-- [x] **THE PULSE GRID colorful output (2025-11-19)** - HTML syntax highlighting, optimized UI, auto-focus
-- [x] **THE PULSE GRID MUD (2025-11-15)** - Playable alpha with NPCs, real-time multiplayer, command history
-- [x] **hackr.fm platform (2025-11-14)** - Radio, Pulse Vault, Bands directory, album system with Active Storage
-- [x] **Multi-domain routing (2025-11-10)** - Artist domains redirect to hackr.tv with preserved paths
-- [x] **ViewComponent infrastructure (2025-11-12)** - BandProfileComponent with 3 slots, 4 band profile pages
-- [x] **Data import system (2025-11-11)** - YAML-based idempotent import for artists/albums/tracks
+### Hackr Streams (2025-12)
+- [x] **Livestream management** - Go live/end stream functionality
+- [x] **VOD support** - Video on demand URL storage
+- [x] **YouTube integration** - Auto-conversion of YouTube URLs to embed format
+
+### Zone Playlists (2025-12)
+- [x] **Zone ambient music** - Per-zone playlists for THE PULSE GRID
+- [x] **Admin management** - CRUD interface for zone playlist configuration
+
+### Background Jobs Infrastructure (2025-12)
+- [x] **Solid Queue** - Async job processing configured and ready
+- [x] **Solid Cache** - Caching layer configured
+- [x] **Solid Cable** - Action Cable adapter for WebSocket support
+
+### PulseWire Social Network (2025-11-22)
+- [x] **Admin moderation** - Dashboard at `/root/pulse_wire`, signal-drop system, filters, bulk actions, 35 controller tests
+- [x] **Core social features** - Pulses (256 char), Echoes (retweets), Splices (replies), Hotwire timeline
+- [x] **Real-time updates** - Action Cable broadcasts for new pulses
+- [x] **Profanity filtering** - Obscenity gem integration
+
+### The Codex Wiki (2025-11-20)
+- [x] **7 entry types** - People, Organizations, Events, Locations, Technology, Factions, Items
+- [x] **Markdown rendering** - Full markdown support with auto-linking
+- [x] **Global inline linking** - `[[Entry Name]]` syntax works everywhere
+- [x] **Admin CRUD** - Full management interface
+- [x] **Public SPA** - Search and filter interface
+
+### THE PULSE GRID MUD (2025-11-15 - 2025-11-19)
+- [x] **Real-time multiplayer** - Live presence tracking via Action Cable
+- [x] **Account system** - Registration, login, roles (operative/admin)
+- [x] **Reserved alias protection** - Profanity + reserved name filtering
+- [x] **Interactive NPCs** - Dialogue trees (Fracture Coordinator, Temporal Theorist)
+- [x] **14+ commands** - Movement, interaction, inventory, social, meta commands
+- [x] **Command history** - Arrow key navigation (100 commands)
+- [x] **5 zones, 5 rooms** - Foundation with faction-based room types
+- [x] **Colorful output** - HTML syntax highlighting, terminal-style UI
+
+### Playlists Feature (2025-11-16)
+- [x] **Full CRUD** - Create, read, update, delete playlists
+- [x] **Manual ordering** - Drag-and-drop track reordering
+- [x] **Share tokens** - Public playlist sharing via unique URLs
+- [x] **Queue panel** - Current + next 3 tracks display
+- [x] **Auth-gated UI** - Requires Grid Hackr login
+
+### React SPA Architecture (2025-11-16)
+- [x] **React 19 + TypeScript** - Modern frontend stack
+- [x] **React Router v7** - Client-side routing
+- [x] **Persistent audio** - Playback continues across navigation
+- [x] **Error boundaries** - Graceful error handling with custom 404
+- [x] **Code splitting** - Lazy loading for performance
+- [x] **8 custom hooks** - useGridAuth, useActionCable, useCommandHistory, usePlaylist, usePulseWire, useCodexMappings, useMobileDetect, useTerminalAccess
+
+### hackr.fm Platform (2025-11-14)
+- [x] **Radio stations** - 4 database-backed stations with admin CRUD
+- [x] **Pulse Vault** - Track discovery with search/filter, keyboard shortcuts
+- [x] **Bands directory** - 13 artist profiles with track counts
+- [x] **Album system** - Active Storage for cover images
+- [x] **Persistent audio player** - Continuous playback with queue management
+
+### Infrastructure (2025-11-10 - 2025-11-12)
+- [x] **Multi-domain routing** - hackr.tv, xeraen.com, rockerboy.net, ashlinn.net, sectorx.media
+- [x] **ViewComponent** - BandProfileComponent with 3 slots
+- [x] **YAML data import** - Idempotent import for artists/albums/tracks
+- [x] **Hackr Logs blog** - Markdown posts with publish workflow
+
+### Testing (Current)
+- [x] **1104 RSpec tests** - Backend test coverage
+- [x] **129 Vitest tests** - Frontend test coverage
+- [x] **96 test files** - Comprehensive test suite
