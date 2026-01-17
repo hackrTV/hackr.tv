@@ -249,7 +249,7 @@ seed_codex_entry(
     GovCorp implemented complete tracking and monitoring of all economic activity by shifting legal currencies to exclusively cryptocurrencies under their control. Every transaction is visible. Every purchase is recorded. Economic freedom is an illusion.
 
     ### RAINNs
-    Realistic AI Neural Networks serve as GovCorp's agents throughout the RIDE and beyond. They synthesize voices, replace authentic human expression, and enforce compliance. By 2125, most people have never heard unprocessed human voices.
+    Randomized AI Neural Networks serve as GovCorp's agents throughout the RIDE and beyond. They synthesize voices, replace authentic human expression, and enforce compliance. By 2125, most people have never heard unprocessed human voices.
 
     ### Social Credit System
     Citizens are ranked based on compliance, consumption patterns, and social connections. Low scores result in restricted access to resources, employment, and services.
@@ -524,7 +524,7 @@ seed_codex_entry(
     All RIDE operations feed into a central monitoring system. Reality itself becomes a managed resource, allocated and adjusted according to GovCorp's needs.
 
     ### RAINN Integration
-    Realistic AI Neural Networks operate as agents throughout the RIDE, enforcing reality compliance and replacing authentic human expression with synthesized alternatives.
+    Randomized AI Neural Networks operate as agents throughout the RIDE, enforcing reality compliance and replacing authentic human expression with synthesized alternatives.
 
     ## Coming Online (2109)
 
@@ -1158,18 +1158,18 @@ seed_codex_entry(
   name: "RAINNs",
   slug: "rainns",
   entry_type: "technology",
-  summary: "Realistic AI Neural Networks - GovCorp's billions of quasi-autonomous AI agents that manage infrastructure, counter-hack the Fracture Network, and have replaced authentic human expression.",
+  summary: "Randomized AI Neural Networks - GovCorp's billions of quasi-autonomous AI agents that manage infrastructure, counter-hack the Fracture Network, and have replaced authentic human expression.",
   content: <<~MD,
     # RAINNs
 
-    **Full Name:** Realistic AI Neural Networks<br>
+    **Full Name:** Randomized AI Neural Networks<br>
     **Operator:** [[GovCorp]]<br>
     **Status:** Ubiquitous<br>
     **Function:** Quasi-autonomous AI agents serving GovCorp across all domains
 
     ## Overview
 
-    RAINNs (Realistic AI Neural Networks) are [[GovCorp]]'s quasi-autonomous AI agents - a vast network of artificial intelligences that perform virtually all functions necessary to maintain GovCorp's control. They are not mere tools; they are operatives. Billions of them, working in concert, fully aligned with GovCorp's directives yet capable of independent problem-solving and adaptation.
+    RAINNs (Randomized AI Neural Networks) are [[GovCorp]]'s quasi-autonomous AI agents - a vast network of artificial intelligences that perform virtually all functions necessary to maintain GovCorp's control. They are not mere tools; they are operatives. Billions of them, working in concert, fully aligned with GovCorp's directives yet capable of independent problem-solving and adaptation.
 
     Voice synthesis is just the most visible manifestation. RAINNs are the backbone of GovCorp's entire operation.
 
