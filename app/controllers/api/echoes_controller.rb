@@ -14,18 +14,10 @@ module Api
         # Echo already exists, remove it (un-echo)
         existing_echo.destroy
 
-        # Broadcast echo removal
-        ActionCable.server.broadcast("pulse_wire", {
-          type: "echo_removed",
-          pulse_id: @pulse.id,
-          hackr_id: current_hackr.id,
-          echo_count: @pulse.reload.echo_count
-        })
-
         render json: {
           success: true,
           echoed: false,
-          echo_count: @pulse.echo_count,
+          echo_count: @pulse.reload.echo_count,
           message: "Echo removed"
         }
       else
@@ -33,19 +25,10 @@ module Api
         @echo = @pulse.echoes.build(grid_hackr: current_hackr)
 
         if @echo.save
-          # Broadcast new echo
-          ActionCable.server.broadcast("pulse_wire", {
-            type: "echo_created",
-            pulse_id: @pulse.id,
-            hackr_id: current_hackr.id,
-            hackr_alias: current_hackr.hackr_alias,
-            echo_count: @pulse.reload.echo_count
-          })
-
           render json: {
             success: true,
             echoed: true,
-            echo_count: @pulse.echo_count,
+            echo_count: @pulse.reload.echo_count,
             message: "Pulse echoed"
           }, status: :created
         else

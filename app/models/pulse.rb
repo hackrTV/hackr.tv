@@ -15,7 +15,9 @@ class Pulse < ApplicationRecord
 
   before_validation :set_pulsed_at, on: :create
   before_save :set_thread_root
-  after_create_commit :broadcast_to_wire
+  after_create_commit :broadcast_new_pulse
+  after_destroy_commit :broadcast_deletion
+  after_update_commit :broadcast_signal_drop, if: :saved_change_to_signal_dropped?
 
   scope :active, -> { where(signal_dropped: false) }
   scope :dropped, -> { where(signal_dropped: true) }
@@ -69,7 +71,7 @@ class Pulse < ApplicationRecord
     end
   end
 
-  def broadcast_to_wire
+  def broadcast_new_pulse
     ActionCable.server.broadcast("pulse_wire", {
       type: "new_pulse",
       pulse: {
@@ -82,6 +84,22 @@ class Pulse < ApplicationRecord
         },
         parent_pulse_id: parent_pulse_id
       }
+    })
+  end
+
+  def broadcast_deletion
+    ActionCable.server.broadcast("pulse_wire", {
+      type: "pulse_deleted",
+      pulse_id: id
+    })
+  end
+
+  def broadcast_signal_drop
+    return unless signal_dropped?
+
+    ActionCable.server.broadcast("pulse_wire", {
+      type: "pulse_dropped",
+      pulse_id: id
     })
   end
 end
