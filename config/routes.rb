@@ -23,19 +23,12 @@ Rails.application.routes.draw do
     get "vidz/:id", to: "pages#spa_root", as: :xeraen_vod
   end
 
-  # Band profile routes - SPA
-  get "system_rot", to: "pages#spa_root", as: :system_rot
-  get "wavelength_zero", to: "pages#spa_root", as: :wavelength_zero
-  get "voiceprint", to: "pages#spa_root", as: :voiceprint
-  get "temporal_blue_drift", to: "pages#spa_root", as: :temporal_blue_drift
-  get "injection_vector", to: "pages#spa_root", as: :injection_vector
-  get "cipher_protocol", to: "pages#spa_root", as: :cipher_protocol
-  get "blitzbeam", to: "pages#spa_root", as: :blitzbeam
-  get "apex_overdrive", to: "pages#spa_root", as: :apex_overdrive
-  get "ethereality", to: "pages#spa_root", as: :ethereality
-  get "neon_hearts", to: "pages#spa_root", as: :neon_hearts
-  get "offline", to: "pages#spa_root", as: :offline
-  get "heartbreak_havoc", to: "pages#spa_root", as: :heartbreak_havoc
+  # Band profile routes - SPA (consolidated dynamic route)
+  band_slugs = %w[system_rot wavelength_zero voiceprint temporal_blue_drift
+    injection_vector cipher_protocol blitzbeam apex_overdrive ethereality
+    neon_hearts offline heartbreak_havoc]
+  get ":band_slug", to: "pages#spa_root", as: :band,
+    constraints: {band_slug: Regexp.union(band_slugs)}
 
   # Sector X routes - SPA
   get "sector/x", to: "pages#spa_root", as: :sector_x
