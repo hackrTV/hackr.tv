@@ -108,12 +108,6 @@ module Api
     def destroy
       @pulse.destroy
 
-      # Broadcast deletion
-      ActionCable.server.broadcast("pulse_wire", {
-        type: "pulse_deleted",
-        pulse_id: @pulse.id
-      })
-
       render json: {
         success: true,
         message: "Pulse deleted successfully"
@@ -123,12 +117,6 @@ module Api
     # POST /api/pulses/:id/signal_drop
     def signal_drop
       if @pulse.signal_drop!
-        # Broadcast signal drop
-        ActionCable.server.broadcast("pulse_wire", {
-          type: "pulse_dropped",
-          pulse_id: @pulse.id
-        })
-
         render json: {
           success: true,
           message: "Pulse signal-dropped by GovCorp",
@@ -198,13 +186,6 @@ module Api
         created_at: pulse.created_at,
         updated_at: pulse.updated_at
       }
-    end
-
-    def broadcast_pulse(pulse, type)
-      ActionCable.server.broadcast("pulse_wire", {
-        type: type,
-        pulse: pulse_json(pulse)
-      })
     end
   end
 end
