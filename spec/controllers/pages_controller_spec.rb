@@ -37,35 +37,13 @@ RSpec.describe PagesController, type: :request do
       end
     end
 
-    describe "GET /system_rot" do
-      it "renders the SPA root" do
-        get "/system_rot"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
-      end
-    end
-
-    describe "GET /wavelength_zero" do
-      it "renders the SPA root" do
-        get "/wavelength_zero"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
-      end
-    end
-
-    describe "GET /voiceprint" do
-      it "renders the SPA root" do
-        get "/voiceprint"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
-      end
-    end
-
-    describe "GET /temporal_blue_drift" do
-      it "renders the SPA root" do
-        get "/temporal_blue_drift"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
+    describe "GET /:band_slug (band profile routes)" do
+      it "renders the SPA root for valid band slugs" do
+        %w[system_rot wavelength_zero voiceprint temporal_blue_drift].each do |slug|
+          get "/#{slug}"
+          expect(response).to have_http_status(:success)
+          expect(response.body).to include('<div id="root">')
+        end
       end
     end
 
