@@ -130,5 +130,78 @@ RSpec.describe Api::GridController, type: :controller do
         expect(json["success"]).to eq(true)
       end
     end
+
+    describe "auth logging" do
+      it "logs successful login" do
+        allow(Rails.logger).to receive(:info).and_call_original
+        expect(Rails.logger).to receive(:info).with(/\[AUTH\] Login success: hackr_alias=TestHackr ip=/)
+
+        post :login, params: {
+          hackr_alias: "TestHackr",
+          password: "password123"
+        }, format: :json
+      end
+
+      it "logs failed login with invalid password" do
+        allow(Rails.logger).to receive(:warn).and_call_original
+        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Login failed: attempted_alias=TestHackr reason=invalid_password ip=/)
+
+        post :login, params: {
+          hackr_alias: "TestHackr",
+          password: "wrongpassword"
+        }, format: :json
+      end
+
+      it "logs failed login with unknown alias" do
+        allow(Rails.logger).to receive(:warn).and_call_original
+        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Login failed: attempted_alias=UnknownHackr reason=unknown_alias ip=/)
+
+        post :login, params: {
+          hackr_alias: "UnknownHackr",
+          password: "password123"
+        }, format: :json
+      end
+
+      it "truncates long alias attempts in logs" do
+        long_alias = "A" * 100
+        allow(Rails.logger).to receive(:warn).and_call_original
+        expect(Rails.logger).to receive(:warn).with(/attempted_alias=A{47}\.\.\./)
+
+        post :login, params: {
+          hackr_alias: long_alias,
+          password: "password123"
+        }, format: :json
+      end
+    end
+  end
+
+  describe "POST #register auth logging" do
+    before do
+      stub_const("APP_SETTINGS", {prerelease_mode: nil}.freeze)
+      zone = create(:grid_zone, slug: "hackr_tv_central")
+      create(:grid_room, grid_zone: zone, room_type: "hub")
+    end
+
+    it "logs successful registration" do
+      allow(Rails.logger).to receive(:info).and_call_original
+      expect(Rails.logger).to receive(:info).with(/\[AUTH\] Registration success: hackr_alias=NewHackr ip=/)
+
+      post :register, params: {
+        hackr_alias: "NewHackr",
+        password: "password123",
+        password_confirmation: "password123"
+      }, format: :json
+    end
+
+    it "logs failed registration" do
+      allow(Rails.logger).to receive(:warn).and_call_original
+      expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Registration failed: attempted_alias=ABC errors=.*must be at least.*ip=/)
+
+      post :register, params: {
+        hackr_alias: "ABC",
+        password: "password123",
+        password_confirmation: "password123"
+      }, format: :json
+    end
   end
 end

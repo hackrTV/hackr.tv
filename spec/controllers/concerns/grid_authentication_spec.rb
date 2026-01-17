@@ -80,6 +80,24 @@ RSpec.describe GridAuthentication, type: :controller do
       it "returns nil" do
         expect(controller.send(:current_hackr)).to be_nil
       end
+
+      it "logs the invalid token attempt" do
+        allow(Rails.logger).to receive(:warn).and_call_original
+        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Invalid API token: token_prefix=invalid_\.\.\./)
+        controller.send(:current_hackr)
+      end
+    end
+
+    context "when invalid token is short" do
+      before do
+        request.headers["Authorization"] = "Bearer abc"
+      end
+
+      it "logs the full short token" do
+        allow(Rails.logger).to receive(:warn).and_call_original
+        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Invalid API token: token_prefix=abc ip=/)
+        controller.send(:current_hackr)
+      end
     end
 
     context "when no hackr is logged in" do
