@@ -82,7 +82,7 @@ class Api::GridController < ApplicationController
       }, status: :created
     else
       attempted_alias = params[:hackr_alias].to_s.truncate(50)
-      Rails.logger.warn("[AUTH] Registration failed: attempted_alias=#{attempted_alias} errors=#{@hackr.errors.full_messages.join('; ')} ip=#{request.remote_ip}")
+      Rails.logger.warn("[AUTH] Registration failed: attempted_alias=#{attempted_alias} errors=#{@hackr.errors.full_messages.join("; ")} ip=#{request.remote_ip}")
       render json: {
         success: false,
         error: "Registration failed: #{@hackr.errors.full_messages.join(", ")}"

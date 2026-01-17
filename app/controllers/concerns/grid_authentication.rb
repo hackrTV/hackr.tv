@@ -27,7 +27,7 @@ module GridAuthentication
     hackr = GridHackr.find_by(api_token: token)
     if hackr.nil?
       # Log invalid token attempt (show first 8 chars for debugging)
-      token_prefix = token.length > 8 ? "#{token[0, 8]}..." : token
+      token_prefix = (token.length > 8) ? "#{token[0, 8]}..." : token
       Rails.logger.warn("[AUTH] Invalid API token: token_prefix=#{token_prefix} ip=#{request.remote_ip}")
     end
     hackr
