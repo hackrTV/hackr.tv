@@ -76,6 +76,11 @@ class GridHackr < ApplicationRecord
     update_column(:last_activity_at, Time.current)
   end
 
+  # Generate or regenerate API token for CLI access
+  def generate_api_token!
+    update!(api_token: SecureRandom.hex(32))
+  end
+
   private
 
   def set_default_role

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_151701) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_16_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -113,6 +113,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_151701) do
   end
 
   create_table "grid_hackrs", force: :cascade do |t|
+    t.string "api_token"
     t.datetime "created_at", null: false
     t.integer "current_room_id"
     t.string "hackr_alias"
@@ -120,6 +121,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_151701) do
     t.string "password_digest"
     t.string "role"
     t.datetime "updated_at", null: false
+    t.index ["api_token"], name: "index_grid_hackrs_on_api_token", unique: true
     t.index ["hackr_alias"], name: "index_grid_hackrs_on_hackr_alias", unique: true
     t.index ["role"], name: "index_grid_hackrs_on_role"
   end

@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   include RequestAnalysis
   include GridAuthentication
 
+  protect_from_forgery with: :exception, unless: :api_token_request?
+
   before_action :check_for_redirect
   before_action :check_for_domain_redirect
 
