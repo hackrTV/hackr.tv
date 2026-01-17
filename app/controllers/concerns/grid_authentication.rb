@@ -8,8 +8,28 @@ module GridAuthentication
   # Authentication methods
 
   def current_hackr
-    @current_hackr ||= GridHackr.find_by(id: session[:grid_hackr_id]) if session[:grid_hackr_id]
+    @current_hackr ||= authenticate_with_token || session_hackr
   end
+
+  def api_token_request?
+    request.headers["Authorization"]&.start_with?("Bearer ")
+  end
+
+  private
+
+  def authenticate_with_token
+    auth_header = request.headers["Authorization"]
+    return nil unless auth_header&.start_with?("Bearer ")
+
+    token = auth_header.split(" ", 2).last
+    GridHackr.find_by(api_token: token) if token.present?
+  end
+
+  def session_hackr
+    GridHackr.find_by(id: session[:grid_hackr_id]) if session[:grid_hackr_id]
+  end
+
+  public
 
   def logged_in?
     current_hackr.present?

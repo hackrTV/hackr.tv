@@ -41,7 +41,7 @@ RSpec.describe GridAuthentication, type: :controller do
   let(:admin) { create(:grid_hackr, role: "admin") }
 
   describe "#current_hackr" do
-    context "when hackr is logged in" do
+    context "when hackr is logged in via session" do
       before { session[:grid_hackr_id] = operative.id }
 
       it "returns the current hackr" do
@@ -49,9 +49,70 @@ RSpec.describe GridAuthentication, type: :controller do
       end
     end
 
+    context "when hackr authenticates via Bearer token" do
+      before do
+        operative.generate_api_token!
+        request.headers["Authorization"] = "Bearer #{operative.api_token}"
+      end
+
+      it "returns the hackr associated with the token" do
+        expect(controller.send(:current_hackr)).to eq(operative)
+      end
+    end
+
+    context "when both session and token are present" do
+      before do
+        session[:grid_hackr_id] = admin.id
+        operative.generate_api_token!
+        request.headers["Authorization"] = "Bearer #{operative.api_token}"
+      end
+
+      it "prefers token authentication over session" do
+        expect(controller.send(:current_hackr)).to eq(operative)
+      end
+    end
+
+    context "when invalid token is provided" do
+      before do
+        request.headers["Authorization"] = "Bearer invalid_token"
+      end
+
+      it "returns nil" do
+        expect(controller.send(:current_hackr)).to be_nil
+      end
+    end
+
     context "when no hackr is logged in" do
       it "returns nil" do
         expect(controller.send(:current_hackr)).to be_nil
+      end
+    end
+  end
+
+  describe "#api_token_request?" do
+    context "when Authorization header has Bearer token" do
+      before do
+        request.headers["Authorization"] = "Bearer some_token"
+      end
+
+      it "returns true" do
+        expect(controller.send(:api_token_request?)).to be true
+      end
+    end
+
+    context "when Authorization header is missing" do
+      it "returns falsey" do
+        expect(controller.send(:api_token_request?)).to be_falsey
+      end
+    end
+
+    context "when Authorization header has different auth type" do
+      before do
+        request.headers["Authorization"] = "Basic some_credentials"
+      end
+
+      it "returns false" do
+        expect(controller.send(:api_token_request?)).to be false
       end
     end
   end

@@ -274,4 +274,34 @@ RSpec.describe GridHackr, type: :model do
       expect(hackr.reload.last_activity_at).to be_within(1.second).of(Time.current)
     end
   end
+
+  describe "#generate_api_token!" do
+    it "generates and saves an api_token" do
+      hackr = create(:grid_hackr)
+      expect(hackr.api_token).to be_nil
+
+      hackr.generate_api_token!
+
+      expect(hackr.api_token).to be_present
+      expect(hackr.api_token.length).to eq(64) # SecureRandom.hex(32) produces 64 chars
+    end
+
+    it "regenerates a new token each time" do
+      hackr = create(:grid_hackr)
+      hackr.generate_api_token!
+      first_token = hackr.api_token
+
+      hackr.generate_api_token!
+      second_token = hackr.api_token
+
+      expect(second_token).not_to eq(first_token)
+    end
+
+    it "persists the token to the database" do
+      hackr = create(:grid_hackr)
+      hackr.generate_api_token!
+
+      expect(hackr.reload.api_token).to eq(hackr.api_token)
+    end
+  end
 end

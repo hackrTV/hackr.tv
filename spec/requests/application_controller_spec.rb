@@ -1,6 +1,36 @@
 require "rails_helper"
 
 RSpec.describe "ApplicationController redirects", type: :request do
+  describe "CSRF protection" do
+    let(:hackr) { create(:grid_hackr) }
+
+    context "for API token requests" do
+      before do
+        hackr.generate_api_token!
+      end
+
+      it "allows requests with valid Bearer token without CSRF" do
+        post "/api/pulses",
+          params: {content: "Test pulse from CLI"},
+          headers: {"Authorization" => "Bearer #{hackr.api_token}"},
+          as: :json
+
+        # Should not raise InvalidAuthenticityToken - request should be processed
+        # May return other status based on pulse validation, but not 422 for CSRF
+        expect(response.status).not_to eq(422)
+      end
+
+      it "returns unauthorized for invalid Bearer token" do
+        post "/api/pulses",
+          params: {content: "Test pulse"},
+          headers: {"Authorization" => "Bearer invalid_token"},
+          as: :json
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe "database-backed redirects" do
     it "redirects from root path when redirect record exists" do
       create(:redirect, domain: "example.com", path: "/", destination_url: "https://destination.com")
