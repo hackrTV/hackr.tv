@@ -22,7 +22,15 @@ module GridAuthentication
     return nil unless auth_header&.start_with?("Bearer ")
 
     token = auth_header.split(" ", 2).last
-    GridHackr.find_by(api_token: token) if token.present?
+    return nil if token.blank?
+
+    hackr = GridHackr.find_by(api_token: token)
+    if hackr.nil?
+      # Log invalid token attempt (show first 8 chars for debugging)
+      token_prefix = (token.length > 8) ? "#{token[0, 8]}..." : token
+      Rails.logger.warn("[AUTH] Invalid API token: token_prefix=#{token_prefix} ip=#{request.remote_ip}")
+    end
+    hackr
   end
 
   def session_hackr

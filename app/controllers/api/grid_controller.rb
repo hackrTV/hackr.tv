@@ -23,6 +23,7 @@ class Api::GridController < ApplicationController
     if hackr&.authenticate(params[:password])
       log_in(hackr)
       hackr.touch_activity!
+      Rails.logger.info("[AUTH] Login success: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
       render json: {
         success: true,
         message: "Welcome back to THE PULSE GRID, #{hackr.hackr_alias}.",
@@ -34,6 +35,9 @@ class Api::GridController < ApplicationController
         }
       }
     else
+      attempted_alias = params[:hackr_alias].to_s.truncate(50)
+      reason = hackr ? "invalid_password" : "unknown_alias"
+      Rails.logger.warn("[AUTH] Login failed: attempted_alias=#{attempted_alias} reason=#{reason} ip=#{request.remote_ip}")
       render json: {
         success: false,
         error: "Invalid hackr alias or password. Access denied."
@@ -65,6 +69,7 @@ class Api::GridController < ApplicationController
     if @hackr.save
       log_in(@hackr)
       @hackr.touch_activity!
+      Rails.logger.info("[AUTH] Registration success: hackr_alias=#{@hackr.hackr_alias} ip=#{request.remote_ip}")
       render json: {
         success: true,
         message: "Welcome to THE PULSE GRID, #{@hackr.hackr_alias}. Your journey with the Fracture Network begins now.",
@@ -76,6 +81,8 @@ class Api::GridController < ApplicationController
         }
       }, status: :created
     else
+      attempted_alias = params[:hackr_alias].to_s.truncate(50)
+      Rails.logger.warn("[AUTH] Registration failed: attempted_alias=#{attempted_alias} errors=#{@hackr.errors.full_messages.join("; ")} ip=#{request.remote_ip}")
       render json: {
         success: false,
         error: "Registration failed: #{@hackr.errors.full_messages.join(", ")}"
