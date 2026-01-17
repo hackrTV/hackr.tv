@@ -25,7 +25,7 @@ class Echo < ApplicationRecord
       pulse_id: pulse_id,
       hackr_id: grid_hackr_id,
       hackr_alias: grid_hackr&.hackr_alias,
-      echo_count: pulse.echo_count
+      echo_count: pulse.reload.echo_count
     })
   end
 
@@ -34,7 +34,7 @@ class Echo < ApplicationRecord
       type: "echo_removed",
       pulse_id: pulse_id,
       hackr_id: grid_hackr_id,
-      echo_count: pulse.echo_count
+      echo_count: pulse.reload.echo_count
     })
   end
 end
