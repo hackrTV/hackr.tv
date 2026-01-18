@@ -2,12 +2,12 @@
 
 > A Ruby on Rails music artist showcase platform and text-based MUD game set in a dystopian cyberpunk universe.
 
-**hackr.tv** is a multi-domain music streaming and discovery platform featuring **THE PULSE GRID** - a playable multiplayer MUD (Multi-User Dungeon) set in 2125. Explore the resistance movement through music, lore, and interactive gameplay.
+**hackr.tv** is a multi-domain music streaming and discovery platform featuring **THE PULSE GRID** - a playable multiplayer MUD (Multi-User Dungeon) set in 2126. Explore the resistance movement through music, lore, and interactive gameplay.
 
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.2-red.svg)](https://rubyonrails.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Tests-1233%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-1320%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
@@ -38,7 +38,7 @@
   - Create/edit/delete playlists
   - Add tracks from Pulse Vault and PlayerBar
   - Manual drag-and-drop ordering
-  - Public sharing via unique share tokens
+  - Public sharing via unique share tokens (`/shared/:token`)
   - Queue panel showing current + next 3 tracks
   - Playlist context preservation across navigation
 - **Pulse Vault** - Music discovery interface with 66+ tracks
@@ -50,6 +50,12 @@
   - Keyboard shortcuts (Tab to search, Spacebar to play/pause)
 - **Auto-play & Queue** - Automatic track progression with loop functionality
 - **Bands Directory** - Artist profiles with track counts and genre information
+- **Track List Pages** - Artist track listings at `/thecyberpulse/trackz` and `/xeraen/trackz`
+- **Track Detail Pages** - Individual track pages with lyrics, streaming links, and video embeds
+  - Routes: `/thecyberpulse/trackz/:slug`, `/xeraen/trackz/:slug`
+  - Streaming links organized by platform (Bandcamp, YouTube, Spotify, Apple Music, SoundCloud)
+  - Lyrics display with Markdown and Codex auto-linking
+  - Artist-specific color themes
 
 ### The Codex - Lore Wiki
 - **In-World Encyclopedia** - Comprehensive wiki documenting THE.CYBERPUL.SE universe
@@ -83,7 +89,7 @@
 - **PulseWire Overlay** - Show live social activity during streams
 - **Grid Activity Overlay** - Stream multiplayer game activity
 - **Scene Management** - Compose multiple overlay elements with positioning
-- **Scene Groups** - Collections of scenes for easy switching during streams
+- **Scene Groups** - Collections of scenes for easy switching during streams (admin at `/root/overlays/groups`)
 - **Lower Thirds** - Text overlays with custom slugs and styling
 - **Tickers** - Scrolling marquee text for announcements
 - **Alert System** - Alert notifications via Action Cable
@@ -105,6 +111,23 @@
 - Mobile-responsive TUI (Terminal User Interface) design
 - Database-backed redirect system
 - Artist-specific branding and theming
+
+### API Token Authentication
+- **Bearer Token Auth** - Programmatic API access for Grid Hackr accounts
+- **Token Generation** - `bin/rails api:generate_token[alias]` rake task
+- **Header Format** - `Authorization: Bearer <token>`
+- **Use Cases** - CLI tools, integrations, automated workflows
+
+### Prerelease Mode
+- **Registration Control** - Disable new user registration during alpha/beta phases
+- **Banner System** - Customizable prerelease banner text
+- **Configuration** - `config/app_settings.yml` with `prerelease_mode` and `prerelease_banner_text`
+- **Settings API** - `GET /api/settings` returns current prerelease state
+
+### Security
+- **Content Security Policy** - CSP with nonce-based inline script execution
+- **XSS Protection** - Prevents cross-site scripting while allowing dynamic scripts
+- **Rate Limiting** - Rack::Attack for request throttling
 
 ---
 
@@ -301,9 +324,9 @@ bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- **Backend:** 1104 examples, 0 failures (RSpec)
-- **Frontend:** 129 examples (Vitest)
-- **Total:** 1233 passing tests
+- **Backend:** 1158 examples, 0 failures (RSpec)
+- **Frontend:** 162 examples (Vitest)
+- **Total:** 1320 passing tests
 
 **Tested Components:**
 - **Models:** Artist, Album, Track, Playlist, PlaylistTrack, RadioStation, RadioStationPlaylist, GridHackr, GridRoom, HackrLog, Redirect, CodexEntry, Pulse, Echo
@@ -461,7 +484,7 @@ bin/rails import:yaml_tracks        # Tracks only
 - NPC dialogue system - 2 NPCs with 13 total topics
 - Command history - Arrow key navigation (100 commands)
 - Hackr Logs - Blog platform with Markdown support
-- Comprehensive test suite - 1104 backend + 129 frontend tests (100% passing)
+- Comprehensive test suite - 1158 backend + 162 frontend tests (100% passing)
 - The Codex wiki - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
 - PulseWire social network - Pulses, Echoes, Splices, real-time updates, admin moderation
 - OBS Overlay system - Scenes, groups, now playing, lower thirds, tickers, alerts
@@ -505,8 +528,8 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/rails console` | Interactive Rails console |
 | `bin/rails db:migrate` | Run database migrations |
 | `bin/rails import:from_yaml` | Import all YAML data (artists, albums, tracks) |
-| `bundle exec rspec` | Run backend test suite (1104 tests) |
-| `pnpm test` | Run frontend test suite (129 tests) |
+| `bundle exec rspec` | Run backend test suite (1158 tests) |
+| `pnpm test` | Run frontend test suite (162 tests) |
 | `bundle exec standardrb` | Lint backend code |
 | `pnpm install` | Install frontend dependencies |
 
