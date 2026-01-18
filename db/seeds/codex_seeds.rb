@@ -257,9 +257,63 @@ seed_codex_entry(
     ### Information Control
     GovCorp maintains strict control over media, education, and entertainment. Unauthorized art, music, and literature are classified as "corrupted data" and purged from official systems.
 
+    ## The Democratic Facade
+
+    GovCorp maintains the appearance of democracy. Citizens vote. Representatives are elected. Policies are debated. The rituals of democratic participation continue unchanged.
+
+    However:
+    - All candidates are pre-vetted by GovCorp-aligned systems
+    - Information exposure is algorithmically curated long before voting occurs
+    - Public sentiment is shaped through [[The RIDE]] before choices are presented
+    - Elections function as confirmation rituals, not decision points
+
+    The genius is that most citizens genuinely believe they're making free choices. They are - from a menu GovCorp wrote.
+
+    ## Dissent Management
+
+    GovCorp rarely crushes dissent openly. Open suppression creates martyrs, and martyrs create movements. Instead, dissent is:
+
+    - **Redirected:** Channeled into approved outlets that feel rebellious but change nothing
+    - **Fragmented:** Potential movements are algorithmically divided before they can coalesce
+    - **Exhausted:** Activists are worn down through bureaucratic friction and manufactured distractions
+    - **Diluted:** Radical ideas are absorbed into aesthetics, memes, and harmless subcultures
+
+    Rebellion is permitted - even encouraged - as long as it remains performance. A citizen can wear anti-GovCorp symbols, listen to "resistance" music, and post provocative content. None of it matters if it never translates to action.
+
+    ## Cultural Control
+
+    GovCorp's cultural strategy is sophisticated:
+
+    - **Nostalgia is commodified** but never allowed to inspire change. The past is a product, not a blueprint.
+    - **Creativity is channeled** into approved forms that feel transgressive but reinforce existing structures
+    - **Authenticity is simulated** so thoroughly that most citizens cannot distinguish real from manufactured
+
+    The result is a culture that feels vibrant and diverse while remaining fundamentally static. Everything changes; nothing transforms.
+
     ## Structure
 
     GovCorp operates through regional directorates, each overseen by a Board of Directors who are simultaneously corporate executives and government officials. True leadership remains obscured behind layers of bureaucracy.
+
+    ## Temporal Blind Spot
+
+    GovCorp's models assume temporal permanence. Their predictive systems, their control mechanisms, their entire worldview operates on the assumption that the timeline flows in one direction and cannot be meaningfully altered from the past.
+
+    This is their critical vulnerability.
+
+    The discovery that [[PRISM]] - and therefore [[The RIDE]] - can be affected by signals sent backward through time represents an existential threat GovCorp has not fully comprehended. Their systems were not designed to account for interference from a past they consider settled history.
+
+    ## The Anomaly of The.CyberPul.se
+
+    GovCorp does not classify [[The Fracture Network]] as terrorists. That would imply a threat they understand how to counter.
+
+    Instead, they view [[The.CyberPul.se]] as an *anomaly*:
+    - A signal that should not exist
+    - A broadcast that violates causality assumptions
+    - A reminder that the timeline is not closed
+
+    Current GovCorp response focuses on narrative suppression - dismissing the broadcasts as corrupted data, glitches in the RIDE, collective hallucination. But if GovCorp ever fully understands the nature of the threat - that information is being transmitted from the future to prevent their rise - their response would escalate from narrative suppression to total temporal containment.
+
+    The Fracture Network's survival depends on GovCorp never achieving that understanding.
 
     ## Opposition
 
@@ -1172,6 +1226,25 @@ seed_codex_entry(
     RAINNs (Randomized AI Neural Networks) are [[GovCorp]]'s quasi-autonomous AI agents - a vast network of artificial intelligences that perform virtually all functions necessary to maintain GovCorp's control. They are not mere tools; they are operatives. Billions of them, working in concert, fully aligned with GovCorp's directives yet capable of independent problem-solving and adaptation.
 
     Voice synthesis is just the most visible manifestation. RAINNs are the backbone of GovCorp's entire operation.
+
+    ## The Artificiality Problem
+
+    Early GovCorp AI systems failed for a reason no one anticipated: humans could *feel* the difference. Not consciously - the simulations were technically flawless - but something deeper. People instinctively recoiled from AI that lacked nostalgia, that couldn't feel the weight of memory, that had no capacity for the emotional contradictions that define human experience.
+
+    An AI could simulate grief perfectly. But it couldn't understand why a song from childhood still brings tears decades later. It couldn't feel the paradox of loving something that hurts you. It couldn't long for a past it never had.
+
+    GovCorp needed AI that felt *real*. Not just technically convincing - existentially convincing.
+
+    ## The RAINN Solution
+
+    To solve the artificiality problem, GovCorp developed the RAINN architecture:
+
+    - **Randomized Seeds:** Each RAINN is "born" from a unique randomized seed, ensuring no two are identical
+    - **Developmental Conditioning:** RAINNs undergo controlled developmental exercises that simulate formative experiences
+    - **Inception-Level Alignment:** Obedience to GovCorp is woven in from the earliest stages of development - not as a rule, but as foundational identity
+    - **Emergent Personality:** RAINNs grow unique personalities, preferences, and even quirks - while remaining ideologically incapable of opposing GovCorp
+
+    The result: AI that passes the uncanny valley not through better simulation, but through genuine individuality. Each RAINN is authentically itself - and authentically loyal.
 
     ## Quasi-Autonomous Alignment
 
