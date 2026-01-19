@@ -550,14 +550,14 @@ logs << {
     **System Rot** - Hardcore punk. Street-level chaos. Let the system collapse.
     **Voiceprint** - Melodic drum and bass. Preserving authentic human voices.
     **Injection Vector** - Deathcore. Physical infiltration. Kinetic warfare.
-    **Cipher Protocol** - Progressive metal. Data encoded in music.
-    **Wavelength Zero** - Atmospheric metal. Emotional restoration.
+    **Cipher Protocol** - Progressive Metal. Data encoded in music.
+    **Wavelength Zero** - Atmospheric Metal. Emotional restoration.
     **BlitzBeam+** - Hypertrance. Speed == freedom. Velocity == escape.
-    **Apex Overdrive** - Hardstyle. Collective euphoria. Victory in present tense.
-    **Ethereality** - Vocal trance. Consciousness liberation.
-    **Neon Hearts** - J-pop. Revolution in cute packaging.
-    **Offline** - Post-grunge. Complete disconnection. Analog authenticity.
-    **Temporal Blue Drift** - Indie math rock. X's personal project. Love across time.
+    **Apex Overdrive** - Hardstyle. Collective euphoria. Victory in the present tense.
+    **Ethereality** - Vocal Trance. Consciousness liberation.
+    **Neon Hearts** - J-Pop. Revolution in cute packaging.
+    **Offline** - Post-Grunge. Complete disconnection. Analog authenticity.
+    **Temporal Blue Drift** - Math Rock. X's personal project. Love across time.
 
     And The.CyberPul.se itself - me, X, and Synthia. The central broadcast. The signal that unifies.
 
