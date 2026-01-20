@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { TerminalAnimation } from '~/components/terminal/TerminalAnimation'
 import { LiveStreamEmbed } from '~/components/LiveStreamEmbed'
+import { UplinkPanel } from '~/components/uplink/UplinkPanel'
 import { apiJson } from '~/utils/apiClient'
 
 interface StreamData {
@@ -65,6 +66,7 @@ export const HomePage: React.FC = () => {
           url={streamData.live_url}
           title={streamData.title}
           artistName={streamData.artist?.name}
+          sideContent={<UplinkPanel defaultChannel="live" livestreamOnly />}
         />
       ) : (
         <TerminalAnimation />

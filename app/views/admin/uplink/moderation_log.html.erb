@@ -1,0 +1,116 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/uplink/moderation_log :: AUDIT TRAIL</legend>
+
+    <div style="padding: 20px;">
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <%= link_to "← Uplink Dashboard", admin_uplink_index_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <!-- Filters -->
+      <div style="margin-bottom: 20px; background: #1a1a1a; padding: 15px; border: 1px solid #333;">
+        <label style="color: #888; display: block; margin-bottom: 8px; font-weight: bold;">FILTER LOG</label>
+
+        <%= form_with url: moderation_log_admin_uplink_index_path, method: :get, local: true, style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
+          <div style="flex: 0 0 auto;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Action</label>
+            <%= f.select :action, ModerationLog::ACTIONS.map { |a| [a.gsub("_", " ").titleize, a] }.unshift(["All Actions", ""]), { selected: params[:action] }, style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          </div>
+
+          <div style="flex: 1 1 150px;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Actor</label>
+            <%= f.text_field :actor, value: params[:actor], placeholder: "@username", style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          </div>
+
+          <div style="flex: 1 1 150px;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Target</label>
+            <%= f.text_field :target, value: params[:target], placeholder: "@username", style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          </div>
+
+          <div style="flex: 0 0 auto; display: flex; gap: 5px;">
+            <%= f.submit "Apply Filters", class: "tui-button purple-168", style: "padding: 8px 20px;" %>
+            <%= link_to "Clear", moderation_log_admin_uplink_index_path, class: "tui-button grey-168", style: "padding: 8px 20px;" %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Stats -->
+      <div style="margin-bottom: 20px; color: #666;">
+        <strong><%= @logs.count %></strong> log entr<%= @logs.count == 1 ? 'y' : 'ies' %>
+      </div>
+
+      <!-- Logs Table -->
+      <% if @logs.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center; width: 15%;">Timestamp</th>
+                <th style="text-align: center; width: 15%;">Actor</th>
+                <th style="text-align: center; width: 15%;">Action</th>
+                <th style="text-align: center; width: 15%;">Target</th>
+                <th style="text-align: left; width: 25%;">Details</th>
+                <th style="text-align: center; width: 15%;">Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @logs.each do |log| %>
+                <tr class="admin-table-row">
+                  <td style="text-align: center;">
+                    <small style="color: #888;">
+                      <%= log.created_at.strftime("%Y-%m-%d") %><br>
+                      <%= log.created_at.strftime("%H:%M:%S") %>
+                    </small>
+                  </td>
+                  <td style="text-align: center;">
+                    <strong class="orange-255-text">@<%= log.actor.hackr_alias %></strong>
+                  </td>
+                  <td style="text-align: center;">
+                    <% action_color = case log.action
+                      when "squelch", "blackout" then "#ff5555"
+                      when "unsquelch", "unblackout" then "#00ff00"
+                      when "drop_packet" then "#ffaa00"
+                      when "restore_packet" then "#00d4ff"
+                      else "#888"
+                    end %>
+                    <span style="color: <%= action_color %>;"><%= log.action.gsub("_", " ").upcase %></span>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if log.target %>
+                      <strong class="cyan-255-text">@<%= log.target.hackr_alias %></strong>
+                    <% else %>
+                      <span style="color: #555;">-</span>
+                    <% end %>
+                  </td>
+                  <td>
+                    <% if log.reason.present? %>
+                      <small style="color: #888;">"<%= log.reason %>"</small>
+                    <% elsif log.chat_message_id.present? %>
+                      <small style="color: #666;">Packet #<%= log.chat_message_id %></small>
+                    <% else %>
+                      <span style="color: #555;">-</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if log.duration_minutes.present? %>
+                      <%= log.duration_minutes %> min
+                    <% elsif log.action.in?(%w[squelch blackout]) %>
+                      <span class="red-255-text">Permanent</span>
+                    <% else %>
+                      <span style="color: #555;">-</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No moderation logs found.</p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

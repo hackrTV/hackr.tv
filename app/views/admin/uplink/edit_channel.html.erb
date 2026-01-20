@@ -1,0 +1,66 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 800px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/uplink/channels/<%= @channel.slug %> :: EDIT CHANNEL</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px;">
+        <%= link_to "← Back to Uplink", admin_uplink_index_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <!-- Edit Form -->
+      <%= form_with model: @channel, url: admin_uplink_channel_path(@channel.slug), method: :patch, local: true do |f| %>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #888; margin-bottom: 8px;">Channel Name</label>
+          <%= f.text_field :name, style: "width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #888; margin-bottom: 8px;">Description</label>
+          <%= f.text_area :description, rows: 3, style: "width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #888; margin-bottom: 8px;">
+            <%= f.check_box :is_active, style: "margin-right: 8px;" %>
+            Active
+          </label>
+          <small style="color: #555;">When disabled, the channel will not be accessible.</small>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #888; margin-bottom: 8px;">
+            <%= f.check_box :requires_livestream, style: "margin-right: 8px;" %>
+            Requires Livestream
+          </label>
+          <small style="color: #555;">When enabled, the channel is only available during live broadcasts.</small>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #888; margin-bottom: 8px;">Slow Mode (seconds)</label>
+          <%= f.number_field :slow_mode_seconds, min: 0, max: 300, style: "width: 150px; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          <small style="color: #555; display: block; margin-top: 4px;">0 = disabled. Users must wait this many seconds between messages.</small>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #888; margin-bottom: 8px;">Minimum Role</label>
+          <%= f.select :minimum_role, [["Operative", "operative"], ["Operator", "operator"], ["Admin", "admin"]], {}, style: "padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+          <small style="color: #555; display: block; margin-top: 4px;">Only users with this role or higher can access the channel.</small>
+        </div>
+
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+          <%= f.submit "Save Changes", class: "tui-button purple-168", style: "padding: 10px 30px;" %>
+          <%= link_to "Cancel", admin_uplink_index_path, class: "tui-button grey-168", style: "padding: 10px 30px;" %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

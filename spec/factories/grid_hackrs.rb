@@ -5,6 +5,10 @@ FactoryBot.define do
     role { "operative" }
     current_room { nil }
 
+    trait :operator do
+      role { "operator" }
+    end
+
     trait :admin do
       role { "admin" }
     end

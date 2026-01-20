@@ -76,6 +76,9 @@ Rails.application.routes.draw do
     get ":username", to: "pages#spa_root", as: :wire_user
   end
 
+  # Uplink routes - SPA
+  get "uplink", to: "pages#spa_root", as: :uplink
+
   # Terminal SSH access credentials page
   get "terminal", to: "terminal#index", as: :terminal
 
@@ -123,6 +126,20 @@ Rails.application.routes.draw do
 
     # Overlay API routes
     post "overlay/now-playing", to: "overlay#set_now_playing"
+
+    # Uplink API routes
+    namespace :uplink do
+      resources :channels, only: %i[index show], param: :slug do
+        resources :packets, only: %i[index create], param: :id
+      end
+      delete "packets/:id", to: "packets#destroy", as: :packet
+
+      # Moderation
+      post "users/:id/squelch", to: "moderation#squelch", as: :squelch_user
+      post "users/:id/blackout", to: "moderation#blackout", as: :blackout_user
+      delete "users/:id/punishment", to: "moderation#lift_punishment", as: :lift_punishment
+      get "moderation_log", to: "moderation#moderation_log", as: :moderation_log
+    end
   end
 
   # Admin routes (accessible at /root)
@@ -173,6 +190,23 @@ Rails.application.routes.draw do
       end
     end
     resources :redirects
+
+    # Uplink admin routes
+    resources :uplink, only: [:index] do
+      collection do
+        get "packets"
+        get "punishments"
+        get "moderation_log"
+      end
+    end
+    get "uplink/channels/:slug/edit", to: "uplink#edit_channel", as: :edit_uplink_channel
+    patch "uplink/channels/:slug", to: "uplink#update_channel", as: :uplink_channel
+    delete "uplink/packets/:id", to: "uplink#destroy_packet", as: :destroy_uplink_packet
+    post "uplink/packets/:id/drop", to: "uplink#drop_packet", as: :drop_uplink_packet
+    post "uplink/packets/:id/restore", to: "uplink#restore_packet", as: :restore_uplink_packet
+    post "uplink/users/:id/squelch", to: "uplink#squelch_user", as: :squelch_uplink_user
+    post "uplink/users/:id/blackout", to: "uplink#blackout_user", as: :blackout_uplink_user
+    delete "uplink/punishments/:id", to: "uplink#lift_punishment", as: :lift_uplink_punishment
 
     # Overlay admin routes
     get "overlays", to: "overlays#index", as: :overlays
