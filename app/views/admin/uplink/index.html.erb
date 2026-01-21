@@ -1,0 +1,188 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/uplink :: UPLINK CONTROL</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= link_to "📡 Packets", packets_admin_uplink_index_path, class: "tui-button cyan-168", style: "padding: 8px 20px;" %>
+        <%= link_to "🚫 Punishments", punishments_admin_uplink_index_path, class: "tui-button orange-168", style: "padding: 8px 20px;" %>
+        <%= link_to "📋 Mod Log", moderation_log_admin_uplink_index_path, class: "tui-button purple-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <!-- Channels Section -->
+      <div style="margin-bottom: 30px;">
+        <h3 style="color: #7c3aed; margin-bottom: 15px;">CHANNELS</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Channel</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center;">Requires Stream</th>
+                <th style="text-align: center;">Slow Mode</th>
+                <th style="text-align: center;">Min Role</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @channels.each do |channel| %>
+                <tr>
+                  <td>
+                    <strong class="cyan-255-text"><%= channel.name %></strong>
+                    <br><small style="color: #666;"><%= channel.slug %></small>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if channel.is_active %>
+                      <span class="green-255-text">● Active</span>
+                    <% else %>
+                      <span class="red-255-text">○ Inactive</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= channel.requires_livestream ? "Yes" : "No" %>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= channel.slow_mode_seconds > 0 ? "#{channel.slow_mode_seconds}s" : "Off" %>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= channel.minimum_role %>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= link_to "Edit", admin_edit_uplink_channel_path(slug: channel.slug), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Active Punishments Section -->
+      <div style="margin-bottom: 30px;">
+        <h3 style="color: #ff5555; margin-bottom: 15px;">ACTIVE PUNISHMENTS (<%= @active_punishments.count %>)</h3>
+        <% if @active_punishments.any? %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+            <table class="tui-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">User</th>
+                  <th style="text-align: center;">Type</th>
+                  <th style="text-align: left;">Reason</th>
+                  <th style="text-align: center;">Issued By</th>
+                  <th style="text-align: center;">Expires</th>
+                  <th style="text-align: center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @active_punishments.each do |punishment| %>
+                  <tr>
+                    <td>
+                      <strong class="cyan-255-text">@<%= punishment.grid_hackr.hackr_alias %></strong>
+                    </td>
+                    <td style="text-align: center;">
+                      <% if punishment.punishment_type == "blackout" %>
+                        <span class="red-255-text">BLACKOUT</span>
+                      <% else %>
+                        <span class="orange-255-text">SQUELCH</span>
+                      <% end %>
+                    </td>
+                    <td>
+                      <small><%= punishment.reason || "-" %></small>
+                    </td>
+                    <td style="text-align: center;">
+                      <small>@<%= punishment.issued_by.hackr_alias %></small>
+                    </td>
+                    <td style="text-align: center;">
+                      <% if punishment.permanent? %>
+                        <span class="red-255-text">Permanent</span>
+                      <% else %>
+                        <%= distance_of_time_in_words_to_now(punishment.expires_at) %>
+                      <% end %>
+                    </td>
+                    <td style="text-align: center;">
+                      <%= button_to "Lift", admin_lift_uplink_punishment_path(punishment), method: :delete, class: "tui-button green-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div style="padding: 20px; text-align: center; background: #1a1a1a; color: #666;">
+            No active punishments.
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Recent Packets Section -->
+      <div style="margin-bottom: 30px;">
+        <h3 style="color: #00d4ff; margin-bottom: 15px;">RECENT PACKETS</h3>
+        <% if @recent_packets.any? %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a; max-height: 400px; overflow-y: auto;">
+            <% @recent_packets.each do |packet| %>
+              <div style="padding: 8px 12px; border-bottom: 1px solid #222; <%= packet.dropped ? 'opacity: 0.5; background: rgba(255,0,0,0.05);' : '' %>">
+                <span style="color: #555; font-size: 0.75rem;"><%= packet.created_at.strftime("%H:%M") %></span>
+                <span style="color: #666; font-size: 0.75rem;">[<%= packet.chat_channel.slug %>]</span>
+                <strong style="color: #00d4ff;">@<%= packet.grid_hackr.hackr_alias %></strong>
+                <span style="color: #ccc;"><%= packet.dropped ? "[DROPPED]" : packet.content.truncate(100) %></span>
+              </div>
+            <% end %>
+          </div>
+          <div style="margin-top: 10px;">
+            <%= link_to "View All Packets →", packets_admin_uplink_index_path, style: "color: #7c3aed;" %>
+          </div>
+        <% else %>
+          <div style="padding: 20px; text-align: center; background: #1a1a1a; color: #666;">
+            No packets yet.
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Recent Moderation Log -->
+      <div>
+        <h3 style="color: #a78bfa; margin-bottom: 15px;">RECENT MODERATION ACTIVITY</h3>
+        <% if @moderation_logs.any? %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+            <% @moderation_logs.each do |log| %>
+              <div style="padding: 8px 12px; border-bottom: 1px solid #222;">
+                <span style="color: #555; font-size: 0.75rem;"><%= log.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+                <strong style="color: #ffaa00;">@<%= log.actor.hackr_alias %></strong>
+                <span style="color: #888;"><%= log.action.gsub("_", " ") %></span>
+                <% if log.target %>
+                  <span style="color: #00d4ff;">@<%= log.target.hackr_alias %></span>
+                <% end %>
+                <% if log.reason %>
+                  <small style="color: #666;"> - "<%= log.reason.truncate(50) %>"</small>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          <div style="margin-top: 10px;">
+            <%= link_to "View Full Log →", moderation_log_admin_uplink_index_path, style: "color: #7c3aed;" %>
+          </div>
+        <% else %>
+          <div style="padding: 20px; text-align: center; background: #1a1a1a; color: #666;">
+            No moderation activity yet.
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </fieldset>
+</div>

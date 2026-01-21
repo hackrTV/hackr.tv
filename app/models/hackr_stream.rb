@@ -7,6 +7,7 @@ class HackrStream < ApplicationRecord
   validate :cannot_restart_stream, on: :update
 
   before_validation :convert_youtube_urls
+  after_update_commit :broadcast_stream_status, if: :saved_change_to_is_live?
 
   scope :live, -> { where(is_live: true) }
   scope :recent, -> { order(created_at: :desc) }
@@ -74,5 +75,22 @@ class HackrStream < ApplicationRecord
     if is_live? && started_at_was.present? && started_at_changed?
       errors.add(:base, "Cannot restart a stream that has already been used. Create a new stream instead.")
     end
+  end
+
+  def broadcast_stream_status
+    ActionCable.server.broadcast("stream_status", {
+      type: is_live? ? "stream_live" : "stream_ended",
+      is_live: is_live?,
+      stream: is_live? ? stream_json : nil
+    })
+  end
+
+  def stream_json
+    {
+      id: id,
+      title: title,
+      artist: artist&.name,
+      started_at: started_at&.iso8601
+    }
   end
 end

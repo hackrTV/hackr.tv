@@ -29,6 +29,7 @@ const CodexEntryPage = lazy(() => import('~/components/pages/codex/CodexEntryPag
 const HotwirePage = lazy(() => import('~/components/pulsewire/HotwirePage').then(m => ({ default: m.HotwirePage })))
 const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage').then(m => ({ default: m.UserPulsesPage })))
 const SinglePulsePage = lazy(() => import('~/components/pulsewire/SinglePulsePage').then(m => ({ default: m.SinglePulsePage })))
+const UplinkPage = lazy(() => import('~/components/pages/uplink/UplinkPage').then(m => ({ default: m.UplinkPage })))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 // Auth components
@@ -93,6 +94,8 @@ export const AppLayout: React.FC = () => {
         <Route path="/wire" element={<HotwirePage />} />
         <Route path="/wire/:username" element={<UserPulsesPage />} />
         <Route path="/wire/pulse/:id" element={<SinglePulsePage />} />
+        {/* Uplink routes */}
+        <Route path="/uplink" element={<UplinkPage />} />
         {/* 404 catch-all - must be last */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

@@ -4,29 +4,36 @@ interface LiveStreamEmbedProps {
   url: string
   title?: string
   artistName?: string
+  sideContent?: React.ReactNode
 }
 
 export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
   url,
   title,
-  artistName
+  artistName,
+  sideContent
 }) => {
   return (
     <div style={{
       width: '100%',
       maxWidth: '1400px',
       margin: '0 auto',
-      padding: '20px'
+      padding: '4px 20px 20px'
     }}>
       {/* LIVE Indicator */}
       <div style={{
         background: 'linear-gradient(90deg, #001a00 0%, #003300 50%, #001a00 100%)',
         border: '2px solid #00ff00',
-        padding: '20px',
-        marginBottom: '20px',
+        padding: '10px 20px',
+        marginBottom: '16px',
         textAlign: 'center',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '16px',
+        flexWrap: 'wrap'
       }}>
         <div style={{
           position: 'absolute',
@@ -40,8 +47,8 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
 
         <h1 style={{
           color: '#00ff00',
-          fontSize: '3em',
-          margin: '0 0 10px 0',
+          fontSize: '1.5em',
+          margin: 0,
           textShadow: '0 0 20px #00ff00, 0 0 40px #00ff00',
           fontWeight: 'bold',
           letterSpacing: '0.1em'
@@ -52,8 +59,8 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
         {artistName && (
           <p style={{
             color: '#fff',
-            fontSize: '1.5em',
-            margin: '10px 0',
+            fontSize: '1.1em',
+            margin: 0,
             fontWeight: 'bold'
           }}>
             {artistName}
@@ -63,38 +70,67 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
         {title && (
           <p style={{
             color: '#aaa',
-            fontSize: '1.2em',
-            margin: '5px 0'
+            fontSize: '1em',
+            margin: 0
           }}>
             {title}
           </p>
         )}
       </div>
 
-      {/* Stream Embed */}
+      {/* Stream Embed + Side Content */}
       <div style={{
-        position: 'relative',
-        paddingBottom: '56.25%', // 16:9 aspect ratio
-        height: 0,
-        overflow: 'hidden',
-        background: '#000',
-        border: '3px solid #7c3aed',
-        boxShadow: '0 0 30px rgba(124, 58, 237, 0.5)'
+        display: 'flex',
+        gap: '16px',
+        alignItems: 'stretch'
       }}>
-        <iframe
-          src={url}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            border: 'none'
-          }}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          title={title || 'Live Stream'}
-        />
+        <div style={{
+          flex: sideContent ? '1 1 65%' : '1 1 100%',
+          minWidth: 0,
+          position: 'relative'
+        }}>
+          <div style={{
+            position: 'relative',
+            paddingBottom: '56.25%', // 16:9 aspect ratio
+            height: 0,
+            overflow: 'hidden',
+            background: '#000',
+            border: '3px solid #7c3aed',
+            boxShadow: '0 0 30px rgba(124, 58, 237, 0.5)'
+          }}>
+            <iframe
+              src={url}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none'
+              }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              title={title || 'Live Stream'}
+            />
+          </div>
+        </div>
+        {sideContent && (
+          <div style={{
+            flex: '0 0 350px',
+            position: 'relative'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              overflow: 'hidden'
+            }}>
+              {sideContent}
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`

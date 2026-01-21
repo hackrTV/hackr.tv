@@ -47,16 +47,21 @@ class GridHackr < ApplicationRecord
   has_many :playlists, dependent: :destroy
   has_many :pulses, dependent: :destroy
   has_many :echoes, dependent: :destroy
+  has_many :chat_messages, dependent: :destroy
+  has_many :user_punishments, dependent: :destroy
+  has_many :moderation_logs_as_actor, class_name: "ModerationLog", foreign_key: :actor_id, dependent: :nullify
+  has_many :moderation_logs_as_target, class_name: "ModerationLog", foreign_key: :target_id, dependent: :nullify
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length
-  validates :role, inclusion: {in: %w[operative admin], message: "%{value} is not a valid role"}
+  validates :role, inclusion: {in: %w[operative operator admin], message: "%{value} is not a valid role"}
   validate :alias_not_reserved
 
   after_initialize :set_default_role, if: :new_record?
 
   # Scopes
   scope :admins, -> { where(role: "admin") }
+  scope :operators, -> { where(role: "operator") }
   scope :operatives, -> { where(role: "operative") }
   scope :online, -> { recently_active.where.not(current_room_id: nil) }
   scope :in_room, ->(room) { where(current_room: room) }
@@ -67,8 +72,27 @@ class GridHackr < ApplicationRecord
     role == "admin"
   end
 
+  def operator?
+    role == "operator"
+  end
+
   def operative?
     role == "operative"
+  end
+
+  # Role hierarchy: admin (3) > operator (2) > operative (1)
+  ROLE_LEVELS = {"operative" => 1, "operator" => 2, "admin" => 3}.freeze
+
+  def role_level
+    ROLE_LEVELS[role] || 0
+  end
+
+  def at_least_operator?
+    role_level >= ROLE_LEVELS["operator"]
+  end
+
+  def at_least_admin?
+    role_level >= ROLE_LEVELS["admin"]
   end
 
   # Update last activity timestamp without triggering callbacks

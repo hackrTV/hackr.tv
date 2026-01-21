@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_16_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -60,6 +60,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_000001) do
     t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_artists_on_slug", unique: true
+  end
+
+  create_table "chat_channels", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.boolean "is_active", default: true, null: false
+    t.string "minimum_role", default: "operative", null: false
+    t.string "name", null: false
+    t.boolean "requires_livestream", default: false, null: false
+    t.integer "slow_mode_seconds", default: 0, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_chat_channels_on_is_active"
+    t.index ["slug"], name: "index_chat_channels_on_slug", unique: true
+  end
+
+  create_table "chat_messages", force: :cascade do |t|
+    t.integer "chat_channel_id", null: false
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.boolean "dropped", default: false, null: false
+    t.datetime "dropped_at"
+    t.integer "grid_hackr_id", null: false
+    t.integer "hackr_stream_id"
+    t.datetime "updated_at", null: false
+    t.index ["chat_channel_id", "created_at"], name: "index_chat_messages_on_chat_channel_id_and_created_at"
+    t.index ["chat_channel_id"], name: "index_chat_messages_on_chat_channel_id"
+    t.index ["dropped"], name: "index_chat_messages_on_dropped"
+    t.index ["grid_hackr_id"], name: "index_chat_messages_on_grid_hackr_id"
+    t.index ["hackr_stream_id"], name: "index_chat_messages_on_hackr_stream_id"
   end
 
   create_table "codex_entries", force: :cascade do |t|
@@ -207,6 +237,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_000001) do
     t.datetime "updated_at", null: false
     t.string "vod_url"
     t.index ["artist_id"], name: "index_hackr_streams_on_artist_id"
+  end
+
+  create_table "moderation_logs", force: :cascade do |t|
+    t.string "action", null: false
+    t.integer "actor_id", null: false
+    t.integer "chat_message_id"
+    t.datetime "created_at", null: false
+    t.integer "duration_minutes"
+    t.text "reason"
+    t.integer "target_id"
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_moderation_logs_on_action"
+    t.index ["actor_id"], name: "index_moderation_logs_on_actor_id"
+    t.index ["chat_message_id"], name: "index_moderation_logs_on_chat_message_id"
+    t.index ["created_at"], name: "index_moderation_logs_on_created_at"
+    t.index ["target_id"], name: "index_moderation_logs_on_target_id"
   end
 
   create_table "overlay_alerts", force: :cascade do |t|
@@ -429,6 +475,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_000001) do
     t.index ["release_date"], name: "index_tracks_on_release_date"
   end
 
+  create_table "user_punishments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.integer "grid_hackr_id", null: false
+    t.integer "issued_by_id", null: false
+    t.string "punishment_type", null: false
+    t.text "reason"
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_user_punishments_on_expires_at"
+    t.index ["grid_hackr_id", "punishment_type"], name: "index_user_punishments_on_grid_hackr_id_and_punishment_type"
+    t.index ["grid_hackr_id"], name: "index_user_punishments_on_grid_hackr_id"
+    t.index ["issued_by_id"], name: "index_user_punishments_on_issued_by_id"
+  end
+
   create_table "zone_playlist_tracks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "position", null: false
@@ -452,12 +512,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_000001) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "albums", "artists"
+  add_foreign_key "chat_messages", "chat_channels"
+  add_foreign_key "chat_messages", "grid_hackrs"
+  add_foreign_key "chat_messages", "hackr_streams"
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_logs", "grid_hackrs", column: "author_id"
   add_foreign_key "hackr_streams", "artists"
+  add_foreign_key "moderation_logs", "chat_messages"
+  add_foreign_key "moderation_logs", "grid_hackrs", column: "actor_id"
+  add_foreign_key "moderation_logs", "grid_hackrs", column: "target_id"
   add_foreign_key "overlay_now_playing", "tracks"
   add_foreign_key "overlay_scene_elements", "overlay_elements"
   add_foreign_key "overlay_scene_elements", "overlay_scenes"
@@ -473,6 +539,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_000001) do
   add_foreign_key "radio_station_playlists", "radio_stations"
   add_foreign_key "tracks", "albums"
   add_foreign_key "tracks", "artists"
+  add_foreign_key "user_punishments", "grid_hackrs"
+  add_foreign_key "user_punishments", "grid_hackrs", column: "issued_by_id"
   add_foreign_key "zone_playlist_tracks", "tracks"
   add_foreign_key "zone_playlist_tracks", "zone_playlists"
 end

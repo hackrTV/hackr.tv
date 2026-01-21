@@ -16,3 +16,6 @@ load Rails.root.join("db", "seeds", "hackr_logs_seeds.rb")
 
 # Load Overlay seed data
 load Rails.root.join("db", "seeds", "overlay_seeds.rb")
+
+# Load Uplink seed data
+load Rails.root.join("db", "seeds", "uplink_seeds.rb")

@@ -1,0 +1,230 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/uplink/punishments :: MANAGE PUNISHMENTS</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <%= link_to "← Uplink Dashboard", admin_uplink_index_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <!-- Issue New Punishment -->
+      <div style="margin-bottom: 30px; background: #1a1a1a; padding: 20px; border: 1px solid #333;">
+        <h3 style="color: #ff5555; margin-bottom: 15px;">ISSUE PUNISHMENT</h3>
+
+        <%= form_with url: admin_squelch_uplink_user_path(0), method: :post, local: true, id: "punishment-form", style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
+          <div style="flex: 1 1 200px;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Username</label>
+            <input type="text" name="username" id="punishment-username" placeholder="@username" required style="width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
+          </div>
+
+          <div style="flex: 0 0 auto;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Type</label>
+            <select name="punishment_type" id="punishment-type" style="padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
+              <option value="squelch">Squelch (mute)</option>
+              <option value="blackout">Blackout (ban)</option>
+            </select>
+          </div>
+
+          <div style="flex: 0 0 auto;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Duration (minutes)</label>
+            <input type="number" name="duration_minutes" placeholder="Leave empty for permanent" min="1" style="width: 180px; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
+          </div>
+
+          <div style="flex: 1 1 300px;">
+            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Reason</label>
+            <input type="text" name="reason" placeholder="Optional reason" style="width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
+          </div>
+
+          <div style="flex: 0 0 auto;">
+            <button type="submit" class="tui-button red-168" style="padding: 8px 20px;">Issue Punishment</button>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Filters -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <label style="color: #888; padding: 8px 0;">Filter:</label>
+        <%= link_to "All", punishments_admin_uplink_index_path,
+            class: "tui-button #{params[:status].blank? && params[:type].blank? ? 'cyan-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+        <%= link_to "Active", punishments_admin_uplink_index_path(status: 'active'),
+            class: "tui-button #{params[:status] == 'active' ? 'green-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+        <%= link_to "Expired", punishments_admin_uplink_index_path(status: 'expired'),
+            class: "tui-button #{params[:status] == 'expired' ? 'red-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+        <span style="color: #444;">|</span>
+        <%= link_to "Squelches", punishments_admin_uplink_index_path(type: 'squelch'),
+            class: "tui-button #{params[:type] == 'squelch' ? 'orange-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+        <%= link_to "Blackouts", punishments_admin_uplink_index_path(type: 'blackout'),
+            class: "tui-button #{params[:type] == 'blackout' ? 'red-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+      </div>
+
+      <!-- Stats -->
+      <div style="margin-bottom: 20px; color: #666;">
+        <strong><%= @punishments.count %></strong> punishment<%= @punishments.count == 1 ? '' : 's' %>
+      </div>
+
+      <!-- Punishments Table -->
+      <% if @punishments.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">User</th>
+                <th style="text-align: center;">Type</th>
+                <th style="text-align: left;">Reason</th>
+                <th style="text-align: center;">Issued By</th>
+                <th style="text-align: center;">Issued At</th>
+                <th style="text-align: center;">Expires</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @punishments.each do |punishment| %>
+                <tr class="admin-table-row">
+                  <td>
+                    <strong class="cyan-255-text">@<%= punishment.grid_hackr.hackr_alias %></strong>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if punishment.punishment_type == "blackout" %>
+                      <span class="red-255-text">BLACKOUT</span>
+                    <% else %>
+                      <span class="orange-255-text">SQUELCH</span>
+                    <% end %>
+                  </td>
+                  <td>
+                    <small><%= punishment.reason || "-" %></small>
+                  </td>
+                  <td style="text-align: center;">
+                    <small>@<%= punishment.issued_by.hackr_alias %></small>
+                  </td>
+                  <td style="text-align: center;">
+                    <small style="color: #888;">
+                      <%= punishment.created_at.strftime("%Y-%m-%d") %><br>
+                      <%= punishment.created_at.strftime("%H:%M") %>
+                    </small>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if punishment.permanent? %>
+                      <span class="red-255-text">Permanent</span>
+                    <% else %>
+                      <small><%= punishment.expires_at.strftime("%Y-%m-%d %H:%M") %></small>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if punishment.expired? %>
+                      <span style="color: #666;">Expired</span>
+                    <% else %>
+                      <span class="green-255-text">Active</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% unless punishment.expired? %>
+                      <%= button_to "Lift", admin_lift_uplink_punishment_path(punishment), method: :delete, class: "tui-button green-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No punishments found.</p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('punishment-form');
+    const usernameInput = document.getElementById('punishment-username');
+    const typeSelect = document.getElementById('punishment-type');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const username = usernameInput.value.replace('@', '').trim();
+      if (!username) {
+        alert('Please enter a username');
+        return;
+      }
+
+      // Find user ID by username via API
+      fetch('/api/grid/current_hackr')
+        .then(r => r.json())
+        .then(data => {
+          // For now, use a simple approach - the admin controller will look up by username
+          // Update form action based on punishment type
+          const punishmentType = typeSelect.value;
+          const action = punishmentType === 'blackout' ? 'blackout' : 'squelch';
+
+          // We need to find the user ID - for simplicity, submit with username and handle server-side
+          // Create a hidden form with the correct action
+          const submitForm = document.createElement('form');
+          submitForm.method = 'POST';
+
+          // We'll use a special endpoint that accepts username
+          if (punishmentType === 'blackout') {
+            submitForm.action = '/root/uplink/users/0/blackout';
+          } else {
+            submitForm.action = '/root/uplink/users/0/squelch';
+          }
+
+          // Add CSRF token
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'authenticity_token';
+          csrfInput.value = csrfToken;
+          submitForm.appendChild(csrfInput);
+
+          // Add username
+          const usernameHidden = document.createElement('input');
+          usernameHidden.type = 'hidden';
+          usernameHidden.name = 'username';
+          usernameHidden.value = username;
+          submitForm.appendChild(usernameHidden);
+
+          // Copy other fields
+          const duration = form.querySelector('[name="duration_minutes"]').value;
+          if (duration) {
+            const durationInput = document.createElement('input');
+            durationInput.type = 'hidden';
+            durationInput.name = 'duration_minutes';
+            durationInput.value = duration;
+            submitForm.appendChild(durationInput);
+          }
+
+          const reason = form.querySelector('[name="reason"]').value;
+          if (reason) {
+            const reasonInput = document.createElement('input');
+            reasonInput.type = 'hidden';
+            reasonInput.name = 'reason';
+            reasonInput.value = reason;
+            submitForm.appendChild(reasonInput);
+          }
+
+          document.body.appendChild(submitForm);
+          submitForm.submit();
+        });
+    });
+  });
+</script>
