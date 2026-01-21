@@ -14,7 +14,7 @@ class ChatMessage < ApplicationRecord
   scope :for_channel, ->(channel) { where(chat_channel: channel) }
 
   after_create_commit :broadcast_new_packet
-  after_update_commit :broadcast_packet_dropped, if: :saved_change_to_dropped?
+  after_update_commit :broadcast_dropped_change, if: :saved_change_to_dropped?
 
   # Drop a message (moderation action)
   def drop!
@@ -35,13 +35,19 @@ class ChatMessage < ApplicationRecord
     })
   end
 
-  def broadcast_packet_dropped
-    return unless dropped?
-
-    ActionCable.server.broadcast(chat_channel.stream_name, {
-      type: "packet_dropped",
-      packet_id: id
-    })
+  def broadcast_dropped_change
+    if dropped?
+      ActionCable.server.broadcast(chat_channel.stream_name, {
+        type: "packet_dropped",
+        packet_id: id
+      })
+    else
+      ActionCable.server.broadcast(chat_channel.stream_name, {
+        type: "packet_restored",
+        packet_id: id,
+        packet: packet_json
+      })
+    end
   end
 
   def packet_json

@@ -174,7 +174,7 @@ class Admin::UplinkController < Admin::ApplicationController
     @logs = ModerationLog.includes(:actor, :target, :chat_message).recent
 
     # Filter by action
-    @logs = @logs.by_action(params[:action]) if params[:action].present?
+    @logs = @logs.by_action(params[:action_type]) if params[:action_type].present?
 
     # Filter by actor
     if params[:actor].present?

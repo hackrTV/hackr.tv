@@ -76,6 +76,16 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({ defaultChannel = 'ambi
       }
       break
 
+    case 'packet_restored':
+      if (message.packet_id) {
+        setPackets(prev => prev.map(p =>
+          p.id === message.packet_id
+            ? { ...p, dropped: false }
+            : p
+        ))
+      }
+      break
+
     case 'presence_update':
       if (message.count !== undefined) {
         setPresenceCount(message.count)

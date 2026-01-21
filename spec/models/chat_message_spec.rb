@@ -126,5 +126,16 @@ RSpec.describe ChatMessage, type: :model do
       expect(message.dropped).to be false
       expect(message.dropped_at).to be_nil
     end
+
+    it "broadcasts packet_restored message" do
+      message = create(:chat_message, :dropped)
+
+      expect(ActionCable.server).to receive(:broadcast).with(
+        message.chat_channel.stream_name,
+        hash_including(type: "packet_restored", packet_id: message.id)
+      )
+
+      message.restore!
+    end
   end
 end

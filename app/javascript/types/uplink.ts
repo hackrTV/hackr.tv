@@ -28,7 +28,7 @@ export interface Packet {
 }
 
 export interface UplinkMessage {
-  type: 'new_packet' | 'packet_dropped' | 'initial_packets' | 'presence_update'
+  type: 'new_packet' | 'packet_dropped' | 'packet_restored' | 'initial_packets' | 'presence_update'
   packet?: Packet
   packets?: Packet[]
   packet_id?: number

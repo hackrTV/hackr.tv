@@ -15,7 +15,7 @@
         <%= form_with url: moderation_log_admin_uplink_index_path, method: :get, local: true, style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
           <div style="flex: 0 0 auto;">
             <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Action</label>
-            <%= f.select :action, ModerationLog::ACTIONS.map { |a| [a.gsub("_", " ").titleize, a] }.unshift(["All Actions", ""]), { selected: params[:action] }, style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
+            <%= f.select :action_type, ModerationLog::ACTIONS.map { |a| [a.gsub("_", " ").titleize, a] }.unshift(["All Actions", ""]), { selected: params[:action_type] }, style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
           </div>
 
           <div style="flex: 1 1 150px;">
