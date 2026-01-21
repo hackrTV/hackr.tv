@@ -1,8 +1,8 @@
 # hackr.tv
 
-> A Ruby on Rails music artist showcase platform and text-based MUD game set in a dystopian cyberpunk universe.
+> A Ruby on Rails music artist showcase platform and text-based MUD.
 
-**hackr.tv** is a multi-domain music streaming and discovery platform featuring **THE PULSE GRID** - a playable multiplayer MUD (Multi-User Dungeon) set in 2126. Explore the resistance movement through music, lore, and interactive gameplay.
+**hackr.tv** is a multi-domain music streaming and discovery platform featuring **THE PULSE GRID** - a multiplayer MUD (Multi-User Dungeon) set in 2126. Explore the resistance movement through music and interactive experiences.
 
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.2-red.svg)](https://rubyonrails.org/)
@@ -57,15 +57,15 @@
   - Lyrics display with Markdown and Codex auto-linking
   - Artist-specific color themes
 
-### The Codex - Lore Wiki
-- **In-World Encyclopedia** - Comprehensive wiki documenting THE.CYBERPUL.SE universe
+### The Codex - Wiki
+- **Encyclopedia** - Comprehensive wiki documenting THE.CYBERPUL.SE
 - **7 Entry Types** - People, organizations, events, locations, technology, factions, items
 - **Markdown Content** - Rich formatting with auto-linking via `[[Entry Name]]` syntax
 - **Search & Filter** - Find entries by type, search by name/content
 - **Admin Interface** - Full CRUD with draft/publish workflow at `/root/codex`
 
 ### PulseWire - Social Network
-- **In-World Micro-Blogging** - Twitter-like platform for Grid Hackr users
+- **Micro-Blogging** - Twitter-like platform for Grid Hackr users
 - **Pulses** - 256-character posts with real-time updates via Action Cable
 - **Echoes** - Rebroadcast system (like retweets)
 - **Splices** - Threaded replies for conversations
@@ -73,9 +73,9 @@
 - **User Profiles** - View any user's pulse history at `/wire/:username`
 - **Admin Moderation** - SignalDrop system for content moderation
 
-### THE PULSE GRID - MUD Game
+### THE PULSE GRID - MUD
 - **Real-time Multiplayer** - Live chat and movement tracking via Action Cable
-- **Interactive NPCs** - Rich dialogue trees with lore-heavy conversations
+- **Interactive NPCs** - Rich dialogue trees with detailed conversations
   - Fracture Network Coordinator (6 topics: mission, fracture, help, station, synthia, govcorp)
   - Temporal Theorist (7 topics: time, paradox, xeraen, future, 2125, prism, synthia)
 - **Command History** - Arrow key navigation through previous commands (up to 100 stored)
@@ -87,7 +87,7 @@
 ### OBS Overlay System
 - **Now Playing Overlay** - Display currently playing track for livestreams
 - **PulseWire Overlay** - Show live social activity during streams
-- **Grid Activity Overlay** - Stream multiplayer game activity
+- **Grid Activity Overlay** - Stream multiplayer Grid activity
 - **Scene Management** - Compose multiple overlay elements with positioning
 - **Scene Groups** - Collections of scenes for easy switching during streams (admin at `/root/overlays/groups`)
 - **Lower Thirds** - Text overlays with custom slugs and styling
@@ -258,7 +258,7 @@ hackr.tv/
 │   │   ├── api/                       # JSON API for React SPA
 │   │   │   ├── radio_controller.rb    # Radio stations & playlists endpoint
 │   │   │   ├── playlists_controller.rb # User playlist CRUD
-│   │   │   └── grid_controller.rb     # Grid game API
+│   │   │   └── grid_controller.rb     # Grid API
 │   │   ├── admin/                     # Server-rendered admin CRUD
 │   │   │   ├── radio_stations_controller.rb
 │   │   │   ├── tracks_controller.rb
@@ -412,7 +412,7 @@ bin/rails import:yaml_tracks        # Tracks only
 
 ### THE PULSE GRID
 - **grid_hackrs** - player accounts with bcrypt authentication (role: operative/admin), has_many :playlists
-- **grid_rooms** - locations in the game world
+- **grid_rooms** - locations in THE PULSE GRID
 - **grid_zones** - areas grouping rooms (faction_base, govcorp, transit)
 - **grid_factions** - Fracture Network factions (The.CyberPul.se, XERAEN, GovCorp)
 - **grid_exits** - directional connections between rooms
@@ -496,7 +496,7 @@ bin/rails import:yaml_tracks        # Tracks only
 - World expansion - More rooms, NPCs, items (currently only 5 rooms)
 - Faction reputation system
 - Mission/quest system for THE PULSE GRID
-- Hacking system (core gameplay mechanic)
+- Hacking system
 - Combat mechanics (physical/cyber)
 - Synthia frequency tuning mechanic
 - Persistent inventory between sessions
