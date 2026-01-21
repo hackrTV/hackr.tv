@@ -129,7 +129,7 @@ export const PacketInput: React.FC<PacketInputProps> = ({
               backgroundColor: '#0a0a0a',
               border: `1px solid ${isOverLimit ? '#ff5555' : '#333'}`,
               color: '#ccc',
-              fontFamily: "'Courier New', monospace",
+              fontFamily: 'Terminus, monospace',
               fontSize: '0.9rem',
               outline: 'none'
             }}
@@ -157,7 +157,7 @@ export const PacketInput: React.FC<PacketInputProps> = ({
             backgroundColor: cooldown > 0 ? '#333' : '#7c3aed',
             border: 'none',
             color: cooldown > 0 ? '#666' : '#fff',
-            fontFamily: "'Courier New', monospace",
+            fontFamily: 'Terminus, monospace',
             fontSize: '0.85rem',
             cursor: disabled || isSubmitting || isOverLimit || !content.trim() || cooldown > 0
               ? 'not-allowed'

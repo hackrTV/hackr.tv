@@ -42,7 +42,6 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({ defaultChannel = 'ambi
       }
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: fetch data on mount
     fetchChannels()
   }, [])
 
@@ -226,7 +225,7 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({ defaultChannel = 'ambi
             margin: 0,
             fontSize: '1rem',
             color: '#7c3aed',
-            fontFamily: "'Courier New', monospace"
+            fontFamily: 'Terminus, monospace'
           }}
         >
           UPLINK

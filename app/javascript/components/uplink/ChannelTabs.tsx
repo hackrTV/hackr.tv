@@ -31,7 +31,7 @@ export const ChannelTabs: React.FC<ChannelTabsProps> = ({
         return (
           <button
             key={channel.slug}
-            onClick={() => !isDisabled && onChannelChange(channel.slug)}
+            onClick={() => !isDisabled && !isActive && onChannelChange(channel.slug)}
             disabled={isDisabled}
             title={channel.description}
             style={{
@@ -41,7 +41,7 @@ export const ChannelTabs: React.FC<ChannelTabsProps> = ({
               border: 'none',
               borderBottom: isActive ? '2px solid #7c3aed' : '2px solid transparent',
               color: isActive ? '#7c3aed' : isDisabled ? '#444' : '#888',
-              fontFamily: "'Courier New', monospace",
+              fontFamily: 'Terminus, monospace',
               fontSize: '0.9rem',
               cursor: isDisabled ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
@@ -59,7 +59,7 @@ export const ChannelTabs: React.FC<ChannelTabsProps> = ({
                   borderRadius: '50%',
                   backgroundColor: isLive ? '#00ff00' : '#555',
                   marginLeft: '6px',
-                  verticalAlign: 'middle'
+                  verticalAlign: '1px'
                 }}
                 title={isLive ? 'LIVE' : 'Offline'}
               />

@@ -115,9 +115,9 @@ export const useStreamStatus = ({ enabled = true }: UseStreamStatusOptions = {})
   useEffect(() => {
     reconnectAttemptsRef.current = 0
     if (enabled) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: establish WebSocket on mount
       connect()
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: cleanup WebSocket on disable
       disconnect()
     }
 

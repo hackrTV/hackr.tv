@@ -92,7 +92,7 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
           style={{
             color: '#555',
             fontSize: '0.75rem',
-            fontFamily: "'Courier New', monospace",
+            fontFamily: 'Terminus, monospace',
             flexShrink: 0,
             marginTop: '2px'
           }}

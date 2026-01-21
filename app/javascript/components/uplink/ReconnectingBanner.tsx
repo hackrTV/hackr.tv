@@ -80,7 +80,7 @@ export const ReconnectingBanner: React.FC<ReconnectingBannerProps> = ({ status, 
             color: '#ccc',
             fontSize: '0.75rem',
             cursor: 'pointer',
-            fontFamily: "'Courier New', monospace"
+            fontFamily: 'Terminus, monospace'
           }}
         >
           Reconnect
