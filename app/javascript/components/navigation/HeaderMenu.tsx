@@ -242,24 +242,26 @@ export const HeaderMenu: React.FC = () => {
                 </Link>
               </div>
 
-              <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">5. UPLINK</div>
-                <Link to="/uplink" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">/</span>chat
-                </Link>
-              </div>
+              {isLoggedIn && (
+                <div className="mobile-menu-section">
+                  <div className="mobile-menu-section-title">5. UPLINK</div>
+                  <Link to="/uplink" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                    <span className="purple-168-text">/</span>transmit
+                  </Link>
+                </div>
+              )}
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MORE</div>
                 <Link to="/codex" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">6</span> The Codex
+                  <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span> The Codex
                 </Link>
                 <Link to="/logs" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">7</span> Hackr Logs
+                  <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Hackr Logs
                 </Link>
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
-                    <span className="red-255-text">8</span> /root <span className="red-255-text">[ADMIN]</span>
+                    <span className="red-255-text">{isLoggedIn ? '8' : '7'}</span> /root <span className="red-255-text">[ADMIN]</span>
                   </a>
                 )}
               </div>
@@ -447,32 +449,34 @@ export const HeaderMenu: React.FC = () => {
             </Link>
           </li>
 
-          {/* 5: Uplink */}
-          <li className="header-nav-item">
-            <Link to="/uplink">
-              <span className="purple-168-text">5</span> Uplink&nbsp;
-            </Link>
-          </li>
+          {/* 5: Uplink (logged in only) */}
+          {isLoggedIn && (
+            <li className="header-nav-item">
+              <Link to="/uplink">
+                <span className="purple-168-text">5</span> Uplink&nbsp;
+              </Link>
+            </li>
+          )}
 
-          {/* 6: The Codex */}
+          {/* The Codex */}
           <li className="header-nav-item">
             <Link to="/codex">
-              <span className="purple-168-text">6</span> The Codex&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span> The Codex&nbsp;
             </Link>
           </li>
 
-          {/* 7: Hackr Logs */}
+          {/* Hackr Logs */}
           <li className="header-nav-item">
             <Link to="/logs">
-              <span className="purple-168-text">7</span> Hackr Logs&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Hackr Logs&nbsp;
             </Link>
           </li>
 
-          {/* 8: Admin (only show if user is admin) */}
+          {/* Admin (only show if user is admin) */}
           {hackr?.role === 'admin' && (
             <li className="header-nav-item">
               <a href="/root">
-                <span className="red-255-text">8</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">{isLoggedIn ? '8' : '7'}</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

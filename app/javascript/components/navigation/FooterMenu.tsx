@@ -5,7 +5,7 @@ import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useTerminal } from '~/contexts/TerminalContext'
 
 export const FooterMenu: React.FC = () => {
-  const { hackr } = useGridAuth()
+  const { hackr, isLoggedIn } = useGridAuth()
   const { isMobile } = useMobileDetect()
   const { openTerminal } = useTerminal()
 
@@ -51,25 +51,27 @@ export const FooterMenu: React.FC = () => {
               <span className="purple-168-text">4</span>&nbsp;The WIRE&nbsp;
             </Link>
           </li>
-          <li>
-            <Link to="/uplink">
-              <span className="purple-168-text">5</span>&nbsp;Uplink&nbsp;
-            </Link>
-          </li>
+          {isLoggedIn && (
+            <li>
+              <Link to="/uplink">
+                <span className="purple-168-text">5</span>&nbsp;Uplink&nbsp;
+              </Link>
+            </li>
+          )}
           <li>
             <Link to="/codex">
-              <span className="purple-168-text">6</span>&nbsp;The Codex&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span>&nbsp;The Codex&nbsp;
             </Link>
           </li>
           <li>
             <Link to="/logs">
-              <span className="purple-168-text">7</span>&nbsp;Hackr Logs&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;Hackr Logs&nbsp;
             </Link>
           </li>
           {hackr?.role === 'admin' && (
             <li>
               <a href="/root">
-                <span className="red-255-text">8</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

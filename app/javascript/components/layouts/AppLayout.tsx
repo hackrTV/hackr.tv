@@ -94,8 +94,8 @@ export const AppLayout: React.FC = () => {
         <Route path="/wire" element={<HotwirePage />} />
         <Route path="/wire/:username" element={<UserPulsesPage />} />
         <Route path="/wire/pulse/:id" element={<SinglePulsePage />} />
-        {/* Uplink routes */}
-        <Route path="/uplink" element={<UplinkPage />} />
+        {/* Uplink routes - protected */}
+        <Route path="/uplink" element={<ProtectedRoute><UplinkPage /></ProtectedRoute>} />
         {/* 404 catch-all - must be last */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
