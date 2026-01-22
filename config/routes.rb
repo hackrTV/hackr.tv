@@ -78,6 +78,7 @@ Rails.application.routes.draw do
 
   # Uplink routes - SPA
   get "uplink", to: "pages#spa_root", as: :uplink
+  get "uplink/popout", to: "pages#spa_root", as: :uplink_popout
 
   # Terminal SSH access credentials page
   get "terminal", to: "terminal#index", as: :terminal

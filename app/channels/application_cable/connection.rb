@@ -3,17 +3,14 @@ module ApplicationCable
     identified_by :current_hackr
 
     def connect
-      self.current_hackr = find_verified_hackr
+      self.current_hackr = find_hackr
     end
 
     private
 
-    def find_verified_hackr
-      if (verified_hackr = GridHackr.find_by(id: cookies.encrypted[:grid_hackr_id]))
-        verified_hackr
-      else
-        reject_unauthorized_connection
-      end
+    def find_hackr
+      # Allow anonymous connections (return nil if not logged in)
+      GridHackr.find_by(id: cookies.encrypted[:grid_hackr_id])
     end
   end
 end

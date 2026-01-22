@@ -1,5 +1,12 @@
 class GridChannel < ApplicationCable::Channel
   def subscribed
+    # Reject anonymous connections
+    unless current_hackr
+      Rails.logger.warn "=== GridChannel: Rejected anonymous connection ==="
+      reject
+      return
+    end
+
     # Reload hackr to get fresh current_room data from database
     current_hackr.reload
 
