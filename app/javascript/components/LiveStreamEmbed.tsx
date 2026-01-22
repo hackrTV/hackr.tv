@@ -1,18 +1,193 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 interface LiveStreamEmbedProps {
   url: string
   title?: string
   artistName?: string
   sideContent?: React.ReactNode
+  theaterMode?: boolean
+  onTheaterModeToggle?: () => void
 }
 
 export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
   url,
   title,
   artistName,
-  sideContent
+  sideContent,
+  theaterMode = false,
+  onTheaterModeToggle
 }) => {
+  // Handle escape key to exit theater mode
+  useEffect(() => {
+    if (!theaterMode) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onTheaterModeToggle) {
+        onTheaterModeToggle()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [theaterMode, onTheaterModeToggle])
+
+  // Prevent body scroll in theater mode
+  useEffect(() => {
+    if (theaterMode) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [theaterMode])
+
+  const theaterButton = onTheaterModeToggle && (
+    <button
+      onClick={onTheaterModeToggle}
+      title={theaterMode ? 'Exit theater mode (Esc)' : 'Theater mode'}
+      style={{
+        position: 'absolute',
+        right: '10px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        background: 'rgba(0, 0, 0, 0.6)',
+        border: '1px solid #00ff00',
+        color: '#00ff00',
+        padding: '6px 10px',
+        fontSize: '0.75rem',
+        cursor: 'pointer',
+        fontFamily: 'Terminus, monospace',
+        zIndex: 10
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'rgba(0, 255, 0, 0.2)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'
+      }}
+    >
+      {theaterMode ? '[x] EXIT' : '[=] THEATER'}
+    </button>
+  )
+
+  // Theater mode: full screen overlay
+  if (theaterMode) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: '#000',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Compact header */}
+        <div style={{
+          background: 'linear-gradient(90deg, #001a00 0%, #003300 50%, #001a00 100%)',
+          borderBottom: '2px solid #00ff00',
+          padding: '8px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          position: 'relative',
+          flexShrink: 0
+        }}>
+          <h1 style={{
+            color: '#00ff00',
+            fontSize: '1.1em',
+            margin: 0,
+            textShadow: '0 0 20px #00ff00',
+            fontWeight: 'bold',
+            letterSpacing: '0.1em'
+          }}>
+            LIVE
+          </h1>
+
+          {artistName && (
+            <span style={{ color: '#fff', fontSize: '1em', fontWeight: 'bold' }}>
+              {artistName}
+            </span>
+          )}
+
+          {title && (
+            <span style={{ color: '#888', fontSize: '0.9em' }}>
+              {title}
+            </span>
+          )}
+
+          {theaterButton}
+        </div>
+
+        {/* Video + Chat container */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          gap: '0',
+          minHeight: 0
+        }}>
+          {/* Video */}
+          <div style={{
+            flex: sideContent ? '1 1 auto' : '1 1 100%',
+            minWidth: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#000'
+          }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              maxHeight: '100%',
+              position: 'relative'
+            }}>
+              <iframe
+                src={url}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 'none'
+                }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                title={title || 'Live Stream'}
+              />
+            </div>
+          </div>
+
+          {/* Chat sidebar */}
+          {sideContent && (
+            <div style={{
+              flex: '0 0 380px',
+              borderLeft: '2px solid #333',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: 0
+            }}>
+              {sideContent}
+            </div>
+          )}
+        </div>
+
+        <style>{`
+          @keyframes pulse-wave {
+            0% { left: -100%; }
+            100% { left: 100%; }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  // Normal mode
   return (
     <div style={{
       width: '100%',
@@ -53,7 +228,7 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
           fontWeight: 'bold',
           letterSpacing: '0.1em'
         }}>
-          ⚡ LIVE NOW ⚡
+          LIVE NOW
         </h1>
 
         {artistName && (
@@ -76,6 +251,8 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
             {title}
           </p>
         )}
+
+        {theaterButton}
       </div>
 
       {/* Stream Embed + Side Content */}

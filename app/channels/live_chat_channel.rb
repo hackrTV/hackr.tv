@@ -22,9 +22,9 @@ class LiveChatChannel < ApplicationCable::Channel
       return
     end
 
-    # Check channel accessibility
-    unless chat_channel.accessible_by?(current_hackr)
-      Rails.logger.warn "=== LiveChatChannel: #{current_hackr&.hackr_alias || "Anonymous"} cannot access channel #{@channel_slug} ==="
+    # Check channel viewability (allows anonymous read-only access for livestream channels)
+    unless chat_channel.viewable_by?(current_hackr)
+      Rails.logger.warn "=== LiveChatChannel: #{current_hackr&.hackr_alias || "Anonymous"} cannot view channel #{@channel_slug} ==="
       reject
       return
     end

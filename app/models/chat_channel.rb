@@ -16,7 +16,7 @@ class ChatChannel < ApplicationRecord
     true
   end
 
-  # Check if a hackr can access this channel based on role requirements
+  # Check if a hackr can access this channel based on role requirements (for transmitting)
   def accessible_by?(hackr)
     return false unless hackr
     return false unless currently_available?
@@ -25,6 +25,18 @@ class ChatChannel < ApplicationRecord
     required_level = GridHackr::ROLE_LEVELS[minimum_role] || 0
 
     hackr_level >= required_level
+  end
+
+  # Check if channel is viewable (read-only access)
+  # Anonymous users can only view livestream channels (e.g., #live)
+  def viewable_by?(hackr)
+    return false unless currently_available?
+
+    # Anonymous users can only view livestream channels
+    return requires_livestream? unless hackr
+
+    # Logged-in users must meet role requirements
+    accessible_by?(hackr)
   end
 
   # Get the broadcast stream name for ActionCable

@@ -13,9 +13,16 @@ import type { ChatChannel, Packet, UplinkHackr, UplinkMessage, ChannelsResponse,
 interface UplinkPanelProps {
   defaultChannel?: string
   livestreamOnly?: boolean
+  allowPopout?: boolean
+  onPopout?: () => void
 }
 
-export const UplinkPanel: React.FC<UplinkPanelProps> = ({ defaultChannel = 'ambient', livestreamOnly = false }) => {
+export const UplinkPanel: React.FC<UplinkPanelProps> = ({
+  defaultChannel = 'ambient',
+  livestreamOnly = false,
+  allowPopout = false,
+  onPopout
+}) => {
   const [channels, setChannels] = useState<ChatChannel[]>([])
   const [activeChannel, setActiveChannel] = useState<string>(defaultChannel)
   const [packets, setPackets] = useState<Packet[]>([])
@@ -241,11 +248,39 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({ defaultChannel = 'ambi
           UPLINK
         </h2>
 
-        {currentHackr && (
-          <span style={{ fontSize: '0.75rem', color: '#666' }}>
-            @{currentHackr.hackr_alias}
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {currentHackr && (
+            <span style={{ fontSize: '0.75rem', color: '#666' }}>
+              @{currentHackr.hackr_alias}
+            </span>
+          )}
+          {allowPopout && onPopout && (
+            <button
+              onClick={onPopout}
+              title="Pop out chat"
+              style={{
+                background: 'none',
+                border: '1px solid #444',
+                color: '#888',
+                padding: '4px 8px',
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                fontFamily: 'Terminus, monospace',
+                borderRadius: '2px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#7c3aed'
+                e.currentTarget.style.color = '#7c3aed'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#444'
+                e.currentTarget.style.color = '#888'
+              }}
+            >
+              [^]
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Channel tabs */}
@@ -330,7 +365,8 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({ defaultChannel = 'ambi
               padding: '16px',
               textAlign: 'center',
               backgroundColor: '#111',
-              borderTop: '1px solid #333'
+              borderTop: '1px solid #333',
+              color: '#999'
             }}
           >
             <Link
