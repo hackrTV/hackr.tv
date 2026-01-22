@@ -98,22 +98,21 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
           position: 'relative',
           flexShrink: 0
         }}>
-          <h1 style={{
-            color: '#00ff00',
-            fontSize: '1.1em',
-            margin: 0,
-            textShadow: '0 0 20px #00ff00',
-            fontWeight: 'bold',
-            letterSpacing: '0.1em'
-          }}>
-            LIVE
-          </h1>
-
           {artistName && (
             <span style={{ color: '#fff', fontSize: '1em', fontWeight: 'bold' }}>
               {artistName}
             </span>
           )}
+
+          <h1 style={{
+            fontSize: '1.1em',
+            margin: 0,
+            fontWeight: 'bold',
+            letterSpacing: '0.1em'
+          }}>
+            {artistName && <span style={{ color: '#888', fontWeight: 'normal' }}>is </span>}
+            <span style={{ color: '#00ff00', textShadow: '0 0 20px #00ff00' }}>LIVE</span>
+          </h1>
 
           {title && (
             <span style={{ color: '#888', fontSize: '0.9em' }}>
@@ -220,17 +219,6 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
           animation: 'pulse-wave 3s linear infinite'
         }} />
 
-        <h1 style={{
-          color: '#00ff00',
-          fontSize: '1.5em',
-          margin: 0,
-          textShadow: '0 0 20px #00ff00, 0 0 40px #00ff00',
-          fontWeight: 'bold',
-          letterSpacing: '0.1em'
-        }}>
-          LIVE NOW
-        </h1>
-
         {artistName && (
           <p style={{
             color: '#fff',
@@ -241,6 +229,16 @@ export const LiveStreamEmbed: React.FC<LiveStreamEmbedProps> = ({
             {artistName}
           </p>
         )}
+
+        <h1 style={{
+          fontSize: '1.5em',
+          margin: 0,
+          fontWeight: 'bold',
+          letterSpacing: '0.1em'
+        }}>
+          {artistName && <span style={{ color: '#888', fontWeight: 'normal' }}>is </span>}
+          <span style={{ color: '#00ff00', textShadow: '0 0 20px #00ff00, 0 0 40px #00ff00' }}>LIVE NOW</span>
+        </h1>
 
         {title && (
           <p style={{
