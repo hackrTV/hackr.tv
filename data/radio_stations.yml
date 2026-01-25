@@ -5,13 +5,7 @@ stations:
     genre: "Hackrcore"
     color: "green-168"
     stream_url: ""  # To be configured with actual stream URL
-
-  - name: "XERAEN's Frequency"
-    slug: "xeraen"
-    description: "Trans-temporal broadcasts from the timeline that GovCorp controls. XERAEN's warning signals echoing backward through time."
-    genre: "Hackr News and Motivation"
-    color: "purple-168"
-    stream_url: ""  # To be configured
+    position: 0
 
   - name: "Sector X Underground"
     slug: "sector_x"
@@ -19,6 +13,15 @@ stations:
     genre: "Various Hackr Styles"
     color: "cyan-168"
     stream_url: ""  # To be configured
+    position: 1
+
+  - name: "XERAEN's Frequency"
+    slug: "xeraen"
+    description: "Trans-temporal broadcasts from the timeline that GovCorp controls. XERAEN's warning signals echoing backward through time."
+    genre: "Hackr News and Motivation"
+    color: "purple-168"
+    stream_url: ""  # To be configured
+    position: 2
 
   - name: "GovCorp Official Radio (FN Monitoring Relay)"
     slug: "govcorp"
@@ -26,3 +29,4 @@ stations:
     genre: "Propaganda"
     color: "red-168"
     stream_url: ""  # To be configured
+    position: 3

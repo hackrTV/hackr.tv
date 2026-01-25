@@ -29,7 +29,7 @@
 
 namespace :data do
   # === Master Tasks ===
-  desc "Load all data from YAML (full fresh load)"
+  desc "Load all data from YAML (full fresh load). Set S3_BUCKET to also load audio from S3."
   task load: :environment do
     puts "\n" + "=" * 80
     puts "LOADING ALL DATA FROM YAML FILES"
@@ -41,6 +41,13 @@ namespace :data do
     Rake::Task["data:playlists"].invoke
     Rake::Task["data:content"].invoke
     Rake::Task["data:overlays"].invoke
+
+    if ENV["S3_BUCKET"].present?
+      puts "\n" + "-" * 80
+      puts "S3_BUCKET detected - loading audio files..."
+      puts "-" * 80 + "\n"
+      Rake::Task["data:audio"].invoke
+    end
 
     puts "\n" + "=" * 80
     puts "DATA LOAD COMPLETE"
@@ -66,7 +73,7 @@ namespace :data do
   task world: [:factions, :zones, :rooms, :exits, :mobs, :items]
 
   desc "Load playlists (key playlists with radio station links)"
-  task playlists: [:key_playlists]
+  task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
 
   desc "Load content (codex, hackr_logs, wire)"
   task content: [:codex, :hackr_logs, :wire]
@@ -379,7 +386,8 @@ namespace :data do
         description: attrs["description"],
         genre: attrs["genre"],
         color: attrs["color"],
-        stream_url: attrs["stream_url"]
+        stream_url: attrs["stream_url"],
+        position: attrs["position"] || 0
       )
 
       if station.changed?
@@ -1417,11 +1425,6 @@ namespace :data do
     puts "=" * 80 + "\n"
   end
 
-  desc "Load all data from YAML including audio sideloading"
-  task load_with_audio: :environment do
-    Rake::Task["data:load"].invoke
-    Rake::Task["data:audio"].invoke
-  end
 end
 
 # Helper module for data loading utilities
