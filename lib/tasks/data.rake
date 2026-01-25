@@ -72,8 +72,10 @@ namespace :data do
   task content: [:codex, :hackr_logs, :wire]
 
   desc "Load overlays"
-  task overlays: [:overlay_elements, :overlay_tickers, :overlay_lower_thirds,
-                  :overlay_scenes, :overlay_scene_elements, :overlay_scene_groups]
+  task overlays: [
+    :overlay_elements, :overlay_tickers, :overlay_lower_thirds,
+    :overlay_scenes, :overlay_scene_elements, :overlay_scene_groups
+  ]
 
   # === Reset Tasks ===
   desc "Clear seed content only (preserves user data)"
@@ -696,9 +698,6 @@ namespace :data do
     playlists_data.each do |attrs|
       owner = GridHackr.find_by(hackr_alias: attrs["owner"])
       radio_station = attrs["radio_station"].present? ? RadioStation.find_by(slug: attrs["radio_station"]) : nil
-
-      # Generate a slug from name if not provided
-      slug = attrs["name"].downcase.gsub(/[^a-z0-9\s-]/, "").gsub(/\s+/, "-")
 
       playlist = Playlist.find_or_initialize_by(name: attrs["name"])
       was_new = playlist.new_record?
@@ -1423,7 +1422,6 @@ namespace :data do
     Rake::Task["data:load"].invoke
     Rake::Task["data:audio"].invoke
   end
-
 end
 
 # Helper module for data loading utilities

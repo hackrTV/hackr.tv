@@ -3,14 +3,11 @@
     <legend class="center"><%= @scene_group.name %></legend>
 
     <div style="padding: 20px;">
-      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-        <%= link_to "Edit Group", edit_admin_overlay_scene_group_path(@scene_group), class: "tui-button", style: "background: #ff9900; color: #000; padding: 10px 20px;" %>
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
         <%= link_to "< Back to Groups", admin_overlay_scene_groups_path, class: "tui-button green-168", style: "padding: 10px 20px;" %>
-        <%= button_to "Delete Group", admin_overlay_scene_group_path(@scene_group),
-                      method: :delete,
-                      class: "tui-button",
-                      style: "background: #cc0000; color: #fff; padding: 10px 20px;",
-                      data: { confirm: "Are you sure? This will remove all scene associations." } %>
+        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
+          Edit via: <code style="color: #888;">data/overlays/scene_groups.yml</code>
+        </span>
       </div>
 
       <div class="tui-window purple-168 white-text" style="display: block; margin-bottom: 30px;">
@@ -36,40 +33,17 @@
           <legend class="cyan-255-text">SCENES (<%= @scene_group.overlay_scenes.count %>)</legend>
           <div style="padding: 20px; background: #0a0a0a;">
             <% if @scene_group.overlay_scenes.any? %>
-              <p style="color: #00ff00; margin-bottom: 15px; font-weight: bold;">Drag to reorder scenes</p>
-              <div id="sortable-scenes" style="margin-bottom: 30px;">
-                <% @scene_group.overlay_scene_group_scenes.includes(:overlay_scene).order(position: :asc).each do |sgs| %>
-                  <div style="background: #1a1a1a; border: 2px solid #00ff00; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: move;" data-scene-id="<%= sgs.overlay_scene_id %>">
-                    <div>
-                      <span class="handle" style="cursor: move; margin-right: 15px; color: #00ff00; font-weight: bold; font-size: 1.2em;">&#9776;</span>
-                      <strong style="color: #00d9ff; font-size: 1.1em;"><%= sgs.overlay_scene.name %></strong>
-                      <small style="color: #888; margin-left: 10px;">(<%= sgs.overlay_scene.scene_type %>)</small>
-                    </div>
-                    <%= button_to "Remove", remove_scene_admin_overlay_scene_group_path(@scene_group, scene_group_scene_id: sgs.id),
-                                  method: :delete,
-                                  class: "tui-button",
-                                  style: "background: #cc0000; color: #fff; padding: 8px 15px; font-weight: bold;",
-                                  data: { confirm: "Remove this scene from the group?" } %>
+              <% @scene_group.overlay_scene_group_scenes.includes(:overlay_scene).order(position: :asc).each do |sgs| %>
+                <div style="background: #1a1a1a; border: 2px solid #00ff00; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #00d9ff; font-size: 1.1em;"><%= sgs.overlay_scene.name %></strong>
+                    <small style="color: #888; margin-left: 10px;">(<%= sgs.overlay_scene.scene_type %>)</small>
                   </div>
-                <% end %>
-              </div>
-            <% else %>
-              <p style="color: #888; margin-bottom: 30px;">No scenes assigned to this group yet.</p>
-            <% end %>
-
-            <hr style="border-color: #00ff00; border-width: 2px; margin: 30px 0;">
-
-            <h4 class="cyan-255-text" style="margin-bottom: 15px; font-size: 1.3em;">Add Scene</h4>
-            <% if @available_scenes.any? %>
-              <%= form_with url: add_scene_admin_overlay_scene_group_path(@scene_group), method: :post, style: "display: flex; gap: 10px; align-items: center;" do |f| %>
-                <%= select_tag :scene_id,
-                               options_from_collection_for_select(@available_scenes, :slug, :name),
-                               style: "flex: 1; padding: 10px; background: #1a1a1a; border: 2px solid #00ff00; color: #fff; font-family: monospace; font-size: 1em;",
-                               prompt: "Select a scene..." %>
-                <%= f.submit "Add Scene", class: "tui-button", style: "background: #7c3aed; color: #fff; padding: 10px 20px; font-weight: bold;" %>
+                  <%= link_to "View Scene", admin_overlay_scene_path(sgs.overlay_scene), class: "tui-button purple-168", style: "padding: 5px 15px;" %>
+                </div>
               <% end %>
             <% else %>
-              <p style="color: #888;">All scenes are already assigned to this group.</p>
+              <p style="color: #888;">No scenes assigned to this group.</p>
             <% end %>
           </div>
         </fieldset>
@@ -77,39 +51,3 @@
     </div>
   </fieldset>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-<script nonce="<%= content_security_policy_nonce %>">
-document.addEventListener('DOMContentLoaded', function() {
-  const sortableList = document.getElementById('sortable-scenes');
-  if (sortableList) {
-    const sortable = new Sortable(sortableList, {
-      handle: '.handle',
-      animation: 150,
-      onEnd: function(evt) {
-        const sceneIds = Array.from(sortableList.children).map(el => el.dataset.sceneId);
-
-        fetch('<%= reorder_scenes_admin_overlay_scene_group_path(@scene_group) %>', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
-          },
-          body: JSON.stringify({ scene_ids: sceneIds })
-        })
-        .then(response => {
-          if (response.ok) {
-            console.log('Scenes reordered successfully');
-          } else {
-            alert('Failed to save scene order');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Failed to save scene order');
-        });
-      }
-    });
-  }
-});
-</script>
