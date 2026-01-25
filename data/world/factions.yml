@@ -1,0 +1,19 @@
+# Grid Factions
+factions:
+  - name: The.CyberPul.se
+    slug: thecyberpulse
+    description: "The primary broadcast entity. XERAEN, Ryker, and Synthia unite the Fracture Network through music."
+    color_scheme: purple
+    artist_slug: thecyberpulse
+
+  - name: XERAEN
+    slug: xeraen
+    description: "Temporal guardian broadcasting from the future to prevent the timeline he lives in."
+    color_scheme: purple
+    artist_slug: xeraen
+
+  - name: GovCorp
+    slug: govcorp
+    description: "The totalitarian corporate-government entity. Enemy of the Fracture Network."
+    color_scheme: red
+    artist_slug: null

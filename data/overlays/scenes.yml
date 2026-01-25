@@ -1,0 +1,25 @@
+# Overlay Scenes
+scenes:
+  - name: Stream Starting
+    slug: intro
+    scene_type: fullscreen
+    width: 1920
+    height: 1080
+
+  - name: Be Right Back
+    slug: brb
+    scene_type: fullscreen
+    width: 1920
+    height: 1080
+
+  - name: Stream Ending
+    slug: ending
+    scene_type: fullscreen
+    width: 1920
+    height: 1080
+
+  - name: Main Streaming Layout
+    slug: main-layout
+    scene_type: composition
+    width: 1920
+    height: 1080

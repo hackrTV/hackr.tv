@@ -1,0 +1,41 @@
+# Grid Zones
+zones:
+  - name: hackr.tv Central
+    slug: hackr_tv_central
+    description: "The central hub of Fracture Network broadcasting operations."
+    zone_type: faction_base
+    color_scheme: purple
+    faction_slug: thecyberpulse
+    ambient_playlist_slug: fracture-network-ambience
+
+  - name: Sector X
+    slug: sector_x
+    description: "XERAEN's homebase. A fortress of temporal technology and Fracture Network operations."
+    zone_type: faction_base
+    color_scheme: purple
+    faction_slug: xeraen
+    ambient_playlist_slug: fracture-network-ambience
+
+  - name: Transit Network
+    slug: transit_network
+    description: "Neutral corridors connecting the major zones of THE PULSE GRID."
+    zone_type: transit
+    color_scheme: gray/neon green
+    faction_slug: null
+    ambient_playlist_slug: transit-network-ambience
+
+  - name: GovCorp Surveillance District
+    slug: govcorp_surveillance
+    description: "Enemy territory under total GovCorp control."
+    zone_type: govcorp
+    color_scheme: red
+    faction_slug: govcorp
+    ambient_playlist_slug: govcorp-surveillance-ambience
+
+  - name: The Hackr Hangar
+    slug: hackr_hangar
+    description: "Ryker M. Pulse's headquarters and primary broadcast facility. Where the raw signal is created before transmission to Sector X."
+    zone_type: faction_base
+    color_scheme: purple/cyan
+    faction_slug: thecyberpulse
+    ambient_playlist_slug: fracture-network-ambience

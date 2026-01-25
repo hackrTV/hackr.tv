@@ -1,0 +1,63 @@
+# Artists - Canonical artist data
+# All other files reference artists by slug
+artists:
+  - slug: the_pulse_grid
+    name: "THE PULSE GRID"
+    genre: "Soundtrack"
+    artist_type: ost
+
+  - slug: thecyberpulse
+    name: "The.CyberPul.se"
+    genre: "Hackrcore"
+
+  - slug: xeraen
+    name: "XERAEN"
+    genre: "Omniwave"
+
+  - slug: injection_vector
+    name: "Injection Vector"
+    genre: "Deathcore"
+
+  - slug: wavelength_zero
+    name: "Wavelength Zero"
+    genre: "Emotional Atmospheric Metal"
+
+  - slug: cipher_protocol
+    name: "Cipher Protocol"
+    genre: "Instrumental Progressive Metal"
+
+  - slug: system_rot
+    name: "System Rot"
+    genre: "Hardcore Punk"
+
+  - slug: temporal_blue_drift
+    name: "Temporal Blue Drift"
+    genre: "Math Rock"
+
+  - slug: offline
+    name: "Offline"
+    genre: "Post-Grunge"
+
+  - slug: apex_overdrive
+    name: "Apex Overdrive"
+    genre: "Melodic Euphoric Hardstyle"
+
+  - slug: voiceprint
+    name: "Voiceprint"
+    genre: "Melodic Drum and Bass"
+
+  - slug: neon_hearts
+    name: "Neon Hearts (ネオンハーツ)"
+    genre: "J-Pop"
+
+  - slug: ethereality
+    name: "Ethereality"
+    genre: "Classic Vocal Trance"
+
+  - slug: heartbreak_havoc
+    name: "heartbreak_havoc.sh"
+    genre: "Nightcore"
+
+  - slug: blitzbeam
+    name: "BlitzBeam+"
+    genre: "Hypertrance (2000s Style)"

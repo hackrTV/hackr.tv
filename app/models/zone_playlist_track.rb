@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: zone_playlist_tracks
+# Database name: primary
+#
+#  id               :integer          not null, primary key
+#  position         :integer          not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  track_id         :integer          not null
+#  zone_playlist_id :integer          not null
+#
+# Indexes
+#
+#  index_zone_playlist_tracks_on_playlist_and_track  (zone_playlist_id,track_id) UNIQUE
+#  index_zone_playlist_tracks_on_track_id            (track_id)
+#  index_zone_playlist_tracks_on_zone_playlist_id    (zone_playlist_id)
+#
+# Foreign Keys
+#
+#  track_id          (track_id => tracks.id)
+#  zone_playlist_id  (zone_playlist_id => zone_playlists.id)
+#
 class ZonePlaylistTrack < ApplicationRecord
   belongs_to :zone_playlist
   belongs_to :track

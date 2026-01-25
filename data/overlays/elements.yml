@@ -1,0 +1,25 @@
+# Overlay Elements (reusable building blocks)
+elements:
+  - name: Now Playing
+    slug: now-playing
+    element_type: now_playing
+
+  - name: PulseWire Feed
+    slug: pulsewire-feed
+    element_type: pulsewire_feed
+
+  - name: Alert Box
+    slug: alert-box
+    element_type: alert
+
+  - name: Lower Third
+    slug: lower-third
+    element_type: lower_third
+
+  - name: Top Ticker
+    slug: ticker-top
+    element_type: ticker_top
+
+  - name: Bottom Ticker
+    slug: ticker-bottom
+    element_type: ticker_bottom

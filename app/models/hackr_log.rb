@@ -1,5 +1,29 @@
+# == Schema Information
+#
+# Table name: hackr_logs
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  body          :text             not null
+#  published     :boolean          default(FALSE), not null
+#  published_at  :datetime
+#  slug          :string           not null
+#  title         :string           not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#
+# Indexes
+#
+#  index_hackr_logs_on_grid_hackr_id  (grid_hackr_id)
+#  index_hackr_logs_on_slug           (slug) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 class HackrLog < ApplicationRecord
-  belongs_to :author, class_name: "GridHackr"
+  belongs_to :grid_hackr
 
   validates :title, presence: true
   validates :slug, presence: true, uniqueness: true

@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: overlay_alerts
+# Database name: primary
+#
+#  id           :integer          not null, primary key
+#  alert_type   :string           not null
+#  data         :json
+#  displayed    :boolean          default(FALSE)
+#  displayed_at :datetime
+#  expires_at   :datetime
+#  message      :text
+#  title        :string
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#
+# Indexes
+#
+#  index_overlay_alerts_on_alert_type  (alert_type)
+#  index_overlay_alerts_on_displayed   (displayed)
+#  index_overlay_alerts_on_expires_at  (expires_at)
+#
 FactoryBot.define do
   factory :overlay_alert do
     alert_type { "custom" }

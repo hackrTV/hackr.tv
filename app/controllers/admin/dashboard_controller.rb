@@ -11,7 +11,7 @@ class Admin::DashboardController < Admin::ApplicationController
     }
 
     @recent_tracks = Track.includes(:artist).ordered.limit(5)
-    @recent_logs = HackrLog.includes(:author).ordered.limit(5)
+    @recent_logs = HackrLog.includes(:grid_hackr).ordered.limit(5)
     @online_hackrs = GridHackr.online.includes(:current_room).limit(10)
     @recent_messages = GridMessage.order(created_at: :desc).includes(:grid_hackr).limit(10)
   end

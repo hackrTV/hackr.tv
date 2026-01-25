@@ -1,3 +1,38 @@
+# == Schema Information
+#
+# Table name: tracks
+# Database name: primary
+#
+#  id                  :integer          not null, primary key
+#  cover_image         :string
+#  duration            :string
+#  featured            :boolean          default(FALSE)
+#  lyrics              :text
+#  release_date        :date
+#  show_in_pulse_vault :boolean          default(TRUE), not null
+#  slug                :string
+#  streaming_links     :text
+#  title               :string
+#  track_number        :integer
+#  videos              :text
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  album_id            :integer          not null
+#  artist_id           :integer          not null
+#
+# Indexes
+#
+#  index_tracks_on_album_id            (album_id)
+#  index_tracks_on_artist_id           (artist_id)
+#  index_tracks_on_artist_id_and_slug  (artist_id,slug) UNIQUE
+#  index_tracks_on_featured            (featured)
+#  index_tracks_on_release_date        (release_date)
+#
+# Foreign Keys
+#
+#  album_id   (album_id => albums.id)
+#  artist_id  (artist_id => artists.id)
+#
 class Track < ApplicationRecord
   belongs_to :artist
   belongs_to :album

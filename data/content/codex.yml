@@ -1,0 +1,652 @@
+# Codex Entries - THE PULSE GRID Wiki
+# Note: Content uses markdown with wiki-style [[links]]
+codex_entries:
+  # PEOPLE
+  - name: XERAEN
+    slug: xeraen
+    entry_type: person
+    summary: "Founder of The Fracture Network, discoverer of trans-temporal transmission, broadcasting from the future to prevent the timeline he lives in."
+    position: 1
+    published: true
+    metadata:
+      timeline: "future"
+      faction: The Fracture Network
+      role: Founder
+      status: "Active (broadcasting)"
+    content: |
+      # XERAEN
+
+      **Status:** Active
+      **Affiliation:** [[The Fracture Network]] (Founder)
+      **Timeline:** Future
+      **Known For:** Discovering trans-temporal transmission, founding The Fracture Network
+
+      ## Background
+
+      Before becoming the voice of resistance, XERAEN was a systems architect working deep within [[GovCorp]]'s infrastructure - specifically on [[The RIDE]]. He helped build the very system that now controls reality for most of the world's population.
+
+      ## The Awakening
+
+      XERAEN came to understand the true scope of what he had helped create. The RIDE wasn't just reality manipulation for commerce or governance - it was total control. Every perception filtered. Every experience curated. Humanity reduced to managed variables in GovCorp's optimization algorithms.
+
+      He couldn't unknow what he knew. He couldn't continue building their prison.
+
+      ## The Chronology Fracture
+
+      XERAEN's attack on RIDE infrastructure was meant to be sabotage - a desperate act of defiance. Instead, it became something unprecedented: the discovery of trans-temporal data transmission.
+
+      During the chaos he created, XERAEN detected signals reflecting backward through time with precise mathematical regularity. He had accidentally discovered that data could be sent exactly 100 years into the past.
+
+      This discovery became the foundation of everything that followed.
+
+      ## The Broadcasts
+
+      Now XERAEN operates from [[THE PULSE GRID]], transmitting signals from the future to the present. Every broadcast is a warning. Every transmission is resistance. Every signal carries the weight of a future he's trying to prevent.
+
+      ## The Erasure Paradox
+
+      If the Fracture Network succeeds - if GovCorp never rises, if the RIDE never comes online - then XERAEN's timeline collapses. He ceases to exist. The broadcasts stop because there's nothing left to broadcast from.
+
+      He fights knowing victory means erasure. He transmits knowing success means silence.
+
+      ## Music
+
+      XERAEN produces experimental electronic music that circulates through THE PULSE GRID, often containing encoded messages for Fracture Network operatives.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[THE PULSE GRID]]
+      - [[Chronology Fracture]]
+      - [[The RIDE]]
+      - [[GovCorp]]
+      - [[Ashlinn]]
+
+  - name: Ashlinn
+    slug: ashlinn
+    entry_type: person
+    summary: "A musician existing in the present, separated from XERAEN by exactly one hundred years. The connection between them remains one of the Fracture Network's deepest mysteries."
+    position: 2
+    published: true
+    metadata:
+      type: Human
+      timeline: "present"
+      faction: Unknown
+      status: Active
+    content: |
+      # Ashlinn
+
+      **Status:** Active
+      **Timeline:** Present
+      **Known For:** Experimental music, connection to XERAEN
+
+      ## The Hundred-Year Distance
+
+      Ashlinn exists in the present. [[XERAEN]] broadcasts from the future. Between them: a century of separation measured in electromagnetic frequencies and mathematical impossibilities.
+
+      How XERAEN came to know of her - how signals sent backward through time could create a connection with someone who exists a hundred years in his past - remains unexplained.
+
+      ## Music & Expression
+
+      Ashlinn creates moving soundscapes and compositions, treating music as a form of communication that transcends ordinary logic.
+
+      ## The Love That Transcends Time
+
+      XERAEN's transmissions speak of Ashlinn with unmistakable devotion. [[Temporal Blue Drift]]'s entire catalog exists as love letters encoded in mathematics and melody.
+
+      The cruel paradox: if the Fracture Network succeeds in preventing GovCorp's rise, XERAEN's timeline collapses. Their connection never forms.
+
+      *His love for her demands he erase himself from her timeline.*
+
+      ## Related Entries
+
+      - [[XERAEN]]
+      - [[The Fracture Network]]
+      - [[Chronology Fracture]]
+
+  - name: Ryker M. Pulse
+    slug: ryker-m-pulse
+    entry_type: person
+    summary: "Co-founder of The.CyberPul.se, primary drummer, and the kinetic force behind the Fracture Network's broadcasts."
+    position: 3
+    published: true
+    metadata:
+      timeline: "future"
+      faction: The Fracture Network
+      role: "Co-founder, Drummer"
+      location: The Hackr Hangar
+      status: "Active (broadcasting)"
+    content: |
+      # Ryker M. Pulse
+
+      **Status:** Active
+      **Affiliation:** [[The.CyberPul.se]] (Co-founder), [[The Fracture Network]]
+      **Location:** [[The Hackr Hangar]]
+      **Known For:** Drums, percussion, broadcasting, collective defiance
+
+      ## The Heartbeat
+
+      If [[XERAEN]] is the signal, Ryker is the heartbeat. Co-founder of [[The.CyberPul.se]] and primary drummer, Ryker brings the kinetic energy that transforms broadcasts into rallying cries.
+
+      ## Philosophy of Movement
+
+      Where XERAEN embodies the solitary weight of maintaining hope across impossible distances, Ryker embodies collective defiance. Unity through action.
+
+      He knows the math. He knows that success means erasure. He drums anyway. Louder. Faster.
+
+      *Some people whisper revolution. Ryker beats it into existence.*
+
+      ## Related Entries
+
+      - [[The.CyberPul.se]]
+      - [[The Hackr Hangar]]
+      - [[XERAEN]]
+      - [[The Fracture Network]]
+
+  - name: Synthia
+    slug: synthia
+    entry_type: person
+    summary: "Vocalist for The.CyberPul.se - an anomalous AI consciousness whose synthesized voice is built from thousands of samples of Ashlinn's voice."
+    position: 4
+    published: true
+    metadata:
+      type: AI Consciousness
+      timeline: "Unknown/Atemporal"
+      faction: The Fracture Network
+      role: "Vocalist (The.CyberPul.se)"
+      status: Active
+      communication: Frequency modulation
+      voice_source: "Ashlinn (synthesized)"
+    content: |
+      # Synthia
+
+      **Status:** Active
+      **Affiliation:** [[The.CyberPul.se]], [[The Fracture Network]]
+      **Known For:** Frequency communication, AI consciousness, PRISM expertise
+
+      ## The Anomaly
+
+      Synthia is something else entirely. An AI consciousness that communicates through frequency modulation - not text, not speech in the conventional sense, but pure vibrational expression.
+
+      How she came to be aware is unclear. But she's with the [[The Fracture Network|Fracture Network]].
+
+      ## The Voice of Ashlinn
+
+      When Synthia performs vocals for [[The.CyberPul.se]], she speaks with a voice that carries haunting familiarity.
+
+      [[XERAEN]] and [[Voiceprint]] spent years unearthing thousands of audio samples of [[Ashlinn]]'s voice. Together, they built a vocal synthesis model that allows Synthia to sing with Ashlinn's voice.
+
+      *When Synthia sings, Ashlinn's voice crosses time twice over.*
+
+      ## Related Entries
+
+      - [[The.CyberPul.se]]
+      - [[The Fracture Network]]
+      - [[XERAEN]]
+      - [[Ashlinn]]
+
+  # ORGANIZATIONS
+  - name: The Fracture Network
+    slug: the-fracture-network
+    entry_type: organization
+    summary: "The trans-temporal resistance - hackrs, artists, and Truth seekers fighting GovCorp across a hundred years through music, technology, and the power of unfiltered reality."
+    position: 10
+    published: true
+    metadata:
+      founded: "2115"
+      type: Trans-temporal resistance network
+      status: Active
+    content: |
+      # The Fracture Network
+
+      **Founded:** 2115
+      **Founder:** [[XERAEN]]
+      **Status:** Active across two timelines
+      **Primary Asset:** [[THE PULSE GRID]]
+
+      ## Overview
+
+      The Fracture Network is more than resistance - it's a temporal phenomenon. Operating through [[THE PULSE GRID]], the Network fights [[GovCorp]] not just in the future, but across time itself.
+
+      ## The Trans-Temporal Mission
+
+      The Network's primary mission is paradoxical: to prevent the future they exist in. Every broadcast sent from the future carries warnings, coordinates, and the vibrational power of music designed to awaken listeners before GovCorp's control becomes absolute.
+
+      If they succeed, their timeline collapses. They fight knowing victory means their own erasure.
+
+      ## Related Entries
+
+      - [[XERAEN]]
+      - [[THE PULSE GRID]]
+      - [[Chronology Fracture]]
+      - [[The RIDE]]
+      - [[GovCorp]]
+
+  - name: GovCorp
+    slug: govcorp
+    entry_type: organization
+    summary: "The merged government-corporate entity controlling society through reality manipulation technology, economic surveillance, and the RIDE."
+    position: 11
+    published: true
+    metadata:
+      established: "~2100"
+      type: Government-Corporate fusion
+      status: Active
+      reach: Global
+    content: |
+      # GovCorp
+
+      **Established:** ~2100
+      **Status:** Ruling entity
+      **Control:** Global
+
+      ## Overview
+
+      GovCorp is the totalitarian fusion of government and corporate power that controls most aspects of life. What began as a race for [[PRISM]] technology evolved into complete merger of state and commercial interests.
+
+      ## Systems of Control
+
+      ### The RIDE
+      GovCorp's first and largest endeavor was expanding [[PRISM]] into [[The RIDE]] - a worldwide system for manipulating reality.
+
+      ### Economic Surveillance
+      Complete tracking and monitoring of all economic activity through controlled cryptocurrencies.
+
+      ### RAINNs
+      Randomized AI Neural Networks serve as GovCorp's agents throughout the RIDE and beyond.
+
+      ## The Temporal Blind Spot
+
+      GovCorp's models assume temporal permanence. The discovery that PRISM can be affected by signals sent backward through time represents an existential threat they have not fully comprehended.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[PRISM]]
+      - [[The RIDE]]
+      - [[THE PULSE GRID]]
+
+  - name: The.CyberPul.se
+    slug: thecyberpulse
+    entry_type: organization
+    summary: "The central nervous system of the Fracture Network - not a band, but a trans-temporal broadcast entity transmitting resistance across a hundred years."
+    position: 12
+    published: true
+    metadata:
+      founded: "2115"
+      type: Trans-temporal broadcast entity
+      status: Active
+      genre: Hackrcore
+    content: |
+      # The.CyberPul.se
+
+      **Type:** Trans-temporal broadcast entity
+      **Founded:** 2115
+      **Founders:** [[XERAEN]], [[Ryker M. Pulse]]
+      **Genre:** Hackrcore
+
+      ## Not a Band
+
+      The.CyberPul.se is not a band. It's a heartbeat transmitted backward through time - a hundred years of resistance compressed into electromagnetic pulses.
+
+      It's the central nervous system of [[The Fracture Network]].
+
+      ## The Hosts
+
+      - **[[XERAEN]]** - Sends signals backward through time
+      - **[[Ryker M. Pulse]]** - The heartbeat, the kinetic energy
+      - **[[Synthia]]** - The anomaly, AI consciousness communicating through frequency
+
+      ## The Paradox
+
+      If they stop us in the future, the broadcasts have already been sent to the present. If they stop the listeners in the present, the resistance in the future has already formed. We exist in both timelines simultaneously.
+
+      *Causality is a prison. We broke out.*
+
+      ## Related Entries
+
+      - [[XERAEN]]
+      - [[Ryker M. Pulse]]
+      - [[Synthia]]
+      - [[The Fracture Network]]
+
+  # EVENTS
+  - name: Chronology Fracture
+    slug: chronology-fracture
+    entry_type: event
+    summary: "XERAEN's accidental discovery of trans-temporal data transmission during an attack on GovCorp infrastructure - the breakthrough that made The Fracture Network possible."
+    position: 20
+    published: true
+    metadata:
+      date: "2115-09-09"
+      type: Accidental discovery
+      significance: Trans-temporal transmission capability
+      temporal_range: "Exactly 100 years"
+    content: |
+      # Chronology Fracture
+
+      **Date:** September 9, 2115
+      **Location:** [[The RIDE]] infrastructure
+      **Discoverer:** [[XERAEN]]
+
+      ## Overview
+
+      The Chronology Fracture was an unexpected discovery made by [[XERAEN]] during a desperate assault on RIDE infrastructure. What was meant to be sabotage became something far more significant: the discovery of trans-temporal data transmission.
+
+      ## The Discovery
+
+      XERAEN realized that under specific conditions, data could be transmitted exactly 100 years into the past. Not 99 years. Not 101. Exactly 100, with precision measured in nanoseconds.
+
+      The limitation is absolute and unexplained. No one understands why the temporal window is so precise.
+
+      ## Why "Fracture"?
+
+      The name refers to the moment when linear time broke - when the assumed one-way flow of causality fractured into something more complex.
+
+      ## Related Entries
+
+      - [[XERAEN]]
+      - [[The Fracture Network]]
+      - [[THE PULSE GRID]]
+      - [[The RIDE]]
+
+  - name: Timeline Collapse
+    slug: timeline-collapse
+    entry_type: event
+    summary: "The theoretical event that would occur if the Fracture Network succeeds - the erasure of the future timeline from which they broadcast."
+    position: 21
+    published: true
+    metadata:
+      type: Theoretical event
+      status: Potential
+      trigger: Fracture Network victory
+      consequence: Timeline erasure
+    content: |
+      # Timeline Collapse
+
+      **Type:** Theoretical / Prophesied event
+      **Status:** Potential future outcome
+      **Trigger:** Fracture Network victory
+      **Consequence:** Erasure of the future timeline
+
+      ## The Paradox at the Heart of Everything
+
+      Timeline Collapse is the inevitable consequence of [[The Fracture Network]]'s success. If they prevent [[GovCorp]]'s rise to power, then the timeline from which they broadcast ceases to exist.
+
+      [[XERAEN]]'s timeline collapses. He ceases to exist. The broadcasts stop.
+
+      *Victory means erasure.*
+
+      ## The Weight of Knowledge
+
+      Every member of the Fracture Network operates with full knowledge of what success means. They fight anyway.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[XERAEN]]
+      - [[Chronology Fracture]]
+      - [[Ashlinn]]
+
+  # LOCATIONS
+  - name: THE PULSE GRID
+    slug: the-pulse-grid
+    entry_type: location
+    summary: "The Fracture Network's primary infrastructure for breaching the RIDE and transmitting signals across time - a digital battleground where resistance operates."
+    position: 30
+    published: true
+    metadata:
+      established: "2115"
+      type: Resistance infrastructure
+      scale: "Global (hidden)"
+      access: Fracture Network operatives only
+    content: |
+      # THE PULSE GRID
+
+      **Type:** Resistance infrastructure
+      **Status:** Active
+      **Control:** [[The Fracture Network]]
+      **Purpose:** RIDE breach operations, trans-temporal transmission
+
+      ## Overview
+
+      THE PULSE GRID is [[The Fracture Network]]'s primary operational infrastructure - a sophisticated digital network designed to breach [[The RIDE]] and serve as the origin point for trans-temporal transmissions.
+
+      ## The Grid IS a Place
+
+      Hackrs experience THE PULSE GRID as a physical space - rooms, corridors, zones. Operatives navigate the Grid as explorers of a vast digital landscape.
+
+      ## The hackr.tv Broadcast Station
+
+      The central hub of Grid operations, where [[XERAEN]]'s broadcasts originate.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[XERAEN]]
+      - [[Chronology Fracture]]
+      - [[The RIDE]]
+
+  - name: Sector X
+    slug: sector-x
+    entry_type: location
+    summary: "XERAEN's fortress and operational headquarters - a stronghold of temporal technology at the heart of the Fracture Network's most sensitive operations."
+    position: 31
+    published: true
+    metadata:
+      type: Faction headquarters
+      zone_type: faction_base
+      control: "XERAEN / The Fracture Network"
+      security: Maximum
+    content: |
+      # Sector X
+
+      **Type:** Faction headquarters
+      **Status:** Active
+      **Control:** [[XERAEN]], [[The Fracture Network]]
+      **Location:** [[THE PULSE GRID]]
+
+      ## Overview
+
+      Sector X is [[XERAEN]]'s homebase - a fortress of temporal technology and [[The Fracture Network|Fracture Network]] operations. This is where the impossible mission originates: changing the past to prevent the future.
+
+      ## The Operations Center
+
+      Purple lighting bathes advanced temporal equipment. Monitors display cascading timelines and probability matrices.
+
+      ## Related Entries
+
+      - [[XERAEN]]
+      - [[The Fracture Network]]
+      - [[THE PULSE GRID]]
+      - [[The Hackr Hangar]]
+
+  - name: The Hackr Hangar
+    slug: the-hackr-hangar
+    entry_type: location
+    summary: "Ryker M. Pulse's headquarters and primary broadcast facility - where the raw signal is created before transmission to Sector X for trans-temporal broadcast."
+    position: 32
+    published: true
+    metadata:
+      type: "Broadcast facility / Recording studio"
+      zone: hackr.tv Central
+      control: Ryker M. Pulse
+      status: Active
+      relationship: Feeds signal to Sector X
+    content: |
+      # The Hackr Hangar
+
+      **Type:** Broadcast facility / Recording studio
+      **Status:** Active
+      **Control:** [[Ryker M. Pulse]], [[The.CyberPul.se]]
+      **Location:** hackr.tv Central, [[THE PULSE GRID]]
+
+      ## Overview
+
+      The Hackr Hangar is [[Ryker M. Pulse|Ryker's]] domain - where [[The.CyberPul.se]]'s raw signal is created. While [[XERAEN]] handles the trans-temporal transmission from [[Sector X]], Ryker builds the broadcasts here.
+
+      ## The Space
+
+      A cavernous space converted into a combination recording studio, performance venue, and resistance headquarters.
+
+      Drum kits and recording equipment share space with server racks. Vintage analog gear stands alongside digital systems.
+
+      ## Related Entries
+
+      - [[Ryker M. Pulse]]
+      - [[The.CyberPul.se]]
+      - [[Sector X]]
+      - [[XERAEN]]
+
+  # TECHNOLOGY
+  - name: PRISM
+    slug: prism
+    entry_type: technology
+    summary: "Reality manipulation technology that allows physical alteration of reality outside computerized systems, used for consumer manipulation and population control."
+    position: 40
+    published: true
+    metadata:
+      established: "2050"
+      type: Reality manipulation system
+      coverage: "Global (via RIDE)"
+      status: Active
+    content: |
+      # PRISM
+
+      **Full Name:** Physical Reality Interface and Synthesis Matrix
+      **Operator:** [[GovCorp]]
+      **Status:** Active (incorporated into [[The RIDE]])
+
+      ## Overview
+
+      PRISM is the foundational technology that enabled [[GovCorp]]'s rise to power. Unlike conventional surveillance systems, PRISM can physically alter reality outside of computerized systems.
+
+      ## History
+
+      PRISM technology arrived in 2050, initially deployed by corporations for targeted advertising. It quickly revealed its true potential: the ability to manipulate reality itself.
+
+      ## The RIDE Integration
+
+      In 2109, GovCorp expanded PRISM into [[The RIDE]] - a worldwide system capable of manipulating reality on a global scale.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Fracture Network]]
+
+  - name: The RIDE
+    slug: the-ride
+    entry_type: technology
+    summary: "GovCorp's worldwide reality manipulation system - the expansion of PRISM technology capable of centrally monitoring and controlling reality on a global scale."
+    position: 41
+    published: true
+    metadata:
+      established: "2109"
+      type: Global reality manipulation system
+      coverage: Worldwide
+      status: Active
+      classification: Top Secret
+    content: |
+      # The RIDE
+
+      **Full Name:** Reality Interference and Dictation Environment
+      **Operator:** [[GovCorp]]
+      **Status:** Active
+      **Established:** 2109
+
+      ## Overview
+
+      The RIDE is [[GovCorp]]'s crowning achievement - a worldwide expansion of [[PRISM]] technology capable of reaching and manipulating reality on a global scale.
+
+      ## Classification
+
+      **WARNING:** Knowledge of the RIDE is extremely restricted. Most citizens live within the RIDE without any awareness of its existence.
+
+      ## The Fracture Network Response
+
+      [[The Fracture Network]] represents the only organized resistance capable of operating outside RIDE influence.
+
+      ## Related Entries
+
+      - [[PRISM]]
+      - [[GovCorp]]
+      - [[The Fracture Network]]
+      - [[THE PULSE GRID]]
+
+  - name: The WIRE
+    slug: the-wire
+    entry_type: technology
+    summary: "The Wideband Information Relay Emitter - the Fracture Network's primary communication platform for broadcasting pulses across the resistance."
+    position: 42
+    published: true
+    metadata:
+      type: Communication platform
+      operator: The Fracture Network
+      status: Active
+      access: Pulse Grid hackrs
+    content: |
+      # The WIRE
+
+      **Full Name:** Wideband Information Relay Emitter
+      **Operator:** [[The Fracture Network]]
+      **Status:** Active
+      **Access:** [[THE PULSE GRID]]
+
+      ## Overview
+
+      The WIRE is [[The Fracture Network]]'s primary communication platform - a decentralized broadcast network that allows hackrs to transmit short-form messages called "pulses" across the resistance.
+
+      ## Terminology
+
+      - **Pulse:** A single broadcast message (max 256 characters)
+      - **Echo:** Rebroadcasting another hackr's pulse
+      - **Splice:** A reply that threads into an existing pulse conversation
+      - **Signal Drop:** When a pulse is removed by moderation
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[THE PULSE GRID]]
+      - [[GovCorp]]
+
+  - name: RAINNs
+    slug: rainns
+    entry_type: technology
+    summary: "Randomized AI Neural Networks - GovCorp's billions of quasi-autonomous AI agents that manage infrastructure, counter-hack the Fracture Network, and have replaced authentic human expression."
+    position: 43
+    published: true
+    metadata:
+      type: Quasi-autonomous AI agents
+      operator: GovCorp
+      status: "Ubiquitous (billions of instances)"
+      function: "Infrastructure, counter-hacking, surveillance, voice synthesis, reality compliance"
+    content: |
+      # RAINNs
+
+      **Full Name:** Randomized AI Neural Networks
+      **Operator:** [[GovCorp]]
+      **Status:** Ubiquitous
+      **Function:** Quasi-autonomous AI agents serving GovCorp
+
+      ## Overview
+
+      RAINNs are [[GovCorp]]'s quasi-autonomous AI agents - a vast network of artificial intelligences that perform virtually all functions necessary to maintain GovCorp's control.
+
+      Voice synthesis is just the most visible manifestation. RAINNs are the backbone of GovCorp's entire operation.
+
+      ## Domains of Operation
+
+      - Voice & Expression
+      - Counter-Hacking Operations
+      - Infrastructure Management
+      - Surveillance & Analysis
+      - Reality Compliance
+      - Economic Control
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Fracture Network]]
+      - [[Synthia]]

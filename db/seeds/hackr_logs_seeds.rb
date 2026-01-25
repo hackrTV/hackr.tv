@@ -23,7 +23,7 @@ logs = []
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Day Zero",
   slug: "day-zero",
   published_at: lore_date(2115, 9, 12, 14),
@@ -53,7 +53,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Naming the Fracture",
   slug: "naming-the-fracture",
   published_at: lore_date(2115, 9, 15, 18),
@@ -75,7 +75,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "The Paradox We Live",
   slug: "the-paradox-we-live",
   published_at: lore_date(2115, 10, 1, 22),
@@ -97,7 +97,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "Building the Backbone",
   slug: "building-the-backbone",
   published_at: lore_date(2115, 11, 8, 14),
@@ -121,7 +121,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Signal Architecture",
   slug: "signal-architecture",
   published_at: lore_date(2116, 2, 14, 14),
@@ -143,7 +143,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "The WIRE Goes Live",
   slug: "wire-goes-live",
   published_at: lore_date(2116, 5, 3, 16),
@@ -163,7 +163,7 @@ logs << {
 }
 
 logs << {
-  author: cipher,
+  grid_hackr: cipher,
   title: "OPSEC Protocols",
   slug: "opsec-protocols",
   published_at: lore_date(2116, 7, 19, 11),
@@ -193,7 +193,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Reception Confirmed",
   slug: "reception-confirmed",
   published_at: lore_date(2117, 3, 22, 14),
@@ -219,7 +219,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Synthia",
   slug: "synthia",
   published_at: lore_date(2117, 8, 9, 23),
@@ -245,7 +245,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "The Hangar Opens",
   slug: "hangar-opens",
   published_at: lore_date(2117, 12, 1, 20),
@@ -273,7 +273,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Music as a Weapon",
   slug: "music-as-a-weapon",
   published_at: lore_date(2118, 4, 15, 19),
@@ -295,7 +295,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "First Broadcast from the Hangar",
   slug: "first-broadcast-hangar",
   published_at: lore_date(2118, 10, 8, 22),
@@ -317,7 +317,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Enter The Hackr Hangar 2",
   slug: "hackr-hangar-2-recap",
   published_at: lore_date(2118, 10, 11, 15),
@@ -343,7 +343,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Across CyberSpace Together Separately",
   slug: "across-cyberspace-together",
   published_at: lore_date(2119, 4, 23, 14),
@@ -365,7 +365,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "Taking Off",
   slug: "taking-off-may-2119",
   published_at: lore_date(2119, 5, 7, 14),
@@ -387,7 +387,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Signal Coherence",
   slug: "signal-coherence",
   published_at: lore_date(2119, 5, 14, 16),
@@ -411,7 +411,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "Rhythm Never Sleeps",
   slug: "rhythm-never-sleeps",
   published_at: lore_date(2119, 5, 23, 14),
@@ -437,7 +437,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "The Fracture Network Grows",
   slug: "network-grows-2120",
   published_at: lore_date(2120, 2, 28, 14),
@@ -463,7 +463,7 @@ logs << {
 }
 
 logs << {
-  author: cipher,
+  grid_hackr: cipher,
   title: "Cell Structure Advisory",
   slug: "cell-structure-advisory",
   published_at: lore_date(2120, 6, 15, 9),
@@ -488,7 +488,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Ashlinn",
   slug: "ashlinn",
   published_at: lore_date(2120, 9, 9, 14),
@@ -516,7 +516,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Temporal Blue Drift",
   slug: "temporal-blue-drift-project",
   published_at: lore_date(2121, 3, 14, 23),
@@ -538,7 +538,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "Eleven Frequencies",
   slug: "eleven-frequencies",
   published_at: lore_date(2121, 8, 8, 18),
@@ -572,7 +572,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Seven Years of Signal",
   slug: "seven-years",
   published_at: lore_date(2122, 9, 9, 12),
@@ -596,7 +596,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "The Analog Archive",
   slug: "analog-archive",
   published_at: lore_date(2123, 4, 2, 16),
@@ -618,7 +618,7 @@ logs << {
 }
 
 logs << {
-  author: cipher,
+  grid_hackr: cipher,
   title: "RAINN Counter-Operations Update",
   slug: "rainn-counter-ops",
   published_at: lore_date(2123, 11, 18, 8),
@@ -646,7 +646,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Synthia's Voice",
   slug: "synthias-voice",
   published_at: lore_date(2124, 7, 20, 21),
@@ -674,7 +674,7 @@ logs << {
 # =============================================================================
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Ten Years",
   slug: "ten-years",
   published_at: lore_date(2125, 9, 9, 14),
@@ -698,7 +698,7 @@ logs << {
 }
 
 logs << {
-  author: ryker,
+  grid_hackr: ryker,
   title: "The Heartbeat Continues",
   slug: "heartbeat-continues",
   published_at: lore_date(2125, 10, 15, 19),
@@ -720,7 +720,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "The Codex",
   slug: "the-codex-launch",
   published_at: lore_date(2125, 11, 3, 14),
@@ -742,7 +742,7 @@ logs << {
 }
 
 logs << {
-  author: cipher,
+  grid_hackr: cipher,
   title: "Operational Integrity Assessment",
   slug: "operational-integrity-2125",
   published_at: lore_date(2125, 11, 20, 10),
@@ -768,7 +768,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Reading Every Pulse",
   slug: "reading-every-pulse",
   published_at: lore_date(2125, 12, 8, 14),
@@ -790,7 +790,7 @@ logs << {
 }
 
 logs << {
-  author: xeraen,
+  grid_hackr: xeraen,
   title: "Transmission Ongoing",
   slug: "transmission-ongoing",
   published_at: lore_date(2125, 12, 14, 22),
@@ -824,7 +824,7 @@ logs.each do |log_data|
     title: log_data[:title],
     slug: log_data[:slug],
     body: log_data[:body].strip,
-    author: log_data[:author],
+    grid_hackr: log_data[:grid_hackr],
     published: true,
     published_at: log_data[:published_at]
   )

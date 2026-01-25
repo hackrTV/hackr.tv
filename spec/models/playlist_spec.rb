@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: playlists
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  description   :text
+#  is_public     :boolean          default(FALSE), not null
+#  name          :string           not null
+#  share_token   :string           not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#
+# Indexes
+#
+#  index_playlists_on_grid_hackr_id  (grid_hackr_id)
+#  index_playlists_on_share_token    (share_token) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 require "rails_helper"
 
 RSpec.describe Playlist, type: :model do

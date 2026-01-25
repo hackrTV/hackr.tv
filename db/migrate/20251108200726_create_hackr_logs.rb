@@ -6,7 +6,7 @@ class CreateHackrLogs < ActiveRecord::Migration[8.1]
       t.text :body, null: false
       t.boolean :published, default: false, null: false
       t.datetime :published_at
-      t.references :author, null: false, foreign_key: {to_table: :grid_hackrs}
+      t.references :grid_hackr, null: false, foreign_key: true
 
       t.timestamps
     end

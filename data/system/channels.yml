@@ -1,0 +1,17 @@
+# Uplink Chat Channels
+channels:
+  - slug: ambient
+    name: "#ambient"
+    description: "Always-on ambient chat channel. Connect with other operatives anytime."
+    is_active: true
+    requires_livestream: false
+    slow_mode_seconds: 0
+    minimum_role: operative
+
+  - slug: live
+    name: "#live"
+    description: "Livestream-only chat channel. Active during live broadcasts."
+    is_active: true
+    requires_livestream: true
+    slow_mode_seconds: 3
+    minimum_role: operative

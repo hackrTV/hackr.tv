@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: radio_stations
+# Database name: primary
+#
+#  id          :integer          not null, primary key
+#  color       :string
+#  description :text
+#  genre       :string
+#  name        :string           not null
+#  position    :integer          default(0), not null
+#  slug        :string           not null
+#  stream_url  :string
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
+# Indexes
+#
+#  index_radio_stations_on_position  (position)
+#  index_radio_stations_on_slug      (slug) UNIQUE
+#
 class RadioStation < ApplicationRecord
   # Associations
   has_many :radio_station_playlists, -> { order(position: :asc) }, dependent: :destroy

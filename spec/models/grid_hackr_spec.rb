@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: grid_hackrs
+# Database name: primary
+#
+#  id               :integer          not null, primary key
+#  api_token        :string
+#  hackr_alias      :string
+#  last_activity_at :datetime
+#  password_digest  :string
+#  role             :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  current_room_id  :integer
+#
+# Indexes
+#
+#  index_grid_hackrs_on_api_token    (api_token) UNIQUE
+#  index_grid_hackrs_on_hackr_alias  (hackr_alias) UNIQUE
+#  index_grid_hackrs_on_role         (role)
+#
 require "rails_helper"
 
 RSpec.describe GridHackr, type: :model do

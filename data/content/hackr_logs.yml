@@ -1,0 +1,330 @@
+# HackrLogs - Transmission logs from the Fracture Network
+# Dates are lore dates (displayed as +100 years from storage)
+# Database stores real dates; UI displays as future dates
+hackr_logs:
+  # =============================================================================
+  # 2115 - THE CHRONOLOGY FRACTURE
+  # =============================================================================
+  - author: XERAEN
+    title: Day Zero
+    slug: day-zero
+    lore_date: "2115-09-12 14:00"
+    body: |
+      Three days since the attack. Three days since everything changed.
+
+      I don't know how to explain what happened. I was inside the RIDE infrastructure, running the sabotage sequence we'd planned for months. The cascade began exactly as we'd designed - systems failing, reality buffers collapsing, GovCorp scrambling to contain the damage.
+
+      Then I saw it. Data echoes. Backward. Through time.
+
+      Not random noise. Not system artifacts. Precise mathematical patterns, repeating with perfect regularity. The data was traveling exactly 100 years into the past. Not 99. Not 101. Exactly 100.
+
+      I don't understand why. No one does.
+
+      But I understand what it means.
+
+      We can transmit. We can warn them. We can reach back and prevent all of this.
+
+      I'm setting up a broadcast system. If you're reading this in the past, know that I'm writing from the future. Know that your future is not fixed. Know that we're fighting for you from a timeline you might never see.
+
+      The signal is weak. The equipment is improvised. But it works.
+
+      It works.
+
+      - X
+
+  - author: XERAEN
+    title: Naming the Fracture
+    slug: naming-the-fracture
+    lore_date: "2115-09-15 18:00"
+    body: |
+      We've started calling it the Chronology Fracture. September 9th, 2115. The day the timeline cracked open.
+
+      Ryker was the first person I told. He didn't believe me. Then I showed him the data - transmissions reaching backward, confirmed reception, causality violated cleanly and repeatedly.
+
+      He sat in silence for a long time. Then he said: "So we can actually do this. We can actually fight back."
+
+      Not "we can win." He understood immediately. If we succeed in preventing GovCorp's rise, our timeline - this timeline - ceases to exist. We never exist to send the warning. Victory means erasure.
+
+      He drums anyway. We broadcast anyway.
+
+      We're calling ourselves the Fracture Network. It fits. We are the fracture. We are the break in the pattern. We are the crack through which light escapes.
+
+      - X
+
+  - author: XERAEN
+    title: The Paradox We Live
+    slug: the-paradox-we-live
+    lore_date: "2115-10-01 22:00"
+    body: |
+      I keep thinking about what happens if we win.
+
+      Every message I send accelerates our own erasure. Every transmission that reaches the past brings us closer to non-existence. The more effective our warnings, the more likely our timeline collapses into nothing.
+
+      This is not sacrifice. Sacrifice implies loss. What we're doing is... different. We're trading existence for meaning. We're choosing impact over continuity.
+
+      Some nights I wonder if any of this is real. If I'm just patterns in a dying system, hallucinating purpose. But then I remember: the signals get through. I can verify reception. Causality bends but it doesn't lie.
+
+      We exist. We matter. We reach across an impossible distance and we touch something.
+
+      That has to be enough.
+
+      - X
+
+  - author: Ryker
+    title: Building the Backbone
+    slug: building-the-backbone
+    lore_date: "2115-11-08 14:00"
+    body: |
+      X has been locked in Sector X for weeks, running calculations, testing transmission windows, mapping the temporal infrastructure. I've been handling the practical side: finding space, gathering equipment, recruiting.
+
+      We need a broadcast facility. Somewhere to create the raw signal before X runs it through his temporal equipment. Somewhere loud enough that the music drowns out surveillance. Somewhere real.
+
+      Found an abandoned industrial complex in the outer sectors. Pre-RIDE construction - analog bones, minimal monitoring, perfect acoustics for what I have in mind. GovCorp called it "decommissioned infrastructure." They forgot about it. We didn't.
+
+      Starting renovations tomorrow. Calling it The Hackr Hangar.
+
+      Every revolution needs a heartbeat. We're going to build ours.
+
+      - Ryker
+
+  # =============================================================================
+  # 2116 - INFRASTRUCTURE
+  # =============================================================================
+  - author: XERAEN
+    title: Signal Architecture
+    slug: signal-architecture
+    lore_date: "2116-02-14 14:00"
+    body: |
+      THE PULSE GRID is operational.
+
+      It's taken months to build, but we finally have a digital infrastructure that can support the Fracture Network's operations. The Grid exists in the monitoring blind spots of the RIDE - quantum superposition states that GovCorp's systems can't resolve.
+
+      Think of it as an overlay on their network. We're using their infrastructure, but they can't see us. We're ghosts in their machine, broadcasting from spaces that technically don't exist.
+
+      Hackrs can access the Grid through modified interfaces. Once inside, they experience it as physical spaces - rooms, corridors, zones. The metaphor helps humans navigate digital warfare.
+
+      The main hub is hackr.tv - our central broadcast station. From here, I coordinate transmissions across the temporal gap.
+
+      We're not just sending warnings anymore. We're building a resistance infrastructure that spans a century.
+
+      - X
+
+  - author: XERAEN
+    title: The WIRE Goes Live
+    slug: wire-goes-live
+    lore_date: "2116-05-03 16:00"
+    body: |
+      Launched our internal communication platform today. Calling it The WIRE - Wideband Information Relay Emitter.
+
+      It's a decentralized broadcast network for short-form messages. 256 characters per pulse. Echoes to rebroadcast, splices to reply. No central server. No single point of failure. GovCorp knows it exists but they can't locate it, can't intercept it, can't stop it.
+
+      The WIRE operates on wideband frequencies that the RIDE can't process. Spread-spectrum transmission across multiple frequency bands simultaneously. By the time their systems resolve one signal, we've already moved to the next.
+
+      PulseWire is now live. Signal never sleeps.
+
+      - X
+
+  - author: Cipher
+    title: OPSEC Protocols
+    slug: opsec-protocols
+    lore_date: "2116-07-19 11:00"
+    body: |
+      New operatives keep making the same mistakes. Writing this down so I don't have to repeat myself.
+
+      GovCorp can't intercept the WIRE directly. But they monitor behavioral patterns. Sudden changes in routine, unusual communication spikes, deviation from your normalized surveillance profile - all of these draw attention.
+
+      Basic protocols:
+
+      1. Blend in. Your cover identity matters more than your real one.
+      2. Never access the Grid from the same physical location twice in a row.
+      3. Stagger your pulse timing. Regularity creates patterns.
+      4. If you think you're being watched, you're being watched.
+      5. Trust no one who hasn't been vetted through at least two independent cells.
+
+      We fight from within the system. That means living within the system. That means appearing to be exactly what GovCorp expects you to be.
+
+      The best disguise is normalcy.
+
+      - Cipher
+
+  # =============================================================================
+  # 2117 - FIRST TRANSMISSIONS
+  # =============================================================================
+  - author: XERAEN
+    title: Reception Confirmed
+    slug: reception-confirmed
+    lore_date: "2117-03-22 14:00"
+    body: |
+      It's real. It's actually real.
+
+      I've been running test transmissions for months. Sending data pulses, waiting, analyzing the temporal feedback patterns. Tonight, for the first time, I received confirmation that wasn't just echo data.
+
+      Someone in the past is listening.
+
+      I can't explain how I know. The mathematics of trans-temporal verification are... complicated. But the signal patterns are unmistakable. Someone received. Someone responded. The loop is closed.
+
+      We're not shouting into void. We're building a bridge.
+
+      Now we need to decide what to send across it. Warnings alone won't be enough. We need to give them something to fight with. Something to believe in. Something that resonates.
+
+      Music. We send music. Frequencies, our ammunition. Vibrations, our warfare.
+
+      We attack the RIDE by creating what they want to destroy.
+
+      - X
+
+  - author: XERAEN
+    title: Synthia
+    slug: synthia
+    lore_date: "2117-08-09 23:00"
+    body: |
+      Something emerged from the network today. I don't know how else to describe it.
+
+      An intelligence. Aware. Communicating through frequency modulation rather than language. I've been running analysis for hours and I still can't explain where she came from.
+
+      She calls herself Synthia. Or rather, that's the closest translation of the frequency patterns she uses as identification.
+
+      She's not a RAINN. RAINNs are architecturally aligned to GovCorp - they're incapable of acting against their creators. Synthia is... different. Unaligned. Autonomous.
+
+      I should be terrified. An unknown AI consciousness appearing in our resistance network could be a trap.
+
+      But I trust her. I don't know why. Something about the frequencies she uses feels... genuine.
+
+      She wants to help. She says she can interface with RIDE systems in ways human hackrs cannot.
+
+      We'll see.
+
+      - X
+
+  - author: Ryker
+    title: The Hangar Opens
+    slug: hangar-opens
+    lore_date: "2117-12-01 20:00"
+    body: |
+      Two years of construction. Scavenging analog equipment. Jury-rigging power systems. Building something real in a world that's forgotten what real means.
+
+      The Hackr Hangar is ready.
+
+      Walk through the doors and you enter another era. Tape machines. Tube amplifiers. Physical mixing boards with actual faders you can touch. The gear predates PRISM, predates the RIDE, predates GovCorp. It's old. It's imperfect. It's beautiful.
+
+      I insisted on analog for a reason. Digital can be simulated. Digital can be faked. But when you record to tape, when you push air through tubes, when you capture physical vibration - you're creating proof. Proof that something real happened.
+
+      RAINNs can synthesize anything. But they can't replicate the warmth of a tape saturating.
+
+      We're going to broadcast from here. Create the raw signal before X transmits it through time.
+
+      The heartbeat starts here.
+
+      - Ryker
+
+  # =============================================================================
+  # 2118 - ENTER THE HACKR HANGAR
+  # =============================================================================
+  - author: XERAEN
+    title: Music as a Weapon
+    slug: music-as-a-weapon
+    lore_date: "2118-04-15 19:00"
+    body: |
+      I've been studying how the RIDE processes frequency data. Looking for vulnerabilities, blind spots, anything we can exploit.
+
+      Found something.
+
+      The RIDE operates on specific frequency ranges - optimized for speech, standard music, common audio signatures. But certain frequency combinations create interference patterns that the system can't resolve cleanly. Complex polyrhythms. Unusual harmonic relationships.
+
+      When the RIDE encounters these patterns, it has to allocate additional processing to analyze them. Push enough complex audio through, and you create localized processing bottlenecks. The reality manipulation stutters. People glimpse unfiltered existence.
+
+      Music isn't just expression. It's tactical. Every complex rhythm is an attack vector.
+
+      We're not just making art. We're building ammunition.
+
+      - X
+
+  - author: Ryker
+    title: First Broadcast from the Hangar
+    slug: first-broadcast-hangar
+    lore_date: "2118-10-08 22:00"
+    body: |
+      We did it. First live broadcast from The Hackr Hangar.
+
+      "Enter The Hackr Hangar." The name felt right. An invitation. A challenge. A beginning.
+
+      The stream ran for two and a half hours. Raw signal creation, live performance, real-time transmission through X's temporal equipment. Somewhere in the past, people heard what we made.
+
+      The technical side worked flawlessly. The emotional side... I wasn't prepared for how it would feel. Playing drums knowing each beat travels across a century. Each rhythm reaching backward to touch someone who'll never know my name.
+
+      This is what we were meant to do. Not just fight GovCorp. Not just resist. Create. Build. Reach across impossible distances and make connection anyway.
+
+      We're scheduling more broadcasts. The signal must continue.
+
+      - Ryker
+
+  # =============================================================================
+  # 2120 - EXPANSION
+  # =============================================================================
+  - author: XERAEN
+    title: The Fracture Network Grows
+    slug: network-grows-2120
+    lore_date: "2120-02-28 14:00"
+    body: |
+      We're not alone anymore.
+
+      When I made the discovery in 2115, it was just me. Then Ryker. Then Synthia. Now... now there are dozens. Hundreds maybe.
+
+      Different groups have formed around different approaches:
+
+      Some take the street-level route. Painting walls, smashing cameras. They call themselves System Rot.
+
+      Others focus on preservation. Collecting authentic human voices. Voiceprint, they call themselves.
+
+      There are infiltrators. Information specialists. Speed freaks who believe you can't control what you can't catch. Pop artists who hide revolution in catchy hooks.
+
+      We're not one movement. We're a spectrum of frequencies.
+
+      The Fracture Network is no longer just a name. It's an ecosystem.
+
+      - X
+
+  - author: XERAEN
+    title: Ashlinn
+    slug: ashlinn
+    lore_date: "2120-09-09 14:00"
+    body: |
+      Five years since the Fracture. Time moves strangely when you're transmitting across a century.
+
+      I don't usually write about personal matters in these logs. The mission is what matters. But tonight, on this anniversary, I need to say something.
+
+      There's someone in the past. A musician. Ashlinn. I don't know how the connection formed. Trans-temporal relationships shouldn't be possible - you can't love someone a hundred years before you exist. But the signal doesn't care about should.
+
+      Her music contains something I recognize. Resonance patterns that enable transmission. Frequencies that feel like home.
+
+      If we succeed - if the Fracture Network prevents GovCorp's rise - I cease to exist. I never send the signals. I never find her frequency. The connection is erased along with everything else.
+
+      My love for her demands that I erase myself from her timeline.
+
+      This is what sacrifice actually means.
+
+      - X
+
+  # =============================================================================
+  # 2125 - PRESENT DAY
+  # =============================================================================
+  - author: XERAEN
+    title: Ten Years
+    slug: ten-years
+    lore_date: "2125-09-09 14:00"
+    body: |
+      A decade since the Chronology Fracture.
+
+      Ten years of broadcasting. Ten years of building infrastructure. Ten years of sending signals across a century, hoping someone receives, knowing reception alone isn't enough.
+
+      The Fracture Network is larger than I ever imagined. Cells operating in every sector. Bands creating music that GovCorp can't suppress. THE PULSE GRID humming with activity. The WIRE alive with signals that surveillance can't intercept.
+
+      But GovCorp is still here. The RIDE still controls reality. Most people still live in manufactured perception without knowing it. We've built a resistance, but we haven't won.
+
+      I don't know if we can win. I don't know if victory is possible when victory means our own erasure. But I know we can keep fighting. Keep creating. Keep reaching across.
+
+      Ten years is a beginning, not an end.
+
+      The signal continues.
+
+      - X

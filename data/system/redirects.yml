@@ -1,0 +1,88 @@
+# Domain redirects
+redirects:
+  # Ashlinn redirects
+  - domain: ashlinn.net
+    path: /
+    destination_url: https://youtube.com/AshlinnSnow
+
+  # XERAEN/Rockerboy redirects
+  - domain: xeraen.com
+    path: /
+    destination_url: /xeraen
+  - domain: xeraen.com
+    path: /git
+    destination_url: https://github.com/xeraen
+  - domain: xeraen.com
+    path: /github
+    destination_url: https://github.com/xeraen
+  - domain: xeraen.com
+    path: /twitter
+    destination_url: https://x.com/xeraen
+  - domain: xeraen.com
+    path: /x
+    destination_url: https://x.com/xeraen
+  - domain: xeraen.com
+    path: /youtube
+    destination_url: https://youtube.com/@xeraen
+
+  - domain: xeraen.net
+    path: /
+    destination_url: /xeraen
+  - domain: xeraen.net
+    path: /git
+    destination_url: https://github.com/xeraen
+  - domain: xeraen.net
+    path: /github
+    destination_url: https://github.com/xeraen
+  - domain: xeraen.net
+    path: /twitter
+    destination_url: https://x.com/xeraen
+  - domain: xeraen.net
+    path: /x
+    destination_url: https://x.com/xeraen
+  - domain: xeraen.net
+    path: /youtube
+    destination_url: https://youtube.com/@xeraen
+
+  - domain: rockerboy.net
+    path: /
+    destination_url: /xeraen
+  - domain: rockerboy.net
+    path: /git
+    destination_url: https://github.com/xeraen
+  - domain: rockerboy.net
+    path: /github
+    destination_url: https://github.com/xeraen
+  - domain: rockerboy.net
+    path: /twitter
+    destination_url: https://x.com/xeraen
+  - domain: rockerboy.net
+    path: /x
+    destination_url: https://x.com/xeraen
+  - domain: rockerboy.net
+    path: /youtube
+    destination_url: https://youtube.com/@xeraen
+
+  - domain: rockerboy.stream
+    path: /
+    destination_url: /xeraen
+  - domain: rockerboy.stream
+    path: /git
+    destination_url: https://github.com/xeraen
+  - domain: rockerboy.stream
+    path: /github
+    destination_url: https://github.com/xeraen
+  - domain: rockerboy.stream
+    path: /twitter
+    destination_url: https://x.com/xeraen
+  - domain: rockerboy.stream
+    path: /x
+    destination_url: https://x.com/xeraen
+  - domain: rockerboy.stream
+    path: /youtube
+    destination_url: https://youtube.com/@xeraen
+
+  # Sector X redirects
+  - domain: sectorx.media
+    path: /
+    destination_url: /sector/x

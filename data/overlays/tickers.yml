@@ -1,0 +1,15 @@
+# Overlay Tickers
+tickers:
+  - name: Top Ticker
+    slug: top
+    content: "SYSTEM NOTIFICATION: All transmissions monitored by PRISM // Maintain signal discipline // Trust no one"
+    direction: left
+    speed: 80
+    active: true
+
+  - name: Bottom Ticker
+    slug: bottom
+    content: "THE.CYBERPUL.SE // LIVE FROM THE PULSE GRID // TUNE IN TO hackr.fm FOR THE FUTURE SOUND // PULSEWIRE: THE SIGNAL NEVER SLEEPS"
+    direction: left
+    speed: 100
+    active: true
