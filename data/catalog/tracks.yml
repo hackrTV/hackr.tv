@@ -2737,6 +2737,7 @@ tracks:
   track_number: 1
   duration: "2:19:41"
   audio_file: "21190515_taking_off_from_the_hackr_hangar.ogg"
+  show_in_pulse_vault: false
 
 - slug: taking-off-from-the-hackr-hangar-21190522
   album_slug: livestream-archive
@@ -2744,3 +2745,4 @@ tracks:
   track_number: 2
   duration: "2:07:25"
   audio_file: "21190522_taking_off_from_the_hackr_hangar.ogg"
+  show_in_pulse_vault: false
