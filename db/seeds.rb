@@ -1,21 +1,24 @@
 # This file should ensure the existence of records required to run the application in every environment (production,
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
+#
+# DATA ARCHITECTURE:
+# All seed data is managed via YAML files in the data/ directory structure:
+#   data/catalog/    - Artists, albums, tracks
+#   data/system/     - Hackrs, channels, radio stations, redirects, zone playlists
+#   data/world/      - Factions, zones, rooms, exits, mobs, items
+#   data/content/    - Codex entries, hackr logs, wire (pulses/echoes)
+#   data/playlists/  - Key playlists with radio station links
+#   data/overlays/   - Elements, scenes, scene elements, tickers, lower thirds
+#
+# To reload data:
+#   rails data:load         # Full load of all data
+#   rails data:reset        # Reset seed content only (preserves user data)
+#   rails data:catalog      # Reload only catalog data
+#   rails data:content      # Reload only content data
+#   etc.
+#
+# See lib/tasks/data.rake for all available tasks.
 
-# Load THE PULSE GRID seed data
-load Rails.root.join("db", "seeds", "grid_seeds.rb")
-
-# Load Codex seed data
-load Rails.root.join("db", "seeds", "codex_seeds.rb")
-
-# Load PulseWire seed data
-load Rails.root.join("db", "seeds", "pulse_wire_seeds.rb")
-
-# Load HackrLogs seed data
-load Rails.root.join("db", "seeds", "hackr_logs_seeds.rb")
-
-# Load Overlay seed data
-load Rails.root.join("db", "seeds", "overlay_seeds.rb")
-
-# Load Uplink seed data
-load Rails.root.join("db", "seeds", "uplink_seeds.rb")
+# Delegate to the unified data:load rake task
+Rake::Task["data:load"].invoke

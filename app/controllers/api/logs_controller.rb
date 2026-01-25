@@ -1,6 +1,6 @@
 class Api::LogsController < ApplicationController
   def index
-    logs = HackrLog.published.ordered.includes(:author)
+    logs = HackrLog.published.ordered.includes(:grid_hackr)
 
     # Pagination
     page = [params[:page].to_i, 1].max
@@ -19,8 +19,8 @@ class Api::LogsController < ApplicationController
           published_at: log.published_at,
           created_at: log.created_at,
           author: {
-            id: log.author.id,
-            hackr_alias: log.author.hackr_alias
+            id: log.grid_hackr.id,
+            hackr_alias: log.grid_hackr.hackr_alias
           }
         }
       },
@@ -44,8 +44,8 @@ class Api::LogsController < ApplicationController
       published_at: @hackr_log.published_at,
       created_at: @hackr_log.created_at,
       author: {
-        id: @hackr_log.author.id,
-        hackr_alias: @hackr_log.author.hackr_alias
+        id: @hackr_log.grid_hackr.id,
+        hackr_alias: @hackr_log.grid_hackr.hackr_alias
       }
     }
   rescue ActiveRecord::RecordNotFound

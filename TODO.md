@@ -1,6 +1,6 @@
 # TODO
 
-**Last Updated:** 2026-01-15
+**Last Updated:** 2026-01-24
 
 This file tracks planned features, enhancements, and tasks for hackr.tv.
 
@@ -20,13 +20,11 @@ This file tracks planned features, enhancements, and tasks for hackr.tv.
 - [ ] **Reverse references** - Show "Referenced in" section listing all places that link to each entry
 - [ ] **Inline tooltips** - Hover over `[[Entry Name]]` links to see entry summary without navigation
 
-### Technical Debt (see `tech_debt.md`)
+### Technical Debt
 
-- [ ] **CSRF protection** - Re-enable for session-cookie APIs or migrate to token auth
-- [ ] **Content Security Policy** - Enable baseline CSP and expand for Vite/dev assets
-- [ ] **Standardize JSON errors** - Normalize error responses and log auth failures
-- [ ] **Remove duplicate broadcasts** - Fix PulseWire double-event issue
-- [ ] **Action Cable UX** - Add retry/backoff and connection status indicators
+- [ ] **Remove legacy import tasks** - Delete obsolete tasks from `lib/tasks/import.rake` now that `data:*` namespace is complete
+- [ ] **Update db/seeds.rb** - Delegate to `data:load` instead of individual seed files
+- [ ] **Standardize JSON errors** - Normalize API error responses (`{error:}` vs `{success: false, error:}`)
 
 ## Medium Priority
 
@@ -87,6 +85,21 @@ This file tracks planned features, enhancements, and tasks for hackr.tv.
 ---
 
 ## Completed
+
+### Data Architecture Consolidation (2026-01)
+- [x] **Unified YAML data system** - Single source of truth with `data:load` task loading all content
+- [x] **Consolidated directory structure** - `data/{catalog,world,content,system,playlists,overlays}/`
+- [x] **35+ data rake tasks** - `data:load`, `data:audio`, `data:reset`, individual loaders
+- [x] **Schema changes** - Added `is_seed` flag to pulses/echoes, slugs to zone_playlists/grid_rooms
+- [x] **Read-only admin controllers** - Removed CRUD for seed-only content (13 controllers updated)
+- [x] **Audio sideloading** - `data:audio` task supports local imports/ and S3 bucket sources
+- [x] **Key playlists** - Radio station linked playlists loaded from YAML
+- [x] **HackrLog refactor** - Changed `author` to `grid_hackr` association
+
+### Security & Infrastructure (2026-01)
+- [x] **CSRF protection** - Enabled with token auth bypass for API requests
+- [x] **Content Security Policy** - Full CSP with nonces, Vite dev support, YouTube iframes
+- [x] **Action Cable resilience** - Exponential backoff retry, connection status indicators, ReconnectingBanner component
 
 ### OBS Overlay System (2025-12)
 - [x] **Overlay scenes & groups** - Fullscreen and composition scenes with element positioning
@@ -164,6 +177,6 @@ This file tracks planned features, enhancements, and tasks for hackr.tv.
 - [x] **Hackr Logs blog** - Markdown posts with publish workflow
 
 ### Testing (Current)
-- [x] **1104 RSpec tests** - Backend test coverage
+- [x] **1164 RSpec tests** - Backend test coverage
 - [x] **129 Vitest tests** - Frontend test coverage
 - [x] **96 test files** - Comprehensive test suite

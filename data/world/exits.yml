@@ -1,0 +1,42 @@
+# Grid Exits (connections between rooms)
+# Each exit is one-way; create pairs for bidirectional movement
+exits:
+  - from_room_slug: hackr_tv_broadcast_station
+    to_room_slug: transit_corridor_alpha
+    direction: north
+    locked: false
+
+  - from_room_slug: transit_corridor_alpha
+    to_room_slug: hackr_tv_broadcast_station
+    direction: south
+    locked: false
+
+  - from_room_slug: transit_corridor_alpha
+    to_room_slug: xeraen_operations_center
+    direction: west
+    locked: false
+
+  - from_room_slug: xeraen_operations_center
+    to_room_slug: transit_corridor_alpha
+    direction: east
+    locked: false
+
+  - from_room_slug: transit_corridor_alpha
+    to_room_slug: govcorp_surveillance_node
+    direction: east
+    locked: true
+
+  - from_room_slug: govcorp_surveillance_node
+    to_room_slug: transit_corridor_alpha
+    direction: west
+    locked: false
+
+  - from_room_slug: hackr_tv_broadcast_station
+    to_room_slug: the_rhythm_nexus
+    direction: west
+    locked: false
+
+  - from_room_slug: the_rhythm_nexus
+    to_room_slug: hackr_tv_broadcast_station
+    direction: east
+    locked: false

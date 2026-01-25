@@ -1,0 +1,16 @@
+# Grid Items
+items:
+  - name: fracture network data chip
+    description: "A small chip containing encrypted Fracture Network communications."
+    item_type: data
+    room_slug: hackr_tv_broadcast_station
+
+  - name: frequency modulator
+    description: "A device for tuning into Synthia's signal. Essential for PRISM communication."
+    item_type: tool
+    room_slug: hackr_tv_broadcast_station
+
+  - name: GovCorp access keycard
+    description: "Stolen keycard providing access to restricted areas. Handle with care."
+    item_type: tool
+    room_slug: xeraen_operations_center

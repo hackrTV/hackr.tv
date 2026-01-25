@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: overlay_scene_group_scenes
+# Database name: primary
+#
+#  id                     :integer          not null, primary key
+#  position               :integer          default(0), not null
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  overlay_scene_group_id :integer          not null
+#  overlay_scene_id       :integer          not null
+#
+# Indexes
+#
+#  index_overlay_scene_group_scenes_on_overlay_scene_group_id  (overlay_scene_group_id)
+#  index_overlay_scene_group_scenes_on_overlay_scene_id        (overlay_scene_id)
+#  index_scene_group_scenes_position                           (overlay_scene_group_id,position)
+#  index_scene_group_scenes_unique                             (overlay_scene_group_id,overlay_scene_id) UNIQUE
+#
+# Foreign Keys
+#
+#  overlay_scene_group_id  (overlay_scene_group_id => overlay_scene_groups.id)
+#  overlay_scene_id        (overlay_scene_id => overlay_scenes.id)
+#
 class OverlaySceneGroupScene < ApplicationRecord
   belongs_to :overlay_scene_group
   belongs_to :overlay_scene

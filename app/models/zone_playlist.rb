@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: zone_playlists
+# Database name: primary
+#
+#  id                    :integer          not null, primary key
+#  crossfade_duration_ms :integer          default(5000), not null
+#  default_volume        :decimal(3, 2)    default(0.35), not null
+#  description           :text
+#  name                  :string           not null
+#  slug                  :string
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#
+# Indexes
+#
+#  index_zone_playlists_on_slug  (slug) UNIQUE
+#
 class ZonePlaylist < ApplicationRecord
   has_many :zone_playlist_tracks, dependent: :destroy
   has_many :tracks, through: :zone_playlist_tracks

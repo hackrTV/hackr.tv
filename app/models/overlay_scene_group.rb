@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: overlay_scene_groups
+# Database name: primary
+#
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_overlay_scene_groups_on_slug  (slug) UNIQUE
+#
 class OverlaySceneGroup < ApplicationRecord
   # Associations
   has_many :overlay_scene_group_scenes, -> { order(position: :asc) }, dependent: :destroy

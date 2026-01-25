@@ -1,56 +1,80 @@
+# == Schema Information
+#
+# Table name: hackr_logs
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  body          :text             not null
+#  published     :boolean          default(FALSE), not null
+#  published_at  :datetime
+#  slug          :string           not null
+#  title         :string           not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#
+# Indexes
+#
+#  index_hackr_logs_on_grid_hackr_id  (grid_hackr_id)
+#  index_hackr_logs_on_slug           (slug) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 require "rails_helper"
 
 RSpec.describe HackrLog, type: :model do
   describe "associations" do
-    it "belongs to author (GridHackr)" do
-      association = HackrLog.reflect_on_association(:author)
+    it "belongs to grid_hackr" do
+      association = HackrLog.reflect_on_association(:grid_hackr)
       expect(association.macro).to eq(:belongs_to)
       expect(association.class_name).to eq("GridHackr")
     end
   end
 
   describe "validations" do
-    let(:author) { create(:grid_hackr) }
+    let(:grid_hackr) { create(:grid_hackr) }
 
     it "is valid with valid attributes" do
-      log = build(:hackr_log, author: author)
+      log = build(:hackr_log, grid_hackr: grid_hackr)
       expect(log).to be_valid
     end
 
     it "is invalid without a title" do
-      log = build(:hackr_log, author: author, title: nil)
+      log = build(:hackr_log, grid_hackr: grid_hackr, title: nil)
       expect(log).not_to be_valid
       expect(log.errors[:title]).to include("can't be blank")
     end
 
     it "is invalid without a slug" do
-      log = build(:hackr_log, author: author, slug: nil)
+      log = build(:hackr_log, grid_hackr: grid_hackr, slug: nil)
       expect(log).not_to be_valid
       expect(log.errors[:slug]).to include("can't be blank")
     end
 
     it "is invalid without a body" do
-      log = build(:hackr_log, author: author, body: nil)
+      log = build(:hackr_log, grid_hackr: grid_hackr, body: nil)
       expect(log).not_to be_valid
       expect(log.errors[:body]).to include("can't be blank")
     end
 
     it "requires unique slug" do
-      create(:hackr_log, author: author, slug: "unique-slug")
-      duplicate = build(:hackr_log, author: author, slug: "unique-slug")
+      create(:hackr_log, grid_hackr: grid_hackr, slug: "unique-slug")
+      duplicate = build(:hackr_log, grid_hackr: grid_hackr, slug: "unique-slug")
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:slug]).to include("has already been taken")
     end
   end
 
   describe "scopes" do
-    let(:author) { create(:grid_hackr) }
+    let(:grid_hackr) { create(:grid_hackr) }
 
     describe ".published" do
       it "returns only published logs" do
-        published1 = create(:hackr_log, :published, author: author)
-        published2 = create(:hackr_log, :published, author: author)
-        create(:hackr_log, author: author, published: false)
+        published1 = create(:hackr_log, :published, grid_hackr: grid_hackr)
+        published2 = create(:hackr_log, :published, grid_hackr: grid_hackr)
+        create(:hackr_log, grid_hackr: grid_hackr, published: false)
 
         expect(HackrLog.published).to contain_exactly(published1, published2)
       end
@@ -58,16 +82,16 @@ RSpec.describe HackrLog, type: :model do
 
     describe ".ordered" do
       it "orders by published_at descending" do
-        log1 = create(:hackr_log, :published, author: author, published_at: 2.days.ago)
-        log2 = create(:hackr_log, :published, author: author, published_at: 1.day.ago)
-        log3 = create(:hackr_log, :published, author: author, published_at: Time.current)
+        log1 = create(:hackr_log, :published, grid_hackr: grid_hackr, published_at: 2.days.ago)
+        log2 = create(:hackr_log, :published, grid_hackr: grid_hackr, published_at: 1.day.ago)
+        log3 = create(:hackr_log, :published, grid_hackr: grid_hackr, published_at: Time.current)
 
         expect(HackrLog.ordered).to eq([log3, log2, log1])
       end
 
       it "falls back to created_at if published_at is nil" do
-        log1 = create(:hackr_log, author: author, published_at: nil, created_at: 2.days.ago)
-        log2 = create(:hackr_log, author: author, published_at: nil, created_at: 1.day.ago)
+        log1 = create(:hackr_log, grid_hackr: grid_hackr, published_at: nil, created_at: 2.days.ago)
+        log2 = create(:hackr_log, grid_hackr: grid_hackr, published_at: nil, created_at: 1.day.ago)
 
         expect(HackrLog.ordered).to eq([log2, log1])
       end
@@ -82,8 +106,8 @@ RSpec.describe HackrLog, type: :model do
   end
 
   describe "#publish!" do
-    let(:author) { create(:grid_hackr) }
-    let(:log) { create(:hackr_log, author: author, published: false, published_at: nil) }
+    let(:grid_hackr) { create(:grid_hackr) }
+    let(:log) { create(:hackr_log, grid_hackr: grid_hackr, published: false, published_at: nil) }
 
     it "sets published to true" do
       log.publish!
@@ -107,8 +131,8 @@ RSpec.describe HackrLog, type: :model do
   end
 
   describe "#unpublish!" do
-    let(:author) { create(:grid_hackr) }
-    let(:log) { create(:hackr_log, :published, author: author) }
+    let(:grid_hackr) { create(:grid_hackr) }
+    let(:log) { create(:hackr_log, :published, grid_hackr: grid_hackr) }
 
     it "sets published to false" do
       log.unpublish!
@@ -124,9 +148,9 @@ RSpec.describe HackrLog, type: :model do
 
   describe "full lifecycle" do
     it "creates a log with all attributes" do
-      author = create(:grid_hackr, :admin)
+      hackr = create(:grid_hackr, :admin)
       log = HackrLog.create!(
-        author: author,
+        grid_hackr: hackr,
         title: "Major Resistance Victory",
         slug: "major-resistance-victory",
         body: "# Victory!\n\nWe have achieved a major breakthrough.",
@@ -135,7 +159,7 @@ RSpec.describe HackrLog, type: :model do
       )
 
       expect(log).to be_persisted
-      expect(log.author).to eq(author)
+      expect(log.grid_hackr).to eq(hackr)
       expect(log.published).to be true
       expect(log.published_at).to be_present
     end

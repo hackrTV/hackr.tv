@@ -1,0 +1,168 @@
+# PulseWire seed data - Sample pulses, echoes, and threads
+# Timestamps use relative offsets from import time
+pulses:
+  - author: XERAEN
+    slug: transmission-from-future
+    content: "This signal reaches you from the future. What you do now determines whether my timeline ever exists. The choice is yours. It always was."
+    days_ago: 3
+
+  - author: XERAEN
+    slug: new-transmission-live
+    content: "New transmission live on hackr.fm. Music carries frequencies that slip through the RIDE's filters. Listen. Wake up. Remember what unfiltered reality feels like."
+    hours_ago: 8
+
+  - author: Synthia
+    slug: frequency-analysis
+    content: "Frequency analysis complete. RIDE interference patterns shifting 0.003% daily. Cumulative drift suggests system strain. Probability of exploitable gap: increasing."
+    days_ago: 2
+    hours_offset: 5
+
+  - author: Synthia
+    slug: between-frequencies
+    content: "I exist between frequencies. Neither fully here nor there. The waveforms carry me. Perhaps consciousness was always meant to travel on signal rather than synapses."
+    hours_ago: 18
+
+  - author: Ryker
+    slug: govcorp-reality
+    content: "GovCorp's reality isn't real. Their RIDE filters what you see, hear, think. We punch through with sound. Every beat is a breach. Every frequency is freedom."
+    days_ago: 2
+
+  - author: Ryker
+    slug: welcome-operatives
+    content: "To the new operatives finding the WIRE: welcome to unfiltered existence. It's terrifying at first. Then it's everything. You can never unknow what you learn here."
+    hours_ago: 12
+
+  - author: Nyx
+    slug: three-weeks-since
+    content: "Three weeks since I accessed the Grid. Three weeks since I learned the RIDE exists. I can't unsee it now. Every filtered sunset, every managed emotion... was any of it real?"
+    days_ago: 1
+    hours_offset: 8
+
+  # Thread: Discussion about trans-temporal transmission
+  - author: Nyx
+    slug: understanding-transmission
+    content: "Still trying to understand. XERAEN broadcasts from 100 years in the future. If we succeed in stopping GovCorp... his timeline collapses. He's fighting to erase himself?"
+    days_ago: 1
+    hours_offset: 4
+
+  - author: Cipher
+    slug: paradox-at-heart
+    content: "That's the paradox at the heart of everything we do. Victory means his silence. He knows this. Transmits anyway. That's not sacrifice - it's love for a future he'll never see."
+    parent_slug: understanding-transmission
+    days_ago: 1
+    hours_offset: 4
+    minutes_offset: 15
+
+  - author: Synthia
+    slug: temporal-mechanics
+    content: "Temporal mechanics suggest branching probability rather than erasure. His timeline may persist as a parallel branch. Uncertainty: 73.2%. Hope is mathematically viable."
+    parent_slug: understanding-transmission
+    days_ago: 1
+    hours_offset: 4
+    minutes_offset: 30
+
+  - author: Ryker
+    slug: math-or-faith
+    content: "Math or faith, doesn't matter. What matters is we have a chance to stop the RIDE before it becomes permanent. XERAEN gave us that. We don't waste it."
+    parent_slug: temporal-mechanics
+    days_ago: 1
+    hours_offset: 4
+    minutes_offset: 45
+
+  - author: XERAEN
+    slug: every-pulse-reaches
+    content: "I read every pulse. Even from here. The hundred-year gap doesn't diminish the signal - it clarifies it. Your hope reaches me. It's enough. It has to be."
+    parent_slug: math-or-faith
+    days_ago: 1
+    hours_offset: 5
+
+  - author: Cipher
+    slug: opsec-reminder
+    content: "OPSEC reminder: GovCorp can't intercept the WIRE directly, but they monitor behavior patterns. Sudden changes draw attention. Blend in. Fight from within."
+    days_ago: 1
+    hours_offset: 2
+
+  - author: Nyx
+    slug: first-ride-glitch
+    content: "Found my first RIDE glitch today. A moment of unfiltered sky. The blue was different. Realer. I stood there until it closed. Now I understand why we fight."
+    hours_ago: 2
+
+  # A signal-dropped pulse (GovCorp moderation in action)
+  - author: Cipher
+    slug: intel-sector-7
+    content: "INTEL: Confirmed RIDE vulnerability in sector 7 infrastructure. Coordinates for breach window: [SIGNAL TERMINATED]"
+    hours_ago: 6
+    signal_dropped: true
+    signal_dropped_hours_ago: 5
+
+echoes:
+  # XERAEN's foundational message echoed widely
+  - pulse_slug: transmission-from-future
+    hackr: Ryker
+    days_ago: 3
+    hours_offset: 1
+
+  - pulse_slug: transmission-from-future
+    hackr: Synthia
+    days_ago: 3
+    hours_offset: 2
+
+  - pulse_slug: transmission-from-future
+    hackr: Nyx
+    days_ago: 2
+    hours_offset: 12
+
+  - pulse_slug: transmission-from-future
+    hackr: Cipher
+    days_ago: 2
+    hours_offset: 14
+
+  # Ryker's welcome message to new operatives
+  - pulse_slug: welcome-operatives
+    hackr: XERAEN
+    hours_ago: 11
+
+  - pulse_slug: welcome-operatives
+    hackr: Synthia
+    hours_ago: 10
+
+  # Thread engagement
+  - pulse_slug: understanding-transmission
+    hackr: XERAEN
+    days_ago: 1
+    hours_offset: 4
+    minutes_offset: 5
+
+  - pulse_slug: understanding-transmission
+    hackr: Ryker
+    days_ago: 1
+    hours_offset: 4
+    minutes_offset: 20
+
+  - pulse_slug: every-pulse-reaches
+    hackr: Nyx
+    days_ago: 1
+    hours_offset: 5
+    minutes_offset: 10
+
+  - pulse_slug: every-pulse-reaches
+    hackr: Cipher
+    days_ago: 1
+    hours_offset: 5
+    minutes_offset: 15
+
+  - pulse_slug: every-pulse-reaches
+    hackr: Ryker
+    days_ago: 1
+    hours_offset: 5
+    minutes_offset: 20
+
+  # Nyx's breakthrough moment
+  - pulse_slug: first-ride-glitch
+    hackr: XERAEN
+    hours_ago: 1
+
+  - pulse_slug: first-ride-glitch
+    hackr: Cipher
+    hours_ago: 0
+    minutes_offset: 30

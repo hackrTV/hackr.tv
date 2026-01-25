@@ -109,11 +109,6 @@ export const LogDetailPage: React.FC = () => {
           <Link to="/logs" style={{ color: '#818cf8', textDecoration: 'none', padding: '8px 16px', display: 'inline-block' }}>
             ← Back to All Logs
           </Link>
-          {hackr?.role === 'admin' && (
-            <a href={`/root/hackr_logs/${log.slug}/edit`} style={{ color: '#a78bfa', textDecoration: 'none', padding: '8px 16px', marginLeft: '10px', display: 'inline-block' }}>
-              ✎ Edit This Log
-            </a>
-          )}
         </div>
       </div>
     </DefaultLayout>

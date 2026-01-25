@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: overlay_elements
+# Database name: primary
+#
+#  id           :integer          not null, primary key
+#  active       :boolean          default(TRUE)
+#  element_type :string           not null
+#  name         :string           not null
+#  settings     :json
+#  slug         :string           not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#
+# Indexes
+#
+#  index_overlay_elements_on_active        (active)
+#  index_overlay_elements_on_element_type  (element_type)
+#  index_overlay_elements_on_slug          (slug) UNIQUE
+#
 class OverlayElement < ApplicationRecord
   ELEMENT_TYPES = %w[
     now_playing

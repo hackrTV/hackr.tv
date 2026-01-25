@@ -1,0 +1,37 @@
+# Overlay Scene Elements (elements placed in scenes)
+scene_elements:
+  # Now Playing in bottom left corner
+  - scene_slug: main-layout
+    element_slug: now-playing
+    x: 20
+    y: 940
+    width: 400
+    height: 120
+    z_index: 10
+
+  # PulseWire feed on the right side
+  - scene_slug: main-layout
+    element_slug: pulsewire-feed
+    x: 1500
+    y: 100
+    width: 400
+    height: 500
+    z_index: 5
+
+  # Alerts centered at top
+  - scene_slug: main-layout
+    element_slug: alert-box
+    x: 710
+    y: 100
+    width: 500
+    height: 200
+    z_index: 20
+
+  # Bottom ticker
+  - scene_slug: main-layout
+    element_slug: ticker-bottom
+    x: 0
+    y: 1040
+    width: 1920
+    height: 40
+    z_index: 15

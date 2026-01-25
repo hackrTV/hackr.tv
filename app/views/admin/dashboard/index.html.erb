@@ -73,10 +73,10 @@
       <!-- Quick Actions -->
       <h2 class="cyan-255-text" style="margin-bottom: 20px;">[:: QUICK ACTIONS ::]</h2>
       <div style="display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;">
-        <%= link_to "➕ New Artist", new_admin_artist_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
-        <%= link_to "💿 New Album", new_admin_album_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
-        <%= link_to "🎵 New Track", new_admin_track_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
-        <%= link_to "📝 New Log", new_admin_hackr_log_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "🎵 Artists", admin_artists_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "💿 Albums", admin_albums_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "🎶 Tracks", admin_tracks_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
+        <%= link_to "📝 Logs", admin_hackr_logs_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "📖 Codex", admin_codex_entries_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "📻 Radio Stations", admin_radio_stations_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
         <%= link_to "🎶 Zone Playlists", admin_zone_playlists_path, class: "tui-button purple-168", style: "padding: 10px 20px;" %>
@@ -103,7 +103,7 @@
                   <% @recent_tracks.each do |track| %>
                     <tr>
                       <td>
-                        <%= link_to track.title, edit_admin_track_path(track), class: "purple-168-text" %>
+                        <span class="purple-168-text"><%= track.title %></span>
                         <%= "★" if track.featured %>
                       </td>
                       <td><%= track.artist.name %></td>
@@ -133,7 +133,7 @@
                   <% @recent_logs.each do |log| %>
                     <tr>
                       <td>
-                        <%= link_to log.title, edit_admin_hackr_log_path(log), class: "purple-168-text" %>
+                        <span class="purple-168-text"><%= log.title %></span>
                       </td>
                       <td style="text-align: center;">
                         <% if log.published? %>

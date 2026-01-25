@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: chat_channels
+# Database name: primary
+#
+#  id                  :integer          not null, primary key
+#  description         :text
+#  is_active           :boolean          default(TRUE), not null
+#  minimum_role        :string           default("operative"), not null
+#  name                :string           not null
+#  requires_livestream :boolean          default(FALSE), not null
+#  slow_mode_seconds   :integer          default(0), not null
+#  slug                :string           not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#
+# Indexes
+#
+#  index_chat_channels_on_is_active  (is_active)
+#  index_chat_channels_on_slug       (slug) UNIQUE
+#
 require "rails_helper"
 
 RSpec.describe ChatChannel, type: :model do

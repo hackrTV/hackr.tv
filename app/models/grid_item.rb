@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: grid_items
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  description   :text
+#  item_type     :string
+#  name          :string
+#  properties    :json
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer
+#  room_id       :integer
+#
 class GridItem < ApplicationRecord
   belongs_to :room, class_name: "GridRoom", optional: true
   belongs_to :grid_hackr, optional: true

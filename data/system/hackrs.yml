@@ -1,0 +1,33 @@
+# Core GridHackr accounts
+# Password handling: In production, requires environment variables
+# In development/test, uses defaults for convenience
+hackrs:
+  - hackr_alias: XERAEN
+    role: admin
+    starting_room: hackr_tv_broadcast_station
+    env_password_key: XERAEN_PASSWORD
+    default_password: hackthefuture
+
+  - hackr_alias: Ryker
+    role: admin
+    starting_room: hackr_tv_broadcast_station
+    env_password_key: RYKER_PASSWORD
+    default_password: cyberpulse
+
+  - hackr_alias: Cipher
+    role: operative
+    starting_room: hackr_tv_broadcast_station
+    env_password_key: CIPHER_PASSWORD
+    default_password: frequency
+
+  - hackr_alias: Synthia
+    role: operative
+    starting_room: xeraen_operations_center
+    env_password_key: SYNTHIA_PASSWORD
+    default_password: waveform
+
+  - hackr_alias: Nyx
+    role: operative
+    starting_room: hackr_tv_broadcast_station
+    env_password_key: NYX_PASSWORD
+    default_password: unfiltered

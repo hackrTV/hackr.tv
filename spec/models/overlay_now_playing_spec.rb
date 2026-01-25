@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: overlay_now_playing
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  custom_artist :string
+#  custom_title  :string
+#  is_live       :boolean          default(FALSE)
+#  paused        :boolean          default(FALSE), not null
+#  started_at    :datetime
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  track_id      :integer
+#
+# Indexes
+#
+#  index_overlay_now_playing_on_track_id  (track_id)
+#
+# Foreign Keys
+#
+#  track_id  (track_id => tracks.id)
+#
 require "rails_helper"
 
 RSpec.describe OverlayNowPlaying, type: :model do

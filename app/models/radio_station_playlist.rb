@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: radio_station_playlists
+# Database name: primary
+#
+#  id               :integer          not null, primary key
+#  position         :integer          not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  playlist_id      :integer          not null
+#  radio_station_id :integer          not null
+#
+# Indexes
+#
+#  index_radio_station_playlists_on_playlist_id       (playlist_id)
+#  index_radio_station_playlists_on_radio_station_id  (radio_station_id)
+#  index_radio_station_playlists_position             (radio_station_id,position)
+#  index_radio_station_playlists_unique               (radio_station_id,playlist_id) UNIQUE
+#
+# Foreign Keys
+#
+#  playlist_id       (playlist_id => playlists.id)
+#  radio_station_id  (radio_station_id => radio_stations.id)
+#
 class RadioStationPlaylist < ApplicationRecord
   belongs_to :radio_station
   belongs_to :playlist

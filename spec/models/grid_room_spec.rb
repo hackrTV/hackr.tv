@@ -1,3 +1,28 @@
+# == Schema Information
+#
+# Table name: grid_rooms
+# Database name: primary
+#
+#  id                  :integer          not null, primary key
+#  description         :text
+#  name                :string
+#  room_type           :string
+#  slug                :string
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  ambient_playlist_id :integer
+#  grid_zone_id        :integer          not null
+#
+# Indexes
+#
+#  index_grid_rooms_on_ambient_playlist_id  (ambient_playlist_id)
+#  index_grid_rooms_on_grid_zone_id         (grid_zone_id)
+#  index_grid_rooms_on_slug                 (slug) UNIQUE
+#
+# Foreign Keys
+#
+#  ambient_playlist_id  (ambient_playlist_id => zone_playlists.id)
+#
 require "rails_helper"
 
 RSpec.describe GridRoom, type: :model do

@@ -4,10 +4,12 @@
   <fieldset class="admin-panel-border">
     <legend class="center">/root/overlays/lower-thirds/<%= @lower_third.slug %> :: LOWER THIRD DETAILS</legend>
 
-    <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+    <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
       <%= link_to "< Back to Lower Thirds", admin_overlay_lower_thirds_path, class: "tui-button green-168" %>
-      <%= link_to "Edit", edit_admin_overlay_lower_third_path(@lower_third), class: "tui-button cyan-168" %>
       <%= link_to "Preview", overlay_lower_third_path(slug: @lower_third.slug), target: "_blank", class: "tui-button purple-168" %>
+      <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
+        Edit via: <code style="color: #888;">data/overlays/lower_thirds.yml</code>
+      </span>
     </div>
 
     <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 20px;">

@@ -4,9 +4,11 @@
   <fieldset class="admin-panel-border">
     <legend class="center">/root/overlays/elements/<%= @element.slug %> :: ELEMENT DETAILS</legend>
 
-    <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+    <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
       <%= link_to "< Back to Elements", admin_overlay_elements_path, class: "tui-button green-168" %>
-      <%= link_to "Edit", edit_admin_overlay_element_path(@element), class: "tui-button cyan-168" %>
+      <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
+        Edit via: <code style="color: #888;">data/overlays/elements.yml</code>
+      </span>
     </div>
 
     <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 20px;">

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_24_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -112,10 +112,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
     t.datetime "created_at", null: false
     t.datetime "echoed_at", null: false
     t.integer "grid_hackr_id", null: false
+    t.boolean "is_seed", default: false, null: false
     t.integer "pulse_id", null: false
     t.datetime "updated_at", null: false
     t.index ["echoed_at"], name: "index_echoes_on_echoed_at"
     t.index ["grid_hackr_id"], name: "index_echoes_on_grid_hackr_id"
+    t.index ["is_seed"], name: "index_echoes_on_is_seed"
     t.index ["pulse_id", "grid_hackr_id"], name: "index_echoes_on_pulse_id_and_grid_hackr_id", unique: true
     t.index ["pulse_id"], name: "index_echoes_on_pulse_id"
   end
@@ -195,9 +197,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
     t.integer "grid_zone_id", null: false
     t.string "name"
     t.string "room_type"
+    t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["ambient_playlist_id"], name: "index_grid_rooms_on_ambient_playlist_id"
     t.index ["grid_zone_id"], name: "index_grid_rooms_on_grid_zone_id"
+    t.index ["slug"], name: "index_grid_rooms_on_slug", unique: true
   end
 
   create_table "grid_zones", force: :cascade do |t|
@@ -214,15 +218,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
   end
 
   create_table "hackr_logs", force: :cascade do |t|
-    t.integer "author_id", null: false
     t.text "body", null: false
     t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
     t.boolean "published", default: false, null: false
     t.datetime "published_at"
     t.string "slug", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["author_id"], name: "index_hackr_logs_on_author_id"
+    t.index ["grid_hackr_id"], name: "index_hackr_logs_on_grid_hackr_id"
     t.index ["slug"], name: "index_hackr_logs_on_slug", unique: true
   end
 
@@ -403,6 +407,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
     t.datetime "created_at", null: false
     t.integer "echo_count", default: 0, null: false
     t.integer "grid_hackr_id", null: false
+    t.boolean "is_seed", default: false, null: false
     t.integer "parent_pulse_id"
     t.datetime "pulsed_at", null: false
     t.boolean "signal_dropped", default: false, null: false
@@ -411,6 +416,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
     t.integer "thread_root_id"
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id"], name: "index_pulses_on_grid_hackr_id"
+    t.index ["is_seed"], name: "index_pulses_on_is_seed"
     t.index ["parent_pulse_id"], name: "index_pulses_on_parent_pulse_id"
     t.index ["pulsed_at"], name: "index_pulses_on_pulsed_at"
     t.index ["signal_dropped"], name: "index_pulses_on_signal_dropped"
@@ -506,7 +512,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
     t.decimal "default_volume", precision: 3, scale: 2, default: "0.35", null: false
     t.text "description"
     t.string "name", null: false
+    t.string "slug"
     t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_zone_playlists_on_slug", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -519,7 +527,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_19_165339) do
   add_foreign_key "echoes", "pulses"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
-  add_foreign_key "hackr_logs", "grid_hackrs", column: "author_id"
+  add_foreign_key "hackr_logs", "grid_hackrs"
   add_foreign_key "hackr_streams", "artists"
   add_foreign_key "moderation_logs", "chat_messages"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "actor_id"

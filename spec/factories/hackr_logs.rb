@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: hackr_logs
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  body          :text             not null
+#  published     :boolean          default(FALSE), not null
+#  published_at  :datetime
+#  slug          :string           not null
+#  title         :string           not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#
+# Indexes
+#
+#  index_hackr_logs_on_grid_hackr_id  (grid_hackr_id)
+#  index_hackr_logs_on_slug           (slug) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 FactoryBot.define do
   factory :hackr_log do
     title { "Resistance Update #{SecureRandom.hex(4)}" }
@@ -5,7 +29,7 @@ FactoryBot.define do
     body { "This is a transmission from the resistance. The fight continues in 2125." }
     published { false }
     published_at { nil }
-    association :author, factory: :grid_hackr
+    association :grid_hackr
 
     trait :published do
       published { true }

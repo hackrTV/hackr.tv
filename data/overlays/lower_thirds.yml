@@ -1,0 +1,19 @@
+# Overlay Lower Thirds
+lower_thirds:
+  - name: XERAEN
+    slug: xeraen
+    primary_text: XERAEN
+    secondary_text: "Musician // Producer // The Pulse Grid Architect"
+    active: true
+
+  - name: hackr.fm
+    slug: hackr-fm
+    primary_text: hackr.fm
+    secondary_text: "Future Sound for Future People"
+    active: true
+
+  - name: Guest Speaker
+    slug: guest
+    primary_text: Guest
+    secondary_text: "Guest appearance on THE.CYBERPUL.SE"
+    active: true

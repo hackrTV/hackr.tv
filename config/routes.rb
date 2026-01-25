@@ -144,35 +144,33 @@ Rails.application.routes.draw do
   end
 
   # Admin routes (accessible at /root)
+  # NOTE: Most resources are read-only (managed via YAML files)
+  # Edit YAML files in data/ directory and run: rails data:load
   namespace :admin, path: "root" do
     root "dashboard#index"
-    resources :artists
-    resources :albums
-    resources :tracks do
-      collection do
-        post :import
-      end
-    end
-    resources :codex_entries
-    resources :hackr_logs
-    resources :radio_stations do
-      member do
-        post :add_playlist
-        delete :remove_playlist
-        post :reorder_playlists
-      end
-    end
-    resources :zone_playlists do
-      member do
-        post :add_track
-        delete "remove_track/:track_id", action: :remove_track, as: :remove_track
-        patch :reorder_tracks
-      end
-    end
-    resources :grid_zones, only: %i[index edit update]
-    resources :grid_rooms, only: %i[index edit update]
+
+    # Read-only catalog resources (managed via data/catalog/*.yml)
+    resources :artists, only: [:index]
+    resources :albums, only: [:index]
+    resources :tracks, only: [:index]
+
+    # Read-only content resources (managed via data/content/*.yml)
+    resources :codex_entries, only: [:index]
+    resources :hackr_logs, only: [:index]
+
+    # Read-only system resources (managed via data/system/*.yml)
+    resources :radio_stations, only: %i[index show]
+    resources :zone_playlists, only: %i[index show]
+
+    # Read-only world resources (managed via data/world/*.yml)
+    resources :grid_zones, only: [:index]
+    resources :grid_rooms, only: [:index]
+
+    # Grid management (still functional - runtime operations)
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
+
+    # PulseWire moderation (still functional - runtime operations)
     resources :pulse_wire, only: %i[index destroy] do
       collection do
         get "signal_drops"
@@ -184,15 +182,19 @@ Rails.application.routes.draw do
         post "restore"
       end
     end
+
+    # Hackr streams (still functional - runtime operations)
     resources :hackr_streams do
       member do
         post :go_live
         post :end_stream
       end
     end
-    resources :redirects
 
-    # Uplink admin routes
+    # Redirects are read-only (managed via data/system/redirects.yml)
+    resources :redirects, only: [:index]
+
+    # Uplink admin routes (moderation is still functional)
     resources :uplink, only: [:index] do
       collection do
         get "packets"
@@ -210,21 +212,16 @@ Rails.application.routes.draw do
     delete "uplink/punishments/:id", to: "uplink#lift_punishment", as: :lift_uplink_punishment
 
     # Overlay admin routes
+    # Runtime operations (ticker updates, alerts) are still functional
     get "overlays", to: "overlays#index", as: :overlays
     patch "overlays/ticker/:ticker_slug", to: "overlays#update_ticker", as: :update_overlay_ticker
     post "overlays/alert", to: "overlays#send_alert", as: :send_overlay_alert
-    resources :overlay_scenes, path: "overlays/scenes" do
-      resources :scene_elements, controller: "overlay_scene_elements", only: %i[new create edit update destroy]
-    end
-    resources :overlay_elements, path: "overlays/elements"
-    resources :overlay_lower_thirds, path: "overlays/lower-thirds"
-    resources :overlay_scene_groups, path: "overlays/groups" do
-      member do
-        post :add_scene
-        delete :remove_scene
-        post :reorder_scenes
-      end
-    end
+
+    # Read-only overlay resources (managed via data/overlays/*.yml)
+    resources :overlay_scenes, path: "overlays/scenes", only: %i[index show]
+    resources :overlay_elements, path: "overlays/elements", only: %i[index show]
+    resources :overlay_lower_thirds, path: "overlays/lower-thirds", only: %i[index show]
+    resources :overlay_scene_groups, path: "overlays/groups", only: %i[index show]
   end
 
   # OBS Overlay routes (Rails server-rendered, NOT SPA)
