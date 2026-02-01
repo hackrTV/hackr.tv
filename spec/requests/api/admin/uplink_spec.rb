@@ -52,6 +52,27 @@ RSpec.describe "Api::Admin::Uplink", type: :request do
 
         expect(response).to have_http_status(:created)
       end
+
+      it "bypasses channel accessibility for inactive channels" do
+        inactive_channel = create(:chat_channel, :inactive)
+
+        post "/api/admin/uplink/send_packet",
+          params: {hackr_alias: admin_hackr.hackr_alias, channel_slug: inactive_channel.slug, content: "Bypassed"},
+          headers: admin_headers
+
+        expect(response).to have_http_status(:created)
+      end
+
+      it "bypasses channel accessibility for role-restricted channels" do
+        # Even though admin_hackr would normally have access, this confirms the bypass path
+        operator_channel = create(:chat_channel, :operator_only)
+
+        post "/api/admin/uplink/send_packet",
+          params: {hackr_alias: admin_hackr.hackr_alias, channel_slug: operator_channel.slug, content: "Bypassed"},
+          headers: admin_headers
+
+        expect(response).to have_http_status(:created)
+      end
     end
 
     context "with non-admin hackr" do
@@ -96,6 +117,38 @@ RSpec.describe "Api::Admin::Uplink", type: :request do
           headers: admin_headers
 
         expect(response).to have_http_status(:too_many_requests)
+      end
+
+      it "blocks access to inactive channels" do
+        inactive_channel = create(:chat_channel, :inactive)
+
+        post "/api/admin/uplink/send_packet",
+          params: {hackr_alias: operative.hackr_alias, channel_slug: inactive_channel.slug, content: "Blocked"},
+          headers: admin_headers
+
+        expect(response).to have_http_status(:forbidden)
+        expect(JSON.parse(response.body)["error"]).to include("cannot access")
+      end
+
+      it "blocks access to role-restricted channels" do
+        admin_channel = create(:chat_channel, :admin_only)
+
+        post "/api/admin/uplink/send_packet",
+          params: {hackr_alias: operative.hackr_alias, channel_slug: admin_channel.slug, content: "Blocked"},
+          headers: admin_headers
+
+        expect(response).to have_http_status(:forbidden)
+        expect(JSON.parse(response.body)["error"]).to include("cannot access")
+      end
+
+      it "blocks access to livestream channels when no stream is live" do
+        live_channel = create(:chat_channel, :livestream_only)
+
+        post "/api/admin/uplink/send_packet",
+          params: {hackr_alias: operative.hackr_alias, channel_slug: live_channel.slug, content: "Blocked"},
+          headers: admin_headers
+
+        expect(response).to have_http_status(:forbidden)
       end
     end
 

@@ -7,9 +7,17 @@ module Api
       # POST /api/admin/uplink/send_packet
       def send_packet
         # Moderation bypass is role-dependent:
-        # Admin hackrs bypass squelch/blackout/slow-mode
+        # Admin hackrs bypass squelch/blackout/slow-mode/channel restrictions
         # Non-admin hackrs are still subject to moderation even through admin API
         unless @acting_hackr.admin?
+          # Check channel accessibility (inactive, role-restricted, etc.)
+          unless @channel.accessible_by?(@acting_hackr)
+            return render json: {
+              success: false,
+              error: "This hackr cannot access this channel."
+            }, status: :forbidden
+          end
+
           if UserPunishment.blackouted?(@acting_hackr)
             return render json: {
               success: false,
