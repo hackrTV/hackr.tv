@@ -1424,7 +1424,6 @@ namespace :data do
     puts "  CLEANUP=true   - Delete local source files after attaching (ignored for S3)"
     puts "=" * 80 + "\n"
   end
-
 end
 
 # Helper module for data loading utilities
