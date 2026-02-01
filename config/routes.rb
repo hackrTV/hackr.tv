@@ -141,6 +141,31 @@ Rails.application.routes.draw do
       delete "users/:id/punishment", to: "moderation#lift_punishment", as: :lift_punishment
       get "moderation_log", to: "moderation#moderation_log", as: :moderation_log
     end
+
+    # Admin API routes (bearer token auth)
+    namespace :admin do
+      # Meta
+      get "capabilities", to: "meta#capabilities"
+      get "rate_limit", to: "meta#rate_limit"
+
+      # Streams
+      get "streams/status", to: "streams#status"
+      post "streams/go_live", to: "streams#go_live"
+      post "streams/end_stream", to: "streams#end_stream"
+
+      # HackrLogs
+      get "hackr_logs", to: "hackr_logs#index"
+      post "hackr_logs", to: "hackr_logs#create"
+      patch "hackr_logs/:slug", to: "hackr_logs#update"
+
+      # Pulses
+      post "pulses", to: "pulses#create"
+      post "pulses/:pulse_id/echo", to: "pulses#echo"
+      post "pulses/splice", to: "pulses#splice"
+
+      # Uplink
+      post "uplink/send_packet", to: "uplink#send_packet"
+    end
   end
 
   # Admin routes (accessible at /root)
