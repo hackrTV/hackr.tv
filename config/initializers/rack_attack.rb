@@ -62,10 +62,10 @@ class Rack::Attack
 
   ### Blocklist repeated offenders ###
 
-  # Block IPs that have been throttled 10+ times in 10 minutes
+  # Block IPs that have been throttled 5+ times in 1 hour
   blocklist("repeated_offenders") do |req|
-    # After 10 blocked requests in 10 minutes, block for 1 hour
-    Rack::Attack::Allow2Ban.filter(req.ip, maxretry: 10, findtime: 10.minutes, bantime: 1.hour) do
+    # After 5 blocked requests in 1 hour, block for 1 hour
+    Rack::Attack::Allow2Ban.filter(req.ip, maxretry: 5, findtime: 1.hour, bantime: 1.hour) do
       # Track all throttled requests
       req.env["rack.attack.matched"]
     end
