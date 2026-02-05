@@ -2,6 +2,26 @@
 # Protects against brute force attacks and abuse
 
 class Rack::Attack
+  # Parse JSON body for POST requests since Rack::Request#params
+  # doesn't include JSON body fields at middleware time
+  def self.json_params(req)
+    return req.env["rack_attack.json_params"] if req.env.key?("rack_attack.json_params")
+
+    parsed = if req.post? && req.content_type&.include?("application/json")
+      begin
+        body = req.body.read
+        req.body.rewind
+        JSON.parse(body)
+      rescue JSON::ParserError
+        {}
+      end
+    else
+      {}
+    end
+
+    req.env["rack_attack.json_params"] = parsed
+  end
+
   ### Throttle login attempts ###
 
   # Throttle login attempts by IP address
@@ -17,7 +37,7 @@ class Rack::Attack
   throttle("logins/alias", limit: 5, period: 20.seconds) do |req|
     if req.path == "/api/grid/login" && req.post?
       # Normalize alias to prevent bypass via case variations
-      req.params["hackr_alias"]&.downcase&.strip
+      json_params(req)["hackr_alias"]&.downcase&.strip
     end
   end
 
@@ -34,7 +54,7 @@ class Rack::Attack
   # 3 registration emails per email address per hour
   throttle("registrations/email", limit: 3, period: 1.hour) do |req|
     if req.path == "/api/grid/register" && req.post?
-      req.params["email"]&.downcase&.strip
+      json_params(req)["email"]&.downcase&.strip
     end
   end
 
@@ -52,7 +72,7 @@ class Rack::Attack
   # 5 completion attempts per token per hour
   throttle("complete_registration/token", limit: 5, period: 1.hour) do |req|
     if req.path == "/api/grid/complete_registration" && req.post?
-      req.params["token"]
+      json_params(req)["token"]
     end
   end
 

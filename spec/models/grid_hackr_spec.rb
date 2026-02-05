@@ -125,7 +125,7 @@ RSpec.describe GridHackr, type: :model do
     end
 
     describe "weak passwords" do
-      let(:weak_error) { "Bro, you're a hackr. Don't use a normie password!" }
+      let(:weak_error) { " -- Bro, you're a hackr. Don't use a normie password!" }
 
       it "rejects common weak passwords" do
         %w[password asdfasdf qwerty letmein welcome monkey dragon admin trustno1].each do |weak|

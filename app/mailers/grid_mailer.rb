@@ -1,5 +1,5 @@
 class GridMailer < ApplicationMailer
-  default from: "noreply@hackr.tv"
+  default from: "null@hackr.tv"
 
   def registration_verification(token)
     @token = token
