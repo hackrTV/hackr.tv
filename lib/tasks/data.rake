@@ -306,6 +306,7 @@ namespace :data do
       end
 
       hackr.assign_attributes(
+        email: attrs["email"],
         role: attrs["role"],
         skip_reserved_check: true
       )

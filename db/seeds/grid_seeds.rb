@@ -312,6 +312,7 @@ end
 
 GridHackr.create!(
   hackr_alias: "XERAEN",
+  email: "x@hackr.tv",
   password: xeraen_password,
   role: "admin",
   current_room: hackr_tv,
@@ -320,6 +321,7 @@ GridHackr.create!(
 
 GridHackr.create!(
   hackr_alias: "Ryker",
+  email: "ryker@hackr.tv",
   password: ryker_password,
   role: "admin",
   current_room: hackr_tv,
@@ -331,6 +333,7 @@ GridHackr.create!(
 cipher_password = Rails.env.production? ? ENV.fetch("CIPHER_PASSWORD") { raise "CIPHER_PASSWORD required in production" } : ENV.fetch("CIPHER_PASSWORD", "frequency")
 GridHackr.create!(
   hackr_alias: "Cipher",
+  email: "cipher@hackr.tv",
   password: cipher_password,
   role: "operative",
   current_room: hackr_tv,
@@ -340,6 +343,7 @@ GridHackr.create!(
 # Synthia - AI consciousness, communicates through frequency modulation
 GridHackr.create!(
   hackr_alias: "Synthia",
+  email: "synthia@hackr.tv",
   password: ENV.fetch("SYNTHIA_PASSWORD", "waveform"),
   role: "operative",
   current_room: xeraen_base,
@@ -349,6 +353,7 @@ GridHackr.create!(
 # Nyx - Newer recruit, still processing the implications
 GridHackr.create!(
   hackr_alias: "Nyx",
+  email: "nyx@hackr.tv",
   password: ENV.fetch("NYX_PASSWORD", "unfiltered"),
   role: "operative",
   current_room: hackr_tv,

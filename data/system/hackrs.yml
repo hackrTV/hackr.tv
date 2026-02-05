@@ -3,30 +3,35 @@
 # In development/test, uses defaults for convenience
 hackrs:
   - hackr_alias: XERAEN
+    email: x@hackr.tv
     role: admin
     starting_room: hackr_tv_broadcast_station
     env_password_key: XERAEN_PASSWORD
     default_password: hackthefuture
 
   - hackr_alias: Ryker
+    email: ryker@hackr.tv
     role: admin
     starting_room: hackr_tv_broadcast_station
     env_password_key: RYKER_PASSWORD
     default_password: cyberpulse
 
   - hackr_alias: Cipher
+    email: cipher@hackr.tv
     role: operative
     starting_room: hackr_tv_broadcast_station
     env_password_key: CIPHER_PASSWORD
     default_password: frequency
 
   - hackr_alias: Synthia
+    email: synthia@hackr.tv
     role: operative
     starting_room: xeraen_operations_center
     env_password_key: SYNTHIA_PASSWORD
     default_password: waveform
 
   - hackr_alias: Nyx
+    email: nyx@hackr.tv
     role: operative
     starting_room: hackr_tv_broadcast_station
     env_password_key: NYX_PASSWORD

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_24_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_05_000002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -148,12 +148,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_24_000001) do
     t.string "api_token"
     t.datetime "created_at", null: false
     t.integer "current_room_id"
+    t.string "email"
     t.string "hackr_alias"
     t.datetime "last_activity_at"
     t.string "password_digest"
     t.string "role"
     t.datetime "updated_at", null: false
     t.index ["api_token"], name: "index_grid_hackrs_on_api_token", unique: true
+    t.index ["email"], name: "index_grid_hackrs_on_email", unique: true
     t.index ["hackr_alias"], name: "index_grid_hackrs_on_hackr_alias", unique: true
     t.index ["role"], name: "index_grid_hackrs_on_role"
   end
@@ -188,6 +190,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_24_000001) do
     t.string "mob_type"
     t.string "name"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "grid_registration_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.datetime "expires_at", null: false
+    t.string "ip_address"
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "used_at"
+    t.index ["email"], name: "index_grid_registration_tokens_on_email"
+    t.index ["token"], name: "index_grid_registration_tokens_on_token", unique: true
   end
 
   create_table "grid_rooms", force: :cascade do |t|

@@ -1,0 +1,38 @@
+<div style="font-family: 'Courier New', monospace; max-width: 600px; margin: 0 auto; background-color: #0a0a0a; color: #00ff00; padding: 30px;">
+  <div style="border: 1px solid #00ff00; padding: 20px; margin-bottom: 20px;">
+    <h1 style="color: #00ff00; margin: 0 0 10px 0; font-size: 24px;">THE PULSE GRID</h1>
+    <p style="color: #999; margin: 0; font-size: 12px;">REGISTRATION VERIFICATION</p>
+  </div>
+
+  <div style="padding: 20px 0;">
+    <p style="color: #ccc; line-height: 1.6;">
+      A registration request was initiated for this email address.
+    </p>
+
+    <p style="color: #ccc; line-height: 1.6;">
+      Click the link below to complete your registration and join the Fracture Network:
+    </p>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="<%= @verification_url %>" style="display: inline-block; background-color: #00ff00; color: #0a0a0a; padding: 15px 30px; text-decoration: none; font-weight: bold; border: none;">
+        COMPLETE REGISTRATION
+      </a>
+    </div>
+
+    <p style="color: #999; font-size: 12px; line-height: 1.6;">
+      Or copy this link into your browser:<br>
+      <span style="color: #00ff00; word-break: break-all;"><%= @verification_url %></span>
+    </p>
+
+    <p style="color: #999; font-size: 12px; line-height: 1.6; margin-top: 30px;">
+      This link expires in 24 hours.<br>
+      If you didn't request this, you can safely ignore this message.
+    </p>
+  </div>
+
+  <div style="border-top: 1px solid #333; padding-top: 20px; margin-top: 20px;">
+    <p style="color: #777; font-size: 10px; margin: 0;">
+      hackr.tv // THE PULSE GRID
+    </p>
+  </div>
+</div>

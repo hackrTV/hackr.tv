@@ -23,11 +23,36 @@ class Rack::Attack
 
   ### Throttle registration attempts ###
 
-  # Prevent registration spam
-  # 3 registrations per IP per hour
+  # Prevent registration email spam
+  # 3 registration emails per IP per hour
   throttle("registrations/ip", limit: 3, period: 1.hour) do |req|
     if req.path == "/api/grid/register" && req.post?
       req.ip
+    end
+  end
+
+  # 3 registration emails per email address per hour
+  throttle("registrations/email", limit: 3, period: 1.hour) do |req|
+    if req.path == "/api/grid/register" && req.post?
+      req.params["email"]&.downcase&.strip
+    end
+  end
+
+  ### Throttle token verification ###
+
+  # 10 token verifications per IP per minute
+  throttle("verify_token/ip", limit: 10, period: 1.minute) do |req|
+    if req.path.start_with?("/api/grid/verify/") && req.get?
+      req.ip
+    end
+  end
+
+  ### Throttle registration completion ###
+
+  # 5 completion attempts per token per hour
+  throttle("complete_registration/token", limit: 5, period: 1.hour) do |req|
+    if req.path == "/api/grid/complete_registration" && req.post?
+      req.params["token"]
     end
   end
 

@@ -5,6 +5,7 @@
 #
 #  id               :integer          not null, primary key
 #  api_token        :string
+#  email            :string
 #  hackr_alias      :string
 #  last_activity_at :datetime
 #  password_digest  :string
@@ -16,6 +17,7 @@
 # Indexes
 #
 #  index_grid_hackrs_on_api_token    (api_token) UNIQUE
+#  index_grid_hackrs_on_email        (email) UNIQUE
 #  index_grid_hackrs_on_hackr_alias  (hackr_alias) UNIQUE
 #  index_grid_hackrs_on_role         (role)
 #
@@ -122,6 +124,71 @@ RSpec.describe GridHackr, type: :model do
       end
     end
 
+    describe "weak passwords" do
+      let(:weak_error) { "Bro, you're a hackr. Don't use a normie password!" }
+
+      it "rejects common weak passwords" do
+        %w[password asdfasdf qwerty letmein welcome monkey dragon admin trustno1].each do |weak|
+          hackr = build(:grid_hackr, password: weak)
+          expect(hackr).not_to be_valid, "Expected '#{weak}' to be rejected"
+          expect(hackr.errors[:password]).to include(weak_error)
+        end
+      end
+
+      it "rejects passwords starting with 'password'" do
+        %w[password1 password123 passwordabc PASSWORD99].each do |weak|
+          hackr = build(:grid_hackr, password: weak)
+          expect(hackr).not_to be_valid, "Expected '#{weak}' to be rejected"
+          expect(hackr.errors[:password]).to include(weak_error)
+        end
+      end
+
+      it "rejects sequential ascending digits" do
+        %w[12345678 123456789 1234567890].each do |weak|
+          hackr = build(:grid_hackr, password: weak)
+          expect(hackr).not_to be_valid, "Expected '#{weak}' to be rejected"
+          expect(hackr.errors[:password]).to include(weak_error)
+        end
+      end
+
+      it "rejects sequential descending digits" do
+        %w[87654321 987654321 9876543210].each do |weak|
+          hackr = build(:grid_hackr, password: weak)
+          expect(hackr).not_to be_valid, "Expected '#{weak}' to be rejected"
+          expect(hackr.errors[:password]).to include(weak_error)
+        end
+      end
+
+      it "rejects repeated characters" do
+        %w[aaaaaaaa 11111111 zzzzzzzz].each do |weak|
+          hackr = build(:grid_hackr, password: weak)
+          expect(hackr).not_to be_valid, "Expected '#{weak}' to be rejected"
+          expect(hackr.errors[:password]).to include(weak_error)
+        end
+      end
+
+      it "rejects keyboard walks" do
+        %w[qwerty123 asdfghjkl zxcvbnm!].each do |weak|
+          hackr = build(:grid_hackr, password: weak)
+          expect(hackr).not_to be_valid, "Expected '#{weak}' to be rejected"
+          expect(hackr.errors[:password]).to include(weak_error)
+        end
+      end
+
+      it "rejects passwords shorter than 8 characters" do
+        hackr = build(:grid_hackr, password: "short")
+        expect(hackr).not_to be_valid
+        expect(hackr.errors[:password]).to include("must be at least 8 characters")
+      end
+
+      it "accepts reasonable passwords" do
+        %w[hackthegrid cyberpulse fr3quency_x n0tf0undh3r3].each do |strong|
+          hackr = build(:grid_hackr, password: strong)
+          expect(hackr).to be_valid, "Expected '#{strong}' to be accepted but got errors: #{hackr.errors.full_messages}"
+        end
+      end
+    end
+
     describe "alias length" do
       context "when enforce_alias_length is true" do
         it "rejects aliases shorter than minimum length" do
@@ -161,12 +228,12 @@ RSpec.describe GridHackr, type: :model do
 
   describe "default values" do
     it "defaults role to 'operative'" do
-      hackr = GridHackr.new(hackr_alias: "TestHackr", password: "password123")
+      hackr = GridHackr.new(hackr_alias: "TestHackr", password: "hackthegrid")
       expect(hackr.role).to eq("operative")
     end
 
     it "does not override explicitly set role" do
-      hackr = GridHackr.new(hackr_alias: "AdminHackr", password: "password123", role: "admin")
+      hackr = GridHackr.new(hackr_alias: "AdminHackr", password: "hackthegrid", role: "admin")
       expect(hackr.role).to eq("admin")
     end
   end
