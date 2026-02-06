@@ -59,9 +59,9 @@ gem "aws-sdk-s3", require: false
 gem "view_component"
 
 group :development, :test do
-  # Load environment variables from .env file
+  # Load environment variables from .env file in dev/test.
+  # In production, ENV vars are injected into the container by Docker Compose.
   gem "dotenv-rails"
-
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
 
