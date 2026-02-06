@@ -19,13 +19,15 @@
 # 15. codex            (no deps)
 # 16. hackr_logs       (depends on hackrs)
 # 17. wire             (depends on hackrs) - sets is_seed: true
-# 18. overlay_elements (no deps)
-# 19. overlay_tickers  (no deps)
-# 20. overlay_lower_thirds (no deps)
-# 21. overlay_scenes   (no deps)
-# 22. overlay_scene_elements (depends on scenes, elements)
-# 23. overlay_scene_groups (depends on scenes)
-# 24. redirects        (no deps)
+# 18. vidz             (depends on artists) - HackrStream VODs
+# 19. overlay_elements (no deps)
+# 20. overlay_tickers  (no deps)
+# 21. overlay_lower_thirds (no deps)
+# 22. overlay_scenes   (no deps)
+# 23. overlay_scene_elements (depends on scenes, elements)
+# 24. overlay_scene_groups (depends on scenes)
+# 25. redirects        (no deps)
+# 26. livestream_archive (depends on audio) - derived playlist
 
 namespace :data do
   # === Master Tasks ===
@@ -40,6 +42,7 @@ namespace :data do
     Rake::Task["data:world"].invoke
     Rake::Task["data:playlists"].invoke
     Rake::Task["data:content"].invoke
+    Rake::Task["data:vidz"].invoke
     Rake::Task["data:overlays"].invoke
 
     if ENV["S3_BUCKET"].present?
@@ -48,6 +51,8 @@ namespace :data do
       puts "-" * 80 + "\n"
       Rake::Task["data:audio"].invoke
     end
+
+    Rake::Task["data:livestream_archive"].invoke
 
     puts "\n" + "=" * 80
     puts "DATA LOAD COMPLETE"
@@ -1187,6 +1192,135 @@ namespace :data do
     end
 
     puts "Redirects: #{created} created, #{updated} updated, #{Redirect.count} total"
+  end
+
+  desc "Load vidz (VODs/streams) from YAML"
+  task vidz: :environment do
+    puts "\n--- Loading Vidz ---"
+    yaml_file = Rails.root.join("data", "vidz.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    vidz_data = data["vidz"] || []
+
+    if vidz_data.empty?
+      puts "  No vidz entries found"
+      next
+    end
+
+    created = updated = skipped = 0
+
+    vidz_data.each do |attrs|
+      artist = Artist.find_by("LOWER(name) = ?", attrs["artist"].to_s.downcase)
+      unless artist
+        puts "  ✗ Artist not found: #{attrs["artist"]}"
+        skipped += 1
+        next
+      end
+
+      started_at = attrs["started_at"].present? ? Time.parse(attrs["started_at"]) : nil
+      ended_at = attrs["ended_at"].present? ? Time.parse(attrs["ended_at"]) : nil
+
+      stream = HackrStream.find_or_initialize_by(vod_url: attrs["vod_url"], artist: artist)
+      was_new = stream.new_record?
+
+      stream.assign_attributes(
+        title: attrs["title"],
+        live_url: attrs["live_url"],
+        is_live: false,
+        started_at: started_at,
+        ended_at: ended_at
+      )
+
+      if was_new
+        stream.save!
+        created += 1
+        puts "  ✓ Created: #{stream.title} (#{artist.name})"
+      elsif stream.changed?
+        stream.save!
+        updated += 1
+        puts "  ↻ Updated: #{stream.title} (#{artist.name})"
+      end
+    rescue => e
+      puts "  ✗ Error processing '#{attrs["title"]}': #{e.message}"
+      skipped += 1
+    end
+
+    puts "Vidz: #{created} created, #{updated} updated, #{skipped} skipped, #{HackrStream.count} total"
+  end
+
+  desc "Create TCP Livestream Archive playlist from tracks with audio"
+  task livestream_archive: :environment do
+    puts "\n--- Loading Livestream Archive Playlist ---"
+
+    xeraen = GridHackr.find_by(hackr_alias: "XERAEN")
+    unless xeraen
+      puts "  ✗ XERAEN hackr not found (run data:hackrs first)"
+      next
+    end
+
+    thecyberpulse = Artist.find_by(slug: "thecyberpulse")
+    unless thecyberpulse
+      puts "  ✗ The.CyberPul.se artist not found (run data:artists first)"
+      next
+    end
+
+    livestream_archive = thecyberpulse.albums.find_by(slug: "livestream-archive")
+    unless livestream_archive
+      puts "  ✗ Livestream Archive album not found (run data:albums first)"
+      next
+    end
+
+    tracks_with_audio = livestream_archive.tracks
+      .joins(:audio_file_attachment)
+      .order(:track_number, :title)
+
+    if tracks_with_audio.empty?
+      puts "  ⚠ No tracks with audio found in Livestream Archive album"
+      puts "  Run data:audio to attach audio files first"
+      next
+    end
+
+    puts "  Found #{tracks_with_audio.count} tracks with audio"
+
+    playlist = xeraen.playlists.find_or_initialize_by(name: "TCP Livestream Archive")
+    was_new = playlist.new_record?
+
+    playlist.assign_attributes(
+      description: "Archived recordings from The.CyberPul.se live trans-temporal broadcasts.",
+      is_public: false
+    )
+
+    if playlist.changed? || was_new
+      playlist.save!
+      puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{playlist.name}"
+    end
+
+    # Add tracks to playlist
+    added = 0
+    tracks_with_audio.each do |track|
+      pt = PlaylistTrack.find_or_initialize_by(playlist: playlist, track: track)
+      if pt.new_record?
+        pt.save!
+        added += 1
+        puts "    + Added: #{track.title}"
+      end
+    end
+
+    # Link to radio station
+    radio_station = RadioStation.find_by(slug: "thecyberpulse")
+    if radio_station
+      RadioStationPlaylist.find_or_create_by!(radio_station: radio_station, playlist: playlist)
+      puts "  → Linked to radio station: #{radio_station.name}"
+    else
+      puts "  ⚠ Radio station 'thecyberpulse' not found"
+    end
+
+    puts "Livestream Archive: #{added} tracks added, #{playlist.playlist_tracks.count} total in playlist"
   end
 
   # === Audio Sideloading ===
