@@ -218,6 +218,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_000002) do
     t.index ["slug"], name: "index_grid_rooms_on_slug", unique: true
   end
 
+  create_table "grid_verification_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.string "ip_address"
+    t.string "purpose", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "used_at"
+    t.index ["grid_hackr_id", "purpose"], name: "index_grid_verification_tokens_on_grid_hackr_id_and_purpose"
+    t.index ["grid_hackr_id"], name: "index_grid_verification_tokens_on_grid_hackr_id"
+    t.index ["token"], name: "index_grid_verification_tokens_on_token", unique: true
+  end
+
   create_table "grid_zones", force: :cascade do |t|
     t.integer "ambient_playlist_id"
     t.string "color_scheme"
@@ -540,6 +554,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_000002) do
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
+  add_foreign_key "grid_verification_tokens", "grid_hackrs"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_logs", "grid_hackrs"
   add_foreign_key "hackr_streams", "artists"

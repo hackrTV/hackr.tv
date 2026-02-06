@@ -43,6 +43,8 @@ Rails.application.routes.draw do
     get "login", to: "pages#spa_root", as: :grid_login
     get "register", to: "pages#spa_root", as: :grid_register
     get "verify/:token", to: "pages#spa_root", as: :grid_verify
+    get "identity", to: "pages#spa_root", as: :grid_identity
+    get "reset_password/:token", to: "pages#spa_root", as: :grid_password_reset
   end
 
   # hackr.fm routes - SPA
@@ -110,6 +112,8 @@ Rails.application.routes.draw do
     post "grid/complete_registration", to: "grid#complete_registration"
     delete "grid/disconnect", to: "grid#disconnect"
     post "grid/command", to: "grid#command"
+    post "grid/request_password_reset", to: "grid#request_password_reset"
+    post "grid/reset_password", to: "grid#reset_password"
 
     # Hackr Logs API routes
     resources :logs, only: %i[index show]

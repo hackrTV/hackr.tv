@@ -307,6 +307,169 @@ RSpec.describe Api::GridController, type: :controller do
     end
   end
 
+  describe "POST #request_password_reset" do
+    let!(:hackr) { create(:grid_hackr, email: "reset@example.com") }
+
+    context "when logged in" do
+      before { session[:grid_hackr_id] = hackr.id }
+
+      it "returns success" do
+        post :request_password_reset, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(true)
+        expect(json["message"]).to include("Password reset email sent")
+      end
+
+      it "creates a verification token with password_reset purpose" do
+        expect {
+          post :request_password_reset, format: :json
+        }.to change(GridVerificationToken, :count).by(1)
+
+        token = GridVerificationToken.last
+        expect(token.grid_hackr_id).to eq(hackr.id)
+        expect(token.purpose).to eq("password_reset")
+      end
+
+      it "sends a password reset email" do
+        expect {
+          post :request_password_reset, format: :json
+        }.to have_enqueued_mail(GridMailer, :password_reset)
+      end
+
+      it "logs the password reset request" do
+        allow(Rails.logger).to receive(:info).and_call_original
+        expect(Rails.logger).to receive(:info).with(/\[AUTH\] Password reset email sent: hackr_alias=#{hackr.hackr_alias} ip=/)
+
+        post :request_password_reset, format: :json
+      end
+    end
+
+    context "when not logged in" do
+      it "returns unauthorized" do
+        post :request_password_reset, format: :json
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe "POST #reset_password" do
+    let!(:hackr) { create(:grid_hackr, email: "reset@example.com", password: "oldpassword") }
+    let!(:token) { GridVerificationToken.create!(grid_hackr: hackr, purpose: "password_reset", ip_address: "127.0.0.1") }
+
+    context "with valid token" do
+      it "updates the password" do
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(true)
+        expect(hackr.reload.authenticate("newpassword123")).to be_truthy
+      end
+
+      it "works without a session (logged-out user)" do
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(true)
+      end
+
+      it "marks the token as used" do
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+
+        expect(token.reload.used_at).to be_present
+      end
+
+      it "logs the password reset" do
+        allow(Rails.logger).to receive(:info).and_call_original
+        expect(Rails.logger).to receive(:info).with(/\[AUTH\] Password reset completed: hackr_alias=#{hackr.hackr_alias} ip=/)
+
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+      end
+
+      it "rejects password mismatch" do
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "differentpassword"
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(false)
+        expect(json["error"]).to include("doesn't match")
+      end
+    end
+
+    context "with invalid token" do
+      it "returns error for nonexistent token" do
+        post :reset_password, params: {
+          token: "bad-token",
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(false)
+        expect(json["error"]).to include("Invalid reset token")
+      end
+    end
+
+    context "with expired token" do
+      before { token.update_column(:expires_at, 1.hour.ago) }
+
+      it "returns error" do
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(false)
+        expect(json["error"]).to include("expired")
+      end
+    end
+
+    context "with used token" do
+      before { token.update!(used_at: Time.current) }
+
+      it "returns error" do
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(false)
+        expect(json["error"]).to include("already been used")
+      end
+    end
+  end
+
   describe "POST #login" do
     let!(:hackr) { create(:grid_hackr, hackr_alias: "TestHackr", password: "hackthegrid") }
 

@@ -248,6 +248,11 @@ export const HeaderMenu: React.FC = () => {
                     </Link>
                   </>
                 )}
+                {isLoggedIn && (
+                  <Link to="/grid/identity" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                    <span className="purple-168-text">/</span>identity
+                  </Link>
+                )}
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
                     <span className="red-255-text">{isLoggedIn ? '8' : '7'}</span> /root <span className="red-255-text">[ADMIN]</span>
@@ -466,6 +471,13 @@ export const HeaderMenu: React.FC = () => {
                       </Link>
                     </li>
                   </>
+                )}
+                {isLoggedIn && (
+                  <li>
+                    <Link to="/grid/identity" onClick={closeDropdown}>
+                      <span className="purple-168-text">/</span>identity
+                    </Link>
+                  </li>
                 )}
               </ul>
             </div>

@@ -1,7 +1,7 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset]
 
   # GET /api/grid/current_hackr - Get current logged-in hackr info
   def current_hackr_info
@@ -196,6 +196,70 @@ class Api::GridController < ApplicationController
       success: true,
       message: "#{hackr_alias} disconnected from THE PULSE GRID."
     }
+  end
+
+  # POST /api/grid/request_password_reset - Send password reset email
+  def request_password_reset
+    token = GridVerificationToken.create!(
+      grid_hackr: current_hackr,
+      purpose: "password_reset",
+      ip_address: request.remote_ip
+    )
+
+    GridMailer.password_reset(token).deliver_later
+
+    Rails.logger.info("[AUTH] Password reset email sent: hackr_alias=#{current_hackr.hackr_alias} ip=#{request.remote_ip}")
+    render json: {
+      success: true,
+      message: "Password reset email sent. Check your inbox."
+    }
+  end
+
+  # POST /api/grid/reset_password - Reset password with token (no login required)
+  def reset_password
+    token = GridVerificationToken.find_by(token: params[:token])
+
+    if token.nil?
+      return render json: {
+        success: false,
+        error: "Invalid reset token."
+      }, status: :unprocessable_entity
+    end
+
+    unless token.purpose == "password_reset"
+      return render json: {
+        success: false,
+        error: "Invalid reset token."
+      }, status: :unprocessable_entity
+    end
+
+    unless token.valid_for_use?
+      error_message = token.used? ? "This reset link has already been used." : "This reset link has expired."
+      return render json: {
+        success: false,
+        error: error_message
+      }, status: :unprocessable_entity
+    end
+
+    hackr = token.grid_hackr
+    hackr.password = params[:password]
+    hackr.password_confirmation = params[:password_confirmation]
+
+    ActiveRecord::Base.transaction do
+      if hackr.save
+        token.mark_used!
+        Rails.logger.info("[AUTH] Password reset completed: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
+        render json: {
+          success: true,
+          message: "Password updated successfully."
+        }
+      else
+        render json: {
+          success: false,
+          error: "Password update failed: #{hackr.errors.full_messages.join(", ")}"
+        }, status: :unprocessable_entity
+      end
+    end
   end
 
   # POST /api/grid/command - Execute game command
