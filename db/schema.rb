@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_05_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_06_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -120,6 +120,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_000002) do
     t.index ["is_seed"], name: "index_echoes_on_is_seed"
     t.index ["pulse_id", "grid_hackr_id"], name: "index_echoes_on_pulse_id_and_grid_hackr_id", unique: true
     t.index ["pulse_id"], name: "index_echoes_on_pulse_id"
+  end
+
+  create_table "feature_grants", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "feature", null: false
+    t.integer "grid_hackr_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feature"], name: "index_feature_grants_on_feature"
+    t.index ["grid_hackr_id", "feature"], name: "index_feature_grants_on_grid_hackr_id_and_feature", unique: true
+    t.index ["grid_hackr_id"], name: "index_feature_grants_on_grid_hackr_id"
   end
 
   create_table "grid_exits", force: :cascade do |t|
@@ -553,6 +563,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_000002) do
   add_foreign_key "chat_messages", "hackr_streams"
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
+  add_foreign_key "feature_grants", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"

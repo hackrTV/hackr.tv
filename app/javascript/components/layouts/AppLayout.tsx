@@ -38,6 +38,7 @@ const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(
 
 // Auth components
 import { ProtectedRoute } from '~/components/auth/ProtectedRoute'
+import { FeatureGate } from '~/components/auth/FeatureGate'
 
 export const AppLayout: React.FC = () => {
   const location = useLocation()
@@ -85,7 +86,7 @@ export const AppLayout: React.FC = () => {
         <Route path="/heartbreak_havoc" element={<BandProfilePage />} />
         <Route path="/wavelength_zero" element={<WavelengthZeroPage />} />
         {/* THE PULSE GRID routes */}
-        <Route path="/grid" element={<GridGamePage />} />
+        <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
         <Route path="/grid/login" element={<GridLoginPage />} />
         <Route path="/grid/register" element={<GridRegisterPage />} />
         <Route path="/grid/verify/:token" element={<GridVerifyPage />} />

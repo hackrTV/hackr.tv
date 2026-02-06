@@ -6,6 +6,7 @@ export interface GridHackr {
   hackr_alias: string
   role: string
   current_room: GridRoom | null
+  features: string[]
 }
 
 export interface GridRoom {
@@ -78,6 +79,7 @@ interface GridAuthContextType {
   resetPassword: (token: string, password: string, password_confirmation: string) => Promise<ResetPasswordResponse>
   disconnect: () => Promise<{ success: boolean; error?: string }>
   checkAuth: () => Promise<void>
+  hasFeature: (feature: string) => boolean
 }
 
 const GridAuthContext = createContext<GridAuthContextType | null>(null)
@@ -285,6 +287,12 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     }
   }, [])
 
+  const hasFeature = useCallback((feature: string): boolean => {
+    if (!hackr) return false
+    if (hackr.role === 'admin') return true
+    return hackr.features?.includes(feature) ?? false
+  }, [hackr])
+
   const disconnect = useCallback(async () => {
     setError(null)
     try {
@@ -315,7 +323,8 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     requestPasswordReset,
     resetPassword,
     disconnect,
-    checkAuth
+    checkAuth,
+    hasFeature
   }
 
   return (

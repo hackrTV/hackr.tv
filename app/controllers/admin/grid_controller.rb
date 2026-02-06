@@ -2,7 +2,21 @@ class Admin::GridController < Admin::ApplicationController
   def index
     @online_hackrs = GridHackr.online.includes(:current_room).order(:hackr_alias)
     @recent_messages = GridMessage.order(created_at: :desc).includes(:grid_hackr, :room).limit(50)
-    @all_hackrs = GridHackr.order(:hackr_alias)
+    @all_hackrs = GridHackr.includes(:feature_grants).order(:hackr_alias)
+  end
+
+  def grant_feature
+    hackr = GridHackr.find(params[:hackr_id])
+    FeatureGrant.find_or_create_by!(grid_hackr: hackr, feature: params[:feature])
+    set_flash_success("Granted '#{params[:feature]}' access to #{hackr.hackr_alias}.")
+    redirect_to admin_grid_path
+  end
+
+  def revoke_feature
+    hackr = GridHackr.find(params[:hackr_id])
+    hackr.feature_grants.where(feature: params[:feature]).destroy_all
+    set_flash_success("Revoked '#{params[:feature]}' access from #{hackr.hackr_alias}.")
+    redirect_to admin_grid_path
   end
 
   def broadcast

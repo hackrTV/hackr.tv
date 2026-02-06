@@ -79,6 +79,17 @@ module GridAuthentication
     }, status: :unauthorized
   end
 
+  def require_feature_api(feature_name)
+    return unless logged_in?
+    return if current_hackr.has_feature?(feature_name)
+
+    render json: {
+      success: false,
+      error: "Access to this feature has not been granted yet.",
+      feature_locked: true
+    }, status: :forbidden
+  end
+
   def require_admin
     return if admin_hackr?
 
