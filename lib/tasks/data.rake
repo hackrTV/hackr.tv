@@ -1245,8 +1245,8 @@ namespace :data do
         updated += 1
         puts "  ↻ Updated: #{stream.title} (#{artist.name})"
       end
-    rescue ArgumentError => e
-      puts "  ⚠ Parse error for '#{attrs["title"]}': #{e.message}"
+    rescue => e
+      puts "  ✗ Error processing '#{attrs["title"]}': #{e.message}"
       skipped += 1
     end
 
