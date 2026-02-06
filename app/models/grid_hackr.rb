@@ -5,6 +5,7 @@
 #
 #  id               :integer          not null, primary key
 #  api_token        :string
+#  email            :string
 #  hackr_alias      :string
 #  last_activity_at :datetime
 #  password_digest  :string
@@ -16,6 +17,7 @@
 # Indexes
 #
 #  index_grid_hackrs_on_api_token    (api_token) UNIQUE
+#  index_grid_hackrs_on_email        (email) UNIQUE
 #  index_grid_hackrs_on_hackr_alias  (hackr_alias) UNIQUE
 #  index_grid_hackrs_on_role         (role)
 #
@@ -75,8 +77,12 @@ class GridHackr < ApplicationRecord
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length
+  validates :email, uniqueness: {case_sensitive: false}, allow_nil: true
+  validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_nil: true
   validates :role, inclusion: {in: %w[operative operator admin], message: "%{value} is not a valid role"}
+  validates :password, length: {minimum: 8, message: "must be at least 8 characters"}, if: -> { password.present? }
   validate :alias_not_reserved
+  validate :password_not_weak
 
   after_initialize :set_default_role, if: :new_record?
 
@@ -130,6 +136,42 @@ class GridHackr < ApplicationRecord
 
   def set_default_role
     self.role ||= "operative"
+  end
+
+  WEAK_PASSWORDS = %w[
+    password asdfasdf qwerty letmein welcome monkey dragon master
+    abc123 admin login trustno1 iloveyou sunshine princess football
+    charlie shadow michael qwerty123 1q2w3e4r baseball
+  ].freeze
+
+  KEYBOARD_WALKS = %w[qwerty asdfgh zxcvbn qwertyuiop asdfghjkl zxcvbnm].freeze
+
+  WEAK_PASSWORD_MESSAGE = " -- Bro, you're a hackr. Don't use a normie password!"
+
+  def password_not_weak
+    return unless password.present?
+
+    pw = password.downcase
+
+    weak =
+      WEAK_PASSWORDS.include?(pw) ||                            # Common passwords (exact match)
+      pw.start_with?("password") ||                             # Starts with "password"
+      KEYBOARD_WALKS.any? { |walk| pw.start_with?(walk) } ||   # Keyboard walks
+      pw.chars.uniq.length == 1 ||                              # All same character
+      (pw.match?(/\A\d+\z/) && sequential_digits?(pw, :asc)) ||  # Sequential ascending digits
+      (pw.match?(/\A\d+\z/) && sequential_digits?(pw, :desc))    # Sequential descending digits
+
+    errors.add(:password, WEAK_PASSWORD_MESSAGE) if weak
+  end
+
+  def sequential_digits?(str, direction)
+    digits = str.chars.map(&:to_i)
+    if direction == :asc
+      # Handle wrap-around: 1234567890 (9 -> 0 counts as ascending)
+      digits.each_cons(2).all? { |a, b| b - a == 1 || (a == 9 && b == 0) }
+    else
+      digits.each_cons(2).all? { |a, b| b - a == -1 || (a == 0 && b == 9) }
+    end
   end
 
   def alias_not_reserved

@@ -63,6 +63,11 @@ describe('LowercaseRedirect', () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
+  it('does not redirect /grid/verify/ paths (case-sensitive tokens)', () => {
+    renderWithRouter('/grid/verify/AbCdEf123XyZ')
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
   it('redirects band profile paths to lowercase', () => {
     renderWithRouter('/System_Rot')
     expect(mockNavigate).toHaveBeenCalledWith('/system_rot', { replace: true })

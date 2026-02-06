@@ -40,6 +40,9 @@ class LowercaseRedirect
     return true if path.start_with?("/shared/")
     # Skip /api/shared_playlists/ paths
     return true if path.start_with?("/api/shared_playlists/")
+    # Skip /grid/verify/ paths (case-sensitive registration tokens)
+    return true if path.start_with?("/grid/verify/")
+    return true if path.start_with?("/api/grid/verify/")
     # Skip asset paths
     return true if path.start_with?("/assets/")
     return true if path.start_with?("/vite-dev/")

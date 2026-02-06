@@ -21,6 +21,15 @@ class Api::GridController < ApplicationController
     hackr = GridHackr.find_by(hackr_alias: params[:hackr_alias])
 
     if hackr&.authenticate(params[:password])
+      # Ensure hackr has a current room (spawn point if missing)
+      if hackr.current_room.nil?
+        starting_room = GridRoom.joins(:grid_zone)
+          .where(grid_zones: {slug: "hackr_tv_central"})
+          .where(room_type: "hub")
+          .first
+        hackr.update!(current_room: starting_room) if starting_room
+      end
+
       log_in(hackr)
       hackr.touch_activity!
       Rails.logger.info("[AUTH] Login success: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
@@ -45,17 +54,104 @@ class Api::GridController < ApplicationController
     end
   end
 
-  # POST /api/grid/register - Create new hackr account
+  # POST /api/grid/register - Request registration verification email
   def register
-    # Block registration during prerelease mode
-    if APP_SETTINGS[:prerelease_mode].present?
+    email = params[:email].to_s.downcase.strip
+
+    if email.blank?
       return render json: {
         success: false,
-        error: "Registration is temporarily disabled during #{APP_SETTINGS[:prerelease_mode]} phase. Existing users can still log in."
-      }, status: :forbidden
+        error: "Email address is required."
+      }, status: :unprocessable_entity
     end
 
-    @hackr = GridHackr.new(hackr_params)
+    unless email.match?(URI::MailTo::EMAIL_REGEXP)
+      return render json: {
+        success: false,
+        error: "Please enter a valid email address."
+      }, status: :unprocessable_entity
+    end
+
+    # Check if email is already registered
+    if GridHackr.exists?(email: email)
+      return render json: {
+        success: false,
+        error: "This email address is already registered. Try logging in instead."
+      }, status: :unprocessable_entity
+    end
+
+    # Create registration token
+    token = GridRegistrationToken.create!(
+      email: email,
+      ip_address: request.remote_ip
+    )
+
+    # Send verification email
+    GridMailer.registration_verification(token).deliver_later
+
+    Rails.logger.info("[AUTH] Registration email sent: email=#{email} ip=#{request.remote_ip}")
+    render json: {
+      success: true,
+      message: "Verification email sent. Check your inbox to complete registration."
+    }
+  end
+
+  # GET /api/grid/verify/:token - Check if registration token is valid
+  def verify_token
+    token = GridRegistrationToken.find_by(token: params[:token])
+
+    if token.nil?
+      return render json: {
+        valid: false,
+        error: "Invalid verification link."
+      }
+    end
+
+    if token.used?
+      return render json: {
+        valid: false,
+        error: "This verification link has already been used."
+      }
+    end
+
+    if token.expired?
+      return render json: {
+        valid: false,
+        error: "This verification link has expired. Please register again."
+      }
+    end
+
+    render json: {
+      valid: true,
+      email: token.email
+    }
+  end
+
+  # POST /api/grid/complete_registration - Complete registration with alias and password
+  def complete_registration
+    token = GridRegistrationToken.find_by(token: params[:token])
+
+    if token.nil?
+      return render json: {
+        success: false,
+        error: "Invalid verification token."
+      }, status: :unprocessable_entity
+    end
+
+    unless token.valid_for_use?
+      error_message = token.used? ? "This verification link has already been used." : "This verification link has expired."
+      return render json: {
+        success: false,
+        error: error_message
+      }, status: :unprocessable_entity
+    end
+
+    @hackr = GridHackr.new(
+      email: token.email,
+      hackr_alias: params[:hackr_alias],
+      password: params[:password],
+      password_confirmation: params[:password_confirmation]
+    )
     @hackr.enforce_alias_length = true
 
     # Set starting room (hackr.tv Broadcast Station)
@@ -66,27 +162,29 @@ class Api::GridController < ApplicationController
 
     @hackr.current_room = starting_room
 
-    if @hackr.save
-      log_in(@hackr)
-      @hackr.touch_activity!
-      Rails.logger.info("[AUTH] Registration success: hackr_alias=#{@hackr.hackr_alias} ip=#{request.remote_ip}")
-      render json: {
-        success: true,
-        message: "Welcome to THE PULSE GRID, #{@hackr.hackr_alias}. Your journey with the Fracture Network begins now.",
-        hackr: {
-          id: @hackr.id,
-          hackr_alias: @hackr.hackr_alias,
-          role: @hackr.role,
-          current_room: @hackr.current_room ? room_json(@hackr.current_room) : nil
-        }
-      }, status: :created
-    else
-      attempted_alias = params[:hackr_alias].to_s.truncate(50)
-      Rails.logger.warn("[AUTH] Registration failed: attempted_alias=#{attempted_alias} errors=#{@hackr.errors.full_messages.join("; ")} ip=#{request.remote_ip}")
-      render json: {
-        success: false,
-        error: "Registration failed: #{@hackr.errors.full_messages.join(", ")}"
-      }, status: :unprocessable_entity
+    ActiveRecord::Base.transaction do
+      if @hackr.save
+        token.mark_used!
+        log_in(@hackr)
+        @hackr.touch_activity!
+        Rails.logger.info("[AUTH] Registration completed: hackr_alias=#{@hackr.hackr_alias} email=#{token.email} ip=#{request.remote_ip}")
+        render json: {
+          success: true,
+          message: "Welcome to THE PULSE GRID, #{@hackr.hackr_alias}. Your journey with the Fracture Network begins now.",
+          hackr: {
+            id: @hackr.id,
+            hackr_alias: @hackr.hackr_alias,
+            role: @hackr.role,
+            current_room: @hackr.current_room ? room_json(@hackr.current_room) : nil
+          }
+        }, status: :created
+      else
+        Rails.logger.warn("[AUTH] Registration completion failed: email=#{token.email} errors=#{@hackr.errors.full_messages.join("; ")} ip=#{request.remote_ip}")
+        render json: {
+          success: false,
+          error: "Registration failed: #{@hackr.errors.full_messages.join(", ")}"
+        }, status: :unprocessable_entity
+      end
     end
   end
 

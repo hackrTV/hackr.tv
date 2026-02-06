@@ -5,7 +5,7 @@ default: &default
 development:
   <<: *default
   prerelease_mode: alpha
-  prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
+  prerelease_banner_text: "ALPHA BUILD - Hackr database will be flushed regularly. Please re-register if you cannot log in."
 
 test:
   <<: *default
@@ -13,9 +13,9 @@ test:
 staging:
   <<: *default
   prerelease_mode: alpha
-  prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
+  prerelease_banner_text: "ALPHA BUILD - Hackr database will be flushed regularly. Please re-register if you cannot log in."
 
 production:
   <<: *default
   prerelease_mode: alpha
-  prerelease_banner_text: "ALPHA BUILD - New user registration is temporarily disabled while we stabilize core systems."
+  prerelease_banner_text: "ALPHA BUILD - Hackr database will be flushed regularly. Please re-register if you cannot log in."

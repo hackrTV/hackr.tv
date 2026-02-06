@@ -10,6 +10,9 @@ import { ZonePlaylistData, TrackData } from '~/types/track'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { apiJson } from '~/utils/apiClient'
 
+// Feature flag to disable ambient audio
+const AMBIENT_AUDIO_ENABLED = false
+
 const getWelcomeMessage = (isMobile: boolean) => {
   const divider = isMobile
     ? '══════════════════════════════════'
@@ -272,7 +275,7 @@ export const GridGamePage: React.FC = () => {
             )}
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
-            {ambientPlaylist && (
+            {AMBIENT_AUDIO_ENABLED && ambientPlaylist && (
               <div style={{ fontSize: '0.85em', color: '#888', marginRight: isMobile ? '0' : '8px', display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none', overflow: 'hidden' }}>
                 <span style={{ color: '#a78bfa' }}>🎵</span>
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: isMobile ? '100px' : 'none' }}>{currentTrack?.title || ambientPlaylist.name}</span>
@@ -324,7 +327,7 @@ export const GridGamePage: React.FC = () => {
                 flexShrink: 0
               }}
             >
-              {isMobile ? 'EXIT' : 'DISCONNECT'}
+              {isMobile ? 'EXIT' : 'KILLSWITCH'}
             </button>
           </div>
         </div>
@@ -333,20 +336,22 @@ export const GridGamePage: React.FC = () => {
         <CommandInput ref={commandInputRef} onSubmit={handleCommand} disabled={executing} />
       </div>
 
-      <GridAmbientPlayer
-        playlist={ambientPlaylist}
-        muted={ambientMuted}
-        volume={ambientVolume}
-        onMutedChange={(muted) => {
-          setAmbientMuted(muted)
-          localStorage.setItem('grid_ambient_muted', String(muted))
-        }}
-        onVolumeChange={(volume) => {
-          setAmbientVolume(volume)
-          localStorage.setItem('grid_ambient_volume', String(volume))
-        }}
-        onTrackChange={setCurrentTrack}
-      />
+      {AMBIENT_AUDIO_ENABLED && (
+        <GridAmbientPlayer
+          playlist={ambientPlaylist}
+          muted={ambientMuted}
+          volume={ambientVolume}
+          onMutedChange={(muted) => {
+            setAmbientMuted(muted)
+            localStorage.setItem('grid_ambient_muted', String(muted))
+          }}
+          onVolumeChange={(volume) => {
+            setAmbientVolume(volume)
+            localStorage.setItem('grid_ambient_volume', String(volume))
+          }}
+          onTrackChange={setCurrentTrack}
+        />
+      )}
     </GridLayout>
   )
 }

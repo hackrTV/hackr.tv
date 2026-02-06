@@ -5,6 +5,7 @@
 #
 #  id               :integer          not null, primary key
 #  api_token        :string
+#  email            :string
 #  hackr_alias      :string
 #  last_activity_at :datetime
 #  password_digest  :string
@@ -16,13 +17,14 @@
 # Indexes
 #
 #  index_grid_hackrs_on_api_token    (api_token) UNIQUE
+#  index_grid_hackrs_on_email        (email) UNIQUE
 #  index_grid_hackrs_on_hackr_alias  (hackr_alias) UNIQUE
 #  index_grid_hackrs_on_role         (role)
 #
 FactoryBot.define do
   factory :grid_hackr do
     sequence(:hackr_alias) { |n| "Hackr#{n}" }
-    password { "password123" }
+    password { "hackthegrid" }
     role { "operative" }
     current_room { nil }
 

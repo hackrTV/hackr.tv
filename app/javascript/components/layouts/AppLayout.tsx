@@ -22,6 +22,7 @@ const TrackDetailPage = lazy(() => import('~/components/pages/tracks/TrackDetail
 const GridGamePage = lazy(() => import('~/components/pages/grid/GridGamePage').then(m => ({ default: m.GridGamePage })))
 const GridLoginPage = lazy(() => import('~/components/pages/grid/GridLoginPage').then(m => ({ default: m.GridLoginPage })))
 const GridRegisterPage = lazy(() => import('~/components/pages/grid/GridRegisterPage').then(m => ({ default: m.GridRegisterPage })))
+const GridVerifyPage = lazy(() => import('~/components/pages/grid/GridVerifyPage').then(m => ({ default: m.GridVerifyPage })))
 const LogsIndexPage = lazy(() => import('~/components/pages/logs/LogsIndexPage').then(m => ({ default: m.LogsIndexPage })))
 const LogDetailPage = lazy(() => import('~/components/pages/logs/LogDetailPage').then(m => ({ default: m.LogDetailPage })))
 const CodexIndexPage = lazy(() => import('~/components/pages/codex/CodexIndexPage').then(m => ({ default: m.CodexIndexPage })))
@@ -85,6 +86,7 @@ export const AppLayout: React.FC = () => {
         <Route path="/grid" element={<GridGamePage />} />
         <Route path="/grid/login" element={<GridLoginPage />} />
         <Route path="/grid/register" element={<GridRegisterPage />} />
+        <Route path="/grid/verify/:token" element={<GridVerifyPage />} />
         {/* Hackr Logs routes */}
         <Route path="/logs" element={<LogsIndexPage />} />
         <Route path="/logs/:slug" element={<LogDetailPage />} />

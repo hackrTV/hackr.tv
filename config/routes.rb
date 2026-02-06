@@ -42,6 +42,7 @@ Rails.application.routes.draw do
     get "/", to: "pages#spa_root", as: :grid
     get "login", to: "pages#spa_root", as: :grid_login
     get "register", to: "pages#spa_root", as: :grid_register
+    get "verify/:token", to: "pages#spa_root", as: :grid_verify
   end
 
   # hackr.fm routes - SPA
@@ -105,6 +106,8 @@ Rails.application.routes.draw do
     get "grid/current_hackr", to: "grid#current_hackr_info"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"
+    get "grid/verify/:token", to: "grid#verify_token"
+    post "grid/complete_registration", to: "grid#complete_registration"
     delete "grid/disconnect", to: "grid#disconnect"
     post "grid/command", to: "grid#command"
 

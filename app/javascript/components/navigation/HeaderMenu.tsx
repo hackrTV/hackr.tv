@@ -208,35 +208,7 @@ export const HeaderMenu: React.FC = () => {
               </div>
 
               <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">3. THE PULSE GRID</div>
-                <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">/</span>grid
-                </Link>
-                {isLoggedIn ? (
-                  <a
-                    href="#"
-                    className="mobile-menu-item"
-                    onClick={(e) => {
-                      handleDisconnect(e)
-                      setMobileMenuOpen(false)
-                    }}
-                  >
-                    <span className="purple-168-text">/</span>disconnect
-                  </a>
-                ) : (
-                  <>
-                    <Link to="/grid/login" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                      <span className="purple-168-text">/</span>login
-                    </Link>
-                    <Link to="/grid/register" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                      <span className="purple-168-text">/</span>register
-                    </Link>
-                  </>
-                )}
-              </div>
-
-              <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">4. The WIRE</div>
+                <div className="mobile-menu-section-title">3. The WIRE</div>
                 <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>hotwire
                 </Link>
@@ -254,14 +226,47 @@ export const HeaderMenu: React.FC = () => {
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MORE</div>
                 <Link to="/codex" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span> The Codex
+                  <span className="purple-168-text">{isLoggedIn ? '5' : '4'}</span> The Codex
                 </Link>
                 <Link to="/logs" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Hackr Logs
+                  <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span> Hackr Logs
                 </Link>
+              </div>
+
+              <div className="mobile-menu-section">
+                <div className="mobile-menu-section-title">{isLoggedIn ? '7' : '6'}. THE PULSE GRID</div>
+                <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">/</span>grid
+                </Link>
+                {!isLoggedIn && (
+                  <>
+                    <Link to="/grid/login" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                      <span className="purple-168-text">/</span>login
+                    </Link>
+                    <Link to="/grid/register" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                      <span className="purple-168-text">/</span>register
+                    </Link>
+                  </>
+                )}
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
                     <span className="red-255-text">{isLoggedIn ? '8' : '7'}</span> /root <span className="red-255-text">[ADMIN]</span>
+                  </a>
+                )}
+              </div>
+
+              <div className="mobile-menu-section">
+                {isLoggedIn && (
+                  <a
+                    href="#"
+                    className="mobile-menu-item"
+                    style={{ color: '#dc2626' }}
+                    onClick={(e) => {
+                      handleDisconnect(e)
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    × Disconnect
                   </a>
                 )}
               </div>
@@ -408,9 +413,39 @@ export const HeaderMenu: React.FC = () => {
             </div>
           </li>
 
-          {/* 3: THE PULSE GRID */}
+          {/* 3: The WIRE */}
+          <li className="header-nav-item">
+            <Link to="/wire">
+              <span className="purple-168-text">3</span> The WIRE&nbsp;
+            </Link>
+          </li>
+
+          {/* 4: Uplink (logged in only) */}
+          {isLoggedIn && (
+            <li className="header-nav-item">
+              <Link to="/uplink">
+                <span className="purple-168-text">4</span> Uplink&nbsp;
+              </Link>
+            </li>
+          )}
+
+          {/* The Codex */}
+          <li className="header-nav-item">
+            <Link to="/codex">
+              <span className="purple-168-text">{isLoggedIn ? '5' : '4'}</span> The Codex&nbsp;
+            </Link>
+          </li>
+
+          {/* Hackr Logs */}
+          <li className="header-nav-item">
+            <Link to="/logs">
+              <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span> Hackr Logs&nbsp;
+            </Link>
+          </li>
+
+          {/* THE PULSE GRID */}
           <li className="header-dropdown" onClick={() => toggleDropdown('grid')}>
-            <span className="purple-168-text">3</span>&nbsp;THE PULSE GRID&nbsp;
+            <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;THE PULSE GRID&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'grid' ? 'open' : ''}`}>
               <ul>
                 <li>
@@ -418,13 +453,7 @@ export const HeaderMenu: React.FC = () => {
                     <span className="purple-168-text">/</span>grid
                   </Link>
                 </li>
-                {isLoggedIn ? (
-                  <li>
-                    <a href="#" onClick={(e) => { handleDisconnect(e); closeDropdown() }}>
-                      <span className="purple-168-text">/</span>disconnect
-                    </a>
-                  </li>
-                ) : (
+                {!isLoggedIn && (
                   <>
                     <li>
                       <Link to="/grid/login" onClick={closeDropdown}>
@@ -442,41 +471,20 @@ export const HeaderMenu: React.FC = () => {
             </div>
           </li>
 
-          {/* 4: The WIRE */}
-          <li className="header-nav-item">
-            <Link to="/wire">
-              <span className="purple-168-text">4</span> The WIRE&nbsp;
-            </Link>
-          </li>
-
-          {/* 5: Uplink (logged in only) */}
-          {isLoggedIn && (
-            <li className="header-nav-item">
-              <Link to="/uplink">
-                <span className="purple-168-text">5</span> Uplink&nbsp;
-              </Link>
-            </li>
-          )}
-
-          {/* The Codex */}
-          <li className="header-nav-item">
-            <Link to="/codex">
-              <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span> The Codex&nbsp;
-            </Link>
-          </li>
-
-          {/* Hackr Logs */}
-          <li className="header-nav-item">
-            <Link to="/logs">
-              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Hackr Logs&nbsp;
-            </Link>
-          </li>
-
           {/* Admin (only show if user is admin) */}
           {hackr?.role === 'admin' && (
             <li className="header-nav-item">
               <a href="/root">
                 <span className="red-255-text">{isLoggedIn ? '8' : '7'}</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+              </a>
+            </li>
+          )}
+
+          {/* Disconnect (only show if logged in) */}
+          {isLoggedIn && (
+            <li className="header-nav-item">
+              <a href="#" onClick={handleDisconnect} style={{ color: '#dc2626' }}>
+                <span>×</span> Disconnect&nbsp;
               </a>
             </li>
           )}

@@ -28,6 +28,25 @@ interface RegisterResponse {
   hackr?: GridHackr
 }
 
+interface RequestRegistrationResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+interface VerifyTokenResponse {
+  valid: boolean
+  email?: string
+  error?: string
+}
+
+interface CompleteRegistrationResponse {
+  success: boolean
+  message?: string
+  error?: string
+  hackr?: GridHackr
+}
+
 interface CurrentHackrResponse {
   logged_in: boolean
   hackr?: GridHackr
@@ -40,6 +59,9 @@ interface GridAuthContextType {
   isLoggedIn: boolean
   login: (hackr_alias: string, password: string) => Promise<LoginResponse>
   register: (hackr_alias: string, password: string, password_confirmation: string) => Promise<RegisterResponse>
+  requestRegistration: (email: string) => Promise<RequestRegistrationResponse>
+  verifyToken: (token: string) => Promise<VerifyTokenResponse>
+  completeRegistration: (token: string, hackr_alias: string, password: string, password_confirmation: string) => Promise<CompleteRegistrationResponse>
   disconnect: () => Promise<{ success: boolean; error?: string }>
   checkAuth: () => Promise<void>
 }
@@ -142,6 +164,70 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     }
   }, [])
 
+  const requestRegistration = useCallback(async (email: string): Promise<RequestRegistrationResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<RequestRegistrationResponse>('/api/grid/register', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      })
+
+      if (!data.success) {
+        setError(data.error || 'Failed to send verification email')
+      }
+      return data
+    } catch (err) {
+      console.error('Registration request failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const verifyToken = useCallback(async (token: string): Promise<VerifyTokenResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<VerifyTokenResponse>(`/api/grid/verify/${token}`)
+      if (!data.valid) {
+        setError(data.error || 'Invalid token')
+      }
+      return data
+    } catch (err) {
+      console.error('Token verification failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { valid: false, error: errorMsg }
+    }
+  }, [])
+
+  const completeRegistration = useCallback(async (
+    token: string,
+    hackr_alias: string,
+    password: string,
+    password_confirmation: string
+  ): Promise<CompleteRegistrationResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<CompleteRegistrationResponse>('/api/grid/complete_registration', {
+        method: 'POST',
+        body: JSON.stringify({ token, hackr_alias, password, password_confirmation })
+      })
+
+      if (data.success && data.hackr) {
+        setHackr(data.hackr)
+        return data
+      }
+
+      setError(data.error || 'Registration failed')
+      return data
+    } catch (err) {
+      console.error('Registration completion failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
   const disconnect = useCallback(async () => {
     setError(null)
     try {
@@ -166,6 +252,9 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     isLoggedIn: !!hackr,
     login,
     register,
+    requestRegistration,
+    verifyToken,
+    completeRegistration,
     disconnect,
     checkAuth
   }
