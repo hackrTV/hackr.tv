@@ -3,7 +3,7 @@ import { GridLayout } from '~/components/layouts/GridLayout'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useGridAuthContext } from '~/contexts/GridAuthContext'
 
-export const IdentityMatrixPage: React.FC = () => {
+export const IdentityPage: React.FC = () => {
   const { hackr } = useGridAuth()
   const { requestPasswordReset } = useGridAuthContext()
   const [message, setMessage] = useState<string | null>(null)
@@ -62,7 +62,7 @@ export const IdentityMatrixPage: React.FC = () => {
                 color: '#0a0a0a',
                 border: 'none',
                 padding: '10px 30px',
-                fontFamily: "'Courier New', monospace",
+                fontFamily: '\'Courier New\', monospace',
                 fontWeight: 'bold',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.6 : 1

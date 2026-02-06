@@ -1,7 +1,7 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset reset_password]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset]
 
   # GET /api/grid/current_hackr - Get current logged-in hackr info
   def current_hackr_info
@@ -215,7 +215,7 @@ class Api::GridController < ApplicationController
     }
   end
 
-  # POST /api/grid/reset_password - Reset password with token
+  # POST /api/grid/reset_password - Reset password with token (no login required)
   def reset_password
     token = GridVerificationToken.find_by(token: params[:token])
 
@@ -233,13 +233,6 @@ class Api::GridController < ApplicationController
       }, status: :unprocessable_entity
     end
 
-    unless token.grid_hackr_id == current_hackr.id
-      return render json: {
-        success: false,
-        error: "This reset token does not belong to your account."
-      }, status: :unprocessable_entity
-    end
-
     unless token.valid_for_use?
       error_message = token.used? ? "This reset link has already been used." : "This reset link has expired."
       return render json: {
@@ -248,13 +241,14 @@ class Api::GridController < ApplicationController
       }, status: :unprocessable_entity
     end
 
-    current_hackr.password = params[:password]
-    current_hackr.password_confirmation = params[:password_confirmation]
+    hackr = token.grid_hackr
+    hackr.password = params[:password]
+    hackr.password_confirmation = params[:password_confirmation]
 
     ActiveRecord::Base.transaction do
-      if current_hackr.save
+      if hackr.save
         token.mark_used!
-        Rails.logger.info("[AUTH] Password reset completed: hackr_alias=#{current_hackr.hackr_alias} ip=#{request.remote_ip}")
+        Rails.logger.info("[AUTH] Password reset completed: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
         render json: {
           success: true,
           message: "Password updated successfully."
@@ -262,7 +256,7 @@ class Api::GridController < ApplicationController
       else
         render json: {
           success: false,
-          error: "Password update failed: #{current_hackr.errors.full_messages.join(", ")}"
+          error: "Password update failed: #{hackr.errors.full_messages.join(", ")}"
         }, status: :unprocessable_entity
       end
     end

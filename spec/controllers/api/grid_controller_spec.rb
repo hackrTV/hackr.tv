@@ -359,9 +359,7 @@ RSpec.describe Api::GridController, type: :controller do
     let!(:hackr) { create(:grid_hackr, email: "reset@example.com", password: "oldpassword") }
     let!(:token) { GridVerificationToken.create!(grid_hackr: hackr, purpose: "password_reset", ip_address: "127.0.0.1") }
 
-    context "when logged in with valid token" do
-      before { session[:grid_hackr_id] = hackr.id }
-
+    context "with valid token" do
       it "updates the password" do
         post :reset_password, params: {
           token: token.token,
@@ -373,6 +371,18 @@ RSpec.describe Api::GridController, type: :controller do
         json = JSON.parse(response.body)
         expect(json["success"]).to eq(true)
         expect(hackr.reload.authenticate("newpassword123")).to be_truthy
+      end
+
+      it "works without a session (logged-out user)" do
+        post :reset_password, params: {
+          token: token.token,
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(true)
       end
 
       it "marks the token as used" do
@@ -411,8 +421,6 @@ RSpec.describe Api::GridController, type: :controller do
     end
 
     context "with invalid token" do
-      before { session[:grid_hackr_id] = hackr.id }
-
       it "returns error for nonexistent token" do
         post :reset_password, params: {
           token: "bad-token",
@@ -428,10 +436,7 @@ RSpec.describe Api::GridController, type: :controller do
     end
 
     context "with expired token" do
-      before do
-        session[:grid_hackr_id] = hackr.id
-        token.update_column(:expires_at, 1.hour.ago)
-      end
+      before { token.update_column(:expires_at, 1.hour.ago) }
 
       it "returns error" do
         post :reset_password, params: {
@@ -448,10 +453,7 @@ RSpec.describe Api::GridController, type: :controller do
     end
 
     context "with used token" do
-      before do
-        session[:grid_hackr_id] = hackr.id
-        token.update!(used_at: Time.current)
-      end
+      before { token.update!(used_at: Time.current) }
 
       it "returns error" do
         post :reset_password, params: {
@@ -464,37 +466,6 @@ RSpec.describe Api::GridController, type: :controller do
         json = JSON.parse(response.body)
         expect(json["success"]).to eq(false)
         expect(json["error"]).to include("already been used")
-      end
-    end
-
-    context "with token belonging to a different hackr" do
-      let!(:other_hackr) { create(:grid_hackr, email: "other@example.com") }
-
-      before { session[:grid_hackr_id] = other_hackr.id }
-
-      it "returns error" do
-        post :reset_password, params: {
-          token: token.token,
-          password: "newpassword123",
-          password_confirmation: "newpassword123"
-        }, format: :json
-
-        expect(response).to have_http_status(:unprocessable_entity)
-        json = JSON.parse(response.body)
-        expect(json["success"]).to eq(false)
-        expect(json["error"]).to include("does not belong to your account")
-      end
-    end
-
-    context "when not logged in" do
-      it "returns unauthorized" do
-        post :reset_password, params: {
-          token: token.token,
-          password: "newpassword123",
-          password_confirmation: "newpassword123"
-        }, format: :json
-
-        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

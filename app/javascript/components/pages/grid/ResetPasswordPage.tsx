@@ -62,7 +62,7 @@ export const ResetPasswordPage: React.FC = () => {
                   color: '#0a0a0a',
                   padding: '10px 30px',
                   textDecoration: 'none',
-                  fontFamily: "'Courier New', monospace",
+                  fontFamily: '\'Courier New\', monospace',
                   fontWeight: 'bold'
                 }}
               >
@@ -87,7 +87,7 @@ export const ResetPasswordPage: React.FC = () => {
                     border: '1px solid #4a4a6a',
                     color: '#00ff00',
                     padding: '8px',
-                    fontFamily: "'Courier New', monospace",
+                    fontFamily: '\'Courier New\', monospace',
                     boxSizing: 'border-box'
                   }}
                 />
@@ -109,7 +109,7 @@ export const ResetPasswordPage: React.FC = () => {
                     border: '1px solid #4a4a6a',
                     color: '#00ff00',
                     padding: '8px',
-                    fontFamily: "'Courier New', monospace",
+                    fontFamily: '\'Courier New\', monospace',
                     boxSizing: 'border-box'
                   }}
                 />
@@ -125,7 +125,7 @@ export const ResetPasswordPage: React.FC = () => {
                     color: '#0a0a0a',
                     border: 'none',
                     padding: '10px 30px',
-                    fontFamily: "'Courier New', monospace",
+                    fontFamily: '\'Courier New\', monospace',
                     fontWeight: 'bold',
                     cursor: loading ? 'not-allowed' : 'pointer',
                     opacity: loading ? 0.6 : 1
