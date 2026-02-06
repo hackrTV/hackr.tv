@@ -13,7 +13,7 @@ export const LowercaseRedirect: React.FC<{ children: React.ReactNode }> = ({ chi
     const { pathname, search, hash } = location
 
     // Skip paths with case-sensitive tokens
-    if (pathname.startsWith('/shared/') || pathname.startsWith('/grid/verify/')) {
+    if (pathname.startsWith('/shared/') || pathname.startsWith('/grid/verify/') || pathname.startsWith('/grid/reset_password/')) {
       return
     }
 

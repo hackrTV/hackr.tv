@@ -47,6 +47,18 @@ interface CompleteRegistrationResponse {
   hackr?: GridHackr
 }
 
+interface RequestPasswordResetResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+interface ResetPasswordResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
 interface CurrentHackrResponse {
   logged_in: boolean
   hackr?: GridHackr
@@ -62,6 +74,8 @@ interface GridAuthContextType {
   requestRegistration: (email: string) => Promise<RequestRegistrationResponse>
   verifyToken: (token: string) => Promise<VerifyTokenResponse>
   completeRegistration: (token: string, hackr_alias: string, password: string, password_confirmation: string) => Promise<CompleteRegistrationResponse>
+  requestPasswordReset: () => Promise<RequestPasswordResetResponse>
+  resetPassword: (token: string, password: string, password_confirmation: string) => Promise<ResetPasswordResponse>
   disconnect: () => Promise<{ success: boolean; error?: string }>
   checkAuth: () => Promise<void>
 }
@@ -228,6 +242,49 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     }
   }, [])
 
+  const requestPasswordReset = useCallback(async (): Promise<RequestPasswordResetResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<RequestPasswordResetResponse>('/api/grid/request_password_reset', {
+        method: 'POST'
+      })
+
+      if (!data.success) {
+        setError(data.error || 'Failed to send password reset email')
+      }
+      return data
+    } catch (err) {
+      console.error('Password reset request failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const resetPassword = useCallback(async (
+    token: string,
+    password: string,
+    password_confirmation: string
+  ): Promise<ResetPasswordResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<ResetPasswordResponse>('/api/grid/reset_password', {
+        method: 'POST',
+        body: JSON.stringify({ token, password, password_confirmation })
+      })
+
+      if (!data.success) {
+        setError(data.error || 'Password reset failed')
+      }
+      return data
+    } catch (err) {
+      console.error('Password reset failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
   const disconnect = useCallback(async () => {
     setError(null)
     try {
@@ -255,6 +312,8 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     requestRegistration,
     verifyToken,
     completeRegistration,
+    requestPasswordReset,
+    resetPassword,
     disconnect,
     checkAuth
   }
