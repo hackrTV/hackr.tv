@@ -470,6 +470,171 @@ RSpec.describe Api::GridController, type: :controller do
     end
   end
 
+  describe "POST #request_email_change" do
+    let!(:hackr) { create(:grid_hackr, email: "current@example.com") }
+
+    context "when logged in" do
+      before { session[:grid_hackr_id] = hackr.id }
+
+      it "returns success with valid new email" do
+        post :request_email_change, params: {new_email: "new@example.com"}, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(true)
+        expect(json["message"]).to include("Verification email sent")
+      end
+
+      it "creates a verification token with email_change purpose and metadata" do
+        expect {
+          post :request_email_change, params: {new_email: "new@example.com"}, format: :json
+        }.to change(GridVerificationToken, :count).by(1)
+
+        token = GridVerificationToken.last
+        expect(token.grid_hackr_id).to eq(hackr.id)
+        expect(token.purpose).to eq("email_change")
+        expect(token.new_email).to eq("new@example.com")
+      end
+
+      it "sends a verification email" do
+        expect {
+          post :request_email_change, params: {new_email: "new@example.com"}, format: :json
+        }.to have_enqueued_mail(GridMailer, :email_change_verification)
+      end
+
+      it "rejects blank email" do
+        post :request_email_change, params: {new_email: ""}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to include("required")
+      end
+
+      it "rejects invalid email format" do
+        post :request_email_change, params: {new_email: "not-an-email"}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to include("valid email")
+      end
+
+      it "rejects same email as current" do
+        post :request_email_change, params: {new_email: "current@example.com"}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to include("different")
+      end
+
+      it "rejects email already in use" do
+        create(:grid_hackr, email: "taken@example.com")
+        post :request_email_change, params: {new_email: "taken@example.com"}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to include("already in use")
+      end
+    end
+
+    context "when not logged in" do
+      it "returns unauthorized" do
+        post :request_email_change, params: {new_email: "new@example.com"}, format: :json
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe "POST #confirm_email_change" do
+    let!(:hackr) { create(:grid_hackr, email: "old@example.com") }
+    let!(:token) do
+      GridVerificationToken.create!(
+        grid_hackr: hackr,
+        purpose: "email_change",
+        metadata: {"new_email" => "new@example.com"},
+        ip_address: "127.0.0.1"
+      )
+    end
+
+    context "with valid token" do
+      it "updates the hackr email" do
+        post :confirm_email_change, params: {token: token.token}, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(true)
+        expect(hackr.reload.email).to eq("new@example.com")
+      end
+
+      it "marks the token as used" do
+        post :confirm_email_change, params: {token: token.token}, format: :json
+
+        expect(token.reload.used_at).to be_present
+      end
+
+      it "sends a notification email to the old address" do
+        expect {
+          post :confirm_email_change, params: {token: token.token}, format: :json
+        }.to have_enqueued_mail(GridMailer, :email_change_notification)
+      end
+
+      it "works without a session (logged-out user)" do
+        post :confirm_email_change, params: {token: token.token}, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(true)
+      end
+    end
+
+    context "with invalid token" do
+      it "returns error for nonexistent token" do
+        post :confirm_email_change, params: {token: "bad-token"}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["success"]).to eq(false)
+        expect(json["error"]).to include("Invalid verification token")
+      end
+    end
+
+    context "with expired token" do
+      before { token.update_column(:expires_at, 1.hour.ago) }
+
+      it "returns error" do
+        post :confirm_email_change, params: {token: token.token}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to include("expired")
+      end
+    end
+
+    context "with used token" do
+      before { token.update!(used_at: Time.current) }
+
+      it "returns error" do
+        post :confirm_email_change, params: {token: token.token}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to include("already been used")
+      end
+    end
+
+    context "when new email is now taken (race condition)" do
+      before { create(:grid_hackr, email: "new@example.com") }
+
+      it "returns error" do
+        post :confirm_email_change, params: {token: token.token}, format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to include("already in use")
+      end
+    end
+  end
+
   describe "POST #login" do
     let!(:hackr) { create(:grid_hackr, hackr_alias: "TestHackr", password: "hackthegrid") }
 

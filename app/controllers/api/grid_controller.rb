@@ -1,7 +1,7 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
 
   # GET /api/grid/current_hackr - Get current logged-in hackr info
@@ -11,6 +11,7 @@ class Api::GridController < ApplicationController
       hackr: {
         id: current_hackr.id,
         hackr_alias: current_hackr.hackr_alias,
+        email: current_hackr.email,
         role: current_hackr.role,
         current_room: current_hackr.current_room ? room_json(current_hackr.current_room) : nil,
         features: current_hackr.admin? ? [FeatureGrant::PULSE_GRID] : current_hackr.feature_grants.pluck(:feature)
@@ -264,6 +265,104 @@ class Api::GridController < ApplicationController
         }, status: :unprocessable_entity
       end
     end
+  end
+
+  # POST /api/grid/request_email_change - Send email change verification
+  def request_email_change
+    new_email = params[:new_email].to_s.downcase.strip
+
+    if new_email.blank?
+      return render json: {
+        success: false,
+        error: "New email address is required."
+      }, status: :unprocessable_entity
+    end
+
+    unless new_email.match?(URI::MailTo::EMAIL_REGEXP)
+      return render json: {
+        success: false,
+        error: "Please enter a valid email address."
+      }, status: :unprocessable_entity
+    end
+
+    if new_email == current_hackr.email
+      return render json: {
+        success: false,
+        error: "New email must be different from your current email."
+      }, status: :unprocessable_entity
+    end
+
+    if GridHackr.exists?(email: new_email)
+      return render json: {
+        success: false,
+        error: "This email address is already in use."
+      }, status: :unprocessable_entity
+    end
+
+    token = GridVerificationToken.create!(
+      grid_hackr: current_hackr,
+      purpose: "email_change",
+      metadata: {new_email: new_email},
+      ip_address: request.remote_ip
+    )
+
+    GridMailer.email_change_verification(token).deliver_later
+
+    Rails.logger.info("[AUTH] Email change verification sent: hackr_alias=#{current_hackr.hackr_alias} new_email=#{new_email} ip=#{request.remote_ip}")
+    render json: {
+      success: true,
+      message: "Verification email sent to #{new_email}. Check your inbox to confirm the change."
+    }
+  end
+
+  # POST /api/grid/confirm_email_change - Confirm email change with token (no login required)
+  def confirm_email_change
+    token = GridVerificationToken.find_by(token: params[:token])
+
+    if token.nil?
+      return render json: {
+        success: false,
+        error: "Invalid verification token."
+      }, status: :unprocessable_entity
+    end
+
+    unless token.purpose == "email_change"
+      return render json: {
+        success: false,
+        error: "Invalid verification token."
+      }, status: :unprocessable_entity
+    end
+
+    unless token.valid_for_use?
+      error_message = token.used? ? "This verification link has already been used." : "This verification link has expired."
+      return render json: {
+        success: false,
+        error: error_message
+      }, status: :unprocessable_entity
+    end
+
+    if GridHackr.exists?(email: token.new_email)
+      return render json: {
+        success: false,
+        error: "This email address is already in use."
+      }, status: :unprocessable_entity
+    end
+
+    hackr = token.grid_hackr
+    old_email = hackr.email
+
+    ActiveRecord::Base.transaction do
+      hackr.update!(email: token.new_email)
+      token.mark_used!
+    end
+
+    GridMailer.email_change_notification(hackr, old_email).deliver_later
+
+    Rails.logger.info("[AUTH] Email changed: hackr_alias=#{hackr.hackr_alias} old_email=#{old_email} new_email=#{token.new_email} ip=#{request.remote_ip}")
+    render json: {
+      success: true,
+      message: "Email address updated successfully."
+    }
   end
 
   # POST /api/grid/command - Execute game command

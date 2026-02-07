@@ -5,10 +5,14 @@ import { useGridAuthContext } from '~/contexts/GridAuthContext'
 
 export const IdentityPage: React.FC = () => {
   const { hackr } = useGridAuth()
-  const { requestPasswordReset } = useGridAuthContext()
+  const { requestPasswordReset, requestEmailChange } = useGridAuthContext()
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
   const [loading, setLoading] = useState(false)
+  const [newEmail, setNewEmail] = useState('')
+  const [emailLoading, setEmailLoading] = useState(false)
+  const [emailMessage, setEmailMessage] = useState<string | null>(null)
+  const [emailMessageType, setEmailMessageType] = useState<'success' | 'error'>('success')
 
   const handleChangePassword = async () => {
     setLoading(true)
@@ -30,6 +34,28 @@ export const IdentityPage: React.FC = () => {
     }
   }
 
+  const handleChangeEmail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setEmailLoading(true)
+    setEmailMessage(null)
+    try {
+      const result = await requestEmailChange(newEmail)
+      if (result.success) {
+        setEmailMessageType('success')
+        setEmailMessage(result.message || 'Verification email sent. Check your inbox.')
+        setNewEmail('')
+      } else {
+        setEmailMessageType('error')
+        setEmailMessage(result.error || 'Failed to send verification email.')
+      }
+    } catch {
+      setEmailMessageType('error')
+      setEmailMessage('Network error. Please try again.')
+    } finally {
+      setEmailLoading(false)
+    }
+  }
+
   return (
     <GridLayout>
       <div className="tui-window white-text" style={{ maxWidth: '600px', margin: '50px auto', display: 'block', background: '#1a1a2e', border: '1px solid #4a4a6a' }}>
@@ -47,9 +73,55 @@ export const IdentityPage: React.FC = () => {
             <p style={{ margin: '0 0 10px 0' }}>
               <span className="cyan-255-text">ALIAS:</span> {hackr?.hackr_alias}
             </p>
+            <p style={{ margin: '0 0 10px 0' }}>
+              <span className="cyan-255-text">EMAIL:</span> {hackr?.email || 'N/A'}
+            </p>
             <p style={{ margin: 0 }}>
               <span className="cyan-255-text">ROLE:</span> {hackr?.role}
             </p>
+          </div>
+
+          <div style={{ margin: '20px 0', padding: '15px', border: '1px solid #4a4a6a' }}>
+            <p className="cyan-255-text" style={{ margin: '0 0 15px 0', fontWeight: 'bold', letterSpacing: '0.05em' }}>
+              CHANGE EMAIL
+            </p>
+            <form onSubmit={handleChangeEmail} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="New email address"
+                required
+                disabled={emailLoading}
+                className="tui-input"
+                style={{ flex: 1, minWidth: '200px' }}
+              />
+              <button
+                type="submit"
+                disabled={emailLoading}
+                className="tui-button"
+                style={{
+                  background: '#00ff00',
+                  color: '#0a0a0a',
+                  border: 'none',
+                  padding: '10px 20px',
+                  fontFamily: "'Courier New', monospace",
+                  fontWeight: 'bold',
+                  cursor: emailLoading ? 'not-allowed' : 'pointer',
+                  opacity: emailLoading ? 0.6 : 1
+                }}
+              >
+                {emailLoading ? 'SENDING...' : 'CHANGE EMAIL'}
+              </button>
+            </form>
+            {emailMessage && (
+              <p style={{
+                margin: '10px 0 0 0',
+                color: emailMessageType === 'success' ? '#00ff00' : '#ff4444'
+              }}>
+                {emailMessage}
+              </p>
+            )}
           </div>
 
           <div className="center" style={{ margin: '30px 0' }}>
@@ -62,7 +134,7 @@ export const IdentityPage: React.FC = () => {
                 color: '#0a0a0a',
                 border: 'none',
                 padding: '10px 30px',
-                fontFamily: '\'Courier New\', monospace',
+                fontFamily: "'Courier New', monospace",
                 fontWeight: 'bold',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.6 : 1

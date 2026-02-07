@@ -4,6 +4,7 @@ import { apiJson, ApiError } from '~/utils/apiClient'
 export interface GridHackr {
   id: number
   hackr_alias: string
+  email?: string
   role: string
   current_room: GridRoom | null
   features: string[]
@@ -60,6 +61,18 @@ interface ResetPasswordResponse {
   error?: string
 }
 
+interface RequestEmailChangeResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+interface ConfirmEmailChangeResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
 interface CurrentHackrResponse {
   logged_in: boolean
   hackr?: GridHackr
@@ -77,6 +90,8 @@ interface GridAuthContextType {
   completeRegistration: (token: string, hackr_alias: string, password: string, password_confirmation: string) => Promise<CompleteRegistrationResponse>
   requestPasswordReset: () => Promise<RequestPasswordResetResponse>
   resetPassword: (token: string, password: string, password_confirmation: string) => Promise<ResetPasswordResponse>
+  requestEmailChange: (new_email: string) => Promise<RequestEmailChangeResponse>
+  confirmEmailChange: (token: string) => Promise<ConfirmEmailChangeResponse>
   disconnect: () => Promise<{ success: boolean; error?: string }>
   checkAuth: () => Promise<void>
   hasFeature: (feature: string) => boolean
@@ -287,6 +302,46 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     }
   }, [])
 
+  const requestEmailChange = useCallback(async (new_email: string): Promise<RequestEmailChangeResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<RequestEmailChangeResponse>('/api/grid/request_email_change', {
+        method: 'POST',
+        body: JSON.stringify({ new_email })
+      })
+
+      if (!data.success) {
+        setError(data.error || 'Failed to send verification email')
+      }
+      return data
+    } catch (err) {
+      console.error('Email change request failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const confirmEmailChange = useCallback(async (token: string): Promise<ConfirmEmailChangeResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<ConfirmEmailChangeResponse>('/api/grid/confirm_email_change', {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      })
+
+      if (!data.success) {
+        setError(data.error || 'Email change confirmation failed')
+      }
+      return data
+    } catch (err) {
+      console.error('Email change confirmation failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
   const hasFeature = useCallback((feature: string): boolean => {
     if (!hackr) return false
     if (hackr.role === 'admin') return true
@@ -322,6 +377,8 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     completeRegistration,
     requestPasswordReset,
     resetPassword,
+    requestEmailChange,
+    confirmEmailChange,
     disconnect,
     checkAuth,
     hasFeature

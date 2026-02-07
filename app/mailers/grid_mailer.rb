@@ -20,4 +20,24 @@ class GridMailer < ApplicationMailer
       subject: "Password reset for THE PULSE GRID"
     )
   end
+
+  def email_change_verification(token)
+    @token = token
+    @verification_url = grid_confirm_email_change_url(token: token.token)
+
+    mail(
+      to: token.new_email,
+      subject: "Confirm your new email for THE PULSE GRID"
+    )
+  end
+
+  def email_change_notification(hackr, old_email)
+    @hackr = hackr
+    @old_email = old_email
+
+    mail(
+      to: old_email,
+      subject: "Your email was changed on THE PULSE GRID"
+    )
+  end
 end
