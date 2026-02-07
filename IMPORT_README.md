@@ -1,213 +1,226 @@
 # Data Import Guide
 
-This document explains how to import data from the Sinatra app (`~/dev/hackr.tv`) into the Rails database.
+This document explains how to load seed data into the Rails database from the YAML files in `data/`.
 
 ## Prerequisites
 
-- Ensure the Sinatra app is located at `~/dev/hackr.tv`
 - Database must be created and migrated (`bin/rails db:create db:migrate`)
 
-## Available Import Tasks
-
-### Import Everything (Recommended)
+## Quick Start
 
 ```bash
-bin/rails import:all
+bin/rails data:load
 ```
 
-This runs all three import tasks in order: artists → tracks → redirects
+This loads everything in dependency order: catalog, system, world, playlists, content, vidz, overlays, and redirects.
 
-### Import Artists Only
+To also sideload audio files from S3:
 
 ```bash
-bin/rails import:artists
+S3_BUCKET=your-bucket bin/rails data:load
 ```
 
-Imports the two artists:
-- The.CyberPul.se (slug: `thecyberpulse`)
-- XERAEN (slug: `xeraen`)
+## Data Architecture
 
-### Import Tracks Only
+All seed data lives in YAML files under `data/`, organized into layers:
+
+```
+data/
+├── artists.yml                # 15 artists
+├── albums.yml                 # 18 albums
+├── tracks.yml                 # 71 tracks
+├── catalog/                   # Alternative location (checked first)
+│   ├── artists.yml
+│   ├── albums.yml
+│   └── tracks.yml
+├── system/
+│   ├── hackrs.yml             # GridHackr users
+│   ├── channels.yml           # Chat channels
+│   ├── radio_stations.yml     # Radio stations
+│   ├── zone_playlists.yml     # Ambient zone playlists
+│   └── redirects.yml          # Domain redirects
+├── world/
+│   ├── factions.yml           # Grid factions
+│   ├── zones.yml              # Grid zones
+│   ├── rooms.yml              # Grid rooms
+│   ├── exits.yml              # Room exits
+│   ├── mobs.yml               # NPCs
+│   └── items.yml              # Items
+├── content/
+│   ├── codex.yml              # Codex entries
+│   ├── hackr_logs.yml         # Blog posts
+│   └── wire.yml               # Seed pulses/echoes
+├── playlists/
+│   └── key_playlists.yml      # Curated playlists
+├── overlays/
+│   ├── elements.yml           # Overlay elements
+│   ├── tickers.yml            # Ticker overlays
+│   ├── lower_thirds.yml       # Lower third overlays
+│   ├── scenes.yml             # Overlay scenes
+│   ├── scene_elements.yml     # Scene-element assignments
+│   └── scene_groups.yml       # Scene groups
+├── vidz.yml                   # VODs/streams
+└── radio_stations.yml         # Radio stations
+```
+
+## Import Order
+
+Tasks run in dependency order (the `data:load` master task handles this automatically):
+
+1. **artists** (no deps)
+2. **albums** (depends on artists)
+3. **tracks** (depends on albums)
+4. **hackrs** (no deps)
+5. **channels** (no deps)
+6. **radio_stations** (no deps)
+7. **zone_playlists** (depends on tracks)
+8. **factions** (depends on artists)
+9. **zones** (depends on factions, zone_playlists)
+10. **rooms** (depends on zones)
+11. **exits** (depends on rooms)
+12. **mobs** (depends on rooms, factions)
+13. **items** (depends on rooms)
+14. **key_playlists** (depends on hackrs, tracks, radio_stations)
+15. **codex** (no deps)
+16. **hackr_logs** (depends on hackrs)
+17. **wire** (depends on hackrs)
+18. **vidz** (depends on artists)
+19. **overlays** (no deps)
+20. **redirects** (no deps)
+21. **livestream_archive** (depends on audio)
+
+## Available Tasks
+
+### Master Tasks
+
+| Task | Description |
+|------|-------------|
+| `data:load` | Load everything (set `S3_BUCKET` to also load audio) |
+| `data:reset` | Reset seed content only (preserves user data) |
+| `data:clear` | Delete ALL data (requires typing `DELETE ALL DATA` to confirm) |
+
+### Layer Tasks
+
+| Task | Loads |
+|------|-------|
+| `data:catalog` | artists, albums, tracks |
+| `data:system` | hackrs, channels, radio_stations, zone_playlists, redirects |
+| `data:world` | factions, zones, rooms, exits, mobs, items |
+| `data:playlists` | key_playlists (also ensures catalog, hackrs, radio_stations) |
+| `data:content` | codex, hackr_logs, wire |
+| `data:overlays` | all overlay elements, tickers, lower_thirds, scenes, scene_elements, scene_groups |
+
+### Individual Tasks
+
+Every data type has its own task: `data:artists`, `data:albums`, `data:tracks`, `data:hackrs`, `data:channels`, `data:radio_stations`, `data:zone_playlists`, `data:factions`, `data:zones`, `data:rooms`, `data:exits`, `data:mobs`, `data:items`, `data:key_playlists`, `data:codex`, `data:hackr_logs`, `data:wire`, `data:vidz`, `data:redirects`, `data:livestream_archive`, `data:audio`.
+
+### Audio Sideloading
 
 ```bash
-bin/rails import:tracks
+# From S3
+S3_BUCKET=your-bucket bin/rails data:audio
+
+# From local imports/ directory
+bin/rails data:audio
 ```
 
-Imports all track YAML files from:
-- `~/dev/hackr.tv/data/thecyberpulse/trackz/*.yml`
-- `~/dev/hackr.tv/data/xeraen/trackz/*.yml`
-
-**Note:** Run `import:artists` first, or tracks will be skipped.
-
-### Import Redirects Only
+### Livestream Archive
 
 ```bash
-bin/rails import:redirects
+bin/rails data:livestream_archive
 ```
 
-Imports domain-based path redirects for:
-- ashlinn.net redirects
-- xeraen.com/xeraen.net/rockerboy.net redirects
-- sectorx.media redirects
-
-### Clear All Data (DANGEROUS)
-
-```bash
-bin/rails import:clear
-```
-
-Deletes ALL artists, tracks, and redirects from the database. Requires confirmation.
+Generates a playlist from all tracks that have audio files attached.
 
 ## Idempotency
 
-All import tasks are **idempotent**, meaning:
+All import tasks are **idempotent**:
 
-✓ Safe to run multiple times
-✓ Won't create duplicates
-✓ Updates existing records if data changed
-✓ Skips unchanged records
+- Safe to run multiple times
+- Won't create duplicates (matched by slug)
+- Updates existing records if data changed
+- Skips unchanged records
 
-### Example Output
+## YAML Schemas
 
-```
---- Importing Artists ---
+### Artists (`data/artists.yml`)
 
-  ✓ Created artist: The.CyberPul.se (thecyberpulse)
-  ✓ Created artist: XERAEN (xeraen)
-
-Artist import summary:
-  Created: 2
-  Updated: 0
-  Total:   2
-
---- Importing Tracks from YAML ---
-
-  Processing artist: The.CyberPul.se (thecyberpulse)
-    ✓ Created: Kernel Panic
-    ✓ Created: Hackr Nights
-    ...
-
-  Processing artist: XERAEN (xeraen)
-    ✓ Created: XORDIUM
-    ...
-
-Track import summary:
-  Created: 11
-  Updated: 0
-  Skipped: 0 (no changes)
-  Errors:  0
-  Total:   11
-
---- Importing Redirects ---
-
-  ✓ Created: ashlinn.net/ → https://youtube.com/AshlinnSnow
-  ✓ Created: xeraen.com/ → /xeraen
-  ✓ Created: xeraen.com/git → https://github.com/xeraen
-  ...
-
-Redirect import summary:
-  Created: 31
-  Updated: 0
-  Skipped: 0 (no changes)
-  Total:   31
+```yaml
+artists:
+  - name: "The.CyberPul.se"
+    slug: "thecyberpulse"
+    genre: "Hackrcore"
+    artist_type: "band"        # band (default), ost, or voiceover
 ```
 
-## Re-running Imports
+**Current artists:** THE PULSE GRID, The.CyberPul.se, XERAEN, Injection Vector, Wavelength Zero, Cipher Protocol, System Rot, Temporal Blue Drift, Offline, Apex Overdrive, Voiceprint, Neon Hearts, Ethereality, heartbreak_havoc.sh, BlitzBeam+
 
-If you re-run the import tasks:
+### Albums (`data/albums.yml`)
 
-```bash
-bin/rails import:all
+```yaml
+albums:
+  - artist: "XERAEN"
+    title: "XORDIUM"
+    slug: "xordium"
+    album_type: "ep"           # ep, lp, single
+    release_date: "2124-10-17"
+    description: ""
+    cover_image: "xeraen/images/xordium.jpg"
 ```
 
-Output will show what already exists:
+### Tracks (`data/tracks.yml`)
 
+```yaml
+- title: "Kernel Panic"
+  slug: "kernel-panic"
+  artist: "The.CyberPul.se"
+  album: "Hackr Nights"
+  album_type: "single"
+  audio_file: "kernel-panic.ogg"
+  track_number: 1
+  release_date: "2125-01-01"
+  duration: "3:45"
+  genre: "Hackrcore"
+  featured: false
+  streaming_links:
+    spotify: "https://..."
+    apple_music: "https://..."
+  videos:
+    music_video: "https://..."
+  lyrics: |
+    Lyrics here...
 ```
---- Importing Artists ---
 
-  ✓ Artist exists: The.CyberPul.se (thecyberpulse)
-  ✓ Artist exists: XERAEN (xeraen)
+### Redirects (`data/system/redirects.yml`)
 
-Artist import summary:
-  Created: 0
-  Updated: 0
-  Total:   2
+```yaml
+redirects:
+  - domain: xeraen.com
+    path: /
+    destination_url: /xeraen
 ```
+
+**Current redirect domains:** ashlinn.net, xeraen.com, xeraen.net, rockerboy.net, rockerboy.stream, sectorx.media
+
+## Reset vs Clear
+
+- `data:reset` - Clears only seed content (pulses/echoes marked `is_seed`, hackr_logs, codex entries) then re-imports. Preserves user-generated content.
+- `data:clear` - Nuclear option. Deletes ALL data including user-generated content. Requires typing `DELETE ALL DATA` to confirm.
+
+## Legacy Import Tasks
+
+The `import:*` namespace (`lib/tasks/import.rake`) contains older import tasks from a previous Sinatra-based system. These are superseded by the `data:*` namespace and should not be used for new imports.
 
 ## Troubleshooting
 
-### Error: "Source directory not found"
+### Error: "File not found"
 
-Ensure the Sinatra app is at the correct location:
-```bash
-ls ~/dev/hackr.tv/data
-# Should show: thecyberpulse  xeraen
-```
+Ensure the YAML files exist in the expected locations. The loader checks `data/catalog/` first, then falls back to `data/`.
 
-### Error: "Artist not found"
+### Error: "Artist not found" when loading tracks
 
-Run the artists import first:
-```bash
-bin/rails import:artists
-```
+Run `data:artists` before `data:tracks`, or use `data:catalog` which handles the order automatically.
 
 ### Invalid Date Format
 
-Tracks with non-standard release dates (e.g., "TBA Release") will have `release_date` set to `nil`. This is expected behavior.
-
-## Data Mappings
-
-### Artist Names
-
-| Slug          | Display Name      |
-|---------------|-------------------|
-| thecyberpulse | The.CyberPul.se   |
-| xeraen        | XERAEN            |
-
-### Track YAML Fields
-
-| YAML Field       | Database Column   | Type    | Notes                          |
-|------------------|-------------------|---------|--------------------------------|
-| title            | title             | string  | Required                       |
-| artist           | (from artist)     | -       | Determined by directory        |
-| album            | album             | string  | Optional                       |
-| album_type       | album_type        | string  | ep, lp, single, etc.           |
-| release_date     | release_date      | date    | Parsed, nil if invalid         |
-| duration         | duration          | string  | Format: M:SS                   |
-| cover_image      | cover_image       | string  | Filename only                  |
-| featured         | featured          | boolean | Default: false                 |
-| streaming_links  | streaming_links   | json    | Hash of platform → URL         |
-| videos           | videos            | json    | Hash of type → URL             |
-| lyrics           | lyrics            | text    | Multiline string               |
-
-### Redirect Domains
-
-| Domain              | Paths                                    |
-|---------------------|------------------------------------------|
-| ashlinn.net         | / → YouTube                              |
-| xeraen.com          | /, /git, /github, /twitter, /x, /youtube |
-| xeraen.net          | (same as xeraen.com)                     |
-| rockerboy.net       | (same as xeraen.com)                     |
-| rockerboy.stream    | (same as xeraen.com)                     |
-| sectorx.media       | / → /sector/x                            |
-
-## Next Steps
-
-After importing data:
-
-1. **Verify the import**:
-   ```bash
-   bin/rails console
-   > Artist.count  # Should be 2
-   > Track.count   # Should be 11
-   > Redirect.count # Should be ~31
-   ```
-
-2. **Start the server**:
-   ```bash
-   bin/rails server
-   ```
-
-3. **Visit the tracks pages**:
-   - http://localhost:3000/trackz
-   - http://localhost:3000/xeraen/trackz
+Tracks with non-standard release dates (e.g., "TBA") will have `release_date` set to `nil`. This is expected.

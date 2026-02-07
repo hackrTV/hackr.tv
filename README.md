@@ -7,7 +7,7 @@
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.2-red.svg)](https://rubyonrails.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Tests-1320%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-1539%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
@@ -25,7 +25,7 @@
 - **Animated Terminal Homepage** - Retro terminal-style interface with typing animation and keyboard skip
 - **Menu System** - Dynamic navigation with artist profiles, services, and conditional admin access
 - **Multi-Artist Showcases** - Dedicated pages for The.CyberPul.se, XERAEN, and more
-- **Band Profile Pages** - 13 custom band pages with config-based architecture
+- **Band Profile Pages** - 12 custom band pages with config-based architecture
 - **ViewComponent Architecture** - Reusable BandProfileComponent with flexible color schemes
 - **Hackr Logs** - Blog platform with Markdown support (remark-gfm, rehype-sanitize)
 
@@ -41,7 +41,7 @@
   - Public sharing via unique share tokens (`/shared/:token`)
   - Queue panel showing current + next 3 tracks
   - Playlist context preservation across navigation
-- **Pulse Vault** - Music discovery interface with 66+ tracks
+- **Pulse Vault** - Music discovery interface with 71 tracks across 15 artists
   - Real-time search/filter by track, artist, album, genre
   - Click-anywhere playback (any cell in row plays/pauses)
   - Row hover highlighting with dynamic now-playing indicators
@@ -49,10 +49,9 @@
   - Custom SQL ordering (The.CyberPul.se, XERAEN, then alphabetical)
   - Keyboard shortcuts (Tab to search, Spacebar to play/pause)
 - **Auto-play & Queue** - Automatic track progression with loop functionality
-- **Bands Directory** - Artist profiles with track counts and genre information
-- **Track List Pages** - Artist track listings at `/thecyberpulse/trackz` and `/xeraen/trackz`
+- **Bands Directory** - 15 artist profiles with track counts and genre information
+- **Track List Pages** - Artist track listings at `/:artist_slug/trackz`
 - **Track Detail Pages** - Individual track pages with lyrics, streaming links, and video embeds
-  - Routes: `/thecyberpulse/trackz/:slug`, `/xeraen/trackz/:slug`
   - Streaming links organized by platform (Bandcamp, YouTube, Spotify, Apple Music, SoundCloud)
   - Lyrics display with Markdown and Codex auto-linking
   - Artist-specific color themes
@@ -73,14 +72,23 @@
 - **User Profiles** - View any user's pulse history at `/wire/:username`
 - **Admin Moderation** - SignalDrop system for content moderation
 
+### Uplink - Chat System
+- **Channel-Based Chat** - Real-time messaging with multiple configurable channels
+- **Slow Mode** - Configurable rate limiting per channel
+- **Role-Based Access** - Channels can require minimum roles
+- **Livestream Integration** - Channels that activate during livestreams
+- **Popout Mode** - Detachable chat window at `/uplink/popout`
+- **Moderation** - Squelch, blackout, and punishment management
+
 ### THE PULSE GRID - MUD
 - **Real-time Multiplayer** - Live chat and movement tracking via Action Cable
 - **Interactive NPCs** - Rich dialogue trees with detailed conversations
-  - Fracture Network Coordinator (6 topics: mission, fracture, help, station, synthia, govcorp)
-  - Temporal Theorist (7 topics: time, paradox, xeraen, future, 2125, prism, synthia)
+  - Fracture Network Coordinator (8 topics: mission, fracture, help, station, synthia, govcorp, ride, prism)
+  - Temporal Theorist (8 topics: time, paradox, xeraen, future, discovery, ride, prism, synthia)
 - **Command History** - Arrow key navigation through previous commands (up to 100 stored)
 - **Room Navigation** - Explore zones controlled by Fracture Network factions
 - **Inventory System** - Collect and manage items
+- **Feature Access Control** - Admin-grantable access via FeatureGrant system
 - **Optimized UI** - Clean terminal-style interface with comfortable dark theme
 - **Dedicated Grid Layout** - 700px output window, compact design, no page scrolling
 
@@ -100,6 +108,13 @@
 - **VOD Support** - Video on demand URL storage for past streams
 - **YouTube Integration** - Auto-conversion of YouTube URLs to embed format
 - **Stream Timing** - Track stream start/end times with validation
+
+### Account Management & Email
+- **Registration** - Email-verified account creation with registration tokens
+- **Password Reset** - Token-based password reset via email
+- **Email Change** - Self-service email change with verification and notification
+- **Email Tracking** - All sent emails recorded via EmailObserver
+- **GridMailer** - 4 transactional email types (registration, password reset, email change verification, email change notification)
 
 ### Zone Playlists
 - **Ambient Music** - Per-zone background playlists for THE PULSE GRID
@@ -139,6 +154,7 @@
 - **Real-time:** Action Cable 8.1 with Solid Cable adapter
 - **Background Jobs:** Solid Queue for async processing
 - **Caching:** Solid Cache
+- **Email:** Action Mailer with email tracking (SentEmail + EmailObserver)
 - **Testing:** RSpec (backend), Vitest (frontend), FactoryBot, Faker
 - **Code Quality:** StandardRB, ESLint
 - **Assets:** Propshaft, TuiCSS (terminal UI framework)
@@ -177,22 +193,18 @@
    bin/rails db:migrate
    ```
 
-4. **Import artist/track data**
+4. **Load seed data**
    ```bash
-   bin/rails import:from_yaml
+   bin/rails data:load
    ```
+   See [IMPORT_README.md](IMPORT_README.md) for details on the data loading system.
 
-5. **Seed THE PULSE GRID world**
-   ```bash
-   bin/rails db:seed
-   ```
-
-6. **Start the server**
+5. **Start the server**
    ```bash
    bin/dev
    ```
 
-7. **Visit the application**
+6. **Visit the application**
    - hackr.tv Home: http://localhost:3000
    - The.CyberPul.se: http://localhost:3000/thecyberpulse
    - THE PULSE GRID: http://localhost:3000/grid
@@ -201,6 +213,7 @@
    - Playlists: http://localhost:3000/fm/playlists (requires Grid login)
    - The Codex: http://localhost:3000/codex
    - PulseWire: http://localhost:3000/wire
+   - Uplink Chat: http://localhost:3000/uplink
    - Admin Dashboard: http://localhost:3000/root (requires Grid admin account)
 
 ---
@@ -233,8 +246,8 @@ clear (cls)            - Clear the screen
 - Arrow keys navigate through command history
 
 **NPCs with Dialogue:**
-- **Fracture Network Coordinator** (hackr.tv Broadcast Station) - Topics: mission, fracture, help, station, synthia, govcorp
-- **Temporal Theorist** (XERAEN Operations Center) - Topics: time, paradox, xeraen, future, 2125, prism, synthia
+- **Fracture Network Coordinator** (hackr.tv Broadcast Station) - Topics: mission, fracture, help, station, synthia, govcorp, ride, prism
+- **Temporal Theorist** (XERAEN Operations Center) - Topics: time, paradox, xeraen, future, discovery, ride, prism, synthia
 
 ---
 
@@ -248,7 +261,7 @@ hackr.tv/
 │   │   │   └── application.tsx        # React app entry point
 │   │   ├── components/
 │   │   │   ├── layouts/               # AppLayout, Header, Footer
-│   │   │   ├── pages/                 # React pages (HomePage, PulseVaultPage, etc.)
+│   │   │   ├── pages/                 # 30+ React pages
 │   │   │   ├── audio/                 # PlayerBar, SeekBar, QueuePanel
 │   │   │   └── playlists/             # CreatePlaylistModal, AddToPlaylistDropdown
 │   │   ├── contexts/
@@ -256,25 +269,13 @@ hackr.tv/
 │   │   └── hooks/                     # useGridAuth, useAudio, useActionCable
 │   ├── controllers/
 │   │   ├── api/                       # JSON API for React SPA
-│   │   │   ├── radio_controller.rb    # Radio stations & playlists endpoint
-│   │   │   ├── playlists_controller.rb # User playlist CRUD
-│   │   │   └── grid_controller.rb     # Grid API
 │   │   ├── admin/                     # Server-rendered admin CRUD
-│   │   │   ├── radio_stations_controller.rb
-│   │   │   ├── tracks_controller.rb
-│   │   │   └── hackr_logs_controller.rb
 │   │   └── application_controller.rb  # Multi-domain routing
-│   ├── models/
-│   │   ├── artist.rb                  # Music artists
-│   │   ├── album.rb                   # Albums with cover images
-│   │   ├── track.rb                   # Tracks with audio files
-│   │   ├── playlist.rb                # User playlists
-│   │   ├── playlist_track.rb          # Playlist tracks (join table)
-│   │   ├── radio_station.rb           # Radio stations
-│   │   ├── radio_station_playlist.rb  # Station playlists (join table)
-│   │   ├── grid_hackr.rb              # Player accounts (owns playlists)
-│   │   ├── grid_room.rb               # MUD locations
-│   │   └── ...                        # Other Grid models
+│   ├── models/                        # 40+ Active Record models
+│   ├── mailers/
+│   │   └── grid_mailer.rb             # Transactional emails
+│   ├── observers/
+│   │   └── email_observer.rb          # Email tracking
 │   ├── views/
 │   │   ├── layouts/
 │   │   │   ├── application.html.erb   # React SPA shell
@@ -285,18 +286,23 @@ hackr.tv/
 │   └── channels/
 │       ├── grid_channel.rb            # Real-time multiplayer (Action Cable)
 │       ├── pulse_wire_channel.rb      # PulseWire social feed updates
+│       ├── uplink_channel.rb          # Uplink chat
 │       └── overlay_channel.rb         # OBS overlay broadcasts
-├── data/                              # YAML data for import
-│   ├── artists.yml                    # 14 artists
-│   ├── albums.yml                     # 15 albums
-│   ├── tracks.yml                     # 66+ tracks
-│   └── [artist_slug]/                 # Artist-specific files
+├── data/                              # YAML seed data
+│   ├── artists.yml                    # 15 artists
+│   ├── albums.yml                     # 18 albums
+│   ├── tracks.yml                     # 71 tracks
+│   ├── system/                        # Hackrs, channels, radio, redirects
+│   ├── world/                         # Zones, rooms, exits, mobs, items
+│   ├── content/                       # Codex, hackr_logs, wire
+│   ├── playlists/                     # Curated playlists
+│   └── overlays/                      # Overlay scenes, elements, tickers
 ├── lib/tasks/
-│   └── import.rake                    # Data import scripts
+│   └── data.rake                      # Unified data loading system
 ├── spec/                              # Test suite
-│   ├── models/                        # Model specs (backend)
-│   ├── controllers/                   # Controller specs (backend)
-│   ├── components/                    # Component specs (frontend Vitest)
+│   ├── models/                        # Model specs
+│   ├── controllers/                   # Controller specs
+│   ├── components/                    # ViewComponent specs
 │   └── services/                      # Service specs
 └── config/
     └── routes.rb                      # Multi-domain routing
@@ -324,16 +330,9 @@ bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- **Backend:** 1158 examples, 0 failures (RSpec)
-- **Frontend:** 162 examples (Vitest)
-- **Total:** 1320 passing tests
-
-**Tested Components:**
-- **Models:** Artist, Album, Track, Playlist, PlaylistTrack, RadioStation, RadioStationPlaylist, GridHackr, GridRoom, HackrLog, Redirect, CodexEntry, Pulse, Echo
-- **Controllers:** Grid, API (Radio, Playlists, PlaylistTracks, SharedPlaylists, Codex, Pulses, Echoes), Admin (RadioStations, Tracks, HackrLogs, CodexEntries, PulseWire), FM, Tracks, Pages
-- **Components:** BandProfileComponent (ViewComponent), AudioPlayer, PlayerBar, SeekBar (React/Vitest)
-- **Services:** Grid::CommandParser
-- **Concerns:** GridAuthentication, RequestAnalysis
+- **Backend:** 1376 examples (RSpec)
+- **Frontend:** 163 examples (Vitest)
+- **Total:** 1539 passing tests
 
 ---
 
@@ -345,22 +344,25 @@ bundle exec standardrb              # Lint code
 bundle exec standardrb --fix        # Auto-fix issues
 ```
 
-### Data Import
-The import system supports YAML-based data loading with file attachments:
+### Data Loading
+The data loading system uses YAML files as the single source of truth for all seed content:
 
 ```bash
-bin/rails import:from_yaml          # Import all data
-bin/rails import:yaml_artists       # Artists only
-bin/rails import:yaml_albums        # Albums only
-bin/rails import:yaml_tracks        # Tracks only
+bin/rails data:load                 # Load everything
+bin/rails data:catalog              # Artists, albums, tracks only
+bin/rails data:system               # Hackrs, channels, radio, redirects
+bin/rails data:world                # Factions, zones, rooms, exits, mobs, items
+bin/rails data:content              # Codex, hackr_logs, wire
+bin/rails data:overlays             # Overlay scenes, elements, tickers
 ```
+
+See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
 
 **Features:**
 - Idempotent operations (safe to re-run)
-- Auto-generates release dates for TBA releases (99-100 years in future)
-- Attaches cover images and audio files from artist directories
-- Filters lyrics section markers (`[Chorus]`, `[Verse]`, etc.)
-- Auto-assigns sequential track numbers
+- Dependency-aware ordering (26 tasks in correct sequence)
+- S3 audio sideloading (`S3_BUCKET=bucket bin/rails data:audio`)
+- Reset seed content without touching user data (`data:reset`)
 
 ### Adding New Content
 
@@ -368,9 +370,9 @@ bin/rails import:yaml_tracks        # Tracks only
 1. Add artist to `data/artists.yml`
 2. Create directory: `data/[artist-slug]/`
 3. Add albums to `data/albums.yml`
-4. Add tracks to `data/tracks.yml` or `data/[artist-slug]/trackz/`
+4. Add tracks to `data/tracks.yml`
 5. Place audio files and cover images in `data/[artist-slug]/`
-6. Run `bin/rails import:from_yaml`
+6. Run `bin/rails data:catalog`
 
 **Add a Radio Station:**
 1. Login to admin at `/root` with Grid admin account
@@ -402,9 +404,9 @@ bin/rails import:yaml_tracks        # Tracks only
 ## Database Schema
 
 ### Music Platform
-- **artists** - name, slug, genre
-- **albums** - name, slug, album_type, release_date, description, cover_image (Active Storage)
-- **tracks** - title, slug, track_number, release_date, duration, featured, streaming_links (JSON), videos (JSON), lyrics, audio_file (Active Storage)
+- **artists** - name, slug, genre, artist_type (band/ost/voiceover)
+- **albums** - title, slug, album_type, release_date, description, cover_image (Active Storage)
+- **tracks** - title, slug, track_number, release_date, duration, genre, featured, streaming_links (JSON), videos (JSON), lyrics, audio_file (Active Storage)
 - **playlists** - name, description, is_public, share_token, belongs_to :grid_hackr
 - **playlist_tracks** - position (1+), belongs_to :playlist, belongs_to :track
 - **radio_stations** - name, slug, description, genre, color, stream_url, position
@@ -420,6 +422,20 @@ bin/rails import:yaml_tracks        # Tracks only
 - **grid_mobs** - NPCs with dialogue trees (dialogue_tree JSON column)
 - **grid_messages** - chat and system messages
 
+### Account Management
+- **grid_registration_tokens** - email, token, expires_at, used_at, ip_address
+- **grid_verification_tokens** - purpose (password_reset/email_change), token, expires_at, metadata (JSON)
+- **feature_grants** - grid_hackr_id, feature (controls access to features like THE PULSE GRID)
+- **sent_emails** - to, from, subject, mailer_class, mailer_action, emailable (polymorphic)
+
+### Uplink Chat
+- **chat_channels** - name, slug, description, minimum_role, requires_livestream, slow_mode_seconds, is_active
+- **chat_messages** - content, dropped, belongs_to :chat_channel, belongs_to :grid_hackr
+
+### Moderation
+- **user_punishments** - punishment_type, reason, expires_at, belongs_to :grid_hackr
+- **moderation_logs** - action, reason, duration_minutes, actor_id, target_id
+
 ### Blog
 - **hackr_logs** - blog posts with Markdown content, published status
 
@@ -427,7 +443,7 @@ bin/rails import:yaml_tracks        # Tracks only
 - **codex_entries** - name, slug, entry_type (person/organization/event/location/technology/faction/item), summary, content (markdown), metadata (JSON), published, position
 
 ### PulseWire
-- **pulses** - content (256 char max), parent_pulse_id, thread_root_id, echo_count, splice_count, pulsed_at, signal_dropped, belongs_to :grid_hackr
+- **pulses** - content (256 char max), parent_pulse_id, thread_root_id, echo_count, splice_count, pulsed_at, signal_dropped, is_seed, belongs_to :grid_hackr
 - **echoes** - echoed_at, belongs_to :pulse (counter_cache), belongs_to :grid_hackr
 
 ### Streaming
@@ -442,6 +458,7 @@ bin/rails import:yaml_tracks        # Tracks only
 - **overlay_elements** - element_type, config (JSON)
 - **overlay_scene_elements** - position_x, position_y, width, height, z_index, belongs_to :overlay_scene, belongs_to :overlay_element
 - **overlay_scene_groups** - name, slug, has_many :overlay_scenes
+- **overlay_scene_group_scenes** - position, belongs_to :overlay_scene_group, belongs_to :overlay_scene
 - **overlay_now_playings** - track metadata singleton
 - **overlay_alerts** - message, alert_type
 - **overlay_tickers** - text, speed
@@ -474,23 +491,26 @@ bin/rails import:yaml_tracks        # Tracks only
 - Queue Panel - Current + next 3 tracks display with click-to-jump
 - Animated terminal homepage - Typing effect & keyboard skip
 - ViewComponent architecture - Reusable band profiles with flexible color schemes
-- Band profile pages - 13 artists with config-based routing
+- Band profile pages - 12 artists with config-based routing
 - Album model - Active Storage cover images with hover zoom
-- Comprehensive YAML import - Idempotent, multi-document support
+- Unified data loading system - 26 idempotent tasks with dependency ordering
 - hackr.fm Radio - 4 stations with live streaming
-- Pulse Vault - Search/filter, click-anywhere playback, custom ordering
+- Pulse Vault - 71 tracks, search/filter, click-anywhere playback, custom ordering
 - Auto-play next track - Queue management with loop functionality
 - THE PULSE GRID - Real-time multiplayer MUD (5 zones, 5 rooms, 2 NPCs)
-- NPC dialogue system - 2 NPCs with 13 total topics
+- NPC dialogue system - 2 NPCs with 13 unique topics
 - Command history - Arrow key navigation (100 commands)
+- Feature access control - Admin-grantable feature grants for Grid access
 - Hackr Logs - Blog platform with Markdown support
-- Comprehensive test suite - 1158 backend + 162 frontend tests (100% passing)
 - The Codex wiki - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
 - PulseWire social network - Pulses, Echoes, Splices, real-time updates, admin moderation
 - OBS Overlay system - Scenes, groups, now playing, lower thirds, tickers, alerts
 - Hackr Streams - Livestream management with go live/VOD support
 - Zone Playlists - Per-zone ambient music for THE PULSE GRID
+- Uplink chat - Channel-based real-time chat with moderation and popout mode
+- Email system - Registration verification, password reset, email change, sent email tracking
 - Background infrastructure - Solid Queue, Solid Cache, Solid Cable configured
+- Comprehensive test suite - 1376 backend + 163 frontend tests (1539 total)
 
 ### Future Enhancements
 - World expansion - More rooms, NPCs, items (currently only 5 rooms)
@@ -500,7 +520,6 @@ bin/rails import:yaml_tracks        # Tracks only
 - Combat mechanics (physical/cyber)
 - Synthia frequency tuning mechanic
 - Persistent inventory between sessions
-- Upload remaining audio files (64 of 66 tracks need audio)
 
 ---
 
@@ -527,9 +546,11 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/dev` | Start development server (Rails + Vite) |
 | `bin/rails console` | Interactive Rails console |
 | `bin/rails db:migrate` | Run database migrations |
-| `bin/rails import:from_yaml` | Import all YAML data (artists, albums, tracks) |
-| `bundle exec rspec` | Run backend test suite (1158 tests) |
-| `pnpm test` | Run frontend test suite (162 tests) |
+| `bin/rails data:load` | Load all seed data from YAML |
+| `bin/rails data:catalog` | Load artists, albums, tracks only |
+| `bin/rails data:reset` | Reset seed content (preserves user data) |
+| `bundle exec rspec` | Run backend test suite (1376 tests) |
+| `pnpm test` | Run frontend test suite (163 tests) |
 | `bundle exec standardrb` | Lint backend code |
 | `pnpm install` | Install frontend dependencies |
 
