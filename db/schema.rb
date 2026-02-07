@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_07_014047) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_07_031914) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -495,6 +495,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_014047) do
     t.string "path"
     t.datetime "updated_at", null: false
     t.index ["domain", "path"], name: "index_redirects_on_domain_and_path", unique: true
+  end
+
+  create_table "sent_emails", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "emailable_id"
+    t.string "emailable_type"
+    t.string "from", null: false
+    t.text "html_body"
+    t.string "mailer_action", null: false
+    t.string "mailer_class", null: false
+    t.string "subject", null: false
+    t.text "text_body"
+    t.string "to", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_sent_emails_on_created_at"
+    t.index ["emailable_type", "emailable_id"], name: "index_sent_emails_on_emailable"
   end
 
   create_table "tracks", force: :cascade do |t|
