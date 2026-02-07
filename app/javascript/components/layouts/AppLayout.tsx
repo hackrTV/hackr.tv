@@ -25,6 +25,7 @@ const GridRegisterPage = lazy(() => import('~/components/pages/grid/GridRegister
 const GridVerifyPage = lazy(() => import('~/components/pages/grid/GridVerifyPage').then(m => ({ default: m.GridVerifyPage })))
 const IdentityPage = lazy(() => import('~/components/pages/grid/IdentityPage').then(m => ({ default: m.IdentityPage })))
 const ResetPasswordPage = lazy(() => import('~/components/pages/grid/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })))
+const GridConfirmEmailChangePage = lazy(() => import('~/components/pages/grid/GridConfirmEmailChangePage').then(m => ({ default: m.GridConfirmEmailChangePage })))
 const LogsIndexPage = lazy(() => import('~/components/pages/logs/LogsIndexPage').then(m => ({ default: m.LogsIndexPage })))
 const LogDetailPage = lazy(() => import('~/components/pages/logs/LogDetailPage').then(m => ({ default: m.LogDetailPage })))
 const CodexIndexPage = lazy(() => import('~/components/pages/codex/CodexIndexPage').then(m => ({ default: m.CodexIndexPage })))
@@ -92,6 +93,7 @@ export const AppLayout: React.FC = () => {
         <Route path="/grid/verify/:token" element={<GridVerifyPage />} />
         <Route path="/grid/identity" element={<ProtectedRoute><IdentityPage /></ProtectedRoute>} />
         <Route path="/grid/reset_password/:token" element={<ResetPasswordPage />} />
+        <Route path="/grid/confirm_email_change/:token" element={<GridConfirmEmailChangePage />} />
         {/* Hackr Logs routes */}
         <Route path="/logs" element={<LogsIndexPage />} />
         <Route path="/logs/:slug" element={<LogDetailPage />} />

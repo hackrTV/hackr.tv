@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_06_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_07_014047) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -233,6 +233,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_000001) do
     t.datetime "expires_at", null: false
     t.integer "grid_hackr_id", null: false
     t.string "ip_address"
+    t.json "metadata", default: {}
     t.string "purpose", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false

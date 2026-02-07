@@ -6,6 +6,7 @@
 #  id            :integer          not null, primary key
 #  expires_at    :datetime         not null
 #  ip_address    :string
+#  metadata      :json
 #  purpose       :string           not null
 #  token         :string           not null
 #  used_at       :datetime
@@ -50,6 +51,27 @@ RSpec.describe GridVerificationToken, type: :model do
     it "accepts password_reset purpose" do
       token = GridVerificationToken.new(grid_hackr: hackr, purpose: "password_reset", ip_address: "127.0.0.1")
       expect(token).to be_valid
+    end
+
+    it "accepts email_change purpose with new_email in metadata" do
+      token = GridVerificationToken.new(
+        grid_hackr: hackr,
+        purpose: "email_change",
+        metadata: {"new_email" => "new@example.com"},
+        ip_address: "127.0.0.1"
+      )
+      expect(token).to be_valid
+    end
+
+    it "requires new_email in metadata when purpose is email_change" do
+      token = GridVerificationToken.new(
+        grid_hackr: hackr,
+        purpose: "email_change",
+        metadata: {},
+        ip_address: "127.0.0.1"
+      )
+      expect(token).not_to be_valid
+      expect(token.errors[:metadata]).to include("must include new_email for email_change purpose")
     end
 
     it "requires a grid_hackr" do
@@ -147,6 +169,18 @@ RSpec.describe GridVerificationToken, type: :model do
 
         expect(GridVerificationToken.for_purpose("password_reset")).to include(token)
       end
+    end
+  end
+
+  describe "#new_email" do
+    it "reads new_email from metadata" do
+      token = create_token(purpose: "email_change", metadata: {"new_email" => "new@example.com"})
+      expect(token.new_email).to eq("new@example.com")
+    end
+
+    it "returns nil when metadata has no new_email" do
+      token = create_token
+      expect(token.new_email).to be_nil
     end
   end
 

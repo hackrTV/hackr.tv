@@ -45,6 +45,8 @@ class LowercaseRedirect
     return true if path.start_with?("/api/grid/verify/")
     # Skip /grid/reset_password/ paths (case-sensitive reset tokens)
     return true if path.start_with?("/grid/reset_password/")
+    # Skip /grid/confirm_email_change/ paths (case-sensitive tokens)
+    return true if path.start_with?("/grid/confirm_email_change/")
     # Skip asset paths
     return true if path.start_with?("/assets/")
     return true if path.start_with?("/vite-dev/")

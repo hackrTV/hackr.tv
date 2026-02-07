@@ -6,6 +6,7 @@
 #  id            :integer          not null, primary key
 #  expires_at    :datetime         not null
 #  ip_address    :string
+#  metadata      :json
 #  purpose       :string           not null
 #  token         :string           not null
 #  used_at       :datetime
@@ -31,8 +32,13 @@ class GridVerificationToken < ApplicationRecord
   before_create :generate_token
   before_create :set_expiration
 
-  validates :purpose, presence: true, inclusion: {in: %w[password_reset]}
+  validates :purpose, presence: true, inclusion: {in: %w[password_reset email_change]}
   validates :token, uniqueness: true, allow_nil: true
+  validate :new_email_required_for_email_change
+
+  def new_email
+    metadata&.dig("new_email")
+  end
 
   scope :valid, -> { where(used_at: nil).where("expires_at > ?", Time.current) }
   scope :for_purpose, ->(purpose) { where(purpose: purpose) }
@@ -54,6 +60,12 @@ class GridVerificationToken < ApplicationRecord
   end
 
   private
+
+  def new_email_required_for_email_change
+    if purpose == "email_change" && metadata&.dig("new_email").blank?
+      errors.add(:metadata, "must include new_email for email_change purpose")
+    end
+  end
 
   def generate_token
     self.token = SecureRandom.urlsafe_base64(32)
