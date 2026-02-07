@@ -24,6 +24,8 @@
 class GridHackr < ApplicationRecord
   include ProfanityFilterable
 
+  has_paper_trail ignore: %i[password_digest api_token last_activity_at]
+
   has_secure_password
 
   filter_profanity :hackr_alias

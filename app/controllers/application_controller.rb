@@ -12,6 +12,11 @@ class ApplicationController < ActionController::Base
 
   helper_method :domain_stylesheet
 
+  # PaperTrail: track which hackr made changes
+  def user_for_paper_trail
+    current_hackr&.id
+  end
+
   private
 
   def domain_stylesheet

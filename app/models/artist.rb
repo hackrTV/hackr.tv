@@ -16,6 +16,8 @@
 #  index_artists_on_slug  (slug) UNIQUE
 #
 class Artist < ApplicationRecord
+  has_paper_trail
+
   ARTIST_TYPES = %w[band ost voiceover].freeze
 
   has_many :albums, dependent: :destroy

@@ -23,6 +23,8 @@
 #  artist_id  (artist_id => artists.id)
 #
 class Album < ApplicationRecord
+  has_paper_trail
+
   belongs_to :artist
   has_many :tracks, -> { order(:track_number, :title) }, dependent: :restrict_with_error
   has_one_attached :cover_image

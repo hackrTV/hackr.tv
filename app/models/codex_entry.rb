@@ -22,6 +22,8 @@
 #  index_codex_entries_on_slug        (slug) UNIQUE
 #
 class CodexEntry < ApplicationRecord
+  has_paper_trail
+
   ENTRY_TYPES = %w[person organization event location technology faction item].freeze
 
   # Validations

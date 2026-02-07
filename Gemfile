@@ -49,6 +49,9 @@ gem "redcarpet"
 # Profanity filtering for user-generated content
 gem "obscenity"
 
+# Audit trail / change history for models
+gem "paper_trail"
+
 # Rate limiting and request throttling
 gem "rack-attack"
 

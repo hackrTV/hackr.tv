@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_07_031914) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -548,6 +548,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_031914) do
     t.index ["grid_hackr_id", "punishment_type"], name: "index_user_punishments_on_grid_hackr_id_and_punishment_type"
     t.index ["grid_hackr_id"], name: "index_user_punishments_on_grid_hackr_id"
     t.index ["issued_by_id"], name: "index_user_punishments_on_issued_by_id"
+  end
+
+  create_table "versions", force: :cascade do |t|
+    t.datetime "created_at"
+    t.string "event", null: false
+    t.bigint "item_id", null: false
+    t.string "item_type", null: false
+    t.text "object", limit: 1073741823
+    t.string "whodunnit"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
   create_table "zone_playlist_tracks", force: :cascade do |t|
