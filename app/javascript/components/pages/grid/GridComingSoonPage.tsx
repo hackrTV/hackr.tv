@@ -42,7 +42,7 @@ export const GridComingSoonPage: React.FC = () => {
         color: '#666',
         marginBottom: '30px'
       }}>
-        // access pending
+        {'// access pending'}
       </p>
 
       <div style={{ marginBottom: '30px', fontSize: '0.9em', color: '#444', letterSpacing: '2px' }}>

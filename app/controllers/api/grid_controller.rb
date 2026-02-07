@@ -42,7 +42,8 @@ class Api::GridController < ApplicationController
           id: hackr.id,
           hackr_alias: hackr.hackr_alias,
           role: hackr.role,
-          current_room: hackr.current_room ? room_json(hackr.current_room) : nil
+          current_room: hackr.current_room ? room_json(hackr.current_room) : nil,
+          features: hackr.admin? ? [FeatureGrant::PULSE_GRID] : hackr.feature_grants.pluck(:feature)
         }
       }
     else
@@ -177,7 +178,8 @@ class Api::GridController < ApplicationController
             id: @hackr.id,
             hackr_alias: @hackr.hackr_alias,
             role: @hackr.role,
-            current_room: @hackr.current_room ? room_json(@hackr.current_room) : nil
+            current_room: @hackr.current_room ? room_json(@hackr.current_room) : nil,
+            features: @hackr.admin? ? [FeatureGrant::PULSE_GRID] : @hackr.feature_grants.pluck(:feature)
           }
         }, status: :created
       else
