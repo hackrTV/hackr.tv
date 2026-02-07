@@ -1,3 +1,28 @@
+# == Schema Information
+#
+# Table name: grid_verification_tokens
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  expires_at    :datetime         not null
+#  ip_address    :string
+#  purpose       :string           not null
+#  token         :string           not null
+#  used_at       :datetime
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#
+# Indexes
+#
+#  index_grid_verification_tokens_on_grid_hackr_id              (grid_hackr_id)
+#  index_grid_verification_tokens_on_grid_hackr_id_and_purpose  (grid_hackr_id,purpose)
+#  index_grid_verification_tokens_on_token                      (token) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 require "rails_helper"
 
 RSpec.describe GridVerificationToken, type: :model do

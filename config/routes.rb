@@ -201,6 +201,8 @@ Rails.application.routes.draw do
     # Grid management (still functional - runtime operations)
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
+    post "grid/grant_feature", to: "grid#grant_feature", as: :grid_grant_feature
+    delete "grid/revoke_feature", to: "grid#revoke_feature", as: :grid_revoke_feature
 
     # PulseWire moderation (still functional - runtime operations)
     resources :pulse_wire, only: %i[index destroy] do

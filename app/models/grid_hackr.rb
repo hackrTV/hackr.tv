@@ -74,6 +74,7 @@ class GridHackr < ApplicationRecord
   has_many :user_punishments, dependent: :destroy
   has_many :moderation_logs_as_actor, class_name: "ModerationLog", foreign_key: :actor_id, dependent: :nullify
   has_many :moderation_logs_as_target, class_name: "ModerationLog", foreign_key: :target_id, dependent: :nullify
+  has_many :feature_grants, dependent: :destroy
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length
@@ -120,6 +121,10 @@ class GridHackr < ApplicationRecord
 
   def at_least_admin?
     role_level >= ROLE_LEVELS["admin"]
+  end
+
+  def has_feature?(feature_name)
+    admin? || feature_grants.exists?(feature: feature_name)
   end
 
   # Update last activity timestamp without triggering callbacks

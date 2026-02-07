@@ -2,6 +2,7 @@ class Api::GridController < ApplicationController
   include GridAuthentication
 
   before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset]
+  before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
 
   # GET /api/grid/current_hackr - Get current logged-in hackr info
   def current_hackr_info
@@ -11,7 +12,8 @@ class Api::GridController < ApplicationController
         id: current_hackr.id,
         hackr_alias: current_hackr.hackr_alias,
         role: current_hackr.role,
-        current_room: current_hackr.current_room ? room_json(current_hackr.current_room) : nil
+        current_room: current_hackr.current_room ? room_json(current_hackr.current_room) : nil,
+        features: current_hackr.admin? ? [FeatureGrant::PULSE_GRID] : current_hackr.feature_grants.pluck(:feature)
       }
     }
   end
@@ -40,7 +42,8 @@ class Api::GridController < ApplicationController
           id: hackr.id,
           hackr_alias: hackr.hackr_alias,
           role: hackr.role,
-          current_room: hackr.current_room ? room_json(hackr.current_room) : nil
+          current_room: hackr.current_room ? room_json(hackr.current_room) : nil,
+          features: hackr.admin? ? [FeatureGrant::PULSE_GRID] : hackr.feature_grants.pluck(:feature)
         }
       }
     else
@@ -175,7 +178,8 @@ class Api::GridController < ApplicationController
             id: @hackr.id,
             hackr_alias: @hackr.hackr_alias,
             role: @hackr.role,
-            current_room: @hackr.current_room ? room_json(@hackr.current_room) : nil
+            current_room: @hackr.current_room ? room_json(@hackr.current_room) : nil,
+            features: @hackr.admin? ? [FeatureGrant::PULSE_GRID] : @hackr.feature_grants.pluck(:feature)
           }
         }, status: :created
       else
