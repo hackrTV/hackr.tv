@@ -210,6 +210,9 @@ GEM
       racc (~> 1.4)
     obscenity (1.0.2)
     ostruct (0.6.3)
+    paper_trail (17.0.0)
+      activerecord (>= 7.1)
+      request_store (~> 1.4)
     parallel (1.27.0)
     parser (3.3.10.1)
       ast (~> 2.4.1)
@@ -285,6 +288,8 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
+    request_store (1.7.0)
+      rack (>= 1.4)
     rspec-core (3.13.6)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.5)
@@ -426,6 +431,7 @@ DEPENDENCIES
   jbuilder
   kamal
   obscenity
+  paper_trail
   propshaft
   puma (>= 5.0)
   rack-attack

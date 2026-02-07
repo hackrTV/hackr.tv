@@ -20,6 +20,8 @@
 #  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
 #
 class FeatureGrant < ApplicationRecord
+  has_paper_trail
+
   PULSE_GRID = "pulse_grid"
 
   belongs_to :grid_hackr

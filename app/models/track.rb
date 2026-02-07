@@ -34,6 +34,8 @@
 #  artist_id  (artist_id => artists.id)
 #
 class Track < ApplicationRecord
+  has_paper_trail
+
   belongs_to :artist
   belongs_to :album
   has_one_attached :audio_file
