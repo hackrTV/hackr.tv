@@ -36,7 +36,7 @@ export const GridConfirmEmailChangePage: React.FC = () => {
     }
 
     confirm()
-  }, [token, confirmEmailChange])
+  }, [token, confirmEmailChange, checkAuth])
 
   if (loading) {
     return (

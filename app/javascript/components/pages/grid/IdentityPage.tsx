@@ -105,7 +105,7 @@ export const IdentityPage: React.FC = () => {
                   color: '#0a0a0a',
                   border: 'none',
                   padding: '10px 20px',
-                  fontFamily: "'Courier New', monospace",
+                  fontFamily: '\'Courier New\', monospace',
                   fontWeight: 'bold',
                   cursor: emailLoading ? 'not-allowed' : 'pointer',
                   opacity: emailLoading ? 0.6 : 1
@@ -134,7 +134,7 @@ export const IdentityPage: React.FC = () => {
                 color: '#0a0a0a',
                 border: 'none',
                 padding: '10px 30px',
-                fontFamily: "'Courier New', monospace",
+                fontFamily: '\'Courier New\', monospace',
                 fontWeight: 'bold',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.6 : 1

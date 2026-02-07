@@ -351,9 +351,16 @@ class Api::GridController < ApplicationController
     hackr = token.grid_hackr
     old_email = hackr.email
 
-    ActiveRecord::Base.transaction do
-      hackr.update!(email: token.new_email)
-      token.mark_used!
+    begin
+      ActiveRecord::Base.transaction do
+        hackr.update!(email: token.new_email)
+        token.mark_used!
+      end
+    rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+      return render json: {
+        success: false,
+        error: "This email address is already in use."
+      }, status: :unprocessable_entity
     end
 
     GridMailer.email_change_notification(hackr, old_email).deliver_later
