@@ -11,7 +11,7 @@ const routeMap: Record<string, string> = {
   '1': '/xeraen',
   '2': '/wavelength_zero',
   '3': '/voiceprint',
-  '4': '/temporal_blue_drift',
+  '4': '/temporal_blue_drift'
 }
 
 interface TerminalLine {
