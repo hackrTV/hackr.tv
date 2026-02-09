@@ -16,6 +16,23 @@ module Api
         }
       end
 
+      # GET /api/admin/stats
+      def stats
+        render json: {
+          success: true,
+          stats: {
+            online_hackrs: GridHackr.online.count,
+            total_emails_sent: SentEmail.count,
+            emails_sent_24h: SentEmail.where("created_at >= ?", 24.hours.ago).count,
+            emails_sent_30d: SentEmail.where("created_at >= ?", 30.days.ago).count,
+            artists: Artist.count,
+            tracks: Track.count,
+            hackr_logs: HackrLog.count,
+            codex_entries: CodexEntry.count
+          }
+        }
+      end
+
       # GET /api/admin/rate_limit
       def rate_limit
         limit = 125
