@@ -157,6 +157,7 @@ Rails.application.routes.draw do
       # Meta
       get "capabilities", to: "meta#capabilities"
       get "rate_limit", to: "meta#rate_limit"
+      get "stats", to: "meta#stats"
 
       # Streams
       get "streams/status", to: "streams#status"

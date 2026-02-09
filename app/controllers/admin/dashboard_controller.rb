@@ -2,7 +2,7 @@ class Admin::DashboardController < Admin::ApplicationController
   def index
     @stats = {
       artists_count: Artist.count,
-      albums_count: Album.count,
+      total_emails_sent: SentEmail.count,
       tracks_count: Track.count,
       hackr_logs_count: HackrLog.count,
       codex_entries_count: CodexEntry.count,

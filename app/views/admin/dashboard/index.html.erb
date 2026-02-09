@@ -6,20 +6,47 @@
       <!-- Quick Stats -->
       <h2 class="cyan-255-text" style="margin-bottom: 20px;">[:: SYSTEM STATS ::]</h2>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
-        <div class="tui-window purple-168 white-text">
-          <fieldset class="purple-168-border">
-            <legend>Artists</legend>
+        <div class="tui-window green-168 white-text">
+          <fieldset class="green-168-border">
+            <legend>Online Hackrs</legend>
             <div style="padding: 15px; text-align: center;">
-              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:artists_count] %></p>
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:online_hackrs_count] %></p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window yellow-168 white-text">
+          <fieldset class="yellow-168-border">
+            <legend>Total Emails Sent</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:total_emails_sent] %></p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window yellow-168 white-text">
+          <fieldset class="yellow-168-border">
+            <legend>Emails Sent (30d)</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:emails_sent_30d] %></p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window yellow-168 white-text">
+          <fieldset class="yellow-168-border">
+            <legend>Emails Sent (24h)</legend>
+            <div style="padding: 15px; text-align: center;">
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:emails_sent_24h] %></p>
             </div>
           </fieldset>
         </div>
 
         <div class="tui-window purple-168 white-text">
           <fieldset class="purple-168-border">
-            <legend>Albums</legend>
+            <legend>Artists</legend>
             <div style="padding: 15px; text-align: center;">
-              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:albums_count] %></p>
+              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:artists_count] %></p>
             </div>
           </fieldset>
         </div>
@@ -47,33 +74,6 @@
             <legend>Codex Entries</legend>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:codex_entries_count] %></p>
-            </div>
-          </fieldset>
-        </div>
-
-        <div class="tui-window green-168 white-text">
-          <fieldset class="green-168-border">
-            <legend>Online Hackrs</legend>
-            <div style="padding: 15px; text-align: center;">
-              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:online_hackrs_count] %></p>
-            </div>
-          </fieldset>
-        </div>
-
-        <div class="tui-window yellow-168 white-text">
-          <fieldset class="yellow-168-border">
-            <legend>Emails Sent (24h)</legend>
-            <div style="padding: 15px; text-align: center;">
-              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:emails_sent_24h] %></p>
-            </div>
-          </fieldset>
-        </div>
-
-        <div class="tui-window yellow-168 white-text">
-          <fieldset class="yellow-168-border">
-            <legend>Emails Sent (30d)</legend>
-            <div style="padding: 15px; text-align: center;">
-              <p style="font-size: 2.5em; margin: 0;"><%= @stats[:emails_sent_30d] %></p>
             </div>
           </fieldset>
         </div>
