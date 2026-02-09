@@ -18,7 +18,7 @@ class Admin::UplinkController < Admin::ApplicationController
   def update_channel
     if @channel.update(channel_params)
       set_flash_success("Channel #{@channel.name} updated successfully.")
-      redirect_to admin_uplink_path
+      redirect_to admin_uplink_index_path
     else
       set_flash_error("Failed to update channel: #{@channel.errors.full_messages.join(", ")}")
       render :edit_channel
