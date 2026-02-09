@@ -1,6 +1,18 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
+
+const routeMap: Record<string, string> = {
+  'FM': '/fm',
+  'GRID': '/grid',
+  'CODEX': '/codex',
+  'LOGS': '/logs',
+  '0': '/thecyberpulse',
+  '1': '/xeraen',
+  '2': '/wavelength_zero',
+  '3': '/voiceprint',
+  '4': '/temporal_blue_drift'
+}
 
 interface TerminalLine {
   text: string
@@ -12,9 +24,31 @@ interface TerminalLine {
 
 export const TerminalAnimation: React.FC = () => {
   const outputRef = useRef<HTMLDivElement>(null)
-  const cursorRef = useRef<HTMLSpanElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
   const { isMobile } = useMobileDetect()
+  const [inputValue, setInputValue] = useState('')
+  const [animationDone, setAnimationDone] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const focusInput = useCallback(() => {
+    if (animationDone && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [animationDone])
+
+  const handleCommand = useCallback(() => {
+    const command = inputValue.trim().toUpperCase()
+    if (!command) return
+
+    const route = routeMap[command]
+    if (route) {
+      navigate(route)
+    } else {
+      setErrorMessage(`UNKNOWN COMMAND: ${inputValue.trim()}`)
+      setInputValue('')
+    }
+  }, [inputValue, navigate])
 
   const currentYear = new Date().getFullYear()
   const speedMultiplier = 5
@@ -92,12 +126,12 @@ export const TerminalAnimation: React.FC = () => {
   ]
 
   useEffect(() => {
-    if (!outputRef.current || !cursorRef.current) return
+    if (!outputRef.current) return
 
-    // On mobile, skip animation entirely and show all text immediately
-    if (isMobile) {
+    const renderAllLines = () => {
+      if (!outputRef.current) return
       outputRef.current.innerHTML = ''
-      lines.forEach((line, index) => {
+      lines.forEach((line) => {
         const lineElement = document.createElement('div')
         if (line.html) {
           lineElement.innerHTML = line.text
@@ -108,12 +142,13 @@ export const TerminalAnimation: React.FC = () => {
           lineElement.className = line.class
         }
         outputRef.current?.appendChild(lineElement)
-
-        // Append cursor to the last line
-        if (index === lines.length - 1 && cursorRef.current) {
-          lineElement.appendChild(cursorRef.current)
-        }
       })
+    }
+
+    // On mobile, skip animation entirely and show all text immediately
+    if (isMobile) {
+      renderAllLines()
+      setAnimationDone(true)
       return
     }
 
@@ -123,32 +158,16 @@ export const TerminalAnimation: React.FC = () => {
     let isTyping = true
     let timeoutId: number | null = null
 
+    const finishAnimation = () => {
+      setAnimationDone(true)
+    }
+
     const skipAnimation = () => {
       if (!isTyping) return
       isTyping = false
       if (timeoutId) clearTimeout(timeoutId)
-
-      if (outputRef.current) {
-        outputRef.current.innerHTML = ''
-        lines.forEach((line, index) => {
-          const lineElement = document.createElement('div')
-          if (line.html) {
-            lineElement.innerHTML = line.text
-          } else {
-            lineElement.textContent = line.text
-          }
-          if (line.class) {
-            lineElement.className = line.class
-          }
-          outputRef.current?.appendChild(lineElement)
-
-          // Append cursor to the last line
-          if (index === lines.length - 1 && cursorRef.current) {
-            lineElement.appendChild(cursorRef.current)
-          }
-        })
-      }
-
+      renderAllLines()
+      finishAnimation()
     }
 
     const typeWriter = () => {
@@ -191,14 +210,7 @@ export const TerminalAnimation: React.FC = () => {
         }
       } else {
         isTyping = false
-        // Keep cursor visible and blinking after animation completes
-        // Append cursor to the last line element
-        if (cursorRef.current && outputRef.current) {
-          const lastLine = outputRef.current.lastChild as HTMLElement
-          if (lastLine) {
-            lastLine.appendChild(cursorRef.current)
-          }
-        }
+        finishAnimation()
       }
     }
 
@@ -215,6 +227,23 @@ export const TerminalAnimation: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speedMultiplier, isMobile])
+
+  // When animation completes, remove the last "> " prompt line from the DOM output
+  // (it will be replaced by the React-managed interactive prompt line)
+  useEffect(() => {
+    if (animationDone && outputRef.current) {
+      const lastChild = outputRef.current.lastChild as HTMLElement
+      if (lastChild && lastChild.textContent?.trim().startsWith('>') && lastChild.textContent.trim().length <= 1) {
+        outputRef.current.removeChild(lastChild)
+      }
+      // Delay focus so the skip keypress doesn't propagate into the input
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      })
+    }
+  }, [animationDone])
 
   // Add click handlers for links to use React Router navigation
   useEffect(() => {
@@ -305,11 +334,68 @@ export const TerminalAnimation: React.FC = () => {
         .terminal-header {
           color: #5cb3cc;
         }
+
+        .terminal-input-line {
+          display: flex;
+          align-items: center;
+          position: relative;
+          line-height: 1.6;
+        }
+
+        .terminal-typed-text {
+          color: #33cc33;
+          white-space: pre;
+        }
+
+        .terminal-hidden-input {
+          position: absolute;
+          opacity: 0;
+          width: 0;
+          height: 0;
+          padding: 0;
+          border: none;
+          pointer-events: none;
+        }
+
+        .terminal-error {
+          color: #ff6633;
+          font-weight: bold;
+          line-height: 1.6;
+          white-space: pre-wrap;
+        }
       `}</style>
 
-      <div className="terminal-container">
+      <div className="terminal-container" onClick={focusInput}>
         <div ref={outputRef} className="terminal-output"></div>
-        <span ref={cursorRef} className="terminal-cursor"></span>
+        {animationDone && (
+          <div className="terminal-input-line terminal-prompt">
+            <span>{'> '}</span>
+            <span className="terminal-typed-text">{inputValue}</span>
+            <span className="terminal-cursor"></span>
+            <input
+              ref={inputRef}
+              type="text"
+              className="terminal-hidden-input"
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value)
+                setErrorMessage(null)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleCommand()
+                }
+              }}
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
+        )}
+        {errorMessage && (
+          <div className="terminal-error">{errorMessage}</div>
+        )}
       </div>
     </>
   )
