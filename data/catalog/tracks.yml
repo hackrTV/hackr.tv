@@ -2746,3 +2746,33 @@ tracks:
   duration: "2:07:25"
   audio_file: "21190522_taking_off_from_the_hackr_hangar.ogg"
   show_in_pulse_vault: false
+
+# XERAEN - Encrypted Shroud (Single)
+- slug: encrypted-shroud
+  album_slug: encrypted-shroud
+  title: "Encrypted Shroud"
+  track_number: 1
+  duration: "2:27"
+  audio_file: "encrypted-shroud.ogg"
+
+# XERAEN - XORDIUM (EP)
+- slug: xordium
+  album_slug: xordium
+  title: "XORDIUM"
+  track_number: 1
+  duration: "2:44"
+  audio_file: "xordium.ogg"
+
+- slug: power-to-the-hackrs
+  album_slug: xordium
+  title: "Power To The Hackrs"
+  track_number: 2
+  duration: "2:46"
+  audio_file: "power-to-the-hackrs.ogg"
+
+- slug: settle-the-score
+  album_slug: xordium
+  title: "Settle The Score"
+  track_number: 3
+  duration: "2:41"
+  audio_file: "settle-the-score.ogg"
