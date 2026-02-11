@@ -16,7 +16,6 @@ module Terminal
 
         @current_channel = nil
         @messages = []
-        @last_message_at = {}
 
         clear_screen
         display_banner
@@ -225,6 +224,12 @@ module Terminal
           return
         end
 
+        # Re-check channel access (conditions may have changed since join)
+        unless @current_channel.accessible_by?(hackr)
+          println renderer.colorize("Access to ##{@current_channel.slug} is no longer available.", :red)
+          return
+        end
+
         # Check punishments
         if UserPunishment.blackedout?(hackr)
           println renderer.colorize("You have been blackedout from Uplink.", :red)
@@ -236,11 +241,15 @@ module Terminal
           return
         end
 
-        # Check slow mode
+        # Check slow mode against persisted timestamps (matches API behavior)
         if @current_channel.slow_mode_seconds > 0
-          last = @last_message_at[@current_channel.id]
-          if last && (Time.current - last) < @current_channel.slow_mode_seconds
-            remaining = (@current_channel.slow_mode_seconds - (Time.current - last)).ceil
+          last_message = @current_channel.chat_messages
+            .where(grid_hackr: hackr)
+            .order(created_at: :desc)
+            .first
+
+          if last_message && last_message.created_at > @current_channel.slow_mode_seconds.seconds.ago
+            remaining = (@current_channel.slow_mode_seconds - (Time.current - last_message.created_at)).ceil
             println renderer.colorize("Slow mode active. Wait #{remaining}s.", :amber)
             return
           end
@@ -263,7 +272,6 @@ module Terminal
 
         begin
           if message.save
-            @last_message_at[@current_channel.id] = Time.current
             @messages << message
             # Trim cached messages
             @messages.shift if @messages.size > RECENT_PACKET_LIMIT
