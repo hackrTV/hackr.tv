@@ -23,7 +23,7 @@ FactoryBot.define do
   factory :chat_channel do
     sequence(:slug) { |n| "channel#{n}" }
     sequence(:name) { |n| "#channel#{n}" }
-    description { "A test chat channel" }
+    description { "A test comms channel" }
     is_active { true }
     requires_livestream { false }
     slow_mode_seconds { 0 }

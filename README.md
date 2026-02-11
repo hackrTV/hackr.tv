@@ -72,16 +72,16 @@
 - **User Profiles** - View any user's pulse history at `/wire/:username`
 - **Admin Moderation** - SignalDrop system for content moderation
 
-### Uplink - Chat System
-- **Channel-Based Chat** - Real-time messaging with multiple configurable channels
+### Uplink - Comms System
+- **Channel-Based Comms** - Real-time messaging with multiple configurable channels
 - **Slow Mode** - Configurable rate limiting per channel
 - **Role-Based Access** - Channels can require minimum roles
 - **Livestream Integration** - Channels that activate during livestreams
-- **Popout Mode** - Detachable chat window at `/uplink/popout`
+- **Popout Mode** - Detachable Uplink window at `/uplink/popout`
 - **Moderation** - Squelch, blackout, and punishment management
 
 ### THE PULSE GRID - MUD
-- **Real-time Multiplayer** - Live chat and movement tracking via Action Cable
+- **Real-time Multiplayer** - Live comms and movement tracking via Action Cable
 - **Interactive NPCs** - Rich dialogue trees with detailed conversations
   - Fracture Network Coordinator (8 topics: mission, fracture, help, station, synthia, govcorp, ride, prism)
   - Temporal Theorist (8 topics: time, paradox, xeraen, future, discovery, ride, prism, synthia)
@@ -213,7 +213,7 @@
    - Playlists: http://localhost:3000/fm/playlists (requires Grid login)
    - The Codex: http://localhost:3000/codex
    - PulseWire: http://localhost:3000/wire
-   - Uplink Chat: http://localhost:3000/uplink
+   - Uplink: http://localhost:3000/uplink
    - Admin Dashboard: http://localhost:3000/root (requires Grid admin account)
 
 ---
@@ -235,7 +235,7 @@ drop [item]            - Drop an item
 examine [item]         - Inspect an item closely
 talk [npc]             - Initiate conversation with an NPC
 ask [npc] about [topic] - Ask an NPC about a specific topic
-say [message]          - Chat with other players in the room
+say [message]          - Talk to other players in the room
 who                    - List online players
 help                   - Show command reference
 clear (cls)            - Clear the screen
@@ -286,7 +286,7 @@ hackr.tv/
 │   └── channels/
 │       ├── grid_channel.rb            # Real-time multiplayer (Action Cable)
 │       ├── pulse_wire_channel.rb      # PulseWire social feed updates
-│       ├── uplink_channel.rb          # Uplink chat
+│       ├── uplink_channel.rb          # Uplink comms
 │       └── overlay_channel.rb         # OBS overlay broadcasts
 ├── data/                              # YAML seed data
 │   ├── artists.yml                    # 15 artists
@@ -420,7 +420,7 @@ See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
 - **grid_exits** - directional connections between rooms
 - **grid_items** - objects in rooms or inventories
 - **grid_mobs** - NPCs with dialogue trees (dialogue_tree JSON column)
-- **grid_messages** - chat and system messages
+- **grid_messages** - comms and system messages
 
 ### Account Management
 - **grid_registration_tokens** - email, token, expires_at, used_at, ip_address
@@ -428,7 +428,7 @@ See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
 - **feature_grants** - grid_hackr_id, feature (controls access to features like THE PULSE GRID)
 - **sent_emails** - to, from, subject, mailer_class, mailer_action, emailable (polymorphic)
 
-### Uplink Chat
+### Uplink
 - **chat_channels** - name, slug, description, minimum_role, requires_livestream, slow_mode_seconds, is_active
 - **chat_messages** - content, dropped, belongs_to :chat_channel, belongs_to :grid_hackr
 
@@ -507,7 +507,7 @@ See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
 - OBS Overlay system - Scenes, groups, now playing, lower thirds, tickers, alerts
 - Hackr Streams - Livestream management with go live/VOD support
 - Zone Playlists - Per-zone ambient music for THE PULSE GRID
-- Uplink chat - Channel-based real-time chat with moderation and popout mode
+- Uplink - Channel-based real-time comms with moderation and popout mode
 - Email system - Registration verification, password reset, email change, sent email tracking
 - Background infrastructure - Solid Queue, Solid Cache, Solid Cable configured
 - Comprehensive test suite - 1376 backend + 163 frontend tests (1539 total)

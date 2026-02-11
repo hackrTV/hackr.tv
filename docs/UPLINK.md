@@ -1,6 +1,6 @@
 # Uplink
 
-Real-time chat system for hackr.tv with channel-based communication.
+Real-time comms system for hackr.tv with channel-based communication.
 
 **Status:** Planned
 
@@ -8,7 +8,7 @@ Real-time chat system for hackr.tv with channel-based communication.
 
 ## Overview
 
-Uplink is a real-time chat feature that allows operatives to communicate across two channels:
+Uplink is a real-time comms feature that allows operatives to communicate across two channels:
 
 - **#ambient** — Always available, persistent background chatter
 - **#live** — Active only during livestreams, displayed alongside the stream
@@ -21,8 +21,8 @@ Anonymous users cannot see or access Uplink. Authentication is required.
 
 | Term | Definition |
 |------|------------|
-| **Uplink** | The chat feature/system |
-| **Packet** | A single chat message |
+| **Uplink** | The comms feature/system |
+| **Packet** | A single comms message |
 | **#ambient** | Always-on channel for general discussion |
 | **#live** | Livestream-only channel, active when stream is live |
 | **Operative** | Regular user |
@@ -94,7 +94,7 @@ Admin-configurable channel settings.
 
 ### ChatMessage (Packet)
 
-Individual chat messages.
+Individual packets (messages).
 
 | Field | Type | Description |
 |-------|------|-------------|

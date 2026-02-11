@@ -22,6 +22,7 @@ require_relative "terminal/handlers/bands_handler"
 require_relative "terminal/handlers/vault_handler"
 require_relative "terminal/handlers/login_handler"
 require_relative "terminal/handlers/register_handler"
+require_relative "terminal/handlers/uplink_handler"
 
 module Terminal
   VERSION = "1.0.0"

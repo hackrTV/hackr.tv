@@ -12,12 +12,17 @@ module Terminal
       @session = session
       @wire_callback = nil
       @grid_callback = nil
+      @uplink_callback = nil
       @wire_subscription = nil
       @grid_subscription = nil
+      @uplink_subscription = nil
       @current_room_stream = nil
+      @current_uplink_stream = nil
       @mutex = Mutex.new
       @seen_pulse_ids = []
       @seen_grid_events = []
+      @seen_packet_ids = []
+      @local_packet_ids = []
     end
 
     # Register a callback for wire events
@@ -31,6 +36,43 @@ module Terminal
     # @param block [Proc] Callback to invoke with event data
     def on_grid(&block)
       @grid_callback = block
+    end
+
+    # Register a callback for uplink chat events
+    # @param block [Proc] Callback to invoke with new packet data
+    def on_uplink(&block)
+      @uplink_callback = block
+    end
+
+    # Subscribe to an uplink channel stream
+    # @param stream_name [String] Stream name (e.g., "uplink:ambient")
+    def subscribe_uplink(stream_name)
+      @mutex.synchronize do
+        unsubscribe_uplink_internal
+        @current_uplink_stream = stream_name
+        return unless @uplink_callback
+
+        @uplink_subscription = ->(message) { handle_uplink_message(message) }
+        pubsub.subscribe(@current_uplink_stream, @uplink_subscription)
+        Rails.logger.info "Terminal: Subscribed to #{@current_uplink_stream}"
+      end
+    end
+
+    # Unsubscribe from the current uplink channel
+    def unsubscribe_uplink
+      @mutex.synchronize { unsubscribe_uplink_internal }
+    end
+
+    # Clear only the uplink callback (without unsubscribing)
+    def clear_uplink_callback
+      @uplink_callback = nil
+    end
+
+    # Track a packet ID as sent from this terminal session
+    # @param packet_id [Integer] The ID of the locally-sent packet
+    def track_local_packet(packet_id)
+      @local_packet_ids << packet_id
+      @local_packet_ids.shift if @local_packet_ids.size > 50
     end
 
     # Start monitoring a specific room for grid events
@@ -55,19 +97,22 @@ module Terminal
     def stop
       unsubscribe_wire
       unsubscribe_grid
+      unsubscribe_uplink
     end
 
     # Clear all callbacks and unsubscribe
     def clear_callbacks
       @wire_callback = nil
       @grid_callback = nil
+      @uplink_callback = nil
       unsubscribe_wire
       unsubscribe_grid
+      unsubscribe_uplink
     end
 
     # Check if actively subscribed (for compatibility)
     def running?
-      @wire_subscription.present? || @grid_subscription.present?
+      @wire_subscription.present? || @grid_subscription.present? || @uplink_subscription.present?
     end
 
     # No-op for compatibility with polling interface
@@ -209,6 +254,55 @@ module Terminal
         Rails.logger.error "Terminal: Failed to parse grid message: #{e.message}"
       rescue => e
         Rails.logger.error "Terminal: Error handling grid message: #{e.message}"
+      end
+    end
+
+    def unsubscribe_uplink_internal
+      return unless @uplink_subscription && @current_uplink_stream
+
+      pubsub.unsubscribe(@current_uplink_stream, @uplink_subscription)
+      @uplink_subscription = nil
+      @current_uplink_stream = nil
+      Rails.logger.info "Terminal: Unsubscribed from uplink channel"
+    end
+
+    def handle_uplink_message(message)
+      return unless @uplink_callback
+
+      begin
+        data = JSON.parse(message, symbolize_names: true)
+
+        # Only handle new_packet events
+        return unless data[:type] == "new_packet" && data[:packet]
+
+        packet = data[:packet]
+        packet_id = packet[:id]
+
+        # Skip duplicates
+        return if @seen_packet_ids.include?(packet_id)
+        @seen_packet_ids << packet_id
+        @seen_packet_ids.shift if @seen_packet_ids.size > 50
+
+        # Skip dropped packets
+        return if packet[:dropped]
+
+        # Skip packets sent from this terminal session
+        return if @local_packet_ids.include?(packet_id)
+
+        event = {
+          type: "new_packet",
+          id: packet_id,
+          hackr_alias: packet[:grid_hackr]&.dig(:hackr_alias) || "Unknown",
+          role: packet[:grid_hackr]&.dig(:role),
+          content: packet[:content],
+          created_at: packet[:created_at]
+        }
+
+        @uplink_callback.call(event)
+      rescue JSON::ParserError => e
+        Rails.logger.error "Terminal: Failed to parse uplink message: #{e.message}"
+      rescue => e
+        Rails.logger.error "Terminal: Error handling uplink message: #{e.message}"
       end
     end
 

@@ -257,7 +257,7 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({
           {allowPopout && onPopout && (
             <button
               onClick={onPopout}
-              title="Pop out chat"
+              title="Pop out Uplink"
               style={{
                 background: 'none',
                 border: '1px solid #444',
@@ -339,7 +339,7 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({
                 color: '#ff5555'
               }}
             >
-              You have been blackouted from chat.
+              You have been blackedout from Uplink.
             </div>
           ) : currentHackr.is_squelched ? (
             <div

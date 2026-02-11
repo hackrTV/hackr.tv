@@ -8,7 +8,7 @@ channels = [
   {
     slug: "ambient",
     name: "#ambient",
-    description: "Always-on ambient chat channel. Connect with other operatives anytime.",
+    description: "Always-on ambient comms channel. Connect with other operatives anytime.",
     is_active: true,
     requires_livestream: false,
     slow_mode_seconds: 0,
@@ -17,7 +17,7 @@ channels = [
   {
     slug: "live",
     name: "#live",
-    description: "Livestream-only chat channel. Active during live broadcasts.",
+    description: "Livestream-only comms channel. Active during live broadcasts.",
     is_active: true,
     requires_livestream: true,
     slow_mode_seconds: 3,

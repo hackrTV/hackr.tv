@@ -21,7 +21,7 @@ module Api
           if UserPunishment.blackouted?(@acting_hackr)
             return render json: {
               success: false,
-              error: "This hackr has been blackouted from chat."
+              error: "This hackr has been blackedout from Uplink."
             }, status: :forbidden
           end
 
