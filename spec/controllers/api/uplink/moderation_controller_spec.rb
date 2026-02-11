@@ -61,7 +61,7 @@ RSpec.describe Api::Uplink::ModerationController, type: :controller do
       it "blackouts the target user" do
         expect {
           post :blackout, params: {id: target_hackr.id, reason: "Harassment"}, format: :json
-        }.to change { UserPunishment.blackouted?(target_hackr) }.from(false).to(true)
+        }.to change { UserPunishment.blackedout?(target_hackr) }.from(false).to(true)
 
         expect(response).to have_http_status(:success)
         json = JSON.parse(response.body)

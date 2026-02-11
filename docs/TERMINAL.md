@@ -167,7 +167,7 @@ Implemented **direct Action Cable pubsub subscription** that:
 - Registers callback on enter, clears on leave
 - Updates monitored room subscription on player movement
 - Displays real-time events:
-  - `@alias says: "message"` - Chat messages
+  - `@alias says: "message"` - Uplink packets
   - `@alias arrives from the south.` - Player arrivals
   - `@alias leaves to the north.` - Player departures
   - `@alias picks up item.` / `@alias drops item.` - Item actions

@@ -11,7 +11,8 @@ module Terminal
         "2" => {label: "PulseWire", state: :on_wire, auth: false, description: "Social feed"},
         "3" => {label: "The Codex", state: :in_codex, auth: false, description: "Lore archive"},
         "4" => {label: "hackr.fm", state: :in_bands, auth: false, description: "Band profiles"},
-        "5" => {label: "Pulse Vault", state: :in_vault, auth: false, description: "Track listings"}
+        "5" => {label: "Pulse Vault", state: :in_vault, auth: false, description: "Track listings"},
+        "6" => {label: "Uplink", state: :on_uplink, auth: true, description: "Real-time signal"}
       }.freeze
 
       AUTH_ITEMS = {
@@ -130,7 +131,7 @@ module Terminal
         println renderer.header("HELP", color: :cyan)
         println ""
         println renderer.colorize("  Navigation:", :amber)
-        println "    Type a number (1-5) to enter a system"
+        println "    Type a number (1-6) to enter a system"
         println "    Type 'L' to login, 'R' to register"
         println "    Type 'Q' to disconnect"
         println ""
@@ -141,6 +142,7 @@ module Terminal
         println "    /codex   - Jump to The Codex"
         println "    /bands   - Jump to hackr.fm"
         println "    /vault   - Jump to Pulse Vault"
+        println "    /uplink  - Connect to Uplink"
         println "    back     - Go back to previous screen"
         println "    who      - See who's online"
         println ""

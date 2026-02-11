@@ -33,6 +33,8 @@ class ApplicationController < ActionController::Base
   end
 
   def check_for_domain_redirect
+    return if performed?
+
     domain = request.host.downcase
 
     # Determine if running in development or production

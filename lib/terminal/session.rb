@@ -17,6 +17,7 @@ module Terminal
       in_codex
       in_bands
       in_vault
+      on_uplink
       login
       register
     ].freeze
@@ -30,6 +31,7 @@ module Terminal
       "/codex" => :in_codex,
       "/bands" => :in_bands,
       "/vault" => :in_vault,
+      "/uplink" => :on_uplink,
       "quit" => :disconnect,
       "exit" => :disconnect,
       "disconnect" => :disconnect
@@ -288,6 +290,8 @@ module Terminal
         Handlers::BandsHandler.new(self)
       when :in_vault
         Handlers::VaultHandler.new(self)
+      when :on_uplink
+        Handlers::UplinkHandler.new(self)
       when :login
         Handlers::LoginHandler.new(self)
       when :register

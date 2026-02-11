@@ -98,7 +98,7 @@ RSpec.describe Api::Uplink::PacketsController, type: :controller do
         end
       end
 
-      context "when user is blackouted" do
+      context "when user is blackedout" do
         before do
           create(:user_punishment, :blackout, grid_hackr: hackr)
         end
@@ -108,7 +108,7 @@ RSpec.describe Api::Uplink::PacketsController, type: :controller do
 
           expect(response).to have_http_status(:forbidden)
           json = JSON.parse(response.body)
-          expect(json["error"]).to include("blackouted")
+          expect(json["error"]).to include("blackedout")
         end
       end
 

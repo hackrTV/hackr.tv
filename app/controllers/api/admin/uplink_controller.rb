@@ -18,10 +18,10 @@ module Api
             }, status: :forbidden
           end
 
-          if UserPunishment.blackouted?(@acting_hackr)
+          if UserPunishment.blackedout?(@acting_hackr)
             return render json: {
               success: false,
-              error: "This hackr has been blackouted from chat."
+              error: "This hackr has been blackedout from Uplink."
             }, status: :forbidden
           end
 

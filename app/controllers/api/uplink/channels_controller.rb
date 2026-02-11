@@ -56,7 +56,7 @@ module Api
           hackr_alias: current_hackr.hackr_alias,
           role: current_hackr.role,
           is_squelched: UserPunishment.squelched?(current_hackr),
-          is_blackouted: UserPunishment.blackouted?(current_hackr)
+          is_blackedout: UserPunishment.blackedout?(current_hackr)
         }
       end
     end

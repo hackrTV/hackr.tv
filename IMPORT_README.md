@@ -35,7 +35,7 @@ data/
 │   └── tracks.yml
 ├── system/
 │   ├── hackrs.yml             # GridHackr users
-│   ├── channels.yml           # Chat channels
+│   ├── channels.yml           # Uplink channels
 │   ├── radio_stations.yml     # Radio stations
 │   ├── zone_playlists.yml     # Ambient zone playlists
 │   └── redirects.yml          # Domain redirects

@@ -95,7 +95,7 @@ RSpec.describe Api::Admin::UplinkController, type: :controller do
         expect(body["error"]).to include("squelched")
       end
 
-      it "blocks blackouted non-admin hackr" do
+      it "blocks blackedout non-admin hackr" do
         issuer = create(:grid_hackr, :admin)
         UserPunishment.blackout!(operative, issued_by: issuer, reason: "test")
 
@@ -107,7 +107,7 @@ RSpec.describe Api::Admin::UplinkController, type: :controller do
 
         expect(response).to have_http_status(:forbidden)
         body = JSON.parse(response.body)
-        expect(body["error"]).to include("blackouted")
+        expect(body["error"]).to include("blackedout")
       end
 
       it "enforces slow mode for non-admin hackr" do

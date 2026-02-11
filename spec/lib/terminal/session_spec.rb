@@ -212,6 +212,13 @@ RSpec.describe Terminal::Session do
       expect(session.current_handler).to be_a(Terminal::Handlers::VaultHandler)
     end
 
+    it "returns UplinkHandler for on_uplink state" do
+      session.authenticate(create(:grid_hackr))
+      session.transition_to(:on_uplink)
+
+      expect(session.current_handler).to be_a(Terminal::Handlers::UplinkHandler)
+    end
+
     it "returns LoginHandler for login state" do
       # LoginHandler requires input for perform_login during on_enter
       # Test the handler building logic directly
@@ -281,6 +288,14 @@ RSpec.describe Terminal::Session do
       session.send(:process_input, "/vault")
 
       expect(session.state).to eq(:in_vault)
+    end
+
+    it "handles /uplink command" do
+      session.authenticate(create(:grid_hackr))
+      session.transition_to(:menu)
+      session.send(:process_input, "/uplink")
+
+      expect(session.state).to eq(:on_uplink)
     end
 
     it "handles quit command" do
@@ -387,7 +402,7 @@ RSpec.describe Terminal::Session do
     it "includes all expected states" do
       expected_states = %i[
         connecting anonymous authenticated menu
-        in_grid on_wire in_codex in_bands in_vault
+        in_grid on_wire in_codex in_bands in_vault on_uplink
         login register
       ]
 
