@@ -97,7 +97,7 @@ RSpec.describe "Api::Admin::Uplink", type: :request do
         expect(response).to have_http_status(:forbidden)
       end
 
-      it "blocks blackouted hackr" do
+      it "blocks blackedout hackr" do
         issuer = create(:grid_hackr, :admin)
         UserPunishment.blackout!(operative, issued_by: issuer)
 
@@ -198,7 +198,7 @@ RSpec.describe "Api::Admin::Uplink", type: :request do
         expect(response).to have_http_status(:forbidden)
       end
 
-      it "regular uplink API blocks blackouted user" do
+      it "regular uplink API blocks blackedout user" do
         issuer = create(:grid_hackr, :admin)
         UserPunishment.blackout!(operative, issued_by: issuer)
         operative.generate_api_token!

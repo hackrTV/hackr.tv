@@ -68,11 +68,26 @@ module Terminal
       @uplink_callback = nil
     end
 
-    # Track a packet ID as sent from this terminal session
+    # Suppress own-hackr packets during an active send to avoid
+    # a race between after_create_commit broadcast and track_local_packet.
+    # Call before message.save, then track_local_packet after save.
+    #
+    # NOTE: During the brief suppression window, legitimate packets from the
+    # same hackr sent via other clients (e.g. web) will also be dropped. This
+    # window is sub-millisecond in practice (between save and track_local_packet)
+    # so the likelihood is negligible. If per-client filtering is ever needed,
+    # replace this with a per-client origin token included in the broadcast payload.
+    def suppress_own_uplink_packets!
+      @suppress_own_uplink = true
+    end
+
+    # Track a packet ID as sent from this terminal session and
+    # end the suppression window.
     # @param packet_id [Integer] The ID of the locally-sent packet
     def track_local_packet(packet_id)
       @local_packet_ids << packet_id
       @local_packet_ids.shift if @local_packet_ids.size > 50
+      @suppress_own_uplink = false
     end
 
     # Start monitoring a specific room for grid events
@@ -288,6 +303,11 @@ module Terminal
 
         # Skip packets sent from this terminal session
         return if @local_packet_ids.include?(packet_id)
+
+        # Skip own-hackr packets during active send (race guard)
+        if @suppress_own_uplink && session.hackr && packet[:grid_hackr]
+          return if packet[:grid_hackr][:id] == session.hackr.id
+        end
 
         event = {
           type: "new_packet",

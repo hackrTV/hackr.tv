@@ -205,6 +205,13 @@ module Terminal
         session.output.puts "  #{renderer.colorize(time, :gray)} #{badge}#{renderer.colorize("@#{event[:hackr_alias]}", :purple)}: #{event[:content]}"
         session.output.print prompt
         session.output.flush
+
+        # Keep history in sync with what the user has seen
+        msg = ChatMessage.find_by(id: event[:id])
+        if msg
+          @messages << msg
+          @messages.shift if @messages.size > RECENT_PACKET_LIMIT
+        end
       end
 
       def send_message(content)
@@ -219,8 +226,8 @@ module Terminal
         end
 
         # Check punishments
-        if UserPunishment.blackouted?(hackr)
-          println renderer.colorize("You are blackouted from Uplink.", :red)
+        if UserPunishment.blackedout?(hackr)
+          println renderer.colorize("You have been blackedout from Uplink.", :red)
           return
         end
 
@@ -251,15 +258,22 @@ module Terminal
           grid_hackr: hackr
         )
 
-        if message.save
-          @last_message_at[@current_channel.id] = Time.current
-          @messages << message
-          # Trim cached messages
-          @messages.shift if @messages.size > RECENT_PACKET_LIMIT
-          # Track so realtime subscriber skips this packet (sent from here)
-          session.realtime.track_local_packet(message.id)
-        else
-          println renderer.colorize("Failed: #{message.errors.full_messages.join(", ")}", :red)
+        # Suppress own packets before save to avoid race with after_create_commit broadcast
+        session.realtime.suppress_own_uplink_packets!
+
+        begin
+          if message.save
+            @last_message_at[@current_channel.id] = Time.current
+            @messages << message
+            # Trim cached messages
+            @messages.shift if @messages.size > RECENT_PACKET_LIMIT
+            # Track packet ID and end suppression window
+            session.realtime.track_local_packet(message.id)
+          else
+            println renderer.colorize("Failed: #{message.errors.full_messages.join(", ")}", :red)
+          end
+        ensure
+          session.realtime.track_local_packet(-1) unless message.persisted?
         end
       end
 

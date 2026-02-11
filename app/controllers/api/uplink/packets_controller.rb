@@ -25,8 +25,8 @@ module Api
 
       # POST /api/uplink/channels/:channel_slug/packets
       def create
-        # Check if user is blackouted
-        if UserPunishment.blackouted?(current_hackr)
+        # Check if user is blackedout
+        if UserPunishment.blackedout?(current_hackr)
           return render json: {
             success: false,
             error: "You have been blackedout from Uplink."

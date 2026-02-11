@@ -49,8 +49,8 @@ class UserPunishment < ApplicationRecord
     active_for(hackr, "squelch").exists?
   end
 
-  # Check if a hackr is currently blackouted (banned from chat)
-  def self.blackouted?(hackr)
+  # Check if a hackr is currently blackedout (banned from chat)
+  def self.blackedout?(hackr)
     active_for(hackr, "blackout").exists?
   end
 

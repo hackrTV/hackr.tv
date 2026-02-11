@@ -129,12 +129,12 @@ RSpec.describe Terminal::Handlers::UplinkHandler do
       expect(ChatMessage.count).to eq(0)
     end
 
-    it "rejects messages when blackouted" do
+    it "rejects messages when blackedout" do
       create(:user_punishment, grid_hackr: hackr, issued_by: other_hackr, punishment_type: "blackout")
 
       handler.handle("say test")
 
-      expect(output.string).to include("blackouted")
+      expect(output.string).to include("blackedout")
       expect(ChatMessage.count).to eq(0)
     end
 
@@ -316,6 +316,51 @@ RSpec.describe Terminal::Handlers::UplinkHandler do
       sleep 0.1
 
       expect(received_events).to be_empty
+    end
+
+    it "suppresses own-hackr packets during active send (race guard)" do
+      received_events = []
+
+      session.realtime.on_uplink { |event| received_events << event }
+      session.realtime.subscribe_uplink(channel.stream_name)
+
+      # Simulate the race: suppress is set before save, but broadcast arrives
+      # before track_local_packet registers the ID
+      session.realtime.suppress_own_uplink_packets!
+
+      ActionCable.server.broadcast(channel.stream_name, {
+        type: "new_packet",
+        packet: {
+          id: 888,
+          content: "Race condition packet",
+          dropped: false,
+          grid_hackr: {id: hackr.id, hackr_alias: hackr.hackr_alias, role: hackr.role},
+          created_at: Time.current.iso8601
+        }
+      })
+
+      sleep 0.1
+
+      expect(received_events).to be_empty
+
+      # After tracking, suppression ends and other-user packets come through again
+      session.realtime.track_local_packet(888)
+
+      ActionCable.server.broadcast(channel.stream_name, {
+        type: "new_packet",
+        packet: {
+          id: 890,
+          content: "From another user after suppression ends",
+          dropped: false,
+          grid_hackr: {id: other_hackr.id, hackr_alias: other_hackr.hackr_alias, role: "operative"},
+          created_at: Time.current.iso8601
+        }
+      })
+
+      sleep 0.1
+
+      expect(received_events.size).to eq(1)
+      expect(received_events.first[:content]).to eq("From another user after suppression ends")
     end
   end
 

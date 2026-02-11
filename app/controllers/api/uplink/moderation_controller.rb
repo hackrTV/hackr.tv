@@ -38,10 +38,10 @@ module Api
         duration = params[:duration_minutes]&.to_i
         reason = params[:reason]
 
-        if UserPunishment.blackouted?(@target)
+        if UserPunishment.blackedout?(@target)
           return render json: {
             success: false,
-            error: "User is already blackouted"
+            error: "User is already blackedout"
           }, status: :unprocessable_entity
         end
 
@@ -54,7 +54,7 @@ module Api
 
         render json: {
           success: true,
-          message: "#{@target.hackr_alias} has been blackouted#{duration ? " for #{duration} minutes" : " permanently"}"
+          message: "#{@target.hackr_alias} has been blackedout#{duration ? " for #{duration} minutes" : " permanently"}"
         }
       end
 

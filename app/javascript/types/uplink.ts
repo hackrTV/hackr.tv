@@ -3,7 +3,7 @@ export interface UplinkHackr {
   hackr_alias: string
   role: string
   is_squelched?: boolean
-  is_blackouted?: boolean
+  is_blackedout?: boolean
 }
 
 export interface ChatChannel {

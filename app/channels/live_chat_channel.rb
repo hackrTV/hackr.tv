@@ -15,8 +15,8 @@ class LiveChatChannel < ApplicationCable::Channel
       return
     end
 
-    # Check if user is blackouted
-    if current_hackr && UserPunishment.blackouted?(current_hackr)
+    # Check if user is blackedout
+    if current_hackr && UserPunishment.blackedout?(current_hackr)
       Rails.logger.warn "=== LiveChatChannel: Blackouted user #{current_hackr.hackr_alias} attempted to connect ==="
       reject
       return

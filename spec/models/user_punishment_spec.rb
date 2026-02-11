@@ -161,16 +161,16 @@ RSpec.describe UserPunishment, type: :model do
     end
   end
 
-  describe ".blackouted?" do
+  describe ".blackedout?" do
     let(:hackr) { create(:grid_hackr) }
 
     it "returns true when user has active blackout" do
       create(:user_punishment, :blackout, grid_hackr: hackr)
-      expect(UserPunishment.blackouted?(hackr)).to be true
+      expect(UserPunishment.blackedout?(hackr)).to be true
     end
 
     it "returns false when user has no active blackout" do
-      expect(UserPunishment.blackouted?(hackr)).to be false
+      expect(UserPunishment.blackedout?(hackr)).to be false
     end
   end
 

@@ -330,7 +330,7 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({
       {/* Input area */}
       {isChannelAvailable && (
         currentHackr ? (
-          currentHackr.is_blackouted ? (
+          currentHackr.is_blackedout ? (
             <div
               style={{
                 padding: '16px',

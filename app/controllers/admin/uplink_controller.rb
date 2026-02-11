@@ -151,11 +151,11 @@ class Admin::UplinkController < Admin::ApplicationController
     duration = params[:duration_minutes].presence&.to_i
     reason = params[:reason].presence
 
-    if UserPunishment.blackouted?(hackr)
-      set_flash_error("#{hackr.hackr_alias} is already blackouted.")
+    if UserPunishment.blackedout?(hackr)
+      set_flash_error("#{hackr.hackr_alias} is already blackedout.")
     else
       UserPunishment.blackout!(hackr, issued_by: current_hackr, duration_minutes: duration, reason: reason)
-      set_flash_success("#{hackr.hackr_alias} has been blackouted#{duration ? " for #{duration} minutes" : " permanently"}.")
+      set_flash_success("#{hackr.hackr_alias} has been blackedout#{duration ? " for #{duration} minutes" : " permanently"}.")
     end
 
     redirect_back(fallback_location: punishments_admin_uplink_index_path)
