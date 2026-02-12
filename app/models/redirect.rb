@@ -27,6 +27,6 @@ class Redirect < ApplicationRecord
       .order(Arel.sql("domain DESC NULLS LAST"))
 
     by_domain.where("LOWER(path) = LOWER(?)", path).first ||
-      (path != normalized ? by_domain.where("LOWER(path) = LOWER(?)", normalized).first : nil)
+      ((path != normalized) ? by_domain.where("LOWER(path) = LOWER(?)", normalized).first : nil)
   end
 end
