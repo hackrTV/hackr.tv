@@ -11,12 +11,20 @@ module Api
         # Get all tracks with Pulse Vault ordering
         @tracks = Track.visible_in_pulse_vault.includes(:artist, :album).order(
           Arel.sql(<<-SQL.squish
-            CASE
-              WHEN artists.name = 'The.CyberPul.se' THEN 0
-              WHEN artists.name = 'XERAEN' THEN 1
-              ELSE 2
+            CASE artists.name
+              WHEN 'The.CyberPul.se' THEN 0
+              WHEN 'XERAEN' THEN 1
+              WHEN 'Wavelength Zero' THEN 2
+              WHEN 'Voiceprint' THEN 3
+              WHEN 'Temporal Blue Drift' THEN 4
+              WHEN 'heartbreak_havoc.sh' THEN 5
+              WHEN 'System Rot' THEN 6
+              WHEN 'Apex Overdrive' THEN 7
+              WHEN 'Cipher Protocol' THEN 8
+              WHEN 'Neon Hearts' THEN 9
+              ELSE 10
             END,
-            CASE WHEN artists.name IN ('The.CyberPul.se', 'XERAEN') THEN '' ELSE artists.name END,
+            CASE WHEN artists.name IN ('The.CyberPul.se', 'XERAEN', 'Wavelength Zero', 'Voiceprint', 'Temporal Blue Drift', 'heartbreak_havoc.sh', 'System Rot', 'Apex Overdrive', 'Cipher Protocol', 'Neon Hearts') THEN '' ELSE artists.name END,
             albums.release_date DESC,
             tracks.track_number ASC
           SQL
