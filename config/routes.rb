@@ -281,8 +281,9 @@ Rails.application.routes.draw do
   end
 
   # Catch-all route for 404s (must be last)
+  # Uses a controller action so ApplicationController before_actions (redirects) still fire
   # Exclude Active Storage paths from catch-all
-  match "*path", to: proc { |_env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] },
+  match "*path", to: "pages#not_found",
     via: :all,
     constraints: ->(req) { !req.path.start_with?("/rails/active_storage") }
 end
