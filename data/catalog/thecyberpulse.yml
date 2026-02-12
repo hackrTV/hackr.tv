@@ -1,0 +1,79 @@
+artist:
+  name: "The.CyberPul.se"
+  genre: "Hackrcore"
+
+albums:
+  - slug: hackr-nights
+    title: "Hackr Nights"
+    album_type: single
+    tracks:
+      - title: "Hackr Nights"
+        slug: hackr-nights
+        track_number: 1
+        duration: "3:29"
+        lyrics: |
+          In hidden streams, we find our path
+          Silent strikes, a hackr's wrath
+          Lines of fire through circuits weave
+          Send the signal of truth conceived
+
+          The system cracks, they can't defend
+          This digital war will soon end
+          We're the Pulse in every node
+          Our future's hidden in the code
+
+          [Chorus]
+          Hackr nights and neon lights
+          We take the fight to unknown heights
+          Weapons forged in lines of code
+          Together we break their hold
+
+          Ciphers in the binary
+          Echoes of our liberty
+          The message, revealed tonight
+          In the dark, we start the fight
+
+          Drones above, the city cold
+          But with the code, we take control
+          From underground, we send the spark
+          To light the truth within the dark
+
+          The system cracks, they can't defend
+          This digital war will soon end
+          We're the Pulse in every node
+          Our future's hidden in the code
+
+          [Chorus]
+          Hackr nights and neon lights
+          We take the fight to unknown heights
+          Weapons forged in lines of code
+          Together we break their hold
+
+          Ciphers in the binary
+          Echoes of our liberty
+          The message, revealed tonight
+          In the dark, we start the fight
+
+          In fragments, we reclaim the night
+          A spark, a hack - our silent light
+          From shadows deep, a world rewrites
+
+  - slug: livestream-archive
+    title: "Livestream Archive"
+    album_type: lp
+    release_date: "2118-10-08"
+    description: "Archived recordings from live trans-temporal broadcasts."
+    cover_image: "images/livestream_archive.jpg"
+    tracks:
+      - title: "Taking Off From The Hackr Hangar (2119-05-15)"
+        slug: taking-off-from-the-hackr-hangar-21190515
+        track_number: 1
+        duration: "2:19:41"
+        audio_file: "21190515_taking_off_from_the_hackr_hangar.ogg"
+        show_in_pulse_vault: false
+      - title: "Taking Off From The Hackr Hangar (2119-05-22)"
+        slug: taking-off-from-the-hackr-hangar-21190522
+        track_number: 2
+        duration: "2:07:25"
+        audio_file: "21190522_taking_off_from_the_hackr_hangar.ogg"
+        show_in_pulse_vault: false

@@ -2,9 +2,7 @@
 # YAML files are the single source of truth for all seeded content
 #
 # Import Order (respecting dependencies):
-# 1. artists           (no deps)
-# 2. albums            (depends on artists)
-# 3. tracks            (depends on albums)
+# 1. catalog           (artists, albums, tracks from per-artist YAML files)
 # 4. hackrs            (no deps)
 # 5. channels          (no deps)
 # 6. radio_stations    (no deps)
@@ -68,8 +66,103 @@ namespace :data do
   end
 
   # === Layer Tasks ===
-  desc "Load catalog (artists, albums, tracks)"
-  task catalog: [:artists, :albums, :tracks]
+  desc "Load catalog (artists, albums, tracks) from per-artist YAML files"
+  task catalog: :environment do
+    puts "\n--- Loading Catalog ---"
+    catalog_dir = Rails.root.join("data", "catalog")
+
+    unless Dir.exist?(catalog_dir)
+      puts "  ✗ Catalog directory not found: #{catalog_dir}"
+      next
+    end
+
+    artist_files = Dir.glob(catalog_dir.join("*.yml")).sort
+    if artist_files.empty?
+      puts "  ✗ No artist files found in #{catalog_dir}"
+      next
+    end
+
+    artists_created = artists_updated = 0
+    albums_created = albums_updated = 0
+    tracks_created = tracks_updated = 0
+
+    artist_files.each do |file|
+      data = YAML.load_file(file)
+      artist_slug = File.basename(file, ".yml")
+      artist_data = data["artist"]
+
+      # Upsert artist
+      artist = Artist.find_or_initialize_by(slug: artist_slug)
+      was_new = artist.new_record?
+
+      artist.assign_attributes(
+        name: artist_data["name"],
+        genre: artist_data["genre"],
+        artist_type: artist_data["artist_type"] || "band"
+      )
+
+      if artist.changed?
+        artist.save!
+        was_new ? (artists_created += 1) : (artists_updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"} artist: #{artist.name}"
+      end
+
+      # Upsert albums and tracks
+      (data["albums"] || []).each do |album_data|
+        next unless album_data["title"].present? && album_data["slug"].present?
+
+        album = Album.find_or_initialize_by(artist: artist, slug: album_data["slug"])
+        was_new = album.new_record?
+
+        release_date = DataLoaderHelpers.parse_date(album_data["release_date"])
+
+        album.assign_attributes(
+          name: album_data["title"],
+          album_type: album_data["album_type"],
+          release_date: release_date,
+          description: album_data["description"]
+        )
+
+        if album.changed?
+          album.save!
+          was_new ? (albums_created += 1) : (albums_updated += 1)
+          puts "  #{was_new ? "✓ Created" : "↻ Updated"} album: #{album.name} (#{artist.name})"
+        end
+
+        # Attach cover image if specified
+        DataLoaderHelpers.attach_cover_image(album, album_data["cover_image"], artist_slug) if album_data["cover_image"].present?
+
+        # Upsert tracks
+        (album_data["tracks"] || []).each do |track_data|
+          track = artist.tracks.find_or_initialize_by(slug: track_data["slug"])
+          was_new = track.new_record?
+
+          track.assign_attributes(
+            title: track_data["title"],
+            album: album,
+            track_number: track_data["track_number"],
+            duration: track_data["duration"],
+            cover_image: track_data["cover_image"],
+            featured: track_data["featured"] || false,
+            show_in_pulse_vault: track_data.fetch("show_in_pulse_vault", true),
+            streaming_links: track_data["streaming_links"],
+            videos: track_data["videos"],
+            lyrics: track_data["lyrics"]
+          )
+
+          if track.changed?
+            track.save!
+            was_new ? (tracks_created += 1) : (tracks_updated += 1)
+            puts "    #{was_new ? "✓ Created" : "↻ Updated"} track: #{track.title}"
+          end
+        end
+      end
+    end
+
+    puts "Artists: #{artists_created} created, #{artists_updated} updated, #{Artist.count} total"
+    puts "Albums: #{albums_created} created, #{albums_updated} updated, #{Album.count} total"
+    puts "Tracks: #{tracks_created} created, #{tracks_updated} updated, #{Track.count} total"
+  end
 
   desc "Load system data (hackrs, channels, radio stations, etc.)"
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
@@ -147,143 +240,6 @@ namespace :data do
   end
 
   # === Individual Loaders ===
-
-  desc "Load artists from YAML"
-  task artists: :environment do
-    puts "\n--- Loading Artists ---"
-    yaml_file = Rails.root.join("data", "catalog", "artists.yml")
-    yaml_file = Rails.root.join("data", "artists.yml") unless File.exist?(yaml_file)
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    artists_data = data["artists"]
-    created = updated = 0
-
-    artists_data.each do |attrs|
-      artist = Artist.find_or_initialize_by(slug: attrs["slug"])
-      was_new = artist.new_record?
-
-      artist.assign_attributes(
-        name: attrs["name"],
-        genre: attrs["genre"],
-        artist_type: attrs["artist_type"] || "band"
-      )
-
-      if artist.changed?
-        artist.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{artist.name}"
-      end
-    end
-
-    puts "Artists: #{created} created, #{updated} updated, #{Artist.count} total"
-  end
-
-  desc "Load albums from YAML"
-  task albums: :environment do
-    puts "\n--- Loading Albums ---"
-    yaml_file = Rails.root.join("data", "catalog", "albums.yml")
-    yaml_file = Rails.root.join("data", "albums.yml") unless File.exist?(yaml_file)
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    albums_data = data["albums"]
-    created = updated = skipped = 0
-
-    albums_data.each do |attrs|
-      next unless attrs["title"].present? && attrs["slug"].present?
-
-      artist = Artist.find_by(slug: attrs["artist_slug"])
-      unless artist
-        puts "  ✗ Artist not found: #{attrs["artist_slug"]}"
-        skipped += 1
-        next
-      end
-
-      album = Album.find_or_initialize_by(artist: artist, slug: attrs["slug"])
-      was_new = album.new_record?
-
-      release_date = DataLoaderHelpers.parse_date(attrs["release_date"])
-
-      album.assign_attributes(
-        name: attrs["title"],
-        album_type: attrs["album_type"],
-        release_date: release_date,
-        description: attrs["description"]
-      )
-
-      if album.changed?
-        album.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{album.name} (#{artist.name})"
-      end
-
-      # Attach cover image if specified and not already attached
-      DataLoaderHelpers.attach_cover_image(album, attrs["cover_image"], artist.slug) if attrs["cover_image"].present?
-    end
-
-    puts "Albums: #{created} created, #{updated} updated, #{skipped} skipped, #{Album.count} total"
-  end
-
-  desc "Load tracks from YAML"
-  task tracks: :environment do
-    puts "\n--- Loading Tracks ---"
-    yaml_file = Rails.root.join("data", "catalog", "tracks.yml")
-    yaml_file = Rails.root.join("data", "tracks.yml") unless File.exist?(yaml_file)
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    tracks_data = data["tracks"]
-    created = updated = skipped = 0
-
-    tracks_data.each do |attrs|
-      # Find album by slug, derive artist from album
-      album = Album.find_by(slug: attrs["album_slug"])
-      unless album
-        puts "  ✗ Album not found: #{attrs["album_slug"]}"
-        skipped += 1
-        next
-      end
-
-      artist = album.artist
-      track = artist.tracks.find_or_initialize_by(slug: attrs["slug"])
-      was_new = track.new_record?
-
-      track.assign_attributes(
-        title: attrs["title"],
-        album: album,
-        track_number: attrs["track_number"],
-        duration: attrs["duration"],
-        cover_image: attrs["cover_image"],
-        featured: attrs["featured"] || false,
-        show_in_pulse_vault: attrs.fetch("show_in_pulse_vault", true),
-        streaming_links: attrs["streaming_links"],
-        videos: attrs["videos"],
-        lyrics: attrs["lyrics"]
-        # release_date inherited from album unless track-specific
-      )
-
-      if track.changed?
-        track.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{track.title}"
-      end
-    end
-
-    puts "Tracks: #{created} created, #{updated} updated, #{skipped} skipped, #{Track.count} total"
-  end
 
   desc "Load hackrs from YAML"
   task hackrs: :environment do
@@ -1172,10 +1128,27 @@ namespace :data do
     end
 
     data = YAML.load_file(yaml_file)
-    redirects_data = data["redirects"]
+    mirror_groups = data["mirrors"] || []
     created = updated = 0
 
-    redirects_data.each do |attrs|
+    # Build mirror lookup: primary_domain => [mirror_domains]
+    mirror_map = {}
+    mirror_groups.each do |group|
+      mirror_map[group["primary"]] = group["domains"]
+    end
+
+    # Flatten domain-grouped redirects and expand mirrors
+    expanded = []
+    data["redirects"].each do |domain, entries|
+      entries.each do |entry|
+        expanded << entry.merge("domain" => domain)
+        mirror_map[domain]&.each do |mirror_domain|
+          expanded << entry.merge("domain" => mirror_domain)
+        end
+      end
+    end
+
+    expanded.each do |attrs|
       redirect = Redirect.find_or_initialize_by(
         domain: attrs["domain"],
         path: attrs["path"]
@@ -1265,13 +1238,13 @@ namespace :data do
 
     thecyberpulse = Artist.find_by(slug: "thecyberpulse")
     unless thecyberpulse
-      puts "  ✗ The.CyberPul.se artist not found (run data:artists first)"
+      puts "  ✗ The.CyberPul.se artist not found (run data:catalog first)"
       next
     end
 
     livestream_archive = thecyberpulse.albums.find_by(slug: "livestream-archive")
     unless livestream_archive
-      puts "  ✗ Livestream Archive album not found (run data:albums first)"
+      puts "  ✗ Livestream Archive album not found (run data:catalog first)"
       next
     end
 

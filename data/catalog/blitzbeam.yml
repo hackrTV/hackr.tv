@@ -1,0 +1,42 @@
+artist:
+  name: "BlitzBeam+"
+  genre: "Hypertrance (2000s Style)"
+
+albums:
+  - slug: maximum-velocity
+    title: "Maximum Velocity"
+    album_type: ep
+    release_date: "2123-09-09"
+    cover_image: "maximum_velocity.jpg"
+    tracks:
+      - title: "Hyperdrive Sequence"
+        slug: hyperdrive-sequence
+        track_number: 1
+        duration: "5:54"
+        audio_file: hyperdrive-sequence.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
+      - title: "Boundary Rift"
+        slug: boundary-rift
+        track_number: 2
+        duration: "2:08"
+        audio_file: boundary-rift.ogg
+        featured: true
+        lyrics: "[INSTRUMENTAL TRACK]\n"
+      - title: "Velocity+"
+        slug: velocity-plus
+        track_number: 3
+        duration: "3:12"
+        audio_file: velocity-plus.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
+      - title: "Axial Acceleration"
+        slug: axial-acceleration
+        track_number: 4
+        duration: "2:43"
+        audio_file: axial-acceleration.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
+      - title: "Beyond Lightspeed"
+        slug: beyond-lightspeed
+        track_number: 5
+        duration: "3:14"
+        audio_file: beyond-lightspeed.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"

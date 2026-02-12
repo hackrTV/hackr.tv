@@ -22,7 +22,7 @@ This file tracks planned features, enhancements, and tasks for hackr.tv.
 
 ### Technical Debt
 
-- [ ] **Remove legacy import tasks** - Delete obsolete tasks from `lib/tasks/import.rake` now that `data:*` namespace is complete
+- [x] **Remove legacy import tasks** - Deleted `import.rake` and unified catalog into per-artist YAML files
 - [ ] **Update db/seeds.rb** - Delegate to `data:load` instead of individual seed files
 - [ ] **Standardize JSON errors** - Normalize API error responses (`{error:}` vs `{success: false, error:}`)
 

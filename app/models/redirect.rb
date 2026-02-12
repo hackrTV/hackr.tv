@@ -20,9 +20,13 @@ class Redirect < ApplicationRecord
 
   # Find redirect by domain and path (case-insensitive)
   def self.find_for(domain, path)
-    where("domain = ? OR domain IS NULL", domain&.downcase)
-      .where("LOWER(path) = LOWER(?)", path)
+    normalized = path.chomp("/")
+    normalized = "/" if normalized.empty?
+
+    by_domain = where("domain = ? OR domain IS NULL", domain&.downcase)
       .order(Arel.sql("domain DESC NULLS LAST"))
-      .first
+
+    by_domain.where("LOWER(path) = LOWER(?)", path).first ||
+      ((path != normalized) ? by_domain.where("LOWER(path) = LOWER(?)", normalized).first : nil)
   end
 end

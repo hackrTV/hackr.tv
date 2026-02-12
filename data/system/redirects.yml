@@ -1,88 +1,65 @@
 # Domain redirects
+
+mirrors:
+  - primary: xeraen.net
+    domains:
+      - xeraen.com
+      - rockerboy.net
+      - rockerboy.stream
+
 redirects:
-  # Ashlinn redirects
-  - domain: ashlinn.net
-    path: /
-    destination_url: https://youtube.com/AshlinnSnow
+  ashlinn.net:
+    - path: /
+      destination_url: https://youtube.com/AshlinnSnow
 
-  # XERAEN/Rockerboy redirects
-  - domain: xeraen.com
-    path: /
-    destination_url: /xeraen
-  - domain: xeraen.com
-    path: /git
-    destination_url: https://github.com/xeraen
-  - domain: xeraen.com
-    path: /github
-    destination_url: https://github.com/xeraen
-  - domain: xeraen.com
-    path: /twitter
-    destination_url: https://x.com/xeraen
-  - domain: xeraen.com
-    path: /x
-    destination_url: https://x.com/xeraen
-  - domain: xeraen.com
-    path: /youtube
-    destination_url: https://youtube.com/@xeraen
+  xeraen.net:
+    - path: /
+      destination_url: /xeraen
+    - path: /albums/xordium
+      destination_url: /fm/pulse_vault?filter=XORDIUM
+    - path: /bandcamp
+      destination_url: https://xeraen.bandcamp.com
+    - path: /dogs
+      destination_url: /fm/pulse_vault?filter=Dogs%20Can%20Grow%20Beards%20All%20Over
+    - path: /encrypted-shroud
+      destination_url: /fm/pulse_vault?filter=Encrypted%20Shroud
+    - path: /git
+      destination_url: https://github.com/xeraen
+    - path: /github
+      destination_url: https://github.com/xeraen
+    - path: /ourcity
+      destination_url: /fm/pulse_vault?filter=Our%20City
+    - path: /our-city
+      destination_url: /fm/pulse_vault?filter=Our%20City
+    - path: /soundcloud
+      destination_url: https://soundcloud.com/xeraen
+    - path: /tracks
+      destination_url: /xeraen/trackz
+    - path: /tracks/birdo
+      destination_url: /fm/pulse_vault?filter=birdo
+    - path: /tracks/dream-surprise
+      destination_url: /fm/pulse_vault?filter=Dream%20Surprise
+    - path: /tracks/dream_surprise
+      destination_url: /fm/pulse_vault?filter=Dream%20Surprise
+    - path: /tracks/dogs
+      destination_url: /fm/pulse_vault?filter=Dogs%20Can%20Grow%20Beards%20All%20Over
+    - path: /tracks/ourcity
+      destination_url: /fm/pulse_vault?filter=Our%20City
+    - path: /tracks/our-city
+      destination_url: /fm/pulse_vault?filter=Our%20City
+    - path: /tracks/our_city
+      destination_url: /fm/pulse_vault?filter=Our%20City
+    - path: /trackz
+      destination_url: /xeraen/trackz
+    - path: /twitter
+      destination_url: https://x.com/xeraen
+    - path: /x
+      destination_url: https://x.com/xeraen
+    - path: /youtube
+      destination_url: https://youtube.com/@xeraen
+    - path: /yt
+      destination_url: https://youtube.com/@xeraen
 
-  - domain: xeraen.net
-    path: /
-    destination_url: /xeraen
-  - domain: xeraen.net
-    path: /git
-    destination_url: https://github.com/xeraen
-  - domain: xeraen.net
-    path: /github
-    destination_url: https://github.com/xeraen
-  - domain: xeraen.net
-    path: /twitter
-    destination_url: https://x.com/xeraen
-  - domain: xeraen.net
-    path: /x
-    destination_url: https://x.com/xeraen
-  - domain: xeraen.net
-    path: /youtube
-    destination_url: https://youtube.com/@xeraen
-
-  - domain: rockerboy.net
-    path: /
-    destination_url: /xeraen
-  - domain: rockerboy.net
-    path: /git
-    destination_url: https://github.com/xeraen
-  - domain: rockerboy.net
-    path: /github
-    destination_url: https://github.com/xeraen
-  - domain: rockerboy.net
-    path: /twitter
-    destination_url: https://x.com/xeraen
-  - domain: rockerboy.net
-    path: /x
-    destination_url: https://x.com/xeraen
-  - domain: rockerboy.net
-    path: /youtube
-    destination_url: https://youtube.com/@xeraen
-
-  - domain: rockerboy.stream
-    path: /
-    destination_url: /xeraen
-  - domain: rockerboy.stream
-    path: /git
-    destination_url: https://github.com/xeraen
-  - domain: rockerboy.stream
-    path: /github
-    destination_url: https://github.com/xeraen
-  - domain: rockerboy.stream
-    path: /twitter
-    destination_url: https://x.com/xeraen
-  - domain: rockerboy.stream
-    path: /x
-    destination_url: https://x.com/xeraen
-  - domain: rockerboy.stream
-    path: /youtube
-    destination_url: https://youtube.com/@xeraen
-
-  # Sector X redirects
-  - domain: sectorx.media
-    path: /
-    destination_url: /sector/x
+  sectorx.media:
+    - path: /
+      destination_url: /sector/x
