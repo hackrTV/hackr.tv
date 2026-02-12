@@ -96,6 +96,25 @@ RSpec.describe Redirect, type: :model do
       expect(result).to eq(global)
     end
 
+    it "matches path with trailing slash against record without" do
+      redirect = create(:redirect, domain: "example.com", path: "/albums/xordium", destination_url: "/fm/pulse_vault")
+      result = Redirect.find_for("example.com", "/albums/xordium/")
+      expect(result).to eq(redirect)
+    end
+
+    it "prefers exact path match over trailing-slash-normalized match" do
+      exact = create(:redirect, domain: "example.com", path: "/test/", destination_url: "/exact")
+      create(:redirect, domain: "example.com", path: "/test", destination_url: "/normalized")
+      result = Redirect.find_for("example.com", "/test/")
+      expect(result).to eq(exact)
+    end
+
+    it "does not strip trailing slash from root path" do
+      redirect = create(:redirect, domain: "example.com", path: "/", destination_url: "/home")
+      result = Redirect.find_for("example.com", "/")
+      expect(result).to eq(redirect)
+    end
+
     it "matches paths case-insensitively" do
       redirect = create(:redirect, domain: nil, path: "/xeraen", destination_url: "/xeraen")
 

@@ -26,13 +26,11 @@ All seed data lives in YAML files under `data/`, organized into layers:
 
 ```
 data/
-├── artists.yml                # 15 artists
-├── albums.yml                 # 18 albums
-├── tracks.yml                 # 71 tracks
-├── catalog/                   # Alternative location (checked first)
-│   ├── artists.yml
-│   ├── albums.yml
-│   └── tracks.yml
+├── catalog/                   # Per-artist files (one file per artist)
+│   ├── xeraen.yml             # Artist + albums + tracks
+│   ├── thecyberpulse.yml
+│   ├── heartbreak_havoc.yml
+│   └── ...                    # 15 artist files total
 ├── system/
 │   ├── hackrs.yml             # GridHackr users
 │   ├── channels.yml           # Uplink channels
@@ -59,35 +57,51 @@ data/
 │   ├── scenes.yml             # Overlay scenes
 │   ├── scene_elements.yml     # Scene-element assignments
 │   └── scene_groups.yml       # Scene groups
-├── vidz.yml                   # VODs/streams
-└── radio_stations.yml         # Radio stations
+└── vidz.yml                   # VODs/streams
 ```
+
+## Adding a New Track
+
+Edit the artist's file in `data/catalog/{artist_slug}.yml` and add the track under the appropriate album:
+
+```yaml
+albums:
+  - slug: album-slug
+    tracks:
+      - title: "New Track"
+        slug: new-track
+        track_number: 6
+        duration: "3:45"
+        audio_file: new-track.ogg
+        lyrics: |
+          Lyrics here...
+```
+
+That's it - one file, one edit.
 
 ## Import Order
 
 Tasks run in dependency order (the `data:load` master task handles this automatically):
 
-1. **artists** (no deps)
-2. **albums** (depends on artists)
-3. **tracks** (depends on albums)
-4. **hackrs** (no deps)
-5. **channels** (no deps)
-6. **radio_stations** (no deps)
-7. **zone_playlists** (depends on tracks)
-8. **factions** (depends on artists)
-9. **zones** (depends on factions, zone_playlists)
-10. **rooms** (depends on zones)
-11. **exits** (depends on rooms)
-12. **mobs** (depends on rooms, factions)
-13. **items** (depends on rooms)
-14. **key_playlists** (depends on hackrs, tracks, radio_stations)
-15. **codex** (no deps)
-16. **hackr_logs** (depends on hackrs)
-17. **wire** (depends on hackrs)
-18. **vidz** (depends on artists)
-19. **overlays** (no deps)
-20. **redirects** (no deps)
-21. **livestream_archive** (depends on audio)
+1. **catalog** (artists, albums, tracks from per-artist files)
+2. **hackrs** (no deps)
+3. **channels** (no deps)
+4. **radio_stations** (no deps)
+5. **zone_playlists** (depends on tracks)
+6. **factions** (depends on artists)
+7. **zones** (depends on factions, zone_playlists)
+8. **rooms** (depends on zones)
+9. **exits** (depends on rooms)
+10. **mobs** (depends on rooms, factions)
+11. **items** (depends on rooms)
+12. **key_playlists** (depends on hackrs, tracks, radio_stations)
+13. **codex** (no deps)
+14. **hackr_logs** (depends on hackrs)
+15. **wire** (depends on hackrs)
+16. **vidz** (depends on artists)
+17. **overlays** (no deps)
+18. **redirects** (no deps)
+19. **livestream_archive** (depends on audio)
 
 ## Available Tasks
 
@@ -103,7 +117,7 @@ Tasks run in dependency order (the `data:load` master task handles this automati
 
 | Task | Loads |
 |------|-------|
-| `data:catalog` | artists, albums, tracks |
+| `data:catalog` | artists, albums, tracks (from per-artist YAML files) |
 | `data:system` | hackrs, channels, radio_stations, zone_playlists, redirects |
 | `data:world` | factions, zones, rooms, exits, mobs, items |
 | `data:playlists` | key_playlists (also ensures catalog, hackrs, radio_stations) |
@@ -112,7 +126,7 @@ Tasks run in dependency order (the `data:load` master task handles this automati
 
 ### Individual Tasks
 
-Every data type has its own task: `data:artists`, `data:albums`, `data:tracks`, `data:hackrs`, `data:channels`, `data:radio_stations`, `data:zone_playlists`, `data:factions`, `data:zones`, `data:rooms`, `data:exits`, `data:mobs`, `data:items`, `data:key_playlists`, `data:codex`, `data:hackr_logs`, `data:wire`, `data:vidz`, `data:redirects`, `data:livestream_archive`, `data:audio`.
+`data:catalog`, `data:hackrs`, `data:channels`, `data:radio_stations`, `data:zone_playlists`, `data:factions`, `data:zones`, `data:rooms`, `data:exits`, `data:mobs`, `data:items`, `data:key_playlists`, `data:codex`, `data:hackr_logs`, `data:wire`, `data:vidz`, `data:redirects`, `data:livestream_archive`, `data:audio`.
 
 ### Audio Sideloading
 
@@ -141,55 +155,37 @@ All import tasks are **idempotent**:
 - Updates existing records if data changed
 - Skips unchanged records
 
-## YAML Schemas
+## YAML Schema
 
-### Artists (`data/artists.yml`)
-
-```yaml
-artists:
-  - name: "The.CyberPul.se"
-    slug: "thecyberpulse"
-    genre: "Hackrcore"
-    artist_type: "band"        # band (default), ost, or voiceover
-```
-
-**Current artists:** THE PULSE GRID, The.CyberPul.se, XERAEN, Injection Vector, Wavelength Zero, Cipher Protocol, System Rot, Temporal Blue Drift, Offline, Apex Overdrive, Voiceprint, Neon Hearts, Ethereality, heartbreak_havoc.sh, BlitzBeam+
-
-### Albums (`data/albums.yml`)
+Each artist has a single file at `data/catalog/{artist_slug}.yml`:
 
 ```yaml
+artist:
+  name: "XERAEN"
+  genre: "Omniwave"
+  artist_type: "band"          # band (default), ost, or voiceover
+
 albums:
-  - artist: "XERAEN"
+  - slug: xordium
     title: "XORDIUM"
-    slug: "xordium"
-    album_type: "ep"           # ep, lp, single
+    album_type: ep             # ep, lp, single
     release_date: "2124-10-17"
-    description: ""
-    cover_image: "xeraen/images/xordium.jpg"
+    cover_image: images/xordium.jpg
+    tracks:
+      - title: "XORDIUM"
+        slug: xordium
+        track_number: 1
+        duration: "2:44"
+        audio_file: xordium.ogg
+        featured: false
+        streaming_links:
+          spotify: "https://open.spotify.com/track/..."
+        lyrics: |
+          Go!
 ```
 
-### Tracks (`data/tracks.yml`)
-
-```yaml
-- title: "Kernel Panic"
-  slug: "kernel-panic"
-  artist: "The.CyberPul.se"
-  album: "Hackr Nights"
-  album_type: "single"
-  audio_file: "kernel-panic.ogg"
-  track_number: 1
-  release_date: "2125-01-01"
-  duration: "3:45"
-  genre: "Hackrcore"
-  featured: false
-  streaming_links:
-    spotify: "https://..."
-    apple_music: "https://..."
-  videos:
-    music_video: "https://..."
-  lyrics: |
-    Lyrics here...
-```
+- **Artist slug** = filename (e.g. `xeraen.yml` -> slug `xeraen`)
+- **Cover images** referenced relative to `data/{artist_slug}/` (existing convention)
 
 ### Redirects (`data/system/redirects.yml`)
 
@@ -207,19 +203,15 @@ redirects:
 - `data:reset` - Clears only seed content (pulses/echoes marked `is_seed`, hackr_logs, codex entries) then re-imports. Preserves user-generated content.
 - `data:clear` - Nuclear option. Deletes ALL data including user-generated content. Requires typing `DELETE ALL DATA` to confirm.
 
-## Legacy Import Tasks
-
-The `import:*` namespace (`lib/tasks/import.rake`) contains older import tasks from a previous Sinatra-based system. These are superseded by the `data:*` namespace and should not be used for new imports.
-
 ## Troubleshooting
 
-### Error: "File not found"
+### Error: "Catalog directory not found"
 
-Ensure the YAML files exist in the expected locations. The loader checks `data/catalog/` first, then falls back to `data/`.
+Ensure the `data/catalog/` directory exists and contains per-artist YAML files.
 
-### Error: "Artist not found" when loading tracks
+### Error: "Artist not found" when loading dependent data
 
-Run `data:artists` before `data:tracks`, or use `data:catalog` which handles the order automatically.
+Run `data:catalog` first, or use `data:load` which handles the order automatically.
 
 ### Invalid Date Format
 

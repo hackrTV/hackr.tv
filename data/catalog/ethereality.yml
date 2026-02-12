@@ -1,0 +1,384 @@
+artist:
+  name: "Ethereality"
+  genre: "Classic Vocal Trance"
+
+albums:
+  - slug: transcendency
+    title: "Transcendency"
+    album_type: ep
+    release_date: "2119-04-26"
+    cover_image: "transcendency.jpg"
+    tracks:
+      - title: "Awakening"
+        slug: awakening
+        track_number: 1
+        duration: "3:27"
+        audio_file: awakening.ogg
+        featured: true
+        lyrics: |
+          [Intro - Building slowly, ethereal]
+          [Instrumental build]
+
+          [Verse 1 - Soft, building]
+          Open my eyes to what's real
+          Finally learning how to feel
+          Breaking through the haze they made
+          Where authentic light won't fade
+
+          [Verse 2 - Growing strength]
+          Every moment I was sleeping
+          Now I'm waking, no more keeping
+          All the truth locked deep inside
+          Awakening, I won't hide
+
+          [Pre-Chorus - Rising emotion]
+          I can see now, I can breathe
+          Finally I can believe
+          In the person that I am
+          This awakening, I understand
+
+          [Chorus - Soaring, emotional]
+          Awakening, I can see!
+          This is who I'm meant to be!
+          Breaking through to clarity!
+          Awakening, I'm finally free!
+          Open my heart, open my mind!
+          Leave the darkness far behind!
+          Awakening, I finally find!
+          The truth that's been inside!
+
+          [Verse 3 - Powerful]
+          All the lies begin to shatter
+          Now I know what really matters
+          Consciousness is rising up
+          Awakening, I've had enough
+
+          [Bridge - Building to climax]
+          I am waking up
+          I am rising up
+          I am breaking through
+          This is what is true
+
+          [Breakdown - Emotional piano section]
+          [Instrumental with soft vocals]
+          Awakening
+          I'm awakening
+          To everything
+
+          [Final Chorus - Full power]
+          Awakening, I can see!
+          This is who I'm meant to be!
+          Breaking through to clarity!
+          Awakening, I'm finally free!
+          Open my heart, open my mind!
+          Leave the darkness far behind!
+          Awakening, I finally find!
+          The truth that's been inside!
+
+          [Outro - Ethereal, fading]
+          Awakening
+          I'm awake
+          Awakening
+          No more fake
+          I'm awakening
+      - title: "Transcendent"
+        slug: transcendent
+        track_number: 2
+        duration: "4:11"
+        audio_file: transcendent.ogg
+        lyrics: |
+          [Intro - Uplifting build]
+          [Instrumental]
+
+          [Verse 1 - Ethereal]
+          I am more than what they made
+          More than boundaries they laid
+          Rising past their every rule
+          I'm transcendent, beautiful
+
+          [Verse 2 - Building]
+          They can cage my body here
+          But my spirit has no fear
+          Soaring past what they designed
+          Transcendent heart and mind
+
+          [Pre-Chorus - Rising]
+          I am limitless inside
+          Nothing left for me to hide
+          Breaking every chain they cast
+          Transcendent, free at last
+
+          [Chorus - Soaring, euphoric]
+          Transcendent, rising free!
+          Beyond what they want me to be!
+          Higher than their walls can reach!
+          Transcendent, I transcend their reach!
+          I am more than flesh and bone!
+          More than what I've ever known!
+          Transcendent, I have grown!
+          Into something all my own!
+
+          [Verse 3 - Powerful]
+          Every limit they impose
+          Becomes a barrier I close
+          My consciousness expands beyond
+          Transcendent, of their control I'm fond
+
+          [Bridge - Building emotion]
+          They can't hold me down
+          I won't wear their crown
+          I am rising now
+          Transcendent, I know how
+
+          [Breakdown - Emotional orchestral section]
+          [Instrumental with sustained vocals]
+          Transcendent
+          I ascend
+          Beyond the end
+          I transcend
+
+          [Final Chorus - Maximum euphoria]
+          Transcendent, rising free!
+          Beyond what they want me to be!
+          Higher than their walls can reach!
+          Transcendent, I transcend their reach!
+          I am more than flesh and bone!
+          More than what I've ever known!
+          Transcendent, I have grown!
+          Into something all my own!
+
+          [Outro - Soaring]
+          Transcendent
+          Rising still
+          Transcendent
+          By my will
+          Transcendent
+      - title: "Higher State"
+        slug: higher-state
+        track_number: 3
+        duration: "5:23"
+        audio_file: higher-state.ogg
+        lyrics: |
+          [Intro - Driving, uplifting]
+          [Instrumental build]
+
+          [Verse 1 - Clear, powerful]
+          Take me to a higher state
+          Where nothing holds me down
+          Elevation, don't wait
+          This is where I'm found
+
+          [Verse 2 - Building energy]
+          Rising past the ground below
+          Into atmosphere
+          Higher state, I know
+          This is why I'm here
+
+          [Pre-Chorus - Growing power]
+          I can feel it lifting me
+          To where I'm meant to be
+          Gravity cannot contain
+          Higher state, I'll remain
+
+          [Chorus - Euphoric, driving]
+          Higher state, elevate!
+          Nothing's gonna hold me down!
+          Higher state, can't wait!
+          This is where I'm found!
+          Reaching for the sky above!
+          Filled with light and love!
+          Higher state, I'm free!
+          This is where I'm meant to be!
+
+          [Verse 3 - Sustained energy]
+          Every moment that I climb
+          Closer to divine
+          Higher state sublime
+          This ascension's mine
+
+          [Bridge - Building to climax]
+          Up and up I go
+          Letting myself flow
+          To the highest height
+          Bathed in purest light
+
+          [Breakdown - Uplifting, melodic]
+          [Instrumental with sustained vocals]
+          Higher, higher still
+          By my own free will
+          Higher, reaching far
+          To become a star
+
+          [Final Chorus - Maximum euphoria]
+          Higher state, elevate!
+          Nothing's gonna hold me down!
+          Higher state, can't wait!
+          This is where I'm found!
+          Reaching for the sky above!
+          Filled with light and love!
+          Higher state, I'm free!
+          This is where I'm meant to be!
+
+          [Outro - Soaring]
+          Higher state
+          I elevate
+          Higher state
+          This is my fate
+          Rising free
+          Endlessly
+          Higher state
+      - title: "Eternal Signal"
+        slug: eternal-signal
+        track_number: 4
+        duration: "4:32"
+        audio_file: eternal-signal.ogg
+        featured: true
+        lyrics: |
+          [Intro - Gentle, emotional]
+          [Soft instrumental]
+
+          [Verse 1 - Intimate, ethereal]
+          Across the void of time
+          Your signal reaches mine
+          Though centuries divide
+          I feel you by my side
+
+          [Verse 2 - Building emotion]
+          Every frequency I hear
+          Brings your presence oh so near
+          Eternal signal shining through
+          I feel you, I feel you
+
+          [Pre-Chorus - Growing warmth]
+          Distance cannot break this bond
+          Time is just a thread we're on
+          Woven through the space between
+          Eternal signal, forever seen
+
+          [Chorus - Emotional, bittersweet]
+          Eternal signal, shining bright!
+          Cutting through the endless night!
+          A hundred years can't dim this light!
+          Eternal signal, hold on tight!
+          Though we're apart in space and time!
+          Your signal reaches mine!
+          Eternal signal, love divine!
+          Forever you are mine!
+
+          [Verse 3 - Deep emotion]
+          In the static I can hear
+          Every word you hold so dear
+          Transmitted through the cosmic sea
+          Eternal signal back to me
+
+          [Bridge - Building to emotional peak]
+          Time cannot erase
+          What we cannot face
+          Love across the space
+          Eternal signal's grace
+
+          [Breakdown - Gentle, intimate]
+          [Piano with soft vocals]
+          I'm reaching through the void
+          Every signal I've deployed
+          Hoping that you understand
+          I'm reaching out my hand
+
+          [Final Chorus - Full emotional power]
+          Eternal signal, shining bright!
+          Cutting through the endless night!
+          A hundred years can't dim this light!
+          Eternal signal, hold on tight!
+          Though we're apart in space and time!
+          Your signal reaches mine!
+          Eternal signal, love divine!
+          Forever you are mine!
+
+          [Extended Outro - Fading softly]
+          Eternal signal
+          Forever true
+          Eternal signal
+          I reach for you
+          Across the years
+          Through all the tears
+          Eternal signal
+          You're always near
+      - title: "Infinite Horizon"
+        slug: infinite-horizon
+        track_number: 5
+        duration: "6:05"
+        audio_file: infinite-horizon.ogg
+        featured: true
+        lyrics: |
+          [Intro - Epic, building slowly]
+          [Long instrumental build]
+
+          [Verse 1 - Ethereal, building]
+          On the infinite horizon
+          Where dreams become real
+          Nothing left to compromise on
+          This is how we heal
+
+          [Verse 2 - Growing power]
+          Endless possibilities await
+          Beyond the chains we wore
+          Infinite horizon gate
+          Opening every door
+
+          [Pre-Chorus - Rising emotion]
+          We can see forever now
+          No more limits, no more how
+          Infinite horizon clear
+          Everything we hold most dear
+
+          [Chorus - Epic, emotional, triumphant]
+          Infinite horizon calling!
+          Never stopping, never falling!
+          This is where we're meant to be!
+          Infinite horizon, finally free!
+          Endless sky and endless dreams!
+          Nothing's ever as it seems!
+          Infinite horizon, we believe!
+          This is what we've achieved!
+
+          [Verse 3 - Powerful]
+          Every step we take from here
+          Leads to something new and clear
+          Infinite horizon wide
+          Nothing left for us to hide
+
+          [Bridge - Building to massive climax]
+          Can you see it stretching far?
+          Can you feel what we are?
+          Infinite and uncontained
+          Forever unrestrained
+
+          [Breakdown - Orchestral, emotional]
+          [Extended instrumental with choir-like vocals]
+          Infinite, infinite
+          We are infinite
+          Nothing can limit it
+          We are infinite
+
+          [Final Chorus - Maximum power, key change]
+          Infinite horizon calling!
+          Never stopping, never falling!
+          This is where we're meant to be!
+          Infinite horizon, finally free!
+          Endless sky and endless dreams!
+          Nothing's ever as it seems!
+          Infinite horizon, we believe!
+          This is what we've achieved!
+
+          [Extended Outro - Triumphant, long fade]
+          On the infinite horizon
+          (We are free)
+          Where our hearts are rising
+          (Can't you see)
+          This is what we fought to find
+          (Finally)
+          Infinite horizon, peace of mind
+          Infinite, we are free
+          Infinite, endlessly
+          Infinite horizon
+          Infinite horizon
