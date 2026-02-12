@@ -1,4 +1,6 @@
 class PagesController < ApplicationController
+  skip_forgery_protection only: :not_found
+
   def spa_root
     # SPA root - renders minimal shell for React
     render layout: "application"
