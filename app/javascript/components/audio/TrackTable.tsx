@@ -5,6 +5,7 @@ import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { usePlaylist } from '~/hooks/usePlaylist'
 import { useContextMenu } from '~/hooks/useContextMenu'
+import { getArtistProfilePath } from '~/utils/artistPaths'
 
 import { CreatePlaylistModal } from '~/components/playlists/CreatePlaylistModal'
 import { ContextMenu } from '~/components/shared/ContextMenu'
@@ -120,7 +121,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
 
   const handleContextMenu = useCallback((e: React.MouseEvent, track: Track) => {
     contextMenu.open(e, track)
-  }, [contextMenu.open])
+  }, [contextMenu])
 
   const buildContextMenuItems = (track: Track): ContextMenuItem[] => {
     const isCurrentTrack = currentTrackId === track.id
@@ -136,7 +137,11 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
       {
         label: 'Go to Artist',
         icon: '→',
-        onClick: () => navigate(`/${track.artist.slug || encodeURIComponent(track.artist.name)}`)
+        disabled: !getArtistProfilePath(track.artist.slug || ''),
+        onClick: () => {
+          const path = getArtistProfilePath(track.artist.slug || '')
+          if (path) navigate(path)
+        }
       },
       {
         label: 'Copy Track Title',

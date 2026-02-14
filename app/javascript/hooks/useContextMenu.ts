@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 interface ContextMenuState<T> {
   isOpen: boolean
@@ -6,7 +6,7 @@ interface ContextMenuState<T> {
   data: T | null
 }
 
-export function useContextMenu<T>() {
+export function useContextMenu<T> () {
   const [state, setState] = useState<ContextMenuState<T>>({
     isOpen: false,
     position: { x: 0, y: 0 },

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useLayoutEffect } from 'react'
 
 export interface ContextMenuItem {
   label: string
@@ -18,8 +18,6 @@ interface ContextMenuProps {
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose, menuRef }) => {
-  const [adjustedPos, setAdjustedPos] = useState({ x, y })
-
   useLayoutEffect(() => {
     if (!menuRef.current) return
     const rect = menuRef.current.getBoundingClientRect()
@@ -35,12 +33,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose, 
     if (y + rect.height > vh) {
       ay = y - rect.height
     }
-    // Clamp to viewport edges
     if (ax < 0) ax = 0
     if (ay < 0) ay = 0
 
-    setAdjustedPos({ x: ax, y: ay })
-  }, [x, y, menuRef])
+    menuRef.current.style.top = `${ay}px`
+    menuRef.current.style.left = `${ax}px`
+  }, [x, y, menuRef, items.length])
 
   return (
     <div
@@ -48,8 +46,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose, 
       role="menu"
       style={{
         position: 'fixed',
-        top: adjustedPos.y,
-        left: adjustedPos.x,
+        top: y,
+        left: x,
         background: '#0a0a0a',
         border: '2px solid #7c3aed',
         borderRadius: '4px',
