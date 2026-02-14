@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { TrackTable } from './TrackTable'
 
 // Mock matchMedia for useMobileDetect hook
@@ -28,12 +29,9 @@ const mockGetStationContext = vi.fn()
 const mockIsShuffle = vi.fn()
 const mockToggleShuffle = vi.fn()
 
+const mockGridAuth = { isLoggedIn: false, hackr: null, loading: false }
 vi.mock('~/hooks/useGridAuth', () => ({
-  useGridAuth: () => ({
-    isLoggedIn: false,
-    hackr: null,
-    loading: false
-  })
+  useGridAuth: () => mockGridAuth
 }))
 
 vi.mock('~/contexts/AudioContext', () => ({
@@ -50,6 +48,19 @@ vi.mock('~/contexts/AudioContext', () => ({
         toggleShuffle: mockToggleShuffle
       }
     }
+  })
+}))
+
+const mockFetchPlaylists = vi.fn().mockResolvedValue(undefined)
+const mockAddTrackToPlaylist = vi.fn().mockResolvedValue({ success: true })
+const mockPlaylists: { id: number; name: string; track_count: number }[] = []
+vi.mock('~/hooks/usePlaylist', () => ({
+  usePlaylist: () => ({
+    playlists: mockPlaylists,
+    loading: false,
+    error: null,
+    fetchPlaylists: mockFetchPlaylists,
+    addTrackToPlaylist: mockAddTrackToPlaylist
   })
 }))
 
@@ -82,10 +93,13 @@ describe('TrackTable', () => {
     vi.clearAllMocks()
     mockGetCurrentTrackId.mockReturnValue(null)
     mockIsPlaying.mockReturnValue(false)
+    mockGetStationContext.mockReturnValue(null)
+    mockGridAuth.isLoggedIn = false
+    mockPlaylists.length = 0
   })
 
   it('renders track information', () => {
-    render(<TrackTable tracks={mockTracks} />)
+    render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
     expect(screen.getByText('Track One')).toBeInTheDocument()
     expect(screen.getByText('Track Two')).toBeInTheDocument()
@@ -93,21 +107,21 @@ describe('TrackTable', () => {
   })
 
   it('renders artist names', () => {
-    render(<TrackTable tracks={mockTracks} />)
+    render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
     expect(screen.getByText(/Artist A/)).toBeInTheDocument()
     expect(screen.getByText(/Artist B/)).toBeInTheDocument()
   })
 
   it('shows PLAY button for tracks with audio', () => {
-    render(<TrackTable tracks={mockTracks} />)
+    render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
     const playButtons = screen.getAllByRole('button', { name: /play/i })
     expect(playButtons).toHaveLength(2)
   })
 
   it('does not show PLAY button for tracks without audio', () => {
-    render(<TrackTable tracks={mockTracks} />)
+    render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
     // Track 3 has no audio_url, so it should show a dash instead of a button
     const trackRow = screen.getByText('Unavailable Track').closest('tr')
@@ -119,7 +133,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -132,7 +146,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -144,7 +158,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the state to update first
       await waitFor(() => {
@@ -160,7 +174,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(false)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // When paused, the track should not have cyan color (no need to wait, initial state is correct)
       const trackTitle = screen.getByText('Track One').closest('strong')
@@ -171,7 +185,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -185,7 +199,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -199,7 +213,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -213,7 +227,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -225,7 +239,7 @@ describe('TrackTable', () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -238,7 +252,7 @@ describe('TrackTable', () => {
   describe('filtering', () => {
     it('filters tracks by title', async () => {
       const user = userEvent.setup()
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       const searchInput = screen.getByPlaceholderText('Type to filter tracks...')
       await user.type(searchInput, 'One')
@@ -249,7 +263,7 @@ describe('TrackTable', () => {
 
     it('filters tracks by artist', async () => {
       const user = userEvent.setup()
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       const searchInput = screen.getByPlaceholderText('Type to filter tracks...')
       await user.type(searchInput, 'Artist B')
@@ -260,7 +274,7 @@ describe('TrackTable', () => {
 
     it('filters tracks by genre', async () => {
       const user = userEvent.setup()
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       const searchInput = screen.getByPlaceholderText('Type to filter tracks...')
       await user.type(searchInput, 'Industrial')
@@ -270,7 +284,7 @@ describe('TrackTable', () => {
     })
 
     it('uses initialFilter prop', () => {
-      render(<TrackTable tracks={mockTracks} initialFilter="Artist A" />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} initialFilter="Artist A" /></MemoryRouter>)
 
       expect(screen.getByText('Track One')).toBeInTheDocument()
       expect(screen.queryByText('Track Two')).not.toBeInTheDocument()
@@ -280,7 +294,7 @@ describe('TrackTable', () => {
   describe('playback controls', () => {
     it('calls loadTrack when clicking play on a track', async () => {
       const user = userEvent.setup()
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       const playButtons = screen.getAllByRole('button', { name: /play/i })
       await user.click(playButtons[0])
@@ -300,7 +314,7 @@ describe('TrackTable', () => {
       mockIsPlaying.mockReturnValue(true)
 
       const user = userEvent.setup()
-      render(<TrackTable tracks={mockTracks} />)
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
 
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
@@ -311,6 +325,133 @@ describe('TrackTable', () => {
       await user.click(pauseButton)
 
       expect(mockTogglePlayPause).toHaveBeenCalled()
+    })
+  })
+
+  describe('context menu', () => {
+    const rightClickTrack = (trackName: string) => {
+      const trackElement = screen.getByText(trackName).closest('tr')!
+      fireEvent.contextMenu(trackElement, { clientX: 100, clientY: 200 })
+    }
+
+    it('opens context menu on right-click with track-specific play label', () => {
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+      expect(screen.getByText('Play "Track One"')).toBeInTheDocument()
+    })
+
+    it('shows Go to Artist and Copy Track Title items', () => {
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+
+      expect(screen.getByText('Go to Artist')).toBeInTheDocument()
+      expect(screen.getByText('Copy Track Title')).toBeInTheDocument()
+    })
+
+    it('does not show playlist section when logged out', () => {
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+
+      expect(screen.queryByText('Add to Playlist')).not.toBeInTheDocument()
+      expect(screen.queryByText('Create New Playlist')).not.toBeInTheDocument()
+    })
+
+    it('shows playlist section when logged in', () => {
+      mockGridAuth.isLoggedIn = true
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+
+      expect(screen.getByText('Add to Playlist')).toBeInTheDocument()
+      expect(screen.getByText('Create New Playlist')).toBeInTheDocument()
+    })
+
+    it('lists user playlists when logged in', () => {
+      mockGridAuth.isLoggedIn = true
+      mockPlaylists.push(
+        { id: 10, name: 'My Playlist', track_count: 3 },
+        { id: 11, name: 'Another Playlist', track_count: 0 }
+      )
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+
+      expect(screen.getByText('My Playlist')).toBeInTheDocument()
+      expect(screen.getByText('Another Playlist')).toBeInTheDocument()
+    })
+
+    it('calls addTrackToPlaylist when clicking a playlist item', async () => {
+      mockGridAuth.isLoggedIn = true
+      mockPlaylists.push({ id: 10, name: 'My Playlist', track_count: 3 })
+      const user = userEvent.setup()
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+      await user.click(screen.getByText('My Playlist'))
+
+      expect(mockAddTrackToPlaylist).toHaveBeenCalledWith(10, 1)
+    })
+
+    it('plays track when clicking Play from context menu', async () => {
+      const user = userEvent.setup()
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+      await user.click(screen.getByText('Play "Track One"'))
+
+      expect(mockLoadTrack).toHaveBeenCalledWith(
+        expect.objectContaining({ id: '1', title: 'Track One' })
+      )
+    })
+
+    it('shows Pause label for currently playing track', async () => {
+      mockGetCurrentTrackId.mockReturnValue('1')
+      mockIsPlaying.mockReturnValue(true)
+
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /pause/i })).toBeInTheDocument()
+      })
+
+      rightClickTrack('Track One')
+
+      expect(screen.getByText('Pause')).toBeInTheDocument()
+    })
+
+    it('closes context menu on Escape key', () => {
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    })
+
+    it('closes context menu on outside click', () => {
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      rightClickTrack('Track One')
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+
+      fireEvent.mouseDown(document.body)
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    })
+
+    it('disables Play for tracks without audio', () => {
+      render(<MemoryRouter><TrackTable tracks={mockTracks} /></MemoryRouter>)
+
+      const trackElement = screen.getByText('Unavailable Track').closest('tr')!
+      fireEvent.contextMenu(trackElement, { clientX: 100, clientY: 200 })
+
+      const playItem = screen.getByText('Play "Unavailable Track"')
+      expect(playItem).toHaveStyle({ color: '#555' })
     })
   })
 })
