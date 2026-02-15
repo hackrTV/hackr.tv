@@ -1,13 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAudio } from '~/contexts/AudioContext'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
-import { AddToPlaylistDropdown } from '~/components/playlists/AddToPlaylistDropdown'
+import { usePlaylist } from '~/hooks/usePlaylist'
+import { useContextMenu } from '~/hooks/useContextMenu'
+import { getArtistProfilePath } from '~/utils/artistPaths'
+
+import { CreatePlaylistModal } from '~/components/playlists/CreatePlaylistModal'
+import { ContextMenu } from '~/components/shared/ContextMenu'
+import type { ContextMenuItem } from '~/components/shared/ContextMenu'
 
 interface Track {
   id: number
   title: string
-  artist: { name: string; genre: string | null }
+  artist: { name: string; slug?: string; genre: string | null }
   album: { name: string; cover_url: string | null }
   audio_url: string | null
 }
@@ -21,9 +28,14 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
   const { audioPlayerAPI } = useAudio()
   const { isLoggedIn } = useGridAuth()
   const { isMobile } = useMobileDetect()
+  const navigate = useNavigate()
+  const { playlists, fetchPlaylists, addTrackToPlaylist } = usePlaylist()
+  const contextMenu = useContextMenu<Track>()
   const [filter, setFilter] = useState(initialFilter)
   const [currentTrackId, setCurrentTrackId] = useState<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false)
+  const [playlistTrackId, setPlaylistTrackId] = useState<number | null>(null)
 
   // Update filter when initialFilter prop changes (e.g., navigating from bands page)
   React.useEffect(() => {
@@ -100,6 +112,83 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
     return () => clearInterval(interval)
   }, [audioPlayerAPI])
 
+  // Fetch playlists when context menu opens for a logged-in user
+  React.useEffect(() => {
+    if (contextMenu.isOpen && isLoggedIn) {
+      fetchPlaylists()
+    }
+  }, [contextMenu.isOpen, isLoggedIn, fetchPlaylists])
+
+  const handleContextMenu = useCallback((e: React.MouseEvent, track: Track) => {
+    contextMenu.open(e, track)
+  }, [contextMenu])
+
+  const buildContextMenuItems = (track: Track): ContextMenuItem[] => {
+    const isCurrentTrack = currentTrackId === track.id
+    const isActive = isCurrentTrack && isPlaying
+
+    const items: ContextMenuItem[] = [
+      {
+        label: isActive ? 'Pause' : `Play "${track.title}"`,
+        icon: isActive ? '❚❚' : '►',
+        disabled: !track.audio_url,
+        onClick: () => handlePlayTrack(track)
+      },
+      {
+        label: 'Go to Artist',
+        icon: '→',
+        disabled: !getArtistProfilePath(track.artist.slug || ''),
+        onClick: () => {
+          const path = getArtistProfilePath(track.artist.slug || '')
+          if (path) navigate(path)
+        }
+      },
+      {
+        label: 'Copy Track Title',
+        icon: '⎘',
+        onClick: () => { navigator.clipboard.writeText(track.title) }
+      }
+    ]
+
+    if (isLoggedIn) {
+      items.push({ label: '', separator: true })
+      items.push({ label: 'Add to Playlist', header: true })
+
+      playlists.forEach(playlist => {
+        items.push({
+          label: playlist.name,
+          icon: '♫',
+          onClick: () => { addTrackToPlaylist(playlist.id, track.id) }
+        })
+      })
+
+      items.push({
+        label: 'Create New Playlist',
+        icon: '+',
+        onClick: () => {
+          setPlaylistTrackId(track.id)
+          setIsCreatingPlaylist(true)
+        }
+      })
+    }
+
+    return items
+  }
+
+  const handlePlaylistCreated = useCallback(async () => {
+    await fetchPlaylists()
+    if (playlistTrackId !== null) {
+      // Fetch playlists directly to get the newly created one
+      const { apiJson } = await import('~/utils/apiClient')
+      const fresh = await apiJson<{ id: number }[]>('/api/playlists')
+      if (fresh && fresh.length > 0) {
+        const newest = fresh.reduce((a, b) => a.id > b.id ? a : b)
+        await addTrackToPlaylist(newest.id, playlistTrackId)
+      }
+      setPlaylistTrackId(null)
+    }
+  }, [fetchPlaylists, playlistTrackId, addTrackToPlaylist])
+
   // Mobile card view for a single track
   const renderMobileTrackCard = (track: Track) => {
     const isCurrentTrack = currentTrackId === track.id
@@ -109,6 +198,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
       <div
         key={track.id}
         onClick={() => track.audio_url && handlePlayTrack(track)}
+        onContextMenu={(e) => handleContextMenu(e, track)}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -219,16 +309,6 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
           </div>
         </div>
 
-        {/* Add to playlist button */}
-        {isLoggedIn && track.audio_url && (
-          <div onClick={(e) => { e.stopPropagation() }} style={{ flexShrink: 0 }}>
-            <AddToPlaylistDropdown
-              trackId={track.id}
-              trackTitle={track.title}
-              buttonText="+"
-            />
-          </div>
-        )}
       </div>
     )
   }
@@ -277,7 +357,6 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                 <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Album</th>
                 <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Genre</th>
                 <th style={{ textAlign: 'center', color: '#888', width: '120px', minWidth: '120px' }}>Stream</th>
-                {isLoggedIn && <th style={{ textAlign: 'center', color: '#888', width: '60px', minWidth: '60px' }}>&nbsp;</th>}
               </tr>
             </thead>
             <tbody>
@@ -296,6 +375,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                     data-track-id={track.id}
                     style={rowStyle}
                     onClick={() => track.audio_url && handlePlayTrack(track)}
+                    onContextMenu={(e) => handleContextMenu(e, track)}
                     onMouseEnter={(e) => {
                       if (track.audio_url) {
                         e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.08)'
@@ -349,17 +429,6 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                         <span style={{ color: '#555' }}>-</span>
                       )}
                     </td>
-                    {isLoggedIn && (
-                      <td style={{ textAlign: 'center', width: '60px', minWidth: '60px' }}>
-                        <div onClick={(e) => { e.stopPropagation() }}>
-                          <AddToPlaylistDropdown
-                            trackId={track.id}
-                            trackTitle={track.title}
-                            buttonText="+"
-                          />
-                        </div>
-                      </td>
-                    )}
                   </tr>
                 )
               })}
@@ -367,6 +436,22 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
           </table>
         )}
       </div>
+
+      {contextMenu.isOpen && contextMenu.data && (
+        <ContextMenu
+          x={contextMenu.position.x}
+          y={contextMenu.position.y}
+          items={buildContextMenuItems(contextMenu.data)}
+          onClose={contextMenu.close}
+          menuRef={contextMenu.menuRef}
+        />
+      )}
+
+      <CreatePlaylistModal
+        isOpen={isCreatingPlaylist}
+        onClose={() => { setIsCreatingPlaylist(false); setPlaylistTrackId(null) }}
+        onSuccess={handlePlaylistCreated}
+      />
     </div>
   )
 }

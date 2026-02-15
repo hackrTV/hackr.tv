@@ -4,6 +4,7 @@ import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { apiJson } from '~/utils/apiClient'
+import { getArtistProfilePath } from '~/utils/artistPaths'
 
 interface Artist {
   id: number
@@ -36,25 +37,7 @@ export const BandsPage: React.FC = () => {
 
   const currentYear = new Date().getFullYear()
 
-  const getProfilePath = (slug: string): string => {
-    const profilePaths: { [key: string]: string } = {
-      'xeraen': '/xeraen',
-      'thecyberpulse': '/thecyberpulse',
-      'system_rot': '/system_rot',
-      'wavelength_zero': '/wavelength_zero',
-      'voiceprint': '/voiceprint',
-      'temporal_blue_drift': '/temporal_blue_drift',
-      'injection_vector': '/injection_vector',
-      'cipher_protocol': '/cipher_protocol',
-      'blitzbeam': '/blitzbeam',
-      'apex_overdrive': '/apex_overdrive',
-      'ethereality': '/ethereality',
-      'neon_hearts': '/neon_hearts',
-      'offline': '/offline',
-      'heartbreak_havoc': '/heartbreak_havoc'
-    }
-    return profilePaths[slug] || ''
-  }
+  const getProfilePath = getArtistProfilePath
 
   const getBandDescription = (slug: string): string => {
     const futureYear = currentYear + 100
