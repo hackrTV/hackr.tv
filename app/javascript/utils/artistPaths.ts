@@ -15,6 +15,6 @@ const artistProfilePaths: Record<string, string> = {
   'heartbreak_havoc': '/heartbreak_havoc'
 }
 
-export function getArtistProfilePath(slug: string): string {
+export function getArtistProfilePath (slug: string): string {
   return artistProfilePaths[slug] || ''
 }
