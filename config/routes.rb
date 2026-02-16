@@ -5,30 +5,21 @@ Rails.application.routes.draw do
   # Root route (SPA)
   root "pages#spa_root"
 
-  # The.CyberPul.se routes (nested under /thecyberpulse) - SPA
-  scope "thecyberpulse" do
-    get "/", to: "pages#spa_root", as: :thecyberpulse
-    get "trackz", to: "pages#spa_root", as: :thecyberpulse_tracks
-    get "trackz/:id", to: "pages#spa_root", as: :thecyberpulse_track
-    get "vidz", to: "pages#spa_root", as: :thecyberpulse_vidz
-    get "vidz/:id", to: "pages#spa_root", as: :thecyberpulse_vod
+  # Artist routes - SPA (consolidated per-artist pattern)
+  # Each artist gets: profile, releases, trackz, vidz
+  %w[thecyberpulse xeraen system-rot wavelength-zero voiceprint temporal-blue-drift
+    injection-vector cipher-protocol blitzbeam apex-overdrive ethereality
+    neon-hearts offline heartbreak-havoc the-pulse-grid].each do |artist_slug|
+    scope artist_slug do
+      get "/", to: "pages#spa_root"
+      get "releases", to: "pages#spa_root"
+      get "releases/:id", to: "pages#spa_root"
+      get "trackz", to: "pages#spa_root"
+      get "trackz/:id", to: "pages#spa_root"
+      get "vidz", to: "pages#spa_root"
+      get "vidz/:id", to: "pages#spa_root"
+    end
   end
-
-  # XERAEN routes - SPA
-  scope "xeraen" do
-    get "/", to: "pages#spa_root", as: :xeraen
-    get "trackz", to: "pages#spa_root", as: :xeraen_tracks
-    get "trackz/:id", to: "pages#spa_root", as: :xeraen_track
-    get "vidz", to: "pages#spa_root", as: :xeraen_vidz
-    get "vidz/:id", to: "pages#spa_root", as: :xeraen_vod
-  end
-
-  # Band profile routes - SPA (consolidated dynamic route)
-  band_slugs = %w[system_rot wavelength_zero voiceprint temporal_blue_drift
-    injection_vector cipher_protocol blitzbeam apex_overdrive ethereality
-    neon_hearts offline heartbreak_havoc]
-  get ":band_slug", to: "pages#spa_root", as: :band,
-    constraints: {band_slug: Regexp.union(band_slugs)}
 
   # Sector X routes - SPA
   get "sector/x", to: "pages#spa_root", as: :sector_x
@@ -52,7 +43,7 @@ Rails.application.routes.draw do
   scope "fm" do
     get "/", to: "pages#spa_root", as: :fm
     get "radio", to: "pages#spa_root", as: :fm_radio
-    get "pulse_vault", to: "pages#spa_root", as: :fm_pulse_vault
+    get "pulse-vault", to: "pages#spa_root", as: :fm_pulse_vault
     get "bands", to: "pages#spa_root", as: :fm_bands
     get "playlists", to: "pages#spa_root", as: :fm_playlists
     get "playlists/:id", to: "pages#spa_root", as: :fm_playlist
@@ -95,7 +86,7 @@ Rails.application.routes.draw do
       resources :tracks, only: [:index]
     end
     resources :tracks, only: %i[index show]
-    resources :albums, only: %i[index show]
+    resources :releases, only: %i[index show]
     get "codex/mappings", to: "codex#mappings"
     get "codex", to: "codex#index"
     get "codex/:slug", to: "codex#show"
@@ -187,7 +178,7 @@ Rails.application.routes.draw do
 
     # Read-only catalog resources (managed via data/catalog/*.yml)
     resources :artists, only: [:index]
-    resources :albums, only: [:index]
+    resources :releases, only: [:index]
     resources :tracks, only: [:index]
 
     # Read-only content resources (managed via data/content/*.yml)

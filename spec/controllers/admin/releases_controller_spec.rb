@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Admin::AlbumsController, type: :controller do
+RSpec.describe Admin::ReleasesController, type: :controller do
   let(:admin_hackr) { create(:grid_hackr, role: "admin") }
   let(:artist) { create(:artist) }
 
@@ -14,24 +14,24 @@ RSpec.describe Admin::AlbumsController, type: :controller do
       expect(response).to have_http_status(:ok)
     end
 
-    it "loads albums with artists" do
-      album = create(:album, artist: artist)
+    it "loads releases with artists" do
+      release = create(:release, artist: artist)
 
       get :index
 
-      expect(assigns(:albums)).to include(album)
+      expect(assigns(:releases)).to include(release)
     end
 
-    it "orders albums by artist name then release date" do
+    it "orders releases by artist name then release date" do
       artist_z = create(:artist, name: "Zebra")
       artist_a = create(:artist, name: "Alpha")
 
-      create(:album, artist: artist_z, release_date: Date.today)
-      album_a = create(:album, artist: artist_a, release_date: Date.today)
+      create(:release, artist: artist_z, release_date: Date.today)
+      release_a = create(:release, artist: artist_a, release_date: Date.today)
 
       get :index
 
-      expect(assigns(:albums).to_a.first).to eq(album_a)
+      expect(assigns(:releases).to_a.first).to eq(release_a)
     end
   end
 

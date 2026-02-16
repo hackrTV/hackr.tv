@@ -4,7 +4,7 @@ export interface Artist {
   slug: string
 }
 
-export interface Album {
+export interface Release {
   id: number
   name: string
   slug: string
@@ -20,7 +20,7 @@ export interface Track {
   duration: string | null
   position: number
   artist: Artist
-  album: Album | null
+  release: Release | null
   audio_url: string | null
 }
 

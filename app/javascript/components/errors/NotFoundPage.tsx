@@ -86,7 +86,7 @@ export const NotFoundPage: React.FC = () => {
           <br />
           &nbsp;&nbsp;• <a href="#" onClick={(e) => { e.preventDefault(); openTerminal() }} style={{ color: '#22d3ee', textDecoration: 'underline' }}>Access the Terminal</a>
           <br />
-          &nbsp;&nbsp;• <Link to="/fm/pulse_vault" style={{ color: '#00ff00', textDecoration: 'underline' }}>Plumb the Pulse Vault</Link>
+          &nbsp;&nbsp;• <Link to="/fm/pulse-vault" style={{ color: '#00ff00', textDecoration: 'underline' }}>Plumb the Pulse Vault</Link>
           <br />
           &nbsp;&nbsp;• <Link to="/fm/radio" style={{ color: '#00ff00', textDecoration: 'underline' }}>Listen to Hackr Radio Chronocasts</Link>
           <br />

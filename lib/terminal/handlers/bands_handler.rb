@@ -25,8 +25,8 @@ module Terminal
           list_bands
         when "view", "band", "v"
           show_band(args)
-        when "album", "a"
-          show_album(args)
+        when "release", "a"
+          show_release(args)
         when "search", "find"
           search_bands(args)
         when "help", "?"
@@ -48,7 +48,7 @@ module Terminal
         println renderer.colorize("  Browsing:", :amber)
         println "    list              - Show all bands"
         println "    view <name>       - View band profile"
-        println "    album <name>      - View album details"
+        println "    release <name>    - View release details"
         println "    search <query>    - Search bands"
         println ""
         println renderer.colorize("  Other:", :amber)
@@ -76,12 +76,12 @@ module Terminal
           println renderer.colorize("  No bands found.", :gray)
         else
           bands.each do |band|
-            album_count = band.albums.count
+            release_count = band.releases.count
             track_count = band.tracks.count
             genre = band.genre || "Unknown"
 
             println "  #{renderer.colorize(band.name, :cyan)}"
-            println "    #{renderer.colorize(genre, :purple)} | #{album_count} album(s) | #{track_count} track(s)"
+            println "    #{renderer.colorize(genre, :purple)} | #{release_count} release(s) | #{track_count} track(s)"
             println ""
           end
         end
@@ -117,20 +117,20 @@ module Terminal
         println renderer.double_line(width: 60, color: :green)
 
         # Discography
-        albums = band.albums.order(release_date: :desc)
+        releases = band.releases.order(release_date: :desc)
 
         println ""
-        if albums.any?
+        if releases.any?
           println renderer.colorize("  DISCOGRAPHY:", :amber)
           println ""
 
-          albums.each do |album|
-            year = album.release_date&.year || "TBA"
-            album_type = album.album_type&.upcase || "ALBUM"
-            println "  #{renderer.colorize(album.name, :cyan)} #{renderer.colorize("(#{year})", :gray)} #{renderer.colorize("[#{album_type}]", :purple)}"
+          releases.each do |release|
+            year = release.release_date&.year || "TBA"
+            release_type = release.release_type&.upcase || "RELEASE"
+            println "  #{renderer.colorize(release.name, :cyan)} #{renderer.colorize("(#{year})", :gray)} #{renderer.colorize("[#{release_type}]", :purple)}"
 
-            # Show tracks for this album
-            album.tracks.order(:track_number).each do |track|
+            # Show tracks for this release
+            release.tracks.order(:track_number).each do |track|
               track_num = track.track_number&.to_s&.rjust(2, "0") || "--"
               duration = format_duration(track.duration)
               featured = track.featured? ? renderer.colorize(" [FEATURED]", :amber) : ""
@@ -139,7 +139,7 @@ module Terminal
             println ""
           end
         else
-          println renderer.colorize("  No albums yet.", :gray)
+          println renderer.colorize("  No releases yet.", :gray)
           println ""
         end
 
@@ -151,38 +151,38 @@ module Terminal
         println ""
       end
 
-      def show_album(name)
+      def show_release(name)
         if name.blank?
-          println renderer.colorize("Usage: album <album name>", :amber)
+          println renderer.colorize("Usage: release <release name>", :amber)
           return
         end
 
-        album = Album.where("LOWER(name) LIKE ?", "%#{name.downcase}%").first
+        release = Release.where("LOWER(name) LIKE ?", "%#{name.downcase}%").first
 
-        unless album
-          println renderer.colorize("Album not found: #{name}", :red)
+        unless release
+          println renderer.colorize("Release not found: #{name}", :red)
           return
         end
 
         println ""
         println renderer.double_line(width: 60, color: :cyan)
-        println renderer.bold_color(album.name.upcase, :cyan)
-        println renderer.colorize("by #{album.artist.name}", :purple)
-        if album.release_date
-          println renderer.colorize("Released: #{album.release_date.strftime("%B %d, %Y")}", :gray)
+        println renderer.bold_color(release.name.upcase, :cyan)
+        println renderer.colorize("by #{release.artist.name}", :purple)
+        if release.release_date
+          println renderer.colorize("Released: #{release.release_date.strftime("%B %d, %Y")}", :gray)
         end
         println renderer.double_line(width: 60, color: :cyan)
 
-        if album.description.present?
+        if release.description.present?
           println ""
-          println album.description
+          println release.description
         end
 
         println ""
         println renderer.colorize("  TRACKS:", :amber)
         println ""
 
-        album.tracks.order(:track_number).each do |track|
+        release.tracks.order(:track_number).each do |track|
           track_num = track.track_number&.to_s&.rjust(2, "0") || "--"
           duration = format_duration(track.duration)
           println "  #{renderer.colorize(track_num, :gray)}. #{renderer.colorize(track.title, :cyan)} #{renderer.colorize(duration, :gray)}"

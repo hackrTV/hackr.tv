@@ -44,18 +44,18 @@ export const BandsPage: React.FC = () => {
     const descriptions: { [key: string]: string } = {
       'thecyberpulse': `The original Fracture Network band, forging metal manifestos from ${futureYear} with brutal precision.`,
       'xeraen': 'OMNIWAVE Genesis Vector - Electronic exploration with rhythmic guitars',
-      'injection_vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
-      'wavelength_zero': 'Where technical precision meets raw emotion in perfect destructive atmospheric harmony.',
-      'cipher_protocol': 'Data couriers wielding djent as encryption. No vocals. Pure instrumental algorithmic assault.',
-      'system_rot': 'Decay is the message. Entropy is the method. Hardcore punk collapse is inevitable.',
-      'temporal_blue_drift': 'Math rock time travelers proving complexity is the most beautiful form of resistance.',
+      'injection-vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
+      'wavelength-zero': 'Where technical precision meets raw emotion in perfect destructive atmospheric harmony.',
+      'cipher-protocol': 'Data couriers wielding djent as encryption. No vocals. Pure instrumental algorithmic assault.',
+      'system-rot': 'Decay is the message. Entropy is the method. Hardcore punk collapse is inevitable.',
+      'temporal-blue-drift': 'Math rock time travelers proving complexity is the most beautiful form of resistance.',
       'offline': 'Unplugged, authentic, and gloriously disconnected from the grid. Analog hearts never die.',
-      'apex_overdrive': 'Euphoric hardstyle, honed into a weapon. Promoting unity as power. Victory coded into every beat.',
+      'apex-overdrive': 'Euphoric hardstyle, honed into a weapon. Promoting unity as power. Victory coded into every beat.',
       'voiceprint': 'Liquid DnB resistance. Your voice is your weapon, your identity eternally unbreakable.',
-      'neon_hearts': 'Kawaii camouflage hiding radical resistance. J-Pop cuteness is the ultimate Trojan horse.',
+      'neon-hearts': 'Kawaii camouflage hiding radical resistance. J-Pop cuteness is the ultimate Trojan horse.',
       'ethereality': 'Consciousness expansion through classic vocal trance. Inner freedom transcends all control.',
       'blitzbeam': 'Maximum velocity hypertrance. SPEED IS LIFE! Physics are merely suggestions.',
-      'heartbreak_havoc': 'Weaponized heartbreak at Nightcore speed. Corrupting RIDE nodes with overclocked romantic chaos.'
+      'heartbreak-havoc': 'Weaponized heartbreak at Nightcore speed. Corrupting RIDE nodes with overclocked romantic chaos.'
     }
     return descriptions[slug] || 'Broadcasting resistance through sound.'
   }
@@ -130,15 +130,13 @@ export const BandsPage: React.FC = () => {
                                 </button>
                               )}
 
-                              {artist.track_count > 0 && (
-                                <Link
-                                  to={`/fm/pulse_vault?filter=${encodeURIComponent(artist.name.toLowerCase().trim())}`}
-                                  className="tui-button cyan-168"
-                                  style={{ flex: 1, textAlign: 'center', fontSize: isMobile ? '0.85em' : '1em' }}
-                                >
-                                  TRACKS
-                                </Link>
-                              )}
+                              <Link
+                                to={`/${artist.slug}/releases`}
+                                className="tui-button cyan-168"
+                                style={{ flex: 1, textAlign: 'center', fontSize: isMobile ? '0.85em' : '1em' }}
+                              >
+                                RELEASES
+                              </Link>
                             </div>
                           </div>
                         </fieldset>

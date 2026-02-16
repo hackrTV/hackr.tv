@@ -49,7 +49,7 @@
                   <th style="text-align: center; width: 80px;">Position</th>
                   <th style="text-align: left;">Track</th>
                   <th style="text-align: left;">Artist</th>
-                  <th style="text-align: left;">Album</th>
+                  <th style="text-align: left;">Release</th>
                 </tr>
               </thead>
               <tbody>
@@ -61,7 +61,7 @@
                     </td>
                     <td><strong><%= track.title %></strong></td>
                     <td><%= track.artist.name %></td>
-                    <td><%= track.album&.name || "—" %></td>
+                    <td><%= track.release&.name || "—" %></td>
                   </tr>
                 <% end %>
               </tbody>

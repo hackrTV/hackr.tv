@@ -39,19 +39,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "albums", force: :cascade do |t|
-    t.string "album_type"
-    t.integer "artist_id", null: false
-    t.datetime "created_at", null: false
-    t.text "description"
-    t.string "name", null: false
-    t.date "release_date"
-    t.string "slug", null: false
-    t.datetime "updated_at", null: false
-    t.index ["artist_id", "slug"], name: "index_albums_on_artist_id_and_slug", unique: true
-    t.index ["artist_id"], name: "index_albums_on_artist_id"
-  end
-
   create_table "artists", force: :cascade do |t|
     t.string "artist_type", default: "band", null: false
     t.datetime "created_at", null: false
@@ -497,6 +484,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.index ["domain", "path"], name: "index_redirects_on_domain_and_path", unique: true
   end
 
+  create_table "releases", force: :cascade do |t|
+    t.integer "artist_id", null: false
+    t.string "catalog_number"
+    t.string "classification"
+    t.datetime "created_at", null: false
+    t.text "credits"
+    t.text "description"
+    t.string "label"
+    t.string "media_format"
+    t.string "name", null: false
+    t.text "notes"
+    t.date "release_date"
+    t.string "release_type"
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["artist_id", "slug"], name: "index_releases_on_artist_id_and_slug", unique: true
+    t.index ["artist_id"], name: "index_releases_on_artist_id"
+  end
+
   create_table "sent_emails", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "emailable_id"
@@ -514,7 +520,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
   end
 
   create_table "tracks", force: :cascade do |t|
-    t.integer "album_id", null: false
     t.integer "artist_id", null: false
     t.string "cover_image"
     t.datetime "created_at", null: false
@@ -522,6 +527,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.boolean "featured", default: false
     t.text "lyrics"
     t.date "release_date"
+    t.integer "release_id", null: false
     t.boolean "show_in_pulse_vault", default: true, null: false
     t.string "slug"
     t.text "streaming_links"
@@ -529,11 +535,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.integer "track_number"
     t.datetime "updated_at", null: false
     t.text "videos"
-    t.index ["album_id"], name: "index_tracks_on_album_id"
     t.index ["artist_id", "slug"], name: "index_tracks_on_artist_id_and_slug", unique: true
     t.index ["artist_id"], name: "index_tracks_on_artist_id"
     t.index ["featured"], name: "index_tracks_on_featured"
     t.index ["release_date"], name: "index_tracks_on_release_date"
+    t.index ["release_id"], name: "index_tracks_on_release_id"
   end
 
   create_table "user_punishments", force: :cascade do |t|
@@ -584,7 +590,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "albums", "artists"
   add_foreign_key "chat_messages", "chat_channels"
   add_foreign_key "chat_messages", "grid_hackrs"
   add_foreign_key "chat_messages", "hackr_streams"
@@ -612,8 +617,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
   add_foreign_key "pulses", "pulses", column: "thread_root_id"
   add_foreign_key "radio_station_playlists", "playlists"
   add_foreign_key "radio_station_playlists", "radio_stations"
-  add_foreign_key "tracks", "albums"
+  add_foreign_key "releases", "artists"
   add_foreign_key "tracks", "artists"
+  add_foreign_key "tracks", "releases"
   add_foreign_key "user_punishments", "grid_hackrs"
   add_foreign_key "user_punishments", "grid_hackrs", column: "issued_by_id"
   add_foreign_key "zone_playlist_tracks", "tracks"

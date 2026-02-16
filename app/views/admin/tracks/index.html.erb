@@ -30,7 +30,7 @@
       <% if @tracks.any? %>
         <div style="margin-bottom: 20px;">
           <label for="track-search" style="color: #888; display: block; margin-bottom: 8px;">
-            SEARCH TRACKS :: Filter by track title, artist, or album
+            SEARCH TRACKS :: Filter by track title, artist, or release
           </label>
           <input
             type="text"
@@ -52,7 +52,7 @@
               <tr>
                 <th style="text-align: left;">Track</th>
                 <th style="text-align: left;">Artist</th>
-                <th style="text-align: left;">Album</th>
+                <th style="text-align: left;">Release</th>
                 <th style="text-align: center;">Featured</th>
                 <th style="text-align: center;">Audio</th>
                 <th style="text-align: center;">Pulse Vault</th>
@@ -63,14 +63,14 @@
                 <tr class="track-row" class="admin-table-row"
                     data-track-title="<%= track.title.downcase %>"
                     data-artist-name="<%= track.artist.name.downcase %>"
-                    data-album-name="<%= track.album&.name&.downcase || '' %>">
+                    data-release-name="<%= track.release&.name&.downcase || '' %>">
                   <td>
                     <strong><%= track.title %></strong>
                     <br>
                     <small style="color: #666; font-family: monospace;">/<%= track.slug %></small>
                   </td>
                   <td><%= track.artist.name %></td>
-                  <td><%= track.album&.name || "—" %></td>
+                  <td><%= track.release&.name || "—" %></td>
                   <td style="text-align: center;">
                     <% if track.featured %>
                       <span class="purple-255-text">★</span>
@@ -121,11 +121,11 @@
         trackRows.forEach(row => {
           const trackTitle = row.dataset.trackTitle || '';
           const artistName = row.dataset.artistName || '';
-          const albumName = row.dataset.albumName || '';
+          const releaseName = row.dataset.releaseName || '';
 
           const matches = trackTitle.includes(searchTerm) ||
                          artistName.includes(searchTerm) ||
-                         albumName.includes(searchTerm);
+                         releaseName.includes(searchTerm);
 
           if (matches) {
             row.style.display = '';

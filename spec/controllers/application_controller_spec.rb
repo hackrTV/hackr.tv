@@ -16,9 +16,9 @@ RSpec.describe ApplicationController, type: :request do
       end
 
       it "preserves query parameters when redirecting" do
-        get "/FM/Pulse_Vault?search=test&page=2"
+        get "/FM/Pulse-Vault?search=test&page=2"
         expect(response).to have_http_status(:moved_permanently)
-        expect(response).to redirect_to("/fm/pulse_vault?search=test&page=2")
+        expect(response).to redirect_to("/fm/pulse-vault?search=test&page=2")
       end
 
       it "does not redirect already lowercase paths" do
@@ -52,9 +52,9 @@ RSpec.describe ApplicationController, type: :request do
       end
 
       it "redirects band profile paths to lowercase" do
-        get "/System_Rot"
+        get "/System-Rot"
         expect(response).to have_http_status(:moved_permanently)
-        expect(response).to redirect_to("/system_rot")
+        expect(response).to redirect_to("/system-rot")
       end
 
       it "redirects grid paths to lowercase" do

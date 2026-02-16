@@ -27,7 +27,7 @@ class Api::GridController < ApplicationController
       # Ensure hackr has a current room (spawn point if missing)
       if hackr.current_room.nil?
         starting_room = GridRoom.joins(:grid_zone)
-          .where(grid_zones: {slug: "hackr_tv_central"})
+          .where(grid_zones: {slug: "hackr-tv-central"})
           .where(room_type: "hub")
           .first
         hackr.update!(current_room: starting_room) if starting_room
@@ -160,7 +160,7 @@ class Api::GridController < ApplicationController
 
     # Set starting room (hackr.tv Broadcast Station)
     starting_room = GridRoom.joins(:grid_zone)
-      .where(grid_zones: {slug: "hackr_tv_central"})
+      .where(grid_zones: {slug: "hackr-tv-central"})
       .where(room_type: "hub")
       .first
 
@@ -443,13 +443,13 @@ class Api::GridController < ApplicationController
       description: playlist.description,
       crossfade_duration_ms: playlist.crossfade_duration_ms,
       default_volume: playlist.default_volume.to_f,
-      tracks: playlist.ordered_tracks.includes(:artist, album: :cover_image_attachment).map do |track|
+      tracks: playlist.ordered_tracks.includes(:artist, release: :cover_image_attachment).map do |track|
         {
           id: track.id.to_s,
           title: track.title,
           artist: track.artist.name,
           url: track.audio_file.attached? ? url_for(track.audio_file) : nil,
-          coverUrl: track.album&.cover_image&.attached? ? url_for(track.album.cover_image) : ""
+          coverUrl: track.release&.cover_image&.attached? ? url_for(track.release.cover_image) : ""
         }
       end
     }

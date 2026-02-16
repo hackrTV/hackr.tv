@@ -1,31 +1,31 @@
 # Grid Rooms
 rooms:
   - name: hackr.tv Broadcast Station
-    slug: hackr_tv_broadcast_station
+    slug: hackr-tv-broadcast-station
     description: "The heart of the Fracture Network. Banks of jury-rigged broadcasting equipment line the walls, their displays flickering with temporal data streams. XERAEN's chair sits before the main console, headphones resting on vintage vinyl records. The air hums with electromagnetic interference - the sound of signals piercing through time itself."
-    zone_slug: hackr_tv_central
+    zone_slug: hackr-tv-central
     room_type: hub
 
   - name: Transit Corridor Alpha
-    slug: transit_corridor_alpha
+    slug: transit-corridor-alpha
     description: "A dimly lit corridor with exposed cables running along the ceiling. Neon strips flicker intermittently, casting shadows on graffitied walls. The distant hum of machinery echoes through the space."
-    zone_slug: transit_network
+    zone_slug: transit-network
     room_type: transit
 
   - name: XERAEN Operations Center
-    slug: xeraen_operations_center
+    slug: xeraen-operations-center
     description: "Purple lighting bathes advanced temporal equipment. Monitors display cascading timelines and probability matrices. This is where the impossible mission originates - changing the past to prevent the future."
-    zone_slug: sector_x
+    zone_slug: sector-x
     room_type: faction_base
 
   - name: GovCorp Surveillance Node
-    slug: govcorp_surveillance_node
+    slug: govcorp-surveillance-node
     description: "Sterile white walls lined with surveillance feeds. Red warning lights pulse slowly. The oppressive atmosphere of total control permeates everything. You shouldn't be here."
-    zone_slug: govcorp_surveillance
+    zone_slug: govcorp-surveillance
     room_type: govcorp
 
   - name: The Rhythm Nexus
-    slug: the_rhythm_nexus
+    slug: the-rhythm-nexus
     description: "Ryker's domain. A cavernous space converted into a combination recording studio, performance venue, and resistance headquarters. Drum kits and recording equipment share space with server racks. Vintage analog gear - tape machines, tube amplifiers, physical mixing boards - stands alongside digital systems. Purple and cyan neon cuts through the darkness. The air vibrates with potential energy even when no one's playing."
-    zone_slug: hackr_hangar
+    zone_slug: hackr-hangar
     room_type: faction_base

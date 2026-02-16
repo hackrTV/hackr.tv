@@ -685,7 +685,20 @@ const TheCyberPulsePage: React.FC = () => {
                 ← BACK TO BANDS
               </Link>
               <Link
-                to="/fm/pulse_vault?filter=the.cyberpul.se"
+                to="/thecyberpulse/releases"
+                className="tui-button"
+                style={{
+                  background: colorScheme.primary,
+                  color: 'white',
+                  fontWeight: 'bold',
+                  boxShadow: `0 0 15px ${colorScheme.glow}`,
+                  textAlign: 'center'
+                }}
+              >
+                RELEASES
+              </Link>
+              <Link
+                to="/fm/pulse-vault?filter=the.cyberpul.se"
                 className="tui-button"
                 style={{
                   background: colorScheme.primary,

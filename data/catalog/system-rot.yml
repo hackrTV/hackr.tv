@@ -2,10 +2,10 @@ artist:
   name: "System Rot"
   genre: "Hardcore Punk"
 
-albums:
+releases:
   - slug: street-level
     title: "Street Level"
-    album_type: ep
+    release_type: ep
     release_date: "2117-06-10"
     cover_image: "street_level.jpg"
     tracks:
@@ -15,40 +15,33 @@ albums:
         duration: "3:58"
         audio_file: static-feed.ogg
         lyrics: |
-          [Intro - Shouted]
           Turn it off!
 
-          [Verse 1 - Fast, shouted]
           Every screen, every wall
           Spitting lies, watch us fall
           Can't escape the constant stream
           Living in their fever dream
 
-          [Verse 2 - Fast, shouted]
           Static noise in every feed
           This is not what we need
           Propaganda on repeat
           Poison words that taste so sweet
 
-          [Chorus - Gang vocals]
           Static feed! Shut it down!
           Static feed! Burn the ground!
           Turn it off, tear it down!
           Static feed! Kill the sound!
 
-          [Bridge - Shouted]
           They control what you see
           But your mind can be free
           Smash the screen, cut the line
           Take back what was mine
 
-          [Final Chorus - Gang vocals]
           Static feed! Shut it down!
           Static feed! Burn the ground!
           Turn it off, tear it down!
           Static feed! Kill the sound!
 
-          [Outro - Shouted]
           No more static!
           No more feed!
       - title: "No Signal"
@@ -57,46 +50,38 @@ albums:
         duration: "2:02"
         audio_file: no-signal.ogg
         lyrics: |
-          [Intro - Fast]
           Go!
 
-          [Verse 1 - Breakneck speed]
           Cut the line, kill the feed
           This is all I'll ever need
           Off the grid, in the dark
           Left no trace, left no mark
 
-          [Chorus - Shouted]
           No signal! No trace!
           Can't find me in your database!
           No signal! I'm gone!
           You can't track where I don't belong!
 
-          [Verse 2 - Fast]
           Cameras blind, sensors dead
           You can't get inside my head
           Disappeared without a sound
           Underground where I'm not found
 
-          [Chorus - Shouted]
           No signal! No trace!
           Can't find me in your database!
           No signal! I'm gone!
           You can't track where I don't belong!
 
-          [Bridge - Gang vocals, rhythmic]
           No face! No name!
           No way! To play their game!
           No light! No sound!
           Can't be! Found!
 
-          [Final Chorus - Shouted]
           No signal! No trace!
           Can't find me in your database!
           No signal! I'm gone!
           You can't track where I don't belong!
 
-          [Outro - Fast fadeout]
           No signal!
           No signal!
       - title: "Concrete and Rage"
@@ -106,51 +91,42 @@ albums:
         audio_file: concrete-and-rage.ogg
         featured: true
         lyrics: |
-          [Intro - Heavy, building]
 
-          [Verse 1 - Driving]
           Spray paint truth across the wall
           Answer back to every call
           Smash the cameras, kill their eyes
           We're the ones who never die
 
-          [Verse 2]
           Underground where we belong
           Growing stronger, growing strong
           Every night we take back streets
           Plant the seeds of their defeat
 
-          [Pre-Chorus]
           Built from concrete and from rage
           Writing history on every page
           They can't stop what we've become
           One by one by one by one
 
-          [Chorus - Gang vocals]
           Concrete and rage! This is war!
           Concrete and rage! Settle the score!
           Paint the walls with truth tonight!
           Break their eyes, kill their sight!
 
-          [Verse 3]
           Abandoned buildings, our domain
           Where resistance breaks their chain
           Every corner that we claim
           Spreads the fire, fans the flame
 
-          [Bridge - Building]
           We are the streets!
           We are the night!
           We are concrete!
           We are the fight!
 
-          [Final Chorus - Gang vocals]
           Concrete and rage! This is war!
           Concrete and rage! Settle the score!
           Paint the walls with truth tonight!
           Break their eyes, kill their sight!
 
-          [Outro - Heavy]
           Concrete and rage
           Concrete and rage
           This is our stage
@@ -160,49 +136,41 @@ albums:
         duration: "2:08"
         audio_file: rot-from-within.ogg
         lyrics: |
-          [Verse 1 - Mid-tempo, aggressive]
           Look around at what we've become
           Hollow shells, going numb
           They built this cage so carefully
           Rotting slow where none can see
 
-          [Verse 2]
           Infection spreads through every street
           System rot beneath our feet
           Not just broken, decomposed
           Everything we loved now closed
 
-          [Pre-Chorus]
           Can you feel it spreading?
           Can you see the decay?
           Everything is dying
           A little more each day
 
-          [Chorus - Gang vocals]
           Rot from within! Can't you see?
           Rot from within! It's you and me!
           They're the disease, we're the cure!
           Rot from within! We endure!
 
-          [Verse 3]
           Society's a corpse we prop
           Pretending that it hasn't stopped
           But underneath the painted face
           Is nothing but an empty space
 
-          [Bridge - Building intensity]
           Let it fall!
           Let it die!
           Let it rot!
           Don't ask why!
 
-          [Final Chorus - Gang vocals]
           Rot from within! Can you see?
           Rot from within! It's you and me!
           They're the disease, we're the cure!
           Rot from within! We endure!
 
-          [Outro - Shouted]
           Let it rot!
           Let it fall!
           Burn it all!
@@ -213,55 +181,45 @@ albums:
         audio_file: burn-the-blueprint.ogg
         featured: true
         lyrics: |
-          [Intro - Slow, building tension]
 
-          [Verse 1 - Slow burn]
           They drew the lines to cage us in
           Calculated every sin
           Planned it all before our birth
           Decided what our lives were worth
 
-          [Verse 2 - Building]
           But blueprints burn just like the rest
           We'll put their design to the test
           Every wall they built will fall
           We'll dismantle it all
 
-          [Pre-Chorus - Intensity rising]
           They think they know what we'll become
           They think they've already won
           But we're rewriting every page
           Burning down their perfect cage
 
-          [Chorus - Gang vocals]
           Burn the blueprint! Start again!
           Burn the blueprint! This is the end!
           Of everything they tried to build!
           Burn the blueprint! Our will fulfilled!
 
-          [Verse 3 - Full intensity]
           No more living by their plan
           Time to show them what we can
           Build ourselves from ashes new
           Create a world that's finally true
 
-          [Bridge - Slower, powerful]
           Watch it burn
           Watch it fall
           From the ashes
           We'll build it all
 
-          [Breakdown - Heavy]
           Burn! The! Blue! Print!
           Burn! The! Blue! Print!
 
-          [Final Chorus - Gang vocals, triumphant]
           Burn the blueprint! Start again!
           Burn the blueprint! This is the end!
           Of everything they tried to build!
           Burn the blueprint! Our will fulfilled!
 
-          [Outro - Fading with determination]
           From the ashes we'll rise
           With the truth in our eyes
           Burn the blueprint

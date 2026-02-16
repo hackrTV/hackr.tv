@@ -37,8 +37,8 @@ module Terminal
           display_tracks
         when "artist", "by"
           filter_by_artist(args)
-        when "album", "on"
-          filter_by_album(args)
+        when "release", "on"
+          filter_by_release(args)
         when "search", "find"
           search_tracks(args)
         when "view", "v"
@@ -66,7 +66,7 @@ module Terminal
         println "    next (n)          - Next page"
         println "    prev (p)          - Previous page"
         println "    artist <name>     - Filter by artist"
-        println "    album <name>      - Filter by album"
+        println "    release <name>    - Filter by release"
         println "    search <query>    - Search tracks"
         println "    view <title>      - View track details"
         println "    featured          - Show featured tracks"
@@ -94,7 +94,7 @@ module Terminal
         @current_page = @current_page.clamp(1, [total_pages, 1].max)
 
         tracks = query
-          .includes(:artist, :album)
+          .includes(:artist, :release)
           .limit(ITEMS_PER_PAGE)
           .offset((@current_page - 1) * ITEMS_PER_PAGE)
 
@@ -124,12 +124,12 @@ module Terminal
         println ""
         println renderer.divider("Page #{@current_page}/#{total_pages} | #{total_count} tracks", width: 60, color: :gray)
         println ""
-        println renderer.colorize("  [n]ext [p]rev [artist] <name> [album] <name> [search] <q> [back]", :gray)
+        println renderer.colorize("  [n]ext [p]rev [artist] <name> [release] <name> [search] <q> [back]", :gray)
         println ""
       end
 
       def base_query
-        Track.visible_in_pulse_vault.order(Arel.sql("CASE WHEN artists.slug = 'the-cyberpulse' THEN 0 WHEN artists.slug = 'xeraen' THEN 1 ELSE 2 END, artists.name, tracks.title"))
+        Track.visible_in_pulse_vault.order(Arel.sql("CASE WHEN artists.slug = 'thecyberpulse' THEN 0 WHEN artists.slug = 'xeraen' THEN 1 ELSE 2 END, artists.name, tracks.title"))
           .joins(:artist)
       end
 
@@ -137,8 +137,8 @@ module Terminal
         case @filter[:type]
         when :artist
           query.where("LOWER(artists.name) LIKE ? OR LOWER(artists.slug) LIKE ?", "%#{@filter[:value].downcase}%", "%#{@filter[:value].downcase}%")
-        when :album
-          query.joins(:album).where("LOWER(albums.name) LIKE ?", "%#{@filter[:value].downcase}%")
+        when :release
+          query.joins(:release).where("LOWER(releases.name) LIKE ?", "%#{@filter[:value].downcase}%")
         when :search
           query.where("LOWER(tracks.title) LIKE ?", "%#{@filter[:value].downcase}%")
         else
@@ -157,13 +157,13 @@ module Terminal
         display_tracks
       end
 
-      def filter_by_album(name)
+      def filter_by_release(name)
         if name.blank?
-          println renderer.colorize("Usage: album <name>", :amber)
+          println renderer.colorize("Usage: release <name>", :amber)
           return
         end
 
-        @filter = {type: :album, value: name}
+        @filter = {type: :release, value: name}
         @current_page = 1
         display_tracks
       end
@@ -200,8 +200,8 @@ module Terminal
         println renderer.double_line(width: 60, color: :cyan)
         println renderer.bold_color(track.title.upcase, :cyan)
         println renderer.colorize("by #{track.artist.name}", :purple)
-        if track.album
-          println renderer.colorize("from #{track.album.name}", :gray)
+        if track.release
+          println renderer.colorize("from #{track.release.name}", :gray)
         end
         println renderer.double_line(width: 60, color: :cyan)
 
@@ -232,7 +232,7 @@ module Terminal
 
       def show_featured
         @filter = nil
-        tracks = Track.where(featured: true).includes(:artist, :album).limit(20)
+        tracks = Track.where(featured: true).includes(:artist, :release).limit(20)
 
         println ""
         println renderer.divider("FEATURED TRACKS", width: 60, color: :amber)

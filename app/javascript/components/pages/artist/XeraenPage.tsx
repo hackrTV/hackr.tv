@@ -549,7 +549,20 @@ const XeraenPage: React.FC = () => {
                 ← BACK TO BANDS
               </Link>
               <Link
-                to="/fm/pulse_vault?filter=xeraen"
+                to="/xeraen/releases"
+                className="tui-button"
+                style={{
+                  background: colorScheme.primary,
+                  color: 'white',
+                  fontWeight: 'bold',
+                  boxShadow: isMobile ? 'none' : `0 0 15px ${colorScheme.glow}`,
+                  textAlign: 'center'
+                }}
+              >
+                RELEASES
+              </Link>
+              <Link
+                to="/fm/pulse-vault?filter=xeraen"
                 className="tui-button"
                 style={{
                   background: colorScheme.primary,

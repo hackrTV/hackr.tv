@@ -134,20 +134,20 @@ RSpec.describe Api::RadioController, type: :controller do
       expect(artist_json["slug"]).to eq(track1.artist.slug)
     end
 
-    it "includes album information when track has album" do
-      album = create(:album, artist: track1.artist)
-      track1.update(album: album)
+    it "includes release information when track has release" do
+      release = create(:release, artist: track1.artist)
+      track1.update(release: release)
 
       get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       track_json = json["tracks"].first
-      album_json = track_json["album"]
+      release_json = track_json["release"]
 
-      expect(album_json).not_to be_nil
-      expect(album_json["id"]).to eq(album.id)
-      expect(album_json["name"]).to eq(album.name)
-      expect(album_json["slug"]).to eq(album.slug)
+      expect(release_json).not_to be_nil
+      expect(release_json["id"]).to eq(release.id)
+      expect(release_json["name"]).to eq(release.name)
+      expect(release_json["slug"]).to eq(release.slug)
     end
 
     it "includes audio_url when track has audio file" do
@@ -162,18 +162,18 @@ RSpec.describe Api::RadioController, type: :controller do
       expect(track_json).to have_key("audio_url")
     end
 
-    it "includes cover_url when album has cover image" do
-      album = create(:album, artist: track1.artist)
-      track1.update(album: album)
+    it "includes cover_url when release has cover image" do
+      release = create(:release, artist: track1.artist)
+      track1.update(release: release)
 
       get :station_playlists, params: {id: station.id}, format: :json
 
       json = JSON.parse(response.body).first
       track_json = json["tracks"].first
-      album_json = track_json["album"]
+      release_json = track_json["release"]
 
-      # cover_url should be present in album
-      expect(album_json).to have_key("cover_url")
+      # cover_url should be present in release
+      expect(release_json).to have_key("cover_url")
     end
 
     it "orders tracks by position within each playlist" do

@@ -2,10 +2,10 @@ artist:
   name: "Cipher Protocol"
   genre: "Instrumental Progressive Metal"
 
-albums:
+releases:
   - slug: alpha-algorithm
     title: "Alpha Algorithm"
-    album_type: ep
+    release_type: ep
     release_date: "2122-09-17"
     cover_image: "alpha_algorithm.jpg"
     tracks:

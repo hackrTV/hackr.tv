@@ -1,7 +1,7 @@
 # Grid Mobs (NPCs)
 mobs:
   - name: Fracture Network Coordinator
-    room_slug: hackr_tv_broadcast_station
+    room_slug: hackr-tv-broadcast-station
     faction_slug: thecyberpulse
     description: "A tired but determined operative managing the hackr.tv station."
     mob_type: quest_giver
@@ -18,7 +18,7 @@ mobs:
         prism: "PRISM was the precursor - reality manipulation tech from 2050. The RIDE is what it became. Global. Pervasive. Inescapable. Unless you know where to look."
 
   - name: Temporal Theorist
-    room_slug: xeraen_operations_center
+    room_slug: xeraen-operations-center
     faction_slug: xeraen
     description: "A scientist studying the paradoxes of XERAEN's temporal discovery and its implications."
     mob_type: lore

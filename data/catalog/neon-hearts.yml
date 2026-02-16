@@ -2,10 +2,10 @@ artist:
   name: "Neon Hearts (ネオンハーツ)"
   genre: "J-Pop"
 
-albums:
+releases:
   - slug: saccharine
     title: "Saccharine"
-    album_type: ep
+    release_type: ep
     release_date: "2124-11-07"
     cover_image: "saccharine.jpg"
     tracks:
@@ -16,29 +16,24 @@ albums:
         audio_file: candy-coded.ogg
         featured: true
         lyrics: |
-          [Intro - Bright, playful]
           キャンディー, キャンディー
           Candy coded, can you see?
 
-          [Verse 1 - Cute delivery, Japanese/English mix]
           Sweet like sugar on the outside (外側)
           But look a little deeper inside (内側)
           We're not just cute, we're something more (もっと)
           Hidden messages in what we're for
 
-          [Verse 2 - Playful energy]
           ピンクとブルー, that's what you see
           But read between the melody
           Every lyric's got a secret code (コード)
           Candy wrapper hiding what we owe
 
-          [Pre-Chorus - Building, cute but intense]
           Sugar sweet but look beneath
           キャンディーコード, we don't deceive
           Packaged cute but we believe
           In the message that we weave
 
-          [Chorus - Catchy, energetic]
           Candy coded, sugar sweet!
           Hidden meaning in the beat!
           Look beyond what seems so neat!
@@ -48,25 +43,21 @@ albums:
           This is our philosophy!
           Candy coded, that's the key!
 
-          [Verse 3 - Rap section, fast delivery]
           They think we're harmless, just a pop song
           But they don't know we've been here all along
           Planting seeds in every hook we sing (歌う)
           Revolution's got a sweeter ring
 
-          [Bridge - Call and response with members]
           What do you see? (Candy!)
           What do we be? (Revolutionary!)
           Who are we? (Neon Hearts!)
           How do we start? (From the charts!)
 
-          [Breakdown - Glitchy, playful]
           C-A-N-D-Y
           コーデッド for you and I
           Sweet on top but strong inside
           Candy coded, can't hide
 
-          [Final Chorus - Full energy]
           Candy coded, sugar sweet!
           Hidden meaning in the beat!
           Look beyond what seems so neat!
@@ -76,7 +67,6 @@ albums:
           This is our philosophy!
           Candy coded, that's the key!
 
-          [Outro - Cute, fading]
           Candy coded (キャンディーコード)
           That's our mode (モード)
           Candy coded
@@ -88,29 +78,24 @@ albums:
         duration: "2:19"
         audio_file: kaleidoscopic.ogg
         lyrics: |
-          [Intro - Colorful, bright]
           万華鏡 (Kaleidoscope)
           Colors everywhere we go
 
-          [Verse 1 - Upbeat, energetic]
           They want to paint the world in gray (グレー)
           We bring the colors every day
           Kaleidoscopic, can't you see (見えるでしょう)
           We make our own reality
 
-          [Verse 2 - Building energy]
           Every shade and every hue (色)
           Breaking through what isn't true
           Spinning like a kaleidoscope (万華鏡)
           Giving everyone new hope
 
-          [Pre-Chorus - Building excitement]
           Paint the world in neon light (ネオン)
           Make our own reality tonight
           They want gray, we shine bright (輝く)
           Kaleidoscopic, take flight
 
-          [Chorus - Explosive, catchy]
           Kaleidoscopic dream!
           Nothing's what it seems!
           Colors bursting at the seams!
@@ -120,13 +105,11 @@ albums:
           Kaleidoscopic, don't wait!
           This is our fate!
 
-          [Verse 3 - Energetic]
           Round and round the colors go (回る)
           Creating patterns that we know
           Every turn reveals something new (新しい)
           Kaleidoscopic, me and you
 
-          [Bridge - Members trading lines rapidly]
           Red! (レッド!)
           Blue! (ブルー!)
           Gold! (ゴールド!)
@@ -134,13 +117,11 @@ albums:
           Every color that we see (見る)
           Is a part of being free!
 
-          [Breakdown - Electronic, playful]
           Spin spin spin the kaleidoscope (万華鏡)
           See the colors, feel the hope
           Spin spin spin, don't ever stop
           Kaleidoscopic, to the top
 
-          [Final Chorus - Maximum energy]
           Kaleidoscopic dream!
           Nothing's what it seems!
           Colors bursting at the seams!
@@ -150,7 +131,6 @@ albums:
           Kaleidoscopic, don't wait!
           This is our fate!
 
-          [Outro - Bright, fading]
           Kaleidoscopic (万華鏡)
           So hypnotic (催眠的)
           Kaleidoscopic
@@ -163,30 +143,25 @@ albums:
         audio_file: glitchframe.ogg
         featured: true
         lyrics: |
-          [Intro - Glitchy, stuttering]
           Er-er-error
           Gl-gl-glitch in the frame
           Cannot compute (計算できない)
 
-          [Verse 1 - Playful, deliberate glitches]
           Beep boop, I'm a glitch in your code (コード)
           エラーメッセージ overload
           Can't fix me, I'm on a different mode (モード)
           Watch your system explode (爆発)
 
-          [Verse 2 - Cute chaos]
           Running programs you don't understand (わからない)
           I'm the bug that wasn't planned
           Glitchframe disrupting your command (コマンド)
           Out of control, out of hand
 
-          [Pre-Chorus - Building with glitch effects]
           Try to patch me, try to fix (直す)
           I'm the glitch that always sticks
           System error, can't predict (予測)
           Glitchframe doing tricks
 
-          [Chorus - Glitchy, energetic]
           Glitchframe! Error in the system!
           Cannot find me, cannot list them!
           Glitchframe! バグだよ, I'm the problem!
@@ -196,25 +171,21 @@ albums:
           システムエラー, we're connected!
           Glitchframe, unrejected!
 
-          [Verse 3 - Rap section with glitches]
           404, can't find me in your database (データベース)
           I'm the error in your interface
           Glitchframe running at my own pace (ペース)
           Digital rebellion, in your face
 
-          [Bridge - Stuttering, playful]
           G-g-g-glitch (グリッチ)
           F-f-f-frame (フレーム)
           C-c-c-can't (できない)
           T-t-t-tame (飼いならす)
 
-          [Breakdown - Maximum glitch effects]
           Error error everywhere (エラー)
           System crashing, don't care
           Glitchframe in the air (空気)
           We're the bug that's always there
 
-          [Final Chorus - Full glitchy energy]
           Glitchframe! Error in the system!
           Cannot find me, cannot list them!
           Glitchframe! バグだよ, I'm the problem!
@@ -224,7 +195,6 @@ albums:
           システムエラー, we're connected!
           Glitchframe, unrejected!
 
-          [Outro - Glitchy fade]
           Gl-gl-glitchframe (グリッチフレーム)
           Cannot tame (飼いならせない)
           Glitchframe
@@ -236,29 +206,24 @@ albums:
         duration: "2:20"
         audio_file: hearts-in-sync.ogg
         lyrics: |
-          [Intro - Soft, emotional]
           心と心 (Heart to heart)
           Together from the start
 
-          [Verse 1 - Gentle, building]
           When our hearts beat as one (一つ)
           All together, we've already won
           Synchronized until we're done (終わり)
           Rising like the sun (太陽)
 
-          [Verse 2 - Building emotion]
           Every heartbeat tells the story (物語)
           Of our journey to this glory
           In sync, we find our way (道)
           Hearts together every day
 
-          [Pre-Chorus - Rising warmth]
           Feel the rhythm, feel the beat (ビート)
           Hearts in sync, incomplete (不完全)
           Alone, but when we meet (会う)
           Together we're complete (完全)
 
-          [Chorus - Emotional, powerful]
           Hearts in sync, beating strong!
           Together's where we belong!
           心と心, never wrong!
@@ -268,25 +233,21 @@ albums:
           ハート同期, we set sail!
           Hearts in sync, love will not pale!
 
-          [Verse 3 - Warm, genuine]
           Distance cannot break this bond (絆)
           Of what we've built and what's beyond
           Hearts in sync, we respond (応答)
           To every call, we correspond
 
-          [Bridge - Harmonies, emotional]
           一緒に (Together)
           強くなる (We grow stronger)
           心一つ (Hearts as one)
           永遠に (Forever)
 
-          [Breakdown - Soft, intimate with building]
           Heart to heart, soul to soul (魂)
           Together we are whole
           Synchronized, this is our role (役割)
           Hearts in sync, reach the goal
 
-          [Final Chorus - Full emotional power]
           Hearts in sync, beating strong!
           Together's where we belong!
           心と心, never wrong!
@@ -296,7 +257,6 @@ albums:
           ハート同期, we set sail!
           Hearts in sync, love will not pale!
 
-          [Outro - Soft, heartfelt]
           Hearts in sync (心同期)
           Forever linked (永遠につながる)
           Hearts in sync
@@ -309,30 +269,25 @@ albums:
         audio_file: starlight-rebellion.ogg
         featured: true
         lyrics: |
-          [Intro - Building, epic]
           星の光 (Starlight)
           Shining through the night
           We are the rebellion (反逆)
 
-          [Verse 1 - Building energy]
           In the darkness we appear (現れる)
           Starlight shining without fear
           We are the lights that guide the way (道)
           Rebellion in the night turns to day (昼)
 
-          [Verse 2 - Growing power]
           Every star that's in the sky (空)
           Represents the ones who try
           Starlight rebellion burning bright (明るい)
           We illuminate the night
 
-          [Pre-Chorus - Rising triumph]
           They can't dim our light (光)
           We shine through the night (夜)
           Starlight rebellion takes flight (飛ぶ)
           This is our birthright
 
-          [Chorus - Epic, triumphant]
           Starlight rebellion, hear us say!
           星の光, we're here to stay!
           Lighting up the Milky Way!
@@ -342,25 +297,21 @@ albums:
           Shining bright come what may!
           Starlight rebellion, every day!
 
-          [Verse 3 - Powerful]
           Constellations that we form (形)
           In the darkness we transform (変える)
           Every heart becomes a star (星)
           Starlight rebellion, here we are
 
-          [Bridge - Building to massive climax]
           One by one we light the sky (空)
           星になる, we will fly
           Together burning oh so bright (明るい)
           Starlight rebellion through the night
 
-          [Breakdown - Anthemic, powerful]
           We are starlight (星の光)
           We are the fight (戦い)
           We shine so bright (明るく輝く)
           Through the night (夜)
 
-          [Final Chorus - Maximum power, key change]
           Starlight rebellion, hear us say!
           星の光, we're here to stay!
           Lighting up the Milky Way!
@@ -370,7 +321,6 @@ albums:
           Shining bright come what may!
           Starlight rebellion, every day!
 
-          [Extended Outro - Triumphant]
           Starlight, starlight (星の光)
           We are the rebellion
           Starlight, starlight (反逆)

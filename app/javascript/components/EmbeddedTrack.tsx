@@ -22,7 +22,7 @@ export const EmbeddedTrack: React.FC<EmbeddedTrackProps> = ({ trackId }) => {
       title: string
       audio_url: string | null
       artist: { name: string }
-      album?: { cover_url: string | null }
+      release?: { cover_url: string | null }
     }
 
     const fetchTrack = async () => {
@@ -36,7 +36,7 @@ export const EmbeddedTrack: React.FC<EmbeddedTrackProps> = ({ trackId }) => {
           url: data.audio_url || '',
           title: data.title,
           artist: data.artist.name,
-          coverUrl: data.album?.cover_url || ''
+          coverUrl: data.release?.cover_url || ''
         }
 
         setTrackData(track)

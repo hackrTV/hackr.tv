@@ -19,19 +19,21 @@ interface ColorScheme {
 
 interface BandProfileLayoutProps {
   artistName: string
+  artistSlug?: string
   colorScheme: ColorScheme
   filterName: string
   intro?: React.ReactNode
-  albumSection?: React.ReactNode
+  releaseSection?: React.ReactNode
   philosophySection?: React.ReactNode
 }
 
 const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
   artistName,
+  artistSlug,
   colorScheme,
   filterName,
   intro,
-  albumSection,
+  releaseSection,
   philosophySection
 }) => {
   const { isMobile } = useMobileDetect()
@@ -86,7 +88,7 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
 
           <div className="band-profile-content">
             {intro}
-            {albumSection}
+            {releaseSection}
             {philosophySection}
 
             <div style={{
@@ -98,8 +100,17 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
               <Link to="/fm/bands" className="tui-button" style={{ ...backButtonStyle, textAlign: 'center' }}>
                 ← BACK TO BANDS
               </Link>
+              {artistSlug && (
+                <Link
+                  to={`/${artistSlug}/releases`}
+                  className="tui-button"
+                  style={{ ...buttonStyle, textAlign: 'center' }}
+                >
+                  RELEASES
+                </Link>
+              )}
               <Link
-                to={`/fm/pulse_vault?filter=${encodeURIComponent(filterName)}`}
+                to={`/fm/pulse-vault?filter=${encodeURIComponent(filterName)}`}
                 className="tui-button"
                 style={{ ...buttonStyle, textAlign: 'center' }}
               >

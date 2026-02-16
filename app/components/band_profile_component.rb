@@ -2,7 +2,7 @@
 
 class BandProfileComponent < ViewComponent::Base
   renders_one :intro
-  renders_one :album_section
+  renders_one :release_section
   renders_one :philosophy_section
 
   def initialize(artist:, tracks:, color_scheme:, filter_name: nil)

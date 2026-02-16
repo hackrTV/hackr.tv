@@ -2,7 +2,7 @@
 # YAML files are the single source of truth for all seeded content
 #
 # Import Order (respecting dependencies):
-# 1. catalog           (artists, albums, tracks from per-artist YAML files)
+# 1. catalog           (artists, releases, tracks from per-artist YAML files)
 # 4. hackrs            (no deps)
 # 5. channels          (no deps)
 # 6. radio_stations    (no deps)
@@ -66,7 +66,7 @@ namespace :data do
   end
 
   # === Layer Tasks ===
-  desc "Load catalog (artists, albums, tracks) from per-artist YAML files"
+  desc "Load catalog (artists, releases, tracks) from per-artist YAML files"
   task catalog: :environment do
     puts "\n--- Loading Catalog ---"
     catalog_dir = Rails.root.join("data", "catalog")
@@ -83,7 +83,7 @@ namespace :data do
     end
 
     artists_created = artists_updated = 0
-    albums_created = albums_updated = 0
+    releases_created = releases_updated = 0
     tracks_created = tracks_updated = 0
 
     artist_files.each do |file|
@@ -107,39 +107,45 @@ namespace :data do
         puts "  #{was_new ? "✓ Created" : "↻ Updated"} artist: #{artist.name}"
       end
 
-      # Upsert albums and tracks
-      (data["albums"] || []).each do |album_data|
-        next unless album_data["title"].present? && album_data["slug"].present?
+      # Upsert releases and tracks
+      (data["releases"] || []).each do |release_data|
+        next unless release_data["title"].present? && release_data["slug"].present?
 
-        album = Album.find_or_initialize_by(artist: artist, slug: album_data["slug"])
-        was_new = album.new_record?
+        release = Release.find_or_initialize_by(artist: artist, slug: release_data["slug"])
+        was_new = release.new_record?
 
-        release_date = DataLoaderHelpers.parse_date(album_data["release_date"])
+        release_date = DataLoaderHelpers.parse_date(release_data["release_date"])
 
-        album.assign_attributes(
-          name: album_data["title"],
-          album_type: album_data["album_type"],
+        release.assign_attributes(
+          name: release_data["title"],
+          release_type: release_data["release_type"],
           release_date: release_date,
-          description: album_data["description"]
+          description: release_data["description"],
+          catalog_number: release_data["catalog_number"],
+          media_format: release_data["media_format"],
+          classification: release_data["classification"],
+          label: release_data["label"],
+          credits: release_data["credits"],
+          notes: release_data["notes"]
         )
 
-        if album.changed?
-          album.save!
-          was_new ? (albums_created += 1) : (albums_updated += 1)
-          puts "  #{was_new ? "✓ Created" : "↻ Updated"} album: #{album.name} (#{artist.name})"
+        if release.changed?
+          release.save!
+          was_new ? (releases_created += 1) : (releases_updated += 1)
+          puts "  #{was_new ? "✓ Created" : "↻ Updated"} release: #{release.name} (#{artist.name})"
         end
 
         # Attach cover image if specified
-        DataLoaderHelpers.attach_cover_image(album, album_data["cover_image"], artist_slug) if album_data["cover_image"].present?
+        DataLoaderHelpers.attach_cover_image(release, release_data["cover_image"], artist_slug) if release_data["cover_image"].present?
 
         # Upsert tracks
-        (album_data["tracks"] || []).each do |track_data|
+        (release_data["tracks"] || []).each do |track_data|
           track = artist.tracks.find_or_initialize_by(slug: track_data["slug"])
           was_new = track.new_record?
 
           track.assign_attributes(
             title: track_data["title"],
-            album: album,
+            release: release,
             track_number: track_data["track_number"],
             duration: track_data["duration"],
             cover_image: track_data["cover_image"],
@@ -160,7 +166,7 @@ namespace :data do
     end
 
     puts "Artists: #{artists_created} created, #{artists_updated} updated, #{Artist.count} total"
-    puts "Albums: #{albums_created} created, #{albums_updated} updated, #{Album.count} total"
+    puts "Releases: #{releases_created} created, #{releases_updated} updated, #{Release.count} total"
     puts "Tracks: #{tracks_created} created, #{tracks_updated} updated, #{Track.count} total"
   end
 
@@ -234,7 +240,7 @@ namespace :data do
     RadioStationPlaylist.destroy_all if defined?(RadioStationPlaylist)
     RadioStation.destroy_all
     Track.destroy_all
-    Album.destroy_all
+    Release.destroy_all
     Artist.destroy_all
     puts "All data cleared."
   end
@@ -1242,9 +1248,9 @@ namespace :data do
       next
     end
 
-    livestream_archive = thecyberpulse.albums.find_by(slug: "livestream-archive")
+    livestream_archive = thecyberpulse.releases.find_by(slug: "livestream-archive")
     unless livestream_archive
-      puts "  ✗ Livestream Archive album not found (run data:catalog first)"
+      puts "  ✗ Livestream Archive release not found (run data:catalog first)"
       next
     end
 
@@ -1395,11 +1401,12 @@ namespace :data do
 
           next unless parsed
 
-          artist = Artist.find_by(slug: parsed[:artist_slug])
+          normalized_slug = parsed[:artist_slug].tr("_", "-")
+          artist = Artist.find_by(slug: normalized_slug)
           unless artist
-            unless artists_seen[parsed[:artist_slug]]
-              puts "  ⚠ Artist not found: #{parsed[:artist_slug]}"
-              artists_seen[parsed[:artist_slug]] = true
+            unless artists_seen[normalized_slug]
+              puts "  ⚠ Artist not found: #{normalized_slug}"
+              artists_seen[normalized_slug] = true
             end
             not_found_count += 1
             next
@@ -1452,7 +1459,7 @@ namespace :data do
       Dir.glob(imports_dir.join("*")).each do |artist_dir|
         next unless File.directory?(artist_dir)
 
-        artist_slug = File.basename(artist_dir)
+        artist_slug = File.basename(artist_dir).tr("_", "-")
         artist = Artist.find_by(slug: artist_slug)
 
         unless artist
@@ -1492,7 +1499,7 @@ namespace :data do
         parsed = parse_file_path.call(file_path)
         next unless parsed
 
-        artist = Artist.find_by(slug: parsed[:artist_slug])
+        artist = Artist.find_by(slug: parsed[:artist_slug].tr("_", "-"))
         unless artist
           puts "  ✗ Artist not found: #{parsed[:artist_slug]} (from #{File.basename(file_path)})"
           not_found_count += 1
@@ -1546,21 +1553,25 @@ module DataLoaderHelpers
     nil
   end
 
-  def attach_cover_image(album, cover_image_path, artist_slug)
-    return if album.cover_image.attached?
+  def attach_cover_image(release, cover_image_path, artist_slug)
+    return if release.cover_image.attached?
 
     filename = File.basename(cover_image_path)
+    legacy_slug = artist_slug.tr("-", "_")
     possible_paths = [
       Rails.root.join("data", artist_slug, filename),
       Rails.root.join("data", artist_slug, "covers", filename),
       Rails.root.join("data", artist_slug, "images", filename),
+      Rails.root.join("data", legacy_slug, filename),
+      Rails.root.join("data", legacy_slug, "covers", filename),
+      Rails.root.join("data", legacy_slug, "images", filename),
       Rails.root.join("data", cover_image_path)
     ]
 
     cover_path = possible_paths.find { |path| File.exist?(path) }
 
     if cover_path
-      album.cover_image.attach(
+      release.cover_image.attach(
         io: File.open(cover_path),
         filename: filename
       )

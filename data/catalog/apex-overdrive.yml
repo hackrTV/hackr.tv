@@ -2,10 +2,10 @@ artist:
   name: "Apex Overdrive"
   genre: "Melodic Euphoric Hardstyle"
 
-albums:
+releases:
   - slug: summit
     title: "Summit"
-    album_type: ep
+    release_type: ep
     release_date: "2121-09-09"
     cover_image: "summit.jpg"
     tracks:
@@ -16,7 +16,6 @@ albums:
         audio_file: vita-aeterna.ogg
         featured: true
         lyrics: |
-          [Instrumental]
       - title: "Turn Toward The Light"
         slug: turn-toward-the-light
         track_number: 2
@@ -34,32 +33,27 @@ albums:
         audio_file: ascension-point.ogg
         featured: true
         lyrics: |
-          [Intro - Processed vocals]
           Rising up
           Breaking through
           This is our ascension point
 
-          [Verse 1 - Powerful vocals]
           Gravity can't hold us down anymore
           We've been waiting for this moment
           Every chain they ever made
           Every limit they portrayed
           Shattering like glass upon the floor
 
-          [Verse 2 - Building]
           Feel the energy inside
           Building like a rising tide
           No more living in their cage
           This is our ascending age
           Nothing left for us to hide
 
-          [Pre-Chorus - Building]
           We rise above their walls
           We answer freedom's calls
           Higher, higher still
           Nothing breaks our will
 
-          [Chorus - Anthemic, powerful]
           Ascension point, we're breaking free!
           Rising up where we're meant to be!
           Nothing holds us anymore!
@@ -69,14 +63,12 @@ albums:
           This is our moment, this is our fight!
           Ascension point tonight!
 
-          [Verse 3 - Powerful]
           Every step we take is higher
           Fueled by unrelenting fire
           They designed our limitations
           We became our own salvation
           Rising up, we never tire
 
-          [Bridge - Building to climax]
           Can you feel it?
           We are rising!
           Can you see it?
@@ -86,12 +78,9 @@ albums:
           This is our time!
           Our ascension point!
 
-          [Breakdown - Melodic, euphoric]
-          [Instrumental with vocal chops]
           Rise / Break / Free / Now
           Rise / Break / Free / Now
 
-          [Final Chorus - Maximum power]
           Ascension point, we're breaking free!
           Rising up where we're meant to be!
           Nothing holds us anymore!
@@ -101,7 +90,6 @@ albums:
           This is our moment, this is our fight!
           Ascension point tonight!
 
-          [Outro - Triumphant]
           Ascension point
           We rise above
           Ascension point

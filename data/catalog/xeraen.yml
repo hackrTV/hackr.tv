@@ -2,10 +2,10 @@ artist:
   name: "XERAEN"
   genre: "Omniwave"
 
-albums:
+releases:
   - slug: encrypted-shroud
     title: "Encrypted Shroud"
-    album_type: single
+    release_type: single
     release_date: "2125-07-19"
     cover_image: "images/encrypted_shroud.jpg"
     tracks:
@@ -28,7 +28,6 @@ albums:
           Transaction trackers show
           The goals of their mark
 
-          [Chorus]
           A way outta the maze
           Fight through the digital RAINNs
           Engage, make it loud
@@ -44,7 +43,6 @@ albums:
           GovCorp, feel the flames
           In the end, they'll know our name
 
-          [Chorus]
           A way outta the maze
           Fight through the digital RAINNs
           Engage, make it loud
@@ -60,7 +58,6 @@ albums:
           GovCorp, feel the flames
           In the end, they'll know our name
 
-          [Chorus]
           A way outta the maze
           Fight through the digital RAINNs
           Engage, make it loud
@@ -68,7 +65,7 @@ albums:
 
   - slug: xordium
     title: "XORDIUM"
-    album_type: ep
+    release_type: ep
     release_date: "2124-10-17"
     cover_image: "images/xordium.jpg"
     tracks:
@@ -104,7 +101,6 @@ albums:
           Purpose joined with me and you
           Steadfast hearts in all we do
 
-          [Chorus]
           Rise together we won't fall
           Hear the echoes in our call
           Power to the hackrs all
@@ -120,7 +116,6 @@ albums:
           United we are strong as one
           The freedom fight has just begun
 
-          [Chorus]
           Rise together we won't fall
           Hear the echoes in our call
           Power to the hackrs all
@@ -163,7 +158,6 @@ albums:
           Got no chains, I'm unconfined
           Seeking light, letting it shine
 
-          [Chorus]
           Rise again stronger than before
           Break the chains, open the door
           Life's a fight hear my roar
@@ -179,7 +173,6 @@ albums:
           Now I soar, left my mark
           Stitch the wounds, heal the scar
 
-          [Chorus]
           Rise again stronger than before
           Break the chains, open the door
           Life's a fight, hear my roar
@@ -189,7 +182,7 @@ albums:
 
   - slug: dogs-can-grow-beards-all-over
     title: "Dogs Can Grow Beards All Over"
-    album_type: single
+    release_type: single
     release_date: "2124-08-05"
     cover_image: "images/dogs_can_grow_beards_all_over.jpg"
     tracks:
@@ -201,7 +194,7 @@ albums:
 
   - slug: dream-surprise
     title: "Dream Surprise"
-    album_type: single
+    release_type: single
     release_date: "2124-07-12"
     cover_image: "images/dream_surprise.jpg"
     tracks:
@@ -213,7 +206,7 @@ albums:
 
   - slug: birdo
     title: "Birdo"
-    album_type: single
+    release_type: single
     release_date: "2124-05-21"
     cover_image: "images/birdo.jpg"
     tracks:
@@ -225,7 +218,7 @@ albums:
 
   - slug: our-city
     title: "Our City"
-    album_type: single
+    release_type: single
     release_date: "2122-09-28"
     cover_image: "images/our_city.jpg"
     tracks:

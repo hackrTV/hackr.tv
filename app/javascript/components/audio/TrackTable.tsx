@@ -15,7 +15,7 @@ interface Track {
   id: number
   title: string
   artist: { name: string; slug?: string; genre: string | null }
-  album: { name: string; cover_url: string | null }
+  release: { name: string; cover_url: string | null }
   audio_url: string | null
 }
 
@@ -47,7 +47,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
     return (
       track.title.toLowerCase().includes(searchTerm) ||
       track.artist.name.toLowerCase().includes(searchTerm) ||
-      track.album.name.toLowerCase().includes(searchTerm) ||
+      track.release.name.toLowerCase().includes(searchTerm) ||
       (track.artist.genre && track.artist.genre.toLowerCase().includes(searchTerm))
     )
   })
@@ -69,7 +69,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
           url: track.audio_url!,
           title: track.title,
           artist: track.artist.name,
-          coverUrl: track.album.cover_url || ''
+          coverUrl: track.release.cover_url || ''
         }))
 
       // Check if switching from radio station before setting new playlist
@@ -89,7 +89,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
         url: track.audio_url,
         title: track.title,
         artist: track.artist.name,
-        coverUrl: track.album.cover_url || ''
+        coverUrl: track.release.cover_url || ''
       })
       setCurrentTrackId(track.id)
       setIsPlaying(true)
@@ -212,11 +212,11 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
       >
         {/* Album cover or play button */}
         <div style={{ flexShrink: 0, width: '40px', height: '40px', position: 'relative' }}>
-          {track.album.cover_url ? (
+          {track.release.cover_url ? (
             <>
               <img
-                src={track.album.cover_url}
-                alt={track.album.name}
+                src={track.release.cover_url}
+                alt={track.release.name}
                 style={{
                   width: '40px',
                   height: '40px',
@@ -317,7 +317,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
     <div>
       <div style={{ marginBottom: isMobile ? '12px' : '20px' }}>
         <label htmlFor="track-search" style={{ color: '#888', display: 'block', marginBottom: '8px', fontSize: isMobile ? '0.85em' : '1em' }}>
-          {isMobile ? 'SEARCH TRACKS' : 'SEARCH TRACKS :: Filter by track, artist, album, or genre'}
+          {isMobile ? 'SEARCH TRACKS' : 'SEARCH TRACKS :: Filter by track, artist, release, or genre'}
         </label>
         <input
           type="text"
@@ -354,7 +354,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
               <tr>
                 <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Track</th>
                 <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Artist</th>
-                <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Album</th>
+                <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Release</th>
                 <th style={{ textAlign: 'left', color: '#888' }}>&nbsp;Genre</th>
                 <th style={{ textAlign: 'center', color: '#888', width: '120px', minWidth: '120px' }}>Stream</th>
               </tr>
@@ -403,7 +403,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
                       &nbsp;{track.artist.name}&nbsp;
                     </td>
                     <td style={{ color: !track.audio_url ? '#555' : isCurrentTrack && isPlaying ? '#00ffff' : '#999' }}>
-                      &nbsp;{track.album.name || '-'}&nbsp;
+                      &nbsp;{track.release.name || '-'}&nbsp;
                     </td>
                     <td style={{ color: !track.audio_url ? '#555' : isCurrentTrack && isPlaying ? '#00ffff' : '#999' }}>
                       &nbsp;{track.artist.genre || '-'}&nbsp;

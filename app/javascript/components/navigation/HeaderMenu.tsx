@@ -194,8 +194,8 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/fm/radio" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>radio
                 </Link>
-                <Link to="/fm/pulse_vault" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">/</span>pulse_vault
+                <Link to="/fm/pulse-vault" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">/</span>pulse-vault
                 </Link>
                 <Link to="/fm/bands" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>bands
@@ -398,8 +398,8 @@ export const HeaderMenu: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/fm/pulse_vault" onClick={closeDropdown}>
-                    <span className="purple-168-text">/</span>pulse_vault
+                  <Link to="/fm/pulse-vault" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>pulse-vault
                   </Link>
                 </li>
                 <li>
