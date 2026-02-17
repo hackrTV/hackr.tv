@@ -1283,6 +1283,7 @@ namespace :data do
       stream.assign_attributes(
         title: attrs["title"],
         live_url: live_url,
+        track_slug: attrs["track_slug"],
         is_live: false,
         started_at: started_at,
         ended_at: ended_at

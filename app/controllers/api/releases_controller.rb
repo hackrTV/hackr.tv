@@ -33,7 +33,7 @@ module Api
     def show
       @release = Release.find_by(slug: params[:id]) || Release.find(params[:id])
 
-      tracks = @release.tracks.order(:track_number, :title)
+      tracks = @release.tracks.includes(:hackr_streams).order(:track_number, :title)
       disc_length = tracks.sum { |t| parse_duration(t.duration) }
 
       render json: {
@@ -66,7 +66,8 @@ module Api
             track_number: track.track_number,
             duration: track.duration,
             streaming_links: track.streaming_links,
-            audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil
+            audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil,
+            vidz: track.hackr_streams.map { |v| {id: v.id, title: v.title} }
           }
         }
       }

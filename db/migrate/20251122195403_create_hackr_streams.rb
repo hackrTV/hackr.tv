@@ -6,6 +6,7 @@ class CreateHackrStreams < ActiveRecord::Migration[8.1]
       t.string :live_url
       t.string :vod_url
       t.string :title
+      t.string :track_slug
       t.datetime :started_at
       t.datetime :ended_at
 
