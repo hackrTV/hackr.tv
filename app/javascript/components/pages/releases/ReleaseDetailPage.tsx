@@ -424,6 +424,20 @@ const ReleaseDetailPage: React.FC = () => {
                 <fieldset style={{ borderColor: streamingSection.borderColor }}>
                   <legend style={{ color: streamingSection.legendColor, textShadow: `0 0 10px ${streamingSection.glowColor}` }}>STREAMING FREQUENCIES</legend>
                   <div style={{ padding: '15px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <Link
+                      to={`/fm/pulse-vault?filter=${encodeURIComponent(release.name)}`}
+                      style={{
+                        padding: '8px 16px',
+                        background: colorScheme.primary,
+                        color: '#fff',
+                        textDecoration: 'none',
+                        fontWeight: 'bold',
+                        boxShadow: `0 0 15px ${colorScheme.glow}`,
+                        fontSize: '0.9em'
+                      }}
+                    >
+                      ▶ PULSE VAULT
+                    </Link>
                     {sortedLinks.map(([platform, url]) => (
                       <a
                         key={platform}
