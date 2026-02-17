@@ -127,7 +127,7 @@ namespace :data do
           label: release_data["label"],
           credits: release_data["credits"],
           notes: release_data["notes"],
-          streaming_links: release_data["streaming_links"]
+          streaming_links: DataLoaderHelpers.normalize_json(release_data["streaming_links"])
         )
 
         if release.changed?
@@ -152,8 +152,8 @@ namespace :data do
             cover_image: track_data["cover_image"],
             featured: track_data["featured"] || false,
             show_in_pulse_vault: track_data.fetch("show_in_pulse_vault", true),
-            streaming_links: track_data["streaming_links"],
-            videos: track_data["videos"],
+            streaming_links: DataLoaderHelpers.normalize_json(track_data["streaming_links"]),
+            videos: DataLoaderHelpers.normalize_json(track_data["videos"]),
             lyrics: track_data["lyrics"]
           )
 
@@ -400,19 +400,29 @@ namespace :data do
         puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{playlist.name}"
       end
 
-      # Add tracks from artist
+      # Sync tracks from artist
       if attrs["artist_tracks"].present?
         artist = Artist.find_by(slug: attrs["artist_tracks"])
         if artist
-          artist.tracks.each_with_index do |track, index|
-            ZonePlaylistTrack.find_or_create_by!(
-              zone_playlist: playlist,
-              track: track
-            ) do |zpt|
-              zpt.position = index + 1
+          desired_track_ids = artist.tracks.pluck(:id).to_set
+
+          # Remove stale tracks
+          playlist.zone_playlist_tracks.each do |zpt|
+            unless desired_track_ids.include?(zpt.track_id)
+              zpt.destroy!
             end
           end
-          puts "    → Added #{artist.tracks.count} tracks from #{artist.name}"
+
+          # Add/update track positions
+          artist.tracks.each_with_index do |track, index|
+            zpt = ZonePlaylistTrack.find_or_initialize_by(
+              zone_playlist: playlist,
+              track: track
+            )
+            zpt.position = index + 1
+            zpt.save! if zpt.new_record? || zpt.changed?
+          end
+          puts "    → Synced #{artist.tracks.count} tracks from #{artist.name}"
         end
       end
     end
@@ -550,7 +560,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     exits_data = data["exits"]
-    created = 0
+    created = updated = 0
 
     exits_data.each do |attrs|
       from_room = GridRoom.find_by(slug: attrs["from_room_slug"])
@@ -566,16 +576,18 @@ namespace :data do
         to_room: to_room,
         direction: attrs["direction"]
       )
+      was_new = exit_record.new_record?
 
-      if exit_record.new_record?
-        exit_record.locked = attrs["locked"] || false
+      exit_record.locked = attrs["locked"] || false
+
+      if exit_record.changed?
         exit_record.save!
-        created += 1
-        puts "  ✓ Created: #{from_room.name} -> #{attrs["direction"]} -> #{to_room.name}"
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{from_room.name} -> #{attrs["direction"]} -> #{to_room.name}"
       end
     end
 
-    puts "Exits: #{created} created, #{GridExit.count} total"
+    puts "Exits: #{created} created, #{updated} updated, #{GridExit.count} total"
   end
 
   desc "Load mobs from YAML"
@@ -633,7 +645,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     items_data = data["items"]
-    created = 0
+    created = updated = 0
 
     items_data.each do |attrs|
       room = GridRoom.find_by(slug: attrs["room_slug"])
@@ -643,18 +655,21 @@ namespace :data do
       end
 
       item = GridItem.find_or_initialize_by(name: attrs["name"], room: room)
-      if item.new_record?
-        item.assign_attributes(
-          description: attrs["description"],
-          item_type: attrs["item_type"]
-        )
+      was_new = item.new_record?
+
+      item.assign_attributes(
+        description: attrs["description"],
+        item_type: attrs["item_type"]
+      )
+
+      if item.changed?
         item.save!
-        created += 1
-        puts "  ✓ Created: #{item.name}"
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{item.name}"
       end
     end
 
-    puts "Items: #{created} created, #{GridItem.count} total"
+    puts "Items: #{created} created, #{updated} updated, #{GridItem.count} total"
   end
 
   desc "Load key playlists from YAML"
@@ -691,31 +706,54 @@ namespace :data do
         puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{playlist.name}"
       end
 
-      # Link to radio station if specified
+      # Sync radio station link
       if radio_station
         RadioStationPlaylist.find_or_create_by!(
           radio_station: radio_station,
           playlist: playlist
         )
         puts "    → Linked to radio station: #{radio_station.name}"
+      else
+        # Remove stale radio station links for this playlist
+        playlist.radio_station_playlists.destroy_all
       end
 
-      # Add tracks
+      # Sync tracks
       if attrs["tracks"].present?
-        attrs["tracks"].each_with_index do |track_ref, index|
+        desired_tracks = []
+        attrs["tracks"].each do |track_ref|
           artist_slug, track_slug = track_ref.split("/")
           artist = Artist.find_by(slug: artist_slug)
           track = artist&.tracks&.find_by(slug: track_slug)
 
           if track
-            PlaylistTrack.find_or_create_by!(playlist: playlist, track: track) do |pt|
-              pt.position = index + 1
-            end
+            desired_tracks << track
           else
             puts "    ✗ Track not found: #{track_ref}"
           end
         end
-        puts "    → Added #{attrs["tracks"].size} tracks"
+
+        desired_track_ids = desired_tracks.map(&:id).to_set
+
+        # Remove stale tracks
+        playlist.playlist_tracks.each do |pt|
+          unless desired_track_ids.include?(pt.track_id)
+            pt.destroy!
+            puts "    - Removed stale track from playlist"
+          end
+        end
+
+        # Add/update track positions
+        desired_tracks.each_with_index do |track, index|
+          pt = PlaylistTrack.find_or_initialize_by(playlist: playlist, track: track)
+          pt.position = index + 1
+          pt.save! if pt.new_record? || pt.changed?
+        end
+        puts "    → Synced #{desired_tracks.size} tracks"
+      else
+        # No tracks specified — clear any existing
+        removed = playlist.playlist_tracks.destroy_all.size
+        puts "    - Removed #{removed} stale tracks" if removed > 0
       end
     end
 
@@ -911,22 +949,25 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     elements_data = data["elements"]
-    created = 0
+    created = updated = 0
 
     elements_data.each do |attrs|
       element = OverlayElement.find_or_initialize_by(slug: attrs["slug"])
-      if element.new_record?
-        element.assign_attributes(
-          name: attrs["name"],
-          element_type: attrs["element_type"]
-        )
+      was_new = element.new_record?
+
+      element.assign_attributes(
+        name: attrs["name"],
+        element_type: attrs["element_type"]
+      )
+
+      if element.changed?
         element.save!
-        created += 1
-        puts "  ✓ Created: #{element.name}"
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{element.name}"
       end
     end
 
-    puts "Overlay Elements: #{created} created, #{OverlayElement.count} total"
+    puts "Overlay Elements: #{created} created, #{updated} updated, #{OverlayElement.count} total"
   end
 
   desc "Load overlay tickers from YAML"
@@ -1012,24 +1053,27 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     scenes_data = data["scenes"]
-    created = 0
+    created = updated = 0
 
     scenes_data.each do |attrs|
       scene = OverlayScene.find_or_initialize_by(slug: attrs["slug"])
-      if scene.new_record?
-        scene.assign_attributes(
-          name: attrs["name"],
-          scene_type: attrs["scene_type"],
-          width: attrs["width"],
-          height: attrs["height"]
-        )
+      was_new = scene.new_record?
+
+      scene.assign_attributes(
+        name: attrs["name"],
+        scene_type: attrs["scene_type"],
+        width: attrs["width"],
+        height: attrs["height"]
+      )
+
+      if scene.changed?
         scene.save!
-        created += 1
-        puts "  ✓ Created: #{scene.name}"
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{scene.name}"
       end
     end
 
-    puts "Overlay Scenes: #{created} created, #{OverlayScene.count} total"
+    puts "Overlay Scenes: #{created} created, #{updated} updated, #{OverlayScene.count} total"
   end
 
   desc "Load overlay scene elements from YAML"
@@ -1044,7 +1088,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     scene_elements_data = data["scene_elements"]
-    created = 0
+    created = updated = 0
 
     scene_elements_data.each do |attrs|
       scene = OverlayScene.find_by(slug: attrs["scene_slug"])
@@ -1059,22 +1103,24 @@ namespace :data do
         overlay_scene: scene,
         overlay_element: element
       )
+      was_new = se.new_record?
 
-      if se.new_record?
-        se.assign_attributes(
-          x: attrs["x"],
-          y: attrs["y"],
-          width: attrs["width"],
-          height: attrs["height"],
-          z_index: attrs["z_index"]
-        )
+      se.assign_attributes(
+        x: attrs["x"],
+        y: attrs["y"],
+        width: attrs["width"],
+        height: attrs["height"],
+        z_index: attrs["z_index"]
+      )
+
+      if se.changed?
         se.save!
-        created += 1
-        puts "  ✓ Created: #{element.name} in #{scene.name}"
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{element.name} in #{scene.name}"
       end
     end
 
-    puts "Overlay Scene Elements: #{created} created, #{OverlaySceneElement.count} total"
+    puts "Overlay Scene Elements: #{created} created, #{updated} updated, #{OverlaySceneElement.count} total"
   end
 
   desc "Load overlay scene groups from YAML"
@@ -1095,33 +1141,53 @@ namespace :data do
       next
     end
 
-    created = 0
+    created = updated = 0
     groups_data.each do |attrs|
       group = OverlaySceneGroup.find_or_initialize_by(slug: attrs["slug"])
-      if group.new_record?
-        group.assign_attributes(
-          name: attrs["name"],
-          description: attrs["description"]
-        )
-        group.save!
-        created += 1
-        puts "  ✓ Created: #{group.name}"
+      was_new = group.new_record?
 
-        # Add scenes to group
-        attrs["scenes"]&.each_with_index do |scene_slug, index|
-          scene = OverlayScene.find_by(slug: scene_slug)
-          if scene
-            OverlaySceneGroupScene.create!(
-              overlay_scene_group: group,
-              overlay_scene: scene,
-              position: index + 1
-            )
-          end
+      group.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"]
+      )
+
+      if group.changed?
+        group.save!
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{group.name}"
+      end
+
+      # Sync scenes in group
+      scene_slugs = attrs["scenes"] || []
+      desired_scenes = scene_slugs.filter_map { |slug| OverlayScene.find_by(slug: slug) }
+      desired_scene_ids = desired_scenes.map(&:id).to_set
+
+      existing = group.overlay_scene_group_scenes.includes(:overlay_scene).to_a
+      existing_scene_ids = existing.map(&:overlay_scene_id).to_set
+
+      # Remove stale
+      existing.each do |sgs|
+        unless desired_scene_ids.include?(sgs.overlay_scene_id)
+          sgs.destroy!
+          puts "    - Removed scene: #{sgs.overlay_scene.name}"
+        end
+      end
+
+      # Add/update positions
+      desired_scenes.each_with_index do |scene, index|
+        sgs = OverlaySceneGroupScene.find_or_initialize_by(
+          overlay_scene_group: group,
+          overlay_scene: scene
+        )
+        sgs.position = index + 1
+        if sgs.new_record? || sgs.changed?
+          sgs.save!
+          puts "    + Added scene: #{scene.name}" if !existing_scene_ids.include?(scene.id)
         end
       end
     end
 
-    puts "Overlay Scene Groups: #{created} created"
+    puts "Overlay Scene Groups: #{created} created, #{updated} updated"
   end
 
   desc "Load redirects from YAML"
@@ -1205,12 +1271,18 @@ namespace :data do
       started_at = attrs["started_at"].present? ? Time.parse(attrs["started_at"]) : nil
       ended_at = attrs["ended_at"].present? ? Time.parse(attrs["ended_at"]) : nil
 
-      stream = HackrStream.find_or_initialize_by(vod_url: attrs["vod_url"], artist: artist)
+      # Pre-convert YouTube URL to embed format to match what the model stores
+      # (HackrStream.before_validation converts watch/live URLs to embed URLs)
+      vod_url = DataLoaderHelpers.youtube_embed_url(attrs["vod_url"])
+
+      stream = HackrStream.find_or_initialize_by(vod_url: vod_url, artist: artist)
       was_new = stream.new_record?
+
+      live_url = DataLoaderHelpers.youtube_embed_url(attrs["live_url"])
 
       stream.assign_attributes(
         title: attrs["title"],
-        live_url: attrs["live_url"],
+        live_url: live_url,
         is_live: false,
         started_at: started_at,
         ended_at: ended_at
@@ -1545,6 +1617,35 @@ end
 # Helper module for data loading utilities
 module DataLoaderHelpers
   module_function
+
+  # Normalize a value for serialized JSON columns to prevent spurious dirty tracking.
+  # YAML loads Ruby objects that may differ in structure from what ActiveRecord
+  # deserializes from the database (e.g., HashWithIndifferentAccess vs Hash,
+  # symbol keys vs string keys). Round-tripping through JSON ensures consistent
+  # comparison so that `changed?` only fires on real changes.
+  def normalize_json(value)
+    return nil if value.nil?
+    JSON.parse(JSON.generate(value))
+  end
+
+  # Convert YouTube watch/live URLs to embed format, matching
+  # HackrStream's before_validation conversion. This ensures
+  # find_or_initialize_by matches existing DB records.
+  def youtube_embed_url(url)
+    return url if url.blank?
+
+    [
+      /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+      /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/
+    ].each do |pattern|
+      if (match = url.match(pattern))
+        return "https://www.youtube.com/embed/#{match[1]}"
+      end
+    end
+
+    url
+  end
 
   def parse_date(date_value)
     return nil if date_value.blank?
