@@ -7,6 +7,6 @@ class Admin::ZonePlaylistsController < Admin::ApplicationController
 
   def show
     @zone_playlist = ZonePlaylist.find(params[:id])
-    @tracks = @zone_playlist.ordered_tracks.includes(:artist, :album)
+    @tracks = @zone_playlist.ordered_tracks.includes(:artist, :release)
   end
 end

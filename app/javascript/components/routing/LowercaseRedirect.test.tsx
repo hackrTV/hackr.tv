@@ -69,8 +69,8 @@ describe('LowercaseRedirect', () => {
   })
 
   it('redirects band profile paths to lowercase', () => {
-    renderWithRouter('/System_Rot')
-    expect(mockNavigate).toHaveBeenCalledWith('/system_rot', { replace: true })
+    renderWithRouter('/System-Rot')
+    expect(mockNavigate).toHaveBeenCalledWith('/system-rot', { replace: true })
   })
 
   it('redirects grid paths to lowercase', () => {

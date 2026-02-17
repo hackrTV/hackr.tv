@@ -2,10 +2,10 @@ artist:
   name: "The.CyberPul.se"
   genre: "Hackrcore"
 
-albums:
+releases:
   - slug: hackr-nights
     title: "Hackr Nights"
-    album_type: single
+    release_type: single
     tracks:
       - title: "Hackr Nights"
         slug: hackr-nights
@@ -22,7 +22,6 @@ albums:
           We're the Pulse in every node
           Our future's hidden in the code
 
-          [Chorus]
           Hackr nights and neon lights
           We take the fight to unknown heights
           Weapons forged in lines of code
@@ -43,7 +42,6 @@ albums:
           We're the Pulse in every node
           Our future's hidden in the code
 
-          [Chorus]
           Hackr nights and neon lights
           We take the fight to unknown heights
           Weapons forged in lines of code
@@ -60,7 +58,7 @@ albums:
 
   - slug: livestream-archive
     title: "Livestream Archive"
-    album_type: lp
+    release_type: lp
     release_date: "2118-10-08"
     description: "Archived recordings from live trans-temporal broadcasts."
     cover_image: "images/livestream_archive.jpg"

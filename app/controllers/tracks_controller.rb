@@ -4,11 +4,11 @@ class TracksController < ApplicationController
 
   # Legacy redirect for /trackz -> /thecyberpulse/trackz
   def legacy_redirect
-    redirect_to thecyberpulse_tracks_path, status: 301
+    redirect_to "/thecyberpulse/trackz", status: 301
   end
 
   # Legacy redirect for /trackz/:id -> /thecyberpulse/trackz/:id
   def legacy_redirect_show
-    redirect_to thecyberpulse_track_path(params[:id]), status: 301
+    redirect_to "/thecyberpulse/trackz/#{params[:id]}", status: 301
   end
 end

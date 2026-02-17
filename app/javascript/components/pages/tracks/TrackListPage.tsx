@@ -3,14 +3,15 @@ import { useLocation, Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { apiJson } from '~/utils/apiClient'
+import { getArtistColors } from '~/utils/artistColors'
 
-interface Album {
+interface Release {
   id: number
   name: string
   slug: string
   release_date: string | null
   cover_url: string | null
-  album_type?: string
+  release_type?: string
 }
 
 interface Track {
@@ -20,7 +21,7 @@ interface Track {
   track_number: number | null
   duration: string | null
   featured: boolean
-  album: Album | null
+  release: Release | null
   audio_url: string | null
   streaming_links?: Record<string, string>
 }
@@ -33,30 +34,6 @@ interface Artist {
   tracks: Track[]
 }
 
-// Color schemes for different artists
-const colorSchemes: Record<string, {
-  primary: string
-  secondary: string
-  glow: string
-  glowStrong: string
-  background: string
-}> = {
-  xeraen: {
-    primary: '#8B00FF',
-    secondary: '#6B00CC',
-    glow: 'rgba(139, 0, 255, 0.6)',
-    glowStrong: 'rgba(139, 0, 255, 0.8)',
-    background: '#0a0a0a'
-  },
-  thecyberpulse: {
-    primary: '#8B00FF',
-    secondary: '#9B59B6',
-    glow: 'rgba(139, 0, 255, 0.6)',
-    glowStrong: 'rgba(139, 0, 255, 0.8)',
-    background: '#0a0a0a'
-  }
-}
-
 const TrackListPage: React.FC = () => {
   const location = useLocation()
   const [artist, setArtist] = useState<Artist | null>(null)
@@ -64,7 +41,43 @@ const TrackListPage: React.FC = () => {
 
   // Extract artist slug from pathname (e.g., /xeraen/trackz -> xeraen)
   const artistSlug = location.pathname.split('/')[1]
-  const colorScheme = colorSchemes[artistSlug] || colorSchemes.xeraen
+  const colorScheme = getArtistColors(artistSlug)
+  const hasPrismatic = !!colorScheme.gradient
+
+  const outerBorderStyle: React.CSSProperties = hasPrismatic
+    ? {
+      border: '3px solid transparent',
+      backgroundImage: `linear-gradient(${colorScheme.background}, ${colorScheme.background}), ${colorScheme.gradient}`,
+      backgroundOrigin: 'border-box',
+      backgroundClip: 'padding-box, border-box',
+      boxShadow: '0 0 30px rgba(255, 0, 128, 0.3)'
+    }
+    : {
+      border: `2px solid ${colorScheme.primary}`,
+      boxShadow: `0 0 30px ${colorScheme.glow}`
+    }
+
+  const legendStyle: React.CSSProperties = hasPrismatic
+    ? {
+      background: colorScheme.gradient,
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      letterSpacing: '3px',
+      fontWeight: 'bold'
+    }
+    : {
+      color: colorScheme.primary,
+      textShadow: `0 0 15px ${colorScheme.glowStrong}`,
+      letterSpacing: '3px'
+    }
+
+  const getAccentColor = (index: number): string => {
+    if (hasPrismatic && colorScheme.accentColors) {
+      return colorScheme.accentColors[index % colorScheme.accentColors.length]
+    }
+    return colorScheme.primary
+  }
 
   useEffect(() => {
     if (!artistSlug) return
@@ -88,18 +101,11 @@ const TrackListPage: React.FC = () => {
           style={{
             maxWidth: '1200px',
             background: colorScheme.background,
-            border: `2px solid ${colorScheme.primary}`,
-            boxShadow: `0 0 30px ${colorScheme.glow}`
+            ...outerBorderStyle
           }}
         >
-          <fieldset style={{ borderColor: colorScheme.primary }}>
-            <legend
-              style={{
-                color: colorScheme.primary,
-                textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-                letterSpacing: '3px'
-              }}
-            >
+          <fieldset style={{ borderColor: hasPrismatic ? 'transparent' : colorScheme.primary, ...(hasPrismatic ? { border: 'none' } : {}) }}>
+            <legend style={legendStyle}>
               LOADING TRANSMISSIONS
             </legend>
             <div style={{ padding: '40px' }}>
@@ -119,18 +125,11 @@ const TrackListPage: React.FC = () => {
           style={{
             maxWidth: '1200px',
             background: colorScheme.background,
-            border: `2px solid ${colorScheme.primary}`,
-            boxShadow: `0 0 30px ${colorScheme.glow}`
+            ...outerBorderStyle
           }}
         >
-          <fieldset style={{ borderColor: colorScheme.primary }}>
-            <legend
-              style={{
-                color: colorScheme.primary,
-                textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-                letterSpacing: '3px'
-              }}
-            >
+          <fieldset style={{ borderColor: hasPrismatic ? 'transparent' : colorScheme.primary, ...(hasPrismatic ? { border: 'none' } : {}) }}>
+            <legend style={legendStyle}>
               SIGNAL LOST
             </legend>
             <div style={{ padding: '40px', textAlign: 'center' }}>
@@ -143,7 +142,7 @@ const TrackListPage: React.FC = () => {
   }
 
   const tracks = artist.tracks || []
-  const artistDisplayName = artist.name === 'XERAEN' ? 'XERAEN' : 'THE.CYBERPUL.SE'
+  const artistDisplayName = artist.name
 
   const platformOrder = ['bandcamp', 'youtube', 'spotify', 'apple_music', 'soundcloud']
 
@@ -167,6 +166,10 @@ const TrackListPage: React.FC = () => {
     })
   }
 
+  // Header section gets first accent color
+  const headerColor = getAccentColor(0)
+  const headerGlow = hasPrismatic ? `${headerColor}99` : colorScheme.glow
+
   return (
     <DefaultLayout>
       <div
@@ -176,18 +179,13 @@ const TrackListPage: React.FC = () => {
           margin: '0 auto',
           display: 'block',
           background: colorScheme.background,
-          border: `2px solid ${colorScheme.primary}`,
-          boxShadow: `0 0 30px ${colorScheme.glow}`
+          ...outerBorderStyle
         }}
       >
-        <fieldset style={{ borderColor: colorScheme.primary }}>
+        <fieldset style={{ borderColor: hasPrismatic ? 'transparent' : colorScheme.primary, ...(hasPrismatic ? { border: 'none' } : {}) }}>
           <legend
             className="center"
-            style={{
-              color: colorScheme.primary,
-              textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-              letterSpacing: '3px'
-            }}
+            style={legendStyle}
           >
             {artistDisplayName} :: TRACKZ
           </legend>
@@ -198,9 +196,11 @@ const TrackListPage: React.FC = () => {
               style={{
                 marginBottom: '30px',
                 padding: '20px',
-                background: 'linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95))',
-                border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 20px ${colorScheme.glow}, inset 0 0 15px rgba(139, 0, 255, 0.1)`
+                background: hasPrismatic
+                  ? `linear-gradient(135deg, ${headerColor}14, rgba(0, 0, 0, 0.95))`
+                  : 'linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95))',
+                border: `2px solid ${headerColor}`,
+                boxShadow: `0 0 20px ${headerGlow}, inset 0 0 15px ${headerColor}1a`
               }}
             >
               <div
@@ -208,10 +208,10 @@ const TrackListPage: React.FC = () => {
                   fontFamily: 'monospace',
                   marginBottom: '15px',
                   padding: '15px',
-                  background: 'rgba(139, 0, 255, 0.1)',
-                  border: `1px solid ${colorScheme.primary}`,
-                  color: colorScheme.primary,
-                  textShadow: `0 0 8px ${colorScheme.glow}`
+                  background: `${headerColor}1a`,
+                  border: `1px solid ${headerColor}`,
+                  color: headerColor,
+                  textShadow: `0 0 8px ${headerGlow}`
                 }}
               >
                 [SIGNAL: ACTIVE]<br />
@@ -236,133 +236,139 @@ const TrackListPage: React.FC = () => {
                 <p style={{ color: '#aaa' }}>No transmissions available yet. Signal frequency is being calibrated...</p>
               </div>
             ) : (
-              tracks.map((track, index) => (
-                <div
-                  key={track.id}
-                  style={{
-                    marginBottom: '20px',
-                    padding: '20px',
-                    background: '#000000',
-                    border: `1px solid ${colorScheme.primary}`,
-                    boxShadow: '0 0 15px rgba(139, 0, 255, 0.15)',
-                    transition: 'box-shadow 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = `0 0 25px ${colorScheme.glow}`
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(139, 0, 255, 0.15)'
-                  }}
-                >
-                  {/* Track Number & Title */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-                    <span
-                      style={{
-                        fontFamily: 'monospace',
-                        color: colorScheme.primary,
-                        textShadow: `0 0 8px ${colorScheme.glow}`,
-                        fontSize: '1.2em',
-                        minWidth: '40px'
-                      }}
-                    >
-                      [{String(index + 1).padStart(2, '0')}]
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <Link
-                        to={`/${artistSlug}/trackz/${track.slug}`}
+              tracks.map((track, index) => {
+                const trackColor = getAccentColor(index)
+                const trackGlow = hasPrismatic ? `${trackColor}99` : colorScheme.glow
+
+                return (
+                  <div
+                    key={track.id}
+                    style={{
+                      marginBottom: '20px',
+                      padding: '20px',
+                      background: '#000000',
+                      border: `1px solid ${trackColor}`,
+                      borderLeft: hasPrismatic ? `3px solid ${trackColor}` : `1px solid ${trackColor}`,
+                      boxShadow: `0 0 15px ${trackColor}26`,
+                      transition: 'box-shadow 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 25px ${trackGlow}`
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 15px ${trackColor}26`
+                    }}
+                  >
+                    {/* Track Number & Title */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+                      <span
                         style={{
-                          color: colorScheme.primary,
-                          textDecoration: 'underline',
-                          textUnderlineOffset: '4px',
-                          fontSize: '1.3em',
-                          fontWeight: 'bold',
-                          letterSpacing: '1px',
-                          textShadow: `0 0 10px ${colorScheme.glow}`,
-                          display: 'inline-block',
-                          marginBottom: '8px'
+                          fontFamily: 'monospace',
+                          color: trackColor,
+                          textShadow: `0 0 8px ${trackGlow}`,
+                          fontSize: '1.2em',
+                          minWidth: '40px'
                         }}
                       >
-                        {track.title}
-                        {track.featured && (
-                          <span
-                            style={{
-                              marginLeft: '10px',
-                              padding: '2px 8px',
-                              background: colorScheme.primary,
-                              color: '#000',
-                              fontSize: '0.7em',
-                              fontWeight: 'bold',
-                              letterSpacing: '1px'
-                            }}
-                          >
-                            FEATURED
-                          </span>
-                        )}
-                      </Link>
-
-                      {/* Track Metadata */}
-                      <p style={{ color: '#888', marginBottom: '12px', fontSize: '0.95em' }}>
-                        {track.album?.name && (
-                          <span style={{ color: '#aaa' }}>{track.album.name}</span>
-                        )}
-                        {track.album?.album_type && (
-                          <span style={{ color: '#666' }}> ({track.album.album_type.toUpperCase()})</span>
-                        )}
-                        {track.album?.release_date && (
-                          <span style={{ color: '#666' }}> • {track.album.release_date}</span>
-                        )}
-                        {track.duration && (
-                          <span style={{ color: '#666' }}> • {track.duration}</span>
-                        )}
-                      </p>
-
-                      {/* Action Buttons */}
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        [{String(index + 1).padStart(2, '0')}]
+                      </span>
+                      <div style={{ flex: 1 }}>
                         <Link
-                          to={`/fm/pulse_vault?filter=${encodeURIComponent(track.title)}`}
+                          to={`/${artistSlug}/trackz/${track.slug}`}
                           style={{
-                            padding: '6px 12px',
-                            background: colorScheme.primary,
-                            color: '#fff',
-                            textDecoration: 'none',
-                            fontSize: '0.85em',
+                            color: trackColor,
+                            textDecoration: 'underline',
+                            textUnderlineOffset: '4px',
+                            fontSize: '1.3em',
                             fontWeight: 'bold',
-                            boxShadow: `0 0 10px ${colorScheme.glow}`
+                            letterSpacing: '1px',
+                            textShadow: `0 0 10px ${trackGlow}`,
+                            display: 'inline-block',
+                            marginBottom: '8px'
                           }}
                         >
-                          ▶ PULSE VAULT
-                        </Link>
-                        {track.streaming_links && Object.keys(track.streaming_links).length > 0 && (
-                          sortStreamingLinks(track.streaming_links).map(([platform, url]) => (
-                            <a
-                              key={platform}
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                          {track.title}
+                          {track.featured && (
+                            <span
                               style={{
-                                padding: '6px 12px',
-                                background: '#222',
-                                color: '#aaa',
-                                textDecoration: 'none',
-                                fontSize: '0.85em',
-                                border: '1px solid #444'
+                                marginLeft: '10px',
+                                padding: '2px 8px',
+                                background: trackColor,
+                                color: '#000',
+                                fontSize: '0.7em',
+                                fontWeight: 'bold',
+                                letterSpacing: '1px'
                               }}
                             >
-                              → {formatPlatformName(platform)}
-                            </a>
-                          ))
-                        )}
+                              FEATURED
+                            </span>
+                          )}
+                        </Link>
+
+                        {/* Track Metadata */}
+                        <p style={{ color: '#888', marginBottom: '12px', fontSize: '0.95em' }}>
+                          {track.release?.name && (
+                            <span style={{ color: '#aaa' }}>{track.release.name}</span>
+                          )}
+                          {track.release?.release_type && (
+                            <span style={{ color: '#666' }}> ({track.release.release_type.toUpperCase()})</span>
+                          )}
+                          {track.release?.release_date && (
+                            <span style={{ color: '#666' }}> • {track.release.release_date}</span>
+                          )}
+                          {track.duration && (
+                            <span style={{ color: '#666' }}> • {track.duration}</span>
+                          )}
+                        </p>
+
+                        {/* Action Buttons */}
+                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                          <Link
+                            to={`/fm/pulse-vault?filter=${encodeURIComponent(track.title)}`}
+                            style={{
+                              padding: '6px 12px',
+                              background: colorScheme.primary,
+                              color: '#fff',
+                              textDecoration: 'none',
+                              fontSize: '0.85em',
+                              fontWeight: 'bold',
+                              boxShadow: `0 0 10px ${colorScheme.glow}`
+                            }}
+                          >
+                            ▶ PULSE VAULT
+                          </Link>
+                          {track.streaming_links && Object.keys(track.streaming_links).length > 0 && (
+                            sortStreamingLinks(track.streaming_links).map(([platform, url]) => (
+                              <a
+                                key={platform}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  padding: '6px 12px',
+                                  background: '#222',
+                                  color: '#aaa',
+                                  textDecoration: 'none',
+                                  fontSize: '0.85em',
+                                  border: '1px solid #444'
+                                }}
+                              >
+                                → {formatPlatformName(platform)}
+                              </a>
+                            ))
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                )
+              })
             )}
 
             {/* Navigation Buttons */}
             <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
               <Link
-                to={artistSlug === 'xeraen' ? '/xeraen' : '/thecyberpulse'}
+                to={`/${artistSlug}`}
                 style={{
                   padding: '10px 20px',
                   background: '#222',
@@ -374,7 +380,20 @@ const TrackListPage: React.FC = () => {
                 ← BACK TO {artistDisplayName}
               </Link>
               <Link
-                to="/fm/pulse_vault"
+                to={`/${artistSlug}/releases`}
+                style={{
+                  padding: '10px 20px',
+                  background: colorScheme.secondary,
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontWeight: 'bold',
+                  boxShadow: `0 0 15px ${colorScheme.glow}66`
+                }}
+              >
+                RELEASES →
+              </Link>
+              <Link
+                to="/fm/pulse-vault"
                 style={{
                   padding: '10px 20px',
                   background: colorScheme.primary,
@@ -394,7 +413,7 @@ const TrackListPage: React.FC = () => {
                   color: 'white',
                   textDecoration: 'none',
                   fontWeight: 'bold',
-                  boxShadow: '0 0 15px rgba(107, 0, 204, 0.6)'
+                  boxShadow: `0 0 15px ${colorScheme.glow}66`
                 }}
               >
                 ALL BANDS →

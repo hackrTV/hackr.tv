@@ -80,14 +80,14 @@ class OverlayNowPlaying < ApplicationRecord
   end
 
   def display_album
-    track&.album&.name || ""
+    track&.release&.name || ""
   end
 
   def album_cover_url
-    return nil unless track&.album&.cover_image&.attached?
+    return nil unless track&.release&.cover_image&.attached?
 
     Rails.application.routes.url_helpers.rails_blob_url(
-      track.album.cover_image,
+      track.release.cover_image,
       only_path: true
     )
   end

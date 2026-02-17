@@ -2,10 +2,10 @@ artist:
   name: "Offline"
   genre: "Post-Grunge"
 
-albums:
+releases:
   - slug: unplugged
     title: "Unplugged"
-    album_type: ep
+    release_type: ep
     release_date: "2120-06-05"
     cover_image: "unplugged.jpg"
     tracks:
@@ -16,51 +16,42 @@ albums:
         audio_file: disconnect.ogg
         featured: true
         lyrics: |
-          [Intro - Quiet, building]
 
-          [Verse 1 - Quiet, intense]
           Staring at the screen again
           Can't tell what is real
           Everything they show me now
           Is manufactured steel
 
-          [Verse 2 - Building]
           I can feel the wires in my brain
           Feeding me their lies
           Time to pull the plug on everything
           Time to close my eyes
 
-          [Pre-Chorus - Rising intensity]
           I don't need their connection
           I don't need their feed
           All I need is freedom
           All I need is me
 
-          [Chorus - Heavy, powerful]
           Disconnect! Pull the plug!
           Cut the wire! Everything they built is a lie!
           Disconnect! I'm awake!
           For the first time! I can see through their fake!
 
-          [Verse 3 - Raw emotion]
           Every notification was a chain
           Every like a cage
           Now I'm standing in the silence
           Feeling all my rage
 
-          [Bridge - Building to explosion]
           Unplug from their reality
           Unplug from their control
           Unplug from everything they said
           Would make me whole
 
-          [Final Chorus - Heavy]
           Disconnect! Pull the plug!
           Cut the wire! Everything they built is a lie!
           Disconnect! I'm awake!
           For the first time! I can see through their fake!
 
-          [Outro - Heavy, fading]
           I disconnect
           I disconnect
           I'm finally free
@@ -71,51 +62,42 @@ albums:
         duration: "3:06"
         audio_file: whatever-man.ogg
         lyrics: |
-          [Intro - Up-tempo]
 
-          [Verse 1 - Casual delivery, building edge]
           They say jump, I say why bother
           They say care, I shrug my shoulders
           Everything's going down the drain
           So whatever, man, I feel no pain
 
-          [Verse 2 - Sarcastic energy]
           They built a world of perfect plans
           I'm just here with empty hands
           Don't believe in their tomorrow
           So whatever, man, I won't follow
 
-          [Pre-Chorus - Building intensity]
           They think I don't care about a thing
           But apathy's the armor that I bring
           Behind this smile there's burning rage
           Whatever, man, I'm off their page
 
-          [Chorus - Heavy, ironic triumph]
           Whatever man, burn it down!
           Nothing left worth keeping around!
           Whatever man, watch it fall!
           I never wanted any of it at all!
 
-          [Verse 3 - Raw underneath casualness]
           They can keep their fake perfection
           I choose authentic disconnection
           Let their system crash and fade
           Whatever, man, I'm not afraid
 
-          [Bridge - Intensity breaking through]
           You think I'm lazy!
           You think I'm numb!
           But I see clearly!
           What we've become!
 
-          [Final Chorus - Full power]
           Whatever man, burn it down!
           Nothing left worth keeping around!
           Whatever man, watch it fall!
           I never wanted any of it at all!
 
-          [Outro - Fading]
           Whatever, man
           Whatever, man
           Whatever
@@ -127,27 +109,22 @@ albums:
         audio_file: analog.ogg
         featured: true
         lyrics: |
-          [Intro - Soft, vulnerable]
 
-          [Verse 1 - Quiet, intimate]
           In a world of perfect copies
           I'm a scratch on a worn-out tape
           They can manufacture everything
           But this feeling they can't fake
 
-          [Verse 2 - Building emotion]
           Every emotion carefully designed
           Every response already programmed in
           But somewhere deep inside of me
           There's something they can't touch or spin
 
-          [Pre-Chorus - Rising]
           I'm made of flesh and blood and bone
           Not circuits, not their code
           This heart beats on its own
           Can't be bought or sold
 
-          [Chorus - Explosive, cathartic]
           They can fake the world around me!
           But they can't replace this analog heart!
           They can break me down completely!
@@ -155,13 +132,11 @@ albums:
           I'm analog! I'm real!
           This is what I feel!
 
-          [Verse 3 - Raw honesty]
           Let them have their perfect systems
           Let them build their perfect cage
           I've got something they'll never understand
           Something they can never gauge
 
-          [Bridge - Building to climax]
           Analog heart
           Still beating loud
           Analog heart
@@ -169,7 +144,6 @@ albums:
           By their digital lies
           Or their manufactured skies
 
-          [Final Chorus - Full emotional power]
           They can fake the world around me!
           But they can't replace this analog heart!
           They can break me down completely!
@@ -177,7 +151,6 @@ albums:
           I'm analog! I'm real!
           This is what I feel!
 
-          [Outro - Quiet return, resolute]
           Analog heart
           Still beating here
           Analog heart
@@ -189,51 +162,42 @@ albums:
         duration: "3:51"
         audio_file: static-reality.ogg
         lyrics: |
-          [Intro - Slow, sludgy]
 
-          [Verse 1 - Heavy, slow]
           Wake up in a world that doesn't breathe
           Everything's too perfect to believe
           Colors that don't quite look right
           Nothing casts a shadow in this light
 
-          [Verse 2]
           Walking through the motions every day
           Everyone's a puppet on display
           Smiling faces, empty eyes
           Living in their comfortable lies
 
-          [Pre-Chorus - Building weight]
           Everything's static, nothing's real
           Can't remember how to feel
           Trapped inside their perfect dream
           Nothing's ever what it seems
 
-          [Chorus - Heavy, emotional]
           Static reality, it's crushing me
           Can't you see? Nothing here is free
           Static reality, I'm breaking through
           Finding what is true
 
-          [Verse 3]
           They control the weather and the news
           They decide what everyone will choose
           Perfect world with perfect seams
           But I can see behind their screens
 
-          [Bridge - Slow, powerful]
           I won't live
           In their static world
           I won't give
           My soul to their control
 
-          [Final Chorus - Heavy]
           Static reality, it's crushing me
           Can't you see? Nothing here is free
           Static reality, I'm breaking through
           Finding what is true
 
-          [Outro - Slow fade]
           Static reality
           It's killing me
           But I'm breaking free
@@ -245,45 +209,37 @@ albums:
         audio_file: dead-signal.ogg
         featured: true
         lyrics: |
-          [Intro - Heavy, building slowly]
 
-          [Verse 1 - Slow, deliberate]
           Pulled the plug on everything
           Cut every single tie
           Disappeared into the static
           Said my last goodbye
 
-          [Verse 2 - Building weight]
           Off the grid and out of reach
           Nowhere to be found
           I'm the ghost inside their system
           Making not a sound
 
-          [Pre-Chorus - Rising tension]
           They're searching every frequency
           But I'm already gone
           A dead signal in their machinery
           I've been offline all along
 
-          [Chorus - Heavy, triumphant]
           I'm a dead signal in their machine!
           The ghost they'll never see!
           I'm a dead signal, lost between!
           Finally I'm free!
 
-          [Verse 3 - Powerful]
           Let them scan for my location
           Let them try to trace
           I'm a void inside their system
           An empty, silent space
 
-          [Bridge - Building to massive climax]
           No connection
           No detection
           Pure rejection
           Of their infection
 
-          [Breakdown - Heavy, extended]
           Dead signal
           Dead signal
           You'll never find me
@@ -291,13 +247,11 @@ albums:
           Dead signal
           I'm finally free
 
-          [Final Chorus - Massive, powerful]
           I'm a dead signal in their machine!
           The ghost they'll never see!
           I'm a dead signal, lost between!
           Finally I'm free!
 
-          [Extended Outro - Slow, heavy fade]
           Dead signal
           Fading out
           Dead signal

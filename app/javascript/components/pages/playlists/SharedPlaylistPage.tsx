@@ -51,7 +51,7 @@ export const SharedPlaylistPage: React.FC = () => {
       url: track.audio_url || '',
       title: track.title,
       artist: track.artist.name,
-      coverUrl: track.album?.cover_url || ''
+      coverUrl: track.release?.cover_url || ''
     })).filter(track => track.url) // Only include tracks with audio files
 
     if (trackDataList.length === 0) {
@@ -166,7 +166,7 @@ export const SharedPlaylistPage: React.FC = () => {
                       <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>#</th>
                       <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Track</th>
                       <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Artist</th>
-                      <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Album</th>
+                      <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Release</th>
                       <th style={{ padding: '10px', textAlign: 'left', color: '#00d9ff' }}>Duration</th>
                     </tr>
                   </thead>
@@ -176,7 +176,7 @@ export const SharedPlaylistPage: React.FC = () => {
                         <td style={{ padding: '10px', color: '#666' }}>{index + 1}</td>
                         <td style={{ padding: '10px', color: '#ccc' }}>{track.title}</td>
                         <td style={{ padding: '10px', color: '#aaa' }}>{track.artist.name}</td>
-                        <td style={{ padding: '10px', color: '#aaa' }}>{track.album?.name || '-'}</td>
+                        <td style={{ padding: '10px', color: '#aaa' }}>{track.release?.name || '-'}</td>
                         <td style={{ padding: '10px', color: '#aaa' }}>{formatDuration(track.duration)}</td>
                       </tr>
                     ))}

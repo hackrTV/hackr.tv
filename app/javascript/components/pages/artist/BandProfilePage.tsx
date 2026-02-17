@@ -23,7 +23,7 @@ const BandProfilePage: React.FC = () => {
   const [artist, setArtist] = useState<Artist | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Extract slug from pathname (e.g., /system_rot -> system_rot)
+  // Extract slug from pathname (e.g., /system-rot -> system-rot)
   const slug = location.pathname.substring(1)
   const config = bandProfiles[slug]
 
@@ -49,21 +49,21 @@ const BandProfilePage: React.FC = () => {
     return (
       <BandProfileLayout
         artistName={config.name}
+        artistSlug={slug}
         colorScheme={config.colorScheme}
         filterName={config.filterName}
       />
     )
   }
 
-  const tracks = artist.tracks || []
-
   return (
     <BandProfileLayout
       artistName={config.name}
+      artistSlug={slug}
       colorScheme={config.colorScheme}
       filterName={config.filterName}
       intro={config.renderIntro()}
-      albumSection={config.renderAlbumSection(tracks)}
+      releaseSection={config.renderReleaseSection()}
       philosophySection={config.renderPhilosophy()}
     />
   )

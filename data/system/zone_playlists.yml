@@ -6,18 +6,18 @@ zone_playlists:
     description: Atmospheric music for Fracture Network zones
     crossfade_duration_ms: 5000
     default_volume: 0.35
-    artist_tracks: wavelength_zero
+    artist_tracks: wavelength-zero
 
   - name: Transit Network Ambience
     slug: transit-network-ambience
     description: Instrumental ambience for neutral zones
     crossfade_duration_ms: 3000
     default_volume: 0.30
-    artist_tracks: cipher_protocol
+    artist_tracks: cipher-protocol
 
   - name: GovCorp Surveillance Ambience
     slug: govcorp-surveillance-ambience
     description: Unsettling atmospheric music for GovCorp zones
     crossfade_duration_ms: 6000
     default_volume: 0.25
-    artist_tracks: temporal_blue_drift
+    artist_tracks: temporal-blue-drift

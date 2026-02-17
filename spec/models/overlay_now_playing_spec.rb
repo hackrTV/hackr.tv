@@ -200,15 +200,15 @@ RSpec.describe OverlayNowPlaying, type: :model do
   end
 
   describe "#display_album" do
-    it "returns album name when track has album" do
+    it "returns release name when track has release" do
       artist = create(:artist)
-      album = create(:album, name: "Album Name", artist: artist)
-      track = create(:track, artist: artist, album: album)
+      release = create(:release, name: "Release Name", artist: artist)
+      track = create(:track, artist: artist, release: release)
       now_playing = build(:overlay_now_playing, track: track)
-      expect(now_playing.display_album).to eq("Album Name")
+      expect(now_playing.display_album).to eq("Release Name")
     end
 
-    it "returns empty string when no album" do
+    it "returns empty string when no release" do
       now_playing = build(:overlay_now_playing)
       expect(now_playing.display_album).to eq("")
     end

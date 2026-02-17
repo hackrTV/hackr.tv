@@ -27,14 +27,14 @@ export type CodexMappings = Record<string, string>
  */
 export const CODEX_FALLBACK_ROUTES: Record<string, { route: string; displayName: string }> = {
   'voiceprint': { route: '/voiceprint', displayName: 'Voiceprint' },
-  'cipher-protocol': { route: '/cipher_protocol', displayName: 'Cipher Protocol' },
-  'injection-vector': { route: '/injection_vector', displayName: 'Injection Vector' },
-  'wavelength-zero': { route: '/wavelength_zero', displayName: 'Wavelength Zero' },
-  'system-rot': { route: '/system_rot', displayName: 'System Rot' },
-  'temporal-blue-drift': { route: '/temporal_blue_drift', displayName: 'Temporal Blue Drift' },
+  'cipher-protocol': { route: '/cipher-protocol', displayName: 'Cipher Protocol' },
+  'injection-vector': { route: '/injection-vector', displayName: 'Injection Vector' },
+  'wavelength-zero': { route: '/wavelength-zero', displayName: 'Wavelength Zero' },
+  'system-rot': { route: '/system-rot', displayName: 'System Rot' },
+  'temporal-blue-drift': { route: '/temporal-blue-drift', displayName: 'Temporal Blue Drift' },
   'offline': { route: '/offline', displayName: 'Offline' },
-  'apex-overdrive': { route: '/apex_overdrive', displayName: 'Apex Overdrive' },
-  'neon-hearts': { route: '/neon_hearts', displayName: 'Neon Hearts (ネオンハーツ)' },
+  'apex-overdrive': { route: '/apex-overdrive', displayName: 'Apex Overdrive' },
+  'neon-hearts': { route: '/neon-hearts', displayName: 'Neon Hearts (ネオンハーツ)' },
   'ethereality': { route: '/ethereality', displayName: 'Ethereality' },
   'blitzbeam': { route: '/blitzbeam', displayName: 'BlitzBeam+' }
 }

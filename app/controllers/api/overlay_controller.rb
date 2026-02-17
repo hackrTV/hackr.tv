@@ -15,7 +15,7 @@ class Api::OverlayController < ApplicationController
             track_id: track.id,
             title: track.title,
             artist: track.artist&.name,
-            album: track.album&.name,
+            album: track.release&.name,
             paused: paused
           }
         }

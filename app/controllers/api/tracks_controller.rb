@@ -6,10 +6,10 @@ module Api
       if params[:artist_id]
         # Get tracks for specific artist
         artist = Artist.find_by(slug: params[:artist_id]) || Artist.find(params[:artist_id])
-        @tracks = artist.tracks.visible_in_pulse_vault.includes(:album).order("albums.release_date DESC NULLS LAST, tracks.track_number ASC").joins(:album)
+        @tracks = artist.tracks.visible_in_pulse_vault.includes(:release).order(Arel.sql("releases.release_date DESC NULLS LAST, tracks.track_number ASC")).joins(:release)
       else
         # Get all tracks with Pulse Vault ordering
-        @tracks = Track.visible_in_pulse_vault.includes(:artist, :album).order(
+        @tracks = Track.visible_in_pulse_vault.includes(:artist, :release).order(
           Arel.sql(<<-SQL.squish
             CASE artists.name
               WHEN 'The.CyberPul.se' THEN 0
@@ -25,11 +25,11 @@ module Api
               ELSE 10
             END,
             CASE WHEN artists.name IN ('The.CyberPul.se', 'XERAEN', 'Wavelength Zero', 'Voiceprint', 'Temporal Blue Drift', 'heartbreak_havoc.sh', 'System Rot', 'Apex Overdrive', 'Cipher Protocol', 'Neon Hearts') THEN '' ELSE artists.name END,
-            albums.release_date DESC,
+            releases.release_date DESC,
             tracks.track_number ASC
           SQL
                   )
-        ).joins(:artist, :album)
+        ).joins(:artist, :release)
       end
 
       render json: @tracks.map { |track|
@@ -46,15 +46,15 @@ module Api
             slug: track.artist.slug,
             genre: track.artist.genre
           },
-          album: if track.album
-                   {
-                     id: track.album.id,
-                     name: track.album.name,
-                     slug: track.album.slug,
-                     release_date: track.album.release_date,
-                     cover_url: track.album.cover_image.attached? ? url_for(track.album.cover_image) : nil
-                   }
-                 end,
+          release: if track.release
+                     {
+                       id: track.release.id,
+                       name: track.release.name,
+                       slug: track.release.slug,
+                       release_date: track.release.release_date,
+                       cover_url: track.release.cover_image.attached? ? url_for(track.release.cover_image) : nil
+                     }
+                   end,
           audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil
         }
       }
@@ -62,8 +62,8 @@ module Api
 
     # GET /api/tracks/:id
     def show
-      @track = Track.includes(:artist, :album).find_by(slug: params[:id])
-      @track ||= Track.includes(:artist, :album).find_by(id: params[:id]) if params[:id].to_i.to_s == params[:id]
+      @track = Track.includes(:artist, :release).find_by(slug: params[:id])
+      @track ||= Track.includes(:artist, :release).find_by(id: params[:id]) if params[:id].to_i.to_s == params[:id]
 
       if @track.nil?
         render json: {error: "Track not found"}, status: :not_found
@@ -87,17 +87,17 @@ module Api
           slug: @track.artist.slug,
           genre: @track.artist.genre
         },
-        album: if @track.album
-                 {
-                   id: @track.album.id,
-                   name: @track.album.name,
-                   slug: @track.album.slug,
-                   album_type: @track.album.album_type,
-                   release_date: @track.album.release_date,
-                   description: @track.album.description,
-                   cover_url: @track.album.cover_image.attached? ? url_for(@track.album.cover_image) : nil
-                 }
-               end,
+        release: if @track.release
+                   {
+                     id: @track.release.id,
+                     name: @track.release.name,
+                     slug: @track.release.slug,
+                     release_type: @track.release.release_type,
+                     release_date: @track.release.release_date,
+                     description: @track.release.description,
+                     cover_url: @track.release.cover_image.attached? ? url_for(@track.release.cover_image) : nil
+                   }
+                 end,
         audio_url: @track.audio_file.attached? ? url_for(@track.audio_file) : nil
       }
     end

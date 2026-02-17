@@ -35,7 +35,7 @@ module Api
     def station_playlists
       station = RadioStation.find(params[:id])
       playlists = station.radio_station_playlists
-        .includes(playlist: {playlist_tracks: {track: [:artist, :album]}})
+        .includes(playlist: {playlist_tracks: {track: [:artist, :release]}})
         .order(position: :asc)
 
       render json: playlists.map { |rsp|
@@ -61,14 +61,14 @@ module Api
                 name: track.artist.name,
                 slug: track.artist.slug
               },
-              album: if track.album
-                       {
-                         id: track.album.id,
-                         name: track.album.name,
-                         slug: track.album.slug,
-                         cover_url: track.album.cover_image.attached? ? url_for(track.album.cover_image) : nil
-                       }
-                     end,
+              release: if track.release
+                         {
+                           id: track.release.id,
+                           name: track.release.name,
+                           slug: track.release.slug,
+                           cover_url: track.release.cover_image.attached? ? url_for(track.release.cover_image) : nil
+                         }
+                       end,
               audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil
             }
           }

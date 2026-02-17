@@ -257,8 +257,8 @@ Line 2 with [[XERAEN]]`
 
     it('returns band profile route for entries with fallbacks', () => {
       expect(getRouteForSlug('voiceprint')).toBe('/voiceprint')
-      expect(getRouteForSlug('cipher-protocol')).toBe('/cipher_protocol')
-      expect(getRouteForSlug('wavelength-zero')).toBe('/wavelength_zero')
+      expect(getRouteForSlug('cipher-protocol')).toBe('/cipher-protocol')
+      expect(getRouteForSlug('wavelength-zero')).toBe('/wavelength-zero')
     })
 
     it('returns undefined for non-fallback slugs', () => {

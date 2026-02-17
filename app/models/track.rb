@@ -17,27 +17,27 @@
 #  videos              :text
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  album_id            :integer          not null
 #  artist_id           :integer          not null
+#  release_id          :integer          not null
 #
 # Indexes
 #
-#  index_tracks_on_album_id            (album_id)
 #  index_tracks_on_artist_id           (artist_id)
 #  index_tracks_on_artist_id_and_slug  (artist_id,slug) UNIQUE
 #  index_tracks_on_featured            (featured)
 #  index_tracks_on_release_date        (release_date)
+#  index_tracks_on_release_id          (release_id)
 #
 # Foreign Keys
 #
-#  album_id   (album_id => albums.id)
-#  artist_id  (artist_id => artists.id)
+#  artist_id   (artist_id => artists.id)
+#  release_id  (release_id => releases.id)
 #
 class Track < ApplicationRecord
   has_paper_trail
 
   belongs_to :artist
-  belongs_to :album
+  belongs_to :release
   has_one_attached :audio_file
   has_many :playlist_tracks, dependent: :destroy
   has_many :playlists, through: :playlist_tracks
@@ -54,7 +54,7 @@ class Track < ApplicationRecord
   # Scopes matching Sinatra logic
   scope :featured, -> { where(featured: true) }
   scope :ordered, -> { order(Arel.sql("CASE WHEN featured THEN 1 ELSE 0 END DESC, release_date DESC NULLS LAST")) }
-  scope :album_order, -> { order(:track_number, :title) }
+  scope :release_order, -> { order(:track_number, :title) }
   scope :visible_in_pulse_vault, -> { where(show_in_pulse_vault: true) }
 
   def to_param

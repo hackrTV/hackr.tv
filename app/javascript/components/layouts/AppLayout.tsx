@@ -19,6 +19,8 @@ const BandProfilePage = lazy(() => import('~/components/pages/artist/BandProfile
 const WavelengthZeroPage = lazy(() => import('~/components/pages/artist/WavelengthZeroPage'))
 const TrackListPage = lazy(() => import('~/components/pages/tracks/TrackListPage'))
 const TrackDetailPage = lazy(() => import('~/components/pages/tracks/TrackDetailPage'))
+const ReleaseListPage = lazy(() => import('~/components/pages/releases/ReleaseListPage'))
+const ReleaseDetailPage = lazy(() => import('~/components/pages/releases/ReleaseDetailPage'))
 const GridGamePage = lazy(() => import('~/components/pages/grid/GridGamePage').then(m => ({ default: m.GridGamePage })))
 const GridLoginPage = lazy(() => import('~/components/pages/grid/GridLoginPage').then(m => ({ default: m.GridLoginPage })))
 const GridRegisterPage = lazy(() => import('~/components/pages/grid/GridRegisterPage').then(m => ({ default: m.GridRegisterPage })))
@@ -55,7 +57,7 @@ export const AppLayout: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         {/* Redirect /fm to /fm/radio */}
         <Route path="/fm" element={<Navigate to="/fm/radio" replace />} />
-        <Route path="/fm/pulse_vault" element={<PulseVaultPage />} />
+        <Route path="/fm/pulse-vault" element={<PulseVaultPage />} />
         <Route path="/fm/radio" element={<RadioPage />} />
         <Route path="/fm/bands" element={<BandsPage />} />
         {/* Playlist routes - protected */}
@@ -64,28 +66,37 @@ export const AppLayout: React.FC = () => {
         {/* Shared playlist - public */}
         <Route path="/shared/:token" element={<SharedPlaylistPage />} />
         <Route path="/thecyberpulse" element={<TheCyberPulsePage />} />
+        <Route path="/thecyberpulse/releases" element={<ReleaseListPage />} />
+        <Route path="/thecyberpulse/releases/:releaseSlug" element={<ReleaseDetailPage />} />
         <Route path="/thecyberpulse/trackz" element={<TrackListPage />} />
         <Route path="/thecyberpulse/trackz/:trackSlug" element={<TrackDetailPage />} />
         <Route path="/thecyberpulse/vidz" element={<VodzPage />} />
         <Route path="/thecyberpulse/vidz/:id" element={<VodzShowPage />} />
         <Route path="/xeraen" element={<XeraenPage />} />
+        <Route path="/xeraen/releases" element={<ReleaseListPage />} />
+        <Route path="/xeraen/releases/:releaseSlug" element={<ReleaseDetailPage />} />
         <Route path="/xeraen/trackz" element={<TrackListPage />} />
         <Route path="/xeraen/trackz/:trackSlug" element={<TrackDetailPage />} />
         <Route path="/xeraen/vidz" element={<VodzPage />} />
         <Route path="/xeraen/vidz/:id" element={<VodzShowPage />} />
         <Route path="/sector/x" element={<SectorXPage />} />
-        <Route path="/system_rot" element={<BandProfilePage />} />
-        <Route path="/voiceprint" element={<BandProfilePage />} />
-        <Route path="/temporal_blue_drift" element={<BandProfilePage />} />
-        <Route path="/injection_vector" element={<BandProfilePage />} />
-        <Route path="/cipher_protocol" element={<BandProfilePage />} />
-        <Route path="/blitzbeam" element={<BandProfilePage />} />
-        <Route path="/apex_overdrive" element={<BandProfilePage />} />
-        <Route path="/ethereality" element={<BandProfilePage />} />
-        <Route path="/neon_hearts" element={<BandProfilePage />} />
-        <Route path="/offline" element={<BandProfilePage />} />
-        <Route path="/heartbreak_havoc" element={<BandProfilePage />} />
-        <Route path="/wavelength_zero" element={<WavelengthZeroPage />} />
+        {/* Band profile routes with releases and trackz */}
+        {['system-rot', 'voiceprint', 'temporal-blue-drift', 'injection-vector',
+          'cipher-protocol', 'blitzbeam', 'apex-overdrive', 'ethereality',
+          'neon-hearts', 'offline', 'heartbreak-havoc'].map(slug => (
+          <React.Fragment key={slug}>
+            <Route path={`/${slug}`} element={<BandProfilePage />} />
+            <Route path={`/${slug}/releases`} element={<ReleaseListPage />} />
+            <Route path={`/${slug}/releases/:releaseSlug`} element={<ReleaseDetailPage />} />
+            <Route path={`/${slug}/trackz`} element={<TrackListPage />} />
+            <Route path={`/${slug}/trackz/:trackSlug`} element={<TrackDetailPage />} />
+          </React.Fragment>
+        ))}
+        <Route path="/wavelength-zero" element={<WavelengthZeroPage />} />
+        <Route path="/wavelength-zero/releases" element={<ReleaseListPage />} />
+        <Route path="/wavelength-zero/releases/:releaseSlug" element={<ReleaseDetailPage />} />
+        <Route path="/wavelength-zero/trackz" element={<TrackListPage />} />
+        <Route path="/wavelength-zero/trackz/:trackSlug" element={<TrackDetailPage />} />
         {/* THE PULSE GRID routes */}
         <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
         <Route path="/grid/login" element={<GridLoginPage />} />

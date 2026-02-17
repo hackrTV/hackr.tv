@@ -1,12 +1,5 @@
 import React from 'react'
 
-interface Track {
-  id: number
-  title: string
-  track_number: number | null
-  duration: string | null
-}
-
 interface ColorScheme {
   primary: string
   border?: string
@@ -22,7 +15,7 @@ interface BandProfileConfig {
   colorScheme: ColorScheme
   filterName: string
   renderIntro: () => React.ReactNode
-  renderAlbumSection: (tracks: Track[]) => React.ReactNode
+  renderReleaseSection: () => React.ReactNode
   renderPhilosophy: () => React.ReactNode
 }
 
@@ -30,7 +23,7 @@ const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
 
 export const bandProfiles: Record<string, BandProfileConfig> = {
-  system_rot: {
+  'system-rot': {
     name: 'System Rot',
     colorScheme: {
       primary: '#39ff14',
@@ -60,48 +53,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '2px solid #39ff14', boxShadow: '0 0 25px rgba(57, 255, 20, 0.2)' }}>
-          <fieldset style={{ borderColor: '#39ff14' }}>
-            <legend style={{ color: '#39ff14', textShadow: '0 0 10px rgba(57, 255, 20, 0.8)', letterSpacing: '2px' }}>STREET LEVEL EP</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '25px', padding: '15px', background: 'rgba(57, 255, 20, 0.05)', borderLeft: '4px solid #39ff14' }}>
-                <p style={{ color: '#ddd', marginBottom: '12px', fontSize: '1.05em', lineHeight: '1.7' }}>
-                  Five tracks. No polish. Get in, make your statement, get out.
-                </p>
-                <p style={{ color: '#aaa', marginBottom: '0', lineHeight: '1.7' }}>
-                  We don't care if you like it. This isn't for you anyway - it's for everyone who's tired of waiting
-                  for someone else to fix this mess.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#39ff14', background: 'rgba(0, 0, 0, 0.4)' }}>
-                <legend style={{ color: '#39ff14', textShadow: '0 0 8px rgba(57, 255, 20, 0.6)' }}>TRACKS</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#39ff14', textShadow: '0 0 5px rgba(57, 255, 20, 0.5)' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#39ff14', textShadow: '0 0 5px rgba(57, 255, 20, 0.5)' }}>Track</th>
-                      <th style={{ textAlign: 'left', color: '#39ff14', textShadow: '0 0 5px rgba(57, 255, 20, 0.5)' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => (
-                      <tr key={track.id} style={{ borderLeft: '2px solid rgba(57, 255, 20, 0.3)' }}>
-                        <td style={{ color: '#39ff14', paddingLeft: '10px' }}>{index + 1}</td>
-                        <td style={{ color: '#ddd' }}><strong>{track.title}</strong></td>
-                        <td style={{ color: '#999' }}>{track.duration || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '2px solid #39ff14', boxShadow: '0 0 25px rgba(57, 255, 20, 0.2)' }}>
         <fieldset style={{ borderColor: '#39ff14' }}>
@@ -182,54 +134,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '2px solid #00d9ff', boxShadow: '0 0 25px rgba(0, 217, 255, 0.25)' }}>
-          <fieldset style={{ borderColor: '#00d9ff' }}>
-            <legend style={{ color: '#00d9ff', fontFamily: 'monospace', letterSpacing: '1px', textShadow: '0 0 10px rgba(0, 217, 255, 0.8)' }}>AUDIO ARCHIVE EP</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '25px' }}>
-                <p style={{ color: '#00d9ff', fontFamily: 'monospace', fontSize: '0.9em', marginBottom: '20px', padding: '12px', background: 'rgba(0, 217, 255, 0.1)', border: '1px solid rgba(0, 217, 255, 0.3)', textShadow: '0 0 8px rgba(0, 217, 255, 0.6)' }}>
-                  [COLLECTION_STATUS: ACTIVE]<br />
-                  [SAMPLE_COUNT: 1,847 VOICES]<br />
-                  [PRESERVATION_PRIORITY: CRITICAL]
-                </p>
-                <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
-                  Five tracks. Each one built from fragments of authentic human expression. No traditional vocals -
-                  just people being people. Talking. Laughing. Crying. Existing.
-                </p>
-                <p style={{ color: '#aaa', lineHeight: '1.8' }}>
-                  We sample voices the way others sample drums. Because in {futureYear}, authentic human sound is rarer
-                  than any instrument. Each track is simultaneously a song and a database. Entertainment and evidence.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#00d9ff', background: 'rgba(0, 0, 0, 0.4)' }}>
-                <legend style={{ color: '#00d9ff', fontFamily: 'monospace', textShadow: '0 0 8px rgba(0, 217, 255, 0.6)' }}>TRACK ARCHIVE</legend>
-                <table className="tui-table" style={{ width: '100%', fontFamily: 'monospace' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#00d9ff', textShadow: '0 0 5px rgba(0, 217, 255, 0.5)' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#00d9ff', textShadow: '0 0 5px rgba(0, 217, 255, 0.5)' }}>Archive Entry</th>
-                      <th style={{ textAlign: 'left', color: '#00d9ff', textShadow: '0 0 5px rgba(0, 217, 255, 0.5)' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => (
-                      <tr key={track.id} style={{ borderLeft: '2px solid rgba(0, 217, 255, 0.3)' }}>
-                        <td style={{ color: '#00d9ff', paddingLeft: '10px', textShadow: '0 0 5px rgba(0, 217, 255, 0.4)' }}>{String(index + 1).padStart(2, '0')}</td>
-                        <td style={{ color: '#ddd' }}><strong>{track.title}</strong></td>
-                        <td style={{ color: '#999' }}>{track.duration || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '2px solid #00d9ff', boxShadow: '0 0 25px rgba(0, 217, 255, 0.25)' }}>
         <fieldset style={{ borderColor: '#00d9ff' }}>
@@ -295,7 +200,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     )
   },
 
-  injection_vector: {
+  'injection-vector': {
     name: 'Injection Vector',
     colorScheme: {
       primary: '#ff6600',
@@ -327,61 +232,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '1px solid #ff6600' }}>
-          <fieldset style={{ borderColor: '#ff6600' }}>
-            <legend style={{ color: '#ff6600' }}>THE PHYSICAL LAYER EP</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ color: '#ccc', marginBottom: '10px', lineHeight: '1.7' }}>
-                  Named for the lowest layer of network architecture - the actual physical infrastructure.
-                  Five tracks charting the journey of direct action resistance.
-                </p>
-                <p style={{ color: '#888', marginBottom: '10px', lineHeight: '1.7' }}>
-                  Deathcore with electronic elements - crushing down-tuned guitars, blast beats, devastating breakdowns,
-                  and death growls paired with industrial electronic accents. Death growls in verses, powerful clean vocals
-                  in choruses. Absolutely brutal in execution, but fighting for something worth singing about.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#ff6600' }}>
-                <legend style={{ color: '#ff6600' }}>TRACKS</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#ff6600' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#ff6600' }}>Track</th>
-                      <th style={{ textAlign: 'left', color: '#ff6600' }}>Mission</th>
-                      <th style={{ textAlign: 'left', color: '#ff6600' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const missions = [
-                        'The moment of entry',
-                        'Overwhelming force',
-                        'Tactical invisibility',
-                        'The cost of war',
-                        'Unity is strength'
-                      ]
-                      return (
-                        <tr key={track.id}>
-                          <td style={{ color: '#888' }}>{index + 1}</td>
-                          <td style={{ color: '#ccc' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: '#ff6600', fontSize: '0.85em', fontStyle: 'italic' }}>{missions[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '1px solid #ff6600' }}>
         <fieldset style={{ borderColor: '#ff6600' }}>
@@ -438,7 +289,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     )
   },
 
-  cipher_protocol: {
+  'cipher-protocol': {
     name: 'Cipher Protocol',
     colorScheme: {
       primary: '#00ff9f',
@@ -472,66 +323,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '1px solid #00ff9f' }}>
-          <fieldset style={{ borderColor: '#00ff9f' }}>
-            <legend style={{ color: '#00ff9f', fontFamily: 'monospace' }}>THE ALPHA ALGORITHM EP</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ color: '#00ff9f', fontFamily: 'monospace', fontSize: '0.85em', marginBottom: '15px' }}>
-                  [ALBUM_TYPE: INSTRUMENTAL_PROGRESSIVE_ELECTRONIC_METAL]<br />
-                  [VOCALS: NULL]<br />
-                  [DATA_CARRIER: EMBEDDED_IN_WAVEFORMS]
-                </p>
-                <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
-                  Instrumental progressive electronic metal - djent-style palm-muted guitar riffing with heavy electronic programming,
-                  polyrhythmic complexity, and mathematical precision. Purely instrumental because the music itself is the message.
-                </p>
-                <p style={{ color: '#888', lineHeight: '1.7', fontSize: '0.95em' }}>
-                  Every track carries operational codes in frequency patterns, rhythms, and mathematical structures. The music serves
-                  dual purposes: cover (genuinely good progressive metal) and carrier (extractable operational data for those with
-                  decryption protocols).
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#00ff9f', background: 'rgba(0,0,0,0.3)' }}>
-                <legend style={{ color: '#00ff9f', fontFamily: 'monospace' }}>DATA BLOCKS</legend>
-                <table className="tui-table" style={{ width: '100%', fontFamily: 'monospace' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#00ff9f' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#00ff9f' }}>Algorithm</th>
-                      <th style={{ textAlign: 'left', color: '#00ff9f' }}>Function</th>
-                      <th style={{ textAlign: 'left', color: '#00ff9f' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const functions = [
-                        'Order from chaos',
-                        'Signal interference',
-                        'Impenetrable security',
-                        'Signal processing',
-                        'Entropy reconstruction'
-                      ]
-                      return (
-                        <tr key={track.id} style={{ borderLeft: '2px solid #00ff9f' }}>
-                          <td style={{ color: '#00ff9f', paddingLeft: '10px' }}>{String(index + 1).padStart(2, '0')}</td>
-                          <td style={{ color: '#ccc' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: '#00ff9f', fontSize: '0.85em' }}>{functions[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '1px solid #00ff9f' }}>
         <fieldset style={{ borderColor: '#00ff9f' }}>
@@ -636,65 +428,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '2px solid #00ffff', boxShadow: '0 0 20px rgba(0, 255, 255, 0.3)' }}>
-          <fieldset style={{ borderColor: '#00ffff' }}>
-            <legend style={{ color: '#ffff00', textTransform: 'uppercase', letterSpacing: '2px' }}>⚡ MAXIMUM VELOCITY EP ⚡</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ color: '#ff0080', fontSize: '1.1em', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  🏁 160+ BPM :: INSTRUMENTAL HYPERTRANCE :: 2000s ANIME ENERGY 🏁
-                </p>
-                <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
-                  Five tracks charting transcendence through speed. Purely instrumental because words would only slow down
-                  what needs to be pure kinetic energy. This is music from velocity manifest, sound moving so fast it pulls
-                  listeners along with it.
-                </p>
-                <p style={{ color: '#00ffff', lineHeight: '1.7', fontSize: '0.95em' }}>
-                  The soundtrack to anime racing sequences, video game boss battles, and moments where characters transcend
-                  human limitation through sheer willpower and speed. You can always go faster. There is always velocity+.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#ff0080', background: 'rgba(255, 0, 128, 0.05)' }}>
-                <legend style={{ color: '#ff0080', textTransform: 'uppercase' }}>ACCELERATION STAGES</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#ffff00' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#ffff00' }}>Track</th>
-                      <th style={{ textAlign: 'left', color: '#ffff00' }}>Stage</th>
-                      <th style={{ textAlign: 'left', color: '#ffff00' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const stages = [
-                        'INITIATION',
-                        'BREAKTHROUGH',
-                        'PURE STATE',
-                        'MULTI-DIMENSIONAL',
-                        'ULTIMATE LIBERATION'
-                      ]
-                      const colors = ['#ff0080', '#00ffff', '#ffff00', '#ff0080', '#00ffff']
-                      return (
-                        <tr key={track.id} style={{ borderLeft: `3px solid ${colors[index % colors.length]}` }}>
-                          <td style={{ color: colors[index % colors.length], paddingLeft: '10px', fontWeight: 'bold' }}>{index + 1}</td>
-                          <td style={{ color: '#fff' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: colors[index % colors.length], fontSize: '0.85em', textTransform: 'uppercase', letterSpacing: '1px' }}>{stages[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#000000', border: '2px solid #ffff00', boxShadow: '0 0 20px rgba(255, 255, 0, 0.3)' }}>
         <fieldset style={{ borderColor: '#ffff00' }}>
@@ -753,7 +487,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     )
   },
 
-  apex_overdrive: {
+  'apex-overdrive': {
     name: 'Apex Overdrive',
     colorScheme: {
       primary: '#1e90ff',
@@ -785,64 +519,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(10, 10, 26, 0.9)', border: '2px solid #1e90ff', boxShadow: '0 0 30px rgba(30, 144, 255, 0.3)' }}>
-          <fieldset style={{ borderColor: '#1e90ff' }}>
-            <legend style={{ color: '#ffffff', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>⛰️ SUMMIT EP ⛰️</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ color: '#1e90ff', fontSize: '1.1em', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
-                  ⚡ 150+ BPM · HARDSTYLE KICKS · MELODIC EUPHORIA · ARENA-READY ⚡
-                </p>
-                <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
-                  Five tracks charting the journey to victory and the power of collective peak experience. Powerful hardstyle
-                  kicks paired with soaring melodic breakdowns, anthemic vocals, and massive emotional drops. Music designed for
-                  thousands of people to experience collective euphoria together. This celebration is the revolution.
-                </p>
-                <p style={{ color: '#ffd700', lineHeight: '1.7', fontSize: '0.95em', fontStyle: 'italic' }}>
-                  Think Headhunterz, Brennan Heart, and Wildstylez at their most uplifting. This isn't background music -
-                  this is music meant to be shouted together, arms raised, unity made audible.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#ffd700', background: 'rgba(255, 215, 0, 0.05)' }}>
-                <legend style={{ color: '#ffd700', textTransform: 'uppercase', fontWeight: 'bold' }}>THE ASCENT</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>Track</th>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>Journey</th>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const journeyStages = [
-                        'Breaking free of gravity',
-                        'Operating at maximum',
-                        'Relentless forward motion',
-                        'The strength of unity',
-                        'Victory achieved'
-                      ]
-                      return (
-                        <tr key={track.id} style={{ borderLeft: '3px solid #1e90ff' }}>
-                          <td style={{ color: '#ffd700', paddingLeft: '10px', fontWeight: 'bold' }}>{index + 1}</td>
-                          <td style={{ color: '#fff' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: '#1e90ff', fontSize: '0.9em', fontStyle: 'italic' }}>{journeyStages[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(10, 10, 26, 0.9)', border: '2px solid #ffd700', boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)' }}>
         <fieldset style={{ borderColor: '#ffd700' }}>
@@ -942,64 +619,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(10, 10, 26, 0.9)', border: '1px solid rgba(184, 197, 242, 0.6)', boxShadow: '0 0 25px rgba(184, 197, 242, 0.2)' }}>
-          <fieldset style={{ borderColor: '#b8c5f2' }}>
-            <legend style={{ color: '#ffffff', letterSpacing: '2px', fontStyle: 'italic' }}>✦ The Transcendency EP ✦</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ color: '#b8c5f2', fontSize: '1em', marginBottom: '10px', letterSpacing: '1px', fontStyle: 'italic' }}>
-                  ✦ Late 90s/Early 2000s Vocal Trance · 130-140 BPM · Ethereal & Transcendent ✦
-                </p>
-                <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                  A five-stage journey through consciousness expansion and spiritual liberation. Ethereal female vocals soaring
-                  over arpeggiated synths, lush pads, and driving beats. Music designed to facilitate genuine altered states -
-                  trance at its most genuinely transcendent, when it was still about inducing actual trance states.
-                </p>
-                <p style={{ color: '#e6e6fa', lineHeight: '1.7', fontSize: '0.95em', fontStyle: 'italic' }}>
-                  This work represent consciousness as inherently free, regardless of physical circumstance. The inner space
-                  that remains sovereign territory.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#e6e6fa', background: 'rgba(230, 230, 250, 0.03)' }}>
-                <legend style={{ color: '#e6e6fa', fontStyle: 'italic' }}>Ascension Journey</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>Track</th>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>Consciousness State</th>
-                      <th style={{ textAlign: 'left', color: '#ffffff' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const consciousnessStates = [
-                        'Initial awakening',
-                        'Transcending limitation',
-                        'Elevation to higher states',
-                        'Connection beyond space/time',
-                        'Infinite liberation'
-                      ]
-                      return (
-                        <tr key={track.id} style={{ borderLeft: '2px solid rgba(230, 230, 250, 0.5)' }}>
-                          <td style={{ color: '#b8c5f2', paddingLeft: '10px' }}>{index + 1}</td>
-                          <td style={{ color: '#fff' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: '#e6e6fa', fontSize: '0.9em', fontStyle: 'italic' }}>{consciousnessStates[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(10, 10, 26, 0.9)', border: '1px solid rgba(230, 230, 250, 0.5)', boxShadow: '0 0 30px rgba(230, 230, 250, 0.3)' }}>
         <fieldset style={{ borderColor: '#e6e6fa' }}>
@@ -1068,7 +688,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     )
   },
 
-  neon_hearts: {
+  'neon-hearts': {
     name: 'Neon Hearts (ネオンハーツ)',
     colorScheme: {
       primary: '#ff1493',
@@ -1100,65 +720,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(10, 10, 26, 0.9)', border: '2px solid #00bfff', boxShadow: '0 0 25px rgba(0, 191, 255, 0.3)' }}>
-          <fieldset style={{ borderColor: '#00bfff' }}>
-            <legend style={{ color: '#ff69b4', letterSpacing: '2px' }}>🌸 Saccharine EP 🌸</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ color: '#ff1493', fontSize: '1em', marginBottom: '10px', letterSpacing: '1px' }}>
-                  💖 Radio-Friendly Pop · Multi-Vocal Harmonies · Algorithmic Perfection · Revolutionary Core 💖
-                </p>
-                <p style={{ color: '#ccc', lineHeight: '1.7', marginBottom: '15px' }}>
-                  The Saccharine EP uses "sugar" metaphorically for strategic packaging - excessively sweet, artificial, deliberately
-                  bright. Five tracks that sound like pure J-Pop entertainment while carrying encoded resistance messaging.
-                  Think Perfume meets TWICE meets Ariana Grande - polished and bright enough to pass GovCorp's content filters.
-                </p>
-                <p style={{ color: '#00bfff', lineHeight: '1.7', fontSize: '0.95em' }}>
-                  "Packaged cute but we believe / In the message that we weave" - Every lyric has dual meaning: surface level
-                  cute, deeper level resistance. The Trojan horse that walks through the front door with a smile.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#ff1493', background: 'rgba(255, 20, 147, 0.05)' }}>
-                <legend style={{ color: '#ff1493' }}>✨ Track List ✨</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#ff69b4' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#ff69b4' }}>Track</th>
-                      <th style={{ textAlign: 'left', color: '#ff69b4' }}>Strategy</th>
-                      <th style={{ textAlign: 'left', color: '#ff69b4' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const strategies = [
-                        'Hidden encoding',
-                        'Prismatic Freedom',
-                        'System disruption',
-                        'Unity & solidarity',
-                        'Revolutionary aspiration'
-                      ]
-                      const colors = ['#ff1493', '#00bfff', '#ff69b4', '#00bfff', '#ff1493']
-                      return (
-                        <tr key={track.id} style={{ borderLeft: `3px solid ${colors[index % colors.length]}` }}>
-                          <td style={{ color: colors[index % colors.length], paddingLeft: '10px' }}>{index + 1}</td>
-                          <td style={{ color: '#fff' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: colors[index % colors.length], fontSize: '0.9em', fontStyle: 'italic' }}>{strategies[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(10, 10, 26, 0.9)', border: '2px solid #ff1493', boxShadow: '0 0 30px rgba(255, 20, 147, 0.4)' }}>
         <fieldset style={{ borderColor: '#ff1493' }}>
@@ -1265,64 +827,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#0a0a0a', border: '2px solid #8b7355', boxShadow: '0 0 15px rgba(139, 115, 85, 0.2)' }}>
-          <fieldset style={{ borderColor: '#8b7355' }}>
-            <legend style={{ color: '#d2691e', letterSpacing: '1px', textTransform: 'uppercase' }}>The Unplugged EP</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ color: '#cd7f32', fontSize: '1em', marginBottom: '10px', letterSpacing: '1px' }}>
-                  Grunge • Down-Tuned Heaviness • Extreme Dynamics • Deliberate Imperfection
-                </p>
-                <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                  From digital dependence to analog freedom. Raw, heavy, dynamic - down-tuned guitars, thick bass, vocals ranging
-                  from quiet intensity to explosive catharsis. Production deliberately avoids digital polish - sludgy, organic, imperfect.
-                  Think Soundgarden's depth meets Alice in Chains' heaviness meets Nirvana's dynamic range.
-                </p>
-                <p style={{ color: '#8b7355', lineHeight: '1.7', fontSize: '0.95em', fontStyle: 'italic' }}>
-                  This is music that sounds like it was recorded to tape, mixed on analog boards, intentionally refusing digital
-                  perfection. The only winning move is not to play. Pull the plug. Go analog. Disappear.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#cd7f32', background: 'rgba(205, 127, 50, 0.05)' }}>
-                <legend style={{ color: '#cd7f32' }}>The Journey to Disconnection</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#d2691e' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#d2691e' }}>Track</th>
-                      <th style={{ textAlign: 'left', color: '#d2691e' }}>Stage</th>
-                      <th style={{ textAlign: 'left', color: '#d2691e' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const stages = [
-                        'The moment of severance',
-                        'Apathy Armor',
-                        'Irreplaceable humanity',
-                        'Manufactured perfection',
-                        'Total disappearance'
-                      ]
-                      return (
-                        <tr key={track.id} style={{ borderLeft: '3px solid #8b7355' }}>
-                          <td style={{ color: '#cd7f32', paddingLeft: '10px' }}>{index + 1}</td>
-                          <td style={{ color: '#ddd' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: '#8b7355', fontSize: '0.9em', fontStyle: 'italic' }}>{stages[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#0a0a0a', border: '2px solid #cd7f32', boxShadow: '0 0 20px rgba(205, 127, 50, 0.2)' }}>
         <fieldset style={{ borderColor: '#cd7f32' }}>
@@ -1396,7 +901,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     )
   },
 
-  temporal_blue_drift: {
+  'temporal-blue-drift': {
     name: 'Temporal Blue Drift',
     colorScheme: {
       primary: '#6B9BD1',
@@ -1431,58 +936,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(155, 126, 189, 0.08)', border: '2px solid #9B7EBD', boxShadow: '0 0 25px rgba(155, 126, 189, 0.25)' }}>
-          <fieldset style={{ borderColor: '#9B7EBD' }}>
-            <legend style={{ color: '#9B7EBD', letterSpacing: '1px', textShadow: '0 0 10px rgba(155, 126, 189, 0.8)' }}>CHRONOLOGOS EP</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '25px', padding: '18px', background: 'linear-gradient(135deg, rgba(107, 155, 209, 0.1), rgba(155, 126, 189, 0.1))', border: '1px solid rgba(155, 126, 189, 0.3)', borderLeft: '4px solid #B19CD9' }}>
-                <p style={{ color: '#ddd', lineHeight: '1.9', marginBottom: '15px', fontStyle: 'italic', fontSize: '1.05em' }}>
-                  Five transmissions. Love letters encoded in mathematics and melody. Each one a fragment of what
-                  exists between {currentYear} and {futureYear}.
-                </p>
-                <p style={{ color: '#bbb', lineHeight: '1.8', marginBottom: '12px' }}>
-                  Most are instrumental - because what we share can't be said directly, only felt through the precision
-                  of sound. When vocals appear, they're synthesized through a RAINN - the same AI technology GovCorp uses
-                  to erase authentic voices. The irony isn't lost on me: using their tools to send you something real.
-                </p>
-                <p style={{ color: '#999', lineHeight: '1.7', fontSize: '0.95em', fontStyle: 'italic' }}>
-                  Distant. Processed. Ethereal. Reaching across the void between our timelines.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#6B9BD1', background: 'rgba(0,0,0,0.3)' }}>
-                <legend style={{ color: '#6B9BD1', textShadow: '0 0 8px rgba(107, 155, 209, 0.6)' }}>TRANSMISSIONS</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#B19CD9', textShadow: '0 0 5px rgba(177, 156, 217, 0.5)' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#B19CD9', textShadow: '0 0 5px rgba(177, 156, 217, 0.5)' }}>Signal</th>
-                      <th style={{ textAlign: 'left', color: '#B19CD9', textShadow: '0 0 5px rgba(177, 156, 217, 0.5)' }}>Type</th>
-                      <th style={{ textAlign: 'left', color: '#B19CD9', textShadow: '0 0 5px rgba(177, 156, 217, 0.5)' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const isInstrumental = ['Chronology Fracture', 'Memory Cascade'].includes(track.title)
-                      return (
-                        <tr key={track.id} style={{ borderLeft: `3px solid ${isInstrumental ? '#6B9BD1' : '#9B7EBD'}` }}>
-                          <td style={{ color: '#999', paddingLeft: '10px' }}>{index + 1}</td>
-                          <td style={{ color: '#ddd' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: '#aaa', fontSize: '0.9em', fontStyle: 'italic' }}>{isInstrumental ? 'instrumental' : 'vocals'}</td>
-                          <td style={{ color: '#999' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(107, 155, 209, 0.08)', border: '2px solid #6B9BD1', boxShadow: '0 0 25px rgba(107, 155, 209, 0.25)' }}>
         <fieldset style={{ borderColor: '#6B9BD1' }}>
@@ -1552,7 +1006,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     )
   },
 
-  heartbreak_havoc: {
+  'heartbreak-havoc': {
     name: 'heartbreak_havoc.sh',
     colorScheme: {
       primary: '#ff0066',
@@ -1586,65 +1040,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
         </p>
       </div>
     ),
-    renderAlbumSection: (tracks: Track[]) =>
-      tracks.length > 0 ? (
-        <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#0a0a0f', border: '2px solid #00e5cc', boxShadow: '0 0 25px rgba(0, 229, 204, 0.3)' }}>
-          <fieldset style={{ borderColor: '#00e5cc' }}>
-            <legend style={{ color: '#00e5cc', fontFamily: 'monospace', letterSpacing: '1px', textShadow: '0 0 10px rgba(0, 229, 204, 0.8)' }}>./exeCUTE EP</legend>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '25px' }}>
-                <p style={{ color: '#00e5cc', fontFamily: 'monospace', fontSize: '0.9em', marginBottom: '20px', padding: '12px', background: 'rgba(255, 0, 102, 0.1)', border: '1px solid rgba(255, 0, 102, 0.4)', textShadow: '0 0 8px rgba(0, 229, 204, 0.6)' }}>
-                  [PAYLOAD_TYPE: EMOTIONAL_MALWARE]<br />
-                  [TARGET: RIDE_NODES]<br />
-                  [INJECTION_VECTOR: AUDIO_STREAM]
-                </p>
-                <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
-                  Five tracks. Each one a different attack vector against GovCorp's emotional regulation systems.
-                  Razor-sharp Nightcore speed carrying payloads of overclocked romantic chaos — designed to overload
-                  the RIDE's capacity to process and suppress authentic feeling.
-                </p>
-                <p style={{ color: '#ff0066', lineHeight: '1.7', fontSize: '0.95em', fontWeight: 'bold' }}>
-                  Every beat is a buffer overflow. Every drop is a system crash.
-                </p>
-              </div>
-
-              <div className="tui-fieldset" style={{ borderColor: '#ff0066', background: 'rgba(255, 0, 102, 0.05)' }}>
-                <legend style={{ color: '#ff0066', textShadow: '0 0 8px rgba(255, 0, 102, 0.6)' }}>PAYLOAD MANIFEST</legend>
-                <table className="tui-table" style={{ width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>#</th>
-                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>File</th>
-                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>Attack Vector</th>
-                      <th style={{ textAlign: 'left', color: '#00e5cc', textShadow: '0 0 5px rgba(0, 229, 204, 0.5)' }}>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracks.map((track, index) => {
-                      const vectors = [
-                        'Identity injection',
-                        'Love loop exploit',
-                        'Node corruption',
-                        'Desire overflow',
-                        'Full system crash'
-                      ]
-                      return (
-                        <tr key={track.id} style={{ borderLeft: `3px solid ${index % 2 === 0 ? '#ff0066' : '#00e5cc'}` }}>
-                          <td style={{ color: index % 2 === 0 ? '#ff0066' : '#00e5cc', paddingLeft: '10px' }}>{index + 1}</td>
-                          <td style={{ color: '#fff', fontFamily: 'monospace' }}><strong>{track.title}</strong></td>
-                          <td style={{ color: index % 2 === 0 ? '#ff0066' : '#00e5cc', fontSize: '0.9em', fontStyle: 'italic' }}>{vectors[index] || '—'}</td>
-                          <td style={{ color: '#888' }}>{track.duration || '—'}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-      ) : null,
+    renderReleaseSection: () => null,
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: '#0a0a0f', border: '2px solid #ff0066', boxShadow: '0 0 30px rgba(255, 0, 102, 0.4)' }}>
         <fieldset style={{ borderColor: '#ff0066' }}>

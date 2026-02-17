@@ -3,10 +3,10 @@ artist:
   genre: "Soundtrack"
   artist_type: ost
 
-albums:
+releases:
   - slug: ost
     title: "OST"
-    album_type: lp
+    release_type: lp
     release_date: "2125-11-21"
     cover_image: "ost.jpg"
     tracks:

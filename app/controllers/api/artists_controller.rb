@@ -32,7 +32,7 @@ module Api
         name: @artist.name,
         slug: @artist.slug,
         genre: @artist.genre,
-        tracks: @artist.tracks.includes(:album).order(Arel.sql("albums.release_date DESC NULLS LAST, tracks.track_number ASC")).map { |track|
+        tracks: @artist.tracks.visible_in_pulse_vault.includes(:release).order(Arel.sql("releases.release_date DESC NULLS LAST, tracks.track_number ASC")).joins(:release).map { |track|
           {
             id: track.id,
             title: track.title,
@@ -41,16 +41,16 @@ module Api
             duration: track.duration,
             featured: track.featured,
             streaming_links: track.streaming_links,
-            album: if track.album
-                     {
-                       id: track.album.id,
-                       name: track.album.name,
-                       slug: track.album.slug,
-                       album_type: track.album.album_type,
-                       release_date: track.album.release_date,
-                       cover_url: track.album.cover_image.attached? ? url_for(track.album.cover_image) : nil
-                     }
-                   end,
+            release: if track.release
+                       {
+                         id: track.release.id,
+                         name: track.release.name,
+                         slug: track.release.slug,
+                         release_type: track.release.release_type,
+                         release_date: track.release.release_date,
+                         cover_url: track.release.cover_image.attached? ? url_for(track.release.cover_image) : nil
+                       }
+                     end,
             audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil
           }
         }

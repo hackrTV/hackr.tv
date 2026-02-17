@@ -9,12 +9,13 @@ import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
 import { apiJson } from '~/utils/apiClient'
+import { getArtistColors } from '~/utils/artistColors'
 
-interface Album {
+interface Release {
   id: number
   name: string
   slug: string
-  album_type: string | null
+  release_type: string | null
   release_date: string | null
   description: string | null
   cover_url: string | null
@@ -39,32 +40,8 @@ interface Track {
   streaming_links: Record<string, string> | null
   videos: Record<string, string> | null
   artist: Artist
-  album: Album | null
+  release: Release | null
   audio_url: string | null
-}
-
-// Color schemes for different artists
-const colorSchemes: Record<string, {
-  primary: string
-  secondary: string
-  glow: string
-  glowStrong: string
-  background: string
-}> = {
-  xeraen: {
-    primary: '#8B00FF',
-    secondary: '#6B00CC',
-    glow: 'rgba(139, 0, 255, 0.6)',
-    glowStrong: 'rgba(139, 0, 255, 0.8)',
-    background: '#0a0a0a'
-  },
-  thecyberpulse: {
-    primary: '#8B00FF',
-    secondary: '#9B59B6',
-    glow: 'rgba(139, 0, 255, 0.6)',
-    glowStrong: 'rgba(139, 0, 255, 0.8)',
-    background: '#0a0a0a'
-  }
 }
 
 const TrackDetailPage: React.FC = () => {
@@ -77,7 +54,51 @@ const TrackDetailPage: React.FC = () => {
   const pathParts = location.pathname.split('/')
   const artistSlug = pathParts[1]
   const trackSlug = pathParts[3]
-  const colorScheme = colorSchemes[artistSlug] || colorSchemes.xeraen
+  const colorScheme = getArtistColors(artistSlug)
+  const hasPrismatic = !!colorScheme.gradient
+
+  const outerBorderStyle: React.CSSProperties = hasPrismatic
+    ? {
+      border: '3px solid transparent',
+      backgroundImage: `linear-gradient(${colorScheme.background}, ${colorScheme.background}), ${colorScheme.gradient}`,
+      backgroundOrigin: 'border-box',
+      backgroundClip: 'padding-box, border-box',
+      boxShadow: '0 0 30px rgba(255, 0, 128, 0.3)'
+    }
+    : {
+      border: `2px solid ${colorScheme.primary}`,
+      boxShadow: `0 0 30px ${colorScheme.glow}`
+    }
+
+  const legendStyle: React.CSSProperties = hasPrismatic
+    ? {
+      background: colorScheme.gradient,
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+      letterSpacing: '3px',
+      fontWeight: 'bold'
+    }
+    : {
+      color: colorScheme.primary,
+      textShadow: `0 0 15px ${colorScheme.glowStrong}`,
+      letterSpacing: '3px'
+    }
+
+  const getAccentColor = (index: number): string => {
+    if (hasPrismatic && colorScheme.accentColors) {
+      return colorScheme.accentColors[index % colorScheme.accentColors.length]
+    }
+    return colorScheme.primary
+  }
+
+  const getSectionStyle = (index: number): { color: string; glow: string } => {
+    const color = getAccentColor(index)
+    return {
+      color,
+      glow: hasPrismatic ? `${color}99` : colorScheme.glow
+    }
+  }
 
   useEffect(() => {
     if (!trackSlug) return
@@ -101,18 +122,11 @@ const TrackDetailPage: React.FC = () => {
           style={{
             maxWidth: '1200px',
             background: colorScheme.background,
-            border: `2px solid ${colorScheme.primary}`,
-            boxShadow: `0 0 30px ${colorScheme.glow}`
+            ...outerBorderStyle
           }}
         >
-          <fieldset style={{ borderColor: colorScheme.primary }}>
-            <legend
-              style={{
-                color: colorScheme.primary,
-                textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-                letterSpacing: '3px'
-              }}
-            >
+          <fieldset style={{ borderColor: hasPrismatic ? 'transparent' : colorScheme.primary, ...(hasPrismatic ? { border: 'none' } : {}) }}>
+            <legend style={legendStyle}>
               DECODING TRANSMISSION
             </legend>
             <div style={{ padding: '40px' }}>
@@ -132,18 +146,11 @@ const TrackDetailPage: React.FC = () => {
           style={{
             maxWidth: '1200px',
             background: colorScheme.background,
-            border: `2px solid ${colorScheme.primary}`,
-            boxShadow: `0 0 30px ${colorScheme.glow}`
+            ...outerBorderStyle
           }}
         >
-          <fieldset style={{ borderColor: colorScheme.primary }}>
-            <legend
-              style={{
-                color: colorScheme.primary,
-                textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-                letterSpacing: '3px'
-              }}
-            >
+          <fieldset style={{ borderColor: hasPrismatic ? 'transparent' : colorScheme.primary, ...(hasPrismatic ? { border: 'none' } : {}) }}>
+            <legend style={legendStyle}>
               SIGNAL LOST
             </legend>
             <div style={{ padding: '40px', textAlign: 'center' }}>
@@ -155,7 +162,7 @@ const TrackDetailPage: React.FC = () => {
     )
   }
 
-  const artistDisplayName = track.artist.name === 'XERAEN' ? 'XERAEN' : 'THE.CYBERPUL.SE'
+  const artistDisplayName = track.artist.name
   const platformOrder = ['bandcamp', 'youtube', 'spotify', 'apple_music', 'soundcloud']
 
   const titleize = (str: string) => {
@@ -176,6 +183,16 @@ const TrackDetailPage: React.FC = () => {
     })
   }
 
+  // Section index counter for cycling accent colors
+  let sectionIndex = 0
+  const headerSection = getSectionStyle(sectionIndex++)
+  const transmissionSection = getSectionStyle(sectionIndex++)
+  const hasStreaming = track.streaming_links && Object.keys(track.streaming_links).length > 0
+  const streamingSection = hasStreaming ? getSectionStyle(sectionIndex++) : null
+  const hasVideos = track.videos && Object.keys(track.videos).length > 0
+  const videosSection = hasVideos ? getSectionStyle(sectionIndex++) : null
+  const lyricsSection = track.lyrics ? getSectionStyle(sectionIndex++) : null
+
   return (
     <DefaultLayout>
       <div
@@ -185,18 +202,13 @@ const TrackDetailPage: React.FC = () => {
           margin: '0 auto',
           display: 'block',
           background: colorScheme.background,
-          border: `2px solid ${colorScheme.primary}`,
-          boxShadow: `0 0 30px ${colorScheme.glow}`
+          ...outerBorderStyle
         }}
       >
-        <fieldset style={{ borderColor: colorScheme.primary }}>
+        <fieldset style={{ borderColor: hasPrismatic ? 'transparent' : colorScheme.primary, ...(hasPrismatic ? { border: 'none' } : {}) }}>
           <legend
             className="center"
-            style={{
-              color: colorScheme.primary,
-              textShadow: `0 0 15px ${colorScheme.glowStrong}`,
-              letterSpacing: '3px'
-            }}
+            style={legendStyle}
           >
             {track.title.toUpperCase()}
           </legend>
@@ -207,9 +219,11 @@ const TrackDetailPage: React.FC = () => {
               style={{
                 marginBottom: '30px',
                 padding: '25px',
-                background: 'linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95))',
-                border: `2px solid ${colorScheme.primary}`,
-                boxShadow: `0 0 20px ${colorScheme.glow}, inset 0 0 15px rgba(139, 0, 255, 0.1)`
+                background: hasPrismatic
+                  ? `linear-gradient(135deg, ${headerSection.color}14, rgba(0, 0, 0, 0.95))`
+                  : 'linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95))',
+                border: `2px solid ${headerSection.color}`,
+                boxShadow: `0 0 20px ${headerSection.glow}, inset 0 0 15px ${headerSection.color}1a`
               }}
             >
               <div
@@ -217,15 +231,15 @@ const TrackDetailPage: React.FC = () => {
                   fontFamily: 'monospace',
                   marginBottom: '20px',
                   padding: '15px',
-                  background: 'rgba(139, 0, 255, 0.1)',
-                  border: `1px solid ${colorScheme.primary}`,
-                  color: colorScheme.primary,
-                  textShadow: `0 0 8px ${colorScheme.glow}`
+                  background: `${headerSection.color}1a`,
+                  border: `1px solid ${headerSection.color}`,
+                  color: headerSection.color,
+                  textShadow: `0 0 8px ${headerSection.glow}`
                 }}
               >
                 [ARTIST: {track.artist.name}]<br />
-                {track.album && <>[ALBUM: {track.album.name}]<br /></>}
-                {track.album?.album_type && <>[TYPE: {track.album.album_type.toUpperCase()}]<br /></>}
+                {track.release && <>[RELEASE: {track.release.name}]<br /></>}
+                {track.release?.release_type && <>[TYPE: {track.release.release_type.toUpperCase()}]<br /></>}
                 {track.release_date && <>[RELEASE: {track.release_date}]<br /></>}
                 {track.duration && <>[DURATION: {track.duration}]<br /></>}
                 [STATUS: TRANSMISSION ACTIVE]
@@ -236,7 +250,7 @@ const TrackDetailPage: React.FC = () => {
                   style={{
                     textAlign: 'center',
                     padding: '10px',
-                    background: colorScheme.primary,
+                    background: headerSection.color,
                     color: '#000',
                     fontWeight: 'bold',
                     letterSpacing: '2px',
@@ -253,15 +267,15 @@ const TrackDetailPage: React.FC = () => {
               style={{
                 marginBottom: '30px',
                 background: '#000000',
-                border: `2px solid ${colorScheme.primary}`,
-                boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
+                border: `2px solid ${transmissionSection.color}`,
+                boxShadow: `0 0 25px ${transmissionSection.glow}33`
               }}
             >
-              <fieldset style={{ borderColor: colorScheme.primary }}>
+              <fieldset style={{ borderColor: transmissionSection.color }}>
                 <legend
                   style={{
-                    color: colorScheme.primary,
-                    textShadow: `0 0 10px ${colorScheme.glowStrong}`,
+                    color: transmissionSection.color,
+                    textShadow: `0 0 10px ${transmissionSection.glow}`,
                     letterSpacing: '2px'
                   }}
                 >
@@ -274,20 +288,20 @@ const TrackDetailPage: React.FC = () => {
             </div>
 
             {/* Streaming Links */}
-            {track.streaming_links && Object.keys(track.streaming_links).length > 0 && (
+            {hasStreaming && streamingSection && (
               <div
                 style={{
                   marginBottom: '30px',
                   background: '#000000',
-                  border: `2px solid ${colorScheme.primary}`,
-                  boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
+                  border: `2px solid ${streamingSection.color}`,
+                  boxShadow: `0 0 25px ${streamingSection.glow}33`
                 }}
               >
-                <fieldset style={{ borderColor: colorScheme.primary }}>
+                <fieldset style={{ borderColor: streamingSection.color }}>
                   <legend
                     style={{
-                      color: colorScheme.primary,
-                      textShadow: `0 0 10px ${colorScheme.glowStrong}`,
+                      color: streamingSection.color,
+                      textShadow: `0 0 10px ${streamingSection.glow}`,
                       letterSpacing: '2px'
                     }}
                   >
@@ -295,7 +309,7 @@ const TrackDetailPage: React.FC = () => {
                   </legend>
                   <div style={{ padding: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     <Link
-                      to={`/fm/pulse_vault?filter=${encodeURIComponent(track.title)}`}
+                      to={`/fm/pulse-vault?filter=${encodeURIComponent(track.title)}`}
                       style={{
                         padding: '10px 20px',
                         background: colorScheme.primary,
@@ -307,7 +321,7 @@ const TrackDetailPage: React.FC = () => {
                     >
                       ▶ PULSE VAULT
                     </Link>
-                    {sortStreamingLinks(track.streaming_links).map(([platform, url]) => (
+                    {sortStreamingLinks(track.streaming_links!).map(([platform, url]) => (
                       <a
                         key={platform}
                         href={url}
@@ -330,27 +344,27 @@ const TrackDetailPage: React.FC = () => {
             )}
 
             {/* Videos */}
-            {track.videos && Object.keys(track.videos).length > 0 && (
+            {hasVideos && videosSection && (
               <div
                 style={{
                   marginBottom: '30px',
                   background: '#000000',
-                  border: `2px solid ${colorScheme.primary}`,
-                  boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
+                  border: `2px solid ${videosSection.color}`,
+                  boxShadow: `0 0 25px ${videosSection.glow}33`
                 }}
               >
-                <fieldset style={{ borderColor: colorScheme.primary }}>
+                <fieldset style={{ borderColor: videosSection.color }}>
                   <legend
                     style={{
-                      color: colorScheme.primary,
-                      textShadow: `0 0 10px ${colorScheme.glowStrong}`,
+                      color: videosSection.color,
+                      textShadow: `0 0 10px ${videosSection.glow}`,
                       letterSpacing: '2px'
                     }}
                   >
                     VISUAL TRANSMISSIONS
                   </legend>
                   <div style={{ padding: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    {Object.entries(track.videos).map(([type, url]) => (
+                    {Object.entries(track.videos!).map(([type, url]) => (
                       <a
                         key={type}
                         href={url}
@@ -362,7 +376,7 @@ const TrackDetailPage: React.FC = () => {
                           color: '#fff',
                           textDecoration: 'none',
                           fontWeight: 'bold',
-                          boxShadow: '0 0 15px rgba(107, 0, 204, 0.6)'
+                          boxShadow: `0 0 15px ${videosSection.glow}66`
                         }}
                       >
                         ▶ {titleize(type)} Video
@@ -374,20 +388,20 @@ const TrackDetailPage: React.FC = () => {
             )}
 
             {/* Lyrics */}
-            {track.lyrics && (
+            {track.lyrics && lyricsSection && (
               <div
                 style={{
                   marginBottom: '30px',
                   background: '#000000',
-                  border: `2px solid ${colorScheme.primary}`,
-                  boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)'
+                  border: `2px solid ${lyricsSection.color}`,
+                  boxShadow: `0 0 25px ${lyricsSection.glow}33`
                 }}
               >
-                <fieldset style={{ borderColor: colorScheme.primary }}>
+                <fieldset style={{ borderColor: lyricsSection.color }}>
                   <legend
                     style={{
-                      color: colorScheme.primary,
-                      textShadow: `0 0 10px ${colorScheme.glowStrong}`,
+                      color: lyricsSection.color,
+                      textShadow: `0 0 10px ${lyricsSection.glow}`,
                       letterSpacing: '2px'
                     }}
                   >
@@ -400,7 +414,7 @@ const TrackDetailPage: React.FC = () => {
                       fontFamily: 'monospace',
                       lineHeight: '1.8',
                       color: '#ddd',
-                      background: 'rgba(139, 0, 255, 0.03)'
+                      background: `${lyricsSection.color}08`
                     }}
                   >
                     <ReactMarkdown
@@ -410,9 +424,9 @@ const TrackDetailPage: React.FC = () => {
                         a: ({ ...props }) => (
                           <a
                             style={{
-                              color: colorScheme.primary,
+                              color: lyricsSection.color,
                               textDecoration: 'underline',
-                              textShadow: `0 0 8px ${colorScheme.glow}`
+                              textShadow: `0 0 8px ${lyricsSection.glow}`
                             }}
                             {...props}
                           />
@@ -444,20 +458,34 @@ const TrackDetailPage: React.FC = () => {
                 ← BACK TO {artistDisplayName} TRACKZ
               </Link>
               <Link
-                to={artistSlug === 'xeraen' ? '/xeraen' : '/thecyberpulse'}
+                to={`/${artistSlug}`}
                 style={{
                   padding: '10px 20px',
                   background: colorScheme.secondary,
                   color: 'white',
                   textDecoration: 'none',
                   fontWeight: 'bold',
-                  boxShadow: '0 0 15px rgba(107, 0, 204, 0.6)'
+                  boxShadow: `0 0 15px ${colorScheme.glow}66`
                 }}
               >
                 {artistDisplayName} HOME →
               </Link>
+              {track.release && (
+                <Link
+                  to={`/${artistSlug}/releases/${track.release.slug}`}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#222',
+                    color: '#aaa',
+                    textDecoration: 'none',
+                    border: '1px solid #444'
+                  }}
+                >
+                  RELEASE: {track.release.name} →
+                </Link>
+              )}
               <Link
-                to="/fm/pulse_vault"
+                to="/fm/pulse-vault"
                 style={{
                   padding: '10px 20px',
                   background: colorScheme.primary,

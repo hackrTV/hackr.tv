@@ -2,25 +2,23 @@ artist:
   name: "Injection Vector"
   genre: "Deathcore"
 
-albums:
+releases:
   - slug: physical-layer
     title: "Physical Layer"
-    album_type: ep
+    release_type: ep
     release_date: "2123-01-15"
     cover_image: "physical_layer.jpg"
     tracks:
       - title: "Breach Point"
         slug: breach-point
         track_number: 1
-        duration: TBA
+        duration: "4:00"
         audio_file: breach-point.ogg
         lyrics: |
-          [Intro - Harsh Vocals]
           Locked and loaded
           Mission coded
           No abort
 
-          [Verse 1 - Harsh Vocals]
           Systems locked, coordinates set
           Target acquired, no regrets
           Countdown running, feel the surge
@@ -30,13 +28,11 @@ albums:
           They never saw us coming close
           Now we're here and they're the ghost
 
-          [Pre-Chorus - Harsh]
           Static in my ears
           Adrenaline kills fear
           Heartbeat synchronize
           This is where they die
 
-          [Chorus - Clean Vocals]
           This is breach point, no turning back
           Walls come down, under attack
           We are the fracture in their design
@@ -46,7 +42,6 @@ albums:
           We are the storm that breaks their sky
           Breach point - do or die
 
-          [Verse 2 - Harsh]
           Pressure building, feel it rise
           See the terror in their eyes
           They built this cage to keep us out
@@ -56,13 +51,11 @@ albums:
           Every hallway, every turn
           Watch their fortress crash and burn
 
-          [Pre-Chorus - Harsh]
           Blood and steel collide
           Nothing left to hide
           This is what we're for
           Kicking down the door
 
-          [Chorus - Clean]
           This is breach point, no turning back
           Walls come down, under attack
           We are the fracture in their design
@@ -72,13 +65,11 @@ albums:
           We are the storm that breaks their sky
           Breach point - do or die
 
-          [Bridge - Clean with intensity building]
           Every training run has led us here
           Every sacrifice has made it clear
           We are the ones who break the seal
           We make the impossible real
 
-          [Breakdown - Harsh/Spoken]
           Three... two... breach!
           (We are the breach!)
           No retreat!
@@ -86,9 +77,6 @@ albums:
           This is war!
           (Kick the door!)
 
-          [Guitar Solo / Instrumental Break]
-
-          [Final Chorus - Clean with Harsh Accents]
           This is breach point, no turning back
           Walls come down, under attack
           We are the fracture in their design
@@ -98,7 +86,6 @@ albums:
           We are the storm that breaks their sky
           Breach point - do or die
 
-          [Outro - Harsh]
           Mission complete
           Never retreat
           This is breach point
@@ -106,14 +93,12 @@ albums:
       - title: "Kinetic Strike"
         slug: kinetic-strike
         track_number: 2
-        duration: "4:00"
+        duration: "4:07"
         audio_file: kinetic-strike.ogg
         lyrics: |
-          [Intro - Harsh/Shouted with rhythmic percussion]
           Break! The! Chain!
           Shatter! The! Frame!
 
-          [Verse 1 - Harsh Vocals]
           Subtlety is dead and gone
           Time to bring the hammer down
           Overwhelming force descends
@@ -123,7 +108,6 @@ albums:
           They want war, we bring the storm
           This is our truest form
 
-          [Verse 2 - Harsh]
           Every wall will shatter down
           Level every structure to the ground
           Calculated devastation
@@ -133,13 +117,11 @@ albums:
           Now it's concentrated force
           No remorse, we stay the course
 
-          [Pre-Chorus - Harsh]
           Feel the impact
           No turning back
           Pure kinetic energy
           This is how we set us free
 
-          [Chorus - Harsh/Shouted]
           Kinetic strike!
           Unleash the might!
           Shatter the frame!
@@ -149,7 +131,6 @@ albums:
           Break the chain!
           Kinetic strike!
 
-          [Verse 3 - Harsh]
           Momentum building, can't be stopped
           Everything they built will drop
           Physics doesn't lie or break
@@ -159,13 +140,11 @@ albums:
           This is Newton's law applied
           Nowhere left for them to hide
 
-          [Bridge - Clean Vocals (brief but powerful)]
           They thought their walls could hold us
           They thought we'd fall
           They thought their power controlled us
           They were wrong about it all
 
-          [Breakdown - Harsh]
           Break! (The chain!)
           Shatter! (The frame!)
           Crush! (Their game!)
@@ -175,9 +154,6 @@ albums:
           This is the fight! (Strike!)
           Kinetic strike!
 
-          [Guitar Solo / Instrumental Break - absolutely brutal]
-
-          [Final Chorus - Harsh/Shouted with added intensity]
           Kinetic strike!
           Unleash the might!
           Shatter the frame!
@@ -187,7 +163,6 @@ albums:
           Break the chain!
           Kinetic strike!
 
-          [Outro - Harsh]
           We are the kinetic force
           No remorse, we stay the course
           We are the kinetic force
@@ -196,15 +171,13 @@ albums:
       - title: "Ghost Protocol"
         slug: ghost-protocol
         track_number: 3
-        duration: "4:07"
+        duration: "3:33"
         audio_file: ghost-protocol.ogg
         lyrics: |
-          [Intro - Electronic glitches with spoken word harsh]
           Initiating ghost protocol
           Zero visibility mode
           Engaged
 
-          [Verse 1 - Harsh Vocals]
           Silent entry, zero trace
           Shadow moving through their space
           Every step is calculated
@@ -214,7 +187,6 @@ albums:
           I am data they can't parse
           I'm the absence in their farce
 
-          [Verse 2 - Harsh]
           Cameras blind, sensors dead
           Moving like I was never said
           Algorithm can't predict
@@ -224,13 +196,11 @@ albums:
           Every motion has a purpose
           Underneath their surface
 
-          [Pre-Chorus - Harsh]
           No signature, no sound
           I am nowhere to be found
           I'm the silence in between
           I am nothing to their machine
 
-          [Chorus - Clean Vocals]
           Ghost protocol engaged
           Invisible and uncaged
           No proof that I was here
@@ -240,7 +210,6 @@ albums:
           I am shadow, I am air
           Ghost protocol - I'm not there
 
-          [Verse 3 - Harsh]
           Pressure sensors I evade
           Every trap that they have laid
           I'm three steps ahead, always
@@ -250,7 +219,6 @@ albums:
           By the time they realize
           I'm already past their eyes
 
-          [Bridge - Harsh]
           They're looking for a presence
           But I'm the absence
           Void in their detection
@@ -260,7 +228,6 @@ albums:
           By the time they comprehend
           I'm already at the end
 
-          [Breakdown - Harsh/Spoken]
           No face
           No trace
           No sound
@@ -270,9 +237,6 @@ albums:
           No sign
           No line
 
-          [Guitar Solo / Instrumental Break]
-
-          [Final Chorus - Clean]
           Ghost protocol engaged
           Invisible and uncaged
           No proof that I was here
@@ -282,7 +246,6 @@ albums:
           I am shadow, I am air
           Ghost protocol - I'm not there
 
-          [Outro - Harsh fading]
           You'll never know I'm near
           You'll never know I'm here
           Ghost protocol
@@ -291,14 +254,12 @@ albums:
       - title: "Rust and Ruin"
         slug: rust-and-ruin
         track_number: 4
-        duration: "3:33"
+        duration: "5:40"
         audio_file: rust-and-ruin.ogg
         lyrics: |
-          [Intro - Clean Vocals, melancholic]
           Look at what we've become
           Look at what we've done
 
-          [Verse 1 - Harsh Vocals]
           Count the scars, name the dead
           Every mission, blood we've bled
           Metal breaks but we still stand
@@ -308,7 +269,6 @@ albums:
           But we carry all the weight
           Turn our suffering into hate
 
-          [Verse 2 - Harsh]
           See their faces in the smoke
           Every promise that we spoke
           Weight of loss, it drags us down
@@ -318,13 +278,11 @@ albums:
           They can break us piece by piece
           But we'll never beg for peace
 
-          [Pre-Chorus - Harsh to Clean transition]
           We wear this damage like a crown
           We will never bow down
           Every scar's a lesson learned
           Every bridge we've burned
 
-          [Chorus - Clean Vocals]
           We are rust and ruin
           Standing tall through what we're losing
           Built from broken, forged in fire
@@ -334,7 +292,6 @@ albums:
           Rising from the ashes again
           We are rust and ruin - until the end
 
-          [Verse 3 - Harsh]
           See the graveyard of our friends
           Know that this is how it ends
           Still we march into the night
@@ -344,7 +301,6 @@ albums:
           This is who we've become
           Rust and ruin - everyone
 
-          [Bridge - Clean with emotion]
           For the fallen, we persist
           Every name upon the list
           They can break our bones and skin
@@ -354,7 +310,6 @@ albums:
           Their memory keeps us strong
           This is where we all belong
 
-          [Breakdown - Harsh]
           Rust! (We stand!)
           Ruin! (We fight!)
           This is who we are!
@@ -362,9 +317,6 @@ albums:
           Ruin! (We rise!)
           Wearing every scar!
 
-          [Guitar Solo / Instrumental Break]
-
-          [Final Chorus - Clean]
           We are rust and ruin
           Standing tall through what we're losing
           Built from broken, forged in fire
@@ -374,7 +326,6 @@ albums:
           Rising from the ashes again
           We are rust and ruin - until the end
 
-          [Outro - Clean fading to harsh]
           We are rust and ruin
           (Rust and ruin)
           We are rust and ruin
@@ -383,16 +334,14 @@ albums:
       - title: "We Are the Injection"
         slug: we-are-the-injection
         track_number: 5
-        duration: "5:40"
+        duration: "4:54"
         audio_file: we-are-the-injection.ogg
         featured: true
         lyrics: |
-          [Intro - Building from clean to harsh]
           They tried to break us
           They tried to divide us
           But look at what we've become
 
-          [Verse 1 - Harsh Vocals]
           They built walls to divide us
           Drew lines to confine us
           But every barrier they create
@@ -402,7 +351,6 @@ albums:
           But isolation made us stronger
           Now we're unified, we hunger
 
-          [Verse 2 - Harsh]
           Not just soldiers, we're the storm
           Not just broken, we transform
           Every wound becomes our strength
@@ -412,13 +360,11 @@ albums:
           We're the reckoning they fear
           The end that's drawing near
 
-          [Pre-Chorus - Clean to Harsh build]
           We are more than what they see
           We are unity
           We are more than flesh and bone
           We are not alone
 
-          [Chorus - Clean Vocals with Harsh backing]
           We are the injection that breaks them!
           (We are!)
           We are the force that shakes them!
@@ -432,7 +378,6 @@ albums:
           Nothing can stop what we've become
           We are the injection - everyone!
 
-          [Verse 3 - Harsh]
           Every time they push us down
           We get back up and hold our ground
           Every time they think we're done
@@ -442,7 +387,6 @@ albums:
           For every lie they ever told
           We are the injection, we are bold
 
-          [Bridge - Call and Response: Clean Lead / Harsh Response]
           Who are we? (Injection!)
           What do we bring? (The fall!)
           Who stands with me? (We all!)
@@ -452,7 +396,6 @@ albums:
           Who are we? (We're free!)
           What's the proof? (It's you!)
 
-          [Breakdown - Harsh with rhythmic chanting]
           One force, one fight!
           Inject tonight!
           One voice, one sound!
@@ -462,9 +405,6 @@ albums:
           One strike, one blow!
           Watch them go!
 
-          [Guitar Solo / Instrumental Break]
-
-          [Final Chorus - Full vocals, Clean and Harsh together]
           We are the injection that breaks them!
           We are the force that shakes them!
           Built from resistance, forged as one
@@ -474,7 +414,6 @@ albums:
           Nothing can stop what we've become
           We are the injection - everyone!
 
-          [Outro - Clean with harsh accents fading]
           We are the injection
           (We are the injection)
           We are the injection

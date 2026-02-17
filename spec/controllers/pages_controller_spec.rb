@@ -39,7 +39,7 @@ RSpec.describe PagesController, type: :request do
 
     describe "GET /:band_slug (band profile routes)" do
       it "renders the SPA root for valid band slugs" do
-        %w[system_rot wavelength_zero voiceprint temporal_blue_drift].each do |slug|
+        %w[system-rot wavelength-zero voiceprint temporal-blue-drift].each do |slug|
           get "/#{slug}"
           expect(response).to have_http_status(:success)
           expect(response.body).to include('<div id="root">')
@@ -55,9 +55,9 @@ RSpec.describe PagesController, type: :request do
       end
     end
 
-    describe "GET /fm/pulse_vault" do
+    describe "GET /fm/pulse-vault" do
       it "renders the SPA root" do
-        get "/fm/pulse_vault"
+        get "/fm/pulse-vault"
         expect(response).to have_http_status(:success)
         expect(response.body).to include('<div id="root">')
       end

@@ -2,10 +2,10 @@ artist:
   name: "Temporal Blue Drift"
   genre: "Math Rock"
 
-albums:
+releases:
   - slug: chronologos
     title: "Chronologos"
-    album_type: ep
+    release_type: ep
     release_date: "2116-09-09"
     cover_image: "chronologos.jpg"
     tracks:
@@ -15,7 +15,6 @@ albums:
         duration: "3:40"
         audio_file: chronology-fracture.ogg
         lyrics: |
-          [INSTRUMENTAL TRACK]
       - title: "A Hundred Years Between"
         slug: a-hundred-years-between
         track_number: 2
@@ -23,27 +22,22 @@ albums:
         audio_file: a-hundred-years-between.ogg
         featured: true
         lyrics: |
-          [Soft, distant vocals over instrumental]
 
-          [Verse - Ethereal, sparse]
           A hundred years between us now
           But somehow I still feel you here
           Reaching through the fabric worn
           Of everything we hold so dear
 
-          [Chorus - Soft, layered]
           Time is just a wall we built
           Space is just a dream
           Love transcends the distances
           Nothing's as it seems
 
-          [Verse 2 - Sparse]
           I'm sending signals through the void
           Hoping that you'll understand
           That even though I'm yet to be
           I'm reaching out my hand
 
-          [Outro - Whispered, fading]
           A hundred years between
           But I can see you
           I can see you
@@ -53,21 +47,17 @@ albums:
         duration: "2:35"
         audio_file: the-blue-shift.ogg
         lyrics: |
-          [Occasional soft vocals, mostly instrumental]
 
-          [Verse - Sparse, atmospheric]
           Moving through the blue
           Time shifts around you
           Nothing stays in place
           Everything's displaced
 
-          [Bridge - Whispered]
           Doppler effect of love
           Moving too fast to touch
           Getting closer, pulling away
           Forever in between today
 
-          [Outro - Soft]
           The blue shift
           The blue shift
           We're moving through time
@@ -77,7 +67,6 @@ albums:
         duration: "3:12"
         audio_file: memory-cascade.ogg
         lyrics: |
-          [INSTRUMENTAL TRACK]
       - title: "Erasure Paradox"
         slug: erasure-paradox
         track_number: 5
@@ -85,21 +74,17 @@ albums:
         audio_file: erasure-paradox.ogg
         featured: true
         lyrics: |
-          [Final sung section only, after long instrumental build]
 
-          [Final Verse - Emotional, clear vocals]
           If we succeed, we disappear
           Erased from every timeline here
           But the future will be clear
           And they'll never know our fear
 
-          [Chorus - Building]
           This is the paradox we choose
           Fighting so the world won't lose
           Even if it means we're gone
           The fight goes on and on
 
-          [Outro - Fading]
           We'll never exist
           But we'll always resist
           This is our sacrifice

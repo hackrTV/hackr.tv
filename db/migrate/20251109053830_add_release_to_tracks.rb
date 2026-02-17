@@ -1,7 +1,7 @@
-class AddAlbumToTracks < ActiveRecord::Migration[8.1]
+class AddReleaseToTracks < ActiveRecord::Migration[8.1]
   def change
-    # Add album association and track number
-    add_reference :tracks, :album, null: false, foreign_key: true
+    # Add release association and track number
+    add_reference :tracks, :release, null: false, foreign_key: true
     add_column :tracks, :track_number, :integer
 
     # Remove old denormalized album columns

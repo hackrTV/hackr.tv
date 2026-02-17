@@ -9,9 +9,9 @@ const routeMap: Record<string, string> = {
   'LOGS': '/logs',
   '0': '/thecyberpulse',
   '1': '/xeraen',
-  '2': '/wavelength_zero',
+  '2': '/wavelength-zero',
   '3': '/voiceprint',
-  '4': '/temporal_blue_drift'
+  '4': '/temporal-blue-drift'
 }
 
 interface TerminalLine {
@@ -93,13 +93,13 @@ export const TerminalAnimation: React.FC = () => {
     { text: '[1] <a href="/xeraen" data-route="/xeraen" class="terminal-link">XERAEN</a>', delay: 200, html: true },
     { text: '    Trans-Temporal Operations', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[2] <a href="/wavelength_zero" data-route="/wavelength_zero" class="terminal-link">Wavelength Zero</a>', delay: 200, html: true },
+    { text: '[2] <a href="/wavelength-zero" data-route="/wavelength-zero" class="terminal-link">Wavelength Zero</a>', delay: 200, html: true },
     { text: '    Signal disruption collective', delay: 100 },
     { text: '', delay: 200 },
     { text: '[3] <a href="/voiceprint" data-route="/voiceprint" class="terminal-link">Voiceprint</a>', delay: 200, html: true },
     { text: '    Archival resistance records', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[4] <a href="/temporal_blue_drift" data-route="/temporal_blue_drift" class="terminal-link">Temporal Blue Drift</a>', delay: 200, html: true },
+    { text: '[4] <a href="/temporal-blue-drift" data-route="/temporal-blue-drift" class="terminal-link">Temporal Blue Drift</a>', delay: 200, html: true },
     { text: '    Love letters across time', delay: 100 },
     { text: '', delay: 500 },
     { text: singleLine, delay: 200 },

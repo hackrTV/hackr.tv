@@ -8,7 +8,7 @@ stations:
     position: 0
 
   - name: "Sector X Underground"
-    slug: "sector_x"
+    slug: "sector-x"
     description: "The underground mix. Fracture Network bands broadcasting from the shadows of corporate control."
     genre: "Various Hackr Styles"
     color: "cyan-168"

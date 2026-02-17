@@ -4,8 +4,8 @@ RSpec.describe BandProfileComponent, type: :component do
   include ViewComponent::TestHelpers
 
   let(:artist) { create(:artist, name: "Test Artist", slug: "test_artist") }
-  let(:album) { create(:album, artist: artist, name: "Test Album") }
-  let(:track) { create(:track, artist: artist, album: album, title: "Test Track") }
+  let(:release) { create(:release, artist: artist, name: "Test Release") }
+  let(:track) { create(:track, artist: artist, release: release, title: "Test Track") }
   let(:tracks) { [track] }
 
   let(:color_scheme) do
@@ -105,12 +105,12 @@ RSpec.describe BandProfileComponent, type: :component do
       expect(rendered_content).to include("Test Intro")
     end
 
-    it "renders album_section slot content" do
+    it "renders release_section slot content" do
       render_inline(described_class.new(artist: artist, tracks: tracks, color_scheme: color_scheme)) do |component|
-        component.with_album_section { "<p>Test Album Section</p>".html_safe }
+        component.with_release_section { "<p>Test Release Section</p>".html_safe }
       end
 
-      expect(rendered_content).to include("Test Album Section")
+      expect(rendered_content).to include("Test Release Section")
     end
 
     it "renders philosophy_section slot content" do

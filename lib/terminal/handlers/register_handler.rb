@@ -106,7 +106,7 @@ module Terminal
       def create_hackr(alias_input, password)
         # Find starting room
         starting_room = GridRoom.joins(:grid_zone)
-          .where(grid_zones: {slug: "hackr_tv_central"})
+          .where(grid_zones: {slug: "hackr-tv-central"})
           .where(room_type: "hub")
           .first
 

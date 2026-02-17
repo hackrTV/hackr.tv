@@ -2,10 +2,10 @@ artist:
   name: "heartbreak_havoc.sh"
   genre: "Nightcore"
 
-albums:
+releases:
   - slug: execute
     title: "./exeCUTE"
-    album_type: ep
+    release_type: ep
     release_date: "2125-09-09"
     cover_image: "images/execute.jpg"
     tracks:

@@ -1,37 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
-import { apiJson } from '~/utils/apiClient'
-
-interface Track {
-  id: number
-  title: string
-  duration: string | null
-}
-
-interface Artist {
-  id: number
-  name: string
-  slug: string
-  tracks: Track[]
-}
 
 const WavelengthZeroPage: React.FC = () => {
-  const [artist, setArtist] = useState<Artist | null>(null)
-
-  useEffect(() => {
-    apiJson<Artist>('/api/artists/wavelength_zero')
-      .then(data => {
-        setArtist(data)
-      })
-      .catch(error => {
-        console.error('Error fetching artist:', error)
-      })
-  }, [])
-
-  const tracks = artist?.tracks || []
-  const rainbowColors = ['#ff0080', '#ff8c00', '#00ff00', '#00d9ff', '#8b00ff']
-
   return (
     <DefaultLayout>
       {/* Rainbow gradient border wrapper */}
@@ -82,51 +53,6 @@ const WavelengthZeroPage: React.FC = () => {
                 We're here to remind you what color looks like.
               </p>
             </div>
-
-            {/* Album Section */}
-            {tracks.length > 0 && (
-              <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(0, 217, 255, 0.05)', borderLeft: '5px solid #00d9ff', border: '2px solid rgba(0, 217, 255, 0.3)', boxShadow: '0 0 25px rgba(0, 217, 255, 0.2)' }}>
-                <fieldset style={{ border: 'none' }}>
-                  <legend style={{ color: '#00d9ff', letterSpacing: '1px', textShadow: '0 0 15px rgba(0, 217, 255, 0.8)', fontSize: '1.1em' }}>ZERO LIGHT EP</legend>
-
-                  <div style={{ padding: '20px' }}>
-                    <div style={{ marginBottom: '25px', padding: '18px', background: 'linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 255, 0, 0.05))', border: '1px solid rgba(0, 217, 255, 0.3)', borderLeft: '4px solid #00d9ff' }}>
-                      <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
-                        Five songs. Each one a prism breaking their manufactured darkness into the full spectrum
-                        they've been hiding from you.
-                      </p>
-                      <p style={{ color: '#aaa', lineHeight: '1.8' }}>
-                        They called it <span style={{ color: '#00d9ff', textShadow: '0 0 8px rgba(0, 217, 255, 0.6)', fontWeight: 'bold' }}>Zero Light</span> - their perfect world with no shadows because
-                        there's no light to cast them. We took their name and split it open. Inside their darkness,
-                        we found every color they said didn't exist anymore.
-                      </p>
-                    </div>
-
-                    <div className="tui-fieldset" style={{ borderColor: '#333', background: 'rgba(0, 0, 0, 0.4)' }}>
-                      <legend style={{ color: '#00d9ff', textShadow: '0 0 10px rgba(0, 217, 255, 0.6)' }}>TRACKS</legend>
-                      <table className="tui-table" style={{ width: '100%' }}>
-                        <thead>
-                          <tr>
-                            <th style={{ textAlign: 'left', color: '#888' }}>#</th>
-                            <th style={{ textAlign: 'left', color: '#aaa' }}>Track</th>
-                            <th style={{ textAlign: 'left', color: '#888' }}>Duration</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {tracks.map((track, index) => (
-                            <tr key={track.id} style={{ borderLeft: `4px solid ${rainbowColors[index % rainbowColors.length]}`, background: `linear-gradient(90deg, ${rainbowColors[index % rainbowColors.length]}15, transparent)` }}>
-                              <td style={{ color: rainbowColors[index % rainbowColors.length], paddingLeft: '12px', textShadow: `0 0 8px ${rainbowColors[index % rainbowColors.length]}80` }}>{index + 1}</td>
-                              <td style={{ color: '#ddd' }}><strong>{track.title}</strong></td>
-                              <td style={{ color: '#999' }}>{track.duration || '—'}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </fieldset>
-              </div>
-            )}
 
             {/* Philosophy Section */}
             <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(139, 0, 255, 0.05)', borderLeft: '5px solid #8b00ff', border: '2px solid rgba(139, 0, 255, 0.3)', boxShadow: '0 0 25px rgba(139, 0, 255, 0.2)' }}>
@@ -180,7 +106,14 @@ const WavelengthZeroPage: React.FC = () => {
                 ← BACK TO BANDS
               </Link>
               <Link
-                to="/fm/pulse_vault?filter=wavelength%20zero"
+                to="/wavelength-zero/releases"
+                className="tui-button"
+                style={{ background: 'linear-gradient(90deg, #ff0080, #8b00ff)', color: 'white', fontWeight: 'bold', border: 'none' }}
+              >
+                RELEASES
+              </Link>
+              <Link
+                to="/fm/pulse-vault?filter=wavelength%20zero"
                 className="tui-button"
                 style={{ background: 'linear-gradient(90deg, #ff0080, #8b00ff)', color: 'white', fontWeight: 'bold', border: 'none' }}
               >

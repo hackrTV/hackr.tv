@@ -17,26 +17,26 @@
 #  videos              :text
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  album_id            :integer          not null
 #  artist_id           :integer          not null
+#  release_id          :integer          not null
 #
 # Indexes
 #
-#  index_tracks_on_album_id            (album_id)
 #  index_tracks_on_artist_id           (artist_id)
 #  index_tracks_on_artist_id_and_slug  (artist_id,slug) UNIQUE
 #  index_tracks_on_featured            (featured)
 #  index_tracks_on_release_date        (release_date)
+#  index_tracks_on_release_id          (release_id)
 #
 # Foreign Keys
 #
-#  album_id   (album_id => albums.id)
-#  artist_id  (artist_id => artists.id)
+#  artist_id   (artist_id => artists.id)
+#  release_id  (release_id => releases.id)
 #
 FactoryBot.define do
   factory :track do
     association :artist
-    association :album
+    association :release
     title { "Test Track" }
     sequence(:slug) { |n| "test-track-#{n}" }
     track_number { 1 }

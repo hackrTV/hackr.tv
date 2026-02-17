@@ -70,21 +70,21 @@ describe('TrackTable', () => {
       id: 1,
       title: 'Track One',
       artist: { name: 'Artist A', genre: 'Electronic' },
-      album: { name: 'Album A', cover_url: 'https://example.com/cover1.jpg' },
+      release: { name: 'Album A', cover_url: 'https://example.com/cover1.jpg' },
       audio_url: 'https://example.com/track1.mp3'
     },
     {
       id: 2,
       title: 'Track Two',
       artist: { name: 'Artist B', genre: 'Industrial' },
-      album: { name: 'Album B', cover_url: 'https://example.com/cover2.jpg' },
+      release: { name: 'Album B', cover_url: 'https://example.com/cover2.jpg' },
       audio_url: 'https://example.com/track2.mp3'
     },
     {
       id: 3,
       title: 'Unavailable Track',
       artist: { name: 'Artist C', genre: 'Synthwave' },
-      album: { name: 'Album C', cover_url: null },
+      release: { name: 'Album C', cover_url: null },
       audio_url: null
     }
   ]
@@ -195,7 +195,7 @@ describe('TrackTable', () => {
       })
     })
 
-    it('highlights album name with cyan when track is playing', async () => {
+    it('highlights release name with cyan when track is playing', async () => {
       mockGetCurrentTrackId.mockReturnValue('1')
       mockIsPlaying.mockReturnValue(true)
 
@@ -204,8 +204,8 @@ describe('TrackTable', () => {
       // Wait for the useEffect polling to update the state
       await waitFor(() => {
         const trackRow = screen.getByText('Track One').closest('tr')
-        const albumCell = trackRow?.querySelectorAll('td')[2]
-        expect(albumCell).toHaveStyle({ color: '#00ffff' })
+        const releaseCell = trackRow?.querySelectorAll('td')[2]
+        expect(releaseCell).toHaveStyle({ color: '#00ffff' })
       })
     })
 
