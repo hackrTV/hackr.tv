@@ -126,7 +126,8 @@ namespace :data do
           classification: release_data["classification"],
           label: release_data["label"],
           credits: release_data["credits"],
-          notes: release_data["notes"]
+          notes: release_data["notes"],
+          streaming_links: release_data["streaming_links"]
         )
 
         if release.changed?

@@ -49,6 +49,7 @@ module Api
         label: @release.label,
         credits: @release.credits,
         notes: @release.notes,
+        streaming_links: @release.streaming_links,
         artist: {
           id: @release.artist.id,
           name: @release.artist.name,

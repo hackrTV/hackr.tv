@@ -12,6 +12,7 @@ class CreateReleases < ActiveRecord::Migration[8.1]
       t.string :label
       t.text :credits
       t.text :notes
+      t.text :streaming_links
       t.references :artist, null: false, foreign_key: true
 
       t.timestamps

@@ -29,6 +29,7 @@ interface ReleaseDetail {
   label: string | null
   credits: string | null
   notes: string | null
+  streaming_links: Record<string, string> | null
   artist: {
     id: number
     name: string
@@ -186,17 +187,21 @@ const ReleaseDetailPage: React.FC = () => {
     )
   }
 
-  // Aggregate streaming links from all tracks
+  // Use release-level streaming links if present, otherwise aggregate from tracks
   const allStreamingLinks: Record<string, string> = {}
-  release.tracks.forEach(track => {
-    if (track.streaming_links) {
-      Object.entries(track.streaming_links).forEach(([platform, url]) => {
-        if (!allStreamingLinks[platform]) {
-          allStreamingLinks[platform] = url
-        }
-      })
-    }
-  })
+  if (release.streaming_links) {
+    Object.assign(allStreamingLinks, release.streaming_links)
+  } else {
+    release.tracks.forEach(track => {
+      if (track.streaming_links) {
+        Object.entries(track.streaming_links).forEach(([platform, url]) => {
+          if (!allStreamingLinks[platform]) {
+            allStreamingLinks[platform] = url
+          }
+        })
+      }
+    })
+  }
 
   const platformOrder = ['bandcamp', 'youtube', 'spotify', 'apple_music', 'soundcloud']
   const sortedLinks = Object.entries(allStreamingLinks).sort((a, b) => {

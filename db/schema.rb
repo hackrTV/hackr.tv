@@ -498,6 +498,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.date "release_date"
     t.string "release_type"
     t.string "slug", null: false
+    t.text "streaming_links"
     t.datetime "updated_at", null: false
     t.index ["artist_id", "slug"], name: "index_releases_on_artist_id_and_slug", unique: true
     t.index ["artist_id"], name: "index_releases_on_artist_id"
