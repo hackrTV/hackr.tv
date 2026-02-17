@@ -64,14 +64,14 @@ export const BandsPage: React.FC = () => {
     <FmLayout>
       <div className="tui-window white-text" style={{ maxWidth: isMobile ? '100%' : '1400px', margin: '0 auto', display: 'block', background: '#1a1a1a', border: '2px solid #666' }}>
         <fieldset style={{ borderColor: '#666' }}>
-          <legend className="center" style={{ color: '#10b981' }}>{isMobile ? 'BANDS' : 'hackr.fm :: BANDS'}</legend>
+          <legend className="center" style={{ color: '#10b981' }}>{isMobile ? 'FRACTURE NETWORK' : 'hackr.fm :: FRACTURE NETWORK'}</legend>
 
           <div>
             <h2 style={{ textAlign: 'center', marginBottom: '15px', color: '#10b981' }}>
-              [:: FRACTURE NETWORK BANDS ::]
+              [:: FRACTURE NETWORK ::]
             </h2>
 
-            {loading && <LoadingSpinner message="Loading Fracture Network bands..." color="green-255-text" />}
+            {loading && <LoadingSpinner message="Loading Fracture Network..." color="green-255-text" />}
 
             {error && (
               <div style={{ padding: '40px', textAlign: 'center' }}>
@@ -145,7 +145,7 @@ export const BandsPage: React.FC = () => {
                   </div>
                 ) : (
                   <div style={{ padding: '40px', textAlign: 'center', background: '#1a1a1a' }}>
-                    <p style={{ color: '#999', fontSize: '1.2em' }}>No bands in the roster yet.</p>
+                    <p style={{ color: '#999', fontSize: '1.2em' }}>No artists in the Fracture Network yet.</p>
                   </div>
                 )}
 

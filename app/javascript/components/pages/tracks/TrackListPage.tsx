@@ -406,7 +406,7 @@ const TrackListPage: React.FC = () => {
                 ALL TRACKS IN PULSE VAULT →
               </Link>
               <Link
-                to="/fm/bands"
+                to="/f/net"
                 style={{
                   padding: '10px 20px',
                   background: colorScheme.secondary,
@@ -416,7 +416,7 @@ const TrackListPage: React.FC = () => {
                   boxShadow: `0 0 15px ${colorScheme.glow}66`
                 }}
               >
-                ALL BANDS →
+                FRACTURE NETWORK →
               </Link>
             </div>
           </div>

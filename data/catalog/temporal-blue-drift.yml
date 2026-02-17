@@ -14,7 +14,7 @@ releases:
         track_number: 1
         duration: "3:40"
         audio_file: chronology-fracture.ogg
-        lyrics: |
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "A Hundred Years Between"
         slug: a-hundred-years-between
         track_number: 2
@@ -66,7 +66,7 @@ releases:
         track_number: 4
         duration: "3:12"
         audio_file: memory-cascade.ogg
-        lyrics: |
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "Erasure Paradox"
         slug: erasure-paradox
         track_number: 5

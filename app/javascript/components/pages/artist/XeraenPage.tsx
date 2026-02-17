@@ -537,7 +537,7 @@ const XeraenPage: React.FC = () => {
               marginTop: '30px'
             }}>
               <Link
-                to="/fm/bands"
+                to="/f/net"
                 className="tui-button"
                 style={{
                   background: '#222',
@@ -546,7 +546,7 @@ const XeraenPage: React.FC = () => {
                   textAlign: 'center'
                 }}
               >
-                ← BACK TO BANDS
+                ← BACK TO FRACTURE NETWORK
               </Link>
               <Link
                 to="/xeraen/releases"

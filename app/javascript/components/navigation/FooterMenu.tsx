@@ -2,12 +2,10 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
-import { useTerminal } from '~/contexts/TerminalContext'
 
 export const FooterMenu: React.FC = () => {
   const { hackr, isLoggedIn } = useGridAuth()
   const { isMobile } = useMobileDetect()
-  const { openTerminal } = useTerminal()
 
   // Don't render footer menu on mobile
   if (isMobile) return null
@@ -27,51 +25,56 @@ export const FooterMenu: React.FC = () => {
             </Link>
           </li>
           <li>
-            <a href="#" onClick={(e) => { e.preventDefault(); openTerminal() }}>
-              <span className="purple-168-text">&gt;</span>&nbsp;terminal&nbsp;
-            </a>
-          </li>
-          <li>
             <Link to="/thecyberpulse">
               <span className="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;
             </Link>
           </li>
           <li>
-            <Link to="/fm/radio">
-              <span className="purple-168-text">2</span>&nbsp;hackr.fm&nbsp;
+            <Link to="/xeraen">
+              <span className="purple-168-text">2</span>&nbsp;XERAEN&nbsp;
             </Link>
           </li>
           <li>
-            <Link to="/grid">
-              <span className="purple-168-text">3</span>&nbsp;THE PULSE GRID&nbsp;
+            <Link to="/fm/radio">
+              <span className="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;
+            </Link>
+          </li>
+          <li>
+            <Link to="/f/net">
+              <span className="purple-168-text">4</span>&nbsp;FNet&nbsp;
             </Link>
           </li>
           <li>
             <Link to="/wire">
-              <span className="purple-168-text">4</span>&nbsp;The WIRE&nbsp;
+              <span className="purple-168-text">5</span>&nbsp;WIRE&nbsp;
             </Link>
           </li>
           {isLoggedIn && (
             <li>
               <Link to="/uplink">
-                <span className="purple-168-text">5</span>&nbsp;Uplink&nbsp;
+                <span className="purple-168-text">6</span>&nbsp;Uplink&nbsp;
               </Link>
             </li>
           )}
           <li>
             <Link to="/codex">
-              <span className="purple-168-text">{isLoggedIn ? '6' : '5'}</span>&nbsp;The Codex&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;Codex&nbsp;
             </Link>
           </li>
           <li>
             <Link to="/logs">
-              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;Hackr Logs&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;Logs&nbsp;
+            </Link>
+          </li>
+          <li>
+            <Link to="/grid">
+              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;THE PULSE GRID&nbsp;
             </Link>
           </li>
           {hackr?.role === 'admin' && (
             <li>
               <a href="/root">
-                <span className="red-255-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

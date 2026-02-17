@@ -44,10 +44,15 @@ Rails.application.routes.draw do
     get "/", to: "pages#spa_root", as: :fm
     get "radio", to: "pages#spa_root", as: :fm_radio
     get "pulse-vault", to: "pages#spa_root", as: :fm_pulse_vault
-    get "bands", to: "pages#spa_root", as: :fm_bands
     get "playlists", to: "pages#spa_root", as: :fm_playlists
     get "playlists/:id", to: "pages#spa_root", as: :fm_playlist
   end
+
+  # Fracture Network - SPA
+  scope "f" do
+    get "net", to: "pages#spa_root", as: :f_net
+  end
+  get "fnet", to: redirect("/f/net")
 
   # Shared playlist - public (SPA)
   get "shared/:token", to: "pages#spa_root", as: :shared_playlist

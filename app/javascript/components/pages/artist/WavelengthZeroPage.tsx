@@ -99,11 +99,11 @@ const WavelengthZeroPage: React.FC = () => {
             {/* Navigation Buttons */}
             <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
               <Link
-                to="/fm/bands"
+                to="/f/net"
                 className="tui-button"
                 style={{ background: '#1a1a1a', color: '#888', border: '1px solid #333' }}
               >
-                ← BACK TO BANDS
+                ← BACK TO FRACTURE NETWORK
               </Link>
               <Link
                 to="/wavelength-zero/releases"

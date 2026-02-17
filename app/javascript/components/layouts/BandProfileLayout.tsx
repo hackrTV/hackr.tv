@@ -97,8 +97,8 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
               gap: isMobile ? '10px' : '15px',
               marginTop: '30px'
             }}>
-              <Link to="/fm/bands" className="tui-button" style={{ ...backButtonStyle, textAlign: 'center' }}>
-                ← BACK TO BANDS
+              <Link to="/f/net" className="tui-button" style={{ ...backButtonStyle, textAlign: 'center' }}>
+                ← BACK TO FRACTURE NETWORK
               </Link>
               {artistSlug && (
                 <Link

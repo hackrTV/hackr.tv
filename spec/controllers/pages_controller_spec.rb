@@ -63,9 +63,9 @@ RSpec.describe PagesController, type: :request do
       end
     end
 
-    describe "GET /fm/bands" do
+    describe "GET /f/net" do
       it "renders the SPA root" do
-        get "/fm/bands"
+        get "/f/net"
         expect(response).to have_http_status(:success)
         expect(response.body).to include('<div id="root">')
       end
