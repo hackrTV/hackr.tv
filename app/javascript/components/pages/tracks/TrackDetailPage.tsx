@@ -342,7 +342,7 @@ const TrackDetailPage: React.FC = () => {
                     {hasVidz && (
                       <div style={{ padding: '10px 12px', display: 'flex', gap: '10px', flexWrap: 'wrap', borderTop: '1px solid #333' }}>
                         {track.vidz.map((vod) => {
-                          const videoIdMatch = vod.vod_url.match(/embed\/([a-zA-Z0-9_-]{11})/)
+                          const videoIdMatch = vod.vod_url?.match(/embed\/([a-zA-Z0-9_-]{11})/)
                           const thumbnailUrl = videoIdMatch
                             ? `https://img.youtube.com/vi/${videoIdMatch[1]}/mqdefault.jpg`
                             : null
