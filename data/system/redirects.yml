@@ -16,39 +16,39 @@ redirects:
     - path: /
       destination_url: /xeraen
     - path: /albums/xordium
-      destination_url: /fm/pulse-vault?filter=XORDIUM
+      destination_url: /xeraen/releases/xordium
     - path: /bandcamp
       destination_url: https://xeraen.bandcamp.com
     - path: /dogs
-      destination_url: /fm/pulse-vault?filter=Dogs%20Can%20Grow%20Beards%20All%20Over
+      destination_url: /xeraen/trackz/dogs-can-grow-beards-all-over
     - path: /encrypted-shroud
-      destination_url: /fm/pulse-vault?filter=Encrypted%20Shroud
+      destination_url: /xeraen/trackz/encrypted-shroud
     - path: /git
       destination_url: https://github.com/xeraen
     - path: /github
       destination_url: https://github.com/xeraen
     - path: /ourcity
-      destination_url: /fm/pulse-vault?filter=Our%20City
+      destination_url: /xeraen/trackz/our-city
     - path: /our-city
-      destination_url: /fm/pulse-vault?filter=Our%20City
+      destination_url: /xeraen/trackz/our-city
     - path: /soundcloud
       destination_url: https://soundcloud.com/xeraen
     - path: /tracks
       destination_url: /xeraen/trackz
     - path: /tracks/birdo
-      destination_url: /fm/pulse-vault?filter=birdo
+      destination_url: /xeraen/trackz/birdo
     - path: /tracks/dream-surprise
-      destination_url: /fm/pulse-vault?filter=Dream%20Surprise
+      destination_url: /xeraen/trackz/dream-surprise
     - path: /tracks/dream_surprise
-      destination_url: /fm/pulse-vault?filter=Dream%20Surprise
+      destination_url: /xeraen/trackz/dream-surprise
     - path: /tracks/dogs
-      destination_url: /fm/pulse-vault?filter=Dogs%20Can%20Grow%20Beards%20All%20Over
+      destination_url: /xeraen/trackz/dogs-can-grow-beards-all-over
     - path: /tracks/ourcity
-      destination_url: /fm/pulse-vault?filter=Our%20City
+      destination_url: /xeraen/trackz/our-city
     - path: /tracks/our-city
-      destination_url: /fm/pulse-vault?filter=Our%20City
+      destination_url: /xeraen/trackz/our-city
     - path: /tracks/our_city
-      destination_url: /fm/pulse-vault?filter=Our%20City
+      destination_url: /xeraen/trackz/our-city
     - path: /trackz
       destination_url: /xeraen/trackz
     - path: /twitter
