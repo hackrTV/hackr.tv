@@ -234,7 +234,7 @@ export const RadioPage: React.FC = () => {
             {!loading && !error && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
                 {stations.map((station) => {
-                  const isSectorX = station.slug === 'sector_x'
+                  const isSectorX = station.slug === 'sector-x'
 
                   if (isSectorX) {
                     return (

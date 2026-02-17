@@ -15,17 +15,19 @@ releases:
         duration: "4:17"
         audio_file: vita-aeterna.ogg
         featured: true
-        lyrics: |
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "Turn Toward The Light"
         slug: turn-toward-the-light
         track_number: 2
         duration: "4:40"
         audio_file: turn-toward-the-light.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "Lift Your Gaze"
         slug: lift-your-gaze
         track_number: 3
         duration: "3:49"
         audio_file: lift-your-gaze.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "Ascension Point"
         slug: ascension-point
         track_number: 4
@@ -102,3 +104,4 @@ releases:
         track_number: 5
         duration: "3:27"
         audio_file: melody-of-hope.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"

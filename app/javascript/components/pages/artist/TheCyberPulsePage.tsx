@@ -673,7 +673,7 @@ const TheCyberPulsePage: React.FC = () => {
               marginTop: '30px'
             }}>
               <Link
-                to="/fm/bands"
+                to="/f/net"
                 className="tui-button"
                 style={{
                   background: '#222',
@@ -682,7 +682,7 @@ const TheCyberPulsePage: React.FC = () => {
                   textAlign: 'center'
                 }}
               >
-                ← BACK TO BANDS
+                ← BACK TO FRACTURE NETWORK
               </Link>
               <Link
                 to="/thecyberpulse/releases"

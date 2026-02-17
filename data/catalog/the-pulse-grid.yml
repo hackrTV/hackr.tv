@@ -15,53 +15,64 @@ releases:
         track_number: 1
         duration: "3:16"
         audio_file: zone-sector-x-alpha.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] Sector X (BETA)"
         slug: zone-sector-x-beta
         track_number: 2
         duration: "4:35"
         audio_file: zone-sector-x-beta.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] Sector X (GAMMA)"
         slug: zone-sector-x-gamma
         track_number: 3
         duration: "5:35"
         audio_file: zone-sector-x-gamma.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] Sector X (DELTA)"
         slug: zone-sector-x-delta
         track_number: 4
         duration: "3:21"
         audio_file: zone-sector-x-delta.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] Sector X (EPSILON)"
         slug: zone-sector-x-epsilon
         track_number: 5
         duration: "5:29"
         audio_file: zone-sector-x-epsilon.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] Sector X (ZETA)"
         slug: zone-sector-x-zeta
         track_number: 6
         duration: "5:52"
         audio_file: zone-sector-x-zeta.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] The Hackr Hangar (ALPHA)"
         slug: zone-the-hackr-hangar-alpha
         track_number: 7
         duration: "3:42"
         audio_file: zone-the-hackr-hangar-alpha.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] The Hackr Hangar (BETA)"
         slug: zone-the-hackr-hangar-beta
         track_number: 8
         duration: "2:16"
         audio_file: zone-the-hackr-hangar-beta.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] The Hackr Hangar (GAMMA)"
         slug: zone-the-hackr-hangar-gamma
         track_number: 9
         duration: "4:34"
         audio_file: zone-the-hackr-hangar-gamma.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] The Hackr Hangar (DELTA)"
         slug: zone-the-hackr-hangar-delta
         track_number: 10
         duration: "3:12"
         audio_file: zone-the-hackr-hangar-delta.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "[ZONE] The Hackr Hangar (EPSILON)"
         slug: zone-the-hackr-hangar-epsilon
         track_number: 11
         duration: "4:34"
         audio_file: zone-the-hackr-hangar-epsilon.ogg
+        lyrics: "[INSTRUMENTAL TRACK]\n"

@@ -59,7 +59,7 @@ export const AppLayout: React.FC = () => {
         <Route path="/fm" element={<Navigate to="/fm/radio" replace />} />
         <Route path="/fm/pulse-vault" element={<PulseVaultPage />} />
         <Route path="/fm/radio" element={<RadioPage />} />
-        <Route path="/fm/bands" element={<BandsPage />} />
+        <Route path="/f/net" element={<BandsPage />} />
         {/* Playlist routes - protected */}
         <Route path="/fm/playlists" element={<ProtectedRoute><PlaylistsPage /></ProtectedRoute>} />
         <Route path="/fm/playlists/:id" element={<ProtectedRoute><PlaylistDetailPage /></ProtectedRoute>} />

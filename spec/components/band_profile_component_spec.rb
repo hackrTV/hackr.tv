@@ -123,10 +123,10 @@ RSpec.describe BandProfileComponent, type: :component do
   end
 
   describe "navigation links" do
-    it "includes back to bands link" do
+    it "includes back to fracture network link" do
       render_inline(described_class.new(artist: artist, tracks: tracks, color_scheme: color_scheme))
 
-      expect(rendered_content).to include("← BACK TO BANDS")
+      expect(rendered_content).to include("← BACK TO FRACTURE NETWORK")
     end
 
     it "includes pulse vault link with filter" do
