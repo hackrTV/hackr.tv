@@ -1,15 +1,36 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { CodexText } from '~/components/shared/CodexText'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
+import { apiJson } from '~/utils/apiClient'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
 
 const XeraenPage: React.FC = () => {
   const { isMobile } = useMobileDetect()
+  const [latestFeaturedSlug, setLatestFeaturedSlug] = useState<string | null>(null)
+
+  useEffect(() => {
+    apiJson<{
+      tracks: Array<{
+        slug: string
+        featured: boolean
+        release: { release_date: string }
+      }>
+    }>('/api/artists/xeraen').then((data) => {
+      if (!data) return
+      const featured = data.tracks
+        .filter((t) => t.featured)
+        .sort((a, b) => b.release.release_date.localeCompare(a.release.release_date))
+      if (featured.length > 0) {
+        setLatestFeaturedSlug(featured[0].slug)
+      }
+    })
+  }, [])
+
   const colorScheme = {
     primary: '#8B00FF',
     secondary: '#6B00CC',
@@ -123,7 +144,13 @@ const XeraenPage: React.FC = () => {
                   LATEST TRANSMISSION
                 </legend>
                 <div style={{ padding: '20px' }}>
-                  <EmbeddedTrack trackId="encrypted-shroud" />
+                  {latestFeaturedSlug ? (
+                    <EmbeddedTrack trackId={latestFeaturedSlug} />
+                  ) : (
+                    <p style={{ color: colorScheme.primary, fontFamily: 'monospace', textAlign: 'center' }}>
+                      [TUNING SIGNAL...]
+                    </p>
+                  )}
                 </div>
               </fieldset>
             </div>
