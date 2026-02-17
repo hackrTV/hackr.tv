@@ -29,6 +29,7 @@ interface ReleaseDetail {
   label: string | null
   credits: string | null
   notes: string | null
+  streaming_links: Record<string, string> | null
   artist: {
     id: number
     name: string
@@ -186,17 +187,21 @@ const ReleaseDetailPage: React.FC = () => {
     )
   }
 
-  // Aggregate streaming links from all tracks
+  // Use release-level streaming links if present, otherwise aggregate from tracks
   const allStreamingLinks: Record<string, string> = {}
-  release.tracks.forEach(track => {
-    if (track.streaming_links) {
-      Object.entries(track.streaming_links).forEach(([platform, url]) => {
-        if (!allStreamingLinks[platform]) {
-          allStreamingLinks[platform] = url
-        }
-      })
-    }
-  })
+  if (release.streaming_links) {
+    Object.assign(allStreamingLinks, release.streaming_links)
+  } else {
+    release.tracks.forEach(track => {
+      if (track.streaming_links) {
+        Object.entries(track.streaming_links).forEach(([platform, url]) => {
+          if (!allStreamingLinks[platform]) {
+            allStreamingLinks[platform] = url
+          }
+        })
+      }
+    })
+  }
 
   const platformOrder = ['bandcamp', 'youtube', 'spotify', 'apple_music', 'soundcloud']
   const sortedLinks = Object.entries(allStreamingLinks).sort((a, b) => {
@@ -419,6 +424,20 @@ const ReleaseDetailPage: React.FC = () => {
                 <fieldset style={{ borderColor: streamingSection.borderColor }}>
                   <legend style={{ color: streamingSection.legendColor, textShadow: `0 0 10px ${streamingSection.glowColor}` }}>STREAMING FREQUENCIES</legend>
                   <div style={{ padding: '15px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <Link
+                      to={`/fm/pulse-vault?filter=${encodeURIComponent(release.name)}`}
+                      style={{
+                        padding: '8px 16px',
+                        background: colorScheme.primary,
+                        color: '#fff',
+                        textDecoration: 'none',
+                        fontWeight: 'bold',
+                        boxShadow: `0 0 15px ${colorScheme.glow}`,
+                        fontSize: '0.9em'
+                      }}
+                    >
+                      ▶ PULSE VAULT
+                    </Link>
                     {sortedLinks.map(([platform, url]) => (
                       <a
                         key={platform}

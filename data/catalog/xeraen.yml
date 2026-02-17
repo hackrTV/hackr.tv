@@ -17,6 +17,8 @@ releases:
         featured: true
         streaming_links:
           spotify: "https://open.spotify.com/track/0UBIJ5ANHtfpONWph4CQXY"
+          apple_music: "https://music.apple.com/in/album/encrypted-shroud-single/1829040457"
+          youtube: "https://www.youtube.com/watch?v=fm-usrpELBE"
         lyrics: |
           Little drones in the sky
           Watching every move we make
@@ -68,6 +70,10 @@ releases:
     release_type: ep
     release_date: "2124-10-17"
     cover_image: "images/xordium.jpg"
+    streaming_links:
+      spotify: "https://open.spotify.com/album/5Wu1CitYR7bsz3pP3VYdLj"
+      apple_music: "https://music.apple.com/us/album/xordium-single/1772402715"
+      youtube: "https://www.youtube.com/watch?v=Qh71UP18Mgw&list=OLAK5uy_lasHCOsiDUyepBW_FqluXAukPHMdBqwos"
     tracks:
       - title: "XORDIUM"
         slug: xordium
@@ -88,7 +94,7 @@ releases:
         audio_file: power-to-the-hackrs.ogg
         streaming_links:
           spotify: "https://open.spotify.com/track/2HPhxQQ2arfMTVbuZnhILK"
-          apple_music: "https://www.youtube.com/watch?v=glsL6PMNedk"
+          apple_music: "https://music.apple.com/us/song/power-to-the-hackrs/1772402717"
           youtube: "https://www.youtube.com/watch?v=glsL6PMNedk"
         lyrics: |
           In the streets we raise our might
@@ -145,7 +151,7 @@ releases:
         audio_file: settle-the-score.ogg
         streaming_links:
           spotify: "https://open.spotify.com/track/6Leh2HoyBtq6Lbz5TcpgA4"
-          apple_music: "https://open.spotify.com/track/6Leh2HoyBtq6Lbz5TcpgA4"
+          apple_music: "https://music.apple.com/us/song/settle-the-score/1772402718"
           youtube: "https://www.youtube.com/watch?v=yJMCI4pwwn0"
         lyrics: |
           Fell down hard, lost my way
@@ -191,6 +197,10 @@ releases:
         track_number: 1
         duration: "3:38"
         audio_file: dogs-can-grow-beards-all-over.ogg
+        streaming_links:
+          spotify: "https://open.spotify.com/track/3HnjuZvQa6BXciIkvEXvNa"
+          apple_music: "https://music.apple.com/us/album/dogs-can-grow-beards-all-over-chipcore-version-single/1761230286"
+          youtube: "https://www.youtube.com/watch?v=0njf6C5PSzk"
         lyrics: |
           Welcome to the war
           Welcome to the war
@@ -236,6 +246,10 @@ releases:
         track_number: 1
         duration: "5:11"
         audio_file: dream-surprise.ogg
+        streaming_links:
+          spotify: "https://open.spotify.com/track/0A3Wacldq99zvADqTpsABq"
+          apple_music: "https://music.apple.com/us/album/dream-surprise-feat-ashlinn-chipcore-version-single/1757659297"
+          youtube: "https://www.youtube.com/watch?v=NgsogKRN6gI"
         lyrics: |
           I love you
 
@@ -307,6 +321,10 @@ releases:
         track_number: 1
         duration: "3:36"
         audio_file: birdo.ogg
+        streaming_links:
+          spotify: "https://open.spotify.com/track/5KqbmlMa0s7rjM1j1Mtevp"
+          apple_music: "https://music.apple.com/us/album/birdo-cover-single/1747849173"
+          youtube: "https://www.youtube.com/watch?v=lIwYkqCBiL0"
         lyrics: |
           Bird! O!
 
@@ -373,6 +391,10 @@ releases:
         track_number: 1
         duration: "4:45"
         audio_file: our-city.ogg
+        streaming_links:
+          spotify: "https://open.spotify.com/track/0l4fIe71TwBjSq1ECR4jIf"
+          apple_music: "https://music.apple.com/us/album/our-city-single/1647511813"
+          youtube: "https://www.youtube.com/watch?v=ba-m2ABkrAI"
         lyrics: |
           Waking up in New York City
           Dreaming about how it all began

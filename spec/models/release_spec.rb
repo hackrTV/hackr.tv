@@ -3,21 +3,22 @@
 # Table name: releases
 # Database name: primary
 #
-#  id             :integer          not null, primary key
-#  catalog_number :string
-#  classification :string
-#  credits        :text
-#  description    :text
-#  label          :string
-#  media_format   :string
-#  name           :string           not null
-#  notes          :text
-#  release_date   :date
-#  release_type   :string
-#  slug           :string           not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  artist_id      :integer          not null
+#  id              :integer          not null, primary key
+#  catalog_number  :string
+#  classification  :string
+#  credits         :text
+#  description     :text
+#  label           :string
+#  media_format    :string
+#  name            :string           not null
+#  notes           :text
+#  release_date    :date
+#  release_type    :string
+#  slug            :string           not null
+#  streaming_links :text
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  artist_id       :integer          not null
 #
 # Indexes
 #

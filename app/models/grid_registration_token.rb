@@ -5,17 +5,17 @@
 #
 #  id         :integer          not null, primary key
 #  email      :string           not null
-#  token      :string           not null
 #  expires_at :datetime         not null
-#  used_at    :datetime
 #  ip_address :string
+#  token      :string           not null
+#  used_at    :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
 # Indexes
 #
-#  index_grid_registration_tokens_on_token  (token) UNIQUE
 #  index_grid_registration_tokens_on_email  (email)
+#  index_grid_registration_tokens_on_token  (token) UNIQUE
 #
 class GridRegistrationToken < ApplicationRecord
   EXPIRATION_HOURS = 24
