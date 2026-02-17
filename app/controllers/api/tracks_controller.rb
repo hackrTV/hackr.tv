@@ -62,8 +62,8 @@ module Api
 
     # GET /api/tracks/:id
     def show
-      @track = Track.includes(:artist, :release).find_by(slug: params[:id])
-      @track ||= Track.includes(:artist, :release).find_by(id: params[:id]) if params[:id].to_i.to_s == params[:id]
+      @track = Track.includes(:artist, :release, :hackr_streams).find_by(slug: params[:id])
+      @track ||= Track.includes(:artist, :release, :hackr_streams).find_by(id: params[:id]) if params[:id].to_i.to_s == params[:id]
 
       if @track.nil?
         render json: {error: "Track not found"}, status: :not_found
@@ -98,7 +98,8 @@ module Api
                      cover_url: @track.release.cover_image.attached? ? url_for(@track.release.cover_image) : nil
                    }
                  end,
-        audio_url: @track.audio_file.attached? ? url_for(@track.audio_file) : nil
+        audio_url: @track.audio_file.attached? ? url_for(@track.audio_file) : nil,
+        vidz: @track.hackr_streams.map { |v| {id: v.id, title: v.title, vod_url: v.vod_url} }
       }
     end
   end

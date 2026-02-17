@@ -9,6 +9,7 @@
 #  live_url   :string
 #  started_at :datetime
 #  title      :string
+#  track_slug :string
 #  vod_url    :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

@@ -43,6 +43,7 @@ class Track < ApplicationRecord
   has_many :playlists, through: :playlist_tracks
   has_many :zone_playlist_tracks, dependent: :destroy
   has_many :zone_playlists, through: :zone_playlist_tracks
+  has_many :hackr_streams, primary_key: :slug, foreign_key: :track_slug
 
   # Serialize JSON fields
   serialize :streaming_links, coder: JSON

@@ -14,6 +14,7 @@ interface ReleaseTrack {
   duration: string | null
   streaming_links: Record<string, string> | null
   audio_url: string | null
+  vidz: { id: number; title: string }[]
 }
 
 interface ReleaseDetail {
@@ -272,6 +273,14 @@ const ReleaseDetailPage: React.FC = () => {
                           <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Title:</td>
                           <td style={{ padding: '6px 12px', color: '#ccc', fontWeight: 'bold' }}>{release.name}</td>
                         </tr>
+                        <tr>
+                          <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Artist:</td>
+                          <td style={{ padding: '6px 12px' }}>
+                            <Link to={`/${artistSlug}`} style={{ color: colorScheme.primary, textDecoration: 'none', textShadow: `0 0 8px ${colorScheme.glow}` }}>
+                              {release.artist.name}
+                            </Link>
+                          </td>
+                        </tr>
                         {release.catalog_number && (
                           <tr>
                             <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Catalog #:</td>
@@ -304,18 +313,10 @@ const ReleaseDetailPage: React.FC = () => {
                         )}
                         {release.release_type && (
                           <tr>
-                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Type:</td>
+                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Release Type:</td>
                             <td style={{ padding: '6px 12px', color: '#ccc' }}>{release.release_type.toUpperCase()}</td>
                           </tr>
                         )}
-                        <tr>
-                          <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Artist:</td>
-                          <td style={{ padding: '6px 12px' }}>
-                            <Link to={`/${artistSlug}`} style={{ color: colorScheme.primary, textDecoration: 'none', textShadow: `0 0 8px ${colorScheme.glow}` }}>
-                              {release.artist.name}
-                            </Link>
-                          </td>
-                        </tr>
                       </tbody>
                     </table>
                   </fieldset>
@@ -391,6 +392,27 @@ const ReleaseDetailPage: React.FC = () => {
                             </td>
                             <td style={{ padding: '10px 12px', color: '#666', width: '60px', textAlign: 'right', fontFamily: 'monospace' }}>
                               {track.duration || '—'}
+                            </td>
+                            <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                              {track.vidz?.length > 0 && (
+                                <Link
+                                  to={`/${artistSlug}/vidz/${track.vidz[0].id}`}
+                                  style={{
+                                    padding: '4px 10px',
+                                    background: colorScheme.secondary,
+                                    color: '#fff',
+                                    textDecoration: 'none',
+                                    fontWeight: 'bold',
+                                    fontSize: '0.75em',
+                                    letterSpacing: '1px',
+                                    boxShadow: `0 0 8px ${trackAccent}66`
+                                  }}
+                                  title={track.vidz[0].title}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  ▶ VIDEO
+                                </Link>
+                              )}
                             </td>
                           </tr>
                         )

@@ -42,6 +42,7 @@ interface Track {
   artist: Artist
   release: Release | null
   audio_url: string | null
+  vidz: { id: number; title: string; vod_url: string }[]
 }
 
 const TrackDetailPage: React.FC = () => {
@@ -185,12 +186,9 @@ const TrackDetailPage: React.FC = () => {
 
   // Section index counter for cycling accent colors
   let sectionIndex = 0
-  const headerSection = getSectionStyle(sectionIndex++)
-  const transmissionSection = getSectionStyle(sectionIndex++)
+  const infoSection = getSectionStyle(sectionIndex++)
   const hasStreaming = track.streaming_links && Object.keys(track.streaming_links).length > 0
-  const streamingSection = hasStreaming ? getSectionStyle(sectionIndex++) : null
-  const hasVideos = track.videos && Object.keys(track.videos).length > 0
-  const videosSection = hasVideos ? getSectionStyle(sectionIndex++) : null
+  const hasVidz = track.vidz && track.vidz.length > 0
   const lyricsSection = track.lyrics ? getSectionStyle(sectionIndex++) : null
 
   return (
@@ -214,180 +212,197 @@ const TrackDetailPage: React.FC = () => {
           </legend>
 
           <div>
-            {/* Track Header with Status */}
-            <div
-              style={{
-                marginBottom: '30px',
-                padding: '25px',
-                background: hasPrismatic
-                  ? `linear-gradient(135deg, ${headerSection.color}14, rgba(0, 0, 0, 0.95))`
-                  : 'linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95))',
-                border: `2px solid ${headerSection.color}`,
-                boxShadow: `0 0 20px ${headerSection.glow}, inset 0 0 15px ${headerSection.color}1a`
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: 'monospace',
-                  marginBottom: '20px',
-                  padding: '15px',
-                  background: `${headerSection.color}1a`,
-                  border: `1px solid ${headerSection.color}`,
-                  color: headerSection.color,
-                  textShadow: `0 0 8px ${headerSection.glow}`
-                }}
-              >
-                [ARTIST: {track.artist.name}]<br />
-                {track.release && <>[RELEASE: {track.release.name}]<br /></>}
-                {track.release?.release_type && <>[TYPE: {track.release.release_type.toUpperCase()}]<br /></>}
-                {track.release_date && <>[RELEASE: {track.release_date}]<br /></>}
-                {track.duration && <>[DURATION: {track.duration}]<br /></>}
-                [STATUS: TRANSMISSION ACTIVE]
+            {/* Header: Player + Info side-by-side */}
+            <div style={{ display: 'flex', gap: '25px', marginBottom: '25px', flexWrap: 'wrap' }}>
+              {/* Left: Embedded Player */}
+              <div style={{ flexShrink: 0 }}>
+                <EmbeddedTrack trackId={track.slug} />
               </div>
 
-              {track.featured && (
+              {/* Right: Track Info Table + Links */}
+              <div style={{ flex: 1, minWidth: '280px' }}>
                 <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '10px',
-                    background: headerSection.color,
-                    color: '#000',
-                    fontWeight: 'bold',
-                    letterSpacing: '2px',
-                    marginBottom: '15px'
-                  }}
+                  className="tui-window white-text"
+                  style={{ display: 'block', background: '#000', border: `1px solid ${infoSection.color}` }}
                 >
-                  ★ FEATURED TRANSMISSION ★
-                </div>
-              )}
-            </div>
-
-            {/* Embedded Player */}
-            <div
-              style={{
-                marginBottom: '30px',
-                background: '#000000',
-                border: `2px solid ${transmissionSection.color}`,
-                boxShadow: `0 0 25px ${transmissionSection.glow}33`
-              }}
-            >
-              <fieldset style={{ borderColor: transmissionSection.color }}>
-                <legend
-                  style={{
-                    color: transmissionSection.color,
-                    textShadow: `0 0 10px ${transmissionSection.glow}`,
-                    letterSpacing: '2px'
-                  }}
-                >
-                  TRANSMISSION
-                </legend>
-                <div style={{ padding: '20px' }}>
-                  <EmbeddedTrack trackId={track.slug} />
-                </div>
-              </fieldset>
-            </div>
-
-            {/* Streaming Links */}
-            {hasStreaming && streamingSection && (
-              <div
-                style={{
-                  marginBottom: '30px',
-                  background: '#000000',
-                  border: `2px solid ${streamingSection.color}`,
-                  boxShadow: `0 0 25px ${streamingSection.glow}33`
-                }}
-              >
-                <fieldset style={{ borderColor: streamingSection.color }}>
-                  <legend
-                    style={{
-                      color: streamingSection.color,
-                      textShadow: `0 0 10px ${streamingSection.glow}`,
-                      letterSpacing: '2px'
-                    }}
-                  >
-                    STREAMING FREQUENCIES
-                  </legend>
-                  <div style={{ padding: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <Link
-                      to={`/fm/pulse-vault?filter=${encodeURIComponent(track.title)}`}
+                  <fieldset style={{ borderColor: infoSection.color }}>
+                    <legend
                       style={{
-                        padding: '10px 20px',
-                        background: colorScheme.primary,
-                        color: '#fff',
-                        textDecoration: 'none',
-                        fontWeight: 'bold',
-                        boxShadow: `0 0 15px ${colorScheme.glow}`
+                        color: infoSection.color,
+                        textShadow: `0 0 10px ${infoSection.glow}`,
+                        letterSpacing: '2px'
                       }}
                     >
-                      ▶ PULSE VAULT
-                    </Link>
-                    {sortStreamingLinks(track.streaming_links!).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          padding: '10px 20px',
-                          background: '#222',
-                          color: '#aaa',
-                          textDecoration: 'none',
-                          border: '1px solid #444'
-                        }}
-                      >
-                        → {titleize(platform)}
-                      </a>
-                    ))}
-                  </div>
-                </fieldset>
-              </div>
-            )}
+                      TRACK INFO
+                    </legend>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Title:</td>
+                          <td style={{ padding: '6px 12px', color: '#ccc', fontWeight: 'bold' }}>{track.title}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Artist:</td>
+                          <td style={{ padding: '6px 12px' }}>
+                            <Link
+                              to={`/${artistSlug}`}
+                              style={{
+                                color: colorScheme.primary,
+                                textDecoration: 'none',
+                                textShadow: `0 0 8px ${colorScheme.glow}`
+                              }}
+                            >
+                              {track.artist.name}
+                            </Link>
+                          </td>
+                        </tr>
+                        {track.release && (
+                          <tr>
+                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Release:</td>
+                            <td style={{ padding: '6px 12px' }}>
+                              <Link
+                                to={`/${artistSlug}/releases/${track.release.slug}`}
+                                style={{
+                                  color: colorScheme.primary,
+                                  textDecoration: 'none',
+                                  textShadow: `0 0 8px ${colorScheme.glow}`
+                                }}
+                              >
+                                {track.release.name}
+                              </Link>
+                            </td>
+                          </tr>
+                        )}
+                        {track.release?.release_type && (
+                          <tr>
+                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Release Type:</td>
+                            <td style={{ padding: '6px 12px', color: '#ccc' }}>{track.release.release_type.toUpperCase()}</td>
+                          </tr>
+                        )}
+                        {track.release_date && (
+                          <tr>
+                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Release Date:</td>
+                            <td style={{ padding: '6px 12px', color: '#ccc' }}>{track.release_date}</td>
+                          </tr>
+                        )}
+                        {track.duration && (
+                          <tr>
+                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Duration:</td>
+                            <td style={{ padding: '6px 12px', color: '#ccc' }}>{track.duration}</td>
+                          </tr>
+                        )}
+                        {track.featured && (
+                          <tr>
+                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Status:</td>
+                            <td style={{ padding: '6px 12px', color: infoSection.color, fontWeight: 'bold' }}>★ FEATURED</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
 
-            {/* Videos */}
-            {hasVideos && videosSection && (
-              <div
-                style={{
-                  marginBottom: '30px',
-                  background: '#000000',
-                  border: `2px solid ${videosSection.color}`,
-                  boxShadow: `0 0 25px ${videosSection.glow}33`
-                }}
-              >
-                <fieldset style={{ borderColor: videosSection.color }}>
-                  <legend
-                    style={{
-                      color: videosSection.color,
-                      textShadow: `0 0 10px ${videosSection.glow}`,
-                      letterSpacing: '2px'
-                    }}
-                  >
-                    VISUAL TRANSMISSIONS
-                  </legend>
-                  <div style={{ padding: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    {Object.entries(track.videos!).map(([type, url]) => (
-                      <a
-                        key={type}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          padding: '10px 20px',
-                          background: colorScheme.secondary,
-                          color: '#fff',
-                          textDecoration: 'none',
-                          fontWeight: 'bold',
-                          boxShadow: `0 0 15px ${videosSection.glow}66`
-                        }}
-                      >
-                        ▶ {titleize(type)} Video
-                      </a>
-                    ))}
-                  </div>
-                </fieldset>
-              </div>
-            )}
+                    {/* Streaming Links inline */}
+                    {hasStreaming && (
+                      <div style={{ padding: '10px 12px', display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid #333', marginTop: '8px' }}>
+                        <Link
+                          to={`/fm/pulse-vault?filter=${encodeURIComponent(track.title)}`}
+                          style={{
+                            padding: '6px 14px',
+                            background: colorScheme.primary,
+                            color: '#fff',
+                            textDecoration: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '0.85em',
+                            boxShadow: `0 0 10px ${colorScheme.glow}`
+                          }}
+                        >
+                          ▶ PULSE VAULT
+                        </Link>
+                        {sortStreamingLinks(track.streaming_links!).map(([platform, url]) => (
+                          <a
+                            key={platform}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              padding: '6px 14px',
+                              background: '#222',
+                              color: '#aaa',
+                              textDecoration: 'none',
+                              border: '1px solid #444',
+                              fontSize: '0.85em'
+                            }}
+                          >
+                            → {titleize(platform)}
+                          </a>
+                        ))}
+                      </div>
+                    )}
 
-            {/* Lyrics */}
+                    {/* Vidz thumbnails */}
+                    {hasVidz && (
+                      <div style={{ padding: '10px 12px', display: 'flex', gap: '10px', flexWrap: 'wrap', borderTop: '1px solid #333' }}>
+                        {track.vidz.map((vod) => {
+                          const videoIdMatch = vod.vod_url?.match(/embed\/([a-zA-Z0-9_-]{11})/)
+                          const thumbnailUrl = videoIdMatch
+                            ? `https://img.youtube.com/vi/${videoIdMatch[1]}/mqdefault.jpg`
+                            : null
+                          return (
+                            <Link
+                              key={vod.id}
+                              to={`/${artistSlug}/vidz/${vod.id}`}
+                              style={{ textDecoration: 'none', color: 'inherit' }}
+                              title={vod.title}
+                            >
+                              <div
+                                style={{
+                                  width: '160px',
+                                  height: '90px',
+                                  background: thumbnailUrl
+                                    ? `url(${thumbnailUrl}) center / cover no-repeat`
+                                    : '#222',
+                                  borderRadius: '2px',
+                                  position: 'relative',
+                                  border: `1px solid ${infoSection.color}44`
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '30px',
+                                    height: '30px',
+                                    background: 'rgba(0, 0, 0, 0.7)',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      width: 0,
+                                      height: 0,
+                                      borderLeft: '10px solid #fff',
+                                      borderTop: '6px solid transparent',
+                                      borderBottom: '6px solid transparent',
+                                      marginLeft: '2px'
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+
+            {/* Lyrics - full width below */}
             {track.lyrics && lyricsSection && (
               <div
                 style={{
@@ -432,7 +447,7 @@ const TrackDetailPage: React.FC = () => {
                           />
                         ),
                         p: ({ ...props }) => (
-                          <p style={{ marginBottom: '15px' }} {...props} />
+                          <p style={{ margin: 0 }} {...props} />
                         )
                       }}
                     >
@@ -444,7 +459,7 @@ const TrackDetailPage: React.FC = () => {
             )}
 
             {/* Navigation Buttons */}
-            <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
+            <div style={{ display: 'flex', gap: '15px', marginTop: '30px', flexWrap: 'wrap' }}>
               <Link
                 to={`/${artistSlug}/trackz`}
                 style={{
