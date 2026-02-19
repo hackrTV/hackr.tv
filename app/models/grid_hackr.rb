@@ -39,6 +39,7 @@ class GridHackr < ApplicationRecord
     anonymous unknown guest user hackr
     help info support contact
     the_pulse the_grid the_codex
+    relay
   ].freeze
 
   # Reserved alias patterns (regex, applied case-insensitively)

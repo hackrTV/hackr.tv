@@ -36,3 +36,10 @@ hackrs:
     starting_room: hackr-tv-broadcast-station
     env_password_key: NYX_PASSWORD
     default_password: unfiltered
+
+  - hackr_alias: relay
+    email: relay@hackr.tv
+    role: admin
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: RELAY_PASSWORD
+    default_password: relaystream
