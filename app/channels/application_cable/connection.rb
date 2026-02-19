@@ -26,7 +26,10 @@ module ApplicationCable
       configured_token = ENV["HACKR_ADMIN_API_TOKEN"]
       reject_unauthorized_connection unless configured_token.present?
 
-      unless ActiveSupport::SecurityUtils.secure_compare(request.params[:token], configured_token)
+      token = request.params[:token]
+      reject_unauthorized_connection unless token.is_a?(String)
+
+      unless ActiveSupport::SecurityUtils.secure_compare(token, configured_token)
         Rails.logger.warn("[ActionCable] Invalid admin token from #{request.remote_ip}")
         reject_unauthorized_connection
       end

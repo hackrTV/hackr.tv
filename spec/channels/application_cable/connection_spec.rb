@@ -51,6 +51,12 @@ module ApplicationCable
         }.to have_rejected_connection
       end
 
+      it "rejects when token param is not a string" do
+        expect {
+          connect params: {token: ["array_value"], hackr_alias: admin_hackr.hackr_alias}
+        }.to have_rejected_connection
+      end
+
       it "rejects when HACKR_ADMIN_API_TOKEN env is not set" do
         allow(ENV).to receive(:[]).with("HACKR_ADMIN_API_TOKEN").and_return(nil)
 
