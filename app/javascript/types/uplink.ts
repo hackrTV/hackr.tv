@@ -25,6 +25,7 @@ export interface Packet {
   dropped: boolean
   grid_hackr: UplinkHackr
   hackr_stream_id: number | null
+  source: string | null
 }
 
 export interface UplinkMessage {

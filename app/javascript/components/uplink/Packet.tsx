@@ -8,7 +8,19 @@ interface PacketProps {
   onDrop?: (packetId: number) => void
 }
 
+const PLATFORM_COLORS: Record<string, { badge: string; username: string }> = {
+  TTV: { badge: '#a78bfa', username: '#c4b5fd' },
+  YT_: { badge: '#ff5555', username: '#fca5a5' }
+}
+
+const parseBridgedContent = (content: string) => {
+  const match = content.match(/^\[.+?\]\s*(.+?):\s(.+)$/)
+  if (match) return { username: match[1], message: match[2] }
+  return null
+}
+
 export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) => {
+  const isBridged = !!packet.source
   const isOwnPacket = currentHackr?.id === packet.grid_hackr.id
   const canDrop = currentHackr && (
     isOwnPacket ||
@@ -76,61 +88,119 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
     })
   }
 
+  const platformColors = packet.source ? PLATFORM_COLORS[packet.source] : null
+
   return (
     <div
       className="packet"
       style={{
         padding: '8px 12px',
         borderBottom: '1px solid #222',
-        opacity: packet.dropped ? 0.5 : 1,
+        opacity: packet.dropped ? 0.3 : isBridged ? 0.5 : 1,
         backgroundColor: packet.dropped ? 'rgba(255, 0, 0, 0.05)' : 'transparent'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-        <span
-          className="packet-time"
-          style={{
-            color: '#555',
-            fontSize: '0.75rem',
-            fontFamily: 'Terminus, monospace',
-            flexShrink: 0,
-            marginTop: '2px'
-          }}
-        >
-          {formatTime(packet.created_at)}
-        </span>
+        <div style={{ flexShrink: 0, marginTop: '2px', textAlign: 'center' }}>
+          <span
+            className="packet-time"
+            style={{
+              color: '#555',
+              fontSize: '0.75rem',
+              fontFamily: 'Terminus, monospace',
+              display: 'block'
+            }}
+          >
+            {formatTime(packet.created_at)}
+          </span>
+          {isBridged && platformColors && (
+            <span
+              style={{
+                color: platformColors.badge,
+                fontSize: '0.6rem',
+                fontFamily: 'Terminus, monospace',
+                fontWeight: 'bold',
+                display: 'block',
+                lineHeight: 1,
+                marginTop: '2px'
+              }}
+            >
+              {packet.source}
+            </span>
+          )}
+        </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <span
-            className="packet-author"
-            style={{
-              color: getRoleColor(packet.grid_hackr.role),
-              fontWeight: 'bold',
-              marginRight: '6px'
-            }}
-          >
-            <Link
-              to={`/wire/${packet.grid_hackr.hackr_alias}`}
-              style={{ color: 'inherit', textDecoration: 'none' }}
-            >
-              @{packet.grid_hackr.hackr_alias}
-            </Link>
-            {getRoleBadge(packet.grid_hackr.role) && (
-              <span style={{ fontSize: '0.7rem', marginLeft: '4px', opacity: 0.8 }}>
-                {getRoleBadge(packet.grid_hackr.role)}
+          {isBridged ? (
+            // Bridged message rendering
+            (() => {
+              const parsed = parseBridgedContent(packet.content)
+              if (parsed) {
+                return (
+                  <span
+                    className="packet-content"
+                    style={{ wordBreak: 'break-word' }}
+                  >
+                    <span
+                      style={{
+                        color: platformColors?.username || '#ccc',
+                        fontWeight: 'bold',
+                        marginRight: '6px'
+                      }}
+                    >
+                      {parsed.username}:
+                    </span>
+                    <span style={{ color: packet.dropped ? '#666' : '#ccc' }}>
+                      {packet.dropped ? '[PACKET DROPPED]' : renderContent(parsed.message)}
+                    </span>
+                  </span>
+                )
+              }
+              // Fallback: render raw content if parsing fails
+              return (
+                <span
+                  className="packet-content"
+                  style={{ color: packet.dropped ? '#666' : '#ccc', wordBreak: 'break-word' }}
+                >
+                  {packet.dropped ? '[PACKET DROPPED]' : renderContent(packet.content)}
+                </span>
+              )
+            })()
+          ) : (
+            // Native message rendering
+            <>
+              <span
+                className="packet-author"
+                style={{
+                  color: getRoleColor(packet.grid_hackr.role),
+                  fontWeight: 'bold',
+                  marginRight: '6px'
+                }}
+              >
+                <Link
+                  to={`/wire/${packet.grid_hackr.hackr_alias}`}
+                  style={{ color: 'inherit', textDecoration: 'none' }}
+                >
+                  @{packet.grid_hackr.hackr_alias}
+                </Link>
+                {getRoleBadge(packet.grid_hackr.role) && (
+                  <span style={{ fontSize: '0.7rem', marginLeft: '4px', opacity: 0.8 }}>
+                    {getRoleBadge(packet.grid_hackr.role)}
+                  </span>
+                )}
               </span>
-            )}
-          </span>
 
-          <span
-            className="packet-content"
-            style={{
-              color: packet.dropped ? '#666' : '#ccc',
-              wordBreak: 'break-word'
-            }}
-          >
-            {packet.dropped ? '[PACKET DROPPED]' : renderContent(packet.content)}
-          </span>
+              <span
+                className="packet-content"
+                style={{
+                  color: packet.dropped ? '#666' : '#ccc',
+                  wordBreak: 'break-word'
+                }}
+              >
+                {packet.dropped ? '[PACKET DROPPED]' : renderContent(packet.content)}
+              </span>
+            </>
+          )}
         </div>
 
         {canDrop && !packet.dropped && onDrop && (

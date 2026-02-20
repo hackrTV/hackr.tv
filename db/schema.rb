@@ -71,6 +71,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.datetime "dropped_at"
     t.integer "grid_hackr_id", null: false
     t.integer "hackr_stream_id"
+    t.string "source"
     t.datetime "updated_at", null: false
     t.index ["chat_channel_id", "created_at"], name: "index_chat_messages_on_chat_channel_id_and_created_at"
     t.index ["chat_channel_id"], name: "index_chat_messages_on_chat_channel_id"
