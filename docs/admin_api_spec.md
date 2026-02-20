@@ -16,17 +16,21 @@ A new `Api::Admin` namespace providing programmatic access to hackr.tv admin ope
 
 ## 1. Authentication
 
-### Admin Token
+### Per-Hackr Token Auth (SHA-256 Digest)
 
-A standalone bearer token, separate from Grid Hackr tokens.
+Each hackr has a unique API token. The raw token is shown once on generation; only the SHA-256 digest is stored in `grid_hackrs.api_token_digest`.
 
-**Header:** `Authorization: Bearer <admin_token>`
+**Header:** `Authorization: Bearer <hackr_alias>:<token>`
 
-**Implementation Options (pick one):**
-- **A) ENV-based:** Single token via `HACKR_ADMIN_API_TOKEN` env var. Simple, sufficient for a single consumer (Echo).
-- **B) DB-backed:** `AdminApiToken` model with `token`, `name`, `rate_limit`, `created_at`, `last_used_at`, `revoked_at`. More flexible if you ever want multiple consumers or per-token rate limits.
+The alias prefix lets us look up the hackr to compare the digest against, without iterating all records. Admin API endpoints additionally enforce the `admin` role.
 
-**Recommendation:** Option A for now, migrate to B if needed later.
+### Token Generation
+
+```ruby
+hackr = GridHackr.find_by(hackr_alias: "relay")
+token = hackr.generate_api_token!  # Returns raw token (show once)
+# hackr.api_token_digest now contains SHA-256 hex digest
+```
 
 ### Base Controller
 
@@ -41,22 +45,13 @@ module Api
       private
 
       def authenticate_admin_token!
-        token = request.headers["Authorization"]&.sub(/\ABearer\s+/, "")
-        expected = ENV["HACKR_ADMIN_API_TOKEN"].presence
-
-        unless expected && ActiveSupport::SecurityUtils.secure_compare(token.to_s, expected)
-          render json: { success: false, error: "Unauthorized" }, status: :unauthorized
-        end
-      end
-
-      def resolve_hackr!(alias_param = params[:hackr_alias])
-        @acting_hackr = GridHackr.find_by!(hackr_alias: alias_param)
-      rescue ActiveRecord::RecordNotFound
-        render json: { success: false, error: "Hackr not found: #{alias_param}" }, status: :not_found
+        # Parses "alias:token" from Bearer header
+        # Calls GridHackr.authenticate_by_token (SHA-256 digest comparison)
+        # Enforces admin role, sets @current_admin_hackr
       end
 
       def enforce_rate_limit!
-        # See Section 7: Rate Limiting
+        # Per-hackr rate limiting, see Section 7
       end
     end
   end

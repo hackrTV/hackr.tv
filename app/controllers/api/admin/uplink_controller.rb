@@ -1,60 +1,15 @@
 module Api
   module Admin
     class UplinkController < BaseController
-      before_action :resolve_hackr!
       before_action :set_channel
 
       # POST /api/admin/uplink/send_packet
       def send_packet
-        # Moderation bypass is role-dependent:
-        # Admin hackrs bypass squelch/blackout/slow-mode/channel restrictions
-        # Non-admin hackrs are still subject to moderation even through admin API
-        unless @acting_hackr.admin?
-          # Check channel accessibility (inactive, role-restricted, etc.)
-          unless @channel.accessible_by?(@acting_hackr)
-            return render json: {
-              success: false,
-              error: "This hackr cannot access this channel."
-            }, status: :forbidden
-          end
-
-          if UserPunishment.blackedout?(@acting_hackr)
-            return render json: {
-              success: false,
-              error: "This hackr has been blackedout from Uplink."
-            }, status: :forbidden
-          end
-
-          if UserPunishment.squelched?(@acting_hackr)
-            return render json: {
-              success: false,
-              error: "This hackr has been squelched."
-            }, status: :forbidden
-          end
-
-          # Slow mode enforcement for non-admin hackrs
-          if @channel.slow_mode_seconds > 0
-            last_message = @channel.chat_messages
-              .where(grid_hackr: @acting_hackr)
-              .order(created_at: :desc)
-              .first
-
-            if last_message && last_message.created_at > @channel.slow_mode_seconds.seconds.ago
-              wait_time = (@channel.slow_mode_seconds - (Time.current - last_message.created_at)).ceil
-              return render json: {
-                success: false,
-                error: "Slow mode active. Please wait #{wait_time} seconds.",
-                wait_seconds: wait_time
-              }, status: :too_many_requests
-            end
-          end
-        end
-
-        # Get current livestream if channel requires it
+        # Admin auth is enforced by BaseController — admins bypass all moderation
         hackr_stream = @channel.requires_livestream ? HackrStream.current_live : nil
 
         packet = @channel.chat_messages.build(
-          grid_hackr: @acting_hackr,
+          grid_hackr: @current_admin_hackr,
           hackr_stream: hackr_stream,
           content: params[:content]
         )

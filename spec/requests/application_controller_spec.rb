@@ -5,14 +5,12 @@ RSpec.describe "ApplicationController redirects", type: :request do
     let(:hackr) { create(:grid_hackr) }
 
     context "for API token requests" do
-      before do
-        hackr.generate_api_token!
-      end
+      let!(:raw_token) { hackr.generate_api_token! }
 
       it "allows requests with valid Bearer token without CSRF" do
         post "/api/pulses",
           params: {content: "Test pulse from CLI"},
-          headers: {"Authorization" => "Bearer #{hackr.api_token}"},
+          headers: {"Authorization" => "Bearer #{hackr.hackr_alias}:#{raw_token}"},
           as: :json
 
         # Should not raise InvalidAuthenticityToken - request should be processed
@@ -23,7 +21,7 @@ RSpec.describe "ApplicationController redirects", type: :request do
       it "returns unauthorized for invalid Bearer token" do
         post "/api/pulses",
           params: {content: "Test pulse"},
-          headers: {"Authorization" => "Bearer invalid_token"},
+          headers: {"Authorization" => "Bearer somealias:invalid_token"},
           as: :json
 
         expect(response).to have_http_status(:unauthorized)

@@ -36,7 +36,7 @@ module Api
       # GET /api/admin/rate_limit
       def rate_limit
         limit = 125
-        window_key = "admin_api_rate:#{Time.current.strftime("%Y%m%d%H%M")}"
+        window_key = "admin_api_rate:#{@current_admin_hackr.hackr_alias}:#{Time.current.strftime("%Y%m%d%H%M")}"
         count = Rails.cache.read(window_key).to_i
         remaining = [limit - count, 0].max
 

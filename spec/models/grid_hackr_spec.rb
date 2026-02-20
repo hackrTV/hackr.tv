@@ -4,7 +4,7 @@
 # Database name: primary
 #
 #  id               :integer          not null, primary key
-#  api_token        :string
+#  api_token_digest :string
 #  email            :string
 #  hackr_alias      :string
 #  last_activity_at :datetime
@@ -16,10 +16,10 @@
 #
 # Indexes
 #
-#  index_grid_hackrs_on_api_token    (api_token) UNIQUE
-#  index_grid_hackrs_on_email        (email) UNIQUE
-#  index_grid_hackrs_on_hackr_alias  (hackr_alias) UNIQUE
-#  index_grid_hackrs_on_role         (role)
+#  index_grid_hackrs_on_api_token_digest  (api_token_digest) UNIQUE
+#  index_grid_hackrs_on_email             (email) UNIQUE
+#  index_grid_hackrs_on_hackr_alias       (hackr_alias) UNIQUE
+#  index_grid_hackrs_on_role              (role)
 #
 require "rails_helper"
 
@@ -364,32 +364,64 @@ RSpec.describe GridHackr, type: :model do
   end
 
   describe "#generate_api_token!" do
-    it "generates and saves an api_token" do
+    it "returns a raw token and stores a digest" do
       hackr = create(:grid_hackr)
-      expect(hackr.api_token).to be_nil
+      expect(hackr.api_token_digest).to be_nil
 
-      hackr.generate_api_token!
+      raw_token = hackr.generate_api_token!
 
-      expect(hackr.api_token).to be_present
-      expect(hackr.api_token.length).to eq(64) # SecureRandom.hex(32) produces 64 chars
+      expect(raw_token).to be_present
+      expect(raw_token.length).to eq(64) # SecureRandom.hex(32) produces 64 chars
+      expect(hackr.reload.api_token_digest).to be_present
+      expect(hackr.api_token_digest).not_to eq(raw_token) # digest, not plaintext
+      expect(hackr.api_token_digest).to eq(Digest::SHA256.hexdigest(raw_token))
     end
 
     it "regenerates a new token each time" do
       hackr = create(:grid_hackr)
-      hackr.generate_api_token!
-      first_token = hackr.api_token
-
-      hackr.generate_api_token!
-      second_token = hackr.api_token
+      first_token = hackr.generate_api_token!
+      second_token = hackr.generate_api_token!
 
       expect(second_token).not_to eq(first_token)
     end
 
-    it "persists the token to the database" do
+    it "persists the digest to the database" do
       hackr = create(:grid_hackr)
-      hackr.generate_api_token!
+      raw_token = hackr.generate_api_token!
+      expected_digest = Digest::SHA256.hexdigest(raw_token)
 
-      expect(hackr.reload.api_token).to eq(hackr.api_token)
+      expect(hackr.reload.api_token_digest).to eq(expected_digest)
+    end
+  end
+
+  describe ".authenticate_by_token" do
+    let(:hackr) { create(:grid_hackr) }
+    let(:raw_token) { hackr.generate_api_token! }
+
+    it "returns the hackr for valid alias and token" do
+      expect(GridHackr.authenticate_by_token(hackr.hackr_alias, raw_token)).to eq(hackr)
+    end
+
+    it "returns nil for wrong token" do
+      hackr.generate_api_token! # ensure token exists
+      expect(GridHackr.authenticate_by_token(hackr.hackr_alias, "wrong_token")).to be_nil
+    end
+
+    it "returns nil for wrong alias" do
+      expect(GridHackr.authenticate_by_token("nonexistent", raw_token)).to be_nil
+    end
+
+    it "returns nil for blank alias" do
+      expect(GridHackr.authenticate_by_token("", raw_token)).to be_nil
+    end
+
+    it "returns nil for blank token" do
+      expect(GridHackr.authenticate_by_token(hackr.hackr_alias, "")).to be_nil
+    end
+
+    it "returns nil when hackr has no token digest" do
+      hackr_without_token = create(:grid_hackr)
+      expect(GridHackr.authenticate_by_token(hackr_without_token.hackr_alias, "any_token")).to be_nil
     end
   end
 end

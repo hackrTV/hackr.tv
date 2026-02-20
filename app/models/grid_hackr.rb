@@ -4,7 +4,7 @@
 # Database name: primary
 #
 #  id               :integer          not null, primary key
-#  api_token        :string
+#  api_token_digest :string
 #  email            :string
 #  hackr_alias      :string
 #  last_activity_at :datetime
@@ -16,15 +16,15 @@
 #
 # Indexes
 #
-#  index_grid_hackrs_on_api_token    (api_token) UNIQUE
-#  index_grid_hackrs_on_email        (email) UNIQUE
-#  index_grid_hackrs_on_hackr_alias  (hackr_alias) UNIQUE
-#  index_grid_hackrs_on_role         (role)
+#  index_grid_hackrs_on_api_token_digest  (api_token_digest) UNIQUE
+#  index_grid_hackrs_on_email             (email) UNIQUE
+#  index_grid_hackrs_on_hackr_alias       (hackr_alias) UNIQUE
+#  index_grid_hackrs_on_role              (role)
 #
 class GridHackr < ApplicationRecord
   include ProfanityFilterable
 
-  has_paper_trail ignore: %i[password_digest api_token last_activity_at]
+  has_paper_trail ignore: %i[password_digest api_token_digest last_activity_at]
 
   has_secure_password
 
@@ -135,9 +135,26 @@ class GridHackr < ApplicationRecord
     update_column(:last_activity_at, Time.current)
   end
 
-  # Generate or regenerate API token for CLI access
+  # Generate or regenerate API token for CLI access.
+  # Returns the raw token (shown once). Only the SHA-256 digest is stored.
   def generate_api_token!
-    update!(api_token: SecureRandom.hex(32))
+    token = SecureRandom.hex(32)
+    update_column(:api_token_digest, Digest::SHA256.hexdigest(token))
+    token
+  end
+
+  # Authenticate a hackr by alias and raw token.
+  # Returns the hackr if valid, nil otherwise.
+  def self.authenticate_by_token(hackr_alias, raw_token)
+    return nil if hackr_alias.blank? || raw_token.blank?
+
+    hackr = find_by(hackr_alias: hackr_alias)
+    return nil unless hackr&.api_token_digest.present?
+
+    digest = Digest::SHA256.hexdigest(raw_token)
+    return nil unless ActiveSupport::SecurityUtils.secure_compare(digest, hackr.api_token_digest)
+
+    hackr
   end
 
   private

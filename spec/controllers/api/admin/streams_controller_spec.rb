@@ -1,12 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Api::Admin::StreamsController, type: :controller do
-  before do
-    ENV["HACKR_ADMIN_API_TOKEN"] = admin_token
-    request.headers["Authorization"] = "Bearer #{admin_token}"
-  end
+  let!(:admin_hackr) { create(:grid_hackr, :admin) }
+  let!(:raw_token) { admin_hackr.generate_api_token! }
 
-  after { ENV.delete("HACKR_ADMIN_API_TOKEN") }
+  before do
+    request.headers["Authorization"] = "Bearer #{admin_hackr.hackr_alias}:#{raw_token}"
+  end
 
   describe "GET #status" do
     context "when a stream is live" do
