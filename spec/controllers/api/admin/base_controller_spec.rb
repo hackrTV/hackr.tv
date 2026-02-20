@@ -8,16 +8,16 @@ RSpec.describe Api::Admin::BaseController, type: :controller do
     end
   end
 
+  let!(:admin_hackr) { create(:grid_hackr, :admin) }
+  let!(:raw_token) { admin_hackr.generate_api_token! }
+
   before do
-    ENV["HACKR_ADMIN_API_TOKEN"] = admin_token
     routes.draw { get "index" => "api/admin/base#index" }
   end
 
-  after { ENV.delete("HACKR_ADMIN_API_TOKEN") }
-
   describe "authentication" do
     it "allows access with valid bearer token" do
-      request.headers["Authorization"] = "Bearer #{admin_token}"
+      request.headers["Authorization"] = "Bearer #{admin_hackr.hackr_alias}:#{raw_token}"
       get :index
       expect(response).to have_http_status(:ok)
       expect(parsed_body["success"]).to be true
@@ -30,24 +30,33 @@ RSpec.describe Api::Admin::BaseController, type: :controller do
     end
 
     it "rejects requests with invalid token" do
-      request.headers["Authorization"] = "Bearer wrong_token"
+      request.headers["Authorization"] = "Bearer #{admin_hackr.hackr_alias}:wrong_token"
       get :index
       expect(response).to have_http_status(:unauthorized)
       expect(parsed_body["error"]).to eq("Invalid admin token")
     end
 
     it "rejects requests with non-Bearer auth scheme" do
-      request.headers["Authorization"] = "Basic #{admin_token}"
+      request.headers["Authorization"] = "Basic #{admin_hackr.hackr_alias}:#{raw_token}"
       get :index
       expect(response).to have_http_status(:unauthorized)
     end
 
-    it "returns 503 when ENV token is not configured" do
-      ENV.delete("HACKR_ADMIN_API_TOKEN")
-      request.headers["Authorization"] = "Bearer #{admin_token}"
+    it "rejects requests with invalid format (no colon separator)" do
+      request.headers["Authorization"] = "Bearer just_a_token"
       get :index
-      expect(response).to have_http_status(:service_unavailable)
-      expect(parsed_body["error"]).to include("not configured")
+      expect(response).to have_http_status(:unauthorized)
+      expect(parsed_body["error"]).to include("Invalid token format")
+    end
+
+    it "returns 403 when hackr is not an admin" do
+      operative = create(:grid_hackr, role: "operative")
+      operative_token = operative.generate_api_token!
+
+      request.headers["Authorization"] = "Bearer #{operative.hackr_alias}:#{operative_token}"
+      get :index
+      expect(response).to have_http_status(:forbidden)
+      expect(parsed_body["error"]).to include("Admin privileges required")
     end
   end
 
@@ -55,7 +64,7 @@ RSpec.describe Api::Admin::BaseController, type: :controller do
     let(:memory_store) { ActiveSupport::Cache::MemoryStore.new }
 
     before do
-      request.headers["Authorization"] = "Bearer #{admin_token}"
+      request.headers["Authorization"] = "Bearer #{admin_hackr.hackr_alias}:#{raw_token}"
       allow(Rails).to receive(:cache).and_return(memory_store)
     end
 
@@ -67,40 +76,12 @@ RSpec.describe Api::Admin::BaseController, type: :controller do
     end
 
     it "returns 429 when rate limit is exceeded" do
-      window_key = "admin_api_rate:#{Time.current.strftime("%Y%m%d%H%M")}"
+      window_key = "admin_api_rate:#{admin_hackr.hackr_alias}:#{Time.current.strftime("%Y%m%d%H%M")}"
       memory_store.write(window_key, 125, expires_in: 2.minutes)
 
       get :index
       expect(response).to have_http_status(:too_many_requests)
       expect(parsed_body["error"]).to include("Rate limit exceeded")
-    end
-  end
-
-  describe "#resolve_hackr!" do
-    controller(Api::Admin::BaseController) do
-      before_action :resolve_hackr!
-
-      def index
-        render json: {success: true, hackr_alias: @acting_hackr.hackr_alias}
-      end
-    end
-
-    before do
-      routes.draw { get "index" => "api/admin/base#index" }
-      request.headers["Authorization"] = "Bearer #{admin_token}"
-    end
-
-    it "resolves a valid hackr by alias" do
-      hackr = create(:grid_hackr)
-      get :index, params: {hackr_alias: hackr.hackr_alias}
-      expect(response).to have_http_status(:ok)
-      expect(parsed_body["hackr_alias"]).to eq(hackr.hackr_alias)
-    end
-
-    it "returns 404 for unknown hackr alias" do
-      get :index, params: {hackr_alias: "nonexistent_hackr"}
-      expect(response).to have_http_status(:not_found)
-      expect(parsed_body["error"]).to include("not found")
     end
   end
 

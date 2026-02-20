@@ -1,12 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Api::Admin::HackrLogsController, type: :controller do
-  before do
-    ENV["HACKR_ADMIN_API_TOKEN"] = admin_token
-    request.headers["Authorization"] = "Bearer #{admin_token}"
-  end
+  let!(:admin_hackr) { create(:grid_hackr, :admin) }
+  let!(:raw_token) { admin_hackr.generate_api_token! }
 
-  after { ENV.delete("HACKR_ADMIN_API_TOKEN") }
+  before do
+    request.headers["Authorization"] = "Bearer #{admin_hackr.hackr_alias}:#{raw_token}"
+  end
 
   describe "GET #index" do
     it "returns all logs including unpublished" do
@@ -43,11 +43,8 @@ RSpec.describe Api::Admin::HackrLogsController, type: :controller do
   end
 
   describe "POST #create" do
-    let(:hackr) { create(:grid_hackr) }
-
-    it "creates a hackr log with auto-generated slug" do
+    it "creates a hackr log as the authenticated admin" do
       post :create, params: {
-        hackr_alias: hackr.hackr_alias,
         title: "Resistance Update Alpha",
         body: "The fight continues"
       }
@@ -56,13 +53,13 @@ RSpec.describe Api::Admin::HackrLogsController, type: :controller do
       body = JSON.parse(response.body)
       expect(body["hackr_log"]["slug"]).to eq("resistance-update-alpha")
       expect(body["hackr_log"]["published"]).to be true
+      expect(body["hackr_log"]["grid_hackr"]["hackr_alias"]).to eq(admin_hackr.hackr_alias)
     end
 
     it "handles slug collisions" do
-      create(:hackr_log, slug: "test-title", grid_hackr: hackr)
+      create(:hackr_log, slug: "test-title", grid_hackr: admin_hackr)
 
       post :create, params: {
-        hackr_alias: hackr.hackr_alias,
         title: "Test Title",
         body: "Content"
       }
@@ -74,7 +71,6 @@ RSpec.describe Api::Admin::HackrLogsController, type: :controller do
 
     it "defaults published to true and sets published_at" do
       post :create, params: {
-        hackr_alias: hackr.hackr_alias,
         title: "New Log",
         body: "Content"
       }
@@ -86,7 +82,6 @@ RSpec.describe Api::Admin::HackrLogsController, type: :controller do
 
     it "allows creating unpublished log" do
       post :create, params: {
-        hackr_alias: hackr.hackr_alias,
         title: "Draft Log",
         body: "Content",
         published: false
@@ -97,18 +92,8 @@ RSpec.describe Api::Admin::HackrLogsController, type: :controller do
       expect(body["hackr_log"]["published_at"]).to be_nil
     end
 
-    it "returns 404 for unknown hackr" do
-      post :create, params: {
-        hackr_alias: "nonexistent_hackr",
-        title: "Test",
-        body: "Content"
-      }
-      expect(response).to have_http_status(:not_found)
-    end
-
     it "returns 422 for invalid data" do
       post :create, params: {
-        hackr_alias: hackr.hackr_alias,
         title: "",
         body: ""
       }

@@ -1,27 +1,26 @@
 require "rails_helper"
 
 RSpec.describe "Api::Admin::Pulses", type: :request do
-  before { ENV["HACKR_ADMIN_API_TOKEN"] = admin_token }
-  after { ENV.delete("HACKR_ADMIN_API_TOKEN") }
-
-  let(:hackr) { create(:grid_hackr) }
+  let!(:admin_hackr) { create(:grid_hackr, :admin) }
+  let!(:raw_token) { admin_hackr.generate_api_token! }
+  let(:valid_headers) { admin_headers_for(admin_hackr, raw_token) }
 
   describe "POST /api/admin/pulses" do
-    it "creates a pulse on behalf of a hackr" do
+    it "creates a pulse as the authenticated admin" do
       post "/api/admin/pulses",
-        params: {hackr_alias: hackr.hackr_alias, content: "Admin pulse"},
-        headers: admin_headers
+        params: {content: "Admin pulse"},
+        headers: valid_headers
 
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
       expect(body["pulse"]["content"]).to eq("Admin pulse")
-      expect(body["pulse"]["grid_hackr"]["hackr_alias"]).to eq(hackr.hackr_alias)
+      expect(body["pulse"]["grid_hackr"]["hackr_alias"]).to eq(admin_hackr.hackr_alias)
     end
 
     it "enforces 256 character limit" do
       post "/api/admin/pulses",
-        params: {hackr_alias: hackr.hackr_alias, content: "x" * 257},
-        headers: admin_headers
+        params: {content: "x" * 257},
+        headers: valid_headers
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -31,18 +30,10 @@ RSpec.describe "Api::Admin::Pulses", type: :request do
       allow(Obscenity).to receive(:profane?).with("bad content").and_return(true)
 
       post "/api/admin/pulses",
-        params: {hackr_alias: hackr.hackr_alias, content: "bad content"},
-        headers: admin_headers
+        params: {content: "bad content"},
+        headers: valid_headers
 
       expect(response).to have_http_status(:unprocessable_entity)
-    end
-
-    it "returns 404 for unknown hackr" do
-      post "/api/admin/pulses",
-        params: {hackr_alias: "nonexistent_hackr", content: "Test"},
-        headers: admin_headers
-
-      expect(response).to have_http_status(:not_found)
     end
   end
 
@@ -51,8 +42,7 @@ RSpec.describe "Api::Admin::Pulses", type: :request do
 
     it "creates an echo" do
       post "/api/admin/pulses/#{pulse.id}/echo",
-        params: {hackr_alias: hackr.hackr_alias},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
@@ -60,11 +50,10 @@ RSpec.describe "Api::Admin::Pulses", type: :request do
     end
 
     it "toggles echo off when already echoed" do
-      create(:echo, pulse: pulse, grid_hackr: hackr)
+      create(:echo, pulse: pulse, grid_hackr: admin_hackr)
 
       post "/api/admin/pulses/#{pulse.id}/echo",
-        params: {hackr_alias: hackr.hackr_alias},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
@@ -73,8 +62,7 @@ RSpec.describe "Api::Admin::Pulses", type: :request do
 
     it "returns 404 for unknown pulse" do
       post "/api/admin/pulses/99999/echo",
-        params: {hackr_alias: hackr.hackr_alias},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:not_found)
     end
@@ -85,8 +73,8 @@ RSpec.describe "Api::Admin::Pulses", type: :request do
 
     it "creates a splice to a parent pulse" do
       post "/api/admin/pulses/splice",
-        params: {hackr_alias: hackr.hackr_alias, parent_pulse_id: parent.id, content: "Reply"},
-        headers: admin_headers
+        params: {parent_pulse_id: parent.id, content: "Reply"},
+        headers: valid_headers
 
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
@@ -98,16 +86,16 @@ RSpec.describe "Api::Admin::Pulses", type: :request do
       parent.signal_drop!
 
       post "/api/admin/pulses/splice",
-        params: {hackr_alias: hackr.hackr_alias, parent_pulse_id: parent.id, content: "Reply"},
-        headers: admin_headers
+        params: {parent_pulse_id: parent.id, content: "Reply"},
+        headers: valid_headers
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it "returns 404 for unknown parent pulse" do
       post "/api/admin/pulses/splice",
-        params: {hackr_alias: hackr.hackr_alias, parent_pulse_id: 99999, content: "Reply"},
-        headers: admin_headers
+        params: {parent_pulse_id: 99999, content: "Reply"},
+        headers: valid_headers
 
       expect(response).to have_http_status(:not_found)
     end

@@ -1,12 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Api::Admin::MetaController, type: :controller do
-  before do
-    ENV["HACKR_ADMIN_API_TOKEN"] = admin_token
-    request.headers["Authorization"] = "Bearer #{admin_token}"
-  end
+  let!(:admin_hackr) { create(:grid_hackr, :admin) }
+  let!(:raw_token) { admin_hackr.generate_api_token! }
 
-  after { ENV.delete("HACKR_ADMIN_API_TOKEN") }
+  before do
+    request.headers["Authorization"] = "Bearer #{admin_hackr.hackr_alias}:#{raw_token}"
+  end
 
   describe "GET #capabilities" do
     before { get :capabilities }
@@ -43,7 +43,7 @@ RSpec.describe Api::Admin::MetaController, type: :controller do
     end
 
     it "reflects usage after requests" do
-      window_key = "admin_api_rate:#{Time.current.strftime("%Y%m%d%H%M")}"
+      window_key = "admin_api_rate:#{admin_hackr.hackr_alias}:#{Time.current.strftime("%Y%m%d%H%M")}"
       memory_store.write(window_key, 10, expires_in: 2.minutes)
 
       get :rate_limit

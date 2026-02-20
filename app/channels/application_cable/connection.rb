@@ -23,20 +23,19 @@ module ApplicationCable
     end
 
     def find_hackr_by_admin_token
-      configured_token = ENV["HACKR_ADMIN_API_TOKEN"]
-      reject_unauthorized_connection unless configured_token.present?
-
       token = request.params[:token]
+      hackr_alias = request.params[:hackr_alias]
+
       reject_unauthorized_connection unless token.is_a?(String)
 
-      unless ActiveSupport::SecurityUtils.secure_compare(token, configured_token)
-        Rails.logger.warn("[ActionCable] Invalid admin token from #{request.remote_ip}")
+      hackr = GridHackr.authenticate_by_token(hackr_alias, token)
+      unless hackr
+        Rails.logger.warn("[ActionCable] Invalid token from #{request.remote_ip} for alias '#{hackr_alias}'")
         reject_unauthorized_connection
       end
 
-      hackr = GridHackr.find_by(hackr_alias: request.params[:hackr_alias])
-      unless hackr&.admin?
-        Rails.logger.warn("[ActionCable] Token auth denied for non-admin '#{request.params[:hackr_alias]}'")
+      unless hackr.admin?
+        Rails.logger.warn("[ActionCable] Token auth denied for non-admin '#{hackr_alias}'")
         reject_unauthorized_connection
       end
 

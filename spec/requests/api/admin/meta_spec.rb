@@ -1,12 +1,13 @@
 require "rails_helper"
 
 RSpec.describe "Api::Admin::Meta", type: :request do
-  before { ENV["HACKR_ADMIN_API_TOKEN"] = admin_token }
-  after { ENV.delete("HACKR_ADMIN_API_TOKEN") }
+  let!(:admin_hackr) { create(:grid_hackr, :admin) }
+  let!(:raw_token) { admin_hackr.generate_api_token! }
+  let(:valid_headers) { admin_headers_for(admin_hackr, raw_token) }
 
   describe "GET /api/admin/capabilities" do
     it "returns all capability flags" do
-      get "/api/admin/capabilities", headers: admin_headers
+      get "/api/admin/capabilities", headers: valid_headers
       expect(response).to have_http_status(:ok)
 
       body = JSON.parse(response.body)
@@ -25,7 +26,7 @@ RSpec.describe "Api::Admin::Meta", type: :request do
 
   describe "GET /api/admin/stats" do
     it "returns all system stats with correct keys" do
-      get "/api/admin/stats", headers: admin_headers
+      get "/api/admin/stats", headers: valid_headers
       expect(response).to have_http_status(:ok)
 
       body = JSON.parse(response.body)
@@ -44,7 +45,7 @@ RSpec.describe "Api::Admin::Meta", type: :request do
       create(:sent_email, created_at: 10.days.ago)
       create(:sent_email, created_at: 60.days.ago)
 
-      get "/api/admin/stats", headers: admin_headers
+      get "/api/admin/stats", headers: valid_headers
       stats = JSON.parse(response.body)["stats"]
 
       expect(stats["total_emails_sent"]).to eq(4)
@@ -59,7 +60,7 @@ RSpec.describe "Api::Admin::Meta", type: :request do
     before { allow(Rails).to receive(:cache).and_return(memory_store) }
 
     it "returns rate limit status" do
-      get "/api/admin/rate_limit", headers: admin_headers
+      get "/api/admin/rate_limit", headers: valid_headers
       expect(response).to have_http_status(:ok)
 
       body = JSON.parse(response.body)

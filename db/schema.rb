@@ -142,7 +142,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
   end
 
   create_table "grid_hackrs", force: :cascade do |t|
-    t.string "api_token"
+    t.string "api_token_digest"
     t.datetime "created_at", null: false
     t.integer "current_room_id"
     t.string "email"
@@ -151,7 +151,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.string "password_digest"
     t.string "role"
     t.datetime "updated_at", null: false
-    t.index ["api_token"], name: "index_grid_hackrs_on_api_token", unique: true
+    t.index ["api_token_digest"], name: "index_grid_hackrs_on_api_token_digest", unique: true
     t.index ["email"], name: "index_grid_hackrs_on_email", unique: true
     t.index ["hackr_alias"], name: "index_grid_hackrs_on_hackr_alias", unique: true
     t.index ["role"], name: "index_grid_hackrs_on_role"

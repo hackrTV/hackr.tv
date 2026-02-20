@@ -1,10 +1,16 @@
 module AdminApiHelpers
-  def admin_token
-    "test_admin_api_token_secret"
+  def create_admin_with_token(traits: [:admin], **attrs)
+    hackr = create(:grid_hackr, *traits, **attrs)
+    token = hackr.generate_api_token!
+    [hackr, token]
   end
 
-  def admin_headers
-    {"Authorization" => "Bearer #{admin_token}"}
+  def admin_bearer_token(hackr, token)
+    "#{hackr.hackr_alias}:#{token}"
+  end
+
+  def admin_headers_for(hackr, token)
+    {"Authorization" => "Bearer #{admin_bearer_token(hackr, token)}"}
   end
 end
 

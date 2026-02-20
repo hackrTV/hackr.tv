@@ -1,8 +1,6 @@
 module Api
   module Admin
     class HackrLogsController < BaseController
-      before_action :resolve_hackr!, only: [:create]
-
       # GET /api/admin/hackr_logs
       def index
         page = [params[:page].to_i, 1].max
@@ -33,7 +31,7 @@ module Api
         published = ActiveModel::Type::Boolean.new.cast(published)
 
         log = HackrLog.new(
-          grid_hackr: @acting_hackr,
+          grid_hackr: @current_admin_hackr,
           title: params[:title],
           slug: slug,
           body: params[:body],

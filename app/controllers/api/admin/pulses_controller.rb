@@ -1,11 +1,9 @@
 module Api
   module Admin
     class PulsesController < BaseController
-      before_action :resolve_hackr!
-
       # POST /api/admin/pulses
       def create
-        pulse = @acting_hackr.pulses.build(
+        pulse = @current_admin_hackr.pulses.build(
           content: params[:content],
           pulsed_at: Time.current
         )
@@ -29,7 +27,7 @@ module Api
           return render json: {success: false, error: "Pulse not found"}, status: :not_found
         end
 
-        existing_echo = pulse.echoes.find_by(grid_hackr_id: @acting_hackr.id)
+        existing_echo = pulse.echoes.find_by(grid_hackr_id: @current_admin_hackr.id)
 
         if existing_echo
           existing_echo.destroy
@@ -40,7 +38,7 @@ module Api
             message: "Echo removed"
           }
         else
-          new_echo = pulse.echoes.build(grid_hackr: @acting_hackr)
+          new_echo = pulse.echoes.build(grid_hackr: @current_admin_hackr)
           if new_echo.save
             render json: {
               success: true,
@@ -64,7 +62,7 @@ module Api
           return render json: {success: false, error: "Parent pulse not found"}, status: :not_found
         end
 
-        pulse = @acting_hackr.pulses.build(
+        pulse = @current_admin_hackr.pulses.build(
           content: params[:content],
           parent_pulse_id: parent.id,
           pulsed_at: Time.current

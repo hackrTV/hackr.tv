@@ -11,39 +11,39 @@ module Api
       private
 
       def authenticate_admin_token!
-        configured_token = ENV["HACKR_ADMIN_API_TOKEN"]
-
-        unless configured_token.present?
-          Rails.logger.error("[ADMIN API] HACKR_ADMIN_API_TOKEN is not configured")
-          render json: {success: false, error: "Admin API is not configured"}, status: :service_unavailable
-          return
-        end
-
         auth_header = request.headers["Authorization"]
         unless auth_header&.start_with?("Bearer ")
           render json: {success: false, error: "Missing or invalid Authorization header"}, status: :unauthorized
           return
         end
 
-        provided_token = auth_header.split(" ", 2).last
-        unless ActiveSupport::SecurityUtils.secure_compare(provided_token, configured_token)
-          Rails.logger.warn("[ADMIN API] Invalid token attempt from #{request.remote_ip}")
+        credentials = auth_header.split(" ", 2).last
+        hackr_alias, token = credentials.split(":", 2)
+
+        unless hackr_alias.present? && token.present?
+          render json: {success: false, error: "Invalid token format. Expected alias:token"}, status: :unauthorized
+          return
+        end
+
+        hackr = GridHackr.authenticate_by_token(hackr_alias, token)
+        unless hackr
+          Rails.logger.warn("[ADMIN API] Invalid token attempt from #{request.remote_ip} for alias '#{hackr_alias}'")
           render json: {success: false, error: "Invalid admin token"}, status: :unauthorized
+          return
         end
-      end
 
-      def resolve_hackr!
-        hackr_alias = params[:hackr_alias]
-        @acting_hackr = GridHackr.find_by(hackr_alias: hackr_alias)
-
-        unless @acting_hackr
-          render json: {success: false, error: "Hackr '#{hackr_alias}' not found"}, status: :not_found
+        unless hackr.admin?
+          Rails.logger.warn("[ADMIN API] Non-admin access attempt by '#{hackr_alias}' from #{request.remote_ip}")
+          render json: {success: false, error: "Admin privileges required"}, status: :forbidden
+          return
         end
+
+        @current_admin_hackr = hackr
       end
 
       def enforce_rate_limit!
         limit = 125
-        window_key = "admin_api_rate:#{Time.current.strftime("%Y%m%d%H%M")}"
+        window_key = "admin_api_rate:#{@current_admin_hackr&.hackr_alias || request.remote_ip}:#{Time.current.strftime("%Y%m%d%H%M")}"
 
         count = Rails.cache.increment(window_key, 1, expires_in: 2.minutes).to_i
         count = 1 if count == 0

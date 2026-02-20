@@ -4,7 +4,7 @@
 # Database name: primary
 #
 #  id               :integer          not null, primary key
-#  api_token        :string
+#  api_token_digest :string
 #  email            :string
 #  hackr_alias      :string
 #  last_activity_at :datetime
@@ -16,10 +16,10 @@
 #
 # Indexes
 #
-#  index_grid_hackrs_on_api_token    (api_token) UNIQUE
-#  index_grid_hackrs_on_email        (email) UNIQUE
-#  index_grid_hackrs_on_hackr_alias  (hackr_alias) UNIQUE
-#  index_grid_hackrs_on_role         (role)
+#  index_grid_hackrs_on_api_token_digest  (api_token_digest) UNIQUE
+#  index_grid_hackrs_on_email             (email) UNIQUE
+#  index_grid_hackrs_on_hackr_alias       (hackr_alias) UNIQUE
+#  index_grid_hackrs_on_role              (role)
 #
 FactoryBot.define do
   factory :grid_hackr do

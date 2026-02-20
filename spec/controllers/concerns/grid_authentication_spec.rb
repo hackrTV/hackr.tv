@@ -51,8 +51,8 @@ RSpec.describe GridAuthentication, type: :controller do
 
     context "when hackr authenticates via Bearer token" do
       before do
-        operative.generate_api_token!
-        request.headers["Authorization"] = "Bearer #{operative.api_token}"
+        @operative_token = operative.generate_api_token!
+        request.headers["Authorization"] = "Bearer #{operative.hackr_alias}:#{@operative_token}"
       end
 
       it "returns the hackr associated with the token" do
@@ -63,8 +63,8 @@ RSpec.describe GridAuthentication, type: :controller do
     context "when both session and token are present" do
       before do
         session[:grid_hackr_id] = admin.id
-        operative.generate_api_token!
-        request.headers["Authorization"] = "Bearer #{operative.api_token}"
+        @operative_token = operative.generate_api_token!
+        request.headers["Authorization"] = "Bearer #{operative.hackr_alias}:#{@operative_token}"
       end
 
       it "prefers token authentication over session" do
@@ -74,7 +74,7 @@ RSpec.describe GridAuthentication, type: :controller do
 
     context "when invalid token is provided" do
       before do
-        request.headers["Authorization"] = "Bearer invalid_token"
+        request.headers["Authorization"] = "Bearer somealias:invalid_token"
       end
 
       it "returns nil" do
@@ -83,20 +83,30 @@ RSpec.describe GridAuthentication, type: :controller do
 
       it "logs the invalid token attempt" do
         allow(Rails.logger).to receive(:warn).and_call_original
-        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Invalid API token: token_prefix=invalid_\.\.\./)
+        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Invalid API token: alias=somealias token_prefix=invalid_\.\.\./)
         controller.send(:current_hackr)
       end
     end
 
     context "when invalid token is short" do
       before do
-        request.headers["Authorization"] = "Bearer abc"
+        request.headers["Authorization"] = "Bearer somealias:abc"
       end
 
       it "logs the full short token" do
         allow(Rails.logger).to receive(:warn).and_call_original
-        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Invalid API token: token_prefix=abc ip=/)
+        expect(Rails.logger).to receive(:warn).with(/\[AUTH\] Invalid API token: alias=somealias token_prefix=abc ip=/)
         controller.send(:current_hackr)
+      end
+    end
+
+    context "when token format is missing colon" do
+      before do
+        request.headers["Authorization"] = "Bearer just_a_token"
+      end
+
+      it "returns nil" do
+        expect(controller.send(:current_hackr)).to be_nil
       end
     end
 

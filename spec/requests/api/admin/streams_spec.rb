@@ -1,15 +1,16 @@
 require "rails_helper"
 
 RSpec.describe "Api::Admin::Streams", type: :request do
-  before { ENV["HACKR_ADMIN_API_TOKEN"] = admin_token }
-  after { ENV.delete("HACKR_ADMIN_API_TOKEN") }
+  let!(:admin_hackr) { create(:grid_hackr, :admin) }
+  let!(:raw_token) { admin_hackr.generate_api_token! }
+  let(:valid_headers) { admin_headers_for(admin_hackr, raw_token) }
 
   describe "GET /api/admin/streams/status" do
     it "returns is_live: true when a stream is live" do
       artist = create(:artist)
       stream = create(:hackr_stream, :live, artist: artist)
 
-      get "/api/admin/streams/status", headers: admin_headers
+      get "/api/admin/streams/status", headers: valid_headers
       body = JSON.parse(response.body)
 
       expect(response).to have_http_status(:ok)
@@ -19,7 +20,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
     end
 
     it "returns is_live: false when no stream is live" do
-      get "/api/admin/streams/status", headers: admin_headers
+      get "/api/admin/streams/status", headers: valid_headers
       body = JSON.parse(response.body)
 
       expect(response).to have_http_status(:ok)
@@ -33,7 +34,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
     it "creates a new live stream" do
       post "/api/admin/streams/go_live",
         params: {artist_slug: artist.slug, url: "https://youtube.com/live/abc12345678", title: "Live Show"},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
@@ -46,7 +47,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
 
       post "/api/admin/streams/go_live",
         params: {artist_slug: artist.slug, url: "https://youtube.com/live/abc12345678"},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(existing.reload.is_live).to be false
     end
@@ -54,7 +55,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
     it "returns 404 for unknown artist" do
       post "/api/admin/streams/go_live",
         params: {artist_slug: "nonexistent", url: "https://example.com/stream"},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:not_found)
     end
@@ -62,7 +63,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
     it "returns 422 when URL is missing" do
       post "/api/admin/streams/go_live",
         params: {artist_slug: artist.slug},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -76,7 +77,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
 
       post "/api/admin/streams/end_stream",
         params: {artist_slug: artist.slug},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
@@ -87,7 +88,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
     it "returns 404 when no live stream exists" do
       post "/api/admin/streams/end_stream",
         params: {artist_slug: artist.slug},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:not_found)
     end
@@ -95,7 +96,7 @@ RSpec.describe "Api::Admin::Streams", type: :request do
     it "returns 404 for unknown artist" do
       post "/api/admin/streams/end_stream",
         params: {artist_slug: "nonexistent"},
-        headers: admin_headers
+        headers: valid_headers
 
       expect(response).to have_http_status(:not_found)
     end

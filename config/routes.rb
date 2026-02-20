@@ -281,5 +281,5 @@ Rails.application.routes.draw do
   # Exclude Active Storage paths from catch-all
   match "*path", to: "pages#not_found",
     via: :all,
-    constraints: ->(req) { !req.path.start_with?("/rails/active_storage") }
+    constraints: ->(req) { !req.path.start_with?("/rails/active_storage", "/cable") }
 end
