@@ -11,7 +11,8 @@ module Api
         packet = @channel.chat_messages.build(
           grid_hackr: @current_admin_hackr,
           hackr_stream: hackr_stream,
-          content: params[:content]
+          content: params[:content],
+          source: params[:source]
         )
 
         if packet.save
@@ -46,7 +47,8 @@ module Api
             hackr_alias: packet.grid_hackr&.hackr_alias,
             role: packet.grid_hackr&.role
           },
-          hackr_stream_id: packet.hackr_stream_id
+          hackr_stream_id: packet.hackr_stream_id,
+          source: packet.source
         }
       end
     end

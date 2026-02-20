@@ -7,6 +7,7 @@
 #  content         :text             not null
 #  dropped         :boolean          default(FALSE), not null
 #  dropped_at      :datetime
+#  source          :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  chat_channel_id :integer          not null

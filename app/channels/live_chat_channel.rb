@@ -75,7 +75,8 @@ class LiveChatChannel < ApplicationCable::Channel
           hackr_alias: message.grid_hackr&.hackr_alias,
           role: message.grid_hackr&.role
         },
-        hackr_stream_id: message.hackr_stream_id
+        hackr_stream_id: message.hackr_stream_id,
+        source: message.source
       }
     end
 

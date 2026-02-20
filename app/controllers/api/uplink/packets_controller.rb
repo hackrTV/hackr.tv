@@ -159,7 +159,8 @@ module Api
             hackr_alias: packet.grid_hackr&.hackr_alias,
             role: packet.grid_hackr&.role
           },
-          hackr_stream_id: packet.hackr_stream_id
+          hackr_stream_id: packet.hackr_stream_id,
+          source: packet.source
         }
       end
 

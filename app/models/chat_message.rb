@@ -7,6 +7,7 @@
 #  content         :text             not null
 #  dropped         :boolean          default(FALSE), not null
 #  dropped_at      :datetime
+#  source          :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  chat_channel_id :integer          not null
@@ -90,7 +91,8 @@ class ChatMessage < ApplicationRecord
         hackr_alias: grid_hackr&.hackr_alias,
         role: grid_hackr&.role
       },
-      hackr_stream_id: hackr_stream_id
+      hackr_stream_id: hackr_stream_id,
+      source: source
     }
   end
 end

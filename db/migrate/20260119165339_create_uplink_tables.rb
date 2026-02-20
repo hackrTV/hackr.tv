@@ -22,6 +22,7 @@ class CreateUplinkTables < ActiveRecord::Migration[8.0]
       t.references :grid_hackr, null: false, foreign_key: true
       t.references :hackr_stream, null: true, foreign_key: true
       t.text :content, null: false
+      t.string :source
       t.boolean :dropped, default: false, null: false
       t.datetime :dropped_at
 
