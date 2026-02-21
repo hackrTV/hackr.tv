@@ -5,6 +5,7 @@ import { EchoButton } from './EchoButton'
 import { PulseComposer } from './PulseComposer'
 import { WireText } from '../shared/WireText'
 import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
 
 interface PulseCardProps {
   pulse: Pulse
@@ -27,6 +28,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
   onPulseCreated,
   onPulseDeleted
 }) => {
+  const { hackr: currentHackr } = useGridAuth()
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [replies, setReplies] = useState<Pulse[]>([])
@@ -177,7 +179,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
             </Link>
           )}
 
-          {pulse.current_hackr_is_admin && (
+          {currentHackr && currentHackr.id === pulse.grid_hackr.id && (
             <button
               className="delete-button"
               onClick={handleDelete}
