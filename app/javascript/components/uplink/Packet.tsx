@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import type { Packet as PacketType, UplinkHackr } from '../../types/uplink'
+import { processUrls } from '../../utils/urlContent'
 
 interface PacketProps {
   packet: PacketType
@@ -50,10 +51,10 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
     }
   }
 
-  // Highlight @mentions in content
-  const renderContent = (content: string) => {
+  // Highlight @mentions in a plain string fragment
+  const renderMentions = (text: string, keyPrefix: string) => {
     const mentionRegex = /@([a-zA-Z0-9_]+)/g
-    const parts = content.split(mentionRegex)
+    const parts = text.split(mentionRegex)
 
     return parts.map((part, index) => {
       // Odd indices are the captured groups (usernames)
@@ -61,7 +62,7 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
         const isCurrentUser = currentHackr?.hackr_alias.toLowerCase() === part.toLowerCase()
         return (
           <Link
-            key={index}
+            key={`${keyPrefix}-${index}`}
             to={`/wire/${part}`}
             style={{
               color: isCurrentUser ? '#ffff00' : '#a78bfa',
@@ -74,6 +75,19 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
             @{part}
           </Link>
         )
+      }
+      return part
+    })
+  }
+
+  // Process URLs then @mentions in content
+  const renderContent = (content: string) => {
+    const allowLinks = !packet.source && packet.grid_hackr.role === 'admin'
+    const urlProcessed = processUrls(content, allowLinks)
+
+    return urlProcessed.flatMap((part, i) => {
+      if (typeof part === 'string') {
+        return renderMentions(part, `m${i}`)
       }
       return part
     })

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import type { Pulse } from '../../types/pulse'
 import { EchoButton } from './EchoButton'
 import { PulseComposer } from './PulseComposer'
-import { CodexText } from '../shared/CodexText'
+import { WireText } from '../shared/WireText'
 import { apiFetch, apiJson } from '~/utils/apiClient'
 
 interface PulseCardProps {
@@ -136,7 +136,7 @@ export const PulseCard: React.FC<PulseCardProps> = ({
             )}
           </div>
         ) : (
-          <p><CodexText>{pulse.content}</CodexText></p>
+          <p><WireText posterIsAdmin={pulse.grid_hackr.role === 'admin'}>{pulse.content}</WireText></p>
         )}
       </div>
 
