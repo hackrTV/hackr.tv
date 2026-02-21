@@ -7,7 +7,6 @@
   background: transparent;
   border: 1px solid #444;
   color: #a78bfa;
-  font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -50,7 +49,6 @@
 .alert {
   padding: 12px;
   margin-top: 10px;
-  font-family: 'Courier New', Courier, monospace;
   font-size: 0.9rem;
   border: 1px solid;
 }
@@ -71,7 +69,6 @@
   background: #000;
   border: 1px solid #444;
   color: #fff;
-  font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
 }
 
@@ -102,7 +99,6 @@
 }
 
 .wire-status {
-  font-family: 'Courier New', Courier, monospace;
   font-size: 0.9rem;
 }
 
@@ -122,7 +118,6 @@
 
 .user-stats {
   color: #60a5fa;
-  font-family: 'Courier New', Courier, monospace;
 }
 
 /* Pulse Composer */
@@ -144,7 +139,6 @@
   background: #000;
   border: 1px solid #444;
   color: #fff;
-  font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
   resize: vertical;
 }
@@ -163,7 +157,6 @@
 }
 
 .char-count {
-  font-family: 'Courier New', Courier, monospace;
   font-size: 0.9rem;
   color: #888;
 }
@@ -223,7 +216,6 @@
 
 .hackr-alias {
   font-weight: bold;
-  font-family: 'Courier New', Courier, monospace;
 }
 
 .admin-badge {
@@ -237,7 +229,6 @@
 .pulse-timestamp {
   font-size: 0.85rem;
   color: #888;
-  font-family: 'Courier New', Courier, monospace;
 }
 
 .pulse-content {
@@ -256,7 +247,6 @@
 /* Signal Dropped */
 .signal-dropped-notice {
   color: #f87171;
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   padding: 15px;
   border: 1px dashed #f87171;
@@ -297,7 +287,6 @@
   color: #a78bfa;
   padding: 6px 12px;
   cursor: pointer;
-  font-family: 'Courier New', Courier, monospace;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -358,7 +347,6 @@
   color: #60a5fa;
   text-decoration: none;
   font-size: 0.9rem;
-  font-family: 'Courier New', Courier, monospace;
 }
 
 .thread-link:hover {
@@ -395,7 +383,6 @@
 }
 
 .thread-stats {
-  font-family: 'Courier New', Courier, monospace;
   color: #60a5fa;
 }
 
@@ -430,7 +417,6 @@
 .back-link a {
   color: #a78bfa;
   text-decoration: none;
-  font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
 }
 
@@ -444,21 +430,18 @@
   text-align: center;
   padding: 40px 20px;
   color: #888;
-  font-family: 'Courier New', Courier, monospace;
 }
 
 .loading-more {
   text-align: center;
   padding: 20px;
   color: #60a5fa;
-  font-family: 'Courier New', Courier, monospace;
 }
 
 .end-of-feed {
   text-align: center;
   padding: 30px;
   color: #888;
-  font-family: 'Courier New', Courier, monospace;
   border-top: 1px dashed #444;
   margin-top: 20px;
 }

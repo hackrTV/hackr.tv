@@ -274,7 +274,7 @@ export const TerminalAnimation: React.FC = () => {
         .terminal-container {
           background: #0a0a0a;
           color: #33cc33;
-          font-family: 'Courier New', Courier, monospace;
+          font-family: 'Terminus', 'Courier New', Courier, monospace;
           padding: 20px;
           margin: 20px auto 0 auto;
           border: 2px solid #33aa33;

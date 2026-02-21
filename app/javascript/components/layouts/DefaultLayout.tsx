@@ -70,7 +70,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
               border: '2px solid #7c3aed',
               color: '#7c3aed',
               padding: '8px 16px',
-              fontFamily: '\'Courier New\', Courier, monospace',
+              fontFamily: 'inherit',
               fontSize: '16px',
               cursor: 'pointer',
               margin: 0,
