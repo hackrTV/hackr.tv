@@ -18,7 +18,7 @@ export function processUrls (text: string, allowLinks: boolean): (string | React
   const mdParts: (string | React.ReactNode)[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
-  const markdownLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g
+  const markdownLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi
 
   while ((match = markdownLinkRe.exec(text)) !== null) {
     if (match.index > lastIndex) {
@@ -53,16 +53,24 @@ export function processUrls (text: string, allowLinks: boolean): (string | React
     }
 
     let urlLastIndex = 0
-    const plainUrlRe = /\b(https?:\/\/[^\s<]+)/g
+    const plainUrlRe = /\b(https?:\/\/[^\s<]+)/gi
     while ((match = plainUrlRe.exec(part)) !== null) {
+      // Trim trailing punctuation that's likely sentence-level, not part of the URL
+      let url = match[1]
+      const trailingPunctRe = /[.,;:!?\])\u2019']+$/
+      const punctMatch = url.match(trailingPunctRe)
+      if (punctMatch) {
+        url = url.slice(0, -punctMatch[0].length)
+      }
+
       if (match.index > urlLastIndex) {
         result.push(part.slice(urlLastIndex, match.index))
       }
 
       if (allowLinks) {
         result.push(
-          <a key={`url-${keyIdx++}`} href={match[1]} target="_blank" rel="noopener noreferrer" style={linkStyle}>
-            {match[1]}
+          <a key={`url-${keyIdx++}`} href={url} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+            {url}
           </a>
         )
       } else {
@@ -71,7 +79,8 @@ export function processUrls (text: string, allowLinks: boolean): (string | React
         )
       }
 
-      urlLastIndex = match.index + match[0].length
+      // Emit trimmed punctuation back as plain text
+      urlLastIndex = match.index + match[0].length - (punctMatch ? punctMatch[0].length : 0)
     }
 
     if (urlLastIndex === 0) {

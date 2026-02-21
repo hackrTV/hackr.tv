@@ -178,6 +178,117 @@ describe('processUrls', () => {
     })
   })
 
+  describe('case-insensitive URL schemes', () => {
+    it('censors uppercase HTTPS plain URL', () => {
+      const result = processUrls('Visit HTTPS://example.com today', false)
+
+      const { container } = render(<>{result}</>)
+      expect(container.querySelectorAll('a')).toHaveLength(0)
+      expect(container.textContent).toContain('[LINK CENSORED BY GOVCORP]')
+    })
+
+    it('censors mixed-case Https plain URL', () => {
+      const result = processUrls('Visit Https://example.com today', false)
+
+      const { container } = render(<>{result}</>)
+      expect(container.querySelectorAll('a')).toHaveLength(0)
+      expect(container.textContent).toContain('[LINK CENSORED BY GOVCORP]')
+    })
+
+    it('censors uppercase scheme in markdown link', () => {
+      const result = processUrls('See [click me](HTTPS://evil.com) now', false)
+
+      const { container } = render(<>{result}</>)
+      expect(container.querySelectorAll('a')).toHaveLength(0)
+      expect(container.textContent).toContain('[LINK CENSORED BY GOVCORP]')
+    })
+
+    it('makes uppercase scheme URL clickable for admin', () => {
+      const result = processUrls('Visit HTTPS://example.com today', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'HTTPS://example.com')
+    })
+
+    it('censors HTTP with uppercase scheme', () => {
+      const result = processUrls('Visit HTTP://example.com today', false)
+
+      const { container } = render(<>{result}</>)
+      expect(container.querySelectorAll('a')).toHaveLength(0)
+      expect(container.textContent).toContain('[LINK CENSORED BY GOVCORP]')
+    })
+  })
+
+  describe('trailing punctuation trimming', () => {
+    it('excludes trailing period from URL href', () => {
+      const result = processUrls('See https://example.com.', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://example.com')
+      expect(container.textContent).toBe('See https://example.com.')
+    })
+
+    it('excludes trailing comma from URL href', () => {
+      const result = processUrls('Visit https://example.com, then leave', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://example.com')
+      expect(container.textContent).toContain(', then leave')
+    })
+
+    it('excludes trailing closing paren from URL href', () => {
+      const result = processUrls('(see https://example.com)', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://example.com')
+      expect(container.textContent).toBe('(see https://example.com)')
+    })
+
+    it('excludes trailing closing bracket from URL href', () => {
+      const result = processUrls('check https://example.com]', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://example.com')
+    })
+
+    it('preserves trailing punctuation as visible text when censored', () => {
+      const result = processUrls('See https://example.com.', false)
+
+      const { container } = render(<>{result}</>)
+      expect(container.textContent).toBe('See [LINK CENSORED BY GOVCORP].')
+    })
+
+    it('preserves mid-URL periods (e.g. subdomains)', () => {
+      const result = processUrls('Visit https://sub.example.com/path today', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://sub.example.com/path')
+    })
+
+    it('handles multiple trailing punctuation characters', () => {
+      const result = processUrls('Really?! https://example.com!!', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://example.com')
+    })
+
+    it('excludes trailing semicolon', () => {
+      const result = processUrls('url: https://example.com; done', true)
+
+      const { container } = render(<>{result}</>)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://example.com')
+      expect(container.textContent).toContain('; done')
+    })
+  })
+
   describe('link styling', () => {
     it('applies blue underline styling to allowed links', () => {
       const result = processUrls('https://example.com', true)
