@@ -11,7 +11,8 @@ interface PacketProps {
 
 const PLATFORM_COLORS: Record<string, { badge: string; username: string }> = {
   TTV: { badge: '#a78bfa', username: '#c4b5fd' },
-  YT_: { badge: '#ff5555', username: '#fca5a5' }
+  YT_: { badge: '#ff5555', username: '#fca5a5' },
+  SYNTHIA: { badge: '#00ff88', username: '#00ff88' }
 }
 
 const parseBridgedContent = (content: string) => {
@@ -21,7 +22,8 @@ const parseBridgedContent = (content: string) => {
 }
 
 export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) => {
-  const isBridged = !!packet.source
+  const isBotSource = packet.source === 'SYNTHIA'
+  const isBridged = !!packet.source && !isBotSource
   const isOwnPacket = currentHackr?.id === packet.grid_hackr.id
   const canDrop = currentHackr && (
     isOwnPacket ||
@@ -32,20 +34,20 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
   const getRoleColor = (role: string): string => {
     switch (role) {
     case 'admin':
-      return '#ff5555'
+      return '#00d4ff'
     case 'operator':
       return '#ffaa00'
     default:
-      return '#00d4ff'
+      return '#cc0088'
     }
   }
 
   const getRoleBadge = (role: string): string | null => {
     switch (role) {
     case 'admin':
-      return '[ADMIN]'
+      return 'ADMIN'
     case 'operator':
-      return '[OP]'
+      return 'OP'
     default:
       return null
     }
@@ -127,7 +129,7 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
           >
             {formatTime(packet.created_at)}
           </span>
-          {isBridged && platformColors && (
+          {(isBridged || isBotSource) && platformColors ? (
             <span
               style={{
                 color: platformColors.badge,
@@ -140,6 +142,20 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
               }}
             >
               {packet.source}
+            </span>
+          ) : getRoleBadge(packet.grid_hackr.role) && (
+            <span
+              style={{
+                color: getRoleColor(packet.grid_hackr.role),
+                fontSize: '0.6rem',
+                fontFamily: 'Terminus, monospace',
+                fontWeight: 'bold',
+                display: 'block',
+                lineHeight: 1,
+                marginTop: '2px'
+              }}
+            >
+              {getRoleBadge(packet.grid_hackr.role)}
             </span>
           )}
         </div>
@@ -183,31 +199,28 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
           ) : (
             // Native message rendering
             <>
-              <span
-                className="packet-author"
-                style={{
-                  color: getRoleColor(packet.grid_hackr.role),
-                  fontWeight: 'bold',
-                  marginRight: '6px'
-                }}
-              >
-                <Link
-                  to={`/wire/${packet.grid_hackr.hackr_alias}`}
-                  style={{ color: 'inherit', textDecoration: 'none' }}
+              {!isBotSource && (
+                <span
+                  className="packet-author"
+                  style={{
+                    color: getRoleColor(packet.grid_hackr.role),
+                    fontWeight: 'bold',
+                    marginRight: '6px'
+                  }}
                 >
-                  @{packet.grid_hackr.hackr_alias}
-                </Link>
-                {getRoleBadge(packet.grid_hackr.role) && (
-                  <span style={{ fontSize: '0.7rem', marginLeft: '4px', opacity: 0.8 }}>
-                    {getRoleBadge(packet.grid_hackr.role)}
-                  </span>
-                )}
-              </span>
+                  <Link
+                    to={`/wire/${packet.grid_hackr.hackr_alias}`}
+                    style={{ color: 'inherit', textDecoration: 'none' }}
+                  >
+                    @{packet.grid_hackr.hackr_alias}
+                  </Link>
+                </span>
+              )}
 
               <span
                 className="packet-content"
                 style={{
-                  color: packet.dropped ? '#666' : '#ccc',
+                  color: packet.dropped ? '#666' : isBotSource ? platformColors!.username : '#ccc',
                   wordBreak: 'break-word'
                 }}
               >
