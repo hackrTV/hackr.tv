@@ -22,6 +22,14 @@ class Rack::Attack
     req.env["rack_attack.json_params"] = parsed
   end
 
+  # Safely extract a string value from parsed JSON params.
+  # Returns nil for non-string values (arrays, hashes, numbers)
+  # to avoid NoMethodError/TypeError in throttle key blocks.
+  def self.json_string_param(req, key)
+    value = json_params(req)[key]
+    value.is_a?(String) ? value.downcase.strip : nil
+  end
+
   ### Throttle login attempts ###
 
   # Throttle login attempts by IP address
@@ -36,8 +44,7 @@ class Rack::Attack
   # 5 requests per 20 seconds per alias
   throttle("logins/alias", limit: 5, period: 20.seconds) do |req|
     if req.path == "/api/grid/login" && req.post?
-      # Normalize alias to prevent bypass via case variations
-      json_params(req)["hackr_alias"]&.downcase&.strip
+      json_string_param(req, "hackr_alias")
     end
   end
 
@@ -54,7 +61,7 @@ class Rack::Attack
   # 3 registration emails per email address per hour
   throttle("registrations/email", limit: 3, period: 1.hour) do |req|
     if req.path == "/api/grid/register" && req.post?
-      json_params(req)["email"]&.downcase&.strip
+      json_string_param(req, "email")
     end
   end
 
@@ -70,7 +77,7 @@ class Rack::Attack
   # 3 forgot password requests per email per hour
   throttle("forgot_password/email", limit: 3, period: 1.hour) do |req|
     if req.path == "/api/grid/forgot_password" && req.post?
-      json_params(req)["email"]&.downcase&.strip
+      json_string_param(req, "email")
     end
   end
 
@@ -88,7 +95,7 @@ class Rack::Attack
   # 5 completion attempts per token per hour
   throttle("complete_registration/token", limit: 5, period: 1.hour) do |req|
     if req.path == "/api/grid/complete_registration" && req.post?
-      json_params(req)["token"]
+      json_string_param(req, "token")
     end
   end
 
