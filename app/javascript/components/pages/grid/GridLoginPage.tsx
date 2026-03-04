@@ -98,6 +98,13 @@ export const GridLoginPage: React.FC = () => {
           <hr style={{ borderColor: '#00ffff', margin: '30px 0' }} />
 
           <div className="center" style={{ margin: '20px 0' }}>
+            <p className="white-text" style={{ marginBottom: '10px' }}>LOST YOUR CREDENTIALS?</p>
+            <Link to="/grid/forgot_password" className="tui-button orange-168">RECOVER ACCESS</Link>
+          </div>
+
+          <hr style={{ borderColor: '#00ffff', margin: '30px 0' }} />
+
+          <div className="center" style={{ margin: '20px 0' }}>
             <p className="white-text" style={{ marginBottom: '10px' }}>NEW TO THE FRACTURE NETWORK?</p>
             <Link to="/grid/register" className="tui-button green-168">REGISTER AS HACKR</Link>
           </div>

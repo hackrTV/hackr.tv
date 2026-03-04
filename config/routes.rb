@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     get "login", to: "pages#spa_root", as: :grid_login
     get "register", to: "pages#spa_root", as: :grid_register
     get "verify/:token", to: "pages#spa_root", as: :grid_verify
+    get "forgot_password", to: "pages#spa_root", as: :grid_forgot_password
     get "identity", to: "pages#spa_root", as: :grid_identity
     get "reset_password/:token", to: "pages#spa_root", as: :grid_password_reset
     get "confirm_email_change/:token", to: "pages#spa_root", as: :grid_confirm_email_change
@@ -109,6 +110,7 @@ Rails.application.routes.draw do
     post "grid/complete_registration", to: "grid#complete_registration"
     delete "grid/disconnect", to: "grid#disconnect"
     post "grid/command", to: "grid#command"
+    post "grid/forgot_password", to: "grid#forgot_password"
     post "grid/request_password_reset", to: "grid#request_password_reset"
     post "grid/reset_password", to: "grid#reset_password"
     post "grid/request_email_change", to: "grid#request_email_change"
