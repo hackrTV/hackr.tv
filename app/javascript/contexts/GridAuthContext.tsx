@@ -49,6 +49,12 @@ interface CompleteRegistrationResponse {
   hackr?: GridHackr
 }
 
+interface ForgotPasswordResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
 interface RequestPasswordResetResponse {
   success: boolean
   message?: string
@@ -88,6 +94,7 @@ interface GridAuthContextType {
   requestRegistration: (email: string) => Promise<RequestRegistrationResponse>
   verifyToken: (token: string) => Promise<VerifyTokenResponse>
   completeRegistration: (token: string, hackr_alias: string, password: string, password_confirmation: string) => Promise<CompleteRegistrationResponse>
+  forgotPassword: (email: string) => Promise<ForgotPasswordResponse>
   requestPasswordReset: () => Promise<RequestPasswordResetResponse>
   resetPassword: (token: string, password: string, password_confirmation: string) => Promise<ResetPasswordResponse>
   requestEmailChange: (new_email: string) => Promise<RequestEmailChangeResponse>
@@ -259,6 +266,26 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     }
   }, [])
 
+  const forgotPassword = useCallback(async (email: string): Promise<ForgotPasswordResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<ForgotPasswordResponse>('/api/grid/forgot_password', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      })
+
+      if (!data.success) {
+        setError(data.error || 'Failed to send password reset email')
+      }
+      return data
+    } catch (err) {
+      console.error('Forgot password request failed:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error. Please try again.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
   const requestPasswordReset = useCallback(async (): Promise<RequestPasswordResetResponse> => {
     setError(null)
     try {
@@ -375,6 +402,7 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     requestRegistration,
     verifyToken,
     completeRegistration,
+    forgotPassword,
     requestPasswordReset,
     resetPassword,
     requestEmailChange,

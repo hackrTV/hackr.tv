@@ -140,7 +140,7 @@ export const IdentityPage: React.FC = () => {
                 opacity: loading ? 0.6 : 1
               }}
             >
-              {loading ? 'SENDING...' : 'CHANGE PASSWORD'}
+              {loading ? 'SENDING...' : 'RESET CREDENTIALS'}
             </button>
 
             {message && (

@@ -42,6 +42,7 @@ class Api::GridController < ApplicationController
         hackr: {
           id: hackr.id,
           hackr_alias: hackr.hackr_alias,
+          email: hackr.email,
           role: hackr.role,
           current_room: hackr.current_room ? room_json(hackr.current_room) : nil,
           features: hackr.admin? ? [FeatureGrant::PULSE_GRID] : hackr.feature_grants.pluck(:feature)
@@ -203,8 +204,41 @@ class Api::GridController < ApplicationController
     }
   end
 
+  # POST /api/grid/forgot_password - Send password reset email (unauthenticated)
+  def forgot_password
+    email = params[:email].to_s.downcase.strip
+
+    # Always return success to prevent email enumeration
+    hackr = GridHackr.find_by(email: email)
+
+    if hackr
+      token = GridVerificationToken.create!(
+        grid_hackr: hackr,
+        purpose: "password_reset",
+        ip_address: request.remote_ip
+      )
+
+      GridMailer.password_reset(token).deliver_later
+      Rails.logger.info("[AUTH] Forgot password email sent: email=#{email} ip=#{request.remote_ip}")
+    else
+      Rails.logger.info("[AUTH] Forgot password attempt for unknown email: ip=#{request.remote_ip}")
+    end
+
+    render json: {
+      success: true,
+      message: "If an account exists with that email, a reset link has been sent."
+    }
+  end
+
   # POST /api/grid/request_password_reset - Send password reset email
   def request_password_reset
+    if current_hackr.email.blank?
+      return render json: {
+        success: false,
+        error: "No email address on file. Set an email first to enable password reset."
+      }, status: :unprocessable_entity
+    end
+
     token = GridVerificationToken.create!(
       grid_hackr: current_hackr,
       purpose: "password_reset",

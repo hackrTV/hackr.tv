@@ -58,6 +58,22 @@ class Rack::Attack
     end
   end
 
+  ### Throttle forgot password attempts ###
+
+  # 3 forgot password requests per IP per hour
+  throttle("forgot_password/ip", limit: 3, period: 1.hour) do |req|
+    if req.path == "/api/grid/forgot_password" && req.post?
+      req.ip
+    end
+  end
+
+  # 3 forgot password requests per email per hour
+  throttle("forgot_password/email", limit: 3, period: 1.hour) do |req|
+    if req.path == "/api/grid/forgot_password" && req.post?
+      json_params(req)["email"]&.downcase&.strip
+    end
+  end
+
   ### Throttle token verification ###
 
   # 10 token verifications per IP per minute
