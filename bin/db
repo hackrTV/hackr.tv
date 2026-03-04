@@ -20,13 +20,12 @@ if [ ! -f "$DB_PATH" ]; then
   exit 1
 fi
 
-# Check if litecli is installed
-if ! command -v litecli &> /dev/null; then
-  echo "Error: litecli is not installed"
-  echo "Install it with: pip install litecli"
-  exit 1
-fi
-
-# Connect to the database
+# Connect to the database using the best available client
 echo "Connecting to $ENV database at $DB_PATH"
-litecli --auto-vertical-output "$DB_PATH"
+if command -v usql &> /dev/null; then
+  usql "sqlite3://$DB_PATH"
+elif command -v litecli &> /dev/null; then
+  litecli --auto-vertical-output "$DB_PATH"
+else
+  sqlite3 "$DB_PATH"
+fi
