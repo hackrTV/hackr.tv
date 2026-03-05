@@ -40,11 +40,15 @@ Rails.application.routes.draw do
     get "confirm_email_change/:token", to: "pages#spa_root", as: :grid_confirm_email_change
   end
 
+  # Vault (promoted from /fm/pulse-vault)
+  get "vault", to: "pages#spa_root", as: :vault
+  get "fm/pulse-vault", to: redirect("/vault")
+  get "pulse-vault", to: redirect("/vault")
+
   # hackr.fm routes - SPA
   scope "fm" do
     get "/", to: "pages#spa_root", as: :fm
     get "radio", to: "pages#spa_root", as: :fm_radio
-    get "pulse-vault", to: "pages#spa_root", as: :fm_pulse_vault
     get "playlists", to: "pages#spa_root", as: :fm_playlists
     get "playlists/:id", to: "pages#spa_root", as: :fm_playlist
   end

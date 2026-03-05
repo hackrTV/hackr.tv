@@ -58,7 +58,7 @@ export const AppLayout: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         {/* Redirect /fm to /fm/radio */}
         <Route path="/fm" element={<Navigate to="/fm/radio" replace />} />
-        <Route path="/fm/pulse-vault" element={<PulseVaultPage />} />
+        <Route path="/vault" element={<PulseVaultPage />} />
         <Route path="/fm/radio" element={<RadioPage />} />
         <Route path="/f/net" element={<BandsPage />} />
         {/* Playlist routes - protected */}
