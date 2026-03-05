@@ -110,7 +110,7 @@ const BandProfileLayout: React.FC<BandProfileLayoutProps> = ({
                 </Link>
               )}
               <Link
-                to={`/fm/pulse-vault?filter=${encodeURIComponent(filterName)}`}
+                to={`/vault?filter=${encodeURIComponent(filterName)}`}
                 className="tui-button"
                 style={{ ...buttonStyle, textAlign: 'center' }}
               >

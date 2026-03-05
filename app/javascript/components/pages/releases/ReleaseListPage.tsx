@@ -228,7 +228,7 @@ const ReleaseListPage: React.FC = () => {
                 ALL TRACKZ →
               </Link>
               <Link
-                to="/fm/pulse-vault"
+                to="/vault"
                 style={{ padding: '10px 20px', background: colorScheme.primary, color: 'white', textDecoration: 'none', fontWeight: 'bold', boxShadow: `0 0 15px ${colorScheme.glow}` }}
               >
                 PULSE VAULT →

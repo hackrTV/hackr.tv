@@ -478,7 +478,7 @@ export const PlaylistDetailPage: React.FC = () => {
                 This playlist is empty. Add tracks from the Pulse Vault!
                 </p>
                 <Link
-                  to="/fm/pulse-vault"
+                  to="/vault"
                   className="tui-button"
                   style={{ background: '#7c3aed', color: '#fff', textDecoration: 'none' }}
                 >

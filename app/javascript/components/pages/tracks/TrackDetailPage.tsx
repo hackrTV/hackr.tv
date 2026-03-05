@@ -304,7 +304,7 @@ const TrackDetailPage: React.FC = () => {
                     {hasStreaming && (
                       <div style={{ padding: '10px 12px', display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid #333', marginTop: '8px' }}>
                         <Link
-                          to={`/fm/pulse-vault?filter=${encodeURIComponent(track.title)}`}
+                          to={`/vault?filter=${encodeURIComponent(track.title)}`}
                           style={{
                             padding: '6px 14px',
                             background: colorScheme.primary,
@@ -500,7 +500,7 @@ const TrackDetailPage: React.FC = () => {
                 </Link>
               )}
               <Link
-                to="/fm/pulse-vault"
+                to="/vault"
                 style={{
                   padding: '10px 20px',
                   background: colorScheme.primary,

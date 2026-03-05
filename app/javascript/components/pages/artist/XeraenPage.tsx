@@ -589,7 +589,7 @@ const XeraenPage: React.FC = () => {
                 RELEASES
               </Link>
               <Link
-                to="/fm/pulse-vault?filter=xeraen"
+                to="/vault?filter=xeraen"
                 className="tui-button"
                 style={{
                   background: colorScheme.primary,
