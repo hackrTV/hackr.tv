@@ -55,11 +55,25 @@ RSpec.describe PagesController, type: :request do
       end
     end
 
-    describe "GET /fm/pulse-vault" do
+    describe "GET /vault" do
       it "renders the SPA root" do
-        get "/fm/pulse-vault"
+        get "/vault"
         expect(response).to have_http_status(:success)
         expect(response.body).to include('<div id="root">')
+      end
+    end
+
+    describe "GET /fm/pulse-vault" do
+      it "redirects to /vault" do
+        get "/fm/pulse-vault"
+        expect(response).to redirect_to("/vault")
+      end
+    end
+
+    describe "GET /pulse-vault" do
+      it "redirects to /vault" do
+        get "/pulse-vault"
+        expect(response).to redirect_to("/vault")
       end
     end
 

@@ -324,7 +324,7 @@ const TrackListPage: React.FC = () => {
                         {/* Action Buttons */}
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                           <Link
-                            to={`/fm/pulse-vault?filter=${encodeURIComponent(track.title)}`}
+                            to={`/vault?filter=${encodeURIComponent(track.title)}`}
                             style={{
                               padding: '6px 12px',
                               background: colorScheme.primary,
@@ -393,7 +393,7 @@ const TrackListPage: React.FC = () => {
                 RELEASES →
               </Link>
               <Link
-                to="/fm/pulse-vault"
+                to="/vault"
                 style={{
                   padding: '10px 20px',
                   background: colorScheme.primary,

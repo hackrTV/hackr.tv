@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
@@ -8,6 +8,8 @@ import { useTerminal } from '~/contexts/TerminalContext'
 export const HeaderMenu: React.FC = () => {
   const { hackr, isLoggedIn, disconnect } = useGridAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isActive = (path: string) => path === '/' ? pathname === '/' : pathname.startsWith(path)
   const { isMobile } = useMobileDetect()
   const { mobileMenuOpen, setMobileMenuOpen } = useMobileMenu()
   const { openTerminal } = useTerminal()
@@ -125,7 +127,8 @@ export const HeaderMenu: React.FC = () => {
             text-decoration: none;
             border-left: 3px solid transparent;
           }
-          .mobile-menu-item:active {
+          .mobile-menu-item:active,
+          .mobile-menu-item.active {
             background: rgba(124, 58, 237, 0.2);
             border-left: 3px solid #7c3aed;
           }
@@ -161,7 +164,7 @@ export const HeaderMenu: React.FC = () => {
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MAIN</div>
-                <Link to="/" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/" className={`mobile-menu-item${isActive('/') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">0</span> / hackr.tv
                 </Link>
                 <button
@@ -178,43 +181,43 @@ export const HeaderMenu: React.FC = () => {
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">1. THE.CYBERPUL.SE</div>
-                <Link to="/thecyberpulse" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/thecyberpulse" className={`mobile-menu-item${isActive('/thecyberpulse') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>root
                 </Link>
-                <Link to="/thecyberpulse/releases" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/thecyberpulse/releases" className={`mobile-menu-item${isActive('/thecyberpulse') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>releases
                 </Link>
-                <Link to="/thecyberpulse/vidz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/thecyberpulse/vidz" className={`mobile-menu-item${isActive('/thecyberpulse') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>vidz
                 </Link>
               </div>
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">2. XERAEN</div>
-                <Link to="/xeraen" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/xeraen" className={`mobile-menu-item${isActive('/xeraen') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>root
                 </Link>
-                <Link to="/xeraen/releases" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/xeraen/releases" className={`mobile-menu-item${isActive('/xeraen') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>releases
                 </Link>
-                <Link to="/xeraen/vidz" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/xeraen/vidz" className={`mobile-menu-item${isActive('/xeraen') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>vidz
                 </Link>
               </div>
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">3. HACKR.FM</div>
-                <Link to="/fm/radio" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/fm/radio" className={`mobile-menu-item${isActive('/fm') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">3</span> hackr.fm
                 </Link>
-                <Link to="/f/net" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/f/net" className={`mobile-menu-item${isActive('/f/net') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">4</span> FNet
                 </Link>
               </div>
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">5. WIRE</div>
-                <Link to="/wire" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/wire" className={`mobile-menu-item${isActive('/wire') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>hotwire
                 </Link>
               </div>
@@ -222,7 +225,7 @@ export const HeaderMenu: React.FC = () => {
               {isLoggedIn && (
                 <div className="mobile-menu-section">
                   <div className="mobile-menu-section-title">6. UPLINK</div>
-                  <Link to="/uplink" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/uplink" className={`mobile-menu-item${isActive('/uplink') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                     <span className="purple-168-text">/</span>transmit
                   </Link>
                 </div>
@@ -230,42 +233,45 @@ export const HeaderMenu: React.FC = () => {
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MORE</div>
-                <Link to="/codex" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/codex" className={`mobile-menu-item${isActive('/codex') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Codex
                 </Link>
-                <Link to="/logs" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Logs
+                <Link to="/vault" className={`mobile-menu-item${isActive('/vault') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Vault
+                </Link>
+                <Link to="/logs" className={`mobile-menu-item${isActive('/logs') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Logs
                 </Link>
               </div>
 
               <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">{isLoggedIn ? '9' : '8'}. THE PULSE GRID</div>
-                <Link to="/grid" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                <div className="mobile-menu-section-title">{isLoggedIn ? '10' : '9'}. THE PULSE GRID</div>
+                <Link to="/grid" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>grid
                 </Link>
                 {!isLoggedIn && (
                   <>
-                    <Link to="/grid/login" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/grid/login" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>login
                     </Link>
-                    <Link to="/grid/register" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/grid/register" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>register
                     </Link>
                   </>
                 )}
                 {isLoggedIn && (
                   <>
-                    <Link to="/grid/identity" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/grid/identity" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>identity
                     </Link>
-                    <Link to="/fm/playlists" className="mobile-menu-item" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/fm/playlists" className={`mobile-menu-item${isActive('/fm') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>playlists
                     </Link>
                   </>
                 )}
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
-                    <span className="red-255-text">{isLoggedIn ? '10' : '9'}</span> /root <span className="red-255-text">[ADMIN]</span>
+                    <span className="red-255-text">{isLoggedIn ? '11' : '10'}</span> /root <span className="red-255-text">[ADMIN]</span>
                   </a>
                 )}
               </div>
@@ -346,16 +352,25 @@ export const HeaderMenu: React.FC = () => {
         .header-nav-item:hover {
           background-color: rgb(0, 168, 0);
         }
+        .header-nav-item.active {
+          background-color: rgba(124, 58, 237, 0.5);
+        }
+        .header-nav-item.active a {
+          color: black;
+        }
         .header-nav-item a {
           display: block;
           color: black;
           text-decoration: none;
         }
+        .header-dropdown.active {
+          background-color: rgba(124, 58, 237, 0.5);
+        }
       `}</style>
       <nav className="tui-nav" ref={menuRef}>
         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
           {/* 0: hackr.tv */}
-          <li className="header-dropdown" onClick={() => toggleDropdown('hackrtv')}>
+          <li className={`header-dropdown${isActive('/') ? ' active' : ''}`} onClick={() => toggleDropdown('hackrtv')}>
             <span className="purple-168-text">0</span>&nbsp;hackr.tv&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'hackrtv' ? 'open' : ''}`}>
               <ul>
@@ -374,7 +389,7 @@ export const HeaderMenu: React.FC = () => {
           </li>
 
           {/* 1: The.CyberPul.se */}
-          <li className="header-dropdown" onClick={() => toggleDropdown('cyberpulse')}>
+          <li className={`header-dropdown${isActive('/thecyberpulse') ? ' active' : ''}`} onClick={() => toggleDropdown('cyberpulse')}>
             <span className="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'cyberpulse' ? 'open' : ''}`}>
               <ul>
@@ -398,7 +413,7 @@ export const HeaderMenu: React.FC = () => {
           </li>
 
           {/* 2: XERAEN */}
-          <li className="header-dropdown" onClick={() => toggleDropdown('xeraen')}>
+          <li className={`header-dropdown${isActive('/xeraen') ? ' active' : ''}`} onClick={() => toggleDropdown('xeraen')}>
             <span className="purple-168-text">2</span>&nbsp;XERAEN&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'xeraen' ? 'open' : ''}`}>
               <ul>
@@ -422,21 +437,21 @@ export const HeaderMenu: React.FC = () => {
           </li>
 
           {/* 3: hackr.fm */}
-          <li className="header-nav-item">
+          <li className={`header-nav-item${isActive('/fm') ? ' active' : ''}`}>
             <Link to="/fm/radio">
               <span className="purple-168-text">3</span> hackr.fm&nbsp;
             </Link>
           </li>
 
           {/* 4: FNet */}
-          <li className="header-nav-item">
+          <li className={`header-nav-item${isActive('/f/net') ? ' active' : ''}`}>
             <Link to="/f/net">
               <span className="purple-168-text">4</span> FNet&nbsp;
             </Link>
           </li>
 
           {/* WIRE */}
-          <li className="header-nav-item">
+          <li className={`header-nav-item${isActive('/wire') ? ' active' : ''}`}>
             <Link to="/wire">
               <span className="purple-168-text">5</span> WIRE&nbsp;
             </Link>
@@ -444,7 +459,7 @@ export const HeaderMenu: React.FC = () => {
 
           {/* Uplink (logged in only) */}
           {isLoggedIn && (
-            <li className="header-nav-item">
+            <li className={`header-nav-item${isActive('/uplink') ? ' active' : ''}`}>
               <Link to="/uplink">
                 <span className="purple-168-text">6</span> Uplink&nbsp;
               </Link>
@@ -452,22 +467,29 @@ export const HeaderMenu: React.FC = () => {
           )}
 
           {/* Codex */}
-          <li className="header-nav-item">
+          <li className={`header-nav-item${isActive('/codex') ? ' active' : ''}`}>
             <Link to="/codex">
               <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Codex&nbsp;
             </Link>
           </li>
 
+          {/* Vault */}
+          <li className={`header-nav-item${isActive('/vault') ? ' active' : ''}`}>
+            <Link to="/vault">
+              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Vault&nbsp;
+            </Link>
+          </li>
+
           {/* Logs */}
-          <li className="header-nav-item">
+          <li className={`header-nav-item${isActive('/logs') ? ' active' : ''}`}>
             <Link to="/logs">
-              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Logs&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Logs&nbsp;
             </Link>
           </li>
 
           {/* THE PULSE GRID */}
-          <li className="header-dropdown" onClick={() => toggleDropdown('grid')}>
-            <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;THE PULSE GRID&nbsp;
+          <li className={`header-dropdown${isActive('/grid') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
+            <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'grid' ? 'open' : ''}`}>
               <ul>
                 <li>
@@ -511,7 +533,7 @@ export const HeaderMenu: React.FC = () => {
           {hackr?.role === 'admin' && (
             <li className="header-nav-item">
               <a href="/root">
-                <span className="red-255-text">{isLoggedIn ? '10' : '9'}</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">{isLoggedIn ? '11' : '10'}</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

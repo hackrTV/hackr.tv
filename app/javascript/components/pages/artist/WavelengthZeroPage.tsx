@@ -113,7 +113,7 @@ const WavelengthZeroPage: React.FC = () => {
                 RELEASES
               </Link>
               <Link
-                to="/fm/pulse-vault?filter=wavelength%20zero"
+                to="/vault?filter=wavelength%20zero"
                 className="tui-button"
                 style={{ background: 'linear-gradient(90deg, #ff0080, #8b00ff)', color: 'white', fontWeight: 'bold', border: 'none' }}
               >
