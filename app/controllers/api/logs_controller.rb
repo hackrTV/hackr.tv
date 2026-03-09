@@ -5,12 +5,7 @@ class Api::LogsController < ApplicationController
 
     logs = HackrLog.published.for_timeline(timeline).includes(:grid_hackr)
 
-    # Sort order: 2020s oldest-first (chronological discovery), everything else newest-first
-    logs = if timeline == "2020s"
-      logs.order(published_at: :asc, created_at: :asc)
-    else
-      logs.ordered
-    end
+    logs = logs.ordered
 
     # Pagination
     page = [params[:page].to_i, 1].max
