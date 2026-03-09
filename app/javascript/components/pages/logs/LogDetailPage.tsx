@@ -16,6 +16,7 @@ interface HackrLog {
   title: string
   slug: string
   body: string
+  timeline: string
   published_at: string
   created_at: string
   author: {
@@ -106,7 +107,7 @@ export const LogDetailPage: React.FC = () => {
 
         {/* Navigation */}
         <div style={{ paddingTop: '20px', borderTop: '1px solid #4b5563' }}>
-          <Link to="/logs" style={{ color: '#818cf8', textDecoration: 'none', padding: '8px 16px', display: 'inline-block' }}>
+          <Link to={`/logs?timeline=${log.timeline}`} style={{ color: '#818cf8', textDecoration: 'none', padding: '8px 16px', display: 'inline-block' }}>
             ← Back to All Logs
           </Link>
         </div>

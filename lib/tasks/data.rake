@@ -833,6 +833,7 @@ namespace :data do
         grid_hackr: grid_hackr,
         title: attrs["title"],
         body: attrs["body"],
+        timeline: attrs["timeline"] || "2120s",
         published: true,
         published_at: published_at
       )

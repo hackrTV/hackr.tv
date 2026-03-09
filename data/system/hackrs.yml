@@ -43,3 +43,67 @@ hackrs:
     starting_room: hackr-tv-broadcast-station
     env_password_key: RELAY_PASSWORD
     default_password: relaystream
+
+  # Expansion characters — hackr log authors
+  - hackr_alias: Vex
+    email: vex@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: VEX_PASSWORD
+    default_password: infiltrate
+
+  - hackr_alias: Koda
+    email: koda@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: KODA_PASSWORD
+    default_password: glitchpaint
+
+  - hackr_alias: Cascade
+    email: cascade@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: CASCADE_PASSWORD
+    default_password: synesthete
+
+  - hackr_alias: Sora Nexa
+    email: sora@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: SORA_PASSWORD
+    default_password: neonheart
+
+  - hackr_alias: The Archivist
+    email: archivist@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: ARCHIVIST_PASSWORD
+    default_password: preserve
+
+  - hackr_alias: Mel Reeves
+    email: mel@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: MEL_PASSWORD
+    default_password: quantumnoise
+
+  - hackr_alias: Ashlinn
+    email: ashlinn@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: ASHLINN_PASSWORD
+    default_password: resonance
+
+  - hackr_alias: Krell
+    email: krell@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: KRELL_PASSWORD
+    default_password: stability
+
+  - hackr_alias: Volkov
+    email: volkov@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: VOLKOV_PASSWORD
+    default_password: nightshade

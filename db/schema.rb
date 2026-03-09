@@ -251,10 +251,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.boolean "published", default: false, null: false
     t.datetime "published_at"
     t.string "slug", null: false
+    t.string "timeline", default: "2120s", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id"], name: "index_hackr_logs_on_grid_hackr_id"
     t.index ["slug"], name: "index_hackr_logs_on_slug", unique: true
+    t.index ["timeline"], name: "index_hackr_logs_on_timeline"
   end
 
   create_table "hackr_streams", force: :cascade do |t|

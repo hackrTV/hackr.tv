@@ -12,7 +12,8 @@ const ENTRY_TYPE_COLORS: Record<string, string> = {
   location: '#34d399',    // green
   technology: '#fbbf24',  // yellow
   faction: '#f87171',     // red
-  item: '#a3e635'         // lime
+  item: '#a3e635',         // lime
+  concept: '#22d3ee'       // cyan
 }
 
 const ENTRY_TYPE_ICONS: Record<string, string> = {
@@ -22,7 +23,8 @@ const ENTRY_TYPE_ICONS: Record<string, string> = {
   location: '📍',
   technology: '⚙️',
   faction: '⚔️',
-  item: '📦'
+  item: '📦',
+  concept: '💡'
 }
 
 export const CodexIndexPage: React.FC = () => {
@@ -91,7 +93,7 @@ export const CodexIndexPage: React.FC = () => {
     <DefaultLayout showAsciiArt={false}>
       <div style={{ maxWidth: '1200px', margin: '30px auto' }}>
         {/* Header */}
-        <div className="tui-window cyan-168 white-text">
+        <div className="tui-window cyan-168 white-text" style={{ display: 'block' }}>
           <fieldset className="cyan-168-border">
             <legend className="center">THE CODEX :: Knowledge Archive</legend>
             <div style={{ padding: '20px', background: '#1a1a1a' }}>
@@ -103,9 +105,33 @@ export const CodexIndexPage: React.FC = () => {
         </div>
 
         {/* Filter Controls */}
-        <div style={{ margin: '20px 0', display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <div style={{ margin: '20px 0', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          {/* Search */}
+          <div>
+            <label htmlFor="codex-search" style={{ display: 'block', marginBottom: '8px', color: '#888', fontSize: '0.9em' }}>
+              SEARCH:
+            </label>
+            <input
+              id="codex-search"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name or summary..."
+              className="tui-input"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                background: '#0a0a0a',
+                border: '1px solid #444',
+                color: '#ccc',
+                fontFamily: 'monospace',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
           {/* Type Filter */}
-          <div style={{ flex: '0 0 auto' }}>
+          <div>
             <label style={{ display: 'block', marginBottom: '8px', color: '#888', fontSize: '0.9em' }}>
               FILTER BY TYPE:
             </label>
@@ -128,29 +154,6 @@ export const CodexIndexPage: React.FC = () => {
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Search */}
-          <div style={{ flex: '1 1 300px' }}>
-            <label htmlFor="codex-search" style={{ display: 'block', marginBottom: '8px', color: '#888', fontSize: '0.9em' }}>
-              SEARCH:
-            </label>
-            <input
-              id="codex-search"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name or summary..."
-              className="tui-input"
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                background: '#0a0a0a',
-                border: '1px solid #444',
-                color: '#ccc',
-                fontFamily: 'monospace'
-              }}
-            />
           </div>
         </div>
 

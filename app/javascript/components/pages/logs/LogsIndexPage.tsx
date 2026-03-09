@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
+import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { formatFutureDate } from '~/utils/dateUtils'
 import { apiJson } from '~/utils/apiClient'
 
@@ -10,6 +11,7 @@ interface HackrLog {
   title: string
   slug: string
   body: string
+  timeline: string
   published_at: string
   created_at: string
   author: {
@@ -19,10 +21,23 @@ interface HackrLog {
 }
 
 interface PaginationMeta {
+  timelines: Record<string, number>
+  timeline: string
   total: number
   page: number
   per_page: number
   total_pages: number
+}
+
+const TIMELINE_CONFIG: Record<string, { label: string; subtitle: string }> = {
+  '2120s': {
+    label: '2120s — THE FRACTURE NETWORK',
+    subtitle: 'Transmissions from the Fracture Network',
+  },
+  '2020s': {
+    label: '2020s — THE LISTENERS',
+    subtitle: 'Signals received in the present day',
+  },
 }
 
 const truncateMarkdown = (markdown: string, maxLength: number = 300): string => {
@@ -43,30 +58,40 @@ export const LogsIndexPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [logs, setLogs] = useState<HackrLog[]>([])
   const [meta, setMeta] = useState<PaginationMeta | null>(null)
-  const [fetchedPage, setFetchedPage] = useState<number | null>(null)
+  const [fetchedKey, setFetchedKey] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const { isDesktop } = useMobileDetect()
+  const currentTimeline = searchParams.get('timeline') || '2120s'
   const currentPage = parseInt(searchParams.get('page') || '1', 10)
-  const loading = fetchedPage !== currentPage
+  const requestKey = `${currentTimeline}:${currentPage}`
+  const loading = fetchedKey !== requestKey
 
   useEffect(() => {
-    apiJson<{ logs: HackrLog[]; meta: PaginationMeta }>(`/api/logs?page=${currentPage}`)
+    apiJson<{ logs: HackrLog[]; meta: PaginationMeta }>(`/api/logs?timeline=${currentTimeline}&page=${currentPage}`)
       .then(data => {
         setLogs(data.logs)
         setMeta(data.meta)
-        setFetchedPage(currentPage)
+        setFetchedKey(requestKey)
       })
       .catch(err => {
         console.error('Failed to load logs:', err)
         setError('Failed to load logs')
-        setFetchedPage(currentPage)
+        setFetchedKey(requestKey)
       })
-  }, [currentPage])
+  }, [currentTimeline, currentPage])
 
-  const goToPage = (page: number) => {
-    setSearchParams({ page: page.toString() })
+  const switchTimeline = (timeline: string) => {
+    setSearchParams({ timeline, page: '1' })
     window.scrollTo(0, 0)
   }
+
+  const goToPage = (page: number) => {
+    setSearchParams({ timeline: currentTimeline, page: page.toString() })
+    window.scrollTo(0, 0)
+  }
+
+  const config = TIMELINE_CONFIG[currentTimeline] || TIMELINE_CONFIG['2120s']
 
   if (loading) {
     return (
@@ -88,12 +113,107 @@ export const LogsIndexPage: React.FC = () => {
     )
   }
 
+  // Build sorted timeline keys for tabs (ensure consistent order)
+  const timelineKeys = meta?.timelines ? Object.keys(meta.timelines).sort().reverse() : [currentTimeline]
+
   return (
     <DefaultLayout showAsciiArt={false}>
-      <div style={{ maxWidth: '900px', margin: '30px auto', background: '#1a1a1a', color: '#d0d0d0', padding: '20px', border: '1px solid #333' }}>
-        <div style={{ marginBottom: '30px', paddingBottom: '15px', borderBottom: '1px solid #4b5563' }}>
+      <div style={{ maxWidth: '900px', margin: '30px auto', position: 'relative' }}>
+        {/* Timeline Tabs — desktop: side tabs outside left edge */}
+        {isDesktop && (
+          <div style={{
+            position: 'absolute',
+            right: '100%',
+            top: '0',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            marginRight: '-1px',
+          }}>
+            {timelineKeys.map(tl => {
+              const tlConfig = TIMELINE_CONFIG[tl]
+              const count = meta?.timelines?.[tl] ?? 0
+              const isActive = tl === currentTimeline
+              return (
+                <button
+                  key={tl}
+                  onClick={() => switchTimeline(tl)}
+                  style={isActive ? {
+                    padding: '10px 14px',
+                    backgroundColor: '#1a1a1a',
+                    color: '#22d3ee',
+                    fontWeight: 'bold',
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                    border: '1px solid #333',
+                    borderRight: '1px solid #1a1a1a',
+                    cursor: 'pointer',
+                    textAlign: 'right',
+                    whiteSpace: 'nowrap',
+                  } : {
+                    padding: '10px 14px',
+                    backgroundColor: '#111',
+                    color: '#555',
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                    border: '1px solid #2a2a2a',
+                    borderRight: '1px solid #333',
+                    cursor: 'pointer',
+                    textAlign: 'right',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span style={{ fontSize: '1em' }}>{tl}</span>
+                  <br />
+                  <span style={{ fontSize: '0.75em' }}>
+                    {tlConfig ? `${tlConfig.label.split(' — ')[1]} (${count})` : `(${count})`}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Main Content Container */}
+        <div style={{ background: '#1a1a1a', color: '#d0d0d0', padding: '20px', border: '1px solid #333' }}>
+        <div style={{ marginBottom: '15px' }}>
           <h1 style={{ margin: 0, fontSize: '1.4em', color: '#a78bfa' }}>HACKR LOGS</h1>
-          <p style={{ margin: '5px 0 0 0', fontSize: '0.9em', color: '#888' }}>Transmissions from the Fracture Network</p>
+        </div>
+
+        {/* Timeline Tabs — mobile/tablet: inline tabs below header */}
+        {!isDesktop && (
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px' }}>
+            {timelineKeys.map(tl => {
+              const tlConfig = TIMELINE_CONFIG[tl]
+              const count = meta?.timelines?.[tl] ?? 0
+              const isActive = tl === currentTimeline
+              return (
+                <button
+                  key={tl}
+                  onClick={() => switchTimeline(tl)}
+                  className="tui-button"
+                  style={isActive ? {
+                    padding: '6px 14px',
+                    backgroundColor: 'rgb(0, 168, 168)',
+                    color: '#000',
+                    fontWeight: 'bold',
+                    boxShadow: 'none',
+                  } : {
+                    padding: '6px 14px',
+                    backgroundColor: '#252525',
+                    color: '#666',
+                    boxShadow: 'none',
+                  }}
+                >
+                  {tl} — {tlConfig ? `${tlConfig.label.split(' — ')[1]} (${count})` : `(${count})`}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        <div style={{ marginBottom: '30px', paddingBottom: '15px', borderBottom: '1px solid #4b5563' }}>
+          <p style={{ margin: 0, fontSize: '0.9em', color: '#888' }}>{config.subtitle}</p>
         </div>
 
         {logs.length > 0 ? (
@@ -178,6 +298,7 @@ export const LogsIndexPage: React.FC = () => {
             </p>
           </div>
         )}
+        </div>{/* end Main Content Container */}
       </div>
     </DefaultLayout>
   )
