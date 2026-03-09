@@ -256,9 +256,8 @@ Line 2 with [[XERAEN]]`
     })
 
     it('returns band profile route for entries with fallbacks', () => {
-      expect(getRouteForSlug('voiceprint')).toBe('/voiceprint')
-      expect(getRouteForSlug('cipher-protocol')).toBe('/cipher-protocol')
-      expect(getRouteForSlug('wavelength-zero')).toBe('/wavelength-zero')
+      expect(getRouteForSlug('apex-overdrive')).toBe('/apex-overdrive')
+      expect(getRouteForSlug('blitzbeam')).toBe('/blitzbeam')
     })
 
     it('returns undefined for non-fallback slugs', () => {
@@ -267,39 +266,38 @@ Line 2 with [[XERAEN]]`
     })
 
     it('returns display name for fallback slugs', () => {
-      expect(getFallbackDisplayName('voiceprint')).toBe('Voiceprint')
-      expect(getFallbackDisplayName('cipher-protocol')).toBe('Cipher Protocol')
+      expect(getFallbackDisplayName('apex-overdrive')).toBe('Apex Overdrive')
       expect(getFallbackDisplayName('blitzbeam')).toBe('BlitzBeam+')
     })
 
     it('transformMarkdownLinks uses fallback routes', () => {
-      const result = transformMarkdownLinks('See [[Voiceprint]] for details')
-      expect(result).toBe('See [Voiceprint](/voiceprint) for details')
+      const result = transformMarkdownLinks('See [[Apex Overdrive]] for details')
+      expect(result).toBe('See [Apex Overdrive](/apex-overdrive) for details')
     })
 
     it('transformMarkdownLinks uses fallback display names', () => {
-      const result = transformMarkdownLinks('See [[voiceprint]] for details')
-      expect(result).toBe('See [Voiceprint](/voiceprint) for details')
+      const result = transformMarkdownLinks('See [[apex-overdrive]] for details')
+      expect(result).toBe('See [Apex Overdrive](/apex-overdrive) for details')
     })
 
     it('transformHtmlLinks uses fallback routes', () => {
-      const result = transformHtmlLinks('See [[Voiceprint]] for details')
-      expect(result).toBe('See <a href="/voiceprint">Voiceprint</a> for details')
+      const result = transformHtmlLinks('See [[Apex Overdrive]] for details')
+      expect(result).toBe('See <a href="/apex-overdrive">Apex Overdrive</a> for details')
     })
 
     it('transformHtmlLinks uses fallback display names', () => {
-      const result = transformHtmlLinks('See [[voiceprint]]', undefined, 'codex-link')
-      expect(result).toBe('See <a href="/voiceprint" class="codex-link">Voiceprint</a>')
+      const result = transformHtmlLinks('See [[apex-overdrive]]', undefined, 'codex-link')
+      expect(result).toBe('See <a href="/apex-overdrive" class="codex-link">Apex Overdrive</a>')
     })
 
     it('custom text overrides fallback display names', () => {
-      const result = transformMarkdownLinks('See [[Voiceprint|the archivists]]')
-      expect(result).toBe('See [the archivists](/voiceprint)')
+      const result = transformMarkdownLinks('See [[Apex Overdrive|the band]]')
+      expect(result).toBe('See [the band](/apex-overdrive)')
     })
 
     it('mixes codex entries and fallback entries', () => {
-      const result = transformMarkdownLinks('[[XERAEN]] and [[Voiceprint]] work together')
-      expect(result).toBe('[XERAEN](/codex/xeraen) and [Voiceprint](/voiceprint) work together')
+      const result = transformMarkdownLinks('[[XERAEN]] and [[Apex Overdrive]] work together')
+      expect(result).toBe('[XERAEN](/codex/xeraen) and [Apex Overdrive](/apex-overdrive) work together')
     })
   })
 

@@ -64,11 +64,12 @@ export const LogsIndexPage: React.FC = () => {
   const { isDesktop } = useMobileDetect()
   const currentTimeline = searchParams.get('timeline') || '2120s'
   const currentPage = parseInt(searchParams.get('page') || '1', 10)
-  const requestKey = `${currentTimeline}:${currentPage}`
+  const currentSort = searchParams.get('sort') === 'asc' ? 'asc' : 'desc'
+  const requestKey = `${currentTimeline}:${currentPage}:${currentSort}`
   const loading = fetchedKey !== requestKey
 
   useEffect(() => {
-    apiJson<{ logs: HackrLog[]; meta: PaginationMeta }>(`/api/logs?timeline=${currentTimeline}&page=${currentPage}`)
+    apiJson<{ logs: HackrLog[]; meta: PaginationMeta }>(`/api/logs?timeline=${currentTimeline}&page=${currentPage}&sort=${currentSort}`)
       .then(data => {
         setLogs(data.logs)
         setMeta(data.meta)
@@ -79,15 +80,21 @@ export const LogsIndexPage: React.FC = () => {
         setError('Failed to load logs')
         setFetchedKey(requestKey)
       })
-  }, [currentTimeline, currentPage])
+  }, [currentTimeline, currentPage, currentSort])
 
   const switchTimeline = (timeline: string) => {
-    setSearchParams({ timeline, page: '1' })
+    setSearchParams({ timeline, page: '1', sort: currentSort })
+    window.scrollTo(0, 0)
+  }
+
+  const toggleSort = () => {
+    const newSort = currentSort === 'desc' ? 'asc' : 'desc'
+    setSearchParams({ timeline: currentTimeline, page: '1', sort: newSort })
     window.scrollTo(0, 0)
   }
 
   const goToPage = (page: number) => {
-    setSearchParams({ timeline: currentTimeline, page: page.toString() })
+    setSearchParams({ timeline: currentTimeline, page: page.toString(), sort: currentSort })
     window.scrollTo(0, 0)
   }
 
@@ -212,8 +219,23 @@ export const LogsIndexPage: React.FC = () => {
             </div>
           )}
 
-          <div style={{ marginBottom: '30px', paddingBottom: '15px', borderBottom: '1px solid #4b5563' }}>
+          <div style={{ marginBottom: '30px', paddingBottom: '15px', borderBottom: '1px solid #4b5563', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <p style={{ margin: 0, fontSize: '0.9em', color: '#888' }}>{config.subtitle}</p>
+            <button
+              onClick={toggleSort}
+              style={{
+                background: 'none',
+                border: '1px solid #333',
+                color: '#666',
+                padding: '4px 10px',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontSize: '0.8em',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {currentSort === 'desc' ? 'Newest first ↓' : 'Oldest first ↑'}
+            </button>
           </div>
 
           {logs.length > 0 ? (

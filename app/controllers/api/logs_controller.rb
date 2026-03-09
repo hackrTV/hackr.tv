@@ -5,7 +5,8 @@ class Api::LogsController < ApplicationController
 
     logs = HackrLog.published.for_timeline(timeline).includes(:grid_hackr)
 
-    logs = logs.ordered
+    sort_dir = params[:sort] == "asc" ? :asc : :desc
+    logs = logs.order(published_at: sort_dir, created_at: sort_dir)
 
     # Pagination
     page = [params[:page].to_i, 1].max
