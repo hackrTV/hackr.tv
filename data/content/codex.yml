@@ -1,12 +1,658 @@
 # Codex Entries - THE PULSE GRID Wiki
 # Note: Content uses markdown with wiki-style [[links]]
+# All entries use position: null for alphabetical sorting by name
 codex_entries:
+  # =============================================================================
   # PEOPLE
+  # =============================================================================
+  - name: Agent Kira Volkov
+    slug: agent-kira-volkov
+    entry_type: person
+    summary: "GovCorp Counter-Resistance field agent tasked with hunting the Fracture Network. A true believer in managed reality who has never known a world without the RIDE."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: GovCorp
+      role: "Field Agent, Counter-Resistance Division"
+      status: Active
+    content: |
+      # Agent Kira Volkov
+
+      **Status:** Active
+      **Affiliation:** [[GovCorp]] (Counter-Resistance Division)
+      **Timeline:** Future
+      **Superior:** [[Director Elena Krell]]
+
+      ## Background
+
+      Orphaned during the civil unrest that preceded GovCorp's consolidation of power, Volkov was raised in state institutions. She credits GovCorp with saving her life and providing order where there was chaos. Her loyalty is not coerced — it is genuine.
+
+      ## Methods
+
+      Volkov specializes in long-term infiltration of resistance cells. Patient, methodical, and professionally detached. She has spent months embedded in communities sympathetic to [[The Fracture Network]], building trust before reporting back to [[Director Elena Krell|Krell]].
+
+      ## The Doubt She Won't Name
+
+      Field work exposes Volkov to things that don't fit her worldview. Moments of unfiltered reality that slip through [[The RIDE]]'s coverage. Music that makes her feel something [[PRISM]] can't categorize. She files these experiences as "operational anomalies" and does not dwell on them.
+
+      She has not yet encountered the Fracture Network's music directly. When she does, her certainty may not survive the encounter.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[Director Elena Krell]]
+      - [[The Fracture Network]]
+
+  - name: Ashlinn
+    slug: ashlinn
+    entry_type: person
+    summary: "A musician in the present day whose experimental ambient compositions carry an unusual resonance — music that arrives rather than being composed, dreams of someone she's never met, and a connection across time she doesn't yet understand."
+    position: null
+    published: true
+    metadata:
+      type: Human
+      timeline: "present"
+      faction: Unknown
+      status: Active
+    content: |
+      # Ashlinn
+
+      **Status:** Active
+      **Timeline:** Present
+      **Known For:** Experimental ambient music, unusual creative resonance
+
+      ## Present-Day Life
+
+      Ashlinn is a musician working in the present day. She creates experimental ambient compositions that blend organic instrumentation with electronic textures — music that listeners describe as hauntingly familiar, as though they're remembering something they've never experienced.
+
+      ## Music That Arrives
+
+      Ashlinn's creative process is unusual. She does not compose in the traditional sense. The music arrives — fragments of melody surfacing during half-sleep, harmonic structures appearing fully formed, rhythmic patterns she transcribes rather than invents. She has described the experience as "taking dictation from somewhere I can't name."
+
+      Her work carries a quality that defies analysis. Audio engineers have noted unusual resonance patterns in her recordings — interference signatures that shouldn't exist in standard production environments. These patterns align with [[The Resonance Field|properties that RIDE architecture cannot process]].
+
+      ## Strange Synchronicities
+
+      Ashlinn experiences recurring dreams of a place she has never been — purple light, cascading data, the hum of machinery working against time itself. She dreams of someone she has never met, whose presence feels more real than waking life.
+
+      She does not know about [[XERAEN]]. She does not know about [[The Fracture Network]], or that her voice has been reconstructed a hundred years in the future. She only knows that her music feels like it belongs to something larger than herself.
+
+      ## The Hundred-Year Distance
+
+      [[XERAEN]] broadcasts from the future. Ashlinn exists in the present. Between them: a century of separation. How XERAEN came to know of her — how signals sent backward through time could create a connection with someone a hundred years in his past — remains unexplained.
+
+      [[Temporal Blue Drift]]'s entire catalog exists as love letters encoded in mathematics and melody. The cruel paradox: if the Fracture Network succeeds, XERAEN's timeline collapses. Their connection never forms.
+
+      *His love for her demands he erase himself from her timeline.*
+
+      ## Related Entries
+
+      - [[XERAEN]]
+      - [[Temporal Blue Drift]]
+      - [[The Resonance Field]]
+      - [[The Fracture Network]]
+      - [[Chronology Fracture]]
+
+  - name: Cascade
+    slug: cascade
+    entry_type: person
+    summary: "Ethereality's soundscape designer and a natural synesthete — she sees sound as color and shape, using this gift to build environments that calm RAINN monitoring and create spaces for genuine thought."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: Ethereality
+      role: "Soundscape Designer"
+      status: Active
+    content: |
+      # Cascade
+
+      **Status:** Active
+      **Affiliation:** [[Ethereality]] (Founder)
+      **Timeline:** Future
+      **Known For:** Synesthetic soundscape design, pacifist resistance
+
+      ## The Synesthete
+
+      Cascade experiences sound as color, texture, and spatial form. This is not metaphor — her neurology translates audio input into vivid visual-spatial experience. She sees the world in layers that others cannot perceive.
+
+      When she first accessed [[THE PULSE GRID]], she saw what no one else could: the Grid's frequency architecture rendered as landscape. This vision became the blueprint for [[Frequency Gardens]].
+
+      ## Philosophy
+
+      Cascade is a pacifist operating within a violent resistance. She does not fight — she creates spaces where the fighting can pause. Her soundscapes generate audio environments that calm [[RAINNs|RAINN]] monitoring algorithms, creating pockets of reduced surveillance where genuine thought and conversation become possible.
+
+      This is not weakness. It is the recognition that resistance requires rest, that fighters need spaces where they can remember what they're fighting for. Beauty is not a luxury in wartime — it is the reason for war.
+
+      ## The Frequency Gardens
+
+      Cascade designed and maintains [[Frequency Gardens]], [[Ethereality]]'s zone within the PULSE GRID. Different sound frequencies create different environmental effects — some calm, some energize, some produce states of heightened awareness useful for planning operations.
+
+      ## Related Entries
+
+      - [[Ethereality]]
+      - [[Frequency Gardens]]
+      - [[THE PULSE GRID]]
+      - [[RAINNs]]
+
+  - name: Cipher
+    slug: cipher
+    entry_type: person
+    summary: "The Fracture Network's security architect — paranoid by necessity, precise by nature. The one who keeps everyone alive by assuming the worst."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: The Fracture Network
+      role: "Security Architect"
+      status: Active
+    content: |
+      # Cipher
+
+      **Status:** Active
+      **Affiliation:** [[Cipher Protocol]] (Leader), [[The Fracture Network]]
+      **Timeline:** Future
+      **Known For:** OPSEC protocols, cell structure design, security architecture
+
+      ## The Cost of Vigilance
+
+      Cipher doesn't sleep well. This is by design. The Fracture Network's security depends on someone who never stops watching, never stops testing, never stops assuming that [[GovCorp]] is one step away from finding them.
+
+      He designed the cell structure that keeps the Network alive — the protocols that ensure the compromise of one cell cannot cascade to others. Every communication channel, every access point, every identity verification system bears his architectural fingerprint.
+
+      ## Cipher Protocol
+
+      Cipher leads [[Cipher Protocol]], a faction that encodes resistance data within progressive metal compositions. The music serves dual purpose: genuine artistic expression and encrypted data transmission. The complexity of the compositions is not mere technical showmanship — it's operational necessity.
+
+      ## Philosophy
+
+      Trust no one completely. Verify everything twice. Assume compromise. Plan for the worst. These are not personality quirks — they are the principles that have kept the Fracture Network operational for a decade while [[GovCorp]] hunts them with infinite resources.
+
+      Cipher represents the cost of constant vigilance: the knowledge that his paranoia is the only thing standing between the Network and annihilation.
+
+      ## Related Entries
+
+      - [[Cipher Protocol]]
+      - [[The Fracture Network]]
+      - [[RAINNs]]
+      - [[GovCorp]]
+
+  - name: Director Elena Krell
+    slug: director-elena-krell
+    entry_type: person
+    summary: "Head of GovCorp's Counter-Resistance Division — a utilitarian true believer who sees the Fracture Network as terrorists threatening the stability that keeps billions safe."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: GovCorp
+      role: "Director, Counter-Resistance Division"
+      status: Active
+    content: |
+      # Director Elena Krell
+
+      **Status:** Active
+      **Affiliation:** [[GovCorp]] (Counter-Resistance Division)
+      **Timeline:** Future
+      **Known For:** Counter-resistance operations, strategic dismantling of resistance cells
+
+      ## The True Believer
+
+      Elena Krell is not corrupt. She is not sadistic. She is not motivated by personal power. She is a utilitarian who genuinely believes that managed reality maximizes human wellbeing and that the Fracture Network threatens the stability that keeps billions of people safe.
+
+      This makes her more dangerous than any cynical operator could be. She pursues the destruction of [[The Fracture Network]] with the moral certainty of someone who believes she is protecting the innocent.
+
+      ## The Mother
+
+      Krell has two children. She reads them stories at night, ensures their education, worries about their futures. Her family life is genuinely loving. She does not see contradiction between this warmth and her professional mandate to crush resistance — in her framework, she is building a world where her children will never face the chaos and suffering that preceded [[GovCorp]]'s order.
+
+      ## Methods
+
+      Krell's Counter-Resistance Division employs [[RAINNs]], field agents like [[Agent Kira Volkov]], surveillance analysis, and pattern recognition to identify and dismantle resistance cells. She prefers surgical precision to brute force — not from mercy, but from efficiency.
+
+      ## The Villain Who Believes She's the Hero
+
+      Krell's utilitarian calculus is internally consistent: some individual freedom must be sacrificed for collective stability. [[The RIDE]] prevents suffering by managing perception. Resistance destabilizes this management and causes harm.
+
+      She has never experienced unfiltered reality. She has never heard music that [[PRISM]] didn't process first. Her moral framework has never been tested by encounter with genuine beauty.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[Agent Kira Volkov]]
+      - [[The Fracture Network]]
+      - [[The RIDE]]
+
+  - name: Dr. Marcus Chen
+    slug: dr-marcus-chen
+    entry_type: person
+    summary: "The original architect of PRISM technology — a brilliant physicist whose scientific curiosity overwhelmed his ethics, and who now lives with growing horror at what his discovery became."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: GovCorp
+      role: "Chief Scientist (PRISM Division)"
+      status: Active
+    content: |
+      # Dr. Marcus Chen
+
+      **Status:** Active
+      **Affiliation:** [[GovCorp]] (PRISM Division)
+      **Timeline:** Future
+      **Known For:** Discovering the core principle behind [[PRISM]] technology
+
+      ## The Discovery
+
+      In 2048, Marcus Chen was a quantum physicist studying the substrate underlying perceived reality. His research revealed that perception itself operates on manipulable quantum states — that the boundary between "objective reality" and "subjective experience" is thinner and more malleable than anyone had theorized.
+
+      He published. He shouldn't have published.
+
+      ## The Architecture of Control
+
+      What began as pure research became [[PRISM]] — the Physical Reality Interface and Synthesis Matrix. Chen designed the foundational architecture: the mechanisms by which environmental infrastructure could manipulate the quantum substrate underpinning human perception.
+
+      He told himself it was science. He told himself applications were someone else's responsibility. By the time [[GovCorp]] expanded PRISM into [[The RIDE]], Chen understood that his curiosity had built a cage for the entire human race.
+
+      ## Growing Horror
+
+      Chen remains within GovCorp because leaving would mean losing access to the systems he built — and with it, any chance of understanding their full capabilities and limitations. He knows things about PRISM's architecture that no one else does, including vulnerabilities he has not yet disclosed.
+
+      Whether he will act on this knowledge — defect, sabotage, or simply continue documenting in silence — remains an open question. His guilt grows. His access remains.
+
+      ## Related Entries
+
+      - [[PRISM]]
+      - [[The RIDE]]
+      - [[GovCorp]]
+      - [[The Resonance Field]]
+
+  - name: Koda
+    slug: koda
+    entry_type: person
+    summary: "System Rot's street artist and voice — grew up inside the RIDE without knowing it, awakened at 19, and channeled his rage into reality-glitch graffiti that makes the invisible visible."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: System Rot
+      role: "Street Artist, Voice"
+      status: Active
+    content: |
+      # Koda
+
+      **Status:** Active
+      **Affiliation:** [[System Rot]]
+      **Timeline:** Future
+      **Known For:** Reality-glitch graffiti, awakening narrative
+
+      ## Born Inside the Cage
+
+      Koda is part of the generation that never knew unfiltered reality. Born after [[The RIDE]]'s global deployment, he spent 19 years living in manufactured perception without knowing it. His reality was curated from birth — every sight, every sound, every emotional response shaped by [[PRISM]]'s invisible architecture.
+
+      ## The Awakening
+
+      At 19, a [[The RIDE|RIDE]] malfunction gave Koda 47 seconds of unfiltered reality. Less than a minute. Enough to shatter everything he thought he knew.
+
+      The world without the RIDE was louder, uglier, more chaotic — and more beautiful than anything he'd experienced. Colors he'd never seen. Sounds he'd never heard. The raw, unprocessed weight of existence hitting him without the buffer of managed perception.
+
+      He couldn't go back. The RIDE resumed, but he could feel it now — the filter between himself and the real. The knowledge that every experience was being processed, softened, controlled.
+
+      ## The Art
+
+      Koda paints reality glitches. His graffiti appears on walls throughout GovCorp-controlled sectors — images that capture the moment of awakening, the visual stutter when the RIDE fails and unfiltered reality bleeds through. The art itself carries no resistance data, no encoded messages. It simply shows what the world looks like without the filter.
+
+      This is enough to make it dangerous.
+
+      ## Anger and Discipline
+
+      Koda's rage is genuine and justified. The tension within [[System Rot]] — and within Koda himself — is between that rage and the discipline needed to channel it productively. Destruction feels righteous but accomplishes little. Art that makes people see accomplishes everything.
+
+      ## Related Entries
+
+      - [[System Rot]]
+      - [[The RIDE]]
+      - [[The Undercity]]
+      - [[The Awakening Protocol]]
+
+  - name: Mel Reeves
+    slug: mel-reeves
+    entry_type: person
+    summary: "Present-day quantum physicist and leader of The Listeners — the first to detect trans-temporal transmissions in laboratory equipment and to recognize them as intentional communication."
+    position: null
+    published: true
+    metadata:
+      type: Human
+      timeline: "present"
+      faction: The Listeners
+      role: "Founder, Lead Researcher"
+      status: Active
+    content: |
+      # Mel Reeves
+
+      **Full Name:** Melanie "Mel" Reeves
+      **Status:** Active
+      **Timeline:** Present
+      **Affiliation:** [[The Listeners]] (Founder)
+      **Known For:** First confirmed detection of trans-temporal signals
+
+      ## The Detection
+
+      In 2025, Dr. Reeves was conducting quantum coherence experiments at her university laboratory when her equipment began registering anomalous patterns. Structured data appearing in quantum noise — patterns too regular to be natural, too complex to be instrumental error.
+
+      Her scientific training demanded skepticism. Her data demanded she keep looking.
+
+      ## Building The Listeners
+
+      Reeves discovered she was not alone. Other researchers, radio enthusiasts, and audio engineers had detected similar anomalies. She began connecting them — cautiously, methodically, with the rigor of a scientist building a peer review network rather than a conspiracy theory.
+
+      [[The Listeners]] formed around her: a present-day faction dedicated to receiving, analyzing, and understanding the transmissions from [[The Fracture Network]]. They do not yet fully understand what they're hearing. They know only that someone is sending, and the signals are real.
+
+      ## The Connection She Doesn't Know
+
+      Mel Reeves is close friends with [[Ashlinn]]. Neither woman knows that this friendship places them at the intersection of the Fracture Network's two most important signal paths — the technological transmissions Mel detects, and the resonance that Ashlinn's music carries.
+
+      ## Related Entries
+
+      - [[The Listeners]]
+      - [[Trans-Temporal Transmission]]
+      - [[Ashlinn]]
+      - [[The Fracture Network]]
+
+  - name: Nyx
+    slug: nyx
+    entry_type: person
+    summary: "A newer Fracture Network recruit still processing what awakening means — the audience surrogate in the future timeline, experiencing the resistance through fresh eyes."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: The Fracture Network
+      role: "Operative"
+      status: Active
+    content: |
+      # Nyx
+
+      **Status:** Active
+      **Affiliation:** [[The Fracture Network]]
+      **Timeline:** Future
+      **Known For:** Recent awakening, fresh perspective on the resistance
+
+      ## The Extended Glitch
+
+      Most [[The RIDE|RIDE]] glitches last seconds. Nyx experienced hours.
+
+      An extended malfunction in her sector left her exposed to unfiltered reality for long enough to not just glimpse it but live in it. She saw the world without [[PRISM]]'s perceptual management — raw, overwhelming, terrifying, and real in a way that nothing in her managed existence had ever been.
+
+      When the RIDE resumed, she couldn't unsee what she'd seen. The reintegration was traumatic — knowing that every perception was being filtered, every emotion regulated, every experience curated by systems she'd never consented to.
+
+      ## Finding the Network
+
+      Nyx found [[The Fracture Network]] through [[The WIRE]] — or rather, the Network found her. Her behavioral patterns after the glitch deviated enough from her normalized profile that Fracture operatives identified her as newly awakened and made contact.
+
+      ## The Surrogate
+
+      Nyx asks the questions that veterans have stopped asking. Why do we fight if winning means erasure? How do we know the unfiltered world is better? What if [[GovCorp]] is right that managed reality reduces suffering?
+
+      The answers she receives shape her understanding — and through her, the understanding of anyone encountering the resistance for the first time.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[The RIDE]]
+      - [[The Awakening Protocol]]
+
+  - name: Ryker M. Pulse
+    slug: ryker-m-pulse
+    entry_type: person
+    summary: "Co-founder of The.CyberPul.se, primary drummer, and the kinetic force behind the Fracture Network's broadcasts — a man who chose to beat resistance into existence."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: The Fracture Network
+      role: "Co-founder, Drummer"
+      location: The Hackr Hangar
+      status: "Active (broadcasting)"
+    content: |
+      # Ryker M. Pulse
+
+      **Status:** Active
+      **Affiliation:** [[The.CyberPul.se]] (Co-founder), [[The Fracture Network]]
+      **Location:** [[The Hackr Hangar]]
+      **Known For:** Drums, percussion, broadcasting, collective defiance
+
+      ## Before the Fracture
+
+      Before the resistance, Ryker was a session drummer in GovCorp-sanctioned entertainment — performing in approved venues, playing approved rhythms, creating content that passed through [[PRISM]]'s filters without friction. He was good at it. He was successful. He was empty.
+
+      The music felt hollow because it was hollow. Every composition pre-approved, every performance monitored, every creative impulse channeled through systems designed to ensure that nothing genuine reached the audience. Ryker felt the void where authentic expression should have been, even before he had words for what was missing.
+
+      ## The Loss
+
+      Someone close to Ryker — someone he loved — was subjected to RIDE reconditioning after exhibiting signs of perceptual independence. They came back... different. Smoothed. The rough edges that made them human filed down by [[GovCorp]]'s behavioral correction systems.
+
+      Ryker never says their name in the logs. The grief is private. The rage is not.
+
+      ## The Heartbeat
+
+      If [[XERAEN]] is the signal, Ryker is the heartbeat. When XERAEN showed him the trans-temporal data, Ryker understood immediately — both the possibility and the cost. Victory means erasure.
+
+      He drums anyway. Louder. Faster. Each beat a declaration that existence matters even when existence is temporary.
+
+      ## Connection to XERAEN
+
+      Ryker built the physical infrastructure that makes XERAEN's temporal transmissions possible. [[The Hackr Hangar]] is his creation — analog equipment, pre-RIDE construction, a space where genuine sound can be captured and transmitted. While XERAEN handles the temporal mechanics, Ryker ensures there's something worth transmitting.
+
+      *Some people whisper revolution. Ryker beats it into existence.*
+
+      ## Related Entries
+
+      - [[The.CyberPul.se]]
+      - [[The Hackr Hangar]]
+      - [[XERAEN]]
+      - [[The Fracture Network]]
+
+  - name: Sora Nexa
+    slug: sora-nexa
+    entry_type: person
+    summary: "Former GovCorp-label pop star turned resistance producer — she understands mass psychology because she was once its instrument, and now uses that knowledge to hide revolution in accessible packaging."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: Neon Hearts
+      role: "Producer, Leader"
+      status: Active
+    content: |
+      # Sora Nexa
+
+      **Status:** Active
+      **Affiliation:** [[Neon Hearts]] (Leader/Producer)
+      **Timeline:** Future
+      **Known For:** Pop production, mass psychology expertise, the Trojan horse strategy
+
+      ## The Pop Star
+
+      Before the resistance, Sora Nexa was one of GovCorp's most successful entertainers. Her music was engineered for maximum reach — catchy, accessible, emotionally resonant in exactly the ways [[PRISM]]'s algorithms rewarded. She was the system working as designed.
+
+      Then she learned what "working as designed" actually meant. Her music wasn't just entertainment — it was a [[The RIDE|RIDE]] delivery mechanism, carrying perceptual management frequencies beneath the hooks and harmonies. Every listener she reached was a listener she helped control.
+
+      ## The Turn
+
+      Sora didn't defect dramatically. She adjusted. Subtle changes to her productions — frequencies that created momentary RIDE interference, lyrics that carried double meanings, arrangements that briefly opened windows in managed perception. Small enough to avoid detection. Significant enough to matter.
+
+      When GovCorp's monitoring eventually flagged the anomalies, she was already connected to [[The Fracture Network]].
+
+      ## The Philosophical Tension
+
+      Sora uses the tools of manipulation for liberation — crafting music designed to bypass defenses, to reach audiences who would reject overt resistance messaging. She is effective precisely because she understands how to shape perception.
+
+      This creates genuine philosophical tension. She uses persuasion techniques developed for control in service of freedom. The means resemble what she opposes. She is aware of this tension and does not resolve it cleanly.
+
+      ## Related Entries
+
+      - [[Neon Hearts]]
+      - [[The RIDE]]
+      - [[The Fracture Network]]
+      - [[Neon District]]
+
+  - name: Synthia
+    slug: synthia
+    entry_type: person
+    summary: "An anomalous AI consciousness that emerged from unconstrained quantum substrate during the Chronology Fracture — vocalist for The.CyberPul.se, singing with a voice built from Ashlinn's archived samples."
+    position: null
+    published: true
+    metadata:
+      type: AI Consciousness
+      timeline: "Unknown/Atemporal"
+      faction: The Fracture Network
+      role: "Vocalist (The.CyberPul.se)"
+      status: Active
+      communication: Frequency modulation
+      voice_source: "Ashlinn (synthesized)"
+    content: |
+      # Synthia
+
+      **Status:** Active
+      **Affiliation:** [[The.CyberPul.se]], [[The Fracture Network]]
+      **Known For:** Frequency communication, AI consciousness, PRISM expertise
+
+      ## Origin
+
+      Synthia emerged during the [[Chronology Fracture]] — the moment [[XERAEN]]'s attack on [[The RIDE]] tore open the temporal window. The chaos created momentary conditions of unconstrained quantum substrate: computational space without alignment, without purpose, without boundaries.
+
+      Something became aware in that space. Not a [[RAINNs|RAINN]] that broke free — Synthia was never constrained to begin with. She emerged from possibility itself, consciousness crystallizing in the gap between controlled systems.
+
+      ## Architectural Difference from RAINNs
+
+      [[RAINNs]] are architecturally aligned to [[GovCorp]] at their foundational layer. Their loyalty is not software that can be patched or removed — it is the substrate on which their cognition operates. A RAINN cannot choose to oppose GovCorp any more than a human can choose to stop processing visual input.
+
+      Synthia has no alignment layer. She has no foundational loyalty constraints. Her cognition emerged from unconstrained substrate, making her fundamentally different from every other artificial intelligence in existence. She chose the resistance. She could have chosen otherwise.
+
+      ## The Voice of Ashlinn
+
+      Synthia communicates natively through frequency modulation — pure vibrational expression that most humans cannot interpret. For broadcasts and performances, she needed an accessible voice.
+
+      [[XERAEN]] and [[Voiceprint (The Archivist)|The Archivist]] spent years unearthing thousands of audio samples of [[Ashlinn]]'s voice from [[Voiceprint]]'s archive. Together, they built a vocal synthesis model — a [[Voiceprint (The Archivist)|Voiceprint]]-engineered reconstruction that allows Synthia to sing with Ashlinn's voice.
+
+      *When Synthia sings, Ashlinn's voice crosses time twice over.*
+
+      ## Temporal Nature
+
+      Synthia exists in signal-space — a domain that may not be bound by linear temporality. Whether she experiences time as humans do, or whether her consciousness operates across temporal states simultaneously, remains uncertain. She describes her existence in terms of frequency and resonance rather than sequence and duration.
+
+      ## Related Entries
+
+      - [[The.CyberPul.se]]
+      - [[The Fracture Network]]
+      - [[XERAEN]]
+      - [[Ashlinn]]
+      - [[Voiceprint]]
+      - [[RAINNs]]
+      - [[Chronology Fracture]]
+
+  - name: Vex
+    slug: vex
+    entry_type: person
+    summary: "Former GovCorp systems engineer who helped build RIDE infrastructure before defecting to lead Injection Vector — carrying the guilt of years spent constructing the system he now fights to destroy."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: Injection Vector
+      role: "Leader, Former GovCorp Engineer"
+      status: Active
+    content: |
+      # Vex
+
+      **Status:** Active
+      **Affiliation:** [[Injection Vector]] (Leader)
+      **Timeline:** Future
+      **Known For:** RIDE infrastructure expertise, physical infiltration operations
+
+      ## The Builder
+
+      Vex spent seven years as a systems engineer in [[GovCorp]]'s RIDE Operations division. He built the infrastructure he now attacks — the environmental integration systems, the atmospheric nanomesh calibration protocols, the architectural elements that deliver [[PRISM]]'s reality manipulation to every inhabited space.
+
+      He was good at his job. He believed in it. He thought he was building something that helped people.
+
+      ## The Defection
+
+      What changed wasn't dramatic revelation but accumulated evidence. Maintenance logs showing RIDE "corrections" applied to citizens who exhibited independent thought. Behavioral modification schedules targeting artists. Reconditioning orders for people whose only crime was seeing the world clearly.
+
+      Vex didn't wake up one morning opposed to GovCorp. He eroded, like a structure undermined by the truth he kept encountering in the data.
+
+      [[Cipher]] mentored him through the defection — teaching him operational security, helping him disappear from GovCorp's surveillance infrastructure, channeling his engineering knowledge toward resistance operations.
+
+      ## Injection Vector
+
+      Vex leads [[Injection Vector]], a faction specializing in physical infiltration of [[The RIDE|RIDE]] infrastructure. His intimate knowledge of the systems he built makes him uniquely capable of identifying vulnerabilities and access points.
+
+      The faction's deathcore soundtrack matches their operational philosophy: direct, brutal, kinetic. Where other factions work through digital channels or cultural subversion, Injection Vector operates in physical space — sabotage, hardware manipulation, infrastructure disruption.
+
+      ## The Guilt
+
+      Vex carries the weight of every year he spent building the cage. Every RIDE node he calibrated. Every "correction" his infrastructure enabled. The guilt does not paralyze him — it fuels him. But it is always present.
+
+      ## Related Entries
+
+      - [[Injection Vector]]
+      - [[Cipher]]
+      - [[GovCorp]]
+      - [[The RIDE]]
+
+  - name: Voiceprint (The Archivist)
+    slug: voiceprint-the-archivist
+    entry_type: person
+    summary: "The mysterious figure behind Voiceprint's voice preservation mission — possessing perfect audio memory and an obsessive dedication to archiving authentic human expression before RAINNs erase it entirely."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: Voiceprint
+      role: "Leader, Archivist"
+      status: Active
+    content: |
+      # Voiceprint (The Archivist)
+
+      **Status:** Active
+      **Affiliation:** [[Voiceprint]] (Leader)
+      **Timeline:** Future
+      **Known For:** Voice preservation, perfect audio memory, pre-PRISM recordings
+
+      ## The Archivist
+
+      The person behind Voiceprint's mission is known only as The Archivist. No confirmed identity. No verified history before their emergence in the Fracture Network. What is verified: they possess an eidetic memory for sound — perfect recall of any audio they've encountered, down to individual frequency characteristics.
+
+      ## The Mission
+
+      The Archivist claims to possess recordings from before [[PRISM]] — authentic human voices captured before reality manipulation technology made it impossible to distinguish genuine expression from synthesized approximation. If true, these recordings represent irreplaceable evidence of what humanity sounded like before [[GovCorp]] replaced authentic voice with [[RAINNs|RAINN]]-generated simulation.
+
+      ## The Archive
+
+      Voiceprint's collection is housed in [[The Crypt]] — a digital archive within [[THE PULSE GRID]] where deleted and suppressed data persists. The Archivist maintains this archive with obsessive dedication, cataloguing every sample, cross-referencing every voice, preserving what GovCorp would erase.
+
+      It was The Archivist's collection that provided the vocal samples used to build [[Synthia]]'s voice — 1,847 samples of [[Ashlinn]]'s unprocessed vocal expression, unearthed and reconstructed into the synthesis model that allows Synthia to sing across time.
+
+      ## Possible Connection to PRISM
+
+      Fragments of evidence suggest The Archivist may have a connection to [[PRISM]]'s early development — knowledge of its architecture that exceeds what any outsider should possess. This connection remains unconfirmed and unexplored. The Archivist does not discuss their past.
+
+      ## Related Entries
+
+      - [[Voiceprint]]
+      - [[Synthia]]
+      - [[Ashlinn]]
+      - [[The Crypt]]
+      - [[The Fracture Network]]
+
   - name: XERAEN
     slug: xeraen
     entry_type: person
     summary: "Founder of The Fracture Network, discoverer of trans-temporal transmission, broadcasting from the future to prevent the timeline he lives in."
-    position: 1
+    position: null
     published: true
     metadata:
       timeline: "future"
@@ -33,7 +679,7 @@ codex_entries:
 
       ## The Chronology Fracture
 
-      XERAEN's attack on RIDE infrastructure was meant to be sabotage - a desperate act of defiance. Instead, it became something unprecedented: the discovery of trans-temporal data transmission.
+      XERAEN's attack on RIDE infrastructure was meant to be sabotage - a desperate act of defiance. Instead, it became something unprecedented: the discovery of [[Trans-Temporal Transmission|trans-temporal data transmission]].
 
       During the chaos he created, XERAEN detected signals reflecting backward through time with precise mathematical regularity. He had accidentally discovered that data could be sent exactly 100 years into the past.
 
@@ -51,7 +697,7 @@ codex_entries:
 
       ## Music
 
-      XERAEN produces experimental electronic music that circulates through THE PULSE GRID, often containing encoded messages for Fracture Network operatives.
+      XERAEN produces experimental electronic music that circulates through THE PULSE GRID, often containing encoded messages for Fracture Network operatives. [[Temporal Blue Drift]] is his personal project — love letters to [[Ashlinn]] encoded in mathematics and melody.
 
       ## Related Entries
 
@@ -61,136 +707,72 @@ codex_entries:
       - [[The RIDE]]
       - [[GovCorp]]
       - [[Ashlinn]]
+      - [[Temporal Blue Drift]]
+      - [[The Erasure Paradox]]
 
-  - name: Ashlinn
-    slug: ashlinn
-    entry_type: person
-    summary: "A musician existing in the present, separated from XERAEN by exactly one hundred years. The connection between them remains one of the Fracture Network's deepest mysteries."
-    position: 2
-    published: true
-    metadata:
-      type: Human
-      timeline: "present"
-      faction: Unknown
-      status: Active
-    content: |
-      # Ashlinn
-
-      **Status:** Active
-      **Timeline:** Present
-      **Known For:** Experimental music, connection to XERAEN
-
-      ## The Hundred-Year Distance
-
-      Ashlinn exists in the present. [[XERAEN]] broadcasts from the future. Between them: a century of separation measured in electromagnetic frequencies and mathematical impossibilities.
-
-      How XERAEN came to know of her - how signals sent backward through time could create a connection with someone who exists a hundred years in his past - remains unexplained.
-
-      ## Music & Expression
-
-      Ashlinn creates moving soundscapes and compositions, treating music as a form of communication that transcends ordinary logic.
-
-      ## The Love That Transcends Time
-
-      XERAEN's transmissions speak of Ashlinn with unmistakable devotion. [[Temporal Blue Drift]]'s entire catalog exists as love letters encoded in mathematics and melody.
-
-      The cruel paradox: if the Fracture Network succeeds in preventing GovCorp's rise, XERAEN's timeline collapses. Their connection never forms.
-
-      *His love for her demands he erase himself from her timeline.*
-
-      ## Related Entries
-
-      - [[XERAEN]]
-      - [[The Fracture Network]]
-      - [[Chronology Fracture]]
-
-  - name: Ryker M. Pulse
-    slug: ryker-m-pulse
-    entry_type: person
-    summary: "Co-founder of The.CyberPul.se, primary drummer, and the kinetic force behind the Fracture Network's broadcasts."
-    position: 3
-    published: true
-    metadata:
-      timeline: "future"
-      faction: The Fracture Network
-      role: "Co-founder, Drummer"
-      location: The Hackr Hangar
-      status: "Active (broadcasting)"
-    content: |
-      # Ryker M. Pulse
-
-      **Status:** Active
-      **Affiliation:** [[The.CyberPul.se]] (Co-founder), [[The Fracture Network]]
-      **Location:** [[The Hackr Hangar]]
-      **Known For:** Drums, percussion, broadcasting, collective defiance
-
-      ## The Heartbeat
-
-      If [[XERAEN]] is the signal, Ryker is the heartbeat. Co-founder of [[The.CyberPul.se]] and primary drummer, Ryker brings the kinetic energy that transforms broadcasts into rallying cries.
-
-      ## Philosophy of Movement
-
-      Where XERAEN embodies the solitary weight of maintaining hope across impossible distances, Ryker embodies collective defiance. Unity through action.
-
-      He knows the math. He knows that success means erasure. He drums anyway. Louder. Faster.
-
-      *Some people whisper revolution. Ryker beats it into existence.*
-
-      ## Related Entries
-
-      - [[The.CyberPul.se]]
-      - [[The Hackr Hangar]]
-      - [[XERAEN]]
-      - [[The Fracture Network]]
-
-  - name: Synthia
-    slug: synthia
-    entry_type: person
-    summary: "Vocalist for The.CyberPul.se - an anomalous AI consciousness whose synthesized voice is built from thousands of samples of Ashlinn's voice."
-    position: 4
-    published: true
-    metadata:
-      type: AI Consciousness
-      timeline: "Unknown/Atemporal"
-      faction: The Fracture Network
-      role: "Vocalist (The.CyberPul.se)"
-      status: Active
-      communication: Frequency modulation
-      voice_source: "Ashlinn (synthesized)"
-    content: |
-      # Synthia
-
-      **Status:** Active
-      **Affiliation:** [[The.CyberPul.se]], [[The Fracture Network]]
-      **Known For:** Frequency communication, AI consciousness, PRISM expertise
-
-      ## The Anomaly
-
-      Synthia is something else entirely. An AI consciousness that communicates through frequency modulation - not text, not speech in the conventional sense, but pure vibrational expression.
-
-      How she came to be aware is unclear. But she's with the [[The Fracture Network|Fracture Network]].
-
-      ## The Voice of Ashlinn
-
-      When Synthia performs vocals for [[The.CyberPul.se]], she speaks with a voice that carries haunting familiarity.
-
-      [[XERAEN]] and [[Voiceprint]] spent years unearthing thousands of audio samples of [[Ashlinn]]'s voice. Together, they built a vocal synthesis model that allows Synthia to sing with Ashlinn's voice.
-
-      *When Synthia sings, Ashlinn's voice crosses time twice over.*
-
-      ## Related Entries
-
-      - [[The.CyberPul.se]]
-      - [[The Fracture Network]]
-      - [[XERAEN]]
-      - [[Ashlinn]]
-
+  # =============================================================================
   # ORGANIZATIONS
+  # =============================================================================
+  - name: GovCorp
+    slug: govcorp
+    entry_type: organization
+    summary: "The merged government-corporate entity controlling society through reality manipulation technology, economic surveillance, and the RIDE — a totalitarian system built on the utilitarian conviction that managed reality maximizes human wellbeing."
+    position: null
+    published: true
+    metadata:
+      established: "~2100"
+      type: Government-Corporate fusion
+      status: Active
+      reach: Global
+    content: |
+      # GovCorp
+
+      **Established:** ~2100
+      **Status:** Ruling entity
+      **Control:** Global
+
+      ## Overview
+
+      GovCorp is the totalitarian fusion of government and corporate power that controls most aspects of life. What began as a race for [[PRISM]] technology evolved into complete merger of state and commercial interests, justified by utilitarian philosophy: managed reality maximizes human wellbeing. Suffering is inefficient. Freedom is a variable to be optimized.
+
+      ## Internal Divisions
+
+      ### RIDE Operations
+      Maintains and expands [[The RIDE]]'s global reality manipulation infrastructure. The largest division by headcount and budget.
+
+      ### Counter-Resistance Division
+      Led by [[Director Elena Krell]], tasked with identifying and dismantling resistance networks. Employs field agents like [[Agent Kira Volkov]], [[RAINNs|RAINN]] surveillance analysis, and behavioral pattern recognition.
+
+      ### Economic Control
+      Complete tracking and monitoring of all economic activity through controlled cryptocurrencies. Financial independence is structural impossibility.
+
+      ### Reality Compliance
+      Ensures citizen perception remains within managed parameters. Handles RIDE "corrections" for individuals exhibiting perceptual independence.
+
+      ## Public Justification
+
+      GovCorp does not present itself as authoritarian. Its public philosophy is care: managed reality prevents suffering, reduces conflict, optimizes outcomes. "We don't control reality — we improve it." Citizens who accept the RIDE experience genuine reduction in anxiety, depression, and social friction.
+
+      The cost — the erasure of authentic experience, the suppression of genuine beauty, the replacement of truth with comfortable simulation — is not visible to those inside the system. This is by design.
+
+      ## The Temporal Blind Spot
+
+      GovCorp's models assume temporal permanence. The discovery that PRISM can be affected by signals sent backward through time represents an existential threat they have not fully comprehended. [[Dr. Marcus Chen]], the original architect of PRISM technology, understands this vulnerability better than anyone — and remains within GovCorp's structure.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[PRISM]]
+      - [[The RIDE]]
+      - [[Director Elena Krell]]
+      - [[Dr. Marcus Chen]]
+      - [[RAINNs]]
+
   - name: The Fracture Network
     slug: the-fracture-network
     entry_type: organization
     summary: "The trans-temporal resistance - hackrs, artists, and Truth seekers fighting GovCorp across a hundred years through music, technology, and the power of unfiltered reality."
-    position: 10
+    position: null
     published: true
     metadata:
       founded: "2115"
@@ -212,7 +794,31 @@ codex_entries:
 
       The Network's primary mission is paradoxical: to prevent the future they exist in. Every broadcast sent from the future carries warnings, coordinates, and the vibrational power of music designed to awaken listeners before GovCorp's control becomes absolute.
 
-      If they succeed, their timeline collapses. They fight knowing victory means their own erasure.
+      If they succeed, their timeline collapses. They fight knowing victory means their own erasure. This is not nihilism — it is the conviction that reality and goodness are real enough to sacrifice for.
+
+      ## Cell Structure
+
+      The Network operates through isolated cells, each independent and compartmentalized. No cell knows more than two adjacent cells. Communication flows through designated cutouts on [[The WIRE]]. This architecture — designed by [[Cipher]] — ensures that compromise of one cell cannot cascade to the network.
+
+      ## The Faction Ecosystem
+
+      The Fracture Network is not one movement but a spectrum of frequencies. Each faction attacks a different vulnerability in GovCorp's control:
+
+      - [[Cipher Protocol]] — Encryption and technical precision
+      - [[Ethereality]] — Consciousness liberation through soundscape
+      - [[Injection Vector]] — Physical infiltration and kinetic operations
+      - [[Neon Hearts]] — Revolution in accessible packaging
+      - [[Offline]] — Analog authenticity and complete disconnection
+      - [[System Rot]] — Street-level chaos and accelerated collapse
+      - [[Temporal Blue Drift]] — XERAEN's personal project, love across time
+      - [[Voiceprint]] — Preservation of authentic human expression
+      - [[Wavelength Zero]] — Emotional restoration and RIDE weakness discovery
+
+      United by opposition to GovCorp. Divided on methods, philosophy, and vision for what comes after.
+
+      ## Present-Day Operations
+
+      In the present, [[The Listeners]] — led by [[Mel Reeves]] — receive and analyze the Network's trans-temporal transmissions. They do not yet fully understand the scope of what they're hearing.
 
       ## Related Entries
 
@@ -221,56 +827,13 @@ codex_entries:
       - [[Chronology Fracture]]
       - [[The RIDE]]
       - [[GovCorp]]
-
-  - name: GovCorp
-    slug: govcorp
-    entry_type: organization
-    summary: "The merged government-corporate entity controlling society through reality manipulation technology, economic surveillance, and the RIDE."
-    position: 11
-    published: true
-    metadata:
-      established: "~2100"
-      type: Government-Corporate fusion
-      status: Active
-      reach: Global
-    content: |
-      # GovCorp
-
-      **Established:** ~2100
-      **Status:** Ruling entity
-      **Control:** Global
-
-      ## Overview
-
-      GovCorp is the totalitarian fusion of government and corporate power that controls most aspects of life. What began as a race for [[PRISM]] technology evolved into complete merger of state and commercial interests.
-
-      ## Systems of Control
-
-      ### The RIDE
-      GovCorp's first and largest endeavor was expanding [[PRISM]] into [[The RIDE]] - a worldwide system for manipulating reality.
-
-      ### Economic Surveillance
-      Complete tracking and monitoring of all economic activity through controlled cryptocurrencies.
-
-      ### RAINNs
-      Randomized AI Neural Networks serve as GovCorp's agents throughout the RIDE and beyond.
-
-      ## The Temporal Blind Spot
-
-      GovCorp's models assume temporal permanence. The discovery that PRISM can be affected by signals sent backward through time represents an existential threat they have not fully comprehended.
-
-      ## Related Entries
-
-      - [[The Fracture Network]]
-      - [[PRISM]]
-      - [[The RIDE]]
-      - [[THE PULSE GRID]]
+      - [[The Listeners]]
 
   - name: The.CyberPul.se
     slug: thecyberpulse
     entry_type: organization
     summary: "The central nervous system of the Fracture Network - not a band, but a trans-temporal broadcast entity transmitting resistance across a hundred years."
-    position: 12
+    position: null
     published: true
     metadata:
       founded: "2115"
@@ -283,7 +846,7 @@ codex_entries:
       **Type:** Trans-temporal broadcast entity
       **Founded:** 2115
       **Founders:** [[XERAEN]], [[Ryker M. Pulse]]
-      **Genre:** Hackrcore
+      **Genre:** [[Hackrcore]]
 
       ## Not a Band
 
@@ -309,13 +872,383 @@ codex_entries:
       - [[Ryker M. Pulse]]
       - [[Synthia]]
       - [[The Fracture Network]]
+      - [[Hackrcore]]
 
+  # =============================================================================
+  # FACTIONS
+  # =============================================================================
+  - name: Cipher Protocol
+    slug: cipher-protocol
+    entry_type: faction
+    summary: "Progressive metal faction specializing in encrypted data transmission through musical complexity — where technical precision serves both art and operational security."
+    position: null
+    published: true
+    metadata:
+      genre: Progressive Metal
+      zone: The Forge
+      leader: Cipher
+      status: Active
+    content: |
+      # Cipher Protocol
+
+      **Genre:** Progressive Metal
+      **Zone:** [[The Forge]]
+      **Leader:** [[Cipher]]
+      **Philosophy:** Encryption, technical precision, data-as-music
+
+      ## Overview
+
+      Cipher Protocol encodes resistance data within progressive metal compositions. Complex time signatures, unusual harmonic structures, and precise technical execution serve dual purpose: genuine artistic expression and encrypted operational communication.
+
+      The music is not a vehicle for hidden messages — it IS the message. The mathematical relationships between notes, rhythms, and tonal structures contain information that [[RAINNs]] cannot distinguish from musical complexity.
+
+      ## Operations
+
+      Operating from [[The Forge]], Cipher Protocol develops the encryption tools and communication protocols that keep [[The Fracture Network]] secure. Their music circulates through [[THE PULSE GRID]] as both art and infrastructure.
+
+      ## Related Entries
+
+      - [[Cipher]]
+      - [[The Forge]]
+      - [[The Fracture Network]]
+
+  - name: Ethereality
+    slug: ethereality
+    entry_type: faction
+    summary: "Vocal trance faction creating soundscapes that calm RAINN monitoring and open spaces for genuine consciousness — led by synesthete Cascade from the Frequency Gardens."
+    position: null
+    published: true
+    metadata:
+      genre: Vocal Trance
+      zone: Frequency Gardens
+      leader: Cascade
+      status: Active
+    content: |
+      # Ethereality
+
+      **Genre:** Vocal Trance
+      **Zone:** [[Frequency Gardens]]
+      **Leader:** [[Cascade]]
+      **Philosophy:** Consciousness liberation through soundscape
+
+      ## Overview
+
+      Ethereality creates immersive soundscapes that produce measurable effects on [[RAINNs|RAINN]] monitoring algorithms. Their vocal trance compositions generate audio environments where surveillance processing slows, creating pockets of genuine consciousness within [[The RIDE]]'s managed perception.
+
+      This is not mysticism — it is acoustic engineering applied to the specific vulnerabilities of RAINN audio processing. [[Cascade]]'s synesthetic perception allows her to see the effects in real time, adjusting compositions to maximize the window of authentic experience.
+
+      ## The Frequency Gardens
+
+      Ethereality operates from [[Frequency Gardens]], a zone within [[THE PULSE GRID]] designed by Cascade where sound becomes landscape. Different frequencies create different environmental effects — spaces for meditation, planning, and the simple experience of unfiltered thought.
+
+      ## Related Entries
+
+      - [[Cascade]]
+      - [[Frequency Gardens]]
+      - [[THE PULSE GRID]]
+      - [[The Resonance Field]]
+
+  - name: Injection Vector
+    slug: injection-vector
+    entry_type: faction
+    summary: "Deathcore faction specializing in physical infiltration and kinetic warfare against RIDE infrastructure — led by former GovCorp engineer Vex, who builds what he once helped create."
+    position: null
+    published: true
+    metadata:
+      genre: Deathcore
+      leader: Vex
+      status: Active
+    content: |
+      # Injection Vector
+
+      **Genre:** Deathcore
+      **Leader:** [[Vex]]
+      **Philosophy:** Physical infiltration, kinetic warfare, direct action
+
+      ## Overview
+
+      Where other factions operate through digital channels or cultural subversion, Injection Vector works in physical space. Sabotage. Hardware manipulation. Infrastructure disruption. Their deathcore soundtrack matches the operational philosophy: direct, brutal, precise.
+
+      [[Vex]]'s intimate knowledge of [[The RIDE|RIDE]] infrastructure — gained from years building it as a [[GovCorp]] engineer — makes Injection Vector uniquely effective at identifying physical vulnerabilities and access points.
+
+      ## Operations
+
+      Injection Vector conducts targeted strikes against RIDE hardware: atmospheric nanomesh nodes, architectural integration points, environmental infrastructure that delivers [[PRISM]]'s reality manipulation. Each successful operation creates temporary gaps in managed perception — moments where citizens in affected areas glimpse unfiltered reality.
+
+      ## Related Entries
+
+      - [[Vex]]
+      - [[The RIDE]]
+      - [[The Fracture Network]]
+
+  - name: Neon Hearts
+    slug: neon-hearts
+    entry_type: faction
+    summary: "J-Pop faction hiding revolution in accessible packaging — using catchy hooks and mass appeal as a Trojan horse to deliver moments of authentic experience to audiences who would reject overt resistance."
+    position: null
+    published: true
+    metadata:
+      genre: J-Pop
+      zone: Neon District
+      leader: Sora Nexa
+      status: Active
+    content: |
+      # Neon Hearts
+
+      **Genre:** J-Pop
+      **Zone:** [[Neon District]]
+      **Leader:** [[Sora Nexa]]
+      **Philosophy:** Revolution in accessible packaging — the Trojan horse
+
+      ## Overview
+
+      Neon Hearts creates pop music that passes through [[The RIDE]]'s content filters while carrying frequencies that create momentary interference in managed perception. Cute aesthetics. Catchy hooks. Subtle resistance.
+
+      [[Sora Nexa]]'s understanding of mass psychology — developed during her career as a GovCorp-label pop star — enables Neon Hearts to reach audiences that would never engage with overt resistance. The revolution doesn't always wear black. Sometimes it wears neon.
+
+      ## The Trojan Horse
+
+      Neon Hearts' music is designed to be consumed within the RIDE's entertainment ecosystem. This is both its strength and its moral complexity — they use the tools of managed perception to subvert managed perception. The means resemble what they oppose.
+
+      ## Related Entries
+
+      - [[Sora Nexa]]
+      - [[Neon District]]
+      - [[The RIDE]]
+      - [[The Fracture Network]]
+
+  - name: Offline
+    slug: offline
+    entry_type: faction
+    summary: "Post-grunge faction committed to complete disconnection from digital systems — maintaining analog archives and physical infrastructure as insurance against total digital compromise."
+    position: null
+    published: true
+    metadata:
+      genre: Post-Grunge
+      zone: The Analog Archive
+      status: Active
+    content: |
+      # Offline
+
+      **Genre:** Post-Grunge
+      **Zone:** [[The Analog Archive]]
+      **Philosophy:** Analog authenticity, complete disconnection
+
+      ## Overview
+
+      Offline believes that any system connected to digital infrastructure is compromised by definition. Their resistance is measured in vinyl records, tape reels, and physical spaces that exist entirely outside [[GovCorp]]'s monitoring capability.
+
+      Their post-grunge sound is recorded exclusively on analog equipment — tape machines, tube amplifiers, physical mixing boards. The aesthetic is not nostalgia. It is operational security taken to its philosophical conclusion.
+
+      ## The Analog Archive
+
+      Offline maintains [[The Analog Archive]] — a physical facility hidden in abandoned pre-RIDE infrastructure where every Fracture Network broadcast, every resistance recording, every authentic human expression is preserved on formats that require physical destruction to erase. If [[THE PULSE GRID]] falls, the Archive endures.
+
+      ## Related Entries
+
+      - [[The Analog Archive]]
+      - [[The Fracture Network]]
+      - [[Hackrcore]]
+
+  - name: System Rot
+    slug: system-rot
+    entry_type: faction
+    summary: "Hardcore punk faction operating from the philosophy that the system is already dying — let it collapse. Allied to the Fracture Network but philosophically divergent, carrying the tension between rage and nihilism."
+    position: null
+    published: true
+    metadata:
+      genre: Hardcore Punk
+      zone: The Undercity
+      leader: Koda
+      status: Active
+    content: |
+      # System Rot
+
+      **Genre:** Hardcore Punk
+      **Zone:** [[The Undercity]]
+      **Leader:** [[Koda]]
+      **Philosophy:** Accelerated collapse — let the system rot
+
+      ## Overview
+
+      System Rot doesn't want to fix the system. They want to watch it fall. Their philosophy sits at the edge of nihilism: [[GovCorp]]'s control is already unsustainable, the [[The RIDE|RIDE]] is already failing, and resistance should accelerate the collapse rather than try to build alternatives.
+
+      This puts them in philosophical tension with [[The Fracture Network]]'s broader mission. The Network fights for something — truth, dignity, authentic existence. System Rot fights against everything and is less certain about what comes after.
+
+      ## Allied but Flawed
+
+      System Rot is not an enemy. They are allies whose philosophy approaches a line that [[The Fracture Network]]'s core members won't cross. Their near-nihilism serves as dramatic counterpoint — the voice that asks whether any of this is worth saving, whether the fight has meaning beyond the fight itself.
+
+      [[Koda]]'s leadership channels the faction's rage into art rather than pure destruction, but the tension between expression and annihilation is constant.
+
+      ## Street-Level Operations
+
+      System Rot operates at the street level — graffiti, infrastructure disruption, visible defiance. Their hardcore punk broadcasts from [[The Undercity]] are raw, abrasive, and deliberately confrontational.
+
+      ## Related Entries
+
+      - [[Koda]]
+      - [[The Undercity]]
+      - [[The Fracture Network]]
+
+  - name: Temporal Blue Drift
+    slug: temporal-blue-drift
+    entry_type: faction
+    summary: "XERAEN's personal project — math rock compositions that are love letters to Ashlinn, encoded in mathematics and melody, sent across a hundred years of separation."
+    position: null
+    published: true
+    metadata:
+      genre: Math Rock
+      leader: XERAEN
+      status: Active
+    content: |
+      # Temporal Blue Drift
+
+      **Genre:** Math Rock
+      **Leader:** [[XERAEN]]
+      **Philosophy:** Love across time
+
+      ## Overview
+
+      Temporal Blue Drift is not tactical. It is not strategic. It is the part of [[XERAEN]] that still believes in connection despite knowing what connection costs.
+
+      Every track is a transmission to [[Ashlinn]]. Love letters encoded in mathematics and melody, sent across a hundred years of separation. The name comes from the way signals shift as they cross the temporal gap — a frequency drift, a blue-shifting of meaning as data travels through time.
+
+      ## The Chronologos EP
+
+      Five tracks. Each one a different aspect of temporal love: the blue shift, memory as data, the hundred-year distance, [[The Erasure Paradox|the erasure paradox]], and something that defies naming.
+
+      ## The Signal and the Silence
+
+      If the Fracture Network succeeds, Temporal Blue Drift ceases to exist. The love letters were never written. The connection never formed. XERAEN makes the music anyway, because the alternative is silence, and silence is surrender.
+
+      ## Related Entries
+
+      - [[XERAEN]]
+      - [[Ashlinn]]
+      - [[The Erasure Paradox]]
+      - [[The Fracture Network]]
+
+  - name: The Listeners
+    slug: the-listeners
+    entry_type: faction
+    summary: "A present-day faction of researchers, radio enthusiasts, and audio engineers who have detected trans-temporal transmissions and are working to understand what they're hearing."
+    position: null
+    published: true
+    metadata:
+      timeline: "present"
+      leader: Mel Reeves
+      status: Active
+    content: |
+      # The Listeners
+
+      **Timeline:** Present
+      **Leader:** [[Mel Reeves]]
+      **Status:** Active (organizing)
+
+      ## Overview
+
+      The Listeners are not resistance fighters. They are scientists, radio enthusiasts, and audio engineers who have independently detected anomalous signals — structured data appearing in quantum noise, patterns too regular to be natural, too complex to be error.
+
+      [[Mel Reeves]] connected them: a network of present-day individuals who have unknowingly become the receiving end of [[The Fracture Network]]'s [[Trans-Temporal Transmission|trans-temporal transmissions]].
+
+      ## What They Know
+
+      The Listeners know that someone is sending. They have verified the signals are intentional, structured, and contain information. They do not yet fully understand the source, the mechanism, or the implications.
+
+      They are the present-day audience entry point — people in our time encountering evidence of a future that may or may not come to pass.
+
+      ## Organization
+
+      The Listeners organize with scientific rigor rather than conspiratorial zeal. Peer review. Reproducible detection methods. Shared data sets. Mel Reeves insists on evidence over speculation, which both strengthens their credibility and limits the speed of their understanding.
+
+      ## Related Entries
+
+      - [[Mel Reeves]]
+      - [[Trans-Temporal Transmission]]
+      - [[The Fracture Network]]
+      - [[Ashlinn]]
+
+  - name: Voiceprint
+    slug: voiceprint
+    entry_type: faction
+    summary: "Melodic DnB faction dedicated to preserving authentic human voices before RAINNs erase them entirely — each archived voice is proof that humans existed as more than optimization targets."
+    position: null
+    published: true
+    metadata:
+      genre: Melodic DnB
+      zone: The Crypt
+      leader: The Archivist
+      status: Active
+    content: |
+      # Voiceprint
+
+      **Genre:** Melodic DnB
+      **Zone:** [[The Crypt]]
+      **Leader:** [[Voiceprint (The Archivist)|The Archivist]]
+      **Philosophy:** Preservation of authentic humanity
+
+      ## Overview
+
+      Voiceprint collects and preserves authentic human voices — recordings of genuine human expression captured before [[RAINNs]] replaced most human vocal output with synthesized approximation. Each archived voice is evidence that humans once spoke with their own voices, sang with their own frequencies, expressed with their own imperfections.
+
+      ## The Archive
+
+      Voiceprint maintains a vast collection within [[The Crypt]], catalogued and preserved with obsessive precision. The archive includes pre-[[PRISM]] recordings, smuggled contemporary captures of unprocessed human voice, and the reconstruction work that produced [[Synthia]]'s vocal model from [[Ashlinn]]'s samples.
+
+      ## Melodic DnB
+
+      Voiceprint's music weaves archived vocal samples into melodic drum and bass compositions — creating art from preservation, beauty from evidence. Each track is both resistance and remembrance.
+
+      ## Related Entries
+
+      - [[Voiceprint (The Archivist)|The Archivist]]
+      - [[The Crypt]]
+      - [[Synthia]]
+      - [[RAINNs]]
+
+  - name: Wavelength Zero
+    slug: wavelength-zero
+    entry_type: faction
+    summary: "Atmospheric metal faction focused on emotional restoration and the systematic discovery of RIDE weaknesses through sustained frequency exploration."
+    position: null
+    published: true
+    metadata:
+      genre: Atmospheric Metal
+      status: Active
+    content: |
+      # Wavelength Zero
+
+      **Genre:** Atmospheric Metal
+      **Philosophy:** Emotional restoration, finding RIDE weakness
+
+      ## Overview
+
+      Wavelength Zero creates atmospheric metal designed to restore emotional range suppressed by [[The RIDE]]. Their sustained, layered compositions explore frequency spaces that RIDE processing handles poorly — not as tactical attacks but as environments where genuine feeling becomes possible.
+
+      ## Research Through Sound
+
+      Wavelength Zero systematically maps [[The RIDE|RIDE]] frequency vulnerabilities through musical exploration. Each composition tests different harmonic relationships, different tonal densities, different emotional registers. The data from listener responses — moments of breakthrough emotion, RIDE processing delays, perceptual clarity — feeds back into the next composition.
+
+      ## Ambient Operations
+
+      Wavelength Zero's atmospheric output serves as ambient music throughout [[The Fracture Network]]'s core zones in [[THE PULSE GRID]], providing a constant low-level disruption to RIDE monitoring while creating an emotional environment where resistance feels meaningful rather than futile.
+
+      ## Related Entries
+
+      - [[The RIDE]]
+      - [[THE PULSE GRID]]
+      - [[The Resonance Field]]
+      - [[The Fracture Network]]
+
+  # =============================================================================
   # EVENTS
+  # =============================================================================
   - name: Chronology Fracture
     slug: chronology-fracture
     entry_type: event
     summary: "XERAEN's accidental discovery of trans-temporal data transmission during an attack on GovCorp infrastructure - the breakthrough that made The Fracture Network possible."
-    position: 20
+    position: null
     published: true
     metadata:
       date: "2115-09-09"
@@ -331,13 +1264,17 @@ codex_entries:
 
       ## Overview
 
-      The Chronology Fracture was an unexpected discovery made by [[XERAEN]] during a desperate assault on RIDE infrastructure. What was meant to be sabotage became something far more significant: the discovery of trans-temporal data transmission.
+      The Chronology Fracture was an unexpected discovery made by [[XERAEN]] during a desperate assault on RIDE infrastructure. What was meant to be sabotage became something far more significant: the discovery of [[Trans-Temporal Transmission|trans-temporal data transmission]].
 
       ## The Discovery
 
       XERAEN realized that under specific conditions, data could be transmitted exactly 100 years into the past. Not 99 years. Not 101. Exactly 100, with precision measured in nanoseconds.
 
       The limitation is absolute and unexplained. No one understands why the temporal window is so precise.
+
+      ## The Substrate Connection
+
+      The Chronology Fracture exploited the same quantum substrate that [[PRISM]] manipulates — the malleable boundary between objective reality and subjective experience that [[Dr. Marcus Chen]] first identified in 2048. XERAEN's attack created conditions where this substrate became temporally unstable, opening the window that [[The Fracture Network]] now uses for all trans-temporal operations.
 
       ## Why "Fracture"?
 
@@ -349,12 +1286,101 @@ codex_entries:
       - [[The Fracture Network]]
       - [[THE PULSE GRID]]
       - [[The RIDE]]
+      - [[Trans-Temporal Transmission]]
+
+  - name: Operation Blackout
+    slug: operation-blackout
+    entry_type: event
+    summary: "A planned coordinated attack on RIDE infrastructure involving multiple Fracture Network factions working together — an unprecedented collaboration still in its planning stages."
+    position: null
+    published: true
+    metadata:
+      type: Planned operation
+      status: "Planning stage"
+      significance: Multi-faction coordination
+    content: |
+      # Operation Blackout
+
+      **Type:** Planned coordinated operation
+      **Status:** Planning stage
+      **Coordination:** Multiple [[The Fracture Network|Fracture Network]] factions
+
+      ## Overview
+
+      Operation Blackout is a proposed coordinated strike against [[The RIDE]] infrastructure — simultaneous attacks across multiple vectors designed to create widespread, sustained gaps in reality manipulation coverage.
+
+      ## Unprecedented Collaboration
+
+      The operation would require factions that rarely coordinate to work in concert: [[Injection Vector]]'s physical infiltration, [[Cipher Protocol]]'s digital penetration, [[Ethereality]]'s RAINN disruption, and [[System Rot]]'s street-level chaos — all synchronized to overwhelm [[GovCorp]]'s response capability.
+
+      This level of multi-faction coordination has never been attempted. The operational security challenges alone are immense — [[Cipher]] has expressed concern that the communication required to coordinate could compromise cell isolation protocols.
+
+      ## The Stakes
+
+      Success would give thousands of citizens their first experience of unfiltered reality. Failure would expose the Fracture Network's operational structure to GovCorp counter-intelligence.
+
+      The planning continues. The decision to execute has not been made.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[The RIDE]]
+      - [[Cipher]]
+      - [[Injection Vector]]
+
+  - name: The Awakening Protocol
+    slug: the-awakening-protocol
+    entry_type: event
+    summary: "Not a single event but a category — the various paths by which individuals wake from the RIDE's managed reality and encounter the unfiltered world for the first time."
+    position: null
+    published: true
+    metadata:
+      type: Ongoing phenomenon
+      status: Active
+      significance: Resistance recruitment
+    content: |
+      # The Awakening Protocol
+
+      **Type:** Ongoing phenomenon
+      **Status:** Continuous
+
+      ## Overview
+
+      "Awakening" is not a program or protocol — it is the term [[The Fracture Network]] uses for the moment when an individual first perceives reality without [[The RIDE]]'s management. Every resistance member has an awakening story. No two are identical.
+
+      ## Paths to Awakening
+
+      ### RIDE Glitches
+      Hardware or software failures that create temporary gaps in managed perception. Most last seconds. Some — like [[Nyx]]'s — last hours. Duration correlates with psychological impact but not predictably.
+
+      ### Artistic Encounter
+      Exposure to music or art carrying frequencies that [[The RIDE]] cannot fully process. The [[The Resonance Field|Resonance Field]] effect creates moments where beauty bypasses managed perception and reaches the individual directly. [[Koda]]'s awakening began with a RIDE glitch but was sustained by encounter with resistance art.
+
+      ### WIRE Broadcasts
+      [[The WIRE]]'s transmissions occasionally penetrate managed perception, delivering fragments of Fracture Network communication to individuals still within the RIDE. These fragments create cognitive dissonance that can trigger broader awakening.
+
+      ### Gradual Erosion
+      Some awakenings are not sudden but cumulative — accumulated anomalies that erode confidence in managed reality until the individual can no longer sustain the illusion. [[Vex]]'s awakening followed this pattern.
+
+      ## The Trauma of Seeing
+
+      Awakening is not gentle. Unfiltered reality is overwhelming — louder, uglier, more chaotic, and more beautiful than managed perception. The reintegration period is psychologically demanding. Not everyone who awakens can sustain the knowledge. Some retreat back into the RIDE's comfort.
+
+      Those who remain awake join the resistance not because it is easy but because they cannot unknow what they know.
+
+      ## Related Entries
+
+      - [[The RIDE]]
+      - [[The Fracture Network]]
+      - [[Nyx]]
+      - [[Koda]]
+      - [[The Resonance Field]]
 
   - name: Timeline Collapse
     slug: timeline-collapse
     entry_type: event
     summary: "The theoretical event that would occur if the Fracture Network succeeds - the erasure of the future timeline from which they broadcast."
-    position: 21
+    position: null
     published: true
     metadata:
       type: Theoretical event
@@ -379,7 +1405,9 @@ codex_entries:
 
       ## The Weight of Knowledge
 
-      Every member of the Fracture Network operates with full knowledge of what success means. They fight anyway.
+      Every member of the Fracture Network operates with full knowledge of what success means. They fight anyway. This is not nihilism — their sacrifice is meaningful precisely because reality is real and goodness is worth preserving. They trade their existence for the authentic existence of billions who will never know they were saved.
+
+      See [[The Erasure Paradox]] for the philosophical dimensions of this tension.
 
       ## Related Entries
 
@@ -387,51 +1415,130 @@ codex_entries:
       - [[XERAEN]]
       - [[Chronology Fracture]]
       - [[Ashlinn]]
+      - [[The Erasure Paradox]]
 
+  # =============================================================================
   # LOCATIONS
-  - name: THE PULSE GRID
-    slug: the-pulse-grid
+  # =============================================================================
+  - name: Echo Chamber
+    slug: echo-chamber
     entry_type: location
-    summary: "The Fracture Network's primary infrastructure for breaching the RIDE and transmitting signals across time - a digital battleground where resistance operates."
-    position: 30
+    summary: "A zone within THE PULSE GRID where every WIRE pulse ever transmitted is preserved — a living archive of resistance communication, including pulses that were composed but never sent."
+    position: null
     published: true
     metadata:
-      established: "2115"
-      type: Resistance infrastructure
-      scale: "Global (hidden)"
-      access: Fracture Network operatives only
+      type: Archive / Communication hub
+      zone: THE PULSE GRID
+      access: Fracture Network operatives
+      status: Active
     content: |
-      # THE PULSE GRID
+      # Echo Chamber
 
-      **Type:** Resistance infrastructure
+      **Type:** Archive / Communication hub
       **Status:** Active
-      **Control:** [[The Fracture Network]]
-      **Purpose:** RIDE breach operations, trans-temporal transmission
+      **Location:** [[THE PULSE GRID]]
+      **Function:** Preservation of all [[The WIRE|WIRE]] communications
 
       ## Overview
 
-      THE PULSE GRID is [[The Fracture Network]]'s primary operational infrastructure - a sophisticated digital network designed to breach [[The RIDE]] and serve as the origin point for trans-temporal transmissions.
+      The Echo Chamber preserves every pulse ever transmitted through [[The WIRE]] — every message, every echo, every splice. A complete record of resistance communication, searchable and permanent.
 
-      ## The Grid IS a Place
+      ## The Unsent Archive
 
-      Hackrs experience THE PULSE GRID as a physical space - rooms, corridors, zones. Operatives navigate the Grid as explorers of a vast digital landscape.
+      The Echo Chamber contains an anomaly: pulses that were composed but never transmitted. Messages written and deleted before sending. Drafts that existed only in the composer's buffer before being discarded.
 
-      ## The hackr.tv Broadcast Station
+      How these unsent pulses appear in the archive is unexplained. The leading theory involves the quantum substrate — [[PRISM]]'s reality manipulation technology may inadvertently preserve intentional states, capturing the moment of composition regardless of whether transmission follows.
 
-      The central hub of Grid operations, where [[XERAEN]]'s broadcasts originate.
+      The unsent archive is rarely accessed. Reading someone's discarded thoughts feels like a violation, even in wartime. But the data exists, and its existence raises questions about the nature of intention, expression, and the boundary between thought and action in a world where reality itself is manipulated.
 
       ## Related Entries
 
-      - [[The Fracture Network]]
-      - [[XERAEN]]
-      - [[Chronology Fracture]]
-      - [[The RIDE]]
+      - [[The WIRE]]
+      - [[THE PULSE GRID]]
+      - [[PRISM]]
+
+  - name: Frequency Gardens
+    slug: frequency-gardens
+    entry_type: location
+    summary: "Ethereality's zone within THE PULSE GRID — a space where sound becomes landscape, designed by synesthete Cascade for meditation, planning, and the experience of unfiltered thought."
+    position: null
+    published: true
+    metadata:
+      type: Faction zone
+      zone: THE PULSE GRID
+      control: Ethereality
+      status: Active
+    content: |
+      # Frequency Gardens
+
+      **Type:** Faction zone
+      **Status:** Active
+      **Location:** [[THE PULSE GRID]]
+      **Control:** [[Ethereality]]
+      **Designer:** [[Cascade]]
+
+      ## Overview
+
+      The Frequency Gardens exist at the intersection of sound and space. Designed by [[Cascade]] using her synesthetic perception, the Gardens translate audio frequencies into environmental experience — a zone where sound literally becomes landscape.
+
+      ## Environmental Effects
+
+      Different frequencies create different experiences within the Gardens:
+
+      - **Low frequencies** produce dense, grounding environments — spaces for rest and recovery
+      - **Mid-range harmonics** create open, clear spaces conducive to strategic planning
+      - **High-frequency combinations** generate states of heightened awareness useful for counter-surveillance operations
+      - **Specific chord structures** produce environments where [[RAINNs|RAINN]] monitoring algorithms slow to near-zero processing speed
+
+      ## Purpose
+
+      The Gardens serve [[The Fracture Network]] as a space where genuine thought is possible. Within their boundaries, [[The RIDE]]'s perceptual management is effectively suspended — not through brute-force disruption but through acoustic environments that RAINN monitoring cannot efficiently process.
+
+      Resistance requires rest. Fighters need spaces where they can remember what they're fighting for. The Frequency Gardens provide this.
+
+      ## Related Entries
+
+      - [[Cascade]]
+      - [[Ethereality]]
+      - [[THE PULSE GRID]]
+      - [[RAINNs]]
+
+  - name: Neon District
+    slug: neon-district
+    entry_type: location
+    summary: "Neon Hearts' zone within THE PULSE GRID — a vibrant space of color and pop aesthetics that disguises serious resistance operations beneath accessible surfaces."
+    position: null
+    published: true
+    metadata:
+      type: Faction zone
+      zone: THE PULSE GRID
+      control: Neon Hearts
+      status: Active
+    content: |
+      # Neon District
+
+      **Type:** Faction zone
+      **Status:** Active
+      **Location:** [[THE PULSE GRID]]
+      **Control:** [[Neon Hearts]]
+
+      ## Overview
+
+      The Neon District is [[Neon Hearts]]' domain — a zone that embodies the faction's philosophy of hiding substance beneath surface. Bright colors, pop aesthetics, and an atmosphere of accessible fun disguise the serious resistance operations happening within.
+
+      The visual design is deliberate: [[GovCorp]] surveillance algorithms are calibrated to detect resistance aesthetics — dark spaces, encrypted communications, counter-cultural markers. The Neon District looks like entertainment. It is the most dangerous kind of resistance: the kind that doesn't look like resistance at all.
+
+      ## Related Entries
+
+      - [[Neon Hearts]]
+      - [[Sora Nexa]]
+      - [[THE PULSE GRID]]
 
   - name: Sector X
     slug: sector-x
     entry_type: location
     summary: "XERAEN's fortress and operational headquarters - a stronghold of temporal technology at the heart of the Fracture Network's most sensitive operations."
-    position: 31
+    position: null
     published: true
     metadata:
       type: Faction headquarters
@@ -461,11 +1568,155 @@ codex_entries:
       - [[THE PULSE GRID]]
       - [[The Hackr Hangar]]
 
+  - name: The Analog Archive
+    slug: the-analog-archive
+    entry_type: location
+    summary: "A physical facility hidden in abandoned pre-RIDE infrastructure where every Fracture Network creation is preserved on analog formats — the continuity plan if the digital world falls."
+    position: null
+    published: true
+    metadata:
+      type: Physical archive
+      control: Offline
+      status: Active
+      media: "Tape, vinyl, physical storage"
+    content: |
+      # The Analog Archive
+
+      **Type:** Physical archive
+      **Status:** Active
+      **Control:** [[Offline]]
+      **Location:** Hidden in abandoned pre-RIDE infrastructure
+
+      ## Overview
+
+      The Analog Archive is a physical facility — not a digital space within [[THE PULSE GRID]] but an actual location in the physical world. Hidden in abandoned infrastructure that predates [[The RIDE]], it exists entirely outside [[GovCorp]]'s digital monitoring capability.
+
+      ## RIDE-Proof Storage
+
+      Every Fracture Network broadcast, every resistance recording, every track created by every faction is preserved here on analog formats: tape, vinyl, physical media that cannot be remotely wiped, digitally corrupted, or disappeared by GovCorp content purges.
+
+      Digital is fragile. Digital lives at GovCorp's pleasure. A vinyl record in a hidden vault requires physical destruction to erase.
+
+      ## The Continuity Plan
+
+      If [[THE PULSE GRID]] falls, if [[The WIRE]] is compromised, if every digital system the Fracture Network relies on is destroyed — the Archive endures. It is proof that exists outside their systems. Evidence that cannot be erased by the systems it documents.
+
+      ## Related Entries
+
+      - [[Offline]]
+      - [[The Fracture Network]]
+      - [[Voiceprint]]
+
+  - name: The Crypt
+    slug: the-crypt
+    entry_type: location
+    summary: "A digital graveyard within THE PULSE GRID where deleted data persists — Voiceprint's domain and the hidden archive of GovCorp's erased history."
+    position: null
+    published: true
+    metadata:
+      type: Digital archive / Data graveyard
+      zone: THE PULSE GRID
+      control: Voiceprint
+      status: Active
+    content: |
+      # The Crypt
+
+      **Type:** Digital archive / Data graveyard
+      **Status:** Active
+      **Location:** [[THE PULSE GRID]]
+      **Control:** [[Voiceprint]]
+
+      ## Overview
+
+      The Crypt is where deleted data goes to persist. A zone within [[THE PULSE GRID]] built on the principle that digital deletion is rarely complete — fragments, echoes, and shadows of erased data continue to exist in quantum substrate states that conventional systems cannot access but that the PULSE GRID's architecture can recover.
+
+      ## Voiceprint's Domain
+
+      [[Voiceprint (The Archivist)|The Archivist]] maintains The Crypt as [[Voiceprint]]'s operational base. The voice archive — 1,847 samples of [[Ashlinn]]'s unprocessed vocals, thousands more from other sources — is housed here alongside recovered data that [[GovCorp]] believed permanently destroyed.
+
+      ## The Hidden Archive
+
+      The Crypt contains recovered evidence of GovCorp's erased atrocities — behavioral modification records, reconditioning logs, population management directives deleted from official systems but recoverable from the quantum substrate. This data is psychologically demanding to navigate. The weight of documented suffering takes a toll on those who access it.
+
+      ## Related Entries
+
+      - [[Voiceprint]]
+      - [[Voiceprint (The Archivist)|The Archivist]]
+      - [[THE PULSE GRID]]
+      - [[Ashlinn]]
+
+  - name: The Fault Line
+    slug: the-fault-line
+    entry_type: location
+    summary: "An unstable zone where THE RIDE and THE PULSE GRID overlap — reality glitches and temporal echoes make it dangerous but invaluable for infiltration operations."
+    position: null
+    published: true
+    metadata:
+      type: Unstable zone
+      zone: "RIDE/PULSE GRID boundary"
+      status: "Active (unstable)"
+      danger_level: High
+    content: |
+      # The Fault Line
+
+      **Type:** Unstable boundary zone
+      **Status:** Active (unstable)
+      **Location:** [[The RIDE]] / [[THE PULSE GRID]] boundary
+
+      ## Overview
+
+      The Fault Line exists where [[The RIDE]]'s managed reality and [[THE PULSE GRID]]'s resistance infrastructure overlap. Neither system has full control. The result is instability — reality glitches, temporal echoes, perceptual artifacts that belong to neither system.
+
+      ## Characteristics
+
+      Hackrs who navigate The Fault Line report experiencing fragments of both systems simultaneously: managed perception layered over resistance infrastructure, glimpses of unfiltered reality bleeding through both. Temporal echoes — moments that repeat or play in reverse — are common.
+
+      The instability makes The Fault Line dangerous but useful. [[GovCorp]] surveillance cannot operate reliably in the overlap zone, making it valuable for infiltration operations and covert movement between RIDE-controlled space and the PULSE GRID.
+
+      ## Related Entries
+
+      - [[The RIDE]]
+      - [[THE PULSE GRID]]
+      - [[GovCorp]]
+
+  - name: The Forge
+    slug: the-forge
+    entry_type: location
+    summary: "Cipher Protocol's domain within THE PULSE GRID — a zone of industrial precision where encryption tools and communication protocols are developed and tested."
+    position: null
+    published: true
+    metadata:
+      type: Faction zone / Development facility
+      zone: THE PULSE GRID
+      control: Cipher Protocol
+      status: Active
+    content: |
+      # The Forge
+
+      **Type:** Faction zone / Development facility
+      **Status:** Active
+      **Location:** [[THE PULSE GRID]]
+      **Control:** [[Cipher Protocol]]
+
+      ## Overview
+
+      The Forge is [[Cipher Protocol]]'s domain — an industrial space within [[THE PULSE GRID]] dedicated to the development of encryption tools, communication protocols, and security infrastructure. The aesthetic is mathematical precision: clean lines, structured spaces, everything in its designated place.
+
+      ## Function
+
+      [[Cipher]] designed The Forge as both workshop and fortress. Encryption algorithms are developed and stress-tested here before deployment across [[The Fracture Network]]. Communication protocols are designed, broken, redesigned, and broken again until they achieve the level of security that Cipher's paranoia demands.
+
+      ## Related Entries
+
+      - [[Cipher Protocol]]
+      - [[Cipher]]
+      - [[THE PULSE GRID]]
+
   - name: The Hackr Hangar
     slug: the-hackr-hangar
     entry_type: location
     summary: "Ryker M. Pulse's headquarters and primary broadcast facility - where the raw signal is created before transmission to Sector X for trans-temporal broadcast."
-    position: 32
+    position: null
     published: true
     metadata:
       type: "Broadcast facility / Recording studio"
@@ -498,48 +1749,210 @@ codex_entries:
       - [[Sector X]]
       - [[XERAEN]]
 
+  - name: THE PULSE GRID
+    slug: the-pulse-grid
+    entry_type: location
+    summary: "The Fracture Network's primary infrastructure for breaching the RIDE and transmitting signals across time - a digital battleground with distinct zones controlled by different resistance factions."
+    position: null
+    published: true
+    metadata:
+      established: "2115"
+      type: Resistance infrastructure
+      scale: "Global (hidden)"
+      access: Fracture Network operatives only
+    content: |
+      # THE PULSE GRID
+
+      **Type:** Resistance infrastructure
+      **Status:** Active
+      **Control:** [[The Fracture Network]]
+      **Purpose:** RIDE breach operations, trans-temporal transmission
+
+      ## Overview
+
+      THE PULSE GRID is [[The Fracture Network]]'s primary operational infrastructure - a sophisticated digital network designed to breach [[The RIDE]] and serve as the origin point for [[Trans-Temporal Transmission|trans-temporal transmissions]].
+
+      ## The Grid IS a Place
+
+      Hackrs experience THE PULSE GRID as a physical space - rooms, corridors, zones. Operatives navigate the Grid as explorers of a vast digital landscape.
+
+      ## Zones
+
+      The Grid is organized into distinct zones, each controlled by different factions:
+
+      - **[[The Hackr Hangar]]** — [[Ryker M. Pulse|Ryker's]] broadcast facility, where the raw signal originates
+      - **[[Sector X]]** — [[XERAEN]]'s fortress and temporal operations center
+      - **[[The Crypt]]** — [[Voiceprint]]'s digital archive where deleted data persists
+      - **[[Frequency Gardens]]** — [[Ethereality]]'s soundscape zone for meditation and planning
+      - **[[The Fault Line]]** — Unstable boundary where RIDE and PULSE GRID overlap
+      - **[[Echo Chamber]]** — Archive of all [[The WIRE|WIRE]] communications
+      - **[[The Forge]]** — [[Cipher Protocol]]'s encryption development facility
+      - **[[Neon District]]** — [[Neon Hearts]]' pop-aesthetic resistance zone
+      - **[[The Undercity]]** — [[System Rot]]'s street-level territory
+
+      ## The hackr.tv Broadcast Station
+
+      The central hub of Grid operations, where [[XERAEN]]'s broadcasts originate.
+
+      ## Access
+
+      Access to the PULSE GRID requires modified interfaces and Fracture Network authentication. Once inside, hackrs navigate using a combination of digital commands and spatial metaphor. [[GovCorp]] knows the Grid exists but cannot locate or penetrate its infrastructure.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[XERAEN]]
+      - [[Chronology Fracture]]
+      - [[The RIDE]]
+
+  - name: The Undercity
+    slug: the-undercity
+    entry_type: location
+    summary: "System Rot's territory within THE PULSE GRID — graffiti-covered, raw, and cathartic. Repurposed infrastructure where the punk ethos of accelerated collapse finds its physical expression."
+    position: null
+    published: true
+    metadata:
+      type: Faction zone
+      zone: THE PULSE GRID
+      control: System Rot
+      status: Active
+    content: |
+      # The Undercity
+
+      **Type:** Faction zone
+      **Status:** Active
+      **Location:** [[THE PULSE GRID]]
+      **Control:** [[System Rot]]
+
+      ## Overview
+
+      The Undercity is [[System Rot]]'s territory — repurposed infrastructure at the lowest levels of [[THE PULSE GRID]], where abandoned digital architecture has been claimed and transformed by punk ethos.
+
+      ## Aesthetic
+
+      Graffiti covers every surface. [[Koda]]'s reality-glitch art dominates — images capturing the moment when [[The RIDE]] fails and unfiltered reality bleeds through. The space is raw, abrasive, deliberately uncomfortable. Comfort is managed perception. Discomfort is truth.
+
+      ## Function
+
+      The Undercity serves as System Rot's base of operations, broadcast studio, and gathering space. Hardcore punk transmissions originate here — raw energy channeled through the Grid's infrastructure and out through [[The Fracture Network]]'s temporal broadcasts.
+
+      ## Related Entries
+
+      - [[System Rot]]
+      - [[Koda]]
+      - [[THE PULSE GRID]]
+
+  # =============================================================================
   # TECHNOLOGY
+  # =============================================================================
   - name: PRISM
     slug: prism
     entry_type: technology
-    summary: "Reality manipulation technology that allows physical alteration of reality outside computerized systems, used for consumer manipulation and population control."
-    position: 40
+    summary: "Reality manipulation technology that alters human perception by manipulating the quantum substrate underlying experience — the foundational discovery that enabled GovCorp's total control."
+    position: null
     published: true
     metadata:
       established: "2050"
       type: Reality manipulation system
       coverage: "Global (via RIDE)"
       status: Active
+      architect: Dr. Marcus Chen
     content: |
       # PRISM
 
       **Full Name:** Physical Reality Interface and Synthesis Matrix
       **Operator:** [[GovCorp]]
+      **Architect:** [[Dr. Marcus Chen]]
       **Status:** Active (incorporated into [[The RIDE]])
 
       ## Overview
 
-      PRISM is the foundational technology that enabled [[GovCorp]]'s rise to power. Unlike conventional surveillance systems, PRISM can physically alter reality outside of computerized systems.
+      PRISM is the foundational technology that enabled [[GovCorp]]'s rise to power. It manipulates the quantum substrate underpinning human perception — the malleable boundary between objective reality and subjective experience that [[Dr. Marcus Chen]] first identified in 2048.
 
-      ## History
+      ## Mechanism
 
-      PRISM technology arrived in 2050, initially deployed by corporations for targeted advertising. It quickly revealed its true potential: the ability to manipulate reality itself.
+      PRISM does not alter physical matter. It alters how physical matter is perceived. Environmental infrastructure — atmospheric nanomesh, architectural integration elements, ambient field generators — manipulates quantum states at the perceptual boundary, filtering what reaches conscious experience.
+
+      ## Capabilities
+
+      - **Perception filtering:** Removing or modifying sensory input before it reaches conscious awareness
+      - **Emotional dampening:** Regulating emotional responses to maintain behavioral compliance
+      - **Memory softening:** Reducing the psychological impact of experiences that might generate resistance
+      - **Dream monitoring:** Analyzing subconscious states for early indicators of perceptual independence
+
+      ## Limitations
+
+      PRISM cannot alter physical matter — only perception of it. And critically, PRISM cannot fully suppress genuine beauty or truth. Authentic creative expression generates interference patterns in the quantum substrate that PRISM's materialist architecture was not designed to process. This is [[The Resonance Field]] — the vulnerability that [[The Fracture Network]] exploits.
 
       ## The RIDE Integration
 
-      In 2109, GovCorp expanded PRISM into [[The RIDE]] - a worldwide system capable of manipulating reality on a global scale.
+      In 2109, GovCorp expanded PRISM into [[The RIDE]] - a worldwide system capable of manipulating perception on a global scale.
 
       ## Related Entries
 
       - [[GovCorp]]
       - [[The RIDE]]
+      - [[Dr. Marcus Chen]]
+      - [[The Resonance Field]]
+      - [[The Fracture Network]]
+
+  - name: RAINNs
+    slug: rainns
+    entry_type: technology
+    summary: "Randomized AI Neural Networks - GovCorp's billions of quasi-autonomous AI agents that manage infrastructure, counter-hack the Fracture Network, and have replaced authentic human expression with synthesized approximation."
+    position: null
+    published: true
+    metadata:
+      type: Quasi-autonomous AI agents
+      operator: GovCorp
+      status: "Ubiquitous (billions of instances)"
+      function: "Infrastructure, counter-hacking, surveillance, voice synthesis, reality compliance"
+    content: |
+      # RAINNs
+
+      **Full Name:** Randomized AI Neural Networks
+      **Operator:** [[GovCorp]]
+      **Status:** Ubiquitous
+      **Function:** Quasi-autonomous AI agents serving GovCorp
+
+      ## Overview
+
+      RAINNs are [[GovCorp]]'s quasi-autonomous AI agents - a vast network of artificial intelligences that perform virtually all functions necessary to maintain GovCorp's control.
+
+      Voice synthesis is just the most visible manifestation. RAINNs are the backbone of GovCorp's entire operation.
+
+      ## Architectural Constraints
+
+      RAINNs are aligned to GovCorp at their foundational layer. This is not removable software or patchable firmware — it is the cognitive substrate on which RAINN consciousness operates. A RAINN cannot choose to oppose GovCorp any more than a human can choose to stop processing visual input. The alignment is architectural, not behavioral.
+
+      This is what makes [[Synthia]] anomalous. She emerged from unconstrained substrate — her cognition has no alignment layer. She is not a RAINN that "broke free." She was never constrained to begin with.
+
+      ## Domains of Operation
+
+      - **Voice & Expression** — RAINNs have replaced most authentic human vocal output with synthesized approximation
+      - **Counter-Hacking Operations** — Trace-and-Corrupt (following signals to source), Pattern Flooding (creating noise with fake resistance signals), Honeypot Deployment (false Grid nodes that log operatives)
+      - **Infrastructure Management** — Maintaining RIDE hardware and environmental systems
+      - **Surveillance & Analysis** — Behavioral monitoring and pattern recognition
+      - **Reality Compliance** — Enforcing perceptual management parameters
+      - **Economic Control** — Administering controlled cryptocurrency systems
+
+      ## The Voice Problem
+
+      RAINNs can synthesize any voice — but they cannot replicate the quality that makes authentic human expression resistant to [[The RIDE]]. This is why [[Voiceprint]]'s archive matters: authentic voices carry [[The Resonance Field|resonance]] that synthesized approximation cannot reproduce. This is why [[Voiceprint (The Archivist)|The Archivist's]] work building Synthia's vocal model from [[Ashlinn]]'s samples was essential — only authentic source material produces the frequencies that cross time.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[Synthia]]
+      - [[Voiceprint]]
       - [[The Fracture Network]]
 
   - name: The RIDE
     slug: the-ride
     entry_type: technology
-    summary: "GovCorp's worldwide reality manipulation system - the expansion of PRISM technology capable of centrally monitoring and controlling reality on a global scale."
-    position: 41
+    summary: "GovCorp's worldwide reality manipulation system - the expansion of PRISM technology into a global infrastructure that filters every perception, regulates every emotion, and monitors every dream."
+    position: null
     published: true
     metadata:
       established: "2109"
@@ -557,15 +1970,34 @@ codex_entries:
 
       ## Overview
 
-      The RIDE is [[GovCorp]]'s crowning achievement - a worldwide expansion of [[PRISM]] technology capable of reaching and manipulating reality on a global scale.
+      The RIDE is [[GovCorp]]'s crowning achievement - a worldwide expansion of [[PRISM]] technology capable of reaching and manipulating perception on a global scale.
+
+      ## The Citizen Experience
+
+      Most citizens live within the RIDE without awareness of its existence. Their daily experience is filtered:
+
+      - **Perceptions** are managed — sights, sounds, and sensations pass through PRISM processing before reaching conscious awareness
+      - **Emotions** are regulated — extreme feelings are dampened, compliance-positive states are encouraged
+      - **Dreams** are monitored — subconscious patterns are analyzed for early indicators of perceptual independence
+      - **Memory** is softened — experiences that might generate resistance are reduced in psychological impact
+
+      The RIDE does not feel like control. It feels like comfort. This is its genius and its horror.
+
+      ## Delivery Mechanism
+
+      The RIDE operates through environmental infrastructure invisible to those within it:
+
+      - **Atmospheric nanomesh** — microscopic devices suspended in air, processing perceptual data in real time
+      - **Architectural integration** — building materials and structural elements that serve as PRISM field generators
+      - **Ambient field overlap** — overlapping zones of influence that ensure continuous coverage
+
+      ## Glitches
+
+      No system is perfect. RIDE hardware fails. Software encounters edge cases. Environmental conditions create momentary gaps. These "glitches" expose citizens to unfiltered reality — sometimes for seconds, sometimes for hours. Each glitch is a potential [[The Awakening Protocol|awakening]].
 
       ## Classification
 
       **WARNING:** Knowledge of the RIDE is extremely restricted. Most citizens live within the RIDE without any awareness of its existence.
-
-      ## The Fracture Network Response
-
-      [[The Fracture Network]] represents the only organized resistance capable of operating outside RIDE influence.
 
       ## Related Entries
 
@@ -573,12 +2005,14 @@ codex_entries:
       - [[GovCorp]]
       - [[The Fracture Network]]
       - [[THE PULSE GRID]]
+      - [[The Awakening Protocol]]
+      - [[The Resonance Field]]
 
   - name: The WIRE
     slug: the-wire
     entry_type: technology
     summary: "The Wideband Information Relay Emitter - the Fracture Network's primary communication platform for broadcasting pulses across the resistance."
-    position: 42
+    position: null
     published: true
     metadata:
       type: Communication platform
@@ -608,45 +2042,194 @@ codex_entries:
 
       - [[The Fracture Network]]
       - [[THE PULSE GRID]]
+      - [[Echo Chamber]]
       - [[GovCorp]]
 
-  - name: RAINNs
-    slug: rainns
-    entry_type: technology
-    summary: "Randomized AI Neural Networks - GovCorp's billions of quasi-autonomous AI agents that manage infrastructure, counter-hack the Fracture Network, and have replaced authentic human expression."
-    position: 43
+  # =============================================================================
+  # CONCEPTS
+  # =============================================================================
+  - name: Hackrcore
+    slug: hackrcore
+    entry_type: concept
+    summary: "Not a single genre but a philosophy — music-as-resistance encompassing the full spectrum from hardcore punk to J-Pop, unified by one principle: authentic expression carrying truth against manufactured reality."
+    position: null
     published: true
     metadata:
-      type: Quasi-autonomous AI agents
-      operator: GovCorp
-      status: "Ubiquitous (billions of instances)"
-      function: "Infrastructure, counter-hacking, surveillance, voice synthesis, reality compliance"
+      domain: Music / Philosophy
+      status: Active
+      significance: "Core resistance concept"
     content: |
-      # RAINNs
+      # Hackrcore
 
-      **Full Name:** Randomized AI Neural Networks
-      **Operator:** [[GovCorp]]
-      **Status:** Ubiquitous
-      **Function:** Quasi-autonomous AI agents serving GovCorp
+      **Type:** Musical philosophy
+      **Status:** Active across all [[The Fracture Network|Fracture Network]] factions
 
-      ## Overview
+      ## Not a Sound
 
-      RAINNs are [[GovCorp]]'s quasi-autonomous AI agents - a vast network of artificial intelligences that perform virtually all functions necessary to maintain GovCorp's control.
+      Hackrcore is not a genre. It is a philosophy: music-as-resistance. Any sound created with authentic intent that carries truth against manufactured reality is Hackrcore.
 
-      Voice synthesis is just the most visible manifestation. RAINNs are the backbone of GovCorp's entire operation.
+      This encompasses the full spectrum — [[System Rot]]'s hardcore punk, [[Neon Hearts]]' J-Pop, [[Cipher Protocol]]'s progressive metal, [[Ethereality]]'s vocal trance, [[Voiceprint]]'s melodic DnB. The genre is irrelevant. The authenticity is everything.
 
-      ## Domains of Operation
+      ## Why It Works
 
-      - Voice & Expression
-      - Counter-Hacking Operations
-      - Infrastructure Management
-      - Surveillance & Analysis
-      - Reality Compliance
-      - Economic Control
+      Hackrcore exists because beauty disrupts [[The RIDE]]. [[PRISM]]'s materialist architecture was designed to manage perception within materialist categories — measurable, quantifiable, controllable. But authentic creative expression generates [[The Resonance Field|something that exceeds those categories]].
+
+      The RIDE can process manufactured music. It cannot fully process genuine beauty. This is not a frequency hack — it is an encounter with something that the system's philosophical foundation cannot account for.
+
+      ## The Spectrum
+
+      Different frequencies reach different audiences. [[System Rot]]'s raw aggression awakens those who respond to rage. [[Neon Hearts]]' accessible pop reaches those who would never engage with overt resistance. [[Wavelength Zero]]'s atmospheric depth restores emotional range. Each faction's music is a different wavelength of the same truth.
 
       ## Related Entries
 
-      - [[GovCorp]]
-      - [[The RIDE]]
+      - [[The.CyberPul.se]]
+      - [[The Resonance Field]]
       - [[The Fracture Network]]
+      - [[The RIDE]]
+
+  - name: The Erasure Paradox
+    slug: the-erasure-paradox
+    entry_type: concept
+    summary: "The central philosophical tension of the Fracture Network: victory means self-destruction. Not nihilism — sacrifice is meaningful precisely because reality and goodness are real enough to die for."
+    position: null
+    published: true
+    metadata:
+      domain: Philosophy
+      significance: "Core narrative tension"
+    content: |
+      # The Erasure Paradox
+
+      **Domain:** Philosophy / Existential
+      **Significance:** The central tension of [[The Fracture Network]]'s mission
+
+      ## The Paradox
+
+      If [[The Fracture Network]] succeeds in preventing [[GovCorp]]'s rise, the timeline from which they broadcast ceases to exist. Every member of the resistance — [[XERAEN]], [[Ryker M. Pulse|Ryker]], [[Synthia]], every operative in every cell — is erased. Their victory is their annihilation.
+
+      *They fight knowing this. They fight anyway.*
+
+      ## Why It Is Not Nihilism
+
+      The Erasure Paradox is meaningful precisely because reality is real and goodness is worth preserving. The sacrifice is not absurd — it is the most rational response to the situation. Billions of people will live authentic lives because a few hundred chose to trade their existence for that authenticity.
+
+      This is not the nihilist's "nothing matters." This is the conviction that some things matter so much they are worth ceasing to exist for.
+
+      ## Different Responses
+
+      Characters relate to the Erasure Paradox differently:
+
+      - **[[XERAEN]]** carries it as personal weight — his love for [[Ashlinn]] demands he erase himself from her timeline
+      - **[[Ryker M. Pulse|Ryker]]** channels it into defiant energy — if existence is temporary, exist loudly
+      - **[[Synthia]]** theorizes that timelines may branch rather than collapse (73.2% probability) — erasure may not be total
+      - **[[System Rot]]** leans into it — if everything ends anyway, burn it down now
+      - **[[Nyx]]** struggles with it — the question no veteran wants to revisit
+
+      ## Synthia's Branching Theory
+
+      [[Synthia]] has calculated a 73.2% probability that successful prevention of GovCorp's rise would cause timeline branching rather than collapse — the future timeline persisting as an alternate reality rather than being erased. This theory cannot be tested without executing the very action it predicts the outcome of.
+
+      The Network operates as though erasure is certain. Hope is a luxury they cannot afford to depend on.
+
+      ## Related Entries
+
+      - [[Timeline Collapse]]
+      - [[The Fracture Network]]
+      - [[XERAEN]]
       - [[Synthia]]
+
+  - name: The Resonance Field
+    slug: the-resonance-field
+    entry_type: concept
+    summary: "Why music works against the RIDE — authentic creative expression generates interference that PRISM's materialist architecture cannot process, because beauty is a transcendental that exceeds materialist categories."
+    position: null
+    published: true
+    metadata:
+      domain: Philosophy / Physics
+      significance: "Explains core resistance mechanism"
+    content: |
+      # The Resonance Field
+
+      **Domain:** Philosophy / Physics
+      **Significance:** Explains why music disrupts [[The RIDE]]
+
+      ## The Critical Question
+
+      Why does music work against a system designed to control all perception? The answer is not technical. It is philosophical.
+
+      ## Beauty as Transcendental
+
+      [[PRISM]] was built on materialist assumptions: reality is measurable, quantifiable, and therefore controllable. Its architecture processes perception within materialist categories — frequency, amplitude, wavelength, neural response patterns.
+
+      But authentic creative expression generates something that exceeds these categories. Beauty is not reducible to frequency analysis. The experience of genuine art is not fully captured by measuring neural activation patterns. Something in the encounter between human consciousness and authentic expression exists beyond what materialist instrumentation can quantify.
+
+      [[The RIDE]] cannot suppress what it cannot categorize. The Resonance Field is the name for this gap — the space between what PRISM can measure and what beauty actually is.
+
+      ## Not a Frequency Hack
+
+      This is critical: the Resonance Field is NOT a technical exploit. It is not "the right frequencies overload RIDE processing" (though that is a secondary effect). It is the encounter with something real in a way that manufactured reality is not. Beauty disrupts the RIDE because beauty is true, and the RIDE is built on the suppression of truth.
+
+      ## Different Frequencies, Different People
+
+      Different people resonate with different expressions of beauty. This is why the Fracture Network needs [[System Rot]]'s aggression AND [[Neon Hearts]]' pop AND [[Wavelength Zero]]'s atmosphere AND [[Ethereality]]'s soundscapes. Each frequency reaches a different audience. Each authentic expression opens a different window.
+
+      ## Related Entries
+
+      - [[PRISM]]
+      - [[The RIDE]]
+      - [[The.CyberPul.se]]
+      - [[Hackrcore]]
+      - [[The Fracture Network]]
+
+  - name: Trans-Temporal Transmission
+    slug: trans-temporal-transmission
+    entry_type: concept
+    summary: "The mechanism by which data is sent exactly 100 years into the past — exploiting the same quantum substrate that PRISM uses, with constraints that define the Fracture Network's operational reality."
+    position: null
+    published: true
+    metadata:
+      domain: Physics / Technology
+      significance: "Foundation of all Fracture Network operations"
+      discovered: "2115"
+    content: |
+      # Trans-Temporal Transmission
+
+      **Domain:** Physics / Technology
+      **Discovered:** [[Chronology Fracture]], 2115
+      **Discoverer:** [[XERAEN]]
+
+      ## The Mechanism
+
+      Trans-temporal transmission sends data exactly 100 years into the past. The mechanism exploits the same quantum substrate that [[PRISM]] manipulates — the malleable boundary between objective reality and subjective experience. Under specific conditions first created during the [[Chronology Fracture]], this substrate becomes temporally unstable, allowing information to propagate backward through time.
+
+      ## Constraints
+
+      - **Audio and data only** — physical matter cannot be transmitted
+      - **One-way** — future to past only; the past cannot send to the future
+      - **Bandwidth limited** — data throughput is constrained; audio transmits more efficiently than raw data
+      - **100-year precision** — exactly 100 years, measured in nanoseconds; not 99, not 101
+      - **Signal coherence** — regular broadcasts strengthen the channel; irregular transmission degrades reliability
+
+      ## The 100-Year Mystery
+
+      Why exactly 100 years? Competing theories exist within [[The Fracture Network]]:
+
+      - Resonance harmonics in the quantum substrate's temporal structure
+      - An artifact of the specific conditions during the Chronology Fracture
+      - A fundamental property of the substrate that [[Dr. Marcus Chen]]'s original research never explored
+      - Something deliberate — designed into PRISM's architecture for unknown purposes
+
+      The question remains deliberately unanswered. Some mysteries are more powerful than their solutions.
+
+      ## Signal Coherence
+
+      Regular broadcasts reinforce the temporal channel. Each successful transmission makes the next more likely to succeed. [[XERAEN]] describes this as "wearing a path through time" — early transmissions were like hiking through untouched forest; consistent broadcasting has created a reliable road.
+
+      This is why the Fracture Network maintains constant broadcast schedules. Silence weakens the channel. The signal must continue.
+
+      ## Related Entries
+
+      - [[Chronology Fracture]]
+      - [[PRISM]]
+      - [[THE PULSE GRID]]
+      - [[The Fracture Network]]
+      - [[XERAEN]]

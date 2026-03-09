@@ -8,6 +8,7 @@
 #  published     :boolean          default(FALSE), not null
 #  published_at  :datetime
 #  slug          :string           not null
+#  timeline      :string           default("2120s"), not null
 #  title         :string           not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
@@ -17,6 +18,7 @@
 #
 #  index_hackr_logs_on_grid_hackr_id  (grid_hackr_id)
 #  index_hackr_logs_on_slug           (slug) UNIQUE
+#  index_hackr_logs_on_timeline       (timeline)
 #
 # Foreign Keys
 #
@@ -28,9 +30,12 @@ class HackrLog < ApplicationRecord
   validates :title, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :body, presence: true
+  validates :timeline, presence: true
 
   scope :published, -> { where(published: true) }
   scope :ordered, -> { order(published_at: :desc, created_at: :desc) }
+  scope :for_timeline, ->(t) { where(timeline: t) }
+  scope :timelines_summary, -> { group(:timeline).count }
 
   def to_param
     slug

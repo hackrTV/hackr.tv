@@ -1,6 +1,12 @@
 class Api::LogsController < ApplicationController
   def index
-    logs = HackrLog.published.ordered.includes(:grid_hackr)
+    timeline = params[:timeline].presence || "2120s"
+    timelines = HackrLog.published.timelines_summary
+
+    logs = HackrLog.published.for_timeline(timeline).includes(:grid_hackr)
+
+    sort_dir = (params[:sort] == "asc") ? :asc : :desc
+    logs = logs.order(published_at: sort_dir, created_at: sort_dir)
 
     # Pagination
     page = [params[:page].to_i, 1].max
@@ -16,6 +22,7 @@ class Api::LogsController < ApplicationController
           title: log.title,
           slug: log.slug,
           body: log.body,
+          timeline: log.timeline,
           published_at: log.published_at,
           created_at: log.created_at,
           author: {
@@ -25,6 +32,8 @@ class Api::LogsController < ApplicationController
         }
       },
       meta: {
+        timelines: timelines,
+        timeline: timeline,
         total: total,
         page: page,
         per_page: per_page,
@@ -41,6 +50,7 @@ class Api::LogsController < ApplicationController
       title: @hackr_log.title,
       slug: @hackr_log.slug,
       body: @hackr_log.body,
+      timeline: @hackr_log.timeline,
       published_at: @hackr_log.published_at,
       created_at: @hackr_log.created_at,
       author: {

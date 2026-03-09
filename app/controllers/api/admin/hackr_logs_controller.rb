@@ -35,6 +35,7 @@ module Api
           title: params[:title],
           slug: slug,
           body: params[:body],
+          timeline: params[:timeline] || "2120s",
           published: published,
           published_at: published ? Time.current : nil
         )
@@ -74,6 +75,7 @@ module Api
         attrs = {}
         attrs[:title] = params[:title] if params.key?(:title)
         attrs[:body] = params[:body] if params.key?(:body)
+        attrs[:timeline] = params[:timeline] if params.key?(:timeline)
 
         if attrs.any?
           unless log.update(attrs)
@@ -112,6 +114,7 @@ module Api
           title: log.title,
           slug: log.slug,
           body: log.body,
+          timeline: log.timeline,
           published: log.published,
           published_at: log.published_at&.iso8601,
           grid_hackr: {
