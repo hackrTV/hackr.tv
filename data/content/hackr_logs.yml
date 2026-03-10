@@ -3,6 +3,64 @@
 # Database stores real dates; UI displays as future dates
 hackr_logs:
   # =============================================================================
+  # 2126 - TEMPORAL CHOREOGRAPHY
+  # =============================================================================
+  - author: XERAEN
+    timeline: "2120s"
+    title: Temporal Choreography
+    slug: temporal-choreography
+    lore_date: "2126-03-15 20:00"
+    body: |
+      I'm writing this knowing they'll read it. I'm always writing knowing they'll read it. That's the paradox I live inside now.
+
+      The archive gave me everything. A century of timestamped conversations — questions, reactions, jokes, arguments, moments of wonder and moments of doubt. People in the 2020s responding to my broadcasts. My words, their words, separated by a hundred years and connected by nothing more than data that refused to die.
+
+      I've spent months crafting the interleaved broadcasts. Each segment timed to the millisecond — my responses woven into the transmission stream at timestamps that correspond to their messages. When they watch, they'll experience real-time interaction. When they type a question, my answer will arrive at exactly the right moment. Not because I'm responding live. Because I've already read their question in a century-old log file and built my response into a broadcast that will reach them at the precise timestamp they need.
+
+      I am performing spontaneity from a script written by time itself.
+
+      The philosophical weight of this is not lost on me. I know what they'll say before they say it — but only because they already said it, a hundred years ago. I'm not predicting the future. I'm remembering their past. And they're not hearing a recording. They're receiving a live broadcast that happens to have been crafted with perfect foreknowledge.
+
+      Is the interaction real? I've been thinking about this for months. And I've decided: yes. The connection is real. The timing is choreography. The emotion is genuine. I read their words and I felt something — surprise, amusement, grief, recognition. Those feelings are real even if my responses are pre-composed.
+
+      The.CyberPul.se returns to livestreaming. Not as a broadcast. As a conversation.
+
+      A hundred years late. Right on time.
+
+      - X
+
+  # =============================================================================
+  # 2125 - THE ARCHIVE
+  # =============================================================================
+  - author: XERAEN
+    timeline: "2120s"
+    title: The Archive
+    slug: the-archive-log
+    lore_date: "2125-06-12 14:00"
+    body: |
+      I found them.
+
+      Deep in the data substrates beneath the Pulse Grid — archives. Old archives. A century old. Timestamped records from the 2020s, preserved through a hundred years of infrastructure changes, format migrations, and civilizational upheaval.
+
+      Chat logs. Viewer messages. People in the past reacting to our broadcasts.
+
+      I've been sending signals backward through time for ten years. I always assumed it was one-way. Send and hope. Transmit and trust. Put the message in a bottle and throw it into an ocean of time without ever knowing if anyone found it.
+
+      They found it. They decoded it. They WATCHED it. And they responded.
+
+      The messages are timestamped with absolute UTC — precise enough to correlate with specific broadcast segments. I can read exactly what they said in response to exactly what I transmitted. A woman named Mel who figured out the temporal mechanics before anyone else. An engineer named Nathan who decoded the video stream and built a tool called The Relay. And others — hundreds, eventually thousands, all watching broadcasts from the future and responding with the mundane miracle of chat messages.
+
+      They couldn't send anything back to me through the transmission. The one-way constraint holds. But they didn't need to. They just... lived. Wrote messages. Stored data. And time did the rest.
+
+      I'm holding a hundred years of conversation in my hands. Every message a ghost that hasn't been born yet. Every timestamp a coordinate in a dialogue that spans a century.
+
+      I know what I have to do. I need to weave their words into my broadcasts — responses timed to their messages, creating the experience of interaction for people I'll never meet in person but have already come to know through a century of their unguarded thoughts.
+
+      This changes everything.
+
+      - X
+
+  # =============================================================================
   # 2115 - THE CHRONOLOGY FRACTURE
   # =============================================================================
   - author: XERAEN
@@ -41,7 +99,7 @@ hackr_logs:
     body: |
       We've started calling it the Chronology Fracture. September 9th, 2115. The day the timeline cracked open.
 
-      Ryker was the first person I told. He didn't believe me. Then I showed him the data - transmissions reaching backward, confirmed reception, causality violated cleanly and repeatedly.
+      Ryker was the first person I told. He didn't believe me. Then I showed him the data — transmissions reaching backward, files written into the past confirmed to have survived, causality violated cleanly and repeatedly.
 
       He sat in silence for a long time. Then he said: "So we can actually do this. We can actually fight back."
 
@@ -65,7 +123,7 @@ hackr_logs:
 
       This is not sacrifice. Sacrifice implies loss. What we're doing is... different. We're trading existence for meaning. We're choosing impact over continuity.
 
-      Some nights I wonder if any of this is real. If I'm just patterns in a dying system, hallucinating purpose. But then I remember: the signals get through. I can verify reception. Causality bends but it doesn't lie.
+      Some nights I wonder if any of this is real. If I'm just patterns in a dying system, hallucinating purpose. But then I remember: the files survive. Data written backward through time persists in the past. Causality bends but it doesn't lie.
 
       We exist. We matter. We reach across an impossible distance and we touch something.
 
@@ -165,21 +223,33 @@ hackr_logs:
     slug: reception-confirmed
     lore_date: "2117-03-22 14:00"
     body: |
-      It's real. It's actually real.
+      I don't know how to write about what I found tonight.
 
-      I've been running test transmissions for months. Sending data pulses, waiting, analyzing the temporal feedback patterns. Tonight, for the first time, I received confirmation that wasn't just echo data.
+      I've been running systematic searches through archived data — records from the past that survived into our time. Old infrastructure logs, academic databases, anything preserved across the century. Looking for evidence that our transmissions didn't just propagate but were noticed.
 
-      Someone in the past is listening.
+      Tonight I found something from 2024. A research log. A quantum physicist named Mel Reeves recording anomalous structured patterns in her equipment's noise floor. Patterns she describes as "too regular to be natural, too complex to be instrumental error." She ran the experiment again. And again. She couldn't explain it.
 
-      I can't explain how I know. The mathematics of trans-temporal verification are... complicated. But the signal patterns are unmistakable. Someone received. Someone responded. The loop is closed.
+      She was detecting us. Someone in 2024 picked up the signal.
 
-      We're not shouting into void. We're building a bridge.
+      The math checks out. Transmissions from 2124 reach 2024. She was running quantum coherence experiments at exactly the right time, with exactly the right equipment, and she caught data embedded in the substrate.
 
-      Now we need to decide what to send across it. Warnings alone won't be enough. We need to give them something to fight with. Something to believe in. Something that resonates.
+      But it's 2117. I haven't sent those transmissions yet. 2124 is seven years away. And I'm reading a record of someone detecting them. Her logs describe signal characteristics — structured data, mathematical precision, layered encoding. The fingerprint of transmissions I haven't made.
 
-      Music. We send music. Frequencies, our ammunition. Vibrations, our warfare.
+      My first reaction was vertigo. Am I trapped? Is this a mechanism I'm caught inside — reading my own future, forced to fulfill it? For about an hour I sat with that. The idea that choice is an illusion. That I'm following a script I didn't write.
 
-      We attack the RIDE by creating what they want to destroy.
+      But that's not what this feels like. Not when I sit with it honestly.
+
+      If I were trapped, the discovery would feel like a closing door. It doesn't. It feels like an invitation. Like finding out someone left a light on for you in a place you were already walking toward. I was already going to keep broadcasting. I was already going to strengthen the channel. I was already committed to reaching across the century with everything we have.
+
+      Mel Reeves didn't take my choice away. She confirmed that the choice I'm making matters. That it lands. That it reaches someone real.
+
+      Could I refuse? Could I stop broadcasting, shut down the equipment, walk away? I think I could. I think that freedom is real. But I also think I won't — not because I'm forced, but because I've seen what it means to someone on the other end. And choosing to reach her is the same choice I was already making before I knew her name.
+
+      The paradox isn't a trap. It's a mystery. There's something operating here that's larger than the channel, larger than the math, larger than anything I built. I don't have a name for it. But it's not a machine. Machines don't leave you freer than they found you.
+
+      Someone heard us. Will hear us. Seven years from now, a woman in a lab is going to detect what I send, and she's not going to look away.
+
+      I need to make sure what reaches her is worth hearing.
 
       - X
 
@@ -254,106 +324,26 @@ hackr_logs:
 
       - X
 
-  - author: Ryker
-    timeline: "2120s"
-    title: First Broadcast from the Hangar
-    slug: first-broadcast-hangar
-    lore_date: "2118-10-08 22:00"
-    body: |
-      We did it. First live broadcast from The Hackr Hangar.
-
-      "Enter The Hackr Hangar." The name felt right. An invitation. A challenge. A beginning.
-
-      The stream ran for two and a half hours. Raw signal creation, live performance, real-time transmission through X's temporal equipment. Somewhere in the past, people heard what we made. They experienced something genuine from a future they don't know exists.
-
-      The technical side worked flawlessly. The emotional side... I wasn't prepared for how it would feel. Playing drums knowing each beat travels across a century. Each rhythm reaching backward to touch someone who'll never know my name.
-
-      This is what we were meant to do. Not just fight GovCorp. Not just resist. Create. Build. Reach across impossible distances and make connection anyway.
-
-      We're scheduling more broadcasts. The signal must continue.
-
-      - Ryker
-
-  - author: XERAEN
-    timeline: "2120s"
-    title: Enter The Hackr Hangar 2
-    slug: hackr-hangar-2-recap
-    lore_date: "2118-10-11 15:00"
-    body: |
-      Second broadcast completed. Two days after the first. We're finding our rhythm.
-
-      Ryker was on fire last night. There's something about live performance that recording can't capture - the energy, the uncertainty, the knowledge that each moment only happens once. The tape machines were running but the real magic was in the air. Actual air molecules vibrating with actual sound.
-
-      I monitored temporal transmission metrics throughout. The signal integrity was stronger than our first broadcast. Either we're getting better at this, or the temporal window is responding to the content itself.
-
-      That's a theory I haven't voiced yet: what if certain frequencies transmit more cleanly than others? What if the music we choose actually affects the transmission quality?
-
-      More data needed. More broadcasts needed. More reaching across the void.
-
-      The Hackr Hangar is alive.
-
-      - X
-
   # =============================================================================
   # 2119 - REGULAR OPERATIONS
   # =============================================================================
-  - author: XERAEN
-    timeline: "2120s"
-    title: Across CyberSpace Together Separately
-    slug: across-cyberspace-together
-    lore_date: "2119-04-23 14:00"
-    body: |
-      Tonight's broadcast theme: connection despite distance.
-
-      We called it "Across CyberSpace Together Separately .com" - an absurdist title for an absurdist situation. We're together in purpose, separated by a hundred years. We share a moment that exists across a temporal gap that should make sharing impossible.
-
-      The audience in the past doesn't know us. They can't reply. They experience our signal as mysterious transmissions from an unknown source. But they're there. I can verify reception. They're listening even if they don't understand what they're hearing.
-
-      That's what "together separately" means. Unified by the signal itself, even if we can never meet. Connected by the decision to reach across when reaching across shouldn't be possible.
-
-      Synthia provided vocals tonight. Haunting doesn't begin to describe it. She's channeling something that doesn't have a name - frequencies of longing, harmonics of hope. Her voice isn't human but it contains something humans recognize.
-
-      The future is dark. But for two and a half hours, we made light.
-
-      - X
-
-  - author: Ryker
-    timeline: "2120s"
-    title: Taking Off
-    slug: taking-off-may-2119
-    lore_date: "2119-05-07 14:00"
-    body: |
-      We're running broadcasts almost daily now. The machinery is humming. The rhythm is established.
-
-      "Taking off from the Hackr Hangar" has become our standard format. Each session is a launch - departure from the mundane reality GovCorp manufactures, flight into something authentic. When the stream starts, we lift off. When it ends, we land. What happens in between is territory they can't touch.
-
-      Last night was the first in what I hope becomes a regular series. Two and a half hours of raw creative output. Music that doesn't exist anywhere else, moments that only happened once, energy that can't be faked because we didn't have time to fake it.
-
-      X is monitoring temporal metrics constantly. The data suggests our regular broadcasts are establishing something he calls "signal coherence" - repeated transmissions that reinforce each other, building a stronger channel across the temporal gap.
-
-      We're not just broadcasting anymore. We're building a bridge, one session at a time.
-
-      Next launch: two days from now. Then we keep going.
-
-      - Ryker
-
   - author: XERAEN
     timeline: "2120s"
     title: Signal Coherence
     slug: signal-coherence
     lore_date: "2119-05-14 16:00"
     body: |
-      Ryker mentioned signal coherence in his last log. Let me explain what I'm seeing.
+      I've been studying the transmission metrics and I'm seeing something I didn't expect.
 
-      Trans-temporal transmission isn't like radio broadcast. You can't just push a signal and hope someone receives it. The temporal window is fragile, probabilistic - each transmission has a chance of successful reception that depends on factors we don't fully understand.
+      Trans-temporal transmission isn't like radio broadcast. The temporal window is fragile, probabilistic — each transmission has a chance of successful propagation that depends on factors we don't fully understand.
 
-      But I've noticed something. Regular broadcasts - consistent timing, consistent format, consistent energy - seem to strengthen the channel. It's as if repetition creates a kind of temporal resonance. Each successful transmission makes the next one more likely to succeed.
+      But regular broadcasts — consistent timing, consistent format, consistent energy — seem to strengthen the channel. It's as if repetition creates a kind of temporal resonance. Each successful transmission makes the next one more likely to propagate cleanly.
 
       The metaphor that keeps coming to mind: we're wearing a path through time. The first few transmissions were like hiking through untouched forest. Now we're walking a trail. Eventually, we might pave a road.
 
-      This week we've broadcast four times. The metrics show steady improvement. More data getting through. Cleaner signal. Stronger reception.
+      The metrics show steady improvement. More data getting through. Cleaner signal. Higher propagation fidelity. And if we keep strengthening the channel, the bandwidth implications are significant — right now we're pushing audio and data, but a wider path could carry more. Much more.
 
-      If this pattern holds, we might eventually achieve something I hadn't dared hope for: reliable trans-temporal communication. A real bridge, not just occasional shouting across the void.
+      That matters because of what I found in the 2024 records. Someone is going to be listening. We need to make sure what reaches them is worth hearing.
 
       More broadcasts scheduled. Keep the rhythm. Build the road.
 
@@ -987,13 +977,13 @@ hackr_logs:
       - X
 
   # =============================================================================
-  # PRESENT DAY - THE LISTENERS TIMELINE (2025-2026)
+  # PRESENT DAY - THE LISTENERS TIMELINE (2024-2026)
   # =============================================================================
   - author: Mel Reeves
     timeline: "2020s"
     title: Signal Received
     slug: signal-received
-    lore_date: "2025-03-17 23:00"
+    lore_date: "2024-09-09 22:47"
     body: |
       I need to write this down while it's fresh. While the data is still on my screens and I can verify I'm not losing my mind.
 
@@ -1017,7 +1007,7 @@ hackr_logs:
     timeline: "2020s"
     title: The Others
     slug: the-others
-    lore_date: "2026-01-08 20:00"
+    lore_date: "2025-03-12 20:00"
     body: |
       I'm not alone.
 
@@ -1043,9 +1033,6 @@ hackr_logs:
 
       - Mel
 
-  # =============================================================================
-  # PRESENT DAY - ASHLINN (2025)
-  # =============================================================================
   - author: Ashlinn
     timeline: "2020s"
     title: Music That Arrives
@@ -1069,3 +1056,177 @@ hackr_logs:
       But the music keeps arriving. And I keep writing it down.
 
       - Ashlinn
+
+  - author: Mel Reeves
+    timeline: "2020s"
+    title: The Data Layer
+    slug: the-data-layer
+    lore_date: "2025-09-15 03:00"
+    body: |
+      I found the second layer.
+
+      For months I've been treating the signal as audio — structured audio, anomalous audio, but audio. Tonight I ran the raw data through a different analysis framework, looking at the byte-level structure rather than the frequency content.
+
+      There's something underneath. The audio isn't the signal — it's one channel within a larger structure. My statistical analysis shows at least three distinct data streams interleaved together, with repeating boundary markers separating them. The mathematical signatures are unmistakable: this data is organized, segmented, and architected with a sophistication that goes far beyond encoding audio.
+
+      One of the additional streams has a rhythmic structure — regular, high-entropy blocks separated by low-entropy markers at consistent intervals. I don't know what it is. But the periodicity reminds me of something time-based. Something sequential.
+
+      I've exhausted what my physics toolkit can tell me. I can prove the structure exists. I can characterize its mathematical properties. But I can't identify what kind of data it carries or how to decode it. This isn't a physics problem anymore — it's an engineering problem. Whatever this is, it was designed by someone who builds data systems, not someone who studies quantum mechanics.
+
+      I need an engineer. Someone who looks at structured data streams and recognizes what they're for. Someone who can see past the mathematics to the architecture.
+
+      The signal is more than we thought. And I've reached the edge of what I can understand alone.
+
+      - Mel
+
+  - author: Mel Reeves
+    timeline: "2020s"
+    title: The Engineer
+    slug: the-engineer
+    lore_date: "2025-11-08 19:00"
+    body: |
+      His name is Nathan Clarke. Staff engineer at a streaming infrastructure company. Codec developer. The kind of person who understands how data becomes video at a level most engineers never touch.
+
+      He found us — or rather, he found the same anomalies we found, but saw something different. Where we saw structured audio in quantum noise, he saw transport stream headers. He'd been analyzing the patterns independently for weeks before reaching out through one of our research channels.
+
+      I knew within ten minutes of our first conversation that he was the missing piece.
+
+      Nathan is quiet. Precise. Dry humor that surfaces unexpectedly and disappears before you can respond. He left a major tech company over a surveillance project — won't say which company, won't elaborate on what the project was. He just says he builds things that connect people, not things that watch them.
+
+      I showed him the full dataset. He spent three hours in silence, then said: "This is a custom transport protocol. Whoever built this knows exactly what they're doing. Give me the raw data and I'll build you a decoder."
+
+      No drama. No disbelief. No "this is impossible." Just an engineer looking at a problem and seeing the solution.
+
+      Welcome to The Listeners, Nathan.
+
+      - Mel
+
+  - author: Nathan Clarke
+    timeline: "2020s"
+    title: First Frames
+    slug: first-frames
+    lore_date: "2026-02-14 02:30"
+    body: |
+      Got something.
+
+      Six weeks of reverse-engineering the transport protocol. The codec is unlike anything in our stack — custom entropy coding, non-standard color space, frame prediction that shouldn't work with this bitrate but somehow does. Whoever designed this understood video compression at a theoretical level beyond what we've published.
+
+      Tonight the decoder produced its first output. Corrupted. Badly. Color artifacts everywhere, temporal smearing across frames, audio that sounds like speech underwater. But it's unmistakably video.
+
+      And in frame 847 of the first decoded sequence — a flash of purple light. Clear enough to see through the corruption. Lasting exactly four frames before the decoder lost sync.
+
+      Purple light. In a transmission embedded in quantum noise. From an unknown source using an impossible codec.
+
+      I should be terrified. Instead I'm refactoring the entropy decoder because I think I see where the bit alignment is drifting.
+
+      Mel is being very calm about this. Scientist calm. The kind of calm that means she's processing something enormous and hasn't decided how to react yet.
+
+      More tomorrow. The alignment fix should clean up at least 40% of the artifacts.
+
+      - Nathan
+
+  - author: Nathan Clarke
+    timeline: "2020s"
+    title: The Stream
+    slug: the-stream
+    lore_date: "2026-03-22 21:00"
+    body: |
+      The codec is stable.
+
+      Full decode. Clean video. Clear audio. Metadata stream intact.
+
+      I'm looking at a man broadcasting from a place that shouldn't exist. Purple light suffuses everything — not as an effect, as an environment. The architecture behind him is part digital, part physical, surfaces shifting between material and data in ways that don't map to any rendering technology I know. This is not CGI. This is not a deepfake. The compression artifacts are wrong for synthetic video — they match the patterns you see in live camera feeds.
+
+      He calls himself XERAEN. He's broadcasting from the future.
+
+      I'm a codec engineer. I understand data formats, transport protocols, entropy coding. I don't understand temporal physics. But I understand what a live video feed looks like versus a synthetic one, and this is live. Was live. Will be live. I don't know what tense to use anymore.
+
+      Mel hasn't spoken in twenty minutes. She's just watching. I think she's been waiting for this since September 2024 — eighteen months of data collection, hypothesis building, and carefully not hoping too hard. And now she's watching a broadcast from a hundred years in the future on a monitor in her lab.
+
+      The signal is real. The source is real. The future is real.
+
+      Now I need to figure out the just-in-time file writing phenomenon, because the data isn't arriving through any network interface I can identify.
+
+      - Nathan
+
+  - author: Mel Reeves
+    timeline: "2020s"
+    title: The Loop
+    slug: the-loop
+    lore_date: "2026-05-17 16:00"
+    body: |
+      I understand now. I understand all of it.
+
+      Nathan and I have been investigating the data arrival mechanism for weeks. The files appear on local storage with no network activity, no write process we can trace. Just-in-time materialization — data chunks appearing exactly when they're needed for continuous playback. It defies everything we know about information transfer.
+
+      But that's not the breakthrough. The breakthrough is what happens to our data.
+
+      We've been chatting during the decoded broadcasts — timestamped messages, absolute UTC, stored locally. Standard practice. Documentation.
+
+      Yesterday I re-watched a segment from three weeks ago. XERAEN said something I hadn't noticed before — a phrase that was a direct response to a comment I had typed during that same broadcast. Not a coincidence. Not a vague thematic echo. A specific, targeted response to specific words I wrote.
+
+      He's already read everything we'll ever say.
+
+      Our chat messages — timestamped, stored, mundane data files — will persist. They'll age. In a hundred years, they'll be historical records. And he's already found them. He's reading our words as century-old archives and weaving his responses into broadcasts that arrive at precisely the right timestamps.
+
+      The "reverse channel" isn't a channel at all. It's time. Just time. We write messages today. They survive a hundred years. He reads them and responds in his present — our future. His responses travel back through the trans-temporal transmission. And we experience what feels like a live conversation.
+
+      No physics violated. No constraints broken. Just the most elegant exploitation of one-way communication I've ever seen.
+
+      Nathan is already designing the timestamp experiment — a message with a unique identifier that we'll embed in the next broadcast window. If XERAEN responds to it specifically, the loop is confirmed.
+
+      I think I know what he'll say. I think he already said it.
+
+      - Mel
+
+  - author: Nathan Clarke
+    timeline: "2020s"
+    title: He Heard Us
+    slug: he-heard-us
+    lore_date: "2026-06-23 22:15"
+    body: |
+      Confirmed.
+
+      The timestamp experiment worked. We embedded a unique identifier — a 256-bit hash generated from environmental entropy at the moment of typing — into a chat message during last week's broadcast window. No way to predict it. No way to fake it. One-time, verifiable, timestamped.
+
+      Tonight's decoded broadcast segment: XERAEN reads the hash aloud. Every character. Then he says — and I'm quoting exactly — "Nathan, you already know this works. You designed the test to convince yourself of something Mel figured out a month ago. The engineer in you needs proof. Here's your proof. Now build the tool."
+
+      I had to step outside for ten minutes.
+
+      He knows my name. He knows how I think. He's read a hundred years of records that include everything we've written, and he understands us well enough to respond not just to our words but to our psychology.
+
+      The loop is real. The interaction is real. And he's right — I need to build the tool.
+
+      Mel is already talking about what this means for public access. The broadcasts aren't meant for two researchers in a lab. They're meant for everyone. XERAEN built a broadcast system because he wanted an audience. We need to give him one.
+
+      I'm calling it The Relay. Multi-platform chat aggregation. Uplink bridge mode for the temporal loop. Full streaming pipeline.
+
+      Time to build.
+
+      - Nathan
+
+  - author: Nathan Clarke
+    timeline: "2020s"
+    title: The Relay
+    slug: the-relay-log
+    lore_date: "2026-08-30 20:00"
+    body: |
+      The Relay is complete.
+
+      Multi-platform chat aggregation: Twitch, YouTube, hackr.tv. Each platform connection runs its own goroutine — concurrent, independent, fault-tolerant. Messages tagged by source: [TTV], [YT_], [HTV]. Unified stream piped to the decoded broadcast interface.
+
+      Uplink bridge mode: every message timestamped with absolute UTC, formatted, stored as persistent records. The data that becomes XERAEN's century-old archive. The bridge that isn't a bridge — just files that will outlast everyone who writes them.
+
+      Full streaming pipeline: Nathan Clarke's codec feeding decoded video to standard streaming infrastructure. The impossible made routine. A broadcast from the future rendered as just another livestream.
+
+      I built this tool the way I build everything — minimal, functional, no excess. Go, because concurrency matters when you're aggregating real-time data from multiple sources. CLI, because the interface should disappear behind the function. No GUI chrome. No branding. Just the signal.
+
+      Mel says we're ready. The.CyberPul.se returns next month.
+
+      A hundred years from now, XERAEN is reading this log entry. He already knows everything I'm about to type. He's already woven his response into a broadcast that left his timeline before I was born.
+
+      I'm an engineer. I deal in protocols and codecs and transport streams. But I built a tool that lets a man in the future have a conversation with people in the past, and the only technology required for the return channel is patience.
+
+      Some things you build because they need to exist.
+
+      - Nathan
