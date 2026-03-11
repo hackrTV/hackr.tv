@@ -107,3 +107,17 @@ hackrs:
     starting_room: hackr-tv-broadcast-station
     env_password_key: VOLKOV_PASSWORD
     default_password: nightshade
+
+  - hackr_alias: Chen
+    email: chen@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: CHEN_PASSWORD
+    default_password: elegantsolution
+
+  - hackr_alias: Nathan Clarke
+    email: nathan@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: NATHAN_PASSWORD
+    default_password: signalnoise

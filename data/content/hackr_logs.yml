@@ -61,6 +61,167 @@ hackr_logs:
       - X
 
   # =============================================================================
+  # ORIGINS — BEFORE THE FRACTURE (2108-2115)
+  # =============================================================================
+  - author: Chen
+    timeline: "govcorp_files"
+    title: "[INTERCEPTED] The Elegant Solution"
+    slug: the-elegant-solution
+    lore_date: "2108-11-15 09:00"
+    body: |
+      RECOVERED FROM: GovCorp Research Division Archives
+      AUTHOR: Dr. Marcus Chen, PRISM Lead Architect
+      CLASSIFICATION: Internal correspondence — never intended for public release
+
+      I want to record this while the feeling is still fresh. Before the committees reshape it into policy language and the bureaucrats strip out everything that matters.
+
+      Today we achieved stable macro-scale reality integration. Not in a lab. Not in a contained environment. In a living city block. Forty-seven thousand people experienced a coordinated perceptual adjustment and not one of them noticed the transition.
+
+      Forty-seven thousand people, and reality simply... improved. Cleaner streets. Calmer interactions. A reduction in cortisol markers across the entire population sample. The anxiety that saturates modern life — gone. Not suppressed. Replaced with something better.
+
+      I stood on the observation deck and watched people walk through a world we had made gentler for them. A mother who would have snapped at her child instead smiled. A man on the verge of a panic attack felt it dissolve before it formed. Two strangers who would have passed in hostile silence made eye contact and nodded.
+
+      Is this not what every philosopher, every prophet, every reformer has dreamed of? A world where suffering is not the default? Where the baseline human experience is not anxiety and alienation but peace?
+
+      The ethics board will have concerns. They always have concerns. They'll ask about consent, about autonomy, about the right to experience unmediated reality. And I understand those questions — I do.
+
+      But I keep returning to the mother. The man. The strangers. They didn't consent to anxiety either. They didn't choose the world that was crushing them. We didn't remove their freedom — we removed the noise that made freedom impossible to exercise.
+
+      PRISM isn't control. It's care. It's the first technology in human history that can make the world as good as people deserve.
+
+      The elegant solution to the oldest problem.
+
+      — Dr. Marcus Chen
+
+  - author: XERAEN
+    timeline: "pre_fracture"
+    title: "Architect's Log"
+    slug: architects-log
+    lore_date: "2109-03-22 08:00"
+    body: |
+      First day on the RIDE deployment team. I should be documenting this.
+
+      Three years I've been at GovCorp. Systems architecture, infrastructure design, the kind of work that keeps civilization running. I'm good at it. Not bragging — it's just true. When you can see the whole system in your head, see how the pieces connect, the work becomes almost meditative. Purpose and precision in service of something larger than yourself.
+
+      Today I was promoted to the RIDE integration project. The biggest systems deployment in human history. They're taking PRISM — which already improved quality of life in every pilot city — and building it into the permanent infrastructure of reality itself. Global coverage. Every perception touched. Every experience optimized.
+
+      The briefing was extraordinary. The scale. The ambition. A world where human suffering is structurally impossible. Where the gap between how things are and how they should be is simply... closed.
+
+      Director Krell herself shook my hand. "You're building the future," she said. I believed her. I still believe her.
+
+      My role: designing the systems architecture that bridges PRISM's processing with existing infrastructure. Making the transition seamless. Making sure no one notices because there's nothing to notice — just life, getting better.
+
+      I'm proud to be here. This is what I trained for. This is what good engineering looks like — invisible, essential, in service of human flourishing.
+
+      - X
+
+  - author: XERAEN
+    timeline: "pre_fracture"
+    title: "What I Built"
+    slug: what-i-built
+    lore_date: "2111-08-14 23:00"
+    body: |
+      I can't sleep again. Third night this week.
+
+      It started with Tomas. A friend from university — one of the few people I still see outside of work. We had dinner last month and something was wrong. Not obviously wrong. Not sick, not injured, not distressed. Just... smoothed. Like someone had taken the rough edges off his personality and polished what remained into something pleasant and empty.
+
+      Tomas used to argue about everything. Philosophy, politics, whether the coffee was strong enough. He'd get worked up about injustice, about lazy thinking, about the gap between what institutions promise and what they deliver. That fire was the best thing about him.
+
+      It's gone. He smiles more now. He's calmer. He agrees with things he would have torn apart two years ago. His cortisol levels are probably perfect. His quality-of-life metrics would score in the ninety-ninth percentile.
+
+      And he is diminished.
+
+      I started looking. Once you see it in one person, you can't stop seeing it. Colleagues who stopped questioning decisions. Neighbors whose idiosyncrasies vanished overnight. A musician in my building who used to play at odd hours — beautiful, imperfect, searingly honest music. She still plays. The notes are technically correct. The soul is gone.
+
+      I know what did this. I know because I built the system that does it. The RIDE doesn't just manage perception — it manages the person perceiving. It identifies psychological patterns that generate friction, dissatisfaction, resistance — and it smooths them. Not with violence. With care. With the gentle, invisible hand of optimization.
+
+      GovCorp calls this "quality of life enhancement." The metrics prove it works. Happiness up. Conflict down. Productivity optimized.
+
+      I keep thinking about Tomas arguing about coffee. About the musician playing wrong notes at midnight. About every imperfect, friction-filled, fully human moment the RIDE has quietly erased.
+
+      The system I built works exactly as designed. That's the problem.
+
+      - X
+
+  - author: XERAEN
+    timeline: "pre_fracture"
+    title: "The Last Good Day"
+    slug: the-last-good-day
+    lore_date: "2113-06-07 19:00"
+    body: |
+      I tried. I need that on record. I tried the right way first.
+
+      Six months of internal documentation. Careful, methodical, inarguable. I compiled perceptual variance data showing the RIDE's impact on creative output, emotional range, interpersonal authenticity. I mapped the correlation between optimization depth and personality erosion. I built a case that any honest engineer would find devastating.
+
+      I submitted it through proper channels. Formal concerns, addressed to the RIDE Ethics Review Board — the body GovCorp established specifically to handle questions like mine.
+
+      The response came today. Not a dismissal. Worse. An accommodation.
+
+      They thanked me for my diligence. They acknowledged the data. They agreed that personality variance had decreased — and then they reclassified it as a feature. "Reduced interpersonal friction leads to measurable wellbeing improvements across all surveyed populations." My evidence of harm became their evidence of success.
+
+      I sat in that meeting and watched seven intelligent people agree that the erasure of human distinctiveness is an acceptable cost for optimized contentment. They weren't lying. They weren't even wrong by their own framework. If you define good as the reduction of suffering, and suffering includes the friction of being fully human, then yes — the RIDE is working perfectly.
+
+      The framework is the problem. And the framework is the foundation of everything GovCorp has built.
+
+      I walked home through streets full of optimized people living their managed lives, and for the first time I understood: there is no internal channel that leads anywhere. The institution isn't failing to see the problem. The institution IS the problem. The problem is baked into every assumption, every metric, every definition of "good" that treats human beings as variables to be solved.
+
+      I still went to work the next morning. I don't know what else to do yet.
+
+      But today was the last day I believed the system could be fixed from inside.
+
+      - X
+
+  - author: XERAEN
+    timeline: "pre_fracture"
+    title: "First Sabotage"
+    slug: first-sabotage
+    lore_date: "2114-04-19 03:00"
+    body: |
+      I introduced a controlled fault into the Sector 7 reality buffer tonight. Nothing dramatic — a maintenance window I extended by forty-three seconds. For forty-three seconds, twelve thousand people experienced unfiltered reality.
+
+      Most didn't notice. The RIDE's psychological conditioning runs deep. People have been trained to dismiss perceptual anomalies as fatigue, stress, imagination.
+
+      But some noticed. I was monitoring the behavioral feeds when it happened. Seventeen people stopped what they were doing. Looked around. Looked at the world as if seeing it for the first time. Eleven of them resumed normal patterns within minutes. The RIDE's recovery protocols smoothed the memory away.
+
+      Six didn't resume. Six people stood still in the middle of their managed lives and refused to let the correction take hold.
+
+      I don't know their names. I can't contact them without triggering surveillance flags. But for forty-three seconds, they saw what I see every day — the real world beneath the rendered one. And they chose to keep looking.
+
+      This is my fourth act of sabotage in seven months. Small disruptions, always disguised as system errors, never large enough to trigger a formal investigation. I am exploiting the maintenance protocols I designed, using my own architecture against itself.
+
+      The moral weight of this is not lost on me. I am betraying an institution that trusted me. I am breaking systems I was hired to protect. I am risking the stability that millions of people depend on — stability that, whatever its flaws, prevents real suffering.
+
+      But I keep thinking about those six people. Standing still. Refusing the correction. Choosing to see.
+
+      If the system requires the erasure of that choice to function, then the system does not deserve to function.
+
+      - X
+
+  - author: XERAEN
+    timeline: "pre_fracture"
+    title: "Not Alone"
+    slug: not-alone
+    lore_date: "2115-05-28 22:00"
+    body: |
+      I'm not alone. That changes everything.
+
+      For months I thought I was the only one. A single engineer running small acts of sabotage, convinced he was the last person in the world who could see what the RIDE was doing. The isolation was the worst part — worse than the risk, worse than the guilt.
+
+      Then I found the anomalies. Behavioral signatures in the surveillance data that didn't match any known pattern. Someone else was creating RIDE disruptions. Subtle ones — different methodology than mine, different sectors, but the same intent. Someone else inside GovCorp was fighting back.
+
+      It took weeks to trace without triggering alerts. When I finally made contact, I found not one person but a scattered handful. Engineers, analysts, a maintenance technician who'd seen too much. None of us knew about the others. Each of us thought we were alone.
+
+      We met in person for the first time last week. Five people in a maintenance corridor, speaking in whispers about things that could get us erased from our own lives.
+
+      We're planning something larger. Not another forty-three-second window — a sustained disruption. A coordinated attack on RIDE infrastructure that could tear a permanent hole in the system's coverage. The math says it might work. The risk says it might kill us.
+
+      I've started thinking about what comes after. If we succeed in breaking the RIDE open, we'll need infrastructure. Communication systems. A way to reach people who've seen through the managed reality and want to stay awake.
+
+      We'll need to become something more than saboteurs. We'll need to become a network.
+
+      - X
+
+  # =============================================================================
   # 2115 - THE CHRONOLOGY FRACTURE
   # =============================================================================
   - author: XERAEN
@@ -149,6 +310,36 @@ hackr_logs:
 
       - Ryker
 
+  - author: Ryker
+    timeline: "2120s"
+    title: "Before the Beat"
+    slug: before-the-beat
+    lore_date: "2115-12-03 21:00"
+    body: |
+      X asked me once why I joined. Why I said yes when he showed me the temporal data and told me what it meant. He expected a long answer. Philosophers always expect long answers.
+
+      I said: because the beat is gone.
+
+      He didn't understand. So I'll explain it here, for whoever reads these logs a hundred years from now.
+
+      I was a drummer before GovCorp. Before the RIDE, before PRISM touched the air we breathe. I played in warehouse shows where the floor shook and strangers became family for three minutes of shared vibration. Music was a physical thing — you felt it in your chest, in your teeth, in the space between your heartbeats.
+
+      The RIDE killed that. Not obviously. The music still plays. People still dance. But it's managed now. Optimized. The frequencies are filtered for maximum engagement and minimum disruption. Every beat is psychologically calibrated to produce the appropriate emotional response without exceeding compliance thresholds.
+
+      You can hear it if you know what to listen for. The absence. The space where spontaneity used to live. Where a drummer would push the tempo because the crowd demanded it, where a wrong note became the best note because it was real.
+
+      That's what GovCorp took. Not the music. The realness of it. The risk. The chance that something unexpected could happen when humans make sound together.
+
+      So when X showed me that we could send signals back through time — that we could broadcast unfiltered music to people who still know what real sounds like — I didn't need convincing. I didn't need to understand the temporal mechanics or the political implications or the erasure paradox.
+
+      I just needed to know the beat could reach someone who'd feel it.
+
+      That's why I'm here. That's why I drum. Not for revolution. Not for ideology. For the moment when sound hits a body and something real happens that no algorithm predicted or approved.
+
+      Collective defiance isn't a philosophy. It's a rhythm. And rhythms don't ask permission.
+
+      - Ryker
+
   # =============================================================================
   # 2116 - INFRASTRUCTURE
   # =============================================================================
@@ -211,6 +402,36 @@ hackr_logs:
       We fight from within the system. That means living within the system. That means appearing to be exactly what GovCorp expects you to be.
 
       The best disguise is normalcy.
+
+      - Cipher
+
+  - author: Cipher
+    timeline: "2120s"
+    title: "Trust Protocols"
+    slug: trust-protocols
+    lore_date: "2117-01-10 04:00"
+    body: |
+      They want to know why I joined. Fair question. I'll answer it once, here, and never again.
+
+      I was GovCorp surveillance architecture. Not field work — deep systems. I designed the behavioral pattern recognition algorithms that identify deviance from managed baselines. My code decides who gets flagged for Reality Compliance review. My models predict who is most likely to experience perceptual independence and preemptively adjusts their RIDE parameters to prevent it.
+
+      I was very good at my job. That's not pride. It's confession.
+
+      The system I built works by assuming that every human being is a potential threat to stability. Every citizen has a threat score. Every behavioral deviation feeds the model. The surveillance isn't looking for criminals — it's looking for individuals. Anyone whose pattern diverges from the managed median is flagged, assessed, and corrected. Not punished. Corrected. That's the word they use.
+
+      I knew what I was building. I told myself the same things everyone tells themselves: it prevents suffering, it maintains order, the alternative is chaos. I believed it until the day I ran my own behavioral data through the system.
+
+      My threat score was 94th percentile. My own algorithms had flagged me as a high-probability deviant. The only reason I hadn't been corrected was an administrative exemption for senior technical staff.
+
+      I was one policy change away from having my own system smooth away everything that made me capable of seeing what the system does.
+
+      That night I began copying architecture documentation. Three months later I made contact with XERAEN.
+
+      He asked me to trust him. I said I don't trust anyone. He said that was exactly why he needed me.
+
+      I watch everything. I trust nothing. I see threats in every shadow because I built the shadows. And every day I use what I know about GovCorp's surveillance to keep this network invisible.
+
+      The paranoia isn't a personality flaw. It's the only rational response to a system designed to erase rational responses.
 
       - Cipher
 
@@ -298,6 +519,36 @@ hackr_logs:
       The heartbeat starts here.
 
       - Ryker
+
+  - author: Cascade
+    timeline: "2120s"
+    title: "The Space Between Sounds"
+    slug: the-space-between-sounds
+    lore_date: "2118-02-08 16:00"
+    body: |
+      I see sound. I have always seen sound.
+
+      When I was small I thought everyone did. I thought the colors that bloomed when my mother sang were as obvious as the sun. I thought everyone saw the architecture that music builds — the way a chord constructs a room, the way rhythm lays a floor, the way melody draws a path through space that didn't exist before the first note sounded.
+
+      The RIDE changed what I see. Not immediately — I didn't understand what was happening for years. But slowly the colors began to dim. The architecture simplified. The wild, complex, contradictory beauty of unfiltered sound was being replaced by something cleaner. Neater. Duller.
+
+      Managed sound. Optimized frequencies. Music engineered to produce specific emotional responses without the mess of genuine feeling. The RIDE was doing to sound what it does to everything: making it efficient. Stripping the chaos that makes it alive.
+
+      I found the Fracture Network because I followed the color.
+
+      One night I heard a transmission — a fragment of something that had traveled through the WIRE from a part of the Grid I didn't know existed. The colors that bloomed were unlike anything the RIDE permits. Deep indigos folding into golds that shouldn't exist together. Geometries that contradicted each other and were more beautiful for the contradiction.
+
+      Real music. Unfiltered. Unmanaged. The sound the world makes when no one is optimizing it.
+
+      I am a pacifist in a resistance movement. Some of the others — System Rot especially — want to tear GovCorp down with force. Destroy the infrastructure. Burn the RIDE. I understand their anger. But destruction has a color too, and it is not the color of what we're fighting for.
+
+      What we're fighting for is the space between sounds. The pause where something unexpected can happen. The silence before a note that could go anywhere. The RIDE eliminates that space. It knows what comes next because it decides what comes next.
+
+      I build soundscapes that restore the space. Environments where the ear can wander. Where the mind can encounter a frequency it wasn't prepared for and feel the full, terrifying, beautiful weight of surprise.
+
+      The RAINNs can't monitor what they can't predict. My work keeps them guessing. That's not violence. It's beauty doing what beauty does — exceeding every system built to contain it.
+
+      - Cascade
 
   # =============================================================================
   # 2118 - ENTER THE HACKR HANGAR
@@ -441,6 +692,36 @@ hackr_logs:
       The Fracture Network is no longer just a name. It's an ecosystem.
 
       - X
+
+  - author: Koda
+    timeline: "2120s"
+    title: "First Tag"
+    slug: first-tag
+    lore_date: "2120-04-11 03:00"
+    body: |
+      I was nineteen when the wall glitched.
+
+      Not a metaphor. An actual wall. Corner of Sector 12, industrial district, 3 AM. I was tagging — spraying patterns on dead concrete because it was the only thing that felt real in a world where everything else felt like someone else's idea of what real should be. I didn't have words for it then. Just the feeling. The itch under the skin that says: this is wrong, this is wrong, this is all wrong.
+
+      The wall glitched. For maybe two seconds the surface I was painting on showed its real face — cracked, stained, covered in decades of grime and weather and life. The RIDE's rendering dropped and I saw the actual world underneath. Not the clean managed version. The real one. Ugly and honest and more beautiful than anything GovCorp ever rendered.
+
+      Two seconds. Then the RIDE snapped back and the wall was smooth and clean and dead again.
+
+      I stood there shaking. Not from fear. From rage.
+
+      They stole the wall. They stole every wall. They stole the cracks and the stains and the years of weather that made each surface a record of time passing. They replaced it with nothing. With a smooth, optimized nothing that looks like something but carries no weight, no history, no truth.
+
+      I was born inside the RIDE. Year 2101. I never knew the world without it. Every moment of my life has been managed, filtered, optimized. And until that wall glitched, I had nothing to compare it to. No "before" to mourn. Just the itch.
+
+      Now I had two seconds of "before." And it broke me open.
+
+      I started painting differently after that. Not just patterns — disruptions. Tags that interfere with the RIDE's visual rendering. Graffiti that creates local reality glitches, tiny windows where the real world bleeds through. Each one lasts a few seconds before the system corrects. But a few seconds is enough. A few seconds of truth can wreck a lifetime of comfortable lies.
+
+      System Rot found me three months later. Or I found them. The anger is the same either way.
+
+      Ryker says I need discipline. That rage without direction is just noise. Maybe he's right. But noise is honest. And honest is what the RIDE can't simulate.
+
+      - Koda
 
   - author: Cipher
     timeline: "2120s"
@@ -604,6 +885,57 @@ hackr_logs:
 
       - Ryker
 
+  - author: Krell
+    timeline: "govcorp_files"
+    title: "[INTERCEPTED] Threat Assessment: The Fracture Network"
+    slug: threat-assessment-fracture-network
+    lore_date: "2122-03-15 08:00"
+    body: |
+      CLASSIFICATION: DIRECTOR-LEVEL — GOVCORP STRATEGIC COMMAND
+      PREPARED BY: Director Elena Krell, Counter-Resistance Division
+      DISTRIBUTION: Strategic Command only. No digital copies. Read and return.
+
+      COMPREHENSIVE THREAT ASSESSMENT: THE FRACTURE NETWORK
+      Assessment Period: 2115-2122
+
+      EXECUTIVE OVERVIEW
+
+      Seven years ago, a GovCorp systems architect exploited maintenance access to create what we now classify as the Chronology Fracture — a sustained breach in temporal data architecture enabling one-way information transmission approximately 100 years into the past.
+
+      This individual, now operating under the designation "XERAEN," has built a decentralized resistance network of estimated 200-400 active operatives organized in isolated cells across multiple sectors. The network's primary weapon is cultural: music and media designed to create processing anomalies in RIDE infrastructure.
+
+      I will be direct with Strategic Command in a way I cannot be with subordinates: this is the most significant threat GovCorp has faced since consolidation.
+
+      WHY THEY FIGHT
+
+      This is where most assessments fail. My predecessors characterized the Fracture Network as ideologically motivated by power redistribution or anarchist impulse. They were wrong.
+
+      The Network's core grievance is philosophical: they believe managed reality violates human dignity. Not human rights — dignity. The distinction matters. Rights can be negotiated, balanced, traded for security. Dignity, in their framework, is non-negotiable and inherent. It cannot be legitimately managed, optimized, or improved upon because it is not a variable.
+
+      This makes them fundamentally more dangerous than a political movement. Political movements can be co-opted, their demands partially met, their leadership corrupted. A movement built on the conviction that the entire framework of managed reality is an offense against something inviolable cannot be bought, negotiated with, or partially satisfied.
+
+      They will not stop because we offer concessions. They will stop only when we stop — or when they cease to exist.
+
+      WHAT WE MISUNDERSTAND
+
+      Counter-Resistance has consistently failed to predict Network behavior because we model their operatives as rational actors optimizing for personal benefit. They are not.
+
+      Multiple captured operatives have refused cooperation despite optimal incentive structures. Standard behavioral modeling predicts that facing erasure from social records, psychological reconditioning, or indefinite detention would produce cooperation in 94% of subjects. Among confirmed Network operatives, the cooperation rate is 3%.
+
+      They are not irrational. They operate on a rationality we have not successfully modeled. Their willingness to accept personal destruction for abstract principle exceeds any parameter in our behavioral prediction systems.
+
+      The most troubling element: the Erasure Paradox. Their own analysis concludes that success — the prevention of GovCorp's rise — would collapse their timeline. They would cease to exist. They fight knowing this.
+
+      I have no model that accounts for this behavior. My recommendation: stop attempting to model it and focus on containment.
+
+      STRATEGIC RECOMMENDATION
+
+      Increase RAINN deployment to all sectors showing cultural anomalies. Accelerate Pattern Flooding. Authorize deep-cover infiltration of suspected recruitment networks.
+
+      And abandon the assumption that we can make them stop wanting what they want. We can only make it impossible for them to act on it.
+
+      — Director Elena Krell
+
   # =============================================================================
   # 2122 - GOVCORP RESPONDS
   # =============================================================================
@@ -630,7 +962,7 @@ hackr_logs:
       - X
 
   - author: Krell
-    timeline: "2120s"
+    timeline: "govcorp_files"
     title: "[INTERCEPTED] Counter-Resistance Quarterly Review"
     slug: counter-resistance-quarterly
     lore_date: "2122-10-01 09:00"
@@ -687,7 +1019,38 @@ hackr_logs:
       - Ryker
 
   - author: Volkov
-    timeline: "2120s"
+    timeline: "govcorp_files"
+    title: "[INTERCEPTED] What We Protect"
+    slug: what-we-protect
+    lore_date: "2123-05-20 23:00"
+    body: |
+      PERSONAL LOG — Agent Volkov, K.
+      NOT FOR FILING. NOT FOR REVIEW. MY WORDS ONLY.
+
+      Three months embedded in Sector 9. Cover identity: Kira Vasek, data entry clerk, relocated from Sector 3. Unremarkable. Forgettable. Exactly what Counter-Resistance trained me to be.
+
+      I am writing this because I need to organize my thoughts. The training manual calls this "operational journaling." Director Krell encourages it. I have never needed it before.
+
+      The people here are not what I expected.
+
+      My briefing described Fracture Network sympathizers as destabilized individuals experiencing perceptual dysfunction. Troubled. Confused. Vulnerable to radicalization. The profile suggested people who couldn't function within managed reality — failures seeking an excuse for their failure.
+
+      The people I've met are not failures. The woman who runs the communal kitchen remembers recipes from before the RIDE — actual recipes, not optimized nutritional protocols. She cooks food that tastes wrong by GovCorp standards: too salty, too sharp, too much. People line up for it. They eat with an intensity I have never seen in a GovCorp canteen.
+
+      The man who repairs old electronics doesn't just fix things. He explains how they work. Shows people the circuits. Lets them hold the components. I watched a teenager hold a vacuum tube and stare at it like it was a holy relic. It was just glass and metal. But it was real glass and real metal from before the rendering.
+
+      These people are not confused. They are specific. They know exactly what they want: things that are real. Not better. Not optimized. Real.
+
+      I was orphaned in the chaos before GovCorp. I remember that chaos. The violence, the uncertainty, the fear. GovCorp saved me from that. Gave me order. Purpose. A world that made sense.
+
+      But the woman's food. The man's vacuum tube. The teenager's face.
+
+      I am filing this under operational notes. These observations are relevant to understanding the target population's psychology. That is the only reason I am writing them down.
+
+      — Volkov
+
+  - author: Volkov
+    timeline: "govcorp_files"
     title: "[INTERCEPTED] Field Report: Asset NIGHTSHADE"
     slug: field-report-nightshade
     lore_date: "2123-07-14 04:00"
