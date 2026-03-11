@@ -35,7 +35,20 @@ class HackrLog < ApplicationRecord
   scope :published, -> { where(published: true) }
   scope :ordered, -> { order(published_at: :desc, created_at: :desc) }
   scope :for_timeline, ->(t) { where(timeline: t) }
-  scope :timelines_summary, -> { group(:timeline).count }
+  def self.timelines_summary
+    group(:timeline).pluck(
+      :timeline,
+      Arel.sql("COUNT(*)"),
+      Arel.sql("CAST(strftime('%Y', MIN(published_at)) AS INTEGER)"),
+      Arel.sql("CAST(strftime('%Y', MAX(published_at)) AS INTEGER)")
+    ).each_with_object({}) do |(timeline, count, min_year, max_year), hash|
+      hash[timeline] = {
+        count: count,
+        min_year: min_year ? min_year + 100 : nil,
+        max_year: max_year ? max_year + 100 : nil
+      }
+    end
+  end
 
   def to_param
     slug

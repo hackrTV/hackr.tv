@@ -5,6 +5,9 @@ import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { formatFutureDate } from '~/utils/dateUtils'
 import { apiJson } from '~/utils/apiClient'
+import { TIMELINE_ORDER, TIMELINE_CONFIG, formatEra } from './timelineConfig'
+import type { TimelineSummary } from './timelineConfig'
+import { TimelineSideTabs } from './TimelineSideTabs'
 
 interface HackrLog {
   id: number
@@ -21,23 +24,12 @@ interface HackrLog {
 }
 
 interface PaginationMeta {
-  timelines: Record<string, number>
+  timelines: TimelineSummary
   timeline: string
   total: number
   page: number
   per_page: number
   total_pages: number
-}
-
-const TIMELINE_CONFIG: Record<string, { label: string; subtitle: string }> = {
-  '2120s': {
-    label: '2120s — THE FRACTURE NETWORK',
-    subtitle: 'Transmissions from the Fracture Network'
-  },
-  '2020s': {
-    label: '2020s — THE LISTENERS',
-    subtitle: 'Signals received in the present day'
-  }
 }
 
 const truncateMarkdown = (markdown: string, maxLength: number = 300): string => {
@@ -120,65 +112,17 @@ export const LogsIndexPage: React.FC = () => {
     )
   }
 
-  // Build sorted timeline keys for tabs (ensure consistent order)
-  const timelineKeys = meta?.timelines ? Object.keys(meta.timelines).sort().reverse() : [currentTimeline]
+  // Build timeline keys for tabs in defined display order
+  const timelineKeys = meta?.timelines
+    ? TIMELINE_ORDER.filter(tl => tl in meta.timelines)
+    : [currentTimeline]
 
   return (
     <DefaultLayout showAsciiArt={false}>
       <div style={{ maxWidth: '900px', margin: '30px auto', position: 'relative' }}>
         {/* Timeline Tabs — desktop: side tabs outside left edge */}
-        {isDesktop && (
-          <div style={{
-            position: 'absolute',
-            right: '100%',
-            top: '0',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-            marginRight: '-1px'
-          }}>
-            {timelineKeys.map(tl => {
-              const tlConfig = TIMELINE_CONFIG[tl]
-              const count = meta?.timelines?.[tl] ?? 0
-              const isActive = tl === currentTimeline
-              return (
-                <button
-                  key={tl}
-                  onClick={() => switchTimeline(tl)}
-                  style={isActive ? {
-                    padding: '10px 14px',
-                    backgroundColor: '#1a1a1a',
-                    color: '#22d3ee',
-                    fontWeight: 'bold',
-                    fontFamily: 'inherit',
-                    fontSize: 'inherit',
-                    border: '1px solid #333',
-                    borderRight: '1px solid #1a1a1a',
-                    cursor: 'pointer',
-                    textAlign: 'right',
-                    whiteSpace: 'nowrap'
-                  } : {
-                    padding: '10px 14px',
-                    backgroundColor: '#111',
-                    color: '#555',
-                    fontFamily: 'inherit',
-                    fontSize: 'inherit',
-                    border: '1px solid #2a2a2a',
-                    borderRight: '1px solid #333',
-                    cursor: 'pointer',
-                    textAlign: 'right',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <span style={{ fontSize: '1em' }}>{tl}</span>
-                  <br />
-                  <span style={{ fontSize: '0.75em' }}>
-                    {tlConfig ? `${tlConfig.label.split(' — ')[1]} (${count})` : `(${count})`}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+        {isDesktop && meta?.timelines && (
+          <TimelineSideTabs currentTimeline={currentTimeline} currentSort={currentSort} timelines={meta.timelines} />
         )}
 
         {/* Main Content Container */}
@@ -192,7 +136,9 @@ export const LogsIndexPage: React.FC = () => {
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px' }}>
               {timelineKeys.map(tl => {
                 const tlConfig = TIMELINE_CONFIG[tl]
-                const count = meta?.timelines?.[tl] ?? 0
+                const info = meta?.timelines?.[tl]
+                const count = info?.count ?? 0
+                const era = info ? formatEra(info) : ''
                 const isActive = tl === currentTimeline
                 return (
                   <button
@@ -212,7 +158,7 @@ export const LogsIndexPage: React.FC = () => {
                       boxShadow: 'none'
                     }}
                   >
-                    {tl} — {tlConfig ? `${tlConfig.label.split(' — ')[1]} (${count})` : `(${count})`}
+                    {tlConfig ? `${era} — ${tlConfig.name} (${count})` : `${tl} (${count})`}
                   </button>
                 )
               })}
