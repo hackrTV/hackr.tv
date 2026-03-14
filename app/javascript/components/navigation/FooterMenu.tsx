@@ -7,7 +7,7 @@ export const FooterMenu: React.FC = () => {
   const { hackr, isLoggedIn } = useGridAuth()
   const { isMobile } = useMobileDetect()
   const { pathname } = useLocation()
-  const isActive = (path: string) => path === '/' ? pathname === '/' : pathname.startsWith(path)
+  const isActive = (path: string) => path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/')
 
   // Don't render footer menu on mobile
   if (isMobile) return null
@@ -76,15 +76,20 @@ export const FooterMenu: React.FC = () => {
               <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;Logs&nbsp;
             </Link>
           </li>
+          <li className={isActive('/code') ? 'active' : undefined}>
+            <Link to="/code">
+              <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;Code&nbsp;
+            </Link>
+          </li>
           <li className={isActive('/grid') ? 'active' : undefined}>
             <Link to="/grid">
-              <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '11' : '10'}</span>&nbsp;THE PULSE GRID&nbsp;
             </Link>
           </li>
           {hackr?.role === 'admin' && (
             <li>
               <a href="/root">
-                <span className="red-255-text">{isLoggedIn ? '11' : '10'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">{isLoggedIn ? '12' : '11'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

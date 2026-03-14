@@ -22,8 +22,123 @@
         601
       ],
       "note": "This redirect is intentional and safe. The destination URLs come from our controlled database (Redirect model), not from user input. We use allow_other_host: true because we intentionally redirect to external domains (e.g., YouTube for artist pages). The Redirect.find_for method only queries our database with sanitized inputs."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "6986f3316354585ff68adcb5e779933e5a88a81f1179d7b9d91868be257cb42b",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/code/github_sync_service.rb",
+      "line": 91,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture2(\"git\", \"clone\", \"--bare\", \"https://github.com/#{record.full_name}.git\", record.bare_repo_path.to_s)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Code::GithubSyncService",
+        "method": "sync_repo_files"
+      },
+      "user_input": "record.full_name",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Safe: Open3.capture2 with array arguments bypasses the shell entirely. record.full_name comes from our allowlisted GitHub org repos (REPO_ALLOWLIST), not user input."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "b8c34fb4d21692ef26d448c4b96d245ceaf15e465dd380031d66e703ef0537ce",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/code/repo_reader_service.rb",
+      "line": 31,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture2(\"git\", \"-C\", repository.bare_repo_path.to_s, \"ls-tree\", \"--name-only\", (\"#{(repository.default_branch or \"main\")}:#{path}\" or (repository.default_branch or \"main\")))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Code::RepoReaderService",
+        "method": "tree"
+      },
+      "user_input": "repository.default_branch",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Safe: Open3.capture2 with array arguments bypasses the shell. default_branch comes from GitHub API via our sync service, and git commands are sandboxed to the bare repo path."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "30d74f1562adf768925053c7f0ec937df74cd38473b53d88314f7bd437a25b12",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/code/repo_reader_service.rb",
+      "line": 52,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture2(\"git\", \"-C\", repository.bare_repo_path.to_s, \"cat-file\", \"-s\", \"#{(repository.default_branch or \"main\")}:#{path}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Code::RepoReaderService",
+        "method": "blob"
+      },
+      "user_input": "repository.default_branch",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Safe: Open3.capture2 with array arguments bypasses the shell. default_branch and path are not shell-interpreted."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "cd09ecf7095ed75c0b09f7585241a63cd4baa8ab106bf95ef9af684edb832b98",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/code/repo_reader_service.rb",
+      "line": 59,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture2(\"git\", \"-C\", repository.bare_repo_path.to_s, \"show\", \"#{(repository.default_branch or \"main\")}:#{path}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Code::RepoReaderService",
+        "method": "blob"
+      },
+      "user_input": "repository.default_branch",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Safe: Open3.capture2 with array arguments bypasses the shell. default_branch and path are not shell-interpreted."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "896e00a5a529d8339750b1f121e82508f967b510a68da4fca42e34be784444bb",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/code/repo_reader_service.rb",
+      "line": 82,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture2(\"git\", \"-C\", repository.bare_repo_path.to_s, \"cat-file\", \"-t\", \"#{(repository.default_branch or \"main\")}:#{path}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Code::RepoReaderService",
+        "method": "detect_entry_type"
+      },
+      "user_input": "repository.default_branch",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": "Safe: Open3.capture2 with array arguments bypasses the shell. default_branch and path are not shell-interpreted."
     }
   ],
-  "updated": "2025-11-06 00:00:00 +0000",
-  "brakeman_version": "7.1.1"
+  "updated": "2026-03-14 04:30:00 +0000",
+  "brakeman_version": "8.0.4"
 }

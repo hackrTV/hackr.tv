@@ -1,0 +1,33 @@
+<div style="font-family: 'Courier New', monospace; max-width: 600px; margin: 0 auto; background-color: #0a0a0a; color: #00ff00; padding: 30px;">
+  <div style="border: 1px solid #00ff00; padding: 20px; margin-bottom: 20px;">
+    <h1 style="color: #00ff00; margin: 0 0 10px 0; font-size: 24px;">CODE SYNC</h1>
+    <p style="color: #999; margin: 0; font-size: 12px;">GITHUB TOKEN EXPIRED</p>
+  </div>
+
+  <div style="padding: 20px 0;">
+    <p style="color: #ccc; line-height: 1.6;">
+      The code browser sync failed because the GitHub token is expired or invalid.
+    </p>
+
+    <div style="background-color: #1a1a1a; border: 1px solid #333; padding: 15px; margin: 20px 0;">
+      <p style="color: #999; font-size: 12px; margin: 0 0 5px 0;">ERROR</p>
+      <p style="color: #ff4444; margin: 0; word-break: break-all;"><%= @error %></p>
+    </div>
+
+    <p style="color: #ccc; line-height: 1.6;">
+      To fix this:
+    </p>
+
+    <ol style="color: #ccc; line-height: 2; padding-left: 20px;">
+      <li>Go to <a href="https://github.com/settings/tokens" style="color: #00ff00;">GitHub Token Settings</a></li>
+      <li>Generate a new token (classic) with <span style="color: #00ff00;">public_repo</span> scope</li>
+      <li>Update the token in production credentials or <span style="color: #00ff00;">.env</span></li>
+    </ol>
+  </div>
+
+  <div style="border-top: 1px solid #333; padding-top: 20px; margin-top: 20px;">
+    <p style="color: #777; font-size: 10px; margin: 0;">
+      hackr.tv // CODE SYNC
+    </p>
+  </div>
+</div>

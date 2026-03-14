@@ -58,6 +58,9 @@ gem "rack-attack"
 # AWS S3 for audio file imports
 gem "aws-sdk-s3", require: false
 
+# GitHub API client for code browser sync
+gem "octokit"
+
 # ViewComponent for reusable components
 gem "view_component"
 
