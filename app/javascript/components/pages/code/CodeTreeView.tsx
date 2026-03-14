@@ -35,7 +35,7 @@ export const CodeTreeView: React.FC<CodeTreeViewProps> = ({ repoSlug, entries })
               color: entry.type === 'tree' ? '#a78bfa' : '#d0d0d0',
               textDecoration: 'none',
               borderBottom: i < entries.length - 1 ? '1px solid #1a1a1a' : 'none',
-              fontFamily: "'Courier New', Courier, monospace",
+              fontFamily: '\'Courier New\', Courier, monospace',
               fontSize: '0.9em'
             }}
           >

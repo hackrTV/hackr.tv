@@ -120,7 +120,7 @@ export const CodeIndexPage: React.FC = () => {
                 border: '1px solid #333',
                 color: '#d0d0d0',
                 padding: '6px 12px',
-                fontFamily: "'Courier New', Courier, monospace",
+                fontFamily: '\'Courier New\', Courier, monospace',
                 fontSize: '0.9em',
                 flex: '1 1 200px',
                 minWidth: '150px'
@@ -135,7 +135,7 @@ export const CodeIndexPage: React.FC = () => {
                   border: 'none',
                   padding: '4px 10px',
                   cursor: 'pointer',
-                  fontFamily: "'Courier New', Courier, monospace",
+                  fontFamily: '\'Courier New\', Courier, monospace',
                   fontSize: '0.8em'
                 }}
               >
@@ -151,7 +151,7 @@ export const CodeIndexPage: React.FC = () => {
                     border: 'none',
                     padding: '4px 10px',
                     cursor: 'pointer',
-                    fontFamily: "'Courier New', Courier, monospace",
+                    fontFamily: '\'Courier New\', Courier, monospace',
                     fontSize: '0.8em'
                   }}
                 >
@@ -174,7 +174,7 @@ export const CodeIndexPage: React.FC = () => {
                     background: '#0d0d0d',
                     padding: '16px 20px',
                     borderLeft: '3px solid #6366f1',
-                    transition: 'border-color 0.15s',
+                    transition: 'border-color 0.15s'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                       <h3 style={{ margin: 0, color: '#a78bfa', fontSize: '1.1em' }}>

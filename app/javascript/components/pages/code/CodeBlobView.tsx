@@ -51,7 +51,7 @@ export const CodeBlobView: React.FC<CodeBlobViewProps> = ({ content, language, n
           padding: '20px 30px',
           color: '#d0d0d0',
           lineHeight: '1.7',
-          fontFamily: "'Courier New', Courier, monospace",
+          fontFamily: '\'Courier New\', Courier, monospace',
           fontSize: '0.9em'
         }}>
           <div className="code-markdown-content">
@@ -91,7 +91,7 @@ export const CodeBlobView: React.FC<CodeBlobViewProps> = ({ content, language, n
                 color: '#4b5563',
                 fontSize: '0.85em',
                 lineHeight: '1.45em',
-                fontFamily: "'Courier New', Courier, monospace"
+                fontFamily: '\'Courier New\', Courier, monospace'
               }}>
                 {i + 1}
               </div>
@@ -112,7 +112,7 @@ export const CodeBlobView: React.FC<CodeBlobViewProps> = ({ content, language, n
               style={{
                 fontSize: '0.85em',
                 lineHeight: '1.45em',
-                fontFamily: "'Courier New', Courier, monospace",
+                fontFamily: '\'Courier New\', Courier, monospace',
                 background: 'transparent'
               }}
             >

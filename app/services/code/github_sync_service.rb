@@ -28,13 +28,12 @@ module Code
         synced_github_ids << repo.id
       rescue => e
         Rails.logger.error("[CodeSync] Error syncing #{ORG_NAME}/#{repo_name}: #{e.message}")
-        if record
-          record.update(sync_error: e.message, sync_status: "error")
-        end
+        record&.update(sync_error: e.message, sync_status: "error")
       end
 
-      # Mark repos no longer in the allowlist as not visible
-      CodeRepository.where.not(github_id: synced_github_ids).update_all(visible: false) if synced_github_ids.any?
+      # Mark repos not in the allowlist as not visible
+      allowlist_slugs = REPO_ALLOWLIST.map { |name| name.downcase.gsub(/[^a-z0-9\s-]/, "").gsub(/\s+/, "-").squeeze("-") }
+      CodeRepository.where.not(slug: allowlist_slugs).update_all(visible: false)
 
       {synced: synced_github_ids.size}
     end

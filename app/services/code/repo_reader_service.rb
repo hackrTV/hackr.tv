@@ -40,7 +40,7 @@ module Code
       end
 
       # Sort: directories first, then alphabetical
-      entries.sort_by { |e| [e[:type] == "tree" ? 0 : 1, e[:name].downcase] }
+      entries.sort_by { |e| [(e[:type] == "tree") ? 0 : 1, e[:name].downcase] }
     end
 
     def blob(path)
@@ -86,7 +86,7 @@ module Code
       type_output, = Open3.capture2(
         "git", "-C", @repo_path, "cat-file", "-t", "#{@branch}:#{path}"
       )
-      type_output.strip == "tree" ? "tree" : "blob"
+      (type_output.strip == "tree") ? "tree" : "blob"
     end
 
     def detect_language(path)

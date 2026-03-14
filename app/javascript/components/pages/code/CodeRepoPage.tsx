@@ -14,20 +14,18 @@ export const CodeRepoPage: React.FC = () => {
   const [repoData, setRepoData] = useState<CodeRepository | null>(null)
   const [treeEntries, setTreeEntries] = useState<TreeEntry[]>([])
   const [blobData, setBlobData] = useState<{ content: string; language: string; name: string; size: number } | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [fetchedKey, setFetchedKey] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // Determine view mode and path from URL
   const pathMatch = location.pathname.match(/^\/code\/[^/]+\/(tree|blob)\/(.+)$/)
   const viewMode: 'root' | 'tree' | 'blob' = pathMatch ? (pathMatch[1] as 'tree' | 'blob') : 'root'
   const currentPath = pathMatch ? pathMatch[2] : ''
+  const requestKey = `${repo}:${viewMode}:${currentPath}`
+  const loading = fetchedKey !== requestKey
 
   useEffect(() => {
     if (!repo) return
-
-    setLoading(true)
-    setError(null)
-    setBlobData(null)
 
     let url: string
     if (viewMode === 'blob') {
@@ -44,36 +42,41 @@ export const CodeRepoPage: React.FC = () => {
           setRepoData(data.repo)
           setBlobData({ content: data.content, language: data.language, name: data.name, size: data.size })
           setTreeEntries([])
-          setLoading(false)
+          setFetchedKey(requestKey)
+          setError(null)
         })
         .catch(err => {
           setError(err.message || 'Failed to load file')
-          setLoading(false)
+          setFetchedKey(requestKey)
         })
     } else if (viewMode === 'tree') {
       apiJson<TreeResponse>(url)
         .then(data => {
           setRepoData(data.repo)
           setTreeEntries(data.tree)
-          setLoading(false)
+          setBlobData(null)
+          setFetchedKey(requestKey)
+          setError(null)
         })
         .catch(err => {
           setError(err.message || 'Failed to load directory')
-          setLoading(false)
+          setFetchedKey(requestKey)
         })
     } else {
       apiJson<RepoDetailResponse>(url)
         .then(data => {
           setRepoData(data.repo)
           setTreeEntries(data.tree)
-          setLoading(false)
+          setBlobData(null)
+          setFetchedKey(requestKey)
+          setError(null)
         })
         .catch(err => {
           setError(err.message || 'Failed to load repository')
-          setLoading(false)
+          setFetchedKey(requestKey)
         })
     }
-  }, [repo, viewMode, currentPath])
+  }, [repo, viewMode, currentPath, requestKey])
 
   if (loading) {
     return (

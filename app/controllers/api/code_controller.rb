@@ -1,5 +1,7 @@
 module Api
   class CodeController < ApplicationController
+    before_action :set_repo, only: %i[show tree blob]
+
     # GET /api/code
     def index
       repos = CodeRepository.browsable
@@ -9,31 +11,28 @@ module Api
 
     # GET /api/code/:repo
     def show
-      repo = find_repo!
-      reader = Code::RepoReaderService.new(repo)
-      tree = repo.cloned? ? reader.tree : []
+      reader = Code::RepoReaderService.new(@repo)
+      tree = @repo.cloned? ? reader.tree : []
 
-      render json: {repo: repo_json(repo), tree: tree}
+      render json: {repo: repo_json(@repo), tree: tree}
     end
 
     # GET /api/code/:repo/tree/*path
     def tree
-      repo = find_repo!
-      reader = Code::RepoReaderService.new(repo)
+      reader = Code::RepoReaderService.new(@repo)
       entries = reader.tree(params[:path])
 
-      render json: {repo: repo_json(repo), path: params[:path], tree: entries}
+      render json: {repo: repo_json(@repo), path: params[:path], tree: entries}
     rescue Code::RepoReaderService::NotFoundError => e
       render json: {error: e.message}, status: :not_found
     end
 
     # GET /api/code/:repo/blob/*path
     def blob
-      repo = find_repo!
-      reader = Code::RepoReaderService.new(repo)
+      reader = Code::RepoReaderService.new(@repo)
       result = reader.blob(params[:path])
 
-      render json: {repo: repo_json(repo), **result}
+      render json: {repo: repo_json(@repo), **result}
     rescue Code::RepoReaderService::NotFoundError => e
       render json: {error: e.message}, status: :not_found
     rescue Code::RepoReaderService::BinaryFileError => e
@@ -44,10 +43,9 @@ module Api
 
     private
 
-    def find_repo!
-      CodeRepository.browsable.find_by!(slug: params[:repo])
-    rescue ActiveRecord::RecordNotFound
-      render json: {error: "Repository not found"}, status: :not_found
+    def set_repo
+      @repo = CodeRepository.browsable.find_by(slug: params[:repo])
+      render json: {error: "Repository not found"}, status: :not_found unless @repo
     end
 
     def repo_json(repo)
