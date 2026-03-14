@@ -38,6 +38,8 @@ const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage'
 const SinglePulsePage = lazy(() => import('~/components/pulsewire/SinglePulsePage').then(m => ({ default: m.SinglePulsePage })))
 const UplinkPage = lazy(() => import('~/components/pages/uplink/UplinkPage').then(m => ({ default: m.UplinkPage })))
 const UplinkPopoutPage = lazy(() => import('~/components/pages/uplink/UplinkPopoutPage').then(m => ({ default: m.UplinkPopoutPage })))
+const CodeIndexPage = lazy(() => import('~/components/pages/code/CodeIndexPage').then(m => ({ default: m.CodeIndexPage })))
+const CodeRepoPage = lazy(() => import('~/components/pages/code/CodeRepoPage'))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 // Auth components
@@ -121,6 +123,11 @@ export const AppLayout: React.FC = () => {
         <Route path="/uplink" element={<ProtectedRoute><UplinkPage /></ProtectedRoute>} />
         {/* Uplink popout - public for livestream viewing */}
         <Route path="/uplink/popout" element={<UplinkPopoutPage />} />
+        {/* Code browser routes */}
+        <Route path="/code" element={<CodeIndexPage />} />
+        <Route path="/code/:repo" element={<CodeRepoPage />} />
+        <Route path="/code/:repo/tree/*" element={<CodeRepoPage />} />
+        <Route path="/code/:repo/blob/*" element={<CodeRepoPage />} />
         {/* 404 catch-all - must be last */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

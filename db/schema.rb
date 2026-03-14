@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_020453) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -78,6 +78,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_041436) do
     t.index ["dropped"], name: "index_chat_messages_on_dropped"
     t.index ["grid_hackr_id"], name: "index_chat_messages_on_grid_hackr_id"
     t.index ["hackr_stream_id"], name: "index_chat_messages_on_hackr_stream_id"
+  end
+
+  create_table "code_repositories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "default_branch"
+    t.text "description"
+    t.string "full_name", null: false
+    t.integer "github_id", null: false
+    t.datetime "github_pushed_at"
+    t.string "homepage"
+    t.string "language"
+    t.datetime "last_synced_at"
+    t.string "name", null: false
+    t.integer "size_kb", default: 0
+    t.string "slug", null: false
+    t.integer "stargazers_count", default: 0
+    t.text "sync_error"
+    t.string "sync_status"
+    t.datetime "updated_at", null: false
+    t.boolean "visible", default: true, null: false
+    t.index ["github_id"], name: "index_code_repositories_on_github_id", unique: true
+    t.index ["slug"], name: "index_code_repositories_on_slug", unique: true
+    t.index ["visible"], name: "index_code_repositories_on_visible"
   end
 
   create_table "codex_entries", force: :cascade do |t|

@@ -68,6 +68,14 @@ Rails.application.routes.draw do
     get ":id", to: "pages#spa_root", as: :hackr_log
   end
 
+  # Code browser routes - SPA
+  scope "code" do
+    get "/", to: "pages#spa_root", as: :code
+    get ":repo", to: "pages#spa_root", as: :code_repo
+    get ":repo/tree/*path", to: "pages#spa_root", as: :code_tree, format: false
+    get ":repo/blob/*path", to: "pages#spa_root", as: :code_blob, format: false
+  end
+
   # Codex (wiki) routes - SPA
   scope "codex" do
     get "/", to: "pages#spa_root", as: :codex
@@ -119,6 +127,12 @@ Rails.application.routes.draw do
     post "grid/reset_password", to: "grid#reset_password"
     post "grid/request_email_change", to: "grid#request_email_change"
     post "grid/confirm_email_change", to: "grid#confirm_email_change"
+
+    # Code browser API routes
+    get "code", to: "code#index"
+    get "code/:repo", to: "code#show"
+    get "code/:repo/tree/*path", to: "code#tree", format: false
+    get "code/:repo/blob/*path", to: "code#blob", format: false
 
     # Hackr Logs API routes
     resources :logs, only: %i[index show]
@@ -178,6 +192,9 @@ Rails.application.routes.draw do
 
       # Uplink
       post "uplink/send_packet", to: "uplink#send_packet"
+
+      # Code sync
+      post "code/sync", to: "code#sync"
     end
   end
 
