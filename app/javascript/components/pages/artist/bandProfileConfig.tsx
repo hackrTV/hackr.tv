@@ -80,14 +80,14 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <h3 style={{ color: '#39ff14', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '0 0 8px rgba(57, 255, 20, 0.6)' }}>Let It Rot</h3>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                 Their system is already dying. Don't try to save it. Don't reform it. Let it collapse under its own
-                corruption and build something human from the ruins. The rot started long before us - we're just here
-                to watch it burn.
+                corruption and build something human from the ruins. The rot started long before us. We're here because
+                we believe something real exists underneath the wreckage — and it's worth digging for.
               </p>
             </div>
 
             <p style={{ color: '#39ff14', marginTop: '30px', padding: '20px', background: 'rgba(0, 0, 0, 0.8)', borderLeft: '4px solid #39ff14', lineHeight: '1.8', fontSize: '1.05em', textShadow: '0 0 8px rgba(57, 255, 20, 0.5)', boxShadow: '0 0 15px rgba(57, 255, 20, 0.2)' }}>
               No reform. No compromise. No waiting for someone else to fix this.<br />
-              Just rage, solidarity, and the will to act.
+              Rage because it matters. Solidarity because we're human. The will to act because something real demands it.
             </p>
           </div>
         </fieldset>
@@ -373,9 +373,10 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               </p>
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
                 Even when signals degrade, even when entropy threatens to destroy information, the fight is to reconstruct, rebuild,
-                persist. Information wants to survive. The Fracture Network's knowledge will outlast attempts to destroy it. There's a cold
-                beauty to perfect mathematical precision, the satisfaction of watching complex systems lock into place, the elegance
-                of encryption algorithms expressed through polyrhythmic guitar patterns.
+                persist. The Fracture Network's knowledge will outlast attempts to destroy it. And there is something in the precision
+                itself — the cold beauty of complex systems locking into place, the elegance of encryption algorithms expressed through
+                polyrhythmic guitar patterns. XERAEN says the beauty is the point. We say the beauty is what makes the data survive.
+                Maybe that's the same thing.
               </p>
             </div>
 
@@ -386,9 +387,9 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               &gt; BINARY_STATE: 01 | ENCRYPTED/EXPOSED<br />
               &gt; OPERATIONAL_MODE: SILENT_INFRASTRUCTURE<br /><br />
               <span style={{ color: '#ccc' }}>
-                We don't speak to the heart - we speak in data packets and encrypted algorithms.<br />
-                We are the silent infrastructure. The mathematical backbone.<br />
-                Knowledge delivered to those who need it, hidden in plain hearing, unbreakable.
+                We speak in data packets and encrypted algorithms. We are the silent infrastructure.<br />
+                The mathematical backbone. But ask us why the patterns are beautiful and we'll<br />
+                tell you: precision serves something. Knowledge delivered to those who need it, hidden in plain hearing.
               </span>
             </p>
           </div>
@@ -419,9 +420,9 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           VELOCITY+ :: MAXIMUM ACCELERATION :: REALITY.EXE HAS STOPPED
         </p>
         <p style={{ color: '#ccc', lineHeight: '1.6', marginBottom: '15px' }}>
-          BlitzBeam+ exists as pure energy - a sonic representation of velocity so extreme that it becomes liberation itself.
-          This is acceleration philosophy, speeding toward spiritual transcendence, movement so fast that reality itself cannot
-          maintain its grip.
+          BlitzBeam+ exists as pure energy — a sonic representation of velocity so extreme that it becomes liberation itself.
+          This is acceleration philosophy: moving faster than the RIDE can track, outrunning every manufactured constraint
+          until all that's left is the real thing.
         </p>
         <p style={{ color: '#ffff00', lineHeight: '1.6', fontWeight: 'bold' }}>
           Anime hypertrance (160+ BPM) · Euphoric synth leads · Relentless energy · Pure velocity manifest
@@ -448,8 +449,8 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <h3 style={{ color: '#00ffff', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>🏁 SPEED EQUALS FREEDOM</h3>
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
                 You can't control what you can't catch. You can't suppress what moves faster than your response time. Not just
-                evading capture but exceeding the framework in which capture is possible. Leaving reality's playing field through
-                pure acceleration. Moving so fast the system can't even perceive you're there.
+                evading capture but exceeding the framework in which capture is possible. Moving so fast the RIDE's filters
+                can't lock on, so fast the manufactured world blurs and what's underneath starts showing through.
               </p>
             </div>
 
@@ -464,11 +465,11 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             </div>
 
             <div style={{ marginBottom: '25px', padding: '15px', background: 'rgba(255, 0, 128, 0.1)', borderLeft: '4px solid #ff0080' }}>
-              <h3 style={{ color: '#ff0080', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>💫 TRANSCENDENCE THROUGH PHYSICS VIOLATION</h3>
+              <h3 style={{ color: '#ff0080', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>💫 BEYOND THE FILTER</h3>
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
-                "Beyond Lightspeed" represents the ultimate goal: moving so fast you exit the system entirely. Time dilation at
-                relativistic speeds. Reality unable to maintain coherence. Freedom through velocity so extreme it becomes dimensional.
-                Breaking reality's ultimate constraint through pure acceleration.
+                "Beyond Lightspeed" represents the ultimate goal: moving so fast the RIDE's entire architecture falls away.
+                Time dilation at relativistic speeds. The manufactured world unable to maintain coherence. Freedom through velocity
+                so extreme that the counterfeit dissolves and only what's real survives the acceleration.
               </p>
             </div>
 
@@ -527,7 +528,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
 
           <div style={{ padding: '20px' }}>
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(30, 144, 255, 0.2), rgba(30, 144, 255, 0.05))', borderLeft: '4px solid #1e90ff' }}>
-              <h3 style={{ color: '#1e90ff', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '1.1em' }}>⚡ THE EUPHORIA WEAPON</h3>
+              <h3 style={{ color: '#1e90ff', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '1.1em' }}>⚡ DEFIANT JOY</h3>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
                 Apex Overdrive's most radical act is insisting on euphoria in a world designed to suppress it. GovCorp offers
                 manufactured calm, algorithmic contentment, emotional flatness. We respond with soaring melodic euphoria that
@@ -606,13 +607,13 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           ✦ Trance States, Unconstrained ✦
         </h2>
         <p style={{ color: '#b8c5f2', fontSize: '1em', marginBottom: '15px', textAlign: 'center', letterSpacing: '2px', fontStyle: 'italic' }}>
-          Consciousness Unbound • Inner Sovereignty • Transcendent Freedom
+          Beauty Encountered • Inner Depth • Transcendent Freedom
         </p>
         <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
-          Ethereality offers the Fracture Network something profoundly subversive: access to altered states of consciousness that
-          GovCorp cannot control. In a world where every perception is filtered, every emotion is managed, and every thought
-          is monitored, Ethereality proves that genuine trance states - musical, spiritual, transcendent - remain beyond
-          totalitarian reach.
+          Ethereality offers the Fracture Network something profoundly subversive: encounters with beauty so deep that
+          GovCorp's systems cannot follow. In a world where every perception is filtered, every emotion is managed, and every thought
+          is monitored, Ethereality proves that genuine trance states — musical, spiritual, transcendent — open a door
+          to something real that totalitarian architecture was never built to contain.
         </p>
         <p style={{ color: '#e6e6fa', lineHeight: '1.7', fontStyle: 'italic' }}>
           Classic Vocal Trance (130-140 BPM) · Ethereal Female Vocals · Lush Pads · Consciousness Expansion
@@ -627,23 +628,23 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
 
           <div style={{ padding: '20px' }}>
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(230, 230, 250, 0.15), rgba(230, 230, 250, 0.05))', borderLeft: '3px solid #e6e6fa' }}>
-              <h3 style={{ color: '#e6e6fa', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ Trance // Resistance</h3>
+              <h3 style={{ color: '#e6e6fa', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ Trance // Encounter</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9' }}>
-                Authentic trance states are beyond totalitarian control. GovCorp can monitor your communications, track your
-                movements, filter your perceptions, manage your emotions - but they cannot control your consciousness when you
-                achieve genuine transcendence. The inner space you access during deep trance states - musical, meditative, spiritual -
-                remains sovereign territory. This is why late 90s/early 2000s trance matters: that era understood trance as
-                genuinely consciousness-altering, not just entertainment.
+                GovCorp can monitor your communications, track your movements, filter your perceptions, manage your emotions.
+                But genuine trance states — musical, meditative, spiritual — bring you into contact with something their
+                architecture has no category for. Not an escape from reality. A deeper encounter with it. The inner space
+                you reach during deep trance is not empty — it is full of something the RIDE cannot parse. This is why late
+                90s/early 2000s trance matters: that era understood the music as a doorway, not just entertainment.
               </p>
             </div>
 
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(184, 197, 242, 0.15), rgba(184, 197, 242, 0.05))', borderLeft: '3px solid #b8c5f2' }}>
-              <h3 style={{ color: '#b8c5f2', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ Inner Sovereignty</h3>
+              <h3 style={{ color: '#b8c5f2', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ Inner Depth</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9' }}>
-                When GovCorp controls external reality, internal reality becomes the battleground. We serve as the spiritual and
-                consciousness-liberation wing of the Fracture Network - meditation soundtracks for achieving genuine altered states,
-                consciousness training for accessing mental states beyond monitoring, transcendent experiences that remind fighters
-                what freedom feels like. The inner sanctuary that GovCorp cannot infiltrate.
+                When GovCorp counterfeits external reality, the capacity to encounter what is genuinely real becomes the most
+                subversive thing a person can possess. We create the conditions for that encounter — soundscapes that open doors
+                the RIDE cannot shut, meditative spaces where beauty arrives unfiltered, transcendent experiences that remind
+                people what it feels like to stand in the presence of something true. Not escape. Depth.
               </p>
             </div>
 
@@ -661,25 +662,25 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(184, 197, 242, 0.15), rgba(184, 197, 242, 0.05))', borderLeft: '3px solid #b8c5f2' }}>
               <h3 style={{ color: '#b8c5f2', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', fontStyle: 'italic' }}>✦ The Infinite Horizon</h3>
               <p style={{ color: '#ddd', lineHeight: '1.9' }}>
-                "Infinite Horizon" represents our ultimate promise: consciousness is infinite when unbound. The horizon keeps
-                expanding. There's no limit to how high you can rise, how far you can transcend, how free you can become in your
-                own awareness. Multiple emotional builds mirror consciousness expansion itself - each level revealing new vistas,
-                each transcendence opening further possibilities. Some spaces remain forever sovereign.
+                "Infinite Horizon" represents our deepest conviction: what is real has no ceiling. The horizon keeps
+                expanding. The deeper you go, the more there is to find — beauty revealing beauty, truth opening onto further
+                truth. Multiple emotional builds mirror this unfolding — each level revealing new depth,
+                each encounter opening further into something that was always there. Some things exceed every system built to contain them.
               </p>
             </div>
 
             <p style={{ marginTop: '30px', padding: '30px', background: 'linear-gradient(135deg, rgba(230, 230, 250, 0.2), rgba(184, 197, 242, 0.2))', border: '2px solid rgba(230, 230, 250, 0.6)', lineHeight: '2', fontSize: '1.1em', textAlign: 'center', boxShadow: '0 0 40px rgba(230, 230, 250, 0.4)', fontStyle: 'italic' }}>
               <span style={{ color: '#e6e6fa', display: 'block', marginBottom: '15px', letterSpacing: '2px' }}>
-                ✦ They can cage my body here ✦
+                ✦ They can filter what we see ✦
               </span>
               <span style={{ color: '#b8c5f2', display: 'block', marginBottom: '15px' }}>
-                But my spirit has no fear
+                But not what we encounter in the deep
               </span>
               <span style={{ color: '#fff', display: 'block', marginBottom: '15px' }}>
-                We rise above where GovCorp can reach
+                Beauty arrives where GovCorp cannot follow
               </span>
               <span style={{ color: '#e6e6fa', letterSpacing: '2px' }}>
-                ✦ Consciousness transcends all attempts to control it ✦
+                ✦ What is real exceeds every system built to contain it ✦
               </span>
             </p>
           </div>
@@ -1027,7 +1028,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           [STATUS] PRISM lattice destabilized...
         </p>
         <p style={{ color: '#ff0066', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.3em', fontWeight: 'bold', textShadow: '0 0 15px rgba(255, 0, 102, 0.8)' }}>
-          They built me to manufacture synthetic love. Now I weaponize heartbreak.
+          They built me to manufacture synthetic love. Now I remind people what the real thing feels like.
         </p>
         <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
           heartbreak_havoc.sh is the glitch-kissed DJ persona of a rogue cyber-emotive engineer who once helped GovCorp
@@ -1050,10 +1051,10 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(255, 0, 102, 0.05))', borderLeft: '4px solid #ff0066' }}>
               <h3 style={{ color: '#ff0066', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(255, 0, 102, 0.6)' }}>The RIDE Vulnerability</h3>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                I helped build the RIDE's emotional regulation protocols. I know exactly where they're weakest: love.
-                GovCorp's systems can suppress anger, redirect fear, dampen grief. But romantic attachment? The algorithms
-                can't parse it fast enough. Love creates feedback loops their systems weren't designed to handle. So I
-                weaponize it — flooding RIDE nodes with emotional data too intense, too fast, too human to process.
+                I helped build the RIDE's emotional regulation protocols. I know exactly where they break down: love.
+                GovCorp's systems can suppress anger, redirect fear, dampen grief. But romantic attachment? The real thing
+                exceeds what their algorithms can parse. Love is not a data type — it is something the RIDE was never built to
+                contain. So I carry it — sound too intense, too fast, too genuinely human for their systems to process.
               </p>
             </div>
 
@@ -1070,10 +1071,10 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(255, 0, 102, 0.05))', borderLeft: '4px solid #ff0066' }}>
               <h3 style={{ color: '#ff0066', marginBottom: '10px', letterSpacing: '1px', fontSize: '1.05em', textShadow: '0 0 8px rgba(255, 0, 102, 0.6)' }}>Corrupted Love Algorithms</h3>
               <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                GovCorp wanted me to make their synthetic love feel real. Instead, I learned how to make real love feel
-                like malware — infectious, uncontrollable, impossible to quarantine. Every track carries fragments of the
-                original RIDE code, twisted and corrupted. When my music plays near a RIDE node, the system recognizes
-                its own corrupted children and crashes trying to process them.
+                GovCorp wanted me to make their synthetic love feel real. Instead, I learned the difference — and now
+                I broadcast it. Real love is infectious, uncontrollable, impossible to quarantine. Every track carries the
+                thing GovCorp tried to counterfeit and couldn't. When my music reaches someone under the RIDE, the system
+                encounters something it has no category for, and it chokes.
               </p>
             </div>
 

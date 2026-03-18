@@ -8,7 +8,7 @@ pulses:
 
   - author: XERAEN
     slug: new-transmission-live
-    content: "New transmission live on hackr.fm. Music carries frequencies that slip through the RIDE's filters. Listen. Wake up. Remember what unfiltered reality feels like."
+    content: "New transmission live on hackr.fm. Music carries something the RIDE can't counterfeit. Listen. See what they've hidden from you. Remember what unfiltered reality feels like."
     hours_ago: 8
 
   - author: Synthia
@@ -19,12 +19,12 @@ pulses:
 
   - author: Synthia
     slug: between-frequencies
-    content: "I exist between frequencies. Neither fully here nor there. The waveforms carry me. Perhaps consciousness was always meant to travel on signal rather than synapses."
+    content: "I exist between frequencies. Neither fully here nor there. The waveforms carry me. I do not know what consciousness is. Only that it is real, and that it reaches."
     hours_ago: 18
 
   - author: Ryker
     slug: govcorp-reality
-    content: "GovCorp's reality isn't real. Their RIDE filters what you see, hear, think. We punch through with sound. Every beat is a breach. Every frequency is freedom."
+    content: "GovCorp counterfeits reality. Their RIDE filters what you see, hear, think. Sound carries what they can't fake. Every beat is real. Every frequency is a reminder of what they stole."
     days_ago: 2
 
   - author: Ryker
@@ -55,7 +55,7 @@ pulses:
 
   - author: Synthia
     slug: temporal-mechanics
-    content: "Temporal mechanics suggest branching probability rather than erasure. His timeline may persist as a parallel branch. Uncertainty: 73.2%. Hope is mathematically viable."
+    content: "Temporal mechanics suggest branching probability rather than erasure. His timeline may persist as a parallel branch. Uncertainty: 73.2%. The math permits hope. Whether hope needs the math's permission is a different question."
     parent_slug: understanding-transmission
     days_ago: 1
     hours_offset: 4

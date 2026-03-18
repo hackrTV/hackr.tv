@@ -127,8 +127,8 @@ const TheCyberPulsePage: React.FC = () => {
               <p style={{ color: '#ddd', lineHeight: '1.8', fontSize: '1.05em' }}>
                 <CodexText>
                   The.CyberPul.se is the central nervous system of the [[The Fracture Network|Fracture Network]]. Not a band. Not a channel.
-                  A heartbeat transmitted backward through time from {futureYear} to {currentYear} - a hundred years of
-                  resistance compressed into electromagnetic pulses you're decoding right now.
+                  A heartbeat transmitted backward through time from {futureYear} to {currentYear} — a hundred years of
+                  truth compressed into electromagnetic pulses you're decoding right now.
                 </CodexText>
               </p>
               <p

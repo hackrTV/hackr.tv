@@ -46,18 +46,18 @@ export const BandsPage: React.FC = () => {
       'xeraen': 'OMNIWAVE Genesis Vector - Electronic exploration with rhythmic guitars',
       'injection-vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
       'wavelength-zero': 'Where technical precision meets raw emotion in perfect destructive atmospheric harmony.',
-      'cipher-protocol': 'Data couriers wielding djent as encryption. No vocals. Pure instrumental algorithmic assault.',
-      'system-rot': 'Decay is the message. Entropy is the method. Hardcore punk collapse is inevitable.',
-      'temporal-blue-drift': 'Math rock time travelers proving complexity is the most beautiful form of resistance.',
+      'cipher-protocol': 'Data couriers wielding djent with precision. No vocals. The complexity carries what words cannot.',
+      'system-rot': 'Raw. Uncompromising. Punk that tears down the manufactured and demands something real.',
+      'temporal-blue-drift': 'Math rock time travelers proving complexity is the most beautiful thing the RIDE can\'t parse.',
       'offline': 'Unplugged, authentic, and gloriously disconnected from the grid. Analog hearts never die.',
       'apex-overdrive': 'Euphoric hardstyle, honed into a weapon. Promoting unity as power. Victory coded into every beat.',
-      'voiceprint': 'Liquid DnB resistance. Your voice is your weapon, your identity eternally unbreakable.',
-      'neon-hearts': 'Kawaii camouflage hiding radical resistance. J-Pop cuteness is the ultimate Trojan horse.',
-      'ethereality': 'Consciousness expansion through classic vocal trance. Inner freedom transcends all control.',
-      'blitzbeam': 'Maximum velocity hypertrance. SPEED IS LIFE! Physics are merely suggestions.',
-      'heartbreak-havoc': 'Weaponized heartbreak at Nightcore speed. Corrupting RIDE nodes with overclocked romantic chaos.'
+      'voiceprint': 'Liquid DnB archivists. Your voice is proof you exist — irreplaceable, authentic, unbreakable.',
+      'neon-hearts': 'Kawaii brilliance carrying truth in candy-coated hooks. J-Pop that means more than it seems.',
+      'ethereality': 'Classic vocal trance. Beauty so deep the RIDE cannot follow where it leads.',
+      'blitzbeam': 'Maximum velocity hypertrance. SPEED IS LIFE! Faster than the RIDE can track.',
+      'heartbreak-havoc': 'Heartbreak at Nightcore speed. Real love the RIDE was never built to contain.'
     }
-    return descriptions[slug] || 'Broadcasting resistance through sound.'
+    return descriptions[slug] || 'Broadcasting truth through sound.'
   }
 
   return (
@@ -83,7 +83,7 @@ export const BandsPage: React.FC = () => {
               <>
                 <div style={{ marginBottom: '30px', padding: '15px', background: '#0a0a0a', border: '1px solid #444' }}>
                   <p style={{ color: '#999', textAlign: 'center' }}>
-                    {artists.length} artists broadcasting from the underground | Each with a story, each with a mission
+                    {artists.length} artists broadcasting from the underground | Each with a story, each with a frequency
                   </p>
                 </div>
 
@@ -152,9 +152,9 @@ export const BandsPage: React.FC = () => {
                 <div style={{ marginTop: '30px', padding: '20px', background: '#0a0a0a', border: '1px solid #333' }}>
                   <h3 style={{ marginBottom: '10px', color: '#10b981' }}>[:: ABOUT THE FRACTURE NETWORK ::]</h3>
                   <p style={{ lineHeight: '1.6', color: '#888' }}>
-                    These bands broadcast resistance through time under the loose banner of the Fracture Network.
-                    Every artist here is connected to THE PULSE GRID, fighting GovCorp control through
-                    creativity, collaboration, and uncompromising artistic vision. From {currentYear} to {currentYear + 100}, the signal
+                    These bands carry truth and beauty through time under the loose banner of the Fracture Network.
+                    Every artist here is connected to THE PULSE GRID — creating, collaborating, and carrying forward
+                    an uncompromising artistic vision that no system can contain. From {currentYear} to {currentYear + 100}, the signal
                     continues.
                   </p>
                 </div>
