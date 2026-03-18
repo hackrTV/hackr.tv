@@ -85,6 +85,7 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
     "hackr.tv",
+    "hackr.fm",
     "ashlinn.net",
     "cyberpul.se",
     "the.cyberpul.se",
