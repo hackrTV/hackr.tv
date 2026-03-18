@@ -36,11 +36,11 @@ export const FooterMenu: React.FC = () => {
           </li>
           <li className={isActive('/xeraen') ? 'active' : undefined}>
             <Link to="/xeraen">
-              <span className="purple-168-text">2</span>&nbsp;XERAEN&nbsp;
+              <span className="purple-168-text">2</span>&nbsp;XERAEN.net&nbsp;
             </Link>
           </li>
-          <li className={isActive('/fm') ? 'active' : undefined}>
-            <Link to="/fm/radio">
+          <li className={isActive('/fm') || isActive('/vault') ? 'active' : undefined}>
+            <Link to="/fm">
               <span className="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;
             </Link>
           </li>
@@ -66,30 +66,25 @@ export const FooterMenu: React.FC = () => {
               <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;Codex&nbsp;
             </Link>
           </li>
-          <li className={isActive('/vault') ? 'active' : undefined}>
-            <Link to="/vault">
-              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;Vault&nbsp;
-            </Link>
-          </li>
           <li className={isActive('/logs') ? 'active' : undefined}>
             <Link to="/logs">
-              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;Logs&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;Logs&nbsp;
             </Link>
           </li>
           <li className={isActive('/code') ? 'active' : undefined}>
             <Link to="/code">
-              <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;Code&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;Code&nbsp;
             </Link>
           </li>
           <li className={isActive('/grid') ? 'active' : undefined}>
             <Link to="/grid">
-              <span className="purple-168-text">{isLoggedIn ? '11' : '10'}</span>&nbsp;THE PULSE GRID&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
             </Link>
           </li>
           {hackr?.role === 'admin' && (
             <li>
               <a href="/root">
-                <span className="red-255-text">{isLoggedIn ? '12' : '11'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">{isLoggedIn ? '11' : '10'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     neon-hearts offline heartbreak-havoc the-pulse-grid].each do |artist_slug|
     scope artist_slug do
       get "/", to: "pages#spa_root"
+      get "bio", to: "pages#spa_root"
       get "releases", to: "pages#spa_root"
       get "releases/:id", to: "pages#spa_root"
       get "trackz", to: "pages#spa_root"

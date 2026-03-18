@@ -1,16 +1,19 @@
 import React, { useEffect, lazy, Suspense } from 'react'
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { HomePage } from '~/components/pages/HomePage'
 import { LoadingPage } from '~/components/shared/LoadingSpinner'
 
 // Lazy load pages for code splitting
 const PulseVaultPage = lazy(() => import('~/components/pages/fm/PulseVaultPage').then(m => ({ default: m.PulseVaultPage })))
+const FmLandingPage = lazy(() => import('~/components/pages/fm/FmLandingPage').then(m => ({ default: m.FmLandingPage })))
 const RadioPage = lazy(() => import('~/components/pages/fm/RadioPage').then(m => ({ default: m.RadioPage })))
 const BandsPage = lazy(() => import('~/components/pages/fm/BandsPage').then(m => ({ default: m.BandsPage })))
 const PlaylistsPage = lazy(() => import('~/components/pages/playlists/PlaylistsPage').then(m => ({ default: m.PlaylistsPage })))
 const PlaylistDetailPage = lazy(() => import('~/components/pages/playlists/PlaylistDetailPage').then(m => ({ default: m.PlaylistDetailPage })))
 const SharedPlaylistPage = lazy(() => import('~/components/pages/playlists/SharedPlaylistPage').then(m => ({ default: m.SharedPlaylistPage })))
+const TheCyberPulseLandingPage = lazy(() => import('~/components/pages/artist/TheCyberPulseLandingPage').then(m => ({ default: m.TheCyberPulseLandingPage })))
 const TheCyberPulsePage = lazy(() => import('~/components/pages/artist/TheCyberPulsePage'))
+const XeraenLandingPage = lazy(() => import('~/components/pages/artist/XeraenLandingPage').then(m => ({ default: m.XeraenLandingPage })))
 const XeraenPage = lazy(() => import('~/components/pages/artist/XeraenPage'))
 const VodzPage = lazy(() => import('~/components/pages/artist/VodzPage'))
 const VodzShowPage = lazy(() => import('~/components/pages/artist/VodzShowPage'))
@@ -58,8 +61,7 @@ export const AppLayout: React.FC = () => {
     <Suspense fallback={<LoadingPage message="Loading page..." />}>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        {/* Redirect /fm to /fm/radio */}
-        <Route path="/fm" element={<Navigate to="/fm/radio" replace />} />
+        <Route path="/fm" element={<FmLandingPage />} />
         <Route path="/vault" element={<PulseVaultPage />} />
         <Route path="/fm/radio" element={<RadioPage />} />
         <Route path="/f/net" element={<BandsPage />} />
@@ -68,14 +70,16 @@ export const AppLayout: React.FC = () => {
         <Route path="/fm/playlists/:id" element={<ProtectedRoute><PlaylistDetailPage /></ProtectedRoute>} />
         {/* Shared playlist - public */}
         <Route path="/shared/:token" element={<SharedPlaylistPage />} />
-        <Route path="/thecyberpulse" element={<TheCyberPulsePage />} />
+        <Route path="/thecyberpulse" element={<TheCyberPulseLandingPage />} />
+        <Route path="/thecyberpulse/bio" element={<TheCyberPulsePage />} />
         <Route path="/thecyberpulse/releases" element={<ReleaseListPage />} />
         <Route path="/thecyberpulse/releases/:releaseSlug" element={<ReleaseDetailPage />} />
         <Route path="/thecyberpulse/trackz" element={<TrackListPage />} />
         <Route path="/thecyberpulse/trackz/:trackSlug" element={<TrackDetailPage />} />
         <Route path="/thecyberpulse/vidz" element={<VodzPage />} />
         <Route path="/thecyberpulse/vidz/:id" element={<VodzShowPage />} />
-        <Route path="/xeraen" element={<XeraenPage />} />
+        <Route path="/xeraen" element={<XeraenLandingPage />} />
+        <Route path="/xeraen/bio" element={<XeraenPage />} />
         <Route path="/xeraen/releases" element={<ReleaseListPage />} />
         <Route path="/xeraen/releases/:releaseSlug" element={<ReleaseDetailPage />} />
         <Route path="/xeraen/trackz" element={<TrackListPage />} />
