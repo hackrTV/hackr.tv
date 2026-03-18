@@ -1,6 +1,6 @@
 const artistProfilePaths: Record<string, string> = {
-  'xeraen': '/xeraen',
-  'thecyberpulse': '/thecyberpulse',
+  'xeraen': '/xeraen/bio',
+  'thecyberpulse': '/thecyberpulse/bio',
   'system-rot': '/system-rot',
   'wavelength-zero': '/wavelength-zero',
   'voiceprint': '/voiceprint',
