@@ -267,7 +267,8 @@ export const RadioPage: React.FC = () => {
                                 style={{
                                   width: '100%',
                                   background: playingStationId === station.id ? '#0d9488' : '#14b8a6',
-                                  color: 'white'
+                                  color: 'white',
+                                  boxShadow: '10px 10px #333'
                                 }}
                               >
                                 {playingStationId === station.id
@@ -322,11 +323,12 @@ export const RadioPage: React.FC = () => {
 
                           {station.playlists && station.playlists.length > 0 ? (
                             <button
-                              className={`tui-button tune-in-btn ${station.color}`}
+                              className="tui-button tune-in-btn"
                               onClick={() => playStationPlaylists(station)}
                               style={{
                                 width: '100%',
-                                background: playingStationId === station.id ? '#9333ea' : undefined
+                                background: playingStationId === station.id ? '#9333ea' : '#222',
+                                color: 'white'
                               }}
                             >
                               {playingStationId === station.id
@@ -335,9 +337,9 @@ export const RadioPage: React.FC = () => {
                             </button>
                           ) : station.stream_url ? (
                             <button
-                              className={`tui-button tune-in-btn ${station.color}`}
+                              className="tui-button tune-in-btn"
                               onClick={() => tuneIn(station.stream_url, station.name, station.genre)}
-                              style={{ width: '100%' }}
+                              style={{ width: '100%', background: '#222', color: 'white' }}
                             >
                               ► TUNE IN
                             </button>

@@ -356,7 +356,8 @@ namespace :data do
         genre: attrs["genre"],
         color: attrs["color"],
         stream_url: attrs["stream_url"],
-        position: attrs["position"] || 0
+        position: attrs["position"] || 0,
+        hidden: attrs.fetch("hidden", false)
       )
 
       if station.changed?

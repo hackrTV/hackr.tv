@@ -7,6 +7,7 @@
 #  color       :string
 #  description :text
 #  genre       :string
+#  hidden      :boolean          default(FALSE), not null
 #  name        :string           not null
 #  position    :integer          default(0), not null
 #  slug        :string           not null
@@ -31,6 +32,7 @@ class RadioStation < ApplicationRecord
 
   # Scopes
   scope :ordered, -> { order(position: :asc, name: :asc) }
+  scope :visible, -> { where(hidden: false) }
 
   # Callbacks
   before_validation :generate_slug, if: -> { slug.blank? && name.present? }

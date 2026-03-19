@@ -7,6 +7,7 @@
 #  color       :string
 #  description :text
 #  genre       :string
+#  hidden      :boolean          default(FALSE), not null
 #  name        :string           not null
 #  position    :integer          default(0), not null
 #  slug        :string           not null

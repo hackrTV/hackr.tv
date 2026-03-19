@@ -2,7 +2,7 @@ module Api
   class RadioController < ApplicationController
     # GET /api/radio_stations
     def index
-      stations = RadioStation.ordered.includes(playlists: [:tracks, :grid_hackr])
+      stations = RadioStation.visible.ordered.includes(playlists: [:tracks, :grid_hackr])
 
       render json: stations.map { |station|
         {

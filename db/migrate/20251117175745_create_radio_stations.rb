@@ -8,6 +8,7 @@ class CreateRadioStations < ActiveRecord::Migration[8.1]
       t.string :color
       t.string :stream_url
       t.integer :position, null: false, default: 0
+      t.boolean :hidden, null: false, default: false
 
       t.timestamps
     end
