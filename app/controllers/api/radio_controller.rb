@@ -33,7 +33,7 @@ module Api
     # Returns all playlists assigned to a radio station with their tracks
     # This is public - anyone can fetch playlists assigned to a station
     def station_playlists
-      station = RadioStation.find(params[:id])
+      station = RadioStation.visible.find(params[:id])
       playlists = station.radio_station_playlists
         .includes(playlist: {playlist_tracks: {track: [:artist, :release]}})
         .order(position: :asc)
