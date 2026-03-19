@@ -6,6 +6,7 @@ stations:
     color: "green-168"
     stream_url: ""  # To be configured with actual stream URL
     position: 0
+    hidden: true
 
   - name: "Sector X Underground"
     slug: "sector-x"
@@ -14,6 +15,7 @@ stations:
     color: "cyan-168"
     stream_url: ""  # To be configured
     position: 1
+    hidden: false
 
   - name: "XERAEN's Frequency"
     slug: "xeraen"
@@ -22,6 +24,7 @@ stations:
     color: "purple-168"
     stream_url: ""  # To be configured
     position: 2
+    hidden: true
 
   - name: "GovCorp Official Radio (FN Monitoring Relay)"
     slug: "govcorp"
@@ -30,3 +33,4 @@ stations:
     color: "red-168"
     stream_url: ""  # To be configured
     position: 3
+    hidden: true
