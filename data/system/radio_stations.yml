@@ -6,7 +6,7 @@ stations:
     color: "green-168"
     stream_url: ""  # To be configured with actual stream URL
     position: 0
-    hidden: true
+    hidden: false
 
   - name: "Sector X Underground"
     slug: "sector-x"
