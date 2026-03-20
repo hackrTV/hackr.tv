@@ -97,9 +97,9 @@ class HackrStream < ApplicationRecord
   end
 
   def cannot_restart_stream
-    # If trying to go live and stream has already been started before
-    if is_live? && started_at_was.present? && started_at_changed?
-      errors.add(:base, "Cannot restart a stream that has already been used. Create a new stream instead.")
+    # Prevent re-going-live on a stream that has already ended
+    if is_live? && !is_live_was && ended_at_was.present?
+      errors.add(:base, "Cannot restart a stream that has already ended. Create a new stream instead.")
     end
   end
 

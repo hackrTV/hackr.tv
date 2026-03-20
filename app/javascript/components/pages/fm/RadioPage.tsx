@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { TrackData } from '~/types/track'
 import { CodexText } from '~/components/shared/CodexText'
+import { useStreamStatus } from '~/hooks/useStreamStatus'
 import { apiJson } from '~/utils/apiClient'
 
 interface Playlist {
@@ -51,6 +53,7 @@ export const RadioPage: React.FC = () => {
   const [volume, setVolume] = useState(70)
   const [playingStationId, setPlayingStationId] = useState<number | null>(null)
   const [audioPlayerIsPlaying, setAudioPlayerIsPlaying] = useState(false)
+  const { isLive, streamInfo } = useStreamStatus()
 
   useEffect(() => {
     apiJson<RadioStation[]>('/api/radio_stations')
@@ -234,7 +237,51 @@ export const RadioPage: React.FC = () => {
             {!loading && !error && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
                 {stations.map((station) => {
+                  const isTCP = station.slug === 'thecyberpulse'
                   const isSectorX = station.slug === 'sector-x'
+
+                  if (isTCP && isLive) {
+                    return (
+                      <div key={station.slug} className="tui-window white-text" style={{ background: '#0d0d0d', border: '1px solid #00d9ff' }}>
+                        <fieldset style={{ borderColor: '#00d9ff' }}>
+                          <legend style={{ color: '#00d9ff' }}>{station.name}</legend>
+
+                          <div style={{ padding: '15px' }}>
+                            <div style={{ marginBottom: '10px' }}>
+                              <span className="live-indicator" style={{ color: '#ff3333', fontWeight: 'bold', fontSize: '0.9em', marginRight: '10px' }}>● LIVE NOW</span>
+                              <span style={{ color: '#00d9ff', fontWeight: 'bold' }}>
+                                {streamInfo?.artist ? `${streamInfo.artist} is streaming` : 'Stream active'}
+                              </span>
+                            </div>
+                            {streamInfo?.title && (
+                              <p style={{ marginBottom: '10px', color: '#aaa' }}>
+                                {streamInfo.title}
+                              </p>
+                            )}
+                            <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#999' }}>
+                              <CodexText>A live transmission is cutting through the noise. Tune in now on the root frequency.</CodexText>
+                            </p>
+
+                            <Link
+                              to="/"
+                              className="tui-button tune-in-btn"
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                textAlign: 'center',
+                                background: '#ff3333',
+                                color: 'white',
+                                boxShadow: '10px 10px #333',
+                                textDecoration: 'none'
+                              }}
+                            >
+                              ▶ WATCH LIVE
+                            </Link>
+                          </div>
+                        </fieldset>
+                      </div>
+                    )
+                  }
 
                   if (isSectorX) {
                     return (
