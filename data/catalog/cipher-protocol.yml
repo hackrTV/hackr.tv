@@ -6,6 +6,7 @@ releases:
   - slug: alpha-algorithm
     title: "Alpha Algorithm"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2122-09-17"
     cover_image: "alpha_algorithm.jpg"
     tracks:

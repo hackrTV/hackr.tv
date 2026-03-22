@@ -6,6 +6,7 @@ releases:
   - slug: hackr-nights
     title: "Hackr Nights"
     release_type: single
+    label: "hackr.fm"
     tracks:
       - title: "Hackr Nights"
         slug: hackr-nights
@@ -59,6 +60,7 @@ releases:
   - slug: livestream-archive
     title: "Livestream Archive"
     release_type: lp
+    label: "hackr.fm"
     release_date: "2118-10-08"
     description: "Archived recordings from live trans-temporal broadcasts."
     cover_image: "images/livestream_archive.jpg"

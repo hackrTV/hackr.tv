@@ -6,6 +6,7 @@ releases:
   - slug: unplugged
     title: "Unplugged"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2120-06-05"
     cover_image: "unplugged.jpg"
     tracks:

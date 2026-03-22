@@ -6,7 +6,8 @@ releases:
   - slug: execute
     title: "./exeCUTE"
     release_type: ep
-    release_date: "2125-09-09"
+    label: "hackr.fm"
+    release_date: "2125-06-21"
     cover_image: "images/execute.jpg"
     tracks:
       - title: "heartbreak_havoc.sh"

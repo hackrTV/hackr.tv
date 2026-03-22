@@ -6,6 +6,7 @@ releases:
   - slug: encrypted-shroud
     title: "Encrypted Shroud"
     release_type: single
+    label: "hackr.fm"
     release_date: "2125-07-19"
     cover_image: "images/encrypted_shroud.jpg"
     tracks:
@@ -68,6 +69,7 @@ releases:
   - slug: xordium
     title: "XORDIUM"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2124-10-17"
     cover_image: "images/xordium.jpg"
     streaming_links:
@@ -189,6 +191,7 @@ releases:
   - slug: dogs-can-grow-beards-all-over
     title: "Dogs Can Grow Beards All Over"
     release_type: single
+    label: "hackr.fm"
     release_date: "2124-08-05"
     cover_image: "images/dogs_can_grow_beards_all_over.jpg"
     tracks:
@@ -238,6 +241,7 @@ releases:
   - slug: dream-surprise
     title: "Dream Surprise"
     release_type: single
+    label: "hackr.fm"
     release_date: "2124-07-12"
     cover_image: "images/dream_surprise.jpg"
     tracks:
@@ -313,6 +317,7 @@ releases:
   - slug: birdo
     title: "Birdo"
     release_type: single
+    label: "hackr.fm"
     release_date: "2124-05-21"
     cover_image: "images/birdo.jpg"
     tracks:
@@ -383,6 +388,7 @@ releases:
   - slug: our-city
     title: "Our City"
     release_type: single
+    label: "hackr.fm"
     release_date: "2122-09-28"
     cover_image: "images/our_city.jpg"
     tracks:

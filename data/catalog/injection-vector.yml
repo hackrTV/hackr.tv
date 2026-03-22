@@ -6,6 +6,7 @@ releases:
   - slug: physical-layer
     title: "Physical Layer"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2123-01-15"
     cover_image: "physical_layer.jpg"
     tracks:

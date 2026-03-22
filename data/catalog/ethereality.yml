@@ -6,6 +6,7 @@ releases:
   - slug: transcendency
     title: "Transcendency"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2119-04-26"
     cover_image: "transcendency.jpg"
     tracks:

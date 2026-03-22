@@ -6,6 +6,7 @@ releases:
   - slug: audio-archive
     title: "Audio Archive"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2118-04-11"
     cover_image: "audio_archive.jpg"
     tracks:

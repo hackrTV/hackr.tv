@@ -6,6 +6,7 @@ releases:
   - slug: saccharine
     title: "Saccharine"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2124-11-07"
     cover_image: "saccharine.jpg"
     tracks:
