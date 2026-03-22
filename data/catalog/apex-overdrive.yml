@@ -6,6 +6,7 @@ releases:
   - slug: summit
     title: "Summit"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2121-09-09"
     cover_image: "summit.jpg"
     tracks:

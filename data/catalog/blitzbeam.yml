@@ -6,6 +6,7 @@ releases:
   - slug: maximum-velocity
     title: "Maximum Velocity"
     release_type: ep
+    label: "hackr.fm"
     release_date: "2123-09-09"
     cover_image: "maximum_velocity.jpg"
     tracks:

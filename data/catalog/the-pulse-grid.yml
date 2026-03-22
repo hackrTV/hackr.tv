@@ -7,6 +7,7 @@ releases:
   - slug: ost
     title: "OST"
     release_type: lp
+    label: ""
     release_date: "2125-11-21"
     cover_image: "ost.jpg"
     tracks:
