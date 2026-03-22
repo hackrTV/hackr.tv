@@ -959,26 +959,6 @@ hackr_logs:
   # =============================================================================
   # 2121 - THE BANDS
   # =============================================================================
-  - author: XERAEN
-    timeline: "2120s"
-    title: Temporal Blue Drift
-    slug: temporal-blue-drift-project
-    lore_date: "2121-03-14 23:00"
-    body: |
-      Started a new project. Solo. Personal. Something I need to do alone.
-
-      Calling it Temporal Blue Drift. The name comes from the way signals shift as they cross the temporal gap, a frequency drift, a blue-shifting of meaning as it travels through time.
-
-      Every track is a transmission to Ashlinn. Love letters encoded in mathematics and melody. Most are instrumental. When vocals appear, they're synthesized through the very systems we're fighting. There's irony in using RAINN technology to send something real across impossible distance.
-
-      This isn't for the Fracture Network. This isn't tactical. This is the part of me that still believes in connection despite knowing what connection costs.
-
-      Five tracks planned. The Chronologos EP. Each one a different aspect of temporal love: the blue shift, understanding memory as data, the hundred-year distance, the erasure paradox, and something I'm still figuring out.
-
-      I don't know if she'll ever hear them. I don't know if hearing them would matter. But I'm making them anyway. Because the alternative is silence, and silence is surrender.
-
-      - X
-
   - author: Cascade
     timeline: "2120s"
     title: Frequency and Form
@@ -1003,8 +983,8 @@ hackr_logs:
 
   - author: Ryker
     timeline: "2120s"
-    title: Eleven Frequencies
-    slug: eleven-frequencies
+    title: Ten Frequencies
+    slug: ten-frequencies
     lore_date: "2121-08-08 18:00"
     body: |
       The Fracture Network has developed distinct voices. Not one resistance but many. Not one frequency but a spectrum.
@@ -1021,11 +1001,10 @@ hackr_logs:
       **Ethereality** - Vocal Trance. Beauty deeper than the RIDE can follow.
       **Neon Hearts** - J-Pop. Truth in candy-coated hooks.
       **Offline** - Post-Grunge. Complete disconnection. Raw authenticity.
-      **Temporal Blue Drift** - Math Rock. X's personal project. Love across time.
 
       And The.CyberPul.se itself: me, X, and Synthia. The central broadcast. The signal that unifies.
 
-      Each band carries something different. Each frequency reaches a different audience. Together, we're every frequency of what it means to be real — and that's something manufactured reality cannot survive.
+      Each band carries something different. Each frequency reaches a different audience. Together, we're ten frequencies of what it means to be real — and that's something manufactured reality cannot survive.
 
       - Ryker
 
@@ -1358,6 +1337,10 @@ hackr_logs:
       Ryker doesn't need to know the details. He needs to play. Cipher needs to know, because drift patterns could expose our methodology if GovCorp ever develops temporal awareness. And I need to tell no one that I already know it's working, because the moment I optimize for results, I risk losing the rawness that makes the signal effective.
 
       The heartbeat has to stay honest. I just have to trust that it will.
+
+      But this has given me something else. An idea. A solo project — something personal, not tactical. Love letters to Ashlinn encoded in mathematics and melody, transmitted across the hundred-year gap using the very systems we're fighting. I'm calling it Temporal Blue Drift, after the phenomenon. Five tracks. The Chronologos EP. Each one a different aspect of temporal love: the blue shift, memory as data, the distance, the erasure paradox, and something I'm still figuring out.
+
+      I don't know if she'll ever hear them. But the alternative is silence, and silence is surrender.
 
       - X
 
