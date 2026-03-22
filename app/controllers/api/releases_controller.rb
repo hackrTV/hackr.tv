@@ -29,6 +29,33 @@ module Api
       }
     end
 
+    # GET /api/releases/latest
+    def latest
+      @releases = Release.includes(:artist, cover_image_attachment: :blob)
+        .where(label: "hackr.fm")
+        .where.associated(:cover_image_attachment)
+        .order(Arel.sql("release_date DESC NULLS LAST"))
+        .limit(3)
+
+      render json: @releases.map { |release|
+        {
+          id: release.id,
+          name: release.name,
+          slug: release.slug,
+          release_type: release.release_type,
+          release_date: release.release_date,
+          label: release.label,
+          artist: {
+            id: release.artist.id,
+            name: release.artist.name,
+            slug: release.artist.slug
+          },
+          cover_url: url_for(release.cover_image),
+          track_count: release.tracks.count
+        }
+      }
+    end
+
     # GET /api/releases/:id
     def show
       @release = Release.find_by(slug: params[:id]) || Release.find(params[:id])

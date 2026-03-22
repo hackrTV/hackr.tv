@@ -14,11 +14,9 @@ interface Release {
     id: number
     name: string
     slug: string
-    genre: string
   }
-  cover_url: string | null
+  cover_url: string
   track_count: number
-  label: string | null
 }
 
 export const FmLandingPage: React.FC = () => {
@@ -28,13 +26,8 @@ export const FmLandingPage: React.FC = () => {
   const [latestReleases, setLatestReleases] = useState<Release[]>([])
 
   useEffect(() => {
-    apiJson<Release[]>('/api/releases')
-      .then(data => {
-        const labelReleases = data
-          .filter(r => r.label?.toLowerCase() === 'hackr.fm' && r.cover_url)
-          .slice(0, 3)
-        setLatestReleases(labelReleases)
-      })
+    apiJson<Release[]>('/api/releases/latest')
+      .then(data => setLatestReleases(data))
       .catch(error => console.error('Error fetching releases:', error))
   }, [])
 

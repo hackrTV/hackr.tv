@@ -105,7 +105,9 @@ Rails.application.routes.draw do
       resources :tracks, only: [:index]
     end
     resources :tracks, only: %i[index show]
-    resources :releases, only: %i[index show]
+    resources :releases, only: %i[index show] do
+      get :latest, on: :collection
+    end
     get "codex/mappings", to: "codex#mappings"
     get "codex", to: "codex#index"
     get "codex/:slug", to: "codex#show"
