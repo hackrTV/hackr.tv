@@ -49,6 +49,7 @@ Rails.application.routes.draw do
   # hackr.fm routes - SPA
   scope "fm" do
     get "/", to: "pages#spa_root", as: :fm
+    get "releases", to: "pages#spa_root", as: :fm_releases
     get "radio", to: "pages#spa_root", as: :fm_radio
     get "playlists", to: "pages#spa_root", as: :fm_playlists
     get "playlists/:id", to: "pages#spa_root", as: :fm_playlist

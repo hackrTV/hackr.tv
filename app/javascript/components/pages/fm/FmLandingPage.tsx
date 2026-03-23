@@ -124,6 +124,26 @@ export const FmLandingPage: React.FC = () => {
                     </Link>
                   ))}
                 </div>
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                  <Link
+                    to="/fm/releases"
+                    style={{
+                      display: 'inline-block',
+                      padding: '10px 25px',
+                      background: 'transparent',
+                      color: '#7c3aed',
+                      textDecoration: 'none',
+                      border: '1px solid #7c3aed',
+                      letterSpacing: '2px',
+                      fontSize: '0.9em',
+                      transition: 'background 0.2s ease, color 0.2s ease'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#7c3aed'; e.currentTarget.style.color = 'white' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#7c3aed' }}
+                  >
+                    VIEW ALL RELEASES →
+                  </Link>
+                </div>
               </div>
             )}
 

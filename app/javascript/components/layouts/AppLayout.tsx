@@ -6,6 +6,7 @@ import { LoadingPage } from '~/components/shared/LoadingSpinner'
 // Lazy load pages for code splitting
 const PulseVaultPage = lazy(() => import('~/components/pages/fm/PulseVaultPage').then(m => ({ default: m.PulseVaultPage })))
 const FmLandingPage = lazy(() => import('~/components/pages/fm/FmLandingPage').then(m => ({ default: m.FmLandingPage })))
+const FmReleasesPage = lazy(() => import('~/components/pages/fm/FmReleasesPage').then(m => ({ default: m.FmReleasesPage })))
 const RadioPage = lazy(() => import('~/components/pages/fm/RadioPage').then(m => ({ default: m.RadioPage })))
 const BandsPage = lazy(() => import('~/components/pages/fm/BandsPage').then(m => ({ default: m.BandsPage })))
 const PlaylistsPage = lazy(() => import('~/components/pages/playlists/PlaylistsPage').then(m => ({ default: m.PlaylistsPage })))
@@ -62,6 +63,7 @@ export const AppLayout: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/fm" element={<FmLandingPage />} />
+        <Route path="/fm/releases" element={<FmReleasesPage />} />
         <Route path="/vault" element={<PulseVaultPage />} />
         <Route path="/fm/radio" element={<RadioPage />} />
         <Route path="/f/net" element={<BandsPage />} />
