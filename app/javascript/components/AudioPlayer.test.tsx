@@ -400,7 +400,7 @@ describe('AudioPlayer', () => {
       vi.useRealTimers()
     })
 
-    it('handles stalled event by logging without reloading', async () => {
+    it('does not reload when stalled fires during startup buffering', async () => {
       vi.useRealTimers() // Use real timers for this test
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
@@ -602,30 +602,104 @@ describe('AudioPlayer', () => {
       playSpy.mockRestore()
     })
 
-    it('watchdog is activated when track is playing', async () => {
-      vi.useRealTimers()
+    it('watchdog recovers when playback stops advancing during active playback', async () => {
       render(<AudioPlayer />)
+
+      const audio = document.querySelector('#audio-element') as HTMLAudioElement
+      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
+      const loadSpy = vi.spyOn(audio, 'load')
 
       await act(async () => {
         window.audioPlayer?.loadTrack(mockTrack)
       })
 
-      await waitFor(() => {
-        expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+      Object.defineProperty(audio, 'duration', {
+        value: 120,
+        configurable: true
       })
 
-      // Wait for play state to be set - this indicates the watchdog effect should be running
-      await waitFor(() => {
-        const pauseBtn = document.querySelector('#play-pause-btn')
-        expect(pauseBtn?.textContent).toContain('PAUSE')
+      Object.defineProperty(audio, 'currentTime', {
+        value: 0,
+        writable: true,
+        configurable: true
       })
 
-      // Verify the player is in a state where watchdog would be active
-      expect(window.audioPlayer?.isPlaying()).toBe(true)
-      expect(window.audioPlayer?.getCurrentTrackId()).toBe('track-1')
+      await act(async () => {
+        audio.dispatchEvent(new Event('loadedmetadata'))
+        audio.dispatchEvent(new Event('canplay'))
+      })
 
-      // The watchdog effect is now monitoring playback
-      // (Full timing tests are impractical in unit tests due to 5s intervals)
+      playSpy.mockClear()
+      loadSpy.mockClear()
+
+      Object.defineProperty(audio, 'paused', {
+        value: false,
+        configurable: true
+      })
+      Object.defineProperty(audio, 'ended', {
+        value: false,
+        configurable: true
+      })
+
+      await act(async () => {
+        vi.advanceTimersByTime(5000)
+      })
+
+      expect(loadSpy).toHaveBeenCalledTimes(1)
+      expect(playSpy).toHaveBeenCalledTimes(1)
+
+      loadSpy.mockRestore()
+      playSpy.mockRestore()
+    })
+
+    it('watchdog does not reload while playback is progressing normally', async () => {
+      render(<AudioPlayer />)
+
+      const audio = document.querySelector('#audio-element') as HTMLAudioElement
+      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
+      const loadSpy = vi.spyOn(audio, 'load')
+
+      await act(async () => {
+        window.audioPlayer?.loadTrack(mockTrack)
+      })
+
+      Object.defineProperty(audio, 'duration', {
+        value: 120,
+        configurable: true
+      })
+
+      const playbackPositions = [1, 2]
+      Object.defineProperty(audio, 'currentTime', {
+        get: () => playbackPositions.shift() ?? 2,
+        configurable: true
+      })
+
+      await act(async () => {
+        audio.dispatchEvent(new Event('loadedmetadata'))
+        audio.dispatchEvent(new Event('canplay'))
+      })
+
+      playSpy.mockClear()
+      loadSpy.mockClear()
+
+      Object.defineProperty(audio, 'paused', {
+        value: false,
+        configurable: true
+      })
+      Object.defineProperty(audio, 'ended', {
+        value: false,
+        configurable: true
+      })
+
+      await act(async () => {
+        vi.advanceTimersByTime(10000)
+      })
+
+      expect(loadSpy).not.toHaveBeenCalled()
+      expect(playSpy).not.toHaveBeenCalled()
+
+      loadSpy.mockRestore()
+      playSpy.mockRestore()
     })
 
     it('logs waiting event for debugging', async () => {
