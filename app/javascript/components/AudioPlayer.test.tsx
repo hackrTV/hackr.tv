@@ -400,8 +400,10 @@ describe('AudioPlayer', () => {
       vi.useRealTimers()
     })
 
-    it('handles stalled event by reloading audio', async () => {
+    it('handles stalled event by logging without reloading', async () => {
       vi.useRealTimers() // Use real timers for this test
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
       render(<AudioPlayer />)
 
       await act(async () => {
@@ -413,14 +415,6 @@ describe('AudioPlayer', () => {
       const audio = document.querySelector('#audio-element') as HTMLAudioElement
 
       const loadSpy = vi.spyOn(audio, 'load')
-      const playSpy = vi.spyOn(audio, 'play').mockResolvedValue(undefined)
-
-      // Set currentTime to simulate playback position
-      Object.defineProperty(audio, 'currentTime', {
-        value: 300,
-        writable: true,
-        configurable: true
-      })
 
       // Simulate stalled event
       const stalledEvent = new Event('stalled')
@@ -428,12 +422,14 @@ describe('AudioPlayer', () => {
         audio.dispatchEvent(stalledEvent)
       })
 
-      // Verify recovery attempt
-      expect(loadSpy).toHaveBeenCalled()
-      expect(playSpy).toHaveBeenCalled()
+      // Should log a warning but NOT reload — browser handles rebuffering on its own
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Audio playback stalled — browser is rebuffering, waiting for data...'
+      )
+      expect(loadSpy).not.toHaveBeenCalled()
 
       loadSpy.mockRestore()
-      playSpy.mockRestore()
+      consoleSpy.mockRestore()
     })
 
     it('handles network error by attempting recovery after delay', async () => {
