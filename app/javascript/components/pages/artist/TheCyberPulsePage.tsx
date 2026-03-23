@@ -372,7 +372,7 @@ const TheCyberPulsePage: React.FC = () => {
                     </p>
                     <p style={{ color: '#bbb', lineHeight: '1.8', marginBottom: '15px' }}>
                       Where XERAEN embodies the solitary weight of maintaining hope across impossible distances,
-                      Ryker embodies collective defiance. Unity through action. The belief that every small choice
+                      Ryker embodies defiance made physical. Unity through action. The belief that every small choice
                       ripples forward - or in their case, backward - shaping futures that haven't been written yet.
                     </p>
                     <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
@@ -616,7 +616,7 @@ const TheCyberPulsePage: React.FC = () => {
                       textShadow: `0 0 10px ${colorScheme.glow}`
                     }}
                   >
-                    Causality is a prison. We picked the lock.
+                    Causality bent. We broadcast through the fracture.
                   </p>
                 </div>
               </fieldset>

@@ -441,7 +441,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
               <p style={{ color: '#ccc', lineHeight: '1.7' }}>
                 The "+" in BlitzBeam+ means exceeding designed limits, going beyond what's already extreme, the euphoria of velocity,
                 continuous acceleration without plateau. You can always go faster. There is always velocity+. This is the
-                existential experience of speed - pure movement without destination, velocity being its own reward.
+                existential experience of speed — moving so fast that every manufactured barrier falls away and only what's real survives.
               </p>
             </div>
 
@@ -607,7 +607,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           ✦ Trance States, Unconstrained ✦
         </h2>
         <p style={{ color: '#b8c5f2', fontSize: '1em', marginBottom: '15px', textAlign: 'center', letterSpacing: '2px', fontStyle: 'italic' }}>
-          Beauty Encountered • Inner Depth • Transcendent Freedom
+          Beauty Encountered • Inner Depth • Depth of Encounter
         </p>
         <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
           Ethereality offers the Fracture Network something profoundly subversive: encounters with beauty so deep that
@@ -616,7 +616,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           to something real that totalitarian architecture was never built to contain.
         </p>
         <p style={{ color: '#e6e6fa', lineHeight: '1.7', fontStyle: 'italic' }}>
-          Classic Vocal Trance (130-140 BPM) · Ethereal Female Vocals · Lush Pads · Consciousness Expansion
+          Classic Vocal Trance (130-140 BPM) · Ethereal Female Vocals · Lush Pads · Depth of Encounter
         </p>
       </div>
     ),
@@ -624,7 +624,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
     renderPhilosophy: () => (
       <div className="tui-window white-text" style={{ marginBottom: '30px', background: 'rgba(10, 10, 26, 0.9)', border: '1px solid rgba(230, 230, 250, 0.5)', boxShadow: '0 0 30px rgba(230, 230, 250, 0.3)' }}>
         <fieldset style={{ borderColor: '#e6e6fa' }}>
-          <legend style={{ color: '#e6e6fa', letterSpacing: '2px', fontStyle: 'italic' }}>The Path to Transcendence</legend>
+          <legend style={{ color: '#e6e6fa', letterSpacing: '2px', fontStyle: 'italic' }}>Encounter with the Deep</legend>
 
           <div style={{ padding: '20px' }}>
             <div style={{ marginBottom: '25px', padding: '20px', background: 'linear-gradient(135deg, rgba(230, 230, 250, 0.15), rgba(230, 230, 250, 0.05))', borderLeft: '3px solid #e6e6fa' }}>
@@ -824,7 +824,7 @@ export const bandProfiles: Record<string, BandProfileConfig> = {
           every digital touchpoint, Offline's radical solution is simple: pull the plug, go analog, disappear into the static.
         </p>
         <p style={{ color: '#8b7355', lineHeight: '1.7', fontWeight: 'bold' }}>
-          Post-Grunge • Raw & Heavy • Dynamic Quiet-Loud • Organic Imperfection • Analog Authenticity
+          Post-Grunge • Raw & Heavy • Dynamic Quiet-Loud • Organic Imperfection • Raw Authenticity
         </p>
       </div>
     ),

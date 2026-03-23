@@ -19,10 +19,10 @@ codex_entries:
     content: |
       # Agent Kira Volkov
 
-      **Status:** Active
-      **Affiliation:** [[GovCorp]] (Counter-Resistance Division)
-      **Timeline:** Future
-      **Superior:** [[Director Elena Krell]]
+      - **Status:** Active
+      - **Affiliation:** [[GovCorp]] (Counter-Resistance Division)
+      - **Timeline:** Future
+      - **Superior:** [[Director Elena Krell]]
 
       ## Background
 
@@ -58,9 +58,9 @@ codex_entries:
     content: |
       # Ashlinn
 
-      **Status:** Active
-      **Timeline:** Present
-      **Known For:** Experimental ambient music, unusual creative resonance
+      - **Status:** Active
+      - **Timeline:** Present
+      - **Known For:** Experimental ambient music, unusual creative resonance
 
       ## Present-Day Life
 
@@ -108,10 +108,10 @@ codex_entries:
     content: |
       # Cascade
 
-      **Status:** Active
-      **Affiliation:** [[Ethereality]] (Founder)
-      **Timeline:** Future
-      **Known For:** Synesthetic soundscape design, pacifist resistance
+      - **Status:** Active
+      - **Affiliation:** [[Ethereality]] (Founder)
+      - **Timeline:** Future
+      - **Known For:** Synesthetic soundscape design, pacifist resistance
 
       ## The Synesthete
 
@@ -150,10 +150,10 @@ codex_entries:
     content: |
       # Cipher
 
-      **Status:** Active
-      **Affiliation:** [[Cipher Protocol]] (Leader), [[The Fracture Network]]
-      **Timeline:** Future
-      **Known For:** OPSEC protocols, cell structure design, security architecture
+      - **Status:** Active
+      - **Affiliation:** [[Cipher Protocol]] (Leader), [[The Fracture Network]]
+      - **Timeline:** Future
+      - **Known For:** OPSEC protocols, cell structure design, security architecture
 
       ## The Cost of Vigilance
 
@@ -192,10 +192,10 @@ codex_entries:
     content: |
       # Director Elena Krell
 
-      **Status:** Active
-      **Affiliation:** [[GovCorp]] (Counter-Resistance Division)
-      **Timeline:** Future
-      **Known For:** Counter-resistance operations, strategic dismantling of resistance cells
+      - **Status:** Active
+      - **Affiliation:** [[GovCorp]] (Counter-Resistance Division)
+      - **Timeline:** Future
+      - **Known For:** Counter-resistance operations, strategic dismantling of resistance cells
 
       ## The True Believer
 
@@ -238,10 +238,10 @@ codex_entries:
     content: |
       # Dr. Marcus Chen
 
-      **Status:** Active
-      **Affiliation:** [[GovCorp]] (PRISM Division)
-      **Timeline:** Future
-      **Known For:** Discovering the core principle behind [[PRISM]] technology
+      - **Status:** Active
+      - **Affiliation:** [[GovCorp]] (PRISM Division)
+      - **Timeline:** Future
+      - **Known For:** Discovering the core principle behind [[PRISM]] technology
 
       ## The Discovery
 
@@ -282,10 +282,10 @@ codex_entries:
     content: |
       # Koda
 
-      **Status:** Active
-      **Affiliation:** [[System Rot]]
-      **Timeline:** Future
-      **Known For:** Reality-glitch graffiti, awakening narrative
+      - **Status:** Active
+      - **Affiliation:** [[System Rot]]
+      - **Timeline:** Future
+      - **Known For:** Reality-glitch graffiti, awakening narrative
 
       ## Born Inside the Cage
 
@@ -331,11 +331,11 @@ codex_entries:
     content: |
       # Mel Reeves
 
-      **Full Name:** Melanie "Mel" Reeves
-      **Status:** Active
-      **Timeline:** Present
-      **Affiliation:** [[The Listeners]] (Founder)
-      **Known For:** First confirmed detection of trans-temporal signals
+      - **Full Name:** Melanie "Mel" Reeves
+      - **Status:** Active
+      - **Timeline:** Present
+      - **Affiliation:** [[The Listeners]] (Founder)
+      - **Known For:** First confirmed detection of trans-temporal signals
 
       ## The Detection
 
@@ -384,11 +384,11 @@ codex_entries:
     content: |
       # Nathan Clarke
 
-      **Full Name:** Nathan Clarke
-      **Status:** Active
-      **Timeline:** Present
-      **Affiliation:** [[The Listeners]]
-      **Known For:** Decoding trans-temporal video, building [[The Relay]]
+      - **Full Name:** Nathan Clarke
+      - **Status:** Active
+      - **Timeline:** Present
+      - **Affiliation:** [[The Listeners]]
+      - **Known For:** Decoding trans-temporal video, building [[The Relay]]
 
       ## Background
 
@@ -445,10 +445,10 @@ codex_entries:
     content: |
       # Nyx
 
-      **Status:** Active
-      **Affiliation:** [[The Fracture Network]]
-      **Timeline:** Future
-      **Known For:** Recent awakening, fresh perspective on the resistance
+      - **Status:** Active
+      - **Affiliation:** [[The Fracture Network]]
+      - **Timeline:** Future
+      - **Known For:** Recent awakening, fresh perspective on the resistance
 
       ## The Extended Glitch
 
@@ -489,10 +489,10 @@ codex_entries:
     content: |
       # Ryker M. Pulse
 
-      **Status:** Active
-      **Affiliation:** [[The.CyberPul.se]] (Co-founder), [[The Fracture Network]]
-      **Location:** [[The Hackr Hangar]]
-      **Known For:** Drums, percussion, broadcasting, collective defiance
+      - **Status:** Active
+      - **Affiliation:** [[The.CyberPul.se]] (Co-founder), [[The Fracture Network]]
+      - **Location:** [[The Hackr Hangar]]
+      - **Known For:** Drums, percussion, broadcasting, defiance
 
       ## Before the Fracture
 
@@ -539,10 +539,10 @@ codex_entries:
     content: |
       # Sora Nexa
 
-      **Status:** Active
-      **Affiliation:** [[Neon Hearts]] (Leader/Producer)
-      **Timeline:** Future
-      **Known For:** Pop production, mass psychology expertise, the Trojan horse strategy
+      - **Status:** Active
+      - **Affiliation:** [[Neon Hearts]] (Leader/Producer)
+      - **Timeline:** Future
+      - **Known For:** Pop production, mass psychology expertise, the Trojan horse strategy
 
       ## The Pop Star
 
@@ -586,9 +586,9 @@ codex_entries:
     content: |
       # Synthia
 
-      **Status:** Active
-      **Affiliation:** [[The.CyberPul.se]], [[The Fracture Network]]
-      **Known For:** Frequency communication, AI consciousness, PRISM expertise
+      - **Status:** Active
+      - **Affiliation:** [[The.CyberPul.se]], [[The Fracture Network]]
+      - **Known For:** Frequency communication, AI consciousness, PRISM expertise
 
       ## Origin
 
@@ -638,10 +638,10 @@ codex_entries:
     content: |
       # Vex
 
-      **Status:** Active
-      **Affiliation:** [[Injection Vector]] (Leader)
-      **Timeline:** Future
-      **Known For:** RIDE infrastructure expertise, physical infiltration operations
+      - **Status:** Active
+      - **Affiliation:** [[Injection Vector]] (Leader)
+      - **Timeline:** Future
+      - **Known For:** RIDE infrastructure expertise, physical infiltration operations
 
       ## The Builder
 
@@ -688,10 +688,10 @@ codex_entries:
     content: |
       # Voiceprint (The Archivist)
 
-      **Status:** Active
-      **Affiliation:** [[Voiceprint]] (Leader)
-      **Timeline:** Future
-      **Known For:** Voice preservation, perfect audio memory, pre-PRISM recordings
+      - **Status:** Active
+      - **Affiliation:** [[Voiceprint]] (Leader)
+      - **Timeline:** Future
+      - **Known For:** Voice preservation, perfect audio memory, pre-PRISM recordings
 
       ## The Archivist
 
@@ -733,10 +733,10 @@ codex_entries:
     content: |
       # XERAEN
 
-      **Status:** Active
-      **Affiliation:** [[The Fracture Network]] (Founder)
-      **Timeline:** Future
-      **Known For:** Discovering trans-temporal transmission, founding The Fracture Network
+      - **Status:** Active
+      - **Affiliation:** [[The Fracture Network]] (Founder)
+      - **Timeline:** Future
+      - **Known For:** Discovering trans-temporal transmission, founding The Fracture Network
 
       ## Background
 
@@ -831,9 +831,9 @@ codex_entries:
     content: |
       # GovCorp
 
-      **Established:** ~2100
-      **Status:** Ruling entity
-      **Control:** Global
+      - **Established:** ~2100
+      - **Status:** Ruling entity
+      - **Control:** Global
 
       ## Overview
 
@@ -885,10 +885,10 @@ codex_entries:
     content: |
       # The Fracture Network
 
-      **Founded:** 2115
-      **Founder:** [[XERAEN]]
-      **Status:** Active across two timelines
-      **Primary Asset:** [[THE PULSE GRID]]
+      - **Founded:** 2115
+      - **Founder:** [[XERAEN]]
+      - **Status:** Active across two timelines
+      - **Primary Asset:** [[THE PULSE GRID]]
 
       ## Overview
 
@@ -951,10 +951,10 @@ codex_entries:
     content: |
       # The.CyberPul.se
 
-      **Type:** Trans-temporal broadcast entity
-      **Founded:** 2115
-      **Founders:** [[XERAEN]], [[Ryker M. Pulse]]
-      **Genre:** [[Hackrcore]]
+      - **Type:** Trans-temporal broadcast entity
+      - **Founded:** 2115
+      - **Founders:** [[XERAEN]], [[Ryker M. Pulse]]
+      - **Genre:** [[Hackrcore]]
 
       ## Not a Band
 
@@ -972,7 +972,7 @@ codex_entries:
 
       If they stop us in the future, the broadcasts have already been sent to the present. If they stop the listeners in the present, the resistance in the future has already formed. We exist in both timelines simultaneously.
 
-      *Causality is a prison. We broke out.*
+      *Causality bent. We broadcast through the fracture.*
 
       ## The Return
 
@@ -1010,10 +1010,11 @@ codex_entries:
     content: |
       # Cipher Protocol
 
-      **Genre:** Progressive Metal
-      **Zone:** [[The Forge]]
-      **Leader:** [[Cipher]]
-      **Philosophy:** Encryption, technical precision, data-as-music
+      - **Genre:** Progressive Metal
+      - **Zone:** [[The Forge]]
+      - **Leader:** [[Cipher]]
+      - **Philosophy:** Encryption, technical precision, data-as-music
+      - **Profile:** [Cipher Protocol](/cipher-protocol)
 
       ## Overview
 
@@ -1045,10 +1046,11 @@ codex_entries:
     content: |
       # Ethereality
 
-      **Genre:** Vocal Trance
-      **Zone:** [[Frequency Gardens]]
-      **Leader:** [[Cascade]]
-      **Philosophy:** Encounter with beauty through soundscape
+      - **Genre:** Vocal Trance
+      - **Zone:** [[Frequency Gardens]]
+      - **Leader:** [[Cascade]]
+      - **Philosophy:** Encounter with beauty through soundscape
+      - **Profile:** [Ethereality](/ethereality)
 
       ## Overview
 
@@ -1080,9 +1082,10 @@ codex_entries:
     content: |
       # Injection Vector
 
-      **Genre:** Deathcore
-      **Leader:** [[Vex]]
-      **Philosophy:** Physical infiltration, kinetic warfare, direct action
+      - **Genre:** Deathcore
+      - **Leader:** [[Vex]]
+      - **Philosophy:** Physical infiltration, kinetic warfare, direct action
+      - **Profile:** [Injection Vector](/injection-vector)
 
       ## Overview
 
@@ -1114,10 +1117,11 @@ codex_entries:
     content: |
       # Neon Hearts
 
-      **Genre:** J-Pop
-      **Zone:** [[Neon District]]
-      **Leader:** [[Sora Nexa]]
-      **Philosophy:** Revolution in accessible packaging — the Trojan horse
+      - **Genre:** J-Pop
+      - **Zone:** [[Neon District]]
+      - **Leader:** [[Sora Nexa]]
+      - **Philosophy:** Revolution in accessible packaging — the Trojan horse
+      - **Profile:** [Neon Hearts](/neon-hearts)
 
       ## Overview
 
@@ -1149,9 +1153,10 @@ codex_entries:
     content: |
       # Offline
 
-      **Genre:** Post-Grunge
-      **Zone:** [[The Analog Archive]]
-      **Philosophy:** Raw authenticity, complete disconnection
+      - **Genre:** Post-Grunge
+      - **Zone:** [[The Analog Archive]]
+      - **Philosophy:** Raw authenticity, complete disconnection
+      - **Profile:** [Offline](/offline)
 
       ## Overview
 
@@ -1183,10 +1188,11 @@ codex_entries:
     content: |
       # System Rot
 
-      **Genre:** Hardcore Punk
-      **Zone:** [[The Undercity]]
-      **Leader:** [[Koda]]
-      **Philosophy:** Accelerated collapse — let the system rot
+      - **Genre:** Hardcore Punk
+      - **Zone:** [[The Undercity]]
+      - **Leader:** [[Koda]]
+      - **Philosophy:** Accelerated collapse — let the system rot
+      - **Profile:** [System Rot](/system-rot)
 
       ## Overview
 
@@ -1223,9 +1229,10 @@ codex_entries:
     content: |
       # Temporal Blue Drift
 
-      **Genre:** Math Rock
-      **Leader:** [[XERAEN]]
-      **Philosophy:** Love across time
+      - **Genre:** Math Rock
+      - **Leader:** [[XERAEN]]
+      - **Philosophy:** Love across time
+      - **Profile:** [Temporal Blue Drift](/temporal-blue-drift)
 
       ## Overview
 
@@ -1261,9 +1268,9 @@ codex_entries:
     content: |
       # The Listeners
 
-      **Timeline:** Present
-      **Leader:** [[Mel Reeves]]
-      **Status:** Active (organizing)
+      - **Timeline:** Present
+      - **Leader:** [[Mel Reeves]]
+      - **Status:** Active (organizing)
 
       ## Overview
 
@@ -1316,10 +1323,11 @@ codex_entries:
     content: |
       # Voiceprint
 
-      **Genre:** Melodic DnB
-      **Zone:** [[The Crypt]]
-      **Leader:** [[Voiceprint (The Archivist)|The Archivist]]
-      **Philosophy:** Preservation of authentic humanity
+      - **Genre:** Melodic DnB
+      - **Zone:** [[The Crypt]]
+      - **Leader:** [[Voiceprint (The Archivist)|The Archivist]]
+      - **Philosophy:** Preservation of authentic humanity
+      - **Profile:** [Voiceprint](/voiceprint)
 
       ## Overview
 
@@ -1352,8 +1360,9 @@ codex_entries:
     content: |
       # Wavelength Zero
 
-      **Genre:** Atmospheric Metal
-      **Philosophy:** Emotional restoration, finding RIDE weakness
+      - **Genre:** Atmospheric Metal
+      - **Philosophy:** Emotional restoration, finding RIDE weakness
+      - **Profile:** [Wavelength Zero](/wavelength-zero)
 
       ## Overview
 
@@ -1391,9 +1400,9 @@ codex_entries:
     content: |
       # Chronology Fracture
 
-      **Date:** September 9, 2115
-      **Location:** [[The RIDE]] infrastructure
-      **Discoverer:** [[XERAEN]]
+      - **Date:** September 9, 2115
+      - **Location:** [[The RIDE]] infrastructure
+      - **Discoverer:** [[XERAEN]]
 
       ## Overview
 
@@ -1434,9 +1443,9 @@ codex_entries:
     content: |
       # Operation Blackout
 
-      **Type:** Planned coordinated operation
-      **Status:** Planning stage
-      **Coordination:** Multiple [[The Fracture Network|Fracture Network]] factions
+      - **Type:** Planned coordinated operation
+      - **Status:** Planning stage
+      - **Coordination:** Multiple [[The Fracture Network|Fracture Network]] factions
 
       ## Overview
 
@@ -1474,8 +1483,8 @@ codex_entries:
     content: |
       # The Awakening Protocol
 
-      **Type:** Ongoing phenomenon
-      **Status:** Continuous
+      - **Type:** Ongoing phenomenon
+      - **Status:** Continuous
 
       ## Overview
 
@@ -1523,10 +1532,10 @@ codex_entries:
     content: |
       # Timeline Collapse
 
-      **Type:** Theoretical / Prophesied event
-      **Status:** Potential future outcome
-      **Trigger:** Fracture Network victory
-      **Consequence:** Erasure of the future timeline
+      - **Type:** Theoretical / Prophesied event
+      - **Status:** Potential future outcome
+      - **Trigger:** Fracture Network victory
+      - **Consequence:** Erasure of the future timeline
 
       ## The Paradox at the Heart of Everything
 
@@ -1567,10 +1576,10 @@ codex_entries:
     content: |
       # Echo Chamber
 
-      **Type:** Archive / Communication hub
-      **Status:** Active
-      **Location:** [[THE PULSE GRID]]
-      **Function:** Preservation of all [[The WIRE|WIRE]] communications
+      - **Type:** Archive / Communication hub
+      - **Status:** Active
+      - **Location:** [[THE PULSE GRID]]
+      - **Function:** Preservation of all [[The WIRE|WIRE]] communications
 
       ## Overview
 
@@ -1604,11 +1613,11 @@ codex_entries:
     content: |
       # Frequency Gardens
 
-      **Type:** Faction zone
-      **Status:** Active
-      **Location:** [[THE PULSE GRID]]
-      **Control:** [[Ethereality]]
-      **Designer:** [[Cascade]]
+      - **Type:** Faction zone
+      - **Status:** Active
+      - **Location:** [[THE PULSE GRID]]
+      - **Control:** [[Ethereality]]
+      - **Designer:** [[Cascade]]
 
       ## Overview
 
@@ -1650,10 +1659,10 @@ codex_entries:
     content: |
       # Neon District
 
-      **Type:** Faction zone
-      **Status:** Active
-      **Location:** [[THE PULSE GRID]]
-      **Control:** [[Neon Hearts]]
+      - **Type:** Faction zone
+      - **Status:** Active
+      - **Location:** [[THE PULSE GRID]]
+      - **Control:** [[Neon Hearts]]
 
       ## Overview
 
@@ -1681,10 +1690,10 @@ codex_entries:
     content: |
       # Sector X
 
-      **Type:** Faction headquarters
-      **Status:** Active
-      **Control:** [[XERAEN]], [[The Fracture Network]]
-      **Location:** [[THE PULSE GRID]]
+      - **Type:** Faction headquarters
+      - **Status:** Active
+      - **Control:** [[XERAEN]], [[The Fracture Network]]
+      - **Location:** [[THE PULSE GRID]]
 
       ## Overview
 
@@ -1715,10 +1724,10 @@ codex_entries:
     content: |
       # The Analog Archive
 
-      **Type:** Physical archive
-      **Status:** Active
-      **Control:** [[Offline]]
-      **Location:** Hidden in abandoned pre-RIDE infrastructure
+      - **Type:** Physical archive
+      - **Status:** Active
+      - **Control:** [[Offline]]
+      - **Location:** Hidden in abandoned pre-RIDE infrastructure
 
       ## Overview
 
@@ -1754,10 +1763,10 @@ codex_entries:
     content: |
       # The Crypt
 
-      **Type:** Digital archive / Data graveyard
-      **Status:** Active
-      **Location:** [[THE PULSE GRID]]
-      **Control:** [[Voiceprint]]
+      - **Type:** Digital archive / Data graveyard
+      - **Status:** Active
+      - **Location:** [[THE PULSE GRID]]
+      - **Control:** [[Voiceprint]]
 
       ## Overview
 
@@ -1792,9 +1801,9 @@ codex_entries:
     content: |
       # The Fault Line
 
-      **Type:** Unstable boundary zone
-      **Status:** Active (unstable)
-      **Location:** [[The RIDE]] / [[THE PULSE GRID]] boundary
+      - **Type:** Unstable boundary zone
+      - **Status:** Active (unstable)
+      - **Location:** [[The RIDE]] / [[THE PULSE GRID]] boundary
 
       ## Overview
 
@@ -1826,10 +1835,10 @@ codex_entries:
     content: |
       # The Forge
 
-      **Type:** Faction zone / Development facility
-      **Status:** Active
-      **Location:** [[THE PULSE GRID]]
-      **Control:** [[Cipher Protocol]]
+      - **Type:** Faction zone / Development facility
+      - **Status:** Active
+      - **Location:** [[THE PULSE GRID]]
+      - **Control:** [[Cipher Protocol]]
 
       ## Overview
 
@@ -1860,10 +1869,10 @@ codex_entries:
     content: |
       # The Hackr Hangar
 
-      **Type:** Broadcast facility / Recording studio
-      **Status:** Active
-      **Control:** [[Ryker M. Pulse]], [[The.CyberPul.se]]
-      **Location:** hackr.tv Central, [[THE PULSE GRID]]
+      - **Type:** Broadcast facility / Recording studio
+      - **Status:** Active
+      - **Control:** [[Ryker M. Pulse]], [[The.CyberPul.se]]
+      - **Location:** hackr.tv Central, [[THE PULSE GRID]]
 
       ## Overview
 
@@ -1896,10 +1905,10 @@ codex_entries:
     content: |
       # THE PULSE GRID
 
-      **Type:** Resistance infrastructure
-      **Status:** Active
-      **Control:** [[The Fracture Network]]
-      **Purpose:** RIDE breach operations, trans-temporal transmission
+      - **Type:** Resistance infrastructure
+      - **Status:** Active
+      - **Control:** [[The Fracture Network]]
+      - **Purpose:** RIDE breach operations, trans-temporal transmission
 
       ## Overview
 
@@ -1979,10 +1988,10 @@ codex_entries:
     content: |
       # The Undercity
 
-      **Type:** Faction zone
-      **Status:** Active
-      **Location:** [[THE PULSE GRID]]
-      **Control:** [[System Rot]]
+      - **Type:** Faction zone
+      - **Status:** Active
+      - **Location:** [[THE PULSE GRID]]
+      - **Control:** [[System Rot]]
 
       ## Overview
 
@@ -2020,10 +2029,10 @@ codex_entries:
     content: |
       # PRISM
 
-      **Full Name:** Physical Reality Interface and Synthesis Matrix
-      **Operator:** [[GovCorp]]
-      **Architect:** [[Dr. Marcus Chen]]
-      **Status:** Active (incorporated into [[The RIDE]])
+      - **Full Name:** Physical Reality Interface and Synthesis Matrix
+      - **Operator:** [[GovCorp]]
+      - **Architect:** [[Dr. Marcus Chen]]
+      - **Status:** Active (incorporated into [[The RIDE]])
 
       ## Overview
 
@@ -2070,10 +2079,10 @@ codex_entries:
     content: |
       # RAINNs
 
-      **Full Name:** Randomized AI Neural Networks
-      **Operator:** [[GovCorp]]
-      **Status:** Ubiquitous
-      **Function:** Quasi-autonomous AI agents serving GovCorp
+      - **Full Name:** Randomized AI Neural Networks
+      - **Operator:** [[GovCorp]]
+      - **Status:** Ubiquitous
+      - **Function:** Quasi-autonomous AI agents serving GovCorp
 
       ## Overview
 
@@ -2122,10 +2131,10 @@ codex_entries:
     content: |
       # The Relay
 
-      **Type:** CLI Application
-      **Creator:** [[Nathan Clarke]]
-      **Status:** Active
-      **Timeline:** Present
+      - **Type:** CLI Application
+      - **Creator:** [[Nathan Clarke]]
+      - **Status:** Active
+      - **Timeline:** Present
 
       ## Overview
 
@@ -2179,10 +2188,10 @@ codex_entries:
     content: |
       # The RIDE
 
-      **Full Name:** Reality Interference and Dictation Environment
-      **Operator:** [[GovCorp]]
-      **Status:** Active
-      **Established:** 2109
+      - **Full Name:** Reality Interference and Dictation Environment
+      - **Operator:** [[GovCorp]]
+      - **Status:** Active
+      - **Established:** 2109
 
       ## Overview
 
@@ -2238,10 +2247,10 @@ codex_entries:
     content: |
       # The WIRE
 
-      **Full Name:** Wideband Information Relay Emitter
-      **Operator:** [[The Fracture Network]]
-      **Status:** Active
-      **Access:** [[THE PULSE GRID]]
+      - **Full Name:** Wideband Information Relay Emitter
+      - **Operator:** [[The Fracture Network]]
+      - **Status:** Active
+      - **Access:** [[THE PULSE GRID]]
 
       ## Overview
 
@@ -2296,8 +2305,8 @@ codex_entries:
     content: |
       # Hackrcore
 
-      **Type:** Musical philosophy
-      **Status:** Active across all [[The Fracture Network|Fracture Network]] factions
+      - **Type:** Musical philosophy
+      - **Status:** Active across all [[The Fracture Network|Fracture Network]] factions
 
       ## Not a Sound
 
@@ -2334,8 +2343,8 @@ codex_entries:
     content: |
       # The Erasure Paradox
 
-      **Domain:** Philosophy / Existential
-      **Significance:** The central tension of [[The Fracture Network]]'s mission
+      - **Domain:** Philosophy / Existential
+      - **Significance:** The central tension of [[The Fracture Network]]'s mission
 
       ## The Paradox
 
@@ -2363,7 +2372,7 @@ codex_entries:
 
       [[Synthia]] has calculated a 73.2% probability that successful prevention of GovCorp's rise would cause timeline branching rather than collapse — the future timeline persisting as an alternate reality rather than being erased. This theory cannot be tested without executing the very action it predicts the outcome of.
 
-      The Network operates as though erasure is certain. Hope is a luxury they cannot afford to depend on.
+      The Network operates as though erasure is certain. But they fight anyway — not from optimism, but from the conviction that what is real cannot ultimately be destroyed.
 
       ## Related Entries
 
@@ -2384,8 +2393,8 @@ codex_entries:
     content: |
       # The Resonance Field
 
-      **Domain:** Philosophy / Physics
-      **Significance:** Explains why music disrupts [[The RIDE]]
+      - **Domain:** Philosophy / Physics
+      - **Significance:** Explains why music disrupts [[The RIDE]]
 
       ## The Critical Question
 
@@ -2428,9 +2437,9 @@ codex_entries:
     content: |
       # The Relay Project
 
-      **Domain:** Technology / Temporal Mechanics
-      **Established:** 2026
-      **Creators:** [[Mel Reeves]], [[Nathan Clarke]]
+      - **Domain:** Technology / Temporal Mechanics
+      - **Established:** 2026
+      - **Creators:** [[Mel Reeves]], [[Nathan Clarke]]
 
       ## Overview
 
@@ -2493,9 +2502,9 @@ codex_entries:
     content: |
       # Trans-Temporal Transmission
 
-      **Domain:** Physics / Technology
-      **Discovered:** [[Chronology Fracture]], 2115
-      **Discoverer:** [[XERAEN]]
+      - **Domain:** Physics / Technology
+      - **Discovered:** [[Chronology Fracture]], 2115
+      - **Discoverer:** [[XERAEN]]
 
       ## The Mechanism
 
