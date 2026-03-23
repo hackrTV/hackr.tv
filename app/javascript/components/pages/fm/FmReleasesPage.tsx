@@ -20,21 +20,19 @@ interface Release {
   }
   cover_url: string | null
   track_count: number
-  all_tracks_hidden: boolean
 }
 
 export const FmReleasesPage: React.FC = () => {
   const { isMobile } = useMobileDetect()
   const [releases, setReleases] = useState<Release[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     apiJson<Release[]>('/api/releases')
       .then(data => {
         const fmReleases = data.filter(r => r.label === 'hackr.fm')
         fmReleases.sort((a, b) => {
-          const hiddenDiff = Number(a.all_tracks_hidden) - Number(b.all_tracks_hidden)
-          if (hiddenDiff !== 0) return hiddenDiff
           const dateA = a.release_date || ''
           const dateB = b.release_date || ''
           return dateB.localeCompare(dateA)
@@ -44,6 +42,7 @@ export const FmReleasesPage: React.FC = () => {
       })
       .catch(error => {
         console.error('Error fetching releases:', error)
+        setError(true)
         setLoading(false)
       })
   }, [])
@@ -84,7 +83,11 @@ export const FmReleasesPage: React.FC = () => {
           </legend>
 
           <div>
-            {releases.length === 0 ? (
+            {error ? (
+              <div style={{ padding: '40px', textAlign: 'center', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                <p style={{ color: '#ef4444' }}>Signal lost — failed to load releases. Try again later.</p>
+              </div>
+            ) : releases.length === 0 ? (
               <div style={{ padding: '40px', textAlign: 'center', background: 'rgba(124, 58, 237, 0.05)', border: '1px solid rgba(124, 58, 237, 0.2)' }}>
                 <p style={{ color: '#aaa' }}>No releases cataloged yet.</p>
               </div>

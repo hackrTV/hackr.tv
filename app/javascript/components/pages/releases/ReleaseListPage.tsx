@@ -24,7 +24,6 @@ interface Release {
   }
   cover_url: string | null
   track_count: number
-  all_tracks_hidden: boolean
 }
 
 const ReleaseListPage: React.FC = () => {
@@ -75,8 +74,6 @@ const ReleaseListPage: React.FC = () => {
           setArtistName(artistReleases[0].artist.name)
         }
         artistReleases.sort((a, b) => {
-          const hiddenDiff = Number(a.all_tracks_hidden) - Number(b.all_tracks_hidden)
-          if (hiddenDiff !== 0) return hiddenDiff
           const dateA = a.release_date || ''
           const dateB = b.release_date || ''
           return dateB.localeCompare(dateA)
