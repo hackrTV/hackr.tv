@@ -7,7 +7,7 @@ releases:
     title: "./exeCUTE"
     release_type: ep
     label: "hackr.fm"
-    release_date: "2125-06-21"
+    release_date: "2125-02-14"
     cover_image: "images/execute.jpg"
     tracks:
       - title: "heartbreak_havoc.sh"

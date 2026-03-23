@@ -7,7 +7,7 @@ releases:
     title: "Physical Layer"
     release_type: ep
     label: "hackr.fm"
-    release_date: "2123-01-15"
+    release_date: "2124-06-21"
     cover_image: "physical_layer.jpg"
     tracks:
       - title: "Breach Point"

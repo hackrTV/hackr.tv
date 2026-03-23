@@ -61,7 +61,7 @@ releases:
     title: "Livestream Archive"
     release_type: lp
     label: "hackr.fm"
-    release_date: "2118-10-08"
+    release_date: "2124-01-22"
     description: "Archived recordings from live trans-temporal broadcasts."
     cover_image: "images/livestream_archive.jpg"
     tracks:
