@@ -212,8 +212,8 @@ export const CodexEntryPage: React.FC = () => {
                           borderBottom: '1px solid #60a5fa',
                           transition: 'color 0.2s'
                         }
-                        // Use React Router Link for internal /codex/ links
-                        if (href && href.startsWith('/codex/')) {
+                        // Use React Router Link for internal links
+                        if (href && href.startsWith('/')) {
                           return (
                             <Link
                               to={href}

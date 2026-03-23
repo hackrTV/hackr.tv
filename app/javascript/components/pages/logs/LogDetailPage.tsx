@@ -154,6 +154,13 @@ export const LogDetailPage: React.FC = () => {
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeSanitize]}
+                components={{
+                  a: ({ href, children }) => (
+                    <Link to={href || '#'} style={{ color: '#818cf8', textDecoration: 'none', display: 'inline' }}>
+                      {children}
+                    </Link>
+                  )
+                }}
               >
                 {transformMarkdownLinks(log.body, mappings)}
               </ReactMarkdown>
