@@ -7,7 +7,7 @@ releases:
     title: "Alpha Algorithm"
     release_type: ep
     label: "hackr.fm"
-    release_date: "2122-09-17"
+    release_date: "2125-05-22"
     cover_image: "alpha_algorithm.jpg"
     tracks:
       - title: "Encryption Sequence"
