@@ -219,6 +219,9 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/fm/radio" className={`mobile-menu-item${isActive('/fm/radio') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>radio
                 </Link>
+                <Link to="/fm/releases" className={`mobile-menu-item${isActive('/fm/releases') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">/</span>releases
+                </Link>
                 <Link to="/vault" className={`mobile-menu-item${isActive('/vault') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>vault
                 </Link>
@@ -475,6 +478,11 @@ export const HeaderMenu: React.FC = () => {
                 <li>
                   <Link to="/fm/radio" onClick={closeDropdown}>
                     <span className="purple-168-text">/</span>radio
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/fm/releases" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>releases
                   </Link>
                 </li>
                 <li>
