@@ -438,18 +438,10 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     }
 
     // Handle stalled playback - browser is trying to fetch media but data is unavailable
+    // This event is normal during initial buffering; the browser will keep retrying.
+    // The watchdog timer handles truly stuck playback — no need to reload here.
     const handleStalled = () => {
-      console.warn('Audio playback stalled, attempting to recover...')
-      // Store current position to resume from
-      const currentPos = audio.currentTime
-      // Reload from current position
-      audio.load()
-      audio.currentTime = currentPos
-      if (isPlaying) {
-        audio.play().catch((error) => {
-          console.error('Failed to resume after stall:', error)
-        })
-      }
+      console.warn('Audio playback stalled — browser is rebuffering, waiting for data...')
     }
 
     // Handle waiting - playback stopped due to temporary lack of data
@@ -578,7 +570,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
           onClose={handleClose}
         />
       )}
-      <audio ref={audioRef} id="audio-element" style={{ display: 'none' }} />
+      <audio ref={audioRef} id="audio-element" preload="auto" style={{ display: 'none' }} />
     </>
   )
 }
