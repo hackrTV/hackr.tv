@@ -13,33 +13,33 @@ releases:
       - title: "Archivist's Procedure"
         slug: archivists-procedure
         track_number: 1
-        duration: "2:38"
+        duration: "3:45"
         audio_file: archivists-procedure.ogg
         lyrics: "[INSTRUMENTAL TRACK WITH SAMPLED VOICES]\n"
       - title: "Frequency of Memory"
         slug: frequency-of-memory
         track_number: 2
-        duration: "3:45"
+        duration: "3:24"
         audio_file: frequency-of-memory.ogg
         featured: true
         lyrics: "[INSTRUMENTAL TRACK WITH SAMPLED VOICES]\n"
       - title: "Human Resonance"
         slug: human-resonance
         track_number: 3
-        duration: "3:24"
+        duration: "3:50"
         audio_file: human-resonance.ogg
         lyrics: "[INSTRUMENTAL TRACK WITH SAMPLED VOICES]\n"
       - title: "Breakpoint"
         slug: breakpoint
         track_number: 4
-        duration: "3:50"
+        duration: "4:13"
         audio_file: breakpoint.ogg
         featured: true
         lyrics: "[INSTRUMENTAL TRACK WITH SAMPLED VOICES]\n"
       - title: "Cracks in the Echo Chamber"
         slug: cracks-in-the-echo-chamber
         track_number: 5
-        duration: "4:13"
+        duration: "3:49"
         audio_file: cracks-in-the-echo-chamber.ogg
         featured: true
         lyrics: "[INSTRUMENTAL TRACK WITH SAMPLED VOICES]\n"

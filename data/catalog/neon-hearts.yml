@@ -13,7 +13,7 @@ releases:
       - title: "Candy Coded"
         slug: candy-coded
         track_number: 1
-        duration: "3:49"
+        duration: "2:19"
         audio_file: candy-coded.ogg
         featured: true
         lyrics: |
@@ -76,7 +76,7 @@ releases:
       - title: "Kaleidoscopic"
         slug: kaleidoscopic
         track_number: 2
-        duration: "2:19"
+        duration: "2:25"
         audio_file: kaleidoscopic.ogg
         lyrics: |
           万華鏡 (Kaleidoscope)
@@ -140,7 +140,7 @@ releases:
       - title: "Glitchframe"
         slug: glitchframe
         track_number: 3
-        duration: "2:25"
+        duration: "2:20"
         audio_file: glitchframe.ogg
         featured: true
         lyrics: |
@@ -204,7 +204,7 @@ releases:
       - title: "Hearts in Sync"
         slug: hearts-in-sync
         track_number: 4
-        duration: "2:20"
+        duration: "3:07"
         audio_file: hearts-in-sync.ogg
         lyrics: |
           心と心 (Heart to heart)
@@ -266,7 +266,7 @@ releases:
       - title: "Starlight Rebellion"
         slug: starlight-rebellion
         track_number: 5
-        duration: "3:07"
+        duration: "3:27"
         audio_file: starlight-rebellion.ogg
         featured: true
         lyrics: |
