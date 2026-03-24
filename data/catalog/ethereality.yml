@@ -13,7 +13,7 @@ releases:
       - title: "Awakening"
         slug: awakening
         track_number: 1
-        duration: "3:27"
+        duration: "4:11"
         audio_file: awakening.ogg
         featured: true
         lyrics: |
@@ -73,7 +73,7 @@ releases:
       - title: "Transcendent"
         slug: transcendent
         track_number: 2
-        duration: "4:11"
+        duration: "5:23"
         audio_file: transcendent.ogg
         lyrics: |
 
@@ -133,7 +133,7 @@ releases:
       - title: "Higher State"
         slug: higher-state
         track_number: 3
-        duration: "5:23"
+        duration: "4:32"
         audio_file: higher-state.ogg
         lyrics: |
 
@@ -195,7 +195,7 @@ releases:
       - title: "Eternal Signal"
         slug: eternal-signal
         track_number: 4
-        duration: "4:32"
+        duration: "6:05"
         audio_file: eternal-signal.ogg
         featured: true
         lyrics: |
@@ -259,7 +259,7 @@ releases:
       - title: "Infinite Horizon"
         slug: infinite-horizon
         track_number: 5
-        duration: "6:05"
+        duration: "5:54"
         audio_file: infinite-horizon.ogg
         featured: true
         lyrics: |

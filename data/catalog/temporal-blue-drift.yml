@@ -13,13 +13,13 @@ releases:
       - title: "Chronology Fracture"
         slug: chronology-fracture
         track_number: 1
-        duration: "3:40"
+        duration: "3:26"
         audio_file: chronology-fracture.ogg
         lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "A Hundred Years Between"
         slug: a-hundred-years-between
         track_number: 2
-        duration: "3:26"
+        duration: "2:35"
         audio_file: a-hundred-years-between.ogg
         featured: true
         lyrics: |
@@ -45,7 +45,7 @@ releases:
       - title: "The Blue Shift"
         slug: the-blue-shift
         track_number: 3
-        duration: "2:35"
+        duration: "3:12"
         audio_file: the-blue-shift.ogg
         lyrics: |
 
@@ -65,13 +65,13 @@ releases:
       - title: "Memory Cascade"
         slug: memory-cascade
         track_number: 4
-        duration: "3:12"
+        duration: "4:34"
         audio_file: memory-cascade.ogg
         lyrics: "[INSTRUMENTAL TRACK]\n"
       - title: "Erasure Paradox"
         slug: erasure-paradox
         track_number: 5
-        duration: "4:34"
+        duration: "4:15"
         audio_file: erasure-paradox.ogg
         featured: true
         lyrics: |

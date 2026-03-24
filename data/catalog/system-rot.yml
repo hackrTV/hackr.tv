@@ -13,7 +13,7 @@ releases:
       - title: "Static Feed"
         slug: static-feed
         track_number: 1
-        duration: "3:58"
+        duration: "2:02"
         audio_file: static-feed.ogg
         lyrics: |
           Turn it off!
@@ -48,7 +48,7 @@ releases:
       - title: "No Signal"
         slug: no-signal
         track_number: 2
-        duration: "2:02"
+        duration: "1:59"
         audio_file: no-signal.ogg
         lyrics: |
           Go!
@@ -88,7 +88,7 @@ releases:
       - title: "Concrete and Rage"
         slug: concrete-and-rage
         track_number: 3
-        duration: "1:59"
+        duration: "2:08"
         audio_file: concrete-and-rage.ogg
         featured: true
         lyrics: |
@@ -134,7 +134,7 @@ releases:
       - title: "Rot From Within"
         slug: rot-from-within
         track_number: 4
-        duration: "2:08"
+        duration: "2:38"
         audio_file: rot-from-within.ogg
         lyrics: |
           Look around at what we've become
@@ -178,7 +178,7 @@ releases:
       - title: "Burn the Blueprint"
         slug: burn-the-blueprint
         track_number: 5
-        duration: "2:38"
+        duration: "3:40"
         audio_file: burn-the-blueprint.ogg
         featured: true
         lyrics: |
