@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
       redirect_to "#{protocol}://#{primary_domain}/thecyberpulse#{path}", allow_other_host: true
     # Redirect hackr.fm to hackr.tv/fm
     elsif domain.include?("hackr.fm")
-      if request.fullpath.start_with?("/artists") || request.fullpath.start_with?("/bands")
+      if request.fullpath.start_with?("/artists", "/bands")
         redirect_to "#{protocol}://#{primary_domain}/f/net", allow_other_host: true
       else
         path = request.fullpath.sub(%r{^/fm}, "")

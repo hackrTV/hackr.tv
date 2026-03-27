@@ -31,8 +31,13 @@ ENV RAILS_ENV="production" \
 FROM base AS build
 
 # Install packages needed to build gems and Node.js for Vite
+# Vite 8 requires Node.js ^20.19.0 || >=22.12.0 (Debian Bookworm only provides 18.x)
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config nodejs npm && \
+    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config curl ca-certificates && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x -o /tmp/nodesource_setup.sh && \
+    bash /tmp/nodesource_setup.sh && \
+    rm /tmp/nodesource_setup.sh && \
+    apt-get install --no-install-recommends -y nodejs && \
     npm install -g pnpm && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 

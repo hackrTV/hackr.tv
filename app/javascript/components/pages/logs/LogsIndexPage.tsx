@@ -63,8 +63,8 @@ export const LogsIndexPage: React.FC = () => {
   useEffect(() => {
     apiJson<{ logs: HackrLog[]; meta: PaginationMeta }>(`/api/logs?timeline=${currentTimeline}&page=${currentPage}&sort=${currentSort}`)
       .then(data => {
-        setLogs(data.logs)
-        setMeta(data.meta)
+        setLogs(data?.logs || [])
+        setMeta(data?.meta || null)
         setFetchedKey(requestKey)
       })
       .catch(err => {

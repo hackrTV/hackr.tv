@@ -46,7 +46,11 @@ export const LogDetailPage: React.FC = () => {
 
     apiJson<HackrLog>(`/api/logs/${slug}`)
       .then(data => {
-        setLog(data)
+        if (!data?.slug) {
+          setError('Log not found or not yet published.')
+        } else {
+          setLog(data)
+        }
         setLoading(false)
       })
       .catch(err => {
@@ -57,7 +61,7 @@ export const LogDetailPage: React.FC = () => {
 
     // Fetch timeline summary for side tabs
     apiJson<{ meta: { timelines: TimelineSummary } }>('/api/logs?per_page=5')
-      .then(data => setTimelines(data.meta.timelines))
+      .then(data => setTimelines(data?.meta?.timelines || null))
       .catch(() => {}) // Non-critical — tabs just won't render
   }, [slug])
 
