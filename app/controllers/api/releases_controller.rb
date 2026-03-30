@@ -23,6 +23,7 @@ module Api
             genre: release.artist.genre
           },
           cover_url: release.cover_image.attached? ? url_for(release.cover_image) : nil,
+          cover_urls: cover_urls_for(release),
           track_count: release.tracks.count
         }
       }
@@ -51,6 +52,7 @@ module Api
             slug: release.artist.slug
           },
           cover_url: url_for(release.cover_image),
+          cover_urls: cover_urls_for(release),
           track_count: release.tracks.count
         }
       }
@@ -88,6 +90,7 @@ module Api
           genre: @release.artist.genre
         },
         cover_url: @release.cover_image.attached? ? url_for(@release.cover_image) : nil,
+        cover_urls: cover_urls_for(@release),
         disc_length: format_duration(disc_length),
         tracks: tracks.map { |track|
           {

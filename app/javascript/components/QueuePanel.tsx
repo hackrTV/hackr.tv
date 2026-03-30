@@ -71,7 +71,7 @@ export const QueuePanel: React.FC<QueuePanelProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {track.coverUrl && (
               <img
-                src={track.coverUrl}
+                src={track.coverUrls?.thumbnail || track.coverUrl}
                 alt={track.title}
                 style={{
                   width: '40px',

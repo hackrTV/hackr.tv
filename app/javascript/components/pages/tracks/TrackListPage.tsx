@@ -11,6 +11,7 @@ interface Release {
   slug: string
   release_date: string | null
   cover_url: string | null
+  cover_urls?: { thumbnail: string; standard: string; full: string }
   release_type?: string
 }
 

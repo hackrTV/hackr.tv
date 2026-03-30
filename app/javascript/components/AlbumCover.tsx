@@ -1,20 +1,25 @@
 import React, { useState } from 'react'
+import type { CoverUrls } from '~/types/track'
 
 interface AlbumCoverProps {
   coverUrl: string;
+  coverUrls?: CoverUrls;
   size?: number;
 }
 
-export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl, size = 60 }) => {
+export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl, coverUrls, size = 60 }) => {
   const [showOverlay, setShowOverlay] = useState(false)
 
-  if (!coverUrl) return null
+  const thumbnailSrc = coverUrls?.thumbnail || coverUrl
+  const fullSrc = coverUrls?.full || coverUrl
+
+  if (!thumbnailSrc) return null
 
   return (
     <>
       <img
         id="player-cover"
-        src={coverUrl}
+        src={thumbnailSrc}
         alt="Album Cover"
         onMouseEnter={() => setShowOverlay(true)}
         onMouseLeave={() => setShowOverlay(false)}
@@ -38,7 +43,7 @@ export const AlbumCover: React.FC<AlbumCoverProps> = ({ coverUrl, size = 60 }) =
           }}
         >
           <img
-            src={coverUrl}
+            src={fullSrc}
             alt="Album Cover"
             style={{
               width: '300px',

@@ -9,7 +9,7 @@ import { useGridAuth } from '~/hooks/useGridAuth'
 import { useAudio } from '~/contexts/AudioContext'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { AddToPlaylistDropdown } from '~/components/playlists/AddToPlaylistDropdown'
-import type { TrackData, StationContext } from '~/types/track'
+import type { TrackData, StationContext, CoverUrls } from '~/types/track'
 
 interface PlayerBarProps {
   isPlaying: boolean;
@@ -18,6 +18,7 @@ interface PlayerBarProps {
     title: string;
     artist: string;
     coverUrl: string;
+    coverUrls?: CoverUrls;
   } | null;
   currentTime: number;
   duration: number;
@@ -126,7 +127,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             {/* Album cover - smaller on mobile */}
             {currentTrack?.coverUrl && (
               <div style={{ flexShrink: 0 }}>
-                <AlbumCover coverUrl={currentTrack.coverUrl} size={isMobile ? 40 : undefined} />
+                <AlbumCover coverUrl={currentTrack.coverUrl} coverUrls={currentTrack.coverUrls} size={isMobile ? 40 : undefined} />
               </div>
             )}
 

@@ -51,7 +51,8 @@ export const SharedPlaylistPage: React.FC = () => {
       url: track.audio_url || '',
       title: track.title,
       artist: track.artist.name,
-      coverUrl: track.release?.cover_url || ''
+      coverUrl: track.release?.cover_url || '',
+      coverUrls: track.release?.cover_urls
     })).filter(track => track.url) // Only include tracks with audio files
 
     if (trackDataList.length === 0) {

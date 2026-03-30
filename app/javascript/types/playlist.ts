@@ -4,11 +4,18 @@ export interface Artist {
   slug: string
 }
 
+export interface CoverUrls {
+  thumbnail: string
+  standard: string
+  full: string
+}
+
 export interface Release {
   id: number
   name: string
   slug: string
   cover_url: string | null
+  cover_urls?: CoverUrls
 }
 
 export interface Track {

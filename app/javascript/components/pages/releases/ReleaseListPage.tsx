@@ -23,6 +23,7 @@ interface Release {
     genre: string
   }
   cover_url: string | null
+  cover_urls?: { thumbnail: string; standard: string; full: string }
   track_count: number
 }
 
@@ -170,7 +171,7 @@ const ReleaseListPage: React.FC = () => {
                         <div style={{ width: '100%', aspectRatio: '1', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                           {release.cover_url ? (
                             <img
-                              src={release.cover_url}
+                              src={release.cover_urls?.full || release.cover_url}
                               alt={release.name}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />

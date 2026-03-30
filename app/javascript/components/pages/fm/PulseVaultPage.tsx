@@ -9,7 +9,7 @@ interface Track {
   id: number
   title: string
   artist: { name: string }
-  release: { name: string; cover_url: string | null }
+  release: { name: string; cover_url: string | null; cover_urls?: { thumbnail: string; standard: string; full: string } }
   audio_url: string | null
 }
 

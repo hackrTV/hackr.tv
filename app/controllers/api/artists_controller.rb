@@ -48,7 +48,8 @@ module Api
                          slug: track.release.slug,
                          release_type: track.release.release_type,
                          release_date: track.release.release_date,
-                         cover_url: track.release.cover_image.attached? ? url_for(track.release.cover_image) : nil
+                         cover_url: track.release.cover_image.attached? ? url_for(track.release.cover_image) : nil,
+                         cover_urls: cover_urls_for(track.release)
                        }
                      end,
             audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil

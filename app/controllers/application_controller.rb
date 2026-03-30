@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
 
   include RequestAnalysis
   include GridAuthentication
+  include CoverUrlHelpers
 
   protect_from_forgery with: :exception, unless: :api_token_request?
 

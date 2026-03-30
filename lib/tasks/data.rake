@@ -1659,8 +1659,6 @@ module DataLoaderHelpers
   end
 
   def attach_cover_image(release, cover_image_path, artist_slug)
-    return if release.cover_image.attached?
-
     filename = File.basename(cover_image_path)
     legacy_slug = artist_slug.tr("-", "_")
     possible_paths = [
@@ -1674,13 +1672,21 @@ module DataLoaderHelpers
     ]
 
     cover_path = possible_paths.find { |path| File.exist?(path) }
+    return unless cover_path
 
-    if cover_path
-      release.cover_image.attach(
-        io: File.open(cover_path),
-        filename: filename
-      )
-      puts "    → Attached cover image: #{filename}"
+    if release.cover_image.attached?
+      source_mtime = File.mtime(cover_path)
+      blob_created = release.cover_image.blob.created_at
+      return if source_mtime <= blob_created
+      release.cover_image.purge
+      puts "    → Re-attaching cover (source newer): #{filename}"
     end
+
+    release.cover_image.attach(
+      io: File.open(cover_path),
+      filename: filename,
+      content_type: "image/jpeg"
+    )
+    puts "    → Attached cover image: #{filename}"
   end
 end

@@ -38,6 +38,7 @@ interface ReleaseDetail {
     genre: string
   }
   cover_url: string | null
+  cover_urls?: { thumbnail: string; standard: string; full: string }
   disc_length: string | null
   tracks: ReleaseTrack[]
 }
@@ -140,7 +141,8 @@ const ReleaseDetailPage: React.FC = () => {
           url: t.audio_url!,
           title: t.title,
           artist: release.artist.name,
-          coverUrl: release.cover_url || ''
+          coverUrl: release.cover_url || '',
+          coverUrls: release.cover_urls
         }))
 
       audioPlayerAPI.current.setPlaylist(playableTracks)
@@ -149,7 +151,8 @@ const ReleaseDetailPage: React.FC = () => {
         url: track.audio_url,
         title: track.title,
         artist: release.artist.name,
-        coverUrl: release.cover_url || ''
+        coverUrl: release.cover_url || '',
+        coverUrls: release.cover_urls
       })
     }
   }
@@ -253,7 +256,7 @@ const ReleaseDetailPage: React.FC = () => {
               {/* Cover Image */}
               <div style={{ flexShrink: 0, width: '250px', height: '250px', background: '#111', border: `1px solid ${getAccentColor(0)}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 {release.cover_url ? (
-                  <img src={release.cover_url} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={release.cover_urls?.full || release.cover_url} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <div style={{ color: '#333', fontSize: '4em', fontFamily: 'monospace' }}>&#9834;</div>
                 )}

@@ -36,6 +36,14 @@ class Release < ApplicationRecord
   has_many :tracks, -> { order(:track_number, :title) }, dependent: :restrict_with_error
   has_one_attached :cover_image
 
+  def cover_thumbnail
+    cover_image.variant(resize_to_fill: [80, 80], format: :jpeg, saver: {quality: 80})
+  end
+
+  def cover_standard
+    cover_image.variant(resize_to_fill: [300, 300], format: :jpeg, saver: {quality: 85})
+  end
+
   serialize :streaming_links, coder: JSON
 
   validates :name, presence: true
