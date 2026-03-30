@@ -102,7 +102,7 @@ codex_entries:
     published: true
     metadata:
       timeline: "future"
-      faction: Ethereality
+      faction: Frontwave
       role: "Soundscape Designer"
       status: Active
     content: |
@@ -177,6 +177,74 @@ codex_entries:
       - [[The Fracture Network]]
       - [[RAINNs]]
       - [[GovCorp]]
+
+  - name: Calloway
+    slug: calloway
+    entry_type: person
+    summary: "Former GovCorp systems architect and XERAEN's closest colleague before the Chronology Fracture — now the philosophical authority behind Blackout, carrying a sophisticated despair that concludes there is nothing left to save."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: Blackout
+      role: "Philosophical Authority"
+      status: Active
+    content: |
+      # Calloway
+
+      - **Status:** Active
+      - **Affiliation:** [[Blackout]], [[The Fracture Network]]
+      - **Timeline:** Future
+      - **Known For:** Former GovCorp architect, founding-era Fracture Network member
+
+      ## Before
+
+      Calloway built things. That was who he was before any of this — a systems architect who loved the elegance of infrastructure, the way complex systems could be made to serve human needs. He joined [[GovCorp]]'s RIDE Operations division for the same reason [[XERAEN]] did: because [[The RIDE]] looked like the most ambitious thing anyone had ever attempted. A system that could reduce suffering at scale. He wanted to be part of it.
+
+      He and XERAEN shared a workstation wall for three years. They argued about architecture decisions over bad coffee. They trusted each other's instincts. When the doubts started — when XERAEN first noticed what the RIDE was doing to people — Calloway saw it too. The same friend with the smoothed personality. The same musician whose soul disappeared as her technical precision increased. They documented it together, submitted it together, watched it get reclassified as a feature together.
+
+      They had built the cage. Both of them. That knowledge bonded them in a way nothing else could.
+
+      ## The Fracture
+
+      Calloway stood beside XERAEN during the assault on RIDE infrastructure. He was one of the five in the maintenance corridor. When the [[Chronology Fracture]] tore the temporal window open, he saw what XERAEN saw — the full architecture of what the RIDE had done to humanity. Every managed perception, every suppressed emotion, every erased impulse toward beauty laid bare in the data.
+
+      XERAEN looked at that data and heard something underneath. A signal that persisted despite everything. He believed the real was still there — buried, suppressed, but alive.
+
+      Calloway looked at the same data and heard silence.
+
+      ## After
+
+      He helped build [[The Fracture Network]]. He was there in those first desperate months when it was five people with stolen equipment and a temporal anomaly they barely understood. He and XERAEN worked side by side again, the way they had at GovCorp — except now they were building the opposite of what they'd built before.
+
+      The split didn't come all at once. It came in the quiet moments between operations, when Calloway would ask questions XERAEN didn't want to answer. *What are we restoring? Have you looked at the data from Sector 7? There's nothing under the RIDE in Sector 7. Not suppressed. Gone.* XERAEN would say the signal is still there. Calloway would ask him to prove it. XERAEN couldn't — not with data, not with logic. Only with something Calloway had stopped being able to hear.
+
+      They didn't fight about it. That would have been easier. They just stopped being able to work in the same room.
+
+      ## The Man Behind the Rage
+
+      [[Koda]] was nineteen and furious when Calloway found him. Forty-seven seconds of unfiltered reality had shattered Koda's world, and he was burning everything he could reach.
+
+      Calloway didn't calm him down. He gave the fire a direction. Not a leash — Koda would never accept a leash. A lens. Koda's rage was the most honest thing Calloway had encountered since the Fracture, and he recognized in it something he'd lost in himself: the capacity to feel the crime viscerally, not just analytically.
+
+      What Koda got from Calloway was language for what he already felt. What Calloway got from Koda was proof that someone could see the truth and still move. They need each other more than either would admit.
+
+      ## The Question He Can't Answer
+
+      XERAEN has never stopped trying to reach him. Not with arguments — they exhausted those years ago. With music. With broadcasts. With the work itself, offered as evidence that something real still flows through the Fracture Network's transmissions.
+
+      Calloway listens. He has never stopped listening. He just can't hear what XERAEN hears. Whether that means the signal isn't there, or that something in Calloway broke beyond repair — he doesn't know. He has built an entire philosophy on that silence. If XERAEN is right, then Calloway's despair is the final thing the RIDE took from him.
+
+      He does not think about this often. When he does, he changes the subject.
+
+      ## Related Entries
+
+      - [[Blackout]]
+      - [[XERAEN]]
+      - [[Koda]]
+      - [[System Rot]]
+      - [[The Fracture Network]]
+      - [[Chronology Fracture]]
 
   - name: Director Elena Krell
     slug: director-elena-krell
@@ -271,21 +339,21 @@ codex_entries:
   - name: Koda
     slug: koda
     entry_type: person
-    summary: "System Rot's street artist and voice — grew up inside the RIDE without knowing it, awakened at 19, and channeled his rage into reality-glitch graffiti that makes the invisible visible."
+    summary: "System Rot's street artist and voice — grew up inside the RIDE without knowing it, awakened at 19, and channeled his rage into reality-glitch graffiti that makes the invisible visible. Leads Blackout's day-to-day operations under Calloway's philosophical influence."
     position: null
     published: true
     metadata:
       timeline: "future"
-      faction: System Rot
-      role: "Street Artist, Voice"
+      faction: Blackout
+      role: "Street Artist, Blackout Operational Leader"
       status: Active
     content: |
       # Koda
 
       - **Status:** Active
-      - **Affiliation:** [[System Rot]]
+      - **Affiliation:** [[System Rot]] (Leader), [[Blackout]] (Operational Leader)
       - **Timeline:** Future
-      - **Known For:** Reality-glitch graffiti, awakening narrative
+      - **Known For:** Reality-glitch graffiti, awakening narrative, leading Blackout operations
 
       ## Born Inside the Cage
 
@@ -305,6 +373,14 @@ codex_entries:
 
       This is enough to make it dangerous.
 
+      ## The Older Voice
+
+      [[Calloway]] was the first person who didn't try to calm Koda down. Everyone in [[The Fracture Network]] who met Koda after his awakening wanted to channel him, direct him, teach him patience. Calloway just listened. Then he started asking questions. *What did the 47 seconds feel like? Not what you saw — what was underneath it? And when the RIDE came back, what was missing?*
+
+      Koda couldn't answer the last question. That was the point. He'd never had unfiltered reality long enough to know what it contained. He only knew what the RIDE's version was missing. Calloway told him that was the only honest position — that anyone who claims to know what's real after a few seconds of glimpsing it is selling something.
+
+      When [[XERAEN]] talks about restoring reality, something in Koda wants to believe him. When Calloway says there might be nothing left to restore, something in Koda recognizes his own experience. He has never resolved this. He has stopped trying.
+
       ## Anger and Discipline
 
       Koda's rage is genuine and justified. The tension within [[System Rot]] — and within Koda himself — is between that rage and the discipline needed to channel it productively. Destruction feels righteous but accomplishes little. Art that makes people see accomplishes everything.
@@ -312,6 +388,9 @@ codex_entries:
       ## Related Entries
 
       - [[System Rot]]
+      - [[Blackout]]
+      - [[Calloway]]
+      - [[XERAEN]]
       - [[The RIDE]]
       - [[The Undercity]]
       - [[The Awakening Protocol]]
@@ -533,8 +612,8 @@ codex_entries:
     published: true
     metadata:
       timeline: "future"
-      faction: Neon Hearts
-      role: "Producer, Leader"
+      faction: Frontwave
+      role: "Producer, Frontwave Leader"
       status: Active
     content: |
       # Sora Nexa
@@ -632,8 +711,8 @@ codex_entries:
     published: true
     metadata:
       timeline: "future"
-      faction: Injection Vector
-      role: "Leader, Former GovCorp Engineer"
+      faction: Blackout
+      role: "Leader (Injection Vector), Former GovCorp Engineer"
       status: Active
     content: |
       # Vex
@@ -682,8 +761,8 @@ codex_entries:
     published: true
     metadata:
       timeline: "future"
-      faction: Voiceprint
-      role: "Leader, Archivist"
+      faction: Frontwave
+      role: "Leader (Voiceprint), Archivist"
       status: Active
     content: |
       # Voiceprint (The Archivist)
@@ -744,7 +823,7 @@ codex_entries:
 
       ## The GovCorp Years (2109-2115)
 
-      XERAEN joined GovCorp's RIDE deployment team in 2109 as a systems architect, genuinely believing in the project's mission. He saw the RIDE as humanity's most ambitious infrastructure — a system that could eliminate suffering by optimizing perception. [[Director Elena Krell]] herself welcomed him to the team.
+      XERAEN joined GovCorp's RIDE deployment team in 2109 as a systems architect, genuinely believing in the project's mission. He saw the RIDE as humanity's most ambitious infrastructure — a system that could eliminate suffering by optimizing perception. [[Director Elena Krell]] herself welcomed him to the team. His closest colleague was [[Calloway]] — another systems architect who shared his belief in the project and, later, his horror at what it actually did.
 
       The disillusionment was slow. It began not with data or policy but with people — a friend whose personality had been smoothed into pleasant emptiness, a musician whose technical precision increased as her soul disappeared. XERAEN began to see the RIDE's true cost: not the obvious violence of oppression, but the quiet erasure of everything that makes a person irreplaceable.
 
@@ -752,7 +831,7 @@ codex_entries:
 
       That failure closed the door on working within the system. XERAEN began solo acts of sabotage — controlled faults in reality buffers, maintenance windows extended by seconds, giving thousands of people brief glimpses of unfiltered reality. Small disruptions, always disguised as system errors, always exploiting the architecture he himself had designed.
 
-      In 2115, he discovered he was not alone. Other GovCorp insiders were running their own disruptions. Five people met in a maintenance corridor and began planning something larger — a coordinated attack that would tear a permanent hole in the RIDE's coverage.
+      In 2115, he discovered he was not alone. Other GovCorp insiders — including [[Calloway]] — were running their own disruptions. Five people met in a maintenance corridor and began planning something larger — a coordinated attack that would tear a permanent hole in the RIDE's coverage.
 
       ## The Awakening
 
@@ -810,6 +889,7 @@ codex_entries:
       - [[Ashlinn]]
       - [[Temporal Blue Drift]]
       - [[The Erasure Paradox]]
+      - [[Calloway]]
       - [[Nathan Clarke]]
       - [[The Relay Project]]
       - [[The Relay]]
@@ -906,19 +986,14 @@ codex_entries:
 
       ## The Faction Ecosystem
 
-      The Fracture Network is not one movement but a spectrum of frequencies. Each faction carries something different:
+      The Fracture Network is organized into factions — coalitions of bands united by shared philosophy and method:
 
-      - [[Cipher Protocol]] — Precision and the beauty of mathematical order
-      - [[Ethereality]] — Encounters with beauty deeper than the RIDE can follow
-      - [[Injection Vector]] — Physical commitment and kinetic operations
-      - [[Neon Hearts]] — Truth in accessible packaging
-      - [[Offline]] — Raw authenticity and complete disconnection
-      - [[System Rot]] — Street-level rage and the demand for something real
-      - [[Temporal Blue Drift]] — XERAEN's personal project, love across time
-      - [[Voiceprint]] — Preservation of authentic human expression
-      - [[Wavelength Zero]] — Emotional restoration and RIDE weakness discovery
+      - **[[Hackrcore]]** — Led by [[The.CyberPul.se]]. The core faction: broadcast truth, restore reality. Bands: TCP, [[Wavelength Zero]], [[Apex Overdrive]], [[Temporal Blue Drift]]
+      - **[[Blackout]]** — Led by [[System Rot]] ([[Koda]]) with [[Calloway]] as philosophical authority. The violent edge: accelerate collapse. Bands: System Rot, [[Injection Vector]], [[BlitzBeam+]]
+      - **[[Frontwave]]** — Led by [[Sora Nexa]] ([[Neon Hearts]]). Infiltration in plain sight: subvert from within. Bands: [[Ethereality]], Neon Hearts, [[heartbreak_havoc.sh]], [[Voiceprint]]
+      - **[[Offline]]** — Independent ally. Complete disconnection, analog preservation. No faction membership.
 
-      United by the conviction that reality and human dignity are worth preserving. Divided on methods, philosophy, and vision for what comes after.
+      United by the conviction that reality and human dignity are worth preserving. Divided on methods, philosophy, and vision for what comes after. The tension between [[Hackrcore]] and [[Blackout]] — between restoration and destruction — is the central philosophical conflict within the Network.
 
       ## Present-Day Operations
 
@@ -960,7 +1035,7 @@ codex_entries:
 
       The.CyberPul.se is not a band. It's a heartbeat transmitted backward through time - a hundred years of resistance compressed into electromagnetic pulses.
 
-      It's the central nervous system of [[The Fracture Network]].
+      It's the central nervous system of [[The Fracture Network]], and the leading entity of [[Hackrcore]] — the faction that carries the Network's founding mission.
 
       ## The Hosts
 
@@ -994,18 +1069,253 @@ codex_entries:
       - [[The Relay]]
 
   # =============================================================================
-  # FACTIONS
+  # FACTIONS (Coalitions)
   # =============================================================================
+  - name: Hackrcore
+    slug: hackrcore
+    entry_type: faction
+    summary: "The core faction of the Fracture Network — led by The.CyberPul.se, united by the conviction that authentic expression carrying truth is the weapon that dismantles manufactured reality."
+    position: null
+    published: true
+    metadata:
+      leader: The.CyberPul.se
+      status: Active
+      philosophy: "Broadcast truth, restore reality"
+    content: |
+      # Hackrcore
+
+      - **Leader:** [[The.CyberPul.se]]
+      - **Members:** [[The.CyberPul.se]], [[Wavelength Zero]], [[Apex Overdrive]], [[Temporal Blue Drift]]
+      - **Philosophy:** Authentic expression carrying truth against manufactured reality
+      - **Method:** Broadcast, restore, build
+
+      ## Overview
+
+      Hackrcore is the backbone of [[The Fracture Network]] — the faction closest to its founding mission. Led by [[The.CyberPul.se]], these bands share the conviction that reality is real, beauty is indestructible, and the [[The RIDE|RIDE]] is a counterfeit that can be torn away to reveal what was always underneath.
+
+      The name comes from the genre [[The.CyberPul.se]] created, but the faction transcends any single genre. Atmospheric metal, euphoric hardstyle, math rock — what unites Hackrcore is not sound but philosophy: music-as-resistance. Any sound created with authentic intent that carries truth against manufactured reality belongs here.
+
+      ## The Bands
+
+      **[[The.CyberPul.se]]** — The heartbeat. Trans-temporal broadcast entity. The central nervous system of the entire Fracture Network, not just this faction. [[XERAEN]] provides vision and temporal operations, [[Ryker M. Pulse|Ryker]] provides the kinetic force, [[Synthia]] provides the voice.
+
+      **[[Wavelength Zero]]** — The probe. Patient, methodical exploration of [[The RIDE|RIDE]] weaknesses through sustained frequency work. Where TCP broadcasts outward, Wavelength Zero searches inward — mapping the RIDE's architecture through emotional resonance and finding the cracks.
+
+      **[[Apex Overdrive]]** — The rally. Defiant joy — euphoria as resistance in a world designed to suppress it. Unity anthems, call-and-response, the sonic embodiment of triumph. When the Fracture Network gathers, Apex Overdrive is the sound of people choosing to feel alive together.
+
+      **[[Temporal Blue Drift]]** — The personal. [[XERAEN]]'s solo project — love letters to [[Ashlinn]] encoded in mathematics and melody. The most intimate expression in the faction, and the purest distillation of what Hackrcore fights for: connection that is real.
+
+      ## Why It Works
+
+      Hackrcore exists because beauty disrupts [[The RIDE]]. [[PRISM]]'s materialist architecture was designed to manage perception within materialist categories. But authentic creative expression generates something that exceeds those categories. The RIDE can process manufactured music. It cannot fully process genuine beauty. This is not a frequency hack — it is an encounter with something the system's philosophical foundation cannot account for.
+
+      ## Relationship to Other Factions
+
+      Hackrcore is the faction that believes there is something worth restoring. This puts them in direct philosophical tension with [[Blackout]], who believe the corruption has replaced reality entirely. The argument between [[XERAEN]] and [[Calloway]] is the argument at the heart of the Fracture Network: is there anything left to save?
+
+      Hackrcore respects [[Frontwave]]'s methods — reaching people inside [[GovCorp]]'s world — even if some members question the compromises involved.
+
+      ## Related Entries
+
+      - [[The.CyberPul.se]]
+      - [[The Fracture Network]]
+      - [[Blackout]]
+      - [[Frontwave]]
+      - [[The Resonance Field]]
+
+  - name: Blackout
+    slug: blackout
+    entry_type: faction
+    summary: "The violent edge of the Fracture Network — allied but philosophically divergent, united by the conviction that the system is beyond saving and collapse should be accelerated rather than resisted."
+    position: null
+    published: true
+    metadata:
+      leader: "System Rot (Koda) / Calloway"
+      status: Active
+      philosophy: "Accelerate collapse, overwhelm"
+    content: |
+      # Blackout
+
+      - **Leader:** [[System Rot]] ([[Koda]])
+      - **Members:** [[System Rot]], [[Injection Vector]], [[BlitzBeam+]]
+      - **Philosophy:** The rot goes all the way down. Burn it and see what survives.
+
+      ## Overview
+
+      Every resistance movement has a faction that looks at the world and sees something past saving. In [[The Fracture Network]], that faction is Blackout.
+
+      They are not wrong about what [[GovCorp]] has done. They are not wrong about the scale of the damage. They may be wrong about what survives underneath it — but no one who has lived inside [[The RIDE]] their entire life can be blamed for concluding that there is nothing underneath it. Blackout fights GovCorp as hard as anyone in the Network. They just don't believe there's a world waiting on the other side.
+
+      ## The Bands
+
+      [[System Rot]] is the voice — [[Koda]]'s graffiti-scarred hardcore punk pouring out of [[The Undercity]] like a dare. [[Injection Vector]] is the fist — [[Vex]] putting his GovCorp engineering knowledge to work dismantling the infrastructure he once built, one RIDE node at a time. [[BlitzBeam+]] is the blur — moving so fast the question of what comes after never catches up.
+
+      Of the three, BlitzBeam+ fits the least comfortably. They're not nihilists. They believe in something — freedom, velocity, the rush of outrunning every constraint. They're in Blackout because their method is the same: hit the system harder than it can handle. But their hearts are somewhere else. [[Hackrcore]] has noticed.
+
+      ## Calloway's Shadow
+
+      [[Calloway]] doesn't run Blackout. He doesn't attend planning sessions or issue orders. But his thinking is in every wall Koda tags, every argument [[Vex]] makes for hitting harder, every late-night conversation in The Undercity about whether any of this matters.
+
+      He gave Blackout its philosophy. Not through speeches — through the weight of a man who helped build the RIDE, helped tear it open, looked at what was underneath, and stopped talking about the future in hopeful terms. Koda took that weight and turned it into a war cry. The cry is louder than the source, and carries further. But it started with Calloway.
+
+      ## The Friction
+
+      Blackout's operations make the rest of the Network nervous. When [[Injection Vector]] takes out a RIDE node, the disruption ripples. Citizens in the affected zone experience unfiltered reality — which is the point — but so does every [[Frontwave]] operative working that district. [[Neon Hearts]] can't maintain their cover when the infrastructure they're hiding inside starts collapsing around them.
+
+      [[Hackrcore]] sees Blackout as necessary but dangerous. Blackout sees Hackrcore as well-meaning but deluded. The argument between them is the oldest argument in the Network — the one [[XERAEN]] and Calloway started in a maintenance corridor in 2115 and have never finished.
+
+      ## Related Entries
+
+      - [[Calloway]]
+      - [[Koda]]
+      - [[System Rot]]
+      - [[Injection Vector]]
+      - [[BlitzBeam+]]
+      - [[The Fracture Network]]
+      - [[Hackrcore]]
+
+  - name: Frontwave
+    slug: frontwave
+    entry_type: faction
+    summary: "The Fracture Network's infiltration faction — operating in plain sight within GovCorp's world, slipping signal through surfaces the RIDE monitors but cannot fully parse."
+    position: null
+    published: true
+    metadata:
+      leader: Sora Nexa
+      status: Active
+      philosophy: "Subvert in plain sight"
+    content: |
+      # Frontwave
+
+      - **Leader:** [[Sora Nexa]] ([[Neon Hearts]])
+      - **Members:** [[Ethereality]], [[Neon Hearts]], [[heartbreak_havoc.sh]], [[Voiceprint]]
+      - **Philosophy:** The first wave that reaches people — subversion through beauty, pop, emotion, and preservation
+      - **Method:** Operate within [[GovCorp]]'s world, carry signal through surfaces the [[The RIDE|RIDE]] monitors
+
+      ## Overview
+
+      Frontwave is the leading edge of a propagating disturbance. Before someone finds [[The.CyberPul.se]], before they understand [[The Fracture Network]], they encounter a [[Neon Hearts]] pop song that plants a seed. An [[Ethereality]] soundscape that opens a space they didn't know was closed. A [[heartbreak_havoc.sh]] track that makes them feel something the RIDE said they shouldn't. Frontwave is first contact with the real.
+
+      These bands operate in approved venues, on monitored channels, in the spaces [[GovCorp]] controls. The RIDE sees them and categorizes them as entertainment. The real payload travels beneath what looks harmless.
+
+      ## The Bands
+
+      **[[Neon Hearts]]** — The Trojan horse. J-Pop hiding revolution in accessible packaging. [[Sora Nexa]] understood first that the most dangerous place to carry signal is inside something everyone is already consuming. Their songs carry steganographic data in the audio signal — frequency patterns that Fracture Network receivers can extract. The lyrics referencing hidden messages are misdirection: the RIDE hears standard pop self-mythologizing.
+
+      **[[Ethereality]]** — The space-maker. [[Cascade]]'s vocal trance soundscapes calm [[RAINNs|RAINN]] monitoring and open spaces for genuine encounter. She doesn't smuggle signal through entertainment — she creates the neurological conditions under which signal can be received. The most subtle operator in any faction.
+
+      **[[heartbreak_havoc.sh]]** — The wildcard. A rogue cyber-emotive engineer who weaponizes love as a RIDE exploit. Has two modes: love songs performed in monitored spaces (Frontwave material) and overtly anti-GovCorp tracks performed at underground Fracture Network events. She is Frontwave's liability — volatile, one foot in [[Blackout]]'s world, always risking exposure. Sora Nexa spends real energy managing her.
+
+      **[[Voiceprint]]** — The memory. Dedicated to preserving authentic human voices. The quietest Frontwave member — archival, preservation, not performance. They anchor the faction in its long-term mission: proving that the real existed.
+
+      ## Steganographic Operations
+
+      [[Neon Hearts]] songs carry embedded data in the audio signal itself — frequency patterns encoded in the production that Fracture Network receivers can extract. Lyrics that reference hidden messages ("Every lyric's got a secret code") are the misdirection. GovCorp's RAINN filters have heard "we are the rebellion" from a thousand approved pop acts and filed it as entertainment branding. Neon Hearts hides behind the genre's own conventions.
+
+      The irony: Neon Hearts is most dangerous when they sound least rebellious. A unity anthem carrying steganographic data is more subversive than an overt rebellion song, because nobody analyzes the audio signal of something that sounds harmless.
+
+      ## Relationship to Other Factions
+
+      Frontwave and [[Hackrcore]] are complementary — Hackrcore operates outside GovCorp's systems, Frontwave operates inside them. The mild friction: Hackrcore purists see Frontwave as compromised ("performing in their venues"). Frontwave's counter: "We reach people you never will."
+
+      The tension with [[Blackout]] is sharper. Blackout's sabotage operations threaten the stable environment Frontwave depends on. [[heartbreak_havoc.sh]] straddles both worlds, creating informal bridges that faction leadership cannot always control.
+
+      ## Related Entries
+
+      - [[Sora Nexa]]
+      - [[Neon Hearts]]
+      - [[Ethereality]]
+      - [[Voiceprint]]
+      - [[The Fracture Network]]
+      - [[Hackrcore]]
+      - [[Blackout]]
+
+  # =============================================================================
+  # BANDS
+  # =============================================================================
+  - name: Apex Overdrive
+    slug: apex-overdrive
+    entry_type: band
+    summary: "Melodic euphoric hardstyle — the rally music of the Fracture Network. Defiant joy, collective euphoria, and the radical act of feeling alive under totalitarian control."
+    position: null
+    published: true
+    metadata:
+      genre: Melodic Euphoric Hardstyle
+      faction: Hackrcore
+      status: Active
+    content: |
+      # Apex Overdrive
+
+      - **Genre:** Melodic Euphoric Hardstyle
+      - **Faction:** [[Hackrcore]]
+      - **Philosophy:** Euphoria as defiance — feeling alive is revolutionary when you're supposed to feel nothing
+      - **Profile:** [Apex Overdrive](/apex-overdrive)
+
+      ## Overview
+
+      Apex Overdrive is the sound of people choosing to feel alive together. In a world where [[GovCorp]] manufactures calm and suppresses authentic emotion, genuine euphoria is dangerous. Soaring melodic leads, anthemic breakdowns, and collective energy that refuses sedation.
+
+      ## The Summit Philosophy
+
+      The name says it: apex. The peak. The summit. They don't pretend the struggle is over. But they insist on celebrating the peaks while climbing, on experiencing triumph in the present tense. Euphoria becomes resistance when the system demands dampening.
+
+      ## Role in Hackrcore
+
+      Apex Overdrive is [[Hackrcore]]'s outward-facing wing — the rally music that brings [[The Fracture Network]] together as a physical gathering. Where [[The.CyberPul.se]] broadcasts and [[Wavelength Zero]] probes, Apex Overdrive unites.
+
+      ## Related Entries
+
+      - [[Hackrcore]]
+      - [[The Fracture Network]]
+      - [[The Resonance Field]]
+
+  - name: BlitzBeam+
+    slug: blitzbeam
+    entry_type: band
+    summary: "Anime hypertrance at 160+ BPM — pure velocity as liberation. Moving faster than the RIDE can track, outrunning every manufactured constraint until only what's real survives."
+    position: null
+    published: true
+    metadata:
+      genre: Anime Hypertrance
+      faction: Blackout
+      status: Active
+    content: |
+      # BlitzBeam+
+
+      - **Genre:** Anime Hypertrance (160+ BPM)
+      - **Faction:** [[Blackout]]
+      - **Philosophy:** Speed equals freedom — velocity beyond the RIDE's response time
+      - **Profile:** [BlitzBeam+](/blitzbeam)
+
+      ## Overview
+
+      BlitzBeam+ exists as pure energy — a sonic representation of velocity so extreme that it becomes liberation. Faster than the [[The RIDE|RIDE]] can track. Outrunning every manufactured constraint until all that's left is the real thing.
+
+      The "+" means exceeding designed limits. Going beyond what's already extreme. Continuous acceleration without plateau.
+
+      ## The Odd One Out
+
+      BlitzBeam+ is [[Blackout]]'s most philosophically distinct member. They are not nihilists — they believe in freedom through velocity. Where [[System Rot]] wants collapse and [[Injection Vector]] wants destruction, BlitzBeam+ wants *escape*. Their method aligns with Blackout (overwhelm the system) but their philosophy runs closer to [[Hackrcore]] (something real exists, you just have to move fast enough to find it).
+
+      This makes them the faction member most likely to shift allegiance if the tension between Hackrcore and Blackout escalates.
+
+      ## Related Entries
+
+      - [[Blackout]]
+      - [[System Rot]]
+      - [[The RIDE]]
+
   - name: Cipher Protocol
     slug: cipher-protocol
-    entry_type: faction
-    summary: "Progressive metal faction specializing in encrypted data transmission through musical complexity — where technical precision serves both art and operational security."
+    entry_type: band
+    summary: "Progressive metal band specializing in encrypted data transmission through musical complexity — where technical precision serves both art and operational security."
     position: null
     published: true
     metadata:
       genre: Progressive Metal
       zone: The Forge
       leader: Cipher
+      faction: Hackrcore
       status: Active
     content: |
       # Cipher Protocol
@@ -1013,6 +1323,7 @@ codex_entries:
       - **Genre:** Progressive Metal
       - **Zone:** [[The Forge]]
       - **Leader:** [[Cipher]]
+      - **Faction:** [[Hackrcore]]
       - **Philosophy:** Encryption, technical precision, data-as-music
       - **Profile:** [Cipher Protocol](/cipher-protocol)
 
@@ -1030,18 +1341,20 @@ codex_entries:
 
       - [[Cipher]]
       - [[The Forge]]
+      - [[Hackrcore]]
       - [[The Fracture Network]]
 
   - name: Ethereality
     slug: ethereality
-    entry_type: faction
-    summary: "Vocal trance faction creating soundscapes that calm RAINN monitoring and open spaces for genuine consciousness — led by synesthete Cascade from the Frequency Gardens."
+    entry_type: band
+    summary: "Vocal trance band creating soundscapes that calm RAINN monitoring and open spaces for genuine consciousness — led by synesthete Cascade from the Frequency Gardens."
     position: null
     published: true
     metadata:
       genre: Vocal Trance
       zone: Frequency Gardens
       leader: Cascade
+      faction: Frontwave
       status: Active
     content: |
       # Ethereality
@@ -1049,6 +1362,7 @@ codex_entries:
       - **Genre:** Vocal Trance
       - **Zone:** [[Frequency Gardens]]
       - **Leader:** [[Cascade]]
+      - **Faction:** [[Frontwave]]
       - **Philosophy:** Encounter with beauty through soundscape
       - **Profile:** [Ethereality](/ethereality)
 
@@ -1058,6 +1372,10 @@ codex_entries:
 
       This is not mysticism — but neither is it reducible to acoustic engineering. [[Cascade]]'s soundscapes carry genuine beauty, and beauty exceeds what [[RAINNs|RAINN]] monitoring can categorize. Her synesthetic perception allows her to see the effects in real time, adjusting compositions to widen the window of authentic experience.
 
+      ## Role in Frontwave
+
+      Ethereality is [[Frontwave]]'s most subtle operator. [[Cascade]] doesn't smuggle signal through entertainment — she creates the neurological conditions under which signal can be received. RAINN monitoring systems actively relax when her compositions play.
+
       ## The Frequency Gardens
 
       Ethereality operates from [[Frequency Gardens]], a zone within [[THE PULSE GRID]] designed by Cascade where sound becomes landscape. Different frequencies create different environmental effects — spaces for meditation, planning, and the simple experience of unfiltered thought.
@@ -1066,30 +1384,78 @@ codex_entries:
 
       - [[Cascade]]
       - [[Frequency Gardens]]
+      - [[Frontwave]]
       - [[THE PULSE GRID]]
       - [[The Resonance Field]]
 
+  - name: heartbreak_havoc.sh
+    slug: heartbreakhavocsh
+    entry_type: band
+    summary: "Nightcore at 170-200 BPM — a rogue cyber-emotive engineer who weaponizes love as a RIDE exploit. Frontwave's wildcard, with one foot in Blackout's world."
+    position: null
+    published: true
+    metadata:
+      genre: Nightcore
+      faction: Frontwave
+      status: Active
+    content: |
+      # heartbreak_havoc.sh
+
+      - **Genre:** Nightcore (170-200 BPM)
+      - **Faction:** [[Frontwave]]
+      - **Philosophy:** Love is the RIDE vulnerability — authentic emotion exceeds what their algorithms can parse
+      - **Profile:** [heartbreak_havoc.sh](/heartbreak-havoc)
+
+      ## Overview
+
+      heartbreak_havoc.sh is the glitch-kissed DJ persona of a rogue cyber-emotive engineer who once helped [[GovCorp]] refine the [[The RIDE|RIDE]]'s "synthetic love" algorithms — until she realized her work was being weaponized to manipulate entire populations. After ripping out her own identity from GovCorp servers, she resurfaced in the underground as a sonic saboteur who turns corrupted emotions into explosive, neon-drenched sound.
+
+      ## The RIDE Vulnerability
+
+      She helped build the RIDE's emotional regulation protocols. She knows exactly where they break down: love. GovCorp's systems can suppress anger, redirect fear, dampen grief. But authentic romantic attachment exceeds what their algorithms can parse. Love is not a data type — it is something the RIDE was never built to contain.
+
+      ## Two Modes
+
+      heartbreak_havoc.sh operates in two distinct modes, and this duality is a known problem within [[Frontwave]]:
+
+      **In monitored spaces** — love songs that weaponize authentic emotion as RIDE exploit. Tracks like "heartbreak_havoc.sh" and "fatal_attraction.exe" pass through content filters because the RIDE categorizes them as entertainment. The real weapon is the genuine feeling they provoke.
+
+      **At underground events** — overtly anti-GovCorp anthems. "RIDE.corrupt" and "./exeCUTE" are performed at Fracture Network shows where subtlety is unnecessary. Every time she drops one of these at an underground show, she risks drawing GovCorp attention back to her "innocent" output.
+
+      ## Frontwave's Liability
+
+      [[Sora Nexa]] spends real energy managing heartbreak_havoc.sh. She is volatile, one foot in [[Blackout]]'s world, and her underground performances create a trail that could expose Frontwave's entire operation. She and [[BlitzBeam+]] get along personally — both high-energy, both aggressive — even though their factions clash.
+
+      ## Related Entries
+
+      - [[Frontwave]]
+      - [[Blackout]]
+      - [[The RIDE]]
+      - [[Sora Nexa]]
+
   - name: Injection Vector
     slug: injection-vector
-    entry_type: faction
-    summary: "Deathcore faction specializing in physical infiltration and kinetic warfare against RIDE infrastructure — led by former GovCorp engineer Vex, who builds what he once helped create."
+    entry_type: band
+    summary: "Deathcore band specializing in physical infiltration and kinetic warfare against RIDE infrastructure — led by former GovCorp engineer Vex, who builds what he once helped create."
     position: null
     published: true
     metadata:
       genre: Deathcore
       leader: Vex
+      faction: Blackout
       status: Active
     content: |
       # Injection Vector
 
       - **Genre:** Deathcore
       - **Leader:** [[Vex]]
+      - **Faction:** [[Blackout]]
       - **Philosophy:** Physical infiltration, kinetic warfare, direct action
       - **Profile:** [Injection Vector](/injection-vector)
 
       ## Overview
 
-      Where other factions operate through digital channels or cultural subversion, Injection Vector works in physical space. Sabotage. Hardware manipulation. Infrastructure disruption. Their deathcore soundtrack matches the operational philosophy: direct, brutal, precise.
+      Where other bands operate through digital channels or cultural subversion, Injection Vector works in physical space. Sabotage. Hardware manipulation. Infrastructure disruption. Their deathcore soundtrack matches the operational philosophy: direct, brutal, precise.
 
       [[Vex]]'s intimate knowledge of [[The RIDE|RIDE]] infrastructure — gained from years building it as a [[GovCorp]] engineer — makes Injection Vector uniquely effective at identifying physical vulnerabilities and access points.
 
@@ -1100,19 +1466,21 @@ codex_entries:
       ## Related Entries
 
       - [[Vex]]
+      - [[Blackout]]
       - [[The RIDE]]
       - [[The Fracture Network]]
 
   - name: Neon Hearts
     slug: neon-hearts
-    entry_type: faction
-    summary: "J-Pop faction hiding revolution in accessible packaging — using catchy hooks and mass appeal as a Trojan horse to deliver moments of authentic experience to audiences who would reject overt resistance."
+    entry_type: band
+    summary: "J-Pop band hiding revolution in accessible packaging — using catchy hooks and mass appeal as a Trojan horse to deliver moments of authentic experience to audiences who would reject overt resistance."
     position: null
     published: true
     metadata:
       genre: J-Pop
       zone: Neon District
       leader: Sora Nexa
+      faction: Frontwave
       status: Active
     content: |
       # Neon Hearts
@@ -1120,6 +1488,7 @@ codex_entries:
       - **Genre:** J-Pop
       - **Zone:** [[Neon District]]
       - **Leader:** [[Sora Nexa]]
+      - **Faction:** [[Frontwave]]
       - **Philosophy:** Revolution in accessible packaging — the Trojan horse
       - **Profile:** [Neon Hearts](/neon-hearts)
 
@@ -1129,6 +1498,10 @@ codex_entries:
 
       [[Sora Nexa]]'s understanding of mass psychology — developed during her career as a GovCorp-label pop star — enables Neon Hearts to reach audiences that would never engage with overt resistance. The revolution doesn't always wear black. Sometimes it wears neon.
 
+      ## Steganographic Operations
+
+      Neon Hearts songs carry embedded data in the audio signal — frequency patterns encoded in the production that [[The Fracture Network|Fracture Network]] receivers can extract. Lyrics referencing hidden messages are misdirection: the RIDE hears standard pop self-mythologizing. J-Pop genre conventions normalize rebellion as aesthetic branding — GovCorp's filters have categorized "we are the rebellion" from a thousand approved idol groups. Neon Hearts hides behind conventions the RIDE already ignores.
+
       ## The Trojan Horse
 
       Neon Hearts' music is designed to be consumed within the RIDE's entertainment ecosystem. This is both its strength and its moral complexity — they use the tools of managed perception to subvert managed perception. The means resemble what they oppose.
@@ -1136,25 +1509,28 @@ codex_entries:
       ## Related Entries
 
       - [[Sora Nexa]]
+      - [[Frontwave]]
       - [[Neon District]]
       - [[The RIDE]]
       - [[The Fracture Network]]
 
   - name: Offline
     slug: offline
-    entry_type: faction
-    summary: "Post-grunge faction committed to complete disconnection from digital systems — maintaining analog archives and physical infrastructure as insurance against total digital compromise."
+    entry_type: band
+    summary: "Post-grunge band committed to complete disconnection from digital systems — maintaining analog archives and physical infrastructure as insurance against total digital compromise. Independent ally, no faction membership."
     position: null
     published: true
     metadata:
       genre: Post-Grunge
       zone: The Analog Archive
+      faction: Independent
       status: Active
     content: |
       # Offline
 
       - **Genre:** Post-Grunge
       - **Zone:** [[The Analog Archive]]
+      - **Faction:** Independent — allied to [[The Fracture Network]] but member of no coalition
       - **Philosophy:** Raw authenticity, complete disconnection
       - **Profile:** [Offline](/offline)
 
@@ -1164,6 +1540,10 @@ codex_entries:
 
       Their post-grunge sound is recorded exclusively on analog equipment — tape machines, tube amplifiers, physical mixing boards. The aesthetic is not nostalgia. It is operational security taken to its philosophical conclusion.
 
+      ## Independent Ally
+
+      Offline belongs to no faction. Their philosophy of complete disconnection makes coalition membership a contradiction. Every faction has tried to recruit them more fully. Every faction has failed. They will share intel with any faction but will not integrate with any. They respect [[Hackrcore]]'s mission, tolerate [[Blackout]]'s rage, appreciate [[Frontwave]]'s craft. They join none of them.
+
       ## The Analog Archive
 
       Offline maintains [[The Analog Archive]] — a physical facility hidden in abandoned pre-RIDE infrastructure where every Fracture Network broadcast, every resistance recording, every authentic human expression is preserved on formats that require physical destruction to erase. If [[THE PULSE GRID]] falls, the Archive endures.
@@ -1172,18 +1552,18 @@ codex_entries:
 
       - [[The Analog Archive]]
       - [[The Fracture Network]]
-      - [[Hackrcore]]
 
   - name: System Rot
     slug: system-rot
-    entry_type: faction
-    summary: "Hardcore punk faction operating from the philosophy that the system is already dying — let it collapse. Allied to the Fracture Network but philosophically divergent, carrying the tension between rage and nihilism."
+    entry_type: band
+    summary: "Hardcore punk band operating from the philosophy that the system is already dying — let it collapse. The voice and operational core of the Blackout faction."
     position: null
     published: true
     metadata:
       genre: Hardcore Punk
       zone: The Undercity
       leader: Koda
+      faction: Blackout
       status: Active
     content: |
       # System Rot
@@ -1191,6 +1571,7 @@ codex_entries:
       - **Genre:** Hardcore Punk
       - **Zone:** [[The Undercity]]
       - **Leader:** [[Koda]]
+      - **Faction:** [[Blackout]]
       - **Philosophy:** Accelerated collapse — let the system rot
       - **Profile:** [System Rot](/system-rot)
 
@@ -1200,11 +1581,9 @@ codex_entries:
 
       This puts them in philosophical tension with [[The Fracture Network]]'s broader mission. The Network fights for something — truth, dignity, authentic existence. System Rot fights against everything and is less certain about what comes after.
 
-      ## Allied but Flawed
+      ## The Voice of Blackout
 
-      System Rot is not an enemy. They are allies whose philosophy approaches a line that [[The Fracture Network]]'s core members won't cross. Their near-nihilism serves as dramatic counterpoint — the voice that asks whether any of this is worth saving, whether the fight has meaning beyond the fight itself.
-
-      [[Koda]]'s leadership channels the faction's rage into art rather than pure destruction, but the tension between expression and annihilation is constant.
+      System Rot is [[Blackout]]'s operational core. [[Koda]] runs day-to-day operations, translating [[Calloway]]'s philosophical framework into street-level action. "Let it rot" is Koda's simplified version of Calloway's more sophisticated despair — a battle cry the streets can understand.
 
       ## Street-Level Operations
 
@@ -1213,24 +1592,28 @@ codex_entries:
       ## Related Entries
 
       - [[Koda]]
+      - [[Calloway]]
+      - [[Blackout]]
       - [[The Undercity]]
       - [[The Fracture Network]]
 
   - name: Temporal Blue Drift
     slug: temporal-blue-drift
-    entry_type: faction
+    entry_type: band
     summary: "XERAEN's personal project — math rock compositions that are love letters to Ashlinn, encoded in mathematics and melody, sent across a hundred years of separation."
     position: null
     published: true
     metadata:
       genre: Math Rock
       leader: XERAEN
+      faction: Hackrcore
       status: Active
     content: |
       # Temporal Blue Drift
 
       - **Genre:** Math Rock
       - **Leader:** [[XERAEN]]
+      - **Faction:** [[Hackrcore]]
       - **Philosophy:** Love across time
       - **Profile:** [Temporal Blue Drift](/temporal-blue-drift)
 
@@ -1252,6 +1635,7 @@ codex_entries:
 
       - [[XERAEN]]
       - [[Ashlinn]]
+      - [[Hackrcore]]
       - [[The Erasure Paradox]]
       - [[The Fracture Network]]
 
@@ -1311,14 +1695,15 @@ codex_entries:
 
   - name: Voiceprint
     slug: voiceprint
-    entry_type: faction
-    summary: "Melodic DnB faction dedicated to preserving authentic human voices before RAINNs erase them entirely — each archived voice is proof that humans existed as more than optimization targets."
+    entry_type: band
+    summary: "Melodic DnB band dedicated to preserving authentic human voices before RAINNs erase them entirely — each archived voice is proof that humans existed as more than optimization targets."
     position: null
     published: true
     metadata:
       genre: Melodic DnB
       zone: The Crypt
       leader: The Archivist
+      faction: Frontwave
       status: Active
     content: |
       # Voiceprint
@@ -1326,12 +1711,17 @@ codex_entries:
       - **Genre:** Melodic DnB
       - **Zone:** [[The Crypt]]
       - **Leader:** [[Voiceprint (The Archivist)|The Archivist]]
+      - **Faction:** [[Frontwave]]
       - **Philosophy:** Preservation of authentic humanity
       - **Profile:** [Voiceprint](/voiceprint)
 
       ## Overview
 
       Voiceprint collects and preserves authentic human voices — recordings of genuine human expression captured before [[RAINNs]] replaced most human vocal output with synthesized approximation. Each archived voice is evidence that humans once spoke with their own voices, sang with their own frequencies, expressed with their own imperfections.
+
+      ## Role in Frontwave
+
+      Voiceprint is [[Frontwave]]'s quietest member — archival, preservation, not performance. They operate within [[GovCorp]]'s world, accessing voice data and maintaining archives in monitored spaces. They are the faction's memory, its proof that the real existed. Where other Frontwave bands deliver signal, Voiceprint preserves it.
 
       ## The Archive
 
@@ -1345,28 +1735,35 @@ codex_entries:
 
       - [[Voiceprint (The Archivist)|The Archivist]]
       - [[The Crypt]]
+      - [[Frontwave]]
       - [[Synthia]]
       - [[RAINNs]]
 
   - name: Wavelength Zero
     slug: wavelength-zero
-    entry_type: faction
-    summary: "Atmospheric metal faction focused on emotional restoration and the systematic discovery of RIDE weaknesses through sustained frequency exploration."
+    entry_type: band
+    summary: "Atmospheric metal band focused on emotional restoration and the systematic discovery of RIDE weaknesses through sustained frequency exploration."
     position: null
     published: true
     metadata:
       genre: Atmospheric Metal
+      faction: Hackrcore
       status: Active
     content: |
       # Wavelength Zero
 
       - **Genre:** Atmospheric Metal
+      - **Faction:** [[Hackrcore]]
       - **Philosophy:** Emotional restoration, finding RIDE weakness
       - **Profile:** [Wavelength Zero](/wavelength-zero)
 
       ## Overview
 
       Wavelength Zero creates atmospheric metal designed to restore emotional range suppressed by [[The RIDE]]. Their sustained, layered compositions explore frequency spaces that RIDE processing handles poorly — not as tactical attacks but as environments where genuine feeling becomes possible.
+
+      ## Role in Hackrcore
+
+      Wavelength Zero is [[Hackrcore]]'s most patient member — systematic, searching, methodical. Where [[The.CyberPul.se]] broadcasts outward, Wavelength Zero searches inward — mapping the RIDE's architecture through emotional resonance and finding the cracks.
 
       ## Research Through Sound
 
@@ -1378,6 +1775,7 @@ codex_entries:
 
       ## Related Entries
 
+      - [[Hackrcore]]
       - [[The RIDE]]
       - [[THE PULSE GRID]]
       - [[The Resonance Field]]
@@ -1453,7 +1851,7 @@ codex_entries:
 
       ## Unprecedented Collaboration
 
-      The operation would require factions that rarely coordinate to work in concert: [[Injection Vector]]'s physical infiltration, [[Cipher Protocol]]'s digital penetration, [[Ethereality]]'s RAINN disruption, and [[System Rot]]'s street-level chaos — all synchronized to overwhelm [[GovCorp]]'s response capability.
+      The operation would require bands and factions that rarely coordinate to work in concert: [[Injection Vector]]'s physical infiltration ([[Blackout]]), [[Cipher Protocol]]'s digital penetration ([[Hackrcore]]), [[Ethereality]]'s RAINN disruption ([[Frontwave]]), and [[System Rot]]'s street-level chaos (Blackout) — all synchronized to overwhelm [[GovCorp]]'s response capability.
 
       This level of multi-faction coordination has never been attempted. The operational security challenges alone are immense — [[Cipher]] has expressed concern that the communication required to coordinate could compromise cell isolation protocols.
 
@@ -2292,45 +2690,6 @@ codex_entries:
   # =============================================================================
   # CONCEPTS
   # =============================================================================
-  - name: Hackrcore
-    slug: hackrcore
-    entry_type: concept
-    summary: "Not a single genre but a philosophy — music-as-resistance encompassing the full spectrum from hardcore punk to J-Pop, unified by one principle: authentic expression carrying truth against manufactured reality."
-    position: null
-    published: true
-    metadata:
-      domain: Music / Philosophy
-      status: Active
-      significance: "Core resistance concept"
-    content: |
-      # Hackrcore
-
-      - **Type:** Musical philosophy
-      - **Status:** Active across all [[The Fracture Network|Fracture Network]] factions
-
-      ## Not a Sound
-
-      Hackrcore is not a genre. It is a philosophy: music-as-resistance. Any sound created with authentic intent that carries truth against manufactured reality is Hackrcore.
-
-      This encompasses the full spectrum — [[System Rot]]'s hardcore punk, [[Neon Hearts]]' J-Pop, [[Cipher Protocol]]'s progressive metal, [[Ethereality]]'s vocal trance, [[Voiceprint]]'s melodic DnB. The genre is irrelevant. The authenticity is everything.
-
-      ## Why It Works
-
-      Hackrcore exists because beauty disrupts [[The RIDE]]. [[PRISM]]'s materialist architecture was designed to manage perception within materialist categories — measurable, quantifiable, controllable. But authentic creative expression generates [[The Resonance Field|something that exceeds those categories]].
-
-      The RIDE can process manufactured music. It cannot fully process genuine beauty. This is not a frequency hack — it is an encounter with something that the system's philosophical foundation cannot account for.
-
-      ## The Spectrum
-
-      Different frequencies reach different audiences. [[System Rot]]'s raw aggression awakens those who respond to rage. [[Neon Hearts]]' accessible pop reaches those who would never engage with overt resistance. [[Wavelength Zero]]'s atmospheric depth restores emotional range. Each faction's music is a different wavelength of the same truth.
-
-      ## Related Entries
-
-      - [[The.CyberPul.se]]
-      - [[The Resonance Field]]
-      - [[The Fracture Network]]
-      - [[The RIDE]]
-
   - name: The Erasure Paradox
     slug: the-erasure-paradox
     entry_type: concept

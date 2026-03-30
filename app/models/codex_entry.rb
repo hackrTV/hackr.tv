@@ -24,7 +24,7 @@
 class CodexEntry < ApplicationRecord
   has_paper_trail
 
-  ENTRY_TYPES = %w[person organization event location technology faction item concept].freeze
+  ENTRY_TYPES = %w[person organization event location technology faction band item concept].freeze
 
   # Validations
   validates :name, presence: true

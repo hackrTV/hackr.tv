@@ -250,54 +250,38 @@ Line 2 with [[XERAEN]]`
   })
 
   describe('fallback routes', () => {
-    it('returns codex route for entries without fallbacks', () => {
+    it('returns codex route for all entries (no fallbacks configured)', () => {
       expect(getRouteForSlug('xeraen')).toBe('/codex/xeraen')
       expect(getRouteForSlug('the-fracture-network')).toBe('/codex/the-fracture-network')
+      expect(getRouteForSlug('apex-overdrive')).toBe('/codex/apex-overdrive')
+      expect(getRouteForSlug('blitzbeam')).toBe('/codex/blitzbeam')
     })
 
-    it('returns band profile route for entries with fallbacks', () => {
-      expect(getRouteForSlug('apex-overdrive')).toBe('/apex-overdrive')
-      expect(getRouteForSlug('blitzbeam')).toBe('/blitzbeam')
-    })
-
-    it('returns undefined for non-fallback slugs', () => {
+    it('returns undefined for all slugs when no fallbacks configured', () => {
       expect(getFallbackDisplayName('xeraen')).toBeUndefined()
       expect(getFallbackDisplayName('the-fracture-network')).toBeUndefined()
+      expect(getFallbackDisplayName('apex-overdrive')).toBeUndefined()
+      expect(getFallbackDisplayName('blitzbeam')).toBeUndefined()
     })
 
-    it('returns display name for fallback slugs', () => {
-      expect(getFallbackDisplayName('apex-overdrive')).toBe('Apex Overdrive')
-      expect(getFallbackDisplayName('blitzbeam')).toBe('BlitzBeam+')
-    })
-
-    it('transformMarkdownLinks uses fallback routes', () => {
+    it('transformMarkdownLinks routes to codex', () => {
       const result = transformMarkdownLinks('See [[Apex Overdrive]] for details')
-      expect(result).toBe('See [Apex Overdrive](/apex-overdrive) for details')
+      expect(result).toBe('See [Apex Overdrive](/codex/apex-overdrive) for details')
     })
 
-    it('transformMarkdownLinks uses fallback display names', () => {
-      const result = transformMarkdownLinks('See [[apex-overdrive]] for details')
-      expect(result).toBe('See [Apex Overdrive](/apex-overdrive) for details')
-    })
-
-    it('transformHtmlLinks uses fallback routes', () => {
+    it('transformHtmlLinks routes to codex', () => {
       const result = transformHtmlLinks('See [[Apex Overdrive]] for details')
-      expect(result).toBe('See <a href="/apex-overdrive">Apex Overdrive</a> for details')
+      expect(result).toBe('See <a href="/codex/apex-overdrive">Apex Overdrive</a> for details')
     })
 
-    it('transformHtmlLinks uses fallback display names', () => {
-      const result = transformHtmlLinks('See [[apex-overdrive]]', undefined, 'codex-link')
-      expect(result).toBe('See <a href="/apex-overdrive" class="codex-link">Apex Overdrive</a>')
-    })
-
-    it('custom text overrides fallback display names', () => {
+    it('custom text overrides display names', () => {
       const result = transformMarkdownLinks('See [[Apex Overdrive|the band]]')
-      expect(result).toBe('See [the band](/apex-overdrive)')
+      expect(result).toBe('See [the band](/codex/apex-overdrive)')
     })
 
-    it('mixes codex entries and fallback entries', () => {
+    it('all entries route to codex', () => {
       const result = transformMarkdownLinks('[[XERAEN]] and [[Apex Overdrive]] work together')
-      expect(result).toBe('[XERAEN](/codex/xeraen) and [Apex Overdrive](/apex-overdrive) work together')
+      expect(result).toBe('[XERAEN](/codex/xeraen) and [Apex Overdrive](/codex/apex-overdrive) work together')
     })
   })
 
