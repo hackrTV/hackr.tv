@@ -3,59 +3,59 @@ artist:
   genre: "Hackrcore"
 
 releases:
-  - slug: hackr-nights
-    title: "Hackr Nights"
-    release_type: single
-    label: "hackr.fm"
-    tracks:
-      - title: "Hackr Nights"
-        slug: hackr-nights
-        track_number: 1
-        duration: "3:29"
-        lyrics: |
-          In hidden streams, we find our path
-          Silent strikes, a hackr's wrath
-          Lines of fire through circuits weave
-          Send the signal of truth conceived
-
-          The system cracks, they can't defend
-          This digital war will soon end
-          We're the Pulse in every node
-          Our future's hidden in the code
-
-          Hackr nights and neon lights
-          We take the fight to unknown heights
-          Weapons forged in lines of code
-          Together we break their hold
-
-          Ciphers in the binary
-          Echoes of our liberty
-          The message, revealed tonight
-          In the dark, we start the fight
-
-          Drones above, the city cold
-          But with the code, we take control
-          From underground, we send the spark
-          To light the truth within the dark
-
-          The system cracks, they can't defend
-          This digital war will soon end
-          We're the Pulse in every node
-          Our future's hidden in the code
-
-          Hackr nights and neon lights
-          We take the fight to unknown heights
-          Weapons forged in lines of code
-          Together we break their hold
-
-          Ciphers in the binary
-          Echoes of our liberty
-          The message, revealed tonight
-          In the dark, we start the fight
-
-          In fragments, we reclaim the night
-          A spark, a hack - our silent light
-          From shadows deep, a world rewrites
+  # - slug: hackr-nights
+  #   title: "Hackr Nights"
+  #   release_type: single
+  #   label: "hackr.fm"
+  #   tracks:
+  #     - title: "Hackr Nights"
+  #       slug: hackr-nights
+  #       track_number: 1
+  #       duration: "3:29"
+  #       lyrics: |
+  #         In hidden streams, we find our path
+  #         Silent strikes, a hackr's wrath
+  #         Lines of fire through circuits weave
+  #         Send the signal of truth conceived
+  #
+  #         The system cracks, they can't defend
+  #         This digital war will soon end
+  #         We're the Pulse in every node
+  #         Our future's hidden in the code
+  #
+  #         Hackr nights and neon lights
+  #         We take the fight to unknown heights
+  #         Weapons forged in lines of code
+  #         Together we break their hold
+  #
+  #         Ciphers in the binary
+  #         Echoes of our liberty
+  #         The message, revealed tonight
+  #         In the dark, we start the fight
+  #
+  #         Drones above, the city cold
+  #         But with the code, we take control
+  #         From underground, we send the spark
+  #         To light the truth within the dark
+  #
+  #         The system cracks, they can't defend
+  #         This digital war will soon end
+  #         We're the Pulse in every node
+  #         Our future's hidden in the code
+  #
+  #         Hackr nights and neon lights
+  #         We take the fight to unknown heights
+  #         Weapons forged in lines of code
+  #         Together we break their hold
+  #
+  #         Ciphers in the binary
+  #         Echoes of our liberty
+  #         The message, revealed tonight
+  #         In the dark, we start the fight
+  #
+  #         In fragments, we reclaim the night
+  #         A spark, a hack - our silent light
+  #         From shadows deep, a world rewrites
 
   - slug: livestream-archive
     title: "Livestream Archive"

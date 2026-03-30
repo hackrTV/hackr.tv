@@ -8,7 +8,7 @@ releases:
     release_type: ep
     label: "hackr.fm"
     release_date: "2123-09-09"
-    cover_image: "unplugged.jpg"
+    cover_image: "images/unplugged.jpg"
     tracks:
       - title: "Disconnect"
         slug: disconnect

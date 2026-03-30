@@ -8,7 +8,7 @@ releases:
     release_type: ep
     label: "hackr.fm"
     release_date: "2123-05-17"
-    cover_image: "transcendency.jpg"
+    cover_image: "images/transcendency.jpg"
     tracks:
       - title: "Awakening"
         slug: awakening

@@ -22,6 +22,7 @@ interface PlaylistTrack {
   }
   release?: {
     cover_url: string | null
+    cover_urls?: { thumbnail: string; standard: string; full: string }
   }
   duration: string | null
 }
@@ -122,6 +123,7 @@ export const RadioPage: React.FC = () => {
               title: track.title,
               artist: track.artist.name,
               coverUrl: track.release?.cover_url || '',
+              coverUrls: track.release?.cover_urls,
               duration: track.duration
             }))
             .filter((track: TrackData) => track.url) // Only include tracks with audio

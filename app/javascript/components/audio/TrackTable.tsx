@@ -11,11 +11,17 @@ import { CreatePlaylistModal } from '~/components/playlists/CreatePlaylistModal'
 import { ContextMenu } from '~/components/shared/ContextMenu'
 import type { ContextMenuItem } from '~/components/shared/ContextMenu'
 
+interface CoverUrls {
+  thumbnail: string
+  standard: string
+  full: string
+}
+
 interface Track {
   id: number
   title: string
   artist: { name: string; slug?: string; genre: string | null }
-  release: { name: string; cover_url: string | null }
+  release: { name: string; cover_url: string | null; cover_urls?: CoverUrls }
   audio_url: string | null
 }
 
@@ -69,7 +75,8 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
           url: track.audio_url!,
           title: track.title,
           artist: track.artist.name,
-          coverUrl: track.release.cover_url || ''
+          coverUrl: track.release.cover_url || '',
+          coverUrls: track.release.cover_urls
         }))
 
       // Check if switching from radio station before setting new playlist
@@ -89,7 +96,8 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
         url: track.audio_url,
         title: track.title,
         artist: track.artist.name,
-        coverUrl: track.release.cover_url || ''
+        coverUrl: track.release.cover_url || '',
+        coverUrls: track.release.cover_urls
       })
       setCurrentTrackId(track.id)
       setIsPlaying(true)
@@ -215,7 +223,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({ tracks, initialFilter = 
           {track.release.cover_url ? (
             <>
               <img
-                src={track.release.cover_url}
+                src={track.release.cover_urls?.thumbnail || track.release.cover_url}
                 alt={track.release.name}
                 style={{
                   width: '40px',

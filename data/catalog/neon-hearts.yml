@@ -8,7 +8,7 @@ releases:
     release_type: ep
     label: "hackr.fm"
     release_date: "2124-12-28"
-    cover_image: "saccharine.jpg"
+    cover_image: "images/saccharine.jpg"
     tracks:
       - title: "Candy Coded"
         slug: candy-coded

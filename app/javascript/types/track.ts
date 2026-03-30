@@ -1,9 +1,16 @@
+export interface CoverUrls {
+  thumbnail: string;
+  standard: string;
+  full: string;
+}
+
 export interface TrackData {
   id: string;
   url: string;
   title: string;
   artist: string;
   coverUrl: string;
+  coverUrls?: CoverUrls;
 }
 
 export interface StationContext {

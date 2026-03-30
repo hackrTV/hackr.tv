@@ -24,9 +24,6 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Disable image variants to avoid image_processing gem requirement
-  # (we don't use image variants in this application)
-  config.active_storage.variant_processor = nil
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true

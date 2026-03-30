@@ -483,7 +483,8 @@ class Api::GridController < ApplicationController
           title: track.title,
           artist: track.artist.name,
           url: track.audio_file.attached? ? url_for(track.audio_file) : nil,
-          coverUrl: track.release&.cover_image&.attached? ? url_for(track.release.cover_image) : ""
+          coverUrl: track.release&.cover_image&.attached? ? url_for(track.release.cover_image) : "",
+          coverUrls: track.release ? cover_urls_for(track.release) : nil
         }
       end
     }

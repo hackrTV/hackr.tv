@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# bin/cover-prep — Resize and optimize a cover image for hackr.tv
+# Usage: bin/cover-prep <source> <output>
+#
+# Produces a 600x600 center-crop JPEG at quality 85 with EXIF stripped.
+
+set -euo pipefail
+
+if [ $# -ne 2 ]; then
+  echo "Usage: bin/cover-prep <source> <output>"
+  echo "Resizes to 600x600 center-crop, JPEG q85, strips EXIF."
+  exit 1
+fi
+
+SOURCE="$1"
+OUTPUT="$2"
+
+if [ ! -f "$SOURCE" ]; then
+  echo "Error: source file not found: $SOURCE"
+  exit 1
+fi
+
+convert "$SOURCE" -resize 600x600^ -gravity center -extent 600x600 -quality 85 -strip "$OUTPUT"
+echo "Created: $OUTPUT ($(identify -format '%wx%h %m' "$OUTPUT"))"

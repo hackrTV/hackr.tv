@@ -8,7 +8,7 @@ releases:
     release_type: ep
     label: "hackr.fm"
     release_date: "2124-06-21"
-    cover_image: "physical_layer.jpg"
+    cover_image: "images/physical_layer.jpg"
     tracks:
       - title: "Breach Point"
         slug: breach-point

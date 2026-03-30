@@ -19,6 +19,7 @@ interface Release {
   release_date: string | null
   description: string | null
   cover_url: string | null
+  cover_urls?: { thumbnail: string; standard: string; full: string }
 }
 
 interface Artist {

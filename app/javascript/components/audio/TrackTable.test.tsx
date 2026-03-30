@@ -305,7 +305,8 @@ describe('TrackTable', () => {
         url: 'https://example.com/track1.mp3',
         title: 'Track One',
         artist: 'Artist A',
-        coverUrl: 'https://example.com/cover1.jpg'
+        coverUrl: 'https://example.com/cover1.jpg',
+        coverUrls: undefined
       })
     })
 
