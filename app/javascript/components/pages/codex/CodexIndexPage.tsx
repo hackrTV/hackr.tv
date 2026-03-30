@@ -12,6 +12,7 @@ const ENTRY_TYPE_COLORS: Record<string, string> = {
   location: '#34d399',    // green
   technology: '#fbbf24',  // yellow
   faction: '#f87171',     // red
+  band: '#fb923c',         // orange
   item: '#a3e635',         // lime
   concept: '#22d3ee'       // cyan
 }
@@ -23,6 +24,7 @@ const ENTRY_TYPE_ICONS: Record<string, string> = {
   location: '📍',
   technology: '⚙️',
   faction: '⚔️',
+  band: '🎸',
   item: '📦',
   concept: '💡'
 }

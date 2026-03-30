@@ -26,8 +26,6 @@ export type CodexMappings = Record<string, string>
  * check this mapping to link to an alternative page (e.g., band profiles)
  */
 export const CODEX_FALLBACK_ROUTES: Record<string, { route: string; displayName: string }> = {
-  'apex-overdrive': { route: '/apex-overdrive', displayName: 'Apex Overdrive' },
-  'blitzbeam': { route: '/blitzbeam', displayName: 'BlitzBeam+' }
 }
 
 /**

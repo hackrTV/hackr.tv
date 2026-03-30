@@ -19,7 +19,9 @@ const ENTRY_TYPE_COLORS: Record<string, string> = {
   location: '#34d399',
   technology: '#fbbf24',
   faction: '#f87171',
-  item: '#a3e635'
+  band: '#fb923c',
+  item: '#a3e635',
+  concept: '#22d3ee'
 }
 
 const ENTRY_TYPE_ICONS: Record<string, string> = {
@@ -29,7 +31,9 @@ const ENTRY_TYPE_ICONS: Record<string, string> = {
   location: '📍',
   technology: '⚙️',
   faction: '⚔️',
-  item: '📦'
+  band: '🎸',
+  item: '📦',
+  concept: '💡'
 }
 
 export const CodexEntryPage: React.FC = () => {

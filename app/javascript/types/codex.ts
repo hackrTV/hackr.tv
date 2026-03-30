@@ -2,7 +2,7 @@ export interface CodexEntry {
   id: number
   name: string
   slug: string
-  entry_type: 'person' | 'organization' | 'event' | 'location' | 'technology' | 'faction' | 'item' | 'concept'
+  entry_type: 'person' | 'organization' | 'event' | 'location' | 'technology' | 'faction' | 'band' | 'item' | 'concept'
   summary: string | null
   content?: string
   metadata: Record<string, string>
