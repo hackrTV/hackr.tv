@@ -121,3 +121,10 @@ hackrs:
     starting_room: hackr-tv-broadcast-station
     env_password_key: NATHAN_PASSWORD
     default_password: signalnoise
+
+  - hackr_alias: Calloway
+    email: calloway@hackr.tv
+    role: operative
+    starting_room: hackr-tv-broadcast-station
+    env_password_key: CALLOWAY_PASSWORD
+    default_password: letitrot
