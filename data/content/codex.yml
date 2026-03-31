@@ -117,7 +117,7 @@ codex_entries:
 
       Cascade experiences sound as color, texture, and spatial form. This is not metaphor — her neurology translates audio input into vivid visual-spatial experience. She sees the world in layers that others cannot perceive.
 
-      When she first accessed [[THE PULSE GRID]], she saw what no one else could: the Grid's frequency architecture rendered as landscape. This vision became the blueprint for [[Frequency Gardens]].
+      When she first accessed [[THE PULSE GRID]], she saw what no one else could: the Grid's frequency architecture as physical space. This perception became the blueprint for [[Frequency Gardens]], built within [[The Canopy]]'s natural acoustic isolation.
 
       ## Philosophy
 
@@ -127,7 +127,7 @@ codex_entries:
 
       ## The Frequency Gardens
 
-      Cascade designed and maintains [[Frequency Gardens]], [[Ethereality]]'s zone within the PULSE GRID. Different sound frequencies create different environmental effects — some calm, some energize, some produce states of heightened awareness useful for planning operations.
+      Cascade designed and maintains [[Frequency Gardens]], [[Ethereality]]'s facility within the PULSE GRID. Different sound frequencies create different environmental effects — some calm, some energize, some produce states of heightened awareness useful for planning operations.
 
       ## Related Entries
 
@@ -782,7 +782,7 @@ codex_entries:
 
       ## The Archive
 
-      Voiceprint's collection is housed in [[The Crypt]] — a digital archive within [[THE PULSE GRID]] where deleted and suppressed data persists. The Archivist maintains this archive with obsessive dedication, cataloguing every sample, cross-referencing every voice, preserving what GovCorp would erase.
+      Voiceprint's collection is housed in [[The Crypt]] — a data recovery facility within [[THE PULSE GRID]] where deleted and suppressed data persists on salvaged physical media. The Archivist maintains this archive with obsessive dedication, cataloguing every sample, cross-referencing every voice, preserving what GovCorp would erase.
 
       It was The Archivist's collection that provided the vocal samples used to build [[Synthia]]'s voice — 1,847 samples of [[Ashlinn]]'s unprocessed vocal expression, unearthed and reconstructed into the synthesis model that allows Synthia to sing across time.
 
@@ -863,7 +863,7 @@ codex_entries:
 
       ## The Archive Discovery
 
-      In 2124, XERAEN discovered something unexpected in the data archives beneath [[THE PULSE GRID]]: century-old timestamped chat logs. Messages from the 2020s — from people who had decoded his broadcasts and were responding to them. The messages referenced specific transmissions by timestamp with absolute UTC precision.
+      In 2124, XERAEN discovered something unexpected in the data archives within [[THE PULSE GRID]]: century-old timestamped chat logs. Messages from the 2020s — from people who had decoded his broadcasts and were responding to them. The messages referenced specific transmissions by timestamp with absolute UTC precision.
 
       He was reading his own audience's reactions, preserved by nothing more than the passage of time. The "reverse channel" he had never thought possible wasn't a channel at all — it was history.
 
@@ -1378,7 +1378,7 @@ codex_entries:
 
       ## The Frequency Gardens
 
-      Ethereality operates from [[Frequency Gardens]], a zone within [[THE PULSE GRID]] designed by Cascade where sound becomes landscape. Different frequencies create different environmental effects — spaces for meditation, planning, and the simple experience of unfiltered thought.
+      Ethereality operates from [[Frequency Gardens]], a facility within [[THE PULSE GRID]] designed by Cascade — acoustic architecture shaped by synesthetic perception. Different frequencies create different environmental effects — spaces for meditation, planning, and the simple experience of unfiltered thought.
 
       ## Related Entries
 
@@ -1829,8 +1829,8 @@ codex_entries:
       - [[The RIDE]]
       - [[Trans-Temporal Transmission]]
 
-  - name: Operation Blackout
-    slug: operation-blackout
+  - name: Operation Flashpoint
+    slug: operation-flashpoint
     entry_type: event
     summary: "A planned coordinated attack on RIDE infrastructure involving multiple Fracture Network factions working together — an unprecedented collaboration still in its planning stages."
     position: null
@@ -1840,7 +1840,7 @@ codex_entries:
       status: "Planning stage"
       significance: Multi-faction coordination
     content: |
-      # Operation Blackout
+      # Operation Flashpoint
 
       - **Type:** Planned coordinated operation
       - **Status:** Planning stage
@@ -1848,7 +1848,7 @@ codex_entries:
 
       ## Overview
 
-      Operation Blackout is a proposed coordinated strike against [[The RIDE]] infrastructure — simultaneous attacks across multiple vectors designed to create widespread, sustained gaps in reality manipulation coverage.
+      Operation Flashpoint is a proposed coordinated strike against [[The RIDE]] infrastructure — simultaneous attacks across multiple vectors designed to create widespread, sustained gaps in reality manipulation coverage.
 
       ## Unprecedented Collaboration
 
@@ -1964,78 +1964,79 @@ codex_entries:
   - name: Echo Chamber
     slug: echo-chamber
     entry_type: location
-    summary: "A zone within THE PULSE GRID where every WIRE pulse ever transmitted is preserved — a living archive of resistance communication, including pulses that were composed but never sent."
+    summary: "A physical archive facility in The Basin housing every WIRE pulse ever transmitted — the complete record of resistance communication, preserved on hardened storage in a region that has been archiving human expression for centuries."
     position: null
     published: true
     metadata:
-      type: Archive / Communication hub
-      zone: THE PULSE GRID
+      type: Physical archive / Communication hub
+      region: The Basin
       access: Fracture Network operatives
       status: Active
     content: |
       # Echo Chamber
 
-      - **Type:** Archive / Communication hub
+      - **Type:** Physical archive / Communication hub
       - **Status:** Active
-      - **Location:** [[THE PULSE GRID]]
+      - **Region:** [[The Basin]]
       - **Function:** Preservation of all [[The WIRE|WIRE]] communications
 
       ## Overview
 
-      The Echo Chamber preserves every pulse ever transmitted through [[The WIRE]] — every message, every echo, every splice. A complete record of resistance communication, searchable and permanent.
+      The Echo Chamber is a fortified archive facility hidden within [[The Basin]]'s entertainment infrastructure — a region that has been archiving human expression for centuries, where one more archive draws no attention.
 
-      ## The Unsent Archive
+      Inside, rows of hardened storage media preserve every pulse ever transmitted through [[The WIRE]] — every message, every echo, every splice. Access terminals line the walls of a reinforced building designed for preservation and retrieval. The complete record of resistance communication, searchable and permanent.
 
-      The Echo Chamber contains an anomaly: pulses that were composed but never transmitted. Messages written and deleted before sending. Drafts that existed only in the composer's buffer before being discarded.
+      ## The Facility
 
-      How these unsent pulses appear in the archive is unexplained. The leading theory involves the quantum substrate — [[PRISM]]'s reality manipulation technology may inadvertently preserve intentional states, capturing the moment of composition regardless of whether transmission follows.
-
-      The unsent archive is rarely accessed. Reading someone's discarded thoughts feels like a violation, even in wartime. But the data exists, and its existence raises questions about the nature of intention, expression, and the boundary between thought and action in a world where reality itself is manipulated.
+      The physical design prioritizes durability and redundancy. Multiple copies on independent storage systems. Environmental controls to protect the media. Restricted access points monitored by [[The Fracture Network]] operatives. The building itself is unremarkable from outside — architecturally consistent with the surrounding [[The Basin|Basin]] infrastructure, invisible to [[GovCorp]] surveillance sweeps looking for resistance signatures.
 
       ## Related Entries
 
       - [[The WIRE]]
       - [[THE PULSE GRID]]
-      - [[PRISM]]
+      - [[The Basin]]
+      - [[The Slipstream]]
 
   - name: Frequency Gardens
     slug: frequency-gardens
     entry_type: location
-    summary: "Ethereality's zone within THE PULSE GRID — a space where sound becomes landscape, designed by synesthete Cascade for meditation, planning, and the experience of unfiltered thought."
+    summary: "A physical facility in The Canopy designed by synesthete Cascade using acoustic architecture — real rooms engineered to produce specific environments for meditation, planning, and encounters with unfiltered thought."
     position: null
     published: true
     metadata:
-      type: Faction zone
-      zone: THE PULSE GRID
+      type: Acoustic facility / Faction zone
+      region: The Canopy
       control: Ethereality
       status: Active
     content: |
       # Frequency Gardens
 
-      - **Type:** Faction zone
+      - **Type:** Acoustic facility / Faction zone
       - **Status:** Active
-      - **Location:** [[THE PULSE GRID]]
+      - **Region:** [[The Canopy]]
       - **Control:** [[Ethereality]]
       - **Designer:** [[Cascade]]
 
       ## Overview
 
-      The Frequency Gardens exist at the intersection of sound and space. Designed by [[Cascade]] using her synesthetic perception, the Gardens translate audio frequencies into environmental experience — a zone where sound literally becomes landscape.
+      The Frequency Gardens are a physical facility in [[The Canopy]], designed by [[Cascade]] using her synesthetic perception. Real rooms with real acoustic properties — resonating chambers, architectural surfaces chosen for their frequency response. [[Cascade]] sees sound as color and shape; she designed spaces where acoustic architecture produces specific physical and psychological environments.
+
+      [[The Canopy]]'s dense biomass provides natural [[The RIDE|RIDE]] attenuation, creating a foundation that supports the acoustic work. The facility is built into the region's infrastructure, its presence masked by the surrounding environment.
 
       ## Environmental Effects
 
-      Different frequencies create different experiences within the Gardens:
+      Different rooms produce different experiences through physical acoustic engineering:
 
-      - **Low frequencies** produce dense, grounding environments — spaces for rest and recovery
-      - **Mid-range harmonics** create open, clear spaces conducive to strategic planning
-      - **High-frequency combinations** generate states of heightened awareness — clarity that the RIDE's perceptual management cannot replicate
-      - **Specific chord structures** create encounters with beauty so genuine that [[RAINNs|RAINN]] monitoring cannot categorize them — processing effectively stalls
+      - **Low-frequency chambers** use resonating surfaces and room dimensions tuned to produce dense, grounding environments — spaces for rest and recovery
+      - **Mid-range rooms** feature open geometries and reflective materials that create clear acoustic spaces conducive to strategic planning
+      - **High-frequency suites** combine architectural precision with specific material properties to generate states of heightened awareness — clarity that [[The RIDE]]'s perceptual management cannot replicate
+      - **Harmonic halls** produce encounters with beauty so genuine that [[RAINNs|RAINN]] monitoring cannot categorize them — processing effectively stalls
 
       ## Purpose
 
-      The Gardens serve [[The Fracture Network]] as a space where genuine thought is possible. Within their boundaries, [[The RIDE]]'s perceptual management is effectively suspended — not through brute-force disruption but through acoustic environments that RAINN monitoring cannot efficiently process.
-
       Resistance requires rest. Fighters need spaces where they can remember what they're fighting for. The Frequency Gardens provide this.
+
+      The Gardens serve [[The Fracture Network]] as a space where genuine thought is possible — not through brute-force disruption of [[The RIDE]] but through physical acoustic environments that [[RAINNs|RAINN]] monitoring cannot efficiently process.
 
       ## Related Entries
 
@@ -2043,16 +2044,18 @@ codex_entries:
       - [[Ethereality]]
       - [[THE PULSE GRID]]
       - [[RAINNs]]
+      - [[The Canopy]]
+      - [[The Slipstream]]
 
   - name: Neon District
     slug: neon-district
     entry_type: location
-    summary: "Neon Hearts' zone within THE PULSE GRID — a vibrant space of color and pop aesthetics that disguises serious resistance operations beneath accessible surfaces."
+    summary: "Neon Hearts' entertainment corridor in The Narrows — a strip of clubs, venues, and galleries hiding serious resistance operations beneath pop aesthetics in the most RIDE-saturated zone on the continent."
     position: null
     published: true
     metadata:
       type: Faction zone
-      zone: THE PULSE GRID
+      region: The Narrows
       control: Neon Hearts
       status: Active
     content: |
@@ -2060,20 +2063,24 @@ codex_entries:
 
       - **Type:** Faction zone
       - **Status:** Active
-      - **Location:** [[THE PULSE GRID]]
+      - **Region:** [[The Narrows]]
       - **Control:** [[Neon Hearts]]
 
       ## Overview
 
-      The Neon District is [[Neon Hearts]]' domain — a zone that embodies the faction's philosophy of hiding substance beneath surface. Bright colors, pop aesthetics, and an atmosphere of accessible fun disguise the serious resistance operations happening within.
+      The Neon District is [[Neon Hearts]]' domain — a physical venue corridor in the most densely packed, neon-saturated urban zone on the continent. [[Neon Hearts]] operates what looks like a commercial entertainment strip: clubs, venues, galleries. The kind of thing [[The Narrows]] produces endlessly.
 
-      The visual design is deliberate: [[GovCorp]] surveillance algorithms are calibrated to detect resistance aesthetics — dark spaces, encrypted communications, counter-cultural markers. The Neon District looks like entertainment. It is the most dangerous kind of resistance: the kind that doesn't look like resistance at all.
+      [[GovCorp]] surveillance algorithms are calibrated for resistance aesthetics — dark spaces, encrypted communications, counter-cultural markers. They cannot distinguish Neon Hearts from the legitimate entertainment infrastructure surrounding them. The Neon District looks like entertainment. It is the most dangerous kind of resistance: the kind that doesn't look like resistance at all.
+
+      Extremely high-risk location, but [[Frontwave]]'s "hiding in plain sight" philosophy is exactly suited to it. The RIDE saturation that makes [[The Narrows]] dangerous also makes it the perfect camouflage.
 
       ## Related Entries
 
       - [[Neon Hearts]]
       - [[Sora Nexa]]
       - [[THE PULSE GRID]]
+      - [[The Narrows]]
+      - [[The Slipstream]]
 
   - name: Sector X
     slug: sector-x
@@ -2092,15 +2099,18 @@ codex_entries:
       - **Type:** Faction headquarters
       - **Status:** Active
       - **Control:** [[XERAEN]], [[The Fracture Network]]
-      - **Location:** [[THE PULSE GRID]]
+      - **Region:** [[The Lakeshore]]
+      - **Network:** [[THE PULSE GRID]]
 
       ## Overview
 
-      Sector X is [[XERAEN]]'s homebase - a fortress of temporal technology and [[The Fracture Network|Fracture Network]] operations. This is where the impossible mission originates: changing the past to prevent the future.
+      Sector X is [[XERAEN]]'s homebase — a fortress of temporal technology and [[The Fracture Network|Fracture Network]] operations. This is where the impossible mission originates: changing the past to prevent the future.
+
+      Built in the industrial periphery of [[The Lakeshore]], where RIDE coverage thins at the edges of the population center. The infrastructure decay that GovCorp never prioritized repairing becomes the Network's camouflage — sensor gaps in crumbling lakefront industrial zones where nobody lives and nobody looks.
 
       ## The Operations Center
 
-      Purple lighting bathes advanced temporal equipment. Monitors display cascading timelines and probability matrices.
+      Purple lighting bathes advanced temporal equipment. Monitors display cascading timelines and probability matrices. The facility sits in a pre-Consolidation industrial structure — thick concrete and steel that partially attenuates RIDE signal, supplemented by the Network's own shielding.
 
       ## Related Entries
 
@@ -2108,15 +2118,17 @@ codex_entries:
       - [[The Fracture Network]]
       - [[THE PULSE GRID]]
       - [[The Hackr Hangar]]
+      - [[The Lakeshore]]
 
   - name: The Analog Archive
     slug: the-analog-archive
     entry_type: location
-    summary: "A physical facility hidden in abandoned pre-RIDE infrastructure where every Fracture Network creation is preserved on analog formats — the continuity plan if the digital world falls."
+    summary: "Offline's preservation facility in The Badlands — every Fracture Network creation preserved on analog formats, the only Grid zone with zero digital infrastructure. The continuity plan if everything else falls."
     position: null
     published: true
     metadata:
       type: Physical archive
+      region: The Badlands
       control: Offline
       status: Active
       media: "Tape, vinyl, physical storage"
@@ -2126,58 +2138,63 @@ codex_entries:
       - **Type:** Physical archive
       - **Status:** Active
       - **Control:** [[Offline]]
-      - **Location:** Hidden in abandoned pre-RIDE infrastructure
+      - **Region:** [[The Badlands]]
+      - **Network:** [[THE PULSE GRID]]
 
       ## Overview
 
-      The Analog Archive is a physical facility — not a digital space within [[THE PULSE GRID]] but an actual location in the physical world. Hidden in abandoned infrastructure that predates [[The RIDE]], it exists entirely outside [[GovCorp]]'s digital monitoring capability.
+      The Analog Archive is the only [[THE PULSE GRID]] facility with zero digital infrastructure. Every other Grid zone — workshops, studios, archives — uses digital tools and servers alongside its physical space. The Analog Archive has none. Tape. Vinyl. Physical media. Nothing that can be remotely accessed, remotely wiped, or remotely compromised.
+
+      Hidden in the sparse, barely-monitored expanse of [[The Badlands]], where [[The RIDE|RIDE]] coverage is thin by design and [[GovCorp]] allocates minimal rendering resources. [[Offline]]'s philosophy of complete disconnection finds its natural geography here.
 
       ## RIDE-Proof Storage
 
-      Every Fracture Network broadcast, every resistance recording, every track created by every faction is preserved here on analog formats: tape, vinyl, physical media that cannot be remotely wiped, digitally corrupted, or disappeared by GovCorp content purges.
+      Every Fracture Network broadcast, every resistance recording, every track created by every faction is preserved here on analog formats. Physical media that cannot be remotely wiped, digitally corrupted, or disappeared by GovCorp content purges.
 
-      Digital is fragile. Digital lives at GovCorp's pleasure. A vinyl record in a hidden vault requires physical destruction to erase.
+      A vinyl record in a hidden vault requires physical destruction to erase.
 
       ## The Continuity Plan
 
-      If [[THE PULSE GRID]] falls, if [[The WIRE]] is compromised, if every digital system the Fracture Network relies on is destroyed — the Archive endures. It is proof that exists outside their systems. Evidence that cannot be erased by the systems it documents.
+      If the Grid's facilities are compromised, if [[The WIRE]] falls, if every digital system the Fracture Network relies on is destroyed — the Archive endures. It is proof that exists outside their systems. Evidence that cannot be erased by the systems it documents.
 
       ## Related Entries
 
       - [[Offline]]
       - [[The Fracture Network]]
       - [[Voiceprint]]
+      - [[The Badlands]]
+      - [[The Slipstream]]
 
   - name: The Crypt
     slug: the-crypt
     entry_type: location
-    summary: "A digital graveyard within THE PULSE GRID where deleted data persists — Voiceprint's domain and the hidden archive of GovCorp's erased history."
+    summary: "Voiceprint's domain in The Straits — a fortified data recovery facility housing evidence that GovCorp believed permanently destroyed, recovered from decommissioned hardware in the industrial ruins surrounding it."
     position: null
     published: true
     metadata:
-      type: Digital archive / Data graveyard
-      zone: THE PULSE GRID
+      type: Physical archive / Data recovery facility
+      region: The Straits
       control: Voiceprint
       status: Active
     content: |
       # The Crypt
 
-      - **Type:** Digital archive / Data graveyard
+      - **Type:** Physical archive / Data recovery facility
       - **Status:** Active
-      - **Location:** [[THE PULSE GRID]]
+      - **Region:** [[The Straits]]
       - **Control:** [[Voiceprint]]
 
       ## Overview
 
-      The Crypt is where deleted data goes to persist. A zone within [[THE PULSE GRID]] built on the principle that digital deletion is rarely complete — fragments, echoes, and shadows of erased data continue to exist in quantum substrate states that conventional systems cannot access but that the PULSE GRID's architecture can recover.
+      The Crypt is a fortified data recovery facility hidden in the massive industrial ruins of [[The Straits]] — structures too large to demolish, too contaminated to repurpose. The Crypt houses data recovered from [[GovCorp]] systems through physical extraction: storage media pulled from disposal sites, hardware salvaged from decommissioned facilities. Digital deletion is rarely complete. The persistence of deleted data comes from physical media survival — fragments preserved on drives and servers that GovCorp discarded but never destroyed.
 
       ## Voiceprint's Domain
 
-      [[Voiceprint (The Archivist)|The Archivist]] maintains The Crypt as [[Voiceprint]]'s operational base. The voice archive — 1,847 samples of [[Ashlinn]]'s unprocessed vocals, thousands more from other sources — is housed here alongside recovered data that [[GovCorp]] believed permanently destroyed.
+      [[Voiceprint (The Archivist)|The Archivist]] maintains The Crypt as [[Voiceprint]]'s operational base. Hardened storage racks, physical servers, recovered hardware line the facility. The voice archive — 1,847 samples of [[Ashlinn]]'s unprocessed vocals, thousands more from other sources — is housed here alongside recovered data that [[GovCorp]] believed permanently destroyed.
 
       ## The Hidden Archive
 
-      The Crypt contains recovered evidence of GovCorp's erased atrocities — behavioral modification records, reconditioning logs, population management directives deleted from official systems but recoverable from the quantum substrate. This data is psychologically demanding to navigate. The weight of documented suffering takes a toll on those who access it.
+      The Crypt contains recovered evidence of GovCorp's erased atrocities — behavioral modification records, reconditioning logs, population management directives deleted from official systems but recovered from physical media. This data is psychologically demanding to navigate. The weight of documented suffering takes a toll on those who access it.
 
       ## Related Entries
 
@@ -2185,73 +2202,79 @@ codex_entries:
       - [[Voiceprint (The Archivist)|The Archivist]]
       - [[THE PULSE GRID]]
       - [[Ashlinn]]
+      - [[The Straits]]
+      - [[The Slipstream]]
 
   - name: The Fault Line
     slug: the-fault-line
     entry_type: location
-    summary: "An unstable zone where THE RIDE and THE PULSE GRID overlap — reality glitches and temporal echoes make it dangerous but invaluable for infiltration operations."
+    summary: "An unstable border zone in The Front where RIDE coverage degrades against extreme terrain — reality glitches and temporal echoes make it dangerous but invaluable for infiltration operations between managed and unmanaged territory."
     position: null
     published: true
     metadata:
-      type: Unstable zone
-      zone: "RIDE/PULSE GRID boundary"
+      type: Unstable border zone
+      region: The Front
       status: "Active (unstable)"
       danger_level: High
     content: |
       # The Fault Line
 
-      - **Type:** Unstable boundary zone
+      - **Type:** Unstable border zone
       - **Status:** Active (unstable)
-      - **Location:** [[The RIDE]] / [[THE PULSE GRID]] boundary
+      - **Region:** [[The Front]]
 
       ## Overview
 
-      The Fault Line exists where [[The RIDE]]'s managed reality and [[THE PULSE GRID]]'s resistance infrastructure overlap. Neither system has full control. The result is instability — reality glitches, temporal echoes, perceptual artifacts that belong to neither system.
+      The Fault Line is not a single facility but a region — the high-altitude border zone in [[The Front]] where [[The RIDE]]'s coverage genuinely degrades due to extreme vertical variation and the proximity of [[The Fracture Network]]'s operations. The interference is physical: the Network's equipment and [[GovCorp]]'s rendering infrastructure create mutual disruption, like radio interference between neighboring transmitters. [[The RIDE|RIDE]] rendering stutters. Managed reality flickers.
 
       ## Characteristics
 
-      Hackrs who navigate The Fault Line report experiencing fragments of both systems simultaneously: managed perception layered over resistance infrastructure, glimpses of unfiltered reality bleeding through both. Temporal echoes — moments that repeat or play in reverse — are common.
+      Operatives who navigate The Fault Line experience fragments of both managed and unmanaged perception — [[The RIDE]]'s curated reality layered over raw, unfiltered terrain, each bleeding through the other. Temporal echoes — localized anomalies near Grid facilities where moments repeat or play in reverse — remain a persistent phenomenon.
 
-      The instability makes The Fault Line dangerous but useful. [[GovCorp]] surveillance cannot operate reliably in the overlap zone, making it valuable for infiltration operations and covert movement between RIDE-controlled space and the PULSE GRID.
+      The instability makes The Fault Line dangerous but invaluable. [[GovCorp]] surveillance cannot operate reliably in the disruption zone, making it essential for infiltration operations and covert movement between managed and unmanaged territory.
 
       ## Related Entries
 
       - [[The RIDE]]
       - [[THE PULSE GRID]]
       - [[GovCorp]]
+      - [[The Front]]
+      - [[The Slipstream]]
 
   - name: The Forge
     slug: the-forge
     entry_type: location
-    summary: "Cipher Protocol's domain within THE PULSE GRID — a zone of industrial precision where encryption tools and communication protocols are developed and tested."
+    summary: "Cipher Protocol's workshop in The Works — a physical facility of industrial precision where encryption hardware and communication tools are built, tested, and stress-tested before deployment across the Fracture Network."
     position: null
     published: true
     metadata:
-      type: Faction zone / Development facility
-      zone: THE PULSE GRID
+      type: Workshop / Development facility
+      region: The Works
       control: Cipher Protocol
       status: Active
     content: |
       # The Forge
 
-      - **Type:** Faction zone / Development facility
+      - **Type:** Workshop / Development facility
       - **Status:** Active
-      - **Location:** [[THE PULSE GRID]]
+      - **Region:** [[The Works]]
       - **Control:** [[Cipher Protocol]]
 
       ## Overview
 
-      The Forge is [[Cipher Protocol]]'s domain — an industrial space within [[THE PULSE GRID]] dedicated to the development of encryption tools, communication protocols, and security infrastructure. The aesthetic is mathematical precision: clean lines, structured spaces, everything in its designated place.
+      The Forge is [[Cipher Protocol]]'s domain — an industrial space of concrete, steel, and workbenches dedicated to the development of encryption hardware, communication tools, and security infrastructure. The aesthetic is mathematical precision: clean lines, structured spaces, everything in its designated place. Real manufacturing in a region where [[The RIDE]] curates manufacturing identity as nostalgia.
 
       ## Function
 
-      [[Cipher]] designed The Forge as both workshop and fortress. Encryption algorithms are developed and stress-tested here before deployment across [[The Fracture Network]]. Communication protocols are designed, broken, redesigned, and broken again until they achieve the level of security that Cipher's paranoia demands.
+      [[Cipher]] designed The Forge as both laboratory and fortress. Encryption hardware is built, tested, broken, and redesigned here before deployment across [[The Fracture Network]]. Communication tools are stress-tested until they achieve the level of security that Cipher's paranoia demands.
 
       ## Related Entries
 
       - [[Cipher Protocol]]
       - [[Cipher]]
       - [[THE PULSE GRID]]
+      - [[The Works]]
+      - [[The Slipstream]]
 
   - name: The Hackr Hangar
     slug: the-hackr-hangar
@@ -2261,7 +2284,7 @@ codex_entries:
     published: true
     metadata:
       type: "Broadcast facility / Recording studio"
-      zone: hackr.tv Central
+      region: The Lowlands
       control: Ryker M. Pulse
       status: Active
       relationship: Feeds signal to Sector X
@@ -2271,11 +2294,14 @@ codex_entries:
       - **Type:** Broadcast facility / Recording studio
       - **Status:** Active
       - **Control:** [[Ryker M. Pulse]], [[The.CyberPul.se]]
-      - **Location:** hackr.tv Central, [[THE PULSE GRID]]
+      - **Region:** [[The Lowlands]]
+      - **Network:** [[THE PULSE GRID]]
 
       ## Overview
 
-      The Hackr Hangar is [[Ryker M. Pulse|Ryker's]] domain - where [[The.CyberPul.se]]'s raw signal is created. While [[XERAEN]] handles the trans-temporal transmission from [[Sector X]], Ryker builds the broadcasts here.
+      The Hackr Hangar is [[Ryker M. Pulse|Ryker's]] domain — where [[The.CyberPul.se]]'s raw signal is created. While [[XERAEN]] handles the trans-temporal transmission from [[Sector X]], Ryker builds the broadcasts here.
+
+      Located in the outskirts of [[The Lowlands]], in the river country where music has seeped into the substrate for centuries. The region's deep history as a birthplace of music left something in the landscape that even [[The RIDE]] couldn't fully overwrite. [[The Fracture Network]] built here because [[The Resonance Field|the resonance]] is stronger. The geography remembers.
 
       ## The Space
 
@@ -2289,17 +2315,18 @@ codex_entries:
       - [[The.CyberPul.se]]
       - [[Sector X]]
       - [[XERAEN]]
+      - [[The Lowlands]]
 
   - name: THE PULSE GRID
     slug: the-pulse-grid
     entry_type: location
-    summary: "The Fracture Network's digital battleground — a navigable spatial network spanning two centuries. Hackrs in the 2020s walk the same Grid as operatives in the 2120s, their actions aging into history that shapes resistance operations across time."
+    summary: "The Fracture Network's operational infrastructure — a network of physical facilities across the continent, connected by the Slipstream and spanning two centuries through the signal. Hackrs in the 2020s participate in the Grid's operations from a century away, their authentic choices carried across the temporal gap by something no one built."
     position: null
     published: true
     metadata:
       established: "2115"
       type: Resistance infrastructure
-      scale: "Global (hidden)"
+      scale: "Continental (hidden)"
       access: Fracture Network operatives
     content: |
       # THE PULSE GRID
@@ -2311,39 +2338,43 @@ codex_entries:
 
       ## Overview
 
-      THE PULSE GRID is [[The Fracture Network]]'s primary operational infrastructure — a sophisticated digital network designed to breach [[The RIDE]] and serve as the origin point for [[Trans-Temporal Transmission|trans-temporal transmissions]].
+      THE PULSE GRID is [[The Fracture Network]]'s primary operational infrastructure — a network of physical facilities hidden across the continent in [[The RIDE|RIDE]] coverage gaps, pre-[[The Consolidation|Consolidation]] ruins, and the peripheral infrastructure that [[GovCorp]] never prioritized. Workshops, archives, studios, broadcast stations. Real buildings in real geography. What the RIDE cannot render, it cannot control.
 
       ## The Grid IS a Place
 
-      Hackrs experience THE PULSE GRID as a physical space — rooms, corridors, zones. Operatives navigate the Grid as explorers of a vast digital landscape, issuing commands and moving through spatial architecture that renders resistance infrastructure as traversable territory.
+      Every zone in THE PULSE GRID is a physical facility — a building you can walk into, walls you can touch, air you can breathe. Operatives in the 2120s are bodily present in these places. They travel between them on [[The Slipstream]]. They work, plan, broadcast, and fight from rooms that exist in the unrendered margins of GovCorp's managed world.
 
       ## Zones
 
-      The Grid is organized into distinct zones, each controlled by different factions:
+      The Grid's facilities are distributed across the continent, each in a region chosen for strategic, acoustic, or operational advantage:
 
-      - **[[The Hackr Hangar]]** — [[Ryker M. Pulse|Ryker's]] broadcast facility, where the raw signal originates
-      - **[[Sector X]]** — [[XERAEN]]'s fortress and temporal operations center
-      - **[[The Crypt]]** — [[Voiceprint]]'s digital archive where deleted data persists
-      - **[[Frequency Gardens]]** — [[Ethereality]]'s soundscape zone for meditation and planning
-      - **[[The Fault Line]]** — Unstable boundary where RIDE and PULSE GRID overlap
-      - **[[Echo Chamber]]** — Archive of all [[The WIRE|WIRE]] communications
-      - **[[The Forge]]** — [[Cipher Protocol]]'s encryption development facility
-      - **[[Neon District]]** — [[Neon Hearts]]' pop-aesthetic resistance zone
-      - **[[The Undercity]]** — [[System Rot]]'s street-level territory
+      - **[[Sector X]]** — [[XERAEN]]'s fortress in [[The Lakeshore]], temporal operations center
+      - **[[The Hackr Hangar]]** — [[Ryker M. Pulse|Ryker's]] broadcast facility in [[The Lowlands]], where the raw signal originates
+      - **[[The Arch]]** — Persistent RIDE deadzone at the river confluence between The Lakeshore and The Lowlands
+      - **[[Echo Chamber]]** — Complete [[The WIRE|WIRE]] communication archive in [[The Basin]]
+      - **[[Frequency Gardens]]** — [[Ethereality]]'s acoustic facility in [[The Canopy]], designed by [[Cascade]]
+      - **[[Neon District]]** — [[Neon Hearts]]' entertainment corridor in [[The Narrows]], hiding in plain sight
+      - **[[The Crypt]]** — [[Voiceprint]]'s data recovery facility in [[The Straits]]
+      - **[[The Fault Line]]** — Unstable RIDE border zone in [[The Front]], where managed reality stutters
+      - **[[The Forge]]** — [[Cipher Protocol]]'s encryption workshop in [[The Works]]
+      - **[[The Undercity]]** — [[System Rot]]'s underground territory in [[The Bend]]
+      - **[[The Analog Archive]]** — [[Offline]]'s analog preservation facility in [[The Badlands]]
 
       ## The Temporal Surface
 
-      Like [[The WIRE]], THE PULSE GRID's spatial architecture rides the [[Trans-Temporal Transmission|trans-temporal]] data stream. [[Nathan Clarke]] decoded not just broadcasts and communication protocols but the Grid's navigable structure — its rooms, zones, and command interface. He reconstructed it as a text-based navigable environment accessible through hackr.tv: a MUD in 2020s terms, the Grid in 2120s terms. The same space, separated by a century.
+      [[Nathan Clarke]] decoded more than broadcasts and communication protocols from the [[Trans-Temporal Transmission|trans-temporal]] data stream. He decoded the Grid's layout — its facilities, zones, operational geography. He reconstructed it as a text-based navigable environment accessible through hackr.tv: a MUD in 2020s terms. A map of real places that exist a century in the future.
 
-      Hackrs in the 2020s navigate the same zones as operatives in the 2120s. They see each other in real time. They see 2120s content that arrived through the temporal stream. And every action they take — every room entered, every command issued, every operation participated in — is recorded, ages a hundred years, and becomes historical Grid data in 2126.
-
-      [[XERAEN]] surfaces this century-old activity progressively, the same way he releases historical [[The WIRE|WIRE]] posts. In the 2120s, it appears as contemporary hackr activity. The temporal origin remains hidden from all but the inner circle.
+      When a 2020s hackr enters a room in the MUD, they are interacting with a text representation of a physical facility. When they issue a command, they are making a real choice — a genuine act of will by a whole person, body at keyboard, engaged and present. Those choices generate signal. And the signal crosses the temporal gap.
 
       ## Operations Across Time
 
-      The Grid is not a museum. It is an operational space. Hackrs in the 2020s participate in Fracture Network operations — assaults on [[GovCorp]] facilities, reconnaissance missions, coordinated breaches. Their actions are real. Their contributions matter.
+      The Grid is not a museum. It is an operational space. Hackrs in the 2020s participate in Fracture Network operations — assaults, reconnaissance, coordinated breaches. Their actions are real. Their contributions matter. But the mechanism by which they participate has confounded even [[XERAEN]].
 
-      The mechanism is temporal choreography extended from broadcast to action. XERAEN reads century-old Grid logs — every movement, every decision, every coordinated strike from 2020s hackrs — and designs 2126 operations that incorporate those actions. The hackrs of 2026 experience genuine agency. XERAEN performs the integration of that agency from foreknowledge written by time.
+      **What XERAEN planned:** The same temporal choreography he uses for broadcasts. Read century-old MUD interaction logs — every command, every room entered, every choice made by 2020s hackrs. Design 2126 Grid operations that incorporate those actions at corresponding timestamps. The hackrs of the 2020s experience genuine agency. XERAEN performs the integration of that agency from foreknowledge written by time.
+
+      **What actually happens:** The signal carries their participation without choreography. XERAEN discovered that 2020s hackr actions were manifesting in Grid operations he had not designed to incorporate them. Authentic choices appearing in real-time at facilities across the continent, without his integration, without any mechanism he built. The trans-temporal architecture has no pathway for this. He reviewed everything. There is no explanation.
+
+      It is the same pattern as the 100-year precision — something that exceeds the technology, something that implies an order no one designed. XERAEN stopped choreographing Grid interactions. He still choreographs the broadcasts — that is his craft, his offering. But the Grid operations, he lets the signal do what the signal does. It was doing it before he noticed.
 
       ## Why the Grid Requires Real Hackrs
 
@@ -2353,13 +2384,17 @@ codex_entries:
 
       [[The RIDE]] is built on the premise that manufactured experience can replace authentic experience. [[GovCorp]] scripts reality for billions of people — curating perception, optimizing behavior, treating human beings as variables in an algorithm. If XERAEN fabricated hackr participation to script operations, he would be building a RIDE of his own. Manufactured input optimizing outcomes. People reduced to simulated variables. The enemy's method wearing a resistance uniform.
 
-      What makes hackr input irreplaceable is not complexity but authenticity. [[The Resonance Field]] — the phenomenon that disrupts the RIDE — is generated by genuine expression, real choice, actual human beings acting from their own will. A script produces output. A person produces meaning. The signal works through people, through participation that cannot be mechanized or shortcut. Fabricated action would carry no signal. It would be noise shaped like meaning — which is precisely what the RIDE produces.
+      What makes hackr input irreplaceable is not complexity but authenticity. [[The Resonance Field]] — the phenomenon that disrupts the RIDE — is generated by genuine expression, real choice, actual human beings acting from their own will. A script produces output. A person produces meaning. The signal works through people — through whole persons, body and spirit undivided, participating from wherever they are. Fabricated action would carry no signal. It would be noise shaped like meaning — which is precisely what the RIDE produces.
 
       The hackrs' dignity is not a constraint on operational planning. It is the source of the operation's power.
 
       ## Access
 
-      In the 2120s, access requires modified interfaces and Fracture Network authentication. In the 2020s, hackrs access the Grid through hackr.tv — navigating the same spatial architecture through a text-based interface decoded from the temporal stream. [[GovCorp]] knows the Grid exists but cannot locate or penetrate its infrastructure. They have never accounted for the possibility that it spans two centuries.
+      In the 2120s, access means physically being there. Operatives travel to Grid facilities on [[The Slipstream]] and work from within the buildings themselves. In the 2020s, hackrs access the Grid through hackr.tv — a text-based interface that maps to the Grid's physical layout, decoded from the temporal stream by [[Nathan Clarke]]. [[GovCorp]] knows the Grid exists but cannot locate or penetrate its facilities. They have never accounted for the possibility that it spans two centuries.
+
+      ## Transit
+
+      The Grid spans the geography of the physical world. Zones map to regions — [[The Hackr Hangar]] in [[The Lowlands]], [[Sector X]] in [[The Lakeshore]], faction territories distributed across the continent. Traversing these distances requires [[The Slipstream]] — GovCorp's automated transportation infrastructure, repurposed by the Fracture Network. Operatives board at service access points and travel between facilities on the enemy's own freight and maintenance rail, without appearing in any passenger manifest.
 
       ## Related Entries
 
@@ -2372,16 +2407,18 @@ codex_entries:
       - [[The Relay Project]]
       - [[The Resonance Field]]
       - [[Trans-Temporal Transmission]]
+      - [[The Slipstream]]
+      - [[The Consolidation]]
 
   - name: The Undercity
     slug: the-undercity
     entry_type: location
-    summary: "System Rot's territory within THE PULSE GRID — graffiti-covered, raw, and cathartic. Repurposed infrastructure where the punk ethos of accelerated collapse finds its physical expression."
+    summary: "System Rot's underground territory in The Bend — repurposed flood control tunnels and utility corridors below the water table, where the punk ethos of accelerated collapse finds its physical expression beneath a city of curated celebration."
     position: null
     published: true
     metadata:
       type: Faction zone
-      zone: THE PULSE GRID
+      region: The Bend
       control: System Rot
       status: Active
     content: |
@@ -2389,12 +2426,12 @@ codex_entries:
 
       - **Type:** Faction zone
       - **Status:** Active
-      - **Location:** [[THE PULSE GRID]]
+      - **Region:** [[The Bend]]
       - **Control:** [[System Rot]]
 
       ## Overview
 
-      The Undercity is [[System Rot]]'s territory — repurposed infrastructure at the lowest levels of [[THE PULSE GRID]], where abandoned digital architecture has been claimed and transformed by punk ethos.
+      The Undercity is [[System Rot]]'s territory — repurposed flood control infrastructure beneath [[The Bend]]. Tunnels, utility corridors, sub-grade chambers below the water table. System Rot claimed the infrastructure that keeps The Bend from drowning. Wet walls, low ceilings, the constant sound of water being held back.
 
       ## Aesthetic
 
@@ -2402,13 +2439,15 @@ codex_entries:
 
       ## Function
 
-      The Undercity serves as System Rot's base of operations, broadcast studio, and gathering space. Hardcore punk transmissions originate here — raw energy channeled through the Grid's infrastructure and out through [[The Fracture Network]]'s temporal broadcasts.
+      The Undercity serves as System Rot's base of operations, broadcast studio, and gathering space. Hardcore punk transmissions originate here — raw energy channeled through [[The Fracture Network]]'s temporal broadcasts from beneath a city of curated celebration.
 
       ## Related Entries
 
       - [[System Rot]]
       - [[Koda]]
       - [[THE PULSE GRID]]
+      - [[The Bend]]
+      - [[The Slipstream]]
 
   # =============================================================================
   # TECHNOLOGY
@@ -2672,7 +2711,7 @@ codex_entries:
 
       ## The Progressive Release
 
-      [[XERAEN]] discovered the century-old hackr.tv data in the archives beneath [[THE PULSE GRID]]. Rather than surfacing it all at once, he releases it progressively — timing the appearance of century-old posts on The WIRE so they arrive as if from active, contemporary hackrs.
+      [[XERAEN]] discovered the century-old hackr.tv data in the archives within [[THE PULSE GRID]]. Rather than surfacing it all at once, he releases it progressively — timing the appearance of century-old posts on The WIRE so they arrive as if from active, contemporary hackrs.
 
       The WIRE is decentralized and pseudonymous. New handles appear constantly. No one questions the origin of unfamiliar voices. The temporal depth of the network is hidden in plain sight.
 
@@ -3023,3 +3062,534 @@ codex_entries:
       - [[Mel Reeves]]
       - [[The Consolidation]]
       - [[Chronology Fracture]]
+
+  # =============================================================================
+  # GEOGRAPHY — Regional Locations
+  # =============================================================================
+
+  - name: The Slipstream
+    slug: the-slipstream
+    entry_type: technology
+    summary: "GovCorp's automated transportation infrastructure repurposed by the Fracture Network for physical rapid transit between Grid facilities — riding the enemy's own freight and maintenance rail across the continent."
+    position: null
+    published: true
+    metadata:
+      type: Transit infrastructure
+      origin: "GovCorp (repurposed)"
+      access: Fracture Network operatives
+    content: |
+      # The Slipstream
+
+      - **Type:** Transit infrastructure
+      - **Origin:** [[GovCorp]] (repurposed by [[The Fracture Network]])
+      - **Purpose:** Physical rapid transit between [[THE PULSE GRID]] facilities
+
+      ## Overview
+
+      The Slipstream is [[GovCorp]]'s automated transportation network — high-speed underground rail and freight corridors that form the logistics backbone of managed reality. These corridors move materiel, equipment, and authorized personnel between population centers. They keep [[The RIDE|RIDE]] infrastructure supplied and maintained across thousands of miles. They span the continent.
+
+      [[The Fracture Network]] discovered that GovCorp's transit system has a service layer — maintenance access, freight routing, emergency bypass — that runs parallel to passenger and cargo manifests. An operative in [[The Lakeshore]] can board at a service access point and emerge in [[The Lowlands]] without appearing in any transit log. GovCorp does not audit the service layer because the volume of automated freight traffic makes anomaly detection impractical at scale.
+
+      ## Mechanics
+
+      Operatives access the Slipstream through service hatches, maintenance platforms, and freight loading bays located near Grid facilities. The transit itself is physical — underground rail, automated freight cars, service vehicles running at speeds that cross the continent in hours. Fast, but not instant. An operative boards, rides, and arrives with their body in one piece at the other end.
+
+      The transit is not invisible. Heavy use creates anomalies in service-layer traffic — unexpected mass readings on freight corridors, service access at unusual hours, wear patterns on maintenance infrastructure that don't match scheduled upkeep. The Network uses the Slipstream strategically, not casually.
+
+      ## The Risk
+
+      Every Slipstream transit is a calculated bet. The more frequently a corridor is used, the more likely its traffic patterns will deviate from the baseline that GovCorp's automated logistics systems expect. The Network rotates access points, staggers transit times, and limits the number of operatives using any single corridor within a given window.
+
+      ## Offline's Alternative
+
+      [[Offline]] maintains physical courier routes between regions — slower, on foot, completely invisible to GovCorp. When the Network cannot risk Slipstream traffic, Offline carries the message by hand. Their value to the resistance is directly proportional to the risk of mechanized transit.
+
+      ## Related Entries
+
+      - [[THE PULSE GRID]]
+      - [[The RIDE]]
+      - [[GovCorp]]
+      - [[The Fracture Network]]
+      - [[Offline]]
+
+  - name: The Lakeshore
+    slug: the-lakeshore
+    entry_type: location
+    summary: "A dense urban region on the western shore of a vast freshwater inland sea — home to Sector X and the Fracture Network's primary operations hub."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      significance: "Home of Sector X"
+      status: GovCorp Cultural Zone
+    content: |
+      # The Lakeshore
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+      - **Significance:** Home of [[Sector X]]
+
+      ## Overview
+
+      A sprawling urban region built along the western shore of a vast freshwater inland sea. Flat terrain stretching west, water stretching east to the horizon. Harsh winters drive the architecture inward — enclosed skywalks, subterranean commerce, heated transit corridors. The lake dominates everything: weather, layout, identity.
+
+      The Lakeshore's Cultural Zone programming emphasizes industry, resilience, and lakefront pride. GovCorp's cultural engineers curate a regional identity built on working-class heritage and harsh-weather toughness — all of it surface-level, all of it running on the same [[The RIDE|RIDE]] substrate as every other zone.
+
+      ## The Periphery
+
+      At the edges of the population center, where the dense urban core gives way to abandoned industrial zones along the lakefront, RIDE coverage thins. Infrastructure decay that GovCorp never prioritized repairing creates sensor gaps — dead spots in the perceptual grid. [[The Fracture Network]] built [[Sector X]] in this periphery, hidden in crumbling pre-Consolidation structures where nobody lives and nobody looks.
+
+      ## Related Entries
+
+      - [[Sector X]]
+      - [[XERAEN]]
+      - [[The Fracture Network]]
+      - [[The Slipstream]]
+
+  - name: The Lowlands
+    slug: the-lowlands
+    entry_type: location
+    summary: "River country in the broad floodplain of a great continental river — home to The Hackr Hangar and a region where music seeped into the substrate long before GovCorp existed."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      significance: "Home of The Hackr Hangar"
+      status: GovCorp Cultural Zone
+    content: |
+      # The Lowlands
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+      - **Significance:** Home of [[The Hackr Hangar]]
+
+      ## Overview
+
+      Low, flat river country along the eastern bank of a great continental river where it widens through broad floodplain. Hot, humid, built on rich alluvial soil. The river defines the region the way the lake defines [[The Lakeshore]] — it is the thing everything else is measured against.
+
+      The Lowlands' Cultural Zone programming leans into musical heritage and river culture — soul food, live performance venues, a curated sense of artistic authenticity. GovCorp gives The Lowlands a blues-and-barbecue identity that feels organic and ancient. Under the surface, the same behavioral parameters run as everywhere else.
+
+      ## The Resonance
+
+      The Lowlands have a deep history as a birthplace of music — centuries of sound layered into the landscape. [[The Fracture Network]] built [[The Hackr Hangar]] here because [[The Resonance Field|the resonance]] is stronger in this region. Something in the substrate resists the RIDE's flattening. Not enough for civilians to notice. Enough for operatives who know what to listen for.
+
+      ## Related Entries
+
+      - [[The Hackr Hangar]]
+      - [[Ryker M. Pulse]]
+      - [[The.CyberPul.se]]
+      - [[The Resonance Field]]
+      - [[The Slipstream]]
+
+  - name: The Arch
+    slug: the-arch
+    entry_type: location
+    summary: "A massive steel monument at the confluence of two great rivers — and the Fracture Network's only known persistent RIDE deadzone, created by amplifying the structure's natural interference with RIDE signal propagation."
+    position: null
+    published: true
+    metadata:
+      type: Regional location / RIDE deadzone
+      significance: "Persistent RIDE deadzone — Fracture Network's most valuable fixed asset"
+      control: "The Fracture Network (covert)"
+      status: Active
+    content: |
+      # The Arch
+
+      - **Type:** Regional location / RIDE deadzone
+      - **Status:** Active (covert [[The Fracture Network|Fracture Network]] asset)
+      - **Location:** River confluence between [[The Lakeshore]] and [[The Lowlands]]
+
+      ## Overview
+
+      A massive stainless steel catenary curve, over 190 meters tall, standing at the confluence of two great rivers. Built three centuries ago as a monument to expansion. It has outlasted every government that claimed it.
+
+      The Arch is the [[The Fracture Network|Fracture Network's]] most valuable fixed asset: a persistent [[The RIDE|RIDE]] deadzone. Within roughly 400 meters of the structure, the RIDE cannot render. Reality is unfiltered.
+
+      ## The Natural Anomaly
+
+      The Arch's continuous steel structure genuinely interferes with RIDE signal propagation. 190 meters of unbroken metal acting as reflector, absorber, and refractive surface for the substrate the RIDE uses to render reality. [[GovCorp]]'s infrastructure teams have logged the coverage anomaly since the RIDE came online. Maintenance crews have been dispatched. Engineering reports have been filed. The area around the Arch has always shown degraded RIDE fidelity — rendering artifacts, micro-lag in perceptual updates, occasional sensory flicker.
+
+      GovCorp classified it as an acceptable coverage gap. One aging monument in a mid-priority Cultural Zone. Not worth the cost of demolishing a landmark that their own cultural engineers use for regional identity programming.
+
+      ## What the Fracture Network Did
+
+      They found the natural dead spot and amplified it. Equipment installed inside the Arch's hollow interior — accessible via existing maintenance infrastructure. The installed tech pushes natural interference from degraded fidelity to full deadzone within a radius of roughly 400 meters, covering the old monument grounds.
+
+      The deadzone does not present as a hard cutoff. The Network's equipment creates a gradient — RIDE fidelity degrades smoothly as you approach the Arch, matching the pattern GovCorp's engineers have always documented. Their monitoring systems show the same signature they have been filing variance reports on for years. The reports get the same response: noted, acceptable loss, deprioritized.
+
+      ## What It Feels Like
+
+      For a civilian under the RIDE, approaching the Arch produces a vague unease. Colors shift slightly. Sounds sharpen. Most people attribute it to the wind off the river or the open sight lines. They do not stay long. The RIDE is designed to make comfort the default — an area where comfort degrades is an area people naturally drift away from. GovCorp's own system becomes the camouflage.
+
+      For a Fracture Network operative who knows what they are walking into, there is no place like it. The last few hundred meters where reality is real. Unmediated sky, unprocessed air, unfiltered light. The Arch overhead, built centuries ago by people who had no idea what they were preserving.
+
+      ## Strategic Value
+
+      The Arch is the Network's only known persistent deadzone. Other deadzones are temporary or personal. The Arch is always on.
+
+      - A meeting point for operatives who cannot risk digital communication
+      - A calibration site — operatives check their perception against unfiltered reality
+      - A proof of concept: the RIDE can be beaten by the physical world itself
+      - A recruitment tool — bring a potential ally under the Arch, let them feel the difference
+      - A [[The Slipstream|slipstream]] waypoint — the deadzone means operatives transiting between [[The Lakeshore]] and [[The Lowlands]] can enter and exit slipstream nodes without their passage being RIDE-visible
+
+      ## Vulnerability
+
+      If GovCorp ever connects the Arch anomaly to the Fracture Network, they would demolish it. The Network knows this. Protecting the Arch's secret is a standing priority.
+
+      ## The Template
+
+      The Network actively scouts for other structures that produce natural RIDE interference. Large metal structures, deep underground spaces, areas with unusual electromagnetic properties. The Arch was first. It may not be the only one.
+
+      ## Related Entries
+
+      - [[The Fracture Network]]
+      - [[The RIDE]]
+      - [[GovCorp]]
+      - [[The Slipstream]]
+      - [[The Lakeshore]]
+      - [[The Lowlands]]
+
+  - name: The Narrows
+    slug: the-narrows
+    entry_type: location
+    summary: "A dense vertical region built across a series of islands and peninsulas compressed around a deep natural harbor — the most heavily populated and most thoroughly RIDE-saturated zone on the continent."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Narrows
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      A series of islands and peninsulas compressed around a deep natural harbor where a river meets the sea. Vertical architecture stacked beyond anything the original builders imagined. The most densely populated region on the continent, and the most thoroughly saturated with [[The RIDE|RIDE]] infrastructure. Every surface, every sightline, every cubic meter of air is rendered. There are no dead spots in The Narrows.
+
+      GovCorp's Cultural Zone programming here emphasizes cosmopolitan ambition, cultural sophistication, and the energy of density. The RIDE gives every resident the feeling of living at the center of the world. In a sense, they do — The Narrows is GovCorp's showcase, the proof that managed reality can produce something that feels like vitality.
+
+      The Narrows is also home to [[Neon District]] — [[Neon Hearts]]' entertainment corridor, the most audacious of the [[The Fracture Network|Fracture Network's]] fixed assets. Hiding resistance operations inside GovCorp's most thoroughly monitored zone is either brilliant or suicidal. Neon Hearts considers it both.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Slipstream]]
+      - [[Neon District]]
+      - [[Neon Hearts]]
+      - [[The Fracture Network]]
+
+  - name: The Basin
+    slug: the-basin
+    entry_type: location
+    summary: "A broad coastal basin bounded by mountains and desert — GovCorp's entertainment production center, where the line between RIDE-manufactured experience and curated culture disappeared long before the RIDE existed."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Basin
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      A broad, sun-drenched coastal basin bounded by mountains to the north and east, desert beyond. Sprawling, horizontal, built for surfaces. The Basin was producing manufactured experience long before [[GovCorp]] formalized it — entertainment, image, the curation of perception as an industry. [[The RIDE]] did not change The Basin so much as validate what it was already doing.
+
+      GovCorp's Cultural Zone programming leans into aspiration, image, and perpetual reinvention. The weather is always perfect — though it was nearly always perfect before the RIDE, too. The distinction between organic culture and RIDE-curated culture is thinner here than anywhere else, which makes The Basin simultaneously the easiest and hardest place to see the counterfeit.
+
+      The Basin is also home to the [[Echo Chamber]] — the complete archive of [[The WIRE|WIRE]] communications, hidden within the region's entertainment infrastructure. In a landscape built on recorded media, one more archive draws no attention.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[Echo Chamber]]
+      - [[The WIRE]]
+
+  - name: The Gate
+    slug: the-gate
+    entry_type: location
+    summary: "A region built around a strait connecting an inland bay to the open ocean — historically a center of technical innovation, now a GovCorp research hub where RIDE infrastructure is developed and refined."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Gate
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      Built around a narrow strait where an inland bay opens to the ocean. Fog, hills, a peninsula dense with infrastructure. The Gate has a deep history as a center of technical innovation — the region that built the tools that built the tools that built [[PRISM]]. The irony is not lost on those who know the history. Most do not.
+
+      GovCorp operates major research facilities here. [[The RIDE|RIDE]] infrastructure development, perceptual rendering optimization, Cultural Zone programming design — much of the technology that maintains managed reality is refined in The Gate. The Cultural Zone identity emphasizes innovation and progressive thinking. The residents believe they are shaping the future. In a narrow, managed sense, they are.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[PRISM]]
+
+  - name: The Front
+    slug: the-front
+    entry_type: location
+    summary: "A high-altitude region where vast plains abruptly meet a massive mountain range — thin air, wide sky, and RIDE coverage that struggles with the terrain's extreme vertical variation."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Front
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      High plateau where plains stretching a thousand miles abruptly collide with a massive mountain range. Thin air, intense sun, wide sky. The altitude and vertical variation create challenges for [[The RIDE|RIDE]] coverage — rendering consistency across rapid elevation changes requires processing overhead that GovCorp has never fully optimized.
+
+      The Cultural Zone programming emphasizes independence, open space, and mountain identity. GovCorp gives The Front's residents a rugged self-reliance that feels earned. It is not. But the RIDE coverage gaps in the high passes and remote valleys are real — not large enough to be strategic, but enough for [[The Fracture Network]] to maintain quiet supply routes through the mountains.
+
+      The altitude and terrain create [[The Fault Line]] — the unstable border zone where RIDE coverage genuinely degrades and [[The Fracture Network|Fracture Network]] equipment creates mutual interference with GovCorp's rendering infrastructure. Dangerous, but invaluable for infiltration operations.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Fracture Network]]
+      - [[The Fault Line]]
+
+  - name: The Straits
+    slug: the-straits
+    entry_type: location
+    summary: "A region built around a river strait connecting two great freshwater lakes — once a center of manufacturing, now a landscape of industrial ruins that GovCorp's Cultural Zone programming frames as heritage."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Straits
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      Built around a river strait connecting two of the great freshwater inland seas. A landscape defined by what it used to be — massive industrial ruins, infrastructure built for a manufacturing base that disappeared a century before GovCorp existed. The bones of a previous economy, too large to demolish, too expensive to repurpose, left standing as monuments to a purpose nobody remembers.
+
+      GovCorp's Cultural Zone programming frames the ruins as heritage — industrial pride, maker identity, the dignity of building things. The [[The RIDE|RIDE]] renders the decay as character. Residents feel connected to a tradition of labor and craftsmanship that the actual economy hasn't supported in two hundred years.
+
+      The Straits sits between [[The Lakeshore]] and [[The Works]], connected by [[The Slipstream|slipstream]] corridors that follow the old lakefront infrastructure routes.
+
+      The industrial ruins also shelter [[The Crypt]] — [[Voiceprint]]'s data recovery facility, hidden in decommissioned manufacturing infrastructure. Hardware pulled from GovCorp disposal sites, storage media recovered from facilities the Straits' factories once supplied.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Lakeshore]]
+      - [[The Works]]
+      - [[The Slipstream]]
+      - [[The Crypt]]
+      - [[Voiceprint]]
+
+  - name: The Bend
+    slug: the-bend
+    entry_type: location
+    summary: "A low-lying region where a great river curves sharply before meeting the sea — built below sea level, perpetually at war with water, and home to a Cultural Zone identity built on music and celebration that GovCorp exploits ruthlessly."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Bend
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      Where a great continental river makes its final sharp curve before meeting the sea. Built below sea level, perpetually at war with water. The land itself resists occupation — floods, subsidence, heat, humidity. People built here anyway, for centuries, because the river was worth it.
+
+      Like [[The Lowlands]], The Bend has deep musical roots that predate [[The Consolidation]] by centuries. GovCorp's Cultural Zone programming exploits this ruthlessly — curating an identity built on celebration, excess, and performative joy. The RIDE renders The Bend as perpetual festival. Residents feel like they live in the most alive place on the continent. The vitality is real in origin but manufactured in delivery.
+
+      The [[The Fracture Network|Fracture Network]] watches The Bend carefully. The region's authentic musical substrate — like The Lowlands — shows stronger [[The Resonance Field|Resonance Field]] readings than baseline. But the RIDE coverage here is dense and the Cultural Zone programming is aggressive. The Bend is a place where genuine signal and manufactured signal are nearly impossible to distinguish.
+
+      Below the surface, in flood control tunnels and utility corridors beneath the water table, [[System Rot]] operates [[The Undercity]] — the Fracture Network's most physically hostile facility, and its most uncompromising.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Lowlands]]
+      - [[The Resonance Field]]
+      - [[The Undercity]]
+      - [[System Rot]]
+
+  - name: The Canopy
+    slug: the-canopy
+    entry_type: location
+    summary: "A densely forested region of volcanic peaks, ancient evergreens, and persistent rain — where the tree cover and terrain create natural RIDE attenuation that GovCorp has struggled to fully resolve."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Canopy
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      Dense evergreen forests stretching from coast to volcanic peaks. Persistent rain, low cloud cover, a green ceiling that filters everything. The tree canopy is so thick in places that the sky disappears entirely. Volcanic peaks break through at intervals — massive, snow-capped, ancient.
+
+      The terrain and biological density create natural [[The RIDE|RIDE]] attenuation. Not deadzones — the RIDE functions — but the rendering is softer here, less precise. GovCorp attributes it to the organic interference of dense biomass. They have spent significant resources trying to resolve the issue. The forests keep growing.
+
+      The Cultural Zone programming emphasizes sustainability, connection to nature, and quiet independence. Residents of The Canopy feel like they live in the last honest place. They do not. But the RIDE has to work harder here, and the edges show if you know where to look.
+
+      The natural acoustic isolation and RIDE attenuation make The Canopy home to [[Frequency Gardens]] — [[Cascade]]'s acoustic facility, designed using her synesthetic perception to produce environments that suspend the RIDE's perceptual management through sound.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[Frequency Gardens]]
+      - [[Cascade]]
+
+  - name: The Flats
+    slug: the-flats
+    entry_type: location
+    summary: "Vast coastal prairie stretching flat to the horizon along a warm gulf — the most geographically exposed region, where there is nowhere to hide and RIDE coverage is total."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Flats
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      Vast coastal prairie stretching flat to the horizon along a warm gulf. No elevation change, no forest cover, no terrain to break line of sight. The most geographically exposed region on the continent. [[The RIDE|RIDE]] coverage is total and unobstructed — the flat terrain and open sky make this the easiest region for GovCorp to render and the hardest for the [[The Fracture Network|Fracture Network]] to operate in.
+
+      The Cultural Zone programming runs on scale, heat, and swagger — big everything, loud identity, fierce regional pride. GovCorp gives The Flats a personality that demands space, which conveniently discourages the kind of density that creates RIDE rendering challenges.
+
+      The Fracture Network maintains only transit routes through The Flats. No fixed assets. Nowhere to hide.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+
+  - name: The Marshes
+    slug: the-marshes
+    entry_type: location
+    summary: "A peninsula of wetlands, swamp, and subtropical heat jutting into warm ocean — where the boundary between land and water is so uncertain that even the RIDE has trouble deciding what to render."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Marshes
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      A broad peninsula jutting into warm ocean, most of it barely above sea level. Wetlands, mangrove, sawgrass, and subtropical heat. The boundary between land and water is so gradual and so constantly shifting that even [[The RIDE]] has difficulty maintaining consistent perceptual rendering at the margins. Tidal zones, seasonal flooding, and biological density create a landscape that resists the kind of static modeling the RIDE depends on.
+
+      GovCorp's Cultural Zone programming emphasizes leisure, warmth, and retirement — a managed paradise of coast and sunshine. The interior wetlands are largely depopulated, left to flood and reclaim at will. GovCorp sees no value in rendering swamp for an audience that isn't there.
+
+      The [[The Fracture Network|Fracture Network]] has noted The Marshes' interior as a potential operational space — vast, unmonitored, difficult to render — but the environment itself is hostile to the kind of infrastructure the Network requires. The water wins every argument.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+
+  - name: The Works
+    slug: the-works
+    entry_type: location
+    summary: "River valleys dense with the skeletal remains of a vanished industrial age — a region whose identity is built on labor and craft that the actual economy hasn't supported in two centuries."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone
+    content: |
+      # The Works
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone
+
+      ## Overview
+
+      River valleys cutting through rolling hills, dense with the skeletal remains of a vanished industrial age. Steelworks, foundries, mills — structures too massive to demolish, too contaminated to repurpose, left standing as the landscape's dominant feature. The rivers that powered the original industry still run through everything, brown and slow.
+
+      GovCorp's Cultural Zone programming builds identity around craft, labor, and working-class solidarity. [[The RIDE]] renders the ruins as heritage rather than decay. Residents feel a deep connection to the tradition of making things — the pride of the forge, the dignity of the mill. The irony is that nothing has been manufactured in The Works for generations. The identity is as manufactured as anything else the RIDE produces.
+
+      The Works sits between [[The Straits]] to the north and [[The Lakeshore]] to the west, connected by [[The Slipstream|slipstream]] corridors running through old industrial transport routes.
+
+      The old foundry infrastructure now houses [[The Forge]] — [[Cipher Protocol]]'s encryption workshop, where resistance hardware is built and stress-tested. Real manufacturing in a region where the RIDE curates manufacturing identity as nostalgia.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Straits]]
+      - [[The Lakeshore]]
+      - [[The Slipstream]]
+      - [[The Forge]]
+      - [[Cipher Protocol]]
+
+  - name: The Badlands
+    slug: the-badlands
+    entry_type: location
+    summary: "High plains and eroded rock formations under an enormous sky — the most sparsely populated region, where RIDE coverage is thin by design because there is almost no one to render for."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone (minimal)
+    content: |
+      # The Badlands
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone (minimal coverage)
+
+      ## Overview
+
+      High plains stretching to horizons broken only by eroded rock formations and river-cut canyons. Enormous sky. Sparse population — the lowest density of any named region. The land was called the Badlands long before [[GovCorp]] existed, and the name outlasted every attempt to rebrand it. Some geography is too honest to rename.
+
+      [[The RIDE|RIDE]] coverage in The Badlands is thin by design. GovCorp allocates rendering resources by population density, and there is almost no one here to render for. The Cultural Zone programming is minimal — rugged independence, silence, space. Residents of The Badlands are largely left alone, which is what they came for.
+
+      The [[The Fracture Network|Fracture Network]] maintains emergency caches and dead-drop routes through The Badlands. The thin RIDE coverage makes it useful for transit and storage, but the sparse infrastructure and extreme distances make it impractical for permanent operations. [[Offline]] has the strongest presence here — their philosophy of disconnection finds its natural geography.
+
+      The Badlands also house [[The Analog Archive]] — [[Offline]]'s preservation facility, the only Grid zone with zero digital infrastructure. Every Fracture Network recording preserved on tape, vinyl, and physical media that requires physical destruction to erase.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[Offline]]
+      - [[The Fracture Network]]
+      - [[The Analog Archive]]
