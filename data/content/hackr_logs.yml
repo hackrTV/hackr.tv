@@ -390,6 +390,36 @@ hackr_logs:
 
       - X
 
+  - author: XERAEN
+    timeline: "2120s"
+    title: The First Call
+    slug: the-first-call
+    lore_date: "2115-10-04 01:00"
+    body: |
+      I went to Ryker first.
+
+      Not Calloway. Not Cipher. Not any of the people who'd been in that maintenance corridor when we planned the attack that accidentally tore open time. They were the right people for sabotage. Ryker is the right person for what comes next.
+
+      I've known him since I was twenty-three. He was twenty, building terrible drum machines in a closet with foam on the walls. We spent three years making music together — writing, recording, scrapping everything, starting over. Nothing ever shipped. We were young and broke and didn't know what we were doing. But in those sessions I learned something about Ryker that matters more now than it did then.
+
+      He doesn't optimize. He doesn't calculate whether the effort is worth the output. He plays because playing is what he is. When everything around him was telling him to be practical — and he was practical, he wrote software for a living, he kept the lights on — the music was the one part of himself he refused to manage. Nine years of engineering that tried to grind him into a throughput metric, and the man still played drums every night like it was the only real thing he'd done all day.
+
+      I needed that. Because what I'm building now cannot be managed. The signal doesn't respond to optimization. The broadcast has to be raw, honest, unfiltered — the opposite of everything GovCorp trained me to build. I'm a systems architect. My instinct is to architect. Ryker's instinct is to play. I needed someone whose first response to the impossible wouldn't be to build a system around it, but to beat a drum and see what happens.
+
+      I showed up at his door three weeks after the Fracture. I hadn't slept. I told him about the temporal transmission, the hundred-year window, the attack that went wrong in exactly the right way. I told him I wanted to build a broadcast — music carried across a century, reaching people who could still hear it.
+
+      He said yes before I finished.
+
+      Nine years of software engineering that tried to convince him he was a resource, and the first chance he gets to do the thing he was actually made for, he doesn't ask about risk. He doesn't ask about probability of success. He asks where the studio is.
+
+      I told him we'd have to build one. He said good.
+
+      The music we never finished in our twenties — the projects that died of bad timing and no money and life getting in the way — I think they were preparation. We were learning to trust each other through failure. Learning that the other person would show up again tomorrow even when today produced nothing. That trust is the only foundation strong enough for what we're building now.
+
+      Ryker starts looking for a location tomorrow. Somewhere real. Somewhere outside their grid.
+
+      - X
+
   - author: Ryker
     timeline: "2120s"
     title: Building the Backbone
@@ -414,25 +444,23 @@ hackr_logs:
     slug: before-the-beat
     lore_date: "2115-12-03 21:00"
     body: |
-      X asked me once why I joined. Why I said yes when he showed me the temporal data and told me what it meant. He expected a long answer. Philosophers always expect long answers.
+      X asked me once why I joined. Why I said yes when he showed up at my door three weeks after the Chronology Fracture, looking like he hadn't slept in a month, and told me what he'd found. He expected a long answer. Philosophers always expect long answers.
 
-      I said: because the beat is gone.
+      Here's the short one: I'd been waiting.
 
-      He didn't understand. So I'll explain it here, for whoever reads these logs a hundred years from now.
+      Not for him specifically. Not for trans-temporal transmission or the Fracture Network or any of this. I'd been waiting for the thing itself — the moment someone showed me that what I'd been feeling my entire adult life had a shape.
 
-      I was a drummer before GovCorp. Before the RIDE, before PRISM touched the air we breathe. I played in warehouse shows where the floor shook and strangers became family for three minutes of shared vibration. Music was a physical thing. You felt it in your chest, in your teeth, in the space between your heartbeats.
+      I spent nine years writing code for companies that didn't care what the code did as long as the metrics went up. Nine years of standups and sprint reviews and performance evaluations that measured everything about my work except whether it meant anything. The engineering wasn't the problem. Code is honest enough. But the managerialism around it — the optimization of people into throughput, the slow replacement of craft with process — it was a drain on something I couldn't name. It was never a career to me. It was what I did to keep the lights on while I waited for the real thing.
 
-      The RIDE killed that. Not obviously. The music still plays. People still dance. But it's managed now. Optimized. The frequencies are filtered for maximum engagement and minimum disruption. Every beat is psychologically calibrated to produce the appropriate emotional response without exceeding compliance thresholds.
+      The real thing was always music. I'd been playing drums since I was a teenager, and I met X when I was twenty. He was twenty-three, building terrible synth patches in a studio that was really just a closet with foam on the walls. We spent three years making music together — writing, recording, scrapping everything, starting over. Nothing ever shipped. The timing was wrong, the gear was wrong, life kept interfering. But those sessions — jamming until two in the morning, arguing about arrangements, failing together at the thing we actually loved — that was the closest I'd ever been to the real version of myself.
 
-      You can hear it if you know what to listen for. The absence. The space where spontaneity used to live. Where a drummer would push the tempo because the crowd demanded it, where a wrong note became the best note because it was real.
+      Then GovCorp recruited him. The music stopped. He disappeared into whatever they had him building, and I went back to engineering and back to hating it. We stayed in touch, but it wasn't the same. You can't keep a creative partnership alive across that kind of distance.
 
-      That's what GovCorp took. Not the music. The realness of it. The risk. The chance that something unexpected could happen when humans make sound together.
+      So when he showed up at my door nine years later, wrecked, talking about temporal transmission and a hundred-year window and signals that could carry music across a century — I didn't need convincing. Not because I understood the physics. Because I understood what the RIDE was doing. It was the same thing my career had been doing to me since I was twenty. Optimizing the humanity out of everything and calling it improvement. The RIDE just did it to the whole species instead of one engineer at a time.
 
-      So when X showed me that we could send signals back through time, that we could broadcast unfiltered music to people who still know what real sounds like, I didn't need convincing. I didn't need to understand the temporal mechanics or the political implications or the erasure paradox.
+      He needed someone he could trust. We'd built that over three years of failed music projects and a decade of honest friendship. The kind of trust you get when someone has seen you fail at the thing you love and stayed anyway.
 
-      I just needed to know the beat could reach someone who'd feel it.
-
-      That's why I'm here. That's why I drum. Not for revolution. Not for ideology. For the moment when sound hits a body and something real happens that no algorithm predicted or approved.
+      I said yes before he finished talking. The music we never got off the ground in our twenties is about to be the most important broadcast in human history.
 
       Defiance isn't a philosophy. It's a rhythm. And rhythms don't ask permission.
 
@@ -453,7 +481,7 @@ hackr_logs:
 
       Real buildings. Real geography. Every zone is a place you can walk into, touch the walls, hear the echo of your footsteps. What the RIDE cannot render, it cannot control. What exists outside its coverage is invisible to its monitoring.
 
-      We've connected the zones using GovCorp's own transit corridors — the automated freight and maintenance rail that runs beneath the continent. Their logistics infrastructure has a service layer they barely monitor. We ride it. An operative can board in The Lakeshore and step out in The Lowlands without appearing in a single passenger manifest.
+      We've connected the zones using GovCorp's own transit corridors — the automated freight and maintenance rail that runs beneath the continent. Their logistics infrastructure has a service layer they barely monitor. We ride it. An operative can board in The Lakeshore and step out in The Riverlands without appearing in a single passenger manifest.
 
       The main hub is hackr.tv, our central broadcast coordination point. From here, I coordinate transmissions across the temporal gap.
 

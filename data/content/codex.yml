@@ -575,9 +575,11 @@ codex_entries:
 
       ## Before the Fracture
 
-      Before the resistance, Ryker was a session drummer in GovCorp-sanctioned entertainment — performing in approved venues, playing approved rhythms, creating content that passed through [[PRISM]]'s filters without friction. He was good at it. He was successful. He was empty.
+      Before the resistance, Ryker was a software engineer. He was competent, reliable, employed — and miserable. The work was never the problem. Code was honest enough. But the apparatus around it — the managers optimizing throughput, the metrics reducing craft to velocity, the endless meetings where people performed productivity instead of doing anything — drained something out of him he couldn't name at the time. It was never a career to him. It was a slow, managed diminishment of everything he actually was.
 
-      The music felt hollow because it was hollow. Every composition pre-approved, every performance monitored, every creative impulse channeled through systems designed to ensure that nothing genuine reached the audience. Ryker felt the void where authentic expression should have been, even before he had words for what was missing.
+      Music was what kept him alive. He'd been playing drums since he was a teenager, and in his early twenties he met [[XERAEN]] through the underground music scene — two people who heard the same thing in the noise and wanted to build something from it. They spent three years working on projects together. Nothing ever took off. Wrong timing, no resources, life getting in the way. But the creative bond was real, and the friendship it built ran deeper than any project they failed to finish.
+
+      When XERAEN was recruited by [[GovCorp]] in 2109, the music dried up. They stayed in touch, but XERAEN's new life consumed him. Ryker kept engineering, kept hating it, kept making music alone in whatever hours he could steal from a career that felt less like work and more like a rehearsal for the RIDE.
 
       ## The Loss
 
@@ -587,13 +589,15 @@ codex_entries:
 
       ## The Heartbeat
 
-      If [[XERAEN]] carries the signal, Ryker is the heartbeat. When XERAEN showed him the trans-temporal data, Ryker understood immediately — both the possibility and the cost. Victory means erasure.
+      If [[XERAEN]] carries the signal, Ryker is the heartbeat. When XERAEN showed up at his door three weeks after the [[Chronology Fracture]], looking like he hadn't slept in a month, Ryker said yes before he finished talking. Not because he understood the physics. Because he understood what [[The RIDE]] was doing — the same thing his career had been doing to him for nine years, scaled to the entire species. Optimizing the humanity out of everything and calling it improvement.
 
-      He drums anyway. Louder. Faster. Each beat a declaration that existence matters even when existence is temporary.
+      He drums anyway. Louder. Faster. Each beat a declaration that existence matters even when existence is temporary. The music he and XERAEN never got off the ground in their twenties became the most important broadcast in human history. The timing was never wrong. They just weren't ready yet.
 
       ## Connection to XERAEN
 
-      Ryker built the physical infrastructure that makes XERAEN's temporal transmissions possible. [[The Hackr Hangar]] is his creation — a broadcast facility outside GovCorp's monitoring grid, where unfiltered sound can be captured and transmitted. While XERAEN handles the temporal mechanics from [[Sector X]], Ryker ensures there's something worth transmitting. They operate apart by necessity — co-location creates convergence patterns in [[The RIDE]]'s model that trigger GovCorp's threat detection — but their work is inseparable.
+      The friendship predates XERAEN's years at GovCorp, predates the RIDE, predates the resistance. They built trust over a decade of failed music projects and honest conversations — the kind of trust you get when someone has seen you fail at the thing you love and stayed anyway. When XERAEN needed someone to build the physical infrastructure for trans-temporal broadcasting, Ryker was the only choice.
+
+      [[The Hackr Hangar]] is his creation — a broadcast facility in [[The Riverlands]], outside GovCorp's monitoring grid, where unfiltered sound can be captured and transmitted. While XERAEN handles the temporal mechanics from [[Sector X]], Ryker ensures there's something worth transmitting. They operate apart by necessity — co-location creates convergence patterns in [[The RIDE]]'s model that trigger GovCorp's threat detection — but their work is inseparable.
 
       *Some people whisper revolution. Ryker beats it into existence.*
 
@@ -821,9 +825,13 @@ codex_entries:
 
       Before becoming the voice of resistance, XERAEN was a systems architect working deep within [[GovCorp]]'s infrastructure — specifically on [[The RIDE]]. He helped build the very system that now controls reality for most of the world's population.
 
+      ## Before GovCorp
+
+      Before the RIDE, before the resistance, XERAEN was a musician. In his early twenties he met [[Ryker M. Pulse|Ryker]] through the underground music scene, and they spent three years working on projects together — writing, recording, scrapping everything, starting over. Nothing ever took off. But the friendship it built became the foundation for everything that followed.
+
       ## The GovCorp Years (2109-2115)
 
-      XERAEN joined GovCorp's RIDE deployment team in 2109 as a systems architect, genuinely believing in the project's mission. He saw the RIDE as humanity's most ambitious infrastructure — a system that could eliminate suffering by optimizing perception. [[Director Elena Krell]] herself welcomed him to the team. His closest colleague was [[Calloway]] — another systems architect who shared his belief in the project and, later, his horror at what it actually did.
+      XERAEN joined GovCorp's RIDE deployment team in 2109 as a systems architect, genuinely believing in the project's mission. The music stopped. He saw the RIDE as humanity's most ambitious infrastructure — a system that could eliminate suffering by optimizing perception. [[Director Elena Krell]] herself welcomed him to the team. His closest colleague was [[Calloway]] — another systems architect who shared his belief in the project and, later, his horror at what it actually did.
 
       The disillusionment was slow. It began not with data or policy but with people — a friend whose personality had been smoothed into pleasant emptiness, a musician whose technical precision increased as her soul disappeared. XERAEN began to see the RIDE's true cost: not the obvious violence of oppression, but the quiet erasure of everything that makes a person irreplaceable.
 
@@ -2284,7 +2292,7 @@ codex_entries:
     published: true
     metadata:
       type: "Broadcast facility / Recording studio"
-      region: The Lowlands
+      region: The Riverlands
       control: Ryker M. Pulse
       status: Active
       relationship: Feeds signal to Sector X
@@ -2294,14 +2302,14 @@ codex_entries:
       - **Type:** Broadcast facility / Recording studio
       - **Status:** Active
       - **Control:** [[Ryker M. Pulse]], [[The.CyberPul.se]]
-      - **Region:** [[The Lowlands]]
+      - **Region:** [[The Riverlands]]
       - **Network:** [[THE PULSE GRID]]
 
       ## Overview
 
       The Hackr Hangar is [[Ryker M. Pulse|Ryker's]] domain — where [[The.CyberPul.se]]'s raw signal is created. While [[XERAEN]] handles the trans-temporal transmission from [[Sector X]], Ryker builds the broadcasts here.
 
-      Located in the outskirts of [[The Lowlands]], in the river country where music has seeped into the substrate for centuries. The region's deep history as a birthplace of music left something in the landscape that even [[The RIDE]] couldn't fully overwrite. [[The Fracture Network]] built here because [[The Resonance Field|the resonance]] is stronger. The geography remembers.
+      Located in the outskirts of [[The Riverlands]], in the river country where music has seeped into the substrate for centuries. The region's deep history as a birthplace of music left something in the landscape that even [[The RIDE]] couldn't fully overwrite. [[The Fracture Network]] built here because [[The Resonance Field|the resonance]] is stronger. The geography remembers.
 
       ## The Space
 
@@ -2315,7 +2323,7 @@ codex_entries:
       - [[The.CyberPul.se]]
       - [[Sector X]]
       - [[XERAEN]]
-      - [[The Lowlands]]
+      - [[The Riverlands]]
 
   - name: THE PULSE GRID
     slug: the-pulse-grid
@@ -2349,8 +2357,8 @@ codex_entries:
       The Grid's facilities are distributed across the continent, each in a region chosen for strategic, acoustic, or operational advantage:
 
       - **[[Sector X]]** — [[XERAEN]]'s fortress in [[The Lakeshore]], temporal operations center
-      - **[[The Hackr Hangar]]** — [[Ryker M. Pulse|Ryker's]] broadcast facility in [[The Lowlands]], where the raw signal originates
-      - **[[The Arch]]** — Persistent RIDE deadzone at the river confluence between The Lakeshore and The Lowlands
+      - **[[The Hackr Hangar]]** — [[Ryker M. Pulse|Ryker's]] broadcast facility in [[The Riverlands]], where the raw signal originates
+      - **[[The Arch]]** — Persistent RIDE deadzone at the river confluence between The Lakeshore and The Riverlands
       - **[[Echo Chamber]]** — Complete [[The WIRE|WIRE]] communication archive in [[The Basin]]
       - **[[Frequency Gardens]]** — [[Ethereality]]'s acoustic facility in [[The Canopy]], designed by [[Cascade]]
       - **[[Neon District]]** — [[Neon Hearts]]' entertainment corridor in [[The Narrows]], hiding in plain sight
@@ -2394,7 +2402,7 @@ codex_entries:
 
       ## Transit
 
-      The Grid spans the geography of the physical world. Zones map to regions — [[The Hackr Hangar]] in [[The Lowlands]], [[Sector X]] in [[The Lakeshore]], faction territories distributed across the continent. Traversing these distances requires [[The Slipstream]] — GovCorp's automated transportation infrastructure, repurposed by the Fracture Network. Operatives board at service access points and travel between facilities on the enemy's own freight and maintenance rail, without appearing in any passenger manifest.
+      The Grid spans the geography of the physical world. Zones map to regions — [[The Hackr Hangar]] in [[The Riverlands]], [[Sector X]] in [[The Lakeshore]], faction territories distributed across the continent. Traversing these distances requires [[The Slipstream]] — GovCorp's automated transportation infrastructure, repurposed by the Fracture Network. Operatives board at service access points and travel between facilities on the enemy's own freight and maintenance rail, without appearing in any passenger manifest.
 
       ## Related Entries
 
@@ -3088,7 +3096,7 @@ codex_entries:
 
       The Slipstream is [[GovCorp]]'s automated transportation network — high-speed underground rail and freight corridors that form the logistics backbone of managed reality. These corridors move materiel, equipment, and authorized personnel between population centers. They keep [[The RIDE|RIDE]] infrastructure supplied and maintained across thousands of miles. They span the continent.
 
-      [[The Fracture Network]] discovered that GovCorp's transit system has a service layer — maintenance access, freight routing, emergency bypass — that runs parallel to passenger and cargo manifests. An operative in [[The Lakeshore]] can board at a service access point and emerge in [[The Lowlands]] without appearing in any transit log. GovCorp does not audit the service layer because the volume of automated freight traffic makes anomaly detection impractical at scale.
+      [[The Fracture Network]] discovered that GovCorp's transit system has a service layer — maintenance access, freight routing, emergency bypass — that runs parallel to passenger and cargo manifests. An operative in [[The Lakeshore]] can board at a service access point and emerge in [[The Riverlands]] without appearing in any transit log. GovCorp does not audit the service layer because the volume of automated freight traffic makes anomaly detection impractical at scale.
 
       ## Mechanics
 
@@ -3146,10 +3154,10 @@ codex_entries:
       - [[The Fracture Network]]
       - [[The Slipstream]]
 
-  - name: The Lowlands
-    slug: the-lowlands
+  - name: The Riverlands
+    slug: the-riverlands
     entry_type: location
-    summary: "River country in the broad floodplain of a great continental river — home to The Hackr Hangar and a region where music seeped into the substrate long before GovCorp existed."
+    summary: "River country along a great continental river — bluffs overlooking the water, dense with musical heritage. Home to The Hackr Hangar and a region where music seeped into the substrate long before GovCorp existed."
     position: null
     published: true
     metadata:
@@ -3157,7 +3165,7 @@ codex_entries:
       significance: "Home of The Hackr Hangar"
       status: GovCorp Cultural Zone
     content: |
-      # The Lowlands
+      # The Riverlands
 
       - **Type:** Regional location
       - **Status:** [[GovCorp]] Cultural Zone
@@ -3165,13 +3173,13 @@ codex_entries:
 
       ## Overview
 
-      Low, flat river country along the eastern bank of a great continental river where it widens through broad floodplain. Hot, humid, built on rich alluvial soil. The river defines the region the way the lake defines [[The Lakeshore]] — it is the thing everything else is measured against.
+      River country where bluffs rise above the eastern bank of a great continental river. Hot, humid, built where high ground meets deep water. The river defines the region the way the lake defines [[The Lakeshore]] — it is the thing everything else is measured against.
 
-      The Lowlands' Cultural Zone programming leans into musical heritage and river culture — soul food, live performance venues, a curated sense of artistic authenticity. GovCorp gives The Lowlands a blues-and-barbecue identity that feels organic and ancient. Under the surface, the same behavioral parameters run as everywhere else.
+      The Riverlands' Cultural Zone programming leans into musical heritage and river culture — soul food, live performance venues, a curated sense of artistic authenticity. GovCorp gives The Riverlands a blues-and-barbecue identity that feels organic and ancient. Under the surface, the same behavioral parameters run as everywhere else.
 
       ## The Resonance
 
-      The Lowlands have a deep history as a birthplace of music — centuries of sound layered into the landscape. [[The Fracture Network]] built [[The Hackr Hangar]] here because [[The Resonance Field|the resonance]] is stronger in this region. Something in the substrate resists the RIDE's flattening. Not enough for civilians to notice. Enough for operatives who know what to listen for.
+      The Riverlands have a deep history as a birthplace of music — centuries of sound layered into the landscape. [[The Fracture Network]] built [[The Hackr Hangar]] here because [[The Resonance Field|the resonance]] is stronger in this region. Something in the substrate resists the RIDE's flattening. Not enough for civilians to notice. Enough for operatives who know what to listen for.
 
       ## Related Entries
 
@@ -3197,7 +3205,7 @@ codex_entries:
 
       - **Type:** Regional location / RIDE deadzone
       - **Status:** Active (covert [[The Fracture Network|Fracture Network]] asset)
-      - **Location:** River confluence between [[The Lakeshore]] and [[The Lowlands]]
+      - **Location:** River confluence between [[The Lakeshore]] and [[The Riverlands]]
 
       ## Overview
 
@@ -3231,7 +3239,7 @@ codex_entries:
       - A calibration site — operatives check their perception against unfiltered reality
       - A proof of concept: the RIDE can be beaten by the physical world itself
       - A recruitment tool — bring a potential ally under the Arch, let them feel the difference
-      - A [[The Slipstream|slipstream]] waypoint — the deadzone means operatives transiting between [[The Lakeshore]] and [[The Lowlands]] can enter and exit slipstream nodes without their passage being RIDE-visible
+      - A [[The Slipstream|slipstream]] waypoint — the deadzone means operatives transiting between [[The Lakeshore]] and [[The Riverlands]] can enter and exit slipstream nodes without their passage being RIDE-visible
 
       ## Vulnerability
 
@@ -3248,7 +3256,7 @@ codex_entries:
       - [[GovCorp]]
       - [[The Slipstream]]
       - [[The Lakeshore]]
-      - [[The Lowlands]]
+      - [[The Riverlands]]
 
   - name: The Narrows
     slug: the-narrows
@@ -3423,9 +3431,9 @@ codex_entries:
 
       Where a great continental river makes its final sharp curve before meeting the sea. Built below sea level, perpetually at war with water. The land itself resists occupation — floods, subsidence, heat, humidity. People built here anyway, for centuries, because the river was worth it.
 
-      Like [[The Lowlands]], The Bend has deep musical roots that predate [[The Consolidation]] by centuries. GovCorp's Cultural Zone programming exploits this ruthlessly — curating an identity built on celebration, excess, and performative joy. The RIDE renders The Bend as perpetual festival. Residents feel like they live in the most alive place on the continent. The vitality is real in origin but manufactured in delivery.
+      Like [[The Riverlands]], The Bend has deep musical roots that predate [[The Consolidation]] by centuries. GovCorp's Cultural Zone programming exploits this ruthlessly — curating an identity built on celebration, excess, and performative joy. The RIDE renders The Bend as perpetual festival. Residents feel like they live in the most alive place on the continent. The vitality is real in origin but manufactured in delivery.
 
-      The [[The Fracture Network|Fracture Network]] watches The Bend carefully. The region's authentic musical substrate — like The Lowlands — shows stronger [[The Resonance Field|Resonance Field]] readings than baseline. But the RIDE coverage here is dense and the Cultural Zone programming is aggressive. The Bend is a place where genuine signal and manufactured signal are nearly impossible to distinguish.
+      The [[The Fracture Network|Fracture Network]] watches The Bend carefully. The region's authentic musical substrate — like The Riverlands — shows stronger [[The Resonance Field|Resonance Field]] readings than baseline. But the RIDE coverage here is dense and the Cultural Zone programming is aggressive. The Bend is a place where genuine signal and manufactured signal are nearly impossible to distinguish.
 
       Below the surface, in flood control tunnels and utility corridors beneath the water table, [[System Rot]] operates [[The Undercity]] — the Fracture Network's most physically hostile facility, and its most uncompromising.
 
@@ -3433,7 +3441,7 @@ codex_entries:
 
       - [[GovCorp]]
       - [[The RIDE]]
-      - [[The Lowlands]]
+      - [[The Riverlands]]
       - [[The Resonance Field]]
       - [[The Undercity]]
       - [[System Rot]]
