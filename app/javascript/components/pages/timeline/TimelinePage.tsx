@@ -104,7 +104,7 @@ export const TimelinePage: React.FC = () => {
         maxWidth: isMobile ? '100%' : '800px',
         margin: '0 auto',
         padding: isMobile ? '0 12px 60px' : '0 24px 80px',
-        marginLeft: isMobile ? 'auto' : 'max(auto, 220px)',
+        marginLeft: isMobile ? 'auto' : '220px',
         position: 'relative'
       }}>
         {/* Page header */}
