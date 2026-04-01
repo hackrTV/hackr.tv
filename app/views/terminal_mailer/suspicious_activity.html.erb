@@ -1,0 +1,28 @@
+<div style="font-family: 'Courier New', monospace; max-width: 600px; margin: 0 auto; background-color: #0a0a0a; color: #ff4444; padding: 30px;">
+  <div style="border: 1px solid #ff4444; padding: 20px; margin-bottom: 20px;">
+    <h1 style="color: #ff4444; margin: 0 0 10px 0; font-size: 24px;">TERMINAL AUDIT</h1>
+    <p style="color: #999; margin: 0; font-size: 12px;">SUSPICIOUS ACTIVITY DETECTED</p>
+  </div>
+
+  <div style="padding: 20px 0;">
+    <p style="color: #ccc; line-height: 1.6;">
+      <strong style="color: #ff4444;"><%= @flags.size %></strong> flag<%= @flags.size == 1 ? '' : 's' %>
+      detected since <%= @since.strftime('%Y-%m-%d %H:%M UTC') %>
+    </p>
+
+    <div style="margin: 20px 0;">
+      <% @flags.each do |flag| %>
+        <div style="background-color: #1a0000; border-left: 3px solid #ff4444; padding: 10px 15px; margin-bottom: 8px; color: #ff8888; font-size: 13px;">
+          <%= flag %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="border-top: 1px solid #333; padding-top: 20px; margin-top: 20px;">
+    <p style="color: #777; font-size: 10px; margin: 0;">
+      Generated: <%= @generated_at.strftime('%Y-%m-%d %H:%M UTC') %><br>
+      hackr.tv // TERMINAL AUDIT
+    </p>
+  </div>
+</div>

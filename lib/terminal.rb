@@ -10,6 +10,7 @@ require_relative "terminal/art"
 require_relative "terminal/effects"
 require_relative "terminal/easter_eggs"
 require_relative "terminal/realtime_subscriber"
+require_relative "terminal/audit_log"
 require_relative "terminal/session"
 
 # Handlers
@@ -32,8 +33,8 @@ module Terminal
     # @param input [IO] Input stream (default: $stdin)
     # @param output [IO] Output stream (default: $stdout)
     # @return [Session] The session instance
-    def start(input: $stdin, output: $stdout)
-      session = Session.new(input, output)
+    def start(input: $stdin, output: $stdout, ip_address: nil)
+      session = Session.new(input, output, ip_address: ip_address)
       session.run
       session
     end

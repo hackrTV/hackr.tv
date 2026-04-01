@@ -69,7 +69,7 @@ module Terminal
         if hackr&.authenticate(password)
           login_success(hackr)
         else
-          login_failure
+          login_failure(alias_input)
         end
       end
 
@@ -91,7 +91,8 @@ module Terminal
         go_back
       end
 
-      def login_failure
+      def login_failure(attempted_alias = nil)
+        session.audit.track(:auth_failure, handler: :login, input: attempted_alias)
         println ""
         banner = Art.banner(:access_denied)
         if banner.present?

@@ -40,13 +40,13 @@ module Terminal
     # Color scheme commands
     COLOR_SCHEME_COMMANDS = %w[amber green cga default cyberpunk].freeze
 
-    attr_reader :state, :hackr, :renderer, :input, :output, :realtime
+    attr_reader :state, :hackr, :renderer, :input, :output, :realtime, :audit
     attr_accessor :running
 
     # Initialize a new terminal session
     # @param input [IO] Input stream (default: $stdin)
     # @param output [IO] Output stream (default: $stdout)
-    def initialize(input = $stdin, output = $stdout)
+    def initialize(input = $stdin, output = $stdout, ip_address: nil)
       @input = input
       @output = output
       @state = :connecting
@@ -56,21 +56,30 @@ module Terminal
       @running = true
       @state_stack = []
       @realtime = RealtimeSubscriber.new(self)
+      @audit = AuditLog.new(ip_address: ip_address)
     end
 
     # Main entry point - runs the terminal session
     def run
+      @audit.start_session
       setup_signal_handlers
       display_connection_banner
       transition_to(:menu)
 
       main_loop
+      @disconnect_reason = "normal"
     rescue Interrupt
       # Ctrl+C pressed
+      @disconnect_reason = "interrupt"
       println "\n#{renderer.colorize("Signal interrupted. Disconnecting...", :amber)}"
     rescue EOFError
       # Connection closed
+      @disconnect_reason = "eof"
+    rescue
+      @disconnect_reason = "error"
+      raise
     ensure
+      @audit.end_session(reason: @disconnect_reason || "normal")
       cleanup
     end
 
@@ -87,6 +96,7 @@ module Terminal
       # Push current state to stack for "back" navigation
       @state_stack.push(@state) if push_stack && @state != :connecting
       @state = new_state
+      @audit.track(:state_change, handler: new_state)
 
       # Notify handler of state entry
       handler = current_handler
@@ -108,6 +118,8 @@ module Terminal
     def authenticate(hackr)
       @hackr = hackr
       @hackr.touch_activity! if @hackr.respond_to?(:touch_activity!)
+      @audit.associate_hackr(hackr)
+      @audit.track(:auth_success, handler: :login, metadata: {hackr_alias: hackr.hackr_alias})
     end
 
     # Log out current hackr
@@ -198,6 +210,8 @@ module Terminal
 
     def process_input(line)
       return if line.empty?
+
+      @audit.track(:command, handler: @state, input: line)
 
       # Check for global commands first
       if GLOBAL_COMMANDS.key?(line.downcase)
