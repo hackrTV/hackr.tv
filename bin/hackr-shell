@@ -61,8 +61,10 @@ rescue LoadError
 end
 
 # Run the terminal session
+ssh_ip = ENV["SSH_CLIENT"]&.split&.first
+
 begin
-  Terminal.start(input: $stdin, output: $stdout)
+  Terminal.start(input: $stdin, output: $stdout, ip_address: ssh_ip)
 rescue => e
   # Log errors but don't expose to user
   Rails.logger.error "[Terminal] Session error: #{e.message}"
