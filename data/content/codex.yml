@@ -246,6 +246,57 @@ codex_entries:
       - [[The Fracture Network]]
       - [[Chronology Fracture]]
 
+  - name: Dante Russo
+    slug: dante-russo
+    entry_type: person
+    summary: "Operator of #BlackShadez and black market tech dealer — the man who keeps the Fracture Network's only neutral ground running by refusing to belong to any part of it."
+    position: null
+    published: true
+    metadata:
+      timeline: "future"
+      faction: Independent
+      role: "Venue Operator / Tech Dealer"
+      status: Active
+    content: |
+      # Dante Russo
+
+      - **Status:** Active
+      - **Affiliation:** Independent (operates [[#BlackShadez]])
+      - **Timeline:** Future
+      - **Known For:** Running the Fracture Network's neutral ground, black market tech sourcing
+
+      ## The Operator
+
+      Dante Russo runs [[#BlackShadez]]. He does not own it — the four factions of [[The Fracture Network]] fund it independently, and the venue belongs to no one, which is the point. But Dante is the one who keeps the lights on, books the acts, manages the GovCorp entertainment licenses, and ensures that the underground space below the main floor remains invisible to every surveillance sweep that passes over [[The Riverlands]].
+
+      He is a tech dealer by trade. Black market hardware, anti-surveillance equipment, components that have no legitimate civilian application. The Faraday-caged booths in the underground space exist because Dante sourced the shielding. The acoustic isolation exists because he knows people who know how to build rooms that swallow sound. The club is simultaneously his front and his real operation — the venue justifies his presence in The Riverlands, and the tech trade funds what the factions' contributions do not cover.
+
+      ## The Connections
+
+      Dante knows [[XERAEN]] and [[Calloway]] from before the factional lines hardened. The three share an appetite for systems — how things work, how they break, how they can be repurposed. Different conclusions drawn from the same fascination. XERAEN builds transmission infrastructure. Calloway deconstructs the architecture of managed reality. Dante acquires, modifies, and moves the hardware that both of them need. He has sat in rooms with both men and understood exactly what each wanted without agreeing with either.
+
+      He knows [[Sora Nexa]] from the GovCorp-approved touring circuit. Before she built [[Frontwave]], before [[Neon Hearts]] became a steganographic delivery system, she was a performer booking venues through legitimate channels. Dante was one of the operators she worked with. He recognized what she was doing before she told him, and he said nothing, which is how trust is built with Dante — not through declaration but through silence at the right moment.
+
+      For [[Blackout]]'s involvement in #BlackShadez, Dante works through Calloway. Not [[Koda]]. This is not a slight — or if it is, Dante would frame it as practical. Calloway speaks a language Dante understands: systems, leverage, long-term architecture. Koda speaks in urgency and fire, and Dante does not negotiate with urgency. The result is that the youngest faction leader in the Fracture Network — the one who runs [[Blackout]]'s day-to-day operations, who books the underground shows, whose people pack the room — deals with Dante through his mentor's intermediation. Koda finds this intolerable in a way he has not yet articulated clearly enough to act on.
+
+      ## The Freedom
+
+      Dante has had offers. GovCorp would pay well for what he knows about the Fracture Network's logistics. Any faction would benefit from having him formally aligned. He has declined everything, and if you asked him why, he would say something about independence, about not wanting a leash, about the money being better when you serve everyone.
+
+      The truth is slightly different, and Dante knows it even if he would not say it aloud. The moment he commits — to GovCorp, to Hackrcore, to anyone — he becomes an asset instead of an operator. Assets are managed. Operators manage themselves. #BlackShadez exists because no one owns it, and Dante exists the same way. He has built a life in the gap between factions, and he understands instinctively that the gap is the only space where he is free.
+
+      Whether he believes in the Fracture Network's cause is a question people ask about him. The answer is that he believes in the room. The space where people meet without faction logos, where the music is unfiltered and the conversations are unmonitored. If that constitutes belief, he has never examined it closely enough to find out.
+
+      ## Related Entries
+
+      - [[#BlackShadez]]
+      - [[The Fracture Network]]
+      - [[XERAEN]]
+      - [[Calloway]]
+      - [[Sora Nexa]]
+      - [[Koda]]
+      - [[The.CyberPul.se Underground]]
+
   - name: Director Elena Krell
     slug: director-elena-krell
     entry_type: person
@@ -689,7 +740,7 @@ codex_entries:
 
       Synthia communicates natively through frequency modulation — pure vibrational expression that most humans cannot interpret. For broadcasts and performances, she needed an accessible voice.
 
-      [[XERAEN]] and [[Voiceprint (The Archivist)|The Archivist]] spent years unearthing thousands of audio samples of [[Ashlinn]]'s voice from [[Voiceprint]]'s archive. Together, they built a vocal synthesis model — a [[Voiceprint (The Archivist)|Voiceprint]]-engineered reconstruction that allows Synthia to sing with Ashlinn's voice.
+      [[XERAEN]] and [[The Archivist]] spent years unearthing thousands of audio samples of [[Ashlinn]]'s voice from [[Voiceprint]]'s archive. Together, they built a vocal synthesis model — a [[The Archivist|Voiceprint]]-engineered reconstruction that allows Synthia to sing with Ashlinn's voice.
 
       *When Synthia sings, Ashlinn's voice crosses time twice over.*
 
@@ -757,8 +808,8 @@ codex_entries:
       - [[GovCorp]]
       - [[The RIDE]]
 
-  - name: Voiceprint (The Archivist)
-    slug: voiceprint-the-archivist
+  - name: The Archivist
+    slug: the-archivist
     entry_type: person
     summary: "The mysterious figure behind Voiceprint's voice preservation mission — possessing perfect audio memory and an obsessive dedication to archiving authentic human expression before RAINNs erase it entirely."
     position: null
@@ -769,7 +820,7 @@ codex_entries:
       role: "Leader (Voiceprint), Archivist"
       status: Active
     content: |
-      # Voiceprint (The Archivist)
+      # The Archivist
 
       - **Status:** Active
       - **Affiliation:** [[Voiceprint]] (Leader)
@@ -1719,7 +1770,7 @@ codex_entries:
 
       - **Genre:** Melodic DnB
       - **Zone:** [[The Crypt]]
-      - **Leader:** [[Voiceprint (The Archivist)|The Archivist]]
+      - **Leader:** [[The Archivist]]
       - **Faction:** [[Frontwave]]
       - **Philosophy:** Preservation of authentic humanity
       - **Profile:** [Voiceprint](/voiceprint)
@@ -1742,7 +1793,7 @@ codex_entries:
 
       ## Related Entries
 
-      - [[Voiceprint (The Archivist)|The Archivist]]
+      - [[The Archivist]]
       - [[The Crypt]]
       - [[Frontwave]]
       - [[Synthia]]
@@ -1966,9 +2017,121 @@ codex_entries:
       - [[Ashlinn]]
       - [[The Erasure Paradox]]
 
+  - name: The.CyberPul.se Underground
+    slug: thecyberpulse-underground
+    entry_type: event
+    summary: "An annual all-day, all-night festival at #BlackShadez — the one time per year every Fracture Network faction shares the same room, and hackrs who normally never encounter each other find out they are not alone."
+    position: null
+    published: true
+    metadata:
+      type: Annual festival
+      status: Recurring
+      significance: Cross-faction gathering
+      location: "#BlackShadez"
+    content: |
+      # The.CyberPul.se Underground
+
+      - **Type:** Annual festival
+      - **Status:** Recurring
+      - **Location:** [[#BlackShadez]], [[The Riverlands]]
+      - **Timing:** Varies — late winter, typically in the weeks before the old calendar's season of fasting and reflection
+
+      ## Overview
+
+      Once a year, [[#BlackShadez]] stops being a small EDM club with an invisible basement. For one day and one night, the main floor goes dark to its regular programming, and [[The.CyberPul.se Underground]] takes over the entire venue — upstairs and down.
+
+      Every [[The Fracture Network|Fracture Network]] band plays. [[Hackrcore]], [[Blackout]], [[Frontwave]], [[Offline]]. The factions that spend the rest of the year in separate spaces, operating through separate channels, pursuing separate methods — all of them in the same room. Hackrs who have only ever encountered the resistance through [[The WIRE]] or a single faction's underground shows find themselves standing next to people they did not know existed. The kid from [[The Narrows]] who thought [[Neon Hearts]] was the whole resistance hears [[System Rot]] for the first time and has her world reframed. The Blackout operative who thinks the signal is dead watches a [[Temporal Blue Drift]] set and feels something he cannot dismiss.
+
+      This is what The.CyberPul.se Underground is for. Not the music — or not only the music. The encounter. The proof that the resistance is larger, stranger, and more alive than any single faction's experience of it.
+
+      ## The Timing
+
+      The date is not arbitrary. The.CyberPul.se Underground falls in the dead of winter, in the stretch of weeks when the old calendar demanded feasting before denial, excess before discipline. A season that predates [[GovCorp]] by millennia — when people wore masks not to hide but to become something truer than their daily faces allowed. The festival does not name this inheritance. It does not need to. The structure speaks for itself: one night of unmasking before the weight of the year resumes.
+
+      The date shifts. Sometimes for security — GovCorp pattern-detection makes fixed annual events dangerous. Sometimes for logistics — the GovCorp-mandated touring schedules that give [[#BlackShadez]] its legitimate cover occasionally lock the venue into approved bookings that cannot be canceled without drawing attention. The variability itself becomes cover. No fixed date means no predictable spike in [[The Slipstream|Slipstream]] traffic for GovCorp analysts to flag.
+
+      ## The Word
+
+      Word travels through every channel the [[The Fracture Network|Fracture Network]] has built. There is no single announcement. [[Frontwave]] operatives buy advertising space through GovCorp's own channels and encode the date in the metadata of approved promotional material. [[Offline]] distributes physical notes through their network — paper, hand to hand, no digital trace. [[Koda]] embeds the information in his graffiti tags across [[The Bend]] and [[The Undercity]]. Encoded caches are deposited throughout [[THE PULSE GRID]] zones, cloaked against RIDE detection. Each faction signals through its own methods. If any single channel is compromised, the others carry the message.
+
+      The Fracture Network maintains small-scale but broad-reach transit operations specifically for events like this — enough to move people without creating the mass-movement patterns that trigger GovCorp's anomaly detection. The operations work because they are never overused and never deployed at scale without cross-faction coordination.
+
+      ## What Happens
+
+      All day, all night. Sets run continuously — the main floor hosts the larger performances while the underground space runs parallel programming. The Faraday-caged booths are booked solid for coordination meetings that cannot wait for another year of intermediated communication. [[Dante Russo]] manages the logistics with the same studied neutrality he brings to everything, ensuring no faction dominates the schedule, no faction controls the space.
+
+      By morning, the venue is wrecked. The main floor returns to its GovCorp-approved programming within days. The underground space takes longer to reset. The booths need to be re-swept. The memories made do not reset at all.
+
+      ## Related Entries
+
+      - [[#BlackShadez]]
+      - [[Dante Russo]]
+      - [[The.CyberPul.se]]
+      - [[The Fracture Network]]
+      - [[Hackrcore]]
+      - [[Blackout]]
+      - [[Frontwave]]
+      - [[Offline]]
+      - [[The Riverlands]]
+
   # =============================================================================
   # LOCATIONS
   # =============================================================================
+  - name: "#BlackShadez"
+    slug: blackshadez
+    entry_type: location
+    summary: "A hackr club in The Riverlands operating as a generic EDM venue on the surface — below it, the only neutral ground in the Fracture Network, where all factions share space and Dante Russo keeps the lights on without asking whose money pays for them."
+    position: null
+    published: true
+    metadata:
+      type: "Hackr club / Neutral ground"
+      region: The Riverlands
+      control: Dante Russo (operator)
+      status: Active
+    content: |
+      # #BlackShadez
+
+      - **Type:** Hackr club / Neutral ground
+      - **Status:** Active
+      - **Operator:** [[Dante Russo]]
+      - **Region:** [[The Riverlands]]
+
+      ## The Surface
+
+      From the outside, #BlackShadez is a small EDM club in [[The Riverlands]]. Capacity two hundred, maybe three on a packed night. Generic bookings, GovCorp-approved entertainment licenses, [[The RIDE|RIDE]] monitoring passing clean on every sweep. [[Frontwave]] artists play here openly — their surface-level material passes every filter. The kind of place the Cultural Zone programming expects in a region built on musical heritage. One more venue drawing no attention.
+
+      [[Dante Russo]] runs the bookings, manages the licenses, handles the GovCorp compliance paperwork. On paper, he is a small-time venue operator running a club that barely breaks even.
+
+      ## The Underground
+
+      Below the main floor, a second space. Literally underground — low ceilings, dark, capacity one hundred on a good night, one-fifty when packed to the walls, which it often is. No GovCorp entertainment licenses apply here because officially this space does not exist.
+
+      This is where [[The Fracture Network]]'s bands perform. No promotional fliers. No advance booking announcements on monitored channels. You hear about it the way you hear about everything real in 2126: through someone who trusts you enough to tell you.
+
+      The underground space is dark in the way that darkness itself is a feature — not a failure of lighting but an intentional erasure of the visible. Bodies, sound, heat. The floor vibrates with sub-bass that the room above can feel but not identify. Every Fracture Network band has played here. [[heartbreak_havoc.sh]] performs her anti-GovCorp material here — the tracks that would burn [[Frontwave]]'s cover if she played them upstairs. [[System Rot]] has torn this room apart more than once. [[Wavelength Zero]] has held it so still that a hundred people forgot to breathe.
+
+      ## The Booths
+
+      Off the underground floor, a handful of private rooms. Not VIP in the entertainment sense — VIP in the operational sense. Faraday-caged. Acoustically isolated. Swept for surveillance hardware before every use. The walls are thick enough and shielded enough that nothing spoken inside reaches anything outside.
+
+      [[The Fracture Network]] uses these rooms for coordination that cannot happen over [[The WIRE]]. Face-to-face planning between faction leaders. Meetings with sympathetic individuals who are not Fracture-aligned but have something to offer — information, access, resources. The kind of conversation that requires eye contact and deniability.
+
+      Dante manages access to the booths personally. No faction owns them. No faction gets priority. This is the rule that holds #BlackShadez together, and everyone knows it.
+
+      ## Neutral Ground
+
+      #BlackShadez is the only fixed location in the Fracture Network that belongs to no faction. [[Hackrcore]], [[Blackout]], [[Frontwave]], [[Offline]] — each funds the operation independently. Four revenue streams from four philosophies, balanced by a man whose only ideology is that the room stays open.
+
+      This makes #BlackShadez fragile in a way that no one discusses openly. If any faction pulls funding, the balance shifts. If any faction tries to claim the space, the neutrality that makes it valuable evaporates. Dante holds it together through logistics and a refusal to take sides that everyone interprets as pragmatism. Whether it is something more than that is a question he does not answer.
+
+      ## Related Entries
+
+      - [[Dante Russo]]
+      - [[The.CyberPul.se Underground]]
+      - [[The Fracture Network]]
+      - [[The Riverlands]]
+      - [[The Hackr Hangar]]
+
   - name: Echo Chamber
     slug: echo-chamber
     entry_type: location
@@ -2198,7 +2361,7 @@ codex_entries:
 
       ## Voiceprint's Domain
 
-      [[Voiceprint (The Archivist)|The Archivist]] maintains The Crypt as [[Voiceprint]]'s operational base. Hardened storage racks, physical servers, recovered hardware line the facility. The voice archive — 1,847 samples of [[Ashlinn]]'s unprocessed vocals, thousands more from other sources — is housed here alongside recovered data that [[GovCorp]] believed permanently destroyed.
+      [[The Archivist]] maintains The Crypt as [[Voiceprint]]'s operational base. Hardened storage racks, physical servers, recovered hardware line the facility. The voice archive — 1,847 samples of [[Ashlinn]]'s unprocessed vocals, thousands more from other sources — is housed here alongside recovered data that [[GovCorp]] believed permanently destroyed.
 
       ## The Hidden Archive
 
@@ -2207,7 +2370,7 @@ codex_entries:
       ## Related Entries
 
       - [[Voiceprint]]
-      - [[Voiceprint (The Archivist)|The Archivist]]
+      - [[The Archivist]]
       - [[THE PULSE GRID]]
       - [[Ashlinn]]
       - [[The Straits]]
@@ -2553,7 +2716,7 @@ codex_entries:
 
       ## The Voice Problem
 
-      RAINNs can synthesize any voice — but they cannot replicate the quality that makes authentic human expression resistant to [[The RIDE]]. This is why [[Voiceprint]]'s archive matters: authentic voices carry [[The Resonance Field|resonance]] that synthesized approximation cannot reproduce. This is why [[Voiceprint (The Archivist)|The Archivist's]] work building Synthia's vocal model from [[Ashlinn]]'s samples was essential — only authentic source material produces the frequencies that cross time.
+      RAINNs can synthesize any voice — but they cannot replicate the quality that makes authentic human expression resistant to [[The RIDE]]. This is why [[Voiceprint]]'s archive matters: authentic voices carry [[The Resonance Field|resonance]] that synthesized approximation cannot reproduce. This is why [[The Archivist|The Archivist's]] work building Synthia's vocal model from [[Ashlinn]]'s samples was essential — only authentic source material produces the frequencies that cross time.
 
       ## Related Entries
 
