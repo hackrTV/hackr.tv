@@ -16,7 +16,7 @@ WORKDIR /rails
 
 # Install base packages (including OpenSSH for terminal access)
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 python3 python3-pip openssh-server libpam-modules git && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 python3 python3-pip openssh-server libpam-modules git fail2ban iptables && \
     pip3 install --no-cache-dir --break-system-packages litecli && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives && \
     mkdir -p /var/run/sshd
@@ -76,7 +76,8 @@ RUN groupadd --system --gid 1000 rails && \
     chown -R rails:rails db log storage tmp && \
     chmod +x /rails/bin/hackr-shell /rails/bin/docker-start /rails/docker/ssh/validate-password.rb /rails/docker/ssh/start-services.sh && \
     cp /rails/docker/ssh/pam-hackr-ssh /etc/pam.d/sshd && \
-    cp /rails/docker/ssh/sshd_config /etc/ssh/sshd_config.hackr
+    cp /rails/docker/ssh/sshd_config /etc/ssh/sshd_config.hackr && \
+    cp /rails/docker/ssh/fail2ban-sshd.conf /etc/fail2ban/jail.d/hackr-sshd.conf
 
 # Generate SSH host keys in /etc/ssh/keys/ (volume-mounted separately from config)
 # This allows sshd_config updates on rebuild while persisting keys

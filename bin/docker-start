@@ -79,14 +79,21 @@ export DATABASE_URL="${DATABASE_URL:-}"
 ENVEOF
     chmod 644 /rails/tmp/terminal_env.sh
 
-    # Start SSH daemon in background
+    # Start fail2ban for SSH brute-force protection
+    echo "Starting fail2ban..."
+    touch /var/log/sshd.log
+    fail2ban-server -b -x
+    FAIL2BAN_PID=$(cat /var/run/fail2ban/fail2ban.pid 2>/dev/null || echo "")
+
+    # Start SSH daemon in background (log to file for fail2ban to watch)
     echo "Starting SSH daemon on port 9915..."
-    /usr/sbin/sshd -D -f /etc/ssh/sshd_config &
+    /usr/sbin/sshd -D -e -f /etc/ssh/sshd_config 2>> /var/log/sshd.log &
     SSHD_PID=$!
 
     # Trap signals to gracefully shut down both services
     cleanup() {
         echo "Shutting down services..."
+        fail2ban-client stop 2>/dev/null || true
         kill $SSHD_PID 2>/dev/null || true
         exit 0
     }

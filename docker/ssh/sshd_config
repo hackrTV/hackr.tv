@@ -18,6 +18,11 @@ PermitRootLogin no
 MaxAuthTries 3
 MaxSessions 10
 
+# Throttle unauthenticated connections: allow 3 full-speed, then 50% drop
+# probability ramping up until 10 concurrent unauthenticated connections,
+# at which point all new connections are refused.
+MaxStartups 3:50:10
+
 # Password authentication via PAM
 # KbdInteractiveAuthentication (formerly ChallengeResponseAuthentication) is required
 # for pam_exec to receive the password properly
