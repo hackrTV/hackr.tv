@@ -79,11 +79,15 @@ export DATABASE_URL="${DATABASE_URL:-}"
 ENVEOF
     chmod 644 /rails/tmp/terminal_env.sh
 
-    # Start fail2ban for SSH brute-force protection
-    echo "Starting fail2ban..."
+    # Start fail2ban for SSH brute-force protection (requires CAP_NET_ADMIN)
+    # Degrades gracefully if firewall capabilities are missing — SSH still works,
+    # just without automatic IP banning.
     touch /var/log/sshd.log
-    fail2ban-server -b -x
-    FAIL2BAN_PID=$(cat /var/run/fail2ban/fail2ban.pid 2>/dev/null || echo "")
+    if fail2ban-server -b -x 2>/dev/null; then
+        echo "fail2ban started (SSH brute-force protection active)"
+    else
+        echo "WARNING: fail2ban failed to start (missing CAP_NET_ADMIN?) — SSH will run without ban protection"
+    fi
 
     # Start SSH daemon in background (log to file for fail2ban to watch)
     echo "Starting SSH daemon on port 9915..."
