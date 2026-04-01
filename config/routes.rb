@@ -78,6 +78,9 @@ Rails.application.routes.draw do
     get ":repo/blob/*path", to: "pages#spa_root", as: :code_blob, format: false
   end
 
+  # Timeline route - SPA
+  get "timeline", to: "pages#spa_root", as: :timeline
+
   # Codex (wiki) routes - SPA
   scope "codex" do
     get "/", to: "pages#spa_root", as: :codex

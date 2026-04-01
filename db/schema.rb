@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_020453) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_31_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -548,6 +548,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_020453) do
     t.index ["emailable_type", "emailable_id"], name: "index_sent_emails_on_emailable"
   end
 
+  create_table "terminal_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.string "handler"
+    t.string "input"
+    t.json "metadata"
+    t.integer "terminal_session_id", null: false
+    t.index ["created_at"], name: "index_terminal_events_on_created_at"
+    t.index ["event_type"], name: "index_terminal_events_on_event_type"
+    t.index ["terminal_session_id", "created_at"], name: "index_terminal_events_on_terminal_session_id_and_created_at"
+    t.index ["terminal_session_id"], name: "index_terminal_events_on_terminal_session_id"
+  end
+
+  create_table "terminal_sessions", force: :cascade do |t|
+    t.datetime "connected_at", null: false
+    t.string "disconnect_reason"
+    t.datetime "disconnected_at"
+    t.integer "duration_seconds"
+    t.integer "grid_hackr_id"
+    t.string "ip_address"
+    t.index ["connected_at"], name: "index_terminal_sessions_on_connected_at"
+    t.index ["grid_hackr_id"], name: "index_terminal_sessions_on_grid_hackr_id"
+    t.index ["ip_address"], name: "index_terminal_sessions_on_ip_address"
+  end
+
   create_table "tracks", force: :cascade do |t|
     t.integer "artist_id", null: false
     t.string "cover_image"
@@ -647,6 +672,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_020453) do
   add_foreign_key "radio_station_playlists", "playlists"
   add_foreign_key "radio_station_playlists", "radio_stations"
   add_foreign_key "releases", "artists"
+  add_foreign_key "terminal_events", "terminal_sessions"
+  add_foreign_key "terminal_sessions", "grid_hackrs"
   add_foreign_key "tracks", "artists"
   add_foreign_key "tracks", "releases"
   add_foreign_key "user_punishments", "grid_hackrs"

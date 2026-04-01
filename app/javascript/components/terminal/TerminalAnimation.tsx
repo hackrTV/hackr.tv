@@ -8,10 +8,8 @@ const routeMap: Record<string, string> = {
   'CODEX': '/codex',
   'LOGS': '/logs',
   '0': '/thecyberpulse',
-  '1': '/xeraen',
-  '2': '/wavelength-zero',
-  '3': '/voiceprint',
-  '4': '/temporal-blue-drift'
+  '1': '/wavelength-zero',
+  '2': '/voiceprint'
 }
 
 interface TerminalLine {
@@ -69,12 +67,12 @@ export const TerminalAnimation: React.FC = () => {
     { text: '', delay: 500 },
     ...(isMobile ? [
       { text: 'Welcome to hackr.tv - the multimedia', delay: 100 },
-      { text: 'Fracture Network platform broadcasting', delay: 100 },
-      { text: 'cyberpunk transmissions across time', delay: 100 },
-      { text: `and space from ${currentYear + 100}.`, delay: 100 }
+      { text: '<a href="/codex/the-fracture-network" data-route="/codex/the-fracture-network" class="terminal-link">Fracture Network</a> platform broadcasting', delay: 100, html: true },
+      { text: 'urgent transmissions <a href="/timeline" data-route="/timeline" class="terminal-link">across time</a>', delay: 100, html: true },
+      { text: `<a href="/timeline" data-route="/timeline" class="terminal-link">and space</a> from ${currentYear + 100}.`, delay: 100, html: true }
     ] : [
-      { text: 'Welcome to hackr.tv - the multimedia Fracture Network platform broadcasting', delay: 100 },
-      { text: `cyberpunk transmissions across time and space from ${currentYear + 100}.`, delay: 100 }
+      { text: 'Welcome to hackr.tv - the multimedia <a href="/codex/the-fracture-network" data-route="/codex/the-fracture-network" class="terminal-link">Fracture Network</a> platform broadcasting', delay: 100, html: true },
+      { text: `urgent transmissions <a href="/timeline" data-route="/timeline" class="terminal-link">across time</a> and space from ${currentYear + 100}.`, delay: 100, html: true }
     ]),
     { text: '', delay: 500 },
     { text: singleLine, delay: 200 },
@@ -87,20 +85,14 @@ export const TerminalAnimation: React.FC = () => {
       { text: '    the Hackrs of CyberSpace', delay: 100 }
     ] : [
       { text: '    Flagship Standard Bearers of the Hackrs of CyberSpace,', delay: 100 },
-      { text: '    sending pirate broadcasts across time and space', delay: 100 }
+      { text: '    broadcasting truth across time and space', delay: 100 }
     ]),
     { text: '', delay: 200 },
-    { text: '[1] <a href="/xeraen" data-route="/xeraen" class="terminal-link">XERAEN</a>', delay: 200, html: true },
-    { text: '    Trans-Temporal Operations', delay: 100 },
+    { text: '[1] <a href="/wavelength-zero" data-route="/wavelength-zero" class="terminal-link">Wavelength Zero</a>', delay: 200, html: true },
+    { text: '    Emotive Signal refraction', delay: 100 },
     { text: '', delay: 200 },
-    { text: '[2] <a href="/wavelength-zero" data-route="/wavelength-zero" class="terminal-link">Wavelength Zero</a>', delay: 200, html: true },
-    { text: '    Signal disruption collective', delay: 100 },
-    { text: '', delay: 200 },
-    { text: '[3] <a href="/voiceprint" data-route="/voiceprint" class="terminal-link">Voiceprint</a>', delay: 200, html: true },
-    { text: '    Archival resistance records', delay: 100 },
-    { text: '', delay: 200 },
-    { text: '[4] <a href="/temporal-blue-drift" data-route="/temporal-blue-drift" class="terminal-link">Temporal Blue Drift</a>', delay: 200, html: true },
-    { text: '    Love letters across time', delay: 100 },
+    { text: '[2] <a href="/voiceprint" data-route="/voiceprint" class="terminal-link">Voiceprint</a>', delay: 200, html: true },
+    { text: '    Archived human expression', delay: 100 },
     { text: '', delay: 500 },
     { text: singleLine, delay: 200 },
     { text: 'PLATFORM SERVICES:', delay: 300, class: 'terminal-header' },

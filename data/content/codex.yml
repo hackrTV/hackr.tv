@@ -473,7 +473,7 @@ codex_entries:
 
       Her scientific training demanded skepticism. Her data demanded she keep looking. She spent months in quiet investigation — ruling out equipment malfunction, environmental interference, every rational explanation — before she was certain enough to look for others who had seen the same thing.
 
-      ## Building The Listeners
+      ## Gathering The Listeners
 
       Reeves discovered she was not alone. Other researchers, radio enthusiasts, and audio engineers had detected similar anomalies. She began connecting them — cautiously, methodically, with the rigor of a scientist building a peer review network rather than a conspiracy theory.
 
@@ -502,7 +502,7 @@ codex_entries:
   - name: Nathan Clarke
     slug: nathan-clarke
     entry_type: person
-    summary: "Software engineer and codec developer who decoded the Fracture Network's trans-temporal transmissions into viewable livestream — builder of The Relay, the tool that bridges a century."
+    summary: "Software engineer and codec developer who decoded the Fracture Network's trans-temporal transmissions into viewable livestreams — builder of The Relay, the tool that bridges a century."
     position: null
     published: true
     metadata:
@@ -518,7 +518,7 @@ codex_entries:
       - **Status:** Active
       - **Timeline:** Present
       - **Affiliation:** [[The Listeners]]
-      - **Known For:** Decoding trans-temporal video, building [[The Relay]]
+      - **Known For:** Decoding complex trans-temporal data, building [[The Relay]]
 
       ## Background
 
@@ -530,11 +530,13 @@ codex_entries:
 
       Nathan found what others missed: structured transport stream headers in the signal data that [[Mel Reeves]] and [[The Listeners]] had been analyzing. Where they saw audio anomalies, he saw a familiar architecture — interleaved data streams with frame markers, synchronization bytes, and metadata channels. Someone had built a broadcast system. A very good one.
 
-      He reached out to Mel in November 2025. She recognized immediately that his skills were the missing piece.
+      He reached out to Mel in November 2025. She recognized immediately that his skills were the missing piece to her analysis.
 
       ## The Codec
 
-      January 2026: Nathan identifies the data stream as a custom transport protocol containing interleaved audio, video, and metadata. February: first partial decode — corrupted frames, garbled audio, but unmistakably video. A flash of purple light through the static. March: the codec stabilizes. First full decode. They see [[XERAEN]] broadcasting from an impossible place.
+      - January 2026: Nathan identifies the data stream as a custom transport protocol containing interleaved audio, video, and metadata.
+      - February: first partial decode — corrupted frames, garbled audio, but unmistakably video. A flash of purple light through the static.
+      - March: the codec stabilizes. First full decode. They see [[XERAEN]] broadcasting from an impossible place.
 
       ## The Relay and hackr.tv
 
@@ -544,7 +546,7 @@ codex_entries:
 
       Nathan reconstructed it as a web-accessible platform: **hackr.tv**. The name was his — practical, descriptive, suited to the 2020s. The platform was not. Every protocol, every interaction pattern, every piece of infrastructure was decoded from a network that wouldn't be built for another century.
 
-      The real-world Relay application is Nathan's creation brought to life. Code is lore. Lore is code.
+      The Relay application is Nathan's creation brought to life.
 
       ## Philosophy
 
