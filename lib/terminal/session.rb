@@ -75,7 +75,7 @@ module Terminal
     rescue EOFError
       # Connection closed
       @disconnect_reason = "eof"
-    rescue => e
+    rescue
       @disconnect_reason = "error"
       raise
     ensure
@@ -119,7 +119,7 @@ module Terminal
       @hackr = hackr
       @hackr.touch_activity! if @hackr.respond_to?(:touch_activity!)
       @audit.associate_hackr(hackr)
-      @audit.track(:auth_success, handler: :login, metadata: { hackr_alias: hackr.hackr_alias })
+      @audit.track(:auth_success, handler: :login, metadata: {hackr_alias: hackr.hackr_alias})
     end
 
     # Log out current hackr

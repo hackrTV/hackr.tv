@@ -17,8 +17,9 @@ namespace :terminal do
       next
     end
 
-    puts format("%-6s %-16s %-20s %-20s %-10s %-8s %s",
-      "ID", "IP", "Connected", "Disconnected", "Duration", "Reason", "Hackr")
+    puts "%-6s %-16s %-20s %-20s %-10s %-8s %s" % [
+      "ID", "IP", "Connected", "Disconnected", "Duration", "Reason", "Hackr"
+    ]
     puts "-" * 110
 
     sessions.each do |s|
@@ -55,14 +56,15 @@ namespace :terminal do
 
     events = session.terminal_events.order(:created_at)
 
-    puts "Session ##{session.id} — #{session.ip_address || 'unknown IP'}"
+    puts "Session ##{session.id} — #{session.ip_address || "unknown IP"}"
     puts "Connected: #{session.connected_at}"
-    puts "Disconnected: #{session.disconnected_at || '(active)'}"
-    puts "Hackr: #{session.grid_hackr&.hackr_alias || '-'}"
+    puts "Disconnected: #{session.disconnected_at || "(active)"}"
+    puts "Hackr: #{session.grid_hackr&.hackr_alias || "-"}"
     puts ""
 
-    puts format("%-6s %-20s %-16s %-20s %s",
-      "ID", "Time", "Type", "Handler", "Input")
+    puts "%-6s %-20s %-16s %-20s %s" % [
+      "ID", "Time", "Type", "Handler", "Input"
+    ]
     puts "-" * 90
 
     events.each do |e|
@@ -113,7 +115,7 @@ namespace :terminal do
       end
 
     if flags.empty?
-      puts "No suspicious activity detected since #{since.strftime('%Y-%m-%d %H:%M')}."
+      puts "No suspicious activity detected since #{since.strftime("%Y-%m-%d %H:%M")}."
     else
       puts "=== Suspicious Activity Flags ==="
       puts ""
@@ -133,8 +135,15 @@ namespace :terminal do
     days = (ENV["DAYS"] || 90).to_i
     cutoff = days.days.ago
 
+    # Delete events older than cutoff first
     event_count = TerminalEvent.where("created_at < ?", cutoff).delete_all
-    session_count = TerminalSession.where("connected_at < ?", cutoff).delete_all
+
+    # Only delete sessions that have no remaining events (avoids FK violation
+    # for long-lived sessions whose newer events survived the cutoff)
+    session_count = TerminalSession
+      .where("connected_at < ?", cutoff)
+      .where.not(id: TerminalEvent.select(:terminal_session_id))
+      .delete_all
 
     puts "Pruned #{event_count} events and #{session_count} sessions older than #{days} days."
   end

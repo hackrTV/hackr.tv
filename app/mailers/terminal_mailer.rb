@@ -11,7 +11,7 @@ class TerminalMailer < ApplicationMailer
     track_email
     mail(
       to: "x@hackr.tv",
-      subject: "[TERMINAL] #{flags.size} suspicious activity flag#{flags.size == 1 ? '' : 's'} detected"
+      subject: "[TERMINAL] #{flags.size} suspicious activity flag#{"s" unless flags.size == 1} detected"
     )
   end
 end

@@ -28,7 +28,7 @@ module Terminal
 
     def end_session(reason: "normal")
       flush
-      track(:session_end, metadata: { reason: reason })
+      track(:session_end, metadata: {reason: reason})
       flush
       @session_record&.close!(reason: reason)
     rescue => e
@@ -51,7 +51,7 @@ module Terminal
         event_type: event_type.to_s,
         handler: handler&.to_s,
         input: input&.to_s&.truncate(MAX_INPUT_LENGTH),
-        metadata: metadata&.to_json,
+        metadata: metadata,
         created_at: Time.current
       }
 
