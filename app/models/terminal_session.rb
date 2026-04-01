@@ -1,5 +1,28 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: terminal_sessions
+# Database name: primary
+#
+#  id                :integer          not null, primary key
+#  connected_at      :datetime         not null
+#  disconnect_reason :string
+#  disconnected_at   :datetime
+#  duration_seconds  :integer
+#  ip_address        :string
+#  grid_hackr_id     :integer
+#
+# Indexes
+#
+#  index_terminal_sessions_on_connected_at   (connected_at)
+#  index_terminal_sessions_on_grid_hackr_id  (grid_hackr_id)
+#  index_terminal_sessions_on_ip_address     (ip_address)
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 class TerminalSession < ApplicationRecord
   belongs_to :grid_hackr, optional: true
   has_many :terminal_events, dependent: :delete_all

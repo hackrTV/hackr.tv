@@ -252,19 +252,19 @@ export const HeaderMenu: React.FC = () => {
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MORE</div>
+                <Link to="/timeline" className={`mobile-menu-item${isActive('/timeline') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Timeline
+                </Link>
                 <Link to="/codex" className={`mobile-menu-item${isActive('/codex') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Codex
+                  <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Codex
                 </Link>
                 <Link to="/logs" className={`mobile-menu-item${isActive('/logs') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Logs
-                </Link>
-                <Link to="/code" className={`mobile-menu-item${isActive('/code') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Code
+                  <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Logs
                 </Link>
               </div>
 
               <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">{isLoggedIn ? '10' : '9'}. THE PULSE GRID</div>
+                <div className="mobile-menu-section-title">{isLoggedIn ? '9' : '8'}. THE PULSE GRID</div>
                 <Link to="/grid" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>grid
                 </Link>
@@ -286,11 +286,14 @@ export const HeaderMenu: React.FC = () => {
                     <Link to="/fm/playlists" className={`mobile-menu-item${isActive('/fm') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>playlists
                     </Link>
+                    <Link to="/code" className={`mobile-menu-item${isActive('/code') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                      <span className="purple-168-text">/</span>code
+                    </Link>
                   </>
                 )}
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
-                    <span className="red-255-text">{isLoggedIn ? '11' : '10'}</span> /root <span className="red-255-text">[ADMIN]</span>
+                    <span className="red-255-text">10</span> /root <span className="red-255-text">[ADMIN]</span>
                   </a>
                 )}
               </div>
@@ -501,7 +504,7 @@ export const HeaderMenu: React.FC = () => {
             </Link>
           </li>
 
-          {/* WIRE */}
+          {/* 5: WIRE */}
           <li className={`header-nav-item${isActive('/wire') ? ' active' : ''}`}>
             <Link to="/wire">
               <span className="purple-168-text">5</span> WIRE&nbsp;
@@ -517,29 +520,29 @@ export const HeaderMenu: React.FC = () => {
             </li>
           )}
 
+          {/* Timeline */}
+          <li className={`header-nav-item${isActive('/timeline') ? ' active' : ''}`}>
+            <Link to="/timeline">
+              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Timeline&nbsp;
+            </Link>
+          </li>
+
           {/* Codex */}
           <li className={`header-nav-item${isActive('/codex') ? ' active' : ''}`}>
             <Link to="/codex">
-              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Codex&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Codex&nbsp;
             </Link>
           </li>
 
           {/* Logs */}
           <li className={`header-nav-item${isActive('/logs') ? ' active' : ''}`}>
             <Link to="/logs">
-              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Logs&nbsp;
-            </Link>
-          </li>
-
-          {/* Code */}
-          <li className={`header-nav-item${isActive('/code') ? ' active' : ''}`}>
-            <Link to="/code">
-              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Code&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Logs&nbsp;
             </Link>
           </li>
 
           {/* THE PULSE GRID */}
-          <li className={`header-dropdown${isActive('/grid') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
+          <li className={`header-dropdown${isActive('/grid') || isActive('/code') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
             <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'grid' ? 'open' : ''}`}>
               <ul>
@@ -574,6 +577,11 @@ export const HeaderMenu: React.FC = () => {
                         <span className="purple-168-text">/</span>playlists
                       </Link>
                     </li>
+                    <li>
+                      <Link to="/code" onClick={closeDropdown}>
+                        <span className="purple-168-text">/</span>code
+                      </Link>
+                    </li>
                   </>
                 )}
               </ul>
@@ -584,7 +592,7 @@ export const HeaderMenu: React.FC = () => {
           {hackr?.role === 'admin' && (
             <li className="header-nav-item">
               <a href="/root">
-                <span className="red-255-text">{isLoggedIn ? '11' : '10'}</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">11</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}

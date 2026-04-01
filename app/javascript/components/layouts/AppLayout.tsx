@@ -37,6 +37,7 @@ const LogsIndexPage = lazy(() => import('~/components/pages/logs/LogsIndexPage')
 const LogDetailPage = lazy(() => import('~/components/pages/logs/LogDetailPage').then(m => ({ default: m.LogDetailPage })))
 const CodexIndexPage = lazy(() => import('~/components/pages/codex/CodexIndexPage').then(m => ({ default: m.CodexIndexPage })))
 const CodexEntryPage = lazy(() => import('~/components/pages/codex/CodexEntryPage').then(m => ({ default: m.CodexEntryPage })))
+const TimelinePage = lazy(() => import('~/components/pages/timeline/TimelinePage').then(m => ({ default: m.TimelinePage })))
 const HotwirePage = lazy(() => import('~/components/pulsewire/HotwirePage').then(m => ({ default: m.HotwirePage })))
 const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage').then(m => ({ default: m.UserPulsesPage })))
 const SinglePulsePage = lazy(() => import('~/components/pulsewire/SinglePulsePage').then(m => ({ default: m.SinglePulsePage })))
@@ -121,6 +122,8 @@ export const AppLayout: React.FC = () => {
         {/* Codex routes */}
         <Route path="/codex" element={<CodexIndexPage />} />
         <Route path="/codex/:slug" element={<CodexEntryPage />} />
+        {/* Timeline route */}
+        <Route path="/timeline" element={<TimelinePage />} />
         {/* PulseWire routes */}
         <Route path="/wire" element={<HotwirePage />} />
         <Route path="/wire/:username" element={<UserPulsesPage />} />
@@ -129,11 +132,11 @@ export const AppLayout: React.FC = () => {
         <Route path="/uplink" element={<ProtectedRoute><UplinkPage /></ProtectedRoute>} />
         {/* Uplink popout - public for livestream viewing */}
         <Route path="/uplink/popout" element={<UplinkPopoutPage />} />
-        {/* Code browser routes */}
-        <Route path="/code" element={<CodeIndexPage />} />
-        <Route path="/code/:repo" element={<CodeRepoPage />} />
-        <Route path="/code/:repo/tree/*" element={<CodeRepoPage />} />
-        <Route path="/code/:repo/blob/*" element={<CodeRepoPage />} />
+        {/* Code browser routes - protected */}
+        <Route path="/code" element={<ProtectedRoute><CodeIndexPage /></ProtectedRoute>} />
+        <Route path="/code/:repo" element={<ProtectedRoute><CodeRepoPage /></ProtectedRoute>} />
+        <Route path="/code/:repo/tree/*" element={<ProtectedRoute><CodeRepoPage /></ProtectedRoute>} />
+        <Route path="/code/:repo/blob/*" element={<ProtectedRoute><CodeRepoPage /></ProtectedRoute>} />
         {/* 404 catch-all - must be last */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

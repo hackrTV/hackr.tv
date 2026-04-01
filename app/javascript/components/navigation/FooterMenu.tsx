@@ -61,22 +61,22 @@ export const FooterMenu: React.FC = () => {
               </Link>
             </li>
           )}
+          <li className={isActive('/timeline') ? 'active' : undefined}>
+            <Link to="/timeline">
+              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;Timeline&nbsp;
+            </Link>
+          </li>
           <li className={isActive('/codex') ? 'active' : undefined}>
             <Link to="/codex">
-              <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;Codex&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;Codex&nbsp;
             </Link>
           </li>
           <li className={isActive('/logs') ? 'active' : undefined}>
             <Link to="/logs">
-              <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;Logs&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;Logs&nbsp;
             </Link>
           </li>
-          <li className={isActive('/code') ? 'active' : undefined}>
-            <Link to="/code">
-              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;Code&nbsp;
-            </Link>
-          </li>
-          <li className={isActive('/grid') ? 'active' : undefined}>
+          <li className={isActive('/grid') || isActive('/code') ? 'active' : undefined}>
             <Link to="/grid">
               <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
             </Link>
@@ -84,7 +84,7 @@ export const FooterMenu: React.FC = () => {
           {hackr?.role === 'admin' && (
             <li>
               <a href="/root">
-                <span className="red-255-text">{isLoggedIn ? '11' : '10'}</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">11</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
               </a>
             </li>
           )}
