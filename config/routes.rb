@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   # Root route (SPA)
   root "pages#spa_root"
 
+  # XERAEN vidz redirect to thecyberpulse
+  get "xeraen/vidz", to: redirect("/thecyberpulse/vidz")
+  get "xeraen/vidz/:id", to: redirect("/thecyberpulse/vidz/%{id}")
+
   # Artist routes - SPA (consolidated per-artist pattern)
   # Each artist gets: profile, releases, trackz, vidz
   %w[thecyberpulse xeraen system-rot wavelength-zero voiceprint temporal-blue-drift
@@ -111,6 +115,7 @@ Rails.application.routes.draw do
     resources :tracks, only: %i[index show]
     resources :releases, only: %i[index show] do
       get :latest, on: :collection
+      get :coming_soon, on: :collection
     end
     get "codex/mappings", to: "codex#mappings"
     get "codex", to: "codex#index"
@@ -211,10 +216,14 @@ Rails.application.routes.draw do
   namespace :admin, path: "root" do
     root "dashboard#index"
 
-    # Read-only catalog resources (managed via data/catalog/*.yml)
+    # Catalog resources
     resources :artists, only: [:index]
-    resources :releases, only: [:index]
-    resources :tracks, only: [:index]
+    resources :releases, only: %i[index edit update destroy] do
+      member do
+        delete :purge_cover, to: "releases#purge_cover"
+      end
+    end
+    resources :tracks, only: %i[index edit update destroy]
 
     # Read-only content resources (managed via data/content/*.yml)
     resources :codex_entries, only: [:index]

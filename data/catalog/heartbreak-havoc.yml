@@ -269,3 +269,16 @@ releases:
           ./exeCUTE
 
           heartbreak_havoc.sh
+
+  - slug: segfault-serenade
+    title: "Segfault Serenade"
+    release_type: ep
+    label: "hackr.fm"
+    release_date: "2126-08-18"
+    coming_soon: true
+    cover_image: "segfault_serenade.jpg"
+    tracks:
+      - title: "Segfault Serenade"
+        slug: segfault-serenade
+        track_number: 1
+        duration: "3:33"

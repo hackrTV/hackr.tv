@@ -1042,12 +1042,16 @@ hackr_logs:
     slug: threat-assessment-fracture-network
     lore_date: "2122-03-15 08:00"
     body: |
-      CLASSIFICATION: DIRECTOR-LEVEL — GOVCORP STRATEGIC COMMAND
-      PREPARED BY: Director Elena Krell, Counter-Resistance Division
-      DISTRIBUTION: Strategic Command only. No digital copies. Read and return.
+      - CLASSIFICATION: DIRECTOR-LEVEL — GOVCORP STRATEGIC COMMAND
+      - PREPARED BY: Director Elena Krell, Counter-Resistance Division
+      - DISTRIBUTION: Strategic Command only. No digital copies. Read and return.
 
-      COMPREHENSIVE THREAT ASSESSMENT: THE FRACTURE NETWORK
-      Assessment Period: 2115-2122
+      ---
+
+      - COMPREHENSIVE THREAT ASSESSMENT: THE FRACTURE NETWORK
+      - Assessment Period: 2115-2122
+
+      ---
 
       EXECUTIVE OVERVIEW
 

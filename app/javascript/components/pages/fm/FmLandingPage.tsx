@@ -25,11 +25,15 @@ export const FmLandingPage: React.FC = () => {
   const currentYear = new Date().getFullYear()
   const futureYear = currentYear + 100
   const [latestReleases, setLatestReleases] = useState<Release[]>([])
+  const [comingSoon, setComingSoon] = useState<Release[]>([])
 
   useEffect(() => {
     apiJson<Release[]>('/api/releases/latest')
       .then(data => setLatestReleases(data))
       .catch(error => console.error('Error fetching releases:', error))
+    apiJson<Release[]>('/api/releases/coming_soon')
+      .then(data => setComingSoon(data))
+      .catch(error => console.error('Error fetching coming soon:', error))
   }, [])
 
   return (
@@ -90,11 +94,11 @@ export const FmLandingPage: React.FC = () => {
                           background: '#0d0d0d',
                           border: '1px solid #7c3aed',
                           boxShadow: '0 0 10px rgba(124, 58, 237, 0.15)',
-                          transition: 'box-shadow 0.2s ease',
+                          transition: 'box-shadow 0.2s ease, transform 0.2s ease',
                           cursor: 'pointer'
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 20px rgba(124, 58, 237, 0.4)' }}
-                        onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 10px rgba(124, 58, 237, 0.15)' }}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 20px rgba(124, 58, 237, 0.4)'; e.currentTarget.style.transform = 'scale(1.02)' }}
+                        onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 10px rgba(124, 58, 237, 0.15)'; e.currentTarget.style.transform = 'scale(1)' }}
                       >
                         <div style={{ width: '100%', aspectRatio: '1', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                           {release.cover_url ? (
@@ -148,7 +152,138 @@ export const FmLandingPage: React.FC = () => {
               </div>
             )}
 
+            {/* Coming Soon */}
+            {comingSoon.length > 0 && (
+              <div style={{ marginBottom: '30px' }}>
+                <div style={{ borderTop: '1px solid #333', marginBottom: '25px' }} />
+                <style>{`
+                  @keyframes signal-pulse {
+                    0%, 100% { opacity: 1; text-shadow: 0 0 10px #7c3aed, 0 0 20px #7c3aed; }
+                    50% { opacity: 0.7; text-shadow: 0 0 5px #7c3aed; }
+                  }
+                  @keyframes scanline-move {
+                    0% { background-position: 0 0; }
+                    100% { background-position: 0 4px; }
+                  }
+                  @keyframes glitch-shift {
+                    0%, 100% { transform: translate(0); }
+                    20% { transform: translate(-2px, 1px); }
+                    40% { transform: translate(2px, -1px); }
+                    60% { transform: translate(-1px, -1px); }
+                    80% { transform: translate(1px, 2px); }
+                  }
+                  @keyframes border-glow {
+                    0%, 100% { border-color: #7c3aed; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
+                    50% { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+                  }
+                `}</style>
+                <h3 style={{
+                  color: '#7c3aed',
+                  textAlign: 'center',
+                  marginBottom: '20px',
+                  fontSize: '1.1em',
+                  letterSpacing: '3px',
+                  animation: 'signal-pulse 2s ease-in-out infinite'
+                }}>
+                  ◈ SIGNAL INCOMING ◈
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : `repeat(${Math.min(comingSoon.length, 4)}, 1fr)`,
+                  gap: isMobile ? '10px' : '15px'
+                }}>
+                  {comingSoon.map(release => (
+                    <Link
+                      key={release.id}
+                      to={`/${release.artist.slug}/releases/${release.slug}`}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      <div
+                        style={{
+                          background: '#0a0a0a',
+                          border: '1px solid #7c3aed',
+                          animation: 'border-glow 3s ease-in-out infinite',
+                          transition: 'transform 0.2s ease',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = 'scale(1.02)'
+                          const img = e.currentTarget.querySelector('img') as HTMLElement
+                          if (img) img.style.animation = 'glitch-shift 0.3s ease-in-out 3'
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = 'scale(1)'
+                          const img = e.currentTarget.querySelector('img') as HTMLElement
+                          if (img) img.style.animation = 'none'
+                        }}
+                      >
+                        {/* Cover with scanline overlay */}
+                        <div style={{ width: '100%', aspectRatio: '1', background: '#111', position: 'relative', overflow: 'hidden' }}>
+                          {release.cover_url ? (
+                            <img
+                              src={release.cover_urls?.standard || release.cover_url}
+                              alt={release.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                filter: 'saturate(0.5) brightness(0.6) contrast(1.1)'
+                              }}
+                            />
+                          ) : (
+                            <div style={{ color: '#333', fontSize: '2em', fontFamily: 'monospace', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>&#9834;</div>
+                          )}
+                          {/* Scanline overlay */}
+                          <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px)',
+                            animation: 'scanline-move 0.5s linear infinite',
+                            pointerEvents: 'none'
+                          }} />
+                          {/* Purple tint overlay */}
+                          <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'rgba(124, 58, 237, 0.15)',
+                            pointerEvents: 'none'
+                          }} />
+                          {/* INCOMING badge */}
+                          <div style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            background: 'rgba(124, 58, 237, 0.85)',
+                            color: '#fff',
+                            padding: '2px 8px',
+                            fontSize: '0.65em',
+                            letterSpacing: '2px',
+                            fontWeight: 'bold'
+                          }}>
+                            INCOMING
+                          </div>
+                        </div>
+                        <div style={{ padding: '10px' }}>
+                          <div style={{ color: '#7c3aed', fontWeight: 'bold', fontSize: '0.9em', marginBottom: '3px' }}>
+                            {release.name}
+                          </div>
+                          <div style={{ color: '#888', fontSize: '0.75em', marginBottom: '4px' }}>
+                            {release.artist.name}
+                          </div>
+                          <div style={{ color: '#555', fontSize: '0.7em', letterSpacing: '1px' }}>
+                            {release.release_type?.toUpperCase() || 'RELEASE'} · {release.track_count} track{release.track_count !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Navigation cards */}
+            <div style={{ borderTop: '1px solid #333', marginBottom: '25px' }} />
             <div style={{
               display: 'grid',
               gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',

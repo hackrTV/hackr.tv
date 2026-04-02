@@ -1,0 +1,111 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1000px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/tracks/<%= @track.slug %> :: EDIT TRACK</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <%= link_to "← Back to #{@release.name}", edit_admin_release_path(@release), class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= link_to "All Releases", admin_releases_path, class: "tui-button cyan-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <div style="padding: 10px; margin-bottom: 20px; background: #0a0a0a; border: 1px solid #333;">
+        <span style="color: #888;">Release:</span>
+        <span style="color: #0ff;"><%= @release.name %></span>
+        <span style="color: #666;">by</span>
+        <span style="color: #0ff;"><%= @track.artist.name %></span>
+      </div>
+
+      <%# Flash Errors %>
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <%= form_with model: [:admin, @track], local: true do |f| %>
+        <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: TRACK INFO ::]</h3>
+
+        <div style="margin-bottom: 20px;">
+          <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.text_field :title, class: "tui-input", style: "width: 100%;" %>
+          <% if @track.errors[:title].any? %>
+            <br><small class="red-255-text"><%= @track.errors[:title].join(", ") %></small>
+          <% end %>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+          <% if @track.errors[:slug].any? %>
+            <br><small class="red-255-text"><%= @track.errors[:slug].join(", ") %></small>
+          <% end %>
+        </div>
+
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 120px; margin-bottom: 20px;">
+            <%= f.label :track_number, "TRACK #", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+            <%= f.number_field :track_number, class: "tui-input", style: "width: 100%;", min: 1 %>
+          </div>
+          <div style="flex: 1; min-width: 120px; margin-bottom: 20px;">
+            <%= f.label :duration, "DURATION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+            <%= f.text_field :duration, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "3:45" %>
+          </div>
+          <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+            <%= f.label :release_date, "RELEASE DATE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+            <%= f.date_field :release_date, class: "tui-input", style: "width: 100%;" %>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+          <div>
+            <%= f.label :featured, class: "white-text", style: "display: inline-flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;" do %>
+              <%= f.check_box :featured, style: "width: 20px; height: 20px;" %>
+              <span>FEATURED</span>
+            <% end %>
+          </div>
+          <div>
+            <%= f.label :show_in_pulse_vault, class: "white-text", style: "display: inline-flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;" do %>
+              <%= f.check_box :show_in_pulse_vault, style: "width: 20px; height: 20px;" %>
+              <span>SHOW IN PULSE VAULT</span>
+            <% end %>
+          </div>
+        </div>
+
+        <% if @track.audio_file.attached? %>
+          <div style="margin-bottom: 20px; padding: 10px; background: #0a0a0a; border: 1px solid #333;">
+            <span class="green-255-text">✓ Audio file attached</span>
+            <span style="color: #888; margin-left: 10px; font-family: monospace; font-size: 0.85em;">
+              <%= @track.audio_file.filename %>
+              (<%= number_to_human_size(@track.audio_file.byte_size) %>)
+            </span>
+          </div>
+        <% end %>
+
+        <div style="margin-bottom: 20px;">
+          <%= f.label :lyrics, "LYRICS", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.text_area :lyrics, class: "tui-input", style: "width: 100%; min-height: 200px; font-family: monospace; line-height: 1.6;" %>
+        </div>
+
+        <%# Actions %>
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+          <%= f.submit "Save Track",
+              class: "tui-button purple-168",
+              style: "padding: 10px 30px; font-size: 1.1em;" %>
+          <%= link_to "Cancel", edit_admin_release_path(@release),
+              class: "tui-button grey-168",
+              style: "padding: 10px 30px; font-size: 1.1em;" %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

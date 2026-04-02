@@ -163,6 +163,9 @@ export const LogDetailPage: React.FC = () => {
                     <Link to={href || '#'} style={{ color: '#818cf8', textDecoration: 'none', display: 'inline' }}>
                       {children}
                     </Link>
+                  ),
+                  hr: () => (
+                    <hr style={{ border: 'none', borderTop: '1px solid #333', margin: '20px 0' }} />
                   )
                 }}
               >

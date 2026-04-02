@@ -127,7 +127,8 @@ namespace :data do
           label: release_data["label"],
           credits: release_data["credits"],
           notes: release_data["notes"],
-          streaming_links: DataLoaderHelpers.normalize_json(release_data["streaming_links"])
+          streaming_links: DataLoaderHelpers.normalize_json(release_data["streaming_links"]),
+          coming_soon: release_data.fetch("coming_soon", false)
         )
 
         if release.changed?

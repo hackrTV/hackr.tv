@@ -6,6 +6,7 @@
 #  id              :integer          not null, primary key
 #  catalog_number  :string
 #  classification  :string
+#  coming_soon     :boolean          default(FALSE), not null
 #  credits         :text
 #  description     :text
 #  label           :string

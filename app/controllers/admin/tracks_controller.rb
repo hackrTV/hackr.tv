@@ -1,7 +1,44 @@
-# Read-only controller - Tracks are managed via YAML files
-# Edit data/catalog/{artist_slug}.yml and run: rails data:catalog
 class Admin::TracksController < Admin::ApplicationController
+  before_action :set_track, only: [:edit, :update, :destroy]
+
   def index
     @tracks = Track.includes(:artist, :release).ordered
+  end
+
+  def edit
+    @release = @track.release
+  end
+
+  def update
+    if @track.update(track_params)
+      set_flash_success("Track '#{@track.title}' updated successfully!")
+      redirect_to edit_admin_release_path(@track.release)
+    else
+      @release = @track.release
+      flash.now[:error] = "Failed to update track: #{@track.errors.full_messages.join(", ")}"
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    release = @track.release
+    title = @track.title
+    @track.audio_file.purge if @track.audio_file.attached?
+    @track.destroy!
+    set_flash_success("Track '#{title}' deleted.")
+    redirect_to edit_admin_release_path(release)
+  end
+
+  private
+
+  def set_track
+    @track = Track.find(params[:id])
+  end
+
+  def track_params
+    params.require(:track).permit(
+      :title, :slug, :track_number, :duration, :featured,
+      :show_in_pulse_vault, :lyrics, :release_date
+    )
   end
 end
