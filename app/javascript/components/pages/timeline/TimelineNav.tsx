@@ -64,7 +64,7 @@ export const TimelineNav: React.FC<TimelineNavProps> = ({ activeEra, onEraClick,
       display: 'flex',
       flexDirection: 'column',
       gap: '4px',
-      right: `calc(50% + 400px + 10px)`
+      right: 'calc(50% + 400px + 10px)'
     }}>
       {ERA_CONFIGS.map(era => {
         const isActive = era.key === activeEra

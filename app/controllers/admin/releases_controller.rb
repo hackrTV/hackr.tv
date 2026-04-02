@@ -23,18 +23,10 @@ class Admin::ReleasesController < Admin::ApplicationController
 
   def destroy
     name = @release.name
-    blobs_to_purge = []
-    blobs_to_purge << @release.cover_image.blob if @release.cover_image.attached?
-    @release.tracks.each do |track|
-      blobs_to_purge << track.audio_file.blob if track.audio_file.attached?
-    end
-
     ActiveRecord::Base.transaction do
       @release.tracks.destroy_all
       @release.destroy!
     end
-
-    blobs_to_purge.each(&:purge)
     set_flash_success("Release '#{name}' and all its tracks deleted.")
     redirect_to admin_releases_path
   end
