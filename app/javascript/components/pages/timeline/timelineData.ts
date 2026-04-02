@@ -244,7 +244,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
   {
     date: 'September 9, 2115',
     title: 'THE CHRONOLOGY FRACTURE',
-    description: 'Five insiders attack RIDE infrastructure. XERAEN accidentally discovers trans-temporal transmission. Time breaks.',
+    description: 'Five insiders attack RIDE infrastructure. XERAEN accidentally discovers trans-temporal transmission. Time breaks open.',
     era: 'the_fracture',
     codexSlug: 'chronology-fracture'
   },

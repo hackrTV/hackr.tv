@@ -225,3 +225,16 @@ releases:
           With the truth in our eyes
           Burn the blueprint
           Burn the blueprint down
+
+  - slug: critical-failure
+    title: "Critical Failure"
+    release_type: single
+    label: "hackr.fm"
+    release_date: "2126-07-27"
+    coming_soon: true
+    cover_image: "critical_failure.jpg"
+    tracks:
+      - title: "Critical Failure"
+        slug: critical-failure
+        track_number: 1
+        duration: "2:49"

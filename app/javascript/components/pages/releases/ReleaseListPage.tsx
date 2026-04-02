@@ -156,15 +156,17 @@ const ReleaseListPage: React.FC = () => {
                           background: '#000',
                           border: `1px solid ${accentColor}`,
                           boxShadow: `0 0 15px ${accentColor}33`,
-                          transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
+                          transition: 'box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
                           cursor: 'pointer'
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.boxShadow = `0 0 25px ${accentGlow}`
                           e.currentTarget.style.borderColor = accentColor
+                          e.currentTarget.style.transform = 'scale(1.02)'
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.boxShadow = `0 0 15px ${accentColor}33`
+                          e.currentTarget.style.transform = 'scale(1)'
                         }}
                       >
                         {/* Cover Image */}

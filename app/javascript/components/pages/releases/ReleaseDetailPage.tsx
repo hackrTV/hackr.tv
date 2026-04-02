@@ -30,6 +30,7 @@ interface ReleaseDetail {
   label: string | null
   credits: string | null
   notes: string | null
+  coming_soon: boolean
   streaming_links: Record<string, string> | null
   artist: {
     id: number
@@ -232,6 +233,44 @@ const ReleaseDetailPage: React.FC = () => {
 
   return (
     <DefaultLayout>
+      {release.coming_soon && (
+        <style>{`
+          @keyframes cs-scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+          }
+          @keyframes cs-glitch {
+            0%, 100% { transform: translate(0) skew(0deg); }
+            10% { transform: translate(-2px, 1px) skew(0.5deg); }
+            30% { transform: translate(2px, -1px) skew(-0.5deg); }
+            50% { transform: translate(-1px, 2px) skew(0.3deg); }
+            70% { transform: translate(1px, -2px) skew(-0.3deg); }
+            90% { transform: translate(-1px, 0) skew(0.2deg); }
+          }
+          @keyframes cs-flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.3; }
+            94% { opacity: 1; }
+            96% { opacity: 0.5; }
+            97% { opacity: 1; }
+          }
+          @keyframes cs-banner-pulse {
+            0%, 100% { background-color: rgba(124, 58, 237, 0.15); border-color: #7c3aed; }
+            50% { background-color: rgba(124, 58, 237, 0.25); border-color: #a855f7; }
+          }
+          @keyframes cs-text-glitch {
+            0%, 100% { text-shadow: 0 0 10px #7c3aed; }
+            25% { text-shadow: -2px 0 #ff0080, 2px 0 #00ffff; }
+            50% { text-shadow: 0 0 10px #7c3aed; }
+            75% { text-shadow: 2px 0 #ff0080, -2px 0 #00ffff; }
+          }
+          @keyframes cs-redact-pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.4; }
+          }
+        `}</style>
+      )}
       <div
         className="tui-window white-text"
         style={{
@@ -251,14 +290,85 @@ const ReleaseDetailPage: React.FC = () => {
           </legend>
 
           <div>
+            {/* Coming Soon Banner */}
+            {release.coming_soon && (
+              <div style={{
+                marginBottom: '25px',
+                padding: '15px',
+                border: '1px solid #7c3aed',
+                textAlign: 'center',
+                animation: 'cs-banner-pulse 2s ease-in-out infinite',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.15) 2px, rgba(0, 0, 0, 0.15) 4px)',
+                  animation: 'cs-scanline 0.5s linear infinite',
+                  pointerEvents: 'none'
+                }} />
+                <div style={{
+                  fontSize: '1.2em',
+                  fontWeight: 'bold',
+                  color: '#7c3aed',
+                  letterSpacing: '4px',
+                  animation: 'cs-text-glitch 4s ease-in-out infinite',
+                  fontFamily: 'monospace'
+                }}>
+                  ◈ SIGNAL INCOMING — TRANSMISSION PENDING ◈
+                </div>
+                <div style={{ color: '#666', fontSize: '0.8em', marginTop: '8px', letterSpacing: '2px' }}>
+                  RELEASE DATA PARTIALLY DECRYPTED — FULL SIGNAL LOCK PENDING
+                </div>
+              </div>
+            )}
             {/* Release Header: Cover + Info */}
             <div style={{ display: 'flex', gap: '25px', marginBottom: '25px', flexWrap: 'wrap' }}>
               {/* Cover Image */}
-              <div style={{ flexShrink: 0, width: '250px', height: '250px', background: '#111', border: `1px solid ${getAccentColor(0)}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <div style={{
+                flexShrink: 0,
+                width: '250px',
+                height: '250px',
+                background: '#111',
+                border: `1px solid ${getAccentColor(0)}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                position: 'relative',
+                ...(release.coming_soon ? { animation: 'cs-flicker 8s ease-in-out infinite' } : {})
+              }}>
                 {release.cover_url ? (
-                  <img src={release.cover_urls?.full || release.cover_url} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img
+                    src={release.cover_urls?.full || release.cover_url}
+                    alt={release.name}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      ...(release.coming_soon ? { filter: 'saturate(0.4) brightness(0.6) contrast(1.2)' } : {})
+                    }}
+                  />
                 ) : (
                   <div style={{ color: '#333', fontSize: '4em', fontFamily: 'monospace' }}>&#9834;</div>
+                )}
+                {release.coming_soon && (
+                  <>
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px)',
+                      animation: 'cs-scanline 0.5s linear infinite',
+                      pointerEvents: 'none'
+                    }} />
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(124, 58, 237, 0.15)',
+                      pointerEvents: 'none'
+                    }} />
+                  </>
                 )}
               </div>
 
@@ -284,28 +394,38 @@ const ReleaseDetailPage: React.FC = () => {
                             </Link>
                           </td>
                         </tr>
-                        {release.catalog_number && (
+                        {(release.catalog_number || release.coming_soon) && (
                           <tr>
                             <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Catalog #:</td>
-                            <td style={{ padding: '6px 12px', color: '#ccc', fontFamily: 'monospace' }}>{release.catalog_number}</td>
+                            <td style={{ padding: '6px 12px', color: release.coming_soon ? '#444' : '#ccc', fontFamily: 'monospace' }}>
+                              {release.coming_soon ? '███-███' : release.catalog_number}
+                            </td>
                           </tr>
                         )}
-                        {release.release_date && (
+                        {(release.release_date || release.coming_soon) && (
                           <tr>
                             <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Release Date:</td>
-                            <td style={{ padding: '6px 12px', color: '#ccc' }}>{release.release_date}</td>
+                            <td style={{ padding: '6px 12px', color: release.coming_soon ? '#7c3aed' : '#ccc' }}>
+                              {release.coming_soon ? (
+                                <span style={{ letterSpacing: '1px' }}>PENDING TRANSMISSION</span>
+                              ) : release.release_date}
+                            </td>
                           </tr>
                         )}
-                        {release.media_format && (
+                        {(release.media_format || release.coming_soon) && (
                           <tr>
                             <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Media Format:</td>
-                            <td style={{ padding: '6px 12px', color: '#ccc' }}>{release.media_format}</td>
+                            <td style={{ padding: '6px 12px', color: release.coming_soon ? '#444' : '#ccc' }}>
+                              {release.coming_soon ? '████████' : release.media_format}
+                            </td>
                           </tr>
                         )}
-                        {release.classification && (
+                        {(release.classification || release.coming_soon) && (
                           <tr>
                             <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Classification:</td>
-                            <td style={{ padding: '6px 12px', color: '#ccc' }}>{release.classification}</td>
+                            <td style={{ padding: '6px 12px', color: release.coming_soon ? '#444' : '#ccc' }}>
+                              {release.coming_soon ? '[CLASSIFIED]' : release.classification}
+                            </td>
                           </tr>
                         )}
                         {release.label && (
@@ -320,6 +440,12 @@ const ReleaseDetailPage: React.FC = () => {
                             <td style={{ padding: '6px 12px', color: '#ccc' }}>{release.release_type.toUpperCase()}</td>
                           </tr>
                         )}
+                        {release.coming_soon && (
+                          <tr>
+                            <td style={{ padding: '6px 12px', color: '#888', whiteSpace: 'nowrap' }}>Status:</td>
+                            <td style={{ padding: '6px 12px', color: '#7c3aed', fontFamily: 'monospace', letterSpacing: '1px' }}>SIGNAL INCOMING</td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </fieldset>
@@ -328,14 +454,14 @@ const ReleaseDetailPage: React.FC = () => {
             </div>
 
             {/* Description */}
-            {release.description && (
+            {release.description && !release.coming_soon && (
               <div style={{ marginBottom: '25px', padding: '20px', background: '#000', border: `1px solid ${colorScheme.primary}33` }}>
                 <p style={{ color: '#ccc', lineHeight: '1.7' }}>{release.description}</p>
               </div>
             )}
 
             {/* Credits */}
-            {release.credits && creditsSection && (
+            {release.credits && creditsSection && !release.coming_soon && (
               <div className="tui-window white-text" style={{ display: 'block', marginBottom: '25px', background: '#000', border: `1px solid ${creditsSection.borderColor}` }}>
                 <fieldset style={{ borderColor: creditsSection.borderColor }}>
                   <legend style={{ color: creditsSection.legendColor, textShadow: `0 0 10px ${creditsSection.glowColor}` }}>CREDITS</legend>
@@ -347,15 +473,53 @@ const ReleaseDetailPage: React.FC = () => {
             )}
 
             {/* Tracklist */}
-            <div className="tui-window white-text" style={{ display: 'block', marginBottom: '25px', background: '#000', border: `1px solid ${tracklistSection.borderColor}` }}>
+            <div className="tui-window white-text" style={{
+              display: 'block',
+              marginBottom: '25px',
+              background: '#000',
+              border: `1px solid ${tracklistSection.borderColor}`,
+              position: 'relative'
+            }}>
               <fieldset style={{ borderColor: tracklistSection.borderColor }}>
-                <legend style={{ color: tracklistSection.legendColor, textShadow: `0 0 10px ${tracklistSection.glowColor}` }}>TRACKLIST</legend>
+                <legend style={{ color: tracklistSection.legendColor, textShadow: `0 0 10px ${tracklistSection.glowColor}` }}>
+                  {release.coming_soon ? 'TRACKLIST [ENCRYPTED]' : 'TRACKLIST'}
+                </legend>
                 <div style={{ padding: '10px' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <tbody>
                       {release.tracks.map((track, trackIndex) => {
-                        const isActive = currentTrackId === track.id && isPlaying
+                        const isActive = !release.coming_soon && currentTrackId === track.id && isPlaying
                         const trackAccent = getAccentColor(trackIndex)
+
+                        if (release.coming_soon) {
+                          const redactedNames = ['[SIGNAL ENCRYPTED]', '[DECRYPTING...]', '[LOCKED]', '[FREQUENCY MASKED]', '[INTERCEPTED]', '[AWAITING CLEARANCE]']
+                          return (
+                            <tr
+                              key={track.id}
+                              style={{
+                                borderBottom: '1px solid #1a1a1a',
+                                borderLeft: hasPrismatic ? `3px solid ${trackAccent}44` : 'none',
+                                opacity: 0.5,
+                                animation: `cs-redact-pulse ${3 + trackIndex * 0.5}s ease-in-out infinite`
+                              }}
+                            >
+                              <td style={{ padding: '10px 12px', color: '#333', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
+                                {String(track.track_number || 0).padStart(2, '0')}
+                              </td>
+                              <td style={{ padding: '10px 12px', color: '#444', fontFamily: 'monospace', fontSize: '0.9em', letterSpacing: '1px' }}>
+                                {redactedNames[trackIndex % redactedNames.length]}
+                              </td>
+                              <td style={{ padding: '10px 12px', width: '50px', textAlign: 'center' }}>
+                                <span style={{ color: '#333', fontSize: '0.9em' }}>◌</span>
+                              </td>
+                              <td style={{ padding: '10px 12px', color: '#333', width: '60px', textAlign: 'right', fontFamily: 'monospace' }}>
+                                ██:██
+                              </td>
+                              <td style={{ padding: '10px 12px' }} />
+                            </tr>
+                          )
+                        }
+
                         return (
                           <tr
                             key={track.id}
@@ -422,17 +586,30 @@ const ReleaseDetailPage: React.FC = () => {
                       })}
                     </tbody>
                   </table>
-                  {release.disc_length && (
+                  {release.coming_soon ? (
+                    <div style={{ textAlign: 'right', padding: '10px 12px', color: '#444', fontFamily: 'monospace', borderTop: '1px solid #1a1a1a', letterSpacing: '1px' }}>
+                      Disc length&nbsp;&nbsp;██:██
+                    </div>
+                  ) : release.disc_length && (
                     <div style={{ textAlign: 'right', padding: '10px 12px', color: '#888', fontFamily: 'monospace', borderTop: '1px solid #333' }}>
                       Disc length&nbsp;&nbsp;{release.disc_length}
                     </div>
                   )}
                 </div>
               </fieldset>
+              {/* Scanline overlay for encrypted tracklist */}
+              {release.coming_soon && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px)',
+                  pointerEvents: 'none'
+                }} />
+              )}
             </div>
 
             {/* Notes */}
-            {release.notes && notesSection && (
+            {release.notes && notesSection && !release.coming_soon && (
               <div className="tui-window white-text" style={{ display: 'block', marginBottom: '25px', background: '#000', border: `1px solid ${notesSection.borderColor}` }}>
                 <fieldset style={{ borderColor: notesSection.borderColor }}>
                   <legend style={{ color: notesSection.legendColor, textShadow: `0 0 10px ${notesSection.glowColor}` }}>NOTES</legend>
@@ -444,7 +621,21 @@ const ReleaseDetailPage: React.FC = () => {
             )}
 
             {/* Streaming Links */}
-            {sortedLinks.length > 0 && streamingSection && (
+            {release.coming_soon ? (
+              <div className="tui-window white-text" style={{ display: 'block', marginBottom: '25px', background: '#000', border: '1px solid #333' }}>
+                <fieldset style={{ borderColor: '#333' }}>
+                  <legend style={{ color: '#444' }}>STREAMING FREQUENCIES</legend>
+                  <div style={{ padding: '20px', textAlign: 'center' }}>
+                    <div style={{ color: '#444', fontFamily: 'monospace', letterSpacing: '2px', fontSize: '0.9em' }}>
+                      FREQUENCIES NOT YET ALLOCATED
+                    </div>
+                    <div style={{ color: '#333', fontSize: '0.75em', marginTop: '8px' }}>
+                      Signal will be broadcast when transmission lock is acquired
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            ) : sortedLinks.length > 0 && streamingSection && (
               <div className="tui-window white-text" style={{ display: 'block', marginBottom: '25px', background: '#000', border: `1px solid ${streamingSection.borderColor}` }}>
                 <fieldset style={{ borderColor: streamingSection.borderColor }}>
                   <legend style={{ color: streamingSection.legendColor, textShadow: `0 0 10px ${streamingSection.glowColor}` }}>STREAMING FREQUENCIES</legend>

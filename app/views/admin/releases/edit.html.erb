@@ -1,0 +1,92 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/releases/<%= @release.slug %> :: EDIT RELEASE</legend>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <%= link_to "← All Releases", admin_releases_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <%= render "form", release: @release %>
+
+      <!-- Tracks Section -->
+      <h3 class="cyan-255-text" style="margin: 40px 0 15px 0;">[:: TRACKLIST ::]</h3>
+
+      <% tracks = @release.tracks.order(:track_number, :title) %>
+      <% if tracks.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center; width: 40px;">#</th>
+                <th style="text-align: left;">Title</th>
+                <th style="text-align: center;">Duration</th>
+                <th style="text-align: center;">Audio</th>
+                <th style="text-align: center;">Featured</th>
+                <th style="text-align: center;">Vault</th>
+                <th style="text-align: center; width: 140px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% tracks.each do |track| %>
+                <tr class="admin-table-row">
+                  <td style="text-align: center; color: #666; font-family: monospace;">
+                    <%= track.track_number&.to_s&.rjust(2, "0") || "—" %>
+                  </td>
+                  <td>
+                    <strong><%= track.title %></strong>
+                    <div style="font-family: monospace; color: #888; font-size: 0.85em;">/<%= track.slug %></div>
+                  </td>
+                  <td style="text-align: center; color: #888; font-family: monospace;">
+                    <%= track.duration || "—" %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if track.audio_file.attached? %>
+                      <span class="green-255-text">✓</span>
+                    <% else %>
+                      <span style="color: #666;">✗</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if track.featured %>
+                      <span class="purple-255-text">★</span>
+                    <% else %>
+                      <span style="color: #333;">—</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if track.show_in_pulse_vault %>
+                      <span class="green-255-text">✓</span>
+                    <% else %>
+                      <span style="color: #f87171;">✗</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= link_to "Edit", edit_admin_track_path(track), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    <%= button_to "Delete", admin_track_path(track), method: :delete,
+                        class: "tui-button red-168",
+                        style: "padding: 4px 12px; font-size: 0.85em; display: inline;",
+                        form: { data: { turbo_confirm: "Delete track '#{track.title}'?" } } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 20px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666;">No tracks on this release.</p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

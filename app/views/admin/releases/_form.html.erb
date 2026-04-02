@@ -1,0 +1,149 @@
+<%# Flash Messages %>
+<% if flash[:error] %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+    <p class="red-255-text">⚠ ERROR</p>
+    <p class="white-text"><%= flash[:error] %></p>
+  </div>
+<% end %>
+
+<%= form_with model: [:admin, release], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: RELEASE INFO ::]</h3>
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px;">
+      <div style="margin-bottom: 20px;">
+        <%= f.label :name, "TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+        <%= f.text_field :name, class: "tui-input", style: "width: 100%;" %>
+        <% if release.errors[:name].any? %>
+          <br><small class="red-255-text"><%= release.errors[:name].join(", ") %></small>
+        <% end %>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+        <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+        <small style="color: #888;">URL-safe identifier (lowercase, hyphens)</small>
+        <% if release.errors[:slug].any? %>
+          <br><small class="red-255-text"><%= release.errors[:slug].join(", ") %></small>
+        <% end %>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <%= f.label :artist_id, "ARTIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+        <%= f.select :artist_id,
+            options_for_select(@artists.map { |a| [a.name, a.id] }, release.artist_id),
+            {},
+            class: "tui-input", style: "width: 100%; max-width: 400px;" %>
+      </div>
+
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+          <%= f.label :release_type, "TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.select :release_type,
+              options_for_select(["single", "ep", "album", "compilation", "mixtape"], release.release_type),
+              { include_blank: "—" },
+              class: "tui-input", style: "width: 100%;" %>
+        </div>
+        <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+          <%= f.label :release_date, "RELEASE DATE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.date_field :release_date, class: "tui-input", style: "width: 100%;" %>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+          <%= f.label :label, "LABEL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.text_field :label, class: "tui-input", style: "width: 100%;", placeholder: "hackr.fm" %>
+        </div>
+        <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+          <%= f.label :catalog_number, "CATALOG #", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.text_field :catalog_number, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+          <%= f.label :media_format, "MEDIA FORMAT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.text_field :media_format, class: "tui-input", style: "width: 100%;" %>
+        </div>
+        <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+          <%= f.label :classification, "CLASSIFICATION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+          <%= f.text_field :classification, class: "tui-input", style: "width: 100%;" %>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <%= f.label :coming_soon, class: "white-text", style: "display: inline-flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;" do %>
+          <%= f.check_box :coming_soon, style: "width: 20px; height: 20px;" %>
+          <span>COMING SOON</span>
+        <% end %>
+        <br><small style="color: #888;">Mark as incoming — shows in SIGNAL INCOMING section with glitchy treatment</small>
+      </div>
+    </div>
+
+    <!-- Cover Image -->
+    <div style="flex-shrink: 0; width: 250px;">
+      <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">COVER IMAGE</label>
+      <% if release.cover_image.attached? %>
+        <div style="margin-bottom: 15px;">
+          <%= image_tag release.cover_image, style: "width: 250px; height: 250px; object-fit: cover; border: 1px solid #333;" %>
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+          <%= button_to "Remove Cover", purge_cover_admin_release_path(release), method: :delete,
+              class: "tui-button red-168",
+              style: "padding: 6px 16px; font-size: 0.85em;",
+              form: { data: { turbo_confirm: "Remove the cover image?" } } %>
+        </div>
+        <small style="color: #888;">Upload a new image below to replace:</small>
+      <% else %>
+        <div style="width: 250px; height: 250px; background: #1a1a1a; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+          <span style="color: #444; font-size: 1.2em;">NO COVER</span>
+        </div>
+      <% end %>
+      <div style="margin-top: 10px;">
+        <%= f.file_field :cover_image, accept: "image/jpeg,image/png,image/webp",
+            id: "cover-image-input",
+            style: "display: none;" %>
+        <label for="cover-image-input" class="tui-button purple-168"
+               style="padding: 8px 20px; font-size: 0.85em; cursor: pointer; display: inline-block;">
+          UPLOAD COVER
+        </label>
+        <span id="cover-filename" style="color: #888; font-size: 0.85em; margin-left: 10px;"></span>
+        <small style="color: #666; display: block; margin-top: 8px;">JPEG, PNG, or WebP. Will be processed to 600x600.</small>
+        <script nonce="<%= content_security_policy_nonce %>">
+          document.getElementById('cover-image-input').addEventListener('change', function(e) {
+            var name = e.target.files[0] ? e.target.files[0].name : '';
+            document.getElementById('cover-filename').textContent = name;
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: METADATA ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :description, class: "tui-input", style: "width: 100%; min-height: 80px; font-family: monospace;" %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :credits, "CREDITS", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :credits, class: "tui-input", style: "width: 100%; min-height: 60px; font-family: monospace;" %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :notes, "NOTES", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :notes, class: "tui-input", style: "width: 100%; min-height: 60px; font-family: monospace;" %>
+  </div>
+
+  <%# Actions %>
+  <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <%= f.submit "Save Release",
+        class: "tui-button purple-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= link_to "Cancel", admin_releases_path,
+        class: "tui-button grey-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+  </div>
+<% end %>

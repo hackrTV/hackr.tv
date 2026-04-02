@@ -8,8 +8,8 @@ stations:
     position: 0
     hidden: false
 
-  - name: "Sector X Underground"
-    slug: "sector-x"
+  - name: "hackr.fm Mix"
+    slug: "hackr-fm"
     description: "The underground mix. Fracture Network bands broadcasting from the shadows of corporate control."
     genre: "Various Hackr Styles"
     color: "cyan-168"

@@ -54,17 +54,17 @@ export const TimelineNav: React.FC<TimelineNavProps> = ({ activeEra, onEraClick,
     )
   }
 
-  // Desktop: fixed left sidebar
+  // Desktop: side tabs anchored to left edge of content
   return (
     <nav style={{
       position: 'fixed',
-      left: '20px',
       top: '50%',
       transform: 'translateY(-50%)',
       zIndex: 10,
       display: 'flex',
       flexDirection: 'column',
-      gap: '4px'
+      gap: '4px',
+      right: 'calc(50% + 400px + 10px)'
     }}>
       {ERA_CONFIGS.map(era => {
         const isActive = era.key === activeEra

@@ -21,9 +21,6 @@
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/catalog/{artist_slug}.yml</code> → <code style="color: #888;">rails data:catalog</code>
-        </span>
       </div>
 
       <!-- Releases Table -->
@@ -38,6 +35,8 @@
                 <th style="text-align: left;">Type</th>
                 <th style="text-align: center;">Release Date</th>
                 <th style="text-align: center;">Tracks</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center; width: 140px;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -62,6 +61,20 @@
                     <%= release.release_date&.strftime("%Y-%m-%d") || "TBA" %>
                   </td>
                   <td style="text-align: center;"><%= release.tracks.count %></td>
+                  <td style="text-align: center;">
+                    <% if release.coming_soon %>
+                      <span style="color: #a855f7; font-size: 0.85em;">INCOMING</span>
+                    <% else %>
+                      <span style="color: #4ade80; font-size: 0.85em;">LIVE</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= link_to "Edit", edit_admin_release_path(release), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    <%= button_to "Delete", admin_release_path(release), method: :delete,
+                        class: "tui-button red-168",
+                        style: "padding: 4px 12px; font-size: 0.85em; display: inline;",
+                        form: { class: "delete-release-form", data: { release_slug: release.slug } } %>
+                  </td>
                 </tr>
               <% end %>
             </tbody>
@@ -69,9 +82,24 @@
         </div>
       <% else %>
         <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No releases yet. Create your first one!</p>
+          <p style="color: #666; font-size: 1.2em;">No releases yet.</p>
         </div>
       <% end %>
     </div>
   </fieldset>
 </div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-release-form').forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        var slug = form.dataset.releaseSlug;
+        var input = prompt('Type "' + slug + '" to confirm deletion:');
+        if (input !== slug) {
+          e.preventDefault();
+          if (input !== null) alert('Slug did not match. Deletion cancelled.');
+        }
+      });
+    });
+  });
+</script>

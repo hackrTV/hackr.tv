@@ -105,11 +105,11 @@ export const FmReleasesPage: React.FC = () => {
                         background: '#0d0d0d',
                         border: '1px solid #7c3aed',
                         boxShadow: '0 0 10px rgba(124, 58, 237, 0.15)',
-                        transition: 'box-shadow 0.2s ease',
+                        transition: 'box-shadow 0.2s ease, transform 0.2s ease',
                         cursor: 'pointer'
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 20px rgba(124, 58, 237, 0.4)' }}
-                      onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 10px rgba(124, 58, 237, 0.15)' }}
+                      onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 20px rgba(124, 58, 237, 0.4)'; e.currentTarget.style.transform = 'scale(1.02)' }}
+                      onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 10px rgba(124, 58, 237, 0.15)'; e.currentTarget.style.transform = 'scale(1)' }}
                     >
                       <div style={{ width: '100%', aspectRatio: '1', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                         {release.cover_url ? (

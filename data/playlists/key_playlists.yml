@@ -1,14 +1,11 @@
 playlists:
-  - name: "Sector X Mix"
+  - name: "hackr.fm Mix"
     description: "Underground tracks from the Fracture Network. The sound of resistance."
     owner: "XERAEN"
     is_public: false
-    radio_station: "sector-x"
+    radio_station: "hackr-fm"
     tracks:
       # Format: artist_slug/track_slug
-      # - xeraen/xordium
-      # - xeraen/power-to-the-hackrs
-      # - thecyberpulse/some-track
       - wavelength-zero/refracted-light
       - wavelength-zero/nostalgia-weapon
       - wavelength-zero/monochrome-collapse

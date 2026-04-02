@@ -2,7 +2,7 @@ module Api
   class ReleasesController < ApplicationController
     # GET /api/releases
     def index
-      @releases = Release.includes(:artist).order(Arel.sql("release_date DESC NULLS LAST"))
+      @releases = Release.includes(:artist).where(coming_soon: false).order(Arel.sql("release_date DESC NULLS LAST"))
 
       render json: @releases.reject { |r| r.tracks.any? && r.tracks.visible_in_pulse_vault.none? }.map { |release|
         {
@@ -32,7 +32,7 @@ module Api
     # GET /api/releases/latest
     def latest
       @releases = Release.includes(:artist, cover_image_attachment: :blob)
-        .where(label: "hackr.fm")
+        .where(label: "hackr.fm", coming_soon: false)
         .where.associated(:cover_image_attachment)
         .order(Arel.sql("release_date DESC NULLS LAST"))
 
@@ -83,6 +83,7 @@ module Api
         credits: @release.credits,
         notes: @release.notes,
         streaming_links: @release.streaming_links,
+        coming_soon: @release.coming_soon,
         artist: {
           id: @release.artist.id,
           name: @release.artist.name,
@@ -103,6 +104,33 @@ module Api
             audio_url: track.audio_file.attached? ? url_for(track.audio_file) : nil,
             vidz: track.hackr_streams.map { |v| {id: v.id, title: v.title} }
           }
+        }
+      }
+    end
+
+    # GET /api/releases/coming_soon
+    def coming_soon
+      @releases = Release.includes(:artist, cover_image_attachment: :blob)
+        .where(coming_soon: true, label: "hackr.fm")
+        .where.associated(:cover_image_attachment)
+        .order(Arel.sql("release_date ASC NULLS LAST"))
+
+      render json: @releases.map { |release|
+        {
+          id: release.id,
+          name: release.name,
+          slug: release.slug,
+          release_type: release.release_type,
+          release_date: release.release_date,
+          label: release.label,
+          artist: {
+            id: release.artist.id,
+            name: release.artist.name,
+            slug: release.artist.slug
+          },
+          cover_url: url_for(release.cover_image),
+          cover_urls: cover_urls_for(release),
+          track_count: release.tracks.count
         }
       }
     end
