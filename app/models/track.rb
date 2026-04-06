@@ -56,7 +56,7 @@ class Track < ApplicationRecord
   scope :featured, -> { where(featured: true) }
   scope :ordered, -> { order(Arel.sql("CASE WHEN featured THEN 1 ELSE 0 END DESC, release_date DESC NULLS LAST")) }
   scope :release_order, -> { order(:track_number, :title) }
-  scope :visible_in_pulse_vault, -> { joins(:release).where(show_in_pulse_vault: true).where(releases: { coming_soon: false }).where.associated(:audio_file_attachment) }
+  scope :visible_in_pulse_vault, -> { joins(:release).where(show_in_pulse_vault: true).where(releases: {coming_soon: false}).where.associated(:audio_file_attachment) }
 
   def to_param
     slug
