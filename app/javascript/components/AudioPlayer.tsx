@@ -512,6 +512,19 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
     }
   }, [volume, isSeeking, currentTrack, loadTrack, shuffle, isPlaying])
 
+  // Update document title with current track info
+  useEffect(() => {
+    if (isPlaying && currentTrack) {
+      if (stationContext) {
+        document.title = `${stationContext.name} | hackr.tv`
+      } else {
+        document.title = `${currentTrack.title} — ${currentTrack.artist} | hackr.tv`
+      }
+    } else {
+      document.title = 'hackr.tv'
+    }
+  }, [isPlaying, currentTrack, stationContext])
+
   // Watchdog: detect if playback has silently stalled (no events fired)
   // This catches HTTP connection timeouts that don't trigger browser events
   useEffect(() => {
