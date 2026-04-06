@@ -16,6 +16,25 @@
         <%= link_to "← All Releases", admin_releases_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
       </div>
 
+      <!-- Cover Image Preview & Purge -->
+      <div style="margin-bottom: 20px; padding: 15px; background: #0a0a0a; border: 1px solid #333;">
+        <label class="white-text" style="display: block; margin-bottom: 10px; font-weight: bold;">COVER IMAGE</label>
+        <% if @release.cover_image.attached? %>
+          <div style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
+            <%= image_tag @release.cover_image, style: "width: 150px; height: 150px; object-fit: cover; border: 1px solid #333;" %>
+            <div>
+              <p style="color: #888; font-size: 0.85em; margin: 0 0 10px 0;">Cover image attached.</p>
+              <%= button_to "Remove Cover", purge_cover_admin_release_path(@release), method: :delete,
+                  class: "tui-button red-168",
+                  style: "padding: 6px 16px; font-size: 0.85em;",
+                  form: { data: { turbo_confirm: "Remove the cover image?" } } %>
+            </div>
+          </div>
+        <% else %>
+          <p style="color: #555; margin: 0;">No cover image attached.</p>
+        <% end %>
+      </div>
+
       <%= render "form", release: @release %>
 
       <!-- Tracks Section -->

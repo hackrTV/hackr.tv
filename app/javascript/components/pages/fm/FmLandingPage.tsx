@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
@@ -26,6 +26,38 @@ export const FmLandingPage: React.FC = () => {
   const futureYear = currentYear + 100
   const [latestReleases, setLatestReleases] = useState<Release[]>([])
   const [comingSoon, setComingSoon] = useState<Release[]>([])
+  const [signalUnlocked, setSignalUnlocked] = useState(false)
+  const [showCodeModal, setShowCodeModal] = useState(false)
+  const [codeInput, setCodeInput] = useState('')
+  const [codeError, setCodeError] = useState(false)
+  const clickCount = useRef(0)
+  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleSignalClick = useCallback(() => {
+    clickCount.current++
+    if (clickTimer.current) clearTimeout(clickTimer.current)
+    if (clickCount.current >= 3) {
+      clickCount.current = 0
+      setShowCodeModal(true)
+      setCodeInput('')
+      setCodeError(false)
+    } else {
+      clickTimer.current = setTimeout(() => { clickCount.current = 0 }, 600)
+    }
+  }, [])
+
+  const handleCodeSubmit = useCallback(() => {
+    const valid = ['9915', '09092115', '992115', '9092115', '090915']
+    if (valid.includes(codeInput.trim())) {
+      setSignalUnlocked(true)
+      setShowCodeModal(false)
+    } else {
+      setCodeError(true)
+      setTimeout(() => setCodeError(false), 2000)
+    }
+  }, [codeInput])
+
+  const visibleComingSoon = signalUnlocked ? comingSoon : comingSoon.slice(0, 4)
 
   useEffect(() => {
     apiJson<Release[]>('/api/releases/latest')
@@ -177,22 +209,27 @@ export const FmLandingPage: React.FC = () => {
                     50% { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
                   }
                 `}</style>
-                <h3 style={{
-                  color: '#7c3aed',
-                  textAlign: 'center',
-                  marginBottom: '20px',
-                  fontSize: '1.1em',
-                  letterSpacing: '3px',
-                  animation: 'signal-pulse 2s ease-in-out infinite'
-                }}>
+                <h3
+                  onClick={handleSignalClick}
+                  style={{
+                    color: '#7c3aed',
+                    textAlign: 'center',
+                    marginBottom: '20px',
+                    fontSize: '1.1em',
+                    letterSpacing: '3px',
+                    animation: 'signal-pulse 2s ease-in-out infinite',
+                    cursor: 'default',
+                    userSelect: 'none'
+                  }}
+                >
                   ◈ SIGNAL INCOMING ◈
                 </h3>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : `repeat(${Math.min(comingSoon.length, 4)}, 1fr)`,
+                  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : `repeat(${Math.min(visibleComingSoon.length, 4)}, 1fr)`,
                   gap: isMobile ? '10px' : '15px'
                 }}>
-                  {comingSoon.map(release => (
+                  {visibleComingSoon.map(release => (
                     <Link
                       key={release.id}
                       to={`/${release.artist.slug}/releases/${release.slug}`}
@@ -354,6 +391,98 @@ export const FmLandingPage: React.FC = () => {
           </div>
         </fieldset>
       </div>
+      {/* Signal Code Modal */}
+      {showCodeModal && (
+        <div
+          onClick={() => setShowCodeModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: 'rgba(0, 0, 0, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#0a0a0a',
+              border: '1px solid #7c3aed',
+              boxShadow: '0 0 30px rgba(124, 58, 237, 0.3)',
+              padding: '30px',
+              maxWidth: '400px',
+              width: '90%',
+              position: 'relative',
+              fontFamily: 'monospace'
+            }}
+          >
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(124, 58, 237, 0.03) 2px, rgba(124, 58, 237, 0.03) 4px)',
+              pointerEvents: 'none'
+            }} />
+            <div style={{ color: '#7c3aed', fontSize: '0.8em', letterSpacing: '3px', marginBottom: '20px', textAlign: 'center' }}>
+              SIGNAL INTERCEPT DETECTED
+            </div>
+            <div style={{ color: '#444', fontSize: '0.75em', marginBottom: '15px', textAlign: 'center', lineHeight: '1.6' }}>
+              FREQUENCY LOCK REQUIRES AUTHORIZATION<br />
+              ENTER TRANSMISSION CODE TO PROCEED
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input
+                type="text"
+                value={codeInput}
+                onChange={e => setCodeInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleCodeSubmit()}
+                autoFocus
+                placeholder="_ _ _ _"
+                style={{
+                  flex: 1,
+                  background: '#111',
+                  border: `1px solid ${codeError ? '#ef4444' : '#333'}`,
+                  color: '#ccc',
+                  padding: '10px 14px',
+                  fontFamily: 'monospace',
+                  fontSize: '1.1em',
+                  letterSpacing: '4px',
+                  textAlign: 'center',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease'
+                }}
+              />
+              <button
+                onClick={handleCodeSubmit}
+                style={{
+                  background: '#7c3aed',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '10px 16px',
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                  fontSize: '0.85em',
+                  letterSpacing: '1px'
+                }}
+              >
+                TRANSMIT
+              </button>
+            </div>
+            {codeError && (
+              <div style={{ color: '#ef4444', fontSize: '0.75em', marginTop: '10px', textAlign: 'center', letterSpacing: '2px' }}>
+                AUTHORIZATION DENIED — INVALID FREQUENCY
+              </div>
+            )}
+            <div
+              onClick={() => setShowCodeModal(false)}
+              style={{ color: '#333', fontSize: '0.7em', marginTop: '15px', textAlign: 'center', cursor: 'pointer', letterSpacing: '1px' }}
+            >
+              [ABORT SIGNAL]
+            </div>
+          </div>
+        </div>
+      )}
     </FmLayout>
   )
 }

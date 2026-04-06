@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# bin/audio-prep — Convert a WAV file to Ogg Vorbis for hackr.tv
+# Usage: bin/audio-prep <source.wav> [output.ogg]
+#
+# Produces a stereo 44.1kHz Ogg Vorbis file at quality 6 (~192kbps).
+# If output is omitted, writes to the same basename with .ogg extension.
+
+set -euo pipefail
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  echo "Usage: bin/audio-prep <source.wav> [output.ogg]"
+  echo "Converts WAV to Ogg Vorbis (stereo, 44.1kHz, q6 ~192kbps)."
+  exit 1
+fi
+
+if ! command -v ffmpeg &>/dev/null; then
+  echo "Error: ffmpeg is required. Install with: sudo apt-get install ffmpeg"
+  exit 1
+fi
+
+SOURCE="$1"
+
+if [ ! -f "$SOURCE" ]; then
+  echo "Error: source file not found: $SOURCE"
+  exit 1
+fi
+
+if [ $# -eq 2 ]; then
+  OUTPUT="$2"
+else
+  OUTPUT="${SOURCE%.*}.ogg"
+fi
+
+ffmpeg -y -i "$SOURCE" -vn -c:a libvorbis -q:a 6 -ar 44100 -ac 2 "$OUTPUT" 2>/dev/null
+
+DURATION=$(ffprobe -v quiet -show_entries format=duration -of csv=p=0 "$OUTPUT" | cut -d. -f1)
+MINS=$((DURATION / 60))
+SECS=$((DURATION % 60))
+SIZE=$(du -h "$OUTPUT" | cut -f1)
+
+echo "Created: $OUTPUT (${MINS}:$(printf '%02d' $SECS), ${SIZE})"

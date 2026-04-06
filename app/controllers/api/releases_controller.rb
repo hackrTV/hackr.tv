@@ -4,7 +4,7 @@ module Api
     def index
       @releases = Release.includes(:artist).where(coming_soon: false).order(Arel.sql("release_date DESC NULLS LAST"))
 
-      render json: @releases.reject { |r| r.tracks.any? && r.tracks.visible_in_pulse_vault.none? }.map { |release|
+      render json: @releases.reject { |r| r.tracks.any? && r.tracks.where(show_in_pulse_vault: true).none? }.map { |release|
         {
           id: release.id,
           name: release.name,
@@ -36,7 +36,7 @@ module Api
         .where.associated(:cover_image_attachment)
         .order(Arel.sql("release_date DESC NULLS LAST"))
 
-      visible = @releases.reject { |r| r.tracks.any? && r.tracks.visible_in_pulse_vault.none? }.first(3)
+      visible = @releases.reject { |r| r.tracks.any? && r.tracks.where(show_in_pulse_vault: true).none? }.first(3)
 
       render json: visible.map { |release|
         {
@@ -62,7 +62,7 @@ module Api
     def show
       @release = Release.find_by(slug: params[:id]) || Release.find(params[:id])
 
-      if @release.tracks.any? && @release.tracks.visible_in_pulse_vault.none?
+      if !@release.coming_soon && @release.tracks.any? && @release.tracks.where(show_in_pulse_vault: true).none?
         return head :not_found
       end
 
