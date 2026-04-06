@@ -89,10 +89,13 @@
           <%= image_tag release.cover_image, style: "width: 250px; height: 250px; object-fit: cover; border: 1px solid #333;" %>
         </div>
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-          <%= button_to "Remove Cover", purge_cover_admin_release_path(release), method: :delete,
-              class: "tui-button red-168",
-              style: "padding: 6px 16px; font-size: 0.85em;",
-              form: { data: { turbo_confirm: "Remove the cover image?" } } %>
+          <a href="<%= purge_cover_admin_release_path(release) %>"
+             class="tui-button red-168"
+             style="padding: 6px 16px; font-size: 0.85em; text-decoration: none;"
+             data-method="delete"
+             onclick="if(!confirm('Remove the cover image?')) return false; var f=document.createElement('form');f.method='POST';f.action=this.href;var m=document.createElement('input');m.type='hidden';m.name='_method';m.value='delete';f.appendChild(m);var t=document.createElement('input');t.type='hidden';t.name='authenticity_token';t.value=document.querySelector('meta[name=csrf-token]').content;f.appendChild(t);document.body.appendChild(f);f.submit();return false;">
+            Remove Cover
+          </a>
         </div>
         <small style="color: #888;">Upload a new image below to replace:</small>
       <% else %>
