@@ -163,10 +163,22 @@ RSpec.describe Track, type: :model do
     end
 
     describe ".visible_in_pulse_vault" do
-      it "returns only tracks with show_in_pulse_vault true" do
+      let(:audio_fixture) { Rails.root.join("spec", "fixtures", "files", "test_audio.mp3") }
+
+      it "returns only tracks with show_in_pulse_vault true, audio attached, and release not coming_soon" do
         vault_track1 = create(:track, artist: artist, show_in_pulse_vault: true)
+        vault_track1.audio_file.attach(io: File.open(audio_fixture), filename: "t1.mp3", content_type: "audio/mpeg")
         vault_track2 = create(:track, artist: artist, show_in_pulse_vault: true)
-        create(:track, artist: artist, show_in_pulse_vault: false)
+        vault_track2.audio_file.attach(io: File.open(audio_fixture), filename: "t2.mp3", content_type: "audio/mpeg")
+        # Excluded: show_in_pulse_vault false
+        hidden = create(:track, artist: artist, show_in_pulse_vault: false)
+        hidden.audio_file.attach(io: File.open(audio_fixture), filename: "t3.mp3", content_type: "audio/mpeg")
+        # Excluded: no audio file
+        create(:track, artist: artist, show_in_pulse_vault: true)
+        # Excluded: coming_soon release
+        coming_soon_release = create(:release, artist: artist, coming_soon: true)
+        coming_soon_track = create(:track, artist: artist, release: coming_soon_release, show_in_pulse_vault: true)
+        coming_soon_track.audio_file.attach(io: File.open(audio_fixture), filename: "t4.mp3", content_type: "audio/mpeg")
 
         expect(Track.visible_in_pulse_vault).to contain_exactly(vault_track1, vault_track2)
       end
