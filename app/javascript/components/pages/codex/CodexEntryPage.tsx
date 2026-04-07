@@ -177,7 +177,7 @@ export const CodexEntryPage: React.FC = () => {
                   border: '1px solid #333',
                   borderRadius: '3px'
                 }}>
-                  {Object.entries(entry.metadata).map(([key, value]) => (
+                  {Object.entries(entry.metadata).filter(([key]) => key !== 'search_tags').map(([key, value]) => (
                     <div key={key}>
                       <div style={{ color: '#888', fontSize: '0.8em', textTransform: 'uppercase', marginBottom: '5px' }}>
                         {key.replace(/_/g, ' ')}

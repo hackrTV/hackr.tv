@@ -62,7 +62,14 @@ export const CodexIndexPage: React.FC = () => {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(entry =>
         entry.name.toLowerCase().includes(query) ||
-        (entry.summary && entry.summary.toLowerCase().includes(query))
+        (entry.summary && entry.summary.toLowerCase().includes(query)) ||
+        (entry.metadata && Object.entries(entry.metadata).some(([k, v]) => {
+          if (k === 'search_tags') {
+            return Array.isArray(v) && v.some((tag: string) => String(tag).toLowerCase().includes(query))
+          }
+          return (k && String(k).toLowerCase().includes(query)) ||
+            (v != null && String(v).toLowerCase().includes(query))
+        }))
       )
     }
 
@@ -232,7 +239,7 @@ export const CodexIndexPage: React.FC = () => {
                     {/* Metadata Tags */}
                     {entry.metadata && Object.keys(entry.metadata).length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                        {Object.entries(entry.metadata).slice(0, 3).map(([key, value]) => (
+                        {Object.entries(entry.metadata).filter(([key]) => key !== 'search_tags').slice(0, 3).map(([key, value]) => (
                           <span
                             key={key}
                             style={{

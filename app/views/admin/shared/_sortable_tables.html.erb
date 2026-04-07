@@ -1,0 +1,108 @@
+<script nonce="<%= content_security_policy_nonce %>">
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('table.tui-table').forEach(function(table) {
+      var thead = table.querySelector('thead');
+      var tbody = table.querySelector('tbody');
+      if (!thead || !tbody) return;
+
+      var headers = thead.querySelectorAll('th');
+
+      headers.forEach(function(th, colIndex) {
+        // Check if this column contains text by sampling cells
+        var rows = tbody.querySelectorAll('tr');
+        if (rows.length === 0) return;
+
+        var hasNonText = false;
+        var hasText = false;
+        var sampled = 0;
+
+        for (var i = 0; i < Math.min(rows.length, 5); i++) {
+          var cell = rows[i].children[colIndex];
+          if (!cell) continue;
+          sampled++;
+
+          // Skip columns with forms, buttons, inputs, images, or checkboxes
+          if (cell.querySelector('form, button, input, img, .tui-button')) {
+            hasNonText = true;
+            break;
+          }
+
+          var text = cell.textContent.trim();
+          if (text.length > 0) hasText = true;
+        }
+
+        if (hasNonText || !hasText || sampled === 0) return;
+
+        // Make this header sortable
+        th.style.cursor = 'pointer';
+        th.style.userSelect = 'none';
+        th.title = 'Click to sort';
+
+        var arrow = document.createElement('span');
+        arrow.style.marginLeft = '6px';
+        arrow.style.fontSize = '0.8em';
+        arrow.style.opacity = '0.4';
+        arrow.textContent = '⇅';
+        th.appendChild(arrow);
+
+        th.addEventListener('click', function() {
+          // Clear arrows on sibling headers
+          headers.forEach(function(otherTh) {
+            var otherArrow = otherTh.querySelector('span[data-sort-arrow]');
+            if (otherArrow && otherTh !== th) {
+              otherArrow.textContent = '⇅';
+              otherArrow.style.opacity = '0.4';
+              otherTh.removeAttribute('data-sort-dir');
+            }
+          });
+
+          arrow.setAttribute('data-sort-arrow', '');
+
+          // Toggle direction: none -> desc -> asc -> desc ...
+          var dir = th.getAttribute('data-sort-dir');
+          if (dir === 'desc') {
+            dir = 'asc';
+          } else {
+            dir = 'desc';
+          }
+          th.setAttribute('data-sort-dir', dir);
+
+          arrow.textContent = dir === 'desc' ? '▼' : '▲';
+          arrow.style.opacity = '1';
+
+          // Sort rows
+          var rowsArray = Array.from(tbody.querySelectorAll('tr'));
+          rowsArray.sort(function(a, b) {
+            var aCell = a.children[colIndex];
+            var bCell = b.children[colIndex];
+            var aText = (aCell ? aCell.textContent.trim() : '').toLowerCase();
+            var bText = (bCell ? bCell.textContent.trim() : '').toLowerCase();
+
+            // Try date comparison (YYYY-MM-DD)
+            var dateRe = /^\d{4}-\d{2}-\d{2}$/;
+            if (dateRe.test(aText) && dateRe.test(bText)) {
+              if (aText < bText) return dir === 'desc' ? 1 : -1;
+              if (aText > bText) return dir === 'desc' ? -1 : 1;
+              return 0;
+            }
+
+            // Try numeric comparison (only pure numbers)
+            var numRe = /^-?\d+(\.\d+)?$/;
+            if (numRe.test(aText) && numRe.test(bText)) {
+              return dir === 'desc' ? parseFloat(bText) - parseFloat(aText) : parseFloat(aText) - parseFloat(bText);
+            }
+
+            // String comparison
+            if (aText < bText) return dir === 'desc' ? 1 : -1;
+            if (aText > bText) return dir === 'desc' ? -1 : 1;
+            return 0;
+          });
+
+          rowsArray.forEach(function(row) {
+            tbody.appendChild(row);
+          });
+        });
+      });
+    });
+  });
+</script>

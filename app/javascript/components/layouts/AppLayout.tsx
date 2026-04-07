@@ -90,23 +90,14 @@ export const AppLayout: React.FC = () => {
         <Route path="/xeraen/vidz" element={<VodzPage />} />
         <Route path="/xeraen/vidz/:id" element={<VodzShowPage />} />
         <Route path="/sector/x" element={<SectorXPage />} />
-        {/* Band profile routes with releases and trackz */}
-        {['system-rot', 'voiceprint', 'temporal-blue-drift', 'injection-vector',
-          'cipher-protocol', 'blitzbeam', 'apex-overdrive', 'ethereality',
-          'neon-hearts', 'offline', 'heartbreak-havoc'].map(slug => (
-          <React.Fragment key={slug}>
-            <Route path={`/${slug}`} element={<BandProfilePage />} />
-            <Route path={`/${slug}/releases`} element={<ReleaseListPage />} />
-            <Route path={`/${slug}/releases/:releaseSlug`} element={<ReleaseDetailPage />} />
-            <Route path={`/${slug}/trackz`} element={<TrackListPage />} />
-            <Route path={`/${slug}/trackz/:trackSlug`} element={<TrackDetailPage />} />
-          </React.Fragment>
-        ))}
+        {/* Wavelength Zero has a custom landing page */}
         <Route path="/wavelength-zero" element={<WavelengthZeroPage />} />
-        <Route path="/wavelength-zero/releases" element={<ReleaseListPage />} />
-        <Route path="/wavelength-zero/releases/:releaseSlug" element={<ReleaseDetailPage />} />
-        <Route path="/wavelength-zero/trackz" element={<TrackListPage />} />
-        <Route path="/wavelength-zero/trackz/:trackSlug" element={<TrackDetailPage />} />
+        {/* Dynamic artist routes — catches any artist slug */}
+        <Route path="/:artistSlug" element={<BandProfilePage />} />
+        <Route path="/:artistSlug/releases" element={<ReleaseListPage />} />
+        <Route path="/:artistSlug/releases/:releaseSlug" element={<ReleaseDetailPage />} />
+        <Route path="/:artistSlug/trackz" element={<TrackListPage />} />
+        <Route path="/:artistSlug/trackz/:trackSlug" element={<TrackDetailPage />} />
         {/* THE PULSE GRID routes */}
         <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
         <Route path="/grid/login" element={<GridLoginPage />} />

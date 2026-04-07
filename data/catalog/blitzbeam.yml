@@ -41,3 +41,15 @@ releases:
         duration: "3:13"
         audio_file: beyond-lightspeed.ogg
         lyrics: "[INSTRUMENTAL TRACK]\n"
+
+  - slug: motion-blur-meltdown
+    title: "Motion Blur Meltdown"
+    release_type: single
+    label: "hackr.fm"
+    release_date: "2126-10-31"
+    coming_soon: true
+    cover_image: "motion_blur_meltdown.jpg"
+    tracks:
+      - title: "Motion Blur Meltdown"
+        slug: motion-blur-meltdown
+        track_number: 1

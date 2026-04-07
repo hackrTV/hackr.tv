@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize from 'rehype-sanitize'
@@ -8,7 +8,7 @@ import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
-import { apiJson } from '~/utils/apiClient'
+import { apiJson, ApiError } from '~/utils/apiClient'
 import { getArtistColors } from '~/utils/artistColors'
 
 interface Release {
@@ -48,6 +48,7 @@ interface Track {
 
 const TrackDetailPage: React.FC = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [track, setTrack] = useState<Track | null>(null)
   const [loading, setLoading] = useState(true)
   const { mappings } = useCodexMappings()
@@ -110,7 +111,14 @@ const TrackDetailPage: React.FC = () => {
         setTrack(data)
         setLoading(false)
       })
-      .catch(error => {
+      .catch((error: unknown) => {
+        if (error instanceof ApiError && error.body && typeof error.body === 'object' && 'coming_soon' in error.body) {
+          const body = error.body as { redirect_to?: string }
+          if (body.redirect_to) {
+            navigate(body.redirect_to, { replace: true })
+            return
+          }
+        }
         console.error('Error fetching track:', error)
         setLoading(false)
       })

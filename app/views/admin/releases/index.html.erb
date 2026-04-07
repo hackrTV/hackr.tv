@@ -43,19 +43,23 @@
               <% @releases.each do |release| %>
                 <tr class="admin-table-row">
                   <td style="text-align: center; padding: 5px;">
-                    <% if release.cover_image.attached? %>
-                      <%= image_tag release.cover_thumbnail, style: "width: 50px; height: 50px; object-fit: cover; border: 1px solid #333;" %>
-                    <% else %>
-                      <div style="width: 50px; height: 50px; background: #1a1a1a; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7em; color: #666;">
-                        NO IMG
-                      </div>
+                    <%= link_to edit_admin_release_path(release) do %>
+                      <% if release.cover_image.attached? %>
+                        <%= image_tag release.cover_thumbnail, style: "width: 50px; height: 50px; object-fit: cover; border: 1px solid #333;" %>
+                      <% else %>
+                        <div style="width: 50px; height: 50px; background: #1a1a1a; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7em; color: #666;">
+                          NO IMG
+                        </div>
+                      <% end %>
                     <% end %>
                   </td>
                   <td>
-                    <strong><%= release.name %></strong>
-                    <div style="font-family: monospace; color: #888; font-size: 0.85em;">/<%= release.slug %></div>
+                    <%= link_to edit_admin_release_path(release), style: "color: #0ff; text-decoration: none;" do %>
+                      <strong><%= release.name %></strong>
+                      <div style="font-family: monospace; color: #888; font-size: 0.85em;">/<%= release.slug %></div>
+                    <% end %>
                   </td>
-                  <td style="color: #0ff;"><%= release.artist.name %></td>
+                  <td><%= release.artist.name %></td>
                   <td style="color: #888;"><%= release.release_type&.titleize || "—" %></td>
                   <td style="text-align: center; color: #888;">
                     <%= release.release_date&.strftime("%Y-%m-%d") || "TBA" %>

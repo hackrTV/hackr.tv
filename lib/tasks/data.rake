@@ -91,6 +91,11 @@ namespace :data do
       artist_slug = File.basename(file, ".yml")
       artist_data = data["artist"]
 
+      if artist_data["skip"]
+        puts "  ⊘ Skipped artist: #{artist_data["name"] || artist_slug}"
+        next
+      end
+
       # Upsert artist
       artist = Artist.find_or_initialize_by(slug: artist_slug)
       was_new = artist.new_record?
@@ -110,6 +115,11 @@ namespace :data do
       # Upsert releases and tracks
       (data["releases"] || []).each do |release_data|
         next unless release_data["title"].present? && release_data["slug"].present?
+
+        if release_data["skip"]
+          puts "  ⊘ Skipped release: #{release_data["title"]} (#{artist.name})"
+          next
+        end
 
         release = Release.find_or_initialize_by(artist: artist, slug: release_data["slug"])
         was_new = release.new_record?
@@ -142,6 +152,11 @@ namespace :data do
 
         # Upsert tracks
         (release_data["tracks"] || []).each do |track_data|
+          if track_data["skip"]
+            puts "    ⊘ Skipped track: #{track_data["title"]}"
+            next
+          end
+
           track = artist.tracks.find_or_initialize_by(slug: track_data["slug"])
           was_new = track.new_record?
 
@@ -790,7 +805,7 @@ namespace :data do
         metadata: attrs["metadata"]
       )
 
-      if entry.changed?
+      if entry.changed? || attrs["metadata"].present?
         entry.save!
         was_new ? (created += 1) : (updated += 1)
         puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{entry.name} (#{entry.entry_type})"

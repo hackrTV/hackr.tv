@@ -32,7 +32,7 @@ class Admin::TracksController < Admin::ApplicationController
   private
 
   def set_track
-    @track = Track.find(params[:id])
+    @track = Track.find_by(slug: params[:id]) || Track.find(params[:id])
   end
 
   def track_params
