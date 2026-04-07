@@ -71,6 +71,15 @@ module Api
         return
       end
 
+      if @track.release&.coming_soon
+        render json: {
+          error: "Track not yet available",
+          coming_soon: true,
+          redirect_to: "/#{@track.artist.slug}/releases/#{@track.release.slug}"
+        }, status: :forbidden
+        return
+      end
+
       render json: {
         id: @track.id,
         title: @track.title,

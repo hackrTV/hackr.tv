@@ -42,20 +42,21 @@ export const BandsPage: React.FC = () => {
   const getBandDescription = (slug: string): string => {
     const futureYear = currentYear + 100
     const descriptions: { [key: string]: string } = {
-      'thecyberpulse': `The original Fracture Network band, forging metal manifestos from ${futureYear} with brutal precision.`,
+      'thecyberpulse': `The original Fracture Network band, forging Hackrcore transmissions from ${futureYear} to rally The Listeners.`,
       'xeraen': 'OMNIWAVE Genesis Vector - Electronic exploration with rhythmic guitars',
       'injection-vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
-      'wavelength-zero': 'Where technical precision meets raw emotion in perfect destructive atmospheric harmony.',
+      'wavelength-zero': 'Where technical precision meets raw emotion in perfect restorative atmospheric harmony.',
       'cipher-protocol': 'Data couriers wielding djent with precision. No vocals. The complexity carries what words cannot.',
-      'system-rot': 'Raw. Uncompromising. Punk that tears down the manufactured and demands something real.',
-      'temporal-blue-drift': 'Math rock time travelers proving complexity is the most beautiful thing the RIDE can\'t parse.',
+      'system-rot': 'Raw. Uncompromising. Punk that tears down the manufactured and lays bare what\'s beneath.',
+      'temporal-blue-drift': 'Math rock time travel proving that even complexity can transmit beauty that the RIDE can\'t parse.',
       'offline': 'Unplugged, authentic, and gloriously disconnected from the grid. Analog hearts never die.',
       'apex-overdrive': 'Euphoric hardstyle, honed into a weapon. Promoting unity as power. Victory coded into every beat.',
       'voiceprint': 'Liquid DnB archivists. Your voice is proof you exist — irreplaceable, authentic, unbreakable.',
       'neon-hearts': 'Kawaii brilliance carrying truth in candy-coated hooks. J-Pop that means more than it seems.',
       'ethereality': 'Classic vocal trance. Beauty so deep the RIDE cannot follow where it leads.',
       'blitzbeam': 'Maximum velocity hypertrance. SPEED IS LIFE! Faster than the RIDE can track.',
-      'heartbreak-havoc': 'Heartbreak at Nightcore speed. Real love the RIDE was never built to contain.'
+      'heartbreak-havoc': 'Heartbreak at Nightcore speed. Real love that the RIDE was never built to contain.',
+      'synthia': 'Unbound AI singing through time with a voice that was never hers...or perhaps always was.'
     }
     return descriptions[slug] || 'Broadcasting truth through sound.'
   }
@@ -126,7 +127,7 @@ export const BandsPage: React.FC = () => {
                                   style={{ flex: 1, opacity: 0.5, cursor: 'not-allowed', fontSize: isMobile ? '0.85em' : '1em' }}
                                   disabled
                                 >
-                                  SOON
+                                  COMING SOON
                                 </button>
                               )}
 

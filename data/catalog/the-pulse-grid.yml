@@ -2,6 +2,7 @@ artist:
   name: "THE PULSE GRID"
   genre: "Soundtrack"
   artist_type: ost
+  skip: true
 
 releases:
   - slug: ost
