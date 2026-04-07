@@ -75,7 +75,13 @@
       <%= link_to "PulseWire", admin_pulse_wire_index_path, class: "purple-168-text", style: "text-decoration: none;" %>
       <%= link_to "Uplink", admin_uplink_index_path, class: "purple-168-text", style: "text-decoration: none;" %>
       <%= link_to "Overlays", admin_overlays_path, class: "yellow-168-text", style: "text-decoration: none;" %>
-      <%= link_to "GRID", admin_grid_path, class: "green-168-text", style: "text-decoration: none;" %>
+      <div class="admin-nav-dropdown">
+        <span class="admin-nav-dropdown-trigger green-168-text">Grid</span>
+        <div class="admin-nav-dropdown-menu">
+          <%= link_to "Dashboard", admin_grid_path, class: "green-168-text" %>
+          <%= link_to "Achievements", admin_grid_achievements_path, class: "green-168-text" %>
+        </div>
+      </div>
       <%= link_to "Redirects", admin_redirects_path, class: "cyan-168-text", style: "text-decoration: none;" %>
       <span style="color: #333;">|</span>
       <%= link_to "← Exit Admin", root_path, class: "red-168-text", style: "text-decoration: none;" %>

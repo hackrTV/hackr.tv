@@ -87,25 +87,25 @@
                       <%= time_ago_in_words(pulse.signal_dropped_at) %> ago
                     </small>
                   </td>
-                  <td style="text-align: center;">
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
-                      <%= link_to "View", wire_pulse_path(pulse.id),
-                          target: "_blank",
-                          class: "tui-button cyan-168",
-                          style: "padding: 2px 8px; font-size: 0.9em;" %>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <%= link_to "View", wire_pulse_path(pulse.id),
+                        target: "_blank",
+                        class: "tui-button cyan-168",
+                        style: "padding: 2px 8px; font-size: 0.9em;" %>
 
-                      <%= button_to "Restore", restore_admin_pulse_wire_path(pulse),
-                          method: :post,
-                          data: { confirm: "Restore this pulse by @#{pulse.grid_hackr.hackr_alias}?" },
-                          class: "tui-button green-168",
-                          style: "padding: 2px 8px; font-size: 0.9em;" %>
+                    <%= button_to "Restore", restore_admin_pulse_wire_path(pulse),
+                        method: :post,
+                        form: { style: "display: inline;" },
+                        data: { confirm: "Restore this pulse by @#{pulse.grid_hackr.hackr_alias}?" },
+                        class: "tui-button green-168",
+                        style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
 
-                      <%= button_to "Delete", admin_pulse_wire_path(pulse),
-                          method: :delete,
-                          data: { confirm: "Permanently delete this pulse? This cannot be undone!" },
-                          class: "tui-button red-168",
-                          style: "padding: 2px 8px; font-size: 0.9em;" %>
-                    </div>
+                    <%= button_to "Delete", admin_pulse_wire_path(pulse),
+                        method: :delete,
+                        form: { style: "display: inline;" },
+                        data: { confirm: "Permanently delete this pulse? This cannot be undone!" },
+                        class: "tui-button red-168",
+                        style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
                   </td>
                 </tr>
               <% end %>

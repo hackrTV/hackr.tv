@@ -54,6 +54,12 @@ module Grid
         talk_command(args.join(" "))
       when "ask"
         ask_command(args)
+      when "stat", "stats"
+        stat_command
+      when "use"
+        use_command(args.join(" "))
+      when "salvage"
+        salvage_command(args.join(" "))
       when "help", "?"
         help_command
       when "who"
@@ -95,7 +101,8 @@ module Grid
       items = room.grid_items.in_room(room)
       if items.any?
         output << ""
-        output << "<span style='color: #fbbf24;'>Items:</span> <span style='color: #34d399;'>#{items.map(&:name).join(", ")}</span>"
+        item_names = items.map { |item| item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>" }
+        output << "<span style='color: #fbbf24;'>Items:</span> #{item_names.join(", ")}"
       end
 
       # Show Mobs
@@ -131,8 +138,24 @@ module Grid
       new_room = exit.to_room
       hackr.update!(current_room: new_room)
 
+      # Track exploration (unique rooms via visited_rooms array in stats)
+      visited = hackr.stat("visited_rooms") || []
+      if visited.include?(new_room.id)
+        hackr.grant_xp!(1) # Small XP for movement
+      else
+        visited += [new_room.id]
+        hackr.set_stat!("visited_rooms", visited)
+        hackr.set_stat!("rooms_visited", visited.size)
+        hackr.grant_xp!(5) # Bonus XP for new room discovery
+      end
+
+      look_output = look_command
+      notifications = achievement_checker.check(:room_visit, room_slug: new_room.slug)
+      notifications += achievement_checker.check(:rooms_visited)
+      look_output = append_notifications(look_output, notifications)
+
       {
-        output: look_command,
+        output: look_output,
         event: {
           type: "movement",
           hackr_alias: hackr.hackr_alias,
@@ -179,11 +202,17 @@ module Grid
 
     def inventory_command
       items = hackr.grid_items
-      if items.any?
-        "<span style='color: #fbbf24;'>Inventory:</span>\n" + items.map { |item| "  - <span style='color: #34d399;'>#{item.name}</span>" }.join("\n")
-      else
-        "<span style='color: #9ca3af;'>Your inventory is empty.</span>"
+      return "<span style='color: #9ca3af;'>Your inventory is empty.</span>" unless items.any?
+
+      lines = ["<span style='color: #fbbf24;'>Inventory:</span>"]
+      items.each do |item|
+        color = item.rarity_color
+        name_display = item.unicorn? ? item.rainbow_name_html : "<span style='color: #{color};'>#{h(item.name)}</span>"
+        rarity_tag = item.rarity ? " <span style='color: #{color};'>[#{item.rarity_label}]</span>" : ""
+        qty_tag = (item.quantity > 1) ? " <span style='color: #6b7280;'>x#{item.quantity}</span>" : ""
+        lines << "  - #{name_display}#{rarity_tag}#{qty_tag}"
       end
+      lines.join("\n")
     end
 
     def take_command(item_name)
@@ -197,8 +226,16 @@ module Grid
 
       item.update!(grid_hackr: hackr, room: nil)
 
+      increment_stat!("items_taken")
+
+      output = "<span style='color: #34d399;'>You take the </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>"}<span style='color: #34d399;'>.</span>"
+      notifications = achievement_checker.check(:take_item, item_name: item.name)
+      notifications += achievement_checker.check(:items_collected)
+      notifications += achievement_checker.check(:rarity_owned, rarity: item.rarity) if item.rarity.present?
+      output = append_notifications(output, notifications)
+
       {
-        output: "<span style='color: #34d399;'>You take the #{item.name}.</span>",
+        output: output,
         event: {
           type: "take",
           hackr_alias: hackr.hackr_alias,
@@ -218,7 +255,7 @@ module Grid
       item.update!(room: room, grid_hackr: nil)
 
       {
-        output: "<span style='color: #34d399;'>You drop the #{item.name}.</span>",
+        output: "<span style='color: #34d399;'>You drop the </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>"}<span style='color: #34d399;'>.</span>",
         event: {
           type: "drop",
           hackr_alias: hackr.hackr_alias,
@@ -246,6 +283,14 @@ module Grid
       mob = room.grid_mobs.find_by("LOWER(name) = ?", target.downcase)
       return "<span style='color: #d0d0d0;'>#{codex_linkify(mob.description)}</span>" if mob
 
+      # Check hackrs in room (or self)
+      target_hackr = if target.downcase == hackr.hackr_alias.downcase
+        hackr
+      else
+        room.grid_hackrs.recently_active.find_by("LOWER(hackr_alias) = ?", target.downcase)
+      end
+      return examine_hackr(target_hackr) if target_hackr
+
       "<span style='color: #f87171;'>You don't see '#{h(target)}' here.</span>"
     end
 
@@ -270,7 +315,11 @@ module Grid
         content << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{dialogue["topics"].keys.map { |k| h(k) }.join(", ")}</span>"
       end
 
-      dialogue_box(content.join("\n"))
+      increment_stat!("npcs_talked")
+
+      output = dialogue_box(content.join("\n"))
+      notifications = achievement_checker.check(:talk_npc, npc_name: mob.name)
+      append_notifications(output, notifications)
     end
 
     def ask_command(args)
@@ -327,7 +376,9 @@ module Grid
           <span style='color: #34d399;'>inventory, inv, i</span>       - View your inventory
           <span style='color: #34d399;'>take &lt;item&gt;</span>             - Pick up an item
           <span style='color: #34d399;'>drop &lt;item&gt;</span>             - Drop an item
-          <span style='color: #34d399;'>examine &lt;target&gt;, x</span>     - Examine an item or NPC
+          <span style='color: #34d399;'>use &lt;item&gt;</span>              - Use an item
+          <span style='color: #34d399;'>salvage &lt;item&gt;</span>          - Break down an item for XP
+          <span style='color: #34d399;'>examine &lt;target&gt;, x</span>     - Examine item, NPC, or hackr
 
         <span style='color: #fbbf24;'>NPCs:</span>
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>              - Talk to an NPC
@@ -337,7 +388,8 @@ module Grid
           <span style='color: #34d399;'>say &lt;message&gt;</span>           - Say something in the room
           <span style='color: #34d399;'>who</span>                     - See who's online
 
-        <span style='color: #fbbf24;'>Utility:</span>
+        <span style='color: #fbbf24;'>Operative:</span>
+          <span style='color: #34d399;'>stat, stats</span>             - View your operative profile
           <span style='color: #34d399;'>clear, cls</span>              - Clear the screen
           <span style='color: #34d399;'>help, ?</span>                 - Show this help message
       HELP
@@ -359,10 +411,159 @@ module Grid
       }
     end
 
+    def stat_command
+      s = hackr.current_stats
+      cl = hackr.stat("clearance")
+      xp = hackr.stat("xp")
+      next_threshold = GridHackr::Stats.xp_for_clearance(cl + 1)
+      xp_to_next = (cl < GridHackr::Stats::MAX_CLEARANCE) ? next_threshold - xp : nil
+
+      achievements = hackr.grid_hackr_achievements.includes(:grid_achievement).order(:awarded_at).to_a
+
+      output = []
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output << "<span style='color: #22d3ee; font-weight: bold;'>OPERATIVE FILE :: #{h(hackr.hackr_alias)}</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output << ""
+      output << "<span style='color: #fbbf24;'>CLEARANCE:</span> <span style='color: #22d3ee;'>#{cl}</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>#{xp}</span>#{xp_to_next ? " <span style='color: #6b7280;'>(#{xp_to_next} to next)</span>" : " <span style='color: #fbbf24;'>[MAX]</span>"}"
+      output << ""
+      output << "<span style='color: #fbbf24;'>VITALS:</span>"
+      output << "  <span style='color: #34d399;'>HEALTH      #{s["health"]}/100</span>"
+      output << "  <span style='color: #60a5fa;'>ENERGY      #{s["energy"]}/100</span>"
+      output << "  <span style='color: #c084fc;'>PSYCHE      #{s["psyche"]}/100</span>"
+      output << "  <span style='color: #f59e0b;'>INSPIRATION #{s["inspiration"]}/100</span>"
+
+      if achievements.any?
+        output << ""
+        output << "<span style='color: #fbbf24;'>ACHIEVEMENTS (#{achievements.size}):</span>"
+        achievements.each do |ha|
+          a = ha.grid_achievement
+          icon = a.badge_icon.present? ? "#{a.badge_icon} " : ""
+          output << "  #{icon}<span style='color: #d0d0d0;'>#{h(a.name)}</span> <span style='color: #6b7280;'>(+#{a.xp_reward}xp)</span>"
+        end
+      end
+
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output.join("\n")
+    end
+
+    def use_command(item_name)
+      return "<span style='color: #fbbf24;'>Use what?</span>" if item_name.empty?
+
+      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      saved_name = item.name
+      result = apply_item_effect(item)
+      increment_stat!("use_count")
+
+      # Consume if consumable
+      if item.item_type == "consumable"
+        if item.quantity > 1
+          item.update!(quantity: item.quantity - 1)
+        else
+          item.destroy!
+        end
+      end
+
+      notifications = achievement_checker.check(:use_item, item_name: saved_name)
+      output = append_notifications(result, notifications)
+      {output: output, event: nil}
+    end
+
+    def salvage_command(item_name)
+      return "<span style='color: #fbbf24;'>Salvage what?</span>" if item_name.empty?
+
+      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      xp_amount = [item.value, 1].max
+      item_styled = item.unicorn? ? item.rainbow_name_html : h(item.name)
+      item.destroy!
+
+      increment_stat!("salvage_count")
+      xp_result = hackr.grant_xp!(xp_amount)
+
+      level_msg = xp_result[:leveled_up] ? "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{xp_result[:new_clearance]}!</span>" : ""
+      output = "<span style='color: #34d399;'>You salvage </span>#{item_styled}<span style='color: #34d399;'>. +#{xp_amount} XP.</span>#{level_msg}"
+
+      notifications = achievement_checker.check(:salvage_item)
+      notifications += achievement_checker.check(:salvage_count)
+      output = append_notifications(output, notifications)
+      {output: output, event: nil}
+    end
+
+    def apply_item_effect(item)
+      props = (item.properties || {}).with_indifferent_access
+      effect_type = props[:effect_type]
+
+      case effect_type
+      when "heal"
+        amount = props[:amount].to_i
+        new_val = hackr.adjust_vital!("health", amount)
+        "<span style='color: #34d399;'>You use #{h(item.name)}. Health restored by #{amount}. (#{new_val}/100)</span>"
+      when "energize"
+        amount = props[:amount].to_i
+        new_val = hackr.adjust_vital!("energy", amount)
+        "<span style='color: #60a5fa;'>You use #{h(item.name)}. Energy restored by #{amount}. (#{new_val}/100)</span>"
+      when "psyche_boost"
+        amount = props[:amount].to_i
+        new_val = hackr.adjust_vital!("psyche", amount)
+        "<span style='color: #c084fc;'>You use #{h(item.name)}. Psyche boosted by #{amount}. (#{new_val}/100)</span>"
+      when "inspire"
+        amount = props[:amount].to_i
+        new_val = hackr.adjust_vital!("inspiration", amount)
+        "<span style='color: #f59e0b;'>You use #{h(item.name)}. Inspiration surges by #{amount}. (#{new_val}/100)</span>"
+      when "xp_boost"
+        amount = props[:amount].to_i
+        result = hackr.grant_xp!(amount)
+        level_msg = result[:leveled_up] ? "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{result[:new_clearance]}!</span>" : ""
+        "<span style='color: #fbbf24;'>You use #{h(item.name)}. +#{amount} XP.#{level_msg}</span>"
+      else
+        "<span style='color: #9ca3af;'>You use #{h(item.name)}. Nothing happens.</span>"
+      end
+    end
+
+    def examine_hackr(target_hackr)
+      cl = target_hackr.stat("clearance")
+      achievements = target_hackr.grid_achievements.visible.order(:name)
+
+      output = []
+      output << "<span style='color: #a78bfa; font-weight: bold;'>#{h(target_hackr.hackr_alias)}</span> <span style='color: #9ca3af;'>:: CLEARANCE #{cl}</span>"
+
+      if achievements.any?
+        badges = achievements.map { |a|
+          icon = a.badge_icon.present? ? "#{a.badge_icon} " : ""
+          "<span style='color: #fbbf24;'>#{icon}#{h(a.name)}</span>"
+        }.join(", ")
+        output << "<span style='color: #9ca3af;'>Badges:</span> #{badges}"
+      else
+        output << "<span style='color: #6b7280;'>No badges earned yet.</span>"
+      end
+
+      output.join("\n")
+    end
+
     def dialogue_box(content)
       # Create a thin-bordered box around dialogue content
       # Add blank line before box, strip content to avoid blank lines inside
       "\n<div style='border: 1px solid #666; padding: 10px; margin: 5px 0; background: #0d0d0d;'>#{content.strip}</div>"
+    end
+
+    # --- Progression helpers ---
+
+    def achievement_checker
+      @achievement_checker ||= Grid::AchievementChecker.new(hackr)
+    end
+
+    def increment_stat!(key, amount = 1)
+      current = hackr.stat(key) || 0
+      hackr.set_stat!(key, current + amount)
+    end
+
+    def append_notifications(output, notifications)
+      return output if notifications.empty?
+      [output, *notifications].compact.join("\n")
     end
   end
 end

@@ -62,14 +62,17 @@ module Terminal
         println "    inventory (i)     - View your inventory"
         println "    take <item>       - Pick up an item"
         println "    drop <item>       - Drop an item"
-        println "    examine <target>  - Inspect an item or NPC"
+        println "    use <item>        - Use an item"
+        println "    salvage <item>    - Break down an item for XP"
+        println "    examine <target>  - Inspect item, NPC, or hackr"
         println ""
         println renderer.colorize("  Interaction:", :amber)
         println "    say <message>     - Speak to the room"
         println "    talk <npc>        - Start conversation with NPC"
         println "    ask <npc> about <topic> - Ask NPC about a topic"
         println ""
-        println renderer.colorize("  Other:", :amber)
+        println renderer.colorize("  Operative:", :amber)
+        println "    stat              - View your operative profile"
         println "    who               - See who's online"
         println "    clear             - Clear the screen"
         println "    back              - Return to main menu"
@@ -109,10 +112,11 @@ module Terminal
         # Broadcast event to other players (web and terminal)
         broadcast_event(result[:event]) if result[:event]
 
-        # Reload hackr to get updated room after movement
+        # Reload hackr to clear cached associations (inventory, stats, room)
+        hackr.reload
+
+        # Update real-time monitoring if room changed
         if result[:event]&.dig(:type) == "movement"
-          hackr.reload
-          # Update real-time monitoring to new room
           update_room_monitoring
         end
       end

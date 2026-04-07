@@ -191,7 +191,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, zones, rooms, etc.)"
-  task world: [:factions, :zones, :rooms, :exits, :mobs, :items]
+  task world: [:factions, :zones, :rooms, :exits, :mobs, :items, :achievements]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -676,7 +676,11 @@ namespace :data do
 
       item.assign_attributes(
         description: attrs["description"],
-        item_type: attrs["item_type"]
+        item_type: attrs["item_type"],
+        rarity: attrs["rarity"],
+        value: attrs["value"] || 0,
+        quantity: attrs["quantity"] || 1,
+        properties: attrs["properties"]
       )
 
       if item.changed?
@@ -687,6 +691,44 @@ namespace :data do
     end
 
     puts "Items: #{created} created, #{updated} updated, #{GridItem.count} total"
+  end
+
+  desc "Load achievements from YAML"
+  task achievements: :environment do
+    puts "\n--- Loading Achievements ---"
+    yaml_file = Rails.root.join("data", "world", "achievements.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    achievements_data = data["achievements"]
+    created = updated = 0
+
+    achievements_data.each do |attrs|
+      achievement = GridAchievement.find_or_initialize_by(slug: attrs["slug"])
+      was_new = achievement.new_record?
+
+      achievement.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"],
+        badge_icon: attrs["badge_icon"],
+        trigger_type: attrs["trigger_type"],
+        trigger_data: attrs["trigger_data"] || {},
+        xp_reward: attrs["xp_reward"] || 0,
+        hidden: attrs["hidden"] || false
+      )
+
+      if achievement.changed?
+        achievement.save!
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{achievement.name}"
+      end
+    end
+
+    puts "Achievements: #{created} created, #{updated} updated, #{GridAchievement.count} total"
   end
 
   desc "Load key playlists from YAML"

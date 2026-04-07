@@ -1,0 +1,151 @@
+# Grid Achievement Definitions
+# Loaded via: rails data:achievements
+achievements:
+
+  # --- Exploration ---
+  - slug: first_steps
+    name: "First Steps"
+    description: "Moved through the Grid for the first time."
+    badge_icon: ">>"
+    trigger_type: rooms_visited
+    trigger_data:
+      count: 1
+    xp_reward: 10
+
+  - slug: grid_walker
+    name: "Grid Walker"
+    description: "Explored 10 rooms across the Grid."
+    badge_icon: ">>"
+    trigger_type: rooms_visited
+    trigger_data:
+      count: 10
+    xp_reward: 50
+
+  - slug: grid_runner
+    name: "Grid Runner"
+    description: "Explored 25 rooms across the Grid."
+    badge_icon: ">>>"
+    trigger_type: rooms_visited
+    trigger_data:
+      count: 25
+    xp_reward: 150
+
+  - slug: grid_phantom
+    name: "Grid Phantom"
+    description: "Explored 50 rooms. You know every shadow."
+    badge_icon: ">>>"
+    trigger_type: rooms_visited
+    trigger_data:
+      count: 50
+    xp_reward: 500
+
+  # --- NPC Interaction ---
+  - slug: first_contact
+    name: "First Contact"
+    description: "Established contact with a Grid operative."
+    badge_icon: "~"
+    trigger_type: talk_npc
+    trigger_data: {}
+    xp_reward: 15
+
+  - slug: synthia_signal
+    name: "Synthia Signal"
+    description: "Made contact with Synthia."
+    badge_icon: "S"
+    trigger_type: talk_npc
+    trigger_data:
+      npc_name: Synthia
+    xp_reward: 100
+
+  # --- Collection ---
+  - slug: data_acquired
+    name: "Data Acquired"
+    description: "Picked up your first item."
+    badge_icon: "+"
+    trigger_type: items_collected
+    trigger_data:
+      count: 1
+    xp_reward: 10
+
+  - slug: data_hoarder
+    name: "Data Hoarder"
+    description: "Collected 5 items."
+    badge_icon: "++"
+    trigger_type: items_collected
+    trigger_data:
+      count: 5
+    xp_reward: 50
+
+  - slug: pack_rat
+    name: "Pack Rat"
+    description: "Collected 15 items. Your inventory is full of secrets."
+    badge_icon: "+++"
+    trigger_type: items_collected
+    trigger_data:
+      count: 15
+    xp_reward: 200
+
+  - slug: fracture_contact
+    name: "Fracture Contact"
+    description: "Recovered Fracture Network encrypted data."
+    badge_icon: "F"
+    trigger_type: take_item
+    trigger_data:
+      item_name: fracture network data chip
+    xp_reward: 100
+
+  # --- Rarity ---
+  - slug: rare_find
+    name: "Rare Find"
+    description: "Obtained a Rare-tier item."
+    badge_icon: "R"
+    trigger_type: rarity_owned
+    trigger_data:
+      rarity: rare
+    xp_reward: 100
+
+  - slug: ultra_rare_find
+    name: "Ultra-Rare Find"
+    description: "Obtained an Ultra-Rare item."
+    badge_icon: "U"
+    trigger_type: rarity_owned
+    trigger_data:
+      rarity: ultra_rare
+    xp_reward: 300
+
+  - slug: unicorn_hunter
+    name: "Unicorn Hunter"
+    description: "You found something that shouldn't exist."
+    badge_icon: "*"
+    trigger_type: rarity_owned
+    trigger_data:
+      rarity: unicorn
+    xp_reward: 500
+    hidden: true
+
+  # --- Salvage ---
+  - slug: scrapper
+    name: "Scrapper"
+    description: "Salvaged your first item."
+    badge_icon: "%"
+    trigger_type: salvage_item
+    trigger_data: {}
+    xp_reward: 15
+
+  - slug: junk_dealer
+    name: "Junk Dealer"
+    description: "Salvaged 5 items."
+    badge_icon: "%%"
+    trigger_type: salvage_count
+    trigger_data:
+      count: 5
+    xp_reward: 50
+
+  - slug: chop_shop
+    name: "Chop Shop"
+    description: "Salvaged 20 items. Nothing is safe around you."
+    badge_icon: "%%%"
+    trigger_type: salvage_count
+    trigger_data:
+      count: 20
+    xp_reward: 200

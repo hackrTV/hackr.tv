@@ -4,13 +4,26 @@ items:
     description: "A small chip containing encrypted Fracture Network communications."
     item_type: data
     room_slug: hackr-tv-broadcast-station
+    rarity: rare
+    value: 50
 
   - name: frequency modulator
     description: "A device for tuning into Synthia's signal. Essential for PRISM communication."
     item_type: tool
     room_slug: hackr-tv-broadcast-station
+    rarity: uncommon
+    value: 30
 
   - name: GovCorp access keycard
     description: "Stolen keycard providing access to restricted areas. Handle with care."
     item_type: tool
     room_slug: xeraen-operations-center
+    rarity: rare
+    value: 75
+
+  - name: Chronology Shard
+    description: "A fragment of crystallized time from the moment of the Fracture. It hums with impossible frequencies — echoes of 9/9. Those who hold it report dreams of futures that never happened. It shouldn't exist."
+    item_type: collectible
+    room_slug: hackr-tv-broadcast-station
+    rarity: unicorn
+    value: 999
