@@ -35,7 +35,7 @@ const ReleaseListPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [artistName, setArtistName] = useState('')
 
-  const artistSlug = location.pathname.split('/')[1]
+  const artistSlug = location.pathname.split('/')[1] ?? ''
   const colorScheme = getArtistColors(artistSlug)
   const hasPrismatic = !!colorScheme.gradient
 
@@ -78,9 +78,9 @@ const ReleaseListPage: React.FC = () => {
         const artistReleases = releasesData.filter(r => r.artist.slug === artistSlug)
         const artistComingSoon = comingSoonData.filter(r => r.artist.slug === artistSlug)
         if (artistReleases.length > 0) {
-          setArtistName(artistReleases[0].artist.name)
+          setArtistName(artistReleases[0]!.artist.name)
         } else if (artistComingSoon.length > 0) {
-          setArtistName(artistComingSoon[0].artist.name)
+          setArtistName(artistComingSoon[0]!.artist.name)
         }
         artistReleases.sort((a, b) => {
           const dateA = a.release_date || ''
@@ -170,9 +170,9 @@ const ReleaseListPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
                 {[...comingSoon.map(r => ({ ...r, _comingSoon: true as const })), ...releases.map(r => ({ ...r, _comingSoon: false as const }))].map((release, index) => {
                   const isComingSoon = release._comingSoon
-                  const accentColor = isComingSoon ? '#7c3aed'
+                  const accentColor: string = isComingSoon ? '#7c3aed'
                     : hasPrismatic && colorScheme.accentColors
-                      ? colorScheme.accentColors[index % colorScheme.accentColors.length]
+                      ? colorScheme.accentColors[index % colorScheme.accentColors.length] ?? colorScheme.primary
                       : colorScheme.primary
                   const accentGlow = isComingSoon ? 'rgba(124, 58, 237, 0.5)'
                     : hasPrismatic ? `${accentColor}99` : colorScheme.glow
