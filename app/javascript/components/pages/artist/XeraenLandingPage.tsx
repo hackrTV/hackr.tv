@@ -120,8 +120,6 @@ export const XeraenLandingPage: React.FC = () => {
                   </fieldset>
                 </div>
               </Link>
-
-
             </div>
 
             {/* Footer tagline */}
