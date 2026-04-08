@@ -18,8 +18,8 @@ export const GameOutput: React.FC<GameOutputProps> = ({ output, onOutputClick })
   }, [output])
 
   return (
-      <>
-        <style>{`
+    <>
+      <style>{`
           @keyframes rainbow-cycle {
             0%   { color: #ff6b6b; }
             17%  { color: #fbbf24; }
@@ -34,35 +34,35 @@ export const GameOutput: React.FC<GameOutputProps> = ({ output, onOutputClick })
             font-weight: bold;
           }
         `}</style>
-        <div
-          ref={outputRef}
-          id="game-output"
-          onClick={onOutputClick}
-          style={{
-            cursor: onOutputClick ? 'text' : 'default',
-            fontFamily: 'monospace',
-            fontSize: isMobile ? '0.7em' : '0.75em',
-            lineHeight: '1.2',
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            overflowWrap: 'break-word',
-            height: isMobile ? 'calc(100vh - 200px)' : '700px',
-            minHeight: isMobile ? '300px' : '700px',
-            maxHeight: isMobile ? '500px' : '700px',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            padding: isMobile ? '8px' : '10px',
-            background: '#0d0d0d',
-            color: '#d0d0d0',
-            border: '1px solid #4b5563',
-            borderRadius: '3px',
-            marginBottom: '8px'
-          }}
-        >
-          {output.map((line, index) => (
-            <div key={index} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
-          ))}
-        </div>
-      </>
+      <div
+        ref={outputRef}
+        id="game-output"
+        onClick={onOutputClick}
+        style={{
+          cursor: onOutputClick ? 'text' : 'default',
+          fontFamily: 'monospace',
+          fontSize: isMobile ? '0.7em' : '0.75em',
+          lineHeight: '1.2',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+          overflowWrap: 'break-word',
+          height: isMobile ? 'calc(100vh - 200px)' : '700px',
+          minHeight: isMobile ? '300px' : '700px',
+          maxHeight: isMobile ? '500px' : '700px',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          padding: isMobile ? '8px' : '10px',
+          background: '#0d0d0d',
+          color: '#d0d0d0',
+          border: '1px solid #4b5563',
+          borderRadius: '3px',
+          marginBottom: '8px'
+        }}
+      >
+        {output.map((line, index) => (
+          <div key={index} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
+        ))}
+      </div>
+    </>
   )
 }
