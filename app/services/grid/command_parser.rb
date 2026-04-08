@@ -479,7 +479,11 @@ module Grid
 
       xp_amount = [item.value, 1].max
       item_styled = item.unicorn? ? item.rainbow_name_html : h(item.name)
-      item.destroy!
+      if item.quantity > 1
+        item.update!(quantity: item.quantity - 1)
+      else
+        item.destroy!
+      end
 
       increment_stat!("salvage_count")
       xp_result = hackr.grant_xp!(xp_amount)
@@ -526,7 +530,7 @@ module Grid
 
     def examine_hackr(target_hackr)
       cl = target_hackr.stat("clearance")
-      achievements = target_hackr.grid_achievements.visible.order(:name)
+      achievements = target_hackr.grid_achievements.order(:name)
 
       output = []
       output << "<span style='color: #a78bfa; font-weight: bold;'>#{h(target_hackr.hackr_alias)}</span> <span style='color: #9ca3af;'>:: CLEARANCE #{cl}</span>"
