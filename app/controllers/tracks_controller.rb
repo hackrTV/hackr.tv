@@ -2,9 +2,9 @@ class TracksController < ApplicationController
   # Legacy redirects for old /trackz routes
   # All track functionality now handled by React SPA via pages#spa_root
 
-  # Legacy redirect for /trackz -> /thecyberpulse/trackz
+  # Legacy redirect for /trackz -> /thecyberpulse/releases
   def legacy_redirect
-    redirect_to "/thecyberpulse/trackz", status: 301
+    redirect_to "/thecyberpulse/releases", status: 301
   end
 
   # Legacy redirect for /trackz/:id -> /thecyberpulse/trackz/:id

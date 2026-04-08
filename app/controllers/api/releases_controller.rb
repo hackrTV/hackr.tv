@@ -111,8 +111,7 @@ module Api
     # GET /api/releases/coming_soon
     def coming_soon
       @releases = Release.includes(:artist, cover_image_attachment: :blob)
-        .where(coming_soon: true, label: "hackr.fm")
-        .where.associated(:cover_image_attachment)
+        .where(coming_soon: true)
         .order(Arel.sql("release_date ASC NULLS LAST"))
 
       render json: @releases.map { |release|
@@ -128,7 +127,7 @@ module Api
             name: release.artist.name,
             slug: release.artist.slug
           },
-          cover_url: url_for(release.cover_image),
+          cover_url: release.cover_image.attached? ? url_for(release.cover_image) : nil,
           cover_urls: cover_urls_for(release),
           track_count: release.tracks.count
         }
