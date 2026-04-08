@@ -10,6 +10,7 @@
 #  last_activity_at :datetime
 #  password_digest  :string
 #  role             :string
+#  stats            :json
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  current_room_id  :integer
@@ -23,8 +24,9 @@
 #
 class GridHackr < ApplicationRecord
   include ProfanityFilterable
+  include GridHackr::Stats
 
-  has_paper_trail ignore: %i[password_digest api_token_digest last_activity_at]
+  has_paper_trail ignore: %i[password_digest api_token_digest last_activity_at stats]
 
   has_secure_password
 
@@ -78,6 +80,8 @@ class GridHackr < ApplicationRecord
   has_many :moderation_logs_as_actor, class_name: "ModerationLog", foreign_key: :actor_id, dependent: :nullify
   has_many :moderation_logs_as_target, class_name: "ModerationLog", foreign_key: :target_id, dependent: :nullify
   has_many :feature_grants, dependent: :destroy
+  has_many :grid_hackr_achievements, dependent: :destroy
+  has_many :grid_achievements, through: :grid_hackr_achievements
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length

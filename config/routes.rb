@@ -243,6 +243,13 @@ Rails.application.routes.draw do
     post "grid/grant_feature", to: "grid#grant_feature", as: :grid_grant_feature
     delete "grid/revoke_feature", to: "grid#revoke_feature", as: :grid_revoke_feature
 
+    # Grid achievements (runtime CRUD + manual award)
+    resources :grid_achievements do
+      member do
+        post :award
+      end
+    end
+
     # PulseWire moderation (still functional - runtime operations)
     resources :pulse_wire, only: %i[index destroy] do
       collection do

@@ -10,6 +10,7 @@
 #  last_activity_at :datetime
 #  password_digest  :string
 #  role             :string
+#  stats            :json
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  current_room_id  :integer

@@ -1,0 +1,60 @@
+<div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+  <% if @achievement.errors.any? %>
+    <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+      <p class="red-255-text"><%= @achievement.errors.full_messages.join(", ") %></p>
+    </div>
+  <% end %>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px; font-family: monospace;" %>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 60px;" %>
+  </div>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+      <%= f.label :badge_icon, "BADGE ICON", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.text_field :badge_icon, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <small style="color: #666;">Short text icon (e.g. >>, %, *, F)</small>
+    </div>
+
+    <div style="flex: 1;">
+      <%= f.label :trigger_type, "TRIGGER TYPE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.select :trigger_type, GridAchievement::TRIGGER_TYPES.map { |t| [t, t] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+      <%= f.label :xp_reward, "XP REWARD", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.number_field :xp_reward, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0 %>
+    </div>
+
+    <div style="flex: 1;">
+      <%= f.label :hidden, class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" do %>
+        <%= f.check_box :hidden, style: "margin-right: 8px;" %> HIDDEN
+      <% end %>
+      <small style="color: #666;">Hidden achievements don't show in examine until earned</small>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <%= label_tag :trigger_data_json, "TRIGGER DATA (JSON)", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= text_area_tag "grid_achievement[trigger_data_json]", (@achievement.trigger_data || {}).to_json, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 60px; font-family: monospace;" %>
+    <small style="color: #666;">e.g. {"count": 10} or {"item_name": "data chip"} or {"room_slug": "govcorp-hub"}</small>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= f.submit @achievement.new_record? ? "Create Achievement" : "Update Achievement", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+    <%= link_to "Cancel", admin_grid_achievements_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+  </div>
+</div>

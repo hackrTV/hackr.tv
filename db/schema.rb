@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_01_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -143,6 +143,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_000001) do
     t.index ["grid_hackr_id"], name: "index_feature_grants_on_grid_hackr_id"
   end
 
+  create_table "grid_achievements", force: :cascade do |t|
+    t.string "badge_icon"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.boolean "hidden", default: false, null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.json "trigger_data", default: {}
+    t.string "trigger_type", null: false
+    t.datetime "updated_at", null: false
+    t.integer "xp_reward", default: 0, null: false
+    t.index ["slug"], name: "index_grid_achievements_on_slug", unique: true
+    t.index ["trigger_type"], name: "index_grid_achievements_on_trigger_type"
+  end
+
   create_table "grid_exits", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "direction"
@@ -165,6 +180,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_000001) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "grid_hackr_achievements", force: :cascade do |t|
+    t.datetime "awarded_at", null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_achievement_id", null: false
+    t.integer "grid_hackr_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_achievement_id"], name: "index_grid_hackr_achievements_on_grid_achievement_id"
+    t.index ["grid_hackr_id", "grid_achievement_id"], name: "index_hackr_achievements_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_grid_hackr_achievements_on_grid_hackr_id"
+  end
+
   create_table "grid_hackrs", force: :cascade do |t|
     t.string "api_token_digest"
     t.datetime "created_at", null: false
@@ -174,6 +200,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_000001) do
     t.datetime "last_activity_at"
     t.string "password_digest"
     t.string "role"
+    t.json "stats"
     t.datetime "updated_at", null: false
     t.index ["api_token_digest"], name: "index_grid_hackrs_on_api_token_digest", unique: true
     t.index ["email"], name: "index_grid_hackrs_on_email", unique: true
@@ -188,8 +215,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_000001) do
     t.string "item_type"
     t.string "name"
     t.json "properties"
+    t.integer "quantity", default: 1, null: false
+    t.string "rarity"
     t.integer "room_id"
     t.datetime "updated_at", null: false
+    t.integer "value", default: 0, null: false
   end
 
   create_table "grid_messages", force: :cascade do |t|
@@ -651,6 +681,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_01_000001) do
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "feature_grants", "grid_hackrs"
+  add_foreign_key "grid_hackr_achievements", "grid_achievements"
+  add_foreign_key "grid_hackr_achievements", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"

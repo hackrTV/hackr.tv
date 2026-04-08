@@ -179,8 +179,8 @@ export const GridGamePage: React.FC = () => {
       return
     }
 
-    // Echo the command in cyan
-    setOutput(prev => [...prev, `<span style="color: #22d3ee;">&gt; ${command}</span>`])
+    // Echo the command in cyan with breathing room
+    setOutput(prev => [...prev, '', `<span style="color: #22d3ee;">&gt; ${command}</span>`])
 
     setExecuting(true)
 

@@ -8,6 +8,9 @@
 #  item_type     :string
 #  name          :string
 #  properties    :json
+#  quantity      :integer          default(1), not null
+#  rarity        :string
+#  value         :integer          default(0), not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  grid_hackr_id :integer

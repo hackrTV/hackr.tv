@@ -110,15 +110,13 @@
                       <%= packet.created_at.strftime("%H:%M") %>
                     </small>
                   </td>
-                  <td style="text-align: center;">
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
-                      <% if packet.dropped %>
-                        <%= button_to "Restore", admin_restore_uplink_packet_path(packet), method: :post, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.9em;" %>
-                      <% else %>
-                        <%= button_to "Drop", admin_drop_uplink_packet_path(packet), method: :post, data: { confirm: "Drop this packet?" }, class: "tui-button orange-168", style: "padding: 2px 8px; font-size: 0.9em;" %>
-                      <% end %>
-                      <%= button_to "Delete", admin_destroy_uplink_packet_path(packet), method: :delete, data: { confirm: "Permanently delete this packet? This cannot be undone!" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.9em;" %>
-                    </div>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <% if packet.dropped %>
+                      <%= button_to "Restore", admin_restore_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.9em;" %>
+                    <% else %>
+                      <%= button_to "Drop", admin_drop_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, data: { confirm: "Drop this packet?" }, class: "tui-button orange-168", style: "padding: 2px 8px; font-size: 0.9em;" %>
+                    <% end %>
+                    <%= button_to "Delete", admin_destroy_uplink_packet_path(packet), method: :delete, form: { style: "display: inline;" }, data: { confirm: "Permanently delete this packet? This cannot be undone!" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
                   </td>
                 </tr>
               <% end %>

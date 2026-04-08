@@ -345,7 +345,7 @@ module Terminal
       # Clean up resources on disconnect
       println ""
       println renderer.colorize("Disconnected from THE.CYBERPUL.SE", :amber)
-      println renderer.colorize("Signal lost.", :gray)
+      println renderer.colorize("The Signal is always on...", :gray)
     end
   end
 end

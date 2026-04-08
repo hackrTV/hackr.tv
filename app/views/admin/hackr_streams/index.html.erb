@@ -105,11 +105,12 @@
                     <% end %>
                   </td>
                   <td style="text-align: center;">
-                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 5px; justify-content: center; white-space: nowrap;">
                       <% if stream.is_live %>
                         <%= button_to "⏸ End Stream", end_stream_admin_hackr_stream_path(stream),
                             class: "tui-button orange-168",
                             style: "padding: 2px 10px; font-size: 0.9em;",
+                            form: { style: "display: contents;" },
                             data: { confirm: "End this livestream?" } %>
                       <% elsif stream.started_at.present? %>
                         <span class="tui-button grey-168"
@@ -121,6 +122,7 @@
                         <%= button_to "▶ Go Live", go_live_admin_hackr_stream_path(stream),
                             class: "tui-button green-168",
                             style: "padding: 2px 10px; font-size: 0.9em;",
+                            form: { style: "display: contents;" },
                             data: { confirm: "Start livestream for #{stream.artist.name}?" } %>
                       <% else %>
                         <span class="tui-button grey-168"
@@ -134,6 +136,7 @@
                           style: "padding: 2px 10px; font-size: 0.9em;" %>
                       <%= button_to "✗ Delete", admin_hackr_stream_path(stream),
                           method: :delete,
+                          form: { style: "display: contents;" },
                           data: { confirm: "Delete stream for #{stream.artist.name}?" },
                           class: "tui-button red-168",
                           style: "padding: 2px 10px; font-size: 0.9em;" %>

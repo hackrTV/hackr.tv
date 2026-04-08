@@ -72,12 +72,12 @@
                       <span style="color: #4ade80; font-size: 0.85em;">LIVE</span>
                     <% end %>
                   </td>
-                  <td style="text-align: center;">
+                  <td style="text-align: center; white-space: nowrap;">
                     <%= link_to "Edit", edit_admin_release_path(release), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
                     <%= button_to "Delete", admin_release_path(release), method: :delete,
                         class: "tui-button red-168",
-                        style: "padding: 4px 12px; font-size: 0.85em; display: inline;",
-                        form: { class: "delete-release-form", data: { release_slug: release.slug } } %>
+                        style: "padding: 4px 12px; font-size: 0.85em;",
+                        form: { style: "display: inline;", class: "delete-release-form", data: { release_slug: release.slug } } %>
                   </td>
                 </tr>
               <% end %>

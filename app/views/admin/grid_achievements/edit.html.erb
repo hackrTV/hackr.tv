@@ -1,0 +1,11 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/achievements/<%= @achievement.slug %> :: EDIT ACHIEVEMENT</legend>
+
+    <div style="padding: 20px;">
+      <%= form_with model: @achievement, url: admin_grid_achievement_path(@achievement), local: true do |f| %>
+        <%= render "form", f: f %>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

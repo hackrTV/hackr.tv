@@ -89,12 +89,12 @@
                       <span style="color: #f87171;">✗</span>
                     <% end %>
                   </td>
-                  <td style="text-align: center;">
+                  <td style="text-align: center; white-space: nowrap;">
                     <%= link_to "Edit", edit_admin_track_path(track), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
                     <%= button_to "Delete", admin_track_path(track), method: :delete,
                         class: "tui-button red-168",
-                        style: "padding: 4px 12px; font-size: 0.85em; display: inline;",
-                        form: { data: { turbo_confirm: "Delete track '#{track.title}'?" } } %>
+                        style: "padding: 4px 12px; font-size: 0.85em;",
+                        form: { style: "display: inline;", data: { turbo_confirm: "Delete track '#{track.title}'?" } } %>
                   </td>
                 </tr>
               <% end %>

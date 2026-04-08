@@ -116,6 +116,8 @@
                 <th style="text-align: left;">ID</th>
                 <th style="text-align: left;">Hackr Alias</th>
                 <th style="text-align: left;">Role</th>
+                <th style="text-align: center;">CLR</th>
+                <th style="text-align: center;">XP</th>
                 <th style="text-align: center;">Grid Access</th>
                 <th style="text-align: center;">Status</th>
                 <th style="text-align: center;">Created</th>
@@ -133,15 +135,17 @@
                       <span style="color: #888;">operative</span>
                     <% end %>
                   </td>
-                  <td style="text-align: center;">
+                  <td style="text-align: center; font-family: monospace;" class="cyan-255-text"><%= hackr.stat("clearance") %></td>
+                  <td style="text-align: center; font-family: monospace;" class="green-255-text"><%= hackr.stat("xp") %></td>
+                  <td style="text-align: center; white-space: nowrap;">
                     <% if hackr.admin? %>
                       <span class="red-255-text">ADMIN</span>
                     <% elsif hackr.feature_grants.any? { |fg| fg.feature == FeatureGrant::PULSE_GRID } %>
                       <span class="green-255-text">GRANTED</span>
-                      <%= button_to "Revoke", admin_grid_revoke_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :delete, class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Revoke grid access from #{hackr.hackr_alias}?" } %>
+                      <%= button_to "Revoke", admin_grid_revoke_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :delete, form: { style: "display: inline;" }, class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Revoke grid access from #{hackr.hackr_alias}?" } %>
                     <% else %>
                       <span style="color: #666;">NONE</span>
-                      <%= button_to "Grant", admin_grid_grant_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :post, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Grant grid access to #{hackr.hackr_alias}?" } %>
+                      <%= button_to "Grant", admin_grid_grant_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :post, form: { style: "display: inline;" }, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Grant grid access to #{hackr.hackr_alias}?" } %>
                     <% end %>
                   </td>
                   <td style="text-align: center;">

@@ -34,6 +34,24 @@ module Terminal
 
       result = html_content.dup
 
+      # Convert rainbow unicorn spans to static per-character ANSI colors
+      rainbow_colors = [
+        "\e[38;2;255;107;107m",
+        "\e[38;2;251;191;36m",
+        "\e[38;2;52;211;153m",
+        "\e[38;2;34;211;238m",
+        "\e[38;2;96;165;250m",
+        "\e[38;2;167;139;250m"
+      ]
+      result.gsub!(/<span\s+class='rarity-unicorn'>(.*?)<\/span>/im) do
+        content = $1
+        # Strip any nested HTML tags for clean character coloring
+        plain = content.gsub(/<[^>]+>/, "")
+        plain.chars.each_with_index.map { |char, i|
+          "#{rainbow_colors[i % rainbow_colors.size]}#{char}#{RESET}"
+        }.join
+      end
+
       # Convert spans with style attributes to ANSI
       # Pattern handles: color, font-weight, and combinations
       result.gsub!(/<span\s+style='([^']*)'>(.*?)<\/span>/im) do
