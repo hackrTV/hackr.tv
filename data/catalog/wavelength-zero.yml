@@ -469,7 +469,6 @@ releases:
           I am free
           I can see
 
-releases:
   - slug: prism-break-live
     title: "Prism Break [LIVE at #BlackShadez (TCPU 2126)]"
     release_type: single
