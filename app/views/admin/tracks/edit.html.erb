@@ -81,15 +81,53 @@
           </div>
         </div>
 
+        <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: AUDIO FILE ::]</h3>
+
         <% if @track.audio_file.attached? %>
-          <div style="margin-bottom: 20px; padding: 10px; background: #0a0a0a; border: 1px solid #333;">
-            <span class="green-255-text">✓ Audio file attached</span>
-            <span style="color: #888; margin-left: 10px; font-family: monospace; font-size: 0.85em;">
-              <%= @track.audio_file.filename %>
-              (<%= number_to_human_size(@track.audio_file.byte_size) %>)
-            </span>
+          <div style="margin-bottom: 15px; padding: 10px; background: #0a0a0a; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <span class="green-255-text">✓ Audio file attached</span>
+              <span style="color: #888; margin-left: 10px; font-family: monospace; font-size: 0.85em;">
+                <%= @track.audio_file.filename %>
+                (<%= number_to_human_size(@track.audio_file.byte_size) %>)
+              </span>
+            </div>
           </div>
         <% end %>
+
+        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+          <div>
+            <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">
+              <%= @track.audio_file.attached? ? "REPLACE AUDIO" : "UPLOAD AUDIO" %>
+            </label>
+            <%= f.file_field :audio_file, accept: "audio/ogg,audio/mpeg,audio/wav,audio/flac,audio/mp4",
+                id: "audio-file-input",
+                style: "display: none;" %>
+            <label for="audio-file-input" class="tui-button purple-168"
+                   style="padding: 8px 20px; font-size: 0.85em; cursor: pointer; display: inline-block;">
+              CHOOSE FILE
+            </label>
+            <span id="audio-filename" style="color: #888; font-size: 0.85em; margin-left: 10px;"></span>
+            <small style="color: #666; display: block; margin-top: 8px;">OGG, MP3, WAV, FLAC, or M4A.</small>
+            <script nonce="<%= content_security_policy_nonce %>">
+              document.getElementById('audio-file-input').addEventListener('change', function(e) {
+                var name = e.target.files[0] ? e.target.files[0].name : '';
+                document.getElementById('audio-filename').textContent = name;
+              });
+            </script>
+          </div>
+
+          <% if @track.audio_file.attached? %>
+            <div style="margin-left: auto;">
+              <%= button_to "Remove Audio",
+                  purge_audio_admin_track_path(@track),
+                  method: :delete,
+                  class: "tui-button red-168",
+                  style: "padding: 8px 20px; font-size: 0.85em;",
+                  data: { turbo_confirm: "Remove audio file from '#{@track.title}'?" } %>
+            </div>
+          <% end %>
+        </div>
 
         <div style="margin-bottom: 20px;">
           <%= f.label :lyrics, "LYRICS", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>

@@ -16,6 +16,7 @@ interface Release {
   media_format: string | null
   classification: string | null
   label: string | null
+  coming_soon?: boolean
   artist: {
     id: number
     name: string
@@ -30,10 +31,11 @@ interface Release {
 const ReleaseListPage: React.FC = () => {
   const location = useLocation()
   const [releases, setReleases] = useState<Release[]>([])
+  const [comingSoon, setComingSoon] = useState<Release[]>([])
   const [loading, setLoading] = useState(true)
   const [artistName, setArtistName] = useState('')
 
-  const artistSlug = location.pathname.split('/')[1]
+  const artistSlug = location.pathname.split('/')[1] ?? ''
   const colorScheme = getArtistColors(artistSlug)
   const hasPrismatic = !!colorScheme.gradient
 
@@ -68,11 +70,17 @@ const ReleaseListPage: React.FC = () => {
   useEffect(() => {
     if (!artistSlug) return
 
-    apiJson<Release[]>('/api/releases')
-      .then(data => {
-        const artistReleases = data.filter(r => r.artist.slug === artistSlug)
+    Promise.all([
+      apiJson<Release[]>('/api/releases'),
+      apiJson<Release[]>('/api/releases/coming_soon')
+    ])
+      .then(([releasesData, comingSoonData]) => {
+        const artistReleases = releasesData.filter(r => r.artist.slug === artistSlug)
+        const artistComingSoon = comingSoonData.filter(r => r.artist.slug === artistSlug)
         if (artistReleases.length > 0) {
-          setArtistName(artistReleases[0].artist.name)
+          setArtistName(artistReleases[0]!.artist.name)
+        } else if (artistComingSoon.length > 0) {
+          setArtistName(artistComingSoon[0]!.artist.name)
         }
         artistReleases.sort((a, b) => {
           const dateA = a.release_date || ''
@@ -80,6 +88,7 @@ const ReleaseListPage: React.FC = () => {
           return dateB.localeCompare(dateA)
         })
         setReleases(artistReleases)
+        setComingSoon(artistComingSoon)
         setLoading(false)
       })
       .catch(error => {
@@ -133,52 +142,126 @@ const ReleaseListPage: React.FC = () => {
           </legend>
 
           <div>
-            {releases.length === 0 ? (
+            {comingSoon.length > 0 && (
+              <style>{`
+                @keyframes scanline-move {
+                  0% { background-position: 0 0; }
+                  100% { background-position: 0 4px; }
+                }
+                @keyframes glitch-shift {
+                  0%, 100% { transform: translate(0); }
+                  20% { transform: translate(-2px, 1px); }
+                  40% { transform: translate(2px, -1px); }
+                  60% { transform: translate(-1px, -1px); }
+                  80% { transform: translate(1px, 2px); }
+                }
+                @keyframes border-glow {
+                  0%, 100% { border-color: #7c3aed; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
+                  50% { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+                }
+              `}</style>
+            )}
+
+            {releases.length === 0 && comingSoon.length === 0 ? (
               <div style={{ padding: '40px', textAlign: 'center', background: `rgba(${colorScheme.primary}, 0.05)`, border: `1px solid ${colorScheme.primary}33` }}>
                 <p style={{ color: '#aaa' }}>No releases cataloged yet.</p>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-                {releases.map((release, index) => {
-                  const accentColor = hasPrismatic && colorScheme.accentColors
-                    ? colorScheme.accentColors[index % colorScheme.accentColors.length]
-                    : colorScheme.primary
-                  const accentGlow = hasPrismatic ? `${accentColor}99` : colorScheme.glow
+                {[...comingSoon.map(r => ({ ...r, _comingSoon: true as const })), ...releases.map(r => ({ ...r, _comingSoon: false as const }))].map((release, index) => {
+                  const isComingSoon = release._comingSoon
+                  const accentColor: string = isComingSoon ? '#7c3aed'
+                    : hasPrismatic && colorScheme.accentColors
+                      ? colorScheme.accentColors[index % colorScheme.accentColors.length] ?? colorScheme.primary
+                      : colorScheme.primary
+                  const accentGlow = isComingSoon ? 'rgba(124, 58, 237, 0.5)'
+                    : hasPrismatic ? `${accentColor}99` : colorScheme.glow
 
                   return (
                     <Link
                       key={release.id}
                       to={`/${artistSlug}/releases/${release.slug}`}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
+                      style={{ textDecoration: 'none', color: 'inherit', display: 'flex' }}
                     >
                       <div
                         style={{
-                          background: '#000',
+                          width: '100%',
+                          background: isComingSoon ? '#0a0a0a' : '#000',
                           border: `1px solid ${accentColor}`,
-                          boxShadow: `0 0 15px ${accentColor}33`,
+                          ...(isComingSoon
+                            ? { animation: 'border-glow 3s ease-in-out infinite' }
+                            : { boxShadow: `0 0 15px ${accentColor}33` }),
                           transition: 'box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          position: 'relative',
+                          overflow: 'hidden'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = `0 0 25px ${accentGlow}`
-                          e.currentTarget.style.borderColor = accentColor
                           e.currentTarget.style.transform = 'scale(1.02)'
+                          if (!isComingSoon) {
+                            e.currentTarget.style.boxShadow = `0 0 25px ${accentGlow}`
+                            e.currentTarget.style.borderColor = accentColor
+                          }
+                          const img = e.currentTarget.querySelector('img') as HTMLElement
+                          if (img && isComingSoon) img.style.animation = 'glitch-shift 0.3s ease-in-out 3'
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = `0 0 15px ${accentColor}33`
                           e.currentTarget.style.transform = 'scale(1)'
+                          if (!isComingSoon) {
+                            e.currentTarget.style.boxShadow = `0 0 15px ${accentColor}33`
+                          }
+                          const img = e.currentTarget.querySelector('img') as HTMLElement
+                          if (img && isComingSoon) img.style.animation = 'none'
                         }}
                       >
                         {/* Cover Image */}
-                        <div style={{ width: '100%', aspectRatio: '1', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                        <div style={{ width: '100%', aspectRatio: '1', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
                           {release.cover_url ? (
                             <img
-                              src={release.cover_urls?.full || release.cover_url}
+                              src={(isComingSoon ? release.cover_urls?.standard : release.cover_urls?.full) || release.cover_url}
                               alt={release.name}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                ...(isComingSoon ? { filter: 'saturate(0.5) brightness(0.6) contrast(1.1)' } : {})
+                              }}
                             />
                           ) : (
                             <div style={{ color: '#333', fontSize: '3em', fontFamily: 'monospace' }}>&#9834;</div>
+                          )}
+                          {isComingSoon && (
+                            <>
+                              {/* Scanline overlay */}
+                              <div style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px)',
+                                animation: 'scanline-move 0.5s linear infinite',
+                                pointerEvents: 'none'
+                              }} />
+                              {/* Purple tint overlay */}
+                              <div style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: 'rgba(124, 58, 237, 0.15)',
+                                pointerEvents: 'none'
+                              }} />
+                              {/* INCOMING badge */}
+                              <div style={{
+                                position: 'absolute',
+                                top: '8px',
+                                right: '8px',
+                                background: 'rgba(124, 58, 237, 0.85)',
+                                color: '#fff',
+                                padding: '2px 8px',
+                                fontSize: '0.65em',
+                                letterSpacing: '2px',
+                                fontWeight: 'bold'
+                              }}>
+                                INCOMING
+                              </div>
+                            </>
                           )}
                         </div>
 
@@ -195,7 +278,7 @@ const ReleaseListPage: React.FC = () => {
                               {release.track_count} track{release.track_count !== 1 ? 's' : ''}
                             </span>
                           </div>
-                          {release.release_date && (
+                          {release.release_date && !isComingSoon && (
                             <div style={{ color: '#555', fontSize: '0.85em', marginTop: '5px' }}>
                               {release.release_date}
                             </div>

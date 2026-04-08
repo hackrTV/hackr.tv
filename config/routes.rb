@@ -223,7 +223,11 @@ Rails.application.routes.draw do
         delete :purge_cover, to: "releases#purge_cover"
       end
     end
-    resources :tracks, only: %i[index edit update destroy]
+    resources :tracks, only: %i[index edit update destroy] do
+      member do
+        delete :purge_audio, to: "tracks#purge_audio"
+      end
+    end
 
     # Read-only content resources (managed via data/content/*.yml)
     resources :codex_entries, only: [:index]
@@ -271,8 +275,7 @@ Rails.application.routes.draw do
       end
     end
 
-    # Redirects are read-only (managed via data/system/redirects.yml)
-    resources :redirects, only: [:index]
+    resources :redirects
 
     # Uplink admin routes (moderation is still functional)
     resources :uplink, only: [:index] do

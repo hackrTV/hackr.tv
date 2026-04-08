@@ -8,7 +8,7 @@ const futureYear = currentYear + 100
 
 const colorScheme = {
   primary: '#8B00FF',
-  secondary: '#6B00CC',
+  secondary: '#9B59B6',
   glow: 'rgba(139, 0, 255, 0.6)',
   glowStrong: 'rgba(139, 0, 255, 0.8)',
   background: '#0a0a0a'
@@ -83,7 +83,7 @@ export const XeraenLandingPage: React.FC = () => {
             {/* Navigation cards */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
               gap: isMobile ? '15px' : '20px',
               marginBottom: '30px'
             }}>
@@ -115,23 +115,6 @@ export const XeraenLandingPage: React.FC = () => {
                       </p>
                       <p style={{ color: '#999', fontSize: '0.9em', lineHeight: '1.6' }}>
                         Every transmission committed to record. Hardcore fury to OMNIWAVE and everything between.
-                      </p>
-                    </div>
-                  </fieldset>
-                </div>
-              </Link>
-
-              {/* Vidz */}
-              <Link to="/xeraen/vidz" style={{ textDecoration: 'none' }}>
-                <div className="tui-window white-text" style={{ background: '#0d0d0d', border: '1px solid #ef4444', cursor: 'pointer', height: '100%' }}>
-                  <fieldset style={{ borderColor: '#ef4444', height: '100%' }}>
-                    <legend style={{ color: '#ef4444' }}>VIDZ</legend>
-                    <div style={{ padding: isMobile ? '10px' : '15px' }}>
-                      <p style={{ color: '#ef4444', fontSize: '1.4em', marginBottom: '10px', textAlign: 'center' }}>
-                        ▶ VIDZ
-                      </p>
-                      <p style={{ color: '#999', fontSize: '0.9em', lineHeight: '1.6' }}>
-                        Visual transmissions. Live sessions, signal broadcasts, and archived operations.
                       </p>
                     </div>
                   </fieldset>

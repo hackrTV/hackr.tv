@@ -57,6 +57,7 @@ gem "aws-sdk-s3", require: false
 
 # GitHub API client for code browser sync
 gem "octokit"
+gem "faraday-retry", require: false # Silences Faraday v2 retry middleware warning from octokit
 
 # ViewComponent for reusable components
 gem "view_component"
