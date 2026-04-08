@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get "xeraen/vidz/:id", to: redirect("/thecyberpulse/vidz/%{id}")
 
   # Artist routes - SPA (consolidated per-artist pattern)
-  # Each artist gets: profile, releases, trackz, vidz
+  # Each artist gets: profile, releases, track detail, vidz
   %w[thecyberpulse xeraen system-rot wavelength-zero voiceprint temporal-blue-drift
     injection-vector cipher-protocol blitzbeam apex-overdrive ethereality
     neon-hearts offline heartbreak-havoc the-pulse-grid].each do |artist_slug|
@@ -19,7 +19,6 @@ Rails.application.routes.draw do
       get "bio", to: "pages#spa_root"
       get "releases", to: "pages#spa_root"
       get "releases/:id", to: "pages#spa_root"
-      get "trackz", to: "pages#spa_root"
       get "trackz/:id", to: "pages#spa_root"
       get "vidz", to: "pages#spa_root"
       get "vidz/:id", to: "pages#spa_root"

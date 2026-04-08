@@ -469,18 +469,20 @@ const TrackDetailPage: React.FC = () => {
 
             {/* Navigation Buttons */}
             <div style={{ display: 'flex', gap: '15px', marginTop: '30px', flexWrap: 'wrap' }}>
-              <Link
-                to={`/${artistSlug}/trackz`}
-                style={{
-                  padding: '10px 20px',
-                  background: '#222',
-                  color: '#888',
-                  textDecoration: 'none',
-                  border: '1px solid #444'
-                }}
-              >
-                ← BACK TO {artistDisplayName} TRACKZ
-              </Link>
+              {track?.release && (
+                <Link
+                  to={`/${artistSlug}/releases/${track.release.slug}`}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#222',
+                    color: '#888',
+                    textDecoration: 'none',
+                    border: '1px solid #444'
+                  }}
+                >
+                  ← BACK TO {track.release.name.toUpperCase()}
+                </Link>
+              )}
               <Link
                 to={`/${artistSlug}`}
                 style={{

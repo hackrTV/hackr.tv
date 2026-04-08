@@ -21,7 +21,6 @@ const VodzShowPage = lazy(() => import('~/components/pages/artist/VodzShowPage')
 const SectorXPage = lazy(() => import('~/components/pages/artist/SectorXPage'))
 const BandProfilePage = lazy(() => import('~/components/pages/artist/BandProfilePage'))
 const WavelengthZeroPage = lazy(() => import('~/components/pages/artist/WavelengthZeroPage'))
-const TrackListPage = lazy(() => import('~/components/pages/tracks/TrackListPage'))
 const TrackDetailPage = lazy(() => import('~/components/pages/tracks/TrackDetailPage'))
 const ReleaseListPage = lazy(() => import('~/components/pages/releases/ReleaseListPage'))
 const ReleaseDetailPage = lazy(() => import('~/components/pages/releases/ReleaseDetailPage'))
@@ -77,7 +76,6 @@ export const AppLayout: React.FC = () => {
         <Route path="/thecyberpulse/bio" element={<TheCyberPulsePage />} />
         <Route path="/thecyberpulse/releases" element={<ReleaseListPage />} />
         <Route path="/thecyberpulse/releases/:releaseSlug" element={<ReleaseDetailPage />} />
-        <Route path="/thecyberpulse/trackz" element={<TrackListPage />} />
         <Route path="/thecyberpulse/trackz/:trackSlug" element={<TrackDetailPage />} />
         <Route path="/thecyberpulse/vidz" element={<VodzPage />} />
         <Route path="/thecyberpulse/vidz/:id" element={<VodzShowPage />} />
@@ -85,7 +83,6 @@ export const AppLayout: React.FC = () => {
         <Route path="/xeraen/bio" element={<XeraenPage />} />
         <Route path="/xeraen/releases" element={<ReleaseListPage />} />
         <Route path="/xeraen/releases/:releaseSlug" element={<ReleaseDetailPage />} />
-        <Route path="/xeraen/trackz" element={<TrackListPage />} />
         <Route path="/xeraen/trackz/:trackSlug" element={<TrackDetailPage />} />
         <Route path="/xeraen/vidz" element={<VodzPage />} />
         <Route path="/xeraen/vidz/:id" element={<VodzShowPage />} />
@@ -96,7 +93,6 @@ export const AppLayout: React.FC = () => {
         <Route path="/:artistSlug" element={<BandProfilePage />} />
         <Route path="/:artistSlug/releases" element={<ReleaseListPage />} />
         <Route path="/:artistSlug/releases/:releaseSlug" element={<ReleaseDetailPage />} />
-        <Route path="/:artistSlug/trackz" element={<TrackListPage />} />
         <Route path="/:artistSlug/trackz/:trackSlug" element={<TrackDetailPage />} />
         {/* THE PULSE GRID routes */}
         <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />

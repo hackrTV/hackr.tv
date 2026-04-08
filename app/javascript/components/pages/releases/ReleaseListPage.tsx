@@ -305,12 +305,6 @@ const ReleaseListPage: React.FC = () => {
                 ← {artistName || artistSlug.toUpperCase()}
               </Link>
               <Link
-                to={`/${artistSlug}/trackz`}
-                style={{ padding: '10px 20px', background: colorScheme.secondary, color: 'white', textDecoration: 'none', fontWeight: 'bold' }}
-              >
-                ALL TRACKZ →
-              </Link>
-              <Link
                 to="/vault"
                 style={{ padding: '10px 20px', background: colorScheme.primary, color: 'white', textDecoration: 'none', fontWeight: 'bold', boxShadow: `0 0 15px ${colorScheme.glow}` }}
               >

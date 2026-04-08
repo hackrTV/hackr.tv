@@ -6,9 +6,9 @@ RSpec.describe TracksController, type: :request do
 
   describe "Legacy redirects" do
     describe "GET /trackz" do
-      it "redirects to thecyberpulse trackz path" do
+      it "redirects to thecyberpulse releases path" do
         get "/trackz"
-        expect(response).to redirect_to("/thecyberpulse/trackz")
+        expect(response).to redirect_to("/thecyberpulse/releases")
         expect(response).to have_http_status(301)
       end
     end
@@ -22,24 +22,8 @@ RSpec.describe TracksController, type: :request do
     end
   end
 
-  # SPA routes - all track routes now render the React SPA shell
+  # SPA routes - individual track detail pages still exist
   describe "SPA routes" do
-    describe "GET /thecyberpulse/trackz" do
-      it "renders the SPA root" do
-        get "/thecyberpulse/trackz"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
-      end
-    end
-
-    describe "GET /xeraen/trackz" do
-      it "renders the SPA root" do
-        get "/xeraen/trackz"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
-      end
-    end
-
     describe "GET /thecyberpulse/trackz/:id" do
       it "renders the SPA root" do
         get "/thecyberpulse/trackz/test-track"
