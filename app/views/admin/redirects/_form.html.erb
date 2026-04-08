@@ -1,0 +1,47 @@
+<%# Flash Messages %>
+<% if flash[:error] %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+    <p class="red-255-text">⚠ ERROR</p>
+    <p class="white-text"><%= flash[:error] %></p>
+  </div>
+<% end %>
+
+<%= form_with model: [:admin, redirect], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: REDIRECT INFO ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :path, "PATH", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :path, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "/old-path" %>
+    <small style="color: #888;">The incoming path to match (e.g. /old-page)</small>
+    <% if redirect.errors[:path].any? %>
+      <br><small class="red-255-text"><%= redirect.errors[:path].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :destination_url, "DESTINATION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :destination_url, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "/new-path or https://example.com/page" %>
+    <small style="color: #888;">Where to redirect to (path or full URL)</small>
+    <% if redirect.errors[:destination_url].any? %>
+      <br><small class="red-255-text"><%= redirect.errors[:destination_url].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :domain, "DOMAIN", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :domain, class: "tui-input", style: "width: 100%; font-family: monospace; max-width: 400px;", placeholder: "hackr.tv" %>
+    <small style="color: #888;">Optional. Leave blank for all domains.</small>
+    <% if redirect.errors[:domain].any? %>
+      <br><small class="red-255-text"><%= redirect.errors[:domain].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <%= f.submit redirect.persisted? ? "Save Redirect" : "Create Redirect",
+        class: "tui-button purple-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= link_to "Cancel", admin_redirects_path,
+        class: "tui-button grey-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+  </div>
+<% end %>

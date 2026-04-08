@@ -1,5 +1,5 @@
 class Admin::TracksController < Admin::ApplicationController
-  before_action :set_track, only: [:edit, :update, :destroy]
+  before_action :set_track, only: [:edit, :update, :destroy, :purge_audio]
 
   def index
     @tracks = Track.includes(:artist, :release).ordered
@@ -20,6 +20,12 @@ class Admin::TracksController < Admin::ApplicationController
     end
   end
 
+  def purge_audio
+    @track.audio_file.purge
+    set_flash_success("Audio file removed from '#{@track.title}'.")
+    redirect_to edit_admin_track_path(@track)
+  end
+
   def destroy
     release = @track.release
     title = @track.title
@@ -38,7 +44,7 @@ class Admin::TracksController < Admin::ApplicationController
   def track_params
     params.require(:track).permit(
       :title, :slug, :track_number, :duration, :featured,
-      :show_in_pulse_vault, :lyrics, :release_date
+      :show_in_pulse_vault, :lyrics, :release_date, :audio_file
     )
   end
 end

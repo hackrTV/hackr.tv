@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { formatFutureDate } from '~/utils/dateUtils'
@@ -51,6 +51,8 @@ const VodzPage: React.FC = () => {
   const pathParts = location.pathname.split('/')
   const artistSlug = pathParts[1] // 'xeraen' or 'thecyberpulse'
 
+  const navigate = useNavigate()
+
   const colorScheme = {
     primary: '#8B00FF',
     glow: 'rgba(139, 0, 255, 0.6)',
@@ -79,6 +81,11 @@ const VodzPage: React.FC = () => {
         <LoadingSpinner message="Loading VODs..." />
       </DefaultLayout>
     )
+  }
+
+  if (!loading && data && data.vods.length === 0 && artistSlug === 'xeraen') {
+    navigate('/thecyberpulse/vidz', { replace: true })
+    return null
   }
 
   if (error || !data) {

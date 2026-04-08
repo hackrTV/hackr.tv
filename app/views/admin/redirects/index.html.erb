@@ -21,9 +21,7 @@
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/system/redirects.yml</code> → <code style="color: #888;">rails data:redirects</code>
-        </span>
+        <%= link_to "+ New Redirect", new_admin_redirect_path, class: "tui-button purple-168", style: "padding: 8px 20px;" %>
       </div>
 
       <!-- Redirects Table -->
@@ -35,6 +33,7 @@
                 <th style="text-align: left;">Domain</th>
                 <th style="text-align: left;">Path</th>
                 <th style="text-align: left;">Destination</th>
+                <th style="text-align: right; width: 150px;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -43,6 +42,15 @@
                   <td style="font-family: monospace; color: #888;"><%= redirect.domain || "(global)" %></td>
                   <td style="font-family: monospace;"><%= redirect.path %></td>
                   <td style="font-family: monospace; color: #0ff; max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="<%= redirect.destination_url %>"><%= truncate(redirect.destination_url, length: 50) %></td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <%= link_to "Edit", edit_admin_redirect_path(redirect), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    <%= button_to "Delete", admin_redirect_path(redirect),
+                        method: :delete,
+                        class: "tui-button red-168",
+                        style: "padding: 4px 12px; font-size: 0.85em;",
+                        form: { style: "display: inline;" },
+                        data: { turbo_confirm: "Delete redirect '#{redirect.path}'?" } %>
+                  </td>
                 </tr>
               <% end %>
             </tbody>
