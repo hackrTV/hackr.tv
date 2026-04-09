@@ -66,10 +66,27 @@ RSpec.describe GridMiningRig, type: :model do
       install_component(rig, slot: "motherboard", name: "MB1", extra_props: {cpu_slots: 1, gpu_slots: 2, ram_slots: 2})
       install_component(rig, slot: "motherboard", name: "MB2", extra_props: {cpu_slots: 1, gpu_slots: 2, ram_slots: 2})
       install_component(rig, slot: "psu", name: "PSU1") # only 1 PSU for 2 boards
-      install_component(rig, slot: "cpu")
-      install_component(rig, slot: "gpu")
-      install_component(rig, slot: "ram")
+      install_component(rig, slot: "cpu", name: "CPU1")
+      install_component(rig, slot: "cpu", name: "CPU2")
+      install_component(rig, slot: "gpu", name: "GPU1")
+      install_component(rig, slot: "gpu", name: "GPU2")
+      install_component(rig, slot: "ram", name: "RAM1")
+      install_component(rig, slot: "ram", name: "RAM2")
       expect(rig).not_to be_functional
+    end
+
+    it "requires all component counts >= motherboard count" do
+      install_component(rig, slot: "motherboard", name: "MB1", extra_props: {cpu_slots: 1, gpu_slots: 2, ram_slots: 2})
+      install_component(rig, slot: "motherboard", name: "MB2", extra_props: {cpu_slots: 1, gpu_slots: 2, ram_slots: 2})
+      install_component(rig, slot: "psu", name: "PSU1")
+      install_component(rig, slot: "psu", name: "PSU2")
+      install_component(rig, slot: "cpu", name: "CPU1") # only 1 CPU for 2 boards
+      install_component(rig, slot: "gpu", name: "GPU1")
+      install_component(rig, slot: "gpu", name: "GPU2")
+      install_component(rig, slot: "ram", name: "RAM1")
+      install_component(rig, slot: "ram", name: "RAM2")
+      expect(rig).not_to be_functional
+      expect(rig.functionality_errors).to include(/Insufficient CPUs/)
     end
   end
 
