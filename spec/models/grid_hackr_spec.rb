@@ -9,6 +9,7 @@
 #  hackr_alias      :string
 #  last_activity_at :datetime
 #  password_digest  :string
+#  registration_ip  :string
 #  role             :string
 #  stats            :json
 #  created_at       :datetime         not null

@@ -36,8 +36,9 @@ class LiveChatChannel < ApplicationCable::Channel
     # Send recent packets on join
     send_recent_packets(chat_channel)
 
-    # Track presence
+    # Track presence (count + economy presence)
     update_presence_count(chat_channel, 1)
+    track_uplink_presence(chat_channel)
   end
 
   def unsubscribed
@@ -46,12 +47,17 @@ class LiveChatChannel < ApplicationCable::Channel
       if chat_channel
         Rails.logger.info "=== LiveChatChannel: #{current_hackr&.hackr_alias || "Anonymous"} disconnected from #{@channel_slug} ==="
         update_presence_count(chat_channel, -1)
+        remove_uplink_presence(chat_channel)
       end
     end
   end
 
   def receive(data)
-    # Handle incoming WebSocket messages (typing indicators, etc.)
+    # Handle ping for presence TTL refresh
+    if data["type"] == "ping"
+      chat_channel = ChatChannel.find_by(slug: @channel_slug)
+      track_uplink_presence(chat_channel) if chat_channel
+    end
   end
 
   private
@@ -89,6 +95,21 @@ class LiveChatChannel < ApplicationCable::Channel
       channel: @channel_slug,
       presence_count: presence_count
     })
+  end
+
+  def track_uplink_presence(chat_channel)
+    return unless current_hackr
+    GridUplinkPresence.touch!(current_hackr, chat_channel)
+    current_hackr.touch_activity!
+  rescue => e
+    Rails.logger.error "=== LiveChatChannel: Presence tracking error: #{e.message} ==="
+  end
+
+  def remove_uplink_presence(chat_channel)
+    return unless current_hackr
+    GridUplinkPresence.remove!(current_hackr, chat_channel)
+  rescue => e
+    Rails.logger.error "=== LiveChatChannel: Presence removal error: #{e.message} ==="
   end
 
   def update_presence_count(chat_channel, delta)

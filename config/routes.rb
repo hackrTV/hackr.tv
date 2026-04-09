@@ -133,6 +133,7 @@ Rails.application.routes.draw do
     post "grid/complete_registration", to: "grid#complete_registration"
     delete "grid/disconnect", to: "grid#disconnect"
     post "grid/command", to: "grid#command"
+    post "grid/debit", to: "grid#debit"
     post "grid/forgot_password", to: "grid#forgot_password"
     post "grid/request_password_reset", to: "grid#request_password_reset"
     post "grid/reset_password", to: "grid#reset_password"
@@ -245,6 +246,9 @@ Rails.application.routes.draw do
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
     post "grid/grant_feature", to: "grid#grant_feature", as: :grid_grant_feature
     delete "grid/revoke_feature", to: "grid#revoke_feature", as: :grid_revoke_feature
+
+    # Grid economy (read-only admin dashboard)
+    get "grid_economy", to: "grid_economy#index", as: :grid_economy
 
     # Grid achievements (runtime CRUD + manual award)
     resources :grid_achievements do

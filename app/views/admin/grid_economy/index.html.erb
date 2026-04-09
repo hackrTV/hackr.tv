@@ -1,0 +1,204 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid_economy :: CRED ECONOMY</legend>
+
+    <div style="padding: 20px;">
+
+      <!-- Supply Overview -->
+      <div style="margin-bottom: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SUPPLY OVERVIEW ::]</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <table style="width: 100%; font-family: monospace;">
+            <tr>
+              <td style="color: #fbbf24; padding: 4px 10px;">Total Supply:</td>
+              <td class="white-text"><%= format_cred(@supply[:total]) %> CRED</td>
+              <td style="color: #fbbf24; padding: 4px 10px;">Halving Factor:</td>
+              <td class="white-text"><%= @supply[:halving_factor] %>x</td>
+            </tr>
+            <tr>
+              <td style="color: #fbbf24; padding: 4px 10px;">Mining Pool:</td>
+              <td class="green-255-text"><%= format_cred(@supply[:mining_pool_balance]) %> <span style="color: #666;">/ <%= format_cred(@supply[:mining_pool_total]) %></span></td>
+              <td style="color: #fbbf24; padding: 4px 10px;">Total Mined:</td>
+              <td class="white-text"><%= format_cred(@supply[:mining_pool_mined]) %></td>
+            </tr>
+            <tr>
+              <td style="color: #fbbf24; padding: 4px 10px;">Gameplay Pool:</td>
+              <td class="green-255-text"><%= format_cred(@supply[:gameplay_pool_balance]) %> <span style="color: #666;">/ <%= format_cred(@supply[:gameplay_pool_total]) %></span></td>
+              <td style="color: #fbbf24; padding: 4px 10px;">Gameplay Awarded:</td>
+              <td class="white-text"><%= format_cred(@supply[:gameplay_awarded]) %></td>
+            </tr>
+            <tr>
+              <td style="color: #fbbf24; padding: 4px 10px;">Total Burned:</td>
+              <td class="red-255-text"><%= format_cred(@supply[:total_burned]) %></td>
+              <td style="color: #fbbf24; padding: 4px 10px;">Total Redeemed:</td>
+              <td class="purple-168-text"><%= format_cred(@supply[:total_redeemed]) %></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <% if @flagged_ips.any? %>
+        <!-- Anti-Abuse Flags -->
+        <div style="margin-bottom: 40px;">
+          <h3 class="red-255-text" style="margin-bottom: 15px;">[:: ANTI-ABUSE FLAGS ::]</h3>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+            <table class="tui-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Registration IP</th>
+                  <th style="text-align: center;">Active Rigs</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @flagged_ips.each do |ip, count| %>
+                  <tr>
+                    <td style="font-family: monospace;"><%= ip %></td>
+                    <td style="text-align: center;" class="red-255-text"><%= count %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- All Caches -->
+      <div style="margin-bottom: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: CACHES (<%= @caches.count %>) ::]</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Address</th>
+                <th style="text-align: left;">Owner</th>
+                <th style="text-align: left;">Nickname</th>
+                <th style="text-align: right;">Balance</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center;">Type</th>
+                <th style="text-align: center;">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @caches.each do |cache| %>
+                <tr>
+                  <td style="font-family: monospace;"><%= cache.address %></td>
+                  <td>
+                    <% if cache.system? %>
+                      <span style="color: #888;">[SYSTEM]</span>
+                    <% else %>
+                      <%= cache.grid_hackr&.hackr_alias || "—" %>
+                    <% end %>
+                  </td>
+                  <td style="color: #a78bfa;"><%= cache.nickname || "—" %></td>
+                  <td style="text-align: right; font-family: monospace;" class="green-255-text"><%= format_cred(cache.balance) %></td>
+                  <td style="text-align: center;">
+                    <% if cache.active? %>
+                      <span class="green-255-text">active</span>
+                    <% else %>
+                      <span style="color: #666;">abandoned</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center; color: #888;"><%= cache.system_type || "player" %></td>
+                  <td style="text-align: center; color: #666;"><%= cache.created_at.strftime("%Y-%m-%d") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Active Mining Rigs -->
+      <div style="margin-bottom: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ACTIVE MINING RIGS (<%= @active_rigs.count %>) ::]</h3>
+        <% if @active_rigs.any? %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+            <table class="tui-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Hackr</th>
+                  <th style="text-align: center;">Rate</th>
+                  <th style="text-align: center;">Multiplier</th>
+                  <th style="text-align: center;">Components</th>
+                  <th style="text-align: center;">Last Tick</th>
+                  <th style="text-align: center;">Reg IP</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @active_rigs.each do |rig| %>
+                  <tr>
+                    <td><%= rig.grid_hackr.hackr_alias %></td>
+                    <td style="text-align: center; font-family: monospace;" class="green-255-text"><%= rig.effective_rate %></td>
+                    <td style="text-align: center; font-family: monospace;">×<%= rig.total_multiplier %></td>
+                    <td style="text-align: center;"><%= rig.components.count %></td>
+                    <td style="text-align: center; color: #666;"><%= rig.last_tick_at&.strftime("%Y-%m-%d %H:%M") || "—" %></td>
+                    <td style="text-align: center; color: #666; font-family: monospace;"><%= rig.grid_hackr.registration_ip || "—" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+            <p style="color: #666;">No active mining rigs</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div style="margin-bottom: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT TRANSACTIONS (Last 100) ::]</h3>
+        <% if @recent_transactions.any? %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+            <table class="tui-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Hash</th>
+                  <th style="text-align: left;">Type</th>
+                  <th style="text-align: left;">From</th>
+                  <th style="text-align: left;">To</th>
+                  <th style="text-align: right;">Amount</th>
+                  <th style="text-align: left;">Memo</th>
+                  <th style="text-align: center;">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @recent_transactions.each do |tx| %>
+                  <tr>
+                    <td style="font-family: monospace; color: #666;"><%= tx.short_hash %></td>
+                    <td>
+                      <% color = case tx.tx_type
+                        when "transfer" then "#d0d0d0"
+                        when "mining_reward" then "#00ff00"
+                        when "gameplay_reward" then "#fbbf24"
+                        when "burn" then "#ff0000"
+                        when "redemption" then "#a78bfa"
+                        when "genesis" then "#00ffff"
+                        else "#888"
+                      end %>
+                      <span style="color: <%= color %>;"><%= tx.tx_type.upcase %></span>
+                    </td>
+                    <td style="font-family: monospace; font-size: 0.85em;"><%= tx.from_cache.address %></td>
+                    <td style="font-family: monospace; font-size: 0.85em;"><%= tx.to_cache.address %></td>
+                    <td style="text-align: right; font-family: monospace;" class="green-255-text"><%= format_cred(tx.amount) %></td>
+                    <td style="color: #888; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= tx.memo || "—" %></td>
+                    <td style="text-align: center; color: #666;"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+            <p style="color: #666;">No transactions yet. Run <code>rails data:economy</code> to seed genesis.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Navigation -->
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Grid Dashboard", admin_grid_path, class: "tui-button green-168" %>
+        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

@@ -60,6 +60,12 @@ module Grid
         use_command(args.join(" "))
       when "salvage"
         salvage_command(args.join(" "))
+      when "cache"
+        cache_command(args)
+      when "chain"
+        chain_command(args)
+      when "rig"
+        rig_command(args)
       when "help", "?"
         help_command
       when "who"
@@ -384,6 +390,29 @@ module Grid
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>              - Talk to an NPC
           <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span> - Ask an NPC about a topic
 
+        <span style='color: #fbbf24;'>Economy:</span>
+          <span style='color: #34d399;'>cache</span>                   - List your caches
+          <span style='color: #34d399;'>cache create</span>            - Create a new cache
+          <span style='color: #34d399;'>cache balance [addr]</span>    - Check balance
+          <span style='color: #34d399;'>cache history [addr]</span>    - Transaction history
+          <span style='color: #34d399;'>cache send &lt;amt&gt; &lt;addr&gt;</span> - Send CRED
+          <span style='color: #34d399;'>cache default &lt;addr&gt;</span>   - Set default cache
+          <span style='color: #34d399;'>cache name &lt;addr&gt; &lt;nick&gt;</span> - Nickname a cache
+          <span style='color: #34d399;'>cache abandon &lt;addr&gt;</span>   - Abandon a cache
+
+        <span style='color: #fbbf24;'>Ledger:</span>
+          <span style='color: #34d399;'>chain latest</span>            - Recent global transactions
+          <span style='color: #34d399;'>chain tx &lt;hash&gt;</span>         - Look up a transaction
+          <span style='color: #34d399;'>chain cache &lt;addr&gt;</span>     - Public history for a cache
+          <span style='color: #34d399;'>chain supply</span>            - CRED supply overview
+
+        <span style='color: #fbbf24;'>Mining:</span>
+          <span style='color: #34d399;'>rig</span>                     - Mining rig status
+          <span style='color: #34d399;'>rig on / rig off</span>        - Toggle mining
+          <span style='color: #34d399;'>rig install &lt;item&gt;</span>     - Install component (rig must be off)
+          <span style='color: #34d399;'>rig uninstall &lt;item&gt;</span>   - Remove component (rig must be off)
+          <span style='color: #34d399;'>rig inspect</span>             - Detailed rig view
+
         <span style='color: #fbbf24;'>Social:</span>
           <span style='color: #34d399;'>say &lt;message&gt;</span>           - Say something in the room
           <span style='color: #34d399;'>who</span>                     - See who's online
@@ -552,6 +581,487 @@ module Grid
       # Create a thin-bordered box around dialogue content
       # Add blank line before box, strip content to avoid blank lines inside
       "\n<div style='border: 1px solid #666; padding: 10px; margin: 5px 0; background: #0d0d0d;'>#{content.strip}</div>"
+    end
+
+    # --- Economy commands ---
+
+    def cache_command(args)
+      subcmd = args.first&.downcase
+      sub_args = args[1..] || []
+
+      case subcmd
+      when nil, "list"
+        cache_list_command
+      when "create"
+        cache_create_command
+      when "balance"
+        cache_balance_command(sub_args.first)
+      when "history"
+        cache_history_command(sub_args.first)
+      when "send"
+        cache_send_command(sub_args)
+      when "default"
+        cache_default_command(sub_args.first)
+      when "abandon"
+        cache_abandon_command(sub_args.first)
+      when "name"
+        cache_name_command(sub_args)
+      else
+        "<span style='color: #f87171;'>Unknown cache command: #{h(subcmd)}. Try 'help' for usage.</span>"
+      end
+    end
+
+    def cache_list_command
+      caches = hackr.grid_caches.order(:created_at)
+      return "<span style='color: #9ca3af;'>You have no caches. Use 'cache create' to create one.</span>" if caches.empty?
+
+      lines = ["<span style='color: #fbbf24;'>Your Caches:</span>"]
+      caches.each do |cache|
+        default_tag = cache.is_default? ? " <span style='color: #22d3ee;'>[DEFAULT]</span>" : ""
+        nick_tag = cache.nickname.present? ? " <span style='color: #a78bfa;'>(#{h(cache.nickname)})</span>" : ""
+        status_tag = cache.abandoned? ? " <span style='color: #f87171;'>[ABANDONED]</span>" : ""
+        lines << "  <span style='color: #34d399;'>#{cache.address}</span>#{nick_tag}#{default_tag}#{status_tag}  <span style='color: #d0d0d0;'>Balance: #{format_cred(cache.balance)} CRED</span>"
+      end
+      lines.join("\n")
+    end
+
+    def cache_create_command
+      address = GridCache.generate_address
+      hackr.grid_caches.create!(address: address, status: "active")
+      "<span style='color: #34d399;'>Cache created:</span> <span style='color: #22d3ee;'>#{address}</span>\n<span style='color: #9ca3af;'>Use 'cache name #{address} &lt;nickname&gt;' to give it a name.</span>"
+    end
+
+    def cache_balance_command(identifier)
+      cache = if identifier.present?
+        resolve_own_cache(identifier)
+      else
+        hackr.default_cache
+      end
+      return "<span style='color: #f87171;'>Cache not found.</span>" unless cache
+
+      "<span style='color: #fbbf24;'>#{cache.display_name}:</span> <span style='color: #34d399;'>#{format_cred(cache.balance)} CRED</span>"
+    end
+
+    def cache_history_command(identifier)
+      cache = if identifier.present?
+        resolve_own_cache(identifier)
+      else
+        hackr.default_cache
+      end
+      return "<span style='color: #f87171;'>Cache not found.</span>" unless cache
+
+      txs = GridTransaction.for_cache(cache).recent.limit(15)
+      return "<span style='color: #9ca3af;'>No transactions found for #{cache.display_name}.</span>" if txs.empty?
+
+      lines = ["<span style='color: #fbbf24;'>Transaction History — #{cache.display_name}:</span>"]
+      txs.each do |tx|
+        direction = (tx.to_cache_id == cache.id) ? "+" : "-"
+        color = (direction == "+") ? "#34d399" : "#f87171"
+        other = (direction == "+") ? tx.from_cache.address : tx.to_cache.address
+        memo_tag = tx.memo.present? ? " <span style='color: #6b7280;'>#{h(tx.memo)}</span>" : ""
+        lines << "  <span style='color: #6b7280;'>[#{tx.created_at.strftime("%Y-%m-%d %H:%M")}]</span> <span style='color: #{color};'>#{direction}#{format_cred(tx.amount)}</span> <span style='color: #9ca3af;'>#{other}</span>#{memo_tag} <span style='color: #4b5563;'>#{tx.short_hash}</span>"
+      end
+      lines.join("\n")
+    end
+
+    def cache_send_command(args)
+      if args.length < 2
+        return "<span style='color: #fbbf24;'>Usage: cache send &lt;amount&gt; &lt;address_or_nickname&gt;</span>"
+      end
+
+      amount_str = args[0]
+      target_identifier = args[1]
+
+      amount = amount_str.to_i
+      return "<span style='color: #f87171;'>Amount must be a positive whole number.</span>" unless amount_str.match?(/\A\d+\z/) && amount.positive?
+
+      from_cache = hackr.default_cache
+      return "<span style='color: #f87171;'>You don't have a default cache. Use 'cache create' first.</span>" unless from_cache
+
+      to_cache = resolve_any_cache(target_identifier)
+      return "<span style='color: #f87171;'>Target cache not found: #{h(target_identifier)}</span>" unless to_cache
+      return "<span style='color: #f87171;'>Cannot send to the same cache.</span>" if from_cache.id == to_cache.id
+
+      tx = Grid::TransactionService.transfer!(from_cache: from_cache, to_cache: to_cache, amount: amount)
+      "<span style='color: #34d399;'>Sent #{format_cred(amount)} CRED to #{to_cache.address}.</span>\n<span style='color: #6b7280;'>TX: #{tx.short_hash}</span>"
+    rescue Grid::TransactionService::InsufficientBalance
+      "<span style='color: #f87171;'>Insufficient balance. Your cache has #{format_cred(from_cache.balance)} CRED.</span>"
+    rescue Grid::TransactionService::InvalidTransfer => e
+      "<span style='color: #f87171;'>Transfer failed: #{h(e.message)}</span>"
+    end
+
+    def cache_default_command(identifier)
+      return "<span style='color: #fbbf24;'>Usage: cache default &lt;address_or_nickname&gt;</span>" if identifier.blank?
+
+      cache = resolve_own_cache(identifier)
+      return "<span style='color: #f87171;'>Cache not found.</span>" unless cache
+      return "<span style='color: #f87171;'>Cannot set an abandoned cache as default.</span>" if cache.abandoned?
+
+      ActiveRecord::Base.transaction do
+        hackr.grid_caches.where(is_default: true).update_all(is_default: false)
+        cache.update!(is_default: true)
+      end
+      "<span style='color: #34d399;'>Default cache set to #{cache.display_name}.</span>"
+    end
+
+    def cache_abandon_command(identifier)
+      return "<span style='color: #fbbf24;'>Usage: cache abandon &lt;address_or_nickname&gt;</span>" if identifier.blank?
+
+      cache = resolve_own_cache(identifier)
+      return "<span style='color: #f87171;'>Cache not found.</span>" unless cache
+      return "<span style='color: #f87171;'>Cannot abandon your default cache. Set a different default first.</span>" if cache.is_default?
+      return "<span style='color: #9ca3af;'>That cache is already abandoned.</span>" if cache.abandoned?
+
+      cache.abandon!
+      "<span style='color: #fbbf24;'>Cache #{cache.address} has been abandoned.</span>\n<span style='color: #9ca3af;'>It will persist on the ledger but can no longer send or receive CRED.</span>"
+    end
+
+    def cache_name_command(args)
+      if args.length < 2
+        return "<span style='color: #fbbf24;'>Usage: cache name &lt;address_or_nickname&gt; &lt;new_nickname&gt;</span>"
+      end
+
+      identifier = args[0]
+      new_nickname = args[1]
+
+      cache = resolve_own_cache(identifier)
+      return "<span style='color: #f87171;'>Cache not found.</span>" unless cache
+
+      cache.nickname = new_nickname
+      if cache.save
+        "<span style='color: #34d399;'>Cache #{cache.address} nicknamed '#{h(new_nickname)}'.</span>"
+      else
+        "<span style='color: #f87171;'>#{cache.errors.full_messages.join(", ")}</span>"
+      end
+    end
+
+    # --- Chain commands ---
+
+    def chain_command(args)
+      subcmd = args.first&.downcase
+      sub_args = args[1..] || []
+
+      case subcmd
+      when "latest"
+        chain_latest_command
+      when "tx"
+        chain_tx_command(sub_args.first)
+      when "cache"
+        chain_cache_command(sub_args.first)
+      when "supply"
+        chain_supply_command
+      when nil
+        "<span style='color: #fbbf24;'>Usage: chain latest | chain tx &lt;hash&gt; | chain cache &lt;address&gt; | chain supply</span>"
+      else
+        "<span style='color: #f87171;'>Unknown chain command: #{h(subcmd)}. Try 'chain latest', 'chain tx', 'chain cache', or 'chain supply'.</span>"
+      end
+    end
+
+    def chain_latest_command
+      txs = GridTransaction.recent.limit(10).includes(:from_cache, :to_cache)
+      return "<span style='color: #9ca3af;'>The ledger is empty.</span>" if txs.empty?
+
+      lines = ["<span style='color: #22d3ee; font-weight: bold;'>GLOBAL LEDGER — LATEST TRANSACTIONS</span>", ""]
+      txs.each do |tx|
+        type_color = case tx.tx_type
+        when "transfer" then "#d0d0d0"
+        when "mining_reward" then "#34d399"
+        when "gameplay_reward" then "#fbbf24"
+        when "burn" then "#f87171"
+        when "redemption" then "#c084fc"
+        when "genesis" then "#22d3ee"
+        else "#9ca3af"
+        end
+        memo_tag = tx.memo.present? ? " <span style='color: #6b7280;'>#{h(tx.memo)}</span>" : ""
+        lines << "  <span style='color: #6b7280;'>[#{tx.created_at.strftime("%Y-%m-%d %H:%M")}]</span> <span style='color: #{type_color};'>[#{tx.tx_type.upcase}]</span> <span style='color: #9ca3af;'>#{tx.from_cache.address} → #{tx.to_cache.address}</span> <span style='color: #34d399;'>#{format_cred(tx.amount)} CRED</span>#{memo_tag}"
+      end
+      lines.join("\n")
+    end
+
+    def chain_tx_command(hash_fragment)
+      return "<span style='color: #fbbf24;'>Usage: chain tx &lt;hash&gt;</span>" if hash_fragment.blank?
+
+      tx = GridTransaction.find_by(tx_hash: hash_fragment)
+      tx ||= GridTransaction.where("tx_hash LIKE ?", "#{hash_fragment}%").first
+
+      return "<span style='color: #f87171;'>Transaction not found.</span>" unless tx
+
+      lines = []
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>TRANSACTION DETAIL</span>"
+      lines << ""
+      lines << "  <span style='color: #fbbf24;'>Hash:</span>     <span style='color: #d0d0d0;'>#{tx.tx_hash}</span>"
+      lines << "  <span style='color: #fbbf24;'>Prev:</span>     <span style='color: #6b7280;'>#{tx.previous_tx_hash || "GENESIS"}</span>"
+      lines << "  <span style='color: #fbbf24;'>Type:</span>     <span style='color: #d0d0d0;'>#{tx.tx_type.upcase}</span>"
+      lines << "  <span style='color: #fbbf24;'>From:</span>     <span style='color: #9ca3af;'>#{tx.from_cache.address}</span>"
+      lines << "  <span style='color: #fbbf24;'>To:</span>       <span style='color: #9ca3af;'>#{tx.to_cache.address}</span>"
+      lines << "  <span style='color: #fbbf24;'>Amount:</span>   <span style='color: #34d399;'>#{format_cred(tx.amount)} CRED</span>"
+      lines << "  <span style='color: #fbbf24;'>Memo:</span>     <span style='color: #d0d0d0;'>#{tx.memo.present? ? h(tx.memo) : "—"}</span>"
+      lines << "  <span style='color: #fbbf24;'>Time:</span>     <span style='color: #6b7280;'>#{tx.created_at.strftime("%Y-%m-%d %H:%M:%S UTC")}</span>"
+      lines.join("\n")
+    end
+
+    def chain_cache_command(address)
+      return "<span style='color: #fbbf24;'>Usage: chain cache &lt;address&gt;</span>" if address.blank?
+
+      cache = GridCache.find_by("LOWER(address) = ?", address.downcase)
+      return "<span style='color: #f87171;'>Cache not found.</span>" unless cache
+
+      txs = GridTransaction.for_cache(cache).recent.limit(15).includes(:from_cache, :to_cache)
+
+      lines = ["<span style='color: #22d3ee; font-weight: bold;'>LEDGER — #{cache.address}</span>"]
+      lines << "<span style='color: #fbbf24;'>Balance:</span> <span style='color: #34d399;'>#{format_cred(cache.balance)} CRED</span>"
+      lines << "<span style='color: #fbbf24;'>Status:</span> <span style='color: #d0d0d0;'>#{cache.status.upcase}</span>"
+      lines << ""
+
+      if txs.any?
+        txs.each do |tx|
+          direction = (tx.to_cache_id == cache.id) ? "+" : "-"
+          color = (direction == "+") ? "#34d399" : "#f87171"
+          other = (direction == "+") ? tx.from_cache.address : tx.to_cache.address
+          memo_tag = tx.memo.present? ? " <span style='color: #6b7280;'>#{h(tx.memo)}</span>" : ""
+          lines << "  <span style='color: #6b7280;'>[#{tx.created_at.strftime("%Y-%m-%d %H:%M")}]</span> <span style='color: #{color};'>#{direction}#{format_cred(tx.amount)}</span> <span style='color: #9ca3af;'>#{other}</span>#{memo_tag}"
+        end
+      else
+        lines << "  <span style='color: #6b7280;'>No transactions.</span>"
+      end
+      lines.join("\n")
+    end
+
+    def chain_supply_command
+      config = Grid::EconomyConfig
+      halving = config.halving_factor
+      mining_mined = config.mining_pool_mined
+      gameplay_awarded = config.total_gameplay_awarded
+      total_circulating = mining_mined + gameplay_awarded - config.total_burned - config.total_redeemed
+
+      lines = []
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>CRED SUPPLY</span>"
+      lines << ""
+      lines << "  <span style='color: #fbbf24;'>Total Supply:</span>       <span style='color: #d0d0d0;'>#{format_cred(config::TOTAL_SUPPLY)} CRED</span>"
+      lines << ""
+      lines << "  <span style='color: #fbbf24;'>Mining Pool:</span>        <span style='color: #34d399;'>#{format_cred(config.mining_pool_balance)}</span> <span style='color: #6b7280;'>remaining of #{format_cred(config::MINING_POOL_TOTAL)}</span>"
+      lines << "  <span style='color: #fbbf24;'>Gameplay Pool:</span>      <span style='color: #34d399;'>#{format_cred(config.gameplay_pool_balance)}</span> <span style='color: #6b7280;'>remaining of #{format_cred(config::GAMEPLAY_POOL_TOTAL)}</span>"
+      lines << ""
+      lines << "  <span style='color: #fbbf24;'>Total Mined:</span>        <span style='color: #d0d0d0;'>#{format_cred(mining_mined)}</span>"
+      lines << "  <span style='color: #fbbf24;'>Total Burned:</span>       <span style='color: #d0d0d0;'>#{format_cred(config.total_burned)}</span>"
+      lines << "  <span style='color: #fbbf24;'>Total Redeemed:</span>     <span style='color: #d0d0d0;'>#{format_cred(config.total_redeemed)}</span>"
+      lines << "  <span style='color: #fbbf24;'>Circulating:</span>        <span style='color: #22d3ee;'>#{format_cred(total_circulating)}</span>"
+      lines << ""
+      lines << "  <span style='color: #fbbf24;'>Halving Factor:</span>     <span style='color: #d0d0d0;'>#{halving}x</span>"
+      lines << "  <span style='color: #fbbf24;'>Mining Rate/Tick:</span>   <span style='color: #d0d0d0;'>#{halving} × base rate × rig multiplier</span>"
+      lines.join("\n")
+    end
+
+    # --- Rig commands ---
+
+    def rig_command(args)
+      subcmd = args.first&.downcase
+      sub_args = args[1..] || []
+
+      rig = hackr.grid_mining_rig
+      return "<span style='color: #f87171;'>You don't have a mining rig. This shouldn't happen!</span>" unless rig
+
+      case subcmd
+      when nil
+        rig_status_command(rig)
+      when "on"
+        rig_on_command(rig)
+      when "off"
+        rig_off_command(rig)
+      when "install"
+        rig_install_command(rig, sub_args.join(" "))
+      when "uninstall"
+        rig_uninstall_command(rig, sub_args.join(" "))
+      when "inspect"
+        rig_inspect_command(rig)
+      else
+        "<span style='color: #f87171;'>Unknown rig command: #{h(subcmd)}. Try 'rig', 'rig on', 'rig off', 'rig install', 'rig uninstall', or 'rig inspect'.</span>"
+      end
+    end
+
+    def rig_status_command(rig)
+      status = rig.active? ? "<span style='color: #34d399;'>● ONLINE</span>" : "<span style='color: #f87171;'>○ OFFLINE</span>"
+      functional = rig.functional?
+      halving = Grid::EconomyConfig.halving_factor
+      rate = (rig.effective_rate * halving).floor
+
+      lines = []
+      lines << "\n<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>MINING RIG</span>"
+      lines << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      lines << ""
+      lines << "  <span style='color: #fbbf24;'>Status:</span>     #{status}#{functional ? "" : " <span style='color: #f87171;'>[NON-FUNCTIONAL]</span>"}"
+      lines << "  <span style='color: #fbbf24;'>Rate:</span>       <span style='color: #34d399;'>#{rate} CRED/tick</span> <span style='color: #6b7280;'>(base #{rig.effective_rate} × #{halving} halving)</span>"
+      lines << "  <span style='color: #fbbf24;'>Boards:</span>     <span style='color: #d0d0d0;'>#{rig.motherboards.count} motherboard(s)</span>"
+      lines << "  <span style='color: #fbbf24;'>Slots:</span>      <span style='color: #d0d0d0;'>PSU #{rig.psus.count}/#{rig.total_psu_slots} | CPU #{rig.cpus.count}/#{rig.total_cpu_slots} | GPU #{rig.gpus.count}/#{rig.total_gpu_slots} | RAM #{rig.rams.count}/#{rig.total_ram_slots}</span>"
+      unless functional
+        rig.functionality_errors.each do |err|
+          lines << "  <span style='color: #f87171;'>⚠ #{h(err)}</span>"
+        end
+      end
+      if rig.last_tick_at
+        lines << "  <span style='color: #fbbf24;'>Last Tick:</span>  <span style='color: #6b7280;'>#{rig.last_tick_at.strftime("%Y-%m-%d %H:%M:%S")}</span>"
+      end
+      lines << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      lines.join("\n")
+    end
+
+    def rig_on_command(rig)
+      return "<span style='color: #9ca3af;'>Your rig is already running.</span>" if rig.active?
+
+      unless rig.functional?
+        errors = rig.functionality_errors.map { |e| "  <span style='color: #f87171;'>⚠ #{h(e)}</span>" }.join("\n")
+        return "<span style='color: #f87171;'>Rig is non-functional. Fix the following:</span>\n#{errors}"
+      end
+
+      rig.activate!
+      "<span style='color: #34d399;'>Mining rig activated. ● ONLINE</span>\n<span style='color: #6b7280;'>You will begin earning CRED on the next mining tick.</span>"
+    end
+
+    def rig_off_command(rig)
+      return "<span style='color: #9ca3af;'>Your rig is already offline.</span>" unless rig.active?
+
+      rig.deactivate!
+      "<span style='color: #fbbf24;'>Mining rig deactivated. ○ OFFLINE</span>\n<span style='color: #6b7280;'>Passive mining stopped. You can still earn CRED by watching live streams.</span>"
+    end
+
+    def rig_install_command(rig, item_name)
+      return "<span style='color: #fbbf24;'>Install what? Usage: rig install &lt;item&gt;</span>" if item_name.blank?
+      return "<span style='color: #f87171;'>Your rig must be powered down before modifying components. Use 'rig off' first.</span>" if rig.active?
+
+      item = hackr.grid_items.where(grid_mining_rig_id: nil).find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}' in your inventory.</span>" unless item
+      return "<span style='color: #f87171;'>#{h(item.name)} is not a rig component.</span>" unless item.component?
+
+      slot = item.slot
+      return "<span style='color: #f87171;'>#{h(item.name)} has no slot defined.</span>" unless slot.present?
+
+      # Slot capacity check
+      unless rig.slot_available?(slot)
+        case slot
+        when "psu"
+          return "<span style='color: #f87171;'>No PSU slot available. Each motherboard supports 1 PSU (#{rig.psus.count}/#{rig.total_psu_slots} installed).</span>"
+        when "cpu"
+          return "<span style='color: #f87171;'>No CPU slot available (#{rig.cpus.count}/#{rig.total_cpu_slots} installed). Install another motherboard for more slots.</span>"
+        when "gpu"
+          return "<span style='color: #f87171;'>No GPU slot available (#{rig.gpus.count}/#{rig.total_gpu_slots} installed). Install another motherboard for more slots.</span>"
+        when "ram"
+          return "<span style='color: #f87171;'>No RAM slot available (#{rig.rams.count}/#{rig.total_ram_slots} installed). Install another motherboard for more slots.</span>"
+        else
+          return "<span style='color: #f87171;'>No slot available for #{h(slot)}.</span>"
+        end
+      end
+
+      item.update!(grid_mining_rig: rig, grid_hackr: nil, room: nil)
+
+      rate_display = "×#{item.rate_multiplier}"
+      "<span style='color: #34d399;'>Installed #{h(item.name)} into #{slot.upcase} slot.</span> <span style='color: #6b7280;'>(#{rate_display})</span>\n<span style='color: #9ca3af;'>Rig effective rate: #{rig.reload.effective_rate} CRED/tick (base)</span>"
+    end
+
+    def rig_uninstall_command(rig, item_name)
+      return "<span style='color: #fbbf24;'>Uninstall what? Usage: rig uninstall &lt;component&gt;</span>" if item_name.blank?
+      return "<span style='color: #f87171;'>Your rig must be powered down before modifying components. Use 'rig off' first.</span>" if rig.active?
+
+      item = rig.components.find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>No component named '#{h(item_name)}' is installed in your rig.</span>" unless item
+
+      # Motherboard removal: check that remaining boards have capacity for installed components
+      if item.slot == "motherboard"
+        unless rig.can_remove_motherboard?(item)
+          return "<span style='color: #f87171;'>Cannot remove this motherboard — installed components exceed remaining slot capacity. Uninstall components first.</span>"
+        end
+      end
+
+      item.update!(grid_hackr: hackr, grid_mining_rig: nil, room: nil)
+      rig.reload
+
+      # Auto-deactivate if rig is no longer functional
+      was_functional = rig.functional?
+      output = "<span style='color: #34d399;'>Uninstalled #{h(item.name)} from your rig. It's now in your inventory.</span>"
+      output += "\n<span style='color: #9ca3af;'>Rig effective rate: #{rig.effective_rate} CRED/tick (base)</span>"
+
+      unless was_functional
+        rig.functionality_errors.each do |err|
+          output += "\n<span style='color: #f87171;'>⚠ #{h(err)}</span>"
+        end
+      end
+
+      output
+    end
+
+    def rig_inspect_command(rig)
+      lines = []
+      lines << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>RIG INSPECTION</span>"
+      lines << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
+
+      if rig.motherboards.empty?
+        lines << ""
+        lines << "  <span style='color: #4b5563;'>No motherboard installed. Rig is non-functional.</span>"
+      else
+        rig.motherboards.each_with_index do |mb, i|
+          color = mb.rarity_color
+          name_display = mb.unicorn? ? mb.rainbow_name_html : "<span style='color: #{color};'>#{h(mb.name)}</span>"
+          rarity_tag = mb.rarity ? " <span style='color: #{color};'>[#{mb.rarity_label}]</span>" : ""
+          cpu_slots = (mb.properties&.dig("cpu_slots") || 1).to_i
+          gpu_slots = (mb.properties&.dig("gpu_slots") || 2).to_i
+          ram_slots = (mb.properties&.dig("ram_slots") || 2).to_i
+
+          lines << ""
+          lines << "  <span style='color: #22d3ee;'>BOARD #{i + 1}:</span> #{name_display}#{rarity_tag} <span style='color: #6b7280;'>(×#{mb.rate_multiplier})</span>"
+          lines << "  <span style='color: #6b7280;'>         Slots: #{cpu_slots} CPU / #{gpu_slots} GPU / #{ram_slots} RAM / 1 PSU</span>"
+        end
+      end
+
+      # List components by type
+      {
+        "PSU" => rig.psus,
+        "CPU" => rig.cpus,
+        "GPU" => rig.gpus,
+        "RAM" => rig.rams
+      }.each do |label, items|
+        lines << ""
+        if items.any?
+          items.each do |comp|
+            color = comp.rarity_color
+            name_display = comp.unicorn? ? comp.rainbow_name_html : "<span style='color: #{color};'>#{h(comp.name)}</span>"
+            rarity_tag = comp.rarity ? " <span style='color: #{color};'>[#{comp.rarity_label}]</span>" : ""
+            lines << "  <span style='color: #fbbf24;'>#{label.ljust(4)}</span> #{name_display}#{rarity_tag} <span style='color: #6b7280;'>(×#{comp.rate_multiplier})</span>"
+          end
+        else
+          lines << "  <span style='color: #fbbf24;'>#{label.ljust(4)}</span> <span style='color: #4b5563;'>[ empty ]</span>"
+        end
+      end
+
+      lines << ""
+      lines << "  <span style='color: #fbbf24;'>Total Multiplier:</span> <span style='color: #22d3ee;'>×#{rig.total_multiplier}</span>"
+      lines << "  <span style='color: #fbbf24;'>Effective Rate:</span>   <span style='color: #34d399;'>#{rig.effective_rate} CRED/tick (base)</span>"
+      unless rig.functional?
+        lines << ""
+        rig.functionality_errors.each { |err| lines << "  <span style='color: #f87171;'>⚠ #{h(err)}</span>" }
+      end
+      lines << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
+      lines.join("\n")
+    end
+
+    # --- Economy helpers ---
+
+    def resolve_own_cache(identifier)
+      return nil if identifier.blank?
+      # Try nickname first, then address
+      hackr.grid_caches.find_by("LOWER(nickname) = ?", identifier.downcase) ||
+        hackr.grid_caches.find_by("LOWER(address) = ?", identifier.downcase)
+    end
+
+    def resolve_any_cache(identifier)
+      return nil if identifier.blank?
+      # Try own nickname first, then any address
+      hackr.grid_caches.find_by("LOWER(nickname) = ?", identifier.downcase) ||
+        GridCache.find_by("LOWER(address) = ?", identifier.downcase)
+    end
+
+    def format_cred(amount)
+      amount.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
     end
 
     # --- Progression helpers ---

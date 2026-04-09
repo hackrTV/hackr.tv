@@ -51,6 +51,7 @@ namespace :data do
     end
 
     Rake::Task["data:livestream_archive"].invoke
+    Rake::Task["data:economy"].invoke
 
     puts "\n" + "=" * 80
     puts "DATA LOAD COMPLETE"

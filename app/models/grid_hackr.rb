@@ -9,6 +9,7 @@
 #  hackr_alias      :string
 #  last_activity_at :datetime
 #  password_digest  :string
+#  registration_ip  :string
 #  role             :string
 #  stats            :json
 #  created_at       :datetime         not null
@@ -72,6 +73,9 @@ class GridHackr < ApplicationRecord
   belongs_to :current_room, class_name: "GridRoom", optional: true
   has_many :grid_items
   has_many :grid_messages
+  has_many :grid_caches, class_name: "GridCache", dependent: :destroy
+  has_one :grid_mining_rig, dependent: :destroy
+  has_many :grid_uplink_presences, dependent: :destroy
   has_many :playlists, dependent: :destroy
   has_many :pulses, dependent: :destroy
   has_many :echoes, dependent: :destroy
@@ -93,6 +97,77 @@ class GridHackr < ApplicationRecord
   validate :password_not_weak
 
   after_initialize :set_default_role, if: :new_record?
+
+  # Economy helpers
+  def default_cache
+    grid_caches.find_by(is_default: true)
+  end
+
+  # Provision economy: default cache + mining rig with base components
+  def provision_economy!
+    return if grid_caches.any? # Already provisioned
+
+    cache = grid_caches.create!(
+      address: GridCache.generate_address,
+      status: "active",
+      is_default: true
+    )
+
+    rig = create_grid_mining_rig!(active: false)
+
+    # Base motherboard: 1 CPU, 2 GPU, 2 RAM slots
+    GridItem.create!(
+      grid_mining_rig: rig,
+      name: "Basic Motherboard",
+      description: "A standard-issue board with minimal expansion. Gets the job done.",
+      item_type: "component",
+      rarity: "common",
+      value: 10,
+      properties: {slot: "motherboard", cpu_slots: 1, gpu_slots: 2, ram_slots: 2, rate_multiplier: 1.0}
+    )
+
+    GridItem.create!(
+      grid_mining_rig: rig,
+      name: "Basic PSU",
+      description: "A reliable power supply. Keeps the lights on.",
+      item_type: "component",
+      rarity: "common",
+      value: 5,
+      properties: {slot: "psu", rate_multiplier: 1.0}
+    )
+
+    GridItem.create!(
+      grid_mining_rig: rig,
+      name: "Basic CPU",
+      description: "A single-core processor. Slow but steady.",
+      item_type: "component",
+      rarity: "common",
+      value: 8,
+      properties: {slot: "cpu", rate_multiplier: 1.0}
+    )
+
+    GridItem.create!(
+      grid_mining_rig: rig,
+      name: "Basic GPU",
+      description: "A standard-issue mining processor. Not fast, but it works.",
+      item_type: "component",
+      rarity: "common",
+      value: 5,
+      properties: {slot: "gpu", rate_multiplier: 1.0}
+    )
+
+    GridItem.create!(
+      grid_mining_rig: rig,
+      name: "Basic RAM",
+      description: "A single stick of memory. Enough to boot.",
+      item_type: "component",
+      rarity: "common",
+      value: 4,
+      properties: {slot: "ram", rate_multiplier: 1.0}
+    )
+
+    cache
+  end
 
   # Scopes
   scope :admins, -> { where(role: "admin") }
