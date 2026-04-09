@@ -1,8 +1,9 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
+  before_action :require_admin_api, only: [:debit]
 
   # GET /api/grid/current_hackr - Get current logged-in hackr info
   def current_hackr_info
@@ -167,9 +168,12 @@ class Api::GridController < ApplicationController
 
     @hackr.current_room = starting_room
 
+    @hackr.registration_ip = request.remote_ip
+
     ActiveRecord::Base.transaction do
       if @hackr.save
         token.mark_used!
+        @hackr.provision_economy!
         log_in(@hackr)
         @hackr.touch_activity!
         Rails.logger.info("[AUTH] Registration completed: hackr_alias=#{@hackr.hackr_alias} email=#{token.email} ip=#{request.remote_ip}")
@@ -404,6 +408,43 @@ class Api::GridController < ApplicationController
       success: true,
       message: "Email address updated successfully."
     }
+  end
+
+  # POST /api/grid/debit - External service debit (e.g., Synthia redemptions)
+  # Authenticated via Bearer token (service account)
+  def debit
+    hackr_alias = params[:hackr_alias]
+    amount = params[:amount].to_i
+    memo = params[:memo].to_s.presence || "External debit"
+
+    hackr = GridHackr.find_by(hackr_alias: hackr_alias)
+    unless hackr
+      return render json: {success: false, error: "Hackr not found"}, status: :not_found
+    end
+
+    cache = hackr.default_cache
+    unless cache&.active?
+      return render json: {success: false, error: "No active cache"}, status: :unprocessable_entity
+    end
+
+    unless amount.positive?
+      return render json: {success: false, error: "Amount must be positive"}, status: :unprocessable_entity
+    end
+
+    tx = Grid::TransactionService.redeem!(from_cache: cache, amount: amount, memo: memo)
+    Rails.logger.info("[ECONOMY] Debit: hackr=#{hackr_alias} amount=#{amount} memo=#{memo} tx=#{tx.short_hash}")
+
+    render json: {
+      success: true,
+      tx_hash: tx.tx_hash,
+      remaining_balance: cache.balance
+    }
+  rescue Grid::TransactionService::InsufficientBalance
+    render json: {
+      success: false,
+      error: "Insufficient balance",
+      balance: cache&.balance || 0
+    }, status: :unprocessable_entity
   end
 
   # POST /api/grid/command - Execute game command

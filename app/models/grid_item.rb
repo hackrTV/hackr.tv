@@ -3,18 +3,23 @@
 # Table name: grid_items
 # Database name: primary
 #
-#  id            :integer          not null, primary key
-#  description   :text
-#  item_type     :string
-#  name          :string
-#  properties    :json
-#  quantity      :integer          default(1), not null
-#  rarity        :string
-#  value         :integer          default(0), not null
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  grid_hackr_id :integer
-#  room_id       :integer
+#  id                 :integer          not null, primary key
+#  description        :text
+#  item_type          :string
+#  name               :string
+#  properties         :json
+#  quantity           :integer          default(1), not null
+#  rarity             :string
+#  value              :integer          default(0), not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  grid_hackr_id      :integer
+#  grid_mining_rig_id :integer
+#  room_id            :integer
+#
+# Indexes
+#
+#  index_grid_items_on_grid_mining_rig_id  (grid_mining_rig_id)
 #
 class GridItem < ApplicationRecord
   RARITIES = %w[scrap ubiquitous common uncommon rare ultra_rare unicorn].freeze
@@ -39,14 +44,17 @@ class GridItem < ApplicationRecord
 
   belongs_to :room, class_name: "GridRoom", optional: true
   belongs_to :grid_hackr, optional: true
+  belongs_to :grid_mining_rig, optional: true
 
   validates :name, presence: true
-  validates :item_type, inclusion: {in: %w[tool consumable data faction collectible], allow_nil: true}
+  validates :item_type, inclusion: {in: %w[tool consumable data faction collectible component], allow_nil: true}
   validates :rarity, inclusion: {in: RARITIES, allow_nil: true}
   validates :quantity, numericality: {greater_than: 0}, allow_nil: true
+  validate :single_location
 
-  scope :in_room, ->(room) { where(room: room, grid_hackr: nil) }
-  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr) }
+  scope :in_room, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil) }
+  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil) }
+  scope :installed_in, ->(rig) { where(grid_mining_rig: rig, grid_hackr: nil, room: nil) }
 
   RAINBOW_COLORS = %w[#ff6b6b #fbbf24 #34d399 #22d3ee #60a5fa #a78bfa].freeze
 
@@ -78,5 +86,27 @@ class GridItem < ApplicationRecord
   # Returns the appropriately styled name HTML
   def styled_name_html
     unicorn? ? rainbow_name_html : ERB::Util.html_escape(name)
+  end
+
+  def component?
+    item_type == "component"
+  end
+
+  def slot
+    properties&.dig("slot")
+  end
+
+  def rate_multiplier
+    properties&.dig("rate_multiplier")&.to_f || 1.0
+  end
+
+  private
+
+  # An item can only be in one place: room, inventory, or mining rig
+  def single_location
+    locations = [room_id, grid_hackr_id, grid_mining_rig_id].compact.count
+    if locations > 1
+      errors.add(:base, "Item can only be in one location (room, inventory, or mining rig)")
+    end
   end
 end

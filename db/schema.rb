@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -158,6 +158,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
     t.index ["trigger_type"], name: "index_grid_achievements_on_trigger_type"
   end
 
+  create_table "grid_caches", force: :cascade do |t|
+    t.string "address", null: false
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id"
+    t.boolean "is_default", default: false, null: false
+    t.string "nickname"
+    t.string "status", default: "active", null: false
+    t.string "system_type"
+    t.datetime "updated_at", null: false
+    t.index ["address"], name: "index_grid_caches_on_address", unique: true
+    t.index ["grid_hackr_id", "nickname"], name: "index_grid_caches_on_hackr_nickname", unique: true, where: "nickname IS NOT NULL"
+    t.index ["grid_hackr_id"], name: "index_grid_caches_on_grid_hackr_id"
+    t.index ["system_type"], name: "index_grid_caches_on_system_type"
+  end
+
   create_table "grid_exits", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "direction"
@@ -199,6 +215,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
     t.string "hackr_alias"
     t.datetime "last_activity_at"
     t.string "password_digest"
+    t.string "registration_ip"
     t.string "role"
     t.json "stats"
     t.datetime "updated_at", null: false
@@ -212,6 +229,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_hackr_id"
+    t.integer "grid_mining_rig_id"
     t.string "item_type"
     t.string "name"
     t.json "properties"
@@ -220,6 +238,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
     t.integer "room_id"
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
+    t.index ["grid_mining_rig_id"], name: "index_grid_items_on_grid_mining_rig_id"
   end
 
   create_table "grid_messages", force: :cascade do |t|
@@ -230,6 +249,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
     t.integer "room_id"
     t.integer "target_hackr_id"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "grid_mining_rigs", force: :cascade do |t|
+    t.boolean "active", default: false, null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.datetime "last_tick_at"
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id"], name: "index_grid_mining_rigs_on_grid_hackr_id", unique: true
   end
 
   create_table "grid_mobs", force: :cascade do |t|
@@ -267,6 +295,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_000003) do
     t.index ["ambient_playlist_id"], name: "index_grid_rooms_on_ambient_playlist_id"
     t.index ["grid_zone_id"], name: "index_grid_rooms_on_grid_zone_id"
     t.index ["slug"], name: "index_grid_rooms_on_slug", unique: true
+  end
+
+  create_table "grid_transactions", force: :cascade do |t|
+    t.integer "amount", null: false
+    t.datetime "created_at", null: false
+    t.integer "from_cache_id", null: false
+    t.string "memo"
+    t.string "previous_tx_hash"
+    t.integer "to_cache_id", null: false
+    t.string "tx_hash", null: false
+    t.string "tx_type", null: false
+    t.index ["created_at"], name: "index_grid_transactions_on_created_at"
+    t.index ["from_cache_id"], name: "index_grid_transactions_on_from_cache_id"
+    t.index ["to_cache_id"], name: "index_grid_transactions_on_to_cache_id"
+    t.index ["tx_hash"], name: "index_grid_transactions_on_tx_hash", unique: true
+    t.index ["tx_type"], name: "index_grid_transactions_on_tx_type"
+  end
+
+  create_table "grid_uplink_presences", force: :cascade do |t|
+    t.integer "chat_channel_id", null: false
+    t.integer "grid_hackr_id", null: false
+    t.datetime "last_seen_at", null: false
+    t.index ["grid_hackr_id", "chat_channel_id"], name: "index_grid_uplink_presences_unique", unique: true
+    t.index ["last_seen_at"], name: "index_grid_uplink_presences_on_last_seen_at"
   end
 
   create_table "grid_verification_tokens", force: :cascade do |t|

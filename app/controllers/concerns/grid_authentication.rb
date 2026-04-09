@@ -92,6 +92,15 @@ module GridAuthentication
     }, status: :forbidden
   end
 
+  def require_admin_api
+    return if logged_in? && current_hackr.admin?
+
+    render json: {
+      success: false,
+      error: "Admin access required."
+    }, status: :forbidden
+  end
+
   def require_admin
     return if admin_hackr?
 
