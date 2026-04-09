@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: grid_mining_rigs
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  active        :boolean          default(FALSE), not null
+#  last_tick_at  :datetime
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#
+# Indexes
+#
+#  index_grid_mining_rigs_on_grid_hackr_id  (grid_hackr_id) UNIQUE
+#
 require "rails_helper"
 
 RSpec.describe GridMiningRig, type: :model do

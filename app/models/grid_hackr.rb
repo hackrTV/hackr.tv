@@ -104,16 +104,18 @@ class GridHackr < ApplicationRecord
   end
 
   # Provision economy: default cache + mining rig with base components
+  # Idempotent — only creates what's missing.
   def provision_economy!
-    return if grid_caches.any? # Already provisioned
+    unless grid_caches.any?
+      grid_caches.create!(
+        address: GridCache.generate_address,
+        status: "active",
+        is_default: true
+      )
+    end
 
-    cache = grid_caches.create!(
-      address: GridCache.generate_address,
-      status: "active",
-      is_default: true
-    )
-
-    rig = create_grid_mining_rig!(active: false)
+    rig = grid_mining_rig || create_grid_mining_rig!(active: false)
+    return if rig.components.any? # Rig already has components
 
     # Base motherboard: 1 CPU, 2 GPU, 2 RAM slots
     GridItem.create!(
@@ -165,8 +167,6 @@ class GridHackr < ApplicationRecord
       value: 4,
       properties: {slot: "ram", rate_multiplier: 1.0}
     )
-
-    cache
   end
 
   # Scopes

@@ -32,7 +32,8 @@ class Admin::GridEconomyController < Admin::ApplicationController
   private
 
   def format_cred(amount)
-    amount.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
+    prefix = amount.negative? ? "-" : ""
+    "#{prefix}#{amount.abs.to_s.reverse.scan(/\d{1,3}/).join(",").reverse}"
   end
   helper_method :format_cred
 end

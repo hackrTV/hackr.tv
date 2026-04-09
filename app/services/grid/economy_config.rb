@@ -2,16 +2,16 @@
 
 module Grid
   module EconomyConfig
-    TOTAL_SUPPLY        = 1_000_000_000
-    MINING_POOL_SHARE   = 0.70  # 700,000,000
+    TOTAL_SUPPLY = 1_000_000_000
+    MINING_POOL_SHARE = 0.70  # 700,000,000
     GAMEPLAY_POOL_SHARE = 0.30  # 300,000,000
-    BASE_MINING_RATE    = 1     # CRED per tick at base level
-    TICK_INTERVAL       = 5.minutes
-    INACTIVITY_SHUTOFF  = 7.days
-    PRESENCE_TTL        = 10.minutes
-    CHAT_BONUS          = 1     # flat CRED per tick for chatting during live stream
+    BASE_MINING_RATE = 1     # CRED per tick at base level
+    TICK_INTERVAL = 5.minutes
+    INACTIVITY_SHUTOFF = 7.days
+    PRESENCE_TTL = 10.minutes
+    CHAT_BONUS = 1     # flat CRED per tick for chatting during live stream
 
-    MINING_POOL_TOTAL   = (TOTAL_SUPPLY * MINING_POOL_SHARE).to_i
+    MINING_POOL_TOTAL = (TOTAL_SUPPLY * MINING_POOL_SHARE).to_i
     GAMEPLAY_POOL_TOTAL = (TOTAL_SUPPLY * GAMEPLAY_POOL_SHARE).to_i
 
     # Halving milestones: rate halves each time this cumulative % of the mining pool is mined.

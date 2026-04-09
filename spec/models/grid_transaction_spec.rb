@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: grid_transactions
+# Database name: primary
+#
+#  id               :integer          not null, primary key
+#  amount           :integer          not null
+#  memo             :string
+#  previous_tx_hash :string
+#  tx_hash          :string           not null
+#  tx_type          :string           not null
+#  created_at       :datetime         not null
+#  from_cache_id    :integer          not null
+#  to_cache_id      :integer          not null
+#
+# Indexes
+#
+#  index_grid_transactions_on_created_at     (created_at)
+#  index_grid_transactions_on_from_cache_id  (from_cache_id)
+#  index_grid_transactions_on_to_cache_id    (to_cache_id)
+#  index_grid_transactions_on_tx_hash        (tx_hash) UNIQUE
+#  index_grid_transactions_on_tx_type        (tx_type)
+#
 require "rails_helper"
 
 RSpec.describe GridTransaction, type: :model do
@@ -58,7 +81,7 @@ RSpec.describe GridTransaction, type: :model do
 
   describe "scopes" do
     it ".recent orders by created_at desc" do
-      old = create_tx(created_at: 1.hour.ago, tx_hash: "old")
+      create_tx(created_at: 1.hour.ago, tx_hash: "old")
       new_tx = create_tx(created_at: Time.current, tx_hash: "new")
       expect(described_class.recent.first).to eq(new_tx)
     end

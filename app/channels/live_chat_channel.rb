@@ -3,6 +3,14 @@ class LiveChatChannel < ApplicationCable::Channel
   @@presence_counts = Hash.new(0)
   @@presence_mutex = Mutex.new
 
+  # Refresh presence TTL server-side while the WebSocket is alive — no client ping needed
+  periodically every: 60.seconds do
+    if @channel_slug && current_hackr
+      chat_channel = ChatChannel.find_by(slug: @channel_slug)
+      track_uplink_presence(chat_channel) if chat_channel
+    end
+  end
+
   def subscribed
     @channel_slug = params[:chat_channel]
 
@@ -53,11 +61,7 @@ class LiveChatChannel < ApplicationCable::Channel
   end
 
   def receive(data)
-    # Handle ping for presence TTL refresh
-    if data["type"] == "ping"
-      chat_channel = ChatChannel.find_by(slug: @channel_slug)
-      track_uplink_presence(chat_channel) if chat_channel
-    end
+    # No inbound messages expected — presence is refreshed via periodically callback
   end
 
   private

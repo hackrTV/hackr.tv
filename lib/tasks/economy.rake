@@ -30,40 +30,28 @@ namespace :data do
       mining_pool = GridCache.mining_pool
       gameplay_pool = GridCache.gameplay_pool
 
-      total = Grid::EconomyConfig::TOTAL_SUPPLY
       mining_amount = Grid::EconomyConfig::MINING_POOL_TOTAL
       gameplay_amount = Grid::EconomyConfig::GAMEPLAY_POOL_TOTAL
 
-      # 1. Genesis self-mint (the Big Bang)
+      # Genesis: distribute supply from the genesis cache to the two pools.
+      # Genesis balance will be -1B (it created 1B from nothing). This is correct.
       now = Time.current
-      genesis_tx = GridTransaction.new(
-        from_cache: genesis,
-        to_cache: genesis,
-        amount: total,
-        tx_type: "genesis",
-        memo: "The Big Bang — #{total.to_s.reverse.scan(/\d{1,3}/).join(",").reverse} CRED created",
-        previous_tx_hash: nil,
-        created_at: now
-      )
-      genesis_tx.tx_hash = genesis_tx.compute_hash
-      genesis_tx.save!
-      puts "    TX 1: Genesis self-mint #{total} CRED (#{genesis_tx.short_hash})"
 
-      # 2. Distribute to mining pool
+      # 1. Mining pool allocation (70%)
       mining_tx = GridTransaction.new(
         from_cache: genesis,
         to_cache: mining_pool,
         amount: mining_amount,
         tx_type: "genesis",
         memo: "Mining pool allocation (70%)",
-        previous_tx_hash: genesis_tx.tx_hash,
-        created_at: now + 0.001.seconds
+        previous_tx_hash: nil,
+        created_at: now
       )
       mining_tx.tx_hash = mining_tx.compute_hash
       mining_tx.save!
-      puts "    TX 2: Mining pool #{mining_amount} CRED (#{mining_tx.short_hash})"
+      puts "    TX 1: Genesis → Mining pool #{mining_amount} CRED (#{mining_tx.short_hash})"
 
-      # 3. Distribute to gameplay pool
+      # 2. Gameplay pool allocation (30%)
       gameplay_tx = GridTransaction.new(
         from_cache: genesis,
         to_cache: gameplay_pool,
@@ -71,13 +59,13 @@ namespace :data do
         tx_type: "genesis",
         memo: "Gameplay pool allocation (30%)",
         previous_tx_hash: mining_tx.tx_hash,
-        created_at: now + 0.002.seconds
+        created_at: now + 0.001.seconds
       )
       gameplay_tx.tx_hash = gameplay_tx.compute_hash
       gameplay_tx.save!
-      puts "    TX 3: Gameplay pool #{gameplay_amount} CRED (#{gameplay_tx.short_hash})"
+      puts "    TX 2: Genesis → Gameplay pool #{gameplay_amount} CRED (#{gameplay_tx.short_hash})"
 
-      puts "\n  Genesis complete. Ledger initialized with 3 transactions."
+      puts "\n  Genesis complete. Ledger initialized with 2 transactions."
     else
       puts "\n  Ledger already has #{GridTransaction.count} transactions — skipping genesis."
     end

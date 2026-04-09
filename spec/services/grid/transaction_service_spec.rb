@@ -113,12 +113,10 @@ RSpec.describe Grid::TransactionService do
       results = []
       threads = 2.times.map do
         Thread.new do
-          begin
-            described_class.transfer!(from_cache: cache_a, to_cache: cache_b, amount: 100)
-            results << :success
-          rescue described_class::InsufficientBalance
-            results << :insufficient
-          end
+          described_class.transfer!(from_cache: cache_a, to_cache: cache_b, amount: 100)
+          results << :success
+        rescue described_class::InsufficientBalance
+          results << :insufficient
         end
       end
       threads.each(&:join)

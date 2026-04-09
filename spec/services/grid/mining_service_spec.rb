@@ -41,14 +41,14 @@ RSpec.describe Grid::MiningService do
     before { fund_mining_pool(Grid::EconomyConfig::MINING_POOL_TOTAL) }
 
     it "awards CRED to active mining rigs" do
-      hackr, cache, _rig = setup_hackr_with_rig(active: true)
+      _, cache, _rig = setup_hackr_with_rig(active: true)
 
       described_class.tick!
       expect(cache.balance).to be > 0
     end
 
     it "does not award CRED to inactive rigs" do
-      hackr, cache, _rig = setup_hackr_with_rig(active: false)
+      _, cache, _rig = setup_hackr_with_rig(active: false)
 
       described_class.tick!
       expect(cache.balance).to eq(0)
@@ -124,7 +124,7 @@ RSpec.describe Grid::MiningService do
     end
 
     it "awards bonus CRED to hackrs watching a live stream" do
-      hackr, cache, rig = setup_hackr_with_rig(active: false) # rig OFF
+      hackr, cache, _ = setup_hackr_with_rig(active: false) # rig OFF
 
       # Simulate live stream
       HackrStream.create!(artist: artist, is_live: true, live_url: "https://example.com", started_at: Time.current)

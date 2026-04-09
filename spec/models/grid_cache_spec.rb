@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: grid_caches
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  address       :string           not null
+#  archived_at   :datetime
+#  is_default    :boolean          default(FALSE), not null
+#  nickname      :string
+#  status        :string           default("active"), not null
+#  system_type   :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer
+#
+# Indexes
+#
+#  index_grid_caches_on_address         (address) UNIQUE
+#  index_grid_caches_on_grid_hackr_id   (grid_hackr_id)
+#  index_grid_caches_on_hackr_nickname  (grid_hackr_id,nickname) UNIQUE WHERE nickname IS NOT NULL
+#  index_grid_caches_on_system_type     (system_type)
+#
 require "rails_helper"
 
 RSpec.describe GridCache, type: :model do

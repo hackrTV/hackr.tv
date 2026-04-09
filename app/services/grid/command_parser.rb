@@ -890,7 +890,7 @@ module Grid
       lines << "<span style='color: #22d3ee; font-weight: bold;'>MINING RIG</span>"
       lines << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
       lines << ""
-      lines << "  <span style='color: #fbbf24;'>Status:</span>     #{status}#{functional ? "" : " <span style='color: #f87171;'>[NON-FUNCTIONAL]</span>"}"
+      lines << "  <span style='color: #fbbf24;'>Status:</span>     #{status}#{" <span style='color: #f87171;'>[NON-FUNCTIONAL]</span>" unless functional}"
       lines << "  <span style='color: #fbbf24;'>Rate:</span>       <span style='color: #34d399;'>#{rate} CRED/tick</span> <span style='color: #6b7280;'>(base #{rig.effective_rate} × #{halving} halving)</span>"
       lines << "  <span style='color: #fbbf24;'>Boards:</span>     <span style='color: #d0d0d0;'>#{rig.motherboards.count} motherboard(s)</span>"
       lines << "  <span style='color: #fbbf24;'>Slots:</span>      <span style='color: #d0d0d0;'>PSU #{rig.psus.count}/#{rig.total_psu_slots} | CPU #{rig.cpus.count}/#{rig.total_cpu_slots} | GPU #{rig.gpus.count}/#{rig.total_gpu_slots} | RAM #{rig.rams.count}/#{rig.total_ram_slots}</span>"
@@ -1061,7 +1061,8 @@ module Grid
     end
 
     def format_cred(amount)
-      amount.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
+      prefix = amount.negative? ? "-" : ""
+      "#{prefix}#{amount.abs.to_s.reverse.scan(/\d{1,3}/).join(",").reverse}"
     end
 
     # --- Progression helpers ---
