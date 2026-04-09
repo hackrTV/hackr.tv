@@ -459,7 +459,11 @@ module Grid
       default_cache = hackr.default_cache
       default_balance = default_cache&.balance || 0
       total_balance = hackr.grid_caches.sum { |c| c.balance }
-      cache_label = default_cache ? (default_cache.nickname.present? ? default_cache.nickname : default_cache.address) : "none"
+      cache_label = if default_cache
+        default_cache.nickname.present? ? default_cache.nickname : default_cache.address
+      else
+        "none"
+      end
       output << "<span style='color: #fbbf24;'>CLEARANCE:</span> <span style='color: #22d3ee;'>#{cl}</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>#{xp}</span>#{xp_to_next ? " <span style='color: #6b7280;'>(#{xp_to_next} to next)</span>" : " <span style='color: #fbbf24;'>[MAX]</span>"}"
       output << "<span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>#{format_cred(default_balance)}</span> <span style='color: #6b7280;'>(default cache: #{h(cache_label)})</span>"
       output << "<span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>#{format_cred(total_balance)}</span> <span style='color: #6b7280;'>(total across all caches)</span>"
@@ -1028,7 +1032,8 @@ module Grid
 
       lines = []
       lines << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
-      lines << "<span style='color: #22d3ee; font-weight: bold;'>RIG INSPECTION</span> #{status}#{functional ? "" : " <span style='color: #f87171;'>[NON-FUNCTIONAL]</span>"}"
+      non_functional_tag = functional ? nil : " <span style='color: #f87171;'>[NON-FUNCTIONAL]</span>"
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>RIG INSPECTION</span> #{status}#{non_functional_tag}"
       lines << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
 
       if rig.motherboards.empty?
