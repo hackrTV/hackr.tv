@@ -54,7 +54,7 @@ module Grid
         talk_command(args.join(" "))
       when "ask"
         ask_command(args)
-      when "stat", "stats"
+      when "stat", "stats", "st"
         stat_command
       when "use"
         use_command(args.join(" "))
@@ -62,6 +62,8 @@ module Grid
         salvage_command(args.join(" "))
       when "cache"
         cache_command(args)
+      when "caches", "cred"
+        cache_list_command
       when "chain"
         chain_command(args)
       when "rig"
@@ -395,7 +397,7 @@ module Grid
           <span style='color: #34d399;'>cache create</span>            - Create a new cache
           <span style='color: #34d399;'>cache balance [addr]</span>    - Check balance
           <span style='color: #34d399;'>cache history [addr]</span>    - Transaction history
-          <span style='color: #34d399;'>cache send &lt;amt&gt; &lt;addr&gt;</span> - Send CRED
+          <span style='color: #34d399;'>cache send &lt;amt&gt; &lt;to&gt; [from &lt;src&gt;] [memo &lt;text&gt;]</span> - Send CRED
           <span style='color: #34d399;'>cache default &lt;addr&gt;</span>   - Set default cache
           <span style='color: #34d399;'>cache name &lt;addr&gt; &lt;nick&gt;</span> - Nickname a cache
           <span style='color: #34d399;'>cache abandon &lt;addr&gt;</span>   - Abandon a cache
@@ -454,7 +456,13 @@ module Grid
       output << "<span style='color: #22d3ee; font-weight: bold;'>OPERATIVE FILE :: #{h(hackr.hackr_alias)}</span>"
       output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
       output << ""
+      default_cache = hackr.default_cache
+      default_balance = default_cache&.balance || 0
+      total_balance = hackr.grid_caches.sum { |c| c.balance }
+      cache_label = default_cache ? (default_cache.nickname.present? ? default_cache.nickname : default_cache.address) : "none"
       output << "<span style='color: #fbbf24;'>CLEARANCE:</span> <span style='color: #22d3ee;'>#{cl}</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>#{xp}</span>#{xp_to_next ? " <span style='color: #6b7280;'>(#{xp_to_next} to next)</span>" : " <span style='color: #fbbf24;'>[MAX]</span>"}"
+      output << "<span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>#{format_cred(default_balance)}</span> <span style='color: #6b7280;'>(default cache: #{h(cache_label)})</span>"
+      output << "<span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>#{format_cred(total_balance)}</span> <span style='color: #6b7280;'>(total across all caches)</span>"
       output << ""
       output << "<span style='color: #fbbf24;'>VITALS:</span>"
       output << "  <span style='color: #34d399;'>HEALTH      #{s["health"]}/100</span>"
@@ -615,12 +623,25 @@ module Grid
       caches = hackr.grid_caches.order(:created_at)
       return "<span style='color: #9ca3af;'>You have no caches. Use 'cache create' to create one.</span>" if caches.empty?
 
+      # Pre-compute balances for right-alignment
+      cache_data = caches.map do |cache|
+        {cache: cache, balance_str: format_cred(cache.balance)}
+      end
+      max_balance_len = cache_data.map { |d| d[:balance_str].length }.max
+      max_nick_len = caches.filter_map { |c| c.nickname&.length }.max || 0
+      nick_col = [max_nick_len, 8].max # minimum column width
+
       lines = ["<span style='color: #fbbf24;'>Your Caches:</span>"]
-      caches.each do |cache|
-        default_tag = cache.is_default? ? " <span style='color: #22d3ee;'>[DEFAULT]</span>" : ""
-        nick_tag = cache.nickname.present? ? " <span style='color: #a78bfa;'>(#{h(cache.nickname)})</span>" : ""
-        status_tag = cache.abandoned? ? " <span style='color: #f87171;'>[ABANDONED]</span>" : ""
-        lines << "  <span style='color: #34d399;'>#{cache.address}</span>#{nick_tag}#{default_tag}#{status_tag}  <span style='color: #d0d0d0;'>Balance: #{format_cred(cache.balance)} CRED</span>"
+      cache_data.each do |data|
+        cache = data[:cache]
+        bal = data[:balance_str].rjust(max_balance_len)
+        nick = cache.nickname.present? ? h(cache.nickname).ljust(nick_col) : "—".ljust(nick_col)
+        flags = []
+        flags << "<span style='color: #22d3ee;'>DEFAULT</span>" if cache.is_default?
+        flags << "<span style='color: #f87171;'>ABANDONED</span>" if cache.abandoned?
+        flag_str = flags.any? ? " #{flags.join(" ")}" : ""
+
+        lines << "  <span style='color: #34d399;'>#{cache.address}</span>  <span style='color: #a78bfa;'>#{nick}</span>  <span style='color: #34d399;'>#{bal}</span> <span style='color: #6b7280;'>CRED</span>#{flag_str}"
       end
       lines.join("\n")
     end
@@ -659,33 +680,52 @@ module Grid
         color = (direction == "+") ? "#34d399" : "#f87171"
         other = (direction == "+") ? tx.from_cache.address : tx.to_cache.address
         memo_tag = tx.memo.present? ? " <span style='color: #6b7280;'>#{h(tx.memo)}</span>" : ""
-        lines << "  <span style='color: #6b7280;'>[#{tx.created_at.strftime("%Y-%m-%d %H:%M")}]</span> <span style='color: #{color};'>#{direction}#{format_cred(tx.amount)}</span> <span style='color: #9ca3af;'>#{other}</span>#{memo_tag} <span style='color: #4b5563;'>#{tx.short_hash}</span>"
+        lines << "  <span style='color: #6b7280;'>[#{grid_time(tx.created_at)}]</span> <span style='color: #{color};'>#{direction}#{format_cred(tx.amount)}</span> <span style='color: #9ca3af;'>#{other}</span>#{memo_tag} <span style='color: #4b5563;'>#{tx.short_hash}</span>"
       end
       lines.join("\n")
     end
 
     def cache_send_command(args)
       if args.length < 2
-        return "<span style='color: #fbbf24;'>Usage: cache send &lt;amount&gt; &lt;address_or_nickname&gt;</span>"
+        return "<span style='color: #fbbf24;'>Usage: cache send &lt;amount&gt; &lt;to&gt; [from &lt;source&gt;] [memo &lt;text&gt;]</span>"
       end
 
       amount_str = args[0]
       target_identifier = args[1]
+      remaining = args[2..] || []
+
+      # Parse optional "from <source>" and "memo <text>" from remaining args
+      from_identifier = nil
+      memo = nil
+
+      memo_index = remaining.index { |w| w.downcase == "memo" }
+      if memo_index
+        memo = remaining[(memo_index + 1)..].join(" ").presence
+        remaining = remaining[0...memo_index]
+      end
+
+      if remaining.length >= 2 && remaining[0]&.downcase == "from"
+        from_identifier = remaining[1]
+      end
 
       amount = amount_str.to_i
       return "<span style='color: #f87171;'>Amount must be a positive whole number.</span>" unless amount_str.match?(/\A\d+\z/) && amount.positive?
 
-      from_cache = hackr.default_cache
-      return "<span style='color: #f87171;'>You don't have a default cache. Use 'cache create' first.</span>" unless from_cache
+      from_cache = if from_identifier
+        resolve_own_cache(from_identifier)
+      else
+        hackr.default_cache
+      end
+      return "<span style='color: #f87171;'>Source cache not found.</span>" unless from_cache
 
       to_cache = resolve_any_cache(target_identifier)
       return "<span style='color: #f87171;'>Target cache not found: #{h(target_identifier)}</span>" unless to_cache
       return "<span style='color: #f87171;'>Cannot send to the same cache.</span>" if from_cache.id == to_cache.id
 
-      tx = Grid::TransactionService.transfer!(from_cache: from_cache, to_cache: to_cache, amount: amount)
+      tx = Grid::TransactionService.transfer!(from_cache: from_cache, to_cache: to_cache, amount: amount, memo: memo)
       "<span style='color: #34d399;'>Sent #{format_cred(amount)} CRED to #{to_cache.address}.</span>\n<span style='color: #6b7280;'>TX: #{tx.short_hash}</span>"
     rescue Grid::TransactionService::InsufficientBalance
-      "<span style='color: #f87171;'>Insufficient balance. Your cache has #{format_cred(from_cache.balance)} CRED.</span>"
+      "<span style='color: #f87171;'>Insufficient balance. Cache has #{format_cred(from_cache.balance)} CRED.</span>"
     rescue Grid::TransactionService::InvalidTransfer => e
       "<span style='color: #f87171;'>Transfer failed: #{h(e.message)}</span>"
     end
@@ -763,17 +803,9 @@ module Grid
 
       lines = ["<span style='color: #22d3ee; font-weight: bold;'>GLOBAL LEDGER — LATEST TRANSACTIONS</span>", ""]
       txs.each do |tx|
-        type_color = case tx.tx_type
-        when "transfer" then "#d0d0d0"
-        when "mining_reward" then "#34d399"
-        when "gameplay_reward" then "#fbbf24"
-        when "burn" then "#f87171"
-        when "redemption" then "#c084fc"
-        when "genesis" then "#22d3ee"
-        else "#9ca3af"
-        end
+        label, type_color = tx_type_display(tx.tx_type)
         memo_tag = tx.memo.present? ? " <span style='color: #6b7280;'>#{h(tx.memo)}</span>" : ""
-        lines << "  <span style='color: #6b7280;'>[#{tx.created_at.strftime("%Y-%m-%d %H:%M")}]</span> <span style='color: #{type_color};'>[#{tx.tx_type.upcase}]</span> <span style='color: #9ca3af;'>#{tx.from_cache.address} → #{tx.to_cache.address}</span> <span style='color: #34d399;'>#{format_cred(tx.amount)} CRED</span>#{memo_tag}"
+        lines << "  <span style='color: #6b7280;'>[#{grid_time(tx.created_at)}]</span> <span style='color: #{type_color};'>[#{label}]</span> <span style='color: #9ca3af;'>#{tx.from_cache.address} → #{tx.to_cache.address}</span> <span style='color: #34d399;'>#{format_cred(tx.amount)} CRED</span>#{memo_tag}"
       end
       lines.join("\n")
     end
@@ -791,12 +823,13 @@ module Grid
       lines << ""
       lines << "  <span style='color: #fbbf24;'>Hash:</span>     <span style='color: #d0d0d0;'>#{tx.tx_hash}</span>"
       lines << "  <span style='color: #fbbf24;'>Prev:</span>     <span style='color: #6b7280;'>#{tx.previous_tx_hash || "GENESIS"}</span>"
-      lines << "  <span style='color: #fbbf24;'>Type:</span>     <span style='color: #d0d0d0;'>#{tx.tx_type.upcase}</span>"
+      label, type_color = tx_type_display(tx.tx_type)
+      lines << "  <span style='color: #fbbf24;'>Type:</span>     <span style='color: #{type_color};'>#{label}</span>"
       lines << "  <span style='color: #fbbf24;'>From:</span>     <span style='color: #9ca3af;'>#{tx.from_cache.address}</span>"
       lines << "  <span style='color: #fbbf24;'>To:</span>       <span style='color: #9ca3af;'>#{tx.to_cache.address}</span>"
       lines << "  <span style='color: #fbbf24;'>Amount:</span>   <span style='color: #34d399;'>#{format_cred(tx.amount)} CRED</span>"
       lines << "  <span style='color: #fbbf24;'>Memo:</span>     <span style='color: #d0d0d0;'>#{tx.memo.present? ? h(tx.memo) : "—"}</span>"
-      lines << "  <span style='color: #fbbf24;'>Time:</span>     <span style='color: #6b7280;'>#{tx.created_at.strftime("%Y-%m-%d %H:%M:%S UTC")}</span>"
+      lines << "  <span style='color: #fbbf24;'>Time:</span>     <span style='color: #6b7280;'>#{grid_time(tx.created_at, format: :long)}</span>"
       lines.join("\n")
     end
 
@@ -819,7 +852,7 @@ module Grid
           color = (direction == "+") ? "#34d399" : "#f87171"
           other = (direction == "+") ? tx.from_cache.address : tx.to_cache.address
           memo_tag = tx.memo.present? ? " <span style='color: #6b7280;'>#{h(tx.memo)}</span>" : ""
-          lines << "  <span style='color: #6b7280;'>[#{tx.created_at.strftime("%Y-%m-%d %H:%M")}]</span> <span style='color: #{color};'>#{direction}#{format_cred(tx.amount)}</span> <span style='color: #9ca3af;'>#{other}</span>#{memo_tag}"
+          lines << "  <span style='color: #6b7280;'>[#{grid_time(tx.created_at)}]</span> <span style='color: #{color};'>#{direction}#{format_cred(tx.amount)}</span> <span style='color: #9ca3af;'>#{other}</span>#{memo_tag}"
         end
       else
         lines << "  <span style='color: #6b7280;'>No transactions.</span>"
@@ -840,7 +873,7 @@ module Grid
       lines << "  <span style='color: #fbbf24;'>Total Supply:</span>       <span style='color: #d0d0d0;'>#{format_cred(config::TOTAL_SUPPLY)} CRED</span>"
       lines << ""
       lines << "  <span style='color: #fbbf24;'>Mining Pool:</span>        <span style='color: #34d399;'>#{format_cred(config.mining_pool_balance)}</span> <span style='color: #6b7280;'>remaining of #{format_cred(config::MINING_POOL_TOTAL)}</span>"
-      lines << "  <span style='color: #fbbf24;'>Gameplay Pool:</span>      <span style='color: #34d399;'>#{format_cred(config.gameplay_pool_balance)}</span> <span style='color: #6b7280;'>remaining of #{format_cred(config::GAMEPLAY_POOL_TOTAL)}</span>"
+      lines << "  <span style='color: #fbbf24;'>Fracture Reserve:</span>   <span style='color: #34d399;'>#{format_cred(config.gameplay_pool_balance)}</span> <span style='color: #6b7280;'>remaining of #{format_cred(config::GAMEPLAY_POOL_TOTAL)}</span>"
       lines << ""
       lines << "  <span style='color: #fbbf24;'>Total Mined:</span>        <span style='color: #d0d0d0;'>#{format_cred(mining_mined)}</span>"
       lines << "  <span style='color: #fbbf24;'>Total Burned:</span>       <span style='color: #d0d0d0;'>#{format_cred(config.total_burned)}</span>"
@@ -900,7 +933,7 @@ module Grid
         end
       end
       if rig.last_tick_at
-        lines << "  <span style='color: #fbbf24;'>Last Tick:</span>  <span style='color: #6b7280;'>#{rig.last_tick_at.strftime("%Y-%m-%d %H:%M:%S")}</span>"
+        lines << "  <span style='color: #fbbf24;'>Last Tick:</span>  <span style='color: #6b7280;'>#{grid_time(rig.last_tick_at, format: :long)}</span>"
       end
       lines << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
       lines.join("\n")
@@ -990,9 +1023,12 @@ module Grid
     end
 
     def rig_inspect_command(rig)
+      status = rig.active? ? "<span style='color: #34d399;'>● ONLINE</span>" : "<span style='color: #f87171;'>○ OFFLINE</span>"
+      functional = rig.functional?
+
       lines = []
       lines << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
-      lines << "<span style='color: #22d3ee; font-weight: bold;'>RIG INSPECTION</span>"
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>RIG INSPECTION</span> #{status}#{functional ? "" : " <span style='color: #f87171;'>[NON-FUNCTIONAL]</span>"}"
       lines << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
 
       if rig.motherboards.empty?
@@ -1013,23 +1049,26 @@ module Grid
         end
       end
 
-      # List components by type
+      # List components by type with empty slot indicators
       {
-        "PSU" => rig.psus,
-        "CPU" => rig.cpus,
-        "GPU" => rig.gpus,
-        "RAM" => rig.rams
-      }.each do |label, items|
+        "PSU" => {items: rig.psus, total: rig.total_psu_slots},
+        "CPU" => {items: rig.cpus, total: rig.total_cpu_slots},
+        "GPU" => {items: rig.gpus, total: rig.total_gpu_slots},
+        "RAM" => {items: rig.rams, total: rig.total_ram_slots}
+      }.each do |label, data|
         lines << ""
-        if items.any?
-          items.each do |comp|
-            color = comp.rarity_color
-            name_display = comp.unicorn? ? comp.rainbow_name_html : "<span style='color: #{color};'>#{h(comp.name)}</span>"
-            rarity_tag = comp.rarity ? " <span style='color: #{color};'>[#{comp.rarity_label}]</span>" : ""
-            lines << "  <span style='color: #fbbf24;'>#{label.ljust(4)}</span> #{name_display}#{rarity_tag} <span style='color: #6b7280;'>(×#{comp.rate_multiplier})</span>"
-          end
-        else
+        data[:items].each do |comp|
+          color = comp.rarity_color
+          name_display = comp.unicorn? ? comp.rainbow_name_html : "<span style='color: #{color};'>#{h(comp.name)}</span>"
+          rarity_tag = comp.rarity ? " <span style='color: #{color};'>[#{comp.rarity_label}]</span>" : ""
+          lines << "  <span style='color: #fbbf24;'>#{label.ljust(4)}</span> #{name_display}#{rarity_tag} <span style='color: #6b7280;'>(×#{comp.rate_multiplier})</span>"
+        end
+        empty = data[:total] - data[:items].size
+        empty.times do
           lines << "  <span style='color: #fbbf24;'>#{label.ljust(4)}</span> <span style='color: #4b5563;'>[ empty ]</span>"
+        end
+        if data[:total].zero?
+          lines << "  <span style='color: #fbbf24;'>#{label.ljust(4)}</span> <span style='color: #4b5563;'>[ no slots ]</span>"
         end
       end
 
@@ -1045,6 +1084,26 @@ module Grid
     end
 
     # --- Economy helpers ---
+
+    def grid_time(time, format: :short)
+      future = time.change(year: time.year + 100)
+      case format
+      when :short then future.strftime("%Y-%m-%d %H:%M")
+      when :long then future.strftime("%Y-%m-%d %H:%M:%S UTC")
+      end
+    end
+
+    def tx_type_display(tx_type)
+      case tx_type
+      when "transfer" then ["TRANSFER", "#d0d0d0"]
+      when "mining_reward" then ["MINING", "#34d399"]
+      when "gameplay_reward" then ["FRACTURE RESERVE", "#fbbf24"]
+      when "burn" then ["BURN", "#f87171"]
+      when "redemption" then ["REDEMPTION", "#c084fc"]
+      when "genesis" then ["GENESIS", "#22d3ee"]
+      else [tx_type.upcase, "#9ca3af"]
+      end
+    end
 
     def resolve_own_cache(identifier)
       return nil if identifier.blank?

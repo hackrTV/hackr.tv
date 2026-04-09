@@ -100,20 +100,22 @@ class GridMiningRig < ApplicationRecord
   # --- Functional check ---
 
   def functional?
-    motherboards.any? &&
-      psus.count >= motherboards.count &&
-      cpus.any? &&
-      gpus.any? &&
-      rams.any?
+    mb_count = motherboards.count
+    mb_count > 0 &&
+      psus.count >= mb_count &&
+      cpus.count >= mb_count &&
+      gpus.count >= mb_count &&
+      rams.count >= mb_count
   end
 
   def functionality_errors
+    mb_count = motherboards.count
     errors = []
-    errors << "No motherboard installed" if motherboards.empty?
-    errors << "Insufficient power (need #{motherboards.count} PSU, have #{psus.count})" if psus.count < motherboards.count
-    errors << "No CPU installed" if cpus.empty?
-    errors << "No GPU installed" if gpus.empty?
-    errors << "No RAM installed" if rams.empty?
+    errors << "No motherboard installed" if mb_count.zero?
+    errors << "Insufficient PSUs (need #{mb_count}, have #{psus.count})" if psus.count < mb_count
+    errors << "Insufficient CPUs (need #{mb_count}, have #{cpus.count})" if cpus.count < mb_count
+    errors << "Insufficient GPUs (need #{mb_count}, have #{gpus.count})" if gpus.count < mb_count
+    errors << "Insufficient RAM (need #{mb_count}, have #{rams.count})" if rams.count < mb_count
     errors
   end
 
