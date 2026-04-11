@@ -143,7 +143,7 @@ module Grid
       if mob.black_market?
         multiplier = [1.0, EconomyConfig::BLACK_MARKET_BASE_MULTIPLIER -
           (clearance - EconomyConfig::BLACK_MARKET_MIN_CLEARANCE) *
-          EconomyConfig::BLACK_MARKET_CLEARANCE_REDUCTION].max
+            EconomyConfig::BLACK_MARKET_CLEARANCE_REDUCTION].max
         (listing.base_price * multiplier).ceil
       else
         listing.base_price
@@ -185,17 +185,21 @@ module Grid
       burn_amt = burn_amount(amount)
       recycle_amt = amount - burn_amt
 
-      Grid::TransactionService.burn!(
-        from_cache: hackr_cache,
-        amount: burn_amt,
-        memo: "Shop purchase: #{item_name}"
-      ) if burn_amt > 0
+      if burn_amt > 0
+        Grid::TransactionService.burn!(
+          from_cache: hackr_cache,
+          amount: burn_amt,
+          memo: "Shop purchase: #{item_name}"
+        )
+      end
 
-      Grid::TransactionService.recycle!(
-        from_cache: hackr_cache,
-        amount: recycle_amt,
-        memo: "Shop recycle: #{item_name}"
-      ) if recycle_amt > 0
+      if recycle_amt > 0
+        Grid::TransactionService.recycle!(
+          from_cache: hackr_cache,
+          amount: recycle_amt,
+          memo: "Shop recycle: #{item_name}"
+        )
+      end
     end
     private_class_method :split_purchase!
   end

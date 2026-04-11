@@ -78,7 +78,11 @@ RSpec.describe Grid::ShopService do
     end
 
     it "raises InsufficientBalance when hackr can't afford it" do
-      fund_cache(cache, -950) rescue nil # drain to 50
+      begin
+        fund_cache(cache, -950)
+      rescue
+        nil
+      end # drain to 50
       hackr_cache = create(:grid_cache, :default, grid_hackr: create(:grid_hackr))
       poor_hackr = hackr_cache.grid_hackr
       fund_cache(hackr_cache, 10)

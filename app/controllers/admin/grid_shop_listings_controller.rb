@@ -77,10 +77,10 @@ class Admin::GridShopListingsController < Admin::ApplicationController
       :active, :rotation_pool, :min_clearance
     )
     # Parse properties from JSON string
-    if params[:grid_shop_listing][:properties_json].present?
-      permitted[:properties] = JSON.parse(params[:grid_shop_listing][:properties_json])
+    permitted[:properties] = if params[:grid_shop_listing][:properties_json].present?
+      JSON.parse(params[:grid_shop_listing][:properties_json])
     else
-      permitted[:properties] = {}
+      {}
     end
     permitted
   rescue JSON::ParserError
