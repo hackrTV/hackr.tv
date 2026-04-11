@@ -192,7 +192,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, zones, rooms, etc.)"
-  task world: [:factions, :zones, :rooms, :exits, :mobs, :items, :achievements]
+  task world: [:factions, :zones, :rooms, :exits, :mobs, :items, :achievements, :shop_listings]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -553,7 +553,8 @@ namespace :data do
         name: attrs["name"],
         description: attrs["description"],
         grid_zone: zone,
-        room_type: attrs["room_type"]
+        room_type: attrs["room_type"],
+        min_clearance: attrs["min_clearance"] || 0
       )
 
       if room.changed?
@@ -638,7 +639,8 @@ namespace :data do
         description: attrs["description"],
         mob_type: attrs["mob_type"],
         grid_faction: faction,
-        dialogue_tree: attrs["dialogue_tree"]
+        dialogue_tree: attrs["dialogue_tree"],
+        vendor_config: attrs["vendor_config"]
       )
 
       if mob.changed?
@@ -730,6 +732,66 @@ namespace :data do
     end
 
     puts "Achievements: #{created} created, #{updated} updated, #{GridAchievement.count} total"
+  end
+
+  desc "Load shop listings from YAML"
+  task shop_listings: :environment do
+    puts "\n--- Loading Shop Listings ---"
+    yaml_file = Rails.root.join("data", "world", "shop_listings.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    listings_data = data["shop_listings"]
+    created = updated = 0
+
+    listings_data.each do |attrs|
+      room = GridRoom.find_by(slug: attrs["room_slug"])
+      unless room
+        puts "  ✗ Room not found: #{attrs["room_slug"]}"
+        next
+      end
+
+      mob = GridMob.find_by(name: attrs["vendor_name"], grid_room: room)
+      unless mob
+        puts "  ✗ Vendor not found: #{attrs["vendor_name"]} in #{attrs["room_slug"]}"
+        next
+      end
+
+      listing = GridShopListing.find_or_initialize_by(name: attrs["name"], grid_mob: mob)
+      was_new = listing.new_record?
+
+      base_price = attrs["base_price"]
+      sell_price = attrs["sell_price"] || (base_price / 2.0).ceil
+
+      listing.assign_attributes(
+        description: attrs["description"],
+        item_type: attrs["item_type"],
+        rarity: attrs["rarity"],
+        base_price: base_price,
+        sell_price: sell_price,
+        stock: attrs["max_stock"],
+        max_stock: attrs["max_stock"],
+        restock_amount: attrs["restock_amount"] || 1,
+        restock_interval_hours: attrs["restock_interval_hours"] || mob.restock_interval_hours,
+        next_restock_at: Time.current + (attrs["restock_interval_hours"] || mob.restock_interval_hours).hours,
+        active: attrs.fetch("active", true),
+        rotation_pool: attrs.fetch("rotation_pool", false),
+        min_clearance: attrs["min_clearance"] || 0,
+        properties: attrs["properties"] || {}
+      )
+
+      if listing.changed?
+        listing.save!
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{listing.name} (#{mob.name})"
+      end
+    end
+
+    puts "Shop Listings: #{created} created, #{updated} updated, #{GridShopListing.count} total"
   end
 
   desc "Load key playlists from YAML"

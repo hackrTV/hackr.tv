@@ -1,0 +1,70 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/shops :: TRANSACTION LOG</legend>
+
+    <div style="padding: 20px;">
+      <!-- Filters -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <%= link_to "<- Listings", admin_grid_shop_listings_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+
+        <%= form_tag admin_grid_shop_transactions_path, method: :get, style: "display: flex; gap: 10px; align-items: center;" do %>
+          <%= text_field_tag :hackr_alias, params[:hackr_alias], placeholder: "Hackr alias", class: "tui-input", style: "width: 150px; padding: 6px 10px;" %>
+          <%= select_tag :mob_id,
+              options_from_collection_for_select(@vendors, :id, :name, params[:mob_id]),
+              include_blank: "All Vendors", class: "tui-input", style: "padding: 6px 10px;" %>
+          <%= select_tag :transaction_type,
+              options_for_select([["All Types", ""], ["Purchases", "buy"], ["Sales", "sell"]], params[:transaction_type]),
+              class: "tui-input", style: "padding: 6px 10px;" %>
+          <%= submit_tag "Filter", class: "tui-button cyan-168", style: "padding: 6px 16px;" %>
+        <% end %>
+      </div>
+
+      <% if @transactions.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Time</th>
+                <th style="text-align: left;">Hackr</th>
+                <th style="text-align: center;">Type</th>
+                <th style="text-align: left;">Vendor</th>
+                <th style="text-align: left;">Item</th>
+                <th style="text-align: right;">Price</th>
+                <th style="text-align: right;">Burn</th>
+                <th style="text-align: right;">Recycle</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @transactions.each do |tx| %>
+                <tr>
+                  <td style="color: #666; font-family: monospace; font-size: 0.85em;"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+                  <td class="purple-168-text"><%= tx.grid_hackr.hackr_alias %></td>
+                  <td style="text-align: center;">
+                    <% if tx.transaction_type == "buy" %>
+                      <span class="green-255-text">BUY</span>
+                    <% else %>
+                      <span class="yellow-168-text">SELL</span>
+                    <% end %>
+                  </td>
+                  <td style="color: #c084fc;"><%= tx.grid_mob.name %></td>
+                  <td class="cyan-255-text"><%= tx.grid_shop_listing&.name || "(deleted)" %></td>
+                  <td style="text-align: right;" class="green-255-text"><%= number_with_delimiter(tx.price_paid) %></td>
+                  <td style="text-align: right; color: #f87171;"><%= tx.burn_amount > 0 ? number_with_delimiter(tx.burn_amount) : "-" %></td>
+                  <td style="text-align: right; color: #34d399;"><%= tx.recycle_amount > 0 ? number_with_delimiter(tx.recycle_amount) : "-" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No shop transactions recorded yet.</p>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "<- Grid Admin", admin_grid_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

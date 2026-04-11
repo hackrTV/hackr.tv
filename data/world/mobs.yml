@@ -17,6 +17,37 @@ mobs:
         ride: "The RIDE - Reality Interference and Dictation Environment. GovCorp's worldwide reality manipulation system. Most citizens live inside it without knowing. We breach it. We fight it."
         prism: "PRISM was the precursor - reality manipulation tech from 2050. The RIDE is what it became. Global. Pervasive. Inescapable. Unless you know where to look."
 
+  - name: Codec
+    room_slug: the-signal-bazaar
+    faction_slug: null
+    description: "A wiry trader with augmented eyes that cycle through spectrums, tracking every item in the bazaar simultaneously. Their fingers are stained with solder and their coat is lined with pockets full of components."
+    mob_type: vendor
+    vendor_config:
+      shop_type: standard
+      restock_interval_hours: 24
+    dialogue_tree:
+      greeting: "Welcome to The Signal Bazaar. I got tools, patches, components — you name it. You got CRED, we can make something work."
+      topics:
+        prices: "Everything at fair market rate. No haggling, no drama. Take it or leave it."
+        stock: "I restock daily from my supply chains. If I'm out of something, check back tomorrow."
+        components: "I carry standard-grade components. Nothing fancy, but they'll keep your rig running. For the exotic stuff... you'll have to look elsewhere."
+
+  - name: GHOST
+    room_slug: the-blacksite
+    faction_slug: null
+    description: "You can't quite make out GHOST's face — the shadows seem to actively avoid illuminating it. They speak in a low monotone that somehow cuts through any background noise. A faint smell of burnt circuitry follows them."
+    mob_type: vendor
+    vendor_config:
+      shop_type: black_market
+      restock_interval_hours: 168
+      rotation_count: 4
+    dialogue_tree:
+      greeting: "You're either very brave or very stupid to come here. Either works for me. What do you need?"
+      topics:
+        clearance: "The higher your clearance, the better I treat you. Prove you're worth the risk and the prices get... friendlier."
+        stock: "Stock rotates weekly. What's here today won't be here next week. If you see something you want, don't hesitate."
+        trust: "Trust is earned in the Underbelly. Every clearance level you gain means less risk for me, which means better rates for you."
+
   - name: Temporal Theorist
     room_slug: xeraen-operations-center
     faction_slug: xeraen

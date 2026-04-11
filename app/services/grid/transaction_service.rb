@@ -42,6 +42,11 @@ module Grid
       execute!(from_cache: from_cache, to_cache: GridCache.redemption, amount: amount, tx_type: "redemption", memo: memo)
     end
 
+    # Purchase recycle (player cache → gameplay pool)
+    def self.recycle!(from_cache:, amount:, memo: nil)
+      execute!(from_cache: from_cache, to_cache: GridCache.gameplay_pool, amount: amount, tx_type: "purchase_recycle", memo: memo)
+    end
+
     # Genesis mint (genesis cache → genesis cache, then distribute)
     def self.genesis!(to_cache:, amount:, memo:)
       execute!(from_cache: GridCache.genesis, to_cache: to_cache, amount: amount, tx_type: "genesis", memo: memo)

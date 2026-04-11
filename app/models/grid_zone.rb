@@ -31,7 +31,7 @@ class GridZone < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :zone_type, inclusion: {
-    in: %w[faction_base govcorp residential transit special],
+    in: %w[faction_base govcorp residential transit special danger_zone],
     allow_nil: true
   }
 end

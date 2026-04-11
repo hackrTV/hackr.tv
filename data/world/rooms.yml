@@ -24,6 +24,19 @@ rooms:
     zone_slug: govcorp-surveillance
     room_type: govcorp
 
+  - name: The Signal Bazaar
+    slug: the-signal-bazaar
+    description: "A cramped market corridor lit by flickering neon signs advertising firmware patches and bootleg components. Salvaged tech lines makeshift shelves behind reinforced glass. The air smells like solder and ozone. A vendor tracks your movements from behind a jury-rigged counter."
+    zone_slug: transit-network
+    room_type: shop
+
+  - name: The Blacksite
+    slug: the-blacksite
+    description: "No signs. No light except a single red strip running along the baseboards. The air tastes like ozone and bad decisions. The walls are lined with signal-dampening mesh — nothing broadcasts in or out. If you found this place, you were meant to."
+    zone_slug: the-underbelly
+    room_type: shop
+    min_clearance: 10
+
   - name: The Rhythm Nexus
     slug: the-rhythm-nexus
     description: "Ryker's domain. A cavernous space converted into a combination recording studio, performance venue, and resistance headquarters. Drum kits and recording equipment share space with server racks. Vintage analog gear - tape machines, tube amplifiers, physical mixing boards - stands alongside digital systems. Purple and cyan neon cuts through the darkness. The air vibrates with potential energy even when no one's playing."

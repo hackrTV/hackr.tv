@@ -22,6 +22,7 @@
 #  index_grid_items_on_grid_mining_rig_id  (grid_mining_rig_id)
 #
 class GridItem < ApplicationRecord
+  ITEM_TYPES = %w[tool consumable data faction collectible component].freeze
   RARITIES = %w[scrap ubiquitous common uncommon rare ultra_rare unicorn].freeze
   RARITY_LABELS = {
     "scrap" => "SCRAP",
@@ -47,7 +48,7 @@ class GridItem < ApplicationRecord
   belongs_to :grid_mining_rig, optional: true
 
   validates :name, presence: true
-  validates :item_type, inclusion: {in: %w[tool consumable data faction collectible component], allow_nil: true}
+  validates :item_type, inclusion: {in: ITEM_TYPES, allow_nil: true}
   validates :rarity, inclusion: {in: RARITIES, allow_nil: true}
   validates :quantity, numericality: {greater_than: 0}, allow_nil: true
   validate :single_location

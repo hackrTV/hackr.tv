@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_000002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -269,6 +269,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_000001) do
     t.string "mob_type"
     t.string "name"
     t.datetime "updated_at", null: false
+    t.json "vendor_config"
   end
 
   create_table "grid_registration_tokens", force: :cascade do |t|
@@ -288,6 +289,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_000001) do
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_zone_id", null: false
+    t.integer "min_clearance", default: 0, null: false
     t.string "name"
     t.string "room_type"
     t.string "slug"
@@ -295,6 +297,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_000001) do
     t.index ["ambient_playlist_id"], name: "index_grid_rooms_on_ambient_playlist_id"
     t.index ["grid_zone_id"], name: "index_grid_rooms_on_grid_zone_id"
     t.index ["slug"], name: "index_grid_rooms_on_slug", unique: true
+  end
+
+  create_table "grid_shop_listings", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.integer "base_price", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "grid_mob_id", null: false
+    t.string "item_type"
+    t.integer "max_stock"
+    t.integer "min_clearance", default: 0, null: false
+    t.string "name", null: false
+    t.datetime "next_restock_at"
+    t.json "properties", default: {}
+    t.string "rarity"
+    t.integer "restock_amount", default: 1, null: false
+    t.integer "restock_interval_hours", default: 24, null: false
+    t.boolean "rotation_pool", default: false, null: false
+    t.integer "sell_price", null: false
+    t.integer "stock"
+    t.datetime "updated_at", null: false
+    t.index ["grid_mob_id", "active"], name: "index_grid_shop_listings_on_grid_mob_id_and_active"
+    t.index ["grid_mob_id"], name: "index_grid_shop_listings_on_grid_mob_id"
+    t.index ["next_restock_at"], name: "index_grid_shop_listings_on_next_restock_at"
+  end
+
+  create_table "grid_shop_transactions", force: :cascade do |t|
+    t.integer "burn_amount", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "grid_mob_id", null: false
+    t.integer "grid_shop_listing_id"
+    t.integer "price_paid", null: false
+    t.integer "quantity", default: 1, null: false
+    t.integer "recycle_amount", default: 0, null: false
+    t.string "transaction_type", null: false
+    t.index ["grid_hackr_id", "created_at"], name: "index_grid_shop_transactions_on_grid_hackr_id_and_created_at"
+    t.index ["grid_hackr_id"], name: "index_grid_shop_transactions_on_grid_hackr_id"
+    t.index ["grid_mob_id"], name: "index_grid_shop_transactions_on_grid_mob_id"
+    t.index ["grid_shop_listing_id"], name: "index_grid_shop_transactions_on_grid_shop_listing_id"
   end
 
   create_table "grid_transactions", force: :cascade do |t|
@@ -736,6 +778,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_000001) do
   add_foreign_key "grid_hackr_achievements", "grid_achievements"
   add_foreign_key "grid_hackr_achievements", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
+  add_foreign_key "grid_shop_listings", "grid_mobs"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_logs", "grid_hackrs"
