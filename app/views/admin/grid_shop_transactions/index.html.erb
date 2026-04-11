@@ -38,7 +38,7 @@
               <% @transactions.each do |tx| %>
                 <tr>
                   <td style="color: #666; font-family: monospace; font-size: 0.85em;"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></td>
-                  <td class="purple-168-text"><%= tx.grid_hackr.hackr_alias %></td>
+                  <td class="purple-168-text"><%= tx.grid_hackr&.hackr_alias || "<span style='color: #666;'>(deleted)</span>".html_safe %></td>
                   <td style="text-align: center;">
                     <% if tx.transaction_type == "buy" %>
                       <span class="green-255-text">BUY</span>
@@ -46,7 +46,7 @@
                       <span class="yellow-168-text">SELL</span>
                     <% end %>
                   </td>
-                  <td style="color: #c084fc;"><%= tx.grid_mob.name %></td>
+                  <td style="color: #c084fc;"><%= tx.grid_mob&.name || "<span style='color: #666;'>(deleted)</span>".html_safe %></td>
                   <td class="cyan-255-text"><%= tx.grid_shop_listing&.name || "(deleted)" %></td>
                   <td style="text-align: right;" class="green-255-text"><%= number_with_delimiter(tx.price_paid) %></td>
                   <td style="text-align: right; color: #f87171;"><%= tx.burn_amount > 0 ? number_with_delimiter(tx.burn_amount) : "-" %></td>
@@ -58,7 +58,11 @@
         </div>
       <% else %>
         <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No shop transactions recorded yet.</p>
+          <% if @hackr_not_found %>
+            <p class="yellow-168-text" style="font-size: 1.2em;">No hackr found with alias '<%= h(params[:hackr_alias]) %>'.</p>
+          <% else %>
+            <p style="color: #666; font-size: 1.2em;">No shop transactions match the current filters.</p>
+          <% end %>
         </div>
       <% end %>
 

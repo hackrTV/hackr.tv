@@ -301,12 +301,15 @@ module Grid
       item = hackr.grid_items.find_by("LOWER(name) = ?", target.downcase)
       return examine_item(item) if item
 
-      # Check vendor shop listings
+      # Check vendor shop listings (respecting per-listing clearance gate)
       vendor = room.grid_mobs.find_by(mob_type: "vendor")
       if vendor
-        listing = vendor.grid_shop_listings.where(active: true).find_by("LOWER(name) = ?", target.downcase)
+        clearance = hackr.stat("clearance")
+        listing = vendor.grid_shop_listings.where(active: true)
+          .where("min_clearance <= ?", clearance)
+          .find_by("LOWER(name) = ?", target.downcase)
         if listing
-          price = Grid::ShopService.effective_price(listing: listing, mob: vendor, clearance: hackr.stat("clearance"))
+          price = Grid::ShopService.effective_price(listing: listing, mob: vendor, clearance: clearance)
           return examine_listing(listing, price)
         end
       end

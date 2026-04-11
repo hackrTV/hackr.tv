@@ -1,5 +1,40 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: grid_shop_listings
+# Database name: primary
+#
+#  id                     :integer          not null, primary key
+#  active                 :boolean          default(TRUE), not null
+#  base_price             :integer          not null
+#  description            :text
+#  item_type              :string
+#  max_stock              :integer
+#  min_clearance          :integer          default(0), not null
+#  name                   :string           not null
+#  next_restock_at        :datetime
+#  properties             :json
+#  rarity                 :string
+#  restock_amount         :integer          default(1), not null
+#  restock_interval_hours :integer          default(24), not null
+#  rotation_pool          :boolean          default(FALSE), not null
+#  sell_price             :integer          not null
+#  stock                  :integer
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  grid_mob_id            :integer          not null
+#
+# Indexes
+#
+#  index_grid_shop_listings_on_grid_mob_id             (grid_mob_id)
+#  index_grid_shop_listings_on_grid_mob_id_and_active  (grid_mob_id,active)
+#  index_grid_shop_listings_on_next_restock_at         (next_restock_at)
+#
+# Foreign Keys
+#
+#  grid_mob_id  (grid_mob_id => grid_mobs.id)
+#
 class GridShopListing < ApplicationRecord
   belongs_to :grid_mob
   has_many :grid_shop_transactions, dependent: :nullify

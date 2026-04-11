@@ -748,6 +748,9 @@ namespace :data do
     listings_data = data["shop_listings"]
     created = updated = 0
 
+    # Vendors that need initial rotation seeding (first-time black market creation).
+    vendors_needing_rotation = Set.new
+
     listings_data.each do |attrs|
       room = GridRoom.find_by(slug: attrs["room_slug"])
       unless room
@@ -766,29 +769,48 @@ namespace :data do
 
       base_price = attrs["base_price"]
       sell_price = attrs["sell_price"] || (base_price / 2.0).ceil
+      rotation_pool = attrs.fetch("rotation_pool", false)
+      restock_hours = attrs["restock_interval_hours"] || mob.restock_interval_hours
 
+      # Definition fields — always updated from YAML (source of truth)
       listing.assign_attributes(
         description: attrs["description"],
         item_type: attrs["item_type"],
         rarity: attrs["rarity"],
         base_price: base_price,
         sell_price: sell_price,
-        stock: attrs["max_stock"],
         max_stock: attrs["max_stock"],
         restock_amount: attrs["restock_amount"] || 1,
-        restock_interval_hours: attrs["restock_interval_hours"] || mob.restock_interval_hours,
-        next_restock_at: Time.current + (attrs["restock_interval_hours"] || mob.restock_interval_hours).hours,
-        active: attrs.fetch("active", true),
-        rotation_pool: attrs.fetch("rotation_pool", false),
+        restock_interval_hours: restock_hours,
+        rotation_pool: rotation_pool,
         min_clearance: attrs["min_clearance"] || 0,
         properties: attrs["properties"] || {}
       )
+
+      # Runtime state — only set on creation. Preserves live stock, active flag,
+      # and restock timer on re-import. Rotation pool items start inactive so the
+      # rotation job (or the initial seed below) controls which are visible.
+      if was_new
+        listing.stock = attrs["max_stock"]
+        listing.next_restock_at = Time.current + restock_hours.hours
+        listing.active = attrs.fetch("active", !rotation_pool)
+        vendors_needing_rotation << mob if rotation_pool
+      end
 
       if listing.changed?
         listing.save!
         was_new ? (created += 1) : (updated += 1)
         puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{listing.name} (#{mob.name})"
       end
+    end
+
+    # Seed initial rotation for any vendor with a freshly-created rotation pool
+    # and no currently-active rotation items. This ensures players don't see an
+    # empty black market until the next weekly rotation job runs.
+    vendors_needing_rotation.each do |mob|
+      next if mob.grid_shop_listings.in_rotation_pool.where(active: true).exists?
+      Grid::ShopService.rotate!(mob)
+      puts "  ⟳ Seeded initial rotation: #{mob.name}"
     end
 
     puts "Shop Listings: #{created} created, #{updated} updated, #{GridShopListing.count} total"

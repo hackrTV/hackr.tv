@@ -149,7 +149,9 @@ shop_listings:
 
   # ══════════════════════════════════════════
   # THE BLACKSITE — Black market (GHOST)
-  # All items in rotation pool, activated weekly
+  # All items in rotation pool. Seeded as inactive;
+  # ShopRotationJob activates N per week (vendor_config.rotation_count).
+  # Initial rotation triggered at first seed time.
   # ══════════════════════════════════════════
 
   - vendor_name: GHOST

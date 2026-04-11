@@ -326,8 +326,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_000002) do
   create_table "grid_shop_transactions", force: :cascade do |t|
     t.integer "burn_amount", default: 0, null: false
     t.datetime "created_at", null: false
-    t.integer "grid_hackr_id", null: false
-    t.integer "grid_mob_id", null: false
+    t.integer "grid_hackr_id"
+    t.integer "grid_mob_id"
     t.integer "grid_shop_listing_id"
     t.integer "price_paid", null: false
     t.integer "quantity", default: 1, null: false

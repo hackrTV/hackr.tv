@@ -24,9 +24,9 @@ class CreateGridShopTables < ActiveRecord::Migration[8.1]
     add_index :grid_shop_listings, :next_restock_at
 
     create_table :grid_shop_transactions do |t|
-      t.references :grid_hackr, null: false, index: true
+      t.references :grid_hackr, null: true, index: true
       t.references :grid_shop_listing, null: true, index: true
-      t.references :grid_mob, null: false, index: true
+      t.references :grid_mob, null: true, index: true
       t.string :transaction_type, null: false
       t.integer :quantity, default: 1, null: false
       t.integer :price_paid, null: false

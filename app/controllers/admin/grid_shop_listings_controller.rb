@@ -19,15 +19,22 @@ class Admin::GridShopListingsController < Admin::ApplicationController
   end
 
   def create
-    @listing = GridShopListing.new(listing_params)
-    if @listing.save
+    attrs, json_error = listing_params
+    @listing = GridShopListing.new(attrs)
+
+    if json_error.nil? && @listing.save
       set_flash_success("Listing '#{@listing.name}' created for #{@listing.grid_mob.name}.")
       redirect_to admin_grid_shop_listings_path(mob_id: @listing.grid_mob_id)
-    else
-      @vendors = GridMob.where(mob_type: "vendor").includes(:grid_room).order(:name)
-      flash.now[:error] = @listing.errors.full_messages.join(", ")
-      render :new, status: :unprocessable_entity
+      return
     end
+
+    if json_error
+      @listing.valid? # populate other validation errors
+      @listing.errors.add(:properties, json_error)
+    end
+    @vendors = GridMob.where(mob_type: "vendor").includes(:grid_room).order(:name)
+    flash.now[:error] = @listing.errors.full_messages.join(", ")
+    render :new, status: :unprocessable_entity
   end
 
   def edit
@@ -35,7 +42,17 @@ class Admin::GridShopListingsController < Admin::ApplicationController
   end
 
   def update
-    if @listing.update(listing_params)
+    attrs, json_error = listing_params
+    if json_error
+      @listing.assign_attributes(attrs)
+      @listing.errors.add(:properties, json_error)
+      @vendors = GridMob.where(mob_type: "vendor").includes(:grid_room).order(:name)
+      flash.now[:error] = @listing.errors.full_messages.join(", ")
+      render :edit, status: :unprocessable_entity
+      return
+    end
+
+    if @listing.update(attrs)
       set_flash_success("Listing '#{@listing.name}' updated.")
       redirect_to admin_grid_shop_listings_path(mob_id: @listing.grid_mob_id)
     else
@@ -69,6 +86,9 @@ class Admin::GridShopListingsController < Admin::ApplicationController
     @listing = GridShopListing.find(params[:id])
   end
 
+  # Returns [permitted_attrs, json_error_message_or_nil].
+  # On invalid JSON, :properties is omitted from attrs entirely (preserving
+  # existing values on update) and a human-readable error is returned.
   def listing_params
     permitted = params.require(:grid_shop_listing).permit(
       :grid_mob_id, :name, :description, :item_type, :rarity,
@@ -76,15 +96,21 @@ class Admin::GridShopListingsController < Admin::ApplicationController
       :restock_amount, :restock_interval_hours,
       :active, :rotation_pool, :min_clearance
     )
-    # Parse properties from JSON string
-    permitted[:properties] = if params[:grid_shop_listing][:properties_json].present?
-      JSON.parse(params[:grid_shop_listing][:properties_json])
-    else
-      {}
+
+    json_source = params[:grid_shop_listing][:properties_json]
+    if json_source.blank?
+      permitted[:properties] = {}
+      return [permitted, nil]
     end
-    permitted
-  rescue JSON::ParserError
-    permitted[:properties] = {}
-    permitted
+
+    parsed = JSON.parse(json_source)
+    unless parsed.is_a?(Hash)
+      return [permitted, "must be a JSON object (e.g. {\"slot\": \"gpu\"})"]
+    end
+
+    permitted[:properties] = parsed
+    [permitted, nil]
+  rescue JSON::ParserError => e
+    [permitted, "is not valid JSON: #{e.message}"]
   end
 end
