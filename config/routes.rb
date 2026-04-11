@@ -257,6 +257,14 @@ Rails.application.routes.draw do
       end
     end
 
+    # Grid shops (runtime CRUD + stock management)
+    resources :grid_shop_listings do
+      member do
+        post :restock
+      end
+    end
+    resources :grid_shop_transactions, only: [:index]
+
     # PulseWire moderation (still functional - runtime operations)
     resources :pulse_wire, only: %i[index destroy] do
       collection do

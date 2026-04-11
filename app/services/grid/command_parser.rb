@@ -68,6 +68,12 @@ module Grid
         chain_command(args)
       when "rig"
         rig_command(args)
+      when "shop", "browse"
+        shop_command
+      when "buy", "purchase"
+        buy_command(args.join(" "))
+      when "sell"
+        sell_command(args.join(" "))
       when "help", "?"
         help_command
       when "who"
@@ -144,6 +150,14 @@ module Grid
       end
 
       new_room = exit.to_room
+
+      # Clearance gate
+      if new_room.clearance_gated?
+        hackr_clearance = hackr.stat("clearance")
+        if hackr_clearance < new_room.min_clearance
+          return "<span style='color: #f87171;'>ACCESS DENIED. Clearance #{new_room.min_clearance}+ required. You are Clearance #{hackr_clearance}.</span>"
+        end
+      end
       hackr.update!(current_room: new_room)
 
       # Track exploration (unique rooms via visited_rooms array in stats)
@@ -281,11 +295,24 @@ module Grid
 
       # Check items in room
       item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", target.downcase)
-      return "<span style='color: #d0d0d0;'>#{codex_linkify(item.description)}</span>" if item
+      return examine_item(item) if item
 
       # Check items in inventory
       item = hackr.grid_items.find_by("LOWER(name) = ?", target.downcase)
-      return "<span style='color: #d0d0d0;'>#{codex_linkify(item.description)}</span>" if item
+      return examine_item(item) if item
+
+      # Check vendor shop listings (respecting per-listing clearance gate)
+      vendor = room.grid_mobs.find_by(mob_type: "vendor")
+      if vendor
+        clearance = hackr.stat("clearance")
+        listing = vendor.grid_shop_listings.where(active: true)
+          .where("min_clearance <= ?", clearance)
+          .find_by("LOWER(name) = ?", target.downcase)
+        if listing
+          price = Grid::ShopService.effective_price(listing: listing, mob: vendor, clearance: clearance)
+          return examine_listing(listing, price)
+        end
+      end
 
       # Check Mobs
       mob = room.grid_mobs.find_by("LOWER(name) = ?", target.downcase)
@@ -391,6 +418,11 @@ module Grid
         <span style='color: #fbbf24;'>NPCs:</span>
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>              - Talk to an NPC
           <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span> - Ask an NPC about a topic
+
+        <span style='color: #fbbf24;'>Commerce:</span>
+          <span style='color: #34d399;'>shop, browse</span>            - View vendor inventory &amp; prices
+          <span style='color: #34d399;'>buy &lt;item&gt;</span>              - Purchase an item from vendor
+          <span style='color: #34d399;'>sell &lt;item&gt;</span>             - Sell an item to vendor
 
         <span style='color: #fbbf24;'>Economy:</span>
           <span style='color: #34d399;'>cache</span>                   - List your caches
@@ -589,10 +621,164 @@ module Grid
       output.join("\n")
     end
 
+    def examine_item(item)
+      output = "<span style='color: #d0d0d0;'>#{codex_linkify(item.description)}</span>"
+      if item.component? && item.rate_multiplier
+        props = item.properties || {}
+        slot = props["slot"]&.upcase || "UNKNOWN"
+        output += "\n<span style='color: #22d3ee;'>Slot: #{slot}</span>"
+        output += " <span style='color: #fbbf24;'>Multiplier: x#{item.rate_multiplier}</span>"
+        if slot == "MOTHERBOARD"
+          output += "\n<span style='color: #9ca3af;'>Slots: CPU #{props["cpu_slots"] || 0} / GPU #{props["gpu_slots"] || 0} / RAM #{props["ram_slots"] || 0}</span>"
+        end
+      end
+      output
+    end
+
+    def examine_listing(listing, effective_price)
+      color = listing.rarity_color
+      rarity_tag = listing.rarity ? " <span style='color: #{color};'>[#{listing.rarity_label}]</span>" : ""
+      output = "<span style='color: #d0d0d0;'>#{codex_linkify(listing.description)}</span>#{rarity_tag}"
+      output += "\n<span style='color: #6b7280;'>Buy: <span style='color: #34d399;'>#{format_cred(effective_price)} CRED</span> / Sell: #{format_cred(listing.sell_price)} CRED</span>"
+      if listing.item_type == "component"
+        props = listing.properties || {}
+        slot = props["slot"]&.upcase || "UNKNOWN"
+        mult = props["rate_multiplier"] || 1.0
+        output += "\n<span style='color: #22d3ee;'>Slot: #{slot}</span>"
+        output += " <span style='color: #fbbf24;'>Multiplier: x#{mult}</span>"
+        if slot == "MOTHERBOARD"
+          output += "\n<span style='color: #9ca3af;'>Slots: CPU #{props["cpu_slots"] || 0} / GPU #{props["gpu_slots"] || 0} / RAM #{props["ram_slots"] || 0}</span>"
+        end
+      end
+      output
+    end
+
     def dialogue_box(content)
       # Create a thin-bordered box around dialogue content
       # Add blank line before box, strip content to avoid blank lines inside
       "\n<div style='border: 1px solid #666; padding: 10px; margin: 5px 0; background: #0d0d0d;'>#{content.strip}</div>"
+    end
+
+    # --- Shop commands ---
+
+    def shop_command
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      vendor = room.grid_mobs.find_by(mob_type: "vendor")
+      return "<span style='color: #9ca3af;'>There's no vendor here.</span>" unless vendor
+
+      items = Grid::ShopService.listing_display(mob: vendor, hackr: hackr)
+
+      if items.empty?
+        return dialogue_box(
+          "<span style='color: #c084fc;'>#{h(vendor.name)}</span>: <span style='color: #60a5fa;'>\"Nothing for you right now.\"</span>"
+        )
+      end
+
+      output = []
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+
+      if vendor.black_market?
+        clearance = hackr.stat("clearance")
+        output << "<span style='color: #f87171; font-weight: bold;'>⚠ BLACK MARKET</span> <span style='color: #9ca3af;'>:: #{h(vendor.name)}</span>"
+        output << "<span style='color: #6b7280;'>Prices adjusted for CLEARANCE #{clearance}. Higher clearance = better rates.</span>"
+      else
+        output << "<span style='color: #22d3ee; font-weight: bold;'>VENDOR :: #{h(vendor.name)}</span>"
+      end
+
+      output << ""
+
+      # Table
+      rows = items.map do |entry|
+        listing = entry[:listing]
+        price = entry[:effective_price]
+        color = listing.rarity_color
+        name_display = "<span style='color: #{color};'>#{h(listing.name)}</span>"
+        rarity_display = "<span style='color: #{color};'>[#{listing.rarity_label}]</span>"
+
+        price_color = entry[:affordable] ? "#34d399" : "#f87171"
+        price_display = "<span style='color: #{price_color};'>#{format_cred(price)}</span>"
+
+        stock_display = if listing.unlimited_stock?
+          "<span style='color: #34d399;'>∞</span>"
+        elsif listing.out_of_stock?
+          "<span style='color: #f87171;'>OUT</span>"
+        else
+          "<span style='color: #fbbf24;'>#{listing.stock}</span>"
+        end
+
+        "<tr><td style='padding: 2px 12px 2px 0;'>#{name_display}</td>" \
+        "<td style='padding: 2px 12px 2px 0;'>#{rarity_display}</td>" \
+        "<td style='padding: 2px 12px 2px 0; text-align: right;'>#{price_display}</td>" \
+        "<td style='padding: 2px 0; text-align: center;'>#{stock_display}</td></tr>"
+      end
+
+      table = "<table style='border-collapse: collapse; margin: 0 8px;'>" \
+        "<tr style='color: #6b7280;'>" \
+        "<th style='text-align: left; padding: 2px 12px 2px 0; border-bottom: 1px solid #333;'>Item</th>" \
+        "<th style='text-align: left; padding: 2px 12px 2px 0; border-bottom: 1px solid #333;'>Rarity</th>" \
+        "<th style='text-align: right; padding: 2px 12px 2px 0; border-bottom: 1px solid #333;'>Price</th>" \
+        "<th style='text-align: center; padding: 2px 0; border-bottom: 1px solid #333;'>Stock</th>" \
+        "</tr>#{rows.join}</table>"
+      output << table
+
+      output << ""
+      balance = hackr.default_cache&.balance || 0
+      output << "<span style='color: #6b7280;'>Your CRED: #{format_cred(balance)}. Use 'buy &lt;item&gt;' to purchase, 'sell &lt;item&gt;' to sell.</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+
+      output.join("\n")
+    end
+
+    def buy_command(item_name)
+      return "<span style='color: #fbbf24;'>Buy what? Usage: buy &lt;item&gt;</span>" if item_name.empty?
+
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      vendor = room.grid_mobs.find_by(mob_type: "vendor")
+      return "<span style='color: #9ca3af;'>There's no vendor here.</span>" unless vendor
+
+      result = Grid::ShopService.buy!(hackr: hackr, mob: vendor, item_name: item_name)
+
+      item = result[:item]
+      color = item.rarity_color
+      name_display = item.unicorn? ? item.rainbow_name_html : "<span style='color: #{color};'>#{h(item.name)}</span>"
+
+      output = "<span style='color: #34d399;'>Purchased </span>#{name_display}<span style='color: #34d399;'> for <span style='color: #fbbf24;'>#{format_cred(result[:price_paid])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
+
+      notifications = achievement_checker.check(:purchase_item, item_name: item.name)
+      output = append_notifications(output, notifications)
+      {output: output, event: nil}
+    rescue Grid::ShopService::AccessDenied => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ShopService::ItemNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ShopService::InsufficientStock => e
+      "<span style='color: #fbbf24;'>#{h(e.message)}</span>"
+    rescue Grid::ShopService::InsufficientBalance => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    def sell_command(item_name)
+      return "<span style='color: #fbbf24;'>Sell what? Usage: sell &lt;item&gt;</span>" if item_name.empty?
+
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      vendor = room.grid_mobs.find_by(mob_type: "vendor")
+      return "<span style='color: #9ca3af;'>There's no vendor here.</span>" unless vendor
+
+      result = Grid::ShopService.sell!(hackr: hackr, mob: vendor, item_name: item_name)
+
+      "<span style='color: #34d399;'>Sold </span><span style='color: #d0d0d0;'>#{h(result[:item_name])}</span><span style='color: #34d399;'> for <span style='color: #fbbf24;'>#{format_cred(result[:sell_price])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
+    rescue Grid::ShopService::AccessDenied => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ShopService::ItemNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::TransactionService::InsufficientBalance
+      "<span style='color: #f87171;'>The vendor can't afford to buy that right now.</span>"
     end
 
     # --- Economy commands ---

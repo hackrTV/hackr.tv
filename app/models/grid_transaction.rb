@@ -22,7 +22,7 @@
 #  index_grid_transactions_on_tx_type        (tx_type)
 #
 class GridTransaction < ApplicationRecord
-  TX_TYPES = %w[transfer mining_reward gameplay_reward burn redemption genesis].freeze
+  TX_TYPES = %w[transfer mining_reward gameplay_reward burn redemption genesis purchase_recycle].freeze
 
   belongs_to :from_cache, class_name: "GridCache"
   belongs_to :to_cache, class_name: "GridCache"

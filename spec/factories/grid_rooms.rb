@@ -5,6 +5,7 @@
 #
 #  id                  :integer          not null, primary key
 #  description         :text
+#  min_clearance       :integer          default(0), not null
 #  name                :string
 #  room_type           :string
 #  slug                :string

@@ -11,6 +11,16 @@ module Grid
     PRESENCE_TTL = 10.minutes
     CHAT_BONUS = 1     # flat CRED per tick for chatting during live stream
 
+    # Shop economy
+    SHOP_BURN_RATIO = 0.70       # 70% of purchase price burned
+    SHOP_RECYCLE_RATIO = 0.30    # 30% recycled to gameplay pool
+    SELL_PRICE_RATIO = 0.50      # Players sell items at 50% of base price
+
+    # Black market
+    BLACK_MARKET_MIN_CLEARANCE = 10
+    BLACK_MARKET_BASE_MULTIPLIER = 5.0
+    BLACK_MARKET_CLEARANCE_REDUCTION = 0.04  # per clearance level above minimum
+
     MINING_POOL_TOTAL = (TOTAL_SUPPLY * MINING_POOL_SHARE).to_i
     GAMEPLAY_POOL_TOTAL = (TOTAL_SUPPLY * GAMEPLAY_POOL_SHARE).to_i
 

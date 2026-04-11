@@ -1,0 +1,111 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/shops :: SHOP LISTINGS</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation & Filters -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <%= link_to "+ New Listing", new_admin_grid_shop_listing_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= link_to "Transactions", admin_grid_shop_transactions_path, class: "tui-button purple-168", style: "padding: 8px 20px;" %>
+        <span style="color: #666; margin: 0 5px;">|</span>
+        <%= link_to "All Vendors", admin_grid_shop_listings_path, class: "tui-button", style: "padding: 6px 14px; font-size: 0.85em;" %>
+        <% @vendors.each do |vendor| %>
+          <% active = params[:mob_id].to_s == vendor.id.to_s %>
+          <%= link_to vendor.name,
+              admin_grid_shop_listings_path(mob_id: vendor.id),
+              class: "tui-button #{active ? "cyan-168" : ""}",
+              style: "padding: 6px 14px; font-size: 0.85em;" %>
+        <% end %>
+      </div>
+
+      <% if @listings.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Vendor</th>
+                <th style="text-align: left;">Item</th>
+                <th style="text-align: left;">Rarity</th>
+                <th style="text-align: right;">Buy</th>
+                <th style="text-align: right;">Sell</th>
+                <th style="text-align: center;">Stock</th>
+                <th style="text-align: center;">Active</th>
+                <th style="text-align: center;">Rot.</th>
+                <th style="text-align: center;">CL</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @listings.each do |listing| %>
+                <tr>
+                  <td style="color: #c084fc;"><%= listing.grid_mob.name %></td>
+                  <td class="cyan-255-text"><%= listing.name %></td>
+                  <td>
+                    <% if listing.rarity %>
+                      <span style="color: <%= listing.rarity_color %>;"><%= listing.rarity_label %></span>
+                    <% else %>
+                      <span style="color: #444;">-</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: right;" class="green-255-text"><%= number_with_delimiter(listing.base_price) %></td>
+                  <td style="text-align: right; color: #888;"><%= number_with_delimiter(listing.sell_price) %></td>
+                  <td style="text-align: center;">
+                    <% if listing.unlimited_stock? %>
+                      <span style="color: #34d399;">&infin;</span>
+                    <% elsif listing.out_of_stock? %>
+                      <span class="red-255-text">0/<%= listing.max_stock %></span>
+                    <% else %>
+                      <span class="yellow-168-text"><%= listing.stock %>/<%= listing.max_stock %></span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if listing.active? %>
+                      <span class="green-255-text">ON</span>
+                    <% else %>
+                      <span style="color: #444;">OFF</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if listing.rotation_pool? %>
+                      <span class="yellow-168-text">YES</span>
+                    <% else %>
+                      <span style="color: #444;">-</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center; color: #888;"><%= listing.min_clearance > 0 ? listing.min_clearance : "-" %></td>
+                  <td style="text-align: right; white-space: nowrap;">
+                    <%= link_to "Edit", edit_admin_grid_shop_listing_path(listing), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <% if listing.max_stock.present? %>
+                      <%= button_to "Restock", restock_admin_grid_shop_listing_path(listing), method: :post, form: { style: "display: inline;" }, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <% end %>
+                    <%= button_to "Delete", admin_grid_shop_listing_path(listing), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete listing '#{listing.name}'?" } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No shop listings found.</p>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "<- Grid Admin", admin_grid_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

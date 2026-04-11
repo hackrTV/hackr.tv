@@ -5,6 +5,7 @@
 #
 #  id                  :integer          not null, primary key
 #  description         :text
+#  min_clearance       :integer          default(0), not null
 #  name                :string
 #  room_type           :string
 #  slug                :string
@@ -38,7 +39,12 @@ class GridRoom < ApplicationRecord
     in: %w[hub faction_base govcorp special safe_zone transit shop danger_zone prism dream],
     allow_nil: true
   }
+  validates :min_clearance, numericality: {only_integer: true, greater_than_or_equal_to: 0}
 
   # Delegate to zone for convenience
   delegate :faction, :color_scheme, to: :grid_zone
+
+  def clearance_gated?
+    min_clearance > 0
+  end
 end

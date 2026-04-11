@@ -32,6 +32,14 @@ zones:
     faction_slug: govcorp
     ambient_playlist_slug: govcorp-surveillance-ambience
 
+  - name: The Underbelly
+    slug: the-underbelly
+    description: "A network of unregistered passages beneath the Transit Network. Surveillance dead zone. If you know, you know."
+    zone_type: danger_zone
+    color_scheme: red/black
+    faction_slug: null
+    ambient_playlist_slug: null
+
   - name: The Hackr Hangar
     slug: hackr-hangar
     description: "Ryker M. Pulse's headquarters and primary broadcast facility. Where the raw signal is created before transmission to Sector X."

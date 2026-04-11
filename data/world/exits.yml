@@ -31,6 +31,28 @@ exits:
     direction: west
     locked: false
 
+  # Signal Bazaar (shop) — accessible from Transit Corridor
+  - from_room_slug: transit-corridor-alpha
+    to_room_slug: the-signal-bazaar
+    direction: north
+    locked: false
+
+  - from_room_slug: the-signal-bazaar
+    to_room_slug: transit-corridor-alpha
+    direction: south
+    locked: false
+
+  # The Blacksite (black market) — hidden passage from Transit Corridor
+  - from_room_slug: transit-corridor-alpha
+    to_room_slug: the-blacksite
+    direction: down
+    locked: false
+
+  - from_room_slug: the-blacksite
+    to_room_slug: transit-corridor-alpha
+    direction: up
+    locked: false
+
   - from_room_slug: hackr-tv-broadcast-station
     to_room_slug: the-rhythm-nexus
     direction: west

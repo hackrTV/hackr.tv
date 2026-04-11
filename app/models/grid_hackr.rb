@@ -86,6 +86,7 @@ class GridHackr < ApplicationRecord
   has_many :feature_grants, dependent: :destroy
   has_many :grid_hackr_achievements, dependent: :destroy
   has_many :grid_achievements, through: :grid_hackr_achievements
+  has_many :grid_shop_transactions, dependent: :nullify
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length
