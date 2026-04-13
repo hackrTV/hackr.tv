@@ -159,13 +159,13 @@ hackr_logs:
       - X
 
   # =============================================================================
-  # ORIGINS — BEFORE THE FRACTURE (2108-2115)
+  # ORIGINS — BEFORE THE FRACTURE (2099-2115)
   # =============================================================================
   - author: Chen
     timeline: "govcorp_files"
     title: "[INTERCEPTED] The Elegant Solution"
     slug: the-elegant-solution
-    lore_date: "2108-11-15 09:00"
+    lore_date: "2099-11-15 09:00"
     body: |
       RECOVERED FROM: GovCorp Research Division Archives
       AUTHOR: Dr. Marcus Chen, PRISM Lead Architect

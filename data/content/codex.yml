@@ -47,7 +47,7 @@ codex_entries:
   - name: Ashlinn
     slug: ashlinn
     entry_type: person
-    summary: "A musician in the present day whose experimental ambient compositions carry an unusual resonance — music that arrives rather than being composed, dreams of someone she's never met, and a connection across time she doesn't yet understand."
+    summary: "A musician in the present day whose dark, symphonic compositions carry an unusual resonance — music that arrives rather than being composed, dreams of someone she's never met, and a connection across time she doesn't yet understand."
     position: null
     published: true
     metadata:
@@ -60,11 +60,11 @@ codex_entries:
 
       - **Status:** Active
       - **Timeline:** Present
-      - **Known For:** Experimental ambient music, unusual creative resonance
+      - **Known For:** Gothic hard rock, unusual creative resonance
 
       ## Present-Day Life
 
-      Ashlinn is a musician working in the present day. She creates experimental ambient compositions that blend organic instrumentation with electronic textures — music that listeners describe as hauntingly familiar, as though they're remembering something they've never experienced.
+      Ashlinn is a musician working in the present day. She creates dark, melodic compositions built on powerful vocals, heavy guitar work, and orchestral undertones — music that listeners describe as hauntingly familiar, as though they're remembering something they've never experienced.
 
       ## Music That Arrives
 
@@ -346,18 +346,18 @@ codex_entries:
   - name: Dr. Marcus Chen
     slug: dr-marcus-chen
     entry_type: person
-    summary: "The original architect of PRISM technology — a brilliant physicist whose scientific curiosity overwhelmed his ethics, and who now lives with growing horror at what his discovery became."
+    summary: "The original architect of PRISM technology — a brilliant physicist whose curiosity built the foundation for humanity's cage. He did not survive to see it become one."
     position: null
     published: true
     metadata:
       timeline: "future"
       faction: GovCorp
       role: "Chief Scientist (PRISM Division)"
-      status: Active
+      status: Deceased
     content: |
       # Dr. Marcus Chen
 
-      - **Status:** Active
+      - **Status:** Deceased (2103)
       - **Affiliation:** [[GovCorp]] (PRISM Division)
       - **Timeline:** Future
       - **Known For:** Discovering the core principle behind [[PRISM]] technology
@@ -372,13 +372,21 @@ codex_entries:
 
       What began as pure research became [[PRISM]] — the Physical Reality Interface and Synthesis Matrix. Chen designed the foundational architecture: the mechanisms by which environmental infrastructure could manipulate the quantum substrate underpinning human perception.
 
-      He told himself it was science. He told himself applications were someone else's responsibility. By the time [[GovCorp]] expanded PRISM into [[The RIDE]], Chen understood that his curiosity had built a cage for the entire human race.
+      He told himself it was science. He told himself applications were someone else's responsibility. He never lived long enough to see what [[GovCorp]] made of it.
 
-      ## Growing Horror
+      ## The Last Document
 
-      Chen remains within GovCorp because leaving would mean losing access to the systems he built — and with it, any chance of understanding their full capabilities and limitations. He knows things about PRISM's architecture that no one else does, including vulnerabilities he has not yet disclosed.
+      In late 2099, Chen recorded his final internal correspondence — "[INTERCEPTED] The Elegant Solution." In it, he described the first successful macro-scale reality integration with the wonder of a man who believed he had solved suffering. Forty-seven thousand people in a living city block, their anxiety replaced with peace, and Chen watched from the observation deck convinced he had built something beautiful.
 
-      Whether he will act on this knowledge — defect, sabotage, or simply continue documenting in silence — remains an open question. His guilt grows. His access remains.
+      He called PRISM "the elegant solution to the oldest problem."
+
+      Chen died in 2103 — six years before [[GovCorp]] deployed [[The RIDE]]. The circumstances of his death remain unclear, and GovCorp has never clarified them.
+
+      ## What Died With Him
+
+      Chen understood PRISM's architecture in ways no one else did, including vulnerabilities he had mapped but never disclosed. When he died, that knowledge was buried with him. GovCorp deployed the RIDE without its architect — scaling his creation beyond anything he had tested, without the one person who understood where it could break.
+
+      The Fracture Network exploits weaknesses in the quantum substrate that Chen may have already documented. If those documents exist somewhere in GovCorp's archives, no one has found them. Or no one has looked.
 
       ## Related Entries
 
@@ -1002,7 +1010,7 @@ codex_entries:
 
       ## The Temporal Blind Spot
 
-      GovCorp's models assume temporal permanence. The discovery that PRISM can be affected by signals sent backward through time represents an existential threat they have not fully comprehended. [[Dr. Marcus Chen]], the original architect of PRISM technology, understands this vulnerability better than anyone — and remains within GovCorp's structure.
+      GovCorp's models assume temporal permanence. The discovery that PRISM can be affected by signals sent backward through time represents an existential threat they have not fully comprehended. [[Dr. Marcus Chen]], the original architect of PRISM technology, may have understood this vulnerability — but he died before the RIDE was deployed, and whatever he knew about PRISM's weaknesses died with him.
 
       ## Related Entries
 
