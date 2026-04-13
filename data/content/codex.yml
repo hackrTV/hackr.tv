@@ -2783,9 +2783,9 @@ codex_entries:
 
       ## The Mirror
 
-      The real-world Relay application at `~/dev/relay/` IS this tool. The Go CLI that aggregates multi-platform chat with bridge mode is not inspired by the lore — it is the lore. Nathan Clarke's engineering philosophy materializes as actual running code. Every goroutine, every platform tag, every line of the bridge mode implementation is simultaneously software and story.
+      The real-world Relay application at `~/dev/relay/` IS this tool. The Go CLI that aggregates multi-platform chat with bridge mode is not inspired by the transmission — it is the transmission. Nathan Clarke's engineering philosophy materializes as actual running code. Every goroutine, every platform tag, every line of the bridge mode implementation is simultaneously software and signal.
 
-      Code is lore. Lore is code.
+      Code is transmission. Transmission is code.
 
       ## Related Entries
 
