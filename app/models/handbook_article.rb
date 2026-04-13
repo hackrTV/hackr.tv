@@ -47,6 +47,12 @@ class HandbookArticle < ApplicationRecord
   before_validation :generate_slug, if: -> { slug.blank? && title.present? }
 
   scope :published, -> { where(published: true) }
+  # Visible to end users: article AND its section are both published. Use
+  # this for any reader-facing lookup; use `published` alone only when the
+  # section's visibility has already been enforced separately.
+  scope :visible, -> {
+    published.joins(:handbook_section).where(handbook_sections: {published: true})
+  }
   scope :ordered, -> { order(position: :asc, title: :asc) }
   scope :tutorials, -> { where(kind: "tutorial") }
   scope :reference_kind, -> { where(kind: "reference") }

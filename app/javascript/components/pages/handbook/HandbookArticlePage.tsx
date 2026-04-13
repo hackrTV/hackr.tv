@@ -19,32 +19,39 @@ export const HandbookArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const { tree, loading: treeLoading } = useHandbookTree()
   const [article, setArticle] = useState<HandbookArticle | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [fetchedSlug, setFetchedSlug] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Derived during render: when `slug` changes, `fetchedSlug` lags until
+  // the effect resolves. Avoids the anti-pattern of calling setLoading()
+  // synchronously inside the effect body, which triggers cascading renders.
+  const loading = slug !== undefined && slug !== fetchedSlug
+
   useEffect(() => {
     if (!slug) return
-    setLoading(true)
-    setError(null)
-
     let mounted = true
     apiJson<HandbookArticle>(`/api/handbook/${slug}`)
       .then(data => {
         if (mounted) {
           setArticle(data)
-          setLoading(false)
+          setError(null)
+          setFetchedSlug(slug)
         }
       })
       .catch(err => {
         if (mounted) {
           console.error('Failed to load handbook article:', err)
           setError(err?.message || 'Failed to load article')
-          setLoading(false)
+          setFetchedSlug(slug)
         }
       })
     return () => { mounted = false }
   }, [slug])
+
+  // When the URL slug changes, hide any stale error from the previous
+  // fetch. Derived, not effect-driven.
+  const activeError = slug === fetchedSlug ? error : null
 
   const sections = tree?.sections || []
 
@@ -61,7 +68,7 @@ export const HandbookArticlePage: React.FC = () => {
     )
   }
 
-  if (error || !article) {
+  if (activeError || !article) {
     return (
       <HandbookLayout
         sections={sections}
@@ -73,7 +80,7 @@ export const HandbookArticlePage: React.FC = () => {
           <fieldset className="red-168-border">
             <legend className="center">ERROR</legend>
             <div style={{ padding: '30px', textAlign: 'center' }}>
-              <p>{error || 'Article not found.'}</p>
+              <p>{activeError || 'Article not found.'}</p>
               <Link to="/handbook" className="tui-button cyan-168" style={{ marginTop: '16px', display: 'inline-block' }}>
                 ← Back to Handbook
               </Link>

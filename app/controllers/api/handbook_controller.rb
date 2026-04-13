@@ -32,11 +32,12 @@ module Api
     end
 
     # GET /api/handbook/recent
-    # Last N published articles by updated_at. Used by the landing-page
-    # "Recently Updated" panel.
+    # Last N visible articles by updated_at. Used by the landing-page
+    # "Recently Updated" panel. `visible` requires both the article and
+    # its section to be published.
     def recent
       limit = [(params[:limit] || 5).to_i, 20].min
-      articles = HandbookArticle.published
+      articles = HandbookArticle.visible
         .includes(:handbook_section)
         .recently_updated
         .limit(limit)
@@ -50,16 +51,19 @@ module Api
 
     # GET /api/handbook/mappings
     # slug -> title map for any future wiki-link style cross-references.
+    # Scoped to visible articles so unpublished-section content isn't leaked.
     def mappings
-      mapping = HandbookArticle.published.pluck(:slug, :title).to_h
+      mapping = HandbookArticle.visible.pluck(:slug, :title).to_h
       render json: mapping
     end
 
     # GET /api/handbook/:slug
     # Full article with section context and prev/next siblings within the
     # same section for GitBook-style navigation at the bottom of each page.
+    # `visible` ensures articles in unpublished sections 404 here even if
+    # the article itself is marked published.
     def show
-      article = HandbookArticle.published.find_by!(slug: params[:slug])
+      article = HandbookArticle.visible.find_by!(slug: params[:slug])
       section = article.handbook_section
       siblings = section.articles.published.ordered.to_a
       idx = siblings.index(article)
@@ -101,7 +105,11 @@ module Api
         difficulty: article.difficulty,
         summary: article.summary,
         position: article.position,
-        updated_at: article.updated_at
+        updated_at: article.updated_at,
+        # Required for sidebar tag search to match against `search_tags`.
+        # Mirrors the `metadata` field returned by #show so the payload
+        # shape is consistent between summary and detail.
+        metadata: article.metadata || {}
       }
     end
   end

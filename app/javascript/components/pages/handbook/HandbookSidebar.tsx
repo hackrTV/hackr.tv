@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { HandbookSection } from '~/types/handbook'
 
@@ -20,29 +20,26 @@ export const HandbookSidebar: React.FC<HandbookSidebarProps> = ({
   searchQuery = '',
   onSearchChange
 }) => {
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {}
-    sections.forEach(s => {
-      initial[s.slug] = currentSectionSlug ? s.slug === currentSectionSlug : true
-    })
-    return initial
-  })
+  // Tracks ONLY explicit user toggles. Default open/closed state is derived
+  // during render from `currentSectionSlug`, so navigation between articles
+  // no longer needs an effect to "sync" the sidebar state.
+  const [userToggles, setUserToggles] = useState<Record<string, boolean>>({})
 
-  // Expand the section containing the current article whenever it changes
-  useEffect(() => {
-    if (!currentSectionSlug) return
-    setOpenSections(prev => ({ ...prev, [currentSectionSlug]: true }))
-  }, [currentSectionSlug])
+  const defaultOpen = (slug: string) =>
+    !currentSectionSlug || slug === currentSectionSlug
+
+  const isOpen = (slug: string) => userToggles[slug] ?? defaultOpen(slug)
 
   const toggle = (slug: string) => {
-    setOpenSections(prev => ({ ...prev, [slug]: !prev[slug] }))
+    setUserToggles(prev => ({ ...prev, [slug]: !(prev[slug] ?? defaultOpen(slug)) }))
   }
 
   const q = searchQuery.trim().toLowerCase()
   const hasQuery = q.length > 0
 
   const articleMatches = (section: HandbookSection, a: HandbookSection['articles'][number]) => {
-    const tags = (((a as unknown) as { metadata?: { search_tags?: string[] } }).metadata?.search_tags) || []
+    const rawTags = (a.metadata as { search_tags?: unknown })?.search_tags
+    const tags = Array.isArray(rawTags) ? rawTags.filter((t): t is string => typeof t === 'string') : []
     return (
       a.title.toLowerCase().includes(q) ||
       (a.summary || '').toLowerCase().includes(q) ||
@@ -108,7 +105,7 @@ export const HandbookSidebar: React.FC<HandbookSidebarProps> = ({
 
       <div>
         {filteredSections.map(({ section, matchingArticles }) => {
-          const isOpen = hasQuery ? true : (openSections[section.slug] ?? false)
+          const sectionOpen = hasQuery ? true : isOpen(section.slug)
           const isActiveSection = section.slug === currentSectionSlug
 
           return (
@@ -132,7 +129,7 @@ export const HandbookSidebar: React.FC<HandbookSidebarProps> = ({
                 }}
               >
                 <span style={{ color: MUTED, width: '10px', display: 'inline-block' }}>
-                  {isOpen ? '▾' : '▸'}
+                  {sectionOpen ? '▾' : '▸'}
                 </span>
                 {section.icon && (
                   <span style={{ color: '#fbbf24', fontFamily: 'monospace' }}>{section.icon}</span>
@@ -140,7 +137,7 @@ export const HandbookSidebar: React.FC<HandbookSidebarProps> = ({
                 <span>{section.name}</span>
               </button>
 
-              {isOpen && (
+              {sectionOpen && (
                 <ul style={{ listStyle: 'none', margin: 0, padding: '2px 0 2px 28px' }}>
                   {matchingArticles.map(article => {
                     const isActive = article.slug === currentArticleSlug

@@ -48,6 +48,17 @@ RSpec.describe Api::HandbookController, type: :controller do
       expect(section_payload["articles"].map { |a| a["slug"] }).not_to include(unpublished.slug)
     end
 
+    it "includes metadata in article summaries so tag search can match" do
+      section = create(:handbook_section)
+      create(:handbook_article,
+        handbook_section: section,
+        metadata: {"search_tags" => ["cred", "mining"]})
+
+      get :index, format: :json
+      article_payload = JSON.parse(response.body)["sections"].first["articles"].first
+      expect(article_payload["metadata"]).to eq("search_tags" => ["cred", "mining"])
+    end
+
     it "orders sections by position then name" do
       later = create(:handbook_section, name: "Zeta", position: 5)
       earlier = create(:handbook_section, name: "Alpha", position: 1)
@@ -108,6 +119,13 @@ RSpec.describe Api::HandbookController, type: :controller do
       get :show, params: {slug: hidden.slug}, format: :json
       expect(response).to have_http_status(:not_found)
     end
+
+    it "returns 404 for a published article in an unpublished section" do
+      hidden_section = create(:handbook_section, :unpublished)
+      orphaned = create(:handbook_article, handbook_section: hidden_section)
+      get :show, params: {slug: orphaned.slug}, format: :json
+      expect(response).to have_http_status(:not_found)
+    end
   end
 
   describe "GET #recent (authenticated)" do
@@ -142,6 +160,14 @@ RSpec.describe Api::HandbookController, type: :controller do
       get :recent, format: :json
       expect(JSON.parse(response.body)).to be_empty
     end
+
+    it "excludes published articles whose section is unpublished" do
+      hidden_section = create(:handbook_section, :unpublished)
+      create(:handbook_article, handbook_section: hidden_section)
+
+      get :recent, format: :json
+      expect(JSON.parse(response.body)).to be_empty
+    end
   end
 
   describe "GET #mappings (authenticated)" do
@@ -155,6 +181,14 @@ RSpec.describe Api::HandbookController, type: :controller do
       get :mappings, format: :json
       body = JSON.parse(response.body)
       expect(body).to eq({published.slug => published.title})
+    end
+
+    it "excludes published articles whose section is unpublished" do
+      hidden_section = create(:handbook_section, :unpublished)
+      create(:handbook_article, handbook_section: hidden_section, slug: "hidden-article", title: "Hidden")
+
+      get :mappings, format: :json
+      expect(JSON.parse(response.body)).to be_empty
     end
   end
 end

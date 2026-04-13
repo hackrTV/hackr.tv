@@ -10,6 +10,7 @@ export interface HandbookArticleSummary {
   summary: string | null
   position: number
   updated_at: string
+  metadata: Record<string, unknown>
   section?: { slug: string; name: string }
 }
 
