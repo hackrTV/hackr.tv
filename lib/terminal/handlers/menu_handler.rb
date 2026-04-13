@@ -9,7 +9,7 @@ module Terminal
       MENU_ITEMS = {
         "1" => {label: "THE PULSE GRID", state: :in_grid, auth: true, description: "Enter the MUD"},
         "2" => {label: "PulseWire", state: :on_wire, auth: false, description: "Social feed"},
-        "3" => {label: "The Codex", state: :in_codex, auth: false, description: "Lore archive"},
+        "3" => {label: "The Codex", state: :in_codex, auth: false, description: "Knowledge archive"},
         "4" => {label: "hackr.fm", state: :in_bands, auth: false, description: "Band profiles"},
         "5" => {label: "Pulse Vault", state: :in_vault, auth: false, description: "Track listings"},
         "6" => {label: "Uplink", state: :on_uplink, auth: true, description: "Real-time signal"}
