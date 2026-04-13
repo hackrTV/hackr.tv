@@ -255,13 +255,18 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/codex" className={`mobile-menu-item${isActive('/codex') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Codex
                 </Link>
+                {isLoggedIn && (
+                  <Link to="/handbook" className={`mobile-menu-item${isActive('/handbook') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <span className="purple-168-text">9</span> Handbook
+                  </Link>
+                )}
                 <Link to="/logs" className={`mobile-menu-item${isActive('/logs') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-                  <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Logs
+                  <span className="purple-168-text">{isLoggedIn ? '10' : '8'}</span> Logs
                 </Link>
               </div>
 
               <div className="mobile-menu-section">
-                <div className="mobile-menu-section-title">{isLoggedIn ? '9' : '8'}. THE PULSE GRID</div>
+                <div className="mobile-menu-section-title">{isLoggedIn ? '11' : '9'}. THE PULSE GRID</div>
                 <Link to="/grid" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span>grid
                 </Link>
@@ -290,7 +295,7 @@ export const HeaderMenu: React.FC = () => {
                 )}
                 {hackr?.role === 'admin' && (
                   <a href="/root" className="mobile-menu-item">
-                    <span className="red-255-text">10</span> /root <span className="red-255-text">[ADMIN]</span>
+                    <span className="red-255-text">12</span> /root
                   </a>
                 )}
               </div>
@@ -301,12 +306,14 @@ export const HeaderMenu: React.FC = () => {
                     href="#"
                     className="mobile-menu-item"
                     style={{ color: '#dc2626' }}
+                    title="Disconnect"
+                    aria-label="Disconnect"
                     onClick={(e) => {
                       handleDisconnect(e)
                       setMobileMenuOpen(false)
                     }}
                   >
-                    × Disconnect
+                    × DC
                   </a>
                 )}
               </div>
@@ -526,16 +533,25 @@ export const HeaderMenu: React.FC = () => {
             </Link>
           </li>
 
+          {/* Handbook (logged in only) */}
+          {isLoggedIn && (
+            <li className={`header-nav-item${isActive('/handbook') ? ' active' : ''}`}>
+              <Link to="/handbook">
+                <span className="purple-168-text">9</span> Handbook&nbsp;
+              </Link>
+            </li>
+          )}
+
           {/* Logs */}
           <li className={`header-nav-item${isActive('/logs') ? ' active' : ''}`}>
             <Link to="/logs">
-              <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span> Logs&nbsp;
+              <span className="purple-168-text">{isLoggedIn ? '10' : '8'}</span> Logs&nbsp;
             </Link>
           </li>
 
           {/* THE PULSE GRID */}
           <li className={`header-dropdown${isActive('/grid') || isActive('/code') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
-            <span className="purple-168-text">{isLoggedIn ? '10' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
+            <span className="purple-168-text">{isLoggedIn ? '11' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'grid' ? 'open' : ''}`}>
               <ul>
                 <li>
@@ -584,7 +600,7 @@ export const HeaderMenu: React.FC = () => {
           {hackr?.role === 'admin' && (
             <li className="header-nav-item">
               <a href="/root">
-                <span className="red-255-text">11</span> /root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">12</span> /root
               </a>
             </li>
           )}
@@ -592,8 +608,8 @@ export const HeaderMenu: React.FC = () => {
           {/* Disconnect (only show if logged in) */}
           {isLoggedIn && (
             <li className="header-nav-item">
-              <a href="#" onClick={handleDisconnect} style={{ color: '#dc2626' }}>
-                <span>×</span> Disconnect&nbsp;
+              <a href="#" onClick={handleDisconnect} style={{ color: '#dc2626' }} title="Disconnect" aria-label="Disconnect">
+                <span>×</span> DC&nbsp;
               </a>
             </li>
           )}

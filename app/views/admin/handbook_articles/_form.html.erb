@@ -1,0 +1,86 @@
+<%= form_with model: [:admin, article], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 0 0 15px 0;">[:: ARTICLE INFO ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <%= f.label :handbook_section_id, "SECTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :handbook_section_id,
+          @sections.map { |s| [s.name, s.id] },
+          {}, class: "tui-input", style: "width: 100%;" %>
+    </div>
+
+    <div>
+      <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :title, class: "tui-input", style: "width: 100%;" %>
+    </div>
+  </div>
+
+  <div style="margin-top: 15px;">
+    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+    <small style="color: #666;">Auto-generated from title if left blank. Globally unique across the handbook.</small>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :kind, "KIND", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :kind,
+          HandbookArticle::KINDS.map { |k| [k.titleize, k] },
+          {}, class: "tui-input", style: "width: 100%;" %>
+    </div>
+
+    <div>
+      <%= f.label :difficulty, "DIFFICULTY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :difficulty,
+          HandbookArticle::DIFFICULTIES.map { |d| [d.titleize, d] },
+          {include_blank: "—"}, class: "tui-input", style: "width: 100%;" %>
+      <small style="color: #666;">Optional. Useful for tutorials.</small>
+    </div>
+
+    <div>
+      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :position, class: "tui-input", style: "width: 100%;", min: 0 %>
+      <small style="color: #666;">Order within section.</small>
+    </div>
+
+    <div>
+      <%= f.label :published, class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" do %>
+        <%= f.check_box :published, style: "margin-right: 8px;" %> PUBLISHED
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin-top: 15px;">
+    <%= f.label :summary, "SUMMARY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :summary, class: "tui-input", style: "width: 100%; min-height: 60px;" %>
+    <small style="color: #666;">One-sentence hook shown in sidebar/landing.</small>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: BODY (MARKDOWN) ::]</h3>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.text_area :body, class: "tui-input", style: "width: 100%; min-height: 400px; font-family: monospace; font-size: 0.95em;" %>
+    <small style="color: #666;">
+      GFM markdown. Raw HTML allowed (sanitized on render). Use <code>[[Codex Entry]]</code> for Codex cross-references,
+      and <code>[link text](/handbook/other-slug)</code> for internal handbook links.
+    </small>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: METADATA (JSON) ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= text_area_tag "handbook_article[metadata_json]",
+        (article.metadata.present? ? JSON.pretty_generate(article.metadata) : "{}"),
+        class: "tui-input", style: "width: 100%; font-family: monospace; min-height: 100px;" %>
+    <small style="color: #666;">JSON object. <code>search_tags</code> array is searched client-side (hidden from display). Example: <code>{"search_tags": ["cred", "mining", "rigs"]}</code></small>
+  </div>
+
+  <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <%= f.submit article.persisted? ? "Save Article" : "Create Article",
+        class: "tui-button purple-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= link_to "Cancel", admin_handbook_articles_path,
+        class: "tui-button grey-168",
+        style: "padding: 10px 30px; font-size: 1.1em;" %>
+  </div>
+<% end %>

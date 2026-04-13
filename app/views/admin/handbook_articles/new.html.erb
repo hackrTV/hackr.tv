@@ -1,0 +1,15 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/handbook/articles :: NEW ARTICLE</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <%= render "form", article: @article %>
+    </div>
+  </fieldset>
+</div>

@@ -52,9 +52,6 @@
       <% if current_hackr %>
         <span style="color: #888;">Logged in as:</span>
         <span class="purple-168-text"><%= current_hackr.hackr_alias %></span>
-        <% if current_hackr.admin? %>
-          <span class="red-255-text">[ADMIN]</span>
-        <% end %>
       <% end %>
     </div>
 
@@ -71,6 +68,13 @@
       </div>
       <%= link_to "Logs", admin_hackr_logs_path, class: "cyan-168-text", style: "text-decoration: none;" %>
       <%= link_to "Codex", admin_codex_entries_path, class: "cyan-168-text", style: "text-decoration: none;" %>
+      <div class="admin-nav-dropdown">
+        <span class="admin-nav-dropdown-trigger cyan-168-text">Handbook</span>
+        <div class="admin-nav-dropdown-menu">
+          <%= link_to "Sections", admin_handbook_sections_path, class: "cyan-168-text" %>
+          <%= link_to "Articles", admin_handbook_articles_path, class: "cyan-168-text" %>
+        </div>
+      </div>
       <%= link_to "Streams", admin_hackr_streams_path, class: "green-255-text", style: "text-decoration: none;" %>
       <%= link_to "PulseWire", admin_pulse_wire_index_path, class: "purple-168-text", style: "text-decoration: none;" %>
       <%= link_to "Uplink", admin_uplink_index_path, class: "purple-168-text", style: "text-decoration: none;" %>
@@ -86,7 +90,7 @@
       </div>
       <%= link_to "Redirects", admin_redirects_path, class: "cyan-168-text", style: "text-decoration: none;" %>
       <span style="color: #333;">|</span>
-      <%= link_to "← Exit Admin", root_path, class: "red-168-text", style: "text-decoration: none;" %>
+      <%= link_to "← Exit", root_path, class: "red-168-text", style: "text-decoration: none;" %>
     </nav>
   </div>
 </div>

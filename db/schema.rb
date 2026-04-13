@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_09_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_12_120002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -420,6 +420,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_000002) do
     t.index ["artist_id"], name: "index_hackr_streams_on_artist_id"
   end
 
+  create_table "handbook_articles", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "difficulty"
+    t.integer "handbook_section_id", null: false
+    t.string "kind", default: "reference", null: false
+    t.json "metadata", default: {}
+    t.integer "position", default: 0, null: false
+    t.boolean "published", default: true, null: false
+    t.string "slug", null: false
+    t.text "summary"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["handbook_section_id", "position"], name: "index_handbook_articles_on_handbook_section_id_and_position"
+    t.index ["handbook_section_id"], name: "index_handbook_articles_on_handbook_section_id"
+    t.index ["kind"], name: "index_handbook_articles_on_kind"
+    t.index ["published"], name: "index_handbook_articles_on_published"
+    t.index ["slug"], name: "index_handbook_articles_on_slug", unique: true
+  end
+
+  create_table "handbook_sections", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "icon"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "published", default: true, null: false
+    t.string "slug", null: false
+    t.text "summary"
+    t.datetime "updated_at", null: false
+    t.index ["published", "position"], name: "index_handbook_sections_on_published_and_position"
+    t.index ["published"], name: "index_handbook_sections_on_published"
+    t.index ["slug"], name: "index_handbook_sections_on_slug", unique: true
+  end
+
   create_table "moderation_logs", force: :cascade do |t|
     t.string "action", null: false
     t.integer "actor_id", null: false
@@ -783,6 +817,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_000002) do
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_logs", "grid_hackrs"
   add_foreign_key "hackr_streams", "artists"
+  add_foreign_key "handbook_articles", "handbook_sections"
   add_foreign_key "moderation_logs", "chat_messages"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "actor_id"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "target_id"

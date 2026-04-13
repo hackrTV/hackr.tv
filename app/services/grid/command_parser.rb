@@ -401,60 +401,60 @@ module Grid
         <span style='color: #22d3ee; font-weight: bold;'>Available Commands:</span>
 
         <span style='color: #fbbf24;'>Navigation:</span>
-          <span style='color: #34d399;'>look, l</span>                 - Look around the room
-          <span style='color: #34d399;'>go &lt;direction&gt;</span>          - Move in a direction
-          <span style='color: #34d399;'>north, n / south, s</span>     - Move north/south
-          <span style='color: #34d399;'>east, e / west, w</span>       - Move east/west
-          <span style='color: #34d399;'>up, u / down, d</span>         - Move up/down
+          <span style='color: #34d399;'>look, l</span>                   - Look around the room
+          <span style='color: #34d399;'>go &lt;direction&gt;</span>            - Move in a direction
+          <span style='color: #34d399;'>north, n / south, s</span>       - Move north/south
+          <span style='color: #34d399;'>east, e / west, w</span>         - Move east/west
+          <span style='color: #34d399;'>up, u / down, d</span>           - Move up/down
 
         <span style='color: #fbbf24;'>Items:</span>
-          <span style='color: #34d399;'>inventory, inv, i</span>       - View your inventory
-          <span style='color: #34d399;'>take &lt;item&gt;</span>             - Pick up an item
-          <span style='color: #34d399;'>drop &lt;item&gt;</span>             - Drop an item
-          <span style='color: #34d399;'>use &lt;item&gt;</span>              - Use an item
-          <span style='color: #34d399;'>salvage &lt;item&gt;</span>          - Break down an item for XP
-          <span style='color: #34d399;'>examine &lt;target&gt;, x</span>     - Examine item, NPC, or hackr
+          <span style='color: #34d399;'>inventory, inv, i</span>         - View your inventory
+          <span style='color: #34d399;'>take &lt;item&gt;</span>               - Pick up an item
+          <span style='color: #34d399;'>drop &lt;item&gt;</span>               - Drop an item
+          <span style='color: #34d399;'>use &lt;item&gt;</span>                - Use an item
+          <span style='color: #34d399;'>salvage &lt;item&gt;</span>            - Break down an item for XP
+          <span style='color: #34d399;'>examine &lt;target&gt;, x</span>       - Examine item, NPC, or hackr
 
         <span style='color: #fbbf24;'>NPCs:</span>
-          <span style='color: #34d399;'>talk &lt;npc&gt;</span>              - Talk to an NPC
-          <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span> - Ask an NPC about a topic
+          <span style='color: #34d399;'>talk &lt;npc&gt;</span>                - Talk to an NPC
+          <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>   - Ask an NPC about a topic
 
         <span style='color: #fbbf24;'>Commerce:</span>
-          <span style='color: #34d399;'>shop, browse</span>            - View vendor inventory &amp; prices
-          <span style='color: #34d399;'>buy &lt;item&gt;</span>              - Purchase an item from vendor
-          <span style='color: #34d399;'>sell &lt;item&gt;</span>             - Sell an item to vendor
+          <span style='color: #34d399;'>shop, browse</span>              - View vendor inventory &amp; prices
+          <span style='color: #34d399;'>buy &lt;item&gt;</span>                - Purchase an item from vendor
+          <span style='color: #34d399;'>sell &lt;item&gt;</span>               - Sell an item to vendor
 
         <span style='color: #fbbf24;'>Economy:</span>
-          <span style='color: #34d399;'>cache</span>                   - List your caches
-          <span style='color: #34d399;'>cache create</span>            - Create a new cache
-          <span style='color: #34d399;'>cache balance [addr]</span>    - Check balance
-          <span style='color: #34d399;'>cache history [addr]</span>    - Transaction history
-          <span style='color: #34d399;'>cache send &lt;amt&gt; &lt;to&gt; [from &lt;src&gt;] [memo &lt;text&gt;]</span> - Send CRED
-          <span style='color: #34d399;'>cache default &lt;addr&gt;</span>   - Set default cache
-          <span style='color: #34d399;'>cache name &lt;addr&gt; &lt;nick&gt;</span> - Nickname a cache
-          <span style='color: #34d399;'>cache abandon &lt;addr&gt;</span>   - Abandon a cache
+          <span style='color: #34d399;'>cache</span>                     - List your caches
+          <span style='color: #34d399;'>cache create</span>              - Create a new cache
+          <span style='color: #34d399;'>cache balance [addr]</span>      - Check balance
+          <span style='color: #34d399;'>cache history [addr]</span>      - Transaction history
+          <span style='color: #34d399;'>cache send &lt;amt&gt; &lt;to&gt;</span>     - Send CRED (opts: from &lt;src&gt;, memo &lt;text&gt;)
+          <span style='color: #34d399;'>cache default &lt;addr&gt;</span>      - Set default cache
+          <span style='color: #34d399;'>cache name &lt;addr&gt; &lt;nick&gt;</span>  - Nickname a cache
+          <span style='color: #34d399;'>cache abandon &lt;addr&gt;</span>      - Abandon a cache (WARNING: This is irreversible)
 
         <span style='color: #fbbf24;'>Ledger:</span>
-          <span style='color: #34d399;'>chain latest</span>            - Recent global transactions
-          <span style='color: #34d399;'>chain tx &lt;hash&gt;</span>         - Look up a transaction
-          <span style='color: #34d399;'>chain cache &lt;addr&gt;</span>     - Public history for a cache
-          <span style='color: #34d399;'>chain supply</span>            - CRED supply overview
+          <span style='color: #34d399;'>chain latest</span>              - Recent global transactions
+          <span style='color: #34d399;'>chain tx &lt;hash&gt;</span>           - Look up a transaction
+          <span style='color: #34d399;'>chain cache &lt;addr&gt;</span>        - Public history for a cache
+          <span style='color: #34d399;'>chain supply</span>              - CRED supply overview
 
         <span style='color: #fbbf24;'>Mining:</span>
-          <span style='color: #34d399;'>rig</span>                     - Mining rig status
-          <span style='color: #34d399;'>rig on / rig off</span>        - Toggle mining
-          <span style='color: #34d399;'>rig install &lt;item&gt;</span>     - Install component (rig must be off)
-          <span style='color: #34d399;'>rig uninstall &lt;item&gt;</span>   - Remove component (rig must be off)
-          <span style='color: #34d399;'>rig inspect</span>             - Detailed rig view
+          <span style='color: #34d399;'>rig</span>                       - Mining rig status
+          <span style='color: #34d399;'>rig on / rig off</span>          - Toggle mining
+          <span style='color: #34d399;'>rig install &lt;item&gt;</span>        - Install component (rig must be off)
+          <span style='color: #34d399;'>rig uninstall &lt;item&gt;</span>      - Remove component (rig must be off)
+          <span style='color: #34d399;'>rig inspect</span>               - Detailed rig view
 
         <span style='color: #fbbf24;'>Social:</span>
-          <span style='color: #34d399;'>say &lt;message&gt;</span>           - Say something in the room
-          <span style='color: #34d399;'>who</span>                     - See who's online
+          <span style='color: #34d399;'>say &lt;message&gt;</span>             - Say something in the room
+          <span style='color: #34d399;'>who</span>                       - See who's online
 
         <span style='color: #fbbf24;'>Operative:</span>
-          <span style='color: #34d399;'>stat, stats</span>             - View your operative profile
-          <span style='color: #34d399;'>clear, cls</span>              - Clear the screen
-          <span style='color: #34d399;'>help, ?</span>                 - Show this help message
+          <span style='color: #34d399;'>stat, stats</span>               - View your operative profile
+          <span style='color: #34d399;'>clear, cls</span>                - Clear the screen
+          <span style='color: #34d399;'>help, ?</span>                   - Show this help message
       HELP
     end
 

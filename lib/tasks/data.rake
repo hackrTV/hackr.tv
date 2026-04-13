@@ -197,8 +197,8 @@ namespace :data do
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
 
-  desc "Load content (codex, hackr_logs, wire)"
-  task content: [:codex, :hackr_logs, :wire]
+  desc "Load content (codex, hackr_logs, wire, handbook)"
+  task content: [:codex, :hackr_logs, :wire, :handbook]
 
   desc "Load overlays"
   task overlays: [
@@ -932,7 +932,7 @@ namespace :data do
         metadata: attrs["metadata"]
       )
 
-      if entry.changed? || attrs["metadata"].present?
+      if entry.changed?
         entry.save!
         was_new ? (created += 1) : (updated += 1)
         puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{entry.name} (#{entry.entry_type})"
@@ -940,6 +940,68 @@ namespace :data do
     end
 
     puts "Codex Entries: #{created} created, #{updated} updated, #{CodexEntry.count} total"
+  end
+
+  desc "Load handbook sections and articles from YAML"
+  task handbook: :environment do
+    puts "\n--- Loading Handbook ---"
+    yaml_file = Rails.root.join("data", "content", "handbook.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    sections_data = data["handbook_sections"] || []
+
+    sections_created = sections_updated = 0
+    articles_created = articles_updated = 0
+
+    sections_data.each do |section_attrs|
+      section = HandbookSection.find_or_initialize_by(slug: section_attrs["slug"])
+      was_new = section.new_record?
+
+      section.assign_attributes(
+        name: section_attrs["name"],
+        icon: section_attrs["icon"],
+        summary: section_attrs["summary"],
+        position: section_attrs["position"] || 0,
+        published: section_attrs.fetch("published", true)
+      )
+
+      if section.changed?
+        section.save!
+        was_new ? (sections_created += 1) : (sections_updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"} section: #{section.name}"
+      end
+
+      (section_attrs["articles"] || []).each do |article_attrs|
+        article = HandbookArticle.find_or_initialize_by(slug: article_attrs["slug"])
+        article_was_new = article.new_record?
+
+        article.assign_attributes(
+          handbook_section: section,
+          title: article_attrs["title"],
+          kind: article_attrs["kind"] || "reference",
+          difficulty: article_attrs["difficulty"],
+          summary: article_attrs["summary"],
+          body: article_attrs["body"],
+          position: article_attrs["position"] || 0,
+          published: article_attrs.fetch("published", true),
+          metadata: article_attrs["metadata"] || {}
+        )
+
+        if article.changed?
+          article.save!
+          article_was_new ? (articles_created += 1) : (articles_updated += 1)
+          puts "    #{article_was_new ? "✓ Created" : "↻ Updated"} article: #{article.title}"
+        end
+      end
+    end
+
+    puts "Handbook Sections: #{sections_created} created, #{sections_updated} updated, #{HandbookSection.count} total"
+    puts "Handbook Articles: #{articles_created} created, #{articles_updated} updated, #{HandbookArticle.count} total"
   end
 
   desc "Load hackr logs from YAML"

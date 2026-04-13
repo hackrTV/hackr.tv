@@ -90,6 +90,12 @@ Rails.application.routes.draw do
     get ":slug", to: "pages#spa_root", as: :codex_entry
   end
 
+  # Handbook (practical docs for GridHackr users) - SPA
+  scope "handbook" do
+    get "/", to: "pages#spa_root", as: :handbook
+    get ":slug", to: "pages#spa_root", as: :handbook_article
+  end
+
   # PulseWire routes - SPA
   scope "wire" do
     get "/", to: "pages#spa_root", as: :wire
@@ -119,6 +125,11 @@ Rails.application.routes.draw do
     get "codex/mappings", to: "codex#mappings"
     get "codex", to: "codex#index"
     get "codex/:slug", to: "codex#show"
+
+    get "handbook/mappings", to: "handbook#mappings"
+    get "handbook/recent", to: "handbook#recent"
+    get "handbook", to: "handbook#index"
+    get "handbook/:slug", to: "handbook#show"
     get "radio_stations", to: "radio#index"
     get "radio_stations/:id/playlists", to: "radio#station_playlists"
     get "hackr_stream", to: "hackr_streams#show"
@@ -264,6 +275,10 @@ Rails.application.routes.draw do
       end
     end
     resources :grid_shop_transactions, only: [:index]
+
+    # Hackr Handbook (docs — full CRUD, YAML-seedable)
+    resources :handbook_sections
+    resources :handbook_articles
 
     # PulseWire moderation (still functional - runtime operations)
     resources :pulse_wire, only: %i[index destroy] do
