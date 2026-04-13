@@ -1,0 +1,89 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/handbook/articles :: ARTICLES</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <%= link_to "+ New Article", new_admin_handbook_article_path(section_id: params[:section_id]), class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= link_to "← Sections", admin_handbook_sections_path, class: "tui-button cyan-168", style: "padding: 8px 20px;" %>
+        <span style="color: #666; margin: 0 5px;">|</span>
+        <%= link_to "All Sections", admin_handbook_articles_path, class: "tui-button", style: "padding: 6px 14px; font-size: 0.85em;" %>
+        <% @sections.each do |section| %>
+          <% active = params[:section_id].to_s == section.id.to_s %>
+          <%= link_to section.name,
+              admin_handbook_articles_path(section_id: section.id),
+              class: "tui-button #{active ? "cyan-168" : ""}",
+              style: "padding: 6px 14px; font-size: 0.85em;" %>
+        <% end %>
+      </div>
+
+      <% if @articles.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Section</th>
+                <th style="text-align: center;">Pos</th>
+                <th style="text-align: left;">Title</th>
+                <th style="text-align: left;">Slug</th>
+                <th style="text-align: center;">Kind</th>
+                <th style="text-align: center;">Difficulty</th>
+                <th style="text-align: center;">Published</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @articles.each do |article| %>
+                <tr>
+                  <td style="color: #c084fc;"><%= article.handbook_section.name %></td>
+                  <td style="text-align: center; color: #888;"><%= article.position %></td>
+                  <td class="cyan-255-text"><%= article.title %></td>
+                  <td style="color: #666; font-family: monospace;"><%= article.slug %></td>
+                  <td style="text-align: center;">
+                    <% if article.kind == "tutorial" %>
+                      <span class="yellow-168-text">TUTORIAL</span>
+                    <% else %>
+                      <span style="color: #888;">REFERENCE</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center; color: #888;"><%= article.difficulty.presence || "-" %></td>
+                  <td style="text-align: center;">
+                    <% if article.published? %>
+                      <span class="green-255-text">YES</span>
+                    <% else %>
+                      <span style="color: #444;">-</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: right; white-space: nowrap;">
+                    <%= link_to "Edit", edit_admin_handbook_article_path(article), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= button_to "Delete", admin_handbook_article_path(article), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete article '#{article.title}'?" } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No handbook articles yet.</p>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "<- Admin Dashboard", admin_root_path, class: "tui-button cyan-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

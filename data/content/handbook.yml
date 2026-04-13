@@ -1,0 +1,430 @@
+# Hackr Handbook - practical docs for GridHackr users.
+# Two-level hierarchy: sections contain articles.
+# Markdown body. [[Codex Slug]] links to Codex entries. Internal
+# links: [link text](/handbook/other-slug).
+# Re-running `rails data:handbook` upserts by slug (YAML wins). Admin-
+# created articles/sections not present here are preserved.
+handbook_sections:
+  - slug: getting-started
+    name: Getting Started
+    icon: ">>"
+    position: 0
+    published: true
+    summary: "Orientation for new operatives — what the Grid is, how to log in, and where to go first."
+    articles:
+      - slug: welcome-to-the-handbook
+        title: Welcome to the Handbook
+        kind: reference
+        position: 0
+        published: true
+        summary: "What the Hackr Handbook is and how to use it."
+        metadata:
+          search_tags:
+            - welcome
+            - intro
+            - handbook
+        body: |
+          # Welcome to the Hackr Handbook
+
+          The Handbook is the operator's field manual for hackr.tv. It covers the
+          tools you'll use day-to-day: **THE PULSE GRID**, **WIRE**, **Uplink**,
+          the **Vault**, the **Terminal interface**, and everything in between.
+
+          ## How it's organized
+
+          - **Reference** pages describe a system — what it is, what the commands do, how the rules work.
+          - **Tutorials** walk you through doing something end-to-end. Follow them in order.
+
+          Use the sidebar on the left to browse by section. Use the search box at
+          the top to jump straight to an article by title or tag.
+
+          ## Where to start
+
+          - New to the Grid? Read [Your First Connection](/handbook/first-connection).
+          - Looking up a command? Start with [GRID Terminal Basics](/handbook/grid-terminal-basics).
+          - Hunting for context instead of mechanics? That's the [Codex](/codex), not the Handbook.
+      - slug: first-connection
+        title: Your First Connection
+        kind: tutorial
+        difficulty: beginner
+        position: 1
+        published: true
+        summary: "What to do in your first session in-Grid — orientation, core commands, finding your bearings."
+        metadata:
+          search_tags:
+            - onboarding
+            - first session
+            - orientation
+        body: |
+          # Your First Connection
+
+          You're in. Now what?
+
+          This walkthrough gets a brand-new operative oriented in their first
+          session on the Grid.
+
+          ## 1. Get your bearings
+
+          Type `look` to see a description of your current room — where you
+          are, what's around you, who else is here, and which directions you
+          can go.
+
+          ## 2. See the command list
+
+          Type `help`. The terminal will list the commands available to you.
+          Most take simple arguments. For example, `go north`, `examine Codec`,
+          `take card`.
+
+          ## 3. Check your profile
+
+          Type `stat` (or `st`). This shows your XP, clearance, vitals, and
+          your CRED balance. You won't have much yet - it's in your hands to change that.
+
+          ## 4. Move through an exit
+
+          Pick one of the exits from your `look` output and type
+          `go <direction>`. Keep exploring. Unfamiliar rooms are the point.
+
+          ## 5. Talk to people
+
+          If there's a character (mob) in the room, `talk <name>` will start a
+          conversation. Some of them have useful things to tell you. Some of
+          them don't.
+
+          ## Next step
+
+          Read [What is THE PULSE GRID?](/handbook/pulse-grid-overview) for a
+          high-level tour of the systems you'll be interacting with from here
+          on.
+
+  - slug: pulse-grid
+    name: THE PULSE GRID
+    icon: "#"
+    position: 1
+    published: true
+    summary: "The MUD. Rooms, items, commands, clearance, CRED, and everything the operative does in the Grid."
+    articles:
+      - slug: pulse-grid-overview
+        title: What is THE PULSE GRID?
+        kind: reference
+        position: 0
+        published: true
+        summary: "High-level tour of the MUD and its core loops."
+        metadata:
+          search_tags:
+            - grid
+            - mud
+            - overview
+        body: |
+          # THE PULSE GRID
+
+          THE PULSE GRID is the text-based MUD at the heart of hackr.tv.
+          Operatives move between rooms, interact with mobs, collect items,
+          mine [[CRED]], and unlock progression.
+
+          ## Core loops
+
+          - **Explore** — move through zones and rooms with `go`, `look`, `examine`.
+          - **Interact** — `talk`, `take`, `use`, `salvage`.
+          - **Progress** — earn XP, raise your clearance, unlock new zones and commands.
+          - **Trade** — `shop` at vendors, `buy` and `sell` items.
+
+          Read the individual articles in this section for detail on each loop.
+      - slug: clearance-levels
+        title: Clearance Levels
+        kind: reference
+        position: 1
+        published: true
+        summary: "How clearance works and what higher tiers unlock."
+        metadata:
+          search_tags:
+            - clearance
+            - xp
+            - leveling
+        body: |
+          # Clearance Levels
+
+          Your **clearance level** (CL) is your standing in the Grid. It rises
+          as you earn XP. Higher clearance opens doors — literally and
+          figuratively.
+
+          ## What clearance gates
+
+          - **Zones and rooms.** Some parts of the Grid refuse entry until
+            you've earned your way in. If you get bounced at a threshold,
+            you're not cleared yet — come back later.
+          - **Vendors and listings.** Certain shops, and certain items within
+            shops, require a minimum clearance.
+          - **Commands.** A handful of commands only become available once
+            you've climbed high enough.
+
+          ## Pacing
+
+          Early levels come fast. Later ones don't. Don't expect the curve to
+          feel the same at CL3 as it does at CL30.
+
+          Check your current CL any time with `stat`.
+
+  - slug: wire
+    name: WIRE
+    icon: "~"
+    position: 2
+    published: true
+    summary: "Asynchronous broadcast feed — post pulses, echo what you agree with, signal drops."
+    articles:
+      - slug: wire-overview
+        title: WIRE — Broadcast Feed
+        kind: reference
+        position: 0
+        published: true
+        summary: "What WIRE is and how the pulse/echo model works."
+        metadata:
+          search_tags:
+            - wire
+            - pulses
+            - echoes
+            - social
+        body: |
+          # WIRE
+
+          WIRE is the asynchronous broadcast feed at `/wire`. Think of it as the
+          operative bulletin board: short messages (**pulses**) and their
+          amplifications (**echoes**).
+
+          ## Pulses
+
+          A pulse is a short broadcast — markdown-friendly, visible to all
+          operatives. Post from the web UI or via terminal command.
+
+          ## Echoes
+
+          An echo amplifies someone else's pulse onto your timeline. Similar to
+          a repost, but with optional commentary.
+
+          ## Signal drops
+
+          Moderators can **signal drop** a pulse to remove it from public
+          view. If your own pulse gets dropped, you'll be notified.
+
+  - slug: uplink
+    name: Uplink
+    icon: "@"
+    position: 3
+    published: true
+    summary: "Real-time operative chat channels. Use during livestreams and for coordination."
+    articles:
+      - slug: uplink-overview
+        title: Uplink — Real-Time Channels
+        kind: reference
+        position: 0
+        published: true
+        summary: "Channel model, moderation, livestream integration."
+        metadata:
+          search_tags:
+            - uplink
+            - chat
+            - livestream
+        body: |
+          # Uplink
+
+          Uplink is the real-time chat layer at `/uplink`. Operatives join
+          channels, send packets (messages), and coordinate in the moment —
+          especially during livestreams.
+
+          ## Channels
+
+          Channels are organized around topics or streams. Some are open, some
+          are clearance-gated.
+
+          ## Livestream popout
+
+          `/uplink/popout` gives a chromeless chat overlay for use on stream —
+          the only Uplink route that's publicly viewable.
+
+  - slug: vault
+    name: Vault
+    icon: "$"
+    position: 4
+    published: true
+    summary: "Your personal music repository — releases you've unlocked and tracks you can play anywhere."
+    articles:
+      - slug: vault-overview
+        title: Vault — Your Music Repository
+        kind: reference
+        position: 0
+        published: true
+        summary: "What lives in the Vault, how unlocks work, where to find it."
+        metadata:
+          search_tags:
+            - vault
+            - music
+            - releases
+        body: |
+          # Vault
+
+          The Vault (at [`/vault`](/vault)) is the personal music archive for operatives
+          — releases and tracks you've collected, bookmarked, or had granted
+          to you.
+
+          Access the Vault any time from the `hackr.fm` nav dropdown.
+
+  - slug: terminal
+    name: Terminal Interfaces
+    icon: "%"
+    position: 5
+    published: true
+    summary: "Command syntax reference for the in-Grid terminal."
+    articles:
+      - slug: grid-terminal-basics
+        title: GRID Terminal Basics
+        kind: reference
+        position: 0
+        published: true
+        summary: "Common commands: look, go, take, examine, help."
+        metadata:
+          search_tags:
+            - commands
+            - terminal
+            - help
+        body: |
+          # GRID Terminal Basics
+
+          Inside THE PULSE GRID, you interact by typing commands. The terminal
+          parses the first word as the command and the rest as arguments.
+
+          ## Core commands
+
+          | Command | Purpose |
+          |---------|---------|
+          | `look` | Describe the current room |
+          | `go <dir>` | Move through an exit |
+          | `examine <target>` | Inspect a mob, item, or operative |
+          | `take <item>` | Pick up an item |
+          | `inventory` / `inv` | Show your carried items |
+          | `stat` | Show XP, clearance, vitals, CRED |
+          | `help` | List available commands |
+
+          Commands are case-insensitive. Most have short aliases — `inv` for
+          `inventory`, `st` for `stat`.
+
+          ## Not using the web client?
+
+          If you prefer a native terminal, see
+          [SSH Terminal Access](/handbook/ssh-terminal-access) — same command
+          parser, different front door.
+      - slug: ssh-terminal-access
+        title: SSH Terminal Access
+        kind: reference
+        position: 1
+        published: true
+        summary: "Connect to hackr.tv from a native terminal over SSH. Rotating credentials at /terminal."
+        metadata:
+          search_tags:
+            - ssh
+            - terminal
+            - access
+            - credentials
+            - mudlet
+        body: |
+          # SSH Terminal Access
+
+          hackr.tv can be accessed from a native terminal over SSH, separate
+          from the web client. Some operatives prefer it — native keybinds,
+          tmux/screen sessions, scrollback, and no browser chrome.
+
+          ## Get the Network credentials
+
+          Visit [`/terminal`](/terminal) to see the current connection
+          command and password. Credentials rotate daily, so check back when
+          your session expires.
+
+          ## Connect
+
+          From any terminal:
+
+          ```
+          ssh access@terminal.hackr.tv -p 9915
+          ```
+
+          Enter the password from the `/terminal` page when prompted.
+
+          ## Compatible clients
+
+          Anything that speaks SSH will work. Common choices:
+
+          - **Linux / BSD** — your shell of choice (bash, zsh, fish, ksh, sh) in any emulator
+          - **macOS** — Terminal.app, Kitty, Ghostty, iTerm2
+          - **Windows** — Windows Terminal, Tabby, mRemoteNG, PuTTY
+          - **Mobile** — Termux (Android), a-Shell or Blink (iOS)
+          - **MUD-aware** — Mudlet, TinTin++, MUSHclient
+
+          MUD clients give you the nicest experience for the in-Grid
+          interface — triggers, aliases, logging, and highlighted output.
+
+          ## Inside the session
+
+          Once connected, you will have general hackr access. To connect to THE
+          PULSE GRID, you'll need to log in with your operative credentials. At
+          that point, you can access THE PULSE GRID where you will be at the
+          same command parser described in
+          [GRID Terminal Basics](/handbook/grid-terminal-basics). All the  same
+          commands work.
+
+          ## Why rotating credentials?
+
+          The daily rotation is a soft barrier, not a secret. The purpose is
+          to keep the endpoint public-ish (anyone who visits the web can
+          connect) without giving bots a permanent handle.
+
+  - slug: tutorials
+    name: Tutorials
+    icon: ">"
+    position: 6
+    published: true
+    summary: "Step-by-step walkthroughs. Follow them in order to learn a full subsystem end-to-end."
+    articles:
+      - slug: tutorial-mine-your-first-cred
+        title: Mine Your First CRED
+        kind: tutorial
+        difficulty: beginner
+        position: 0
+        published: true
+        summary: "Provision a mining rig, install components, and earn your first CRED."
+        metadata:
+          search_tags:
+            - cred
+            - mining
+            - tutorial
+            - rigs
+        body: |
+          # Mine Your First CRED
+
+          CRED is the currency of THE PULSE GRID. You earn it by running a
+          mining rig. This tutorial gets you from zero to mining.
+
+          ## 1. Check your provisioning
+
+          Log in and run `rig`. If you see a rig, you're already provisioned.
+          If not, check `help` for the provisioning command.
+
+          ## 2. Inspect your rig
+
+          `rig inspect` shows your motherboard slots and what's installed.
+
+          ## 3. Turn the rig on
+
+          `rig on` — your rig starts working and will accrue CRED over time.
+
+          ## 4. Check your cache
+
+          `cache` lists your wallets. The default one receives mining rewards.
+
+          ## 5. Boost while streaming
+
+          Watching `#live` during an active stream boosts your mining rate
+          and earns a chat bonus on top. Showing up pays off.
+
+          ## Next step
+
+          Read [Clearance Levels](/handbook/clearance-levels) to understand
+          how progression works.

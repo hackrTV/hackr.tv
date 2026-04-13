@@ -84,7 +84,7 @@ export const FooterMenu: React.FC = () => {
           {hackr?.role === 'admin' && (
             <li>
               <a href="/root">
-                <span className="red-255-text">11</span>&nbsp;/root <span className="red-255-text">[ADMIN]</span>&nbsp;
+                <span className="red-255-text">11</span>&nbsp;/root
               </a>
             </li>
           )}

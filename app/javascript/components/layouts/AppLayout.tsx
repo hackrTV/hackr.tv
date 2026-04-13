@@ -36,6 +36,8 @@ const LogsIndexPage = lazy(() => import('~/components/pages/logs/LogsIndexPage')
 const LogDetailPage = lazy(() => import('~/components/pages/logs/LogDetailPage').then(m => ({ default: m.LogDetailPage })))
 const CodexIndexPage = lazy(() => import('~/components/pages/codex/CodexIndexPage').then(m => ({ default: m.CodexIndexPage })))
 const CodexEntryPage = lazy(() => import('~/components/pages/codex/CodexEntryPage').then(m => ({ default: m.CodexEntryPage })))
+const HandbookIndexPage = lazy(() => import('~/components/pages/handbook/HandbookIndexPage').then(m => ({ default: m.HandbookIndexPage })))
+const HandbookArticlePage = lazy(() => import('~/components/pages/handbook/HandbookArticlePage').then(m => ({ default: m.HandbookArticlePage })))
 const TimelinePage = lazy(() => import('~/components/pages/timeline/TimelinePage').then(m => ({ default: m.TimelinePage })))
 const HotwirePage = lazy(() => import('~/components/pulsewire/HotwirePage').then(m => ({ default: m.HotwirePage })))
 const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage').then(m => ({ default: m.UserPulsesPage })))
@@ -109,6 +111,9 @@ export const AppLayout: React.FC = () => {
         {/* Codex routes */}
         <Route path="/codex" element={<CodexIndexPage />} />
         <Route path="/codex/:slug" element={<CodexEntryPage />} />
+        {/* Handbook routes - login required */}
+        <Route path="/handbook" element={<ProtectedRoute><HandbookIndexPage /></ProtectedRoute>} />
+        <Route path="/handbook/:slug" element={<ProtectedRoute><HandbookArticlePage /></ProtectedRoute>} />
         {/* Timeline route */}
         <Route path="/timeline" element={<TimelinePage />} />
         {/* PulseWire routes */}
