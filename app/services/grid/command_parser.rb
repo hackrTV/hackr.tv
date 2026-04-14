@@ -562,7 +562,7 @@ module Grid
       walk = lambda do |standing, depth, visited|
         fid = standing[:faction].id
         next if visited.include?(fid)
-        visited = visited + [fid]
+        visited += [fid]
         ordered << [standing, depth]
         indent_len = (depth > 0) ? (2 * (depth - 1) + 3) : 0
         max_name = [max_name, indent_len + standing[:faction].display_name.length].max

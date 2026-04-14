@@ -141,10 +141,10 @@ RSpec.describe Grid::ReputationService do
     it "propagates through chained aggregates (A → B → C)" do
       # Build a fresh 3-level chain: leaf → mid → top
       leaf = create(:grid_faction, slug: "chain_leaf")
-      mid  = create(:grid_faction, slug: "chain_mid")
-      top  = create(:grid_faction, slug: "chain_top")
+      mid = create(:grid_faction, slug: "chain_mid")
+      top = create(:grid_faction, slug: "chain_top")
       create(:grid_faction_rep_link, source_faction: leaf, target_faction: mid, weight: 0.5)
-      create(:grid_faction_rep_link, source_faction: mid,  target_faction: top, weight: 2.0)
+      create(:grid_faction_rep_link, source_faction: mid, target_faction: top, weight: 2.0)
 
       service.adjust!(leaf, 100)
 
