@@ -1,19 +1,85 @@
 # Grid Factions
+#
+# `parent_slug` sets the display hierarchy (used by admin tree + `rep` grouping).
+# It is NOT the rep-rollup path — rep math is configured separately via
+# `rep_links` below (source_slug → target_slug @ weight). Keeping the two
+# concerns independent lets GovCorp contribute NEGATIVELY to Fracture Network
+# rep without being a sub-faction of FN in the org chart.
 factions:
-  - name: The.CyberPul.se
-    slug: thecyberpulse
-    description: "The primary broadcast entity. XERAEN, Ryker, and Synthia unite the Fracture Network through music."
-    color_scheme: purple
-    artist_slug: thecyberpulse
+  - name: The Fracture Network
+    slug: fracture_network
+    kind: collective
+    color_scheme: violet
+    position: 10
+    description: "Umbrella resistance collective. Standing here is derived from rep with its member subfactions and antagonists."
 
-  - name: XERAEN
-    slug: xeraen
-    description: "Temporal guardian broadcasting from the future to prevent the timeline he lives in."
+  - name: Hackrcore
+    slug: hackrcore
+    parent_slug: fracture_network
+    kind: collective
     color_scheme: purple
-    artist_slug: xeraen
+    position: 20
+    artist_slug: thecyberpulse
+    description: "The broadcast spine of the resistance. XERAEN, Ryker, and Synthia push signal through the noise."
+
+  - name: Blackout
+    slug: blackout
+    parent_slug: fracture_network
+    kind: collective
+    color_scheme: red
+    position: 30
+    description: "Underground saboteurs. They kill the lights so others can move."
+
+  - name: Frontwave
+    slug: frontwave
+    parent_slug: fracture_network
+    kind: collective
+    color_scheme: cyan
+    position: 40
+    description: "Signal artists and culture-shapers. The Fracture Network's public face."
+
+  - name: Offline
+    slug: offline
+    parent_slug: fracture_network
+    kind: collective
+    color_scheme: gray
+    position: 50
+    description: "Analog refugees. They left the grid; they didn't leave the fight."
 
   - name: GovCorp
     slug: govcorp
-    description: "The totalitarian corporate-government entity. Enemy of the Fracture Network."
+    kind: collective
     color_scheme: red
-    artist_slug: null
+    position: 60
+    description: "The totalitarian corporate-government entity. Enemy of the Fracture Network."
+
+  - name: Dante Russo
+    slug: dante
+    kind: individual
+    color_scheme: amber
+    position: 70
+    description: "Unaffiliated operative. His favor is earned one conversation at a time."
+
+# Reputation graph. Directed edges: adjusting SOURCE rep shifts effective rep
+# computed for TARGET by `weight × source_value`. Multiple sources feeding one
+# target are summed. Edges are independent of parent_slug hierarchy above.
+rep_links:
+  - source_slug: hackrcore
+    target_slug: fracture_network
+    weight: 1.2
+
+  - source_slug: blackout
+    target_slug: fracture_network
+    weight: 0.8
+
+  - source_slug: frontwave
+    target_slug: fracture_network
+    weight: 1.0
+
+  - source_slug: offline
+    target_slug: fracture_network
+    weight: 0.9
+
+  - source_slug: govcorp
+    target_slug: fracture_network
+    weight: -0.2

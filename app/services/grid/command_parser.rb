@@ -56,6 +56,8 @@ module Grid
         ask_command(args)
       when "stat", "stats", "st"
         stat_command
+      when "rep", "reputation", "standing"
+        rep_command
       when "use"
         use_command(args.join(" "))
       when "salvage"
@@ -353,7 +355,9 @@ module Grid
       increment_stat!("npcs_talked")
 
       output = dialogue_box(content.join("\n"))
+      rep_notif = grant_faction_rep(mob.grid_faction, 1, reason: "talk:#{slugify(mob.name)}", source: mob)
       notifications = achievement_checker.check(:talk_npc, npc_name: mob.name)
+      notifications.unshift(rep_notif) if rep_notif
       append_notifications(output, notifications)
     end
 
@@ -453,6 +457,7 @@ module Grid
 
         <span style='color: #fbbf24;'>Operative:</span>
           <span style='color: #34d399;'>stat, stats</span>               - View your operative profile
+          <span style='color: #34d399;'>rep, reputation</span>           - View faction standings in detail
           <span style='color: #34d399;'>clear, cls</span>                - Clear the screen
           <span style='color: #34d399;'>help, ?</span>                   - Show this help message
       HELP
@@ -514,6 +519,59 @@ module Grid
           icon = a.badge_icon.present? ? "#{a.badge_icon} " : ""
           output << "  #{icon}<span style='color: #d0d0d0;'>#{h(a.name)}</span> <span style='color: #6b7280;'>(+#{a.xp_reward}xp)</span>"
         end
+      end
+
+      standings = reputation_service.faction_standings
+      if standings.any?
+        output << ""
+        output << "<span style='color: #fbbf24;'>STANDING:</span>"
+        max_name = standings.map { |s| s[:faction].display_name.length }.max || 0
+        standings.each do |s|
+          output << "  #{format_rep_row(s, name_width: max_name, compact: true)}"
+        end
+        output << "  <span style='color: #6b7280;'>(use 'rep' for the full standing report)</span>"
+      end
+
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output.join("\n")
+    end
+
+    def rep_command
+      standings = reputation_service.faction_standings(include_zero: true)
+      output = []
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output << "<span style='color: #22d3ee; font-weight: bold;'>STANDING REPORT :: #{h(hackr.hackr_alias)}</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+
+      if standings.empty?
+        output << "<span style='color: #9ca3af;'>No factions on file. The Grid doesn't know you yet.</span>"
+        output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+        return output.join("\n")
+      end
+
+      # Walk the parent→child hierarchy recursively so arbitrary depth renders.
+      # Orphan rows (parent_id set but parent not in the standings list, e.g.,
+      # filtered out or deleted) are promoted to roots. Cycle guard defends
+      # against pathological data — real prevention is at the model validator.
+      children_by_parent = standings.group_by { |s| s[:faction].parent_id }
+      standing_ids = standings.map { |s| s[:faction].id }.to_set
+      roots = standings.select { |s| s[:faction].parent_id.nil? || !standing_ids.include?(s[:faction].parent_id) }
+
+      ordered = []
+      max_name = 0
+      walk = lambda do |standing, depth, visited|
+        fid = standing[:faction].id
+        next if visited.include?(fid)
+        visited = visited + [fid]
+        ordered << [standing, depth]
+        indent_len = (depth > 0) ? (2 * (depth - 1) + 3) : 0
+        max_name = [max_name, indent_len + standing[:faction].display_name.length].max
+        (children_by_parent[fid] || []).each { |child| walk.call(child, depth + 1, visited) }
+      end
+      roots.each { |s| walk.call(s, 0, []) }
+
+      ordered.each do |(standing, depth)|
+        output << format_rep_row(standing, name_width: max_name, depth: depth)
       end
 
       output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
@@ -748,7 +806,9 @@ module Grid
 
       output = "<span style='color: #34d399;'>Purchased </span>#{name_display}<span style='color: #34d399;'> for <span style='color: #fbbf24;'>#{format_cred(result[:price_paid])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
 
+      rep_notif = grant_faction_rep(vendor.grid_faction, 2, reason: "buy:#{slugify(item.name)}", source: vendor)
       notifications = achievement_checker.check(:purchase_item, item_name: item.name)
+      notifications.unshift(rep_notif) if rep_notif
       output = append_notifications(output, notifications)
       {output: output, event: nil}
     rescue Grid::ShopService::AccessDenied => e
@@ -1321,6 +1381,10 @@ module Grid
       @achievement_checker ||= Grid::AchievementChecker.new(hackr)
     end
 
+    def reputation_service
+      @reputation_service ||= Grid::ReputationService.new(hackr)
+    end
+
     def increment_stat!(key, amount = 1)
       current = hackr.stat(key) || 0
       hackr.set_stat!(key, current + amount)
@@ -1329,6 +1393,121 @@ module Grid
     def append_notifications(output, notifications)
       return output if notifications.empty?
       [output, *notifications].compact.join("\n")
+    end
+
+    # --- Reputation helpers ---
+
+    # Apply rep and return a short inline notification for the command output,
+    # or nil if the subject is missing/misconfigured or the delta clamped to zero.
+    # Aggregate-faction misconfiguration (NPC/vendor assigned to a faction with
+    # incoming rep-links) is swallowed silently — gameplay should never crash
+    # because world data has a bad edge; it just skips the rep award.
+    def grant_faction_rep(faction, delta, reason:, source: nil)
+      return nil unless faction
+      result = reputation_service.adjust!(faction, delta, reason: reason, source: source)
+      return nil if result.nil? || result[:applied_delta].zero?
+      build_rep_notification(result)
+    rescue Grid::ReputationService::SubjectMissing,
+      Grid::ReputationService::AggregateSubjectNotAdjustable
+      nil
+    end
+
+    def build_rep_notification(result)
+      subject = result[:subject]
+      delta = result[:applied_delta]
+      sign = delta.positive? ? "+" : ""
+      delta_color = delta.positive? ? "#34d399" : "#ef4444"
+      tier_transition = (result[:tier_before][:key] != result[:tier_after][:key])
+
+      parts = [
+        "<span style='color: #fbbf24;'>▲ REP</span>",
+        "<span style='color: #{delta_color};'>#{sign}#{delta}</span>",
+        "<span style='color: #9ca3af;'>::</span>",
+        "<span style='color: #a78bfa;'>#{h(subject.display_name)}</span>",
+        tier_label_span(result[:tier_after])
+      ]
+      lines = [parts.join(" ")]
+
+      if tier_transition
+        lines << "  <span style='color: #fbbf24;'>▲▲ #{h(subject.display_name)}: #{result[:tier_before][:label]} → #{result[:tier_after][:label]}</span>"
+      end
+
+      result[:rollups].each do |rollup|
+        rollup_transition = rollup[:tier_before][:key] != rollup[:tier_after][:key]
+        next unless rollup_transition
+        lines << "  <span style='color: #a78bfa;'>▲ #{h(rollup[:faction].display_name)}: #{rollup[:tier_before][:label]} → #{rollup[:tier_after][:label]}</span>"
+      end
+
+      lines.join("\n")
+    end
+
+    # Longest tier label — used to pad the tier badge column so bars align.
+    TIER_BADGE_WIDTH = Grid::Reputation::TIERS.map { |t| t[:label].length }.max + 2 # brackets
+    # Widest numeric value: sign + up to 4 digits = 5 chars (e.g. "+1000", "-1000").
+    REP_VALUE_WIDTH = 5
+
+    def tier_label_span(tier, pad_to: TIER_BADGE_WIDTH)
+      padded = "[#{tier[:label]}]".ljust(pad_to)
+      "<span style='color: #{tier[:color]};'>#{padded}</span>"
+    end
+
+    # Render a single standing line.
+    # `compact: true` → short form for the `stat` STANDING block (no bar, no next-tier).
+    # `compact: false` → full form for `rep` (bar, next-tier hint, rollup contribution footnote).
+    def format_rep_row(standing, name_width:, depth: 0, compact: false)
+      faction = standing[:faction]
+      tier = standing[:tier]
+      effective = standing[:effective]
+      # depth 0 → no prefix; depth 1 → "└─ "; each deeper level adds 2 leading
+      # spaces so grandchildren stack visibly under their parent's "└─".
+      indent = (depth > 0) ? ("  " * (depth - 1)) + "└─ " : ""
+      label_padded = "#{indent}#{faction.display_name}".ljust(name_width)
+      value_padded = format_rep_value(effective).rjust(REP_VALUE_WIDTH)
+
+      if compact
+        tag = standing[:aggregate] ? " <span style='color: #6b7280;'>(rollup)</span>" : ""
+        return "<span style='color: #d0d0d0;'>#{h(label_padded)}</span>  #{tier_label_span(tier)} <span style='color: #9ca3af;'>#{value_padded}</span>#{tag}"
+      end
+
+      bar = rep_bar(effective)
+      next_tier_str = if standing[:next_tier]
+        diff = standing[:next_tier][:min] - effective
+        "<span style='color: #6b7280;'>#{diff} to #{standing[:next_tier][:label]}</span>"
+      else
+        "<span style='color: #fbbf24;'>[MAX]</span>"
+      end
+
+      "  <span style='color: #d0d0d0;'>#{h(label_padded)}</span>  #{tier_label_span(tier)}  #{bar}  <span style='color: #9ca3af;'>#{value_padded}</span>  #{next_tier_str}"
+    end
+
+    # 20-cell bar spanning -1000..+1000, centered on zero. Color reflects tier.
+    def rep_bar(value)
+      width = 20
+      half = width / 2
+      clamped = value.clamp(Grid::Reputation::MIN_VALUE, Grid::Reputation::MAX_VALUE)
+      fill_cells = (clamped.abs * half / Grid::Reputation::MAX_VALUE.to_f).round
+      tier = Grid::Reputation.tier_for(value)
+
+      left = if value < 0
+        ("░" * (half - fill_cells)) + ("█" * fill_cells)
+      else
+        "░" * half
+      end
+      right = if value > 0
+        ("█" * fill_cells) + ("░" * (half - fill_cells))
+      else
+        "░" * half
+      end
+      "<span style='color: #{tier[:color]};'>#{left}│#{right}</span>"
+    end
+
+    def format_rep_value(value)
+      sign = value.positive? ? "+" : ""
+      "#{sign}#{value}"
+    end
+
+    def slugify(text)
+      text.to_s.downcase.gsub(/[^a-z0-9]+/, "_").gsub(/^_|_$/, "")
     end
   end
 end

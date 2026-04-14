@@ -268,6 +268,23 @@ Rails.application.routes.draw do
       end
     end
 
+    # Grid factions (full CRUD + rep-link management)
+    resources :grid_factions do
+      collection do
+        post :update_rep_links
+      end
+    end
+
+    # Grid reputations (read + adjust per-hackr)
+    resources :grid_hackr_reputations, only: [:index] do
+      collection do
+        post :adjust
+      end
+    end
+
+    # Grid reputation event log (read-only)
+    resources :grid_reputation_events, only: [:index]
+
     # Grid shops (runtime CRUD + stock management)
     resources :grid_shop_listings do
       member do

@@ -1,0 +1,76 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/reputation_events :: REP LOG</legend>
+
+    <div style="padding: 20px;">
+      <!-- Filters -->
+      <%= form_with url: admin_grid_reputation_events_path, method: :get, local: true, style: "margin-bottom: 20px;" do %>
+        <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+          <div>
+            <label class="white-text" style="display: block; margin-bottom: 5px;">Hackr alias</label>
+            <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "tui-input", style: "padding: 6px 10px;" %>
+          </div>
+          <div>
+            <label class="white-text" style="display: block; margin-bottom: 5px;">Faction</label>
+            <%= select_tag :faction_slug, options_from_collection_for_select(@factions, :slug, :display_name, params[:faction_slug]), include_blank: "(any)", class: "tui-input", style: "padding: 6px 10px;" %>
+          </div>
+          <div>
+            <label class="white-text" style="display: block; margin-bottom: 5px;">Reason prefix</label>
+            <%= text_field_tag :reason, params[:reason], class: "tui-input", style: "padding: 6px 10px;", placeholder: "talk: / buy: / admin:" %>
+          </div>
+          <%= submit_tag "Filter", class: "tui-button green-168", style: "padding: 6px 16px;" %>
+          <%= link_to "Clear", admin_grid_reputation_events_path, class: "tui-button", style: "padding: 6px 16px;" %>
+        </div>
+      <% end %>
+
+      <% if @hackr_filter_missing %>
+        <p class="yellow-168-text" style="margin-bottom: 15px;">No hackr found with alias '<%= params[:hackr_alias] %>'.</p>
+      <% end %>
+
+      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <table class="tui-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">When</th>
+              <th style="text-align: left;">Hackr</th>
+              <th style="text-align: left;">Faction</th>
+              <th style="text-align: right;">Δ</th>
+              <th style="text-align: right;">After</th>
+              <th style="text-align: left;">Reason</th>
+              <th style="text-align: left;">Source</th>
+              <th style="text-align: left;">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @events.each do |e| %>
+              <tr>
+                <td style="color: #888; font-family: monospace; white-space: nowrap;"><%= e.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+                <td><span class="cyan-255-text"><%= e.grid_hackr.hackr_alias %></span></td>
+                <td style="color: #a78bfa;">
+                  <%= @faction_map[e.subject_id]&.display_name || "#{e.subject_type}##{e.subject_id}" %>
+                </td>
+                <td style="text-align: right; font-family: monospace;" class="<%= e.delta.positive? ? "green-255-text" : (e.delta.negative? ? "red-255-text" : "") %>">
+                  <%= e.delta.positive? ? "+" : "" %><%= e.delta %>
+                </td>
+                <td style="text-align: right; font-family: monospace; color: #ddd;"><%= e.value_after %></td>
+                <td style="color: #888; font-family: monospace;"><%= e.reason %></td>
+                <td style="color: #888;"><%= e.source_type.present? ? "#{e.source_type}##{e.source_id}" : "—" %></td>
+                <td style="color: #888;"><%= e.note %></td>
+              </tr>
+            <% end %>
+            <% if @events.empty? %>
+              <tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">No events match.</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="color: #666; margin-top: 10px;">Showing most recent <%= [Admin::GridReputationEventsController::PAGE_SIZE, @events.size].min %> events.</p>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Factions", admin_grid_factions_path, class: "tui-button green-168" %>
+        <%= link_to "Hackr Reps →", admin_grid_hackr_reputations_path, class: "tui-button", style: "margin-left: 8px;" %>
+      </div>
+    </div>
+  </fieldset>
+</div>
