@@ -1,0 +1,11 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/factions/<%= @faction.slug %> :: EDIT FACTION</legend>
+
+    <div style="padding: 20px;">
+      <%= form_with model: @faction, url: admin_grid_faction_path(@faction), method: :patch, local: true do |f| %>
+        <%= render "form", f: f %>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

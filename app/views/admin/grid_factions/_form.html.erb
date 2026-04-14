@@ -1,0 +1,54 @@
+<div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+  <% if @faction.errors.any? %>
+    <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+      <p class="red-255-text"><%= @faction.errors.full_messages.join(", ") %></p>
+    </div>
+  <% end %>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+    <div style="flex: 1;">
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px; font-family: monospace;" %>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 60px;" %>
+  </div>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+      <%= f.label :kind, "KIND", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.select :kind, GridFaction::KINDS.map { |k| [k, k] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+    <div style="flex: 1;">
+      <%= f.label :color_scheme, "COLOR", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.text_field :color_scheme, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+    <div style="flex: 1;">
+      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.number_field :position, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.label :parent_id, "PARENT FACTION (display hierarchy only)", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= f.collection_select :parent_id, GridFaction.ordered.where.not(id: @faction.id), :id, :display_name, {include_blank: "(none)"}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <small style="color: #666;">Rep math is controlled by the Rep Link Graph on the index page, NOT by this field.</small>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <%= f.label :artist_id, "LINKED ARTIST", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= f.collection_select :artist_id, Artist.order(:name), :id, :name, {include_blank: "(none)"}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= f.submit @faction.new_record? ? "Create Faction" : "Update Faction", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+    <%= link_to "Cancel", admin_grid_factions_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+  </div>
+</div>

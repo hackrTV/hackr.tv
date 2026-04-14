@@ -17,5 +17,28 @@
 require "rails_helper"
 
 RSpec.describe GridMob, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe "faction_not_aggregate" do
+    let(:leaf) { create(:grid_faction, slug: "leaf") }
+    let(:aggregate) { create(:grid_faction, slug: "agg") }
+
+    before do
+      create(:grid_faction_rep_link, source_faction: leaf, target_faction: aggregate, weight: 1.0)
+    end
+
+    it "accepts a leaf faction" do
+      mob = build(:grid_mob, grid_faction: leaf)
+      expect(mob).to be_valid
+    end
+
+    it "accepts a nil faction" do
+      mob = build(:grid_mob, grid_faction: nil)
+      expect(mob).to be_valid
+    end
+
+    it "rejects an aggregate faction" do
+      mob = build(:grid_mob, grid_faction: aggregate)
+      expect(mob).not_to be_valid
+      expect(mob.errors[:grid_faction].join).to match(/aggregate/)
+    end
+  end
 end

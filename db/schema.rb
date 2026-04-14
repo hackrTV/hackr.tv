@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_12_120002) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -186,14 +186,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_12_120002) do
     t.index ["to_room_id"], name: "index_grid_exits_on_to_room_id"
   end
 
+  create_table "grid_faction_rep_links", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "source_faction_id", null: false
+    t.integer "target_faction_id", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "weight", precision: 6, scale: 3, null: false
+    t.index ["source_faction_id", "target_faction_id"], name: "index_faction_rep_links_unique", unique: true
+    t.index ["source_faction_id"], name: "index_grid_faction_rep_links_on_source_faction_id"
+    t.index ["target_faction_id"], name: "index_grid_faction_rep_links_on_target_faction_id"
+  end
+
   create_table "grid_factions", force: :cascade do |t|
     t.integer "artist_id"
     t.string "color_scheme"
     t.datetime "created_at", null: false
     t.text "description"
+    t.string "kind", default: "collective", null: false
     t.string "name"
+    t.integer "parent_id"
+    t.integer "position", default: 0, null: false
     t.string "slug"
     t.datetime "updated_at", null: false
+    t.index ["kind"], name: "index_grid_factions_on_kind"
+    t.index ["parent_id"], name: "index_grid_factions_on_parent_id"
+    t.index ["slug"], name: "index_grid_factions_on_slug", unique: true
   end
 
   create_table "grid_hackr_achievements", force: :cascade do |t|
@@ -205,6 +222,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_12_120002) do
     t.index ["grid_achievement_id"], name: "index_grid_hackr_achievements_on_grid_achievement_id"
     t.index ["grid_hackr_id", "grid_achievement_id"], name: "index_hackr_achievements_unique", unique: true
     t.index ["grid_hackr_id"], name: "index_grid_hackr_achievements_on_grid_hackr_id"
+  end
+
+  create_table "grid_hackr_reputations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.bigint "subject_id", null: false
+    t.string "subject_type", null: false
+    t.datetime "updated_at", null: false
+    t.integer "value", default: 0, null: false
+    t.index ["grid_hackr_id", "subject_type", "subject_id"], name: "index_hackr_reputations_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_grid_hackr_reputations_on_grid_hackr_id"
+    t.index ["subject_type", "subject_id"], name: "index_hackr_reputations_on_subject"
   end
 
   create_table "grid_hackrs", force: :cascade do |t|
@@ -282,6 +311,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_12_120002) do
     t.datetime "used_at"
     t.index ["email"], name: "index_grid_registration_tokens_on_email"
     t.index ["token"], name: "index_grid_registration_tokens_on_token", unique: true
+  end
+
+  create_table "grid_reputation_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "delta", null: false
+    t.integer "grid_hackr_id", null: false
+    t.text "note"
+    t.string "reason"
+    t.bigint "source_id"
+    t.string "source_type"
+    t.bigint "subject_id", null: false
+    t.string "subject_type", null: false
+    t.integer "value_after", null: false
+    t.index ["grid_hackr_id", "created_at"], name: "index_rep_events_on_hackr_and_time", order: { created_at: :desc }
+    t.index ["grid_hackr_id"], name: "index_grid_reputation_events_on_grid_hackr_id"
+    t.index ["source_type", "source_id"], name: "index_rep_events_on_source"
+    t.index ["subject_type", "subject_id", "created_at"], name: "index_rep_events_on_subject_and_time", order: { created_at: :desc }
   end
 
   create_table "grid_rooms", force: :cascade do |t|
@@ -809,8 +855,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_12_120002) do
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "feature_grants", "grid_hackrs"
+  add_foreign_key "grid_faction_rep_links", "grid_factions", column: "source_faction_id"
+  add_foreign_key "grid_faction_rep_links", "grid_factions", column: "target_faction_id"
+  add_foreign_key "grid_factions", "grid_factions", column: "parent_id"
   add_foreign_key "grid_hackr_achievements", "grid_achievements"
   add_foreign_key "grid_hackr_achievements", "grid_hackrs"
+  add_foreign_key "grid_hackr_reputations", "grid_hackrs"
+  add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_shop_listings", "grid_mobs"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"

@@ -459,9 +459,12 @@ namespace :data do
     end
 
     data = YAML.load_file(yaml_file)
-    factions_data = data["factions"]
+    factions_data = data["factions"] || []
+    links_data = data["rep_links"] || []
     created = updated = 0
 
+    # Pass 1: upsert factions without parent FK (parents may be defined later
+    # in the YAML than their children; resolve on pass 2).
     factions_data.each do |attrs|
       faction = GridFaction.find_or_initialize_by(slug: attrs["slug"])
       was_new = faction.new_record?
@@ -472,6 +475,8 @@ namespace :data do
         name: attrs["name"],
         description: attrs["description"],
         color_scheme: attrs["color_scheme"],
+        kind: attrs["kind"] || "collective",
+        position: attrs["position"] || 0,
         artist: artist
       )
 
@@ -482,7 +487,46 @@ namespace :data do
       end
     end
 
+    # Pass 2: resolve parent_slug → parent_id. Only writes when changed.
+    factions_data.each do |attrs|
+      faction = GridFaction.find_by(slug: attrs["slug"])
+      next unless faction
+      parent_id = attrs["parent_slug"].present? ? GridFaction.where(slug: attrs["parent_slug"]).pick(:id) : nil
+      if faction.parent_id != parent_id
+        faction.update!(parent_id: parent_id)
+      end
+    end
+
+    # Pass 3: rep-link graph. Idempotent — we fully reconcile to match YAML so
+    # removing a link from YAML removes it from DB (unlike other tasks here,
+    # because the link graph is small and fully declarative).
+    desired_keys = Set.new
+    links_data.each do |attrs|
+      source = GridFaction.find_by(slug: attrs["source_slug"])
+      target = GridFaction.find_by(slug: attrs["target_slug"])
+      unless source && target
+        puts "  ⚠ Skipping rep_link: unknown slug (#{attrs["source_slug"]} → #{attrs["target_slug"]})"
+        next
+      end
+
+      link = GridFactionRepLink.find_or_initialize_by(
+        source_faction_id: source.id, target_faction_id: target.id
+      )
+      link.weight = attrs["weight"]
+      link.save! if link.new_record? || link.changed?
+      desired_keys << [source.id, target.id]
+    end
+
+    removed = 0
+    GridFactionRepLink.find_each do |existing|
+      unless desired_keys.include?([existing.source_faction_id, existing.target_faction_id])
+        existing.destroy!
+        removed += 1
+      end
+    end
+
     puts "Factions: #{created} created, #{updated} updated, #{GridFaction.count} total"
+    puts "Rep links: #{GridFactionRepLink.count} active, #{removed} removed"
   end
 
   desc "Load zones from YAML"

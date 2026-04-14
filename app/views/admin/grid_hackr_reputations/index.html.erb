@@ -1,0 +1,106 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/reputations :: HACKR STANDINGS</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Filters -->
+      <%= form_with url: admin_grid_hackr_reputations_path, method: :get, local: true, style: "margin-bottom: 20px;" do %>
+        <div style="display: flex; gap: 10px; align-items: flex-end;">
+          <div>
+            <label class="white-text" style="display: block; margin-bottom: 5px;">Hackr alias</label>
+            <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "tui-input", style: "padding: 6px 10px;" %>
+          </div>
+          <div>
+            <label class="white-text" style="display: block; margin-bottom: 5px;">Faction</label>
+            <%= select_tag :faction_slug, options_from_collection_for_select(@factions, :slug, :display_name, params[:faction_slug]), include_blank: "(any)", class: "tui-input", style: "padding: 6px 10px;" %>
+          </div>
+          <%= submit_tag "Filter", class: "tui-button green-168", style: "padding: 6px 16px;" %>
+          <%= link_to "Clear", admin_grid_hackr_reputations_path, class: "tui-button", style: "padding: 6px 16px;" %>
+        </div>
+      <% end %>
+
+      <% if @hackr_filter_missing %>
+        <p class="yellow-168-text" style="margin-bottom: 15px;">No hackr found with alias '<%= params[:hackr_alias] %>'.</p>
+      <% end %>
+
+      <!-- Listing -->
+      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <table class="tui-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">Hackr</th>
+              <th style="text-align: left;">Faction</th>
+              <th style="text-align: right;">Value</th>
+              <th style="text-align: left;">Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @reputations.each do |rep| %>
+              <tr>
+                <td><span class="cyan-255-text"><%= rep.grid_hackr.hackr_alias %></span></td>
+                <td style="color: #a78bfa;"><%= @faction_map[rep.subject_id]&.display_name %></td>
+                <td style="text-align: right; font-family: monospace;" class="<%= rep.value.positive? ? "green-255-text" : (rep.value.negative? ? "red-255-text" : "") %>">
+                  <%= rep.value.positive? ? "+" : "" %><%= rep.value %>
+                </td>
+                <td style="color: #888;"><%= rep.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
+              </tr>
+            <% end %>
+            <% if @reputations.empty? %>
+              <tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">No reputation records match.</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Manual Adjust -->
+      <div style="margin-top: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: MANUAL ADJUST ::]</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <%= form_with url: adjust_admin_grid_hackr_reputations_path, method: :post, local: true do %>
+            <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 5px;">Hackr</label>
+                <%= select_tag :grid_hackr_id, options_from_collection_for_select(@hackrs, :id, :hackr_alias), class: "tui-input", style: "padding: 6px 10px; min-width: 180px;" %>
+              </div>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 5px;">Faction</label>
+                <%= select_tag :grid_faction_id, options_from_collection_for_select(@adjustable_factions, :id, :display_name), class: "tui-input", style: "padding: 6px 10px; min-width: 180px;" %>
+                <small style="color: #666; display: block; margin-top: 4px;">Aggregate factions (derived from rep-links) are hidden.</small>
+              </div>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 5px;">Delta</label>
+                <%= number_field_tag :delta, 0, class: "tui-input", style: "padding: 6px 10px; width: 90px;" %>
+              </div>
+              <div style="flex: 1; min-width: 200px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px;">Reason tag</label>
+                <%= text_field_tag :reason, "admin:manual", class: "tui-input", style: "padding: 6px 10px; width: 100%;" %>
+              </div>
+              <div style="flex: 2; min-width: 260px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px;">Note (optional)</label>
+                <%= text_field_tag :note, "", class: "tui-input", style: "padding: 6px 10px; width: 100%;" %>
+              </div>
+              <%= submit_tag "Apply", class: "tui-button green-168", style: "padding: 6px 16px;" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Factions", admin_grid_factions_path, class: "tui-button green-168" %>
+        <%= link_to "Rep Log →", admin_grid_reputation_events_path, class: "tui-button", style: "margin-left: 8px;" %>
+      </div>
+    </div>
+  </fieldset>
+</div>
