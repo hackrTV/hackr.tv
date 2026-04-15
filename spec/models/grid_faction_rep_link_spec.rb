@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: grid_faction_rep_links
+# Database name: primary
+#
+#  id                :integer          not null, primary key
+#  weight            :decimal(6, 3)    not null
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  source_faction_id :integer          not null
+#  target_faction_id :integer          not null
+#
+# Indexes
+#
+#  index_faction_rep_links_unique                     (source_faction_id,target_faction_id) UNIQUE
+#  index_grid_faction_rep_links_on_source_faction_id  (source_faction_id)
+#  index_grid_faction_rep_links_on_target_faction_id  (target_faction_id)
+#
+# Foreign Keys
+#
+#  source_faction_id  (source_faction_id => grid_factions.id)
+#  target_faction_id  (target_faction_id => grid_factions.id)
+#
 require "rails_helper"
 
 RSpec.describe GridFactionRepLink, type: :model do

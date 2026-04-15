@@ -61,4 +61,20 @@ class Api::LogsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: {error: "Log not found or not yet published."}, status: :not_found
   end
+
+  # POST /api/logs/:id/read
+  def mark_read
+    return head :no_content unless current_hackr
+
+    log = HackrLog.published.find_by(slug: params[:id])
+    return head :not_found unless log
+
+    HackrLogRead.record!(current_hackr, log)
+
+    checker = Grid::AchievementChecker.new(current_hackr)
+    checker.check("hackr_logs_read")
+    checker.check("hackr_logs_read_all")
+
+    head :no_content
+  end
 end

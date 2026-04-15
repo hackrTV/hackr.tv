@@ -1,8 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
+import { apiFetch } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useHackrScopedDedupFlag } from '~/hooks/useHackrScopedDedup'
 
 const WavelengthZeroPage: React.FC = () => {
+  const { hackr } = useGridAuth()
+  const bioCreditedRef = useHackrScopedDedupFlag(hackr?.id)
+
+  useEffect(() => {
+    if (hackr && !bioCreditedRef.current) {
+      bioCreditedRef.current = true
+      apiFetch('/api/artists/wavelength-zero/bio_viewed', { method: 'POST' })
+        .catch(() => { /* fire-and-forget */ })
+    }
+  }, [hackr, bioCreditedRef])
+
   return (
     <DefaultLayout>
       {/* Rainbow gradient border wrapper */}

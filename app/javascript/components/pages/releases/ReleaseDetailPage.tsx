@@ -4,7 +4,9 @@ import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { getArtistColors } from '~/utils/artistColors'
 import { useAudio } from '~/contexts/AudioContext'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useHackrScopedDedupSet } from '~/hooks/useHackrScopedDedup'
 
 interface ReleaseTrack {
   id: number
@@ -47,6 +49,7 @@ interface ReleaseDetail {
 const ReleaseDetailPage: React.FC = () => {
   const location = useLocation()
   const { audioPlayerAPI } = useAudio()
+  const { hackr } = useGridAuth()
   const [release, setRelease] = useState<ReleaseDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [currentTrackId, setCurrentTrackId] = useState<number | null>(null)
@@ -115,6 +118,19 @@ const ReleaseDetailPage: React.FC = () => {
         setLoading(false)
       })
   }, [releaseSlug])
+
+  // Credit the release view once both the release and auth have
+  // resolved. Coming-soon releases are excluded (the server rejects
+  // them too). Dedup set scoped to hackr.id so logout/login swap
+  // resets cleanly.
+  const creditedSlugsRef = useHackrScopedDedupSet<string>(hackr?.id)
+  useEffect(() => {
+    if (!hackr || !release?.slug || release.coming_soon) return
+    if (creditedSlugsRef.current.has(release.slug)) return
+    creditedSlugsRef.current.add(release.slug)
+    apiFetch(`/api/releases/${encodeURIComponent(release.slug)}/viewed`, { method: 'POST' })
+      .catch(() => { /* fire-and-forget */ })
+  }, [hackr, release?.slug, release?.coming_soon, creditedSlugsRef])
 
   // Track play state
   useEffect(() => {

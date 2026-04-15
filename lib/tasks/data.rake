@@ -765,6 +765,8 @@ namespace :data do
         trigger_type: attrs["trigger_type"],
         trigger_data: attrs["trigger_data"] || {},
         xp_reward: attrs["xp_reward"] || 0,
+        cred_reward: attrs["cred_reward"] || 0,
+        category: attrs["category"] || "grid",
         hidden: attrs["hidden"] || false
       )
 

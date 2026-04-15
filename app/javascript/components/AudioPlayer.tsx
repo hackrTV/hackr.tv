@@ -22,6 +22,12 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
   const stationContextRef = useRef<StationContext | null>(null) // Store station context
   const shuffledPlaylistRef = useRef<TrackData[]>([]) // Store shuffled playlist
   const lastTimeRef = useRef<number>(0) // Track last known playback time for stall detection
+  const creditedTrackIdsRef = useRef<Set<string>>(new Set()) // Achievement play_credit dedup (per session)
+  // Cumulative audio played per track (id → seconds). Used to gate the
+  // 30s play-credit — counts only forward-progression under 2s between
+  // samples, so seeking past the 30s mark does not award credit.
+  const playedSecondsByTrackRef = useRef<Map<string, number>>(new Map())
+  const lastPlaybackPosRef = useRef<{ id: string; time: number } | null>(null)
 
   // Update overlay paused state only (without changing track)
   const updateOverlayPaused = useCallback((paused: boolean) => {
@@ -408,6 +414,30 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ onReady }) => {
       // Only update time if not currently seeking to avoid conflicts
       if (!isSeeking) {
         setCurrentTime(audio.currentTime)
+      }
+
+      // Achievement: credit a track play once 30s of actual playback has
+      // been accumulated. Seeking past the mark does not count — we only
+      // add the delta between samples when it's a small forward step
+      // (< 2s), indicating real playback progression rather than a jump.
+      const track = currentTrack
+      if (track && !creditedTrackIdsRef.current.has(track.id)) {
+        const last = lastPlaybackPosRef.current
+        const now = audio.currentTime
+        if (last && last.id === track.id) {
+          const delta = now - last.time
+          if (delta > 0 && delta < 2) {
+            const prev = playedSecondsByTrackRef.current.get(track.id) || 0
+            const accumulated = prev + delta
+            playedSecondsByTrackRef.current.set(track.id, accumulated)
+            if (accumulated >= 30) {
+              creditedTrackIdsRef.current.add(track.id)
+              apiFetch(`/api/tracks/${encodeURIComponent(track.id)}/play_credit`, { method: 'POST' })
+                .catch(err => console.warn('play_credit failed:', err))
+            }
+          }
+        }
+        lastPlaybackPosRef.current = { id: track.id, time: now }
       }
     }
 

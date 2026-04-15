@@ -5,6 +5,7 @@ interface YouTubePlayerProps {
   width?: number
   height?: number
   responsive?: boolean
+  onPlay?: () => void
 }
 
 // YouTube Player types
@@ -16,6 +17,11 @@ interface YTPlayer {
 
 interface YTPlayerEvent {
   target: YTPlayer
+}
+
+interface YTStateChangeEvent {
+  target: YTPlayer
+  data: number
 }
 
 // Extend Window interface to include YouTube API
@@ -36,12 +42,19 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   videoId,
   width = 560,
   height = 315,
-  responsive = false
+  responsive = false,
+  onPlay
 }) => {
   const playerRef = useRef<HTMLDivElement>(null)
   const [player, setPlayer] = useState<YTPlayer | null>(null)
   const [showThumbnail, setShowThumbnail] = useState(true)
   const isAPIReadyRef = useRef(false)
+  const onPlayRef = useRef(onPlay)
+  const playFiredRef = useRef(false)
+
+  useEffect(() => {
+    onPlayRef.current = onPlay
+  }, [onPlay])
 
   // Load YouTube IFrame API
   useEffect(() => {
@@ -85,6 +98,17 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
       events: {
         onReady: (event: YTPlayerEvent) => {
           event.target.playVideo()
+        },
+        // Fire `onPlay` exactly once — the first time the YT player
+        // reports PLAYING state. This is the real "watched" signal
+        // (distinct from the page-load event), used by parent
+        // components for achievement credit.
+        onStateChange: (event: YTStateChangeEvent) => {
+          const playingState = window.YT?.PlayerState?.PLAYING ?? 1
+          if (event.data === playingState && !playFiredRef.current) {
+            playFiredRef.current = true
+            onPlayRef.current?.()
+          }
         }
       }
     })

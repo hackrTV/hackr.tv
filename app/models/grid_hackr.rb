@@ -89,6 +89,12 @@ class GridHackr < ApplicationRecord
   has_many :grid_shop_transactions, dependent: :nullify
   has_many :grid_hackr_reputations, dependent: :destroy
   has_many :grid_reputation_events, dependent: :destroy
+  has_many :grid_hackr_track_plays, dependent: :destroy
+  has_many :hackr_log_reads, dependent: :destroy
+  has_many :codex_entry_reads, dependent: :destroy
+  has_many :hackr_page_views, dependent: :destroy
+  has_many :hackr_vod_watches, dependent: :destroy
+  has_many :hackr_radio_tunes, dependent: :destroy
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length

@@ -5,11 +5,12 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize from 'rehype-sanitize'
 import { useGridAuth } from '~/hooks/useGridAuth'
+import { useHackrScopedDedupSet } from '~/hooks/useHackrScopedDedup'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
 import { formatFutureDate } from '~/utils/dateUtils'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { TIMELINE_ORDER, TIMELINE_CONFIG, formatEra } from './timelineConfig'
 import type { TimelineSummary } from './timelineConfig'
@@ -64,6 +65,19 @@ export const LogDetailPage: React.FC = () => {
       .then(data => setTimelines(data?.meta?.timelines || null))
       .catch(() => {}) // Non-critical — tabs just won't render
   }, [slug])
+
+  // Credit the read once BOTH the log data and auth have resolved.
+  // Splitting this from the fetch effect avoids the race where the log
+  // API returns before /api/grid/current_hackr. Dedup set is scoped
+  // to hackr.id so logout/login swap does not suppress the new user.
+  const creditedSlugsRef = useHackrScopedDedupSet<string>(hackr?.id)
+  useEffect(() => {
+    if (!hackr || !log?.slug) return
+    if (creditedSlugsRef.current.has(log.slug)) return
+    creditedSlugsRef.current.add(log.slug)
+    apiFetch(`/api/logs/${encodeURIComponent(log.slug)}/read`, { method: 'POST' })
+      .catch(() => { /* fire-and-forget */ })
+  }, [hackr, log?.slug, creditedSlugsRef])
 
   if (loading) {
     return (

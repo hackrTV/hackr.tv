@@ -19,9 +19,19 @@ module Api
         return
       end
 
+      # Note the playlist's track count BEFORE the add so we can tell
+      # if this add is what transitioned the playlist from empty to
+      # populated. `playlists_created` counts playlists with ≥1 track;
+      # its tally only changes on the 0→1 transition, so the achievement
+      # checker only needs to run then.
+      was_empty = @playlist.playlist_tracks.none?
+
       playlist_track = @playlist.playlist_tracks.build(track: track)
 
       if playlist_track.save
+        if was_empty
+          Grid::AchievementChecker.new(current_hackr).check("playlists_created")
+        end
         render json: {
           success: true,
           message: "Track added to playlist",

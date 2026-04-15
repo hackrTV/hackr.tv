@@ -10,7 +10,9 @@ import type { CodexEntry } from '~/types/codex'
 import { transformMarkdownLinks } from '~/utils/codexLinks'
 import { useCodexMappings } from '~/hooks/useCodexMappings'
 import { formatFutureDate } from '~/utils/dateUtils'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useHackrScopedDedupSet } from '~/hooks/useHackrScopedDedup'
 
 const ENTRY_TYPE_COLORS: Record<string, string> = {
   person: '#a78bfa',
@@ -42,6 +44,7 @@ export const CodexEntryPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { mappings } = useCodexMappings()
+  const { hackr } = useGridAuth()
 
   useEffect(() => {
     if (!slug) return
@@ -67,6 +70,18 @@ export const CodexEntryPage: React.FC = () => {
       isMounted = false
     }
   }, [slug])
+
+  // Credit the read once BOTH the entry and auth have resolved. Fires
+  // even if auth resolves after the codex fetch. Dedup set is scoped
+  // to hackr.id so a logout/login swap resets cleanly.
+  const creditedSlugsRef = useHackrScopedDedupSet<string>(hackr?.id)
+  useEffect(() => {
+    if (!hackr || !entry?.slug) return
+    if (creditedSlugsRef.current.has(entry.slug)) return
+    creditedSlugsRef.current.add(entry.slug)
+    apiFetch(`/api/codex/${encodeURIComponent(entry.slug)}/read`, { method: 'POST' })
+      .catch(() => { /* fire-and-forget */ })
+  }, [hackr, entry?.slug, creditedSlugsRef])
 
   if (loading) {
     return (

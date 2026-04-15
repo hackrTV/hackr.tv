@@ -61,5 +61,21 @@ module Api
     rescue ActiveRecord::RecordNotFound
       render json: {error: "Codex entry not found"}, status: :not_found
     end
+
+    # POST /api/codex/:slug/read
+    def mark_read
+      return head :no_content unless current_hackr
+
+      entry = CodexEntry.published.find_by(slug: params[:slug])
+      return head :not_found unless entry
+
+      CodexEntryRead.record!(current_hackr, entry)
+
+      checker = Grid::AchievementChecker.new(current_hackr)
+      checker.check("codex_entries_read")
+      checker.check("codex_entries_read_all")
+
+      head :no_content
+    end
   end
 end

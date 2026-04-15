@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: grid_hackr_reputations
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  subject_type  :string           not null
+#  value         :integer          default(0), not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#  subject_id    :bigint           not null
+#
+# Indexes
+#
+#  index_grid_hackr_reputations_on_grid_hackr_id  (grid_hackr_id)
+#  index_hackr_reputations_on_subject             (subject_type,subject_id)
+#  index_hackr_reputations_unique                 (grid_hackr_id,subject_type,subject_id) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 require "rails_helper"
 
 RSpec.describe GridHackrReputation, type: :model do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_14_000007) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -119,6 +119,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
     t.index ["slug"], name: "index_codex_entries_on_slug", unique: true
   end
 
+  create_table "codex_entry_reads", force: :cascade do |t|
+    t.integer "codex_entry_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.datetime "read_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["codex_entry_id"], name: "index_codex_entry_reads_on_codex_entry_id"
+    t.index ["grid_hackr_id", "codex_entry_id"], name: "index_codex_entry_reads_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_codex_entry_reads_on_grid_hackr_id"
+  end
+
   create_table "echoes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "echoed_at", null: false
@@ -145,7 +156,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
 
   create_table "grid_achievements", force: :cascade do |t|
     t.string "badge_icon"
+    t.string "category", default: "grid", null: false
     t.datetime "created_at", null: false
+    t.integer "cred_reward", default: 0, null: false
     t.text "description"
     t.boolean "hidden", default: false, null: false
     t.string "name", null: false
@@ -154,6 +167,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
     t.string "trigger_type", null: false
     t.datetime "updated_at", null: false
     t.integer "xp_reward", default: 0, null: false
+    t.index ["category"], name: "index_grid_achievements_on_category"
     t.index ["slug"], name: "index_grid_achievements_on_slug", unique: true
     t.index ["trigger_type"], name: "index_grid_achievements_on_trigger_type"
   end
@@ -234,6 +248,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
     t.index ["grid_hackr_id", "subject_type", "subject_id"], name: "index_hackr_reputations_unique", unique: true
     t.index ["grid_hackr_id"], name: "index_grid_hackr_reputations_on_grid_hackr_id"
     t.index ["subject_type", "subject_id"], name: "index_hackr_reputations_on_subject"
+  end
+
+  create_table "grid_hackr_track_plays", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "first_played_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "play_count", default: 1, null: false
+    t.integer "track_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id", "track_id"], name: "index_track_plays_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_grid_hackr_track_plays_on_grid_hackr_id"
+    t.index ["track_id"], name: "index_grid_hackr_track_plays_on_track_id"
   end
 
   create_table "grid_hackrs", force: :cascade do |t|
@@ -437,6 +463,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
     t.index ["ambient_playlist_id"], name: "index_grid_zones_on_ambient_playlist_id"
   end
 
+  create_table "hackr_log_reads", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "hackr_log_id", null: false
+    t.datetime "read_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id", "hackr_log_id"], name: "index_hackr_log_reads_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_hackr_log_reads_on_grid_hackr_id"
+    t.index ["hackr_log_id"], name: "index_hackr_log_reads_on_hackr_log_id"
+  end
+
   create_table "hackr_logs", force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
@@ -452,6 +489,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
     t.index ["timeline"], name: "index_hackr_logs_on_timeline"
   end
 
+  create_table "hackr_page_views", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.string "page_type", null: false
+    t.integer "resource_id", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "viewed_at", null: false
+    t.index ["grid_hackr_id", "page_type", "resource_id"], name: "index_hackr_page_views_unique", unique: true
+    t.index ["grid_hackr_id", "page_type"], name: "index_hackr_page_views_hackr_type"
+    t.index ["grid_hackr_id"], name: "index_hackr_page_views_on_grid_hackr_id"
+  end
+
+  create_table "hackr_radio_tunes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "radio_station_id", null: false
+    t.datetime "tuned_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id", "radio_station_id"], name: "index_hackr_radio_tunes_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_hackr_radio_tunes_on_grid_hackr_id"
+    t.index ["radio_station_id"], name: "index_hackr_radio_tunes_on_radio_station_id"
+  end
+
   create_table "hackr_streams", force: :cascade do |t|
     t.integer "artist_id", null: false
     t.datetime "created_at", null: false
@@ -464,6 +524,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
     t.datetime "updated_at", null: false
     t.string "vod_url"
     t.index ["artist_id"], name: "index_hackr_streams_on_artist_id"
+  end
+
+  create_table "hackr_vod_watches", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "hackr_stream_id", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "watched_at", null: false
+    t.index ["grid_hackr_id", "hackr_stream_id"], name: "index_hackr_vod_watches_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_hackr_vod_watches_on_grid_hackr_id"
+    t.index ["hackr_stream_id"], name: "index_hackr_vod_watches_on_hackr_stream_id"
   end
 
   create_table "handbook_articles", force: :cascade do |t|
@@ -852,6 +923,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
   add_foreign_key "chat_messages", "chat_channels"
   add_foreign_key "chat_messages", "grid_hackrs"
   add_foreign_key "chat_messages", "hackr_streams"
+  add_foreign_key "codex_entry_reads", "codex_entries"
+  add_foreign_key "codex_entry_reads", "grid_hackrs"
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "feature_grants", "grid_hackrs"
@@ -861,13 +934,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_120003) do
   add_foreign_key "grid_hackr_achievements", "grid_achievements"
   add_foreign_key "grid_hackr_achievements", "grid_hackrs"
   add_foreign_key "grid_hackr_reputations", "grid_hackrs"
+  add_foreign_key "grid_hackr_track_plays", "grid_hackrs"
+  add_foreign_key "grid_hackr_track_plays", "tracks"
   add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_shop_listings", "grid_mobs"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
+  add_foreign_key "hackr_log_reads", "grid_hackrs"
+  add_foreign_key "hackr_log_reads", "hackr_logs"
   add_foreign_key "hackr_logs", "grid_hackrs"
+  add_foreign_key "hackr_page_views", "grid_hackrs"
+  add_foreign_key "hackr_radio_tunes", "grid_hackrs"
+  add_foreign_key "hackr_radio_tunes", "radio_stations"
   add_foreign_key "hackr_streams", "artists"
+  add_foreign_key "hackr_vod_watches", "grid_hackrs"
+  add_foreign_key "hackr_vod_watches", "hackr_streams"
   add_foreign_key "handbook_articles", "handbook_sections"
   add_foreign_key "moderation_logs", "chat_messages"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "actor_id"

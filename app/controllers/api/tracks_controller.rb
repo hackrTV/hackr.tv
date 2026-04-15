@@ -113,5 +113,28 @@ module Api
         vidz: @track.hackr_streams.map { |v| {id: v.id, title: v.title, vod_url: v.vod_url} }
       }
     end
+
+    # POST /api/tracks/:id/play_credit
+    # Records a 30s+ play toward achievement progress. No-op for anon.
+    # Only Pulse Vault tracks count — coming_soon tracks and tracks
+    # hidden from the vault are rejected to keep counter-based
+    # achievements (`track_plays_count`, `pulse_vault_completed`)
+    # honest.
+    def play_credit
+      return head :no_content unless current_hackr
+
+      track = Track.find_by(slug: params[:id]) || Track.find_by(id: params[:id])
+      return head :not_found unless track
+      return head :unprocessable_entity if track.release&.coming_soon
+      return head :unprocessable_entity unless track.show_in_pulse_vault
+
+      GridHackrTrackPlay.record!(current_hackr, track)
+
+      checker = Grid::AchievementChecker.new(current_hackr)
+      checker.check("track_plays_count")
+      checker.check("pulse_vault_completed")
+
+      head :no_content
+    end
   end
 end

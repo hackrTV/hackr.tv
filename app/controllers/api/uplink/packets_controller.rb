@@ -76,6 +76,14 @@ module Api
         )
 
         if @packet.save
+          # "Packet" is the in-world user-facing term for an Uplink
+          # message — aesthetic naming to preserve the Grid's fourth
+          # wall. Underlying model is `ChatMessage` (see @packet
+          # assignment above: `@channel.chat_messages.build(...)`).
+          # The `uplink_packets_count` achievement trigger counts
+          # `chat_messages` rows — same table, same rows, cosmetic
+          # alias only.
+          Grid::AchievementChecker.new(current_hackr).check("uplink_packets_count")
           render json: {
             success: true,
             message: "Packet transmitted",
