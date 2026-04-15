@@ -24,6 +24,7 @@ class RadioStation < ApplicationRecord
   # Associations
   has_many :radio_station_playlists, -> { order(position: :asc) }, dependent: :destroy
   has_many :playlists, through: :radio_station_playlists
+  has_many :hackr_radio_tunes, dependent: :destroy
 
   # Validations
   validates :name, presence: true

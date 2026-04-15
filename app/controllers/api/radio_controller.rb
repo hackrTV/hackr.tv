@@ -78,5 +78,20 @@ module Api
     rescue ActiveRecord::RecordNotFound
       render json: {error: "Radio station not found"}, status: :not_found
     end
+
+    # POST /api/radio_stations/:id/tune_in
+    def tune_in
+      return head :no_content unless current_hackr
+
+      station = RadioStation.visible.find_by(id: params[:id])
+      return head :not_found unless station
+
+      HackrRadioTune.record!(current_hackr, station)
+      checker = Grid::AchievementChecker.new(current_hackr)
+      checker.check("radio_stations_tuned")
+      checker.check("radio_stations_tuned_all")
+
+      head :no_content
+    end
   end
 end

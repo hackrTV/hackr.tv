@@ -2,12 +2,15 @@ class Admin::GridAchievementsController < Admin::ApplicationController
   before_action :set_achievement, only: [:edit, :update, :destroy, :award]
 
   def index
-    @achievements = GridAchievement.includes(:grid_hackr_achievements).order(:trigger_type, :name)
+    scope = GridAchievement.includes(:grid_hackr_achievements)
+    scope = scope.by_category(params[:category]) if params[:category].present? && GridAchievement::CATEGORIES.include?(params[:category])
+    @category_filter = params[:category]
+    @achievements = scope.order(:category, :trigger_type, :name)
     @hackrs = GridHackr.order(:hackr_alias)
   end
 
   def new
-    @achievement = GridAchievement.new(trigger_data: {}, xp_reward: 0)
+    @achievement = GridAchievement.new(trigger_data: {}, xp_reward: 0, cred_reward: 0, category: "grid")
   end
 
   def create
@@ -43,13 +46,9 @@ class Admin::GridAchievementsController < Admin::ApplicationController
 
   def award
     hackr = GridHackr.find(params[:hackr_id])
-    gha = GridHackrAchievement.find_or_create_by!(
-      grid_hackr: hackr,
-      grid_achievement: @achievement
-    ) { |r| r.awarded_at = Time.current }
+    notification = Grid::AchievementAwarder.new(hackr, @achievement).award!
 
-    if gha.previously_new_record?
-      hackr.grant_xp!(@achievement.xp_reward) if @achievement.xp_reward > 0
+    if notification
       set_flash_success("Awarded '#{@achievement.name}' to #{hackr.hackr_alias}.")
     else
       set_flash_error("#{hackr.hackr_alias} already has '#{@achievement.name}'.")
@@ -66,7 +65,7 @@ class Admin::GridAchievementsController < Admin::ApplicationController
   def achievement_params
     permitted = params.require(:grid_achievement).permit(
       :slug, :name, :description, :badge_icon,
-      :trigger_type, :xp_reward, :hidden
+      :trigger_type, :xp_reward, :cred_reward, :category, :hidden
     )
     # Parse trigger_data from JSON string
     permitted[:trigger_data] = if params[:grid_achievement][:trigger_data_json].present?

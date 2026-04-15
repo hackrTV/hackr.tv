@@ -73,6 +73,19 @@ class Api::HackrStreamsController < ApplicationController
     }
   end
 
+  # POST /api/artists/:artist_slug/vods/:id/watch
+  def watch
+    return head :no_content unless current_hackr
+
+    artist = Artist.find_by!(slug: params[:artist_slug])
+    stream = artist.hackr_streams.find(params[:id])
+
+    HackrVodWatch.record!(current_hackr, stream)
+    Grid::AchievementChecker.new(current_hackr).check("vods_watched")
+
+    head :no_content
+  end
+
   private
 
   def record_not_found

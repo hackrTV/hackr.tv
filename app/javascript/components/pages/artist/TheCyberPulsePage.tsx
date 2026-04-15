@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import { useHackrScopedDedupFlag } from '~/hooks/useHackrScopedDedup'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
 import { CodexText } from '~/components/shared/CodexText'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
@@ -34,6 +36,16 @@ const extractVideoId = (url: string): string | null => {
 const TheCyberPulsePage: React.FC = () => {
   const [latestVod, setLatestVod] = useState<Vod | null>(null)
   const { isMobile } = useMobileDetect()
+  const { hackr } = useGridAuth()
+  const bioCreditedRef = useHackrScopedDedupFlag(hackr?.id)
+
+  useEffect(() => {
+    if (hackr && !bioCreditedRef.current) {
+      bioCreditedRef.current = true
+      apiFetch('/api/artists/thecyberpulse/bio_viewed', { method: 'POST' })
+        .catch(() => { /* fire-and-forget */ })
+    }
+  }, [hackr, bioCreditedRef])
 
   useEffect(() => {
     const fetchLatestVod = async () => {

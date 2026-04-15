@@ -1,17 +1,29 @@
 import React, { useEffect, useState } from 'react'
+import { useHackrScopedDedupFlag } from '~/hooks/useHackrScopedDedup'
 import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { EmbeddedTrack } from '~/components/EmbeddedTrack'
 import { CodexText } from '~/components/shared/CodexText'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
 
 const currentYear = new Date().getFullYear()
 const futureYear = currentYear + 100
 
 const XeraenPage: React.FC = () => {
   const { isMobile } = useMobileDetect()
+  const { hackr } = useGridAuth()
   const [latestFeaturedSlug, setLatestFeaturedSlug] = useState<string | null>(null)
+  const bioCreditedRef = useHackrScopedDedupFlag(hackr?.id)
+
+  useEffect(() => {
+    if (hackr && !bioCreditedRef.current) {
+      bioCreditedRef.current = true
+      apiFetch('/api/artists/xeraen/bio_viewed', { method: 'POST' })
+        .catch(() => { /* fire-and-forget */ })
+    }
+  }, [hackr, bioCreditedRef])
 
   useEffect(() => {
     apiJson<{

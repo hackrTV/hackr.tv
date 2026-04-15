@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: grid_reputation_events
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  delta         :integer          not null
+#  note          :text
+#  reason        :string
+#  source_type   :string
+#  subject_type  :string           not null
+#  value_after   :integer          not null
+#  created_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#  source_id     :bigint
+#  subject_id    :bigint           not null
+#
+# Indexes
+#
+#  index_grid_reputation_events_on_grid_hackr_id  (grid_hackr_id)
+#  index_rep_events_on_hackr_and_time             (grid_hackr_id,created_at DESC)
+#  index_rep_events_on_source                     (source_type,source_id)
+#  index_rep_events_on_subject_and_time           (subject_type,subject_id,created_at DESC)
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 require "rails_helper"
 
 RSpec.describe GridReputationEvent, type: :model do

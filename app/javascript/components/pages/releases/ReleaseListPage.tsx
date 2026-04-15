@@ -3,7 +3,9 @@ import { useLocation, Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { getArtistColors } from '~/utils/artistColors'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useHackrScopedDedupSet } from '~/hooks/useHackrScopedDedup'
 
 interface Release {
   id: number
@@ -30,6 +32,7 @@ interface Release {
 
 const ReleaseListPage: React.FC = () => {
   const location = useLocation()
+  const { hackr } = useGridAuth()
   const [releases, setReleases] = useState<Release[]>([])
   const [comingSoon, setComingSoon] = useState<Release[]>([])
   const [loading, setLoading] = useState(true)
@@ -96,6 +99,19 @@ const ReleaseListPage: React.FC = () => {
         setLoading(false)
       })
   }, [artistSlug])
+
+  // Credit the release-index view once both artistSlug and auth have
+  // resolved. Handles the case where auth lands after the releases
+  // API call completes. Dedup scoped to hackr.id so logout/login
+  // swap resets cleanly.
+  const creditedSlugsRef = useHackrScopedDedupSet<string>(hackr?.id)
+  useEffect(() => {
+    if (!hackr || !artistSlug) return
+    if (creditedSlugsRef.current.has(artistSlug)) return
+    creditedSlugsRef.current.add(artistSlug)
+    apiFetch(`/api/artists/${encodeURIComponent(artistSlug)}/release_index_viewed`, { method: 'POST' })
+      .catch(() => { /* fire-and-forget */ })
+  }, [hackr, artistSlug, creditedSlugsRef])
 
   if (loading) {
     return (

@@ -57,5 +57,31 @@ module Api
         }
       }
     end
+
+    # POST /api/artists/:id/bio_viewed
+    def bio_viewed
+      return head :no_content unless current_hackr
+
+      artist = Artist.find_by(slug: params[:id]) || Artist.find_by(id: params[:id])
+      return head :not_found unless artist
+
+      HackrPageView.record!(current_hackr, "bio", artist.id)
+      Grid::AchievementChecker.new(current_hackr).check("artist_bios_viewed_all")
+
+      head :no_content
+    end
+
+    # POST /api/artists/:id/release_index_viewed
+    def release_index_viewed
+      return head :no_content unless current_hackr
+
+      artist = Artist.find_by(slug: params[:id]) || Artist.find_by(id: params[:id])
+      return head :not_found unless artist
+
+      HackrPageView.record!(current_hackr, "release_index", artist.id)
+      Grid::AchievementChecker.new(current_hackr).check("release_indexes_viewed_all")
+
+      head :no_content
+    end
   end
 end

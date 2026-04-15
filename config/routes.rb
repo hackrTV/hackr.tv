@@ -84,6 +84,9 @@ Rails.application.routes.draw do
   # Timeline route - SPA
   get "timeline", to: "pages#spa_root", as: :timeline
 
+  # Achievements (login-gated SPA)
+  get "achievements", to: "pages#spa_root", as: :achievements
+
   # Codex (wiki) routes - SPA
   scope "codex" do
     get "/", to: "pages#spa_root", as: :codex
@@ -116,15 +119,27 @@ Rails.application.routes.draw do
 
     resources :artists, only: %i[index show] do
       resources :tracks, only: [:index]
+      member do
+        post :bio_viewed
+        post :release_index_viewed
+      end
     end
-    resources :tracks, only: %i[index show]
+    resources :tracks, only: %i[index show] do
+      member do
+        post :play_credit
+      end
+    end
     resources :releases, only: %i[index show] do
       get :latest, on: :collection
       get :coming_soon, on: :collection
+      member do
+        post :viewed
+      end
     end
     get "codex/mappings", to: "codex#mappings"
     get "codex", to: "codex#index"
     get "codex/:slug", to: "codex#show"
+    post "codex/:slug/read", to: "codex#mark_read"
 
     get "handbook/mappings", to: "handbook#mappings"
     get "handbook/recent", to: "handbook#recent"
@@ -132,12 +147,15 @@ Rails.application.routes.draw do
     get "handbook/:slug", to: "handbook#show"
     get "radio_stations", to: "radio#index"
     get "radio_stations/:id/playlists", to: "radio#station_playlists"
+    post "radio_stations/:id/tune_in", to: "radio#tune_in"
     get "hackr_stream", to: "hackr_streams#show"
     get "artists/:artist_slug/vods", to: "hackr_streams#index"
     get "artists/:artist_slug/vods/:id", to: "hackr_streams#vod_show"
+    post "artists/:artist_slug/vods/:id/watch", to: "hackr_streams#watch"
 
     # Grid API routes
     get "grid/current_hackr", to: "grid#current_hackr_info"
+    get "grid/achievements", to: "grid#achievements_index"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"
     get "grid/verify/:token", to: "grid#verify_token"
@@ -159,6 +177,7 @@ Rails.application.routes.draw do
 
     # Hackr Logs API routes
     resources :logs, only: %i[index show]
+    post "logs/:id/read", to: "logs#mark_read"
 
     # Playlists API routes
     resources :playlists do

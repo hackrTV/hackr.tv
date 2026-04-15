@@ -50,6 +50,8 @@ class Release < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: {scope: :artist_id}
 
+  scope :released, -> { where(coming_soon: false) }
+
   def to_param
     slug
   end

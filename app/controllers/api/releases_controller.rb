@@ -134,6 +134,20 @@ module Api
       }
     end
 
+    # POST /api/releases/:id/viewed
+    def viewed
+      return head :no_content unless current_hackr
+
+      release = Release.find_by(slug: params[:id]) || Release.find_by(id: params[:id])
+      return head :not_found unless release
+      return head :unprocessable_entity if release.coming_soon
+
+      HackrPageView.record!(current_hackr, "release", release.id)
+      Grid::AchievementChecker.new(current_hackr).check("releases_viewed_all")
+
+      head :no_content
+    end
+
     private
 
     def parse_duration(duration_str)

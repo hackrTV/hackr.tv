@@ -5,7 +5,9 @@ import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { TrackData } from '~/types/track'
 import { CodexText } from '~/components/shared/CodexText'
 import { useStreamStatus } from '~/hooks/useStreamStatus'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useHackrScopedDedupSet } from '~/hooks/useHackrScopedDedup'
 
 interface Playlist {
   id: number
@@ -45,6 +47,7 @@ interface StationPlaylist {
 }
 
 export const RadioPage: React.FC = () => {
+  const { hackr } = useGridAuth()
   const [stations, setStations] = useState<RadioStation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -54,7 +57,50 @@ export const RadioPage: React.FC = () => {
   const [volume, setVolume] = useState(70)
   const [playingStationId, setPlayingStationId] = useState<number | null>(null)
   const [audioPlayerIsPlaying, setAudioPlayerIsPlaying] = useState(false)
+  // Dedup is scoped to hackr.id — auto-resets on logout/login swap so
+  // a second user isn't silenced by the prior user's credits.
+  const tunedStationIdsRef = useHackrScopedDedupSet<number>(hackr?.id)
   const { isLive, streamInfo } = useStreamStatus()
+
+  // --- Dual-playback architecture ---------------------------------
+  // Radio stations come in two flavors, each with its own audio
+  // backend — a given station uses exactly one:
+  //
+  //   1. Playlist-backed (station.playlists.length > 0) — plays
+  //      through the SHARED global `window.audioPlayer` (same
+  //      instance that drives the Pulse Vault). Tune credit fires
+  //      from the useEffect below, which watches the player's
+  //      `playingStationId` + `isPlaying` state (polled every 500ms).
+  //
+  //   2. Raw stream URL (station.stream_url set, no playlists) —
+  //      plays through a LOCAL `<audio ref={audioRef}>` element
+  //      inside this component. Tune credit fires from the direct
+  //      `play().then()` signal inside `tuneIn()` further down.
+  //
+  // The two paths are dispatched by the render (see the station
+  // card JSX: `station.playlists?.length ? <playlist> : <stream>`).
+  // `tunedStationIdsRef` guards against a user stopping + re-tuning
+  // the SAME station, not against a cross-path double-fire — a
+  // single station only ever uses one path.
+  //
+  // Fire tune_in POST once per station per hackr when playback starts.
+  const creditTuneIn = React.useCallback((stationId: number) => {
+    if (!hackr || tunedStationIdsRef.current.has(stationId)) return
+    tunedStationIdsRef.current.add(stationId)
+    apiFetch(`/api/radio_stations/${stationId}/tune_in`, { method: 'POST' })
+      .catch(() => { /* fire-and-forget */ })
+  }, [hackr, tunedStationIdsRef])
+
+  // Path 1 — playlist-backed stations. Credit only when audio is
+  // actually playing. `playingStationId` alone proves nothing more
+  // than `setPlaylist` was called, which can race ahead of playback
+  // failure (bad audio URL, autoplay blocked, etc.). Requiring the
+  // `audioPlayerIsPlaying` signal filters those out.
+  useEffect(() => {
+    if (playingStationId != null && audioPlayerIsPlaying) {
+      creditTuneIn(playingStationId)
+    }
+  }, [playingStationId, audioPlayerIsPlaying, creditTuneIn])
 
   useEffect(() => {
     apiJson<RadioStation[]>('/api/radio_stations')
@@ -185,17 +231,24 @@ export const RadioPage: React.FC = () => {
     }
   }
 
-  const tuneIn = (streamUrl: string, stationName: string, genre: string) => {
+  // Path 2 — raw-stream stations (see dual-playback block above).
+  // Uses the local `audioRef` element; credits inside `.then()` so
+  // autoplay rejections / bad stream URLs do NOT advance the counter.
+  const tuneIn = (streamUrl: string, stationName: string, genre: string, stationId?: number) => {
     if (!audioRef.current) return
 
     audioRef.current.src = streamUrl
     setCurrentStation({ name: stationName, genre })
     setIsPlaying(true)
 
-    audioRef.current.play().catch((error) => {
-      console.error('Error playing stream:', error)
-      alert('Error: Unable to connect to radio stream. Please check the stream URL.')
-    })
+    audioRef.current.play()
+      .then(() => {
+        if (stationId != null) creditTuneIn(stationId)
+      })
+      .catch((error) => {
+        console.error('Error playing stream:', error)
+        alert('Error: Unable to connect to radio stream. Please check the stream URL.')
+      })
   }
 
   const stopRadio = () => {
@@ -327,7 +380,7 @@ export const RadioPage: React.FC = () => {
                             ) : station.stream_url ? (
                               <button
                                 className="tui-button tune-in-btn"
-                                onClick={() => tuneIn(station.stream_url, station.name, station.genre)}
+                                onClick={() => tuneIn(station.stream_url, station.name, station.genre, station.id)}
                                 style={{ width: '100%', background: '#14b8a6', color: 'white' }}
                               >
                                 ► TUNE IN
@@ -387,7 +440,7 @@ export const RadioPage: React.FC = () => {
                           ) : station.stream_url ? (
                             <button
                               className="tui-button tune-in-btn"
-                              onClick={() => tuneIn(station.stream_url, station.name, station.genre)}
+                              onClick={() => tuneIn(station.stream_url, station.name, station.genre, station.id)}
                               style={{ width: '100%', background: '#222', color: 'white' }}
                             >
                               ► TUNE IN

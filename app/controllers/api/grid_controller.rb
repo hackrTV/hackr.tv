@@ -1,9 +1,58 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action :require_admin_api, only: [:debit]
+
+  # GET /api/grid/achievements - All visible achievements grouped by
+  # category, with earned status, awarded_at, and live progress for
+  # cumulative triggers. Hidden achievements appear only if earned.
+  def achievements_index
+    earned_map = current_hackr.grid_hackr_achievements
+      .pluck(:grid_achievement_id, :awarded_at)
+      .to_h
+
+    checker = Grid::AchievementChecker.new(current_hackr)
+    achievements = GridAchievement.order(:category, :name).to_a
+
+    categories = Hash.new { |h, k| h[k] = [] }
+    summary = Hash.new { |h, k| h[k] = {total: 0, earned: 0} }
+
+    achievements.each do |a|
+      earned = earned_map.key?(a.id)
+
+      # Hidden achievements hide from the list until earned.
+      next if a.hidden && !earned
+
+      summary[a.category][:total] += 1
+      summary[a.category][:earned] += 1 if earned
+
+      categories[a.category] << {
+        slug: a.slug,
+        name: a.name,
+        description: a.description,
+        badge_icon: a.badge_icon,
+        category: a.category,
+        trigger_type: a.trigger_type,
+        xp_reward: a.xp_reward,
+        cred_reward: a.cred_reward,
+        earned: earned,
+        awarded_at: earned_map[a.id]&.iso8601,
+        progress: checker.progress(a)
+      }
+    end
+
+    total_summary = {
+      total: summary.values.sum { |s| s[:total] },
+      earned: summary.values.sum { |s| s[:earned] }
+    }
+
+    render json: {
+      categories: categories,
+      summary: {by_category: summary, total: total_summary}
+    }
+  end
 
   # GET /api/grid/current_hackr - Get current logged-in hackr info
   def current_hackr_info
@@ -36,6 +85,7 @@ class Api::GridController < ApplicationController
 
       log_in(hackr)
       hackr.touch_activity!
+      Grid::AchievementSweepJob.perform_later(hackr.id)
       Rails.logger.info("[AUTH] Login success: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
       render json: {
         success: true,

@@ -285,6 +285,9 @@ export const HeaderMenu: React.FC = () => {
                     <Link to="/grid/identity" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>identity
                     </Link>
+                    <Link to="/achievements" className={`mobile-menu-item${isActive('/achievements') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                      <span className="purple-168-text">/</span>achievements
+                    </Link>
                     <Link to="/fm/playlists" className={`mobile-menu-item${isActive('/fm') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>playlists
                     </Link>
@@ -550,7 +553,7 @@ export const HeaderMenu: React.FC = () => {
           </li>
 
           {/* THE PULSE GRID */}
-          <li className={`header-dropdown${isActive('/grid') || isActive('/code') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
+          <li className={`header-dropdown${isActive('/grid') || isActive('/code') || isActive('/achievements') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
             <span className="purple-168-text">{isLoggedIn ? '11' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'grid' ? 'open' : ''}`}>
               <ul>
@@ -578,6 +581,11 @@ export const HeaderMenu: React.FC = () => {
                     <li>
                       <Link to="/grid/identity" onClick={closeDropdown}>
                         <span className="purple-168-text">/</span>identity
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/achievements" onClick={closeDropdown}>
+                        <span className="purple-168-text">/</span>achievements
                       </Link>
                     </li>
                     <li>

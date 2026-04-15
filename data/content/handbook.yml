@@ -164,6 +164,86 @@ handbook_sections:
           feel the same at CL3 as it does at CL30.
 
           Check your current CL any time with `stat`.
+      - slug: achievements
+        title: Achievements & Badges
+        kind: reference
+        difficulty: beginner
+        position: 2
+        published: true
+        summary: "Unlockable badges across the Grid, Vault, WIRE, Uplink, and more — with XP and CRED rewards."
+        metadata:
+          search_tags:
+            - achievements
+            - badges
+            - progression
+            - unlocks
+            - rewards
+        body: |
+          # Achievements & Badges
+
+          Achievements unlock permanently when you hit a milestone. Each
+          achievement awards **XP** toward your clearance level, and most
+          also drop **CRED** directly into your default cache.
+
+          ## Categories
+
+          Achievements are grouped into five categories:
+
+          - **GRID** — MUD exploration, items, NPC interaction, salvage.
+          - **MUSIC** — Pulse Vault listening, VODs, radio, artist pages.
+          - **SOCIAL** — WIRE pulses, Uplink packets, custom playlists.
+          - **META** — Hackr Logs and Codex reading.
+          - **PROGRESSION** — Clearance level milestones.
+
+          ## How you unlock them
+
+          Most achievements track automatically as you use the site:
+
+          - Move between rooms and `talk` / `take` / `use` / `salvage` in-Grid.
+          - Play tracks in the Vault (credit kicks in after ~30 seconds of playback).
+          - Read Hackr Logs and Codex entries.
+          - Visit band bios, release indexes, and individual releases.
+          - Watch VODs. Tune into radio stations.
+          - Post pulses on the WIRE. Send Uplink packets. Create playlists.
+
+          A handful of achievements are **hidden** — you'll only find out
+          what they are by earning them.
+
+          ## Rewards
+
+          The standard ladder for tiered counter-based achievements:
+
+          | Tier        | XP      | CRED   |
+          |-------------|--------:|-------:|
+          | Tier 1      |  25     |   1    |
+          | Tier 2      | 100     |  10    |
+          | Tier 3      | 250     |  20    |
+          | Completionist | 500   |  50    |
+          | Single-event |  10    |   0    |
+
+          Clearance-level achievements grant CRED only — the XP that got you
+          to that level is its own reward.
+
+          CRED payouts are minted from the Fracture Reserve and land in your
+          default cache automatically. Check `stat` or the `cache` command to
+          confirm the balance.
+
+          ## Where to see your progress
+
+          - `stat` in the Terminal lists every achievement you've earned, with
+            its badge icon, name, and XP value.
+          - When an achievement unlocks, a toast appears in the corner of the
+            screen anywhere on hackr.tv — even outside the Terminal.
+          - The Terminal shows the full `ACHIEVEMENT UNLOCKED` banner inline
+            when the trigger happens during a command.
+
+          ## Catch-up on login
+
+          When you log in, the system runs a quick sweep to award any
+          cumulative achievements you qualified for while away (e.g. you
+          hit 50 tracks played across multiple sessions but never triggered
+          a Terminal command to check). Expect a small burst of toasts on a
+          long-absence login.
 
   - slug: wire
     name: WIRE

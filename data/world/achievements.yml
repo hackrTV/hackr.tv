@@ -1,126 +1,160 @@
 # Grid Achievement Definitions
 # Loaded via: rails data:achievements
+#
+# Reward ladders (expansion): Tier-1 (+25 XP, +1 CRED), Tier-2 (+100 XP, +10 CRED),
+# Tier-3 (+250 XP, +20 CRED), Completionist (+500 XP, +50 CRED), Single-event (+10 XP, 0 CRED).
+# Existing MUD achievements retain their original XP values (no CRED) for backward compat.
 achievements:
+
+  # ============================================================
+  # GRID CATEGORY (MUD — existing)
+  # ============================================================
 
   # --- Exploration ---
   - slug: first_steps
     name: "First Steps"
     description: "Moved through the Grid for the first time."
     badge_icon: ">>"
+    category: grid
     trigger_type: rooms_visited
     trigger_data:
       count: 1
     xp_reward: 10
+    cred_reward: 0
 
   - slug: grid_walker
     name: "Grid Walker"
     description: "Explored 10 rooms across the Grid."
     badge_icon: ">>"
+    category: grid
     trigger_type: rooms_visited
     trigger_data:
       count: 10
     xp_reward: 50
+    cred_reward: 0
 
   - slug: grid_runner
     name: "Grid Runner"
     description: "Explored 25 rooms across the Grid."
     badge_icon: ">>>"
+    category: grid
     trigger_type: rooms_visited
     trigger_data:
       count: 25
     xp_reward: 150
+    cred_reward: 0
 
   - slug: grid_phantom
     name: "Grid Phantom"
     description: "Explored 50 rooms. You know every shadow."
     badge_icon: ">>>"
+    category: grid
     trigger_type: rooms_visited
     trigger_data:
       count: 50
     xp_reward: 500
+    cred_reward: 0
 
   # --- NPC Interaction ---
   - slug: first_contact
     name: "First Contact"
     description: "Established contact with a Grid operative."
     badge_icon: "~"
+    category: grid
     trigger_type: talk_npc
     trigger_data: {}
     xp_reward: 15
+    cred_reward: 0
 
   - slug: synthia_signal
     name: "Synthia Signal"
     description: "Made contact with Synthia."
     badge_icon: "S"
+    category: grid
     trigger_type: talk_npc
     trigger_data:
       npc_name: Synthia
     xp_reward: 100
+    cred_reward: 0
 
   # --- Collection ---
   - slug: data_acquired
     name: "Data Acquired"
     description: "Picked up your first item."
     badge_icon: "+"
+    category: grid
     trigger_type: items_collected
     trigger_data:
       count: 1
     xp_reward: 10
+    cred_reward: 0
 
   - slug: data_hoarder
     name: "Data Hoarder"
     description: "Collected 5 items."
     badge_icon: "++"
+    category: grid
     trigger_type: items_collected
     trigger_data:
       count: 5
     xp_reward: 50
+    cred_reward: 0
 
   - slug: pack_rat
     name: "Pack Rat"
     description: "Collected 15 items. Your inventory is full of secrets."
     badge_icon: "+++"
+    category: grid
     trigger_type: items_collected
     trigger_data:
       count: 15
     xp_reward: 200
+    cred_reward: 0
 
   - slug: fracture_contact
     name: "Fracture Contact"
     description: "Recovered Fracture Network encrypted data."
     badge_icon: "F"
+    category: grid
     trigger_type: take_item
     trigger_data:
       item_name: fracture network data chip
     xp_reward: 100
+    cred_reward: 0
 
   # --- Rarity ---
   - slug: rare_find
     name: "Rare Find"
     description: "Obtained a Rare-tier item."
     badge_icon: "R"
+    category: grid
     trigger_type: rarity_owned
     trigger_data:
       rarity: rare
     xp_reward: 100
+    cred_reward: 0
 
   - slug: ultra_rare_find
     name: "Ultra-Rare Find"
     description: "Obtained an Ultra-Rare item."
     badge_icon: "U"
+    category: grid
     trigger_type: rarity_owned
     trigger_data:
       rarity: ultra_rare
     xp_reward: 300
+    cred_reward: 0
 
   - slug: unicorn_hunter
     name: "Unicorn Hunter"
     description: "You found something that shouldn't exist."
     badge_icon: "*"
+    category: grid
     trigger_type: rarity_owned
     trigger_data:
       rarity: unicorn
     xp_reward: 500
+    cred_reward: 0
     hidden: true
 
   # --- Salvage ---
@@ -128,24 +162,533 @@ achievements:
     name: "Scrapper"
     description: "Salvaged your first item."
     badge_icon: "%"
+    category: grid
     trigger_type: salvage_item
     trigger_data: {}
     xp_reward: 15
+    cred_reward: 0
 
   - slug: junk_dealer
     name: "Junk Dealer"
     description: "Salvaged 5 items."
     badge_icon: "%%"
+    category: grid
     trigger_type: salvage_count
     trigger_data:
       count: 5
     xp_reward: 50
+    cred_reward: 0
 
   - slug: chop_shop
     name: "Chop Shop"
     description: "Salvaged 20 items. Nothing is safe around you."
     badge_icon: "%%%"
+    category: grid
     trigger_type: salvage_count
     trigger_data:
       count: 20
     xp_reward: 200
+    cred_reward: 0
+
+  # ============================================================
+  # MUSIC CATEGORY (Pulse Vault + Radio + VODs + Livestream + Bands)
+  # ============================================================
+
+  # --- Pulse Vault track plays (30s+ counted) ---
+  - slug: first_signal
+    name: "Signal Acquired"
+    description: "Played your first track for 30+ seconds."
+    badge_icon: ">>"
+    category: music
+    trigger_type: track_plays_count
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: vault_listener_10
+    name: "Data Streamer"
+    description: "Played 10 unique tracks from the Pulse Vault."
+    badge_icon: "%"
+    category: music
+    trigger_type: track_plays_count
+    trigger_data:
+      count: 10
+    xp_reward: 25
+    cred_reward: 1
+
+  - slug: vault_listener_25
+    name: "Frequency Hunter"
+    description: "Played 25 unique tracks from the Pulse Vault."
+    badge_icon: "%%"
+    category: music
+    trigger_type: track_plays_count
+    trigger_data:
+      count: 25
+    xp_reward: 100
+    cred_reward: 10
+
+  - slug: vault_listener_50
+    name: "Archive Diver"
+    description: "Played 50 unique tracks from the Pulse Vault."
+    badge_icon: "%%%"
+    category: music
+    trigger_type: track_plays_count
+    trigger_data:
+      count: 50
+    xp_reward: 250
+    cred_reward: 20
+
+  - slug: vault_complete
+    name: "The Completionist"
+    description: "Listened to every track in the Pulse Vault."
+    badge_icon: "[*]"
+    category: music
+    trigger_type: pulse_vault_completed
+    trigger_data: {}
+    xp_reward: 500
+    cred_reward: 50
+
+  # --- Radio ---
+  - slug: channel_found
+    name: "Channel Found"
+    description: "Tuned into a hackr.fm radio station."
+    badge_icon: "~"
+    category: music
+    trigger_type: radio_stations_tuned
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: radio_all
+    name: "Full Spectrum"
+    description: "Tuned into every radio station."
+    badge_icon: "~~~"
+    category: music
+    trigger_type: radio_stations_tuned_all
+    trigger_data: {}
+    xp_reward: 500
+    cred_reward: 50
+
+  # --- Band discovery (bio + release index + release pages) ---
+  - slug: bio_all
+    name: "Band Intel"
+    description: "Viewed every band's bio page."
+    badge_icon: "ID"
+    category: music
+    trigger_type: artist_bios_viewed_all
+    trigger_data: {}
+    xp_reward: 500
+    cred_reward: 50
+
+  - slug: release_index_all
+    name: "Catalog Sweep"
+    description: "Browsed every band's release index."
+    badge_icon: "RX"
+    category: music
+    trigger_type: release_indexes_viewed_all
+    trigger_data: {}
+    xp_reward: 500
+    cred_reward: 50
+
+  - slug: release_all
+    name: "Full Discography"
+    description: "Viewed every published release across every band."
+    badge_icon: "DX"
+    category: music
+    trigger_type: releases_viewed_all
+    trigger_data: {}
+    xp_reward: 500
+    cred_reward: 50
+
+  # --- VODs ---
+  - slug: vod_1
+    name: "Screen Tap"
+    description: "Watched your first VOD."
+    badge_icon: "VD"
+    category: music
+    trigger_type: vods_watched
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: vod_5
+    name: "Replay Buffer"
+    description: "Watched 5 VODs."
+    badge_icon: "VD5"
+    category: music
+    trigger_type: vods_watched
+    trigger_data:
+      count: 5
+    xp_reward: 25
+    cred_reward: 1
+
+  - slug: vod_10
+    name: "Live Archive"
+    description: "Watched 10 VODs."
+    badge_icon: "VDA"
+    category: music
+    trigger_type: vods_watched
+    trigger_data:
+      count: 10
+    xp_reward: 100
+    cred_reward: 10
+
+  - slug: vod_15
+    name: "Broadcast Hound"
+    description: "Watched 15 VODs."
+    badge_icon: "VDB"
+    category: music
+    trigger_type: vods_watched
+    trigger_data:
+      count: 15
+    xp_reward: 250
+    cred_reward: 20
+
+  - slug: vod_20
+    name: "Signal Archivist"
+    description: "Watched 20 VODs."
+    badge_icon: "VDX"
+    category: music
+    trigger_type: vods_watched
+    trigger_data:
+      count: 20
+    xp_reward: 500
+    cred_reward: 50
+
+  # ============================================================
+  # SOCIAL CATEGORY (WIRE + Uplink + Playlists)
+  # ============================================================
+
+  # --- WIRE pulses ---
+  - slug: first_pulse
+    name: "Signal Sent"
+    description: "Posted your first pulse to the WIRE."
+    badge_icon: "W"
+    category: social
+    trigger_type: wire_pulses_count
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: wire_10
+    name: "WIRE Veteran"
+    description: "Posted 10 pulses to the WIRE."
+    badge_icon: "WW"
+    category: social
+    trigger_type: wire_pulses_count
+    trigger_data:
+      count: 10
+    xp_reward: 25
+    cred_reward: 1
+
+  - slug: wire_50
+    name: "Broadcaster"
+    description: "Posted 50 pulses to the WIRE."
+    badge_icon: "WB"
+    category: social
+    trigger_type: wire_pulses_count
+    trigger_data:
+      count: 50
+    xp_reward: 100
+    cred_reward: 10
+
+  - slug: wire_100
+    name: "Signal Flooder"
+    description: "Posted 100 pulses to the WIRE."
+    badge_icon: "WF"
+    category: social
+    trigger_type: wire_pulses_count
+    trigger_data:
+      count: 100
+    xp_reward: 250
+    cred_reward: 20
+
+  - slug: wire_500
+    name: "Transmission Legend"
+    description: "Posted 500 pulses to the WIRE."
+    badge_icon: "W*"
+    category: social
+    trigger_type: wire_pulses_count
+    trigger_data:
+      count: 500
+    xp_reward: 500
+    cred_reward: 50
+
+  # --- Uplink packets ---
+  - slug: first_packet
+    name: "Uplink Active"
+    description: "Sent your first Uplink packet."
+    badge_icon: "UP"
+    category: social
+    trigger_type: uplink_packets_count
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: uplink_50
+    name: "Chat Regular"
+    description: "Sent 50 Uplink packets."
+    badge_icon: "UP5"
+    category: social
+    trigger_type: uplink_packets_count
+    trigger_data:
+      count: 50
+    xp_reward: 25
+    cred_reward: 1
+
+  - slug: uplink_100
+    name: "Comms Operator"
+    description: "Sent 100 Uplink packets."
+    badge_icon: "UPA"
+    category: social
+    trigger_type: uplink_packets_count
+    trigger_data:
+      count: 100
+    xp_reward: 100
+    cred_reward: 10
+
+  - slug: uplink_500
+    name: "Protocol Master"
+    description: "Sent 500 Uplink packets."
+    badge_icon: "UPM"
+    category: social
+    trigger_type: uplink_packets_count
+    trigger_data:
+      count: 500
+    xp_reward: 250
+    cred_reward: 20
+
+  - slug: uplink_5000
+    name: "Signal Saturator"
+    description: "Sent 5,000 Uplink packets."
+    badge_icon: "UPS"
+    category: social
+    trigger_type: uplink_packets_count
+    trigger_data:
+      count: 5000
+    xp_reward: 500
+    cred_reward: 50
+
+  - slug: uplink_50000
+    name: "Flood Protocol"
+    description: "Sent 50,000 Uplink packets."
+    badge_icon: "UPF"
+    category: social
+    trigger_type: uplink_packets_count
+    trigger_data:
+      count: 50000
+    xp_reward: 500
+    cred_reward: 50
+
+  # --- Custom playlists (only playlists with ≥1 track count) ---
+  - slug: first_playlist
+    name: "Curator Online"
+    description: "Created your first playlist with a track in it."
+    badge_icon: "PL"
+    category: social
+    trigger_type: playlists_created
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: playlists_5
+    name: "Mix Architect"
+    description: "Created 5 playlists."
+    badge_icon: "PL5"
+    category: social
+    trigger_type: playlists_created
+    trigger_data:
+      count: 5
+    xp_reward: 25
+    cred_reward: 1
+
+  - slug: playlists_10
+    name: "DJ Protocol"
+    description: "Created 10 playlists."
+    badge_icon: "PLX"
+    category: social
+    trigger_type: playlists_created
+    trigger_data:
+      count: 10
+    xp_reward: 100
+    cred_reward: 10
+
+  # ============================================================
+  # META CATEGORY (Hackr Logs + Codex reading)
+  # ============================================================
+
+  # --- Hackr Logs ---
+  - slug: first_log_read
+    name: "Log Intercepted"
+    description: "Read your first Hackr Log."
+    badge_icon: ">>"
+    category: meta
+    trigger_type: hackr_logs_read
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: logs_read_10
+    name: "Archive Seeker"
+    description: "Read 10 Hackr Logs."
+    badge_icon: "LG"
+    category: meta
+    trigger_type: hackr_logs_read
+    trigger_data:
+      count: 10
+    xp_reward: 25
+    cred_reward: 1
+
+  - slug: logs_read_25
+    name: "Log Hound"
+    description: "Read 25 Hackr Logs."
+    badge_icon: "LGA"
+    category: meta
+    trigger_type: hackr_logs_read
+    trigger_data:
+      count: 25
+    xp_reward: 100
+    cred_reward: 10
+
+  - slug: logs_read_50
+    name: "Transmission Scholar"
+    description: "Read 50 Hackr Logs."
+    badge_icon: "LGS"
+    category: meta
+    trigger_type: hackr_logs_read
+    trigger_data:
+      count: 50
+    xp_reward: 250
+    cred_reward: 20
+
+  - slug: logs_read_all
+    name: "Full Chronicle"
+    description: "Read every published Hackr Log."
+    badge_icon: "[L]"
+    category: meta
+    trigger_type: hackr_logs_read_all
+    trigger_data: {}
+    xp_reward: 500
+    cred_reward: 50
+
+  # --- Codex ---
+  - slug: first_codex_read
+    name: "Entry Found"
+    description: "Read your first Codex entry."
+    badge_icon: "CX"
+    category: meta
+    trigger_type: codex_entries_read
+    trigger_data:
+      count: 1
+    xp_reward: 10
+    cred_reward: 0
+
+  - slug: codex_read_10
+    name: "Codex Explorer"
+    description: "Read 10 Codex entries."
+    badge_icon: "CXA"
+    category: meta
+    trigger_type: codex_entries_read
+    trigger_data:
+      count: 10
+    xp_reward: 25
+    cred_reward: 1
+
+  - slug: codex_read_25
+    name: "Knowledge Broker"
+    description: "Read 25 Codex entries."
+    badge_icon: "CXB"
+    category: meta
+    trigger_type: codex_entries_read
+    trigger_data:
+      count: 25
+    xp_reward: 100
+    cred_reward: 10
+
+  - slug: codex_read_50
+    name: "Lore Master"
+    description: "Read 50 Codex entries."
+    badge_icon: "CXM"
+    category: meta
+    trigger_type: codex_entries_read
+    trigger_data:
+      count: 50
+    xp_reward: 250
+    cred_reward: 20
+
+  - slug: codex_read_all
+    name: "The Archivist"
+    description: "Read every published Codex entry."
+    badge_icon: "[C]"
+    category: meta
+    trigger_type: codex_entries_read_all
+    trigger_data: {}
+    xp_reward: 500
+    cred_reward: 50
+
+  # ============================================================
+  # PROGRESSION CATEGORY (Clearance milestones)
+  # ============================================================
+
+  - slug: clearance_5
+    name: "CLEARANCE 5"
+    description: "Reached Clearance Level 5."
+    badge_icon: "CL5"
+    category: progression
+    trigger_type: clearance_level
+    trigger_data:
+      level: 5
+    xp_reward: 0
+    cred_reward: 1
+
+  - slug: clearance_10
+    name: "CLEARANCE 10"
+    description: "Reached Clearance Level 10. The Blacksite is open."
+    badge_icon: "CL10"
+    category: progression
+    trigger_type: clearance_level
+    trigger_data:
+      level: 10
+    xp_reward: 0
+    cred_reward: 10
+
+  - slug: clearance_25
+    name: "CLEARANCE 25"
+    description: "Reached Clearance Level 25."
+    badge_icon: "CL25"
+    category: progression
+    trigger_type: clearance_level
+    trigger_data:
+      level: 25
+    xp_reward: 0
+    cred_reward: 20
+
+  - slug: clearance_50
+    name: "CLEARANCE 50"
+    description: "Reached Clearance Level 50."
+    badge_icon: "CL50"
+    category: progression
+    trigger_type: clearance_level
+    trigger_data:
+      level: 50
+    xp_reward: 0
+    cred_reward: 50
+
+  - slug: clearance_99
+    name: "CLEARANCE 99"
+    description: "Reached max clearance. The Chronology Fracture remembers."
+    badge_icon: "CL99"
+    category: progression
+    trigger_type: clearance_level
+    trigger_data:
+      level: 99
+    xp_reward: 0
+    cred_reward: 50
+    hidden: true

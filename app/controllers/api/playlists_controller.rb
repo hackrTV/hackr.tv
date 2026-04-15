@@ -68,6 +68,8 @@ module Api
       @playlist = current_hackr.playlists.build(playlist_params)
 
       if @playlist.save
+        # Note: `playlists_created` achievement requires ≥1 track — fires
+        # from PlaylistTracksController#create after the first track add.
         render json: {
           success: true,
           message: "Playlist created successfully",

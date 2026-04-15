@@ -89,6 +89,9 @@ module Api
       @pulse = current_hackr.pulses.build(pulse_params)
 
       if @pulse.save
+        if @pulse.parent_pulse_id.nil?
+          Grid::AchievementChecker.new(current_hackr).check("wire_pulses_count")
+        end
         render json: {
           success: true,
           message: "Pulse broadcast successfully",

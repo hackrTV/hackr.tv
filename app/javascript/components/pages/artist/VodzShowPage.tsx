@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import { YouTubePlayer } from '~/components/YouTubePlayer'
 import { formatFutureDate } from '~/utils/dateUtils'
-import { apiJson } from '~/utils/apiClient'
+import { apiFetch, apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useHackrScopedDedupSet } from '~/hooks/useHackrScopedDedup'
 
 interface Vod {
   id: number
@@ -39,6 +41,7 @@ const extractVideoId = (url: string): string | null => {
 const VodzShowPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
+  const { hackr } = useGridAuth()
   const [vod, setVod] = useState<Vod | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -70,6 +73,21 @@ const VodzShowPage: React.FC = () => {
       fetchVod()
     }
   }, [artistSlug, id])
+
+  // Credit the watch only when the YouTube player reports PLAYING
+  // state (fired from YouTubePlayer's onPlay callback). This matches
+  // the achievement copy — "Watched your first VOD" — and filters out
+  // page-open/refresh traffic where no video ever plays. Dedup set is
+  // scoped to hackr.id so logout/login swap resets cleanly.
+  const creditedIdsRef = useHackrScopedDedupSet<number>(hackr?.id)
+  const handleWatchStarted = useCallback(() => {
+    if (!hackr || !vod?.id) return
+    if (creditedIdsRef.current.has(vod.id)) return
+    creditedIdsRef.current.add(vod.id)
+    apiFetch(`/api/artists/${encodeURIComponent(artistSlug)}/vods/${encodeURIComponent(String(vod.id))}/watch`, {
+      method: 'POST'
+    }).catch(() => { /* fire-and-forget */ })
+  }, [hackr, vod?.id, artistSlug, creditedIdsRef])
 
   if (loading) {
     return (
@@ -193,6 +211,7 @@ const VodzShowPage: React.FC = () => {
                   <YouTubePlayer
                     videoId={videoId}
                     responsive
+                    onPlay={handleWatchStarted}
                   />
                 </div>
               </div>

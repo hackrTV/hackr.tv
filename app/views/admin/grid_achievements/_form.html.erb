@@ -28,6 +28,11 @@
     </div>
 
     <div style="flex: 1;">
+      <%= f.label :category, "CATEGORY", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.select :category, GridAchievement::CATEGORIES.map { |c| [c, c] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+
+    <div style="flex: 1;">
       <%= f.label :trigger_type, "TRIGGER TYPE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
       <%= f.select :trigger_type, GridAchievement::TRIGGER_TYPES.map { |t| [t, t] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
     </div>
@@ -37,6 +42,11 @@
     <div style="flex: 1;">
       <%= f.label :xp_reward, "XP REWARD", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
       <%= f.number_field :xp_reward, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0 %>
+    </div>
+
+    <div style="flex: 1;">
+      <%= f.label :cred_reward, "CRED REWARD", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.number_field :cred_reward, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0 %>
     </div>
 
     <div style="flex: 1;">
