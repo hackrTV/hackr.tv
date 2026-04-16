@@ -22,10 +22,8 @@ RSpec.describe GridMiningRig, type: :model do
 
   def install_component(rig, slot:, name: "Test #{slot}", rate_multiplier: 1.0, extra_props: {})
     props = {slot: slot, rate_multiplier: rate_multiplier}.merge(extra_props)
-    GridItem.create!(
-      grid_mining_rig: rig, name: name, item_type: "component",
-      rarity: "common", value: 1, properties: props
-    )
+    defn = create(:grid_item_definition, :component, properties: props, name: name)
+    GridItem.create!(defn.item_attributes.merge(grid_mining_rig: rig))
   end
 
   def install_base_rig(rig)

@@ -1,0 +1,309 @@
+# Item Definitions — the canonical item catalog for THE PULSE GRID.
+# Loaded by: rails data:item_definitions (before items and shop_listings).
+# Idempotent: upsert by slug.
+#
+# item_type: tool | consumable | data | faction | collectible | component
+# rarity:    scrap | ubiquitous | common | uncommon | rare | ultra_rare | unicorn
+
+item_definitions:
+
+  # ── Starter Components ─────────────────────────────────────────
+  - slug: basic-motherboard
+    name: Basic Motherboard
+    description: "A standard-issue board with minimal expansion. Gets the job done."
+    item_type: component
+    rarity: common
+    value: 10
+    properties:
+      slot: motherboard
+      cpu_slots: 1
+      gpu_slots: 2
+      ram_slots: 2
+      rate_multiplier: 1.0
+
+  - slug: basic-psu
+    name: Basic PSU
+    description: "A reliable power supply. Keeps the lights on."
+    item_type: component
+    rarity: common
+    value: 5
+    properties:
+      slot: psu
+      rate_multiplier: 1.0
+
+  - slug: basic-cpu
+    name: Basic CPU
+    description: "A single-core processor. Slow but steady."
+    item_type: component
+    rarity: common
+    value: 8
+    properties:
+      slot: cpu
+      rate_multiplier: 1.0
+
+  - slug: basic-gpu
+    name: Basic GPU
+    description: "A standard-issue mining processor. Not fast, but it works."
+    item_type: component
+    rarity: common
+    value: 5
+    properties:
+      slot: gpu
+      rate_multiplier: 1.0
+
+  - slug: basic-ram
+    name: Basic RAM
+    description: "A single stick of memory. Enough to boot."
+    item_type: component
+    rarity: common
+    value: 4
+    properties:
+      slot: ram
+      rate_multiplier: 1.0
+
+  # ── Shop Components (Codec) ────────────────────────────────────
+  - slug: enhanced-gpu
+    name: Enhanced GPU
+    description: "A mid-tier graphics processor. Decent hash rate, reasonable power draw."
+    item_type: component
+    rarity: uncommon
+    value: 300
+    properties:
+      slot: gpu
+      rate_multiplier: 1.3
+
+  - slug: enhanced-cpu
+    name: Enhanced CPU
+    description: "Dual-core processor salvaged from decommissioned GovCorp terminals. Still kicks."
+    item_type: component
+    rarity: uncommon
+    value: 300
+    properties:
+      slot: cpu
+      rate_multiplier: 1.3
+
+  - slug: enhanced-ram-module
+    name: Enhanced RAM Module
+    description: "High-bandwidth memory module. Makes everything snappier."
+    item_type: component
+    rarity: uncommon
+    value: 250
+    properties:
+      slot: ram
+      rate_multiplier: 1.25
+
+  - slug: hardened-psu
+    name: Hardened PSU
+    description: "Surge-protected power supply. Won't fry when the grid spikes."
+    item_type: component
+    rarity: uncommon
+    value: 200
+    properties:
+      slot: psu
+      rate_multiplier: 1.2
+
+  # ── Black Market Components (GHOST) ────────────────────────────
+  - slug: milspec-gpu
+    name: Milspec GPU
+    description: "Military-specification graphics processor. Stolen from a GovCorp mining facility. The serial numbers have been... removed."
+    item_type: component
+    rarity: rare
+    value: 800
+    properties:
+      slot: gpu
+      rate_multiplier: 1.8
+
+  - slug: milspec-cpu
+    name: Milspec CPU
+    description: "Quad-core processor with hardened encryption coprocessor. Falls off a GovCorp truck every now and then."
+    item_type: component
+    rarity: rare
+    value: 800
+    properties:
+      slot: cpu
+      rate_multiplier: 1.8
+
+  - slug: overclocked-ram-array
+    name: Overclocked RAM Array
+    description: "Eight high-density modules wired in parallel. Runs hot. Runs fast. Don't ask where it came from."
+    item_type: component
+    rarity: rare
+    value: 650
+    properties:
+      slot: ram
+      rate_multiplier: 1.7
+
+  - slug: quantum-flux-capacitor
+    name: Quantum Flux Capacitor
+    description: "Experimental power supply that harnesses quantum fluctuations. Theoretically impossible. Practically devastating."
+    item_type: component
+    rarity: ultra_rare
+    value: 2500
+    properties:
+      slot: psu
+      rate_multiplier: 2.5
+
+  - slug: neural-cortex-board
+    name: Neural Cortex Board
+    description: "A motherboard that interfaces directly with neural tissue. Three times the slots of anything on the market. The installation process is... unpleasant."
+    item_type: component
+    rarity: ultra_rare
+    value: 5000
+    properties:
+      slot: motherboard
+      cpu_slots: 2
+      gpu_slots: 4
+      ram_slots: 4
+      rate_multiplier: 2.0
+
+  # ── Consumables ────────────────────────────────────────────────
+  - slug: medpatch
+    name: MedPatch
+    description: "A standard-issue dermal adhesive infused with nanite healing agents. Slap it on, feel the burn, feel better."
+    item_type: consumable
+    rarity: common
+    value: 50
+    properties:
+      effect_type: heal
+      amount: 30
+
+  - slug: stim-shot
+    name: Stim Shot
+    description: "A cocktail of synthetic adrenaline and nootropics. Your hands will shake, but you'll get things done."
+    item_type: consumable
+    rarity: common
+    value: 50
+    properties:
+      effect_type: energize
+      amount: 30
+
+  - slug: neural-patch
+    name: Neural Patch
+    description: "Firmware patch that temporarily boosts cognitive throughput. Side effects include vivid dreams and a mild taste of copper."
+    item_type: consumable
+    rarity: uncommon
+    value: 150
+    properties:
+      effect_type: psyche_boost
+      amount: 40
+
+  - slug: muse-chip
+    name: Muse Chip
+    description: "A micro-implant that stimulates the creative cortex. Popular among artists, musicians, and the dangerously unhinged."
+    item_type: consumable
+    rarity: uncommon
+    value: 150
+    properties:
+      effect_type: inspire
+      amount: 40
+
+  - slug: black-ice-injector
+    name: Black ICE Injector
+    description: "Military-grade psyche stimulant. Sharpens the mind to a razor edge. The comedown is legendary. Handle with extreme care."
+    item_type: consumable
+    rarity: rare
+    value: 500
+    properties:
+      effect_type: psyche_boost
+      amount: 80
+
+  # ── Tools ──────────────────────────────────────────────────────
+  - slug: basic-decryption-key
+    name: Basic Decryption Key
+    description: "Opens standard-grade encrypted containers. Disposable — one use, then it fries itself."
+    item_type: tool
+    rarity: common
+    value: 75
+    properties: {}
+
+  - slug: signal-analyzer
+    name: Signal Analyzer
+    description: "Portable frequency scanner. Useful for detecting hidden transmissions and anomalies."
+    item_type: tool
+    rarity: uncommon
+    value: 200
+    properties: {}
+
+  - slug: deep-scan-array
+    name: Deep Scan Array
+    description: "Military-grade network scanner. Reads encrypted traffic, identifies hidden nodes, maps surveillance blind spots."
+    item_type: tool
+    rarity: rare
+    value: 1000
+    properties: {}
+
+  - slug: govcorp-access-spoofcard
+    name: GovCorp Access Spoofcard
+    description: "Spoofs GovCorp network credentials. Burns out after a single use. Don't get caught with one."
+    item_type: tool
+    rarity: rare
+    value: 1200
+    properties: {}
+
+  # ── Data ───────────────────────────────────────────────────────
+  - slug: fracture-network-data-chip
+    name: Fracture Network Data Chip
+    description: "A small chip containing encrypted Fracture Network communications."
+    item_type: data
+    rarity: rare
+    value: 50
+    properties: {}
+
+  - slug: faction-data-shard
+    name: Faction Data Shard
+    description: "A data fragment of unknown origin. The encryption is beyond standard tools. Someone will want this."
+    item_type: data
+    rarity: uncommon
+    value: 200
+    properties: {}
+
+  - slug: phantom-drive
+    name: Phantom Drive
+    description: "Untraceable storage device with quantum-encrypted partitions. What's stored on it is between you and the universe."
+    item_type: data
+    rarity: rare
+    value: 900
+    properties: {}
+
+  # ── Tools (world-placed) ───────────────────────────────────────
+  - slug: frequency-modulator
+    name: Frequency Modulator
+    description: "A device for tuning into Synthia's signal. Essential for PRISM communication."
+    item_type: tool
+    rarity: uncommon
+    value: 30
+    properties: {}
+
+  - slug: govcorp-access-keycard
+    name: GovCorp Access Keycard
+    description: "Stolen keycard providing access to restricted areas. Handle with care."
+    item_type: tool
+    rarity: rare
+    value: 75
+    properties: {}
+
+  # ── Collectibles ───────────────────────────────────────────────
+  - slug: chronology-shard
+    name: Chronology Shard
+    description: "A fragment of crystallized time from the moment of the Fracture. It hums with impossible frequencies — echoes of 9/9. Those who hold it report dreams of futures that never happened. It shouldn't exist."
+    item_type: collectible
+    rarity: unicorn
+    value: 999
+    properties: {}
+
+  - slug: temporal-resonance-crystal
+    name: Temporal Resonance Crystal
+    description: "A byproduct of Chronology Fracture research. It hums at a frequency that shouldn't exist. Collectors pay a fortune for these."
+    item_type: collectible
+    rarity: ultra_rare
+    value: 3000
+    properties: {}
+
+  # ── Faction Items ──────────────────────────────────────────────
+  - slug: fracture-beacon
+    name: Fracture Beacon
+    description: "Emits a signal recognizable only to Fracture Network operatives across temporal boundaries. Possession alone is a statement."
+    item_type: faction
+    rarity: ultra_rare
+    value: 5000
+    properties: {}

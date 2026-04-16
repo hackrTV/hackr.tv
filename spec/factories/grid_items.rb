@@ -3,33 +3,43 @@
 # Table name: grid_items
 # Database name: primary
 #
-#  id                 :integer          not null, primary key
-#  description        :text
-#  item_type          :string
-#  name               :string
-#  properties         :json
-#  quantity           :integer          default(1), not null
-#  rarity             :string
-#  value              :integer          default(0), not null
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  grid_hackr_id      :integer
-#  grid_mining_rig_id :integer
-#  room_id            :integer
+#  id                      :integer          not null, primary key
+#  description             :text
+#  item_type               :string
+#  name                    :string
+#  properties              :json
+#  quantity                :integer          default(1), not null
+#  rarity                  :string
+#  value                   :integer          default(0), not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  grid_hackr_id           :integer
+#  grid_item_definition_id :integer          not null
+#  grid_mining_rig_id      :integer
+#  room_id                 :integer
 #
 # Indexes
 #
-#  index_grid_items_on_grid_mining_rig_id  (grid_mining_rig_id)
+#  index_grid_items_on_grid_item_definition_id  (grid_item_definition_id)
+#  index_grid_items_on_grid_mining_rig_id       (grid_mining_rig_id)
+#
+# Foreign Keys
+#
+#  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
 #
 FactoryBot.define do
   factory :grid_item do
-    sequence(:name) { |n| "Item #{n}" }
-    description { "A grid item" }
-    item_type { "tool" }
-    rarity { "common" }
-    value { 10 }
+    association :grid_item_definition
+
+    # Denormalized fields derived from the definition to stay in sync.
+    # Explicit overrides (e.g. `create(:grid_item, name: "Custom")`) still work.
+    name { grid_item_definition.name }
+    description { grid_item_definition.description }
+    item_type { grid_item_definition.item_type }
+    rarity { grid_item_definition.rarity }
+    value { grid_item_definition.value }
+    properties { grid_item_definition.properties&.deep_dup || {} }
     quantity { 1 }
-    properties { {} }
 
     # By default, items are in a room
     association :room, factory: :grid_room
@@ -40,13 +50,11 @@ FactoryBot.define do
     end
 
     trait :component do
-      item_type { "component" }
-      properties { {"slot" => "gpu", "rate_multiplier" => 1.0} }
+      association :grid_item_definition, factory: [:grid_item_definition, :component]
     end
 
     trait :consumable do
-      item_type { "consumable" }
-      properties { {"effect_type" => "heal", "amount" => 25} }
+      association :grid_item_definition, factory: [:grid_item_definition, :consumable]
     end
   end
 end

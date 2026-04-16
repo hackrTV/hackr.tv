@@ -310,6 +310,9 @@ Rails.application.routes.draw do
     # Grid reputation event log (read-only)
     resources :grid_reputation_events, only: [:index]
 
+    # Grid item definitions (item master catalog)
+    resources :grid_item_definitions, except: [:show]
+
     # Grid shops (runtime CRUD + stock management)
     resources :grid_shop_listings do
       member do

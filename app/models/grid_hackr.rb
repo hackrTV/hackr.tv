@@ -128,56 +128,11 @@ class GridHackr < ApplicationRecord
     rig = grid_mining_rig || create_grid_mining_rig!(active: false)
     return if rig.components.any? # Rig already has components
 
-    # Base motherboard: 1 CPU, 2 GPU, 2 RAM slots
-    GridItem.create!(
-      grid_mining_rig: rig,
-      name: "Basic Motherboard",
-      description: "A standard-issue board with minimal expansion. Gets the job done.",
-      item_type: "component",
-      rarity: "common",
-      value: 10,
-      properties: {slot: "motherboard", cpu_slots: 1, gpu_slots: 2, ram_slots: 2, rate_multiplier: 1.0}
-    )
-
-    GridItem.create!(
-      grid_mining_rig: rig,
-      name: "Basic PSU",
-      description: "A reliable power supply. Keeps the lights on.",
-      item_type: "component",
-      rarity: "common",
-      value: 5,
-      properties: {slot: "psu", rate_multiplier: 1.0}
-    )
-
-    GridItem.create!(
-      grid_mining_rig: rig,
-      name: "Basic CPU",
-      description: "A single-core processor. Slow but steady.",
-      item_type: "component",
-      rarity: "common",
-      value: 8,
-      properties: {slot: "cpu", rate_multiplier: 1.0}
-    )
-
-    GridItem.create!(
-      grid_mining_rig: rig,
-      name: "Basic GPU",
-      description: "A standard-issue mining processor. Not fast, but it works.",
-      item_type: "component",
-      rarity: "common",
-      value: 5,
-      properties: {slot: "gpu", rate_multiplier: 1.0}
-    )
-
-    GridItem.create!(
-      grid_mining_rig: rig,
-      name: "Basic RAM",
-      description: "A single stick of memory. Enough to boot.",
-      item_type: "component",
-      rarity: "common",
-      value: 4,
-      properties: {slot: "ram", rate_multiplier: 1.0}
-    )
+    %w[basic-motherboard basic-psu basic-cpu basic-gpu basic-ram].each do |slug|
+      defn = GridItemDefinition.find_by(slug: slug)
+      raise "Item definition '#{slug}' not found — run `rails data:item_definitions` first" unless defn
+      GridItem.create!(defn.item_attributes.merge(grid_mining_rig: rig))
+    end
   end
 
   # Scopes

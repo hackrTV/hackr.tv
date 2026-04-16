@@ -1,0 +1,69 @@
+<%= form_with model: [:admin, definition], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: DEFINITION INFO ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <% if definition.errors[:name].any? %>
+        <br><small class="red-255-text"><%= definition.errors[:name].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">lowercase letters, numbers, hyphens only</small>
+      <% if definition.errors[:slug].any? %>
+        <br><small class="red-255-text"><%= definition.errors[:slug].join(", ") %></small>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin-top: 15px;">
+    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :description, class: "tui-input", style: "width: 100%; font-family: monospace; height: 80px;" %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :item_type, "ITEM TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :item_type,
+            GridItem::ITEM_TYPES.map { |t| [t.titleize, t] },
+            { include_blank: "Select..." }, class: "tui-input", style: "width: 100%;" %>
+      <% if definition.errors[:item_type].any? %>
+        <br><small class="red-255-text"><%= definition.errors[:item_type].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :rarity, "RARITY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :rarity,
+            GridItem::RARITIES.map { |r| [GridItem::RARITY_LABELS[r] || r.upcase, r] },
+            { include_blank: "Select..." }, class: "tui-input", style: "width: 100%;" %>
+      <% if definition.errors[:rarity].any? %>
+        <br><small class="red-255-text"><%= definition.errors[:rarity].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :value, "BASE VALUE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :value, class: "tui-input", style: "width: 100%;", min: 0 %>
+    </div>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: PROPERTIES (JSON) ::]</h3>
+  <div style="margin-bottom: 20px;">
+    <%= text_area_tag "grid_item_definition[properties_json]",
+          (definition.properties.present? ? JSON.pretty_generate(definition.properties) : "{}"),
+          class: "tui-input", style: "width: 100%; font-family: monospace; height: 120px;" %>
+    <small style="color: #888;">JSON object. Components: {"slot": "gpu", "rate_multiplier": 1.5}. Consumables: {"effect_type": "heal", "amount": 30}</small>
+    <% if definition.errors[:properties].any? %>
+      <br><small class="red-255-text"><%= definition.errors[:properties].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <%= f.submit definition.persisted? ? "Save Definition" : "Create Definition",
+          class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= link_to "Cancel", admin_grid_item_definitions_path,
+          class: "tui-button grey-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+  </div>
+<% end %>
