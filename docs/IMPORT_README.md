@@ -43,7 +43,10 @@ data/
 │   ├── rooms.yml              # Grid rooms
 │   ├── exits.yml              # Room exits
 │   ├── mobs.yml               # NPCs
-│   └── items.yml              # Items
+│   ├── items.yml              # Items
+│   ├── achievements.yml       # Achievement/badge definitions
+│   ├── missions.yml           # Mission arcs, missions, objectives, rewards
+│   └── shop_listings.yml      # Shop vendor listings
 ├── content/
 │   ├── codex.yml              # Codex entries
 │   ├── hackr_logs.yml         # Blog posts
@@ -94,14 +97,17 @@ Tasks run in dependency order (the `data:load` master task handles this automati
 9. **exits** (depends on rooms)
 10. **mobs** (depends on rooms, factions)
 11. **items** (depends on rooms)
-12. **key_playlists** (depends on hackrs, tracks, radio_stations)
-13. **codex** (no deps)
-14. **hackr_logs** (depends on hackrs)
-15. **wire** (depends on hackrs)
-16. **vidz** (depends on artists)
-17. **overlays** (no deps)
-18. **redirects** (no deps)
-19. **livestream_archive** (depends on audio)
+12. **achievements** (no deps)
+13. **missions** (depends on mobs, rooms, factions, items, achievements)
+14. **shop_listings** (depends on mobs, items)
+15. **key_playlists** (depends on hackrs, tracks, radio_stations)
+16. **codex** (no deps)
+17. **hackr_logs** (depends on hackrs)
+18. **wire** (depends on hackrs)
+19. **vidz** (depends on artists)
+20. **overlays** (no deps)
+21. **redirects** (no deps)
+22. **livestream_archive** (depends on audio)
 
 ## Available Tasks
 
@@ -119,14 +125,14 @@ Tasks run in dependency order (the `data:load` master task handles this automati
 |------|-------|
 | `data:catalog` | artists, albums, tracks (from per-artist YAML files) |
 | `data:system` | hackrs, channels, radio_stations, zone_playlists, redirects |
-| `data:world` | factions, zones, rooms, exits, mobs, items |
+| `data:world` | factions, zones, rooms, exits, mobs, items, achievements, missions, shop_listings |
 | `data:playlists` | key_playlists (also ensures catalog, hackrs, radio_stations) |
 | `data:content` | codex, hackr_logs, wire |
 | `data:overlays` | all overlay elements, tickers, lower_thirds, scenes, scene_elements, scene_groups |
 
 ### Individual Tasks
 
-`data:catalog`, `data:hackrs`, `data:channels`, `data:radio_stations`, `data:zone_playlists`, `data:factions`, `data:zones`, `data:rooms`, `data:exits`, `data:mobs`, `data:items`, `data:key_playlists`, `data:codex`, `data:hackr_logs`, `data:wire`, `data:vidz`, `data:redirects`, `data:livestream_archive`, `data:audio`.
+`data:catalog`, `data:hackrs`, `data:channels`, `data:radio_stations`, `data:zone_playlists`, `data:factions`, `data:zones`, `data:rooms`, `data:exits`, `data:mobs`, `data:items`, `data:achievements`, `data:missions`, `data:shop_listings`, `data:key_playlists`, `data:codex`, `data:hackr_logs`, `data:wire`, `data:vidz`, `data:redirects`, `data:livestream_archive`, `data:audio`.
 
 ### Audio Sideloading
 
