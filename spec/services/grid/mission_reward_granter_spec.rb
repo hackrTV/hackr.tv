@@ -64,7 +64,8 @@ RSpec.describe Grid::MissionRewardGranter do
     end
 
     it "creates a GridItem for item_grant rewards" do
-      create(:grid_mission_reward, grid_mission: mission, reward_type: "item_grant", target_slug: "Reward Core", amount: 100, quantity: 2)
+      create(:grid_item_definition, slug: "reward-core", name: "Reward Core", item_type: "collectible", rarity: "uncommon")
+      create(:grid_mission_reward, grid_mission: mission, reward_type: "item_grant", target_slug: "reward-core", amount: 100, quantity: 2)
 
       expect {
         described_class.new(hackr, hackr_mission).grant!

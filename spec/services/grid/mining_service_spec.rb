@@ -22,10 +22,8 @@ RSpec.describe Grid::MiningService do
       {slot: "ram", name: "RAM"}
     ].each do |comp|
       props = {slot: comp[:slot], rate_multiplier: 1.0}.merge(comp[:extra] || {})
-      GridItem.create!(
-        grid_mining_rig: rig, name: comp[:name], item_type: "component",
-        rarity: "common", value: 1, properties: props
-      )
+      defn = create(:grid_item_definition, :component, properties: props, name: comp[:name])
+      GridItem.create!(defn.item_attributes.merge(grid_mining_rig: rig))
     end
   end
 

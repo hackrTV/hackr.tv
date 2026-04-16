@@ -324,9 +324,11 @@ module Grid
       vendor = room.grid_mobs.find_by(mob_type: "vendor")
       if vendor
         clearance = hackr.stat("clearance")
-        listing = vendor.grid_shop_listings.where(active: true)
+        listing = vendor.grid_shop_listings.includes(:grid_item_definition).joins(:grid_item_definition)
+          .where(active: true)
           .where("min_clearance <= ?", clearance)
-          .find_by("LOWER(name) = ?", target.downcase)
+          .where("LOWER(grid_item_definitions.name) = ?", target.downcase)
+          .first
         if listing
           price = Grid::ShopService.effective_price(listing: listing, mob: vendor, clearance: clearance)
           return examine_listing(listing, price)

@@ -142,6 +142,16 @@ RSpec.describe Api::GridController, type: :controller do
     let!(:room) { create(:grid_room, grid_zone: zone, room_type: "hub") }
     let!(:token) { GridRegistrationToken.create!(email: "test@example.com", ip_address: "127.0.0.1") }
 
+    before do
+      # provision_economy! needs base component definitions
+      %w[basic-motherboard basic-psu basic-cpu basic-gpu basic-ram].each_with_index do |slug, i|
+        slots = %w[motherboard psu cpu gpu ram]
+        props = {"slot" => slots[i], "rate_multiplier" => 1.0}
+        props.merge!("cpu_slots" => 1, "gpu_slots" => 2, "ram_slots" => 2) if slug == "basic-motherboard"
+        create(:grid_item_definition, slug: slug, name: "Basic #{slots[i].capitalize}", item_type: "component", properties: props)
+      end
+    end
+
     context "with valid token and valid params" do
       it "creates a new GridHackr" do
         expect {

@@ -145,21 +145,23 @@ module Grid
       end
     end
 
-    # Materialize a new GridItem in the hackr's inventory from the reward
-    # row. `target_slug` may point to an existing shop_listing slug (to
-    # copy its full definition) OR be a bare item name. For v1 we use
-    # target_slug as the name and lean on reward.amount + reward.quantity
-    # for value + stack size. More elaborate templating can extend this.
+    # Materialize a new GridItem in the hackr's inventory from a
+    # GridItemDefinition looked up by reward.target_slug. The definition
+    # supplies name/description/type/rarity/properties; reward.amount and
+    # reward.quantity override value and stack size.
     def build_item_grant(reward)
-      name = reward.target_slug.presence || "Mission Reward"
+      definition = GridItemDefinition.find_by(slug: reward.target_slug)
+      unless definition
+        Rails.logger.warn("[MissionRewardGranter] item_grant skipped: no definition for slug='#{reward.target_slug}'")
+        return nil
+      end
+
       GridItem.create!(
-        grid_hackr: @hackr,
-        name: name,
-        description: "Reward from mission: #{@mission.name}",
-        item_type: "collectible",
-        rarity: "uncommon",
-        value: reward.amount.to_i,
-        quantity: reward.quantity.to_i.clamp(1, 9999)
+        definition.item_attributes.merge(
+          grid_hackr: @hackr,
+          value: [reward.amount.to_i, 0].max,
+          quantity: reward.quantity.to_i.clamp(1, 9999)
+        )
       )
     rescue ActiveRecord::RecordInvalid => e
       Rails.logger.warn("[MissionRewardGranter] item grant failed: #{e.message}")

@@ -5,43 +5,43 @@
 # Table name: grid_shop_listings
 # Database name: primary
 #
-#  id                     :integer          not null, primary key
-#  active                 :boolean          default(TRUE), not null
-#  base_price             :integer          not null
-#  description            :text
-#  item_type              :string
-#  max_stock              :integer
-#  min_clearance          :integer          default(0), not null
-#  name                   :string           not null
-#  next_restock_at        :datetime
-#  properties             :json
-#  rarity                 :string
-#  restock_amount         :integer          default(1), not null
-#  restock_interval_hours :integer          default(24), not null
-#  rotation_pool          :boolean          default(FALSE), not null
-#  sell_price             :integer          not null
-#  stock                  :integer
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  grid_mob_id            :integer          not null
+#  id                      :integer          not null, primary key
+#  active                  :boolean          default(TRUE), not null
+#  base_price              :integer          not null
+#  max_stock               :integer
+#  min_clearance           :integer          default(0), not null
+#  next_restock_at         :datetime
+#  restock_amount          :integer          default(1), not null
+#  restock_interval_hours  :integer          default(24), not null
+#  rotation_pool           :boolean          default(FALSE), not null
+#  sell_price              :integer          not null
+#  stock                   :integer
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  grid_item_definition_id :integer          not null
+#  grid_mob_id             :integer          not null
 #
 # Indexes
 #
-#  index_grid_shop_listings_on_grid_mob_id             (grid_mob_id)
-#  index_grid_shop_listings_on_grid_mob_id_and_active  (grid_mob_id,active)
-#  index_grid_shop_listings_on_next_restock_at         (next_restock_at)
+#  index_grid_shop_listings_on_grid_item_definition_id  (grid_item_definition_id)
+#  index_grid_shop_listings_on_grid_mob_id              (grid_mob_id)
+#  index_grid_shop_listings_on_grid_mob_id_and_active   (grid_mob_id,active)
+#  index_grid_shop_listings_on_next_restock_at          (next_restock_at)
 #
 # Foreign Keys
 #
-#  grid_mob_id  (grid_mob_id => grid_mobs.id)
+#  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
+#  grid_mob_id              (grid_mob_id => grid_mobs.id)
 #
 class GridShopListing < ApplicationRecord
   belongs_to :grid_mob
+  belongs_to :grid_item_definition
   has_many :grid_shop_transactions, dependent: :nullify
 
-  validates :name, presence: true
-  validates :item_type, inclusion: {in: GridItem::ITEM_TYPES}, allow_nil: true
-  validates :rarity, inclusion: {in: GridItem::RARITIES}, allow_nil: true
+  delegate :name, :description, :item_type, :rarity, :properties,
+    :rarity_color, :rarity_label,
+    to: :grid_item_definition
+
   validates :base_price, numericality: {only_integer: true, greater_than: 0}
   validates :sell_price, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :stock, numericality: {only_integer: true, greater_than_or_equal_to: 0}, allow_nil: true
@@ -65,14 +65,6 @@ class GridShopListing < ApplicationRecord
 
   def in_stock?
     unlimited_stock? || stock > 0
-  end
-
-  def rarity_color
-    GridItem::RARITY_COLORS[rarity] || "#9ca3af"
-  end
-
-  def rarity_label
-    GridItem::RARITY_LABELS[rarity] || rarity&.upcase
   end
 
   private

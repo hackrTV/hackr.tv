@@ -12,18 +12,22 @@ module Grid
       clearance = hackr.stat("clearance")
       cache = hackr.default_cache
 
-      mob.grid_shop_listings.where(active: true).order(:rarity, :name).map do |listing|
-        next if listing.min_clearance > clearance
+      mob.grid_shop_listings.includes(:grid_item_definition)
+        .joins(:grid_item_definition)
+        .where(active: true)
+        .order("grid_item_definitions.rarity, grid_item_definitions.name")
+        .map do |listing|
+          next if listing.min_clearance > clearance
 
-        price = effective_price(listing: listing, mob: mob, clearance: clearance)
-        balance = cache&.balance || 0
+          price = effective_price(listing: listing, mob: mob, clearance: clearance)
+          balance = cache&.balance || 0
 
-        {
-          listing: listing,
-          effective_price: price,
-          affordable: balance >= price,
-          out_of_stock: listing.out_of_stock?
-        }
+          {
+            listing: listing,
+            effective_price: price,
+            affordable: balance >= price,
+            out_of_stock: listing.out_of_stock?
+          }
       end.compact
     end
 
@@ -32,8 +36,10 @@ module Grid
       raise AccessDenied, "This vendor doesn't sell anything" unless mob.vendor?
 
       clearance = hackr.stat("clearance")
-      listing = mob.grid_shop_listings.where(active: true)
-        .find_by("LOWER(name) = ?", item_name.downcase)
+      listing = mob.grid_shop_listings.joins(:grid_item_definition)
+        .where(active: true)
+        .where("LOWER(grid_item_definitions.name) = ?", item_name.downcase)
+        .first
 
       raise ItemNotFound, "This vendor doesn't sell '#{item_name}'" unless listing
       raise AccessDenied, "CLEARANCE #{listing.min_clearance}+ required" if clearance < listing.min_clearance
@@ -56,16 +62,13 @@ module Grid
         # Split CRED: burn 70%, recycle 30% to gameplay pool
         split_purchase!(hackr_cache: cache, amount: price, item_name: listing.name)
 
-        # Create item in hackr's inventory
+        # Create item in hackr's inventory from the definition
         item = GridItem.create!(
-          grid_hackr: hackr,
-          name: listing.name,
-          description: listing.description,
-          item_type: listing.item_type,
-          rarity: listing.rarity,
-          value: listing.base_price,
-          quantity: 1,
-          properties: listing.properties
+          listing.grid_item_definition.item_attributes.merge(
+            grid_hackr: hackr,
+            value: listing.base_price,
+            quantity: 1
+          )
         )
 
         # Record the shop transaction
@@ -93,7 +96,9 @@ module Grid
       raise ItemNotFound, "You don't have '#{item_name}'" unless item
 
       # Find matching listing for sell price, or use item.value * SELL_PRICE_RATIO
-      listing = mob.grid_shop_listings.find_by("LOWER(name) = ?", item_name.downcase)
+      listing = mob.grid_shop_listings.joins(:grid_item_definition)
+        .where("LOWER(grid_item_definitions.name) = ?", item_name.downcase)
+        .first
       sell_price = if listing
         listing.sell_price
       else

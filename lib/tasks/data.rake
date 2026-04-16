@@ -192,7 +192,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, zones, rooms, etc.)"
-  task world: [:factions, :zones, :rooms, :exits, :mobs, :items, :achievements, :shop_listings, :missions]
+  task world: [:factions, :zones, :rooms, :exits, :mobs, :item_definitions, :items, :achievements, :shop_listings, :missions]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -697,6 +697,43 @@ namespace :data do
     puts "Mobs: #{created} created, #{updated} updated, #{GridMob.count} total"
   end
 
+  desc "Load item definitions from YAML"
+  task item_definitions: :environment do
+    puts "\n--- Loading Item Definitions ---"
+    yaml_file = Rails.root.join("data", "world", "item_definitions.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    defs_data = data["item_definitions"]
+    created = updated = 0
+
+    defs_data.each do |attrs|
+      defn = GridItemDefinition.find_or_initialize_by(slug: attrs["slug"])
+      was_new = defn.new_record?
+
+      defn.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"],
+        item_type: attrs["item_type"],
+        rarity: attrs["rarity"],
+        value: attrs["value"] || 0,
+        properties: attrs["properties"] || {}
+      )
+
+      if defn.changed?
+        defn.save!
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{defn.name} (#{defn.slug})"
+      end
+    end
+
+    puts "Item Definitions: #{created} created, #{updated} updated, #{GridItemDefinition.count} total"
+  end
+
   desc "Load items from YAML"
   task items: :environment do
     puts "\n--- Loading Items ---"
@@ -718,17 +755,22 @@ namespace :data do
         next
       end
 
-      item = GridItem.find_or_initialize_by(name: attrs["name"], room: room)
+      defn = GridItemDefinition.find_by(slug: attrs["definition_slug"])
+      unless defn
+        puts "  ✗ Definition not found: #{attrs["definition_slug"]}"
+        next
+      end
+
+      item = GridItem.find_or_initialize_by(grid_item_definition: defn, room: room, grid_hackr: nil)
       was_new = item.new_record?
 
       item.assign_attributes(
-        description: attrs["description"],
-        item_type: attrs["item_type"],
-        rarity: attrs["rarity"],
-        value: attrs["value"] || 0,
-        quantity: attrs["quantity"] || 1,
-        properties: attrs["properties"]
+        defn.item_attributes.merge(
+          room: room,
+          quantity: attrs["quantity"] || 1
+        )
       )
+      item.value = attrs["value"] if attrs.key?("value")
 
       if item.changed?
         item.save!
@@ -738,6 +780,25 @@ namespace :data do
     end
 
     puts "Items: #{created} created, #{updated} updated, #{GridItem.count} total"
+  end
+
+  desc "Sync existing grid_items with their current definitions"
+  task sync_item_definitions: :environment do
+    puts "\n--- Syncing Item Definitions → Items ---"
+    synced = 0
+
+    GridItem.includes(:grid_item_definition).find_each do |item|
+      defn = item.grid_item_definition
+      attrs = defn.item_attributes.except(:grid_item_definition)
+      changes = attrs.select { |k, v| item.read_attribute(k) != v }
+      next if changes.empty?
+
+      item.update_columns(changes)
+      synced += 1
+      puts "  ↻ #{item.name} (id=#{item.id}): #{changes.keys.join(", ")}"
+    end
+
+    puts "Synced #{synced} items, #{GridItem.count} total"
   end
 
   desc "Load achievements from YAML"
@@ -810,7 +871,13 @@ namespace :data do
         next
       end
 
-      listing = GridShopListing.find_or_initialize_by(name: attrs["name"], grid_mob: mob)
+      defn = GridItemDefinition.find_by(slug: attrs["definition_slug"])
+      unless defn
+        puts "  ✗ Definition not found: #{attrs["definition_slug"]}"
+        next
+      end
+
+      listing = GridShopListing.find_or_initialize_by(grid_item_definition: defn, grid_mob: mob)
       was_new = listing.new_record?
 
       base_price = attrs["base_price"]
@@ -818,19 +885,15 @@ namespace :data do
       rotation_pool = attrs.fetch("rotation_pool", false)
       restock_hours = attrs["restock_interval_hours"] || mob.restock_interval_hours
 
-      # Definition fields — always updated from YAML (source of truth)
+      # Shop-specific fields — always updated from YAML (source of truth)
       listing.assign_attributes(
-        description: attrs["description"],
-        item_type: attrs["item_type"],
-        rarity: attrs["rarity"],
         base_price: base_price,
         sell_price: sell_price,
         max_stock: attrs["max_stock"],
         restock_amount: attrs["restock_amount"] || 1,
         restock_interval_hours: restock_hours,
         rotation_pool: rotation_pool,
-        min_clearance: attrs["min_clearance"] || 0,
-        properties: attrs["properties"] || {}
+        min_clearance: attrs["min_clearance"] || 0
       )
 
       # Runtime state — only set on creation. Preserves live stock, active flag,

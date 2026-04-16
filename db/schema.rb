@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_15_120002) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_16_120003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -307,10 +307,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_120002) do
     t.index ["role"], name: "index_grid_hackrs_on_role"
   end
 
+  create_table "grid_item_definitions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "item_type", null: false
+    t.string "name", null: false
+    t.json "properties", default: {}, null: false
+    t.string "rarity", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.integer "value", default: 0, null: false
+    t.index ["item_type"], name: "index_grid_item_definitions_on_item_type"
+    t.index ["slug"], name: "index_grid_item_definitions_on_slug", unique: true
+  end
+
   create_table "grid_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_hackr_id"
+    t.integer "grid_item_definition_id", null: false
     t.integer "grid_mining_rig_id"
     t.string "item_type"
     t.string "name"
@@ -320,6 +335,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_120002) do
     t.integer "room_id"
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
+    t.index ["grid_item_definition_id"], name: "index_grid_items_on_grid_item_definition_id"
     t.index ["grid_mining_rig_id"], name: "index_grid_items_on_grid_mining_rig_id"
   end
 
@@ -460,21 +476,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_120002) do
     t.boolean "active", default: true, null: false
     t.integer "base_price", null: false
     t.datetime "created_at", null: false
-    t.text "description"
+    t.integer "grid_item_definition_id", null: false
     t.integer "grid_mob_id", null: false
-    t.string "item_type"
     t.integer "max_stock"
     t.integer "min_clearance", default: 0, null: false
-    t.string "name", null: false
     t.datetime "next_restock_at"
-    t.json "properties", default: {}
-    t.string "rarity"
     t.integer "restock_amount", default: 1, null: false
     t.integer "restock_interval_hours", default: 24, null: false
     t.boolean "rotation_pool", default: false, null: false
     t.integer "sell_price", null: false
     t.integer "stock"
     t.datetime "updated_at", null: false
+    t.index ["grid_item_definition_id"], name: "index_grid_shop_listings_on_grid_item_definition_id"
     t.index ["grid_mob_id", "active"], name: "index_grid_shop_listings_on_grid_mob_id_and_active"
     t.index ["grid_mob_id"], name: "index_grid_shop_listings_on_grid_mob_id"
     t.index ["next_restock_at"], name: "index_grid_shop_listings_on_next_restock_at"
@@ -1025,6 +1038,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_120002) do
   add_foreign_key "grid_hackr_reputations", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "tracks"
+  add_foreign_key "grid_items", "grid_item_definitions"
   add_foreign_key "grid_mission_objectives", "grid_missions", on_delete: :cascade
   add_foreign_key "grid_mission_rewards", "grid_missions", on_delete: :cascade
   add_foreign_key "grid_missions", "grid_factions", column: "min_rep_faction_id", on_delete: :nullify
@@ -1033,6 +1047,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_120002) do
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
+  add_foreign_key "grid_shop_listings", "grid_item_definitions"
   add_foreign_key "grid_shop_listings", "grid_mobs"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"

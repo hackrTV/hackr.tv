@@ -3,23 +3,29 @@
 # Table name: grid_items
 # Database name: primary
 #
-#  id                 :integer          not null, primary key
-#  description        :text
-#  item_type          :string
-#  name               :string
-#  properties         :json
-#  quantity           :integer          default(1), not null
-#  rarity             :string
-#  value              :integer          default(0), not null
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  grid_hackr_id      :integer
-#  grid_mining_rig_id :integer
-#  room_id            :integer
+#  id                      :integer          not null, primary key
+#  description             :text
+#  item_type               :string
+#  name                    :string
+#  properties              :json
+#  quantity                :integer          default(1), not null
+#  rarity                  :string
+#  value                   :integer          default(0), not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  grid_hackr_id           :integer
+#  grid_item_definition_id :integer          not null
+#  grid_mining_rig_id      :integer
+#  room_id                 :integer
 #
 # Indexes
 #
-#  index_grid_items_on_grid_mining_rig_id  (grid_mining_rig_id)
+#  index_grid_items_on_grid_item_definition_id  (grid_item_definition_id)
+#  index_grid_items_on_grid_mining_rig_id       (grid_mining_rig_id)
+#
+# Foreign Keys
+#
+#  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
 #
 class GridItem < ApplicationRecord
   ITEM_TYPES = %w[tool consumable data faction collectible component].freeze
@@ -43,6 +49,11 @@ class GridItem < ApplicationRecord
     "unicorn" => "#fbbf24"
   }.freeze
 
+  # Display fields (name, description, item_type, rarity, value, properties) are
+  # denormalized snapshots copied from the definition at creation time. They are
+  # NOT automatically synced when a definition is updated. To propagate definition
+  # changes to existing items, run: rails data:sync_item_definitions
+  belongs_to :grid_item_definition
   belongs_to :room, class_name: "GridRoom", optional: true
   belongs_to :grid_hackr, optional: true
   belongs_to :grid_mining_rig, optional: true

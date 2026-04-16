@@ -84,29 +84,16 @@ namespace :data do
     incomplete_rigs = GridMiningRig.includes(:grid_items, :grid_hackr).select { |rig| !rig.functional? }
     if incomplete_rigs.any?
       puts "\n  Backfilling #{incomplete_rigs.count} incomplete rigs..."
-      base_components = [
-        {name: "Basic Motherboard", description: "A standard-issue board with minimal expansion. Gets the job done.", slot: "motherboard", rate_multiplier: 1.0, value: 10, extra: {cpu_slots: 1, gpu_slots: 2, ram_slots: 2}},
-        {name: "Basic PSU", description: "A reliable power supply. Keeps the lights on.", slot: "psu", rate_multiplier: 1.0, value: 5},
-        {name: "Basic CPU", description: "A single-core processor. Slow but steady.", slot: "cpu", rate_multiplier: 1.0, value: 8},
-        {name: "Basic GPU", description: "A standard-issue mining processor. Not fast, but it works.", slot: "gpu", rate_multiplier: 1.0, value: 5},
-        {name: "Basic RAM", description: "A single stick of memory. Enough to boot.", slot: "ram", rate_multiplier: 1.0, value: 4}
-      ]
+      base_slugs = %w[basic-motherboard basic-psu basic-cpu basic-gpu basic-ram]
+      definitions = GridItemDefinition.where(slug: base_slugs).index_by(&:slug)
 
       incomplete_rigs.each do |rig|
         installed_slots = rig.components.map(&:slot)
-        base_components.each do |comp|
-          next if installed_slots.include?(comp[:slot])
-          props = {slot: comp[:slot], rate_multiplier: comp[:rate_multiplier]}
-          props.merge!(comp[:extra]) if comp[:extra]
-          GridItem.create!(
-            grid_mining_rig: rig,
-            name: comp[:name],
-            description: comp[:description],
-            item_type: "component",
-            rarity: "common",
-            value: comp[:value],
-            properties: props
-          )
+        base_slugs.each do |slug|
+          defn = definitions[slug]
+          next unless defn
+          next if installed_slots.include?(defn.properties["slot"])
+          GridItem.create!(defn.item_attributes.merge(grid_mining_rig: rig))
         end
         puts "    #{rig.grid_hackr.hackr_alias}: backfilled to #{rig.reload.components.count} components (functional=#{rig.functional?})"
       end

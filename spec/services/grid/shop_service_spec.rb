@@ -9,10 +9,14 @@ RSpec.describe Grid::ShopService do
   let(:gameplay_pool) { create(:grid_cache, :gameplay_pool) }
   let(:burn_cache) { create(:grid_cache, :burn) }
 
+  let(:medpatch_def) do
+    create(:grid_item_definition, :consumable, slug: "medpatch", name: "MedPatch")
+  end
+
   let!(:listing) do
-    create(:grid_shop_listing, :consumable,
+    create(:grid_shop_listing,
+      grid_item_definition: medpatch_def,
       grid_mob: vendor,
-      name: "MedPatch",
       base_price: 100,
       sell_price: 50,
       stock: 5,
@@ -144,11 +148,11 @@ RSpec.describe Grid::ShopService do
     end
 
     let!(:item) do
-      create(:grid_item,
+      create(:grid_item, :consumable,
+        grid_item_definition: medpatch_def,
         grid_hackr: hackr,
         room: nil,
         name: "MedPatch",
-        item_type: "consumable",
         rarity: "common",
         value: 100)
     end
@@ -206,7 +210,7 @@ RSpec.describe Grid::ShopService do
     end
 
     let(:bm_listing) do
-      create(:grid_shop_listing, grid_mob: bm_vendor, base_price: 1000)
+      create(:grid_shop_listing, grid_mob: bm_vendor, base_price: 1000, sell_price: 500)
     end
 
     it "returns base_price for standard vendors" do
@@ -287,9 +291,10 @@ RSpec.describe Grid::ShopService do
 
     let!(:rot_listings) do
       5.times.map do |i|
+        defn = create(:grid_item_definition, slug: "rot-item-#{i}", name: "Rotation Item #{i}")
         create(:grid_shop_listing,
+          grid_item_definition: defn,
           grid_mob: bm_vendor,
-          name: "Rotation Item #{i}",
           rotation_pool: true,
           active: false)
       end
