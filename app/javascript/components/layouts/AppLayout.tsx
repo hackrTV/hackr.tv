@@ -26,6 +26,7 @@ const ReleaseListPage = lazy(() => import('~/components/pages/releases/ReleaseLi
 const ReleaseDetailPage = lazy(() => import('~/components/pages/releases/ReleaseDetailPage'))
 const GridGamePage = lazy(() => import('~/components/pages/grid/GridGamePage').then(m => ({ default: m.GridGamePage })))
 const AchievementsPage = lazy(() => import('~/components/pages/grid/AchievementsPage'))
+const MissionsPage = lazy(() => import('~/components/pages/grid/MissionsPage'))
 const GridLoginPage = lazy(() => import('~/components/pages/grid/GridLoginPage').then(m => ({ default: m.GridLoginPage })))
 const GridRegisterPage = lazy(() => import('~/components/pages/grid/GridRegisterPage').then(m => ({ default: m.GridRegisterPage })))
 const GridVerifyPage = lazy(() => import('~/components/pages/grid/GridVerifyPage').then(m => ({ default: m.GridVerifyPage })))
@@ -102,6 +103,7 @@ export const AppLayout: React.FC = () => {
           <Route path="/:artistSlug/trackz/:trackSlug" element={<TrackDetailPage />} />
           {/* THE PULSE GRID routes */}
           <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
+          <Route path="/missions" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />
           <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
           <Route path="/grid/login" element={<GridLoginPage />} />
           <Route path="/grid/register" element={<GridRegisterPage />} />

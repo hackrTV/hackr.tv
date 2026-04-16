@@ -100,6 +100,8 @@ module Grid
         derive(radio_stations_tuned_visible_count, radio_stations_visible_total)
       when "clearance_level"
         derive(@hackr.stat("clearance").to_i, data[:level].to_i)
+      when "missions_completed_count"
+        derive(missions_completed_count, data[:count].to_i)
       end
     end
 
@@ -249,6 +251,17 @@ module Grid
         .joins(:radio_station).merge(RadioStation.visible).count
     end
 
+    def missions_completed_count
+      return @missions_completed_count if defined?(@missions_completed_count)
+      # Turn-ins increment `turn_in_count` on the (possibly repeatable)
+      # hackr_mission row. A repeatable mission turned in 3 times should
+      # count as 3 completions toward the achievement ladder; a single
+      # completed row is at minimum 1 turn-in.
+      @missions_completed_count = @hackr.grid_hackr_missions
+        .where(status: "completed")
+        .sum(:turn_in_count)
+    end
+
     def matches?(achievement, context)
       # Event-only triggers — unlock fires on the specific action, not
       # a cumulative threshold. These are never catch-up swept.
@@ -266,6 +279,14 @@ module Grid
         return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
       when "salvage_item"
         return true
+      when "purchase_item"
+        return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
+      when "mission_completed"
+        # Fires when a specific mission turns in. `mission_slug` in
+        # trigger_data pins the achievement to a specific mission;
+        # leaving it blank unlocks on ANY mission turn-in (rarely
+        # useful — `missions_completed_count` covers the generic case).
+        return data[:mission_slug].blank? || data[:mission_slug].to_s == context[:mission_slug].to_s
       when "manual"
         return false
       end

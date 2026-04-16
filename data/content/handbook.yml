@@ -244,6 +244,100 @@ handbook_sections:
           hit 50 tracks played across multiple sessions but never triggered
           a Terminal command to check). Expect a small burst of toasts on a
           long-absence login.
+      - slug: missions
+        title: Missions & Quests
+        kind: reference
+        difficulty: beginner
+        position: 3
+        published: true
+        summary: "Accept structured objectives from NPCs for XP, CRED, rep, items, and unlocks."
+        metadata:
+          search_tags:
+            - missions
+            - quests
+            - storylines
+            - objectives
+            - turn-in
+            - deliver
+            - give
+        body: |
+          # Missions
+
+          Missions are structured jobs offered by NPCs. Each mission is a set
+          of objectives (visit a room, talk to someone, retrieve an item,
+          etc.) with rewards paid out on turn-in.
+
+          ## Finding work
+
+          Travel to an NPC and ask about their work:
+
+          ```
+          ask Coordinator about missions
+          ```
+
+          You'll see a list of slugs and short descriptions for every mission
+          that NPC is currently offering you. Specific mission details live
+          one keyword deeper:
+
+          ```
+          ask Coordinator about first-contact
+          ```
+
+          You can only accept a mission from the NPC who gives it, and you
+          have to be in the same room.
+
+          ## Accept, progress, turn in
+
+          | Command              | What it does |
+          |----------------------|--------------|
+          | `accept <slug>`      | Take the job (must be with the giver). |
+          | `missions`           | List your active missions + objective progress. |
+          | `mission <slug>`     | Full detail for one mission. |
+          | `abandon <slug>`     | Drop a mission. Progress clears; re-acceptable anytime. |
+          | `turn_in <slug>`     | Complete the mission (must be with the giver, all objectives met). |
+          | `give <item> to <npc>` | Hand an item to an NPC — used for delivery objectives. |
+
+          Objectives advance automatically as you do the matching action in
+          the Grid. The Terminal shows a short ✓ line on every objective
+          that just completed; progress-only ticks are silent.
+
+          When every objective on a mission is done, the Terminal surfaces
+          `▲ READY FOR TURN-IN`. Return to the giver's room and
+          `turn_in <slug>`.
+
+          ## Storylines and repeatable jobs
+
+          Some missions have a **prerequisite** — you need to complete the
+          prereq before the next one opens up. Related missions can be
+          grouped into an **arc** (e.g. "Signal Recovery") for flavor.
+
+          Missions flagged **repeatable** can be accepted again and again.
+          Each turn-in counts toward any `missions_completed_count`
+          achievements.
+
+          Missions that aren't repeatable are one-shot: once you turn one
+          in, it's done for you. If you abandon it before turn-in, you can
+          re-accept freely.
+
+          ## Rewards
+
+          Mission rewards are a mix of:
+
+          - **XP** and **CRED** (minted from the Fracture Reserve).
+          - **Faction rep** deltas against one or more factions.
+          - **Item grants** dropped into your inventory on turn-in.
+          - **Achievement** unlocks.
+          - **Prereq unlocks** — completing a mission opens the next in its chain.
+
+          See the rewards preview inline when you `ask <npc> about <slug>` or
+          on the `/missions` page.
+
+          ## The `/missions` page
+
+          The SPA page at `/missions` (dropdown under THE PULSE GRID) shows
+          your active jobs, every job available from NPCs in your current
+          room, and your recent completion history. It live-refreshes
+          whenever you turn a mission in.
 
   - slug: wire
     name: WIRE

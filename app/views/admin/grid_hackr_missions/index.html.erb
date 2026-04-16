@@ -1,0 +1,68 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/hackr_missions :: HACKR MISSION LOG</legend>
+
+    <div style="padding: 20px;">
+      <%= form_with url: admin_grid_hackr_missions_path, method: :get, local: true, style: "display: flex; gap: 10px; align-items: center; margin-bottom: 20px;" do %>
+        <label class="white-text" style="font-weight: bold;">STATUS:</label>
+        <%= select_tag :status,
+              options_for_select([["ALL", ""], ["ACTIVE", "active"], ["COMPLETED", "completed"]], @status_filter),
+              class: "tui-input", style: "padding: 4px 8px;", onchange: "this.form.submit()" %>
+        <label class="white-text" style="font-weight: bold; margin-left: 10px;">HACKR:</label>
+        <%= text_field_tag :hackr_alias, @hackr_alias_filter, class: "tui-input", style: "padding: 4px 8px;", placeholder: "hackr alias" %>
+        <%= submit_tag "Filter", class: "tui-button green-168", style: "padding: 4px 12px;" %>
+        <% if @status_filter.present? || @hackr_alias_filter.present? %>
+          <%= link_to "× clear", admin_grid_hackr_missions_path, class: "tui-button", style: "padding: 4px 10px; font-size: 0.8em;" %>
+        <% end %>
+      <% end %>
+
+      <% if @hackr_alias_filter.present? && @hackr_missions.empty? %>
+        <p style="color: #fbbf24;">No hackr found with alias '<%= @hackr_alias_filter %>'.</p>
+      <% end %>
+
+      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <table class="tui-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="text-align: left;">Hackr</th>
+              <th style="text-align: left;">Mission</th>
+              <th style="text-align: left;">Status</th>
+              <th style="text-align: left;">Accepted</th>
+              <th style="text-align: left;">Completed</th>
+              <th style="text-align: center;">Turn-ins</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @hackr_missions.each do |hm| %>
+              <tr>
+                <td style="color: #a78bfa;"><%= hm.grid_hackr.hackr_alias %></td>
+                <td>
+                  <span class="cyan-255-text"><%= hm.grid_mission.name %></span>
+                  <span style="color: #6b7280; font-family: monospace; margin-left: 6px;"><%= hm.grid_mission.slug %></span>
+                </td>
+                <td>
+                  <% if hm.active? %>
+                    <span style="color: #22d3ee;">ACTIVE</span>
+                  <% else %>
+                    <span class="green-255-text">COMPLETED</span>
+                  <% end %>
+                </td>
+                <td style="color: #9ca3af;"><%= hm.accepted_at.strftime("%Y-%m-%d %H:%M") %></td>
+                <td style="color: #9ca3af;"><%= hm.completed_at&.strftime("%Y-%m-%d %H:%M") || "—" %></td>
+                <td style="text-align: center; color: #fbbf24;"><%= hm.turn_in_count %></td>
+                <td style="text-align: right;">
+                  <%= link_to "View", admin_grid_hackr_mission_path(hm), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "<- Missions", admin_grid_missions_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

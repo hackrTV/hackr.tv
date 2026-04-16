@@ -192,7 +192,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, zones, rooms, etc.)"
-  task world: [:factions, :zones, :rooms, :exits, :mobs, :items, :achievements, :shop_listings]
+  task world: [:factions, :zones, :rooms, :exits, :mobs, :items, :achievements, :shop_listings, :missions]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -1865,6 +1865,143 @@ namespace :data do
     puts "  DRY_RUN=true   - Preview without attaching"
     puts "  CLEANUP=true   - Delete local source files after attaching (ignored for S3)"
     puts "=" * 80 + "\n"
+  end
+
+  desc "Load missions and arcs from YAML"
+  task missions: :environment do
+    puts "\n--- Loading Mission Arcs & Missions ---"
+    yaml_file = Rails.root.join("data", "world", "missions.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file) || {}
+    arcs_data = data["arcs"] || []
+    missions_data = data["missions"] || []
+
+    # Pass 1: upsert arcs
+    arc_created = arc_updated = 0
+    arcs_data.each do |attrs|
+      arc = GridMissionArc.find_or_initialize_by(slug: attrs["slug"])
+      was_new = arc.new_record?
+      arc.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"],
+        position: attrs["position"] || 0,
+        published: attrs.fetch("published", true)
+      )
+      if arc.new_record? || arc.changed?
+        arc.save!
+        was_new ? (arc_created += 1) : (arc_updated += 1)
+        puts "  #{was_new ? "✓ Arc Created" : "↻ Arc Updated"}: #{arc.name}"
+      end
+    end
+
+    # Pass 2: upsert missions WITHOUT prereq (resolved in pass 3 so order
+    # in YAML doesn't matter — a mission can prereq a later-declared one).
+    mission_created = mission_updated = 0
+    missions_data.each do |attrs|
+      mission = GridMission.find_or_initialize_by(slug: attrs["slug"])
+      was_new = mission.new_record?
+
+      giver = if attrs["giver_mob_name"].present?
+        query = GridMob.where("LOWER(name) = ?", attrs["giver_mob_name"].to_s.downcase)
+        if attrs["giver_room_slug"].present?
+          room = GridRoom.find_by(slug: attrs["giver_room_slug"])
+          query = query.where(grid_room_id: room.id) if room
+        end
+        query.first
+      end
+      if giver.nil? && attrs["giver_mob_name"].present?
+        puts "  ⚠ Mission '#{attrs["slug"]}': giver '#{attrs["giver_mob_name"]}' not found — saving without giver"
+      end
+
+      arc = attrs["arc_slug"].present? ? GridMissionArc.find_by(slug: attrs["arc_slug"]) : nil
+      min_rep_faction = attrs["min_rep_faction_slug"].present? ? GridFaction.find_by(slug: attrs["min_rep_faction_slug"]) : nil
+
+      mission.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"],
+        giver_mob: giver,
+        grid_mission_arc: arc,
+        min_clearance: attrs["min_clearance"] || 0,
+        min_rep_faction: min_rep_faction,
+        min_rep_value: attrs["min_rep_value"] || 0,
+        repeatable: attrs.fetch("repeatable", false),
+        position: attrs["position"] || 0,
+        published: attrs.fetch("published", true)
+      )
+
+      if mission.new_record? || mission.changed?
+        mission.save!
+        was_new ? (mission_created += 1) : (mission_updated += 1)
+        puts "  #{was_new ? "✓ Mission Created" : "↻ Mission Updated"}: #{mission.name}"
+      end
+
+      # Reconcile objectives declaratively by position. Objectives not in
+      # YAML are removed (including the "empty list" case — fully
+      # clearing objectives from YAML deletes all existing rows so
+      # authors see the change reflected).
+      desired_obj_positions = (attrs["objectives"] || []).map { |o| o["position"].to_i }
+      mission.grid_mission_objectives.where.not(position: desired_obj_positions).destroy_all
+
+      (attrs["objectives"] || []).each do |o|
+        pos = o["position"].to_i
+        objective = mission.grid_mission_objectives.find_or_initialize_by(position: pos)
+        objective.assign_attributes(
+          objective_type: o["objective_type"],
+          label: o["label"],
+          target_slug: o["target_slug"],
+          target_count: o["target_count"] || 1
+        )
+        objective.save! if objective.new_record? || objective.changed?
+      end
+
+      # Rewards: same declarative reconcile by position. Matches
+      # factions/objectives idiom — upsert on `changed?`, destroy
+      # rows no longer in YAML. Avoids churn on idempotent re-runs.
+      desired_reward_positions = (attrs["rewards"] || []).each_with_index.map { |r, i| r["position"] || (i + 1) }
+      mission.grid_mission_rewards.where.not(position: desired_reward_positions).destroy_all
+
+      (attrs["rewards"] || []).each_with_index do |r, i|
+        pos = r["position"] || (i + 1)
+        reward = mission.grid_mission_rewards.find_or_initialize_by(position: pos)
+        reward.assign_attributes(
+          reward_type: r["reward_type"],
+          amount: r["amount"] || 0,
+          target_slug: r["target_slug"],
+          quantity: r["quantity"] || 1
+        )
+        reward.save! if reward.new_record? || reward.changed?
+      end
+    end
+
+    # Pass 3: reconcile prereq_mission_slug → prereq_mission_id declaratively.
+    # Handles three cases per mission:
+    #   1. YAML adds/changes prereq → resolve slug → set FK
+    #   2. YAML removes prereq → null out the FK (prevents stale prereq drift)
+    #   3. YAML references an unknown prereq slug → warn, leave existing FK
+    missions_data.each do |attrs|
+      mission = GridMission.find_by(slug: attrs["slug"])
+      next unless mission
+
+      desired_prereq_id = if attrs["prereq_mission_slug"].present?
+        prereq = GridMission.find_by(slug: attrs["prereq_mission_slug"])
+        unless prereq
+          puts "  ⚠ Mission '#{attrs["slug"]}': prereq '#{attrs["prereq_mission_slug"]}' not found — leaving existing FK"
+          next
+        end
+        prereq.id
+      end
+
+      next if mission.prereq_mission_id == desired_prereq_id
+      mission.update!(prereq_mission_id: desired_prereq_id)
+    end
+
+    puts "Arcs: #{arc_created} created, #{arc_updated} updated, #{GridMissionArc.count} total"
+    puts "Missions: #{mission_created} created, #{mission_updated} updated, #{GridMission.count} total"
   end
 end
 

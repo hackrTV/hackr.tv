@@ -76,6 +76,18 @@ module Grid
         buy_command(args.join(" "))
       when "sell"
         sell_command(args.join(" "))
+      when "missions", "quests"
+        missions_command
+      when "mission", "quest"
+        mission_detail_command(args.first)
+      when "accept"
+        accept_mission_command(args.first)
+      when "abandon"
+        abandon_mission_command(args.first)
+      when "turn_in", "turnin", "ti"
+        turn_in_command(args.first)
+      when "give"
+        give_command(args)
       when "help", "?"
         help_command
       when "who"
@@ -176,6 +188,10 @@ module Grid
       look_output = look_command
       notifications = achievement_checker.check(:room_visit, room_slug: new_room.slug)
       notifications += achievement_checker.check(:rooms_visited)
+      notifications += mission_progressor.record(:visit_room, room_slug: new_room.slug)
+      # Clearance may have changed if level-up happened above; check missions
+      # that track reach_clearance too (cheap — progressor no-ops if none exist).
+      notifications += mission_progressor.record(:reach_clearance, clearance: hackr.stat("clearance").to_i)
       look_output = append_notifications(look_output, notifications)
 
       {
@@ -256,6 +272,7 @@ module Grid
       notifications = achievement_checker.check(:take_item, item_name: item.name)
       notifications += achievement_checker.check(:items_collected)
       notifications += achievement_checker.check(:rarity_owned, rarity: item.rarity) if item.rarity.present?
+      notifications += mission_progressor.record(:collect_item, item_name: item.name)
       output = append_notifications(output, notifications)
 
       {
@@ -358,6 +375,15 @@ module Grid
       rep_notif = grant_faction_rep(mob.grid_faction, 1, reason: "talk:#{slugify(mob.name)}", source: mob)
       notifications = achievement_checker.check(:talk_npc, npc_name: mob.name)
       notifications.unshift(rep_notif) if rep_notif
+      notifications += mission_progressor.record(:talk_npc, npc_name: mob.name)
+      # Rep changed from the talk grant — fire reach_rep for this faction.
+      if mob.grid_faction
+        notifications += mission_progressor.record(
+          :reach_rep,
+          faction_slug: mob.grid_faction.slug,
+          rep_value: reputation_service.effective_rep(mob.grid_faction)
+        )
+      end
       append_notifications(output, notifications)
     end
 
@@ -388,6 +414,13 @@ module Grid
       dialogue = mob.dialogue_tree
       topics = dialogue["topics"] || {}
 
+      # Mission intercepts — checked BEFORE topic dictionary lookup so a
+      # quest_giver's topic list doesn't need to enumerate every mission
+      # slug or the literal "missions"/"work" keyword. A dialogue_tree
+      # topic with the same key still overrides if the author defined one.
+      mission_topic = mission_topic_response(mob, topic, room)
+      return dialogue_box(mission_topic) if mission_topic
+
       # Try exact match first, then case-insensitive match
       response = topics[topic] || topics[topic.downcase] || topics.find { |k, v| k.downcase == topic.downcase }&.last
 
@@ -398,6 +431,120 @@ module Grid
         content = "<span style='color: #c084fc;'>#{h(mob.name)}</span> doesn't know about '#{h(topic)}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
       end
       dialogue_box(content)
+    end
+
+    # Returns HTML content (without dialogue_box wrapping) when `topic`
+    # is a mission-related keyword or a specific mission slug offered by
+    # this NPC. Nil otherwise — caller falls through to generic topics.
+    def mission_topic_response(mob, topic, room)
+      normalized = topic.to_s.downcase.strip
+      return missions_offered_by_response(mob, room) if %w[missions quests work assignments].include?(normalized)
+
+      # Specific mission slug lookup. Case-insensitive. Match only missions
+      # this NPC actually gives.
+      mission = GridMission.published.find_by(
+        "LOWER(slug) = ? AND giver_mob_id = ?", normalized, mob.id
+      )
+      return mission_brief_response(mob, mission, room) if mission
+
+      nil
+    end
+
+    def missions_offered_by_response(mob, room)
+      available = mission_service.available_missions(room).select { |m| m.giver_mob_id == mob.id }
+      if available.empty?
+        return "<span style='color: #c084fc;'>#{h(mob.name)}</span>: " \
+          "<span style='color: #60a5fa;'>\"Nothing for you right now.\"</span>"
+      end
+
+      lines = ["<span style='color: #c084fc;'>#{h(mob.name)}</span>: " \
+        "<span style='color: #60a5fa;'>\"Here's what I've got.\"</span>"]
+      lines << ""
+      available.each do |m|
+        arc = m.grid_mission_arc ? " <span style='color: #6b7280;'>[#{h(m.grid_mission_arc.name)}]</span>" : ""
+        rep_tag = m.repeatable? ? " <span style='color: #34d399;'>(repeatable)</span>" : ""
+        lines << "  <span style='color: #fbbf24;'>#{h(m.slug)}</span>#{rep_tag} " \
+          "<span style='color: #9ca3af;'>::</span> <span style='color: #d0d0d0;'>#{h(m.name)}</span>#{arc}"
+        lines << "    <span style='color: #6b7280;'>#{h(m.description.to_s.truncate(120))}</span>" if m.description.present?
+      end
+      lines << ""
+      lines << "<span style='color: #9ca3af;'>Use 'ask #{h(mob.name)} about &lt;slug&gt;' for details, or 'accept &lt;slug&gt;' to take the job.</span>"
+      lines.join("\n")
+    end
+
+    def mission_brief_response(mob, mission, room)
+      lines = []
+      arc = mission.grid_mission_arc ? " <span style='color: #6b7280;'>[#{h(mission.grid_mission_arc.name)}]</span>" : ""
+      # Giver may be nil — schema allows it and the loader leaves the FK
+      # null if the YAML `giver_mob_name` can't be resolved. Render a
+      # neutral header rather than dereferencing nil.
+      speaker = mob ? "<span style='color: #c084fc;'>#{h(mob.name)}</span>: " : ""
+      lines << "#{speaker}<span style='color: #22d3ee; font-weight: bold;'>#{h(mission.name)}</span>#{arc}"
+      lines << "<span style='color: #d0d0d0;'>#{h(mission.description)}</span>" if mission.description.present?
+
+      lines << ""
+      lines << "<span style='color: #fbbf24;'>Objectives:</span>"
+      mission.grid_mission_objectives.each do |obj|
+        lines << "  <span style='color: #9ca3af;'>▸</span> #{h(obj.label)}" + ((obj.target_count > 1) ? " <span style='color: #6b7280;'>(×#{obj.target_count})</span>" : "")
+      end
+
+      rewards_summary = mission_rewards_summary(mission)
+      if rewards_summary.present?
+        lines << ""
+        lines << "<span style='color: #fbbf24;'>Rewards:</span> #{rewards_summary}"
+      end
+
+      status_hint = mission_status_hint(mission, room)
+      lines << ""
+      lines << status_hint if status_hint
+      lines.join("\n")
+    end
+
+    def mission_rewards_summary(mission)
+      parts = []
+      mission.grid_mission_rewards.each do |r|
+        case r.reward_type
+        when "xp"
+          parts << "<span style='color: #34d399;'>+#{r.amount} XP</span>" if r.amount.to_i.positive?
+        when "cred"
+          parts << "<span style='color: #fbbf24;'>+#{r.amount} CRED</span>" if r.amount.to_i.positive?
+        when "faction_rep"
+          sign = (r.amount.to_i >= 0) ? "+" : ""
+          color = (r.amount.to_i >= 0) ? "#34d399" : "#ef4444"
+          parts << "<span style='color: #{color};'>#{sign}#{r.amount} rep</span> <span style='color: #9ca3af;'>(#{h(r.target_slug.to_s)})</span>" if r.amount.to_i != 0
+        when "item_grant"
+          qty_tag = (r.quantity.to_i > 1) ? " x#{r.quantity}" : ""
+          parts << "<span style='color: #22d3ee;'>+ #{h(r.target_slug.to_s)}#{qty_tag}</span>"
+        when "grant_achievement"
+          parts << "<span style='color: #fbbf24;'>◆ Achievement</span>"
+        end
+      end
+      parts.join(" <span style='color: #4b5563;'>|</span> ")
+    end
+
+    def mission_status_hint(mission, room)
+      active = hackr.grid_hackr_missions.active.where(grid_mission_id: mission.id).exists?
+      return "<span style='color: #fbbf24;'>You're already working on this. Use 'mission #{h(mission.slug)}' to see progress.</span>" if active
+
+      completed_count = hackr.grid_hackr_missions.completed.where(grid_mission_id: mission.id).sum(:turn_in_count)
+      if completed_count.positive? && !mission.repeatable?
+        return "<span style='color: #9ca3af;'>You've already completed this job.</span>"
+      end
+
+      reason = refusal_reason(mission, room)
+      if reason
+        "<span style='color: #f87171;'>#{reason}</span>"
+      else
+        "<span style='color: #34d399;'>Available. Use 'accept #{h(mission.slug)}' to take this job.</span>"
+      end
+    end
+
+    def refusal_reason(mission, room)
+      unless room && mission.giver_mob_id && room.grid_mobs.exists?(id: mission.giver_mob_id)
+        return "You need to speak to the giver in person to accept."
+      end
+      status = mission_service.gate_status(mission)
+      status.reason ? h(status.reason) : nil
     end
 
     def help_command
@@ -422,6 +569,15 @@ module Grid
         <span style='color: #fbbf24;'>NPCs:</span>
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>                - Talk to an NPC
           <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>   - Ask an NPC about a topic
+          <span style='color: #34d399;'>give &lt;item&gt; to &lt;npc&gt;</span>     - Hand an item to an NPC (for delivery missions)
+
+        <span style='color: #fbbf24;'>Missions:</span>
+          <span style='color: #34d399;'>missions</span>                  - List your active missions
+          <span style='color: #34d399;'>mission &lt;slug&gt;</span>           - View details for a specific mission
+          <span style='color: #34d399;'>ask &lt;npc&gt; about missions</span> - See what work an NPC is offering
+          <span style='color: #34d399;'>accept &lt;slug&gt;</span>            - Accept a mission (must be with giver)
+          <span style='color: #34d399;'>abandon &lt;slug&gt;</span>           - Drop an active mission
+          <span style='color: #34d399;'>turn_in &lt;slug&gt;, ti</span>       - Turn in a completed mission (must be with giver)
 
         <span style='color: #fbbf24;'>Commerce:</span>
           <span style='color: #34d399;'>shop, browse</span>              - View vendor inventory &amp; prices
@@ -598,6 +754,7 @@ module Grid
       end
 
       notifications = achievement_checker.check(:use_item, item_name: saved_name)
+      notifications += mission_progressor.record(:use_item, item_name: saved_name)
       output = append_notifications(result, notifications)
       {output: output, event: nil}
     end
@@ -624,6 +781,8 @@ module Grid
 
       notifications = achievement_checker.check(:salvage_item)
       notifications += achievement_checker.check(:salvage_count)
+      notifications += mission_progressor.record(:salvage_item, item_name: item.name)
+      notifications += mission_progressor.record(:reach_clearance, clearance: hackr.stat("clearance").to_i)
       output = append_notifications(output, notifications)
       {output: output, event: nil}
     end
@@ -809,6 +968,15 @@ module Grid
       rep_notif = grant_faction_rep(vendor.grid_faction, 2, reason: "buy:#{slugify(item.name)}", source: vendor)
       notifications = achievement_checker.check(:purchase_item, item_name: item.name)
       notifications.unshift(rep_notif) if rep_notif
+      notifications += mission_progressor.record(:buy_item, item_name: item.name)
+      notifications += mission_progressor.record(:spend_cred, amount: result[:price_paid].to_i)
+      if vendor.grid_faction
+        notifications += mission_progressor.record(
+          :reach_rep,
+          faction_slug: vendor.grid_faction.slug,
+          rep_value: reputation_service.effective_rep(vendor.grid_faction)
+        )
+      end
       output = append_notifications(output, notifications)
       {output: output, event: nil}
     rescue Grid::ShopService::AccessDenied => e
@@ -1383,6 +1551,267 @@ module Grid
 
     def reputation_service
       @reputation_service ||= Grid::ReputationService.new(hackr)
+    end
+
+    def mission_service
+      @mission_service ||= Grid::MissionService.new(hackr)
+    end
+
+    def mission_progressor
+      @mission_progressor ||= Grid::MissionProgressor.new(hackr)
+    end
+
+    # --- Mission commands ---
+
+    def missions_command
+      active = mission_service.active_hackr_missions.to_a
+      completed = mission_service.completed_hackr_missions(limit: 5).to_a
+
+      output = []
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output << "<span style='color: #22d3ee; font-weight: bold;'>ACTIVE MISSIONS</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+
+      if active.empty?
+        output << ""
+        output << "<span style='color: #9ca3af;'>You have no active missions.</span>"
+        output << "<span style='color: #6b7280;'>Talk to NPCs and 'ask &lt;npc&gt; about missions' to find work.</span>"
+      else
+        active.each do |hm|
+          output << ""
+          output << format_active_mission_row(hm)
+        end
+      end
+
+      if completed.any?
+        output << ""
+        output << "<span style='color: #fbbf24;'>Recently completed:</span>"
+        completed.each do |hm|
+          m = hm.grid_mission
+          output << "  <span style='color: #34d399;'>✓</span> <span style='color: #6b7280;'>#{h(m.slug)}</span> " \
+            "<span style='color: #9ca3af;'>::</span> <span style='color: #d0d0d0;'>#{h(m.name)}</span>" +
+            ((hm.turn_in_count.to_i > 1) ? " <span style='color: #6b7280;'>(×#{hm.turn_in_count})</span>" : "")
+        end
+      end
+
+      output << ""
+      output << "<span style='color: #6b7280;'>Commands: mission &lt;slug&gt; | accept &lt;slug&gt; | turn_in &lt;slug&gt; | abandon &lt;slug&gt;</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output.join("\n")
+    end
+
+    def format_active_mission_row(hackr_mission)
+      m = hackr_mission.grid_mission
+      giver = m.giver_mob ? " <span style='color: #6b7280;'>[giver: #{h(m.giver_mob.name)}]</span>" : ""
+      arc = m.grid_mission_arc ? " <span style='color: #6b7280;'>[#{h(m.grid_mission_arc.name)}]</span>" : ""
+
+      lines = []
+      lines << "  <span style='color: #fbbf24;'>#{h(m.slug)}</span> " \
+        "<span style='color: #9ca3af;'>::</span> <span style='color: #22d3ee;'>#{h(m.name)}</span>#{giver}#{arc}"
+
+      all_done, obj_lines = mission_objective_lines(hackr_mission, indent: "    ")
+      lines.concat(obj_lines)
+
+      if all_done
+        giver_hint = m.giver_mob ? "Return to #{h(m.giver_mob.name)}" : "Ready"
+        lines << "    <span style='color: #fbbf24;'>▲ READY FOR TURN-IN</span> <span style='color: #6b7280;'>(#{giver_hint}. 'turn_in #{h(m.slug)}')</span>"
+      end
+
+      lines.join("\n")
+    end
+
+    # Render the objective checklist for a hackr_mission. Returns
+    # [all_done?, Array<String>] so callers can decide whether to append
+    # a READY notice. Used by both the summary row (`missions`) and the
+    # detail view (`mission <slug>`).
+    def mission_objective_lines(hackr_mission, indent:)
+      progress_by_obj = hackr_mission.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id)
+      all_done = true
+      lines = hackr_mission.grid_mission.grid_mission_objectives.map do |obj|
+        hobj = progress_by_obj[obj.id]
+        current = hobj&.progress.to_i
+        target = obj.target_count.to_i
+        done = hobj&.completed_at.present?
+        all_done &&= done
+        check = done ? "<span style='color: #34d399;'>✓</span>" : "<span style='color: #6b7280;'>▸</span>"
+        count_tag = (target > 1) ? " <span style='color: #9ca3af;'>(#{current}/#{target})</span>" : ""
+        "#{indent}#{check} #{h(obj.label)}#{count_tag}"
+      end
+      [all_done, lines]
+    end
+
+    def mission_detail_command(slug)
+      return "<span style='color: #fbbf24;'>Usage: mission &lt;slug&gt;</span>" if slug.blank?
+
+      # First check active instance (player's current progress view)
+      active = hackr.grid_hackr_missions.active.joins(:grid_mission)
+        .where(grid_missions: {slug: slug}).first
+      if active
+        return format_active_mission_detail(active)
+      end
+
+      # Otherwise show definition (if in giver's room, show accept hint)
+      mission = GridMission.published.find_by(slug: slug)
+      return "<span style='color: #f87171;'>No mission with slug '#{h(slug)}'.</span>" unless mission
+
+      room = hackr.current_room
+      mission_brief_response(mission.giver_mob, mission, room) || "<span style='color: #9ca3af;'>Nothing to show.</span>"
+    end
+
+    def format_active_mission_detail(hackr_mission)
+      m = hackr_mission.grid_mission
+      output = []
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output << "<span style='color: #22d3ee; font-weight: bold;'>#{h(m.name)}</span>" +
+        (m.grid_mission_arc ? " <span style='color: #6b7280;'>[#{h(m.grid_mission_arc.name)}]</span>" : "")
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output << ""
+      output << "<span style='color: #d0d0d0;'>#{h(m.description)}</span>" if m.description.present?
+      output << ""
+      output << "<span style='color: #fbbf24;'>Objectives:</span>"
+
+      _all_done, obj_lines = mission_objective_lines(hackr_mission, indent: "  ")
+      output.concat(obj_lines)
+
+      rewards_summary = mission_rewards_summary(m)
+      if rewards_summary.present?
+        output << ""
+        output << "<span style='color: #fbbf24;'>Rewards:</span> #{rewards_summary}"
+      end
+
+      if hackr_mission.all_objectives_completed?
+        giver_hint = m.giver_mob ? "Return to #{h(m.giver_mob.name)}" : "Ready"
+        output << ""
+        output << "<span style='color: #fbbf24;'>▲ READY FOR TURN-IN</span> <span style='color: #6b7280;'>(#{giver_hint}. Use 'turn_in #{h(m.slug)}')</span>"
+      end
+
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output.join("\n")
+    end
+
+    def accept_mission_command(slug)
+      return "<span style='color: #fbbf24;'>Usage: accept &lt;slug&gt;</span>" if slug.blank?
+
+      room = hackr.current_room
+      mission_service.accept!(slug, room: room)
+
+      mission = GridMission.find_by(slug: slug)
+      giver = mission&.giver_mob
+      giver_line = giver ? " <span style='color: #6b7280;'>from #{h(giver.name)}</span>" : ""
+
+      "<span style='color: #34d399;'>▲ MISSION ACCEPTED:</span> " \
+        "<span style='color: #22d3ee;'>#{h(mission&.name)}</span>#{giver_line}\n" \
+        "<span style='color: #6b7280;'>Use 'mission #{h(slug)}' to view objectives.</span>"
+    rescue Grid::MissionService::MissionMissing,
+      Grid::MissionService::NotAtGiver,
+      Grid::MissionService::PrereqUnmet,
+      Grid::MissionService::ClearanceTooLow,
+      Grid::MissionService::RepTooLow,
+      Grid::MissionService::AlreadyActive,
+      Grid::MissionService::AlreadyCompletedNonRepeatable => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    def abandon_mission_command(slug)
+      return "<span style='color: #fbbf24;'>Usage: abandon &lt;slug&gt;</span>" if slug.blank?
+
+      hackr_mission = mission_service.abandon!(slug)
+      "<span style='color: #fbbf24;'>Mission abandoned:</span> " \
+        "<span style='color: #d0d0d0;'>#{h(hackr_mission.grid_mission.name)}</span>\n" \
+        "<span style='color: #6b7280;'>Progress has been cleared. You can re-accept it anytime.</span>"
+    rescue Grid::MissionService::NotActive => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    def turn_in_command(slug)
+      return "<span style='color: #fbbf24;'>Usage: turn_in &lt;slug&gt;</span>" if slug.blank?
+
+      room = hackr.current_room
+      outcome = mission_service.turn_in!(slug, room: room)
+
+      output = outcome[:notification_html]
+      output = append_notifications(output, outcome[:progressor_notifs] || [])
+      output = append_notifications(output, outcome[:achievement_notifs] || [])
+      {output: output, event: nil}
+    rescue Grid::MissionService::NotActive,
+      Grid::MissionService::ObjectivesIncomplete,
+      Grid::MissionService::NotAtTurnIn => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    # "give <item> to <npc>" — consumes the item and fires a :deliver_item
+    # mission tick if any active mission has a matching objective. If no
+    # objective matches, the item is NOT consumed (flavor-only delivery)
+    # and the NPC offers a non-committal line.
+    def give_command(args)
+      return "<span style='color: #fbbf24;'>Usage: give &lt;item&gt; to &lt;npc&gt;</span>" if args.length < 3
+
+      # Split on the last occurrence of "to" so multi-word item + NPC names
+      # round-trip correctly (e.g. "give Signal Fragment to Codec Prime").
+      to_index = args.rindex { |w| w.downcase == "to" }
+      return "<span style='color: #fbbf24;'>Usage: give &lt;item&gt; to &lt;npc&gt;</span>" unless to_index && to_index > 0 && to_index < args.length - 1
+
+      item_name = args[0...to_index].join(" ")
+      npc_name = args[(to_index + 1)..].join(" ")
+
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
+      return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
+
+      # Wrap progressor + consumption in one transaction so a mid-flow
+      # exception can't leave the objective advanced without the item
+      # consumed (free repeat deliveries) or the item gone without
+      # progress (lost reward). All-or-nothing.
+      notifications = []
+      tx_committed = false
+      begin
+        ActiveRecord::Base.transaction do
+          notifications = mission_progressor.record(
+            :deliver_item, item_name: item.name, npc_name: mob.name
+          )
+
+          if notifications.empty?
+            # No mission objective matched — roll back the transaction
+            # so nothing is written and the NPC politely declines. The
+            # item stays in the player's inventory.
+            raise ActiveRecord::Rollback
+          end
+
+          # Consume the item only when a delivery objective matched.
+          if item.quantity.to_i > 1
+            item.update!(quantity: item.quantity - 1)
+          else
+            item.destroy!
+          end
+          tx_committed = true
+        end
+      ensure
+        # If the transaction rolled back (either ActiveRecord::Rollback
+        # or an exception from item.destroy!), the progressor's memoized
+        # `@active_hackr_missions` holds AR objects whose `completed_at`
+        # was mutated in-memory by `save!` before the rollback. Drop
+        # the memoization so any subsequent `record` call in this same
+        # command execution re-reads from the DB.
+        @mission_progressor = nil unless tx_committed
+      end
+
+      if notifications.empty?
+        return dialogue_box(
+          "<span style='color: #c084fc;'>#{h(mob.name)}</span>: " \
+          "<span style='color: #60a5fa;'>\"I appreciate the gesture, but I have no use for that.\"</span>"
+        )
+      end
+
+      output = "<span style='color: #34d399;'>You hand the </span>" \
+        "<span style='color: #d0d0d0;'>#{h(item.name)}</span>" \
+        "<span style='color: #34d399;'> to </span>" \
+        "<span style='color: #c084fc;'>#{h(mob.name)}</span><span style='color: #34d399;'>.</span>"
+      append_notifications(output, notifications)
     end
 
     def increment_stat!(key, amount = 1)

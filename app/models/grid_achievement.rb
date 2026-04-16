@@ -41,6 +41,7 @@ class GridAchievement < ApplicationRecord
     salvage_item
     salvage_count
     manual
+    purchase_item
     track_plays_count
     pulse_vault_completed
     hackr_logs_read
@@ -57,6 +58,8 @@ class GridAchievement < ApplicationRecord
     radio_stations_tuned
     radio_stations_tuned_all
     clearance_level
+    missions_completed_count
+    mission_completed
   ].freeze
 
   CATEGORIES = %w[grid music social meta progression].freeze
@@ -73,6 +76,7 @@ class GridAchievement < ApplicationRecord
     wire_pulses_count uplink_packets_count playlists_created
     vods_watched radio_stations_tuned radio_stations_tuned_all
     clearance_level
+    missions_completed_count
   ].freeze
 
   has_many :grid_hackr_achievements, dependent: :destroy

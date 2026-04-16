@@ -1,0 +1,54 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1000px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/hackr_missions/<%= @hackr_mission.id %> :: HACKR MISSION</legend>
+
+    <div style="padding: 20px;">
+      <h3 class="cyan-255-text"><%= @hackr_mission.grid_mission.name %></h3>
+      <p style="color: #9ca3af;"><strong>Hackr:</strong> <%= @hackr_mission.grid_hackr.hackr_alias %></p>
+      <p style="color: #9ca3af;"><strong>Status:</strong> <%= @hackr_mission.status.upcase %></p>
+      <p style="color: #9ca3af;"><strong>Accepted:</strong> <%= @hackr_mission.accepted_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
+      <% if @hackr_mission.completed_at %>
+        <p style="color: #9ca3af;"><strong>Completed:</strong> <%= @hackr_mission.completed_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
+      <% end %>
+      <p style="color: #9ca3af;"><strong>Turn-in count:</strong> <%= @hackr_mission.turn_in_count %></p>
+
+      <h3 class="cyan-255-text" style="margin-top: 25px;">[:: OBJECTIVES ::]</h3>
+      <table class="tui-table" style="width: 100%; margin-top: 10px;">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Label</th>
+            <th style="text-align: left;">Type</th>
+            <th style="text-align: left;">Target</th>
+            <th style="text-align: center;">Progress</th>
+            <th style="text-align: center;">Completed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% hobj_by_id = @hackr_mission.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id) %>
+          <% @hackr_mission.grid_mission.grid_mission_objectives.each do |obj| %>
+            <% hobj = hobj_by_id[obj.id] %>
+            <tr>
+              <td><%= obj.label %></td>
+              <td style="color: #888;"><%= obj.objective_type %></td>
+              <td style="color: #888; font-family: monospace;"><%= obj.target_slug || "—" %></td>
+              <td style="text-align: center; color: #9ca3af;">
+                <%= hobj&.progress.to_i %> / <%= obj.target_count %>
+              </td>
+              <td style="text-align: center;">
+                <% if hobj&.completed_at %>
+                  <span class="green-255-text">✓</span>
+                <% else %>
+                  <span style="color: #444;">–</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "<- Hackr Missions", admin_grid_hackr_missions_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>
