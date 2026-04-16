@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_000007) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_15_120002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -238,6 +238,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_000007) do
     t.index ["grid_hackr_id"], name: "index_grid_hackr_achievements_on_grid_hackr_id"
   end
 
+  create_table "grid_hackr_mission_objectives", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_mission_id", null: false
+    t.integer "grid_mission_objective_id", null: false
+    t.integer "progress", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_mission_id", "grid_mission_objective_id"], name: "index_hackr_mission_objs_unique", unique: true
+    t.index ["grid_hackr_mission_id"], name: "index_hackr_mission_objs_on_hackr_mission"
+    t.index ["grid_mission_objective_id"], name: "index_hackr_mission_objs_on_objective"
+  end
+
+  create_table "grid_hackr_missions", force: :cascade do |t|
+    t.datetime "accepted_at", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "grid_mission_id", null: false
+    t.string "status", default: "active", null: false
+    t.integer "turn_in_count", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id", "grid_mission_id"], name: "index_hackr_missions_unique_active", unique: true, where: "status = 'active'"
+    t.index ["grid_hackr_id", "status"], name: "index_hackr_missions_on_hackr_and_status"
+    t.index ["grid_hackr_id"], name: "index_grid_hackr_missions_on_grid_hackr_id"
+    t.index ["grid_mission_id"], name: "index_grid_hackr_missions_on_grid_mission_id"
+  end
+
   create_table "grid_hackr_reputations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "grid_hackr_id", null: false
@@ -313,6 +340,64 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_000007) do
     t.datetime "last_tick_at"
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id"], name: "index_grid_mining_rigs_on_grid_hackr_id", unique: true
+  end
+
+  create_table "grid_mission_arcs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "published", default: false, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_grid_mission_arcs_on_slug", unique: true
+  end
+
+  create_table "grid_mission_objectives", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_mission_id", null: false
+    t.string "label", null: false
+    t.string "objective_type", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "target_count", default: 1, null: false
+    t.string "target_slug"
+    t.datetime "updated_at", null: false
+    t.index ["grid_mission_id", "position"], name: "index_mission_objectives_on_mission_and_position"
+    t.index ["grid_mission_id"], name: "index_grid_mission_objectives_on_grid_mission_id"
+  end
+
+  create_table "grid_mission_rewards", force: :cascade do |t|
+    t.integer "amount", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_mission_id", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "quantity", default: 1, null: false
+    t.string "reward_type", null: false
+    t.string "target_slug"
+    t.datetime "updated_at", null: false
+    t.index ["grid_mission_id"], name: "index_grid_mission_rewards_on_grid_mission_id"
+  end
+
+  create_table "grid_missions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "giver_mob_id"
+    t.integer "grid_mission_arc_id"
+    t.integer "min_clearance", default: 0, null: false
+    t.integer "min_rep_faction_id"
+    t.integer "min_rep_value", default: 0, null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "prereq_mission_id"
+    t.boolean "published", default: false, null: false
+    t.boolean "repeatable", default: false, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["giver_mob_id"], name: "index_grid_missions_on_giver_mob_id"
+    t.index ["grid_mission_arc_id"], name: "index_grid_missions_on_grid_mission_arc_id"
+    t.index ["min_rep_faction_id"], name: "index_grid_missions_on_min_rep_faction_id"
+    t.index ["prereq_mission_id"], name: "index_grid_missions_on_prereq_mission_id"
+    t.index ["slug"], name: "index_grid_missions_on_slug", unique: true
   end
 
   create_table "grid_mobs", force: :cascade do |t|
@@ -933,9 +1018,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_000007) do
   add_foreign_key "grid_factions", "grid_factions", column: "parent_id"
   add_foreign_key "grid_hackr_achievements", "grid_achievements"
   add_foreign_key "grid_hackr_achievements", "grid_hackrs"
+  add_foreign_key "grid_hackr_mission_objectives", "grid_hackr_missions", on_delete: :cascade
+  add_foreign_key "grid_hackr_mission_objectives", "grid_mission_objectives", on_delete: :restrict
+  add_foreign_key "grid_hackr_missions", "grid_hackrs", on_delete: :cascade
+  add_foreign_key "grid_hackr_missions", "grid_missions", on_delete: :cascade
   add_foreign_key "grid_hackr_reputations", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "tracks"
+  add_foreign_key "grid_mission_objectives", "grid_missions", on_delete: :cascade
+  add_foreign_key "grid_mission_rewards", "grid_missions", on_delete: :cascade
+  add_foreign_key "grid_missions", "grid_factions", column: "min_rep_faction_id", on_delete: :nullify
+  add_foreign_key "grid_missions", "grid_mission_arcs", on_delete: :nullify
+  add_foreign_key "grid_missions", "grid_missions", column: "prereq_mission_id", on_delete: :nullify
+  add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_shop_listings", "grid_mobs"

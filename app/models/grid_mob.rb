@@ -19,6 +19,9 @@ class GridMob < ApplicationRecord
   belongs_to :grid_faction, optional: true
   has_many :grid_shop_listings, dependent: :destroy
   has_many :grid_shop_transactions, dependent: :nullify
+  # When a giver mob is deleted, the missions lose their giver (FK nullified
+  # at the DB level). Missions are world data — an admin can reassign.
+  has_many :given_missions, class_name: "GridMission", foreign_key: :giver_mob_id, dependent: :nullify
 
   validates :name, presence: true
   validates :mob_type, inclusion: {in: %w[quest_giver vendor lore special], allow_nil: true}
@@ -26,6 +29,10 @@ class GridMob < ApplicationRecord
 
   def vendor?
     mob_type == "vendor"
+  end
+
+  def quest_giver?
+    mob_type == "quest_giver"
   end
 
   def shop_type

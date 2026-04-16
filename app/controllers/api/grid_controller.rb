@@ -1,7 +1,7 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action :require_admin_api, only: [:debit]
 
@@ -51,6 +51,21 @@ class Api::GridController < ApplicationController
     render json: {
       categories: categories,
       summary: {by_category: summary, total: total_summary}
+    }
+  end
+
+  # GET /api/grid/missions - Active + completed + available-in-current-room missions.
+  def missions_index
+    service = Grid::MissionService.new(current_hackr)
+
+    active = service.active_hackr_missions.to_a
+    completed = service.completed_hackr_missions(limit: 20).to_a
+    available = service.available_missions(current_hackr.current_room).to_a
+
+    render json: {
+      active: active.map { |hm| hackr_mission_json(hm, include_progress: true) },
+      completed: completed.map { |hm| hackr_mission_json(hm, include_progress: false) },
+      available: available.map { |m| mission_json(m, include_gate_status: true) }
     }
   end
 
@@ -579,5 +594,90 @@ class Api::GridController < ApplicationController
         }
       end
     }
+  end
+
+  # --- Mission JSON helpers ---
+
+  def mission_json(mission, include_gate_status: false)
+    data = {
+      slug: mission.slug,
+      name: mission.name,
+      description: mission.description,
+      repeatable: mission.repeatable,
+      arc: mission.grid_mission_arc ? {slug: mission.grid_mission_arc.slug, name: mission.grid_mission_arc.name} : nil,
+      giver: mission.giver_mob ? {
+        name: mission.giver_mob.name,
+        room_id: mission.giver_mob.grid_room_id,
+        room_slug: mission.giver_mob.grid_room&.slug
+      } : nil,
+      prereq_slug: mission.prereq_mission&.slug,
+      min_clearance: mission.min_clearance,
+      min_rep: mission.min_rep_faction ? {faction_slug: mission.min_rep_faction.slug, value: mission.min_rep_value} : nil,
+      objectives: mission.grid_mission_objectives.map { |o|
+        {
+          id: o.id,
+          position: o.position,
+          objective_type: o.objective_type,
+          label: o.label,
+          target_slug: o.target_slug,
+          target_count: o.target_count
+        }
+      },
+      rewards: mission.grid_mission_rewards.map { |r|
+        {
+          id: r.id,
+          reward_type: r.reward_type,
+          amount: r.amount,
+          target_slug: r.target_slug,
+          quantity: r.quantity
+        }
+      }
+    }
+
+    if include_gate_status
+      status = mission_service.gate_status(mission)
+      data[:gates] = {
+        clearance_met: status.clearance_met,
+        prereq_met: status.prereq_met,
+        rep_met: status.rep_met
+      }
+    end
+
+    data
+  end
+
+  # Memoized per-request. Reuses one MissionService instance across all
+  # mission_json calls in a serializer loop so ReputationService preload
+  # + completed_mission_ids don't re-query per row.
+  def mission_service
+    @mission_service ||= Grid::MissionService.new(current_hackr)
+  end
+
+  def hackr_mission_json(hackr_mission, include_progress: true)
+    mission = hackr_mission.grid_mission
+    base = {
+      id: hackr_mission.id,
+      status: hackr_mission.status,
+      accepted_at: hackr_mission.accepted_at&.iso8601,
+      completed_at: hackr_mission.completed_at&.iso8601,
+      turn_in_count: hackr_mission.turn_in_count,
+      mission: mission_json(mission)
+    }
+
+    if include_progress
+      progress_by_obj = hackr_mission.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id)
+      base[:objective_progress] = mission.grid_mission_objectives.map do |obj|
+        hobj = progress_by_obj[obj.id]
+        {
+          objective_id: obj.id,
+          progress: hobj&.progress.to_i,
+          target_count: obj.target_count,
+          completed: hobj&.completed_at.present?
+        }
+      end
+      base[:ready_to_turn_in] = hackr_mission.all_objectives_completed?
+    end
+
+    base
   end
 end

@@ -87,6 +87,11 @@ Rails.application.routes.draw do
   # Achievements (login-gated SPA)
   get "achievements", to: "pages#spa_root", as: :achievements
 
+  # Missions (login-gated SPA). Per-mission detail renders inline in
+  # the MissionsPage card grid — no dedicated per-slug React route, so
+  # we don't expose `/missions/:slug` as a Rails SPA path either.
+  get "missions", to: "pages#spa_root", as: :missions
+
   # Codex (wiki) routes - SPA
   scope "codex" do
     get "/", to: "pages#spa_root", as: :codex
@@ -156,6 +161,7 @@ Rails.application.routes.draw do
     # Grid API routes
     get "grid/current_hackr", to: "grid#current_hackr_info"
     get "grid/achievements", to: "grid#achievements_index"
+    get "grid/missions", to: "grid#missions_index"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"
     get "grid/verify/:token", to: "grid#verify_token"
@@ -311,6 +317,11 @@ Rails.application.routes.draw do
       end
     end
     resources :grid_shop_transactions, only: [:index]
+
+    # Grid missions (runtime CRUD + YAML-seedable)
+    resources :grid_mission_arcs
+    resources :grid_missions
+    resources :grid_hackr_missions, only: %i[index show]
 
     # Hackr Handbook (docs — full CRUD, YAML-seedable)
     resources :handbook_sections
