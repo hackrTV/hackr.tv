@@ -48,8 +48,8 @@
               </tr>
             </thead>
             <tbody>
-              <% @listings.each do |listing| %>
-                <tr>
+              <% @listings.each_with_index do |listing, i| %>
+                <tr style="<%= " background: #112;" if i.odd? %>">
                   <td style="color: #c084fc;"><%= listing.grid_mob.name %></td>
                   <td class="cyan-255-text"><%= listing.name %></td>
                   <td>

@@ -190,6 +190,28 @@ achievements:
     xp_reward: 200
     cred_reward: 0
 
+  # --- Salvage Yields (Decomposition) ---
+  - slug: recycler
+    name: "Recycler"
+    description: "Received your first item from salvage decomposition."
+    badge_icon: "~%"
+    category: grid
+    trigger_type: salvage_yield_received
+    trigger_data: {}
+    xp_reward: 50
+    cred_reward: 0
+
+  - slug: breaker-of-circuits
+    name: "Breaker of Circuits"
+    description: "Received 25 items total through salvage decomposition."
+    badge_icon: "~%%"
+    category: grid
+    trigger_type: salvage_yield_count
+    trigger_data:
+      count: 25
+    xp_reward: 150
+    cred_reward: 0
+
   # ============================================================
   # MUSIC CATEGORY (Pulse Vault + Radio + VODs + Livestream + Bands)
   # ============================================================

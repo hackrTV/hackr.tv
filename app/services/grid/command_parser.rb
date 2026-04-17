@@ -60,8 +60,10 @@ module Grid
         rep_command
       when "use"
         use_command(args.join(" "))
-      when "salvage"
+      when "salvage", "sal"
         salvage_command(args.join(" "))
+      when "analyze", "an"
+        analyze_command(args.join(" "))
       when "cache"
         cache_command(args)
       when "caches", "cred"
@@ -80,7 +82,7 @@ module Grid
         missions_command
       when "mission", "quest"
         mission_detail_command(args.first)
-      when "accept"
+      when "accept", "acc", "ac"
         accept_mission_command(args.first)
       when "abandon"
         abandon_mission_command(args.first)
@@ -92,7 +94,7 @@ module Grid
         help_command
       when "who"
         who_command
-      when "clear", "cls"
+      when "clear", "cls", "cl"
         clear_command
       else
         "<span style='color: #f87171;'>Unknown command: #{h(command)}. Type 'help' for a list of commands.</span>"
@@ -565,21 +567,22 @@ module Grid
           <span style='color: #34d399;'>take &lt;item&gt;</span>               - Pick up an item
           <span style='color: #34d399;'>drop &lt;item&gt;</span>               - Drop an item
           <span style='color: #34d399;'>use &lt;item&gt;</span>                - Use an item
-          <span style='color: #34d399;'>salvage &lt;item&gt;</span>            - Break down an item for XP
+          <span style='color: #34d399;'>salvage &lt;item&gt;, sal</span>       - Break down an item for XP
+          <span style='color: #34d399;'>analyze &lt;item&gt;, an</span>        - Preview salvage yields before breaking down
           <span style='color: #34d399;'>examine &lt;target&gt;, x</span>       - Examine item, NPC, or hackr
 
         <span style='color: #fbbf24;'>NPCs:</span>
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>                - Talk to an NPC
           <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>   - Ask an NPC about a topic
-          <span style='color: #34d399;'>give &lt;item&gt; to &lt;npc&gt;</span>     - Hand an item to an NPC (for delivery missions)
+          <span style='color: #34d399;'>give &lt;item&gt; to &lt;npc&gt;</span>      - Hand an item to an NPC (for delivery missions)
 
         <span style='color: #fbbf24;'>Missions:</span>
           <span style='color: #34d399;'>missions</span>                  - List your active missions
-          <span style='color: #34d399;'>mission &lt;slug&gt;</span>           - View details for a specific mission
-          <span style='color: #34d399;'>ask &lt;npc&gt; about missions</span> - See what work an NPC is offering
-          <span style='color: #34d399;'>accept &lt;slug&gt;</span>            - Accept a mission (must be with giver)
-          <span style='color: #34d399;'>abandon &lt;slug&gt;</span>           - Drop an active mission
-          <span style='color: #34d399;'>turn_in &lt;slug&gt;, ti</span>       - Turn in a completed mission (must be with giver)
+          <span style='color: #34d399;'>mission &lt;slug&gt;</span>            - View details for a specific mission
+          <span style='color: #34d399;'>ask &lt;npc&gt; about missions</span>  - See what work an NPC is offering
+          <span style='color: #34d399;'>accept &lt;slug&gt;, acc, ac</span>    - Accept a mission (must be with giver)
+          <span style='color: #34d399;'>abandon &lt;slug&gt;</span>            - Drop an active mission
+          <span style='color: #34d399;'>turn_in &lt;slug&gt;, ti</span>        - Turn in a completed mission (must be with giver)
 
         <span style='color: #fbbf24;'>Commerce:</span>
           <span style='color: #34d399;'>shop, browse</span>              - View vendor inventory &amp; prices
@@ -614,9 +617,9 @@ module Grid
           <span style='color: #34d399;'>who</span>                       - See who's online
 
         <span style='color: #fbbf24;'>Operative:</span>
-          <span style='color: #34d399;'>stat, stats</span>               - View your operative profile
+          <span style='color: #34d399;'>stat, stats, st</span>           - View your operative profile
           <span style='color: #34d399;'>rep, reputation</span>           - View faction standings in detail
-          <span style='color: #34d399;'>clear, cls</span>                - Clear the screen
+          <span style='color: #34d399;'>clear, cls, cl</span>            - Clear the screen
           <span style='color: #34d399;'>help, ?</span>                   - Show this help message
       HELP
     end
@@ -767,26 +770,75 @@ module Grid
       item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
-      xp_amount = [item.value, 1].max
-      item_styled = item.unicorn? ? item.rainbow_name_html : h(item.name)
-      if item.quantity > 1
-        item.update!(quantity: item.quantity - 1)
-      else
-        item.destroy!
+      if item.unicorn?
+        return "<span style='color: #f87171;'>UNICORN items are irreducible. They cannot be salvaged.</span>"
       end
 
-      increment_stat!("salvage_count")
-      xp_result = hackr.grant_xp!(xp_amount)
+      item_styled = h(item.name)
+      result = Grid::SalvageService.salvage!(hackr: hackr, item: item)
 
-      level_msg = xp_result[:leveled_up] ? "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{xp_result[:new_clearance]}!</span>" : ""
-      output = "<span style='color: #34d399;'>You salvage </span>#{item_styled}<span style='color: #34d399;'>. +#{xp_amount} XP.</span>#{level_msg}"
+      increment_stat!("salvage_count")
+
+      level_msg = result.xp_result[:leveled_up] ?
+        "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{result.xp_result[:new_clearance]}!</span>" : ""
+      output = "<span style='color: #34d399;'>You salvage </span>#{item_styled}" \
+        "<span style='color: #34d399;'>. +#{result.xp_awarded} XP.</span>#{level_msg}"
+
+      result.yielded_items.each do |yi|
+        output += "\n<span style='color: #a78bfa;'>  ▸ Decomposed: </span>" \
+          "<span style='color: #d0d0d0;'>#{h(yi[:name])}</span>" \
+          "<span style='color: #6b7280;'> ×#{yi[:quantity]}</span>"
+      end
 
       notifications = achievement_checker.check(:salvage_item)
       notifications += achievement_checker.check(:salvage_count)
-      notifications += mission_progressor.record(:salvage_item, item_name: item.name)
+      notifications += mission_progressor.record(:salvage_item, item_name: result.item_name)
+
+      if result.yielded_items.any?
+        total_yield_qty = result.yielded_items.sum { |yi| yi[:quantity] }
+        increment_stat!("salvage_yield_count", total_yield_qty)
+
+        result.yielded_items.each do |yi|
+          notifications += achievement_checker.check(:salvage_yield_received)
+          notifications += mission_progressor.record(:salvage_yield_received, item_name: yi[:name])
+        end
+
+        notifications += achievement_checker.check(:salvage_yield_count)
+      end
+
       notifications += mission_progressor.record(:reach_clearance, clearance: hackr.stat("clearance").to_i)
       output = append_notifications(output, notifications)
       {output: output, event: nil}
+    end
+
+    def analyze_command(item_name)
+      return "<span style='color: #fbbf24;'>Analyze what?</span>" if item_name.empty?
+
+      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      if item.unicorn?
+        return "<span style='color: #f87171;'>UNICORN items are irreducible. They cannot be salvaged.</span>"
+      end
+
+      xp_amount = [item.value, 1].max
+      yields = item.grid_item_definition.salvage_yields.ordered.includes(:output_definition)
+
+      output = "<span style='color: #22d3ee;'>▸ ANALYSIS :: </span><span style='color: #d0d0d0;'>#{h(item.name)}</span>"
+      output += "\n<span style='color: #6b7280;'>  XP yield: </span><span style='color: #34d399;'>+#{xp_amount} XP</span>"
+
+      if yields.any?
+        output += "\n<span style='color: #6b7280;'>  Decomposition yields:</span>"
+        yields.each do |y|
+          output += "\n<span style='color: #a78bfa;'>    ▸ </span>" \
+            "<span style='color: #d0d0d0;'>#{h(y.output_definition.name)}</span>" \
+            "<span style='color: #6b7280;'> ×#{y.quantity}</span>"
+        end
+      else
+        output += "\n<span style='color: #6b7280;'>  No decomposition yields. XP only.</span>"
+      end
+
+      output
     end
 
     def apply_item_effect(item)
@@ -842,9 +894,9 @@ module Grid
 
     def examine_item(item)
       output = "<span style='color: #d0d0d0;'>#{codex_linkify(item.description)}</span>"
-      if item.component? && item.rate_multiplier
+      if item.rig_component? && item.slot.present? && item.properties&.key?("rate_multiplier")
         props = item.properties || {}
-        slot = props["slot"]&.upcase || "UNKNOWN"
+        slot = props["slot"].upcase
         output += "\n<span style='color: #22d3ee;'>Slot: #{slot}</span>"
         output += " <span style='color: #fbbf24;'>Multiplier: x#{item.rate_multiplier}</span>"
         if slot == "MOTHERBOARD"
@@ -859,7 +911,7 @@ module Grid
       rarity_tag = listing.rarity ? " <span style='color: #{color};'>[#{listing.rarity_label}]</span>" : ""
       output = "<span style='color: #d0d0d0;'>#{codex_linkify(listing.description)}</span>#{rarity_tag}"
       output += "\n<span style='color: #6b7280;'>Buy: <span style='color: #34d399;'>#{format_cred(effective_price)} CRED</span> / Sell: #{format_cred(listing.sell_price)} CRED</span>"
-      if listing.item_type == "component"
+      if listing.item_type == "rig_component"
         props = listing.properties || {}
         slot = props["slot"]&.upcase || "UNKNOWN"
         mult = props["rate_multiplier"] || 1.0
@@ -1384,7 +1436,7 @@ module Grid
 
       item = hackr.grid_items.where(grid_mining_rig_id: nil).find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}' in your inventory.</span>" unless item
-      return "<span style='color: #f87171;'>#{h(item.name)} is not a rig component.</span>" unless item.component?
+      return "<span style='color: #f87171;'>#{h(item.name)} is not a rig component.</span>" unless item.rig_component?
 
       slot = item.slot
       return "<span style='color: #f87171;'>#{h(item.name)} has no slot defined.</span>" unless slot.present?

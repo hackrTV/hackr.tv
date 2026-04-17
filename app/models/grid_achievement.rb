@@ -60,6 +60,8 @@ class GridAchievement < ApplicationRecord
     clearance_level
     missions_completed_count
     mission_completed
+    salvage_yield_received
+    salvage_yield_count
   ].freeze
 
   CATEGORIES = %w[grid music social meta progression].freeze

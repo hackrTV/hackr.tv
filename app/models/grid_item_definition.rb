@@ -24,6 +24,13 @@
 class GridItemDefinition < ApplicationRecord
   has_many :grid_items, dependent: :restrict_with_error
   has_many :grid_shop_listings, dependent: :restrict_with_error
+  has_many :salvage_yields, class_name: "GridSalvageYield",
+    foreign_key: :source_definition_id, dependent: :destroy
+  has_many :output_definitions, through: :salvage_yields, source: :output_definition
+
+  accepts_nested_attributes_for :salvage_yields,
+    allow_destroy: true,
+    reject_if: ->(attrs) { attrs["output_definition_id"].blank? }
 
   validates :slug, presence: true, uniqueness: true,
     format: {with: /\A[a-z0-9-]+\z/, message: "only lowercase letters, numbers, and hyphens"}

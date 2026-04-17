@@ -60,6 +60,53 @@
     <% end %>
   </div>
 
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: SALVAGE YIELDS ::]</h3>
+  <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
+    Items produced when this item is salvaged. No yields = XP only. UNICORN items cannot be salvaged regardless.
+  </p>
+  <table class="tui-table" style="width: 100%; margin-bottom: 10px;">
+    <thead>
+      <tr>
+        <th style="text-align: left; width: 70px;">Pos</th>
+        <th style="text-align: left;">Output Item</th>
+        <th style="text-align: center; width: 80px;">Qty</th>
+        <th style="text-align: center; width: 50px;">&times;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.fields_for :salvage_yields, @sorted_yields || definition.salvage_yields do |ff| %>
+        <tr>
+          <td><%= ff.number_field :position, class: "tui-input", style: "width: 60px; padding: 4px;", min: 0 %></td>
+          <td>
+            <%= ff.select :output_definition_id,
+                  @all_definitions.map { |d| ["#{d.name} [#{d.rarity_label}]", d.id] },
+                  {include_blank: "— select output —"},
+                  class: "tui-input", style: "width: 100%; padding: 4px;" %>
+          </td>
+          <td style="text-align: center;">
+            <%= ff.number_field :quantity, class: "tui-input", style: "width: 70px; padding: 4px; text-align: center;", min: 1 %>
+          </td>
+          <td style="text-align: center;">
+            <% if ff.object.persisted? %>
+              <%= ff.hidden_field :_destroy, value: "0" %>
+              <button type="button" class="tui-button red-168" style="padding: 2px 6px; font-size: 0.8em;"
+                onclick="this.previousElementSibling.value='1'; this.closest('tr').style.display='none';">&times;</button>
+            <% else %>
+              <button type="button" class="tui-button red-168" style="padding: 2px 6px; font-size: 0.8em;"
+                onclick="this.closest('tr').remove();">&times;</button>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if definition.errors[:salvage_yields].any? %>
+    <small class="red-255-text"><%= definition.errors[:salvage_yields].join(", ") %></small>
+  <% end %>
+  <p style="color: #6b7280; font-size: 0.85em; margin-top: 5px;">
+    Save and re-edit to add more yield rows.
+  </p>
+
   <div style="margin-top: 30px; display: flex; gap: 10px;">
     <%= f.submit definition.persisted? ? "Save Definition" : "Create Definition",
           class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>

@@ -148,7 +148,7 @@ RSpec.describe Api::GridController, type: :controller do
         slots = %w[motherboard psu cpu gpu ram]
         props = {"slot" => slots[i], "rate_multiplier" => 1.0}
         props.merge!("cpu_slots" => 1, "gpu_slots" => 2, "ram_slots" => 2) if slug == "basic-motherboard"
-        create(:grid_item_definition, slug: slug, name: "Basic #{slots[i].capitalize}", item_type: "component", properties: props)
+        create(:grid_item_definition, slug: slug, name: "Basic #{slots[i].capitalize}", item_type: "rig_component", properties: props)
       end
     end
 

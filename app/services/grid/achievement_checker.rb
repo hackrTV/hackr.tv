@@ -64,6 +64,8 @@ module Grid
         derive(items_collected_count, data[:count].to_i)
       when "salvage_count"
         derive(@hackr.stat("salvage_count").to_i, data[:count].to_i)
+      when "salvage_yield_count"
+        derive(@hackr.stat("salvage_yield_count").to_i, data[:count].to_i)
       when "track_plays_count"
         derive(track_plays_count, data[:count].to_i)
       when "pulse_vault_completed"
@@ -278,6 +280,8 @@ module Grid
       when "use_item"
         return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
       when "salvage_item"
+        return true
+      when "salvage_yield_received"
         return true
       when "purchase_item"
         return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
