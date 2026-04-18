@@ -1,5 +1,6 @@
-# Unified Data Loading System
-# YAML files are the single source of truth for all seeded content
+# Unified Data Seeding System
+# YAML files provide initial seed data. The database is the source of truth.
+# Existing records are never overwritten — only new records are created.
 #
 # Import Order (respecting dependencies):
 # 1. catalog           (artists, releases, tracks from per-artist YAML files)
@@ -29,10 +30,10 @@
 
 namespace :data do
   # === Master Tasks ===
-  desc "Load all data from YAML (full fresh load). Set S3_BUCKET to also load audio from S3."
+  desc "Seed data from YAML (creates missing records only). Set S3_BUCKET to also load audio from S3."
   task load: :environment do
     puts "\n" + "=" * 80
-    puts "LOADING ALL DATA FROM YAML FILES"
+    puts "SEEDING DATA FROM YAML FILES (new records only)"
     puts "=" * 80 + "\n"
 
     Rake::Task["data:catalog"].invoke
@@ -54,7 +55,7 @@ namespace :data do
     Rake::Task["data:economy"].invoke
 
     puts "\n" + "=" * 80
-    puts "DATA LOAD COMPLETE"
+    puts "DATA SEED COMPLETE"
     puts "=" * 80 + "\n"
   end
 
@@ -83,9 +84,9 @@ namespace :data do
       next
     end
 
-    artists_created = artists_updated = 0
-    releases_created = releases_updated = 0
-    tracks_created = tracks_updated = 0
+    artists_created = 0
+    releases_created = 0
+    tracks_created = 0
 
     artist_files.each do |file|
       data = YAML.load_file(file)
@@ -97,23 +98,21 @@ namespace :data do
         next
       end
 
-      # Upsert artist
+      # Seed artist (skip if exists)
       artist = Artist.find_or_initialize_by(slug: artist_slug)
-      was_new = artist.new_record?
 
-      artist.assign_attributes(
-        name: artist_data["name"],
-        genre: artist_data["genre"],
-        artist_type: artist_data["artist_type"] || "band"
-      )
-
-      if artist.changed?
+      if artist.new_record?
+        artist.assign_attributes(
+          name: artist_data["name"],
+          genre: artist_data["genre"],
+          artist_type: artist_data["artist_type"] || "band"
+        )
         artist.save!
-        was_new ? (artists_created += 1) : (artists_updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"} artist: #{artist.name}"
+        artists_created += 1
+        puts "  ✓ Created artist: #{artist.name}"
       end
 
-      # Upsert releases and tracks
+      # Seed releases and tracks (skip existing)
       (data["releases"] || []).each do |release_data|
         next unless release_data["title"].present? && release_data["slug"].present?
 
@@ -123,35 +122,33 @@ namespace :data do
         end
 
         release = Release.find_or_initialize_by(artist: artist, slug: release_data["slug"])
-        was_new = release.new_record?
 
-        release_date = DataLoaderHelpers.parse_date(release_data["release_date"])
+        if release.new_record?
+          release_date = DataLoaderHelpers.parse_date(release_data["release_date"])
 
-        release.assign_attributes(
-          name: release_data["title"],
-          release_type: release_data["release_type"],
-          release_date: release_date,
-          description: release_data["description"],
-          catalog_number: release_data["catalog_number"],
-          media_format: release_data["media_format"],
-          classification: release_data["classification"],
-          label: release_data["label"],
-          credits: release_data["credits"],
-          notes: release_data["notes"],
-          streaming_links: DataLoaderHelpers.normalize_json(release_data["streaming_links"]),
-          coming_soon: release_data.fetch("coming_soon", false)
-        )
-
-        if release.changed?
+          release.assign_attributes(
+            name: release_data["title"],
+            release_type: release_data["release_type"],
+            release_date: release_date,
+            description: release_data["description"],
+            catalog_number: release_data["catalog_number"],
+            media_format: release_data["media_format"],
+            classification: release_data["classification"],
+            label: release_data["label"],
+            credits: release_data["credits"],
+            notes: release_data["notes"],
+            streaming_links: DataLoaderHelpers.normalize_json(release_data["streaming_links"]),
+            coming_soon: release_data.fetch("coming_soon", false)
+          )
           release.save!
-          was_new ? (releases_created += 1) : (releases_updated += 1)
-          puts "  #{was_new ? "✓ Created" : "↻ Updated"} release: #{release.name} (#{artist.name})"
+          releases_created += 1
+          puts "  ✓ Created release: #{release.name} (#{artist.name})"
+
+          # Attach cover image on creation
+          DataLoaderHelpers.attach_cover_image(release, release_data["cover_image"], artist_slug) if release_data["cover_image"].present?
         end
 
-        # Attach cover image if specified
-        DataLoaderHelpers.attach_cover_image(release, release_data["cover_image"], artist_slug) if release_data["cover_image"].present?
-
-        # Upsert tracks
+        # Seed tracks (skip existing)
         (release_data["tracks"] || []).each do |track_data|
           if track_data["skip"]
             puts "    ⊘ Skipped track: #{track_data["title"]}"
@@ -159,7 +156,7 @@ namespace :data do
           end
 
           track = artist.tracks.find_or_initialize_by(slug: track_data["slug"])
-          was_new = track.new_record?
+          next unless track.new_record?
 
           track.assign_attributes(
             title: track_data["title"],
@@ -173,19 +170,16 @@ namespace :data do
             videos: DataLoaderHelpers.normalize_json(track_data["videos"]),
             lyrics: track_data["lyrics"]
           )
-
-          if track.changed?
-            track.save!
-            was_new ? (tracks_created += 1) : (tracks_updated += 1)
-            puts "    #{was_new ? "✓ Created" : "↻ Updated"} track: #{track.title}"
-          end
+          track.save!
+          tracks_created += 1
+          puts "    ✓ Created track: #{track.title}"
         end
       end
     end
 
-    puts "Artists: #{artists_created} created, #{artists_updated} updated, #{Artist.count} total"
-    puts "Releases: #{releases_created} created, #{releases_updated} updated, #{Release.count} total"
-    puts "Tracks: #{tracks_created} created, #{tracks_updated} updated, #{Track.count} total"
+    puts "Artists: #{artists_created} created, #{Artist.count} total"
+    puts "Releases: #{releases_created} created, #{Release.count} total"
+    puts "Tracks: #{tracks_created} created, #{Track.count} total"
   end
 
   desc "Load system data (hackrs, channels, radio stations, etc.)"
@@ -277,11 +271,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     hackrs_data = data["hackrs"]
-    created = updated = 0
+    created = 0
 
     hackrs_data.each do |attrs|
       hackr = GridHackr.find_or_initialize_by(hackr_alias: attrs["hackr_alias"])
-      was_new = hackr.new_record?
+      next unless hackr.new_record?
 
       # Get password from env or use default
       password = if Rails.env.production?
@@ -293,22 +287,15 @@ namespace :data do
       hackr.assign_attributes(
         email: attrs["email"],
         role: attrs["role"],
+        password: password,
         skip_reserved_check: true
       )
-
-      # Only set password on new records or if explicitly changed
-      if was_new
-        hackr.password = password
-      end
-
-      if hackr.changed? || was_new
-        hackr.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{hackr.hackr_alias} (#{hackr.role})"
-      end
+      hackr.save!
+      created += 1
+      puts "  ✓ Created: #{hackr.hackr_alias} (#{hackr.role})"
     end
 
-    puts "Hackrs: #{created} created, #{updated} updated, #{GridHackr.count} total"
+    puts "Hackrs: #{created} created, #{GridHackr.count} total"
   end
 
   desc "Load channels from YAML"
@@ -323,11 +310,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     channels_data = data["channels"]
-    created = updated = 0
+    created = 0
 
     channels_data.each do |attrs|
       channel = ChatChannel.find_or_initialize_by(slug: attrs["slug"])
-      was_new = channel.new_record?
+      next unless channel.new_record?
 
       channel.assign_attributes(
         name: attrs["name"],
@@ -337,15 +324,12 @@ namespace :data do
         slow_mode_seconds: attrs["slow_mode_seconds"],
         minimum_role: attrs["minimum_role"]
       )
-
-      if channel.changed?
-        channel.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{channel.name}"
-      end
+      channel.save!
+      created += 1
+      puts "  ✓ Created: #{channel.name}"
     end
 
-    puts "Channels: #{created} created, #{updated} updated, #{ChatChannel.count} total"
+    puts "Channels: #{created} created, #{ChatChannel.count} total"
   end
 
   desc "Load radio stations from YAML"
@@ -361,11 +345,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     stations_data = data["stations"]
-    created = updated = 0
+    created = 0
 
     stations_data.each do |attrs|
       station = RadioStation.find_or_initialize_by(slug: attrs["slug"])
-      was_new = station.new_record?
+      next unless station.new_record?
 
       station.assign_attributes(
         name: attrs["name"],
@@ -376,15 +360,12 @@ namespace :data do
         position: attrs["position"] || 0,
         hidden: attrs.fetch("hidden", false)
       )
-
-      if station.changed?
-        station.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{station.name}"
-      end
+      station.save!
+      created += 1
+      puts "  ✓ Created: #{station.name}"
     end
 
-    puts "Radio Stations: #{created} created, #{updated} updated, #{RadioStation.count} total"
+    puts "Radio Stations: #{created} created, #{RadioStation.count} total"
   end
 
   desc "Load zone playlists from YAML"
@@ -399,53 +380,41 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     playlists_data = data["zone_playlists"]
-    created = updated = 0
+    created = 0
 
     playlists_data.each do |attrs|
       playlist = ZonePlaylist.find_or_initialize_by(slug: attrs["slug"])
       was_new = playlist.new_record?
 
-      playlist.assign_attributes(
-        name: attrs["name"],
-        description: attrs["description"],
-        crossfade_duration_ms: attrs["crossfade_duration_ms"],
-        default_volume: attrs["default_volume"]
-      )
-
-      if playlist.changed? || was_new
+      if was_new
+        playlist.assign_attributes(
+          name: attrs["name"],
+          description: attrs["description"],
+          crossfade_duration_ms: attrs["crossfade_duration_ms"],
+          default_volume: attrs["default_volume"]
+        )
         playlist.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{playlist.name}"
-      end
+        created += 1
+        puts "  ✓ Created: #{playlist.name}"
 
-      # Sync tracks from artist
-      if attrs["artist_tracks"].present?
-        artist = Artist.find_by(slug: attrs["artist_tracks"])
-        if artist
-          desired_track_ids = artist.tracks.pluck(:id).to_set
-
-          # Remove stale tracks
-          playlist.zone_playlist_tracks.each do |zpt|
-            unless desired_track_ids.include?(zpt.track_id)
-              zpt.destroy!
+        # Seed tracks from artist (only on new playlists)
+        if attrs["artist_tracks"].present?
+          artist = Artist.find_by(slug: attrs["artist_tracks"])
+          if artist
+            artist.tracks.each_with_index do |track, index|
+              ZonePlaylistTrack.create!(
+                zone_playlist: playlist,
+                track: track,
+                position: index + 1
+              )
             end
+            puts "    → Seeded #{artist.tracks.count} tracks from #{artist.name}"
           end
-
-          # Add/update track positions
-          artist.tracks.each_with_index do |track, index|
-            zpt = ZonePlaylistTrack.find_or_initialize_by(
-              zone_playlist: playlist,
-              track: track
-            )
-            zpt.position = index + 1
-            zpt.save! if zpt.new_record? || zpt.changed?
-          end
-          puts "    → Synced #{artist.tracks.count} tracks from #{artist.name}"
         end
       end
     end
 
-    puts "Zone Playlists: #{created} created, #{updated} updated, #{ZonePlaylist.count} total"
+    puts "Zone Playlists: #{created} created, #{ZonePlaylist.count} total"
   end
 
   desc "Load factions from YAML"
@@ -461,13 +430,14 @@ namespace :data do
     data = YAML.load_file(yaml_file)
     factions_data = data["factions"] || []
     links_data = data["rep_links"] || []
-    created = updated = 0
+    created = 0
+    new_faction_slugs = Set.new
 
-    # Pass 1: upsert factions without parent FK (parents may be defined later
+    # Pass 1: seed factions without parent FK (parents may be defined later
     # in the YAML than their children; resolve on pass 2).
     factions_data.each do |attrs|
       faction = GridFaction.find_or_initialize_by(slug: attrs["slug"])
-      was_new = faction.new_record?
+      next unless faction.new_record?
 
       artist = attrs["artist_slug"].present? ? Artist.find_by(slug: attrs["artist_slug"]) : nil
 
@@ -479,28 +449,26 @@ namespace :data do
         position: attrs["position"] || 0,
         artist: artist
       )
-
-      if faction.changed?
-        faction.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{faction.name}"
-      end
+      faction.save!
+      created += 1
+      new_faction_slugs << attrs["slug"]
+      puts "  ✓ Created: #{faction.name}"
     end
 
-    # Pass 2: resolve parent_slug → parent_id. Only writes when changed.
+    # Pass 2: resolve parent_slug → parent_id (only for newly created factions).
     factions_data.each do |attrs|
+      next unless new_faction_slugs.include?(attrs["slug"])
+      next unless attrs["parent_slug"].present?
+
       faction = GridFaction.find_by(slug: attrs["slug"])
       next unless faction
-      parent_id = attrs["parent_slug"].present? ? GridFaction.where(slug: attrs["parent_slug"]).pick(:id) : nil
-      if faction.parent_id != parent_id
-        faction.update!(parent_id: parent_id)
-      end
+
+      parent_id = GridFaction.where(slug: attrs["parent_slug"]).pick(:id)
+      faction.update!(parent_id: parent_id) if parent_id
     end
 
-    # Pass 3: rep-link graph. Idempotent — we fully reconcile to match YAML so
-    # removing a link from YAML removes it from DB (unlike other tasks here,
-    # because the link graph is small and fully declarative).
-    desired_keys = Set.new
+    # Pass 3: seed rep-link graph (only create missing links, never delete).
+    links_created = 0
     links_data.each do |attrs|
       source = GridFaction.find_by(slug: attrs["source_slug"])
       target = GridFaction.find_by(slug: attrs["target_slug"])
@@ -512,21 +480,15 @@ namespace :data do
       link = GridFactionRepLink.find_or_initialize_by(
         source_faction_id: source.id, target_faction_id: target.id
       )
-      link.weight = attrs["weight"]
-      link.save! if link.new_record? || link.changed?
-      desired_keys << [source.id, target.id]
-    end
-
-    removed = 0
-    GridFactionRepLink.find_each do |existing|
-      unless desired_keys.include?([existing.source_faction_id, existing.target_faction_id])
-        existing.destroy!
-        removed += 1
+      if link.new_record?
+        link.weight = attrs["weight"]
+        link.save!
+        links_created += 1
       end
     end
 
-    puts "Factions: #{created} created, #{updated} updated, #{GridFaction.count} total"
-    puts "Rep links: #{GridFactionRepLink.count} active, #{removed} removed"
+    puts "Factions: #{created} created, #{GridFaction.count} total"
+    puts "Rep links: #{links_created} created, #{GridFactionRepLink.count} total"
   end
 
   desc "Load zones from YAML"
@@ -541,11 +503,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     zones_data = data["zones"]
-    created = updated = 0
+    created = 0
 
     zones_data.each do |attrs|
       zone = GridZone.find_or_initialize_by(slug: attrs["slug"])
-      was_new = zone.new_record?
+      next unless zone.new_record?
 
       faction = attrs["faction_slug"].present? ? GridFaction.find_by(slug: attrs["faction_slug"]) : nil
       playlist = attrs["ambient_playlist_slug"].present? ? ZonePlaylist.find_by(slug: attrs["ambient_playlist_slug"]) : nil
@@ -558,15 +520,12 @@ namespace :data do
         grid_faction: faction,
         ambient_playlist: playlist
       )
-
-      if zone.changed?
-        zone.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{zone.name}"
-      end
+      zone.save!
+      created += 1
+      puts "  ✓ Created: #{zone.name}"
     end
 
-    puts "Zones: #{created} created, #{updated} updated, #{GridZone.count} total"
+    puts "Zones: #{created} created, #{GridZone.count} total"
   end
 
   desc "Load rooms from YAML"
@@ -581,11 +540,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     rooms_data = data["rooms"]
-    created = updated = 0
+    created = 0
 
     rooms_data.each do |attrs|
       room = GridRoom.find_or_initialize_by(slug: attrs["slug"])
-      was_new = room.new_record?
+      next unless room.new_record?
 
       zone = GridZone.find_by(slug: attrs["zone_slug"])
       unless zone
@@ -600,15 +559,12 @@ namespace :data do
         room_type: attrs["room_type"],
         min_clearance: attrs["min_clearance"] || 0
       )
-
-      if room.changed?
-        room.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{room.name}"
-      end
+      room.save!
+      created += 1
+      puts "  ✓ Created: #{room.name}"
     end
 
-    puts "Rooms: #{created} created, #{updated} updated, #{GridRoom.count} total"
+    puts "Rooms: #{created} created, #{GridRoom.count} total"
   end
 
   desc "Load exits from YAML"
@@ -623,7 +579,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     exits_data = data["exits"]
-    created = updated = 0
+    created = 0
 
     exits_data.each do |attrs|
       from_room = GridRoom.find_by(slug: attrs["from_room_slug"])
@@ -639,18 +595,15 @@ namespace :data do
         to_room: to_room,
         direction: attrs["direction"]
       )
-      was_new = exit_record.new_record?
+      next unless exit_record.new_record?
 
       exit_record.locked = attrs["locked"] || false
-
-      if exit_record.changed?
-        exit_record.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{from_room.name} -> #{attrs["direction"]} -> #{to_room.name}"
-      end
+      exit_record.save!
+      created += 1
+      puts "  ✓ Created: #{from_room.name} -> #{attrs["direction"]} -> #{to_room.name}"
     end
 
-    puts "Exits: #{created} created, #{updated} updated, #{GridExit.count} total"
+    puts "Exits: #{created} created, #{GridExit.count} total"
   end
 
   desc "Load mobs from YAML"
@@ -665,7 +618,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     mobs_data = data["mobs"]
-    created = updated = 0
+    created = 0
 
     mobs_data.each do |attrs|
       room = GridRoom.find_by(slug: attrs["room_slug"])
@@ -677,7 +630,7 @@ namespace :data do
       end
 
       mob = GridMob.find_or_initialize_by(name: attrs["name"], grid_room: room)
-      was_new = mob.new_record?
+      next unless mob.new_record?
 
       mob.assign_attributes(
         description: attrs["description"],
@@ -686,15 +639,12 @@ namespace :data do
         dialogue_tree: attrs["dialogue_tree"],
         vendor_config: attrs["vendor_config"]
       )
-
-      if mob.changed?
-        mob.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{mob.name}"
-      end
+      mob.save!
+      created += 1
+      puts "  ✓ Created: #{mob.name}"
     end
 
-    puts "Mobs: #{created} created, #{updated} updated, #{GridMob.count} total"
+    puts "Mobs: #{created} created, #{GridMob.count} total"
   end
 
   desc "Load item definitions from YAML"
@@ -709,11 +659,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     defs_data = data["item_definitions"]
-    created = updated = 0
+    created = 0
 
     defs_data.each do |attrs|
       defn = GridItemDefinition.find_or_initialize_by(slug: attrs["slug"])
-      was_new = defn.new_record?
+      next unless defn.new_record?
 
       defn.assign_attributes(
         name: attrs["name"],
@@ -723,15 +673,12 @@ namespace :data do
         value: attrs["value"] || 0,
         properties: attrs["properties"] || {}
       )
-
-      if defn.changed?
-        defn.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{defn.name} (#{defn.slug})"
-      end
+      defn.save!
+      created += 1
+      puts "  ✓ Created: #{defn.name} (#{defn.slug})"
     end
 
-    puts "Item Definitions: #{created} created, #{updated} updated, #{GridItemDefinition.count} total"
+    puts "Item Definitions: #{created} created, #{GridItemDefinition.count} total"
   end
 
   desc "Load salvage yield definitions from YAML"
@@ -746,7 +693,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     yields_data = data["salvage_yields"] || []
-    created = updated = 0
+    created = 0
 
     yields_data.each do |attrs|
       source = GridItemDefinition.find_by(slug: attrs["source_slug"])
@@ -765,21 +712,18 @@ namespace :data do
         source_definition: source,
         output_definition: output
       )
-      was_new = yield_row.new_record?
+      next unless yield_row.new_record?
 
       yield_row.assign_attributes(
         quantity: attrs["quantity"] || 1,
         position: attrs["position"] || 0
       )
-
-      if yield_row.changed?
-        yield_row.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{source.name} → #{output.name} ×#{yield_row.quantity}"
-      end
+      yield_row.save!
+      created += 1
+      puts "  ✓ Created: #{source.name} → #{output.name} ×#{yield_row.quantity}"
     end
 
-    puts "Salvage Yields: #{created} created, #{updated} updated, #{GridSalvageYield.count} total"
+    puts "Salvage Yields: #{created} created, #{GridSalvageYield.count} total"
   end
 
   desc "Load items from YAML"
@@ -794,7 +738,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     items_data = data["items"]
-    created = updated = 0
+    created = 0
 
     items_data.each do |attrs|
       room = GridRoom.find_by(slug: attrs["room_slug"])
@@ -810,7 +754,7 @@ namespace :data do
       end
 
       item = GridItem.find_or_initialize_by(grid_item_definition: defn, room: room, grid_hackr: nil)
-      was_new = item.new_record?
+      next unless item.new_record?
 
       item.assign_attributes(
         defn.item_attributes.merge(
@@ -819,15 +763,12 @@ namespace :data do
         )
       )
       item.value = attrs["value"] if attrs.key?("value")
-
-      if item.changed?
-        item.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{item.name}"
-      end
+      item.save!
+      created += 1
+      puts "  ✓ Created: #{item.name}"
     end
 
-    puts "Items: #{created} created, #{updated} updated, #{GridItem.count} total"
+    puts "Items: #{created} created, #{GridItem.count} total"
   end
 
   desc "Sync existing grid_items with their current definitions"
@@ -861,11 +802,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     achievements_data = data["achievements"]
-    created = updated = 0
+    created = 0
 
     achievements_data.each do |attrs|
       achievement = GridAchievement.find_or_initialize_by(slug: attrs["slug"])
-      was_new = achievement.new_record?
+      next unless achievement.new_record?
 
       achievement.assign_attributes(
         name: attrs["name"],
@@ -878,15 +819,12 @@ namespace :data do
         category: attrs["category"] || "grid",
         hidden: attrs["hidden"] || false
       )
-
-      if achievement.changed?
-        achievement.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{achievement.name}"
-      end
+      achievement.save!
+      created += 1
+      puts "  ✓ Created: #{achievement.name}"
     end
 
-    puts "Achievements: #{created} created, #{updated} updated, #{GridAchievement.count} total"
+    puts "Achievements: #{created} created, #{GridAchievement.count} total"
   end
 
   desc "Load shop listings from YAML"
@@ -901,7 +839,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     listings_data = data["shop_listings"]
-    created = updated = 0
+    created = 0
 
     # Vendors that need initial rotation seeding (first-time black market creation).
     vendors_needing_rotation = Set.new
@@ -926,14 +864,13 @@ namespace :data do
       end
 
       listing = GridShopListing.find_or_initialize_by(grid_item_definition: defn, grid_mob: mob)
-      was_new = listing.new_record?
+      next unless listing.new_record?
 
       base_price = attrs["base_price"]
       sell_price = attrs["sell_price"] || (base_price / 2.0).ceil
       rotation_pool = attrs.fetch("rotation_pool", false)
       restock_hours = attrs["restock_interval_hours"] || mob.restock_interval_hours
 
-      # Shop-specific fields — always updated from YAML (source of truth)
       listing.assign_attributes(
         base_price: base_price,
         sell_price: sell_price,
@@ -941,24 +878,16 @@ namespace :data do
         restock_amount: attrs["restock_amount"] || 1,
         restock_interval_hours: restock_hours,
         rotation_pool: rotation_pool,
-        min_clearance: attrs["min_clearance"] || 0
+        min_clearance: attrs["min_clearance"] || 0,
+        stock: attrs["max_stock"],
+        next_restock_at: Time.current + restock_hours.hours,
+        active: attrs.fetch("active", !rotation_pool)
       )
+      listing.save!
+      created += 1
+      puts "  ✓ Created: #{listing.name} (#{mob.name})"
 
-      # Runtime state — only set on creation. Preserves live stock, active flag,
-      # and restock timer on re-import. Rotation pool items start inactive so the
-      # rotation job (or the initial seed below) controls which are visible.
-      if was_new
-        listing.stock = attrs["max_stock"]
-        listing.next_restock_at = Time.current + restock_hours.hours
-        listing.active = attrs.fetch("active", !rotation_pool)
-        vendors_needing_rotation << mob if rotation_pool
-      end
-
-      if listing.changed?
-        listing.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{listing.name} (#{mob.name})"
-      end
+      vendors_needing_rotation << mob if rotation_pool
     end
 
     # Seed initial rotation for any vendor with a freshly-created rotation pool
@@ -970,7 +899,7 @@ namespace :data do
       puts "  ⟳ Seeded initial rotation: #{mob.name}"
     end
 
-    puts "Shop Listings: #{created} created, #{updated} updated, #{GridShopListing.count} total"
+    puts "Shop Listings: #{created} created, #{GridShopListing.count} total"
   end
 
   desc "Load key playlists from YAML"
@@ -986,79 +915,51 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     playlists_data = data["playlists"]
-    created = updated = 0
+    created = 0
 
     playlists_data.each do |attrs|
+      playlist = Playlist.find_or_initialize_by(name: attrs["name"])
+      next unless playlist.new_record?
+
       owner = GridHackr.find_by(hackr_alias: attrs["owner"])
       radio_station = attrs["radio_station"].present? ? RadioStation.find_by(slug: attrs["radio_station"]) : nil
-
-      playlist = Playlist.find_or_initialize_by(name: attrs["name"])
-      was_new = playlist.new_record?
 
       playlist.assign_attributes(
         description: attrs["description"],
         grid_hackr: owner,
         is_public: attrs["is_public"] || false
       )
+      playlist.save!
+      created += 1
+      puts "  ✓ Created: #{playlist.name}"
 
-      if playlist.changed? || was_new
-        playlist.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{playlist.name}"
-      end
-
-      # Sync radio station link
+      # Seed radio station link
       if radio_station
         RadioStationPlaylist.find_or_create_by!(
           radio_station: radio_station,
           playlist: playlist
         )
         puts "    → Linked to radio station: #{radio_station.name}"
-      else
-        # Remove stale radio station links for this playlist
-        playlist.radio_station_playlists.destroy_all
       end
 
-      # Sync tracks
+      # Seed tracks
       if attrs["tracks"].present?
-        desired_tracks = []
-        attrs["tracks"].each do |track_ref|
+        attrs["tracks"].each_with_index do |track_ref, index|
           artist_slug, track_slug = track_ref.split("/")
           artist = Artist.find_by(slug: artist_slug)
           track = artist&.tracks&.find_by(slug: track_slug)
 
           if track
-            desired_tracks << track
+            PlaylistTrack.create!(playlist: playlist, track: track, position: index + 1)
           else
             puts "    ✗ Track not found: #{track_ref}"
           end
         end
-
-        desired_track_ids = desired_tracks.map(&:id).to_set
-
-        # Remove stale tracks
-        playlist.playlist_tracks.each do |pt|
-          unless desired_track_ids.include?(pt.track_id)
-            pt.destroy!
-            puts "    - Removed stale track from playlist"
-          end
-        end
-
-        # Add/update track positions
-        desired_tracks.each_with_index do |track, index|
-          pt = PlaylistTrack.find_or_initialize_by(playlist: playlist, track: track)
-          pt.position = index + 1
-          pt.save! if pt.new_record? || pt.changed?
-        end
-        puts "    → Synced #{desired_tracks.size} tracks"
-      else
-        # No tracks specified — clear any existing
-        removed = playlist.playlist_tracks.destroy_all.size
-        puts "    - Removed #{removed} stale tracks" if removed > 0
+        puts "    → Seeded #{playlist.playlist_tracks.count} tracks"
       end
     end
 
-    puts "Key Playlists: #{created} created, #{updated} updated, #{Playlist.count} total"
+    puts "Key Playlists: #{created} created, #{Playlist.count} total"
   end
 
   desc "Load codex entries from YAML"
@@ -1073,11 +974,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     entries_data = data["codex_entries"]
-    created = updated = 0
+    created = 0
 
     entries_data.each do |attrs|
       entry = CodexEntry.find_or_initialize_by(slug: attrs["slug"])
-      was_new = entry.new_record?
+      next unless entry.new_record?
 
       entry.assign_attributes(
         name: attrs["name"],
@@ -1088,15 +989,12 @@ namespace :data do
         position: attrs["position"],
         metadata: attrs["metadata"]
       )
-
-      if entry.changed?
-        entry.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{entry.name} (#{entry.entry_type})"
-      end
+      entry.save!
+      created += 1
+      puts "  ✓ Created: #{entry.name} (#{entry.entry_type})"
     end
 
-    puts "Codex Entries: #{created} created, #{updated} updated, #{CodexEntry.count} total"
+    puts "Codex Entries: #{created} created, #{CodexEntry.count} total"
   end
 
   desc "Load handbook sections and articles from YAML"
@@ -1112,30 +1010,28 @@ namespace :data do
     data = YAML.load_file(yaml_file)
     sections_data = data["handbook_sections"] || []
 
-    sections_created = sections_updated = 0
-    articles_created = articles_updated = 0
+    sections_created = 0
+    articles_created = 0
 
     sections_data.each do |section_attrs|
       section = HandbookSection.find_or_initialize_by(slug: section_attrs["slug"])
-      was_new = section.new_record?
 
-      section.assign_attributes(
-        name: section_attrs["name"],
-        icon: section_attrs["icon"],
-        summary: section_attrs["summary"],
-        position: section_attrs["position"] || 0,
-        published: section_attrs.fetch("published", true)
-      )
-
-      if section.changed?
+      if section.new_record?
+        section.assign_attributes(
+          name: section_attrs["name"],
+          icon: section_attrs["icon"],
+          summary: section_attrs["summary"],
+          position: section_attrs["position"] || 0,
+          published: section_attrs.fetch("published", true)
+        )
         section.save!
-        was_new ? (sections_created += 1) : (sections_updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"} section: #{section.name}"
+        sections_created += 1
+        puts "  ✓ Created section: #{section.name}"
       end
 
       (section_attrs["articles"] || []).each do |article_attrs|
         article = HandbookArticle.find_or_initialize_by(slug: article_attrs["slug"])
-        article_was_new = article.new_record?
+        next unless article.new_record?
 
         article.assign_attributes(
           handbook_section: section,
@@ -1148,17 +1044,14 @@ namespace :data do
           published: article_attrs.fetch("published", true),
           metadata: article_attrs["metadata"] || {}
         )
-
-        if article.changed?
-          article.save!
-          article_was_new ? (articles_created += 1) : (articles_updated += 1)
-          puts "    #{article_was_new ? "✓ Created" : "↻ Updated"} article: #{article.title}"
-        end
+        article.save!
+        articles_created += 1
+        puts "    ✓ Created article: #{article.title}"
       end
     end
 
-    puts "Handbook Sections: #{sections_created} created, #{sections_updated} updated, #{HandbookSection.count} total"
-    puts "Handbook Articles: #{articles_created} created, #{articles_updated} updated, #{HandbookArticle.count} total"
+    puts "Handbook Sections: #{sections_created} created, #{HandbookSection.count} total"
+    puts "Handbook Articles: #{articles_created} created, #{HandbookArticle.count} total"
   end
 
   desc "Load hackr logs from YAML"
@@ -1173,7 +1066,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     logs_data = data["hackr_logs"]
-    created = updated = 0
+    created = 0
 
     logs_data.each do |attrs|
       grid_hackr = GridHackr.find_by(hackr_alias: attrs["author"])
@@ -1183,7 +1076,7 @@ namespace :data do
       end
 
       log = HackrLog.find_or_initialize_by(slug: attrs["slug"])
-      was_new = log.new_record?
+      next unless log.new_record?
 
       # Parse lore date (subtract 100 years for database storage)
       published_at = nil
@@ -1200,15 +1093,12 @@ namespace :data do
         published: true,
         published_at: published_at
       )
-
-      if log.changed?
-        log.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{log.title}"
-      end
+      log.save!
+      created += 1
+      puts "  ✓ Created: #{log.title}"
     end
 
-    puts "Hackr Logs: #{created} created, #{updated} updated, #{HackrLog.count} total"
+    puts "Hackr Logs: #{created} created, #{HackrLog.count} total"
   end
 
   desc "Load wire (pulses and echoes) from YAML"
@@ -1313,25 +1203,22 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     elements_data = data["elements"]
-    created = updated = 0
+    created = 0
 
     elements_data.each do |attrs|
       element = OverlayElement.find_or_initialize_by(slug: attrs["slug"])
-      was_new = element.new_record?
+      next unless element.new_record?
 
       element.assign_attributes(
         name: attrs["name"],
         element_type: attrs["element_type"]
       )
-
-      if element.changed?
-        element.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{element.name}"
-      end
+      element.save!
+      created += 1
+      puts "  ✓ Created: #{element.name}"
     end
 
-    puts "Overlay Elements: #{created} created, #{updated} updated, #{OverlayElement.count} total"
+    puts "Overlay Elements: #{created} created, #{OverlayElement.count} total"
   end
 
   desc "Load overlay tickers from YAML"
@@ -1346,11 +1233,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     tickers_data = data["tickers"]
-    created = updated = 0
+    created = 0
 
     tickers_data.each do |attrs|
       ticker = OverlayTicker.find_or_initialize_by(slug: attrs["slug"])
-      was_new = ticker.new_record?
+      next unless ticker.new_record?
 
       ticker.assign_attributes(
         name: attrs["name"],
@@ -1359,15 +1246,12 @@ namespace :data do
         speed: attrs["speed"],
         active: attrs["active"]
       )
-
-      if ticker.changed?
-        ticker.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{ticker.name}"
-      end
+      ticker.save!
+      created += 1
+      puts "  ✓ Created: #{ticker.name}"
     end
 
-    puts "Overlay Tickers: #{created} created, #{updated} updated, #{OverlayTicker.count} total"
+    puts "Overlay Tickers: #{created} created, #{OverlayTicker.count} total"
   end
 
   desc "Load overlay lower thirds from YAML"
@@ -1382,11 +1266,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     lower_thirds_data = data["lower_thirds"]
-    created = updated = 0
+    created = 0
 
     lower_thirds_data.each do |attrs|
       lt = OverlayLowerThird.find_or_initialize_by(slug: attrs["slug"])
-      was_new = lt.new_record?
+      next unless lt.new_record?
 
       lt.assign_attributes(
         name: attrs["name"],
@@ -1394,15 +1278,12 @@ namespace :data do
         secondary_text: attrs["secondary_text"],
         active: attrs["active"]
       )
-
-      if lt.changed?
-        lt.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{lt.name}"
-      end
+      lt.save!
+      created += 1
+      puts "  ✓ Created: #{lt.name}"
     end
 
-    puts "Overlay Lower Thirds: #{created} created, #{updated} updated, #{OverlayLowerThird.count} total"
+    puts "Overlay Lower Thirds: #{created} created, #{OverlayLowerThird.count} total"
   end
 
   desc "Load overlay scenes from YAML"
@@ -1417,11 +1298,11 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     scenes_data = data["scenes"]
-    created = updated = 0
+    created = 0
 
     scenes_data.each do |attrs|
       scene = OverlayScene.find_or_initialize_by(slug: attrs["slug"])
-      was_new = scene.new_record?
+      next unless scene.new_record?
 
       scene.assign_attributes(
         name: attrs["name"],
@@ -1429,15 +1310,12 @@ namespace :data do
         width: attrs["width"],
         height: attrs["height"]
       )
-
-      if scene.changed?
-        scene.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{scene.name}"
-      end
+      scene.save!
+      created += 1
+      puts "  ✓ Created: #{scene.name}"
     end
 
-    puts "Overlay Scenes: #{created} created, #{updated} updated, #{OverlayScene.count} total"
+    puts "Overlay Scenes: #{created} created, #{OverlayScene.count} total"
   end
 
   desc "Load overlay scene elements from YAML"
@@ -1452,7 +1330,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     scene_elements_data = data["scene_elements"]
-    created = updated = 0
+    created = 0
 
     scene_elements_data.each do |attrs|
       scene = OverlayScene.find_by(slug: attrs["scene_slug"])
@@ -1467,7 +1345,7 @@ namespace :data do
         overlay_scene: scene,
         overlay_element: element
       )
-      was_new = se.new_record?
+      next unless se.new_record?
 
       se.assign_attributes(
         x: attrs["x"],
@@ -1476,15 +1354,12 @@ namespace :data do
         height: attrs["height"],
         z_index: attrs["z_index"]
       )
-
-      if se.changed?
-        se.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{element.name} in #{scene.name}"
-      end
+      se.save!
+      created += 1
+      puts "  ✓ Created: #{element.name} in #{scene.name}"
     end
 
-    puts "Overlay Scene Elements: #{created} created, #{updated} updated, #{OverlaySceneElement.count} total"
+    puts "Overlay Scene Elements: #{created} created, #{OverlaySceneElement.count} total"
   end
 
   desc "Load overlay scene groups from YAML"
@@ -1505,53 +1380,37 @@ namespace :data do
       next
     end
 
-    created = updated = 0
+    created = 0
     groups_data.each do |attrs|
       group = OverlaySceneGroup.find_or_initialize_by(slug: attrs["slug"])
       was_new = group.new_record?
 
-      group.assign_attributes(
-        name: attrs["name"],
-        description: attrs["description"]
-      )
-
-      if group.changed?
-        group.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{group.name}"
-      end
-
-      # Sync scenes in group
-      scene_slugs = attrs["scenes"] || []
-      desired_scenes = scene_slugs.filter_map { |slug| OverlayScene.find_by(slug: slug) }
-      desired_scene_ids = desired_scenes.map(&:id).to_set
-
-      existing = group.overlay_scene_group_scenes.includes(:overlay_scene).to_a
-      existing_scene_ids = existing.map(&:overlay_scene_id).to_set
-
-      # Remove stale
-      existing.each do |sgs|
-        unless desired_scene_ids.include?(sgs.overlay_scene_id)
-          sgs.destroy!
-          puts "    - Removed scene: #{sgs.overlay_scene.name}"
-        end
-      end
-
-      # Add/update positions
-      desired_scenes.each_with_index do |scene, index|
-        sgs = OverlaySceneGroupScene.find_or_initialize_by(
-          overlay_scene_group: group,
-          overlay_scene: scene
+      if was_new
+        group.assign_attributes(
+          name: attrs["name"],
+          description: attrs["description"]
         )
-        sgs.position = index + 1
-        if sgs.new_record? || sgs.changed?
-          sgs.save!
-          puts "    + Added scene: #{scene.name}" if !existing_scene_ids.include?(scene.id)
+        group.save!
+        created += 1
+        puts "  ✓ Created: #{group.name}"
+
+        # Seed scenes in group (only on new groups)
+        scene_slugs = attrs["scenes"] || []
+        scene_slugs.each_with_index do |slug, index|
+          scene = OverlayScene.find_by(slug: slug)
+          next unless scene
+
+          OverlaySceneGroupScene.create!(
+            overlay_scene_group: group,
+            overlay_scene: scene,
+            position: index + 1
+          )
+          puts "    + Added scene: #{scene.name}"
         end
       end
     end
 
-    puts "Overlay Scene Groups: #{created} created, #{updated} updated"
+    puts "Overlay Scene Groups: #{created} created"
   end
 
   desc "Load redirects from YAML"
@@ -1566,7 +1425,7 @@ namespace :data do
 
     data = YAML.load_file(yaml_file)
     mirror_groups = data["mirrors"] || []
-    created = updated = 0
+    created = 0
 
     # Build mirror lookup: primary_domain => [mirror_domains]
     mirror_map = {}
@@ -1590,18 +1449,15 @@ namespace :data do
         domain: attrs["domain"],
         path: attrs["path"]
       )
-      was_new = redirect.new_record?
+      next unless redirect.new_record?
 
       redirect.destination_url = attrs["destination_url"]
-
-      if redirect.changed?
-        redirect.save!
-        was_new ? (created += 1) : (updated += 1)
-        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{attrs["domain"]}#{attrs["path"]} → #{attrs["destination_url"]}"
-      end
+      redirect.save!
+      created += 1
+      puts "  ✓ Created: #{attrs["domain"]}#{attrs["path"]} → #{attrs["destination_url"]}"
     end
 
-    puts "Redirects: #{created} created, #{updated} updated, #{Redirect.count} total"
+    puts "Redirects: #{created} created, #{Redirect.count} total"
   end
 
   desc "Load vidz (VODs/streams) from YAML"
@@ -1622,7 +1478,7 @@ namespace :data do
       next
     end
 
-    created = updated = skipped = 0
+    created = skipped = 0
 
     vidz_data.each do |attrs|
       artist = Artist.find_by("LOWER(name) = ?", attrs["artist"].to_s.downcase)
@@ -1632,16 +1488,15 @@ namespace :data do
         next
       end
 
-      started_at = attrs["started_at"].present? ? Time.parse(attrs["started_at"]) : nil
-      ended_at = attrs["ended_at"].present? ? Time.parse(attrs["ended_at"]) : nil
-
       # Pre-convert YouTube URL to embed format to match what the model stores
       # (HackrStream.before_validation converts watch/live URLs to embed URLs)
       vod_url = DataLoaderHelpers.youtube_embed_url(attrs["vod_url"])
 
       stream = HackrStream.find_or_initialize_by(vod_url: vod_url, artist: artist)
-      was_new = stream.new_record?
+      next unless stream.new_record?
 
+      started_at = attrs["started_at"].present? ? Time.parse(attrs["started_at"]) : nil
+      ended_at = attrs["ended_at"].present? ? Time.parse(attrs["ended_at"]) : nil
       live_url = DataLoaderHelpers.youtube_embed_url(attrs["live_url"])
 
       stream.assign_attributes(
@@ -1652,22 +1507,15 @@ namespace :data do
         started_at: started_at,
         ended_at: ended_at
       )
-
-      if was_new
-        stream.save!
-        created += 1
-        puts "  ✓ Created: #{stream.title} (#{artist.name})"
-      elsif stream.changed?
-        stream.save!
-        updated += 1
-        puts "  ↻ Updated: #{stream.title} (#{artist.name})"
-      end
+      stream.save!
+      created += 1
+      puts "  ✓ Created: #{stream.title} (#{artist.name})"
     rescue => e
       puts "  ✗ Error processing '#{attrs["title"]}': #{e.message}"
       skipped += 1
     end
 
-    puts "Vidz: #{created} created, #{updated} updated, #{skipped} skipped, #{HackrStream.count} total"
+    puts "Vidz: #{created} created, #{skipped} skipped, #{HackrStream.count} total"
   end
 
   desc "Create TCP Livestream Archive playlist from tracks with audio"
@@ -1705,19 +1553,17 @@ namespace :data do
     puts "  Found #{tracks_with_audio.count} tracks with audio"
 
     playlist = xeraen.playlists.find_or_initialize_by(name: "TCP Livestream Archive")
-    was_new = playlist.new_record?
 
-    playlist.assign_attributes(
-      description: "Archived recordings from The.CyberPul.se live trans-temporal broadcasts.",
-      is_public: false
-    )
-
-    if playlist.changed? || was_new
+    if playlist.new_record?
+      playlist.assign_attributes(
+        description: "Archived recordings from The.CyberPul.se live trans-temporal broadcasts.",
+        is_public: false
+      )
       playlist.save!
-      puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{playlist.name}"
+      puts "  ✓ Created: #{playlist.name}"
     end
 
-    # Add tracks to playlist
+    # Add new tracks to playlist (always — new audio may be attached after initial seed)
     added = 0
     tracks_with_audio.each do |track|
       pt = PlaylistTrack.find_or_initialize_by(playlist: playlist, track: track)
@@ -1992,30 +1838,30 @@ namespace :data do
     arcs_data = data["arcs"] || []
     missions_data = data["missions"] || []
 
-    # Pass 1: upsert arcs
-    arc_created = arc_updated = 0
+    # Pass 1: seed arcs (skip existing)
+    arc_created = 0
     arcs_data.each do |attrs|
       arc = GridMissionArc.find_or_initialize_by(slug: attrs["slug"])
-      was_new = arc.new_record?
+      next unless arc.new_record?
+
       arc.assign_attributes(
         name: attrs["name"],
         description: attrs["description"],
         position: attrs["position"] || 0,
         published: attrs.fetch("published", true)
       )
-      if arc.new_record? || arc.changed?
-        arc.save!
-        was_new ? (arc_created += 1) : (arc_updated += 1)
-        puts "  #{was_new ? "✓ Arc Created" : "↻ Arc Updated"}: #{arc.name}"
-      end
+      arc.save!
+      arc_created += 1
+      puts "  ✓ Arc Created: #{arc.name}"
     end
 
-    # Pass 2: upsert missions WITHOUT prereq (resolved in pass 3 so order
+    # Pass 2: seed missions WITHOUT prereq (resolved in pass 3 so order
     # in YAML doesn't matter — a mission can prereq a later-declared one).
-    mission_created = mission_updated = 0
+    mission_created = 0
+    new_mission_slugs = Set.new
     missions_data.each do |attrs|
       mission = GridMission.find_or_initialize_by(slug: attrs["slug"])
-      was_new = mission.new_record?
+      next unless mission.new_record?
 
       giver = if attrs["giver_mob_name"].present?
         query = GridMob.where("LOWER(name) = ?", attrs["giver_mob_name"].to_s.downcase)
@@ -2044,75 +1890,53 @@ namespace :data do
         position: attrs["position"] || 0,
         published: attrs.fetch("published", true)
       )
+      mission.save!
+      mission_created += 1
+      new_mission_slugs << attrs["slug"]
+      puts "  ✓ Mission Created: #{mission.name}"
 
-      if mission.new_record? || mission.changed?
-        mission.save!
-        was_new ? (mission_created += 1) : (mission_updated += 1)
-        puts "  #{was_new ? "✓ Mission Created" : "↻ Mission Updated"}: #{mission.name}"
-      end
-
-      # Reconcile objectives declaratively by position. Objectives not in
-      # YAML are removed (including the "empty list" case — fully
-      # clearing objectives from YAML deletes all existing rows so
-      # authors see the change reflected).
-      desired_obj_positions = (attrs["objectives"] || []).map { |o| o["position"].to_i }
-      mission.grid_mission_objectives.where.not(position: desired_obj_positions).destroy_all
-
+      # Seed objectives
       (attrs["objectives"] || []).each do |o|
-        pos = o["position"].to_i
-        objective = mission.grid_mission_objectives.find_or_initialize_by(position: pos)
-        objective.assign_attributes(
+        mission.grid_mission_objectives.create!(
+          position: o["position"].to_i,
           objective_type: o["objective_type"],
           label: o["label"],
           target_slug: o["target_slug"],
           target_count: o["target_count"] || 1
         )
-        objective.save! if objective.new_record? || objective.changed?
       end
 
-      # Rewards: same declarative reconcile by position. Matches
-      # factions/objectives idiom — upsert on `changed?`, destroy
-      # rows no longer in YAML. Avoids churn on idempotent re-runs.
-      desired_reward_positions = (attrs["rewards"] || []).each_with_index.map { |r, i| r["position"] || (i + 1) }
-      mission.grid_mission_rewards.where.not(position: desired_reward_positions).destroy_all
-
+      # Seed rewards
       (attrs["rewards"] || []).each_with_index do |r, i|
-        pos = r["position"] || (i + 1)
-        reward = mission.grid_mission_rewards.find_or_initialize_by(position: pos)
-        reward.assign_attributes(
+        mission.grid_mission_rewards.create!(
+          position: r["position"] || (i + 1),
           reward_type: r["reward_type"],
           amount: r["amount"] || 0,
           target_slug: r["target_slug"],
           quantity: r["quantity"] || 1
         )
-        reward.save! if reward.new_record? || reward.changed?
       end
     end
 
-    # Pass 3: reconcile prereq_mission_slug → prereq_mission_id declaratively.
-    # Handles three cases per mission:
-    #   1. YAML adds/changes prereq → resolve slug → set FK
-    #   2. YAML removes prereq → null out the FK (prevents stale prereq drift)
-    #   3. YAML references an unknown prereq slug → warn, leave existing FK
+    # Pass 3: resolve prereq_mission_slug → prereq_mission_id (only for newly created missions).
     missions_data.each do |attrs|
+      next unless new_mission_slugs.include?(attrs["slug"])
+      next unless attrs["prereq_mission_slug"].present?
+
       mission = GridMission.find_by(slug: attrs["slug"])
       next unless mission
 
-      desired_prereq_id = if attrs["prereq_mission_slug"].present?
-        prereq = GridMission.find_by(slug: attrs["prereq_mission_slug"])
-        unless prereq
-          puts "  ⚠ Mission '#{attrs["slug"]}': prereq '#{attrs["prereq_mission_slug"]}' not found — leaving existing FK"
-          next
-        end
-        prereq.id
+      prereq = GridMission.find_by(slug: attrs["prereq_mission_slug"])
+      unless prereq
+        puts "  ⚠ Mission '#{attrs["slug"]}': prereq '#{attrs["prereq_mission_slug"]}' not found"
+        next
       end
 
-      next if mission.prereq_mission_id == desired_prereq_id
-      mission.update!(prereq_mission_id: desired_prereq_id)
+      mission.update!(prereq_mission_id: prereq.id)
     end
 
-    puts "Arcs: #{arc_created} created, #{arc_updated} updated, #{GridMissionArc.count} total"
-    puts "Missions: #{mission_created} created, #{mission_updated} updated, #{GridMission.count} total"
+    puts "Arcs: #{arc_created} created, #{GridMissionArc.count} total"
+    puts "Missions: #{mission_created} created, #{GridMission.count} total"
   end
 end
 

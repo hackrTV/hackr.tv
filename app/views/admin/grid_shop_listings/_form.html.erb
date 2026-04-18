@@ -93,5 +93,10 @@
     <%= link_to "Cancel", admin_grid_shop_listings_path,
         class: "tui-button grey-168",
         style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% if listing.persisted? %>
+      <%= link_to "History", history_admin_grid_shop_listing_path(listing),
+          class: "tui-button purple-168",
+          style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% end %>
   </div>
 <% end %>

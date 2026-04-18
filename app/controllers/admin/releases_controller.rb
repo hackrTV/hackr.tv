@@ -1,9 +1,30 @@
 class Admin::ReleasesController < Admin::ApplicationController
+  include Admin::Versionable
+
+  versionable Release, find_by: :slug
+
   before_action :set_release, only: [:edit, :update, :destroy, :purge_cover]
 
   def index
     @releases = Release.includes(:artist, :tracks, cover_image_attachment: :blob)
       .order("artists.name", :release_date)
+  end
+
+  def new
+    @release = Release.new
+    @artists = Artist.order(:name)
+  end
+
+  def create
+    @release = Release.new(release_params)
+    if @release.save
+      set_flash_success("Release '#{@release.name}' created.")
+      redirect_to edit_admin_release_path(@release)
+    else
+      @artists = Artist.order(:name)
+      flash.now[:error] = @release.errors.full_messages.join(", ")
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def edit

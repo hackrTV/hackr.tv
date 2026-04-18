@@ -1,0 +1,106 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/history :: <%= @model_name.upcase %> VERSION HISTORY</legend>
+
+    <div style="padding: 20px;">
+      <div style="margin-bottom: 20px;">
+        <span class="cyan-255-text" style="font-size: 1.1em;"><%= @record.respond_to?(:name) ? @record.name : @record.respond_to?(:title) ? @record.title : "##{@record.id}" %></span>
+        <% if @record.respond_to?(:slug) %>
+          <span style="color: #666; font-family: monospace; margin-left: 10px;"><%= @record.slug %></span>
+        <% end %>
+      </div>
+
+      <% if @entries.empty? %>
+        <div style="padding: 20px; color: #666;">
+          No version history recorded for this record.
+        </div>
+      <% else %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Event</th>
+                <th style="text-align: left;">Source</th>
+                <th style="text-align: left;">Changed By</th>
+                <th style="text-align: left;">Changed At</th>
+                <th style="text-align: left;">Changes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @entries.each_with_index do |entry, i| %>
+                <% version = entry[:version] %>
+                <% changes = entry[:changes] %>
+                <% is_child = entry[:source] != @model_name %>
+                <tr style="<%= " background: #112;" if i.odd? %>">
+                  <td style="padding: 8px 4px;">
+                    <% case version.event %>
+                    <% when "create" %>
+                      <span class="green-255-text">CREATE</span>
+                    <% when "update" %>
+                      <span class="yellow-168-text">UPDATE</span>
+                    <% when "destroy" %>
+                      <span class="red-255-text">DESTROY</span>
+                    <% end %>
+                  </td>
+                  <td style="padding: 8px 4px; white-space: nowrap;">
+                    <% if is_child %>
+                      <span style="color: #22d3ee; font-size: 0.85em;"><%= entry[:source] %></span>
+                    <% else %>
+                      <span style="color: #888;"><%= entry[:source] %></span>
+                    <% end %>
+                  </td>
+                  <td style="padding: 8px 4px;">
+                    <% if version.whodunnit.present? %>
+                      <% hackr = GridHackr.find_by(id: version.whodunnit) %>
+                      <span class="cyan-255-text"><%= hackr&.hackr_alias || "hackr##{version.whodunnit}" %></span>
+                    <% else %>
+                      <span style="color: #666;">system</span>
+                    <% end %>
+                  </td>
+                  <td style="padding: 8px 4px; color: #888; font-family: monospace; white-space: nowrap;">
+                    <%= version.created_at.strftime("%Y-%m-%d %H:%M:%S") %>
+                  </td>
+                  <td style="padding: 8px 4px; max-width: 500px;">
+                    <% if changes.any? %>
+                      <% changes.first(8).each do |change| %>
+                        <div style="margin-bottom: 4px;">
+                          <span style="color: #a78bfa; font-family: monospace;"><%= change[:key].delete_suffix("_id") %></span>
+                          <% if change[:from].present? && change[:to].present? %>
+                            <span style="color: #666;"> : </span>
+                            <span class="red-255-text" style="font-family: monospace; font-size: 0.85em; text-decoration: line-through;"><%= truncate(change[:from].to_s, length: 60) %></span>
+                            <span style="color: #666;"> &rarr; </span>
+                            <span class="green-255-text" style="font-family: monospace; font-size: 0.85em;"><%= truncate(change[:to].to_s, length: 60) %></span>
+                          <% elsif change[:to].present? %>
+                            <span style="color: #666;"> : </span>
+                            <span class="green-255-text" style="font-family: monospace; font-size: 0.85em;"><%= truncate(change[:to].to_s, length: 60) %></span>
+                          <% elsif change[:from].present? %>
+                            <span style="color: #666;"> : </span>
+                            <span class="red-255-text" style="font-family: monospace; font-size: 0.85em; text-decoration: line-through;"><%= truncate(change[:from].to_s, length: 60) %></span>
+                            <span style="color: #666;"> &rarr; </span>
+                            <span style="color: #666;">null</span>
+                          <% end %>
+                        </div>
+                      <% end %>
+                      <% if changes.size > 8 %>
+                        <span style="color: #666;">+<%= changes.size - 8 %> more</span>
+                      <% end %>
+                    <% elsif version.event == "create" && !is_child %>
+                      <span style="color: #666;">initial creation</span>
+                    <% else %>
+                      <span style="color: #666;">—</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; display: flex; gap: 10px;">
+        <%= link_to "<- Back", @back_path, class: "tui-button green-168" %>
+        <%= link_to "Edit", url_for(action: :edit, id: @record), class: "tui-button cyan-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

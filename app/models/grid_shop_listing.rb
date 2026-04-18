@@ -34,6 +34,8 @@
 #  grid_mob_id              (grid_mob_id => grid_mobs.id)
 #
 class GridShopListing < ApplicationRecord
+  has_paper_trail
+
   belongs_to :grid_mob
   belongs_to :grid_item_definition
   has_many :grid_shop_transactions, dependent: :nullify

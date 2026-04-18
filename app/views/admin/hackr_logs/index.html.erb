@@ -19,15 +19,13 @@
       <% end %>
 
       <!-- Navigation -->
-      <div style="margin-bottom: 20px;">
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/content/hackr_logs.yml</code> → <code style="color: #888;">rails data:hackr_logs</code>
-        </span>
+        <%= link_to "+ New", new_admin_hackr_log_path, class: "tui-button cyan-168", style: "padding: 8px 20px;" %>
       </div>
 
       <!-- Logs Table -->
-      <% if @hackr_logs.any? %>
+      <% if @logs.any? %>
         <div class="tui-window white-text" style="display: block; background: #0a0a0a; margin-top: 20px;">
           <table class="tui-table" style="width: 100%;">
             <thead>
@@ -36,17 +34,18 @@
                 <th style="text-align: left;">Author</th>
                 <th style="text-align: center;">Status</th>
                 <th style="text-align: center;">Published</th>
+                <th style="text-align: center;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <% @hackr_logs.each do |log| %>
-                <tr class="admin-table-row">
+              <% @logs.each_with_index do |log, i| %>
+                <tr class="admin-table-row" style="<%= " background: #112;" if i.odd? %>">
                   <td>
                     <strong><%= log.title %></strong>
                     <br>
                     <small style="color: #666; font-family: monospace;">/<%= log.slug %></small>
                   </td>
-                  <td><%= log.grid_hackr.hackr_alias %></td>
+                  <td><%= log.grid_hackr&.hackr_alias %></td>
                   <td style="text-align: center;">
                     <% if log.published? %>
                       <span class="green-255-text">✓ Published</span>
@@ -56,6 +55,11 @@
                   </td>
                   <td style="text-align: center;">
                     <%= log.published_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
+                  </td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <%= link_to "Edit", edit_admin_hackr_log_path(log), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= link_to "History", history_admin_hackr_log_path(log), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= button_to "Delete", admin_hackr_log_path(log), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{log.title}'?" } %>
                   </td>
                 </tr>
               <% end %>

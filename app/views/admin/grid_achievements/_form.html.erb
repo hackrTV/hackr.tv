@@ -66,5 +66,8 @@
   <div style="margin-top: 20px;">
     <%= f.submit @achievement.new_record? ? "Create Achievement" : "Update Achievement", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
     <%= link_to "Cancel", admin_grid_achievements_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% if @achievement.persisted? %>
+      <%= link_to "History", history_admin_grid_achievement_path(@achievement), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% end %>
   </div>
 </div>

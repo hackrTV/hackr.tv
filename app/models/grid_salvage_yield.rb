@@ -25,6 +25,8 @@
 #  source_definition_id  (source_definition_id => grid_item_definitions.id)
 #
 class GridSalvageYield < ApplicationRecord
+  has_paper_trail
+
   belongs_to :source_definition, class_name: "GridItemDefinition"
   belongs_to :output_definition, class_name: "GridItemDefinition"
 

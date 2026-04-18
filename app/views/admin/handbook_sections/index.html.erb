@@ -52,6 +52,7 @@
                   <td style="text-align: right; white-space: nowrap;">
                     <%= link_to "Articles", admin_handbook_articles_path(section_id: section.id), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
                     <%= link_to "Edit", edit_admin_handbook_section_path(section), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= link_to "History", history_admin_handbook_section_path(section), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                     <%= button_to "Delete", admin_handbook_section_path(section), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete section '#{section.name}' and all #{section.articles.size} articles?" } %>
                   </td>
                 </tr>

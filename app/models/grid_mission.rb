@@ -35,6 +35,8 @@
 #  prereq_mission_id    (prereq_mission_id => grid_missions.id) ON DELETE => nullify
 #
 class GridMission < ApplicationRecord
+  has_paper_trail
+
   # Objective type allowlist. Extending the mission system with a new
   # action verb is a three-line change: add here, add case branch in
   # Grid::MissionProgressor#record, and wire a `progressor.record(:...)`

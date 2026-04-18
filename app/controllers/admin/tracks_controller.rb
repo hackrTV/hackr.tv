@@ -1,8 +1,30 @@
 class Admin::TracksController < Admin::ApplicationController
+  include Admin::Versionable
+
+  versionable Track, find_by: :slug
+
   before_action :set_track, only: [:edit, :update, :destroy, :purge_audio]
 
   def index
     @tracks = Track.includes(:artist, :release).ordered
+  end
+
+  def new
+    @track = Track.new
+    @releases = Release.includes(:artist).order("artists.name", :name)
+  end
+
+  def create
+    @track = Track.new(track_params)
+    @track.artist = @track.release.artist if @track.release
+    if @track.save
+      set_flash_success("Track '#{@track.title}' created.")
+      redirect_to edit_admin_release_path(@track.release)
+    else
+      @releases = Release.includes(:artist).order("artists.name", :name)
+      flash.now[:error] = @track.errors.full_messages.join(", ")
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def edit
@@ -43,7 +65,7 @@ class Admin::TracksController < Admin::ApplicationController
 
   def track_params
     params.require(:track).permit(
-      :title, :slug, :track_number, :duration, :featured,
+      :title, :slug, :release_id, :track_number, :duration, :featured,
       :show_in_pulse_vault, :lyrics, :release_date, :audio_file
     )
   end

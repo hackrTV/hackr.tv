@@ -15,6 +15,8 @@
 #  grid_room_id    :integer
 #
 class GridMob < ApplicationRecord
+  has_paper_trail
+
   belongs_to :grid_room
   belongs_to :grid_faction, optional: true
   has_many :grid_shop_listings, dependent: :destroy

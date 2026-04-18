@@ -1,0 +1,46 @@
+<% if @exit.errors.any? %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+    <p class="red-255-text">ERRORS:</p>
+    <ul style="margin: 5px 0 0 20px;">
+      <% @exit.errors.full_messages.each do |msg| %>
+        <li class="white-text"><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :from_room_id, "FROM ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.select :from_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.from_room_id), { include_blank: "(select room)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :to_room_id, "TO ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.select :to_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.to_room_id), { include_blank: "(select room)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :direction, "DIRECTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.select :direction,
+          [["North", "north"], ["South", "south"], ["East", "east"], ["West", "west"], ["Up", "up"], ["Down", "down"]],
+          { include_blank: "(select direction)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :locked, "LOCKED", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.check_box :locked, style: "margin-top: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :requires_item_id, "REQUIRES ITEM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :requires_item_id, GridItem.all, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+</div>
+
+<div style="margin-top: 30px; display: flex; gap: 10px;">
+  <%= f.submit @exit.new_record? ? "Create Exit" : "Update Exit", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+  <%= link_to "Cancel", admin_grid_exits_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+  <% if @exit.persisted? %>
+    <%= link_to "History", history_admin_grid_exit_path(@exit), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+  <% end %>
+</div>

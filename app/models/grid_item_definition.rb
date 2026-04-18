@@ -22,6 +22,8 @@
 #  index_grid_item_definitions_on_slug       (slug) UNIQUE
 #
 class GridItemDefinition < ApplicationRecord
+  has_paper_trail
+
   has_many :grid_items, dependent: :restrict_with_error
   has_many :grid_shop_listings, dependent: :restrict_with_error
   has_many :salvage_yields, class_name: "GridSalvageYield",

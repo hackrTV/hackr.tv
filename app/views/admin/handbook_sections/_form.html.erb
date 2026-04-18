@@ -38,5 +38,8 @@
   <div style="margin-top: 20px;">
     <%= f.submit section.persisted? ? "Save Section" : "Create Section", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
     <%= link_to "Cancel", admin_handbook_sections_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% if section.persisted? %>
+      <%= link_to "History", history_admin_handbook_section_path(section), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% end %>
   </div>
 <% end %>

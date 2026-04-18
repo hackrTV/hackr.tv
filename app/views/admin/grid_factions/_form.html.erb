@@ -50,5 +50,8 @@
   <div style="margin-top: 20px;">
     <%= f.submit @faction.new_record? ? "Create Faction" : "Update Faction", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
     <%= link_to "Cancel", admin_grid_factions_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% if @faction.persisted? %>
+      <%= link_to "History", history_admin_grid_faction_path(@faction), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% end %>
   </div>
 </div>

@@ -23,6 +23,8 @@
 #  grid_mission_id  (grid_mission_id => grid_missions.id) ON DELETE => cascade
 #
 class GridMissionObjective < ApplicationRecord
+  has_paper_trail
+
   belongs_to :grid_mission
   has_many :grid_hackr_mission_objectives, dependent: :restrict_with_exception
 

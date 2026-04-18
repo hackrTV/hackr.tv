@@ -23,6 +23,8 @@
 #  ambient_playlist_id  (ambient_playlist_id => zone_playlists.id)
 #
 class GridZone < ApplicationRecord
+  has_paper_trail
+
   belongs_to :grid_faction, optional: true
   belongs_to :ambient_playlist, class_name: "ZonePlaylist", optional: true
 

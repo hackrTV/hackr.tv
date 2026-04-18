@@ -21,13 +21,11 @@
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/content/codex.yml</code> → <code style="color: #888;">rails data:codex</code>
-        </span>
+        <%= link_to "+ New", new_admin_codex_entry_path, class: "tui-button cyan-168", style: "padding: 8px 20px;" %>
       </div>
 
       <!-- Filter by Type -->
-      <% if @codex_entries.any? %>
+      <% if @entries.any? %>
         <div style="margin-bottom: 20px;">
           <label style="color: #888; display: block; margin-bottom: 8px;">
             FILTER BY TYPE
@@ -52,13 +50,13 @@
             style="width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace; font-size: 1em;"
           />
           <div style="margin-top: 8px; color: #666; font-size: 0.9em;">
-            <span id="entry-count"><%= @codex_entries.count %></span> / <%= @codex_entries.count %> entries visible
+            <span id="entry-count"><%= @entries.count %></span> / <%= @entries.count %> entries visible
           </div>
         </div>
       <% end %>
 
       <!-- Entries Table -->
-      <% if @codex_entries.any? %>
+      <% if @entries.any? %>
         <div class="tui-window white-text" style="display: block; background: #0a0a0a; margin-top: 20px;">
           <table class="tui-table" style="width: 100%;">
             <thead>
@@ -67,11 +65,13 @@
                 <th style="text-align: left;">Type</th>
                 <th style="text-align: center;">Position</th>
                 <th style="text-align: center;">Published</th>
+                <th style="text-align: center;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <% @codex_entries.each do |entry| %>
+              <% @entries.each_with_index do |entry, i| %>
                 <tr class="entry-row" class="admin-table-row"
+                    style="<%= " background: #112;" if i.odd? %>"
                     data-entry-name="<%= entry.name.downcase %>"
                     data-entry-summary="<%= entry.summary&.downcase || '' %>">
                   <td>
@@ -96,6 +96,11 @@
                       <span style="color: #f87171;">✗ Draft</span>
                     <% end %>
                   </td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <%= link_to "Edit", edit_admin_codex_entry_path(entry), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= link_to "History", history_admin_codex_entry_path(entry), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= button_to "Delete", admin_codex_entry_path(entry), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{entry.name}'?" } %>
+                  </td>
                 </tr>
               <% end %>
             </tbody>
@@ -110,7 +115,7 @@
   </fieldset>
 </div>
 
-<% if @codex_entries.any? %>
+<% if @entries.any? %>
   <script nonce="<%= content_security_policy_nonce %>">
     document.addEventListener('DOMContentLoaded', function() {
       const searchInput = document.getElementById('entry-search');

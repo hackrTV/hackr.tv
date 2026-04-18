@@ -82,5 +82,10 @@
     <%= link_to "Cancel", admin_handbook_articles_path,
         class: "tui-button grey-168",
         style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% if article.persisted? %>
+      <%= link_to "History", history_admin_handbook_article_path(article),
+          class: "tui-button purple-168",
+          style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% end %>
   </div>
 <% end %>

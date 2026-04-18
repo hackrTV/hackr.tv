@@ -18,6 +18,8 @@
 #  index_grid_exits_on_to_room_id    (to_room_id)
 #
 class GridExit < ApplicationRecord
+  has_paper_trail
+
   belongs_to :from_room, class_name: "GridRoom", foreign_key: :from_room_id
   belongs_to :to_room, class_name: "GridRoom", foreign_key: :to_room_id
   belongs_to :requires_item, class_name: "GridItem", optional: true

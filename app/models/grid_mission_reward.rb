@@ -22,6 +22,8 @@
 #  grid_mission_id  (grid_mission_id => grid_missions.id) ON DELETE => cascade
 #
 class GridMissionReward < ApplicationRecord
+  has_paper_trail
+
   belongs_to :grid_mission
 
   validates :reward_type, presence: true, inclusion: {in: GridMission::REWARD_TYPES}

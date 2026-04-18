@@ -17,6 +17,8 @@
 #  index_grid_mission_arcs_on_slug  (slug) UNIQUE
 #
 class GridMissionArc < ApplicationRecord
+  has_paper_trail
+
   has_many :grid_missions, dependent: :nullify
 
   validates :slug, presence: true, uniqueness: true

@@ -1,0 +1,63 @@
+<div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+  <% if @entry.errors.any? %>
+    <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+      <p class="red-255-text"><%= @entry.errors.full_messages.join(", ") %></p>
+    </div>
+  <% end %>
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px; margin-bottom: 20px;">
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", style: "width: 100%;" %>
+    </div>
+    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+      <%= f.label :entry_type, "ENTRY TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :entry_type,
+          options_for_select(CodexEntry::ENTRY_TYPES.map { |t| [t.titleize, t] }, @entry.entry_type),
+          {},
+          class: "tui-input", style: "width: 100%;" %>
+    </div>
+    <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :position, class: "tui-input", style: "width: 100%;" %>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :summary, "SUMMARY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :summary, class: "tui-input", style: "width: 100%; min-height: 80px;" %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :content, "CONTENT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :content, class: "tui-input", style: "width: 100%; min-height: 200px;" %>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :metadata_json, "METADATA", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :metadata_json, value: (@entry.metadata.present? ? JSON.pretty_generate(@entry.metadata) : "{}"), class: "tui-input", style: "width: 100%; min-height: 100px; font-family: monospace;" %>
+    <small style="color: #888;">JSON object</small>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :published, class: "white-text", style: "display: inline-flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;" do %>
+      <%= f.check_box :published, style: "width: 20px; height: 20px;" %>
+      <span>PUBLISHED</span>
+    <% end %>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= f.submit @entry.new_record? ? "Create Entry" : "Update Entry", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+    <%= link_to "Cancel", admin_codex_entries_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% if @entry.persisted? %>
+      <%= link_to "History", history_admin_codex_entry_path(@entry), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% end %>
+  </div>
+</div>
