@@ -26,6 +26,8 @@
 #  parent_id  (parent_id => grid_factions.id)
 #
 class GridFaction < ApplicationRecord
+  has_paper_trail
+
   KINDS = %w[collective individual system].freeze
 
   belongs_to :artist, optional: true

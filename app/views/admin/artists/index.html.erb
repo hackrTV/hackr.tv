@@ -21,9 +21,7 @@
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/catalog/{artist_slug}.yml</code> → <code style="color: #888;">rails data:catalog</code>
-        </span>
+        <%= link_to "+ New Artist", new_admin_artist_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
       </div>
 
       <!-- Artists Table -->
@@ -35,14 +33,20 @@
                 <th style="text-align: left;">Name</th>
                 <th style="text-align: left;">Slug</th>
                 <th style="text-align: center;">Tracks</th>
+                <th style="text-align: center;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <% @artists.each do |artist| %>
-                <tr class="admin-table-row">
+              <% @artists.each_with_index do |artist, i| %>
+                <tr class="admin-table-row" style="<%= " background: #112;" if i.odd? %>">
                   <td><strong><%= artist.name %></strong></td>
                   <td style="font-family: monospace; color: #888;">/<%= artist.slug %></td>
-                  <td style="text-align: center;"><%= artist.tracks.count %></td>
+                  <td style="text-align: center;"><%= artist.tracks.size %></td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <%= link_to "Edit", edit_admin_artist_path(artist), class: "tui-button", style: "padding: 4px 10px;" %>
+                    <%= link_to "History", history_admin_artist_path(artist), class: "tui-button purple-168", style: "padding: 4px 10px;" %>
+                    <%= button_to "Delete", admin_artist_path(artist), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 4px 10px;", data: { confirm: "Delete artist '#{artist.name}'?" } %>
+                  </td>
                 </tr>
               <% end %>
             </tbody>

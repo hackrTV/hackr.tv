@@ -1,4 +1,8 @@
 class Admin::GridFactionsController < Admin::ApplicationController
+  include Admin::Versionable
+
+  versionable GridFaction
+
   before_action :set_faction, only: [:edit, :update, :destroy]
 
   def index

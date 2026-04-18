@@ -24,6 +24,8 @@
 #  index_grid_achievements_on_trigger_type  (trigger_type)
 #
 class GridAchievement < ApplicationRecord
+  has_paper_trail
+
   # Naming note: `uplink_packets_count` tracks what players see as
   # Uplink "packets" — an in-world aesthetic alias. The backing model
   # is `ChatMessage`; there is no separate Packet table. Similarly,

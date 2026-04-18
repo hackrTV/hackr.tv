@@ -1,0 +1,58 @@
+<% if @room.errors.any? %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+    <p class="red-255-text">ERRORS:</p>
+    <ul style="margin: 5px 0 0 20px;">
+      <% @room.errors.full_messages.each do |msg| %>
+        <li class="white-text"><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+</div>
+
+<div style="margin-top: 15px;">
+  <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+  <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :room_type, "ROOM TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.select :room_type,
+          [["Hub", "hub"], ["Faction Base", "faction_base"], ["GovCorp", "govcorp"], ["Special", "special"], ["Safe Zone", "safe_zone"], ["Transit", "transit"], ["Shop", "shop"], ["Danger Zone", "danger_zone"], ["Prism", "prism"], ["Dream", "dream"]],
+          { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :min_clearance, "MIN CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.number_field :min_clearance, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0 %>
+  </div>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :grid_zone_id, "ZONE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :grid_zone_id, @zones, :id, :name, { include_blank: "(select zone)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :ambient_playlist_id, "AMBIENT PLAYLIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :ambient_playlist_id, @playlists, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+</div>
+
+<div style="margin-top: 30px; display: flex; gap: 10px;">
+  <%= f.submit @room.new_record? ? "Create Room" : "Update Room", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+  <%= link_to "Cancel", admin_grid_rooms_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+  <% if @room.persisted? %>
+    <%= link_to "History", history_admin_grid_room_path(@room), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+  <% end %>
+</div>

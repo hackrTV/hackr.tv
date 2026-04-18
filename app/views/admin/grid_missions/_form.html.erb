@@ -170,5 +170,8 @@
   <div style="margin-top: 25px;">
     <%= f.submit @mission.new_record? ? "Create Mission" : "Update Mission", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
     <%= link_to "Cancel", admin_grid_missions_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% if @mission.persisted? %>
+      <%= link_to "History", history_admin_grid_mission_path(@mission), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% end %>
   </div>
 </div>

@@ -129,5 +129,10 @@
     <%= link_to "Cancel", admin_releases_path,
         class: "tui-button grey-168",
         style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% if release.persisted? %>
+      <%= link_to "History", history_admin_release_path(release),
+          class: "tui-button purple-168",
+          style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% end %>
   </div>
 <% end %>

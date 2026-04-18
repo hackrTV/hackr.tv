@@ -28,6 +28,8 @@
 #  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
 #
 class GridItem < ApplicationRecord
+  has_paper_trail
+
   ITEM_TYPES = %w[tool consumable data faction collectible rig_component material].freeze
   RARITIES = %w[scrap ubiquitous common uncommon rare ultra_rare unicorn].freeze
   RARITY_LABELS = {

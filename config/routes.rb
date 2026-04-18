@@ -252,30 +252,62 @@ Rails.application.routes.draw do
   namespace :admin, path: "root" do
     root "dashboard#index"
 
-    # Catalog resources
-    resources :artists, only: [:index]
-    resources :releases, only: %i[index edit update destroy] do
+    # Catalog resources (full CRUD)
+    resources :artists do
+      member do
+        get :history
+      end
+    end
+    resources :releases do
       member do
         delete :purge_cover, to: "releases#purge_cover"
+        get :history
       end
     end
-    resources :tracks, only: %i[index edit update destroy] do
+    resources :tracks do
       member do
         delete :purge_audio, to: "tracks#purge_audio"
+        get :history
       end
     end
 
-    # Read-only content resources (managed via data/content/*.yml)
-    resources :codex_entries, only: [:index]
-    resources :hackr_logs, only: [:index]
+    # Content resources (full CRUD)
+    resources :codex_entries do
+      member do
+        get :history
+      end
+    end
+    resources :hackr_logs do
+      member do
+        get :history
+      end
+    end
 
-    # Read-only system resources (managed via data/system/*.yml)
+    # System resources (read-only)
     resources :radio_stations, only: %i[index show]
     resources :zone_playlists, only: %i[index show]
 
-    # Read-only world resources (managed via data/world/*.yml)
-    resources :grid_zones, only: [:index]
-    resources :grid_rooms, only: [:index]
+    # World resources (full CRUD)
+    resources :grid_zones do
+      member do
+        get :history
+      end
+    end
+    resources :grid_rooms do
+      member do
+        get :history
+      end
+    end
+    resources :grid_mobs do
+      member do
+        get :history
+      end
+    end
+    resources :grid_exits do
+      member do
+        get :history
+      end
+    end
 
     # Grid management (still functional - runtime operations)
     get "grid", to: "grid#index", as: :grid
@@ -290,11 +322,15 @@ Rails.application.routes.draw do
     resources :grid_achievements do
       member do
         post :award
+        get :history
       end
     end
 
     # Grid factions (full CRUD + rep-link management)
     resources :grid_factions do
+      member do
+        get :history
+      end
       collection do
         post :update_rep_links
       end
@@ -311,24 +347,45 @@ Rails.application.routes.draw do
     resources :grid_reputation_events, only: [:index]
 
     # Grid item definitions (item master catalog)
-    resources :grid_item_definitions, except: [:show]
+    resources :grid_item_definitions, except: [:show] do
+      member do
+        get :history
+      end
+    end
 
     # Grid shops (runtime CRUD + stock management)
     resources :grid_shop_listings do
       member do
         post :restock
+        get :history
       end
     end
     resources :grid_shop_transactions, only: [:index]
 
-    # Grid missions (runtime CRUD + YAML-seedable)
-    resources :grid_mission_arcs
-    resources :grid_missions
+    # Grid missions (runtime CRUD)
+    resources :grid_mission_arcs do
+      member do
+        get :history
+      end
+    end
+    resources :grid_missions do
+      member do
+        get :history
+      end
+    end
     resources :grid_hackr_missions, only: %i[index show]
 
-    # Hackr Handbook (docs — full CRUD, YAML-seedable)
-    resources :handbook_sections
-    resources :handbook_articles
+    # Hackr Handbook (docs — full CRUD)
+    resources :handbook_sections do
+      member do
+        get :history
+      end
+    end
+    resources :handbook_articles do
+      member do
+        get :history
+      end
+    end
 
     # PulseWire moderation (still functional - runtime operations)
     resources :pulse_wire, only: %i[index destroy] do

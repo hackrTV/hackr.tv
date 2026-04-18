@@ -22,6 +22,8 @@
 #  target_faction_id  (target_faction_id => grid_factions.id)
 #
 class GridFactionRepLink < ApplicationRecord
+  has_paper_trail
+
   belongs_to :source_faction, class_name: "GridFaction", inverse_of: :outgoing_rep_links
   belongs_to :target_faction, class_name: "GridFaction", inverse_of: :incoming_rep_links
 

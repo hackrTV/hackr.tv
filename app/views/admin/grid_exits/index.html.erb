@@ -1,0 +1,62 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/exits :: MANAGE GRID EXITS</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+        <%= link_to "+ New Exit", new_admin_grid_exit_path, class: "tui-button green-168" %>
+      </div>
+
+      <% if @exits.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; overflow-x: auto;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">From Room</th>
+                <th style="text-align: center;">Direction</th>
+                <th style="text-align: left;">To Room</th>
+                <th style="text-align: center;">Locked</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @exits.each_with_index do |exit_record, i| %>
+                <tr style="<%= " background: #112;" if i.odd? %>">
+                  <td class="cyan-255-text"><%= exit_record.from_room&.name || "—" %></td>
+                  <td style="text-align: center; font-weight: bold;"><%= exit_record.direction %></td>
+                  <td class="cyan-255-text"><%= exit_record.to_room&.name || "—" %></td>
+                  <td style="text-align: center;"><%= exit_record.locked? ? "LOCKED" : "—" %></td>
+                  <td style="text-align: right; white-space: nowrap;">
+                    <%= link_to "Edit", edit_admin_grid_exit_path(exit_record), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= link_to "History", history_admin_grid_exit_path(exit_record), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= button_to "Delete", admin_grid_exit_path(exit_record), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete this exit?" } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
+          <%= @exits.count %> exits
+        </p>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No exits yet.</p>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

@@ -45,6 +45,7 @@
                 <td style="text-align: center; color: #888;"><%= faction.position %></td>
                 <td style="text-align: right; white-space: nowrap;">
                   <%= link_to "Edit", edit_admin_grid_faction_path(faction), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                  <%= link_to "History", history_admin_grid_faction_path(faction), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                   <%= button_to "Delete", admin_grid_faction_path(faction), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete faction '#{faction.name}'?" } %>
                 </td>
               </tr>

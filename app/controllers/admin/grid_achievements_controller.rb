@@ -1,4 +1,8 @@
 class Admin::GridAchievementsController < Admin::ApplicationController
+  include Admin::Versionable
+
+  versionable GridAchievement
+
   before_action :set_achievement, only: [:edit, :update, :destroy, :award]
 
   def index

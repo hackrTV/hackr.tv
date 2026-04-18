@@ -1,0 +1,13 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/releases/new :: NEW RELEASE</legend>
+
+    <div style="padding: 20px;">
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <%= link_to "← All Releases", admin_releases_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+      </div>
+
+      <%= render "form", release: @release %>
+    </div>
+  </fieldset>
+</div>

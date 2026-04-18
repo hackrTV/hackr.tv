@@ -51,6 +51,7 @@
                 <td style="text-align: right; color: #fbbf24;"><%= defn.value %></td>
                 <td style="text-align: center; white-space: nowrap; display: flex; gap: 8px; justify-content: center; align-items: center; padding: 8px 4px;">
                   <%= link_to "Edit", edit_admin_grid_item_definition_path(defn), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;" %>
+                  <%= link_to "History", history_admin_grid_item_definition_path(defn), class: "tui-button purple-168", style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;" %>
                   <%= button_to "Delete", admin_grid_item_definition_path(defn), method: :delete,
                         data: {confirm: "Delete '#{defn.name}'? This will fail if any items or listings reference it."},
                         class: "tui-button red-168", style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;",

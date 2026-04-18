@@ -1,0 +1,57 @@
+<div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+  <% if @log.errors.any? %>
+    <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+      <p class="red-255-text"><%= @log.errors.full_messages.join(", ") %></p>
+    </div>
+  <% end %>
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px; margin-bottom: 20px;">
+      <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :title, class: "tui-input", style: "width: 100%;" %>
+    </div>
+    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+      <%= f.label :grid_hackr_id, "AUTHOR", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.collection_select :grid_hackr_id, @hackrs, :id, :hackr_alias,
+          { include_blank: "— Select Author —" },
+          class: "tui-input", style: "width: 100%;" %>
+    </div>
+    <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
+      <%= f.label :timeline, "TIMELINE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :timeline, class: "tui-input", style: "width: 100%;" %>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :body, "BODY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :body, class: "tui-input", style: "width: 100%; min-height: 300px;" %>
+  </div>
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+    <div style="margin-bottom: 20px;">
+      <%= f.label :published, class: "white-text", style: "display: inline-flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;" do %>
+        <%= f.check_box :published, style: "width: 20px; height: 20px;" %>
+        <span>PUBLISHED</span>
+      <% end %>
+    </div>
+    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
+      <%= f.label :published_at, "PUBLISHED AT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.datetime_field :published_at, class: "tui-input", style: "width: 100%;" %>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= f.submit @log.new_record? ? "Create Log" : "Update Log", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+    <%= link_to "Cancel", admin_hackr_logs_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% if @log.persisted? %>
+      <%= link_to "History", history_admin_hackr_log_path(@log), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% end %>
+  </div>
+</div>

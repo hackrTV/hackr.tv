@@ -166,5 +166,9 @@
           class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
     <%= link_to "Cancel", admin_grid_item_definitions_path,
           class: "tui-button grey-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% if definition.persisted? %>
+      <%= link_to "History", history_admin_grid_item_definition_path(definition),
+            class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% end %>
   </div>
 <% end %>

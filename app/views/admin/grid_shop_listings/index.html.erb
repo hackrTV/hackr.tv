@@ -87,6 +87,7 @@
                   <td style="text-align: center; color: #888;"><%= listing.min_clearance > 0 ? listing.min_clearance : "-" %></td>
                   <td style="text-align: right; white-space: nowrap;">
                     <%= link_to "Edit", edit_admin_grid_shop_listing_path(listing), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= link_to "History", history_admin_grid_shop_listing_path(listing), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                     <% if listing.max_stock.present? %>
                       <%= button_to "Restock", restock_admin_grid_shop_listing_path(listing), method: :post, form: { style: "display: inline;" }, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                     <% end %>

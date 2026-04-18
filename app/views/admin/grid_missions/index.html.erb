@@ -69,6 +69,7 @@
                 </td>
                 <td style="text-align: right; white-space: nowrap;">
                   <%= link_to "Edit", edit_admin_grid_mission_path(mission), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                  <%= link_to "History", history_admin_grid_mission_path(mission), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                   <%= button_to "Delete", admin_grid_mission_path(mission), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete mission '#{mission.name}'?" } %>
                 </td>
               </tr>

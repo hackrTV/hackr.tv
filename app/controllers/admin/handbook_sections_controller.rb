@@ -1,4 +1,8 @@
 class Admin::HandbookSectionsController < Admin::ApplicationController
+  include Admin::Versionable
+
+  versionable HandbookSection, find_by: :slug
+
   before_action :set_section, only: [:edit, :update, :destroy]
 
   def index

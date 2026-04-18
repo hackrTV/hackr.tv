@@ -1,4 +1,8 @@
 class Admin::HandbookArticlesController < Admin::ApplicationController
+  include Admin::Versionable
+
+  versionable HandbookArticle, find_by: :slug
+
   before_action :set_article, only: [:edit, :update, :destroy]
 
   def index

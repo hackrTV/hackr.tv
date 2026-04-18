@@ -25,6 +25,8 @@
 #  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
 #
 class HackrLog < ApplicationRecord
+  has_paper_trail
+
   belongs_to :grid_hackr
 
   validates :title, presence: true
