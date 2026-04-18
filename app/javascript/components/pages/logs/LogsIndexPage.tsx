@@ -72,6 +72,7 @@ export const LogsIndexPage: React.FC = () => {
         setError('Failed to load logs')
         setFetchedKey(requestKey)
       })
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- requestKey is derived from the deps already listed
   }, [currentTimeline, currentPage, currentSort])
 
   const switchTimeline = (timeline: string) => {

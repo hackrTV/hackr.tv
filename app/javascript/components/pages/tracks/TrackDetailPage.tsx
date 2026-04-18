@@ -122,6 +122,7 @@ const TrackDetailPage: React.FC = () => {
         console.error('Error fetching track:', error)
         setLoading(false)
       })
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- navigate is stable from react-router
   }, [trackSlug])
 
   if (loading) {

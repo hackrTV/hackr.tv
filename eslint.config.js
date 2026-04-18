@@ -68,7 +68,9 @@ export default [
       // React-specific
       'react/react-in-jsx-scope': 'off', // Not needed in React 17+
       'react/prop-types': 'off', // Using TypeScript for prop validation
-      'react/no-unescaped-entities': 'off' // Allow apostrophes and quotes in JSX text
+      'react/no-unescaped-entities': 'off', // Allow apostrophes and quotes in JSX text
+      'react-hooks/set-state-in-effect': 'warn', // Fetch-in-effect and WebSocket patterns are intentional
+      'react-hooks/preserve-manual-memoization': 'warn' // React Compiler advisory, not blocking
     },
     settings: {
       react: {
