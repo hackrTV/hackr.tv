@@ -37,7 +37,7 @@ RSpec.describe Grid::SalvageService do
 
       it "grants XP to the hackr" do
         old_xp = hackr.stat("xp").to_i
-        result = described_class.salvage!(hackr: hackr, item: item)
+        described_class.salvage!(hackr: hackr, item: item)
         expect(hackr.stat("xp").to_i).to eq(old_xp + 5)
       end
     end
@@ -131,7 +131,11 @@ RSpec.describe Grid::SalvageService do
         allow(GridItem).to receive(:create!).and_raise(ActiveRecord::RecordInvalid)
 
         expect {
-          described_class.salvage!(hackr: hackr, item: item) rescue nil
+          begin
+            described_class.salvage!(hackr: hackr, item: item)
+          rescue ActiveRecord::RecordInvalid
+            nil
+          end
         }.not_to change { item.reload.quantity }
       end
     end
