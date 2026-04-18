@@ -33,6 +33,15 @@ class GridSalvageYield < ApplicationRecord
     scope: :source_definition_id,
     message: "already configured as a yield for this item"
   }
+  validate :source_and_output_differ
 
   scope :ordered, -> { order(:position, :id) }
+
+  private
+
+  def source_and_output_differ
+    if source_definition_id == output_definition_id
+      errors.add(:output_definition_id, "cannot be the same as the source")
+    end
+  end
 end

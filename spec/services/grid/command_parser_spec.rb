@@ -320,5 +320,76 @@ RSpec.describe Grid::CommandParser do
         end
       end
     end
+
+    describe "analyze command" do
+      let(:gpu_def) do
+        create(:grid_item_definition, :component, slug: "basic-gpu", name: "Basic GPU", value: 5)
+      end
+
+      let(:wafer_def) do
+        create(:grid_item_definition, slug: "raw-silicon-wafer",
+          name: "Raw Silicon Wafer", item_type: "material", rarity: "scrap", value: 2)
+      end
+
+      context "with yields defined" do
+        let!(:item) { GridItem.create!(gpu_def.item_attributes.merge(grid_hackr: hackr)) }
+        let!(:yield_row) do
+          GridSalvageYield.create!(source_definition: gpu_def, output_definition: wafer_def, quantity: 3, position: 0)
+        end
+        let(:input) { "analyze Basic GPU" }
+
+        it "shows XP and yield preview" do
+          result = parser.execute
+          expect(result[:output]).to include("ANALYSIS")
+          expect(result[:output]).to include("Basic GPU")
+          expect(result[:output]).to include("+5 XP")
+          expect(result[:output]).to include("Raw Silicon Wafer")
+          expect(result[:output]).to include("×3")
+        end
+      end
+
+      context "with no yields" do
+        let!(:tool_def) { create(:grid_item_definition, slug: "signal-analyzer", name: "Signal Analyzer", value: 200) }
+        let!(:item) { GridItem.create!(tool_def.item_attributes.merge(grid_hackr: hackr)) }
+        let(:input) { "analyze Signal Analyzer" }
+
+        it "shows XP only message" do
+          result = parser.execute
+          expect(result[:output]).to include("+200 XP")
+          expect(result[:output]).to include("No decomposition yields")
+        end
+      end
+
+      context "with unicorn item" do
+        let(:unicorn_def) { create(:grid_item_definition, :unicorn, slug: "unicorn-gem", name: "Unicorn Gem", value: 999) }
+        let!(:item) { GridItem.create!(unicorn_def.item_attributes.merge(grid_hackr: hackr)) }
+        let(:input) { "analyze Unicorn Gem" }
+
+        it "shows irreducible message" do
+          result = parser.execute
+          expect(result[:output]).to include("irreducible")
+        end
+      end
+
+      context "with no item name" do
+        let(:input) { "analyze" }
+
+        it "prompts for target" do
+          result = parser.execute
+          expect(result[:output]).to include("Analyze what?")
+        end
+      end
+
+      context "with 'an' alias" do
+        let!(:tool_def) { create(:grid_item_definition, slug: "some-tool", name: "Some Tool", value: 10) }
+        let!(:item) { GridItem.create!(tool_def.item_attributes.merge(grid_hackr: hackr)) }
+        let(:input) { "an Some Tool" }
+
+        it "works as alias" do
+          result = parser.execute
+          expect(result[:output]).to include("ANALYSIS")
+        end
+      end
+    end
   end
 end

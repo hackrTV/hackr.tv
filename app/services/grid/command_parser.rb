@@ -775,7 +775,11 @@ module Grid
       end
 
       item_styled = h(item.name)
-      result = Grid::SalvageService.salvage!(hackr: hackr, item: item)
+      begin
+        result = Grid::SalvageService.salvage!(hackr: hackr, item: item)
+      rescue ArgumentError => e
+        return "<span style='color: #f87171;'>#{h(e.message)}</span>"
+      end
 
       increment_stat!("salvage_count")
 
@@ -896,7 +900,7 @@ module Grid
       output = "<span style='color: #d0d0d0;'>#{codex_linkify(item.description)}</span>"
       if item.rig_component? && item.slot.present? && item.properties&.key?("rate_multiplier")
         props = item.properties || {}
-        slot = props["slot"].upcase
+        slot = props["slot"]&.upcase || "UNKNOWN"
         output += "\n<span style='color: #22d3ee;'>Slot: #{slot}</span>"
         output += " <span style='color: #fbbf24;'>Multiplier: x#{item.rate_multiplier}</span>"
         if slot == "MOTHERBOARD"
