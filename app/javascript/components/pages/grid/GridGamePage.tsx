@@ -174,7 +174,7 @@ export const GridGamePage: React.FC = () => {
   // Handle command execution
   const handleCommand = async (command: string) => {
     // Handle clear command locally
-    if (command.toLowerCase() === 'clear' || command.toLowerCase() === 'cls') {
+    if (['clear', 'cls', 'cl'].includes(command.toLowerCase())) {
       setOutput([])
       return
     }

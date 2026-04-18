@@ -1,0 +1,77 @@
+# Salvage Yields — decomposition outputs for item definitions.
+# Loaded by: rails data:salvage_yields (after item_definitions).
+# Idempotent: upsert by source_slug + output_slug pair.
+
+salvage_yields:
+
+  # ── Starter Components ─────────────────────────────────────────
+  - source_slug: basic-motherboard
+    output_slug: scrap-wire-bundle
+    quantity: 1
+    position: 0
+
+  - source_slug: basic-motherboard
+    output_slug: raw-silicon-wafer
+    quantity: 1
+    position: 1
+
+  - source_slug: basic-psu
+    output_slug: scrap-wire-bundle
+    quantity: 2
+    position: 0
+
+  - source_slug: basic-cpu
+    output_slug: raw-silicon-wafer
+    quantity: 2
+    position: 0
+
+  - source_slug: basic-gpu
+    output_slug: raw-silicon-wafer
+    quantity: 3
+    position: 0
+
+  - source_slug: basic-gpu
+    output_slug: corrupted-shader-fragment
+    quantity: 1
+    position: 1
+
+  - source_slug: basic-ram
+    output_slug: raw-silicon-wafer
+    quantity: 1
+    position: 0
+
+  - source_slug: basic-ram
+    output_slug: data-shard
+    quantity: 1
+    position: 1
+
+  # ── Shop Components (Codec) ────────────────────────────────────
+  - source_slug: enhanced-gpu
+    output_slug: raw-silicon-wafer
+    quantity: 5
+    position: 0
+
+  - source_slug: enhanced-gpu
+    output_slug: corrupted-shader-fragment
+    quantity: 2
+    position: 1
+
+  - source_slug: enhanced-cpu
+    output_slug: raw-silicon-wafer
+    quantity: 5
+    position: 0
+
+  - source_slug: enhanced-ram-module
+    output_slug: raw-silicon-wafer
+    quantity: 3
+    position: 0
+
+  - source_slug: enhanced-ram-module
+    output_slug: data-shard
+    quantity: 2
+    position: 1
+
+  - source_slug: hardened-psu
+    output_slug: scrap-wire-bundle
+    quantity: 4
+    position: 0

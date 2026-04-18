@@ -105,7 +105,6 @@ export const usePulseWire = ({ onMessage, enabled = true }: UsePulseWireOptions)
   useEffect(() => {
     reconnectAttemptsRef.current = 0
     if (enabled) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: establish WebSocket on mount
       connect()
     } else {
       disconnect()

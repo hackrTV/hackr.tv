@@ -87,7 +87,7 @@ const VodzShowPage: React.FC = () => {
     apiFetch(`/api/artists/${encodeURIComponent(artistSlug)}/vods/${encodeURIComponent(String(vod.id))}/watch`, {
       method: 'POST'
     }).catch(() => { /* fire-and-forget */ })
-  }, [hackr, vod?.id, artistSlug, creditedIdsRef])
+  }, [hackr, vod, artistSlug, creditedIdsRef])
 
   if (loading) {
     return (

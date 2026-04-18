@@ -117,7 +117,6 @@ export const useStreamStatus = ({ enabled = true }: UseStreamStatusOptions = {})
     if (enabled) {
       connect()
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: cleanup WebSocket on disable
       disconnect()
     }
 

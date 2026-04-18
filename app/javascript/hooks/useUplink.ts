@@ -117,7 +117,6 @@ export const useUplink = ({ channel, onMessage, enabled = true }: UseUplinkOptio
   useEffect(() => {
     reconnectAttemptsRef.current = 0
     if (enabled && channel) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: establish WebSocket on mount
       connect()
     } else {
       disconnect()

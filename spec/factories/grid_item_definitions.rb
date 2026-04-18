@@ -30,7 +30,7 @@ FactoryBot.define do
     properties { {} }
 
     trait :component do
-      item_type { "component" }
+      item_type { "rig_component" }
       properties { {"slot" => "gpu", "rate_multiplier" => 1.0} }
     end
 

@@ -10,6 +10,8 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
 
   def new
     @definition = GridItemDefinition.new(value: 0, properties: {})
+    @definition.salvage_yields.build
+    load_yield_selects
   end
 
   def create
@@ -20,20 +22,25 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
       @definition.valid?
       @definition.errors.add(:properties, json_error)
       flash.now[:error] = @definition.errors.full_messages.join(", ")
+      load_yield_selects
       render :new, status: :unprocessable_entity
       return
     end
 
     if @definition.save
       set_flash_success("Definition '#{@definition.name}' created.")
-      redirect_to admin_grid_item_definitions_path
+      redirect_to edit_admin_grid_item_definition_path(@definition)
     else
       flash.now[:error] = @definition.errors.full_messages.join(", ")
+      load_yield_selects
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
+    @sorted_yields = @definition.salvage_yields.ordered.to_a
+    @sorted_yields << @definition.salvage_yields.build
+    load_yield_selects
   end
 
   def update
@@ -43,15 +50,17 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
       @definition.assign_attributes(attrs)
       @definition.errors.add(:properties, json_error)
       flash.now[:error] = @definition.errors.full_messages.join(", ")
+      load_yield_selects
       render :edit, status: :unprocessable_entity
       return
     end
 
     if @definition.update(attrs)
       set_flash_success("Definition '#{@definition.name}' updated.")
-      redirect_to admin_grid_item_definitions_path
+      redirect_to edit_admin_grid_item_definition_path(@definition)
     else
       flash.now[:error] = @definition.errors.full_messages.join(", ")
+      load_yield_selects
       render :edit, status: :unprocessable_entity
     end
   end
@@ -59,6 +68,12 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
   def destroy
     if @definition.grid_items.exists? || @definition.grid_shop_listings.exists?
       set_flash_error("Cannot delete '#{@definition.name}' — it has live items or shop listings.")
+      redirect_to admin_grid_item_definitions_path
+      return
+    end
+
+    if GridSalvageYield.where(output_definition_id: @definition.id).exists?
+      set_flash_error("Cannot delete '#{@definition.name}' — it is referenced as a salvage yield output.")
       redirect_to admin_grid_item_definitions_path
       return
     end
@@ -78,9 +93,14 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
     @definition = GridItemDefinition.find_by!(slug: params[:id])
   end
 
+  def load_yield_selects
+    @all_definitions = GridItemDefinition.ordered
+  end
+
   def definition_params
     permitted = params.require(:grid_item_definition).permit(
-      :slug, :name, :description, :item_type, :rarity, :value
+      :slug, :name, :description, :item_type, :rarity, :value,
+      salvage_yields_attributes: %i[id output_definition_id quantity position _destroy]
     )
 
     json_source = params[:grid_item_definition][:properties_json]

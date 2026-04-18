@@ -338,6 +338,61 @@ handbook_sections:
           your active jobs, every job available from NPCs in your current
           room, and your recent completion history. It live-refreshes
           whenever you turn a mission in.
+      - slug: salvaging-decomposition
+        title: Salvaging & Decomposition
+        kind: reference
+        difficulty: beginner
+        position: 4
+        published: true
+        summary: "Salvaging destroys an item and awards XP. Items with decomposition yields also produce raw materials."
+        metadata:
+          search_tags:
+            - salvage
+            - decomposition
+            - scrap
+            - yields
+            - crafting
+        body: |
+          # Salvaging & Decomposition
+
+          ## SALVAGE COMMAND
+
+          `salvage <item name>`
+
+          Destroys the named item from your inventory and awards XP equal to the
+          item's base value (minimum 1 XP). If you have a stack, one unit is consumed.
+
+          ## DECOMPOSITION YIELDS
+
+          Some items have **decomposition yields** — salvaging them produces additional
+          scrap-tier materials alongside the XP award. The output items are added
+          directly to your inventory. If you already own a stack of the output item,
+          the quantity increments automatically.
+
+          Yields are deterministic: the same item always produces the same output. No RNG.
+
+          Example — salvaging a **Basic GPU** yields:
+          - Raw Silicon Wafer ×3
+          - Corrupted Shader Fragment ×1
+
+          ## SCRAP TIER
+
+          Scrap-rarity items are decomposition byproducts and raw materials. They
+          currently have no direct use, but are intended as inputs for a future
+          fabrication (crafting) system. Salvage them for XP or hold them.
+
+          ## RESTRICTIONS
+
+          - **UNICORN** rarity items cannot be salvaged under any circumstances.
+          - Only one unit is salvaged per command. There is no `salvage all`.
+          - Yields are first-level only — output items do not recursively decompose
+            in a single command. To break down yielded items further, salvage them
+            individually.
+
+          ## ACHIEVEMENTS
+
+          Salvaging and receiving yield materials may unlock achievements. Check
+          `stat` for your current salvage and yield counts.
 
   - slug: wire
     name: WIRE

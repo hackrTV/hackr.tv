@@ -42,18 +42,19 @@
             </tr>
           </thead>
           <tbody>
-            <% @definitions.each do |defn| %>
-              <tr>
+            <% @definitions.each_with_index do |defn, i| %>
+              <tr style="<%= " background: #112;" if i.odd? %>">
                 <td class="cyan-255-text"><%= defn.name %></td>
                 <td style="color: #666; font-family: monospace;"><%= defn.slug %></td>
                 <td style="color: #9ca3af;"><%= defn.item_type %></td>
                 <td style="color: <%= defn.rarity_color %>;"><%= defn.rarity_label %></td>
                 <td style="text-align: right; color: #fbbf24;"><%= defn.value %></td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= link_to "Edit", edit_admin_grid_item_definition_path(defn), class: "tui-button", style: "padding: 3px 10px; font-size: 0.85em;" %>
+                <td style="text-align: center; white-space: nowrap; display: flex; gap: 8px; justify-content: center; align-items: center; padding: 8px 4px;">
+                  <%= link_to "Edit", edit_admin_grid_item_definition_path(defn), class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;" %>
                   <%= button_to "Delete", admin_grid_item_definition_path(defn), method: :delete,
-                        data: { confirm: "Delete '#{defn.name}'? This will fail if any items or listings reference it." },
-                        class: "tui-button red-168", style: "padding: 3px 10px; font-size: 0.85em;" %>
+                        data: {confirm: "Delete '#{defn.name}'? This will fail if any items or listings reference it."},
+                        class: "tui-button red-168", style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;",
+                        form: {style: "display: inline; margin: 0;"} %>
                 </td>
               </tr>
             <% end %>

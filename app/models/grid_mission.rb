@@ -42,7 +42,7 @@ class GridMission < ApplicationRecord
   OBJECTIVE_TYPES = %w[
     visit_room talk_npc collect_item deliver_item
     spend_cred buy_item reach_rep reach_clearance
-    use_item salvage_item
+    use_item salvage_item salvage_yield_received
   ].freeze
 
   # Reward type allowlist. `amount` is the scalar for XP/CRED/rep deltas;

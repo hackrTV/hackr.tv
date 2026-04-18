@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_16_120003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_16_213400) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -470,6 +470,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_120003) do
     t.index ["ambient_playlist_id"], name: "index_grid_rooms_on_ambient_playlist_id"
     t.index ["grid_zone_id"], name: "index_grid_rooms_on_grid_zone_id"
     t.index ["slug"], name: "index_grid_rooms_on_slug", unique: true
+  end
+
+  create_table "grid_salvage_yields", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "output_definition_id", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "quantity", default: 1, null: false
+    t.integer "source_definition_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["output_definition_id"], name: "index_grid_salvage_yields_on_output_definition_id"
+    t.index ["source_definition_id", "output_definition_id"], name: "index_grid_salvage_yields_unique", unique: true
+    t.index ["source_definition_id"], name: "index_grid_salvage_yields_on_source_definition_id"
   end
 
   create_table "grid_shop_listings", force: :cascade do |t|
@@ -1047,6 +1059,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_120003) do
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
+  add_foreign_key "grid_salvage_yields", "grid_item_definitions", column: "output_definition_id"
+  add_foreign_key "grid_salvage_yields", "grid_item_definitions", column: "source_definition_id"
   add_foreign_key "grid_shop_listings", "grid_item_definitions"
   add_foreign_key "grid_shop_listings", "grid_mobs"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"

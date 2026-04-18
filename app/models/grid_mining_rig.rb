@@ -19,7 +19,7 @@ class GridMiningRig < ApplicationRecord
   has_many :grid_items, dependent: :nullify
 
   def components
-    grid_items.where(item_type: "component")
+    grid_items.where(item_type: "rig_component")
   end
 
   # --- Component queries ---

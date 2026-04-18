@@ -192,7 +192,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, zones, rooms, etc.)"
-  task world: [:factions, :zones, :rooms, :exits, :mobs, :item_definitions, :items, :achievements, :shop_listings, :missions]
+  task world: [:factions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -732,6 +732,54 @@ namespace :data do
     end
 
     puts "Item Definitions: #{created} created, #{updated} updated, #{GridItemDefinition.count} total"
+  end
+
+  desc "Load salvage yield definitions from YAML"
+  task salvage_yields: :environment do
+    puts "\n--- Loading Salvage Yields ---"
+    yaml_file = Rails.root.join("data", "world", "salvage_yields.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    yields_data = data["salvage_yields"] || []
+    created = updated = 0
+
+    yields_data.each do |attrs|
+      source = GridItemDefinition.find_by(slug: attrs["source_slug"])
+      output = GridItemDefinition.find_by(slug: attrs["output_slug"])
+
+      unless source
+        puts "  ✗ Source definition not found: #{attrs["source_slug"]}"
+        next
+      end
+      unless output
+        puts "  ✗ Output definition not found: #{attrs["output_slug"]}"
+        next
+      end
+
+      yield_row = GridSalvageYield.find_or_initialize_by(
+        source_definition: source,
+        output_definition: output
+      )
+      was_new = yield_row.new_record?
+
+      yield_row.assign_attributes(
+        quantity: attrs["quantity"] || 1,
+        position: attrs["position"] || 0
+      )
+
+      if yield_row.changed?
+        yield_row.save!
+        was_new ? (created += 1) : (updated += 1)
+        puts "  #{was_new ? "✓ Created" : "↻ Updated"}: #{source.name} → #{output.name} ×#{yield_row.quantity}"
+      end
+    end
+
+    puts "Salvage Yields: #{created} created, #{updated} updated, #{GridSalvageYield.count} total"
   end
 
   desc "Load items from YAML"

@@ -60,6 +60,107 @@
     <% end %>
   </div>
 
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: SALVAGE YIELDS ::]</h3>
+  <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
+    Items produced when this item is salvaged. No yields = XP only. UNICORN items cannot be salvaged regardless.
+  </p>
+  <table id="salvage-yields-table" class="tui-table" style="width: 100%; margin-bottom: 10px;">
+    <thead>
+      <tr>
+        <th style="text-align: left; width: 70px;">Pos</th>
+        <th style="text-align: left;">Output Item</th>
+        <th style="text-align: center; width: 80px;">Qty</th>
+        <th style="text-align: center; width: 50px;">&times;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.fields_for :salvage_yields, @sorted_yields || definition.salvage_yields do |ff| %>
+        <tr>
+          <td><%= ff.number_field :position, class: "tui-input", style: "width: 60px; padding: 4px;", min: 0 %></td>
+          <td>
+            <%= ff.select :output_definition_id,
+                  @all_definitions.map { |d| ["#{d.name} [#{d.rarity_label}]", d.id] },
+                  {include_blank: "— select output —"},
+                  class: "tui-input", style: "width: 100%; padding: 4px;" %>
+          </td>
+          <td style="text-align: center;">
+            <%= ff.number_field :quantity, class: "tui-input", style: "width: 70px; padding: 4px; text-align: center;", min: 1 %>
+          </td>
+          <td style="text-align: center;">
+            <% if ff.object.persisted? %>
+              <%= ff.hidden_field :id %>
+              <%= ff.hidden_field :_destroy, value: "0", class: "destroy-flag" %>
+              <button type="button" class="tui-button red-168 yield-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" data-persisted="true">&times;</button>
+            <% else %>
+              <button type="button" class="tui-button red-168 yield-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if definition.errors[:salvage_yields].any? %>
+    <small class="red-255-text"><%= definition.errors[:salvage_yields].join(", ") %></small>
+  <% end %>
+  <button type="button" id="add-yield-btn" class="tui-button green-168" style="padding: 4px 12px; font-size: 0.85em; margin-top: 5px;">+ Add Yield</button>
+
+  <template id="yield-row-template">
+    <tr>
+      <td>
+        <input type="number" name="grid_item_definition[salvage_yields_attributes][__INDEX__][position]"
+          class="tui-input" style="width: 60px; padding: 4px;" min="0" value="0">
+      </td>
+      <td>
+        <select name="grid_item_definition[salvage_yields_attributes][__INDEX__][output_definition_id]"
+          class="tui-input" style="width: 100%; padding: 4px;">
+          <option value="">— select output —</option>
+          <% @all_definitions.each do |d| %>
+            <option value="<%= d.id %>"><%= d.name %> [<%= d.rarity_label %>]</option>
+          <% end %>
+        </select>
+      </td>
+      <td style="text-align: center;">
+        <input type="number" name="grid_item_definition[salvage_yields_attributes][__INDEX__][quantity]"
+          class="tui-input" style="width: 70px; padding: 4px; text-align: center;" min="1" value="1">
+      </td>
+      <td style="text-align: center;">
+        <button type="button" class="tui-button red-168 yield-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+      </td>
+    </tr>
+  </template>
+
+  <script nonce="<%= content_security_policy_nonce %>">
+    (function() {
+      var yieldRowIndex = <%= definition.salvage_yields.size + 1000 %>;
+      var table = document.getElementById('salvage-yields-table');
+
+      // Event delegation for all destroy buttons (current + future rows)
+      table.addEventListener('click', function(e) {
+        var btn = e.target.closest('.yield-destroy-btn');
+        if (!btn) return;
+        var row = btn.closest('tr');
+        if (btn.dataset.persisted) {
+          row.querySelector('.destroy-flag').value = '1';
+          row.style.display = 'none';
+        } else {
+          row.remove();
+        }
+      });
+
+      // Add yield row
+      document.getElementById('add-yield-btn').addEventListener('click', function() {
+        var template = document.getElementById('yield-row-template');
+        var tbody = table.querySelector('tbody');
+        var clone = template.content.cloneNode(true);
+        clone.querySelectorAll('[name]').forEach(function(el) {
+          el.name = el.name.replace('__INDEX__', yieldRowIndex);
+        });
+        tbody.appendChild(clone);
+        yieldRowIndex++;
+      });
+    })();
+  </script>
+
   <div style="margin-top: 30px; display: flex; gap: 10px;">
     <%= f.submit definition.persisted? ? "Save Definition" : "Create Definition",
           class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>

@@ -2,7 +2,7 @@
 # Loaded by: rails data:item_definitions (before items and shop_listings).
 # Idempotent: upsert by slug.
 #
-# item_type: tool | consumable | data | faction | collectible | component
+# item_type: tool | consumable | data | faction | collectible | rig_component | material
 # rarity:    scrap | ubiquitous | common | uncommon | rare | ultra_rare | unicorn
 
 item_definitions:
@@ -11,7 +11,7 @@ item_definitions:
   - slug: basic-motherboard
     name: Basic Motherboard
     description: "A standard-issue board with minimal expansion. Gets the job done."
-    item_type: component
+    item_type: rig_component
     rarity: common
     value: 10
     properties:
@@ -24,7 +24,7 @@ item_definitions:
   - slug: basic-psu
     name: Basic PSU
     description: "A reliable power supply. Keeps the lights on."
-    item_type: component
+    item_type: rig_component
     rarity: common
     value: 5
     properties:
@@ -34,7 +34,7 @@ item_definitions:
   - slug: basic-cpu
     name: Basic CPU
     description: "A single-core processor. Slow but steady."
-    item_type: component
+    item_type: rig_component
     rarity: common
     value: 8
     properties:
@@ -44,7 +44,7 @@ item_definitions:
   - slug: basic-gpu
     name: Basic GPU
     description: "A standard-issue mining processor. Not fast, but it works."
-    item_type: component
+    item_type: rig_component
     rarity: common
     value: 5
     properties:
@@ -54,7 +54,7 @@ item_definitions:
   - slug: basic-ram
     name: Basic RAM
     description: "A single stick of memory. Enough to boot."
-    item_type: component
+    item_type: rig_component
     rarity: common
     value: 4
     properties:
@@ -65,7 +65,7 @@ item_definitions:
   - slug: enhanced-gpu
     name: Enhanced GPU
     description: "A mid-tier graphics processor. Decent hash rate, reasonable power draw."
-    item_type: component
+    item_type: rig_component
     rarity: uncommon
     value: 300
     properties:
@@ -75,7 +75,7 @@ item_definitions:
   - slug: enhanced-cpu
     name: Enhanced CPU
     description: "Dual-core processor salvaged from decommissioned GovCorp terminals. Still kicks."
-    item_type: component
+    item_type: rig_component
     rarity: uncommon
     value: 300
     properties:
@@ -85,7 +85,7 @@ item_definitions:
   - slug: enhanced-ram-module
     name: Enhanced RAM Module
     description: "High-bandwidth memory module. Makes everything snappier."
-    item_type: component
+    item_type: rig_component
     rarity: uncommon
     value: 250
     properties:
@@ -95,7 +95,7 @@ item_definitions:
   - slug: hardened-psu
     name: Hardened PSU
     description: "Surge-protected power supply. Won't fry when the grid spikes."
-    item_type: component
+    item_type: rig_component
     rarity: uncommon
     value: 200
     properties:
@@ -106,7 +106,7 @@ item_definitions:
   - slug: milspec-gpu
     name: Milspec GPU
     description: "Military-specification graphics processor. Stolen from a GovCorp mining facility. The serial numbers have been... removed."
-    item_type: component
+    item_type: rig_component
     rarity: rare
     value: 800
     properties:
@@ -116,7 +116,7 @@ item_definitions:
   - slug: milspec-cpu
     name: Milspec CPU
     description: "Quad-core processor with hardened encryption coprocessor. Falls off a GovCorp truck every now and then."
-    item_type: component
+    item_type: rig_component
     rarity: rare
     value: 800
     properties:
@@ -126,7 +126,7 @@ item_definitions:
   - slug: overclocked-ram-array
     name: Overclocked RAM Array
     description: "Eight high-density modules wired in parallel. Runs hot. Runs fast. Don't ask where it came from."
-    item_type: component
+    item_type: rig_component
     rarity: rare
     value: 650
     properties:
@@ -136,7 +136,7 @@ item_definitions:
   - slug: quantum-flux-capacitor
     name: Quantum Flux Capacitor
     description: "Experimental power supply that harnesses quantum fluctuations. Theoretically impossible. Practically devastating."
-    item_type: component
+    item_type: rig_component
     rarity: ultra_rare
     value: 2500
     properties:
@@ -146,7 +146,7 @@ item_definitions:
   - slug: neural-cortex-board
     name: Neural Cortex Board
     description: "A motherboard that interfaces directly with neural tissue. Three times the slots of anything on the market. The installation process is... unpleasant."
-    item_type: component
+    item_type: rig_component
     rarity: ultra_rare
     value: 5000
     properties:
@@ -297,6 +297,39 @@ item_definitions:
     item_type: collectible
     rarity: ultra_rare
     value: 3000
+    properties: {}
+
+  # ── Scrap (Salvage Decomposition Materials) ─────────────────────
+  - slug: raw-silicon-wafer
+    name: Raw Silicon Wafer
+    description: "A fractured wafer of raw silicon, recovered from disassembled hardware. Used in circuit fabrication."
+    item_type: material
+    rarity: scrap
+    value: 2
+    properties: {}
+
+  - slug: scrap-wire-bundle
+    name: Scrap Wire Bundle
+    description: "Tangled salvaged wiring stripped from decommissioned gear. Conductive but messy."
+    item_type: material
+    rarity: scrap
+    value: 1
+    properties: {}
+
+  - slug: data-shard
+    name: Data Shard
+    description: "A fragment of volatile memory, partially wiped. May contain recoverable signal."
+    item_type: material
+    rarity: scrap
+    value: 3
+    properties: {}
+
+  - slug: corrupted-shader-fragment
+    name: Corrupted Shader Fragment
+    description: "A broken GPU shader core, its logic irreparably fragmented. Salvage value only."
+    item_type: material
+    rarity: scrap
+    value: 2
     properties: {}
 
   # ── Faction Items ──────────────────────────────────────────────
