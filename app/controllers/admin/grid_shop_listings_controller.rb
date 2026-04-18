@@ -1,5 +1,6 @@
 class Admin::GridShopListingsController < Admin::ApplicationController
   include Admin::Versionable
+
   versionable GridShopListing
 
   before_action :set_listing, only: [:edit, :update, :destroy, :restock]

@@ -188,7 +188,7 @@ module Admin::Versionable
   def safe_load_object(version)
     return nil if version.blank? || version.object.blank?
     PaperTrail.serializer.load(version.object)
-  rescue StandardError
+  rescue
     nil
   end
 

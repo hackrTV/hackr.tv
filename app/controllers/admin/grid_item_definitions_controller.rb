@@ -1,5 +1,6 @@
 class Admin::GridItemDefinitionsController < Admin::ApplicationController
   include Admin::Versionable
+
   versionable GridItemDefinition, find_by: :slug, children: [:salvage_yields]
 
   before_action :set_definition, only: %i[edit update destroy]

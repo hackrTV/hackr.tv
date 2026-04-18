@@ -1,5 +1,6 @@
 class Admin::GridMissionArcsController < Admin::ApplicationController
   include Admin::Versionable
+
   versionable GridMissionArc, find_by: :slug
 
   before_action :set_arc, only: %i[edit update destroy]

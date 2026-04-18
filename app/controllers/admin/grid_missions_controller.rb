@@ -1,5 +1,6 @@
 class Admin::GridMissionsController < Admin::ApplicationController
   include Admin::Versionable
+
   versionable GridMission, find_by: :slug, children: [:grid_mission_objectives, :grid_mission_rewards]
 
   before_action :set_mission, only: %i[edit update destroy]
