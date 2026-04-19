@@ -47,20 +47,11 @@ module Grid
     private
 
     def grant_yield!(yield_row)
-      output_def = yield_row.output_definition
-      existing = @hackr.grid_items.find_by(grid_item_definition_id: output_def.id)
-
-      if existing
-        existing.update!(quantity: existing.quantity + yield_row.quantity)
-        existing
-      else
-        GridItem.create!(
-          output_def.item_attributes.merge(
-            grid_hackr: @hackr,
-            quantity: yield_row.quantity
-          )
-        )
-      end
+      Grid::Inventory.grant_item!(
+        hackr: @hackr,
+        definition: yield_row.output_definition,
+        quantity: yield_row.quantity
+      )
     end
   end
 end

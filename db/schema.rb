@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_18_120004) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -488,6 +488,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_18_120004) do
     t.index ["output_definition_id"], name: "index_grid_salvage_yields_on_output_definition_id"
     t.index ["source_definition_id", "output_definition_id"], name: "index_grid_salvage_yields_unique", unique: true
     t.index ["source_definition_id"], name: "index_grid_salvage_yields_on_source_definition_id"
+  end
+
+  create_table "grid_schematic_ingredients", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_schematic_id", null: false
+    t.integer "input_definition_id", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "quantity", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_schematic_id", "input_definition_id"], name: "index_grid_schematic_ingredients_unique", unique: true
+    t.index ["grid_schematic_id"], name: "index_grid_schematic_ingredients_on_grid_schematic_id"
+    t.index ["input_definition_id"], name: "index_grid_schematic_ingredients_on_input_definition_id"
+  end
+
+  create_table "grid_schematics", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.integer "output_definition_id", null: false
+    t.integer "output_quantity", default: 1, null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "published", default: false, null: false
+    t.string "required_achievement_slug"
+    t.integer "required_clearance", default: 0, null: false
+    t.string "required_mission_slug"
+    t.string "required_room_type"
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.integer "xp_reward", default: 0, null: false
+    t.index ["output_definition_id"], name: "index_grid_schematics_on_output_definition_id"
+    t.index ["slug"], name: "index_grid_schematics_on_slug", unique: true
   end
 
   create_table "grid_shop_listings", force: :cascade do |t|
@@ -1067,6 +1098,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_18_120004) do
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_salvage_yields", "grid_item_definitions", column: "output_definition_id"
   add_foreign_key "grid_salvage_yields", "grid_item_definitions", column: "source_definition_id"
+  add_foreign_key "grid_schematic_ingredients", "grid_item_definitions", column: "input_definition_id"
+  add_foreign_key "grid_schematic_ingredients", "grid_schematics"
+  add_foreign_key "grid_schematics", "grid_item_definitions", column: "output_definition_id"
   add_foreign_key "grid_shop_listings", "grid_item_definitions"
   add_foreign_key "grid_shop_listings", "grid_mobs"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"

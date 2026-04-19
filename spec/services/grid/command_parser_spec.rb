@@ -391,5 +391,267 @@ RSpec.describe Grid::CommandParser do
         end
       end
     end
+
+    # --- Fabrication commands ---
+
+    describe "schematics command" do
+      let(:cpu_def) do
+        create(:grid_item_definition, :component, slug: "basic-cpu", name: "Basic CPU", value: 8)
+      end
+      let(:wafer_def) do
+        create(:grid_item_definition, slug: "raw-silicon-wafer",
+          name: "Raw Silicon Wafer", item_type: "material", rarity: "scrap", value: 2)
+      end
+
+      context "with available schematics" do
+        let(:input) { "schematics" }
+
+        before do
+          s = create(:grid_schematic, slug: "fab-cpu", name: "Fabricate CPU",
+            output_definition: cpu_def, xp_reward: 10)
+          create(:grid_schematic_ingredient, grid_schematic: s, input_definition: wafer_def, quantity: 3)
+        end
+
+        it "lists available schematics" do
+          result = parser.execute
+          expect(result[:output]).to include("FABRICATION SCHEMATICS")
+          expect(result[:output]).to include("fab-cpu")
+          expect(result[:output]).to include("Fabricate CPU")
+        end
+      end
+
+      context "with no schematics" do
+        let(:input) { "schematics" }
+
+        it "shows empty message" do
+          result = parser.execute
+          expect(result[:output]).to include("No schematics available")
+        end
+      end
+
+      context "with clearance-locked schematic" do
+        let(:input) { "schematics" }
+
+        before do
+          create(:grid_schematic, :clearance_gated, slug: "locked-sch", name: "Locked",
+            output_definition: cpu_def, required_clearance: 99)
+        end
+
+        it "shows schematic in locked section" do
+          result = parser.execute
+          expect(result[:output]).to include("[LOCKED]")
+          expect(result[:output]).to include("Locked")
+        end
+      end
+
+      context "aliases" do
+        let(:input) { "schem" }
+
+        it "works with schem alias" do
+          result = parser.execute
+          expect(result[:output]).to include("FABRICATION SCHEMATICS")
+        end
+      end
+
+      context "schem with slug argument" do
+        let(:input) { "schem fab-cpu" }
+
+        before do
+          s = create(:grid_schematic, slug: "fab-cpu", name: "Fabricate CPU",
+            output_definition: cpu_def, xp_reward: 10)
+          create(:grid_schematic_ingredient, grid_schematic: s, input_definition: wafer_def, quantity: 3)
+        end
+
+        it "shows schematic detail instead of list" do
+          result = parser.execute
+          expect(result[:output]).to include("Fabricate CPU")
+          expect(result[:output]).to include("INGREDIENTS")
+        end
+      end
+
+      context "sch with slug argument" do
+        let(:input) { "sch fab-cpu" }
+
+        before do
+          s = create(:grid_schematic, slug: "fab-cpu", name: "Fabricate CPU",
+            output_definition: cpu_def, xp_reward: 10)
+          create(:grid_schematic_ingredient, grid_schematic: s, input_definition: wafer_def, quantity: 3)
+        end
+
+        it "shows schematic detail instead of list" do
+          result = parser.execute
+          expect(result[:output]).to include("Fabricate CPU")
+          expect(result[:output]).to include("INGREDIENTS")
+        end
+      end
+    end
+
+    describe "schematic detail command" do
+      let(:cpu_def) do
+        create(:grid_item_definition, :component, slug: "basic-cpu", name: "Basic CPU", value: 8)
+      end
+      let(:wafer_def) do
+        create(:grid_item_definition, slug: "raw-silicon-wafer",
+          name: "Raw Silicon Wafer", item_type: "material", rarity: "scrap", value: 2)
+      end
+
+      let!(:schematic) do
+        s = create(:grid_schematic, slug: "fab-cpu", name: "Fabricate CPU",
+          description: "Build a CPU", output_definition: cpu_def, xp_reward: 15, output_quantity: 1)
+        create(:grid_schematic_ingredient, grid_schematic: s, input_definition: wafer_def, quantity: 3)
+        s
+      end
+
+      context "with valid slug" do
+        let(:input) { "schematic fab-cpu" }
+
+        it "shows schematic details" do
+          result = parser.execute
+          expect(result[:output]).to include("Fabricate CPU")
+          expect(result[:output]).to include("Build a CPU")
+          expect(result[:output]).to include("Raw Silicon Wafer")
+          expect(result[:output]).to include("+15")
+        end
+
+        it "shows ingredient ownership status" do
+          GridItem.create!(wafer_def.item_attributes.merge(grid_hackr: hackr, quantity: 5))
+          result = parser.execute
+          expect(result[:output]).to include("5/3")
+          expect(result[:output]).to include("Ready to fabricate")
+        end
+
+        it "shows missing ingredient status" do
+          result = parser.execute
+          expect(result[:output]).to include("0/3")
+          expect(result[:output]).to include("Missing ingredients")
+        end
+      end
+
+      context "with unknown slug" do
+        let(:input) { "schematic nonexistent" }
+
+        it "returns error" do
+          result = parser.execute
+          expect(result[:output]).to include("Unknown schematic")
+        end
+      end
+
+      context "with no slug" do
+        let(:input) { "schematic" }
+
+        it "shows usage hint" do
+          result = parser.execute
+          expect(result[:output]).to include("Usage:")
+        end
+      end
+    end
+
+    describe "fabricate command" do
+      let(:cpu_def) do
+        create(:grid_item_definition, :component, slug: "basic-cpu", name: "Basic CPU", value: 8)
+      end
+      let(:wafer_def) do
+        create(:grid_item_definition, slug: "raw-silicon-wafer",
+          name: "Raw Silicon Wafer", item_type: "material", rarity: "scrap", value: 2)
+      end
+
+      let!(:schematic) do
+        s = create(:grid_schematic, slug: "fab-cpu", name: "Fabricate CPU",
+          output_definition: cpu_def, xp_reward: 15)
+        create(:grid_schematic_ingredient, grid_schematic: s, input_definition: wafer_def, quantity: 3)
+        s
+      end
+
+      context "happy path" do
+        let(:input) { "fab fab-cpu" }
+
+        before do
+          GridItem.create!(wafer_def.item_attributes.merge(grid_hackr: hackr, quantity: 5))
+        end
+
+        it "fabricates the item and shows success" do
+          result = parser.execute
+          expect(result[:output]).to include("Fabricated:")
+          expect(result[:output]).to include("Basic CPU")
+          expect(result[:output]).to include("+15 XP")
+        end
+
+        it "consumes ingredients" do
+          parser.execute
+          wafer = hackr.grid_items.find_by(grid_item_definition: wafer_def)
+          expect(wafer.quantity).to eq(2)
+        end
+
+        it "creates output item" do
+          parser.execute
+          cpu = hackr.grid_items.find_by(grid_item_definition: cpu_def)
+          expect(cpu).to be_present
+        end
+
+        it "increments fabricate_count stat" do
+          parser.execute
+          expect(hackr.stat("fabricate_count")).to eq(1)
+        end
+      end
+
+      context "insufficient ingredients" do
+        let(:input) { "fab fab-cpu" }
+
+        before do
+          GridItem.create!(wafer_def.item_attributes.merge(grid_hackr: hackr, quantity: 1))
+        end
+
+        it "returns error message" do
+          result = parser.execute
+          expect(result[:output]).to include("Missing:")
+          expect(result[:output]).to include("Raw Silicon Wafer")
+        end
+      end
+
+      context "unknown schematic" do
+        let(:input) { "fab nonexistent" }
+
+        it "returns error" do
+          result = parser.execute
+          expect(result[:output]).to include("Unknown schematic")
+        end
+      end
+
+      context "empty input" do
+        let(:input) { "fabricate" }
+
+        it "shows usage hint" do
+          result = parser.execute
+          expect(result[:output]).to include("Usage:")
+        end
+      end
+
+      context "clearance blocked" do
+        let(:input) { "fab fab-cpu" }
+
+        before do
+          schematic.update!(required_clearance: 99)
+          GridItem.create!(wafer_def.item_attributes.merge(grid_hackr: hackr, quantity: 5))
+        end
+
+        it "returns requirements error" do
+          result = parser.execute
+          expect(result[:output]).to include("don't meet the requirements")
+        end
+      end
+
+      context "fabricate alias" do
+        let(:input) { "fabricate fab-cpu" }
+
+        before do
+          GridItem.create!(wafer_def.item_attributes.merge(grid_hackr: hackr, quantity: 5))
+        end
+
+        it "works with full command name" do
+          result = parser.execute
+          expect(result[:output]).to include("Fabricated:")
+        end
+      end
+    end
   end
 end

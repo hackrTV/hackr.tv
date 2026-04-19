@@ -156,12 +156,10 @@ module Grid
         return nil
       end
 
-      GridItem.create!(
-        definition.item_attributes.merge(
-          grid_hackr: @hackr,
-          value: [reward.amount.to_i, 0].max,
-          quantity: reward.quantity.to_i.clamp(1, 9999)
-        )
+      Grid::Inventory.grant_item!(
+        hackr: @hackr,
+        definition: definition,
+        quantity: reward.quantity.to_i.clamp(1, 9999)
       )
     rescue ActiveRecord::RecordInvalid => e
       Rails.logger.warn("[MissionRewardGranter] item grant failed: #{e.message}")

@@ -92,6 +92,7 @@ Rails.application.routes.draw do
   # the MissionsPage card grid — no dedicated per-slug React route, so
   # we don't expose `/missions/:slug` as a Rails SPA path either.
   get "missions", to: "pages#spa_root", as: :missions
+  get "schematics", to: "pages#spa_root", as: :schematics
 
   # Codex (wiki) routes - SPA
   scope "codex" do
@@ -163,6 +164,7 @@ Rails.application.routes.draw do
     get "grid/current_hackr", to: "grid#current_hackr_info"
     get "grid/achievements", to: "grid#achievements_index"
     get "grid/missions", to: "grid#missions_index"
+    get "grid/schematics", to: "grid#schematics_index"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"
     get "grid/verify/:token", to: "grid#verify_token"
@@ -388,6 +390,13 @@ Rails.application.routes.draw do
       end
     end
     resources :grid_hackr_missions, only: %i[index show]
+
+    # Grid schematics (fabrication recipes)
+    resources :grid_schematics, except: [:show] do
+      member do
+        get :history
+      end
+    end
 
     # Hackr Handbook (docs — full CRUD)
     resources :handbook_sections do

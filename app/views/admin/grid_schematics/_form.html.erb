@@ -1,0 +1,186 @@
+<%= form_with model: [:admin, schematic], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: SCHEMATIC INFO ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <% if schematic.errors[:name].any? %>
+        <br><small class="red-255-text"><%= schematic.errors[:name].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">lowercase letters, numbers, hyphens only</small>
+      <% if schematic.errors[:slug].any? %>
+        <br><small class="red-255-text"><%= schematic.errors[:slug].join(", ") %></small>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin-top: 15px;">
+    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :description, class: "tui-input", style: "width: 100%; font-family: monospace; height: 80px;" %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :output_definition_id, "OUTPUT ITEM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :output_definition_id,
+            @all_definitions.map { |d| ["#{d.name} [#{d.rarity_label}]", d.id] },
+            { include_blank: "Select..." }, class: "tui-input", style: "width: 100%;" %>
+      <% if schematic.errors[:output_definition_id].any? %>
+        <br><small class="red-255-text"><%= schematic.errors[:output_definition_id].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :output_quantity, "OUTPUT QTY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :output_quantity, class: "tui-input", style: "width: 100%;", min: 1 %>
+    </div>
+    <div>
+      <%= f.label :xp_reward, "XP REWARD", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :xp_reward, class: "tui-input", style: "width: 100%;", min: 0 %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :required_clearance, "REQUIRED CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :required_clearance, class: "tui-input", style: "width: 100%;", min: 0, max: 99 %>
+    </div>
+    <div>
+      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :position, class: "tui-input", style: "width: 100%;", min: 0 %>
+    </div>
+    <div style="display: flex; align-items: center; padding-top: 25px;">
+      <%= f.check_box :published, style: "margin-right: 8px;" %>
+      <%= f.label :published, "PUBLISHED", class: "white-text", style: "font-weight: bold;" %>
+    </div>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: VISIBILITY GATES (Optional) ::]</h3>
+  <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
+    Leave blank for no gate. Slugs are resolved at runtime.
+  </p>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <%= f.label :required_mission_slug, "REQUIRED MISSION SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :required_mission_slug, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "e.g. signal-recovery" %>
+    </div>
+    <div>
+      <%= f.label :required_achievement_slug, "REQUIRED ACHIEVEMENT SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :required_achievement_slug, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "e.g. first-salvage" %>
+    </div>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: INGREDIENTS ::]</h3>
+  <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
+    Items consumed when this schematic is fabricated.
+  </p>
+  <table id="ingredients-table" class="tui-table" style="width: 100%; margin-bottom: 10px;">
+    <thead>
+      <tr>
+        <th style="text-align: left; width: 70px;">Pos</th>
+        <th style="text-align: left;">Input Item</th>
+        <th style="text-align: center; width: 80px;">Qty</th>
+        <th style="text-align: center; width: 50px;">&times;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.fields_for :ingredients, @sorted_ingredients || schematic.ingredients do |ff| %>
+        <tr>
+          <td><%= ff.number_field :position, class: "tui-input", style: "width: 60px; padding: 4px;", min: 0 %></td>
+          <td>
+            <%= ff.select :input_definition_id,
+                  @all_definitions.map { |d| ["#{d.name} [#{d.rarity_label}]", d.id] },
+                  {include_blank: "— select input —"},
+                  class: "tui-input", style: "width: 100%; padding: 4px;" %>
+          </td>
+          <td style="text-align: center;">
+            <%= ff.number_field :quantity, class: "tui-input", style: "width: 70px; padding: 4px; text-align: center;", min: 1 %>
+          </td>
+          <td style="text-align: center;">
+            <% if ff.object.persisted? %>
+              <%= ff.hidden_field :id %>
+              <%= ff.hidden_field :_destroy, value: "0", class: "destroy-flag" %>
+              <button type="button" class="tui-button red-168 ingredient-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" data-persisted="true">&times;</button>
+            <% else %>
+              <button type="button" class="tui-button red-168 ingredient-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if schematic.errors[:ingredients].any? %>
+    <small class="red-255-text"><%= schematic.errors[:ingredients].join(", ") %></small>
+  <% end %>
+  <button type="button" id="add-ingredient-btn" class="tui-button green-168" style="padding: 4px 12px; font-size: 0.85em; margin-top: 5px;">+ Add Ingredient</button>
+
+  <template id="ingredient-row-template">
+    <tr>
+      <td>
+        <input type="number" name="grid_schematic[ingredients_attributes][__INDEX__][position]"
+          class="tui-input" style="width: 60px; padding: 4px;" min="0" value="0">
+      </td>
+      <td>
+        <select name="grid_schematic[ingredients_attributes][__INDEX__][input_definition_id]"
+          class="tui-input" style="width: 100%; padding: 4px;">
+          <option value="">— select input —</option>
+          <% @all_definitions.each do |d| %>
+            <option value="<%= d.id %>"><%= d.name %> [<%= d.rarity_label %>]</option>
+          <% end %>
+        </select>
+      </td>
+      <td style="text-align: center;">
+        <input type="number" name="grid_schematic[ingredients_attributes][__INDEX__][quantity]"
+          class="tui-input" style="width: 70px; padding: 4px; text-align: center;" min="1" value="1">
+      </td>
+      <td style="text-align: center;">
+        <button type="button" class="tui-button red-168 ingredient-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+      </td>
+    </tr>
+  </template>
+
+  <script nonce="<%= content_security_policy_nonce %>">
+    (function() {
+      var ingredientRowIndex = <%= schematic.ingredients.size + 1000 %>;
+      var table = document.getElementById('ingredients-table');
+
+      table.addEventListener('click', function(e) {
+        var btn = e.target.closest('.ingredient-destroy-btn');
+        if (!btn) return;
+        var row = btn.closest('tr');
+        if (btn.dataset.persisted) {
+          row.querySelector('.destroy-flag').value = '1';
+          row.style.display = 'none';
+        } else {
+          row.remove();
+        }
+      });
+
+      document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+        var template = document.getElementById('ingredient-row-template');
+        var tbody = table.querySelector('tbody');
+        var clone = template.content.cloneNode(true);
+        clone.querySelectorAll('[name]').forEach(function(el) {
+          el.name = el.name.replace('__INDEX__', ingredientRowIndex);
+        });
+        tbody.appendChild(clone);
+        ingredientRowIndex++;
+      });
+    })();
+  </script>
+
+  <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <%= f.submit schematic.persisted? ? "Save Schematic" : "Create Schematic",
+          class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= link_to "Cancel", admin_grid_schematics_path,
+          class: "tui-button grey-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% if schematic.persisted? %>
+      <%= link_to "History", history_admin_grid_schematic_path(schematic),
+            class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <% end %>
+  </div>
+<% end %>

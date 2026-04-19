@@ -104,6 +104,8 @@ module Grid
         derive(@hackr.stat("clearance").to_i, data[:level].to_i)
       when "missions_completed_count"
         derive(missions_completed_count, data[:count].to_i)
+      when "fabricate_count"
+        derive(@hackr.stat("fabricate_count").to_i, data[:count].to_i)
       end
     end
 
@@ -283,6 +285,8 @@ module Grid
         return true
       when "salvage_yield_received"
         return true
+      when "fabricate_item"
+        return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
       when "purchase_item"
         return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
       when "mission_completed"

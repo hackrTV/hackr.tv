@@ -186,7 +186,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, zones, rooms, etc.)"
-  task world: [:factions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions]
+  task world: [:factions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -1941,6 +1941,64 @@ namespace :data do
 
     puts "Arcs: #{arc_created} created, #{GridMissionArc.count} total"
     puts "Missions: #{mission_created} created, #{GridMission.count} total"
+  end
+
+  desc "Load fabrication schematics from YAML"
+  task schematics: :environment do
+    puts "\n--- Loading Fabrication Schematics ---"
+    yaml_file = Rails.root.join("data", "world", "schematics.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    schematics_data = data["schematics"] || []
+    created = 0
+
+    schematics_data.each do |attrs|
+      output_def = GridItemDefinition.find_by(slug: attrs["output_slug"])
+      unless output_def
+        puts "  ✗ Output definition not found: #{attrs["output_slug"]}"
+        next
+      end
+
+      schematic = GridSchematic.find_or_initialize_by(slug: attrs["slug"])
+      next unless schematic.new_record?
+
+      schematic.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"],
+        output_definition: output_def,
+        output_quantity: attrs["output_quantity"] || 1,
+        xp_reward: attrs["xp_reward"] || 0,
+        required_clearance: attrs["required_clearance"] || 0,
+        published: attrs["published"] != false,
+        position: attrs["position"] || 0,
+        required_mission_slug: attrs["required_mission_slug"],
+        required_achievement_slug: attrs["required_achievement_slug"]
+      )
+
+      (attrs["ingredients"] || []).each_with_index do |ing_attrs, idx|
+        input_def = GridItemDefinition.find_by(slug: ing_attrs["input_slug"])
+        unless input_def
+          puts "  ✗ Ingredient definition not found: #{ing_attrs["input_slug"]} (schematic: #{attrs["slug"]})"
+          next
+        end
+        schematic.ingredients.build(
+          input_definition: input_def,
+          quantity: ing_attrs["quantity"] || 1,
+          position: ing_attrs["position"] || idx
+        )
+      end
+
+      schematic.save!
+      created += 1
+      puts "  ✓ Created: #{schematic.name} → #{output_def.name}"
+    end
+
+    puts "Schematics: #{created} created, #{GridSchematic.count} total"
   end
 end
 

@@ -2,7 +2,7 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action :require_admin_api, only: [:debit]
 
@@ -67,6 +67,64 @@ class Api::GridController < ApplicationController
       active: active.map { |hm| hackr_mission_json(hm, include_progress: true) },
       completed: completed.map { |hm| hackr_mission_json(hm, include_progress: false) },
       available: available.map { |m| mission_json(m, include_gate_status: true) }
+    }
+  end
+
+  # GET /api/grid/schematics - Published schematics with ingredients,
+  # craftable status, and per-ingredient ownership for the current hackr.
+  def schematics_index
+    schematics = GridSchematic.published.ordered
+      .includes(:output_definition, ingredients: :input_definition)
+
+    # Pre-load hackr state to avoid N+1 on craftable_by? checks
+    inventory_qtys = current_hackr.grid_items
+      .group(:grid_item_definition_id)
+      .sum(:quantity)
+    completed_mission_slugs = current_hackr.grid_hackr_missions
+      .where(status: "completed")
+      .joins(:grid_mission)
+      .pluck("grid_missions.slug").to_set
+    earned_achievement_slugs = current_hackr.grid_hackr_achievements
+      .joins(:grid_achievement)
+      .pluck("grid_achievements.slug").to_set
+
+    render json: {
+      schematics: schematics.map { |s|
+        craftable = s.craftable_by?(current_hackr,
+          completed_mission_slugs: completed_mission_slugs,
+          earned_achievement_slugs: earned_achievement_slugs)
+        has_ingredients = s.ingredients.all? { |i| (inventory_qtys[i.input_definition_id] || 0) >= i.quantity }
+
+        {
+          slug: s.slug,
+          name: s.name,
+          description: s.description,
+          output: {
+            slug: s.output_definition.slug,
+            name: s.output_definition.name,
+            rarity: s.output_definition.rarity,
+            rarity_color: s.output_definition.rarity_color
+          },
+          output_quantity: s.output_quantity,
+          xp_reward: s.xp_reward,
+          required_clearance: s.required_clearance,
+          required_mission_slug: s.required_mission_slug,
+          required_achievement_slug: s.required_achievement_slug,
+          ingredients: s.ingredients.ordered.map { |i|
+            owned = inventory_qtys[i.input_definition_id] || 0
+            {
+              item_slug: i.input_definition.slug,
+              item_name: i.input_definition.name,
+              rarity: i.input_definition.rarity,
+              rarity_color: i.input_definition.rarity_color,
+              required: i.quantity,
+              owned: owned
+            }
+          },
+          craftable: craftable,
+          has_ingredients: has_ingredients
+        }
+      }
     }
   end
 
