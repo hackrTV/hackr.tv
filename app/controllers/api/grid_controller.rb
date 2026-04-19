@@ -1,5 +1,6 @@
 class Api::GridController < ApplicationController
   include GridAuthentication
+  include GridSerialization
 
   before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
@@ -73,14 +74,7 @@ class Api::GridController < ApplicationController
   def current_hackr_info
     render json: {
       logged_in: true,
-      hackr: {
-        id: current_hackr.id,
-        hackr_alias: current_hackr.hackr_alias,
-        email: current_hackr.email,
-        role: current_hackr.role,
-        current_room: current_hackr.current_room ? room_json(current_hackr.current_room) : nil,
-        features: current_hackr.admin? ? [FeatureGrant::PULSE_GRID] : current_hackr.feature_grants.pluck(:feature)
-      }
+      hackr: auth_hackr_json(current_hackr)
     }
   end
 
@@ -89,15 +83,20 @@ class Api::GridController < ApplicationController
     hackr = GridHackr.find_by(hackr_alias: params[:hackr_alias])
 
     if hackr&.authenticate(params[:password])
-      # Ensure hackr has a current room (spawn point if missing)
-      if hackr.current_room.nil?
-        starting_room = GridRoom.joins(:grid_zone)
-          .where(grid_zones: {slug: "hackr-tv-central"})
-          .where(room_type: "hub")
-          .first
-        hackr.update!(current_room: starting_room) if starting_room
+      if hackr.login_disabled?
+        Rails.logger.warn("[AUTH] Login blocked (disabled): hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
+        return render json: {success: false, error: "This account has been disabled."}, status: :forbidden
       end
 
+      # 2FA gate: if TOTP enabled, defer login until code is verified
+      if hackr.otp_required_for_login?
+        session[:pending_2fa_hackr_id] = hackr.id
+        session[:pending_2fa_at] = Time.current.to_i
+        Rails.logger.info("[AUTH] 2FA required: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
+        return render json: {success: true, requires_totp: true}
+      end
+
+      hackr.ensure_current_room!
       log_in(hackr)
       hackr.touch_activity!
       Grid::AchievementSweepJob.perform_later(hackr.id)
@@ -105,14 +104,7 @@ class Api::GridController < ApplicationController
       render json: {
         success: true,
         message: "Welcome back to THE PULSE GRID, #{hackr.hackr_alias}.",
-        hackr: {
-          id: hackr.id,
-          hackr_alias: hackr.hackr_alias,
-          email: hackr.email,
-          role: hackr.role,
-          current_room: hackr.current_room ? room_json(hackr.current_room) : nil,
-          features: hackr.admin? ? [FeatureGrant::PULSE_GRID] : hackr.feature_grants.pluck(:feature)
-        }
+        hackr: auth_hackr_json(hackr)
       }
     else
       attempted_alias = params[:hackr_alias].to_s.truncate(50)
@@ -224,19 +216,11 @@ class Api::GridController < ApplicationController
       password_confirmation: params[:password_confirmation]
     )
     @hackr.enforce_alias_length = true
-
-    # Set starting room (hackr.tv Broadcast Station)
-    starting_room = GridRoom.joins(:grid_zone)
-      .where(grid_zones: {slug: "hackr-tv-central"})
-      .where(room_type: "hub")
-      .first
-
-    @hackr.current_room = starting_room
-
     @hackr.registration_ip = request.remote_ip
 
     ActiveRecord::Base.transaction do
       if @hackr.save
+        @hackr.ensure_current_room!
         token.mark_used!
         @hackr.provision_economy!
         log_in(@hackr)
@@ -245,13 +229,7 @@ class Api::GridController < ApplicationController
         render json: {
           success: true,
           message: "Welcome to THE PULSE GRID, #{@hackr.hackr_alias}. Your journey with the Fracture Network begins now.",
-          hackr: {
-            id: @hackr.id,
-            hackr_alias: @hackr.hackr_alias,
-            role: @hackr.role,
-            current_room: @hackr.current_room ? room_json(@hackr.current_room) : nil,
-            features: @hackr.admin? ? [FeatureGrant::PULSE_GRID] : @hackr.feature_grants.pluck(:feature)
-          }
+          hackr: auth_hackr_json(@hackr)
         }, status: :created
       else
         Rails.logger.warn("[AUTH] Registration completion failed: email=#{token.email} errors=#{@hackr.errors.full_messages.join("; ")} ip=#{request.remote_ip}")

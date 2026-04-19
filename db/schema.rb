@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_16_213400) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_18_120004) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -296,9 +296,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_16_213400) do
     t.string "email"
     t.string "hackr_alias"
     t.datetime "last_activity_at"
+    t.boolean "login_disabled", default: false, null: false
+    t.json "otp_backup_code_digests"
+    t.integer "otp_last_used_at"
+    t.boolean "otp_required_for_login", default: false, null: false
+    t.string "otp_secret"
     t.string "password_digest"
     t.string "registration_ip"
     t.string "role"
+    t.boolean "service_account", default: false, null: false
     t.json "stats"
     t.datetime "updated_at", null: false
     t.index ["api_token_digest"], name: "index_grid_hackrs_on_api_token_digest", unique: true

@@ -119,6 +119,7 @@
                 <th style="text-align: center;">CLR</th>
                 <th style="text-align: center;">XP</th>
                 <th style="text-align: center;">Grid Access</th>
+                <th style="text-align: center;">Login</th>
                 <th style="text-align: center;">Status</th>
                 <th style="text-align: center;">Created</th>
               </tr>
@@ -127,7 +128,15 @@
               <% @all_hackrs.each do |hackr| %>
                 <tr>
                   <td style="font-family: monospace; color: #666;"><%= hackr.id %></td>
-                  <td><%= hackr.hackr_alias %></td>
+                  <td style="white-space: nowrap;">
+                    <%= hackr.hackr_alias %>
+                    <% if hackr.service_account? %>
+                      <span style="color: #ff8800; font-size: 0.8em;">[SVC]</span>
+                      <%= button_to "✕", admin_grid_toggle_service_account_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, class: "tui-button", style: "padding: 1px 5px; font-size: 0.7em; margin-left: 3px; background: transparent; color: #ff8800; border: 1px solid #ff8800;", data: { confirm: "Remove service account flag from #{hackr.hackr_alias}?" } %>
+                    <% else %>
+                      <%= button_to "SVC", admin_grid_toggle_service_account_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, class: "tui-button", style: "padding: 1px 5px; font-size: 0.7em; margin-left: 3px; background: transparent; color: #666; border: 1px solid #444;", data: { confirm: "Mark #{hackr.hackr_alias} as a service account? API tokens will bypass login-disabled." } %>
+                    <% end %>
+                  </td>
                   <td>
                     <% if hackr.admin? %>
                       <span class="red-255-text">[ADMIN]</span>
@@ -146,6 +155,17 @@
                     <% else %>
                       <span style="color: #666;">NONE</span>
                       <%= button_to "Grant", admin_grid_grant_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :post, form: { style: "display: inline;" }, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Grant grid access to #{hackr.hackr_alias}?" } %>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <% if hackr.login_disabled? %>
+                      <span class="red-255-text">DISABLED</span>
+                      <%= button_to "Enable", admin_grid_enable_login_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Re-enable login for #{hackr.hackr_alias}?" } %>
+                    <% else %>
+                      <span class="green-255-text">ENABLED</span>
+                      <% unless hackr.id == current_hackr.id %>
+                        <%= button_to "Disable", admin_grid_disable_login_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px; background: #ff4444; color: #fff;", data: { confirm: "Disable login for #{hackr.hackr_alias}? They will be logged out immediately." } %>
+                      <% end %>
                     <% end %>
                   </td>
                   <td style="text-align: center;">

@@ -81,6 +81,23 @@ class Rack::Attack
     end
   end
 
+  ### Throttle TOTP verification ###
+
+  # 5 TOTP verify attempts per 2 minutes per IP (brute-force protection)
+  throttle("totp_verify/ip", limit: 5, period: 2.minutes) do |req|
+    if req.path == "/api/totp/verify" && req.post?
+      req.ip
+    end
+  end
+
+  # 5 TOTP setup/enable/disable attempts per 15 minutes per IP
+  throttle("totp_manage/ip", limit: 5, period: 15.minutes) do |req|
+    if (%w[/api/totp/setup /api/totp/enable].include?(req.path) && req.post?) ||
+        (req.path == "/api/totp/disable" && req.delete?)
+      req.ip
+    end
+  end
+
   ### Throttle token verification ###
 
   # 10 token verifications per IP per minute

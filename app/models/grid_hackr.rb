@@ -3,18 +3,24 @@
 # Table name: grid_hackrs
 # Database name: primary
 #
-#  id               :integer          not null, primary key
-#  api_token_digest :string
-#  email            :string
-#  hackr_alias      :string
-#  last_activity_at :datetime
-#  password_digest  :string
-#  registration_ip  :string
-#  role             :string
-#  stats            :json
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  current_room_id  :integer
+#  id                      :integer          not null, primary key
+#  api_token_digest        :string
+#  email                   :string
+#  hackr_alias             :string
+#  last_activity_at        :datetime
+#  login_disabled          :boolean          default(FALSE), not null
+#  otp_backup_code_digests :json
+#  otp_last_used_at        :integer
+#  otp_required_for_login  :boolean          default(FALSE), not null
+#  otp_secret              :string
+#  password_digest         :string
+#  registration_ip         :string
+#  role                    :string
+#  service_account         :boolean          default(FALSE), not null
+#  stats                   :json
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  current_room_id         :integer
 #
 # Indexes
 #
@@ -27,9 +33,13 @@ class GridHackr < ApplicationRecord
   include ProfanityFilterable
   include GridHackr::Stats
 
-  has_paper_trail ignore: %i[password_digest api_token_digest last_activity_at stats]
+  has_paper_trail ignore: %i[
+    password_digest api_token_digest last_activity_at stats
+    otp_secret otp_backup_code_digests otp_last_used_at
+  ]
 
   has_secure_password
+  encrypts :otp_secret
 
   filter_profanity :hackr_alias
 
@@ -175,6 +185,16 @@ class GridHackr < ApplicationRecord
     admin? || feature_grants.exists?(feature: feature_name)
   end
 
+  # Ensure hackr has a current room, spawning in the starting hub if needed.
+  def ensure_current_room!
+    return if current_room.present?
+    starting_room = GridRoom.joins(:grid_zone)
+      .where(grid_zones: {slug: "hackr-tv-central"})
+      .where(room_type: "hub")
+      .first
+    update!(current_room: starting_room) if starting_room
+  end
+
   # Update last activity timestamp without triggering callbacks
   def touch_activity!
     update_column(:last_activity_at, Time.current)
@@ -186,6 +206,56 @@ class GridHackr < ApplicationRecord
     token = SecureRandom.hex(32)
     update_column(:api_token_digest, Digest::SHA256.hexdigest(token))
     token
+  end
+
+  # --- TOTP Two-Factor Authentication ---
+
+  TOTP_ISSUER = "hackr.tv"
+  TOTP_BACKUP_CODE_COUNT = 8
+  TOTP_BACKUP_CODE_LENGTH = 10
+
+  def totp
+    return nil unless otp_secret.present?
+    ROTP::TOTP.new(otp_secret, issuer: TOTP_ISSUER)
+  end
+
+  def verify_otp(code)
+    return false unless totp
+    timestamp = totp.verify(code.to_s.strip, drift_behind: 30, drift_ahead: 30, after: otp_last_used_at)
+    return false unless timestamp
+    update_column(:otp_last_used_at, timestamp)
+    true
+  end
+
+  def otp_provisioning_uri
+    totp&.provisioning_uri(hackr_alias)
+  end
+
+  def generate_backup_codes!
+    raw_codes = Array.new(TOTP_BACKUP_CODE_COUNT) { SecureRandom.alphanumeric(TOTP_BACKUP_CODE_LENGTH).upcase }
+    self.otp_backup_code_digests = raw_codes.map { |c| BCrypt::Password.create(c) }
+    save!(validate: false)
+    raw_codes
+  end
+
+  def consume_backup_code!(raw_code)
+    digests = otp_backup_code_digests.to_a
+    idx = digests.index { |d| BCrypt::Password.new(d) == raw_code.to_s.strip.upcase }
+    return false if idx.nil?
+    digests.delete_at(idx)
+    update_column(:otp_backup_code_digests, digests)
+    true
+  end
+
+  # NOTE: update_columns bypasses AR Encryption but is safe here since
+  # we're only writing nils. Do NOT write non-nil otp_secret this way.
+  def clear_totp!
+    update_columns(
+      otp_required_for_login: false,
+      otp_secret: nil,
+      otp_backup_code_digests: nil,
+      otp_last_used_at: nil
+    )
   end
 
   # Authenticate a hackr by alias and raw token.

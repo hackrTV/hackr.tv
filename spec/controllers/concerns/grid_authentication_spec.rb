@@ -115,6 +115,32 @@ RSpec.describe GridAuthentication, type: :controller do
         expect(controller.send(:current_hackr)).to be_nil
       end
     end
+
+    context "when hackr has login_disabled" do
+      before { session[:grid_hackr_id] = operative.id }
+
+      it "returns nil and clears session" do
+        operative.update!(login_disabled: true)
+        expect(controller.send(:current_hackr)).to be_nil
+        expect(session[:grid_hackr_id]).to be_nil
+      end
+    end
+
+    context "when hackr has login_disabled and uses API token" do
+      it "returns nil for non-service accounts" do
+        operative.update!(login_disabled: true)
+        token = operative.generate_api_token!
+        request.headers["Authorization"] = "Bearer #{operative.hackr_alias}:#{token}"
+        expect(controller.send(:current_hackr)).to be_nil
+      end
+
+      it "returns hackr for service accounts" do
+        operative.update!(login_disabled: true, service_account: true)
+        token = operative.generate_api_token!
+        request.headers["Authorization"] = "Bearer #{operative.hackr_alias}:#{token}"
+        expect(controller.send(:current_hackr)).to eq(operative)
+      end
+    end
   end
 
   describe "#api_token_request?" do

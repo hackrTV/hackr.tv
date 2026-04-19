@@ -288,11 +288,15 @@ namespace :data do
         email: attrs["email"],
         role: attrs["role"],
         password: password,
-        skip_reserved_check: true
+        skip_reserved_check: true,
+        login_disabled: attrs["hackr_alias"] != "XERAEN",
+        service_account: attrs["service_account"] == true
       )
       hackr.save!
       created += 1
-      puts "  ✓ Created: #{hackr.hackr_alias} (#{hackr.role})"
+      flags = [hackr.login_disabled? ? "login_disabled" : nil, hackr.service_account? ? "service_account" : nil].compact
+      flag_str = flags.any? ? " [#{flags.join(", ")}]" : ""
+      puts "  ✓ Created: #{hackr.hackr_alias} (#{hackr.role})#{flag_str}"
     end
 
     puts "Hackrs: #{created} created, #{GridHackr.count} total"
