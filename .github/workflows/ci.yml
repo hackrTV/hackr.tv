@@ -71,6 +71,10 @@ jobs:
           bin/rails db:migrate
 
       - name: Run RSpec tests
+        env:
+          ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: ci-test-primary-key-not-real
+          ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: ci-test-deterministic-key-00
+          ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: ci-test-derivation-salt-000
         run: bundle exec rspec
 
   test_frontend:
