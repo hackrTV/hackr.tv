@@ -82,6 +82,18 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
       return
     end
 
+    if @definition.schematics_as_output.exists?
+      set_flash_error("Cannot delete '#{@definition.name}' — it is referenced as a schematic output.")
+      redirect_to admin_grid_item_definitions_path
+      return
+    end
+
+    if @definition.schematic_ingredients.exists?
+      set_flash_error("Cannot delete '#{@definition.name}' — it is used as an ingredient in a schematic.")
+      redirect_to admin_grid_item_definitions_path
+      return
+    end
+
     name = @definition.name
     if @definition.destroy
       set_flash_success("Definition '#{name}' deleted.")

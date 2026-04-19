@@ -1,0 +1,123 @@
+# Fabrication Schematics — crafting recipes for THE PULSE GRID.
+# Loaded by: rails data:schematics (after item_definitions).
+# Idempotent: find_or_initialize_by slug, skip if exists.
+#
+# Ingredients reference item definitions by slug.
+# Output references a single item definition by slug.
+
+schematics:
+
+  # ── Scrap → Basic Rig Components ─────────────────────────────────
+  - slug: fab-basic-cpu
+    name: Fabricate Basic CPU
+    description: "Assemble a functional CPU from salvaged silicon wafers."
+    output_slug: basic-cpu
+    output_quantity: 1
+    xp_reward: 15
+    required_clearance: 0
+    published: true
+    position: 10
+    ingredients:
+      - input_slug: raw-silicon-wafer
+        quantity: 3
+        position: 0
+
+  - slug: fab-basic-gpu
+    name: Fabricate Basic GPU
+    description: "Build a basic mining GPU from reclaimed wafers and shader fragments."
+    output_slug: basic-gpu
+    output_quantity: 1
+    xp_reward: 20
+    required_clearance: 0
+    published: true
+    position: 20
+    ingredients:
+      - input_slug: raw-silicon-wafer
+        quantity: 3
+        position: 0
+      - input_slug: corrupted-shader-fragment
+        quantity: 1
+        position: 1
+
+  - slug: fab-basic-ram
+    name: Fabricate Basic RAM
+    description: "Compile a RAM stick from reclaimed silicon and data shards."
+    output_slug: basic-ram
+    output_quantity: 1
+    xp_reward: 12
+    required_clearance: 0
+    published: true
+    position: 30
+    ingredients:
+      - input_slug: raw-silicon-wafer
+        quantity: 2
+        position: 0
+      - input_slug: data-shard
+        quantity: 1
+        position: 1
+
+  - slug: fab-basic-psu
+    name: Fabricate Basic PSU
+    description: "Wire together a working power supply from scrap cables."
+    output_slug: basic-psu
+    output_quantity: 1
+    xp_reward: 10
+    required_clearance: 0
+    published: true
+    position: 40
+    ingredients:
+      - input_slug: scrap-wire-bundle
+        quantity: 3
+        position: 0
+
+  - slug: fab-basic-motherboard
+    name: Fabricate Basic Motherboard
+    description: "Assemble a motherboard from silicon and wire. The foundation of any rig."
+    output_slug: basic-motherboard
+    output_quantity: 1
+    xp_reward: 25
+    required_clearance: 0
+    published: true
+    position: 50
+    ingredients:
+      - input_slug: raw-silicon-wafer
+        quantity: 2
+        position: 0
+      - input_slug: scrap-wire-bundle
+        quantity: 2
+        position: 1
+
+  # ── Scrap → Basic Consumables ────────────────────────────────────
+  - slug: fab-medpatch
+    name: Fabricate MedPatch
+    description: "Synthesize a basic healing patch from data shards and wire."
+    output_slug: medpatch
+    output_quantity: 1
+    xp_reward: 8
+    required_clearance: 0
+    published: true
+    position: 60
+    ingredients:
+      - input_slug: data-shard
+        quantity: 2
+        position: 0
+      - input_slug: scrap-wire-bundle
+        quantity: 1
+        position: 1
+
+  - slug: fab-stim-shot
+    name: Fabricate Stim Shot
+    description: "Cobble together a stimulant from raw silicon and data fragments."
+    output_slug: stim-shot
+    output_quantity: 1
+    xp_reward: 8
+    required_clearance: 0
+    published: true
+    position: 70
+    ingredients:
+      - input_slug: raw-silicon-wafer
+        quantity: 1
+        position: 0
+      - input_slug: data-shard
+        quantity: 2
+        position: 1

@@ -29,6 +29,10 @@ class GridItemDefinition < ApplicationRecord
   has_many :salvage_yields, class_name: "GridSalvageYield",
     foreign_key: :source_definition_id, dependent: :destroy
   has_many :output_definitions, through: :salvage_yields, source: :output_definition
+  has_many :schematics_as_output, class_name: "GridSchematic",
+    foreign_key: :output_definition_id, dependent: :restrict_with_error
+  has_many :schematic_ingredients, class_name: "GridSchematicIngredient",
+    foreign_key: :input_definition_id, dependent: :restrict_with_error
 
   accepts_nested_attributes_for :salvage_yields,
     allow_destroy: true,

@@ -90,6 +90,12 @@ module Grid
         turn_in_command(args.first)
       when "give"
         give_command(args)
+      when "fabricate", "fab"
+        fabricate_command(args.first)
+      when "schematics", "schem", "sch"
+        args.any? ? schematic_detail_command(args.first) : schematics_command
+      when "schematic"
+        schematic_detail_command(args.first)
       when "help", "?"
         help_command
       when "who"
@@ -584,6 +590,11 @@ module Grid
           <span style='color: #34d399;'>abandon &lt;slug&gt;</span>            - Drop an active mission
           <span style='color: #34d399;'>turn_in &lt;slug&gt;, ti</span>        - Turn in a completed mission (must be with giver)
 
+        <span style='color: #fbbf24;'>Fabrication:</span>
+          <span style='color: #34d399;'>schematics, schem, sch</span>     - Browse available schematics
+          <span style='color: #34d399;'>schematic &lt;slug&gt;</span>          - View schematic details &amp; ingredients
+          <span style='color: #34d399;'>fabricate &lt;slug&gt;, fab</span>     - Fabricate an item from a schematic
+
         <span style='color: #fbbf24;'>Commerce:</span>
           <span style='color: #34d399;'>shop, browse</span>              - View vendor inventory &amp; prices
           <span style='color: #34d399;'>buy &lt;item&gt;</span>                - Purchase an item from vendor
@@ -843,6 +854,133 @@ module Grid
       end
 
       output
+    end
+
+    # --- Fabrication commands ---
+
+    def schematics_command
+      all_schematics = GridSchematic.published.ordered
+        .includes(:output_definition, ingredients: :input_definition).to_a
+
+      inventory_qtys = hackr.grid_items.group(:grid_item_definition_id).sum(:quantity)
+      gate_ctx = schematic_gate_context
+
+      available, locked = all_schematics.partition { |s| s.craftable_by?(hackr, **gate_ctx) }
+
+      output = []
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output << "<span style='color: #22d3ee; font-weight: bold;'>FABRICATION SCHEMATICS</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+
+      if all_schematics.empty?
+        output << ""
+        output << "<span style='color: #9ca3af;'>No schematics available.</span>"
+      else
+        if available.any?
+          output << ""
+          output << "<span style='color: #34d399; font-weight: bold;'>[AVAILABLE]</span>"
+          available.each do |s|
+            ingredients_line = s.ingredients.ordered
+              .map { |i| "#{h(i.input_definition.name)} ×#{i.quantity}" }.join(", ")
+            has_mats = s.ingredients.all? { |i| (inventory_qtys[i.input_definition_id] || 0) >= i.quantity }
+            badge = has_mats ? "<span style='color: #34d399;'>✓</span>" : "<span style='color: #f87171;'>✗</span>"
+            output << "  #{badge} <span style='color: #60a5fa;'>#{h(s.slug)}</span> " \
+              "<span style='color: #9ca3af;'>— #{h(s.name)}</span> " \
+              "<span style='color: #6b7280;'>[ #{ingredients_line} ]</span>"
+          end
+        end
+
+        if locked.any?
+          output << ""
+          output << "<span style='color: #6b7280; font-weight: bold;'>[LOCKED]</span>"
+          locked.each do |s|
+            output << "  <span style='color: #4b5563;'>◈ #{h(s.name)}</span>"
+          end
+        end
+      end
+
+      output << ""
+      output << "<span style='color: #6b7280;'>Use 'schematic &lt;slug&gt;' for details. Use 'fab &lt;slug&gt;' to fabricate.</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output.join("\n")
+    end
+
+    def schematic_detail_command(slug)
+      return "<span style='color: #fbbf24;'>Which schematic? Usage: schematic &lt;slug&gt;</span>" if slug.blank?
+
+      schematic = GridSchematic.published
+        .includes(:output_definition, ingredients: :input_definition)
+        .find_by(slug: slug.downcase)
+      return "<span style='color: #f87171;'>Unknown schematic: #{h(slug)}. Use 'schematics' to browse.</span>" unless schematic
+
+      unless schematic.craftable_by?(hackr, **schematic_gate_context)
+        return "<span style='color: #f87171;'>You don't meet the requirements for this schematic.</span>"
+      end
+
+      output = []
+      output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output << "<span style='color: #60a5fa; font-weight: bold;'>#{h(schematic.name)}</span> <span style='color: #6b7280;'>[#{h(schematic.slug)}]</span>"
+      output << "<span style='color: #9ca3af;'>#{h(schematic.description)}</span>" if schematic.description.present?
+      output << ""
+      output << "<span style='color: #fbbf24;'>OUTPUT:</span> " \
+        "<span style='color: #{schematic.output_definition.rarity_color};'>#{h(schematic.output_definition.name)}</span>" \
+        "#{" <span style='color: #6b7280;'>×#{schematic.output_quantity}</span>" if schematic.output_quantity > 1}"
+      output << "<span style='color: #fbbf24;'>XP REWARD:</span> <span style='color: #a78bfa;'>+#{schematic.xp_reward}</span>" if schematic.xp_reward.positive?
+      if schematic.required_clearance.positive?
+        output << "<span style='color: #fbbf24;'>CLEARANCE:</span> <span style='color: #d0d0d0;'>#{schematic.required_clearance}+</span>"
+      end
+      output << ""
+      output << "<span style='color: #fbbf24;'>INGREDIENTS:</span>"
+      inventory_qtys = hackr.grid_items.group(:grid_item_definition_id).sum(:quantity)
+      can_craft = true
+      schematic.ingredients.ordered.each do |ing|
+        owned = inventory_qtys[ing.input_definition_id] || 0
+        can_craft = false if owned < ing.quantity
+        status = (owned >= ing.quantity) ?
+          "<span style='color: #34d399;'>✓ #{owned}/#{ing.quantity}</span>" :
+          "<span style='color: #f87171;'>✗ #{owned}/#{ing.quantity}</span>"
+        output << "  #{status} <span style='color: #d0d0d0;'>#{h(ing.input_definition.name)}</span>"
+      end
+      output << ""
+      output << (can_craft ?
+        "<span style='color: #34d399;'>★ Ready to fabricate. Use: fab #{h(schematic.slug)}</span>" :
+        "<span style='color: #6b7280;'>Missing ingredients. Gather materials and try again.</span>")
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
+      output.join("\n")
+    end
+
+    def fabricate_command(recipe_slug)
+      return "<span style='color: #fbbf24;'>Fabricate what? Usage: fab &lt;schematic-slug&gt;</span>" if recipe_slug.blank?
+
+      schematic = GridSchematic.published
+        .includes(:output_definition, ingredients: :input_definition)
+        .find_by(slug: recipe_slug.downcase)
+      return "<span style='color: #f87171;'>Unknown schematic: #{h(recipe_slug)}. Use 'schematics' to browse.</span>" unless schematic
+
+      unless schematic.craftable_by?(hackr, **schematic_gate_context)
+        return "<span style='color: #f87171;'>You don't meet the requirements for this schematic.</span>"
+      end
+
+      begin
+        result = Grid::FabricationService.fabricate!(hackr: hackr, schematic: schematic)
+      rescue Grid::FabricationService::IngredientsInsufficient => e
+        return "<span style='color: #f87171;'>#{h(e.message)}</span>"
+      end
+
+      level_msg = result.xp_result[:leveled_up] ?
+        "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{result.xp_result[:new_clearance]}!</span>" : ""
+      qty_display = (result.output_quantity > 1) ? " <span style='color: #6b7280;'>×#{result.output_quantity}</span>" : ""
+      output = "<span style='color: #34d399;'>Fabricated: </span>" \
+        "<span style='color: #60a5fa; font-weight: bold;'>#{h(result.output_item_name)}</span>#{qty_display}" \
+        "<span style='color: #34d399;'>.</span>" \
+        "#{" <span style='color: #a78bfa;'>+#{result.xp_awarded} XP</span>" if result.xp_awarded.positive?}#{level_msg}"
+
+      notifications = achievement_checker.check(:fabricate_item, item_name: result.output_item_name)
+      notifications += achievement_checker.check(:fabricate_count)
+      notifications += mission_progressor.record(:fabricate_item, item_name: result.output_item_name)
+      notifications += mission_progressor.record(:reach_clearance, clearance: hackr.stat("clearance").to_i)
+      output = append_notifications(output, notifications)
+      {output: output, event: nil}
     end
 
     def apply_item_effect(item)
@@ -1617,6 +1755,19 @@ module Grid
 
     def mission_progressor
       @mission_progressor ||= Grid::MissionProgressor.new(hackr)
+    end
+
+    # Pre-loaded gate context for schematic craftable_by? checks.
+    # Memoized per request — safe because CommandParser is single-use.
+    def schematic_gate_context
+      @schematic_gate_context ||= {
+        completed_mission_slugs: hackr.grid_hackr_missions
+          .where(status: "completed").joins(:grid_mission)
+          .pluck("grid_missions.slug").to_set,
+        earned_achievement_slugs: hackr.grid_hackr_achievements
+          .joins(:grid_achievement)
+          .pluck("grid_achievements.slug").to_set
+      }
     end
 
     # --- Mission commands ---
