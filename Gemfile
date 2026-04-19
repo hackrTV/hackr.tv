@@ -14,6 +14,10 @@ gem "jbuilder"
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.22"
 
+# TOTP two-factor authentication
+gem "rotp", "~> 6.3"
+gem "rqrcode", "~> 2.2"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[windows jruby]
 

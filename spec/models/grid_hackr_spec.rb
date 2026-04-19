@@ -3,18 +3,24 @@
 # Table name: grid_hackrs
 # Database name: primary
 #
-#  id               :integer          not null, primary key
-#  api_token_digest :string
-#  email            :string
-#  hackr_alias      :string
-#  last_activity_at :datetime
-#  password_digest  :string
-#  registration_ip  :string
-#  role             :string
-#  stats            :json
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  current_room_id  :integer
+#  id                      :integer          not null, primary key
+#  api_token_digest        :string
+#  email                   :string
+#  hackr_alias             :string
+#  last_activity_at        :datetime
+#  login_disabled          :boolean          default(FALSE), not null
+#  otp_backup_code_digests :json
+#  otp_last_used_at        :integer
+#  otp_required_for_login  :boolean          default(FALSE), not null
+#  otp_secret              :string
+#  password_digest         :string
+#  registration_ip         :string
+#  role                    :string
+#  service_account         :boolean          default(FALSE), not null
+#  stats                   :json
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  current_room_id         :integer
 #
 # Indexes
 #

@@ -31,12 +31,25 @@ module GridAuthentication
     if hackr.nil?
       token_prefix = (token.length > 8) ? "#{token[0, 8]}..." : token
       Rails.logger.warn("[AUTH] Invalid API token: alias=#{hackr_alias} token_prefix=#{token_prefix} ip=#{request.remote_ip}")
+      return nil
     end
+
+    if hackr.login_disabled? && !hackr.service_account?
+      Rails.logger.warn("[AUTH] API token rejected (disabled): alias=#{hackr_alias} ip=#{request.remote_ip}")
+      return nil
+    end
+
     hackr
   end
 
   def session_hackr
-    GridHackr.find_by(id: session[:grid_hackr_id]) if session[:grid_hackr_id]
+    return nil unless session[:grid_hackr_id]
+    hackr = GridHackr.find_by(id: session[:grid_hackr_id])
+    if hackr&.login_disabled?
+      log_out
+      return nil
+    end
+    hackr
   end
 
   public
@@ -57,8 +70,25 @@ module GridAuthentication
 
   def log_out
     session.delete(:grid_hackr_id)
+    session.delete(:pending_2fa_hackr_id)
     cookies.delete(:grid_hackr_id)
     @current_hackr = nil
+  end
+
+  PENDING_2FA_EXPIRY = 10.minutes
+
+  def pending_2fa_hackr
+    return nil unless session[:pending_2fa_hackr_id]
+    if session[:pending_2fa_at] && Time.current.to_i - session[:pending_2fa_at].to_i > PENDING_2FA_EXPIRY.to_i
+      clear_pending_2fa
+      return nil
+    end
+    GridHackr.find_by(id: session[:pending_2fa_hackr_id])
+  end
+
+  def clear_pending_2fa
+    session.delete(:pending_2fa_hackr_id)
+    session.delete(:pending_2fa_at)
   end
 
   # Authorization filters

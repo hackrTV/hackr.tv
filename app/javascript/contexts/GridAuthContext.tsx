@@ -8,6 +8,7 @@ export interface GridHackr {
   role: string
   current_room: GridRoom | null
   features: string[]
+  otp_enabled?: boolean
 }
 
 export interface GridRoom {
@@ -21,6 +22,26 @@ interface LoginResponse {
   message?: string
   error?: string
   hackr?: GridHackr
+  requires_totp?: boolean
+}
+
+interface TotpSetupResponse {
+  success: boolean
+  secret?: string
+  qr_svg?: string
+  error?: string
+}
+
+interface TotpEnableResponse {
+  success: boolean
+  backup_codes?: string[]
+  message?: string
+  error?: string
+}
+
+interface TotpStatusResponse {
+  enabled: boolean
+  backup_codes_remaining: number
 }
 
 interface RegisterResponse {
@@ -102,6 +123,12 @@ interface GridAuthContextType {
   disconnect: () => Promise<{ success: boolean; error?: string }>
   checkAuth: () => Promise<void>
   hasFeature: (feature: string) => boolean
+  totpSetup: () => Promise<TotpSetupResponse>
+  totpEnable: (password: string, otp_secret: string, code: string) => Promise<TotpEnableResponse>
+  totpDisable: (password: string, code: string) => Promise<{ success: boolean; error?: string; message?: string }>
+  verifyTotp: (code: string) => Promise<LoginResponse>
+  totpStatus: () => Promise<TotpStatusResponse>
+  regenerateBackupCodes: (password: string, code: string) => Promise<TotpEnableResponse>
 }
 
 const GridAuthContext = createContext<GridAuthContextType | null>(null)
@@ -392,6 +419,79 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     }
   }, [])
 
+  const totpSetup = useCallback(async (): Promise<TotpSetupResponse> => {
+    try {
+      return await apiJson<TotpSetupResponse>('/api/totp/setup', { method: 'POST' })
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Setup failed.'
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const totpEnable = useCallback(async (password: string, otp_secret: string, code: string): Promise<TotpEnableResponse> => {
+    try {
+      return await apiJson<TotpEnableResponse>('/api/totp/enable', {
+        method: 'POST',
+        body: JSON.stringify({ password, otp_secret, code })
+      })
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Enable failed.'
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const totpDisable = useCallback(async (password: string, code: string): Promise<{ success: boolean; error?: string; message?: string }> => {
+    try {
+      return await apiJson<{ success: boolean; error?: string; message?: string }>('/api/totp/disable', {
+        method: 'DELETE',
+        body: JSON.stringify({ password, code })
+      })
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Disable failed.'
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const verifyTotp = useCallback(async (code: string): Promise<LoginResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<LoginResponse>('/api/totp/verify', {
+        method: 'POST',
+        body: JSON.stringify({ code })
+      })
+      if (data.success && data.hackr) {
+        setHackr(data.hackr)
+        return data
+      }
+      setError(data.error || 'Verification failed')
+      return data
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Verification failed.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const regenerateBackupCodes = useCallback(async (password: string, code: string): Promise<TotpEnableResponse> => {
+    try {
+      return await apiJson<TotpEnableResponse>('/api/totp/regenerate_backup_codes', {
+        method: 'POST',
+        body: JSON.stringify({ password, code })
+      })
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Regeneration failed.'
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
+  const totpStatus = useCallback(async (): Promise<TotpStatusResponse> => {
+    try {
+      return await apiJson<TotpStatusResponse>('/api/totp/status')
+    } catch {
+      return { enabled: false, backup_codes_remaining: 0 }
+    }
+  }, [])
+
   const value: GridAuthContextType = {
     hackr,
     loading,
@@ -409,7 +509,13 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     confirmEmailChange,
     disconnect,
     checkAuth,
-    hasFeature
+    hasFeature,
+    totpSetup,
+    totpEnable,
+    totpDisable,
+    verifyTotp,
+    totpStatus,
+    regenerateBackupCodes
   }
 
   return (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { GridLayout } from '~/components/layouts/GridLayout'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useGridAuthContext } from '~/contexts/GridAuthContext'
@@ -122,6 +123,34 @@ export const IdentityPage: React.FC = () => {
                 {emailMessage}
               </p>
             )}
+          </div>
+
+          <div style={{ margin: '20px 0', padding: '15px', border: '1px solid #4a4a6a' }}>
+            <p className="cyan-255-text" style={{ margin: '0 0 15px 0', fontWeight: 'bold', letterSpacing: '0.05em' }}>
+              TWO-FACTOR AUTHENTICATION
+            </p>
+            <p style={{ margin: '0 0 15px 0' }}>
+              {hackr?.otp_enabled
+                ? <span style={{ color: '#00ff00' }}>[ ACTIVE ]</span>
+                : <span style={{ color: '#888' }}>[ INACTIVE ]</span>
+              }
+            </p>
+            <Link
+              to="/grid/identity/two-factor"
+              className="tui-button"
+              style={{
+                background: '#00ff00',
+                color: '#0a0a0a',
+                border: 'none',
+                padding: '10px 20px',
+                fontFamily: '\'Courier New\', monospace',
+                fontWeight: 'bold',
+                textDecoration: 'none',
+                display: 'inline-block'
+              }}
+            >
+              MANAGE 2FA
+            </Link>
           </div>
 
           <div className="center" style={{ margin: '30px 0' }}>

@@ -43,6 +43,7 @@ hackrs:
     starting_room: hackr-tv-broadcast-station
     env_password_key: RELAY_PASSWORD
     default_password: relaystream
+    service_account: true
 
   # Expansion characters — hackr log authors
   - hackr_alias: Vex

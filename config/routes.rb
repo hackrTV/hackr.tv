@@ -40,6 +40,7 @@ Rails.application.routes.draw do
     get "verify/:token", to: "pages#spa_root", as: :grid_verify
     get "forgot_password", to: "pages#spa_root", as: :grid_forgot_password
     get "identity", to: "pages#spa_root", as: :grid_identity
+    get "identity/two-factor", to: "pages#spa_root", as: :grid_two_factor
     get "reset_password/:token", to: "pages#spa_root", as: :grid_password_reset
     get "confirm_email_change/:token", to: "pages#spa_root", as: :grid_confirm_email_change
   end
@@ -174,6 +175,15 @@ Rails.application.routes.draw do
     post "grid/reset_password", to: "grid#reset_password"
     post "grid/request_email_change", to: "grid#request_email_change"
     post "grid/confirm_email_change", to: "grid#confirm_email_change"
+
+    # TOTP two-factor authentication
+    get "totp/status", to: "totp#status"
+    post "totp/setup", to: "totp#setup"
+    post "totp/enable", to: "totp#enable"
+    post "totp/verify", to: "totp#verify"
+    delete "totp/disable", to: "totp#disable"
+    post "totp/regenerate_backup_codes", to: "totp#regenerate_backup_codes"
+    post "totp/admin_reset", to: "totp#admin_reset"
 
     # Code browser API routes
     get "code", to: "code#index"
@@ -312,6 +322,10 @@ Rails.application.routes.draw do
     # Grid management (still functional - runtime operations)
     get "grid", to: "grid#index", as: :grid
     post "grid/broadcast", to: "grid#broadcast", as: :grid_broadcast
+    post "grid/hackrs/:hackr_id/reset_totp", to: "grid#reset_totp", as: :grid_reset_totp
+    post "grid/hackrs/:hackr_id/disable_login", to: "grid#disable_login", as: :grid_disable_login
+    post "grid/hackrs/:hackr_id/enable_login", to: "grid#enable_login", as: :grid_enable_login
+    post "grid/hackrs/:hackr_id/toggle_service_account", to: "grid#toggle_service_account", as: :grid_toggle_service_account
     post "grid/grant_feature", to: "grid#grant_feature", as: :grid_grant_feature
     delete "grid/revoke_feature", to: "grid#revoke_feature", as: :grid_revoke_feature
 
