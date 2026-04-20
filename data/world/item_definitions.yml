@@ -332,6 +332,17 @@ item_definitions:
     value: 2
     properties: {}
 
+  # ── Den Items ───────────────────────────────────────────────────
+  - slug: den-access-chip
+    name: Den Access Chip
+    description: "A compact biometric data shard containing residential allocation tokens. Single-use. Will provision a private node in the Residential District. Examine for usage instructions."
+    item_type: data
+    rarity: uncommon
+    value: 0
+    max_stack: 1
+    properties:
+      effect_type: redeem_den
+
   # ── Faction Items ──────────────────────────────────────────────
   - slug: fracture-beacon
     name: Fracture Beacon

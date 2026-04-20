@@ -96,6 +96,12 @@ module Grid
         args.any? ? schematic_detail_command(args.first) : schematics_command
       when "schematic"
         schematic_detail_command(args.first)
+      when "den"
+        den_command(args)
+      when "out"
+        go_command("out")
+      when "home"
+        go_command("home")
       when "help", "?"
         help_command
       when "who"
@@ -122,11 +128,50 @@ module Grid
       output << "<span style='color: #9ca3af;'>[#{room.color_scheme}]</span>" if room.color_scheme
       output << ""
       output << "<span style='color: #d0d0d0;'>#{codex_linkify(room.description)}</span>" if room.description
+
+      # Den banner
+      if room.den?
+        output << ""
+        if room.owner_id == hackr.id
+          output << "<span style='color: #22d3ee; font-weight: bold;'>[ THIS IS YOUR DEN ]</span>"
+        else
+          owner_alias = room.owner&.hackr_alias || "Unknown"
+          output << "<span style='color: #a78bfa;'>[ This is #{h(owner_alias)}'s Den ]</span>"
+        end
+        output << "<span style='color: #6b7280;'>Storage: #{room.den_floor_count}/#{Grid::DenService::DEN_STORAGE_CAP} items</span>"
+        output << "<span style='color: #6b7280;'>Owner: <span style='color: #a78bfa;'>#{h(room.owner&.hackr_alias)}</span></span>"
+        output << "<span style='color: #f87171;'>[ DEN IS LOCKED ]</span>" if room.locked?
+      end
+
       output << ""
 
       # Show exits
-      exits = room.exits_from.includes(:to_room)
-      if exits.any?
+      exits = room.exits_from.includes(to_room: :owner)
+      if room.slug == Grid::DenService::RESIDENTIAL_CORRIDOR_SLUG
+        # In corridor: split standard exits from den exits
+        # Batch-load accessible den IDs to avoid N+1 on can_enter_den?
+        accessible_den_ids = accessible_den_room_ids
+        std_exits = exits.reject { |e| e.to_room.den? }
+        den_exits = exits.select { |e| e.to_room.den? && accessible_den_ids.include?(e.to_room.id) }
+
+        if std_exits.any?
+          exit_list = std_exits.map { |e| "<span style='color: #22d3ee;'>#{e.direction}</span> <span style='color: #9ca3af;'>(#{e.to_room.name})</span>" }.join(", ")
+          output << "<span style='color: #fbbf24;'>Exits:</span> #{exit_list}"
+        else
+          output << "<span style='color: #fbbf24;'>Exits:</span> <span style='color: #6b7280;'>none</span>"
+        end
+
+        if den_exits.any?
+          output << ""
+          output << "<span style='color: #fbbf24;'>Private Dens:</span>"
+          den_exits.each do |e|
+            den = e.to_room
+            owner_tag = (den.owner_id == hackr.id) ? " <span style='color: #22d3ee;'>[YOUR DEN]</span>" : ""
+            lock_tag = den.locked? ? " <span style='color: #f87171;'>[LOCKED]</span>" : ""
+            output << "  <span style='color: #22d3ee;'>go #{e.direction}</span> <span style='color: #9ca3af;'>→ #{h(den.name)}</span>#{owner_tag}#{lock_tag}"
+          end
+        end
+      elsif exits.any?
         exit_list = exits.map { |e| "<span style='color: #22d3ee;'>#{e.direction}</span> <span style='color: #9ca3af;'>(#{e.to_room.name})</span>" }.join(", ")
         output << "<span style='color: #fbbf24;'>Exits:</span> #{exit_list}"
       else
@@ -159,12 +204,33 @@ module Grid
     end
 
     def go_command(direction)
-      return "<span style='color: #fbbf24;'>Go where? Specify a direction: north, south, east, west, up, down</span>" unless direction
+      return "<span style='color: #fbbf24;'>Go where? Specify a direction (e.g. north, south, east, west, up, down)</span>" unless direction
 
       old_room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless old_room
 
+      # "go home" / "go den" resolves to hackr's den slug when in the corridor
+      if direction == "home" || direction == "den"
+        den = GridRoom.where(owner: hackr).order(:id).first
+        unless den
+          return "<span style='color: #f87171;'>You don't have a den.</span>"
+        end
+        unless old_room.slug == Grid::DenService::RESIDENTIAL_CORRIDOR_SLUG
+          return "<span style='color: #f87171;'>You must be in the Residential Corridor to enter your den.</span>"
+        end
+        direction = den.slug
+      end
+
       exit = old_room.exits_from.find_by(direction: direction)
+
+      # Prefix match for den slugs in the corridor (e.g. "go den-xeraen" matches "den-xeraen-a7f")
+      if !exit && old_room.slug == Grid::DenService::RESIDENTIAL_CORRIDOR_SLUG && direction.start_with?("den-")
+        matching_exits = old_room.exits_from.includes(:to_room)
+          .where("direction LIKE ?", "#{ActiveRecord::Base.sanitize_sql_like(direction)}%")
+          .select { |e| e.to_room.den? && accessible_den_room_ids.include?(e.to_room.id) }
+        exit = matching_exits.first
+      end
+
       return "<span style='color: #f87171;'>You can't go #{direction} from here.</span>" unless exit
 
       if exit.locked
@@ -180,6 +246,25 @@ module Grid
           return "<span style='color: #f87171;'>ACCESS DENIED. Clearance #{new_room.min_clearance}+ required. You are Clearance #{hackr_clearance}.</span>"
         end
       end
+
+      # Den entry access control
+      if new_room.den?
+        if old_room.slug != Grid::DenService::RESIDENTIAL_CORRIDOR_SLUG
+          return "<span style='color: #f87171;'>You must be in the Residential Corridor to enter a den.</span>"
+        end
+        if new_room.locked?
+          return "<span style='color: #f87171;'>That den is locked from the inside.</span>"
+        end
+        unless den_service.can_enter_den?(new_room)
+          return "<span style='color: #f87171;'>ACCESS DENIED. You have not been invited to this den.</span>"
+        end
+      end
+
+      # Den exit — locked check
+      if old_room.den? && old_room.locked?
+        return "<span style='color: #f87171;'>The den is locked. Use 'den unlock' first.</span>"
+      end
+
       hackr.update!(current_room: new_room)
 
       # Track exploration (unique rooms via visited_rooms array in stats)
@@ -249,16 +334,29 @@ module Grid
     end
 
     def inventory_command
-      items = hackr.grid_items
-      return "<span style='color: #9ca3af;'>Your inventory is empty.</span>" unless items.any?
+      items = hackr.grid_items.in_inventory(hackr)
+      cap = hackr.inventory_capacity
+      used = items.count
 
-      lines = ["<span style='color: #fbbf24;'>Inventory:</span>"]
+      header_color = (used >= cap) ? "#f87171" : "#9ca3af"
+      slot_display = "<span style='color: #{header_color};'>[#{used}/#{cap} slots]</span>"
+
+      unless items.any?
+        return "<span style='color: #fbbf24;'>Inventory:</span> #{slot_display}\n<span style='color: #9ca3af;'>Your inventory is empty.</span>"
+      end
+
+      lines = ["<span style='color: #fbbf24;'>Inventory:</span> #{slot_display}"]
       items.each do |item|
         color = item.rarity_color
         name_display = item.unicorn? ? item.rainbow_name_html : "<span style='color: #{color};'>#{h(item.name)}</span>"
         rarity_tag = item.rarity ? " <span style='color: #{color};'>[#{item.rarity_label}]</span>" : ""
         qty_tag = (item.quantity > 1) ? " <span style='color: #6b7280;'>x#{item.quantity}</span>" : ""
-        lines << "  - #{name_display}#{rarity_tag}#{qty_tag}"
+        stack_tag = if item.grid_item_definition&.max_stack && item.quantity > 1
+          " <span style='color: #4b5563;'>(#{item.quantity}/#{item.grid_item_definition.max_stack})</span>"
+        else
+          ""
+        end
+        lines << "  - #{name_display}#{rarity_tag}#{qty_tag}#{stack_tag}"
       end
       lines.join("\n")
     end
@@ -271,6 +369,17 @@ module Grid
 
       item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>You don't see '#{h(item_name)}' here.</span>" unless item
+
+      # Den owner-only take restriction
+      if room.den? && room.owner_id != hackr.id
+        return "<span style='color: #f87171;'>You can't take items from someone else's den.</span>"
+      end
+
+      # Inventory capacity check
+      used = hackr.grid_items.in_inventory(hackr).count
+      if used >= hackr.inventory_capacity
+        return "<span style='color: #f87171;'>Inventory full (#{used}/#{hackr.inventory_capacity} slots). Drop, sell, or store items to make room.</span>"
+      end
 
       item.update!(grid_hackr: hackr, room: nil)
 
@@ -301,10 +410,32 @@ module Grid
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      # Den visitor restrictions
+      if room.den? && room.owner_id != hackr.id
+        return "<span style='color: #f87171;'>You can't drop items in someone else's den.</span>"
+      end
+
+      # Den storage cap
+      if room.den? && room.owner_id == hackr.id
+        if room.den_floor_count >= Grid::DenService::DEN_STORAGE_CAP
+          return "<span style='color: #f87171;'>Den storage full (#{Grid::DenService::DEN_STORAGE_CAP}/#{Grid::DenService::DEN_STORAGE_CAP}). Take something first.</span>"
+        end
+      end
+
       item.update!(room: room, grid_hackr: nil)
 
+      notifications = []
+      if room.den? && room.owner_id == hackr.id
+        notifications += achievement_checker.check(:items_stored)
+      end
+
+      output = "<span style='color: #34d399;'>You drop the </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>"}<span style='color: #34d399;'>.</span>"
+      output = append_notifications(output, notifications) if notifications.any?
+
       {
-        output: "<span style='color: #34d399;'>You drop the </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>"}<span style='color: #34d399;'>.</span>",
+        output: output,
         event: {
           type: "drop",
           hackr_alias: hackr.hackr_alias,
@@ -623,6 +754,16 @@ module Grid
           <span style='color: #34d399;'>rig uninstall &lt;item&gt;</span>      - Remove component (rig must be off)
           <span style='color: #34d399;'>rig inspect</span>               - Detailed rig view
 
+        <span style='color: #fbbf24;'>Den:</span>
+          <span style='color: #34d399;'>den</span>                       - View den status
+          <span style='color: #34d399;'>den rename &lt;name&gt;</span>         - Rename your den (80 char max)
+          <span style='color: #34d399;'>den describe &lt;text&gt;</span>       - Set den description
+          <span style='color: #34d399;'>den invite &lt;hackr&gt;</span>        - Invite a hackr (1 hour)
+          <span style='color: #34d399;'>den uninvite &lt;hackr&gt;</span>      - Revoke invite
+          <span style='color: #34d399;'>den lock</span>                  - Lock den (blocks entry &amp; exit)
+          <span style='color: #34d399;'>den unlock</span>                - Unlock den
+          <span style='color: #34d399;'>out</span>                       - Leave a den (shortcut for 'go out')
+
         <span style='color: #fbbf24;'>Social:</span>
           <span style='color: #34d399;'>say &lt;message&gt;</span>             - Say something in the room
           <span style='color: #34d399;'>who</span>                       - See who's online
@@ -824,6 +965,8 @@ module Grid
       notifications += mission_progressor.record(:reach_clearance, clearance: hackr.stat("clearance").to_i)
       output = append_notifications(output, notifications)
       {output: output, event: nil}
+    rescue Grid::InventoryErrors::InventoryFull, Grid::InventoryErrors::StackLimitExceeded => e
+      "<span style='color: #f87171;'>Salvage aborted — #{h(e.message)}</span>"
     end
 
     def analyze_command(item_name)
@@ -965,6 +1108,10 @@ module Grid
         result = Grid::FabricationService.fabricate!(hackr: hackr, schematic: schematic)
       rescue Grid::FabricationService::IngredientsInsufficient => e
         return "<span style='color: #f87171;'>#{h(e.message)}</span>"
+      rescue Grid::InventoryErrors::InventoryFull => e
+        return "<span style='color: #f87171;'>Fabrication aborted — #{h(e.message)}</span>"
+      rescue Grid::InventoryErrors::StackLimitExceeded => e
+        return "<span style='color: #f87171;'>Fabrication aborted — #{h(e.message)}</span>"
       end
 
       level_msg = result.xp_result[:leveled_up] ?
@@ -1009,6 +1156,18 @@ module Grid
         result = hackr.grant_xp!(amount)
         level_msg = result[:leveled_up] ? "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{result[:new_clearance]}!</span>" : ""
         "<span style='color: #fbbf24;'>You use #{h(item.name)}. +#{amount} XP.#{level_msg}</span>"
+      when "redeem_den"
+        begin
+          den = Grid::DenService.new(hackr).create_den!(consume_item: item)
+          notifications = achievement_checker.check(:den_created)
+          output = "<span style='color: #a78bfa; font-weight: bold;'>DEN PROVISIONED.</span> " \
+            "<span style='color: #d0d0d0;'>Your private node is ready in the Residential District.</span>\n" \
+            "<span style='color: #9ca3af;'>Navigate to the Residential Corridor and enter: </span>" \
+            "<span style='color: #22d3ee;'>go #{den.slug}</span>"
+          append_notifications(output, notifications)
+        rescue Grid::DenService::DenAlreadyExists
+          "<span style='color: #f87171;'>You already have a den. The chip sizzles uselessly.</span>"
+        end
       else
         "<span style='color: #9ca3af;'>You use #{h(item.name)}. Nothing happens.</span>"
       end
@@ -1044,6 +1203,11 @@ module Grid
         if slot == "MOTHERBOARD"
           output += "\n<span style='color: #9ca3af;'>Slots: CPU #{props["cpu_slots"] || 0} / GPU #{props["gpu_slots"] || 0} / RAM #{props["ram_slots"] || 0}</span>"
         end
+      end
+      props = item.properties || {}
+      if props["effect_type"] == "redeem_den"
+        output += "\n<span style='color: #a78bfa;'>▸ USE this item to claim a private den in the Residential District.</span>"
+        output += "\n<span style='color: #9ca3af;'>  Type: <span style='color: #22d3ee;'>use #{h(item.name.downcase)}</span></span>"
       end
       output
     end
@@ -1182,6 +1346,8 @@ module Grid
     rescue Grid::ShopService::InsufficientStock => e
       "<span style='color: #fbbf24;'>#{h(e.message)}</span>"
     rescue Grid::ShopService::InsufficientBalance => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::InventoryErrors::InventoryFull => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
@@ -1946,6 +2112,8 @@ module Grid
       Grid::MissionService::ObjectivesIncomplete,
       Grid::MissionService::NotAtTurnIn => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::InventoryErrors::InventoryFull, Grid::InventoryErrors::StackLimitExceeded => e
+      "<span style='color: #f87171;'>Cannot turn in — #{h(e.message)}</span>"
     end
 
     # "give <item> to <npc>" — consumes the item and fires a :deliver_item
@@ -2146,6 +2314,139 @@ module Grid
 
     def slugify(text)
       text.to_s.downcase.gsub(/[^a-z0-9]+/, "_").gsub(/^_|_$/, "")
+    end
+
+    # --- Den commands ---
+
+    def den_command(args)
+      subcmd = args.first&.downcase
+      sub_args = args[1..] || []
+
+      case subcmd
+      when "rename"
+        den_rename_command(sub_args.join(" "))
+      when "describe", "desc"
+        den_describe_command(sub_args.join(" "))
+      when "invite"
+        den_invite_command(sub_args.first)
+      when "uninvite"
+        den_uninvite_command(sub_args.first)
+      when "lock"
+        den_lock_command
+      when "unlock"
+        den_unlock_command
+      when nil
+        den_status_command
+      else
+        "<span style='color: #f87171;'>Unknown den command: #{h(subcmd)}. Try: den rename, den describe, den invite, den uninvite, den lock, den unlock</span>"
+      end
+    end
+
+    def den_rename_command(name)
+      return "<span style='color: #fbbf24;'>Usage: den rename &lt;name&gt;</span>" if name.blank?
+      if name.length > 80
+        return "<span style='color: #f87171;'>Name is too long (80 character limit).</span>"
+      end
+
+      den_service.rename_den!(name)
+      "<span style='color: #34d399;'>Den renamed to: #{h(name)}</span>"
+    rescue Grid::DenService::DenNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue ActiveRecord::RecordInvalid => e
+      "<span style='color: #f87171;'>#{e.record.errors.full_messages.first}</span>"
+    end
+
+    def den_describe_command(text)
+      return "<span style='color: #fbbf24;'>Usage: den describe &lt;text&gt;</span>" if text.blank?
+
+      den_service.describe_den!(text)
+      "<span style='color: #34d399;'>Den description updated.</span>"
+    rescue Grid::DenService::DenNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue ActiveRecord::RecordInvalid => e
+      "<span style='color: #f87171;'>#{e.record.errors.full_messages.first}</span>"
+    end
+
+    def den_invite_command(guest_alias)
+      return "<span style='color: #fbbf24;'>Usage: den invite &lt;hackr&gt;</span>" if guest_alias.blank?
+
+      invite = den_service.invite!(guest_alias)
+      expires_str = invite.expires_at.strftime("%H:%M UTC")
+      "<span style='color: #34d399;'>#{h(guest_alias)} invited to your den. Invite expires at #{expires_str}.</span>"
+    rescue Grid::DenService::DenNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue ActiveRecord::RecordNotFound
+      "<span style='color: #f87171;'>Hackr '#{h(guest_alias)}' not found.</span>"
+    end
+
+    def den_uninvite_command(guest_alias)
+      return "<span style='color: #fbbf24;'>Usage: den uninvite &lt;hackr&gt;</span>" if guest_alias.blank?
+
+      den_service.uninvite!(guest_alias)
+      "<span style='color: #34d399;'>#{h(guest_alias)} removed from your den invite list.</span>"
+    rescue Grid::DenService::DenNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue ActiveRecord::RecordNotFound
+      "<span style='color: #f87171;'>Hackr '#{h(guest_alias)}' not found.</span>"
+    end
+
+    def den_lock_command
+      den_service.lock_den!(hackr.current_room)
+      "<span style='color: #f87171;'>Den locked. No one can enter or leave.</span>"
+    rescue Grid::DenService::DenNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::DenService::NotInDenOrCorridor
+      "<span style='color: #f87171;'>You must be in your den or the Residential Corridor to lock it.</span>"
+    end
+
+    def den_unlock_command
+      den_service.unlock_den!(hackr.current_room)
+      "<span style='color: #34d399;'>Den unlocked.</span>"
+    rescue Grid::DenService::DenNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::DenService::NotInDenOrCorridor
+      "<span style='color: #f87171;'>You must be in your den or the Residential Corridor to unlock it.</span>"
+    end
+
+    def den_status_command
+      den = hackr.den
+      unless den
+        return "<span style='color: #9ca3af;'>You don't have a den yet. Use a Den Access Chip to claim one.</span>"
+      end
+
+      lines = []
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>DEN STATUS :: #{h(den.name)}</span>"
+      lines << "<span style='color: #fbbf24;'>Location:</span> <span style='color: #d0d0d0;'>#{h(den.grid_zone.name)}</span>"
+      lines << "<span style='color: #fbbf24;'>Storage:</span> <span style='color: #d0d0d0;'>#{den.den_floor_count}/#{Grid::DenService::DEN_STORAGE_CAP} items</span>"
+      lines << "<span style='color: #fbbf24;'>Locked:</span> <span style='color: #{den.locked? ? "#f87171" : "#34d399"};'>#{den.locked? ? "YES" : "NO"}</span>"
+
+      active_invites = GridDenInvite.active.where(hackr: hackr).includes(:guest)
+      if active_invites.any?
+        lines << "<span style='color: #fbbf24;'>Invited:</span>"
+        active_invites.each do |inv|
+          lines << "  <span style='color: #a78bfa;'>#{h(inv.guest.hackr_alias)}</span> <span style='color: #6b7280;'>(expires #{inv.expires_at.strftime("%H:%M UTC")})</span>"
+        end
+      else
+        lines << "<span style='color: #6b7280;'>No active invites.</span>"
+      end
+
+      lines.join("\n")
+    end
+
+    def den_service
+      @den_service ||= Grid::DenService.new(hackr)
+    end
+
+    # All den room IDs this hackr can enter: their own + actively invited.
+    # Single query, memoized per request. Used by look_command in corridor.
+    def accessible_den_room_ids
+      @accessible_den_room_ids ||= begin
+        ids = Set.new
+        ids << hackr.den&.id if hackr.den
+        invited_ids = GridDenInvite.active.where(guest: hackr).pluck(:den_id)
+        ids.merge(invited_ids)
+        ids
+      end
     end
   end
 end

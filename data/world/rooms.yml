@@ -37,6 +37,12 @@ rooms:
     room_type: shop
     min_clearance: 10
 
+  - name: Residential Corridor
+    slug: residential-corridor
+    description: "A long corridor lined with numbered data-node access panels. Each panel conceals a private den belonging to a registered hackr. The air carries a faint hum of isolated processing cores. Somewhere behind the walls, a ventilation system cycles stale air."
+    zone_slug: residential-district
+    room_type: hub
+
   - name: The Rhythm Nexus
     slug: the-rhythm-nexus
     description: "Ryker's domain. A cavernous space converted into a combination recording studio, performance venue, and resistance headquarters. Drum kits and recording equipment share space with server racks. Vintage analog gear - tape machines, tube amplifiers, physical mixing boards - stands alongside digital systems. Purple and cyan neon cuts through the darkness. The air vibrates with potential energy even when no one's playing."

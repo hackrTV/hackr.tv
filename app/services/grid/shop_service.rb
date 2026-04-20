@@ -59,17 +59,15 @@ module Grid
           raise InsufficientStock, "'#{listing.name}' is out of stock" if updated == 0
         end
 
+        # Grant item first — fail fast on inventory full before touching CRED
+        item = Grid::Inventory.grant_item!(
+          hackr: hackr,
+          definition: listing.grid_item_definition,
+          quantity: 1
+        )
+
         # Split CRED: burn 70%, recycle 30% to gameplay pool
         split_purchase!(hackr_cache: cache, amount: price, item_name: listing.name)
-
-        # Create item in hackr's inventory from the definition
-        item = GridItem.create!(
-          listing.grid_item_definition.item_attributes.merge(
-            grid_hackr: hackr,
-            value: listing.base_price,
-            quantity: 1
-          )
-        )
 
         # Record the shop transaction
         GridShopTransaction.create!(

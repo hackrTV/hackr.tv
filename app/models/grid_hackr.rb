@@ -107,6 +107,8 @@ class GridHackr < ApplicationRecord
   has_many :hackr_radio_tunes, dependent: :destroy
   has_many :grid_hackr_missions, dependent: :destroy
   has_many :grid_missions, through: :grid_hackr_missions
+  has_one :den, class_name: "GridRoom", foreign_key: :owner_id
+  has_many :den_invites_received, class_name: "GridDenInvite", foreign_key: :guest_id, dependent: :destroy
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length
@@ -143,6 +145,21 @@ class GridHackr < ApplicationRecord
       raise "Item definition '#{slug}' not found — run `rails data:item_definitions` first" unless defn
       GridItem.create!(defn.item_attributes.merge(grid_mining_rig: rig))
     end
+
+    provision_den_chip!
+  end
+
+  # Grant a Den Access Chip if the hackr doesn't already have one.
+  # Idempotent — safe to call multiple times.
+  def provision_den_chip!
+    return if den.present? # Already has a den, no chip needed
+    return if grid_items.joins(:grid_item_definition)
+      .where(grid_item_definitions: {slug: "den-access-chip"}).exists?
+
+    defn = GridItemDefinition.find_by(slug: "den-access-chip")
+    return unless defn # Gracefully skip if definition not yet seeded
+
+    GridItem.create!(defn.item_attributes.merge(grid_hackr: self))
   end
 
   # Scopes

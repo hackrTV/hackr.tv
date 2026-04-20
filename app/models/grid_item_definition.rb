@@ -8,6 +8,7 @@
 #  id          :integer          not null, primary key
 #  description :text
 #  item_type   :string           not null
+#  max_stack   :integer
 #  name        :string           not null
 #  properties  :json             not null
 #  rarity      :string           not null
@@ -44,6 +45,7 @@ class GridItemDefinition < ApplicationRecord
   validates :item_type, presence: true, inclusion: {in: GridItem::ITEM_TYPES}
   validates :rarity, presence: true, inclusion: {in: GridItem::RARITIES}
   validates :value, numericality: {only_integer: true, greater_than_or_equal_to: 0}
+  validates :max_stack, numericality: {only_integer: true, greater_than: 0}, allow_nil: true
 
   scope :ordered, -> { order(:item_type, :name) }
   scope :by_item_type, ->(t) { where(item_type: t) }

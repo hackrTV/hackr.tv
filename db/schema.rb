@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_120001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -188,6 +188,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
     t.index ["system_type"], name: "index_grid_caches_on_system_type"
   end
 
+  create_table "grid_den_invites", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "den_id", null: false
+    t.datetime "expires_at", null: false
+    t.integer "guest_id", null: false
+    t.integer "hackr_id", null: false
+    t.datetime "revoked_at"
+    t.datetime "updated_at", null: false
+    t.index ["den_id"], name: "index_grid_den_invites_on_den_id"
+    t.index ["expires_at"], name: "index_grid_den_invites_on_expires_at"
+    t.index ["guest_id"], name: "index_grid_den_invites_on_guest_id"
+    t.index ["hackr_id", "guest_id", "den_id"], name: "index_den_invites_unique", unique: true
+  end
+
   create_table "grid_exits", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "direction"
@@ -317,6 +331,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
     t.datetime "created_at", null: false
     t.text "description"
     t.string "item_type", null: false
+    t.integer "max_stack"
     t.string "name", null: false
     t.json "properties", default: {}, null: false
     t.string "rarity", null: false
@@ -341,6 +356,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
     t.integer "room_id"
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
+    t.index ["grid_hackr_id"], name: "index_grid_items_on_grid_hackr_id"
     t.index ["grid_item_definition_id"], name: "index_grid_items_on_grid_item_definition_id"
     t.index ["grid_mining_rig_id"], name: "index_grid_items_on_grid_mining_rig_id"
   end
@@ -468,13 +484,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_zone_id", null: false
+    t.boolean "locked", default: false, null: false
     t.integer "min_clearance", default: 0, null: false
     t.string "name"
+    t.integer "owner_id"
     t.string "room_type"
     t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["ambient_playlist_id"], name: "index_grid_rooms_on_ambient_playlist_id"
     t.index ["grid_zone_id"], name: "index_grid_rooms_on_grid_zone_id"
+    t.index ["owner_id"], name: "index_grid_rooms_on_owner_id", unique: true
     t.index ["slug"], name: "index_grid_rooms_on_slug", unique: true
   end
 
@@ -1075,6 +1094,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "feature_grants", "grid_hackrs"
+  add_foreign_key "grid_den_invites", "grid_hackrs", column: "guest_id"
+  add_foreign_key "grid_den_invites", "grid_hackrs", column: "hackr_id"
+  add_foreign_key "grid_den_invites", "grid_rooms", column: "den_id"
   add_foreign_key "grid_faction_rep_links", "grid_factions", column: "source_faction_id"
   add_foreign_key "grid_faction_rep_links", "grid_factions", column: "target_faction_id"
   add_foreign_key "grid_factions", "grid_factions", column: "parent_id"
@@ -1095,6 +1117,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_120001) do
   add_foreign_key "grid_missions", "grid_missions", column: "prereq_mission_id", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
+  add_foreign_key "grid_rooms", "grid_hackrs", column: "owner_id"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_salvage_yields", "grid_item_definitions", column: "output_definition_id"
   add_foreign_key "grid_salvage_yields", "grid_item_definitions", column: "source_definition_id"

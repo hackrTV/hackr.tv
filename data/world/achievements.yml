@@ -714,3 +714,39 @@ achievements:
     xp_reward: 0
     cred_reward: 50
     hidden: true
+
+  # ============================================================
+  # DEN / STORAGE
+  # ============================================================
+
+  - slug: home_node
+    name: "Home Node"
+    description: "Claimed a private den in the Residential District."
+    badge_icon: "DEN"
+    category: grid
+    trigger_type: den_created
+    trigger_data: {}
+    xp_reward: 100
+    cred_reward: 0
+
+  - slug: pack_rat
+    name: "Pack Rat"
+    description: "Stored 5 items in your den."
+    badge_icon: "STR"
+    category: grid
+    trigger_type: items_stored
+    trigger_data:
+      count: 5
+    xp_reward: 50
+    cred_reward: 0
+
+  - slug: den_hoarder
+    name: "Den Hoarder"
+    description: "Filled your den storage to capacity."
+    badge_icon: "FUL"
+    category: grid
+    trigger_type: items_stored
+    trigger_data:
+      count: 16
+    xp_reward: 100
+    cred_reward: 0
