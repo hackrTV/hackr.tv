@@ -6,6 +6,7 @@
 #  id          :integer          not null, primary key
 #  description :text
 #  item_type   :string           not null
+#  max_stack   :integer
 #  name        :string           not null
 #  properties  :json             not null
 #  rarity      :string           not null

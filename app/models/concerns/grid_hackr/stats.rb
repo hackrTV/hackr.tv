@@ -13,13 +13,16 @@ module GridHackr::Stats
     (10 * (level**2.1)).floor
   end
 
+  INVENTORY_BASE_SLOTS = 16
+
   STAT_DEFAULTS = {
     "xp" => 0,
     "clearance" => 0,
     "health" => 100,
     "energy" => 100,
     "psyche" => 100,
-    "inspiration" => 100
+    "inspiration" => 100,
+    "bonus_inventory_slots" => 0
   }.freeze
 
   included do
@@ -41,6 +44,11 @@ module GridHackr::Stats
     new_stats = (stats || {}).merge(key.to_s => value)
     update_column(:stats, new_stats)
     self.stats = new_stats
+  end
+
+  # Effective inventory capacity: base slots + bonus from equipment
+  def inventory_capacity
+    INVENTORY_BASE_SLOTS + stat("bonus_inventory_slots").to_i
   end
 
   # Adjust a vital (health/energy/psyche/inspiration) clamped to 0..100

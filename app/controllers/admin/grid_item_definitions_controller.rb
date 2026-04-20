@@ -115,7 +115,7 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
 
   def definition_params
     permitted = params.require(:grid_item_definition).permit(
-      :slug, :name, :description, :item_type, :rarity, :value,
+      :slug, :name, :description, :item_type, :rarity, :value, :max_stack,
       salvage_yields_attributes: %i[id output_definition_id quantity position _destroy]
     )
 

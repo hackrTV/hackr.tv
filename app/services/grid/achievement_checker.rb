@@ -106,6 +106,10 @@ module Grid
         derive(missions_completed_count, data[:count].to_i)
       when "fabricate_count"
         derive(@hackr.stat("fabricate_count").to_i, data[:count].to_i)
+      when "items_stored"
+        den = @hackr.den
+        current = den ? den.den_floor_count : 0
+        derive(current, data[:count].to_i)
       end
     end
 
@@ -295,6 +299,8 @@ module Grid
         # leaving it blank unlocks on ANY mission turn-in (rarely
         # useful — `missions_completed_count` covers the generic case).
         return data[:mission_slug].blank? || data[:mission_slug].to_s == context[:mission_slug].to_s
+      when "den_created"
+        return true
       when "manual"
         return false
       end

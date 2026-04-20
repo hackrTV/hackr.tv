@@ -1,3 +1,33 @@
+# == Schema Information
+#
+# Table name: grid_schematics
+# Database name: primary
+#
+#  id                        :integer          not null, primary key
+#  description               :text
+#  name                      :string           not null
+#  output_quantity           :integer          default(1), not null
+#  position                  :integer          default(0), not null
+#  published                 :boolean          default(FALSE), not null
+#  required_achievement_slug :string
+#  required_clearance        :integer          default(0), not null
+#  required_mission_slug     :string
+#  required_room_type        :string
+#  slug                      :string           not null
+#  xp_reward                 :integer          default(0), not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  output_definition_id      :integer          not null
+#
+# Indexes
+#
+#  index_grid_schematics_on_output_definition_id  (output_definition_id)
+#  index_grid_schematics_on_slug                  (slug) UNIQUE
+#
+# Foreign Keys
+#
+#  output_definition_id  (output_definition_id => grid_item_definitions.id)
+#
 require "rails_helper"
 
 RSpec.describe GridSchematic do

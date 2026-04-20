@@ -53,6 +53,17 @@ exits:
     direction: up
     locked: false
 
+  # Residential Corridor — accessible from Transit Corridor (up)
+  - from_room_slug: transit-corridor-alpha
+    to_room_slug: residential-corridor
+    direction: up
+    locked: false
+
+  - from_room_slug: residential-corridor
+    to_room_slug: transit-corridor-alpha
+    direction: down
+    locked: false
+
   - from_room_slug: hackr-tv-broadcast-station
     to_room_slug: the-rhythm-nexus
     direction: west

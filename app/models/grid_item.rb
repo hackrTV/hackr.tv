@@ -20,6 +20,7 @@
 #
 # Indexes
 #
+#  index_grid_items_on_grid_hackr_id            (grid_hackr_id)
 #  index_grid_items_on_grid_item_definition_id  (grid_item_definition_id)
 #  index_grid_items_on_grid_mining_rig_id       (grid_mining_rig_id)
 #

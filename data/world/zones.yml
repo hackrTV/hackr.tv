@@ -40,6 +40,14 @@ zones:
     faction_slug: null
     ambient_playlist_slug: null
 
+  - name: Residential District
+    slug: residential-district
+    description: "A quieter section of THE PULSE GRID. Rows of private nodes line the data-corridors. Hackrs with enough standing have claimed their own spaces here."
+    zone_type: residential
+    color_scheme: blue/gray
+    faction_slug: null
+    ambient_playlist_slug: null
+
   - name: The Hackr Hangar
     slug: hackr-hangar
     description: "Ryker M. Pulse's headquarters and primary broadcast facility. Where the raw signal is created before transmission to Sector X."

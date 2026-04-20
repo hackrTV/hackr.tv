@@ -66,6 +66,8 @@ class GridAchievement < ApplicationRecord
     salvage_yield_count
     fabricate_item
     fabricate_count
+    den_created
+    items_stored
   ].freeze
 
   CATEGORIES = %w[grid music social meta progression].freeze
@@ -84,6 +86,7 @@ class GridAchievement < ApplicationRecord
     clearance_level
     missions_completed_count
     fabricate_count
+    items_stored
   ].freeze
 
   has_many :grid_hackr_achievements, dependent: :destroy
