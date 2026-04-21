@@ -88,11 +88,14 @@ class Api::GridController < ApplicationController
       .joins(:grid_achievement)
       .pluck("grid_achievements.slug").to_set
 
+    current_room = current_hackr.current_room
+
     render json: {
       schematics: schematics.map { |s|
         craftable = s.craftable_by?(current_hackr,
           completed_mission_slugs: completed_mission_slugs,
-          earned_achievement_slugs: earned_achievement_slugs)
+          earned_achievement_slugs: earned_achievement_slugs,
+          current_room: current_room)
         has_ingredients = s.ingredients.all? { |i| (inventory_qtys[i.input_definition_id] || 0) >= i.quantity }
 
         {
@@ -110,6 +113,8 @@ class Api::GridController < ApplicationController
           required_clearance: s.required_clearance,
           required_mission_slug: s.required_mission_slug,
           required_achievement_slug: s.required_achievement_slug,
+          required_room_type: s.required_room_type,
+          required_room_type_label: s.room_type_label,
           ingredients: s.ingredients.ordered.map { |i|
             owned = inventory_qtys[i.input_definition_id] || 0
             {

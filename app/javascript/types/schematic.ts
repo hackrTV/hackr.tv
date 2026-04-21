@@ -24,6 +24,8 @@ export interface Schematic {
   required_clearance: number
   required_mission_slug: string | null
   required_achievement_slug: string | null
+  required_room_type: string | null
+  required_room_type_label: string | null
   ingredients: SchematicIngredient[]
   craftable: boolean
   has_ingredients: boolean

@@ -182,6 +182,69 @@ RSpec.describe GridSchematic do
       end
     end
 
+    context "room_type gate" do
+      let(:den_room) { create(:grid_room, :den, grid_zone: zone, owner: hackr) }
+      let(:other_hackr) { create(:grid_hackr, current_room: room) }
+      let(:other_den) { create(:grid_room, :den, grid_zone: zone, owner: other_hackr) }
+
+      it "returns true when hackr is in own den" do
+        schematic = described_class.create!(
+          slug: "den-only", name: "Den Only",
+          output_definition: output_def, required_room_type: "den"
+        )
+        expect(schematic.craftable_by?(hackr, current_room: den_room)).to be true
+      end
+
+      it "returns false when hackr is in another hackr's den" do
+        schematic = described_class.create!(
+          slug: "den-only", name: "Den Only",
+          output_definition: output_def, required_room_type: "den"
+        )
+        expect(schematic.craftable_by?(hackr, current_room: other_den)).to be false
+      end
+
+      it "returns false when hackr is in a non-den room" do
+        schematic = described_class.create!(
+          slug: "den-only", name: "Den Only",
+          output_definition: output_def, required_room_type: "den"
+        )
+        expect(schematic.craftable_by?(hackr, current_room: room)).to be false
+      end
+
+      it "returns false when current_room is nil" do
+        schematic = described_class.create!(
+          slug: "den-only", name: "Den Only",
+          output_definition: output_def, required_room_type: "den"
+        )
+        expect(schematic.craftable_by?(hackr, current_room: nil)).to be false
+      end
+
+      it "rejects unknown room_type values" do
+        schematic = described_class.new(
+          slug: "bad-type", name: "Bad Type",
+          output_definition: output_def, required_room_type: "typo"
+        )
+        expect(schematic).not_to be_valid
+        expect(schematic.errors[:required_room_type]).to be_present
+      end
+
+      it "passes when no room_type required (nil)" do
+        schematic = described_class.create!(
+          slug: "anywhere", name: "Anywhere",
+          output_definition: output_def, required_room_type: nil
+        )
+        expect(schematic.craftable_by?(hackr, current_room: room)).to be true
+      end
+
+      it "skips room check when current_room is not provided" do
+        schematic = described_class.create!(
+          slug: "den-only", name: "Den Only",
+          output_definition: output_def, required_room_type: "den"
+        )
+        expect(schematic.craftable_by?(hackr)).to be true
+      end
+    end
+
     context "no gates" do
       it "returns true with all nil gates" do
         schematic = described_class.create!(

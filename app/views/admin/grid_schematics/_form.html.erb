@@ -63,7 +63,7 @@
   <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
     Leave blank for no gate. Slugs are resolved at runtime.
   </p>
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
     <div>
       <%= f.label :required_mission_slug, "REQUIRED MISSION SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
       <%= f.text_field :required_mission_slug, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "e.g. signal-recovery" %>
@@ -71,6 +71,14 @@
     <div>
       <%= f.label :required_achievement_slug, "REQUIRED ACHIEVEMENT SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
       <%= f.text_field :required_achievement_slug, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "e.g. first-salvage" %>
+    </div>
+    <div>
+      <%= f.label :required_room_type, "REQUIRED ROOM TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :required_room_type,
+            [["Den (own)", "den"]],
+            { include_blank: "None (craft anywhere)" },
+            class: "tui-input", style: "width: 100%;" %>
+      <small style="color: #888;">Location required to fabricate</small>
     </div>
   </div>
 

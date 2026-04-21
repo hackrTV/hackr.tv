@@ -33,6 +33,10 @@
 class GridSchematic < ApplicationRecord
   has_paper_trail
 
+  ROOM_TYPE_LABELS = {
+    "den" => "the Workbench in your Den"
+  }.freeze
+
   belongs_to :output_definition, class_name: "GridItemDefinition"
   has_many :ingredients, class_name: "GridSchematicIngredient", dependent: :destroy
   has_many :input_definitions, through: :ingredients
@@ -47,6 +51,7 @@ class GridSchematic < ApplicationRecord
   validates :output_quantity, numericality: {only_integer: true, greater_than_or_equal_to: 1}
   validates :xp_reward, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :required_clearance, numericality: {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 99}
+  validates :required_room_type, inclusion: {in: ROOM_TYPE_LABELS.keys, allow_nil: true}
 
   scope :published, -> { where(published: true) }
   scope :ordered, -> { order(:position, :name) }
@@ -62,8 +67,16 @@ class GridSchematic < ApplicationRecord
   # For batch checks, pass pre-loaded sets to avoid N+1 queries:
   #   completed_mission_slugs: Set of slug strings
   #   earned_achievement_slugs: Set of slug strings
-  def craftable_by?(hackr, completed_mission_slugs: nil, earned_achievement_slugs: nil)
+  #   current_room: GridRoom or nil — checked against required_room_type
+  NOT_PROVIDED = Object.new.freeze
+  private_constant :NOT_PROVIDED
+
+  def craftable_by?(hackr, completed_mission_slugs: nil, earned_achievement_slugs: nil, current_room: NOT_PROVIDED)
     return false unless hackr.stat("clearance").to_i >= required_clearance
+
+    if required_room_type.present? && current_room != NOT_PROVIDED
+      return false unless room_type_satisfied?(hackr, current_room)
+    end
 
     if required_mission_slug.present?
       if completed_mission_slugs
@@ -89,5 +102,24 @@ class GridSchematic < ApplicationRecord
     end
 
     true
+  end
+
+  # Human-readable label for the room type requirement.
+  def room_type_label
+    return nil unless required_room_type.present?
+    ROOM_TYPE_LABELS[required_room_type] || "a #{required_room_type.titleize}"
+  end
+
+  private
+
+  # Check if hackr's current room satisfies the required_room_type.
+  def room_type_satisfied?(hackr, current_room)
+    return false unless current_room
+
+    if required_room_type == "den"
+      current_room.owned_den_of?(hackr)
+    else
+      current_room.room_type == required_room_type
+    end
   end
 end

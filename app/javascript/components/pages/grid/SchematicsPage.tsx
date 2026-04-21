@@ -185,6 +185,9 @@ const SchematicCard: React.FC<{ schematic: Schematic }> = ({ schematic: s }) => 
       <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px solid #2a2a2a', display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: '0.8em' }}>
         {s.xp_reward > 0 && <span style={{ color: '#a78bfa' }}>+{s.xp_reward} XP</span>}
         {s.required_clearance > 0 && <span style={{ color: '#d0d0d0' }}>CL{s.required_clearance}+</span>}
+        {s.required_room_type_label && (
+          <span style={{ color: '#fbbf24' }}>Requires {s.required_room_type_label}</span>
+        )}
       </div>
 
       {ready && (

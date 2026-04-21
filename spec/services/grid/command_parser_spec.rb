@@ -444,6 +444,38 @@ RSpec.describe Grid::CommandParser do
         end
       end
 
+      context "with den-locked schematic outside own den" do
+        let(:input) { "schematics" }
+
+        before do
+          create(:grid_schematic, :den_required, slug: "den-sch", name: "Den Only",
+            output_definition: cpu_def)
+        end
+
+        it "shows schematic in locked section" do
+          result = parser.execute
+          expect(result[:output]).to include("[LOCKED]")
+          expect(result[:output]).to include("Den Only")
+        end
+      end
+
+      context "with den-locked schematic inside own den" do
+        let(:input) { "schematics" }
+        let(:den_room) { create(:grid_room, :den, grid_zone: zone, owner: hackr) }
+
+        before do
+          hackr.update!(current_room: den_room)
+          create(:grid_schematic, :den_required, slug: "den-sch", name: "Den Only",
+            output_definition: cpu_def)
+        end
+
+        it "shows schematic in available section" do
+          result = described_class.new(hackr, "schematics").execute
+          expect(result[:output]).to include("[AVAILABLE]")
+          expect(result[:output]).to include("den-sch")
+        end
+      end
+
       context "aliases" do
         let(:input) { "schem" }
 
@@ -542,6 +574,25 @@ RSpec.describe Grid::CommandParser do
         it "shows usage hint" do
           result = parser.execute
           expect(result[:output]).to include("Usage:")
+        end
+      end
+
+      context "den-required schematic" do
+        let(:input) { "schematic fab-cpu" }
+        let(:den_room) { create(:grid_room, :den, grid_zone: zone, owner: hackr) }
+
+        before { schematic.update!(required_room_type: "den") }
+
+        it "shows room error when not in own den" do
+          result = parser.execute
+          expect(result[:output]).to include("Workbench in your Den")
+        end
+
+        it "shows detail when in own den" do
+          hackr.update!(current_room: den_room)
+          result = described_class.new(hackr, "schematic fab-cpu").execute
+          expect(result[:output]).to include("Fabricate CPU")
+          expect(result[:output]).to include("INGREDIENTS")
         end
       end
     end
@@ -650,6 +701,96 @@ RSpec.describe Grid::CommandParser do
         it "works with full command name" do
           result = parser.execute
           expect(result[:output]).to include("Fabricated:")
+        end
+      end
+
+      context "den-required schematic" do
+        let(:input) { "fab fab-cpu" }
+        let(:den_room) { create(:grid_room, :den, grid_zone: zone, owner: hackr) }
+
+        before do
+          schematic.update!(required_room_type: "den")
+          GridItem.create!(wafer_def.item_attributes.merge(grid_hackr: hackr, quantity: 5))
+        end
+
+        it "blocks fabrication when not in own den" do
+          result = parser.execute
+          expect(result[:output]).to include("Workbench in your Den")
+        end
+
+        it "allows fabrication when in own den" do
+          hackr.update!(current_room: den_room)
+          result = described_class.new(hackr, "fab fab-cpu").execute
+          expect(result[:output]).to include("Fabricated:")
+        end
+
+        it "blocks fabrication when in another hackr's den" do
+          other_hackr = create(:grid_hackr, current_room: room)
+          other_den = create(:grid_room, :den, grid_zone: zone, owner: other_hackr)
+          hackr.update!(current_room: other_den)
+          result = described_class.new(hackr, "fab fab-cpu").execute
+          expect(result[:output]).to include("Workbench in your Den")
+        end
+      end
+    end
+
+    describe "rig install/uninstall den restriction" do
+      let(:den_room) { create(:grid_room, :den, grid_zone: zone, owner: hackr) }
+      let!(:rig) { create(:grid_mining_rig, grid_hackr: hackr, active: false) }
+
+      let(:motherboard_def) do
+        create(:grid_item_definition, :component,
+          slug: "test-mb", name: "Test Motherboard",
+          properties: {"slot" => "motherboard", "rate_multiplier" => 1.0,
+                       "cpu_slots" => 1, "gpu_slots" => 2, "ram_slots" => 2})
+      end
+
+      let(:component_def) do
+        create(:grid_item_definition, :component,
+          slug: "test-gpu", name: "Test GPU",
+          properties: {"slot" => "gpu", "rate_multiplier" => 1.5})
+      end
+
+      before do
+        # Install a motherboard so the rig has GPU slots
+        GridItem.create!(motherboard_def.item_attributes.merge(grid_mining_rig: rig))
+      end
+
+      context "rig install" do
+        let(:input) { "rig install Test GPU" }
+
+        before do
+          GridItem.create!(component_def.item_attributes.merge(grid_hackr: hackr))
+        end
+
+        it "blocks install when not in own den" do
+          result = parser.execute
+          expect(result[:output]).to include("Your rig isn't here")
+          expect(result[:output]).to include("in your Den")
+        end
+
+        it "allows install when in own den" do
+          hackr.update!(current_room: den_room)
+          result = described_class.new(hackr, "rig install Test GPU").execute
+          expect(result[:output]).to include("Installed")
+        end
+      end
+
+      context "rig uninstall" do
+        before do
+          # Install the GPU into the rig
+          GridItem.create!(component_def.item_attributes.merge(grid_mining_rig: rig))
+        end
+
+        it "blocks uninstall when not in own den" do
+          result = described_class.new(hackr, "rig uninstall Test GPU").execute
+          expect(result[:output]).to include("Your rig isn't here")
+        end
+
+        it "allows uninstall when in own den" do
+          hackr.update!(current_room: den_room)
+          result = described_class.new(hackr, "rig uninstall Test GPU").execute
+          expect(result[:output]).to include("Uninstalled")
         end
       end
     end

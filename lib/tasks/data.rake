@@ -1977,7 +1977,8 @@ namespace :data do
         published: attrs["published"] != false,
         position: attrs["position"] || 0,
         required_mission_slug: attrs["required_mission_slug"],
-        required_achievement_slug: attrs["required_achievement_slug"]
+        required_achievement_slug: attrs["required_achievement_slug"],
+        required_room_type: attrs["required_room_type"]
       )
 
       (attrs["ingredients"] || []).each_with_index do |ing_attrs, idx|

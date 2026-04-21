@@ -72,7 +72,7 @@ class Admin::GridSchematicsController < Admin::ApplicationController
     params.require(:grid_schematic).permit(
       :slug, :name, :description, :output_definition_id, :output_quantity,
       :xp_reward, :required_clearance, :published, :position,
-      :required_mission_slug, :required_achievement_slug,
+      :required_mission_slug, :required_achievement_slug, :required_room_type,
       ingredients_attributes: %i[id input_definition_id quantity position _destroy]
     )
   end

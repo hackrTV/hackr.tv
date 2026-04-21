@@ -66,6 +66,10 @@ class GridRoom < ApplicationRecord
     room_type == "den"
   end
 
+  def owned_den_of?(hackr)
+    den? && owner_id == hackr.id
+  end
+
   def den_floor_items
     grid_items.where(grid_hackr_id: nil, grid_mining_rig_id: nil)
   end
