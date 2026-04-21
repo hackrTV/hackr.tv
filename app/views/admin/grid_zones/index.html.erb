@@ -27,6 +27,7 @@
               <tr>
                 <th style="text-align: left;">Name</th>
                 <th style="text-align: left;">Slug</th>
+                <th style="text-align: left;">Region</th>
                 <th style="text-align: left;">Type</th>
                 <th style="text-align: left;">Faction</th>
                 <th style="text-align: left;">Ambient Playlist</th>
@@ -39,6 +40,7 @@
                 <tr style="<%= " background: #112;" if i.odd? %>">
                   <td class="cyan-255-text"><strong><%= zone.name %></strong></td>
                   <td style="font-family: monospace; color: #666;">/<%= zone.slug %></td>
+                  <td><%= zone.grid_region&.name || "—" %></td>
                   <td><%= zone.zone_type || "—" %></td>
                   <td><%= zone.grid_faction&.name || "—" %></td>
                   <td>

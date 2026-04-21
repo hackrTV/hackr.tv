@@ -1,0 +1,34 @@
+<% if @region.errors.any? %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+    <p class="red-255-text">ERRORS:</p>
+    <ul style="margin: 5px 0 0 20px;">
+      <% @region.errors.full_messages.each do |msg| %>
+        <li class="white-text"><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+</div>
+
+<div style="margin-top: 15px;">
+  <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+  <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+</div>
+
+<div style="margin-top: 30px; display: flex; gap: 10px;">
+  <%= f.submit @region.new_record? ? "Create Region" : "Update Region", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+  <%= link_to "Cancel", admin_grid_regions_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+  <% if @region.persisted? %>
+    <%= link_to "History", history_admin_grid_region_path(@region), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+  <% end %>
+</div>

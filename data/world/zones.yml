@@ -5,6 +5,7 @@ zones:
     description: "The central hub of Fracture Network broadcasting operations."
     zone_type: faction_base
     color_scheme: purple
+    region_slug: the-lakeshore
     faction_slug: thecyberpulse
     ambient_playlist_slug: fracture-network-ambience
 
@@ -13,6 +14,7 @@ zones:
     description: "XERAEN's homebase. A fortress of temporal technology and Fracture Network operations."
     zone_type: faction_base
     color_scheme: purple
+    region_slug: the-lakeshore
     faction_slug: xeraen
     ambient_playlist_slug: fracture-network-ambience
 
@@ -21,6 +23,7 @@ zones:
     description: "Neutral corridors connecting the major zones of THE PULSE GRID."
     zone_type: transit
     color_scheme: gray/neon green
+    region_slug: the-lakeshore
     faction_slug: null
     ambient_playlist_slug: transit-network-ambience
 
@@ -29,6 +32,7 @@ zones:
     description: "Enemy territory under total GovCorp control."
     zone_type: govcorp
     color_scheme: red
+    region_slug: the-lakeshore
     faction_slug: govcorp
     ambient_playlist_slug: govcorp-surveillance-ambience
 
@@ -37,6 +41,7 @@ zones:
     description: "A network of unregistered passages beneath the Transit Network. Surveillance dead zone. If you know, you know."
     zone_type: danger_zone
     color_scheme: red/black
+    region_slug: the-lakeshore
     faction_slug: null
     ambient_playlist_slug: null
 
@@ -45,6 +50,7 @@ zones:
     description: "A quieter section of THE PULSE GRID. Rows of private nodes line the data-corridors. Hackrs with enough standing have claimed their own spaces here."
     zone_type: residential
     color_scheme: blue/gray
+    region_slug: the-lakeshore
     faction_slug: null
     ambient_playlist_slug: null
 
@@ -53,5 +59,6 @@ zones:
     description: "Ryker M. Pulse's headquarters and primary broadcast facility. Where the raw signal is created before transmission to Sector X."
     zone_type: faction_base
     color_scheme: purple/cyan
+    region_slug: the-riverlands
     faction_slug: thecyberpulse
     ambient_playlist_slug: fracture-network-ambience

@@ -4,20 +4,21 @@
 #
 # Import Order (respecting dependencies):
 # 1. catalog           (artists, releases, tracks from per-artist YAML files)
-# 4. hackrs            (no deps)
-# 5. channels          (no deps)
-# 6. radio_stations    (no deps)
-# 7. zone_playlists    (depends on tracks)
-# 8. factions          (depends on artists)
-# 9. zones             (depends on factions, zone_playlists)
-# 10. rooms            (depends on zones)
-# 11. exits            (depends on rooms)
-# 12. mobs             (depends on rooms, factions)
-# 13. items            (depends on rooms)
-# 14. key_playlists    (depends on hackrs, tracks, radio_stations)
-# 15. codex            (no deps)
-# 16. hackr_logs       (depends on hackrs)
-# 17. wire             (depends on hackrs) - sets is_seed: true
+# 2. hackrs            (no deps)
+# 3. channels          (no deps)
+# 4. radio_stations    (no deps)
+# 5. zone_playlists    (depends on tracks)
+# 6. factions          (depends on artists)
+# 7. regions           (no deps)
+# 8. zones             (depends on factions, zone_playlists, regions)
+# 9. rooms             (depends on zones)
+# 10. exits            (depends on rooms)
+# 11. mobs             (depends on rooms, factions)
+# 12. items            (depends on rooms)
+# 13. key_playlists    (depends on hackrs, tracks, radio_stations)
+# 14. codex            (no deps)
+# 15. hackr_logs       (depends on hackrs)
+# 16. wire             (depends on hackrs) - sets is_seed: true
 # 18. vidz             (depends on artists) - HackrStream VODs
 # 19. overlay_elements (no deps)
 # 20. overlay_tickers  (no deps)
@@ -185,8 +186,8 @@ namespace :data do
   desc "Load system data (hackrs, channels, radio stations, etc.)"
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
-  desc "Load world data (factions, zones, rooms, etc.)"
-  task world: [:factions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics]
+  desc "Load world data (factions, regions, zones, rooms, etc.)"
+  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -243,6 +244,7 @@ namespace :data do
     GridHackr.destroy_all
     GridRoom.destroy_all
     GridZone.destroy_all
+    GridRegion.destroy_all
     GridFaction.destroy_all
     ZonePlaylistTrack.destroy_all
     ZonePlaylist.destroy_all
@@ -495,8 +497,38 @@ namespace :data do
     puts "Rep links: #{links_created} created, #{GridFactionRepLink.count} total"
   end
 
+  desc "Load regions from YAML"
+  task regions: :environment do
+    puts "\n--- Loading Regions ---"
+    yaml_file = Rails.root.join("data", "world", "regions.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    regions_data = data["regions"]
+    created = 0
+
+    regions_data.each do |attrs|
+      region = GridRegion.find_or_initialize_by(slug: attrs["slug"])
+      next unless region.new_record?
+
+      region.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"]
+      )
+      region.save!
+      created += 1
+      puts "  ✓ Created: #{region.name}"
+    end
+
+    puts "Regions: #{created} created, #{GridRegion.count} total"
+  end
+
   desc "Load zones from YAML"
-  task zones: :environment do
+  task zones: [:environment, :regions] do
     puts "\n--- Loading Zones ---"
     yaml_file = Rails.root.join("data", "world", "zones.yml")
 
@@ -508,11 +540,17 @@ namespace :data do
     data = YAML.load_file(yaml_file)
     zones_data = data["zones"]
     created = 0
+    region_map = GridRegion.all.index_by(&:slug)
 
     zones_data.each do |attrs|
       zone = GridZone.find_or_initialize_by(slug: attrs["slug"])
       next unless zone.new_record?
 
+      region = region_map[attrs["region_slug"]]
+      unless region
+        puts "  ✗ Region not found: #{attrs["region_slug"]} (zone: #{attrs["slug"]})"
+        next
+      end
       faction = attrs["faction_slug"].present? ? GridFaction.find_by(slug: attrs["faction_slug"]) : nil
       playlist = attrs["ambient_playlist_slug"].present? ? ZonePlaylist.find_by(slug: attrs["ambient_playlist_slug"]) : nil
 
@@ -521,6 +559,7 @@ namespace :data do
         description: attrs["description"],
         zone_type: attrs["zone_type"],
         color_scheme: attrs["color_scheme"],
+        grid_region: region,
         grid_faction: faction,
         ambient_playlist: playlist
       )

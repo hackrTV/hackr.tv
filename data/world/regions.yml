@@ -1,0 +1,57 @@
+# Grid Regions
+regions:
+  - name: The Lakeshore
+    slug: the-lakeshore
+    description: "A dense urban region on the western shore of a vast freshwater inland sea — home to Sector X and the Fracture Network's primary operations hub."
+
+  - name: The Riverlands
+    slug: the-riverlands
+    description: "River country along a great continental river — bluffs overlooking the water, dense with musical heritage. Home to The Hackr Hangar and a region where music seeped into the substrate long before GovCorp existed."
+
+  - name: The Arch
+    slug: the-arch
+    description: "A massive steel monument at the confluence of two great rivers — and the Fracture Network's only known persistent RIDE deadzone, created by amplifying the structure's natural interference with RIDE signal propagation."
+
+  - name: The Narrows
+    slug: the-narrows
+    description: "A dense vertical region built across a series of islands and peninsulas compressed around a deep natural harbor — the most heavily populated and most thoroughly RIDE-saturated zone on the continent."
+
+  - name: The Basin
+    slug: the-basin
+    description: "A broad coastal basin bounded by mountains and desert — GovCorp's entertainment production center, where the line between RIDE-manufactured experience and curated culture disappeared long before the RIDE existed."
+
+  - name: The Gate
+    slug: the-gate
+    description: "A region built around a strait connecting an inland bay to the open ocean — historically a center of technical innovation, now a GovCorp research hub where RIDE infrastructure is developed and refined."
+
+  - name: The Front
+    slug: the-front
+    description: "A high-altitude region where vast plains abruptly meet a massive mountain range — thin air, wide sky, and RIDE coverage that struggles with the terrain's extreme vertical variation."
+
+  - name: The Straits
+    slug: the-straits
+    description: "A region built around a river strait connecting two great freshwater lakes — once a center of manufacturing, now a landscape of industrial ruins that GovCorp's Cultural Zone programming frames as heritage."
+
+  - name: The Bend
+    slug: the-bend
+    description: "A low-lying region where a great river curves sharply before meeting the sea — built below sea level, perpetually at war with water, and home to a Cultural Zone identity built on music and celebration that GovCorp exploits ruthlessly."
+
+  - name: The Canopy
+    slug: the-canopy
+    description: "A densely forested region of volcanic peaks, ancient evergreens, and persistent rain — where the tree cover and terrain create natural RIDE attenuation that GovCorp has struggled to fully resolve."
+
+  - name: The Flats
+    slug: the-flats
+    description: "Vast coastal prairie stretching flat to the horizon along a warm gulf — the most geographically exposed region, where there is nowhere to hide and RIDE coverage is total."
+
+  - name: The Marshes
+    slug: the-marshes
+    description: "A peninsula of wetlands, swamp, and subtropical heat jutting into warm ocean — where the boundary between land and water is so uncertain that even the RIDE has trouble deciding what to render."
+
+  - name: The Works
+    slug: the-works
+    description: "River valleys dense with the skeletal remains of a vanished industrial age — a region whose identity is built on labor and craft that the actual economy hasn't supported in two centuries."
+
+  - name: The Badlands
+    slug: the-badlands
+    description: "High plains and eroded rock formations under an enormous sky — the most sparsely populated region, where RIDE coverage is thin by design because there is almost no one to render for."

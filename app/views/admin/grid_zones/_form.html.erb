@@ -40,6 +40,10 @@
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
+    <%= f.label :grid_region_id, "REGION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :grid_region_id, @regions, :id, :name, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 200px;">
     <%= f.label :grid_faction_id, "FACTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
     <%= f.collection_select :grid_faction_id, @factions, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
   </div>

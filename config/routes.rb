@@ -300,6 +300,11 @@ Rails.application.routes.draw do
     resources :zone_playlists, only: %i[index show]
 
     # World resources (full CRUD)
+    resources :grid_regions do
+      member do
+        get :history
+      end
+    end
     resources :grid_zones do
       member do
         get :history

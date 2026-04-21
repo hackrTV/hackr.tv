@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_120003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -450,6 +450,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_120001) do
     t.json "vendor_config"
   end
 
+  create_table "grid_regions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_grid_regions_on_slug", unique: true
+  end
+
   create_table "grid_registration_tokens", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -622,11 +631,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_120001) do
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_faction_id"
+    t.integer "grid_region_id"
     t.string "name"
     t.string "slug"
     t.datetime "updated_at", null: false
     t.string "zone_type"
     t.index ["ambient_playlist_id"], name: "index_grid_zones_on_ambient_playlist_id"
+    t.index ["grid_region_id"], name: "index_grid_zones_on_grid_region_id"
   end
 
   create_table "hackr_log_reads", force: :cascade do |t|
@@ -1127,6 +1138,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_120001) do
   add_foreign_key "grid_shop_listings", "grid_item_definitions"
   add_foreign_key "grid_shop_listings", "grid_mobs"
   add_foreign_key "grid_verification_tokens", "grid_hackrs"
+  add_foreign_key "grid_zones", "grid_regions"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "hackr_log_reads", "grid_hackrs"
   add_foreign_key "hackr_log_reads", "hackr_logs"
