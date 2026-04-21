@@ -40,6 +40,14 @@ FactoryBot.define do
       properties { {"effect_type" => "heal", "amount" => 25} }
     end
 
+    trait :fixture do
+      sequence(:slug) { |n| "fixture-def-#{n}" }
+      sequence(:name) { |n| "Storage Fixture #{n}" }
+      item_type { "fixture" }
+      max_stack { 1 }
+      properties { {"storage_capacity" => 8, "fixture_type" => "data_rack"} }
+    end
+
     trait :rare do
       rarity { "rare" }
     end

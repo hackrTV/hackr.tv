@@ -115,7 +115,7 @@ module Grid
       case trigger_type.to_s
       when "visit_room"
         target.blank? || target.casecmp?(context[:room_slug].to_s)
-      when "talk_npc", "use_item", "salvage_item", "salvage_yield_received", "buy_item", "collect_item", "fabricate_item"
+      when "talk_npc", "use_item", "salvage_item", "salvage_yield_received", "buy_item", "collect_item", "fabricate_item", "place_fixture"
         target.blank? || target.casecmp?(name_context(context).to_s)
       when "deliver_item"
         # Convention: `target_slug` holds the item name. The delivery
@@ -149,7 +149,7 @@ module Grid
     # target_count so the `progress >= target_count` completion check fires.
     def next_progress_value(current, trigger_type, context, target_count)
       case trigger_type.to_s
-      when "visit_room", "talk_npc", "use_item", "salvage_item", "salvage_yield_received", "buy_item", "collect_item", "deliver_item", "fabricate_item"
+      when "visit_room", "talk_npc", "use_item", "salvage_item", "salvage_yield_received", "buy_item", "collect_item", "deliver_item", "fabricate_item", "place_fixture"
         [current + 1, target_count].min
       when "spend_cred"
         [current + context[:amount].to_i, target_count].min

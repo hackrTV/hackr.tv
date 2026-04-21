@@ -126,3 +126,67 @@ schematics:
       - input_slug: data-shard
         quantity: 2
         position: 1
+
+  # ── Storage Fixtures ─────────────────────────────────────────────
+  - slug: fab-basic-data-rack
+    name: Fabricate Basic Data Rack
+    description: "Assemble a compact 8-slot storage rack from alloy and wiring."
+    output_slug: basic-data-rack
+    output_quantity: 1
+    xp_reward: 25
+    required_clearance: 0
+    required_room_type: den
+    published: true
+    position: 100
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 4
+        position: 0
+      - input_slug: synth-fiber
+        quantity: 2
+        position: 1
+
+  - slug: fab-reinforced-locker
+    name: Fabricate Reinforced Locker
+    description: "Weld together a heavy-duty 16-slot storage locker from alloy, logic substrates, and cipher modules."
+    output_slug: reinforced-locker
+    output_quantity: 1
+    xp_reward: 60
+    required_clearance: 5
+    required_room_type: den
+    published: true
+    position: 110
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 6
+        position: 0
+      - input_slug: logic-core
+        quantity: 2
+        position: 1
+      - input_slug: cipher-chip
+        quantity: 1
+        position: 2
+
+  - slug: fab-cryo-vault
+    name: Fabricate Cryo Vault
+    description: "Construct a quantum-shielded 32-slot cryogenic vault from high-grade alloy, logic cores, and quantum shards."
+    output_slug: cryo-vault
+    output_quantity: 1
+    xp_reward: 120
+    required_clearance: 15
+    required_room_type: den
+    published: true
+    position: 120
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 8
+        position: 0
+      - input_slug: logic-core
+        quantity: 4
+        position: 1
+      - input_slug: quantum-shard
+        quantity: 2
+        position: 2
+      - input_slug: cipher-chip
+        quantity: 2
+        position: 3

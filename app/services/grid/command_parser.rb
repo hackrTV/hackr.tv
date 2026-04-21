@@ -96,6 +96,16 @@ module Grid
         args.any? ? schematic_detail_command(args.first) : schematics_command
       when "schematic"
         schematic_detail_command(args.first)
+      when "place", "install"
+        place_fixture_command(args.join(" "))
+      when "unplace", "uninstall"
+        unplace_fixture_command(args.join(" "))
+      when "store", "put"
+        store_in_fixture_command(args)
+      when "retrieve"
+        retrieve_from_fixture_command(args)
+      when "peek", "search"
+        peek_fixture_command(args.join(" "))
       when "den"
         den_command(args)
       when "out"
@@ -138,7 +148,7 @@ module Grid
           owner_alias = room.owner&.hackr_alias || "Unknown"
           output << "<span style='color: #a78bfa;'>[ This is #{h(owner_alias)}'s Den ]</span>"
         end
-        output << "<span style='color: #6b7280;'>Storage: #{room.den_floor_count}/#{Grid::DenService::DEN_STORAGE_CAP} items</span>"
+        output << "<span style='color: #6b7280;'>Floor: #{room.den_floor_count}/#{Grid::DenService::DEN_STORAGE_CAP} items</span>"
         output << "<span style='color: #6b7280;'>Owner: <span style='color: #a78bfa;'>#{h(room.owner&.hackr_alias)}</span></span>"
         output << "<span style='color: #f87171;'>[ DEN IS LOCKED ]</span>" if room.locked?
       end
@@ -178,11 +188,25 @@ module Grid
         output << "<span style='color: #fbbf24;'>Exits:</span> <span style='color: #6b7280;'>none</span>"
       end
 
-      # Show items
-      items = room.grid_items.in_room(room)
-      if items.any?
+      # Show fixtures (den only)
+      if room.den?
+        fixtures = room.placed_fixtures.includes(:stored_items)
+        if fixtures.any?
+          output << ""
+          output << "<span style='color: #fbbf24;'>Fixtures:</span>"
+          fixtures.each do |f|
+            used = f.stored_items.size
+            cap = f.storage_capacity
+            output << "  <span style='color: #a78bfa;'>#{h(f.name)}</span> <span style='color: #6b7280;'>[#{used}/#{cap} slots]</span>"
+          end
+        end
+      end
+
+      # Show items (floor items, excluding placed fixtures)
+      floor_items = room.den? ? room.den_floor_items : room.grid_items.in_room(room)
+      if floor_items.any?
         output << ""
-        item_names = items.map { |item| item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>" }
+        item_names = floor_items.map { |item| item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>" }
         output << "<span style='color: #fbbf24;'>Items:</span> #{item_names.join(", ")}"
       end
 
@@ -375,6 +399,11 @@ module Grid
         return "<span style='color: #f87171;'>You can't take items from someone else's den.</span>"
       end
 
+      # Placed fixture with contents cannot be picked up
+      if item.fixture? && item.placed? && item.stored_items.exists?
+        return "<span style='color: #f87171;'>#{h(item.name)} has items stored inside. Retrieve them first.</span>"
+      end
+
       # Inventory capacity check
       used = hackr.grid_items.in_inventory(hackr).count
       if used >= hackr.inventory_capacity
@@ -408,6 +437,11 @@ module Grid
 
       item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      # Fixtures must be placed via the place command
+      if item.fixture?
+        return "<span style='color: #f87171;'>Use 'place #{h(item.name.downcase)}' to install fixtures in your den.</span>"
+      end
 
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
@@ -693,86 +727,94 @@ module Grid
         <span style='color: #22d3ee; font-weight: bold;'>Available Commands:</span>
 
         <span style='color: #fbbf24;'>Navigation:</span>
-          <span style='color: #34d399;'>look, l</span>                   - Look around the room
-          <span style='color: #34d399;'>go &lt;direction&gt;</span>            - Move in a direction
-          <span style='color: #34d399;'>north, n / south, s</span>       - Move north/south
-          <span style='color: #34d399;'>east, e / west, w</span>         - Move east/west
-          <span style='color: #34d399;'>up, u / down, d</span>           - Move up/down
+          <span style='color: #34d399;'>look, l</span>                    - Look around the room
+          <span style='color: #34d399;'>go &lt;direction&gt;</span>             - Move in a direction
+          <span style='color: #34d399;'>north, n / south, s</span>        - Move north/south
+          <span style='color: #34d399;'>east, e / west, w</span>          - Move east/west
+          <span style='color: #34d399;'>up, u / down, d</span>            - Move up/down
 
         <span style='color: #fbbf24;'>Items:</span>
-          <span style='color: #34d399;'>inventory, inv, i</span>         - View your inventory
-          <span style='color: #34d399;'>take &lt;item&gt;</span>               - Pick up an item
-          <span style='color: #34d399;'>drop &lt;item&gt;</span>               - Drop an item
-          <span style='color: #34d399;'>use &lt;item&gt;</span>                - Use an item
-          <span style='color: #34d399;'>salvage &lt;item&gt;, sal</span>       - Break down an item for XP
-          <span style='color: #34d399;'>analyze &lt;item&gt;, an</span>        - Preview salvage yields before breaking down
-          <span style='color: #34d399;'>examine &lt;target&gt;, x</span>       - Examine item, NPC, or hackr
+          <span style='color: #34d399;'>inventory, inv, i</span>          - View your inventory
+          <span style='color: #34d399;'>take &lt;item&gt;</span>                - Pick up an item
+          <span style='color: #34d399;'>drop &lt;item&gt;</span>                - Drop an item
+          <span style='color: #34d399;'>use &lt;item&gt;</span>                 - Use an item
+          <span style='color: #34d399;'>salvage &lt;item&gt;, sal</span>        - Break down an item for XP
+          <span style='color: #34d399;'>analyze &lt;item&gt;, an</span>         - Preview salvage yields before breaking down
+          <span style='color: #34d399;'>examine &lt;target&gt;, x</span>        - Examine item, NPC, or hackr
 
         <span style='color: #fbbf24;'>NPCs:</span>
-          <span style='color: #34d399;'>talk &lt;npc&gt;</span>                - Talk to an NPC
-          <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>   - Ask an NPC about a topic
-          <span style='color: #34d399;'>give &lt;item&gt; to &lt;npc&gt;</span>      - Hand an item to an NPC (for delivery missions)
+          <span style='color: #34d399;'>talk &lt;npc&gt;</span>                 - Talk to an NPC
+          <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>    - Ask an NPC about a topic
+          <span style='color: #34d399;'>give &lt;item&gt; to &lt;npc&gt;</span>       - Hand an item to an NPC (for delivery missions)
 
         <span style='color: #fbbf24;'>Missions:</span>
-          <span style='color: #34d399;'>missions</span>                  - List your active missions
-          <span style='color: #34d399;'>mission &lt;slug&gt;</span>            - View details for a specific mission
-          <span style='color: #34d399;'>ask &lt;npc&gt; about missions</span>  - See what work an NPC is offering
-          <span style='color: #34d399;'>accept &lt;slug&gt;, acc, ac</span>    - Accept a mission (must be with giver)
-          <span style='color: #34d399;'>abandon &lt;slug&gt;</span>            - Drop an active mission
-          <span style='color: #34d399;'>turn_in &lt;slug&gt;, ti</span>        - Turn in a completed mission (must be with giver)
+          <span style='color: #34d399;'>missions</span>                   - List your active missions
+          <span style='color: #34d399;'>mission &lt;slug&gt;</span>             - View details for a specific mission
+          <span style='color: #34d399;'>ask &lt;npc&gt; about missions</span>   - See what work an NPC is offering
+          <span style='color: #34d399;'>accept &lt;slug&gt;, acc, ac</span>     - Accept a mission (must be with giver)
+          <span style='color: #34d399;'>abandon &lt;slug&gt;</span>             - Drop an active mission
+          <span style='color: #34d399;'>turn_in &lt;slug&gt;, ti</span>         - Turn in a completed mission (must be with giver)
 
         <span style='color: #fbbf24;'>Fabrication:</span>
           <span style='color: #34d399;'>schematics, schem, sch</span>     - Browse available schematics
-          <span style='color: #34d399;'>schematic &lt;slug&gt;</span>          - View schematic details &amp; ingredients
-          <span style='color: #34d399;'>fabricate &lt;slug&gt;, fab</span>     - Fabricate an item from a schematic
+          <span style='color: #34d399;'>schematic &lt;slug&gt;</span>           - View schematic details &amp; ingredients
+          <span style='color: #34d399;'>fabricate &lt;slug&gt;, fab</span>      - Fabricate an item from a schematic
 
         <span style='color: #fbbf24;'>Commerce:</span>
-          <span style='color: #34d399;'>shop, browse</span>              - View vendor inventory &amp; prices
-          <span style='color: #34d399;'>buy &lt;item&gt;</span>                - Purchase an item from vendor
-          <span style='color: #34d399;'>sell &lt;item&gt;</span>               - Sell an item to vendor
+          <span style='color: #34d399;'>shop, browse</span>               - View vendor inventory &amp; prices
+          <span style='color: #34d399;'>buy &lt;item&gt;</span>                 - Purchase an item from vendor
+          <span style='color: #34d399;'>sell &lt;item&gt;</span>                - Sell an item to vendor
 
         <span style='color: #fbbf24;'>Economy:</span>
-          <span style='color: #34d399;'>cache</span>                     - List your caches
-          <span style='color: #34d399;'>cache create</span>              - Create a new cache
-          <span style='color: #34d399;'>cache balance [addr]</span>      - Check balance
-          <span style='color: #34d399;'>cache history [addr]</span>      - Transaction history
-          <span style='color: #34d399;'>cache send &lt;amt&gt; &lt;to&gt;</span>     - Send CRED (opts: from &lt;src&gt;, memo &lt;text&gt;)
-          <span style='color: #34d399;'>cache default &lt;addr&gt;</span>      - Set default cache
-          <span style='color: #34d399;'>cache name &lt;addr&gt; &lt;nick&gt;</span>  - Nickname a cache
-          <span style='color: #34d399;'>cache abandon &lt;addr&gt;</span>      - Abandon a cache (WARNING: This is irreversible)
+          <span style='color: #34d399;'>cache</span>                      - List your caches
+          <span style='color: #34d399;'>cache create</span>               - Create a new cache
+          <span style='color: #34d399;'>cache balance [addr]</span>       - Check balance
+          <span style='color: #34d399;'>cache history [addr]</span>       - Transaction history
+          <span style='color: #34d399;'>cache send &lt;amt&gt; &lt;to&gt;</span>      - Send CRED (opts: from &lt;src&gt;, memo &lt;text&gt;)
+          <span style='color: #34d399;'>cache default &lt;addr&gt;</span>       - Set default cache
+          <span style='color: #34d399;'>cache name &lt;addr&gt; &lt;nick&gt;</span>   - Nickname a cache
+          <span style='color: #34d399;'>cache abandon &lt;addr&gt;</span>       - Abandon a cache (WARNING: This is irreversible)
 
         <span style='color: #fbbf24;'>Ledger:</span>
-          <span style='color: #34d399;'>chain latest</span>              - Recent global transactions
-          <span style='color: #34d399;'>chain tx &lt;hash&gt;</span>           - Look up a transaction
-          <span style='color: #34d399;'>chain cache &lt;addr&gt;</span>        - Public history for a cache
-          <span style='color: #34d399;'>chain supply</span>              - CRED supply overview
+          <span style='color: #34d399;'>chain latest</span>               - Recent global transactions
+          <span style='color: #34d399;'>chain tx &lt;hash&gt;</span>            - Look up a transaction
+          <span style='color: #34d399;'>chain cache &lt;addr&gt;</span>         - Public history for a cache
+          <span style='color: #34d399;'>chain supply</span>               - CRED supply overview
 
         <span style='color: #fbbf24;'>Mining:</span>
-          <span style='color: #34d399;'>rig</span>                       - Mining rig status
-          <span style='color: #34d399;'>rig on / rig off</span>          - Toggle mining
-          <span style='color: #34d399;'>rig install &lt;item&gt;</span>        - Install component (rig must be off)
-          <span style='color: #34d399;'>rig uninstall &lt;item&gt;</span>      - Remove component (rig must be off)
-          <span style='color: #34d399;'>rig inspect</span>               - Detailed rig view
+          <span style='color: #34d399;'>rig</span>                        - Mining rig status
+          <span style='color: #34d399;'>rig on / rig off</span>           - Toggle mining
+          <span style='color: #34d399;'>rig install &lt;item&gt;</span>         - Install component (rig must be off)
+          <span style='color: #34d399;'>rig uninstall &lt;item&gt;</span>       - Remove component (rig must be off)
+          <span style='color: #34d399;'>rig inspect</span>                - Detailed rig view
 
         <span style='color: #fbbf24;'>Den:</span>
-          <span style='color: #34d399;'>den</span>                       - View den status
-          <span style='color: #34d399;'>den rename &lt;name&gt;</span>         - Rename your den (80 char max)
-          <span style='color: #34d399;'>den describe &lt;text&gt;</span>       - Set den description
-          <span style='color: #34d399;'>den invite &lt;hackr&gt;</span>        - Invite a hackr (1 hour)
-          <span style='color: #34d399;'>den uninvite &lt;hackr&gt;</span>      - Revoke invite
-          <span style='color: #34d399;'>den lock</span>                  - Lock den (blocks entry &amp; exit)
-          <span style='color: #34d399;'>den unlock</span>                - Unlock den
-          <span style='color: #34d399;'>out</span>                       - Leave a den (shortcut for 'go out')
+          <span style='color: #34d399;'>den</span>                        - View den status
+          <span style='color: #34d399;'>den rename &lt;name&gt;</span>          - Rename your den (80 char max)
+          <span style='color: #34d399;'>den describe &lt;text&gt;</span>        - Set den description
+          <span style='color: #34d399;'>den invite &lt;hackr&gt;</span>         - Invite a hackr (1 hour)
+          <span style='color: #34d399;'>den uninvite &lt;hackr&gt;</span>       - Revoke invite
+          <span style='color: #34d399;'>den lock</span>                   - Lock den (blocks entry &amp; exit)
+          <span style='color: #34d399;'>den unlock</span>                 - Unlock den
+          <span style='color: #34d399;'>out</span>                        - Leave a den (shortcut for 'go out')
+
+        <span style='color: #fbbf24;'>Fixtures:</span>
+          <span style='color: #34d399;'>place &lt;f&gt;, install &lt;f&gt;</span>     - Install a fixture in your den
+          <span style='color: #34d399;'>unplace &lt;f&gt;, uninstall &lt;f&gt;</span> - Uninstall a fixture (must be empty)
+          <span style='color: #34d399;'>store &lt;item&gt; in &lt;f&gt;</span>        - Store an item in a fixture
+          <span style='color: #34d399;'>put &lt;item&gt; in &lt;f&gt;</span>          - Same as store
+          <span style='color: #34d399;'>retrieve &lt;item&gt; from &lt;f&gt;</span>   - Retrieve an item from a fixture
+          <span style='color: #34d399;'>peek &lt;f&gt;, search &lt;f&gt;</span>       - Inspect fixture contents
 
         <span style='color: #fbbf24;'>Social:</span>
-          <span style='color: #34d399;'>say &lt;message&gt;</span>             - Say something in the room
-          <span style='color: #34d399;'>who</span>                       - See who's online
+          <span style='color: #34d399;'>say &lt;message&gt;</span>              - Say something in the room
+          <span style='color: #34d399;'>who</span>                        - See who's online
 
         <span style='color: #fbbf24;'>Operative:</span>
-          <span style='color: #34d399;'>stat, stats, st</span>           - View your operative profile
-          <span style='color: #34d399;'>rep, reputation</span>           - View faction standings in detail
-          <span style='color: #34d399;'>clear, cls, cl</span>            - Clear the screen
-          <span style='color: #34d399;'>help, ?</span>                   - Show this help message
+          <span style='color: #34d399;'>stat, stats, st</span>            - View your operative profile
+          <span style='color: #34d399;'>rep, reputation</span>            - View faction standings in detail
+          <span style='color: #34d399;'>clear, cls, cl</span>             - Clear the screen
+          <span style='color: #34d399;'>help, ?</span>                    - Show this help message
       HELP
     end
 
@@ -924,6 +966,10 @@ module Grid
 
       if item.unicorn?
         return "<span style='color: #f87171;'>UNICORN items are irreducible. They cannot be salvaged.</span>"
+      end
+
+      if item.fixture? && item.placed?
+        return "<span style='color: #f87171;'>#{h(item.name)} is placed in your den. Unplace it first.</span>"
       end
 
       item_styled = h(item.name)
@@ -1208,6 +1254,17 @@ module Grid
       if props["effect_type"] == "redeem_den"
         output += "\n<span style='color: #a78bfa;'>▸ USE this item to claim a private den in the Residential District.</span>"
         output += "\n<span style='color: #9ca3af;'>  Type: <span style='color: #22d3ee;'>use #{h(item.name.downcase)}</span></span>"
+      end
+      if item.fixture?
+        cap = item.storage_capacity
+        if item.placed?
+          used = item.stored_items.count
+          output += "\n<span style='color: #a78bfa;'>Storage Fixture</span> <span style='color: #34d399;'>[PLACED]</span> <span style='color: #9ca3af;'>#{used}/#{cap} slots used</span>"
+          output += "\n<span style='color: #9ca3af;'>  Inspect: <span style='color: #22d3ee;'>peek #{h(item.name.downcase)}</span></span>"
+        else
+          output += "\n<span style='color: #a78bfa;'>Storage Fixture</span> <span style='color: #6b7280;'>[in inventory]</span> <span style='color: #9ca3af;'>#{cap} slots</span>"
+          output += "\n<span style='color: #9ca3af;'>  Place in your den: <span style='color: #22d3ee;'>place #{h(item.name.downcase)}</span></span>"
+        end
       end
       output
     end
@@ -2431,7 +2488,20 @@ module Grid
       lines = []
       lines << "<span style='color: #22d3ee; font-weight: bold;'>DEN STATUS :: #{h(den.name)}</span>"
       lines << "<span style='color: #fbbf24;'>Location:</span> <span style='color: #d0d0d0;'>#{h(den.grid_zone.name)}</span>"
-      lines << "<span style='color: #fbbf24;'>Storage:</span> <span style='color: #d0d0d0;'>#{den.den_floor_count}/#{Grid::DenService::DEN_STORAGE_CAP} items</span>"
+      lines << "<span style='color: #fbbf24;'>Floor:</span> <span style='color: #d0d0d0;'>#{den.den_floor_count}/#{Grid::DenService::DEN_STORAGE_CAP} items</span>"
+
+      fixtures = den.placed_fixtures.includes(:stored_items)
+      if fixtures.any?
+        lines << "<span style='color: #fbbf24;'>Fixtures (#{fixtures.size}/#{Grid::DenService::MAX_DEN_FIXTURES}):</span>"
+        fixtures.each do |f|
+          used = f.stored_items.size
+          cap = f.storage_capacity
+          lines << "  <span style='color: #a78bfa;'>#{h(f.name)}</span> <span style='color: #6b7280;'>(#{used}/#{cap} slots)</span>"
+        end
+      else
+        lines << "<span style='color: #6b7280;'>No fixtures installed.</span>"
+      end
+
       lines << "<span style='color: #fbbf24;'>Locked:</span> <span style='color: #{den.locked? ? "#f87171" : "#34d399"};'>#{den.locked? ? "YES" : "NO"}</span>"
 
       active_invites = GridDenInvite.active.where(hackr: hackr).includes(:guest)
@@ -2449,6 +2519,157 @@ module Grid
 
     def den_service
       @den_service ||= Grid::DenService.new(hackr)
+    end
+
+    # --- Fixture commands ---
+
+    def place_fixture_command(item_name)
+      return "<span style='color: #fbbf24;'>Place what? Usage: place &lt;fixture&gt;</span>" if item_name.empty?
+      return "<span style='color: #f87171;'>You can only place fixtures in your own den.</span>" unless in_own_den?
+
+      room = hackr.current_room
+
+      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+      unless item.fixture?
+        return "<span style='color: #f87171;'>#{h(item.name)} is not a fixture.</span>"
+      end
+
+      fixture_count = room.placed_fixtures.count
+      if fixture_count >= Grid::DenService::MAX_DEN_FIXTURES
+        return "<span style='color: #f87171;'>Fixture limit reached (#{fixture_count}/#{Grid::DenService::MAX_DEN_FIXTURES}). Unplace one first.</span>"
+      end
+
+      item.update!(room: room, grid_hackr: nil)
+
+      notifications = achievement_checker.check(:place_fixture, item_name: item.name)
+      notifications += achievement_checker.check(:fixtures_placed)
+      notifications += mission_progressor.record(:place_fixture, item_name: item.name)
+
+      output = "<span style='color: #34d399;'>Installed </span><span style='color: #a78bfa;'>#{h(item.name)}</span><span style='color: #34d399;'>. +#{item.storage_capacity} storage slots.</span>"
+      output = append_notifications(output, notifications)
+      {output: output, event: nil}
+    end
+
+    def unplace_fixture_command(item_name)
+      return "<span style='color: #fbbf24;'>Unplace what? Usage: unplace &lt;fixture&gt;</span>" if item_name.empty?
+      return "<span style='color: #f87171;'>You can only unplace fixtures from your own den.</span>" unless in_own_den?
+
+      room = hackr.current_room
+      item = room.placed_fixtures.find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>No placed fixture called '#{h(item_name)}' here.</span>" unless item
+
+      if item.stored_items.exists?
+        return "<span style='color: #f87171;'>#{h(item.name)} has items stored inside. Retrieve them first.</span>"
+      end
+
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        used = hackr.grid_items.in_inventory(hackr).count
+        if used >= hackr.inventory_capacity
+          return "<span style='color: #f87171;'>Inventory full (#{used}/#{hackr.inventory_capacity} slots). Make room first.</span>"
+        end
+
+        item.update!(grid_hackr: hackr, room: nil)
+      end
+      "<span style='color: #34d399;'>#{h(item.name)} uninstalled and returned to inventory.</span>"
+    end
+
+    def store_in_fixture_command(args)
+      in_idx = args.rindex { |w| w.downcase == "in" }
+      unless in_idx && in_idx > 0 && in_idx < args.length - 1
+        return "<span style='color: #fbbf24;'>Usage: store &lt;item&gt; in &lt;fixture&gt;</span>"
+      end
+
+      item_name = args[0...in_idx].join(" ")
+      fixture_name = args[(in_idx + 1)..].join(" ")
+
+      return "<span style='color: #f87171;'>You can only store items in fixtures in your own den.</span>" unless in_own_den?
+
+      room = hackr.current_room
+      fixture = room.placed_fixtures.find_by("LOWER(name) = ?", fixture_name.downcase)
+      return "<span style='color: #f87171;'>No placed fixture called '#{h(fixture_name)}' here.</span>" unless fixture
+
+      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      if item.fixture?
+        return "<span style='color: #f87171;'>You can't store a fixture inside another fixture.</span>"
+      end
+
+      ActiveRecord::Base.transaction do
+        fixture.lock!
+        cap = fixture.storage_capacity
+        stored_count = fixture.stored_items.count
+        if stored_count >= cap
+          return "<span style='color: #f87171;'>#{h(fixture.name)} is full (#{stored_count}/#{cap}).</span>"
+        end
+
+        item.update!(container: fixture, grid_hackr: nil, room: nil)
+
+        notifications = achievement_checker.check(:items_stored)
+        output = "<span style='color: #34d399;'>Stored </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #d0d0d0;'>#{h(item.name)}</span>"}<span style='color: #34d399;'> in </span><span style='color: #a78bfa;'>#{h(fixture.name)}</span><span style='color: #34d399;'>. (#{stored_count + 1}/#{cap} slots)</span>"
+        output = append_notifications(output, notifications)
+        {output: output, event: nil}
+      end
+    end
+
+    def retrieve_from_fixture_command(args)
+      from_idx = args.rindex { |w| w.downcase == "from" }
+      unless from_idx && from_idx > 0 && from_idx < args.length - 1
+        return "<span style='color: #fbbf24;'>Usage: retrieve &lt;item&gt; from &lt;fixture&gt;</span>"
+      end
+
+      item_name = args[0...from_idx].join(" ")
+      fixture_name = args[(from_idx + 1)..].join(" ")
+
+      return "<span style='color: #f87171;'>You can only retrieve items from fixtures in your own den.</span>" unless in_own_den?
+
+      room = hackr.current_room
+      fixture = room.placed_fixtures.find_by("LOWER(name) = ?", fixture_name.downcase)
+      return "<span style='color: #f87171;'>No placed fixture called '#{h(fixture_name)}' here.</span>" unless fixture
+
+      item = fixture.stored_items.find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>#{h(fixture.name)} doesn't contain '#{h(item_name)}'.</span>" unless item
+
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        used = hackr.grid_items.in_inventory(hackr).count
+        if used >= hackr.inventory_capacity
+          return "<span style='color: #f87171;'>Inventory full (#{used}/#{hackr.inventory_capacity} slots). Make room first.</span>"
+        end
+
+        item.update!(grid_hackr: hackr, container: nil)
+      end
+      "<span style='color: #34d399;'>Retrieved </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #d0d0d0;'>#{h(item.name)}</span>"}<span style='color: #34d399;'> from </span><span style='color: #a78bfa;'>#{h(fixture.name)}</span><span style='color: #34d399;'>.</span>"
+    end
+
+    def peek_fixture_command(fixture_name)
+      return "<span style='color: #fbbf24;'>Peek inside what? Usage: peek &lt;fixture&gt;</span>" if fixture_name.empty?
+
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      fixture = room.placed_fixtures.find_by("LOWER(name) = ?", fixture_name.downcase)
+      return "<span style='color: #f87171;'>No placed fixture called '#{h(fixture_name)}' here.</span>" unless fixture
+
+      cap = fixture.storage_capacity
+      stored = fixture.stored_items.to_a
+      slot_color = (stored.count >= cap) ? "#f87171" : "#9ca3af"
+
+      output = []
+      output << "<span style='color: #a78bfa; font-weight: bold;'>#{h(fixture.name)}</span> <span style='color: #{slot_color};'>[#{stored.count}/#{cap} slots]</span>"
+      if stored.any?
+        stored.each do |item|
+          name_display = item.unicorn? ? item.rainbow_name_html : "<span style='color: #{item.rarity_color};'>#{h(item.name)}</span>"
+          rarity_tag = item.rarity ? " <span style='color: #{item.rarity_color};'>[#{item.rarity_label}]</span>" : ""
+          qty_tag = (item.quantity.to_i > 1) ? " <span style='color: #6b7280;'>×#{item.quantity}</span>" : ""
+          output << "  ▸ #{name_display}#{rarity_tag}#{qty_tag}"
+        end
+      else
+        output << "  <span style='color: #6b7280;'>Empty.</span>"
+      end
+      output.join("\n")
     end
 
     # All den room IDs this hackr can enter: their own + actively invited.

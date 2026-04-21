@@ -7,6 +7,7 @@ module Grid
     class NotInDenOrCorridor < StandardError; end
 
     DEN_STORAGE_CAP = 16
+    MAX_DEN_FIXTURES = 3
     RESIDENTIAL_CORRIDOR_SLUG = "residential-corridor"
     MAX_SLUG_RETRIES = 3
 

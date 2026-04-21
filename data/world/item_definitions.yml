@@ -343,6 +343,86 @@ item_definitions:
     properties:
       effect_type: redeem_den
 
+  # ── Fixture Materials ────────────────────────────────────────────
+  - slug: alloy-plate
+    name: Alloy Plate
+    description: "Reinforced composite sheeting salvaged from GovCorp structural waste. Dense and workable."
+    item_type: material
+    rarity: common
+    value: 15
+    max_stack: 32
+    properties: {}
+
+  - slug: logic-core
+    name: Logic Core
+    description: "A compact processor substrate. Runs basic control firmware. Essential for anything smarter than a doorstop."
+    item_type: material
+    rarity: uncommon
+    value: 40
+    max_stack: 16
+    properties: {}
+
+  - slug: quantum-shard
+    name: Quantum Shard
+    description: "A fragment of crystallized quantum matter. Unstable but extremely dense. Handle with gloves."
+    item_type: material
+    rarity: rare
+    value: 150
+    max_stack: 8
+    properties: {}
+
+  - slug: synth-fiber
+    name: Synth Fiber
+    description: "Woven synthetic cabling stripped from decommissioned network conduits. Ideal for internal fixture wiring."
+    item_type: material
+    rarity: common
+    value: 10
+    max_stack: 32
+    properties: {}
+
+  - slug: cipher-chip
+    name: Cipher Chip
+    description: "An encryption module recovered from a GovCorp security terminal. Powers compartmentalized storage systems."
+    item_type: material
+    rarity: uncommon
+    value: 60
+    max_stack: 16
+    properties: {}
+
+  # ── Storage Fixtures ────────────────────────────────────────────
+  - slug: basic-data-rack
+    name: Basic Data Rack
+    description: "A compact open-frame rack for holding data media and small components. Nothing fancy, but it keeps things organized."
+    item_type: fixture
+    rarity: common
+    value: 50
+    max_stack: 1
+    properties:
+      storage_capacity: 8
+      fixture_type: data_rack
+
+  - slug: reinforced-locker
+    name: Reinforced Locker
+    description: "A heavy-duty locker with a mag-seal closure. Holds a significant volume and keeps curious hands out."
+    item_type: fixture
+    rarity: uncommon
+    value: 120
+    max_stack: 1
+    properties:
+      storage_capacity: 16
+      fixture_type: locker
+
+  - slug: cryo-vault
+    name: Cryo Vault
+    description: "A cryogenic storage unit that preserves volatile materials indefinitely. Quantum-shielded. Expensive to build. Worth every shard."
+    item_type: fixture
+    rarity: rare
+    value: 300
+    max_stack: 1
+    properties:
+      storage_capacity: 32
+      fixture_type: cryo_vault
+
   # ── Faction Items ──────────────────────────────────────────────
   - slug: fracture-beacon
     name: Fracture Beacon
