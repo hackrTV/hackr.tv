@@ -14,7 +14,7 @@ namespace :grid do
 
     hackr = GridHackr.find_by!(hackr_alias: hackr_alias)
     cache = GridCache.where(grid_hackr: hackr, is_default: true).first ||
-            GridCache.where(grid_hackr: hackr).active.first
+      GridCache.where(grid_hackr: hackr).active.first
     abort "ERROR: No active cache found for #{hackr_alias}." unless cache
 
     pool = (pool_key == "play") ? GridCache.gameplay_pool : GridCache.mining_pool
