@@ -6,7 +6,7 @@ class Admin::GridZonesController < Admin::ApplicationController
   before_action :set_zone, only: %i[edit update destroy]
 
   def index
-    @zones = GridZone.includes(:ambient_playlist, :grid_faction, :grid_rooms).order(:name)
+    @zones = GridZone.includes(:grid_region, :ambient_playlist, :grid_faction, :grid_rooms).order(:name)
   end
 
   def new
@@ -59,13 +59,14 @@ class Admin::GridZonesController < Admin::ApplicationController
   end
 
   def load_selects
+    @regions = GridRegion.order(:name)
     @factions = GridFaction.ordered
     @playlists = ZonePlaylist.order(:name)
   end
 
   def zone_params
     params.require(:grid_zone).permit(
-      :name, :slug, :description, :zone_type, :color_scheme, :grid_faction_id, :ambient_playlist_id
+      :name, :slug, :description, :zone_type, :color_scheme, :grid_region_id, :grid_faction_id, :ambient_playlist_id
     )
   end
 end
