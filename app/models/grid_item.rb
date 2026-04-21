@@ -13,6 +13,7 @@
 #  value                   :integer          default(0), not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  container_id            :integer
 #  grid_hackr_id           :integer
 #  grid_item_definition_id :integer          not null
 #  grid_mining_rig_id      :integer
@@ -20,18 +21,20 @@
 #
 # Indexes
 #
+#  index_grid_items_on_container_id             (container_id)
 #  index_grid_items_on_grid_hackr_id            (grid_hackr_id)
 #  index_grid_items_on_grid_item_definition_id  (grid_item_definition_id)
 #  index_grid_items_on_grid_mining_rig_id       (grid_mining_rig_id)
 #
 # Foreign Keys
 #
+#  container_id             (container_id => grid_items.id)
 #  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
 #
 class GridItem < ApplicationRecord
   has_paper_trail
 
-  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material].freeze
+  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material fixture].freeze
   RARITIES = %w[scrap ubiquitous common uncommon rare ultra_rare unicorn].freeze
   RARITY_LABELS = {
     "scrap" => "SCRAP",
@@ -60,6 +63,8 @@ class GridItem < ApplicationRecord
   belongs_to :room, class_name: "GridRoom", optional: true
   belongs_to :grid_hackr, optional: true
   belongs_to :grid_mining_rig, optional: true
+  belongs_to :container, class_name: "GridItem", optional: true
+  has_many :stored_items, class_name: "GridItem", foreign_key: :container_id, dependent: :restrict_with_error
 
   validates :name, presence: true
   validates :item_type, inclusion: {in: ITEM_TYPES, allow_nil: true}
@@ -67,9 +72,12 @@ class GridItem < ApplicationRecord
   validates :quantity, numericality: {greater_than: 0}, allow_nil: true
   validate :single_location
 
-  scope :in_room, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil) }
-  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil) }
+  scope :in_room, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
+  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil) }
   scope :installed_in, ->(rig) { where(grid_mining_rig: rig, grid_hackr: nil, room: nil) }
+  scope :on_floor, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil).where.not(item_type: "fixture") }
+  scope :placed_fixtures, ->(room) { where(room: room, item_type: "fixture", grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
+  scope :in_fixture, ->(fixture) { where(container: fixture) }
 
   RAINBOW_COLORS = %w[#ff6b6b #fbbf24 #34d399 #22d3ee #60a5fa #a78bfa].freeze
 
@@ -107,6 +115,18 @@ class GridItem < ApplicationRecord
     item_type == "rig_component"
   end
 
+  def fixture?
+    item_type == "fixture"
+  end
+
+  def storage_capacity
+    properties&.dig("storage_capacity").to_i
+  end
+
+  def placed?
+    fixture? && room_id.present?
+  end
+
   def slot
     properties&.dig("slot")
   end
@@ -117,11 +137,11 @@ class GridItem < ApplicationRecord
 
   private
 
-  # An item can only be in one place: room, inventory, or mining rig
+  # An item can only be in one place: room, inventory, mining rig, or container
   def single_location
-    locations = [room_id, grid_hackr_id, grid_mining_rig_id].compact.count
+    locations = [room_id, grid_hackr_id, grid_mining_rig_id, container_id].compact.count
     if locations > 1
-      errors.add(:base, "Item can only be in one location (room, inventory, or mining rig)")
+      errors.add(:base, "Item can only be in one location (room, inventory, mining rig, or container)")
     end
   end
 end

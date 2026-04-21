@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_120003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_120001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -343,6 +343,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_120003) do
   end
 
   create_table "grid_items", force: :cascade do |t|
+    t.integer "container_id"
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_hackr_id"
@@ -356,6 +357,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_120003) do
     t.integer "room_id"
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
+    t.index ["container_id"], name: "index_grid_items_on_container_id"
     t.index ["grid_hackr_id"], name: "index_grid_items_on_grid_hackr_id"
     t.index ["grid_item_definition_id"], name: "index_grid_items_on_grid_item_definition_id"
     t.index ["grid_mining_rig_id"], name: "index_grid_items_on_grid_mining_rig_id"
@@ -1121,6 +1123,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_120003) do
   add_foreign_key "grid_hackr_track_plays", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "tracks"
   add_foreign_key "grid_items", "grid_item_definitions"
+  add_foreign_key "grid_items", "grid_items", column: "container_id"
   add_foreign_key "grid_mission_objectives", "grid_missions", on_delete: :cascade
   add_foreign_key "grid_mission_rewards", "grid_missions", on_delete: :cascade
   add_foreign_key "grid_missions", "grid_factions", column: "min_rep_faction_id", on_delete: :nullify

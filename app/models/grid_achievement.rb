@@ -68,6 +68,8 @@ class GridAchievement < ApplicationRecord
     fabricate_count
     den_created
     items_stored
+    place_fixture
+    fixtures_placed
   ].freeze
 
   CATEGORIES = %w[grid music social meta progression].freeze
@@ -87,6 +89,7 @@ class GridAchievement < ApplicationRecord
     missions_completed_count
     fabricate_count
     items_stored
+    fixtures_placed
   ].freeze
 
   has_many :grid_hackr_achievements, dependent: :destroy

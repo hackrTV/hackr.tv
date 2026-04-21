@@ -714,6 +714,7 @@ namespace :data do
         item_type: attrs["item_type"],
         rarity: attrs["rarity"],
         value: attrs["value"] || 0,
+        max_stack: attrs["max_stack"],
         properties: attrs["properties"] || {}
       )
       defn.save!

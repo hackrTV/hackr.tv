@@ -71,10 +71,22 @@ class GridRoom < ApplicationRecord
   end
 
   def den_floor_items
-    grid_items.where(grid_hackr_id: nil, grid_mining_rig_id: nil)
+    grid_items.on_floor(self)
   end
 
   def den_floor_count
     den_floor_items.count
+  end
+
+  def placed_fixtures
+    grid_items.placed_fixtures(self)
+  end
+
+  def den_fixture_capacity
+    placed_fixtures.sum { |f| f.storage_capacity }
+  end
+
+  def den_stored_in_fixtures_count
+    GridItem.where(container_id: placed_fixtures.select(:id)).count
   end
 end

@@ -729,8 +729,8 @@ achievements:
     xp_reward: 100
     cred_reward: 0
 
-  - slug: pack_rat
-    name: "Pack Rat"
+  - slug: den_stash
+    name: "Den Stash"
     description: "Stored 5 items in your den."
     badge_icon: "STR"
     category: grid
@@ -742,7 +742,7 @@ achievements:
 
   - slug: den_hoarder
     name: "Den Hoarder"
-    description: "Filled your den storage to capacity."
+    description: "Stored 16 items in your den."
     badge_icon: "FUL"
     category: grid
     trigger_type: items_stored
@@ -750,3 +750,25 @@ achievements:
       count: 16
     xp_reward: 100
     cred_reward: 0
+
+  # --- Fixtures ---
+  - slug: den_architect
+    name: "Den Architect"
+    description: "Placed your first storage fixture."
+    badge_icon: "FIX"
+    category: grid
+    trigger_type: place_fixture
+    trigger_data: {}
+    xp_reward: 25
+    cred_reward: 0
+
+  - slug: den_outfitter
+    name: "Den Outfitter"
+    description: "Placed 3 unique fixtures in your den."
+    badge_icon: "FIX"
+    category: grid
+    trigger_type: fixtures_placed
+    trigger_data:
+      count: 3
+    xp_reward: 75
+    cred_reward: 5
