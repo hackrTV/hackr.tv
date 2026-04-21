@@ -15,6 +15,7 @@ schematics:
     output_quantity: 1
     xp_reward: 15
     required_clearance: 0
+    required_room_type: den
     published: true
     position: 10
     ingredients:
@@ -29,6 +30,7 @@ schematics:
     output_quantity: 1
     xp_reward: 20
     required_clearance: 0
+    required_room_type: den
     published: true
     position: 20
     ingredients:
@@ -46,6 +48,7 @@ schematics:
     output_quantity: 1
     xp_reward: 12
     required_clearance: 0
+    required_room_type: den
     published: true
     position: 30
     ingredients:
@@ -63,6 +66,7 @@ schematics:
     output_quantity: 1
     xp_reward: 10
     required_clearance: 0
+    required_room_type: den
     published: true
     position: 40
     ingredients:
@@ -77,6 +81,7 @@ schematics:
     output_quantity: 1
     xp_reward: 25
     required_clearance: 0
+    required_room_type: den
     published: true
     position: 50
     ingredients:

@@ -47,5 +47,9 @@ FactoryBot.define do
     trait :clearance_gated do
       required_clearance { 5 }
     end
+
+    trait :den_required do
+      required_room_type { "den" }
+    end
   end
 end

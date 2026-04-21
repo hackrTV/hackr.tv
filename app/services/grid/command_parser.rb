@@ -1008,7 +1008,7 @@ module Grid
       inventory_qtys = hackr.grid_items.group(:grid_item_definition_id).sum(:quantity)
       gate_ctx = schematic_gate_context
 
-      available, locked = all_schematics.partition { |s| s.craftable_by?(hackr, **gate_ctx) }
+      available, locked = all_schematics.partition { |s| s.craftable_by?(hackr, **gate_ctx, current_room: hackr.current_room) }
 
       output = []
       output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
@@ -1056,8 +1056,8 @@ module Grid
         .find_by(slug: slug.downcase)
       return "<span style='color: #f87171;'>Unknown schematic: #{h(slug)}. Use 'schematics' to browse.</span>" unless schematic
 
-      unless schematic.craftable_by?(hackr, **schematic_gate_context)
-        return "<span style='color: #f87171;'>You don't meet the requirements for this schematic.</span>"
+      unless schematic.craftable_by?(hackr, **schematic_gate_context, current_room: hackr.current_room)
+        return craftability_error_for(schematic)
       end
 
       output = []
@@ -1100,8 +1100,8 @@ module Grid
         .find_by(slug: recipe_slug.downcase)
       return "<span style='color: #f87171;'>Unknown schematic: #{h(recipe_slug)}. Use 'schematics' to browse.</span>" unless schematic
 
-      unless schematic.craftable_by?(hackr, **schematic_gate_context)
-        return "<span style='color: #f87171;'>You don't meet the requirements for this schematic.</span>"
+      unless schematic.craftable_by?(hackr, **schematic_gate_context, current_room: hackr.current_room)
+        return craftability_error_for(schematic)
       end
 
       begin
@@ -1740,6 +1740,7 @@ module Grid
 
     def rig_install_command(rig, item_name)
       return "<span style='color: #fbbf24;'>Install what? Usage: rig install &lt;item&gt;</span>" if item_name.blank?
+      return "<span style='color: #f87171;'>Your rig isn't here. It's in your Den.</span>" unless in_own_den?
       return "<span style='color: #f87171;'>Your rig must be powered down before modifying components. Use 'rig off' first.</span>" if rig.active?
 
       item = hackr.grid_items.where(grid_mining_rig_id: nil).find_by("LOWER(name) = ?", item_name.downcase)
@@ -1773,6 +1774,7 @@ module Grid
 
     def rig_uninstall_command(rig, item_name)
       return "<span style='color: #fbbf24;'>Uninstall what? Usage: rig uninstall &lt;component&gt;</span>" if item_name.blank?
+      return "<span style='color: #f87171;'>Your rig isn't here. It's in your Den.</span>" unless in_own_den?
       return "<span style='color: #f87171;'>Your rig must be powered down before modifying components. Use 'rig off' first.</span>" if rig.active?
 
       item = rig.components.find_by("LOWER(name) = ?", item_name.downcase)
@@ -1921,6 +1923,18 @@ module Grid
 
     def mission_progressor
       @mission_progressor ||= Grid::MissionProgressor.new(hackr)
+    end
+
+    def in_own_den?
+      hackr.current_room&.owned_den_of?(hackr)
+    end
+
+    def craftability_error_for(schematic)
+      if schematic.required_room_type.present? && schematic.craftable_by?(hackr, **schematic_gate_context)
+        "<span style='color: #f87171;'>You can only fabricate this item at #{schematic.room_type_label}.</span>"
+      else
+        "<span style='color: #f87171;'>You don't meet the requirements for this schematic.</span>"
+      end
     end
 
     # Pre-loaded gate context for schematic craftable_by? checks.
