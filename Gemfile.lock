@@ -302,10 +302,10 @@ GEM
     request_store (1.7.0)
       rack (>= 1.4)
     rotp (6.3.0)
-    rqrcode (2.2.0)
+    rqrcode (3.2.0)
       chunky_png (~> 1.0)
-      rqrcode_core (~> 1.0)
-    rqrcode_core (1.2.0)
+      rqrcode_core (~> 2.0)
+    rqrcode_core (2.1.0)
     rspec-core (3.13.6)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.5)
@@ -455,7 +455,7 @@ DEPENDENCIES
   rails-controller-testing
   redcarpet
   rotp (~> 6.3)
-  rqrcode (~> 2.2)
+  rqrcode (~> 3.2)
   rspec-rails (~> 8.0)
   shoulda-matchers (~> 7.0)
   solid_cable
