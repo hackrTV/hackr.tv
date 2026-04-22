@@ -24,15 +24,15 @@ module Grid
     # `context` keys expected per trigger_type:
     #   :visit_room       → room_slug:
     #   :talk_npc         → npc_name:  (case-insensitive match on target_slug)
-    #   :collect_item     → item_name: (case-insensitive)
-    #   :deliver_item     → item_name:, npc_name:
+    #   :collect_item     → item_name:, amount: (default 1)
+    #   :deliver_item     → item_name:, npc_name:, amount: (default 1)
     #   :spend_cred       → amount:   (accumulator, capped at target_count)
-    #   :buy_item         → item_name:
+    #   :buy_item         → item_name:, amount: (default 1)
     #   :reach_rep        → faction_slug:, rep_value:  (threshold; rep_value is NEW value)
     #   :reach_clearance  → clearance: (threshold; NEW value)
     #   :use_item         → item_name:
-    #   :salvage_item     → item_name:
-    #   :salvage_yield_received → item_name: (name of yielded item)
+    #   :salvage_item     → item_name:, amount: (default 1)
+    #   :salvage_yield_received → item_name:, amount: (default 1)
     #   :fabricate_item   → item_name: (name of crafted output item)
     def record(trigger_type, context = {})
       return [] unless @hackr
@@ -143,14 +143,16 @@ module Grid
     end
 
     # Compute the new `progress` column value given the event semantics.
-    # Event-style triggers (visit, talk, take, use, salvage, buy, deliver)
-    # increment by 1 per event. Threshold triggers (spend_cred accumulates,
-    # reach_rep / reach_clearance take the NEW value directly) clamp to
-    # target_count so the `progress >= target_count` completion check fires.
+    # Event-style triggers increment by 1 (or by context[:amount] when
+    # present). Threshold triggers (spend_cred accumulates, reach_rep /
+    # reach_clearance take the NEW value directly) clamp to target_count
+    # so the `progress >= target_count` completion check fires.
     def next_progress_value(current, trigger_type, context, target_count)
       case trigger_type.to_s
-      when "visit_room", "talk_npc", "use_item", "salvage_item", "salvage_yield_received", "buy_item", "collect_item", "deliver_item", "fabricate_item", "place_fixture"
+      when "visit_room", "talk_npc", "use_item", "fabricate_item", "place_fixture"
         [current + 1, target_count].min
+      when "collect_item", "deliver_item", "buy_item", "salvage_item", "salvage_yield_received"
+        [current + context.fetch(:amount, 1).to_i, target_count].min
       when "spend_cred"
         [current + context[:amount].to_i, target_count].min
       when "reach_rep"
