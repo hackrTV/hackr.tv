@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -346,6 +346,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_120001) do
     t.integer "container_id"
     t.datetime "created_at", null: false
     t.text "description"
+    t.string "equipped_slot"
     t.integer "grid_hackr_id"
     t.integer "grid_item_definition_id", null: false
     t.integer "grid_mining_rig_id"
@@ -358,6 +359,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_120001) do
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
     t.index ["container_id"], name: "index_grid_items_on_container_id"
+    t.index ["grid_hackr_id", "equipped_slot"], name: "index_grid_items_on_hackr_equipped_slot_unique", unique: true, where: "equipped_slot IS NOT NULL"
     t.index ["grid_hackr_id"], name: "index_grid_items_on_grid_hackr_id"
     t.index ["grid_item_definition_id"], name: "index_grid_items_on_grid_item_definition_id"
     t.index ["grid_mining_rig_id"], name: "index_grid_items_on_grid_mining_rig_id"

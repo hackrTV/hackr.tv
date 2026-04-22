@@ -2,7 +2,7 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action :require_admin_api, only: [:debit]
 
@@ -129,6 +129,36 @@ class Api::GridController < ApplicationController
           craftable: craftable,
           has_ingredients: has_ingredients
         }
+      }
+    }
+  end
+
+  # GET /api/grid/loadout - Loadout data for the SPA page
+  def loadout_index
+    loadout = current_hackr.loadout_by_slot
+    effects = current_hackr.loadout_effects
+
+    inventory_gear = current_hackr.grid_items
+      .in_inventory(current_hackr)
+      .where(item_type: "gear")
+      .includes(:grid_item_definition)
+
+    render json: {
+      slots: GridItem::GEAR_SLOTS.map { |slot|
+        item = loadout[slot]
+        {
+          slot: slot,
+          label: GridHackr::Loadout::GEAR_SLOT_LABELS[slot],
+          item: item ? loadout_item_json(item) : nil
+        }
+      },
+      inventory_gear: inventory_gear.map { |item| loadout_item_json(item) },
+      active_effects: effects.reject { |_, v| v == 0 || v == false },
+      vitals: {
+        health: {current: current_hackr.stat("health"), max: current_hackr.effective_max("health")},
+        energy: {current: current_hackr.stat("energy"), max: current_hackr.effective_max("energy")},
+        psyche: {current: current_hackr.stat("psyche"), max: current_hackr.effective_max("psyche")},
+        inspiration: {current: current_hackr.stat("inspiration"), max: current_hackr.effective_max("inspiration")}
       }
     }
   end
@@ -603,6 +633,22 @@ class Api::GridController < ApplicationController
     Rails.logger.info "=== BROADCASTING to room #{room.id} (#{room.name}): #{event.inspect} ==="
     GridChannel.broadcast_to(room, event)
     Rails.logger.info "=== BROADCAST COMPLETE ==="
+  end
+
+  def loadout_item_json(item)
+    {
+      id: item.id,
+      name: item.name,
+      rarity: item.rarity,
+      rarity_color: item.rarity_color,
+      rarity_label: item.rarity_label,
+      description: item.description,
+      gear_slot: item.gear_slot,
+      gear_slot_label: GridHackr::Loadout::GEAR_SLOT_LABELS[item.gear_slot] || item.gear_slot&.upcase,
+      equipped_slot: item.equipped_slot,
+      effects: item.gear_effects,
+      required_clearance: item.required_clearance
+    }
   end
 
   def room_json(room)

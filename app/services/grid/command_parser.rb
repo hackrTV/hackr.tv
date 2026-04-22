@@ -106,6 +106,12 @@ module Grid
         retrieve_from_fixture_command(args)
       when "peek", "search"
         peek_fixture_command(args.join(" "))
+      when "equip", "wear"
+        equip_command(args.join(" "))
+      when "unequip", "remove"
+        unequip_command(args.join(" "))
+      when "loadout", "lo"
+        loadout_command
       when "den"
         den_command(args)
       when "out"
@@ -221,7 +227,17 @@ module Grid
       other_hackrs = room.grid_hackrs.recently_active.where.not(id: hackr.id)
       if other_hackrs.any?
         output << ""
-        output << "<span style='color: #fbbf24;'>Hackrs:</span> <span style='color: #a78bfa;'>#{other_hackrs.map(&:hackr_alias).join(", ")}</span>"
+        hackr_entries = other_hackrs.map do |other|
+          visible = other.grid_items.equipped_by(other).where(equipped_slot: GridItem::VISIBLE_SLOTS)
+          gear_tag = if visible.any?
+            items = visible.map { |gi| "<span style='color: #{gi.rarity_color};'>#{h(gi.name)}</span>" }
+            " <span style='color: #6b7280;'>[#{items.join(", ")}]</span>"
+          else
+            ""
+          end
+          "<span style='color: #a78bfa;'>#{h(other.hackr_alias)}</span>#{gear_tag}"
+        end
+        output << "<span style='color: #fbbf24;'>Hackrs:</span> #{hackr_entries.join(", ")}"
       end
 
       output.join("\n")
@@ -452,7 +468,7 @@ module Grid
       return "<span style='color: #fbbf24;'>Drop what?</span>" if item_name.empty?
 
       item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
-      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+      return equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       # Fixtures must be placed via the place command
       if item.fixture?
@@ -768,6 +784,11 @@ module Grid
           <span style='color: #34d399;'>analyze &lt;item&gt;, an</span>         - Preview salvage yields before breaking down
           <span style='color: #34d399;'>examine &lt;target&gt;, x</span>        - Examine item, NPC, or hackr
 
+        <span style='color: #fbbf24;'>Loadout:</span>
+          <span style='color: #34d399;'>equip &lt;item&gt;, wear</span>         - Equip a gear item
+          <span style='color: #34d399;'>unequip &lt;item|slot&gt;, remove</span> - Remove equipped gear
+          <span style='color: #34d399;'>loadout, lo</span>                - View your current loadout
+
         <span style='color: #fbbf24;'>NPCs:</span>
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>                 - Talk to an NPC
           <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>    - Ask an NPC about a topic
@@ -887,10 +908,16 @@ module Grid
       output << "<span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>#{format_cred(total_balance)}</span> <span style='color: #6b7280;'>(total across all caches)</span>"
       output << ""
       output << "<span style='color: #fbbf24;'>VITALS:</span>"
-      output << "  <span style='color: #34d399;'>HEALTH      #{s["health"]}/100</span>"
-      output << "  <span style='color: #60a5fa;'>ENERGY      #{s["energy"]}/100</span>"
-      output << "  <span style='color: #c084fc;'>PSYCHE      #{s["psyche"]}/100</span>"
-      output << "  <span style='color: #f59e0b;'>INSPIRATION #{s["inspiration"]}/100</span>"
+      output << "  <span style='color: #34d399;'>HEALTH      #{s["health"]}/#{hackr.effective_max("health")}</span>"
+      output << "  <span style='color: #60a5fa;'>ENERGY      #{s["energy"]}/#{hackr.effective_max("energy")}</span>"
+      output << "  <span style='color: #c084fc;'>PSYCHE      #{s["psyche"]}/#{hackr.effective_max("psyche")}</span>"
+      output << "  <span style='color: #f59e0b;'>INSPIRATION #{s["inspiration"]}/#{hackr.effective_max("inspiration")}</span>"
+
+      equipped_count = hackr.grid_items.equipped_by(hackr).count
+      if equipped_count > 0
+        output << ""
+        output << "<span style='color: #fbbf24;'>LOADOUT:</span> <span style='color: #9ca3af;'>#{equipped_count}/#{GridItem::GEAR_SLOTS.size} slots</span> <span style='color: #6b7280;'>(use 'loadout' for details)</span>"
+      end
 
       if achievements.any?
         output << ""
@@ -959,6 +986,142 @@ module Grid
       output.join("\n")
     end
 
+    # --- Loadout commands ---
+
+    def equip_command(item_name)
+      return "<span style='color: #fbbf24;'>Equip what? Usage: equip &lt;item&gt;</span>" if item_name.empty?
+
+      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      unless item
+        candidate = hackr.grid_items.equipped_by(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+        if candidate
+          return "<span style='color: #f87171;'>#{h(candidate.name)} is already equipped.</span>"
+        end
+        return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>"
+      end
+
+      result = Grid::LoadoutService.equip!(hackr: hackr, item: item)
+
+      slot_label = GridHackr::Loadout::GEAR_SLOT_LABELS[result.slot] || result.slot.upcase
+      color = result.item.rarity_color
+      name_display = result.item.unicorn? ? result.item.rainbow_name_html : "<span style='color: #{color};'>#{h(result.item.name)}</span>"
+
+      lines = ["<span style='color: #34d399;'>Equipped </span>#{name_display}<span style='color: #9ca3af;'> → [#{slot_label}]</span>"]
+
+      if result.swapped_item
+        lines << "<span style='color: #9ca3af;'>  ↳ Swapped out: #{h(result.swapped_item.name)}</span>"
+      end
+
+      effects = result.item.gear_effects
+      if effects.any?
+        effect_parts = effects.reject { |_, v| v == 0 || v == false }.map do |key, val|
+          label = h(key.to_s.tr("_", " "))
+          (val == true) ? label : "#{label} +#{h(val.to_s)}"
+        end
+        lines << "<span style='color: #a78bfa;'>  Effects: #{effect_parts.join(", ")}</span>" if effect_parts.any?
+      end
+
+      output = lines.join("\n")
+
+      notifications = []
+      notifications += achievement_checker.check(:equip_item, item_name: result.item.name, slot: result.slot)
+      notifications += mission_progressor.record(:equip_item, item_name: result.item.name)
+      output = append_notifications(output, notifications) if notifications.any?
+
+      output
+    rescue Grid::LoadoutService::NotGear, Grid::LoadoutService::NoGearSlot => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::LoadoutService::ClearanceBlocked => e
+      "<span style='color: #f87171;'>ACCESS DENIED — #{h(e.message)}</span>"
+    rescue Grid::LoadoutService::ZoneRestricted, ArgumentError => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    def unequip_command(item_name)
+      return "<span style='color: #fbbf24;'>Unequip what? Usage: unequip &lt;item|slot&gt;</span>" if item_name.empty?
+
+      # Allow "unequip <slot>" as alternative
+      if GridItem::GEAR_SLOTS.include?(item_name.downcase)
+        result = Grid::LoadoutService.unequip_by_slot!(hackr: hackr, slot: item_name.downcase)
+        return format_unequip_output(result)
+      end
+
+      item = hackr.grid_items.equipped_by(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}' equipped.</span>" unless item
+
+      result = Grid::LoadoutService.unequip!(hackr: hackr, item: item)
+      format_unequip_output(result)
+    rescue Grid::LoadoutService::NotEquipped => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::LoadoutService::ZoneRestricted => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    def loadout_command
+      loadout = hackr.loadout_by_slot
+
+      lines = []
+      lines << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      lines << "<span style='color: #22d3ee; font-weight: bold;'>LOADOUT :: #{h(hackr.hackr_alias)}</span>"
+      lines << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      lines << ""
+
+      GridItem::GEAR_SLOTS.each do |slot|
+        label = GridHackr::Loadout::GEAR_SLOT_LABELS[slot] || slot.upcase
+        item = loadout[slot]
+        if item
+          color = item.rarity_color
+          name_display = item.unicorn? ? item.rainbow_name_html : "<span style='color: #{color};'>#{h(item.name)}</span>"
+          rarity_tag = " <span style='color: #{color};'>[#{item.rarity_label}]</span>"
+          effect_str = format_gear_effects(item.gear_effects)
+          effect_tag = effect_str.present? ? " <span style='color: #6b7280;'>#{effect_str}</span>" : ""
+          lines << "  <span style='color: #22d3ee;'>#{label.ljust(8)}</span> #{name_display}#{rarity_tag}#{effect_tag}"
+        else
+          lines << "  <span style='color: #22d3ee;'>#{label.ljust(8)}</span> <span style='color: #4b5563;'>-- empty --</span>"
+        end
+      end
+
+      total_effects = hackr.loadout_effects
+      if total_effects.any? { |_, v| v != 0 && v != false }
+        lines << ""
+        lines << "<span style='color: #fbbf24;'>Active Effects:</span>"
+        total_effects.reject { |_, v| v == 0 || v == false }.each do |key, val|
+          label = key.to_s.tr("_", " ")
+          display = (val == true) ? label : "#{label}: +#{val}"
+          lines << "  <span style='color: #34d399;'>#{h(display)}</span>"
+        end
+      end
+
+      lines << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      lines.join("\n")
+    end
+
+    def equipped_item_hint(item_name)
+      return nil unless hackr.grid_items.equipped_by(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      "<span style='color: #f87171;'>That item is equipped. Use 'unequip #{h(item_name)}' first.</span>"
+    end
+
+    def format_unequip_output(result)
+      slot_label = GridHackr::Loadout::GEAR_SLOT_LABELS[result.slot] || result.slot.upcase
+      color = result.item.rarity_color
+      name_display = result.item.unicorn? ? result.item.rainbow_name_html : "<span style='color: #{color};'>#{h(result.item.name)}</span>"
+
+      lines = ["<span style='color: #34d399;'>Unequipped </span>#{name_display}<span style='color: #9ca3af;'> from [#{slot_label}]</span>"]
+      result.vitals_clamped.each do |clamp|
+        lines << "<span style='color: #f87171;'>  ↳ #{clamp[:vital].capitalize} reduced to #{clamp[:new_value]} (cap lowered)</span>"
+      end
+      lines.join("\n")
+    end
+
+    def format_gear_effects(effects)
+      return "" if effects.blank?
+      parts = effects.reject { |_, v| v == 0 || v == false }.map do |key, val|
+        label = h(key.to_s.tr("_", " "))
+        (val == true) ? label : "+#{h(val.to_s)} #{label}"
+      end
+      parts.any? ? "[#{parts.join(", ")}]" : ""
+    end
+
     def use_command(item_name)
       return "<span style='color: #fbbf24;'>Use what?</span>" if item_name.empty?
 
@@ -990,7 +1153,7 @@ module Grid
       return "<span style='color: #fbbf24;'>Salvage what?</span>" if item_name.empty?
 
       item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
-      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+      return equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       if item.unicorn?
         return "<span style='color: #f87171;'>UNICORN items are irreducible. They cannot be salvaged.</span>"
@@ -1248,11 +1411,24 @@ module Grid
     def examine_hackr(target_hackr)
       cl = target_hackr.stat("clearance")
       achievements = target_hackr.grid_achievements.order(:name)
+      loadout = target_hackr.loadout_by_slot
 
       output = []
       output << "<span style='color: #a78bfa; font-weight: bold;'>#{h(target_hackr.hackr_alias)}</span> <span style='color: #9ca3af;'>:: CLEARANCE #{cl}</span>"
 
+      equipped_slots = loadout.select { |_, item| item }
+      if equipped_slots.any?
+        output << ""
+        output << "<span style='color: #fbbf24;'>LOADOUT:</span>"
+        equipped_slots.each do |slot, item|
+          label = GridHackr::Loadout::GEAR_SLOT_LABELS[slot] || slot.upcase
+          name_display = item.unicorn? ? item.rainbow_name_html : "<span style='color: #{item.rarity_color};'>#{h(item.name)}</span>"
+          output << "  <span style='color: #22d3ee;'>#{label.ljust(8)}</span> #{name_display}"
+        end
+      end
+
       if achievements.any?
+        output << ""
         badges = achievements.map { |a|
           icon = a.badge_icon.present? ? "#{a.badge_icon} " : ""
           "<span style='color: #fbbf24;'>#{icon}#{h(a.name)}</span>"
@@ -1290,6 +1466,23 @@ module Grid
         else
           output += "\n<span style='color: #a78bfa;'>Storage Fixture</span> <span style='color: #6b7280;'>[in inventory]</span> <span style='color: #9ca3af;'>#{cap} slots</span>"
           output += "\n<span style='color: #9ca3af;'>  Place in your den: <span style='color: #22d3ee;'>place #{h(item.name.downcase)}</span></span>"
+        end
+      end
+      if item.gear?
+        slot_label = item.gear_slot&.upcase&.tr("_", " ") || "UNKNOWN"
+        status = item.equipped? ? "<span style='color: #34d399;'>[EQUIPPED]</span>" : "<span style='color: #6b7280;'>[in inventory]</span>"
+        output += "\n<span style='color: #22d3ee;'>Gear Slot: #{slot_label}</span> #{status}"
+        output += " <span style='color: #fbbf24;'>Requires CLEARANCE #{item.required_clearance}</span>" if item.required_clearance > 0
+        effects = item.gear_effects
+        if effects.any?
+          output += "\n<span style='color: #a78bfa;'>Effects:</span>"
+          effects.each do |key, val|
+            label = key.to_s.tr("_", " ")
+            output += "\n  <span style='color: #34d399;'>#{h(label)}: #{h(val.to_s)}</span>"
+          end
+        end
+        unless item.equipped?
+          output += "\n<span style='color: #9ca3af;'>  Equip: <span style='color: #22d3ee;'>equip #{h(item.name.downcase)}</span></span>"
         end
       end
       output
@@ -1458,8 +1651,8 @@ module Grid
       "<span style='color: #34d399;'>Sold </span><span style='color: #d0d0d0;'>#{h(result[:item_name])}</span><span style='color: #34d399;'>#{h(qty_label)} for <span style='color: #fbbf24;'>#{format_cred(result[:sell_price])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
     rescue Grid::ShopService::AccessDenied => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
-    rescue Grid::ShopService::ItemNotFound => e
-      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ShopService::ItemNotFound
+      equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>"
     rescue Grid::ShopService::InsufficientStock => e
       "<span style='color: #fbbf24;'>#{h(e.message)}</span>"
     rescue Grid::TransactionService::InsufficientBalance
@@ -2248,7 +2441,7 @@ module Grid
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
-      return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+      return equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       qty = (parsed.quantity == :all) ? item.quantity : parsed.quantity
       return "<span style='color: #f87171;'>You only have #{item.quantity} #{h(item.name)} (requested #{qty}).</span>" if qty > item.quantity

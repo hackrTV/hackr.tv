@@ -51,10 +51,12 @@ module GridHackr::Stats
     INVENTORY_BASE_SLOTS + stat("bonus_inventory_slots").to_i
   end
 
-  # Adjust a vital (health/energy/psyche/inspiration) clamped to 0..100
+  # Adjust a vital (health/energy/psyche/inspiration) clamped to 0..max.
+  # Max defaults to 100 but may be raised by equipped gear via effective_max.
   def adjust_vital!(key, delta)
     current = stat(key)
-    clamped = (current + delta).clamp(0, 100)
+    max = effective_max(key.to_s)
+    clamped = (current + delta).clamp(0, max)
     set_stat!(key, clamped)
     clamped
   end

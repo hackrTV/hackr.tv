@@ -93,6 +93,8 @@ Rails.application.routes.draw do
   # we don't expose `/missions/:slug` as a Rails SPA path either.
   get "missions", to: "pages#spa_root", as: :missions
   get "schematics", to: "pages#spa_root", as: :schematics
+  get "loadout", to: "pages#spa_root", as: :loadout
+  get "gear", to: redirect("/loadout")
 
   # Codex (wiki) routes - SPA
   scope "codex" do
@@ -165,6 +167,7 @@ Rails.application.routes.draw do
     get "grid/achievements", to: "grid#achievements_index"
     get "grid/missions", to: "grid#missions_index"
     get "grid/schematics", to: "grid#schematics_index"
+    get "grid/loadout", to: "grid#loadout_index"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"
     get "grid/verify/:token", to: "grid#verify_token"

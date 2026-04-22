@@ -307,6 +307,8 @@ module Grid
         return true
       when "place_fixture"
         return true
+      when "equip_item"
+        return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
       when "manual"
         return false
       end

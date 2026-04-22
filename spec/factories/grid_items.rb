@@ -5,6 +5,7 @@
 #
 #  id                      :integer          not null, primary key
 #  description             :text
+#  equipped_slot           :string
 #  item_type               :string
 #  name                    :string
 #  properties              :json
@@ -21,10 +22,11 @@
 #
 # Indexes
 #
-#  index_grid_items_on_container_id             (container_id)
-#  index_grid_items_on_grid_hackr_id            (grid_hackr_id)
-#  index_grid_items_on_grid_item_definition_id  (grid_item_definition_id)
-#  index_grid_items_on_grid_mining_rig_id       (grid_mining_rig_id)
+#  index_grid_items_on_container_id                (container_id)
+#  index_grid_items_on_grid_hackr_id               (grid_hackr_id)
+#  index_grid_items_on_grid_item_definition_id     (grid_item_definition_id)
+#  index_grid_items_on_grid_mining_rig_id          (grid_mining_rig_id)
+#  index_grid_items_on_hackr_equipped_slot_unique  (grid_hackr_id,equipped_slot) UNIQUE WHERE equipped_slot IS NOT NULL
 #
 # Foreign Keys
 #
