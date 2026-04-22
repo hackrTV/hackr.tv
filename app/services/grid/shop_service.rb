@@ -31,8 +31,8 @@ module Grid
       end.compact
     end
 
-    # Buy an item from a vendor
-    def self.buy!(hackr:, mob:, item_name:)
+    # Buy item(s) from a vendor. Quantity defaults to 1.
+    def self.buy!(hackr:, mob:, item_name:, quantity: 1)
       raise AccessDenied, "This vendor doesn't sell anything" unless mob.vendor?
 
       clearance = hackr.stat("clearance")
@@ -43,31 +43,37 @@ module Grid
 
       raise ItemNotFound, "This vendor doesn't sell '#{item_name}'" unless listing
       raise AccessDenied, "CLEARANCE #{listing.min_clearance}+ required" if clearance < listing.min_clearance
-      raise InsufficientStock, "'#{listing.name}' is out of stock" if listing.out_of_stock?
 
-      price = effective_price(listing: listing, mob: mob, clearance: clearance)
+      unit_price = effective_price(listing: listing, mob: mob, clearance: clearance)
+      total_price = unit_price * quantity
       cache = hackr.default_cache
-      raise InsufficientBalance, "Insufficient CRED (need #{price}, have #{cache&.balance || 0})" unless cache && cache.balance >= price
+      raise InsufficientBalance, "Insufficient CRED (need #{total_price}, have #{cache&.balance || 0})" unless cache && cache.balance >= total_price
+
+      # Check stock availability for full quantity
+      unless listing.unlimited_stock?
+        raise InsufficientStock, "'#{listing.name}' is out of stock" if listing.out_of_stock?
+        raise InsufficientStock, "Only #{listing.stock} '#{listing.name}' in stock (requested #{quantity})" if listing.stock < quantity
+      end
 
       item = nil
 
       ActiveRecord::Base.transaction do
         # Optimistic stock decrement — prevents race condition
         unless listing.unlimited_stock?
-          updated = GridShopListing.where(id: listing.id).where("stock > 0")
-            .update_all("stock = stock - 1")
+          updated = GridShopListing.where(id: listing.id).where("stock >= ?", quantity)
+            .update_all(["stock = stock - ?", quantity])
           raise InsufficientStock, "'#{listing.name}' is out of stock" if updated == 0
         end
 
-        # Grant item first — fail fast on inventory full before touching CRED
+        # Grant items — fail fast on inventory full before touching CRED
         item = Grid::Inventory.grant_item!(
           hackr: hackr,
           definition: listing.grid_item_definition,
-          quantity: 1
+          quantity: quantity
         )
 
         # Split CRED: burn 70%, recycle 30% to gameplay pool
-        split_purchase!(hackr_cache: cache, amount: price, item_name: listing.name)
+        split_purchase!(hackr_cache: cache, amount: total_price, item_name: listing.name)
 
         # Record the shop transaction
         GridShopTransaction.create!(
@@ -75,51 +81,59 @@ module Grid
           grid_shop_listing: listing,
           grid_mob: mob,
           transaction_type: "buy",
-          quantity: 1,
-          price_paid: price,
-          burn_amount: burn_amount(price),
-          recycle_amount: price - burn_amount(price),
+          quantity: quantity,
+          price_paid: total_price,
+          burn_amount: burn_amount(total_price),
+          recycle_amount: total_price - burn_amount(total_price),
           created_at: Time.current
         )
       end
 
-      {listing: listing, item: item, price_paid: price, new_balance: cache.reload.balance}
+      {listing: listing, item: item, price_paid: total_price, quantity: quantity, new_balance: cache.reload.balance}
     end
 
-    # Sell an item to a vendor
-    def self.sell!(hackr:, mob:, item_name:)
+    # Sell item(s) to a vendor. Quantity defaults to 1; :all sells entire stack.
+    def self.sell!(hackr:, mob:, item_name:, quantity: 1)
       raise AccessDenied, "This vendor doesn't buy anything" unless mob.vendor?
 
-      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
       raise ItemNotFound, "You don't have '#{item_name}'" unless item
 
       # Find matching listing for sell price, or use item.value * SELL_PRICE_RATIO
       listing = mob.grid_shop_listings.joins(:grid_item_definition)
         .where("LOWER(grid_item_definitions.name) = ?", item_name.downcase)
         .first
-      sell_price = if listing
+      unit_sell_price = if listing
         listing.sell_price
       else
         (item.value * EconomyConfig::SELL_PRICE_RATIO).ceil
       end
-      sell_price = [sell_price, 1].max # minimum 1 CRED
+      unit_sell_price = [unit_sell_price, 1].max # minimum 1 CRED
 
       cache = hackr.default_cache
       raise AccessDenied, "You need a cache to receive CRED" unless cache
 
       item_name_saved = item.name
+      qty = nil
+      total_sell_price = nil
 
       ActiveRecord::Base.transaction do
+        item.lock!
+        qty = (quantity == :all) ? item.quantity : quantity.to_i
+        raise InsufficientStock, "You only have #{item.quantity} (requested #{qty})." if qty > item.quantity
+        total_sell_price = unit_sell_price * qty
+
         # Pay the hackr from gameplay pool
         Grid::TransactionService.mint_gameplay!(
           to_cache: cache,
-          amount: sell_price,
-          memo: "Sell: #{item.name}"
+          amount: total_sell_price,
+          memo: "Sell: #{item.name} ×#{qty}"
         )
 
-        # Remove the item
-        if item.quantity > 1
-          item.update!(quantity: item.quantity - 1)
+        # Remove the items
+        remaining = item.quantity - qty
+        if remaining > 0
+          item.update!(quantity: remaining)
         else
           item.destroy!
         end
@@ -130,15 +144,15 @@ module Grid
           grid_shop_listing: listing,
           grid_mob: mob,
           transaction_type: "sell",
-          quantity: 1,
-          price_paid: sell_price,
+          quantity: qty,
+          price_paid: total_sell_price,
           burn_amount: 0,
           recycle_amount: 0,
           created_at: Time.current
         )
       end
 
-      {item_name: item_name_saved, sell_price: sell_price, new_balance: cache.reload.balance}
+      {item_name: item_name_saved, sell_price: total_sell_price, quantity: qty, new_balance: cache.reload.balance}
     end
 
     # Compute effective price for a listing

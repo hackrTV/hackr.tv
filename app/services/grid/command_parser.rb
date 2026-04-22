@@ -386,6 +386,8 @@ module Grid
     end
 
     def take_command(item_name)
+      parsed = Grid::QuantityParser.parse(item_name)
+      item_name = parsed.remainder
       return "<span style='color: #fbbf24;'>Take what?</span>" if item_name.empty?
 
       room = hackr.current_room
@@ -404,21 +406,29 @@ module Grid
         return "<span style='color: #f87171;'>#{h(item.name)} has items stored inside. Retrieve them first.</span>"
       end
 
-      # Inventory capacity check
-      used = hackr.grid_items.in_inventory(hackr).count
-      if used >= hackr.inventory_capacity
-        return "<span style='color: #f87171;'>Inventory full (#{used}/#{hackr.inventory_capacity} slots). Drop, sell, or store items to make room.</span>"
+      saved_name = item.name
+      saved_unicorn = item.unicorn?
+      saved_rarity = item.rarity
+      qty = nil
+
+      ActiveRecord::Base.transaction do
+        qty = Grid::ItemTransfer.move!(
+          source_item: item,
+          quantity: parsed.quantity,
+          destination_type: :inventory,
+          destination: hackr
+        )
       end
 
-      item.update!(grid_hackr: hackr, room: nil)
+      increment_stat!("items_taken", qty)
 
-      increment_stat!("items_taken")
-
-      output = "<span style='color: #34d399;'>You take the </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>"}<span style='color: #34d399;'>.</span>"
-      notifications = achievement_checker.check(:take_item, item_name: item.name)
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
+      name_display = saved_unicorn ? "<span class='rarity-unicorn'>#{h(saved_name)}</span>" : "<span style='color: #34d399;'>#{h(saved_name)}</span>"
+      output = "<span style='color: #34d399;'>You take </span>#{name_display}<span style='color: #34d399;'>#{h(qty_label)}.</span>"
+      notifications = achievement_checker.check(:take_item, item_name: saved_name)
       notifications += achievement_checker.check(:items_collected)
-      notifications += achievement_checker.check(:rarity_owned, rarity: item.rarity) if item.rarity.present?
-      notifications += mission_progressor.record(:collect_item, item_name: item.name)
+      notifications += achievement_checker.check(:rarity_owned, rarity: saved_rarity) if saved_rarity.present?
+      notifications += mission_progressor.record(:collect_item, item_name: saved_name, amount: qty)
       output = append_notifications(output, notifications)
 
       {
@@ -426,16 +436,22 @@ module Grid
         event: {
           type: "take",
           hackr_alias: hackr.hackr_alias,
-          item_name: item.name,
+          item_name: saved_name,
           room_id: room.id
         }
       }
+    rescue Grid::InventoryErrors::InventoryFull => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ItemTransfer::InsufficientQuantity => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
     def drop_command(item_name)
+      parsed = Grid::QuantityParser.parse(item_name)
+      item_name = parsed.remainder
       return "<span style='color: #fbbf24;'>Drop what?</span>" if item_name.empty?
 
-      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       # Fixtures must be placed via the place command
@@ -451,21 +467,27 @@ module Grid
         return "<span style='color: #f87171;'>You can't drop items in someone else's den.</span>"
       end
 
-      # Den storage cap
-      if room.den? && room.owner_id == hackr.id
-        if room.den_floor_count >= Grid::DenService::DEN_STORAGE_CAP
-          return "<span style='color: #f87171;'>Den storage full (#{Grid::DenService::DEN_STORAGE_CAP}/#{Grid::DenService::DEN_STORAGE_CAP}). Take something first.</span>"
-        end
-      end
+      saved_name = item.name
+      saved_unicorn = item.unicorn?
+      qty = nil
 
-      item.update!(room: room, grid_hackr: nil)
+      ActiveRecord::Base.transaction do
+        qty = Grid::ItemTransfer.move!(
+          source_item: item,
+          quantity: parsed.quantity,
+          destination_type: :room,
+          destination: room
+        )
+      end
 
       notifications = []
       if room.den? && room.owner_id == hackr.id
         notifications += achievement_checker.check(:items_stored)
       end
 
-      output = "<span style='color: #34d399;'>You drop the </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #34d399;'>#{h(item.name)}</span>"}<span style='color: #34d399;'>.</span>"
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
+      name_display = saved_unicorn ? "<span class='rarity-unicorn'>#{h(saved_name)}</span>" : "<span style='color: #34d399;'>#{h(saved_name)}</span>"
+      output = "<span style='color: #34d399;'>You drop </span>#{name_display}<span style='color: #34d399;'>#{h(qty_label)}.</span>"
       output = append_notifications(output, notifications) if notifications.any?
 
       {
@@ -473,10 +495,14 @@ module Grid
         event: {
           type: "drop",
           hackr_alias: hackr.hackr_alias,
-          item_name: item.name,
+          item_name: saved_name,
           room_id: room.id
         }
       }
+    rescue Grid::ItemTransfer::DestinationFull => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ItemTransfer::InsufficientQuantity => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
     def examine_command(target)
@@ -735,17 +761,17 @@ module Grid
 
         <span style='color: #fbbf24;'>Items:</span>
           <span style='color: #34d399;'>inventory, inv, i</span>          - View your inventory
-          <span style='color: #34d399;'>take &lt;item&gt;</span>                - Pick up an item
-          <span style='color: #34d399;'>drop &lt;item&gt;</span>                - Drop an item
+          <span style='color: #34d399;'>take [qty|all] &lt;item&gt;</span>     - Pick up item(s) from the room
+          <span style='color: #34d399;'>drop [qty|all] &lt;item&gt;</span>     - Drop item(s) from inventory
           <span style='color: #34d399;'>use &lt;item&gt;</span>                 - Use an item
-          <span style='color: #34d399;'>salvage &lt;item&gt;, sal</span>        - Break down an item for XP
+          <span style='color: #34d399;'>salvage [qty|all] &lt;item&gt;</span>  - Break down item(s) for XP
           <span style='color: #34d399;'>analyze &lt;item&gt;, an</span>         - Preview salvage yields before breaking down
           <span style='color: #34d399;'>examine &lt;target&gt;, x</span>        - Examine item, NPC, or hackr
 
         <span style='color: #fbbf24;'>NPCs:</span>
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>                 - Talk to an NPC
           <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>    - Ask an NPC about a topic
-          <span style='color: #34d399;'>give &lt;item&gt; to &lt;npc&gt;</span>       - Hand an item to an NPC (for delivery missions)
+          <span style='color: #34d399;'>give [qty|all] &lt;item&gt; to &lt;npc&gt;</span> - Hand item(s) to an NPC (for delivery missions)
 
         <span style='color: #fbbf24;'>Missions:</span>
           <span style='color: #34d399;'>missions</span>                   - List your active missions
@@ -762,8 +788,8 @@ module Grid
 
         <span style='color: #fbbf24;'>Commerce:</span>
           <span style='color: #34d399;'>shop, browse</span>               - View vendor inventory &amp; prices
-          <span style='color: #34d399;'>buy &lt;item&gt;</span>                 - Purchase an item from vendor
-          <span style='color: #34d399;'>sell &lt;item&gt;</span>                - Sell an item to vendor
+          <span style='color: #34d399;'>buy [qty] &lt;item&gt;</span>            - Purchase item(s) from vendor
+          <span style='color: #34d399;'>sell [qty|all] &lt;item&gt;</span>      - Sell item(s) to vendor
 
         <span style='color: #fbbf24;'>Economy:</span>
           <span style='color: #34d399;'>cache</span>                      - List your caches
@@ -801,9 +827,9 @@ module Grid
         <span style='color: #fbbf24;'>Fixtures:</span>
           <span style='color: #34d399;'>place &lt;f&gt;, install &lt;f&gt;</span>     - Install a fixture in your den
           <span style='color: #34d399;'>unplace &lt;f&gt;, uninstall &lt;f&gt;</span> - Uninstall a fixture (must be empty)
-          <span style='color: #34d399;'>store &lt;item&gt; in &lt;f&gt;</span>        - Store an item in a fixture
-          <span style='color: #34d399;'>put &lt;item&gt; in &lt;f&gt;</span>          - Same as store
-          <span style='color: #34d399;'>retrieve &lt;item&gt; from &lt;f&gt;</span>   - Retrieve an item from a fixture
+          <span style='color: #34d399;'>store [qty|all] &lt;item&gt; in &lt;f&gt;</span>     - Store item(s) in a fixture
+          <span style='color: #34d399;'>put [qty|all] &lt;item&gt; in &lt;f&gt;</span>       - Same as store
+          <span style='color: #34d399;'>retrieve [qty|all] &lt;item&gt; from &lt;f&gt;</span> - Retrieve item(s) from a fixture
           <span style='color: #34d399;'>peek &lt;f&gt;, search &lt;f&gt;</span>       - Inspect fixture contents
 
         <span style='color: #fbbf24;'>Social:</span>
@@ -959,32 +985,32 @@ module Grid
     end
 
     def salvage_command(item_name)
+      parsed = Grid::QuantityParser.parse(item_name)
+      item_name = parsed.remainder
       return "<span style='color: #fbbf24;'>Salvage what?</span>" if item_name.empty?
 
-      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       if item.unicorn?
         return "<span style='color: #f87171;'>UNICORN items are irreducible. They cannot be salvaged.</span>"
       end
 
-      if item.fixture? && item.placed?
-        return "<span style='color: #f87171;'>#{h(item.name)} is placed in your den. Unplace it first.</span>"
-      end
-
       item_styled = h(item.name)
       begin
-        result = Grid::SalvageService.salvage!(hackr: hackr, item: item)
+        result = Grid::SalvageService.salvage!(hackr: hackr, item: item, quantity: parsed.quantity)
       rescue ArgumentError => e
         return "<span style='color: #f87171;'>#{h(e.message)}</span>"
       end
 
-      increment_stat!("salvage_count")
+      qty = result.quantity_salvaged
+      increment_stat!("salvage_count", qty)
 
       level_msg = result.xp_result[:leveled_up] ?
         "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{result.xp_result[:new_clearance]}!</span>" : ""
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
       output = "<span style='color: #34d399;'>You salvage </span>#{item_styled}" \
-        "<span style='color: #34d399;'>. +#{result.xp_awarded} XP.</span>#{level_msg}"
+        "<span style='color: #34d399;'>#{h(qty_label)}. +#{result.xp_awarded} XP.</span>#{level_msg}"
 
       result.yielded_items.each do |yi|
         output += "\n<span style='color: #a78bfa;'>  ▸ Decomposed: </span>" \
@@ -994,7 +1020,7 @@ module Grid
 
       notifications = achievement_checker.check(:salvage_item)
       notifications += achievement_checker.check(:salvage_count)
-      notifications += mission_progressor.record(:salvage_item, item_name: result.item_name)
+      notifications += mission_progressor.record(:salvage_item, item_name: result.item_name, amount: qty)
 
       if result.yielded_items.any?
         total_yield_qty = result.yielded_items.sum { |yi| yi[:quantity] }
@@ -1002,7 +1028,7 @@ module Grid
 
         result.yielded_items.each do |yi|
           notifications += achievement_checker.check(:salvage_yield_received)
-          notifications += mission_progressor.record(:salvage_yield_received, item_name: yi[:name])
+          notifications += mission_progressor.record(:salvage_yield_received, item_name: yi[:name], amount: yi[:quantity])
         end
 
         notifications += achievement_checker.check(:salvage_yield_count)
@@ -1366,7 +1392,12 @@ module Grid
     end
 
     def buy_command(item_name)
-      return "<span style='color: #fbbf24;'>Buy what? Usage: buy &lt;item&gt;</span>" if item_name.empty?
+      parsed = Grid::QuantityParser.parse(item_name)
+      item_name = parsed.remainder
+      return "<span style='color: #fbbf24;'>Buy what? Usage: buy [qty] &lt;item&gt;</span>" if item_name.empty?
+
+      return "<span style='color: #f87171;'>Specify a number to buy, not 'all'.</span>" if parsed.quantity == :all
+      qty = parsed.quantity
 
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
@@ -1374,18 +1405,19 @@ module Grid
       vendor = room.grid_mobs.find_by(mob_type: "vendor")
       return "<span style='color: #9ca3af;'>There's no vendor here.</span>" unless vendor
 
-      result = Grid::ShopService.buy!(hackr: hackr, mob: vendor, item_name: item_name)
+      result = Grid::ShopService.buy!(hackr: hackr, mob: vendor, item_name: item_name, quantity: qty)
 
       item = result[:item]
       color = item.rarity_color
       name_display = item.unicorn? ? item.rainbow_name_html : "<span style='color: #{color};'>#{h(item.name)}</span>"
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
 
-      output = "<span style='color: #34d399;'>Purchased </span>#{name_display}<span style='color: #34d399;'> for <span style='color: #fbbf24;'>#{format_cred(result[:price_paid])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
+      output = "<span style='color: #34d399;'>Purchased </span>#{name_display}<span style='color: #34d399;'>#{h(qty_label)} for <span style='color: #fbbf24;'>#{format_cred(result[:price_paid])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
 
       rep_notif = grant_faction_rep(vendor.grid_faction, 2, reason: "buy:#{slugify(item.name)}", source: vendor)
       notifications = achievement_checker.check(:purchase_item, item_name: item.name)
       notifications.unshift(rep_notif) if rep_notif
-      notifications += mission_progressor.record(:buy_item, item_name: item.name)
+      notifications += mission_progressor.record(:buy_item, item_name: item.name, amount: qty)
       notifications += mission_progressor.record(:spend_cred, amount: result[:price_paid].to_i)
       if vendor.grid_faction
         notifications += mission_progressor.record(
@@ -1409,7 +1441,9 @@ module Grid
     end
 
     def sell_command(item_name)
-      return "<span style='color: #fbbf24;'>Sell what? Usage: sell &lt;item&gt;</span>" if item_name.empty?
+      parsed = Grid::QuantityParser.parse(item_name)
+      item_name = parsed.remainder
+      return "<span style='color: #fbbf24;'>Sell what? Usage: sell [qty|all] &lt;item&gt;</span>" if item_name.empty?
 
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
@@ -1417,13 +1451,17 @@ module Grid
       vendor = room.grid_mobs.find_by(mob_type: "vendor")
       return "<span style='color: #9ca3af;'>There's no vendor here.</span>" unless vendor
 
-      result = Grid::ShopService.sell!(hackr: hackr, mob: vendor, item_name: item_name)
+      result = Grid::ShopService.sell!(hackr: hackr, mob: vendor, item_name: item_name, quantity: parsed.quantity)
 
-      "<span style='color: #34d399;'>Sold </span><span style='color: #d0d0d0;'>#{h(result[:item_name])}</span><span style='color: #34d399;'> for <span style='color: #fbbf24;'>#{format_cred(result[:sell_price])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
+      qty = result[:quantity]
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
+      "<span style='color: #34d399;'>Sold </span><span style='color: #d0d0d0;'>#{h(result[:item_name])}</span><span style='color: #34d399;'>#{h(qty_label)} for <span style='color: #fbbf24;'>#{format_cred(result[:sell_price])} CRED</span>. Balance: #{format_cred(result[:new_balance])} CRED.</span>"
     rescue Grid::ShopService::AccessDenied => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     rescue Grid::ShopService::ItemNotFound => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ShopService::InsufficientStock => e
+      "<span style='color: #fbbf24;'>#{h(e.message)}</span>"
     rescue Grid::TransactionService::InsufficientBalance
       "<span style='color: #f87171;'>The vendor can't afford to buy that right now.</span>"
     end
@@ -2192,24 +2230,33 @@ module Grid
     # objective matches, the item is NOT consumed (flavor-only delivery)
     # and the NPC offers a non-committal line.
     def give_command(args)
-      return "<span style='color: #fbbf24;'>Usage: give &lt;item&gt; to &lt;npc&gt;</span>" if args.length < 3
+      return "<span style='color: #fbbf24;'>Usage: give [qty] &lt;item&gt; to &lt;npc&gt;</span>" if args.length < 3
 
       # Split on the last occurrence of "to" so multi-word item + NPC names
-      # round-trip correctly (e.g. "give Signal Fragment to Codec Prime").
+      # round-trip correctly (e.g. "give 5 Signal Fragment to Codec Prime").
       to_index = args.rindex { |w| w.downcase == "to" }
-      return "<span style='color: #fbbf24;'>Usage: give &lt;item&gt; to &lt;npc&gt;</span>" unless to_index && to_index > 0 && to_index < args.length - 1
+      return "<span style='color: #fbbf24;'>Usage: give [qty] &lt;item&gt; to &lt;npc&gt;</span>" unless to_index && to_index > 0 && to_index < args.length - 1
 
-      item_name = args[0...to_index].join(" ")
+      raw_item_part = args[0...to_index].join(" ")
       npc_name = args[(to_index + 1)..].join(" ")
+
+      parsed = Grid::QuantityParser.parse(raw_item_part)
+      item_name = parsed.remainder
+      return "<span style='color: #fbbf24;'>Usage: give [qty] &lt;item&gt; to &lt;npc&gt;</span>" if item_name.empty?
 
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
-      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      qty = (parsed.quantity == :all) ? item.quantity : parsed.quantity
+      return "<span style='color: #f87171;'>You only have #{item.quantity} #{h(item.name)} (requested #{qty}).</span>" if qty > item.quantity
 
       mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
       return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
+
+      saved_name = item.name
 
       # Wrap progressor + consumption in one transaction so a mid-flow
       # exception can't leave the objective advanced without the item
@@ -2217,10 +2264,18 @@ module Grid
       # progress (lost reward). All-or-nothing.
       notifications = []
       tx_committed = false
+      qty_insufficient = false
       begin
         ActiveRecord::Base.transaction do
+          item.lock!
+          # Re-check after lock — concurrent request may have consumed units
+          if qty > item.quantity
+            qty_insufficient = true
+            raise ActiveRecord::Rollback
+          end
+
           notifications = mission_progressor.record(
-            :deliver_item, item_name: item.name, npc_name: mob.name
+            :deliver_item, item_name: saved_name, npc_name: mob.name, amount: qty
           )
 
           if notifications.empty?
@@ -2230,9 +2285,10 @@ module Grid
             raise ActiveRecord::Rollback
           end
 
-          # Consume the item only when a delivery objective matched.
-          if item.quantity.to_i > 1
-            item.update!(quantity: item.quantity - 1)
+          # Consume the items only when a delivery objective matched.
+          remaining = item.quantity - qty
+          if remaining > 0
+            item.update!(quantity: remaining)
           else
             item.destroy!
           end
@@ -2248,6 +2304,10 @@ module Grid
         @mission_progressor = nil unless tx_committed
       end
 
+      if qty_insufficient
+        return "<span style='color: #f87171;'>You only have #{item.quantity} #{h(saved_name)} (requested #{qty}).</span>"
+      end
+
       if notifications.empty?
         return dialogue_box(
           "<span style='color: #c084fc;'>#{h(mob.name)}</span>: " \
@@ -2255,9 +2315,10 @@ module Grid
         )
       end
 
-      output = "<span style='color: #34d399;'>You hand the </span>" \
-        "<span style='color: #d0d0d0;'>#{h(item.name)}</span>" \
-        "<span style='color: #34d399;'> to </span>" \
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
+      output = "<span style='color: #34d399;'>You hand </span>" \
+        "<span style='color: #d0d0d0;'>#{h(saved_name)}</span>" \
+        "<span style='color: #34d399;'>#{h(qty_label)} to </span>" \
         "<span style='color: #c084fc;'>#{h(mob.name)}</span><span style='color: #34d399;'>.</span>"
       append_notifications(output, notifications)
     end
@@ -2578,11 +2639,15 @@ module Grid
     def store_in_fixture_command(args)
       in_idx = args.rindex { |w| w.downcase == "in" }
       unless in_idx && in_idx > 0 && in_idx < args.length - 1
-        return "<span style='color: #fbbf24;'>Usage: store &lt;item&gt; in &lt;fixture&gt;</span>"
+        return "<span style='color: #fbbf24;'>Usage: store [qty] &lt;item&gt; in &lt;fixture&gt;</span>"
       end
 
-      item_name = args[0...in_idx].join(" ")
+      raw_item_part = args[0...in_idx].join(" ")
       fixture_name = args[(in_idx + 1)..].join(" ")
+
+      parsed = Grid::QuantityParser.parse(raw_item_part)
+      item_name = parsed.remainder
+      return "<span style='color: #fbbf24;'>Usage: store [qty] &lt;item&gt; in &lt;fixture&gt;</span>" if item_name.empty?
 
       return "<span style='color: #f87171;'>You can only store items in fixtures in your own den.</span>" unless in_own_den?
 
@@ -2597,31 +2662,46 @@ module Grid
         return "<span style='color: #f87171;'>You can't store a fixture inside another fixture.</span>"
       end
 
+      saved_name = item.name
+      saved_unicorn = item.unicorn?
+      fixture_display = fixture.name
+      cap = fixture.storage_capacity
+      qty = nil
+
       ActiveRecord::Base.transaction do
-        fixture.lock!
-        cap = fixture.storage_capacity
-        stored_count = fixture.stored_items.count
-        if stored_count >= cap
-          return "<span style='color: #f87171;'>#{h(fixture.name)} is full (#{stored_count}/#{cap}).</span>"
-        end
-
-        item.update!(container: fixture, grid_hackr: nil, room: nil)
-
-        notifications = achievement_checker.check(:items_stored)
-        output = "<span style='color: #34d399;'>Stored </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #d0d0d0;'>#{h(item.name)}</span>"}<span style='color: #34d399;'> in </span><span style='color: #a78bfa;'>#{h(fixture.name)}</span><span style='color: #34d399;'>. (#{stored_count + 1}/#{cap} slots)</span>"
-        output = append_notifications(output, notifications)
-        {output: output, event: nil}
+        qty = Grid::ItemTransfer.move!(
+          source_item: item,
+          quantity: parsed.quantity,
+          destination_type: :fixture,
+          destination: fixture
+        )
       end
+
+      stored_count = fixture.stored_items.count
+      notifications = achievement_checker.check(:items_stored)
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
+      name_display = saved_unicorn ? "<span class='rarity-unicorn'>#{h(saved_name)}</span>" : "<span style='color: #d0d0d0;'>#{h(saved_name)}</span>"
+      output = "<span style='color: #34d399;'>Stored </span>#{name_display}<span style='color: #34d399;'>#{h(qty_label)} in </span><span style='color: #a78bfa;'>#{h(fixture_display)}</span><span style='color: #34d399;'>. (#{stored_count}/#{cap} slots)</span>"
+      output = append_notifications(output, notifications)
+      {output: output, event: nil}
+    rescue Grid::ItemTransfer::DestinationFull => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ItemTransfer::InsufficientQuantity => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
     def retrieve_from_fixture_command(args)
       from_idx = args.rindex { |w| w.downcase == "from" }
       unless from_idx && from_idx > 0 && from_idx < args.length - 1
-        return "<span style='color: #fbbf24;'>Usage: retrieve &lt;item&gt; from &lt;fixture&gt;</span>"
+        return "<span style='color: #fbbf24;'>Usage: retrieve [qty] &lt;item&gt; from &lt;fixture&gt;</span>"
       end
 
-      item_name = args[0...from_idx].join(" ")
+      raw_item_part = args[0...from_idx].join(" ")
       fixture_name = args[(from_idx + 1)..].join(" ")
+
+      parsed = Grid::QuantityParser.parse(raw_item_part)
+      item_name = parsed.remainder
+      return "<span style='color: #fbbf24;'>Usage: retrieve [qty] &lt;item&gt; from &lt;fixture&gt;</span>" if item_name.empty?
 
       return "<span style='color: #f87171;'>You can only retrieve items from fixtures in your own den.</span>" unless in_own_den?
 
@@ -2632,16 +2712,27 @@ module Grid
       item = fixture.stored_items.find_by("LOWER(name) = ?", item_name.downcase)
       return "<span style='color: #f87171;'>#{h(fixture.name)} doesn't contain '#{h(item_name)}'.</span>" unless item
 
-      ActiveRecord::Base.transaction do
-        hackr.lock!
-        used = hackr.grid_items.in_inventory(hackr).count
-        if used >= hackr.inventory_capacity
-          return "<span style='color: #f87171;'>Inventory full (#{used}/#{hackr.inventory_capacity} slots). Make room first.</span>"
-        end
+      saved_name = item.name
+      saved_unicorn = item.unicorn?
+      fixture_display = fixture.name
+      qty = nil
 
-        item.update!(grid_hackr: hackr, container: nil)
+      ActiveRecord::Base.transaction do
+        qty = Grid::ItemTransfer.move!(
+          source_item: item,
+          quantity: parsed.quantity,
+          destination_type: :inventory,
+          destination: hackr
+        )
       end
-      "<span style='color: #34d399;'>Retrieved </span>#{item.unicorn? ? item.rainbow_name_html : "<span style='color: #d0d0d0;'>#{h(item.name)}</span>"}<span style='color: #34d399;'> from </span><span style='color: #a78bfa;'>#{h(fixture.name)}</span><span style='color: #34d399;'>.</span>"
+
+      qty_label = (qty > 1) ? " ×#{qty}" : ""
+      name_display = saved_unicorn ? "<span class='rarity-unicorn'>#{h(saved_name)}</span>" : "<span style='color: #d0d0d0;'>#{h(saved_name)}</span>"
+      "<span style='color: #34d399;'>Retrieved </span>#{name_display}<span style='color: #34d399;'>#{h(qty_label)} from </span><span style='color: #a78bfa;'>#{h(fixture_display)}</span><span style='color: #34d399;'>.</span>"
+    rescue Grid::InventoryErrors::InventoryFull => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::ItemTransfer::InsufficientQuantity => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
     def peek_fixture_command(fixture_name)
