@@ -32,6 +32,7 @@
 class GridHackr < ApplicationRecord
   include ProfanityFilterable
   include GridHackr::Stats
+  include GridHackr::Loadout
 
   has_paper_trail ignore: %i[
     password_digest api_token_digest last_activity_at stats

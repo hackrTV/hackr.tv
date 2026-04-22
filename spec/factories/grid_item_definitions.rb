@@ -48,6 +48,14 @@ FactoryBot.define do
       properties { {"storage_capacity" => 8, "fixture_type" => "data_rack"} }
     end
 
+    trait :gear do
+      sequence(:slug) { |n| "gear-def-#{n}" }
+      sequence(:name) { |n| "Gear Item #{n}" }
+      item_type { "gear" }
+      max_stack { 1 }
+      properties { {"slot" => "head", "effects" => {}} }
+    end
+
     trait :rare do
       rarity { "rare" }
     end

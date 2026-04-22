@@ -5,6 +5,7 @@
 #
 #  id                      :integer          not null, primary key
 #  description             :text
+#  equipped_slot           :string
 #  item_type               :string
 #  name                    :string
 #  properties              :json
@@ -21,10 +22,11 @@
 #
 # Indexes
 #
-#  index_grid_items_on_container_id             (container_id)
-#  index_grid_items_on_grid_hackr_id            (grid_hackr_id)
-#  index_grid_items_on_grid_item_definition_id  (grid_item_definition_id)
-#  index_grid_items_on_grid_mining_rig_id       (grid_mining_rig_id)
+#  index_grid_items_on_container_id                (container_id)
+#  index_grid_items_on_grid_hackr_id               (grid_hackr_id)
+#  index_grid_items_on_grid_item_definition_id     (grid_item_definition_id)
+#  index_grid_items_on_grid_mining_rig_id          (grid_mining_rig_id)
+#  index_grid_items_on_hackr_equipped_slot_unique  (grid_hackr_id,equipped_slot) UNIQUE WHERE equipped_slot IS NOT NULL
 #
 # Foreign Keys
 #
@@ -34,7 +36,9 @@
 class GridItem < ApplicationRecord
   has_paper_trail
 
-  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material fixture].freeze
+  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material fixture gear].freeze
+  GEAR_SLOTS = %w[deck back chest head ears eyes left_wrist right_wrist hands neck waist legs feet].freeze
+  VISIBLE_SLOTS = %w[head eyes chest legs feet].freeze
   RARITIES = %w[scrap ubiquitous common uncommon rare ultra_rare unicorn].freeze
   RARITY_LABELS = {
     "scrap" => "SCRAP",
@@ -70,10 +74,13 @@ class GridItem < ApplicationRecord
   validates :item_type, inclusion: {in: ITEM_TYPES, allow_nil: true}
   validates :rarity, inclusion: {in: RARITIES, allow_nil: true}
   validates :quantity, numericality: {greater_than: 0}, allow_nil: true
+  validates :equipped_slot, inclusion: {in: GEAR_SLOTS, allow_nil: true}
   validate :single_location
+  validate :equipped_slot_requirements
 
   scope :in_room, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
-  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil) }
+  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil, equipped_slot: nil) }
+  scope :equipped_by, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil).where.not(equipped_slot: nil) }
   scope :installed_in, ->(rig) { where(grid_mining_rig: rig, grid_hackr: nil, room: nil) }
   scope :on_floor, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil).where.not(item_type: "fixture") }
   scope :placed_fixtures, ->(room) { where(room: room, item_type: "fixture", grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
@@ -135,6 +142,24 @@ class GridItem < ApplicationRecord
     properties&.dig("rate_multiplier")&.to_f || 1.0
   end
 
+  def gear?
+    item_type == "gear"
+  end
+
+  def equipped?
+    equipped_slot.present?
+  end
+
+  alias_method :gear_slot, :slot
+
+  def gear_effects
+    properties&.dig("effects") || {}
+  end
+
+  def required_clearance
+    properties&.dig("required_clearance").to_i
+  end
+
   private
 
   # An item can only be in one place: room, inventory, mining rig, or container
@@ -143,5 +168,11 @@ class GridItem < ApplicationRecord
     if locations > 1
       errors.add(:base, "Item can only be in one location (room, inventory, mining rig, or container)")
     end
+  end
+
+  def equipped_slot_requirements
+    return if equipped_slot.nil?
+    errors.add(:equipped_slot, "can only be set on gear items") unless gear?
+    errors.add(:equipped_slot, "requires a hackr owner") if grid_hackr_id.nil?
   end
 end
