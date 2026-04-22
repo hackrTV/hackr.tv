@@ -235,7 +235,7 @@ const VitalBar: React.FC<{ label: string; vital: VitalInfo; color: string }> = (
   )
 }
 
-function formatEffectLabel(key: string): string {
+function formatEffectLabel (key: string): string {
   return key.replace(/_/g, ' ')
 }
 
