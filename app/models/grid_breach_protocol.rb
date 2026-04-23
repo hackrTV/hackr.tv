@@ -30,7 +30,7 @@
 #  grid_hackr_breach_id  (grid_hackr_breach_id => grid_hackr_breaches.id) ON DELETE => cascade
 #
 class GridBreachProtocol < ApplicationRecord
-  PROTOCOL_TYPES = %w[trace feedback lock adapt].freeze
+  PROTOCOL_TYPES = %w[trace feedback lock adapt spike purge].freeze
   PROTOCOL_STATES = %w[idle charging active destroyed].freeze
 
   belongs_to :grid_hackr_breach

@@ -24,6 +24,8 @@ module Grid
         exec_command(args)
       when "analyze", "an"
         analyze_command(args.first)
+      when "reroute", "rr"
+        reroute_command(args.first)
       when "jackout", "jo"
         jackout_command
       when "status", "st"
@@ -96,15 +98,11 @@ module Grid
 
       append_notifications(output, notifications)
       output.join("\n")
-    rescue Grid::BreachActionService::NoActionsRemaining => e
-      "<span style='color: #f87171;'>#{h(e.message)}</span>"
-    rescue Grid::BreachActionService::ProgramNotLoaded => e
-      "<span style='color: #f87171;'>#{h(e.message)}</span>"
-    rescue Grid::BreachActionService::InsufficientBattery => e
-      "<span style='color: #f87171;'>#{h(e.message)}</span>"
-    rescue Grid::BreachActionService::InvalidTarget => e
-      "<span style='color: #f87171;'>#{h(e.message)}</span>"
-    rescue Grid::BreachActionService::ProtocolAlreadyDestroyed => e
+    rescue Grid::BreachActionService::NoActionsRemaining,
+      Grid::BreachActionService::ProgramNotLoaded,
+      Grid::BreachActionService::InsufficientBattery,
+      Grid::BreachActionService::InvalidTarget,
+      Grid::BreachActionService::ProtocolAlreadyDestroyed => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
@@ -131,11 +129,38 @@ module Grid
       output << round_output if round_output
 
       output.join("\n")
-    rescue Grid::BreachActionService::NoActionsRemaining => e
+    rescue Grid::BreachActionService::NoActionsRemaining,
+      Grid::BreachActionService::InvalidTarget,
+      Grid::BreachActionService::ProtocolAlreadyDestroyed => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
-    rescue Grid::BreachActionService::InvalidTarget => e
-      "<span style='color: #f87171;'>#{h(e.message)}</span>"
-    rescue Grid::BreachActionService::ProtocolAlreadyDestroyed => e
+    end
+
+    def reroute_command(target_str)
+      if target_str.nil?
+        return "<span style='color: #fbbf24;'>Usage: reroute &lt;target#&gt;</span>"
+      end
+
+      target_position = parse_target(target_str)
+      return "<span style='color: #f87171;'>Invalid target. Use protocol number (1, 2, 3...).</span>" unless target_position
+
+      result = Grid::BreachActionService.reroute!(
+        hackr: hackr,
+        target_position: target_position
+      )
+
+      output = []
+      output << "<span style='color: #22d3ee;'>REROUTE → Protocol [#{result.target_position + 1}] (#{result.protocol_type_label}) delayed.</span>"
+
+      # Check if round should end
+      breach.reload
+      round_output = maybe_end_round
+      output << round_output if round_output
+
+      output.join("\n")
+    rescue Grid::BreachActionService::NoActionsRemaining,
+      Grid::BreachActionService::InvalidTarget,
+      Grid::BreachActionService::ProtocolAlreadyDestroyed,
+      Grid::BreachActionService::AlreadyRerouted => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
@@ -193,6 +218,7 @@ module Grid
       output << ""
       output << "<span style='color: #fbbf24;'>exec &lt;program&gt; &lt;target#&gt;</span>  <span style='color: #9ca3af;'>Run software against a protocol (1 action + battery)</span>"
       output << "<span style='color: #fbbf24;'>analyze &lt;target#&gt;</span>           <span style='color: #9ca3af;'>Scan a protocol for intel (1 action)</span>"
+      output << "<span style='color: #fbbf24;'>reroute &lt;target#&gt;</span>           <span style='color: #9ca3af;'>Delay a protocol 1 round (1 action, 30% chance protocol fizzles on retry)</span>"
       output << "<span style='color: #fbbf24;'>jackout</span>                      <span style='color: #9ca3af;'>Abort the encounter</span>"
       output << ""
       output << "<span style='color: #6b7280;'>Free commands (no action cost):</span>"
@@ -200,7 +226,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>deck</span>                         <span style='color: #9ca3af;'>Show loaded software + battery</span>"
       output << "<span style='color: #fbbf24;'>help</span>                         <span style='color: #9ca3af;'>This reference</span>"
       output << ""
-      output << "<span style='color: #6b7280;'>Aliases: sh=exec, an=analyze, jo=jackout, st=status, dk=deck, ?=help</span>"
+      output << "<span style='color: #6b7280;'>Aliases: sh=exec, an=analyze, rr=reroute, jo=jackout, st=status, dk=deck, ?=help</span>"
       output.join("\n")
     end
 

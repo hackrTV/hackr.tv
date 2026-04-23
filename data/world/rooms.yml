@@ -49,3 +49,9 @@ rooms:
     description: "Ryker's domain. A cavernous space converted into a combination recording studio, performance venue, and resistance headquarters. Drum kits and recording equipment share space with server racks. Vintage analog gear - tape machines, tube amplifiers, physical mixing boards - stands alongside digital systems. Purple and cyan neon cuts through the darkness. The air vibrates with potential energy even when no one's playing."
     zone_slug: hackr-hangar
     room_type: faction_base
+
+  - name: "RestorePoint\u2122 Recovery Bay"
+    slug: restorepoint-lakeshore-bay
+    description: "You wake on a padded recovery slab under painfully neutral lighting. A holographic GovCorp logo rotates slowly overhead. A soothing voice intones: 'Welcome back to consciousness. Your RestorePoint\u2122 recovery fee has been automatically assessed. GovCorp cares.' The exit is to the south."
+    zone_slug: restorepoint-lakeshore
+    room_type: hospital

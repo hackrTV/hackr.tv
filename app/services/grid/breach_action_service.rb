@@ -5,6 +5,7 @@ module Grid
     ExecResult = Data.define(:hit, :damage_dealt, :program_name, :target_position,
       :protocol_destroyed, :battery_consumed, :all_destroyed)
     AnalyzeResult = Data.define(:target_position, :level_reached, :info_revealed, :bonus_action)
+    RerouteResult = Data.define(:target_position, :protocol_type_label)
 
     class NotInBreach < StandardError; end
     class NoActionsRemaining < StandardError; end
@@ -12,6 +13,7 @@ module Grid
     class InsufficientBattery < StandardError; end
     class InvalidTarget < StandardError; end
     class ProtocolAlreadyDestroyed < StandardError; end
+    class AlreadyRerouted < StandardError; end
 
     def self.exec!(hackr:, program_name:, target_position:)
       new(hackr).exec!(program_name, target_position)
@@ -19,6 +21,10 @@ module Grid
 
     def self.analyze!(hackr:, target_position:)
       new(hackr).analyze!(target_position)
+    end
+
+    def self.reroute!(hackr:, target_position:)
+      new(hackr).reroute!(target_position)
     end
 
     def initialize(hackr)
@@ -135,18 +141,30 @@ module Grid
         protocol.analyze_level = level_reached
         protocol.save!
 
-        # Progressive reveal
+        # Progressive reveal (with psyche degradation + ADAPT+TRACE penalty)
+        wrong_info = psyche_wrong_info?(protocol)
+
         info_revealed = case level_reached
         when 1
-          "Protocol type identified: #{protocol.type_label}."
+          if wrong_info
+            fake_type = (GridBreachProtocol::PROTOCOL_TYPES - [protocol.protocol_type]).sample
+            "Protocol type identified: #{fake_type.upcase}."
+          else
+            "Protocol type identified: #{protocol.type_label}."
+          end
         when 2
           weakness = protocol.weakness || Grid::BreachProtocol::Engine.weakness_for(protocol.protocol_type)
           # Assign weakness if not yet set
           if protocol.weakness.nil? && weakness
             protocol.update!(weakness: weakness)
           end
-          weakness_label = protocol.weakness || "none"
-          "Weakness revealed: #{weakness_label}."
+          if wrong_info
+            fake_weakness = (%w[offensive defensive utility] - [protocol.weakness]).sample
+            "Weakness revealed: #{fake_weakness}."
+          else
+            weakness_label = protocol.weakness || "none"
+            "Weakness revealed: #{weakness_label}."
+          end
         when 3
           "Full protocol analysis complete. Thresholds exposed."
         end
@@ -170,6 +188,44 @@ module Grid
         level_reached: level_reached,
         info_revealed: info_revealed,
         bonus_action: bonus_action
+      )
+    end
+
+    def reroute!(target_position)
+      breach = @hackr.active_breach
+      raise NotInBreach, "You are not in a BREACH encounter." unless breach
+      raise NoActionsRemaining, "No actions remaining this round." if breach.actions_remaining <= 0
+
+      protocol = find_protocol(breach, target_position)
+      raise AlreadyRerouted, "Protocol [#{target_position + 1}] is already rerouted." if protocol.rerouted?
+
+      ActiveRecord::Base.transaction do
+        breach.lock!
+        protocol.lock!
+
+        raise NoActionsRemaining, "No actions remaining this round." if breach.actions_remaining <= 0
+        raise AlreadyRerouted, "Protocol [#{target_position + 1}] is already rerouted." if protocol.rerouted?
+
+        # Can't reroute a protocol that's still charging or idle
+        if protocol.state == "charging"
+          raise InvalidTarget, "Protocol [#{target_position + 1}] is still charging — nothing to reroute."
+        end
+        if protocol.state == "idle"
+          raise InvalidTarget, "Protocol [#{target_position + 1}] is idle — nothing to reroute."
+        end
+
+        protocol.update_columns(rerouted: true)
+
+        # Consume action
+        breach.update!(actions_remaining: breach.actions_remaining - 1)
+
+        # Inspiration bump on reroute
+        bump_inspiration!(breach)
+      end
+
+      RerouteResult.new(
+        target_position: target_position,
+        protocol_type_label: protocol.type_label
       )
     end
 
@@ -211,7 +267,57 @@ module Grid
         end
       end
 
-      [base, 1].max # Always deal at least 1 damage
+      # Energy degradation: low energy reduces damage output
+      energy_mult = energy_damage_multiplier
+      return 0 if energy_mult <= 0.0 # 0 energy = no damage
+      base = (base * energy_mult).floor
+
+      [base, 1].max # Always deal at least 1 damage (when energy > 0)
+    end
+
+    # Energy scaling: damage reduction when energy is low.
+    # 0 energy = no damage at all.
+    def energy_damage_multiplier
+      energy = @hackr.stat("energy")
+      max_energy = @hackr.effective_max("energy")
+      return 0.0 if energy <= 0
+      ratio = energy.to_f / max_energy
+      if ratio >= 0.50
+        1.0
+      elsif ratio >= 0.25
+        0.90
+      elsif ratio >= 0.10
+        0.75
+      else
+        0.50
+      end
+    end
+
+    # Psyche degradation: chance of wrong info during analyze.
+    # ADAPT+TRACE synergy adds +15% wrong-info chance on adapted protocols.
+    def psyche_wrong_info?(protocol)
+      psyche = @hackr.stat("psyche")
+      max_psyche = @hackr.effective_max("psyche")
+
+      base_chance = if psyche <= 0
+        1.0
+      else
+        ratio = psyche.to_f / max_psyche
+        if ratio >= 0.50
+          0.0
+        elsif ratio >= 0.25
+          0.10
+        elsif ratio >= 0.10
+          0.20
+        else
+          0.40
+        end
+      end
+
+      # ADAPT+TRACE synergy: adapted protocols are harder to analyze
+      base_chance += 0.15 if protocol.meta["adapted"]
+
+      rand < base_chance
     end
   end
 end

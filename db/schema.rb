@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_200003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -525,9 +525,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_200003) do
   create_table "grid_regions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
+    t.integer "hospital_room_id"
     t.string "name", null: false
     t.string "slug", null: false
     t.datetime "updated_at", null: false
+    t.index ["hospital_room_id"], name: "index_grid_regions_on_hospital_room_id"
     t.index ["slug"], name: "index_grid_regions_on_slug", unique: true
   end
 
@@ -1207,6 +1209,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_200003) do
   add_foreign_key "grid_missions", "grid_mission_arcs", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_missions", column: "prereq_mission_id", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
+  add_foreign_key "grid_regions", "grid_rooms", column: "hospital_room_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "grid_hackrs", column: "owner_id"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"

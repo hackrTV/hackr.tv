@@ -3,7 +3,7 @@
 # Idempotent: find_or_initialize_by slug, skip if exists.
 #
 # protocol_composition: array of protocol definitions
-#   type: trace | feedback | lock | adapt
+#   type: trace | feedback | lock | adapt | spike | purge
 #   count: number of instances to spawn
 #   health/max_health: protocol durability
 #   charge_rounds: rounds before activation (0 = active immediately)
@@ -71,4 +71,115 @@ breach_templates:
         count: 1
         health: 45
         max_health: 45
+        charge_rounds: 3
+
+  - slug: data-vault-theta
+    name: "Encrypted Data Vault \u0398"
+    description: "A hardened GovCorp data vault. PURGE protocols bleed your rewards while SPIKE countermeasures target your neural link directly. Speed matters."
+    tier: standard
+    min_clearance: 10
+    pnr_threshold: 65
+    base_detection_rate: 6
+    cooldown_min: 600
+    cooldown_max: 1200
+    xp_reward: 300
+    cred_reward: 120
+    published: true
+    position: 3
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 2
+        weakness: defensive
+      - type: purge
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 1
+        weakness: utility
+      - type: feedback
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 1
+        weakness: offensive
+
+  - slug: rainn-nexus-gateway
+    name: "RAINN Nexus Gateway"
+    description: "A RAINN tri-node relay cluster. Triple TRACE protocols enable ADAPT mutation even at standard tier. Speed is critical — the detection clock accelerates fast."
+    tier: standard
+    min_clearance: 15
+    pnr_threshold: 65
+    base_detection_rate: 7
+    cooldown_min: 900
+    cooldown_max: 1500
+    xp_reward: 400
+    cred_reward: 150
+    published: true
+    position: 4
+    protocol_composition:
+      - type: trace
+        count: 3
+        health: 40
+        max_health: 40
+        charge_rounds: 0
+      - type: adapt
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 3
+      - type: feedback
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 1
+        weakness: offensive
+
+  - slug: rainn-command-relay
+    name: "RAINN Command Relay"
+    description: "A RAINN command-and-control relay node. Heavy protocol synergies — dual TRACE accelerates detection, ADAPT mutates weaknesses, SPIKE punishes hesitation."
+    tier: advanced
+    min_clearance: 20
+    pnr_threshold: 60
+    base_detection_rate: 7
+    cooldown_min: 900
+    cooldown_max: 1800
+    xp_reward: 500
+    cred_reward: 200
+    published: true
+    position: 5
+    protocol_composition:
+      - type: trace
+        count: 2
+        health: 55
+        max_health: 55
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 1
+        weakness: defensive
+      - type: lock
+        count: 1
+        health: 65
+        max_health: 65
+        charge_rounds: 2
+      - type: purge
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 0
+        weakness: utility
+      - type: adapt
+        count: 1
+        health: 40
+        max_health: 40
         charge_rounds: 3
