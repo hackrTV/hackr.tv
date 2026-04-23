@@ -288,7 +288,7 @@ RSpec.describe "BREACH Phase 2A" do
 
       # SPIKE×2 at positions 0,1 — FEEDBACK at position 2
       spike_protocols = breach.grid_breach_protocols.where(protocol_type: "spike").order(:position)
-      feedback_protocol = breach.grid_breach_protocols.find_by(protocol_type: "feedback")
+      breach.grid_breach_protocols.find_by(protocol_type: "feedback")
 
       breach.update!(actions_remaining: 0)
       Grid::BreachService.end_round!(hackr_breach: breach)
