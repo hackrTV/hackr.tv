@@ -168,13 +168,20 @@ module Grid
         output << "<span style='color: #f87171;'>[ DEN IS LOCKED ]</span>" if room.locked?
       end
 
-      # Breach target indicator
-      if room.breachable?
-        template = GridBreachTemplate.find_by(slug: room.breach_template_slug)
-        if template&.published?
-          output << ""
-          output << "<span style='color: #22d3ee; font-weight: bold;'>[ BREACH TARGET DETECTED ]</span> <span style='color: #9ca3af;'>#{h(template.name)} :: #{template.tier_label}</span>"
+      # Breach target indicator(s)
+      breach_encounters = Grid::BreachService.available_encounters(room: room, hackr: hackr)
+      if breach_encounters.any?
+        output << ""
+        if breach_encounters.size == 1
+          enc = breach_encounters.first
+          output << "<span style='color: #22d3ee; font-weight: bold;'>[ BREACH TARGET DETECTED ]</span> <span style='color: #9ca3af;'>#{h(enc.name)} :: #{enc.tier_label}</span>"
           output << "<span style='color: #6b7280;'>  Type 'breach' to initiate.</span>"
+        else
+          output << "<span style='color: #22d3ee; font-weight: bold;'>[ BREACH TARGETS DETECTED ]</span>"
+          breach_encounters.each_with_index do |enc, i|
+            output << "<span style='color: #9ca3af;'>  [#{i + 1}] #{h(enc.name)} :: #{enc.tier_label}</span>"
+          end
+          output << "<span style='color: #6b7280;'>  Type 'breach &lt;name or #&gt;' to initiate.</span>"
         end
       end
 
@@ -1272,16 +1279,17 @@ module Grid
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
-      unless room.breachable?
+      encounters = Grid::BreachService.available_encounters(room: room, hackr: hackr)
+      if encounters.empty?
         return "<span style='color: #f87171;'>Nothing to breach here.</span>"
       end
 
-      template = GridBreachTemplate.find_by(slug: room.breach_template_slug)
-      unless template&.published?
-        return "<span style='color: #f87171;'>Breach target is offline.</span>"
+      encounter = resolve_breach_target(encounters, target_name)
+      unless encounter
+        return "<span style='color: #f87171;'>No matching breach target. Type 'look' to see available targets.</span>"
       end
 
-      result = Grid::BreachService.start!(hackr: hackr, template: template)
+      result = Grid::BreachService.start!(hackr: hackr, encounter: encounter)
 
       output = []
       output << ""
@@ -1299,6 +1307,27 @@ module Grid
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     rescue Grid::BreachService::TemplateGated => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    # Resolve breach target from name or number
+    def resolve_breach_target(encounters, target_name)
+      # Single encounter + no target specified → auto-select
+      return encounters.first if encounters.size == 1 && target_name.blank?
+
+      # Must specify target when multiple encounters
+      return nil if target_name.blank? && encounters.size > 1
+
+      target = target_name.to_s.strip
+
+      # Try numeric index first (1-based)
+      if target.match?(/\A\d+\z/)
+        idx = target.to_i - 1
+        return encounters[idx] if idx >= 0 && idx < encounters.size
+        return nil # Out-of-range number — don't fall through to name search
+      end
+
+      # Try name match (case-insensitive, partial)
+      encounters.find { |enc| enc.name.downcase.include?(target.downcase) }
     end
 
     def equipped_item_hint(item_name)

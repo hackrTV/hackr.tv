@@ -1,0 +1,36 @@
+<%= form_with model: [:admin, encounter], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: ENCOUNTER PLACEMENT ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <%= f.label :grid_breach_template_id, "TEMPLATE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :grid_breach_template_id, @templates.map { |t| ["#{t.name} (#{t.tier_label})", t.id] }, { include_blank: "-- Select Template --" }, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <% if encounter.errors[:grid_breach_template_id].any? %>
+        <br><small class="red-255-text"><%= encounter.errors[:grid_breach_template_id].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :grid_room_id, "ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :grid_room_id, @rooms.map { |r| ["#{r.grid_zone.name} :: #{r.name}", r.id] }, { include_blank: "-- Select Room --" }, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <% if encounter.errors[:grid_room_id].any? %>
+        <br><small class="red-255-text"><%= encounter.errors[:grid_room_id].join(", ") %></small>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :state, "STATE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :state, GridBreachEncounter::STATES.map { |s| [s.upcase, s] }, {}, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+    </div>
+    <div>
+      <%= f.label :instance_seed, "INSTANCE SEED", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :instance_seed, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">Optional — procedural variation seed</small>
+    </div>
+  </div>
+
+  <div style="margin-top: 25px;">
+    <%= f.submit encounter.new_record? ? "Place Encounter" : "Update Encounter", class: "tui-button green-168", style: "padding: 8px 20px;" %>
+  </div>
+<% end %>

@@ -23,7 +23,6 @@ rooms:
     description: "Sterile white walls lined with surveillance feeds. Red warning lights pulse slowly. The oppressive atmosphere of total control permeates everything. You shouldn't be here. A RAINN patrol node blinks in the corner — its access port exposed."
     zone_slug: govcorp-surveillance
     room_type: govcorp
-    breach_template_slug: patrol-node-alpha
 
   - name: The Signal Bazaar
     slug: the-signal-bazaar

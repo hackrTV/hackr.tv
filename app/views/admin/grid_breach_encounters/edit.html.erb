@@ -1,0 +1,29 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/breach_encounters/<%= @encounter.id %> :: EDIT ENCOUNTER</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <%= render "form", encounter: @encounter %>
+
+      <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
+        <p style="color: #6b7280;">
+          Room: <span style="color: #d0d0d0;"><%= @encounter.grid_room&.name %></span> &middot;
+          Template: <span style="color: #d0d0d0;"><%= @encounter.grid_breach_template&.name %></span> &middot;
+          Created: <span style="color: #d0d0d0;"><%= @encounter.created_at&.strftime("%Y-%m-%d %H:%M") %></span>
+        </p>
+      </div>
+    </div>
+  </fieldset>
+</div>

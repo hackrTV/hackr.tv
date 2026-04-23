@@ -94,6 +94,13 @@ module Grid
 
         # Check all-destroyed win condition
         all_destroyed = breach.all_protocols_destroyed?
+
+        log_action!(breach, "exec", target_position, program.grid_item_definition&.slug, {
+          hit: damage > 0,
+          damage: damage,
+          destroyed: destroyed,
+          battery_consumed: battery_cost
+        })
       end
 
       ExecResult.new(
@@ -181,6 +188,12 @@ module Grid
 
         # Inspiration bump on analyze
         bump_inspiration!(breach)
+
+        log_action!(breach, "analyze", target_position, nil, {
+          level_reached: level_reached,
+          info: info_revealed,
+          bonus_action: bonus_action
+        })
       end
 
       AnalyzeResult.new(
@@ -221,6 +234,10 @@ module Grid
 
         # Inspiration bump on reroute
         bump_inspiration!(breach)
+
+        log_action!(breach, "reroute", target_position, nil, {
+          protocol_type: protocol.protocol_type
+        })
       end
 
       RerouteResult.new(
@@ -230,6 +247,17 @@ module Grid
     end
 
     private
+
+    def log_action!(breach, action_type, target_position, program_slug, result_data)
+      GridHackrBreachLog.create!(
+        grid_hackr_breach: breach,
+        round: breach.round_number,
+        action_type: action_type,
+        target: target_position&.to_s,
+        program_slug: program_slug,
+        result: result_data
+      )
+    end
 
     def find_loaded_program(deck, name)
       deck.loaded_software.find { |s| s.name.downcase == name.to_s.downcase }

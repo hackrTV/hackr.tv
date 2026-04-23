@@ -38,7 +38,8 @@ RSpec.describe "BREACH Phase 2A" do
   # Helper: start a breach and return the breach record
   def start_breach!(template: nil)
     template ||= create(:grid_breach_template)
-    result = Grid::BreachService.start!(hackr: hackr, template: template)
+    enc = create(:grid_breach_encounter, grid_breach_template: template, grid_room: room)
+    result = Grid::BreachService.start!(hackr: hackr, encounter: enc)
     result.hackr_breach
   end
 

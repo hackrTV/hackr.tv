@@ -37,6 +37,7 @@ class GridBreachTemplate < ApplicationRecord
 
   TIERS = %w[ambient standard advanced elite world_event].freeze
 
+  has_many :grid_breach_encounters, dependent: :restrict_with_error
   has_many :grid_hackr_breaches, dependent: :restrict_with_error
 
   validates :slug, presence: true, uniqueness: true,

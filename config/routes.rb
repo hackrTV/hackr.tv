@@ -408,6 +408,13 @@ Rails.application.routes.draw do
       end
     end
 
+    # BREACH encounters (placed in rooms)
+    resources :grid_breach_encounters, except: [:show] do
+      member do
+        get :history
+      end
+    end
+
     # Grid schematics (fabrication recipes)
     resources :grid_schematics, except: [:show] do
       member do
