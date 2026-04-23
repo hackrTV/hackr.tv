@@ -36,8 +36,8 @@ module Grid
       BREACH_RANK_TABLE.find { |range, _| range.include?(clearance.to_i) }&.last
     end
 
-    def self.start!(hackr:, template:)
-      new(hackr).start!(template)
+    def self.start!(hackr:, encounter:)
+      new(hackr).start!(encounter)
     end
 
     def self.end_round!(hackr_breach:)
@@ -56,13 +56,41 @@ module Grid
       new(hackr).jackout!
     end
 
+    # List voluntary encounters in a room, respecting cooldowns and gates.
+    # Lazy expiration: expired cooldowns are flushed on read rather than via
+    # a background job. Each check_cooldown! is a single UPDATE when the timer
+    # has elapsed, no-op otherwise. Acceptable trade-off vs. cron infrastructure.
+    def self.available_encounters(room:, hackr: nil)
+      encounters = room.grid_breach_encounters
+        .not_depleted
+        .includes(:grid_breach_template)
+        .select { |enc| enc.grid_breach_template.published? }
+
+      # Flush expired cooldowns (lazy expiration — see class comment above)
+      encounters.each(&:check_cooldown!)
+
+      # Filter to available state after cooldown check
+      encounters = encounters.select(&:available?)
+
+      # Apply hackr-specific gates if provided
+      if hackr
+        cl = hackr.stat("clearance")
+        encounters = encounters.select { |enc| cl >= enc.min_clearance }
+      end
+
+      encounters.sort_by { |enc| enc.grid_breach_template.position }
+    end
+
     def initialize(hackr)
       @hackr = hackr
     end
 
-    def start!(template)
+    def start!(encounter)
       raise AlreadyInBreach, "You are already in a BREACH encounter." if @hackr.in_breach?
+
+      template = encounter.grid_breach_template
       raise TemplateGated, "This encounter is not available." unless template.published?
+      raise TemplateGated, "This encounter is not available." unless encounter.available?
 
       cl = @hackr.stat("clearance")
       if cl < template.min_clearance
@@ -77,6 +105,10 @@ module Grid
 
       ActiveRecord::Base.transaction do
         @hackr.lock!
+        encounter.lock!
+
+        # Re-check availability after lock
+        raise TemplateGated, "This encounter is not available." unless encounter.available?
 
         # Mission prerequisite gate
         if template.requires_mission_slug.present?
@@ -93,28 +125,15 @@ module Grid
           raise TemplateGated, "Requires item: #{template.requires_item_slug}." unless has_item
         end
 
-        # Cooldown gate
-        if template.cooldown_min > 0
-          last_breach = @hackr.grid_hackr_breaches
-            .where(grid_breach_template: template)
-            .where(state: %w[success failure jacked_out])
-            .order(ended_at: :desc)
-            .first
-          if last_breach&.ended_at
-            cooldown_seconds = [template.cooldown_min, template.cooldown_max].max
-            cooldown_until = last_breach.ended_at + cooldown_seconds.seconds
-            if Time.current < cooldown_until
-              remaining = ((cooldown_until - Time.current) / 60.0).ceil
-              raise TemplateGated, "Encounter on cooldown. Available in #{remaining} minute(s)."
-            end
-          end
-        end
+        # Mark encounter as active
+        encounter.update!(state: "active")
 
         initial_actions = 1 # Always start with 1 action — inspiration ramps during encounter
 
         breach = GridHackrBreach.create!(
           grid_hackr: @hackr,
           grid_breach_template: template,
+          grid_breach_encounter: encounter,
           origin_room_id: @hackr.current_room_id,
           state: "active",
           detection_level: 0,
@@ -245,6 +264,9 @@ module Grid
 
         hackr_breach.update!(state: "success", ended_at: Time.current)
 
+        # Transition encounter to cooldown
+        transition_encounter_cooldown!(hackr_breach)
+
         # Grant XP
         xp_result = @hackr.grant_xp!(xp_awarded) if xp_awarded > 0
 
@@ -294,6 +316,9 @@ module Grid
         @hackr.lock! if wrap
 
         hackr_breach.update!(state: "failure", ended_at: Time.current)
+
+        # Transition encounter to cooldown
+        transition_encounter_cooldown!(hackr_breach)
 
         # Tier 1: vitals drain (all tiers get this)
         vitals_hit << drain_vital!("energy", 20)
@@ -353,6 +378,17 @@ module Grid
         end
 
         hackr_breach.update!(state: "jacked_out", ended_at: Time.current)
+
+        # Transition encounter to cooldown
+        transition_encounter_cooldown!(hackr_breach)
+
+        # Log jackout action
+        GridHackrBreachLog.create!(
+          grid_hackr_breach: hackr_breach,
+          round: hackr_breach.round_number,
+          action_type: "jackout",
+          result: {clean: clean}
+        )
       end
 
       vitals_hit.compact!
@@ -416,6 +452,25 @@ module Grid
     def clearance_ceiling
       rank_data = self.class.breach_rank(@hackr.stat("clearance"))
       rank_data ? rank_data[:ceiling] : 1
+    end
+
+    # Transition the encounter back to cooldown (or available if no cooldown).
+    # Called inside the breach-ending transaction. Wrapped in rescue to prevent
+    # a cooldown transition failure from leaving the encounter stuck in "active".
+    def transition_encounter_cooldown!(hackr_breach)
+      encounter = hackr_breach.grid_breach_encounter
+      return unless encounter # Ambient encounters have no persistent record
+
+      encounter.lock!
+      encounter.start_cooldown!
+    rescue => e
+      Rails.logger.error("[BreachService] Failed to transition encounter #{encounter.id} to cooldown: #{e.message}")
+      # Force encounter back to available so it's not stuck in "active"
+      begin
+        encounter.update_columns(state: "available", cooldown_until: nil)
+      rescue
+        nil
+      end
     end
 
     def drain_vital!(key, amount)

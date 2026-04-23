@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_23_120001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -172,6 +172,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
     t.index ["trigger_type"], name: "index_grid_achievements_on_trigger_type"
   end
 
+  create_table "grid_breach_encounters", force: :cascade do |t|
+    t.datetime "cooldown_until"
+    t.datetime "created_at", null: false
+    t.integer "grid_breach_template_id", null: false
+    t.integer "grid_room_id", null: false
+    t.integer "instance_seed"
+    t.string "state", default: "available", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_breach_template_id"], name: "index_grid_breach_encounters_on_grid_breach_template_id"
+    t.index ["grid_room_id", "grid_breach_template_id"], name: "index_breach_encounters_on_room_and_template"
+    t.index ["grid_room_id"], name: "index_grid_breach_encounters_on_grid_room_id"
+    t.index ["state"], name: "index_grid_breach_encounters_on_state"
+  end
+
   create_table "grid_breach_protocols", force: :cascade do |t|
     t.integer "charge_rounds", default: 0, null: false
     t.datetime "created_at", null: false
@@ -295,12 +309,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
     t.index ["grid_hackr_id"], name: "index_grid_hackr_achievements_on_grid_hackr_id"
   end
 
+  create_table "grid_hackr_breach_logs", force: :cascade do |t|
+    t.string "action_type", null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_breach_id", null: false
+    t.string "program_slug"
+    t.json "result", default: {}, null: false
+    t.integer "round", null: false
+    t.string "target"
+    t.index ["grid_hackr_breach_id", "round"], name: "index_breach_logs_on_breach_and_round"
+    t.index ["grid_hackr_breach_id"], name: "index_grid_hackr_breach_logs_on_grid_hackr_breach_id"
+  end
+
   create_table "grid_hackr_breaches", force: :cascade do |t|
     t.integer "actions_remaining", default: 1, null: false
     t.integer "actions_this_round", default: 1, null: false
     t.datetime "created_at", null: false
     t.integer "detection_level", default: 0, null: false
     t.datetime "ended_at"
+    t.integer "grid_breach_encounter_id"
     t.integer "grid_breach_template_id", null: false
     t.integer "grid_hackr_id", null: false
     t.integer "inspiration", default: 0, null: false
@@ -311,6 +338,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
     t.datetime "started_at", null: false
     t.string "state", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.index ["grid_breach_encounter_id"], name: "index_grid_hackr_breaches_on_grid_breach_encounter_id"
     t.index ["grid_breach_template_id"], name: "index_grid_hackr_breaches_on_grid_breach_template_id"
     t.index ["grid_hackr_id"], name: "index_grid_hackr_breaches_on_grid_hackr_id"
     t.index ["grid_hackr_id"], name: "index_hackr_breaches_one_active_per_hackr", unique: true, where: "state = 'active'"
@@ -564,7 +592,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
 
   create_table "grid_rooms", force: :cascade do |t|
     t.integer "ambient_playlist_id"
-    t.string "breach_template_slug"
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_zone_id", null: false
@@ -1180,6 +1207,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "feature_grants", "grid_hackrs"
+  add_foreign_key "grid_breach_encounters", "grid_breach_templates", on_delete: :restrict
+  add_foreign_key "grid_breach_encounters", "grid_rooms", on_delete: :cascade
   add_foreign_key "grid_breach_protocols", "grid_hackr_breaches", on_delete: :cascade
   add_foreign_key "grid_den_invites", "grid_hackrs", column: "guest_id"
   add_foreign_key "grid_den_invites", "grid_hackrs", column: "hackr_id"
@@ -1189,6 +1218,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_300001) do
   add_foreign_key "grid_factions", "grid_factions", column: "parent_id"
   add_foreign_key "grid_hackr_achievements", "grid_achievements"
   add_foreign_key "grid_hackr_achievements", "grid_hackrs"
+  add_foreign_key "grid_hackr_breach_logs", "grid_hackr_breaches", on_delete: :cascade
+  add_foreign_key "grid_hackr_breaches", "grid_breach_encounters", on_delete: :nullify
   add_foreign_key "grid_hackr_breaches", "grid_breach_templates", on_delete: :restrict
   add_foreign_key "grid_hackr_breaches", "grid_hackrs", on_delete: :cascade
   add_foreign_key "grid_hackr_breaches", "grid_rooms", column: "origin_room_id", on_delete: :nullify

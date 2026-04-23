@@ -1,0 +1,9 @@
+# BREACH Encounters — template placements in rooms.
+# Loaded by: rails data:breach_encounters (after breach_templates and rooms).
+# Idempotent: find_or_initialize_by template_slug + room_slug, skip if exists.
+
+breach_encounters:
+
+  - template_slug: patrol-node-alpha
+    room_slug: govcorp-surveillance-node
+    state: available

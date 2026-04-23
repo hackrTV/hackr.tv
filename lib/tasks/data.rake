@@ -28,6 +28,8 @@
 # 24. overlay_scene_groups (depends on scenes)
 # 25. redirects        (no deps)
 # 26. livestream_archive (depends on audio) - derived playlist
+# 27. breach_templates  (no deps)
+# 28. breach_encounters (depends on breach_templates, rooms)
 
 namespace :data do
   # === Master Tasks ===
@@ -187,7 +189,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, regions, zones, rooms, etc.)"
-  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics, :breach_templates]
+  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics, :breach_templates, :breach_encounters]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -237,6 +239,10 @@ namespace :data do
     OverlayElement.destroy_all
     PlaylistTrack.destroy_all
     Playlist.destroy_all
+    GridHackrBreachLog.destroy_all
+    GridHackrBreach.destroy_all
+    GridBreachEncounter.destroy_all
+    GridBreachTemplate.destroy_all
     GridItem.destroy_all
     GridMob.destroy_all
     GridExit.destroy_all
@@ -600,21 +606,11 @@ namespace :data do
         description: attrs["description"],
         grid_zone: zone,
         room_type: attrs["room_type"],
-        min_clearance: attrs["min_clearance"] || 0,
-        breach_template_slug: attrs["breach_template_slug"]
+        min_clearance: attrs["min_clearance"] || 0
       )
       room.save!
       created += 1
       puts "  ✓ Created: #{room.name}"
-    end
-
-    # Backfill breach_template_slug on existing rooms
-    rooms_data.select { |a| a["breach_template_slug"].present? }.each do |attrs|
-      room = GridRoom.find_by(slug: attrs["slug"])
-      next unless room
-      next if room.breach_template_slug == attrs["breach_template_slug"]
-      room.update!(breach_template_slug: attrs["breach_template_slug"])
-      puts "  ↻ Updated breach target: #{room.name} → #{attrs["breach_template_slug"]}"
     end
 
     # Assign RestorePoint™ hospital rooms to regions
@@ -879,6 +875,51 @@ namespace :data do
     end
 
     puts "BREACH Templates: #{created} created, #{GridBreachTemplate.count} total"
+  end
+
+  desc "Load BREACH encounters from YAML"
+  task breach_encounters: :environment do
+    puts "\n--- Loading BREACH Encounters ---"
+    yaml_file = Rails.root.join("data", "world", "breach_encounters.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    encounters_data = data["breach_encounters"]
+    created = 0
+
+    encounters_data.each do |attrs|
+      template = GridBreachTemplate.find_by(slug: attrs["template_slug"])
+      room = GridRoom.find_by(slug: attrs["room_slug"])
+
+      unless template
+        puts "  ✗ Template not found: #{attrs["template_slug"]}"
+        next
+      end
+      unless room
+        puts "  ✗ Room not found: #{attrs["room_slug"]}"
+        next
+      end
+
+      encounter = GridBreachEncounter.find_or_initialize_by(
+        grid_breach_template: template,
+        grid_room: room
+      )
+      next unless encounter.new_record?
+
+      encounter.assign_attributes(
+        state: attrs["state"] || "available",
+        instance_seed: attrs["instance_seed"]
+      )
+      encounter.save!
+      created += 1
+      puts "  ✓ Placed: #{template.name} → #{room.name}"
+    end
+
+    puts "BREACH Encounters: #{created} created, #{GridBreachEncounter.count} total"
   end
 
   desc "Sync existing grid_items with their current definitions"

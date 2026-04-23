@@ -34,8 +34,10 @@ RSpec.describe Grid::BreachActionService do
     create(:grid_item, grid_item_definition: software_def, grid_hackr: hackr, room: nil, deck_id: deck.id)
   end
 
+  let(:encounter) { create(:grid_breach_encounter, grid_breach_template: template, grid_room: room) }
+
   let!(:breach) do
-    result = Grid::BreachService.start!(hackr: hackr, template: template)
+    result = Grid::BreachService.start!(hackr: hackr, encounter: encounter)
     result.hackr_breach
   end
 

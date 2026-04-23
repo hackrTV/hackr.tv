@@ -7,6 +7,7 @@ RSpec.describe Grid::BreachService do
   let(:room) { create(:grid_room, grid_zone: zone) }
   let(:hackr) { create(:grid_hackr, current_room: room) }
   let(:template) { create(:grid_breach_template) }
+  let(:encounter) { create(:grid_breach_encounter, grid_breach_template: template, grid_room: room) }
 
   let(:deck_def) do
     create(:grid_item_definition, :gear,
@@ -23,7 +24,7 @@ RSpec.describe Grid::BreachService do
 
   describe ".start!" do
     it "creates an active breach with protocols" do
-      result = described_class.start!(hackr: hackr, template: template)
+      result = described_class.start!(hackr: hackr, encounter: encounter)
 
       expect(result.hackr_breach).to be_a(GridHackrBreach)
       expect(result.hackr_breach.state).to eq("active")
@@ -35,36 +36,38 @@ RSpec.describe Grid::BreachService do
     end
 
     it "raises AlreadyInBreach when hackr has an active breach" do
-      described_class.start!(hackr: hackr, template: template)
+      described_class.start!(hackr: hackr, encounter: encounter)
       expect {
-        described_class.start!(hackr: hackr, template: template)
+        described_class.start!(hackr: hackr, encounter: encounter)
       }.to raise_error(Grid::BreachService::AlreadyInBreach)
     end
 
     it "raises NoDeckEquipped when no deck is equipped" do
       deck.update!(equipped_slot: nil)
       expect {
-        described_class.start!(hackr: hackr, template: template)
+        described_class.start!(hackr: hackr, encounter: encounter)
       }.to raise_error(Grid::BreachService::NoDeckEquipped)
     end
 
     it "raises ClearanceBlocked when hackr clearance is insufficient" do
       high_cl_template = create(:grid_breach_template, min_clearance: 50)
+      high_cl_encounter = create(:grid_breach_encounter, grid_breach_template: high_cl_template, grid_room: room)
       expect {
-        described_class.start!(hackr: hackr, template: high_cl_template)
+        described_class.start!(hackr: hackr, encounter: high_cl_encounter)
       }.to raise_error(Grid::BreachService::ClearanceBlocked)
     end
 
     it "raises TemplateGated for unpublished templates" do
       unpub = create(:grid_breach_template, :unpublished)
+      unpub_encounter = create(:grid_breach_encounter, grid_breach_template: unpub, grid_room: room)
       expect {
-        described_class.start!(hackr: hackr, template: unpub)
+        described_class.start!(hackr: hackr, encounter: unpub_encounter)
       }.to raise_error(Grid::BreachService::TemplateGated)
     end
   end
 
   describe ".end_round!" do
-    let!(:breach_result) { described_class.start!(hackr: hackr, template: template) }
+    let!(:breach_result) { described_class.start!(hackr: hackr, encounter: encounter) }
     let(:breach) { breach_result.hackr_breach }
 
     before do
@@ -97,7 +100,7 @@ RSpec.describe Grid::BreachService do
   end
 
   describe ".resolve_success!" do
-    let!(:breach_result) { described_class.start!(hackr: hackr, template: template) }
+    let!(:breach_result) { described_class.start!(hackr: hackr, encounter: encounter) }
     let(:breach) { breach_result.hackr_breach }
 
     it "grants XP and CRED rewards" do
@@ -112,7 +115,7 @@ RSpec.describe Grid::BreachService do
   end
 
   describe ".resolve_failure!" do
-    let!(:breach_result) { described_class.start!(hackr: hackr, template: template) }
+    let!(:breach_result) { described_class.start!(hackr: hackr, encounter: encounter) }
     let(:breach) { breach_result.hackr_breach }
 
     it "drains vitals and sets failure state" do
@@ -135,14 +138,15 @@ RSpec.describe Grid::BreachService do
 
     it "does not apply zone lockout for ambient tier" do
       ambient_template = create(:grid_breach_template, :ambient)
-      ambient_breach = described_class.start!(hackr: hackr.tap { |h| breach.update!(state: "failure") }, template: ambient_template)
+      ambient_encounter = create(:grid_breach_encounter, grid_breach_template: ambient_template, grid_room: room)
+      ambient_breach = described_class.start!(hackr: hackr.tap { |h| breach.update!(state: "failure") }, encounter: ambient_encounter)
       result = described_class.resolve_failure!(hackr_breach: ambient_breach.hackr_breach)
       expect(result.zone_lockout_minutes).to be_nil
     end
   end
 
   describe ".jackout!" do
-    let!(:breach_result) { described_class.start!(hackr: hackr, template: template) }
+    let!(:breach_result) { described_class.start!(hackr: hackr, encounter: encounter) }
 
     it "clean jackout before PNR" do
       result = described_class.jackout!(hackr: hackr)
