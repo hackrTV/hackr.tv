@@ -21,7 +21,7 @@ module GridHackr::Stats
     "health" => 100,
     "energy" => 100,
     "psyche" => 100,
-    "inspiration" => 100,
+    "inspiration" => 0,
     "bonus_inventory_slots" => 0
   }.freeze
 

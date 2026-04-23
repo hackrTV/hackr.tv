@@ -452,9 +452,9 @@ RSpec.describe Grid::CommandParser do
             output_definition: cpu_def)
         end
 
-        it "shows schematic in locked section" do
+        it "shows schematic in available section regardless of room" do
           result = parser.execute
-          expect(result[:output]).to include("[LOCKED]")
+          expect(result[:output]).to include("[AVAILABLE]")
           expect(result[:output]).to include("Den Only")
         end
       end

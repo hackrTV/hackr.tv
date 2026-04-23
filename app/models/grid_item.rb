@@ -15,6 +15,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  container_id            :integer
+#  deck_id                 :integer
 #  grid_hackr_id           :integer
 #  grid_item_definition_id :integer          not null
 #  grid_mining_rig_id      :integer
@@ -23,6 +24,7 @@
 # Indexes
 #
 #  index_grid_items_on_container_id                (container_id)
+#  index_grid_items_on_deck_id                     (deck_id)
 #  index_grid_items_on_grid_hackr_id               (grid_hackr_id)
 #  index_grid_items_on_grid_item_definition_id     (grid_item_definition_id)
 #  index_grid_items_on_grid_mining_rig_id          (grid_mining_rig_id)
@@ -31,12 +33,13 @@
 # Foreign Keys
 #
 #  container_id             (container_id => grid_items.id)
+#  deck_id                  (deck_id => grid_items.id) ON DELETE => nullify
 #  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
 #
 class GridItem < ApplicationRecord
   has_paper_trail
 
-  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material fixture gear].freeze
+  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material fixture gear software firmware].freeze
   GEAR_SLOTS = %w[deck back chest head ears eyes left_wrist right_wrist hands neck waist legs feet].freeze
   VISIBLE_SLOTS = %w[head eyes chest legs feet].freeze
   RARITIES = %w[scrap ubiquitous common uncommon rare ultra_rare unicorn].freeze
@@ -68,7 +71,9 @@ class GridItem < ApplicationRecord
   belongs_to :grid_hackr, optional: true
   belongs_to :grid_mining_rig, optional: true
   belongs_to :container, class_name: "GridItem", optional: true
+  belongs_to :deck_item, class_name: "GridItem", foreign_key: :deck_id, optional: true
   has_many :stored_items, class_name: "GridItem", foreign_key: :container_id, dependent: :restrict_with_error
+  has_many :loaded_software, -> { where(item_type: "software") }, class_name: "GridItem", foreign_key: :deck_id, dependent: :nullify
 
   validates :name, presence: true
   validates :item_type, inclusion: {in: ITEM_TYPES, allow_nil: true}
@@ -77,14 +82,16 @@ class GridItem < ApplicationRecord
   validates :equipped_slot, inclusion: {in: GEAR_SLOTS, allow_nil: true}
   validate :single_location
   validate :equipped_slot_requirements
+  validate :deck_id_requirements
 
   scope :in_room, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
-  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil, equipped_slot: nil) }
+  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil, equipped_slot: nil, deck_id: nil) }
   scope :equipped_by, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil).where.not(equipped_slot: nil) }
   scope :installed_in, ->(rig) { where(grid_mining_rig: rig, grid_hackr: nil, room: nil) }
   scope :on_floor, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil).where.not(item_type: "fixture") }
   scope :placed_fixtures, ->(room) { where(room: room, item_type: "fixture", grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
   scope :in_fixture, ->(fixture) { where(container: fixture) }
+  scope :loaded_in_deck, ->(deck) { where(deck_id: deck.id, item_type: "software") }
 
   RAINBOW_COLORS = %w[#ff6b6b #fbbf24 #34d399 #22d3ee #60a5fa #a78bfa].freeze
 
@@ -146,8 +153,45 @@ class GridItem < ApplicationRecord
     item_type == "gear"
   end
 
+  def software?
+    item_type == "software"
+  end
+
+  def firmware?
+    item_type == "firmware"
+  end
+
+  def deck_item?
+    gear? && slot == "deck"
+  end
+
   def equipped?
     equipped_slot.present?
+  end
+
+  # DECK-specific helpers (only meaningful when deck_item? is true)
+  def deck_battery
+    properties&.dig("battery_current").to_i
+  end
+
+  def deck_battery_max
+    properties&.dig("battery_max").to_i
+  end
+
+  def deck_slot_count
+    properties&.dig("slot_count").to_i
+  end
+
+  def deck_firmware_slot_count
+    properties&.dig("firmware_slot_count").to_i
+  end
+
+  def deck_slots_used
+    loaded_software.sum { |s| (s.properties&.dig("slot_cost") || 1).to_i }
+  end
+
+  def deck_slots_available
+    [deck_slot_count - deck_slots_used, 0].max
   end
 
   alias_method :gear_slot, :slot
@@ -174,5 +218,12 @@ class GridItem < ApplicationRecord
     return if equipped_slot.nil?
     errors.add(:equipped_slot, "can only be set on gear items") unless gear?
     errors.add(:equipped_slot, "requires a hackr owner") if grid_hackr_id.nil?
+  end
+
+  def deck_id_requirements
+    return if deck_id.nil?
+    unless software? || firmware?
+      errors.add(:deck_id, "can only be set on software or firmware items")
+    end
   end
 end

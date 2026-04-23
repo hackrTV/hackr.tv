@@ -38,7 +38,7 @@ RSpec.describe Api::GridController, type: :controller do
         expect(json["inventory_gear"]).to eq([])
         expect(json["active_effects"]).to eq({})
 
-        %w[health energy psyche inspiration].each do |vital|
+        %w[health energy psyche].each do |vital|
           expect(json["vitals"][vital]).to eq({"current" => 100, "max" => 100})
         end
       end

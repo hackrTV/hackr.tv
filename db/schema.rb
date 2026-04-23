@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_200003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -172,6 +172,49 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
     t.index ["trigger_type"], name: "index_grid_achievements_on_trigger_type"
   end
 
+  create_table "grid_breach_protocols", force: :cascade do |t|
+    t.integer "charge_rounds", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_breach_id", null: false
+    t.integer "health", null: false
+    t.integer "max_health", null: false
+    t.json "meta", default: {}, null: false
+    t.integer "position", null: false
+    t.string "protocol_type", null: false
+    t.boolean "rerouted", default: false, null: false
+    t.integer "rounds_charging", default: 0, null: false
+    t.string "state", default: "idle", null: false
+    t.datetime "updated_at", null: false
+    t.string "weakness"
+    t.index ["grid_hackr_breach_id", "position"], name: "index_breach_protocols_on_breach_and_position", unique: true
+    t.index ["grid_hackr_breach_id"], name: "index_grid_breach_protocols_on_grid_hackr_breach_id"
+  end
+
+  create_table "grid_breach_templates", force: :cascade do |t|
+    t.integer "base_detection_rate", default: 5, null: false
+    t.integer "cooldown_max", default: 600, null: false
+    t.integer "cooldown_min", default: 300, null: false
+    t.datetime "created_at", null: false
+    t.integer "cred_reward", default: 0, null: false
+    t.text "description"
+    t.integer "min_clearance", default: 0, null: false
+    t.string "name", null: false
+    t.integer "pnr_threshold", default: 75, null: false
+    t.integer "position", default: 0, null: false
+    t.json "protocol_composition", default: {}, null: false
+    t.boolean "published", default: false, null: false
+    t.string "requires_item_slug"
+    t.string "requires_mission_slug"
+    t.json "reward_table", default: {}, null: false
+    t.string "slug", null: false
+    t.string "tier", default: "standard", null: false
+    t.datetime "updated_at", null: false
+    t.integer "xp_reward", default: 0, null: false
+    t.index ["published"], name: "index_grid_breach_templates_on_published"
+    t.index ["slug"], name: "index_grid_breach_templates_on_slug", unique: true
+    t.index ["tier"], name: "index_grid_breach_templates_on_tier"
+  end
+
   create_table "grid_caches", force: :cascade do |t|
     t.string "address", null: false
     t.datetime "archived_at"
@@ -252,6 +295,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
     t.index ["grid_hackr_id"], name: "index_grid_hackr_achievements_on_grid_hackr_id"
   end
 
+  create_table "grid_hackr_breaches", force: :cascade do |t|
+    t.integer "actions_remaining", default: 1, null: false
+    t.integer "actions_this_round", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.integer "detection_level", default: 0, null: false
+    t.datetime "ended_at"
+    t.integer "grid_breach_template_id", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "inspiration", default: 0, null: false
+    t.integer "origin_room_id"
+    t.integer "pnr_threshold", default: 75, null: false
+    t.decimal "reward_multiplier", precision: 5, scale: 4, default: "1.0", null: false
+    t.integer "round_number", default: 1, null: false
+    t.datetime "started_at", null: false
+    t.string "state", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_breach_template_id"], name: "index_grid_hackr_breaches_on_grid_breach_template_id"
+    t.index ["grid_hackr_id"], name: "index_grid_hackr_breaches_on_grid_hackr_id"
+    t.index ["grid_hackr_id"], name: "index_hackr_breaches_one_active_per_hackr", unique: true, where: "state = 'active'"
+    t.index ["state"], name: "index_grid_hackr_breaches_on_state"
+  end
+
   create_table "grid_hackr_mission_objectives", force: :cascade do |t|
     t.datetime "completed_at"
     t.datetime "created_at", null: false
@@ -321,6 +386,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
     t.boolean "service_account", default: false, null: false
     t.json "stats"
     t.datetime "updated_at", null: false
+    t.integer "zone_entry_room_id"
     t.index ["api_token_digest"], name: "index_grid_hackrs_on_api_token_digest", unique: true
     t.index ["email"], name: "index_grid_hackrs_on_email", unique: true
     t.index ["hackr_alias"], name: "index_grid_hackrs_on_hackr_alias", unique: true
@@ -345,6 +411,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
   create_table "grid_items", force: :cascade do |t|
     t.integer "container_id"
     t.datetime "created_at", null: false
+    t.integer "deck_id"
     t.text "description"
     t.string "equipped_slot"
     t.integer "grid_hackr_id"
@@ -359,6 +426,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
     t.index ["container_id"], name: "index_grid_items_on_container_id"
+    t.index ["deck_id"], name: "index_grid_items_on_deck_id"
     t.index ["grid_hackr_id", "equipped_slot"], name: "index_grid_items_on_hackr_equipped_slot_unique", unique: true, where: "equipped_slot IS NOT NULL"
     t.index ["grid_hackr_id"], name: "index_grid_items_on_grid_hackr_id"
     t.index ["grid_item_definition_id"], name: "index_grid_items_on_grid_item_definition_id"
@@ -494,6 +562,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
 
   create_table "grid_rooms", force: :cascade do |t|
     t.integer "ambient_playlist_id"
+    t.string "breach_template_slug"
     t.datetime "created_at", null: false
     t.text "description"
     t.integer "grid_zone_id", null: false
@@ -1109,6 +1178,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
   add_foreign_key "feature_grants", "grid_hackrs"
+  add_foreign_key "grid_breach_protocols", "grid_hackr_breaches", on_delete: :cascade
   add_foreign_key "grid_den_invites", "grid_hackrs", column: "guest_id"
   add_foreign_key "grid_den_invites", "grid_hackrs", column: "hackr_id"
   add_foreign_key "grid_den_invites", "grid_rooms", column: "den_id"
@@ -1117,6 +1187,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
   add_foreign_key "grid_factions", "grid_factions", column: "parent_id"
   add_foreign_key "grid_hackr_achievements", "grid_achievements"
   add_foreign_key "grid_hackr_achievements", "grid_hackrs"
+  add_foreign_key "grid_hackr_breaches", "grid_breach_templates", on_delete: :restrict
+  add_foreign_key "grid_hackr_breaches", "grid_hackrs", on_delete: :cascade
+  add_foreign_key "grid_hackr_breaches", "grid_rooms", column: "origin_room_id", on_delete: :nullify
   add_foreign_key "grid_hackr_mission_objectives", "grid_hackr_missions", on_delete: :cascade
   add_foreign_key "grid_hackr_mission_objectives", "grid_mission_objectives", on_delete: :restrict
   add_foreign_key "grid_hackr_missions", "grid_hackrs", on_delete: :cascade
@@ -1124,8 +1197,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_120001) do
   add_foreign_key "grid_hackr_reputations", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "tracks"
+  add_foreign_key "grid_hackrs", "grid_rooms", column: "zone_entry_room_id", on_delete: :nullify
   add_foreign_key "grid_items", "grid_item_definitions"
   add_foreign_key "grid_items", "grid_items", column: "container_id"
+  add_foreign_key "grid_items", "grid_items", column: "deck_id", on_delete: :nullify
   add_foreign_key "grid_mission_objectives", "grid_missions", on_delete: :cascade
   add_foreign_key "grid_mission_rewards", "grid_missions", on_delete: :cascade
   add_foreign_key "grid_missions", "grid_factions", column: "min_rep_faction_id", on_delete: :nullify

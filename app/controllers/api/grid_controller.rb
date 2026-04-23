@@ -2,7 +2,7 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action :require_admin_api, only: [:debit]
 
@@ -157,9 +157,39 @@ class Api::GridController < ApplicationController
       vitals: {
         health: {current: current_hackr.stat("health"), max: current_hackr.effective_max("health")},
         energy: {current: current_hackr.stat("energy"), max: current_hackr.effective_max("energy")},
-        psyche: {current: current_hackr.stat("psyche"), max: current_hackr.effective_max("psyche")},
-        inspiration: {current: current_hackr.stat("inspiration"), max: current_hackr.effective_max("inspiration")}
+        psyche: {current: current_hackr.stat("psyche"), max: current_hackr.effective_max("psyche")}
       }
+    }
+  end
+
+  # GET /api/grid/deck - DECK status for the /deck SPA page
+  def deck_index
+    deck = current_hackr.equipped_deck
+
+    unless deck
+      return render json: {deck: nil, software: [], inventory_software: []}
+    end
+
+    loaded = current_hackr.grid_items.where(deck_id: deck.id, item_type: "software")
+      .includes(:grid_item_definition)
+    inventory_sw = current_hackr.grid_items.in_inventory(current_hackr)
+      .where(item_type: "software").includes(:grid_item_definition)
+
+    render json: {
+      deck: {
+        id: deck.id,
+        name: deck.name,
+        rarity: deck.rarity,
+        rarity_color: deck.rarity_color,
+        rarity_label: deck.rarity_label,
+        battery_current: deck.deck_battery,
+        battery_max: deck.deck_battery_max,
+        slot_count: deck.deck_slot_count,
+        slots_used: deck.deck_slots_used,
+        firmware_slot_count: deck.deck_firmware_slot_count
+      },
+      software: loaded.map { |s| software_item_json(s) },
+      inventory_software: inventory_sw.map { |s| software_item_json(s) }
     }
   end
 
@@ -648,6 +678,26 @@ class Api::GridController < ApplicationController
       equipped_slot: item.equipped_slot,
       effects: item.gear_effects,
       required_clearance: item.required_clearance
+    }
+  end
+
+  def software_item_json(item)
+    props = item.properties || {}
+    {
+      id: item.id,
+      name: item.name,
+      rarity: item.rarity,
+      rarity_color: item.rarity_color,
+      rarity_label: item.rarity_label,
+      description: item.description,
+      software_category: props["software_category"],
+      slot_cost: (props["slot_cost"] || 1).to_i,
+      battery_cost: (props["battery_cost"] || 0).to_i,
+      effect_type: props["effect_type"],
+      effect_magnitude: (props["effect_magnitude"] || 0).to_i,
+      target_types: props["target_types"],
+      level: (props["level"] || 1).to_i,
+      loaded: item.deck_id.present?
     }
   end
 

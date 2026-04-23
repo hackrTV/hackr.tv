@@ -297,6 +297,9 @@ export const HeaderMenu: React.FC = () => {
                     <Link to="/loadout" className={`mobile-menu-item${isActive('/loadout') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>loadout
                     </Link>
+                    <Link to="/deck" className={`mobile-menu-item${isActive('/deck') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                      <span className="purple-168-text">/</span>deck
+                    </Link>
                     <Link to="/fm/playlists" className={`mobile-menu-item${isActive('/fm') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>playlists
                     </Link>
@@ -562,7 +565,7 @@ export const HeaderMenu: React.FC = () => {
           </li>
 
           {/* THE PULSE GRID */}
-          <li className={`header-dropdown${isActive('/grid') || isActive('/code') || isActive('/achievements') || isActive('/missions') || isActive('/schematics') || isActive('/loadout') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
+          <li className={`header-dropdown${isActive('/grid') || isActive('/code') || isActive('/achievements') || isActive('/missions') || isActive('/schematics') || isActive('/loadout') || isActive('/deck') ? ' active' : ''}`} onClick={() => toggleDropdown('grid')}>
             <span className="purple-168-text">{isLoggedIn ? '11' : '9'}</span>&nbsp;THE PULSE GRID&nbsp;
             <div className={`header-dropdown-content ${openDropdown === 'grid' ? 'open' : ''}`}>
               <ul>
@@ -610,6 +613,11 @@ export const HeaderMenu: React.FC = () => {
                     <li>
                       <Link to="/loadout" onClick={closeDropdown}>
                         <span className="purple-168-text">/</span>loadout
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/deck" onClick={closeDropdown}>
+                        <span className="purple-168-text">/</span>deck
                       </Link>
                     </li>
                     <li>

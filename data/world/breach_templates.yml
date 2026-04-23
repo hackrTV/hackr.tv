@@ -1,0 +1,74 @@
+# BREACH Templates — encounter definitions for THE PULSE GRID.
+# Loaded by: rails data:breach_templates (after item_definitions).
+# Idempotent: find_or_initialize_by slug, skip if exists.
+#
+# protocol_composition: array of protocol definitions
+#   type: trace | feedback | lock | adapt
+#   count: number of instances to spawn
+#   health/max_health: protocol durability
+#   charge_rounds: rounds before activation (0 = active immediately)
+#   weakness: software category vulnerable to (nullable = unknown until analyzed)
+
+breach_templates:
+
+  - slug: patrol-node-alpha
+    name: "RAINN Patrol Node \u03B1"
+    description: "A standard RAINN patrol node. Entry-level breach. Detection is slow but protocols are relentless once active."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 75
+    base_detection_rate: 5
+    cooldown_min: 300
+    cooldown_max: 600
+    xp_reward: 120
+    cred_reward: 45
+    published: true
+    position: 1
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 0
+        weakness: offensive
+      - type: feedback
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 1
+
+  - slug: surveillance-relay
+    name: "Surveillance Relay v2.3"
+    description: "A GovCorp surveillance relay node. Heavier defenses. The LOCK protocol will drain your momentum if you let it charge."
+    tier: standard
+    min_clearance: 5
+    pnr_threshold: 70
+    base_detection_rate: 6
+    cooldown_min: 600
+    cooldown_max: 900
+    xp_reward: 200
+    cred_reward: 75
+    published: true
+    position: 2
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 0
+      - type: feedback
+        count: 1
+        health: 65
+        max_health: 65
+        charge_rounds: 1
+        weakness: offensive
+      - type: lock
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 2
+      - type: adapt
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 3

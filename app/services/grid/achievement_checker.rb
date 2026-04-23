@@ -114,6 +114,10 @@ module Grid
         den = @hackr.den
         current = den ? den.placed_fixtures.distinct.count(:grid_item_definition_id) : 0
         derive(current, data[:count].to_i)
+      when "breaches_completed_count"
+        derive(@hackr.stat("breach_completed_count").to_i, data[:count].to_i)
+      when "protocols_dismantled"
+        derive(@hackr.stat("protocols_dismantled_count").to_i, data[:count].to_i)
       end
     end
 
@@ -309,6 +313,8 @@ module Grid
         return true
       when "equip_item"
         return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
+      when "breach_completed"
+        return data[:template_slug].blank? || data[:template_slug].to_s == context[:template_slug].to_s
       when "manual"
         return false
       end

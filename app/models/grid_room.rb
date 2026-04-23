@@ -3,18 +3,19 @@
 # Table name: grid_rooms
 # Database name: primary
 #
-#  id                  :integer          not null, primary key
-#  description         :text
-#  locked              :boolean          default(FALSE), not null
-#  min_clearance       :integer          default(0), not null
-#  name                :string
-#  room_type           :string
-#  slug                :string
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  ambient_playlist_id :integer
-#  grid_zone_id        :integer          not null
-#  owner_id            :integer
+#  id                   :integer          not null, primary key
+#  breach_template_slug :string
+#  description          :text
+#  locked               :boolean          default(FALSE), not null
+#  min_clearance        :integer          default(0), not null
+#  name                 :string
+#  room_type            :string
+#  slug                 :string
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  ambient_playlist_id  :integer
+#  grid_zone_id         :integer          not null
+#  owner_id             :integer
 #
 # Indexes
 #
@@ -60,6 +61,10 @@ class GridRoom < ApplicationRecord
 
   def clearance_gated?
     min_clearance > 0
+  end
+
+  def breachable?
+    breach_template_slug.present?
   end
 
   def den?
