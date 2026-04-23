@@ -4,8 +4,9 @@ module Grid
   module BreachProtocol
     # Handles per-protocol-type behavior during the system turn.
     # Each protocol type has a tick! method that fires its effect.
-    # Phase 2 adds SPIKE and PURGE as new `when` branches.
     module Engine
+      REROUTE_FIZZLE_CHANCE = 0.30
+
       # Called once per protocol during the system turn.
       # Returns an array of HTML message strings for display.
       def self.tick!(protocol, breach)
@@ -19,18 +20,17 @@ module Grid
         # Fire active protocols
         return [] unless protocol.state == "active"
 
-        case protocol.protocol_type
-        when "trace"
-          tick_trace!(protocol, breach)
-        when "feedback"
-          tick_feedback!(protocol, breach)
-        when "lock"
-          tick_lock!(protocol, breach)
-        when "adapt"
-          tick_adapt!(protocol, breach)
-        else
-          []
+        # Reroute: skip this tick, queue fizzle check for next tick
+        if protocol.rerouted?
+          return handle_reroute!(protocol)
         end
+
+        # Fizzle check: protocol was rerouted last round, now retrying
+        if protocol.meta["fizzle_check"]
+          return handle_fizzle!(protocol, breach)
+        end
+
+        fire_protocol!(protocol, breach)
       end
 
       # Default weakness category for each protocol type.
@@ -40,11 +40,51 @@ module Grid
           "trace" => "offensive",
           "feedback" => "offensive",
           "lock" => "defensive",
-          "adapt" => "utility"
+          "adapt" => "utility",
+          "spike" => "defensive",
+          "purge" => "utility"
         }[protocol_type.to_s]
       end
 
       # --- Private class methods ---
+
+      def self.fire_protocol!(protocol, breach)
+        case protocol.protocol_type
+        when "trace"
+          tick_trace!(protocol, breach)
+        when "feedback"
+          tick_feedback!(protocol, breach)
+        when "lock"
+          tick_lock!(protocol, breach)
+        when "adapt"
+          tick_adapt!(protocol, breach)
+        when "spike"
+          tick_spike!(protocol, breach)
+        when "purge"
+          tick_purge!(protocol, breach)
+        else
+          []
+        end
+      end
+      private_class_method :fire_protocol!
+
+      def self.handle_reroute!(protocol)
+        protocol.update_columns(rerouted: false, meta: protocol.meta.merge("fizzle_check" => true))
+        [reroute_msg("Protocol [#{protocol.position + 1}] REROUTED — delayed.")]
+      end
+      private_class_method :handle_reroute!
+
+      def self.handle_fizzle!(protocol, breach)
+        new_meta = protocol.meta.except("fizzle_check")
+        protocol.update_columns(meta: new_meta)
+
+        if rand < REROUTE_FIZZLE_CHANCE
+          [reroute_msg("Protocol [#{protocol.position + 1}] fizzled on retry!")]
+        else
+          fire_protocol!(protocol, breach)
+        end
+      end
+      private_class_method :handle_fizzle!
 
       def self.advance_charge!(protocol)
         new_rounds = protocol.rounds_charging + 1
@@ -89,11 +129,19 @@ module Grid
       private_class_method :tick_lock!
 
       # ADAPT: after 3 rounds active, mutates a random living protocol's weakness.
+      # On low-tier encounters (ambient/standard), requires 3+ active TRACE protocols.
       def self.tick_adapt!(protocol, breach)
         rounds_active = protocol.meta["rounds_active"].to_i + 1
         protocol.update!(meta: protocol.meta.merge("rounds_active" => rounds_active))
 
         return [] unless rounds_active >= 3 && (rounds_active % 3).zero?
+
+        # Low-tier gate: ambient/standard encounters need TRACE chain to enable ADAPT
+        tier = breach.grid_breach_template.tier
+        if %w[ambient standard].include?(tier)
+          trace_count = breach.grid_breach_protocols.alive.where(protocol_type: "trace", state: "active").count
+          return [] unless trace_count >= 3
+        end
 
         target = breach.grid_breach_protocols
           .where.not(state: "destroyed")
@@ -107,6 +155,24 @@ module Grid
         [adapt_msg("ADAPT [#{protocol.position + 1}] MUTATED → Protocol [#{target.position + 1}] weakness shifted.")]
       end
       private_class_method :tick_adapt!
+
+      # SPIKE: direct HEALTH drain — rare, dangerous. HEALTH 0 = worst failure.
+      def self.tick_spike!(protocol, breach)
+        hackr = breach.grid_hackr
+        damage = 6
+        hackr.adjust_vital!("health", -damage)
+        [spike_msg("SPIKE [#{protocol.position + 1}] FIRING → HEALTH -#{damage}")]
+      end
+      private_class_method :tick_spike!
+
+      # PURGE: stair-step reward degradation. Each active PURGE compounds.
+      def self.tick_purge!(protocol, breach)
+        new_multiplier = (breach.reward_multiplier * 0.90).round(4)
+        breach.update!(reward_multiplier: new_multiplier)
+        pct = (new_multiplier * 100).round
+        [purge_msg("PURGE [#{protocol.position + 1}] FIRING → Rewards degraded to #{pct}%")]
+      end
+      private_class_method :tick_purge!
 
       def self.alert_msg(text)
         "<span style='color: #f87171; font-weight: bold;'>⚠ #{text}</span>"
@@ -127,6 +193,21 @@ module Grid
         "<span style='color: #a78bfa;'>#{text}</span>"
       end
       private_class_method :adapt_msg
+
+      def self.spike_msg(text)
+        "<span style='color: #dc2626; font-weight: bold;'>#{text}</span>"
+      end
+      private_class_method :spike_msg
+
+      def self.purge_msg(text)
+        "<span style='color: #8b5cf6;'>#{text}</span>"
+      end
+      private_class_method :purge_msg
+
+      def self.reroute_msg(text)
+        "<span style='color: #22d3ee;'>#{text}</span>"
+      end
+      private_class_method :reroute_msg
     end
   end
 end

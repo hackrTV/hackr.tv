@@ -62,3 +62,12 @@ zones:
     region_slug: the-riverlands
     faction_slug: thecyberpulse
     ambient_playlist_slug: fracture-network-ambience
+
+  - name: "GovCorp RestorePoint\u2122 — Lakeshore"
+    slug: restorepoint-lakeshore
+    description: "A sterile GovCorp medical facility. Soft lighting, ambient wellness muzak, and the faint smell of antiseptic. A scrolling display reads: 'RestorePoint\u2122 — Because Your Wellbeing Is Our Priority.' The exit is clearly marked. Your CRED balance is clearly lower."
+    zone_type: govcorp
+    color_scheme: white/cyan
+    region_slug: the-lakeshore
+    faction_slug: null
+    ambient_playlist_slug: null

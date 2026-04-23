@@ -23,13 +23,15 @@ module Grid
     end
 
     # Mining reward (mining pool → hackr's cache)
+    # Auto-garnishes 50% if hackr has GovCorp debt.
     def self.mint_mining!(to_cache:, amount:)
-      execute!(from_cache: GridCache.mining_pool, to_cache: to_cache, amount: amount, tx_type: "mining_reward", memo: "Mining reward")
+      garnish_and_mint!(from_cache: GridCache.mining_pool, to_cache: to_cache, amount: amount, tx_type: "mining_reward", memo: "Mining reward")
     end
 
     # Gameplay reward (gameplay pool → hackr's cache)
+    # Auto-garnishes 50% if hackr has GovCorp debt.
     def self.mint_gameplay!(to_cache:, amount:, memo: "Gameplay reward")
-      execute!(from_cache: GridCache.gameplay_pool, to_cache: to_cache, amount: amount, tx_type: "gameplay_reward", memo: memo)
+      garnish_and_mint!(from_cache: GridCache.gameplay_pool, to_cache: to_cache, amount: amount, tx_type: "gameplay_reward", memo: memo)
     end
 
     # General burn (hackr cache → burn address)
@@ -52,33 +54,59 @@ module Grid
       execute!(from_cache: GridCache.genesis, to_cache: to_cache, amount: amount, tx_type: "genesis", memo: memo)
     end
 
+    # Garnish + mint atomically inside LEDGER_MUTEX to prevent double-garnishment races.
+    # Returns the GridTransaction (same contract as execute!).
+    def self.garnish_and_mint!(from_cache:, to_cache:, amount:, tx_type:, memo:)
+      raise InvalidTransfer, "Amount must be positive" unless amount.positive?
+
+      LEDGER_MUTEX.synchronize do
+        # Garnishment inside the mutex — atomic with the mint
+        hackr = to_cache.grid_hackr
+        if hackr
+          result = Grid::DebtService.garnish(hackr: hackr, gross_amount: amount)
+          amount = result[:net_amount]
+        end
+
+        return nil if amount <= 0
+
+        write_transaction!(from_cache: from_cache, to_cache: to_cache, amount: amount, tx_type: tx_type, memo: memo)
+      end
+    end
+    private_class_method :garnish_and_mint!
+
     private_class_method def self.execute!(from_cache:, to_cache:, amount:, tx_type:, memo: nil)
       raise InvalidTransfer, "Amount must be positive" unless amount.positive?
 
       LEDGER_MUTEX.synchronize do
-        ActiveRecord::Base.transaction do
-          # Balance check inside the lock — no stale reads
-          unless tx_type == "genesis"
-            balance = from_cache.reload.balance
-            raise InsufficientBalance, "Insufficient balance" if balance < amount
-          end
+        write_transaction!(from_cache: from_cache, to_cache: to_cache, amount: amount, tx_type: tx_type, memo: memo)
+      end
+    end
 
-          last_tx = GridTransaction.recent.first
-          now = Time.current
-
-          tx = GridTransaction.new(
-            from_cache: from_cache,
-            to_cache: to_cache,
-            amount: amount,
-            tx_type: tx_type,
-            memo: memo,
-            previous_tx_hash: last_tx&.tx_hash,
-            created_at: now
-          )
-          tx.tx_hash = tx.compute_hash
-          tx.save!
-          tx
+    # Shared inner mint logic. Must be called inside LEDGER_MUTEX.synchronize.
+    private_class_method def self.write_transaction!(from_cache:, to_cache:, amount:, tx_type:, memo:)
+      raise "write_transaction! must be called under LEDGER_MUTEX" unless LEDGER_MUTEX.owned?
+      ActiveRecord::Base.transaction do
+        # Balance check inside the lock — no stale reads
+        unless tx_type == "genesis"
+          balance = from_cache.reload.balance
+          raise InsufficientBalance, "Insufficient balance" if balance < amount
         end
+
+        last_tx = GridTransaction.recent.first
+        now = Time.current
+
+        tx = GridTransaction.new(
+          from_cache: from_cache,
+          to_cache: to_cache,
+          amount: amount,
+          tx_type: tx_type,
+          memo: memo,
+          previous_tx_hash: last_tx&.tx_hash,
+          created_at: now
+        )
+        tx.tx_hash = tx.compute_hash
+        tx.save!
+        tx
       end
     end
   end

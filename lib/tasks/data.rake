@@ -617,6 +617,18 @@ namespace :data do
       puts "  ↻ Updated breach target: #{room.name} → #{attrs["breach_template_slug"]}"
     end
 
+    # Assign RestorePoint™ hospital rooms to regions
+    {
+      "the-lakeshore" => "restorepoint-lakeshore-bay"
+    }.each do |region_slug, room_slug|
+      region = GridRegion.find_by(slug: region_slug)
+      room = GridRoom.find_by(slug: room_slug)
+      next unless region && room
+      next if region.hospital_room_id == room.id
+      region.update!(hospital_room: room)
+      puts "  ↻ Assigned RestorePoint™: #{region.name} → #{room.name}"
+    end
+
     puts "Rooms: #{created} created, #{GridRoom.count} total"
   end
 

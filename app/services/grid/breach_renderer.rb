@@ -13,15 +13,19 @@ module Grid
       "trace" => "#f59e0b",
       "feedback" => "#f87171",
       "lock" => "#ef4444",
-      "adapt" => "#a78bfa"
+      "adapt" => "#a78bfa",
+      "spike" => "#dc2626",
+      "purge" => "#8b5cf6"
     }.freeze
 
     STATE_LABELS = {
       "idle" => "idle",
       "charging" => "charging",
       "active" => "ACTIVE",
-      "destroyed" => "✓ CLEARED"
+      "destroyed" => "\u2713 CLEARED"
     }.freeze
+
+    SEPARATOR = "\u2550" * 62 # ═ repeated
 
     def initialize(breach, protocols = nil)
       @breach = breach
@@ -43,7 +47,7 @@ module Grid
     end
 
     def render_round_end(protocol_messages)
-      lines = ["<span style='color: #9ca3af;'>── SYSTEM TURN ──</span>"]
+      lines = ["<span style='color: #9ca3af;'>\u2500\u2500 SYSTEM TURN \u2500\u2500</span>"]
       if protocol_messages.any?
         lines.concat(protocol_messages)
       else
@@ -57,30 +61,30 @@ module Grid
     def render_success(xp_awarded, cred_awarded, template_name)
       lines = []
       lines << ""
-      lines << "<span style='color: #34d399; font-weight: bold;'>╔══════════════════════════════════════════════════════════════╗</span>"
-      lines << "<span style='color: #34d399; font-weight: bold;'>║  B R E A C H   C O M P L E T E                              ║</span>"
-      lines << "<span style='color: #34d399; font-weight: bold;'>╠══════════════════════════════════════════════════════════════╣</span>"
-      lines << "<span style='color: #34d399;'>║</span>  <span style='color: #d0d0d0;'>#{h(template_name)}</span>"
-      lines << "<span style='color: #34d399;'>║</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>+#{xp_awarded}</span>" if xp_awarded > 0
-      lines << "<span style='color: #34d399;'>║</span>  <span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>+#{cred_awarded}</span>" if cred_awarded > 0
-      lines << "<span style='color: #34d399; font-weight: bold;'>╚══════════════════════════════════════════════════════════════╝</span>"
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  B R E A C H   C O M P L E T E                              \u2551</span>"
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
+      lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #d0d0d0;'>#{h(template_name)}</span>"
+      lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>+#{xp_awarded}</span>" if xp_awarded > 0
+      lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>+#{cred_awarded}</span>" if cred_awarded > 0
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u255a#{SEPARATOR}\u255d</span>"
       lines.join("\n")
     end
 
     def render_failure(vitals_hit, zone_lockout_minutes = nil)
       lines = []
       lines << ""
-      lines << "<span style='color: #f87171; font-weight: bold;'>╔══════════════════════════════════════════════════════════════╗</span>"
-      lines << "<span style='color: #f87171; font-weight: bold;'>║  B R E A C H   F A I L E D                                   ║</span>"
-      lines << "<span style='color: #f87171; font-weight: bold;'>╠══════════════════════════════════════════════════════════════╣</span>"
-      lines << "<span style='color: #f87171;'>║</span>  <span style='color: #d0d0d0;'>Detection reached 100% — system countermeasures engaged.</span>"
+      lines << "<span style='color: #f87171; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
+      lines << "<span style='color: #f87171; font-weight: bold;'>\u2551  B R E A C H   F A I L E D                                   \u2551</span>"
+      lines << "<span style='color: #f87171; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
+      lines << "<span style='color: #f87171;'>\u2551</span>  <span style='color: #d0d0d0;'>Detection reached 100% \u2014 system countermeasures engaged.</span>"
       vitals_hit.each do |hit|
-        lines << "<span style='color: #f87171;'>║</span>  <span style='color: #f87171;'>#{hit[:vital].upcase} -#{hit[:amount]}</span>"
+        lines << "<span style='color: #f87171;'>\u2551</span>  <span style='color: #f87171;'>#{hit[:vital].upcase} -#{hit[:amount]}</span>"
       end
       if zone_lockout_minutes
-        lines << "<span style='color: #f87171;'>║</span>  <span style='color: #ef4444;'>Zone lockout: #{zone_lockout_minutes} minute(s)</span>"
+        lines << "<span style='color: #f87171;'>\u2551</span>  <span style='color: #ef4444;'>Zone lockout: #{zone_lockout_minutes} minute(s)</span>"
       end
-      lines << "<span style='color: #f87171; font-weight: bold;'>╚══════════════════════════════════════════════════════════════╝</span>"
+      lines << "<span style='color: #f87171; font-weight: bold;'>\u255a#{SEPARATOR}\u255d</span>"
       lines.join("\n")
     end
 
@@ -97,7 +101,7 @@ module Grid
     end
 
     def render_pnr_warning
-      "<span style='color: #f87171; font-weight: bold;'>⚠ SYSTEM ALERT: Intrusion signature locked. Jack-out route compromised.</span>"
+      "<span style='color: #f87171; font-weight: bold;'>\u26a0 SYSTEM ALERT: Intrusion signature locked. Jack-out route compromised.</span>"
     end
 
     private
@@ -107,10 +111,10 @@ module Grid
       tier_label = template.tier_label
       alive_count = @protocols.count(&:alive?)
       [
-        "<span style='color: #{BORDER_COLOR};'>╔══════════════════════════════════════════════════════════════╗</span>",
-        "<span style='color: #{BORDER_COLOR};'>║</span>  <span style='color: #22d3ee; font-weight: bold;'>B R E A C H</span>  <span style='color: #6b7280;'>::</span>  <span style='color: #d0d0d0;'>#{h(template.name)}</span>",
-        "<span style='color: #{BORDER_COLOR};'>║</span>  <span style='color: #fbbf24;'>Tier:</span> <span style='color: #d0d0d0;'>#{tier_label}</span>    <span style='color: #fbbf24;'>Protocols:</span> <span style='color: #f87171;'>#{alive_count} active</span>",
-        "<span style='color: #{BORDER_COLOR};'>╠══════════════════════════════════════════════════════════════╣</span>"
+        "<span style='color: #{BORDER_COLOR};'>\u2554#{SEPARATOR}\u2557</span>",
+        "<span style='color: #{BORDER_COLOR};'>\u2551</span>  <span style='color: #22d3ee; font-weight: bold;'>B R E A C H</span>  <span style='color: #6b7280;'>::</span>  <span style='color: #d0d0d0;'>#{h(template.name)}</span>",
+        "<span style='color: #{BORDER_COLOR};'>\u2551</span>  <span style='color: #fbbf24;'>Tier:</span> <span style='color: #d0d0d0;'>#{tier_label}</span>    <span style='color: #fbbf24;'>Protocols:</span> <span style='color: #f87171;'>#{alive_count} active</span>",
+        "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
       ].join("\n")
     end
 
@@ -121,18 +125,28 @@ module Grid
       battery_max = @deck&.deck_battery_max || 0
       actions = @breach.actions_remaining
       actions_total = @breach.actions_this_round
+      reward_mult = @breach.reward_multiplier
       pnr_crossed = detect >= pnr
 
       pnr_label = pnr_crossed ?
         " <span style='color: #f87171; font-weight: bold;'>[PNR CROSSED]</span>" : ""
 
-      [
+      lines = [
         "#{border}  <span style='color: #fbbf24;'>DETECTION</span>  #{bar(detect, 100, DETECT_COLOR)}  #{detect}%#{pnr_label}",
-        "#{border}              <span style='color: #6b7280;'>PNR ──────────▶</span>  #{pnr}%",
+        "#{border}              <span style='color: #6b7280;'>PNR \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u25b6</span>  #{pnr}%",
         "#{border}  <span style='color: #fbbf24;'>BATTERY  </span>  #{bar(battery, battery_max, BATTERY_COLOR)}  #{battery}/#{battery_max}",
-        "#{border}  <span style='color: #fbbf24;'>ACTIONS  </span>  #{bar(actions, actions_total, INSPIRE_COLOR)}  #{actions}/#{actions_total}",
-        "<span style='color: #{BORDER_COLOR};'>╠══════════════════════════════════════════════════════════════╣</span>"
-      ].join("\n")
+        "#{border}  <span style='color: #fbbf24;'>ACTIONS  </span>  #{bar(actions, actions_total, INSPIRE_COLOR)}  #{actions}/#{actions_total}"
+      ]
+
+      # Show reward multiplier when degraded by PURGE
+      if reward_mult < 1.0
+        pct = (reward_mult * 100).round
+        reward_color = (pct >= 70) ? "#34d399" : "#8b5cf6"
+        lines << "#{border}  <span style='color: #fbbf24;'>REWARDS  </span>  #{bar(pct, 100, reward_color)}  #{pct}%"
+      end
+
+      lines << "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
+      lines.join("\n")
     end
 
     def protocols_block
@@ -143,7 +157,7 @@ module Grid
         analyze = p.analyze_level
 
         if p.destroyed?
-          lines << "  <span style='color: #6b7280;'>[#{p.position + 1}] ──────── ✓ CLEARED</span>"
+          lines << "  <span style='color: #6b7280;'>[#{p.position + 1}] \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \u2713 CLEARED</span>"
           next
         end
 
@@ -162,16 +176,21 @@ module Grid
         end
 
         health_bar = bar(p.health, p.max_health, color, width: 8)
-        charge_info = if p.state == "charging"
+
+        state_info = if p.state == "charging"
           remaining = p.charge_rounds - p.rounds_charging
           " <span style='color: #6b7280;'>(#{remaining} rounds)</span>"
+        elsif p.rerouted?
+          " <span style='color: #22d3ee;'>[REROUTED]</span>"
+        elsif p.meta["fizzle_check"]
+          " <span style='color: #22d3ee;'>[RETRYING]</span>"
         else
           ""
         end
 
-        lines << "  <span style='color: #9ca3af;'>[#{p.position + 1}]</span> #{health_bar}  #{type_hint}  <span style='color: #9ca3af;'>#{state_label}#{charge_info}</span>  <span style='color: #6b7280;'>weak:</span> #{weakness_hint}"
+        lines << "  <span style='color: #9ca3af;'>[#{p.position + 1}]</span> #{health_bar}  #{type_hint}  <span style='color: #9ca3af;'>#{state_label}#{state_info}</span>  <span style='color: #6b7280;'>weak:</span> #{weakness_hint}"
       end
-      lines << "<span style='color: #{BORDER_COLOR};'>╠══════════════════════════════════════════════════════════════╣</span>"
+      lines << "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
       lines.join("\n")
     end
 
@@ -179,9 +198,9 @@ module Grid
       rank_data = Grid::BreachService.breach_rank(@hackr.stat("clearance"))
       rank_label = rank_data ? rank_data[:rank] : "Unknown"
       [
-        "#{border}  <span style='color: #9ca3af;'>Round #{@breach.round_number}</span>  <span style='color: #6b7280;'>—</span>  <span style='color: #9ca3af;'>#{@breach.actions_remaining} actions remaining</span>",
+        "#{border}  <span style='color: #9ca3af;'>Round #{@breach.round_number}</span>  <span style='color: #6b7280;'>\u2014</span>  <span style='color: #9ca3af;'>#{@breach.actions_remaining} actions remaining</span>",
         "#{border}  <span style='color: #fbbf24;'>BREACH RANK:</span> <span style='color: #22d3ee;'>#{h(rank_label)}</span>",
-        "<span style='color: #{BORDER_COLOR};'>╚══════════════════════════════════════════════════════════════╝</span>"
+        "<span style='color: #{BORDER_COLOR};'>\u255a#{SEPARATOR}\u255d</span>"
       ].join("\n")
     end
 
@@ -193,7 +212,7 @@ module Grid
     end
 
     def border
-      "<span style='color: #{BORDER_COLOR};'>║</span>"
+      "<span style='color: #{BORDER_COLOR};'>\u2551</span>"
     end
 
     def h(text)
