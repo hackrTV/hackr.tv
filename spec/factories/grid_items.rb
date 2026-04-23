@@ -15,6 +15,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  container_id            :integer
+#  deck_id                 :integer
 #  grid_hackr_id           :integer
 #  grid_item_definition_id :integer          not null
 #  grid_mining_rig_id      :integer
@@ -23,6 +24,7 @@
 # Indexes
 #
 #  index_grid_items_on_container_id                (container_id)
+#  index_grid_items_on_deck_id                     (deck_id)
 #  index_grid_items_on_grid_hackr_id               (grid_hackr_id)
 #  index_grid_items_on_grid_item_definition_id     (grid_item_definition_id)
 #  index_grid_items_on_grid_mining_rig_id          (grid_mining_rig_id)
@@ -31,6 +33,7 @@
 # Foreign Keys
 #
 #  container_id             (container_id => grid_items.id)
+#  deck_id                  (deck_id => grid_items.id) ON DELETE => nullify
 #  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
 #
 FactoryBot.define do

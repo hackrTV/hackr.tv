@@ -18,6 +18,11 @@ module Grid
     def execute
       return {output: "<span style='color: #fbbf24;'>Please enter a command.</span>", event: nil} if input.empty?
 
+      # BREACH mode: all input routes through BreachCommandParser
+      if (active_breach = hackr.active_breach)
+        return Grid::BreachCommandParser.new(hackr, input, active_breach).execute
+      end
+
       # Split input but preserve case in arguments
       parts = input.split
       command = parts.first&.downcase
@@ -112,6 +117,10 @@ module Grid
         unequip_command(args.join(" "))
       when "loadout", "lo"
         loadout_command
+      when "deck", "dk"
+        args.empty? ? deck_show_command : deck_subcommand(args)
+      when "breach", "br"
+        breach_initiate_command(args.join(" "))
       when "den"
         den_command(args)
       when "out"
@@ -157,6 +166,16 @@ module Grid
         output << "<span style='color: #6b7280;'>Floor: #{room.den_floor_count}/#{Grid::DenService::DEN_STORAGE_CAP} items</span>"
         output << "<span style='color: #6b7280;'>Owner: <span style='color: #a78bfa;'>#{h(room.owner&.hackr_alias)}</span></span>"
         output << "<span style='color: #f87171;'>[ DEN IS LOCKED ]</span>" if room.locked?
+      end
+
+      # Breach target indicator
+      if room.breachable?
+        template = GridBreachTemplate.find_by(slug: room.breach_template_slug)
+        if template&.published?
+          output << ""
+          output << "<span style='color: #22d3ee; font-weight: bold;'>[ BREACH TARGET DETECTED ]</span> <span style='color: #9ca3af;'>#{h(template.name)} :: #{template.tier_label}</span>"
+          output << "<span style='color: #6b7280;'>  Type 'breach' to initiate.</span>"
+        end
       end
 
       output << ""
@@ -249,6 +268,19 @@ module Grid
       old_room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless old_room
 
+      # Zone lockout check — deny entry into locked-out zones
+      if direction != "home" && direction != "den"
+        exit_check = old_room.exits_from.includes(to_room: :grid_zone).find_by(direction: direction)
+        if exit_check
+          target_zone = exit_check.to_room.grid_zone
+          lockout_until = hackr.stat("zone_lockout_#{target_zone.id}").to_i
+          if lockout_until > 0 && Time.current.to_i < lockout_until
+            remaining = ((lockout_until - Time.current.to_i) / 60.0).ceil
+            return "<span style='color: #f87171;'>Zone lockout active for #{target_zone.name}. #{remaining} minute(s) remaining.</span>"
+          end
+        end
+      end
+
       # "go home" / "go den" resolves to hackr's den slug when in the corridor
       if direction == "home" || direction == "den"
         den = GridRoom.where(owner: hackr).order(:id).first
@@ -305,7 +337,12 @@ module Grid
         return "<span style='color: #f87171;'>The den is locked. Use 'den unlock' first.</span>"
       end
 
-      hackr.update!(current_room: new_room)
+      # Track zone entry room for BREACH ejection
+      if old_room.grid_zone_id != new_room.grid_zone_id
+        hackr.update!(current_room: new_room, zone_entry_room_id: old_room.id)
+      else
+        hackr.update!(current_room: new_room)
+      end
 
       # Track exploration (unique rooms via visited_rooms array in stats)
       visited = hackr.stat("visited_rooms") || []
@@ -789,6 +826,13 @@ module Grid
           <span style='color: #34d399;'>unequip &lt;item|slot&gt;, remove</span> - Remove equipped gear
           <span style='color: #34d399;'>loadout, lo</span>                - View your current loadout
 
+        <span style='color: #fbbf24;'>DECK &amp; BREACH:</span>
+          <span style='color: #34d399;'>deck, dk</span>                   - View equipped DECK status
+          <span style='color: #34d399;'>deck load &lt;software&gt;</span>       - Load software into DECK
+          <span style='color: #34d399;'>deck unload &lt;software&gt;</span>     - Unload software from DECK
+          <span style='color: #34d399;'>deck charge</span>                - Recharge DECK battery (at den)
+          <span style='color: #34d399;'>breach, br</span>                 - Initiate BREACH encounter (if target present)
+
         <span style='color: #fbbf24;'>NPCs:</span>
           <span style='color: #34d399;'>talk &lt;npc&gt;</span>                 - Talk to an NPC
           <span style='color: #34d399;'>ask &lt;npc&gt; about &lt;topic&gt;</span>    - Ask an NPC about a topic
@@ -911,7 +955,13 @@ module Grid
       output << "  <span style='color: #34d399;'>HEALTH      #{s["health"]}/#{hackr.effective_max("health")}</span>"
       output << "  <span style='color: #60a5fa;'>ENERGY      #{s["energy"]}/#{hackr.effective_max("energy")}</span>"
       output << "  <span style='color: #c084fc;'>PSYCHE      #{s["psyche"]}/#{hackr.effective_max("psyche")}</span>"
-      output << "  <span style='color: #f59e0b;'>INSPIRATION #{s["inspiration"]}/#{hackr.effective_max("inspiration")}</span>"
+
+      # DECK status (if equipped)
+      deck = hackr.equipped_deck
+      if deck
+        output << ""
+        output << "<span style='color: #fbbf24;'>DECK:</span> <span style='color: #d0d0d0;'>#{h(deck.name)}</span> <span style='color: #6b7280;'>Battery: #{deck.deck_battery}/#{deck.deck_battery_max} | Slots: #{deck.deck_slots_used}/#{deck.deck_slot_count}</span>"
+      end
 
       equipped_count = hackr.grid_items.equipped_by(hackr).count
       if equipped_count > 0
@@ -1096,6 +1146,161 @@ module Grid
       lines.join("\n")
     end
 
+    # ── DECK commands (outside BREACH) ─────────────────────────
+
+    def deck_show_command
+      deck = hackr.equipped_deck
+      return "<span style='color: #f87171;'>No DECK equipped. Equip a DECK from your inventory first.</span>" unless deck
+
+      output = []
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output << "<span style='color: #22d3ee; font-weight: bold;'>DECK :: #{h(deck.name)}</span> <span style='color: #{deck.rarity_color};'>[#{deck.rarity_label}]</span>"
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output << ""
+      output << "<span style='color: #fbbf24;'>Battery:</span> <span style='color: #d0d0d0;'>#{deck.deck_battery}/#{deck.deck_battery_max}</span>"
+      output << "<span style='color: #fbbf24;'>Software Slots:</span> <span style='color: #d0d0d0;'>#{deck.deck_slots_used}/#{deck.deck_slot_count}</span>"
+      output << "<span style='color: #fbbf24;'>Firmware Slots:</span> <span style='color: #d0d0d0;'>#{deck.deck_firmware_slot_count}</span>"
+      output << ""
+
+      loaded = deck.loaded_software.order(:name)
+      if loaded.any?
+        output << "<span style='color: #fbbf24;'>Loaded Software:</span>"
+        loaded.each do |sw|
+          cat = sw.properties&.dig("software_category") || "unknown"
+          cost = sw.properties&.dig("battery_cost") || 0
+          slots = sw.properties&.dig("slot_cost") || 1
+          mag = sw.properties&.dig("effect_magnitude") || 0
+          color = sw.rarity_color
+          output << "  <span style='color: #{color};'>#{h(sw.name)}</span> <span style='color: #6b7280;'>[#{cat}]</span> <span style='color: #9ca3af;'>slots:#{slots} pwr:#{cost} dmg:#{mag}</span>"
+        end
+      else
+        output << "<span style='color: #6b7280;'>No software loaded. Use 'deck load &lt;software&gt;' to load programs.</span>"
+      end
+
+      output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
+      output.join("\n")
+    end
+
+    def deck_subcommand(args)
+      sub = args.first&.downcase
+      name = args[1..]&.join(" ")
+
+      case sub
+      when "load"
+        deck_load_command(name)
+      when "unload"
+        deck_unload_command(name)
+      when "charge"
+        deck_charge_command
+      else
+        "<span style='color: #fbbf24;'>Usage: deck [load|unload|charge] &lt;name&gt;</span>"
+      end
+    end
+
+    def deck_load_command(software_name)
+      return "<span style='color: #fbbf24;'>Load what? Usage: deck load &lt;software name&gt;</span>" if software_name.blank?
+
+      deck = hackr.equipped_deck
+      return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
+
+      software = hackr.grid_items.in_inventory(hackr)
+        .where(item_type: "software")
+        .find_by("LOWER(name) = ?", software_name.downcase)
+      return "<span style='color: #f87171;'>No software named '#{h(software_name)}' in your inventory.</span>" unless software
+
+      slot_cost = (software.properties&.dig("slot_cost") || 1).to_i
+      if deck.deck_slots_available < slot_cost
+        return "<span style='color: #f87171;'>Not enough DECK slots. Need #{slot_cost}, have #{deck.deck_slots_available} available.</span>"
+      end
+
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        deck.lock!
+        if deck.deck_slots_available < slot_cost
+          return "<span style='color: #f87171;'>Not enough DECK slots. Need #{slot_cost}, have #{deck.deck_slots_available} available.</span>"
+        end
+        software.update!(deck_id: deck.id)
+      end
+
+      "<span style='color: #34d399;'>Loaded #{h(software.name)} into DECK.</span> <span style='color: #6b7280;'>(#{deck.deck_slots_used}/#{deck.deck_slot_count} slots)</span>"
+    end
+
+    def deck_unload_command(software_name)
+      return "<span style='color: #fbbf24;'>Unload what? Usage: deck unload &lt;software name&gt;</span>" if software_name.blank?
+
+      deck = hackr.equipped_deck
+      return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
+
+      software = deck.loaded_software.find_by("LOWER(name) = ?", software_name.downcase)
+      return "<span style='color: #f87171;'>No software named '#{h(software_name)}' loaded in your DECK.</span>" unless software
+
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        software.update!(deck_id: nil)
+      end
+
+      "<span style='color: #34d399;'>Unloaded #{h(software.name)} from DECK.</span>"
+    end
+
+    def deck_charge_command
+      deck = hackr.equipped_deck
+      return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
+
+      room = hackr.current_room
+      can_charge = room&.owned_den_of?(hackr)
+
+      unless can_charge
+        return "<span style='color: #f87171;'>No charging source available. Charge your DECK at your den.</span>"
+      end
+
+      if deck.deck_battery >= deck.deck_battery_max
+        return "<span style='color: #9ca3af;'>DECK battery is already full.</span>"
+      end
+
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        deck.reload
+        deck.update!(properties: deck.properties.merge("battery_current" => deck.deck_battery_max))
+      end
+
+      "<span style='color: #34d399;'>DECK fully charged.</span> <span style='color: #d0d0d0;'>#{deck.deck_battery_max}/#{deck.deck_battery_max}</span>"
+    end
+
+    # ── BREACH initiation (outside BREACH) ───────────────────
+
+    def breach_initiate_command(target_name)
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      unless room.breachable?
+        return "<span style='color: #f87171;'>Nothing to breach here.</span>"
+      end
+
+      template = GridBreachTemplate.find_by(slug: room.breach_template_slug)
+      unless template&.published?
+        return "<span style='color: #f87171;'>Breach target is offline.</span>"
+      end
+
+      result = Grid::BreachService.start!(hackr: hackr, template: template)
+
+      output = []
+      output << ""
+      output << "<span style='color: #22d3ee; font-weight: bold;'>Initiating BREACH...</span>"
+      output << ""
+      output << result.display
+      output << ""
+      output << "<span style='color: #6b7280;'>Type 'help' for BREACH commands.</span>"
+      output.join("\n")
+    rescue Grid::BreachService::AlreadyInBreach => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::BreachService::NoDeckEquipped => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::BreachService::ClearanceBlocked => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::BreachService::TemplateGated => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
     def equipped_item_hint(item_name)
       return nil unless hackr.grid_items.equipped_by(hackr).find_by("LOWER(name) = ?", item_name.downcase)
       "<span style='color: #f87171;'>That item is equipped. Use 'unequip #{h(item_name)}' first.</span>"
@@ -1243,7 +1448,7 @@ module Grid
       inventory_qtys = hackr.grid_items.group(:grid_item_definition_id).sum(:quantity)
       gate_ctx = schematic_gate_context
 
-      available, locked = all_schematics.partition { |s| s.craftable_by?(hackr, **gate_ctx, current_room: hackr.current_room) }
+      available, locked = all_schematics.partition { |s| s.craftable_by?(hackr, **gate_ctx) }
 
       output = []
       output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
@@ -1291,10 +1496,6 @@ module Grid
         .find_by(slug: slug.downcase)
       return "<span style='color: #f87171;'>Unknown schematic: #{h(slug)}. Use 'schematics' to browse.</span>" unless schematic
 
-      unless schematic.craftable_by?(hackr, **schematic_gate_context, current_room: hackr.current_room)
-        return craftability_error_for(schematic)
-      end
-
       output = []
       output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
       output << "<span style='color: #60a5fa; font-weight: bold;'>#{h(schematic.name)}</span> <span style='color: #6b7280;'>[#{h(schematic.slug)}]</span>"
@@ -1306,6 +1507,10 @@ module Grid
       output << "<span style='color: #fbbf24;'>XP REWARD:</span> <span style='color: #a78bfa;'>+#{schematic.xp_reward}</span>" if schematic.xp_reward.positive?
       if schematic.required_clearance.positive?
         output << "<span style='color: #fbbf24;'>CLEARANCE:</span> <span style='color: #d0d0d0;'>#{schematic.required_clearance}+</span>"
+      end
+      if schematic.required_room_type.present?
+        label = GridSchematic::ROOM_TYPE_LABELS[schematic.required_room_type] || schematic.required_room_type
+        output << "<span style='color: #fbbf24;'>REQUIRES:</span> <span style='color: #f59e0b;'>#{h(label)}</span>"
       end
       output << ""
       output << "<span style='color: #fbbf24;'>INGREDIENTS:</span>"
@@ -1382,10 +1587,20 @@ module Grid
         amount = props[:amount].to_i
         new_val = hackr.adjust_vital!("psyche", amount)
         "<span style='color: #c084fc;'>You use #{h(item.name)}. Psyche boosted by #{amount}. (#{new_val}/100)</span>"
-      when "inspire"
+      when "deck_recharge"
         amount = props[:amount].to_i
-        new_val = hackr.adjust_vital!("inspiration", amount)
-        "<span style='color: #f59e0b;'>You use #{h(item.name)}. Inspiration surges by #{amount}. (#{new_val}/100)</span>"
+        deck = hackr.equipped_deck
+        unless deck
+          return "<span style='color: #f87171;'>No DECK equipped.</span>"
+        end
+        old_battery = deck.deck_battery
+        new_battery = [old_battery + amount, deck.deck_battery_max].min
+        deck.update!(properties: deck.properties.merge("battery_current" => new_battery))
+        "<span style='color: #fbbf24;'>You use #{h(item.name)}. DECK battery restored by #{new_battery - old_battery}. (#{new_battery}/#{deck.deck_battery_max})</span>"
+      when "inspire"
+        # Inspiration is now BREACH-scoped (lives on breach row, not hackr stats).
+        # inspire items have no effect outside of BREACH.
+        "<span style='color: #9ca3af;'>You use #{h(item.name)}... but the effect fizzles. Nothing to inspire outside a BREACH.</span>"
       when "xp_boost"
         amount = props[:amount].to_i
         result = hackr.grant_xp!(amount)

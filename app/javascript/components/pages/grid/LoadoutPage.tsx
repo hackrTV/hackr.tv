@@ -36,7 +36,6 @@ interface LoadoutResponse {
     health: VitalInfo
     energy: VitalInfo
     psyche: VitalInfo
-    inspiration: VitalInfo
   }
 }
 
@@ -128,7 +127,6 @@ const LoadoutPage: React.FC = () => {
                   <VitalBar label="HEALTH" vital={data.vitals.health} color="#34d399" />
                   <VitalBar label="ENERGY" vital={data.vitals.energy} color="#60a5fa" />
                   <VitalBar label="PSYCHE" vital={data.vitals.psyche} color="#c084fc" />
-                  <VitalBar label="INSPIRATION" vital={data.vitals.inspiration} color="#f59e0b" />
                 </div>
               </div>
 

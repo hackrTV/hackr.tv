@@ -21,6 +21,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  current_room_id         :integer
+#  zone_entry_room_id      :integer
 #
 # Indexes
 #
@@ -29,10 +30,15 @@
 #  index_grid_hackrs_on_hackr_alias       (hackr_alias) UNIQUE
 #  index_grid_hackrs_on_role              (role)
 #
+# Foreign Keys
+#
+#  zone_entry_room_id  (zone_entry_room_id => grid_rooms.id) ON DELETE => nullify
+#
 class GridHackr < ApplicationRecord
   include ProfanityFilterable
   include GridHackr::Stats
   include GridHackr::Loadout
+  include GridHackr::Breach
 
   has_paper_trail ignore: %i[
     password_digest api_token_digest last_activity_at stats

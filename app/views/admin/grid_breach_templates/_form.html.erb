@@ -1,0 +1,110 @@
+<%= form_with model: [:admin, template], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: TEMPLATE INFO ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <% if template.errors[:name].any? %>
+        <br><small class="red-255-text"><%= template.errors[:name].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">lowercase letters, numbers, hyphens only</small>
+      <% if template.errors[:slug].any? %>
+        <br><small class="red-255-text"><%= template.errors[:slug].join(", ") %></small>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin-top: 15px;">
+    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :description, class: "tui-input", style: "width: 100%; font-family: monospace; height: 80px;" %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :tier, "TIER", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :tier, @tiers.map { |t| [t.upcase.tr("_", " "), t] }, {}, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+    </div>
+    <div>
+      <%= f.label :min_clearance, "MIN CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :min_clearance, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0, max: 99 %>
+    </div>
+    <div>
+      <%= f.label :pnr_threshold, "PNR THRESHOLD (%)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :pnr_threshold, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 1, max: 100 %>
+    </div>
+    <div>
+      <%= f.label :base_detection_rate, "BASE DETECT RATE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :base_detection_rate, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 1 %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :xp_reward, "XP REWARD", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :xp_reward, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+    </div>
+    <div>
+      <%= f.label :cred_reward, "CRED REWARD", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :cred_reward, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+    </div>
+    <div>
+      <%= f.label :cooldown_min, "COOLDOWN MIN (s)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :cooldown_min, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+    </div>
+    <div>
+      <%= f.label :cooldown_max, "COOLDOWN MAX (s)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :cooldown_max, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :requires_mission_slug, "REQUIRES MISSION SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :requires_mission_slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">Optional — mission that must be active/completed</small>
+    </div>
+    <div>
+      <%= f.label :requires_item_slug, "REQUIRES ITEM SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :requires_item_slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">Optional — key item required to breach</small>
+    </div>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 25px 0 15px 0;">[:: PROTOCOL COMPOSITION (JSON) ::]</h3>
+  <div style="margin-top: 10px;">
+    <%= f.text_area :protocol_composition_json,
+      value: JSON.pretty_generate(template.protocol_composition.is_a?(Array) ? template.protocol_composition : []),
+      class: "tui-input", style: "width: 100%; font-family: monospace; height: 200px;" %>
+    <small style="color: #888;">Array of protocol definitions. Example: [{"type": "trace", "count": 1, "health": 50, "max_health": 50, "charge_rounds": 0}]</small>
+  </div>
+
+  <h3 class="cyan-255-text" style="margin: 25px 0 15px 0;">[:: REWARD TABLE (JSON) ::]</h3>
+  <div style="margin-top: 10px;">
+    <%= f.text_area :reward_table_json,
+      value: JSON.pretty_generate(template.reward_table || {}),
+      class: "tui-input", style: "width: 100%; font-family: monospace; height: 100px;" %>
+    <small style="color: #888;">Additional reward configuration (future use). XP and CRED are set above.</small>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+    <div>
+      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :position, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+    </div>
+    <div style="display: flex; align-items: flex-end;">
+      <label style="color: white; cursor: pointer;">
+        <%= f.check_box :published, style: "margin-right: 8px;" %>
+        PUBLISHED
+      </label>
+    </div>
+  </div>
+
+  <div style="margin-top: 25px;">
+    <%= f.submit template.new_record? ? "Create Template" : "Update Template", class: "tui-button green-168", style: "padding: 8px 20px;" %>
+  </div>
+<% end %>

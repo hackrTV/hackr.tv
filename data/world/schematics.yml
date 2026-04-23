@@ -190,3 +190,106 @@ schematics:
       - input_slug: cipher-chip
         quantity: 2
         position: 3
+
+  # ── BREACH: DECK Schematics ───────────────────────────────────
+  - slug: fab-basic-deck
+    name: Fabricate Basic Deck
+    description: "Assemble a basic hacking deck from salvaged components."
+    output_slug: basic-deck
+    output_quantity: 1
+    xp_reward: 80
+    required_clearance: 0
+    required_room_type: den
+    published: true
+    position: 200
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 3
+        position: 0
+      - input_slug: logic-core
+        quantity: 2
+        position: 1
+
+  - slug: fab-advanced-deck
+    name: Fabricate Advanced Deck
+    description: "Build an advanced hacking platform. Requires clearance 10."
+    output_slug: advanced-deck
+    output_quantity: 1
+    xp_reward: 200
+    required_clearance: 10
+    required_room_type: den
+    published: true
+    position: 210
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 6
+        position: 0
+      - input_slug: logic-core
+        quantity: 4
+        position: 1
+      - input_slug: quantum-shard
+        quantity: 2
+        position: 2
+
+  # ── BREACH: Software Schematics ───────────────────────────────
+  - slug: fab-packet-storm
+    name: Fabricate Packet Storm
+    description: "Compile a reliable offensive data-flood routine."
+    output_slug: packet-storm
+    output_quantity: 1
+    xp_reward: 40
+    required_clearance: 0
+    published: true
+    position: 220
+    ingredients:
+      - input_slug: cipher-chip
+        quantity: 2
+        position: 0
+
+  - slug: fab-signal-disruptor
+    name: Fabricate Signal Disruptor
+    description: "Build a targeted signal disruption program."
+    output_slug: signal-disruptor
+    output_quantity: 1
+    xp_reward: 40
+    required_clearance: 0
+    published: true
+    position: 230
+    ingredients:
+      - input_slug: cipher-chip
+        quantity: 2
+        position: 0
+      - input_slug: synth-fiber
+        quantity: 1
+        position: 1
+
+  - slug: fab-cloak-routine
+    name: Fabricate Cloak Routine
+    description: "Weave a detection-dampening cloak from synthetic fibers."
+    output_slug: cloak-routine
+    output_quantity: 1
+    xp_reward: 40
+    required_clearance: 0
+    published: true
+    position: 240
+    ingredients:
+      - input_slug: synth-fiber
+        quantity: 3
+        position: 0
+
+  - slug: fab-deep-scan
+    name: Fabricate Deep Scan
+    description: "Assemble an advanced protocol analysis scanner."
+    output_slug: deep-scan
+    output_quantity: 1
+    xp_reward: 50
+    required_clearance: 5
+    published: true
+    position: 250
+    ingredients:
+      - input_slug: cipher-chip
+        quantity: 2
+        position: 0
+      - input_slug: logic-core
+        quantity: 1
+        position: 1

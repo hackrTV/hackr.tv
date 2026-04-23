@@ -24,7 +24,7 @@ exits:
   - from_room_slug: transit-corridor-alpha
     to_room_slug: govcorp-surveillance-node
     direction: east
-    locked: true
+    locked: false
 
   - from_room_slug: govcorp-surveillance-node
     to_room_slug: transit-corridor-alpha

@@ -11,7 +11,7 @@ module Grid
     class ZoneRestricted < StandardError; end
     class NotEquipped < StandardError; end
 
-    VITAL_KEYS = %w[health energy psyche inspiration].freeze
+    VITAL_KEYS = %w[health energy psyche].freeze
 
     def self.equip!(hackr:, item:)
       new(hackr).equip!(item)

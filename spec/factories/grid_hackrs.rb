@@ -21,6 +21,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  current_room_id         :integer
+#  zone_entry_room_id      :integer
 #
 # Indexes
 #
@@ -28,6 +29,10 @@
 #  index_grid_hackrs_on_email             (email) UNIQUE
 #  index_grid_hackrs_on_hackr_alias       (hackr_alias) UNIQUE
 #  index_grid_hackrs_on_role              (role)
+#
+# Foreign Keys
+#
+#  zone_entry_room_id  (zone_entry_room_id => grid_rooms.id) ON DELETE => nullify
 #
 FactoryBot.define do
   factory :grid_hackr do

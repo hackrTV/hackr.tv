@@ -187,7 +187,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, regions, zones, rooms, etc.)"
-  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics]
+  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics, :breach_templates]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -600,11 +600,21 @@ namespace :data do
         description: attrs["description"],
         grid_zone: zone,
         room_type: attrs["room_type"],
-        min_clearance: attrs["min_clearance"] || 0
+        min_clearance: attrs["min_clearance"] || 0,
+        breach_template_slug: attrs["breach_template_slug"]
       )
       room.save!
       created += 1
       puts "  ✓ Created: #{room.name}"
+    end
+
+    # Backfill breach_template_slug on existing rooms
+    rooms_data.select { |a| a["breach_template_slug"].present? }.each do |attrs|
+      room = GridRoom.find_by(slug: attrs["slug"])
+      next unless room
+      next if room.breach_template_slug == attrs["breach_template_slug"]
+      room.update!(breach_template_slug: attrs["breach_template_slug"])
+      puts "  ↻ Updated breach target: #{room.name} → #{attrs["breach_template_slug"]}"
     end
 
     puts "Rooms: #{created} created, #{GridRoom.count} total"
@@ -813,6 +823,50 @@ namespace :data do
     end
 
     puts "Items: #{created} created, #{GridItem.count} total"
+  end
+
+  desc "Load BREACH templates from YAML"
+  task breach_templates: :environment do
+    puts "\n--- Loading BREACH Templates ---"
+    yaml_file = Rails.root.join("data", "world", "breach_templates.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    templates_data = data["breach_templates"]
+    created = 0
+
+    templates_data.each do |attrs|
+      template = GridBreachTemplate.find_or_initialize_by(slug: attrs["slug"])
+      next unless template.new_record?
+
+      template.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"],
+        tier: attrs["tier"] || "standard",
+        min_clearance: attrs["min_clearance"] || 0,
+        pnr_threshold: attrs["pnr_threshold"] || 75,
+        base_detection_rate: attrs["base_detection_rate"] || 5,
+        cooldown_min: attrs["cooldown_min"] || 300,
+        cooldown_max: attrs["cooldown_max"] || 600,
+        xp_reward: attrs["xp_reward"] || 0,
+        cred_reward: attrs["cred_reward"] || 0,
+        requires_mission_slug: attrs["requires_mission_slug"],
+        requires_item_slug: attrs["requires_item_slug"],
+        published: attrs["published"] || false,
+        position: attrs["position"] || 0,
+        protocol_composition: attrs["protocol_composition"] || [],
+        reward_table: attrs["reward_table"] || {}
+      )
+      template.save!
+      created += 1
+      puts "  ✓ Created: #{template.name} (#{template.slug})"
+    end
+
+    puts "BREACH Templates: #{created} created, #{GridBreachTemplate.count} total"
   end
 
   desc "Sync existing grid_items with their current definitions"

@@ -177,6 +177,28 @@ item_definitions:
       effect_type: energize
       amount: 30
 
+  - slug: power-bank
+    name: Power Bank
+    description: "Portable battery cell. Plug into your DECK to restore charge mid-field. Crackles when you shake it."
+    item_type: consumable
+    rarity: common
+    value: 75
+    max_stack: 8
+    properties:
+      effect_type: deck_recharge
+      amount: 32
+
+  - slug: emergency-cell
+    name: Emergency Cell
+    description: "Military-grade battery pack. Full DECK recharge in one hit. Don't ask where it came from."
+    item_type: consumable
+    rarity: rare
+    value: 300
+    max_stack: 4
+    properties:
+      effect_type: deck_recharge
+      amount: 128
+
   - slug: neural-patch
     name: Neural Patch
     description: "Firmware patch that temporarily boosts cognitive throughput. Side effects include vivid dreams and a mild taste of copper."
@@ -422,6 +444,106 @@ item_definitions:
     properties:
       storage_capacity: 32
       fixture_type: cryo_vault
+
+  # ── DECK (Hacking Hardware) ─────────────────────────────────────
+  - slug: basic-deck
+    name: Basic Deck
+    description: "A no-frills hacking deck. 4 software slots, 64 battery. Enough to get your feet wet."
+    item_type: gear
+    rarity: common
+    value: 0
+    max_stack: 1
+    properties:
+      slot: deck
+      required_clearance: 0
+      slot_count: 4
+      battery_max: 64
+      battery_current: 64
+      firmware_slot_count: 1
+      effects: {}
+
+  - slug: advanced-deck
+    name: Advanced Deck
+    description: "Military-surplus hacking platform. 8 slots, doubled battery. The real work starts here."
+    item_type: gear
+    rarity: uncommon
+    value: 500
+    max_stack: 1
+    properties:
+      slot: deck
+      required_clearance: 10
+      slot_count: 8
+      battery_max: 128
+      battery_current: 128
+      firmware_slot_count: 1
+      effects: {}
+
+  # ── Software (BREACH Programs) ────────────────────────────────
+  - slug: packet-storm
+    name: Packet Storm
+    description: "Floods a protocol with junk data. Reliable offensive software."
+    item_type: software
+    rarity: common
+    value: 0
+    max_stack: 1
+    properties:
+      software_category: offensive
+      slot_cost: 1
+      battery_cost: 12
+      complexity_tier: 1
+      effect_type: damage
+      effect_magnitude: 30
+      level: 1
+
+  - slug: signal-disruptor
+    name: Signal Disruptor
+    description: "Disrupts protocol communication signals. Extra effective against TRACE."
+    item_type: software
+    rarity: common
+    value: 0
+    max_stack: 1
+    properties:
+      software_category: offensive
+      slot_cost: 1
+      battery_cost: 14
+      complexity_tier: 1
+      target_types:
+        - trace
+      effect_type: damage
+      effect_magnitude: 38
+      level: 1
+
+  - slug: cloak-routine
+    name: Cloak Routine
+    description: "Dampens your signature. Reduces detection this round."
+    item_type: software
+    rarity: common
+    value: 0
+    max_stack: 1
+    properties:
+      software_category: defensive
+      slot_cost: 1
+      battery_cost: 10
+      complexity_tier: 1
+      effect_type: reduce_detection
+      effect_magnitude: 12
+      level: 1
+
+  - slug: deep-scan
+    name: Deep Scan
+    description: "Utility scanner. Enhances analyze depth."
+    item_type: software
+    rarity: uncommon
+    value: 0
+    max_stack: 1
+    properties:
+      software_category: utility
+      slot_cost: 1
+      battery_cost: 8
+      complexity_tier: 1
+      effect_type: analyze_boost
+      effect_magnitude: 1
+      level: 1
 
   # ── Faction Items ──────────────────────────────────────────────
   - slug: fracture-beacon

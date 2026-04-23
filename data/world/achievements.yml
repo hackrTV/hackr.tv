@@ -772,3 +772,50 @@ achievements:
       count: 3
     xp_reward: 75
     cred_reward: 5
+
+  # ============================================================
+  # BREACH ENCOUNTERS
+  # ============================================================
+
+  - slug: first_breach
+    name: "First Breach"
+    description: "Completed your first BREACH encounter."
+    badge_icon: "BRK"
+    category: grid
+    trigger_type: breach_completed
+    trigger_data: {}
+    xp_reward: 100
+    cred_reward: 5
+
+  - slug: breach_veteran
+    name: "Breach Veteran"
+    description: "Completed 10 BREACH encounters."
+    badge_icon: "BRK"
+    category: grid
+    trigger_type: breaches_completed_count
+    trigger_data:
+      count: 10
+    xp_reward: 250
+    cred_reward: 20
+
+  - slug: protocol_hunter
+    name: "Protocol Hunter"
+    description: "Dismantled 10 protocols across BREACH encounters."
+    badge_icon: "PRT"
+    category: grid
+    trigger_type: protocols_dismantled
+    trigger_data:
+      count: 10
+    xp_reward: 150
+    cred_reward: 10
+
+  - slug: protocol_killer
+    name: "Protocol Killer"
+    description: "Dismantled 50 protocols across BREACH encounters."
+    badge_icon: "PRT"
+    category: grid
+    trigger_type: protocols_dismantled
+    trigger_data:
+      count: 50
+    xp_reward: 500
+    cred_reward: 50
