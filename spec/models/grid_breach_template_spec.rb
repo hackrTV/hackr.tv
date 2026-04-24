@@ -18,6 +18,7 @@
 #  position              :integer          default(0), not null
 #  protocol_composition  :json             not null
 #  published             :boolean          default(FALSE), not null
+#  puzzle_gates          :json             not null
 #  requires_item_slug    :string
 #  requires_mission_slug :string
 #  reward_table          :json             not null

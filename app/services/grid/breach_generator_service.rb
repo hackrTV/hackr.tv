@@ -30,8 +30,14 @@ module Grid
       return nil unless template
 
       # No DECK equipped → auto-fail at tier 1 (vitals drain + eject)
-      unless @hackr.equipped_deck
+      deck = @hackr.equipped_deck
+      unless deck
         return auto_fail_no_deck!(template)
+      end
+
+      # Fried DECK → auto-fail at tier 1 (prevents loophole of equipping fried DECK to dodge encounters)
+      if deck.deck_fried?
+        return auto_fail_fried_deck!(template)
       end
 
       # Start the ambient BREACH
@@ -69,17 +75,32 @@ module Grid
     end
 
     def auto_fail_no_deck!(template)
+      auto_fail_ambient!(
+        template,
+        reason: "No DECK equipped \u2014 system scan overwhelms your unshielded neural link.",
+        hint: "Equip a DECK to survive ambient encounters."
+      )
+    end
+
+    def auto_fail_fried_deck!(template)
+      auto_fail_ambient!(
+        template,
+        reason: "DECK is fried \u2014 system scan overwhelms your damaged hardware.",
+        hint: "Repair your DECK at a repair service node or with a DECK Repair Kit."
+      )
+    end
+
+    # Shared tier 1 ambient auto-fail: vitals drain + eject + display.
+    def auto_fail_ambient!(template, reason:, hint:)
       eject_room_id = nil
       ejected = false
 
       ActiveRecord::Base.transaction do
         @hackr.lock!
 
-        # Tier 1 failure: vitals drain
         @hackr.adjust_vital!("energy", -20)
         @hackr.adjust_vital!("psyche", -20)
 
-        # Eject to zone entry room (if available)
         eject_room_id = @hackr.zone_entry_room_id
         if eject_room_id && eject_room_id != @hackr.current_room_id
           @hackr.update!(current_room_id: eject_room_id)
@@ -90,14 +111,14 @@ module Grid
       display = []
       display << ""
       display << "<span style='color: #ef4444; font-weight: bold;'>\u26a0 AMBIENT BREACH \u2014 #{ERB::Util.html_escape(template.name)}</span>"
-      display << "<span style='color: #f87171;'>No DECK equipped \u2014 system scan overwhelms your unshielded neural link.</span>"
+      display << "<span style='color: #f87171;'>#{ERB::Util.html_escape(reason)}</span>"
       display << ""
       display << "<span style='color: #f87171;'>ENERGY -20 | PSYCHE -20</span>"
       if ejected
         eject_room = GridRoom.find_by(id: eject_room_id)
         display << "<span style='color: #f87171;'>Ejected to #{ERB::Util.html_escape(eject_room&.name || "unknown")}.</span>"
       end
-      display << "<span style='color: #6b7280;'>Equip a DECK to survive ambient encounters.</span>"
+      display << "<span style='color: #6b7280;'>#{ERB::Util.html_escape(hint)}</span>"
 
       AmbientResult.new(display: display.join("\n"), ejected: ejected)
     end

@@ -433,3 +433,101 @@ schematics:
       - input_slug: cipher-chip
         quantity: 3
         position: 2
+
+  # ── DECK Repair Kit Schematics ────────────────────────────────
+  - slug: fab-deck-repair-kit-1
+    name: Fabricate DECK Repair Kit (Mk.I)
+    description: "Assemble a basic DECK repair kit from salvaged components."
+    output_slug: deck-repair-kit-1
+    output_quantity: 1
+    xp_reward: 20
+    required_clearance: 0
+    published: true
+    position: 400
+    ingredients:
+      - input_slug: scrap-wire
+        quantity: 3
+        position: 0
+      - input_slug: scrap-chip
+        quantity: 2
+        position: 1
+
+  - slug: fab-deck-repair-kit-2
+    name: Fabricate DECK Repair Kit (Mk.II)
+    description: "Build a reinforced repair kit for moderate DECK damage."
+    output_slug: deck-repair-kit-2
+    output_quantity: 1
+    xp_reward: 50
+    required_clearance: 10
+    published: true
+    position: 410
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 3
+        position: 0
+      - input_slug: logic-core
+        quantity: 2
+        position: 1
+      - input_slug: synth-fiber
+        quantity: 2
+        position: 2
+
+  - slug: fab-deck-repair-kit-3
+    name: Fabricate DECK Repair Kit (Mk.III)
+    description: "Construct an advanced repair kit using precision components."
+    output_slug: deck-repair-kit-3
+    output_quantity: 1
+    xp_reward: 120
+    required_clearance: 20
+    published: true
+    position: 420
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 5
+        position: 0
+      - input_slug: quantum-shard
+        quantity: 2
+        position: 1
+      - input_slug: cipher-chip
+        quantity: 2
+        position: 2
+
+  - slug: fab-deck-repair-kit-4
+    name: Fabricate DECK Repair Kit (Mk.IV)
+    description: "Engineer a precision repair kit for severe DECK damage."
+    output_slug: deck-repair-kit-4
+    output_quantity: 1
+    xp_reward: 280
+    required_clearance: 35
+    published: true
+    position: 430
+    ingredients:
+      - input_slug: quantum-shard
+        quantity: 4
+        position: 0
+      - input_slug: cipher-chip
+        quantity: 4
+        position: 1
+      - input_slug: logic-core
+        quantity: 3
+        position: 2
+
+  - slug: fab-deck-repair-kit-5
+    name: Fabricate DECK Repair Kit (Mk.V)
+    description: "Military-grade repair kit requiring the rarest components."
+    output_slug: deck-repair-kit-5
+    output_quantity: 1
+    xp_reward: 600
+    required_clearance: 55
+    published: true
+    position: 440
+    ingredients:
+      - input_slug: quantum-shard
+        quantity: 8
+        position: 0
+      - input_slug: cipher-chip
+        quantity: 6
+        position: 1
+      - input_slug: alloy-plate
+        quantity: 10
+        position: 2

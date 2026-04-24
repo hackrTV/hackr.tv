@@ -68,6 +68,27 @@ class GridHackrBreach < ApplicationRecord
   end
 
   def all_protocols_destroyed?
-    grid_breach_protocols.where.not(state: "destroyed").none?
+    grid_breach_protocols.exists? &&
+      grid_breach_protocols.where.not(state: "destroyed").none?
+  end
+
+  def all_circumvention_gates_solved?
+    ps = meta&.dig("puzzle_state")
+    return false unless ps
+    required = ps["required_count"].to_i
+    return false if required == 0
+    ps["solved_count"].to_i >= required
+  end
+
+  def breach_won?
+    has_protocols = grid_breach_protocols.exists?
+    has_gates = puzzle_gates_exist?
+    return false unless has_protocols || has_gates
+
+    all_protocols_destroyed? || (has_gates && all_circumvention_gates_solved?)
+  end
+
+  def puzzle_gates_exist?
+    meta&.dig("puzzle_state", "gates")&.any? || false
   end
 end

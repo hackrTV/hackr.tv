@@ -24,7 +24,7 @@
 #  grid_hackr_breach_id  (grid_hackr_breach_id => grid_hackr_breaches.id) ON DELETE => cascade
 #
 class GridHackrBreachLog < ApplicationRecord
-  ACTION_TYPES = %w[exec analyze reroute jackout use system].freeze
+  ACTION_TYPES = %w[exec analyze reroute jackout use system interface].freeze
 
   belongs_to :grid_hackr_breach
 

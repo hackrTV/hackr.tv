@@ -766,6 +766,62 @@ item_definitions:
     max_stack: 8
     properties: {}
 
+  # ── DECK Repair Kits ────────────────────────────────────────────
+  - slug: deck-repair-kit-1
+    name: DECK Repair Kit (Mk.I)
+    description: "A basic field repair kit for minor DECK damage. Clears fried level 1."
+    item_type: consumable
+    rarity: common
+    value: 300
+    max_stack: 1
+    properties:
+      effect_type: repair_deck
+      kit_level: 1
+
+  - slug: deck-repair-kit-2
+    name: DECK Repair Kit (Mk.II)
+    description: "A reinforced repair kit for moderate DECK damage. Clears fried level 1-2."
+    item_type: consumable
+    rarity: uncommon
+    value: 900
+    max_stack: 1
+    properties:
+      effect_type: repair_deck
+      kit_level: 2
+
+  - slug: deck-repair-kit-3
+    name: DECK Repair Kit (Mk.III)
+    description: "An advanced repair kit for serious DECK damage. Clears fried level 1-3."
+    item_type: consumable
+    rarity: uncommon
+    value: 2400
+    max_stack: 1
+    properties:
+      effect_type: repair_deck
+      kit_level: 3
+
+  - slug: deck-repair-kit-4
+    name: DECK Repair Kit (Mk.IV)
+    description: "A precision repair kit for severe DECK damage. Clears fried level 1-4."
+    item_type: consumable
+    rarity: rare
+    value: 6000
+    max_stack: 1
+    properties:
+      effect_type: repair_deck
+      kit_level: 4
+
+  - slug: deck-repair-kit-5
+    name: DECK Repair Kit (Mk.V)
+    description: "A military-grade repair kit for catastrophic DECK damage. Clears any fried level."
+    item_type: consumable
+    rarity: ultra_rare
+    value: 15000
+    max_stack: 1
+    properties:
+      effect_type: repair_deck
+      kit_level: 5
+
   # ── Faction Items ──────────────────────────────────────────────
   - slug: fracture-beacon
     name: Fracture Beacon

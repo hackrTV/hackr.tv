@@ -5,11 +5,12 @@ module Grid
     StartResult = Data.define(:hackr_breach, :protocols, :display)
     EndRoundResult = Data.define(:hackr_breach, :state, :protocol_messages, :display, :failure_display)
     ResolveResult = Data.define(:hackr_breach, :xp_awarded, :cred_awarded, :xp_result, :display)
-    FailureResult = Data.define(:hackr_breach, :vitals_hit, :zone_lockout_minutes, :display)
+    FailureResult = Data.define(:hackr_breach, :vitals_hit, :zone_lockout_minutes, :fried_level, :software_wiped, :display)
     JackoutResult = Data.define(:hackr_breach, :clean, :vitals_hit, :display)
 
     class AlreadyInBreach < StandardError; end
     class NoDeckEquipped < StandardError; end
+    class DeckFried < StandardError; end
     class ClearanceBlocked < StandardError; end
     class NotInBreach < StandardError; end
     class TemplateGated < StandardError; end
@@ -52,8 +53,8 @@ module Grid
       new(hackr_breach.grid_hackr).resolve_success!(hackr_breach)
     end
 
-    def self.resolve_failure!(hackr_breach:)
-      new(hackr_breach.grid_hackr).resolve_failure!(hackr_breach)
+    def self.resolve_failure!(hackr_breach:, failure_mode: :detection_overflow)
+      new(hackr_breach.grid_hackr).resolve_failure!(hackr_breach, failure_mode: failure_mode)
     end
 
     def self.jackout!(hackr:, emergency: false)
@@ -103,6 +104,7 @@ module Grid
 
       deck = @hackr.equipped_deck
       raise NoDeckEquipped, "No DECK equipped. Equip a DECK before initiating a BREACH." unless deck
+      raise DeckFried, "DECK is fried (level #{deck.deck_fried_level}/5). Repair it before initiating a BREACH." if deck.deck_fried?
 
       breach = nil
       protocols = nil
@@ -151,6 +153,7 @@ module Grid
         )
 
         protocols = generate_protocols!(breach, template)
+        generate_puzzle_gates!(breach, template)
       end
 
       display = Grid::BreachRenderer.new(breach, protocols).render_full
@@ -166,6 +169,7 @@ module Grid
 
       deck = @hackr.equipped_deck
       raise NoDeckEquipped, "No DECK equipped." unless deck
+      raise DeckFried, "DECK is fried. Repair it before initiating a BREACH." if deck.deck_fried?
 
       cl = @hackr.stat("clearance")
       if cl < template.min_clearance
@@ -198,6 +202,7 @@ module Grid
         )
 
         protocols = generate_protocols!(breach, template)
+        generate_puzzle_gates!(breach, template)
       end
 
       display = Grid::BreachRenderer.new(breach, protocols).render_full
@@ -232,7 +237,7 @@ module Grid
         # 1b. Health-at-zero check
         @hackr.reload
         if @hackr.stat("health") <= 0
-          failure_result = resolve_failure!(hackr_breach)
+          failure_result = resolve_failure!(hackr_breach, failure_mode: :health_zero)
           state = :health_zero
           failure_display = failure_result.display
         end
@@ -273,8 +278,8 @@ module Grid
             failure_display = failure_result.display
           end
 
-          # 5. Check win condition (all protocols destroyed)
-          if state == :ongoing && hackr_breach.all_protocols_destroyed?
+          # 5. Check win condition (all protocols destroyed OR all circumvention gates solved)
+          if state == :ongoing && hackr_breach.breach_won?
             state = :success
           end
         end
@@ -354,14 +359,16 @@ module Grid
       )
     end
 
-    def resolve_failure!(hackr_breach)
+    def resolve_failure!(hackr_breach, failure_mode: :detection_overflow)
       unless hackr_breach.state == "active"
-        return FailureResult.new(hackr_breach: hackr_breach, vitals_hit: [], zone_lockout_minutes: nil, display: "")
+        return FailureResult.new(hackr_breach: hackr_breach, vitals_hit: [], zone_lockout_minutes: nil, fried_level: nil, software_wiped: false, display: "")
       end
 
       template = hackr_breach.grid_breach_template
       vitals_hit = []
       zone_lockout_minutes = nil
+      fried_level_set = nil
+      software_wiped = false
       tier = template.tier
 
       # Wrap in transaction if not already inside one (end_round! calls this inside its own)
@@ -390,6 +397,26 @@ module Grid
           end
         end
 
+        # Tier 3+4: DECK consequences (detection-overflow only, not health-zero)
+        # Tier 3: software wipe (standard+). Tier 4: DECK fried (advanced+).
+        # When tier 4 triggers, software is also wiped (it gets _really_ fried).
+        deck = @hackr.equipped_deck
+        if deck && failure_mode == :detection_overflow
+          if %w[advanced elite world_event].include?(tier)
+            # Tier 4: DECK fried — compute level + wipe software
+            fried_level_set = compute_fried_level(tier)
+            deck.lock!
+            deck.loaded_software.destroy_all
+            deck.update!(properties: deck.properties.merge("fried_level" => fried_level_set))
+            software_wiped = true
+          elsif %w[standard].include?(tier)
+            # Tier 3: software wipe only (no fry)
+            deck.lock!
+            deck.loaded_software.destroy_all
+            software_wiped = true
+          end
+        end
+
         # Eject to zone entry room
         eject_room_id = @hackr.zone_entry_room_id || hackr_breach.origin_room_id
         if eject_room_id && eject_room_id != @hackr.current_room_id
@@ -404,11 +431,17 @@ module Grid
       end
 
       vitals_hit.compact!
-      display = Grid::BreachRenderer.new(hackr_breach).render_failure(vitals_hit, zone_lockout_minutes)
+      display = Grid::BreachRenderer.new(hackr_breach).render_failure(
+        vitals_hit, zone_lockout_minutes,
+        fried_level: fried_level_set, software_wiped: software_wiped,
+        failure_mode: failure_mode
+      )
       FailureResult.new(
         hackr_breach: hackr_breach,
         vitals_hit: vitals_hit,
         zone_lockout_minutes: zone_lockout_minutes,
+        fried_level: fried_level_set,
+        software_wiped: software_wiped,
         display: display
       )
     end
@@ -487,6 +520,63 @@ module Grid
       protocols
     end
 
+    # Generate puzzle circumvention gates from template definition.
+    # Clearance reduces required gate count; psyche grants bonus attempts.
+    def generate_puzzle_gates!(breach, template)
+      gate_defs = template.puzzle_gate_definitions
+      return if gate_defs.empty?
+
+      clearance = @hackr.stat("clearance")
+      psyche = @hackr.stat("psyche")
+      total = gate_defs.size
+      bypass_count = [(clearance / 30).floor, total - 1].min # Always leave at least 1 gate active
+      required_count = [1, total - bypass_count].max
+
+      # Base 3 attempts. Psyche bonus: +1 if psyche >= 50% of max
+      max_psyche = @hackr.effective_max("psyche")
+      psyche_bonus = (max_psyche > 0 && psyche.to_f / max_psyche >= 0.5) ? 1 : 0
+      attempts = 3 + psyche_bonus
+
+      # Last N gates (by template order) are bypassed — hardest gates last convention
+      bypassed_ids = gate_defs.last(bypass_count).map { |g| g["id"] }
+
+      gates = {}
+      gate_defs.each_with_index do |spec, idx|
+        rng = Random.new(breach.id * 31 + idx)
+        generated = Grid::PuzzleGeneratorService.generate(spec, rng)
+
+        is_bypassed = bypassed_ids.include?(spec["id"])
+        dep = spec["depends_on"]
+        dep_is_bypassed = dep && bypassed_ids.include?(dep)
+
+        initial_state = if is_bypassed
+          "bypassed"
+        elsif dep && !dep_is_bypassed
+          "locked"
+        else
+          "active"
+        end
+
+        gates[spec["id"]] = {
+          "type" => spec["type"],
+          "state" => initial_state,
+          "attempts_remaining" => is_bypassed ? 0 : attempts,
+          "max_attempts" => is_bypassed ? 0 : attempts,
+          "depends_on" => dep,
+          "solution" => is_bypassed ? nil : generated[:solution],
+          "display" => generated[:display_data]
+        }
+      end
+
+      puzzle_state = {
+        "required_count" => required_count,
+        "solved_count" => 0,
+        "gates" => gates
+      }
+
+      breach.update!(meta: breach.meta.merge("puzzle_state" => puzzle_state))
+    end
+
     def compute_new_inspiration(hackr_breach)
       # Inspiration increases by 1 per successful offensive action this round,
       # capped at the clearance ceiling. For Phase 1, simple: +2 per round survived.
@@ -558,6 +648,33 @@ module Grid
       end
 
       granted
+    end
+
+    # Compute fried_level based on encounter tier and hackr clearance.
+    # Higher clearance = weighted toward lower fried_level (better at damage control).
+    # Only called for advanced/elite/world_event tiers (standard gets software wipe only, no fry).
+    def compute_fried_level(tier)
+      clearance = @hackr.stat("clearance")
+      case tier
+      when "advanced"
+        # 2-3, weighted toward 2 for high clearance (clearance >= 40 = 70% chance of 2)
+        if rand < ((clearance >= 40) ? 0.7 : 0.4)
+          2
+        else
+          3
+        end
+      when "elite"
+        # 3-4, weighted toward 3 for high clearance
+        if rand < ((clearance >= 60) ? 0.65 : 0.35)
+          3
+        else
+          4
+        end
+      when "world_event"
+        5
+      else
+        1
+      end
     end
 
     def drain_vital!(key, amount)

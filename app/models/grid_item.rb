@@ -207,6 +207,14 @@ class GridItem < ApplicationRecord
     [deck_module_slot_count - deck_modules_used, 0].max
   end
 
+  def deck_fried?
+    properties&.dig("fried_level").to_i > 0
+  end
+
+  def deck_fried_level
+    properties&.dig("fried_level").to_i
+  end
+
   def has_module?(module_slug)
     installed_modules.joins(:grid_item_definition)
       .exists?(grid_item_definitions: {slug: module_slug})

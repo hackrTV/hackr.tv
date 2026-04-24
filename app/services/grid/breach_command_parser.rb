@@ -28,6 +28,8 @@ module Grid
         reroute_command(args.first)
       when "use"
         use_command(args.join(" "))
+      when "interface", "if"
+        interface_command(args)
       when "jackout", "jo"
         jackout_command
       when "status", "st"
@@ -217,6 +219,62 @@ module Grid
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
+    def interface_command(args)
+      if args.nil? || args.length < 2
+        return "<span style='color: #fbbf24;'>Usage: interface &lt;gate&gt; &lt;answer...&gt;</span>"
+      end
+
+      gate_id = args[0].upcase
+      answer = args[1..].join(" ")
+
+      result = Grid::BreachActionService.interface!(
+        hackr: hackr,
+        gate_id: gate_id,
+        answer: answer
+      )
+
+      output = []
+      if result.correct
+        output << "<span style='color: #34d399; font-weight: bold;'>Gate [#{result.gate_id}]: #{h(result.feedback)}</span>"
+      elsif result.gate_state == "failed"
+        output << "<span style='color: #f87171; font-weight: bold;'>Gate [#{result.gate_id}]: #{h(result.feedback)}</span>"
+      else
+        output << "<span style='color: #f87171;'>Gate [#{result.gate_id}]: #{h(result.feedback)}</span>"
+        output << "<span style='color: #9ca3af;'>  Review the gate with 'status'.</span>"
+      end
+
+      notifications = []
+
+      if result.all_solved
+        # Resolve success — circumvention gates completed (OR win condition)
+        resolve_result = Grid::BreachService.resolve_success!(hackr_breach: breach)
+        output << resolve_result.display
+
+        template = breach.grid_breach_template
+        notifications += achievement_checker.check(:breach_completed, template_slug: template.slug, tier: template.tier)
+        notifications += achievement_checker.check(:breaches_completed_count)
+        notifications += mission_progressor.record(:complete_breach, template_slug: template.slug, tier: template.tier)
+
+        if resolve_result.xp_result[:leveled_up]
+          output << "<span style='color: #fbbf24; font-weight: bold;'>\u25b2 CLEARANCE UP \u2192 #{resolve_result.xp_result[:new_clearance]}</span>"
+        end
+      else
+        # Check if round should end
+        breach.reload
+        round_output = maybe_end_round
+        output << round_output if round_output
+      end
+
+      append_notifications(output, notifications)
+      output.join("\n")
+    rescue Grid::BreachActionService::NoActionsRemaining,
+      Grid::BreachActionService::GateNotFound,
+      Grid::BreachActionService::GateLocked,
+      Grid::BreachActionService::GateAlreadySolved,
+      Grid::BreachActionService::GateFailed => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
     def jackout_command
       result = Grid::BreachService.jackout!(hackr: hackr)
 
@@ -273,6 +331,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>analyze &lt;target#&gt;</span>           <span style='color: #9ca3af;'>Scan a protocol for intel (1 action)</span>"
       output << "<span style='color: #fbbf24;'>reroute &lt;target#&gt;</span>           <span style='color: #9ca3af;'>Delay a protocol 1 round (1 action, 30% chance protocol fizzles on retry)</span>"
       output << "<span style='color: #fbbf24;'>use &lt;item&gt;</span>                   <span style='color: #9ca3af;'>Use a consumable from inventory (1 action)</span>"
+      output << "<span style='color: #fbbf24;'>interface &lt;gate&gt; &lt;answer&gt;</span>    <span style='color: #9ca3af;'>Submit answer to a circumvention gate (1 action)</span>"
       output << "<span style='color: #fbbf24;'>jackout</span>                      <span style='color: #9ca3af;'>Abort the encounter</span>"
       output << ""
       output << "<span style='color: #6b7280;'>Free commands (no action cost):</span>"
@@ -280,7 +339,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>deck</span>                         <span style='color: #9ca3af;'>Show loaded software + battery</span>"
       output << "<span style='color: #fbbf24;'>help</span>                         <span style='color: #9ca3af;'>This reference</span>"
       output << ""
-      output << "<span style='color: #6b7280;'>Aliases: sh=exec, an=analyze, rr=reroute, jo=jackout, st=status, dk=deck, ?=help</span>"
+      output << "<span style='color: #6b7280;'>Aliases: sh=exec, an=analyze, rr=reroute, if=interface, jo=jackout, st=status, dk=deck, ?=help</span>"
       output.join("\n")
     end
 

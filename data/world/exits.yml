@@ -73,3 +73,13 @@ exits:
     to_room_slug: hackr-tv-broadcast-station
     direction: east
     locked: false
+
+  - from_room_slug: transit-corridor-alpha
+    to_room_slug: techmed-repair-bay
+    direction: northwest
+    locked: false
+
+  - from_room_slug: techmed-repair-bay
+    to_room_slug: transit-corridor-alpha
+    direction: southeast
+    locked: false

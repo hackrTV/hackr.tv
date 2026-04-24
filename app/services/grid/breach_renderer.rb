@@ -35,7 +35,7 @@ module Grid
     end
 
     def render_full
-      [header_block, meters_block, protocols_block, footer_block].join("\n")
+      [header_block, meters_block, protocols_block, circumvention_gates_block, footer_block].compact.join("\n")
     end
 
     def render_action_result(action_message)
@@ -43,7 +43,7 @@ module Grid
     end
 
     def render_compact_status
-      [meters_block, protocols_block, footer_block].join("\n")
+      [meters_block, protocols_block, circumvention_gates_block, footer_block].compact.join("\n")
     end
 
     def render_round_end(protocol_messages)
@@ -78,18 +78,34 @@ module Grid
       lines.join("\n")
     end
 
-    def render_failure(vitals_hit, zone_lockout_minutes = nil)
+    def render_failure(vitals_hit, zone_lockout_minutes = nil, fried_level: nil, software_wiped: false, failure_mode: :detection_overflow)
+      border_red = "<span style='color: #f87171;'>\u2551</span>"
       lines = []
       lines << ""
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2551  B R E A C H   F A I L E D                                   \u2551</span>"
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
-      lines << "<span style='color: #f87171;'>\u2551</span>  <span style='color: #d0d0d0;'>Detection reached 100% \u2014 system countermeasures engaged.</span>"
+      cause = if failure_mode == :health_zero
+        "Neural link severed \u2014 vitals critical."
+      else
+        "Detection reached 100% \u2014 system countermeasures engaged."
+      end
+      lines << "#{border_red}  <span style='color: #d0d0d0;'>#{cause}</span>"
       vitals_hit.each do |hit|
-        lines << "<span style='color: #f87171;'>\u2551</span>  <span style='color: #f87171;'>#{hit[:vital].upcase} -#{hit[:amount]}</span>"
+        lines << "#{border_red}  <span style='color: #f87171;'>#{hit[:vital].upcase} -#{hit[:amount]}</span>"
       end
       if zone_lockout_minutes
-        lines << "<span style='color: #f87171;'>\u2551</span>  <span style='color: #ef4444;'>Zone lockout: #{zone_lockout_minutes} minute(s)</span>"
+        lines << "#{border_red}  <span style='color: #ef4444;'>Zone lockout: #{zone_lockout_minutes} minute(s)</span>"
+      end
+      if fried_level
+        lines << border_red
+        lines << "#{border_red}  <span style='color: #ef4444; font-weight: bold;'>\u26a0 DECK FRIED \u2014 neural feedback cascade (level #{fried_level}/5)</span>"
+        lines << "#{border_red}  <span style='color: #f87171;'>All loaded software destroyed.</span>"
+        lines << "#{border_red}  <span style='color: #9ca3af;'>Repair at a service node or craft a DECK Repair Kit (Mk.#{fried_level}+).</span>"
+      elsif software_wiped
+        lines << border_red
+        lines << "#{border_red}  <span style='color: #ef4444; font-weight: bold;'>\u26a0 DECK OVERLOADED \u2014 all loaded software wiped.</span>"
+        lines << "#{border_red}  <span style='color: #9ca3af;'>Reload software from inventory before your next BREACH.</span>"
       end
       lines << "<span style='color: #f87171; font-weight: bold;'>\u255a#{SEPARATOR}\u255d</span>"
       lines.join("\n")
@@ -196,6 +212,34 @@ module Grid
         end
 
         lines << "  <span style='color: #9ca3af;'>[#{p.position + 1}]</span> #{health_bar}  #{type_hint}  <span style='color: #9ca3af;'>#{state_label}#{state_info}</span>  <span style='color: #6b7280;'>weak:</span> #{weakness_hint}"
+      end
+      lines << "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
+      lines.join("\n")
+    end
+
+    def circumvention_gates_block
+      ps = @breach.meta&.dig("puzzle_state")
+      return nil unless ps&.dig("gates")&.any?
+
+      lines = ["#{border}  <span style='color: #fbbf24; font-weight: bold;'>PROTOCOL CIRCUMVENTION GATES</span>"]
+      ps["gates"].each do |gate_id, gate|
+        state = gate["state"]
+        type_label = gate["type"].to_s.tr("_", " ").split.map(&:capitalize).join(" ")
+
+        state_color, icon, status_text = case state
+        when "solved"
+          ["#34d399", "\u2713", "COMPLETE"]
+        when "bypassed"
+          ["#34d399", "\u2713", "BYPASSED"]
+        when "failed"
+          ["#f87171", "\u2717", "FAILED"]
+        when "locked"
+          ["#6b7280", "\u25a1", "locked (solve #{gate["depends_on"]} first)"]
+        else # active
+          ["#d0d0d0", "\u25cb", "#{gate["attempts_remaining"]}/#{gate["max_attempts"]} attempts"]
+        end
+
+        lines << "#{border}  <span style='color: #9ca3af;'>[#{gate_id}]</span> <span style='color: #d0d0d0;'>#{h(type_label)}</span>  <span style='color: #{state_color};'>#{icon} #{h(status_text)}</span>"
       end
       lines << "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
       lines.join("\n")

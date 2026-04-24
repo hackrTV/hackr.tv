@@ -870,6 +870,7 @@ namespace :data do
         published: attrs["published"] || false,
         position: attrs["position"] || 0,
         protocol_composition: attrs["protocol_composition"] || [],
+        puzzle_gates: attrs["puzzle_gates"] || [],
         reward_table: attrs["reward_table"] || {}
       )
       template.save!
