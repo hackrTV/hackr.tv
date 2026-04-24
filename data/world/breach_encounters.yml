@@ -7,3 +7,24 @@ breach_encounters:
   - template_slug: patrol-node-alpha
     room_slug: govcorp-surveillance-node
     state: available
+
+  # Puzzle encounter placements
+  - template_slug: cipher-lock-station
+    room_slug: transit-corridor-alpha
+    state: available
+
+  - template_slug: fortified-relay-node
+    room_slug: govcorp-surveillance-node
+    state: available
+
+  - template_slug: govcorp-auth-node
+    room_slug: govcorp-surveillance-node
+    state: available
+
+  - template_slug: sector-7-maintenance-node
+    room_slug: transit-corridor-alpha
+    state: available
+
+  - template_slug: vault-core-epsilon
+    room_slug: govcorp-surveillance-node
+    state: available

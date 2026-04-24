@@ -7,6 +7,7 @@ module Grid
     AnalyzeResult = Data.define(:target_position, :level_reached, :info_revealed, :bonus_action)
     RerouteResult = Data.define(:target_position, :protocol_type_label)
     UseItemResult = Data.define(:item_name, :effect_output, :emergency_jackout)
+    InterfaceResult = Data.define(:gate_id, :correct, :gate_state, :attempts_remaining, :all_solved, :feedback)
 
     class NotInBreach < StandardError; end
     class NoActionsRemaining < StandardError; end
@@ -16,6 +17,10 @@ module Grid
     class ProtocolAlreadyDestroyed < StandardError; end
     class AlreadyRerouted < StandardError; end
     class ItemNotFound < StandardError; end
+    class GateNotFound < StandardError; end
+    class GateLocked < StandardError; end
+    class GateAlreadySolved < StandardError; end
+    class GateFailed < StandardError; end
 
     def self.exec!(hackr:, program_name:, target_position:)
       new(hackr).exec!(program_name, target_position)
@@ -31,6 +36,10 @@ module Grid
 
     def self.use_item!(hackr:, item_name:)
       new(hackr).use_item!(item_name)
+    end
+
+    def self.interface!(hackr:, gate_id:, answer:)
+      new(hackr).interface!(gate_id, answer)
     end
 
     include Grid::ItemEffectApplier
@@ -347,6 +356,87 @@ module Grid
       )
     end
 
+    def interface!(gate_id, answer)
+      gate_id = gate_id.to_s.upcase
+
+      breach = @hackr.active_breach
+      raise NotInBreach, "You are not in a BREACH encounter." unless breach
+      raise NoActionsRemaining, "No actions remaining this round." if breach.actions_remaining <= 0
+
+      puzzle_state = breach.meta&.dig("puzzle_state")
+      raise GateNotFound, "No circumvention gates in this encounter." unless puzzle_state&.dig("gates")&.any?
+
+      gate = puzzle_state["gates"][gate_id]
+      raise GateNotFound, "No gate [#{gate_id}]." unless gate
+      validate_gate_state!(gate_id, gate)
+
+      # If breach is already won (e.g., protocols destroyed), don't waste the action
+      raise GateAlreadySolved, "Encounter already complete." if breach.breach_won?
+
+      correct = false
+      gate_state = nil
+      attempts_remaining = 0
+      all_solved = false
+      feedback = nil
+
+      ActiveRecord::Base.transaction do
+        breach.lock!
+        @hackr.lock!
+
+        raise NoActionsRemaining, "No actions remaining this round." if breach.actions_remaining <= 0
+
+        # Re-read puzzle state after lock and re-validate
+        puzzle_state = breach.meta["puzzle_state"]
+        gate = puzzle_state["gates"][gate_id]
+        validate_gate_state!(gate_id, gate)
+
+        correct = answers_match?(gate["type"], gate["solution"], answer)
+
+        if correct
+          gate["state"] = "solved"
+          puzzle_state["solved_count"] = puzzle_state["solved_count"].to_i + 1
+          feedback = "ACCESS GRANTED"
+          unlock_dependent_gates!(puzzle_state, gate_id)
+        else
+          gate["attempts_remaining"] = gate["attempts_remaining"].to_i - 1
+          if gate["attempts_remaining"] <= 0
+            gate["state"] = "failed"
+            feedback = "LOCKED OUT — all attempts exhausted"
+          else
+            hint = sequence_position_hint(gate, answer)
+            feedback = "Incorrect — #{gate["attempts_remaining"]} attempt(s) remaining"
+            feedback = "#{feedback}. #{hint}" if hint
+          end
+        end
+
+        gate_state = gate["state"]
+        attempts_remaining = gate["attempts_remaining"].to_i
+
+        breach.update!(
+          meta: breach.meta.merge("puzzle_state" => puzzle_state),
+          actions_remaining: breach.actions_remaining - 1
+        )
+
+        all_solved = breach.all_circumvention_gates_solved?
+
+        log_action!(breach, "interface", gate_id, nil, {
+          gate_id: gate_id,
+          correct: correct,
+          gate_state: gate_state,
+          attempts_remaining: attempts_remaining
+        })
+      end
+
+      InterfaceResult.new(
+        gate_id: gate_id.upcase,
+        correct: correct,
+        gate_state: gate_state,
+        attempts_remaining: attempts_remaining,
+        all_solved: all_solved,
+        feedback: feedback
+      )
+    end
+
     private
 
     attr_reader :hackr
@@ -398,6 +488,81 @@ module Grid
       breach.update!(meta: breach.meta.merge("pending_fragments" => pending))
 
       fragment_slug
+    end
+
+    # Compare player answer to stored solution. Normalization varies by puzzle type.
+    def answers_match?(type, stored_solution, provided_answer)
+      case type
+      when "sequence"
+        # Case-insensitive, space-separated tokens
+        normalize_tokens(provided_answer) == normalize_tokens(stored_solution)
+      when "logic_gate"
+        # Evaluate any valid input combination — stored solution is "GATE_TYPE:TARGET:INPUT_COUNT"
+        validate_logic_gate_answer(stored_solution, provided_answer)
+      when "circuit"
+        # Sort pairs before compare (order doesn't matter)
+        normalize_circuit(provided_answer) == normalize_circuit(stored_solution)
+      when "credential"
+        # Exact match (case-sensitive — passwords are case-sensitive)
+        provided_answer.strip == stored_solution
+      else
+        provided_answer.strip.upcase == stored_solution.strip.upcase
+      end
+    end
+
+    def validate_logic_gate_answer(stored_solution, provided_answer)
+      gate_type, target, input_count_str = stored_solution.split(":")
+      input_count = input_count_str.to_i
+      tokens = provided_answer.strip.upcase.split
+      return false unless tokens.size == input_count
+      return false unless tokens.all? { |t| %w[HIGH LOW].include?(t) }
+
+      bools = tokens.map { |t| t == "HIGH" }
+      result = Grid::PuzzleGeneratorService.evaluate_gate(gate_type, bools)
+      (result ? "HIGH" : "LOW") == target
+    end
+
+    def normalize_tokens(str)
+      str.to_s.strip.upcase.split.join(" ")
+    end
+
+    def normalize_circuit(str)
+      str.to_s.strip.upcase.split.map { |pair|
+        pair.split("-").sort.join("-")
+      }.sort.join(" ")
+    end
+
+    def validate_gate_state!(gate_id, gate)
+      raise GateAlreadySolved, "Gate [#{gate_id}] is already complete." if gate["state"] == "solved" || gate["state"] == "bypassed"
+      raise GateFailed, "Gate [#{gate_id}] is locked out — all attempts exhausted." if gate["state"] == "failed"
+      raise GateLocked, "Gate [#{gate_id}] is locked — solve #{gate["depends_on"]} first." if gate["state"] == "locked"
+    end
+
+    # Wordle-style progressive hint for sequence puzzles.
+    # Shows which positions are correct (✓) and which are wrong (✗).
+    def sequence_position_hint(gate, answer)
+      return nil unless gate["type"] == "sequence"
+
+      solution_tokens = gate["solution"].to_s.strip.upcase.split
+      answer_tokens = answer.to_s.strip.upcase.split
+      return nil if answer_tokens.empty?
+
+      hints = solution_tokens.each_with_index.map do |node, i|
+        if i < answer_tokens.size && answer_tokens[i] == node
+          "\u2713#{node}"
+        else
+          "\u2717"
+        end
+      end
+      "Positions: #{hints.join(" ")}"
+    end
+
+    def unlock_dependent_gates!(puzzle_state, solved_gate_id)
+      puzzle_state["gates"].each do |_id, gate|
+        next unless gate["state"] == "locked"
+        next unless gate["depends_on"] == solved_gate_id
+        gate["state"] = "active"
+      end
     end
 
     def compute_damage(program, protocol)

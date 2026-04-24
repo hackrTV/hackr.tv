@@ -122,6 +122,8 @@ module Grid
         args.empty? ? deck_show_command : deck_subcommand(args)
       when "breach", "br"
         breach_initiate_command(args.join(" "))
+      when "repair"
+        repair_command
       when "den"
         den_command(args)
       when "out"
@@ -1175,6 +1177,11 @@ module Grid
       output << "<span style='color: #22d3ee; font-weight: bold;'>DECK :: #{h(deck.name)}</span> <span style='color: #{deck.rarity_color};'>[#{deck.rarity_label}]</span>"
       output << "<span style='color: #a78bfa;'>════════════════════════════════════════</span>"
       output << ""
+      if deck.deck_fried?
+        output << "<span style='color: #ef4444; font-weight: bold;'>STATUS: FRIED (level #{deck.deck_fried_level}/5) \u2014 unusable in BREACH</span>"
+        output << "<span style='color: #9ca3af;'>Repair at a service node or use a DECK Repair Kit.</span>"
+        output << ""
+      end
       output << "<span style='color: #fbbf24;'>Battery:</span> <span style='color: #d0d0d0;'>#{deck.deck_battery}/#{deck.deck_battery_max}</span>"
       output << "<span style='color: #fbbf24;'>Software Slots:</span> <span style='color: #d0d0d0;'>#{deck.deck_slots_used}/#{deck.deck_slot_count}</span>"
       output << "<span style='color: #fbbf24;'>Module Slots:</span> <span style='color: #d0d0d0;'>#{deck.deck_modules_used}/#{deck.deck_module_slot_count}</span>"
@@ -1279,6 +1286,19 @@ module Grid
       end
 
       "<span style='color: #34d399;'>Unloaded #{h(software.name)} from DECK.</span>"
+    end
+
+    def repair_command
+      result = Grid::DeckRepairService.repair_at_npc!(hackr: hackr)
+      result.display
+    rescue Grid::DeckRepairService::NotAtRepairService => e
+      "<span style='color: #9ca3af;'>#{h(e.message)}</span>"
+    rescue Grid::DeckRepairService::NoDeckEquipped => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::DeckRepairService::DeckNotFried => e
+      "<span style='color: #9ca3af;'>#{h(e.message)}</span>"
+    rescue Grid::DeckRepairService::InsufficientBalance => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
     def deck_charge_command

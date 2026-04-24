@@ -18,6 +18,7 @@
 #  position              :integer          default(0), not null
 #  protocol_composition  :json             not null
 #  published             :boolean          default(FALSE), not null
+#  puzzle_gates          :json             not null
 #  requires_item_slug    :string
 #  requires_mission_slug :string
 #  reward_table          :json             not null
@@ -75,6 +76,14 @@ class GridBreachTemplate < ApplicationRecord
     composition = protocol_composition
     return [] unless composition.is_a?(Array)
     composition
+  end
+
+  # Parse the puzzle_gates JSON into a usable array of hashes.
+  # Expected shape: [{"id": "A", "type": "sequence", "difficulty": 3, "depends_on": null}, ...]
+  def puzzle_gate_definitions
+    gates = puzzle_gates
+    return [] unless gates.is_a?(Array)
+    gates
   end
 
   # Does this template's zone constraint match the given zone?

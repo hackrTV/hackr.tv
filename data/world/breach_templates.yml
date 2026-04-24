@@ -300,3 +300,195 @@ breach_templates:
         health: 40
         max_health: 40
         charge_rounds: 3
+
+  # ── PUZZLE TEMPLATES ─────────────────────────────────────────
+
+  # Pure puzzle — ambient
+  - slug: access-terminal-echo
+    name: "Access Terminal Echo"
+    description: "A dormant access terminal flickers to life. Its authentication protocols are degraded but still functional. A single credential stands between you and its data."
+    tier: ambient
+    min_clearance: 0
+    danger_level_min: 1
+    zone_slugs: []
+    pnr_threshold: 85
+    base_detection_rate: 4
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 60
+    cred_reward: 15
+    published: true
+    position: 110
+    protocol_composition: []
+    puzzle_gates:
+      - id: "A"
+        type: credential
+        difficulty: 1
+        depends_on: null
+
+  # Pure puzzle — standard
+  - slug: cipher-lock-station
+    name: "Cipher Lock Station"
+    description: "A GovCorp data terminal secured behind layered authentication. Sequence locks guard the outer shell; encrypted credentials protect the core."
+    tier: standard
+    min_clearance: 5
+    danger_level_min: 0
+    pnr_threshold: 80
+    base_detection_rate: 3
+    cooldown_min: 240
+    cooldown_max: 480
+    xp_reward: 150
+    cred_reward: 50
+    published: true
+    position: 30
+    protocol_composition: []
+    puzzle_gates:
+      - id: "A"
+        type: sequence
+        difficulty: 2
+        depends_on: null
+      - id: "B"
+        type: credential
+        difficulty: 2
+        depends_on: "A"
+
+  # Mixed — standard (protocols + gates, two paths to win)
+  - slug: fortified-relay-node
+    name: "Fortified Relay Node"
+    description: "A communications relay with redundant security layers. Brute-force through the protocols or bypass via the circumvention gates — your choice."
+    tier: standard
+    min_clearance: 10
+    danger_level_min: 0
+    pnr_threshold: 70
+    base_detection_rate: 6
+    cooldown_min: 300
+    cooldown_max: 600
+    xp_reward: 220
+    cred_reward: 80
+    published: true
+    position: 31
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 0
+      - type: feedback
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 1
+    puzzle_gates:
+      - id: "A"
+        type: logic_gate
+        difficulty: 2
+        depends_on: null
+      - id: "B"
+        type: circuit
+        difficulty: 2
+        depends_on: "A"
+
+  # Mixed — advanced (protocols + deep gate chain)
+  - slug: govcorp-auth-node
+    name: "GovCorp Authorization Node"
+    description: "A heavily fortified GovCorp authentication node. Dual TRACE protocols accelerate detection. The circumvention path requires logic and decryption."
+    tier: advanced
+    min_clearance: 15
+    danger_level_min: 0
+    pnr_threshold: 65
+    base_detection_rate: 8
+    cooldown_min: 480
+    cooldown_max: 900
+    xp_reward: 400
+    cred_reward: 150
+    published: true
+    position: 32
+    protocol_composition:
+      - type: trace
+        count: 2
+        health: 60
+        max_health: 60
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 2
+    puzzle_gates:
+      - id: "A"
+        type: logic_gate
+        difficulty: 3
+        depends_on: null
+      - id: "B"
+        type: credential
+        difficulty: 3
+        depends_on: "A"
+
+  # Mixed — advanced (parallel gates)
+  - slug: sector-7-maintenance-node
+    name: "Sector 7 Maintenance Node"
+    description: "A maintenance access node with LOCK protocols that shut down your options. Three independent circumvention gates offer an alternate path."
+    tier: advanced
+    min_clearance: 20
+    danger_level_min: 0
+    pnr_threshold: 65
+    base_detection_rate: 7
+    cooldown_min: 360
+    cooldown_max: 720
+    xp_reward: 350
+    cred_reward: 120
+    published: true
+    position: 33
+    protocol_composition:
+      - type: lock
+        count: 2
+        health: 70
+        max_health: 70
+        charge_rounds: 1
+    puzzle_gates:
+      - id: "A"
+        type: circuit
+        difficulty: 3
+        depends_on: null
+      - id: "B"
+        type: sequence
+        difficulty: 3
+        depends_on: null
+      - id: "C"
+        type: logic_gate
+        difficulty: 3
+        depends_on: null
+
+  # Pure puzzle — elite (deep dependency chain)
+  - slug: vault-core-epsilon
+    name: "Vault Core Epsilon"
+    description: "A high-security vault with four-layer circumvention. Each gate unlocks the next. High CLEARANCE hackrs bypass the deepest layers."
+    tier: elite
+    min_clearance: 30
+    danger_level_min: 0
+    pnr_threshold: 60
+    base_detection_rate: 8
+    cooldown_min: 600
+    cooldown_max: 1200
+    xp_reward: 600
+    cred_reward: 250
+    published: true
+    position: 34
+    protocol_composition: []
+    puzzle_gates:
+      - id: "A"
+        type: sequence
+        difficulty: 4
+        depends_on: null
+      - id: "B"
+        type: logic_gate
+        difficulty: 4
+        depends_on: "A"
+      - id: "C"
+        type: circuit
+        difficulty: 5
+        depends_on: "B"
+      - id: "D"
+        type: credential
+        difficulty: 5
+        depends_on: "C"

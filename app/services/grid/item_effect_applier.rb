@@ -41,6 +41,8 @@ module Grid
         result = hackr.grant_xp!(amount)
         level_msg = result[:leveled_up] ? "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{result[:new_clearance]}!</span>" : ""
         "<span style='color: #fbbf24;'>You use #{h(item.name)}. +#{amount} XP.#{level_msg}</span>"
+      when "repair_deck"
+        apply_repair_deck(item, props)
       when "redeem_den"
         apply_redeem_den(item)
       else
@@ -93,6 +95,25 @@ module Grid
       end
       # Returns a sentinel that the caller checks to trigger a clean jackout
       :emergency_jackout
+    end
+
+    def apply_repair_deck(item, props)
+      deck = hackr.equipped_deck
+      unless deck
+        return "<span style='color: #f87171;'>No DECK equipped.</span>"
+      end
+      unless deck.deck_fried?
+        return "<span style='color: #9ca3af;'>Your DECK doesn't need repair.</span>"
+      end
+
+      kit_level = props[:kit_level].to_i
+      fried = deck.deck_fried_level
+      if kit_level < fried
+        return "<span style='color: #f87171;'>Repair Kit Mk.#{kit_level} is insufficient for damage level #{fried}. Need Mk.#{fried}+ kit.</span>"
+      end
+
+      deck.update!(properties: deck.properties.merge("fried_level" => 0))
+      "<span style='color: #34d399; font-weight: bold;'>You use #{h(item.name)}. DECK repaired \u2014 damage cleared (was level #{fried}/5).</span>"
     end
 
     def apply_redeem_den(item)
