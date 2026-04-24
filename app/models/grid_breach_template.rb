@@ -10,6 +10,7 @@
 #  cooldown_max          :integer          default(600), not null
 #  cooldown_min          :integer          default(300), not null
 #  cred_reward           :integer          default(0), not null
+#  danger_level_min      :integer          default(0), not null
 #  description           :text
 #  min_clearance         :integer          default(0), not null
 #  name                  :string           not null
@@ -23,6 +24,7 @@
 #  slug                  :string           not null
 #  tier                  :string           default("standard"), not null
 #  xp_reward             :integer          default(0), not null
+#  zone_slugs            :json             not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #
@@ -53,9 +55,11 @@ class GridBreachTemplate < ApplicationRecord
   validates :cooldown_max, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validate :cooldown_range_valid
   validates :position, numericality: {only_integer: true, greater_than_or_equal_to: 0}
+  validates :danger_level_min, numericality: {only_integer: true, greater_than_or_equal_to: 0}
 
   scope :published, -> { where(published: true) }
   scope :ordered, -> { order(:position, :name) }
+  scope :ambient, -> { where(tier: "ambient") }
 
   def to_param
     slug
@@ -71,6 +75,12 @@ class GridBreachTemplate < ApplicationRecord
     composition = protocol_composition
     return [] unless composition.is_a?(Array)
     composition
+  end
+
+  # Does this template's zone constraint match the given zone?
+  # Empty zone_slugs = matches any zone.
+  def matches_zone?(zone)
+    zone_slugs.empty? || zone_slugs.include?(zone.slug)
   end
 
   # reward_table: Phase 2 — will drive variable loot drops on breach completion.

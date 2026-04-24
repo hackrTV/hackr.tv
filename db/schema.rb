@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_24_024043) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_24_031949) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -210,6 +210,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_024043) do
     t.integer "cooldown_min", default: 300, null: false
     t.datetime "created_at", null: false
     t.integer "cred_reward", default: 0, null: false
+    t.integer "danger_level_min", default: 0, null: false
     t.text "description"
     t.integer "min_clearance", default: 0, null: false
     t.string "name", null: false
@@ -224,6 +225,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_024043) do
     t.string "tier", default: "standard", null: false
     t.datetime "updated_at", null: false
     t.integer "xp_reward", default: 0, null: false
+    t.json "zone_slugs", default: [], null: false
     t.index ["published"], name: "index_grid_breach_templates_on_published"
     t.index ["slug"], name: "index_grid_breach_templates_on_slug", unique: true
     t.index ["tier"], name: "index_grid_breach_templates_on_tier"
@@ -732,6 +734,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_024043) do
     t.integer "ambient_playlist_id"
     t.string "color_scheme"
     t.datetime "created_at", null: false
+    t.integer "danger_level", default: 0, null: false
     t.text "description"
     t.integer "grid_faction_id"
     t.integer "grid_region_id"

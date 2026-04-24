@@ -36,6 +36,11 @@
     <%= f.label :color_scheme, "COLOR SCHEME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
     <%= f.text_field :color_scheme, class: "tui-input", style: "width: 100%; padding: 8px;" %>
   </div>
+  <div style="flex: 1; min-width: 200px;">
+    <%= f.label :danger_level, "DANGER LEVEL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.number_field :danger_level, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0, max: 10 %>
+    <small style="color: #888;">0 = safe, 10 = max ambient encounters</small>
+  </div>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">

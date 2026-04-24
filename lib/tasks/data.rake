@@ -565,6 +565,7 @@ namespace :data do
         description: attrs["description"],
         zone_type: attrs["zone_type"],
         color_scheme: attrs["color_scheme"],
+        danger_level: attrs["danger_level"] || 0,
         grid_region: region,
         grid_faction: faction,
         ambient_playlist: playlist
@@ -864,6 +865,8 @@ namespace :data do
         cred_reward: attrs["cred_reward"] || 0,
         requires_mission_slug: attrs["requires_mission_slug"],
         requires_item_slug: attrs["requires_item_slug"],
+        danger_level_min: attrs["danger_level_min"] || 0,
+        zone_slugs: attrs["zone_slugs"] || [],
         published: attrs["published"] || false,
         position: attrs["position"] || 0,
         protocol_composition: attrs["protocol_composition"] || [],

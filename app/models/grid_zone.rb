@@ -5,6 +5,7 @@
 #
 #  id                  :integer          not null, primary key
 #  color_scheme        :string
+#  danger_level        :integer          default(0), not null
 #  description         :text
 #  name                :string
 #  slug                :string
@@ -40,4 +41,5 @@ class GridZone < ApplicationRecord
     in: %w[faction_base govcorp residential transit special danger_zone],
     allow_nil: true
   }
+  validates :danger_level, numericality: {only_integer: true, in: 0..10}
 end

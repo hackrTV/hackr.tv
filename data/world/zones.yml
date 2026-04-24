@@ -8,6 +8,7 @@ zones:
     region_slug: the-lakeshore
     faction_slug: thecyberpulse
     ambient_playlist_slug: fracture-network-ambience
+    danger_level: 0
 
   - name: Sector X
     slug: sector-x
@@ -17,6 +18,7 @@ zones:
     region_slug: the-lakeshore
     faction_slug: xeraen
     ambient_playlist_slug: fracture-network-ambience
+    danger_level: 0
 
   - name: Transit Network
     slug: transit-network
@@ -26,6 +28,7 @@ zones:
     region_slug: the-lakeshore
     faction_slug: null
     ambient_playlist_slug: transit-network-ambience
+    danger_level: 2
 
   - name: GovCorp Surveillance District
     slug: govcorp-surveillance
@@ -35,6 +38,7 @@ zones:
     region_slug: the-lakeshore
     faction_slug: govcorp
     ambient_playlist_slug: govcorp-surveillance-ambience
+    danger_level: 5
 
   - name: The Underbelly
     slug: the-underbelly
@@ -44,6 +48,7 @@ zones:
     region_slug: the-lakeshore
     faction_slug: null
     ambient_playlist_slug: null
+    danger_level: 7
 
   - name: Residential District
     slug: residential-district
@@ -53,6 +58,7 @@ zones:
     region_slug: the-lakeshore
     faction_slug: null
     ambient_playlist_slug: null
+    danger_level: 0
 
   - name: The Hackr Hangar
     slug: hackr-hangar
@@ -62,6 +68,7 @@ zones:
     region_slug: the-riverlands
     faction_slug: thecyberpulse
     ambient_playlist_slug: fracture-network-ambience
+    danger_level: 0
 
   - name: "GovCorp RestorePoint\u2122 — Lakeshore"
     slug: restorepoint-lakeshore
@@ -71,3 +78,4 @@ zones:
     region_slug: the-lakeshore
     faction_slug: null
     ambient_playlist_slug: null
+    danger_level: 0

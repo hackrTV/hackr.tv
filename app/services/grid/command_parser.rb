@@ -372,6 +372,16 @@ module Grid
       notifications += mission_progressor.record(:reach_clearance, clearance: hackr.stat("clearance").to_i)
       look_output = append_notifications(look_output, notifications)
 
+      # Ambient encounter check — random BREACH trigger based on zone danger_level
+      ambient_result = Grid::BreachGeneratorService.ambient_check!(hackr: hackr, room: new_room)
+      if ambient_result
+        look_output += "\n" + ambient_result.display
+        if ambient_result.ejected
+          hackr.reload
+          look_output += "\n" + look_command
+        end
+      end
+
       {
         output: look_output,
         event: {

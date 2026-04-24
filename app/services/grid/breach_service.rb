@@ -40,6 +40,10 @@ module Grid
       new(hackr).start!(encounter)
     end
 
+    def self.start_ambient!(hackr:, template:)
+      new(hackr).start_ambient!(template)
+    end
+
     def self.end_round!(hackr_breach:)
       new(hackr_breach.grid_hackr).end_round!(hackr_breach)
     end
@@ -142,6 +146,53 @@ module Grid
           inspiration: 0,
           actions_this_round: initial_actions,
           actions_remaining: initial_actions,
+          reward_multiplier: 1.0,
+          started_at: Time.current
+        )
+
+        protocols = generate_protocols!(breach, template)
+      end
+
+      display = Grid::BreachRenderer.new(breach, protocols).render_full
+      StartResult.new(hackr_breach: breach, protocols: protocols, display: display)
+    rescue ActiveRecord::RecordNotUnique
+      raise AlreadyInBreach, "You are already in a BREACH encounter."
+    end
+
+    # Start an ambient encounter (no persistent GridBreachEncounter record).
+    # Called by BreachGeneratorService when a random encounter triggers.
+    def start_ambient!(template)
+      raise AlreadyInBreach, "You are already in a BREACH encounter." if @hackr.in_breach?
+
+      deck = @hackr.equipped_deck
+      raise NoDeckEquipped, "No DECK equipped." unless deck
+
+      cl = @hackr.stat("clearance")
+      if cl < template.min_clearance
+        raise ClearanceBlocked, "Requires CLEARANCE #{template.min_clearance}. You are CLEARANCE #{cl}."
+      end
+
+      breach = nil
+      protocols = nil
+
+      ActiveRecord::Base.transaction do
+        @hackr.lock!
+
+        # Re-check after lock (another request may have started a breach)
+        raise AlreadyInBreach, "You are already in a BREACH encounter." if @hackr.in_breach?
+
+        breach = GridHackrBreach.create!(
+          grid_hackr: @hackr,
+          grid_breach_template: template,
+          grid_breach_encounter: nil,
+          origin_room_id: @hackr.current_room_id,
+          state: "active",
+          detection_level: 0,
+          pnr_threshold: template.pnr_threshold,
+          round_number: 1,
+          inspiration: 0,
+          actions_this_round: 1,
+          actions_remaining: 1,
           reward_multiplier: 1.0,
           started_at: Time.current
         )
