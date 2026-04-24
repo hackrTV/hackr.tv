@@ -119,6 +119,8 @@ module Grid
         target.blank? || target.casecmp?(context[:template_slug].to_s)
       when "dismantle_protocols"
         target.blank? || target.casecmp?(context[:protocol_type].to_s)
+      when "extract_data"
+        target.blank? || target.casecmp?(context[:fragment_slug].to_s)
       when "talk_npc", "use_item", "salvage_item", "salvage_yield_received", "buy_item", "collect_item", "fabricate_item", "place_fixture", "equip_item"
         target.blank? || target.casecmp?(name_context(context).to_s)
       when "deliver_item"
@@ -155,7 +157,7 @@ module Grid
       case trigger_type.to_s
       when "visit_room", "talk_npc", "use_item", "fabricate_item", "place_fixture", "equip_item", "complete_breach"
         [current + 1, target_count].min
-      when "collect_item", "deliver_item", "buy_item", "salvage_item", "salvage_yield_received", "dismantle_protocols"
+      when "collect_item", "deliver_item", "buy_item", "salvage_item", "salvage_yield_received", "dismantle_protocols", "extract_data"
         [current + context.fetch(:amount, 1).to_i, target_count].min
       when "spend_cred"
         [current + context[:amount].to_i, target_count].min

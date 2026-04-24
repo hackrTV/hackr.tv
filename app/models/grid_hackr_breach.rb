@@ -11,6 +11,7 @@
 #  detection_level          :integer          default(0), not null
 #  ended_at                 :datetime
 #  inspiration              :integer          default(0), not null
+#  meta                     :json             not null
 #  pnr_threshold            :integer          default(75), not null
 #  reward_multiplier        :decimal(5, 4)    default(1.0), not null
 #  round_number             :integer          default(1), not null

@@ -459,7 +459,7 @@ item_definitions:
       slot_count: 4
       battery_max: 64
       battery_current: 64
-      firmware_slot_count: 1
+      module_slot_count: 1
       effects: {}
 
   - slug: advanced-deck
@@ -475,7 +475,7 @@ item_definitions:
       slot_count: 8
       battery_max: 128
       battery_current: 128
-      firmware_slot_count: 1
+      module_slot_count: 1
       effects: {}
 
   # ── Software (BREACH Programs) ────────────────────────────────
@@ -544,6 +544,227 @@ item_definitions:
       effect_type: analyze_boost
       effect_magnitude: 1
       level: 1
+
+  # ── Exploit Software (One-Shot BREACH Programs) ───────────────
+  - slug: rainn-killswitch
+    name: RAINN Killswitch
+    description: "Targets ADAPT protocols with a neural feedback loop that collapses the protocol's decision engine. One shot. One kill. If it matches."
+    item_type: software
+    rarity: rare
+    value: 400
+    max_stack: 1
+    properties:
+      software_category: exploit
+      slot_cost: 2
+      battery_cost: 20
+      complexity_tier: 2
+      target_types:
+        - adapt
+      effect_type: instant_kill
+      effect_magnitude: 999
+      level: 2
+
+  - slug: firewall-bypass
+    name: Firewall Bypass
+    description: "Injects a precision zero-day into LOCK protocol firmware. Instantly dismantles the lock — but burns itself in the process."
+    item_type: software
+    rarity: rare
+    value: 400
+    max_stack: 1
+    properties:
+      software_category: exploit
+      slot_cost: 2
+      battery_cost: 20
+      complexity_tier: 2
+      target_types:
+        - lock
+      effect_type: instant_kill
+      effect_magnitude: 999
+      level: 2
+
+  - slug: trace-purge
+    name: Trace Purge
+    description: "Floods the TRACE protocol with false positives until its own detection matrix collapses. Single use."
+    item_type: software
+    rarity: uncommon
+    value: 250
+    max_stack: 1
+    properties:
+      software_category: exploit
+      slot_cost: 1
+      battery_cost: 16
+      complexity_tier: 1
+      target_types:
+        - trace
+      effect_type: instant_kill
+      effect_magnitude: 999
+      level: 1
+
+  # ── Utility Software (Fragment Extraction) ───────────────────
+  - slug: fragment-extractor
+    name: Fragment Extractor
+    description: "Siphons protocol data during execution. Each hit has a chance to extract a software fragment. Fragments are pending until breach success."
+    item_type: software
+    rarity: uncommon
+    value: 200
+    max_stack: 1
+    properties:
+      software_category: utility
+      slot_cost: 1
+      battery_cost: 10
+      complexity_tier: 1
+      effect_type: damage
+      effect_magnitude: 15
+      fragment_chance: 0.30
+      level: 1
+
+  - slug: data-siphon
+    name: Data Siphon
+    description: "Advanced extraction tool. Higher fragment yield, lower damage output. The trade-off of a specialist."
+    item_type: software
+    rarity: rare
+    value: 500
+    max_stack: 1
+    properties:
+      software_category: utility
+      slot_cost: 2
+      battery_cost: 14
+      complexity_tier: 2
+      effect_type: damage
+      effect_magnitude: 10
+      fragment_chance: 0.50
+      level: 2
+
+  # ── BREACH Consumables (In-Encounter) ───────────────────────
+  - slug: signal-flare
+    name: Signal Flare
+    description: "Emits a burst of electromagnetic noise that temporarily blinds nearby surveillance systems. Reduces detection level during BREACH."
+    item_type: consumable
+    rarity: uncommon
+    value: 200
+    max_stack: 4
+    properties:
+      effect_type: signal_flare
+      amount: 15
+
+  - slug: emergency-jackout-chip
+    name: Emergency Jack-Out Chip
+    description: "One-use neural bypass chip. Forces a clean disconnect even past the Point of No Return. Don't leave home without one."
+    item_type: consumable
+    rarity: rare
+    value: 750
+    max_stack: 2
+    properties:
+      effect_type: emergency_jackout
+
+  # ── DECK Modules (Hardware Peripherals) ─────────────────────
+  - slug: breach-amplifier
+    name: BREACH Amplification Antenna
+    description: "A compact directional antenna that boosts signal penetration during BREACH encounters. Requires firmware to operate."
+    item_type: module
+    rarity: uncommon
+    value: 300
+    max_stack: 1
+    properties:
+      flashed: false
+
+  - slug: signal-intercept-array
+    name: Signal Intercept Array
+    description: "A passive signal capture array that enables advanced exploit software to interface with hostile protocols. Firmware required."
+    item_type: module
+    rarity: rare
+    value: 600
+    max_stack: 1
+    properties:
+      flashed: false
+
+  # ── Firmware (Module Software) ──────────────────────────────
+  - slug: amplifier-firmware-v1
+    name: Amplifier Firmware v1.0
+    description: "Basic firmware package for BREACH Amplification Antennas. Enables signal boost capabilities."
+    item_type: firmware
+    rarity: uncommon
+    value: 150
+    max_stack: 4
+    properties:
+      compatible_modules:
+        - breach-amplifier
+
+  - slug: intercept-protocol-loader
+    name: Intercept Protocol Loader
+    description: "Firmware package for Signal Intercept Arrays. Activates passive capture and exploit interface protocols."
+    item_type: firmware
+    rarity: rare
+    value: 350
+    max_stack: 4
+    properties:
+      compatible_modules:
+        - signal-intercept-array
+
+  # ── Tools (BREACH) ──────────────────────────────────────────
+  - slug: eeprom-flasher
+    name: EEPROM Flasher
+    description: "Portable firmware programming tool. Flash firmware onto DECK modules anywhere, anytime. Beats making the trip to a Vending Machine."
+    item_type: tool
+    rarity: rare
+    value: 800
+    max_stack: 1
+    properties: {}
+
+  # ── Protocol Fragments (Extracted Data) ─────────────────────
+  - slug: trace-fragment
+    name: TRACE Fragment
+    description: "A data shard extracted from a TRACE protocol during BREACH. Contains partial detection algorithm signatures. Used in software fabrication."
+    item_type: data
+    rarity: uncommon
+    value: 25
+    max_stack: 16
+    properties: {}
+
+  - slug: feedback-fragment
+    name: FEEDBACK Fragment
+    description: "A data shard extracted from a FEEDBACK protocol during BREACH. Contains neural drain waveform patterns. Used in software fabrication."
+    item_type: data
+    rarity: uncommon
+    value: 25
+    max_stack: 16
+    properties: {}
+
+  - slug: lock-fragment
+    name: LOCK Fragment
+    description: "A data shard extracted from a LOCK protocol during BREACH. Contains access control bypass signatures. Used in software fabrication."
+    item_type: data
+    rarity: uncommon
+    value: 30
+    max_stack: 16
+    properties: {}
+
+  - slug: adapt-fragment
+    name: ADAPT Fragment
+    description: "A data shard extracted from an ADAPT protocol during BREACH. Contains mutation algorithm core logic. Rare and valuable."
+    item_type: data
+    rarity: rare
+    value: 50
+    max_stack: 8
+    properties: {}
+
+  - slug: spike-fragment
+    name: SPIKE Fragment
+    description: "A data shard extracted from a SPIKE protocol during BREACH. Contains counter-intrusion payload signatures. Dangerous to handle."
+    item_type: data
+    rarity: rare
+    value: 50
+    max_stack: 8
+    properties: {}
+
+  - slug: purge-fragment
+    name: PURGE Fragment
+    description: "A data shard extracted from a PURGE protocol during BREACH. Contains reward degradation algorithms. Useful for reverse-engineering countermeasures."
+    item_type: data
+    rarity: rare
+    value: 50
+    max_stack: 8
+    properties: {}
 
   # ── Faction Items ──────────────────────────────────────────────
   - slug: fracture-beacon

@@ -52,8 +52,8 @@ module Grid
       new(hackr_breach.grid_hackr).resolve_failure!(hackr_breach)
     end
 
-    def self.jackout!(hackr:)
-      new(hackr).jackout!
+    def self.jackout!(hackr:, emergency: false)
+      new(hackr).jackout!(emergency: emergency)
     end
 
     # List voluntary encounters in a room, respecting cooldowns and gates.
@@ -257,6 +257,7 @@ module Grid
       cred_awarded = (template.cred_reward * hackr_breach.reward_multiplier).floor
 
       xp_result = nil
+      fragments_granted = []
 
       ActiveRecord::Base.transaction do
         hackr_breach.lock!
@@ -273,6 +274,9 @@ module Grid
         # Increment breach completed stat
         current = @hackr.stat("breach_completed_count").to_i
         @hackr.set_stat!("breach_completed_count", current + 1)
+
+        # Grant pending fragments from utility software extraction
+        fragments_granted = grant_pending_fragments!(hackr_breach)
       end
 
       # Grant CRED outside transaction (TransactionService has its own mutex)
@@ -289,7 +293,7 @@ module Grid
         end
       end
 
-      display = Grid::BreachRenderer.new(hackr_breach).render_success(xp_awarded, cred_awarded, template.name)
+      display = Grid::BreachRenderer.new(hackr_breach).render_success(xp_awarded, cred_awarded, template.name, fragments_granted)
       ResolveResult.new(
         hackr_breach: hackr_breach,
         xp_awarded: xp_awarded,
@@ -358,11 +362,11 @@ module Grid
       )
     end
 
-    def jackout!
+    def jackout!(emergency: false)
       hackr_breach = @hackr.active_breach
       raise NotInBreach, "You are not in a BREACH encounter." unless hackr_breach
 
-      clean = !hackr_breach.pnr_crossed?
+      clean = emergency || !hackr_breach.pnr_crossed?
       vitals_hit = []
 
       ActiveRecord::Base.transaction do
@@ -471,6 +475,38 @@ module Grid
       rescue
         nil
       end
+    end
+
+    # Grant pending fragments accumulated during the breach via utility software.
+    # Called inside the success transaction. Returns array of granted fragment slugs.
+    def grant_pending_fragments!(hackr_breach)
+      pending = hackr_breach.meta&.dig("pending_fragments")
+      return [] if pending.blank?
+
+      granted = []
+      pending.tally.each do |fragment_slug, qty|
+        definition = GridItemDefinition.find_by(slug: fragment_slug)
+        next unless definition
+
+        granted_qty = 0
+        qty.times do
+          Grid::Inventory.grant_item!(hackr: @hackr, definition: definition)
+          granted_qty += 1
+        rescue Grid::InventoryErrors::InventoryFull
+          Rails.logger.warn("[BreachService] Inventory full — fragment #{fragment_slug} skipped for hackr #{@hackr.id}")
+          break
+        end
+        granted << {slug: fragment_slug, name: definition.name, quantity: granted_qty} if granted_qty > 0
+      end
+
+      # Update data_extracted stat
+      total = pending.size
+      if total > 0
+        current = @hackr.stat("data_extracted_count").to_i
+        @hackr.set_stat!("data_extracted_count", current + total)
+      end
+
+      granted
     end
 
     def drain_vital!(key, amount)

@@ -12,7 +12,7 @@ RSpec.describe "BREACH Phase 2A" do
     create(:grid_item_definition, :gear,
       slug: "test-deck-2a",
       name: "Test Deck",
-      properties: {"slot" => "deck", "slot_count" => 4, "battery_max" => 128, "battery_current" => 128, "firmware_slot_count" => 1, "effects" => {}})
+      properties: {"slot" => "deck", "slot_count" => 4, "battery_max" => 128, "battery_current" => 128, "module_slot_count" => 1, "effects" => {}})
   end
 
   let!(:deck) do

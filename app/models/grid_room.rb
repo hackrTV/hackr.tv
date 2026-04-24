@@ -48,7 +48,7 @@ class GridRoom < ApplicationRecord
   validates :name, presence: true
   validates :name, length: {maximum: 80}, if: :den?
   validates :room_type, inclusion: {
-    in: %w[hub faction_base govcorp special safe_zone transit shop danger_zone prism dream den hospital],
+    in: %w[hub faction_base govcorp special safe_zone transit shop danger_zone prism dream den hospital firmware_vendor],
     allow_nil: true
   }
   validates :min_clearance, numericality: {only_integer: true, greater_than_or_equal_to: 0}

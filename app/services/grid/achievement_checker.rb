@@ -118,6 +118,8 @@ module Grid
         derive(@hackr.stat("breach_completed_count").to_i, data[:count].to_i)
       when "protocols_dismantled"
         derive(@hackr.stat("protocols_dismantled_count").to_i, data[:count].to_i)
+      when "data_extracted"
+        derive(@hackr.stat("data_extracted_count").to_i, data[:count].to_i)
       end
     end
 

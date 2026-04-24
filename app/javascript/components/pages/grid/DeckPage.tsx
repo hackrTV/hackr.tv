@@ -30,7 +30,8 @@ interface DeckInfo {
   battery_max: number
   slot_count: number
   slots_used: number
-  firmware_slot_count: number
+  module_slot_count: number
+  modules_used: number
 }
 
 interface DeckResponse {
@@ -162,7 +163,7 @@ const DeckPage: React.FC = () => {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <div style={{ color: '#9ca3af', fontSize: '0.9em' }}>
-                      <span style={{ color: '#fbbf24' }}>Firmware Slots:</span> {deck.firmware_slot_count}
+                      <span style={{ color: '#fbbf24' }}>Module Slots:</span> {deck.modules_used}/{deck.module_slot_count}
                     </div>
                     <div style={{ color: '#6b7280', fontSize: '0.85em', marginTop: 4 }}>
                       Terminal: <span style={{ color: '#22d3ee' }}>deck load &lt;name&gt;</span> / <span style={{ color: '#22d3ee' }}>deck unload &lt;name&gt;</span>

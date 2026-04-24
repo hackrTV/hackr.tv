@@ -48,6 +48,7 @@ class GridMission < ApplicationRecord
     fabricate_item
     complete_breach
     dismantle_protocols
+    extract_data
   ].freeze
 
   # Reward type allowlist. `amount` is the scalar for XP/CRED/rep deltas;
