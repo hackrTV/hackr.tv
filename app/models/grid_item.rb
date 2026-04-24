@@ -39,7 +39,7 @@
 class GridItem < ApplicationRecord
   has_paper_trail
 
-  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material fixture gear software firmware].freeze
+  ITEM_TYPES = %w[tool consumable data faction collectible rig_component material fixture gear software firmware module].freeze
   GEAR_SLOTS = %w[deck back chest head ears eyes left_wrist right_wrist hands neck waist legs feet].freeze
   VISIBLE_SLOTS = %w[head eyes chest legs feet].freeze
   RARITIES = %w[scrap ubiquitous common uncommon rare ultra_rare unicorn].freeze
@@ -74,6 +74,7 @@ class GridItem < ApplicationRecord
   belongs_to :deck_item, class_name: "GridItem", foreign_key: :deck_id, optional: true
   has_many :stored_items, class_name: "GridItem", foreign_key: :container_id, dependent: :restrict_with_error
   has_many :loaded_software, -> { where(item_type: "software") }, class_name: "GridItem", foreign_key: :deck_id, dependent: :nullify
+  has_many :installed_modules, -> { where(item_type: "module") }, class_name: "GridItem", foreign_key: :deck_id, dependent: :nullify
 
   validates :name, presence: true
   validates :item_type, inclusion: {in: ITEM_TYPES, allow_nil: true}
@@ -161,6 +162,10 @@ class GridItem < ApplicationRecord
     item_type == "firmware"
   end
 
+  def deck_module?
+    item_type == "module"
+  end
+
   def deck_item?
     gear? && slot == "deck"
   end
@@ -182,8 +187,8 @@ class GridItem < ApplicationRecord
     properties&.dig("slot_count").to_i
   end
 
-  def deck_firmware_slot_count
-    properties&.dig("firmware_slot_count").to_i
+  def deck_module_slot_count
+    properties&.dig("module_slot_count").to_i
   end
 
   def deck_slots_used
@@ -192,6 +197,19 @@ class GridItem < ApplicationRecord
 
   def deck_slots_available
     [deck_slot_count - deck_slots_used, 0].max
+  end
+
+  def deck_modules_used
+    installed_modules.count
+  end
+
+  def deck_modules_available
+    [deck_module_slot_count - deck_modules_used, 0].max
+  end
+
+  def has_module?(module_slug)
+    installed_modules.joins(:grid_item_definition)
+      .exists?(grid_item_definitions: {slug: module_slug})
   end
 
   alias_method :gear_slot, :slot
@@ -222,8 +240,8 @@ class GridItem < ApplicationRecord
 
   def deck_id_requirements
     return if deck_id.nil?
-    unless software? || firmware?
-      errors.add(:deck_id, "can only be set on software or firmware items")
+    unless software? || deck_module?
+      errors.add(:deck_id, "can only be set on software or module items")
     end
   end
 end

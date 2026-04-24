@@ -186,7 +186,8 @@ class Api::GridController < ApplicationController
         battery_max: deck.deck_battery_max,
         slot_count: deck.deck_slot_count,
         slots_used: deck.deck_slots_used,
-        firmware_slot_count: deck.deck_firmware_slot_count
+        module_slot_count: deck.deck_module_slot_count,
+        modules_used: deck.deck_modules_used
       },
       software: loaded.map { |s| software_item_json(s) },
       inventory_software: inventory_sw.map { |s| software_item_json(s) }

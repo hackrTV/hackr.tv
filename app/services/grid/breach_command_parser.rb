@@ -26,6 +26,8 @@ module Grid
         analyze_command(args.first)
       when "reroute", "rr"
         reroute_command(args.first)
+      when "use"
+        use_command(args.join(" "))
       when "jackout", "jo"
         jackout_command
       when "status", "st"
@@ -61,7 +63,11 @@ module Grid
       )
 
       output = []
-      if result.hit
+      if result.exploit && result.protocol_destroyed
+        output << "<span style='color: #fbbf24; font-weight: bold;'>⚡ EXPLOIT → Protocol [#{result.target_position + 1}]: INSTANT KILL — DESTROYED</span>"
+        output << "<span style='color: #6b7280;'>#{h(result.program_name)} consumed.</span>"
+        output << "<span style='color: #6b7280;'>Battery: -#{result.battery_consumed}</span>"
+      elsif result.hit
         damage_color = result.protocol_destroyed ? "#34d399" : "#22d3ee"
         output << "<span style='color: #{damage_color};'>#{h(result.program_name)} → Protocol [#{result.target_position + 1}]: #{result.damage_dealt} damage#{" — DESTROYED" if result.protocol_destroyed}</span>"
         output << "<span style='color: #6b7280;'>Battery: -#{result.battery_consumed}</span>"
@@ -69,11 +75,21 @@ module Grid
         output << "<span style='color: #9ca3af;'>#{h(result.program_name)} → Protocol [#{result.target_position + 1}]: no effect.</span>"
       end
 
+      # Fragment extraction notification
+      if result.fragment
+        output << "<span style='color: #a78bfa;'>  ▸ Fragment extracted: #{h(result.fragment)} (pending — granted on success)</span>"
+      end
+
       # Achievement/mission hooks
       notifications = []
       if result.protocol_destroyed
         notifications += achievement_checker.check(:protocols_dismantled)
         notifications += mission_progressor.record(:dismantle_protocols, protocol_type: breach.grid_breach_protocols.find_by(position: target_position)&.protocol_type)
+      end
+
+      if result.fragment
+        notifications += achievement_checker.check(:data_extracted)
+        notifications += mission_progressor.record(:extract_data, fragment_slug: result.fragment)
       end
 
       if result.all_destroyed
@@ -164,6 +180,43 @@ module Grid
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
+    def use_command(item_name)
+      if item_name.empty?
+        return "<span style='color: #fbbf24;'>Usage: use &lt;item&gt;</span>"
+      end
+
+      result = Grid::BreachActionService.use_item!(
+        hackr: hackr,
+        item_name: item_name
+      )
+
+      output = []
+      output << result.effect_output
+
+      # Achievement/mission hooks for item usage
+      notifications = []
+      notifications += achievement_checker.check(:use_item, item_name: result.item_name)
+      notifications += mission_progressor.record(:use_item, item_name: result.item_name)
+
+      if result.emergency_jackout
+        # Trigger clean jackout (bypasses PNR via emergency override)
+        jackout_result = Grid::BreachService.jackout!(hackr: hackr, emergency: true)
+        output << jackout_result.display
+        output << "<span style='color: #34d399;'>You disconnect cleanly.</span>"
+      else
+        # Check if round should end
+        breach.reload
+        round_output = maybe_end_round
+        output << round_output if round_output
+      end
+
+      append_notifications(output, notifications)
+      output.join("\n")
+    rescue Grid::BreachActionService::NoActionsRemaining,
+      Grid::BreachActionService::ItemNotFound => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
     def jackout_command
       result = Grid::BreachService.jackout!(hackr: hackr)
 
@@ -219,6 +272,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>exec &lt;program&gt; &lt;target#&gt;</span>  <span style='color: #9ca3af;'>Run software against a protocol (1 action + battery)</span>"
       output << "<span style='color: #fbbf24;'>analyze &lt;target#&gt;</span>           <span style='color: #9ca3af;'>Scan a protocol for intel (1 action)</span>"
       output << "<span style='color: #fbbf24;'>reroute &lt;target#&gt;</span>           <span style='color: #9ca3af;'>Delay a protocol 1 round (1 action, 30% chance protocol fizzles on retry)</span>"
+      output << "<span style='color: #fbbf24;'>use &lt;item&gt;</span>                   <span style='color: #9ca3af;'>Use a consumable from inventory (1 action)</span>"
       output << "<span style='color: #fbbf24;'>jackout</span>                      <span style='color: #9ca3af;'>Abort the encounter</span>"
       output << ""
       output << "<span style='color: #6b7280;'>Free commands (no action cost):</span>"

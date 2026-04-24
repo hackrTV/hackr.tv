@@ -58,7 +58,7 @@ module Grid
       lines.join("\n")
     end
 
-    def render_success(xp_awarded, cred_awarded, template_name)
+    def render_success(xp_awarded, cred_awarded, template_name, fragments_granted = [])
       lines = []
       lines << ""
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
@@ -67,6 +67,13 @@ module Grid
       lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #d0d0d0;'>#{h(template_name)}</span>"
       lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>+#{xp_awarded}</span>" if xp_awarded > 0
       lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #fbbf24;'>CRED:</span> <span style='color: #34d399;'>+#{cred_awarded}</span>" if cred_awarded > 0
+      if fragments_granted.any?
+        lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #a78bfa;'>FRAGMENTS:</span>"
+        fragments_granted.each do |frag|
+          qty_label = (frag[:quantity] > 1) ? " \u00d7#{frag[:quantity]}" : ""
+          lines << "<span style='color: #34d399;'>\u2551</span>    <span style='color: #a78bfa;'>#{h(frag[:name])}#{qty_label}</span>"
+        end
+      end
       lines << "<span style='color: #34d399; font-weight: bold;'>\u255a#{SEPARATOR}\u255d</span>"
       lines.join("\n")
     end

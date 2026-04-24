@@ -1,6 +1,7 @@
 module Grid
   class CommandParser
     include CodexHelper
+    include ItemEffectApplier
 
     attr_reader :hackr, :input, :event
 
@@ -1166,8 +1167,20 @@ module Grid
       output << ""
       output << "<span style='color: #fbbf24;'>Battery:</span> <span style='color: #d0d0d0;'>#{deck.deck_battery}/#{deck.deck_battery_max}</span>"
       output << "<span style='color: #fbbf24;'>Software Slots:</span> <span style='color: #d0d0d0;'>#{deck.deck_slots_used}/#{deck.deck_slot_count}</span>"
-      output << "<span style='color: #fbbf24;'>Firmware Slots:</span> <span style='color: #d0d0d0;'>#{deck.deck_firmware_slot_count}</span>"
+      output << "<span style='color: #fbbf24;'>Module Slots:</span> <span style='color: #d0d0d0;'>#{deck.deck_modules_used}/#{deck.deck_module_slot_count}</span>"
       output << ""
+
+      # Installed modules
+      modules = deck.installed_modules.order(:name)
+      if modules.any?
+        output << "<span style='color: #fbbf24;'>Installed Modules:</span>"
+        modules.each do |mod|
+          firmware_slug = mod.properties&.dig("firmware_slug")
+          firmware_label = firmware_slug ? "<span style='color: #34d399;'>firmware: #{h(firmware_slug)}</span>" : "<span style='color: #f87171;'>RAW — needs firmware</span>"
+          output << "  <span style='color: #{mod.rarity_color};'>#{h(mod.name)}</span> #{firmware_label}"
+        end
+        output << ""
+      end
 
       loaded = deck.loaded_software.order(:name)
       if loaded.any?
@@ -1199,8 +1212,14 @@ module Grid
         deck_unload_command(name)
       when "charge"
         deck_charge_command
+      when "flash"
+        deck_flash_command(args[1..])
+      when "install"
+        deck_install_command(name)
+      when "uninstall"
+        deck_uninstall_command(name)
       else
-        "<span style='color: #fbbf24;'>Usage: deck [load|unload|charge] &lt;name&gt;</span>"
+        "<span style='color: #fbbf24;'>Usage: deck [load|unload|charge|flash|install|uninstall] &lt;name&gt;</span>"
       end
     end
 
@@ -1220,15 +1239,18 @@ module Grid
         return "<span style='color: #f87171;'>Not enough DECK slots. Need #{slot_cost}, have #{deck.deck_slots_available} available.</span>"
       end
 
+      error = nil
       ActiveRecord::Base.transaction do
         hackr.lock!
         deck.lock!
         if deck.deck_slots_available < slot_cost
-          return "<span style='color: #f87171;'>Not enough DECK slots. Need #{slot_cost}, have #{deck.deck_slots_available} available.</span>"
+          error = "<span style='color: #f87171;'>Not enough DECK slots. Need #{slot_cost}, have #{deck.deck_slots_available} available.</span>"
+          raise ActiveRecord::Rollback
         end
         software.update!(deck_id: deck.id)
       end
 
+      return error if error
       "<span style='color: #34d399;'>Loaded #{h(software.name)} into DECK.</span> <span style='color: #6b7280;'>(#{deck.deck_slots_used}/#{deck.deck_slot_count} slots)</span>"
     end
 
@@ -1271,6 +1293,174 @@ module Grid
       end
 
       "<span style='color: #34d399;'>DECK fully charged.</span> <span style='color: #d0d0d0;'>#{deck.deck_battery_max}/#{deck.deck_battery_max}</span>"
+    end
+
+    # ── Module flash/install/uninstall ───────────────────
+
+    def deck_flash_command(args)
+      # Syntax: deck flash <firmware> onto <module>
+      # At firmware_vendor room: firmware bought + flashed in one step
+      # With EEPROM Flasher tool: firmware from inventory + flash anywhere
+      args ||= []
+      raw = args.join(" ")
+
+      # Parse "firmware onto module" syntax
+      parts = raw.split(/\s+onto\s+/i, 2)
+      if parts.length != 2 || parts.any?(&:blank?)
+        return "<span style='color: #fbbf24;'>Usage: deck flash &lt;firmware&gt; onto &lt;module&gt;</span>"
+      end
+
+      firmware_name = parts[0].strip
+      module_name = parts[1].strip
+
+      deck = hackr.equipped_deck
+      return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
+
+      # Find the module in inventory (must be unflashed OR reflash overwrites)
+      mod = hackr.grid_items.in_inventory(hackr)
+        .where(item_type: "module")
+        .find_by("LOWER(name) = ?", module_name.downcase)
+      return "<span style='color: #f87171;'>No module named '#{h(module_name)}' in your inventory.</span>" unless mod
+
+      room = hackr.current_room
+      at_vendor = room&.room_type == "firmware_vendor"
+      has_flasher = hackr.grid_items.in_inventory(hackr)
+        .joins(:grid_item_definition)
+        .exists?(grid_item_definitions: {slug: "eeprom-flasher"})
+
+      unless at_vendor || has_flasher
+        return "<span style='color: #f87171;'>You need an EEPROM Flasher tool or a Firmware Vending Machine to flash firmware.</span>"
+      end
+
+      # Find firmware
+      firmware = if at_vendor
+        # At vendor: firmware available from vendor catalog (just need definition)
+        GridItemDefinition.where(item_type: "firmware")
+          .find_by("LOWER(name) = ?", firmware_name.downcase)
+      else
+        # DIY: firmware must be in inventory
+        hackr.grid_items.in_inventory(hackr)
+          .where(item_type: "firmware")
+          .find_by("LOWER(name) = ?", firmware_name.downcase)
+      end
+
+      if firmware.nil?
+        location_hint = at_vendor ? "available at this vendor" : "in your inventory"
+        return "<span style='color: #f87171;'>No firmware named '#{h(firmware_name)}' #{location_hint}.</span>"
+      end
+
+      firmware_def = at_vendor ? firmware : firmware.grid_item_definition
+
+      # Check compatibility: firmware's compatible_modules must include module definition slug
+      compatible = firmware_def.properties&.dig("compatible_modules")
+      mod_slug = mod.grid_item_definition.slug
+      if compatible.is_a?(Array) && compatible.any? && !compatible.include?(mod_slug)
+        return "<span style='color: #f87171;'>#{h(firmware_def.name)} is not compatible with #{h(mod.name)}.</span>"
+      end
+
+      # Vendor cost check
+      if at_vendor
+        cost = firmware_def.value
+        cache = hackr.default_cache
+        if cost > 0 && (!cache&.active? || cache.balance < cost)
+          return "<span style='color: #f87171;'>Insufficient CRED. Cost: #{cost}.</span>"
+        end
+      end
+
+      old_firmware = mod.properties&.dig("firmware_slug")
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        mod.lock!
+
+        # Pay at vendor
+        if at_vendor
+          cost = firmware_def.value
+          if cost > 0
+            Grid::TransactionService.burn!(
+              from_cache: hackr.default_cache,
+              amount: cost,
+              memo: "Firmware: #{firmware_def.name}"
+            )
+          end
+        elsif firmware.quantity > 1
+          # DIY: consume firmware item from inventory
+          firmware.update!(quantity: firmware.quantity - 1)
+        else
+          firmware.destroy!
+        end
+
+        # Flash firmware onto module (overwrites previous)
+        mod.update!(properties: (mod.properties || {}).merge(
+          "flashed" => true,
+          "firmware_slug" => firmware_def.slug,
+          "firmware_name" => firmware_def.name
+        ))
+      end
+
+      output = "<span style='color: #34d399;'>Firmware flashed: #{h(firmware_def.name)} → #{h(mod.name)}.</span>"
+      output += " <span style='color: #6b7280;'>Previous firmware overwritten.</span>" if old_firmware.present?
+      output
+    end
+
+    def deck_install_command(module_name)
+      return "<span style='color: #fbbf24;'>Install what? Usage: deck install &lt;module name&gt;</span>" if module_name.blank?
+
+      if hackr.in_breach?
+        return "<span style='color: #f87171;'>Cannot install modules during a BREACH.</span>"
+      end
+
+      deck = hackr.equipped_deck
+      return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
+
+      mod = hackr.grid_items.in_inventory(hackr)
+        .where(item_type: "module")
+        .find_by("LOWER(name) = ?", module_name.downcase)
+      return "<span style='color: #f87171;'>No module named '#{h(module_name)}' in your inventory.</span>" unless mod
+
+      unless mod.properties&.dig("flashed")
+        return "<span style='color: #f87171;'>#{h(mod.name)} has no firmware. Flash firmware onto it first.</span>"
+      end
+
+      if deck.deck_modules_available <= 0
+        return "<span style='color: #f87171;'>No module slots available. Uninstall a module first. (#{deck.deck_modules_used}/#{deck.deck_module_slot_count})</span>"
+      end
+
+      error = nil
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        deck.lock!
+
+        if deck.deck_modules_available <= 0
+          error = "<span style='color: #f87171;'>No module slots available.</span>"
+          raise ActiveRecord::Rollback
+        end
+
+        mod.update!(deck_id: deck.id)
+      end
+
+      return error if error
+      "<span style='color: #34d399;'>Installed #{h(mod.name)} into DECK.</span> <span style='color: #6b7280;'>(#{deck.deck_modules_used}/#{deck.deck_module_slot_count} module slots)</span>"
+    end
+
+    def deck_uninstall_command(module_name)
+      return "<span style='color: #fbbf24;'>Uninstall what? Usage: deck uninstall &lt;module name&gt;</span>" if module_name.blank?
+
+      if hackr.in_breach?
+        return "<span style='color: #f87171;'>Cannot uninstall modules during a BREACH.</span>"
+      end
+
+      deck = hackr.equipped_deck
+      return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
+
+      mod = deck.installed_modules.find_by("LOWER(name) = ?", module_name.downcase)
+      return "<span style='color: #f87171;'>No module named '#{h(module_name)}' installed in your DECK.</span>" unless mod
+
+      ActiveRecord::Base.transaction do
+        hackr.lock!
+        mod.update!(deck_id: nil)
+      end
+
+      "<span style='color: #34d399;'>Uninstalled #{h(mod.name)} from DECK.</span>"
     end
 
     # ── BREACH initiation (outside BREACH) ───────────────────
@@ -1363,7 +1553,7 @@ module Grid
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       saved_name = item.name
-      result = apply_item_effect(item)
+      result = apply_item_effect_with_notifications(item)
       increment_stat!("use_count")
 
       # Consume if consumable
@@ -1599,57 +1789,18 @@ module Grid
       {output: output, event: nil}
     end
 
-    def apply_item_effect(item)
-      props = (item.properties || {}).with_indifferent_access
-      effect_type = props[:effect_type]
+    # Delegates to Grid::ItemEffectApplier#apply_item_effect.
+    # Wraps redeem_den to add achievement notifications (CommandParser-specific).
+    def apply_item_effect_with_notifications(item)
+      result = apply_item_effect(item)
 
-      case effect_type
-      when "heal"
-        amount = props[:amount].to_i
-        new_val = hackr.adjust_vital!("health", amount)
-        "<span style='color: #34d399;'>You use #{h(item.name)}. Health restored by #{amount}. (#{new_val}/100)</span>"
-      when "energize"
-        amount = props[:amount].to_i
-        new_val = hackr.adjust_vital!("energy", amount)
-        "<span style='color: #60a5fa;'>You use #{h(item.name)}. Energy restored by #{amount}. (#{new_val}/100)</span>"
-      when "psyche_boost"
-        amount = props[:amount].to_i
-        new_val = hackr.adjust_vital!("psyche", amount)
-        "<span style='color: #c084fc;'>You use #{h(item.name)}. Psyche boosted by #{amount}. (#{new_val}/100)</span>"
-      when "deck_recharge"
-        amount = props[:amount].to_i
-        deck = hackr.equipped_deck
-        unless deck
-          return "<span style='color: #f87171;'>No DECK equipped.</span>"
-        end
-        old_battery = deck.deck_battery
-        new_battery = [old_battery + amount, deck.deck_battery_max].min
-        deck.update!(properties: deck.properties.merge("battery_current" => new_battery))
-        "<span style='color: #fbbf24;'>You use #{h(item.name)}. DECK battery restored by #{new_battery - old_battery}. (#{new_battery}/#{deck.deck_battery_max})</span>"
-      when "inspire"
-        # Inspiration is now BREACH-scoped (lives on breach row, not hackr stats).
-        # inspire items have no effect outside of BREACH.
-        "<span style='color: #9ca3af;'>You use #{h(item.name)}... but the effect fizzles. Nothing to inspire outside a BREACH.</span>"
-      when "xp_boost"
-        amount = props[:amount].to_i
-        result = hackr.grant_xp!(amount)
-        level_msg = result[:leveled_up] ? "\n<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE INCREASED TO #{result[:new_clearance]}!</span>" : ""
-        "<span style='color: #fbbf24;'>You use #{h(item.name)}. +#{amount} XP.#{level_msg}</span>"
-      when "redeem_den"
-        begin
-          den = Grid::DenService.new(hackr).create_den!(consume_item: item)
-          notifications = achievement_checker.check(:den_created)
-          output = "<span style='color: #a78bfa; font-weight: bold;'>DEN PROVISIONED.</span> " \
-            "<span style='color: #d0d0d0;'>Your private node is ready in the Residential District.</span>\n" \
-            "<span style='color: #9ca3af;'>Navigate to the Residential Corridor and enter: </span>" \
-            "<span style='color: #22d3ee;'>go #{den.slug}</span>"
-          append_notifications(output, notifications)
-        rescue Grid::DenService::DenAlreadyExists
-          "<span style='color: #f87171;'>You already have a den. The chip sizzles uselessly.</span>"
-        end
-      else
-        "<span style='color: #9ca3af;'>You use #{h(item.name)}. Nothing happens.</span>"
+      # Den creation triggers achievements (only relevant outside BREACH)
+      if item.properties&.dig("effect_type") == "redeem_den" && result.is_a?(String) && result.include?("DEN PROVISIONED")
+        notifications = achievement_checker.check(:den_created)
+        return append_notifications(result, notifications)
       end
+
+      result
     end
 
     def examine_hackr(target_hackr)

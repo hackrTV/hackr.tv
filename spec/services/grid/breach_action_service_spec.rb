@@ -12,7 +12,7 @@ RSpec.describe Grid::BreachActionService do
     create(:grid_item_definition, :gear,
       slug: "test-deck-action",
       name: "Test Deck",
-      properties: {"slot" => "deck", "slot_count" => 4, "battery_max" => 64, "battery_current" => 64, "firmware_slot_count" => 1, "effects" => {}})
+      properties: {"slot" => "deck", "slot_count" => 4, "battery_max" => 64, "battery_current" => 64, "module_slot_count" => 1, "effects" => {}})
   end
 
   let!(:deck) do

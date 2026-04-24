@@ -73,6 +73,7 @@ class GridAchievement < ApplicationRecord
     breach_completed
     breaches_completed_count
     protocols_dismantled
+    data_extracted
   ].freeze
 
   CATEGORIES = %w[grid music social meta progression].freeze
@@ -95,6 +96,7 @@ class GridAchievement < ApplicationRecord
     fixtures_placed
     breaches_completed_count
     protocols_dismantled
+    data_extracted
   ].freeze
 
   has_many :grid_hackr_achievements, dependent: :destroy

@@ -293,3 +293,143 @@ schematics:
       - input_slug: logic-core
         quantity: 1
         position: 1
+
+  # ── BREACH: Fragment → Software Schematics ──────────────────
+  - slug: fab-fragment-extractor
+    name: Fabricate Fragment Extractor
+    description: "Build a utility program that siphons protocol data fragments during BREACH."
+    output_slug: fragment-extractor
+    output_quantity: 1
+    xp_reward: 60
+    required_clearance: 5
+    required_room_type: den
+    published: true
+    position: 300
+    ingredients:
+      - input_slug: cipher-chip
+        quantity: 2
+        position: 0
+      - input_slug: trace-fragment
+        quantity: 2
+        position: 1
+
+  - slug: fab-data-siphon
+    name: Fabricate Data Siphon
+    description: "Assemble an advanced fragment extraction tool with higher yield rates."
+    output_slug: data-siphon
+    output_quantity: 1
+    xp_reward: 100
+    required_clearance: 10
+    required_room_type: den
+    published: true
+    position: 310
+    ingredients:
+      - input_slug: cipher-chip
+        quantity: 3
+        position: 0
+      - input_slug: logic-core
+        quantity: 2
+        position: 1
+      - input_slug: feedback-fragment
+        quantity: 3
+        position: 2
+
+  - slug: fab-trace-purge
+    name: Fabricate Trace Purge
+    description: "Compile a one-shot exploit that collapses TRACE protocols. Requires extracted TRACE fragments."
+    output_slug: trace-purge
+    output_quantity: 1
+    xp_reward: 80
+    required_clearance: 5
+    required_room_type: den
+    published: true
+    position: 320
+    ingredients:
+      - input_slug: trace-fragment
+        quantity: 4
+        position: 0
+      - input_slug: cipher-chip
+        quantity: 1
+        position: 1
+
+  - slug: fab-firewall-bypass
+    name: Fabricate Firewall Bypass
+    description: "Build a precision zero-day exploit for LOCK protocols. Requires extracted LOCK fragments."
+    output_slug: firewall-bypass
+    output_quantity: 1
+    xp_reward: 120
+    required_clearance: 10
+    required_room_type: den
+    published: true
+    position: 330
+    ingredients:
+      - input_slug: lock-fragment
+        quantity: 4
+        position: 0
+      - input_slug: adapt-fragment
+        quantity: 2
+        position: 1
+
+  - slug: fab-rainn-killswitch
+    name: Fabricate RAINN Killswitch
+    description: "Assemble a neural feedback exploit that collapses ADAPT protocols. The ultimate one-shot."
+    output_slug: rainn-killswitch
+    output_quantity: 1
+    xp_reward: 150
+    required_clearance: 15
+    required_room_type: den
+    published: true
+    position: 340
+    ingredients:
+      - input_slug: adapt-fragment
+        quantity: 4
+        position: 0
+      - input_slug: spike-fragment
+        quantity: 2
+        position: 1
+      - input_slug: quantum-shard
+        quantity: 1
+        position: 2
+
+  # ── BREACH: Module + Firmware Schematics ────────────────────
+  - slug: fab-breach-amplifier
+    name: Fabricate BREACH Amplifier
+    description: "Build a BREACH Amplification Antenna from salvaged components."
+    output_slug: breach-amplifier
+    output_quantity: 1
+    xp_reward: 80
+    required_clearance: 5
+    required_room_type: den
+    published: true
+    position: 350
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 4
+        position: 0
+      - input_slug: synth-fiber
+        quantity: 3
+        position: 1
+      - input_slug: logic-core
+        quantity: 1
+        position: 2
+
+  - slug: fab-signal-intercept-array
+    name: Fabricate Signal Intercept Array
+    description: "Assemble a passive signal capture array for advanced BREACH exploits."
+    output_slug: signal-intercept-array
+    output_quantity: 1
+    xp_reward: 150
+    required_clearance: 10
+    required_room_type: den
+    published: true
+    position: 360
+    ingredients:
+      - input_slug: alloy-plate
+        quantity: 6
+        position: 0
+      - input_slug: quantum-shard
+        quantity: 2
+        position: 1
+      - input_slug: cipher-chip
+        quantity: 3
+        position: 2

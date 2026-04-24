@@ -3,9 +3,10 @@
 module Grid
   class BreachActionService
     ExecResult = Data.define(:hit, :damage_dealt, :program_name, :target_position,
-      :protocol_destroyed, :battery_consumed, :all_destroyed)
+      :protocol_destroyed, :battery_consumed, :all_destroyed, :exploit, :fragment)
     AnalyzeResult = Data.define(:target_position, :level_reached, :info_revealed, :bonus_action)
     RerouteResult = Data.define(:target_position, :protocol_type_label)
+    UseItemResult = Data.define(:item_name, :effect_output, :emergency_jackout)
 
     class NotInBreach < StandardError; end
     class NoActionsRemaining < StandardError; end
@@ -14,6 +15,7 @@ module Grid
     class InvalidTarget < StandardError; end
     class ProtocolAlreadyDestroyed < StandardError; end
     class AlreadyRerouted < StandardError; end
+    class ItemNotFound < StandardError; end
 
     def self.exec!(hackr:, program_name:, target_position:)
       new(hackr).exec!(program_name, target_position)
@@ -26,6 +28,12 @@ module Grid
     def self.reroute!(hackr:, target_position:)
       new(hackr).reroute!(target_position)
     end
+
+    def self.use_item!(hackr:, item_name:)
+      new(hackr).use_item!(item_name)
+    end
+
+    include Grid::ItemEffectApplier
 
     def initialize(hackr)
       @hackr = hackr
@@ -44,6 +52,23 @@ module Grid
 
       protocol = find_protocol(breach, target_position)
 
+      # Module gate: some software requires a specific module installed in DECK
+      required_module = program.properties&.dig("requires_module")
+      if required_module.present? && !deck.has_module?(required_module)
+        raise ProgramNotLoaded, "#{program.name} requires module '#{required_module}' installed in DECK."
+      end
+
+      is_exploit = program.properties&.dig("software_category") == "exploit"
+
+      # Exploit type-guard: check target_types BEFORE consuming action
+      if is_exploit
+        target_types = program.properties&.dig("target_types")
+        if target_types.is_a?(Array) && target_types.any? && !target_types.include?(protocol.protocol_type)
+          # Mismatch — action NOT consumed, exploit NOT destroyed
+          raise InvalidTarget, "Exploit incompatible with #{protocol.type_label} protocol. Requires: #{target_types.map(&:upcase).join(", ")}."
+        end
+      end
+
       battery_cost = (program.properties&.dig("battery_cost") || 10).to_i
       if deck.deck_battery < battery_cost
         raise InsufficientBattery, "Insufficient battery. Need #{battery_cost}, have #{deck.deck_battery}."
@@ -52,6 +77,7 @@ module Grid
       damage = 0
       destroyed = false
       all_destroyed = false
+      fragment_extracted = nil
 
       ActiveRecord::Base.transaction do
         breach.lock!
@@ -65,18 +91,23 @@ module Grid
         # Re-check battery after lock
         raise InsufficientBattery, "Insufficient battery. Need #{battery_cost}, have #{deck.deck_battery}." if deck.deck_battery < battery_cost
 
-        # Compute damage
-        damage = compute_damage(program, protocol)
+        if is_exploit
+          # Exploit: instant kill — protocol destroyed regardless of health
+          damage = protocol.health
+          destroyed = true
+          protocol.update_columns(health: 0, state: "destroyed")
+        else
+          # Standard: compute damage normally
+          damage = compute_damage(program, protocol)
 
-        # Apply damage
-        new_health = [protocol.health - damage, 0].max
-        destroyed = new_health <= 0
-        attrs = {health: new_health}
-        attrs[:state] = "destroyed" if destroyed
-        protocol.update_columns(attrs)
+          new_health = [protocol.health - damage, 0].max
+          destroyed = new_health <= 0
+          attrs = {health: new_health}
+          attrs[:state] = "destroyed" if destroyed
+          protocol.update_columns(attrs)
+        end
 
         if destroyed
-
           # Increment cumulative stat
           count = @hackr.stat("protocols_dismantled_count").to_i
           @hackr.set_stat!("protocols_dismantled_count", count + 1)
@@ -89,6 +120,17 @@ module Grid
         # Consume action
         breach.update!(actions_remaining: breach.actions_remaining - 1)
 
+        # Exploit consumed from DECK after successful use (one-shot)
+        if is_exploit
+          program.destroy!
+        end
+
+        # Utility fragment extraction: roll for fragment drop
+        is_utility = program.properties&.dig("software_category") == "utility"
+        if is_utility && damage > 0
+          fragment_extracted = roll_fragment_extraction!(breach, protocol, program)
+        end
+
         # Inspiration bump on successful hit
         bump_inspiration!(breach) if damage > 0
 
@@ -99,7 +141,9 @@ module Grid
           hit: damage > 0,
           damage: damage,
           destroyed: destroyed,
-          battery_consumed: battery_cost
+          battery_consumed: battery_cost,
+          exploit: is_exploit,
+          fragment: fragment_extracted
         })
       end
 
@@ -110,7 +154,9 @@ module Grid
         target_position: target_position,
         protocol_destroyed: destroyed,
         battery_consumed: battery_cost,
-        all_destroyed: all_destroyed
+        all_destroyed: all_destroyed,
+        exploit: is_exploit,
+        fragment: fragment_extracted
       )
     end
 
@@ -204,6 +250,61 @@ module Grid
       )
     end
 
+    def use_item!(item_name)
+      breach = @hackr.active_breach
+      raise NotInBreach, "You are not in a BREACH encounter." unless breach
+      raise NoActionsRemaining, "No actions remaining this round." if breach.actions_remaining <= 0
+
+      item = @hackr.grid_items.in_inventory(@hackr)
+        .where(item_type: "consumable")
+        .find_by("LOWER(name) = ?", item_name.to_s.downcase)
+      raise ItemNotFound, "No consumable named '#{item_name}' in your inventory." unless item
+
+      effect_output = nil
+      emergency_jackout = false
+      saved_name = item.name
+
+      ActiveRecord::Base.transaction do
+        breach.lock!
+        @hackr.lock!
+
+        raise NoActionsRemaining, "No actions remaining this round." if breach.actions_remaining <= 0
+
+        # Apply item effect (from ItemEffectApplier module)
+        result = apply_item_effect(item, breach: breach)
+
+        if result == :emergency_jackout
+          emergency_jackout = true
+          effect_output = "<span style='color: #22d3ee; font-weight: bold;'>EMERGENCY JACK-OUT INITIATED — PNR override engaged.</span>"
+        else
+          effect_output = result
+        end
+
+        # Consume the item
+        if item.quantity > 1
+          item.update!(quantity: item.quantity - 1)
+        else
+          item.destroy!
+        end
+
+        # Consume action
+        breach.update!(actions_remaining: breach.actions_remaining - 1)
+
+        log_action!(breach, "use", nil, nil, {
+          item_name: saved_name,
+          item_slug: item.grid_item_definition&.slug,
+          effect_type: item.properties&.dig("effect_type"),
+          emergency_jackout: emergency_jackout
+        })
+      end
+
+      UseItemResult.new(
+        item_name: saved_name,
+        effect_output: effect_output,
+        emergency_jackout: emergency_jackout
+      )
+    end
+
     def reroute!(target_position)
       breach = @hackr.active_breach
       raise NotInBreach, "You are not in a BREACH encounter." unless breach
@@ -248,6 +349,12 @@ module Grid
 
     private
 
+    attr_reader :hackr
+
+    def h(text)
+      ERB::Util.html_escape(text.to_s)
+    end
+
     def log_action!(breach, action_type, target_position, program_slug, result_data)
       GridHackrBreachLog.create!(
         grid_hackr_breach: breach,
@@ -276,6 +383,21 @@ module Grid
       max_inspiration = ceiling * 10
       new_inspiration = [breach.inspiration + 1, max_inspiration].min
       breach.update!(inspiration: new_inspiration)
+    end
+
+    # Roll for fragment drop from utility software execution.
+    # Fragments are pending on the breach — only granted on success.
+    def roll_fragment_extraction!(breach, protocol, program)
+      chance = (program.properties&.dig("fragment_chance") || 0.25).to_f
+      return nil unless rand < chance
+
+      # Determine fragment type from the protocol being targeted
+      fragment_slug = "#{protocol.protocol_type}-fragment"
+      pending = breach.meta["pending_fragments"] || []
+      pending << fragment_slug
+      breach.update!(meta: breach.meta.merge("pending_fragments" => pending))
+
+      fragment_slug
     end
 
     def compute_damage(program, protocol)
