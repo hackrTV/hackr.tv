@@ -31,6 +31,7 @@
                 <th style="text-align: left;">Type</th>
                 <th style="text-align: left;">Faction</th>
                 <th style="text-align: left;">Ambient Playlist</th>
+                <th style="text-align: center;">Danger</th>
                 <th style="text-align: center;">Rooms</th>
                 <th style="text-align: right;">Actions</th>
               </tr>
@@ -48,6 +49,13 @@
                       <span class="purple-255-text"><%= zone.ambient_playlist.name %></span>
                     <% else %>
                       <span style="color: #666;">—</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if zone.danger_level > 0 %>
+                      <span style="color: #ef4444;"><%= zone.danger_level %></span>
+                    <% else %>
+                      <span style="color: #666;">0</span>
                     <% end %>
                   </td>
                   <td style="text-align: center;"><%= zone.grid_rooms.size %></td>

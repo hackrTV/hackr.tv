@@ -5,6 +5,7 @@
 #
 #  id                  :integer          not null, primary key
 #  color_scheme        :string
+#  danger_level        :integer          default(0), not null
 #  description         :text
 #  name                :string
 #  slug                :string

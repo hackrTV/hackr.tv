@@ -10,6 +10,7 @@
 #  cooldown_max          :integer          default(600), not null
 #  cooldown_min          :integer          default(300), not null
 #  cred_reward           :integer          default(0), not null
+#  danger_level_min      :integer          default(0), not null
 #  description           :text
 #  min_clearance         :integer          default(0), not null
 #  name                  :string           not null
@@ -23,6 +24,7 @@
 #  slug                  :string           not null
 #  tier                  :string           default("standard"), not null
 #  xp_reward             :integer          default(0), not null
+#  zone_slugs            :json             not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #

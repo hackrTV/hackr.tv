@@ -142,6 +142,123 @@ breach_templates:
         charge_rounds: 1
         weakness: offensive
 
+  # ── AMBIENT TEMPLATES ──────────────────────────────────────
+
+  - slug: ambient-scan-ping
+    name: "GovCorp Scan Ping"
+    description: "A routine GovCorp surveillance ping sweeps the area. Low threat — but it knows you're here."
+    tier: ambient
+    min_clearance: 0
+    danger_level_min: 1
+    zone_slugs: []
+    pnr_threshold: 80
+    base_detection_rate: 8
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 40
+    cred_reward: 15
+    published: true
+    position: 100
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 25
+        max_health: 25
+        charge_rounds: 0
+        weakness: offensive
+
+  - slug: ambient-rainn-sweep
+    name: "RAINN Patrol Sweep"
+    description: "A RAINN patrol unit locks onto your signal. It's fast, but fragile."
+    tier: ambient
+    min_clearance: 0
+    danger_level_min: 2
+    zone_slugs: []
+    pnr_threshold: 75
+    base_detection_rate: 7
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 60
+    cred_reward: 25
+    published: true
+    position: 101
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 30
+        max_health: 30
+        charge_rounds: 0
+      - type: feedback
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 1
+        weakness: offensive
+
+  - slug: ambient-govcorp-interceptor
+    name: "GovCorp Signal Interceptor"
+    description: "A GovCorp interception node has triangulated your position. SPIKE protocol targets your neural link directly."
+    tier: ambient
+    min_clearance: 5
+    danger_level_min: 4
+    zone_slugs:
+      - govcorp-surveillance
+    pnr_threshold: 70
+    base_detection_rate: 8
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 100
+    cred_reward: 40
+    published: true
+    position: 102
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 30
+        max_health: 30
+        charge_rounds: 1
+        weakness: defensive
+
+  - slug: ambient-underbelly-wraith
+    name: "Underbelly Wraith Process"
+    description: "Something old lurks in the unregistered passages. A rogue process, mutated beyond its original purpose. It's been waiting."
+    tier: ambient
+    min_clearance: 10
+    danger_level_min: 5
+    zone_slugs:
+      - the-underbelly
+    pnr_threshold: 65
+    base_detection_rate: 9
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 150
+    cred_reward: 60
+    published: true
+    position: 103
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 0
+      - type: feedback
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 1
+      - type: lock
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 2
+
+  # ── STANDARD+ TEMPLATES ─────────────────────────────────────
+
   - slug: rainn-command-relay
     name: "RAINN Command Relay"
     description: "A RAINN command-and-control relay node. Heavy protocol synergies — dual TRACE accelerates detection, ADAPT mutates weaknesses, SPIKE punishes hesitation."

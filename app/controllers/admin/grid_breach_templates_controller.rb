@@ -96,6 +96,7 @@ class Admin::GridBreachTemplatesController < Admin::ApplicationController
       :pnr_threshold, :base_detection_rate,
       :cooldown_min, :cooldown_max, :xp_reward, :cred_reward,
       :requires_mission_slug, :requires_item_slug,
+      :danger_level_min,
       :published, :position,
       :protocol_composition_json, :reward_table_json
     )
@@ -103,6 +104,10 @@ class Admin::GridBreachTemplatesController < Admin::ApplicationController
 
   # Returns true on success, false on parse error (with error added to @template)
   def parse_json_fields!
+    # Parse zone_slugs from CSV text field (splitting "" yields [])
+    csv = params[:grid_breach_template].delete(:zone_slugs_csv)
+    @template.zone_slugs = csv.split(",").map(&:strip).reject(&:blank?) unless csv.nil?
+
     if params[:grid_breach_template][:protocol_composition_json].present?
       parsed = JSON.parse(params[:grid_breach_template][:protocol_composition_json])
       unless parsed.is_a?(Array)

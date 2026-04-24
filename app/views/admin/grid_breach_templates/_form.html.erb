@@ -75,6 +75,23 @@
     </div>
   </div>
 
+  <h3 class="cyan-255-text" style="margin: 25px 0 15px 0;">[:: AMBIENT ENCOUNTER TARGETING ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+    <div>
+      <%= f.label :danger_level_min, "MIN DANGER LEVEL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :danger_level_min, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0, max: 10 %>
+      <small style="color: #888;">Zone danger_level must be >= this to spawn</small>
+    </div>
+    <div>
+      <%= f.label :zone_slugs_csv, "ZONE SLUGS", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :zone_slugs_csv,
+            value: (template.zone_slugs.is_a?(Array) ? template.zone_slugs.join(", ") : ""),
+            class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">Comma-separated zone slugs. Empty = any zone.</small>
+    </div>
+  </div>
+
   <h3 class="cyan-255-text" style="margin: 25px 0 15px 0;">[:: PROTOCOL COMPOSITION (JSON) ::]</h3>
   <div style="margin-top: 10px;">
     <%= f.text_area :protocol_composition_json,
