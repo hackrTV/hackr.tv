@@ -236,7 +236,12 @@ module Grid
         when "locked"
           ["#6b7280", "\u25a1", "locked (solve #{gate["depends_on"]} first)"]
         else # active
-          ["#d0d0d0", "\u25cb", "#{gate["attempts_remaining"]}/#{gate["max_attempts"]} attempts"]
+          attempts_text = if gate["max_attempts"].to_i == Grid::BreachService::UNLIMITED_ATTEMPTS
+            "unlimited attempts"
+          else
+            "#{gate["attempts_remaining"]}/#{gate["max_attempts"]} attempts"
+          end
+          ["#d0d0d0", "\u25cb", attempts_text]
         end
 
         lines << "#{border}  <span style='color: #9ca3af;'>[#{gate_id}]</span> <span style='color: #d0d0d0;'>#{h(type_label)}</span>  <span style='color: #{state_color};'>#{icon} #{h(status_text)}</span>"

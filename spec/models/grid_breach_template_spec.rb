@@ -14,6 +14,7 @@
 #  description           :text
 #  min_clearance         :integer          default(0), not null
 #  name                  :string           not null
+#  no_clearance_bypass   :boolean          default(FALSE), not null
 #  pnr_threshold         :integer          default(75), not null
 #  position              :integer          default(0), not null
 #  protocol_composition  :json             not null

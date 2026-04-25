@@ -4,6 +4,7 @@ class Admin::GridRegionsController < Admin::ApplicationController
   versionable GridRegion
 
   before_action :set_region, only: %i[edit update destroy]
+  before_action :load_selects, only: %i[new edit create update]
 
   def index
     @regions = GridRegion.includes(:grid_zones).order(:name)
@@ -54,7 +55,13 @@ class Admin::GridRegionsController < Admin::ApplicationController
     @region = GridRegion.find(params[:id])
   end
 
+  def load_selects
+    @rooms = GridRoom.includes(:grid_zone).joins(:grid_zone).order("grid_zones.name, grid_rooms.name")
+  end
+
   def region_params
-    params.require(:grid_region).permit(:name, :slug, :description)
+    params.require(:grid_region).permit(:name, :slug, :description,
+      :hospital_room_id, :containment_room_id,
+      :facility_exit_room_id, :facility_bribe_exit_room_id)
   end
 end

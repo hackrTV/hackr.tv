@@ -48,13 +48,27 @@ class GridRoom < ApplicationRecord
   validates :name, presence: true
   validates :name, length: {maximum: 80}, if: :den?
   validates :room_type, inclusion: {
-    in: %w[hub faction_base govcorp special safe_zone transit shop danger_zone prism dream den hospital firmware_vendor repair_service],
+    in: %w[hub faction_base govcorp special safe_zone transit shop danger_zone prism dream den hospital firmware_vendor repair_service containment impound sally_port sally_port_anteroom],
     allow_nil: true
   }
   validates :min_clearance, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :owner_id, uniqueness: {allow_nil: true}
 
-  filter_profanity :name, :description
+  # Profanity filter: only for dens (user-controlled name + description).
+  # Non-den rooms are admin-seeded — no filter needed.
+  # Uses ProfanityFilterable#profane_content? to stay in sync with the concern.
+  validate :filter_den_profanity
+
+  def filter_den_profanity
+    return unless den?
+    %i[name description].each do |attr|
+      value = public_send(attr)
+      next if value.blank?
+      if profane_content?(value)
+        errors.add(attr, ProfanityFilterable.rejection_message)
+      end
+    end
+  end
 
   # Delegate to zone for convenience
   delegate :faction, :color_scheme, to: :grid_zone

@@ -29,6 +29,11 @@ RSpec.describe "BREACH Phase 2E: Failure + Puzzles" do
   # FAILURE TIERS 3-4
   # ═══════════════════════════════════════════════════════════════
 
+  # Suppress probabilistic capture so these tests exercise the standard/advanced failure path
+  before do
+    allow_any_instance_of(Grid::BreachService).to receive(:should_capture?).and_return(false)
+  end
+
   describe "Failure Tier 3: DECK software wipe" do
     let(:template) { create(:grid_breach_template, tier: "standard") }
     let(:encounter) { create(:grid_breach_encounter, grid_breach_template: template, grid_room: room) }

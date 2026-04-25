@@ -118,6 +118,11 @@ RSpec.describe Grid::BreachService do
     let!(:breach_result) { described_class.start!(hackr: hackr, encounter: encounter) }
     let(:breach) { breach_result.hackr_breach }
 
+    # Suppress probabilistic capture so existing tests exercise the standard failure path
+    before do
+      allow_any_instance_of(described_class).to receive(:should_capture?).and_return(false)
+    end
+
     it "drains vitals and sets failure state" do
       old_energy = hackr.stat("energy")
       old_psyche = hackr.stat("psyche")
