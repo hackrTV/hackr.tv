@@ -113,6 +113,7 @@ class GridHackr < ApplicationRecord
   has_many :hackr_vod_watches, dependent: :destroy
   has_many :hackr_radio_tunes, dependent: :destroy
   has_many :grid_hackr_missions, dependent: :destroy
+  has_many :grid_impound_records, dependent: :destroy
   has_many :grid_missions, through: :grid_hackr_missions
   has_one :den, class_name: "GridRoom", foreign_key: :owner_id
   has_many :den_invites_received, class_name: "GridDenInvite", foreign_key: :guest_id, dependent: :destroy

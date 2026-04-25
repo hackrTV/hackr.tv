@@ -5,7 +5,7 @@ module Grid
     StartResult = Data.define(:hackr_breach, :protocols, :display)
     EndRoundResult = Data.define(:hackr_breach, :state, :protocol_messages, :display, :failure_display)
     ResolveResult = Data.define(:hackr_breach, :xp_awarded, :cred_awarded, :xp_result, :display)
-    FailureResult = Data.define(:hackr_breach, :vitals_hit, :zone_lockout_minutes, :fried_level, :software_wiped, :display)
+    FailureResult = Data.define(:hackr_breach, :vitals_hit, :zone_lockout_minutes, :fried_level, :software_wiped, :captured, :display)
     JackoutResult = Data.define(:hackr_breach, :clean, :vitals_hit, :display)
 
     class AlreadyInBreach < StandardError; end
@@ -32,6 +32,7 @@ module Grid
     }.freeze
 
     TRACE_DETECTION_BONUS = 4
+    UNLIMITED_ATTEMPTS = -1 # Sentinel for infinite puzzle gate attempts (facility BREACHes)
 
     def self.breach_rank(clearance)
       BREACH_RANK_TABLE.find { |range, _| range.include?(clearance.to_i) }&.last
@@ -86,6 +87,43 @@ module Grid
       encounters.sort_by { |enc| enc.grid_breach_template.position }
     end
 
+    # Returns all non-depleted encounters in room for display, including locked ones.
+    # Each entry: { encounter:, template:, available:, locked_reason: }
+    # Used by look_command to show "[LOCKED]" indicators on gated encounters.
+    def self.listed_encounters(room:, hackr: nil)
+      encounters = room.grid_breach_encounters
+        .not_depleted
+        .includes(:grid_breach_template)
+        .select { |enc| enc.grid_breach_template.published? }
+
+      encounters.each(&:check_cooldown!)
+      encounters = encounters.reject(&:active?)
+
+      cl = hackr ? hackr.stat("clearance") : 0
+
+      encounters.sort_by { |enc| enc.grid_breach_template.position }.map do |enc|
+        t = enc.grid_breach_template
+        locked_reason = nil
+
+        if !enc.available?
+          locked_reason = "ON COOLDOWN"
+        elsif hackr && cl < t.min_clearance
+          locked_reason = "CLEARANCE #{t.min_clearance} REQUIRED"
+        elsif t.requires_mission_slug.present? && hackr
+          completed = hackr.grid_hackr_missions
+            .joins(:grid_mission)
+            .exists?(grid_missions: {slug: t.requires_mission_slug}, status: "completed")
+          locked_reason = "MISSION REQUIRED" unless completed
+        elsif t.requires_item_slug.present? && hackr
+          has_item = hackr.grid_items.joins(:grid_item_definition)
+            .exists?(grid_item_definitions: {slug: t.requires_item_slug})
+          locked_reason = "KEY ITEM REQUIRED" unless has_item
+        end
+
+        {encounter: enc, template: t, available: locked_reason.nil?, locked_reason: locked_reason}
+      end
+    end
+
     def initialize(hackr)
       @hackr = hackr
     end
@@ -118,9 +156,9 @@ module Grid
 
         # Mission prerequisite gate
         if template.requires_mission_slug.present?
-          completed = @hackr.grid_mission_progresses
+          completed = @hackr.grid_hackr_missions
             .joins(:grid_mission)
-            .exists?(grid_missions: {slug: template.requires_mission_slug}, state: "completed")
+            .exists?(grid_missions: {slug: template.requires_mission_slug}, status: "completed")
           raise TemplateGated, "Requires completed mission: #{template.requires_mission_slug}." unless completed
         end
 
@@ -361,7 +399,7 @@ module Grid
 
     def resolve_failure!(hackr_breach, failure_mode: :detection_overflow)
       unless hackr_breach.state == "active"
-        return FailureResult.new(hackr_breach: hackr_breach, vitals_hit: [], zone_lockout_minutes: nil, fried_level: nil, software_wiped: false, display: "")
+        return FailureResult.new(hackr_breach: hackr_breach, vitals_hit: [], zone_lockout_minutes: nil, fried_level: nil, software_wiped: false, captured: false, display: "")
       end
 
       template = hackr_breach.grid_breach_template
@@ -369,7 +407,12 @@ module Grid
       zone_lockout_minutes = nil
       fried_level_set = nil
       software_wiped = false
+      captured = false
       tier = template.tier
+
+      # Determine failure path: standard consequences OR GovCorp capture.
+      # Capture replaces lockout + DECK consequences — you're in custody instead.
+      govcorp_capture = should_capture?(tier, failure_mode)
 
       # Wrap in transaction if not already inside one (end_round! calls this inside its own)
       wrap = !ActiveRecord::Base.connection.transaction_open?
@@ -386,42 +429,45 @@ module Grid
         vitals_hit << drain_vital!("energy", 20)
         vitals_hit << drain_vital!("psyche", 20)
 
-        # Tier 2: zone lockout (standard+ encounters)
-        unless tier == "ambient"
-          zone_lockout_minutes = (1 + (hackr_breach.round_number / 3.0).floor).clamp(1, 10)
+        unless govcorp_capture
+          # Standard failure path: lockout + DECK consequences + eject
 
-          zone = GridRoom.find_by(id: hackr_breach.origin_room_id)&.grid_zone
-          if zone
-            lockout_until = (Time.current + zone_lockout_minutes.minutes).to_i
-            @hackr.set_stat!("zone_lockout_#{zone.id}", lockout_until)
+          # Tier 2: zone lockout (standard+ encounters)
+          unless tier == "ambient"
+            zone_lockout_minutes = (1 + (hackr_breach.round_number / 3.0).floor).clamp(1, 10)
+
+            zone = GridRoom.find_by(id: hackr_breach.origin_room_id)&.grid_zone
+            if zone
+              lockout_until = (Time.current + zone_lockout_minutes.minutes).to_i
+              @hackr.set_stat!("zone_lockout_#{zone.id}", lockout_until)
+            end
+          end
+
+          # Tier 3+4: DECK consequences (detection-overflow only, not health-zero)
+          deck = @hackr.equipped_deck
+          if deck && failure_mode == :detection_overflow
+            if %w[advanced elite world_event].include?(tier)
+              # Tier 4: DECK fried — compute level + wipe software
+              fried_level_set = compute_fried_level(tier)
+              deck.lock!
+              deck.loaded_software.destroy_all
+              deck.update!(properties: deck.properties.merge("fried_level" => fried_level_set))
+              software_wiped = true
+            elsif tier == "standard"
+              # Tier 3: software wipe only (no fry)
+              deck.lock!
+              deck.loaded_software.destroy_all
+              software_wiped = true
+            end
+          end
+
+          # Eject to zone entry room
+          eject_room_id = @hackr.zone_entry_room_id || hackr_breach.origin_room_id
+          if eject_room_id && eject_room_id != @hackr.current_room_id
+            @hackr.update!(current_room_id: eject_room_id)
           end
         end
-
-        # Tier 3+4: DECK consequences (detection-overflow only, not health-zero)
-        # Tier 3: software wipe (standard+). Tier 4: DECK fried (advanced+).
-        # When tier 4 triggers, software is also wiped (it gets _really_ fried).
-        deck = @hackr.equipped_deck
-        if deck && failure_mode == :detection_overflow
-          if %w[advanced elite world_event].include?(tier)
-            # Tier 4: DECK fried — compute level + wipe software
-            fried_level_set = compute_fried_level(tier)
-            deck.lock!
-            deck.loaded_software.destroy_all
-            deck.update!(properties: deck.properties.merge("fried_level" => fried_level_set))
-            software_wiped = true
-          elsif %w[standard].include?(tier)
-            # Tier 3: software wipe only (no fry)
-            deck.lock!
-            deck.loaded_software.destroy_all
-            software_wiped = true
-          end
-        end
-
-        # Eject to zone entry room
-        eject_room_id = @hackr.zone_entry_room_id || hackr_breach.origin_room_id
-        if eject_room_id && eject_room_id != @hackr.current_room_id
-          @hackr.update!(current_room_id: eject_room_id)
-        end
+        # Capture path is handled outside the transaction (ContainmentService has its own)
       end
 
       if wrap
@@ -430,18 +476,42 @@ module Grid
         run.call
       end
 
+      # Tier 5+6: GovCorp capture (outside main transaction)
+      capture_result = nil
+      if govcorp_capture
+        captured = true
+        impound = %w[elite world_event].include?(tier) ||
+          (tier == "advanced" && rand < Grid::ContainmentService::ADVANCED_IMPOUND_CHANCE)
+        begin
+          capture_result = Grid::ContainmentService.capture!(
+            hackr: @hackr, breach: hackr_breach, impound: impound
+          )
+        rescue Grid::ContainmentService::AlreadyCaptured, Grid::ContainmentService::NoContainmentRoom => e
+          Rails.logger.warn("[BreachService] Capture failed: #{e.message} — applying standard failure consequences")
+          captured = false
+          apply_standard_failure!(hackr_breach, tier, failure_mode, vitals_hit) do |result|
+            zone_lockout_minutes = result[:zone_lockout_minutes]
+            fried_level_set = result[:fried_level]
+            software_wiped = result[:software_wiped]
+          end
+        end
+      end
+
       vitals_hit.compact!
       display = Grid::BreachRenderer.new(hackr_breach).render_failure(
         vitals_hit, zone_lockout_minutes,
         fried_level: fried_level_set, software_wiped: software_wiped,
         failure_mode: failure_mode
       )
+      display = [display, capture_result&.display].compact.join("\n") if capture_result
+
       FailureResult.new(
         hackr_breach: hackr_breach,
         vitals_hit: vitals_hit,
         zone_lockout_minutes: zone_lockout_minutes,
         fried_level: fried_level_set,
         software_wiped: software_wiped,
+        captured: captured,
         display: display
       )
     end
@@ -529,13 +599,19 @@ module Grid
       clearance = @hackr.stat("clearance")
       psyche = @hackr.stat("psyche")
       total = gate_defs.size
-      bypass_count = [(clearance / 30).floor, total - 1].min # Always leave at least 1 gate active
-      required_count = [1, total - bypass_count].max
 
-      # Base 3 attempts. Psyche bonus: +1 if psyche >= 50% of max
-      max_psyche = @hackr.effective_max("psyche")
-      psyche_bonus = (max_psyche > 0 && psyche.to_f / max_psyche >= 0.5) ? 1 : 0
-      attempts = 3 + psyche_bonus
+      # no_clearance_bypass: facility containment locks — all gates must be solved
+      if template.no_clearance_bypass
+        bypass_count = 0
+        attempts = UNLIMITED_ATTEMPTS
+      else
+        bypass_count = [(clearance / 30).floor, total - 1].min # Always leave at least 1 gate active
+        # Base 3 attempts. Psyche bonus: +1 if psyche >= 50% of max
+        max_psyche = @hackr.effective_max("psyche")
+        psyche_bonus = (max_psyche > 0 && psyche.to_f / max_psyche >= 0.5) ? 1 : 0
+        attempts = 3 + psyche_bonus
+      end
+      required_count = [1, total - bypass_count].max
 
       # Last N gates (by template order) are bypassed — hardest gates last convention
       bypassed_ids = gate_defs.last(bypass_count).map { |g| g["id"] }
@@ -674,6 +750,71 @@ module Grid
         5
       else
         1
+      end
+    end
+
+    # Apply standard failure consequences (lockout + DECK + eject).
+    # Used as fallback when capture attempt fails.
+    def apply_standard_failure!(hackr_breach, tier, failure_mode, vitals_hit)
+      zone_lockout_minutes = nil
+      fried_level_set = nil
+      software_wiped = false
+
+      ActiveRecord::Base.transaction do
+        @hackr.lock!
+
+        # Tier 2: zone lockout
+        unless tier == "ambient"
+          zone_lockout_minutes = (1 + (hackr_breach.round_number / 3.0).floor).clamp(1, 10)
+          zone = GridRoom.find_by(id: hackr_breach.origin_room_id)&.grid_zone
+          if zone
+            lockout_until = (Time.current + zone_lockout_minutes.minutes).to_i
+            @hackr.set_stat!("zone_lockout_#{zone.id}", lockout_until)
+          end
+        end
+
+        # Tier 3+4: DECK consequences
+        deck = @hackr.equipped_deck
+        if deck && failure_mode == :detection_overflow
+          if %w[advanced elite world_event].include?(tier)
+            fried_level_set = compute_fried_level(tier)
+            deck.lock!
+            deck.loaded_software.destroy_all
+            deck.update!(properties: deck.properties.merge("fried_level" => fried_level_set))
+            software_wiped = true
+          elsif tier == "standard"
+            deck.lock!
+            deck.loaded_software.destroy_all
+            software_wiped = true
+          end
+        end
+
+        # Eject to zone entry room
+        eject_room_id = @hackr.zone_entry_room_id || hackr_breach.origin_room_id
+        if eject_room_id && eject_room_id != @hackr.current_room_id
+          @hackr.update!(current_room_id: eject_room_id)
+        end
+      end
+
+      yield({zone_lockout_minutes: zone_lockout_minutes, fried_level: fried_level_set, software_wiped: software_wiped})
+    end
+
+    # Determine whether this failure results in GovCorp capture.
+    # Capture only happens on detection-overflow, never health-zero.
+    # Probabilistic: standard 25%, advanced 50%, elite+ 100%.
+    def should_capture?(tier, failure_mode)
+      return false unless failure_mode == :detection_overflow
+      return false if Grid::ContainmentService.captured?(@hackr)
+
+      case tier
+      when "standard"
+        rand < Grid::ContainmentService::STANDARD_CAPTURE_CHANCE
+      when "advanced"
+        rand < Grid::ContainmentService::ADVANCED_CAPTURE_CHANCE
+      when "elite", "world_event"
+        true
+      else
+        false
       end
     end
 

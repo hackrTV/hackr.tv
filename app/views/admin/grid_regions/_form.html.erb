@@ -25,6 +25,28 @@
   <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
 </div>
 
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :hospital_room_id, "RESTOREPOINT ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :hospital_room_id, @rooms, :id, ->(r) { "#{r.grid_zone.name} / #{r.name}" }, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :containment_room_id, "CONTAINMENT CELL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :containment_room_id, @rooms, :id, ->(r) { "#{r.grid_zone.name} / #{r.name}" }, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :facility_exit_room_id, "FACILITY EXIT (SALLY PORT)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :facility_exit_room_id, @rooms, :id, ->(r) { "#{r.grid_zone.name} / #{r.name}" }, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+  <div style="flex: 1; min-width: 250px;">
+    <%= f.label :facility_bribe_exit_room_id, "FACILITY EXIT (BRIBE)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.collection_select :facility_bribe_exit_room_id, @rooms, :id, ->(r) { "#{r.grid_zone.name} / #{r.name}" }, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+  </div>
+</div>
+
 <div style="margin-top: 30px; display: flex; gap: 10px;">
   <%= f.submit @region.new_record? ? "Create Region" : "Update Region", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
   <%= link_to "Cancel", admin_grid_regions_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>

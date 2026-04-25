@@ -17,6 +17,7 @@
 #  container_id            :integer
 #  deck_id                 :integer
 #  grid_hackr_id           :integer
+#  grid_impound_record_id  :integer
 #  grid_item_definition_id :integer          not null
 #  grid_mining_rig_id      :integer
 #  room_id                 :integer
@@ -26,6 +27,7 @@
 #  index_grid_items_on_container_id                (container_id)
 #  index_grid_items_on_deck_id                     (deck_id)
 #  index_grid_items_on_grid_hackr_id               (grid_hackr_id)
+#  index_grid_items_on_grid_impound_record_id      (grid_impound_record_id)
 #  index_grid_items_on_grid_item_definition_id     (grid_item_definition_id)
 #  index_grid_items_on_grid_mining_rig_id          (grid_mining_rig_id)
 #  index_grid_items_on_hackr_equipped_slot_unique  (grid_hackr_id,equipped_slot) UNIQUE WHERE equipped_slot IS NOT NULL
@@ -34,6 +36,7 @@
 #
 #  container_id             (container_id => grid_items.id)
 #  deck_id                  (deck_id => grid_items.id) ON DELETE => nullify
+#  grid_impound_record_id   (grid_impound_record_id => grid_impound_records.id) ON DELETE => nullify
 #  grid_item_definition_id  (grid_item_definition_id => grid_item_definitions.id)
 #
 class GridItem < ApplicationRecord
@@ -72,9 +75,10 @@ class GridItem < ApplicationRecord
   belongs_to :grid_mining_rig, optional: true
   belongs_to :container, class_name: "GridItem", optional: true
   belongs_to :deck_item, class_name: "GridItem", foreign_key: :deck_id, optional: true
+  belongs_to :grid_impound_record, optional: true
   has_many :stored_items, class_name: "GridItem", foreign_key: :container_id, dependent: :restrict_with_error
-  has_many :loaded_software, -> { where(item_type: "software") }, class_name: "GridItem", foreign_key: :deck_id, dependent: :nullify
-  has_many :installed_modules, -> { where(item_type: "module") }, class_name: "GridItem", foreign_key: :deck_id, dependent: :nullify
+  has_many :loaded_software, -> { where(item_type: "software", grid_impound_record_id: nil) }, class_name: "GridItem", foreign_key: :deck_id, dependent: :nullify
+  has_many :installed_modules, -> { where(item_type: "module", grid_impound_record_id: nil) }, class_name: "GridItem", foreign_key: :deck_id, dependent: :nullify
 
   validates :name, presence: true
   validates :item_type, inclusion: {in: ITEM_TYPES, allow_nil: true}
@@ -86,13 +90,13 @@ class GridItem < ApplicationRecord
   validate :deck_id_requirements
 
   scope :in_room, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
-  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil, equipped_slot: nil, deck_id: nil) }
-  scope :equipped_by, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil).where.not(equipped_slot: nil) }
+  scope :in_inventory, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil, equipped_slot: nil, deck_id: nil, grid_impound_record_id: nil) }
+  scope :equipped_by, ->(hackr) { where(grid_hackr: hackr, grid_mining_rig: nil, container_id: nil, grid_impound_record_id: nil).where.not(equipped_slot: nil) }
   scope :installed_in, ->(rig) { where(grid_mining_rig: rig, grid_hackr: nil, room: nil) }
-  scope :on_floor, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil).where.not(item_type: "fixture") }
+  scope :on_floor, ->(room) { where(room: room, grid_hackr: nil, grid_mining_rig: nil, container_id: nil, grid_impound_record_id: nil).where.not(item_type: "fixture") }
   scope :placed_fixtures, ->(room) { where(room: room, item_type: "fixture", grid_hackr: nil, grid_mining_rig: nil, container_id: nil) }
-  scope :in_fixture, ->(fixture) { where(container: fixture) }
-  scope :loaded_in_deck, ->(deck) { where(deck_id: deck.id, item_type: "software") }
+  scope :in_fixture, ->(fixture) { where(container: fixture, grid_impound_record_id: nil) }
+  scope :loaded_in_deck, ->(deck) { where(deck_id: deck.id, item_type: "software", grid_impound_record_id: nil) }
 
   RAINBOW_COLORS = %w[#ff6b6b #fbbf24 #34d399 #22d3ee #60a5fa #a78bfa].freeze
 

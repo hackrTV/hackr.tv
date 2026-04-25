@@ -107,6 +107,9 @@ module Grid
         if resolve_result.xp_result[:leveled_up]
           output << "<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE UP → #{resolve_result.xp_result[:new_clearance]}</span>"
         end
+
+        # Facility BREACH hooks (captured mode)
+        output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
       else
         # Check if round should end
         breach.reload
@@ -258,6 +261,9 @@ module Grid
         if resolve_result.xp_result[:leveled_up]
           output << "<span style='color: #fbbf24; font-weight: bold;'>\u25b2 CLEARANCE UP \u2192 #{resolve_result.xp_result[:new_clearance]}</span>"
         end
+
+        # Facility BREACH hooks (captured mode)
+        output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
       else
         # Check if round should end
         breach.reload
@@ -266,7 +272,7 @@ module Grid
       end
 
       append_notifications(output, notifications)
-      output.join("\n")
+      output.compact.join("\n")
     rescue Grid::BreachActionService::NoActionsRemaining,
       Grid::BreachActionService::GateNotFound,
       Grid::BreachActionService::GateLocked,
@@ -345,6 +351,41 @@ module Grid
 
     def blocked_command(command)
       "<span style='color: #f87171;'>Cannot use '#{h(command)}' during BREACH. Type <span style='color: #22d3ee;'>help</span> for available commands.</span>"
+    end
+
+    # Post-BREACH-success actions when captured in a GovCorp facility.
+    # Handles cell escape (teleport to corridor), sally port progression,
+    # and alert reduction for voluntary targets.
+    def facility_breach_success_hook
+      room = hackr.current_room
+      return nil unless room
+
+      # Reduce facility alert for any successful BREACH in the facility
+      Grid::ContainmentService.alert_reduce!(hackr: hackr)
+
+      case room.room_type
+      when "containment"
+        # Cell escape — teleport to the processing corridor (slug convention: *-processing-corridor)
+        corridor = room.grid_zone.grid_rooms.find_by("slug LIKE ?", "%-pac-processing-corridor")
+        corridor ||= room.grid_zone.grid_rooms.where.not(room_type: "containment").order(:id).first
+        if corridor
+          hackr.update!(current_room_id: corridor.id)
+          "<span style='color: #34d399; font-weight: bold;'>Cell seal breached. You slip into the corridor.</span>"
+        end
+      when "sally_port"
+        # Inner sally port door — escape the facility entirely
+        escape_result = Grid::ContainmentService.escape_facility!(hackr: hackr, via: :sally_port)
+        escape_result.display
+      when "sally_port_anteroom"
+        # Outer door BREACH success = move to the sally_port room in the same zone.
+        sally_port = room.grid_zone.grid_rooms.find_by(room_type: "sally_port")
+        if sally_port
+          hackr.update!(current_room_id: sally_port.id)
+          "<span style='color: #34d399; font-weight: bold;'>Outer door seal breached. You enter the sally port.</span>"
+        end
+      else
+        nil # Regular voluntary target — alert reduction already handled above
+      end
     end
 
     def maybe_end_round

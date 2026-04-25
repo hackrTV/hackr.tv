@@ -397,6 +397,11 @@ module Grid
           puzzle_state["solved_count"] = puzzle_state["solved_count"].to_i + 1
           feedback = "ACCESS GRANTED"
           unlock_dependent_gates!(puzzle_state, gate_id)
+        elsif gate["attempts_remaining"].to_i == Grid::BreachService::UNLIMITED_ATTEMPTS
+          # Infinite attempts (facility BREACHes): never decrement, never fail
+          hint = sequence_position_hint(gate, answer)
+          feedback = "Incorrect — try again"
+          feedback = "#{feedback}. #{hint}" if hint
         else
           gate["attempts_remaining"] = gate["attempts_remaining"].to_i - 1
           if gate["attempts_remaining"] <= 0

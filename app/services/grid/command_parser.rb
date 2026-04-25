@@ -24,16 +24,30 @@ module Grid
         return Grid::BreachCommandParser.new(hackr, input, active_breach).execute
       end
 
+      # Captured mode: restricted command set in GovCorp facility
+      if Grid::ContainmentService.captured?(hackr)
+        return Grid::CapturedCommandParser.new(hackr, input, self).execute
+      end
+
       # Split input but preserve case in arguments
       parts = input.split
       command = parts.first&.downcase
       args = parts[1..]
 
-      result = case command
+      result = dispatch_command(command, args)
+
+      # Normalize result to hash format
+      result.is_a?(Hash) ? result : {output: result, event: nil}
+    end
+
+    # Extracted for delegation by CapturedCommandParser.
+    # Accepts pre-parsed command + args and returns raw result.
+    def dispatch_command(command, args)
+      case command
       when "look", "l"
         look_command
       when "go", "move"
-        go_command(args.first)
+        go_command(args&.first)
       when "north", "n"
         go_command("north")
       when "south", "s"
@@ -47,17 +61,17 @@ module Grid
       when "down", "d"
         go_command("down")
       when "say"
-        say_command(args.join(" "))
+        say_command(args&.join(" "))
       when "inventory", "inv", "i"
         inventory_command
       when "take", "get"
-        take_command(args.join(" "))
+        take_command(args&.join(" "))
       when "drop"
-        drop_command(args.join(" "))
+        drop_command(args&.join(" "))
       when "examine", "ex", "x"
-        examine_command(args.join(" "))
+        examine_command(args&.join(" "))
       when "talk"
-        talk_command(args.join(" "))
+        talk_command(args&.join(" "))
       when "ask"
         ask_command(args)
       when "stat", "stats", "st"
@@ -65,11 +79,11 @@ module Grid
       when "rep", "reputation", "standing"
         rep_command
       when "use"
-        use_command(args.join(" "))
+        use_command(args&.join(" "))
       when "salvage", "sal"
-        salvage_command(args.join(" "))
+        salvage_command(args&.join(" "))
       when "analyze", "an"
-        analyze_command(args.join(" "))
+        analyze_command(args&.join(" "))
       when "cache"
         cache_command(args)
       when "caches", "cred"
@@ -81,47 +95,47 @@ module Grid
       when "shop", "browse"
         shop_command
       when "buy", "purchase"
-        buy_command(args.join(" "))
+        buy_command(args&.join(" "))
       when "sell"
-        sell_command(args.join(" "))
+        sell_command(args&.join(" "))
       when "missions", "quests"
         missions_command
       when "mission", "quest"
-        mission_detail_command(args.first)
+        mission_detail_command(args&.first)
       when "accept", "acc", "ac"
-        accept_mission_command(args.first)
+        accept_mission_command(args&.first)
       when "abandon"
-        abandon_mission_command(args.first)
+        abandon_mission_command(args&.first)
       when "turn_in", "turnin", "ti"
-        turn_in_command(args.first)
+        turn_in_command(args&.first)
       when "give"
         give_command(args)
       when "fabricate", "fab"
-        fabricate_command(args.first)
+        fabricate_command(args&.first)
       when "schematics", "schem", "sch"
-        args.any? ? schematic_detail_command(args.first) : schematics_command
+        args&.any? ? schematic_detail_command(args.first) : schematics_command
       when "schematic"
-        schematic_detail_command(args.first)
+        schematic_detail_command(args&.first)
       when "place", "install"
-        place_fixture_command(args.join(" "))
+        place_fixture_command(args&.join(" "))
       when "unplace", "uninstall"
-        unplace_fixture_command(args.join(" "))
+        unplace_fixture_command(args&.join(" "))
       when "store", "put"
         store_in_fixture_command(args)
       when "retrieve"
         retrieve_from_fixture_command(args)
       when "peek", "search"
-        peek_fixture_command(args.join(" "))
+        peek_fixture_command(args&.join(" "))
       when "equip", "wear"
-        equip_command(args.join(" "))
+        equip_command(args&.join(" "))
       when "unequip", "remove"
-        unequip_command(args.join(" "))
+        unequip_command(args&.join(" "))
       when "loadout", "lo"
         loadout_command
       when "deck", "dk"
-        args.empty? ? deck_show_command : deck_subcommand(args)
+        args&.empty? ? deck_show_command : deck_subcommand(args)
       when "breach", "br"
-        breach_initiate_command(args.join(" "))
+        breach_initiate_command(args&.join(" "))
       when "repair"
         repair_command
       when "den"
@@ -139,9 +153,6 @@ module Grid
       else
         "<span style='color: #f87171;'>Unknown command: #{h(command)}. Type 'help' for a list of commands.</span>"
       end
-
-      # Normalize result to hash format
-      result.is_a?(Hash) ? result : {output: result, event: nil}
     end
 
     private
@@ -269,6 +280,12 @@ module Grid
         output << "<span style='color: #fbbf24;'>Hackrs:</span> #{hackr_entries.join(", ")}"
       end
 
+      # Facility alert HUD (captured mode)
+      if Grid::ContainmentService.captured?(hackr)
+        output << ""
+        output << Grid::ContainmentService.render_alert_bar(hackr.stat("facility_alert_level").to_i)
+      end
+
       output.join("\n")
     end
 
@@ -373,6 +390,18 @@ module Grid
       # that track reach_clearance too (cheap — progressor no-ops if none exist).
       notifications += mission_progressor.record(:reach_clearance, clearance: hackr.stat("clearance").to_i)
       look_output = append_notifications(look_output, notifications)
+
+      # Facility alert check (captured mode) — increments alert on each move,
+      # returns to containment cell if threshold reached
+      if Grid::ContainmentService.captured?(hackr)
+        alert_result = Grid::ContainmentService.alert_increment!(hackr: hackr)
+        if alert_result.caught
+          hackr.reload
+          return {output: alert_result.display + "\n" + look_command, event: nil}
+        elsif alert_result.display
+          look_output += "\n" + alert_result.display
+        end
+      end
 
       # Ambient encounter check — random BREACH trigger based on zone danger_level
       ambient_result = Grid::BreachGeneratorService.ambient_check!(hackr: hackr, room: new_room)

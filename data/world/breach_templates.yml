@@ -492,3 +492,153 @@ breach_templates:
         type: credential
         difficulty: 5
         depends_on: "C"
+
+  # ═══════════════════════════════════════════════════════════════
+  # PAC TEMPLATES — Shared across all 14 Perception Alignment Facilities
+  # ═══════════════════════════════════════════════════════════════
+
+  # Pure puzzle — containment cell escape (no cooldown, infinite retry)
+  - slug: pac-cell-escape
+    name: "Containment Cell Seal"
+    description: "A BREACH-locked ferrocarbon door. Four authentication gates — credential, sequence, circuit, logic. No protocols. No detection pressure. Just the lock, and your skill."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 90
+    base_detection_rate: 2
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 180
+    cred_reward: 0
+    published: true
+    position: 50
+    no_clearance_bypass: true
+    protocol_composition: []
+    puzzle_gates:
+      - id: "A"
+        type: credential
+        difficulty: 2
+        depends_on: null
+      - id: "B"
+        type: sequence
+        difficulty: 2
+        depends_on: "A"
+      - id: "C"
+        type: circuit
+        difficulty: 3
+        depends_on: "B"
+      - id: "D"
+        type: logic_gate
+        difficulty: 3
+        depends_on: "C"
+
+  # Voluntary target — surveillance hub (reduces facility alert)
+  - slug: pac-surveillance-node
+    name: "PAC Surveillance Array"
+    description: "The facility's camera monitoring cluster. Breach it and the feeds cycle to a recorded loop — a window where movement through the facility goes unlogged."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 78
+    base_detection_rate: 5
+    cooldown_min: 480
+    cooldown_max: 720
+    xp_reward: 140
+    cred_reward: 50
+    published: true
+    position: 51
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 0
+        weakness: offensive
+      - type: feedback
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 1
+
+  # Voluntary target — security checkpoint auth node
+  - slug: pac-checkpoint-auth
+    name: "Checkpoint Authentication Node"
+    description: "The credential verification terminal controlling the security checkpoint. Take it down and the scanner arch goes offline."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 75
+    base_detection_rate: 5
+    cooldown_min: 600
+    cooldown_max: 900
+    xp_reward: 160
+    cred_reward: 60
+    published: true
+    position: 52
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 0
+      - type: lock
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 2
+
+  # Sally port — outer door
+  - slug: pac-sally-port-outer
+    name: "PAC Outer Door Seal"
+    description: "The outer door of the sally port anteroom. A standard GovCorp perimeter node — TRACE/FEEDBACK combination."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 75
+    base_detection_rate: 6
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 120
+    cred_reward: 0
+    published: true
+    position: 53
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 0
+        weakness: offensive
+      - type: feedback
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 1
+
+  # Sally port — inner door (zone exit)
+  - slug: pac-sally-port-inner
+    name: "PAC Perimeter Seal"
+    description: "The innermost door of the sally port. A GovCorp Perimeter Seal — TRACE, FEEDBACK, and a LOCK protocol. This is the last gate between you and the transit corridor."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 72
+    base_detection_rate: 6
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 200
+    cred_reward: 0
+    published: true
+    position: 54
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 0
+        weakness: offensive
+      - type: feedback
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 1
+      - type: lock
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 2

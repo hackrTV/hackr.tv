@@ -19,7 +19,7 @@ module Grid
     # Acquires an exclusive lock on the hackr row to serialize concurrent grants.
     def check_capacity!(hackr)
       hackr.lock!
-      used = GridItem.where(grid_hackr_id: hackr.id, grid_mining_rig_id: nil, container_id: nil, equipped_slot: nil).count
+      used = GridItem.where(grid_hackr_id: hackr.id, grid_mining_rig_id: nil, container_id: nil, equipped_slot: nil, grid_impound_record_id: nil).count
       if used >= hackr.inventory_capacity
         raise Grid::InventoryErrors::InventoryFull,
           "Inventory full (#{used}/#{hackr.inventory_capacity} slots). Drop, sell, or store items to make room."

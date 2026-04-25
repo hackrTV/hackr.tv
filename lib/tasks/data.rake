@@ -189,7 +189,7 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, regions, zones, rooms, etc.)"
-  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics, :breach_templates, :breach_encounters]
+  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics, :breach_templates, :breach_encounters, :pac_facilities]
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -871,7 +871,8 @@ namespace :data do
         position: attrs["position"] || 0,
         protocol_composition: attrs["protocol_composition"] || [],
         puzzle_gates: attrs["puzzle_gates"] || [],
-        reward_table: attrs["reward_table"] || {}
+        reward_table: attrs["reward_table"] || {},
+        no_clearance_bypass: attrs["no_clearance_bypass"] || false
       )
       template.save!
       created += 1
@@ -924,6 +925,140 @@ namespace :data do
     end
 
     puts "BREACH Encounters: #{created} created, #{GridBreachEncounter.count} total"
+  end
+
+  desc "Stamp GovCorp Perception Alignment Facilities per region from template"
+  task pac_facilities: :environment do
+    puts "\n--- Loading PAC Facilities ---"
+    yaml_file = Rails.root.join("data", "world", "pac_facilities.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    zone_tmpl = data["zone"]
+    room_tmpls = data["rooms"]
+    exit_tmpls = data["exits"]
+    mob_tmpls = data["mobs"]
+    encounter_tmpls = data["encounters"]
+    cell_ids = data["cell_ids"] || {}
+
+    regions = GridRegion.all.index_by(&:slug)
+    govcorp_faction = GridFaction.find_by(slug: zone_tmpl["faction_slug"])
+
+    zones_created = rooms_created = exits_created = mobs_created = encounters_created = 0
+
+    regions.each do |region_slug, region|
+      prefix = "#{region_slug}-govcorp-pac"
+      cell_id = cell_ids[region_slug] || "0-X"
+
+      # --- Zone ---
+      zone = GridZone.find_or_initialize_by(slug: prefix)
+      if zone.new_record?
+        zone.assign_attributes(
+          name: zone_tmpl["name"],
+          description: zone_tmpl["description"],
+          zone_type: zone_tmpl["zone_type"],
+          color_scheme: zone_tmpl["color_scheme"],
+          grid_region: region,
+          grid_faction: govcorp_faction,
+          danger_level: zone_tmpl["danger_level"] || 0
+        )
+        zone.save!
+        zones_created += 1
+        puts "  ✓ Zone: #{zone.name} (#{zone.slug})"
+      end
+
+      # --- Rooms ---
+      room_tmpls.each do |rt|
+        slug = "#{region_slug}-pac-#{rt["suffix"]}"
+        room = GridRoom.find_or_initialize_by(slug: slug)
+        next unless room.new_record?
+
+        name = rt["name_template"].gsub("%{cell_id}", cell_id)
+        room.assign_attributes(
+          name: name,
+          description: rt["description"],
+          grid_zone: zone,
+          room_type: rt["room_type"]
+        )
+        room.save!
+        rooms_created += 1
+      end
+
+      # --- Exits ---
+      exit_tmpls.each do |et|
+        from_slug = "#{region_slug}-pac-#{et["from"]}"
+        to_slug = "#{region_slug}-pac-#{et["to"]}"
+        from_room = GridRoom.find_by(slug: from_slug)
+        to_room = GridRoom.find_by(slug: to_slug)
+        next unless from_room && to_room
+
+        exit_record = GridExit.find_or_initialize_by(
+          from_room: from_room, to_room: to_room, direction: et["direction"]
+        )
+        next unless exit_record.new_record?
+
+        exit_record.save!
+        exits_created += 1
+      end
+
+      # --- Mobs ---
+      mob_tmpls.each do |mt|
+        room_slug = "#{region_slug}-pac-#{mt["suffix"]}"
+        mob_room = GridRoom.find_by(slug: room_slug)
+        next unless mob_room
+
+        mob = GridMob.find_or_initialize_by(name: mt["name"], grid_room: mob_room)
+        next unless mob.new_record?
+
+        mob_faction = mt["faction_slug"] ? GridFaction.find_by(slug: mt["faction_slug"]) : nil
+        mob.assign_attributes(
+          description: mt["description"],
+          mob_type: mt["mob_type"],
+          grid_faction: mob_faction,
+          dialogue_tree: mt["dialogue_tree"]
+        )
+        mob.save!
+        mobs_created += 1
+      end
+
+      # --- Breach Encounters ---
+      encounter_tmpls.each do |et|
+        template = GridBreachTemplate.find_by(slug: et["template_slug"])
+        room_slug = "#{region_slug}-pac-#{et["room_suffix"]}"
+        enc_room = GridRoom.find_by(slug: room_slug)
+        next unless template && enc_room
+
+        encounter = GridBreachEncounter.find_or_initialize_by(
+          grid_breach_template: template, grid_room: enc_room
+        )
+        next unless encounter.new_record?
+
+        encounter.assign_attributes(state: "available")
+        encounter.save!
+        encounters_created += 1
+      end
+
+      # --- Region assignments ---
+      containment_room = GridRoom.find_by(slug: "#{region_slug}-pac-containment-cell")
+      exit_room = GridRoom.find_by(slug: "#{region_slug}-pac-external-corridor")
+      bribe_exit_room = GridRoom.find_by(slug: "#{region_slug}-pac-admin-discharge")
+
+      updates = {}
+      updates[:containment_room] = containment_room if containment_room && region.containment_room_id != containment_room.id
+      updates[:facility_exit_room] = exit_room if exit_room && region.facility_exit_room_id != exit_room.id
+      updates[:facility_bribe_exit_room] = bribe_exit_room if bribe_exit_room && region.facility_bribe_exit_room_id != bribe_exit_room.id
+
+      if updates.any?
+        region.update!(updates)
+        puts "  ↻ Region #{region.name}: assigned PAC rooms"
+      end
+    end
+
+    puts "PAC Facilities: #{zones_created} zones, #{rooms_created} rooms, #{exits_created} exits, #{mobs_created} mobs, #{encounters_created} encounters"
   end
 
   desc "Sync existing grid_items with their current definitions"

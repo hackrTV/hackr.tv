@@ -1,0 +1,187 @@
+# GovCorp Perception Alignment Center — template layout.
+# Stamped per region by: rails data:pac_facilities
+# Slugs are prefixed with the region slug (e.g., the-lakeshore-pac-containment-cell).
+# One template, 14 instances. Change the layout here, re-run the task.
+
+zone:
+  name: "GovCorp Perception Alignment Center"
+  description: "A sanitized GovCorp containment facility. Neutral walls, filtered air, and the quiet hum of compliance infrastructure. Somewhere behind these walls is a processing corridor that leads to daylight — if you can reach it."
+  zone_type: govcorp
+  color_scheme: white/red
+  faction_slug: govcorp
+  danger_level: 5
+
+rooms:
+  - suffix: containment-cell
+    name_template: "Containment Cell %{cell_id}"
+    description: "A featureless white room, two meters by three. A cot bolted to the wall. A ceiling-mounted camera with a blinking red light. The door — reinforced ferrocarbon with a BREACH-locked panel flush to the frame — has no handle on this side. You were brought here. You will not leave the same way."
+    room_type: containment
+
+  - suffix: processing-corridor
+    name_template: "Processing Corridor"
+    description: "A long corridor with overhead strip lighting that hums at a frequency designed to discourage extended thought. Numbered cell doors line one side. A floor-mounted stripe leads toward processing in one direction, intake in the other. GovCorp signage recommends cooperation."
+    room_type: govcorp
+
+  - suffix: intake-junction
+    name_template: "Intake Junction"
+    description: "A junction node where intake processing meets the main corridor. A terminal mounted to the wall runs identity verification loops. The junction connects to the administrative wing and the impound bay."
+    room_type: govcorp
+
+  - suffix: surveillance-hub
+    name_template: "Surveillance Hub"
+    description: "A circular room dominated by a central monitoring array — sixteen feeds, all facility cameras, cycling in ten-second intervals. A RAINN node cluster pulses in the corner, its access port just visible behind a cable conduit. Breach it and the feeds go dark. Temporarily."
+    room_type: govcorp
+
+  - suffix: security-checkpoint
+    name_template: "Security Checkpoint"
+    description: "A hardened checkpoint with a manual scanner arch and a GovCorp authentication terminal. Both doors are locked from this side. The authentication node is clearly a BREACH target — disabling it would kill credential verification across the checkpoint for a window long enough to matter."
+    room_type: govcorp
+
+  - suffix: impound-bay
+    name_template: "Impound Bay"
+    description: "Floor-to-ceiling wire shelving holds labeled bins of confiscated gear. Everything is tagged, logged, and technically retrievable — for a fee. A clerk sits behind reinforced plexi, expression professionally neutral, processing forms with the efficiency of someone who has processed many forms."
+    room_type: impound
+
+  - suffix: administrative-wing
+    name_template: "Administrative Wing"
+    description: "A carpeted corridor that smells of recycled air and bureaucratic permanence. A GovCorp agent occupies a desk at the far end, surrounded by physical paperwork — a deliberate choice in an era of digital records. The agent handles 'compliance resolution services.' The price list is not posted."
+    room_type: govcorp
+
+  - suffix: sally-port-anteroom
+    name_template: "Sally Port Anteroom"
+    description: "A small anteroom between the facility interior and the sally port proper. Two doors, never both open simultaneously. A GovCorp protocol panel controls the outer door. You are, technically, almost outside."
+    room_type: sally_port_anteroom
+
+  - suffix: sally-port
+    name_template: "Sally Port"
+    description: "The final controlled threshold. A reinforced chamber with an inner door behind you and an outer door ahead. The outer door is BREACH-locked — a GovCorp Perimeter Seal, two protocols deep. The transit corridor is visible through the outer door's narrow observation slit. Exit is ten meters away."
+    room_type: sally_port
+
+  - suffix: external-corridor
+    name_template: "PAC External Corridor"
+    description: "A dim service corridor outside the Perception Alignment Center. The heavy door behind you seals shut."
+    room_type: govcorp
+
+  - suffix: admin-discharge
+    name_template: "Administrative Discharge Exit"
+    description: "A side door marked 'ADMINISTRATIVE USE ONLY.' A narrow alley leads away from the facility. The door locks behind you."
+    room_type: govcorp
+
+# Exits: hub-and-spoke around processing-corridor.
+# Containment cell has NO exits (BREACH escape only).
+# Sally port anteroom → sally port: NO exit (BREACH only). Sally port → anteroom: YES (retreat).
+exits:
+  - from: processing-corridor
+    to: intake-junction
+    direction: north
+  - from: intake-junction
+    to: processing-corridor
+    direction: south
+  - from: processing-corridor
+    to: surveillance-hub
+    direction: east
+  - from: surveillance-hub
+    to: processing-corridor
+    direction: west
+  - from: processing-corridor
+    to: security-checkpoint
+    direction: west
+  - from: security-checkpoint
+    to: processing-corridor
+    direction: east
+  - from: intake-junction
+    to: impound-bay
+    direction: west
+  - from: impound-bay
+    to: intake-junction
+    direction: east
+  - from: intake-junction
+    to: administrative-wing
+    direction: north
+  - from: administrative-wing
+    to: intake-junction
+    direction: south
+  - from: security-checkpoint
+    to: sally-port-anteroom
+    direction: west
+  - from: sally-port-anteroom
+    to: security-checkpoint
+    direction: east
+  # Sally port chamber → anteroom (retreat option)
+  - from: sally-port
+    to: sally-port-anteroom
+    direction: east
+  # Exit rooms — connect to each other so escaped hackrs aren't stranded.
+  # Per-region transit connections added separately when region graphs are wired.
+  - from: external-corridor
+    to: admin-discharge
+    direction: south
+  - from: admin-discharge
+    to: external-corridor
+    direction: north
+
+mobs:
+  - suffix: impound-bay
+    name: "Compliance Clerk"
+    faction_slug: govcorp
+    description: "A mid-tier GovCorp functionary in a pressed gray uniform. They process impound forms with the detached precision of someone who genuinely enjoys paperwork. Behind the plexi sits a wall of numbered bins. Your gear is in one of them."
+    mob_type: special
+    dialogue_tree:
+      greeting: "Impound Services. Retrieve your items by presenting your case number and the applicable processing fee. GovCorp thanks you for your compliance."
+      topics:
+        fee: "Processing fee is assessed per impound event. Fees are non-negotiable and non-refundable."
+        bribe: "I don't know what you're implying. But hypothetically, a significant CRED transfer could reduce wait times considerably. Hypothetically."
+        release: "Once fees are paid, items are released. Leave promptly."
+
+  - suffix: administrative-wing
+    name: "Agent Harwick"
+    faction_slug: govcorp
+    description: "A senior GovCorp compliance agent in a charcoal suit that costs more than your DECK. Harwick handles what the forms can't — outcomes that GovCorp would prefer not to have formally documented."
+    mob_type: special
+    dialogue_tree:
+      greeting: "Compliance Resolution Services. I handle matters that require discretion. Sit down."
+      topics:
+        options: "You have options. One involves paperwork, hearings, and a formal processing timeline. The other involves a direct resolution fee and you leaving in the next fifteen minutes. I recommend the second option."
+        fee: "Resolution fees are indexed to your CLEARANCE level and the nature of the infraction. I'll give you a number."
+        deal: "Payment handled through an anonymous intermediary. Once it clears, your record is flagged as 'administratively resolved.' You are free to go."
+
+  - suffix: security-checkpoint
+    name: "RAINN Guard — Post 7"
+    faction_slug: govcorp
+    description: "A RAINN unit in full tactical compliance gear. Their visor scans constantly. They don't speak unless activating the checkpoint protocol."
+    mob_type: lore
+    dialogue_tree:
+      greeting: "Halt. Present credentials."
+      topics:
+        credentials: "Credential verification is mandatory. Unauthorized passage triggers automatic lockdown."
+        facility: "This facility operates under GovCorp Directive 44-C. Queries are not encouraged."
+
+# Breach encounter placements (reference shared templates by slug)
+encounters:
+  - template_slug: pac-cell-escape
+    room_suffix: containment-cell
+  - template_slug: pac-surveillance-node
+    room_suffix: surveillance-hub
+  - template_slug: pac-checkpoint-auth
+    room_suffix: security-checkpoint
+  - template_slug: pac-sally-port-outer
+    room_suffix: sally-port-anteroom
+  - template_slug: pac-sally-port-inner
+    room_suffix: sally-port
+
+# Cell IDs per region (cosmetic variation)
+cell_ids:
+  the-lakeshore: "7-L"
+  the-riverlands: "3-R"
+  the-arch: "9-A"
+  the-narrows: "2-N"
+  the-basin: "5-B"
+  the-gate: "1-G"
+  the-front: "4-F"
+  the-straits: "6-S"
+  the-bend: "8-D"
+  the-canopy: "11-C"
+  the-flats: "10-T"
+  the-marshes: "12-M"
+  the-works: "13-W"
+  the-badlands: "14-X"

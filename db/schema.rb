@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_24_211652) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -214,6 +214,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
     t.text "description"
     t.integer "min_clearance", default: 0, null: false
     t.string "name", null: false
+    t.boolean "no_clearance_bypass", default: false, null: false
     t.integer "pnr_threshold", default: 75, null: false
     t.integer "position", default: 0, null: false
     t.json "protocol_composition", default: {}, null: false
@@ -425,6 +426,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
     t.index ["role"], name: "index_grid_hackrs_on_role"
   end
 
+  create_table "grid_impound_records", force: :cascade do |t|
+    t.integer "bribe_cost", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_breach_id"
+    t.integer "grid_hackr_id", null: false
+    t.string "status", default: "impounded", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_breach_id"], name: "index_grid_impound_records_on_grid_hackr_breach_id"
+    t.index ["grid_hackr_id", "status"], name: "index_grid_impound_records_on_grid_hackr_id_and_status"
+    t.index ["grid_hackr_id"], name: "index_grid_impound_records_on_grid_hackr_id"
+  end
+
   create_table "grid_item_definitions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -447,6 +460,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
     t.text "description"
     t.string "equipped_slot"
     t.integer "grid_hackr_id"
+    t.integer "grid_impound_record_id"
     t.integer "grid_item_definition_id", null: false
     t.integer "grid_mining_rig_id"
     t.string "item_type"
@@ -461,6 +475,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
     t.index ["deck_id"], name: "index_grid_items_on_deck_id"
     t.index ["grid_hackr_id", "equipped_slot"], name: "index_grid_items_on_hackr_equipped_slot_unique", unique: true, where: "equipped_slot IS NOT NULL"
     t.index ["grid_hackr_id"], name: "index_grid_items_on_grid_hackr_id"
+    t.index ["grid_impound_record_id"], name: "index_grid_items_on_grid_impound_record_id"
     t.index ["grid_item_definition_id"], name: "index_grid_items_on_grid_item_definition_id"
     t.index ["grid_mining_rig_id"], name: "index_grid_items_on_grid_mining_rig_id"
   end
@@ -555,12 +570,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
   end
 
   create_table "grid_regions", force: :cascade do |t|
+    t.integer "containment_room_id"
     t.datetime "created_at", null: false
     t.text "description"
+    t.integer "facility_bribe_exit_room_id"
+    t.integer "facility_exit_room_id"
     t.integer "hospital_room_id"
     t.string "name", null: false
     t.string "slug", null: false
     t.datetime "updated_at", null: false
+    t.index ["containment_room_id"], name: "index_grid_regions_on_containment_room_id"
+    t.index ["facility_bribe_exit_room_id"], name: "index_grid_regions_on_facility_bribe_exit_room_id"
+    t.index ["facility_exit_room_id"], name: "index_grid_regions_on_facility_exit_room_id"
     t.index ["hospital_room_id"], name: "index_grid_regions_on_hospital_room_id"
     t.index ["slug"], name: "index_grid_regions_on_slug", unique: true
   end
@@ -1236,6 +1257,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
   add_foreign_key "grid_hackr_track_plays", "grid_hackrs"
   add_foreign_key "grid_hackr_track_plays", "tracks"
   add_foreign_key "grid_hackrs", "grid_rooms", column: "zone_entry_room_id", on_delete: :nullify
+  add_foreign_key "grid_impound_records", "grid_hackr_breaches", on_delete: :nullify
+  add_foreign_key "grid_impound_records", "grid_hackrs", on_delete: :cascade
+  add_foreign_key "grid_items", "grid_impound_records", on_delete: :nullify
   add_foreign_key "grid_items", "grid_item_definitions"
   add_foreign_key "grid_items", "grid_items", column: "container_id"
   add_foreign_key "grid_items", "grid_items", column: "deck_id", on_delete: :nullify
@@ -1245,6 +1269,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_200840) do
   add_foreign_key "grid_missions", "grid_mission_arcs", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_missions", column: "prereq_mission_id", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
+  add_foreign_key "grid_regions", "grid_rooms", column: "containment_room_id", on_delete: :nullify
+  add_foreign_key "grid_regions", "grid_rooms", column: "facility_bribe_exit_room_id", on_delete: :nullify
+  add_foreign_key "grid_regions", "grid_rooms", column: "facility_exit_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "hospital_room_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "grid_hackrs", column: "owner_id"
