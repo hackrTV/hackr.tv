@@ -1,5 +1,6 @@
 class Admin::ApplicationController < ApplicationController
   include GridAuthentication
+  include Admin::DevToolsGate
 
   layout "admin"
 

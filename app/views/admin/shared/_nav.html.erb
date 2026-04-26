@@ -101,6 +101,11 @@
           <%= link_to "Rep Log", admin_grid_reputation_events_path, class: "green-168-text" %>
         </div>
       </div>
+      <% if dev_tools_enabled? %>
+        <%= link_to "Hackrs", admin_grid_hackrs_path, class: "yellow-168-text", style: "text-decoration: none;", title: "DEV TOOLS ON" %>
+      <% else %>
+        <%= link_to "Hackrs", admin_grid_hackrs_path, class: "green-168-text", style: "text-decoration: none;" %>
+      <% end %>
       <%= link_to "Redirects", admin_redirects_path, class: "cyan-168-text", style: "text-decoration: none;" %>
       <span style="color: #333;">|</span>
       <%= link_to "← Exit", root_path, class: "red-168-text", style: "text-decoration: none;" %>

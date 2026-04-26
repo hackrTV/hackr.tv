@@ -344,6 +344,20 @@ Rails.application.routes.draw do
     # Grid economy (read-only admin dashboard)
     get "grid_economy", to: "grid_economy#index", as: :grid_economy
 
+    # Hackr inspector + dev tools (per-hackr)
+    resources :grid_hackrs, only: %i[index show] do
+      member do
+        get :edit_stats
+        patch :update_stats
+        get :warp
+        post :perform_warp
+      end
+    end
+    # Hackr item management (prod-safe)
+    get "grid_hackrs/:hackr_id/items", to: "grid_hackr_items#index", as: :grid_hackr_items
+    post "grid_hackrs/:hackr_id/items/grant", to: "grid_hackr_items#grant", as: :grant_grid_hackr_item
+    delete "grid_hackrs/:hackr_id/items/:id", to: "grid_hackr_items#remove", as: :remove_grid_hackr_item
+
     # Grid achievements (runtime CRUD + manual award)
     resources :grid_achievements do
       member do
