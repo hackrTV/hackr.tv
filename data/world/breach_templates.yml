@@ -493,6 +493,684 @@ breach_templates:
         difficulty: 5
         depends_on: "C"
 
+  # ── NEW STANDARD TEMPLATES ────────────────────────────────────
+
+  - slug: corrupted-terminal-node
+    name: "Corrupted Terminal Node"
+    description: "A damaged public terminal spitting error codes. The LOCK protocol fires early — lose your momentum and FEEDBACK eats you alive."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 78
+    base_detection_rate: 5
+    cooldown_min: 300
+    cooldown_max: 600
+    xp_reward: 130
+    cred_reward: 45
+    published: true
+    position: 6
+    protocol_composition:
+      - type: feedback
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 0
+      - type: lock
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 1
+        weakness: offensive
+
+  - slug: data-siphon-relay
+    name: "Data Siphon Relay"
+    description: "A GovCorp data harvesting node. PURGE protocol bleeds your rewards from round one. Kill it fast or walk away with scraps."
+    tier: standard
+    min_clearance: 5
+    pnr_threshold: 72
+    base_detection_rate: 6
+    cooldown_min: 300
+    cooldown_max: 600
+    xp_reward: 200
+    cred_reward: 70
+    published: true
+    position: 7
+    protocol_composition:
+      - type: purge
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 0
+        weakness: utility
+      - type: trace
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 0
+      - type: feedback
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 1
+
+  - slug: signal-jammer-array
+    name: "Signal Jammer Array"
+    description: "A countermeasure array designed to shut hackrs down. Dual LOCK protocols drain INSPIRATION in waves — your action economy collapses if you don't break one early."
+    tier: standard
+    min_clearance: 10
+    pnr_threshold: 70
+    base_detection_rate: 5
+    cooldown_min: 480
+    cooldown_max: 900
+    xp_reward: 280
+    cred_reward: 100
+    published: true
+    position: 8
+    protocol_composition:
+      - type: lock
+        count: 2
+        health: 55
+        max_health: 55
+        charge_rounds: 1
+        weakness: offensive
+      - type: trace
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 0
+
+  - slug: rainn-sensor-cluster
+    name: "RAINN Sensor Cluster"
+    description: "A tri-sensor RAINN node. TRACE feeds detection while SPIKE punishes anyone who lingers. ADAPT rewrites its own vulnerabilities if you give it time."
+    tier: standard
+    min_clearance: 15
+    pnr_threshold: 68
+    base_detection_rate: 7
+    cooldown_min: 600
+    cooldown_max: 1200
+    xp_reward: 380
+    cred_reward: 140
+    published: true
+    position: 9
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 1
+        weakness: defensive
+      - type: adapt
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 3
+
+  # ── NEW ADVANCED TEMPLATES ───────────────────────────────────
+
+  - slug: govcorp-firewall-node
+    name: "GovCorp Firewall Node"
+    description: "A perimeter firewall protecting a GovCorp sector gateway. Dual LOCK protocols kill your momentum while SPIKE hits your neural link. Break one LOCK immediately or you're dead in the water."
+    tier: advanced
+    min_clearance: 20
+    pnr_threshold: 62
+    base_detection_rate: 7
+    cooldown_min: 600
+    cooldown_max: 1200
+    xp_reward: 480
+    cred_reward: 190
+    published: true
+    position: 10
+    protocol_composition:
+      - type: lock
+        count: 2
+        health: 65
+        max_health: 65
+        charge_rounds: 1
+      - type: trace
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 2
+        weakness: defensive
+      - type: feedback
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 1
+
+  - slug: rainn-distribution-hub
+    name: "RAINN Distribution Hub"
+    description: "A RAINN content distribution node. Double PURGE compounds reward degradation — every round costs you exponentially. Dual TRACE accelerates detection. This is a speed-kill or a waste of time."
+    tier: advanced
+    min_clearance: 25
+    pnr_threshold: 58
+    base_detection_rate: 8
+    cooldown_min: 900
+    cooldown_max: 1800
+    xp_reward: 600
+    cred_reward: 240
+    published: true
+    position: 11
+    protocol_composition:
+      - type: trace
+        count: 2
+        health: 55
+        max_health: 55
+        charge_rounds: 0
+      - type: purge
+        count: 2
+        health: 40
+        max_health: 40
+        charge_rounds: 0
+        weakness: utility
+      - type: feedback
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 1
+      - type: adapt
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 3
+
+  - slug: deep-net-archive
+    name: "Deep Net Archive"
+    description: "A buried archive node running every protocol class in the book. TRACE, FEEDBACK, LOCK, SPIKE, PURGE — nothing is missing. Generalist loadout required. Specialist builds will hit a wall."
+    tier: advanced
+    min_clearance: 25
+    pnr_threshold: 58
+    base_detection_rate: 8
+    cooldown_min: 900
+    cooldown_max: 1500
+    xp_reward: 620
+    cred_reward: 260
+    published: true
+    position: 12
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 0
+      - type: feedback
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 1
+        weakness: offensive
+      - type: lock
+        count: 1
+        health: 65
+        max_health: 65
+        charge_rounds: 2
+      - type: spike
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 1
+        weakness: defensive
+      - type: purge
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 0
+        weakness: utility
+
+  - slug: blacksite-terminal
+    name: "Blacksite Terminal"
+    description: "An unregistered GovCorp terminal. No official records. SPIKE hits hard while ADAPT rewrites the rules. The circumvention path is your safest bet — if you can solve under pressure."
+    tier: advanced
+    min_clearance: 28
+    pnr_threshold: 55
+    base_detection_rate: 8
+    cooldown_min: 720
+    cooldown_max: 1200
+    xp_reward: 650
+    cred_reward: 270
+    published: true
+    position: 13
+    protocol_composition:
+      - type: spike
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 1
+        weakness: defensive
+      - type: trace
+        count: 2
+        health: 55
+        max_health: 55
+        charge_rounds: 0
+      - type: adapt
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 3
+    puzzle_gates:
+      - id: "A"
+        type: credential
+        difficulty: 3
+        depends_on: null
+      - id: "B"
+        type: logic_gate
+        difficulty: 4
+        depends_on: "A"
+      - id: "C"
+        type: circuit
+        difficulty: 4
+        depends_on: "B"
+
+  # ── NEW ELITE TEMPLATES ─────────────────────────────────────
+
+  - slug: prism-substation-core
+    name: "PRISM Substation Core"
+    description: "A PRISM surveillance substation. The synergy engine is the real threat — dual TRACE doubles detection, LOCK kills momentum, PURGE bleeds rewards, and ADAPT rewrites everything you learned. Prioritize or drown."
+    tier: elite
+    min_clearance: 35
+    pnr_threshold: 55
+    base_detection_rate: 9
+    cooldown_min: 1200
+    cooldown_max: 2400
+    xp_reward: 800
+    cred_reward: 350
+    published: true
+    position: 14
+    protocol_composition:
+      - type: trace
+        count: 2
+        health: 65
+        max_health: 65
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 1
+        weakness: defensive
+      - type: lock
+        count: 1
+        health: 75
+        max_health: 75
+        charge_rounds: 2
+      - type: purge
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 0
+        weakness: utility
+      - type: feedback
+        count: 1
+        health: 70
+        max_health: 70
+        charge_rounds: 1
+      - type: adapt
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 3
+
+  - slug: rainn-hive-nexus
+    name: "RAINN Hive Nexus"
+    description: "A RAINN hive-mind coordination node. Triple TRACE makes the detection clock a freight train. Dual FEEDBACK grinds your vitals while SPIKE goes for the kill. Analyze fast, hit harder, or jack out early."
+    tier: elite
+    min_clearance: 45
+    pnr_threshold: 50
+    base_detection_rate: 9
+    cooldown_min: 1800
+    cooldown_max: 3600
+    xp_reward: 1050
+    cred_reward: 450
+    published: true
+    position: 15
+    protocol_composition:
+      - type: trace
+        count: 3
+        health: 65
+        max_health: 65
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 70
+        max_health: 70
+        charge_rounds: 1
+        weakness: defensive
+      - type: lock
+        count: 1
+        health: 80
+        max_health: 80
+        charge_rounds: 2
+      - type: feedback
+        count: 2
+        health: 65
+        max_health: 65
+        charge_rounds: 1
+      - type: adapt
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 2
+
+  - slug: govcorp-central-cortex
+    name: "GovCorp Central Cortex"
+    description: "The beating heart of a GovCorp regional operations center. Every protocol class, maximum density. Dual SPIKE shreds your neural link. Dual LOCK shuts you down. PURGE punishes hesitation. This is the endgame."
+    tier: elite
+    min_clearance: 55
+    pnr_threshold: 45
+    base_detection_rate: 10
+    cooldown_min: 2400
+    cooldown_max: 3600
+    xp_reward: 1300
+    cred_reward: 600
+    published: true
+    position: 16
+    protocol_composition:
+      - type: trace
+        count: 2
+        health: 70
+        max_health: 70
+        charge_rounds: 0
+      - type: spike
+        count: 2
+        health: 65
+        max_health: 65
+        charge_rounds: 1
+        weakness: defensive
+      - type: lock
+        count: 2
+        health: 80
+        max_health: 80
+        charge_rounds: 2
+      - type: purge
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 0
+        weakness: utility
+      - type: feedback
+        count: 1
+        health: 75
+        max_health: 75
+        charge_rounds: 1
+      - type: adapt
+        count: 1
+        health: 60
+        max_health: 60
+        charge_rounds: 2
+
+  # ── NEW AMBIENT TEMPLATES ────────────────────────────────────
+
+  - slug: ambient-transit-checkpoint
+    name: "Transit Checkpoint Ping"
+    description: "A GovCorp transit verification ping. PURGE bleeds your payout while TRACE marks your position. Quick encounter — but slow hackrs leave with nothing."
+    tier: ambient
+    min_clearance: 0
+    danger_level_min: 2
+    zone_slugs:
+      - transit-network
+    pnr_threshold: 78
+    base_detection_rate: 7
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 55
+    cred_reward: 20
+    published: true
+    position: 104
+    protocol_composition:
+      - type: purge
+        count: 1
+        health: 20
+        max_health: 20
+        charge_rounds: 0
+        weakness: utility
+      - type: trace
+        count: 1
+        health: 25
+        max_health: 25
+        charge_rounds: 0
+
+  - slug: ambient-corrupted-daemon
+    name: "Corrupted Background Daemon"
+    description: "A rogue process mutating in real time. ADAPT fires fast on this one — analyze before it rewrites itself or you're swinging blind."
+    tier: ambient
+    min_clearance: 5
+    danger_level_min: 3
+    zone_slugs: []
+    pnr_threshold: 72
+    base_detection_rate: 8
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 85
+    cred_reward: 30
+    published: true
+    position: 105
+    protocol_composition:
+      - type: feedback
+        count: 1
+        health: 30
+        max_health: 30
+        charge_rounds: 0
+      - type: adapt
+        count: 1
+        health: 25
+        max_health: 25
+        charge_rounds: 2
+
+  - slug: ambient-rogue-signal
+    name: "Rogue Signal Burst"
+    description: "An unidentified signal burst. Origin unknown. PURGE starts immediately — the longer you engage, the less you walk away with."
+    tier: ambient
+    min_clearance: 10
+    danger_level_min: 3
+    zone_slugs: []
+    pnr_threshold: 70
+    base_detection_rate: 8
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 120
+    cred_reward: 45
+    published: true
+    position: 106
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 0
+      - type: purge
+        count: 1
+        health: 30
+        max_health: 30
+        charge_rounds: 0
+        weakness: utility
+      - type: feedback
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 1
+
+  - slug: ambient-govcorp-drone-swarm
+    name: "GovCorp Drone Swarm"
+    description: "A coordinated drone surveillance swarm. Dual TRACE doubles detection speed. SPIKE targets your neural link. FEEDBACK drains everything else. Heavy response — they know what you are."
+    tier: ambient
+    min_clearance: 15
+    danger_level_min: 5
+    zone_slugs:
+      - govcorp-surveillance
+    pnr_threshold: 65
+    base_detection_rate: 9
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 180
+    cred_reward: 70
+    published: true
+    position: 107
+    protocol_composition:
+      - type: trace
+        count: 2
+        health: 40
+        max_health: 40
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 1
+        weakness: defensive
+      - type: feedback
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 1
+
+  - slug: ambient-underbelly-phantom
+    name: "Underbelly Phantom Thread"
+    description: "Something ancient and vicious in the deep tunnels. LOCK shuts you down. SPIKE hits your body. PURGE takes your reward. A predator that punishes every mistake."
+    tier: ambient
+    min_clearance: 20
+    danger_level_min: 6
+    zone_slugs:
+      - the-underbelly
+    pnr_threshold: 60
+    base_detection_rate: 9
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 200
+    cred_reward: 80
+    published: true
+    position: 108
+    protocol_composition:
+      - type: lock
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 1
+      - type: spike
+        count: 1
+        health: 35
+        max_health: 35
+        charge_rounds: 1
+        weakness: defensive
+      - type: purge
+        count: 1
+        health: 30
+        max_health: 30
+        charge_rounds: 0
+        weakness: utility
+      - type: trace
+        count: 1
+        health: 40
+        max_health: 40
+        charge_rounds: 0
+
+  # ── NEW PUZZLE/MIXED TEMPLATES ──────────────────────────────
+
+  - slug: derelict-access-point
+    name: "Derelict Access Point"
+    description: "An abandoned access terminal in a dead sector. No active protocols — just two degraded authentication locks running in parallel. Solve either path to get in."
+    tier: standard
+    min_clearance: 5
+    pnr_threshold: 82
+    base_detection_rate: 3
+    cooldown_min: 240
+    cooldown_max: 480
+    xp_reward: 140
+    cred_reward: 45
+    published: true
+    position: 35
+    protocol_composition: []
+    puzzle_gates:
+      - id: "A"
+        type: circuit
+        difficulty: 2
+        depends_on: null
+      - id: "B"
+        type: sequence
+        difficulty: 2
+        depends_on: null
+
+  - slug: underbelly-data-cache
+    name: "Underbelly Data Cache"
+    description: "A hidden data cache buried in the unregistered passages. Three authentication gates — two can be solved in any order, but the final gate only unlocks once both are cleared."
+    tier: standard
+    min_clearance: 10
+    pnr_threshold: 75
+    base_detection_rate: 4
+    cooldown_min: 360
+    cooldown_max: 720
+    xp_reward: 250
+    cred_reward: 85
+    published: true
+    position: 36
+    protocol_composition: []
+    puzzle_gates:
+      - id: "A"
+        type: credential
+        difficulty: 2
+        depends_on: null
+      - id: "B"
+        type: sequence
+        difficulty: 3
+        depends_on: null
+      - id: "C"
+        type: logic_gate
+        difficulty: 3
+        depends_on: "A"
+
+  - slug: govcorp-cipher-vault
+    name: "GovCorp Cipher Vault"
+    description: "A high-value GovCorp encryption vault. PURGE bleeds rewards while you work the circumvention path. Three chained gates under time pressure — credential decryption, logic bypass, circuit trace."
+    tier: advanced
+    min_clearance: 20
+    pnr_threshold: 60
+    base_detection_rate: 7
+    cooldown_min: 600
+    cooldown_max: 1200
+    xp_reward: 520
+    cred_reward: 210
+    published: true
+    position: 37
+    protocol_composition:
+      - type: purge
+        count: 1
+        health: 45
+        max_health: 45
+        charge_rounds: 0
+        weakness: utility
+      - type: trace
+        count: 1
+        health: 55
+        max_health: 55
+        charge_rounds: 0
+      - type: spike
+        count: 1
+        health: 50
+        max_health: 50
+        charge_rounds: 2
+        weakness: defensive
+    puzzle_gates:
+      - id: "A"
+        type: credential
+        difficulty: 3
+        depends_on: null
+      - id: "B"
+        type: logic_gate
+        difficulty: 4
+        depends_on: "A"
+      - id: "C"
+        type: circuit
+        difficulty: 4
+        depends_on: "B"
+
   # ═══════════════════════════════════════════════════════════════
   # PAC TEMPLATES — Shared across all 14 Perception Alignment Facilities
   # ═══════════════════════════════════════════════════════════════
