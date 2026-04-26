@@ -1,0 +1,111 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/hackrs/<%= @hackr.hackr_alias %>/stats :: STAT EDITOR</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
+        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
+        <span style="color: #ccc;"> — Direct stat mutation bypasses game logic. Use with care.</span>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+      </div>
+
+      <%# === NAMED FIELDS MODE === %>
+      <div id="fields-mode">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STAT FIELDS ::]</h3>
+        <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true do %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
+
+              <%# Vitals %>
+              <% %w[health energy psyche].each do |vital| %>
+                <div>
+                  <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;"><%= vital.upcase %></label>
+                  <input type="number" name="stats[<%= vital %>]" value="<%= @hackr.stat(vital) %>"
+                    class="tui-input" style="width: 100%; padding: 6px 10px;" min="0" max="999">
+                  <small style="color: #666;">max: <%= @hackr.effective_max(vital) %></small>
+                </div>
+              <% end %>
+
+              <%# Progression %>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">CLEARANCE</label>
+                <input type="number" name="stats[clearance]" value="<%= @hackr.stat("clearance") %>"
+                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0" max="99">
+                <small style="color: #fbbf24;">Sets XP to minimum for this level</small>
+              </div>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">XP</label>
+                <input type="number" name="stats[xp]" value="<%= @hackr.stat("xp") %>"
+                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
+                <small style="color: #fbbf24;">Overrides clearance field if both set</small>
+              </div>
+
+              <%# Other numeric %>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">INSPIRATION</label>
+                <input type="number" name="stats[inspiration]" value="<%= @hackr.stat("inspiration") %>"
+                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
+              </div>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">BONUS INV SLOTS</label>
+                <input type="number" name="stats[bonus_inventory_slots]" value="<%= @hackr.stat("bonus_inventory_slots") %>"
+                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
+              </div>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">GOVCORP DEBT</label>
+                <input type="number" name="stats[govcorp_debt]" value="<%= @hackr.stat("govcorp_debt").to_i %>"
+                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
+              </div>
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">ALERT LEVEL</label>
+                <input type="number" name="stats[facility_alert_level]" value="<%= @hackr.stat("facility_alert_level").to_i %>"
+                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0" max="100">
+              </div>
+            </div>
+
+            <%# Boolean: captured %>
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="hidden" name="stats[captured]" value="0">
+                <input type="checkbox" name="stats[captured]" value="1"
+                  <%= @hackr.stat("captured") ? "checked" : "" %>
+                  style="width: 18px; height: 18px;">
+                <span class="red-255-text" style="font-weight: bold;">CAPTURED</span>
+                <span style="color: #888;">(unchecking clears containment state)</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <%= submit_tag "WRITE STATS", class: "tui-button red-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Overwrite stats for #{@hackr.hackr_alias}?" } %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# === RAW JSON MODE === %>
+      <div style="margin-top: 40px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RAW JSON ::]</h3>
+        <p style="color: #888; margin-bottom: 10px;">Full stats JSON. Replaces entire stats column.</p>
+        <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true do %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+            <textarea name="raw_json" class="tui-input"
+              style="width: 100%; min-height: 200px; padding: 10px; font-family: monospace; font-size: 0.9em;"
+            ><%= JSON.pretty_generate(@hackr.current_stats) %></textarea>
+          </div>
+          <div style="margin-top: 15px;">
+            <%= submit_tag "WRITE RAW JSON", class: "tui-button red-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Replace ALL stats for #{@hackr.hackr_alias} with raw JSON?" } %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </fieldset>
+</div>

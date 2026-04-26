@@ -1,0 +1,101 @@
+<%= render "admin/shared/combobox" %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/hackrs/<%= @hackr.hackr_alias %>/warp :: ADMIN WARP</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
+        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
+        <span style="color: #ccc;"> — Bypasses clearance gates, locks, and zone restrictions. Clears containment if captured.</span>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+      </div>
+
+      <%# Current location %>
+      <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px; margin-bottom: 20px;">
+        <span style="color: #888;">Current Location:</span>
+        <% if @hackr.current_room %>
+          <span class="cyan-255-text"><%= @hackr.current_room.name %></span>
+          <span style="color: #888;"> (<%= @hackr.current_room.grid_zone&.name %>, <%= @hackr.current_room.grid_zone&.grid_region&.name %>)</span>
+        <% else %>
+          <span style="color: #666;">Nowhere (nil)</span>
+        <% end %>
+        <% if @hackr.in_breach? %>
+          <br>
+          <span class="red-255-text" style="font-weight: bold;">WARNING: Active BREACH in progress. Warp is blocked.</span>
+        <% end %>
+        <% if @hackr.stat("captured") %>
+          <br>
+          <span class="yellow-255-text">Captured — warp will clear containment state.</span>
+        <% end %>
+      </div>
+
+      <%# Warp form %>
+      <%= form_with url: perform_warp_admin_grid_hackr_path(@hackr), method: :post, local: true, id: "warp-form" do %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">DESTINATION ROOM</label>
+
+          <input type="hidden" name="room_id" id="warp-room-id" value="">
+
+          <div class="admin-combobox">
+            <input type="text" id="warp-input" class="admin-combobox-input" autocomplete="off"
+              placeholder="Type to search... (region, zone, or room name)">
+            <div id="warp-dropdown" class="admin-combobox-dropdown"></div>
+          </div>
+
+          <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="warp-status">
+            <%= @rooms.size %> rooms — start typing to filter
+          </p>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <%= submit_tag "WARP", class: "tui-button yellow-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Warp #{@hackr.hackr_alias} to selected room?" } %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    function ready(fn) {
+      if (document.readyState !== 'loading') fn();
+      else document.addEventListener('DOMContentLoaded', fn);
+    }
+    ready(function() {
+      AdminCombobox.init({
+        inputId: 'warp-input',
+        hiddenId: 'warp-room-id',
+        dropdownId: 'warp-dropdown',
+        statusId: 'warp-status',
+        formId: 'warp-form',
+        items: <%= raw json_escape(@rooms.map { |r|
+          {
+            id: r.id,
+            name: r.name,
+            type: r.room_type || "default",
+            zone: r.grid_zone.name,
+            region: r.grid_zone.grid_region&.name || "Unknown"
+          }
+        }.to_json) %>,
+        getId: function(r) { return r.id; },
+        getSearchText: function(r) { return (r.region + ' ' + r.zone + ' ' + r.name + ' ' + r.type).toLowerCase(); },
+        getGroupKey: function(r) { return r.region + ' > ' + r.zone; },
+        renderOption: function(r, esc) { return '<span class="cb-name">' + esc(r.name) + '</span> <span class="cb-meta">(' + esc(r.type) + ')</span>'; },
+        getLabel: function(r) { return r.region + ' > ' + r.zone + ' > ' + r.name; },
+        emptyText: 'No rooms match',
+        selectedText: 'Selected — ready to warp',
+        submitError: 'Select a destination room first'
+      });
+    });
+  })();
+</script>
