@@ -159,6 +159,50 @@
         79
       ],
       "note": "Safe: BreachRenderer output is server-controlled HTML with inline styles. All dynamic text is escaped via ERB::Util.html_escape (the renderer's h() helper). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern used by the frontend terminal via dangerouslySetInnerHTML."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "0c10703731f19cf7f2c32e709464b3c451dbebc9b859f8ca47cce091e5aa37ea",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admin/grid_npc_dialogue_tester/show.html.erb",
+      "line": 30,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Grid::NpcDialogueCommandParser.new(GridHackr.find_by(:id => session[:npc_tester][\"hackr_id\"]), \"look\").execute",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "admin/grid_npc_dialogue_tester/show"
+      },
+      "user_input": "GridHackr.find_by(:id => session[:npc_tester][\"hackr_id\"])",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Safe: NpcDialogueCommandParser inherits CommandParser which escapes all dynamic text via h() (ERB::Util.html_escape). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern as the BREACH sandbox terminal."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "1f803af0a33db63095b8f415b39668734cbb768360de691a031f18819f7b5dc6",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admin/grid_npc_dialogue_tester/show.html.erb",
+      "line": 30,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Grid::NpcDialogueCommandParser.new(GridHackr.find_by(:id => session[:npc_tester][\"hackr_id\"]), \"look\").execute[:output]",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "admin/grid_npc_dialogue_tester/show"
+      },
+      "user_input": "GridHackr.find_by(:id => session[:npc_tester][\"hackr_id\"])",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Safe: NpcDialogueCommandParser inherits CommandParser which escapes all dynamic text via h() (ERB::Util.html_escape). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern as the BREACH sandbox terminal."
     }
   ],
   "updated": "2026-04-27 01:10:00 +0000",

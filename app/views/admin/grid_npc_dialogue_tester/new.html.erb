@@ -1,0 +1,159 @@
+<%= render "admin/shared/combobox" %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/npc-dialogue-tester :: NPC DIALOGUE TESTER</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
+        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
+        <span style="color: #ccc;"> — Test NPC dialogue as a specific hackr. Side effects suppressed (no rep, stats, achievements, or mission progress). Write commands (buy, sell, accept, etc.) execute but auto-revert. Hackr is warped to mob's room for the session.</span>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+        <% if @hackr %>
+          <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+        <% end %>
+        <%= link_to "All Hackrs", admin_grid_hackrs_path, class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= link_to "All Mobs", admin_grid_mobs_path, class: "tui-button", style: "padding: 6px 14px;" %>
+      </div>
+
+      <%= form_with url: admin_grid_npc_dialogue_tester_path, method: :post, local: true, id: "tester-form" do %>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <%# Hackr selector %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+            <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">HACKR</label>
+
+            <input type="hidden" name="hackr_id" id="hackr-id" value="<%= @hackr&.id %>">
+
+            <div class="admin-combobox">
+              <input type="text" id="hackr-input" class="admin-combobox-input" autocomplete="off"
+                placeholder="Type to search hackrs..."
+                value="<%= @hackr ? "#{@hackr.hackr_alias} (CL #{@hackr.stat("clearance")})" : "" %>">
+              <div id="hackr-dropdown" class="admin-combobox-dropdown"></div>
+            </div>
+
+            <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="hackr-status">
+              <% if @hackr %>
+                <span style="color: #34d399;">Selected: <%= @hackr.hackr_alias %></span>
+              <% else %>
+                <%= @hackrs.size %> hackrs — start typing to filter
+              <% end %>
+            </p>
+          </div>
+
+          <%# Mob selector %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+            <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">NPC (MOB)</label>
+
+            <input type="hidden" name="mob_id" id="mob-id" value="<%= @mob&.id %>">
+
+            <div class="admin-combobox">
+              <input type="text" id="mob-input" class="admin-combobox-input" autocomplete="off"
+                placeholder="Type to search mobs..."
+                value="<%= @mob ? "#{@mob.grid_room.grid_zone.name} > #{@mob.grid_room.name} > #{@mob.name}" : "" %>">
+              <div id="mob-dropdown" class="admin-combobox-dropdown"></div>
+            </div>
+
+            <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="mob-status">
+              <% if @mob %>
+                <span style="color: #34d399;">Selected: <%= @mob.name %></span>
+              <% else %>
+                <%= @mobs.size %> mobs — start typing to filter
+              <% end %>
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <%= submit_tag "START DIALOGUE TEST", class: "tui-button yellow-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start NPC Dialogue Test? Hackr will be warped to mob's room." } %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    function ready(fn) {
+      if (document.readyState !== 'loading') fn();
+      else document.addEventListener('DOMContentLoaded', fn);
+    }
+    ready(function() {
+      // --- Hackr combobox ---
+      AdminCombobox.init({
+        inputId: 'hackr-input',
+        hiddenId: 'hackr-id',
+        dropdownId: 'hackr-dropdown',
+        statusId: 'hackr-status',
+        formId: 'tester-form',
+        items: <%= raw json_escape(@hackrs.map { |h|
+          {
+            id: h.id,
+            alias: h.hackr_alias,
+            cl: h.stat("clearance"),
+            role: h.role || "hackr"
+          }
+        }.to_json) %>,
+        getId: function(r) { return r.id; },
+        getSearchText: function(r) { return (r.alias + ' ' + r.role).toLowerCase(); },
+        getGroupKey: function(r) { return r.role.toUpperCase(); },
+        renderOption: function(r, esc) {
+          return '<span class="cb-name">' + esc(r.alias) + '</span>' +
+            ' <span class="cb-meta" style="color: #9ca3af;">(CL ' + r.cl + ')</span>';
+        },
+        getLabel: function(r) { return r.alias + ' (CL ' + r.cl + ')'; },
+        emptyText: 'No hackrs match',
+        selectedText: 'Selected',
+        submitError: 'Select a hackr first'
+      });
+
+      // --- Mob combobox ---
+      var mobTypeColors = {
+        quest_giver: '#fbbf24',
+        vendor: '#34d399',
+        lore: '#c084fc',
+        special: '#22d3ee'
+      };
+      AdminCombobox.init({
+        inputId: 'mob-input',
+        hiddenId: 'mob-id',
+        dropdownId: 'mob-dropdown',
+        statusId: 'mob-status',
+        formId: 'tester-form',
+        items: <%= raw json_escape(@mobs.map { |m|
+          {
+            id: m.id,
+            name: m.name,
+            mob_type: m.mob_type || "generic",
+            room_name: m.grid_room.name,
+            zone_name: m.grid_room.grid_zone.name,
+            region_name: m.grid_room.grid_zone.grid_region&.name || "Unknown",
+            has_dialogue: m.dialogue_tree.present?
+          }
+        }.to_json) %>,
+        getId: function(r) { return r.id; },
+        getSearchText: function(r) {
+          return (r.name + ' ' + r.mob_type + ' ' + r.room_name + ' ' + r.zone_name + ' ' + r.region_name).toLowerCase();
+        },
+        getGroupKey: function(r) { return r.zone_name + ' > ' + r.room_name; },
+        renderOption: function(r, esc) {
+          var color = mobTypeColors[r.mob_type] || '#9ca3af';
+          var typeBadge = '<span style="color:' + color + ';">[' + esc(r.mob_type) + ']</span>';
+          var dlg = r.has_dialogue ? '' : ' <span style="color: #f87171;">(no dialogue)</span>';
+          return '<span class="cb-name">' + esc(r.name) + '</span> ' + typeBadge + dlg;
+        },
+        getLabel: function(r) { return r.zone_name + ' > ' + r.room_name + ' > ' + r.name; },
+        emptyText: 'No mobs match',
+        selectedText: 'Selected',
+        submitError: 'Select a mob first'
+      });
+    });
+  })();
+</script>
