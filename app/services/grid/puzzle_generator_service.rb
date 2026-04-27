@@ -104,7 +104,9 @@ module Grid
         }
       end
 
-      # Circuit: connect node pairs to restore signal paths
+      # Circuit: connect node pairs to restore signal paths.
+      # Players get a limited probe budget to test individual connections
+      # before submitting the full answer.
       # Difficulty 1=2 pairs, 2=3, 3=4, 4=5, 5=6
       def generate_circuit(difficulty, rng)
         pair_count = 1 + difficulty
@@ -119,48 +121,111 @@ module Grid
         display_left = left.shuffle(random: rng)
         display_right = right.shuffle(random: rng)
 
+        # Probe budget: enough to solve with strategy, not enough to brute-force
+        probe_budget = case difficulty
+        when 1 then 1   # 2 pairs — probe 1, deduce other
+        when 2 then 2   # 3 pairs — probe 2, deduce other
+        when 3 then 3   # 4 pairs — probe 3, deduce other
+        when 4 then 3   # 5 pairs — must reason about 2 remaining
+        else 4           # 6 pairs — must reason about 2 remaining
+        end
+
         {
           display_data: {
             "type" => "circuit",
-            "prompt" => "Connect open circuit nodes to restore signal path.",
+            "prompt" => "Probe signal paths to map circuit connections.",
             "left_nodes" => display_left,
             "right_nodes" => display_right,
-            "pair_count" => pair_count
+            "pair_count" => pair_count,
+            "probe_budget" => probe_budget
           },
           solution: pairs.join(" ")
         }
       end
 
-      # Credential: decrypt an encrypted string using a partial cipher hint
-      # Difficulty 1=1 substitution, 2=2, 3=3, 4=4, 5=5
+      # Credential: decrypt an encrypted string using a partial substitution map.
+      #
+      # Four difficulty axes:
+      #   1. Substitution count — how many chars are replaced (1-5)
+      #   2. Hints revealed — fraction of real substitutions shown, no positions (all → few)
+      #   3. Red herrings — fake substitution hints mixed in (0-3)
+      #   4. Decoy ciphers — 1 cipher at easy, 3 at hard (only one is real)
+      #
+      # | Diff | Subs | Hints | Herrings | Ciphers |
+      # |------|------|-------|----------|---------|
+      # |  1   |  1   |  1/1  |    0     |    1    |
+      # |  2   |  2   |  1/2  |    1     |    1    |
+      # |  3   |  3   |  2/3  |    1     |    3    |
+      # |  4   |  4   |  2/4  |    2     |    3    |
+      # |  5   |  5   |  2/5  |    3     |    3    |
       def generate_credential(difficulty, rng)
         word = CREDENTIAL_WORDS[rng.rand(CREDENTIAL_WORDS.size)]
         suffix = CREDENTIAL_SUFFIXES[rng.rand(CREDENTIAL_SUFFIXES.size)]
         plaintext = word + suffix
 
-        encrypted = plaintext.dup
-        hint_parts = []
+        # 1. Apply substitutions
+        sub_count = difficulty.clamp(1, 5)
+        encrypted, applied_subs = encrypt_credential(plaintext, sub_count, rng)
 
-        # Apply substitutions at random positions (shift ensures no duplicates)
-        eligible = plaintext.chars.each_with_index.select { |ch, _| SUBSTITUTION_MAP.key?(ch) }
-        eligible.shuffle!(random: rng)
+        # 2. Partial hints (no positions) — reveal only some real substitutions
+        hints_shown = (difficulty <= 1) ? applied_subs.size : [2, applied_subs.size].min
+        real_hints = applied_subs.first(hints_shown).map { |s| "#{s[:to]}\u2192#{s[:from]}" }
 
-        [difficulty, eligible.size].min.times do
-          char, pos = eligible.shift
-          sub = SUBSTITUTION_MAP[char]
-          encrypted[pos] = sub
-          hint_parts << "pos #{pos + 1}: #{sub}\u2192#{char}"
+        # 3. Red herring substitutions (mappings not used in this encryption)
+        herring_count = case difficulty
+        when 1 then 0
+        when 2 then 1
+        when 3 then 1
+        when 4 then 2
+        else 3
+        end
+        used_chars = applied_subs.map { |s| s[:from] }
+        herring_hints = SUBSTITUTION_MAP.except(*used_chars).to_a
+          .sample(herring_count, random: rng)
+          .map { |from, to| "#{to}\u2192#{from}" }
+
+        all_hints = (real_hints + herring_hints).shuffle(random: rng)
+
+        # 4. Decoy ciphers (difficulty 3+)
+        ciphers = [encrypted]
+        if difficulty >= 3
+          decoy_words = (CREDENTIAL_WORDS - [word]).sample(2, random: rng)
+          decoy_words.each do |dw|
+            ds = CREDENTIAL_SUFFIXES[rng.rand(CREDENTIAL_SUFFIXES.size)]
+            decoy_enc, _ = encrypt_credential(dw + ds, sub_count, rng)
+            ciphers << decoy_enc
+          end
+          ciphers.shuffle!(random: rng)
         end
 
         {
           display_data: {
             "type" => "credential",
             "prompt" => "Decrypt the access credential.",
-            "encrypted" => encrypted,
-            "cipher_hint" => hint_parts.join(", ")
+            "ciphers" => ciphers,
+            "substitution_hints" => all_hints
           },
           solution: plaintext
         }
+      end
+
+      # Apply N random substitutions to a plaintext string.
+      # Returns [encrypted_string, applied_substitutions_array].
+      def encrypt_credential(plaintext, count, rng)
+        encrypted = plaintext.dup
+        applied = []
+
+        eligible = plaintext.chars.each_with_index.select { |ch, _| SUBSTITUTION_MAP.key?(ch) }
+        eligible.shuffle!(random: rng)
+
+        [count, eligible.size].min.times do
+          char, pos = eligible.shift
+          sub = SUBSTITUTION_MAP[char]
+          encrypted[pos] = sub
+          applied << {from: char, to: sub}
+        end
+
+        [encrypted, applied]
       end
     end
 

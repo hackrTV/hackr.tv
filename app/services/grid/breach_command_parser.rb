@@ -82,16 +82,18 @@ module Grid
         output << "<span style='color: #a78bfa;'>  ▸ Fragment extracted: #{h(result.fragment)} (pending — granted on success)</span>"
       end
 
-      # Achievement/mission hooks
+      # Achievement/mission hooks (suppressed in sandbox mode)
       notifications = []
-      if result.protocol_destroyed
-        notifications += achievement_checker.check(:protocols_dismantled)
-        notifications += mission_progressor.record(:dismantle_protocols, protocol_type: breach.grid_breach_protocols.find_by(position: target_position)&.protocol_type)
-      end
+      unless breach.sandbox?
+        if result.protocol_destroyed
+          notifications += achievement_checker.check(:protocols_dismantled)
+          notifications += mission_progressor.record(:dismantle_protocols, protocol_type: breach.grid_breach_protocols.find_by(position: target_position)&.protocol_type)
+        end
 
-      if result.fragment
-        notifications += achievement_checker.check(:data_extracted)
-        notifications += mission_progressor.record(:extract_data, fragment_slug: result.fragment)
+        if result.fragment
+          notifications += achievement_checker.check(:data_extracted)
+          notifications += mission_progressor.record(:extract_data, fragment_slug: result.fragment)
+        end
       end
 
       if result.all_destroyed
@@ -99,17 +101,19 @@ module Grid
         resolve_result = Grid::BreachService.resolve_success!(hackr_breach: breach)
         output << resolve_result.display
 
-        template = breach.grid_breach_template
-        notifications += achievement_checker.check(:breach_completed, template_slug: template.slug, tier: template.tier)
-        notifications += achievement_checker.check(:breaches_completed_count)
-        notifications += mission_progressor.record(:complete_breach, template_slug: template.slug, tier: template.tier)
+        unless breach.sandbox?
+          template = breach.grid_breach_template
+          notifications += achievement_checker.check(:breach_completed, template_slug: template.slug, tier: template.tier)
+          notifications += achievement_checker.check(:breaches_completed_count)
+          notifications += mission_progressor.record(:complete_breach, template_slug: template.slug, tier: template.tier)
 
-        if resolve_result.xp_result[:leveled_up]
-          output << "<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE UP → #{resolve_result.xp_result[:new_clearance]}</span>"
+          if resolve_result.xp_result[:leveled_up]
+            output << "<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE UP → #{resolve_result.xp_result[:new_clearance]}</span>"
+          end
+
+          # Facility BREACH hooks (captured mode)
+          output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
         end
-
-        # Facility BREACH hooks (captured mode)
-        output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
       else
         # Check if round should end
         breach.reload
@@ -198,10 +202,12 @@ module Grid
       output = []
       output << result.effect_output
 
-      # Achievement/mission hooks for item usage
+      # Achievement/mission hooks for item usage (suppressed in sandbox mode)
       notifications = []
-      notifications += achievement_checker.check(:use_item, item_name: result.item_name)
-      notifications += mission_progressor.record(:use_item, item_name: result.item_name)
+      unless breach.sandbox?
+        notifications += achievement_checker.check(:use_item, item_name: result.item_name)
+        notifications += mission_progressor.record(:use_item, item_name: result.item_name)
+      end
 
       if result.emergency_jackout
         # Trigger clean jackout (bypasses PNR via emergency override)
@@ -228,6 +234,12 @@ module Grid
       end
 
       gate_id = args[0].upcase
+
+      # Circuit probe — free signal test, doesn't consume an action
+      if args[1]&.downcase == "probe"
+        return circuit_probe_command(gate_id, args[2..].join(" "))
+      end
+
       answer = args[1..].join(" ")
 
       result = Grid::BreachActionService.interface!(
@@ -241,9 +253,10 @@ module Grid
         output << "<span style='color: #34d399; font-weight: bold;'>Gate [#{result.gate_id}]: #{h(result.feedback)}</span>"
       elsif result.gate_state == "failed"
         output << "<span style='color: #f87171; font-weight: bold;'>Gate [#{result.gate_id}]: #{h(result.feedback)}</span>"
+        output << "<span style='color: #f59e0b;'>  DETECTION +#{Grid::BreachActionService::WRONG_ANSWER_DETECTION_BUMP}%</span>"
       else
         output << "<span style='color: #f87171;'>Gate [#{result.gate_id}]: #{h(result.feedback)}</span>"
-        output << "<span style='color: #9ca3af;'>  Review the gate with 'status'.</span>"
+        output << "<span style='color: #f59e0b;'>  DETECTION +#{Grid::BreachActionService::WRONG_ANSWER_DETECTION_BUMP}%</span>"
       end
 
       notifications = []
@@ -253,17 +266,19 @@ module Grid
         resolve_result = Grid::BreachService.resolve_success!(hackr_breach: breach)
         output << resolve_result.display
 
-        template = breach.grid_breach_template
-        notifications += achievement_checker.check(:breach_completed, template_slug: template.slug, tier: template.tier)
-        notifications += achievement_checker.check(:breaches_completed_count)
-        notifications += mission_progressor.record(:complete_breach, template_slug: template.slug, tier: template.tier)
+        unless breach.sandbox?
+          template = breach.grid_breach_template
+          notifications += achievement_checker.check(:breach_completed, template_slug: template.slug, tier: template.tier)
+          notifications += achievement_checker.check(:breaches_completed_count)
+          notifications += mission_progressor.record(:complete_breach, template_slug: template.slug, tier: template.tier)
 
-        if resolve_result.xp_result[:leveled_up]
-          output << "<span style='color: #fbbf24; font-weight: bold;'>\u25b2 CLEARANCE UP \u2192 #{resolve_result.xp_result[:new_clearance]}</span>"
+          if resolve_result.xp_result[:leveled_up]
+            output << "<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE UP → #{resolve_result.xp_result[:new_clearance]}</span>"
+          end
+
+          # Facility BREACH hooks (captured mode)
+          output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
         end
-
-        # Facility BREACH hooks (captured mode)
-        output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
       else
         # Check if round should end
         breach.reload
@@ -341,6 +356,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>jackout</span>                      <span style='color: #9ca3af;'>Abort the encounter</span>"
       output << ""
       output << "<span style='color: #6b7280;'>Free commands (no action cost):</span>"
+      output << "<span style='color: #fbbf24;'>if &lt;gate&gt; probe &lt;N1&gt;-&lt;N2&gt;</span>    <span style='color: #9ca3af;'>Test a circuit connection (limited budget)</span>"
       output << "<span style='color: #fbbf24;'>status</span>                       <span style='color: #9ca3af;'>Show encounter state</span>"
       output << "<span style='color: #fbbf24;'>deck</span>                         <span style='color: #9ca3af;'>Show loaded software + battery</span>"
       output << "<span style='color: #fbbf24;'>help</span>                         <span style='color: #9ca3af;'>This reference</span>"
@@ -386,6 +402,32 @@ module Grid
       else
         nil # Regular voluntary target — alert reduction already handled above
       end
+    end
+
+    def circuit_probe_command(gate_id, probe_pair)
+      if probe_pair.empty?
+        return "<span style='color: #fbbf24;'>Usage: interface #{h(gate_id)} probe NODE1-NODE2</span>"
+      end
+
+      result = Grid::BreachActionService.circuit_probe!(
+        hackr: hackr,
+        gate_id: gate_id,
+        probe_pair: probe_pair
+      )
+
+      color = result.connected ? "#34d399" : "#f87171"
+      output = []
+      output << "<span style='color: #{color}; font-weight: bold;'>PROBE [#{h(result.gate_id)}] #{h(result.probe_pair)}: #{result.feedback}</span>"
+      output << "<span style='color: #6b7280;'>Probes remaining: #{result.probes_remaining}</span>"
+      output.join("\n")
+    rescue Grid::BreachActionService::NotInBreach,
+      Grid::BreachActionService::GateNotFound,
+      Grid::BreachActionService::GateLocked,
+      Grid::BreachActionService::GateAlreadySolved,
+      Grid::BreachActionService::GateFailed,
+      Grid::BreachActionService::InvalidTarget,
+      Grid::BreachActionService::NoProbesRemaining => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
     def maybe_end_round

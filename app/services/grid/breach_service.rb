@@ -46,6 +46,10 @@ module Grid
       new(hackr).start_ambient!(template)
     end
 
+    def self.start_sandbox!(hackr:, template:)
+      new(hackr).start_sandbox!(template)
+    end
+
     def self.end_round!(hackr_breach:)
       new(hackr_breach.grid_hackr).end_round!(hackr_breach)
     end
@@ -249,6 +253,60 @@ module Grid
       raise AlreadyInBreach, "You are already in a BREACH encounter."
     end
 
+    # Start a sandbox (dry-run) breach. Bypasses all gates (clearance, mission,
+    # item prerequisites). No encounter record. Requires DECK equipped + not fried.
+    # Snapshots hackr vitals + DECK battery; restored on breach end.
+    def start_sandbox!(template)
+      raise AlreadyInBreach, "You are already in a BREACH encounter." if @hackr.in_breach?
+
+      deck = @hackr.equipped_deck
+      raise NoDeckEquipped, "No DECK equipped. Equip a DECK before initiating a BREACH." unless deck
+      raise DeckFried, "DECK is fried (level #{deck.deck_fried_level}/5). Repair it before initiating a BREACH." if deck.deck_fried?
+
+      breach = nil
+      protocols = nil
+
+      ActiveRecord::Base.transaction do
+        @hackr.lock!
+        raise AlreadyInBreach, "You are already in a BREACH encounter." if @hackr.in_breach?
+
+        breach = GridHackrBreach.create!(
+          grid_hackr: @hackr,
+          grid_breach_template: template,
+          grid_breach_encounter: nil,
+          origin_room_id: @hackr.current_room_id,
+          state: "active",
+          detection_level: 0,
+          pnr_threshold: template.pnr_threshold,
+          round_number: 1,
+          inspiration: 0,
+          actions_this_round: 1,
+          actions_remaining: 1,
+          reward_multiplier: 1.0,
+          started_at: Time.current,
+          meta: {
+            "sandbox" => true,
+            "sandbox_snapshot" => {
+              "deck_id" => deck.id,
+              "deck_battery" => deck.deck_battery,
+              "health" => @hackr.stat("health"),
+              "energy" => @hackr.stat("energy"),
+              "psyche" => @hackr.stat("psyche"),
+              "inspiration" => @hackr.stat("inspiration")
+            }
+          }
+        )
+
+        protocols = generate_protocols!(breach, template)
+        generate_puzzle_gates!(breach, template)
+      end
+
+      display = Grid::BreachRenderer.new(breach, protocols).render_full
+      StartResult.new(hackr_breach: breach, protocols: protocols, display: display)
+    rescue ActiveRecord::RecordNotUnique
+      raise AlreadyInBreach, "You are already in a BREACH encounter."
+    end
+
     def end_round!(hackr_breach)
       protocol_messages = []
       failure_display = nil
@@ -324,7 +382,8 @@ module Grid
       end
 
       # RestorePoint™ admission happens outside the breach transaction
-      if state == :health_zero
+      # Sandbox breaches skip RestorePoint — vitals are restored by restore_sandbox_state!
+      if state == :health_zero && !hackr_breach.sandbox?
         restore_result = Grid::RestorePointService.admit!(@hackr)
         restore_point_display = restore_result.display
       end
@@ -346,6 +405,8 @@ module Grid
     end
 
     def resolve_success!(hackr_breach)
+      return resolve_sandbox_end!(hackr_breach, "success") if hackr_breach.sandbox?
+
       template = hackr_breach.grid_breach_template
       xp_awarded = template.xp_reward
       cred_awarded = (template.cred_reward * hackr_breach.reward_multiplier).floor
@@ -401,6 +462,8 @@ module Grid
       unless hackr_breach.state == "active"
         return FailureResult.new(hackr_breach: hackr_breach, vitals_hit: [], zone_lockout_minutes: nil, fried_level: nil, software_wiped: false, captured: false, display: "")
       end
+
+      return resolve_sandbox_end!(hackr_breach, "failure", failure_mode: failure_mode) if hackr_breach.sandbox?
 
       template = hackr_breach.grid_breach_template
       vitals_hit = []
@@ -520,6 +583,8 @@ module Grid
       hackr_breach = @hackr.active_breach
       raise NotInBreach, "You are not in a BREACH encounter." unless hackr_breach
 
+      return resolve_sandbox_end!(hackr_breach, "jacked_out") if hackr_breach.sandbox?
+
       clean = emergency || !hackr_breach.pnr_crossed?
       vitals_hit = []
 
@@ -555,6 +620,54 @@ module Grid
     end
 
     private
+
+    # End a sandbox breach: mark terminal state, restore hackr snapshot.
+    # Works inside or outside an existing transaction (resolve_failure! is
+    # called from end_round!'s transaction; resolve_success!/jackout! are not).
+    def resolve_sandbox_end!(hackr_breach, end_state, failure_mode: nil)
+      wrap = !ActiveRecord::Base.connection.transaction_open?
+      run = proc do
+        hackr_breach.lock! if wrap
+        @hackr.lock! if wrap
+        hackr_breach.update!(state: end_state, ended_at: Time.current)
+        restore_sandbox_state!(hackr_breach)
+      end
+
+      if wrap
+        ActiveRecord::Base.transaction(&run)
+      else
+        run.call
+      end
+
+      display = Grid::BreachRenderer.new(hackr_breach).render_sandbox_end(end_state, failure_mode: failure_mode)
+
+      case end_state
+      when "success"
+        ResolveResult.new(hackr_breach: hackr_breach, xp_awarded: 0, cred_awarded: 0, xp_result: {leveled_up: false}, display: display)
+      when "failure"
+        FailureResult.new(hackr_breach: hackr_breach, vitals_hit: [], zone_lockout_minutes: nil, fried_level: nil, software_wiped: false, captured: false, display: display)
+      when "jacked_out"
+        JackoutResult.new(hackr_breach: hackr_breach, clean: true, vitals_hit: [], display: display)
+      end
+    end
+
+    # Restore hackr vitals and DECK battery from the sandbox snapshot.
+    def restore_sandbox_state!(hackr_breach)
+      snapshot = hackr_breach.meta&.dig("sandbox_snapshot")
+      return unless snapshot
+
+      new_stats = (@hackr.stats || {}).merge(
+        "health" => snapshot["health"],
+        "energy" => snapshot["energy"],
+        "psyche" => snapshot["psyche"],
+        "inspiration" => snapshot["inspiration"]
+      )
+      @hackr.update_column(:stats, new_stats)
+      @hackr.stats = new_stats
+
+      deck = GridItem.find_by(id: snapshot["deck_id"])
+      deck&.update!(properties: deck.properties.merge("battery_current" => snapshot["deck_battery"]))
+    end
 
     def generate_protocols!(breach, template)
       composition = template.protocols
@@ -633,7 +746,7 @@ module Grid
           "active"
         end
 
-        gates[spec["id"]] = {
+        gate_data = {
           "type" => spec["type"],
           "state" => initial_state,
           "attempts_remaining" => is_bypassed ? 0 : attempts,
@@ -642,6 +755,14 @@ module Grid
           "solution" => is_bypassed ? nil : generated[:solution],
           "display" => generated[:display_data]
         }
+
+        # Circuit gates get a probe budget for interactive signal testing
+        if spec["type"] == "circuit" && !is_bypassed
+          gate_data["probes_remaining"] = generated[:display_data]["probe_budget"]
+          gate_data["probe_results"] = {}
+        end
+
+        gates[spec["id"]] = gate_data
       end
 
       puzzle_state = {

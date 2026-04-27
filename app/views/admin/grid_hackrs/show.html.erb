@@ -22,6 +22,7 @@
         <% if dev_tools_enabled? %>
           <%= link_to "Edit Stats", edit_stats_admin_grid_hackr_path(@hackr), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
           <%= link_to "Warp", warp_admin_grid_hackr_path(@hackr), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
+          <%= link_to "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
         <% end %>
       </div>
 

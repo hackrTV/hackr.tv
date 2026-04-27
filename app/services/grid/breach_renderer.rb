@@ -127,15 +127,43 @@ module Grid
       "<span style='color: #f87171; font-weight: bold;'>\u26a0 SYSTEM ALERT: Intrusion signature locked. Jack-out route compromised.</span>"
     end
 
+    def render_sandbox_end(end_state, failure_mode: nil)
+      color = (end_state == "success") ? "#34d399" : "#f87171"
+      label = case end_state
+      when "success" then "S A N D B O X   C O M P L E T E"
+      when "failure" then "S A N D B O X   F A I L E D"
+      when "jacked_out" then "S A N D B O X   J A C K - O U T"
+      end
+      cause = case end_state
+      when "success" then "All protocols neutralized."
+      when "failure"
+        (failure_mode == :health_zero) ? "Neural link severed \u2014 vitals critical." : "Detection reached 100%."
+      when "jacked_out" then "Disconnected from encounter."
+      end
+
+      lines = []
+      lines << ""
+      lines << "<span style='color: #{color}; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
+      lines << "<span style='color: #{color}; font-weight: bold;'>\u2551  #{label}#{" " * [62 - label.length - 4, 0].max}\u2551</span>"
+      lines << "<span style='color: #{color}; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
+      lines << "<span style='color: #{color};'>\u2551</span>  <span style='color: #d0d0d0;'>#{cause}</span>"
+      lines << "<span style='color: #{color};'>\u2551</span>"
+      lines << "<span style='color: #{color};'>\u2551</span>  <span style='color: #fbbf24;'>SANDBOX MODE \u2014 no consequences applied.</span>"
+      lines << "<span style='color: #{color};'>\u2551</span>  <span style='color: #9ca3af;'>Vitals and DECK battery restored to pre-breach state.</span>"
+      lines << "<span style='color: #{color}; font-weight: bold;'>\u255a#{SEPARATOR}\u255d</span>"
+      lines.join("\n")
+    end
+
     private
 
     def header_block
       template = @breach.grid_breach_template
       tier_label = template.tier_label
       alive_count = @protocols.count(&:alive?)
+      sandbox_tag = @breach.sandbox? ? "  <span style='color: #fbbf24; font-weight: bold;'>[SANDBOX]</span>" : ""
       [
         "<span style='color: #{BORDER_COLOR};'>\u2554#{SEPARATOR}\u2557</span>",
-        "<span style='color: #{BORDER_COLOR};'>\u2551</span>  <span style='color: #22d3ee; font-weight: bold;'>B R E A C H</span>  <span style='color: #6b7280;'>::</span>  <span style='color: #d0d0d0;'>#{h(template.name)}</span>",
+        "<span style='color: #{BORDER_COLOR};'>\u2551</span>  <span style='color: #22d3ee; font-weight: bold;'>B R E A C H</span>  <span style='color: #6b7280;'>::</span>  <span style='color: #d0d0d0;'>#{h(template.name)}</span>#{sandbox_tag}",
         "<span style='color: #{BORDER_COLOR};'>\u2551</span>  <span style='color: #fbbf24;'>Tier:</span> <span style='color: #d0d0d0;'>#{tier_label}</span>    <span style='color: #fbbf24;'>Protocols:</span> <span style='color: #f87171;'>#{alive_count} active</span>",
         "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
       ].join("\n")
@@ -245,6 +273,11 @@ module Grid
         end
 
         lines << "#{border}  <span style='color: #9ca3af;'>[#{gate_id}]</span> <span style='color: #d0d0d0;'>#{h(type_label)}</span>  <span style='color: #{state_color};'>#{icon} #{h(status_text)}</span>"
+
+        # Render puzzle display data for active gates (locked gates just show status)
+        if state == "active" && gate["display"]
+          lines.concat(render_gate_display(gate_id, gate))
+        end
       end
       lines << "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
       lines.join("\n")
@@ -258,6 +291,58 @@ module Grid
         "#{border}  <span style='color: #fbbf24;'>BREACH RANK:</span> <span style='color: #22d3ee;'>#{h(rank_label)}</span>",
         "<span style='color: #{BORDER_COLOR};'>\u255a#{SEPARATOR}\u255d</span>"
       ].join("\n")
+    end
+
+    def render_gate_display(gate_id, gate)
+      d = gate["display"]
+      return [] unless d
+      lines = []
+      lines << "#{border}    <span style='color: #6b7280;'>#{h(d["prompt"])}</span>" if d["prompt"]
+
+      case d["type"]
+      when "credential"
+        ciphers = d["ciphers"] || [d["encrypted"]].compact
+        if ciphers.size == 1
+          lines << "#{border}    <span style='color: #fbbf24;'>Encrypted:</span> <span style='color: #e0e0e0; font-weight: bold;'>#{h(ciphers[0])}</span>"
+        else
+          ciphers.each_with_index do |c, i|
+            lines << "#{border}    <span style='color: #fbbf24;'>Cipher #{i + 1}:</span>  <span style='color: #e0e0e0; font-weight: bold;'>#{h(c)}</span>"
+          end
+        end
+        hints = d["substitution_hints"] || (d["cipher_hint"].present? ? [d["cipher_hint"]] : [])
+        if hints.any?
+          lines << "#{border}    <span style='color: #fbbf24;'>Known substitutions:</span> #{hints.map { |s| "<span style='color: #34d399;'>#{h(s)}</span>" }.join("  ")}"
+        end
+      when "sequence"
+        nodes = d["nodes"]
+        lines << "#{border}    <span style='color: #fbbf24;'>Nodes:</span> #{nodes.map { |n| "<span style='color: #e0e0e0;'>#{h(n)}</span>" }.join("  ")}" if nodes
+      when "logic_gate"
+        lines << "#{border}    <span style='color: #e0e0e0;'>#{h(d["diagram"])}</span>" if d["diagram"]
+      when "circuit"
+        left = d["left_nodes"]
+        right = d["right_nodes"]
+        if left && right
+          lines << "#{border}    <span style='color: #fbbf24;'>Left:</span>  #{left.map { |n| "<span style='color: #e0e0e0;'>#{h(n)}</span>" }.join("  ")}"
+          lines << "#{border}    <span style='color: #fbbf24;'>Right:</span> #{right.map { |n| "<span style='color: #e0e0e0;'>#{h(n)}</span>" }.join("  ")}"
+        end
+        probes_remaining = gate["probes_remaining"].to_i
+        probe_results = gate["probe_results"] || {}
+        lines << "#{border}    <span style='color: #fbbf24;'>Probes:</span> <span style='color: #d0d0d0;'>#{probes_remaining} remaining</span>"
+        probe_results.each do |pair, connected|
+          color = connected ? "#34d399" : "#f87171"
+          icon = connected ? "\u2713 CONNECTED" : "\u2717 NO SIGNAL"
+          lines << "#{border}      <span style='color: #{color};'>#{icon}: #{h(pair)}</span>"
+        end
+      end
+
+      # Type-specific usage hints
+      if d["type"] == "circuit"
+        lines << "#{border}    <span style='color: #6b7280;'>Probe: interface #{gate_id} probe NODE1-NODE2</span>"
+        lines << "#{border}    <span style='color: #6b7280;'>Solve: interface #{gate_id} NODE1-NODE2 NODE3-NODE4 ...</span>"
+      else
+        lines << "#{border}    <span style='color: #6b7280;'>Use: interface #{gate_id} &lt;answer&gt;</span>"
+      end
+      lines
     end
 
     def bar(current, max, color, width: 16)

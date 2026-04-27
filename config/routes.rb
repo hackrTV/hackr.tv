@@ -358,6 +358,14 @@ Rails.application.routes.draw do
     post "grid_hackrs/:hackr_id/items/grant", to: "grid_hackr_items#grant", as: :grant_grid_hackr_item
     delete "grid_hackrs/:hackr_id/items/:id", to: "grid_hackr_items#remove", as: :remove_grid_hackr_item
 
+    # BREACH sandbox (dev-only)
+    resources :grid_breach_sandbox, only: %i[new create show] do
+      member do
+        post :command
+        delete :abort
+      end
+    end
+
     # Grid achievements (runtime CRUD + manual award)
     resources :grid_achievements do
       member do
