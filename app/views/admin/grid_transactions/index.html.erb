@@ -1,0 +1,124 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid_transactions :: TRANSACTION LOG</legend>
+
+    <div style="padding: 20px;">
+      <%# Filter form %>
+      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
+        <%= form_tag admin_grid_transactions_path, method: :get, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do %>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Type</label>
+            <%= select_tag :tx_type, options_for_select([["All Types", ""]] + GridTransaction::TX_TYPES.map { |t| [t.upcase.gsub("_", " "), t] }, params[:tx_type]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Hackr Alias</label>
+            <%= text_field_tag :hackr_alias, params[:hackr_alias], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "alias" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">From</label>
+            <%= text_field_tag :date_from, params[:date_from], type: "date", style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">To</label>
+            <%= text_field_tag :date_to, params[:date_to], type: "date", style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Memo</label>
+            <%= text_field_tag :memo, params[:memo], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "search..." %>
+          </div>
+          <div>
+            <button type="submit" class="tui-button cyan-168" style="padding: 6px 14px;">Filter</button>
+          </div>
+          <% if params.values_at(:tx_type, :hackr_alias, :date_from, :date_to, :memo).any?(&:present?) %>
+            <div>
+              <%= link_to "Clear", admin_grid_transactions_path, class: "tui-button", style: "padding: 6px 14px;" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @hackr_not_found %>
+        <div style="background: #332200; border: 2px solid #fbbf24; padding: 10px 15px; margin-bottom: 15px;">
+          <span class="yellow-255-text">Hackr "<%= params[:hackr_alias] %>" not found.</span>
+        </div>
+      <% end %>
+
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TRANSACTIONS (<%= @total_count %> total, showing <%= @offset + 1 %>–<%= [@offset + @per_page, @total_count].min %>) ::]</h3>
+
+      <% if @transactions.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center;">Time</th>
+                <th style="text-align: left;">Hash</th>
+                <th style="text-align: left;">Type</th>
+                <th style="text-align: left;">From</th>
+                <th style="text-align: left;">To</th>
+                <th style="text-align: right;">Amount</th>
+                <th style="text-align: left;">Memo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @transactions.each do |tx| %>
+                <tr>
+                  <td style="text-align: center; color: #666; white-space: nowrap;"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+                  <td style="font-family: monospace; color: #666;"><%= tx.short_hash %></td>
+                  <td>
+                    <% color = case tx.tx_type
+                      when "transfer" then "#d0d0d0"
+                      when "mining_reward" then "#00ff00"
+                      when "gameplay_reward" then "#fbbf24"
+                      when "burn" then "#ff0000"
+                      when "redemption" then "#a78bfa"
+                      when "genesis" then "#00ffff"
+                      when "purchase_recycle" then "#34d399"
+                      else "#888"
+                    end %>
+                    <span style="color: <%= color %>; white-space: nowrap;"><%= tx.tx_type.upcase %></span>
+                  </td>
+                  <td style="white-space: nowrap;">
+                    <span style="color: <%= tx.from_cache.system? ? '#888' : '#d0d0d0' %>;"><%= cache_display(tx.from_cache) %></span>
+                    <% unless tx.from_cache.system? %>
+                      <br><span style="color: #555; font-family: monospace; font-size: 0.8em;"><%= tx.from_cache.address %></span>
+                    <% end %>
+                  </td>
+                  <td style="white-space: nowrap;">
+                    <span style="color: <%= tx.to_cache.system? ? '#888' : '#d0d0d0' %>;"><%= cache_display(tx.to_cache) %></span>
+                    <% unless tx.to_cache.system? %>
+                      <br><span style="color: #555; font-family: monospace; font-size: 0.8em;"><%= tx.to_cache.address %></span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: right; font-family: monospace;" class="green-255-text"><%= format_cred(tx.amount) %></td>
+                  <td style="color: #888; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<%= tx.memo %>"><%= tx.memo || "—" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <%# Pagination %>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
+          <% if @offset > 0 %>
+            <%= link_to "← Prev", admin_grid_transactions_path(request.query_parameters.merge("offset" => [@offset - @per_page, 0].max)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+          <% end %>
+          <span style="color: #888;">
+            Page <%= (@offset / @per_page) + 1 %> of <%= [(@total_count.to_f / @per_page).ceil, 1].max %>
+          </span>
+          <% if @offset + @per_page < @total_count %>
+            <%= link_to "Next →", admin_grid_transactions_path(request.query_parameters.merge("offset" => @offset + @per_page)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+          <% end %>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666;">No transactions found.</p>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Economy", admin_grid_economy_path, class: "tui-button green-168" %>
+        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

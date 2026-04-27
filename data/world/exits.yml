@@ -83,3 +83,701 @@ exits:
     to_room_slug: transit-corridor-alpha
     direction: southeast
     locked: false
+
+  # ── Lakeshore Market District ─────────────────
+  - from_room_slug: transit-corridor-alpha
+    to_room_slug: lakeshore-market-throughway
+    direction: northeast
+    locked: false
+  - from_room_slug: lakeshore-market-throughway
+    to_room_slug: transit-corridor-alpha
+    direction: southwest
+    locked: false
+  - from_room_slug: lakeshore-market-throughway
+    to_room_slug: lakeshore-component-alley
+    direction: east
+    locked: false
+  - from_room_slug: lakeshore-component-alley
+    to_room_slug: lakeshore-market-throughway
+    direction: west
+    locked: false
+  - from_room_slug: lakeshore-market-throughway
+    to_room_slug: lakeshore-firmware-kiosk
+    direction: north
+    locked: false
+  - from_room_slug: lakeshore-firmware-kiosk
+    to_room_slug: lakeshore-market-throughway
+    direction: south
+    locked: false
+  - from_room_slug: lakeshore-component-alley
+    to_room_slug: lakeshore-food-court
+    direction: north
+    locked: false
+  - from_room_slug: lakeshore-food-court
+    to_room_slug: lakeshore-component-alley
+    direction: south
+    locked: false
+
+  # ── Lakeshore Industrial Sprawl ───────────────
+  - from_room_slug: lakeshore-market-throughway
+    to_room_slug: lakeshore-rust-yard
+    direction: southeast
+    locked: false
+  - from_room_slug: lakeshore-rust-yard
+    to_room_slug: lakeshore-market-throughway
+    direction: northwest
+    locked: false
+  - from_room_slug: lakeshore-rust-yard
+    to_room_slug: lakeshore-foundry-shell
+    direction: east
+    locked: false
+  - from_room_slug: lakeshore-foundry-shell
+    to_room_slug: lakeshore-rust-yard
+    direction: west
+    locked: false
+  - from_room_slug: lakeshore-rust-yard
+    to_room_slug: lakeshore-loading-dock
+    direction: south
+    locked: false
+  - from_room_slug: lakeshore-loading-dock
+    to_room_slug: lakeshore-rust-yard
+    direction: north
+    locked: false
+  - from_room_slug: lakeshore-foundry-shell
+    to_room_slug: lakeshore-pipe-junction
+    direction: south
+    locked: false
+  - from_room_slug: lakeshore-pipe-junction
+    to_room_slug: lakeshore-foundry-shell
+    direction: north
+    locked: false
+
+  # ── Riverlands Transit & Inter-Region ─────────
+  # Lakeshore <-> Riverlands (south of Lakeshore, like Chicago -> Memphis)
+  - from_room_slug: hackr-tv-broadcast-station
+    to_room_slug: riverlands-depot-platform
+    direction: south
+    locked: false
+  - from_room_slug: riverlands-depot-platform
+    to_room_slug: hackr-tv-broadcast-station
+    direction: north
+    locked: false
+  - from_room_slug: riverlands-depot-platform
+    to_room_slug: riverlands-barge-landing
+    direction: east
+    locked: false
+  - from_room_slug: riverlands-barge-landing
+    to_room_slug: riverlands-depot-platform
+    direction: west
+    locked: false
+  - from_room_slug: riverlands-depot-platform
+    to_room_slug: riverlands-ticket-office
+    direction: west
+    locked: false
+  - from_room_slug: riverlands-ticket-office
+    to_room_slug: riverlands-depot-platform
+    direction: east
+    locked: false
+
+  # ── Riverlands Delta ──────────────────────────
+  - from_room_slug: riverlands-barge-landing
+    to_room_slug: riverlands-delta-mouth
+    direction: south
+    locked: false
+  - from_room_slug: riverlands-delta-mouth
+    to_room_slug: riverlands-barge-landing
+    direction: north
+    locked: false
+  - from_room_slug: riverlands-delta-mouth
+    to_room_slug: riverlands-smuggler-dock
+    direction: east
+    locked: false
+  - from_room_slug: riverlands-smuggler-dock
+    to_room_slug: riverlands-delta-mouth
+    direction: west
+    locked: false
+  - from_room_slug: riverlands-delta-mouth
+    to_room_slug: riverlands-sandspit
+    direction: south
+    locked: false
+  - from_room_slug: riverlands-sandspit
+    to_room_slug: riverlands-delta-mouth
+    direction: north
+    locked: false
+  - from_room_slug: riverlands-sandspit
+    to_room_slug: riverlands-sunken-barge
+    direction: east
+    locked: false
+  - from_room_slug: riverlands-sunken-barge
+    to_room_slug: riverlands-sandspit
+    direction: west
+    locked: false
+
+  # ── Riverlands Blufftop ───────────────────────
+  - from_room_slug: riverlands-depot-platform
+    to_room_slug: riverlands-blufftop-promenade
+    direction: northwest
+    locked: false
+  - from_room_slug: riverlands-blufftop-promenade
+    to_room_slug: riverlands-depot-platform
+    direction: southeast
+    locked: false
+  - from_room_slug: riverlands-blufftop-promenade
+    to_room_slug: riverlands-blufftop-overlook
+    direction: north
+    locked: false
+  - from_room_slug: riverlands-blufftop-overlook
+    to_room_slug: riverlands-blufftop-promenade
+    direction: south
+    locked: false
+  - from_room_slug: riverlands-blufftop-promenade
+    to_room_slug: riverlands-den-corridor
+    direction: east
+    locked: false
+  - from_room_slug: riverlands-den-corridor
+    to_room_slug: riverlands-blufftop-promenade
+    direction: west
+    locked: false
+
+  # ── Riverlands Amp District ───────────────────
+  - from_room_slug: riverlands-depot-platform
+    to_room_slug: riverlands-amp-gate
+    direction: southwest
+    locked: false
+  - from_room_slug: riverlands-amp-gate
+    to_room_slug: riverlands-depot-platform
+    direction: northeast
+    locked: false
+  - from_room_slug: riverlands-amp-gate
+    to_room_slug: riverlands-the-stage
+    direction: west
+    locked: false
+  - from_room_slug: riverlands-the-stage
+    to_room_slug: riverlands-amp-gate
+    direction: east
+    locked: false
+  - from_room_slug: riverlands-amp-gate
+    to_room_slug: riverlands-vinyl-vault
+    direction: south
+    locked: false
+  - from_room_slug: riverlands-vinyl-vault
+    to_room_slug: riverlands-amp-gate
+    direction: north
+    locked: false
+  - from_room_slug: riverlands-the-stage
+    to_room_slug: riverlands-studio-b
+    direction: south
+    locked: false
+  - from_room_slug: riverlands-studio-b
+    to_room_slug: riverlands-the-stage
+    direction: north
+    locked: false
+  - from_room_slug: riverlands-vinyl-vault
+    to_room_slug: riverlands-amp-workshop
+    direction: west
+    locked: false
+  - from_room_slug: riverlands-amp-workshop
+    to_room_slug: riverlands-vinyl-vault
+    direction: east
+    locked: false
+  # Rhythm Nexus connects to Amp District
+  - from_room_slug: the-rhythm-nexus
+    to_room_slug: riverlands-amp-gate
+    direction: south
+    locked: false
+  - from_room_slug: riverlands-amp-gate
+    to_room_slug: the-rhythm-nexus
+    direction: north
+    locked: false
+
+  # ── Narrows ───────────────────────────────────
+  # Narrows <-> Lakeshore (east of Lakeshore, like Chicago -> NYC)
+  # Connected via GovCorp Surveillance Node (east edge of Lakeshore)
+  - from_room_slug: govcorp-surveillance-node
+    to_room_slug: narrows-concourse
+    direction: east
+    locked: false
+  - from_room_slug: narrows-concourse
+    to_room_slug: govcorp-surveillance-node
+    direction: west
+    locked: false
+  - from_room_slug: narrows-concourse
+    to_room_slug: narrows-platform-7
+    direction: north
+    locked: false
+  - from_room_slug: narrows-platform-7
+    to_room_slug: narrows-concourse
+    direction: south
+    locked: false
+  - from_room_slug: narrows-concourse
+    to_room_slug: narrows-undercroft
+    direction: down
+    locked: false
+  - from_room_slug: narrows-undercroft
+    to_room_slug: narrows-concourse
+    direction: up
+    locked: false
+  - from_room_slug: narrows-concourse
+    to_room_slug: narrows-stack-lobby
+    direction: east
+    locked: false
+  - from_room_slug: narrows-stack-lobby
+    to_room_slug: narrows-concourse
+    direction: west
+    locked: false
+  - from_room_slug: narrows-stack-lobby
+    to_room_slug: narrows-stack-mid
+    direction: up
+    locked: false
+  - from_room_slug: narrows-stack-mid
+    to_room_slug: narrows-stack-lobby
+    direction: down
+    locked: false
+  - from_room_slug: narrows-stack-mid
+    to_room_slug: narrows-stack-upper
+    direction: up
+    locked: false
+  - from_room_slug: narrows-stack-upper
+    to_room_slug: narrows-stack-mid
+    direction: down
+    locked: false
+  - from_room_slug: narrows-concourse
+    to_room_slug: narrows-boardwalk
+    direction: south
+    locked: false
+  - from_room_slug: narrows-boardwalk
+    to_room_slug: narrows-concourse
+    direction: north
+    locked: false
+  - from_room_slug: narrows-boardwalk
+    to_room_slug: narrows-fish-market
+    direction: east
+    locked: false
+  - from_room_slug: narrows-fish-market
+    to_room_slug: narrows-boardwalk
+    direction: west
+    locked: false
+  - from_room_slug: narrows-boardwalk
+    to_room_slug: narrows-dock-office
+    direction: west
+    locked: false
+  - from_room_slug: narrows-dock-office
+    to_room_slug: narrows-boardwalk
+    direction: east
+    locked: false
+  - from_room_slug: narrows-boardwalk
+    to_room_slug: narrows-crane
+    direction: south
+    locked: false
+  - from_room_slug: narrows-crane
+    to_room_slug: narrows-boardwalk
+    direction: north
+    locked: false
+  - from_room_slug: narrows-platform-7
+    to_room_slug: narrows-exchange
+    direction: east
+    locked: false
+  - from_room_slug: narrows-exchange
+    to_room_slug: narrows-platform-7
+    direction: west
+    locked: false
+  - from_room_slug: narrows-exchange
+    to_room_slug: narrows-compliance
+    direction: east
+    locked: false
+  - from_room_slug: narrows-compliance
+    to_room_slug: narrows-exchange
+    direction: west
+    locked: false
+  - from_room_slug: narrows-compliance
+    to_room_slug: narrows-vault-corridor
+    direction: north
+    locked: false
+  - from_room_slug: narrows-vault-corridor
+    to_room_slug: narrows-compliance
+    direction: south
+    locked: false
+  - from_room_slug: narrows-undercroft
+    to_room_slug: narrows-flooded-gallery
+    direction: down
+    locked: false
+  - from_room_slug: narrows-flooded-gallery
+    to_room_slug: narrows-undercroft
+    direction: up
+    locked: false
+  - from_room_slug: narrows-flooded-gallery
+    to_room_slug: narrows-pump-station
+    direction: east
+    locked: false
+  - from_room_slug: narrows-pump-station
+    to_room_slug: narrows-flooded-gallery
+    direction: west
+    locked: false
+  - from_room_slug: narrows-flooded-gallery
+    to_room_slug: narrows-drowned-servers
+    direction: south
+    locked: false
+  - from_room_slug: narrows-drowned-servers
+    to_room_slug: narrows-flooded-gallery
+    direction: north
+    locked: false
+
+  # ── The Gate ──────────────────────────────────
+  # Gate <-> Narrows? Actually Gate = SF, far from NYC. Gate is standalone.
+  - from_room_slug: gate-concourse
+    to_room_slug: gate-skybridge
+    direction: north
+    locked: false
+  - from_room_slug: gate-skybridge
+    to_room_slug: gate-concourse
+    direction: south
+    locked: false
+  - from_room_slug: gate-concourse
+    to_room_slug: gate-arrival-hall
+    direction: east
+    locked: false
+  - from_room_slug: gate-arrival-hall
+    to_room_slug: gate-concourse
+    direction: west
+    locked: false
+  - from_room_slug: gate-concourse
+    to_room_slug: gate-innovation-plaza
+    direction: west
+    locked: false
+  - from_room_slug: gate-innovation-plaza
+    to_room_slug: gate-concourse
+    direction: east
+    locked: false
+  - from_room_slug: gate-innovation-plaza
+    to_room_slug: gate-proto-lab
+    direction: north
+    locked: false
+  - from_room_slug: gate-proto-lab
+    to_room_slug: gate-innovation-plaza
+    direction: south
+    locked: false
+  - from_room_slug: gate-innovation-plaza
+    to_room_slug: gate-component-exchange
+    direction: west
+    locked: false
+  - from_room_slug: gate-component-exchange
+    to_room_slug: gate-innovation-plaza
+    direction: east
+    locked: false
+  - from_room_slug: gate-innovation-plaza
+    to_room_slug: gate-firmware-lib
+    direction: south
+    locked: false
+  - from_room_slug: gate-firmware-lib
+    to_room_slug: gate-innovation-plaza
+    direction: north
+    locked: false
+  - from_room_slug: gate-skybridge
+    to_room_slug: gate-rd-atrium
+    direction: east
+    locked: false
+  - from_room_slug: gate-rd-atrium
+    to_room_slug: gate-skybridge
+    direction: west
+    locked: false
+  - from_room_slug: gate-rd-atrium
+    to_room_slug: gate-signal-lab
+    direction: north
+    locked: false
+  - from_room_slug: gate-signal-lab
+    to_room_slug: gate-rd-atrium
+    direction: south
+    locked: false
+  - from_room_slug: gate-rd-atrium
+    to_room_slug: gate-secure-archive
+    direction: east
+    locked: false
+  - from_room_slug: gate-secure-archive
+    to_room_slug: gate-rd-atrium
+    direction: west
+    locked: false
+  - from_room_slug: gate-concourse
+    to_room_slug: gate-pier-landing
+    direction: south
+    locked: false
+  - from_room_slug: gate-pier-landing
+    to_room_slug: gate-concourse
+    direction: north
+    locked: false
+  - from_room_slug: gate-pier-landing
+    to_room_slug: gate-loft-row
+    direction: east
+    locked: false
+  - from_room_slug: gate-loft-row
+    to_room_slug: gate-pier-landing
+    direction: west
+    locked: false
+  - from_room_slug: gate-pier-landing
+    to_room_slug: gate-fog-pier
+    direction: down
+    locked: false
+  - from_room_slug: gate-fog-pier
+    to_room_slug: gate-pier-landing
+    direction: up
+    locked: false
+  - from_room_slug: gate-fog-pier
+    to_room_slug: gate-drip-cache
+    direction: south
+    locked: false
+  - from_room_slug: gate-drip-cache
+    to_room_slug: gate-fog-pier
+    direction: north
+    locked: false
+  - from_room_slug: gate-fog-pier
+    to_room_slug: gate-fog-market
+    direction: east
+    locked: false
+  - from_room_slug: gate-fog-market
+    to_room_slug: gate-fog-pier
+    direction: west
+    locked: false
+
+  # ── The Bend ──────────────────────────────────
+  # Bend <-> Riverlands (south of Riverlands, like Memphis -> New Orleans)
+  - from_room_slug: riverlands-barge-landing
+    to_room_slug: bend-wharf-platform
+    direction: southeast
+    locked: false
+  - from_room_slug: bend-wharf-platform
+    to_room_slug: riverlands-barge-landing
+    direction: northwest
+    locked: false
+  - from_room_slug: bend-wharf-platform
+    to_room_slug: bend-ferry-dock
+    direction: east
+    locked: false
+  - from_room_slug: bend-ferry-dock
+    to_room_slug: bend-wharf-platform
+    direction: west
+    locked: false
+  - from_room_slug: bend-wharf-platform
+    to_room_slug: bend-quarter-gate
+    direction: west
+    locked: false
+  - from_room_slug: bend-quarter-gate
+    to_room_slug: bend-wharf-platform
+    direction: east
+    locked: false
+  - from_room_slug: bend-quarter-gate
+    to_room_slug: bend-jazz-cellar
+    direction: south
+    locked: false
+  - from_room_slug: bend-jazz-cellar
+    to_room_slug: bend-quarter-gate
+    direction: north
+    locked: false
+  - from_room_slug: bend-quarter-gate
+    to_room_slug: bend-brass-row
+    direction: west
+    locked: false
+  - from_room_slug: bend-brass-row
+    to_room_slug: bend-quarter-gate
+    direction: east
+    locked: false
+  - from_room_slug: bend-quarter-gate
+    to_room_slug: bend-second-line
+    direction: north
+    locked: false
+  - from_room_slug: bend-second-line
+    to_room_slug: bend-quarter-gate
+    direction: south
+    locked: false
+  - from_room_slug: bend-wharf-platform
+    to_room_slug: bend-levee-walk
+    direction: south
+    locked: false
+  - from_room_slug: bend-levee-walk
+    to_room_slug: bend-wharf-platform
+    direction: north
+    locked: false
+  - from_room_slug: bend-levee-walk
+    to_room_slug: bend-shotgun-row
+    direction: east
+    locked: false
+  - from_room_slug: bend-shotgun-row
+    to_room_slug: bend-levee-walk
+    direction: west
+    locked: false
+  - from_room_slug: bend-levee-walk
+    to_room_slug: bend-canal-entry
+    direction: down
+    locked: false
+  - from_room_slug: bend-canal-entry
+    to_room_slug: bend-levee-walk
+    direction: up
+    locked: false
+  - from_room_slug: bend-canal-entry
+    to_room_slug: bend-drowned-passage
+    direction: south
+    locked: false
+  - from_room_slug: bend-drowned-passage
+    to_room_slug: bend-canal-entry
+    direction: north
+    locked: false
+  - from_room_slug: bend-drowned-passage
+    to_room_slug: bend-pump-cathedral
+    direction: east
+    locked: false
+  - from_room_slug: bend-pump-cathedral
+    to_room_slug: bend-drowned-passage
+    direction: west
+    locked: false
+  - from_room_slug: bend-drowned-passage
+    to_room_slug: bend-rat-king
+    direction: south
+    locked: false
+  - from_room_slug: bend-rat-king
+    to_room_slug: bend-drowned-passage
+    direction: north
+    locked: false
+  - from_room_slug: bend-ferry-dock
+    to_room_slug: bend-bureau-lobby
+    direction: east
+    locked: false
+  - from_room_slug: bend-bureau-lobby
+    to_room_slug: bend-ferry-dock
+    direction: west
+    locked: false
+  - from_room_slug: bend-bureau-lobby
+    to_room_slug: bend-curation-office
+    direction: north
+    locked: false
+  - from_room_slug: bend-curation-office
+    to_room_slug: bend-bureau-lobby
+    direction: south
+    locked: false
+  - from_room_slug: bend-bureau-lobby
+    to_room_slug: bend-broadcast-center
+    direction: east
+    locked: false
+  - from_room_slug: bend-broadcast-center
+    to_room_slug: bend-bureau-lobby
+    direction: west
+    locked: false
+
+  # ── The Canyon ────────────────────────────────
+  - from_room_slug: canyon-rim-platform
+    to_room_slug: canyon-cable-terminus
+    direction: east
+    locked: false
+  - from_room_slug: canyon-cable-terminus
+    to_room_slug: canyon-rim-platform
+    direction: west
+    locked: false
+  - from_room_slug: canyon-rim-platform
+    to_room_slug: canyon-rim-overlook
+    direction: north
+    locked: false
+  - from_room_slug: canyon-rim-overlook
+    to_room_slug: canyon-rim-platform
+    direction: south
+    locked: false
+  - from_room_slug: canyon-rim-platform
+    to_room_slug: canyon-upper-dwelling
+    direction: down
+    locked: false
+  - from_room_slug: canyon-upper-dwelling
+    to_room_slug: canyon-rim-platform
+    direction: up
+    locked: false
+  - from_room_slug: canyon-upper-dwelling
+    to_room_slug: canyon-dwelling-stairway
+    direction: south
+    locked: false
+  - from_room_slug: canyon-dwelling-stairway
+    to_room_slug: canyon-upper-dwelling
+    direction: north
+    locked: false
+  - from_room_slug: canyon-dwelling-stairway
+    to_room_slug: canyon-community-terrace
+    direction: east
+    locked: false
+  - from_room_slug: canyon-community-terrace
+    to_room_slug: canyon-dwelling-stairway
+    direction: west
+    locked: false
+  - from_room_slug: canyon-dwelling-stairway
+    to_room_slug: canyon-ledge-center
+    direction: down
+    locked: false
+  - from_room_slug: canyon-ledge-center
+    to_room_slug: canyon-dwelling-stairway
+    direction: up
+    locked: false
+  - from_room_slug: canyon-ledge-center
+    to_room_slug: canyon-outfitter
+    direction: east
+    locked: false
+  - from_room_slug: canyon-outfitter
+    to_room_slug: canyon-ledge-center
+    direction: west
+    locked: false
+  - from_room_slug: canyon-ledge-center
+    to_room_slug: canyon-cantina
+    direction: west
+    locked: false
+  - from_room_slug: canyon-cantina
+    to_room_slug: canyon-ledge-center
+    direction: east
+    locked: false
+  - from_room_slug: canyon-ledge-center
+    to_room_slug: canyon-river-bed
+    direction: down
+    locked: false
+  - from_room_slug: canyon-river-bed
+    to_room_slug: canyon-ledge-center
+    direction: up
+    locked: false
+  - from_room_slug: canyon-river-bed
+    to_room_slug: canyon-echo-chamber
+    direction: east
+    locked: false
+  - from_room_slug: canyon-echo-chamber
+    to_room_slug: canyon-river-bed
+    direction: west
+    locked: false
+  - from_room_slug: canyon-river-bed
+    to_room_slug: canyon-fossil-gallery
+    direction: south
+    locked: false
+  - from_room_slug: canyon-fossil-gallery
+    to_room_slug: canyon-river-bed
+    direction: north
+    locked: false
+  - from_room_slug: canyon-river-bed
+    to_room_slug: canyon-deep-pool
+    direction: west
+    locked: false
+  - from_room_slug: canyon-deep-pool
+    to_room_slug: canyon-river-bed
+    direction: east
+    locked: false
+  - from_room_slug: canyon-cable-terminus
+    to_room_slug: canyon-relay-control
+    direction: south
+    locked: false
+  - from_room_slug: canyon-relay-control
+    to_room_slug: canyon-cable-terminus
+    direction: north
+    locked: false
+  - from_room_slug: canyon-relay-control
+    to_room_slug: canyon-signal-array
+    direction: east
+    locked: false
+  - from_room_slug: canyon-signal-array
+    to_room_slug: canyon-relay-control
+    direction: west
+    locked: false
+  - from_room_slug: canyon-relay-control
+    to_room_slug: canyon-staff-quarters
+    direction: south
+    locked: false
+  - from_room_slug: canyon-staff-quarters
+    to_room_slug: canyon-relay-control
+    direction: north
+    locked: false

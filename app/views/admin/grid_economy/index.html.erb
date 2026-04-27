@@ -146,7 +146,12 @@
 
       <!-- Recent Transactions -->
       <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT TRANSACTIONS (Last 100) ::]</h3>
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">
+          [:: RECENT TRANSACTIONS (Last 100) ::]
+          <span style="float: right;">
+            <%= link_to "View All →", admin_grid_transactions_path, class: "tui-button green-168", style: "padding: 4px 12px; font-size: 0.8em;" %>
+          </span>
+        </h3>
         <% if @recent_transactions.any? %>
           <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
             <table class="tui-table" style="width: 100%;">

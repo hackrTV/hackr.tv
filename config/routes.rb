@@ -304,6 +304,13 @@ Rails.application.routes.draw do
     resources :radio_stations, only: %i[index show]
     resources :zone_playlists, only: %i[index show]
 
+    # World Map Viewer (read-only)
+    resources :grid_world_map, only: %i[index show] do
+      member do
+        get :zone_map
+      end
+    end
+
     # World resources (full CRUD)
     resources :grid_regions do
       member do
@@ -344,6 +351,17 @@ Rails.application.routes.draw do
     # Grid economy (read-only admin dashboard)
     get "grid_economy", to: "grid_economy#index", as: :grid_economy
 
+    # CRED transaction log (read-only, filterable)
+    resources :grid_transactions, only: [:index]
+
+    # Impound records (read-only index + dev-only force actions)
+    resources :grid_impound_records, only: [:index] do
+      member do
+        post :force_recover
+        post :force_forfeit
+      end
+    end
+
     # Hackr inspector + dev tools (per-hackr)
     resources :grid_hackrs, only: %i[index show] do
       member do
@@ -351,6 +369,11 @@ Rails.application.routes.draw do
         patch :update_stats
         get :warp
         post :perform_warp
+        get :mining_rig
+        post :force_activate_rig
+        post :force_deactivate_rig
+        post :force_install_component
+        post :force_uninstall_component
       end
     end
     # Hackr item management (prod-safe)

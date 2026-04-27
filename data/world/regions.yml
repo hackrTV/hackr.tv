@@ -55,3 +55,7 @@ regions:
   - name: The Badlands
     slug: the-badlands
     description: "High plains and eroded rock formations under an enormous sky — the most sparsely populated region, where RIDE coverage is thin by design because there is almost no one to render for."
+
+  - name: The Canyon
+    slug: the-canyon
+    description: "A vast desert canyon system carved by an ancient river — layered rock walls glow red at sunset, and the depth plays havoc with RIDE signal propagation. Settlements cling to ledges and tunnel into cliff faces. GovCorp considers it a low-priority region. The people here disagree."

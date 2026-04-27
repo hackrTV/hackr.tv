@@ -60,3 +60,530 @@ rooms:
     description: "A clean workshop smelling of flux and machine oil. Robotic arms hang from ceiling rails, calibrated for precision DECK repair. A hooded technician stands behind a reinforced workbench, diagnostic tools laid out in precise rows. A sign reads: 'TechMed — We fix what GovCorp fries. No questions asked.'"
     zone_slug: transit-network
     room_type: repair_service
+
+  # ── The Lakeshore (expansion) ─────────────────
+  - name: Market Throughway
+    slug: lakeshore-market-throughway
+    description: "A wide pedestrian corridor lined with vendor stalls. Neon signs flicker overhead. The crowd is thick and nobody makes eye contact."
+    zone_slug: lakeshore-market
+    room_type: hub
+
+  - name: Component Alley
+    slug: lakeshore-component-alley
+    description: "A narrow side-street packed with hardware vendors. Every shelf holds salvaged components sorted by questionable criteria. Prices are negotiable. Quality is not guaranteed."
+    zone_slug: lakeshore-market
+    room_type: shop
+
+  - name: Firmware Kiosk
+    slug: lakeshore-firmware-kiosk
+    description: "A cramped booth with a reinforced counter. Holographic menus display firmware versions. The vendor's eyes track your DECK model before you speak."
+    zone_slug: lakeshore-market
+    room_type: firmware_vendor
+
+  - name: Food Court
+    slug: lakeshore-food-court
+    description: "Communal tables beneath buzzing heat lamps. Street food vendors serve synthetic protein in a dozen regional styles. The smell is overwhelming and somehow comforting."
+    zone_slug: lakeshore-market
+    room_type: safe_zone
+
+  - name: Rust Yard
+    slug: lakeshore-rust-yard
+    description: "An open lot filled with corroded machinery. Salvage crews pick through the remains. A hand-painted sign reads: NO GOVCORP PERSONNEL BEYOND THIS POINT."
+    zone_slug: lakeshore-industrial
+    room_type: hub
+
+  - name: Foundry Shell
+    slug: lakeshore-foundry-shell
+    description: "The gutted interior of a manufacturing plant. The ceiling is three stories up and missing in places. Pigeons nest in the exposed I-beams."
+    zone_slug: lakeshore-industrial
+    room_type: danger_zone
+
+  - name: Loading Dock
+    slug: lakeshore-loading-dock
+    description: "Concrete platforms where trucks once backed in. Now the bay doors are jammed open and the ramps are crumbling. Someone has set up a workbench in the corner."
+    zone_slug: lakeshore-industrial
+    room_type: danger_zone
+
+  - name: Pipe Junction
+    slug: lakeshore-pipe-junction
+    description: "A tangle of industrial pipes converging at a massive valve assembly. Steam vents hiss. The floor is slick with condensation."
+    zone_slug: lakeshore-industrial
+    room_type: danger_zone
+
+  # ── The Riverlands ────────────────────────────
+  - name: Riverlands Depot Platform
+    slug: riverlands-depot-platform
+    description: "A raised transit platform overlooking the river. Departures boards flicker with destinations. The concrete is cracked and the benches are bolted down."
+    zone_slug: riverlands-transit
+    room_type: hub
+
+  - name: Barge Landing
+    slug: riverlands-barge-landing
+    description: "A floating dock where cargo barges tie up. Crates of unmarked merchandise stack three high. A dockworker waves you through without looking up."
+    zone_slug: riverlands-transit
+    room_type: transit
+
+  - name: Ticket Office
+    slug: riverlands-ticket-office
+    description: "A small office with bulletproof glass and a bored attendant. Route maps on the wall are years out of date. The coffee machine is broken."
+    zone_slug: riverlands-transit
+    room_type: safe_zone
+
+  - name: Delta Mouth
+    slug: riverlands-delta-mouth
+    description: "Where the main channel splits. Muddy water churns between sand bars. The air smells of river silt and diesel. Navigation markers have been deliberately moved."
+    zone_slug: riverlands-delta
+    room_type: hub
+
+  - name: Smuggler's Dock
+    slug: riverlands-smuggler-dock
+    description: "A hidden mooring beneath overhanging willows. The dock is reinforced with salvaged deck plating. Crates are loaded and unloaded in silence."
+    zone_slug: riverlands-delta
+    room_type: shop
+    min_clearance: 10
+
+  - name: Sandspit Crossing
+    slug: riverlands-sandspit
+    description: "A narrow strip of sand between two channels. At high water it disappears entirely. Someone has driven stakes into the sand as guideposts."
+    zone_slug: riverlands-delta
+    room_type: danger_zone
+
+  - name: Sunken Barge
+    slug: riverlands-sunken-barge
+    description: "A half-submerged cargo barge listing in the shallows. The hold is accessible at low water. What's inside changes weekly."
+    zone_slug: riverlands-delta
+    room_type: danger_zone
+
+  - name: Blufftop Promenade
+    slug: riverlands-blufftop-promenade
+    description: "A wide walkway along the bluff edge. The river sprawls below. Benches face west for sunset viewing. It's quiet here in a way that feels earned."
+    zone_slug: riverlands-blufftop
+    room_type: hub
+
+  - name: Blufftop Overlook
+    slug: riverlands-blufftop-overlook
+    description: "A scenic viewpoint at the highest point of the bluffs. You can see three regions from here on a clear day. Someone has scratched coordinates into the railing."
+    zone_slug: riverlands-blufftop
+    room_type: safe_zone
+
+  - name: Den Corridor B
+    slug: riverlands-den-corridor
+    description: "A residential hallway carved into the bluff rock. Numbered doors line both sides. The stone walls keep the temperature constant year-round."
+    zone_slug: riverlands-blufftop
+    room_type: hub
+
+  - name: Amp Gate
+    slug: riverlands-amp-gate
+    description: "An archway built from welded guitar necks and amplifier chassis. Beyond it, the street thrums with bass frequencies. A hand-lettered sign reads: VOLUME IS A LIFESTYLE."
+    zone_slug: riverlands-amp
+    room_type: hub
+
+  - name: The Stage
+    slug: riverlands-the-stage
+    description: "A converted loading dock turned performance venue. The PA system could strip paint. The acoustics are terrible and nobody cares. This is where it happens."
+    zone_slug: riverlands-amp
+    room_type: special
+
+  - name: Vinyl Vault
+    slug: riverlands-vinyl-vault
+    description: "Floor-to-ceiling shelves of physical media. Vinyl, tape, disc — formats that predate GovCorp's digital monopoly. The owner knows every title by touch."
+    zone_slug: riverlands-amp
+    room_type: shop
+
+  - name: Amp Workshop
+    slug: riverlands-amp-workshop
+    description: "A repair shop specializing in audio equipment and DECKs. Soldering irons, oscilloscopes, and a wall of vacuum tubes. The technician speaks in frequencies."
+    zone_slug: riverlands-amp
+    room_type: repair_service
+
+  - name: Studio B
+    slug: riverlands-studio-b
+    description: "A soundproofed recording room. Analog mixing board. Reel-to-reel tape machine. The red light above the door means someone is laying down something that matters."
+    zone_slug: riverlands-amp
+    room_type: special
+
+  # ── The Narrows ───────────────────────────────
+  - name: Terminal Concourse
+    slug: narrows-concourse
+    description: "The main level of Narrows Central Terminal. Crowds flow in every direction. Departure boards cycle through a hundred destinations. The ceiling is so high it has its own weather."
+    zone_slug: narrows-terminal
+    room_type: hub
+
+  - name: Platform 7
+    slug: narrows-platform-7
+    description: "An elevated transit platform. Magnetic rail cars arrive and depart in near-silence. The wind between the towers is constant."
+    zone_slug: narrows-terminal
+    room_type: transit
+
+  - name: Terminal Undercroft
+    slug: narrows-undercroft
+    description: "Service tunnels beneath the terminal. Maintenance crews and less legitimate traffic share the space. The lighting is industrial fluorescent."
+    zone_slug: narrows-terminal
+    room_type: transit
+
+  - name: Stack Lobby
+    slug: narrows-stack-lobby
+    description: "The ground floor of The Stack. A security desk that hasn't been staffed in months. Mailboxes line one wall, most of them jammed shut."
+    zone_slug: narrows-stack
+    room_type: hub
+
+  - name: Stack Mid-Level
+    slug: narrows-stack-mid
+    description: "Floor 47. The elevators work on this level. The view is a wall of neighboring buildings. Laundry lines stretch between windows."
+    zone_slug: narrows-stack
+    room_type: safe_zone
+
+  - name: Stack Upper Reaches
+    slug: narrows-stack-upper
+    description: "Floor 91. The RIDE signal is spotty here. The view is open sky. Some residents consider the signal loss a feature, not a bug."
+    zone_slug: narrows-stack
+    room_type: safe_zone
+    min_clearance: 5
+
+  - name: Boardwalk
+    slug: narrows-boardwalk
+    description: "A wooden boardwalk along the harbor's edge. Salt spray and the smell of fried food. Vendor carts and buskers compete for attention."
+    zone_slug: narrows-harbor
+    room_type: hub
+
+  - name: Fish Market
+    slug: narrows-fish-market
+    description: "An open-air market where the catch comes in at dawn. By noon the stalls pivot to hardware and firmware. The smell of fish never fully leaves."
+    zone_slug: narrows-harbor
+    room_type: shop
+
+  - name: Dock Office
+    slug: narrows-dock-office
+    description: "A corrugated metal office on the pier. Shipping manifests cover every surface. The harbormaster has seen everything and remembers nothing."
+    zone_slug: narrows-harbor
+    room_type: safe_zone
+
+  - name: Crane Platform
+    slug: narrows-crane
+    description: "An observation platform on a decommissioned cargo crane. The view covers the entire harbor. Someone has bolted a telescope to the railing."
+    zone_slug: narrows-harbor
+    room_type: special
+
+  - name: Exchange Floor
+    slug: narrows-exchange
+    description: "A vast trading floor. Holographic ticker displays wrap the walls. Suited figures gesture at invisible interfaces. The money here isn't real but the consequences are."
+    zone_slug: narrows-financial
+    room_type: hub
+
+  - name: Compliance Office
+    slug: narrows-compliance
+    description: "A sterile office with no personal effects. The desk holds a single terminal. The person behind it asks questions they already know the answers to."
+    zone_slug: narrows-financial
+    room_type: govcorp
+
+  - name: Vault Corridor
+    slug: narrows-vault-corridor
+    description: "A reinforced corridor leading to the data vaults. Biometric scanners at every junction. The air is cold and dry and tastes of recycled nothing."
+    zone_slug: narrows-financial
+    room_type: govcorp
+    min_clearance: 15
+
+  - name: Flooded Gallery
+    slug: narrows-flooded-gallery
+    description: "A sub-level gallery knee-deep in harbor water. Emergency lights cast yellow reflections. The walls are lined with sealed data cabinets that predate the current GovCorp administration."
+    zone_slug: narrows-deep
+    room_type: hub
+
+  - name: Pump Station
+    slug: narrows-pump-station
+    description: "A massive pump room fighting a losing battle against the harbor. The machinery shudders with every cycle. Someone has tapped the power grid here."
+    zone_slug: narrows-deep
+    room_type: danger_zone
+
+  - name: Drowned Server Room
+    slug: narrows-drowned-servers
+    description: "Rack after rack of dead servers standing in black water. Whatever was stored here was important enough to build a bunker for. The bunker lost."
+    zone_slug: narrows-deep
+    room_type: danger_zone
+    min_clearance: 20
+
+  # ── The Gate ──────────────────────────────────
+  - name: Gate Concourse
+    slug: gate-concourse
+    description: "Chrome floors, holographic wayfinding, ambient lighting that adjusts to your mood profile. GovCorp's model transit hub. It's beautiful and it knows too much about you."
+    zone_slug: gate-transit
+    room_type: hub
+
+  - name: Skybridge
+    slug: gate-skybridge
+    description: "A glass-enclosed walkway suspended between two towers. The strait is visible far below. On foggy days you walk through clouds."
+    zone_slug: gate-transit
+    room_type: transit
+
+  - name: Arrival Hall
+    slug: gate-arrival-hall
+    description: "Where inter-region transit passengers arrive. Biometric intake scanners line the walls. A holographic concierge asks if this is your first visit."
+    zone_slug: gate-transit
+    room_type: transit
+
+  - name: Innovation Plaza
+    slug: gate-innovation-plaza
+    description: "An open courtyard ringed by startup incubators. Prototype demonstrations run on loop. Everything is pitch-ready. The surveillance cameras are disguised as art installations."
+    zone_slug: gate-innovation
+    room_type: hub
+
+  - name: Prototyping Lab
+    slug: gate-proto-lab
+    description: "A maker space with industrial fabrication equipment. 3D printers, laser cutters, and a wall of material samples. The work here becomes GovCorp property the moment it's documented."
+    zone_slug: gate-innovation
+    room_type: special
+
+  - name: Component Exchange
+    slug: gate-component-exchange
+    description: "A high-end tech marketplace. Clean display cases. Authenticated components. Prices are steep but nothing here will fry your DECK."
+    zone_slug: gate-innovation
+    room_type: shop
+
+  - name: Firmware Library
+    slug: gate-firmware-lib
+    description: "A curated firmware archive. Licensed versions only. The librarian can find anything in the catalog. The catalog is missing some interesting entries."
+    zone_slug: gate-innovation
+    room_type: firmware_vendor
+
+  - name: R&D Atrium
+    slug: gate-rd-atrium
+    description: "A multi-story atrium with glass-walled labs on every level. Researchers in white coats move between floors. Visitor badges are required and monitored."
+    zone_slug: gate-govcorp-rd
+    room_type: hub
+    min_clearance: 10
+
+  - name: Signal Lab
+    slug: gate-signal-lab
+    description: "Where RIDE signal architecture is designed and tested. Banks of specialized equipment generate and analyze perception-altering frequencies. This is where reality gets its firmware updates."
+    zone_slug: gate-govcorp-rd
+    room_type: govcorp
+    min_clearance: 20
+
+  - name: Secure Archive
+    slug: gate-secure-archive
+    description: "A temperature-controlled vault housing GovCorp's research archives. Every access is logged. Every log is audited. Every audit generates more logs."
+    zone_slug: gate-govcorp-rd
+    room_type: govcorp
+    min_clearance: 25
+
+  - name: Pier Landing
+    slug: gate-pier-landing
+    description: "A wooden pier extending into the strait. Fishing boats bob alongside personal watercraft. The fog horn sounds every thirty seconds when visibility drops."
+    zone_slug: gate-pier
+    room_type: hub
+
+  - name: Loft Row
+    slug: gate-loft-row
+    description: "Converted warehouse lofts with exposed brick and salt-stained windows. The residents are a mix of artists, engineers, and people who don't answer questions."
+    zone_slug: gate-pier
+    room_type: safe_zone
+
+  - name: Fog Pier
+    slug: gate-fog-pier
+    description: "Where the pier meets the fog line. Below here, visibility drops to arm's length. Sounds carry strangely. Navigation is by memory or not at all."
+    zone_slug: gate-fog
+    room_type: hub
+
+  - name: Drip Cache
+    slug: gate-drip-cache
+    description: "A hollow space beneath the pilings where data drops are left in waterproof containers. The water drips constantly. Nothing stays dry. Nothing stays long."
+    zone_slug: gate-fog
+    room_type: danger_zone
+    min_clearance: 15
+
+  - name: Fog Market
+    slug: gate-fog-market
+    description: "A floating platform market that operates in the fog. Vendors appear and disappear. Transactions are quick. If you can find it, you can buy it."
+    zone_slug: gate-fog
+    room_type: shop
+    min_clearance: 10
+
+  # ── The Bend ──────────────────────────────────
+  - name: Wharf Platform
+    slug: bend-wharf-platform
+    description: "An elevated transit platform built on pylons. The water below is always moving. The platform sways in storms but has never failed. Officially."
+    zone_slug: bend-transit
+    room_type: hub
+
+  - name: Ferry Dock
+    slug: bend-ferry-dock
+    description: "A floating dock where flat-bottomed ferries arrive and depart. The schedule is aspirational. The ferry captains navigate by instinct and profanity."
+    zone_slug: bend-transit
+    room_type: transit
+
+  - name: Quarter Gate
+    slug: bend-quarter-gate
+    description: "A wrought-iron archway marking the entrance to The Quarter. Music spills out in waves. The bouncer checks vibes, not IDs."
+    zone_slug: bend-quarter
+    room_type: hub
+
+  - name: Jazz Cellar
+    slug: bend-jazz-cellar
+    description: "A basement venue with a low ceiling and a high standard. The musicians have been playing here longer than GovCorp has existed. The drinks are strong and the sets are longer."
+    zone_slug: bend-quarter
+    room_type: special
+
+  - name: Brass Row
+    slug: bend-brass-row
+    description: "A street where instrument makers ply their trade. Trumpets, trombones, and saxophones hang in workshop windows. The sound of testing fills the air at all hours."
+    zone_slug: bend-quarter
+    room_type: shop
+
+  - name: Second Line Square
+    slug: bend-second-line
+    description: "An open square where impromptu parades form and dissolve. The cobblestones are worn smooth by generations of dancing feet. GovCorp has tried to schedule the spontaneity. It hasn't worked."
+    zone_slug: bend-quarter
+    room_type: safe_zone
+
+  - name: Levee Walk
+    slug: bend-levee-walk
+    description: "A path along the top of the levee. On one side, the neighborhood. On the other, the river. The wall between them is twelve feet of reinforced concrete and collective anxiety."
+    zone_slug: bend-levee
+    room_type: hub
+
+  - name: Shotgun Row
+    slug: bend-shotgun-row
+    description: "A residential street of narrow, deep houses built in the traditional style. Front porches face the street. Neighbors talk across the gaps. The architecture is older than the grid."
+    zone_slug: bend-levee
+    room_type: safe_zone
+
+  - name: Canal Entry
+    slug: bend-canal-entry
+    description: "A grated access point leading down to the canal system. The grate has been cut and re-welded so many times the metal is layered like tree rings."
+    zone_slug: bend-canals
+    room_type: hub
+
+  - name: Drowned Passage
+    slug: bend-drowned-passage
+    description: "Chest-deep water in a brick-lined tunnel. The current is slow but persistent. Waterproof lights mounted to the walls create pools of green illumination."
+    zone_slug: bend-canals
+    room_type: danger_zone
+
+  - name: Pump Cathedral
+    slug: bend-pump-cathedral
+    description: "A massive pump chamber with cathedral ceilings. The pumps are old enough to have plaques. The sound is a deep, rhythmic heartbeat that never stops."
+    zone_slug: bend-canals
+    room_type: danger_zone
+
+  - name: Rat King's Court
+    slug: bend-rat-king
+    description: "A dry platform in the canal system where someone has established a camp. Salvaged furniture, working lights, and an aggressive territorial attitude. The rats here answer to someone."
+    zone_slug: bend-canals
+    room_type: danger_zone
+    min_clearance: 15
+
+  - name: Bureau Lobby
+    slug: bend-bureau-lobby
+    description: "Marble floors and GovCorp branding. A reception desk staffed by someone whose smile is contractually mandated. Cultural programming brochures fan across every surface."
+    zone_slug: bend-govcorp
+    room_type: hub
+
+  - name: Curation Office
+    slug: bend-curation-office
+    description: "Where cultural output is evaluated for 'alignment with community values.' The whiteboard is covered in metrics. The cultural officers have never attended a live performance."
+    zone_slug: bend-govcorp
+    room_type: govcorp
+
+  - name: Broadcast Center
+    slug: bend-broadcast-center
+    description: "Where GovCorp's approved cultural content is produced and distributed. State-of-the-art equipment producing carefully mediocre output. The engineers know better. The budget says otherwise."
+    zone_slug: bend-govcorp
+    room_type: govcorp
+
+  # ── The Canyon ────────────────────────────────
+  - name: Rim Station Platform
+    slug: canyon-rim-platform
+    description: "A transit platform on the canyon's edge. The wind is constant. Cable car lines descend into the canyon in three directions. A guardrail is the only thing between you and geology."
+    zone_slug: canyon-rim
+    room_type: hub
+
+  - name: Cable Car Terminus
+    slug: canyon-cable-terminus
+    description: "Where the cable cars dock at the rim. The machinery creaks and groans. A maintenance log on the wall shows inspections that may or may not have occurred."
+    zone_slug: canyon-rim
+    room_type: transit
+
+  - name: Rim Overlook
+    slug: canyon-rim-overlook
+    description: "A scenic platform extending over the canyon void. The rock layers tell a story measured in millions of years. The drop tells a shorter story."
+    zone_slug: canyon-rim
+    room_type: safe_zone
+
+  - name: Upper Dwelling
+    slug: canyon-upper-dwelling
+    description: "A residential unit carved into the upper canyon wall. The entrance is a reinforced door set into sandstone. Inside, the rock keeps everything cool and quiet."
+    zone_slug: canyon-dwellings
+    room_type: hub
+
+  - name: Dwelling Stairway
+    slug: canyon-dwelling-stairway
+    description: "A carved stone stairway switchbacking down the canyon face. Each landing opens to a row of dwelling entrances. The steps are worn smooth by generations of feet."
+    zone_slug: canyon-dwellings
+    room_type: safe_zone
+
+  - name: Community Terrace
+    slug: canyon-community-terrace
+    description: "A broad natural ledge converted to a community gathering space. Shared gardens grow in terraced planters. The sunset hits this terrace first and leaves last."
+    zone_slug: canyon-dwellings
+    room_type: safe_zone
+
+  - name: Ledge Market Center
+    slug: canyon-ledge-center
+    description: "The main commercial area on the ledge. Vendor stalls built from canyon stone and salvaged metal. The prices reflect the effort of getting merchandise down here."
+    zone_slug: canyon-ledge
+    room_type: hub
+
+  - name: Desert Outfitter
+    slug: canyon-outfitter
+    description: "A shop specializing in canyon survival gear. Rope, water purifiers, signal boosters, and climbing equipment. The owner has the callused hands of someone who uses what they sell."
+    zone_slug: canyon-ledge
+    room_type: shop
+
+  - name: Ledge Cantina
+    slug: canyon-cantina
+    description: "A bar carved into the cliff face. The back wall is living rock. Cold drinks in a hot canyon. The bartender knows everyone and everyone's business."
+    zone_slug: canyon-ledge
+    room_type: safe_zone
+
+  - name: River Bed
+    slug: canyon-river-bed
+    description: "The canyon floor. The river runs shallow and wide over smooth stone. The sky is a narrow strip of light far above. Down here, time moves differently."
+    zone_slug: canyon-river
+    room_type: hub
+
+  - name: Echo Chamber
+    slug: canyon-echo-chamber
+    description: "A natural cave where the canyon acoustics create a perfect reverb chamber. Words spoken here repeat for seconds. Secrets carry further than intended."
+    zone_slug: canyon-river
+    room_type: danger_zone
+
+  - name: Fossil Gallery
+    slug: canyon-fossil-gallery
+    description: "A section of canyon wall where ancient fossils are exposed in the rock. Something very large died here a long time ago. Its outline stretches twenty meters."
+    zone_slug: canyon-river
+    room_type: special
+
+  - name: Deep Pool
+    slug: canyon-deep-pool
+    description: "Where the river collects in a still, deep pool. The water is cold and clear. The bottom is further down than it looks. Much further."
+    zone_slug: canyon-river
+    room_type: danger_zone
+    min_clearance: 15
+
+  - name: Relay Control Room
+    slug: canyon-relay-control
+    description: "A metal-walled room bolted to the canyon face. Racks of signal equipment hum and blink. The AC unit fights a losing battle against canyon heat."
+    zone_slug: canyon-govcorp
+    room_type: hub
+
+  - name: Signal Array
+    slug: canyon-signal-array
+    description: "An antenna farm on a canyon shelf. Dishes point in every direction, trying to bounce RIDE signal off rock walls. The coverage map has more gaps than coverage."
+    zone_slug: canyon-govcorp
+    room_type: govcorp
+
+  - name: Staff Quarters
+    slug: canyon-staff-quarters
+    description: "Cramped living quarters for the relay station crew. Two bunks, a hot plate, and a window that frames the most beautiful view in the world. The staff rarely look at it anymore."
+    zone_slug: canyon-govcorp
+    room_type: govcorp

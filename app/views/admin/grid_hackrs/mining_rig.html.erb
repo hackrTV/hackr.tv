@@ -1,0 +1,171 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/hackrs/<%= @hackr.hackr_alias %>/mining_rig :: MINING RIG MANAGER</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <div style="background: #332200; border: 2px solid #fbbf24; padding: 10px 15px; margin-bottom: 20px;">
+        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
+        <span style="color: #d0d0d0;"> — Mining rig force operations (bypass all guards)</span>
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+      </div>
+
+      <%# === RIG STATUS === %>
+      <div style="margin-bottom: 30px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RIG STATUS ::]</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;">
+            <div><span style="color: #888;">Active:</span>
+              <span style="color: <%= @rig.active? ? '#34d399' : '#f87171' %>; font-weight: bold;"><%= @rig.active? ? "ACTIVE" : "INACTIVE" %></span>
+            </div>
+            <div><span style="color: #888;">Functional:</span>
+              <span style="color: <%= @rig.functional? ? '#34d399' : '#f87171' %>; font-weight: bold;"><%= @rig.functional? ? "YES" : "NO" %></span>
+            </div>
+            <div><span style="color: #888;">Effective Rate:</span> <span class="green-255-text" style="font-weight: bold;"><%= @rig.effective_rate %></span></div>
+            <div><span style="color: #888;">Multiplier:</span> <span class="white-text"><%= @rig.total_multiplier %></span></div>
+            <div><span style="color: #888;">Last Tick:</span> <span style="color: #666;"><%= @rig.last_tick_at&.strftime("%Y-%m-%d %H:%M") || "never" %></span></div>
+          </div>
+
+          <% errors = @rig.functionality_errors %>
+          <% if errors.any? %>
+            <div style="margin-top: 15px; padding: 10px; border: 1px solid #f87171; background: #1a0000;">
+              <span class="red-255-text" style="font-weight: bold;">FUNCTIONALITY ERRORS:</span>
+              <ul style="color: #f87171; margin: 5px 0 0 20px;">
+                <% errors.each do |err| %>
+                  <li><%= err %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <%# Activate / Deactivate %>
+          <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <% if @rig.active? %>
+              <%= button_to "Deactivate", force_deactivate_rig_admin_grid_hackr_path(@hackr), method: :post, class: "tui-button yellow-168", style: "padding: 6px 14px;", form: { data: { turbo_confirm: "Deactivate #{@hackr.hackr_alias}'s mining rig?" } } %>
+            <% else %>
+              <%= button_to "Force Activate", force_activate_rig_admin_grid_hackr_path(@hackr), method: :post, class: "tui-button green-168", style: "padding: 6px 14px;", form: { data: { turbo_confirm: "Force-activate #{@hackr.hackr_alias}'s mining rig? (bypasses functional check)" } } %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# === SLOT BREAKDOWN === %>
+      <div style="margin-bottom: 30px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SLOT BREAKDOWN ::]</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Slot Type</th>
+                <th style="text-align: center;">Capacity</th>
+                <th style="text-align: center;">Installed</th>
+                <th style="text-align: center;">Available</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% mb_count = @rig.motherboards.count %>
+              <tr>
+                <td style="font-weight: bold;">MOTHERBOARD</td>
+                <td style="text-align: center; color: #888;">&infin;</td>
+                <td style="text-align: center;"><%= mb_count %></td>
+                <td style="text-align: center; color: #888;">&infin;</td>
+              </tr>
+              <% [["PSU", @rig.total_psu_slots, @rig.psus.count],
+                  ["CPU", @rig.total_cpu_slots, @rig.cpus.count],
+                  ["GPU", @rig.total_gpu_slots, @rig.gpus.count],
+                  ["RAM", @rig.total_ram_slots, @rig.rams.count]].each do |label, cap, used| %>
+                <% avail = [cap - used, 0].max %>
+                <tr>
+                  <td style="font-weight: bold;"><%= label %></td>
+                  <td style="text-align: center;"><%= cap %></td>
+                  <td style="text-align: center; color: <%= used >= cap && cap > 0 ? '#fbbf24' : '#d0d0d0' %>;"><%= used %></td>
+                  <td style="text-align: center; color: <%= avail > 0 ? '#34d399' : '#666' %>;"><%= avail %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <%# === INSTALLED COMPONENTS === %>
+      <div style="margin-bottom: 30px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: INSTALLED COMPONENTS (<%= @components.size %>) ::]</h3>
+        <% if @components.any? %>
+          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+            <table class="tui-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left;">Name</th>
+                  <th style="text-align: left;">Slot</th>
+                  <th style="text-align: center;">Multiplier</th>
+                  <th style="text-align: left;">Rarity</th>
+                  <th style="text-align: center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @components.sort_by { |c| c.slot.to_s }.each do |comp| %>
+                  <tr>
+                    <td style="color: <%= comp.rarity_color %>;"><%= comp.name %></td>
+                    <td style="color: #888;"><%= comp.slot&.upcase || "—" %></td>
+                    <td style="text-align: center; font-family: monospace;">&times;<%= comp.rate_multiplier %></td>
+                    <td style="color: <%= comp.rarity_color %>;"><%= comp.rarity_label %></td>
+                    <td style="text-align: center;">
+                      <%= button_to "Uninstall", force_uninstall_component_admin_grid_hackr_path(@hackr, item_id: comp.id), method: :post, class: "tui-button red-168", style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-uninstall #{comp.name} from rig? Item returns to inventory." } } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div style="padding: 30px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+            <p style="color: #666;">No components installed</p>
+          </div>
+        <% end %>
+      </div>
+
+      <%# === FORCE INSTALL === %>
+      <div style="margin-bottom: 30px;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: FORCE INSTALL COMPONENT ::]</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+          <% if @inventory_components.any? %>
+            <%= form_with url: force_install_component_admin_grid_hackr_path(@hackr), method: :post, local: true, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do |f| %>
+              <div>
+                <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Component from Inventory</label>
+                <select name="item_id" style="background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace; min-width: 300px;">
+                  <option value="">Select component...</option>
+                  <% @inventory_components.each do |item| %>
+                    <option value="<%= item.id %>"><%= item.name %> (<%= item.slot&.upcase || "?" %>, &times;<%= item.rate_multiplier %>, <%= item.rarity_label %>)</option>
+                  <% end %>
+                </select>
+              </div>
+              <div>
+                <button type="submit" class="tui-button yellow-168" style="padding: 6px 14px;">Force Install</button>
+              </div>
+            <% end %>
+          <% else %>
+            <p style="color: #666;">No rig components available in hackr's inventory.</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

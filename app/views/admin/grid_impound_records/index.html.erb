@@ -1,0 +1,119 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid_impound_records :: IMPOUND MANAGER</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <% if dev_tools_enabled? %>
+        <div style="background: #332200; border: 2px solid #fbbf24; padding: 10px 15px; margin-bottom: 20px;">
+          <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
+          <span style="color: #d0d0d0;"> — Force recover/forfeit actions available</span>
+        </div>
+      <% end %>
+
+      <%# Filter form %>
+      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
+        <%= form_tag admin_grid_impound_records_path, method: :get, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do %>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Hackr Alias</label>
+            <%= text_field_tag :hackr_alias, params[:hackr_alias], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "alias" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Status</label>
+            <%= select_tag :status, options_for_select([["All Statuses", ""], "impounded", "recovered", "forfeited"], params[:status]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <button type="submit" class="tui-button cyan-168" style="padding: 6px 14px;">Filter</button>
+          </div>
+          <% if params[:hackr_alias].present? || params[:status].present? %>
+            <div>
+              <%= link_to "Clear", admin_grid_impound_records_path, class: "tui-button", style: "padding: 6px 14px;" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @hackr_not_found %>
+        <div style="background: #332200; border: 2px solid #fbbf24; padding: 10px 15px; margin-bottom: 15px;">
+          <span class="yellow-255-text">Hackr "<%= params[:hackr_alias] %>" not found.</span>
+        </div>
+      <% end %>
+
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: IMPOUND RECORDS (<%= @records.size %>) ::]</h3>
+      <% if @records.any? %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center;">ID</th>
+                <th style="text-align: left;">Hackr</th>
+                <th style="text-align: center;">Breach</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: right;">Bribe Cost</th>
+                <th style="text-align: center;">Items</th>
+                <th style="text-align: center;">Created</th>
+                <% if dev_tools_enabled? %>
+                  <th style="text-align: center;">Actions</th>
+                <% end %>
+              </tr>
+            </thead>
+            <tbody>
+              <% @records.each do |record| %>
+                <tr>
+                  <td style="text-align: center; color: #666;"><%= record.id %></td>
+                  <td>
+                    <%= link_to record.grid_hackr.hackr_alias, admin_grid_hackr_path(record.grid_hackr), style: "color: #00ffff; text-decoration: none;" %>
+                  </td>
+                  <td style="text-align: center; color: #666;"><%= record.grid_hackr_breach_id || "—" %></td>
+                  <td style="text-align: center;">
+                    <% status_color = case record.status
+                      when "impounded" then "#f87171"
+                      when "recovered" then "#34d399"
+                      when "forfeited" then "#666"
+                    end %>
+                    <span style="color: <%= status_color %>; font-weight: bold;"><%= record.status.upcase %></span>
+                  </td>
+                  <td style="text-align: right; font-family: monospace; color: #fbbf24;"><%= record.bribe_cost %></td>
+                  <td style="text-align: center;"><%= record.impounded_items.size %></td>
+                  <td style="text-align: center; color: #666;"><%= record.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+                  <% if dev_tools_enabled? %>
+                    <td style="text-align: center;">
+                      <% if record.impounded? %>
+                        <div style="display: flex; gap: 6px; justify-content: center;">
+                          <%= button_to "Recover", force_recover_admin_grid_impound_record_path(record), method: :post, class: "tui-button yellow-168", style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-recover impound ##{record.id}? Items return to inventory, no CRED charged." } } %>
+                          <%= button_to "Forfeit", force_forfeit_admin_grid_impound_record_path(record), method: :post, class: "tui-button red-168", style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-forfeit impound ##{record.id}? All items will be PERMANENTLY DESTROYED." } } %>
+                        </div>
+                      <% else %>
+                        <span style="color: #333;">—</span>
+                      <% end %>
+                    </td>
+                  <% end %>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666;">No impound records found.</p>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Grid Dashboard", admin_grid_path, class: "tui-button green-168" %>
+        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>
