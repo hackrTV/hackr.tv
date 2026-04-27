@@ -24,6 +24,7 @@
           <%= link_to "Warp", warp_admin_grid_hackr_path(@hackr), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
           <%= link_to "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
           <%= link_to "NPC Tester", new_admin_grid_npc_dialogue_tester_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
+          <%= link_to "PAC Tester", new_admin_grid_pac_escape_tester_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
         <% end %>
       </div>
 

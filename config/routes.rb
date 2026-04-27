@@ -372,6 +372,12 @@ Rails.application.routes.draw do
       delete :finish
     end
 
+    # PAC Escape Tester (dev-only)
+    resource :grid_pac_escape_tester, only: %i[new create show], controller: "grid_pac_escape_tester" do
+      post :command
+      delete :finish
+    end
+
     # Grid achievements (runtime CRUD + manual award)
     resources :grid_achievements do
       member do
