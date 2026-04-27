@@ -137,8 +137,30 @@
         77
       ],
       "note": "Safe: Open3.capture2 with array arguments bypasses the shell. default_branch and path are not shell-interpreted."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "c958789a93a0a6569a9512adbb513bca52c006cd26d0f9c428ac54623b99b0cc",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admin/grid_breach_sandbox/show.html.erb",
+      "line": 24,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Grid::BreachRenderer.new(GridHackrBreach.find(params[:id])).render_full",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "admin/grid_breach_sandbox/show"
+      },
+      "user_input": null,
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Safe: BreachRenderer output is server-controlled HTML with inline styles. All dynamic text is escaped via ERB::Util.html_escape (the renderer's h() helper). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern used by the frontend terminal via dangerouslySetInnerHTML."
     }
   ],
-  "updated": "2026-03-14 04:30:00 +0000",
+  "updated": "2026-04-27 01:10:00 +0000",
   "brakeman_version": "8.0.4"
 }
