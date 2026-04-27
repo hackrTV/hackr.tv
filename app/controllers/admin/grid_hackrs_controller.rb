@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::GridHackrsController < Admin::ApplicationController
-  before_action :set_hackr, only: %i[show edit_stats update_stats warp perform_warp]
-  before_action :require_dev_tools, only: %i[edit_stats update_stats warp perform_warp]
+  before_action :set_hackr, only: %i[show edit_stats update_stats warp perform_warp
+    mining_rig force_activate_rig force_deactivate_rig force_install_component force_uninstall_component]
+  before_action :require_dev_tools, only: %i[edit_stats update_stats warp perform_warp
+    mining_rig force_activate_rig force_deactivate_rig force_install_component force_uninstall_component]
 
   # GET /root/grid_hackrs
   def index
@@ -31,6 +33,7 @@ class Admin::GridHackrsController < Admin::ApplicationController
       .includes(grid_mission: :grid_mission_arc)
       .order(:accepted_at)
     @feature_grants = @hackr.feature_grants.order(:feature)
+    @impound_records = GridImpoundRecord.for_hackr(@hackr)
   end
 
   # GET /root/grid_hackrs/:id/edit_stats
@@ -135,6 +138,98 @@ class Admin::GridHackrsController < Admin::ApplicationController
     zone_name = room.grid_zone&.name || "unknown zone"
     set_flash_success("#{@hackr.hackr_alias} warped to #{room.name} (#{zone_name}).")
     redirect_to admin_grid_hackr_path(@hackr)
+  end
+
+  # GET /root/grid_hackrs/:id/mining_rig
+  def mining_rig
+    @rig = @hackr.grid_mining_rig
+    unless @rig
+      set_flash_error("#{@hackr.hackr_alias} has no mining rig.")
+      return redirect_to admin_grid_hackr_path(@hackr)
+    end
+    @components = @rig.components.includes(:grid_item_definition).to_a
+    @inventory_components = @hackr.grid_items
+      .where(item_type: "rig_component", grid_mining_rig_id: nil, equipped_slot: nil, grid_impound_record_id: nil, container_id: nil)
+      .includes(:grid_item_definition)
+      .order(:name)
+  end
+
+  # POST /root/grid_hackrs/:id/force_activate_rig
+  def force_activate_rig
+    rig = @hackr.grid_mining_rig
+    unless rig
+      set_flash_error("No mining rig for #{@hackr.hackr_alias}.")
+      return redirect_to admin_grid_hackr_path(@hackr)
+    end
+    rig.activate!
+    set_flash_success("Mining rig for #{@hackr.hackr_alias} force-activated.")
+    redirect_to mining_rig_admin_grid_hackr_path(@hackr)
+  end
+
+  # POST /root/grid_hackrs/:id/force_deactivate_rig
+  def force_deactivate_rig
+    rig = @hackr.grid_mining_rig
+    unless rig
+      set_flash_error("No mining rig for #{@hackr.hackr_alias}.")
+      return redirect_to admin_grid_hackr_path(@hackr)
+    end
+    rig.deactivate!
+    set_flash_success("Mining rig for #{@hackr.hackr_alias} deactivated.")
+    redirect_to mining_rig_admin_grid_hackr_path(@hackr)
+  end
+
+  # POST /root/grid_hackrs/:id/force_install_component
+  def force_install_component
+    rig = @hackr.grid_mining_rig
+    unless rig
+      set_flash_error("No mining rig for #{@hackr.hackr_alias}.")
+      return redirect_to admin_grid_hackr_path(@hackr)
+    end
+
+    item = @hackr.grid_items.find_by(
+      id: params[:item_id],
+      item_type: "rig_component",
+      grid_mining_rig_id: nil,
+      equipped_slot: nil,
+      grid_impound_record_id: nil,
+      container_id: nil
+    )
+    unless item
+      set_flash_error("Item not found in inventory or is not an available rig component.")
+      return redirect_to mining_rig_admin_grid_hackr_path(@hackr)
+    end
+
+    ActiveRecord::Base.transaction do
+      rig.lock!
+      item.update!(grid_mining_rig: rig, grid_hackr: nil, room: nil)
+      rig.reload
+      rig.check_functional!
+    end
+
+    set_flash_success("Force-installed #{item.name} (#{item.slot&.upcase}) into #{@hackr.hackr_alias}'s rig.")
+    redirect_to mining_rig_admin_grid_hackr_path(@hackr)
+  end
+
+  # POST /root/grid_hackrs/:id/force_uninstall_component
+  def force_uninstall_component
+    rig = @hackr.grid_mining_rig
+    unless rig
+      set_flash_error("No mining rig for #{@hackr.hackr_alias}.")
+      return redirect_to admin_grid_hackr_path(@hackr)
+    end
+
+    item = rig.components.find_by(id: params[:item_id])
+    unless item
+      set_flash_error("Component not found in rig.")
+      return redirect_to mining_rig_admin_grid_hackr_path(@hackr)
+    end
+
+    item.update!(grid_hackr: @hackr, grid_mining_rig: nil, room: nil)
+    rig.reload
+    rig.check_functional!
+
+    set_flash_success("Force-uninstalled #{item.name} from #{@hackr.hackr_alias}'s rig. Item returned to inventory.")
+    redirect_to mining_rig_admin_grid_hackr_path(@hackr)
   end
 
   private

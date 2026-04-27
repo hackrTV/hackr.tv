@@ -136,6 +136,13 @@
               <span style="color: #888;"> (50% garnishment active)</span>
             </div>
           <% end %>
+          <% if @impound_records.any? %>
+            <div style="margin-top: 15px;">
+              <span style="color: #888;">Impound Records:</span>
+              <span class="yellow-168-text" style="font-weight: bold;"><%= @impound_records.count %> total (<%= @impound_records.impounded.count %> active)</span>
+              <%= link_to "View Impounds →", admin_grid_impound_records_path(hackr_alias: @hackr.hackr_alias), class: "tui-button yellow-168", style: "padding: 3px 10px; margin-left: 8px; font-size: 0.85em;" %>
+            </div>
+          <% end %>
         </div>
       </div>
 
@@ -234,6 +241,11 @@
                 <% @mining_rig.grid_items.each do |comp| %>
                   <span style="color: <%= comp.rarity_color %>; margin-left: 8px;"><%= comp.name %></span>
                 <% end %>
+              </div>
+            <% end %>
+            <% if dev_tools_enabled? %>
+              <div style="margin-top: 12px;">
+                <%= link_to "Manage Rig →", mining_rig_admin_grid_hackr_path(@hackr), class: "tui-button yellow-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
               </div>
             <% end %>
           <% else %>

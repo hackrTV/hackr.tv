@@ -247,8 +247,52 @@
         79
       ],
       "note": "Safe: CommandParser escapes all dynamic text via h() (ERB::Util.html_escape). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern as the BREACH sandbox and NPC dialogue tester terminals."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "bd6e6f5ca8ff68c814586ce215bdfac584dbb54d294a28ea86cd81b0a8c365bf",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admin/grid_world_map/show.html.erb",
+      "line": 70,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": null,
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "admin/grid_world_map/show"
+      },
+      "user_input": null,
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Safe: WorldMapBuilder#render_svg escapes all dynamic text (room names, zone names, room types) via ERB::Util.html_escape (the service's h() method). SVG structural elements are constants. Admin-only view behind require_admin."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "706e013024445f04ea9a7674f0b4fe41a49198e79e2ed27a635df060f0d7cd0d",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admin/grid_world_map/zone_map.html.erb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": null,
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "admin/grid_world_map/zone_map"
+      },
+      "user_input": null,
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Safe: WorldMapBuilder#render_svg escapes all dynamic text via h() (ERB::Util.html_escape). Same pattern as the region map show view. Admin-only view behind require_admin."
     }
   ],
-  "updated": "2026-04-27 03:15:00 +0000",
+  "updated": "2026-04-27 19:15:00 +0000",
   "brakeman_version": "8.0.4"
 }

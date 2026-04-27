@@ -79,3 +79,243 @@ zones:
     faction_slug: null
     ambient_playlist_slug: null
     danger_level: 0
+
+  # ── The Lakeshore (expansion) ─────────────────
+  - name: Lakeshore Market District
+    slug: lakeshore-market
+    description: "Open-air stalls and reinforced shop fronts crowd a pedestrian throughway. Neon vendor signs compete for attention. The smell of solder, street food, and desperation."
+    zone_type: null
+    color_scheme: green/yellow
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 2
+
+  - name: Industrial Sprawl
+    slug: lakeshore-industrial
+    description: "Abandoned manufacturing blocks repurposed by squatters and salvage crews. Rusted cranes loom overhead. GovCorp patrols are infrequent — the margins aren't worth protecting."
+    zone_type: danger_zone
+    color_scheme: orange/black
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 6
+
+  # ── The Riverlands ────────────────────────────
+  - name: Riverlands Transit Depot
+    slug: riverlands-transit
+    description: "A weathered transit station where river barges dock alongside data-cable junction boxes. The architecture is old — pre-GovCorp — and the signal quality shows it."
+    zone_type: transit
+    color_scheme: gray/green
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 1
+
+  - name: The Delta
+    slug: riverlands-delta
+    description: "Where the river splits into a maze of channels before reaching the sea. Smuggler routes thread between sandbars. RIDE coverage is unreliable — the water interferes."
+    zone_type: danger_zone
+    color_scheme: dark green/brown
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 7
+
+  - name: Blufftop Commons
+    slug: riverlands-blufftop
+    description: "Residential platforms carved into the river bluffs. The view is stunning. The rent is manageable. GovCorp considers this a low-value residential zone — which is exactly why people live here."
+    zone_type: residential
+    color_scheme: blue/warm white
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: The Amp District
+    slug: riverlands-amp
+    description: "Converted warehouse blocks that pulse with sound. Every surface vibrates. Live music venues, recording studios, and instrument workshops occupy every available space. The Fracture Network's cultural heart."
+    zone_type: special
+    color_scheme: purple/magenta
+    region_slug: the-riverlands
+    faction_slug: thecyberpulse
+    danger_level: 1
+
+  # ── The Narrows ───────────────────────────────
+  - name: Narrows Central Terminal
+    slug: narrows-terminal
+    description: "A massive vertical transit hub built into the side of a cliff. Elevators, walkways, and cable cars connect dozens of levels. The density is suffocating. The throughput is impressive."
+    zone_type: transit
+    color_scheme: gray/cyan
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 2
+
+  - name: The Stack
+    slug: narrows-stack
+    description: "A residential tower built so high the upper floors lose reliable RIDE signal. Lower floors are affordable. Upper floors are free — but you're on your own."
+    zone_type: residential
+    color_scheme: blue/dark
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: Harbor Market
+    slug: narrows-harbor
+    description: "Waterfront commercial district. Salt air, fish stalls, and firmware vendors share the same boardwalk. The harbor cranes move cargo containers that officially contain consumer goods."
+    zone_type: null
+    color_scheme: teal/yellow
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 3
+
+  - name: GovCorp Financial Core
+    slug: narrows-financial
+    description: "Glass-and-steel towers housing GovCorp's eastern financial operations. Every surface is monitored. Every transaction is logged. The RIDE overlay here is flawless — which is how they want it."
+    zone_type: govcorp
+    color_scheme: white/gold
+    region_slug: the-narrows
+    faction_slug: govcorp
+    danger_level: 5
+
+  - name: Deep Harbor
+    slug: narrows-deep
+    description: "Flooded sub-levels beneath the harbor district. Sealed bulkheads, emergency lighting, and the constant sound of water. What GovCorp sank down here, they meant to forget."
+    zone_type: danger_zone
+    color_scheme: dark blue/black
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 8
+
+  # ── The Gate ──────────────────────────────────
+  - name: Gate Transit Station
+    slug: gate-transit
+    description: "A sleek, over-engineered transit hub. Everything is chrome and holographic wayfinding. GovCorp built this as a showcase — proof that infrastructure can be beautiful when you control the budget."
+    zone_type: transit
+    color_scheme: chrome/blue
+    region_slug: the-gate
+    faction_slug: null
+    danger_level: 1
+
+  - name: Innovation Quarter
+    slug: gate-innovation
+    description: "Research labs and startup incubators clustered around a central plaza. The ideas here are brilliant. The surveillance is total. GovCorp funds the innovation and owns the patents."
+    zone_type: special
+    color_scheme: white/green
+    region_slug: the-gate
+    faction_slug: null
+    danger_level: 2
+
+  - name: GovCorp R&D Campus
+    slug: gate-govcorp-rd
+    description: "A fortified research campus where RIDE infrastructure is developed. Clearance-gated at every door. The work done here shapes what everyone else experiences as reality."
+    zone_type: govcorp
+    color_scheme: white/red
+    region_slug: the-gate
+    faction_slug: govcorp
+    danger_level: 6
+
+  - name: Pier District
+    slug: gate-pier
+    description: "Former fishing wharves converted to residential lofts. Fog rolls in from the strait every evening. The locals have learned to navigate by sound when visibility drops to zero."
+    zone_type: residential
+    color_scheme: gray/warm white
+    region_slug: the-gate
+    faction_slug: null
+    danger_level: 0
+
+  - name: The Fog
+    slug: gate-fog
+    description: "Below the pier pilings, where fog and seawater create a permanent twilight. Unregistered data drops and dead-letter caches hide in the moisture. Signal attenuation is severe and deliberate."
+    zone_type: danger_zone
+    color_scheme: gray/black
+    region_slug: the-gate
+    faction_slug: null
+    danger_level: 8
+
+  # ── The Bend ──────────────────────────────────
+  - name: Bend Transit Wharf
+    slug: bend-transit
+    description: "A transit hub built on pylons above the waterline. Everything floods eventually. The locals have stopped repairing the lower level and just moved operations up."
+    zone_type: transit
+    color_scheme: brown/cyan
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 2
+
+  - name: The Quarter
+    slug: bend-quarter
+    description: "Narrow streets packed with music halls, bars, and street performers. GovCorp's Cultural Zone programming here is a thin veneer over something genuinely alive. The music is real even if the economy isn't."
+    zone_type: special
+    color_scheme: purple/gold
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 1
+
+  - name: Levee District
+    slug: bend-levee
+    description: "Residential blocks behind the levee wall. The constant awareness of water pressure on the other side creates a particular kind of community — one that helps each other without being asked."
+    zone_type: residential
+    color_scheme: blue/gray
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: Canal Networks
+    slug: bend-canals
+    description: "Flooded service tunnels beneath the city. Some are mapped. Most aren't. The water is chest-deep in places and the rats are the size of small dogs. GovCorp pretends this doesn't exist."
+    zone_type: danger_zone
+    color_scheme: dark green/black
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 9
+
+  - name: GovCorp Cultural Bureau
+    slug: bend-govcorp
+    description: "A gleaming office complex where GovCorp curates the region's cultural output. What gets performed, recorded, and broadcast is decided here. The irony is not lost on the locals."
+    zone_type: govcorp
+    color_scheme: white/purple
+    region_slug: the-bend
+    faction_slug: govcorp
+    danger_level: 4
+
+  # ── The Canyon ────────────────────────────────
+  - name: Canyon Rim Station
+    slug: canyon-rim
+    description: "A transit platform on the canyon rim. Wind howls across the gap. Cable cars descend into the depths on fraying lines. The view is breathtaking if you don't look down at the infrastructure."
+    zone_type: transit
+    color_scheme: red/orange
+    region_slug: the-canyon
+    faction_slug: null
+    danger_level: 2
+
+  - name: Cliff Dwellings
+    slug: canyon-dwellings
+    description: "Residential units carved directly into the canyon wall. Ancient construction techniques layered with modern tech. The walls are three hundred million years of geological history. The wifi is spotty."
+    zone_type: residential
+    color_scheme: sandstone/warm white
+    region_slug: the-canyon
+    faction_slug: null
+    danger_level: 0
+
+  - name: The Ledge Market
+    slug: canyon-ledge
+    description: "A commercial strip built on a natural rock shelf halfway down the canyon. Vendors sell salvaged tech and desert survival gear. The drop on the outer edge is two hundred meters straight down."
+    zone_type: null
+    color_scheme: tan/green
+    region_slug: the-canyon
+    faction_slug: null
+    danger_level: 3
+
+  - name: River Bottom
+    slug: canyon-river
+    description: "The canyon floor where the ancient river still runs. Dark, cool, and echoing. The signal from the rim barely reaches here. What lives down here has adapted to the silence."
+    zone_type: danger_zone
+    color_scheme: dark blue/black
+    region_slug: the-canyon
+    faction_slug: null
+    danger_level: 8
+
+  - name: GovCorp Canyon Relay
+    slug: canyon-govcorp
+    description: "A signal relay station bolted to the canyon wall. GovCorp's attempt to extend RIDE coverage into the depths. The staff rotate out every two weeks. Nobody asks for a third rotation."
+    zone_type: govcorp
+    color_scheme: white/red
+    region_slug: the-canyon
+    faction_slug: govcorp
+    danger_level: 5
