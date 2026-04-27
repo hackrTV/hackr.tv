@@ -203,8 +203,52 @@
         79
       ],
       "note": "Safe: NpcDialogueCommandParser inherits CommandParser which escapes all dynamic text via h() (ERB::Util.html_escape). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern as the BREACH sandbox terminal."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "06e1954bd9044398d320b31ac202cfa8b3cc68da16879bf5f85725d621301997",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admin/grid_pac_escape_tester/show.html.erb",
+      "line": 25,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Grid::CommandParser.new(GridHackr.find_by(:id => session[:pac_tester][\"hackr_id\"]), \"look\").execute",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "admin/grid_pac_escape_tester/show"
+      },
+      "user_input": "GridHackr.find_by(:id => session[:pac_tester][\"hackr_id\"])",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Safe: CommandParser escapes all dynamic text via h() (ERB::Util.html_escape). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern as the BREACH sandbox and NPC dialogue tester terminals."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "94c2316b2eae16960128324ff4651ef47f6751e7e1e41751cc8e463d276c6994",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admin/grid_pac_escape_tester/show.html.erb",
+      "line": 25,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Grid::CommandParser.new(GridHackr.find_by(:id => session[:pac_tester][\"hackr_id\"]), \"look\").execute[:output]",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "admin/grid_pac_escape_tester/show"
+      },
+      "user_input": "GridHackr.find_by(:id => session[:pac_tester][\"hackr_id\"])",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Safe: CommandParser escapes all dynamic text via h() (ERB::Util.html_escape). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern as the BREACH sandbox and NPC dialogue tester terminals."
     }
   ],
-  "updated": "2026-04-27 01:10:00 +0000",
+  "updated": "2026-04-27 03:15:00 +0000",
   "brakeman_version": "8.0.4"
 }
