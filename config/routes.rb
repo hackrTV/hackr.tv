@@ -366,6 +366,12 @@ Rails.application.routes.draw do
       end
     end
 
+    # NPC Dialogue Tester (dev-only)
+    resource :grid_npc_dialogue_tester, only: %i[new create show], controller: "grid_npc_dialogue_tester" do
+      post :command
+      delete :finish
+    end
+
     # Grid achievements (runtime CRUD + manual award)
     resources :grid_achievements do
       member do
