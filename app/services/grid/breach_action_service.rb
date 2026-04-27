@@ -8,6 +8,7 @@ module Grid
     RerouteResult = Data.define(:target_position, :protocol_type_label)
     UseItemResult = Data.define(:item_name, :effect_output, :emergency_jackout)
     InterfaceResult = Data.define(:gate_id, :correct, :gate_state, :attempts_remaining, :all_solved, :feedback)
+    CircuitProbeResult = Data.define(:gate_id, :probe_pair, :connected, :probes_remaining, :feedback)
 
     class NotInBreach < StandardError; end
     class NoActionsRemaining < StandardError; end
@@ -21,6 +22,9 @@ module Grid
     class GateLocked < StandardError; end
     class GateAlreadySolved < StandardError; end
     class GateFailed < StandardError; end
+    class NoProbesRemaining < StandardError; end
+
+    WRONG_ANSWER_DETECTION_BUMP = 5
 
     def self.exec!(hackr:, program_name:, target_position:)
       new(hackr).exec!(program_name, target_position)
@@ -40,6 +44,10 @@ module Grid
 
     def self.interface!(hackr:, gate_id:, answer:)
       new(hackr).interface!(gate_id, answer)
+    end
+
+    def self.circuit_probe!(hackr:, gate_id:, probe_pair:)
+      new(hackr).circuit_probe!(gate_id, probe_pair)
     end
 
     include Grid::ItemEffectApplier
@@ -417,9 +425,14 @@ module Grid
         gate_state = gate["state"]
         attempts_remaining = gate["attempts_remaining"].to_i
 
+        # Wrong answers raise the alarm — detection bump per failed attempt
+        detection_bump = correct ? 0 : WRONG_ANSWER_DETECTION_BUMP
+        new_detection = [breach.detection_level + detection_bump, 100].min
+
         breach.update!(
           meta: breach.meta.merge("puzzle_state" => puzzle_state),
-          actions_remaining: breach.actions_remaining - 1
+          actions_remaining: breach.actions_remaining - 1,
+          detection_level: new_detection
         )
 
         all_solved = breach.all_circumvention_gates_solved?
@@ -439,6 +452,94 @@ module Grid
         attempts_remaining: attempts_remaining,
         all_solved: all_solved,
         feedback: feedback
+      )
+    end
+
+    # Test a single circuit connection without consuming an action.
+    # Costs 1 probe from the gate's budget. Re-probing a cached pair is free.
+    def circuit_probe!(gate_id, probe_pair)
+      gate_id = gate_id.to_s.upcase
+
+      breach = @hackr.active_breach
+      raise NotInBreach, "You are not in a BREACH encounter." unless breach
+
+      puzzle_state = breach.meta&.dig("puzzle_state")
+      raise GateNotFound, "No circumvention gates in this encounter." unless puzzle_state&.dig("gates")&.any?
+
+      gate = puzzle_state["gates"][gate_id]
+      raise GateNotFound, "No gate [#{gate_id}]." unless gate
+      validate_gate_state!(gate_id, gate)
+
+      raise InvalidTarget, "Probes are only available for circuit gates." unless gate["type"] == "circuit"
+
+      # Normalize pair: upcase, sort halves canonically
+      parts = probe_pair.to_s.strip.upcase.split("-")
+      raise InvalidTarget, "Invalid probe format. Use: interface #{gate_id} probe NODE1-NODE2" unless parts.size == 2
+
+      # Validate both nodes exist in the circuit
+      display = gate["display"] || {}
+      valid_nodes = ((display["left_nodes"] || []) + (display["right_nodes"] || [])).map(&:upcase)
+      parts.each do |node|
+        raise InvalidTarget, "Unknown node '#{node}'. Check the circuit layout with 'status'." unless valid_nodes.include?(node)
+      end
+
+      normalized = parts.sort.join("-")
+
+      # Return cached result for already-probed pairs (no budget cost)
+      probe_results = gate["probe_results"] || {}
+      if probe_results.key?(normalized)
+        prev = probe_results[normalized]
+        label = prev ? "CONNECTED \u2713" : "NO SIGNAL \u2717"
+        return CircuitProbeResult.new(
+          gate_id: gate_id, probe_pair: normalized, connected: prev,
+          probes_remaining: gate["probes_remaining"].to_i,
+          feedback: "Already probed: #{label}"
+        )
+      end
+
+      raise NoProbesRemaining, "No probes remaining for gate [#{gate_id}]. Submit your answer." if gate["probes_remaining"].to_i <= 0
+
+      connected = false
+
+      ActiveRecord::Base.transaction do
+        breach.lock!
+
+        # Re-read state after lock — another request may have probed the same pair
+        puzzle_state = breach.meta["puzzle_state"]
+        gate = puzzle_state["gates"][gate_id]
+
+        # Re-check cache and budget after lock
+        if gate["probe_results"]&.key?(normalized)
+          prev = gate["probe_results"][normalized]
+          label = prev ? "CONNECTED \u2713" : "NO SIGNAL \u2717"
+          return CircuitProbeResult.new(
+            gate_id: gate_id, probe_pair: normalized, connected: prev,
+            probes_remaining: gate["probes_remaining"].to_i,
+            feedback: "Already probed: #{label}"
+          )
+        end
+        raise NoProbesRemaining, "No probes remaining for gate [#{gate_id}]. Submit your answer." if gate["probes_remaining"].to_i <= 0
+
+        solution_pairs = gate["solution"].split
+        connected = solution_pairs.include?(normalized)
+
+        gate["probe_results"] ||= {}
+        gate["probe_results"][normalized] = connected
+        gate["probes_remaining"] = gate["probes_remaining"].to_i - 1
+
+        breach.update!(meta: breach.meta.merge("puzzle_state" => puzzle_state))
+
+        log_action!(breach, "probe", gate_id, nil, {
+          gate_id: gate_id, probe_pair: normalized,
+          connected: connected, probes_remaining: gate["probes_remaining"]
+        })
+      end
+
+      label = connected ? "CONNECTED \u2713 \u2014 signal path confirmed" : "NO SIGNAL \u2717 \u2014 path rejected"
+      CircuitProbeResult.new(
+        gate_id: gate_id, probe_pair: normalized, connected: connected,
+        probes_remaining: gate["probes_remaining"],
+        feedback: label
       )
     end
 

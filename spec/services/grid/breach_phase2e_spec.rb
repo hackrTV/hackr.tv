@@ -275,8 +275,9 @@ RSpec.describe "BREACH Phase 2E: Failure + Puzzles" do
     it "generates a credential puzzle" do
       result = described_class.generate({"type" => "credential", "difficulty" => 3}, rng)
       expect(result[:display_data]["type"]).to eq("credential")
-      expect(result[:display_data]["encrypted"]).to be_a(String)
-      expect(result[:display_data]["cipher_hint"]).to be_a(String)
+      expect(result[:display_data]["ciphers"]).to be_an(Array)
+      expect(result[:display_data]["ciphers"].size).to eq(3)
+      expect(result[:display_data]["substitution_hints"]).to be_an(Array)
       expect(result[:solution]).to be_a(String)
     end
 

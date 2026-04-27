@@ -1,0 +1,124 @@
+<%= render "admin/shared/combobox" %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/breach-sandbox :: BREACH SANDBOX</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
+        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
+        <span style="color: #ccc;"> — Dry-run BREACH encounter. Bypasses all gates. No consequences on end (vitals + DECK battery restored). Exploits/consumables used during breach are NOT reverted.</span>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= link_to "All Hackrs", admin_grid_hackrs_path, class: "tui-button", style: "padding: 6px 14px;" %>
+      </div>
+
+      <%# Hackr info %>
+      <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px; margin-bottom: 20px;">
+        <span style="color: #888;">Hackr:</span>
+        <span class="cyan-255-text" style="font-weight: bold;"><%= @hackr.hackr_alias %></span>
+        <span style="color: #888;"> (CL <%= @hackr.stat("clearance") %>)</span>
+        <% deck = @hackr.equipped_deck %>
+        <br>
+        <span style="color: #888;">DECK:</span>
+        <% if deck %>
+          <% if deck.deck_fried? %>
+            <span class="red-255-text"><%= deck.name %> [FRIED lvl <%= deck.deck_fried_level %>]</span>
+          <% else %>
+            <span class="green-255-text"><%= deck.name %></span>
+            <span style="color: #888;"> (battery: <%= deck.deck_battery %>/<%= deck.deck_battery_max %>, slots: <%= deck.deck_slots_used %>/<%= deck.deck_slot_count %>)</span>
+          <% end %>
+        <% else %>
+          <span class="red-255-text">None equipped</span>
+        <% end %>
+        <% if @hackr.in_breach? %>
+          <br>
+          <span class="red-255-text" style="font-weight: bold;">WARNING: Active BREACH in progress. Cannot start sandbox.</span>
+        <% end %>
+      </div>
+
+      <%# Template selector %>
+      <%= form_with url: admin_grid_breach_sandbox_index_path(hackr_id: @hackr.id), method: :post, local: true, id: "sandbox-form" do %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">BREACH TEMPLATE</label>
+
+          <input type="hidden" name="template_id" id="sandbox-template-id" value="">
+
+          <div class="admin-combobox">
+            <input type="text" id="sandbox-input" class="admin-combobox-input" autocomplete="off"
+              placeholder="Type to search... (name, tier, or slug)">
+            <div id="sandbox-dropdown" class="admin-combobox-dropdown"></div>
+          </div>
+
+          <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="sandbox-status">
+            <%= @templates.size %> templates — start typing to filter
+          </p>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <%= submit_tag "START SANDBOX", class: "tui-button yellow-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start sandbox BREACH on #{@hackr.hackr_alias}?" } %>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    function ready(fn) {
+      if (document.readyState !== 'loading') fn();
+      else document.addEventListener('DOMContentLoaded', fn);
+    }
+    ready(function() {
+      var tierColors = {
+        ambient: '#6b7280',
+        standard: '#34d399',
+        advanced: '#fbbf24',
+        elite: '#f87171',
+        world_event: '#a78bfa'
+      };
+      AdminCombobox.init({
+        inputId: 'sandbox-input',
+        hiddenId: 'sandbox-template-id',
+        dropdownId: 'sandbox-dropdown',
+        statusId: 'sandbox-status',
+        formId: 'sandbox-form',
+        items: <%= raw json_escape(@templates.map { |t|
+          {
+            id: t.id,
+            name: t.name,
+            slug: t.slug,
+            tier: t.tier,
+            min_cl: t.min_clearance,
+            published: t.published?,
+            protocols: t.protocols.sum { |p| (p["count"] || 1).to_i },
+            gates: t.puzzle_gate_definitions.size
+          }
+        }.to_json) %>,
+        getId: function(r) { return r.id; },
+        getSearchText: function(r) { return (r.name + ' ' + r.slug + ' ' + r.tier).toLowerCase(); },
+        getGroupKey: function(r) { return r.tier.toUpperCase(); },
+        renderOption: function(r, esc) {
+          var color = tierColors[r.tier] || '#9ca3af';
+          var pub = r.published ? '' : ' <span style="color: #f87171;">[DRAFT]</span>';
+          var info = 'CL' + r.min_cl + ' | ' + r.protocols + 'P';
+          if (r.gates > 0) info += ' ' + r.gates + 'G';
+          return '<span class="cb-name">' + esc(r.name) + '</span>' + pub +
+            ' <span class="cb-meta" style="color:' + color + ';">(' + info + ')</span>';
+        },
+        getLabel: function(r) { return r.tier.toUpperCase() + ' > ' + r.name + ' (CL' + r.min_cl + ')'; },
+        emptyText: 'No templates match',
+        selectedText: 'Selected — ready to start sandbox',
+        submitError: 'Select a breach template first'
+      });
+    });
+  })();
+</script>

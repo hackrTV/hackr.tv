@@ -63,6 +63,10 @@ class GridHackrBreach < ApplicationRecord
     state == "active"
   end
 
+  def sandbox?
+    meta&.dig("sandbox") == true
+  end
+
   def pnr_crossed?
     detection_level >= pnr_threshold
   end
