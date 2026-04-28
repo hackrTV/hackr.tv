@@ -330,6 +330,8 @@ Rails.application.routes.draw do
     resources :grid_mobs do
       member do
         get :history
+        post :add_listing
+        delete :remove_listing
       end
     end
     resources :grid_exits do

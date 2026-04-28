@@ -656,6 +656,14 @@ module Grid
       npc_name = npc_name.sub(/^to\s+/, "")
       return "<span style='color: #fbbf24;'>Talk to whom?</span>" if npc_name.empty?
 
+      # Check for reset aliases at the end: "talk to Codec again"
+      words = npc_name.split
+      reset = false
+      if words.length > 1 && DialogueNavigator.reset_alias?(words.last)
+        reset = true
+        npc_name = words[0..-2].join(" ")
+      end
+
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
@@ -663,18 +671,13 @@ module Grid
       return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
       return "<span style='color: #9ca3af;'>#{h(mob.name)} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
-      dialogue = mob.dialogue_tree
-      content = []
-      content << "<span style='color: #c084fc;'>#{h(mob.name)}</span>: <span style='color: #60a5fa;'>\"#{h(dialogue["greeting"])}\"</span>"
+      nav = DialogueNavigator.new(hackr: hackr, mob: mob)
+      nav.reset! if reset
 
-      if dialogue["topics"].present? && dialogue["topics"].any?
-        content << ""
-        content << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{dialogue["topics"].keys.map { |k| h(k) }.join(", ")}</span>"
-      end
+      output = render_dialogue_position(mob, nav)
 
       increment_stat!("npcs_talked")
 
-      output = dialogue_box(content.join("\n"))
       rep_notif = grant_faction_rep(mob.grid_faction, 1, reason: "talk:#{slugify(mob.name)}", source: mob)
       notifications = achievement_checker.check(:talk_npc, npc_name: mob.name)
       notifications.unshift(rep_notif) if rep_notif
@@ -692,7 +695,7 @@ module Grid
 
     def ask_command(args)
       # Parse "ask <npc> about <topic>"
-      return "<span style='color: #fbbf24;'>Ask whom about what? Usage: ask &lt;npc&gt; about &lt;topic&gt;</span>" if args.length < 3
+      return "<span style='color: #fbbf24;'>Ask whom about what? Usage: ask &lt;npc&gt; about &lt;topic&gt;</span>" if args.length < 2
 
       # Handle both "ask Synthia about mission" and "ask <npc> <topic>" formats
       about_index = args.index { |word| word.downcase == "about" }
@@ -714,26 +717,38 @@ module Grid
       return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
       return "<span style='color: #9ca3af;'>#{h(mob.name)} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
-      dialogue = mob.dialogue_tree
-      topics = dialogue["topics"] || {}
+      nav = DialogueNavigator.new(hackr: hackr, mob: mob)
+
+      # Back navigation — render position without stats/rep
+      if DialogueNavigator.back_alias?(topic)
+        if nav.at_root?
+          return dialogue_box("<span style='color: #9ca3af;'>You're already at the start of the conversation.</span>")
+        end
+        nav.go_back
+        return render_dialogue_position(mob, nav)
+      end
 
       # Mission intercepts — checked BEFORE topic dictionary lookup so a
       # quest_giver's topic list doesn't need to enumerate every mission
-      # slug or the literal "missions"/"work" keyword. A dialogue_tree
-      # topic with the same key still overrides if the author defined one.
+      # slug or the literal "missions"/"work" keyword.
       mission_topic = mission_topic_response(mob, topic, room)
       return dialogue_box(mission_topic) if mission_topic
 
-      # Try exact match first, then case-insensitive match
-      response = topics[topic] || topics[topic.downcase] || topics.find { |k, v| k.downcase == topic.downcase }&.last
+      # Navigate the dialogue tree at current depth
+      result = nav.navigate(topic)
 
-      if response
-        content = "<span style='color: #c084fc;'>#{h(mob.name)}</span>: <span style='color: #60a5fa;'>\"#{h(response)}\"</span>"
+      if result
+        content = []
+        content << "<span style='color: #c084fc;'>#{h(mob.name)}</span>: <span style='color: #60a5fa;'>\"#{h(result[:response])}\"</span>"
+
+        append_topic_list(content, result[:topics])
+        dialogue_box(content.join("\n"))
       else
-        available = topics.keys.map { |k| h(k) }.join(", ")
+        available_topics = nav.current_topics
+        available = available_topics.keys.map { |k| h(k) }.join(", ")
         content = "<span style='color: #c084fc;'>#{h(mob.name)}</span> doesn't know about '#{h(topic)}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
+        dialogue_box(content)
       end
-      dialogue_box(content)
     end
 
     # Returns HTML content (without dialogue_box wrapping) when `topic`
@@ -744,17 +759,30 @@ module Grid
       return missions_offered_by_response(mob, room) if %w[missions quests work assignments].include?(normalized)
 
       # Specific mission slug lookup. Case-insensitive. Match only missions
-      # this NPC actually gives.
+      # this NPC actually gives. Dialogue-path gate applies here too —
+      # guessing the slug shouldn't bypass the depth requirement.
       mission = GridMission.published.find_by(
         "LOWER(slug) = ? AND giver_mob_id = ?", normalized, mob.id
       )
-      return mission_brief_response(mob, mission, room) if mission
+      if mission
+        return nil if dialogue_path_blocked?(mission, mob)
+        return mission_brief_response(mob, mission, room)
+      end
 
       nil
     end
 
     def missions_offered_by_response(mob, room)
-      available = mission_service.available_missions(room).select { |m| m.giver_mob_id == mob.id }
+      current_path = hackr.dialogue_path_for(mob)
+      available = mission_service.available_missions(room).select do |m|
+        next false unless m.giver_mob_id == mob.id
+        # Filter by dialogue_path gate: mission only visible if hackr has
+        # navigated to (or past) the required dialogue depth.
+        required = m.dialogue_path
+        next true if required.blank?
+        required.is_a?(Array) && required.length <= current_path.length &&
+          current_path.first(required.length) == required
+      end
       if available.empty?
         return "<span style='color: #c084fc;'>#{h(mob.name)}</span>: " \
           "<span style='color: #60a5fa;'>\"Nothing for you right now.\"</span>"
@@ -1960,10 +1988,56 @@ module Grid
       output
     end
 
+    # Render the hackr's current position in a mob's dialogue tree.
+    # Used by talk_command and back navigation. No side effects.
+    def render_dialogue_position(mob, nav)
+      content = []
+
+      if nav.at_root?
+        content << "<span style='color: #c084fc;'>#{h(mob.name)}</span>: <span style='color: #60a5fa;'>\"#{h(nav.greeting)}\"</span>"
+      else
+        breadcrumb = nav.current_path.map { |k| h(k).to_s }.join(" > ")
+        content << "<span style='color: #9ca3af;'>[#{breadcrumb}]</span>"
+        content << ""
+        content << "<span style='color: #c084fc;'>#{h(mob.name)}</span> waits for your question."
+      end
+
+      append_topic_list(content, nav.current_topics)
+
+      unless nav.at_root?
+        content << "<span style='color: #6b7280;'>Use 'ask #{h(mob.name)} about back' to go up, or 'talk to #{h(mob.name)} again' to start over.</span>"
+      end
+
+      dialogue_box(content.join("\n"))
+    end
+
     def dialogue_box(content)
       # Create a thin-bordered box around dialogue content
       # Add blank line before box, strip content to avoid blank lines inside
       "\n<div style='border: 1px solid #666; padding: 10px; margin: 5px 0; background: #0d0d0d;'>#{content.strip}</div>"
+    end
+
+    # Check if a mission's dialogue_path gate blocks the current hackr.
+    def dialogue_path_blocked?(mission, mob)
+      required = mission.dialogue_path
+      return false if required.blank?
+      return false unless required.is_a?(Array)
+
+      current = hackr.dialogue_path_for(mob)
+      !(required.length <= current.length && current.first(required.length) == required)
+    end
+
+    def append_topic_list(content, topics)
+      return unless topics.any?
+      content << ""
+      labels = topics.map do |key, node|
+        if DialogueNavigator.has_children?(node)
+          "#{h(key)} <span style='color: #6b7280;'>[+]</span>"
+        else
+          h(key).to_s
+        end
+      end
+      content << "<span style='color: #9ca3af;'>You can ask about:</span> <span style='color: #fbbf24;'>#{labels.join(", ")}</span>"
     end
 
     # --- Shop commands ---
@@ -2822,6 +2896,15 @@ module Grid
 
     def accept_mission_command(slug)
       return "<span style='color: #fbbf24;'>Usage: accept &lt;slug&gt;</span>" if slug.blank?
+
+      # Dialogue-path gate — can't accept a mission you haven't discovered
+      mission = GridMission.published.find_by(slug: slug)
+      if mission&.giver_mob_id && mission.dialogue_path.present?
+        giver = mission.giver_mob
+        if giver && dialogue_path_blocked?(mission, giver)
+          return "<span style='color: #f87171;'>You haven't learned about that job yet.</span>"
+        end
+      end
 
       room = hackr.current_room
       mission_service.accept!(slug, room: room)

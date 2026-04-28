@@ -129,9 +129,12 @@ mobs:
     dialogue_tree:
       greeting: "Impound Services. Retrieve your items by presenting your case number and the applicable processing fee. GovCorp thanks you for your compliance."
       topics:
-        fee: "Processing fee is assessed per impound event. Fees are non-negotiable and non-refundable."
-        bribe: "I don't know what you're implying. But hypothetically, a significant CRED transfer could reduce wait times considerably. Hypothetically."
-        release: "Once fees are paid, items are released. Leave promptly."
+        fee:
+          response: "Processing fee is assessed per impound event. Fees are non-negotiable and non-refundable."
+        bribe:
+          response: "I don't know what you're implying. But hypothetically, a significant CRED transfer could reduce wait times considerably. Hypothetically."
+        release:
+          response: "Once fees are paid, items are released. Leave promptly."
 
   - suffix: administrative-wing
     name: "Agent Harwick"
@@ -141,9 +144,12 @@ mobs:
     dialogue_tree:
       greeting: "Compliance Resolution Services. I handle matters that require discretion. Sit down."
       topics:
-        options: "You have options. One involves paperwork, hearings, and a formal processing timeline. The other involves a direct resolution fee and you leaving in the next fifteen minutes. I recommend the second option."
-        fee: "Resolution fees are indexed to your CLEARANCE level and the nature of the infraction. I'll give you a number."
-        deal: "Payment handled through an anonymous intermediary. Once it clears, your record is flagged as 'administratively resolved.' You are free to go."
+        options:
+          response: "You have options. One involves paperwork, hearings, and a formal processing timeline. The other involves a direct resolution fee and you leaving in the next fifteen minutes. I recommend the second option."
+        fee:
+          response: "Resolution fees are indexed to your CLEARANCE level and the nature of the infraction. I'll give you a number."
+        deal:
+          response: "Payment handled through an anonymous intermediary. Once it clears, your record is flagged as 'administratively resolved.' You are free to go."
 
   - suffix: security-checkpoint
     name: "RAINN Guard — Post 7"
@@ -153,8 +159,10 @@ mobs:
     dialogue_tree:
       greeting: "Halt. Present credentials."
       topics:
-        credentials: "Credential verification is mandatory. Unauthorized passage triggers automatic lockdown."
-        facility: "This facility operates under GovCorp Directive 44-C. Queries are not encouraged."
+        credentials:
+          response: "Credential verification is mandatory. Unauthorized passage triggers automatic lockdown."
+        facility:
+          response: "This facility operates under GovCorp Directive 44-C. Queries are not encouraged."
 
 # Breach encounter placements (reference shared templates by slug)
 encounters:

@@ -17,6 +17,8 @@
 class GridMob < ApplicationRecord
   has_paper_trail
 
+  MAX_DIALOGUE_DEPTH = 100
+
   belongs_to :grid_room
   belongs_to :grid_faction, optional: true
   has_many :grid_shop_listings, dependent: :destroy
@@ -28,6 +30,10 @@ class GridMob < ApplicationRecord
   validates :name, presence: true
   validates :mob_type, inclusion: {in: %w[quest_giver vendor lore special], allow_nil: true}
   validate :faction_not_aggregate
+  validate :dialogue_tree_depth_within_limit
+  validate :dialogue_tree_keys_unique
+
+  before_validation :normalize_dialogue_tree
 
   def vendor?
     mob_type == "vendor"
@@ -54,6 +60,92 @@ class GridMob < ApplicationRecord
   end
 
   private
+
+  # Upgrade flat dialogue format (topic: "string") to nested format
+  # (topic: { response: "string" }) so all downstream code can assume
+  # the canonical shape.
+  def normalize_dialogue_tree
+    return if dialogue_tree.blank?
+    tree = dialogue_tree
+    return unless tree.is_a?(Hash) && tree["topics"].is_a?(Hash)
+
+    tree["topics"] = normalize_topics_recursive(tree["topics"])
+    self.dialogue_tree = tree
+  rescue JSON::NestingError
+    errors.add(:dialogue_tree, "is too deeply nested")
+  end
+
+  def normalize_topics_recursive(topics)
+    return {} unless topics.is_a?(Hash)
+
+    topics.transform_values do |value|
+      case value
+      when String
+        {"response" => value}
+      when Hash
+        if value["topics"].is_a?(Hash)
+          value.merge("topics" => normalize_topics_recursive(value["topics"]))
+        else
+          value
+        end
+      else
+        {"response" => value.to_s}
+      end
+    end
+  end
+
+  def dialogue_tree_depth_within_limit
+    return if errors[:dialogue_tree].any? # normalizer already caught nesting error
+    return if dialogue_tree.blank?
+    return unless dialogue_tree.is_a?(Hash) && dialogue_tree["topics"].is_a?(Hash)
+
+    depth = measure_topic_depth(dialogue_tree["topics"])
+    if depth > MAX_DIALOGUE_DEPTH
+      errors.add(:dialogue_tree, "exceeds maximum depth of #{MAX_DIALOGUE_DEPTH} levels")
+    end
+  rescue JSON::NestingError
+    errors.add(:dialogue_tree, "is too deeply nested") unless errors[:dialogue_tree].any?
+  end
+
+  def measure_topic_depth(topics, current = 1)
+    return current unless topics.is_a?(Hash)
+
+    max = current
+    topics.each_value do |value|
+      next unless value.is_a?(Hash) && value["topics"].is_a?(Hash)
+      sub_depth = measure_topic_depth(value["topics"], current + 1)
+      max = sub_depth if sub_depth > max
+    end
+    max
+  end
+
+  def dialogue_tree_keys_unique
+    return if errors[:dialogue_tree].any?
+    return if dialogue_tree.blank?
+    return unless dialogue_tree.is_a?(Hash) && dialogue_tree["topics"].is_a?(Hash)
+
+    seen = {}
+    collect_topic_keys(dialogue_tree["topics"], [], seen)
+    dupes = seen.select { |_key, paths| paths.length > 1 }
+    dupes.each do |key, paths|
+      locations = paths.map { |p| p.empty? ? "root" : p.join(" > ") }
+      errors.add(:dialogue_tree, "has duplicate topic key '#{key}' at: #{locations.join(", ")}")
+    end
+  end
+
+  def collect_topic_keys(topics, path, seen)
+    return unless topics.is_a?(Hash)
+
+    topics.each_key do |key|
+      normalized = key.downcase
+      seen[normalized] ||= []
+      seen[normalized] << path.dup
+      sub = topics[key]
+      if sub.is_a?(Hash) && sub["topics"].is_a?(Hash)
+        collect_topic_keys(sub["topics"], path + [key], seen)
+      end
+    end
+  end
 
   # NPC/vendor rep hooks call ReputationService#adjust! on the mob's faction;
   # aggregate factions refuse direct writes. Block the misconfiguration at

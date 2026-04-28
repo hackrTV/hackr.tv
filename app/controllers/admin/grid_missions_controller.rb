@@ -79,12 +79,24 @@ class Admin::GridMissionsController < Admin::ApplicationController
   end
 
   def mission_params
-    params.require(:grid_mission).permit(
+    permitted = params.require(:grid_mission).permit(
       :slug, :name, :description, :giver_mob_id, :grid_mission_arc_id,
       :prereq_mission_id, :min_clearance, :min_rep_faction_id, :min_rep_value,
       :repeatable, :position, :published,
       grid_mission_objectives_attributes: %i[id position objective_type label target_slug target_count _destroy],
       grid_mission_rewards_attributes: %i[id position reward_type amount target_slug quantity _destroy]
     )
+    # Parse dialogue_path JSON (array of topic keys, or blank for no gate)
+    raw_dp = params[:grid_mission][:dialogue_path_json]
+    permitted[:dialogue_path] = if raw_dp.blank?
+      nil
+    else
+      parsed = JSON.parse(raw_dp)
+      parsed.is_a?(Array) ? parsed : nil
+    end
+    permitted
+  rescue JSON::ParserError
+    permitted[:dialogue_path] = nil
+    permitted
   end
 end

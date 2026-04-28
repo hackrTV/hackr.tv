@@ -5,6 +5,7 @@
 #
 #  id                  :integer          not null, primary key
 #  description         :text
+#  dialogue_path       :json
 #  min_clearance       :integer          default(0), not null
 #  min_rep_value       :integer          default(0), not null
 #  name                :string           not null
