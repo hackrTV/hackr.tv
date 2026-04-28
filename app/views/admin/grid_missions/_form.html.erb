@@ -78,6 +78,15 @@
     </div>
   </div>
 
+  <div style="margin-bottom: 15px;">
+    <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">DIALOGUE PATH GATE</label>
+    <%= text_area_tag "grid_mission[dialogue_path_json]",
+          @mission.dialogue_path.present? ? JSON.generate(@mission.dialogue_path) : "",
+          class: "tui-input", style: "width: 100%; padding: 8px; font-family: monospace; height: 40px;",
+          placeholder: '["topic", "subtopic"] — blank for no gate' %>
+    <small style="color: #888;">JSON array of topic keys. Mission only visible when hackr has navigated to this dialogue depth with the giver NPC.</small>
+  </div>
+
   <h3 class="cyan-255-text" style="margin: 25px 0 10px;">[:: OBJECTIVES ::]</h3>
   <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
     Objective types: <code><%= GridMission::OBJECTIVE_TYPES.join(", ") %></code>.

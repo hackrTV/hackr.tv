@@ -46,6 +46,32 @@ module GridHackr::Stats
     self.stats = new_stats
   end
 
+  # --- Dialogue context (branching tree navigation) ---
+
+  # Returns the current dialogue path for a mob (array of topic keys).
+  def dialogue_path_for(mob)
+    ctx = stat("dialogue_context")
+    return [] unless ctx.is_a?(Hash)
+    path = ctx[mob.id.to_s]
+    path.is_a?(Array) ? path : []
+  end
+
+  # Set the current dialogue path for a mob.
+  def set_dialogue_path(mob, path)
+    ctx = stat("dialogue_context")
+    ctx = {} unless ctx.is_a?(Hash)
+    ctx[mob.id.to_s] = path
+    set_stat!("dialogue_context", ctx)
+  end
+
+  # Clear dialogue context for a specific mob.
+  def clear_dialogue_path(mob)
+    ctx = stat("dialogue_context")
+    return unless ctx.is_a?(Hash)
+    ctx.delete(mob.id.to_s)
+    set_stat!("dialogue_context", ctx)
+  end
+
   # Effective inventory capacity: base slots + bonus from equipment
   def inventory_capacity
     INVENTORY_BASE_SLOTS + stat("bonus_inventory_slots").to_i

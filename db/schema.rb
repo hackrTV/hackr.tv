@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_24_211652) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_27_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -538,6 +538,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_211652) do
   create_table "grid_missions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
+    t.json "dialogue_path"
     t.integer "giver_mob_id"
     t.integer "grid_mission_arc_id"
     t.integer "min_clearance", default: 0, null: false
