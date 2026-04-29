@@ -36,6 +36,7 @@ module Grid
     STRIDE_X = 200    # horizontal center-to-center distance
     STRIDE_Y = 100    # vertical center-to-center distance
     PADDING = 40      # canvas edge padding
+    MIN_SVG_W = 1000  # minimum viewBox width to prevent oversized rooms
 
     ZONE_COLORS = %w[
       #00ffff #34d399 #f472b6 #fbbf24 #a78bfa
@@ -260,7 +261,7 @@ module Grid
 
       max_lx = positions.values.map(&:first).max
       max_ly = positions.values.map(&:last).max
-      svg_w = (max_lx + 1) * STRIDE_X + PADDING * 2
+      svg_w = [(max_lx + 1) * STRIDE_X + PADDING * 2, MIN_SVG_W].max
       svg_h = (max_ly + 1) * STRIDE_Y + PADDING * 2
 
       lines = []
@@ -346,7 +347,6 @@ module Grid
       x2 = to_lx * STRIDE_X + PADDING
       y2 = to_ly * STRIDE_Y + PADDING
 
-      # Shorten line to stop at box edges
       dx = x2 - x1
       dy = y2 - y1
       dist = Math.sqrt(dx * dx + dy * dy)
@@ -354,14 +354,27 @@ module Grid
 
       ux = dx / dist
       uy = dy / dist
-      inset = (dx.abs > dy.abs) ? BOX_W / 2.0 : BOX_H / 2.0
 
-      sx = x1 + ux * inset
-      sy = y1 + uy * inset
-      ex = x2 - ux * inset
-      ey = y2 - uy * inset
+      # Proper box-edge intersection: find where the direction ray exits the box
+      inset1 = box_edge_inset(ux, uy)
+      inset2 = box_edge_inset(-ux, -uy)
+
+      sx = x1 + ux * inset1
+      sy = y1 + uy * inset1
+      ex = x2 - ux * inset2
+      ey = y2 - uy * inset2
 
       %(<line x1="#{sx.round}" y1="#{sy.round}" x2="#{ex.round}" y2="#{ey.round}" stroke="#333" class="connector"/>)
+    end
+
+    # Distance from box center to its edge along direction (ux, uy).
+    # Handles all angles correctly, including diagonals.
+    def box_edge_inset(ux, uy)
+      hw = BOX_W / 2.0
+      hh = BOX_H / 2.0
+      return hh if ux.abs < 0.001
+      return hw if uy.abs < 0.001
+      [hw / ux.abs, hh / uy.abs].min
     end
 
     def h(text)

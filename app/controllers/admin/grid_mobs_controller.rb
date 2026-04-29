@@ -34,7 +34,7 @@ class Admin::GridMobsController < Admin::ApplicationController
   def update
     if @mob.update(mob_params)
       set_flash_success("Mob '#{@mob.name}' updated.")
-      redirect_to admin_grid_mobs_path
+      redirect_to edit_admin_grid_mob_path(@mob)
     else
       load_selects
       load_listings if @mob.vendor?

@@ -6,6 +6,7 @@
       <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
         <%= link_to "<- #{@region.name}", admin_grid_world_map_path(@region), class: "tui-button", style: "padding: 6px 14px;" %>
         <%= link_to "Edit Zone", edit_admin_grid_zone_path(@zone), class: "tui-button cyan-168", style: "padding: 6px 14px;" %>
+        <%= link_to "Open Map Editor", admin_grid_map_editor_show_path(@zone.id), class: "tui-button green-168", style: "padding: 6px 14px;" %>
       </div>
 
       <div style="margin-bottom: 20px;">

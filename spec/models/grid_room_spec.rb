@@ -6,6 +6,9 @@
 #  id                  :integer          not null, primary key
 #  description         :text
 #  locked              :boolean          default(FALSE), not null
+#  map_x               :integer
+#  map_y               :integer
+#  map_z               :integer          default(0), not null
 #  min_clearance       :integer          default(0), not null
 #  name                :string
 #  room_type           :string

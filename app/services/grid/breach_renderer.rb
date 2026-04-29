@@ -62,7 +62,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
-      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  B R E A C H   C O M P L E T E                              \u2551</span>"
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  B R E A C H   C O M P L E T E                               \u2551</span>"
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
       lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #d0d0d0;'>#{h(template_name)}</span>"
       lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>+#{xp_awarded}</span>" if xp_awarded > 0
@@ -208,7 +208,7 @@ module Grid
         analyze = p.analyze_level
 
         if p.destroyed?
-          lines << "  <span style='color: #6b7280;'>[#{p.position + 1}] \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \u2713 CLEARED</span>"
+          lines << "#{border}  <span style='color: #6b7280;'>[#{p.position + 1}] \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \u2713 CLEARED</span>"
           next
         end
 
@@ -239,7 +239,7 @@ module Grid
           ""
         end
 
-        lines << "  <span style='color: #9ca3af;'>[#{p.position + 1}]</span> #{health_bar}  #{type_hint}  <span style='color: #9ca3af;'>#{state_label}#{state_info}</span>  <span style='color: #6b7280;'>weak:</span> #{weakness_hint}"
+        lines << "#{border}  <span style='color: #9ca3af;'>[#{p.position + 1}]</span> #{health_bar}  #{type_hint}  <span style='color: #9ca3af;'>#{state_label}#{state_info}</span>  <span style='color: #6b7280;'>weak:</span> #{weakness_hint}"
       end
       lines << "<span style='color: #{BORDER_COLOR};'>\u2560#{SEPARATOR}\u2563</span>"
       lines.join("\n")
@@ -288,7 +288,7 @@ module Grid
       rank_label = rank_data ? rank_data[:rank] : "Unknown"
       [
         "#{border}  <span style='color: #9ca3af;'>Round #{@breach.round_number}</span>  <span style='color: #6b7280;'>\u2014</span>  <span style='color: #9ca3af;'>#{@breach.actions_remaining} actions remaining</span>",
-        "#{border}  <span style='color: #fbbf24;'>BREACH RANK:</span> <span style='color: #22d3ee;'>#{h(rank_label)}</span>",
+        "#{border}  <span style='color: #fbbf24;'>YOUR BREACH RANK:</span> <span style='color: #22d3ee;'>#{h(rank_label)}</span>",
         "<span style='color: #{BORDER_COLOR};'>\u255a#{SEPARATOR}\u255d</span>"
       ].join("\n")
     end

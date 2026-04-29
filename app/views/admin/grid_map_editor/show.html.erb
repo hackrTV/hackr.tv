@@ -1,0 +1,1611 @@
+<% content_for(:title) { "/root :: Map Editor :: #{@zone.name}" } %>
+<%= render "admin/shared/combobox" %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 100%; margin: 10px; padding: 10px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/map-editor/<%= @zone.slug %></legend>
+
+    <div style="padding: 10px;">
+      <%# Toolbar %>
+      <div id="me-toolbar" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center;">
+        <%= link_to "<- World Map", admin_grid_world_map_index_path, class: "tui-button", style: "padding: 4px 12px; font-size: 0.85em;" %>
+
+        <label style="color: #888; font-size: 0.85em;">Zone:</label>
+        <div style="min-width: 280px; max-width: 350px; position: relative;" class="admin-combobox">
+          <input type="text" id="me-zone-input" class="admin-combobox-input selected" style="padding: 4px 8px; font-size: 0.85em;" autocomplete="off" placeholder="Search zones..." value="<%= @zone.grid_region.name %> / <%= @zone.name %>" />
+          <input type="hidden" id="me-zone-hidden" value="<%= @zone.id %>" />
+          <div id="me-zone-dropdown" class="admin-combobox-dropdown"></div>
+          <div id="me-zone-status" style="display: none;"></div>
+        </div>
+
+        <button id="me-auto-layout" class="tui-button cyan-168" style="padding: 4px 12px; font-size: 0.85em;">Auto Layout</button>
+        <button id="me-zoom-in" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">+</button>
+        <button id="me-zoom-out" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">-</button>
+        <button id="me-zoom-reset" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">1:1</button>
+        <span style="color: #333; margin: 0 4px;">|</span>
+        <span id="me-z-buttons" style="display: inline-flex; gap: 4px; align-items: center;"></span>
+        <span id="me-status" style="color: #666; font-size: 0.85em; margin-left: auto;"></span>
+      </div>
+
+      <%# Main layout: map + side panel %>
+      <div style="display: flex; gap: 0; border: 1px solid #333; background: #0d0d0d;">
+        <%# SVG Canvas %>
+        <div id="me-canvas-wrap" style="flex: 1; overflow: auto; position: relative; min-height: 600px; cursor: crosshair;">
+          <svg id="me-svg" xmlns="http://www.w3.org/2000/svg" style="display: block;"></svg>
+        </div>
+
+        <%# Side Panel %>
+        <div id="me-panel" style="width: 340px; min-width: 340px; background: #111; border-left: 2px solid #333; overflow-y: auto; max-height: 80vh; display: none;">
+          <div id="me-panel-content" style="padding: 15px;"></div>
+        </div>
+      </div>
+
+      <%# Legend %>
+      <div style="margin-top: 8px; padding: 8px; border: 1px solid #222; background: #0a0a0a;">
+        <span style="color: #666; font-size: 0.85em;">
+          Click room to edit ·
+          Double-click empty space to create room ·
+          Drag room to move ·
+          Drag from <span style="color: #00ffff;">port dot</span> to draw exit ·
+          Click connector to edit/delete ·
+          <span style="color: #555; opacity: 0.6;">Ghost</span>=cross-zone room ·
+          Esc to deselect
+        </span>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+<%# Exit creation dialog %>
+<div id="me-exit-dialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 2px solid #00ffff; padding: 20px; z-index: 10001; min-width: 320px;">
+  <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: CREATE EXIT ::]</h3>
+  <div style="margin-bottom: 10px;">
+    <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">FROM:</label>
+    <span id="me-exit-from" style="color: #888;"></span>
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">TO:</label>
+    <span id="me-exit-to" style="color: #888;"></span>
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">DIRECTION:</label>
+    <input id="me-exit-direction" class="tui-input" style="width: 100%; padding: 6px;" />
+  </div>
+  <div style="margin-bottom: 15px;">
+    <label class="white-text" style="font-size: 0.85em;">
+      <input type="checkbox" id="me-exit-bidi" checked /> Bidirectional
+    </label>
+    <span id="me-exit-reverse-dir-wrap" style="margin-left: 10px;">
+      <label style="color: #888; font-size: 0.85em;">Reverse:</label>
+      <input id="me-exit-reverse-dir" class="tui-input" style="width: 100px; padding: 4px; font-size: 0.85em;" />
+    </span>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <button id="me-exit-confirm" class="tui-button green-168" style="padding: 6px 16px;">Create</button>
+    <button id="me-exit-cancel" class="tui-button" style="padding: 6px 16px;">Cancel</button>
+  </div>
+</div>
+
+<%# Room creation dialog %>
+<div id="me-room-dialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 2px solid #34d399; padding: 20px; z-index: 10001; min-width: 340px;">
+  <h3 class="green-255-text" style="margin-bottom: 15px;">[:: CREATE ROOM ::]</h3>
+  <div style="margin-bottom: 10px;">
+    <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">NAME:</label>
+    <input id="me-room-name" class="tui-input" style="width: 100%; padding: 6px;" />
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">SLUG:</label>
+    <input id="me-room-slug" class="tui-input" style="width: 100%; padding: 6px;" />
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">TYPE:</label>
+    <select id="me-room-type" class="tui-input" style="width: 100%; padding: 6px;">
+      <option value="">(none)</option>
+      <option value="hub">Hub</option>
+      <option value="faction_base">Faction Base</option>
+      <option value="govcorp">GovCorp</option>
+      <option value="special">Special</option>
+      <option value="safe_zone">Safe Zone</option>
+      <option value="transit">Transit</option>
+      <option value="shop">Shop</option>
+      <option value="danger_zone">Danger Zone</option>
+      <option value="prism">Prism</option>
+      <option value="dream">Dream</option>
+      <option value="hospital">Hospital</option>
+      <option value="firmware_vendor">Firmware Vendor</option>
+      <option value="repair_service">Repair Service</option>
+      <option value="containment">Containment</option>
+      <option value="impound">Impound</option>
+      <option value="sally_port_anteroom">Sally Port Anteroom</option>
+      <option value="sally_port">Sally Port</option>
+    </select>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <button id="me-room-confirm" class="tui-button green-168" style="padding: 6px 16px;">Create</button>
+    <button id="me-room-cancel" class="tui-button" style="padding: 6px 16px;">Cancel</button>
+  </div>
+</div>
+
+<%# Overlay backdrop %>
+<div id="me-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10000;"></div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+(function() {
+  // ── Constants ──────────────────────────────────────────────
+  var BOX_W = 140, BOX_H = 52;
+  var STRIDE_X = 200, STRIDE_Y = 100;
+  var PADDING = 60;
+  var PORT_R = 5;
+  var MIN_VIEWBOX_W = 1000;
+  var GHOST_OPACITY = 0.35;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  var DIRECTION_VECTORS = {
+    north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0],
+    northeast: [1, -1], northwest: [-1, -1], southeast: [1, 1], southwest: [-1, 1]
+  };
+  var OPPOSITES = {
+    north: 'south', south: 'north', east: 'west', west: 'east',
+    northeast: 'southwest', southwest: 'northeast',
+    northwest: 'southeast', southeast: 'northwest',
+    up: 'down', down: 'up'
+  };
+  var PORT_POSITIONS = [
+    {dir: 'north', dx: 0, dy: -BOX_H/2},
+    {dir: 'south', dx: 0, dy: BOX_H/2},
+    {dir: 'east', dx: BOX_W/2, dy: 0},
+    {dir: 'west', dx: -BOX_W/2, dy: 0},
+    {dir: 'northeast', dx: BOX_W/2, dy: -BOX_H/2},
+    {dir: 'northwest', dx: -BOX_W/2, dy: -BOX_H/2},
+    {dir: 'southeast', dx: BOX_W/2, dy: BOX_H/2},
+    {dir: 'southwest', dx: -BOX_W/2, dy: BOX_H/2}
+  ];
+  var ROOM_TYPE_COLORS = {
+    hub: '#fbbf24', faction_base: '#a78bfa', govcorp: '#f87171',
+    special: '#e879f9', safe_zone: '#34d399', transit: '#60a5fa',
+    shop: '#fb923c', danger_zone: '#f87171', hospital: '#86efac',
+    containment: '#f87171', impound: '#f87171'
+  };
+
+  // ── State ──────────────────────────────────────────────────
+  var zoneId = <%= @zone.id %>;
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  var state = {rooms: [], exits: [], ghostRooms: [], breachTemplates: [], allRoomsGrouped: [], zone: null, zoneColor: '#00ffff'};
+  var selectedRoomId = null;
+  var _panelZoneUid = null;
+  var zoomLevel = 0.75;
+  var currentZ = 0;
+  var dragState = null; // {type: 'room'|'port', roomId, startX, startY, origX, origY}
+  var drawLine = null;
+
+  // ── DOM refs ───────────────────────────────────────────────
+  var svg = document.getElementById('me-svg');
+  var canvasWrap = document.getElementById('me-canvas-wrap');
+  var panel = document.getElementById('me-panel');
+  var panelContent = document.getElementById('me-panel-content');
+  var statusEl = document.getElementById('me-status');
+  var zoneHidden = document.getElementById('me-zone-hidden');
+  var overlay = document.getElementById('me-overlay');
+
+  // ── API helpers ────────────────────────────────────────────
+  function api(method, path, body) {
+    var opts = {method: method, headers: {'X-CSRF-Token': csrfToken, 'Content-Type': 'application/json', 'Accept': 'application/json'}};
+    if (body) opts.body = JSON.stringify(body);
+    return fetch('/root/grid_map_editor/' + path, opts).then(function(r) {
+      if (!r.ok && r.headers.get('content-type')?.indexOf('json') === -1) {
+        throw new Error('HTTP ' + r.status);
+      }
+      return r.json();
+    }).catch(function(err) {
+      setStatus('Error: ' + err.message);
+      return {success: false, errors: [err.message]};
+    });
+  }
+
+  function setStatus(msg) { statusEl.textContent = msg; }
+
+  // ── Data loading ───────────────────────────────────────────
+  function loadData() {
+    setStatus('Loading...');
+    api('GET', zoneId + '/data?z=' + currentZ).then(function(d) {
+      state = d;
+      currentZ = d.z_level || 0;
+      populateZoneSelect();
+      syncZoneCombobox();
+      renderZButtons();
+      render();
+      // Re-open panel if a room was selected and still exists
+      if (selectedRoomId !== null) {
+        var still = state.rooms.find(function(r) { return r.id === selectedRoomId; });
+        if (still) showPanel(selectedRoomId);
+        else { selectedRoomId = null; closePanel(); }
+      }
+      var zLabel = currentZ === 0 ? 'z=0' : (currentZ > 0 ? 'z+' + currentZ : 'z' + currentZ);
+      setStatus(state.rooms.length + ' rooms · ' + state.exits.length + ' exits · ' + zLabel);
+    });
+  }
+
+  var _zoneComboboxInited = false;
+  function populateZoneSelect() {
+    if (_zoneComboboxInited) return; // only init once; items don't change
+    _zoneComboboxInited = true;
+    var zones = state.available_zones || [];
+    AdminCombobox.init({
+      inputId: 'me-zone-input',
+      hiddenId: 'me-zone-hidden',
+      dropdownId: 'me-zone-dropdown',
+      statusId: 'me-zone-status',
+      items: zones,
+      getSearchText: function(z) { return (z.name + ' ' + z.region_name).toLowerCase(); },
+      getGroupKey: function(z) { return z.region_name; },
+      renderOption: function(z, e) {
+        return '<span class="cb-name">' + e(z.name) + '</span> <span class="cb-meta">' + e(z.region_name) + '</span>';
+      },
+      getId: function(z) { return String(z.id); },
+      getLabel: function(z) { return z.region_name + ' / ' + z.name; },
+      emptyText: 'No zones match',
+      selectedText: 'Zone selected'
+    });
+  }
+
+  function syncZoneCombobox() {
+    var input = document.getElementById('me-zone-input');
+    var hidden = document.getElementById('me-zone-hidden');
+    var cur = (state.available_zones || []).find(function(z) { return z.id === zoneId; });
+    if (cur) {
+      input.value = cur.region_name + ' / ' + cur.name;
+      input.classList.add('selected');
+    }
+    // Set via property directly to avoid triggering the navigation hook
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(hidden, String(zoneId));
+  }
+
+  function renderZButtons() {
+    var wrap = document.getElementById('me-z-buttons');
+    wrap.innerHTML = '';
+    var levels = state.z_levels || [0];
+    if (levels.length <= 1) return;
+    levels.forEach(function(z) {
+      var btn = document.createElement('button');
+      btn.className = 'tui-button' + (z === currentZ ? ' green-168' : '');
+      btn.style.cssText = 'padding: 2px 8px; font-size: 0.8em;' + (z === currentZ ? ' cursor: default;' : '');
+      btn.textContent = z === 0 ? 'z=0' : (z > 0 ? '↑+' + z : '↓' + z);
+      if (z !== currentZ) {
+        btn.addEventListener('click', function() {
+          currentZ = z;
+          selectedRoomId = null;
+          closePanel();
+          loadData();
+        });
+      }
+      wrap.appendChild(btn);
+    });
+  }
+
+  // Intercept zone combobox selection by hooking the hidden input's value setter
+  (function() {
+    var desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    Object.defineProperty(zoneHidden, 'value', {
+      set: function(v) {
+        desc.set.call(this, v);
+        var newId = parseInt(v);
+        if (newId && newId !== zoneId) {
+          zoneId = newId;
+          currentZ = 0;
+          selectedRoomId = null;
+          closePanel();
+          window.history.replaceState(null, '', '/root/grid_map_editor/' + zoneId);
+          loadData();
+        }
+      },
+      get: desc.get
+    });
+  })();
+
+  // ── SVG Rendering ──────────────────────────────────────────
+  function render() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    var allPositions = [];
+    state.rooms.forEach(function(r) { allPositions.push([r.map_x, r.map_y]); });
+
+    // Compute ghost room positions from connection directions
+    var ghostPositions = {};
+    state.ghost_rooms.forEach(function(gr) {
+      if (gr.connected_via.length === 0) return;
+      var conn = gr.connected_via[0];
+      var localRoom = state.rooms.find(function(r) { return r.id === conn.local_room_id; });
+      if (!localRoom) return;
+      var vec = DIRECTION_VECTORS[conn.direction];
+      var gx, gy;
+      if (vec) {
+        gx = localRoom.map_x + vec[0];
+        gy = localRoom.map_y + vec[1];
+      } else if (conn.direction === 'up') {
+        gx = localRoom.map_x;
+        gy = localRoom.map_y - 1;
+      } else if (conn.direction === 'down') {
+        gx = localRoom.map_x;
+        gy = localRoom.map_y + 1;
+      } else {
+        gx = localRoom.map_x + 1;
+        gy = localRoom.map_y;
+      }
+      // Nudge if position already occupied
+      for (var tries = 0; tries < 5; tries++) {
+        var collides = allPositions.some(function(p) { return p[0] === gx && p[1] === gy; });
+        if (!collides) break;
+        gy += (conn.direction === 'up' ? -1 : 1);
+      }
+      ghostPositions[gr.id] = [gx, gy];
+      allPositions.push(ghostPositions[gr.id]);
+    });
+
+    if (allPositions.length === 0) allPositions.push([0, 0]);
+
+    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    allPositions.forEach(function(p) {
+      if (p[0] < minX) minX = p[0];
+      if (p[1] < minY) minY = p[1];
+      if (p[0] > maxX) maxX = p[0];
+      if (p[1] > maxY) maxY = p[1];
+    });
+
+    // Add margin for ghost rooms and new room creation
+    minX -= 2; minY -= 2; maxX += 2; maxY += 2;
+
+    var vbW = (maxX - minX + 1) * STRIDE_X + PADDING * 2;
+    var vbH = (maxY - minY + 1) * STRIDE_Y + PADDING * 2;
+    if (vbW < MIN_VIEWBOX_W) vbW = MIN_VIEWBOX_W;
+    var vbX = minX * STRIDE_X - PADDING;
+    var vbY = minY * STRIDE_Y - PADDING;
+
+    svg.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
+    svg.setAttribute('width', Math.round(vbW * zoomLevel));
+    svg.setAttribute('height', Math.round(vbH * zoomLevel));
+
+    // Background
+    var bg = el('rect', {x: vbX, y: vbY, width: vbW, height: vbH, fill: '#0d0d0d'});
+    svg.appendChild(bg);
+
+    // Grid dots
+    for (var gx = minX; gx <= maxX; gx++) {
+      for (var gy = minY; gy <= maxY; gy++) {
+        var dot = el('circle', {cx: gx * STRIDE_X, cy: gy * STRIDE_Y, r: 1.5, fill: '#1a1a1a'});
+        svg.appendChild(dot);
+      }
+    }
+
+    // Build room lookup
+    var roomById = {};
+    state.rooms.forEach(function(r) { roomById[r.id] = r; });
+
+    // Draw connectors
+    var drawnEdges = {};
+    state.exits.forEach(function(ex) {
+      var fromRoom = roomById[ex.from_room_id];
+      var toRoom = roomById[ex.to_room_id];
+      if (!fromRoom || !toRoom) return;
+      var key = [Math.min(ex.from_room_id, ex.to_room_id), Math.max(ex.from_room_id, ex.to_room_id)].join('-');
+      if (drawnEdges[key]) return;
+      drawnEdges[key] = true;
+      drawConnector(fromRoom.map_x, fromRoom.map_y, toRoom.map_x, toRoom.map_y, ex, false);
+    });
+
+    // Draw ghost-to-local connectors
+    state.ghost_rooms.forEach(function(gr) {
+      var gp = ghostPositions[gr.id];
+      if (!gp) return;
+      gr.connected_via.forEach(function(conn) {
+        var localRoom = roomById[conn.local_room_id];
+        if (!localRoom) return;
+        var vertColor = conn.direction === 'up' ? '#a78bfa' : conn.direction === 'down' ? '#fb923c' : null;
+        drawConnector(localRoom.map_x, localRoom.map_y, gp[0], gp[1], {id: conn.exit_id, direction: conn.direction}, true, vertColor);
+      });
+    });
+
+    // Draw ghost rooms (cross-zone)
+    state.ghost_rooms.forEach(function(gr) {
+      var gp = ghostPositions[gr.id];
+      if (!gp) return;
+      var connDir = gr.connected_via.length > 0 ? gr.connected_via[0].direction : null;
+      drawGhostRoom(gp[0], gp[1], gr, connDir);
+    });
+
+    // Draw vertical rooms (other z-levels connected via up/down)
+    (state.vertical_rooms || []).forEach(function(vr) {
+      if (vr.connected_via.length === 0) return;
+      var conn = vr.connected_via[0];
+      var localRoom = state.rooms.find(function(r) { return r.id === conn.local_room_id; });
+      if (!localRoom) return;
+      // Offset from local room, nudging until free cell found
+      var offsetY = conn.direction === 'up' ? -1 : 1;
+      var vx = localRoom.map_x, vy = localRoom.map_y + offsetY;
+      for (var tries = 0; tries < 5; tries++) {
+        var collides = allPositions.some(function(p) { return p[0] === vx && p[1] === vy; });
+        if (!collides) break;
+        vy += offsetY;
+      }
+      allPositions.push([vx, vy]);
+      drawVerticalRoom(vx, vy, vr, conn.direction);
+    });
+
+    // Draw rooms
+    state.rooms.forEach(function(r) {
+      drawRoom(r);
+    });
+
+    // Draw line (for exit drawing in progress)
+    drawLine = el('line', {x1: 0, y1: 0, x2: 0, y2: 0, stroke: '#00ffff', 'stroke-width': 2, 'stroke-dasharray': '6,4', visibility: 'hidden'});
+    svg.appendChild(drawLine);
+  }
+
+  function el(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function drawRoom(room) {
+    var cx = room.map_x * STRIDE_X;
+    var cy = room.map_y * STRIDE_Y;
+    var rx = cx - BOX_W / 2, ry = cy - BOX_H / 2;
+    var isSelected = room.id === selectedRoomId;
+    var color = state.zone_color || '#00ffff';
+    var stroke = room.locked ? '#f87171' : (isSelected ? '#fff' : color);
+    var strokeW = isSelected ? 2.5 : (room.locked ? 2 : 1);
+    var fill = isSelected ? '#1a2a2a' : '#111';
+
+    var g = el('g', {'data-room-id': room.id, class: 'me-room', style: 'cursor: pointer;'});
+
+    // Hit area (invisible, larger for easier click)
+    g.appendChild(el('rect', {x: rx - 2, y: ry - 2, width: BOX_W + 4, height: BOX_H + 4, fill: 'transparent'}));
+
+    // Box
+    g.appendChild(el('rect', {x: rx, y: ry, width: BOX_W, height: BOX_H, fill: fill, stroke: stroke, 'stroke-width': strokeW, rx: 3}));
+
+    // Name
+    var name = room.name.length > 18 ? room.name.substring(0, 17) + '…' : room.name;
+    var nameEl = el('text', {x: cx, y: cy - 6, 'text-anchor': 'middle', fill: color, 'font-family': "'Courier New', monospace", 'font-size': '11px'});
+    nameEl.textContent = name;
+    g.appendChild(nameEl);
+
+    // Info line
+    var infoParts = [];
+    if (room.room_type) infoParts.push(room.room_type);
+    if (room.hackr_count > 0) infoParts.push(room.hackr_count + 'H');
+    if (room.mob_count > 0) infoParts.push(room.mob_count + 'M');
+    if (room.encounters && room.encounters.length > 0) infoParts.push(room.encounters.length + 'B');
+    var infoEl = el('text', {x: cx, y: cy + 10, 'text-anchor': 'middle', fill: '#666', 'font-family': "'Courier New', monospace", 'font-size': '9px'});
+    infoEl.textContent = infoParts.join(' · ');
+    g.appendChild(infoEl);
+
+    // Lock icon
+    if (room.locked) {
+      var lockEl = el('text', {x: rx + 4, y: ry + 11, 'font-size': '8', fill: '#f87171'});
+      lockEl.textContent = '🔒';
+      g.appendChild(lockEl);
+    }
+
+    // Port dots (for exit drawing) — only show on hover or when selected
+    PORT_POSITIONS.forEach(function(p) {
+      var port = el('circle', {cx: cx + p.dx, cy: cy + p.dy, r: PORT_R, fill: '#00ffff', opacity: 0, class: 'me-port', 'data-room-id': room.id, 'data-dir': p.dir, style: 'cursor: crosshair;'});
+      g.appendChild(port);
+    });
+
+    // Tooltip
+    var titleEl = el('title', {});
+    titleEl.textContent = room.name + ' [' + (room.room_type || 'none') + '] ' + room.hackr_count + 'H ' + room.mob_count + 'M';
+    g.appendChild(titleEl);
+
+    // Hover: show ports
+    g.addEventListener('mouseenter', function() {
+      g.querySelectorAll('.me-port').forEach(function(p) { p.setAttribute('opacity', '0.7'); });
+    });
+    g.addEventListener('mouseleave', function() {
+      if (!dragState || dragState.type !== 'port') {
+        g.querySelectorAll('.me-port').forEach(function(p) { p.setAttribute('opacity', '0'); });
+      }
+    });
+
+    svg.appendChild(g);
+  }
+
+  function drawGhostRoom(gx, gy, ghostRoom, connDirection) {
+    var cx = gx * STRIDE_X, cy = gy * STRIDE_Y;
+    var rx = cx - BOX_W / 2, ry = cy - BOX_H / 2;
+    var isVertical = connDirection === 'up' || connDirection === 'down';
+    var vertColor = connDirection === 'up' ? '#a78bfa' : '#fb923c';
+    var strokeColor = isVertical ? vertColor : '#555';
+    var arrow = connDirection === 'up' ? '↑ ' : connDirection === 'down' ? '↓ ' : '';
+
+    var g = el('g', {'data-ghost-id': ghostRoom.id, class: 'me-ghost', style: 'cursor: pointer; opacity: ' + GHOST_OPACITY + ';'});
+
+    g.appendChild(el('rect', {x: rx, y: ry, width: BOX_W, height: BOX_H, fill: '#0d0d0d', stroke: strokeColor, 'stroke-width': 1, rx: 3, 'stroke-dasharray': '4,3'}));
+
+    var name = ghostRoom.name.length > 16 ? ghostRoom.name.substring(0, 15) + '…' : ghostRoom.name;
+    var nameEl = el('text', {x: cx, y: cy - 6, 'text-anchor': 'middle', fill: isVertical ? vertColor : '#888', 'font-family': "'Courier New', monospace", 'font-size': '10px'});
+    nameEl.textContent = arrow + name;
+    g.appendChild(nameEl);
+
+    var zoneEl = el('text', {x: cx, y: cy + 10, 'text-anchor': 'middle', fill: '#555', 'font-family': "'Courier New', monospace", 'font-size': '8px'});
+    zoneEl.textContent = ghostRoom.zone_name;
+    g.appendChild(zoneEl);
+
+    // Port dots for exit drawing to ghost rooms
+    PORT_POSITIONS.forEach(function(p) {
+      var port = el('circle', {cx: cx + p.dx, cy: cy + p.dy, r: PORT_R, fill: '#666', opacity: 0, class: 'me-port me-ghost-port', 'data-ghost-id': ghostRoom.id, 'data-dir': p.dir, style: 'cursor: crosshair;'});
+      g.appendChild(port);
+    });
+
+    g.addEventListener('mouseenter', function() {
+      g.style.opacity = '0.7';
+      g.querySelectorAll('.me-port').forEach(function(p) { p.setAttribute('opacity', '0.5'); });
+    });
+    g.addEventListener('mouseleave', function() {
+      g.style.opacity = GHOST_OPACITY;
+      g.querySelectorAll('.me-port').forEach(function(p) { p.setAttribute('opacity', '0'); });
+    });
+
+    // Click ghost: navigate to that zone
+    g.addEventListener('click', function(e) {
+      if (e.target.classList.contains('me-port') || e.target.classList.contains('me-ghost-port')) return;
+      if (confirm('Open zone "' + ghostRoom.zone_name + '" in editor?')) {
+        zoneId = ghostRoom.zone_id;
+        currentZ = 0;
+        selectedRoomId = null;
+        closePanel();
+        window.history.replaceState(null, '', '/root/grid_map_editor/' + zoneId);
+        loadData();
+      }
+    });
+
+    var titleEl = el('title', {});
+    titleEl.textContent = ghostRoom.name + ' [' + ghostRoom.zone_name + ' / ' + ghostRoom.region_name + ']';
+    g.appendChild(titleEl);
+
+    svg.appendChild(g);
+  }
+
+  function drawVerticalRoom(gx, gy, vRoom, direction) {
+    var cx = gx * STRIDE_X, cy = gy * STRIDE_Y;
+    var rx = cx - BOX_W / 2, ry = cy - BOX_H / 2;
+    var isUp = direction === 'up';
+    var color = isUp ? '#a78bfa' : '#fb923c';
+    var arrow = isUp ? '↑' : '↓';
+    var zLabel = 'z=' + vRoom.map_z;
+
+    var g = el('g', {'data-vertical-id': vRoom.id, class: 'me-vertical', style: 'cursor: pointer; opacity: 0.45;'});
+
+    g.appendChild(el('rect', {x: rx, y: ry, width: BOX_W, height: BOX_H, fill: '#0d0d0d', stroke: color, 'stroke-width': 1, rx: 3, 'stroke-dasharray': '6,3'}));
+
+    var name = vRoom.name.length > 14 ? vRoom.name.substring(0, 13) + '…' : vRoom.name;
+    var nameEl = el('text', {x: cx, y: cy - 6, 'text-anchor': 'middle', fill: color, 'font-family': "'Courier New', monospace", 'font-size': '10px'});
+    nameEl.textContent = arrow + ' ' + name;
+    g.appendChild(nameEl);
+
+    var zEl = el('text', {x: cx, y: cy + 10, 'text-anchor': 'middle', fill: '#555', 'font-family': "'Courier New', monospace", 'font-size': '8px'});
+    zEl.textContent = zLabel;
+    g.appendChild(zEl);
+
+    // Draw connector from the local room to this vertical stub
+    vRoom.connected_via.forEach(function(conn) {
+      var localRoom = state.rooms.find(function(r) { return r.id === conn.local_room_id; });
+      if (localRoom) {
+        drawConnector(localRoom.map_x, localRoom.map_y, gx, gy, {id: conn.exit_id, direction: conn.direction}, true);
+      }
+    });
+
+    g.addEventListener('mouseenter', function() { g.style.opacity = '0.8'; });
+    g.addEventListener('mouseleave', function() { g.style.opacity = '0.45'; });
+
+    // Click: navigate to that z-level
+    g.addEventListener('click', function() {
+      currentZ = vRoom.map_z;
+      selectedRoomId = null;
+      closePanel();
+      loadData();
+    });
+
+    var titleEl = el('title', {});
+    titleEl.textContent = vRoom.name + ' [' + zLabel + '] — click to go to ' + zLabel;
+    g.appendChild(titleEl);
+
+    svg.appendChild(g);
+  }
+
+  function drawConnector(fromGX, fromGY, toGX, toGY, exitData, isGhost, colorOverride) {
+    var x1 = fromGX * STRIDE_X, y1 = fromGY * STRIDE_Y;
+    var x2 = toGX * STRIDE_X, y2 = toGY * STRIDE_Y;
+
+    var dx = x2 - x1, dy = y2 - y1;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist === 0) return;
+
+    var ux = dx / dist, uy = dy / dist;
+    // Proper box-edge intersection
+    var inset1 = boxEdgeInset(ux, uy);
+    var inset2 = boxEdgeInset(-ux, -uy);
+
+    var sx = x1 + ux * inset1, sy = y1 + uy * inset1;
+    var ex = x2 - ux * inset2, ey = y2 - uy * inset2;
+
+    var isVertical = colorOverride && exitData && (exitData.direction === 'up' || exitData.direction === 'down');
+    var color = colorOverride || (isGhost ? '#2a2a2a' : '#333');
+    var lineAttrs = {x1: Math.round(sx), y1: Math.round(sy), x2: Math.round(ex), y2: Math.round(ey), stroke: color, 'stroke-width': isGhost ? 1 : 1.5, class: 'me-connector'};
+    if (isVertical) lineAttrs['stroke-dasharray'] = '4,3';
+    var line = el('line', lineAttrs);
+    if (exitData && exitData.id) {
+      line.setAttribute('data-exit-id', exitData.id);
+      line.style.cursor = 'pointer';
+      // Wider invisible hit area
+      var hitLine = el('line', {x1: Math.round(sx), y1: Math.round(sy), x2: Math.round(ex), y2: Math.round(ey), stroke: 'transparent', 'stroke-width': 12, style: 'cursor: pointer;', 'data-exit-id': exitData.id});
+      svg.appendChild(hitLine);
+      hitLine.addEventListener('click', function(e) {
+        e.stopPropagation();
+        onConnectorClick(exitData.id);
+      });
+    }
+    svg.appendChild(line);
+
+    // Midpoint label for vertical connectors
+    if (isVertical) {
+      var mx = (sx + ex) / 2, my = (sy + ey) / 2;
+      var arrow = exitData.direction === 'up' ? '↑' : '↓';
+      var bg = el('circle', {cx: mx, cy: my, r: 7, fill: '#0d0d0d'});
+      svg.appendChild(bg);
+      var label = el('text', {x: mx, y: my + 4, 'text-anchor': 'middle', fill: color, 'font-family': "'Courier New', monospace", 'font-size': '10px', 'font-weight': 'bold'});
+      label.textContent = arrow;
+      svg.appendChild(label);
+    }
+  }
+
+  function boxEdgeInset(ux, uy) {
+    // Compute exact distance from center to box edge along direction (ux, uy)
+    var hw = BOX_W / 2, hh = BOX_H / 2;
+    if (Math.abs(ux) < 0.001) return hh;
+    if (Math.abs(uy) < 0.001) return hw;
+    var tx = hw / Math.abs(ux);
+    var ty = hh / Math.abs(uy);
+    return Math.min(tx, ty);
+  }
+
+  // ── Interaction: Room click/select ─────────────────────────
+  svg.addEventListener('click', function(e) {
+    var roomG = e.target.closest('.me-room');
+    if (roomG && !e.target.classList.contains('me-port')) {
+      var id = parseInt(roomG.getAttribute('data-room-id'));
+      selectRoom(id);
+      return;
+    }
+    // Click on empty space (not a room, not a connector, not ghost)
+    if (!e.target.closest('.me-ghost') && !e.target.closest('.me-connector') && !e.target.getAttribute('data-exit-id')) {
+      deselectRoom();
+    }
+  });
+
+  svg.addEventListener('dblclick', function(e) {
+    if (e.target.closest('.me-room') || e.target.closest('.me-ghost')) return;
+    // Double-click on empty space: create room
+    var pt = svgPoint(e);
+    var gx = Math.round(pt.x / STRIDE_X);
+    var gy = Math.round(pt.y / STRIDE_Y);
+    // Check if cell is occupied
+    var occupied = state.rooms.some(function(r) { return r.map_x === gx && r.map_y === gy; });
+    if (occupied) { setStatus('Cell occupied'); return; }
+    showRoomDialog(gx, gy);
+  });
+
+  function svgPoint(e) {
+    var pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    var ctm = svg.getScreenCTM();
+    if (!ctm) return pt;
+    return pt.matrixTransform(ctm.inverse());
+  }
+
+  // ── Interaction: Drag room to move ─────────────────────────
+  svg.addEventListener('mousedown', function(e) {
+    // Port drag (exit drawing)
+    if (e.target.classList.contains('me-port')) {
+      e.preventDefault();
+      var roomId = parseInt(e.target.getAttribute('data-room-id') || e.target.getAttribute('data-ghost-id'));
+      var isGhost = e.target.classList.contains('me-ghost-port');
+      var pt = svgPoint(e);
+      dragState = {type: 'port', roomId: roomId, isGhost: isGhost, startX: pt.x, startY: pt.y};
+      drawLine.setAttribute('x1', pt.x);
+      drawLine.setAttribute('y1', pt.y);
+      drawLine.setAttribute('x2', pt.x);
+      drawLine.setAttribute('y2', pt.y);
+      drawLine.setAttribute('visibility', 'visible');
+      return;
+    }
+
+    // Room drag (reposition)
+    var roomG = e.target.closest('.me-room');
+    if (roomG && !e.target.classList.contains('me-port')) {
+      e.preventDefault();
+      var id = parseInt(roomG.getAttribute('data-room-id'));
+      var room = state.rooms.find(function(r) { return r.id === id; });
+      if (!room) return;
+      var pt = svgPoint(e);
+      dragState = {type: 'room', roomId: id, startX: pt.x, startY: pt.y, origX: room.map_x, origY: room.map_y};
+    }
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!dragState) return;
+    var pt = svgPoint(e);
+
+    if (dragState.type === 'port') {
+      drawLine.setAttribute('x2', pt.x);
+      drawLine.setAttribute('y2', pt.y);
+      return;
+    }
+
+    if (dragState.type === 'room') {
+      var dx = pt.x - dragState.startX;
+      var dy = pt.y - dragState.startY;
+      var newGX = dragState.origX + Math.round(dx / STRIDE_X);
+      var newGY = dragState.origY + Math.round(dy / STRIDE_Y);
+      var room = state.rooms.find(function(r) { return r.id === dragState.roomId; });
+      if (room && (room.map_x !== newGX || room.map_y !== newGY)) {
+        var occupied = state.rooms.some(function(r) { return r.id !== room.id && r.map_x === newGX && r.map_y === newGY; });
+        if (!occupied) {
+          room.map_x = newGX;
+          room.map_y = newGY;
+          render();
+        }
+      }
+    }
+  });
+
+  document.addEventListener('mouseup', function(e) {
+    if (!dragState) return;
+
+    if (dragState.type === 'port') {
+      drawLine.setAttribute('visibility', 'hidden');
+      // Find target room under cursor
+      var pt = svgPoint(e);
+      var targetEl = document.elementFromPoint(e.clientX, e.clientY);
+      var targetG = targetEl ? (targetEl.closest('.me-room') || targetEl.closest('.me-ghost')) : null;
+      if (targetG) {
+        var targetId = parseInt(targetG.getAttribute('data-room-id') || targetG.getAttribute('data-ghost-id'));
+        if (targetId && targetId !== dragState.roomId) {
+          showExitDialog(dragState.roomId, targetId, dragState.isGhost, !!targetG.getAttribute('data-ghost-id'));
+        }
+      }
+      dragState = null;
+      return;
+    }
+
+    if (dragState.type === 'room') {
+      var room = state.rooms.find(function(r) { return r.id === dragState.roomId; });
+      var origX = dragState.origX, origY = dragState.origY;
+      dragState = null;
+      if (room && (room.map_x !== origX || room.map_y !== origY)) {
+        setStatus('Saving position...');
+        api('PATCH', 'rooms/' + room.id, {map_x: room.map_x, map_y: room.map_y}).then(function(d) {
+          if (d.success) {
+            room.position_source = 'stored';
+            setStatus('Position saved');
+          } else {
+            room.map_x = origX;
+            room.map_y = origY;
+            render();
+            setStatus('Error: ' + (d.errors || []).join(', '));
+          }
+        });
+      }
+    }
+  });
+
+  // ── Interaction: Connector click ───────────────────────────
+  function onConnectorClick(exitId) {
+    var exit = state.exits.find(function(e) { return e.id === exitId; });
+    if (!exit) return;
+    var fromRoom = state.rooms.find(function(r) { return r.id === exit.from_room_id; });
+    var toRoom = state.rooms.find(function(r) { return r.id === exit.to_room_id; });
+    var hasReverse = !!exit.reverse_exit_id;
+    var msg = (fromRoom ? fromRoom.name : '?') + ' → ' + exit.direction + ' → ' + (toRoom ? toRoom.name : '?');
+    if (hasReverse) msg += ' (bidirectional)';
+    msg += '\n\nDelete this exit?';
+    if (hasReverse) msg += '\n(Reverse exit will also be deleted)';
+
+    if (confirm(msg)) {
+      setStatus('Deleting exit...');
+      api('DELETE', 'exits/' + exitId + '?delete_reverse=' + hasReverse).then(function(d) {
+        if (d.success) {
+          setStatus('Exit deleted');
+          loadData();
+        } else {
+          setStatus('Error: ' + (d.errors || []).join(', '));
+        }
+      });
+    }
+  }
+
+  // ── Keyboard ───────────────────────────────────────────────
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (overlay.style.display !== 'none') {
+        hideDialogs();
+      } else {
+        deselectRoom();
+      }
+    }
+  });
+
+  // ── Room selection + side panel ────────────────────────────
+  function selectRoom(id) {
+    selectedRoomId = id;
+    render();
+    showPanel(id);
+  }
+
+  function deselectRoom() {
+    if (selectedRoomId === null) return;
+    selectedRoomId = null;
+    closePanel();
+    render();
+  }
+
+  function closePanel() {
+    panel.style.display = 'none';
+    panelContent.innerHTML = '';
+  }
+
+  function showPanel(roomId) {
+    var room = state.rooms.find(function(r) { return r.id === roomId; });
+    if (!room) return;
+    panel.style.display = 'block';
+
+    var html = '';
+    html += '<h3 class="cyan-255-text" style="margin-bottom: 12px; word-break: break-word;">[:: ' + esc(room.name) + ' ::]</h3>';
+
+    // Room properties form
+    html += '<div style="margin-bottom: 15px;">';
+    html += field('Name', 'me-p-name', room.name, 'text');
+    html += field('Slug', 'me-p-slug', room.slug || '', 'text');
+    html += '<label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em; margin-top: 8px;">Description:</label>';
+    html += '<textarea id="me-p-desc" class="tui-input" style="width: 100%; padding: 6px; min-height: 150px; font-size: 0.85em; box-sizing: border-box;">' + esc(room.description || '') + '</textarea>';
+    html += '<div style="display: flex; gap: 8px; margin-top: 8px;">';
+    html += '<div style="flex: 1;">';
+    html += '<label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">Type:</label>';
+    html += '<select id="me-p-type" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em;">';
+    html += '<option value="">(none)</option>';
+    var types = ['hub','faction_base','govcorp','special','safe_zone','transit','shop','danger_zone','prism','dream','hospital','firmware_vendor','repair_service','containment','impound','sally_port_anteroom','sally_port'];
+    types.forEach(function(t) {
+      html += '<option value="' + t + '"' + (room.room_type === t ? ' selected' : '') + '>' + t + '</option>';
+    });
+    html += '</select></div>';
+    html += '<div style="flex: 1;">';
+    html += '<label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">CL:</label>';
+    html += '<input id="me-p-cl" type="number" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em;" value="' + room.min_clearance + '" min="0" />';
+    html += '</div>';
+    html += '<div style="flex: 1;">';
+    html += '<label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">Z:</label>';
+    html += '<input id="me-p-z" type="number" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em;" value="' + (room.map_z || 0) + '" />';
+    html += '</div></div>';
+    html += '<div style="margin-top: 8px;">';
+    html += '<label class="white-text" style="font-size: 0.85em;"><input type="checkbox" id="me-p-locked" ' + (room.locked ? 'checked' : '') + ' /> Locked</label>';
+    html += '</div>';
+
+    // Zone selector (combobox)
+    html += '<div style="margin-top: 8px;">';
+    html += '<label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">Zone:</label>';
+    var panelZoneCb = zoneComboboxHtml('me-p-zone', room.grid_zone_id);
+    _panelZoneUid = panelZoneCb.uid;
+    html += panelZoneCb.html;
+    html += '</div>';
+
+    html += '<div style="margin-top: 12px; display: flex; gap: 8px;">';
+    html += '<button id="me-p-save" class="tui-button green-168" style="padding: 5px 14px; font-size: 0.85em;">Save</button>';
+    html += '<button id="me-p-delete" class="tui-button red-168" style="padding: 5px 14px; font-size: 0.85em;">Delete</button>';
+    html += '</div>';
+    html += '</div>';
+
+    // Exits section
+    var exitComboboxes = []; // {uid, excludeId} pairs to init after innerHTML
+    html += '<div style="border-top: 1px solid #333; padding-top: 10px; margin-top: 10px;">';
+    html += '<h4 class="cyan-255-text" style="margin-bottom: 8px;">[:: EXITS ::]</h4>';
+    if (room.exits && room.exits.length > 0) {
+      room.exits.forEach(function(ex) {
+        var crossBadge = ex.cross_zone ? ' <span style="color: #fbbf24; font-size: 0.75em;">[cross]</span>' : '';
+        html += '<div class="me-exit-row" data-exit-id="' + ex.id + '" style="margin-bottom: 4px; padding: 4px 6px; background: #1a1a1a; border: 1px solid #222;">';
+        // Display row
+        html += '<div class="me-exit-display" style="display: flex; align-items: center; gap: 6px;">';
+        html += '<span style="color: #fbbf24; font-size: 0.85em; min-width: 70px;">' + esc(ex.direction) + '</span>';
+        html += '<span style="color: #888; font-size: 0.85em; flex: 1;">→ ' + esc(ex.to_room_name) + crossBadge + '</span>';
+        html += '<span style="color: ' + (ex.locked ? '#f87171' : '#333') + '; font-size: 0.75em;">' + (ex.locked ? '🔒' : '') + '</span>';
+        html += '<button class="me-edit-exit tui-button" style="padding: 1px 6px; font-size: 0.8em; color: #fbbf24;">✎</button>';
+        html += '<button class="me-del-exit tui-button" data-exit-id="' + ex.id + '" data-reverse-id="' + (ex.reverse_exit_id || '') + '" style="padding: 1px 6px; font-size: 0.8em; color: #f87171;">×</button>';
+        html += '</div>';
+        // Edit row (hidden by default)
+        html += '<div class="me-exit-edit" style="display: none; margin-top: 6px;">';
+        html += '<div style="display: flex; gap: 6px; margin-bottom: 4px;">';
+        html += '<div style="flex: 1;"><label style="color: #666; font-size: 0.75em;">Direction:</label>';
+        html += '<input class="me-exit-edit-dir tui-input" value="' + esc(ex.direction) + '" style="width: 100%; padding: 3px; font-size: 0.85em; box-sizing: border-box;" /></div>';
+        html += '<div><label style="color: #666; font-size: 0.75em;">Locked:</label><br/>';
+        html += '<input type="checkbox" class="me-exit-edit-locked" ' + (ex.locked ? 'checked' : '') + ' style="margin-top: 4px;" /></div>';
+        html += '</div>';
+        html += '<div style="margin-bottom: 4px;">';
+        html += '<div><label style="color: #666; font-size: 0.75em;">Target:</label>';
+        var editCb = roomComboboxHtml('me-exit-edit-' + ex.id, ex.to_room_id);
+        html += editCb.html;
+        exitComboboxes.push({uid: editCb.uid, excludeId: null});
+        html += '</div>';
+        html += '</div>';
+        html += '<div style="display: flex; gap: 6px;">';
+        html += '<button class="me-exit-save tui-button green-168" style="padding: 2px 10px; font-size: 0.8em;">Save</button>';
+        html += '<button class="me-exit-cancel tui-button" style="padding: 2px 10px; font-size: 0.8em;">Cancel</button>';
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+      });
+    } else {
+      html += '<span style="color: #555; font-size: 0.85em;">No exits</span>';
+    }
+    // Inbound exits from ghost rooms
+    if (room.inbound_exits && room.inbound_exits.length > 0) {
+      html += '<div style="margin-top: 6px; color: #555; font-size: 0.8em;">Inbound from other zones:</div>';
+      room.inbound_exits.forEach(function(ex) {
+        html += '<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; padding: 3px 6px; background: #151515; border: 1px solid #1a1a1a;">';
+        html += '<span style="color: #666; font-size: 0.85em;">' + esc(ex.direction) + ' ← ' + esc(ex.from_room_name) + ' <span style="color: #555; font-size: 0.75em;">[' + esc(ex.from_zone_name || '') + ']</span></span>';
+        html += '</div>';
+      });
+    }
+    // Add exit via combobox
+    html += '<button id="me-add-exit-btn" class="tui-button cyan-168" style="margin-top: 6px; padding: 3px 10px; font-size: 0.85em;">+ Add Exit</button>';
+    html += '<div id="me-add-exit-form" style="display: none; margin-top: 8px; padding: 8px; background: #1a1a1a; border: 1px solid #333;">';
+    html += '<label style="color: #888; font-size: 0.8em;">Target Room:</label>';
+    var addCb = roomComboboxHtml('me-add-exit-target', null);
+    exitComboboxes.push({uid: addCb.uid, excludeId: roomId});
+    html += addCb.html;
+    html += '<label style="color: #888; font-size: 0.8em; margin-top: 6px; display: block;">Direction:</label>';
+    html += '<input id="me-exit-target-dir" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em; margin-bottom: 6px; box-sizing: border-box;" placeholder="north" />';
+    html += '<label style="color: #888; font-size: 0.8em;"><input type="checkbox" id="me-exit-target-bidi" checked /> Bidirectional</label>';
+    html += '<div style="margin-top: 6px;"><button id="me-exit-target-create" class="tui-button green-168" style="padding: 3px 10px; font-size: 0.85em;">Create</button></div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Mobs section
+    html += '<div style="border-top: 1px solid #333; padding-top: 10px; margin-top: 10px;">';
+    html += '<h4 class="cyan-255-text" style="margin-bottom: 8px;">[:: MOBS (' + (room.mobs ? room.mobs.length : 0) + ') ::]</h4>';
+    if (room.mobs && room.mobs.length > 0) {
+      room.mobs.forEach(function(m) {
+        var typeColor = ROOM_TYPE_COLORS[m.mob_type] || '#888';
+        html += '<div class="me-mob-row" data-mob-id="' + m.id + '" style="margin-bottom: 4px; padding: 4px 6px; background: #1a1a1a; border: 1px solid #222;">';
+        // Display row
+        html += '<div class="me-mob-display" style="display: flex; align-items: center; gap: 6px;">';
+        html += '<span style="color: ' + typeColor + ';">•</span> ';
+        html += '<span style="color: #ccc; font-size: 0.85em; flex: 1;">' + esc(m.name) + ' <span style="color: #555;">(' + esc(m.mob_type) + ')</span></span>';
+        html += '<a href="/root/grid_mobs/' + m.id + '/edit" style="color: #60a5fa; font-size: 0.8em; text-decoration: none;" title="Full editor">↗</a>';
+        html += '<button class="me-edit-mob tui-button" style="padding: 1px 6px; font-size: 0.8em; color: #fbbf24;">✎</button>';
+        html += '<button class="me-del-mob tui-button" style="padding: 1px 6px; font-size: 0.8em; color: #f87171;">×</button>';
+        html += '</div>';
+        // Edit row (hidden)
+        html += '<div class="me-mob-edit" style="display: none; margin-top: 6px;">';
+        html += '<div style="margin-bottom: 4px;"><label style="color: #666; font-size: 0.75em;">Name:</label>';
+        html += '<input class="me-mob-edit-name tui-input" value="' + esc(m.name) + '" style="width: 100%; padding: 3px; font-size: 0.85em; box-sizing: border-box;" /></div>';
+        html += '<div style="display: flex; gap: 6px; margin-bottom: 4px;">';
+        html += '<div style="flex: 1;"><label style="color: #666; font-size: 0.75em;">Type:</label>';
+        html += '<select class="me-mob-edit-type tui-input" style="width: 100%; padding: 3px; font-size: 0.85em;">';
+        ['quest_giver', 'vendor', 'lore', 'special'].forEach(function(t) {
+          html += '<option value="' + t + '"' + (m.mob_type === t ? ' selected' : '') + '>' + t + '</option>';
+        });
+        html += '</select></div></div>';
+        html += '<div style="display: flex; gap: 6px;">';
+        html += '<button class="me-mob-save tui-button green-168" style="padding: 2px 10px; font-size: 0.8em;">Save</button>';
+        html += '<button class="me-mob-cancel tui-button" style="padding: 2px 10px; font-size: 0.8em;">Cancel</button>';
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+      });
+    } else {
+      html += '<span style="color: #555; font-size: 0.85em;">No mobs</span>';
+    }
+    // Add mob form
+    html += '<button id="me-add-mob-btn" class="tui-button cyan-168" style="margin-top: 6px; padding: 3px 10px; font-size: 0.85em;">+ Add Mob</button>';
+    html += '<div id="me-add-mob-form" style="display: none; margin-top: 8px; padding: 8px; background: #1a1a1a; border: 1px solid #333;">';
+    html += '<div style="margin-bottom: 6px;"><label style="color: #888; font-size: 0.8em;">Name:</label>';
+    html += '<input id="me-mob-name" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em; box-sizing: border-box;" placeholder="NPC name" /></div>';
+    html += '<div style="margin-bottom: 6px;"><label style="color: #888; font-size: 0.8em;">Type:</label>';
+    html += '<select id="me-mob-type" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em;">';
+    html += '<option value="lore">lore</option><option value="quest_giver">quest_giver</option><option value="vendor">vendor</option><option value="special">special</option>';
+    html += '</select></div>';
+    html += '<div style="margin-bottom: 6px;"><label style="color: #888; font-size: 0.8em;">Description:</label>';
+    html += '<input id="me-mob-desc" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em; box-sizing: border-box;" placeholder="(optional)" /></div>';
+    html += '<div style="margin-top: 6px; display: flex; gap: 6px;"><button id="me-mob-create" class="tui-button green-168" style="padding: 3px 10px; font-size: 0.85em;">Create</button>';
+    html += '<button id="me-mob-cancel-add" class="tui-button" style="padding: 3px 10px; font-size: 0.85em;">Cancel</button></div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Breach encounters section
+    html += '<div style="border-top: 1px solid #333; padding-top: 10px; margin-top: 10px;">';
+    html += '<h4 class="cyan-255-text" style="margin-bottom: 8px;">[:: BREACHES ::]</h4>';
+    if (room.encounters && room.encounters.length > 0) {
+      room.encounters.forEach(function(enc) {
+        var stateColor = enc.state === 'available' ? '#34d399' : enc.state === 'active' ? '#fbbf24' : '#666';
+        html += '<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; padding: 3px 6px; background: #1a1a1a; border: 1px solid #222;">';
+        html += '<span style="color: #ccc; font-size: 0.85em; flex: 1;">' + esc(enc.template_name) + ' <span style="color: #555;">(' + esc(enc.tier) + ')</span></span>';
+        html += '<span style="color: ' + stateColor + '; font-size: 0.8em;">' + esc(enc.state) + '</span>';
+        html += '<button class="me-del-encounter tui-button" data-encounter-id="' + enc.id + '" style="padding: 1px 6px; font-size: 0.8em; color: #f87171;">×</button>';
+        html += '</div>';
+      });
+    } else {
+      html += '<span style="color: #555; font-size: 0.85em;">No encounters</span>';
+    }
+    html += '<div style="margin-top: 6px;">';
+    html += '<select id="me-place-template" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em; margin-bottom: 4px;">';
+    html += '<option value="">(select template)</option>';
+    (state.breach_templates || []).forEach(function(t) {
+      html += '<option value="' + t.id + '">' + esc(t.name) + ' [' + esc(t.tier) + ' CL' + esc(String(t.min_clearance)) + ']</option>';
+    });
+    html += '</select>';
+    html += '<button id="me-place-encounter" class="tui-button green-168" style="padding: 3px 10px; font-size: 0.85em;">+ Place Encounter</button>';
+    html += '</div>';
+    html += '</div>';
+
+    // Presence info
+    html += '<div style="border-top: 1px solid #333; padding-top: 10px; margin-top: 10px;">';
+    html += '<h4 class="cyan-255-text" style="margin-bottom: 8px;">[:: PRESENCE ::]</h4>';
+    html += '<span style="color: #888; font-size: 0.85em;">';
+    html += room.hackr_count + ' hackr(s) · ' + room.mob_count + ' mob(s) · ' + room.item_count + ' item(s)';
+    html += '</span>';
+    html += '</div>';
+
+    // Position info
+    html += '<div style="border-top: 1px solid #333; padding-top: 10px; margin-top: 10px; color: #555; font-size: 0.8em;">';
+    html += 'Position: (' + room.map_x + ', ' + room.map_y + ') · ' + room.position_source;
+    html += ' · <a href="/root/grid_rooms/' + room.id + '/edit" style="color: #60a5fa; text-decoration: none;">Full Edit →</a>';
+    html += '</div>';
+
+    panelContent.innerHTML = html;
+
+    // Init room comboboxes (must run after innerHTML is set)
+    exitComboboxes.forEach(function(cb) { initRoomCombobox(cb.uid, cb.excludeId); });
+    initZoneCombobox(panelZoneCb.uid);
+
+    // Wire up panel events
+    document.getElementById('me-p-save').addEventListener('click', function() { saveRoom(room.id); });
+    document.getElementById('me-p-delete').addEventListener('click', function() { deleteRoom(room.id); });
+
+    // Exit edit buttons
+    panelContent.querySelectorAll('.me-edit-exit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var row = btn.closest('.me-exit-row');
+        row.querySelector('.me-exit-display').style.display = 'none';
+        row.querySelector('.me-exit-edit').style.display = 'block';
+      });
+    });
+
+    // Exit save buttons
+    panelContent.querySelectorAll('.me-exit-save').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var row = btn.closest('.me-exit-row');
+        var eid = parseInt(row.getAttribute('data-exit-id'));
+        var dir = row.querySelector('.me-exit-edit-dir').value.trim().toLowerCase();
+        var locked = row.querySelector('.me-exit-edit-locked').checked;
+        var hiddenInput = row.querySelector('.admin-combobox input[type="hidden"]');
+        var targetId = hiddenInput ? parseInt(hiddenInput.value) : 0;
+        if (!dir) { setStatus('Direction required'); return; }
+        if (!targetId) { setStatus('Target room required'); return; }
+        setStatus('Saving exit...');
+        api('PATCH', 'exits/' + eid, {direction: dir, locked: locked, to_room_id: targetId}).then(function(d) {
+          if (d.success) { setStatus('Exit saved'); loadData(); }
+          else { setStatus('Error: ' + (d.errors || []).join(', ')); }
+        });
+      });
+    });
+
+    // Exit cancel buttons
+    panelContent.querySelectorAll('.me-exit-cancel').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var row = btn.closest('.me-exit-row');
+        row.querySelector('.me-exit-display').style.display = 'flex';
+        row.querySelector('.me-exit-edit').style.display = 'none';
+      });
+    });
+
+    // Exit delete buttons
+    panelContent.querySelectorAll('.me-del-exit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var eid = parseInt(btn.getAttribute('data-exit-id'));
+        var rid = btn.getAttribute('data-reverse-id');
+        var hasReverse = rid !== '' && rid !== null;
+        if (confirm('Delete this exit?' + (hasReverse ? ' (Reverse will also be deleted)' : ''))) {
+          api('DELETE', 'exits/' + eid + '?delete_reverse=' + hasReverse).then(function(d) {
+            if (d.success) { setStatus('Exit deleted'); loadData(); }
+            else { setStatus('Error: ' + (d.errors || []).join(', ')); }
+          });
+        }
+      });
+    });
+
+    // Add exit form toggle
+    document.getElementById('me-add-exit-btn').addEventListener('click', function() {
+      var form = document.getElementById('me-add-exit-form');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Add exit create button
+    document.getElementById('me-exit-target-create').addEventListener('click', function() {
+      var addForm = document.getElementById('me-add-exit-form');
+      var hiddenInput = addForm.querySelector('.admin-combobox input[type="hidden"]');
+      var targetId = hiddenInput ? parseInt(hiddenInput.value) : 0;
+      var dir = document.getElementById('me-exit-target-dir').value.trim().toLowerCase();
+      var bidi = document.getElementById('me-exit-target-bidi').checked;
+      if (!targetId || !dir) { setStatus('Target and direction required'); return; }
+      setStatus('Creating exit...');
+      api('POST', 'exits', {from_room_id: room.id, to_room_id: targetId, direction: dir, bidirectional: bidi}).then(function(d) {
+        if (d.success) { setStatus('Exit created'); loadData(); }
+        else { setStatus('Error: ' + (d.errors || []).join(', ')); }
+      });
+    });
+
+    // Mob edit buttons
+    panelContent.querySelectorAll('.me-edit-mob').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var row = btn.closest('.me-mob-row');
+        row.querySelector('.me-mob-display').style.display = 'none';
+        row.querySelector('.me-mob-edit').style.display = 'block';
+      });
+    });
+
+    // Mob save buttons
+    panelContent.querySelectorAll('.me-mob-save').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var row = btn.closest('.me-mob-row');
+        var mid = parseInt(row.getAttribute('data-mob-id'));
+        var name = row.querySelector('.me-mob-edit-name').value.trim();
+        var mobType = row.querySelector('.me-mob-edit-type').value;
+        if (!name) { setStatus('Name required'); return; }
+        setStatus('Saving mob...');
+        api('PATCH', 'mobs/' + mid, {name: name, mob_type: mobType}).then(function(d) {
+          if (d.success) { setStatus('Mob saved'); loadData(); }
+          else { setStatus('Error: ' + (d.errors || []).join(', ')); }
+        });
+      });
+    });
+
+    // Mob cancel buttons
+    panelContent.querySelectorAll('.me-mob-cancel').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var row = btn.closest('.me-mob-row');
+        row.querySelector('.me-mob-display').style.display = 'flex';
+        row.querySelector('.me-mob-edit').style.display = 'none';
+      });
+    });
+
+    // Mob delete buttons
+    panelContent.querySelectorAll('.me-del-mob').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var row = btn.closest('.me-mob-row');
+        var mid = parseInt(row.getAttribute('data-mob-id'));
+        var name = row.querySelector('.me-mob-display').textContent.trim();
+        if (!confirm('Delete mob "' + name + '"?')) return;
+        setStatus('Deleting mob...');
+        api('DELETE', 'mobs/' + mid).then(function(d) {
+          if (d.success) { setStatus('Mob deleted'); loadData(); }
+          else {
+            var msg = (d.blockers || d.errors || []).join('\n• ');
+            alert('Cannot delete:\n• ' + msg);
+            setStatus('Delete blocked');
+          }
+        });
+      });
+    });
+
+    // Add mob form toggle
+    document.getElementById('me-add-mob-btn').addEventListener('click', function() {
+      var form = document.getElementById('me-add-mob-form');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('me-mob-cancel-add').addEventListener('click', function() {
+      document.getElementById('me-add-mob-form').style.display = 'none';
+    });
+
+    // Create mob button
+    document.getElementById('me-mob-create').addEventListener('click', function() {
+      var name = document.getElementById('me-mob-name').value.trim();
+      var mobType = document.getElementById('me-mob-type').value;
+      var desc = document.getElementById('me-mob-desc').value.trim();
+      if (!name) { setStatus('Name required'); return; }
+      setStatus('Creating mob...');
+      api('POST', 'mobs', {grid_room_id: room.id, name: name, mob_type: mobType, description: desc || null}).then(function(d) {
+        if (d.success) { setStatus('Mob created'); loadData(); }
+        else { setStatus('Error: ' + (d.errors || []).join(', ')); }
+      });
+    });
+
+    // Encounter delete buttons
+    panelContent.querySelectorAll('.me-del-encounter').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var encId = parseInt(btn.getAttribute('data-encounter-id'));
+        if (confirm('Remove this encounter?')) {
+          api('DELETE', 'encounters/' + encId).then(function(d) {
+            if (d.success) { setStatus('Encounter removed'); loadData(); }
+            else { setStatus('Error: ' + (d.errors || []).join(', ')); }
+          });
+        }
+      });
+    });
+
+    // Place encounter button
+    document.getElementById('me-place-encounter').addEventListener('click', function() {
+      var templateId = parseInt(document.getElementById('me-place-template').value);
+      if (!templateId) { setStatus('Select a template'); return; }
+      setStatus('Placing encounter...');
+      api('POST', 'encounters', {grid_room_id: room.id, grid_breach_template_id: templateId}).then(function(d) {
+        if (d.success) { setStatus('Encounter placed'); loadData(); }
+        else { setStatus('Error: ' + (d.errors || []).join(', ')); }
+      });
+    });
+  }
+
+  // ── Panel actions ──────────────────────────────────────────
+  function saveRoom(roomId) {
+    var attrs = {
+      name: document.getElementById('me-p-name').value,
+      slug: document.getElementById('me-p-slug').value,
+      description: document.getElementById('me-p-desc').value,
+      room_type: document.getElementById('me-p-type').value || null,
+      min_clearance: parseInt(document.getElementById('me-p-cl').value) || 0,
+      locked: document.getElementById('me-p-locked').checked,
+      grid_zone_id: parseInt(document.getElementById(_panelZoneUid + '-hidden').value),
+      map_z: parseInt(document.getElementById('me-p-z').value) || 0
+    };
+
+    setStatus('Saving...');
+    api('PATCH', 'rooms/' + roomId, attrs).then(function(d) {
+      if (d.success) {
+        setStatus('Saved');
+        loadData();
+      } else {
+        setStatus('Error: ' + (d.errors || []).join(', '));
+      }
+    });
+  }
+
+  function deleteRoom(roomId) {
+    var room = state.rooms.find(function(r) { return r.id === roomId; });
+    if (!room) return;
+
+    // Pre-check: show warnings
+    var warnings = [];
+    if (room.hackr_count > 0) warnings.push(room.hackr_count + ' hackr(s) in room');
+    if (room.mob_count > 0) warnings.push(room.mob_count + ' mob(s) assigned');
+    if (room.item_count > 0) warnings.push(room.item_count + ' item(s) on floor');
+    if (room.encounters && room.encounters.length > 0) warnings.push(room.encounters.length + ' encounter(s)');
+
+    var msg = 'Delete "' + room.name + '"?';
+    if (warnings.length > 0) msg += '\n\nWarning:\n• ' + warnings.join('\n• ');
+
+    if (!confirm(msg)) return;
+
+    setStatus('Deleting...');
+    api('DELETE', 'rooms/' + roomId).then(function(d) {
+      if (d.success) {
+        setStatus('Room deleted');
+        selectedRoomId = null;
+        closePanel();
+        loadData();
+      } else {
+        var errMsg = (d.blockers || d.errors || []).join('\n• ');
+        alert('Cannot delete:\n• ' + errMsg);
+        setStatus('Delete blocked');
+      }
+    });
+  }
+
+  // ── Exit dialog ────────────────────────────────────────────
+  function showExitDialog(fromId, toId, fromIsGhost, toIsGhost) {
+    var fromRoom = fromIsGhost
+      ? state.ghost_rooms.find(function(g) { return g.id === fromId; })
+      : state.rooms.find(function(r) { return r.id === fromId; });
+    var toRoom = toIsGhost
+      ? state.ghost_rooms.find(function(g) { return g.id === toId; })
+      : state.rooms.find(function(r) { return r.id === toId; });
+    if (!fromRoom || !toRoom) return;
+
+    // Infer direction from positions
+    var fromX, fromY, toX, toY;
+    if (fromIsGhost) {
+      // Ghost rooms - find position from connected_via
+      var conn = fromRoom.connected_via[0];
+      var localR = state.rooms.find(function(r) { return r.id === conn.local_room_id; });
+      var vec = DIRECTION_VECTORS[conn.direction];
+      fromX = (localR ? localR.map_x : 0) + (vec ? vec[0] : 0);
+      fromY = (localR ? localR.map_y : 0) + (vec ? vec[1] : 0);
+    } else {
+      fromX = fromRoom.map_x; fromY = fromRoom.map_y;
+    }
+    if (toIsGhost) {
+      var conn2 = toRoom.connected_via[0];
+      var localR2 = state.rooms.find(function(r) { return r.id === conn2.local_room_id; });
+      var vec2 = DIRECTION_VECTORS[conn2.direction];
+      toX = (localR2 ? localR2.map_x : 0) + (vec2 ? vec2[0] : 0);
+      toY = (localR2 ? localR2.map_y : 0) + (vec2 ? vec2[1] : 0);
+    } else {
+      toX = toRoom.map_x; toY = toRoom.map_y;
+    }
+
+    var dir = inferDirection(fromX, fromY, toX, toY);
+    var reverseDir = OPPOSITES[dir] || dir;
+
+    document.getElementById('me-exit-from').textContent = fromRoom.name;
+    document.getElementById('me-exit-to').textContent = toRoom.name;
+    document.getElementById('me-exit-direction').value = dir;
+    document.getElementById('me-exit-bidi').checked = true;
+    document.getElementById('me-exit-reverse-dir').value = reverseDir;
+
+    overlay.style.display = 'block';
+    document.getElementById('me-exit-dialog').style.display = 'block';
+
+    // Update reverse direction when direction changes
+    var dirInput = document.getElementById('me-exit-direction');
+    dirInput.onchange = function() {
+      var d = dirInput.value.trim().toLowerCase();
+      document.getElementById('me-exit-reverse-dir').value = OPPOSITES[d] || d;
+    };
+
+    document.getElementById('me-exit-confirm').onclick = function() {
+      var d = dirInput.value.trim().toLowerCase();
+      var bidi = document.getElementById('me-exit-bidi').checked;
+      var revDir = document.getElementById('me-exit-reverse-dir').value.trim().toLowerCase();
+      if (!d) { setStatus('Direction required'); return; }
+
+      setStatus('Creating exit...');
+      api('POST', 'exits', {
+        from_room_id: fromId, to_room_id: toId, direction: d,
+        bidirectional: bidi, reverse_direction: revDir
+      }).then(function(result) {
+        if (result.success) {
+          hideDialogs();
+          setStatus('Exit created');
+          loadData();
+        } else {
+          setStatus('Error: ' + (result.errors || []).join(', '));
+        }
+      });
+    };
+
+    document.getElementById('me-exit-cancel').onclick = hideDialogs;
+  }
+
+  function inferDirection(fromGX, fromGY, toGX, toGY) {
+    var dx = toGX - fromGX, dy = toGY - fromGY;
+    if (dx === 0 && dy === 0) return 'north';
+    var angle = Math.atan2(dy, dx) * 180 / Math.PI; // 0 = east, 90 = south (SVG y-down)
+    if (angle >= -22.5 && angle < 22.5) return 'east';
+    if (angle >= 22.5 && angle < 67.5) return 'southeast';
+    if (angle >= 67.5 && angle < 112.5) return 'south';
+    if (angle >= 112.5 && angle < 157.5) return 'southwest';
+    if (angle >= 157.5 || angle < -157.5) return 'west';
+    if (angle >= -157.5 && angle < -112.5) return 'northwest';
+    if (angle >= -112.5 && angle < -67.5) return 'north';
+    if (angle >= -67.5 && angle < -22.5) return 'northeast';
+    return 'north';
+  }
+
+  // ── Room creation dialog ───────────────────────────────────
+  var pendingRoomPos = null;
+
+  function showRoomDialog(gx, gy) {
+    pendingRoomPos = {x: gx, y: gy};
+    document.getElementById('me-room-name').value = '';
+    document.getElementById('me-room-slug').value = '';
+    document.getElementById('me-room-type').value = '';
+    overlay.style.display = 'block';
+    document.getElementById('me-room-dialog').style.display = 'block';
+    document.getElementById('me-room-name').focus();
+
+    // Auto-generate slug from name
+    document.getElementById('me-room-name').oninput = function() {
+      var name = this.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      document.getElementById('me-room-slug').value = name;
+    };
+  }
+
+  document.getElementById('me-room-confirm').addEventListener('click', function() {
+    if (!pendingRoomPos) return;
+    var name = document.getElementById('me-room-name').value.trim();
+    var slug = document.getElementById('me-room-slug').value.trim();
+    var roomType = document.getElementById('me-room-type').value;
+    if (!name) { setStatus('Name required'); return; }
+
+    setStatus('Creating room...');
+    api('POST', 'rooms', {
+      name: name, slug: slug, room_type: roomType || null,
+      grid_zone_id: zoneId, map_x: pendingRoomPos.x, map_y: pendingRoomPos.y, map_z: currentZ, min_clearance: 0
+    }).then(function(d) {
+      if (d.success) {
+        hideDialogs();
+        setStatus('Room created');
+        loadData();
+      } else {
+        setStatus('Error: ' + (d.errors || []).join(', '));
+      }
+    });
+  });
+
+  document.getElementById('me-room-cancel').addEventListener('click', hideDialogs);
+
+  function hideDialogs() {
+    overlay.style.display = 'none';
+    document.getElementById('me-exit-dialog').style.display = 'none';
+    document.getElementById('me-room-dialog').style.display = 'none';
+    pendingRoomPos = null;
+  }
+
+  overlay.addEventListener('click', hideDialogs);
+
+  // ── Toolbar buttons ────────────────────────────────────────
+  document.getElementById('me-auto-layout').addEventListener('click', function() {
+    if (!confirm('Recompute positions via BFS for all rooms in this zone?\nExisting positions will be overwritten.')) return;
+    setStatus('Computing layout...');
+    api('POST', zoneId + '/auto_layout').then(function(d) {
+      if (d.success) {
+        setStatus('Layout computed (' + d.updated + ' rooms)');
+        loadData();
+      } else {
+        setStatus('Error');
+      }
+    });
+  });
+
+  document.getElementById('me-zoom-in').addEventListener('click', function() {
+    zoomLevel = Math.min(zoomLevel + 0.25, 3.0);
+    applyZoom();
+  });
+
+  document.getElementById('me-zoom-out').addEventListener('click', function() {
+    zoomLevel = Math.max(zoomLevel - 0.25, 0.25);
+    applyZoom();
+  });
+
+  document.getElementById('me-zoom-reset').addEventListener('click', function() {
+    zoomLevel = 1.0;
+    applyZoom();
+  });
+
+  function applyZoom() {
+    var vb = svg.getAttribute('viewBox');
+    if (!vb) return;
+    var parts = vb.split(' ');
+    var vbW = parseFloat(parts[2]), vbH = parseFloat(parts[3]);
+    svg.setAttribute('width', Math.round(vbW * zoomLevel));
+    svg.setAttribute('height', Math.round(vbH * zoomLevel));
+    setStatus('Zoom: ' + Math.round(zoomLevel * 100) + '%');
+  }
+
+  // ── Helpers ────────────────────────────────────────────────
+  function esc(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function field(label, id, value, type) {
+    return '<label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em; margin-top: 8px;">' + label + ':</label>' +
+      '<input id="' + id + '" type="' + type + '" class="tui-input" style="width: 100%; padding: 6px; font-size: 0.85em; box-sizing: border-box;" value="' + esc(value) + '" />';
+  }
+
+  // Build sorted flat room list: current zone first, then same region, then rest
+  var _sortedRooms = null;
+  function getSortedRooms(excludeId) {
+    if (!_sortedRooms) {
+      var flat = [];
+      (state.all_rooms_grouped || []).forEach(function(rg) {
+        rg.zones.forEach(function(zg) {
+          zg.rooms.forEach(function(rm) {
+            flat.push({id: rm.id, name: rm.name, zone: zg.zone, zone_id: zg.zone_id, region: rg.region});
+          });
+        });
+      });
+      var curZoneId = state.zone ? state.zone.id : zoneId;
+      var curRegion = state.zone ? state.zone.region_name : '';
+      flat.sort(function(a, b) {
+        var aZone = a.zone_id === curZoneId ? 0 : 1;
+        var bZone = b.zone_id === curZoneId ? 0 : 1;
+        if (aZone !== bZone) return aZone - bZone;
+        var aReg = a.region === curRegion ? 0 : 1;
+        var bReg = b.region === curRegion ? 0 : 1;
+        if (aReg !== bReg) return aReg - bReg;
+        if (a.region !== b.region) return a.region < b.region ? -1 : 1;
+        if (a.zone !== b.zone) return a.zone < b.zone ? -1 : 1;
+        return a.name < b.name ? -1 : 1;
+      });
+      _sortedRooms = flat;
+    }
+    if (excludeId) return _sortedRooms.filter(function(r) { return r.id !== excludeId; });
+    return _sortedRooms;
+  }
+
+  // Invalidate sorted cache on data reload
+  var _origLoadData = loadData;
+  loadData = function() { _sortedRooms = null; _origLoadData(); };
+
+  // Render combobox HTML for room picker
+  var _cbCounter = 0;
+  function roomComboboxHtml(prefix, selectedId) {
+    var uid = prefix + '-' + (++_cbCounter);
+    var sel = getSortedRooms().find(function(r) { return r.id === selectedId; });
+    var label = sel ? sel.name : '';
+    var html = '<div class="admin-combobox" style="position: relative;">';
+    html += '<input type="text" id="' + uid + '-input" class="admin-combobox-input' + (sel ? ' selected' : '') + '" style="padding: 4px 6px; font-size: 0.85em;" autocomplete="off" placeholder="Search rooms..." value="' + esc(label) + '" />';
+    html += '<input type="hidden" id="' + uid + '-hidden" value="' + (selectedId || '') + '" />';
+    html += '<div id="' + uid + '-dropdown" class="admin-combobox-dropdown"></div>';
+    html += '<div id="' + uid + '-status" style="color: #666; font-size: 0.75em; margin-top: 2px;"></div>';
+    html += '</div>';
+    return {html: html, uid: uid};
+  }
+
+  function initRoomCombobox(uid, excludeId) {
+    var items = getSortedRooms(excludeId);
+    var curZoneId = state.zone ? state.zone.id : zoneId;
+    var curRegion = state.zone ? state.zone.region_name : '';
+    AdminCombobox.init({
+      inputId: uid + '-input',
+      hiddenId: uid + '-hidden',
+      dropdownId: uid + '-dropdown',
+      statusId: uid + '-status',
+      items: items,
+      getSearchText: function(r) { return (r.name + ' ' + r.zone + ' ' + r.region).toLowerCase(); },
+      getGroupKey: function(r) {
+        if (r.zone_id === curZoneId) return '★ ' + r.zone + ' (this zone)';
+        return r.region + ' / ' + r.zone;
+      },
+      renderOption: function(r, e) {
+        return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone) + '</span>';
+      },
+      getId: function(r) { return String(r.id); },
+      getLabel: function(r) { return r.name; },
+      emptyText: 'No rooms match',
+      selectedText: 'Room selected'
+    });
+  }
+
+  // Zone combobox helpers
+  var _zoneCbCounter = 0;
+  function zoneComboboxHtml(prefix, selectedId) {
+    var uid = prefix + '-' + (++_zoneCbCounter);
+    var zones = state.available_zones || [];
+    var sel = zones.find(function(z) { return z.id === selectedId; });
+    var label = sel ? (sel.region_name + ' / ' + sel.name) : '';
+    var html = '<div class="admin-combobox" style="position: relative;">';
+    html += '<input type="text" id="' + uid + '-input" class="admin-combobox-input' + (sel ? ' selected' : '') + '" style="padding: 4px 6px; font-size: 0.85em;" autocomplete="off" placeholder="Search zones..." value="' + esc(label) + '" />';
+    html += '<input type="hidden" id="' + uid + '-hidden" value="' + (selectedId || '') + '" />';
+    html += '<div id="' + uid + '-dropdown" class="admin-combobox-dropdown"></div>';
+    html += '<div id="' + uid + '-status" style="color: #666; font-size: 0.75em; margin-top: 2px;"></div>';
+    html += '</div>';
+    return {html: html, uid: uid};
+  }
+
+  function initZoneCombobox(uid) {
+    var zones = state.available_zones || [];
+    AdminCombobox.init({
+      inputId: uid + '-input',
+      hiddenId: uid + '-hidden',
+      dropdownId: uid + '-dropdown',
+      statusId: uid + '-status',
+      items: zones,
+      getSearchText: function(z) { return (z.name + ' ' + z.region_name).toLowerCase(); },
+      getGroupKey: function(z) { return z.region_name; },
+      renderOption: function(z, e) {
+        return '<span class="cb-name">' + e(z.name) + '</span> <span class="cb-meta">' + e(z.region_name) + '</span>';
+      },
+      getId: function(z) { return String(z.id); },
+      getLabel: function(z) { return z.region_name + ' / ' + z.name; },
+      emptyText: 'No zones match',
+      selectedText: 'Zone selected'
+    });
+  }
+
+  // ── Init ───────────────────────────────────────────────────
+  loadData();
+})();
+</script>

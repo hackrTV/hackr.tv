@@ -304,11 +304,32 @@ Rails.application.routes.draw do
     resources :radio_stations, only: %i[index show]
     resources :zone_playlists, only: %i[index show]
 
+    # World Export (download DB → YAML archive)
+    get "grid_world_export", to: "grid_world_export#download", as: :grid_world_export
+
     # World Map Viewer (read-only)
     resources :grid_world_map, only: %i[index show] do
       member do
         get :zone_map
       end
+    end
+
+    # Map Editor (zone-scoped visual editor)
+    scope "grid_map_editor", as: :grid_map_editor do
+      get ":zone_id", to: "grid_map_editor#show", as: :show
+      get ":zone_id/data", to: "grid_map_editor#data", as: :data
+      post "rooms", to: "grid_map_editor#create_room", as: :create_room
+      patch "rooms/:id", to: "grid_map_editor#update_room", as: :update_room
+      delete "rooms/:id", to: "grid_map_editor#destroy_room", as: :destroy_room
+      post "exits", to: "grid_map_editor#create_exit", as: :create_exit
+      patch "exits/:id", to: "grid_map_editor#update_exit", as: :update_exit
+      delete "exits/:id", to: "grid_map_editor#destroy_exit", as: :destroy_exit
+      post "mobs", to: "grid_map_editor#create_mob", as: :create_mob
+      patch "mobs/:id", to: "grid_map_editor#update_mob", as: :update_mob
+      delete "mobs/:id", to: "grid_map_editor#remove_mob", as: :remove_mob
+      post "encounters", to: "grid_map_editor#create_encounter", as: :create_encounter
+      delete "encounters/:id", to: "grid_map_editor#destroy_encounter", as: :destroy_encounter
+      post ":zone_id/auto_layout", to: "grid_map_editor#auto_layout", as: :auto_layout
     end
 
     # World resources (full CRUD)
