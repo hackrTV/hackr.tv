@@ -10,17 +10,20 @@ RSpec.describe Grid::WorldExporter do
 
   describe "#export_all" do
     it "writes YAML files to the target directory" do
-      room1; room2
+      room1
+      room2
       create(:grid_exit, from_room: room1, to_room: room2, direction: "east")
 
       Dir.mktmpdir do |dir|
         described_class.new.export_all(dir: dir)
 
-        %w[regions.yml zones.yml rooms.yml exits.yml mobs.yml
-           item_definitions.yml salvage_yields.yml items.yml
-           achievements.yml shop_listings.yml missions.yml
-           schematics.yml breach_templates.yml breach_encounters.yml
-           factions.yml].each do |file|
+        %w[
+          regions.yml zones.yml rooms.yml exits.yml mobs.yml
+          item_definitions.yml salvage_yields.yml items.yml
+          achievements.yml shop_listings.yml missions.yml
+          schematics.yml breach_templates.yml breach_encounters.yml
+          factions.yml
+        ].each do |file|
           expect(File.exist?(File.join(dir, file))).to be(true), "Missing #{file}"
         end
       end
@@ -60,7 +63,7 @@ RSpec.describe Grid::WorldExporter do
     end
 
     it "exports exits with room slug references" do
-      exit_record = create(:grid_exit, from_room: room1, to_room: room2, direction: "east")
+      create(:grid_exit, from_room: room1, to_room: room2, direction: "east")
       Dir.mktmpdir do |dir|
         described_class.new.export_all(dir: dir)
         data = YAML.load_file(File.join(dir, "exits.yml"))
@@ -71,7 +74,7 @@ RSpec.describe Grid::WorldExporter do
     end
 
     it "exports mobs with room slug references" do
-      mob = create(:grid_mob, grid_room: room1, name: "Guard", mob_type: "lore")
+      create(:grid_mob, grid_room: room1, name: "Guard", mob_type: "lore")
       Dir.mktmpdir do |dir|
         described_class.new.export_all(dir: dir)
         data = YAML.load_file(File.join(dir, "mobs.yml"))

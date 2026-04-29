@@ -25,7 +25,10 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
   end
 
   describe "GET #data" do
-    before { room1; room2 }
+    before do
+      room1
+      room2
+    end
 
     it "returns JSON with rooms" do
       get :data, params: {zone_id: zone.id}, format: :json
@@ -87,7 +90,7 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
     end
 
     it "includes presence counts" do
-      hackr = create(:grid_hackr, :online, current_room: room1)
+      create(:grid_hackr, :online, current_room: room1)
       get :data, params: {zone_id: zone.id}, format: :json
       json = response.parsed_body
       hub = json["rooms"].find { |r| r["id"] == room1.id }
@@ -389,7 +392,7 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
       encounter = create(:grid_breach_encounter, grid_room: room1, grid_breach_template: template)
       hackr = create(:grid_hackr, :online, current_room: room1)
       create(:grid_hackr_breach, grid_hackr: hackr, grid_breach_template: template,
-             grid_breach_encounter: encounter, state: "active")
+        grid_breach_encounter: encounter, state: "active")
 
       delete :destroy_encounter, params: {id: encounter.id}, format: :json
       json = response.parsed_body
