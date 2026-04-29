@@ -2,6 +2,11 @@
 # YAML files provide initial seed data. The database is the source of truth.
 # Existing records are never overwritten — only new records are created.
 #
+# PRODUCTION GUARD: All world seed tasks are disabled in production because
+# the database is the authoritative source. Use the admin "Export World"
+# download or `rails data:world:export` to dump DB → YAML for version control.
+# Override with ALLOW_WORLD_SEED=true for disaster recovery.
+#
 # Import Order (respecting dependencies):
 # 1. catalog           (artists, releases, tracks from per-artist YAML files)
 # 2. hackrs            (no deps)
@@ -32,6 +37,16 @@
 # 28. breach_encounters (depends on breach_templates, rooms)
 
 namespace :data do
+  # Guard: prevent accidental world seeding in production.
+  # The database is the authoritative source in production.
+  # Override with ALLOW_WORLD_SEED=true for disaster recovery.
+  def self.guard_world_seed!
+    if Rails.env.production? && ENV["ALLOW_WORLD_SEED"] != "true"
+      abort "World seed tasks are disabled in production (DB is master). " \
+            "Set ALLOW_WORLD_SEED=true to override for disaster recovery."
+    end
+  end
+
   # === Master Tasks ===
   desc "Seed data from YAML (creates missing records only). Set S3_BUCKET to also load audio from S3."
   task load: :environment do
@@ -189,7 +204,12 @@ namespace :data do
   task system: [:hackrs, :channels, :radio_stations, :zone_playlists, :redirects]
 
   desc "Load world data (factions, regions, zones, rooms, etc.)"
-  task world: [:factions, :regions, :zones, :rooms, :exits, :mobs, :item_definitions, :salvage_yields, :items, :achievements, :shop_listings, :missions, :schematics, :breach_templates, :breach_encounters, :pac_facilities]
+  task world: :environment do
+    guard_world_seed!
+    %i[factions regions zones rooms exits mobs item_definitions salvage_yields items achievements shop_listings missions schematics breach_templates breach_encounters pac_facilities].each do |t|
+      Rake::Task["data:#{t}"].invoke
+    end
+  end
 
   desc "Load playlists (key playlists with radio station links)"
   task playlists: [:catalog, :hackrs, :radio_stations, :key_playlists]
@@ -431,6 +451,7 @@ namespace :data do
 
   desc "Load factions from YAML"
   task factions: :environment do
+    guard_world_seed!
     puts "\n--- Loading Factions ---"
     yaml_file = Rails.root.join("data", "world", "factions.yml")
 
@@ -505,6 +526,7 @@ namespace :data do
 
   desc "Load regions from YAML"
   task regions: :environment do
+    guard_world_seed!
     puts "\n--- Loading Regions ---"
     yaml_file = Rails.root.join("data", "world", "regions.yml")
 
@@ -535,6 +557,7 @@ namespace :data do
 
   desc "Load zones from YAML"
   task zones: [:environment, :regions] do
+    guard_world_seed!
     puts "\n--- Loading Zones ---"
     yaml_file = Rails.root.join("data", "world", "zones.yml")
 
@@ -580,6 +603,7 @@ namespace :data do
 
   desc "Load rooms from YAML"
   task rooms: :environment do
+    guard_world_seed!
     puts "\n--- Loading Rooms ---"
     yaml_file = Rails.root.join("data", "world", "rooms.yml")
 
@@ -607,7 +631,10 @@ namespace :data do
         description: attrs["description"],
         grid_zone: zone,
         room_type: attrs["room_type"],
-        min_clearance: attrs["min_clearance"] || 0
+        min_clearance: attrs["min_clearance"] || 0,
+        map_x: attrs["map_x"],
+        map_y: attrs["map_y"],
+        map_z: attrs["map_z"] || 0
       )
       room.save!
       created += 1
@@ -631,6 +658,7 @@ namespace :data do
 
   desc "Load exits from YAML"
   task exits: :environment do
+    guard_world_seed!
     puts "\n--- Loading Exits ---"
     yaml_file = Rails.root.join("data", "world", "exits.yml")
 
@@ -670,6 +698,7 @@ namespace :data do
 
   desc "Load mobs from YAML"
   task mobs: :environment do
+    guard_world_seed!
     puts "\n--- Loading Mobs ---"
     yaml_file = Rails.root.join("data", "world", "mobs.yml")
 
@@ -711,6 +740,7 @@ namespace :data do
 
   desc "Load item definitions from YAML"
   task item_definitions: :environment do
+    guard_world_seed!
     puts "\n--- Loading Item Definitions ---"
     yaml_file = Rails.root.join("data", "world", "item_definitions.yml")
 
@@ -746,6 +776,7 @@ namespace :data do
 
   desc "Load salvage yield definitions from YAML"
   task salvage_yields: :environment do
+    guard_world_seed!
     puts "\n--- Loading Salvage Yields ---"
     yaml_file = Rails.root.join("data", "world", "salvage_yields.yml")
 
@@ -791,6 +822,7 @@ namespace :data do
 
   desc "Load items from YAML"
   task items: :environment do
+    guard_world_seed!
     puts "\n--- Loading Items ---"
     yaml_file = Rails.root.join("data", "world", "items.yml")
 
@@ -836,6 +868,7 @@ namespace :data do
 
   desc "Load BREACH templates from YAML"
   task breach_templates: :environment do
+    guard_world_seed!
     puts "\n--- Loading BREACH Templates ---"
     yaml_file = Rails.root.join("data", "world", "breach_templates.yml")
 
@@ -884,6 +917,7 @@ namespace :data do
 
   desc "Load BREACH encounters from YAML"
   task breach_encounters: :environment do
+    guard_world_seed!
     puts "\n--- Loading BREACH Encounters ---"
     yaml_file = Rails.root.join("data", "world", "breach_encounters.yml")
 
@@ -929,6 +963,7 @@ namespace :data do
 
   desc "Stamp GovCorp Perception Alignment Facilities per region from template"
   task pac_facilities: :environment do
+    guard_world_seed!
     puts "\n--- Loading PAC Facilities ---"
     yaml_file = Rails.root.join("data", "world", "pac_facilities.yml")
 
@@ -1082,6 +1117,7 @@ namespace :data do
 
   desc "Load achievements from YAML"
   task achievements: :environment do
+    guard_world_seed!
     puts "\n--- Loading Achievements ---"
     yaml_file = Rails.root.join("data", "world", "achievements.yml")
 
@@ -1119,6 +1155,7 @@ namespace :data do
 
   desc "Load shop listings from YAML"
   task shop_listings: :environment do
+    guard_world_seed!
     puts "\n--- Loading Shop Listings ---"
     yaml_file = Rails.root.join("data", "world", "shop_listings.yml")
 
@@ -2116,6 +2153,7 @@ namespace :data do
 
   desc "Load missions and arcs from YAML"
   task missions: :environment do
+    guard_world_seed!
     puts "\n--- Loading Mission Arcs & Missions ---"
     yaml_file = Rails.root.join("data", "world", "missions.yml")
 
@@ -2231,6 +2269,7 @@ namespace :data do
 
   desc "Load fabrication schematics from YAML"
   task schematics: :environment do
+    guard_world_seed!
     puts "\n--- Loading Fabrication Schematics ---"
     yaml_file = Rails.root.join("data", "world", "schematics.yml")
 
@@ -2286,6 +2325,21 @@ namespace :data do
     end
 
     puts "Schematics: #{created} created, #{GridSchematic.count} total"
+  end
+
+  # === World Export ===
+
+  namespace :world do
+    desc "Export world data from DB to YAML files in data/world/ (reverse of data:world)"
+    task export: :environment do
+      puts "\n" + "=" * 80
+      puts "EXPORTING WORLD DATA (DB → YAML)"
+      puts "=" * 80 + "\n"
+
+      dir = Grid::WorldExporter.new.export_all
+      puts "\n✓ Exported to #{dir}"
+      puts "  Run `git diff data/world/` to review changes."
+    end
   end
 end
 
