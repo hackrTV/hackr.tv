@@ -382,11 +382,11 @@ namespace :data do
       puts "  PAC preserved: #{pac_zone_ids.size} zones, #{pac_room_ids.size} rooms"
 
       # Shop listings for non-PAC vendors
-      if pac_room_ids.any?
+      count = if pac_room_ids.any?
         non_pac_mob_ids = GridMob.where.not(grid_room_id: pac_room_ids).pluck(:id)
-        count = GridShopListing.where(grid_mob_id: non_pac_mob_ids).delete_all
+        GridShopListing.where(grid_mob_id: non_pac_mob_ids).delete_all
       else
-        count = GridShopListing.delete_all
+        GridShopListing.delete_all
       end
       puts "  - Shop listings: #{count}"
 
@@ -401,47 +401,47 @@ namespace :data do
       puts "  - Mission arcs: #{count}"
 
       # Breach encounters (non-PAC rooms only)
-      if pac_room_ids.any?
-        count = GridBreachEncounter.where.not(grid_room_id: pac_room_ids).delete_all
+      count = if pac_room_ids.any?
+        GridBreachEncounter.where.not(grid_room_id: pac_room_ids).delete_all
       else
-        count = GridBreachEncounter.delete_all
+        GridBreachEncounter.delete_all
       end
       puts "  - Breach encounters: #{count}"
 
       # Mobs (non-PAC rooms only)
-      if pac_room_ids.any?
-        count = GridMob.where.not(grid_room_id: pac_room_ids).delete_all
+      count = if pac_room_ids.any?
+        GridMob.where.not(grid_room_id: pac_room_ids).delete_all
       else
-        count = GridMob.delete_all
+        GridMob.delete_all
       end
       puts "  - Mobs: #{count}"
 
       puts "\n--- Phase 3: World Geography (non-PAC) ---"
 
       # Exits involving any non-PAC room (catches cross-zone exits too)
-      if pac_room_ids.any?
-        count = GridExit
+      count = if pac_room_ids.any?
+        GridExit
           .where.not(from_room_id: pac_room_ids)
           .or(GridExit.where.not(to_room_id: pac_room_ids))
           .delete_all
       else
-        count = GridExit.delete_all
+        GridExit.delete_all
       end
       puts "  - Exits: #{count}"
 
       # Non-PAC rooms (includes player dens — they're in regular zones)
-      if pac_zone_ids.any?
-        count = GridRoom.where.not(grid_zone_id: pac_zone_ids).delete_all
+      count = if pac_zone_ids.any?
+        GridRoom.where.not(grid_zone_id: pac_zone_ids).delete_all
       else
-        count = GridRoom.delete_all
+        GridRoom.delete_all
       end
       puts "  - Rooms: #{count}"
 
       # Non-PAC zones
-      if pac_zone_ids.any?
-        count = GridZone.where.not(id: pac_zone_ids).delete_all
+      count = if pac_zone_ids.any?
+        GridZone.where.not(id: pac_zone_ids).delete_all
       else
-        count = GridZone.delete_all
+        GridZone.delete_all
       end
       puts "  - Zones: #{count}"
 
