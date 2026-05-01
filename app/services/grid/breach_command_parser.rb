@@ -279,6 +279,11 @@ module Grid
           # Facility BREACH hooks (captured mode)
           output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
         end
+      elsif result.all_failed
+        # Gate-only BREACH with all gates exhausted — auto-resolve failure
+        output << "<span style='color: #f87171; font-weight: bold;'>ALL CIRCUMVENTION GATES FAILED — BREACH LOST</span>"
+        failure_result = Grid::BreachService.resolve_failure!(hackr_breach: breach, failure_mode: :gate_exhaustion)
+        output << failure_result.display
       else
         # Check if round should end
         breach.reload
@@ -439,6 +444,28 @@ module Grid
 
       if result.state == :failure
         # Failure display already included in result.display
+      elsif result.state == :success
+        # Win detected during end_round! — resolve properly
+        output = [result.display]
+        resolve_result = Grid::BreachService.resolve_success!(hackr_breach: breach)
+        output << resolve_result.display
+
+        unless breach.sandbox?
+          template = breach.grid_breach_template
+          notifications = []
+          notifications += achievement_checker.check(:breach_completed, template_slug: template.slug, tier: template.tier)
+          notifications += achievement_checker.check(:breaches_completed_count)
+          notifications += mission_progressor.record(:complete_breach, template_slug: template.slug, tier: template.tier)
+
+          if resolve_result.xp_result[:leveled_up]
+            output << "<span style='color: #fbbf24; font-weight: bold;'>▲ CLEARANCE UP → #{resolve_result.xp_result[:new_clearance]}</span>"
+          end
+
+          output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
+          append_notifications(output, notifications)
+        end
+
+        return output.compact.join("\n")
       end
 
       result.display

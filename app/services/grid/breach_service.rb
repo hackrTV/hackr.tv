@@ -34,6 +34,10 @@ module Grid
     TRACE_DETECTION_BONUS = 4
     UNLIMITED_ATTEMPTS = -1 # Sentinel for infinite puzzle gate attempts (facility BREACHes)
 
+    # Failure modes that trigger DECK consequences and capture eligibility.
+    # :health_zero is excluded — dying in a breach skips DECK frying and capture.
+    DECK_CONSEQUENCE_MODES = %i[detection_overflow gate_exhaustion].freeze
+
     def self.breach_rank(clearance)
       BREACH_RANK_TABLE.find { |range, _| range.include?(clearance.to_i) }&.last
     end
@@ -378,6 +382,13 @@ module Grid
           if state == :ongoing && hackr_breach.breach_won?
             state = :success
           end
+
+          # 6. Check unwinnable (gate-only BREACH with all required gates failed)
+          if state == :ongoing && hackr_breach.breach_unwinnable?
+            failure_result = resolve_failure!(hackr_breach, failure_mode: :gate_exhaustion)
+            state = :failure
+            failure_display = failure_result.display
+          end
         end
       end
 
@@ -506,9 +517,9 @@ module Grid
             end
           end
 
-          # Tier 3+4: DECK consequences (detection-overflow only, not health-zero)
+          # Tier 3+4: DECK consequences (detection-overflow/gate-exhaustion, not health-zero)
           deck = @hackr.equipped_deck
-          if deck && failure_mode == :detection_overflow
+          if deck && DECK_CONSEQUENCE_MODES.include?(failure_mode)
             if %w[advanced elite world_event].include?(tier)
               # Tier 4: DECK fried — compute level + wipe software
               fried_level_set = compute_fried_level(tier)
@@ -896,7 +907,7 @@ module Grid
 
         # Tier 3+4: DECK consequences
         deck = @hackr.equipped_deck
-        if deck && failure_mode == :detection_overflow
+        if deck && DECK_CONSEQUENCE_MODES.include?(failure_mode)
           if %w[advanced elite world_event].include?(tier)
             fried_level_set = compute_fried_level(tier)
             deck.lock!
@@ -921,10 +932,10 @@ module Grid
     end
 
     # Determine whether this failure results in GovCorp capture.
-    # Capture only happens on detection-overflow, never health-zero.
+    # Capture only on detection-overflow/gate-exhaustion, never health-zero.
     # Probabilistic: standard 25%, advanced 50%, elite+ 100%.
     def should_capture?(tier, failure_mode)
-      return false unless failure_mode == :detection_overflow
+      return false unless DECK_CONSEQUENCE_MODES.include?(failure_mode)
       return false if Grid::ContainmentService.captured?(@hackr)
 
       case tier

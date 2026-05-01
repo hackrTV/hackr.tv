@@ -56,6 +56,14 @@ module Grid
         go_command("east")
       when "west", "w"
         go_command("west")
+      when "northeast", "ne"
+        go_command("northeast")
+      when "southeast", "se"
+        go_command("southeast")
+      when "southwest", "sw"
+        go_command("southwest")
+      when "northwest", "nw"
+        go_command("northwest")
       when "up", "u"
         go_command("up")
       when "down", "d"
@@ -150,6 +158,8 @@ module Grid
         who_command
       when "clear", "cls", "cl"
         clear_command
+      when "bribe"
+        "<span style='color: #9ca3af;'>Bribe is only available inside a GovCorp facility while in custody.</span>"
       else
         "<span style='color: #f87171;'>Unknown command: #{h(command)}. Type 'help' for a list of commands.</span>"
       end
@@ -157,7 +167,7 @@ module Grid
 
     private
 
-    def look_command
+    def look_command(include_alert_bar: true)
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere. This shouldn't happen!</span>" unless room
 
@@ -280,8 +290,9 @@ module Grid
         output << "<span style='color: #fbbf24;'>Hackrs:</span> #{hackr_entries.join(", ")}"
       end
 
-      # Facility alert HUD (captured mode)
-      if Grid::ContainmentService.captured?(hackr)
+      # Facility alert HUD (captured mode) — suppressed when go_command handles
+      # alert_increment! separately (avoids double-rendering stale + current bar).
+      if include_alert_bar && Grid::ContainmentService.captured?(hackr)
         output << ""
         output << Grid::ContainmentService.render_alert_bar(hackr.stat("facility_alert_level").to_i)
       end
@@ -290,7 +301,7 @@ module Grid
     end
 
     def go_command(direction)
-      return "<span style='color: #fbbf24;'>Go where? Specify a direction (e.g. north, south, east, west, up, down)</span>" unless direction
+      return "<span style='color: #fbbf24;'>Go where? Specify a direction (e.g. north, south, east, west, ne, se, sw, nw, up, down)</span>" unless direction
 
       old_room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless old_room
@@ -382,7 +393,7 @@ module Grid
         hackr.grant_xp!(5) # Bonus XP for new room discovery
       end
 
-      look_output = look_command
+      look_output = look_command(include_alert_bar: !Grid::ContainmentService.captured?(hackr))
       notifications = achievement_checker.check(:room_visit, room_slug: new_room.slug)
       notifications += achievement_checker.check(:rooms_visited)
       notifications += mission_progressor.record(:visit_room, room_slug: new_room.slug)
@@ -887,6 +898,7 @@ module Grid
           <span style='color: #34d399;'>go &lt;direction&gt;</span>             - Move in a direction
           <span style='color: #34d399;'>north, n / south, s</span>        - Move north/south
           <span style='color: #34d399;'>east, e / west, w</span>          - Move east/west
+          <span style='color: #34d399;'>ne / se / sw / nw</span>          - Move diagonally
           <span style='color: #34d399;'>up, u / down, d</span>            - Move up/down
 
         <span style='color: #fbbf24;'>Items:</span>
