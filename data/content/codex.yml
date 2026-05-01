@@ -3778,3 +3778,76 @@ codex_entries:
       - [[Offline]]
       - [[The Fracture Network]]
       - [[The Analog Archive]]
+
+  - name: The Canyon
+    slug: the-canyon
+    entry_type: location
+    summary: "A vast desert canyon system carved by an ancient river — layered rock walls that glow red at sunset, where depth plays havoc with RIDE signal propagation and settlements cling to ledges carved into cliff faces."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone (limited)
+    content: |
+      # The Canyon
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone (limited coverage)
+
+      ## Overview
+
+      A vast canyon system carved by an ancient river over geological time. Layered rock walls — red, orange, ochre, white — drop a vertical mile from rim to river. The scale is disorienting. The depth is the problem.
+
+      [[The RIDE|RIDE]] signal propagation degrades severely below the rim. The canyon walls create multipath interference, signal shadows, and dead zones that shift with the sun angle. GovCorp has deployed relay stations along the major ledge settlements, but coverage below the second terrace is unreliable. Below the third, it's effectively gone. The river bottom is one of the few places on the continent where you can stand in open air and experience zero RIDE rendering.
+
+      Settlements cling to ledges and tunnel into cliff faces at various depths. The deeper you go, the older the community and the weaker GovCorp's presence. Rim-level towns are fully integrated — RIDE-rendered, surveilled, compliant. Ledge communities are partially covered. River-bottom settlements are functionally [[Offline]].
+
+      GovCorp's Cultural Zone programming emphasizes natural wonder, geological time, and human insignificance — a narrative that conveniently discourages residents from questioning why infrastructure investment stops at the second terrace. The Canyon is classified as low-priority. The people who live below the rim have a different word for it: home.
+
+      The Canyon sits south of [[The Front]] and east of [[The Basin]], connected by [[The Slipstream|slipstream]] corridors that run along the rim. The descent into the canyon itself requires older infrastructure — cable cars, switchback roads, and in some cases hand-cut stairs in the rock.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Front]]
+      - [[The Basin]]
+      - [[The Slipstream]]
+      - [[Offline]]
+
+  - name: The Hollows
+    slug: the-hollows
+    entry_type: location
+    summary: "Ancient mountain ridges folded tight around deep valleys where mist pools and signal dies — a region of coal seams, abandoned mines, and communities that GovCorp's infrastructure has never fully reached."
+    position: null
+    published: true
+    metadata:
+      type: Regional location
+      status: GovCorp Cultural Zone (partial)
+    content: |
+      # The Hollows
+
+      - **Type:** Regional location
+      - **Status:** [[GovCorp]] Cultural Zone (partial coverage)
+
+      ## Overview
+
+      Old mountains — the oldest on the continent. Not tall anymore, but folded: ridge after ridge after ridge, with deep valleys between them that locals have always called hollows. The terrain is the story. Every hollow is a world unto itself, separated from the next by a ridge that blocks line of sight, radio signal, and — critically — [[The RIDE|RIDE]] propagation.
+
+      GovCorp has never fully solved The Hollows. The cost of blanketing every fold, every valley, every mine-cut gap with RIDE infrastructure exceeds the economic return of the sparse population living in them. Ridgetop towns and valley-floor population centers have coverage. Everything between — the winding roads, the creek beds, the old mining camps — exists in varying degrees of signal shadow. The Hollows have more RIDE dead zones per square mile than any region except [[The Badlands]], and unlike The Badlands, people actually live in them.
+
+      The region's identity runs deeper than anything the Cultural Zone can manufacture. Coal built it. Coal broke it. The mines closed, the economy collapsed, and the population thinned — but the people who stayed developed a relationship with the land that predates GovCorp by centuries and will outlast it. The RIDE's Cultural Zone programming tries to render this as rustic charm: mountain music, craft heritage, hardscrabble pride. The residents tolerate it. They've been tolerating outsiders telling them what they are for a long time.
+
+      The abandoned mines are The Hollows' most valuable asset to the [[The Fracture Network|Fracture Network]]. Miles of tunnels bored into ridgelines, shielded by solid rock from any signal — electromagnetic, RIDE, or otherwise. Perfect for storage, meetings, and operations that require absolute signal isolation. Several mines have been quietly reactivated as Fracture Network infrastructure, their entrances hidden in hollows that GovCorp's mapping drones have never bothered to survey.
+
+      The Hollows sits between [[The Works]] to the north and [[The Riverlands]] to the southwest, connected by [[The Slipstream|slipstream]] corridors that follow old highway routes through mountain passes. The passes are the bottleneck — GovCorp monitors them heavily, knowing that whoever controls the gaps between ridges controls movement through the region.
+
+      ## Related Entries
+
+      - [[GovCorp]]
+      - [[The RIDE]]
+      - [[The Works]]
+      - [[The Riverlands]]
+      - [[The Badlands]]
+      - [[The Fracture Network]]
+      - [[The Slipstream]]

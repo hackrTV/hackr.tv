@@ -8,7 +8,7 @@
     <div style="padding: 10px;">
       <%# Toolbar %>
       <div id="me-toolbar" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center;">
-        <%= link_to "<- World Map", admin_grid_world_map_index_path, class: "tui-button", style: "padding: 4px 12px; font-size: 0.85em;" %>
+        <%= link_to "<- Zones", admin_grid_zones_path, class: "tui-button", style: "padding: 4px 12px; font-size: 0.85em;" %>
 
         <label style="color: #888; font-size: 0.85em;">Zone:</label>
         <div style="min-width: 280px; max-width: 350px; position: relative;" class="admin-combobox">
@@ -24,18 +24,20 @@
         <button id="me-zoom-reset" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">1:1</button>
         <span style="color: #333; margin: 0 4px;">|</span>
         <span id="me-z-buttons" style="display: inline-flex; gap: 4px; align-items: center;"></span>
+        <span style="color: #333; margin: 0 4px;">|</span>
+        <button id="me-25d-toggle" class="tui-button" style="padding: 4px 12px; font-size: 0.85em;">2.5D</button>
         <span id="me-status" style="color: #666; font-size: 0.85em; margin-left: auto;"></span>
       </div>
 
       <%# Main layout: map + side panel %>
-      <div style="display: flex; gap: 0; border: 1px solid #333; background: #0d0d0d;">
+      <div id="me-layout" style="display: flex; gap: 0; border: 1px solid #333; background: #0d0d0d; height: 80vh;">
         <%# SVG Canvas %>
-        <div id="me-canvas-wrap" style="flex: 1; overflow: auto; position: relative; min-height: 600px; cursor: crosshair;">
+        <div id="me-canvas-wrap" style="flex: 1; overflow: auto; position: relative; height: 100%; cursor: crosshair;">
           <svg id="me-svg" xmlns="http://www.w3.org/2000/svg" style="display: block;"></svg>
         </div>
 
         <%# Side Panel %>
-        <div id="me-panel" style="width: 340px; min-width: 340px; background: #111; border-left: 2px solid #333; overflow-y: auto; max-height: 80vh; display: none;">
+        <div id="me-panel" style="width: 340px; min-width: 340px; background: #111; border-left: 2px solid #333; overflow-y: auto; height: 100%; display: none;">
           <div id="me-panel-content" style="padding: 15px;"></div>
         </div>
       </div>
@@ -140,6 +142,12 @@
   var GHOST_OPACITY = 0.35;
   var NS = 'http://www.w3.org/2000/svg';
 
+  // ── 2.5D Isometric constants ──────────────────────────────
+  var ISO_TILE_W = 160, ISO_TILE_H = 80;
+  var ISO_WALL_H = 22;
+  var ISO_Z_SPACING = 120;
+  var ISO_FADED_OPACITY = 0.3;
+
   var DIRECTION_VECTORS = {
     north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0],
     northeast: [1, -1], northwest: [-1, -1], southeast: [1, 1], southwest: [-1, 1]
@@ -173,8 +181,9 @@
   var state = {rooms: [], exits: [], ghostRooms: [], breachTemplates: [], allRoomsGrouped: [], zone: null, zoneColor: '#00ffff'};
   var selectedRoomId = null;
   var _panelZoneUid = null;
-  var zoomLevel = 0.75;
+  var zoomLevel = 1.0;
   var currentZ = 0;
+  var mode25D = false;
   var dragState = null; // {type: 'room'|'port', roomId, startX, startY, origX, origY}
   var drawLine = null;
 
@@ -204,16 +213,31 @@
 
   function setStatus(msg) { statusEl.textContent = msg; }
 
+  function navigateToZone(newZoneId) {
+    zoneId = newZoneId;
+    currentZ = 0;
+    selectedRoomId = null;
+    closePanel();
+    window.history.replaceState(null, '', '/root/grid_map_editor/' + zoneId);
+    loadData();
+  }
+
   // ── Data loading ───────────────────────────────────────────
   function loadData() {
     setStatus('Loading...');
-    api('GET', zoneId + '/data?z=' + currentZ).then(function(d) {
+    var dataUrl = zoneId + '/data?z=' + currentZ + (mode25D ? '&all_z=true' : '');
+    api('GET', dataUrl).then(function(d) {
       state = d;
       currentZ = d.z_level || 0;
+      // If no rooms exist at currentZ, snap to first available z-level
+      var zLevels = state.z_levels || [0];
+      if (zLevels.indexOf(currentZ) === -1 && zLevels.length > 0) {
+        currentZ = zLevels[0];
+      }
       populateZoneSelect();
       syncZoneCombobox();
       renderZButtons();
-      render();
+      if (mode25D) render25D(); else render();
       // Re-open panel if a room was selected and still exists
       if (selectedRoomId !== null) {
         var still = state.rooms.find(function(r) { return r.id === selectedRoomId; });
@@ -275,7 +299,12 @@
           currentZ = z;
           selectedRoomId = null;
           closePanel();
-          loadData();
+          if (mode25D) {
+            renderZButtons();
+            render25D();
+          } else {
+            loadData();
+          }
         });
       }
       wrap.appendChild(btn);
@@ -290,12 +319,7 @@
         desc.set.call(this, v);
         var newId = parseInt(v);
         if (newId && newId !== zoneId) {
-          zoneId = newId;
-          currentZ = 0;
-          selectedRoomId = null;
-          closePanel();
-          window.history.replaceState(null, '', '/root/grid_map_editor/' + zoneId);
-          loadData();
+          navigateToZone(newId);
         }
       },
       get: desc.get
@@ -551,12 +575,7 @@
     g.addEventListener('click', function(e) {
       if (e.target.classList.contains('me-port') || e.target.classList.contains('me-ghost-port')) return;
       if (confirm('Open zone "' + ghostRoom.zone_name + '" in editor?')) {
-        zoneId = ghostRoom.zone_id;
-        currentZ = 0;
-        selectedRoomId = null;
-        closePanel();
-        window.history.replaceState(null, '', '/root/grid_map_editor/' + zoneId);
-        loadData();
+        navigateToZone(ghostRoom.zone_id);
       }
     });
 
@@ -670,11 +689,439 @@
     return Math.min(tx, ty);
   }
 
+  // ── 2.5D Isometric Rendering ────────────────────────────────
+
+  function iso(gx, gy, gz) {
+    return [(gx - gy) * (ISO_TILE_W / 2), (gx + gy) * (ISO_TILE_H / 2) - gz * ISO_Z_SPACING];
+  }
+
+  function isoInverse(sx, sy, gz) {
+    var hw = ISO_TILE_W / 2, hh = ISO_TILE_H / 2;
+    var syAdj = sy + gz * ISO_Z_SPACING;
+    return [Math.round((sx / hw + syAdj / hh) / 2), Math.round((syAdj / hh - sx / hw) / 2)];
+  }
+
+  function isoPts(arr) { return arr.map(function(p) { return p[0]+','+p[1]; }).join(' '); }
+
+  function isoDarken(hex, factor) {
+    var r = parseInt(hex.slice(1,3), 16), g = parseInt(hex.slice(3,5), 16), b = parseInt(hex.slice(5,7), 16);
+    return '#' + [r,g,b].map(function(c) { return ('0' + Math.round(c * factor).toString(16)).slice(-2); }).join('');
+  }
+
+  function drawIsoTile(g, gx, gy, gz, room, isActive) {
+    var center = iso(gx, gy, gz);
+    var cx = center[0], cy = center[1];
+    var hw = ISO_TILE_W / 2, hh = ISO_TILE_H / 2;
+
+    var top = [cx, cy - hh], right = [cx + hw, cy], bottom = [cx, cy + hh], left = [cx - hw, cy];
+    var color = ROOM_TYPE_COLORS[room.room_type] || (state.zone_color || '#00ffff');
+    var topFill = isActive ? (room.id === selectedRoomId ? '#1a2a2a' : '#111') : '#0e0e0e';
+    var topStroke = isActive ? (room.id === selectedRoomId ? '#fff' : color) : '#444';
+    var topStrokeW = isActive ? (room.id === selectedRoomId ? 2.5 : 1.5) : 0.8;
+    var leftFill = isActive ? isoDarken(color, 0.18) : '#0a0a0a';
+    var rightFill = isActive ? isoDarken(color, 0.12) : '#080808';
+    var sideStroke = isActive ? isoDarken(color, 0.35) : '#1a1a1a';
+    // Left wall
+    g.appendChild(el('polygon', {points: isoPts([left, bottom, [bottom[0], bottom[1]+ISO_WALL_H], [left[0], left[1]+ISO_WALL_H]]), fill: leftFill, stroke: sideStroke, 'stroke-width': 0.5, 'data-room-id': room.id, class: 'me-room-iso'}));
+    // Right wall
+    g.appendChild(el('polygon', {points: isoPts([bottom, right, [right[0], right[1]+ISO_WALL_H], [bottom[0], bottom[1]+ISO_WALL_H]]), fill: rightFill, stroke: sideStroke, 'stroke-width': 0.5, 'data-room-id': room.id, class: 'me-room-iso'}));
+    // Top face (diamond)
+    var topEl = el('polygon', {points: isoPts([top, right, bottom, left]), fill: topFill, stroke: topStroke, 'stroke-width': topStrokeW, 'data-room-id': room.id, class: 'me-room-iso'});
+    g.appendChild(topEl);
+
+    // Name
+    var name = room.name.length > 14 ? room.name.substring(0, 13) + '\u2026' : room.name;
+    var nameEl = el('text', {x: cx, y: isActive ? cy - 4 : cy + 3, 'text-anchor': 'middle', fill: isActive ? color : '#777', 'font-family': "'Courier New', monospace", 'font-size': isActive ? '11px' : '9px', 'pointer-events': 'none'});
+    nameEl.textContent = name;
+    g.appendChild(nameEl);
+
+    // Info + ports (active only)
+    if (isActive) {
+      if (room.room_type) {
+        var info = el('text', {x: cx, y: cy + 12, 'text-anchor': 'middle', fill: '#555', 'font-family': "'Courier New', monospace", 'font-size': '8px', 'pointer-events': 'none'});
+        info.textContent = room.room_type;
+        g.appendChild(info);
+      }
+      // Port dots on diamond edges (N/E/S/W of diamond)
+      var isoPorts = [{dir:'north',pos:top},{dir:'east',pos:right},{dir:'south',pos:bottom},{dir:'west',pos:left}];
+      isoPorts.forEach(function(p) {
+        var port = el('circle', {cx: p.pos[0], cy: p.pos[1], r: PORT_R, fill: '#00ffff', opacity: 0, class: 'me-port', 'data-room-id': room.id, 'data-dir': p.dir, style: 'cursor: crosshair;'});
+        g.appendChild(port);
+      });
+    }
+  }
+
+  function drawIsoConnector(g, fromGX, fromGY, toGX, toGY, gz, exitData, isActive) {
+    var p1 = iso(fromGX, fromGY, gz), p2 = iso(toGX, toGY, gz);
+    var dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist === 0) return;
+    var ux = dx/dist, uy = dy/dist;
+    var shorten = Math.min(ISO_TILE_W, ISO_TILE_H) * 0.45;
+
+    var lineAttrs = {x1: Math.round(p1[0]+ux*shorten), y1: Math.round(p1[1]+uy*shorten), x2: Math.round(p2[0]-ux*shorten), y2: Math.round(p2[1]-uy*shorten), stroke: isActive ? '#444' : '#222', 'stroke-width': isActive ? 2 : 1, class: 'me-connector'};
+    if (exitData && exitData.id) lineAttrs['data-exit-id'] = exitData.id;
+    var line = el('line', lineAttrs);
+    g.appendChild(line);
+
+    if (isActive && exitData && exitData.id) {
+      line.style.cursor = 'pointer';
+      var hitLine = el('line', {x1: lineAttrs.x1, y1: lineAttrs.y1, x2: lineAttrs.x2, y2: lineAttrs.y2, stroke: 'transparent', 'stroke-width': 12, style: 'cursor: pointer;', 'data-exit-id': exitData.id});
+      g.appendChild(hitLine);
+      hitLine.addEventListener('click', function(e) { e.stopPropagation(); onConnectorClick(exitData.id); });
+    }
+  }
+
+  function render25D() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    var zGroups = {};
+    state.rooms.forEach(function(r) {
+      var z = r.map_z || 0;
+      if (!zGroups[z]) zGroups[z] = [];
+      zGroups[z].push(r);
+    });
+    var zLevels = Object.keys(zGroups).map(Number).sort(function(a,b) { return a-b; });
+    if (zLevels.length === 0) zLevels = [0];
+
+    // Compute viewBox from all rooms + ghosts across all z-levels
+    var roomById = {};
+    state.rooms.forEach(function(r) { roomById[r.id] = r; });
+
+    var allPositions = [];
+    state.rooms.forEach(function(r) {
+      var p = iso(r.map_x, r.map_y, r.map_z || 0);
+      allPositions.push(p);
+      allPositions.push([p[0], p[1] + ISO_WALL_H]);
+    });
+    // Include ghost room positions in bounds
+    (state.ghost_rooms || []).forEach(function(gr) {
+      if (gr.connected_via.length === 0) return;
+      var conn = gr.connected_via[0];
+      if (conn.direction === 'up' || conn.direction === 'down') return;
+      var localRoom = roomById[conn.local_room_id];
+      if (!localRoom) return;
+      var vec = DIRECTION_VECTORS[conn.direction];
+      if (vec) {
+        var p = iso(localRoom.map_x + vec[0], localRoom.map_y + vec[1], localRoom.map_z || 0);
+        allPositions.push(p);
+        allPositions.push([p[0], p[1] + ISO_WALL_H]);
+      }
+    });
+    // Include cross-zone vertical ghost positions in bounds
+    (state.vertical_rooms || []).forEach(function(vr) {
+      if (vr.connected_via.length === 0) return;
+      var conn = vr.connected_via[0];
+      var localRoom = roomById[conn.local_room_id];
+      if (!localRoom) return;
+      var ghostZ = (localRoom.map_z || 0) + (conn.direction === 'up' ? 1 : -1);
+      var p = iso(localRoom.map_x, localRoom.map_y, ghostZ);
+      allPositions.push(p);
+      allPositions.push([p[0], p[1] + ISO_WALL_H]);
+    });
+    if (allPositions.length === 0) allPositions.push([0, 0]);
+
+    var minSX = Infinity, minSY = Infinity, maxSX = -Infinity, maxSY = -Infinity;
+    allPositions.forEach(function(p) {
+      if (p[0] - ISO_TILE_W/2 < minSX) minSX = p[0] - ISO_TILE_W/2;
+      if (p[1] - ISO_TILE_H/2 < minSY) minSY = p[1] - ISO_TILE_H/2;
+      if (p[0] + ISO_TILE_W/2 > maxSX) maxSX = p[0] + ISO_TILE_W/2;
+      if (p[1] + ISO_TILE_H/2 + ISO_WALL_H > maxSY) maxSY = p[1] + ISO_TILE_H/2 + ISO_WALL_H;
+    });
+
+    // Use container dimensions for viewBox so rooms stay 1:1 scale
+    var paneW = canvasWrap.clientWidth || 800;
+    var paneH = canvasWrap.clientHeight || 600;
+    // Apply zoom: smaller viewBox = zoom in, larger = zoom out
+    var vbW = paneW / zoomLevel, vbH = paneH / zoomLevel;
+    // Center on content
+    var contentCX = (minSX + maxSX) / 2, contentCY = (minSY + maxSY + ISO_WALL_H) / 2;
+    var vbX = contentCX - vbW / 2, vbY = contentCY - vbH / 2;
+
+    svg.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.removeAttribute('preserveAspectRatio');
+
+    // Background fills entire viewBox
+    svg.appendChild(el('rect', {x: vbX, y: vbY, width: vbW, height: vbH, fill: '#0a0a0a'}));
+
+    // Diamond grid on active layer — extend to fill visible area
+    var gridG = el('g', {opacity: '0.08'});
+    // Inverse-project viewBox corners to find grid range needed
+    var gridCorners = [
+      isoInverse(vbX, vbY, currentZ),
+      isoInverse(vbX + vbW, vbY, currentZ),
+      isoInverse(vbX, vbY + vbH, currentZ),
+      isoInverse(vbX + vbW, vbY + vbH, currentZ)
+    ];
+    var gridMinX = Infinity, gridMaxX = -Infinity, gridMinY = Infinity, gridMaxY = -Infinity;
+    gridCorners.forEach(function(c) {
+      if (c[0] < gridMinX) gridMinX = c[0];
+      if (c[0] > gridMaxX) gridMaxX = c[0];
+      if (c[1] < gridMinY) gridMinY = c[1];
+      if (c[1] > gridMaxY) gridMaxY = c[1];
+    });
+    gridMinX -= 2; gridMinY -= 2; gridMaxX += 2; gridMaxY += 2;
+    for (var gx = gridMinX; gx <= gridMaxX; gx++) {
+      for (var gy = gridMinY; gy <= gridMaxY; gy++) {
+        var gc = iso(gx, gy, currentZ);
+        // Skip if tile is fully outside viewBox
+        if (gc[0] + ISO_TILE_W/2 < vbX || gc[0] - ISO_TILE_W/2 > vbX + vbW) continue;
+        if (gc[1] + ISO_TILE_H/2 < vbY || gc[1] - ISO_TILE_H/2 > vbY + vbH) continue;
+        var ghw = ISO_TILE_W/2, ghh = ISO_TILE_H/2;
+        gridG.appendChild(el('polygon', {points: [gc[0]+','+(gc[1]-ghh), (gc[0]+ghw)+','+gc[1], gc[0]+','+(gc[1]+ghh), (gc[0]-ghw)+','+gc[1]].join(' '), fill: 'none', stroke: '#444', 'stroke-width': 0.5}));
+      }
+    }
+    svg.appendChild(gridG);
+
+    // Identify vertical exits (up/down)
+    var verticalExits = [];
+    var horizontalExitsByZ = {};
+    state.exits.forEach(function(ex) {
+      if (ex.direction === 'up' || ex.direction === 'down') {
+        verticalExits.push(ex);
+      } else {
+        var fromRoom = roomById[ex.from_room_id];
+        if (!fromRoom) return;
+        var z = fromRoom.map_z || 0;
+        if (!horizontalExitsByZ[z]) horizontalExitsByZ[z] = [];
+        horizontalExitsByZ[z].push(ex);
+      }
+    });
+
+    // Sort z-levels: back-to-front, active last
+    var sortedZ = zLevels.slice().sort(function(a, b) {
+      if (a === currentZ) return 1;
+      if (b === currentZ) return -1;
+      return a - b;
+    });
+
+    sortedZ.forEach(function(z) {
+      var isActive = z === currentZ;
+      var opacity = isActive ? 1.0 : ISO_FADED_OPACITY;
+      var layerRooms = zGroups[z] || [];
+
+      var g = el('g', {opacity: opacity, 'data-z-level': z});
+      g.style.cursor = 'pointer';
+
+      // Connectors first (behind tiles)
+      var drawnEdges = {};
+      (horizontalExitsByZ[z] || []).forEach(function(ex) {
+        var from = roomById[ex.from_room_id], to = roomById[ex.to_room_id];
+        if (!from || !to) return;
+        var key = [Math.min(ex.from_room_id, ex.to_room_id), Math.max(ex.from_room_id, ex.to_room_id)].join('-');
+        if (drawnEdges[key]) return;
+        drawnEdges[key] = true;
+        drawIsoConnector(g, from.map_x, from.map_y, to.map_x, to.map_y, z, ex, isActive);
+      });
+
+      // Sort rooms back-to-front for correct overlap
+      var sortedRooms = layerRooms.slice().sort(function(a, b) {
+        var sa = a.map_x + a.map_y, sb = b.map_x + b.map_y;
+        if (sa !== sb) return sa - sb;
+        return a.map_y - b.map_y;
+      });
+
+      sortedRooms.forEach(function(r) {
+        drawIsoTile(g, r.map_x, r.map_y, z, r, isActive);
+      });
+
+      // Ghost rooms (cross-zone connections) on active layer
+      if (isActive) {
+        var ghostPositions = {};
+        (state.ghost_rooms || []).forEach(function(gr) {
+          if (gr.connected_via.length === 0) return;
+          var conn = gr.connected_via[0];
+          // Skip vertical connections — handled by cross-zone vertical ghost code below
+          if (conn.direction === 'up' || conn.direction === 'down') return;
+          var localRoom = roomById[conn.local_room_id];
+          if (!localRoom || (localRoom.map_z || 0) !== z) return;
+          var vec = DIRECTION_VECTORS[conn.direction];
+          var gx, gy;
+          if (vec) { gx = localRoom.map_x + vec[0]; gy = localRoom.map_y + vec[1]; }
+          else { gx = localRoom.map_x + 1; gy = localRoom.map_y; }
+          ghostPositions[gr.id] = [gx, gy];
+
+          // Draw ghost iso tile
+          var center = iso(gx, gy, z);
+          var cx = center[0], cy = center[1];
+          var hw = ISO_TILE_W/2, hh = ISO_TILE_H/2;
+          var top=[cx,cy-hh], right=[cx+hw,cy], bottom=[cx,cy+hh], left=[cx-hw,cy];
+
+
+          var ghostG = el('g', {opacity: GHOST_OPACITY, style: 'cursor: pointer;', 'data-ghost-id': gr.id});
+          ghostG.appendChild(el('polygon', {points: isoPts([left,bottom,[bottom[0],bottom[1]+ISO_WALL_H],[left[0],left[1]+ISO_WALL_H]]), fill: '#0a0a0a', stroke: '#333', 'stroke-width': 0.5}));
+          ghostG.appendChild(el('polygon', {points: isoPts([bottom,right,[right[0],right[1]+ISO_WALL_H],[bottom[0],bottom[1]+ISO_WALL_H]]), fill: '#080808', stroke: '#333', 'stroke-width': 0.5}));
+          ghostG.appendChild(el('polygon', {points: isoPts([top,right,bottom,left]), fill: '#0e0e0e', stroke: '#555', 'stroke-width': 1, 'stroke-dasharray': '4,3'}));
+          var gName = gr.name.length > 12 ? gr.name.substring(0,11)+'\u2026' : gr.name;
+          var gNameEl = el('text', {x: cx, y: cy-2, 'text-anchor': 'middle', fill: '#666', 'font-family': "'Courier New', monospace", 'font-size': '9px', 'pointer-events': 'none'});
+          gNameEl.textContent = gName;
+          ghostG.appendChild(gNameEl);
+          var gZoneEl = el('text', {x: cx, y: cy+12, 'text-anchor': 'middle', fill: '#444', 'font-family': "'Courier New', monospace", 'font-size': '7px', 'pointer-events': 'none'});
+          gZoneEl.textContent = gr.zone_name;
+          ghostG.appendChild(gZoneEl);
+
+          ghostG.addEventListener('mouseenter', function() { ghostG.setAttribute('opacity', '0.7'); });
+          ghostG.addEventListener('mouseleave', function() { ghostG.setAttribute('opacity', GHOST_OPACITY); });
+          (function(ghost) {
+            ghostG.addEventListener('click', function(e) {
+              e.stopPropagation();
+              if (confirm('Open zone "' + ghost.zone_name + '" in editor?')) {
+                navigateToZone(ghost.zone_id);
+              }
+            });
+          })(gr);
+
+          g.appendChild(ghostG);
+
+          // Connector from local room to ghost
+          drawIsoConnector(g, localRoom.map_x, localRoom.map_y, gx, gy, z, {id: conn.exit_id}, false);
+        });
+      }
+
+      // Z-label
+      if (layerRooms.length > 0) {
+        var minSum = Infinity, labelRoom = null;
+        layerRooms.forEach(function(r) {
+          var s = r.map_x + r.map_y;
+          if (s < minSum || (s === minSum && r.map_x < (labelRoom ? labelRoom.map_x : Infinity))) { minSum = s; labelRoom = r; }
+        });
+        var lp = iso(labelRoom.map_x - 1, labelRoom.map_y - 0.5, z);
+        var label = el('text', {x: lp[0], y: lp[1] - 10, fill: isActive ? '#34d399' : '#444', 'font-family': "'Courier New', monospace", 'font-size': '11px', 'font-weight': 'bold', 'pointer-events': 'none'});
+        label.textContent = z === 0 ? 'z=0' : z > 0 ? 'z+' + z : 'z' + z;
+        g.appendChild(label);
+      }
+
+      // Hover: show ports on active layer room groups
+      if (isActive) {
+        g.addEventListener('mouseenter', function(e) {
+          var tgt = e.target.closest('[data-room-id]');
+          if (tgt) {
+            var roomG = tgt.parentNode;
+            roomG.querySelectorAll('.me-port').forEach(function(p) {
+              if (p.getAttribute('data-room-id') === tgt.getAttribute('data-room-id')) p.setAttribute('opacity', '0.7');
+            });
+          }
+        }, true);
+        g.addEventListener('mouseleave', function(e) {
+          if (!dragState || dragState.type !== 'port') {
+            g.querySelectorAll('.me-port').forEach(function(p) { p.setAttribute('opacity', '0'); });
+          }
+        }, true);
+      }
+
+      // Click faded layer to switch z (no reload needed — all data already loaded)
+      if (!isActive) {
+        (function(targetZ) {
+          g.addEventListener('click', function() {
+            currentZ = targetZ;
+            selectedRoomId = null;
+            closePanel();
+            renderZButtons();
+            render25D();
+          });
+        })(z);
+      }
+
+      svg.appendChild(g);
+    });
+
+    // Vertical connectors (between z-levels, on top)
+    var drawnVert = {};
+    verticalExits.forEach(function(ex) {
+      var from = roomById[ex.from_room_id], to = roomById[ex.to_room_id];
+      if (!from || !to) return;
+      var key = [Math.min(ex.from_room_id, ex.to_room_id), Math.max(ex.from_room_id, ex.to_room_id)].join('-');
+      if (drawnVert[key]) return;
+      drawnVert[key] = true;
+
+      var p1 = iso(from.map_x, from.map_y, from.map_z || 0);
+      var p2 = iso(to.map_x, to.map_y, to.map_z || 0);
+      var isUp = (to.map_z || 0) > (from.map_z || 0);
+      var color = isUp ? '#a78bfa' : '#fb923c';
+
+      svg.appendChild(el('line', {x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: color, 'stroke-width': 4, opacity: 0.06}));
+      svg.appendChild(el('line', {x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: color, 'stroke-width': 2, 'stroke-dasharray': '8,5', opacity: 0.3}));
+
+      var mx = (p1[0]+p2[0])/2, my = (p1[1]+p2[1])/2;
+      var badgeG = el('g', {opacity: 0.4});
+      badgeG.appendChild(el('circle', {cx: mx, cy: my, r: 10, fill: '#0a0a0a', stroke: color, 'stroke-width': 1.5}));
+      var arrow = el('text', {x: mx, y: my + 4, 'text-anchor': 'middle', fill: color, 'font-family': "'Courier New', monospace", 'font-size': '12px', 'font-weight': 'bold'});
+      arrow.textContent = isUp ? '\u2191' : '\u2193';
+      badgeG.appendChild(arrow);
+      svg.appendChild(badgeG);
+    });
+
+    // Cross-zone vertical ghost rooms (from vertical_rooms data)
+    (state.vertical_rooms || []).forEach(function(vr) {
+      if (vr.connected_via.length === 0) return;
+      var conn = vr.connected_via[0];
+      var localRoom = roomById[conn.local_room_id];
+      if (!localRoom) return;
+
+      // Place ghost tile adjacent to local room on the appropriate z-level
+      var ghostZ = (localRoom.map_z || 0) + (conn.direction === 'up' ? 1 : conn.direction === 'down' ? -1 : 0);
+      var ghostPos = iso(localRoom.map_x, localRoom.map_y, ghostZ);
+      var cx = ghostPos[0], cy = ghostPos[1];
+      var hw = ISO_TILE_W / 2, hh = ISO_TILE_H / 2;
+      var top = [cx, cy-hh], right = [cx+hw, cy], bottom = [cx, cy+hh], left = [cx-hw, cy];
+
+      var isUp = conn.direction === 'up';
+      var color = isUp ? '#a78bfa' : '#fb923c';
+
+      var ghostG = el('g', {opacity: 0.25, style: 'cursor: pointer;'});
+      // Walls
+      ghostG.appendChild(el('polygon', {points: isoPts([left, bottom, [bottom[0],bottom[1]+ISO_WALL_H], [left[0],left[1]+ISO_WALL_H]]), fill: '#0a0a0a', stroke: '#1a1a1a', 'stroke-width': 0.5}));
+      ghostG.appendChild(el('polygon', {points: isoPts([bottom, right, [right[0],right[1]+ISO_WALL_H], [bottom[0],bottom[1]+ISO_WALL_H]]), fill: '#080808', stroke: '#1a1a1a', 'stroke-width': 0.5}));
+      // Top face (dashed)
+      var topFace = el('polygon', {points: isoPts([top, right, bottom, left]), fill: '#0e0e0e', stroke: color, 'stroke-width': 1, 'stroke-dasharray': '4,3'});
+      ghostG.appendChild(topFace);
+      // Name
+      var name = vr.name.length > 14 ? vr.name.substring(0, 13) + '\u2026' : vr.name;
+      var nameEl = el('text', {x: cx, y: cy - 2, 'text-anchor': 'middle', fill: '#555', 'font-family': "'Courier New', monospace", 'font-size': '9px', 'pointer-events': 'none'});
+      nameEl.textContent = (isUp ? '\u2191 ' : '\u2193 ') + name;
+      ghostG.appendChild(nameEl);
+      // Zone label
+      var zoneLabel = el('text', {x: cx, y: cy + 12, 'text-anchor': 'middle', fill: '#444', 'font-family': "'Courier New', monospace", 'font-size': '7px', 'pointer-events': 'none'});
+      zoneLabel.textContent = vr.zone_name || '';
+      ghostG.appendChild(zoneLabel);
+
+      // Hover + click to navigate
+      ghostG.addEventListener('mouseenter', function() { ghostG.setAttribute('opacity', '0.5'); });
+      ghostG.addEventListener('mouseleave', function() { ghostG.setAttribute('opacity', '0.25'); });
+      (function(room) {
+        ghostG.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (room.zone_id && confirm('Open zone "' + (room.zone_name || '') + '" in editor?')) {
+            navigateToZone(room.zone_id);
+          }
+        });
+      })(vr);
+
+      svg.appendChild(ghostG);
+
+      // Connector from local room to ghost
+      var localPos = iso(localRoom.map_x, localRoom.map_y, localRoom.map_z || 0);
+      svg.appendChild(el('line', {x1: localPos[0], y1: localPos[1], x2: cx, y2: cy, stroke: color, 'stroke-width': 2, 'stroke-dasharray': '8,5', opacity: 0.3}));
+    });
+
+    // Draw line for exit drawing in progress
+    drawLine = el('line', {x1: 0, y1: 0, x2: 0, y2: 0, stroke: '#00ffff', 'stroke-width': 2, 'stroke-dasharray': '6,4', visibility: 'hidden'});
+    svg.appendChild(drawLine);
+  }
+
   // ── Interaction: Room click/select ─────────────────────────
   svg.addEventListener('click', function(e) {
-    var roomG = e.target.closest('.me-room');
-    if (roomG && !e.target.classList.contains('me-port')) {
-      var id = parseInt(roomG.getAttribute('data-room-id'));
+    // Flat mode: .me-room, Iso mode: .me-room-iso on active layer
+    var roomEl = e.target.closest('.me-room') || e.target.closest('.me-room-iso');
+    if (roomEl && !e.target.classList.contains('me-port')) {
+      var id = parseInt(roomEl.getAttribute('data-room-id'));
+      // In 2.5D, only select rooms on active z-level
+      if (mode25D) {
+        var room = state.rooms.find(function(r) { return r.id === id; });
+        if (!room || (room.map_z || 0) !== currentZ) return;
+      }
       selectRoom(id);
       return;
     }
@@ -685,13 +1132,19 @@
   });
 
   svg.addEventListener('dblclick', function(e) {
-    if (e.target.closest('.me-room') || e.target.closest('.me-ghost')) return;
+    if (e.target.closest('.me-room') || e.target.closest('.me-ghost') || e.target.closest('.me-room-iso')) return;
     // Double-click on empty space: create room
     var pt = svgPoint(e);
-    var gx = Math.round(pt.x / STRIDE_X);
-    var gy = Math.round(pt.y / STRIDE_Y);
-    // Check if cell is occupied
-    var occupied = state.rooms.some(function(r) { return r.map_x === gx && r.map_y === gy; });
+    var gx, gy;
+    if (mode25D) {
+      var grid = isoInverse(pt.x, pt.y, currentZ);
+      gx = grid[0]; gy = grid[1];
+    } else {
+      gx = Math.round(pt.x / STRIDE_X);
+      gy = Math.round(pt.y / STRIDE_Y);
+    }
+    // Check if cell is occupied on current z-level
+    var occupied = state.rooms.some(function(r) { return r.map_x === gx && r.map_y === gy && (r.map_z || 0) === currentZ; });
     if (occupied) { setStatus('Cell occupied'); return; }
     showRoomDialog(gx, gy);
   });
@@ -723,14 +1176,17 @@
     }
 
     // Room drag (reposition)
-    var roomG = e.target.closest('.me-room');
+    var roomG = e.target.closest('.me-room') || (mode25D ? e.target.closest('.me-room-iso') : null);
     if (roomG && !e.target.classList.contains('me-port')) {
       e.preventDefault();
       var id = parseInt(roomG.getAttribute('data-room-id'));
       var room = state.rooms.find(function(r) { return r.id === id; });
       if (!room) return;
+      // In 2.5D, only drag rooms on active z-level
+      if (mode25D && (room.map_z || 0) !== currentZ) return;
       var pt = svgPoint(e);
-      dragState = {type: 'room', roomId: id, startX: pt.x, startY: pt.y, origX: room.map_x, origY: room.map_y};
+      var isoStart = mode25D ? isoInverse(pt.x, pt.y, currentZ) : null;
+      dragState = {type: 'room', roomId: id, startX: pt.x, startY: pt.y, origX: room.map_x, origY: room.map_y, isoStartGrid: isoStart};
     }
   });
 
@@ -745,17 +1201,24 @@
     }
 
     if (dragState.type === 'room') {
-      var dx = pt.x - dragState.startX;
-      var dy = pt.y - dragState.startY;
-      var newGX = dragState.origX + Math.round(dx / STRIDE_X);
-      var newGY = dragState.origY + Math.round(dy / STRIDE_Y);
+      var newGX, newGY;
+      if (mode25D) {
+        var curGrid = isoInverse(pt.x, pt.y, currentZ);
+        newGX = dragState.origX + (curGrid[0] - dragState.isoStartGrid[0]);
+        newGY = dragState.origY + (curGrid[1] - dragState.isoStartGrid[1]);
+      } else {
+        var dx = pt.x - dragState.startX;
+        var dy = pt.y - dragState.startY;
+        newGX = dragState.origX + Math.round(dx / STRIDE_X);
+        newGY = dragState.origY + Math.round(dy / STRIDE_Y);
+      }
       var room = state.rooms.find(function(r) { return r.id === dragState.roomId; });
       if (room && (room.map_x !== newGX || room.map_y !== newGY)) {
-        var occupied = state.rooms.some(function(r) { return r.id !== room.id && r.map_x === newGX && r.map_y === newGY; });
+        var occupied = state.rooms.some(function(r) { return r.id !== room.id && r.map_x === newGX && r.map_y === newGY && (r.map_z || 0) === currentZ; });
         if (!occupied) {
           room.map_x = newGX;
           room.map_y = newGY;
-          render();
+          if (mode25D) render25D(); else render();
         }
       }
     }
@@ -769,7 +1232,7 @@
       // Find target room under cursor
       var pt = svgPoint(e);
       var targetEl = document.elementFromPoint(e.clientX, e.clientY);
-      var targetG = targetEl ? (targetEl.closest('.me-room') || targetEl.closest('.me-ghost')) : null;
+      var targetG = targetEl ? (targetEl.closest('.me-room') || targetEl.closest('.me-ghost') || targetEl.closest('.me-room-iso')) : null;
       if (targetG) {
         var targetId = parseInt(targetG.getAttribute('data-room-id') || targetG.getAttribute('data-ghost-id'));
         if (targetId && targetId !== dragState.roomId) {
@@ -793,7 +1256,7 @@
           } else {
             room.map_x = origX;
             room.map_y = origY;
-            render();
+            if (mode25D) render25D(); else render();
             setStatus('Error: ' + (d.errors || []).join(', '));
           }
         });
@@ -840,15 +1303,15 @@
   // ── Room selection + side panel ────────────────────────────
   function selectRoom(id) {
     selectedRoomId = id;
-    render();
     showPanel(id);
+    if (mode25D) render25D(); else render();
   }
 
   function deselectRoom() {
     if (selectedRoomId === null) return;
     selectedRoomId = null;
     closePanel();
-    render();
+    if (mode25D) render25D(); else render();
   }
 
   function closePanel() {
@@ -989,6 +1452,8 @@
         html += '<div class="me-mob-edit" style="display: none; margin-top: 6px;">';
         html += '<div style="margin-bottom: 4px;"><label style="color: #666; font-size: 0.75em;">Name:</label>';
         html += '<input class="me-mob-edit-name tui-input" value="' + esc(m.name) + '" style="width: 100%; padding: 3px; font-size: 0.85em; box-sizing: border-box;" /></div>';
+        html += '<div style="margin-bottom: 4px;"><label style="color: #666; font-size: 0.75em;">Description:</label>';
+        html += '<textarea class="me-mob-edit-desc tui-input" style="width: 100%; padding: 3px; font-size: 0.85em; min-height: 60px; box-sizing: border-box;">' + esc(m.description || '') + '</textarea></div>';
         html += '<div style="display: flex; gap: 6px; margin-bottom: 4px;">';
         html += '<div style="flex: 1;"><label style="color: #666; font-size: 0.75em;">Type:</label>';
         html += '<select class="me-mob-edit-type tui-input" style="width: 100%; padding: 3px; font-size: 0.85em;">';
@@ -1161,9 +1626,10 @@
         var mid = parseInt(row.getAttribute('data-mob-id'));
         var name = row.querySelector('.me-mob-edit-name').value.trim();
         var mobType = row.querySelector('.me-mob-edit-type').value;
+        var desc = row.querySelector('.me-mob-edit-desc').value.trim();
         if (!name) { setStatus('Name required'); return; }
         setStatus('Saving mob...');
-        api('PATCH', 'mobs/' + mid, {name: name, mob_type: mobType}).then(function(d) {
+        api('PATCH', 'mobs/' + mid, {name: name, mob_type: mobType, description: desc || null}).then(function(d) {
           if (d.success) { setStatus('Mob saved'); loadData(); }
           else { setStatus('Error: ' + (d.errors || []).join(', ')); }
         });
@@ -1468,17 +1934,35 @@
   });
 
   document.getElementById('me-zoom-reset').addEventListener('click', function() {
-    zoomLevel = 1.0;
+    zoomLevel = mode25D ? 1.25 : 1.0;
     applyZoom();
   });
 
+  document.getElementById('me-25d-toggle').addEventListener('click', function() {
+    mode25D = !mode25D;
+    var btn = document.getElementById('me-25d-toggle');
+    btn.className = mode25D ? 'tui-button cyan-168' : 'tui-button';
+    zoomLevel = mode25D ? 1.25 : 1.0;
+    canvasWrap.style.display = mode25D ? 'flex' : 'block';
+    canvasWrap.style.justifyContent = mode25D ? 'center' : '';
+    canvasWrap.style.alignItems = mode25D ? 'center' : '';
+    selectedRoomId = null;
+    closePanel();
+    loadData();
+  });
+
   function applyZoom() {
-    var vb = svg.getAttribute('viewBox');
-    if (!vb) return;
-    var parts = vb.split(' ');
-    var vbW = parseFloat(parts[2]), vbH = parseFloat(parts[3]);
-    svg.setAttribute('width', Math.round(vbW * zoomLevel));
-    svg.setAttribute('height', Math.round(vbH * zoomLevel));
+    if (mode25D) {
+      // In 2.5D, re-render to recalculate viewBox at new zoom
+      render25D();
+    } else {
+      var vb = svg.getAttribute('viewBox');
+      if (!vb) return;
+      var parts = vb.split(' ');
+      var vbW = parseFloat(parts[2]), vbH = parseFloat(parts[3]);
+      svg.setAttribute('width', Math.round(vbW * zoomLevel));
+      svg.setAttribute('height', Math.round(vbH * zoomLevel));
+    }
     setStatus('Zoom: ' + Math.round(zoomLevel * 100) + '%');
   }
 

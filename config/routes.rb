@@ -307,13 +307,6 @@ Rails.application.routes.draw do
     # World Export (download DB → YAML archive)
     get "grid_world_export", to: "grid_world_export#download", as: :grid_world_export
 
-    # World Map Viewer (read-only)
-    resources :grid_world_map, only: %i[index show] do
-      member do
-        get :zone_map
-      end
-    end
-
     # Map Editor (zone-scoped visual editor)
     scope "grid_map_editor", as: :grid_map_editor do
       get ":zone_id", to: "grid_map_editor#show", as: :show
