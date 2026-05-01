@@ -285,6 +285,193 @@ namespace :data do
     puts "All data cleared."
   end
 
+  desc "Reset world geography and player progression (keeps accounts, regions, PACs, catalogs)"
+  task reset_world: :environment do
+    if Rails.env.production? && ENV["ALLOW_WORLD_RESET"] != "true"
+      abort "World reset is disabled in production. Set ALLOW_WORLD_RESET=true to override."
+    end
+
+    puts "\n" + "=" * 80
+    puts "WORLD RESET"
+    puts "=" * 80
+    puts "\nThis will:"
+    puts "  - Delete all zones, rooms, exits, mobs, encounters EXCEPT PAC facilities"
+    puts "  - Delete all player items, progression, economy, breaches, missions"
+    puts "  - Reset all hackr stats to defaults (accounts preserved)"
+    puts "\nPreserved:"
+    puts "  - Regions, PAC facilities, item definitions, breach templates"
+    puts "  - Achievements, factions, schematics, salvage yields"
+    puts "  - Catalog, content, system data"
+    puts "\nType 'RESET WORLD' to confirm:"
+
+    confirmation = $stdin.gets.chomp
+    unless confirmation == "RESET WORLD"
+      puts "Aborted."
+      next
+    end
+
+    # Identify PAC data to preserve
+    pac_zone_ids = GridZone.where("slug LIKE ?", "%-govcorp-pac").pluck(:id)
+    pac_room_ids = pac_zone_ids.any? ? GridRoom.where(grid_zone_id: pac_zone_ids).pluck(:id) : []
+
+    ActiveRecord::Base.transaction do
+      puts "\n--- Phase 1: Player Data ---"
+
+      # Clear item FKs that would block dependent deletions
+      cleared = GridItem.where("grid_impound_record_id IS NOT NULL OR container_id IS NOT NULL OR deck_id IS NOT NULL")
+        .update_all(grid_impound_record_id: nil, container_id: nil, deck_id: nil)
+      puts "  - Item FK references cleared: #{cleared}" if cleared > 0
+
+      # Impound records (FK to breaches — delete before breaches)
+      count = GridImpoundRecord.delete_all
+      puts "  - Impound records: #{count}"
+
+      # Breach chain (leaf -> parent)
+      count = GridHackrBreachLog.delete_all
+      puts "  - Breach logs: #{count}"
+      count = GridBreachProtocol.delete_all
+      puts "  - Breach protocols: #{count}"
+      count = GridHackrBreach.delete_all
+      puts "  - Breaches: #{count}"
+
+      # Mission progress (leaf -> parent)
+      count = GridHackrMissionObjective.delete_all
+      puts "  - Mission objective progress: #{count}"
+      count = GridHackrMission.delete_all
+      puts "  - Mission progress: #{count}"
+
+      # Standalone player data
+      count = GridDenInvite.delete_all
+      puts "  - Den invites: #{count}"
+      count = GridMessage.delete_all
+      puts "  - Messages: #{count}"
+      count = GridShopTransaction.delete_all
+      puts "  - Shop transactions: #{count}"
+      count = GridHackrAchievement.delete_all
+      puts "  - Earned achievements: #{count}"
+      count = GridReputationEvent.delete_all
+      puts "  - Reputation events: #{count}"
+      count = GridHackrReputation.delete_all
+      puts "  - Reputations: #{count}"
+      count = GridUplinkPresence.delete_all
+      puts "  - Uplink presences: #{count}"
+
+      # All items (self-ref FKs already cleared)
+      count = GridItem.delete_all
+      puts "  - Items: #{count}"
+
+      # Mining rigs
+      count = GridMiningRig.delete_all
+      puts "  - Mining rigs: #{count}"
+
+      # Economy (transactions -> caches)
+      count = GridTransaction.delete_all
+      puts "  - Transactions: #{count}"
+      count = GridCache.delete_all
+      puts "  - Caches: #{count}"
+
+      # Reset hackr stats and room references
+      GridHackr.update_all(
+        stats: {},
+        current_room_id: nil,
+        zone_entry_room_id: nil
+      )
+      puts "  - Hackr stats reset (#{GridHackr.count} accounts preserved)"
+
+      puts "\n--- Phase 2: World Content (non-PAC) ---"
+      puts "  PAC preserved: #{pac_zone_ids.size} zones, #{pac_room_ids.size} rooms"
+
+      # Shop listings for non-PAC vendors
+      if pac_room_ids.any?
+        non_pac_mob_ids = GridMob.where.not(grid_room_id: pac_room_ids).pluck(:id)
+        count = GridShopListing.where(grid_mob_id: non_pac_mob_ids).delete_all
+      else
+        count = GridShopListing.delete_all
+      end
+      puts "  - Shop listings: #{count}"
+
+      # Missions (all — givers are non-PAC mobs)
+      count = GridMissionReward.delete_all
+      puts "  - Mission rewards: #{count}"
+      count = GridMissionObjective.delete_all
+      puts "  - Mission objectives: #{count}"
+      count = GridMission.delete_all
+      puts "  - Missions: #{count}"
+      count = GridMissionArc.delete_all
+      puts "  - Mission arcs: #{count}"
+
+      # Breach encounters (non-PAC rooms only)
+      if pac_room_ids.any?
+        count = GridBreachEncounter.where.not(grid_room_id: pac_room_ids).delete_all
+      else
+        count = GridBreachEncounter.delete_all
+      end
+      puts "  - Breach encounters: #{count}"
+
+      # Mobs (non-PAC rooms only)
+      if pac_room_ids.any?
+        count = GridMob.where.not(grid_room_id: pac_room_ids).delete_all
+      else
+        count = GridMob.delete_all
+      end
+      puts "  - Mobs: #{count}"
+
+      puts "\n--- Phase 3: World Geography (non-PAC) ---"
+
+      # Exits involving any non-PAC room (catches cross-zone exits too)
+      if pac_room_ids.any?
+        count = GridExit
+          .where.not(from_room_id: pac_room_ids)
+          .or(GridExit.where.not(to_room_id: pac_room_ids))
+          .delete_all
+      else
+        count = GridExit.delete_all
+      end
+      puts "  - Exits: #{count}"
+
+      # Non-PAC rooms (includes player dens — they're in regular zones)
+      if pac_zone_ids.any?
+        count = GridRoom.where.not(grid_zone_id: pac_zone_ids).delete_all
+      else
+        count = GridRoom.delete_all
+      end
+      puts "  - Rooms: #{count}"
+
+      # Non-PAC zones
+      if pac_zone_ids.any?
+        count = GridZone.where.not(id: pac_zone_ids).delete_all
+      else
+        count = GridZone.delete_all
+      end
+      puts "  - Zones: #{count}"
+
+      # Clear region hospital room references (RestorePoint rooms are non-PAC)
+      GridRegion.where.not(hospital_room_id: nil).update_all(hospital_room_id: nil)
+      puts "  - Region hospital rooms cleared"
+    end
+
+    puts "\n--- Re-provision Economy ---"
+
+    # Re-provision economy (system caches, player caches, mining rigs).
+    # Reenable in case data:economy was already invoked in this process.
+    Rake::Task["data:economy"].reenable
+    Rake::Task["data:economy"].invoke
+    puts "  - Economy re-provisioned"
+
+    puts "\n" + "=" * 80
+    puts "WORLD RESET COMPLETE"
+    puts "=" * 80
+    puts "\n  Regions:        #{GridRegion.count}"
+    puts "  PAC zones:      #{GridZone.count}"
+    puts "  PAC rooms:      #{GridRoom.count}"
+    puts "  Hackr accounts: #{GridHackr.count} (stats reset)"
+    puts "\nNext steps:"
+    puts "  1. Build zones and rooms in the map editor"
+    puts "  2. Export with `rails data:world:export` as you go"
+    puts "  3. Re-seed PAC if needed: `rails data:pac_facilities`"
+    puts ""
+  end
+
   # === Individual Loaders ===
 
   desc "Load hackrs from YAML"
