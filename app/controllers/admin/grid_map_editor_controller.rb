@@ -15,10 +15,11 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     @region = @zone.grid_region
   end
 
-  # GET /root/grid_map_editor/:zone_id/data?z=0
+  # GET /root/grid_map_editor/:zone_id/data?z=0&all_z=true
   def data
     zone = GridZone.find(params[:zone_id])
     z_level = params[:z].to_i
+    all_z = ActiveModel::Type::Boolean.new.cast(params[:all_z])
     all_zone_rooms = zone.grid_rooms.includes(:grid_zone).to_a
     all_zone_room_ids = all_zone_rooms.map(&:id)
 
@@ -32,36 +33,49 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     z_levels = all_zone_rooms.map(&:map_z).uniq.sort
     z_levels = [0] if z_levels.empty?
 
-    # Filter rooms for requested z-level
-    rooms = all_zone_rooms.select { |r| r.map_z == z_level }
+    # Snap to first available z-level if requested level has no rooms
+    z_level = z_levels.first unless z_levels.include?(z_level)
+
+    # In all_z mode, include every room; otherwise filter to requested z-level
+    rooms = all_z ? all_zone_rooms : all_zone_rooms.select { |r| r.map_z == z_level }
     room_ids = rooms.map(&:id)
 
-    # Find rooms on other z-levels connected via up/down (outbound + inbound)
     z_directions = Grid::WorldMapBuilder::Z_DIRECTIONS
-    # Outbound: current-level rooms with up/down exits to other levels
     outbound_vertical = all_exits.select { |e| room_ids.include?(e.from_room_id) && z_directions.key?(e.direction) }
-    # Inbound: other-level rooms with up/down exits pointing into current level
-    other_z_room_ids = all_zone_rooms.reject { |r| r.map_z == z_level }.map(&:id)
-    inbound_vertical = all_exits.select { |e| other_z_room_ids.include?(e.from_room_id) && room_ids.include?(e.to_room_id) && z_directions.key?(e.direction) }
-    # Collect all rooms on other z-levels that are connected vertically
-    vertical_room_ids = Set.new
-    outbound_vertical.each { |e| vertical_room_ids.add(e.to_room_id) }
-    inbound_vertical.each { |e| vertical_room_ids.add(e.from_room_id) }
-    vertical_rooms = all_zone_rooms.select { |r| vertical_room_ids.include?(r.id) && r.map_z != z_level }
+
+    same_zone_ids = Set.new(all_zone_room_ids)
+
+    if all_z
+      # In all_z mode, vertical rooms are CROSS-ZONE rooms connected via up/down
+      cross_zone_vertical_ids = Set.new
+      outbound_vertical.each { |e| cross_zone_vertical_ids.add(e.to_room_id) unless same_zone_ids.include?(e.to_room_id) }
+      # Also check inbound: other-zone rooms with up/down exits pointing into this zone
+      inbound_vertical_exits = GridExit.where(to_room_id: room_ids, direction: %w[up down])
+        .where.not(from_room_id: room_ids).to_a
+      cross_zone_vertical_ids.merge(inbound_vertical_exits.map(&:from_room_id))
+      vertical_rooms = GridRoom.where(id: cross_zone_vertical_ids.to_a)
+        .includes(grid_zone: :grid_region).to_a
+      inbound_vertical = inbound_vertical_exits
+    else
+      other_z_room_ids = all_zone_rooms.reject { |r| r.map_z == z_level }.map(&:id)
+      inbound_vertical = all_exits.select { |e| other_z_room_ids.include?(e.from_room_id) && room_ids.include?(e.to_room_id) && z_directions.key?(e.direction) }
+      vertical_room_ids = Set.new
+      outbound_vertical.each { |e| vertical_room_ids.add(e.to_room_id) }
+      inbound_vertical.each { |e| vertical_room_ids.add(e.from_room_id) }
+      vertical_rooms = all_zone_rooms.select { |r| vertical_room_ids.include?(r.id) && r.map_z != z_level }
+    end
 
     exits = all_exits.select { |e| room_ids.include?(e.from_room_id) }
 
     # Presence counts
     hackr_counts = GridHackr.where(current_room_id: room_ids).group(:current_room_id).count
-    mob_data = GridMob.where(grid_room_id: room_ids).select(:id, :name, :mob_type, :grid_room_id).to_a
+    mob_data = GridMob.where(grid_room_id: room_ids).select(:id, :name, :mob_type, :description, :grid_room_id).to_a
     item_counts = GridItem.where(room_id: room_ids, container_id: nil, equipped_slot: nil)
       .group(:room_id).count
     encounter_data = GridBreachEncounter.where(grid_room_id: room_ids)
       .includes(:grid_breach_template).to_a
 
     # Ghost rooms: rooms in OTHER ZONES connected to this zone's rooms.
-    # Exclude same-zone rooms on different z-levels (those are vertical_rooms).
-    same_zone_ids = Set.new(all_zone_room_ids)
     cross_exit_room_ids = exits
       .reject { |e| room_ids.include?(e.to_room_id) || same_zone_ids.include?(e.to_room_id) }
       .map(&:to_room_id).uniq
@@ -120,6 +134,8 @@ class Admin::GridMapEditorController < Admin::ApplicationController
           connections << {exit_id: e.id, local_room_id: e.to_room_id, direction: reverse_dir}
         end
         {id: r.id, name: r.name, room_type: r.room_type, map_z: r.map_z,
+         zone_name: r.grid_zone&.name, zone_id: r.grid_zone_id,
+         region_name: r.grid_zone&.grid_region&.name,
          connected_via: connections}
       },
       rooms: rooms.map { |r|
@@ -138,7 +154,7 @@ class Admin::GridMapEditorController < Admin::ApplicationController
          map_x: mx, map_y: my, map_z: r.map_z, position_source: pos_source,
          hackr_count: hackr_counts[r.id].to_i,
          mob_count: mobs.size, item_count: item_counts[r.id].to_i,
-         mobs: mobs.map { |m| {id: m.id, name: m.name, mob_type: m.mob_type} },
+         mobs: mobs.map { |m| {id: m.id, name: m.name, mob_type: m.mob_type, description: m.description} },
          encounters: encounters.map { |e|
            {id: e.id, template_name: e.grid_breach_template.name,
             template_id: e.grid_breach_template_id, state: e.state,

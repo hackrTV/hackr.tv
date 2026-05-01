@@ -59,3 +59,7 @@ regions:
   - name: The Canyon
     slug: the-canyon
     description: "A vast desert canyon system carved by an ancient river — layered rock walls glow red at sunset, and the depth plays havoc with RIDE signal propagation. Settlements cling to ledges and tunnel into cliff faces. GovCorp considers it a low-priority region. The people here disagree."
+
+  - name: The Hollows
+    slug: the-hollows
+    description: "Ancient mountain ridges folded tight around deep valleys where mist pools and signal dies — a region of coal seams, abandoned mines, and communities that GovCorp's RIDE infrastructure has never fully reached."
