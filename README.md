@@ -7,7 +7,7 @@
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.3-red.svg)](https://rubyonrails.org/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Tests-2097%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-2870%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
@@ -41,7 +41,7 @@
   - Public sharing via unique share tokens (`/shared/:token`)
   - Queue panel showing current + next 3 tracks
   - Playlist context preservation across navigation
-- **Pulse Vault** - Music discovery interface with 71 tracks across 16 artists
+- **Pulse Vault** - Music discovery interface with 89 tracks across 16 artists
   - Real-time search/filter by track, artist, album, genre
   - Click-anywhere playback (any cell in row plays/pauses)
   - Row hover highlighting with dynamic now-playing indicators
@@ -82,15 +82,35 @@
 
 ### THE PULSE GRID - MUD
 - **Real-time Multiplayer** - Live comms and movement tracking via Action Cable
-- **World** - 6 zones, 7 rooms, 4 NPCs, 7 factions, items, and interactive objects
-- **Interactive NPCs** - Rich dialogue trees with quest givers, vendors, and conversation topics
+- **World** - 16 regions, 48+ zones, 249+ rooms, 47+ NPCs, 7 factions, 184+ exits, and interactive objects
+- **Interactive NPCs** - Branching dialogue trees with recursive topic navigation, quest givers, vendors, and conversation topics
 - **Persistent Progression** - XP, clearance levels (0–99), vitals (HP/energy/psyche), inventory with rarity and stacking
+- **Inventory System** - 16-slot finite inventory with per-type stack limits, quantity syntax (`[N|all]` prefix on 8 commands)
+- **Equipment/Loadout** - 13-slot gear system with stat bonuses (vitals cap raises, inventory expansion, BREACH effects)
+- **Personal Dens** - Player housing with rename/describe, invite system (1hr expiry), lock/unlock, 16-slot floor storage
+- **Storage Fixtures** - Placeable furniture (8/16/32 slot) with place/store/retrieve commands, max 3 per den
+- **Item Fabrication** - 28 schematics with ingredient recipes, clearance/location gates, `/schematics` SPA page
+- **Item Catalog** - 75 item definitions across 12 types (gear, software, consumable, material, module, firmware, fixture, tool, data, faction, collectible, rig_component)
+- **Salvage System** - Item decomposition with deterministic yield items, analyze command for preview
+- **BREACH Encounter System** - Turn-based hacking encounters with DECK equip → software load → breach → protocol dismantling → detection clock → success/failure/jackout
+  - 5 protocol types (TRACE/FEEDBACK/LOCK/ADAPT/SPIKE) with synergies and rerouting
+  - 4 puzzle gate types (sequence, logic gate, circuit, credential decryption) with procedural generation
+  - OR win condition: destroy all protocols OR solve all circumvention gates
+  - Encounter placement with cooldowns, ambient encounters on room entry based on zone danger level
+  - DECK hardware with software loading, firmware/module system, exploit instant-kills
+  - Failure tiers: vitals drain → zone lockout → DECK wipe → DECK fried (with repair system)
+  - 39 breach templates across Standard/Advanced/Elite/Ambient/Puzzle tiers (CL0–55)
+- **GovCorp Capture System** - Probabilistic capture on detection-overflow, gear impound, Perception Alignment Center facilities (11 rooms × 14 regions), alert system, bribe/escape mechanics
+- **GovCorp Debt** - 50% CRED income garnishment, RestorePoint™ hospital respawn with fees
 - **CRED Economy** - Fixed-supply cryptocurrency with append-only ledger, CRED caches, mining rigs, stream bonuses, and Fracture Reserve monetary policy (70% burn, 30% recycle)
 - **Shops & Black Market** - Standard and black market vendors with dynamic pricing, clearance-gated listings, and CRED transactions
 - **Faction Reputation** - 7 factions with leaf-storage + derived rollup reputation via directed rep-link graph, 8-tier ladder system
-- **Achievement System** - Site-wide badges covering Grid, music, social, content, and progression categories with XP + CRED rewards
-- **Mission/Quest System** - NPC-gated structured objectives with storyline arcs, prereq chains, clearance/rep gates, 10 objective types, 5 reward types, and per-hackr progress tracking
-- **30+ Commands** - Navigation, interaction, inventory, stats, economy (cache, chain, rig, shop, buy, sell), missions (accept, abandon, turn_in, give), social (say, who), and meta commands
+- **Achievement System** - 71 site-wide badges covering Grid, music, social, content, and progression categories with XP + CRED rewards
+- **Mission/Quest System** - NPC-gated structured objectives with storyline arcs, prereq chains, clearance/rep gates, 10 objective types, 5 reward types, dialogue-path gates, and per-hackr progress tracking
+- **Regions** - Geographic hierarchy above zones (16 regions following US geography: Lakeshore=Chicago, Narrows=NYC, Bend=New Orleans, etc.)
+- **TOTP Two-Factor Auth** - Optional TOTP-based 2FA with backup codes, replay prevention, Rack::Attack rate limiting
+- **Admin Tooling** - Hackr inspector (god-view), stat editor, admin warp, NPC dialogue tester, BREACH sandbox, PAC escape tester, visual map editor (flat + 2.5D isometric), world YAML export, filterable transaction log, impound/mining rig managers
+- **58+ Commands** - Navigation (8 cardinal + intercardinal directions), interaction, inventory, equipment, fabrication, storage, BREACH, DECK, economy, missions, social, and meta commands
 - **Command History** - Arrow key navigation through previous commands (up to 100 stored)
 - **Feature Access Control** - Admin-grantable access via FeatureGrant system
 - **Optimized UI** - Clean terminal-style interface with comfortable dark theme
@@ -178,7 +198,8 @@
 - **Testing:** RSpec (backend), Vitest (frontend), FactoryBot, Faker
 - **Code Quality:** StandardRB, ESLint, Brakeman (security scanner)
 - **Assets:** Propshaft, TuiCSS (terminal UI framework)
-- **Authentication:** bcrypt for password hashing (Grid Hackr accounts)
+- **Authentication:** bcrypt for password hashing, rotp + rqrcode for TOTP 2FA (Grid Hackr accounts)
+- **Auditing:** PaperTrail for version history on 24+ models
 - **Markdown:** react-markdown, remark-gfm, rehype-sanitize
 - **Content Safety:** Obscenity gem for profanity filtering
 
@@ -217,7 +238,6 @@
    ```bash
    bin/rails data:load
    ```
-   See [IMPORT_README.md](IMPORT_README.md) for details on the data loading system.
 
 5. **Start the server**
    ```bash
@@ -236,6 +256,9 @@
    - Uplink: http://localhost:3000/uplink
    - Hackr Handbook: http://localhost:3000/handbook
    - Missions: http://localhost:3000/missions (requires Grid login)
+   - Schematics: http://localhost:3000/schematics (requires Grid login)
+   - Loadout: http://localhost:3000/loadout (requires Grid login)
+   - DECK: http://localhost:3000/deck (requires Grid login)
    - Terminal Credentials: http://localhost:3000/terminal
    - Admin Dashboard: http://localhost:3000/root (requires Grid admin account)
 
@@ -252,25 +275,52 @@ GridHackr.create!(hackr_alias: "YourName", password: "yourpassword", role: "admi
 ```
 Movement & Exploration
   look (l)                    - Examine your surroundings
-  go [direction]              - Move (north/south/east/west/up/down, or n/s/e/w/u/d)
-  examine [item] (ex, x)     - Inspect an item closely
+  go [direction]              - Move in a direction
+  [direction]                 - Shortcut: n/s/e/w/u/d/ne/se/sw/nw/out
+  examine [target] (ex, x)   - Inspect an item, NPC, or hackr closely
+  home                        - Return to your starting room
 
 Inventory & Items
   inventory (inv, i)          - Check your items
-  take [item]                 - Pick up an item
-  drop [item]                 - Drop an item
+  take [N|all] [item]         - Pick up items (supports quantity prefix)
+  drop [N|all] [item]         - Drop items
   use [item]                  - Use an item
-  salvage [item]              - Break down an item
-  give [item] to [npc]        - Give an item to an NPC
+  give [N|all] [item] to [npc] - Give items to an NPC
+  salvage [N|all] [item] (sal) - Break down items for materials
+  analyze [item] (an)         - Preview salvage yields
+
+Equipment
+  equip [item] (wear)         - Equip gear to a slot
+  unequip [item|slot] (remove) - Remove equipped gear
+  loadout (lo)                - View equipped gear and effects
+
+Crafting
+  schematics (schem, sch)     - List available schematics
+  schematic [slug]            - View schematic details
+  fabricate [slug] (fab)      - Craft an item from a schematic
+
+Den & Storage
+  den                         - Den management (rename/describe/invite/uninvite/lock/unlock)
+  place [fixture] (install)   - Place a fixture in your den
+  unplace [fixture] (uninstall) - Remove a placed fixture
+  store [N|all] [item] in [fixture] - Store items in a fixture
+  retrieve [N|all] [item] from [fixture] - Retrieve items from a fixture
+  peek [fixture] (search)     - View fixture contents
+
+BREACH (Hacking Encounters)
+  breach [target]             - Initiate a BREACH encounter
+  deck                        - DECK management (show/load/unload/charge)
+  interface (if)              - Interact with puzzle circumvention gates
+  reroute (rr)                - Attempt to reroute a protocol
 
 NPCs & Social
   talk [npc]                  - Initiate conversation with an NPC
-  ask [npc] about [topic]     - Ask an NPC about a specific topic
+  ask [npc] about [topic]     - Ask about a topic (supports branching: back/up/again)
   say [message]               - Talk to other players in the room
   who                         - List online players
 
 Stats & Progression
-  stat (stats, st)            - View your stats, XP, clearance, and vitals
+  stat (stats, st)            - View stats, XP, clearance, vitals, and loadout
   rep (reputation, standing)  - View faction reputation standings
 
 Economy
@@ -279,8 +329,9 @@ Economy
   chain                       - View blockchain info (latest/tx/cache/supply)
   rig                         - Manage mining rigs (on/off/install/uninstall/inspect)
   shop (browse)               - Browse shop listings
-  buy [item]                  - Purchase from a shop
-  sell [item]                 - Sell an item
+  buy [N|all] [item]          - Purchase from a shop
+  sell [N|all] [item]         - Sell an item
+  repair                      - Repair a fried DECK at a repair service
 
 Missions
   missions (quests)           - List available and active missions
@@ -295,14 +346,18 @@ Meta
 ```
 
 **Navigation:**
-- Use `/disconnect` menu item or type logout command to disconnect from THE PULSE GRID
+- Cardinal directions: `north/south/east/west` (or `n/s/e/w`)
+- Intercardinal: `northeast/southeast/southwest/northwest` (or `ne/se/sw/nw`)
+- Vertical: `up/down` (or `u/d`), plus `out` for den exits
 - Arrow keys navigate through command history
+- Use `/disconnect` menu item to disconnect from THE PULSE GRID
 
 **NPCs:**
 - **Fracture Network Coordinator** (hackr.tv Broadcast Station) - Quest giver
 - **Codec** (Transit Corridor Alpha) - Vendor
 - **GHOST** (The Blacksite) - Quest giver
 - **Temporal Theorist** (XERAEN Operations Center) - Quest giver
+- **Slickwire** (Black Market Hub) - Black market vendor
 
 ---
 
@@ -321,14 +376,14 @@ hackr.tv/
 │   │   │   └── playlists/             # CreatePlaylistModal, AddToPlaylistDropdown
 │   │   ├── contexts/
 │   │   │   └── AudioContext.tsx       # Global audio player state
-│   │   └── hooks/                     # 14 custom hooks (useGridAuth, useUplink, etc.)
+│   │   └── hooks/                     # 14 custom hooks (useGridAuth, useUplink, useCommandHistory, etc.)
 │   ├── controllers/
 │   │   ├── api/                       # JSON API for React SPA
 │   │   ├── admin/                     # Server-rendered admin CRUD
 │   │   └── application_controller.rb  # Multi-domain routing
-│   ├── models/                        # 69 Active Record models (28 Grid-specific)
+│   ├── models/                        # 81 Active Record models (40 Grid-specific)
 │   ├── services/
-│   │   └── grid/                      # Grid services (economy, missions, reputation, shops, etc.)
+│   │   └── grid/                      # 40 Grid services (BREACH, economy, missions, fabrication, etc.)
 │   ├── mailers/
 │   │   └── grid_mailer.rb             # Transactional emails
 │   ├── observers/
@@ -340,18 +395,20 @@ hackr.tv/
 │   │   └── admin/                     # Admin views (server-rendered)
 │   ├── components/
 │   │   └── band_profile_component.rb  # Reusable band profile (ViewComponent)
-│   └── channels/                      # 7 Action Cable channels
-│       ├── grid_channel.rb            # Real-time multiplayer
+│   └── channels/                      # 6 Action Cable channels
 │       ├── achievement_channel.rb     # Per-hackr achievement/mission broadcasts
+│       ├── grid_channel.rb            # Real-time multiplayer
 │       ├── live_chat_channel.rb       # Uplink comms
+│       ├── overlay_channel.rb         # OBS overlay broadcasts
 │       ├── pulse_wire_channel.rb      # PulseWire social feed updates
-│       ├── stream_status_channel.rb   # Livestream state changes
-│       └── overlay_channel.rb         # OBS overlay broadcasts
+│       └── stream_status_channel.rb   # Livestream state changes
 ├── data/                              # YAML seed data
 │   ├── catalog/                       # Per-artist YAML files (16 artists)
 │   ├── system/                        # Hackrs, channels, radio, redirects
-│   ├── world/                         # Zones, rooms, exits, mobs, items, factions,
-│   │                                  #   achievements, missions, shop_listings
+│   ├── world/                         # Regions, zones, rooms, exits, mobs, items,
+│   │                                  #   factions, achievements, missions, schematics,
+│   │                                  #   breach templates/encounters, PAC facilities,
+│   │                                  #   salvage yields, shop listings, item definitions
 │   ├── content/                       # Codex, hackr_logs, wire, handbook
 │   ├── playlists/                     # Curated playlists
 │   └── overlays/                      # Overlay scenes, elements, tickers
@@ -367,7 +424,7 @@ hackr.tv/
 │       ├── easter_eggs.rb             # Hidden commands
 │       ├── realtime_subscriber.rb     # Action Cable pubsub for terminal
 │       └── handlers/                  # Terminal command handlers
-├── spec/                              # Test suite (2097 total)
+├── spec/                              # Test suite (2870 total)
 │   ├── models/                        # Model specs
 │   ├── controllers/                   # Controller specs
 │   ├── components/                    # ViewComponent specs
@@ -399,9 +456,9 @@ bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- **Backend:** 1853 examples (RSpec)
+- **Backend:** 2626 examples (RSpec)
 - **Frontend:** 244 examples (Vitest)
-- **Total:** 2097 passing tests
+- **Total:** 2870 passing tests
 
 ---
 
@@ -414,22 +471,25 @@ bundle exec standardrb --fix        # Auto-fix issues
 ```
 
 ### Data Loading
-The data loading system uses YAML files as the single source of truth for all seed content:
+The database is the source of truth. YAML files provide seed data for initial setup and content updates (never overwrites existing records):
 
 ```bash
 bin/rails data:load                 # Load everything
 bin/rails data:catalog              # Artists, albums, tracks only
 bin/rails data:system               # Hackrs, channels, radio, redirects
-bin/rails data:world                # Factions, zones, rooms, exits, mobs, items, achievements, missions, shop_listings
-bin/rails data:content              # Codex, hackr_logs, wire
+bin/rails data:world                # Factions, regions, zones, rooms, exits, mobs,
+                                    #   item definitions, salvage yields, items,
+                                    #   achievements, shop listings, missions,
+                                    #   schematics, breach templates/encounters,
+                                    #   PAC facilities
+bin/rails data:content              # Codex, hackr_logs, wire, handbook
 bin/rails data:overlays             # Overlay scenes, elements, tickers
 ```
 
-See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
-
 **Features:**
 - Idempotent operations (safe to re-run)
-- Dependency-aware ordering (26 tasks in correct sequence)
+- Dependency-aware ordering (47 tasks in correct sequence)
+- Production seed guards (`guard_world_seed!` blocks world tasks unless `ALLOW_WORLD_SEED=true`)
 - S3 audio sideloading (`S3_BUCKET=bucket bin/rails data:audio`)
 - Reset seed content without touching user data (`data:reset`)
 
@@ -479,32 +539,48 @@ See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
 - **radio_station_playlists** - position (1+), belongs_to :radio_station, belongs_to :playlist
 
 ### THE PULSE GRID — Core
-- **grid_hackrs** - player accounts with bcrypt auth (role: operative/operator/admin), XP, clearance (0–99), vitals, CRED balance, mining stats, has_many :playlists
-- **grid_rooms** - locations in THE PULSE GRID
-- **grid_zones** - areas grouping rooms (faction_base, govcorp, transit, black_market)
+- **grid_hackrs** - player accounts with bcrypt auth (role: operative/operator/admin), XP, clearance (0–99), vitals, CRED balance, mining stats, zone_entry_room_id, TOTP 2FA (encrypted OTP secret, backup codes), has_many :playlists
+- **grid_regions** - geographic hierarchy above zones (name, slug, description, hospital_room_id)
+- **grid_rooms** - locations with map coordinates (map_x, map_y, map_z), room_type, breach_template_slug
+- **grid_zones** - areas grouping rooms (zone_type, color_scheme, danger_level 0–10, belongs_to :grid_region)
 - **grid_factions** - 7 factions (The Fracture Network, Hackrcore, Blackout, Frontwave, Offline, GovCorp, Dante Russo)
-- **grid_exits** - directional connections between rooms
-- **grid_items** - objects with rarity, stacking, equippable flag, room or inventory placement
-- **grid_mobs** - NPCs with dialogue trees, mob_type (quest_giver, vendor)
+- **grid_exits** - directional connections between rooms (including intercardinal)
+- **grid_items** - objects with rarity, stacking, equipped_slot, deck_id (software→DECK), container_id (fixture storage), grid_impound_record_id
+- **grid_item_definitions** - canonical item catalog (75 definitions, 12 item types)
+- **grid_mobs** - NPCs with branching dialogue trees (recursive topic format), mob_type (quest_giver, vendor, special, lore)
 - **grid_messages** - comms and system messages
+- **grid_den_invites** - den access invitations with expiry and revocation
+
+### THE PULSE GRID — Equipment & Crafting
+- **grid_schematics** - crafting recipes with clearance/location gates, required_room_type
+- **grid_schematic_ingredients** - ingredient definitions (item definition FK, quantity)
+- **grid_salvage_yields** - deterministic salvage output mappings (source → output item definitions)
+
+### THE PULSE GRID — BREACH
+- **grid_breach_templates** - encounter definitions with protocol layouts, puzzle gates, tier, cooldown, ambient targeting (zone_slugs, danger_level_min)
+- **grid_breach_encounters** - placed encounters in rooms with state machine (available→active→cooldown→available/depleted)
+- **grid_hackr_breaches** - active/completed breach instances per hackr with round tracking, detection, meta (JSON)
+- **grid_breach_protocols** - individual protocols within a breach (type, health, ticks, status)
+- **grid_hackr_breach_logs** - append-only action log (exec/analyze/reroute/jackout)
+- **grid_impound_records** - gear impound tracking for GovCorp capture (status, bribe cost, recovery)
 
 ### THE PULSE GRID — Economy
 - **grid_caches** - CRED wallets (one per hackr), balance tracking
-- **grid_transactions** - append-only ledger for all CRED movement (transfer, mining_reward, gameplay_reward, burn, redemption, genesis)
+- **grid_transactions** - append-only ledger for all CRED movement (transfer, mining_reward, gameplay_reward, burn, redemption, genesis, garnishment)
 - **grid_mining_rigs** - per-hackr mining hardware with PSU/CPU/GPU/RAM components
-- **grid_shop_listings** - vendor inventory with price, clearance requirements, stock limits
+- **grid_shop_listings** - vendor inventory with price, clearance requirements, stock limits (delegates through item definition FK)
 - **grid_shop_transactions** - purchase audit log
 
 ### THE PULSE GRID — Reputation & Achievements
 - **grid_hackr_reputations** - per-hackr per-faction rep values (leaf storage)
 - **grid_faction_rep_links** - directed graph for rep rollup between factions
 - **grid_reputation_events** - audit log of rep changes
-- **grid_achievements** - badge definitions with trigger types, thresholds, and XP/CRED rewards
+- **grid_achievements** - 71 badge definitions with trigger types, thresholds, and XP/CRED rewards
 - **grid_hackr_achievements** - per-hackr unlock tracking with awarded_at
 
 ### THE PULSE GRID — Missions
 - **grid_mission_arcs** - optional storyline grouping
-- **grid_missions** - definitions with prereq chains, clearance/rep gates, NPC giver, published status
+- **grid_missions** - definitions with prereq chains, clearance/rep gates, NPC giver, dialogue_path gate, published status
 - **grid_mission_objectives** - 10 types (visit_room, talk_npc, collect_item, deliver_item, spend_cred, buy_item, reach_rep, reach_clearance, use_item, salvage_item)
 - **grid_mission_rewards** - 5 types (xp, cred, faction_rep, item_grant, grant_achievement)
 - **grid_hackr_missions** - per-hackr mission state (active/completed/abandoned), partial unique index on active instances
@@ -581,12 +657,12 @@ See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
 - ViewComponent architecture - Reusable band profiles with flexible color schemes
 - Band profile pages - 16 artists with config-based routing
 - Album model - Active Storage cover images with hover zoom
-- Unified data loading system - Idempotent tasks with dependency ordering
+- Unified data loading system - Idempotent tasks with dependency ordering (47 tasks)
 - hackr.fm Radio - 4 stations with live streaming
-- Pulse Vault - 71 tracks, search/filter, click-anywhere playback, custom ordering
+- Pulse Vault - 89 tracks, search/filter, click-anywhere playback, custom ordering
 - Auto-play next track - Queue management with loop functionality
-- THE PULSE GRID - Real-time multiplayer MUD (6 zones, 7 rooms, 4 NPCs, 7 factions)
-- NPC dialogue system - Quest givers, vendors, and conversation topics
+- THE PULSE GRID - Real-time multiplayer MUD (16 regions, 48+ zones, 249+ rooms, 47+ NPCs, 7 factions)
+- Branching NPC dialogue - Recursive topic trees with stateful navigation
 - Command history - Arrow key navigation (100 commands)
 - Feature access control - Admin-grantable feature grants for Grid access
 - Hackr Logs - Blog platform with Markdown support
@@ -600,18 +676,31 @@ See [IMPORT_README.md](IMPORT_README.md) for the full data loading reference.
 - Background infrastructure - Solid Queue, Solid Cache, Solid Cable configured
 - Terminal SSH Access - BBS-style SSH terminal with ASCII art, effects, real-time updates
 - Persistent Progression - XP, clearance levels (0–99), vitals, inventory with rarity/stacking
+- Inventory Limits - 16-slot finite inventory with per-type stack limits and quantity syntax
+- Equipment/Loadout System - 13-slot gear with stat bonuses and visual loadout display
+- Personal Dens - Player housing with invites, storage, lock/unlock
+- Storage Fixtures - Placeable furniture (8/16/32 slot capacity), max 3 per den
+- Item Catalog - 75 canonical item definitions across 12 types
+- Item Fabrication - 28 schematics with ingredient recipes and location gates
+- Salvage Yields - Item decomposition into deterministic material outputs
 - CRED Economy - Fixed-supply cryptocurrency with caches, append-only ledger, mining rigs
+- GovCorp Debt System - Income garnishment, RestorePoint hospital respawn
 - Shops & Black Market - Standard and black market vendors with dynamic pricing
 - Faction Reputation - 7 factions, leaf-storage + rollup rep, 8-tier ladder
-- Achievement/Badge System - Site-wide badges with XP + CRED rewards
+- Achievement/Badge System - 71 site-wide badges with XP + CRED rewards
 - Mission/Quest System - NPC-gated objectives, storyline arcs, prereq chains, 10 objective types
+- BREACH Encounter System - Turn-based hacking with 5 protocol types, 4 puzzle gate types, 39 templates (CL0–55)
+- GovCorp Capture - Probabilistic capture, gear impound, PAC facilities (11 rooms × 14 regions), alert/escape system
+- Grid Regions - 16 geographic regions following US geography
+- TOTP Two-Factor Auth - Optional 2FA with backup codes, replay prevention, rate limiting
+- DB Source of Truth - PaperTrail versioning on 24+ models, admin version history UI
+- Admin Tooling Suite - Hackr inspector, stat editor, NPC dialogue tester, BREACH sandbox, PAC escape tester, visual map editor (flat + 2.5D isometric), world export, transaction log, impound/mining rig managers
 - Hackr Handbook - GitBook-style documentation portal
-- Comprehensive test suite - 1853 backend + 244 frontend tests (2097 total)
+- Comprehensive test suite - 2626 backend + 244 frontend tests (2870 total)
 
 ### Future Enhancements
-- World expansion - More rooms, NPCs, items, and interactive objects
-- Hacking system - Mini-games for breaking into systems
-- Combat mechanics - Physical/cyber encounters
+- BREACH Phase 4: Social - CREW system, multi-hackr BREACH encounters
+- BREACH Phase 5: Endgame - World Event framework, Synthia/Uplink integration, livestream-driven encounters
 - Synthia frequency tuning mechanic
 - Twitter/X auto-posting for admin events
 
@@ -642,9 +731,9 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/rails db:migrate` | Run database migrations |
 | `bin/rails data:load` | Load all seed data from YAML |
 | `bin/rails data:catalog` | Load artists, albums, tracks only |
-| `bin/rails data:world` | Load factions, zones, rooms, mobs, items, achievements, missions, shops |
+| `bin/rails data:world` | Load all world data (16 sub-tasks: regions, zones, rooms, mobs, items, BREACH, etc.) |
 | `bin/rails data:reset` | Reset seed content (preserves user data) |
-| `bundle exec rspec` | Run backend test suite (1853 tests) |
+| `bundle exec rspec` | Run backend test suite (2626 tests) |
 | `pnpm test` | Run frontend test suite (244 tests) |
 | `bundle exec standardrb` | Lint backend code |
 | `bundle exec brakeman` | Run security scanner |
