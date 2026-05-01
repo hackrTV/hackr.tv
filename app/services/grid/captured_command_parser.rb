@@ -7,6 +7,7 @@ module Grid
   class CapturedCommandParser
     ALLOWED_COMMANDS = %w[
       look l go move north n south s east e west w up u down d out
+      northeast ne southeast se southwest sw northwest nw
       stat stats st inventory inv i help ?
       breach br bribe talk examine ex x who clear cls cl say
     ].freeze

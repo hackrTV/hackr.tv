@@ -85,8 +85,11 @@ module Grid
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2551  B R E A C H   F A I L E D                                   \u2551</span>"
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
-      cause = if failure_mode == :health_zero
+      cause = case failure_mode
+      when :health_zero
         "Neural link severed \u2014 vitals critical."
+      when :gate_exhaustion
+        "All circumvention gates locked out \u2014 breach path collapsed."
       else
         "Detection reached 100% \u2014 system countermeasures engaged."
       end
@@ -137,7 +140,11 @@ module Grid
       cause = case end_state
       when "success" then "All protocols neutralized."
       when "failure"
-        (failure_mode == :health_zero) ? "Neural link severed \u2014 vitals critical." : "Detection reached 100%."
+        case failure_mode
+        when :health_zero then "Neural link severed \u2014 vitals critical."
+        when :gate_exhaustion then "All circumvention gates locked out."
+        else "Detection reached 100%."
+        end
       when "jacked_out" then "Disconnected from encounter."
       end
 

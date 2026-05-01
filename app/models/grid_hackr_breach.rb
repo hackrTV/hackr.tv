@@ -92,6 +92,48 @@ class GridHackrBreach < ApplicationRecord
     all_protocols_destroyed? || (has_gates && all_circumvention_gates_solved?)
   end
 
+  # True when neither win path (all protocols destroyed OR all gates solved)
+  # can succeed — e.g. gate-only BREACH where required gates have all failed.
+  def breach_unwinnable?
+    has_protocols = grid_breach_protocols.exists?
+    has_gates = puzzle_gates_exist?
+    return false unless has_gates
+    return false if has_protocols # protocol path always theoretically open
+
+    # Gate-only: can we still reach required_count?
+    ps = meta&.dig("puzzle_state")
+    return false unless ps
+
+    gates = ps["gates"] || {}
+    required = ps["required_count"].to_i
+    solved = ps["solved_count"].to_i
+
+    # A gate is potentially solvable if active, or locked with a solvable dependency.
+    # Fixed-point: seed with active/solved/bypassed, propagate through locked gates.
+    solvable_ids = Set.new
+    gates.each { |id, g| solvable_ids << id if %w[active solved bypassed].include?(g["state"]) }
+
+    changed = true
+    while changed
+      changed = false
+      gates.each do |id, g|
+        next if solvable_ids.include?(id)
+        next unless g["state"] == "locked"
+        if g["depends_on"] && solvable_ids.include?(g["depends_on"])
+          solvable_ids << id
+          changed = true
+        end
+      end
+    end
+
+    # Max possible solved = already solved + still-solvable active/locked gates.
+    # Bypassed gates are excluded from both solved_count AND this count, but they
+    # also reduce required_count at setup (required = total - bypass_count), so the
+    # comparison stays balanced.
+    max_possible = solved + solvable_ids.count { |id| %w[active locked].include?(gates[id]["state"]) }
+    max_possible < required
+  end
+
   def puzzle_gates_exist?
     meta&.dig("puzzle_state", "gates")&.any? || false
   end

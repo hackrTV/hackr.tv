@@ -7,7 +7,7 @@ module Grid
     AnalyzeResult = Data.define(:target_position, :level_reached, :info_revealed, :bonus_action)
     RerouteResult = Data.define(:target_position, :protocol_type_label)
     UseItemResult = Data.define(:item_name, :effect_output, :emergency_jackout)
-    InterfaceResult = Data.define(:gate_id, :correct, :gate_state, :attempts_remaining, :all_solved, :feedback)
+    InterfaceResult = Data.define(:gate_id, :correct, :gate_state, :attempts_remaining, :all_solved, :all_failed, :feedback)
     CircuitProbeResult = Data.define(:gate_id, :probe_pair, :connected, :probes_remaining, :feedback)
 
     class NotInBreach < StandardError; end
@@ -385,6 +385,7 @@ module Grid
       gate_state = nil
       attempts_remaining = 0
       all_solved = false
+      all_failed = false
       feedback = nil
 
       ActiveRecord::Base.transaction do
@@ -436,6 +437,7 @@ module Grid
         )
 
         all_solved = breach.all_circumvention_gates_solved?
+        all_failed = !all_solved && breach.breach_unwinnable?
 
         log_action!(breach, "interface", gate_id, nil, {
           gate_id: gate_id,
@@ -451,6 +453,7 @@ module Grid
         gate_state: gate_state,
         attempts_remaining: attempts_remaining,
         all_solved: all_solved,
+        all_failed: all_failed,
         feedback: feedback
       )
     end
