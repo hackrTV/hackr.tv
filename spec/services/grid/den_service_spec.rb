@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Grid::DenService do
-  let(:zone) { create(:grid_zone, :residential, slug: "residential-district") }
+  let(:zone) { create(:grid_zone, slug: "residential-district") }
   let(:corridor) { create(:grid_room, :hub, grid_zone: zone, slug: "residential-corridor", name: "Residential Corridor") }
   let(:hackr) { create(:grid_hackr) }
   let(:service) { described_class.new(hackr) }

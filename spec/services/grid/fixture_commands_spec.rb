@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Fixture Commands", type: :service do
-  let(:zone) { create(:grid_zone, :residential, slug: "residential-district") }
+  let(:zone) { create(:grid_zone, slug: "residential-district") }
   let(:corridor) { create(:grid_room, :hub, grid_zone: zone, slug: "residential-corridor", name: "Residential Corridor") }
   let(:hackr) { create(:grid_hackr, current_room: den) }
   let(:den) { Grid::DenService.new(hackr_for_den).create_den! }

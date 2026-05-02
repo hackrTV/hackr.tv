@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_28_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_01_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -628,7 +628,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_28_200000) do
     t.integer "min_clearance", default: 0, null: false
     t.string "name"
     t.integer "owner_id"
-    t.string "room_type"
+    t.string "room_type", default: "standard", null: false
     t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["ambient_playlist_id"], name: "index_grid_rooms_on_ambient_playlist_id"
@@ -758,7 +758,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_28_200000) do
 
   create_table "grid_zones", force: :cascade do |t|
     t.integer "ambient_playlist_id"
-    t.string "color_scheme"
     t.datetime "created_at", null: false
     t.integer "danger_level", default: 0, null: false
     t.text "description"
@@ -767,7 +766,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_28_200000) do
     t.string "name"
     t.string "slug"
     t.datetime "updated_at", null: false
-    t.string "zone_type"
     t.index ["ambient_playlist_id"], name: "index_grid_zones_on_ambient_playlist_id"
     t.index ["grid_region_id"], name: "index_grid_zones_on_grid_region_id"
   end

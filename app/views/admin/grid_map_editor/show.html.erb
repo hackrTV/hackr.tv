@@ -105,6 +105,7 @@
     <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">TYPE:</label>
     <select id="me-room-type" class="tui-input" style="width: 100%; padding: 6px;">
       <option value="">(none)</option>
+      <option value="standard">Standard</option>
       <option value="hub">Hub</option>
       <option value="faction_base">Faction Base</option>
       <option value="govcorp">GovCorp</option>
@@ -113,8 +114,6 @@
       <option value="transit">Transit</option>
       <option value="shop">Shop</option>
       <option value="danger_zone">Danger Zone</option>
-      <option value="prism">Prism</option>
-      <option value="dream">Dream</option>
       <option value="hospital">Hospital</option>
       <option value="firmware_vendor">Firmware Vendor</option>
       <option value="repair_service">Repair Service</option>
@@ -1340,7 +1339,7 @@
     html += '<label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">Type:</label>';
     html += '<select id="me-p-type" class="tui-input" style="width: 100%; padding: 4px; font-size: 0.85em;">';
     html += '<option value="">(none)</option>';
-    var types = ['hub','faction_base','govcorp','special','safe_zone','transit','shop','danger_zone','prism','dream','hospital','firmware_vendor','repair_service','containment','impound','sally_port_anteroom','sally_port'];
+    var types = ['standard','hub','faction_base','govcorp','special','safe_zone','transit','shop','danger_zone','hospital','firmware_vendor','repair_service','containment','impound','sally_port_anteroom','sally_port'];
     types.forEach(function(t) {
       html += '<option value="' + t + '"' + (room.room_type === t ? ' selected' : '') + '>' + t + '</option>';
     });

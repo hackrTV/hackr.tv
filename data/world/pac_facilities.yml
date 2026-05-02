@@ -6,8 +6,6 @@
 zone:
   name: "GovCorp Perception Alignment Center"
   description: "A sanitized GovCorp containment facility. Neutral walls, filtered air, and the quiet hum of compliance infrastructure. Somewhere behind these walls is a processing corridor that leads to daylight — if you can reach it."
-  zone_type: govcorp
-  color_scheme: white/red
   faction_slug: govcorp
   danger_level: 5
 

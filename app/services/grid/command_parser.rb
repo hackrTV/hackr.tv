@@ -174,7 +174,6 @@ module Grid
       output = []
       output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
       output << "<span style='color: #22d3ee; font-weight: bold;'>#{room.name.upcase}</span> <span style='color: #666;'>::</span> <span style='color: #fbbf24;'>#{room.grid_zone.name}</span> <span style='color: #666;'>::</span> <span style='color: #a78bfa;'>#{room.grid_zone.grid_region&.name || "Unknown Region"}</span>"
-      output << "<span style='color: #9ca3af;'>[#{room.color_scheme}]</span>" if room.color_scheme
       output << ""
       output << "<span style='color: #d0d0d0;'>#{codex_linkify(room.description)}</span>" if room.description
 

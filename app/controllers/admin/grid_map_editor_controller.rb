@@ -118,7 +118,7 @@ class Admin::GridMapEditorController < Admin::ApplicationController
 
     render json: {
       zone: {id: zone.id, name: zone.name, slug: zone.slug,
-             zone_type: zone.zone_type, danger_level: zone.danger_level,
+             danger_level: zone.danger_level,
              region_id: zone.grid_region_id, region_name: zone.grid_region.name},
       z_level: z_level,
       z_levels: z_levels,

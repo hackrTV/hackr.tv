@@ -4,12 +4,10 @@
 # Database name: primary
 #
 #  id                  :integer          not null, primary key
-#  color_scheme        :string
 #  danger_level        :integer          default(0), not null
 #  description         :text
 #  name                :string
 #  slug                :string
-#  zone_type           :string
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  ambient_playlist_id :integer

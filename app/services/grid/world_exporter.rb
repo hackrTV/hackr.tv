@@ -115,7 +115,6 @@ module Grid
       zones = GridZone.includes(:grid_region, :grid_faction).order("grid_regions.name, grid_zones.name")
         .references(:grid_region).map do |z|
         h = {"slug" => z.slug, "name" => z.name, "description" => z.description,
-             "zone_type" => z.zone_type, "color_scheme" => z.color_scheme,
              "danger_level" => z.danger_level,
              "region_slug" => z.grid_region.slug}
         h["faction_slug"] = z.grid_faction.slug if z.grid_faction
