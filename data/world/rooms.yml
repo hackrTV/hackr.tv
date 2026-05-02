@@ -224,7 +224,7 @@ rooms:
     slug: riverlands-den-corridor
     description: "A residential hallway carved into the bluff rock. Numbered doors line both sides. The stone walls keep the temperature constant year-round."
     zone_slug: riverlands-blufftop
-    room_type: hub
+    room_type: standard
     map_x: 1
     map_y: 1
 
@@ -687,7 +687,7 @@ rooms:
     slug: canyon-upper-dwelling
     description: "A residential unit carved into the upper canyon wall. The entrance is a reinforced door set into sandstone. Inside, the rock keeps everything cool and quiet."
     zone_slug: canyon-dwellings
-    room_type: hub
+    room_type: standard
     map_x: 0
     map_y: 0
     map_z: -1

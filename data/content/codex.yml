@@ -2275,7 +2275,6 @@ codex_entries:
     published: true
     metadata:
       type: Faction headquarters
-      zone_type: faction_base
       control: "XERAEN / The Fracture Network"
       security: Maximum
     content: |

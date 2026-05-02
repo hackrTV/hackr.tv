@@ -32,7 +32,7 @@ require "rails_helper"
 RSpec.describe GridDenInvite do
   let(:owner) { create(:grid_hackr) }
   let(:guest) { create(:grid_hackr) }
-  let(:zone) { create(:grid_zone, :residential) }
+  let(:zone) { create(:grid_zone) }
   let(:den) { create(:grid_room, :den, grid_zone: zone, owner: owner) }
 
   describe "associations" do

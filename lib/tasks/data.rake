@@ -773,8 +773,6 @@ namespace :data do
       zone.assign_attributes(
         name: attrs["name"],
         description: attrs["description"],
-        zone_type: attrs["zone_type"],
-        color_scheme: attrs["color_scheme"],
         danger_level: attrs["danger_level"] || 0,
         grid_region: region,
         grid_faction: faction,
@@ -1182,8 +1180,6 @@ namespace :data do
         zone.assign_attributes(
           name: zone_tmpl["name"],
           description: zone_tmpl["description"],
-          zone_type: zone_tmpl["zone_type"],
-          color_scheme: zone_tmpl["color_scheme"],
           grid_region: region,
           grid_faction: govcorp_faction,
           danger_level: zone_tmpl["danger_level"] || 0

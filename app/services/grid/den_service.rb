@@ -19,8 +19,7 @@ module Grid
     # Raises DenAlreadyExists if hackr already has a den.
     # Pass consume_item: to atomically destroy the chip in the same transaction.
     def create_den!(consume_item: nil)
-      zone = GridZone.find_by!(zone_type: "residential")
-      corridor = zone.grid_rooms.find_by!(slug: RESIDENTIAL_CORRIDOR_SLUG)
+      corridor = GridRoom.find_by!(slug: RESIDENTIAL_CORRIDOR_SLUG)
 
       retries = 0
       begin
@@ -36,7 +35,7 @@ module Grid
             slug: den_slug,
             description: "A private node in the Residential District. Sparse but functional.",
             room_type: "den",
-            grid_zone: zone,
+            grid_zone: corridor.grid_zone,
             owner: @hackr,
             locked: false
           )

@@ -542,7 +542,7 @@ bin/rails data:overlays             # Overlay scenes, elements, tickers
 - **grid_hackrs** - player accounts with bcrypt auth (role: operative/operator/admin), XP, clearance (0–99), vitals, CRED balance, mining stats, zone_entry_room_id, TOTP 2FA (encrypted OTP secret, backup codes), has_many :playlists
 - **grid_regions** - geographic hierarchy above zones (name, slug, description, hospital_room_id)
 - **grid_rooms** - locations with map coordinates (map_x, map_y, map_z), room_type, breach_template_slug
-- **grid_zones** - areas grouping rooms (zone_type, color_scheme, danger_level 0–10, belongs_to :grid_region)
+- **grid_zones** - areas grouping rooms (danger_level 0–10, belongs_to :grid_region, optional :grid_faction)
 - **grid_factions** - 7 factions (The Fracture Network, Hackrcore, Blackout, Frontwave, Offline, GovCorp, Dante Russo)
 - **grid_exits** - directional connections between rooms (including intercardinal)
 - **grid_items** - objects with rarity, stacking, equipped_slot, deck_id (software→DECK), container_id (fixture storage), grid_impound_record_id

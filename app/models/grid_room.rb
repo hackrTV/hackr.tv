@@ -11,7 +11,7 @@
 #  map_z               :integer          default(0), not null
 #  min_clearance       :integer          default(0), not null
 #  name                :string
-#  room_type           :string
+#  room_type           :string           default("standard"), not null
 #  slug                :string
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
@@ -51,8 +51,7 @@ class GridRoom < ApplicationRecord
   validates :name, presence: true
   validates :name, length: {maximum: 80}, if: :den?
   validates :room_type, inclusion: {
-    in: %w[hub faction_base govcorp special safe_zone transit shop danger_zone prism dream den hospital firmware_vendor repair_service containment impound sally_port sally_port_anteroom],
-    allow_nil: true
+    in: %w[standard hub faction_base govcorp special safe_zone transit shop danger_zone den hospital firmware_vendor repair_service containment impound sally_port sally_port_anteroom]
   }
   validates :min_clearance, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :owner_id, uniqueness: {allow_nil: true}
@@ -72,9 +71,6 @@ class GridRoom < ApplicationRecord
       end
     end
   end
-
-  # Delegate to zone for convenience
-  delegate :faction, :color_scheme, to: :grid_zone
 
   def clearance_gated?
     min_clearance > 0

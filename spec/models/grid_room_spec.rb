@@ -11,7 +11,7 @@
 #  map_z               :integer          default(0), not null
 #  min_clearance       :integer          default(0), not null
 #  name                :string
-#  room_type           :string
+#  room_type           :string           default("standard"), not null
 #  slug                :string
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null

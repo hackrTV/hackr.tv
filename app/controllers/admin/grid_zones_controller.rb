@@ -66,7 +66,7 @@ class Admin::GridZonesController < Admin::ApplicationController
 
   def zone_params
     params.require(:grid_zone).permit(
-      :name, :slug, :description, :zone_type, :color_scheme, :danger_level, :grid_region_id, :grid_faction_id, :ambient_playlist_id
+      :name, :slug, :description, :danger_level, :grid_region_id, :grid_faction_id, :ambient_playlist_id
     )
   end
 end
