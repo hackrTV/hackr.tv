@@ -58,10 +58,10 @@ class Admin::GridRegionsController < Admin::ApplicationController
   end
 
   def load_selects
-    if @region&.persisted?
-      @rooms = @region.grid_rooms.includes(grid_zone: :grid_region).joins(:grid_zone).order("grid_zones.name, grid_rooms.name")
+    @rooms = if @region&.persisted?
+      @region.grid_rooms.includes(grid_zone: :grid_region).joins(:grid_zone).order("grid_zones.name, grid_rooms.name")
     else
-      @rooms = GridRoom.none
+      GridRoom.none
     end
   end
 
