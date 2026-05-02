@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_01_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_02_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -571,6 +571,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_200000) do
   end
 
   create_table "grid_regions", force: :cascade do |t|
+    t.integer "cell_block_room_id"
     t.integer "containment_room_id"
     t.datetime "created_at", null: false
     t.text "description"
@@ -578,12 +579,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_200000) do
     t.integer "facility_exit_room_id"
     t.integer "hospital_room_id"
     t.string "name", null: false
+    t.integer "sally_port_room_id"
     t.string "slug", null: false
     t.datetime "updated_at", null: false
+    t.index ["cell_block_room_id"], name: "index_grid_regions_on_cell_block_room_id"
     t.index ["containment_room_id"], name: "index_grid_regions_on_containment_room_id"
     t.index ["facility_bribe_exit_room_id"], name: "index_grid_regions_on_facility_bribe_exit_room_id"
     t.index ["facility_exit_room_id"], name: "index_grid_regions_on_facility_exit_room_id"
     t.index ["hospital_room_id"], name: "index_grid_regions_on_hospital_room_id"
+    t.index ["sally_port_room_id"], name: "index_grid_regions_on_sally_port_room_id"
     t.index ["slug"], name: "index_grid_regions_on_slug", unique: true
   end
 
@@ -1271,10 +1275,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_200000) do
   add_foreign_key "grid_missions", "grid_mission_arcs", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_missions", column: "prereq_mission_id", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
+  add_foreign_key "grid_regions", "grid_rooms", column: "cell_block_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "containment_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "facility_bribe_exit_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "facility_exit_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "hospital_room_id", on_delete: :nullify
+  add_foreign_key "grid_regions", "grid_rooms", column: "sally_port_room_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
   add_foreign_key "grid_rooms", "grid_hackrs", column: "owner_id"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"

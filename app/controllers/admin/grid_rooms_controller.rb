@@ -61,7 +61,7 @@ class Admin::GridRoomsController < Admin::ApplicationController
   end
 
   def load_selects
-    @zones = GridZone.order(:name)
+    @zones = GridZone.includes(:grid_region).order(:name)
     @playlists = ZonePlaylist.order(:name)
   end
 

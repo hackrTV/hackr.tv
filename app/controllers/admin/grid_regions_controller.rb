@@ -4,7 +4,7 @@ class Admin::GridRegionsController < Admin::ApplicationController
   versionable GridRegion
 
   before_action :set_region, only: %i[edit update destroy]
-  before_action :load_selects, only: %i[new edit create update]
+  before_action :load_selects, only: %i[edit update]
 
   def index
     @regions = GridRegion.includes(:grid_zones).order(:name)
@@ -12,6 +12,7 @@ class Admin::GridRegionsController < Admin::ApplicationController
 
   def new
     @region = GridRegion.new
+    load_selects
   end
 
   def create
@@ -20,6 +21,7 @@ class Admin::GridRegionsController < Admin::ApplicationController
       set_flash_success("Region '#{@region.name}' created.")
       redirect_to admin_grid_regions_path
     else
+      load_selects
       flash.now[:error] = @region.errors.full_messages.join(", ")
       render :new, status: :unprocessable_entity
     end
@@ -56,12 +58,16 @@ class Admin::GridRegionsController < Admin::ApplicationController
   end
 
   def load_selects
-    @rooms = GridRoom.includes(:grid_zone).joins(:grid_zone).order("grid_zones.name, grid_rooms.name")
+    if @region&.persisted?
+      @rooms = @region.grid_rooms.includes(grid_zone: :grid_region).joins(:grid_zone).order("grid_zones.name, grid_rooms.name")
+    else
+      @rooms = GridRoom.none
+    end
   end
 
   def region_params
     params.require(:grid_region).permit(:name, :slug, :description,
-      :hospital_room_id, :containment_room_id,
+      :hospital_room_id, :containment_room_id, :cell_block_room_id, :sally_port_room_id,
       :facility_exit_room_id, :facility_bribe_exit_room_id)
   end
 end

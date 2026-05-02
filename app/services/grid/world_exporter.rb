@@ -94,7 +94,8 @@ module Grid
     def export_regions
       all_regions = GridRegion.order(:name).to_a
       special_ids = all_regions.flat_map { |r|
-        [r.hospital_room_id, r.containment_room_id, r.facility_exit_room_id, r.facility_bribe_exit_room_id]
+        [r.hospital_room_id, r.containment_room_id, r.facility_exit_room_id, r.facility_bribe_exit_room_id,
+         r.cell_block_room_id, r.sally_port_room_id]
       }.compact.uniq
       slug_map = GridRoom.where(id: special_ids).pluck(:id, :slug).to_h
 
@@ -104,6 +105,8 @@ module Grid
         h["containment_room_slug"] = slug_map[r.containment_room_id] if r.containment_room_id
         h["facility_exit_room_slug"] = slug_map[r.facility_exit_room_id] if r.facility_exit_room_id
         h["facility_bribe_exit_room_slug"] = slug_map[r.facility_bribe_exit_room_id] if r.facility_bribe_exit_room_id
+        h["cell_block_room_slug"] = slug_map[r.cell_block_room_id] if r.cell_block_room_id
+        h["sally_port_room_slug"] = slug_map[r.sally_port_room_id] if r.sally_port_room_id
         h.compact
       end
       write_yaml("regions.yml", {"regions" => regions})

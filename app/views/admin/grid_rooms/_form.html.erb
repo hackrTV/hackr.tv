@@ -1,3 +1,5 @@
+<%= render "admin/shared/combobox" %>
+
 <% if @room.errors.any? %>
   <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
     <p class="red-255-text">ERRORS:</p>
@@ -30,7 +32,7 @@
     <%= f.label :room_type, "ROOM TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
     <%= f.select :room_type,
           [["Standard", "standard"], ["Hub", "hub"], ["Faction Base", "faction_base"], ["GovCorp", "govcorp"], ["Special", "special"], ["Safe Zone", "safe_zone"], ["Transit", "transit"], ["Shop", "shop"], ["Danger Zone", "danger_zone"], ["Den", "den"], ["Hospital", "hospital"], ["Firmware Vendor", "firmware_vendor"], ["Repair Service", "repair_service"], ["Containment", "containment"], ["Impound", "impound"], ["Sally Port Anteroom", "sally_port_anteroom"], ["Sally Port", "sally_port"]],
-          { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+          { selected: @room.room_type || "standard" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
   </div>
   <div style="flex: 1; min-width: 200px;">
     <%= f.label :min_clearance, "MIN CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
@@ -41,7 +43,16 @@
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
     <%= f.label :grid_zone_id, "ZONE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.collection_select :grid_zone_id, @zones, :id, :name, { include_blank: "(select zone)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <input type="hidden" name="grid_room[grid_zone_id]" id="zone-cb-hidden" value="<%= @room.grid_zone_id %>">
+    <div class="admin-combobox">
+      <input type="text" id="zone-cb-input" class="admin-combobox-input<%= ' selected' if @room.grid_zone_id.present? %>" autocomplete="off"
+        placeholder="Type to search..."
+        value="<%= @room.grid_zone&.grid_region&.name.to_s + ' / ' + @room.grid_zone&.name.to_s if @room.grid_zone_id.present? %>">
+      <div id="zone-cb-dropdown" class="admin-combobox-dropdown"></div>
+    </div>
+    <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="zone-cb-status">
+      <%= @zones.size %> zones
+    </p>
   </div>
   <div style="flex: 1; min-width: 200px;">
     <%= f.label :ambient_playlist_id, "AMBIENT PLAYLIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
@@ -56,3 +67,44 @@
     <%= link_to "History", history_admin_grid_room_path(@room), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
   <% end %>
 </div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    var nameField = document.getElementById('grid_room_name');
+    var slugField = document.getElementById('grid_room_slug');
+    var autoSlug = true;
+
+    function slugify(s) {
+      return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    if (slugField.value && slugField.value !== slugify(nameField.value)) {
+      autoSlug = false;
+    }
+
+    nameField.addEventListener('input', function() {
+      if (autoSlug) slugField.value = slugify(this.value);
+    });
+
+    slugField.addEventListener('input', function() {
+      autoSlug = false;
+    });
+  })();
+
+  AdminCombobox.init({
+    inputId: 'zone-cb-input',
+    hiddenId: 'zone-cb-hidden',
+    dropdownId: 'zone-cb-dropdown',
+    statusId: 'zone-cb-status',
+    items: <%= raw @zones.map { |z| { id: z.id, name: z.name, region_name: z.grid_region.name } }.to_json %>,
+    getSearchText: function(z) { return (z.name + ' ' + z.region_name).toLowerCase(); },
+    getGroupKey: function(z) { return z.region_name; },
+    renderOption: function(z, e) {
+      return '<span class="cb-name">' + e(z.name) + '</span> <span class="cb-meta">' + e(z.region_name) + '</span>';
+    },
+    getId: function(z) { return String(z.id); },
+    getLabel: function(z) { return z.region_name + ' / ' + z.name; },
+    emptyText: 'No zones match',
+    selectedText: 'Zone selected'
+  });
+</script>
