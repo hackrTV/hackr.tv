@@ -7,7 +7,7 @@ class Admin::GridWorldExportController < Admin::ApplicationController
     timestamp = Time.current.strftime("%Y%m%d-%H%M%S")
 
     send_data data,
-      filename: "world-export-#{timestamp}.tar.gz",
+      filename: "the-pulse-grid-world-export-#{timestamp}.tar.gz",
       type: "application/gzip",
       disposition: "attachment"
   end

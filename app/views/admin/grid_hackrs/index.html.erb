@@ -15,17 +15,17 @@
         </div>
       <% end %>
 
-      <%= form_with url: admin_grid_hackrs_path, method: :get, local: true, style: "display: inline-flex; gap: 8px; align-items: center; margin-bottom: 20px;" do %>
-        <label class="white-text" style="font-weight: bold;">SEARCH:</label>
-        <%= text_field_tag :q, params[:q], class: "tui-input", style: "padding: 6px 10px; width: 250px;", placeholder: "hackr alias..." %>
-        <%= submit_tag "Find", class: "tui-button green-168", style: "padding: 6px 14px;" %>
-        <% if params[:q].present? %>
-          <%= link_to "Clear", admin_grid_hackrs_path, class: "tui-button", style: "padding: 6px 14px;" %>
-        <% end %>
-      <% end %>
+      <div style="display: inline-flex; gap: 8px; align-items: center; margin-bottom: 20px;">
+        <label class="white-text" style="font-weight: bold;">FILTER:</label>
+        <input type="text" id="hackr-filter" class="tui-input" style="padding: 6px 10px; width: 250px;" placeholder="hackr alias..." autocomplete="off">
+        <span id="hackr-filter-status" style="color: #666; font-size: 0.85em;"><%= @hackrs.size %> hackrs</span>
+      </div>
 
+      <style>
+        .hackr-table td, .hackr-table th { padding: 6px 8px; }
+      </style>
       <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
-        <table class="tui-table" style="width: 100%;">
+        <table class="tui-table hackr-table" style="width: 100%; border-spacing: 0 2px; border-collapse: separate;">
           <thead>
             <tr>
               <th style="text-align: left;">Alias</th>
@@ -39,9 +39,9 @@
             </tr>
           </thead>
           <tbody>
-            <% @hackrs.each do |hackr| %>
-              <tr>
-                <td class="cyan-255-text"><%= hackr.hackr_alias %></td>
+            <% @hackrs.each_with_index do |hackr, i| %>
+              <tr style="<%= " background: #112;" if i.odd? %>">
+                <td class="cyan-255-text"><%= link_to hackr.hackr_alias, admin_grid_hackr_path(hackr), style: "color: inherit; text-decoration: none;" %></td>
                 <td style="color: #888;"><%= hackr.role %></td>
                 <td style="text-align: center;" class="cyan-255-text"><%= hackr.stat("clearance") %></td>
                 <td style="text-align: center; color: #888;"><%= hackr.stat("xp") %></td>
@@ -61,6 +61,13 @@
                 <td style="text-align: right; white-space: nowrap;">
                   <%= link_to "Inspect", admin_grid_hackr_path(hackr), class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em;" %>
                   <%= link_to "Items", admin_grid_hackr_items_path(hackr), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                  <% if dev_tools_enabled? %>
+                    <%= link_to "Stats", edit_stats_admin_grid_hackr_path(hackr), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= link_to "Warp", warp_admin_grid_hackr_path(hackr), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= link_to "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: hackr.id), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= link_to "NPC", new_admin_grid_npc_dialogue_tester_path(hackr_id: hackr.id), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= link_to "PAC", new_admin_grid_pac_escape_tester_path(hackr_id: hackr.id), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                  <% end %>
                 </td>
               </tr>
             <% end %>
@@ -68,7 +75,27 @@
         </table>
       </div>
 
-      <p style="color: #666; margin-top: 15px;"><%= @hackrs.size %> hackr<%= @hackrs.size == 1 ? "" : "s" %> found</p>
     </div>
   </fieldset>
 </div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    var input = document.getElementById('hackr-filter');
+    var status = document.getElementById('hackr-filter-status');
+    var rows = document.querySelectorAll('.hackr-table tbody tr');
+    var total = rows.length;
+
+    input.addEventListener('input', function() {
+      var q = this.value.toLowerCase();
+      var visible = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var alias = rows[i].cells[0].textContent.toLowerCase();
+        var show = !q || alias.indexOf(q) !== -1;
+        rows[i].style.display = show ? '' : 'none';
+        if (show) visible++;
+      }
+      status.textContent = visible + ' of ' + total + ' hackr' + (total === 1 ? '' : 's');
+    });
+  })();
+</script>

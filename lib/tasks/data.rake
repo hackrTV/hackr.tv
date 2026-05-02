@@ -1264,11 +1264,15 @@ namespace :data do
       containment_room = GridRoom.find_by(slug: "#{region_slug}-pac-containment-cell")
       exit_room = GridRoom.find_by(slug: "#{region_slug}-pac-external-corridor")
       bribe_exit_room = GridRoom.find_by(slug: "#{region_slug}-pac-admin-discharge")
+      cell_block_room = GridRoom.find_by(slug: "#{region_slug}-pac-processing-corridor")
+      sally_port_room = GridRoom.find_by(slug: "#{region_slug}-pac-sally-port")
 
       updates = {}
       updates[:containment_room] = containment_room if containment_room && region.containment_room_id != containment_room.id
       updates[:facility_exit_room] = exit_room if exit_room && region.facility_exit_room_id != exit_room.id
       updates[:facility_bribe_exit_room] = bribe_exit_room if bribe_exit_room && region.facility_bribe_exit_room_id != bribe_exit_room.id
+      updates[:cell_block_room] = cell_block_room if cell_block_room && region.cell_block_room_id != cell_block_room.id
+      updates[:sally_port_room] = sally_port_room if sally_port_room && region.sally_port_room_id != sally_port_room.id
 
       if updates.any?
         region.update!(updates)

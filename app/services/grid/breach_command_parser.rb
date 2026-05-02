@@ -375,8 +375,8 @@ module Grid
     end
 
     # Post-BREACH-success actions when captured in a GovCorp facility.
-    # Handles cell escape (teleport to corridor), sally port progression,
-    # and alert reduction for voluntary targets.
+    # Handles cell escape, sally port progression, and alert reduction.
+    # Destination rooms are configured as FKs on GridRegion.
     def facility_breach_success_hook
       room = hackr.current_room
       return nil unless room
@@ -384,13 +384,14 @@ module Grid
       # Reduce facility alert for any successful BREACH in the facility
       Grid::ContainmentService.alert_reduce!(hackr: hackr)
 
+      region = room.grid_zone&.grid_region
+
       case room.room_type
       when "containment"
-        # Cell escape — teleport to the processing corridor (slug convention: *-processing-corridor)
-        corridor = room.grid_zone.grid_rooms.find_by("slug LIKE ?", "%-pac-processing-corridor")
-        corridor ||= room.grid_zone.grid_rooms.where.not(room_type: "containment").order(:id).first
-        if corridor
-          hackr.update!(current_room_id: corridor.id)
+        # Cell escape — teleport to the cell block corridor (region FK)
+        destination = region&.cell_block_room
+        if destination
+          hackr.update!(current_room_id: destination.id)
           "<span style='color: #34d399; font-weight: bold;'>Cell seal breached. You slip into the corridor.</span>"
         end
       when "sally_port"
@@ -398,10 +399,10 @@ module Grid
         escape_result = Grid::ContainmentService.escape_facility!(hackr: hackr, via: :sally_port)
         escape_result.display
       when "sally_port_anteroom"
-        # Outer door BREACH success = move to the sally_port room in the same zone.
-        sally_port = room.grid_zone.grid_rooms.find_by(room_type: "sally_port")
-        if sally_port
-          hackr.update!(current_room_id: sally_port.id)
+        # Outer door BREACH success — move to the sally port room (region FK)
+        destination = region&.sally_port_room
+        if destination
+          hackr.update!(current_room_id: destination.id)
           "<span style='color: #34d399; font-weight: bold;'>Outer door seal breached. You enter the sally port.</span>"
         end
       else

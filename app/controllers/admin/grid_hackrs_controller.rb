@@ -9,9 +9,6 @@ class Admin::GridHackrsController < Admin::ApplicationController
   # GET /root/grid_hackrs
   def index
     @hackrs = GridHackr.includes(:current_room).order(:hackr_alias)
-    if params[:q].present?
-      @hackrs = @hackrs.where("LOWER(hackr_alias) LIKE ?", "%#{params[:q].downcase}%")
-    end
   end
 
   # GET /root/grid_hackrs/:id
