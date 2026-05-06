@@ -1,253 +1,1094 @@
-# Grid Zones
+# Grid Zones — generated from Dex zone architecture
 zones:
-  - name: hackr.tv Central
-    slug: hackr-tv-central
-    description: "The central hub of Fracture Network broadcasting operations."
+  - name: "The Skyline"
+    slug: the-skyline
+    description: ""
     region_slug: the-lakeshore
-    faction_slug: thecyberpulse
-    ambient_playlist_slug: fracture-network-ambience
+    faction_slug: null
     danger_level: 0
 
-  - name: Sector X
+  - name: "Gold Mile"
+    slug: gold-mile
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Terrace"
+    slug: the-terrace
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Sector X"
     slug: sector-x
-    description: "XERAEN's homebase. A fortress of temporal technology and Fracture Network operations."
+    description: ""
     region_slug: the-lakeshore
-    faction_slug: xeraen
-    ambient_playlist_slug: fracture-network-ambience
+    faction_slug: null
     danger_level: 0
 
-  - name: Transit Network
-    slug: transit-network
-    description: "Neutral corridors connecting the major zones of THE PULSE GRID."
+  - name: "The Skybridge"
+    slug: the-skybridge
+    description: ""
     region_slug: the-lakeshore
     faction_slug: null
-    ambient_playlist_slug: transit-network-ambience
-    danger_level: 2
-
-  - name: GovCorp Surveillance District
-    slug: govcorp-surveillance
-    description: "Enemy territory under total GovCorp control."
-    region_slug: the-lakeshore
-    faction_slug: govcorp
-    ambient_playlist_slug: govcorp-surveillance-ambience
-    danger_level: 5
-
-  - name: The Underbelly
-    slug: the-underbelly
-    description: "A network of unregistered passages beneath the Transit Network. Surveillance dead zone. If you know, you know."
-    region_slug: the-lakeshore
-    faction_slug: null
-    ambient_playlist_slug: null
-    danger_level: 7
-
-  - name: Residential District
-    slug: residential-district
-    description: "A quieter section of THE PULSE GRID. Rows of private nodes line the data-corridors. Hackrs with enough standing have claimed their own spaces here."
-    region_slug: the-lakeshore
-    faction_slug: null
-    ambient_playlist_slug: null
     danger_level: 0
 
-  - name: The Hackr Hangar
+  - name: "Lakefront Terminal"
+    slug: lakefront-terminal
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Breakwall"
+    slug: the-breakwall
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Pier 7"
+    slug: pier-7
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Signal Hill"
+    slug: signal-hill
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Stacks"
+    slug: the-stacks
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Switchyard"
+    slug: the-switchyard
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Cold Storage"
+    slug: cold-storage
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Pumping Station"
+    slug: the-pumping-station
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Rust Row"
+    slug: rust-row
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Boneyard"
+    slug: the-boneyard
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Ward"
+    slug: the-ward
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Yards"
+    slug: the-yards
+    description: ""
+    region_slug: the-lakeshore
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Tower Row"
+    slug: tower-row
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Loft District"
+    slug: the-loft-district
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Prospect Row"
+    slug: prospect-row
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Hackr Hangar"
     slug: hackr-hangar
-    description: "Ryker M. Pulse's headquarters and primary broadcast facility. Where the raw signal is created before transmission to Sector X."
-    region_slug: the-riverlands
-    faction_slug: thecyberpulse
-    ambient_playlist_slug: fracture-network-ambience
-    danger_level: 0
-
-  - name: "GovCorp RestorePoint\u2122 — Lakeshore"
-    slug: restorepoint-lakeshore
-    description: "A sterile GovCorp medical facility. Soft lighting, ambient wellness muzak, and the faint smell of antiseptic. A scrolling display reads: 'RestorePoint\u2122 — Because Your Wellbeing Is Our Priority.' The exit is clearly marked. Your CRED balance is clearly lower."
-    region_slug: the-lakeshore
-    faction_slug: null
-    ambient_playlist_slug: null
-    danger_level: 0
-
-  # ── The Lakeshore (expansion) ─────────────────
-  - name: Lakeshore Market District
-    slug: lakeshore-market
-    description: "Open-air stalls and reinforced shop fronts crowd a pedestrian throughway. Neon vendor signs compete for attention. The smell of solder, street food, and desperation."
-    region_slug: the-lakeshore
-    faction_slug: null
-    danger_level: 2
-
-  - name: Industrial Sprawl
-    slug: lakeshore-industrial
-    description: "Abandoned manufacturing blocks repurposed by squatters and salvage crews. Rusted cranes loom overhead. GovCorp patrols are infrequent — the margins aren't worth protecting."
-    region_slug: the-lakeshore
-    faction_slug: null
-    danger_level: 6
-
-  # ── The Riverlands ────────────────────────────
-  - name: Riverlands Transit Depot
-    slug: riverlands-transit
-    description: "A weathered transit station where river barges dock alongside data-cable junction boxes. The architecture is old — pre-GovCorp — and the signal quality shows it."
-    region_slug: the-riverlands
-    faction_slug: null
-    danger_level: 1
-
-  - name: The Delta
-    slug: riverlands-delta
-    description: "Where the river splits into a maze of channels before reaching the sea. Smuggler routes thread between sandbars. RIDE coverage is unreliable — the water interferes."
-    region_slug: the-riverlands
-    faction_slug: null
-    danger_level: 7
-
-  - name: Blufftop Commons
-    slug: riverlands-blufftop
-    description: "Residential platforms carved into the river bluffs. The view is stunning. The rent is manageable. GovCorp considers this a low-value residential zone — which is exactly why people live here."
+    description: ""
     region_slug: the-riverlands
     faction_slug: null
     danger_level: 0
 
-  - name: The Amp District
-    slug: riverlands-amp
-    description: "Converted warehouse blocks that pulse with sound. Every surface vibrates. Live music venues, recording studios, and instrument workshops occupy every available space. The Fracture Network's cultural heart."
+  - name: "#BlackShadez"
+    slug: blackshadez
+    description: ""
     region_slug: the-riverlands
-    faction_slug: thecyberpulse
-    danger_level: 1
-
-  # ── The Narrows ───────────────────────────────
-  - name: Narrows Central Terminal
-    slug: narrows-terminal
-    description: "A massive vertical transit hub built into the side of a cliff. Elevators, walkways, and cable cars connect dozens of levels. The density is suffocating. The throughput is impressive."
-    region_slug: the-narrows
     faction_slug: null
-    danger_level: 2
+    danger_level: 0
 
-  - name: The Stack
-    slug: narrows-stack
-    description: "A residential tower built so high the upper floors lose reliable RIDE signal. Lower floors are affordable. Upper floors are free — but you're on your own."
+  - name: "The Juke"
+    slug: the-juke
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Bluff Station"
+    slug: bluff-station
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Landing"
+    slug: the-landing
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Channel House"
+    slug: channel-house
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Levee"
+    slug: the-levee
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "River's Edge"
+    slug: rivers-edge
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Bottleneck"
+    slug: the-bottleneck
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Oxbow"
+    slug: the-oxbow
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Mudwater"
+    slug: mudwater
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Cottonmouth"
+    slug: cottonmouth
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Bottoms"
+    slug: the-bottoms
+    description: ""
+    region_slug: the-riverlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Exchange"
+    slug: the-exchange
+    description: ""
     region_slug: the-narrows
     faction_slug: null
     danger_level: 0
 
-  - name: Harbor Market
-    slug: narrows-harbor
-    description: "Waterfront commercial district. Salt air, fish stalls, and firmware vendors share the same boardwalk. The harbor cranes move cargo containers that officially contain consumer goods."
+  - name: "Midtown"
+    slug: midtown
+    description: ""
     region_slug: the-narrows
     faction_slug: null
-    danger_level: 3
+    danger_level: 0
 
-  - name: GovCorp Financial Core
-    slug: narrows-financial
-    description: "Glass-and-steel towers housing GovCorp's eastern financial operations. Every surface is monitored. Every transaction is logged. The RIDE overlay here is flawless — which is how they want it."
-    region_slug: the-narrows
-    faction_slug: govcorp
-    danger_level: 5
-
-  - name: Deep Harbor
-    slug: narrows-deep
-    description: "Flooded sub-levels beneath the harbor district. Sealed bulkheads, emergency lighting, and the constant sound of water. What GovCorp sank down here, they meant to forget."
+  - name: "The Marquee"
+    slug: the-marquee
+    description: ""
     region_slug: the-narrows
     faction_slug: null
-    danger_level: 8
+    danger_level: 0
 
-  # ── The Gate ──────────────────────────────────
-  - name: Gate Transit Station
-    slug: gate-transit
-    description: "A sleek, over-engineered transit hub. Everything is chrome and holographic wayfinding. GovCorp built this as a showcase — proof that infrastructure can be beautiful when you control the budget."
-    region_slug: the-gate
+  - name: "The Green"
+    slug: the-green
+    description: ""
+    region_slug: the-narrows
     faction_slug: null
-    danger_level: 1
+    danger_level: 0
 
-  - name: Innovation Quarter
-    slug: gate-innovation
-    description: "Research labs and startup incubators clustered around a central plaza. The ideas here are brilliant. The surveillance is total. GovCorp funds the innovation and owns the patents."
-    region_slug: the-gate
+  - name: "Neon District"
+    slug: neon-district
+    description: ""
+    region_slug: the-narrows
     faction_slug: null
-    danger_level: 2
+    danger_level: 0
 
-  - name: GovCorp R&D Campus
-    slug: gate-govcorp-rd
-    description: "A fortified research campus where RIDE infrastructure is developed. Clearance-gated at every door. The work done here shapes what everyone else experiences as reality."
-    region_slug: the-gate
-    faction_slug: govcorp
-    danger_level: 6
+  - name: "The Heights"
+    slug: the-heights
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
 
-  - name: Pier District
-    slug: gate-pier
-    description: "Former fishing wharves converted to residential lofts. Fog rolls in from the strait every evening. The locals have learned to navigate by sound when visibility drops to zero."
+  - name: "The Rooftop"
+    slug: the-rooftop
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Span"
+    slug: the-span
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Canal Walk"
+    slug: canal-walk
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Wharf"
+    slug: the-wharf
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Harbor Deep"
+    slug: harbor-deep
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Pier 41"
+    slug: pier-41
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Tidewater"
+    slug: tidewater
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Battery"
+    slug: the-battery
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Tunnel"
+    slug: the-tunnel
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Sub-Level"
+    slug: sub-level
+    description: ""
+    region_slug: the-narrows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Echo Chamber"
+    slug: echo-chamber
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Strip"
+    slug: the-strip
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Studio Row"
+    slug: studio-row
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Lot"
+    slug: the-lot
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Backlot"
+    slug: the-backlot
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Sprawl"
+    slug: the-sprawl
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Palm Line"
+    slug: palm-line
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Velvet Room"
+    slug: the-velvet-room
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Skybar"
+    slug: skybar
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Gallery"
+    slug: the-gallery
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Reservoir"
+    slug: the-reservoir
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Aqueduct"
+    slug: the-aqueduct
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Channel"
+    slug: the-channel
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Desert Edge"
+    slug: desert-edge
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Heat Sink"
+    slug: heat-sink
+    description: ""
+    region_slug: the-basin
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Waterfront"
+    slug: the-waterfront
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Pearl"
+    slug: the-pearl
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Vinyl Row"
+    slug: vinyl-row
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Boardwalk"
+    slug: the-boardwalk
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Market"
+    slug: the-market
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Frequency Gardens"
+    slug: frequency-gardens
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Understory"
+    slug: the-understory
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Moss Bridge"
+    slug: moss-bridge
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Cedar Hall"
+    slug: cedar-hall
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Clearing"
+    slug: the-clearing
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Cloud Line"
+    slug: cloud-line
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Root System"
+    slug: root-system
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Falls"
+    slug: the-falls
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Crater"
+    slug: the-crater
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Timberline"
+    slug: timberline
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Old Growth"
+    slug: old-growth
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Nursery"
+    slug: the-nursery
+    description: ""
+    region_slug: the-canopy
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Towers"
+    slug: the-towers
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Monument Park"
+    slug: monument-park
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Arch"
+    slug: the-arch
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Confluence"
+    slug: the-confluence
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Warehouse Row"
+    slug: warehouse-row
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Overlook"
+    slug: the-overlook
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Brick Row"
+    slug: brick-row
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "River Market"
+    slug: river-market
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Gateway"
+    slug: gateway
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Promenade"
+    slug: the-promenade
+    description: ""
+    region_slug: the-arch
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Undercity"
+    slug: the-undercity
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Quarter"
+    slug: the-quarter
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Brass Row"
+    slug: brass-row
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Parish"
+    slug: the-parish
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Float"
+    slug: the-float
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Iron Gate"
+    slug: iron-gate
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Pump Station"
+    slug: pump-station
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Canal Street"
+    slug: canal-street
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Cistern"
+    slug: the-cistern
+    description: ""
+    region_slug: the-bend
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Fault Line"
+    slug: the-fault-line
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "High Camp"
+    slug: high-camp
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Ridge"
+    slug: the-ridge
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Treeline"
+    slug: treeline
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Base Town"
+    slug: base-town
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Tap Alley"
+    slug: tap-alley
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Pass"
+    slug: the-pass
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Snow Station"
+    slug: snow-station
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Shelf"
+    slug: the-shelf
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Switchback"
+    slug: the-switchback
+    description: ""
+    region_slug: the-front
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Mangrove"
+    slug: the-mangrove
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Sawgrass"
+    slug: sawgrass
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Tidal Flat"
+    slug: tidal-flat
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Stilthouse"
+    slug: the-stilthouse
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Oyster Bank"
+    slug: oyster-bank
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Everwatch"
+    slug: the-everwatch
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Storm Shelter"
+    slug: storm-shelter
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Causeway"
+    slug: the-causeway
+    description: ""
+    region_slug: the-marshes
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Forge"
+    slug: the-forge
+    description: ""
+    region_slug: the-works
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Foundry"
+    slug: the-foundry
+    description: ""
+    region_slug: the-works
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Mill Town"
+    slug: mill-town
+    description: ""
+    region_slug: the-works
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Slag Heap"
+    slug: slag-heap
+    description: ""
+    region_slug: the-works
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Crucible"
+    slug: the-crucible
+    description: ""
+    region_slug: the-works
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Railyard"
+    slug: the-railyard
+    description: ""
+    region_slug: the-works
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Derrick"
+    slug: the-derrick
+    description: ""
+    region_slug: the-flats
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Dust Line"
+    slug: dust-line
+    description: ""
+    region_slug: the-flats
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Refinery"
+    slug: the-refinery
+    description: ""
+    region_slug: the-flats
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Stockyard"
+    slug: the-stockyard
+    description: ""
+    region_slug: the-flats
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Pipeline"
+    slug: the-pipeline
+    description: ""
+    region_slug: the-flats
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Flatline"
+    slug: flatline
+    description: ""
+    region_slug: the-flats
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Pier"
+    slug: the-pier
+    description: ""
     region_slug: the-gate
     faction_slug: null
     danger_level: 0
 
-  - name: The Fog
-    slug: gate-fog
-    description: "Below the pier pilings, where fog and seawater create a permanent twilight. Unregistered data drops and dead-letter caches hide in the moisture. Signal attenuation is severe and deliberate."
+  - name: "Fog Bank"
+    slug: fog-bank
+    description: ""
     region_slug: the-gate
     faction_slug: null
-    danger_level: 8
+    danger_level: 0
 
-  # ── The Bend ──────────────────────────────────
-  - name: Bend Transit Wharf
-    slug: bend-transit
-    description: "A transit hub built on pylons above the waterline. Everything floods eventually. The locals have stopped repairing the lower level and just moved operations up."
-    region_slug: the-bend
-    faction_slug: null
-    danger_level: 2
-
-  - name: The Quarter
-    slug: bend-quarter
-    description: "Narrow streets packed with music halls, bars, and street performers. GovCorp's Cultural Zone programming here is a thin veneer over something genuinely alive. The music is real even if the economy isn't."
-    region_slug: the-bend
-    faction_slug: null
-    danger_level: 1
-
-  - name: Levee District
-    slug: bend-levee
-    description: "Residential blocks behind the levee wall. The constant awareness of water pressure on the other side creates a particular kind of community — one that helps each other without being asked."
-    region_slug: the-bend
+  - name: "The Summit"
+    slug: the-summit
+    description: ""
+    region_slug: the-gate
     faction_slug: null
     danger_level: 0
 
-  - name: Canal Networks
-    slug: bend-canals
-    description: "Flooded service tunnels beneath the city. Some are mapped. Most aren't. The water is chest-deep in places and the rats are the size of small dogs. GovCorp pretends this doesn't exist."
-    region_slug: the-bend
+  - name: "Headlands"
+    slug: headlands
+    description: ""
+    region_slug: the-gate
     faction_slug: null
-    danger_level: 9
+    danger_level: 0
 
-  - name: GovCorp Cultural Bureau
-    slug: bend-govcorp
-    description: "A gleaming office complex where GovCorp curates the region's cultural output. What gets performed, recorded, and broadcast is decided here. The irony is not lost on the locals."
-    region_slug: the-bend
-    faction_slug: govcorp
-    danger_level: 4
-
-  # ── The Canyon ────────────────────────────────
-  - name: Canyon Rim Station
-    slug: canyon-rim
-    description: "A transit platform on the canyon rim. Wind howls across the gap. Cable cars descend into the depths on fraying lines. The view is breathtaking if you don't look down at the infrastructure."
-    region_slug: the-canyon
+  - name: "Harbor View"
+    slug: harbor-view
+    description: ""
+    region_slug: the-gate
     faction_slug: null
-    danger_level: 2
+    danger_level: 0
 
-  - name: Cliff Dwellings
-    slug: canyon-dwellings
-    description: "Residential units carved directly into the canyon wall. Ancient construction techniques layered with modern tech. The walls are three hundred million years of geological history. The wifi is spotty."
+  - name: "Drydock"
+    slug: drydock
+    description: ""
+    region_slug: the-gate
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Crypt"
+    slug: the-crypt
+    description: ""
+    region_slug: the-straits
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Assembly Line"
+    slug: the-assembly-line
+    description: ""
+    region_slug: the-straits
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Crossing"
+    slug: the-crossing
+    description: ""
+    region_slug: the-straits
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Iron Mile"
+    slug: iron-mile
+    description: ""
+    region_slug: the-straits
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Analog Archive"
+    slug: the-analog-archive
+    description: ""
+    region_slug: the-badlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Butte"
+    slug: the-butte
+    description: ""
+    region_slug: the-badlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Dust Devil"
+    slug: dust-devil
+    description: ""
+    region_slug: the-badlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Outpost"
+    slug: the-outpost
+    description: ""
+    region_slug: the-badlands
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Rim"
+    slug: the-rim
+    description: ""
     region_slug: the-canyon
     faction_slug: null
     danger_level: 0
 
-  - name: The Ledge Market
-    slug: canyon-ledge
-    description: "A commercial strip built on a natural rock shelf halfway down the canyon. Vendors sell salvaged tech and desert survival gear. The drop on the outer edge is two hundred meters straight down."
+  - name: "Second Terrace"
+    slug: second-terrace
+    description: ""
     region_slug: the-canyon
     faction_slug: null
-    danger_level: 3
+    danger_level: 0
 
-  - name: River Bottom
-    slug: canyon-river
-    description: "The canyon floor where the ancient river still runs. Dark, cool, and echoing. The signal from the rim barely reaches here. What lives down here has adapted to the silence."
+  - name: "Red Ledge"
+    slug: red-ledge
+    description: ""
     region_slug: the-canyon
     faction_slug: null
-    danger_level: 8
+    danger_level: 0
 
-  - name: GovCorp Canyon Relay
-    slug: canyon-govcorp
-    description: "A signal relay station bolted to the canyon wall. GovCorp's attempt to extend RIDE coverage into the depths. The staff rotate out every two weeks. Nobody asks for a third rotation."
+  - name: "River Bottom"
+    slug: river-bottom
+    description: ""
     region_slug: the-canyon
-    faction_slug: govcorp
-    danger_level: 5
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Cinder Town"
+    slug: cinder-town
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Tipple"
+    slug: the-tipple
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Shaft"
+    slug: the-shaft
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Holler"
+    slug: the-holler
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Ridgeback"
+    slug: ridgeback
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Coal Run"
+    slug: coal-run
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "The Manor"
+    slug: the-manor
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Hunt Country"
+    slug: hunt-country
+    description: ""
+    region_slug: the-hollows
+    faction_slug: null
+    danger_level: 0
+
