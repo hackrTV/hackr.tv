@@ -5,8 +5,8 @@ require "rails_helper"
 RSpec.describe Grid::WorldExporter do
   let(:region) { create(:grid_region) }
   let(:zone) { create(:grid_zone, grid_region: region) }
-  let(:room1) { create(:grid_room, grid_zone: zone, name: "Hub Alpha", slug: "hub-alpha", room_type: "hub", map_x: 0, map_y: 0) }
-  let(:room2) { create(:grid_room, grid_zone: zone, name: "Transit Beta", slug: "transit-beta", room_type: "transit", map_x: 1, map_y: 0) }
+  let(:room1) { create(:grid_room, grid_zone: zone, name: "Hub Alpha", slug: "hub-alpha", room_type: "hub") }
+  let(:room2) { create(:grid_room, grid_zone: zone, name: "Transit Beta", slug: "transit-beta", room_type: "transit") }
 
   describe "#export_all" do
     it "writes YAML files to the target directory" do
@@ -40,25 +40,15 @@ RSpec.describe Grid::WorldExporter do
       end
     end
 
-    it "exports map_x and map_y for rooms with stored coordinates" do
+    it "does not export map coordinates" do
       room1
       Dir.mktmpdir do |dir|
         described_class.new.export_all(dir: dir)
         data = YAML.load_file(File.join(dir, "rooms.yml"))
         exported = data["rooms"].find { |r| r["slug"] == room1.slug }
-        expect(exported["map_x"]).to eq(0)
-        expect(exported["map_y"]).to eq(0)
-      end
-    end
-
-    it "omits map_x/map_y for rooms without stored coordinates" do
-      room = create(:grid_room, grid_zone: zone, map_x: nil, map_y: nil)
-      Dir.mktmpdir do |dir|
-        described_class.new.export_all(dir: dir)
-        data = YAML.load_file(File.join(dir, "rooms.yml"))
-        exported = data["rooms"].find { |r| r["slug"] == room.slug }
         expect(exported).not_to have_key("map_x")
         expect(exported).not_to have_key("map_y")
+        expect(exported).not_to have_key("map_z")
       end
     end
 

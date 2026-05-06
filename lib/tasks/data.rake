@@ -816,10 +816,7 @@ namespace :data do
         description: attrs["description"],
         grid_zone: zone,
         room_type: attrs["room_type"],
-        min_clearance: attrs["min_clearance"] || 0,
-        map_x: attrs["map_x"],
-        map_y: attrs["map_y"],
-        map_z: attrs["map_z"] || 0
+        min_clearance: attrs["min_clearance"] || 0
       )
       room.save!
       created += 1

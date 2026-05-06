@@ -322,7 +322,9 @@ Rails.application.routes.draw do
       delete "mobs/:id", to: "grid_map_editor#remove_mob", as: :remove_mob
       post "encounters", to: "grid_map_editor#create_encounter", as: :create_encounter
       delete "encounters/:id", to: "grid_map_editor#destroy_encounter", as: :destroy_encounter
-      post ":zone_id/auto_layout", to: "grid_map_editor#auto_layout", as: :auto_layout
+      # Region scope
+      get "region/:region_id", to: "grid_map_editor#region_show", as: :region_show
+      get "region/:region_id/data", to: "grid_map_editor#region_data", as: :region_data
     end
 
     # World resources (full CRUD)

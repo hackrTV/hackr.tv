@@ -6,8 +6,8 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
   let(:admin_hackr) { create(:grid_hackr, :admin) }
   let(:region) { create(:grid_region) }
   let(:zone) { create(:grid_zone, grid_region: region) }
-  let(:room1) { create(:grid_room, grid_zone: zone, name: "Hub Alpha", room_type: "hub", map_x: 0, map_y: 0) }
-  let(:room2) { create(:grid_room, grid_zone: zone, name: "Transit Beta", room_type: "transit", map_x: 1, map_y: 0) }
+  let(:room1) { create(:grid_room, grid_zone: zone, name: "Hub Alpha", room_type: "hub") }
+  let(:room2) { create(:grid_room, grid_zone: zone, name: "Transit Beta", room_type: "transit") }
 
   before { session[:grid_hackr_id] = admin_hackr.id }
 
@@ -44,23 +44,27 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
       expect(json["zone"]["name"]).to eq(zone.name)
     end
 
-    it "includes room positions" do
+    it "computes BFS positions from exit topology" do
+      create(:grid_exit, from_room: room1, to_room: room2, direction: "east")
+
       get :data, params: {zone_id: zone.id}, format: :json
       json = response.parsed_body
       hub = json["rooms"].find { |r| r["name"] == "Hub Alpha" }
+      transit = json["rooms"].find { |r| r["name"] == "Transit Beta" }
       expect(hub["map_x"]).to eq(0)
       expect(hub["map_y"]).to eq(0)
-      expect(hub["position_source"]).to eq("stored")
+      expect(transit["map_x"]).to eq(1) # east = +1 x
+      expect(transit["map_y"]).to eq(0)
     end
 
-    it "computes BFS positions for rooms without stored coords" do
-      room_no_coords = create(:grid_room, grid_zone: zone, name: "Unplaced Room")
-      create(:grid_exit, from_room: room1, to_room: room_no_coords, direction: "east")
+    it "computes z-levels from up/down exits" do
+      room_above = create(:grid_room, grid_zone: zone, name: "Upper Room")
+      create(:grid_exit, from_room: room1, to_room: room_above, direction: "up")
 
-      get :data, params: {zone_id: zone.id}, format: :json
+      get :data, params: {zone_id: zone.id, all_z: true}, format: :json
       json = response.parsed_body
-      unplaced = json["rooms"].find { |r| r["name"] == "Unplaced Room" }
-      expect(unplaced["position_source"]).to eq("computed")
+      upper = json["rooms"].find { |r| r["name"] == "Upper Room" }
+      expect(upper["map_z"]).to eq(1)
     end
 
     it "includes exits" do
@@ -98,25 +102,52 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
     end
   end
 
+  describe "GET #region_data" do
+    it "returns JSON with zones and rooms" do
+      room1
+      room2
+      create(:grid_exit, from_room: room1, to_room: room2, direction: "east")
+
+      get :region_data, params: {region_id: region.id}, format: :json
+      json = response.parsed_body
+      expect(json["zones"].length).to eq(1)
+      expect(json["rooms"].length).to eq(2)
+      expect(json["region"]["id"]).to eq(region.id)
+    end
+
+    it "separates zones connected by cross-zone exits" do
+      zone2 = create(:grid_zone, grid_region: region)
+      room_z2 = create(:grid_room, grid_zone: zone2, name: "Zone2 Room", room_type: "hub")
+      room1 # ensure room1 exists
+      create(:grid_exit, from_room: room1, to_room: room_z2, direction: "east")
+
+      get :region_data, params: {region_id: region.id}, format: :json
+      json = response.parsed_body
+      zone_positions = json["zones"].map { |z| [z["id"], [z["map_x"], z["map_y"]]] }.to_h
+      # Connected zones should have different positions
+      expect(zone_positions[zone.id]).not_to eq(zone_positions[zone2.id])
+    end
+  end
+
   describe "POST #create_room" do
-    it "creates a room at specified position" do
+    it "creates a room in the zone" do
       expect {
         post :create_room, params: {
           name: "New Room", slug: "new-room", room_type: "transit",
-          grid_zone_id: zone.id, map_x: 3, map_y: 2, min_clearance: 0
+          grid_zone_id: zone.id, min_clearance: 0
         }, format: :json
       }.to change(GridRoom, :count).by(1)
 
       json = response.parsed_body
       expect(json["success"]).to be true
       room = GridRoom.last
-      expect(room.map_x).to eq(3)
-      expect(room.map_y).to eq(2)
+      expect(room.name).to eq("New Room")
+      expect(room.grid_zone_id).to eq(zone.id)
     end
 
     it "returns errors for invalid room" do
       post :create_room, params: {
-        name: "", slug: "", grid_zone_id: zone.id, map_x: 0, map_y: 0, min_clearance: 0
+        name: "", slug: "", grid_zone_id: zone.id, min_clearance: 0
       }, format: :json
       json = response.parsed_body
       expect(json["success"]).to be false
@@ -131,14 +162,6 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
       expect(json["success"]).to be true
       expect(room1.reload.name).to eq("Renamed Hub")
       expect(room1.min_clearance).to eq(5)
-    end
-
-    it "updates position" do
-      patch :update_room, params: {id: room1.id, map_x: 10, map_y: 5}, format: :json
-      json = response.parsed_body
-      expect(json["success"]).to be true
-      expect(room1.reload.map_x).to eq(10)
-      expect(room1.reload.map_y).to eq(5)
     end
 
     it "returns errors for invalid updates" do
@@ -397,25 +420,6 @@ RSpec.describe Admin::GridMapEditorController, type: :controller do
       delete :destroy_encounter, params: {id: encounter.id}, format: :json
       json = response.parsed_body
       expect(json["success"]).to be false
-    end
-  end
-
-  describe "POST #auto_layout" do
-    it "computes and saves BFS positions" do
-      room_a = create(:grid_room, grid_zone: zone, name: "A", map_x: nil, map_y: nil, room_type: "hub")
-      room_b = create(:grid_room, grid_zone: zone, name: "B", map_x: nil, map_y: nil)
-      create(:grid_exit, from_room: room_a, to_room: room_b, direction: "east")
-
-      post :auto_layout, params: {zone_id: zone.id}, format: :json
-      json = response.parsed_body
-      expect(json["success"]).to be true
-      expect(json["updated"]).to eq(2)
-
-      room_a.reload
-      room_b.reload
-      expect(room_a.map_x).not_to be_nil
-      expect(room_b.map_x).not_to be_nil
-      expect(room_b.map_x).to eq(room_a.map_x + 1) # east = +1 x
     end
   end
 

@@ -79,7 +79,7 @@ class Admin::GridMobsController < Admin::ApplicationController
   end
 
   def load_selects
-    @rooms = GridRoom.includes(:grid_zone).joins(:grid_zone).order("grid_zones.name, grid_rooms.name")
+    @rooms = GridRoom.includes(grid_zone: :grid_region).joins(:grid_zone).order("grid_zones.name, grid_rooms.name")
     @factions = GridFaction.ordered
   end
 

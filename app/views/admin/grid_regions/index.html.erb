@@ -40,7 +40,8 @@
                   <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= truncate(region.description, length: 60) %></td>
                   <td style="text-align: center;"><%= region.grid_zones.size %></td>
                   <td style="text-align: right; white-space: nowrap;">
-                    <%= link_to "Edit", edit_admin_grid_region_path(region), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= link_to "Map", admin_grid_map_editor_region_show_path(region_id: region.id), class: "tui-button cyan-168", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= link_to "Edit", edit_admin_grid_region_path(region), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                     <%= link_to "History", history_admin_grid_region_path(region), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                     <%= button_to "Delete", admin_grid_region_path(region), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{region.name}'?" } %>
                   </td>
