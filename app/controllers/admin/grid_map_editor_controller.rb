@@ -13,43 +13,174 @@ class Admin::GridMapEditorController < Admin::ApplicationController
   def show
     @zone = GridZone.find(params[:zone_id])
     @region = @zone.grid_region
+    @scope = "zone"
+  end
+
+  # GET /root/grid_map_editor/region/:region_id
+  def region_show
+    @region = GridRegion.find(params[:region_id])
+    @scope = "region"
+    render :show
+  end
+
+  # GET /root/grid_map_editor/region/:region_id/data
+  def region_data
+    region = GridRegion.find(params[:region_id])
+    zones = region.grid_zones.to_a
+    all_rooms = region.grid_rooms.includes(:grid_zone).to_a
+    all_room_ids = all_rooms.map(&:id)
+    region_room_id_set = Set.new(all_room_ids)
+
+    all_exits = GridExit.where(from_room_id: all_room_ids)
+      .includes(to_room: {grid_zone: :grid_region}).to_a
+
+    # Compute per-zone room BFS positions and z-levels
+    rooms_by_zone = all_rooms.group_by(&:grid_zone_id)
+    zone_room_bfs = {}
+    zone_room_z = {}
+    zone_bboxes = {}
+
+    zones.each do |z|
+      z_rooms = rooms_by_zone[z.id] || []
+      z_room_ids = Set.new(z_rooms.map(&:id))
+      z_exits = all_exits.select { |e| z_room_ids.include?(e.from_room_id) }
+      bfs = bfs_positions(z_rooms, z_exits)
+      z_levels = compute_z_levels(z_rooms, z_exits)
+      zone_room_bfs[z.id] = bfs
+      zone_room_z[z.id] = z_levels
+
+      positions = z_rooms.map { |r| bfs[r.id] || [0, 0] }
+      if positions.any?
+        xs = positions.map(&:first)
+        ys = positions.map(&:last)
+        zone_bboxes[z.id] = {width: xs.max - xs.min, height: ys.max - ys.min}
+      else
+        zone_bboxes[z.id] = {width: 0, height: 0}
+      end
+    end
+
+    # Compute zone positions via BFS
+    zone_positions = compute_zone_bfs_positions(zones, all_rooms, all_exits, zone_bboxes)
+
+    # Zone colors
+    zone_color_map = build_zone_color_map
+    all_zones_sorted = GridZone.includes(:grid_region).order("grid_regions.name, grid_zones.name").to_a
+
+    # Z-levels present across entire region
+    z_level_map = zone_room_z.values.reduce({}, :merge)
+    z_levels = z_level_map.values.uniq.sort
+    z_levels = [0] if z_levels.empty?
+
+    # Build indexes for O(1) lookups
+    exits_by_from = all_exits.group_by(&:from_room_id)
+    reverse_exit_index = all_exits.index_by { |e| [e.to_room_id, e.from_room_id] }
+    room_by_id = all_rooms.index_by(&:id)
+    presence = load_presence_data(all_room_ids)
+
+    # Ghost rooms + inbound exits
+    ghost_rooms, inbound_exits, inbound_index = load_ghost_data(all_exits, region_room_id_set, all_room_ids)
+    inbound_by_to = inbound_exits.group_by(&:to_room_id)
+    exits_by_to = all_exits.group_by(&:to_room_id)
+
+    ghost_data = build_ghost_json(ghost_rooms, exits_by_to, inbound_index)
+
+    # Build rooms with world coordinates (zone offset + room local)
+    rooms_json = all_rooms.map do |r|
+      zp = zone_positions[r.grid_zone_id] || [0, 0]
+      local = zone_room_bfs.dig(r.grid_zone_id, r.id) || [0, 0]
+      local_x, local_y = local
+      room_z = z_level_map[r.id] || 0
+      room_exits = exits_by_from[r.id] || []
+
+      build_room_json(r, zp[0] + local_x, zp[1] + local_y, room_z, presence, room_exits,
+        reverse_exit_index, room_by_id, ghost_rooms, inbound_by_to[r.id] || []) do |exit_hash, e, to_room|
+        to_zone = to_room&.grid_zone
+        exit_hash[:cross_zone] = to_zone.present? && to_zone.id != r.grid_zone_id
+        exit_hash[:cross_region] = to_zone.present? && to_zone.grid_region_id != region.id
+      end.merge(
+        local_x: local_x, local_y: local_y,
+        zone_color: zone_color_map[r.grid_zone_id] || "#00ffff"
+      )
+    end
+
+    # Exits (only intra-region for connector rendering)
+    exits_json = all_exits.select { |e| region_room_id_set.include?(e.to_room_id) }.map do |e|
+      {id: e.id, from_room_id: e.from_room_id, to_room_id: e.to_room_id,
+       direction: e.direction, locked: e.locked?,
+       reverse_exit_id: reverse_exit_index[[e.from_room_id, e.to_room_id]]&.id}
+    end
+
+    # Zones with positions
+    room_counts_by_zone = rooms_by_zone.transform_values(&:size)
+    zones_json = zones.map do |z|
+      zp = zone_positions[z.id] || [0, 0]
+      {id: z.id, name: z.name, slug: z.slug, danger_level: z.danger_level,
+       map_x: zp[0], map_y: zp[1],
+       color: zone_color_map[z.id] || "#00ffff",
+       room_count: room_counts_by_zone[z.id] || 0}
+    end
+
+    available_zones = all_zones_sorted.map { |z| {id: z.id, name: z.name, region_name: z.grid_region.name} }
+    available_regions = GridRegion.order(:name).map { |r| {id: r.id, name: r.name, slug: r.slug} }
+
+    render json: {
+      region: {id: region.id, name: region.name, slug: region.slug},
+      zones: zones_json,
+      z_level: 0,
+      z_levels: z_levels,
+      rooms: rooms_json,
+      exits: exits_json,
+      ghost_rooms: ghost_data,
+      vertical_rooms: [],
+      breach_templates: GridBreachTemplate.published.ordered.map { |t|
+        {id: t.id, name: t.name, slug: t.slug, tier: t.tier, min_clearance: t.min_clearance}
+      },
+      available_zones: available_zones,
+      available_regions: available_regions,
+      all_rooms_grouped: build_all_rooms_grouped
+    }
   end
 
   # GET /root/grid_map_editor/:zone_id/data?z=0&all_z=true
   def data
     zone = GridZone.find(params[:zone_id])
-    z_level = params[:z].to_i
-    all_z = ActiveModel::Type::Boolean.new.cast(params[:all_z])
     all_zone_rooms = zone.grid_rooms.includes(:grid_zone).to_a
     all_zone_room_ids = all_zone_rooms.map(&:id)
 
     all_exits = GridExit.where(from_room_id: all_zone_room_ids)
       .includes(to_room: {grid_zone: :grid_region}).to_a
 
-    # Compute BFS positions for rooms without stored coords (on z=0 plane)
-    bfs_positions = compute_bfs_positions(all_zone_rooms, all_exits)
+    # Always compute positions and z-levels from exit topology
+    positions = bfs_positions(all_zone_rooms, all_exits)
+    z_levels_map = compute_z_levels(all_zone_rooms, all_exits)
 
     # Discover z-levels present in this zone
-    z_levels = all_zone_rooms.map(&:map_z).uniq.sort
+    z_levels = z_levels_map.values.uniq.sort
     z_levels = [0] if z_levels.empty?
+
+    z_level = params[:z].to_i
+    all_z = ActiveModel::Type::Boolean.new.cast(params[:all_z])
 
     # Snap to first available z-level if requested level has no rooms
     z_level = z_levels.first unless z_levels.include?(z_level)
 
     # In all_z mode, include every room; otherwise filter to requested z-level
-    rooms = all_z ? all_zone_rooms : all_zone_rooms.select { |r| r.map_z == z_level }
+    rooms = if all_z
+      all_zone_rooms
+    else
+      all_zone_rooms.select { |r| (z_levels_map[r.id] || 0) == z_level }
+    end
     room_ids = rooms.map(&:id)
+    room_id_set = Set.new(room_ids)
 
     z_directions = Grid::WorldMapBuilder::Z_DIRECTIONS
-    outbound_vertical = all_exits.select { |e| room_ids.include?(e.from_room_id) && z_directions.key?(e.direction) }
+    outbound_vertical = all_exits.select { |e| room_id_set.include?(e.from_room_id) && z_directions.key?(e.direction) }
 
     same_zone_ids = Set.new(all_zone_room_ids)
 
     if all_z
-      # In all_z mode, vertical rooms are CROSS-ZONE rooms connected via up/down
       cross_zone_vertical_ids = Set.new
       outbound_vertical.each { |e| cross_zone_vertical_ids.add(e.to_room_id) unless same_zone_ids.include?(e.to_room_id) }
-      # Also check inbound: other-zone rooms with up/down exits pointing into this zone
       inbound_vertical_exits = GridExit.where(to_room_id: room_ids, direction: %w[up down])
         .where.not(from_room_id: room_ids).to_a
       cross_zone_vertical_ids.merge(inbound_vertical_exits.map(&:from_room_id))
@@ -57,62 +188,41 @@ class Admin::GridMapEditorController < Admin::ApplicationController
         .includes(grid_zone: :grid_region).to_a
       inbound_vertical = inbound_vertical_exits
     else
-      other_z_room_ids = all_zone_rooms.reject { |r| r.map_z == z_level }.map(&:id)
-      inbound_vertical = all_exits.select { |e| other_z_room_ids.include?(e.from_room_id) && room_ids.include?(e.to_room_id) && z_directions.key?(e.direction) }
+      other_z_room_ids = all_zone_rooms.reject { |r| (z_levels_map[r.id] || 0) == z_level }.map(&:id)
+      other_z_set = Set.new(other_z_room_ids)
+      inbound_vertical = all_exits.select { |e| other_z_set.include?(e.from_room_id) && room_id_set.include?(e.to_room_id) && z_directions.key?(e.direction) }
       vertical_room_ids = Set.new
       outbound_vertical.each { |e| vertical_room_ids.add(e.to_room_id) }
       inbound_vertical.each { |e| vertical_room_ids.add(e.from_room_id) }
-      vertical_rooms = all_zone_rooms.select { |r| vertical_room_ids.include?(r.id) && r.map_z != z_level }
+      vertical_rooms = all_zone_rooms.select { |r| vertical_room_ids.include?(r.id) && (z_levels_map[r.id] || 0) != z_level }
     end
 
-    exits = all_exits.select { |e| room_ids.include?(e.from_room_id) }
+    exits = all_exits.select { |e| room_id_set.include?(e.from_room_id) }
 
-    # Presence counts
-    hackr_counts = GridHackr.where(current_room_id: room_ids).group(:current_room_id).count
-    mob_data = GridMob.where(grid_room_id: room_ids).select(:id, :name, :mob_type, :description, :grid_room_id).to_a
-    item_counts = GridItem.where(room_id: room_ids, container_id: nil, equipped_slot: nil)
-      .group(:room_id).count
-    encounter_data = GridBreachEncounter.where(grid_room_id: room_ids)
-      .includes(:grid_breach_template).to_a
+    # Build indexes for O(1) lookups
+    exits_by_from = exits.group_by(&:from_room_id)
+    reverse_exit_index = exits.index_by { |e| [e.to_room_id, e.from_room_id] }
+    room_by_id = rooms.index_by(&:id)
+    presence = load_presence_data(room_ids)
 
-    # Ghost rooms: rooms in OTHER ZONES connected to this zone's rooms.
+    # Ghost rooms + inbound exits
     cross_exit_room_ids = exits
-      .reject { |e| room_ids.include?(e.to_room_id) || same_zone_ids.include?(e.to_room_id) }
+      .reject { |e| room_id_set.include?(e.to_room_id) || same_zone_ids.include?(e.to_room_id) }
       .map(&:to_room_id).uniq
     ghost_rooms = GridRoom.where(id: cross_exit_room_ids)
       .includes(grid_zone: :grid_region).index_by(&:id)
 
-    # Reverse exits pointing into this zone (from ghost rooms) — load before ghost_data to avoid N+1
     inbound_exits = GridExit.where(from_room_id: cross_exit_room_ids, to_room_id: room_ids)
       .includes(from_room: {grid_zone: :grid_region}).to_a
     inbound_index = inbound_exits.index_by { |e| [e.from_room_id, e.to_room_id] }
+    inbound_by_to = inbound_exits.group_by(&:to_room_id)
+    exits_by_to = exits.group_by(&:to_room_id)
 
-    # Build ghost room data with connection info
-    ghost_data = ghost_rooms.values.map do |gr|
-      connections = exits.select { |e| e.to_room_id == gr.id }.map do |e|
-        reverse = inbound_index[[gr.id, e.from_room_id]]
-        {exit_id: e.id, local_room_id: e.from_room_id, direction: e.direction,
-         reverse_exit_id: reverse&.id, reverse_direction: reverse&.direction}
-      end
-      {id: gr.id, name: gr.name, room_type: gr.room_type,
-       zone_name: gr.grid_zone.name, zone_id: gr.grid_zone_id,
-       region_name: gr.grid_zone.grid_region.name,
-       connected_via: connections}
-    end
+    ghost_data = build_ghost_json(ghost_rooms, exits_by_to, inbound_index)
 
-    # All rooms grouped for combobox (cross-zone/region exit creation)
-    all_rooms_grouped = build_all_rooms_grouped
-
-    # Breach templates for placement
-    breach_templates = GridBreachTemplate.published.ordered.map do |t|
-      {id: t.id, name: t.name, slug: t.slug, tier: t.tier, min_clearance: t.min_clearance}
-    end
-
-    # Available zones for navigation (also used for zone color derivation)
     all_zones = GridZone.includes(:grid_region).order("grid_regions.name, grid_zones.name").to_a
     available_zones = all_zones.map { |z| {id: z.id, name: z.name, region_name: z.grid_region.name} }
 
-    # Zone color — match world map's per-zone color assignment
     zone_index = all_zones.index { |z| z.id == zone.id } || 0
     zone_color = Grid::WorldMapBuilder::ZONE_COLORS[zone_index % Grid::WorldMapBuilder::ZONE_COLORS.length]
 
@@ -124,69 +234,40 @@ class Admin::GridMapEditorController < Admin::ApplicationController
       z_levels: z_levels,
       vertical_rooms: vertical_rooms.map { |r|
         connections = []
-        # Outbound: local room --up/down--> this vertical room
         outbound_vertical.select { |e| e.to_room_id == r.id }.each do |e|
           connections << {exit_id: e.id, local_room_id: e.from_room_id, direction: e.direction}
         end
-        # Inbound: this vertical room --up/down--> local room (reverse perspective)
         inbound_vertical.select { |e| e.from_room_id == r.id }.each do |e|
           reverse_dir = (e.direction == "up") ? "down" : "up"
           connections << {exit_id: e.id, local_room_id: e.to_room_id, direction: reverse_dir}
         end
-        {id: r.id, name: r.name, room_type: r.room_type, map_z: r.map_z,
+        {id: r.id, name: r.name, room_type: r.room_type, map_z: z_levels_map[r.id] || 0,
          zone_name: r.grid_zone&.name, zone_id: r.grid_zone_id,
          region_name: r.grid_zone&.grid_region&.name,
          connected_via: connections}
       },
       rooms: rooms.map { |r|
-        mobs = mob_data.select { |m| m.grid_room_id == r.id }
-        encounters = encounter_data.select { |e| e.grid_room_id == r.id }
-        room_exits = exits.select { |e| e.from_room_id == r.id }
-        # Include inbound exits from ghost rooms
-        inbound = inbound_exits.select { |e| e.to_room_id == r.id }
-        pos_source = r.map_x.nil? ? "computed" : "stored"
-        mx = r.map_x || bfs_positions.dig(r.id, 0) || 0
-        my = r.map_y || bfs_positions.dig(r.id, 1) || 0
+        pos = positions[r.id] || [0, 0]
+        room_exits = exits_by_from[r.id] || []
 
-        {id: r.id, name: r.name, slug: r.slug, description: r.description,
-         room_type: r.room_type, min_clearance: r.min_clearance,
-         locked: r.locked?, grid_zone_id: r.grid_zone_id,
-         map_x: mx, map_y: my, map_z: r.map_z, position_source: pos_source,
-         hackr_count: hackr_counts[r.id].to_i,
-         mob_count: mobs.size, item_count: item_counts[r.id].to_i,
-         mobs: mobs.map { |m| {id: m.id, name: m.name, mob_type: m.mob_type, description: m.description} },
-         encounters: encounters.map { |e|
-           {id: e.id, template_name: e.grid_breach_template.name,
-            template_id: e.grid_breach_template_id, state: e.state,
-            tier: e.grid_breach_template.tier}
-         },
-         exits: room_exits.map { |e|
-           reverse = exits.find { |r_ex| r_ex.from_room_id == e.to_room_id && r_ex.to_room_id == e.from_room_id }
-           to_room = rooms.find { |rm| rm.id == e.to_room_id } || ghost_rooms[e.to_room_id]
-           to_zone = to_room&.grid_zone
-           {id: e.id, direction: e.direction, to_room_id: e.to_room_id,
-            to_room_name: to_room&.name || "unknown",
-            to_zone_name: to_zone&.name,
-            locked: e.locked?, reverse_exit_id: reverse&.id,
-            cross_zone: to_zone.present? && to_zone.id != zone.id}
-         },
-         inbound_exits: inbound.map { |e|
-           {id: e.id, direction: e.direction, from_room_id: e.from_room_id,
-            from_room_name: e.from_room&.name || "unknown",
-            from_zone_name: e.from_room&.grid_zone&.name}
-         }}
+        build_room_json(r, pos[0], pos[1], z_levels_map[r.id] || 0, presence, room_exits,
+          reverse_exit_index, room_by_id, ghost_rooms, inbound_by_to[r.id] || []) do |exit_hash, _e, to_room|
+          to_zone = to_room&.grid_zone
+          exit_hash[:cross_zone] = to_zone.present? && to_zone.id != zone.id
+        end
       },
-      exits: exits.select { |e| room_ids.include?(e.to_room_id) }.map { |e|
-        reverse = exits.find { |r_ex| r_ex.from_room_id == e.to_room_id && r_ex.to_room_id == e.from_room_id }
+      exits: exits.select { |e| room_id_set.include?(e.to_room_id) }.map { |e|
         {id: e.id, from_room_id: e.from_room_id, to_room_id: e.to_room_id,
          direction: e.direction, locked: e.locked?,
-         reverse_exit_id: reverse&.id}
+         reverse_exit_id: reverse_exit_index[[e.from_room_id, e.to_room_id]]&.id}
       },
       ghost_rooms: ghost_data,
-      breach_templates: breach_templates,
+      breach_templates: GridBreachTemplate.published.ordered.map { |t|
+        {id: t.id, name: t.name, slug: t.slug, tier: t.tier, min_clearance: t.min_clearance}
+      },
       zone_color: zone_color,
       available_zones: available_zones,
-      all_rooms_grouped: all_rooms_grouped
+      all_rooms_grouped: build_all_rooms_grouped
     }
   end
 
@@ -199,10 +280,7 @@ class Admin::GridMapEditorController < Admin::ApplicationController
       description: params[:description],
       room_type: params[:room_type].presence,
       min_clearance: params[:min_clearance].to_i,
-      grid_zone_id: zone.id,
-      map_x: params[:map_x].to_i,
-      map_y: params[:map_y].to_i,
-      map_z: params[:map_z].to_i
+      grid_zone_id: zone.id
     )
 
     if room.save
@@ -223,9 +301,6 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     attrs[:min_clearance] = params[:min_clearance].to_i if params.key?(:min_clearance)
     attrs[:locked] = params[:locked] if params.key?(:locked)
     attrs[:grid_zone_id] = params[:grid_zone_id].presence&.to_i if params.key?(:grid_zone_id)
-    attrs[:map_x] = params[:map_x].to_i if params.key?(:map_x)
-    attrs[:map_y] = params[:map_y].to_i if params.key?(:map_y)
-    attrs[:map_z] = params[:map_z].to_i if params.key?(:map_z)
 
     if room.update(attrs)
       render json: {success: true}
@@ -421,38 +496,98 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     render json: {success: true}
   end
 
-  # POST /root/grid_map_editor/:zone_id/auto_layout
-  def auto_layout
-    zone = GridZone.find(params[:zone_id])
-    rooms = zone.grid_rooms.includes(:grid_zone).to_a
-    room_ids = rooms.map(&:id)
-    exits = GridExit.where(from_room_id: room_ids)
-      .includes(to_room: {grid_zone: :grid_region}).to_a
-
-    positions = compute_bfs_positions(rooms, exits)
-    z_levels = compute_z_levels(rooms, exits)
-
-    room_index = rooms.index_by(&:id)
-    count = 0
-    ActiveRecord::Base.transaction do
-      positions.each do |room_id, (x, y)|
-        room = room_index[room_id]
-        next unless room
-        z = z_levels[room_id] || 0
-        room.update!(map_x: x, map_y: y, map_z: z)
-        count += 1
-      end
-    end
-
-    render json: {success: true, updated: count}
-  end
-
   private
 
-  def compute_bfs_positions(rooms, exits)
-    return {} if rooms.empty?
-    bfs_positions(rooms, exits)
+  # ── Shared JSON builders ────────────────────────────────────
+
+  # Load presence counts for a set of room IDs, returns a struct-like hash.
+  def load_presence_data(room_ids)
+    {
+      hackr_counts: GridHackr.where(current_room_id: room_ids).group(:current_room_id).count,
+      mob_data: GridMob.where(grid_room_id: room_ids).select(:id, :name, :mob_type, :description, :grid_room_id).to_a
+        .group_by(&:grid_room_id),
+      item_counts: GridItem.where(room_id: room_ids, container_id: nil, equipped_slot: nil).group(:room_id).count,
+      encounter_data: GridBreachEncounter.where(grid_room_id: room_ids).includes(:grid_breach_template).to_a
+        .group_by(&:grid_room_id)
+    }
   end
+
+  # Load ghost rooms and inbound exits for cross-scope connections.
+  # Returns [ghost_rooms_hash, inbound_exits_array, inbound_index].
+  def load_ghost_data(exits, scope_room_id_set, scope_room_ids)
+    cross_exit_room_ids = exits
+      .reject { |e| scope_room_id_set.include?(e.to_room_id) }
+      .map(&:to_room_id).uniq
+    ghost_rooms = GridRoom.where(id: cross_exit_room_ids)
+      .includes(grid_zone: :grid_region).index_by(&:id)
+
+    inbound_exits = GridExit.where(from_room_id: cross_exit_room_ids, to_room_id: scope_room_ids)
+      .includes(from_room: {grid_zone: :grid_region}).to_a
+    inbound_index = inbound_exits.index_by { |e| [e.from_room_id, e.to_room_id] }
+
+    [ghost_rooms, inbound_exits, inbound_index]
+  end
+
+  # Build ghost room JSON from pre-indexed data.
+  def build_ghost_json(ghost_rooms, exits_by_to, inbound_index)
+    ghost_rooms.values.map do |gr|
+      connections = (exits_by_to[gr.id] || []).map do |e|
+        reverse = inbound_index[[gr.id, e.from_room_id]]
+        {exit_id: e.id, local_room_id: e.from_room_id, direction: e.direction,
+         reverse_exit_id: reverse&.id, reverse_direction: reverse&.direction}
+      end
+      {id: gr.id, name: gr.name, room_type: gr.room_type,
+       zone_name: gr.grid_zone.name, zone_id: gr.grid_zone_id,
+       region_name: gr.grid_zone.grid_region.name,
+       region_id: gr.grid_zone.grid_region_id,
+       connected_via: connections}
+    end
+  end
+
+  # Build room JSON hash with all nested data (exits, mobs, encounters).
+  # Accepts a block to add scope-specific exit fields (cross_zone, cross_region).
+  def build_room_json(room, map_x, map_y, map_z, presence, room_exits,
+    reverse_exit_index, room_by_id, ghost_rooms, inbound_for_room)
+    mobs = presence[:mob_data][room.id] || []
+    encounters = presence[:encounter_data][room.id] || []
+
+    {id: room.id, name: room.name, slug: room.slug, description: room.description,
+     room_type: room.room_type, min_clearance: room.min_clearance,
+     locked: room.locked?, grid_zone_id: room.grid_zone_id,
+     map_x: map_x, map_y: map_y, map_z: map_z,
+     hackr_count: presence[:hackr_counts][room.id].to_i,
+     mob_count: mobs.size, item_count: presence[:item_counts][room.id].to_i,
+     mobs: mobs.map { |m| {id: m.id, name: m.name, mob_type: m.mob_type, description: m.description} },
+     encounters: encounters.map { |e|
+       {id: e.id, template_name: e.grid_breach_template.name,
+        template_id: e.grid_breach_template_id, state: e.state,
+        tier: e.grid_breach_template.tier}
+     },
+     exits: room_exits.map { |e|
+       reverse = reverse_exit_index[[e.from_room_id, e.to_room_id]]
+       to_room = room_by_id[e.to_room_id] || ghost_rooms[e.to_room_id]
+       to_zone = to_room&.grid_zone
+       exit_hash = {id: e.id, direction: e.direction, to_room_id: e.to_room_id,
+        to_room_name: to_room&.name || "unknown",
+        to_zone_name: to_zone&.name,
+        locked: e.locked?, reverse_exit_id: reverse&.id}
+       yield(exit_hash, e, to_room) if block_given?
+       exit_hash
+     },
+     inbound_exits: inbound_for_room.map { |e|
+       {id: e.id, direction: e.direction, from_room_id: e.from_room_id,
+        from_room_name: e.from_room&.name || "unknown",
+        from_zone_name: e.from_room&.grid_zone&.name}
+     }}
+  end
+
+  # Build zone color map from global zone ordering (consistent with world map).
+  def build_zone_color_map
+    all_zones = GridZone.includes(:grid_region).order("grid_regions.name, grid_zones.name").to_a
+    all_zones.each_with_index.to_h { |z, i| [z.id, Grid::WorldMapBuilder::ZONE_COLORS[i % Grid::WorldMapBuilder::ZONE_COLORS.length]] }
+  end
+
+  # ── BFS algorithms ──────────────────────────────────────────
 
   # Compute z-level for each room by walking up/down exits from z=0 seed.
   def compute_z_levels(rooms, exits)
@@ -460,15 +595,12 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     room_ids = Set.new(rooms.map(&:id))
     exits_by_from = exits.group_by(&:from_room_id)
 
-    # Seed: same priority as BFS
     seed = rooms.find { |r| r.room_type == "hub" } ||
       rooms.find { |r| r.room_type == "special" } ||
       rooms.find { |r| r.room_type == "transit" } ||
       rooms.min_by(&:id)
     return {} unless seed
 
-    # BFS: walk horizontal exits to find all rooms reachable on z=0,
-    # then follow up/down exits to discover other z-levels
     levels = {seed.id => 0}
     queue = [seed.id]
     visited = Set.new([seed.id])
@@ -486,12 +618,13 @@ class Admin::GridMapEditorController < Admin::ApplicationController
       end
     end
 
-    # Any unvisited rooms default to z=0
     rooms.each { |r| levels[r.id] ||= 0 }
     levels
   end
 
   def bfs_positions(rooms, exits)
+    return {} if rooms.empty?
+
     room_index = rooms.index_by(&:id)
     room_ids = Set.new(rooms.map(&:id))
     exits_by_from = exits.group_by(&:from_room_id)
@@ -503,7 +636,6 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     occupied = {}
     remaining = Set.new(room_ids)
 
-    # Pick seed: hub > special > transit > min id
     seed = rooms.find { |r| r.room_type == "hub" } ||
       rooms.find { |r| r.room_type == "special" } ||
       rooms.find { |r| r.room_type == "transit" } ||
@@ -519,7 +651,6 @@ class Admin::GridMapEditorController < Admin::ApplicationController
         rid, lx, ly = item
 
         if occupied[[lx, ly]] && occupied[[lx, ly]] != rid
-          # Find free cell
           placed = false
           (1..10).each do |radius|
             break if placed
@@ -566,6 +697,8 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     positions
   end
 
+  # ── Misc helpers ────────────────────────────────────────────
+
   def deletion_blockers(room)
     blockers = []
     hackr_count = room.grid_hackrs.count
@@ -580,7 +713,6 @@ class Admin::GridMapEditorController < Admin::ApplicationController
     encounter_count = room.grid_breach_encounters.count
     blockers << "#{encounter_count} breach encounter(s) placed" if encounter_count > 0
 
-    # Region special room references
     region_refs = []
     region_refs << "hospital" if GridRegion.where(hospital_room_id: room.id).exists?
     region_refs << "containment" if GridRegion.where(containment_room_id: room.id).exists?
@@ -600,5 +732,97 @@ class Admin::GridMapEditorController < Admin::ApplicationController
         }}
       }}
     end
+  end
+
+  # BFS over zones using cross-zone exits as edges to compute zone positions.
+  # Uses zone bounding boxes for tight spacing instead of fixed stride.
+  # Handles disconnected clusters: each connected component gets BFS-positioned
+  # internally, then clusters stack below each other.
+  def compute_zone_bfs_positions(zones, rooms, exits, zone_bboxes = {})
+    zone_gap = 3
+
+    zone_of = rooms.index_by(&:id).transform_values(&:grid_zone_id)
+    zone_ids = Set.new(zones.map(&:id))
+
+    zone_connections = Hash.new { |h, k| h[k] = [] }
+    exits.each do |ex|
+      from_zone = zone_of[ex.from_room_id]
+      to_zone = zone_of[ex.to_room_id]
+      next unless from_zone && to_zone && from_zone != to_zone
+      next unless zone_ids.include?(to_zone)
+      direction_vec = Grid::WorldMapBuilder::DIRECTION_VECTORS[ex.direction]
+      next unless direction_vec
+      zone_connections[from_zone] << {to: to_zone, vec: direction_vec}
+    end
+
+    positions = {}
+    remaining = Set.new(zones.map(&:id))
+    zone_room_counts = rooms.group_by(&:grid_zone_id).transform_values(&:count)
+    cluster_offset_y = 0
+
+    # Process each connected component
+    while remaining.any?
+      # Pick seed: largest unplaced zone
+      seed_id = remaining.max_by { |zid| zone_room_counts[zid] || 0 }
+
+      # BFS this cluster
+      cluster_positions = {}
+      cluster_positions[seed_id] = [0, 0]
+      cluster_occupied = Set.new([[0, 0]])
+      queue = [seed_id]
+      remaining.delete(seed_id)
+
+      while (zid = queue.shift)
+        zx, zy = cluster_positions[zid]
+        src_bb = zone_bboxes[zid] || {width: 4, height: 4}
+
+        zone_connections[zid].each do |conn|
+          next unless remaining.include?(conn[:to])
+          remaining.delete(conn[:to])
+
+          tgt_bb = zone_bboxes[conn[:to]] || {width: 4, height: 4}
+          dx, dy = conn[:vec]
+
+          offset_x = if dx > 0 then src_bb[:width] + zone_gap + 1
+                     elsif dx < 0 then -(tgt_bb[:width] + zone_gap + 1)
+                     else 0
+                     end
+          offset_y = if dy > 0 then src_bb[:height] + zone_gap + 1
+                     elsif dy < 0 then -(tgt_bb[:height] + zone_gap + 1)
+                     else 0
+                     end
+
+          new_zx = zx + offset_x
+          new_zy = zy + offset_y
+
+          nudge_step = [tgt_bb[:height] + zone_gap + 1, zone_gap + 1].max
+          safety = 0
+          while cluster_occupied.include?([new_zx, new_zy]) && safety < 50
+            new_zy += nudge_step
+            safety += 1
+          end
+
+          cluster_positions[conn[:to]] = [new_zx, new_zy]
+          cluster_occupied.add([new_zx, new_zy])
+          queue << conn[:to]
+        end
+      end
+
+      # Normalize cluster to (0, 0) origin, then offset below previous clusters
+      if cluster_positions.any?
+        min_x = cluster_positions.values.map(&:first).min
+        min_y = cluster_positions.values.map(&:last).min
+        cluster_positions.transform_values! { |pos| [pos[0] - min_x, pos[1] - min_y + cluster_offset_y] }
+
+        cluster_bottom = cluster_positions.map { |zid, pos|
+          pos[1] + (zone_bboxes[zid] || {height: 0})[:height]
+        }.max
+
+        positions.merge!(cluster_positions)
+        cluster_offset_y = cluster_bottom + zone_gap + 1
+      end
+    end
+
+    positions
   end
 end

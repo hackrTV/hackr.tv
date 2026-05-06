@@ -1,38 +1,50 @@
-<% content_for(:title) { "/root :: Map Editor :: #{@zone.name}" } %>
+<% content_for(:title) { "/root :: Map Editor :: #{@scope == 'region' ? @region.name : @zone.name}" } %>
 <%= render "admin/shared/combobox" %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 100%; margin: 10px; padding: 10px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/map-editor/<%= @zone.slug %></legend>
+<div class="tui-window white-text admin-panel" style="display: flex; flex-direction: column; max-width: 100%; margin: 10px; padding: 10px; height: calc(100vh - 85px); overflow: hidden;">
+  <fieldset class="admin-panel-border" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+    <legend class="center">/root/grid/map-editor/<%= @scope == 'region' ? "region/#{@region.slug}" : @zone.slug %></legend>
 
-    <div style="padding: 10px;">
+    <div style="padding: 10px; display: flex; flex-direction: column; flex: 1; min-height: 0;">
       <%# Toolbar %>
       <div id="me-toolbar" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center;">
-        <%= link_to "<- Zones", admin_grid_zones_path, class: "tui-button", style: "padding: 4px 12px; font-size: 0.85em;" %>
+        <%= link_to "<- Regions", admin_grid_regions_path, class: "tui-button", style: "padding: 4px 12px; font-size: 0.85em;" %>
 
-        <label style="color: #888; font-size: 0.85em;">Zone:</label>
-        <div style="min-width: 280px; max-width: 350px; position: relative;" class="admin-combobox">
-          <input type="text" id="me-zone-input" class="admin-combobox-input selected" style="padding: 4px 8px; font-size: 0.85em;" autocomplete="off" placeholder="Search zones..." value="<%= @zone.grid_region.name %> / <%= @zone.name %>" />
-          <input type="hidden" id="me-zone-hidden" value="<%= @zone.id %>" />
+        <button id="me-scope-region" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">Region</button>
+        <button id="me-scope-zone" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">Zone</button>
+        <span style="color: #333; margin: 0 2px;">|</span>
+
+        <%# Region picker (shown in region scope) %>
+        <div id="me-region-picker" style="min-width: 200px; max-width: 280px; position: relative;" class="admin-combobox">
+          <input type="text" id="me-region-input" class="admin-combobox-input" style="padding: 4px 8px; font-size: 0.85em;" autocomplete="off" placeholder="Search regions..." value="<%= @region.name %>" />
+          <input type="hidden" id="me-region-hidden" value="<%= @region.id %>" />
+          <div id="me-region-dropdown" class="admin-combobox-dropdown"></div>
+          <div id="me-region-status" style="display: none;"></div>
+        </div>
+
+        <label id="me-zone-label" style="color: #888; font-size: 0.85em;">Zone:</label>
+        <div id="me-zone-picker" style="min-width: 280px; max-width: 350px; position: relative;" class="admin-combobox">
+          <input type="text" id="me-zone-input" class="admin-combobox-input selected" style="padding: 4px 8px; font-size: 0.85em;" autocomplete="off" placeholder="Search zones..." value="<%= @scope == 'zone' ? "#{@zone.grid_region.name} / #{@zone.name}" : '' %>" />
+          <input type="hidden" id="me-zone-hidden" value="<%= @scope == 'zone' ? @zone.id : '' %>" />
           <div id="me-zone-dropdown" class="admin-combobox-dropdown"></div>
           <div id="me-zone-status" style="display: none;"></div>
         </div>
 
-        <button id="me-auto-layout" class="tui-button cyan-168" style="padding: 4px 12px; font-size: 0.85em;">Auto Layout</button>
+        <button id="me-reset-layout" class="tui-button cyan-168" style="padding: 4px 12px; font-size: 0.85em;">Reset Layout</button>
         <button id="me-zoom-in" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">+</button>
         <button id="me-zoom-out" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">-</button>
         <button id="me-zoom-reset" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">1:1</button>
         <span style="color: #333; margin: 0 4px;">|</span>
         <span id="me-z-buttons" style="display: inline-flex; gap: 4px; align-items: center;"></span>
         <span style="color: #333; margin: 0 4px;">|</span>
-        <button id="me-25d-toggle" class="tui-button" style="padding: 4px 12px; font-size: 0.85em;">2.5D</button>
+        <button id="me-25d-toggle" class="tui-button cyan-168" style="padding: 4px 12px; font-size: 0.85em;">2D</button>
         <span style="color: #333; margin: 0 4px;">|</span>
         <%= link_to "Export World", admin_grid_world_export_path, class: "tui-button green-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
         <span id="me-status" style="color: #666; font-size: 0.85em; margin-left: auto;"></span>
       </div>
 
       <%# Main layout: map + side panel %>
-      <div id="me-layout" style="display: flex; gap: 0; border: 1px solid #333; background: #0d0d0d; height: 80vh;">
+      <div id="me-layout" style="display: flex; gap: 0; border: 1px solid #333; background: #0d0d0d; flex: 1; min-height: 0;">
         <%# SVG Canvas %>
         <div id="me-canvas-wrap" style="flex: 1; overflow: auto; position: relative; height: 100%; cursor: crosshair;">
           <svg id="me-svg" xmlns="http://www.w3.org/2000/svg" style="display: block;"></svg>
@@ -50,9 +62,11 @@
           Click room to edit ·
           Double-click empty space to create room ·
           Drag room to move ·
+          Drag background to pan ·
           Drag from <span style="color: #00ffff;">port dot</span> to draw exit ·
           Click connector to edit/delete ·
-          <span style="color: #555; opacity: 0.6;">Ghost</span>=cross-zone room ·
+          <span id="me-legend-ghost" style="color: #555; opacity: 0.6;">Ghost</span>=<span id="me-legend-ghost-desc">cross-zone room</span> ·
+          <span id="me-legend-zone-drag" style="display: none;">Drag zone label to reposition cluster ·</span>
           Esc to deselect
         </span>
       </div>
@@ -122,6 +136,10 @@
       <option value="sally_port">Sally Port</option>
     </select>
   </div>
+  <div id="me-room-zone-wrap" style="margin-bottom: 10px; display: none;">
+    <label class="white-text" style="display: block; margin-bottom: 4px; font-size: 0.85em;">ZONE:</label>
+    <select id="me-room-zone-select" class="tui-input" style="width: 100%; padding: 6px;"></select>
+  </div>
   <div style="display: flex; gap: 10px;">
     <button id="me-room-confirm" class="tui-button green-168" style="padding: 6px 16px;">Create</button>
     <button id="me-room-cancel" class="tui-button" style="padding: 6px 16px;">Cancel</button>
@@ -144,7 +162,7 @@
 
   // ── 2.5D Isometric constants ──────────────────────────────
   var ISO_TILE_W = 160, ISO_TILE_H = 80;
-  var ISO_WALL_H = 22;
+  var ISO_WALL_H = 32;
   var ISO_Z_SPACING = 120;
   var ISO_FADED_OPACITY = 0.3;
 
@@ -176,16 +194,22 @@
   };
 
   // ── State ──────────────────────────────────────────────────
-  var zoneId = <%= @zone.id %>;
+  var scope = '<%= @scope %>';
+  var zoneId = <%= @scope == 'zone' ? @zone.id : 'null' %>;
+  var regionId = <%= @region.id %>;
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-  var state = {rooms: [], exits: [], ghostRooms: [], breachTemplates: [], allRoomsGrouped: [], zone: null, zoneColor: '#00ffff'};
+  var state = {rooms: [], exits: [], ghostRooms: [], zones: [], region: null, breachTemplates: [], allRoomsGrouped: [], zone: null, zoneColor: '#00ffff'};
   var selectedRoomId = null;
   var _panelZoneUid = null;
-  var zoomLevel = 1.0;
+  var zoomLevel = 1.25;
   var currentZ = 0;
-  var mode25D = false;
-  var dragState = null; // {type: 'room'|'port', roomId, startX, startY, origX, origY}
+  var mode25D = true;
+  var dragState = null; // {type: 'room'|'port'|'zone'|'pan', roomId, startX, startY, origX, origY}
   var drawLine = null;
+  var PAN_THRESHOLD = 5;
+  var isoPanX = 0, isoPanY = 0; // viewBox pan offset for 2.5D mode
+  var _isoContentCX = 0, _isoContentCY = 0; // content center from last render (for pan)
+  var _pendingCenterZoneId = null; // set before loadData to center on a zone after render
 
   // ── DOM refs ───────────────────────────────────────────────
   var svg = document.getElementById('me-svg');
@@ -214,30 +238,100 @@
   function setStatus(msg) { statusEl.textContent = msg; }
 
   function navigateToZone(newZoneId) {
+    scope = 'zone';
     zoneId = newZoneId;
     currentZ = 0;
+    isoPanX = 0; isoPanY = 0;
+    _pendingCenterZoneId = null;
     selectedRoomId = null;
     closePanel();
     window.history.replaceState(null, '', '/root/grid_map_editor/' + zoneId);
+    updateScopeUI();
     loadData();
+  }
+
+  function navigateToRegion(newRegionId, centerZoneId) {
+    scope = 'region';
+    regionId = newRegionId;
+    zoneId = null;
+    currentZ = 0;
+    isoPanX = 0; isoPanY = 0;
+    _pendingCenterZoneId = centerZoneId || null;
+    selectedRoomId = null;
+    closePanel();
+    window.history.replaceState(null, '', '/root/grid_map_editor/region/' + regionId);
+    updateScopeUI();
+    loadData();
+  }
+
+  // Center the viewport on a specific zone's rooms
+  function centerOnZone(targetZoneId) {
+    var zoneRooms = state.rooms.filter(function(r) { return r.grid_zone_id === targetZoneId; });
+    if (zoneRooms.length === 0) return;
+
+    if (mode25D) {
+      // Compute screen-space center of target zone's rooms
+      var sumX = 0, sumY = 0;
+      zoneRooms.forEach(function(r) {
+        var p = iso(r.map_x, r.map_y, r.map_z || 0);
+        sumX += p[0]; sumY += p[1];
+      });
+      var zoneCX = sumX / zoneRooms.length;
+      var zoneCY = sumY / zoneRooms.length;
+      isoPanX = zoneCX - _isoContentCX;
+      isoPanY = zoneCY - _isoContentCY;
+      // Re-apply viewBox with new pan offset
+      var vb = svg.getAttribute('viewBox');
+      if (vb) {
+        var parts = vb.split(' ');
+        var vbW = parseFloat(parts[2]), vbH = parseFloat(parts[3]);
+        svg.setAttribute('viewBox', (_isoContentCX - vbW / 2 + isoPanX) + ' ' + (_isoContentCY - vbH / 2 + isoPanY) + ' ' + vbW + ' ' + vbH);
+      }
+    } else {
+      // Flat mode: scroll to center of target zone's rooms
+      var sumGX = 0, sumGY = 0;
+      zoneRooms.forEach(function(r) { sumGX += r.map_x; sumGY += r.map_y; });
+      var cx = (sumGX / zoneRooms.length) * STRIDE_X;
+      var cy = (sumGY / zoneRooms.length) * STRIDE_Y;
+      canvasWrap.scrollLeft = cx + PADDING - canvasWrap.clientWidth / 2;
+      canvasWrap.scrollTop = cy + PADDING - canvasWrap.clientHeight / 2;
+    }
   }
 
   // ── Data loading ───────────────────────────────────────────
   function loadData() {
     setStatus('Loading...');
-    var dataUrl = zoneId + '/data?z=' + currentZ + (mode25D ? '&all_z=true' : '');
+    var dataUrl;
+    if (scope === 'region') {
+      dataUrl = 'region/' + regionId + '/data';
+    } else {
+      dataUrl = zoneId + '/data?z=' + currentZ + (mode25D ? '&all_z=true' : '');
+    }
     api('GET', dataUrl).then(function(d) {
       state = d;
-      currentZ = d.z_level || 0;
+      if (scope === 'region') {
+        currentZ = 0;
+        // Derive regionId from response
+        if (d.region) regionId = d.region.id;
+      } else {
+        currentZ = d.z_level || 0;
+      }
       // If no rooms exist at currentZ, snap to first available z-level
       var zLevels = state.z_levels || [0];
       if (zLevels.indexOf(currentZ) === -1 && zLevels.length > 0) {
         currentZ = zLevels[0];
       }
+      populateRegionSelect();
       populateZoneSelect();
+      syncRegionCombobox();
       syncZoneCombobox();
       renderZButtons();
       if (mode25D) render25D(); else render();
+      // Center on a specific zone if requested
+      if (_pendingCenterZoneId && scope === 'region') {
+        centerOnZone(_pendingCenterZoneId);
+        _pendingCenterZoneId = null;
+      }
       // Re-open panel if a room was selected and still exists
       if (selectedRoomId !== null) {
         var still = state.rooms.find(function(r) { return r.id === selectedRoomId; });
@@ -245,7 +339,9 @@
         else { selectedRoomId = null; closePanel(); }
       }
       var zLabel = currentZ === 0 ? 'z=0' : (currentZ > 0 ? 'z+' + currentZ : 'z' + currentZ);
-      setStatus(state.rooms.length + ' rooms · ' + state.exits.length + ' exits · ' + zLabel);
+      var scopeLabel = scope === 'region' ? ('Region: ' + (state.region ? state.region.name : '')) : '';
+      var zoneCount = scope === 'region' ? ((state.zones || []).length + ' zones · ') : '';
+      setStatus(zoneCount + state.rooms.length + ' rooms · ' + state.exits.length + ' exits' + (scopeLabel ? ' · ' + scopeLabel : ' · ' + zLabel));
     });
   }
 
@@ -275,13 +371,48 @@
   function syncZoneCombobox() {
     var input = document.getElementById('me-zone-input');
     var hidden = document.getElementById('me-zone-hidden');
-    var cur = (state.available_zones || []).find(function(z) { return z.id === zoneId; });
+    if (scope === 'zone' && zoneId) {
+      var cur = (state.available_zones || []).find(function(z) { return z.id === zoneId; });
+      if (cur) {
+        input.value = cur.region_name + ' / ' + cur.name;
+        input.classList.add('selected');
+      }
+      // Set via property directly to avoid triggering the navigation hook
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(hidden, String(zoneId));
+    }
+  }
+
+  var _regionComboboxInited = false;
+  function populateRegionSelect() {
+    if (_regionComboboxInited) return;
+    var regions = state.available_regions || [];
+    if (regions.length === 0) return;
+    _regionComboboxInited = true;
+    AdminCombobox.init({
+      inputId: 'me-region-input',
+      hiddenId: 'me-region-hidden',
+      dropdownId: 'me-region-dropdown',
+      statusId: 'me-region-status',
+      items: regions,
+      getSearchText: function(r) { return (r.name + ' ' + r.slug).toLowerCase(); },
+      getGroupKey: function() { return 'Regions'; },
+      renderOption: function(r, e) { return '<span class="cb-name">' + e(r.name) + '</span>'; },
+      getId: function(r) { return String(r.id); },
+      getLabel: function(r) { return r.name; },
+      emptyText: 'No regions match',
+      selectedText: 'Region selected'
+    });
+  }
+
+  function syncRegionCombobox() {
+    var input = document.getElementById('me-region-input');
+    var hidden = document.getElementById('me-region-hidden');
+    var cur = (state.available_regions || []).find(function(r) { return r.id === regionId; });
     if (cur) {
-      input.value = cur.region_name + ' / ' + cur.name;
+      input.value = cur.name;
       input.classList.add('selected');
     }
-    // Set via property directly to avoid triggering the navigation hook
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(hidden, String(zoneId));
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(hidden, String(regionId));
   }
 
   function renderZButtons() {
@@ -319,12 +450,71 @@
         desc.set.call(this, v);
         var newId = parseInt(v);
         if (newId && newId !== zoneId) {
-          navigateToZone(newId);
+          if (scope === 'zone') {
+            navigateToZone(newId);
+          } else {
+            // In region scope, zone picker tracks "active zone for room creation"
+            zoneId = newId;
+          }
         }
       },
       get: desc.get
     });
   })();
+
+  // Intercept region combobox selection
+  (function() {
+    var regionHidden = document.getElementById('me-region-hidden');
+    var desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    Object.defineProperty(regionHidden, 'value', {
+      set: function(v) {
+        desc.set.call(this, v);
+        var newId = parseInt(v);
+        if (newId && newId !== regionId) {
+          navigateToRegion(newId);
+        }
+      },
+      get: desc.get
+    });
+  })();
+
+  // ── Zone background rendering (region scope) ───────────────
+  function renderZoneBackgrounds() {
+    var zones = state.zones || [];
+    zones.forEach(function(zone) {
+      var zoneRooms = state.rooms.filter(function(r) { return r.grid_zone_id === zone.id; });
+      if (zoneRooms.length === 0) return;
+      var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      zoneRooms.forEach(function(r) {
+        if (r.map_x < minX) minX = r.map_x;
+        if (r.map_y < minY) minY = r.map_y;
+        if (r.map_x > maxX) maxX = r.map_x;
+        if (r.map_y > maxY) maxY = r.map_y;
+      });
+      var ZONE_PAD = 35;
+      var svgX = minX * STRIDE_X - BOX_W/2 - ZONE_PAD;
+      var svgY = minY * STRIDE_Y - BOX_H/2 - ZONE_PAD;
+      var svgW = (maxX - minX) * STRIDE_X + BOX_W + ZONE_PAD * 2;
+      var svgH = (maxY - minY) * STRIDE_Y + BOX_H + ZONE_PAD * 2;
+      var color = zone.color || '#333';
+
+      var bg = el('rect', {x: svgX, y: svgY, width: svgW, height: svgH,
+        fill: 'transparent', stroke: color, 'stroke-width': 1,
+        opacity: 0.2, rx: 6, 'stroke-dasharray': '8,4',
+        class: 'me-zone-bg', 'data-zone-id': zone.id});
+      svg.appendChild(bg);
+
+      // Zone label — draggable for repositioning
+      var labelEl = el('text', {x: svgX + 8, y: svgY - 6,
+        fill: color, opacity: 0.6,
+        'font-family': "'Courier New', monospace",
+        'font-size': '11px', 'font-weight': 'bold',
+        class: 'me-zone-label', 'data-zone-id': zone.id,
+        style: 'cursor: move; user-select: none;'});
+      labelEl.textContent = zone.name + ' (' + zoneRooms.length + ')';
+      svg.appendChild(labelEl);
+    });
+  }
 
   // ── SVG Rendering ──────────────────────────────────────────
   function render() {
@@ -399,6 +589,9 @@
         svg.appendChild(dot);
       }
     }
+
+    // Zone backgrounds (region scope)
+    if (scope === 'region') renderZoneBackgrounds();
 
     // Build room lookup
     var roomById = {};
@@ -475,7 +668,7 @@
     var cy = room.map_y * STRIDE_Y;
     var rx = cx - BOX_W / 2, ry = cy - BOX_H / 2;
     var isSelected = room.id === selectedRoomId;
-    var color = state.zone_color || '#00ffff';
+    var color = (scope === 'region') ? (room.zone_color || '#00ffff') : (state.zone_color || '#00ffff');
     var stroke = room.locked ? '#f87171' : (isSelected ? '#fff' : color);
     var strokeW = isSelected ? 2.5 : (room.locked ? 2 : 1);
     var fill = isSelected ? '#1a2a2a' : '#111';
@@ -571,11 +764,17 @@
       g.querySelectorAll('.me-port').forEach(function(p) { p.setAttribute('opacity', '0'); });
     });
 
-    // Click ghost: navigate to that zone
+    // Click ghost: navigate to that zone (zone scope) or region (region scope)
     g.addEventListener('click', function(e) {
       if (e.target.classList.contains('me-port') || e.target.classList.contains('me-ghost-port')) return;
-      if (confirm('Open zone "' + ghostRoom.zone_name + '" in editor?')) {
-        navigateToZone(ghostRoom.zone_id);
+      if (scope === 'region' && ghostRoom.region_id) {
+        if (confirm('Open region "' + ghostRoom.region_name + '" in editor?')) {
+          navigateToRegion(ghostRoom.region_id);
+        }
+      } else {
+        if (confirm('Open zone "' + ghostRoom.zone_name + '" in editor?')) {
+          navigateToZone(ghostRoom.zone_id);
+        }
       }
     });
 
@@ -714,13 +913,13 @@
     var hw = ISO_TILE_W / 2, hh = ISO_TILE_H / 2;
 
     var top = [cx, cy - hh], right = [cx + hw, cy], bottom = [cx, cy + hh], left = [cx - hw, cy];
-    var color = ROOM_TYPE_COLORS[room.room_type] || (state.zone_color || '#00ffff');
+    var color = ROOM_TYPE_COLORS[room.room_type] || ((scope === 'region') ? (room.zone_color || '#00ffff') : (state.zone_color || '#00ffff'));
     var topFill = isActive ? (room.id === selectedRoomId ? '#1a2a2a' : '#111') : '#0e0e0e';
     var topStroke = isActive ? (room.id === selectedRoomId ? '#fff' : color) : '#444';
     var topStrokeW = isActive ? (room.id === selectedRoomId ? 2.5 : 1.5) : 0.8;
-    var leftFill = isActive ? isoDarken(color, 0.18) : '#0a0a0a';
-    var rightFill = isActive ? isoDarken(color, 0.12) : '#080808';
-    var sideStroke = isActive ? isoDarken(color, 0.35) : '#1a1a1a';
+    var leftFill = isActive ? isoDarken(color, 0.25) : '#0a0a0a';
+    var rightFill = isActive ? isoDarken(color, 0.18) : '#080808';
+    var sideStroke = isActive ? isoDarken(color, 0.45) : '#1a1a1a';
     // Left wall
     g.appendChild(el('polygon', {points: isoPts([left, bottom, [bottom[0], bottom[1]+ISO_WALL_H], [left[0], left[1]+ISO_WALL_H]]), fill: leftFill, stroke: sideStroke, 'stroke-width': 0.5, 'data-room-id': room.id, class: 'me-room-iso'}));
     // Right wall
@@ -834,9 +1033,10 @@
     var paneH = canvasWrap.clientHeight || 600;
     // Apply zoom: smaller viewBox = zoom in, larger = zoom out
     var vbW = paneW / zoomLevel, vbH = paneH / zoomLevel;
-    // Center on content
+    // Center on content + apply pan offset
     var contentCX = (minSX + maxSX) / 2, contentCY = (minSY + maxSY + ISO_WALL_H) / 2;
-    var vbX = contentCX - vbW / 2, vbY = contentCY - vbH / 2;
+    _isoContentCX = contentCX; _isoContentCY = contentCY;
+    var vbX = contentCX - vbW / 2 + isoPanX, vbY = contentCY - vbH / 2 + isoPanY;
 
     svg.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
     svg.setAttribute('width', '100%');
@@ -905,17 +1105,6 @@
       var g = el('g', {opacity: opacity, 'data-z-level': z});
       g.style.cursor = 'pointer';
 
-      // Connectors first (behind tiles)
-      var drawnEdges = {};
-      (horizontalExitsByZ[z] || []).forEach(function(ex) {
-        var from = roomById[ex.from_room_id], to = roomById[ex.to_room_id];
-        if (!from || !to) return;
-        var key = [Math.min(ex.from_room_id, ex.to_room_id), Math.max(ex.from_room_id, ex.to_room_id)].join('-');
-        if (drawnEdges[key]) return;
-        drawnEdges[key] = true;
-        drawIsoConnector(g, from.map_x, from.map_y, to.map_x, to.map_y, z, ex, isActive);
-      });
-
       // Sort rooms back-to-front for correct overlap
       var sortedRooms = layerRooms.slice().sort(function(a, b) {
         var sa = a.map_x + a.map_y, sb = b.map_x + b.map_y;
@@ -923,7 +1112,29 @@
         return a.map_y - b.map_y;
       });
 
+      // Build per-room connector index for interleaved depth rendering
+      var exitsByRoom = {};
+      var drawnEdges = {};
+      (horizontalExitsByZ[z] || []).forEach(function(ex) {
+        var from = roomById[ex.from_room_id], to = roomById[ex.to_room_id];
+        if (!from || !to) return;
+        var key = [Math.min(ex.from_room_id, ex.to_room_id), Math.max(ex.from_room_id, ex.to_room_id)].join('-');
+        // Assign each connector to the room with LOWER depth (drawn first)
+        var fromDepth = from.map_x + from.map_y;
+        var toDepth = to.map_x + to.map_y;
+        var owner = fromDepth <= toDepth ? from.id : to.id;
+        if (!exitsByRoom[owner]) exitsByRoom[owner] = [];
+        exitsByRoom[owner].push({ex: ex, key: key, from: from, to: to});
+      });
+
+      // Interleaved draw: for each room (back-to-front), draw its connectors then its tile
       sortedRooms.forEach(function(r) {
+        // Draw connectors owned by this room (to rooms at same or greater depth)
+        (exitsByRoom[r.id] || []).forEach(function(c) {
+          if (drawnEdges[c.key]) return;
+          drawnEdges[c.key] = true;
+          drawIsoConnector(g, c.from.map_x, c.from.map_y, c.to.map_x, c.to.map_y, z, c.ex, isActive);
+        });
         drawIsoTile(g, r.map_x, r.map_y, z, r, isActive);
       });
 
@@ -967,8 +1178,14 @@
           (function(ghost) {
             ghostG.addEventListener('click', function(e) {
               e.stopPropagation();
-              if (confirm('Open zone "' + ghost.zone_name + '" in editor?')) {
-                navigateToZone(ghost.zone_id);
+              if (scope === 'region' && ghost.region_id) {
+                if (confirm('Open region "' + ghost.region_name + '" in editor?')) {
+                  navigateToRegion(ghost.region_id);
+                }
+              } else {
+                if (confirm('Open zone "' + ghost.zone_name + '" in editor?')) {
+                  navigateToZone(ghost.zone_id);
+                }
               }
             });
           })(gr);
@@ -1093,8 +1310,14 @@
       (function(room) {
         ghostG.addEventListener('click', function(e) {
           e.stopPropagation();
-          if (room.zone_id && confirm('Open zone "' + (room.zone_name || '') + '" in editor?')) {
-            navigateToZone(room.zone_id);
+          if (scope === 'region' && room.region_id) {
+            if (confirm('Open region "' + (room.region_name || '') + '" in editor?')) {
+              navigateToRegion(room.region_id);
+            }
+          } else if (room.zone_id) {
+            if (confirm('Open zone "' + (room.zone_name || '') + '" in editor?')) {
+              navigateToZone(room.zone_id);
+            }
           }
         });
       })(vr);
@@ -1106,13 +1329,39 @@
       svg.appendChild(el('line', {x1: localPos[0], y1: localPos[1], x2: cx, y2: cy, stroke: color, 'stroke-width': 2, 'stroke-dasharray': '8,5', opacity: 0.3}));
     });
 
+    // Zone labels (region scope) — draggable for repositioning
+    if (scope === 'region') {
+      (state.zones || []).forEach(function(zone) {
+        var zoneRooms = state.rooms.filter(function(r) { return r.grid_zone_id === zone.id; });
+        if (zoneRooms.length === 0) return;
+        // Find top-left room in isometric space (min map_x + map_y, then min map_x)
+        var labelRoom = zoneRooms.reduce(function(best, r) {
+          var bs = best.map_x + best.map_y, rs = r.map_x + r.map_y;
+          if (rs < bs || (rs === bs && r.map_x < best.map_x)) return r;
+          return best;
+        });
+        var lp = iso(labelRoom.map_x - 1, labelRoom.map_y - 0.5, labelRoom.map_z || 0);
+        var color = zone.color || '#00ffff';
+        var labelEl = el('text', {x: lp[0], y: lp[1] - 22,
+          fill: color, opacity: 0.6,
+          'font-family': "'Courier New', monospace",
+          'font-size': '11px', 'font-weight': 'bold',
+          class: 'me-zone-label', 'data-zone-id': zone.id,
+          style: 'cursor: move; user-select: none;'});
+        labelEl.textContent = zone.name + ' (' + zoneRooms.length + ')';
+        svg.appendChild(labelEl);
+      });
+    }
+
     // Draw line for exit drawing in progress
     drawLine = el('line', {x1: 0, y1: 0, x2: 0, y2: 0, stroke: '#00ffff', 'stroke-width': 2, 'stroke-dasharray': '6,4', visibility: 'hidden'});
     svg.appendChild(drawLine);
   }
 
   // ── Interaction: Room click/select ─────────────────────────
+  var _dragEndedAt = 0;
   svg.addEventListener('click', function(e) {
+    if (Date.now() - _dragEndedAt < 300) return;
     // Flat mode: .me-room, Iso mode: .me-room-iso on active layer
     var roomEl = e.target.closest('.me-room') || e.target.closest('.me-room-iso');
     if (roomEl && !e.target.classList.contains('me-port')) {
@@ -1125,14 +1374,15 @@
       selectRoom(id);
       return;
     }
-    // Click on empty space (not a room, not a connector, not ghost)
-    if (!e.target.closest('.me-ghost') && !e.target.closest('.me-connector') && !e.target.getAttribute('data-exit-id')) {
+    // Click on empty space (not a room, not a connector, not ghost, not zone label)
+    if (!e.target.closest('.me-ghost') && !e.target.closest('.me-connector') && !e.target.getAttribute('data-exit-id') && !e.target.closest('.me-zone-label')) {
       deselectRoom();
     }
   });
 
   svg.addEventListener('dblclick', function(e) {
-    if (e.target.closest('.me-room') || e.target.closest('.me-ghost') || e.target.closest('.me-room-iso')) return;
+    if (Date.now() - _dragEndedAt < 300) return;
+    if (e.target.closest('.me-room') || e.target.closest('.me-ghost') || e.target.closest('.me-room-iso') || e.target.closest('.me-zone-label')) return;
     // Double-click on empty space: create room
     var pt = svgPoint(e);
     var gx, gy;
@@ -1175,6 +1425,21 @@
       return;
     }
 
+    // Zone label drag (region scope — reposition entire zone cluster)
+    if (scope === 'region') {
+      var zoneLabelEl = e.target.closest('.me-zone-label');
+      if (zoneLabelEl) {
+        e.preventDefault();
+        var zid = parseInt(zoneLabelEl.getAttribute('data-zone-id'));
+        var zone = (state.zones || []).find(function(z) { return z.id === zid; });
+        if (!zone) return;
+        var pt = svgPoint(e);
+        var isoStart = mode25D ? isoInverse(pt.x, pt.y, currentZ) : null;
+        dragState = {type: 'zone', zoneId: zid, origZoneX: zone.map_x, origZoneY: zone.map_y, startX: pt.x, startY: pt.y, isoStartGrid: isoStart};
+        return;
+      }
+    }
+
     // Room drag (reposition)
     var roomG = e.target.closest('.me-room') || (mode25D ? e.target.closest('.me-room-iso') : null);
     if (roomG && !e.target.classList.contains('me-port')) {
@@ -1187,16 +1452,83 @@
       var pt = svgPoint(e);
       var isoStart = mode25D ? isoInverse(pt.x, pt.y, currentZ) : null;
       dragState = {type: 'room', roomId: id, startX: pt.x, startY: pt.y, origX: room.map_x, origY: room.map_y, isoStartGrid: isoStart};
+      return;
+    }
+
+    // Background pan — starts on empty space
+    if (!e.target.closest('.me-room') && !e.target.closest('.me-ghost') && !e.target.closest('.me-room-iso') && !e.target.closest('.me-zone-label')) {
+      dragState = {type: 'pan', startClientX: e.clientX, startClientY: e.clientY,
+        scrollLeft: canvasWrap.scrollLeft, scrollTop: canvasWrap.scrollTop,
+        origIsoPanX: isoPanX, origIsoPanY: isoPanY,
+        contentCX: _isoContentCX, contentCY: _isoContentCY, moved: false};
     }
   });
 
   document.addEventListener('mousemove', function(e) {
     if (!dragState) return;
+
+    if (dragState.type === 'pan') {
+      var dx = e.clientX - dragState.startClientX;
+      var dy = e.clientY - dragState.startClientY;
+      if (!dragState.moved && Math.abs(dx) + Math.abs(dy) > PAN_THRESHOLD) dragState.moved = true;
+      if (dragState.moved) {
+        if (mode25D) {
+          // Update viewBox directly — no full re-render needed, only the camera moves
+          var vb = svg.getAttribute('viewBox');
+          if (vb) {
+            var parts = vb.split(' ');
+            var vbW = parseFloat(parts[2]), vbH = parseFloat(parts[3]);
+            var svgW = svg.clientWidth || 1;
+            var scale = vbW / svgW;
+            isoPanX = dragState.origIsoPanX - dx * scale;
+            isoPanY = dragState.origIsoPanY - dy * scale;
+            var contentCX = dragState.contentCX, contentCY = dragState.contentCY;
+            svg.setAttribute('viewBox', (contentCX - vbW / 2 + isoPanX) + ' ' + (contentCY - vbH / 2 + isoPanY) + ' ' + vbW + ' ' + vbH);
+          }
+        } else {
+          canvasWrap.scrollLeft = dragState.scrollLeft - dx;
+          canvasWrap.scrollTop = dragState.scrollTop - dy;
+        }
+      }
+      return;
+    }
+
     var pt = svgPoint(e);
 
     if (dragState.type === 'port') {
       drawLine.setAttribute('x2', pt.x);
       drawLine.setAttribute('y2', pt.y);
+      return;
+    }
+
+    if (dragState.type === 'zone') {
+      var dx, dy;
+      if (mode25D && dragState.isoStartGrid) {
+        var curGrid = isoInverse(pt.x, pt.y, currentZ);
+        dx = curGrid[0] - dragState.isoStartGrid[0];
+        dy = curGrid[1] - dragState.isoStartGrid[1];
+      } else {
+        dx = Math.round((pt.x - dragState.startX) / STRIDE_X);
+        dy = Math.round((pt.y - dragState.startY) / STRIDE_Y);
+      }
+      var zone = (state.zones || []).find(function(z) { return z.id === dragState.zoneId; });
+      if (!zone) return;
+      var newZoneX = dragState.origZoneX + dx;
+      var newZoneY = dragState.origZoneY + dy;
+      if (zone.map_x !== newZoneX || zone.map_y !== newZoneY) {
+        var zoneDx = newZoneX - zone.map_x;
+        var zoneDy = newZoneY - zone.map_y;
+        zone.map_x = newZoneX;
+        zone.map_y = newZoneY;
+        // Move all rooms in this zone by the delta
+        state.rooms.forEach(function(r) {
+          if (r.grid_zone_id === dragState.zoneId) {
+            r.map_x += zoneDx;
+            r.map_y += zoneDy;
+          }
+        });
+        if (mode25D) render25D(); else render();
+      }
       return;
     }
 
@@ -1227,6 +1559,12 @@
   document.addEventListener('mouseup', function(e) {
     if (!dragState) return;
 
+    if (dragState.type === 'pan') {
+      if (dragState.moved) _dragEndedAt = Date.now();
+      dragState = null;
+      return;
+    }
+
     if (dragState.type === 'port') {
       drawLine.setAttribute('visibility', 'hidden');
       // Find target room under cursor
@@ -1243,24 +1581,14 @@
       return;
     }
 
-    if (dragState.type === 'room') {
-      var room = state.rooms.find(function(r) { return r.id === dragState.roomId; });
-      var origX = dragState.origX, origY = dragState.origY;
+    if (dragState.type === 'zone') {
+      _dragEndedAt = Date.now();
       dragState = null;
-      if (room && (room.map_x !== origX || room.map_y !== origY)) {
-        setStatus('Saving position...');
-        api('PATCH', 'rooms/' + room.id, {map_x: room.map_x, map_y: room.map_y}).then(function(d) {
-          if (d.success) {
-            room.position_source = 'stored';
-            setStatus('Position saved');
-          } else {
-            room.map_x = origX;
-            room.map_y = origY;
-            if (mode25D) render25D(); else render();
-            setStatus('Error: ' + (d.errors || []).join(', '));
-          }
-        });
-      }
+      return;
+    }
+
+    if (dragState.type === 'room') {
+      dragState = null;
     }
   });
 
@@ -1522,7 +1850,13 @@
 
     // Position info
     html += '<div style="border-top: 1px solid #333; padding-top: 10px; margin-top: 10px; color: #555; font-size: 0.8em;">';
-    html += 'Position: (' + room.map_x + ', ' + room.map_y + ') · ' + room.position_source;
+    if (scope === 'region') {
+      html += 'Grid: (' + room.map_x + ', ' + room.map_y + ')';
+      if (room.map_z) html += ' · z=' + room.map_z;
+    } else {
+      html += 'Grid: (' + room.map_x + ', ' + room.map_y + ')';
+      if (room.map_z) html += ' · z=' + room.map_z;
+    }
     html += ' · <a href="/root/grid_rooms/' + room.id + '/edit" style="color: #60a5fa; text-decoration: none;">Full Edit →</a>';
     html += '</div>';
 
@@ -1604,7 +1938,13 @@
       if (!targetId || !dir) { setStatus('Target and direction required'); return; }
       setStatus('Creating exit...');
       api('POST', 'exits', {from_room_id: room.id, to_room_id: targetId, direction: dir, bidirectional: bidi}).then(function(d) {
-        if (d.success) { setStatus('Exit created'); loadData(); }
+        if (d.success) {
+          patchExitsIntoState(d);
+          if (mode25D) render25D(); else render();
+          showPanel(room.id);
+          setStatus('Exit created');
+          loadData();
+        }
         else { setStatus('Error: ' + (d.errors || []).join(', ')); }
       });
     });
@@ -1830,6 +2170,9 @@
       }).then(function(result) {
         if (result.success) {
           hideDialogs();
+          patchExitsIntoState(result);
+          if (mode25D) render25D(); else render();
+          if (selectedRoomId) showPanel(selectedRoomId);
           setStatus('Exit created');
           loadData();
         } else {
@@ -1868,6 +2211,34 @@
     document.getElementById('me-room-dialog').style.display = 'block';
     document.getElementById('me-room-name').focus();
 
+    // Zone selector for region scope
+    var zoneWrap = document.getElementById('me-room-zone-wrap');
+    var zoneSel = document.getElementById('me-room-zone-select');
+    if (scope === 'region') {
+      zoneWrap.style.display = 'block';
+      zoneSel.innerHTML = '';
+      // Auto-detect zone from click position (closest zone bounding box)
+      var bestZone = null, bestDist = Infinity;
+      (state.zones || []).forEach(function(z) {
+        var zoneRooms = state.rooms.filter(function(r) { return r.grid_zone_id === z.id; });
+        if (zoneRooms.length === 0) return;
+        var cx = 0, cy = 0;
+        zoneRooms.forEach(function(r) { cx += r.map_x; cy += r.map_y; });
+        cx /= zoneRooms.length; cy /= zoneRooms.length;
+        var dist = Math.abs(gx - cx) + Math.abs(gy - cy);
+        if (dist < bestDist) { bestDist = dist; bestZone = z; }
+      });
+      (state.zones || []).forEach(function(z) {
+        var opt = document.createElement('option');
+        opt.value = z.id;
+        opt.textContent = z.name + ' (' + z.room_count + ' rooms)';
+        if (bestZone && z.id === bestZone.id) opt.selected = true;
+        zoneSel.appendChild(opt);
+      });
+    } else {
+      zoneWrap.style.display = 'none';
+    }
+
     // Auto-generate slug from name
     document.getElementById('me-room-name').oninput = function() {
       var name = this.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -1882,10 +2253,17 @@
     var roomType = document.getElementById('me-room-type').value;
     if (!name) { setStatus('Name required'); return; }
 
+    var targetZoneId = zoneId;
+
+    if (scope === 'region') {
+      targetZoneId = parseInt(document.getElementById('me-room-zone-select').value);
+      if (!targetZoneId) { setStatus('Zone required'); return; }
+    }
+
     setStatus('Creating room...');
     api('POST', 'rooms', {
       name: name, slug: slug, room_type: roomType || null,
-      grid_zone_id: zoneId, map_x: pendingRoomPos.x, map_y: pendingRoomPos.y, map_z: currentZ, min_clearance: 0
+      grid_zone_id: targetZoneId, min_clearance: 0
     }).then(function(d) {
       if (d.success) {
         hideDialogs();
@@ -1909,17 +2287,9 @@
   overlay.addEventListener('click', hideDialogs);
 
   // ── Toolbar buttons ────────────────────────────────────────
-  document.getElementById('me-auto-layout').addEventListener('click', function() {
-    if (!confirm('Recompute positions via BFS for all rooms in this zone?\nExisting positions will be overwritten.')) return;
-    setStatus('Computing layout...');
-    api('POST', zoneId + '/auto_layout').then(function(d) {
-      if (d.success) {
-        setStatus('Layout computed (' + d.updated + ' rooms)');
-        loadData();
-      } else {
-        setStatus('Error');
-      }
-    });
+  document.getElementById('me-reset-layout').addEventListener('click', function() {
+    isoPanX = 0; isoPanY = 0;
+    loadData();
   });
 
   document.getElementById('me-zoom-in').addEventListener('click', function() {
@@ -1939,7 +2309,9 @@
 
   document.getElementById('me-25d-toggle').addEventListener('click', function() {
     mode25D = !mode25D;
+    isoPanX = 0; isoPanY = 0;
     var btn = document.getElementById('me-25d-toggle');
+    btn.textContent = mode25D ? '2D' : '2.5D';
     btn.className = mode25D ? 'tui-button cyan-168' : 'tui-button';
     zoomLevel = mode25D ? 1.25 : 1.0;
     canvasWrap.style.display = mode25D ? 'flex' : 'block';
@@ -1949,6 +2321,15 @@
     closePanel();
     loadData();
   });
+
+  // Ctrl/Cmd + scroll wheel zoom
+  canvasWrap.addEventListener('wheel', function(e) {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    var delta = e.deltaY > 0 ? -0.1 : 0.1;
+    zoomLevel = Math.min(Math.max(zoomLevel + delta, 0.15), 5.0);
+    applyZoom();
+  }, {passive: false});
 
   function applyZoom() {
     if (mode25D) {
@@ -1966,6 +2347,43 @@
   }
 
   // ── Helpers ────────────────────────────────────────────────
+  // Optimistically patch new exits into local state so panel shows them
+  // before loadData returns with server truth
+  function patchExitsIntoState(result) {
+    if (!result.exit) return;
+    var fwd = result.exit;
+    var rev = result.reverse_exit;
+    // Find the rooms in state and push the new exits
+    var fromRoom = state.rooms.find(function(r) { return r.id === fwd.from_room_id; });
+    var toRoom = state.rooms.find(function(r) { return r.id === fwd.to_room_id; });
+    if (fromRoom) {
+      if (!fromRoom.exits) fromRoom.exits = [];
+      fromRoom.exits.push({
+        id: fwd.id, direction: fwd.direction, to_room_id: fwd.to_room_id,
+        to_room_name: toRoom ? toRoom.name : 'unknown',
+        to_zone_name: toRoom ? (toRoom.zone_name || '') : '',
+        locked: false, reverse_exit_id: rev ? rev.id : null,
+        cross_zone: fromRoom.grid_zone_id !== (toRoom ? toRoom.grid_zone_id : null)
+      });
+    }
+    if (rev && toRoom) {
+      if (!toRoom.exits) toRoom.exits = [];
+      toRoom.exits.push({
+        id: rev.id, direction: rev.direction, to_room_id: rev.from_room_id,
+        to_room_name: fromRoom ? fromRoom.name : 'unknown',
+        to_zone_name: fromRoom ? (fromRoom.zone_name || '') : '',
+        locked: false, reverse_exit_id: fwd.id,
+        cross_zone: toRoom.grid_zone_id !== (fromRoom ? fromRoom.grid_zone_id : null)
+      });
+    }
+    // Also push to top-level exits for connector rendering
+    if (!state.exits) state.exits = [];
+    state.exits.push({id: fwd.id, from_room_id: fwd.from_room_id, to_room_id: fwd.to_room_id, direction: fwd.direction, locked: false, reverse_exit_id: rev ? rev.id : null});
+    if (rev) {
+      state.exits.push({id: rev.id, from_room_id: rev.from_room_id, to_room_id: rev.to_room_id, direction: rev.direction, locked: false, reverse_exit_id: fwd.id});
+    }
+  }
+
   function esc(str) {
     var div = document.createElement('div');
     div.textContent = str || '';
@@ -1989,8 +2407,10 @@
           });
         });
       });
-      var curZoneId = state.zone ? state.zone.id : zoneId;
-      var curRegion = state.zone ? state.zone.region_name : '';
+      var curZoneId = scope === 'region' ? null : (state.zone ? state.zone.id : zoneId);
+      var curRegion = scope === 'region'
+        ? (state.region ? state.region.name : '')
+        : (state.zone ? state.zone.region_name : '');
       flat.sort(function(a, b) {
         var aZone = a.zone_id === curZoneId ? 0 : 1;
         var bZone = b.zone_id === curZoneId ? 0 : 1;
@@ -2029,8 +2449,10 @@
 
   function initRoomCombobox(uid, excludeId) {
     var items = getSortedRooms(excludeId);
-    var curZoneId = state.zone ? state.zone.id : zoneId;
-    var curRegion = state.zone ? state.zone.region_name : '';
+    var curZoneId = scope === 'region' ? null : (state.zone ? state.zone.id : zoneId);
+    var curRegion = scope === 'region'
+      ? (state.region ? state.region.name : '')
+      : (state.zone ? state.zone.region_name : '');
     AdminCombobox.init({
       inputId: uid + '-input',
       hiddenId: uid + '-hidden',
@@ -2088,7 +2510,65 @@
     });
   }
 
+  // ── Scope toggle ────────────────────────────────────────────
+  function updateScopeUI() {
+    var zoneBtn = document.getElementById('me-scope-zone');
+    var regionBtn = document.getElementById('me-scope-region');
+    var regionPicker = document.getElementById('me-region-picker');
+    var zonePicker = document.getElementById('me-zone-picker');
+    var zoneLabel = document.getElementById('me-zone-label');
+    var legendGhostDesc = document.getElementById('me-legend-ghost-desc');
+    var legendZoneDrag = document.getElementById('me-legend-zone-drag');
+
+    zoneBtn.className = scope === 'zone' ? 'tui-button cyan-168' : 'tui-button';
+    regionBtn.className = scope === 'region' ? 'tui-button cyan-168' : 'tui-button';
+    regionPicker.style.display = scope === 'region' ? 'inline-block' : 'none';
+
+    if (scope === 'region') {
+      zoneLabel.textContent = 'Create in:';
+      legendGhostDesc.textContent = 'cross-region room';
+      legendZoneDrag.style.display = 'inline';
+    } else {
+      zoneLabel.textContent = 'Zone:';
+      legendGhostDesc.textContent = 'cross-zone room';
+      legendZoneDrag.style.display = 'none';
+    }
+  }
+
+  document.getElementById('me-scope-zone').addEventListener('click', function() {
+    if (scope === 'zone') return;
+    // If a room is selected, switch to its zone; otherwise pick first zone
+    var targetZone = null;
+    if (selectedRoomId) {
+      var sel = state.rooms.find(function(r) { return r.id === selectedRoomId; });
+      if (sel) targetZone = (state.zones || []).find(function(z) { return z.id === sel.grid_zone_id; });
+    }
+    if (!targetZone) targetZone = (state.zones || state.available_zones || [])[0];
+    if (targetZone) {
+      navigateToZone(targetZone.id);
+    }
+  });
+
+  document.getElementById('me-scope-region').addEventListener('click', function() {
+    if (scope === 'region') return;
+    // Remember current zone to center on it in region view
+    var centerZone = zoneId;
+    // Derive region from zone data if available
+    var targetRegion = regionId;
+    if (state.zone && state.zone.region_id) targetRegion = state.zone.region_id;
+    navigateToRegion(targetRegion, centerZone);
+  });
+
+  updateScopeUI();
+
   // ── Init ───────────────────────────────────────────────────
+  // Apply initial 2.5D canvas styles
+  if (mode25D) {
+    zoomLevel = 1.25;
+    canvasWrap.style.display = 'flex';
+    canvasWrap.style.justifyContent = 'center';
+    canvasWrap.style.alignItems = 'center';
+  }
   loadData();
 })();
 </script>

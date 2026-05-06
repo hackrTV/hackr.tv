@@ -134,13 +134,9 @@ module Grid
         .where.not(room_type: "den")
         .order("grid_regions.name, grid_zones.name, grid_rooms.name")
         .references(:grid_zone, :grid_region).map do |r|
-        h = {"slug" => r.slug, "name" => r.name, "description" => r.description,
-             "zone_slug" => r.grid_zone.slug, "room_type" => r.room_type,
-             "min_clearance" => r.min_clearance}
-        h["map_x"] = r.map_x unless r.map_x.nil?
-        h["map_y"] = r.map_y unless r.map_y.nil?
-        h["map_z"] = r.map_z if r.map_z != 0
-        h.compact
+        {"slug" => r.slug, "name" => r.name, "description" => r.description,
+         "zone_slug" => r.grid_zone.slug, "room_type" => r.room_type,
+         "min_clearance" => r.min_clearance}.compact
       end
       write_yaml("rooms.yml", {"rooms" => rooms})
     end

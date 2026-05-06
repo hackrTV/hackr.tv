@@ -1,3 +1,5 @@
+<%= render "admin/shared/combobox" %>
+
 <% if @mob.errors.any? %>
   <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
     <p class="red-255-text">ERRORS:</p>
@@ -31,7 +33,16 @@
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
     <%= f.label :grid_room_id, "ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.select :grid_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @mob.grid_room_id), { include_blank: "(select room)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <input type="hidden" name="grid_mob[grid_room_id]" id="room-cb-hidden" value="<%= @mob.grid_room_id %>">
+    <div class="admin-combobox">
+      <input type="text" id="room-cb-input" class="admin-combobox-input<%= ' selected' if @mob.grid_room_id.present? %>" autocomplete="off"
+        placeholder="Type to search rooms..."
+        value="<%= "#{@mob.grid_room&.grid_zone&.name} / #{@mob.grid_room&.name}" if @mob.grid_room_id.present? %>">
+      <div id="room-cb-dropdown" class="admin-combobox-dropdown"></div>
+    </div>
+    <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="room-cb-status">
+      <%= @rooms.size %> rooms
+    </p>
   </div>
   <div style="flex: 1; min-width: 200px;">
     <%= f.label :grid_faction_id, "FACTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
@@ -346,6 +357,24 @@
     vBtnStructured.classList.add('green-168');
     vBtnRaw.classList.remove('green-168');
     vendorMode = 'structured';
+  });
+
+  // === Room Combobox ===
+  AdminCombobox.init({
+    inputId: 'room-cb-input',
+    hiddenId: 'room-cb-hidden',
+    dropdownId: 'room-cb-dropdown',
+    statusId: 'room-cb-status',
+    items: <%= raw @rooms.map { |r| { id: r.id, name: r.name, zone: r.grid_zone.name, region: r.grid_zone.grid_region.name } }.to_json %>,
+    getSearchText: function(r) { return (r.name + ' ' + r.zone + ' ' + r.region).toLowerCase(); },
+    getGroupKey: function(r) { return r.region + ' / ' + r.zone; },
+    renderOption: function(r, e) {
+      return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone) + '</span>';
+    },
+    getId: function(r) { return String(r.id); },
+    getLabel: function(r) { return r.zone + ' / ' + r.name; },
+    emptyText: 'No rooms match',
+    selectedText: 'Room selected'
   });
 
   // === Serialize on form submit ===
