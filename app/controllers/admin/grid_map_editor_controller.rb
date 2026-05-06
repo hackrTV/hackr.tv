@@ -567,10 +567,12 @@ class Admin::GridMapEditorController < Admin::ApplicationController
        reverse = reverse_exit_index[[e.from_room_id, e.to_room_id]]
        to_room = room_by_id[e.to_room_id] || ghost_rooms[e.to_room_id]
        to_zone = to_room&.grid_zone
-       exit_hash = {id: e.id, direction: e.direction, to_room_id: e.to_room_id,
-        to_room_name: to_room&.name || "unknown",
-        to_zone_name: to_zone&.name,
-        locked: e.locked?, reverse_exit_id: reverse&.id}
+       exit_hash = {
+         id: e.id, direction: e.direction, to_room_id: e.to_room_id,
+         to_room_name: to_room&.name || "unknown",
+         to_zone_name: to_zone&.name,
+         locked: e.locked?, reverse_exit_id: reverse&.id
+       }
        yield(exit_hash, e, to_room) if block_given?
        exit_hash
      },
@@ -783,14 +785,20 @@ class Admin::GridMapEditorController < Admin::ApplicationController
           tgt_bb = zone_bboxes[conn[:to]] || {width: 4, height: 4}
           dx, dy = conn[:vec]
 
-          offset_x = if dx > 0 then src_bb[:width] + zone_gap + 1
-                     elsif dx < 0 then -(tgt_bb[:width] + zone_gap + 1)
-                     else 0
-                     end
-          offset_y = if dy > 0 then src_bb[:height] + zone_gap + 1
-                     elsif dy < 0 then -(tgt_bb[:height] + zone_gap + 1)
-                     else 0
-                     end
+          offset_x = if dx > 0
+            src_bb[:width] + zone_gap + 1
+          elsif dx < 0
+            -(tgt_bb[:width] + zone_gap + 1)
+          else
+            0
+          end
+          offset_y = if dy > 0
+            src_bb[:height] + zone_gap + 1
+          elsif dy < 0
+            -(tgt_bb[:height] + zone_gap + 1)
+          else
+            0
+          end
 
           new_zx = zx + offset_x
           new_zy = zy + offset_y
