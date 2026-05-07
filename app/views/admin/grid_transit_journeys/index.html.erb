@@ -1,0 +1,74 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/transit_journeys :: TRANSIT JOURNEYS</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <%= form_with url: admin_grid_transit_journeys_path, method: :get, local: true, style: "margin-bottom: 20px;" do %>
+        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+          <%= select_tag :state, options_for_select([["All States", ""], ["active", "active"], ["completed", "completed"], ["abandoned", "abandoned"], ["ejected", "ejected"]], params[:state]), class: "tui-input", style: "font-family: monospace;", onchange: "this.form.submit()" %>
+          <%= select_tag :journey_type, options_for_select([["All Types", ""], ["slipstream", "slipstream"], ["local_public", "local_public"], ["local_private", "local_private"]], params[:journey_type]), class: "tui-input", style: "font-family: monospace;", onchange: "this.form.submit()" %>
+          <% if params[:state].present? || params[:journey_type].present? %>
+            <%= link_to "Clear", admin_grid_transit_journeys_path, class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="tui-window white-text" style="display: block; background: #0a0a0a; overflow-x: auto;">
+        <table class="tui-table" style="width: 100%; min-width: 900px;">
+          <thead>
+            <tr>
+              <th style="text-align: center;">ID</th>
+              <th style="text-align: left;">Hackr</th>
+              <th style="text-align: center;">Type</th>
+              <th style="text-align: left;">Route</th>
+              <th style="text-align: center;">State</th>
+              <th style="text-align: center;">Started</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @journeys.each do |j| %>
+              <tr>
+                <td style="text-align: center;"><%= j.id %></td>
+                <td><%= j.grid_hackr.hackr_alias %></td>
+                <td style="text-align: center;">
+                  <% color = j.slipstream? ? "#a78bfa" : "#22d3ee" %>
+                  <span style="color: <%= color %>;"><%= j.journey_type.upcase %></span>
+                </td>
+                <td>
+                  <% if j.slipstream? %>
+                    <%= j.grid_slipstream_route&.name || "—" %>
+                  <% else %>
+                    <%= j.grid_transit_route&.name || "—" %>
+                  <% end %>
+                </td>
+                <td style="text-align: center;">
+                  <% state_color = case j.state; when "active" then "#34d399"; when "completed" then "#6b7280"; when "abandoned" then "#fbbf24"; else "#f87171"; end %>
+                  <span style="color: <%= state_color %>;"><%= j.state.upcase %></span>
+                </td>
+                <td style="text-align: center; color: #6b7280;"><%= j.started_at&.strftime("%Y-%m-%d %H:%M") %></td>
+                <td style="text-align: right; white-space: nowrap;">
+                  <%= link_to "View", admin_grid_transit_journey_path(j), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                  <% if j.active? && dev_tools_enabled? %>
+                    <%= link_to "Abandon", force_abandon_admin_grid_transit_journey_path(j), data: { turbo_method: :post, turbo_confirm: "Force-abandon journey ##{j.id}?" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </fieldset>
+</div>

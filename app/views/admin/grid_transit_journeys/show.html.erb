@@ -1,0 +1,47 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/transit_journeys/<%= @journey.id %> :: TRANSIT JOURNEY</legend>
+    <div style="padding: 20px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h3 class="cyan-255-text" style="margin: 0 0 15px 0;">[:: JOURNEY ::]</h3>
+          <p><strong>Hackr:</strong> <span style="color: #a78bfa;"><%= @journey.grid_hackr.hackr_alias %></span></p>
+          <p><strong>Type:</strong> <%= @journey.journey_type %></p>
+          <% state_color = case @journey.state; when "active" then "#34d399"; when "completed" then "#6b7280"; when "abandoned" then "#fbbf24"; else "#f87171"; end %>
+          <p><strong>State:</strong> <span style="color: <%= state_color %>;"><%= @journey.state.upcase %></span></p>
+          <p><strong>Started:</strong> <%= @journey.started_at&.strftime("%Y-%m-%d %H:%M:%S") %></p>
+          <p><strong>Ended:</strong> <%= @journey.ended_at&.strftime("%Y-%m-%d %H:%M:%S") || "—" %></p>
+        </div>
+        <div>
+          <h3 class="cyan-255-text" style="margin: 0 0 15px 0;">[:: DETAILS ::]</h3>
+          <p><strong>Origin:</strong> <%= @journey.origin_room&.name || "—" %></p>
+          <p><strong>Destination:</strong> <%= @journey.destination_room&.name || "—" %></p>
+          <% if @journey.slipstream? %>
+            <p><strong>Route:</strong> <%= @journey.grid_slipstream_route&.name || "—" %></p>
+            <p><strong>Current Leg:</strong> <%= @journey.current_leg&.name || "—" %></p>
+            <p><strong>Legs Completed:</strong> <%= @journey.legs_completed %> / <%= @journey.total_legs %></p>
+            <p><strong>Heat Accumulated:</strong> <%= @journey.heat_accumulated %></p>
+            <p><strong>Pending Fork:</strong> <%= @journey.pending_fork? ? "Yes" : "No" %></p>
+            <p><strong>Breach Mid-Journey:</strong> <%= @journey.breach_mid_journey? ? "Yes" : "No" %></p>
+          <% else %>
+            <p><strong>Route:</strong> <%= @journey.grid_transit_route&.name || "—" %></p>
+            <p><strong>Current Stop:</strong> <%= @journey.current_stop&.display_name || "—" %></p>
+            <p><strong>Fare Paid:</strong> <%= @journey.fare_paid %> CRED</p>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @journey.meta.present? && @journey.meta != {} %>
+        <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: META ::]</h3>
+        <pre style="background: #111; padding: 10px; overflow-x: auto; color: #9ca3af;"><%= JSON.pretty_generate(@journey.meta) %></pre>
+      <% end %>
+
+      <div style="margin-top: 20px;">
+        <% if @journey.active? && dev_tools_enabled? %>
+          <%= link_to "Force Abandon", force_abandon_admin_grid_transit_journey_path(@journey), data: { turbo_method: :post, turbo_confirm: "Force-abandon this journey?" }, class: "tui-button red-168", style: "padding: 8px 20px;" %>
+        <% end %>
+        <%= link_to "Back", admin_grid_transit_journeys_path, class: "tui-button", style: "padding: 8px 20px; margin-left: 10px;" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

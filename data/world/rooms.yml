@@ -11232,3 +11232,331 @@ rooms:
     zone_slug: the-railyard
     room_type: standard
 
+  # ══════════════════════════════════════════════════════
+  # SLIPSTREAM ACCESS POINTS
+  # Service hatches, maintenance platforms, and freight loading bays
+  # located near Grid facilities. CL15+ required to board.
+  # ══════════════════════════════════════════════════════
+
+  # --- THE LAKESHORE (lakefront-terminal) ---
+  - name: "Slipstream Gate South"
+    slug: lakeshore-slip-south
+    description: "A service hatch behind the Lakefront Terminal's boiler room, concealed beneath a maintenance platform that hasn't appeared on any GovCorp schematic in decades. The air smells of heated steel and old grease. A freight elevator descends into corridors that officially do not exist."
+    zone_slug: lakefront-terminal
+    room_type: transit
+
+  - name: "Slipstream Gate East"
+    slug: lakeshore-slip-east
+    description: "An access point behind the terminal's eastern loading dock, where automated freight containers stack three high. The Fracture Network cut a passage between two container bays — from the outside it looks like a gap in the shipping schedule."
+    zone_slug: lakefront-terminal
+    room_type: transit
+
+  - name: "Slipstream Gate West"
+    slug: lakeshore-slip-west
+    description: "The western service corridor terminates at a freight elevator shaft that GovCorp's maintenance logs show as 'permanently decommissioned.' The Fracture Network disagrees. A concealed hatch opens onto rails that stretch west into the dark."
+    zone_slug: lakefront-terminal
+    room_type: transit
+
+  # --- THE ARCH (warehouse-row) ---
+  - name: "Slipstream Gate North"
+    slug: arch-slip-north
+    description: "Behind a loading dock on Warehouse Row, a false wall swings open on counterweighted hinges. The RIDE deadzone extends this far — GovCorp's sensors are blind here. The corridor beyond hums with freight rail that the Network has been riding for years without detection."
+    zone_slug: warehouse-row
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: arch-slip-south
+    description: "A basement access beneath the oldest warehouse on the row. Brick walls give way to poured concrete, then to steel-reinforced tunnels that predate the Consolidation. The deadzone makes this the safest boarding point on the continent."
+    zone_slug: warehouse-row
+    room_type: transit
+
+  - name: "Slipstream Gate East"
+    slug: arch-slip-east
+    description: "The eastern dock's drainage system connects to an older tunnel network that runs beneath the riverbank. Water drips from overhead, but the rails are dry and maintained. The deadzone interference fades as the corridor extends eastward."
+    zone_slug: warehouse-row
+    room_type: transit
+
+  - name: "Slipstream Gate West"
+    slug: arch-slip-west
+    description: "A service tunnel behind the western warehouse wall, marked with faded Fracture Network chalk signs. The air is cool and still — the deadzone suppresses even the ambient electromagnetic hum that GovCorp infrastructure usually generates."
+    zone_slug: warehouse-row
+    room_type: transit
+
+  # --- THE RIVERLANDS (bluff-station) ---
+  - name: "Slipstream Gate North"
+    slug: riverlands-slip-north
+    description: "Below the Bluff Station platform, a maintenance access leads to service tunnels carved into the limestone bluff. The arrival board above still shows Slipstream corridor status if you know which numbers to read."
+    zone_slug: bluff-station
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: riverlands-slip-south
+    description: "A freight loading bay at the base of the bluff, where river barges once transferred cargo to rail. The Fracture Network converted the transfer machinery into a concealed Slipstream boarding platform. The river smell is constant."
+    zone_slug: bluff-station
+    room_type: transit
+
+  - name: "Slipstream Gate East"
+    slug: riverlands-slip-east
+    description: "An access point behind the station's eastern retaining wall, where the limestone has been cut to accommodate a service passage. The route heads into the foothills — mountain air replaces river humidity within the first hundred meters."
+    zone_slug: bluff-station
+    room_type: transit
+
+  # --- THE BEND (pump-station) ---
+  - name: "Slipstream Gate North"
+    slug: bend-slip-north
+    description: "The pump station's deepest level, below the flood control machinery. Water pressure regulators mask the vibration of freight rail running beneath the levee system. Everything is damp. The rails lead upriver."
+    zone_slug: pump-station
+    room_type: transit
+
+  - name: "Slipstream Gate East"
+    slug: bend-slip-east
+    description: "An access hatch in the pump station's eastern drainage gallery. The corridor runs alongside municipal water infrastructure — the constant flow of pumped water creates enough noise and vibration to mask transit signatures from GovCorp sensors."
+    zone_slug: pump-station
+    room_type: transit
+
+  - name: "Slipstream Gate West"
+    slug: bend-slip-west
+    description: "The western pump gallery connects to a freight corridor that follows the gulf coast. Salt corrosion on the walls tells you how close the sea is. The rails are maintained but the walls are not."
+    zone_slug: pump-station
+    room_type: transit
+
+  # --- THE MARSHES (the-causeway) ---
+  - name: "Slipstream Gate West"
+    slug: marshes-slip-west
+    description: "Below the causeway's central support pylon, a service access descends to corridors that run along the road's foundation piles. The ground is uncertain — concrete and steel driven into swamp muck that shifts with the tides."
+    zone_slug: the-causeway
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: marshes-slip-north
+    description: "An access point beneath the causeway's northern abutment, where the road meets solid ground. The corridor heads inland through mangrove root systems that GovCorp's infrastructure planners never bothered to map."
+    zone_slug: the-causeway
+    room_type: transit
+
+  # --- THE FLATS (the-pipeline) ---
+  - name: "Slipstream Gate East"
+    slug: flats-slip-east
+    description: "An access hatch inside a pipeline junction facility, camouflaged among the valves and regulators of the petrochemical infrastructure. The corridor follows oil pipelines east — industrial camouflage at its finest."
+    zone_slug: the-pipeline
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: flats-slip-north
+    description: "The pipeline's northern terminus connects to freight infrastructure that runs straight north across the plains. Nothing but flat prairie above and steel below. The longest and most exposed corridors on the Slipstream network."
+    zone_slug: the-pipeline
+    room_type: transit
+
+  - name: "Slipstream Gate West"
+    slug: flats-slip-west
+    description: "A service access in the pipeline's western junction, where petrochemical freight meets desert logistics. The corridor heads toward red rock country, trading humidity for dry heat."
+    zone_slug: the-pipeline
+    room_type: transit
+
+  # --- THE CANYON (the-rim) ---
+  - name: "Slipstream Gate East"
+    slug: canyon-slip-east
+    description: "A concealed access point at the rim's eastern edge, where cable tramway machinery provides cover for the service hatch beneath. The corridor runs along the canyon rim before descending into the rock."
+    zone_slug: the-rim
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: canyon-slip-north
+    description: "Behind a geological survey station on the northern rim. The rock walls of the access corridor show layers of geological time — red sandstone, limestone, shale. GovCorp's signal fails at depth; the Network rides that failure."
+    zone_slug: the-rim
+    room_type: transit
+
+  - name: "Slipstream Gate West"
+    slug: canyon-slip-west
+    description: "The western rim access drops into a corridor carved through Kaibab limestone. Desert wind howls at the entrance but the corridor is dead still. The rails lead toward the coast through some of the driest country on the continent."
+    zone_slug: the-rim
+    room_type: transit
+
+  # --- THE BASIN (the-channel) ---
+  - name: "Slipstream Gate East"
+    slug: basin-slip-east
+    description: "A service access beneath the concrete channel's eastern bank, hidden among flood control infrastructure that Los Angeles stopped needing when GovCorp engineered the weather. The corridor smells like sun-baked concrete and machine oil."
+    zone_slug: the-channel
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: basin-slip-north
+    description: "The channel's northern terminus connects to coastal freight infrastructure. Approaching GovCorp's entertainment capital from the north means approaching the most surveilled region on the continent. The Fracture Network moves carefully here."
+    zone_slug: the-channel
+    room_type: transit
+
+  # --- THE GATE (drydock) ---
+  - name: "Slipstream Gate South"
+    slug: gate-slip-south
+    description: "Deep in the drydock's sub-basement, behind decommissioned ship repair machinery. The bay's fog helps — moisture in the air attenuates sensor arrays. The corridor south follows undersea cable routes along the coast."
+    zone_slug: drydock
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: gate-slip-north
+    description: "A service tunnel beneath the drydock's northern seawall, where tidal engineering infrastructure masks the entrance. The corridor runs through old-growth forest roots and volcanic rock — natural RIDE attenuation all the way north."
+    zone_slug: drydock
+    room_type: transit
+
+  - name: "Slipstream Gate East"
+    slug: gate-slip-east
+    description: "The drydock's eastern access connects to freight tunnels that bore straight through the Sierra. The longest single-leg corridor on the western Slipstream network — mountain rock shields the entire crossing."
+    zone_slug: drydock
+    room_type: transit
+
+  # --- THE CANOPY (the-waterfront) ---
+  - name: "Slipstream Gate South"
+    slug: canopy-slip-south
+    description: "Below the waterfront's ferry terminal, an access leads to corridors that run beneath the river. The persistent rain above creates ground-level noise that helps mask transit vibrations from the surface sensor grid."
+    zone_slug: the-waterfront
+    room_type: transit
+
+  - name: "Slipstream Gate East"
+    slug: canopy-slip-east
+    description: "A service hatch behind the waterfront's cargo handling facility, concealed by stacked shipping containers. The corridor heads east through volcanic mountain passes — lava tubes that the Fracture Network discovered decades before GovCorp mapped the region."
+    zone_slug: the-waterfront
+    room_type: transit
+
+  # --- THE BADLANDS (the-outpost) ---
+  - name: "Slipstream Gate East"
+    slug: badlands-slip-east
+    description: "An access point beneath the outpost's supply depot, where monthly freight deliveries provide cover for Slipstream operations. Out here, GovCorp barely monitors — there's nobody to watch. The corridor heads east across a thousand miles of nothing."
+    zone_slug: the-outpost
+    room_type: transit
+
+  - name: "Slipstream Gate West"
+    slug: badlands-slip-west
+    description: "A service tunnel behind the outpost's western perimeter, dug into eroded rock. The corridor follows old highway infrastructure west toward the mountain passes. Wind from the surface whistles through ventilation grates."
+    zone_slug: the-outpost
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: badlands-slip-south
+    description: "The outpost's southernmost access point, where the high plains begin their descent toward the Front Range. Coverage is thin in both directions — the Badlands' emptiness extends its protection into the first leg of transit."
+    zone_slug: the-outpost
+    room_type: transit
+
+  # --- THE FRONT (snow-station) ---
+  - name: "Slipstream Gate East"
+    slug: front-slip-east
+    description: "Beneath the snow station's gondola machinery, a service corridor drops into the mountain. The altitude makes GovCorp's sensors struggle with false positives — thin air carries signals strangely."
+    zone_slug: snow-station
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: front-slip-south
+    description: "A maintenance tunnel behind the station's southern platform, descending through switchback corridors into freight infrastructure that runs south across the high plains. The corridor is cold year-round."
+    zone_slug: snow-station
+    room_type: transit
+
+  - name: "Slipstream Gate South (Canyon)"
+    slug: front-slip-south-canyon
+    description: "A second southern access point on the station's lower level, routing through a different tunnel system toward the desert and canyon country. The air transitions from mountain cold to desert dry within the first leg."
+    zone_slug: snow-station
+    room_type: transit
+
+  - name: "Slipstream Gate West"
+    slug: front-slip-west
+    description: "The station's western service corridor bores into the mountain range itself. The Fracture Network spent years carving this route — it crosses the Continental Divide underground, following mining infrastructure that predates the Consolidation."
+    zone_slug: snow-station
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: front-slip-north
+    description: "Behind the warming hut at the station's northern edge, a hatch opens onto a corridor that descends through the foothills toward the open plains. The coverage thins as you head north — the Badlands' emptiness is an asset."
+    zone_slug: snow-station
+    room_type: transit
+
+  # --- THE STRAITS (the-crossing) ---
+  - name: "Slipstream Gate West"
+    slug: straits-slip-west
+    description: "Below the bridge crossing's western abutment, a service corridor runs alongside old automotive supply tunnels. The strait's industrial history left infrastructure that GovCorp repurposed but never fully audited."
+    zone_slug: the-crossing
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: straits-slip-south
+    description: "An access point beneath the crossing's southern checkpoint, where the tunnel system connects to rail infrastructure running south through the lake country toward the steel valleys."
+    zone_slug: the-crossing
+    room_type: transit
+
+  - name: "Slipstream Gate East"
+    slug: straits-slip-east
+    description: "The crossing's eastern tunnel extension, built for automotive traffic that never materialized. The Fracture Network uses the overbuilt infrastructure — four lanes of tunnel for a single rail track, with plenty of room to disappear."
+    zone_slug: the-crossing
+    room_type: transit
+
+  # --- THE WORKS (the-railyard) ---
+  - name: "Slipstream Gate West"
+    slug: works-slip-west
+    description: "Deep in the railyard's switching complex, a spur track leads to a dead-end tunnel that isn't dead-end at all. The coal dust in the air has been there for a century. The freight traffic provides perfect acoustic camouflage."
+    zone_slug: the-railyard
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: works-slip-north
+    description: "An access beneath the railyard's northern signal tower, where the switching control room provides visual cover for the hatch below. The corridor follows old ore transport routes toward the lake country."
+    zone_slug: the-railyard
+    room_type: transit
+
+  - name: "Slipstream Gate Northwest"
+    slug: works-slip-northwest
+    description: "A service corridor behind the railyard's westernmost engine house, routing through mountain tunnels toward the harbor city. Century-old railroad bores through the Alleghenies — the oldest infrastructure on the Slipstream network."
+    zone_slug: the-railyard
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: works-slip-south
+    description: "Below the railyard's coal bunker, where the loading mechanism's vibrations mask transit activity. The corridor follows the river south into the mountain hollows — coal country rail that nobody audits anymore."
+    zone_slug: the-railyard
+    room_type: transit
+
+  # --- THE HOLLOWS (coal-run) ---
+  - name: "Slipstream Gate West"
+    slug: hollows-slip-west
+    description: "An old mine entrance behind the coal processing facility, shored up with timber that the Fracture Network reinforced with stolen GovCorp structural alloy. The corridor follows creek beds westward toward the river country."
+    zone_slug: coal-run
+    room_type: transit
+
+  - name: "Slipstream Gate North"
+    slug: hollows-slip-north
+    description: "A service tunnel beneath the rail siding at Coal Run, where the narrow-gauge track connects to standard gauge infrastructure. The corridor climbs through mountain passes toward the harbor city. Signal dies in the hollows."
+    zone_slug: coal-run
+    room_type: transit
+
+  - name: "Slipstream Gate North (Works)"
+    slug: hollows-slip-north-works
+    description: "A second northern access at Coal Run's upper switchback, routing through a different tunnel system toward the steel valleys. The coal dust and ore residue in the walls are indistinguishable from the railyard's own contamination."
+    zone_slug: coal-run
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: hollows-slip-south
+    description: "The deepest access point in Coal Run, below the old mine's third level. The corridor descends through the piedmont toward the coastal wetlands. Mountain cool gives way to subtropical humidity within two legs."
+    zone_slug: coal-run
+    room_type: transit
+
+  # --- THE NARROWS (sub-level) ---
+  - name: "Slipstream Gate West"
+    slug: narrows-slip-west
+    description: "In the sub-level's deepest utility corridor, behind a bank of transformers that the Fracture Network rerouted around. The most heavily surveilled boarding point on the continent — operatives use it only when the alternatives are worse."
+    zone_slug: sub-level
+    room_type: transit
+
+  - name: "Slipstream Gate West (Straits)"
+    slug: narrows-slip-west-straits
+    description: "A secondary western access point in the sub-level's drainage system, routing through old transit tunnels toward the lake country. Separate from the main western gate to allow parallel corridor usage without heat overlap."
+    zone_slug: sub-level
+    room_type: transit
+
+  - name: "Slipstream Gate Southwest"
+    slug: narrows-slip-southwest
+    description: "A concealed access beneath the sub-level's ventilation system, routing southwest through mountain tunnels toward the steel valleys. The Fracture Network built this gate specifically to bypass the main western corridor's surveillance load."
+    zone_slug: sub-level
+    room_type: transit
+
+  - name: "Slipstream Gate South"
+    slug: narrows-slip-south
+    description: "The sub-level's southern access, behind a decommissioned signal relay station. The corridor follows old rail infrastructure south through the Appalachian gaps into the mountain hollows. RIDE saturation drops fast once you clear the harbor district."
+    zone_slug: sub-level
+    room_type: transit
+

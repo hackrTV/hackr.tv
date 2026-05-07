@@ -1,0 +1,32 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/slipstream_routes/<%= @route.slug %> :: SLIPSTREAM ROUTE</legend>
+    <div style="padding: 20px;">
+      <p><strong>Name:</strong> <%= @route.name %></p>
+      <p><strong>Origin:</strong> <%= @route.origin_region.name %> &rarr; <strong>Destination:</strong> <%= @route.destination_region.name %></p>
+      <p><strong>Clearance:</strong> CL<%= @route.min_clearance %>+</p>
+      <p><strong>Heat Cost:</strong> <%= @route.base_heat_cost %> | <strong>Detection:</strong> <%= @route.detection_risk_base %>%</p>
+
+      <% if @legs.any? %>
+        <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: LEGS ::]</h3>
+        <% @legs.each do |leg| %>
+          <div style="border: 1px solid #333; padding: 10px; margin: 5px 0;">
+            <strong>Leg <%= leg.position %>:</strong> <%= leg.name %>
+            <% if leg.has_forks? %>
+              <div style="margin-left: 20px; color: #9ca3af;">
+                <% leg.fork_options.each do |opt| %>
+                  <div>[<%= opt["key"] %>] <%= opt["label"] %> (risk: <%= opt["risk_modifier"] %>)</div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <div style="margin-top: 20px;">
+        <%= link_to "Edit", edit_admin_grid_slipstream_route_path(@route), class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= link_to "Back", admin_grid_slipstream_routes_path, class: "tui-button", style: "padding: 8px 20px; margin-left: 10px;" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

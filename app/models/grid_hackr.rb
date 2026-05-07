@@ -39,6 +39,7 @@ class GridHackr < ApplicationRecord
   include GridHackr::Stats
   include GridHackr::Loadout
   include GridHackr::Breach
+  include GridHackr::Transit
 
   has_paper_trail ignore: %i[
     password_digest api_token_digest last_activity_at stats

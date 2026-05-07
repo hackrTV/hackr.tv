@@ -120,6 +120,12 @@ module Grid
         derive(@hackr.stat("protocols_dismantled_count").to_i, data[:count].to_i)
       when "data_extracted"
         derive(@hackr.stat("data_extracted_count").to_i, data[:count].to_i)
+      when "transits_completed_count"
+        derive(@hackr.stat("local_transit_trips_count").to_i, data[:count].to_i)
+      when "slipstreams_completed_count"
+        derive(@hackr.stat("slipstream_trips_count").to_i, data[:count].to_i)
+      when "regions_visited_count"
+        derive(@hackr.stat("regions_visited_count").to_i, data[:count].to_i)
       end
     end
 
@@ -317,6 +323,10 @@ module Grid
         return data[:item_name].blank? || data[:item_name].to_s.downcase == context[:item_name].to_s.downcase
       when "breach_completed"
         return data[:template_slug].blank? || data[:template_slug].to_s == context[:template_slug].to_s
+      when "local_transit_completed"
+        return data[:transit_type_slug].blank? || data[:transit_type_slug].to_s == context[:transit_type_slug].to_s
+      when "slipstream_completed"
+        return data[:route_slug].blank? || data[:route_slug].to_s == context[:route_slug].to_s
       when "manual"
         return false
       end

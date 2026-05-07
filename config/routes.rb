@@ -96,6 +96,7 @@ Rails.application.routes.draw do
   get "loadout", to: "pages#spa_root", as: :loadout
   get "gear", to: redirect("/loadout")
   get "deck", to: "pages#spa_root", as: :deck_page
+  get "transit", to: "pages#spa_root", as: :transit_page
 
   # Codex (wiki) routes - SPA
   scope "codex" do
@@ -170,6 +171,7 @@ Rails.application.routes.draw do
     get "grid/schematics", to: "grid#schematics_index"
     get "grid/loadout", to: "grid#loadout_index"
     get "grid/deck", to: "grid#deck_index"
+    get "grid/transit", to: "grid#transit_index"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"
     get "grid/verify/:token", to: "grid#verify_token"
@@ -487,6 +489,30 @@ Rails.application.routes.draw do
     resources :grid_breach_encounters, except: [:show] do
       member do
         get :history
+      end
+    end
+
+    # Transit system
+    resources :grid_transit_types, except: [:show] do
+      member do
+        get :history
+      end
+    end
+    resources :grid_transit_routes do
+      member do
+        get :history
+        post :add_stop
+        delete :remove_stop
+      end
+    end
+    resources :grid_slipstream_routes do
+      member do
+        get :history
+      end
+    end
+    resources :grid_transit_journeys, only: %i[index show] do
+      member do
+        post :force_abandon
       end
     end
 
