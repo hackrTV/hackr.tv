@@ -234,11 +234,21 @@ module Grid
         end
       end
 
-      # Local transit indicator — show routes that stop at this room
+      # Local transit indicator — show public routes that stop at this room
       local_routes = Grid::LocalTransitService.routes_at_room(room: room, hackr: hackr)
       if local_routes.any?
         output << ""
         output << Grid::TransitRenderer.render_available_routes(local_routes, hackr)
+      end
+
+      # Private transit indicator — show hailable types + destinations when in a transit room
+      private_types = Grid::LocalTransitService.private_types_at_room(room: room, hackr: hackr)
+      if private_types.any?
+        destinations = Grid::LocalTransitService.private_destinations(room: room)
+        if destinations.any?
+          output << ""
+          output << Grid::TransitRenderer.render_private_types(private_types, destinations, room)
+        end
       end
 
       output << ""
@@ -938,14 +948,6 @@ module Grid
       route = routes.find { |r| r.slug == route_slug }
       return "<span style='color: #f87171;'>Route '#{h(route_slug)}' not available here. Type <span style='color: #22d3ee;'>transit</span> to see routes.</span>" unless route
 
-      type = route.grid_transit_type
-
-      if type.private_point?
-        # Private: need destination — "board taxi-car <destination>"
-        # For now, show available stops
-        return "<span style='color: #fbbf24;'>Private transit requires a destination. Use <span style='color: #22d3ee;'>hail #{h(route_slug)} &lt;stop-name&gt;</span>.</span>"
-      end
-
       result = Grid::LocalTransitService.board!(hackr: hackr, route: route)
       result.display
     rescue Grid::LocalTransitService::AlreadyInJourney
@@ -960,49 +962,45 @@ module Grid
       return "<span style='color: #fbbf24;'>Hail what? e.g. <span style='color: #22d3ee;'>hail taxi-car &lt;destination&gt;</span></span>" unless args&.any?
 
       room = hackr.current_room
-      routes = Grid::LocalTransitService.routes_at_room(room: room, hackr: hackr)
+      private_types = Grid::LocalTransitService.private_types_at_room(room: room, hackr: hackr)
 
-      # First arg is route slug, rest is destination name
-      route_slug = args.first
+      # First arg is type slug, rest is destination name
+      type_slug = args.first
       dest_name = args[1..]&.join(" ")
 
-      route = routes.find { |r| r.slug == route_slug }
-      unless route
-        return "<span style='color: #f87171;'>'#{h(route_slug)}' not available here. Type <span style='color: #22d3ee;'>transit</span> to see options.</span>"
+      transit_type = private_types.find { |t| t.slug == type_slug }
+      unless transit_type
+        return "<span style='color: #f87171;'>'#{h(type_slug)}' not available here. Type <span style='color: #22d3ee;'>look</span> to see options.</span>"
       end
 
-      unless route.grid_transit_type.private_point?
-        return "<span style='color: #9ca3af;'>Use <span style='color: #22d3ee;'>board #{h(route_slug)}</span> for public transit.</span>"
-      end
+      destinations = Grid::LocalTransitService.private_destinations(room: room)
 
       unless dest_name.present?
-        # Show available destinations
-        stops = route.grid_transit_stops.includes(:grid_room).order(:position)
-        lines = ["<span style='color: #fbbf24;'>Available destinations:</span>"]
-        stops.each do |s|
-          next if s.grid_room_id == room.id
-          lines << "  <span style='color: #22d3ee;'>hail #{h(route_slug)} #{h(s.display_name.downcase)}</span>"
+        lines = ["<span style='color: #fbbf24;'>Available destinations for #{h(transit_type.name)}:</span>"]
+        destinations.each do |d|
+          lines << "  <span style='color: #22d3ee;'>hail #{h(type_slug)} #{h(d.name.downcase)}</span> <span style='color: #6b7280;'>(#{h(d.grid_zone.name)})</span>"
         end
         return lines.join("\n")
       end
 
-      # Find destination stop by name match
-      stops = route.grid_transit_stops.includes(:grid_room).to_a
-      dest_stop = stops.find { |s| s.display_name.downcase == dest_name.downcase }
-      dest_stop ||= stops.find { |s| s.display_name.downcase.include?(dest_name.downcase) }
+      # Find destination room by name match
+      dest_room = destinations.find { |d| d.name.downcase == dest_name.downcase }
+      dest_room ||= destinations.find { |d| d.name.downcase.include?(dest_name.downcase) }
 
-      unless dest_stop
-        return "<span style='color: #f87171;'>Destination '#{h(dest_name)}' not found on this route.</span>"
+      unless dest_room
+        return "<span style='color: #f87171;'>Destination '#{h(dest_name)}' not found in this region.</span>"
       end
 
-      result = Grid::LocalTransitService.board!(hackr: hackr, route: route, destination_stop: dest_stop)
+      result = Grid::LocalTransitService.board_private!(hackr: hackr, transit_type: transit_type, destination_room: dest_room)
       result.display
     rescue Grid::LocalTransitService::AlreadyInJourney
       "<span style='color: #f87171;'>Already in transit.</span>"
     rescue Grid::LocalTransitService::InsufficientFunds
       "<span style='color: #f87171;'>Insufficient CRED for fare.</span>"
     rescue Grid::LocalTransitService::AlreadyAtDestination
-      "<span style='color: #f87171;'>You're already at that stop.</span>"
+      "<span style='color: #f87171;'>You're already there.</span>"
+    rescue Grid::LocalTransitService::NotAtTransitStop
+      "<span style='color: #f87171;'>You must be at a transit location to hail private transport.</span>"
     end
 
     def slipstream_command(args)

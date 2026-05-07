@@ -136,44 +136,72 @@ RSpec.describe Grid::LocalTransitService do
     end
   end
 
-  describe "private transit" do
+  describe "private transit (route-free)" do
     let(:private_type) { create(:grid_transit_type, :private_type) }
-    let(:private_route) do
-      create(:grid_transit_route, grid_transit_type: private_type, grid_region: region).tap do |r|
-        create(:grid_transit_stop, grid_transit_route: r, grid_room: room_a, position: 0)
-        create(:grid_transit_stop, grid_transit_route: r, grid_room: room_b, position: 1)
-        create(:grid_transit_stop, grid_transit_route: r, grid_room: room_c, position: 2)
-      end
-    end
+    let!(:assignment) { create(:grid_region_transit_assignment, grid_region: region, grid_transit_type: private_type) }
 
-    it "boards with destination and arrives in single wait" do
-      dest_stop = private_route.grid_transit_stops.find_by(position: 2)
-      result = described_class.board!(hackr: hackr, route: private_route, destination_stop: dest_stop)
+    it "boards with destination room and arrives in single wait" do
+      result = described_class.board_private!(hackr: hackr, transit_type: private_type, destination_room: room_c)
       expect(result.journey.journey_type).to eq("local_private")
+      expect(result.journey.destination_room).to eq(room_c)
+      expect(result.fare_charged).to eq(private_type.base_fare)
 
       wait_result = described_class.wait!(hackr: hackr)
       expect(wait_result.arrived).to be true
       expect(hackr.reload.current_room).to eq(room_c)
     end
 
-    it "raises DestinationNotOnRoute without destination" do
-      expect {
-        described_class.board!(hackr: hackr, route: private_route)
-      }.to raise_error(Grid::LocalTransitService::DestinationNotOnRoute)
+    it "charges flat base fare" do
+      result = described_class.board_private!(hackr: hackr, transit_type: private_type, destination_room: room_c)
+      expect(result.fare_charged).to eq(private_type.base_fare)
     end
 
-    it "raises AlreadyAtDestination when destination is current stop" do
-      dest_stop = private_route.grid_transit_stops.find_by(position: 0)
+    it "raises AlreadyAtDestination when destination is current room" do
       expect {
-        described_class.board!(hackr: hackr, route: private_route, destination_stop: dest_stop)
+        described_class.board_private!(hackr: hackr, transit_type: private_type, destination_room: room_a)
       }.to raise_error(Grid::LocalTransitService::AlreadyAtDestination)
     end
 
-    it "scales fare by distance" do
-      dest_stop = private_route.grid_transit_stops.find_by(position: 2)
-      result = described_class.board!(hackr: hackr, route: private_route, destination_stop: dest_stop)
-      # Distance is 2 stops, fare = base_fare * max(distance, 1)
-      expect(result.fare_charged).to eq(private_type.base_fare * 2)
+    it "raises NotAtTransitStop when not in a transit room" do
+      standard_room = create(:grid_room, :standard, grid_zone: zone)
+      hackr.update!(current_room: standard_room)
+      expect {
+        described_class.board_private!(hackr: hackr, transit_type: private_type, destination_room: room_a)
+      }.to raise_error(Grid::LocalTransitService::NotAtTransitStop)
+    end
+
+    it "raises InsufficientFunds when hackr cannot afford fare" do
+      Grid::TransactionService.burn!(from_cache: cache, amount: 1000, memo: "drain")
+      expect {
+        described_class.board_private!(hackr: hackr, transit_type: private_type, destination_room: room_c)
+      }.to raise_error(Grid::LocalTransitService::InsufficientFunds)
+    end
+  end
+
+  describe ".private_types_at_room" do
+    let(:private_type) { create(:grid_transit_type, :private_type) }
+    let!(:assignment) { create(:grid_region_transit_assignment, grid_region: region, grid_transit_type: private_type) }
+
+    it "returns private types for transit rooms in the region" do
+      results = described_class.private_types_at_room(room: room_a, hackr: hackr)
+      expect(results).to include(private_type)
+    end
+
+    it "returns empty for non-transit rooms" do
+      standard_room = create(:grid_room, :standard, grid_zone: zone)
+      results = described_class.private_types_at_room(room: standard_room, hackr: hackr)
+      expect(results).to be_empty
+    end
+  end
+
+  describe ".private_destinations" do
+    it "returns other transit rooms in the region" do
+      # Force room creation before query
+      room_b
+      room_c
+      results = described_class.private_destinations(room: room_a)
+      expect(results.map(&:id)).to include(room_b.id, room_c.id)
+      expect(results.map(&:id)).not_to include(room_a.id)
     end
   end
 

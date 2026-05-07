@@ -88,6 +88,50 @@ module Grid
         lines.join("\n")
       end
 
+      # === Private Transit (route-free) ===
+
+      def render_private_board(journey, transit_type, destination_room)
+        lines = []
+        lines << ""
+        lines << separator
+        lines << "<span style='color: #fbbf24; font-weight: bold;'>[#{h(transit_type.icon_key || "PRIVATE")}] #{h(transit_type.name).upcase}</span>"
+        lines << separator
+        lines << "<span style='color: #9ca3af;'>Destination: <span style='color: #22d3ee; font-weight: bold;'>#{h(destination_room.name)}</span> (#{h(destination_room.grid_zone.name)})</span>"
+        lines << "<span style='color: #9ca3af;'>Fare: #{journey.fare_paid} CRED</span>"
+        lines << ""
+        lines << "<span style='color: #6b7280;'>Type <span style='color: #22d3ee;'>wait</span> to travel. <span style='color: #22d3ee;'>abandon</span> to cancel.</span>"
+        lines.join("\n")
+      end
+
+      def render_private_arrival(journey, room)
+        lines = []
+        lines << ""
+        type_slug = journey.meta&.dig("transit_type_slug")
+        type = type_slug ? GridTransitType.find_by(slug: type_slug) : nil
+        icon = type&.icon_key || "PRIVATE"
+        lines << "<span style='color: #34d399; font-weight: bold;'>[#{h(icon)}] ARRIVED: #{h(room.name)}</span>"
+        lines << "<span style='color: #9ca3af;'>#{h(room.grid_zone.name)}</span>"
+        lines.join("\n")
+      end
+
+      def render_private_types(types, destinations, room)
+        lines = []
+        lines << "<span style='color: #fbbf24; font-weight: bold;'>[ PRIVATE TRANSIT ]</span>"
+        types.each do |t|
+          lines << "  <span style='color: #fbbf24;'>[#{h(t.icon_key || "PRIVATE")}]</span> <span style='color: #d0d0d0;'>#{h(t.name)}</span> <span style='color: #6b7280;'>— #{t.base_fare} CRED</span>"
+        end
+        lines << "<span style='color: #6b7280;'>  Destinations:</span>"
+        destinations.each do |d|
+          lines << "    <span style='color: #9ca3af;'>#{h(d.name)}</span> <span style='color: #6b7280;'>(#{h(d.grid_zone.name)})</span>"
+        end
+        type_example = types.first
+        dest_example = destinations.first
+        if type_example && dest_example
+          lines << "<span style='color: #6b7280;'>  Use: <span style='color: #22d3ee;'>hail #{h(type_example.slug)} #{h(dest_example.name.downcase)}</span></span>"
+        end
+        lines.join("\n")
+      end
+
       # === Slipstream ===
 
       def render_slipstream_board(journey, route, first_leg)

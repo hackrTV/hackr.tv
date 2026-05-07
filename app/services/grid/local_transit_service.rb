@@ -36,6 +36,35 @@ module Grid
       new(hackr).status
     end
 
+    # Private transit types available at this room (route-free, region-wide)
+    def self.private_types_at_room(room:, hackr:)
+      return [] unless room.room_type == "transit"
+      region = room.grid_zone&.grid_region
+      return [] unless region
+
+      GridRegionTransitAssignment
+        .where(grid_region: region)
+        .includes(:grid_transit_type)
+        .map(&:grid_transit_type)
+        .select { |t| t.private_point? && t.published? && hackr.stat("clearance").to_i >= t.min_clearance }
+    end
+
+    # All transit rooms in the same region as the given room (for private destinations)
+    def self.private_destinations(room:)
+      region = room.grid_zone&.grid_region
+      return [] unless region
+
+      GridRoom.where(room_type: "transit")
+        .joins(:grid_zone).where(grid_zones: {grid_region_id: region.id})
+        .where.not(id: room.id)
+        .includes(:grid_zone)
+        .order(:name)
+    end
+
+    def self.board_private!(hackr:, transit_type:, destination_room:)
+      new(hackr).board_private!(transit_type, destination_room)
+    end
+
     def self.routes_at_room(room:, hackr:)
       region = room.grid_zone&.grid_region
       return [] unless region
@@ -60,9 +89,10 @@ module Grid
 
       type = route.grid_transit_type
 
-      # Private: require destination
+      # Private: require destination on the same route
       if type.private_point?
         raise DestinationNotOnRoute unless destination_stop
+        raise DestinationNotOnRoute unless destination_stop.grid_transit_route_id == route.id
         raise AlreadyAtDestination if destination_stop.id == boarding_stop.id
       end
 
@@ -100,6 +130,40 @@ module Grid
       end
     end
 
+    # Route-free private transit — hackr picks any transit room in the region
+    def board_private!(transit_type, destination_room)
+      room = @hackr.current_room
+      raise NotAtTransitStop unless room.room_type == "transit"
+      raise AlreadyAtDestination if destination_room.id == room.id
+
+      fare = transit_type.base_fare
+
+      ActiveRecord::Base.transaction do
+        @hackr.lock!
+        raise AlreadyInJourney if @hackr.active_journey
+
+        if fare > 0
+          cache = @hackr.default_cache
+          raise InsufficientFunds unless cache && cache.balance >= fare
+          Grid::TransactionService.burn!(from_cache: cache, amount: fare, memo: "#{transit_type.name} fare")
+        end
+
+        journey = GridTransitJourney.create!(
+          grid_hackr: @hackr,
+          journey_type: "local_private",
+          state: "active",
+          origin_room: room,
+          destination_room: destination_room,
+          fare_paid: fare,
+          started_at: Time.current,
+          meta: {"transit_type_slug" => transit_type.slug}
+        )
+
+        display = Grid::TransitRenderer.render_private_board(journey, transit_type, destination_room)
+        BoardResult.new(journey: journey, route: nil, current_stop: nil, fare_charged: fare, display: display)
+      end
+    end
+
     def wait!
       journey = @hackr.active_journey
       raise NotInJourney unless journey&.active? && journey.local?
@@ -112,14 +176,12 @@ module Grid
 
         # Private transit: single wait → arrive directly at destination
         if journey.local_private?
-          dest_stop = route.grid_transit_stops.find_by(grid_room_id: journey.destination_room_id)
-          dest_room = dest_stop&.grid_room || journey.destination_room
+          dest_room = journey.destination_room
           if dest_room
-            journey.update!(current_stop: dest_stop) if dest_stop
             move_hackr_to_room!(dest_room)
             complete_journey!(journey)
-            display = Grid::TransitRenderer.render_wait(journey, dest_stop || current, true, route)
-            return WaitResult.new(journey: journey.reload, current_stop: dest_stop || current, arrived: true, display: display)
+            display = Grid::TransitRenderer.render_private_arrival(journey, dest_room)
+            return WaitResult.new(journey: journey.reload, current_stop: nil, arrived: true, display: display)
           end
         end
 
