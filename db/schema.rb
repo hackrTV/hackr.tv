@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_06_165402) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -570,6 +570,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_165402) do
     t.json "vendor_config"
   end
 
+  create_table "grid_region_transit_assignments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_region_id", null: false
+    t.integer "grid_transit_type_id", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_region_id", "grid_transit_type_id"], name: "index_region_transit_assignments_unique", unique: true
+    t.index ["grid_region_id"], name: "index_grid_region_transit_assignments_on_grid_region_id"
+    t.index ["grid_transit_type_id"], name: "index_grid_region_transit_assignments_on_grid_transit_type_id"
+  end
+
   create_table "grid_regions", force: :cascade do |t|
     t.integer "cell_block_room_id"
     t.integer "containment_room_id"
@@ -718,6 +729,42 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_165402) do
     t.index ["grid_shop_listing_id"], name: "index_grid_shop_transactions_on_grid_shop_listing_id"
   end
 
+  create_table "grid_slipstream_legs", force: :cascade do |t|
+    t.string "breach_template_slug"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.json "fork_options", default: [], null: false
+    t.integer "grid_slipstream_route_id", null: false
+    t.string "name", null: false
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_slipstream_route_id", "position"], name: "index_slipstream_legs_route_position", unique: true
+    t.index ["grid_slipstream_route_id"], name: "index_grid_slipstream_legs_on_grid_slipstream_route_id"
+  end
+
+  create_table "grid_slipstream_routes", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.integer "base_heat_cost", default: 10, null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "destination_region_id", null: false
+    t.integer "destination_room_id", null: false
+    t.integer "detection_risk_base", default: 15, null: false
+    t.integer "min_clearance", default: 15, null: false
+    t.string "name", null: false
+    t.integer "origin_region_id", null: false
+    t.integer "origin_room_id", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["destination_region_id"], name: "index_grid_slipstream_routes_on_destination_region_id"
+    t.index ["destination_room_id"], name: "index_grid_slipstream_routes_on_destination_room_id"
+    t.index ["origin_region_id", "destination_region_id"], name: "index_slipstream_routes_origin_dest", unique: true
+    t.index ["origin_region_id"], name: "index_grid_slipstream_routes_on_origin_region_id"
+    t.index ["origin_room_id"], name: "index_grid_slipstream_routes_on_origin_room_id"
+    t.index ["slug"], name: "index_grid_slipstream_routes_on_slug", unique: true
+  end
+
   create_table "grid_transactions", force: :cascade do |t|
     t.integer "amount", null: false
     t.datetime "created_at", null: false
@@ -732,6 +779,83 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_165402) do
     t.index ["to_cache_id"], name: "index_grid_transactions_on_to_cache_id"
     t.index ["tx_hash"], name: "index_grid_transactions_on_tx_hash", unique: true
     t.index ["tx_type"], name: "index_grid_transactions_on_tx_type"
+  end
+
+  create_table "grid_transit_journeys", force: :cascade do |t|
+    t.boolean "breach_mid_journey", default: false, null: false
+    t.datetime "created_at", null: false
+    t.integer "current_leg_id"
+    t.integer "current_stop_id"
+    t.integer "destination_room_id"
+    t.datetime "ended_at"
+    t.integer "fare_paid", default: 0, null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "grid_slipstream_route_id"
+    t.integer "grid_transit_route_id"
+    t.integer "heat_accumulated", default: 0, null: false
+    t.string "journey_type", null: false
+    t.integer "legs_completed", default: 0, null: false
+    t.json "meta", default: {}, null: false
+    t.integer "origin_room_id"
+    t.boolean "pending_fork", default: false, null: false
+    t.datetime "started_at", null: false
+    t.string "state", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["current_leg_id"], name: "index_grid_transit_journeys_on_current_leg_id"
+    t.index ["current_stop_id"], name: "index_grid_transit_journeys_on_current_stop_id"
+    t.index ["destination_room_id"], name: "index_grid_transit_journeys_on_destination_room_id"
+    t.index ["grid_hackr_id"], name: "index_grid_transit_journeys_on_grid_hackr_id"
+    t.index ["grid_hackr_id"], name: "index_transit_journeys_one_active_per_hackr", unique: true, where: "state = 'active'"
+    t.index ["grid_slipstream_route_id"], name: "index_grid_transit_journeys_on_grid_slipstream_route_id"
+    t.index ["grid_transit_route_id"], name: "index_grid_transit_journeys_on_grid_transit_route_id"
+    t.index ["origin_room_id"], name: "index_grid_transit_journeys_on_origin_room_id"
+    t.index ["state"], name: "index_grid_transit_journeys_on_state"
+  end
+
+  create_table "grid_transit_routes", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "grid_region_id", null: false
+    t.integer "grid_transit_type_id", null: false
+    t.boolean "loop_route", default: false, null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_grid_transit_routes_on_active"
+    t.index ["grid_region_id"], name: "index_grid_transit_routes_on_grid_region_id"
+    t.index ["grid_transit_type_id"], name: "index_grid_transit_routes_on_grid_transit_type_id"
+    t.index ["slug"], name: "index_grid_transit_routes_on_slug", unique: true
+  end
+
+  create_table "grid_transit_stops", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_room_id", null: false
+    t.integer "grid_transit_route_id", null: false
+    t.boolean "is_terminus", default: false, null: false
+    t.string "label"
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_room_id"], name: "index_grid_transit_stops_on_grid_room_id"
+    t.index ["grid_transit_route_id", "position"], name: "index_transit_stops_route_position", unique: true
+    t.index ["grid_transit_route_id"], name: "index_grid_transit_stops_on_grid_transit_route_id"
+  end
+
+  create_table "grid_transit_types", force: :cascade do |t|
+    t.integer "base_fare", default: 0, null: false
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "icon_key"
+    t.integer "min_clearance", default: 0, null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "published", default: false, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_grid_transit_types_on_category"
+    t.index ["slug"], name: "index_grid_transit_types_on_slug", unique: true
   end
 
   create_table "grid_uplink_presences", force: :cascade do |t|
@@ -1272,6 +1396,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_165402) do
   add_foreign_key "grid_missions", "grid_mission_arcs", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_missions", column: "prereq_mission_id", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
+  add_foreign_key "grid_region_transit_assignments", "grid_regions", on_delete: :cascade
+  add_foreign_key "grid_region_transit_assignments", "grid_transit_types", on_delete: :cascade
   add_foreign_key "grid_regions", "grid_rooms", column: "cell_block_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "containment_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "facility_bribe_exit_room_id", on_delete: :nullify
@@ -1288,6 +1414,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_165402) do
   add_foreign_key "grid_schematics", "grid_item_definitions", column: "output_definition_id"
   add_foreign_key "grid_shop_listings", "grid_item_definitions"
   add_foreign_key "grid_shop_listings", "grid_mobs"
+  add_foreign_key "grid_slipstream_legs", "grid_slipstream_routes", on_delete: :cascade
+  add_foreign_key "grid_slipstream_routes", "grid_regions", column: "destination_region_id", on_delete: :restrict
+  add_foreign_key "grid_slipstream_routes", "grid_regions", column: "origin_region_id", on_delete: :restrict
+  add_foreign_key "grid_slipstream_routes", "grid_rooms", column: "destination_room_id", on_delete: :restrict
+  add_foreign_key "grid_slipstream_routes", "grid_rooms", column: "origin_room_id", on_delete: :restrict
+  add_foreign_key "grid_transit_journeys", "grid_hackrs", on_delete: :cascade
+  add_foreign_key "grid_transit_journeys", "grid_rooms", column: "destination_room_id", on_delete: :nullify
+  add_foreign_key "grid_transit_journeys", "grid_rooms", column: "origin_room_id", on_delete: :nullify
+  add_foreign_key "grid_transit_journeys", "grid_slipstream_legs", column: "current_leg_id", on_delete: :nullify
+  add_foreign_key "grid_transit_journeys", "grid_slipstream_routes", on_delete: :nullify
+  add_foreign_key "grid_transit_journeys", "grid_transit_routes", on_delete: :nullify
+  add_foreign_key "grid_transit_journeys", "grid_transit_stops", column: "current_stop_id", on_delete: :nullify
+  add_foreign_key "grid_transit_routes", "grid_regions", on_delete: :restrict
+  add_foreign_key "grid_transit_routes", "grid_transit_types", on_delete: :restrict
+  add_foreign_key "grid_transit_stops", "grid_rooms", on_delete: :restrict
+  add_foreign_key "grid_transit_stops", "grid_transit_routes", on_delete: :cascade
   add_foreign_key "grid_verification_tokens", "grid_hackrs"
   add_foreign_key "grid_zones", "grid_regions"
   add_foreign_key "grid_zones", "zone_playlists", column: "ambient_playlist_id"

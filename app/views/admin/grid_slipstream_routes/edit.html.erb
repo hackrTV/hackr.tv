@@ -1,0 +1,44 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/slipstream_routes/<%= @route.slug %> :: EDIT SLIPSTREAM ROUTE</legend>
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+      <%= render "form", route: @route %>
+
+      <% if @legs&.any? %>
+        <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: LEGS (<%= @legs.size %>) ::]</h3>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; overflow-x: auto;">
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center;">Pos</th>
+                <th style="text-align: left;">Name</th>
+                <th style="text-align: center;">Forks</th>
+                <th style="text-align: left;">Breach Template</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @legs.each do |leg| %>
+                <tr>
+                  <td style="text-align: center;"><%= leg.position %></td>
+                  <td><%= leg.name %></td>
+                  <td style="text-align: center;"><%= leg.fork_options&.size || 0 %></td>
+                  <td style="color: #6b7280;"><%= leg.breach_template_slug.presence || "&mdash;".html_safe %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

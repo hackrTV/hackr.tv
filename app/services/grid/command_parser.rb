@@ -25,8 +25,14 @@ module Grid
       end
 
       # Captured mode: restricted command set in GovCorp facility
+      # (Checked before transit — a captured hackr's journey is effectively frozen)
       if Grid::ContainmentService.captured?(hackr)
         return Grid::CapturedCommandParser.new(hackr, input, self).execute
+      end
+
+      # Transit mode: restricted command set while in transit
+      if (active_journey = hackr.active_journey)
+        return Grid::TransitCommandParser.new(hackr, input, active_journey, self).execute
       end
 
       # Split input but preserve case in arguments
@@ -152,6 +158,14 @@ module Grid
         go_command("out")
       when "home"
         go_command("home")
+      when "transit", "tr"
+        transit_command
+      when "board"
+        board_command(args)
+      when "slipstream", "slip"
+        slipstream_command(args)
+      when "hail"
+        hail_command(args)
       when "help", "?"
         help_command
       when "who"
@@ -205,6 +219,35 @@ module Grid
             output << "<span style='color: #9ca3af;'>  [#{i + 1}] #{h(enc.name)} :: #{enc.tier_label}</span>"
           end
           output << "<span style='color: #6b7280;'>  Type 'breach &lt;name or #&gt;' to initiate.</span>"
+        end
+      end
+
+      # Slipstream access indicator — show destinations available from this room
+      slip_routes = GridSlipstreamRoute.active
+        .where(origin_room: room)
+        .includes(:destination_region)
+      if slip_routes.any?
+        output << ""
+        output << "<span style='color: #a78bfa; font-weight: bold;'>[ SLIPSTREAM ACCESS ]</span>"
+        slip_routes.each do |sr|
+          output << "  <span style='color: #a78bfa;'>→ #{h(sr.destination_region.name)}</span> <span style='color: #6b7280;'>(CL#{sr.min_clearance}+, #{sr.leg_count} legs)</span> <span style='color: #a78bfa;'>slipstream #{h(sr.slug)}</span>"
+        end
+      end
+
+      # Local transit indicator — show public routes that stop at this room
+      local_routes = Grid::LocalTransitService.routes_at_room(room: room, hackr: hackr)
+      if local_routes.any?
+        output << ""
+        output << Grid::TransitRenderer.render_available_routes(local_routes, hackr)
+      end
+
+      # Private transit indicator — show hailable types + destinations when in a transit room
+      private_types = Grid::LocalTransitService.private_types_at_room(room: room, hackr: hackr)
+      if private_types.any?
+        destinations = Grid::LocalTransitService.private_destinations(room: room)
+        if destinations.any?
+          output << ""
+          output << Grid::TransitRenderer.render_private_types(private_types, destinations, room)
         end
       end
 
@@ -888,6 +931,108 @@ module Grid
       status.reason ? h(status.reason) : nil
     end
 
+    def transit_command
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere.</span>" unless room
+
+      routes = Grid::LocalTransitService.routes_at_room(room: room, hackr: hackr)
+      Grid::TransitRenderer.render_available_routes(routes, hackr)
+    end
+
+    def board_command(args)
+      route_slug = args&.join("-")
+      return "<span style='color: #fbbf24;'>Board what? Specify a route slug. Type <span style='color: #22d3ee;'>transit</span> to see available routes.</span>" unless route_slug.present?
+
+      room = hackr.current_room
+      routes = Grid::LocalTransitService.routes_at_room(room: room, hackr: hackr)
+      route = routes.find { |r| r.slug == route_slug }
+      return "<span style='color: #f87171;'>Route '#{h(route_slug)}' not available here. Type <span style='color: #22d3ee;'>transit</span> to see routes.</span>" unless route
+
+      result = Grid::LocalTransitService.board!(hackr: hackr, route: route)
+      result.display
+    rescue Grid::LocalTransitService::AlreadyInJourney
+      "<span style='color: #f87171;'>Already in transit.</span>"
+    rescue Grid::LocalTransitService::InsufficientFunds
+      "<span style='color: #f87171;'>Insufficient CRED for fare.</span>"
+    rescue Grid::LocalTransitService::RouteNotAtStop
+      "<span style='color: #f87171;'>This route doesn't stop here.</span>"
+    end
+
+    def hail_command(args)
+      return "<span style='color: #fbbf24;'>Hail what? e.g. <span style='color: #22d3ee;'>hail taxi-car &lt;destination&gt;</span></span>" unless args&.any?
+
+      room = hackr.current_room
+      private_types = Grid::LocalTransitService.private_types_at_room(room: room, hackr: hackr)
+
+      # First arg is type slug, rest is destination name
+      type_slug = args.first
+      dest_name = args[1..]&.join(" ")
+
+      transit_type = private_types.find { |t| t.slug == type_slug }
+      unless transit_type
+        return "<span style='color: #f87171;'>'#{h(type_slug)}' not available here. Type <span style='color: #22d3ee;'>look</span> to see options.</span>"
+      end
+
+      destinations = Grid::LocalTransitService.private_destinations(room: room)
+
+      unless dest_name.present?
+        lines = ["<span style='color: #fbbf24;'>Available destinations for #{h(transit_type.name)}:</span>"]
+        destinations.each do |d|
+          lines << "  <span style='color: #22d3ee;'>hail #{h(type_slug)} #{h(d.name.downcase)}</span> <span style='color: #6b7280;'>(#{h(d.grid_zone.name)})</span>"
+        end
+        return lines.join("\n")
+      end
+
+      # Find destination room by name match
+      dest_room = destinations.find { |d| d.name.downcase == dest_name.downcase }
+      dest_room ||= destinations.find { |d| d.name.downcase.include?(dest_name.downcase) }
+
+      unless dest_room
+        return "<span style='color: #f87171;'>Destination '#{h(dest_name)}' not found in this region.</span>"
+      end
+
+      result = Grid::LocalTransitService.board_private!(hackr: hackr, transit_type: transit_type, destination_room: dest_room)
+      result.display
+    rescue Grid::LocalTransitService::AlreadyInJourney
+      "<span style='color: #f87171;'>Already in transit.</span>"
+    rescue Grid::LocalTransitService::InsufficientFunds
+      "<span style='color: #f87171;'>Insufficient CRED for fare.</span>"
+    rescue Grid::LocalTransitService::AlreadyAtDestination
+      "<span style='color: #f87171;'>You're already there.</span>"
+    rescue Grid::LocalTransitService::NotAtTransitStop
+      "<span style='color: #f87171;'>You must be at a transit location to hail private transport.</span>"
+    end
+
+    def slipstream_command(args)
+      region = hackr.current_room&.grid_zone&.grid_region
+      return "<span style='color: #f87171;'>You are nowhere.</span>" unless region
+
+      if hackr.stat("clearance").to_i < Grid::SlipstreamService::MIN_CLEARANCE
+        return "<span style='color: #f87171;'>Slipstream access requires Clearance #{Grid::SlipstreamService::MIN_CLEARANCE}+.</span>"
+      end
+
+      routes = Grid::SlipstreamService.routes_from(region: region, hackr: hackr)
+
+      if args&.any?
+        route_slug = args.join("-")
+        route = routes.find { |r| r.slug == route_slug }
+        return "<span style='color: #f87171;'>Slipstream route '#{h(route_slug)}' not found.</span>" unless route
+
+        result = Grid::SlipstreamService.board!(hackr: hackr, route: route)
+        return result.display
+      end
+
+      Grid::TransitRenderer.render_slipstream_routes(routes, hackr)
+    rescue Grid::SlipstreamService::AlreadyInJourney
+      "<span style='color: #f87171;'>Already in transit.</span>"
+    rescue Grid::SlipstreamService::ClearanceRequired
+      "<span style='color: #f87171;'>Clearance too low for this route.</span>"
+    rescue Grid::SlipstreamService::NotAtBoardingPoint
+      "<span style='color: #f87171;'>You must be at the Slipstream access point to board.</span>"
+    rescue Grid::SlipstreamService::CorridorLockedOut
+      "<span style='color: #f87171;'>This corridor is locked out — GovCorp flagged the route. Wait for the heat to clear.</span>"
+    end
+
     def help_command
       <<~HELP
         <span style='color: #22d3ee; font-weight: bold;'>Available Commands:</span>
@@ -913,6 +1058,12 @@ module Grid
           <span style='color: #34d399;'>equip &lt;item&gt;, wear</span>         - Equip a gear item
           <span style='color: #34d399;'>unequip &lt;item|slot&gt;, remove</span> - Remove equipped gear
           <span style='color: #34d399;'>loadout, lo</span>                - View your current loadout
+
+        <span style='color: #fbbf24;'>Transit:</span>
+          <span style='color: #34d399;'>transit, tr</span>                - View transit routes at current location
+          <span style='color: #34d399;'>board &lt;route&gt;</span>              - Board public transit route
+          <span style='color: #34d399;'>hail &lt;type&gt; &lt;dest&gt;</span>         - Hail private transport to destination
+          <span style='color: #34d399;'>slipstream, slip</span>           - View/initiate inter-region Slipstream corridors
 
         <span style='color: #fbbf24;'>DECK &amp; BREACH:</span>
           <span style='color: #34d399;'>deck, dk</span>                   - View equipped DECK status

@@ -206,7 +206,7 @@ namespace :data do
   desc "Load world data (factions, regions, zones, rooms, etc.)"
   task world: :environment do
     guard_world_seed!
-    %i[factions regions zones rooms exits mobs item_definitions salvage_yields items achievements shop_listings missions schematics breach_templates breach_encounters pac_facilities].each do |t|
+    %i[factions regions zones rooms exits mobs item_definitions salvage_yields items achievements shop_listings missions schematics breach_templates breach_encounters pac_facilities transit_types region_transit_assignments slipstream_routes].each do |t|
       Rake::Task["data:#{t}"].invoke
     end
   end
@@ -1278,6 +1278,135 @@ namespace :data do
     end
 
     puts "PAC Facilities: #{zones_created} zones, #{rooms_created} rooms, #{exits_created} exits, #{mobs_created} mobs, #{encounters_created} encounters"
+  end
+
+  desc "Load transit types from YAML"
+  task transit_types: :environment do
+    guard_world_seed!
+    puts "\n--- Loading Transit Types ---"
+    yaml_file = Rails.root.join("data", "world", "transit_types.yml")
+    next unless File.exist?(yaml_file)
+
+    data = YAML.load_file(yaml_file)
+    created = 0
+
+    data["transit_types"].each do |attrs|
+      type = GridTransitType.find_or_initialize_by(slug: attrs["slug"])
+      next unless type.new_record?
+      type.assign_attributes(attrs.except("slug"))
+      type.save!
+      created += 1
+      puts "  ✓ #{type.name} (#{type.category})"
+    end
+
+    puts "Transit Types: #{created} created, #{GridTransitType.count} total"
+  end
+
+  desc "Load region transit assignments from YAML"
+  task region_transit_assignments: :environment do
+    guard_world_seed!
+    puts "\n--- Loading Region Transit Assignments ---"
+    yaml_file = Rails.root.join("data", "world", "region_transit_assignments.yml")
+    next unless File.exist?(yaml_file)
+
+    data = YAML.load_file(yaml_file)
+    type_map = GridTransitType.all.index_by(&:slug)
+    region_map = GridRegion.all.index_by(&:slug)
+    created = 0
+
+    data["region_transit_assignments"].each do |entry|
+      region = region_map[entry["region_slug"]]
+      unless region
+        puts "  ✗ Region not found: #{entry["region_slug"]}"
+        next
+      end
+
+      (entry["transit_type_slugs"] || []).each_with_index do |type_slug, idx|
+        type = type_map[type_slug]
+        unless type
+          puts "  ✗ Transit type not found: #{type_slug}"
+          next
+        end
+
+        assignment = GridRegionTransitAssignment.find_or_initialize_by(
+          grid_region: region, grid_transit_type: type
+        )
+        next unless assignment.new_record?
+        assignment.position = idx
+        assignment.save!
+        created += 1
+      end
+    end
+
+    puts "Region Transit Assignments: #{created} created, #{GridRegionTransitAssignment.count} total"
+  end
+
+  desc "Load slipstream routes and legs from YAML"
+  task slipstream_routes: :environment do
+    guard_world_seed!
+    puts "\n--- Loading Slipstream Routes ---"
+    yaml_file = Rails.root.join("data", "world", "slipstream_routes.yml")
+    next unless File.exist?(yaml_file)
+
+    data = YAML.load_file(yaml_file)
+    region_map = GridRegion.all.index_by(&:slug)
+    room_map = GridRoom.all.index_by(&:slug)
+    created = 0
+    legs_created = 0
+
+    data["slipstream_routes"].each do |attrs|
+      route = GridSlipstreamRoute.find_or_initialize_by(slug: attrs["slug"])
+      next unless route.new_record?
+
+      origin_region = region_map[attrs["origin_region_slug"]]
+      dest_region = region_map[attrs["destination_region_slug"]]
+      origin_room = room_map[attrs["origin_room_slug"]]
+      dest_room = room_map[attrs["destination_room_slug"]]
+
+      unless origin_region && dest_region
+        puts "  ✗ Region not found for #{attrs["slug"]}"
+        next
+      end
+
+      # Skip if rooms don't exist yet — route will be seedable once rooms are created
+      unless origin_room && dest_room
+        puts "  ⚠ Rooms not found for #{attrs["slug"]} — skipping (seed rooms first)"
+        next
+      end
+
+      route.assign_attributes(
+        name: attrs["name"],
+        origin_region: origin_region,
+        destination_region: dest_region,
+        origin_room: origin_room,
+        destination_room: dest_room,
+        min_clearance: attrs["min_clearance"] || 15,
+        base_heat_cost: attrs["base_heat_cost"] || 10,
+        detection_risk_base: attrs["detection_risk_base"] || 15,
+        active: attrs["active"] != false,
+        description: attrs["description"],
+        position: attrs["position"] || 0
+      )
+      route.save!
+      created += 1
+
+      (attrs["legs"] || []).each do |leg_attrs|
+        leg = route.grid_slipstream_legs.find_or_initialize_by(position: leg_attrs["position"])
+        next unless leg.new_record?
+        leg.assign_attributes(
+          name: leg_attrs["name"],
+          description: leg_attrs["description"],
+          fork_options: leg_attrs["fork_options"] || [],
+          breach_template_slug: leg_attrs["breach_template_slug"]
+        )
+        leg.save!
+        legs_created += 1
+      end
+
+      puts "  ✓ #{route.name} (#{route.grid_slipstream_legs.count} legs)"
+    end
+
+    puts "Slipstream Routes: #{created} created (#{legs_created} legs), #{GridSlipstreamRoute.count} total"
   end
 
   desc "Sync existing grid_items with their current definitions"

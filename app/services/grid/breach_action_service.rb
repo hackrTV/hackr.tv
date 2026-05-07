@@ -3,8 +3,8 @@
 module Grid
   class BreachActionService
     ExecResult = Data.define(:hit, :damage_dealt, :program_name, :target_position,
-      :protocol_destroyed, :battery_consumed, :all_destroyed, :exploit, :fragment)
-    AnalyzeResult = Data.define(:target_position, :level_reached, :info_revealed, :bonus_action)
+      :protocol_destroyed, :battery_consumed, :all_destroyed, :exploit, :fragment, :debuff_hint)
+    AnalyzeResult = Data.define(:target_position, :level_reached, :info_revealed, :bonus_action, :debuff_hint)
     RerouteResult = Data.define(:target_position, :protocol_type_label)
     UseItemResult = Data.define(:item_name, :effect_output, :emergency_jackout)
     InterfaceResult = Data.define(:gate_id, :correct, :gate_state, :attempts_remaining, :all_solved, :all_failed, :feedback)
@@ -173,7 +173,8 @@ module Grid
         battery_consumed: battery_cost,
         all_destroyed: all_destroyed,
         exploit: is_exploit,
-        fragment: fragment_extracted
+        fragment: fragment_extracted,
+        debuff_hint: energy_debuff_hint
       )
     end
 
@@ -203,7 +204,8 @@ module Grid
             target_position: target_position,
             level_reached: current_level,
             info_revealed: "Already fully analyzed.",
-            bonus_action: false
+            bonus_action: false,
+            debuff_hint: nil
           )
         end
 
@@ -263,7 +265,8 @@ module Grid
         target_position: target_position,
         level_reached: level_reached,
         info_revealed: info_revealed,
-        bonus_action: bonus_action
+        bonus_action: bonus_action,
+        debuff_hint: psyche_debuff_hint
       )
     end
 
@@ -714,6 +717,36 @@ module Grid
         0.75
       else
         0.50
+      end
+    end
+
+    # Debuff hint for exec output — tells the player why damage is reduced/zero
+    def energy_debuff_hint
+      energy = @hackr.stat("energy")
+      max_energy = @hackr.effective_max("energy")
+      return "ENERGY depleted — damage output disabled." if energy <= 0
+      ratio = energy.to_f / max_energy
+      if ratio < 0.10
+        "Low ENERGY — damage reduced to 50%."
+      elsif ratio < 0.25
+        "Low ENERGY — damage reduced to 75%."
+      elsif ratio < 0.50
+        "Low ENERGY — damage reduced to 90%."
+      end
+    end
+
+    # Debuff hint for analyze output — tells the player intel may be unreliable
+    def psyche_debuff_hint
+      psyche = @hackr.stat("psyche")
+      max_psyche = @hackr.effective_max("psyche")
+      return "PSYCHE depleted — intel unreliable." if psyche <= 0
+      ratio = psyche.to_f / max_psyche
+      if ratio < 0.10
+        "Low PSYCHE — high chance of false intel."
+      elsif ratio < 0.25
+        "Low PSYCHE — intel may be unreliable."
+      elsif ratio < 0.50
+        "Low PSYCHE — slight chance of false intel."
       end
     end
 

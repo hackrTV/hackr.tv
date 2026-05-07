@@ -30,6 +30,7 @@ const MissionsPage = lazy(() => import('~/components/pages/grid/MissionsPage'))
 const SchematicsPage = lazy(() => import('~/components/pages/grid/SchematicsPage'))
 const LoadoutPage = lazy(() => import('~/components/pages/grid/LoadoutPage'))
 const DeckPage = lazy(() => import('~/components/pages/grid/DeckPage'))
+const TransitPage = lazy(() => import('~/components/pages/grid/TransitPage'))
 const GridLoginPage = lazy(() => import('~/components/pages/grid/GridLoginPage').then(m => ({ default: m.GridLoginPage })))
 const GridRegisterPage = lazy(() => import('~/components/pages/grid/GridRegisterPage').then(m => ({ default: m.GridRegisterPage })))
 const GridVerifyPage = lazy(() => import('~/components/pages/grid/GridVerifyPage').then(m => ({ default: m.GridVerifyPage })))
@@ -111,6 +112,7 @@ export const AppLayout: React.FC = () => {
           <Route path="/schematics" element={<ProtectedRoute><SchematicsPage /></ProtectedRoute>} />
           <Route path="/loadout" element={<ProtectedRoute><LoadoutPage /></ProtectedRoute>} />
           <Route path="/deck" element={<ProtectedRoute><DeckPage /></ProtectedRoute>} />
+          <Route path="/transit" element={<ProtectedRoute><TransitPage /></ProtectedRoute>} />
           <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
           <Route path="/grid/login" element={<GridLoginPage />} />
           <Route path="/grid/register" element={<GridRegisterPage />} />

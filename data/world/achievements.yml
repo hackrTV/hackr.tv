@@ -819,3 +819,90 @@ achievements:
       count: 50
     xp_reward: 500
     cred_reward: 50
+
+  # Transit Achievements
+  - slug: first_ride
+    name: "First Ride"
+    description: "Completed your first local transit trip."
+    badge_icon: "TRN"
+    category: grid
+    trigger_type: local_transit_completed
+    trigger_data: {}
+    xp_reward: 50
+    cred_reward: 5
+
+  - slug: frequent_rider
+    name: "Frequent Rider"
+    description: "Completed 10 local transit trips."
+    badge_icon: "TRN"
+    category: grid
+    trigger_type: transits_completed_count
+    trigger_data:
+      count: 10
+    xp_reward: 150
+    cred_reward: 15
+
+  - slug: commuter
+    name: "Commuter"
+    description: "Completed 50 local transit trips."
+    badge_icon: "TRN"
+    category: grid
+    trigger_type: transits_completed_count
+    trigger_data:
+      count: 50
+    xp_reward: 300
+    cred_reward: 30
+
+  - slug: first_slipstream
+    name: "Ghost in the Machine"
+    description: "Completed your first Slipstream transit."
+    badge_icon: "SLP"
+    category: grid
+    trigger_type: slipstream_completed
+    trigger_data: {}
+    xp_reward: 200
+    cred_reward: 20
+
+  - slug: corridor_runner
+    name: "Corridor Runner"
+    description: "Completed 5 Slipstream transits."
+    badge_icon: "SLP"
+    category: grid
+    trigger_type: slipstreams_completed_count
+    trigger_data:
+      count: 5
+    xp_reward: 300
+    cred_reward: 30
+
+  - slug: first_step_larger_world
+    name: "First Step into a Larger World"
+    description: "Visited 2 different regions via Slipstream."
+    badge_icon: "MAP"
+    category: grid
+    trigger_type: regions_visited_count
+    trigger_data:
+      count: 2
+    xp_reward: 150
+    cred_reward: 10
+
+  - slug: well_travelled
+    name: "Well-Travelled"
+    description: "Visited 8 or more regions via Slipstream."
+    badge_icon: "MAP"
+    category: grid
+    trigger_type: regions_visited_count
+    trigger_data:
+      count: 8
+    xp_reward: 500
+    cred_reward: 50
+
+  - slug: continental
+    name: "Continental"
+    description: "Visited every region in THE PULSE GRID via Slipstream."
+    badge_icon: "MAP"
+    category: grid
+    trigger_type: regions_visited_count
+    trigger_data:
+      count: 16
+    xp_reward: 1000
+    cred_reward: 100

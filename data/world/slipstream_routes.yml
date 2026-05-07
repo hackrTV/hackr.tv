@@ -1,0 +1,1716 @@
+# Slipstream Routes — Inter-Region Transit Corridors
+# Each route is directional (A→B and B→A are separate rows).
+# Legs define the fork-choice journey. Each leg has 2-3 fork options.
+# Nearest-neighbor connectivity only — cross-country requires multiple hops.
+#
+# NOTE: origin_room_slug and destination_room_slug must reference existing
+# transit rooms. These will be created when transit infrastructure rooms
+# are seeded. Until then, routes remain seedable but not boardable.
+
+slipstream_routes:
+  # === LAKESHORE CONNECTIONS ===
+  # Lakeshore → Arch (South)
+  - slug: lakeshore-to-arch
+    name: "Lakeshore → Arch Conduit"
+    origin_region_slug: the-lakeshore
+    destination_region_slug: the-arch
+    origin_room_slug: lakeshore-slip-south
+    destination_room_slug: arch-slip-north
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 12
+    active: true
+    description: "Service corridor following old freight rail under the plains."
+    legs:
+      - position: 1
+        name: "Sub-Lake Junction"
+        description: "The corridor passes beneath the lake bed. Three paths diverge."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Drainage Tunnel"
+            description: "Tight, damp, heavily shielded from scans."
+            risk_modifier: -5
+          - key: B
+            label: "Freight Bypass"
+            description: "Standard cargo route. Moderate traffic."
+            risk_modifier: 5
+          - key: C
+            label: "Express Trunk"
+            description: "High-speed main line. Exposed to patrol sweeps."
+            risk_modifier: 15
+      - position: 2
+        name: "Prairie Relay"
+        description: "Signal relay under the flatlands. Brief exposure window."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Arch Approach"
+        description: "Final stretch into the RIDE deadzone. Interference helps."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Deadzone Edge"
+            description: "Skirt the interference boundary. Safer but longer."
+            risk_modifier: -8
+          - key: B
+            label: "Direct Insert"
+            description: "Straight through. Fast but briefly visible."
+            risk_modifier: 10
+
+  # Arch → Lakeshore (North)
+  - slug: arch-to-lakeshore
+    name: "Arch → Lakeshore Conduit"
+    origin_region_slug: the-arch
+    destination_region_slug: the-lakeshore
+    origin_room_slug: arch-slip-north
+    destination_room_slug: lakeshore-slip-south
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 12
+    active: true
+    description: "Return corridor from the deadzone to the lakefront."
+    legs:
+      - position: 1
+        name: "Deadzone Exit"
+        description: "Leaving the interference field. Scanners wake up."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Gradual Ascent"
+            description: "Slow rise out of the deadzone. Lower profile."
+            risk_modifier: -5
+          - key: B
+            label: "Quick Break"
+            description: "Fast exit. One burst of exposure."
+            risk_modifier: 10
+      - position: 2
+        name: "Prairie Crossing"
+        description: "Open corridor under farmland."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Lakefront Approach"
+        description: "Industrial tunnels under the lakeshore periphery."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Service Duct"
+            description: "Narrow maintenance access. Slow, hidden."
+            risk_modifier: -8
+          - key: B
+            label: "Cargo Spur"
+            description: "Main freight line. Mixed traffic cover."
+            risk_modifier: 5
+
+  # Lakeshore → Straits (East)
+  - slug: lakeshore-to-straits
+    name: "Lakeshore → Straits Conduit"
+    origin_region_slug: the-lakeshore
+    destination_region_slug: the-straits
+    origin_room_slug: lakeshore-slip-east
+    destination_room_slug: straits-slip-west
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "Lakefront corridor following old automotive supply routes."
+    legs:
+      - position: 1
+        name: "Lakeshore Tunnel"
+        description: "Under the industrial waterfront."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Water Main"
+            description: "Follow the municipal water infrastructure. Cold, dark, safe."
+            risk_modifier: -5
+          - key: B
+            label: "Rail Bed"
+            description: "Old passenger rail corridor. Faster."
+            risk_modifier: 8
+      - position: 2
+        name: "Straits Approach"
+        description: "Industrial ruins provide cover for the final approach."
+        breach_template_slug: null
+        fork_options: []
+
+  # Straits → Lakeshore (West)
+  - slug: straits-to-lakeshore
+    name: "Straits → Lakeshore Conduit"
+    origin_region_slug: the-straits
+    destination_region_slug: the-lakeshore
+    origin_room_slug: straits-slip-west
+    destination_room_slug: lakeshore-slip-east
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "Return route through lakefront industrial tunnels."
+    legs:
+      - position: 1
+        name: "Assembly Line Exit"
+        description: "Through abandoned manufacturing corridors."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Paint Shop Tunnel"
+            description: "Chemical residue masks heat signatures."
+            risk_modifier: -5
+          - key: B
+            label: "Conveyor Shaft"
+            description: "Wider, faster, exposed."
+            risk_modifier: 8
+      - position: 2
+        name: "Lakefront Insert"
+        description: "Merge into lakeshore freight traffic."
+        breach_template_slug: null
+        fork_options: []
+
+  # Lakeshore → Badlands (West)
+  - slug: lakeshore-to-badlands
+    name: "Lakeshore → Badlands Conduit"
+    origin_region_slug: the-lakeshore
+    destination_region_slug: the-badlands
+    origin_room_slug: lakeshore-slip-west
+    destination_room_slug: badlands-slip-east
+    min_clearance: 15
+    base_heat_cost: 15
+    detection_risk_base: 8
+    active: true
+    description: "Long-haul corridor across the plains. Low risk but high heat from distance."
+    legs:
+      - position: 1
+        name: "Western Outskirts"
+        description: "Urban infrastructure gives way to grain corridor freight."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Grain Silo Route"
+            description: "Follow agricultural freight. Slow, invisible."
+            risk_modifier: -8
+          - key: B
+            label: "Interstate Underpass"
+            description: "Direct routing. Exposed at junctions."
+            risk_modifier: 10
+      - position: 2
+        name: "Great Plains Crossing"
+        description: "Nothing but emptiness above and steel below."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Badlands Descent"
+        description: "The terrain drops. Coverage thins."
+        breach_template_slug: null
+        fork_options: []
+
+  # Badlands → Lakeshore (East)
+  - slug: badlands-to-lakeshore
+    name: "Badlands → Lakeshore Conduit"
+    origin_region_slug: the-badlands
+    destination_region_slug: the-lakeshore
+    origin_room_slug: badlands-slip-east
+    destination_room_slug: lakeshore-slip-west
+    min_clearance: 15
+    base_heat_cost: 15
+    detection_risk_base: 8
+    active: true
+    description: "Long return corridor from the high plains to the lakefront."
+    legs:
+      - position: 1
+        name: "Badlands Ascent"
+        description: "Climbing out of eroded rock. Thin coverage."
+        breach_template_slug: null
+        fork_options: []
+      - position: 2
+        name: "Plains Transit"
+        description: "Flat, featureless, automated freight."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Wind Farm Corridor"
+            description: "Electromagnetic interference from turbines. Good cover."
+            risk_modifier: -5
+          - key: B
+            label: "Direct Line"
+            description: "Fastest path. Clean scans."
+            risk_modifier: 8
+      - position: 3
+        name: "Urban Approach"
+        description: "Re-entering the lakefront sprawl."
+        breach_template_slug: null
+        fork_options: []
+
+  # === ARCH CONNECTIONS ===
+  # Arch → Riverlands (South)
+  - slug: arch-to-riverlands
+    name: "Arch → Riverlands Conduit"
+    origin_region_slug: the-arch
+    destination_region_slug: the-riverlands
+    origin_room_slug: arch-slip-south
+    destination_room_slug: riverlands-slip-north
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "River corridor following the great waterway south."
+    legs:
+      - position: 1
+        name: "River Bluff Descent"
+        description: "Down from the confluence into river country."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Barge Channel"
+            description: "Under the river freight lanes."
+            risk_modifier: -5
+          - key: B
+            label: "Bluff Tunnel"
+            description: "Through the limestone. Direct."
+            risk_modifier: 8
+      - position: 2
+        name: "Riverlands Approach"
+        description: "Delta country. Humid, close."
+        breach_template_slug: null
+        fork_options: []
+
+  # Riverlands → Arch (North)
+  - slug: riverlands-to-arch
+    name: "Riverlands → Arch Conduit"
+    origin_region_slug: the-riverlands
+    destination_region_slug: the-arch
+    origin_room_slug: riverlands-slip-north
+    destination_room_slug: arch-slip-south
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "Upriver corridor to the confluence."
+    legs:
+      - position: 1
+        name: "River Ascent"
+        description: "Climbing the river gradient toward the arch."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Levee Underpass"
+            description: "Follow flood infrastructure. Narrow."
+            risk_modifier: -5
+          - key: B
+            label: "River Bed Channel"
+            description: "Deeper, wider, exposed at bridges."
+            risk_modifier: 8
+      - position: 2
+        name: "Confluence Insert"
+        description: "The deadzone interference begins to help."
+        breach_template_slug: null
+        fork_options: []
+
+  # Arch → Works (East)
+  - slug: arch-to-works
+    name: "Arch → Works Conduit"
+    origin_region_slug: the-arch
+    destination_region_slug: the-works
+    origin_room_slug: arch-slip-east
+    destination_room_slug: works-slip-west
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 12
+    active: true
+    description: "Industrial corridor connecting the confluence to the steel valleys."
+    legs:
+      - position: 1
+        name: "Eastern Departure"
+        description: "Leaving the deadzone. Sensors come alive."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Coal Seam Route"
+            description: "Follow the old coal freight. Deep, dirty, hidden."
+            risk_modifier: -8
+          - key: B
+            label: "River Valley Express"
+            description: "Main corridor. Fast, monitored."
+            risk_modifier: 12
+      - position: 2
+        name: "Steel Valley Approach"
+        description: "Industrial ruins line the corridor."
+        breach_template_slug: null
+        fork_options: []
+
+  # Works → Arch (West)
+  - slug: works-to-arch
+    name: "Works → Arch Conduit"
+    origin_region_slug: the-works
+    destination_region_slug: the-arch
+    origin_room_slug: works-slip-west
+    destination_room_slug: arch-slip-east
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 12
+    active: true
+    description: "Return through the industrial corridor to the deadzone."
+    legs:
+      - position: 1
+        name: "Foundry Exit"
+        description: "Through the skeletal remains of steel production."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Slag Tunnel"
+            description: "Hot, toxic, invisible to thermal scans."
+            risk_modifier: -8
+          - key: B
+            label: "Rail Mainline"
+            description: "Former passenger route. Clean, exposed."
+            risk_modifier: 12
+      - position: 2
+        name: "Deadzone Insert"
+        description: "Relief as the interference field takes hold."
+        breach_template_slug: null
+        fork_options: []
+
+  # Arch → Front (West)
+  - slug: arch-to-front
+    name: "Arch → Front Conduit"
+    origin_region_slug: the-arch
+    destination_region_slug: the-front
+    origin_room_slug: arch-slip-west
+    destination_room_slug: front-slip-east
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 10
+    active: true
+    description: "Long corridor across the plains to the mountains."
+    legs:
+      - position: 1
+        name: "Westward Departure"
+        description: "Out of the deadzone into open country."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Cattle Route"
+            description: "Follow agricultural freight lanes. Slow."
+            risk_modifier: -5
+          - key: B
+            label: "Interstate Corridor"
+            description: "Main infrastructure. Faster, watched."
+            risk_modifier: 10
+      - position: 2
+        name: "High Plains Transit"
+        description: "Altitude climbing. Air thinning."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Mountain Approach"
+        description: "The Front Range rises. Terrain disrupts scans."
+        breach_template_slug: null
+        fork_options: []
+
+  # Front → Arch (East)
+  - slug: front-to-arch
+    name: "Front → Arch Conduit"
+    origin_region_slug: the-front
+    destination_region_slug: the-arch
+    origin_room_slug: front-slip-east
+    destination_room_slug: arch-slip-west
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 10
+    active: true
+    description: "Downhill run from the mountains to the confluence deadzone."
+    legs:
+      - position: 1
+        name: "Mountain Departure"
+        description: "Descending the front range."
+        breach_template_slug: null
+        fork_options: []
+      - position: 2
+        name: "Plains Run"
+        description: "Flat, fast, nothing to hide behind."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Storm Drain Network"
+            description: "Tornado country infrastructure. Intermittent cover."
+            risk_modifier: -3
+          - key: B
+            label: "Freight Express"
+            description: "Direct automated freight. Fast."
+            risk_modifier: 8
+      - position: 3
+        name: "Deadzone Insert"
+        description: "Sweet relief of the interference field."
+        breach_template_slug: null
+        fork_options: []
+
+  # === RIVERLANDS CONNECTIONS ===
+  # Riverlands → Bend (South)
+  - slug: riverlands-to-bend
+    name: "Riverlands → Bend Conduit"
+    origin_region_slug: the-riverlands
+    destination_region_slug: the-bend
+    origin_room_slug: riverlands-slip-south
+    destination_room_slug: bend-slip-north
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 12
+    active: true
+    description: "Downriver to where the great river meets the sea."
+    legs:
+      - position: 1
+        name: "River Descent"
+        description: "Following the current south."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Bayou Channel"
+            description: "Waterlogged side channel. Sensors struggle."
+            risk_modifier: -8
+          - key: B
+            label: "Main River Bed"
+            description: "Center channel. Faster current, more traffic."
+            risk_modifier: 10
+      - position: 2
+        name: "Bend Approach"
+        description: "Below sea level. Everything is damp."
+        breach_template_slug: null
+        fork_options: []
+
+  # Bend → Riverlands (North)
+  - slug: bend-to-riverlands
+    name: "Bend → Riverlands Conduit"
+    origin_region_slug: the-bend
+    destination_region_slug: the-riverlands
+    origin_room_slug: bend-slip-north
+    destination_room_slug: riverlands-slip-south
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 12
+    active: true
+    description: "Upriver from the delta to the bluffs."
+    legs:
+      - position: 1
+        name: "Delta Exit"
+        description: "Fighting the current north."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Cistern Route"
+            description: "Through flood management infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Channel Direct"
+            description: "Against the main current. Strain on systems."
+            risk_modifier: 8
+      - position: 2
+        name: "Bluff Ascent"
+        description: "Climbing to higher ground."
+        breach_template_slug: null
+        fork_options: []
+
+  # Riverlands → Hollows (East)
+  - slug: riverlands-to-hollows
+    name: "Riverlands → Hollows Conduit"
+    origin_region_slug: the-riverlands
+    destination_region_slug: the-hollows
+    origin_room_slug: riverlands-slip-east
+    destination_room_slug: hollows-slip-west
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 10
+    active: true
+    description: "Mountain corridor through old coal country."
+    legs:
+      - position: 1
+        name: "Foothills Entry"
+        description: "Terrain begins to fold. Signal weakens."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Mine Shaft Route"
+            description: "Through abandoned coal mines. Dangerous but dark."
+            risk_modifier: -8
+          - key: B
+            label: "Ridge Runner"
+            description: "Follow the ridgeline. Exposed at gaps."
+            risk_modifier: 10
+      - position: 2
+        name: "Hollows Insert"
+        description: "Deep in the valleys. Mist and silence."
+        breach_template_slug: null
+        fork_options: []
+
+  # Hollows → Riverlands (West)
+  - slug: hollows-to-riverlands
+    name: "Hollows → Riverlands Conduit"
+    origin_region_slug: the-hollows
+    destination_region_slug: the-riverlands
+    origin_room_slug: hollows-slip-west
+    destination_room_slug: riverlands-slip-east
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 10
+    active: true
+    description: "Out of the mountains to the river bluffs."
+    legs:
+      - position: 1
+        name: "Valley Exit"
+        description: "Climbing out of the hollows."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Creek Bed"
+            description: "Follow the water down. Natural cover."
+            risk_modifier: -5
+          - key: B
+            label: "Highway Tunnel"
+            description: "Through old interstate infrastructure."
+            risk_modifier: 8
+      - position: 2
+        name: "Riverlands Approach"
+        description: "Terrain flattening. River smell."
+        breach_template_slug: null
+        fork_options: []
+
+  # === REMAINING CONNECTIONS (abbreviated legs for space) ===
+
+  # Bend → Marshes (East)
+  - slug: bend-to-marshes
+    name: "Bend → Marshes Conduit"
+    origin_region_slug: the-bend
+    destination_region_slug: the-marshes
+    origin_room_slug: bend-slip-east
+    destination_room_slug: marshes-slip-west
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 14
+    active: true
+    description: "Gulf coast corridor through wetlands."
+    legs:
+      - position: 1
+        name: "Coastal Run"
+        description: "Along the gulf. Salt air corrodes everything."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Causeway Underpass"
+            description: "Below the bridges. Tidal interference."
+            risk_modifier: -5
+          - key: B
+            label: "Coastal Express"
+            description: "Above-grade freight. Fast, exposed."
+            risk_modifier: 12
+      - position: 2
+        name: "Marshes Insert"
+        description: "Where the land stops being land."
+        breach_template_slug: null
+        fork_options: []
+
+  # Marshes → Bend (West)
+  - slug: marshes-to-bend
+    name: "Marshes → Bend Conduit"
+    origin_region_slug: the-marshes
+    destination_region_slug: the-bend
+    origin_room_slug: marshes-slip-west
+    destination_room_slug: bend-slip-east
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 14
+    active: true
+    description: "Back through the gulf coast to the river bend."
+    legs:
+      - position: 1
+        name: "Swamp Exit"
+        description: "Solid ground is a relative concept here."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Mangrove Channel"
+            description: "Through root systems. Barely passable."
+            risk_modifier: -8
+          - key: B
+            label: "Highway Corridor"
+            description: "Elevated above the swamp. Visible."
+            risk_modifier: 10
+      - position: 2
+        name: "Bend Approach"
+        description: "Back to the delta."
+        breach_template_slug: null
+        fork_options: []
+
+  # Bend → Flats (West)
+  - slug: bend-to-flats
+    name: "Bend → Flats Conduit"
+    origin_region_slug: the-bend
+    destination_region_slug: the-flats
+    origin_room_slug: bend-slip-west
+    destination_room_slug: flats-slip-east
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 10
+    active: true
+    description: "Gulf coast corridor west to the sprawl."
+    legs:
+      - position: 1
+        name: "Bayou Crossing"
+        description: "Through the bayou infrastructure."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Pipeline Route"
+            description: "Follow the oil infrastructure. Industrial camouflage."
+            risk_modifier: -5
+          - key: B
+            label: "Coastal Highway"
+            description: "Straight shot. Monitored."
+            risk_modifier: 8
+      - position: 2
+        name: "Flats Approach"
+        description: "Everything flattens. Nowhere to hide."
+        breach_template_slug: null
+        fork_options: []
+
+  # Flats → Bend (East)
+  - slug: flats-to-bend
+    name: "Flats → Bend Conduit"
+    origin_region_slug: the-flats
+    destination_region_slug: the-bend
+    origin_room_slug: flats-slip-east
+    destination_room_slug: bend-slip-west
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 10
+    active: true
+    description: "East along the gulf to the river bend."
+    legs:
+      - position: 1
+        name: "Prairie Exit"
+        description: "Leaving the flat sprawl."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Refinery Corridor"
+            description: "Through petrochemical infrastructure. Good cover."
+            risk_modifier: -5
+          - key: B
+            label: "Gulf Freeway"
+            description: "Direct route. Total coverage."
+            risk_modifier: 10
+      - position: 2
+        name: "Delta Insert"
+        description: "Into the river country."
+        breach_template_slug: null
+        fork_options: []
+
+  # Flats → Front (North)
+  - slug: flats-to-front
+    name: "Flats → Front Conduit"
+    origin_region_slug: the-flats
+    destination_region_slug: the-front
+    origin_room_slug: flats-slip-north
+    destination_room_slug: front-slip-south
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 10
+    active: true
+    description: "Long haul north from the gulf to the mountains."
+    legs:
+      - position: 1
+        name: "Plains Ascent"
+        description: "Gradual climb. Altitude increasing."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Wind Farm Corridor"
+            description: "EM interference from turbine arrays."
+            risk_modifier: -5
+          - key: B
+            label: "Interstate Trunk"
+            description: "Main infrastructure. Straight, fast."
+            risk_modifier: 8
+      - position: 2
+        name: "High Country"
+        description: "Thin air, thin coverage."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Front Range Insert"
+        description: "Mountains rise. Terrain is your friend."
+        breach_template_slug: null
+        fork_options: []
+
+  # Front → Flats (South)
+  - slug: front-to-flats
+    name: "Front → Flats Conduit"
+    origin_region_slug: the-front
+    destination_region_slug: the-flats
+    origin_room_slug: front-slip-south
+    destination_room_slug: flats-slip-north
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 10
+    active: true
+    description: "Downhill run from the mountains to the gulf sprawl."
+    legs:
+      - position: 1
+        name: "Mountain Descent"
+        description: "Dropping altitude fast."
+        breach_template_slug: null
+        fork_options: []
+      - position: 2
+        name: "Plains Crossing"
+        description: "Flat and exposed."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Agricultural Corridor"
+            description: "Among the grain freight. Slow but hidden."
+            risk_modifier: -5
+          - key: B
+            label: "Freight Express"
+            description: "Priority cargo lane. Fast."
+            risk_modifier: 8
+      - position: 3
+        name: "Sprawl Insert"
+        description: "Urban infrastructure returns."
+        breach_template_slug: null
+        fork_options: []
+
+  # Flats → Canyon (West)
+  - slug: flats-to-canyon
+    name: "Flats → Canyon Conduit"
+    origin_region_slug: the-flats
+    destination_region_slug: the-canyon
+    origin_room_slug: flats-slip-west
+    destination_room_slug: canyon-slip-east
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 8
+    active: true
+    description: "West through desert to the canyon rim."
+    legs:
+      - position: 1
+        name: "Desert Crossing"
+        description: "Nothing but heat and rock."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Aquifer Route"
+            description: "Follow the water table. Deep and cool."
+            risk_modifier: -8
+          - key: B
+            label: "Surface Run"
+            description: "Above-grade freight. Exposed but fast."
+            risk_modifier: 10
+      - position: 2
+        name: "Canyon Rim"
+        description: "The ground drops away. Signal falters at depth."
+        breach_template_slug: null
+        fork_options: []
+
+  # Canyon → Flats (East)
+  - slug: canyon-to-flats
+    name: "Canyon → Flats Conduit"
+    origin_region_slug: the-canyon
+    destination_region_slug: the-flats
+    origin_room_slug: canyon-slip-east
+    destination_room_slug: flats-slip-west
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 8
+    active: true
+    description: "Out of the canyon into the flat sprawl."
+    legs:
+      - position: 1
+        name: "Rim Ascent"
+        description: "Climbing out of the canyon."
+        breach_template_slug: null
+        fork_options: []
+      - position: 2
+        name: "Desert Transit"
+        description: "East through the badlands."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Pipeline Route"
+            description: "Along old oil infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Highway Underpass"
+            description: "Interstate infrastructure. Monitored."
+            risk_modifier: 8
+
+  # Canyon → Front (North)
+  - slug: canyon-to-front
+    name: "Canyon → Front Conduit"
+    origin_region_slug: the-canyon
+    destination_region_slug: the-front
+    origin_room_slug: canyon-slip-north
+    destination_room_slug: front-slip-south
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 8
+    active: true
+    description: "North through desert to the mountain front."
+    legs:
+      - position: 1
+        name: "Plateau Crossing"
+        description: "High desert. Thin air, thin coverage."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Mesa Route"
+            description: "Wind through rock formations. Natural cover."
+            risk_modifier: -8
+          - key: B
+            label: "Valley Floor"
+            description: "Straight shot. No cover."
+            risk_modifier: 10
+      - position: 2
+        name: "Front Range Insert"
+        description: "Mountains ahead."
+        breach_template_slug: null
+        fork_options: []
+
+  # Front → Canyon (South — intentionally same as Flats South target slot, uses different room)
+  - slug: front-to-canyon
+    name: "Front → Canyon Conduit"
+    origin_region_slug: the-front
+    destination_region_slug: the-canyon
+    origin_room_slug: front-slip-south-canyon
+    destination_room_slug: canyon-slip-north
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 8
+    active: true
+    description: "South through high desert to the canyon rim."
+    legs:
+      - position: 1
+        name: "High Desert"
+        description: "Descending from the mountains into red rock."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Arroyo Route"
+            description: "Dry river beds. Flash flood risk, scanner shade."
+            risk_modifier: -5
+          - key: B
+            label: "Highway Corridor"
+            description: "Main route. Well-maintained, well-monitored."
+            risk_modifier: 8
+      - position: 2
+        name: "Rim Approach"
+        description: "The canyon opens below."
+        breach_template_slug: null
+        fork_options: []
+
+  # Canyon → Basin (West)
+  - slug: canyon-to-basin
+    name: "Canyon → Basin Conduit"
+    origin_region_slug: the-canyon
+    destination_region_slug: the-basin
+    origin_room_slug: canyon-slip-west
+    destination_room_slug: basin-slip-east
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 15
+    active: true
+    description: "West through desert to GovCorp's entertainment capital. Heavy monitoring."
+    legs:
+      - position: 1
+        name: "Desert Crossing"
+        description: "Mojave. Nothing lives here on purpose."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Solar Farm Corridor"
+            description: "Heat shimmer masks thermal signatures."
+            risk_modifier: -5
+          - key: B
+            label: "Highway Express"
+            description: "Interstate freight. GovCorp territory."
+            risk_modifier: 15
+      - position: 2
+        name: "Basin Perimeter"
+        description: "Approaching Ground Zero. Maximum surveillance."
+        breach_template_slug: null
+        fork_options: []
+
+  # Basin → Canyon (East)
+  - slug: basin-to-canyon
+    name: "Basin → Canyon Conduit"
+    origin_region_slug: the-basin
+    destination_region_slug: the-canyon
+    origin_room_slug: basin-slip-east
+    destination_room_slug: canyon-slip-west
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 15
+    active: true
+    description: "East through desert away from GovCorp's core."
+    legs:
+      - position: 1
+        name: "Basin Exit"
+        description: "Leaving the most surveilled region on the continent."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Aqueduct Route"
+            description: "Follow water infrastructure. Low-priority scans."
+            risk_modifier: -5
+          - key: B
+            label: "Freight Direct"
+            description: "Cargo mainline. Fastest exit."
+            risk_modifier: 12
+      - position: 2
+        name: "Desert Relief"
+        description: "Coverage drops as you enter the wasteland."
+        breach_template_slug: null
+        fork_options: []
+
+  # Basin → Gate (North)
+  - slug: basin-to-gate
+    name: "Basin → Gate Conduit"
+    origin_region_slug: the-basin
+    destination_region_slug: the-gate
+    origin_room_slug: basin-slip-north
+    destination_room_slug: gate-slip-south
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 14
+    active: true
+    description: "Coast corridor north to the innovation hub."
+    legs:
+      - position: 1
+        name: "Coastal Highway"
+        description: "Along the coast. Beautiful and monitored."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Submarine Cable Route"
+            description: "Follow undersea fiber infrastructure."
+            risk_modifier: -8
+          - key: B
+            label: "Surface Express"
+            description: "Coastal rail. Fast, exposed."
+            risk_modifier: 10
+      - position: 2
+        name: "Gate Approach"
+        description: "Research-grade RIDE infrastructure ahead."
+        breach_template_slug: null
+        fork_options: []
+
+  # Gate → Basin (South)
+  - slug: gate-to-basin
+    name: "Gate → Basin Conduit"
+    origin_region_slug: the-gate
+    destination_region_slug: the-basin
+    origin_room_slug: gate-slip-south
+    destination_room_slug: basin-slip-north
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 14
+    active: true
+    description: "South along the coast to GovCorp's entertainment capital."
+    legs:
+      - position: 1
+        name: "Bay Exit"
+        description: "Leaving the research hub."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Kelp Farm Route"
+            description: "Through aquaculture infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Coast Rail"
+            description: "Main passenger corridor. Fast."
+            risk_modifier: 10
+      - position: 2
+        name: "Basin Insert"
+        description: "Welcome to GovCorp central."
+        breach_template_slug: null
+        fork_options: []
+
+  # Gate → Canopy (North)
+  - slug: gate-to-canopy
+    name: "Gate → Canopy Conduit"
+    origin_region_slug: the-gate
+    destination_region_slug: the-canopy
+    origin_room_slug: gate-slip-north
+    destination_room_slug: canopy-slip-south
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "North through old-growth forest to the canopy."
+    legs:
+      - position: 1
+        name: "Redwood Corridor"
+        description: "The trees do half the work. Natural signal attenuation."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Root Network"
+            description: "Follow the root systems. Biomass shields everything."
+            risk_modifier: -10
+          - key: B
+            label: "Timber Route"
+            description: "Logging infrastructure. Cleared paths."
+            risk_modifier: 5
+      - position: 2
+        name: "Canopy Insert"
+        description: "Under the evergreen canopy. Rain starts."
+        breach_template_slug: null
+        fork_options: []
+
+  # Canopy → Gate (South)
+  - slug: canopy-to-gate
+    name: "Canopy → Gate Conduit"
+    origin_region_slug: the-canopy
+    destination_region_slug: the-gate
+    origin_room_slug: canopy-slip-south
+    destination_room_slug: gate-slip-north
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "South through the forest to the bay."
+    legs:
+      - position: 1
+        name: "Forest Descent"
+        description: "Out of the canopy. Rain lessening."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Watershed Route"
+            description: "Follow the rivers south."
+            risk_modifier: -5
+          - key: B
+            label: "Highway Tunnel"
+            description: "Interstate infrastructure through the mountains."
+            risk_modifier: 8
+      - position: 2
+        name: "Bay Approach"
+        description: "Research RIDE infrastructure intensifying."
+        breach_template_slug: null
+        fork_options: []
+
+  # Gate → Front (East)
+  - slug: gate-to-front
+    name: "Gate → Front Conduit"
+    origin_region_slug: the-gate
+    destination_region_slug: the-front
+    origin_room_slug: gate-slip-east
+    destination_room_slug: front-slip-west
+    min_clearance: 15
+    base_heat_cost: 14
+    detection_risk_base: 10
+    active: true
+    description: "East across the Sierra and Great Basin to the Front Range."
+    legs:
+      - position: 1
+        name: "Mountain Pass"
+        description: "Through the Sierra. Altitude disrupts scans."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Donner Route"
+            description: "Historic pass. Narrow, slow, shielded."
+            risk_modifier: -8
+          - key: B
+            label: "Freight Tunnel"
+            description: "Modern bore. Wide, fast, monitored."
+            risk_modifier: 10
+      - position: 2
+        name: "Basin Crossing"
+        description: "Salt flats and emptiness."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Front Range Insert"
+        description: "Mountains rise again. Almost there."
+        breach_template_slug: null
+        fork_options: []
+
+  # Front → Gate (West)
+  - slug: front-to-gate
+    name: "Front → Gate Conduit"
+    origin_region_slug: the-front
+    destination_region_slug: the-gate
+    origin_room_slug: front-slip-west
+    destination_room_slug: gate-slip-east
+    min_clearance: 15
+    base_heat_cost: 14
+    detection_risk_base: 10
+    active: true
+    description: "West across the Great Basin and Sierra to the bay."
+    legs:
+      - position: 1
+        name: "Western Descent"
+        description: "Down from the Front Range."
+        breach_template_slug: null
+        fork_options: []
+      - position: 2
+        name: "Salt Flat Transit"
+        description: "Flat, bright, nothing to see. Or be seen."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Mine Corridor"
+            description: "Through lithium extraction infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Highway Express"
+            description: "Straight shot. No cover."
+            risk_modifier: 10
+      - position: 3
+        name: "Sierra Crossing"
+        description: "Through the mountains to the bay."
+        breach_template_slug: null
+        fork_options: []
+
+  # Canopy → Badlands (East)
+  - slug: canopy-to-badlands
+    name: "Canopy → Badlands Conduit"
+    origin_region_slug: the-canopy
+    destination_region_slug: the-badlands
+    origin_room_slug: canopy-slip-east
+    destination_room_slug: badlands-slip-west
+    min_clearance: 15
+    base_heat_cost: 14
+    detection_risk_base: 8
+    active: true
+    description: "East through mountain passes to the high plains."
+    legs:
+      - position: 1
+        name: "Cascade Exit"
+        description: "Through volcanic mountain passes."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Lava Tube"
+            description: "Natural volcanic tunnels. Ancient, stable."
+            risk_modifier: -10
+          - key: B
+            label: "Pass Road"
+            description: "Mountain highway infrastructure."
+            risk_modifier: 8
+      - position: 2
+        name: "Columbia Plateau"
+        description: "Basalt flatlands. Sparse."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Badlands Approach"
+        description: "Everything erodes. Including coverage."
+        breach_template_slug: null
+        fork_options: []
+
+  # Badlands → Canopy (West)
+  - slug: badlands-to-canopy
+    name: "Badlands → Canopy Conduit"
+    origin_region_slug: the-badlands
+    destination_region_slug: the-canopy
+    origin_room_slug: badlands-slip-west
+    destination_room_slug: canopy-slip-east
+    min_clearance: 15
+    base_heat_cost: 14
+    detection_risk_base: 8
+    active: true
+    description: "West through the passes to the evergreen canopy."
+    legs:
+      - position: 1
+        name: "Badlands Exit"
+        description: "Leaving the eroded rock."
+        breach_template_slug: null
+        fork_options: []
+      - position: 2
+        name: "Plateau Crossing"
+        description: "Basalt country."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "River Gorge"
+            description: "Through deep canyon infrastructure."
+            risk_modifier: -8
+          - key: B
+            label: "Freight Line"
+            description: "Agricultural freight. Grain cover."
+            risk_modifier: 5
+      - position: 3
+        name: "Canopy Insert"
+        description: "Rain and trees. Blessed interference."
+        breach_template_slug: null
+        fork_options: []
+
+  # Badlands → Front (South)
+  - slug: badlands-to-front
+    name: "Badlands → Front Conduit"
+    origin_region_slug: the-badlands
+    destination_region_slug: the-front
+    origin_room_slug: badlands-slip-south
+    destination_room_slug: front-slip-north
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 8
+    active: true
+    description: "South from the high plains to the mountain front."
+    legs:
+      - position: 1
+        name: "Plains Descent"
+        description: "South through cattle country."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Ranch Route"
+            description: "Through livestock infrastructure. Low priority."
+            risk_modifier: -5
+          - key: B
+            label: "Highway South"
+            description: "Direct. Monitored at state boundaries."
+            risk_modifier: 8
+      - position: 2
+        name: "Front Range Insert"
+        description: "Mountains ahead. Denver sprawl."
+        breach_template_slug: null
+        fork_options: []
+
+  # Front → Badlands (North)
+  - slug: front-to-badlands
+    name: "Front → Badlands Conduit"
+    origin_region_slug: the-front
+    destination_region_slug: the-badlands
+    origin_room_slug: front-slip-north
+    destination_room_slug: badlands-slip-south
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 8
+    active: true
+    description: "North from the mountains to the high plains."
+    legs:
+      - position: 1
+        name: "Mountain Exit"
+        description: "North through the foothills."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Mining Access"
+            description: "Through abandoned mine infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Interstate North"
+            description: "Direct highway corridor."
+            risk_modifier: 8
+      - position: 2
+        name: "Badlands Insert"
+        description: "Coverage drops. Sky opens."
+        breach_template_slug: null
+        fork_options: []
+
+  # === EASTERN SEABOARD CONNECTIONS ===
+
+  # Straits → Works (South)
+  - slug: straits-to-works
+    name: "Straits → Works Conduit"
+    origin_region_slug: the-straits
+    destination_region_slug: the-works
+    origin_room_slug: straits-slip-south
+    destination_room_slug: works-slip-north
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 12
+    active: true
+    description: "South through industrial lake country to the steel valleys."
+    legs:
+      - position: 1
+        name: "Lake Shore Run"
+        description: "Along the southern lake."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Steel Mill Corridor"
+            description: "Through decommissioned mills. Residual heat masks signatures."
+            risk_modifier: -8
+          - key: B
+            label: "Freeway Underpass"
+            description: "Interstate infrastructure. Maintained."
+            risk_modifier: 10
+      - position: 2
+        name: "River Valley Insert"
+        description: "Into the steel country."
+        breach_template_slug: null
+        fork_options: []
+
+  # Works → Straits (North)
+  - slug: works-to-straits
+    name: "Works → Straits Conduit"
+    origin_region_slug: the-works
+    destination_region_slug: the-straits
+    origin_room_slug: works-slip-north
+    destination_room_slug: straits-slip-south
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 12
+    active: true
+    description: "North from the river valleys to the lake strait."
+    legs:
+      - position: 1
+        name: "Valley Exit"
+        description: "Out of the river valleys."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Ore Car Route"
+            description: "Old ore transport. Slow, buried."
+            risk_modifier: -5
+          - key: B
+            label: "Turnpike Tunnel"
+            description: "Modern infrastructure. Toll cameras."
+            risk_modifier: 10
+      - position: 2
+        name: "Straits Insert"
+        description: "Industrial waterfront ahead."
+        breach_template_slug: null
+        fork_options: []
+
+  # Straits → Narrows (East)
+  - slug: straits-to-narrows
+    name: "Straits → Narrows Conduit"
+    origin_region_slug: the-straits
+    destination_region_slug: the-narrows
+    origin_room_slug: straits-slip-east
+    destination_room_slug: narrows-slip-west
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 14
+    active: true
+    description: "East through the northeast corridor to the most surveilled city on the continent."
+    legs:
+      - position: 1
+        name: "Great Lakes Exit"
+        description: "Leaving the lake country."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Canal Route"
+            description: "Follow the old canal infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Northeast Corridor"
+            description: "High-speed rail infrastructure. Maximum surveillance."
+            risk_modifier: 15
+      - position: 2
+        name: "Mountain Pass"
+        description: "Through the Appalachian gaps."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Narrows Approach"
+        description: "RIDE saturation increasing. Maximum density."
+        breach_template_slug: null
+        fork_options: []
+
+  # Narrows → Straits (West)
+  - slug: narrows-to-straits
+    name: "Narrows → Straits Conduit"
+    origin_region_slug: the-narrows
+    destination_region_slug: the-straits
+    origin_room_slug: narrows-slip-west-straits
+    destination_room_slug: straits-slip-east
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 14
+    active: true
+    description: "West from the harbor city through the northeast corridor."
+    legs:
+      - position: 1
+        name: "Harbor Exit"
+        description: "Escaping the most surveilled location on the continent."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Subway Extension"
+            description: "Through abandoned subway tunnels. Dark, old."
+            risk_modifier: -8
+          - key: B
+            label: "Amtrak Corridor"
+            description: "Main passenger rail. Fast, observed."
+            risk_modifier: 12
+      - position: 2
+        name: "Appalachian Crossing"
+        description: "Mountain country. Coverage fading."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Straits Insert"
+        description: "Industrial lake country ahead."
+        breach_template_slug: null
+        fork_options: []
+
+  # Works → Narrows (Northwest from Works perspective)
+  - slug: works-to-narrows
+    name: "Works → Narrows Conduit"
+    origin_region_slug: the-works
+    destination_region_slug: the-narrows
+    origin_room_slug: works-slip-northwest
+    destination_room_slug: narrows-slip-southwest
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 12
+    active: true
+    description: "Northeast through the mountains to the harbor city."
+    legs:
+      - position: 1
+        name: "Allegheny Crossing"
+        description: "Through the old mountain corridors."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Railroad Tunnel"
+            description: "Century-old bore through the mountains."
+            risk_modifier: -5
+          - key: B
+            label: "Turnpike Route"
+            description: "Modern highway infrastructure."
+            risk_modifier: 10
+      - position: 2
+        name: "Narrows Insert"
+        description: "Urban density increasing. RIDE saturation rising."
+        breach_template_slug: null
+        fork_options: []
+
+  # Narrows → Works (Southwest)
+  - slug: narrows-to-works
+    name: "Narrows → Works Conduit"
+    origin_region_slug: the-narrows
+    destination_region_slug: the-works
+    origin_room_slug: narrows-slip-southwest
+    destination_room_slug: works-slip-northwest
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 12
+    active: true
+    description: "Southwest through the mountains to the steel valleys."
+    legs:
+      - position: 1
+        name: "Metro Exit"
+        description: "Out of the dense urban core."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "PATH Tunnel"
+            description: "Through old trans-river tunnel infrastructure."
+            risk_modifier: -8
+          - key: B
+            label: "Interstate Express"
+            description: "Highway infrastructure. Direct."
+            risk_modifier: 10
+      - position: 2
+        name: "Steel Valley Insert"
+        description: "River valleys and foundry ruins."
+        breach_template_slug: null
+        fork_options: []
+
+  # Hollows → Narrows (North)
+  - slug: hollows-to-narrows
+    name: "Hollows → Narrows Conduit"
+    origin_region_slug: the-hollows
+    destination_region_slug: the-narrows
+    origin_room_slug: hollows-slip-north
+    destination_room_slug: narrows-slip-south
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 10
+    active: true
+    description: "North through the mountains to the harbor city."
+    legs:
+      - position: 1
+        name: "Mountain Exit"
+        description: "Out of the hollows. Coverage slowly returning."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Coal Corridor"
+            description: "Old coal transport routes. Deep, dark."
+            risk_modifier: -8
+          - key: B
+            label: "Valley Highway"
+            description: "Modern infrastructure through gaps."
+            risk_modifier: 8
+      - position: 2
+        name: "Coastal Approach"
+        description: "The harbor city ahead. Maximum RIDE density."
+        breach_template_slug: null
+        fork_options: []
+
+  # Narrows → Hollows (South)
+  - slug: narrows-to-hollows
+    name: "Narrows → Hollows Conduit"
+    origin_region_slug: the-narrows
+    destination_region_slug: the-hollows
+    origin_room_slug: narrows-slip-south
+    destination_room_slug: hollows-slip-north
+    min_clearance: 15
+    base_heat_cost: 10
+    detection_risk_base: 10
+    active: true
+    description: "South from the harbor into the mountain hollows."
+    legs:
+      - position: 1
+        name: "Urban Exit"
+        description: "Leaving the most surveilled city on the continent."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Sewer Infrastructure"
+            description: "Through the century-old drainage system."
+            risk_modifier: -10
+          - key: B
+            label: "Rail Corridor"
+            description: "Main line south. Fast, watched."
+            risk_modifier: 10
+      - position: 2
+        name: "Hollows Insert"
+        description: "Mountains folding around you. Signal dying."
+        breach_template_slug: null
+        fork_options: []
+
+  # Hollows → Marshes (South)
+  - slug: hollows-to-marshes
+    name: "Hollows → Marshes Conduit"
+    origin_region_slug: the-hollows
+    destination_region_slug: the-marshes
+    origin_room_slug: hollows-slip-south
+    destination_room_slug: marshes-slip-north
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 10
+    active: true
+    description: "South from the mountains through the piedmont to the wetlands."
+    legs:
+      - position: 1
+        name: "Piedmont Descent"
+        description: "Mountains give way to rolling hills."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Creek Route"
+            description: "Follow the waterways. Natural cover."
+            risk_modifier: -5
+          - key: B
+            label: "Interstate South"
+            description: "Direct highway corridor."
+            risk_modifier: 8
+      - position: 2
+        name: "Coastal Plain"
+        description: "Flat, subtropical, humid."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Marshes Insert"
+        description: "The ground becomes uncertain."
+        breach_template_slug: null
+        fork_options: []
+
+  # Marshes → Hollows (North)
+  - slug: marshes-to-hollows
+    name: "Marshes → Hollows Conduit"
+    origin_region_slug: the-marshes
+    destination_region_slug: the-hollows
+    origin_room_slug: marshes-slip-north
+    destination_room_slug: hollows-slip-south
+    min_clearance: 15
+    base_heat_cost: 12
+    detection_risk_base: 10
+    active: true
+    description: "North from the wetlands through the piedmont to the mountain hollows."
+    legs:
+      - position: 1
+        name: "Swamp Exit"
+        description: "Finding solid ground."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Cypress Route"
+            description: "Through the cypress swamp infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Highway North"
+            description: "Interstate corridor. Fast."
+            risk_modifier: 8
+      - position: 2
+        name: "Piedmont Ascent"
+        description: "Climbing into the hills."
+        breach_template_slug: null
+        fork_options: []
+      - position: 3
+        name: "Hollows Insert"
+        description: "Mountains closing in. Signal dying."
+        breach_template_slug: null
+        fork_options: []
+
+  # Works → Hollows (South)
+  - slug: works-to-hollows
+    name: "Works → Hollows Conduit"
+    origin_region_slug: the-works
+    destination_region_slug: the-hollows
+    origin_room_slug: works-slip-south
+    destination_room_slug: hollows-slip-north-works
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "South from the steel valleys into the mountain hollows."
+    legs:
+      - position: 1
+        name: "Valley Descent"
+        description: "Following the river south."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "River Barge Route"
+            description: "Follow the barge infrastructure."
+            risk_modifier: -5
+          - key: B
+            label: "Rail Direct"
+            description: "Coal country rail. Industrial traffic."
+            risk_modifier: 8
+      - position: 2
+        name: "Hollows Insert"
+        description: "Into the deep valleys."
+        breach_template_slug: null
+        fork_options: []
+
+  # Hollows → Works (North — toward Works specifically)
+  - slug: hollows-to-works
+    name: "Hollows → Works Conduit"
+    origin_region_slug: the-hollows
+    destination_region_slug: the-works
+    origin_room_slug: hollows-slip-north-works
+    destination_room_slug: works-slip-south
+    min_clearance: 15
+    base_heat_cost: 8
+    detection_risk_base: 10
+    active: true
+    description: "North from the hollows to the steel valleys."
+    legs:
+      - position: 1
+        name: "Mountain Ascent"
+        description: "Climbing toward the river valleys."
+        breach_template_slug: null
+        fork_options:
+          - key: A
+            label: "Mine Cart Route"
+            description: "Through old mining infrastructure."
+            risk_modifier: -8
+          - key: B
+            label: "Highway Tunnel"
+            description: "Modern bore through the mountains."
+            risk_modifier: 8
+      - position: 2
+        name: "Works Insert"
+        description: "Steel country ahead."
+        breach_template_slug: null
+        fork_options: []

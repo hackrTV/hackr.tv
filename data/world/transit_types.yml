@@ -1,0 +1,115 @@
+# Transit Type Definitions
+# Category: "public" (route-based, multiple stops, cheap)
+#           "private" (point-to-point, 1 wait cycle, expensive)
+#           "slipstream" (inter-region, leg-by-leg with fork choices)
+
+transit_types:
+  - slug: elevated-traincar
+    name: "Elevated Traincar"
+    category: public
+    description: "High-speed rail running on elevated tracks above the urban grid. Frequent stops, open platform access."
+    icon_key: TRAIN
+    base_fare: 5
+    min_clearance: 0
+    published: true
+    position: 1
+
+  - slug: underground-rail
+    name: "Underground Rail"
+    category: public
+    description: "Deep-bore tunnel rail system beneath the city substrate. Fast, reliable, claustrophobic."
+    icon_key: RAIL
+    base_fare: 5
+    min_clearance: 0
+    published: true
+    position: 2
+
+  - slug: metro-bus
+    name: "Metro Bus"
+    category: public
+    description: "Surface-level bus routes threading through the urban grid. Slow but everywhere."
+    icon_key: BUS
+    base_fare: 3
+    min_clearance: 0
+    published: true
+    position: 3
+
+  - slug: electric-rail-bus
+    name: "Electric Rail Bus"
+    category: public
+    description: "Overhead-wire electric buses running fixed rail-like routes. Quiet, efficient, practical."
+    icon_key: ERAIL
+    base_fare: 4
+    min_clearance: 0
+    published: true
+    position: 4
+
+  - slug: trolley-streetcar
+    name: "Trolley / Streetcar"
+    category: public
+    description: "Heritage streetcars rattling along embedded tracks. Slow, scenic, beloved."
+    icon_key: TRAM
+    base_fare: 2
+    min_clearance: 0
+    published: true
+    position: 5
+
+  - slug: all-terrain-transport
+    name: "All-Terrain Transport"
+    category: public
+    description: "Rugged vehicles built for rough terrain — switchback crawlers, gondola shuttles, mountain buses."
+    icon_key: ATT
+    base_fare: 8
+    min_clearance: 5
+    published: true
+    position: 6
+
+  - slug: taxi-car
+    name: "Taxi Car"
+    category: private
+    description: "Standard car-for-hire service. Pick your destination, pay the fare, arrive in one stop."
+    icon_key: TAXI
+    base_fare: 20
+    min_clearance: 0
+    published: true
+    position: 7
+
+  - slug: private-car
+    name: "Private Car"
+    category: private
+    description: "Black car service for high-rolling districts. Premium fare, no questions asked."
+    icon_key: CAR
+    base_fare: 35
+    min_clearance: 0
+    published: true
+    position: 8
+
+  - slug: water-taxi
+    name: "Water Taxi"
+    category: private
+    description: "Charter boat service across harbors, rivers, and lakefronts. Wind in your hair, if you have any."
+    icon_key: BOAT
+    base_fare: 25
+    min_clearance: 0
+    published: true
+    position: 9
+
+  - slug: airboat
+    name: "Airboat"
+    category: private
+    description: "Fan-powered flat-bottom craft for swamps and wetlands. Loud, fast, the only thing that moves out here."
+    icon_key: AIR
+    base_fare: 40
+    min_clearance: 0
+    published: true
+    position: 10
+
+  - slug: slipstream
+    name: "Slipstream"
+    category: slipstream
+    description: "Inter-region covert transit through GovCorp's freight and maintenance rail. Leg-by-leg with fork decisions. CL15 minimum."
+    icon_key: SLIP
+    base_fare: 0
+    min_clearance: 15
+    published: true
+    position: 11

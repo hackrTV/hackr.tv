@@ -2,7 +2,7 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action :require_admin_api, only: [:debit]
 
@@ -191,6 +191,43 @@ class Api::GridController < ApplicationController
       },
       software: loaded.map { |s| software_item_json(s) },
       inventory_software: inventory_sw.map { |s| software_item_json(s) }
+    }
+  end
+
+  # GET /api/grid/transit - Transit map and route browser data
+  def transit_index
+    room = current_hackr.current_room
+    region = room&.grid_zone&.grid_region
+
+    active_journey = current_hackr.active_journey
+
+    local_routes = if region
+      Grid::LocalTransitService.routes_at_room(room: room, hackr: current_hackr)
+    else
+      []
+    end
+
+    slip_routes = if region
+      Grid::SlipstreamService.routes_from(region: region, hackr: current_hackr)
+    else
+      GridSlipstreamRoute.none
+    end
+
+    region_assignments = GridRegionTransitAssignment
+      .includes(:grid_region, :grid_transit_type)
+      .order(:position)
+
+    render json: {
+      slipstream_heat: current_hackr.slipstream_heat,
+      slipstream_heat_tier: current_hackr.slipstream_heat_tier,
+      current_region: region ? {slug: region.slug, name: region.name} : nil,
+      current_journey: active_journey ? transit_journey_json(active_journey) : nil,
+      local_routes: local_routes.map { |r| transit_route_json(r) },
+      slipstream_routes: slip_routes.map { |r| slipstream_route_json(r) },
+      region_assignments: region_assignments.group_by { |a| a.grid_region.slug }
+        .transform_values { |assignments|
+          assignments.map { |a| {slug: a.grid_transit_type.slug, name: a.grid_transit_type.name, category: a.grid_transit_type.category} }
+        }
     }
   end
 
@@ -699,6 +736,46 @@ class Api::GridController < ApplicationController
       target_types: props["target_types"],
       level: (props["level"] || 1).to_i,
       loaded: item.deck_id.present?
+    }
+  end
+
+  def transit_journey_json(journey)
+    {
+      id: journey.id,
+      journey_type: journey.journey_type,
+      state: journey.state,
+      legs_completed: journey.legs_completed,
+      total_legs: journey.total_legs,
+      pending_fork: journey.pending_fork,
+      breach_mid_journey: journey.breach_mid_journey,
+      started_at: journey.started_at&.iso8601,
+      route_name: journey.slipstream? ? journey.grid_slipstream_route&.name : journey.grid_transit_route&.name,
+      current_stop: journey.current_stop ? {position: journey.current_stop.position, name: journey.current_stop.display_name} : nil,
+      current_leg: journey.current_leg ? {position: journey.current_leg.position, name: journey.current_leg.name} : nil
+    }
+  end
+
+  def transit_route_json(route)
+    {
+      slug: route.slug,
+      name: route.name,
+      transit_type: {slug: route.grid_transit_type.slug, name: route.grid_transit_type.name, category: route.grid_transit_type.category, base_fare: route.grid_transit_type.base_fare, icon_key: route.grid_transit_type.icon_key},
+      region: {slug: route.grid_region.slug, name: route.grid_region.name},
+      loop_route: route.loop_route,
+      stop_count: route.grid_transit_stops.size,
+      stops: route.grid_transit_stops.map { |s| {position: s.position, name: s.display_name, room_slug: s.grid_room.slug, is_terminus: s.is_terminus} }
+    }
+  end
+
+  def slipstream_route_json(route)
+    {
+      slug: route.slug,
+      name: route.name,
+      origin_region: {slug: route.origin_region.slug, name: route.origin_region.name},
+      destination_region: {slug: route.destination_region.slug, name: route.destination_region.name},
+      min_clearance: route.min_clearance,
+      leg_count: route.grid_slipstream_legs.size,
+      legs: route.grid_slipstream_legs.map { |l| {position: l.position, name: l.name, has_forks: l.has_forks?} }
     }
   end
 

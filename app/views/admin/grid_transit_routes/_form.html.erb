@@ -1,0 +1,57 @@
+<%= form_with model: [:admin, route], local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: ROUTE INFO ::]</h3>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div>
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <% if route.errors[:name].any? %>
+        <br><small class="red-255-text"><%= route.errors[:name].join(", ") %></small>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <small style="color: #888;">lowercase letters, numbers, hyphens only</small>
+      <% if route.errors[:slug].any? %>
+        <br><small class="red-255-text"><%= route.errors[:slug].join(", ") %></small>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :grid_transit_type_id, "TRANSIT TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :grid_transit_type_id, @transit_types.map { |t| ["#{t.name} (#{t.category})", t.id] }, { include_blank: "-- Select --" }, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+    </div>
+    <div>
+      <%= f.label :grid_region_id, "REGION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.select :grid_region_id, @regions.map { |r| [r.name, r.id] }, { include_blank: "-- Select --" }, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+    </div>
+  </div>
+
+  <div style="margin-top: 15px;">
+    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.text_area :description, class: "tui-input", style: "width: 100%; font-family: monospace; height: 80px;" %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+    <div>
+      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.number_field :position, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+    </div>
+    <div>
+      <%= f.label :loop_route, "LOOP ROUTE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.check_box :loop_route, style: "margin-top: 5px;" %>
+    </div>
+    <div>
+      <%= f.label :active, "ACTIVE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+      <%= f.check_box :active, style: "margin-top: 5px;" %>
+    </div>
+  </div>
+
+  <div style="margin-top: 25px;">
+    <%= f.submit route.new_record? ? "Create Route" : "Update Route", class: "tui-button green-168", style: "padding: 8px 20px;" %>
+    <%= link_to "Cancel", admin_grid_transit_routes_path, class: "tui-button", style: "padding: 8px 20px; margin-left: 10px;" %>
+  </div>
+<% end %>

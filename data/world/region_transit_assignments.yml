@@ -1,0 +1,96 @@
+# Region Transit Assignments
+# Maps which transit types are available in each region (0-4 per region)
+# Based on geographic flavor and real-world city analogs
+
+region_transit_assignments:
+  # The Lakeshore (Chicago) — 4 types
+  - region_slug: the-lakeshore
+    transit_type_slugs:
+      - elevated-traincar
+      - underground-rail
+      - water-taxi
+      - taxi-car
+
+  # The Riverlands (Memphis) — 3 types
+  - region_slug: the-riverlands
+    transit_type_slugs:
+      - metro-bus
+      - trolley-streetcar
+      - taxi-car
+
+  # The Narrows (NYC) — 3 types
+  - region_slug: the-narrows
+    transit_type_slugs:
+      - underground-rail
+      - taxi-car
+      - water-taxi
+
+  # The Basin (LA) — 1 type (private only)
+  - region_slug: the-basin
+    transit_type_slugs:
+      - private-car
+
+  # The Gate (SF) — 2 types
+  - region_slug: the-gate
+    transit_type_slugs:
+      - trolley-streetcar
+      - water-taxi
+
+  # The Front (Denver) — 2 types
+  - region_slug: the-front
+    transit_type_slugs:
+      - all-terrain-transport
+      - taxi-car
+
+  # The Straits (Detroit) — 1 type
+  - region_slug: the-straits
+    transit_type_slugs:
+      - electric-rail-bus
+
+  # The Bend (NOLA) — 3 types
+  - region_slug: the-bend
+    transit_type_slugs:
+      - trolley-streetcar
+      - airboat
+      - taxi-car
+
+  # The Canopy (PNW) — 3 types
+  - region_slug: the-canopy
+    transit_type_slugs:
+      - electric-rail-bus
+      - water-taxi
+      - taxi-car
+
+  # The Flats (Houston) — 2 types
+  - region_slug: the-flats
+    transit_type_slugs:
+      - metro-bus
+      - taxi-car
+
+  # The Marshes (Florida) — 1 type (private only)
+  - region_slug: the-marshes
+    transit_type_slugs:
+      - airboat
+
+  # The Works (Pittsburgh) — 2 types
+  - region_slug: the-works
+    transit_type_slugs:
+      - electric-rail-bus
+      - taxi-car
+
+  # The Badlands (Dakotas) — 0 types (walk or Slipstream)
+
+  # The Canyon (Grand Canyon) — 1 type
+  - region_slug: the-canyon
+    transit_type_slugs:
+      - all-terrain-transport
+
+  # The Hollows (Appalachia) — 1 type
+  - region_slug: the-hollows
+    transit_type_slugs:
+      - all-terrain-transport
+
+  # The Arch (St. Louis) — 1 type (private only, premium in deadzone)
+  - region_slug: the-arch
+    transit_type_slugs:
+      - private-car

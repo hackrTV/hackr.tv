@@ -73,8 +73,10 @@ module Grid
         damage_color = result.protocol_destroyed ? "#34d399" : "#22d3ee"
         output << "<span style='color: #{damage_color};'>#{h(result.program_name)} → Protocol [#{result.target_position + 1}]: #{result.damage_dealt} damage#{" — DESTROYED" if result.protocol_destroyed}</span>"
         output << "<span style='color: #6b7280;'>Battery: -#{result.battery_consumed}</span>"
+        output << "<span style='color: #fbbf24;'>  ▸ #{h(result.debuff_hint)}</span>" if result.debuff_hint
       else
         output << "<span style='color: #9ca3af;'>#{h(result.program_name)} → Protocol [#{result.target_position + 1}]: no effect.</span>"
+        output << "<span style='color: #f87171;'>  ▸ #{h(result.debuff_hint)}</span>" if result.debuff_hint
       end
 
       # Fragment extraction notification
@@ -146,6 +148,7 @@ module Grid
 
       output = []
       output << "<span style='color: #22d3ee;'>ANALYZE → Protocol [#{result.target_position + 1}]: #{h(result.info_revealed)}</span>"
+      output << "<span style='color: #fbbf24;'>  ▸ #{h(result.debuff_hint)}</span>" if result.debuff_hint
       output << "<span style='color: #34d399;'>  ▸ Bonus action!</span>" if result.bonus_action
 
       # Check if round should end
