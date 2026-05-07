@@ -66,13 +66,13 @@ const HEAT_COLORS: Record<string, string> = {
   cold: '#34d399',
   warm: '#fbbf24',
   hot: '#f97316',
-  burning: '#ef4444',
+  burning: '#ef4444'
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
   public: '#34d399',
   private: '#fbbf24',
-  slipstream: '#a78bfa',
+  slipstream: '#a78bfa'
 }
 
 const TransitPage: React.FC = () => {
@@ -123,7 +123,7 @@ const TransitPage: React.FC = () => {
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'local', label: 'Local Transit' },
     { key: 'slipstream', label: 'Slipstream' },
-    { key: 'network', label: 'Region Network' },
+    { key: 'network', label: 'Region Network' }
   ]
 
   return (
@@ -155,7 +155,7 @@ const TransitPage: React.FC = () => {
                 padding: '8px 20px',
                 fontFamily: 'monospace',
                 cursor: 'pointer',
-                fontSize: '0.9em',
+                fontSize: '0.9em'
               }}
             >
               {tab.label}

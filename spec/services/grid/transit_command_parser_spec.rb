@@ -72,7 +72,7 @@ RSpec.describe Grid::TransitCommandParser do
 
     it "routes 'off' alias to disembark" do
       execute("wait")
-      result = execute("off")
+      execute("off")
       expect(hackr.reload.active_journey).to be_nil
     end
 
