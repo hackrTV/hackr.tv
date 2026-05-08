@@ -45,12 +45,6 @@ FactoryBot.define do
     is_terminus { false }
   end
 
-  factory :grid_region_transit_assignment do
-    association :grid_region
-    association :grid_transit_type
-    position { 0 }
-  end
-
   factory :grid_slipstream_route do
     sequence(:slug) { |n| "slip-route-#{n}" }
     sequence(:name) { |n| "Slipstream Route #{n}" }

@@ -1,5 +1,34 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: grid_transit_routes
+# Database name: primary
+#
+#  id                   :integer          not null, primary key
+#  active               :boolean          default(TRUE), not null
+#  description          :text
+#  loop_route           :boolean          default(FALSE), not null
+#  name                 :string           not null
+#  position             :integer          default(0), not null
+#  slug                 :string           not null
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  grid_region_id       :integer          not null
+#  grid_transit_type_id :integer          not null
+#
+# Indexes
+#
+#  index_grid_transit_routes_on_active                (active)
+#  index_grid_transit_routes_on_grid_region_id        (grid_region_id)
+#  index_grid_transit_routes_on_grid_transit_type_id  (grid_transit_type_id)
+#  index_grid_transit_routes_on_slug                  (slug) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_region_id        (grid_region_id => grid_regions.id) ON DELETE => restrict
+#  grid_transit_type_id  (grid_transit_type_id => grid_transit_types.id) ON DELETE => restrict
+#
 class GridTransitRoute < ApplicationRecord
   has_paper_trail
 

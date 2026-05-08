@@ -136,9 +136,15 @@ RSpec.describe Grid::LocalTransitService do
     end
   end
 
-  describe "private transit (route-free)" do
+  describe "private transit" do
     let(:private_type) { create(:grid_transit_type, :private_type) }
-    let!(:assignment) { create(:grid_region_transit_assignment, grid_region: region, grid_transit_type: private_type) }
+    # Private route with stops defines boarding points (not destinations)
+    let!(:private_route) do
+      create(:grid_transit_route, grid_transit_type: private_type, grid_region: region).tap do |r|
+        create(:grid_transit_stop, grid_transit_route: r, grid_room: room_a, position: 0)
+        create(:grid_transit_stop, grid_transit_route: r, grid_room: room_b, position: 1)
+      end
+    end
 
     it "boards with destination room and arrives in single wait" do
       result = described_class.board_private!(hackr: hackr, transit_type: private_type, destination_room: room_c)
@@ -170,6 +176,14 @@ RSpec.describe Grid::LocalTransitService do
       }.to raise_error(Grid::LocalTransitService::NotAtTransitStop)
     end
 
+    it "raises NotAtTransitStop when no private route has a stop here" do
+      # room_c has no stop on the private route
+      hackr.update!(current_room: room_c)
+      expect {
+        described_class.board_private!(hackr: hackr, transit_type: private_type, destination_room: room_a)
+      }.to raise_error(Grid::LocalTransitService::NotAtTransitStop)
+    end
+
     it "raises InsufficientFunds when hackr cannot afford fare" do
       Grid::TransactionService.burn!(from_cache: cache, amount: 1000, memo: "drain")
       expect {
@@ -180,9 +194,13 @@ RSpec.describe Grid::LocalTransitService do
 
   describe ".private_types_at_room" do
     let(:private_type) { create(:grid_transit_type, :private_type) }
-    let!(:assignment) { create(:grid_region_transit_assignment, grid_region: region, grid_transit_type: private_type) }
+    let!(:private_route) do
+      create(:grid_transit_route, grid_transit_type: private_type, grid_region: region).tap do |r|
+        create(:grid_transit_stop, grid_transit_route: r, grid_room: room_a, position: 0)
+      end
+    end
 
-    it "returns private types for transit rooms in the region" do
+    it "returns private types when a route has a stop at the room" do
       results = described_class.private_types_at_room(room: room_a, hackr: hackr)
       expect(results).to include(private_type)
     end
@@ -190,6 +208,11 @@ RSpec.describe Grid::LocalTransitService do
     it "returns empty for non-transit rooms" do
       standard_room = create(:grid_room, :standard, grid_zone: zone)
       results = described_class.private_types_at_room(room: standard_room, hackr: hackr)
+      expect(results).to be_empty
+    end
+
+    it "returns empty when no private route has a stop here" do
+      results = described_class.private_types_at_room(room: room_c, hackr: hackr)
       expect(results).to be_empty
     end
   end
