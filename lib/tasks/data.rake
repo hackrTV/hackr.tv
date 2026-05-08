@@ -206,7 +206,7 @@ namespace :data do
   desc "Load world data (factions, regions, zones, rooms, etc.)"
   task world: :environment do
     guard_world_seed!
-    %i[factions regions zones rooms exits mobs item_definitions salvage_yields items achievements shop_listings missions schematics breach_templates breach_encounters pac_facilities transit_types region_transit_assignments slipstream_routes].each do |t|
+    %i[factions regions zones rooms exits mobs item_definitions salvage_yields items achievements shop_listings missions schematics breach_templates breach_encounters pac_facilities transit_types slipstream_routes].each do |t|
       Rake::Task["data:#{t}"].invoke
     end
   end
@@ -1302,44 +1302,9 @@ namespace :data do
     puts "Transit Types: #{created} created, #{GridTransitType.count} total"
   end
 
-  desc "Load region transit assignments from YAML"
-  task region_transit_assignments: :environment do
-    guard_world_seed!
-    puts "\n--- Loading Region Transit Assignments ---"
-    yaml_file = Rails.root.join("data", "world", "region_transit_assignments.yml")
-    next unless File.exist?(yaml_file)
-
-    data = YAML.load_file(yaml_file)
-    type_map = GridTransitType.all.index_by(&:slug)
-    region_map = GridRegion.all.index_by(&:slug)
-    created = 0
-
-    data["region_transit_assignments"].each do |entry|
-      region = region_map[entry["region_slug"]]
-      unless region
-        puts "  ✗ Region not found: #{entry["region_slug"]}"
-        next
-      end
-
-      (entry["transit_type_slugs"] || []).each_with_index do |type_slug, idx|
-        type = type_map[type_slug]
-        unless type
-          puts "  ✗ Transit type not found: #{type_slug}"
-          next
-        end
-
-        assignment = GridRegionTransitAssignment.find_or_initialize_by(
-          grid_region: region, grid_transit_type: type
-        )
-        next unless assignment.new_record?
-        assignment.position = idx
-        assignment.save!
-        created += 1
-      end
-    end
-
-    puts "Region Transit Assignments: #{created} created, #{GridRegionTransitAssignment.count} total"
-  end
+  # NOTE: grid_region_transit_assignments table dropped — transit types per region
+  # are now derived from actual routes. See region_transit_assignments.yml for
+  # the original mapping (retained as reference for route seeding).
 
   desc "Load slipstream routes and legs from YAML"
   task slipstream_routes: :environment do

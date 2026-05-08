@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_06_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_07_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -568,17 +568,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_200000) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.json "vendor_config"
-  end
-
-  create_table "grid_region_transit_assignments", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.integer "grid_region_id", null: false
-    t.integer "grid_transit_type_id", null: false
-    t.integer "position", default: 0, null: false
-    t.datetime "updated_at", null: false
-    t.index ["grid_region_id", "grid_transit_type_id"], name: "index_region_transit_assignments_unique", unique: true
-    t.index ["grid_region_id"], name: "index_grid_region_transit_assignments_on_grid_region_id"
-    t.index ["grid_transit_type_id"], name: "index_grid_region_transit_assignments_on_grid_transit_type_id"
   end
 
   create_table "grid_regions", force: :cascade do |t|
@@ -1396,8 +1385,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_200000) do
   add_foreign_key "grid_missions", "grid_mission_arcs", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_missions", column: "prereq_mission_id", on_delete: :nullify
   add_foreign_key "grid_missions", "grid_mobs", column: "giver_mob_id", on_delete: :nullify
-  add_foreign_key "grid_region_transit_assignments", "grid_regions", on_delete: :cascade
-  add_foreign_key "grid_region_transit_assignments", "grid_transit_types", on_delete: :cascade
   add_foreign_key "grid_regions", "grid_rooms", column: "cell_block_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "containment_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "facility_bribe_exit_room_id", on_delete: :nullify

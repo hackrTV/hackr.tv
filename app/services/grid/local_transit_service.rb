@@ -36,17 +36,17 @@ module Grid
       new(hackr).status
     end
 
-    # Private transit types available at this room (route-free, region-wide)
+    # Private transit types available at this room — derived from private routes
+    # that have a stop at this room (routes define boarding points, not destinations)
     def self.private_types_at_room(room:, hackr:)
       return [] unless room.room_type == "transit"
-      region = room.grid_zone&.grid_region
-      return [] unless region
 
-      GridRegionTransitAssignment
-        .where(grid_region: region)
-        .includes(:grid_transit_type)
-        .map(&:grid_transit_type)
-        .select { |t| t.private_point? && t.published? && hackr.stat("clearance").to_i >= t.min_clearance }
+      GridTransitType.where(category: "private").published
+        .joins(grid_transit_routes: :grid_transit_stops)
+        .where(grid_transit_stops: {grid_room_id: room.id})
+        .where(grid_transit_routes: {active: true})
+        .distinct
+        .select { |t| hackr.stat("clearance").to_i >= t.min_clearance }
     end
 
     # All transit rooms in the same region as the given room (for private destinations)
@@ -54,9 +54,12 @@ module Grid
       region = room.grid_zone&.grid_region
       return [] unless region
 
+      # Exclude slipstream origin rooms — those are hidden access points, not taxi destinations
+      slip_room_ids = GridSlipstreamRoute.active.where(origin_region: region).pluck(:origin_room_id)
+
       GridRoom.where(room_type: "transit")
         .joins(:grid_zone).where(grid_zones: {grid_region_id: region.id})
-        .where.not(id: room.id)
+        .where.not(id: [room.id] + slip_room_ids)
         .includes(:grid_zone)
         .order(:name)
     end
@@ -65,16 +68,23 @@ module Grid
       new(hackr).board_private!(transit_type, destination_room)
     end
 
+    # Public routes only — private transit is shown separately via private_types_at_room.
+    # Uses subquery to avoid joins/includes on the same association (which would
+    # filter preloaded stops to only the current room's stop, breaking stop_count).
     def self.routes_at_room(room:, hackr:)
       region = room.grid_zone&.grid_region
       return [] unless region
 
-      GridTransitRoute.active
-        .joins(:grid_transit_stops)
-        .where(grid_transit_stops: {grid_room_id: room.id})
-        .where(grid_region: region)
+      route_ids = GridTransitStop.where(grid_room_id: room.id)
+        .joins(grid_transit_route: :grid_transit_type)
+        .where(grid_transit_routes: {active: true, grid_region_id: region.id})
+        .where(grid_transit_types: {category: "public"})
+        .pluck(:grid_transit_route_id)
+
+      return [] if route_ids.empty?
+
+      GridTransitRoute.where(id: route_ids)
         .includes(:grid_transit_type, :grid_region, grid_transit_stops: :grid_room)
-        .distinct
         .select { |r| r.grid_transit_type.published? && hackr.stat("clearance").to_i >= r.grid_transit_type.min_clearance }
     end
 
@@ -130,10 +140,19 @@ module Grid
       end
     end
 
-    # Route-free private transit — hackr picks any transit room in the region
+    # Private transit — routes define boarding points, destinations are any transit room in region
     def board_private!(transit_type, destination_room)
       room = @hackr.current_room
       raise NotAtTransitStop unless room.room_type == "transit"
+
+      # Validate a private route for this type has a stop at the current room
+      has_route = GridTransitRoute.active
+        .where(grid_transit_type: transit_type)
+        .joins(:grid_transit_stops)
+        .where(grid_transit_stops: {grid_room_id: room.id})
+        .exists?
+      raise NotAtTransitStop unless has_route
+
       raise AlreadyAtDestination if destination_room.id == room.id
 
       fare = transit_type.base_fare

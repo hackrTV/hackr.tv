@@ -57,7 +57,7 @@ interface TransitResponse {
   current_journey: object | null
   local_routes: TransitRoute[]
   slipstream_routes: SlipstreamRoute[]
-  region_assignments: Record<string, RegionAssignment[]>
+  region_transit: Record<string, RegionAssignment[]>
 }
 
 type TabKey = 'local' | 'slipstream' | 'network'
@@ -166,7 +166,7 @@ const TransitPage: React.FC = () => {
         {/* Tab Content */}
         {activeTab === 'local' && <LocalTransitTab routes={data.local_routes} expandedRoutes={expandedRoutes} toggleRoute={toggleRoute} />}
         {activeTab === 'slipstream' && <SlipstreamTab routes={data.slipstream_routes} heat={data.slipstream_heat} heatTier={data.slipstream_heat_tier} />}
-        {activeTab === 'network' && <NetworkTab assignments={data.region_assignments} />}
+        {activeTab === 'network' && <NetworkTab assignments={data.region_transit} />}
       </div>
     </DefaultLayout>
   )

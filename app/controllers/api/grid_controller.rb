@@ -213,9 +213,18 @@ class Api::GridController < ApplicationController
       GridSlipstreamRoute.none
     end
 
-    region_assignments = GridRegionTransitAssignment
-      .includes(:grid_region, :grid_transit_type)
-      .order(:position)
+    # Derive region transit types from actual routes — lightweight query,
+    # only fetches distinct (region, type) pairs instead of full route objects.
+    region_type_pairs = GridTransitRoute.active
+      .joins(:grid_transit_type, :grid_region)
+      .select("grid_regions.slug AS region_slug, grid_transit_types.slug AS type_slug, grid_transit_types.name AS type_name, grid_transit_types.category AS type_category, grid_transit_types.position AS type_position")
+      .distinct
+    region_transit = region_type_pairs
+      .group_by(&:region_slug)
+      .transform_values { |rows|
+        rows.sort_by(&:type_position)
+          .map { |r| {slug: r.type_slug, name: r.type_name, category: r.type_category} }
+      }
 
     render json: {
       slipstream_heat: current_hackr.slipstream_heat,
@@ -224,10 +233,7 @@ class Api::GridController < ApplicationController
       current_journey: active_journey ? transit_journey_json(active_journey) : nil,
       local_routes: local_routes.map { |r| transit_route_json(r) },
       slipstream_routes: slip_routes.map { |r| slipstream_route_json(r) },
-      region_assignments: region_assignments.group_by { |a| a.grid_region.slug }
-        .transform_values { |assignments|
-          assignments.map { |a| {slug: a.grid_transit_type.slug, name: a.grid_transit_type.name, category: a.grid_transit_type.category} }
-        }
+      region_transit: region_transit
     }
   end
 
