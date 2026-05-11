@@ -531,3 +531,21 @@ schematics:
       - input_slug: alloy-plate
         quantity: 10
         position: 2
+
+  # ── Tutorial ───────────────────────────────────────────────────
+  - slug: fab-training-tool-kit
+    name: Fabricate Training Tool Kit
+    description: "Assemble a basic tool kit from training materials."
+    output_slug: training-tool-kit
+    output_quantity: 1
+    xp_reward: 5
+    required_clearance: 0
+    published: true
+    position: 500
+    ingredients:
+      - input_slug: training-alloy
+        quantity: 1
+        position: 0
+      - input_slug: training-circuit
+        quantity: 1
+        position: 1

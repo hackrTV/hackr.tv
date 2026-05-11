@@ -830,3 +830,103 @@ item_definitions:
     rarity: ultra_rare
     value: 5000
     properties: {}
+
+  # ── Tutorial Items (Bootloader) ────────────────────────────────
+  - slug: training-stim-pack
+    name: Training Stim Pack
+    description: "A simulated health restoration pack. Demonstrates consumable item usage."
+    item_type: consumable
+    rarity: common
+    value: 0
+    max_stack: 5
+    properties:
+      effect_type: heal
+      amount: 20
+
+  - slug: training-probe
+    name: Training Probe
+    description: "Simulated offensive software. Targets hostile protocols during BREACH encounters."
+    item_type: software
+    rarity: common
+    value: 0
+    properties:
+      software_category: offensive
+      damage: 25
+      battery_cost: 5
+
+  - slug: training-shield
+    name: Training Shield
+    description: "Simulated defensive software. Provides protection during BREACH encounters."
+    item_type: software
+    rarity: common
+    value: 0
+    properties:
+      software_category: defensive
+      damage: 15
+      battery_cost: 3
+
+  - slug: training-power-bank
+    name: Training Power Bank
+    description: "A simulated DECK power cell. Restores battery charge."
+    item_type: consumable
+    rarity: common
+    value: 0
+    max_stack: 3
+    properties:
+      effect_type: deck_recharge
+      amount: 50
+
+  - slug: training-scrap
+    name: Training Scrap
+    description: "Simulated salvageable material. Break it down for components."
+    item_type: material
+    rarity: scrap
+    value: 0
+    max_stack: 10
+
+  - slug: training-alloy
+    name: Recycled Training Alloy
+    description: "Simulated refined material recovered from salvage."
+    item_type: material
+    rarity: common
+    value: 0
+    max_stack: 10
+
+  - slug: training-circuit
+    name: Training Circuit
+    description: "A simulated circuit board. Crafting ingredient."
+    item_type: material
+    rarity: common
+    value: 0
+    max_stack: 10
+
+  - slug: training-tool-kit
+    name: Training Tool Kit
+    description: "A basic simulated tool kit. Demonstrates crafting output."
+    item_type: tool
+    rarity: common
+    value: 5
+
+  - slug: training-data-chip
+    name: Training Data Chip
+    description: "A simulated data chip. Practice buying and selling."
+    item_type: data
+    rarity: common
+    value: 10
+    max_stack: 5
+
+  - slug: training-deck
+    name: Training Deck
+    description: "A simulated hacking deck for Bootloader training. Cannot be used outside the training environment."
+    item_type: gear
+    rarity: common
+    value: 0
+    max_stack: 1
+    properties:
+      slot: deck
+      required_clearance: 0
+      slot_count: 4
+      battery_max: 64
+      battery_current: 64
+      module_slot_count: 1
+      effects: {}

@@ -206,7 +206,7 @@ namespace :data do
   desc "Load world data (factions, regions, zones, rooms, etc.)"
   task world: :environment do
     guard_world_seed!
-    %i[factions regions zones rooms exits mobs item_definitions salvage_yields items achievements shop_listings missions schematics breach_templates breach_encounters pac_facilities transit_types slipstream_routes].each do |t|
+    %i[factions regions zones rooms exits mobs item_definitions salvage_yields items achievements shop_listings missions schematics breach_templates breach_encounters pac_facilities transit_types slipstream_routes tutorial starting_rooms].each do |t|
       Rake::Task["data:#{t}"].invoke
     end
   end
@@ -2603,6 +2603,226 @@ namespace :data do
     end
 
     puts "Schematics: #{created} created, #{GridSchematic.count} total"
+  end
+
+  desc "Load tutorial (Bootloader) world data"
+  task tutorial: :environment do
+    guard_world_seed!
+    puts "\n--- Loading Tutorial (Bootloader) ---"
+    yaml_file = Rails.root.join("data", "world", "tutorial.yml")
+    next unless File.exist?(yaml_file)
+
+    data = YAML.load_file(yaml_file)
+    zone_map = GridZone.all.index_by(&:slug)
+    room_map = GridRoom.all.index_by(&:slug)
+
+    # --- Rooms ---
+    rooms_created = 0
+    (data["rooms"] || []).each do |attrs|
+      zone = zone_map[attrs["zone_slug"]]
+      next unless zone
+
+      room = GridRoom.find_or_initialize_by(slug: attrs["slug"])
+      next unless room.new_record?
+
+      room.assign_attributes(
+        name: attrs["name"],
+        description: attrs["description"],
+        room_type: attrs["room_type"] || "standard",
+        min_clearance: attrs["min_clearance"] || 0,
+        grid_zone: zone
+      )
+      room.save!
+      room_map[room.slug] = room
+      rooms_created += 1
+      puts "  ✓ Room: #{room.name}"
+    end
+
+    # --- Exits ---
+    exits_created = 0
+    (data["exits"] || []).each do |attrs|
+      from_room = room_map[attrs["from"]]
+      to_room = room_map[attrs["to"]]
+      next unless from_room && to_room
+
+      ex = GridExit.find_or_initialize_by(from_room: from_room, direction: attrs["direction"])
+      next unless ex.new_record?
+
+      ex.to_room = to_room
+      ex.save!
+      exits_created += 1
+    end
+
+    # --- Mobs ---
+    mobs_created = 0
+    (data["mobs"] || []).each do |attrs|
+      room = room_map[attrs["room_slug"]]
+      next unless room
+
+      mob = GridMob.find_or_initialize_by(name: attrs["name"], grid_room: room)
+      next unless mob.new_record?
+
+      mob.assign_attributes(
+        mob_type: attrs["mob_type"],
+        description: attrs["description"],
+        dialogue_tree: attrs["dialogue_tree"],
+        vendor_config: attrs["vendor_config"]
+      )
+      mob.save!
+      mobs_created += 1
+      puts "  ✓ Mob: #{mob.name}"
+    end
+
+    # --- Breach Encounters ---
+    encounters_created = 0
+    (data["breach_encounters"] || []).each do |attrs|
+      template = GridBreachTemplate.find_by(slug: attrs["template_slug"])
+      room = room_map[attrs["room_slug"]]
+      next unless template && room
+
+      enc = GridBreachEncounter.find_or_initialize_by(
+        grid_breach_template: template, grid_room: room
+      )
+      next unless enc.new_record?
+
+      enc.state = attrs["state"] || "available"
+      enc.save!
+      encounters_created += 1
+      puts "  ✓ Encounter: #{template.name} @ #{room.name}"
+    end
+
+    # --- Transit Route ---
+    routes_created = 0
+    if (route_data = data.dig("transit", "route"))
+      type = GridTransitType.find_by(slug: route_data["transit_type_slug"])
+      region = GridRegion.find_by(slug: route_data["region_slug"])
+      if type && region
+        route = GridTransitRoute.find_or_initialize_by(slug: route_data["slug"])
+        if route.new_record?
+          route.assign_attributes(
+            name: route_data["name"],
+            grid_transit_type: type,
+            grid_region: region,
+            active: route_data["active"],
+            loop_route: route_data["loop_route"] || false,
+            position: route_data["position"] || 0
+          )
+          route.save!
+          routes_created += 1
+
+          (route_data["stops"] || []).each do |stop_attrs|
+            stop_room = room_map[stop_attrs["room_slug"]]
+            next unless stop_room
+
+            route.grid_transit_stops.create!(
+              grid_room: stop_room,
+              label: stop_attrs["label"],
+              position: stop_attrs["position"],
+              is_terminus: stop_attrs["is_terminus"] || false
+            )
+          end
+          puts "  ✓ Route: #{route.name} (#{route.grid_transit_stops.count} stops)"
+        end
+      end
+    end
+
+    # --- Private Transit Route ---
+    if (private_data = data.dig("transit", "private_route"))
+      type = GridTransitType.find_by(slug: private_data["transit_type_slug"])
+      region = GridRegion.find_by(slug: private_data["region_slug"])
+      if type && region
+        route = GridTransitRoute.find_or_initialize_by(slug: private_data["slug"])
+        if route.new_record?
+          route.assign_attributes(
+            name: private_data["name"],
+            grid_transit_type: type,
+            grid_region: region,
+            active: private_data["active"],
+            loop_route: private_data["loop_route"] || false,
+            position: private_data["position"] || 0
+          )
+          route.save!
+          routes_created += 1
+
+          (private_data["stops"] || []).each do |stop_attrs|
+            stop_room = room_map[stop_attrs["room_slug"]]
+            next unless stop_room
+
+            route.grid_transit_stops.create!(
+              grid_room: stop_room,
+              label: stop_attrs["label"],
+              position: stop_attrs["position"],
+              is_terminus: stop_attrs["is_terminus"] || false
+            )
+          end
+          puts "  ✓ Route: #{route.name} (#{route.grid_transit_stops.count} stops)"
+        end
+      end
+    end
+
+    # --- Shop Listings ---
+    listings_created = 0
+    if (shop_data = data["shop_listings"])
+      shop_room = room_map[shop_data["room_slug"]]
+      vendor = shop_room && GridMob.find_by(name: shop_data["vendor_name"], grid_room: shop_room)
+      if vendor
+        (shop_data["listings"] || []).each do |listing_attrs|
+          defn = GridItemDefinition.find_by(slug: listing_attrs["definition_slug"])
+          next unless defn
+
+          listing = GridShopListing.find_or_initialize_by(
+            grid_mob: vendor, grid_item_definition: defn
+          )
+          next unless listing.new_record?
+
+          listing.assign_attributes(
+            base_price: listing_attrs["base_price"] || 0,
+            sell_price: listing_attrs["sell_price"] || 0,
+            stock: listing_attrs["stock"] || 99,
+            max_stock: listing_attrs["max_stock"] || 99,
+            min_clearance: listing_attrs["min_clearance"] || 0,
+            active: listing_attrs.fetch("active", true)
+          )
+          listing.save!
+          listings_created += 1
+        end
+        puts "  ✓ Shop listings: #{listings_created} for #{vendor.name}"
+      end
+    end
+
+    puts "Tutorial: #{rooms_created} rooms, #{exits_created} exits, #{mobs_created} mobs, " \
+         "#{encounters_created} encounters, #{routes_created} routes, #{listings_created} listings"
+  end
+
+  desc "Load starting rooms from YAML"
+  task starting_rooms: :environment do
+    guard_world_seed!
+    puts "\n--- Loading Starting Rooms ---"
+    yaml_file = Rails.root.join("data", "world", "starting_rooms.yml")
+    next unless File.exist?(yaml_file)
+
+    data = YAML.load_file(yaml_file)
+    created = 0
+
+    (data["starting_rooms"] || []).each do |attrs|
+      room = GridRoom.find_by(slug: attrs["room_slug"])
+      next unless room
+
+      sr = GridStartingRoom.find_or_initialize_by(grid_room: room)
+      next unless sr.new_record?
+
+      sr.assign_attributes(
+        name: attrs["name"],
+        blurb: attrs["blurb"],
+        position: attrs["position"] || 0,
+        active: attrs.fetch("active", true)
+      )
+      sr.save!
+      created += 1
+      puts "  ✓ #{sr.name} → #{room.name}"
+    end
+
+    puts "Starting Rooms: #{created} created, #{GridStartingRoom.count} total"
   end
 
   # === World Export ===

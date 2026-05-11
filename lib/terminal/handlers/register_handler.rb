@@ -104,13 +104,15 @@ module Terminal
       end
 
       def create_hackr(alias_input, password)
-        # Find starting room
+        # Find starting room — Bootloader tutorial hub, fallback to hackr-tv-central
         starting_room = GridRoom.joins(:grid_zone)
+          .where(grid_zones: {slug: Grid::TutorialService::TUTORIAL_HUB_ZONE_SLUG})
+          .where(room_type: "hub")
+          .first
+        starting_room ||= GridRoom.joins(:grid_zone)
           .where(grid_zones: {slug: "hackr-tv-central"})
           .where(room_type: "hub")
           .first
-
-        # Fallback to any hub room
         starting_room ||= GridRoom.where(room_type: "hub").first
 
         hackr = GridHackr.new(
@@ -122,6 +124,8 @@ module Terminal
         )
 
         if hackr.save
+          Grid::TutorialService.new(hackr).start!
+          hackr.provision_economy!
           registration_success(hackr)
         else
           registration_failure(hackr)

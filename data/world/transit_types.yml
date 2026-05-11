@@ -113,3 +113,24 @@ transit_types:
     min_clearance: 15
     published: true
     position: 11
+
+  # ── Tutorial Transit Types ─────────────────────────────────────
+  - slug: training-shuttle
+    name: "Training Shuttle"
+    category: public
+    description: "Simulated public transit for Bootloader training. No fare."
+    icon_key: TRAIN
+    base_fare: 0
+    min_clearance: 0
+    published: true
+    position: 100
+
+  - slug: training-taxi
+    name: "Training Taxi"
+    category: private
+    description: "Simulated private transit for Bootloader training. No fare."
+    icon_key: TAXI
+    base_fare: 0
+    min_clearance: 0
+    published: true
+    position: 101

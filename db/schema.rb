@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_07_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_07_210000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -754,6 +754,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_200000) do
     t.index ["slug"], name: "index_grid_slipstream_routes_on_slug", unique: true
   end
 
+  create_table "grid_starting_rooms", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.text "blurb", null: false
+    t.datetime "created_at", null: false
+    t.integer "grid_room_id", null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_room_id"], name: "index_grid_starting_rooms_on_grid_room_id", unique: true
+  end
+
   create_table "grid_transactions", force: :cascade do |t|
     t.integer "amount", null: false
     t.datetime "created_at", null: false
@@ -1406,6 +1417,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_200000) do
   add_foreign_key "grid_slipstream_routes", "grid_regions", column: "origin_region_id", on_delete: :restrict
   add_foreign_key "grid_slipstream_routes", "grid_rooms", column: "destination_room_id", on_delete: :restrict
   add_foreign_key "grid_slipstream_routes", "grid_rooms", column: "origin_room_id", on_delete: :restrict
+  add_foreign_key "grid_starting_rooms", "grid_rooms", on_delete: :cascade
   add_foreign_key "grid_transit_journeys", "grid_hackrs", on_delete: :cascade
   add_foreign_key "grid_transit_journeys", "grid_rooms", column: "destination_room_id", on_delete: :nullify
   add_foreign_key "grid_transit_journeys", "grid_rooms", column: "origin_room_id", on_delete: :nullify

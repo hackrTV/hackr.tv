@@ -1,0 +1,66 @@
+<%= render "admin/shared/combobox" %>
+
+<div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px; max-width: 700px;">
+  <div style="margin-bottom: 15px;">
+    <label for="grid_starting_room_name" class="white-text">Name</label>
+    <%= f.text_field :name, class: "tui-input white-text full-width", style: "width: 100%;" %>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">Room</label>
+    <input type="hidden" name="grid_starting_room[grid_room_id]" id="room-cb-hidden" value="<%= f.object.grid_room_id %>">
+    <div class="admin-combobox">
+      <input type="text" id="room-cb-input" class="admin-combobox-input<%= ' selected' if f.object.grid_room_id.present? %>" autocomplete="off"
+        placeholder="Type to search rooms..."
+        value="<%= "#{f.object.grid_room&.grid_zone&.grid_region&.name} / #{f.object.grid_room&.grid_zone&.name} / #{f.object.grid_room&.name}" if f.object.grid_room_id.present? %>">
+      <div id="room-cb-dropdown" class="admin-combobox-dropdown"></div>
+    </div>
+    <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="room-cb-status">
+      <%= @rooms.size %> rooms
+    </p>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <label for="grid_starting_room_blurb" class="white-text">Blurb</label>
+    <p style="color: #6b7280; font-size: 0.85em; margin: 2px 0 6px;">Shown to hackrs when choosing their starting location after tutorial.</p>
+    <%= f.text_area :blurb, class: "tui-input white-text full-width", style: "width: 100%; min-height: 100px;" %>
+  </div>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div>
+      <label for="grid_starting_room_position" class="white-text">Position</label>
+      <%= f.number_field :position, class: "tui-input white-text", style: "width: 80px;" %>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px; padding-top: 20px;">
+      <%= f.check_box :active, class: "tui-checkbox" %>
+      <label for="grid_starting_room_active" class="white-text">Active</label>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= f.submit(f.object.persisted? ? "Update" : "Create", class: "tui-button green-168") %>
+    <%= link_to "Cancel", admin_grid_starting_rooms_path, class: "tui-button", style: "margin-left: 10px;" %>
+  </div>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  AdminCombobox.init({
+    inputId: 'room-cb-input',
+    hiddenId: 'room-cb-hidden',
+    dropdownId: 'room-cb-dropdown',
+    statusId: 'room-cb-status',
+    formId: '<%= f.object.persisted? ? "edit_grid_starting_room_#{f.object.id}" : "new_grid_starting_room" %>',
+    items: <%= raw @rooms.map { |r| { id: r.id, name: r.name, zone_name: r.grid_zone&.name, region_name: r.grid_zone&.grid_region&.name || "Unknown", room_type: r.room_type } }.to_json %>,
+    getSearchText: function(r) { return (r.name + ' ' + r.zone_name + ' ' + r.region_name + ' ' + r.room_type).toLowerCase(); },
+    getGroupKey: function(r) { return r.region_name + ' / ' + r.zone_name; },
+    renderOption: function(r, e) {
+      return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.room_type) + '</span>';
+    },
+    getId: function(r) { return String(r.id); },
+    getLabel: function(r) { return r.region_name + ' / ' + r.zone_name + ' / ' + r.name; },
+    emptyText: 'No rooms match',
+    selectedText: 'Room selected',
+    submitError: 'Select a room first'
+  });
+</script>

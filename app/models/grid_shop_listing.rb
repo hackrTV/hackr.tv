@@ -44,7 +44,7 @@ class GridShopListing < ApplicationRecord
     :rarity_color, :rarity_label,
     to: :grid_item_definition
 
-  validates :base_price, numericality: {only_integer: true, greater_than: 0}
+  validates :base_price, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :sell_price, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :stock, numericality: {only_integer: true, greater_than_or_equal_to: 0}, allow_nil: true
   validates :max_stock, numericality: {only_integer: true, greater_than: 0}, allow_nil: true
