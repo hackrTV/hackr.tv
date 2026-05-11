@@ -36,10 +36,8 @@ module Grid
       raise AccessDenied, "This vendor doesn't sell anything" unless mob.vendor?
 
       clearance = hackr.stat("clearance")
-      listing = mob.grid_shop_listings.joins(:grid_item_definition)
-        .where(active: true)
-        .where("LOWER(grid_item_definitions.name) = ?", item_name.downcase)
-        .first
+      scope = mob.grid_shop_listings.joins(:grid_item_definition).where(active: true)
+      listing = Grid::NameResolver.resolve(scope, item_name, column: "grid_item_definitions.name")
 
       raise ItemNotFound, "This vendor doesn't sell '#{item_name}'" unless listing
       raise AccessDenied, "CLEARANCE #{listing.min_clearance}+ required" if clearance < listing.min_clearance
@@ -96,12 +94,12 @@ module Grid
     def self.sell!(hackr:, mob:, item_name:, quantity: 1)
       raise AccessDenied, "This vendor doesn't buy anything" unless mob.vendor?
 
-      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       raise ItemNotFound, "You don't have '#{item_name}'" unless item
 
       # Find matching listing for sell price, or use item.value * SELL_PRICE_RATIO
       listing = mob.grid_shop_listings.joins(:grid_item_definition)
-        .where("LOWER(grid_item_definitions.name) = ?", item_name.downcase)
+        .where("LOWER(grid_item_definitions.name) = ?", item.name.downcase)
         .first
       unit_sell_price = if listing
         listing.sell_price

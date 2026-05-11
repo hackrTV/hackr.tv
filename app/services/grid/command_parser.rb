@@ -184,6 +184,8 @@ module Grid
       else
         "<span style='color: #f87171;'>Unknown command: #{h(command)}. Type 'help' for a list of commands.</span>"
       end
+    rescue Grid::NameResolver::AmbiguousMatch => e
+      ambiguous_match_error(e)
     end
 
     private
@@ -555,7 +557,7 @@ module Grid
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
-      item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(room.grid_items.in_room(room), item_name)
       return "<span style='color: #f87171;'>You don't see '#{h(item_name)}' here.</span>" unless item
 
       # Den owner-only take restriction
@@ -613,7 +615,7 @@ module Grid
       item_name = parsed.remainder
       return "<span style='color: #fbbf24;'>Drop what?</span>" if item_name.empty?
 
-      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       return equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       # Fixtures must be placed via the place command
@@ -674,22 +676,21 @@ module Grid
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
       # Check items in room
-      item = room.grid_items.in_room(room).find_by("LOWER(name) = ?", target.downcase)
+      item = Grid::NameResolver.resolve(room.grid_items.in_room(room), target)
       return examine_item(item) if item
 
       # Check items in inventory
-      item = hackr.grid_items.find_by("LOWER(name) = ?", target.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items, target)
       return examine_item(item) if item
 
       # Check vendor shop listings (respecting per-listing clearance gate)
       vendor = room.grid_mobs.find_by(mob_type: "vendor")
       if vendor
         clearance = hackr.stat("clearance")
-        listing = vendor.grid_shop_listings.includes(:grid_item_definition).joins(:grid_item_definition)
+        scope = vendor.grid_shop_listings.includes(:grid_item_definition).joins(:grid_item_definition)
           .where(active: true)
           .where("min_clearance <= ?", clearance)
-          .where("LOWER(grid_item_definitions.name) = ?", target.downcase)
-          .first
+        listing = Grid::NameResolver.resolve(scope, target, column: "grid_item_definitions.name")
         if listing
           price = Grid::ShopService.effective_price(listing: listing, mob: vendor, clearance: clearance)
           return examine_listing(listing, price)
@@ -697,14 +698,14 @@ module Grid
       end
 
       # Check Mobs
-      mob = room.grid_mobs.find_by("LOWER(name) = ?", target.downcase)
+      mob = Grid::NameResolver.resolve(room.grid_mobs, target)
       return "<span style='color: #d0d0d0;'>#{codex_linkify(mob.description)}</span>" if mob
 
       # Check hackrs in room (or self)
       target_hackr = if target.downcase == hackr.hackr_alias.downcase
         hackr
       else
-        room.grid_hackrs.recently_active.find_by("LOWER(hackr_alias) = ?", target.downcase)
+        Grid::NameResolver.resolve(room.grid_hackrs.recently_active, target, column: "hackr_alias")
       end
       return examine_hackr(target_hackr) if target_hackr
 
@@ -727,7 +728,7 @@ module Grid
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
-      mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
+      mob = Grid::NameResolver.resolve(room.grid_mobs, npc_name)
       return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
       return "<span style='color: #9ca3af;'>#{h(mob.name)} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
@@ -773,7 +774,7 @@ module Grid
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
-      mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
+      mob = Grid::NameResolver.resolve(room.grid_mobs, npc_name)
       return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
       return "<span style='color: #9ca3af;'>#{h(mob.name)} doesn't seem interested in talking.</span>" if mob.dialogue_tree.blank?
 
@@ -1291,9 +1292,9 @@ module Grid
     def equip_command(item_name)
       return "<span style='color: #fbbf24;'>Equip what? Usage: equip &lt;item&gt;</span>" if item_name.empty?
 
-      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       unless item
-        candidate = hackr.grid_items.equipped_by(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+        candidate = Grid::NameResolver.resolve(hackr.grid_items.equipped_by(hackr), item_name)
         if candidate
           return "<span style='color: #f87171;'>#{h(candidate.name)} is already equipped.</span>"
         end
@@ -1346,7 +1347,7 @@ module Grid
         return format_unequip_output(result)
       end
 
-      item = hackr.grid_items.equipped_by(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.equipped_by(hackr), item_name)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}' equipped.</span>" unless item
 
       result = Grid::LoadoutService.unequip!(hackr: hackr, item: item)
@@ -1476,9 +1477,7 @@ module Grid
       deck = hackr.equipped_deck
       return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
 
-      software = hackr.grid_items.in_inventory(hackr)
-        .where(item_type: "software")
-        .find_by("LOWER(name) = ?", software_name.downcase)
+      software = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr).where(item_type: "software"), software_name)
       return "<span style='color: #f87171;'>No software named '#{h(software_name)}' in your inventory.</span>" unless software
 
       slot_cost = (software.properties&.dig("slot_cost") || 1).to_i
@@ -1507,7 +1506,7 @@ module Grid
       deck = hackr.equipped_deck
       return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
 
-      software = deck.loaded_software.find_by("LOWER(name) = ?", software_name.downcase)
+      software = Grid::NameResolver.resolve(deck.loaded_software, software_name)
       return "<span style='color: #f87171;'>No software named '#{h(software_name)}' loaded in your DECK.</span>" unless software
 
       ActiveRecord::Base.transaction do
@@ -1577,9 +1576,7 @@ module Grid
       return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
 
       # Find the module in inventory (must be unflashed OR reflash overwrites)
-      mod = hackr.grid_items.in_inventory(hackr)
-        .where(item_type: "module")
-        .find_by("LOWER(name) = ?", module_name.downcase)
+      mod = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr).where(item_type: "module"), module_name)
       return "<span style='color: #f87171;'>No module named '#{h(module_name)}' in your inventory.</span>" unless mod
 
       room = hackr.current_room
@@ -1595,13 +1592,10 @@ module Grid
       # Find firmware
       firmware = if at_vendor
         # At vendor: firmware available from vendor catalog (just need definition)
-        GridItemDefinition.where(item_type: "firmware")
-          .find_by("LOWER(name) = ?", firmware_name.downcase)
+        Grid::NameResolver.resolve(GridItemDefinition.where(item_type: "firmware"), firmware_name)
       else
         # DIY: firmware must be in inventory
-        hackr.grid_items.in_inventory(hackr)
-          .where(item_type: "firmware")
-          .find_by("LOWER(name) = ?", firmware_name.downcase)
+        Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr).where(item_type: "firmware"), firmware_name)
       end
 
       if firmware.nil?
@@ -1672,9 +1666,7 @@ module Grid
       deck = hackr.equipped_deck
       return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
 
-      mod = hackr.grid_items.in_inventory(hackr)
-        .where(item_type: "module")
-        .find_by("LOWER(name) = ?", module_name.downcase)
+      mod = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr).where(item_type: "module"), module_name)
       return "<span style='color: #f87171;'>No module named '#{h(module_name)}' in your inventory.</span>" unless mod
 
       unless mod.properties&.dig("flashed")
@@ -1712,7 +1704,7 @@ module Grid
       deck = hackr.equipped_deck
       return "<span style='color: #f87171;'>No DECK equipped.</span>" unless deck
 
-      mod = deck.installed_modules.find_by("LOWER(name) = ?", module_name.downcase)
+      mod = Grid::NameResolver.resolve(deck.installed_modules, module_name)
       return "<span style='color: #f87171;'>No module named '#{h(module_name)}' installed in your DECK.</span>" unless mod
 
       ActiveRecord::Base.transaction do
@@ -1780,9 +1772,17 @@ module Grid
       encounters.find { |enc| enc.name.downcase.include?(target.downcase) }
     end
 
+    def ambiguous_match_error(exception)
+      names = exception.candidates.map { |n| "'#{h(n)}'" }.join(", ")
+      "<span style='color: #fbbf24;'>Did you mean: #{names}?</span>"
+    end
+
     def equipped_item_hint(item_name)
-      return nil unless hackr.grid_items.equipped_by(hackr).find_by("LOWER(name) = ?", item_name.downcase)
-      "<span style='color: #f87171;'>That item is equipped. Use 'unequip #{h(item_name)}' first.</span>"
+      item = Grid::NameResolver.resolve(hackr.grid_items.equipped_by(hackr), item_name)
+      return nil unless item
+      "<span style='color: #f87171;'>That item is equipped. Use 'unequip #{h(item.name)}' first.</span>"
+    rescue Grid::NameResolver::AmbiguousMatch
+      nil
     end
 
     def format_unequip_output(result)
@@ -1809,7 +1809,7 @@ module Grid
     def use_command(item_name)
       return "<span style='color: #fbbf24;'>Use what?</span>" if item_name.empty?
 
-      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items, item_name)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       saved_name = item.name
@@ -1836,7 +1836,7 @@ module Grid
       item_name = parsed.remainder
       return "<span style='color: #fbbf24;'>Salvage what?</span>" if item_name.empty?
 
-      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       return equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       if item.unicorn?
@@ -1891,7 +1891,7 @@ module Grid
     def analyze_command(item_name)
       return "<span style='color: #fbbf24;'>Analyze what?</span>" if item_name.empty?
 
-      item = hackr.grid_items.find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items, item_name)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       if item.unicorn?
@@ -1970,9 +1970,10 @@ module Grid
     def schematic_detail_command(slug)
       return "<span style='color: #fbbf24;'>Which schematic? Usage: schematic &lt;slug&gt;</span>" if slug.blank?
 
-      schematic = GridSchematic.published
-        .includes(:output_definition, ingredients: :input_definition)
-        .find_by(slug: slug.downcase)
+      schematic = Grid::NameResolver.resolve(
+        GridSchematic.published.includes(:output_definition, ingredients: :input_definition),
+        slug, column: "slug"
+      )
       return "<span style='color: #f87171;'>Unknown schematic: #{h(slug)}. Use 'schematics' to browse.</span>" unless schematic
 
       output = []
@@ -2014,9 +2015,10 @@ module Grid
     def fabricate_command(recipe_slug)
       return "<span style='color: #fbbf24;'>Fabricate what? Usage: fab &lt;schematic-slug&gt;</span>" if recipe_slug.blank?
 
-      schematic = GridSchematic.published
-        .includes(:output_definition, ingredients: :input_definition)
-        .find_by(slug: recipe_slug.downcase)
+      schematic = Grid::NameResolver.resolve(
+        GridSchematic.published.includes(:output_definition, ingredients: :input_definition),
+        recipe_slug, column: "slug"
+      )
       return "<span style='color: #f87171;'>Unknown schematic: #{h(recipe_slug)}. Use 'schematics' to browse.</span>" unless schematic
 
       unless schematic.craftable_by?(hackr, **schematic_gate_context, current_room: hackr.current_room)
@@ -2732,7 +2734,7 @@ module Grid
       return "<span style='color: #f87171;'>Your rig isn't here. It's in your Den.</span>" unless in_own_den?
       return "<span style='color: #f87171;'>Your rig must be powered down before modifying components. Use 'rig off' first.</span>" if rig.active?
 
-      item = hackr.grid_items.where(grid_mining_rig_id: nil).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.where(grid_mining_rig_id: nil), item_name)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}' in your inventory.</span>" unless item
       return "<span style='color: #f87171;'>#{h(item.name)} is not a rig component.</span>" unless item.rig_component?
 
@@ -2766,7 +2768,7 @@ module Grid
       return "<span style='color: #f87171;'>Your rig isn't here. It's in your Den.</span>" unless in_own_den?
       return "<span style='color: #f87171;'>Your rig must be powered down before modifying components. Use 'rig off' first.</span>" if rig.active?
 
-      item = rig.components.find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(rig.components, item_name)
       return "<span style='color: #f87171;'>No component named '#{h(item_name)}' is installed in your rig.</span>" unless item
 
       # Motherboard removal: check that remaining boards have capacity for installed components
@@ -3021,16 +3023,15 @@ module Grid
     def mission_detail_command(slug)
       return "<span style='color: #fbbf24;'>Usage: mission &lt;slug&gt;</span>" if slug.blank?
 
-      # First check active instance (player's current progress view)
-      active = hackr.grid_hackr_missions.active.joins(:grid_mission)
-        .where(grid_missions: {slug: slug}).first
-      if active
-        return format_active_mission_detail(active)
-      end
-
-      # Otherwise show definition (if in giver's room, show accept hint)
-      mission = GridMission.published.find_by(slug: slug)
+      # Resolve against published missions + missions the hackr has active
+      active_ids = hackr.grid_hackr_missions.active.select(:grid_mission_id)
+      scope = GridMission.published.or(GridMission.where(id: active_ids))
+      mission = Grid::NameResolver.resolve(scope, slug, column: "slug")
       return "<span style='color: #f87171;'>No mission with slug '#{h(slug)}'.</span>" unless mission
+
+      # Check active instance (player's current progress view)
+      active = hackr.grid_hackr_missions.active.find_by(grid_mission_id: mission.id)
+      return format_active_mission_detail(active) if active
 
       room = hackr.current_room
       mission_brief_response(mission.giver_mob, mission, room) || "<span style='color: #9ca3af;'>Nothing to show.</span>"
@@ -3070,11 +3071,14 @@ module Grid
     def accept_mission_command(slug)
       return "<span style='color: #fbbf24;'>Usage: accept &lt;slug&gt;</span>" if slug.blank?
 
+      # Resolve partial slug
+      resolved = Grid::NameResolver.resolve(GridMission.published, slug, column: "slug")
+      slug = resolved.slug if resolved
+
       # Dialogue-path gate — can't accept a mission you haven't discovered
-      mission = GridMission.published.find_by(slug: slug)
-      if mission&.giver_mob_id && mission.dialogue_path.present?
-        giver = mission.giver_mob
-        if giver && dialogue_path_blocked?(mission, giver)
+      if resolved&.giver_mob_id && resolved.dialogue_path.present?
+        giver = resolved.giver_mob
+        if giver && dialogue_path_blocked?(resolved, giver)
           return "<span style='color: #f87171;'>You haven't learned about that job yet.</span>"
         end
       end
@@ -3082,7 +3086,7 @@ module Grid
       room = hackr.current_room
       mission_service.accept!(slug, room: room)
 
-      mission = GridMission.find_by(slug: slug)
+      mission = resolved || GridMission.find_by(slug: slug)
       giver = mission&.giver_mob
       giver_line = giver ? " <span style='color: #6b7280;'>from #{h(giver.name)}</span>" : ""
 
@@ -3102,6 +3106,10 @@ module Grid
     def abandon_mission_command(slug)
       return "<span style='color: #fbbf24;'>Usage: abandon &lt;slug&gt;</span>" if slug.blank?
 
+      active_ids = hackr.grid_hackr_missions.active.select(:grid_mission_id)
+      resolved = Grid::NameResolver.resolve(GridMission.where(id: active_ids), slug, column: "slug")
+      slug = resolved.slug if resolved
+
       hackr_mission = mission_service.abandon!(slug)
       "<span style='color: #fbbf24;'>Mission abandoned:</span> " \
         "<span style='color: #d0d0d0;'>#{h(hackr_mission.grid_mission.name)}</span>\n" \
@@ -3112,6 +3120,10 @@ module Grid
 
     def turn_in_command(slug)
       return "<span style='color: #fbbf24;'>Usage: turn_in &lt;slug&gt;</span>" if slug.blank?
+
+      active_ids = hackr.grid_hackr_missions.active.select(:grid_mission_id)
+      resolved = Grid::NameResolver.resolve(GridMission.where(id: active_ids), slug, column: "slug")
+      slug = resolved.slug if resolved
 
       room = hackr.current_room
       outcome = mission_service.turn_in!(slug, room: room)
@@ -3150,13 +3162,13 @@ module Grid
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
-      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       return equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       qty = (parsed.quantity == :all) ? item.quantity : parsed.quantity
       return "<span style='color: #f87171;'>You only have #{item.quantity} #{h(item.name)} (requested #{qty}).</span>" if qty > item.quantity
 
-      mob = room.grid_mobs.find_by("LOWER(name) = ?", npc_name.downcase)
+      mob = Grid::NameResolver.resolve(room.grid_mobs, npc_name)
       return "<span style='color: #f87171;'>You don't see '#{h(npc_name)}' here.</span>" unless mob
 
       saved_name = item.name
@@ -3493,7 +3505,7 @@ module Grid
 
       room = hackr.current_room
 
-      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
       unless item.fixture?
         return "<span style='color: #f87171;'>#{h(item.name)} is not a fixture.</span>"
@@ -3520,7 +3532,7 @@ module Grid
       return "<span style='color: #f87171;'>You can only unplace fixtures from your own den.</span>" unless in_own_den?
 
       room = hackr.current_room
-      item = room.placed_fixtures.find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(room.placed_fixtures, item_name)
       return "<span style='color: #f87171;'>No placed fixture called '#{h(item_name)}' here.</span>" unless item
 
       if item.stored_items.exists?
@@ -3555,10 +3567,10 @@ module Grid
       return "<span style='color: #f87171;'>You can only store items in fixtures in your own den.</span>" unless in_own_den?
 
       room = hackr.current_room
-      fixture = room.placed_fixtures.find_by("LOWER(name) = ?", fixture_name.downcase)
+      fixture = Grid::NameResolver.resolve(room.placed_fixtures, fixture_name)
       return "<span style='color: #f87171;'>No placed fixture called '#{h(fixture_name)}' here.</span>" unless fixture
 
-      item = hackr.grid_items.in_inventory(hackr).find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       return "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
 
       if item.fixture?
@@ -3609,10 +3621,10 @@ module Grid
       return "<span style='color: #f87171;'>You can only retrieve items from fixtures in your own den.</span>" unless in_own_den?
 
       room = hackr.current_room
-      fixture = room.placed_fixtures.find_by("LOWER(name) = ?", fixture_name.downcase)
+      fixture = Grid::NameResolver.resolve(room.placed_fixtures, fixture_name)
       return "<span style='color: #f87171;'>No placed fixture called '#{h(fixture_name)}' here.</span>" unless fixture
 
-      item = fixture.stored_items.find_by("LOWER(name) = ?", item_name.downcase)
+      item = Grid::NameResolver.resolve(fixture.stored_items, item_name)
       return "<span style='color: #f87171;'>#{h(fixture.name)} doesn't contain '#{h(item_name)}'.</span>" unless item
 
       saved_name = item.name
@@ -3644,7 +3656,7 @@ module Grid
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
 
-      fixture = room.placed_fixtures.find_by("LOWER(name) = ?", fixture_name.downcase)
+      fixture = Grid::NameResolver.resolve(room.placed_fixtures, fixture_name)
       return "<span style='color: #f87171;'>No placed fixture called '#{h(fixture_name)}' here.</span>" unless fixture
 
       cap = fixture.storage_capacity
