@@ -138,14 +138,13 @@ module Grid
       topics = node["topics"]
       return nil unless topics.is_a?(Hash)
 
-      key = topics.key?(topic_key) ? topic_key :
-            topics.keys.find { |k| k.downcase == topic_key.downcase }
-      return nil unless key
+      result = Grid::NameResolver.resolve_key(topics, topic_key)
+      return nil unless result
 
-      target = topics[key]
+      target = result[:value]
       return nil unless target.is_a?(Hash)
 
-      {node: target, key: key}
+      {node: target, key: result[:key]}
     end
 
     # DFS search of the entire tree for a topic key.
@@ -157,14 +156,20 @@ module Grid
         # Check this node's children
         sub = v["topics"]
         next unless sub.is_a?(Hash)
-        match = sub.key?(topic_key) ? topic_key :
-                sub.keys.find { |sk| sk.downcase == topic_key.downcase }
-        if match && sub[match].is_a?(Hash)
-          return {node: sub[match], key: match, path: path + [k, match]}
+
+        begin
+          result = Grid::NameResolver.resolve_key(sub, topic_key)
+          if result && result[:value].is_a?(Hash)
+            return {node: result[:value], key: result[:key], path: path + [k, result[:key]]}
+          end
+        rescue Grid::NameResolver::AmbiguousMatch
+          # Ambiguity in this branch — continue DFS, may find unique match deeper.
+          # If nothing else matches, the caller's rescue handles it.
+          nil
         end
         # Recurse deeper
-        result = search_tree(sub, topic_key, path + [k])
-        return result if result
+        deeper = search_tree(sub, topic_key, path + [k])
+        return deeper if deeper
       end
 
       nil

@@ -43,6 +43,9 @@ module Grid
       end
 
       result.is_a?(Hash) ? result : {output: result, event: nil}
+    rescue Grid::NameResolver::AmbiguousMatch => e
+      names = e.candidates.map { |n| "'#{ERB::Util.html_escape(n)}'" }.join(", ")
+      {output: "<span style='color: #fbbf24;'>Did you mean: #{names}?</span>", event: nil}
     end
 
     private

@@ -42,6 +42,9 @@ module Grid
       end
 
       result.is_a?(Hash) ? result : {output: result, event: nil}
+    rescue Grid::NameResolver::AmbiguousMatch => e
+      names = e.candidates.map { |n| "'#{ERB::Util.html_escape(n)}'" }.join(", ")
+      {output: "<span style='color: #fbbf24;'>Did you mean: #{names}?</span>", event: nil}
     end
 
     private
@@ -55,7 +58,7 @@ module Grid
       room = hackr.current_room
       return "<span style='color: #f87171;'>You are nowhere.</span>" unless room
 
-      mob = room.grid_mobs.find_by("LOWER(name) = ?", mob_name.downcase)
+      mob = Grid::NameResolver.resolve(room.grid_mobs, mob_name)
       return "<span style='color: #f87171;'>You don't see '#{h(mob_name)}' here.</span>" unless mob
 
       case mob.mob_type

@@ -275,9 +275,7 @@ module Grid
       raise NotInBreach, "You are not in a BREACH encounter." unless breach
       raise NoActionsRemaining, "No actions remaining this round." if breach.actions_remaining <= 0
 
-      item = @hackr.grid_items.in_inventory(@hackr)
-        .where(item_type: "consumable")
-        .find_by("LOWER(name) = ?", item_name.to_s.downcase)
+      item = Grid::NameResolver.resolve(@hackr.grid_items.in_inventory(@hackr).where(item_type: "consumable"), item_name)
       raise ItemNotFound, "No consumable named '#{item_name}' in your inventory." unless item
 
       effect_output = nil
