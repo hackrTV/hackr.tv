@@ -1,0 +1,9 @@
+---
+starting_rooms:
+- room_slug: bus-stop
+  name: The Lakeshore Bus Stop
+  blurb: >-
+    Right in the middle of The Lakeshore. Starting here allows you to navigate just about anywhere in the region...if you
+    have the CRED.
+  position: 1
+  active: true

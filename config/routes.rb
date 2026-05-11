@@ -523,6 +523,13 @@ Rails.application.routes.draw do
       end
     end
 
+    # Starting rooms (tutorial graduation choices)
+    resources :grid_starting_rooms, except: [:show] do
+      member do
+        get :history
+      end
+    end
+
     # Hackr Handbook (docs — full CRUD)
     resources :handbook_sections do
       member do

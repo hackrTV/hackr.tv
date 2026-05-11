@@ -39,6 +39,7 @@ module Grid
       export_schematics
       export_breach_templates
       export_breach_encounters
+      export_starting_rooms
 
       @dir
     end
@@ -67,7 +68,24 @@ module Grid
     private
 
     def write_yaml(filename, data)
-      File.write(File.join(@dir, filename), data.to_yaml(line_width: YAML_LINE_WIDTH))
+      # Sanitize BigDecimal values to floats before YAML serialization.
+      # Ruby's YAML emitter writes BigDecimal as !ruby/object:BigDecimal which
+      # Psych.safe_load rejects on re-import.
+      sanitized = sanitize_for_yaml(data)
+      File.write(File.join(@dir, filename), sanitized.to_yaml(line_width: YAML_LINE_WIDTH))
+    end
+
+    def sanitize_for_yaml(obj)
+      case obj
+      when Hash
+        obj.transform_values { |v| sanitize_for_yaml(v) }
+      when Array
+        obj.map { |v| sanitize_for_yaml(v) }
+      when BigDecimal
+        obj.to_f
+      else
+        obj
+      end
     end
 
     # ── Factions ──────────────────────────────────────────────
@@ -345,6 +363,22 @@ module Grid
         h
       end.compact
       write_yaml("breach_encounters.yml", {"breach_encounters" => encounters})
+    end
+
+    # ── Starting Rooms ───────────────────────────────────────────
+
+    def export_starting_rooms
+      rooms = GridStartingRoom.includes(:grid_room).order(:position, :name).map do |sr|
+        next unless sr.grid_room&.slug
+        {
+          "room_slug" => sr.grid_room.slug,
+          "name" => sr.name,
+          "blurb" => sr.blurb,
+          "position" => sr.position,
+          "active" => sr.active
+        }
+      end.compact
+      write_yaml("starting_rooms.yml", {"starting_rooms" => rooms})
     end
   end
 end

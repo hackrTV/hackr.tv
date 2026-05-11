@@ -18,6 +18,10 @@ module Grid
     def fabricate!
       ingredients = @schematic.ingredients.ordered.includes(:input_definition)
 
+      if ingredients.empty?
+        raise IngredientsInsufficient, "Schematic has no components defined — cannot fabricate."
+      end
+
       ActiveRecord::Base.transaction do
         # Pre-flight check inside the transaction: lock ingredient rows
         # to prevent a concurrent fabrication from passing the check and

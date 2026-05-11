@@ -5,7 +5,7 @@ module Grid
     # Commands delegated to main parser while in transit
     PASSTHROUGH_COMMANDS = %w[
       look l stat stats st inventory inv i help ? who clear cls cl
-      say examine ex x
+      say examine ex x code
     ].freeze
 
     attr_reader :hackr, :input, :journey, :parser

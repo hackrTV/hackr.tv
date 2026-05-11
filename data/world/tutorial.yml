@@ -1,0 +1,454 @@
+# Tutorial (Bootloader) World Data
+# Loaded by: rails data:tutorial (after regions, zones, item_definitions, breach_templates, transit_types)
+# Creates rooms, exits, mobs, breach encounters, transit routes, and shop listings
+# for the Bootloader tutorial region.
+
+rooms:
+  # ── Training Core ──────────────────────────────────────────────
+  - slug: bl-hub
+    name: "Bootloader Hub"
+    description: "A clean, minimalist VR space. Grid lines pulse faintly along the walls. Status readouts scroll across floating panels. This is the Fracture Network's training simulation — everything here is controlled, sandboxed, safe. Four corridors branch outward."
+    room_type: hub
+    zone_slug: bootloader-training-core
+    min_clearance: 0
+
+  - slug: bl-corridor-north
+    name: "North Corridor"
+    description: "A featureless corridor stretching north. The grid lines here are dimmer — this section of the sim hasn't been fully rendered. Practice navigation space."
+    room_type: standard
+    zone_slug: bootloader-training-core
+    min_clearance: 0
+
+  - slug: bl-observation-deck
+    name: "Observation Deck"
+    description: "A panoramic viewport showing a wireframe representation of THE PULSE GRID — cities rendered as glowing node clusters connected by transit lines. Regions pulse with data traffic. The real thing is bigger, messier, and far more dangerous than this clean visualization suggests."
+    room_type: standard
+    zone_slug: bootloader-training-core
+    min_clearance: 0
+
+  - slug: bl-equipment-locker
+    name: "Equipment Locker"
+    description: "A supply alcove with reinforced shelving. Training consumables are stocked here for new operatives. Take what you need."
+    room_type: standard
+    zone_slug: bootloader-training-core
+    min_clearance: 0
+
+  - slug: bl-interface-chamber
+    name: "Interface Chamber"
+    description: "A circular room with embedded data terminals. AXIOM, the training coordinator, stands at the center console. This is where you learn to interact with the Grid's inhabitants."
+    room_type: standard
+    zone_slug: bootloader-training-core
+    min_clearance: 0
+
+  - slug: bl-deck-lab
+    name: "DECK Lab"
+    description: "Workbenches lined with disassembled DECK units and diagnostic equipment. Software cartridges are racked along the far wall. PATCH manages equipment issue from here."
+    room_type: standard
+    zone_slug: bootloader-training-core
+    min_clearance: 0
+
+  - slug: bl-repair-bay
+    name: "Repair Bay"
+    description: "An automated repair station. Diagnostic arms hang from the ceiling, ready to service damaged DECKs. In the real Grid, this costs CRED. Here, training covers the bill."
+    room_type: repair_service
+    zone_slug: bootloader-training-core
+    min_clearance: 0
+
+  # ── Combat Arena ───────────────────────────────────────────────
+  - slug: bl-arena-lobby
+    name: "Arena Lobby"
+    description: "A staging area with three sealed simulation chambers visible through reinforced glass. Status boards show BREACH difficulty ratings. Each chamber tests a different combat discipline."
+    room_type: standard
+    zone_slug: bootloader-combat-arena
+    min_clearance: 0
+
+  - slug: bl-arena-alpha
+    name: "Simulation Chamber \u03B1"
+    description: "PROTOCOL DRILL. A bare combat space with a single protocol target. Destroy the hostile protocol using your loaded software. Use 'exec' to attack and 'analyze' to identify weaknesses."
+    room_type: standard
+    zone_slug: bootloader-combat-arena
+    min_clearance: 0
+
+  - slug: bl-arena-beta
+    name: "Simulation Chamber \u03B2"
+    description: "CIPHER DRILL. A puzzle chamber with a single circumvention gate. Solve the puzzle to bypass the system. Use 'interface' to attempt solutions."
+    room_type: standard
+    zone_slug: bootloader-combat-arena
+    min_clearance: 0
+
+  - slug: bl-arena-gamma
+    name: "Simulation Chamber \u03B3"
+    description: "COMBINED DRILL. Mixed encounter — both protocols and puzzle gates. Either destroy all protocols OR solve all gates to win. Two paths to victory."
+    room_type: standard
+    zone_slug: bootloader-combat-arena
+    min_clearance: 0
+
+  - slug: bl-arena-debrief
+    name: "Debrief Room"
+    description: "A post-combat assessment area. Supply crates along the wall contain DECK maintenance equipment. A readout displays your BREACH performance metrics."
+    room_type: standard
+    zone_slug: bootloader-combat-arena
+    min_clearance: 0
+
+  # ── Supply Wing ────────────────────────────────────────────────
+  - slug: bl-supply-depot
+    name: "Supply Depot"
+    description: "A simulated vendor stall. VECTOR manages the supply cache. All prices are zeroed for training — in the real Grid, everything costs CRED."
+    room_type: shop
+    zone_slug: bootloader-supply-wing
+    min_clearance: 0
+
+  - slug: bl-salvage-workshop
+    name: "Salvage Workshop"
+    description: "A workbench with cutting tools and sorting bins. Salvaging breaks items into raw materials that can be used for fabrication. Analyze items first to preview yields."
+    room_type: standard
+    zone_slug: bootloader-supply-wing
+    min_clearance: 0
+
+  - slug: bl-fabrication-terminal
+    name: "Fabrication Terminal"
+    description: "An automated assembly station. Feed it materials and a schematic, and it produces finished items. Check available schematics to see what you can build."
+    room_type: standard
+    zone_slug: bootloader-supply-wing
+    min_clearance: 0
+
+  # ── Transit Ring ───────────────────────────────────────────────
+  - slug: bl-transit-hub
+    name: "Transit Hub"
+    description: "A transit platform with route displays and boarding gates. The Training Shuttle runs a loop through the ring. Private transit is also available from any transit point."
+    room_type: transit
+    zone_slug: bootloader-transit-ring
+    min_clearance: 0
+
+  - slug: bl-transit-stop-a
+    name: "Relay Point A"
+    description: "A transit stop along the training ring. Route displays show the current shuttle position."
+    room_type: transit
+    zone_slug: bootloader-transit-ring
+    min_clearance: 0
+
+  - slug: bl-transit-stop-b
+    name: "Relay Point B"
+    description: "End of the public shuttle line. Private transit options are available from here to reach other transit points."
+    room_type: transit
+    zone_slug: bootloader-transit-ring
+    min_clearance: 0
+
+  - slug: bl-transit-stop-c
+    name: "Relay Point C"
+    description: "A private transit destination. Reachable via private vehicle from other transit stops."
+    room_type: transit
+    zone_slug: bootloader-transit-ring
+    min_clearance: 0
+
+  # ── Systems Wing ───────────────────────────────────────────────
+  - slug: bl-systems-lab
+    name: "Systems Lab"
+    description: "A diagnostics bay with rig testing equipment. Your mining rig was provisioned during registration — this is where you learn to manage it. Component slots, power, and activation."
+    room_type: standard
+    zone_slug: bootloader-systems-wing
+    min_clearance: 0
+
+  - slug: bl-graduation-chamber
+    name: "Graduation Chamber"
+    description: "The exit point. A deployment terminal dominates the room — choose your starting zone and step into THE PULSE GRID for real."
+    room_type: standard
+    zone_slug: bootloader-systems-wing
+    min_clearance: 0
+
+exits:
+  # ── Hub connections ────────────────────────────────────────────
+  - from: bl-hub
+    direction: north
+    to: bl-corridor-north
+  - from: bl-corridor-north
+    direction: south
+    to: bl-hub
+
+  - from: bl-hub
+    direction: west
+    to: bl-observation-deck
+  - from: bl-observation-deck
+    direction: east
+    to: bl-hub
+
+  - from: bl-hub
+    direction: east
+    to: bl-equipment-locker
+  - from: bl-equipment-locker
+    direction: west
+    to: bl-hub
+
+  - from: bl-hub
+    direction: south
+    to: bl-interface-chamber
+  - from: bl-interface-chamber
+    direction: north
+    to: bl-hub
+
+  # ── Training Core flow ────────────────────────────────────────
+  - from: bl-interface-chamber
+    direction: south
+    to: bl-deck-lab
+  - from: bl-deck-lab
+    direction: north
+    to: bl-interface-chamber
+
+  - from: bl-deck-lab
+    direction: east
+    to: bl-repair-bay
+  - from: bl-repair-bay
+    direction: west
+    to: bl-deck-lab
+
+  # ── Arena connections ──────────────────────────────────────────
+  - from: bl-deck-lab
+    direction: south
+    to: bl-arena-lobby
+  - from: bl-arena-lobby
+    direction: north
+    to: bl-deck-lab
+
+  - from: bl-arena-lobby
+    direction: northeast
+    to: bl-arena-alpha
+  - from: bl-arena-alpha
+    direction: southwest
+    to: bl-arena-lobby
+
+  - from: bl-arena-lobby
+    direction: east
+    to: bl-arena-beta
+  - from: bl-arena-beta
+    direction: west
+    to: bl-arena-lobby
+
+  - from: bl-arena-lobby
+    direction: southeast
+    to: bl-arena-gamma
+  - from: bl-arena-gamma
+    direction: northwest
+    to: bl-arena-lobby
+
+  - from: bl-arena-lobby
+    direction: south
+    to: bl-arena-debrief
+  - from: bl-arena-debrief
+    direction: north
+    to: bl-arena-lobby
+
+  # ── Supply Wing connections ────────────────────────────────────
+  - from: bl-arena-debrief
+    direction: south
+    to: bl-supply-depot
+  - from: bl-supply-depot
+    direction: north
+    to: bl-arena-debrief
+
+  - from: bl-supply-depot
+    direction: east
+    to: bl-salvage-workshop
+  - from: bl-salvage-workshop
+    direction: west
+    to: bl-supply-depot
+
+  - from: bl-salvage-workshop
+    direction: east
+    to: bl-fabrication-terminal
+  - from: bl-fabrication-terminal
+    direction: west
+    to: bl-salvage-workshop
+
+  # ── Transit Ring connections ───────────────────────────────────
+  - from: bl-supply-depot
+    direction: south
+    to: bl-transit-hub
+  - from: bl-transit-hub
+    direction: north
+    to: bl-supply-depot
+
+  # Transit stops have walking fallback back to hub
+  - from: bl-transit-stop-a
+    direction: south
+    to: bl-transit-hub
+  - from: bl-transit-hub
+    direction: east
+    to: bl-transit-stop-a
+
+  # Stop B connects to Systems Wing
+  - from: bl-transit-stop-b
+    direction: south
+    to: bl-systems-lab
+
+  # Stop C connects to Systems Wing
+  - from: bl-transit-stop-c
+    direction: south
+    to: bl-systems-lab
+  - from: bl-transit-stop-c
+    direction: west
+    to: bl-transit-stop-b
+  - from: bl-transit-stop-b
+    direction: east
+    to: bl-transit-stop-c
+
+  - from: bl-systems-lab
+    direction: north
+    to: bl-transit-stop-b
+
+  # ── Systems Wing connections ───────────────────────────────────
+  - from: bl-systems-lab
+    direction: south
+    to: bl-graduation-chamber
+  - from: bl-graduation-chamber
+    direction: north
+    to: bl-systems-lab
+
+mobs:
+  - name: AXIOM
+    slug: bl-axiom
+    mob_type: quest_giver
+    description: "A holographic instructor with sharp geometric features. Its voice is calm, precise, and slightly condescending in the way all training AIs are."
+    room_slug: bl-interface-chamber
+    dialogue_tree:
+      greeting: "Welcome, operative. I am AXIOM — your training coordinator. Ask me about any topic."
+      topics:
+        training:
+          response: "This simulation covers all core systems: navigation, DECK operations, BREACH combat, economy, transit, and rig management. Complete each module to deploy to the live Grid."
+          topics:
+            breaching:
+              response: "BREACHing is how you penetrate network nodes. Load software onto your DECK, find a target, and initiate. Destroy protocols or solve puzzle gates to win. Watch the detection meter."
+            economy:
+              response: "The Grid runs on CRED — a fixed-supply cryptocurrency. You earn it through mining (your rig), completing missions, and salvaging. You spend it at vendors and repair services."
+            factions:
+              response: "THE PULSE GRID is contested between the Fracture Network and GovCorp. Your actions build reputation with different factions, unlocking access and opportunities."
+        the-grid:
+          response: "THE PULSE GRID is a decentralized network spanning multiple geographic regions. Each region has zones with different danger levels, factions, and resources. The Grid is always watching."
+        fracture:
+          response: "The Fracture Network is a decentralized resistance movement operating within THE PULSE GRID. You're one of us now. We believe information should be free — GovCorp disagrees."
+        govcorp:
+          response: "GovCorp controls the RIDE infrastructure — the augmented reality layer that defines modern life. They see everything. Their RAINN division runs automated network defense. Get caught breaching and you'll see their Perception Alignment Centers firsthand."
+
+  - name: PATCH
+    slug: bl-patch
+    mob_type: quest_giver
+    description: "A technician in a worn utility vest, surrounded by DECK components and diagnostic readouts. Grease-stained hands, sharp eyes."
+    room_slug: bl-deck-lab
+    dialogue_tree:
+      greeting: "PATCH here. DECK specialist. Your equipment's ready — let's get you wired up."
+      topics:
+        decks:
+          response: "A DECK is your primary tool. It loads software, stores battery power, and connects you to the network for BREACH operations. Keep it charged and don't let it get fried."
+        software:
+          response: "Software comes in categories — offensive damages protocols, defensive protects you, utility does everything else. Load what you need before a BREACH."
+        fried:
+          response: "When a BREACH goes bad — detection overflow on an advanced+ target — your DECK can get fried. Damaged DECKs can't initiate BREACHes. Fix them at repair services or with Repair Kits."
+
+  - name: VECTOR
+    slug: bl-vector
+    mob_type: vendor
+    description: "An efficient supply clerk behind a clean counter. Everything is catalogued, labeled, and free — for training purposes only."
+    room_slug: bl-supply-depot
+    vendor_config:
+      shop_type: standard
+    dialogue_tree:
+      greeting: "VECTOR, supply logistics. Everything here is complimentary — training budget. Out in the Grid, you'll need CRED."
+      topics:
+        cred:
+          response: "CRED is mined, earned, or salvaged. Your mining rig generates it passively while you're active. Missions pay out. Salvaging junk produces materials you can sell or craft with."
+        prices:
+          response: "Real-world prices vary. Basic items are cheap. Rare gear can cost thousands. Black market vendors have the best stuff but charge premium prices."
+
+  - name: FORGE
+    slug: bl-forge
+    mob_type: quest_giver
+    description: "A burly mechanic with circuit-tattoo sleeves. Rig components are spread across the workbench in front of them."
+    room_slug: bl-systems-lab
+    dialogue_tree:
+      greeting: "FORGE. Rig specialist. Let's talk hardware."
+      topics:
+        rigs:
+          response: "Your mining rig generates CRED while you're active on the Grid. It needs a motherboard, PSU, CPU, GPU, and RAM to function. Better components = better mining rate."
+        components:
+          response: "Components go in slots. The motherboard defines slot capacity. You can upgrade by swapping in better components — but the rig must be offline first, and you must be in your den."
+        mining:
+          response: "Mining rate depends on your total component multipliers. The network halves the base rate periodically — better gear keeps you competitive. Watch hackr.tv streams for a mining bonus."
+
+breach_encounters:
+  - template_slug: protocol-drill-alpha
+    room_slug: bl-arena-alpha
+    state: available
+
+  - template_slug: cipher-drill-beta
+    room_slug: bl-arena-beta
+    state: available
+
+  - template_slug: combined-drill-gamma
+    room_slug: bl-arena-gamma
+    state: available
+
+transit:
+  # Training shuttle — public route with 3 stops
+  route:
+    slug: bootloader-shuttle
+    name: "Training Shuttle"
+    transit_type_slug: training-shuttle
+    region_slug: bootloader
+    active: true
+    loop_route: false
+    position: 100
+    stops:
+      - room_slug: bl-transit-hub
+        label: "Transit Hub"
+        position: 0
+      - room_slug: bl-transit-stop-a
+        label: "Relay Point A"
+        position: 1
+      - room_slug: bl-transit-stop-b
+        label: "Relay Point B"
+        position: 2
+        is_terminus: true
+
+  # Private transit — taxi available from all transit rooms
+  private_route:
+    slug: bootloader-taxi
+    name: "Training Taxi"
+    transit_type_slug: training-taxi
+    region_slug: bootloader
+    active: true
+    loop_route: false
+    position: 101
+    stops:
+      - room_slug: bl-transit-hub
+        label: "Transit Hub"
+        position: 0
+      - room_slug: bl-transit-stop-a
+        label: "Relay Point A"
+        position: 1
+      - room_slug: bl-transit-stop-b
+        label: "Relay Point B"
+        position: 2
+      - room_slug: bl-transit-stop-c
+        label: "Relay Point C"
+        position: 3
+
+shop_listings:
+  vendor_name: VECTOR
+  room_slug: bl-supply-depot
+  listings:
+    - definition_slug: training-data-chip
+      base_price: 0
+      sell_price: 0
+      stock: 3
+      max_stock: 3
+      min_clearance: 0
+      active: true
+      position: 0
+
+    - definition_slug: training-stim-pack
+      base_price: 0
+      sell_price: 0
+      stock: 3
+      max_stock: 3
+      min_clearance: 0
+      active: true
+      position: 1

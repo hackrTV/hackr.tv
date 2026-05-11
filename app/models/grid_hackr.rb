@@ -155,7 +155,9 @@ class GridHackr < ApplicationRecord
       GridItem.create!(defn.item_attributes.merge(grid_mining_rig: rig))
     end
 
-    provision_den_chip!
+    # Den chip deferred until tutorial completion (DenService crashes in Bootloader zone).
+    # For hackrs bypassing tutorial, provision_den_chip! is called from TutorialService#complete!.
+    provision_den_chip! unless stat("tutorial_active")
   end
 
   # Grant a Den Access Chip if the hackr doesn't already have one.
@@ -211,13 +213,22 @@ class GridHackr < ApplicationRecord
     admin? || feature_grants.exists?(feature: feature_name)
   end
 
-  # Ensure hackr has a current room, spawning in the starting hub if needed.
+  # Ensure hackr has a current room, spawning in the appropriate location.
+  # Tutorial-active hackrs → Bootloader hub.
+  # Everyone else → first starting room, hackr-tv-central, or any hub.
   def ensure_current_room!
     return if current_room.present?
-    starting_room = GridRoom.joins(:grid_zone)
-      .where(grid_zones: {slug: "hackr-tv-central"})
-      .where(room_type: "hub")
-      .first
+
+    starting_room = if stat("tutorial_active")
+      GridRoom.joins(:grid_zone)
+        .where(grid_zones: {slug: Grid::TutorialService::TUTORIAL_HUB_ZONE_SLUG})
+        .where(room_type: "hub")
+        .first
+    end
+
+    starting_room ||= GridStartingRoom.ordered.first&.grid_room
+    starting_room ||= GridRoom.where(room_type: "hub").first
+
     update!(current_room: starting_room) if starting_room
   end
 

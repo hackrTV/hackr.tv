@@ -1,0 +1,17 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/starting_rooms/<%= @starting_room.id %> :: EDIT STARTING ROOM</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <%= form_with(model: [:admin, @starting_room]) do |f| %>
+        <%= render "form", f: f %>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

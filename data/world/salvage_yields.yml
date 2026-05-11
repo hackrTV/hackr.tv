@@ -75,3 +75,14 @@ salvage_yields:
     output_slug: scrap-wire-bundle
     quantity: 4
     position: 0
+
+  # ── Tutorial ───────────────────────────────────────────────────
+  - source_slug: training-scrap
+    output_slug: training-alloy
+    quantity: 1
+    position: 0
+
+  - source_slug: training-scrap
+    output_slug: training-circuit
+    quantity: 1
+    position: 1

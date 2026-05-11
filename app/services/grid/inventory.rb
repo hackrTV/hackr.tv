@@ -19,7 +19,7 @@ module Grid
     # Acquires an exclusive lock on the hackr row to serialize concurrent grants.
     def check_capacity!(hackr)
       hackr.lock!
-      used = GridItem.where(grid_hackr_id: hackr.id, grid_mining_rig_id: nil, container_id: nil, equipped_slot: nil, grid_impound_record_id: nil).count
+      used = GridItem.where(grid_hackr_id: hackr.id, grid_mining_rig_id: nil, container_id: nil, equipped_slot: nil, grid_impound_record_id: nil, deck_id: nil).count
       if used >= hackr.inventory_capacity
         raise Grid::InventoryErrors::InventoryFull,
           "Inventory full (#{used}/#{hackr.inventory_capacity} slots). Drop, sell, or store items to make room."
@@ -31,26 +31,25 @@ module Grid
         raise "Grid::Inventory.grant_item! must be called inside a transaction"
       end
 
-      existing = hackr.grid_items
+      existing_stacks = hackr.grid_items
         .where(grid_item_definition_id: definition.id)
         .in_inventory(hackr)
-        .lock.first
+        .lock.order(:id)
 
       remaining = quantity
 
-      if existing
-        space_in_stack = stack_space(definition, existing.quantity)
+      # Fill existing stacks first
+      existing_stacks.each do |stack|
+        break if remaining <= 0
+        space = stack_space(definition, stack.quantity)
+        next if space <= 0
 
-        if space_in_stack >= remaining
-          # Entire grant fits in existing stack
-          existing.update!(quantity: existing.quantity + remaining)
-          return existing
-        elsif space_in_stack > 0
-          # Partial fit — fill existing stack, remainder overflows to new slots
-          existing.update!(quantity: definition.max_stack)
-          remaining -= space_in_stack
-        end
+        add = [space, remaining].min
+        stack.update!(quantity: stack.quantity + add)
+        remaining -= add
       end
+
+      return existing_stacks.last if remaining <= 0
 
       # Remaining needs new slot(s) — create as many as needed
       last_item = nil

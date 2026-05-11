@@ -1320,3 +1320,70 @@ breach_templates:
         health: 45
         max_health: 45
         charge_rounds: 2
+
+  # ── Tutorial (Bootloader) ──────────────────────────────────────
+
+  - slug: protocol-drill-alpha
+    name: "Protocol Drill \u03B1"
+    description: "Training simulation — protocol-only. A single TRACE protocol with low health. Destroy it to win."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 95
+    base_detection_rate: 2
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 10
+    cred_reward: 0
+    published: true
+    position: 100
+    protocol_composition:
+      - type: trace
+        count: 1
+        health: 20
+        max_health: 20
+        charge_rounds: 0
+        weakness: offensive
+
+  - slug: cipher-drill-beta
+    name: "Cipher Drill \u03B2"
+    description: "Training simulation — puzzle gate only. Solve the credential gate to win. No protocols."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 95
+    base_detection_rate: 2
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 10
+    cred_reward: 0
+    published: true
+    position: 101
+    protocol_composition: []
+    puzzle_gates:
+      - id: A
+        type: credential
+        difficulty: 1
+
+  - slug: combined-drill-gamma
+    name: "Combined Drill \u03B3"
+    description: "Training simulation — mixed. One protocol and one puzzle gate. Destroy the protocol OR solve the gate to win."
+    tier: standard
+    min_clearance: 0
+    pnr_threshold: 95
+    base_detection_rate: 3
+    cooldown_min: 0
+    cooldown_max: 0
+    xp_reward: 15
+    cred_reward: 0
+    published: true
+    position: 102
+    protocol_composition:
+      - type: feedback
+        count: 1
+        health: 25
+        max_health: 25
+        charge_rounds: 0
+        weakness: defensive
+    puzzle_gates:
+      - id: A
+        type: sequence
+        difficulty: 1

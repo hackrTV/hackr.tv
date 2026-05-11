@@ -1092,3 +1092,39 @@ zones:
     faction_slug: null
     danger_level: 0
 
+  # ── Bootloader (Tutorial) ─────────────────────────────────────────
+  - name: "Training Core"
+    slug: bootloader-training-core
+    description: "Primary VR training module. Navigation, interface, DECK, and combat systems."
+    region_slug: bootloader
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Combat Arena"
+    slug: bootloader-combat-arena
+    description: "BREACH simulation chambers for combat training."
+    region_slug: bootloader
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Supply Wing"
+    slug: bootloader-supply-wing
+    description: "Economy and supply chain training. Shops, salvage, fabrication."
+    region_slug: bootloader
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Transit Ring"
+    slug: bootloader-transit-ring
+    description: "Public and private transit training network."
+    region_slug: bootloader
+    faction_slug: null
+    danger_level: 0
+
+  - name: "Systems Wing"
+    slug: bootloader-systems-wing
+    description: "System diagnostics and rig management training."
+    region_slug: bootloader
+    faction_slug: null
+    danger_level: 0
+

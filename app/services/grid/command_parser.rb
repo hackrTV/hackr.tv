@@ -35,6 +35,11 @@ module Grid
         return Grid::TransitCommandParser.new(hackr, input, active_journey, self).execute
       end
 
+      # Tutorial mode: guided training with hint injection
+      if hackr.stat("tutorial_active") == true
+        return Grid::TutorialCommandParser.new(hackr, input, self).execute
+      end
+
       # Split input but preserve case in arguments
       parts = input.split
       command = parts.first&.downcase
@@ -174,6 +179,8 @@ module Grid
         clear_command
       when "bribe"
         "<span style='color: #9ca3af;'>Bribe is only available inside a GovCorp facility while in custody.</span>"
+      when "code"
+        code_command(args)
       else
         "<span style='color: #f87171;'>Unknown command: #{h(command)}. Type 'help' for a list of commands.</span>"
       end
@@ -1162,6 +1169,10 @@ module Grid
         output: "",
         event: {type: "clear"}
       }
+    end
+
+    def code_command(args)
+      Grid::CodeService.new(hackr).execute(args&.join(" "))
     end
 
     def stat_command

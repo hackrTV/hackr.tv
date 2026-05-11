@@ -63,3 +63,7 @@ regions:
   - name: The Hollows
     slug: the-hollows
     description: "Ancient mountain ridges folded tight around deep valleys where mist pools and signal dies — a region of coal seams, abandoned mines, and communities that GovCorp's RIDE infrastructure has never fully reached."
+
+  - name: Bootloader
+    slug: bootloader
+    description: "Fracture Network VR training simulation. A sandboxed environment for orienting new operatives before deployment to THE PULSE GRID."
