@@ -151,9 +151,10 @@ module Grid
     def search_tree(topics, topic_key, path)
       return nil unless topics.is_a?(Hash)
 
+      last_ambiguous = nil
+
       topics.each do |k, v|
         next unless v.is_a?(Hash)
-        # Check this node's children
         sub = v["topics"]
         next unless sub.is_a?(Hash)
 
@@ -162,15 +163,21 @@ module Grid
           if result && result[:value].is_a?(Hash)
             return {node: result[:value], key: result[:key], path: path + [k, result[:key]]}
           end
-        rescue Grid::NameResolver::AmbiguousMatch
-          # Ambiguity in this branch — continue DFS, may find unique match deeper.
-          # If nothing else matches, the caller's rescue handles it.
-          nil
+        rescue Grid::NameResolver::AmbiguousMatch => e
+          last_ambiguous = e
         end
-        # Recurse deeper
-        deeper = search_tree(sub, topic_key, path + [k])
-        return deeper if deeper
+
+        begin
+          deeper = search_tree(sub, topic_key, path + [k])
+          return deeper if deeper
+        rescue Grid::NameResolver::AmbiguousMatch => e
+          last_ambiguous = e
+        end
       end
+
+      # No unique match in any branch. If ambiguity was encountered, propagate it
+      # so the player gets "Did you mean: ..." instead of "NPC doesn't know."
+      raise last_ambiguous if last_ambiguous
 
       nil
     end
