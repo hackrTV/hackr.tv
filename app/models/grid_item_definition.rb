@@ -13,6 +13,7 @@
 #  properties  :json             not null
 #  rarity      :string           not null
 #  slug        :string           not null
+#  tutorial    :boolean          default(FALSE), not null
 #  value       :integer          default(0), not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
@@ -49,6 +50,7 @@ class GridItemDefinition < ApplicationRecord
 
   scope :ordered, -> { order(:item_type, :name) }
   scope :by_item_type, ->(t) { where(item_type: t) }
+  scope :non_tutorial, -> { where(tutorial: false) }
 
   def to_param
     slug

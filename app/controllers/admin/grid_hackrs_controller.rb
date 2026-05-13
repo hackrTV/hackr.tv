@@ -131,6 +131,7 @@ class Admin::GridHackrsController < Admin::ApplicationController
     end
 
     @hackr.update!(current_room_id: room.id, zone_entry_room_id: room.id)
+    Grid::RoomVisitRecorder.record!(hackr: @hackr, room: room)
 
     zone_name = room.grid_zone&.name || "unknown zone"
     set_flash_success("#{@hackr.hackr_alias} warped to #{room.name} (#{zone_name}).")

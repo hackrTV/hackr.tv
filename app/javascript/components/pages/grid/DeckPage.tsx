@@ -34,9 +34,18 @@ interface DeckInfo {
   modules_used: number
 }
 
+interface ModuleItem {
+  id: number
+  name: string
+  rarity_color: string
+  description: string | null
+  firmware: string | null
+}
+
 interface DeckResponse {
   deck: DeckInfo | null
   software: SoftwareItem[]
+  modules: ModuleItem[]
   inventory_software: SoftwareItem[]
 }
 
@@ -128,7 +137,7 @@ const DeckPage: React.FC = () => {
     )
   }
 
-  const { deck, software, inventory_software } = data
+  const { deck, software, modules, inventory_software } = data
 
   return (
     <DefaultLayout>
@@ -170,6 +179,28 @@ const DeckPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {modules.length > 0 && (
+                  <div style={{ borderTop: '1px solid #333', paddingTop: 15, marginTop: 10 }}>
+                    <h3 style={{ color: '#fbbf24', margin: '0 0 10px 0', fontSize: '1em' }}>INSTALLED MODULES</h3>
+                    {modules.map(mod => (
+                      <div key={mod.id} style={{
+                        background: '#1a1a2e', border: '1px solid #333', borderRadius: 4,
+                        padding: '8px 12px', marginBottom: 6
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ color: mod.rarity_color, fontWeight: 'bold' }}>{mod.name}</span>
+                          {mod.firmware && (
+                            <span style={{ color: '#a78bfa', fontSize: '0.85em' }}>{mod.firmware}</span>
+                          )}
+                        </div>
+                        {mod.description && (
+                          <div style={{ color: '#6b7280', fontSize: '0.85em', marginTop: 4 }}>{mod.description}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div style={{ borderTop: '1px solid #333', paddingTop: 15, marginTop: 10 }}>
                   <h3 style={{ color: '#fbbf24', margin: '0 0 10px 0', fontSize: '1em' }}>LOADED SOFTWARE</h3>

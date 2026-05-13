@@ -103,6 +103,7 @@ class GridHackr < ApplicationRecord
   has_many :moderation_logs_as_target, class_name: "ModerationLog", foreign_key: :target_id, dependent: :nullify
   has_many :feature_grants, dependent: :destroy
   has_many :grid_hackr_achievements, dependent: :destroy
+  has_many :grid_room_visits, dependent: :destroy
   has_many :grid_achievements, through: :grid_hackr_achievements
   has_many :grid_shop_transactions, dependent: :nullify
   has_many :grid_hackr_reputations, dependent: :destroy
@@ -230,6 +231,7 @@ class GridHackr < ApplicationRecord
     starting_room ||= GridRoom.where(room_type: "hub").first
 
     update!(current_room: starting_room) if starting_room
+    Grid::RoomVisitRecorder.record!(hackr: self, room: starting_room) if starting_room
   end
 
   # Update last activity timestamp without triggering callbacks

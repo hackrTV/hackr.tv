@@ -38,6 +38,7 @@ module Grid
       @hackr.set_stat!("tutorial_boot_shown", false)
       @hackr.set_stat!("tutorial_granted_steps", [])
       @hackr.update!(current_room: hub)
+      Grid::RoomVisitRecorder.record!(hackr: @hackr, room: hub)
     end
 
     # Complete tutorial — hackr chooses a starting room.
@@ -50,6 +51,7 @@ module Grid
       @hackr.set_stat!("tutorial_completed", true)
       @hackr.set_stat!("tutorial_step", nil)
       @hackr.update!(current_room: starting_room)
+      Grid::RoomVisitRecorder.record!(hackr: @hackr, room: starting_room)
 
       # Grant pulse_grid feature if not already granted
       grant_grid_access!
@@ -83,6 +85,7 @@ module Grid
       @hackr.set_stat!("tutorial_return_room_id", nil)
       @hackr.set_stat!("tutorial_choosing_start", nil)
       @hackr.update!(current_room: return_room) if return_room
+      Grid::RoomVisitRecorder.record!(hackr: @hackr, room: return_room) if return_room
     end
 
     def active?

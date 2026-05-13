@@ -104,6 +104,7 @@ module Grid
         eject_room_id = @hackr.zone_entry_room_id
         if eject_room_id && eject_room_id != @hackr.current_room_id
           @hackr.update!(current_room_id: eject_room_id)
+          Grid::RoomVisitRecorder.record_by_id!(hackr: @hackr, room_id: eject_room_id)
           ejected = true
         end
       end

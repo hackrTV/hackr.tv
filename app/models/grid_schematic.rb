@@ -54,6 +54,7 @@ class GridSchematic < ApplicationRecord
   validates :required_room_type, inclusion: {in: ROOM_TYPE_LABELS.keys, allow_nil: true}
 
   scope :published, -> { where(published: true) }
+  scope :non_tutorial, -> { where(output_definition_id: GridItemDefinition.where(tutorial: false).select(:id)) }
   scope :ordered, -> { order(:position, :name) }
 
   def to_param

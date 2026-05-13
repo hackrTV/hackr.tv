@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_07_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_204418) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -447,6 +447,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_210000) do
     t.json "properties", default: {}, null: false
     t.string "rarity", null: false
     t.string "slug", null: false
+    t.boolean "tutorial", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
     t.index ["item_type"], name: "index_grid_item_definitions_on_item_type"
@@ -618,6 +619,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_210000) do
     t.index ["grid_hackr_id"], name: "index_grid_reputation_events_on_grid_hackr_id"
     t.index ["source_type", "source_id"], name: "index_rep_events_on_source"
     t.index ["subject_type", "subject_id", "created_at"], name: "index_rep_events_on_subject_and_time", order: { created_at: :desc }
+  end
+
+  create_table "grid_room_visits", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "first_visited_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "grid_room_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id", "grid_room_id"], name: "index_grid_room_visits_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_grid_room_visits_on_grid_hackr_id"
+    t.index ["grid_room_id"], name: "index_grid_room_visits_on_grid_room_id"
   end
 
   create_table "grid_rooms", force: :cascade do |t|
@@ -1403,6 +1415,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_210000) do
   add_foreign_key "grid_regions", "grid_rooms", column: "hospital_room_id", on_delete: :nullify
   add_foreign_key "grid_regions", "grid_rooms", column: "sally_port_room_id", on_delete: :nullify
   add_foreign_key "grid_reputation_events", "grid_hackrs"
+  add_foreign_key "grid_room_visits", "grid_hackrs", on_delete: :cascade
+  add_foreign_key "grid_room_visits", "grid_rooms", on_delete: :cascade
   add_foreign_key "grid_rooms", "grid_hackrs", column: "owner_id"
   add_foreign_key "grid_rooms", "zone_playlists", column: "ambient_playlist_id"
   add_foreign_key "grid_salvage_yields", "grid_item_definitions", column: "output_definition_id"

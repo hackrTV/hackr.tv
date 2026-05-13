@@ -735,6 +735,7 @@ module Grid
           else
             tutorial_service.return_to_world!
             hackr.update!(current_room: sr.grid_room)
+            Grid::RoomVisitRecorder.record!(hackr: hackr, room: sr.grid_room)
           end
 
           look = Grid::CommandParser.new(hackr, "look").execute[:output]

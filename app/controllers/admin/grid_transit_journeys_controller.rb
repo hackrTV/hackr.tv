@@ -30,6 +30,7 @@ class Admin::GridTransitJourneysController < Admin::ApplicationController
       journey.update!(state: "abandoned", ended_at: Time.current)
       hackr = journey.grid_hackr
       hackr.update!(current_room: journey.origin_room) if journey.origin_room
+      Grid::RoomVisitRecorder.record!(hackr: hackr, room: journey.origin_room) if journey.origin_room
       set_flash_success("Journey ##{journey.id} force-abandoned.")
     else
       flash[:error] = "Journey is not active (state: #{journey.state})."

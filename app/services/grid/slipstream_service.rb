@@ -181,6 +181,7 @@ module Grid
       ActiveRecord::Base.transaction do
         journey.lock!
         @hackr.update!(current_room: journey.origin_room) if journey.origin_room
+        Grid::RoomVisitRecorder.record!(hackr: @hackr, room: journey.origin_room) if journey.origin_room
         journey.update!(state: "abandoned", ended_at: Time.current)
         display = Grid::TransitRenderer.render_slipstream_abandon(journey)
         AbandonResult.new(journey: journey.reload, display: display)
@@ -343,6 +344,7 @@ module Grid
       else
         @hackr.update!(current_room: dest)
       end
+      Grid::RoomVisitRecorder.record!(hackr: @hackr, room: dest)
       @hackr.add_slipstream_heat!(journey.heat_accumulated)
       journey.update!(
         state: "completed",
@@ -359,6 +361,7 @@ module Grid
     def eject!(journey, severity)
       origin = journey.origin_room
       @hackr.update!(current_room: origin) if origin
+      Grid::RoomVisitRecorder.record!(hackr: @hackr, room: origin) if origin
 
       case severity
       when :severe

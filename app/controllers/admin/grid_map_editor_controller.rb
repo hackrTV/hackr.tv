@@ -646,13 +646,15 @@ class Admin::GridMapEditorController < Admin::ApplicationController
 
     while remaining.any?
       seed_id = remaining.include?(seed.id) ? seed.id : remaining.first
-      queue = [[seed_id, 0, positions.empty? ? 0 : (positions.values.map(&:last).max + 3)]]
+      # Queue items: [room_id, x, y, vertical?]
+      queue = [[seed_id, 0, positions.empty? ? 0 : (positions.values.map(&:last).max + 3), false]]
       visited = Set.new([seed_id])
 
       while (item = queue.shift)
-        rid, lx, ly = item
+        rid, lx, ly, vertical = item
 
-        if occupied[[lx, ly]] && occupied[[lx, ly]] != rid
+        # Skip collision detection for vertical exits (they share x,y by design)
+        if !vertical && occupied[[lx, ly]] && occupied[[lx, ly]] != rid
           placed = false
           (1..10).each do |radius|
             break if placed
@@ -672,17 +674,21 @@ class Admin::GridMapEditorController < Admin::ApplicationController
         end
 
         positions[rid] = [lx, ly]
-        occupied[[lx, ly]] = rid
+        occupied[[lx, ly]] = rid unless vertical
         remaining.delete(rid)
 
         (exits_by_from[rid] || []).each do |ex|
-          next if z_directions.key?(ex.direction)
           next unless room_ids.include?(ex.to_room_id)
           next if visited.include?(ex.to_room_id)
-          vec = direction_vectors[ex.direction]
-          next unless vec
-          visited.add(ex.to_room_id)
-          queue << [ex.to_room_id, lx + vec[0], ly + vec[1]]
+          if z_directions.key?(ex.direction)
+            visited.add(ex.to_room_id)
+            queue << [ex.to_room_id, lx, ly, true]
+          else
+            vec = direction_vectors[ex.direction]
+            next unless vec
+            visited.add(ex.to_room_id)
+            queue << [ex.to_room_id, lx + vec[0], ly + vec[1], false]
+          end
         end
       end
 
