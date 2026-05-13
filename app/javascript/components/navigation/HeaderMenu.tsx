@@ -6,7 +6,7 @@ import { useMobileMenu } from '~/contexts/MobileMenuContext'
 import { useTerminal } from '~/contexts/TerminalContext'
 
 export const HeaderMenu: React.FC = () => {
-  const { hackr, isLoggedIn, disconnect } = useGridAuth()
+  const { hackr, isLoggedIn, disconnect, hasFeature } = useGridAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const isActive = (path: string) => path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/')
@@ -285,6 +285,11 @@ export const HeaderMenu: React.FC = () => {
                     <Link to="/grid/identity" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>identity
                     </Link>
+                    {hasFeature('tactical_grid') && (
+                      <Link to="/grid/1337" className={`mobile-menu-item${isActive('/grid/1337') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                        <span className="purple-168-text">/</span>tactical
+                      </Link>
+                    )}
                     <Link to="/achievements" className={`mobile-menu-item${isActive('/achievements') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>achievements
                     </Link>
@@ -590,6 +595,13 @@ export const HeaderMenu: React.FC = () => {
                 )}
                 {isLoggedIn && (
                   <>
+                    {hasFeature('tactical_grid') && (
+                      <li>
+                        <Link to="/grid/1337" onClick={closeDropdown}>
+                          <span className="purple-168-text">/</span>tactical
+                        </Link>
+                      </li>
+                    )}
                     <li>
                       <Link to="/grid/identity" onClick={closeDropdown}>
                         <span className="purple-168-text">/</span>identity
