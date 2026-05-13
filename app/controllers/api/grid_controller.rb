@@ -2,10 +2,26 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: [:zone_map]
   before_action :require_admin_api, only: [:debit]
+
+  INVENTORY_TYPE_ORDER = %w[gear consumable tool software module firmware material data rig_component fixture collectible faction].freeze
+  INVENTORY_TYPE_LABELS = {
+    "gear" => "GEAR", "consumable" => "CONSUMABLES", "tool" => "TOOLS",
+    "software" => "SOFTWARE", "module" => "MODULES", "firmware" => "FIRMWARE",
+    "material" => "MATERIALS", "data" => "DATA", "rig_component" => "RIG COMPONENTS",
+    "fixture" => "FIXTURES", "collectible" => "COLLECTIBLES", "faction" => "FACTION"
+  }.freeze
+  INVENTORY_ITEM_ACTIONS = {
+    "gear" => %w[equip use drop salvage], "consumable" => %w[use drop salvage],
+    "tool" => %w[use drop salvage], "fixture" => %w[place salvage],
+    "software" => %w[use drop salvage], "firmware" => %w[use drop salvage],
+    "module" => %w[use drop salvage], "material" => %w[use drop salvage],
+    "data" => %w[use drop salvage], "rig_component" => %w[use drop salvage],
+    "collectible" => %w[use drop salvage], "faction" => %w[use drop]
+  }.freeze
 
   # GET /api/grid/achievements - All visible achievements grouped by
   # category, with earned status, awarded_at, and live progress for
@@ -164,6 +180,69 @@ class Api::GridController < ApplicationController
         health: {current: current_hackr.stat("health"), max: current_hackr.effective_max("health")},
         energy: {current: current_hackr.stat("energy"), max: current_hackr.effective_max("energy")},
         psyche: {current: current_hackr.stat("psyche"), max: current_hackr.effective_max("psyche")}
+      }
+    }
+  end
+
+  # GET /api/grid/inventory - Inventory items grouped by type with available actions
+  def inventory_index
+    items = current_hackr.grid_items.in_inventory(current_hackr)
+      .includes(:grid_item_definition).to_a
+
+    grouped = items.group_by(&:item_type)
+
+    render json: {
+      capacity: {used: items.size, max: current_hackr.inventory_capacity},
+      groups: INVENTORY_TYPE_ORDER.filter_map { |type|
+        type_items = grouped[type]
+        next unless type_items&.any?
+        {
+          item_type: type,
+          label: INVENTORY_TYPE_LABELS[type] || type.upcase,
+          items: type_items
+            .sort_by { |i| [-(GridItem::RARITIES.index(i.rarity) || 0), i.name.to_s] }
+            .map { |i| inventory_item_json(i) }
+        }
+      }
+    }
+  end
+
+  # GET /api/grid/reputation - Faction standings with parent→child hierarchy
+  def reputation_index
+    service = Grid::ReputationService.new(current_hackr)
+    standings = service.faction_standings(include_zero: true)
+
+    # Walk parent→child hierarchy — same tree logic as rep_command
+    children_by_parent = standings.group_by { |s| s[:faction].parent_id }
+    standing_ids = standings.map { |s| s[:faction].id }.to_set
+    roots = standings.select { |s| s[:faction].parent_id.nil? || !standing_ids.include?(s[:faction].parent_id) }
+
+    ordered = []
+    visited = Set.new
+    walk = lambda do |standing, depth|
+      fid = standing[:faction].id
+      return if visited.include?(fid)
+      visited << fid
+      ordered << {standing: standing, depth: depth}
+      (children_by_parent[fid] || []).each { |child| walk.call(child, depth + 1) }
+    end
+    roots.each { |s| walk.call(s, 0) }
+
+    render json: {
+      standings: ordered.map { |entry|
+        s = entry[:standing]
+        {
+          faction_name: s[:faction].display_name,
+          faction_slug: s[:faction].slug,
+          effective: s[:effective],
+          tier_key: s[:tier][:key],
+          tier_label: s[:tier][:label],
+          tier_color: s[:tier][:color],
+          next_tier_label: s[:next_tier]&.dig(:label),
+          next_tier_diff: s[:next_tier] ? (s[:next_tier][:min] - s[:effective]) : nil,
+          aggregate: s[:aggregate],
+          depth: entry[:depth]
+        }
       }
     }
   end
@@ -825,6 +904,25 @@ class Api::GridController < ApplicationController
       target_types: props["target_types"],
       level: (props["level"] || 1).to_i,
       loaded: item.deck_id.present?
+    }
+  end
+
+  def inventory_item_json(item)
+    actions = (INVENTORY_ITEM_ACTIONS[item.item_type] || %w[drop]).dup
+    actions.delete("salvage") if item.unicorn?
+    {
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      item_type: item.item_type,
+      rarity: item.rarity,
+      rarity_color: item.rarity_color,
+      rarity_label: item.rarity_label,
+      quantity: item.quantity,
+      max_stack: item.grid_item_definition&.max_stack,
+      definition_slug: item.grid_item_definition&.slug,
+      properties: item.properties || {},
+      actions: actions
     }
   end
 
