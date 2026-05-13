@@ -45,7 +45,7 @@ class Admin::GridHackrsController < Admin::ApplicationController
         @hackr.update_column(:stats, parsed)
         @hackr.stats = parsed
         set_flash_success("Stats updated (raw JSON) for #{@hackr.hackr_alias}.")
-        return redirect_to admin_grid_hackr_path(@hackr)
+        return redirect_to edit_stats_admin_grid_hackr_path(@hackr)
       rescue JSON::ParserError => e
         flash.now[:error] = "Invalid JSON: #{e.message}"
         return render :edit_stats, status: :unprocessable_entity
@@ -96,7 +96,7 @@ class Admin::GridHackrsController < Admin::ApplicationController
     end
 
     set_flash_success("Stats updated for #{@hackr.hackr_alias}.")
-    redirect_to admin_grid_hackr_path(@hackr)
+    redirect_to edit_stats_admin_grid_hackr_path(@hackr)
   end
 
   # GET /root/grid_hackrs/:id/warp

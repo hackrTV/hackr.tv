@@ -115,7 +115,7 @@ const TacticalInner: React.FC = () => {
       color: '#d0d0d0'
     }}>
       <div style={{ gridArea: 'topbar' }}>
-        <TacticalBar connectionStatus={connectionStatus} />
+        <TacticalBar connectionStatus={connectionStatus} refreshToken={refreshToken} />
       </div>
 
       <div style={{

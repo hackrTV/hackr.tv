@@ -67,7 +67,7 @@ class Admin::GridMissionsController < Admin::ApplicationController
 
   def load_selects
     @arcs = GridMissionArc.ordered
-    @missions_for_prereq = GridMission.ordered.where.not(id: @mission.id)
+    @missions_for_prereq = GridMission.ordered.includes(:grid_mission_arc).where.not(id: @mission.id)
     # Restrict giver choices to mob types that plausibly hand out work:
     # quest_givers (obvious) and vendors (can offer repeatable
     # commerce-flavored missions like "spend N CRED at my shop").

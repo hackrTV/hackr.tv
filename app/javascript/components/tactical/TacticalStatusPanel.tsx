@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { StatsTab } from './tabs/StatsTab'
 import { DeckTab } from './tabs/DeckTab'
 import { LoadoutTab } from './tabs/LoadoutTab'
 import { InventoryTab } from './tabs/InventoryTab'
@@ -7,10 +6,9 @@ import { RepTab } from './tabs/RepTab'
 import { MissionsTab } from './tabs/MissionsTab'
 import { SchematicsTab } from './tabs/SchematicsTab'
 
-type TabKey = 'stats' | 'deck' | 'loadout' | 'inventory' | 'rep' | 'missions' | 'schematics'
+type TabKey = 'deck' | 'loadout' | 'inventory' | 'rep' | 'missions' | 'schematics'
 
 const TABS: { key: TabKey; label: string }[] = [
-  { key: 'stats', label: 'STATS' },
   { key: 'deck', label: 'DECK' },
   { key: 'loadout', label: 'GEAR' },
   { key: 'inventory', label: 'INV' },
@@ -25,8 +23,8 @@ interface TacticalStatusPanelProps {
 }
 
 export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refreshToken, onCommand }) => {
-  const [activeTab, setActiveTab] = useState<TabKey>('stats')
-  const [mountedTabs, setMountedTabs] = useState<Set<TabKey>>(new Set(['stats']))
+  const [activeTab, setActiveTab] = useState<TabKey>('deck')
+  const [mountedTabs, setMountedTabs] = useState<Set<TabKey>>(new Set(['deck']))
 
   const handleTabClick = (key: TabKey) => {
     setActiveTab(key)
@@ -44,7 +42,6 @@ export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refres
 
     return (
       <div key={key} style={{ display: isActive ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
-        {key === 'stats' && <StatsTab refreshToken={refreshToken} />}
         {key === 'deck' && <DeckTab refreshToken={refreshToken} />}
         {key === 'loadout' && <LoadoutTab refreshToken={refreshToken} />}
         {key === 'inventory' && <InventoryTab refreshToken={refreshToken} />}

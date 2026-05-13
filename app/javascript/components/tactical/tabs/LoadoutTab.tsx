@@ -13,6 +13,7 @@ interface SlotData {
 
 interface LoadoutResponse {
   slots: SlotData[]
+  active_effects: Record<string, number | boolean>
 }
 
 export const LoadoutTab: React.FC<{ refreshToken: number }> = ({ refreshToken }) => {
@@ -27,6 +28,7 @@ export const LoadoutTab: React.FC<{ refreshToken: number }> = ({ refreshToken })
   const mid = Math.ceil(data.slots.length / 2)
   const left = data.slots.slice(0, mid)
   const right = data.slots.slice(mid)
+  const effectEntries = Object.entries(data.active_effects).filter(([, v]) => v !== 0 && v !== false)
 
   const renderSlot = (slot: SlotData) => (
     <div key={slot.slot} style={{
@@ -49,6 +51,17 @@ export const LoadoutTab: React.FC<{ refreshToken: number }> = ({ refreshToken })
         <div>{left.map(renderSlot)}</div>
         <div>{right.map(renderSlot)}</div>
       </div>
+      {effectEntries.length > 0 && (
+        <div style={{ marginTop: '12px' }}>
+          <div style={{ color: '#666', fontSize: '0.85em', marginBottom: '4px' }}>ACTIVE EFFECTS</div>
+          {effectEntries.map(([key, val]) => (
+            <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', color: '#888' }}>
+              <span>{key.replace(/_/g, ' ')}</span>
+              <span style={{ color: '#34d399' }}>+{String(val)}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

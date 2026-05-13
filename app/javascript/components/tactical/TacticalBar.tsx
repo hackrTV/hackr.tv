@@ -1,14 +1,50 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useNavigate } from 'react-router-dom'
+import { apiJson } from '~/utils/apiClient'
 
 interface TacticalBarProps {
   connectionStatus: 'connected' | 'connecting' | 'reconnecting' | 'disconnected'
+  refreshToken: number
 }
 
-export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus }) => {
+interface VitalsData {
+  vitals: {
+    health: { current: number; max: number }
+    energy: { current: number; max: number }
+    psyche: { current: number; max: number }
+  }
+}
+
+const CompactVital: React.FC<{ label: string; current: number; max: number; color: string }> = ({
+  label, current, max, color
+}) => {
+  const pct = max > 0 ? Math.round((current / max) * 100) : 0
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <span style={{ color, fontSize: '0.7em', fontWeight: 'bold', width: '18px' }}>{label}</span>
+      <div style={{
+        background: '#1a1a1a', borderRadius: '2px', height: '6px', width: '60px',
+        border: '1px solid #333', overflow: 'hidden'
+      }}>
+        <div style={{
+          width: `${pct}%`, height: '100%', borderRadius: '2px',
+          background: color, transition: 'width 0.3s'
+        }} />
+      </div>
+      <span style={{ color: '#999', fontSize: '0.65em', minWidth: '36px' }}>{current}/{max}</span>
+    </div>
+  )
+}
+
+export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus, refreshToken }) => {
   const { hackr, disconnect } = useGridAuth()
   const navigate = useNavigate()
+  const [vitals, setVitals] = useState<VitalsData['vitals'] | null>(null)
+
+  useEffect(() => {
+    apiJson<VitalsData>('/api/grid/loadout').then(d => setVitals(d.vitals)).catch(console.error)
+  }, [refreshToken])
 
   const handleDisconnect = async () => {
     if (confirm('Disconnect from THE PULSE GRID?')) {
@@ -45,6 +81,15 @@ export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus }) =>
           <a href="/root" style={{ color: '#f87171', fontSize: '0.85em', textDecoration: 'none' }}>[ADMIN]</a>
         )}
       </div>
+
+      {vitals && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <CompactVital label="HP" current={vitals.health.current} max={vitals.health.max} color={vitals.health.current <= 30 ? '#f87171' : '#34d399'} />
+          <CompactVital label="EN" current={vitals.energy.current} max={vitals.energy.max} color="#fbbf24" />
+          <CompactVital label="PS" current={vitals.psyche.current} max={vitals.psyche.max} color="#a78bfa" />
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <a href="/grid" style={{
           color: '#666',
