@@ -245,6 +245,7 @@ module Grid
         journey.lock!
         # Return to origin room
         @hackr.update!(current_room: journey.origin_room) if journey.origin_room
+        Grid::RoomVisitRecorder.record!(hackr: @hackr, room: journey.origin_room) if journey.origin_room
         journey.update!(state: "abandoned", ended_at: Time.current)
         display = Grid::TransitRenderer.render_abandon(journey)
         AbandonResult.new(journey: journey.reload, display: display)
@@ -281,6 +282,7 @@ module Grid
       else
         @hackr.update!(current_room: room)
       end
+      Grid::RoomVisitRecorder.record!(hackr: @hackr, room: room)
     end
 
     def complete_journey!(journey)

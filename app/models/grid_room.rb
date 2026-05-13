@@ -42,6 +42,7 @@ class GridRoom < ApplicationRecord
   has_many :grid_items, foreign_key: :room_id
   has_many :grid_mobs
   has_many :grid_hackrs, foreign_key: :current_room_id
+  has_many :grid_room_visits, dependent: :destroy
   has_many :grid_breach_encounters, dependent: :destroy
   has_many :den_invites, class_name: "GridDenInvite", foreign_key: :den_id, dependent: :destroy
 

@@ -48,6 +48,7 @@ module Grid
 
         if destination && destination.id != @hackr.current_room_id
           @hackr.update!(current_room_id: destination.id)
+          Grid::RoomVisitRecorder.record!(hackr: @hackr, room: destination)
         end
       end
 

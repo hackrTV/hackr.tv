@@ -11,6 +11,7 @@
 #  properties  :json             not null
 #  rarity      :string           not null
 #  slug        :string           not null
+#  tutorial    :boolean          default(FALSE), not null
 #  value       :integer          default(0), not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null

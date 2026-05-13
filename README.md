@@ -440,7 +440,7 @@ hackr.tv/
 │       ├── easter_eggs.rb             # Hidden commands
 │       ├── realtime_subscriber.rb     # Action Cable pubsub for terminal
 │       └── handlers/                  # Terminal command handlers
-├── spec/                              # Test suite (2969 total)
+├── spec/                              # Test suite (2994 total)
 │   ├── models/                        # Model specs
 │   ├── controllers/                   # Controller specs
 │   ├── components/                    # ViewComponent specs
@@ -472,9 +472,9 @@ bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- **Backend:** 2725 examples (RSpec)
+- **Backend:** 2750 examples (RSpec)
 - **Frontend:** 244 examples (Vitest)
-- **Total:** 2969 passing tests
+- **Total:** 2994 passing tests
 
 ---
 
@@ -763,7 +763,7 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/rails data:catalog` | Load artists, albums, tracks only |
 | `bin/rails data:world` | Load all world data (regions, zones, rooms, mobs, items, BREACH, transit, etc.) |
 | `bin/rails data:reset` | Reset seed content (preserves user data) |
-| `bundle exec rspec` | Run backend test suite (2725 tests) |
+| `bundle exec rspec` | Run backend test suite (2750 tests) |
 | `pnpm test` | Run frontend test suite (244 tests) |
 | `bundle exec standardrb` | Lint backend code |
 | `bundle exec brakeman` | Run security scanner |

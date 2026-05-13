@@ -432,6 +432,7 @@ module Grid
       else
         hackr.update!(current_room: new_room)
       end
+      Grid::RoomVisitRecorder.record!(hackr: hackr, room: new_room)
 
       # Track exploration (unique rooms via visited_rooms array in stats)
       visited = hackr.stat("visited_rooms") || []
@@ -1921,7 +1922,7 @@ module Grid
     # --- Fabrication commands ---
 
     def schematics_command
-      all_schematics = GridSchematic.published.ordered
+      all_schematics = GridSchematic.published.non_tutorial.ordered
         .includes(:output_definition, ingredients: :input_definition).to_a
 
       inventory_qtys = hackr.grid_items.group(:grid_item_definition_id).sum(:quantity)
@@ -1971,7 +1972,7 @@ module Grid
       return "<span style='color: #fbbf24;'>Which schematic? Usage: schematic &lt;slug&gt;</span>" if slug.blank?
 
       schematic = Grid::NameResolver.resolve(
-        GridSchematic.published.includes(:output_definition, ingredients: :input_definition),
+        GridSchematic.published.non_tutorial.includes(:output_definition, ingredients: :input_definition),
         slug, column: "slug"
       )
       return "<span style='color: #f87171;'>Unknown schematic: #{h(slug)}. Use 'schematics' to browse.</span>" unless schematic
@@ -2016,7 +2017,7 @@ module Grid
       return "<span style='color: #fbbf24;'>Fabricate what? Usage: fab &lt;schematic-slug&gt;</span>" if recipe_slug.blank?
 
       schematic = Grid::NameResolver.resolve(
-        GridSchematic.published.includes(:output_definition, ingredients: :input_definition),
+        GridSchematic.published.non_tutorial.includes(:output_definition, ingredients: :input_definition),
         recipe_slug, column: "slug"
       )
       return "<span style='color: #f87171;'>Unknown schematic: #{h(recipe_slug)}. Use 'schematics' to browse.</span>" unless schematic

@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     get "identity/two-factor", to: "pages#spa_root", as: :grid_two_factor
     get "reset_password/:token", to: "pages#spa_root", as: :grid_password_reset
     get "confirm_email_change/:token", to: "pages#spa_root", as: :grid_confirm_email_change
+    get "1337", to: "pages#spa_root", as: :grid_tactical
   end
 
   # Vault (promoted from /fm/pulse-vault)
@@ -184,6 +185,7 @@ Rails.application.routes.draw do
     post "grid/reset_password", to: "grid#reset_password"
     post "grid/request_email_change", to: "grid#request_email_change"
     post "grid/confirm_email_change", to: "grid#confirm_email_change"
+    get "grid/zone_map", to: "grid#zone_map"
 
     # TOTP two-factor authentication
     get "totp/status", to: "totp#status"

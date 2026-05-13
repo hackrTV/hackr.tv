@@ -2,8 +2,9 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
+  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: [:zone_map]
   before_action :require_admin_api, only: [:debit]
 
   # GET /api/grid/achievements - All visible achievements grouped by
@@ -73,7 +74,7 @@ class Api::GridController < ApplicationController
   # GET /api/grid/schematics - Published schematics with ingredients,
   # craftable status, and per-ingredient ownership for the current hackr.
   def schematics_index
-    schematics = GridSchematic.published.ordered
+    schematics = GridSchematic.published.non_tutorial.ordered
       .includes(:output_definition, ingredients: :input_definition)
 
     # Pre-load hackr state to avoid N+1 on craftable_by? checks
@@ -105,8 +106,13 @@ class Api::GridController < ApplicationController
           output: {
             slug: s.output_definition.slug,
             name: s.output_definition.name,
+            description: s.output_definition.description,
+            item_type: s.output_definition.item_type,
             rarity: s.output_definition.rarity,
-            rarity_color: s.output_definition.rarity_color
+            rarity_color: s.output_definition.rarity_color,
+            rarity_label: s.output_definition.rarity_label,
+            max_stack: s.output_definition.max_stack,
+            properties: s.output_definition.properties
           },
           output_quantity: s.output_quantity,
           xp_reward: s.xp_reward,
@@ -175,6 +181,8 @@ class Api::GridController < ApplicationController
     inventory_sw = current_hackr.grid_items.in_inventory(current_hackr)
       .where(item_type: "software").includes(:grid_item_definition)
 
+    modules = deck.installed_modules.includes(:grid_item_definition)
+
     render json: {
       deck: {
         id: deck.id,
@@ -190,6 +198,15 @@ class Api::GridController < ApplicationController
         modules_used: deck.deck_modules_used
       },
       software: loaded.map { |s| software_item_json(s) },
+      modules: modules.map { |m|
+        {
+          id: m.id,
+          name: m.name,
+          rarity_color: m.rarity_color,
+          description: m.description,
+          firmware: m.properties&.dig("firmware_name")
+        }
+      },
       inventory_software: inventory_sw.map { |s| software_item_json(s) }
     }
   end
@@ -674,6 +691,26 @@ class Api::GridController < ApplicationController
     }, status: :unprocessable_entity
   end
 
+  # GET /api/grid/zone_map - Zone map data for the tactical UI
+  def zone_map
+    room = current_hackr.current_room
+    unless room
+      return render json: {error: "No current room."}, status: :unprocessable_entity
+    end
+
+    result = Grid::ZoneMapBuilder.new(zone: room.grid_zone, hackr: current_hackr).build
+
+    render json: {
+      zone: result.zone,
+      current_room_id: result.current_room_id,
+      rooms: result.rooms,
+      exits: result.exits,
+      ghost_rooms: result.ghost_rooms,
+      z_levels: result.z_levels,
+      z_level: result.z_level
+    }
+  end
+
   # POST /api/grid/command - Execute game command
   def command
     Rails.logger.info "=== API COMMAND RECEIVED: #{params[:input]} from #{current_hackr.hackr_alias} ==="
@@ -709,6 +746,8 @@ class Api::GridController < ApplicationController
         # Broadcast to both old and new rooms
         broadcast_event(GridRoom.find(event[:from_room_id]), event) if event[:from_room_id]
         broadcast_event(GridRoom.find(event[:to_room_id]), event) if event[:to_room_id]
+        # Zone-level presence broadcast for tactical map
+        broadcast_zone_presence(event)
       when "say", "take", "drop"
         # Broadcast to current room
         Rails.logger.info "=== Broadcasting #{event[:type]} to room #{current_hackr.current_room&.id} ==="
@@ -739,6 +778,18 @@ class Api::GridController < ApplicationController
     Rails.logger.info "=== BROADCASTING to room #{room.id} (#{room.name}): #{event.inspect} ==="
     GridChannel.broadcast_to(room, event)
     Rails.logger.info "=== BROADCAST COMPLETE ==="
+  end
+
+  def broadcast_zone_presence(event)
+    from_room = GridRoom.find_by(id: event[:from_room_id])
+    to_room = GridRoom.find_by(id: event[:to_room_id])
+
+    zone_ids = [from_room&.grid_zone_id, to_room&.grid_zone_id].compact.uniq
+    presence_event = event.merge(type: "presence_update")
+
+    zone_ids.each do |zone_id|
+      ActionCable.server.broadcast(ZoneChannel.stream_name_for(zone_id), presence_event)
+    end
   end
 
   def loadout_item_json(item)

@@ -98,6 +98,7 @@ module Grid
         @hackr.set_stat!("captured_origin_room_id", @hackr.current_room_id)
         @hackr.set_stat!("facility_alert_level", 0)
         @hackr.update!(current_room_id: containment_room.id)
+        Grid::RoomVisitRecorder.record!(hackr: @hackr, room: containment_room)
       end
 
       # Impound gear outside main transaction (ImpoundService has its own)
@@ -187,6 +188,7 @@ module Grid
         @hackr.set_stat!("captured_origin_room_id", nil)
         @hackr.set_stat!("facility_alert_level", nil)
         @hackr.update!(current_room_id: destination.id)
+        Grid::RoomVisitRecorder.record!(hackr: @hackr, room: destination)
       end
 
       display = render_escape(destination)
@@ -236,6 +238,7 @@ module Grid
 
       @hackr.set_stat!("facility_alert_level", 0)
       @hackr.update!(current_room_id: containment_room.id)
+      Grid::RoomVisitRecorder.record!(hackr: @hackr, room: containment_room)
     end
 
     def find_containment_room

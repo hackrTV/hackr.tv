@@ -398,6 +398,7 @@ module Grid
         destination = region&.cell_block_room
         if destination
           hackr.update!(current_room_id: destination.id)
+          Grid::RoomVisitRecorder.record!(hackr: hackr, room: destination)
           "<span style='color: #34d399; font-weight: bold;'>Cell seal breached. You slip into the corridor.</span>"
         end
       when "sally_port"
@@ -409,6 +410,7 @@ module Grid
         destination = region&.sally_port_room
         if destination
           hackr.update!(current_room_id: destination.id)
+          Grid::RoomVisitRecorder.record!(hackr: hackr, room: destination)
           "<span style='color: #34d399; font-weight: bold;'>Outer door seal breached. You enter the sally port.</span>"
         end
       else

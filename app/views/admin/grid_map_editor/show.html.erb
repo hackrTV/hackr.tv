@@ -1255,7 +1255,8 @@
 
       var p1 = iso(from.map_x, from.map_y, from.map_z || 0);
       var p2 = iso(to.map_x, to.map_y, to.map_z || 0);
-      var isUp = (to.map_z || 0) > (from.map_z || 0);
+      var otherZ = (from.map_z || 0) === currentZ ? (to.map_z || 0) : (to.map_z || 0) === currentZ ? (from.map_z || 0) : Math.max(from.map_z || 0, to.map_z || 0);
+      var isUp = otherZ > currentZ;
       var color = isUp ? '#a78bfa' : '#fb923c';
 
       svg.appendChild(el('line', {x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: color, 'stroke-width': 4, opacity: 0.06}));

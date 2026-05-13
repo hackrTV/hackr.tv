@@ -23,6 +23,7 @@ class FeatureGrant < ApplicationRecord
   has_paper_trail
 
   PULSE_GRID = "pulse_grid"
+  TACTICAL_GRID = "tactical_grid"
 
   belongs_to :grid_hackr
 
