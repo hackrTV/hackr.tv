@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { apiJson } from '~/utils/apiClient'
 import { ZoneMapData, ZoneMapRoom, ZoneMapGhostRoom } from '~/types/zoneMap'
 import { iso, isoPts, ISO_WALL_H, ISO_TILE_W, ISO_TILE_H, DIRECTION_VECTORS } from './isoGeometry'
+import { useZonePresence } from './useZonePresence'
 import {
   buildRenderList, tileStyles, tileColor, connectorEndpoints,
   computeViewBox, RenderRoom
@@ -41,6 +42,37 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
       })
       .catch(err => console.error('Zone map fetch failed:', err))
   }, [refreshToken])
+
+  // Zone-level presence updates via ZoneChannel
+  const handlePresenceUpdate = useCallback((event: { hackr_alias: string; from_room_id: number; to_room_id: number }) => {
+    setMapData(prev => {
+      if (!prev) return prev
+      const roomIds = new Set(prev.rooms.map(r => r.id))
+      // Only update if the event involves rooms in this zone
+      if (!roomIds.has(event.from_room_id) && !roomIds.has(event.to_room_id)) return prev
+
+      return {
+        ...prev,
+        rooms: prev.rooms.map(r => {
+          if (r.id === event.from_room_id && r.hackr_aliases.includes(event.hackr_alias)) {
+            const aliases = r.hackr_aliases.filter(a => a !== event.hackr_alias)
+            return { ...r, hackr_aliases: aliases, hackr_count: aliases.length }
+          }
+          if (r.id === event.to_room_id && r.visited && !r.hackr_aliases.includes(event.hackr_alias)) {
+            const aliases = [...r.hackr_aliases, event.hackr_alias]
+            return { ...r, hackr_aliases: aliases, hackr_count: aliases.length }
+          }
+          return r
+        })
+      }
+    })
+  }, [])
+
+  useZonePresence({
+    enabled: !!currentRoomId,
+    refreshToken,
+    onPresenceUpdate: handlePresenceUpdate
+  })
 
   // Build render list: visited rooms + unvisited rooms adjacent to current room
   const renderList = useMemo(() => {

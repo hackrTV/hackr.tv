@@ -22,53 +22,41 @@ module Grid
       positions = bfs_positions(rooms, all_exits)
       z_levels_map = compute_z_levels(rooms, all_exits)
 
-      # Visit status (fog of war)
+      # Fog of war: compute visible set (visited + adjacent to current room)
       visited_ids = GridRoomVisit.where(grid_hackr: @hackr, grid_room_id: room_ids)
         .pluck(:grid_room_id).to_set
-      # Current room always visible
       visited_ids.add(@hackr.current_room_id) if room_ids.include?(@hackr.current_room_id)
 
-      # Hackr presence
+      # Adjacent = rooms reachable in one step from current room
+      exits_by_from = all_exits.group_by(&:from_room_id)
+      adjacent_ids = Set.new
+      (exits_by_from[@hackr.current_room_id] || []).each do |ex|
+        adjacent_ids.add(ex.to_room_id)
+      end
+
+      # Visible = visited + adjacent (server only sends these)
+      visible_ids = visited_ids | adjacent_ids
+
+      # Hackr presence (only for visited rooms — no info leak through fog)
       presence_data = GridHackr.where(current_room_id: room_ids)
         .pluck(:current_room_id, :hackr_alias)
       presence_by_room = presence_data.group_by(&:first)
         .transform_values { |pairs| pairs.map(&:last) }
 
-      # Zone color
       zone_color = build_zone_color(@zone)
-
-      # Ghost rooms (cross-zone exit targets)
       room_id_set = Set.new(room_ids)
-      cross_exit_room_ids = all_exits
-        .reject { |e| room_id_set.include?(e.to_room_id) }
-        .map(&:to_room_id).uniq
-      ghost_rooms_raw = GridRoom.where(id: cross_exit_room_ids)
-        .includes(grid_zone: :grid_region).to_a
 
-      ghost_rooms = ghost_rooms_raw.map do |gr|
-        connecting_exits = all_exits.select { |e| e.to_room_id == gr.id }
-        {
-          id: gr.id,
-          name: gr.name,
-          zone_id: gr.grid_zone_id,
-          zone_name: gr.grid_zone.name,
-          region_name: gr.grid_zone.grid_region.name,
-          local_room_id: connecting_exits.first&.from_room_id,
-          direction: connecting_exits.first&.direction
-        }
-      end
-
-      # Build room data
-      room_data = rooms.map do |r|
+      # Build room data — only visible rooms get full details
+      room_data = rooms.select { |r| visible_ids.include?(r.id) }.map do |r|
         pos = positions[r.id] || [0, 0]
         z = z_levels_map[r.id] || 0
         visited = visited_ids.include?(r.id)
 
         {
           id: r.id,
-          name: r.name,
-          slug: r.slug,
-          room_type: r.room_type,
+          name: visited ? r.name : "???",
+          slug: visited ? r.slug : nil,
+          room_type: visited ? r.room_type : nil,
           map_x: pos[0],
           map_y: pos[1],
           map_z: z,
@@ -81,8 +69,9 @@ module Grid
         }
       end
 
-      # Build exit data (only intra-zone exits for rendering)
+      # Build exit data — only exits between visible rooms
       exit_data = all_exits
+        .select { |e| visible_ids.include?(e.from_room_id) && visible_ids.include?(e.to_room_id) }
         .select { |e| room_id_set.include?(e.to_room_id) }
         .map do |e|
           {
@@ -92,6 +81,27 @@ module Grid
             locked: e.locked?
           }
         end
+
+      # Ghost rooms — only those connected to visible rooms
+      cross_exit_room_ids = all_exits
+        .select { |e| visible_ids.include?(e.from_room_id) }
+        .reject { |e| room_id_set.include?(e.to_room_id) }
+        .map(&:to_room_id).uniq
+      ghost_rooms_raw = GridRoom.where(id: cross_exit_room_ids)
+        .includes(grid_zone: :grid_region).to_a
+
+      ghost_rooms = ghost_rooms_raw.map do |gr|
+        connecting_exits = all_exits.select { |e| e.to_room_id == gr.id && visible_ids.include?(e.from_room_id) }
+        {
+          id: gr.id,
+          name: gr.name,
+          zone_id: gr.grid_zone_id,
+          zone_name: gr.grid_zone.name,
+          region_name: gr.grid_zone.grid_region.name,
+          local_room_id: connecting_exits.first&.from_room_id,
+          direction: connecting_exits.first&.direction
+        }
+      end
 
       current_z = z_levels_map[@hackr.current_room_id] || 0
       z_level_list = z_levels_map.values.uniq.sort

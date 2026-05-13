@@ -24,13 +24,22 @@ RSpec.describe Grid::ZoneMapBuilder do
     expect(result).to be_a(described_class::ZoneMapResult)
   end
 
-  it "includes all rooms in zone with BFS positions" do
+  it "returns only visible rooms (visited + adjacent) with BFS positions" do
+    # hackr is in room_a (visited), room_b is adjacent, room_c is 2 hops away
     result = build
-    expect(result.rooms.size).to eq(3)
+    expect(result.rooms.size).to eq(2) # room_a (current) + room_b (adjacent)
     result.rooms.each do |r|
       expect(r[:map_x]).to be_a(Integer)
       expect(r[:map_y]).to be_a(Integer)
     end
+  end
+
+  it "returns all rooms when all are visited" do
+    Grid::RoomVisitRecorder.record!(hackr: hackr, room: room_a)
+    Grid::RoomVisitRecorder.record!(hackr: hackr, room: room_b)
+    Grid::RoomVisitRecorder.record!(hackr: hackr, room: room_c)
+    result = build
+    expect(result.rooms.size).to eq(3)
   end
 
   it "marks current room" do
@@ -56,6 +65,22 @@ RSpec.describe Grid::ZoneMapBuilder do
       result = build
       current = result.rooms.find { |r| r[:id] == room_a.id }
       expect(current[:visited]).to be true
+    end
+
+    it "redacts name and room_type for unvisited adjacent rooms" do
+      result = build
+      adjacent = result.rooms.find { |r| r[:id] == room_b.id }
+      expect(adjacent[:visited]).to be false
+      expect(adjacent[:name]).to eq("???")
+      expect(adjacent[:slug]).to be_nil
+      expect(adjacent[:room_type]).to be_nil
+    end
+
+    it "omits rooms beyond one hop from current" do
+      result = build
+      ids = result.rooms.map { |r| r[:id] }
+      expect(ids).to include(room_a.id, room_b.id)
+      expect(ids).not_to include(room_c.id)
     end
 
     it "hides hackr presence on unvisited rooms" do
@@ -84,27 +109,47 @@ RSpec.describe Grid::ZoneMapBuilder do
   end
 
   describe "exits" do
-    it "returns intra-zone exits" do
+    it "returns only exits between visible rooms" do
+      # Only room_a and room_b are visible (current + adjacent)
+      result = build
+      expect(result.exits.size).to eq(2) # north + south between room_a ↔ room_b
+      directions = result.exits.map { |e| e[:direction] }
+      expect(directions).to include("north", "south")
+    end
+
+    it "returns all exits when all rooms visited" do
+      Grid::RoomVisitRecorder.record!(hackr: hackr, room: room_a)
+      Grid::RoomVisitRecorder.record!(hackr: hackr, room: room_b)
+      Grid::RoomVisitRecorder.record!(hackr: hackr, room: room_c)
       result = build
       expect(result.exits.size).to eq(4)
-      directions = result.exits.map { |e| e[:direction] }
-      expect(directions).to include("north", "south", "east", "west")
     end
   end
 
   describe "ghost rooms" do
-    it "returns cross-zone exit targets as ghosts" do
+    it "returns cross-zone exit targets as ghosts when connected to visible room" do
       zone2 = create(:grid_zone, grid_region: region)
       room_d = create(:grid_room, grid_zone: zone2)
-      GridExit.create!(from_room: room_c, to_room: room_d, direction: "east")
+      # Connect ghost to room_a (current room, visible)
+      GridExit.create!(from_room: room_a, to_room: room_d, direction: "west")
 
       result = build
       expect(result.ghost_rooms.size).to eq(1)
       ghost = result.ghost_rooms.first
       expect(ghost[:id]).to eq(room_d.id)
       expect(ghost[:zone_name]).to eq(zone2.name)
-      expect(ghost[:local_room_id]).to eq(room_c.id)
-      expect(ghost[:direction]).to eq("east")
+      expect(ghost[:local_room_id]).to eq(room_a.id)
+      expect(ghost[:direction]).to eq("west")
+    end
+
+    it "omits ghost rooms connected only to non-visible rooms" do
+      zone2 = create(:grid_zone, grid_region: region)
+      room_d = create(:grid_room, grid_zone: zone2)
+      # Connect ghost to room_c (2 hops away, not visible)
+      GridExit.create!(from_room: room_c, to_room: room_d, direction: "east")
+
+      result = build
+      expect(result.ghost_rooms).to be_empty
     end
   end
 
