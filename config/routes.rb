@@ -172,6 +172,8 @@ Rails.application.routes.draw do
     get "grid/schematics", to: "grid#schematics_index"
     get "grid/loadout", to: "grid#loadout_index"
     get "grid/deck", to: "grid#deck_index"
+    get "grid/inventory", to: "grid#inventory_index"
+    get "grid/reputation", to: "grid#reputation_index"
     get "grid/transit", to: "grid#transit_index"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"

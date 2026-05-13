@@ -44,7 +44,7 @@ export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refres
       <div key={key} style={{ display: isActive ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
         {key === 'deck' && <DeckTab refreshToken={refreshToken} />}
         {key === 'loadout' && <LoadoutTab refreshToken={refreshToken} />}
-        {key === 'inventory' && <InventoryTab refreshToken={refreshToken} />}
+        {key === 'inventory' && <InventoryTab refreshToken={refreshToken} onCommand={onCommand} />}
         {key === 'rep' && <RepTab refreshToken={refreshToken} />}
         {key === 'missions' && <MissionsTab refreshToken={refreshToken} />}
         {key === 'schematics' && <SchematicsTab refreshToken={refreshToken} onCommand={onCommand} />}
