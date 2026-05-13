@@ -72,7 +72,7 @@ function actionHint (action: string, item: InventoryItem): string {
 
 function humanizeProperties (props: Record<string, unknown>): { label: string; value: string }[] {
   const result: { label: string; value: string }[] = []
-  if (props.gear_slot) result.push({ label: 'Slot', value: GEAR_SLOT_LABELS[String(props.gear_slot)] || String(props.gear_slot).toUpperCase() })
+  if (props.slot) result.push({ label: 'Slot', value: GEAR_SLOT_LABELS[String(props.slot)] || String(props.slot).toUpperCase() })
   if (props.software_category) result.push({ label: 'Category', value: String(props.software_category) })
   if (props.effect_type) {
     const effectLabel = EFFECT_LABELS[String(props.effect_type)] || String(props.effect_type)
