@@ -32,7 +32,7 @@ module Grid
         interface_command(args)
       when "jackout", "jo"
         jackout_command
-      when "status", "st"
+      when "status", "st", "look", "l"
         status_command
       when "deck", "dk"
         deck_command
@@ -120,10 +120,7 @@ module Grid
           output << facility_breach_success_hook if Grid::ContainmentService.captured?(hackr)
         end
       else
-        # Check if round should end
-        breach.reload
-        round_output = maybe_end_round
-        output << round_output if round_output
+        append_round_or_status(output)
       end
 
       append_notifications(output, notifications)
@@ -154,10 +151,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>  ▸ #{h(result.debuff_hint)}</span>" if result.debuff_hint
       output << "<span style='color: #34d399;'>  ▸ Bonus action!</span>" if result.bonus_action
 
-      # Check if round should end
-      breach.reload
-      round_output = maybe_end_round
-      output << round_output if round_output
+      append_round_or_status(output)
 
       output.join("\n")
     rescue Grid::BreachActionService::NoActionsRemaining,
@@ -182,10 +176,7 @@ module Grid
       output = []
       output << "<span style='color: #22d3ee;'>REROUTE → Protocol [#{result.target_position + 1}] (#{result.protocol_type_label}) delayed.</span>"
 
-      # Check if round should end
-      breach.reload
-      round_output = maybe_end_round
-      output << round_output if round_output
+      append_round_or_status(output)
 
       output.join("\n")
     rescue Grid::BreachActionService::NoActionsRemaining,
@@ -221,10 +212,7 @@ module Grid
         output << jackout_result.display
         output << "<span style='color: #34d399;'>You disconnect cleanly.</span>"
       else
-        # Check if round should end
-        breach.reload
-        round_output = maybe_end_round
-        output << round_output if round_output
+        append_round_or_status(output)
       end
 
       append_notifications(output, notifications)
@@ -291,10 +279,7 @@ module Grid
         failure_result = Grid::BreachService.resolve_failure!(hackr_breach: breach, failure_mode: :gate_exhaustion)
         output << failure_result.display
       else
-        # Check if round should end
-        breach.reload
-        round_output = maybe_end_round
-        output << round_output if round_output
+        append_round_or_status(output)
       end
 
       append_notifications(output, notifications)
@@ -493,6 +478,19 @@ module Grid
 
     def mission_progressor
       @mission_progressor ||= Grid::MissionProgressor.new(hackr)
+    end
+
+    # Append round-end display if round ended, otherwise compact status so
+    # the breach panel always shows current state after each action.
+    def append_round_or_status(output)
+      breach.reload
+      round_output = maybe_end_round
+      if round_output
+        output << round_output
+      elsif breach.active?
+        output << ""
+        output << Grid::BreachRenderer.new(breach).render_full
+      end
     end
 
     def append_notifications(output, notifications)

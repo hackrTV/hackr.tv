@@ -81,12 +81,12 @@ export const SchematicsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: s
   const locked = data.schematics.filter(s => !s.craftable)
 
   return (
-    <div style={{ fontSize: '0.8em' }}>
+    <div style={{ fontSize: '0.8em', maxWidth: '50%' }}>
       {ready.length > 0 && (
         <>
           <div style={{ color: '#34d399', fontSize: '0.85em', marginBottom: '4px' }}>READY ({ready.length})</div>
           {ready.map(s => (
-            <div key={s.slug} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0' }}>
+            <div key={s.slug} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0', breakInside: 'avoid' }}>
               <button onClick={() => setConfirm(s)} style={{
                 background: '#34d399', color: '#0a0a0a', border: 'none', borderRadius: '2px',
                 padding: '1px 5px', fontSize: '0.8em', cursor: 'pointer', fontWeight: 'bold',
@@ -105,7 +105,7 @@ export const SchematicsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: s
             AVAILABLE ({available.length})
           </div>
           {available.map(s => (
-            <div key={s.slug} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0' }}>
+            <div key={s.slug} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0', breakInside: 'avoid' }}>
               <button onClick={() => setConfirm(s)} style={{
                 background: 'transparent', color: '#fbbf24', border: '1px solid #fbbf24', borderRadius: '2px',
                 padding: '1px 5px', fontSize: '0.8em', cursor: 'pointer', fontWeight: 'bold',

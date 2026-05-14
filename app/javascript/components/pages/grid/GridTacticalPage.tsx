@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useActionCable, GridEvent } from '~/hooks/useActionCable'
@@ -7,20 +7,34 @@ import { TacticalBar } from '~/components/tactical/TacticalBar'
 import { TacticalTerminal } from '~/components/tactical/TacticalTerminal'
 import { TacticalStatusPanel } from '~/components/tactical/TacticalStatusPanel'
 import { ZoneMap } from '~/components/tactical/map/ZoneMap'
-import { apiJson } from '~/utils/apiClient'
-
-interface GridCommandResponse {
-  output?: string
-  room_id?: number
-}
+import { BreachTargetButtons } from '~/components/tactical/breach/BreachTargetButtons'
+import { BreachConfirmModal } from '~/components/tactical/breach/BreachConfirmModal'
+import { BreachPanel } from '~/components/tactical/breach/BreachPanel'
+import { BreachEncounter, DeckStatus } from '~/types/zoneMap'
 
 const TacticalInner: React.FC = () => {
   const { hackr } = useGridAuth()
   const {
     currentRoomId, setCurrentRoomId, setOutput,
-    refreshToken, sendCommand, commandInputRef
+    refreshToken, sendCommand, commandInputRef,
+    inBreach, breachMeta, breachOutput
   } = useTactical()
   const initialLoadDoneRef = useRef(false)
+  const [breachEncounters, setBreachEncounters] = useState<BreachEncounter[]>([])
+  const [deckStatus, setDeckStatus] = useState<DeckStatus>({ equipped: false, fried: false })
+  const [confirmTarget, setConfirmTarget] = useState<BreachEncounter | null>(null)
+
+  const handleBreachEncountersChange = useCallback((encounters: BreachEncounter[], ds: DeckStatus) => {
+    setBreachEncounters(encounters)
+    setDeckStatus(ds)
+  }, [])
+
+  const handleBreachConfirm = useCallback(() => {
+    if (confirmTarget) {
+      sendCommand(`breach ${confirmTarget.name}`)
+      setConfirmTarget(null)
+    }
+  }, [confirmTarget, sendCommand])
 
   // Tab anywhere → focus command input
   useEffect(() => {
@@ -34,35 +48,21 @@ const TacticalInner: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [commandInputRef])
 
-  // Set initial room and execute look
+  // Set initial room and execute look (routes through sendCommand for breach state detection)
   useEffect(() => {
     if (hackr?.current_room && !initialLoadDoneRef.current) {
       initialLoadDoneRef.current = true
       setCurrentRoomId(hackr.current_room.id)
 
-      const loadInitial = async () => {
-        setOutput([`<div style="color: #a78bfa; font-size: 0.9em;">
+      setOutput([`<div style="color: #a78bfa; font-size: 0.9em;">
 ════════════════════════════════════════════════════
   TACTICAL INTERFACE — THE PULSE GRID
 ════════════════════════════════════════════════════
 </div>`])
 
-        try {
-          const data = await apiJson<GridCommandResponse>('/api/grid/command', {
-            method: 'POST',
-            body: JSON.stringify({ input: 'look' })
-          })
-          if (data.output?.trim()) {
-            setOutput(prev => [...prev, data.output!.trim()])
-          }
-          if (data.room_id) setCurrentRoomId(data.room_id)
-        } catch (err) {
-          console.error('Failed to load initial room:', err)
-        }
-      }
-
-      loadInitial()
+      sendCommand('look')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- sendCommand is stable (useCallback with []), initialLoadDoneRef guards against re-fire
   }, [hackr, setCurrentRoomId, setOutput])
 
   // ActionCable for room events (terminal output)
@@ -108,7 +108,7 @@ const TacticalInner: React.FC = () => {
       overflow: 'hidden',
       display: 'grid',
       gridTemplateAreas: '"topbar topbar" "leftcol map" "cmdinput cmdinput"',
-      gridTemplateColumns: '55fr 45fr',
+      gridTemplateColumns: '50fr 50fr',
       gridTemplateRows: '44px 1fr 58px',
       background: '#0a0a0a',
       fontFamily: '\'Courier New\', Courier, monospace',
@@ -132,8 +132,27 @@ const TacticalInner: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ gridArea: 'map', overflow: 'hidden', borderLeft: '1px solid #333' }}>
-        <ZoneMap refreshToken={refreshToken} currentRoomId={currentRoomId} onNavigate={(dir) => sendCommand(`go ${dir}`)} />
+      <div style={{ gridArea: 'map', overflow: 'hidden', borderLeft: '1px solid #333', position: 'relative' }}>
+        <ZoneMap
+          refreshToken={refreshToken}
+          currentRoomId={currentRoomId}
+          onNavigate={(dir) => sendCommand(`go ${dir}`)}
+          onBreachEncountersChange={handleBreachEncountersChange}
+        />
+        {!inBreach && breachEncounters.length > 0 && (
+          <BreachTargetButtons
+            encounters={breachEncounters}
+            deckStatus={deckStatus}
+            onSelect={setConfirmTarget}
+          />
+        )}
+        <BreachPanel
+          visible={inBreach}
+          breachMeta={breachMeta}
+          breachOutput={breachOutput}
+          refreshToken={refreshToken}
+          onCommand={sendCommand}
+        />
       </div>
 
       <div style={{
@@ -143,11 +162,23 @@ const TacticalInner: React.FC = () => {
         background: '#111'
       }}>
         <div style={{ fontSize: '0.75em', color: '#555', textAlign: 'center' }}>
-          Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear
-          <span style={{ marginLeft: '10px', color: '#333' }}>|</span>
-          <span style={{ marginLeft: '10px' }}>↑/↓ for history</span>
+          {inBreach
+            ? <>BREACH: exec [prog] [#], analyze [#], reroute [#], use [item], interface [gate] [ans], jackout, status, help</>
+            : <>Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear
+              <span style={{ marginLeft: '10px', color: '#333' }}>|</span>
+              <span style={{ marginLeft: '10px' }}>↑/↓ for history</span>
+            </>
+          }
         </div>
       </div>
+
+      {confirmTarget && (
+        <BreachConfirmModal
+          encounter={confirmTarget}
+          onConfirm={handleBreachConfirm}
+          onCancel={() => setConfirmTarget(null)}
+        />
+      )}
     </div>
   )
 }

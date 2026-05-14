@@ -48,7 +48,7 @@ export const DeckTab: React.FC<{ refreshToken: number }> = ({ refreshToken }) =>
   const batteryPct = deck.battery_max > 0 ? Math.round((deck.battery_current / deck.battery_max) * 100) : 0
 
   return (
-    <div style={{ fontSize: '0.8em' }}>
+    <div style={{ fontSize: '0.8em', maxWidth: '50%' }}>
       <div style={{ color: deck.rarity_color, fontWeight: 'bold', marginBottom: '8px' }}>
         {deck.name}
       </div>

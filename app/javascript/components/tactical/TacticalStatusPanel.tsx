@@ -5,14 +5,16 @@ import { InventoryTab } from './tabs/InventoryTab'
 import { RepTab } from './tabs/RepTab'
 import { MissionsTab } from './tabs/MissionsTab'
 import { SchematicsTab } from './tabs/SchematicsTab'
+import { CredTab } from './tabs/CredTab'
 
-type TabKey = 'deck' | 'loadout' | 'inventory' | 'rep' | 'missions' | 'schematics'
+type TabKey = 'deck' | 'loadout' | 'inventory' | 'rep' | 'cred' | 'missions' | 'schematics'
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'deck', label: 'DECK' },
   { key: 'loadout', label: 'GEAR' },
   { key: 'inventory', label: 'INV' },
   { key: 'rep', label: 'REP' },
+  { key: 'cred', label: 'CRED' },
   { key: 'missions', label: 'MISSIONS' },
   { key: 'schematics', label: 'SCHEM' }
 ]
@@ -36,18 +38,18 @@ export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refres
     })
   }
 
-  const renderTab = (key: TabKey) => {
-    if (!mountedTabs.has(key)) return null
-    const isActive = key === activeTab
-
+  const renderTab = (tab: typeof TABS[number]) => {
+    if (!mountedTabs.has(tab.key)) return null
+    const isActive = tab.key === activeTab
     return (
-      <div key={key} style={{ display: isActive ? 'block' : 'none', height: '100%', overflow: 'auto' }}>
-        {key === 'deck' && <DeckTab refreshToken={refreshToken} />}
-        {key === 'loadout' && <LoadoutTab refreshToken={refreshToken} />}
-        {key === 'inventory' && <InventoryTab refreshToken={refreshToken} onCommand={onCommand} />}
-        {key === 'rep' && <RepTab refreshToken={refreshToken} />}
-        {key === 'missions' && <MissionsTab refreshToken={refreshToken} />}
-        {key === 'schematics' && <SchematicsTab refreshToken={refreshToken} onCommand={onCommand} />}
+      <div key={tab.key} style={{ display: isActive ? 'block' : 'none', height: '100%' }}>
+        {tab.key === 'deck' && <DeckTab refreshToken={refreshToken} />}
+        {tab.key === 'loadout' && <LoadoutTab refreshToken={refreshToken} />}
+        {tab.key === 'inventory' && <InventoryTab refreshToken={refreshToken} onCommand={onCommand} />}
+        {tab.key === 'rep' && <RepTab refreshToken={refreshToken} />}
+        {tab.key === 'cred' && <CredTab refreshToken={refreshToken} onCommand={onCommand} />}
+        {tab.key === 'missions' && <MissionsTab refreshToken={refreshToken} onCommand={onCommand} />}
+        {tab.key === 'schematics' && <SchematicsTab refreshToken={refreshToken} onCommand={onCommand} />}
       </div>
     )
   }
@@ -79,8 +81,8 @@ export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refres
           </button>
         ))}
       </div>
-      <div style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: '8px' }}>
-        {TABS.map(tab => renderTab(tab.key))}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: '8px' }}>
+        {TABS.map(tab => renderTab(tab))}
       </div>
     </div>
   )
