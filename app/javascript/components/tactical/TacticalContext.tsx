@@ -38,9 +38,11 @@ interface TacticalContextValue {
   inBreach: boolean
   breachMeta: BreachMeta | null
   breachOutput: string[]
+  hasVendor: boolean
   sendCommand: (command: string) => Promise<void>
   setOutput: React.Dispatch<React.SetStateAction<string[]>>
   setCurrentRoomId: React.Dispatch<React.SetStateAction<number | null>>
+  setHasVendor: React.Dispatch<React.SetStateAction<boolean>>
   commandInputRef: React.RefObject<CommandInputHandle | null>
 }
 
@@ -60,6 +62,7 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [inBreach, setInBreach] = useState(false)
   const [breachMeta, setBreachMeta] = useState<BreachMeta | null>(null)
   const [breachOutput, setBreachOutput] = useState<string[]>([])
+  const [hasVendor, setHasVendor] = useState(false)
   const commandInputRef = useRef<CommandInputHandle | null>(null)
   const inBreachRef = useRef(false)
 
@@ -131,8 +134,8 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   return (
     <TacticalContext.Provider value={{
       output, currentRoomId, executing, refreshToken,
-      inBreach, breachMeta, breachOutput,
-      sendCommand, setOutput, setCurrentRoomId, commandInputRef
+      inBreach, breachMeta, breachOutput, hasVendor,
+      sendCommand, setOutput, setCurrentRoomId, setHasVendor, commandInputRef
     }}>
       {children}
     </TacticalContext.Provider>

@@ -1,31 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { apiJson } from '~/utils/apiClient'
-
-interface InventoryItem {
-  id: number
-  name: string
-  description: string | null
-  item_type: string
-  rarity: string
-  rarity_color: string
-  rarity_label: string
-  quantity: number
-  max_stack: number | null
-  definition_slug: string | null
-  properties: Record<string, unknown>
-  actions: string[]
-}
-
-interface ItemGroup {
-  item_type: string
-  label: string
-  items: InventoryItem[]
-}
-
-interface InventoryResponse {
-  capacity: { used: number; max: number }
-  groups: ItemGroup[]
-}
+import { InventoryItem, InventoryResponse } from '~/types/zoneMap'
 
 const ITEM_TYPE_LABELS: Record<string, string> = {
   gear: 'Gear', software: 'Software', module: 'Module', firmware: 'Firmware',
@@ -52,7 +27,8 @@ const ACTION_CONFIG: Record<string, { label: string; color: string }> = {
   equip: { label: 'EQUIP', color: '#22d3ee' },
   drop: { label: 'DROP', color: '#fbbf24' },
   salvage: { label: 'SALVAGE', color: '#f97316' },
-  place: { label: 'PLACE', color: '#22d3ee' }
+  place: { label: 'PLACE', color: '#22d3ee' },
+  sell: { label: 'SELL', color: '#fbbf24' }
 }
 
 function actionHint (action: string, item: InventoryItem): string {
@@ -66,6 +42,7 @@ function actionHint (action: string, item: InventoryItem): string {
   case 'drop': return 'Item will be left on the ground.'
   case 'salvage': return 'Item will be destroyed for XP.'
   case 'place': return 'Fixture will be installed in your den.'
+  case 'sell': return item.sell_price ? `Sells for ${item.sell_price} CRED.` : ''
   default: return ''
   }
 }
@@ -91,7 +68,7 @@ function humanizeProperties (props: Record<string, unknown>): { label: string; v
   return result
 }
 
-export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void }> = ({ refreshToken, onCommand }) => {
+export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void; hasVendor?: boolean }> = ({ refreshToken, onCommand, hasVendor }) => {
   const [data, setData] = useState<InventoryResponse | null>(null)
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
   const [pendingAction, setPendingAction] = useState<{ item: InventoryItem; action: string } | null>(null)
@@ -128,23 +105,36 @@ export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: st
           <div style={{ color: '#666', fontSize: '0.85em', marginBottom: '4px' }}>
             {group.label} ({group.items.length})
           </div>
-          {group.items.map(item => (
-            <div key={item.id}
-              onClick={() => setSelectedItem(item)}
-              style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-                padding: '3px 0', borderBottom: '1px solid #1a1a1a', cursor: 'pointer', gap: '6px'
-              }}
-            >
-              <span style={{ color: item.rarity_color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {item.name}
-              </span>
-              <span style={{ whiteSpace: 'nowrap', flexShrink: 0, fontSize: '0.9em' }}>
-                {item.quantity > 1 && <span style={{ color: '#6b7280' }}>x{item.quantity} </span>}
-                <span style={{ color: item.rarity_color }}>[{item.rarity_label}]</span>
-              </span>
-            </div>
-          ))}
+          {group.items.map(item => {
+            const canSell = hasVendor && item.sell_price && item.sell_price > 0
+            return (
+              <div key={item.id}
+                onClick={() => setSelectedItem(item)}
+                style={{
+                  display: 'flex', alignItems: 'baseline',
+                  padding: '3px 0', borderBottom: '1px solid #1a1a1a', cursor: 'pointer', gap: '6px'
+                }}
+              >
+                {canSell && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setPendingAction({ item, action: 'sell' }) }}
+                    style={{
+                      background: '#fbbf24', color: '#0a0a0a', border: 'none', borderRadius: '2px',
+                      padding: '1px 5px', fontSize: '0.8em', cursor: 'pointer', fontWeight: 'bold',
+                      fontFamily: '\'Courier New\', monospace', lineHeight: 1, flexShrink: 0
+                    }}
+                  >SELL</button>
+                )}
+                <span style={{ color: item.rarity_color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                  {item.name}
+                </span>
+                <span style={{ whiteSpace: 'nowrap', flexShrink: 0, fontSize: '0.9em' }}>
+                  {item.quantity > 1 && <span style={{ color: '#6b7280' }}>x{item.quantity} </span>}
+                  <span style={{ color: item.rarity_color }}>[{item.rarity_label}]</span>
+                </span>
+              </div>
+            )
+          })}
         </div>
       ))}
 
@@ -208,6 +198,13 @@ export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: st
                   }}>{config.label}</button>
                 )
               })}
+              {hasVendor && selectedItem.sell_price && selectedItem.sell_price > 0 && (
+                <button onClick={() => { setPendingAction({ item: selectedItem, action: 'sell' }); setSelectedItem(null) }} style={{
+                  background: '#fbbf24', color: '#0a0a0a', border: 'none',
+                  padding: '6px 16px', fontSize: '0.9em', cursor: 'pointer',
+                  borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
+                }}>SELL</button>
+              )}
             </div>
           </div>
         </div>

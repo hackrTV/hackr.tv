@@ -175,6 +175,7 @@ Rails.application.routes.draw do
     get "grid/inventory", to: "grid#inventory_index"
     get "grid/reputation", to: "grid#reputation_index"
     get "grid/cred", to: "grid#cred_index"
+    get "grid/shop", to: "grid#shop_index"
     get "grid/transit", to: "grid#transit_index"
     post "grid/login", to: "grid#login"
     post "grid/register", to: "grid#register"

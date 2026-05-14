@@ -61,4 +61,53 @@ export interface ZoneMapData {
   in_breach: boolean
   breach_encounters: BreachEncounter[]
   deck_status: DeckStatus
+  has_vendor: boolean
+}
+
+export interface InventoryItem {
+  id: number
+  name: string
+  description: string | null
+  item_type: string
+  rarity: string
+  rarity_color: string
+  rarity_label: string
+  quantity: number
+  max_stack: number | null
+  definition_slug: string | null
+  properties: Record<string, unknown>
+  actions: string[]
+  sell_price?: number | null
+}
+
+export interface InventoryGroup {
+  item_type: string
+  label: string
+  items: InventoryItem[]
+}
+
+export interface InventoryResponse {
+  capacity: { used: number; max: number }
+  groups: InventoryGroup[]
+}
+
+export interface ShopListing {
+  id: number
+  name: string
+  description: string | null
+  item_type: string
+  rarity: string
+  rarity_color: string
+  rarity_label: string
+  price: number
+  affordable: boolean
+  out_of_stock: boolean
+  stock: number | null
+}
+
+export interface ShopData {
+  vendor_name: string
+  shop_type: string
+  balance: number
+  listings: ShopListing[]
 }

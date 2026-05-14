@@ -13,6 +13,7 @@ interface ZoneMapProps {
   currentRoomId: number | null
   onNavigate?: (direction: string) => void
   onBreachEncountersChange?: (encounters: BreachEncounter[], deckStatus: DeckStatus) => void
+  onVendorPresenceChange?: (hasVendor: boolean) => void
 }
 
 interface Tooltip {
@@ -23,7 +24,7 @@ interface Tooltip {
 
 const Z_DIRS = new Set(['up', 'down'])
 
-export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange }) => {
+export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange, onVendorPresenceChange }) => {
   const [mapData, setMapData] = useState<ZoneMapData | null>(null)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const [zoom, setZoom] = useState(1.25)
@@ -41,6 +42,7 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
         setMapData(data)
         setPanOffset([0, 0])
         onBreachEncountersChange?.(data.breach_encounters || [], data.deck_status || { equipped: false, fried: false })
+        onVendorPresenceChange?.(data.has_vendor ?? false)
       })
       .catch(err => console.error('Zone map fetch failed:', err))
   // eslint-disable-next-line react-hooks/exhaustive-deps -- callback ref change should not re-trigger fetch; refreshToken controls cadence

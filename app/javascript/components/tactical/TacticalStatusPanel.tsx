@@ -22,9 +22,10 @@ const TABS: { key: TabKey; label: string }[] = [
 interface TacticalStatusPanelProps {
   refreshToken: number
   onCommand?: (cmd: string) => void
+  hasVendor?: boolean
 }
 
-export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refreshToken, onCommand }) => {
+export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refreshToken, onCommand, hasVendor }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('deck')
   const [mountedTabs, setMountedTabs] = useState<Set<TabKey>>(new Set(['deck']))
 
@@ -45,7 +46,7 @@ export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refres
       <div key={tab.key} style={{ display: isActive ? 'block' : 'none', height: '100%' }}>
         {tab.key === 'deck' && <DeckTab refreshToken={refreshToken} />}
         {tab.key === 'loadout' && <LoadoutTab refreshToken={refreshToken} />}
-        {tab.key === 'inventory' && <InventoryTab refreshToken={refreshToken} onCommand={onCommand} />}
+        {tab.key === 'inventory' && <InventoryTab refreshToken={refreshToken} onCommand={onCommand} hasVendor={hasVendor} />}
         {tab.key === 'rep' && <RepTab refreshToken={refreshToken} />}
         {tab.key === 'cred' && <CredTab refreshToken={refreshToken} onCommand={onCommand} />}
         {tab.key === 'missions' && <MissionsTab refreshToken={refreshToken} onCommand={onCommand} />}
