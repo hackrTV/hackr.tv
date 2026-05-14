@@ -2,9 +2,9 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
-  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: [:zone_map]
+  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index]
   before_action :require_admin_api, only: [:debit]
 
   INVENTORY_TYPE_ORDER = %w[gear consumable tool software module firmware material data rig_component fixture collectible faction].freeze
@@ -191,6 +191,11 @@ class Api::GridController < ApplicationController
       .includes(:grid_item_definition).to_a
 
     grouped = items.group_by(&:item_type)
+    vendor_mob = current_hackr.current_room&.grid_mobs&.find_by(mob_type: "vendor")
+    vendor_listings_by_def = if vendor_mob
+      vendor_mob.grid_shop_listings.includes(:grid_item_definition)
+        .index_by(&:grid_item_definition_id)
+    end
 
     render json: {
       capacity: {used: items.size, max: current_hackr.inventory_capacity},
@@ -202,7 +207,40 @@ class Api::GridController < ApplicationController
           label: INVENTORY_TYPE_LABELS[type] || type.upcase,
           items: type_items
             .sort_by { |i| [-(GridItem::RARITIES.index(i.rarity) || 0), i.name.to_s] }
-            .map { |i| inventory_item_json(i) }
+            .map { |i| inventory_item_json(i, vendor_listings_by_def: vendor_listings_by_def) }
+        }
+      }
+    }
+  end
+
+  # GET /api/grid/shop - Vendor shop listings for current room
+  def shop_index
+    room = current_hackr.current_room
+    vendor = room&.grid_mobs&.find_by(mob_type: "vendor")
+    return render(json: {error: "No vendor here"}, status: :not_found) unless vendor
+
+    listings = Grid::ShopService.listing_display(mob: vendor, hackr: current_hackr)
+
+    balance = current_hackr.default_cache&.balance || 0
+
+    render json: {
+      vendor_name: vendor.name,
+      shop_type: vendor.shop_type,
+      balance: balance,
+      listings: listings.map { |entry|
+        listing = entry[:listing]
+        {
+          id: listing.id,
+          name: listing.name,
+          description: listing.description,
+          item_type: listing.item_type,
+          rarity: listing.rarity,
+          rarity_color: listing.rarity_color,
+          rarity_label: listing.rarity_label,
+          price: entry[:effective_price],
+          affordable: entry[:affordable],
+          out_of_stock: entry[:out_of_stock],
+          stock: listing.unlimited_stock? ? nil : listing.stock
         }
       }
     }
@@ -823,7 +861,8 @@ class Api::GridController < ApplicationController
       z_level: result.z_level,
       in_breach: current_hackr.in_breach?,
       breach_encounters: breach_encounters,
-      deck_status: deck_status
+      deck_status: deck_status,
+      has_vendor: room.grid_mobs.loaded? ? room.grid_mobs.any?(&:vendor?) : room.grid_mobs.exists?(mob_type: "vendor")
     }
   end
 
@@ -948,10 +987,11 @@ class Api::GridController < ApplicationController
     }
   end
 
-  def inventory_item_json(item)
+  def inventory_item_json(item, vendor_listings_by_def: nil)
     actions = (INVENTORY_ITEM_ACTIONS[item.item_type] || %w[drop]).dup
     actions.delete("salvage") if item.unicorn?
-    {
+
+    result = {
       id: item.id,
       name: item.name,
       description: item.description,
@@ -965,6 +1005,22 @@ class Api::GridController < ApplicationController
       properties: item.properties || {},
       actions: actions
     }
+
+    if vendor_listings_by_def && !item.unicorn? && item.value.to_i > 0
+      result[:sell_price] = sell_price_for(item, vendor_listings_by_def)
+    end
+
+    result
+  end
+
+  def sell_price_for(item, vendor_listings_by_def)
+    listing = vendor_listings_by_def[item.grid_item_definition_id]
+    price = if listing
+      listing.sell_price
+    else
+      (item.value * Grid::EconomyConfig::SELL_PRICE_RATIO).ceil
+    end
+    [price, 1].max
   end
 
   def transit_journey_json(journey)

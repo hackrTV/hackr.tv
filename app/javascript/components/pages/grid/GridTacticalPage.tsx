@@ -11,23 +11,37 @@ import { BreachTargetButtons } from '~/components/tactical/breach/BreachTargetBu
 import { BreachConfirmModal } from '~/components/tactical/breach/BreachConfirmModal'
 import { BreachPanel } from '~/components/tactical/breach/BreachPanel'
 import { BreachEncounter, DeckStatus } from '~/types/zoneMap'
+import { VendorHandle } from '~/components/tactical/vendor/VendorHandle'
+import { VendorPanel } from '~/components/tactical/vendor/VendorPanel'
 
 const TacticalInner: React.FC = () => {
   const { hackr } = useGridAuth()
   const {
     currentRoomId, setCurrentRoomId, setOutput,
     refreshToken, sendCommand, commandInputRef,
-    inBreach, breachMeta, breachOutput
+    inBreach, breachMeta, breachOutput,
+    hasVendor, setHasVendor
   } = useTactical()
   const initialLoadDoneRef = useRef(false)
   const [breachEncounters, setBreachEncounters] = useState<BreachEncounter[]>([])
   const [deckStatus, setDeckStatus] = useState<DeckStatus>({ equipped: false, fried: false })
   const [confirmTarget, setConfirmTarget] = useState<BreachEncounter | null>(null)
+  const [vendorOpen, setVendorOpen] = useState(false)
 
   const handleBreachEncountersChange = useCallback((encounters: BreachEncounter[], ds: DeckStatus) => {
     setBreachEncounters(encounters)
     setDeckStatus(ds)
   }, [])
+
+  const handleVendorPresenceChange = useCallback((v: boolean) => {
+    setHasVendor(v)
+    if (!v) setVendorOpen(false)
+  }, [setHasVendor])
+
+  // Close vendor panel when breach starts
+  useEffect(() => {
+    if (inBreach) setVendorOpen(false)
+  }, [inBreach])
 
   const handleBreachConfirm = useCallback(() => {
     if (confirmTarget) {
@@ -125,7 +139,7 @@ const TacticalInner: React.FC = () => {
         overflow: 'hidden'
       }}>
         <div style={{ flex: 2, minHeight: 0, overflow: 'hidden', borderBottom: '1px solid #333' }}>
-          <TacticalStatusPanel refreshToken={refreshToken} onCommand={sendCommand} />
+          <TacticalStatusPanel refreshToken={refreshToken} onCommand={sendCommand} hasVendor={hasVendor} />
         </div>
         <div style={{ flex: 3, minHeight: 0, overflow: 'hidden', padding: '6px' }}>
           <TacticalTerminal />
@@ -138,6 +152,7 @@ const TacticalInner: React.FC = () => {
           currentRoomId={currentRoomId}
           onNavigate={(dir) => sendCommand(`go ${dir}`)}
           onBreachEncountersChange={handleBreachEncountersChange}
+          onVendorPresenceChange={handleVendorPresenceChange}
         />
         {!inBreach && breachEncounters.length > 0 && (
           <BreachTargetButtons
@@ -152,6 +167,15 @@ const TacticalInner: React.FC = () => {
           breachOutput={breachOutput}
           refreshToken={refreshToken}
           onCommand={sendCommand}
+        />
+        {hasVendor && !inBreach && !vendorOpen && (
+          <VendorHandle onClick={() => setVendorOpen(true)} />
+        )}
+        <VendorPanel
+          visible={vendorOpen && !inBreach}
+          refreshToken={refreshToken}
+          onCommand={sendCommand}
+          onClose={() => setVendorOpen(false)}
         />
       </div>
 
