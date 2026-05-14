@@ -8,7 +8,8 @@ interface TacticalBarProps {
   refreshToken: number
 }
 
-interface VitalsData {
+interface LoadoutData {
+  clearance: number
   vitals: {
     health: { current: number; max: number }
     energy: { current: number; max: number }
@@ -40,10 +41,12 @@ const CompactVital: React.FC<{ label: string; current: number; max: number; colo
 export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus, refreshToken }) => {
   const { hackr, disconnect } = useGridAuth()
   const navigate = useNavigate()
-  const [vitals, setVitals] = useState<VitalsData['vitals'] | null>(null)
+  const [vitals, setVitals] = useState<LoadoutData['vitals'] | null>(null)
+  const [clearance, setClearance] = useState<number | null>(null)
+  const [clHover, setClHover] = useState(false)
 
   useEffect(() => {
-    apiJson<VitalsData>('/api/grid/loadout').then(d => setVitals(d.vitals)).catch(console.error)
+    apiJson<LoadoutData>('/api/grid/loadout').then(d => { setVitals(d.vitals); setClearance(d.clearance) }).catch(console.error)
   }, [refreshToken])
 
   const handleDisconnect = async () => {
@@ -67,6 +70,26 @@ export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus, refr
         <span style={{ color: '#a78bfa', fontWeight: 'bold', letterSpacing: '1px' }}>TACTICAL</span>
         <span style={{ color: '#333' }}>|</span>
         <span style={{ color: '#e0e0e0' }}>{hackr?.hackr_alias}</span>
+        {clearance != null && (
+          <span
+            style={{ color: '#fbbf24', fontSize: '0.8em', position: 'relative', cursor: 'default' }}
+            onMouseEnter={() => setClHover(true)}
+            onMouseLeave={() => setClHover(false)}
+          >
+            CL{clearance}
+            {clHover && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, marginTop: '6px',
+                background: '#1a1a1a', border: '1px solid #444', borderRadius: '4px',
+                padding: '6px 10px', whiteSpace: 'nowrap', zIndex: 50,
+                fontSize: '1em', color: '#d0d0d0',
+                fontFamily: '\'Courier New\', monospace'
+              }}>
+                <span style={{ color: '#fbbf24' }}>CLEARANCE:</span> {clearance}
+              </div>
+            )}
+          </span>
+        )}
         <span style={{ color: '#333' }}>|</span>
         <span style={{
           color: connectionStatus === 'connected' ? '#34d399'

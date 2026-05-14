@@ -8,6 +8,26 @@ interface GridCommandResponse {
   current_room?: {
     ambient_playlist?: unknown
   }
+  in_breach?: boolean
+  breach_meta?: BreachMeta | null
+}
+
+export interface BreachProtocolMeta {
+  position: number
+  alive: boolean
+  type_label: string
+  state: string
+}
+
+export interface BreachMeta {
+  template_name: string
+  tier_label: string
+  protocols: BreachProtocolMeta[]
+  detection_level: number
+  pnr_threshold: number
+  actions_remaining: number
+  actions_this_round: number
+  round_number: number
 }
 
 interface TacticalContextValue {
@@ -15,6 +35,9 @@ interface TacticalContextValue {
   currentRoomId: number | null
   executing: boolean
   refreshToken: number
+  inBreach: boolean
+  breachMeta: BreachMeta | null
+  breachOutput: string[]
   sendCommand: (command: string) => Promise<void>
   setOutput: React.Dispatch<React.SetStateAction<string[]>>
   setCurrentRoomId: React.Dispatch<React.SetStateAction<number | null>>
@@ -34,7 +57,11 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [currentRoomId, setCurrentRoomId] = useState<number | null>(null)
   const [executing, setExecuting] = useState(false)
   const [refreshToken, setRefreshToken] = useState(0)
+  const [inBreach, setInBreach] = useState(false)
+  const [breachMeta, setBreachMeta] = useState<BreachMeta | null>(null)
+  const [breachOutput, setBreachOutput] = useState<string[]>([])
   const commandInputRef = useRef<CommandInputHandle | null>(null)
+  const inBreachRef = useRef(false)
 
   const sendCommand = useCallback(async (command: string) => {
     if (['clear', 'cls', 'cl'].includes(command.toLowerCase())) {
@@ -42,11 +69,12 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
       return
     }
 
-    setOutput(prev => [
-      ...prev,
+    const echoLines = [
       '<div style="height: 1px; background: #444; margin-top: 16px; margin-bottom: 12px; overflow: hidden;"></div>',
       `<span style="color: #22d3ee;">&gt; ${command}</span>`
-    ])
+    ]
+
+    setOutput(prev => [...prev, ...echoLines])
 
     setExecuting(true)
 
@@ -65,6 +93,32 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
         setCurrentRoomId(prev => data.room_id !== prev ? data.room_id! : prev)
       }
 
+      // Breach state tracking (uses ref to avoid stale closure)
+      const wasInBreach = inBreachRef.current
+      const nowInBreach = data.in_breach === true
+
+      if (nowInBreach) {
+        inBreachRef.current = true
+        setInBreach(true)
+        setBreachMeta(data.breach_meta ?? null)
+        // Replace breach output with latest command result (no scrolling)
+        const newLines = [...echoLines]
+        if (outputText) newLines.push(outputText)
+        setBreachOutput(newLines)
+      } else if (wasInBreach && !nowInBreach) {
+        // Breach just ended — show final output, then clear all breach state together
+        inBreachRef.current = false
+        const finalLines = [...echoLines]
+        if (outputText) finalLines.push(outputText)
+        setBreachOutput(finalLines)
+        // Delay clearing so panel can show final output during slide-down
+        setTimeout(() => {
+          setInBreach(false)
+          setBreachMeta(null)
+          setBreachOutput([])
+        }, 400)
+      }
+
       setRefreshToken(prev => prev + 1)
     } catch (err) {
       console.error('Command execution failed:', err)
@@ -77,6 +131,7 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   return (
     <TacticalContext.Provider value={{
       output, currentRoomId, executing, refreshToken,
+      inBreach, breachMeta, breachOutput,
       sendCommand, setOutput, setCurrentRoomId, commandInputRef
     }}>
       {children}

@@ -2,7 +2,7 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: [:zone_map]
   before_action :require_admin_api, only: [:debit]
@@ -176,6 +176,7 @@ class Api::GridController < ApplicationController
       },
       inventory_gear: inventory_gear.map { |item| loadout_item_json(item) },
       active_effects: effects.reject { |_, v| v == 0 || v == false },
+      clearance: current_hackr.stat("clearance"),
       vitals: {
         health: {current: current_hackr.stat("health"), max: current_hackr.effective_max("health")},
         energy: {current: current_hackr.stat("energy"), max: current_hackr.effective_max("energy")},
@@ -244,6 +245,26 @@ class Api::GridController < ApplicationController
           depth: entry[:depth]
         }
       }
+    }
+  end
+
+  # GET /api/grid/cred - CRED/cache data for the tactical CRED tab
+  def cred_index
+    caches = current_hackr.grid_caches.player.order(:created_at)
+    debt = current_hackr.stat("govcorp_debt").to_i
+
+    render json: {
+      caches: caches.map { |c|
+        {
+          address: c.address,
+          nickname: c.nickname,
+          balance: c.balance,
+          is_default: c.is_default?,
+          abandoned: c.abandoned?
+        }
+      },
+      total_balance: caches.sum(&:balance),
+      debt: debt
     }
   end
 
@@ -779,6 +800,19 @@ class Api::GridController < ApplicationController
 
     result = Grid::ZoneMapBuilder.new(zone: room.grid_zone, hackr: current_hackr).build
 
+    # Breach encounters available in current room (clearance-filtered)
+    encounters = Grid::BreachService.available_encounters(room: room, hackr: current_hackr)
+    breach_encounters = encounters.map do |enc|
+      {id: enc.id, name: enc.name, tier_label: enc.tier_label, min_clearance: enc.min_clearance}
+    end
+
+    # DECK status for pre-checking breach eligibility
+    deck = current_hackr.equipped_deck
+    deck_status = {
+      equipped: deck.present?,
+      fried: deck.present? && deck.deck_fried?
+    }
+
     render json: {
       zone: result.zone,
       current_room_id: result.current_room_id,
@@ -786,7 +820,10 @@ class Api::GridController < ApplicationController
       exits: result.exits,
       ghost_rooms: result.ghost_rooms,
       z_levels: result.z_levels,
-      z_level: result.z_level
+      z_level: result.z_level,
+      in_breach: current_hackr.in_breach?,
+      breach_encounters: breach_encounters,
+      deck_status: deck_status
     }
   end
 
@@ -837,11 +874,15 @@ class Api::GridController < ApplicationController
     # Reload hackr to get updated current_room
     current_hackr.reload
 
+    breach_meta = breach_meta_for(current_hackr)
+
     render json: {
       success: true,
       output: output,
       room_id: current_hackr.current_room&.id,
-      current_room: current_hackr.current_room ? room_json(current_hackr.current_room) : nil
+      current_room: current_hackr.current_room ? room_json(current_hackr.current_room) : nil,
+      in_breach: breach_meta.present?,
+      breach_meta: breach_meta
     }
   end
 
@@ -978,6 +1019,31 @@ class Api::GridController < ApplicationController
     }
   end
 
+  def breach_meta_for(hackr)
+    breach = hackr.active_breach
+    return nil unless breach
+
+    protocols = breach.grid_breach_protocols.sort_by(&:position).map do |p|
+      {
+        position: p.position,
+        alive: p.alive?,
+        type_label: (p.analyze_level >= 1) ? p.type_label : "???",
+        state: p.state
+      }
+    end
+
+    {
+      template_name: breach.grid_breach_template.name,
+      tier_label: breach.grid_breach_template.tier_label,
+      protocols: protocols,
+      detection_level: breach.detection_level,
+      pnr_threshold: breach.pnr_threshold,
+      actions_remaining: breach.actions_remaining,
+      actions_this_round: breach.actions_this_round,
+      round_number: breach.round_number
+    }
+  end
+
   def playlist_json(playlist)
     {
       id: playlist.id,
@@ -1010,6 +1076,7 @@ class Api::GridController < ApplicationController
       giver: mission.giver_mob ? {
         name: mission.giver_mob.name,
         room_id: mission.giver_mob.grid_room_id,
+        room_name: mission.giver_mob.grid_room&.name,
         room_slug: mission.giver_mob.grid_room&.slug
       } : nil,
       prereq_slug: mission.prereq_mission&.slug,

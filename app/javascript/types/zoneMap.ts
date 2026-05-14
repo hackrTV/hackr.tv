@@ -31,6 +31,18 @@ export interface ZoneMapGhostRoom {
   direction: string
 }
 
+export interface BreachEncounter {
+  id: number
+  name: string
+  tier_label: string
+  min_clearance: number
+}
+
+export interface DeckStatus {
+  equipped: boolean
+  fried: boolean
+}
+
 export interface ZoneMapData {
   zone: {
     id: number
@@ -46,4 +58,7 @@ export interface ZoneMapData {
   current_room_id: number
   z_levels: number[]
   z_level: number
+  in_breach: boolean
+  breach_encounters: BreachEncounter[]
+  deck_status: DeckStatus
 }

@@ -5,7 +5,7 @@ class Admin::GridBreachEncountersController < Admin::ApplicationController
 
   versionable GridBreachEncounter
 
-  before_action :set_encounter, only: %i[edit update destroy]
+  before_action :set_encounter, only: %i[edit update destroy make_available]
 
   def index
     @encounters = GridBreachEncounter
@@ -47,6 +47,19 @@ class Admin::GridBreachEncountersController < Admin::ApplicationController
       load_selects
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def make_available
+    if @encounter.available?
+      flash[:error] = "Encounter is already available."
+    elsif @encounter.grid_hackr_breaches.where(state: "active").exists?
+      flash[:error] = "Cannot reset — active breaches reference this encounter."
+    elsif @encounter.update(state: "available", cooldown_until: nil)
+      set_flash_success("Encounter '#{@encounter.name}' set to available.")
+    else
+      flash[:error] = @encounter.errors.full_messages.join(", ")
+    end
+    redirect_to admin_grid_breach_encounters_path
   end
 
   def destroy

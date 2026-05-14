@@ -107,7 +107,7 @@ export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: st
   const isFull = capacity.used >= capacity.max
 
   return (
-    <div style={{ fontSize: '0.8em' }}>
+    <div style={{ fontSize: '0.8em', maxWidth: '50%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', color: isFull ? '#f87171' : '#888', marginBottom: '4px' }}>
         <span>Inventory</span>
         <span>{capacity.used}/{capacity.max} slots</span>
