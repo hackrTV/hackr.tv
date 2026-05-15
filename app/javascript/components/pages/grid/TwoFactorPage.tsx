@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { GridLayout } from '~/components/layouts/GridLayout'
 import { useGridAuthContext } from '~/contexts/GridAuthContext'
+import { sanitizeHtml } from '~/utils/sanitizeHtml'
 
 type Phase = 'loading' | 'disabled' | 'setup' | 'confirm' | 'backup_codes' | 'enabled' | 'disable' | 'regenerate'
 
@@ -196,7 +197,7 @@ export const TwoFactorPage: React.FC = () => {
               </p>
 
               <div className="center" style={{ margin: '20px 0', background: '#fff', padding: '15px', display: 'inline-block' }}>
-                <div dangerouslySetInnerHTML={{ __html: qrSvg }} style={{ lineHeight: 0 }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(qrSvg) }} style={{ lineHeight: 0 }} />
               </div>
 
               <p style={{ margin: '20px 0 5px 0', color: '#aaa', fontSize: '0.85em' }}>

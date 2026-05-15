@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useRef, ReactNode } from 'react'
 import { apiJson } from '~/utils/apiClient'
 import { CommandInputHandle } from '~/components/grid/CommandInput'
+import { NpcMobStub } from '~/types/zoneMap'
 
 interface GridCommandResponse {
   output?: string
@@ -40,11 +41,15 @@ interface TacticalContextValue {
   breachOutput: string[]
   hasVendor: boolean
   hasTransit: boolean
-  sendCommand: (command: string) => Promise<void>
+  hasNpc: boolean
+  npcMobs: NpcMobStub[]
+  sendCommand: (command: string) => Promise<string | undefined>
   setOutput: React.Dispatch<React.SetStateAction<string[]>>
   setCurrentRoomId: React.Dispatch<React.SetStateAction<number | null>>
   setHasVendor: React.Dispatch<React.SetStateAction<boolean>>
   setHasTransit: React.Dispatch<React.SetStateAction<boolean>>
+  setHasNpc: React.Dispatch<React.SetStateAction<boolean>>
+  setNpcMobs: React.Dispatch<React.SetStateAction<NpcMobStub[]>>
   commandInputRef: React.RefObject<CommandInputHandle | null>
 }
 
@@ -66,6 +71,8 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [breachOutput, setBreachOutput] = useState<string[]>([])
   const [hasVendor, setHasVendor] = useState(false)
   const [hasTransit, setHasTransit] = useState(false)
+  const [hasNpc, setHasNpc] = useState(false)
+  const [npcMobs, setNpcMobs] = useState<NpcMobStub[]>([])
   const commandInputRef = useRef<CommandInputHandle | null>(null)
   const inBreachRef = useRef(false)
 
@@ -126,6 +133,7 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       setRefreshToken(prev => prev + 1)
+      return outputText
     } catch (err: unknown) {
       console.error('Command execution failed:', err)
       const raw = err instanceof Error ? err.message : 'Network error. Please try again.'
@@ -139,8 +147,8 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   return (
     <TacticalContext.Provider value={{
       output, currentRoomId, executing, refreshToken,
-      inBreach, breachMeta, breachOutput, hasVendor, hasTransit,
-      sendCommand, setOutput, setCurrentRoomId, setHasVendor, setHasTransit, commandInputRef
+      inBreach, breachMeta, breachOutput, hasVendor, hasTransit, hasNpc, npcMobs,
+      sendCommand, setOutput, setCurrentRoomId, setHasVendor, setHasTransit, setHasNpc, setNpcMobs, commandInputRef
     }}>
       {children}
     </TacticalContext.Provider>

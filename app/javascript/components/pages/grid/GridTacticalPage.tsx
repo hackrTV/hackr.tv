@@ -10,11 +10,13 @@ import { ZoneMap } from '~/components/tactical/map/ZoneMap'
 import { BreachTargetButtons } from '~/components/tactical/breach/BreachTargetButtons'
 import { BreachConfirmModal } from '~/components/tactical/breach/BreachConfirmModal'
 import { BreachPanel } from '~/components/tactical/breach/BreachPanel'
-import { BreachEncounter, DeckStatus } from '~/types/zoneMap'
+import { BreachEncounter, DeckStatus, NpcMobStub } from '~/types/zoneMap'
 import { VendorHandle } from '~/components/tactical/vendor/VendorHandle'
 import { VendorPanel } from '~/components/tactical/vendor/VendorPanel'
 import { TransitHandle } from '~/components/tactical/transit/TransitHandle'
 import { TransitPanel } from '~/components/tactical/transit/TransitPanel'
+import { NpcHandle } from '~/components/tactical/npc/NpcHandle'
+import { NpcPanel } from '~/components/tactical/npc/NpcPanel'
 
 const TacticalInner: React.FC = () => {
   const { hackr } = useGridAuth()
@@ -23,7 +25,8 @@ const TacticalInner: React.FC = () => {
     refreshToken, sendCommand, commandInputRef,
     inBreach, breachMeta, breachOutput,
     hasVendor, setHasVendor,
-    hasTransit, setHasTransit
+    hasTransit, setHasTransit,
+    hasNpc, setHasNpc, npcMobs, setNpcMobs
   } = useTactical()
   const initialLoadDoneRef = useRef(false)
   const [breachEncounters, setBreachEncounters] = useState<BreachEncounter[]>([])
@@ -31,6 +34,8 @@ const TacticalInner: React.FC = () => {
   const [confirmTarget, setConfirmTarget] = useState<BreachEncounter | null>(null)
   const [vendorOpen, setVendorOpen] = useState(false)
   const [transitOpen, setTransitOpen] = useState(false)
+  const [npcOpen, setNpcOpen] = useState(false)
+  const [selectedNpcId, setSelectedNpcId] = useState<number | null>(null)
 
   const handleBreachEncountersChange = useCallback((encounters: BreachEncounter[], ds: DeckStatus) => {
     setBreachEncounters(encounters)
@@ -47,11 +52,18 @@ const TacticalInner: React.FC = () => {
     if (!v) setTransitOpen(false)
   }, [setHasTransit])
 
+  const handleNpcPresenceChange = useCallback((has: boolean, mobs: NpcMobStub[]) => {
+    setHasNpc(has)
+    setNpcMobs(mobs)
+    if (!has) { setNpcOpen(false); setSelectedNpcId(null) }
+  }, [setHasNpc, setNpcMobs])
+
   // Close panels when breach starts
   useEffect(() => {
     if (inBreach) {
       setVendorOpen(false)
       setTransitOpen(false)
+      setNpcOpen(false)
     }
   }, [inBreach])
 
@@ -166,6 +178,7 @@ const TacticalInner: React.FC = () => {
           onBreachEncountersChange={handleBreachEncountersChange}
           onVendorPresenceChange={handleVendorPresenceChange}
           onTransitPresenceChange={handleTransitPresenceChange}
+          onNpcPresenceChange={handleNpcPresenceChange}
         />
         {!inBreach && breachEncounters.length > 0 && (
           <BreachTargetButtons
@@ -181,7 +194,7 @@ const TacticalInner: React.FC = () => {
           refreshToken={refreshToken}
           onCommand={sendCommand}
         />
-        {hasTransit && !inBreach && !vendorOpen && !transitOpen && (
+        {hasTransit && !inBreach && !vendorOpen && !transitOpen && !npcOpen && (
           <TransitHandle onClick={() => setTransitOpen(true)} />
         )}
         <TransitPanel
@@ -190,7 +203,7 @@ const TacticalInner: React.FC = () => {
           onCommand={sendCommand}
           onClose={() => setTransitOpen(false)}
         />
-        {hasVendor && !inBreach && !vendorOpen && !transitOpen && (
+        {hasVendor && !inBreach && !vendorOpen && !transitOpen && !npcOpen && (
           <VendorHandle onClick={() => setVendorOpen(true)} />
         )}
         <VendorPanel
@@ -198,6 +211,27 @@ const TacticalInner: React.FC = () => {
           refreshToken={refreshToken}
           onCommand={sendCommand}
           onClose={() => setVendorOpen(false)}
+        />
+        {hasNpc && !inBreach && !vendorOpen && !transitOpen && !npcOpen &&
+          npcMobs.map((mob, i) => {
+            const total = npcMobs.length
+            const offsetX = total === 1 ? 0 : (i - (total - 1) / 2) * 72
+            return (
+              <NpcHandle
+                key={mob.id}
+                npc={mob}
+                offsetX={offsetX}
+                onClick={() => { setSelectedNpcId(mob.id); setNpcOpen(true) }}
+              />
+            )
+          })
+        }
+        <NpcPanel
+          visible={npcOpen && !inBreach}
+          refreshToken={refreshToken}
+          onCommand={sendCommand}
+          onClose={() => setNpcOpen(false)}
+          selectedMobId={selectedNpcId}
         />
       </div>
 
