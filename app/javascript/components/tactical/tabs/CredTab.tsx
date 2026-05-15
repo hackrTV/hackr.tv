@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { apiJson } from '~/utils/apiClient'
+import { useTactical } from '../TacticalContext'
 
 interface CacheData {
   address: string
@@ -20,6 +21,7 @@ function formatCred (amount: number): string {
 }
 
 export const CredTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void }> = ({ refreshToken, onCommand }) => {
+  const { executing } = useTactical()
   const [data, setData] = useState<CredResponse | null>(null)
   const [nicknameTarget, setNicknameTarget] = useState<string | null>(null)
   const [nicknameInput, setNicknameInput] = useState('')
@@ -52,6 +54,7 @@ export const CredTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string)
       {/* Create cache button */}
       <button
         onClick={() => onCommand?.('cache create')}
+        disabled={executing}
         style={{
           background: '#1a1a1a',
           border: '1px solid #34d399',
@@ -59,7 +62,8 @@ export const CredTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string)
           padding: '3px 10px',
           color: '#34d399',
           fontSize: '0.85em',
-          cursor: 'pointer',
+          cursor: executing ? 'not-allowed' : 'pointer',
+          opacity: executing ? 0.5 : 1,
           fontFamily: '\'Courier New\', monospace',
           marginBottom: '8px'
         }}
@@ -211,9 +215,12 @@ export const CredTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string)
                     setNicknameTarget(null)
                   }
                 }}
+                disabled={executing}
                 style={{
-                  background: '#a78bfa', color: '#0a0a0a', border: 'none',
-                  padding: '8px 20px', fontSize: '0.9em', cursor: 'pointer',
+                  background: executing ? '#333' : '#a78bfa',
+                  color: executing ? '#666' : '#0a0a0a', border: 'none',
+                  padding: '8px 20px', fontSize: '0.9em',
+                  cursor: executing ? 'not-allowed' : 'pointer',
                   borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
                 }}
               >
@@ -327,17 +334,17 @@ export const CredTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string)
                 CANCEL
               </button>
               <button
-                disabled={!transferAmount || !transferTo}
+                disabled={!transferAmount || !transferTo || executing}
                 onClick={() => {
                   const fromArg = transferFrom.is_default ? '' : ` from ${transferFrom.nickname || transferFrom.address}`
                   onCommand?.(`cache send ${transferAmount} ${transferTo}${fromArg}`)
                   setTransferFrom(null)
                 }}
                 style={{
-                  background: (!transferAmount || !transferTo) ? '#333' : '#fbbf24',
+                  background: (!transferAmount || !transferTo || executing) ? '#333' : '#fbbf24',
                   color: '#0a0a0a', border: 'none',
                   padding: '8px 20px', fontSize: '0.9em',
-                  cursor: (!transferAmount || !transferTo) ? 'not-allowed' : 'pointer',
+                  cursor: (!transferAmount || !transferTo || executing) ? 'not-allowed' : 'pointer',
                   borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
                 }}
               >

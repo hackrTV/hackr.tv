@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { apiJson } from '~/utils/apiClient'
 import { ShopData, ShopListing, InventoryItem, InventoryResponse } from '~/types/zoneMap'
+import { useTactical } from '../TacticalContext'
 
 interface VendorPanelProps {
   visible: boolean
@@ -23,6 +24,7 @@ interface PendingTx {
 export const VendorPanel: React.FC<VendorPanelProps> = ({
   visible, refreshToken, onCommand, onClose
 }) => {
+  const { executing } = useTactical()
   const [isRendered, setIsRendered] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [shopData, setShopData] = useState<ShopData | null>(null)
@@ -233,11 +235,13 @@ export const VendorPanel: React.FC<VendorPanelProps> = ({
               buyQty={buyQty}
               setBuyQty={setBuyQty}
               onBuy={handleBuyClick}
+              executing={executing}
             />
           ) : (
             <SellSection
               items={inventoryData}
               onSell={handleSellClick}
+              executing={executing}
             />
           )}
         </div>
@@ -329,10 +333,12 @@ export const VendorPanel: React.FC<VendorPanelProps> = ({
               >CANCEL</button>
               <button
                 onClick={handleConfirm}
+                disabled={executing}
                 style={{
-                  background: pendingTx.type === 'buy' ? '#34d399' : '#fbbf24',
-                  color: '#0a0a0a', border: 'none',
-                  padding: '8px 20px', fontSize: '0.9em', cursor: 'pointer',
+                  background: executing ? '#333' : (pendingTx.type === 'buy' ? '#34d399' : '#fbbf24'),
+                  color: executing ? '#666' : '#0a0a0a', border: 'none',
+                  padding: '8px 20px', fontSize: '0.9em',
+                  cursor: executing ? 'not-allowed' : 'pointer',
                   borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
                 }}
               >{pendingTx.type === 'buy' ? 'BUY' : 'SELL'}</button>
@@ -351,7 +357,8 @@ const BuySection: React.FC<{
   buyQty: Record<number, number>
   setBuyQty: React.Dispatch<React.SetStateAction<Record<number, number>>>
   onBuy: (listing: ShopListing) => void
-}> = ({ shopData, buyQty, setBuyQty, onBuy }) => {
+  executing: boolean
+}> = ({ shopData, buyQty, setBuyQty, onBuy, executing }) => {
   if (!shopData) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
   if (shopData.listings.length === 0) return <div style={{ color: '#555', fontSize: '0.8em' }}>Nothing for sale.</div>
 
@@ -406,10 +413,10 @@ const BuySection: React.FC<{
                 )}
                 <button
                   onClick={() => onBuy(listing)}
-                  disabled={!canAfford}
+                  disabled={!canAfford || executing}
                   style={{
-                    background: canAfford ? '#34d399' : '#333',
-                    color: canAfford ? '#0a0a0a' : '#666',
+                    background: canAfford && !executing ? '#34d399' : '#333',
+                    color: canAfford && !executing ? '#0a0a0a' : '#666',
                     border: 'none',
                     borderRadius: '3px',
                     padding: '3px 8px',
@@ -438,7 +445,8 @@ const BuySection: React.FC<{
 const SellSection: React.FC<{
   items: InventoryItem[]
   onSell: (item: InventoryItem) => void
-}> = ({ items, onSell }) => {
+  executing: boolean
+}> = ({ items, onSell, executing }) => {
   if (items.length === 0) return <div style={{ color: '#555', fontSize: '0.8em' }}>Nothing to sell.</div>
 
   return (
@@ -467,14 +475,15 @@ const SellSection: React.FC<{
 
           <button
             onClick={() => onSell(item)}
+            disabled={executing}
             style={{
-              background: '#fbbf24',
-              color: '#0a0a0a',
+              background: executing ? '#333' : '#fbbf24',
+              color: executing ? '#666' : '#0a0a0a',
               border: 'none',
               borderRadius: '3px',
               padding: '3px 8px',
               fontSize: '0.9em',
-              cursor: 'pointer',
+              cursor: executing ? 'not-allowed' : 'pointer',
               fontWeight: 'bold',
               fontFamily: '\'Courier New\', monospace',
               flexShrink: 0

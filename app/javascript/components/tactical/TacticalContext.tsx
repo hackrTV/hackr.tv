@@ -75,12 +75,15 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [npcMobs, setNpcMobs] = useState<NpcMobStub[]>([])
   const commandInputRef = useRef<CommandInputHandle | null>(null)
   const inBreachRef = useRef(false)
+  const executingRef = useRef(false)
 
   const sendCommand = useCallback(async (command: string) => {
     if (['clear', 'cls', 'cl'].includes(command.toLowerCase())) {
       setOutput([])
       return
     }
+
+    if (executingRef.current) return
 
     const echoLines = [
       '<div style="height: 1px; background: #444; margin-top: 16px; margin-bottom: 12px; overflow: hidden;"></div>',
@@ -89,6 +92,7 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     setOutput(prev => [...prev, ...echoLines])
 
+    executingRef.current = true
     setExecuting(true)
 
     try {
@@ -140,6 +144,7 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
       const safe = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       setOutput(prev => [...prev, `<span style="color: #f87171;">Error: ${safe}</span>`])
     } finally {
+      executingRef.current = false
       setExecuting(false)
     }
   }, [])

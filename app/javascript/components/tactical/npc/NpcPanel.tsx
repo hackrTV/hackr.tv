@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { apiJson } from '~/utils/apiClient'
 import { NpcData } from '~/types/zoneMap'
+import { useTactical } from '../TacticalContext'
 import { DialogueSection } from './DialogueSection'
 import { MissionsSection } from './MissionsSection'
 
@@ -17,6 +18,7 @@ type PanelSection = 'dialogue' | 'missions'
 export const NpcPanel: React.FC<NpcPanelProps> = ({
   visible, refreshToken, onCommand, onClose, selectedMobId
 }) => {
+  const { executing } = useTactical()
   const [isRendered, setIsRendered] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [npcData, setNpcData] = useState<NpcData | null>(null)
@@ -209,6 +211,7 @@ export const NpcPanel: React.FC<NpcPanelProps> = ({
               mobName={npcData.mob_name}
               dialogueOutput={dialogueOutput}
               onCommand={handleDialogueCommand}
+              executing={executing}
             />
           )}
           {npcData && section === 'missions' && (
@@ -218,6 +221,7 @@ export const NpcPanel: React.FC<NpcPanelProps> = ({
               deliveryItems={npcData.delivery_items}
               mobName={npcData.mob_name}
               onCommand={onCommand}
+              executing={executing}
             />
           )}
         </div>

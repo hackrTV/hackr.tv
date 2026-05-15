@@ -7,6 +7,7 @@ interface MissionsSectionProps {
   deliveryItems: NpcDeliveryItem[]
   mobName: string
   onCommand: (cmd: string) => void
+  executing: boolean
 }
 
 interface ConfirmAction {
@@ -16,7 +17,7 @@ interface ConfirmAction {
 }
 
 export const MissionsSection: React.FC<MissionsSectionProps> = ({
-  availableMissions, activeMissions, deliveryItems, mobName, onCommand
+  availableMissions, activeMissions, deliveryItems, mobName, onCommand, executing
 }) => {
   const [confirm, setConfirm] = useState<ConfirmAction | null>(null)
 
@@ -50,6 +51,7 @@ export const MissionsSection: React.FC<MissionsSectionProps> = ({
               deliveryByObj={deliveryByObj}
               onCommand={onCommand}
               onConfirm={setConfirm}
+              executing={executing}
             />
           ))}
         </div>
@@ -66,6 +68,7 @@ export const MissionsSection: React.FC<MissionsSectionProps> = ({
               key={m.slug}
               mission={m}
               onConfirm={setConfirm}
+              executing={executing}
             />
           ))}
         </div>
@@ -115,10 +118,12 @@ export const MissionsSection: React.FC<MissionsSectionProps> = ({
               >CANCEL</button>
               <button
                 onClick={handleConfirm}
+                disabled={executing}
                 style={{
-                  background: confirm.type === 'abandon' ? '#f87171' : '#c084fc',
-                  color: '#0a0a0a', border: 'none',
-                  padding: '8px 20px', fontSize: '0.9em', cursor: 'pointer',
+                  background: executing ? '#333' : (confirm.type === 'abandon' ? '#f87171' : '#c084fc'),
+                  color: executing ? '#666' : '#0a0a0a', border: 'none',
+                  padding: '8px 20px', fontSize: '0.9em',
+                  cursor: executing ? 'not-allowed' : 'pointer',
                   borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
                 }}
               >
@@ -142,7 +147,8 @@ const ActiveMissionRow: React.FC<{
   deliveryByObj: Map<number, NpcDeliveryItem>
   onCommand: (cmd: string) => void
   onConfirm: (action: ConfirmAction) => void
-}> = ({ mission, mobName, deliveryByObj, onCommand, onConfirm }) => {
+  executing: boolean
+}> = ({ mission, mobName, deliveryByObj, onCommand, onConfirm, executing }) => {
   const objectives = mission.mission.objectives
   const progressMap = new Map(mission.objective_progress.map(p => [p.objective_id, p]))
 
@@ -180,10 +186,10 @@ const ActiveMissionRow: React.FC<{
               {delivery && !done && (
                 <button
                   onClick={() => onCommand(`give ${delivery.item_name} to ${mobName}`)}
-                  disabled={!delivery.in_inventory}
+                  disabled={!delivery.in_inventory || executing}
                   style={{
-                    background: delivery.in_inventory ? '#c084fc' : '#333',
-                    color: delivery.in_inventory ? '#0a0a0a' : '#666',
+                    background: delivery.in_inventory && !executing ? '#c084fc' : '#333',
+                    color: delivery.in_inventory && !executing ? '#0a0a0a' : '#666',
                     border: 'none',
                     borderRadius: '3px',
                     padding: '2px 8px',
@@ -207,19 +213,25 @@ const ActiveMissionRow: React.FC<{
         {mission.ready_to_turn_in && mission.at_giver && (
           <button
             onClick={() => onConfirm({ type: 'turn_in', slug: mission.slug, name: mission.name })}
+            disabled={executing}
             style={{
-              background: '#34d399', color: '#0a0a0a', border: 'none',
+              background: executing ? '#333' : '#34d399',
+              color: executing ? '#666' : '#0a0a0a', border: 'none',
               borderRadius: '3px', padding: '3px 10px', fontSize: '0.8em',
-              cursor: 'pointer', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
+              cursor: executing ? 'not-allowed' : 'pointer',
+              fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
             }}
           >TURN IN</button>
         )}
         <button
           onClick={() => onConfirm({ type: 'abandon', slug: mission.slug, name: mission.name })}
+          disabled={executing}
           style={{
             background: 'transparent', color: '#f87171', border: '1px solid #f87171',
             borderRadius: '3px', padding: '2px 8px', fontSize: '0.75em',
-            cursor: 'pointer', fontFamily: '\'Courier New\', monospace'
+            cursor: executing ? 'not-allowed' : 'pointer',
+            opacity: executing ? 0.5 : 1,
+            fontFamily: '\'Courier New\', monospace'
           }}
         >ABANDON</button>
       </div>
@@ -232,7 +244,8 @@ const ActiveMissionRow: React.FC<{
 const AvailableMissionRow: React.FC<{
   mission: NpcAvailableMission
   onConfirm: (action: ConfirmAction) => void
-}> = ({ mission, onConfirm }) => {
+  executing: boolean
+}> = ({ mission, onConfirm, executing }) => {
   const gates = mission.gates
 
   return (
@@ -289,10 +302,10 @@ const AvailableMissionRow: React.FC<{
 
       <button
         onClick={() => onConfirm({ type: 'accept', slug: mission.slug, name: mission.name })}
-        disabled={!mission.can_accept}
+        disabled={!mission.can_accept || executing}
         style={{
-          background: mission.can_accept ? '#34d399' : '#333',
-          color: mission.can_accept ? '#0a0a0a' : '#666',
+          background: mission.can_accept && !executing ? '#34d399' : '#333',
+          color: mission.can_accept && !executing ? '#0a0a0a' : '#666',
           border: 'none',
           borderRadius: '3px',
           padding: '3px 10px',

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { apiJson } from '~/utils/apiClient'
-import { BreachMeta, BreachProtocolMeta } from '../TacticalContext'
+import { BreachMeta, BreachProtocolMeta, useTactical } from '../TacticalContext'
 import { sanitizeHtml } from '~/utils/sanitizeHtml'
 
 interface DeckData {
@@ -41,7 +41,8 @@ const TargetSelector: React.FC<{
   label: string
   onSelect: (position: number) => void
   onCancel: () => void
-}> = ({ protocols, label, onSelect, onCancel }) => {
+  disabled: boolean
+}> = ({ protocols, label, onSelect, onCancel, disabled }) => {
   const aliveProtocols = protocols.filter(p => p.alive)
 
   return (
@@ -56,14 +57,15 @@ const TargetSelector: React.FC<{
           <button
             key={p.position}
             onClick={() => onSelect(p.position + 1)}
+            disabled={disabled}
             style={{
               background: '#222',
               border: '1px solid #555',
               borderRadius: '3px',
               padding: '4px 10px',
-              color: '#d0d0d0',
+              color: disabled ? '#666' : '#d0d0d0',
               fontSize: '0.8em',
-              cursor: 'pointer',
+              cursor: disabled ? 'not-allowed' : 'pointer',
               fontFamily: '\'Courier New\', monospace'
             }}
           >
@@ -88,6 +90,7 @@ const TargetSelector: React.FC<{
 export const BreachPanel: React.FC<BreachPanelProps> = ({
   visible, breachMeta, breachOutput, refreshToken, onCommand
 }) => {
+  const { executing } = useTactical()
   const [deckData, setDeckData] = useState<DeckData | null>(null)
   const [isRendered, setIsRendered] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -257,6 +260,7 @@ export const BreachPanel: React.FC<BreachPanelProps> = ({
                         : { type: 'exec', softwareName: sw.name }
                     )
                   }}
+                  disabled={executing}
                   style={{
                     background: '#1a1a1a',
                     border: `1px solid ${catColor}44`,
@@ -264,7 +268,8 @@ export const BreachPanel: React.FC<BreachPanelProps> = ({
                     padding: '3px 8px',
                     color: sw.rarity_color,
                     fontSize: '0.65em',
-                    cursor: 'pointer',
+                    cursor: executing ? 'not-allowed' : 'pointer',
+                    opacity: executing ? 0.5 : 1,
                     fontFamily: '\'Courier New\', monospace',
                     whiteSpace: 'nowrap'
                   }}
@@ -281,6 +286,7 @@ export const BreachPanel: React.FC<BreachPanelProps> = ({
                     label={`EXEC ${sw.name} →`}
                     onSelect={(pos) => { onCommand(`exec ${sw.name} ${pos}`); setActiveSelector(null) }}
                     onCancel={() => setActiveSelector(null)}
+                    disabled={executing}
                   />
                 )}
               </div>
@@ -296,9 +302,12 @@ export const BreachPanel: React.FC<BreachPanelProps> = ({
                   e.stopPropagation()
                   setActiveSelector(activeSelector?.type === cmd ? null : { type: cmd })
                 }}
+                disabled={executing}
                 style={{
                   background: '#1a1a1a', border: '1px solid #333', borderRadius: '3px',
-                  padding: '3px 8px', color: '#22d3ee', fontSize: '0.65em', cursor: 'pointer',
+                  padding: '3px 8px', color: '#22d3ee', fontSize: '0.65em',
+                  cursor: executing ? 'not-allowed' : 'pointer',
+                  opacity: executing ? 0.5 : 1,
                   fontFamily: '\'Courier New\', monospace'
                 }}
               >
@@ -310,6 +319,7 @@ export const BreachPanel: React.FC<BreachPanelProps> = ({
                   label={`${cmd.toUpperCase()} \u2192`}
                   onSelect={(pos) => { onCommand(`${cmd} ${pos}`); setActiveSelector(null) }}
                   onCancel={() => setActiveSelector(null)}
+                  disabled={executing}
                 />
               )}
             </div>
@@ -392,9 +402,12 @@ export const BreachPanel: React.FC<BreachPanelProps> = ({
               </button>
               <button
                 onClick={() => { onCommand('jackout'); setJackoutConfirm(false) }}
+                disabled={executing}
                 style={{
-                  background: '#dc2626', color: 'white', border: 'none',
-                  padding: '8px 20px', fontSize: '0.9em', cursor: 'pointer',
+                  background: executing ? '#333' : '#dc2626',
+                  color: executing ? '#666' : 'white', border: 'none',
+                  padding: '8px 20px', fontSize: '0.9em',
+                  cursor: executing ? 'not-allowed' : 'pointer',
                   borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
                 }}
               >

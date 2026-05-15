@@ -4,6 +4,7 @@ import {
   TransitData, TransitRoute, SlipstreamRoute,
   PrivateTransitType, PrivateDestination, TransitJourney
 } from '~/types/zoneMap'
+import { useTactical } from '../TacticalContext'
 
 interface TransitPanelProps {
   visible: boolean
@@ -24,6 +25,7 @@ const HEAT_COLORS: Record<string, string> = {
 export const TransitPanel: React.FC<TransitPanelProps> = ({
   visible, refreshToken, onCommand, onClose
 }) => {
+  const { executing } = useTactical()
   const [isRendered, setIsRendered] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [data, setData] = useState<TransitData | null>(null)
@@ -204,19 +206,20 @@ export const TransitPanel: React.FC<TransitPanelProps> = ({
           {!data ? (
             <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
           ) : hasJourney ? (
-            <JourneySection journey={data.current_journey!} onCommand={onCommand} />
+            <JourneySection journey={data.current_journey!} onCommand={onCommand} executing={executing} />
           ) : availableTabs.length === 0 ? (
             <div style={{ color: '#555', fontSize: '0.8em' }}>No transit options available here.</div>
           ) : (
             <>
               {activeTab === 'local' && (
-                <LocalSection routes={data.local_routes} onCommand={onCommand} />
+                <LocalSection routes={data.local_routes} onCommand={onCommand} executing={executing} />
               )}
               {activeTab === 'private' && (
                 <PrivateSection
                   types={data.private_types}
                   destinations={data.private_destinations}
                   onCommand={onCommand}
+                  executing={executing}
                 />
               )}
               {activeTab === 'slipstream' && (
@@ -225,6 +228,7 @@ export const TransitPanel: React.FC<TransitPanelProps> = ({
                   heat={data.slipstream_heat}
                   heatTier={data.slipstream_heat_tier}
                   onCommand={onCommand}
+                  executing={executing}
                 />
               )}
             </>
@@ -240,7 +244,8 @@ export const TransitPanel: React.FC<TransitPanelProps> = ({
 const JourneySection: React.FC<{
   journey: TransitJourney
   onCommand: (cmd: string) => void
-}> = ({ journey, onCommand }) => {
+  executing: boolean
+}> = ({ journey, onCommand, executing }) => {
   const isSlipstream = journey.journey_type === 'slipstream'
   const isLocalPublic = journey.journey_type === 'local_public'
   const typeColor = isSlipstream ? '#a78bfa' : '#34d399'
@@ -341,7 +346,8 @@ const JourneySection: React.FC<{
               </div>
               <button
                 onClick={() => onCommand(`choose ${fork.key}`)}
-                style={actionBtnStyle('#fbbf24')}
+                disabled={executing}
+                style={actionBtnStyle('#fbbf24', executing)}
               >
                 CHOOSE
               </button>
@@ -355,26 +361,26 @@ const JourneySection: React.FC<{
         {!journey.breach_mid_journey && (
           <>
             {isSlipstream && !journey.pending_fork && (
-              <button onClick={() => onCommand('advance')} style={actionBtnStyle('#a78bfa')}>
+              <button onClick={() => onCommand('advance')} disabled={executing} style={actionBtnStyle('#a78bfa', executing)}>
                 ADVANCE
               </button>
             )}
             {!isSlipstream && (
-              <button onClick={() => onCommand('wait')} style={actionBtnStyle('#34d399')}>
+              <button onClick={() => onCommand('wait')} disabled={executing} style={actionBtnStyle('#34d399', executing)}>
                 WAIT
               </button>
             )}
             {isLocalPublic && (
-              <button onClick={() => onCommand('disembark')} style={actionBtnStyle('#fbbf24')}>
+              <button onClick={() => onCommand('disembark')} disabled={executing} style={actionBtnStyle('#fbbf24', executing)}>
                 DISEMBARK
               </button>
             )}
           </>
         )}
-        <button onClick={() => onCommand('abandon')} style={actionBtnStyle('#f87171')}>
+        <button onClick={() => onCommand('abandon')} disabled={executing} style={actionBtnStyle('#f87171', executing)}>
           ABANDON
         </button>
-        <button onClick={() => onCommand('status')} style={actionBtnStyle('#888')}>
+        <button onClick={() => onCommand('status')} disabled={executing} style={actionBtnStyle('#888', executing)}>
           STATUS
         </button>
       </div>
@@ -387,7 +393,8 @@ const JourneySection: React.FC<{
 const LocalSection: React.FC<{
   routes: TransitRoute[]
   onCommand: (cmd: string) => void
-}> = ({ routes, onCommand }) => {
+  executing: boolean
+}> = ({ routes, onCommand, executing }) => {
   if (routes.length === 0) {
     return <div style={{ color: '#555', fontSize: '0.8em' }}>No local routes at this stop.</div>
   }
@@ -408,7 +415,7 @@ const LocalSection: React.FC<{
             [{typeRoutes[0].transit_type.icon_key || 'TRANSIT'}] {typeName}
           </div>
           {typeRoutes.map(route => (
-            <RouteRow key={route.slug} route={route} onCommand={onCommand} />
+            <RouteRow key={route.slug} route={route} onCommand={onCommand} executing={executing} />
           ))}
         </div>
       ))}
@@ -419,7 +426,8 @@ const LocalSection: React.FC<{
 const RouteRow: React.FC<{
   route: TransitRoute
   onCommand: (cmd: string) => void
-}> = ({ route, onCommand }) => {
+  executing: boolean
+}> = ({ route, onCommand, executing }) => {
   const canForward = route.loop_route || !route.at_last_stop
   const canReverse = !route.loop_route && !route.at_first_stop
   const firstStop = route.stops[0]?.name
@@ -438,7 +446,8 @@ const RouteRow: React.FC<{
           {canForward && (
             <button
               onClick={() => onCommand(`board ${route.slug}`)}
-              style={dirBtnStyle}
+              disabled={executing}
+              style={{ ...dirBtnStyle, ...(executing ? { opacity: 0.5, cursor: 'not-allowed' } : {}) }}
             >
               BOARD {'\u2192'} {lastStop}
             </button>
@@ -446,7 +455,8 @@ const RouteRow: React.FC<{
           {canReverse && (
             <button
               onClick={() => onCommand(`board ${route.slug} reverse`)}
-              style={dirBtnStyle}
+              disabled={executing}
+              style={{ ...dirBtnStyle, ...(executing ? { opacity: 0.5, cursor: 'not-allowed' } : {}) }}
             >
               BOARD {'\u2192'} {firstStop}
             </button>
@@ -470,7 +480,8 @@ const PrivateSection: React.FC<{
   types: PrivateTransitType[]
   destinations: PrivateDestination[]
   onCommand: (cmd: string) => void
-}> = ({ types, destinations, onCommand }) => {
+  executing: boolean
+}> = ({ types, destinations, onCommand, executing }) => {
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedDest, setSelectedDest] = useState<string | null>(null)
 
@@ -554,7 +565,7 @@ const PrivateSection: React.FC<{
                       <span style={{ color: '#555', marginLeft: '6px', fontSize: '0.9em' }}>({dest.zone_name})</span>
                     </div>
                     {isSelected && (
-                      <button onClick={handleHail} style={actionBtnStyle('#fbbf24')}>
+                      <button onClick={handleHail} disabled={executing} style={actionBtnStyle('#fbbf24', executing)}>
                         HAIL
                       </button>
                     )}
@@ -576,7 +587,8 @@ const SlipstreamSection: React.FC<{
   heat: number
   heatTier: string
   onCommand: (cmd: string) => void
-}> = ({ routes, heat, heatTier, onCommand }) => {
+  executing: boolean
+}> = ({ routes, heat, heatTier, onCommand, executing }) => {
   return (
     <div style={{ fontSize: '0.75em' }}>
       {/* Heat indicator */}
@@ -620,7 +632,8 @@ const SlipstreamSection: React.FC<{
               </div>
               <button
                 onClick={() => onCommand(`slipstream ${route.slug}`)}
-                style={actionBtnStyle('#a78bfa')}
+                disabled={executing}
+                style={actionBtnStyle('#a78bfa', executing)}
               >
                 BOARD
               </button>
@@ -634,15 +647,15 @@ const SlipstreamSection: React.FC<{
 
 // --- Shared ---
 
-function actionBtnStyle (color: string): React.CSSProperties {
+function actionBtnStyle (color: string, disabled?: boolean): React.CSSProperties {
   return {
-    background: color,
-    color: '#0a0a0a',
+    background: disabled ? '#333' : color,
+    color: disabled ? '#666' : '#0a0a0a',
     border: 'none',
     borderRadius: '3px',
     padding: '3px 8px',
     fontSize: '0.9em',
-    cursor: 'pointer',
+    cursor: disabled ? 'not-allowed' : 'pointer',
     fontWeight: 'bold',
     fontFamily: '\'Courier New\', monospace',
     flexShrink: 0

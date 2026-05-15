@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { apiJson } from '~/utils/apiClient'
+import { useTactical } from '../TacticalContext'
 
 interface ObjectiveDefinition {
   id: number
@@ -32,6 +33,7 @@ interface MissionsResponse {
 }
 
 export const MissionsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void }> = ({ refreshToken, onCommand }) => {
+  const { executing } = useTactical()
   const [data, setData] = useState<MissionsResponse | null>(null)
 
   useEffect(() => {
@@ -76,15 +78,16 @@ export const MissionsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: str
                 {hm.ready_to_turn_in && (
                   <button
                     onClick={() => onCommand?.(`turn_in ${hm.mission.slug}`)}
+                    disabled={executing}
                     style={{
                       marginTop: '4px',
-                      background: '#34d399',
-                      color: '#0a0a0a',
+                      background: executing ? '#333' : '#34d399',
+                      color: executing ? '#666' : '#0a0a0a',
                       border: 'none',
                       padding: '3px 10px',
                       fontSize: '0.85em',
                       fontWeight: 'bold',
-                      cursor: 'pointer',
+                      cursor: executing ? 'not-allowed' : 'pointer',
                       borderRadius: '3px',
                       fontFamily: '\'Courier New\', monospace'
                     }}

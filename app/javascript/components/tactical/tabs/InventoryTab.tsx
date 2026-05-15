@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { apiJson } from '~/utils/apiClient'
 import { InventoryItem, InventoryResponse } from '~/types/zoneMap'
+import { useTactical } from '../TacticalContext'
 
 const ITEM_TYPE_LABELS: Record<string, string> = {
   gear: 'Gear', software: 'Software', module: 'Module', firmware: 'Firmware',
@@ -69,6 +70,7 @@ function humanizeProperties (props: Record<string, unknown>): { label: string; v
 }
 
 export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void; hasVendor?: boolean }> = ({ refreshToken, onCommand, hasVendor }) => {
+  const { executing } = useTactical()
   const [data, setData] = useState<InventoryResponse | null>(null)
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
   const [pendingAction, setPendingAction] = useState<{ item: InventoryItem; action: string } | null>(null)
@@ -118,9 +120,12 @@ export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: st
                 {canSell && (
                   <button
                     onClick={(e) => { e.stopPropagation(); setPendingAction({ item, action: 'sell' }) }}
+                    disabled={executing}
                     style={{
-                      background: '#fbbf24', color: '#0a0a0a', border: 'none', borderRadius: '2px',
-                      padding: '1px 5px', fontSize: '0.8em', cursor: 'pointer', fontWeight: 'bold',
+                      background: executing ? '#333' : '#fbbf24',
+                      color: executing ? '#666' : '#0a0a0a', border: 'none', borderRadius: '2px',
+                      padding: '1px 5px', fontSize: '0.8em',
+                      cursor: executing ? 'not-allowed' : 'pointer', fontWeight: 'bold',
                       fontFamily: '\'Courier New\', monospace', lineHeight: 1, flexShrink: 0
                     }}
                   >SELL</button>
@@ -243,10 +248,11 @@ export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: st
               <button onClick={() => {
                 onCommand?.(`${pendingAction.action} ${pendingAction.item.name}`)
                 setPendingAction(null)
-              }} style={{
-                background: ACTION_CONFIG[pendingAction.action]?.color || '#34d399',
-                color: '#0a0a0a', border: 'none',
-                padding: '8px 20px', fontSize: '0.95em', cursor: 'pointer',
+              }} disabled={executing} style={{
+                background: executing ? '#333' : (ACTION_CONFIG[pendingAction.action]?.color || '#34d399'),
+                color: executing ? '#666' : '#0a0a0a', border: 'none',
+                padding: '8px 20px', fontSize: '0.95em',
+                cursor: executing ? 'not-allowed' : 'pointer',
                 borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
               }}>{ACTION_CONFIG[pendingAction.action]?.label || pendingAction.action.toUpperCase()}</button>
             </div>
