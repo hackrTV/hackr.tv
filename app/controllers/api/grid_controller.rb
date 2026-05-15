@@ -1014,10 +1014,9 @@ class Api::GridController < ApplicationController
   private
 
   def npc_delivery_items(active_hackr_missions)
-    inventory_by_def = current_hackr.grid_items
+    inventory_by_name = current_hackr.grid_items
       .in_inventory(current_hackr)
-      .joins(:grid_item_definition)
-      .group("grid_item_definitions.slug")
+      .group(:name)
       .sum(:quantity)
 
     items = []
@@ -1029,7 +1028,7 @@ class Api::GridController < ApplicationController
           hobj = progress_by_obj[obj.id]
           next if hobj&.completed_at.present?
 
-          held = inventory_by_def[obj.target_slug].to_i
+          held = inventory_by_name[obj.target_slug].to_i
           needed = obj.target_count.to_i
           items << {
             objective_id: obj.id,
