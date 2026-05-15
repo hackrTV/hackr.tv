@@ -2,9 +2,9 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index npc_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index npc_index stats_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
-  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index npc_index]
+  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index npc_index stats_index]
   before_action :require_admin_api, only: [:debit]
 
   INVENTORY_TYPE_ORDER = %w[gear consumable tool software module firmware material data rig_component fixture collectible faction].freeze
@@ -351,6 +351,88 @@ class Api::GridController < ApplicationController
           depth: entry[:depth]
         }
       }
+    }
+  end
+
+  # GET /api/grid/stats - Operative dossier for the tactical STATS tab
+  def stats_index
+    cl = current_hackr.stat("clearance")
+    xp = current_hackr.stat("xp")
+    max_cl = cl >= GridHackr::Stats::MAX_CLEARANCE
+    xp_to_next = max_cl ? nil : GridHackr::Stats.xp_for_clearance(cl + 1) - xp
+    xp_current_floor = GridHackr::Stats.xp_for_clearance(cl)
+    xp_next_ceil = max_cl ? xp_current_floor : GridHackr::Stats.xp_for_clearance(cl + 1)
+
+    # CRED summary
+    caches = current_hackr.grid_caches.player.to_a
+    default_cache = caches.find(&:is_default?)
+    default_label = if default_cache
+      default_cache.nickname.present? ? default_cache.nickname : default_cache.address
+    else
+      "none"
+    end
+
+    # DECK summary
+    deck = current_hackr.equipped_deck
+    deck_summary = if deck
+      {name: deck.name, rarity_color: deck.rarity_color,
+       battery: [deck.deck_battery, deck.deck_battery_max],
+       slots: [deck.deck_slots_used, deck.deck_slot_count]}
+    end
+
+    # Loadout summary
+    equipped_count = current_hackr.grid_items.equipped_by(current_hackr).count
+
+    # Achievements: earned count, total visible, in-progress list
+    earned_ids = current_hackr.grid_hackr_achievements.pluck(:grid_achievement_id).to_set
+    all_achievements = GridAchievement.select(:id, :name, :badge_icon, :hidden, :trigger_type, :trigger_data).to_a
+    visible = all_achievements.reject { |a| a.hidden && !earned_ids.include?(a.id) }
+    earned_count = visible.count { |a| earned_ids.include?(a.id) }
+
+    # In-progress: unearned achievements with measurable progress
+    checker = Grid::AchievementChecker.new(current_hackr)
+    in_progress = visible.filter_map { |a|
+      next if earned_ids.include?(a.id)
+      prog = checker.progress(a)
+      next unless prog && prog[:target] && prog[:target] > 0 && prog[:current] > 0
+      {name: a.name, badge_icon: a.badge_icon, current: prog[:current], target: prog[:target]}
+    }
+
+    # Standings summary (compact — only factions with activity)
+    rep_service = Grid::ReputationService.new(current_hackr)
+    standings = rep_service.faction_standings
+    standings_summary = standings.map { |s|
+      tier = s[:tier]
+      {name: s[:faction].display_name, tier_label: tier[:label], tier_color: tier[:color], value: s[:effective]}
+    }
+
+    render json: {
+      alias: current_hackr.hackr_alias,
+      clearance: cl,
+      xp: xp,
+      xp_to_next: xp_to_next,
+      xp_current_floor: xp_current_floor,
+      xp_next_ceil: xp_next_ceil,
+      max_clearance: max_cl,
+      vitals: {
+        health: {current: current_hackr.stat("health"), max: current_hackr.effective_max("health")},
+        energy: {current: current_hackr.stat("energy"), max: current_hackr.effective_max("energy")},
+        psyche: {current: current_hackr.stat("psyche"), max: current_hackr.effective_max("psyche")}
+      },
+      cred: {
+        default_label: default_label,
+        default_balance: default_cache&.balance || 0,
+        total_balance: caches.sum(&:balance)
+      },
+      debt: current_hackr.stat("govcorp_debt").to_i,
+      deck_summary: deck_summary,
+      loadout_summary: {equipped: equipped_count, total: GridItem::GEAR_SLOTS.size},
+      achievements: {
+        earned: earned_count,
+        total: visible.size,
+        in_progress: in_progress
+      },
+      standings_summary: standings_summary
     }
   end
 
