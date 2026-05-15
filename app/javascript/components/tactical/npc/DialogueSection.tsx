@@ -7,9 +7,10 @@ interface DialogueSectionProps {
   mobName: string
   dialogueOutput: string | null
   onCommand: (cmd: string) => void
+  executing: boolean
 }
 
-export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobName, dialogueOutput, onCommand }) => {
+export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobName, dialogueOutput, onCommand, executing }) => {
   if (!dialogue.greeting && dialogue.current_topics.length === 0) {
     return <div style={{ color: '#555', fontSize: '0.8em', padding: '8px 0' }}>This NPC has nothing to say.</div>
   }
@@ -50,6 +51,7 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobN
               <button
                 key={topic.key}
                 onClick={() => onCommand(`ask ${mobName} about ${topic.key}`)}
+                disabled={executing}
                 style={{
                   background: 'transparent',
                   border: '1px solid #c084fc',
@@ -57,11 +59,12 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobN
                   color: '#c084fc',
                   padding: '4px 10px',
                   fontSize: '0.9em',
-                  cursor: 'pointer',
+                  cursor: executing ? 'not-allowed' : 'pointer',
+                  opacity: executing ? 0.5 : 1,
                   fontFamily: '\'Courier New\', monospace',
                   transition: 'background 0.15s'
                 }}
-                onMouseEnter={e => { (e.target as HTMLElement).style.background = '#1a1a2e' }}
+                onMouseEnter={e => { if (!executing) (e.target as HTMLElement).style.background = '#1a1a2e' }}
                 onMouseLeave={e => { (e.target as HTMLElement).style.background = 'transparent' }}
               >
                 {topic.key}{topic.has_children ? ' \u203A' : ''}
@@ -76,6 +79,7 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobN
         {!dialogue.at_root && (
           <button
             onClick={() => onCommand(`ask ${mobName} about back`)}
+            disabled={executing}
             style={{
               background: 'transparent',
               border: '1px solid #444',
@@ -83,7 +87,8 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobN
               color: '#888',
               padding: '3px 10px',
               fontSize: '0.85em',
-              cursor: 'pointer',
+              cursor: executing ? 'not-allowed' : 'pointer',
+              opacity: executing ? 0.5 : 1,
               fontFamily: '\'Courier New\', monospace'
             }}
           >
@@ -93,6 +98,7 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobN
         {!dialogue.at_root && (
           <button
             onClick={() => onCommand(`talk to ${mobName} again`)}
+            disabled={executing}
             style={{
               background: 'transparent',
               border: '1px solid #444',
@@ -100,7 +106,8 @@ export const DialogueSection: React.FC<DialogueSectionProps> = ({ dialogue, mobN
               color: '#888',
               padding: '3px 10px',
               fontSize: '0.85em',
-              cursor: 'pointer',
+              cursor: executing ? 'not-allowed' : 'pointer',
+              opacity: executing ? 0.5 : 1,
               fontFamily: '\'Courier New\', monospace'
             }}
           >

@@ -1,5 +1,6 @@
 import React from 'react'
 import { BreachEncounter } from '~/types/zoneMap'
+import { useTactical } from '../TacticalContext'
 import { TIER_COLORS } from './breachConstants'
 
 interface BreachConfirmModalProps {
@@ -11,6 +12,7 @@ interface BreachConfirmModalProps {
 export const BreachConfirmModal: React.FC<BreachConfirmModalProps> = ({
   encounter, onConfirm, onCancel
 }) => {
+  const { executing } = useTactical()
   const tierColor = TIER_COLORS[encounter.tier_label.toLowerCase()] || '#9ca3af'
 
   return (
@@ -78,13 +80,14 @@ export const BreachConfirmModal: React.FC<BreachConfirmModalProps> = ({
           </button>
           <button
             onClick={onConfirm}
+            disabled={executing}
             style={{
-              background: '#22d3ee',
-              color: '#0a0a0a',
+              background: executing ? '#333' : '#22d3ee',
+              color: executing ? '#666' : '#0a0a0a',
               border: 'none',
               padding: '8px 20px',
               fontSize: '0.9em',
-              cursor: 'pointer',
+              cursor: executing ? 'not-allowed' : 'pointer',
               borderRadius: '3px',
               fontWeight: 'bold',
               fontFamily: '\'Courier New\', monospace'

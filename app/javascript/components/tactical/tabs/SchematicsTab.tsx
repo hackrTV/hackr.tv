@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { apiJson } from '~/utils/apiClient'
+import { useTactical } from '../TacticalContext'
 
 interface Ingredient {
   item_name: string
@@ -66,6 +67,7 @@ function humanizeProperties (props: Record<string, unknown>): { label: string; v
 }
 
 export const SchematicsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void }> = ({ refreshToken, onCommand }) => {
+  const { executing } = useTactical()
   const [data, setData] = useState<SchematicsResponse | null>(null)
   const [confirm, setConfirm] = useState<Schematic | null>(null)
   const [detail, setDetail] = useState<OutputDef | null>(null)
@@ -87,9 +89,11 @@ export const SchematicsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: s
           <div style={{ color: '#34d399', fontSize: '0.85em', marginBottom: '4px' }}>READY ({ready.length})</div>
           {ready.map(s => (
             <div key={s.slug} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0', breakInside: 'avoid' }}>
-              <button onClick={() => setConfirm(s)} style={{
-                background: '#34d399', color: '#0a0a0a', border: 'none', borderRadius: '2px',
-                padding: '1px 5px', fontSize: '0.8em', cursor: 'pointer', fontWeight: 'bold',
+              <button onClick={() => setConfirm(s)} disabled={executing} style={{
+                background: executing ? '#333' : '#34d399', color: executing ? '#666' : '#0a0a0a',
+                border: 'none', borderRadius: '2px',
+                padding: '1px 5px', fontSize: '0.8em',
+                cursor: executing ? 'not-allowed' : 'pointer', fontWeight: 'bold',
                 fontFamily: '\'Courier New\', monospace', lineHeight: 1
               }}>FAB</button>
               <span onClick={() => setDetail(s.output)}
@@ -106,9 +110,11 @@ export const SchematicsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: s
           </div>
           {available.map(s => (
             <div key={s.slug} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0', breakInside: 'avoid' }}>
-              <button onClick={() => setConfirm(s)} style={{
-                background: 'transparent', color: '#fbbf24', border: '1px solid #fbbf24', borderRadius: '2px',
-                padding: '1px 5px', fontSize: '0.8em', cursor: 'pointer', fontWeight: 'bold',
+              <button onClick={() => setConfirm(s)} disabled={executing} style={{
+                background: 'transparent', color: executing ? '#666' : '#fbbf24',
+                border: `1px solid ${executing ? '#444' : '#fbbf24'}`, borderRadius: '2px',
+                padding: '1px 5px', fontSize: '0.8em',
+                cursor: executing ? 'not-allowed' : 'pointer', fontWeight: 'bold',
                 fontFamily: '\'Courier New\', monospace', lineHeight: 1
               }}>FAB</button>
               <span onClick={() => setDetail(s.output)}
@@ -217,9 +223,12 @@ export const SchematicsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: s
               </button>
               <button
                 onClick={() => { onCommand?.(`fab ${confirm.slug}`); setConfirm(null) }}
+                disabled={executing}
                 style={{
-                  background: '#34d399', color: '#0a0a0a', border: 'none',
-                  padding: '8px 20px', fontSize: '0.95em', cursor: 'pointer',
+                  background: executing ? '#333' : '#34d399',
+                  color: executing ? '#666' : '#0a0a0a', border: 'none',
+                  padding: '8px 20px', fontSize: '0.95em',
+                  cursor: executing ? 'not-allowed' : 'pointer',
                   borderRadius: '3px', fontWeight: 'bold', fontFamily: '\'Courier New\', monospace'
                 }}
               >
