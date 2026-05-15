@@ -107,7 +107,7 @@ export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus, refr
 
       {vitals && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <CompactVital label="HP" current={vitals.health.current} max={vitals.health.max} color={vitals.health.current <= 30 ? '#f87171' : '#34d399'} />
+          <CompactVital label="HP" current={vitals.health.current} max={vitals.health.max} color={vitals.health.max > 0 && vitals.health.current / vitals.health.max <= 0.3 ? '#f87171' : '#34d399'} />
           <CompactVital label="EN" current={vitals.energy.current} max={vitals.energy.max} color="#fbbf24" />
           <CompactVital label="PS" current={vitals.psyche.current} max={vitals.psyche.max} color="#a78bfa" />
         </div>

@@ -174,6 +174,7 @@ Rails.application.routes.draw do
     get "grid/deck", to: "grid#deck_index"
     get "grid/inventory", to: "grid#inventory_index"
     get "grid/reputation", to: "grid#reputation_index"
+    get "grid/stats", to: "grid#stats_index"
     get "grid/cred", to: "grid#cred_index"
     get "grid/shop", to: "grid#shop_index"
     get "grid/npc", to: "grid#npc_index"

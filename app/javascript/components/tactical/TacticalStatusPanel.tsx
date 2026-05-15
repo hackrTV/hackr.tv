@@ -6,11 +6,13 @@ import { RepTab } from './tabs/RepTab'
 import { MissionsTab } from './tabs/MissionsTab'
 import { SchematicsTab } from './tabs/SchematicsTab'
 import { CredTab } from './tabs/CredTab'
+import { StatsTab } from './tabs/StatsTab'
 
-type TabKey = 'deck' | 'loadout' | 'inventory' | 'rep' | 'cred' | 'missions' | 'schematics'
+type TabKey = 'deck' | 'stats' | 'loadout' | 'inventory' | 'rep' | 'cred' | 'missions' | 'schematics'
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'deck', label: 'DECK' },
+  { key: 'stats', label: 'STATS' },
   { key: 'loadout', label: 'GEAR' },
   { key: 'inventory', label: 'INV' },
   { key: 'rep', label: 'REP' },
@@ -45,6 +47,7 @@ export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refres
     return (
       <div key={tab.key} style={{ display: isActive ? 'block' : 'none', height: '100%' }}>
         {tab.key === 'deck' && <DeckTab refreshToken={refreshToken} />}
+        {tab.key === 'stats' && <StatsTab refreshToken={refreshToken} />}
         {tab.key === 'loadout' && <LoadoutTab refreshToken={refreshToken} />}
         {tab.key === 'inventory' && <InventoryTab refreshToken={refreshToken} onCommand={onCommand} hasVendor={hasVendor} />}
         {tab.key === 'rep' && <RepTab refreshToken={refreshToken} />}
