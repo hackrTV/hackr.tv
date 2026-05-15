@@ -11517,6 +11517,103 @@ rooms:
     zone_slug: coal-run
     room_type: transit
 
+  # --- Local Transit Stops (The Lakeshore) ---
+
+  # ── Lakefront Terminal ───────────────────────────────────────────
+  - name: "Elevated Platform"
+    slug: lakefront-el-platform
+    description: "A steel-and-concrete platform cantilevered over the terminal's north end, exposed to lake wind on three sides. The tracks run on riveted girders thirty feet above street level, and the platform shakes when a traincar approaches. Benches are bolted to the deck, their slats weathered gray. A route map under scratched plexiglass shows the Lakeshore Elevated Line in faded amber."
+    zone_slug: lakefront-terminal
+    room_type: transit
+
+  - name: "Subway Platform"
+    slug: lakefront-subway-platform
+    description: "Two levels below the main concourse, tiled in white ceramic with a green stripe at eye height. The air is warm and still, pushed by trains that arrive with a pressure wave before the sound catches up. The platform edge is ribbed yellow, and a digital board overhead counts down arrivals in minutes that don't always correspond to reality."
+    zone_slug: lakefront-terminal
+    room_type: transit
+
+  # ── The Skyline ──────────────────────────────────────────────────
+  - name: "Skyline L Stop"
+    slug: skyline-el-stop
+    description: "An elevated platform wedged between two glass towers, the station structure bolted directly to the buildings on either side. The wind is channeled and constant. Below, the plaza is visible through the steel grate floor, pedestrians the size of chess pieces. A turnstile guards the stairwell down, and the fare reader blinks green whether or not it's reading."
+    zone_slug: the-skyline
+    room_type: transit
+
+  # ── Gold Mile ────────────────────────────────────────────────────
+  - name: "Gold Mile L Station"
+    slug: gold-mile-el-station
+    description: "The cleanest elevated stop on the line — brass handrails polished daily, the platform swept twice. A glass canopy arches overhead, keeping the weather off waiting passengers and their shopping bags. The station sits above The Boulevard, and the view from the platform takes in the lakefront condominiums to the east and the shopping district stretching south."
+    zone_slug: gold-mile
+    room_type: transit
+
+  - name: "Gold Mile Taxi Stand"
+    slug: gold-mile-taxi-stand
+    description: "A covered pull-off adjacent to Valet Circle, marked by a brass sign reading PRIVATE TRANSIT in block capitals. Black sedans idle at the curb in a queue that never seems to empty. A dispatcher in a fitted coat holds a tablet, matching passengers to vehicles with practiced efficiency. The fare is posted on a discreet placard — discreet because the people who use this service already know what it costs."
+    zone_slug: gold-mile
+    room_type: transit
+
+  - name: "Marina Transit Dock"
+    slug: gold-mile-marina-dock
+    description: "A floating dock at the marina's east end, separate from the private slips, with a boarding ramp that adjusts with the lake level. A covered waiting area with heated benches faces the water. The dock is marked with running lights — green starboard, red port — and a schedule board shows water taxi arrivals in fifteen-minute intervals that stretch to thirty after dark."
+    zone_slug: gold-mile
+    room_type: transit
+
+  # ── The Terrace ──────────────────────────────────────────────────
+  - name: "Terrace L Platform"
+    slug: terrace-el-platform
+    description: "The elevated line dips to its lowest point here, the platform barely clearing the treetops along Tree-Lined Avenue. The station is brick-faced to match the brownstones below, a concession to the neighborhood that the transit authority made once and never repeated. Flower boxes on the platform railing bloom in season — someone in the neighborhood tends them."
+    zone_slug: the-terrace
+    room_type: transit
+
+  # ── The Ward ─────────────────────────────────────────────────────
+  - name: "Ward L Junction"
+    slug: ward-el-junction
+    description: "A heavy steel platform on concrete pillars, the original rivets still visible in the support beams. The station shows its age — peeling paint, a cracked windscreen, benches with carved initials going back decades. But the trains still stop here every twelve minutes, and the turnstiles still take fares. The stairs down to Main Street are worn to bowls in the center."
+    zone_slug: the-ward
+    room_type: transit
+
+  # ── The Switchyard ───────────────────────────────────────────────
+  - name: "Switchyard L Platform"
+    slug: switchyard-el-platform
+    description: "The line's southern terminus, where the elevated track curves down to grade level alongside the freight rails. The platform is utilitarian — poured concrete, chain-link windbreaks, a single overhead light. Shift workers wait here at odd hours, and the platform smells of creosote and ozone. Beyond the end of the line, the switchyard's tracks fan out into the industrial sprawl."
+    zone_slug: the-switchyard
+    room_type: transit
+
+  # ── The Stacks ───────────────────────────────────────────────────
+  - name: "Stacks Subway Station"
+    slug: stacks-subway
+    description: "A deep-bore station two levels underground, the walls cut through bedrock and lined with poured concrete. The platform is long and narrow, lit by caged fixtures that cast hard shadows. A mosaic mural on the back wall depicts books and scrolls in blue and gold tile — the artist's interpretation of what happens in the building above. The air moves only when trains do."
+    zone_slug: the-stacks
+    room_type: transit
+
+  # ── Rust Row ─────────────────────────────────────────────────────
+  - name: "Rust Row Underground"
+    slug: rust-row-subway
+    description: "The station walls are stained with iron-rich groundwater that seeps through the concrete in rust-colored streaks. The platform is narrow, the ceiling low, and the lighting fights a losing battle against the dark. Half the tile has fallen from the walls, exposing the brick backing beneath. The trains come through fast here — this is not a stop where anyone lingers."
+    zone_slug: rust-row
+    room_type: transit
+
+  # ── The Pumping Station ──────────────────────────────────────────
+  - name: "Pump Station Subway"
+    slug: pump-station-subway
+    description: "The southern terminus of the underground line, built into the pumping station's substructure. The rumble of water infrastructure is a constant presence, and the station walls vibrate at a frequency just below hearing. The platform is damp year-round, and a dehumidifier in the corner runs without making a difference. Travelers heading further south surface here and walk."
+    zone_slug: the-pumping-station
+    room_type: transit
+
+  # ── Pier 7 ───────────────────────────────────────────────────────
+  - name: "Pier 7 Ferry Dock"
+    slug: pier-7-ferry-dock
+    description: "A dedicated transit dock at the pier's north face, reinforced with rubber fenders and steel cleats for the water taxi hulls. A gangway with grip-tread descends to the floating platform, which rises and falls with the swells. The boarding area is roped off with stanchions, and a weatherproof fare terminal bolted to a piling takes payment before you step aboard."
+    zone_slug: pier-7
+    room_type: transit
+
+  # ── The Breakwall ────────────────────────────────────────────────
+  - name: "Harbor Dock"
+    slug: breakwall-harbor-dock
+    description: "A small transit dock tucked into the lee side of the breakwall, sheltered from the worst of the lake's chop. The dock is concrete and steel, bolted to the breakwall's foundation, with a ladder down to the water taxi platform. Spray coats everything in a fine salt mist, and the mooring ropes are stiff with brine. The crossing to Pier 7 takes four minutes on a calm day."
+    zone_slug: the-breakwall
+    room_type: transit
+
   - name: "Slipstream Gate North"
     slug: hollows-slip-north
     description: "A service tunnel beneath the rail siding at Coal Run, where the narrow-gauge track connects to standard gauge infrastructure. The corridor climbs through mountain passes toward the harbor city. Signal dies in the hollows."

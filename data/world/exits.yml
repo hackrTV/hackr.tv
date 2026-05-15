@@ -27920,3 +27920,145 @@ exits:
     direction: west
     locked: false
 
+  # --- Local Transit Stops (The Lakeshore) ---
+
+  # Lakefront Terminal — Elevated Platform ↔ Platform One
+  - from_room_slug: lakefront-el-platform
+    to_room_slug: platform-one
+    direction: south
+    locked: false
+  - from_room_slug: platform-one
+    to_room_slug: lakefront-el-platform
+    direction: north
+    locked: false
+
+  # Lakefront Terminal — Subway Platform ↔ Underground Passage
+  - from_room_slug: lakefront-subway-platform
+    to_room_slug: underground-passage
+    direction: up
+    locked: false
+  - from_room_slug: underground-passage
+    to_room_slug: lakefront-subway-platform
+    direction: down
+    locked: false
+
+  # Skyline — L Stop ↔ The Plaza
+  - from_room_slug: skyline-el-stop
+    to_room_slug: the-plaza
+    direction: down
+    locked: false
+  - from_room_slug: the-plaza
+    to_room_slug: skyline-el-stop
+    direction: up
+    locked: false
+
+  # Gold Mile — L Station ↔ The Boulevard
+  - from_room_slug: gold-mile-el-station
+    to_room_slug: the-boulevard
+    direction: down
+    locked: false
+  - from_room_slug: the-boulevard
+    to_room_slug: gold-mile-el-station
+    direction: up
+    locked: false
+
+  # Gold Mile — Taxi Stand ↔ Valet Circle
+  - from_room_slug: gold-mile-taxi-stand
+    to_room_slug: valet-circle
+    direction: east
+    locked: false
+  - from_room_slug: valet-circle
+    to_room_slug: gold-mile-taxi-stand
+    direction: west
+    locked: false
+
+  # Gold Mile — Marina Dock ↔ Private Marina
+  - from_room_slug: gold-mile-marina-dock
+    to_room_slug: private-marina
+    direction: east
+    locked: false
+  - from_room_slug: private-marina
+    to_room_slug: gold-mile-marina-dock
+    direction: west
+    locked: false
+
+  # Terrace — L Platform ↔ Tree-Lined Avenue
+  - from_room_slug: terrace-el-platform
+    to_room_slug: tree-lined-avenue
+    direction: down
+    locked: false
+  - from_room_slug: tree-lined-avenue
+    to_room_slug: terrace-el-platform
+    direction: up
+    locked: false
+
+  # Ward — L Junction ↔ Main Street
+  - from_room_slug: ward-el-junction
+    to_room_slug: the-ward-main-street
+    direction: down
+    locked: false
+  - from_room_slug: the-ward-main-street
+    to_room_slug: ward-el-junction
+    direction: up
+    locked: false
+
+  # Switchyard — L Platform ↔ Track One
+  - from_room_slug: switchyard-el-platform
+    to_room_slug: track-one
+    direction: east
+    locked: false
+  - from_room_slug: track-one
+    to_room_slug: switchyard-el-platform
+    direction: west
+    locked: false
+
+  # Stacks — Subway ↔ Basement Level
+  - from_room_slug: stacks-subway
+    to_room_slug: basement-level
+    direction: up
+    locked: false
+  - from_room_slug: basement-level
+    to_room_slug: stacks-subway
+    direction: down
+    locked: false
+
+  # Rust Row — Underground ↔ Corroded Alley
+  - from_room_slug: rust-row-subway
+    to_room_slug: corroded-alley
+    direction: up
+    locked: false
+  - from_room_slug: corroded-alley
+    to_room_slug: rust-row-subway
+    direction: down
+    locked: false
+
+  # Pump Station — Subway ↔ Discharge Tunnel
+  - from_room_slug: pump-station-subway
+    to_room_slug: discharge-tunnel
+    direction: north
+    locked: false
+  - from_room_slug: discharge-tunnel
+    to_room_slug: pump-station-subway
+    direction: south
+    locked: false
+
+  # Pier 7 — Ferry Dock ↔ Pier Head
+  - from_room_slug: pier-7-ferry-dock
+    to_room_slug: pier-head
+    direction: south
+    locked: false
+  - from_room_slug: pier-head
+    to_room_slug: pier-7-ferry-dock
+    direction: north
+    locked: false
+
+  # Breakwall — Harbor Dock ↔ Fisherman's Walk
+  - from_room_slug: breakwall-harbor-dock
+    to_room_slug: fishermans-walk
+    direction: east
+    locked: false
+  - from_room_slug: fishermans-walk
+    to_room_slug: breakwall-harbor-dock
+    direction: west
+    locked: false
+

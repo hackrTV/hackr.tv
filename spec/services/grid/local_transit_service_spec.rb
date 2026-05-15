@@ -105,6 +105,116 @@ RSpec.describe Grid::LocalTransitService do
     end
   end
 
+  describe "bidirectional travel" do
+    it "auto-detects forward direction when boarding at first stop" do
+      result = described_class.board!(hackr: hackr, route: route)
+      expect(result.journey.meta["direction"]).to eq("forward")
+    end
+
+    it "auto-detects reverse direction when boarding at last stop" do
+      hackr.update!(current_room: room_c)
+      result = described_class.board!(hackr: hackr, route: route)
+      expect(result.journey.meta["direction"]).to eq("reverse")
+    end
+
+    it "defaults to forward when boarding at middle stop" do
+      hackr.update!(current_room: room_b)
+      result = described_class.board!(hackr: hackr, route: route)
+      expect(result.journey.meta["direction"]).to eq("forward")
+    end
+
+    it "accepts explicit reverse direction at middle stop" do
+      hackr.update!(current_room: room_b)
+      result = described_class.board!(hackr: hackr, route: route, direction: "reverse")
+      expect(result.journey.meta["direction"]).to eq("reverse")
+    end
+
+    it "raises EndOfLine when boarding forward at last stop" do
+      hackr.update!(current_room: room_c)
+      expect {
+        described_class.board!(hackr: hackr, route: route, direction: "forward")
+      }.to raise_error(Grid::LocalTransitService::EndOfLine)
+    end
+
+    it "raises EndOfLine when boarding reverse at first stop" do
+      expect {
+        described_class.board!(hackr: hackr, route: route, direction: "reverse")
+      }.to raise_error(Grid::LocalTransitService::EndOfLine)
+    end
+
+    it "travels in reverse from last stop to first" do
+      hackr.update!(current_room: room_c)
+      described_class.board!(hackr: hackr, route: route)
+
+      result = described_class.wait!(hackr: hackr) # C → B
+      expect(result.current_stop.grid_room).to eq(room_b)
+      expect(hackr.reload.current_room).to eq(room_b)
+
+      result = described_class.wait!(hackr: hackr) # B → A
+      expect(result.current_stop.grid_room).to eq(room_a)
+      expect(hackr.reload.current_room).to eq(room_a)
+    end
+
+    it "auto-completes at end of line in reverse" do
+      hackr.update!(current_room: room_c)
+      described_class.board!(hackr: hackr, route: route)
+
+      described_class.wait!(hackr: hackr) # C → B
+      described_class.wait!(hackr: hackr) # B → A
+      result = described_class.wait!(hackr: hackr) # A → end of line
+
+      expect(result.arrived).to be true
+      expect(result.journey.state).to eq("completed")
+    end
+  end
+
+  describe "next_stop_after with direction" do
+    it "returns next stop forward" do
+      stop_a = route.grid_transit_stops.find_by(position: 0)
+      expect(route.next_stop_after(stop_a, direction: :forward).grid_room).to eq(room_b)
+    end
+
+    it "returns previous stop in reverse" do
+      stop_c = route.grid_transit_stops.find_by(position: 2)
+      expect(route.next_stop_after(stop_c, direction: :reverse).grid_room).to eq(room_b)
+    end
+
+    it "returns nil at first stop in reverse (non-loop)" do
+      stop_a = route.grid_transit_stops.find_by(position: 0)
+      expect(route.next_stop_after(stop_a, direction: :reverse)).to be_nil
+    end
+
+    it "returns nil at last stop forward (non-loop)" do
+      stop_c = route.grid_transit_stops.find_by(position: 2)
+      expect(route.next_stop_after(stop_c, direction: :forward)).to be_nil
+    end
+
+    context "with loop route" do
+      let(:loop_route) do
+        create(:grid_transit_route, grid_transit_type: transit_type, grid_region: region, loop_route: true).tap do |r|
+          create(:grid_transit_stop, grid_transit_route: r, grid_room: room_a, position: 0)
+          create(:grid_transit_stop, grid_transit_route: r, grid_room: room_b, position: 1)
+          create(:grid_transit_stop, grid_transit_route: r, grid_room: room_c, position: 2)
+        end
+      end
+
+      it "wraps forward from last to first" do
+        stop_c = loop_route.grid_transit_stops.find_by(position: 2)
+        expect(loop_route.next_stop_after(stop_c, direction: :forward).grid_room).to eq(room_a)
+      end
+
+      it "wraps reverse from first to last" do
+        stop_a = loop_route.grid_transit_stops.find_by(position: 0)
+        expect(loop_route.next_stop_after(stop_a, direction: :reverse).grid_room).to eq(room_c)
+      end
+    end
+
+    it "accepts string direction" do
+      stop_c = route.grid_transit_stops.find_by(position: 2)
+      expect(route.next_stop_after(stop_c, direction: "reverse").grid_room).to eq(room_b)
+    end
+  end
+
   describe ".disembark!" do
     before { described_class.board!(hackr: hackr, route: route) }
 

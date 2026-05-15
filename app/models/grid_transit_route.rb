@@ -56,14 +56,28 @@ class GridTransitRoute < ApplicationRecord
     grid_transit_stops.find_by(grid_room_id: room.id)
   end
 
-  def next_stop_after(stop)
+  def next_stop_after(stop, direction: :forward)
     stops = grid_transit_stops.order(:position).to_a
     idx = stops.index { |s| s.id == stop.id }
     return nil if idx.nil?
-    if idx + 1 < stops.size
+
+    reverse = direction.to_sym == :reverse
+    if reverse && idx > 0
+      stops[idx - 1]
+    elsif reverse && loop_route
+      stops.last
+    elsif !reverse && idx + 1 < stops.size
       stops[idx + 1]
-    elsif loop_route
+    elsif !reverse && loop_route
       stops.first
     end
+  end
+
+  def first_stop
+    grid_transit_stops.order(:position).first
+  end
+
+  def last_stop
+    grid_transit_stops.order(:position).last
   end
 end

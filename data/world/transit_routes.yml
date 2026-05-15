@@ -1,0 +1,105 @@
+# Local Transit Routes — seeded by: rails data:transit_routes (after rooms, transit_types)
+# Public and private routes for intra-region transit.
+#
+# Public routes: hackrs board at a stop, wait through intermediate stops, disembark.
+# Private routes: stops define boarding points; destination is any transit room in the region.
+
+routes:
+  # ── The Lakeshore: Elevated Traincar (Public) ───────────────────
+  - slug: lakeshore-elevated-line
+    name: "Lakeshore Elevated Line"
+    transit_type_slug: elevated-traincar
+    region_slug: the-lakeshore
+    active: true
+    loop_route: true
+    position: 0
+    stops:
+      - room_slug: lakefront-el-platform
+        label: "Lakefront Terminal"
+        position: 0
+      - room_slug: skyline-el-stop
+        label: "Skyline"
+        position: 1
+      - room_slug: gold-mile-el-station
+        label: "Gold Mile"
+        position: 2
+      - room_slug: terrace-el-platform
+        label: "The Terrace"
+        position: 3
+      - room_slug: ward-el-junction
+        label: "The Ward"
+        position: 4
+      - room_slug: switchyard-el-platform
+        label: "Switchyard"
+        position: 5
+
+  # ── The Lakeshore: Underground Rail (Public) ────────────────────
+  - slug: lakeshore-underground
+    name: "Lakeshore Underground"
+    transit_type_slug: underground-rail
+    region_slug: the-lakeshore
+    active: true
+    loop_route: false
+    position: 1
+    stops:
+      - room_slug: lakefront-subway-platform
+        label: "Lakefront Terminal"
+        position: 0
+        is_terminus: true
+      - room_slug: stacks-subway
+        label: "The Stacks"
+        position: 1
+      - room_slug: rust-row-subway
+        label: "Rust Row"
+        position: 2
+      - room_slug: pump-station-subway
+        label: "Pump Station"
+        position: 3
+        is_terminus: true
+
+  # ── The Lakeshore: Taxi Service (Private) ───────────────────────
+  - slug: lakeshore-taxi
+    name: "Lakeshore Taxi"
+    transit_type_slug: taxi-car
+    region_slug: the-lakeshore
+    active: true
+    loop_route: false
+    position: 10
+    stops:
+      - room_slug: gold-mile-taxi-stand
+        label: "Gold Mile"
+        position: 0
+      - room_slug: gold-mile-el-station
+        label: "Gold Mile L Station"
+        position: 1
+      - room_slug: skyline-el-stop
+        label: "Skyline"
+        position: 2
+      - room_slug: lakefront-el-platform
+        label: "Lakefront Terminal"
+        position: 3
+      - room_slug: terrace-el-platform
+        label: "The Terrace"
+        position: 4
+      - room_slug: ward-el-junction
+        label: "The Ward"
+        position: 5
+
+  # ── The Lakeshore: Water Taxi (Private) ─────────────────────────
+  - slug: lakeshore-water-taxi
+    name: "Lakeshore Water Taxi"
+    transit_type_slug: water-taxi
+    region_slug: the-lakeshore
+    active: true
+    loop_route: false
+    position: 11
+    stops:
+      - room_slug: gold-mile-marina-dock
+        label: "Gold Mile Marina"
+        position: 0
+      - room_slug: pier-7-ferry-dock
+        label: "Pier 7"
+        position: 1
+      - room_slug: breakwall-harbor-dock
+        label: "Harbor Dock"
+        position: 2
