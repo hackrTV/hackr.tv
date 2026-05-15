@@ -577,14 +577,14 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
 // --- Compact compass rose + vertical nav ---
 
 const NAV_GRID: { dir: string; label: string; row: number; col: number }[] = [
-  { dir: 'nw', label: 'NW', row: 0, col: 0 },
+  { dir: 'northwest', label: 'NW', row: 0, col: 0 },
   { dir: 'north', label: 'N', row: 0, col: 1 },
-  { dir: 'ne', label: 'NE', row: 0, col: 2 },
+  { dir: 'northeast', label: 'NE', row: 0, col: 2 },
   { dir: 'west', label: 'W', row: 1, col: 0 },
   { dir: 'east', label: 'E', row: 1, col: 2 },
-  { dir: 'sw', label: 'SW', row: 2, col: 0 },
+  { dir: 'southwest', label: 'SW', row: 2, col: 0 },
   { dir: 'south', label: 'S', row: 2, col: 1 },
-  { dir: 'se', label: 'SE', row: 2, col: 2 }
+  { dir: 'southeast', label: 'SE', row: 2, col: 2 }
 ]
 
 const NAV_VERTICAL: { dir: string; label: string }[] = [
