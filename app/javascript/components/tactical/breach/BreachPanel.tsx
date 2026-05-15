@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { apiJson } from '~/utils/apiClient'
 import { BreachMeta, BreachProtocolMeta } from '../TacticalContext'
+import { sanitizeHtml } from '~/utils/sanitizeHtml'
 
 interface DeckData {
   deck: {
@@ -348,7 +349,7 @@ export const BreachPanel: React.FC<BreachPanelProps> = ({
           }
         `}</style>
         {breachOutput.map((line, i) => (
-          <div key={i} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
+          <div key={i} dangerouslySetInnerHTML={{ __html: sanitizeHtml(line || '&nbsp;') }} />
         ))}
       </div>
 

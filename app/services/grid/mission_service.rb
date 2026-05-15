@@ -225,6 +225,8 @@ module Grid
       completed_mission_ids.include?(mission.id)
     end
 
+    public :already_active?, :completed_nonrepeatable?
+
     def active_for_slug(slug)
       @hackr.grid_hackr_missions.active
         .joins(:grid_mission).where(grid_missions: {slug: slug}).first

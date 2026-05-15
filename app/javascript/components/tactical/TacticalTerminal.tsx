@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import { CommandInput } from '~/components/grid/CommandInput'
 import { useTactical } from './TacticalContext'
+import { sanitizeHtml } from '~/utils/sanitizeHtml'
 
 export const TacticalTerminal: React.FC = () => {
   const { output, executing, sendCommand, commandInputRef } = useTactical()
@@ -56,7 +57,7 @@ export const TacticalTerminal: React.FC = () => {
         }}
       >
         {output.map((line, index) => (
-          <div key={index} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
+          <div key={index} dangerouslySetInnerHTML={{ __html: sanitizeHtml(line || '&nbsp;') }} />
         ))}
       </div>
       <div style={{ padding: '6px 0 0 0', flexShrink: 0 }}>

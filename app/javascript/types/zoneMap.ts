@@ -43,6 +43,12 @@ export interface DeckStatus {
   fried: boolean
 }
 
+export interface NpcMobStub {
+  id: number
+  name: string
+  mob_type: string
+}
+
 export interface ZoneMapData {
   zone: {
     id: number
@@ -63,6 +69,8 @@ export interface ZoneMapData {
   deck_status: DeckStatus
   has_vendor: boolean
   has_transit: boolean
+  has_npc: boolean
+  npc_mobs: NpcMobStub[]
 }
 
 export interface InventoryItem {
@@ -204,4 +212,95 @@ export interface TransitData {
   slipstream_routes: SlipstreamRoute[]
   private_types: PrivateTransitType[]
   private_destinations: PrivateDestination[]
+}
+
+// --- NPC panel types ---
+
+export interface DialogueTopic {
+  key: string
+  has_children: boolean
+}
+
+export interface NpcDialogueState {
+  greeting: string | null
+  current_response: string | null
+  current_path: string[]
+  current_topics: DialogueTopic[]
+  at_root: boolean
+}
+
+export interface NpcMissionObjective {
+  id: number
+  position: number
+  objective_type: string
+  label: string
+  target_slug: string | null
+  target_count: number
+}
+
+export interface NpcMissionReward {
+  id: number
+  reward_type: string
+  amount: number | null
+  target_slug: string | null
+  quantity: number | null
+}
+
+export interface NpcAvailableMission {
+  slug: string
+  name: string
+  description: string | null
+  repeatable: boolean
+  min_clearance: number
+  objectives: NpcMissionObjective[]
+  rewards: NpcMissionReward[]
+  gates: { clearance_met: boolean; prereq_met: boolean; rep_met: boolean }
+  can_accept: boolean
+}
+
+export interface NpcObjectiveProgress {
+  objective_id: number
+  progress: number
+  target_count: number
+  completed: boolean
+}
+
+export interface NpcActiveMission {
+  id: number
+  slug: string
+  name: string
+  description: string | null
+  status: string
+  accepted_at: string | null
+  ready_to_turn_in: boolean
+  at_giver: boolean
+  mission: {
+    slug: string
+    name: string
+    description: string | null
+    objectives: NpcMissionObjective[]
+    rewards: NpcMissionReward[]
+  }
+  objective_progress: NpcObjectiveProgress[]
+}
+
+export interface NpcDeliveryItem {
+  objective_id: number
+  mission_slug: string
+  item_slug: string
+  item_name: string
+  in_inventory: boolean
+  quantity_held: number
+  quantity_needed: number
+}
+
+export interface NpcData {
+  mob_id: number
+  mob_name: string
+  mob_type: string
+  faction_name: string | null
+  dialogue: NpcDialogueState
+  available_missions: NpcAvailableMission[]
+  active_missions: NpcActiveMission[]
+  delivery_items: NpcDeliveryItem[]
 }

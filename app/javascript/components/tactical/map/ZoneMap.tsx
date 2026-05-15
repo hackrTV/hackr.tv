@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { apiJson } from '~/utils/apiClient'
-import { ZoneMapData, ZoneMapRoom, ZoneMapGhostRoom, BreachEncounter, DeckStatus } from '~/types/zoneMap'
+import { ZoneMapData, ZoneMapRoom, ZoneMapGhostRoom, BreachEncounter, DeckStatus, NpcMobStub } from '~/types/zoneMap'
 import { iso, isoPts, ISO_WALL_H, ISO_TILE_W, ISO_TILE_H, DIRECTION_VECTORS } from './isoGeometry'
 import { useZonePresence } from './useZonePresence'
 import {
@@ -15,6 +15,7 @@ interface ZoneMapProps {
   onBreachEncountersChange?: (encounters: BreachEncounter[], deckStatus: DeckStatus) => void
   onVendorPresenceChange?: (hasVendor: boolean) => void
   onTransitPresenceChange?: (hasTransit: boolean) => void
+  onNpcPresenceChange?: (hasNpc: boolean, mobs: NpcMobStub[]) => void
 }
 
 interface Tooltip {
@@ -25,7 +26,7 @@ interface Tooltip {
 
 const Z_DIRS = new Set(['up', 'down'])
 
-export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange, onVendorPresenceChange, onTransitPresenceChange }) => {
+export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange, onVendorPresenceChange, onTransitPresenceChange, onNpcPresenceChange }) => {
   const [mapData, setMapData] = useState<ZoneMapData | null>(null)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const [zoom, setZoom] = useState(1.25)
@@ -45,6 +46,7 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
         onBreachEncountersChange?.(data.breach_encounters || [], data.deck_status || { equipped: false, fried: false })
         onVendorPresenceChange?.(data.has_vendor ?? false)
         onTransitPresenceChange?.(data.has_transit ?? false)
+        onNpcPresenceChange?.(data.has_npc ?? false, data.npc_mobs ?? [])
       })
       .catch(err => console.error('Zone map fetch failed:', err))
   // eslint-disable-next-line react-hooks/exhaustive-deps -- callback ref change should not re-trigger fetch; refreshToken controls cadence

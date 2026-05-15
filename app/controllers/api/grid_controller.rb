@@ -2,9 +2,9 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index npc_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
-  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index]
+  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index npc_index]
   before_action :require_admin_api, only: [:debit]
 
   INVENTORY_TYPE_ORDER = %w[gear consumable tool software module firmware material data rig_component fixture collectible faction].freeze
@@ -243,6 +243,74 @@ class Api::GridController < ApplicationController
           stock: listing.unlimited_stock? ? nil : listing.stock
         }
       }
+    }
+  end
+
+  # GET /api/grid/npc?mob_id=X - NPC dialogue state + missions for tactical panel
+  def npc_index
+    room = current_hackr.current_room
+    return render(json: {error: "No current room."}, status: :unprocessable_entity) unless room
+
+    mob = room.grid_mobs.find_by(id: params[:mob_id].to_i)
+    return render(json: {error: "NPC not found in current room."}, status: :not_found) unless mob
+    return render(json: {error: "Use the shop endpoint for vendors."}, status: :unprocessable_entity) if mob.vendor?
+
+    navigator = Grid::DialogueNavigator.new(hackr: current_hackr, mob: mob)
+
+    # Missions scoped to this mob
+    service = mission_service
+    available = GridMission.published
+      .where(giver_mob_id: mob.id)
+      .includes(:grid_mission_arc, :prereq_mission, :min_rep_faction, :grid_mission_objectives, :grid_mission_rewards)
+      .ordered
+      .select { |m| !service.already_active?(m) && !service.completed_nonrepeatable?(m) }
+
+    active_hms = current_hackr.grid_hackr_missions.active
+      .joins(:grid_mission).where(grid_missions: {giver_mob_id: mob.id})
+      .includes(:grid_hackr_mission_objectives,
+        grid_mission: [:grid_mission_objectives, :giver_mob, :grid_mission_rewards])
+
+    # Dialogue-path filtering for available missions
+    current_path = current_hackr.dialogue_path_for(mob)
+    available = available.select do |m|
+      required = m.dialogue_path
+      next true if required.blank?
+      required.is_a?(Array) && required.length <= current_path.length &&
+        current_path.first(required.length) == required
+    end
+
+    delivery_items = npc_delivery_items(active_hms)
+
+    current_topics = navigator.current_topics.map do |key, node|
+      {key: key, has_children: Grid::DialogueNavigator.has_children?(node)}
+    end
+
+    render json: {
+      mob_id: mob.id,
+      mob_name: mob.name,
+      mob_type: mob.mob_type,
+      faction_name: mob.grid_faction&.display_name,
+      dialogue: {
+        greeting: navigator.greeting,
+        current_response: navigator.at_root? ? nil : navigator.node_at(navigator.current_path)&.dig("response"),
+        current_path: navigator.current_path,
+        current_topics: current_topics,
+        at_root: navigator.at_root?
+      },
+      available_missions: available.map { |m|
+        data = mission_json(m, include_gate_status: true)
+        data[:can_accept] = service.gate_status(m).all_met?
+        data
+      },
+      active_missions: active_hms.map { |hm|
+        base = hackr_mission_json(hm, include_progress: true)
+        base[:at_giver] = true
+        base[:slug] = hm.grid_mission.slug
+        base[:name] = hm.grid_mission.name
+        base[:description] = hm.grid_mission.description
+        base
+      },
+      delivery_items: delivery_items
     }
   end
 
@@ -856,6 +924,14 @@ class Api::GridController < ApplicationController
       fried: deck.present? && deck.deck_fried?
     }
 
+    # Eager-load mobs once for both vendor and NPC checks
+    mobs = room.grid_mobs.to_a
+
+    npc_mobs = mobs
+      .reject(&:vendor?)
+      .select { |m| m.dialogue_tree.present? || m.quest_giver? }
+      .map { |m| {id: m.id, name: m.name, mob_type: m.mob_type} }
+
     render json: {
       zone: result.zone,
       current_room_id: result.current_room_id,
@@ -867,10 +943,12 @@ class Api::GridController < ApplicationController
       in_breach: current_hackr.in_breach?,
       breach_encounters: breach_encounters,
       deck_status: deck_status,
-      has_vendor: room.grid_mobs.loaded? ? room.grid_mobs.any?(&:vendor?) : room.grid_mobs.exists?(mob_type: "vendor"),
+      has_vendor: mobs.any?(&:vendor?),
       has_transit: room.room_type == "transit" ||
         GridSlipstreamRoute.active.where(origin_room_id: room.id).exists? ||
-        current_hackr.in_transit?
+        current_hackr.in_transit?,
+      has_npc: npc_mobs.any?,
+      npc_mobs: npc_mobs
     }
   end
 
@@ -934,6 +1012,38 @@ class Api::GridController < ApplicationController
   end
 
   private
+
+  def npc_delivery_items(active_hackr_missions)
+    inventory_by_def = current_hackr.grid_items
+      .in_inventory(current_hackr)
+      .joins(:grid_item_definition)
+      .group("grid_item_definitions.slug")
+      .sum(:quantity)
+
+    items = []
+    active_hackr_missions.each do |hm|
+      progress_by_obj = hm.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id)
+      hm.grid_mission.grid_mission_objectives
+        .select { |o| o.objective_type == "deliver_item" && o.target_slug.present? }
+        .each do |obj|
+          hobj = progress_by_obj[obj.id]
+          next if hobj&.completed_at.present?
+
+          held = inventory_by_def[obj.target_slug].to_i
+          needed = obj.target_count.to_i
+          items << {
+            objective_id: obj.id,
+            mission_slug: hm.grid_mission.slug,
+            item_slug: obj.target_slug,
+            item_name: obj.label,
+            in_inventory: held >= needed,
+            quantity_held: held,
+            quantity_needed: needed
+          }
+        end
+    end
+    items
+  end
 
   def hackr_params
     params.permit(:hackr_alias, :password, :password_confirmation)

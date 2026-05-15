@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
+import { sanitizeHtml } from '~/utils/sanitizeHtml'
 
 interface GameOutputProps {
   output: string[]
@@ -60,7 +61,7 @@ export const GameOutput: React.FC<GameOutputProps> = ({ output, onOutputClick })
         }}
       >
         {output.map((line, index) => (
-          <div key={index} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
+          <div key={index} dangerouslySetInnerHTML={{ __html: sanitizeHtml(line || '&nbsp;') }} />
         ))}
       </div>
     </>
