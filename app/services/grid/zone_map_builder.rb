@@ -137,9 +137,12 @@ module Grid
       room_ids = Set.new(rooms.map(&:id))
       exits_by_from = exits.group_by(&:from_room_id)
 
+      # Seed from hub or special room (surface-level anchors).
+      # Transit rooms are excluded — they're often underground and
+      # would shift the whole zone's z-levels if used as z=0 anchor.
       seed = rooms.find { |r| r.room_type == "hub" } ||
         rooms.find { |r| r.room_type == "special" } ||
-        rooms.find { |r| r.room_type == "transit" } ||
+        rooms.reject { |r| r.room_type == "transit" }.min_by(&:id) ||
         rooms.min_by(&:id)
       return {} unless seed
 

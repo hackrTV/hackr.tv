@@ -13,6 +13,8 @@ import { BreachPanel } from '~/components/tactical/breach/BreachPanel'
 import { BreachEncounter, DeckStatus } from '~/types/zoneMap'
 import { VendorHandle } from '~/components/tactical/vendor/VendorHandle'
 import { VendorPanel } from '~/components/tactical/vendor/VendorPanel'
+import { TransitHandle } from '~/components/tactical/transit/TransitHandle'
+import { TransitPanel } from '~/components/tactical/transit/TransitPanel'
 
 const TacticalInner: React.FC = () => {
   const { hackr } = useGridAuth()
@@ -20,13 +22,15 @@ const TacticalInner: React.FC = () => {
     currentRoomId, setCurrentRoomId, setOutput,
     refreshToken, sendCommand, commandInputRef,
     inBreach, breachMeta, breachOutput,
-    hasVendor, setHasVendor
+    hasVendor, setHasVendor,
+    hasTransit, setHasTransit
   } = useTactical()
   const initialLoadDoneRef = useRef(false)
   const [breachEncounters, setBreachEncounters] = useState<BreachEncounter[]>([])
   const [deckStatus, setDeckStatus] = useState<DeckStatus>({ equipped: false, fried: false })
   const [confirmTarget, setConfirmTarget] = useState<BreachEncounter | null>(null)
   const [vendorOpen, setVendorOpen] = useState(false)
+  const [transitOpen, setTransitOpen] = useState(false)
 
   const handleBreachEncountersChange = useCallback((encounters: BreachEncounter[], ds: DeckStatus) => {
     setBreachEncounters(encounters)
@@ -38,9 +42,17 @@ const TacticalInner: React.FC = () => {
     if (!v) setVendorOpen(false)
   }, [setHasVendor])
 
-  // Close vendor panel when breach starts
+  const handleTransitPresenceChange = useCallback((v: boolean) => {
+    setHasTransit(v)
+    if (!v) setTransitOpen(false)
+  }, [setHasTransit])
+
+  // Close panels when breach starts
   useEffect(() => {
-    if (inBreach) setVendorOpen(false)
+    if (inBreach) {
+      setVendorOpen(false)
+      setTransitOpen(false)
+    }
   }, [inBreach])
 
   const handleBreachConfirm = useCallback(() => {
@@ -153,6 +165,7 @@ const TacticalInner: React.FC = () => {
           onNavigate={(dir) => sendCommand(`go ${dir}`)}
           onBreachEncountersChange={handleBreachEncountersChange}
           onVendorPresenceChange={handleVendorPresenceChange}
+          onTransitPresenceChange={handleTransitPresenceChange}
         />
         {!inBreach && breachEncounters.length > 0 && (
           <BreachTargetButtons
@@ -168,7 +181,16 @@ const TacticalInner: React.FC = () => {
           refreshToken={refreshToken}
           onCommand={sendCommand}
         />
-        {hasVendor && !inBreach && !vendorOpen && (
+        {hasTransit && !inBreach && !vendorOpen && !transitOpen && (
+          <TransitHandle onClick={() => setTransitOpen(true)} />
+        )}
+        <TransitPanel
+          visible={transitOpen && !inBreach}
+          refreshToken={refreshToken}
+          onCommand={sendCommand}
+          onClose={() => setTransitOpen(false)}
+        />
+        {hasVendor && !inBreach && !vendorOpen && !transitOpen && (
           <VendorHandle onClick={() => setVendorOpen(true)} />
         )}
         <VendorPanel

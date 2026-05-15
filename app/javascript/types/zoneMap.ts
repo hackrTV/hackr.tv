@@ -62,6 +62,7 @@ export interface ZoneMapData {
   breach_encounters: BreachEncounter[]
   deck_status: DeckStatus
   has_vendor: boolean
+  has_transit: boolean
 }
 
 export interface InventoryItem {
@@ -110,4 +111,97 @@ export interface ShopData {
   shop_type: string
   balance: number
   listings: ShopListing[]
+}
+
+// --- Transit types ---
+
+export interface TransitType {
+  slug: string
+  name: string
+  category: string
+  base_fare: number
+  icon_key: string | null
+}
+
+export interface TransitStop {
+  position: number
+  name: string
+  room_slug: string
+  is_terminus: boolean
+}
+
+export interface TransitRoute {
+  slug: string
+  name: string
+  transit_type: TransitType
+  region: { slug: string; name: string }
+  loop_route: boolean
+  stop_count: number
+  stops: TransitStop[]
+  at_first_stop: boolean
+  at_last_stop: boolean
+}
+
+export interface SlipstreamLeg {
+  position: number
+  name: string
+  has_forks: boolean
+}
+
+export interface SlipstreamRoute {
+  slug: string
+  name: string
+  origin_region: { slug: string; name: string }
+  destination_region: { slug: string; name: string }
+  min_clearance: number
+  leg_count: number
+  legs: SlipstreamLeg[]
+  boardable: boolean
+}
+
+export interface TransitForkOption {
+  key: string
+  label: string
+  description: string
+}
+
+export interface TransitJourney {
+  id: number
+  journey_type: 'slipstream' | 'local_public' | 'local_private'
+  state: string
+  legs_completed: number
+  total_legs: number
+  pending_fork: boolean
+  breach_mid_journey: boolean
+  direction: 'forward' | 'reverse'
+  started_at: string | null
+  route_name: string | null
+  current_stop: { position: number; name: string } | null
+  next_stop: string | null
+  current_leg: { position: number; name: string } | null
+  current_leg_forks?: TransitForkOption[]
+}
+
+export interface PrivateTransitType {
+  slug: string
+  name: string
+  base_fare: number
+  icon_key: string | null
+}
+
+export interface PrivateDestination {
+  name: string
+  slug: string
+  zone_name: string
+}
+
+export interface TransitData {
+  slipstream_heat: number
+  slipstream_heat_tier: string
+  current_region: { slug: string; name: string } | null
+  current_journey: TransitJourney | null
+  local_routes: TransitRoute[]
+  slipstream_routes: SlipstreamRoute[]
+  private_types: PrivateTransitType[]
+  private_destinations: PrivateDestination[]
 }

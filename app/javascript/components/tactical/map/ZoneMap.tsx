@@ -14,6 +14,7 @@ interface ZoneMapProps {
   onNavigate?: (direction: string) => void
   onBreachEncountersChange?: (encounters: BreachEncounter[], deckStatus: DeckStatus) => void
   onVendorPresenceChange?: (hasVendor: boolean) => void
+  onTransitPresenceChange?: (hasTransit: boolean) => void
 }
 
 interface Tooltip {
@@ -24,7 +25,7 @@ interface Tooltip {
 
 const Z_DIRS = new Set(['up', 'down'])
 
-export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange, onVendorPresenceChange }) => {
+export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange, onVendorPresenceChange, onTransitPresenceChange }) => {
   const [mapData, setMapData] = useState<ZoneMapData | null>(null)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const [zoom, setZoom] = useState(1.25)
@@ -43,6 +44,7 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
         setPanOffset([0, 0])
         onBreachEncountersChange?.(data.breach_encounters || [], data.deck_status || { equipped: false, fried: false })
         onVendorPresenceChange?.(data.has_vendor ?? false)
+        onTransitPresenceChange?.(data.has_transit ?? false)
       })
       .catch(err => console.error('Zone map fetch failed:', err))
   // eslint-disable-next-line react-hooks/exhaustive-deps -- callback ref change should not re-trigger fetch; refreshToken controls cadence
@@ -114,6 +116,9 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
     }
     return map
   }, [mapData, currentRoomId])
+
+  // Available directions from current room (for nav buttons)
+  const availableDirections = useMemo(() => new Set(navigableExits.values()), [navigableExits])
 
   // Ghost room positions: compute from local room position + direction vector
   const ghostRenderList = useMemo(() => {
@@ -528,6 +533,14 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
         })}
       </svg>
 
+      {/* Navigation buttons */}
+      {onNavigate && (
+        <NavButtons
+          availableDirections={availableDirections}
+          onNavigate={(dir) => { setTooltip(null); onNavigate(dir) }}
+        />
+      )}
+
       {/* Tooltip */}
       {tooltip && (
         <div style={{
@@ -557,6 +570,113 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// --- Compact compass rose + vertical nav ---
+
+const NAV_GRID: { dir: string; label: string; row: number; col: number }[] = [
+  { dir: 'northwest', label: 'NW', row: 0, col: 0 },
+  { dir: 'north', label: 'N', row: 0, col: 1 },
+  { dir: 'northeast', label: 'NE', row: 0, col: 2 },
+  { dir: 'west', label: 'W', row: 1, col: 0 },
+  { dir: 'east', label: 'E', row: 1, col: 2 },
+  { dir: 'southwest', label: 'SW', row: 2, col: 0 },
+  { dir: 'south', label: 'S', row: 2, col: 1 },
+  { dir: 'southeast', label: 'SE', row: 2, col: 2 }
+]
+
+const NAV_VERTICAL: { dir: string; label: string }[] = [
+  { dir: 'up', label: '\u2191' },
+  { dir: 'down', label: '\u2193' }
+]
+
+const NavButtons: React.FC<{
+  availableDirections: Set<string>
+  onNavigate: (dir: string) => void
+}> = ({ availableDirections, onNavigate }) => {
+  return (
+    <div style={{
+      position: 'absolute',
+      bottom: 10,
+      left: 10,
+      zIndex: 15,
+      display: 'flex',
+      gap: '4px',
+      alignItems: 'flex-end'
+    }}>
+      {/* Compass rose */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 28px)',
+        gridTemplateRows: 'repeat(3, 28px)',
+        gap: '2px'
+      }}>
+        {NAV_GRID.map(({ dir, label, row, col }) => {
+          const available = availableDirections.has(dir)
+          return (
+            <button
+              key={dir}
+              onClick={(e) => { e.stopPropagation(); if (available) onNavigate(dir) }}
+              disabled={!available}
+              style={{
+                gridRow: row + 1,
+                gridColumn: col + 1,
+                width: 28,
+                height: 28,
+                background: available ? '#1a1a1a' : '#0e0e0e',
+                color: available ? '#22d3ee' : '#333',
+                border: `1px solid ${available ? '#333' : '#1a1a1a'}`,
+                borderRadius: '3px',
+                fontSize: '0.6em',
+                fontFamily: '\'Courier New\', monospace',
+                fontWeight: 'bold',
+                cursor: available ? 'pointer' : 'default',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Up / Down */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        {NAV_VERTICAL.map(({ dir, label }) => {
+          const available = availableDirections.has(dir)
+          const color = dir === 'up' ? '#a78bfa' : '#fb923c'
+          return (
+            <button
+              key={dir}
+              onClick={(e) => { e.stopPropagation(); if (available) onNavigate(dir) }}
+              disabled={!available}
+              style={{
+                width: 28,
+                height: 28,
+                background: available ? '#1a1a1a' : '#0e0e0e',
+                color: available ? color : '#333',
+                border: `1px solid ${available ? '#333' : '#1a1a1a'}`,
+                borderRadius: '3px',
+                fontSize: '0.85em',
+                fontFamily: '\'Courier New\', monospace',
+                fontWeight: 'bold',
+                cursor: available ? 'pointer' : 'default',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

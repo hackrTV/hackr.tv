@@ -7,7 +7,7 @@
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.3-red.svg)](https://rubyonrails.org/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Tests-2969%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/Tests-3014%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
@@ -472,9 +472,9 @@ bundle exec rspec spec/components/
 ```
 
 **Test Coverage:**
-- **Backend:** 2750 examples (RSpec)
+- **Backend:** 2770 examples (RSpec)
 - **Frontend:** 244 examples (Vitest)
-- **Total:** 2994 passing tests
+- **Total:** 3014 passing tests
 
 ---
 
@@ -725,7 +725,7 @@ bin/rails data:overlays             # Overlay scenes, elements, tickers
 - Multi-Type Transit System - Slipstream (inter-region covert travel with heat/detection) + local transit (public routes with stops, private transit), 13 vehicle types, `/transit` SPA page
 - Bootloader Tutorial - 53-step VR training simulation across 7 chapters, starting room selection, hidden `code` command
 - Partial Name Matching - Substring-fallback name resolution with "Did you mean?" disambiguation across all commands
-- Comprehensive test suite - 2725 backend + 244 frontend tests (2969 total)
+- Comprehensive test suite - 2770 backend + 244 frontend tests (3014 total)
 
 ### Future Enhancements
 - Transit System: Local transit route seeding - Seed local routes per region using admin CRUD
@@ -763,7 +763,7 @@ This project is released into the public domain, so feel free to fork, modify, a
 | `bin/rails data:catalog` | Load artists, albums, tracks only |
 | `bin/rails data:world` | Load all world data (regions, zones, rooms, mobs, items, BREACH, transit, etc.) |
 | `bin/rails data:reset` | Reset seed content (preserves user data) |
-| `bundle exec rspec` | Run backend test suite (2750 tests) |
+| `bundle exec rspec` | Run backend test suite (2770 tests) |
 | `pnpm test` | Run frontend test suite (244 tests) |
 | `bundle exec standardrb` | Lint backend code |
 | `bundle exec brakeman` | Run security scanner |

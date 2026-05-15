@@ -24,19 +24,25 @@ module GridHackr::Transit
   # to avoid recalculating on every access. This means API GET endpoints that
   # call slipstream_heat are not purely read-only.
   def slipstream_heat
+    return @slipstream_heat_cache if defined?(@slipstream_heat_cache)
+
     raw = stat("slipstream_heat").to_i
     last_at = stat("slipstream_heat_last_at").to_i
-    return raw if last_at.zero? || raw.zero?
+    if last_at.zero? || raw.zero?
+      return @slipstream_heat_cache = raw
+    end
 
     elapsed_minutes = ((Time.current.to_i - last_at) / 60.0).floor
-    return raw if elapsed_minutes <= 0
+    if elapsed_minutes <= 0
+      return @slipstream_heat_cache = raw
+    end
 
     decayed = [raw - elapsed_minutes, 0].max
     if decayed < raw
       set_stat!("slipstream_heat", decayed)
       set_stat!("slipstream_heat_last_at", Time.current.to_i) if decayed > 0
     end
-    decayed
+    @slipstream_heat_cache = decayed
   end
 
   def slipstream_heat_tier
@@ -53,6 +59,7 @@ module GridHackr::Transit
     current = slipstream_heat # triggers decay first
     new_level = [current + amount, 100].min
     set_stat!("slipstream_heat", new_level)
+    @slipstream_heat_cache = new_level # update memoized value
     set_stat!("slipstream_heat_last_at", Time.current.to_i)
     new_level
   end

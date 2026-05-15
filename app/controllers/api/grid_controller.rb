@@ -381,13 +381,18 @@ class Api::GridController < ApplicationController
           .map { |r| {slug: r.type_slug, name: r.type_name, category: r.type_category} }
       }
 
+    private_types = Grid::LocalTransitService.private_types_at_room(room: room, hackr: current_hackr)
+    private_destinations = private_types.any? ? Grid::LocalTransitService.private_destinations(room: room) : []
+
     render json: {
       slipstream_heat: current_hackr.slipstream_heat,
       slipstream_heat_tier: current_hackr.slipstream_heat_tier,
       current_region: region ? {slug: region.slug, name: region.name} : nil,
       current_journey: active_journey ? transit_journey_json(active_journey) : nil,
-      local_routes: local_routes.map { |r| transit_route_json(r) },
-      slipstream_routes: slip_routes.map { |r| slipstream_route_json(r) },
+      local_routes: local_routes.map { |r| transit_route_json(r, room: room) },
+      slipstream_routes: slip_routes.map { |r| slipstream_route_json(r, room: room) },
+      private_types: private_types.map { |t| {slug: t.slug, name: t.name, base_fare: t.base_fare, icon_key: t.icon_key} },
+      private_destinations: private_destinations.map { |r| {name: r.name, slug: r.slug, zone_name: r.grid_zone.name} },
       region_transit: region_transit
     }
   end
@@ -862,7 +867,10 @@ class Api::GridController < ApplicationController
       in_breach: current_hackr.in_breach?,
       breach_encounters: breach_encounters,
       deck_status: deck_status,
-      has_vendor: room.grid_mobs.loaded? ? room.grid_mobs.any?(&:vendor?) : room.grid_mobs.exists?(mob_type: "vendor")
+      has_vendor: room.grid_mobs.loaded? ? room.grid_mobs.any?(&:vendor?) : room.grid_mobs.exists?(mob_type: "vendor"),
+      has_transit: room.room_type == "transit" ||
+        GridSlipstreamRoute.active.where(origin_room_id: room.id).exists? ||
+        current_hackr.in_transit?
     }
   end
 
@@ -1024,7 +1032,7 @@ class Api::GridController < ApplicationController
   end
 
   def transit_journey_json(journey)
-    {
+    json = {
       id: journey.id,
       journey_type: journey.journey_type,
       state: journey.state,
@@ -1034,24 +1042,47 @@ class Api::GridController < ApplicationController
       breach_mid_journey: journey.breach_mid_journey,
       started_at: journey.started_at&.iso8601,
       route_name: journey.slipstream? ? journey.grid_slipstream_route&.name : journey.grid_transit_route&.name,
+      direction: journey.meta&.dig("direction") || "forward",
       current_stop: journey.current_stop ? {position: journey.current_stop.position, name: journey.current_stop.display_name} : nil,
       current_leg: journey.current_leg ? {position: journey.current_leg.position, name: journey.current_leg.name} : nil
     }
+
+    # Compute next stop name for local journeys (direction-aware)
+    if journey.local? && journey.current_stop && journey.grid_transit_route
+      dir = (journey.meta&.dig("direction") || "forward").to_sym
+      nxt = journey.grid_transit_route.next_stop_after(journey.current_stop, direction: dir)
+      json[:next_stop] = nxt&.display_name
+    end
+
+    # Include fork options when a slipstream journey is awaiting a fork choice
+    if journey.slipstream? && journey.pending_fork? && journey.current_leg&.has_forks?
+      json[:current_leg_forks] = journey.current_leg.fork_options.map do |opt|
+        {key: opt["key"], label: opt["label"], description: opt["description"]}
+      end
+    end
+
+    json
   end
 
-  def transit_route_json(route)
+  def transit_route_json(route, room: nil)
+    stops = route.grid_transit_stops.to_a
+    boarding_stop = room && stops.find { |s| s.grid_room_id == room.id }
+    at_first = boarding_stop && stops.first&.id == boarding_stop.id
+    at_last = boarding_stop && stops.last&.id == boarding_stop.id
     {
       slug: route.slug,
       name: route.name,
       transit_type: {slug: route.grid_transit_type.slug, name: route.grid_transit_type.name, category: route.grid_transit_type.category, base_fare: route.grid_transit_type.base_fare, icon_key: route.grid_transit_type.icon_key},
       region: {slug: route.grid_region.slug, name: route.grid_region.name},
       loop_route: route.loop_route,
-      stop_count: route.grid_transit_stops.size,
-      stops: route.grid_transit_stops.map { |s| {position: s.position, name: s.display_name, room_slug: s.grid_room.slug, is_terminus: s.is_terminus} }
+      stop_count: stops.size,
+      stops: stops.map { |s| {position: s.position, name: s.display_name, room_slug: s.grid_room.slug, is_terminus: s.is_terminus} },
+      at_first_stop: !!at_first,
+      at_last_stop: !!at_last
     }
   end
 
-  def slipstream_route_json(route)
+  def slipstream_route_json(route, room: nil)
     {
       slug: route.slug,
       name: route.name,
@@ -1059,7 +1090,8 @@ class Api::GridController < ApplicationController
       destination_region: {slug: route.destination_region.slug, name: route.destination_region.name},
       min_clearance: route.min_clearance,
       leg_count: route.grid_slipstream_legs.size,
-      legs: route.grid_slipstream_legs.map { |l| {position: l.position, name: l.name, has_forks: l.has_forks?} }
+      legs: route.grid_slipstream_legs.map { |l| {position: l.position, name: l.name, has_forks: l.has_forks?} },
+      boardable: room.present? && route.origin_room_id == room.id
     }
   end
 

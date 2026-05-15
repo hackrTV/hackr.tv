@@ -118,8 +118,10 @@ class Rack::Attack
 
   ### Throttle API requests ###
 
-  # General API throttle - 100 requests per minute per IP
-  throttle("api/ip", limit: 100, period: 1.minute) do |req|
+  # General API throttle - 300 requests per minute per IP
+  # The tactical UI fires 3-5 parallel fetches per command action
+  # (zone_map, transit, loadout, shop, etc.), so 100/min is too tight.
+  throttle("api/ip", limit: 300, period: 1.minute) do |req|
     if req.path.start_with?("/api/")
       req.ip
     end

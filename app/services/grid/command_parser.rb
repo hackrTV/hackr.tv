@@ -949,7 +949,23 @@ module Grid
     end
 
     def board_command(args)
-      route_slug = args&.join("-")
+      return "<span style='color: #fbbf24;'>Board what? Specify a route slug. Type <span style='color: #22d3ee;'>transit</span> to see available routes.</span>" unless args&.any?
+
+      # Parse optional direction: "board <route> reverse" or "board reverse <route>"
+      direction = nil
+      filtered = args.reject do |a|
+        if %w[reverse rev backward back].include?(a.downcase)
+          direction = "reverse"
+          true
+        elsif %w[forward fwd].include?(a.downcase)
+          direction = "forward"
+          true
+        else
+          false
+        end
+      end
+
+      route_slug = filtered.join("-")
       return "<span style='color: #fbbf24;'>Board what? Specify a route slug. Type <span style='color: #22d3ee;'>transit</span> to see available routes.</span>" unless route_slug.present?
 
       room = hackr.current_room
@@ -957,7 +973,7 @@ module Grid
       route = routes.find { |r| r.slug == route_slug }
       return "<span style='color: #f87171;'>Route '#{h(route_slug)}' not available here. Type <span style='color: #22d3ee;'>transit</span> to see routes.</span>" unless route
 
-      result = Grid::LocalTransitService.board!(hackr: hackr, route: route)
+      result = Grid::LocalTransitService.board!(hackr: hackr, route: route, direction: direction)
       result.display
     rescue Grid::LocalTransitService::AlreadyInJourney
       "<span style='color: #f87171;'>Already in transit.</span>"
@@ -965,6 +981,8 @@ module Grid
       "<span style='color: #f87171;'>Insufficient CRED for fare.</span>"
     rescue Grid::LocalTransitService::RouteNotAtStop
       "<span style='color: #f87171;'>This route doesn't stop here.</span>"
+    rescue Grid::LocalTransitService::EndOfLine
+      "<span style='color: #f87171;'>This is the end of the line. The route doesn't continue from here.</span>"
     end
 
     def hail_command(args)

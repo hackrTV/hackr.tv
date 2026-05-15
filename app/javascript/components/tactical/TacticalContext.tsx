@@ -39,10 +39,12 @@ interface TacticalContextValue {
   breachMeta: BreachMeta | null
   breachOutput: string[]
   hasVendor: boolean
+  hasTransit: boolean
   sendCommand: (command: string) => Promise<void>
   setOutput: React.Dispatch<React.SetStateAction<string[]>>
   setCurrentRoomId: React.Dispatch<React.SetStateAction<number | null>>
   setHasVendor: React.Dispatch<React.SetStateAction<boolean>>
+  setHasTransit: React.Dispatch<React.SetStateAction<boolean>>
   commandInputRef: React.RefObject<CommandInputHandle | null>
 }
 
@@ -63,6 +65,7 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [breachMeta, setBreachMeta] = useState<BreachMeta | null>(null)
   const [breachOutput, setBreachOutput] = useState<string[]>([])
   const [hasVendor, setHasVendor] = useState(false)
+  const [hasTransit, setHasTransit] = useState(false)
   const commandInputRef = useRef<CommandInputHandle | null>(null)
   const inBreachRef = useRef(false)
 
@@ -123,9 +126,11 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       setRefreshToken(prev => prev + 1)
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Command execution failed:', err)
-      setOutput(prev => [...prev, '<span style="color: #f87171;">Error: Network error. Please try again.</span>'])
+      const raw = err instanceof Error ? err.message : 'Network error. Please try again.'
+      const safe = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      setOutput(prev => [...prev, `<span style="color: #f87171;">Error: ${safe}</span>`])
     } finally {
       setExecuting(false)
     }
@@ -134,8 +139,8 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   return (
     <TacticalContext.Provider value={{
       output, currentRoomId, executing, refreshToken,
-      inBreach, breachMeta, breachOutput, hasVendor,
-      sendCommand, setOutput, setCurrentRoomId, setHasVendor, commandInputRef
+      inBreach, breachMeta, breachOutput, hasVendor, hasTransit,
+      sendCommand, setOutput, setCurrentRoomId, setHasVendor, setHasTransit, commandInputRef
     }}>
       {children}
     </TacticalContext.Provider>

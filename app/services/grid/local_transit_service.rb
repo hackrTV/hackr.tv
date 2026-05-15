@@ -14,10 +14,11 @@ module Grid
     class InsufficientFunds < StandardError; end
     class DestinationNotOnRoute < StandardError; end
     class AlreadyAtDestination < StandardError; end
+    class EndOfLine < StandardError; end
     class NotInJourney < StandardError; end
 
-    def self.board!(hackr:, route:, destination_stop: nil)
-      new(hackr).board!(route, destination_stop)
+    def self.board!(hackr:, route:, destination_stop: nil, direction: nil)
+      new(hackr).board!(route, destination_stop, direction)
     end
 
     def self.wait!(hackr:)
@@ -92,7 +93,7 @@ module Grid
       @hackr = hackr
     end
 
-    def board!(route, destination_stop = nil)
+    def board!(route, destination_stop = nil, direction = nil)
       room = @hackr.current_room
       boarding_stop = route.stop_for_room(room)
       raise RouteNotAtStop unless boarding_stop
@@ -104,6 +105,21 @@ module Grid
         raise DestinationNotOnRoute unless destination_stop
         raise DestinationNotOnRoute unless destination_stop.grid_transit_route_id == route.id
         raise AlreadyAtDestination if destination_stop.id == boarding_stop.id
+      end
+
+      # Auto-detect travel direction for non-loop public routes
+      travel_direction = if route.loop_route || type.private_point?
+        "forward"
+      elsif direction.to_s == "reverse"
+        "reverse"
+      else
+        resolve_direction(route, boarding_stop, direction)
+      end
+
+      # Validate there's actually a next stop in the chosen direction
+      if !route.loop_route && !type.private_point? &&
+          route.next_stop_after(boarding_stop, direction: travel_direction.to_sym).nil?
+        raise EndOfLine
       end
 
       fare = compute_fare(route, boarding_stop, destination_stop)
@@ -132,7 +148,7 @@ module Grid
           current_stop: boarding_stop,
           fare_paid: fare,
           started_at: Time.current,
-          meta: {}
+          meta: {"direction" => travel_direction}
         )
 
         display = Grid::TransitRenderer.render_board(journey, route, boarding_stop)
@@ -204,7 +220,8 @@ module Grid
           end
         end
 
-        next_stop = route.next_stop_after(current)
+        direction = (journey.meta&.dig("direction") || "forward").to_sym
+        next_stop = route.next_stop_after(current, direction: direction)
 
         unless next_stop
           # End of line (non-loop) — auto-disembark at current stop
@@ -260,6 +277,17 @@ module Grid
     end
 
     private
+
+    # Auto-detect direction: first stop → forward, last stop → reverse, middle → forward (default)
+    def resolve_direction(route, boarding_stop, explicit_direction)
+      return explicit_direction.to_s if %w[forward reverse].include?(explicit_direction.to_s)
+
+      if boarding_stop.id == route.last_stop&.id
+        "reverse"
+      else
+        "forward"
+      end
+    end
 
     def compute_fare(route, boarding_stop, destination_stop)
       type = route.grid_transit_type
