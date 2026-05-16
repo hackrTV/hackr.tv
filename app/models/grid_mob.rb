@@ -26,14 +26,20 @@ class GridMob < ApplicationRecord
   # When a giver mob is deleted, the missions lose their giver (FK nullified
   # at the DB level). Missions are world data — an admin can reassign.
   has_many :given_missions, class_name: "GridMission", foreign_key: :giver_mob_id, dependent: :nullify
+  has_one_attached :avatar
 
   validates :name, presence: true
   validates :mob_type, inclusion: {in: %w[quest_giver vendor lore special], allow_nil: true}
   validate :faction_not_aggregate
+  validate :avatar_file_valid, if: -> { avatar.attached? && avatar.blob&.new_record? }
   validate :dialogue_tree_depth_within_limit
   validate :dialogue_tree_keys_unique
 
   before_validation :normalize_dialogue_tree
+
+  def avatar_panel
+    avatar.variant(resize_to_fill: [180, 180], format: :webp, saver: {quality: 85})
+  end
 
   def vendor?
     mob_type == "vendor"
@@ -60,6 +66,19 @@ class GridMob < ApplicationRecord
   end
 
   private
+
+  AVATAR_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
+  AVATAR_MAX_SIZE = 5.megabytes
+
+  def avatar_file_valid
+    blob = avatar.blob
+    unless AVATAR_CONTENT_TYPES.include?(blob.content_type)
+      errors.add(:avatar, "must be a JPEG, PNG, or WebP image")
+    end
+    if blob.byte_size > AVATAR_MAX_SIZE
+      errors.add(:avatar, "must be less than 5 MB")
+    end
+  end
 
   # Upgrade flat dialogue format (topic: "string") to nested format
   # (topic: { response: "string" }) so all downstream code can assume

@@ -24,6 +24,7 @@ export const NpcPanel: React.FC<NpcPanelProps> = ({
   const [npcData, setNpcData] = useState<NpcData | null>(null)
   const [section, setSection] = useState<PanelSection>('dialogue')
   const [dialogueOutput, setDialogueOutput] = useState<string | null>(null)
+  const [avatarLoaded, setAvatarLoaded] = useState(false)
   const initialTalkFired = useRef<number | null>(null)
 
   // Slide animation: mount first, then open; close first, then unmount
@@ -45,6 +46,7 @@ export const NpcPanel: React.FC<NpcPanelProps> = ({
   useEffect(() => {
     setNpcData(null)
     setDialogueOutput(null)
+    setAvatarLoaded(false)
     initialTalkFired.current = null
   }, [visible, selectedMobId])
 
@@ -125,6 +127,37 @@ export const NpcPanel: React.FC<NpcPanelProps> = ({
           fontFamily: '\'Courier New\', monospace'
         }}
       >
+        {/* Avatar fly-out wing — extends above panel */}
+        {npcData?.avatar_url && (
+          <div style={{
+            position: 'absolute',
+            bottom: '100%',
+            right: '0',
+            background: '#0d0d0d',
+            border: '2px solid #c084fc',
+            borderBottom: 'none',
+            borderRadius: '6px 6px 0 0',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <img
+              src={npcData.avatar_url}
+              alt={npcData.mob_name}
+              onLoad={() => setAvatarLoaded(true)}
+              style={{
+                width: '180px',
+                height: '180px',
+                objectFit: 'cover',
+                borderRadius: '4px',
+                border: '1px solid #333',
+                opacity: avatarLoaded ? 1 : 0,
+                transition: 'opacity 300ms ease-in'
+              }}
+            />
+          </div>
+        )}
+
         {/* Header */}
         <div style={{
           display: 'flex',

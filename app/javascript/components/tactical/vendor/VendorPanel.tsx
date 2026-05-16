@@ -32,6 +32,7 @@ export const VendorPanel: React.FC<VendorPanelProps> = ({
   const [section, setSection] = useState<PanelSection>('buy')
   const [pendingTx, setPendingTx] = useState<PendingTx | null>(null)
   const [buyQty, setBuyQty] = useState<Record<number, number>>({})
+  const [avatarLoaded, setAvatarLoaded] = useState(false)
 
   // Slide animation: mount first, then open; close first, then unmount
   // Double-rAF ensures browser paints the closed state before transitioning to open
@@ -68,9 +69,12 @@ export const VendorPanel: React.FC<VendorPanelProps> = ({
     }
   }, [refreshToken, isRendered])
 
-  // Reset buy quantities when panel closes or shop data refreshes
+  // Reset buy quantities and avatar state when panel closes
   useEffect(() => {
-    if (!visible) setBuyQty({})
+    if (!visible) {
+      setBuyQty({})
+      setAvatarLoaded(false)
+    }
   }, [visible])
 
   useEffect(() => {
@@ -149,6 +153,37 @@ export const VendorPanel: React.FC<VendorPanelProps> = ({
           fontFamily: '\'Courier New\', monospace'
         }}
       >
+        {/* Avatar fly-out wing — extends left from panel */}
+        {shopData?.avatar_url && (
+          <div style={{
+            position: 'absolute',
+            right: '100%',
+            top: '0',
+            background: '#0d0d0d',
+            border: '2px solid #fbbf24',
+            borderRight: 'none',
+            borderRadius: '6px 0 0 6px',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <img
+              src={shopData.avatar_url}
+              alt={shopData.vendor_name}
+              onLoad={() => setAvatarLoaded(true)}
+              style={{
+                width: '180px',
+                height: '180px',
+                objectFit: 'cover',
+                borderRadius: '4px',
+                border: '1px solid #333',
+                opacity: avatarLoaded ? 1 : 0,
+                transition: 'opacity 300ms ease-in'
+              }}
+            />
+          </div>
+        )}
+
         {/* Header */}
         <div style={{
           display: 'flex',

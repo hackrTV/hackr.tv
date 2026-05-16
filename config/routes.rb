@@ -358,6 +358,7 @@ Rails.application.routes.draw do
         get :history
         post :add_listing
         delete :remove_listing
+        delete :purge_avatar
       end
     end
     resources :grid_exits do
