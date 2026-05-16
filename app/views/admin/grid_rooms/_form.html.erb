@@ -31,7 +31,7 @@
   <div style="flex: 1; min-width: 200px;">
     <%= f.label :room_type, "ROOM TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
     <%= f.select :room_type,
-          [["Standard", "standard"], ["Hub", "hub"], ["Faction Base", "faction_base"], ["GovCorp", "govcorp"], ["Special", "special"], ["Safe Zone", "safe_zone"], ["Transit", "transit"], ["Shop", "shop"], ["Danger Zone", "danger_zone"], ["Den", "den"], ["Hospital", "hospital"], ["Firmware Vendor", "firmware_vendor"], ["Repair Service", "repair_service"], ["Containment", "containment"], ["Impound", "impound"], ["Sally Port Anteroom", "sally_port_anteroom"], ["Sally Port", "sally_port"]],
+          [["Standard", "standard"], ["Hub", "hub"], ["Faction Base", "faction_base"], ["GovCorp", "govcorp"], ["Special", "special"], ["Safe Zone", "safe_zone"], ["Transit", "transit"], ["Shop", "shop"], ["Danger Zone", "danger_zone"], ["Den", "den"], ["Hospital", "hospital"], ["Firmware Vendor", "firmware_vendor"], ["Repair Service", "repair_service"], ["Rest Pod", "rest_pod"], ["Containment", "containment"], ["Impound", "impound"], ["Sally Port Anteroom", "sally_port_anteroom"], ["Sally Port", "sally_port"]],
           { selected: @room.room_type || "standard" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
   </div>
   <div style="flex: 1; min-width: 200px;">

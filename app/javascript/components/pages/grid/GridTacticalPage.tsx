@@ -17,6 +17,8 @@ import { TransitHandle } from '~/components/tactical/transit/TransitHandle'
 import { TransitPanel } from '~/components/tactical/transit/TransitPanel'
 import { NpcHandle } from '~/components/tactical/npc/NpcHandle'
 import { NpcPanel } from '~/components/tactical/npc/NpcPanel'
+import { RestPodHandle } from '~/components/tactical/rest_pod/RestPodHandle'
+import { RestPodPanel } from '~/components/tactical/rest_pod/RestPodPanel'
 
 const TacticalInner: React.FC = () => {
   const { hackr } = useGridAuth()
@@ -26,7 +28,8 @@ const TacticalInner: React.FC = () => {
     inBreach, breachMeta, breachOutput,
     hasVendor, setHasVendor,
     hasTransit, setHasTransit,
-    hasNpc, setHasNpc, npcMobs, setNpcMobs
+    hasNpc, setHasNpc, npcMobs, setNpcMobs,
+    hasRestPod, setHasRestPod
   } = useTactical()
   const initialLoadDoneRef = useRef(false)
   const [breachEncounters, setBreachEncounters] = useState<BreachEncounter[]>([])
@@ -35,6 +38,7 @@ const TacticalInner: React.FC = () => {
   const [vendorOpen, setVendorOpen] = useState(false)
   const [transitOpen, setTransitOpen] = useState(false)
   const [npcOpen, setNpcOpen] = useState(false)
+  const [restPodOpen, setRestPodOpen] = useState(false)
   const [selectedNpcId, setSelectedNpcId] = useState<number | null>(null)
 
   const handleBreachEncountersChange = useCallback((encounters: BreachEncounter[], ds: DeckStatus) => {
@@ -58,12 +62,18 @@ const TacticalInner: React.FC = () => {
     if (!has) { setNpcOpen(false); setSelectedNpcId(null) }
   }, [setHasNpc, setNpcMobs])
 
+  const handleRestPodPresenceChange = useCallback((v: boolean) => {
+    setHasRestPod(v)
+    if (!v) setRestPodOpen(false)
+  }, [setHasRestPod])
+
   // Close panels when breach starts
   useEffect(() => {
     if (inBreach) {
       setVendorOpen(false)
       setTransitOpen(false)
       setNpcOpen(false)
+      setRestPodOpen(false)
     }
   }, [inBreach])
 
@@ -179,6 +189,7 @@ const TacticalInner: React.FC = () => {
           onVendorPresenceChange={handleVendorPresenceChange}
           onTransitPresenceChange={handleTransitPresenceChange}
           onNpcPresenceChange={handleNpcPresenceChange}
+          onRestPodPresenceChange={handleRestPodPresenceChange}
         />
         {!inBreach && breachEncounters.length > 0 && (
           <BreachTargetButtons
@@ -194,7 +205,7 @@ const TacticalInner: React.FC = () => {
           refreshToken={refreshToken}
           onCommand={sendCommand}
         />
-        {hasTransit && !inBreach && !vendorOpen && !transitOpen && !npcOpen && (
+        {hasTransit && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
           <TransitHandle onClick={() => setTransitOpen(true)} />
         )}
         <TransitPanel
@@ -203,7 +214,7 @@ const TacticalInner: React.FC = () => {
           onCommand={sendCommand}
           onClose={() => setTransitOpen(false)}
         />
-        {hasVendor && !inBreach && !vendorOpen && !transitOpen && !npcOpen && (
+        {hasVendor && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
           <VendorHandle onClick={() => setVendorOpen(true)} />
         )}
         <VendorPanel
@@ -212,7 +223,7 @@ const TacticalInner: React.FC = () => {
           onCommand={sendCommand}
           onClose={() => setVendorOpen(false)}
         />
-        {hasNpc && !inBreach && !vendorOpen && !transitOpen && !npcOpen &&
+        {hasNpc && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen &&
           npcMobs.map((mob, i) => {
             const total = npcMobs.length
             const offsetX = total === 1 ? 0 : (i - (total - 1) / 2) * 72
@@ -232,6 +243,15 @@ const TacticalInner: React.FC = () => {
           onCommand={sendCommand}
           onClose={() => setNpcOpen(false)}
           selectedMobId={selectedNpcId}
+        />
+        {hasRestPod && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
+          <RestPodHandle onClick={() => setRestPodOpen(true)} />
+        )}
+        <RestPodPanel
+          visible={restPodOpen && !inBreach}
+          refreshToken={refreshToken}
+          onCommand={sendCommand}
+          onClose={() => setRestPodOpen(false)}
         />
       </div>
 

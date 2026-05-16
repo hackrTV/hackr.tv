@@ -63,6 +63,10 @@ FactoryBot.define do
       room_type { "standard" }
     end
 
+    trait :rest_pod do
+      room_type { "rest_pod" }
+    end
+
     trait :den do
       room_type { "den" }
       sequence(:name) { |n| "Den #{n}" }

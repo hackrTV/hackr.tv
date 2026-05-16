@@ -3,6 +3,8 @@ module Grid
     include CodexHelper
     include ItemEffectApplier
 
+    VITAL_SHORTCUTS = {"hp" => "health", "en" => "energy", "ps" => "psyche"}.freeze
+
     attr_reader :hackr, :input, :event
 
     def initialize(hackr, input)
@@ -157,6 +159,8 @@ module Grid
         breach_initiate_command(args&.join(" "))
       when "repair"
         repair_command
+      when "rest"
+        rest_command(args)
       when "den"
         den_command(args)
       when "out"
@@ -229,6 +233,16 @@ module Grid
           end
           output << "<span style='color: #6b7280;'>  Type 'breach &lt;name or #&gt;' to initiate.</span>"
         end
+      end
+
+      # Rest Pod indicator
+      if room.room_type == "rest_pod"
+        rate = Grid::RestPodService.rate_for(hackr)
+        output << ""
+        output << "<span style='color: #34d399; font-weight: bold;'>[ REST POD ]</span>"
+        output << "<span style='color: #6b7280;'>  Restore vitals for CRED. Rate: #{rate} pts/CRED.</span>"
+        output << "<span style='color: #6b7280;'>  Type 'rest &lt;amount&gt; &lt;vital&gt; [...]' — e.g., rest 50 hp 30 en</span>"
+        output << "<span style='color: #6b7280;'>  Use 'full' for max: rest full hp full en full ps</span>"
       end
 
       # Slipstream access indicator — show destinations available from this room
@@ -1546,6 +1560,56 @@ module Grid
     rescue Grid::DeckRepairService::DeckNotFried => e
       "<span style='color: #9ca3af;'>#{h(e.message)}</span>"
     rescue Grid::DeckRepairService::InsufficientBalance => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    end
+
+    def rest_command(args)
+      if args.nil? || args.empty?
+        return "<span style='color: #f87171;'>Usage: rest &lt;amount&gt; &lt;vital&gt; [...] — e.g., rest 50 hp 30 en</span>" \
+               "\n<span style='color: #6b7280;'>  Vitals: health/hp, energy/en, psyche/ps. Use 'full' for max.</span>"
+      end
+
+      # Parse amount/vital pairs, merge duplicates (e.g., "10 hp 20 hp" → health: 30)
+      merged = {}
+      i = 0
+      while i < args.length
+        amount_str = args[i]
+        vital_raw = args[i + 1]
+        i += 2
+
+        unless vital_raw
+          return "<span style='color: #f87171;'>Missing vital name after '#{h(amount_str)}'. Use health/hp, energy/en, psyche/ps.</span>"
+        end
+
+        vital = VITAL_SHORTCUTS.fetch(vital_raw.downcase, vital_raw.downcase)
+        unless Grid::RestPodService::VITALS.include?(vital)
+          return "<span style='color: #f87171;'>Unknown vital: #{h(vital_raw)}. Use health/hp, energy/en, psyche/ps.</span>"
+        end
+
+        points = if amount_str.downcase == "full"
+          hackr.effective_max(vital) - hackr.stat(vital).to_i
+        else
+          amount_str.to_i
+        end
+
+        merged[vital] = (merged[vital] || 0) + points if points > 0
+      end
+
+      allocs = merged.map { |vital, points| {vital: vital, points: points} }
+
+      if allocs.empty?
+        return "<span style='color: #9ca3af;'>Nothing to restore — vitals are already full.</span>"
+      end
+
+      result = Grid::RestPodService.restore!(hackr: hackr, allocs: allocs)
+      result.display
+    rescue Grid::RestPodService::NotAtRestPod => e
+      "<span style='color: #9ca3af;'>#{h(e.message)}</span>"
+    rescue Grid::RestPodService::InvalidAllocation => e
+      "<span style='color: #f87171;'>#{h(e.message)}</span>"
+    rescue Grid::RestPodService::NothingToRestore => e
+      "<span style='color: #9ca3af;'>#{h(e.message)}</span>"
+    rescue Grid::RestPodService::InsufficientBalance => e
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 

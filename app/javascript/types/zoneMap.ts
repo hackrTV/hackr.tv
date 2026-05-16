@@ -71,6 +71,7 @@ export interface ZoneMapData {
   has_transit: boolean
   has_npc: boolean
   npc_mobs: NpcMobStub[]
+  has_rest_pod: boolean
 }
 
 export interface InventoryItem {
@@ -293,6 +294,23 @@ export interface NpcDeliveryItem {
   in_inventory: boolean
   quantity_held: number
   quantity_needed: number
+}
+
+// --- Rest Pod types ---
+
+export interface RestPodVital {
+  current: number
+  max: number
+}
+
+export interface RestPodData {
+  rate: number
+  balance: number
+  vitals: {
+    health: RestPodVital
+    energy: RestPodVital
+    psyche: RestPodVital
+  }
 }
 
 export interface NpcData {
