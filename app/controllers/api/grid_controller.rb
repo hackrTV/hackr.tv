@@ -227,6 +227,7 @@ class Api::GridController < ApplicationController
       vendor_name: vendor.name,
       shop_type: vendor.shop_type,
       balance: balance,
+      avatar_url: vendor.avatar.attached? ? url_for(vendor.avatar_panel) : nil,
       listings: listings.map { |entry|
         listing = entry[:listing]
         {
@@ -290,6 +291,7 @@ class Api::GridController < ApplicationController
       mob_name: mob.name,
       mob_type: mob.mob_type,
       faction_name: mob.grid_faction&.display_name,
+      avatar_url: mob.avatar.attached? ? url_for(mob.avatar_panel) : nil,
       dialogue: {
         greeting: navigator.greeting,
         current_response: navigator.at_root? ? nil : navigator.node_at(navigator.current_path)&.dig("response"),

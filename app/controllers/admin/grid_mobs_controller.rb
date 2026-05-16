@@ -3,7 +3,7 @@ class Admin::GridMobsController < Admin::ApplicationController
 
   versionable GridMob
 
-  before_action :set_mob, only: %i[edit update destroy add_listing remove_listing]
+  before_action :set_mob, only: %i[edit update destroy add_listing remove_listing purge_avatar]
 
   def index
     @mobs = GridMob.includes(:grid_room, :grid_faction).order(:name)
@@ -72,6 +72,12 @@ class Admin::GridMobsController < Admin::ApplicationController
     redirect_to edit_admin_grid_mob_path(@mob)
   end
 
+  def purge_avatar
+    @mob.avatar.purge
+    set_flash_success("Avatar removed.")
+    redirect_to edit_admin_grid_mob_path(@mob)
+  end
+
   private
 
   def set_mob
@@ -97,7 +103,8 @@ class Admin::GridMobsController < Admin::ApplicationController
 
   def mob_params
     permitted = params.require(:grid_mob).permit(
-      :name, :description, :mob_type, :grid_room_id, :grid_faction_id
+      :name, :description, :mob_type, :grid_room_id, :grid_faction_id,
+      :avatar
     )
     # Parse JSON fields
     %w[dialogue_tree vendor_config].each do |json_field|

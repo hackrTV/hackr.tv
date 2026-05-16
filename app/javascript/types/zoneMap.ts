@@ -118,6 +118,7 @@ export interface ShopData {
   vendor_name: string
   shop_type: string
   balance: number
+  avatar_url: string | null
   listings: ShopListing[]
 }
 
@@ -299,6 +300,7 @@ export interface NpcData {
   mob_name: string
   mob_type: string
   faction_name: string | null
+  avatar_url: string | null
   dialogue: NpcDialogueState
   available_missions: NpcAvailableMission[]
   active_missions: NpcActiveMission[]
