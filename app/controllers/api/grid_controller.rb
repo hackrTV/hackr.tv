@@ -2,9 +2,9 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index npc_index stats_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index npc_index rest_pod_index stats_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
-  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index npc_index stats_index]
+  before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index npc_index rest_pod_index stats_index]
   before_action :require_admin_api, only: [:debit]
 
   INVENTORY_TYPE_ORDER = %w[gear consumable tool software module firmware material data rig_component fixture collectible faction].freeze
@@ -352,6 +352,25 @@ class Api::GridController < ApplicationController
           aggregate: s[:aggregate],
           depth: entry[:depth]
         }
+      }
+    }
+  end
+
+  # GET /api/grid/rest_pod - Rest Pod panel data for tactical UI
+  def rest_pod_index
+    room = current_hackr.current_room
+    return render(json: {error: "No current room."}, status: :unprocessable_entity) unless room
+    return render(json: {error: "No Rest Pod here."}, status: :not_found) unless room.room_type == "rest_pod"
+
+    rate = Grid::RestPodService.rate_for(current_hackr)
+
+    render json: {
+      rate: rate,
+      balance: current_hackr.default_cache&.balance || 0,
+      vitals: {
+        health: {current: current_hackr.stat("health"), max: current_hackr.effective_max("health")},
+        energy: {current: current_hackr.stat("energy"), max: current_hackr.effective_max("energy")},
+        psyche: {current: current_hackr.stat("psyche"), max: current_hackr.effective_max("psyche")}
       }
     }
   end
@@ -1032,7 +1051,8 @@ class Api::GridController < ApplicationController
         GridSlipstreamRoute.active.where(origin_room_id: room.id).exists? ||
         current_hackr.in_transit?,
       has_npc: npc_mobs.any?,
-      npc_mobs: npc_mobs
+      npc_mobs: npc_mobs,
+      has_rest_pod: room.room_type == "rest_pod"
     }
   end
 

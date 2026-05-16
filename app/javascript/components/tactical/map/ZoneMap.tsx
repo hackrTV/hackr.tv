@@ -16,6 +16,7 @@ interface ZoneMapProps {
   onVendorPresenceChange?: (hasVendor: boolean) => void
   onTransitPresenceChange?: (hasTransit: boolean) => void
   onNpcPresenceChange?: (hasNpc: boolean, mobs: NpcMobStub[]) => void
+  onRestPodPresenceChange?: (hasRestPod: boolean) => void
 }
 
 interface Tooltip {
@@ -26,7 +27,7 @@ interface Tooltip {
 
 const Z_DIRS = new Set(['up', 'down'])
 
-export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange, onVendorPresenceChange, onTransitPresenceChange, onNpcPresenceChange }) => {
+export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, onNavigate, onBreachEncountersChange, onVendorPresenceChange, onTransitPresenceChange, onNpcPresenceChange, onRestPodPresenceChange }) => {
   const [mapData, setMapData] = useState<ZoneMapData | null>(null)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const [zoom, setZoom] = useState(1.25)
@@ -47,6 +48,7 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
         onVendorPresenceChange?.(data.has_vendor ?? false)
         onTransitPresenceChange?.(data.has_transit ?? false)
         onNpcPresenceChange?.(data.has_npc ?? false, data.npc_mobs ?? [])
+        onRestPodPresenceChange?.(data.has_rest_pod ?? false)
       })
       .catch(err => console.error('Zone map fetch failed:', err))
   // eslint-disable-next-line react-hooks/exhaustive-deps -- callback ref change should not re-trigger fetch; refreshToken controls cadence
