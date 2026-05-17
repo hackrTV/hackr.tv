@@ -97,16 +97,10 @@ module Grid
       item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
       raise ItemNotFound, "You don't have '#{item_name}'" unless item
 
-      # Find matching listing for sell price, or use item.value * SELL_PRICE_RATIO
       listing = mob.grid_shop_listings.joins(:grid_item_definition)
         .where("LOWER(grid_item_definitions.name) = ?", item.name.downcase)
         .first
-      unit_sell_price = if listing
-        listing.sell_price
-      else
-        (item.value * EconomyConfig::SELL_PRICE_RATIO).ceil
-      end
-      unit_sell_price = [unit_sell_price, 1].max # minimum 1 CRED
+      unit_sell_price = sell_price_for(item: item, listing: listing)
 
       cache = hackr.default_cache
       raise AccessDenied, "You need a cache to receive CRED" unless cache
@@ -163,6 +157,19 @@ module Grid
       else
         listing.base_price
       end
+    end
+
+    # Compute what a vendor would pay for an item.
+    # Pass listing: if already fetched, or mob: to look it up.
+    def self.sell_price_for(item:, listing: nil, mob: nil)
+      if listing.nil? && mob
+        listing = mob.grid_shop_listings.joins(:grid_item_definition)
+          .where("LOWER(grid_item_definitions.name) = ?", item.name.downcase)
+          .first
+      end
+
+      price = listing ? listing.sell_price : (item.value * EconomyConfig::SELL_PRICE_RATIO).ceil
+      [price, 1].max
     end
 
     # Restock a vendor's limited-stock listings

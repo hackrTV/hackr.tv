@@ -1236,12 +1236,7 @@ class Api::GridController < ApplicationController
 
   def sell_price_for(item, vendor_listings_by_def)
     listing = vendor_listings_by_def[item.grid_item_definition_id]
-    price = if listing
-      listing.sell_price
-    else
-      (item.value * Grid::EconomyConfig::SELL_PRICE_RATIO).ceil
-    end
-    [price, 1].max
+    Grid::ShopService.sell_price_for(item: item, listing: listing)
   end
 
   def transit_journey_json(journey)
