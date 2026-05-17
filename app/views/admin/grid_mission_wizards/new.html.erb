@@ -1,0 +1,947 @@
+<%= render "admin/shared/combobox" %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1100px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/grid/missions :: NEW MISSION WIZARD</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+          <p class="red-255-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <%# === DRAFT RESUME BANNER === %>
+      <div id="draft-banner" style="display: none; background: #1a1a00; border: 2px solid #fbbf24; padding: 12px 15px; margin-bottom: 20px;">
+        <span style="color: #fbbf24; font-weight: bold;">DRAFT FOUND</span>
+        <span style="color: #ccc; margin-left: 10px;">Unsaved wizard progress detected.</span>
+        <button type="button" id="draft-restore" class="tui-button green-168" style="margin-left: 15px; padding: 4px 12px; font-size: 0.85em;">Restore</button>
+        <button type="button" id="draft-discard" class="tui-button red-168" style="margin-left: 8px; padding: 4px 12px; font-size: 0.85em;">Discard</button>
+      </div>
+
+      <%# === STEP INDICATOR === %>
+      <div id="step-indicator" style="display: flex; gap: 4px; margin-bottom: 25px; font-size: 0.85em;">
+        <div class="step-dot" data-step="1" style="flex: 1; text-align: center; padding: 8px 4px; border: 1px solid #333; cursor: pointer;">1. ARC</div>
+        <div class="step-dot" data-step="2" style="flex: 1; text-align: center; padding: 8px 4px; border: 1px solid #333; cursor: pointer;">2. GIVER</div>
+        <div class="step-dot" data-step="3" style="flex: 1; text-align: center; padding: 8px 4px; border: 1px solid #333; cursor: pointer;">3. ROOM</div>
+        <div class="step-dot" data-step="4" style="flex: 1; text-align: center; padding: 8px 4px; border: 1px solid #333; cursor: pointer;">4. MISSION</div>
+        <div class="step-dot" data-step="5" style="flex: 1; text-align: center; padding: 8px 4px; border: 1px solid #333; cursor: pointer;">5. OBJECTIVES</div>
+        <div class="step-dot" data-step="6" style="flex: 1; text-align: center; padding: 8px 4px; border: 1px solid #333; cursor: pointer;">6. REWARDS</div>
+        <div class="step-dot" data-step="7" style="flex: 1; text-align: center; padding: 8px 4px; border: 1px solid #333; cursor: pointer;">7. REVIEW</div>
+      </div>
+
+      <%= form_with url: admin_grid_mission_wizard_path, method: :post, id: "wizard-form", local: true do |f| %>
+
+        <%# ================================================================ %>
+        <%# STEP 1: ARC                                                      %>
+        <%# ================================================================ %>
+        <div class="wizard-step" id="step-1">
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STEP 1: MISSION ARC (OPTIONAL) ::]</h3>
+          <p style="color: #6b7280; margin-bottom: 15px; font-size: 0.9em;">
+            Group this mission under a storyline arc? Arcs are optional — standalone missions work fine.
+          </p>
+
+          <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <label style="color: #ccc; cursor: pointer;">
+              <input type="radio" name="arc_mode" value="none" checked> No arc
+            </label>
+            <label style="color: #ccc; cursor: pointer;">
+              <input type="radio" name="arc_mode" value="select"> Select existing
+            </label>
+            <label style="color: #ccc; cursor: pointer;">
+              <input type="radio" name="arc_mode" value="create"> Create new
+            </label>
+          </div>
+
+          <%# Select existing arc %>
+          <div id="arc-select-section" style="display: none; background: #0a0a0a; border: 1px solid #333; padding: 15px; margin-bottom: 15px;">
+            <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">SELECT ARC</label>
+            <input type="hidden" name="arc_id" id="arc-select-hidden" value="">
+            <div class="admin-combobox">
+              <input type="text" id="arc-select-input" class="admin-combobox-input" autocomplete="off" placeholder="Type to search arcs...">
+              <div id="arc-select-dropdown" class="admin-combobox-dropdown"></div>
+            </div>
+            <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="arc-select-status"></p>
+          </div>
+
+          <%# Create new arc %>
+          <div id="arc-create-section" style="display: none; background: #0a0a0a; border: 1px solid #333; padding: 15px;">
+            <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+              <div style="flex: 1;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">ARC NAME</label>
+                <input type="text" name="new_arc[name]" id="arc-name" class="tui-input" style="width: 100%; padding: 8px;">
+              </div>
+              <div style="flex: 1;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">ARC SLUG</label>
+                <input type="text" name="new_arc[slug]" id="arc-slug" class="tui-input" style="width: 100%; padding: 8px; font-family: monospace;">
+              </div>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">DESCRIPTION</label>
+              <textarea name="new_arc[description]" id="arc-description" class="tui-input" style="width: 100%; padding: 8px; min-height: 60px;"></textarea>
+            </div>
+            <div style="display: flex; gap: 15px;">
+              <div>
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">POSITION</label>
+                <input type="number" name="new_arc[position]" id="arc-position" class="tui-input" style="width: 80px; padding: 8px;" value="<%= (GridMissionArc.maximum(:position) || 0) + 1 %>" min="0">
+              </div>
+              <div style="padding-top: 24px;">
+                <label style="color: #ccc; cursor: pointer;">
+                  <input type="hidden" name="new_arc[published]" value="0">
+                  <input type="checkbox" name="new_arc[published]" value="1" checked> Published
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%# ================================================================ %>
+        <%# STEP 2: GIVER MOB                                                %>
+        <%# ================================================================ %>
+        <div class="wizard-step" id="step-2" style="display: none;">
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STEP 2: MISSION GIVER NPC ::]</h3>
+          <p style="color: #6b7280; margin-bottom: 15px; font-size: 0.9em;">
+            Who hands out this mission? Select an existing NPC or create a new quest_giver mob.
+          </p>
+
+          <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <label style="color: #ccc; cursor: pointer;">
+              <input type="radio" name="mob_mode" value="select" checked> Select existing
+            </label>
+            <label style="color: #ccc; cursor: pointer;">
+              <input type="radio" name="mob_mode" value="create"> Create new
+            </label>
+          </div>
+
+          <%# Select existing mob %>
+          <div id="mob-select-section" style="background: #0a0a0a; border: 1px solid #333; padding: 15px; margin-bottom: 15px;">
+            <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">SELECT NPC</label>
+            <input type="hidden" name="mob_id" id="mob-select-hidden" value="">
+            <div class="admin-combobox">
+              <input type="text" id="mob-select-input" class="admin-combobox-input" autocomplete="off" placeholder="Type to search NPCs...">
+              <div id="mob-select-dropdown" class="admin-combobox-dropdown"></div>
+            </div>
+            <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="mob-select-status"></p>
+          </div>
+
+          <%# Create new mob %>
+          <div id="mob-create-section" style="display: none; background: #0a0a0a; border: 1px solid #333; padding: 15px;">
+            <p style="color: #34d399; margin-bottom: 12px; font-size: 0.85em;">Type will be set to <strong>quest_giver</strong> automatically.</p>
+            <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+              <div style="flex: 1;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">NPC NAME</label>
+                <input type="text" name="new_mob[name]" id="mob-name" class="tui-input" style="width: 100%; padding: 8px;" placeholder="e.g. AXIOM">
+              </div>
+            </div>
+            <div>
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">DESCRIPTION (OPTIONAL)</label>
+              <textarea name="new_mob[description]" id="mob-description" class="tui-input" style="width: 100%; padding: 8px; min-height: 60px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <%# ================================================================ %>
+        <%# STEP 3: ROOM (conditional on mob_mode=create)                     %>
+        <%# ================================================================ %>
+        <div class="wizard-step" id="step-3" style="display: none;">
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STEP 3: MOB PLACEMENT (ROOM) ::]</h3>
+          <p style="color: #6b7280; margin-bottom: 15px; font-size: 0.9em;">
+            Where does this NPC live? Place them in an existing room or create a new one.
+          </p>
+
+          <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <label style="color: #ccc; cursor: pointer;">
+              <input type="radio" name="room_mode" value="select" checked> Select existing room
+            </label>
+            <label style="color: #ccc; cursor: pointer;">
+              <input type="radio" name="room_mode" value="create"> Create new room
+            </label>
+          </div>
+
+          <%# Select existing room %>
+          <div id="room-select-section" style="background: #0a0a0a; border: 1px solid #333; padding: 15px; margin-bottom: 15px;">
+            <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">SELECT ROOM</label>
+            <input type="hidden" name="mob_room_id" id="room-select-hidden" value="">
+            <div class="admin-combobox">
+              <input type="text" id="room-select-input" class="admin-combobox-input" autocomplete="off" placeholder="Type to search rooms...">
+              <div id="room-select-dropdown" class="admin-combobox-dropdown"></div>
+            </div>
+            <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="room-select-status"></p>
+          </div>
+
+          <%# Create new room %>
+          <div id="room-create-section" style="display: none; background: #0a0a0a; border: 1px solid #333; padding: 15px;">
+            <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+              <div style="flex: 1;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">ROOM NAME</label>
+                <input type="text" name="new_room[name]" id="room-name" class="tui-input" style="width: 100%; padding: 8px;">
+              </div>
+              <div style="flex: 1;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">SLUG</label>
+                <input type="text" name="new_room[slug]" id="room-slug" class="tui-input" style="width: 100%; padding: 8px; font-family: monospace;">
+              </div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+              <div style="flex: 1;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">ZONE</label>
+                <input type="hidden" name="new_room[grid_zone_id]" id="zone-select-hidden" value="">
+                <div class="admin-combobox">
+                  <input type="text" id="zone-select-input" class="admin-combobox-input" autocomplete="off" placeholder="Type to search zones...">
+                  <div id="zone-select-dropdown" class="admin-combobox-dropdown"></div>
+                </div>
+                <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="zone-select-status"></p>
+              </div>
+              <div style="flex: 1;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">ROOM TYPE</label>
+                <select name="new_room[room_type]" id="room-type" class="tui-input" style="width: 100%; padding: 8px;">
+                  <option value="standard" selected>Standard</option>
+                  <option value="hub">Hub</option>
+                  <option value="faction_base">Faction Base</option>
+                  <option value="govcorp">GovCorp</option>
+                  <option value="special">Special</option>
+                  <option value="safe_zone">Safe Zone</option>
+                  <option value="transit">Transit</option>
+                  <option value="shop">Shop</option>
+                  <option value="danger_zone">Danger Zone</option>
+                </select>
+              </div>
+              <div style="width: 120px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">MIN CL</label>
+                <input type="number" name="new_room[min_clearance]" id="room-min-cl" class="tui-input" style="width: 100%; padding: 8px;" value="0" min="0">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%# ================================================================ %>
+        <%# STEP 4: MISSION DEFINITION                                        %>
+        <%# ================================================================ %>
+        <div class="wizard-step" id="step-4" style="display: none;">
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STEP 4: MISSION DEFINITION ::]</h3>
+
+          <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">SLUG</label>
+              <input type="text" name="mission[slug]" id="mission-slug" class="tui-input" style="width: 100%; padding: 8px; font-family: monospace;">
+            </div>
+            <div style="flex: 2;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">NAME</label>
+              <input type="text" name="mission[name]" id="mission-name" class="tui-input" style="width: 100%; padding: 8px;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">DESCRIPTION</label>
+            <textarea name="mission[description]" id="mission-description" class="tui-input" style="width: 100%; padding: 8px; min-height: 70px;"></textarea>
+          </div>
+
+          <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">MIN CLEARANCE</label>
+              <input type="number" name="mission[min_clearance]" id="mission-min-cl" class="tui-input" style="width: 100%; padding: 8px;" value="0" min="0">
+            </div>
+            <div style="flex: 1;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">POSITION</label>
+              <input type="number" name="mission[position]" id="mission-position" class="tui-input" style="width: 100%; padding: 8px;" value="<%= (GridMission.maximum(:position) || 0) + 1 %>" min="0">
+            </div>
+            <div style="flex: 1; padding-top: 24px;">
+              <label style="color: #ccc; cursor: pointer;">
+                <input type="hidden" name="mission[repeatable]" value="0">
+                <input type="checkbox" name="mission[repeatable]" id="mission-repeatable" value="1"> Repeatable
+              </label>
+            </div>
+            <div style="flex: 1; padding-top: 24px;">
+              <label style="color: #ccc; cursor: pointer;">
+                <input type="hidden" name="mission[published]" value="0">
+                <input type="checkbox" name="mission[published]" id="mission-published" value="1" checked> Published
+              </label>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">PREREQUISITE MISSION</label>
+              <input type="hidden" name="mission[prereq_mission_id]" id="prereq-select-hidden" value="">
+              <div class="admin-combobox">
+                <input type="text" id="prereq-select-input" class="admin-combobox-input" autocomplete="off" placeholder="Type to search (optional)...">
+                <div id="prereq-select-dropdown" class="admin-combobox-dropdown"></div>
+              </div>
+              <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="prereq-select-status"></p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">MIN REP FACTION</label>
+              <select name="mission[min_rep_faction_id]" id="mission-rep-faction" class="tui-input" style="width: 100%; padding: 8px;">
+                <option value="">-- None --</option>
+                <% @factions.each do |faction| %>
+                  <option value="<%= faction.id %>"><%= faction.name %></option>
+                <% end %>
+              </select>
+            </div>
+            <div style="flex: 1;">
+              <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">MIN REP VALUE</label>
+              <input type="number" name="mission[min_rep_value]" id="mission-rep-value" class="tui-input" style="width: 100%; padding: 8px;" value="0">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">DIALOGUE PATH GATE</label>
+            <input type="text" name="mission[dialogue_path_json]" id="mission-dialogue-path" class="tui-input" style="width: 100%; padding: 8px; font-family: monospace;" placeholder='["topic", "subtopic"] — blank for no gate'>
+            <small style="color: #888;">JSON array of topic keys. Mission only visible after hackr navigates to this dialogue depth.</small>
+          </div>
+        </div>
+
+        <%# ================================================================ %>
+        <%# STEP 5: OBJECTIVES                                                %>
+        <%# ================================================================ %>
+        <div class="wizard-step" id="step-5" style="display: none;">
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STEP 5: OBJECTIVES ::]</h3>
+          <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
+            Types: <code><%= GridMission::OBJECTIVE_TYPES.join(", ") %></code>
+          </p>
+          <ul style="color: #6b7280; font-size: 0.85em; margin: 0 0 10px 20px; line-height: 1.6;">
+            <li><code>visit_room</code> — room slug</li>
+            <li><code>talk_npc</code> — mob name (case-insensitive)</li>
+            <li><code>collect_item</code>, <code>buy_item</code>, <code>use_item</code>, <code>salvage_item</code>, <code>fabricate_item</code> — item name</li>
+            <li><code>deliver_item</code> — item name (recipient = giver NPC)</li>
+            <li><code>complete_breach</code> — breach template slug</li>
+            <li><code>reach_rep</code> — faction slug</li>
+          </ul>
+
+          <table class="tui-table" style="width: 100%; margin-bottom: 10px;">
+            <thead>
+              <tr>
+                <th style="text-align: left; width: 60px;">Pos</th>
+                <th style="text-align: left; width: 170px;">Type</th>
+                <th style="text-align: left;">Label</th>
+                <th style="text-align: left; width: 180px;">Target Slug</th>
+                <th style="text-align: center; width: 70px;">Count</th>
+                <th style="text-align: center; width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="objectives-tbody"></tbody>
+          </table>
+          <button type="button" id="add-objective-btn" class="tui-button green-168" style="padding: 6px 14px; font-size: 0.85em;">+ Add Objective</button>
+        </div>
+
+        <%# ================================================================ %>
+        <%# STEP 6: REWARDS                                                   %>
+        <%# ================================================================ %>
+        <div class="wizard-step" id="step-6" style="display: none;">
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STEP 6: REWARDS ::]</h3>
+          <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
+            Types: <code><%= GridMission::REWARD_TYPES.join(", ") %></code>.
+            XP/CRED use amount. Item grants use target_slug (item def slug) + quantity.
+          </p>
+
+          <table class="tui-table" style="width: 100%; margin-bottom: 10px;">
+            <thead>
+              <tr>
+                <th style="text-align: left; width: 60px;">Pos</th>
+                <th style="text-align: left; width: 170px;">Type</th>
+                <th style="text-align: center; width: 90px;">Amount</th>
+                <th style="text-align: left;">Target Slug</th>
+                <th style="text-align: center; width: 70px;">Qty</th>
+                <th style="text-align: center; width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="rewards-tbody"></tbody>
+          </table>
+          <button type="button" id="add-reward-btn" class="tui-button green-168" style="padding: 6px 14px; font-size: 0.85em;">+ Add Reward</button>
+        </div>
+
+        <%# ================================================================ %>
+        <%# STEP 7: REVIEW                                                    %>
+        <%# ================================================================ %>
+        <div class="wizard-step" id="step-7" style="display: none;">
+          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STEP 7: REVIEW & CREATE ::]</h3>
+          <div id="review-content" style="background: #0a0a0a; border: 1px solid #333; padding: 20px; font-size: 0.9em; line-height: 1.8;"></div>
+        </div>
+
+      <%# === NAV BUTTONS === %>
+      <div style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <button type="button" id="btn-back" class="tui-button" style="padding: 10px 20px; display: none;">BACK</button>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <%= link_to "Cancel", admin_grid_missions_path, class: "tui-button", style: "padding: 10px 20px;" %>
+          <button type="button" id="btn-next" class="tui-button green-168" style="padding: 10px 20px; font-weight: bold;">NEXT</button>
+          <button type="submit" id="btn-submit" class="tui-button green-168" style="padding: 10px 20px; font-weight: bold; display: none;">CREATE MISSION</button>
+        </div>
+      </div>
+
+      <% end %>
+    </div>
+  </fieldset>
+</div>
+
+<style>
+  .step-dot { background: #111; color: #555; transition: all 0.2s; }
+  .step-dot.active { background: #1a3a2a; color: #34d399; border-color: #34d399 !important; font-weight: bold; }
+  .step-dot.completed { background: #0a1a0a; color: #22c55e; border-color: #22c55e !important; }
+  .step-dot.skipped { background: #1a1a0a; color: #666; border-color: #444 !important; font-style: italic; }
+  .wizard-step { animation: fadeIn 0.15s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+
+<script nonce="<%= content_security_policy_nonce %>">
+(function() {
+  var STORAGE_KEY = 'mission_wizard_draft';
+  var currentStep = 1;
+  var totalSteps = 7;
+  var objectiveIdx = 0;
+  var rewardIdx = 0;
+
+  // === DATA for comboboxes ===
+  var arcItems = <%= raw @arcs.map { |a| { id: a.id, name: a.name, slug: a.slug } }.to_json %>;
+  var mobItems = <%= raw @mobs.map { |m| { id: m.id, name: m.name, room_name: m.grid_room&.name || "\u2014", mob_type: m.mob_type } }.to_json %>;
+  var roomItems = <%= raw @rooms.map { |r| { id: r.id, name: r.name, zone: r.grid_zone.name, region: r.grid_zone.grid_region.name } }.to_json %>;
+  var zoneItems = <%= raw @zones.map { |z| { id: z.id, name: z.name, region_name: z.grid_region.name } }.to_json %>;
+  var prereqItems = <%= raw @missions_for_prereq.map { |m| { id: m.id, name: m.name, slug: m.slug, arc_name: m.grid_mission_arc&.name || "\u2014" } }.to_json %>;
+  var objectiveTypes = <%= raw GridMission::OBJECTIVE_TYPES.to_json %>;
+  var rewardTypes = <%= raw GridMission::REWARD_TYPES.to_json %>;
+
+  // === HTML ESCAPE HELPER (must be defined early — used by row builders) ===
+  function esc(s) {
+    if (!s) return '';
+    var d = document.createElement('span');
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+
+  // === STEP NAVIGATION ===
+  function showStep(n) {
+    // If step 3 should be skipped (mob_mode != create), handle it
+    if (n === 3 && getRadio('mob_mode') !== 'create') {
+      n = (currentStep < 3) ? 4 : 2;
+    }
+    if (n < 1) n = 1;
+    if (n > totalSteps) n = totalSteps;
+    currentStep = n;
+
+    document.querySelectorAll('.wizard-step').forEach(function(el) { el.style.display = 'none'; });
+    var target = document.getElementById('step-' + n);
+    if (target) target.style.display = 'block';
+
+    // Update indicator
+    document.querySelectorAll('.step-dot').forEach(function(dot) {
+      var s = parseInt(dot.dataset.step, 10);
+      dot.className = 'step-dot';
+      if (s === n) dot.classList.add('active');
+      else if (s < n) dot.classList.add('completed');
+      // Mark step 3 as skipped if mob_mode != create
+      if (s === 3 && getRadio('mob_mode') !== 'create') dot.classList.add('skipped');
+    });
+
+    // Nav buttons
+    document.getElementById('btn-back').style.display = (n > 1) ? 'inline-block' : 'none';
+    document.getElementById('btn-next').style.display = (n < totalSteps) ? 'inline-block' : 'none';
+    document.getElementById('btn-submit').style.display = (n === totalSteps) ? 'inline-block' : 'none';
+
+    // Build review on step 7
+    if (n === 7) buildReview();
+
+    saveDraft();
+  }
+
+  function getRadio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  function setRadio(name, value) {
+    var el = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
+    if (el) { el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); }
+  }
+
+  // Next/Back
+  document.getElementById('btn-next').addEventListener('click', function() {
+    if (!validateStep(currentStep)) return;
+    var next = currentStep + 1;
+    // Skip step 3 if mob_mode != create
+    if (next === 3 && getRadio('mob_mode') !== 'create') next = 4;
+    showStep(next);
+  });
+
+  document.getElementById('btn-back').addEventListener('click', function() {
+    var prev = currentStep - 1;
+    if (prev === 3 && getRadio('mob_mode') !== 'create') prev = 2;
+    showStep(prev);
+  });
+
+  // Click step indicators (only allow going to completed steps)
+  document.querySelectorAll('.step-dot').forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      var target = parseInt(this.dataset.step, 10);
+      if (target < currentStep) showStep(target);
+    });
+  });
+
+  // === VALIDATION ===
+  function validateStep(step) {
+    switch (step) {
+      case 1:
+        if (getRadio('arc_mode') === 'select' && !document.getElementById('arc-select-hidden').value) {
+          flashError('Select an arc or switch to "No arc" / "Create new".'); return false;
+        }
+        if (getRadio('arc_mode') === 'create' && !document.getElementById('arc-name').value.trim()) {
+          flashError('Arc name is required.'); return false;
+        }
+        if (getRadio('arc_mode') === 'create' && !document.getElementById('arc-slug').value.trim()) {
+          flashError('Arc slug is required.'); return false;
+        }
+        return true;
+      case 2:
+        if (getRadio('mob_mode') === 'select' && !document.getElementById('mob-select-hidden').value) {
+          flashError('Select a giver NPC.'); return false;
+        }
+        if (getRadio('mob_mode') === 'create' && !document.getElementById('mob-name').value.trim()) {
+          flashError('NPC name is required.'); return false;
+        }
+        return true;
+      case 3:
+        if (getRadio('room_mode') === 'select' && !document.getElementById('room-select-hidden').value) {
+          flashError('Select a room for mob placement.'); return false;
+        }
+        if (getRadio('room_mode') === 'create') {
+          if (!document.getElementById('room-name').value.trim()) { flashError('Room name is required.'); return false; }
+          if (!document.getElementById('room-slug').value.trim()) { flashError('Room slug is required.'); return false; }
+          if (!document.getElementById('zone-select-hidden').value) { flashError('Zone is required for new room.'); return false; }
+        }
+        return true;
+      case 4:
+        if (!document.getElementById('mission-slug').value.trim()) { flashError('Mission slug is required.'); return false; }
+        if (!document.getElementById('mission-name').value.trim()) { flashError('Mission name is required.'); return false; }
+        return true;
+      case 5:
+        return true;
+      case 6:
+        return true;
+      default:
+        return true;
+    }
+  }
+
+  var flashTimer;
+  function flashError(msg) {
+    var existing = document.getElementById('wizard-flash');
+    if (existing) existing.remove();
+    var div = document.createElement('div');
+    div.id = 'wizard-flash';
+    div.style.cssText = 'background: #330000; border: 2px solid #ff0000; padding: 10px 15px; margin-bottom: 15px; color: #f87171;';
+    div.textContent = msg;
+    var step = document.getElementById('step-' + currentStep);
+    step.insertBefore(div, step.firstChild.nextSibling);
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(function() { if (div.parentNode) div.remove(); }, 4000);
+  }
+
+  // === RADIO TOGGLE VISIBILITY ===
+  function setupRadioToggle(radioName, sections) {
+    document.querySelectorAll('input[name="' + radioName + '"]').forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        Object.keys(sections).forEach(function(val) {
+          var el = document.getElementById(sections[val]);
+          if (el) el.style.display = (radio.value === val && radio.checked) ? 'block' : 'none';
+        });
+        saveDraft();
+      });
+    });
+  }
+
+  setupRadioToggle('arc_mode', { select: 'arc-select-section', create: 'arc-create-section' });
+  setupRadioToggle('mob_mode', { select: 'mob-select-section', create: 'mob-create-section' });
+  setupRadioToggle('room_mode', { select: 'room-select-section', create: 'room-create-section' });
+
+  // === AUTO-SLUG for arc and room ===
+  function autoSlug(nameId, slugId) {
+    var nameEl = document.getElementById(nameId);
+    var slugEl = document.getElementById(slugId);
+    var manual = false;
+    nameEl.addEventListener('input', function() {
+      if (!manual) slugEl.value = nameEl.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    });
+    slugEl.addEventListener('input', function() { manual = true; });
+  }
+  autoSlug('arc-name', 'arc-slug');
+  autoSlug('room-name', 'room-slug');
+  autoSlug('mission-name', 'mission-slug');
+
+  // === OBJECTIVES DYNAMIC ROWS ===
+  var objTbody = document.getElementById('objectives-tbody');
+
+  function addObjectiveRow(data) {
+    data = data || {};
+    var idx = objectiveIdx++;
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><input type="number" name="mission[grid_mission_objectives_attributes][' + idx + '][position]" class="tui-input" style="width:50px;padding:4px;" value="' + esc(String(data.position || (idx + 1))) + '"></td>' +
+      '<td><select name="mission[grid_mission_objectives_attributes][' + idx + '][objective_type]" class="tui-input" style="width:100%;padding:4px;">' +
+        '<option value="">--</option>' + objectiveTypes.map(function(t) { return '<option value="' + t + '"' + (data.objective_type === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') +
+      '</select></td>' +
+      '<td><input type="text" name="mission[grid_mission_objectives_attributes][' + idx + '][label]" class="tui-input" style="width:100%;padding:4px;" value="' + esc(data.label || '') + '"></td>' +
+      '<td><input type="text" name="mission[grid_mission_objectives_attributes][' + idx + '][target_slug]" class="tui-input" style="width:100%;padding:4px;font-family:monospace;" value="' + esc(data.target_slug || '') + '"></td>' +
+      '<td style="text-align:center;"><input type="number" name="mission[grid_mission_objectives_attributes][' + idx + '][target_count]" class="tui-input" style="width:60px;padding:4px;text-align:center;" value="' + esc(String(data.target_count || 1)) + '" min="1"></td>' +
+      '<td style="text-align:center;"><button type="button" class="tui-button red-168" style="padding:2px 6px;font-size:0.8em;" onclick="this.closest(\'tr\').remove();">\u00d7</button></td>';
+    objTbody.appendChild(tr);
+  }
+
+  document.getElementById('add-objective-btn').addEventListener('click', function() { addObjectiveRow(); });
+  // Start with one row
+  addObjectiveRow({ position: 1 });
+
+  // === REWARDS DYNAMIC ROWS ===
+  var rewTbody = document.getElementById('rewards-tbody');
+
+  function addRewardRow(data) {
+    data = data || {};
+    var idx = rewardIdx++;
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><input type="number" name="mission[grid_mission_rewards_attributes][' + idx + '][position]" class="tui-input" style="width:50px;padding:4px;" value="' + esc(String(data.position || (idx + 1))) + '"></td>' +
+      '<td><select name="mission[grid_mission_rewards_attributes][' + idx + '][reward_type]" class="tui-input" style="width:100%;padding:4px;">' +
+        '<option value="">--</option>' + rewardTypes.map(function(t) { return '<option value="' + t + '"' + (data.reward_type === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') +
+      '</select></td>' +
+      '<td style="text-align:center;"><input type="number" name="mission[grid_mission_rewards_attributes][' + idx + '][amount]" class="tui-input" style="width:80px;padding:4px;text-align:right;" value="' + esc(String(data.amount || 0)) + '"></td>' +
+      '<td><input type="text" name="mission[grid_mission_rewards_attributes][' + idx + '][target_slug]" class="tui-input" style="width:100%;padding:4px;font-family:monospace;" value="' + esc(data.target_slug || '') + '"></td>' +
+      '<td style="text-align:center;"><input type="number" name="mission[grid_mission_rewards_attributes][' + idx + '][quantity]" class="tui-input" style="width:60px;padding:4px;text-align:center;" value="' + esc(String(data.quantity || 1)) + '" min="1"></td>' +
+      '<td style="text-align:center;"><button type="button" class="tui-button red-168" style="padding:2px 6px;font-size:0.8em;" onclick="this.closest(\'tr\').remove();">\u00d7</button></td>';
+    rewTbody.appendChild(tr);
+  }
+
+  document.getElementById('add-reward-btn').addEventListener('click', function() { addRewardRow(); });
+  // Start with one row
+  addRewardRow({ position: 1, reward_type: 'xp' });
+
+  // === REVIEW BUILDER ===
+  function buildReview() {
+    var html = '';
+
+    // Arc
+    var arcMode = getRadio('arc_mode');
+    html += '<div style="margin-bottom: 12px;"><strong style="color: #a78bfa;">ARC:</strong> ';
+    if (arcMode === 'none') html += '<span style="color: #666;">None</span>';
+    else if (arcMode === 'select') {
+      var arcId = document.getElementById('arc-select-hidden').value;
+      var arc = arcItems.find(function(a) { return String(a.id) === arcId; });
+      html += arc ? esc(arc.name) : '<span style="color:#f87171;">NOT SELECTED</span>';
+    } else {
+      html += '<span style="color: #34d399;">[NEW]</span> ' + esc(document.getElementById('arc-name').value);
+    }
+    html += '</div>';
+
+    // Giver
+    var mobMode = getRadio('mob_mode');
+    html += '<div style="margin-bottom: 12px;"><strong style="color: #c084fc;">GIVER NPC:</strong> ';
+    if (mobMode === 'select') {
+      var mobId = document.getElementById('mob-select-hidden').value;
+      var mob = mobItems.find(function(m) { return String(m.id) === mobId; });
+      html += mob ? esc(mob.name) + ' <span style="color:#666;">@ ' + esc(mob.room_name) + '</span>' : '<span style="color:#f87171;">NOT SELECTED</span>';
+    } else {
+      html += '<span style="color: #34d399;">[NEW]</span> ' + esc(document.getElementById('mob-name').value);
+      // Room
+      var roomMode = getRadio('room_mode');
+      html += '<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #fbbf24;">ROOM:</strong> ';
+      if (roomMode === 'select') {
+        var roomId = document.getElementById('room-select-hidden').value;
+        var room = roomItems.find(function(r) { return String(r.id) === roomId; });
+        html += room ? esc(room.zone) + ' / ' + esc(room.name) : '<span style="color:#f87171;">NOT SELECTED</span>';
+      } else {
+        html += '<span style="color: #34d399;">[NEW]</span> ' + esc(document.getElementById('room-name').value);
+      }
+    }
+    html += '</div>';
+
+    // Mission
+    html += '<div style="margin-bottom: 12px; border-top: 1px solid #333; padding-top: 12px;">';
+    html += '<strong style="color: #22d3ee;">MISSION:</strong> ' + esc(document.getElementById('mission-name').value);
+    html += ' <span style="color:#666; font-family: monospace;">(' + esc(document.getElementById('mission-slug').value) + ')</span>';
+    var desc = document.getElementById('mission-description').value;
+    if (desc) html += '<br><span style="color: #9ca3af; font-size: 0.9em;">' + esc(desc).substring(0, 120) + '</span>';
+    html += '<br><span style="color: #fbbf24;">CL' + esc(document.getElementById('mission-min-cl').value || '0') + '</span>';
+    if (document.getElementById('mission-repeatable').checked) html += ' &bull; <span style="color: #34d399;">Repeatable</span>';
+    if (document.getElementById('mission-published').checked) html += ' &bull; <span style="color: #34d399;">Published</span>';
+    else html += ' &bull; <span style="color: #f87171;">Unpublished</span>';
+    html += '</div>';
+
+    // Objectives
+    var objRows = objTbody.querySelectorAll('tr');
+    html += '<div style="margin-bottom: 12px; border-top: 1px solid #333; padding-top: 12px;">';
+    html += '<strong style="color: #22d3ee;">OBJECTIVES (' + objRows.length + '):</strong><br>';
+    objRows.forEach(function(tr) {
+      var inputs = tr.querySelectorAll('input, select');
+      var type = inputs[1].value || '?';
+      var label = inputs[2].value || '(no label)';
+      var slug = inputs[3].value;
+      var count = inputs[4].value;
+      html += '&nbsp;&nbsp;' + esc(type) + ': ' + esc(label);
+      if (slug) html += ' <span style="color:#666;">[' + esc(slug) + ']</span>';
+      if (parseInt(count) > 1) html += ' x' + esc(count);
+      html += '<br>';
+    });
+    html += '</div>';
+
+    // Rewards
+    var rewRows = rewTbody.querySelectorAll('tr');
+    html += '<div style="border-top: 1px solid #333; padding-top: 12px;">';
+    html += '<strong style="color: #22d3ee;">REWARDS (' + rewRows.length + '):</strong><br>';
+    rewRows.forEach(function(tr) {
+      var inputs = tr.querySelectorAll('input, select');
+      var type = inputs[1].value || '?';
+      var amount = inputs[2].value;
+      var slug = inputs[3].value;
+      var qty = inputs[4].value;
+      html += '&nbsp;&nbsp;' + esc(type);
+      if (parseInt(amount)) html += ' ' + esc(amount);
+      if (slug) html += ' <span style="color:#666;">[' + esc(slug) + ']</span>';
+      if (parseInt(qty) > 1) html += ' x' + esc(qty);
+      html += '<br>';
+    });
+    html += '</div>';
+
+    document.getElementById('review-content').innerHTML = html;
+  }
+
+  // === LOCALSTORAGE DRAFT ===
+  function collectState() {
+    return {
+      step: currentStep,
+      arc_mode: getRadio('arc_mode'),
+      arc_id: document.getElementById('arc-select-hidden').value,
+      arc_name: document.getElementById('arc-name').value,
+      arc_slug: document.getElementById('arc-slug').value,
+      arc_description: document.getElementById('arc-description').value,
+      arc_position: document.getElementById('arc-position').value,
+      mob_mode: getRadio('mob_mode'),
+      mob_id: document.getElementById('mob-select-hidden').value,
+      mob_name: document.getElementById('mob-name').value,
+      mob_description: document.getElementById('mob-description').value,
+      room_mode: getRadio('room_mode'),
+      room_id: document.getElementById('room-select-hidden').value,
+      room_name: document.getElementById('room-name').value,
+      room_slug: document.getElementById('room-slug').value,
+      zone_id: document.getElementById('zone-select-hidden').value,
+      room_type: document.getElementById('room-type').value,
+      room_min_cl: document.getElementById('room-min-cl').value,
+      mission_slug: document.getElementById('mission-slug').value,
+      mission_name: document.getElementById('mission-name').value,
+      mission_description: document.getElementById('mission-description').value,
+      mission_min_cl: document.getElementById('mission-min-cl').value,
+      mission_position: document.getElementById('mission-position').value,
+      mission_repeatable: document.getElementById('mission-repeatable').checked,
+      mission_published: document.getElementById('mission-published').checked,
+      prereq_id: document.getElementById('prereq-select-hidden').value,
+      mission_rep_faction: document.getElementById('mission-rep-faction').value,
+      mission_rep_value: document.getElementById('mission-rep-value').value,
+      mission_dialogue_path: document.getElementById('mission-dialogue-path').value,
+      objectives: collectTableRows(objTbody),
+      rewards: collectTableRows(rewTbody)
+    };
+  }
+
+  function collectTableRows(tbody) {
+    var rows = [];
+    tbody.querySelectorAll('tr').forEach(function(tr) {
+      var inputs = tr.querySelectorAll('input, select');
+      var vals = [];
+      inputs.forEach(function(inp) { vals.push(inp.value); });
+      rows.push(vals);
+    });
+    return rows;
+  }
+
+  function saveDraft() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(collectState())); } catch(e) {}
+  }
+
+  function restoreDraft(state) {
+    setRadio('arc_mode', state.arc_mode || 'none');
+    document.getElementById('arc-select-hidden').value = state.arc_id || '';
+    document.getElementById('arc-name').value = state.arc_name || '';
+    document.getElementById('arc-slug').value = state.arc_slug || '';
+    document.getElementById('arc-description').value = state.arc_description || '';
+    document.getElementById('arc-position').value = state.arc_position || '';
+
+    setRadio('mob_mode', state.mob_mode || 'select');
+    document.getElementById('mob-select-hidden').value = state.mob_id || '';
+    document.getElementById('mob-name').value = state.mob_name || '';
+    document.getElementById('mob-description').value = state.mob_description || '';
+
+    setRadio('room_mode', state.room_mode || 'select');
+    document.getElementById('room-select-hidden').value = state.room_id || '';
+    document.getElementById('room-name').value = state.room_name || '';
+    document.getElementById('room-slug').value = state.room_slug || '';
+    document.getElementById('zone-select-hidden').value = state.zone_id || '';
+    document.getElementById('room-type').value = state.room_type || 'standard';
+    document.getElementById('room-min-cl').value = state.room_min_cl || '0';
+
+    document.getElementById('mission-slug').value = state.mission_slug || '';
+    document.getElementById('mission-name').value = state.mission_name || '';
+    document.getElementById('mission-description').value = state.mission_description || '';
+    document.getElementById('mission-min-cl').value = state.mission_min_cl || '0';
+    document.getElementById('mission-position').value = state.mission_position || '';
+    document.getElementById('mission-repeatable').checked = !!state.mission_repeatable;
+    document.getElementById('mission-published').checked = state.mission_published !== false;
+    document.getElementById('prereq-select-hidden').value = state.prereq_id || '';
+    document.getElementById('mission-rep-faction').value = state.mission_rep_faction || '';
+    document.getElementById('mission-rep-value').value = state.mission_rep_value || '0';
+    document.getElementById('mission-dialogue-path').value = state.mission_dialogue_path || '';
+
+    // Restore combobox display text
+    restoreComboboxDisplay('arc-select', arcItems, state.arc_id, function(a) { return a.name; });
+    restoreComboboxDisplay('mob-select', mobItems, state.mob_id, function(m) { return m.name + ' @ ' + m.room_name; });
+    restoreComboboxDisplay('room-select', roomItems, state.room_id, function(r) { return r.zone + ' / ' + r.name; });
+    restoreComboboxDisplay('prereq-select', prereqItems, state.prereq_id, function(m) { return m.name; });
+
+    // Restore zone combobox
+    if (state.zone_id) {
+      var zone = zoneItems.find(function(z) { return String(z.id) === state.zone_id; });
+      if (zone) {
+        document.getElementById('zone-select-input').value = zone.region_name + ' / ' + zone.name;
+        document.getElementById('zone-select-input').classList.add('selected');
+      }
+    }
+
+    // Restore objectives
+    objTbody.innerHTML = '';
+    objectiveIdx = 0;
+    if (state.objectives && state.objectives.length) {
+      state.objectives.forEach(function(vals) {
+        addObjectiveRow({ position: vals[0], objective_type: vals[1], label: vals[2], target_slug: vals[3], target_count: vals[4] });
+      });
+    } else {
+      addObjectiveRow({ position: 1 });
+    }
+
+    // Restore rewards
+    rewTbody.innerHTML = '';
+    rewardIdx = 0;
+    if (state.rewards && state.rewards.length) {
+      state.rewards.forEach(function(vals) {
+        addRewardRow({ position: vals[0], reward_type: vals[1], amount: vals[2], target_slug: vals[3], quantity: vals[4] });
+      });
+    } else {
+      addRewardRow({ position: 1, reward_type: 'xp' });
+    }
+
+    // Navigate to saved step
+    showStep(state.step || 1);
+  }
+
+  function restoreComboboxDisplay(prefix, items, savedId, labelFn) {
+    if (!savedId) return;
+    var item = items.find(function(i) { return String(i.id) === savedId; });
+    if (item) {
+      var input = document.getElementById(prefix + '-input');
+      input.value = labelFn(item);
+      input.classList.add('selected');
+    }
+  }
+
+  // Check for draft on load
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      var parsed = JSON.parse(saved);
+      // Only show banner if there's meaningful data
+      if (parsed.mission_name || parsed.mob_name || parsed.arc_name) {
+        document.getElementById('draft-banner').style.display = 'block';
+        document.getElementById('draft-restore').addEventListener('click', function() {
+          restoreDraft(parsed);
+          document.getElementById('draft-banner').style.display = 'none';
+        });
+        document.getElementById('draft-discard').addEventListener('click', function() {
+          localStorage.removeItem(STORAGE_KEY);
+          document.getElementById('draft-banner').style.display = 'none';
+        });
+      }
+    }
+  } catch(e) {}
+
+  // Clear draft on successful submit
+  document.getElementById('wizard-form').addEventListener('submit', function() {
+    localStorage.removeItem(STORAGE_KEY);
+  });
+
+  // === COMBOBOX INITIALIZATION ===
+  AdminCombobox.init({
+    inputId: 'arc-select-input',
+    hiddenId: 'arc-select-hidden',
+    dropdownId: 'arc-select-dropdown',
+    statusId: 'arc-select-status',
+    items: arcItems,
+    getSearchText: function(a) { return (a.name + ' ' + a.slug).toLowerCase(); },
+    getGroupKey: function() { return 'Arcs'; },
+    renderOption: function(a, e) { return '<span class="cb-name">' + e(a.name) + '</span> <span class="cb-meta">' + e(a.slug) + '</span>'; },
+    getId: function(a) { return String(a.id); },
+    getLabel: function(a) { return a.name; },
+    emptyText: 'No arcs match',
+    selectedText: 'Arc selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'mob-select-input',
+    hiddenId: 'mob-select-hidden',
+    dropdownId: 'mob-select-dropdown',
+    statusId: 'mob-select-status',
+    items: mobItems,
+    getSearchText: function(m) { return (m.name + ' ' + m.room_name + ' ' + m.mob_type).toLowerCase(); },
+    getGroupKey: function(m) { return m.mob_type; },
+    renderOption: function(m, e) { return '<span class="cb-name">' + e(m.name) + '</span> <span class="cb-meta">@ ' + e(m.room_name) + '</span>'; },
+    getId: function(m) { return String(m.id); },
+    getLabel: function(m) { return m.name + ' @ ' + m.room_name; },
+    emptyText: 'No NPCs match',
+    selectedText: 'NPC selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'room-select-input',
+    hiddenId: 'room-select-hidden',
+    dropdownId: 'room-select-dropdown',
+    statusId: 'room-select-status',
+    items: roomItems,
+    getSearchText: function(r) { return (r.name + ' ' + r.zone + ' ' + r.region).toLowerCase(); },
+    getGroupKey: function(r) { return r.region + ' / ' + r.zone; },
+    renderOption: function(r, e) { return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone) + '</span>'; },
+    getId: function(r) { return String(r.id); },
+    getLabel: function(r) { return r.zone + ' / ' + r.name; },
+    emptyText: 'No rooms match',
+    selectedText: 'Room selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'zone-select-input',
+    hiddenId: 'zone-select-hidden',
+    dropdownId: 'zone-select-dropdown',
+    statusId: 'zone-select-status',
+    items: zoneItems,
+    getSearchText: function(z) { return (z.name + ' ' + z.region_name).toLowerCase(); },
+    getGroupKey: function(z) { return z.region_name; },
+    renderOption: function(z, e) { return '<span class="cb-name">' + e(z.name) + '</span> <span class="cb-meta">' + e(z.region_name) + '</span>'; },
+    getId: function(z) { return String(z.id); },
+    getLabel: function(z) { return z.region_name + ' / ' + z.name; },
+    emptyText: 'No zones match',
+    selectedText: 'Zone selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'prereq-select-input',
+    hiddenId: 'prereq-select-hidden',
+    dropdownId: 'prereq-select-dropdown',
+    statusId: 'prereq-select-status',
+    items: prereqItems,
+    getSearchText: function(m) { return (m.name + ' ' + m.slug + ' ' + m.arc_name).toLowerCase(); },
+    getGroupKey: function(m) { return m.arc_name; },
+    renderOption: function(m, e) { return '<span class="cb-name">' + e(m.name) + '</span> <span class="cb-meta">' + e(m.slug) + '</span>'; },
+    getId: function(m) { return String(m.id); },
+    getLabel: function(m) { return m.name; },
+    emptyText: 'No missions match',
+    selectedText: 'Prerequisite selected'
+  });
+
+  // === INITIAL STATE ===
+  showStep(1);
+})();
+</script>
