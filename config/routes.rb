@@ -476,6 +476,7 @@ Rails.application.routes.draw do
     resources :grid_shop_transactions, only: [:index]
 
     # Grid missions (runtime CRUD)
+    resource :grid_mission_wizard, only: %i[new create]
     resources :grid_mission_arcs do
       member do
         get :history
