@@ -119,6 +119,8 @@ module Grid
         buy_command(args&.join(" "))
       when "sell"
         sell_command(args&.join(" "))
+      when "offer", "appraise"
+        offer_command(args&.join(" "))
       when "missions", "quests"
         missions_command
       when "mission", "quest"
@@ -1135,6 +1137,7 @@ module Grid
           <span style='color: #34d399;'>shop, browse</span>               - View vendor inventory &amp; prices
           <span style='color: #34d399;'>buy [qty] &lt;item&gt;</span>            - Purchase item(s) from vendor
           <span style='color: #34d399;'>sell [qty|all] &lt;item&gt;</span>      - Sell item(s) to vendor
+          <span style='color: #34d399;'>offer &lt;item&gt;, appraise</span>     - Check what vendor will pay for an item
 
         <span style='color: #fbbf24;'>Economy:</span>
           <span style='color: #34d399;'>cache</span>                      - List your caches
@@ -2443,6 +2446,35 @@ module Grid
       "<span style='color: #fbbf24;'>#{h(e.message)}</span>"
     rescue Grid::TransactionService::InsufficientBalance
       "<span style='color: #f87171;'>The vendor can't afford to buy that right now.</span>"
+    end
+
+    def offer_command(item_name)
+      return "<span style='color: #fbbf24;'>Appraise what? Usage: offer &lt;item&gt;</span>" if item_name.blank?
+
+      room = hackr.current_room
+      return "<span style='color: #f87171;'>You are nowhere!</span>" unless room
+
+      vendor = room.grid_mobs.find_by(mob_type: "vendor")
+      return "<span style='color: #9ca3af;'>There's no vendor here.</span>" unless vendor
+
+      item = Grid::NameResolver.resolve(hackr.grid_items.in_inventory(hackr), item_name)
+      return equipped_item_hint(item_name) || "<span style='color: #f87171;'>You don't have '#{h(item_name)}'.</span>" unless item
+
+      if item.unicorn? || item.value.to_i <= 0
+        return "<span style='color: #9ca3af;'>#{h(vendor.name)} has no interest in <span style='color: #{item.rarity_color};'>#{h(item.name)}</span>.</span>"
+      end
+
+      unit_sell_price = Grid::ShopService.sell_price_for(item: item, mob: vendor)
+
+      color = item.rarity_color
+      name_display = "<span style='color: #{color};'>#{h(item.name)}</span>"
+      qty_note = if item.quantity > 1
+        " <span style='color: #6b7280;'>(×#{item.quantity} = #{format_cred(unit_sell_price * item.quantity)} CRED)</span>"
+      else
+        ""
+      end
+
+      "<span style='color: #22d3ee;'>#{h(vendor.name)}</span> offers <span style='color: #fbbf24;'>#{format_cred(unit_sell_price)} CRED</span> for #{name_display}.#{qty_note}"
     end
 
     # --- Economy commands ---

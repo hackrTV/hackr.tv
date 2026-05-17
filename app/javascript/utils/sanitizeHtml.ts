@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify'
 // standard formatting tags. Strips scripts, event handlers, etc.
 export function sanitizeHtml (html: string): string {
   return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['span', 'div', 'br', 'b', 'i', 'em', 'strong', 'a', 'p', 'svg', 'path', 'rect', 'circle', 'g'],
-    ALLOWED_ATTR: ['style', 'class', 'href', 'target', 'rel', 'viewBox', 'xmlns', 'd', 'fill', 'width', 'height', 'x', 'y', 'rx', 'ry', 'transform']
+    ALLOWED_TAGS: ['span', 'div', 'br', 'b', 'i', 'em', 'strong', 'a', 'p', 'table', 'tr', 'td', 'th', 'svg', 'path', 'rect', 'circle', 'g'],
+    ALLOWED_ATTR: ['style', 'class', 'href', 'target', 'rel', 'viewBox', 'xmlns', 'd', 'fill', 'width', 'height', 'x', 'y', 'rx', 'ry', 'transform', 'colspan', 'rowspan']
   })
 }
