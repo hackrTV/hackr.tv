@@ -1,5 +1,6 @@
 import React, { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { trackEvent } from '~/utils/analyticsCollector'
 import { HomePage } from '~/components/pages/HomePage'
 import { LoadingPage } from '~/components/shared/LoadingSpinner'
 
@@ -64,9 +65,10 @@ import { AchievementToastContainer } from '~/components/shared/AchievementToast'
 export const AppLayout: React.FC = () => {
   const location = useLocation()
 
-  // Scroll to top on route change
+  // Scroll to top on route change + track page view (including initial load)
   useEffect(() => {
     window.scrollTo(0, 0)
+    trackEvent('page_view', location.pathname)
   }, [location.pathname])
 
   return (
