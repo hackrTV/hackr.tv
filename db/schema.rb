@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_204418) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -142,6 +142,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_204418) do
     t.index ["is_seed"], name: "index_echoes_on_is_seed"
     t.index ["pulse_id", "grid_hackr_id"], name: "index_echoes_on_pulse_id_and_grid_hackr_id", unique: true
     t.index ["pulse_id"], name: "index_echoes_on_pulse_id"
+  end
+
+  create_table "error_groups", force: :cascade do |t|
+    t.string "component", null: false
+    t.datetime "created_at", null: false
+    t.string "fingerprint", null: false
+    t.datetime "first_seen_at"
+    t.datetime "ignore_until"
+    t.datetime "last_seen_at"
+    t.integer "occurrence_count", default: 0, null: false
+    t.datetime "resolved_at"
+    t.integer "resolved_by_hackr_id"
+    t.string "severity", default: "error", null: false
+    t.string "status", default: "open", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["component"], name: "index_error_groups_on_component"
+    t.index ["fingerprint"], name: "index_error_groups_on_fingerprint", unique: true
+    t.index ["severity"], name: "index_error_groups_on_severity"
+    t.index ["status", "last_seen_at"], name: "index_error_groups_on_status_and_last_seen_at"
+  end
+
+  create_table "error_occurrences", force: :cascade do |t|
+    t.text "backtrace"
+    t.string "component", null: false
+    t.datetime "created_at", null: false
+    t.integer "error_group_id", null: false
+    t.string "exception_class"
+    t.string "hackr_alias"
+    t.integer "hackr_id"
+    t.string "ip_address"
+    t.string "message", null: false
+    t.text "metadata"
+    t.datetime "occurred_at", null: false
+    t.string "rails_env"
+    t.string "request_method"
+    t.text "request_params"
+    t.string "request_url"
+    t.string "user_agent"
+    t.index ["error_group_id", "occurred_at"], name: "index_error_occurrences_on_error_group_id_and_occurred_at", order: { occurred_at: :desc }
+    t.index ["error_group_id"], name: "index_error_occurrences_on_error_group_id"
+    t.index ["occurred_at"], name: "index_error_occurrences_on_occurred_at"
   end
 
   create_table "feature_grants", force: :cascade do |t|
@@ -1371,6 +1413,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_204418) do
   add_foreign_key "codex_entry_reads", "grid_hackrs"
   add_foreign_key "echoes", "grid_hackrs"
   add_foreign_key "echoes", "pulses"
+  add_foreign_key "error_occurrences", "error_groups"
   add_foreign_key "feature_grants", "grid_hackrs"
   add_foreign_key "grid_breach_encounters", "grid_breach_templates", on_delete: :restrict
   add_foreign_key "grid_breach_encounters", "grid_rooms", on_delete: :cascade

@@ -56,6 +56,9 @@ gem "paper_trail"
 # Rate limiting and request throttling
 gem "rack-attack"
 
+# Structured request logging (single-line JSON per request)
+gem "lograge"
+
 # AWS S3 for audio file imports
 gem "aws-sdk-s3", require: false
 

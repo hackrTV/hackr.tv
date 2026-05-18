@@ -9,9 +9,15 @@ import { GridAuthProvider } from '~/contexts/GridAuthContext'
 import { AppLayout } from '~/components/layouts/AppLayout'
 import { ErrorBoundary } from '~/components/errors/ErrorBoundary'
 import { LowercaseRedirect } from '~/components/routing/LowercaseRedirect'
+import { initErrorReporter } from '~/services/errorReporter'
+import { initPerfCollector } from '~/utils/perfCollector'
+import { startAnalyticsCollector } from '~/utils/analyticsCollector'
 
 // Mount React SPA when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+  initErrorReporter()
+  initPerfCollector()
+  startAnalyticsCollector()
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
   if (csrfToken) {
     const originalFetch = window.fetch.bind(window)

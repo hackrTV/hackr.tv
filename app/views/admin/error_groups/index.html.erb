@@ -1,0 +1,135 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/error_groups :: ERROR TRACKER</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #002200; border: 2px solid #00ff00; padding: 10px 15px; margin-bottom: 15px;">
+          <span class="green-255-text"><%= flash[:success] %></span>
+        </div>
+      <% end %>
+      <% if flash[:error] %>
+        <div style="background: #220000; border: 2px solid #ff0000; padding: 10px 15px; margin-bottom: 15px;">
+          <span class="red-255-text"><%= flash[:error] %></span>
+        </div>
+      <% end %>
+
+      <%# Filter form %>
+      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
+        <%= form_tag admin_error_groups_path, method: :get, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do %>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Status</label>
+            <%= select_tag :status, options_for_select([["All", ""]] + ErrorGroup::STATUSES.map { |s| [s.upcase, s] }, params[:status]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Component</label>
+            <%= select_tag :component, options_for_select([["All", ""]] + ErrorGroup::COMPONENTS.map { |c| [c.upcase, c] }, params[:component]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Severity</label>
+            <%= select_tag :severity, options_for_select([["All", ""]] + ErrorGroup::SEVERITIES.map { |s| [s.upcase, s] }, params[:severity]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Search</label>
+            <%= text_field_tag :search, params[:search], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "error title..." %>
+          </div>
+          <div>
+            <button type="submit" class="tui-button cyan-168" style="padding: 6px 14px;">Filter</button>
+          </div>
+          <% if params.values_at(:status, :component, :severity, :search).any?(&:present?) %>
+            <div>
+              <%= link_to "Clear", admin_error_groups_path, class: "tui-button", style: "padding: 6px 14px;" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ERROR GROUPS (<%= @total_count %> total, showing <%= @offset + 1 %>–<%= [@offset + @per_page, @total_count].min %>) ::]</h3>
+
+      <% if @error_groups.any? %>
+        <style>.error-groups-table tbody tr td, .error-groups-table thead tr th { padding: 8px 10px; }</style>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table error-groups-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: left;">Title</th>
+                <th style="text-align: center;">Component</th>
+                <th style="text-align: right;">Count</th>
+                <th style="text-align: right;">24h</th>
+                <th style="text-align: center;">First Seen</th>
+                <th style="text-align: center;">Last Seen</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @error_groups.each_with_index do |group, i| %>
+                <% eff_status = group.effective_status %>
+                <tr style="<%= " background: #112;" if i.odd? %>">
+                  <td style="text-align: center;">
+                    <% color = case eff_status
+                      when "open" then "#ff0000"
+                      when "resolved" then "#00ff00"
+                      when "ignored" then "#888"
+                    end %>
+                    <span style="color: <%= color %>; font-weight: bold;"><%= eff_status.upcase %></span>
+                    <% if group.status == "ignored" && group.ignore_until %>
+                      <br><span style="color: #555; font-size: 0.75em;">until <%= group.ignore_until.strftime("%m/%d %H:%M") %></span>
+                    <% end %>
+                  </td>
+                  <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <%= link_to group.title, admin_error_group_path(group), style: "color: #d0d0d0; text-decoration: none;", title: group.title %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% comp_color = group.component == "backend" ? "#a78bfa" : "#fbbf24" %>
+                    <span style="color: <%= comp_color %>; font-size: 0.85em;"><%= group.component.upcase %></span>
+                  </td>
+                  <td style="text-align: right; font-family: monospace;"><%= group.occurrence_count %></td>
+                  <td style="text-align: right; font-family: monospace;">
+                    <% trend = @trends_24h[group.id] || 0 %>
+                    <span style="color: <%= trend > 0 ? '#ff6b6b' : '#666' %>;"><%= trend %></span>
+                  </td>
+                  <td style="text-align: center; color: #666; white-space: nowrap; font-size: 0.85em;">
+                    <%= group.first_seen_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
+                  </td>
+                  <td style="text-align: center; color: #666; white-space: nowrap; font-size: 0.85em;">
+                    <%= group.last_seen_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
+                  </td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <% if eff_status == "open" %>
+                      <%= button_to "Resolve", resolve_admin_error_group_path(group), method: :post, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
+                      <%= button_to "Ignore", ignore_admin_error_group_path(group, duration: "24h"), method: :post, class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
+                    <% else %>
+                      <%= button_to "Reopen", reopen_admin_error_group_path(group), method: :post, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <%# Pagination %>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
+          <% if @offset > 0 %>
+            <%= link_to "← Prev", admin_error_groups_path(request.query_parameters.merge("offset" => [@offset - @per_page, 0].max)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+          <% end %>
+          <span style="color: #888;">
+            Page <%= (@offset / @per_page) + 1 %> of <%= [(@total_count.to_f / @per_page).ceil, 1].max %>
+          </span>
+          <% if @offset + @per_page < @total_count %>
+            <%= link_to "Next →", admin_error_groups_path(request.query_parameters.merge("offset" => @offset + @per_page)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+          <% end %>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666;">No error groups found.</p>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

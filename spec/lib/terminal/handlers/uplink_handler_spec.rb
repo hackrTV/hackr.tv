@@ -3,6 +3,15 @@
 require "rails_helper"
 
 RSpec.describe Terminal::Handlers::UplinkHandler do
+  # ActionCable's test adapter delivers callbacks asynchronously via
+  # Concurrent.global_io_executor. A fixed sleep is unreliable — poll instead.
+  def wait_for(collection, expected_size:, timeout: 2)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+    while collection.size < expected_size && Process.clock_gettime(Process::CLOCK_MONOTONIC) < deadline
+      sleep 0.02
+    end
+  end
+
   let(:hackr) { create(:grid_hackr) }
   let(:other_hackr) { create(:grid_hackr) }
   let!(:channel) { create(:chat_channel, name: "Ambient", slug: "ambient", is_active: true) }
@@ -266,7 +275,7 @@ RSpec.describe Terminal::Handlers::UplinkHandler do
         }
       })
 
-      sleep 0.1
+      wait_for(received_events, expected_size: 1)
 
       expect(received_events.size).to eq(1)
       expect(received_events.first[:content]).to eq("Live from the network!")
@@ -277,6 +286,7 @@ RSpec.describe Terminal::Handlers::UplinkHandler do
 
       session.realtime.on_uplink { |event| received_events << event }
       session.realtime.subscribe_uplink(channel.stream_name)
+      sleep 0.05 # Allow event loop to settle after prior test's unsubscribe
 
       ActionCable.server.broadcast(channel.stream_name, {
         type: "new_packet",
@@ -289,7 +299,7 @@ RSpec.describe Terminal::Handlers::UplinkHandler do
         }
       })
 
-      sleep 0.1
+      wait_for(received_events, expected_size: 1)
 
       expect(received_events.size).to eq(1)
       expect(received_events.first[:content]).to eq("From the web client")
@@ -357,7 +367,7 @@ RSpec.describe Terminal::Handlers::UplinkHandler do
         }
       })
 
-      sleep 0.1
+      wait_for(received_events, expected_size: 1)
 
       expect(received_events.size).to eq(1)
       expect(received_events.first[:content]).to eq("From another user after suppression ends")

@@ -244,6 +244,15 @@ Rails.application.routes.draw do
       get "moderation_log", to: "moderation#moderation_log", as: :moderation_log
     end
 
+    # Error reporting (frontend JS errors)
+    post "error_report", to: "error_reports#create"
+
+    # Performance metrics (frontend Web Vitals + component timing)
+    post "perf/metrics", to: "perf#create"
+
+    # Analytics events (frontend behavior tracking)
+    post "analytics/events", to: "analytics#create_batch"
+
     # Admin API routes (bearer token auth)
     namespace :admin do
       # Meta
@@ -279,6 +288,18 @@ Rails.application.routes.draw do
   # Edit YAML files in data/ directory and run: rails data:load
   namespace :admin, path: "root" do
     root "dashboard#index"
+
+    # Analytics dashboard
+    get "analytics", to: "analytics_dashboard#index", as: :analytics_dashboard
+
+    # Error tracking
+    resources :error_groups, only: %i[index show] do
+      member do
+        post :resolve
+        post :ignore
+        post :reopen
+      end
+    end
 
     # Catalog resources (full CRUD)
     resources :artists do
