@@ -52,7 +52,20 @@ class Admin::GridMissionsController < Admin::ApplicationController
 
   def destroy
     name = @mission.name
-    @mission.destroy!
+    active_count = @mission.grid_hackr_missions.active.count
+
+    if active_count > 0
+      set_flash_error("Cannot delete '#{name}' — #{active_count} hackr(s) currently have this mission active. They must abandon it first.")
+      redirect_to edit_admin_grid_mission_path(@mission)
+      return
+    end
+
+    # Destroy hackr mission records first (cascades their objectives),
+    # then the mission itself destroys its definition objectives/rewards.
+    ActiveRecord::Base.transaction do
+      @mission.grid_hackr_missions.destroy_all
+      @mission.destroy!
+    end
     set_flash_success("Mission '#{name}' deleted.")
     redirect_to admin_grid_missions_path
   end

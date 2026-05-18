@@ -29,7 +29,7 @@ let initialized = false
 function getOrCreateSessionId (): string {
   let id = sessionStorage.getItem(SESSION_KEY)
   if (!id) {
-    id = crypto.randomUUID()
+    id = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36)
     sessionStorage.setItem(SESSION_KEY, id)
   }
   return id
