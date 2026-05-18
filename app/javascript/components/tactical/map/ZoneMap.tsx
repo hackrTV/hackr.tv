@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { apiJson } from '~/utils/apiClient'
+import { measureComponent } from '~/utils/perfCollector'
 import { ZoneMapData, ZoneMapRoom, ZoneMapGhostRoom, BreachEncounter, DeckStatus, NpcMobStub } from '~/types/zoneMap'
 import { iso, isoPts, ISO_WALL_H, ISO_TILE_W, ISO_TILE_H, DIRECTION_VECTORS } from './isoGeometry'
 import { useZonePresence } from './useZonePresence'
@@ -42,6 +43,8 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
   useEffect(() => {
     apiJson<ZoneMapData>('/api/grid/zone_map')
       .then(data => {
+        const markId = Math.random().toString(36).slice(2, 8)
+        performance.mark(`zone_map_render_start_${markId}`)
         setMapData(data)
         setPanOffset([0, 0])
         onBreachEncountersChange?.(data.breach_encounters || [], data.deck_status || { equipped: false, fried: false })
@@ -49,6 +52,13 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
         onTransitPresenceChange?.(data.has_transit ?? false)
         onNpcPresenceChange?.(data.has_npc ?? false, data.npc_mobs ?? [])
         onRestPodPresenceChange?.(data.has_rest_pod ?? false)
+        // Double-rAF: measure after browser has actually painted the new frame
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            performance.mark(`zone_map_render_end_${markId}`)
+            measureComponent('zone_map_render', `zone_map_render_start_${markId}`, `zone_map_render_end_${markId}`)
+          })
+        })
       })
       .catch(err => console.error('Zone map fetch failed:', err))
   // eslint-disable-next-line react-hooks/exhaustive-deps -- callback ref change should not re-trigger fetch; refreshToken controls cadence

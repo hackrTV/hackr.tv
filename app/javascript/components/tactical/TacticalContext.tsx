@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef, ReactNode } from 'react'
 import { apiJson } from '~/utils/apiClient'
+import { trackEvent } from '~/utils/analyticsCollector'
 import { CommandInputHandle } from '~/components/grid/CommandInput'
 import { NpcMobStub } from '~/types/zoneMap'
 
@@ -81,12 +82,14 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   const executingRef = useRef(false)
 
   const sendCommand = useCallback(async (command: string) => {
+    // clear/cls are UI-only (no server round-trip, no gameplay) — intentionally untracked
     if (['clear', 'cls', 'cl'].includes(command.toLowerCase())) {
       setOutput([])
       return
     }
 
     if (executingRef.current) return
+    trackEvent('command_entered', command.split(' ')[0].toLowerCase())
 
     const echoLines = [
       '<div style="height: 1px; background: #444; margin-top: 16px; margin-bottom: 12px; overflow: hidden;"></div>',

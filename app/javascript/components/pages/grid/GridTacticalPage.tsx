@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { trackEvent } from '~/utils/analyticsCollector'
+import { measureComponent } from '~/utils/perfCollector'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useActionCable, GridEvent } from '~/hooks/useActionCable'
 import { TacticalProvider, useTactical } from '~/components/tactical/TacticalContext'
@@ -79,10 +81,32 @@ const TacticalInner: React.FC = () => {
 
   const handleBreachConfirm = useCallback(() => {
     if (confirmTarget) {
+      trackEvent('feature_click', 'breach_initiate', { target: confirmTarget.name, tier: confirmTarget.tier })
       sendCommand(`breach ${confirmTarget.name}`)
       setConfirmTarget(null)
     }
   }, [confirmTarget, sendCommand])
+
+  // Panel open/close with analytics + perf tracking
+  // deps empty: performance.mark, trackEvent, measureComponent are all module-level.
+  // All tactical panels use a 300ms CSS transform transition, so measure after
+  // transition completes (316ms = mount frame + 300ms slide) rather than double-rAF
+  // which would only capture ~32ms before the animation starts.
+  const openPanel = useCallback((panel: string, setter: (v: boolean) => void) => {
+    const markId = Math.random().toString(36).slice(2, 8)
+    performance.mark(`panel_open_start_${markId}`)
+    setter(true)
+    trackEvent('panel_open', panel)
+    setTimeout(() => {
+      performance.mark(`panel_open_end_${markId}`)
+      measureComponent('panel_open', `panel_open_start_${markId}`, `panel_open_end_${markId}`)
+    }, 350)
+  }, [])
+
+  const closePanel = useCallback((panel: string, setter: (v: boolean) => void) => {
+    setter(false)
+    trackEvent('panel_close', panel)
+  }, [])
 
   // Tab anywhere → focus command input
   useEffect(() => {
@@ -206,22 +230,22 @@ const TacticalInner: React.FC = () => {
           onCommand={sendCommand}
         />
         {hasTransit && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
-          <TransitHandle onClick={() => setTransitOpen(true)} />
+          <TransitHandle onClick={() => openPanel('transit', setTransitOpen)} />
         )}
         <TransitPanel
           visible={transitOpen && !inBreach}
           refreshToken={refreshToken}
           onCommand={sendCommand}
-          onClose={() => setTransitOpen(false)}
+          onClose={() => closePanel('transit', setTransitOpen)}
         />
         {hasVendor && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
-          <VendorHandle onClick={() => setVendorOpen(true)} />
+          <VendorHandle onClick={() => openPanel('vendor', setVendorOpen)} />
         )}
         <VendorPanel
           visible={vendorOpen && !inBreach}
           refreshToken={refreshToken}
           onCommand={sendCommand}
-          onClose={() => setVendorOpen(false)}
+          onClose={() => closePanel('vendor', setVendorOpen)}
         />
         {hasNpc && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen &&
           npcMobs.map((mob, i) => {
@@ -232,7 +256,7 @@ const TacticalInner: React.FC = () => {
                 key={mob.id}
                 npc={mob}
                 offsetX={offsetX}
-                onClick={() => { setSelectedNpcId(mob.id); setNpcOpen(true) }}
+                onClick={() => { setSelectedNpcId(mob.id); openPanel('npc', setNpcOpen) }}
               />
             )
           })
@@ -241,17 +265,17 @@ const TacticalInner: React.FC = () => {
           visible={npcOpen && !inBreach}
           refreshToken={refreshToken}
           onCommand={sendCommand}
-          onClose={() => setNpcOpen(false)}
+          onClose={() => closePanel('npc', setNpcOpen)}
           selectedMobId={selectedNpcId}
         />
         {hasRestPod && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
-          <RestPodHandle onClick={() => setRestPodOpen(true)} />
+          <RestPodHandle onClick={() => openPanel('rest_pod', setRestPodOpen)} />
         )}
         <RestPodPanel
           visible={restPodOpen && !inBreach}
           refreshToken={refreshToken}
           onCommand={sendCommand}
-          onClose={() => setRestPodOpen(false)}
+          onClose={() => closePanel('rest_pod', setRestPodOpen)}
         />
       </div>
 
