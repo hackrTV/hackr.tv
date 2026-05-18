@@ -88,18 +88,19 @@ const TacticalInner: React.FC = () => {
   }, [confirmTarget, sendCommand])
 
   // Panel open/close with analytics + perf tracking
-  // deps empty: performance.mark, trackEvent, measureComponent are all module-level
+  // deps empty: performance.mark, trackEvent, measureComponent are all module-level.
+  // All tactical panels use a 300ms CSS transform transition, so measure after
+  // transition completes (316ms = mount frame + 300ms slide) rather than double-rAF
+  // which would only capture ~32ms before the animation starts.
   const openPanel = useCallback((panel: string, setter: (v: boolean) => void) => {
     const markId = Math.random().toString(36).slice(2, 8)
     performance.mark(`panel_open_start_${markId}`)
     setter(true)
     trackEvent('panel_open', panel)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        performance.mark(`panel_open_end_${markId}`)
-        measureComponent('panel_open', `panel_open_start_${markId}`, `panel_open_end_${markId}`)
-      })
-    })
+    setTimeout(() => {
+      performance.mark(`panel_open_end_${markId}`)
+      measureComponent('panel_open', `panel_open_start_${markId}`, `panel_open_end_${markId}`)
+    }, 350)
   }, [])
 
   const closePanel = useCallback((panel: string, setter: (v: boolean) => void) => {
