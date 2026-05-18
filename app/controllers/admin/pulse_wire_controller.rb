@@ -26,12 +26,20 @@ class Admin::PulseWireController < Admin::ApplicationController
       @pulses = @pulses.where("content LIKE ?", "%#{params[:search]}%")
     end
 
-    # Filter by date range
+    # Filter by date range (use beginning/end of day for timezone-safe boundaries)
     if params[:start_date].present?
-      @pulses = @pulses.where("pulsed_at >= ?", params[:start_date])
+      begin
+        @pulses = @pulses.where("pulsed_at >= ?", Date.parse(params[:start_date]).beginning_of_day)
+      rescue ArgumentError
+        # ignore malformed date
+      end
     end
     if params[:end_date].present?
-      @pulses = @pulses.where("pulsed_at <= ?", params[:end_date])
+      begin
+        @pulses = @pulses.where("pulsed_at <= ?", Date.parse(params[:end_date]).end_of_day)
+      rescue ArgumentError
+        # ignore malformed date
+      end
     end
   end
 
