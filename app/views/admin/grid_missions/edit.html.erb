@@ -5,6 +5,11 @@
       <%= form_with model: @mission, url: admin_grid_mission_path(@mission), local: true do |f| %>
         <%= render "form", f: f %>
       <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+        <%= link_to "← Back to Missions", admin_grid_missions_path, class: "tui-button green-168", style: "padding: 6px 14px;" %>
+        <%= button_to "Delete Mission", admin_grid_mission_path(@mission), method: :delete, class: "tui-button red-168", style: "padding: 6px 14px;", data: { confirm: "Delete mission '#{@mission.name}'? This will also delete all objectives, rewards, and player progress." } %>
+      </div>
     </div>
   </fieldset>
 </div>

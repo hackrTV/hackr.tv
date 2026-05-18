@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_17_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_18_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -128,6 +128,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_200000) do
     t.index ["codex_entry_id"], name: "index_codex_entry_reads_on_codex_entry_id"
     t.index ["grid_hackr_id", "codex_entry_id"], name: "index_codex_entry_reads_unique", unique: true
     t.index ["grid_hackr_id"], name: "index_codex_entry_reads_on_grid_hackr_id"
+  end
+
+  create_table "data_audit_flags", force: :cascade do |t|
+    t.string "check_name", null: false
+    t.datetime "created_at", null: false
+    t.string "domain", null: false
+    t.string "fingerprint", null: false
+    t.datetime "first_flagged_at", null: false
+    t.datetime "last_seen_at", null: false
+    t.string "severity", default: "warning", null: false
+    t.datetime "snooze_until"
+    t.string "status", default: "open", null: false
+    t.integer "subject_id"
+    t.string "subject_type"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["check_name"], name: "index_data_audit_flags_on_check_name"
+    t.index ["domain"], name: "index_data_audit_flags_on_domain"
+    t.index ["fingerprint"], name: "index_data_audit_flags_on_fingerprint", unique: true
+    t.index ["status", "severity"], name: "index_data_audit_flags_on_status_and_severity"
+    t.index ["subject_type", "subject_id"], name: "index_data_audit_flags_on_subject_type_and_subject_id"
   end
 
   create_table "echoes", force: :cascade do |t|

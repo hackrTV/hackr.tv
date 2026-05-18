@@ -301,6 +301,17 @@ Rails.application.routes.draw do
       end
     end
 
+    # Data audit
+    resources :data_audit_flags, only: [:index] do
+      collection do
+        post :scan
+      end
+      member do
+        post :acknowledge
+        post :reopen
+      end
+    end
+
     # Catalog resources (full CRUD)
     resources :artists do
       member do

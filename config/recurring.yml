@@ -37,3 +37,7 @@ production:
   telemetry_prune:
     class: TelemetryPruneJob
     schedule: at 4am every day
+
+  data_audit_scan:
+    class: DataAudit::ScanJob
+    schedule: every 6 hours

@@ -1,0 +1,8 @@
+<% count = DataAudit::FlagCache.open_count %>
+<% if count > 0 %>
+  <div style="background: #1a0a00; border-bottom: 2px solid #ff6600; padding: 8px 20px; text-align: center;">
+    <span style="color: #ff6600; font-weight: bold;">⚑ RED FLAGS: <%= count %> open</span>
+    <span style="color: #666; margin: 0 8px;">|</span>
+    <%= link_to "View All →", admin_data_audit_flags_path, style: "color: #ff9944; text-decoration: none;" %>
+  </div>
+<% end %>

@@ -1,0 +1,185 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/data_audit :: RED FLAGS</legend>
+
+    <div style="padding: 20px;">
+      <% if flash[:success] %>
+        <div style="background: #002200; border: 2px solid #00ff00; padding: 10px 15px; margin-bottom: 15px;">
+          <span class="green-255-text"><%= flash[:success] %></span>
+        </div>
+      <% end %>
+      <% if flash[:error] %>
+        <div style="background: #220000; border: 2px solid #ff0000; padding: 10px 15px; margin-bottom: 15px;">
+          <span class="red-255-text"><%= flash[:error] %></span>
+        </div>
+      <% end %>
+
+      <%# Summary cards %>
+      <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+        <% %w[critical warning info].each do |sev| %>
+          <% count = @by_severity[sev] || 0 %>
+          <% color = case sev
+            when "critical" then "#ff4444"
+            when "warning" then "#ff6600"
+            when "info" then "#fbbf24"
+          end %>
+          <div style="border: 1px solid <%= color %>; padding: 10px 18px; background: #0a0a0a; min-width: 120px; text-align: center;">
+            <div style="color: <%= color %>; font-size: 1.4em; font-weight: bold;"><%= count %></div>
+            <div style="color: #888; font-size: 0.8em; text-transform: uppercase;"><%= sev %></div>
+          </div>
+        <% end %>
+        <% %w[grid music].each do |dom| %>
+          <% count = @by_domain[dom] || 0 %>
+          <% color = dom == "grid" ? "#34d399" : "#a78bfa" %>
+          <div style="border: 1px solid <%= color %>; padding: 10px 18px; background: #0a0a0a; min-width: 120px; text-align: center;">
+            <div style="color: <%= color %>; font-size: 1.4em; font-weight: bold;"><%= count %></div>
+            <div style="color: #888; font-size: 0.8em; text-transform: uppercase;"><%= dom %></div>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Scan info + refresh %>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <span style="color: #666; font-size: 0.85em;">
+          Last scan: <%= @last_scan_at ? @last_scan_at.strftime("%Y-%m-%d %H:%M:%S") : "Never" %>
+        </span>
+        <%= button_to "⟳ Refresh Scan", scan_admin_data_audit_flags_path, method: :post, class: "tui-button cyan-168", style: "padding: 4px 12px; font-size: 0.85em;", form: {style: "display: inline;"} %>
+      </div>
+
+      <%# Filter form %>
+      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
+        <%= form_tag admin_data_audit_flags_path, method: :get, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do %>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Status</label>
+            <%= select_tag :status, options_for_select([["All", ""]] + DataAuditFlag::STATUSES.map { |s| [s.upcase, s] }, params[:status]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Severity</label>
+            <%= select_tag :severity, options_for_select([["All", ""]] + DataAuditFlag::SEVERITIES.map { |s| [s.upcase, s] }, params[:severity]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Domain</label>
+            <%= select_tag :domain, options_for_select([["All", ""]] + DataAuditFlag::DOMAINS.map { |d| [d.upcase, d] }, params[:domain]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Check</label>
+            <%= select_tag :check_name, options_for_select([["All", ""]] + @check_names.map { |c| [c.humanize, c] }, params[:check_name]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
+          </div>
+          <div>
+            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Search</label>
+            <%= text_field_tag :search, params[:search], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "flag title..." %>
+          </div>
+          <div>
+            <button type="submit" class="tui-button cyan-168" style="padding: 6px 14px;">Filter</button>
+          </div>
+          <% if params.values_at(:status, :severity, :domain, :check_name, :search).any?(&:present?) %>
+            <div>
+              <%= link_to "Clear", admin_data_audit_flags_path, class: "tui-button", style: "padding: 6px 14px;" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <h3 style="color: #ff6600; margin-bottom: 15px;">[:: RED FLAGS (<%= @total_count %> total<%= ", showing #{@offset + 1}–#{[@offset + @per_page, @total_count].min}" if @total_count > 0 %>) ::]</h3>
+
+      <% if @flags.any? %>
+        <style>.audit-flags-table tbody tr td, .audit-flags-table thead tr th { padding: 8px 10px; }</style>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <table class="tui-table audit-flags-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center;">Severity</th>
+                <th style="text-align: left;">Title</th>
+                <th style="text-align: center;">Domain</th>
+                <th style="text-align: center;">Subject</th>
+                <th style="text-align: center;">First Flagged</th>
+                <th style="text-align: center;">Last Seen</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @flags.each_with_index do |flag, i| %>
+                <% eff_status = flag.effective_status %>
+                <tr style="<%= " background: #112;" if i.odd? %>">
+                  <td style="text-align: center;">
+                    <% status_color = eff_status == "open" ? "#ff6600" : "#888" %>
+                    <span style="color: <%= status_color %>; font-weight: bold;"><%= eff_status.upcase %></span>
+                    <% if flag.status == "acknowledged" && flag.snooze_until %>
+                      <br><span style="color: #555; font-size: 0.75em;">until <%= flag.snooze_until.strftime("%m/%d %H:%M") %></span>
+                    <% elsif flag.status == "acknowledged" && flag.snooze_until.nil? %>
+                      <br><span style="color: #555; font-size: 0.75em;">forever</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% sev_color = case flag.severity
+                      when "critical" then "#ff4444"
+                      when "warning" then "#ff6600"
+                      when "info" then "#fbbf24"
+                    end %>
+                    <span style="color: <%= sev_color %>; font-weight: bold; font-size: 0.85em;"><%= flag.severity.upcase %></span>
+                  </td>
+                  <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<%= flag.title %>">
+                    <span style="color: #d0d0d0;"><%= flag.title %></span>
+                  </td>
+                  <td style="text-align: center;">
+                    <% dom_color = flag.domain == "grid" ? "#34d399" : "#a78bfa" %>
+                    <span style="color: <%= dom_color %>; font-size: 0.85em;"><%= flag.domain.upcase %></span>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if flag.subject_type.present? && flag.subject_id.present? %>
+                      <% admin_path = admin_subject_path(flag.subject_type, flag.subject_id) %>
+                      <% if admin_path %>
+                        <%= link_to "Edit →", admin_path, style: "color: #00ffff; text-decoration: none; font-size: 0.85em;" %>
+                      <% else %>
+                        <span style="color: #555; font-size: 0.85em;"><%= flag.subject_type.demodulize %>#<%= flag.subject_id %></span>
+                      <% end %>
+                    <% else %>
+                      <span style="color: #333;">—</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center; color: #666; white-space: nowrap; font-size: 0.85em;">
+                    <%= flag.first_flagged_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
+                  </td>
+                  <td style="text-align: center; color: #666; white-space: nowrap; font-size: 0.85em;">
+                    <%= flag.last_seen_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
+                  </td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <% if eff_status == "open" %>
+                      <%= button_to "Ack 24h", acknowledge_admin_data_audit_flag_path(flag, duration: "24h"), method: :post, class: "tui-button", style: "padding: 2px 6px; font-size: 0.75em;", form: {style: "display: inline;"} %>
+                      <%= button_to "Ack 7d", acknowledge_admin_data_audit_flag_path(flag, duration: "7d"), method: :post, class: "tui-button", style: "padding: 2px 6px; font-size: 0.75em;", form: {style: "display: inline;"} %>
+                      <%= button_to "Ack ∞", acknowledge_admin_data_audit_flag_path(flag, duration: "forever"), method: :post, class: "tui-button", style: "padding: 2px 6px; font-size: 0.75em;", form: {style: "display: inline;"} %>
+                    <% else %>
+                      <%= button_to "Reopen", reopen_admin_data_audit_flag_path(flag), method: :post, class: "tui-button red-168", style: "padding: 2px 6px; font-size: 0.75em;", form: {style: "display: inline;"} %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <%# Pagination %>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
+          <% if @offset > 0 %>
+            <%= link_to "← Prev", admin_data_audit_flags_path(request.query_parameters.merge("offset" => [@offset - @per_page, 0].max)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+          <% end %>
+          <span style="color: #888;">
+            Page <%= (@offset / @per_page) + 1 %> of <%= [(@total_count.to_f / @per_page).ceil, 1].max %>
+          </span>
+          <% if @offset + @per_page < @total_count %>
+            <%= link_to "Next →", admin_data_audit_flags_path(request.query_parameters.merge("offset" => @offset + @per_page)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+          <% end %>
+        </div>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666;">No red flags found. All clear.</p>
+        </div>
+      <% end %>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>
