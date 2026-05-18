@@ -9,7 +9,7 @@ module DataAudit
       def violations
         GridBreachTemplate
           .where(published: true)
-          .where("protocol_composition IS NULL OR protocol_composition = '[]' OR protocol_composition = 'null'")
+          .where("protocol_composition IS NULL OR protocol_composition = '[]' OR protocol_composition = '{}' OR protocol_composition = 'null'")
           .pluck(:id, :name)
           .map do |id, name|
             build_violation(
