@@ -1,0 +1,215 @@
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/analytics :: ANALYTICS DASHBOARD</legend>
+
+    <div style="padding: 20px;">
+      <%# Date range selector %>
+      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <% { "7" => "7d", "30" => "30d", "90" => "90d", "0" => "ALL" }.each do |val, label| %>
+          <% active = @range_days.to_s == val %>
+          <%= link_to label, admin_analytics_dashboard_path(range: val),
+              class: "tui-button #{active ? 'green-168' : ''}",
+              style: "padding: 6px 14px; #{active ? 'font-weight: bold;' : ''}" %>
+        <% end %>
+      </div>
+
+      <%# USER METRICS %>
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: USER METRICS ::]</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+        <div style="padding: 15px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.8em;">DAU</div>
+          <div style="font-size: 1.8em; color: #00ff9f;"><%= @user_metrics[:dau] %></div>
+        </div>
+        <div style="padding: 15px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.8em;">WAU</div>
+          <div style="font-size: 1.8em; color: #22d3ee;"><%= @user_metrics[:wau] %></div>
+        </div>
+        <div style="padding: 15px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.8em;">MAU</div>
+          <div style="font-size: 1.8em; color: #a78bfa;"><%= @user_metrics[:mau] %></div>
+        </div>
+        <div style="padding: 15px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.8em;">TOTAL</div>
+          <div style="font-size: 1.8em; color: #d0d0d0;"><%= @user_metrics[:total] %></div>
+        </div>
+        <div style="padding: 15px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.8em;">NEW (30d)</div>
+          <div style="font-size: 1.8em; color: #fbbf24;"><%= @user_metrics[:new_30d] %></div>
+        </div>
+        <div style="padding: 15px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.8em;">RETURNING (30d)</div>
+          <div style="font-size: 1.8em; color: #34d399;"><%= @user_metrics[:returning_30d] %></div>
+        </div>
+      </div>
+
+      <%# REGISTRATIONS CHART %>
+      <h3 class="cyan-255-text" style="margin-bottom: 10px;">[:: REGISTRATIONS ::]</h3>
+      <% max_reg = @registrations_by_day.map { |b| b[:count] }.max.to_f %>
+      <div style="display: flex; align-items: flex-end; gap: 2px; height: 80px; margin-bottom: 5px; padding: 0 5px;">
+        <% @registrations_by_day.each do |bucket| %>
+          <% pct = max_reg > 0 ? (bucket[:count] / max_reg * 100).round : 0 %>
+          <div title="<%= bucket[:date] %>: <%= bucket[:count] %>"
+               style="flex: 1; height: <%= [pct, 2].max %>%; background: #00ff9f; min-height: 1px;"></div>
+        <% end %>
+      </div>
+      <div style="display: flex; justify-content: space-between; color: #555; font-size: 0.7em; margin-bottom: 30px; padding: 0 5px;">
+        <span><%= @registrations_by_day.first&.dig(:date) %></span>
+        <span><%= @registrations_by_day.last&.dig(:date) %></span>
+      </div>
+
+      <%# ACTIVITY CHART %>
+      <h3 class="cyan-255-text" style="margin-bottom: 10px;">[:: DAILY ACTIVE HACKRS ::]</h3>
+      <% max_act = @activity_by_day.map { |b| b[:count] }.max.to_f %>
+      <div style="display: flex; align-items: flex-end; gap: 2px; height: 80px; margin-bottom: 5px; padding: 0 5px;">
+        <% @activity_by_day.each do |bucket| %>
+          <% pct = max_act > 0 ? (bucket[:count] / max_act * 100).round : 0 %>
+          <div title="<%= bucket[:date] %>: <%= bucket[:count] %>"
+               style="flex: 1; height: <%= [pct, 2].max %>%; background: #22d3ee; min-height: 1px;"></div>
+        <% end %>
+      </div>
+      <div style="display: flex; justify-content: space-between; color: #555; font-size: 0.7em; margin-bottom: 30px; padding: 0 5px;">
+        <span><%= @activity_by_day.first&.dig(:date) %></span>
+        <span><%= @activity_by_day.last&.dig(:date) %></span>
+      </div>
+
+      <%# FEATURE USAGE %>
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: FEATURE USAGE ::]</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <%# Top Rooms %>
+        <div style="border: 1px solid #333; background: #0a0a0a; padding: 15px;">
+          <h4 style="color: #888; margin-bottom: 10px;">Top 10 Rooms</h4>
+          <% @feature_usage[:top_rooms].each_with_index do |room, i| %>
+            <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1a1a1a;">
+              <span style="color: #d0d0d0; font-size: 0.85em;"><%= i + 1 %>. <%= room[:name] %></span>
+              <span style="color: #00ff9f; font-family: monospace;"><%= room[:count] %></span>
+            </div>
+          <% end %>
+          <% if @feature_usage[:top_rooms].empty? %>
+            <span style="color: #555;">No data</span>
+          <% end %>
+        </div>
+
+        <%# Top Tracks %>
+        <div style="border: 1px solid #333; background: #0a0a0a; padding: 15px;">
+          <h4 style="color: #888; margin-bottom: 10px;">Top 10 Tracks</h4>
+          <% @feature_usage[:top_tracks].each_with_index do |track, i| %>
+            <div style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1a1a1a;">
+              <span style="color: #d0d0d0; font-size: 0.85em;"><%= i + 1 %>. <%= track[:name] %></span>
+              <span style="color: #fbbf24; font-family: monospace;"><%= track[:count] %></span>
+            </div>
+          <% end %>
+          <% if @feature_usage[:top_tracks].empty? %>
+            <span style="color: #555;">No data</span>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Feature stats grid %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">BREACH ATTEMPTS</div>
+          <div style="font-size: 1.4em; color: #ff6b6b;"><%= @feature_usage[:breach_attempts] %></div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">BREACH SUCCESS</div>
+          <div style="font-size: 1.4em; color: #00ff9f;"><%= @feature_usage[:breach_success_rate] %>%</div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">SHOP BUYS</div>
+          <div style="font-size: 1.4em; color: #fbbf24;"><%= @feature_usage[:shop_buys] %></div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">SHOP SELLS</div>
+          <div style="font-size: 1.4em; color: #34d399;"><%= @feature_usage[:shop_sells] %></div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">MISSIONS ACCEPTED</div>
+          <div style="font-size: 1.4em; color: #22d3ee;"><%= @feature_usage[:mission_accepted] %></div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">MISSION COMPLETE</div>
+          <div style="font-size: 1.4em; color: #a78bfa;"><%= @feature_usage[:mission_completion_rate] %>%</div>
+        </div>
+      </div>
+
+      <%# TUTORIAL FUNNEL %>
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TUTORIAL FUNNEL ::]</h3>
+      <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
+        <div style="margin-bottom: 10px;">
+          <span style="color: #888;">Started:</span> <span style="color: #d0d0d0;"><%= @tutorial_funnel[:total_started] %></span>
+          <span style="color: #555; margin: 0 10px;">|</span>
+          <span style="color: #888;">Completed:</span> <span style="color: #00ff9f;"><%= @tutorial_funnel[:completed] || 0 %></span>
+          <% if @tutorial_funnel[:drop_off_step] %>
+            <span style="color: #555; margin: 0 10px;">|</span>
+            <span style="color: #888;">Biggest drop-off:</span> <span style="color: #ff6b6b;">Step <%= @tutorial_funnel[:drop_off_step] %></span>
+          <% end %>
+        </div>
+
+        <% if @tutorial_funnel[:step_counts].any? %>
+          <% max_step = @tutorial_funnel[:step_counts].map(&:last).max.to_f %>
+          <div style="display: flex; align-items: flex-end; gap: 1px; height: 60px;">
+            <% @tutorial_funnel[:step_counts].each do |step, count| %>
+              <% pct = max_step > 0 ? (count / max_step * 100).round : 0 %>
+              <% is_drop = step == @tutorial_funnel[:drop_off_step] %>
+              <div title="Step <%= step %>: <%= count %> hackrs"
+                   style="flex: 1; height: <%= [pct, 2].max %>%; background: <%= is_drop ? '#ff6b6b' : '#a78bfa' %>; min-height: 1px;"></div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# SESSION METRICS %>
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SESSION METRICS ::]</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">AVG SESSION</div>
+          <% mins = @session_metrics[:avg_duration_seconds].to_i / 60 %>
+          <div style="font-size: 1.4em; color: #d0d0d0;"><%= mins %>m</div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">TOTAL SESSIONS</div>
+          <div style="font-size: 1.4em; color: #d0d0d0;"><%= @session_metrics[:total_sessions] %></div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">UNIQUE USERS</div>
+          <div style="font-size: 1.4em; color: #d0d0d0;"><%= @session_metrics[:unique_users] %></div>
+        </div>
+        <div style="padding: 12px; border: 1px solid #333; background: #0a0a0a; text-align: center;">
+          <div style="color: #888; font-size: 0.75em;">SESSIONS/USER</div>
+          <div style="font-size: 1.4em; color: #d0d0d0;"><%= @session_metrics[:avg_sessions_per_user] %></div>
+        </div>
+      </div>
+
+      <%# TELEMETRY STATUS %>
+      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TELEMETRY STATUS ::]</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+        <%# Performance metrics %>
+        <div style="padding: 15px; border: 1px solid #333; background: #0a0a0a;">
+          <h4 style="color: #888; margin-bottom: 10px;">Performance Metrics</h4>
+          <div style="color: #d0d0d0;">Total: <span style="color: #22d3ee;"><%= @perf_summary[:total_metrics] %></span></div>
+          <div style="color: #d0d0d0;">Web Vitals (24h): <span style="color: #22d3ee;"><%= @perf_summary[:web_vitals_24h] %></span></div>
+          <div style="color: #d0d0d0;">Slow ZoneMap Renders (7d): <span style="color: <%= @perf_summary[:slow_zone_renders_7d] > 0 ? '#ff6b6b' : '#00ff9f' %>;"><%= @perf_summary[:slow_zone_renders_7d] %></span></div>
+        </div>
+
+        <%# Frontend events %>
+        <div style="padding: 15px; border: 1px solid #fbbf24; background: #1a1500;">
+          <h4 style="color: #fbbf24; margin-bottom: 10px;">Frontend Event Collection</h4>
+          <div style="color: #d0d0d0; margin-bottom: 8px;">
+            Frontend event collection is active. Reporting UI coming in a future update.
+          </div>
+          <div style="color: #888;">
+            Events collected: <span style="color: #fbbf24; font-size: 1.2em;"><%= @analytics_event_count %></span>
+          </div>
+          <div style="color: #555; font-size: 0.8em; margin-top: 8px;">
+            Tracking: page_view, feature_click, button_click, panel_open, panel_close, command_entered, session_start, session_end
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <%= link_to "← Error Tracker", admin_error_groups_path, class: "tui-button red-168" %>
+        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+      </div>
+    </div>
+  </fieldset>
+</div>

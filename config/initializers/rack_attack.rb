@@ -116,6 +116,13 @@ class Rack::Attack
     end
   end
 
+  ### Throttle error reports ###
+
+  # 10 error reports per IP per minute (frontend JS errors)
+  throttle("error_report/ip", limit: 10, period: 1.minute) do |req|
+    req.ip if req.path == "/api/error_report" && req.post?
+  end
+
   ### Throttle API requests ###
 
   # General API throttle - 300 requests per minute per IP

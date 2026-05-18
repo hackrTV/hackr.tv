@@ -29,3 +29,11 @@ production:
   shop_rotation:
     class: ShopRotationJob
     schedule: every Monday at midnight
+
+  error_tracker_retention:
+    class: ErrorTracker::RetentionJob
+    schedule: at 3am every day
+
+  telemetry_prune:
+    class: TelemetryPruneJob
+    schedule: at 4am every day
