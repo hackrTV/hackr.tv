@@ -55,6 +55,7 @@ const UplinkPage = lazy(() => import('~/components/pages/uplink/UplinkPage').the
 const UplinkPopoutPage = lazy(() => import('~/components/pages/uplink/UplinkPopoutPage').then(m => ({ default: m.UplinkPopoutPage })))
 const CodeIndexPage = lazy(() => import('~/components/pages/code/CodeIndexPage').then(m => ({ default: m.CodeIndexPage })))
 const CodeRepoPage = lazy(() => import('~/components/pages/code/CodeRepoPage'))
+const StreamSchedulePage = lazy(() => import('~/components/pages/streams/StreamSchedulePage').then(m => ({ default: m.StreamSchedulePage })))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 // Auth components
@@ -104,6 +105,8 @@ export const AppLayout: React.FC = () => {
           <Route path="/sector/x" element={<SectorXPage />} />
           {/* Wavelength Zero has a custom landing page */}
           <Route path="/wavelength-zero" element={<WavelengthZeroPage />} />
+          {/* Stream schedule — public */}
+          <Route path="/schedule" element={<StreamSchedulePage />} />
           {/* Dynamic artist routes — catches any artist slug */}
           <Route path="/:artistSlug" element={<BandProfilePage />} />
           <Route path="/:artistSlug/releases" element={<ReleaseListPage />} />

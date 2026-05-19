@@ -167,6 +167,9 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/" className={`mobile-menu-item${isActive('/') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">0</span> / hackr.tv
                 </Link>
+                <Link to="/schedule" className={`mobile-menu-item${isActive('/schedule') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <span className="purple-168-text">/</span> schedule
+                </Link>
                 <button
                   className="mobile-menu-item"
                   onClick={() => {
@@ -423,6 +426,11 @@ export const HeaderMenu: React.FC = () => {
                 <li>
                   <Link to="/" onClick={closeDropdown}>
                     <span className="purple-168-text">/</span>root
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/schedule" onClick={closeDropdown}>
+                    <span className="purple-168-text">/</span>schedule
                   </Link>
                 </li>
                 <li>

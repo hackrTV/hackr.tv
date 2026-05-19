@@ -99,6 +99,9 @@ Rails.application.routes.draw do
   get "deck", to: "pages#spa_root", as: :deck_page
   get "transit", to: "pages#spa_root", as: :transit_page
 
+  # Stream schedule (SPA)
+  get "schedule", to: "pages#spa_root", as: :streams_schedule
+
   # Codex (wiki) routes - SPA
   scope "codex" do
     get "/", to: "pages#spa_root", as: :codex
@@ -161,6 +164,7 @@ Rails.application.routes.draw do
     get "radio_stations/:id/playlists", to: "radio#station_playlists"
     post "radio_stations/:id/tune_in", to: "radio#tune_in"
     get "hackr_stream", to: "hackr_streams#show"
+    get "streams/schedule", to: "hackr_streams#schedule"
     get "artists/:artist_slug/vods", to: "hackr_streams#index"
     get "artists/:artist_slug/vods/:id", to: "hackr_streams#vod_show"
     post "artists/:artist_slug/vods/:id/watch", to: "hackr_streams#watch"
@@ -604,6 +608,7 @@ Rails.application.routes.draw do
       member do
         post :go_live
         post :end_stream
+        post :cancel
       end
     end
 

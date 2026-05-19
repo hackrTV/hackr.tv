@@ -9,7 +9,7 @@ export const formatFutureDate = (dateStr: string, includeTime: boolean = false):
   }
 
   if (includeTime) {
-    return date.toLocaleDateString('en-US', options) + ` at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}`
+    return date.toLocaleDateString('en-US', options) + ` at ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`
   }
 
   return date.toLocaleDateString('en-US', options)

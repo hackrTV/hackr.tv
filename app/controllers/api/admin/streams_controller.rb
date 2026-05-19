@@ -27,6 +27,7 @@ module Api
       end
 
       # POST /api/admin/streams/go_live
+      # Accepts optional stream_id to go live from a scheduled stream
       def go_live
         artist = Artist.find_by(slug: params[:artist_slug])
         unless artist
@@ -36,16 +37,33 @@ module Api
         url = params[:url]
         title = params[:title]
 
-        unless url.present?
-          return render json: {success: false, error: "URL is required"}, status: :unprocessable_entity
+        # Use existing scheduled stream or create new
+        stream = if params[:stream_id].present?
+          s = artist.hackr_streams.find_by(id: params[:stream_id])
+          unless s
+            return render json: {success: false, error: "Stream not found"}, status: :not_found
+          end
+          if s.ended_at.present?
+            return render json: {success: false, error: "Stream already ended"}, status: :unprocessable_entity
+          end
+          if s.cancelled_at.present?
+            return render json: {success: false, error: "Stream was cancelled"}, status: :unprocessable_entity
+          end
+          s
+        else
+          unless url.present?
+            return render json: {success: false, error: "URL is required"}, status: :unprocessable_entity
+          end
+          nil
         end
 
-        # End all currently live streams
-        HackrStream.live.find_each(&:end_stream!)
+        HackrStream.transaction do
+          # End all currently live streams
+          HackrStream.live.find_each(&:end_stream!)
 
-        # Create a new stream (cannot_restart_stream validation prevents reuse)
-        stream = HackrStream.create!(artist: artist)
-        stream.go_live!(url, title)
+          stream ||= HackrStream.create!(artist: artist)
+          stream.go_live!(url || stream.live_url, title || stream.title)
+        end
 
         render json: {
           success: true,

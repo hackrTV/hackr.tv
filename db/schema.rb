@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_18_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_19_194536) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1021,16 +1021,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_200000) do
 
   create_table "hackr_streams", force: :cascade do |t|
     t.integer "artist_id", null: false
+    t.datetime "cancelled_at"
     t.datetime "created_at", null: false
     t.datetime "ended_at"
     t.boolean "is_live", default: false, null: false
     t.string "live_url"
+    t.datetime "scheduled_at"
     t.datetime "started_at"
     t.string "title"
     t.string "track_slug"
     t.datetime "updated_at", null: false
     t.string "vod_url"
     t.index ["artist_id"], name: "index_hackr_streams_on_artist_id"
+    t.index ["scheduled_at"], name: "index_hackr_streams_on_scheduled_at"
   end
 
   create_table "hackr_vod_watches", force: :cascade do |t|

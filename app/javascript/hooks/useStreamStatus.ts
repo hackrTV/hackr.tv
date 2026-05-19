@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { createConsumer, Cable, Channel } from '@rails/actioncable'
-import type { StreamStatusMessage, StreamInfo } from '../types/uplink'
+import type { StreamStatusMessage, StreamInfo, ScheduledStreamInfo } from '../types/uplink'
 
 interface UseStreamStatusOptions {
   enabled?: boolean
@@ -14,6 +14,7 @@ export const useStreamStatus = ({ enabled = true }: UseStreamStatusOptions = {})
   const connectRef = useRef<() => void>(() => {})
   const [isLive, setIsLive] = useState(false)
   const [streamInfo, setStreamInfo] = useState<StreamInfo | null>(null)
+  const [nextScheduled, setNextScheduled] = useState<ScheduledStreamInfo | null>(null)
   const [isConnected, setIsConnected] = useState(false)
 
   const clearReconnectTimeout = useCallback(() => {
@@ -44,10 +45,15 @@ export const useStreamStatus = ({ enabled = true }: UseStreamStatusOptions = {})
     case 'stream_live':
       setIsLive(message.is_live)
       setStreamInfo(message.stream)
+      setNextScheduled(message.next_scheduled ?? null)
       break
     case 'stream_ended':
       setIsLive(false)
       setStreamInfo(null)
+      setNextScheduled(message.next_scheduled ?? null)
+      break
+    case 'scheduled_stream_updated':
+      setNextScheduled(message.next_scheduled ?? null)
       break
     }
   }, [])
@@ -128,6 +134,7 @@ export const useStreamStatus = ({ enabled = true }: UseStreamStatusOptions = {})
   return {
     isLive,
     streamInfo,
+    nextScheduled,
     isConnected
   }
 }

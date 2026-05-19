@@ -1,9 +1,10 @@
 import React, { ReactNode } from 'react'
 import { HeaderMenu } from '~/components/navigation/HeaderMenu'
 import { FooterMenu } from '~/components/navigation/FooterMenu'
-import { PrereleaseBanner } from '~/components/prerelease/PrereleaseBanner'
+import { LiveNowBanner } from '~/components/stream/LiveNowBanner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
+import { useStreamStatus } from '~/hooks/useStreamStatus'
 
 interface FmLayoutProps {
   children: ReactNode
@@ -12,11 +13,14 @@ interface FmLayoutProps {
 export const FmLayout: React.FC<FmLayoutProps> = ({ children }) => {
   const { isMobile } = useMobileDetect()
   const { setMobileMenuOpen } = useMobileMenu()
+  const { isLive, streamInfo } = useStreamStatus()
 
   return (
     <div className="black-168">
       <HeaderMenu />
-      <PrereleaseBanner />
+      {isLive && streamInfo && (
+        <LiveNowBanner stream={streamInfo} />
+      )}
 
       {!isMobile && <br />}
 

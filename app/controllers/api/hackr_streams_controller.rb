@@ -1,12 +1,13 @@
 class Api::HackrStreamsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
-  # GET /api/hackr_stream - Get current live stream (if any)
+  # GET /api/hackr_stream - Get current live stream + next scheduled
   def show
     @stream = HackrStream.includes(:artist).current_live
+    @next_scheduled = HackrStream.includes(:artist).next_scheduled
 
-    if @stream
-      render json: {
+    response = if @stream
+      {
         is_live: true,
         artist: {
           id: @stream.artist.id,
@@ -19,10 +20,23 @@ class Api::HackrStreamsController < ApplicationController
         started_at: @stream.started_at
       }
     else
-      render json: {
-        is_live: false
-      }
+      {is_live: false}
     end
+
+    response[:next_scheduled] = @next_scheduled&.scheduled_json
+
+    render json: response
+  end
+
+  # GET /api/streams/schedule - Public schedule page data
+  def schedule
+    upcoming = HackrStream.includes(:artist).upcoming.limit(20)
+    past = HackrStream.includes(:artist).past_broadcasts.limit(20)
+
+    render json: {
+      upcoming: upcoming.map { |s| schedule_stream_json(s) },
+      past: past.map { |s| schedule_stream_json(s) }
+    }
   end
 
   # GET /api/artists/:artist_slug/vods - Get all VODs for an artist
@@ -90,5 +104,22 @@ class Api::HackrStreamsController < ApplicationController
 
   def record_not_found
     render json: {error: "Not found"}, status: :not_found
+  end
+
+  def schedule_stream_json(stream)
+    {
+      id: stream.id,
+      title: stream.title,
+      artist: {
+        id: stream.artist.id,
+        name: stream.artist.name,
+        slug: stream.artist.slug
+      },
+      scheduled_at: stream.scheduled_at&.iso8601,
+      started_at: stream.started_at&.iso8601,
+      ended_at: stream.ended_at&.iso8601,
+      vod_url: stream.vod_url,
+      display_state: stream.display_state.to_s
+    }
   end
 end
