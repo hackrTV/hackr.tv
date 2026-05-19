@@ -122,18 +122,260 @@ handbook_sections:
           Operatives move between rooms, interact with mobs, collect items,
           mine [[CRED]], and unlock progression.
 
-          ## Core loops
+          ## Core systems
 
-          - **Explore** — move through zones and rooms with `go`, `look`, `examine`.
-          - **Interact** — `talk`, `take`, `use`, `salvage`.
-          - **Progress** — earn XP, raise your clearance, unlock new zones and commands.
-          - **Trade** — `shop` at vendors, `buy` and `sell` items.
+          - **Explore** — move through zones and rooms with `go`, `look`, `examine`. Rooms are organized into zones within geographic [regions](/codex).
+          - **Items & Inventory** — collect, stack, drop, use, and manage a 16-slot inventory. See [Inventory & Items](/handbook/inventory-items).
+          - **Vitals** — manage your HP, Energy, and Psyche. Running out of HP triggers emergency RestorePoint™ respawn. See [Vitals & Recovery](/handbook/vitals-recovery).
+          - **Progress** — earn XP, raise your [Clearance Level](/handbook/clearance-levels), unlock new zones and commands.
+          - **Economy** — earn, spend, and transfer [CRED](/handbook/cred-economy) through caches, vendors, and the blockchain ledger.
+          - **Gear** — equip armor and accessories across 13 slots to boost your stats. See [Equipment & Loadout](/handbook/equipment-loadout).
+          - **DECK** — your hacking hardware. Load software, install modules, and keep the battery charged. See [DECK System](/handbook/deck-system).
+          - **BREACH** — protocol-based combat encounters against hostile systems. The Grid's primary challenge loop. See [BREACH Encounters](/handbook/breach-encounters).
+          - **Dialogue** — [talk to NPCs](/handbook/npc-dialogue), navigate branching conversation trees, discover missions.
+          - **Missions** — accept structured jobs from NPCs for XP, CRED, rep, and items. See [Missions & Quests](/handbook/missions).
+          - **Reputation** — build or burn standing with [factions](/handbook/reputation-factions) across the Grid.
+          - **Crafting** — gather materials and [fabricate](/handbook/fabrication-schematics) new items from schematics.
+          - **Mining** — run a passive [mining rig](/handbook/mining-rigs) that accrues CRED over time.
+          - **Dens** — set up a [personal home base](/handbook/personal-dens-storage) with storage and invite-only access.
+          - **Transit** — ride [public routes, private taxis, and inter-region slipstream corridors](/handbook/transit-system).
+          - **Containment** — fail badly enough and GovCorp will [capture you](/handbook/govcorp-containment).
 
-          Read the individual articles in this section for detail on each loop.
+      - slug: inventory-items
+        title: Inventory & Items
+        kind: reference
+        position: 1
+        published: true
+        summary: "Item types, rarity tiers, inventory capacity, stacking, quantity syntax, and partial name matching."
+        metadata:
+          search_tags:
+            - inventory
+            - items
+            - rarity
+            - stacking
+            - capacity
+            - quantity
+            - name matching
+        body: |
+          # Inventory & Items
+
+          Your inventory holds items you've collected, purchased, crafted, or
+          been granted. Everything in THE PULSE GRID is an item — gear,
+          software, consumables, materials, fixtures, DECK modules, and more.
+
+          ## Capacity
+
+          You start with **16 inventory slots**. Equipped gear and
+          DECK-loaded software do not count toward this limit. Some gear
+          grants bonus slots via the `bonus_inventory_slots` effect.
+
+          When your inventory is full, you cannot pick up, buy, craft, or
+          receive items until you make space. Drop, sell, salvage, or store
+          items to free slots.
+
+          ## Item types
+
+          | Type | Description |
+          |------|-------------|
+          | gear | Equippable armor and accessories. See [Equipment & Loadout](/handbook/equipment-loadout). |
+          | software | Programs loaded into your DECK for BREACH combat. |
+          | module | Hardware peripherals installed in DECK module slots. |
+          | firmware | Consumable software flashed onto modules before installation. |
+          | consumable | Single-use items — stim packs, repair kits, exploits. |
+          | tool | Reusable utility items (e.g. EEPROM Flasher). |
+          | material | Crafting ingredients from salvage or mission drops. |
+          | data | Intel fragments and protocol data. |
+          | faction | Faction-specific items and tokens. |
+          | collectible | Unique trophies and souvenirs. |
+          | rig_component | Mining rig hardware — motherboards, GPUs, CPUs, PSUs, RAM. |
+          | fixture | Placeable den furniture with built-in storage. |
+
+          ## Rarity
+
+          Every item has a rarity tier that determines its color, salvage
+          XP value, and behavior:
+
+          | Rarity | Color | Notes |
+          |--------|-------|-------|
+          | SCRAP | Gray | Decomposition byproducts and raw materials. |
+          | UBIQUITOUS | Light gray | Extremely common. |
+          | COMMON | White | Standard items. |
+          | UNCOMMON | Teal | Above-average finds. |
+          | RARE | Blue | Hard to come by. |
+          | ULTRA-RARE | Purple | Exceptional. |
+          | UNICORN | Gold (animated) | Cannot be salvaged or destroyed. |
+
+          ## Stacking
+
+          Items of the same definition stack in a single inventory slot up
+          to a per-item maximum. When a stack is full, additional units
+          take a new slot. Typical stack limits:
+
+          | Type | Typical Max Stack |
+          |------|-------------------|
+          | material | 8–32 (common stacks higher, rare stacks lower) |
+          | consumable | 1–16 (varies per item) |
+          | data | 1–16 |
+          | firmware | 4 |
+          | gear / software / module / fixture | 1 (never stacks) |
+
+          ## Quantity syntax
+
+          Many commands accept an optional quantity prefix:
+
+          ```
+          take 5 scrap metal
+          drop all circuit boards
+          sell 3 stim pack
+          salvage all corrupted data
+          ```
+
+          Supported formats: a number (`5`), the word `all`, or omit for
+          one unit. Commands that support quantity: `take`, `drop`, `sell`,
+          `salvage`, `give`, `store`, `retrieve`, and `buy` (number only,
+          not `all`).
+
+          ## Partial name matching
+
+          You don't need to type a full name. The terminal resolves
+          partial names automatically:
+
+          - **Exact match** wins immediately (case-insensitive).
+          - **Unique substring** resolves to the match. `ex coord` finds
+            "Coordinator" if nothing else contains "coord".
+          - **Ambiguous substring** lists candidates: *"Did you mean: X, Y?"*
+
+          This applies to items, mobs, hackrs, shop listings, DECK
+          software, modules, schematics, and missions.
+
+          ## Commands
+
+          | Command | Aliases | Description |
+          |---------|---------|-------------|
+          | `inventory` | `inv`, `i` | List carried items with rarity, quantity, and capacity. |
+          | `take [qty\|all] <item>` | `get` | Pick up from room floor. |
+          | `drop [qty\|all] <item>` | — | Drop to floor. Blocked for equipped gear and placed fixtures. |
+          | `use <item>` | — | Consume a consumable or activate a tool. |
+          | `examine <target>` | `ex`, `x` | Inspect an item, mob, hackr, or fixture in detail. |
+
+      - slug: vitals-recovery
+        title: Vitals & Recovery
+        kind: reference
+        position: 2
+        published: true
+        summary: "HP, Energy, Psyche — what they do, what happens at zero, RestorePoint™ respawn, rest pods, and GovCorp debt."
+        metadata:
+          search_tags:
+            - vitals
+            - health
+            - energy
+            - psyche
+            - rest pod
+            - restorepoint
+            - death
+            - recovery
+        body: |
+          # Vitals & Recovery
+
+          Your operative has three vital stats. All start and cap at 100
+          (before gear bonuses).
+
+          ## The three vitals
+
+          | Vital | Abbr | Purpose |
+          |-------|------|---------|
+          | Health | HP | Physical integrity. Drained by SPIKE protocols and failure consequences. Hitting 0 triggers RestorePoint™. |
+          | Energy | EN | Operational stamina. Drained by FEEDBACK protocols and some failures. Low energy degrades your damage output in BREACH. |
+          | Psyche | PS | Mental stability. Drained by FEEDBACK protocols and some failures. Low psyche degrades the accuracy of `analyze` and reduces puzzle gate attempts. |
+
+          Equipped gear can raise your effective maximum above 100 via
+          effects like `bonus_max_health`. Your current value is clamped
+          to the effective max — unequipping gear that boosted a cap will
+          reduce your current value if it exceeds the new cap.
+
+          ## What happens at zero
+
+          **HP reaches 0** — RestorePoint™ emergency admission (see below).
+          Any active BREACH ends immediately. No DECK frying, no capture,
+          no zone lockout. You simply respawn at the regional hospital.
+
+          **Energy reaches 0** — no automatic game-over, but your BREACH
+          damage output drops to zero. You're effectively useless in
+          combat until you recover.
+
+          **Psyche reaches 0** — no automatic game-over, but `analyze`
+          returns wrong information 100% of the time and puzzle gate
+          attempts are limited.
+
+          ## Energy degradation tiers (BREACH damage)
+
+          Your software damage is multiplied based on your current energy:
+
+          | Energy % of Max | Damage Multiplier |
+          |-----------------|-------------------|
+          | > 50% | 1.0 (full) |
+          | 25–50% | 0.90 |
+          | 10–25% | 0.75 |
+          | 1–10% | 0.50 |
+          | 0 | 0.0 (no damage) |
+
+          ## Psyche degradation tiers (BREACH intel accuracy)
+
+          When you `analyze` a protocol, your chance of receiving wrong
+          intel scales with psyche depletion:
+
+          | Psyche % of Max | Wrong Info Chance |
+          |-----------------|-------------------|
+          | > 50% | 0% |
+          | 25–50% | 10% |
+          | 10–25% | 20% |
+          | 1–10% | 40% |
+          | 0 | 100% |
+
+          Additionally, you get +1 bonus puzzle gate attempt when your
+          psyche is at or above 50% of your effective max.
+
+          ## RestorePoint™
+
+          When your HP hits 0, GovCorp's RestorePoint™ system activates
+          automatically:
+
+          1. Any active BREACH ends.
+          2. You're charged an emergency fee: **50 + (clearance × 5) CRED**.
+             At CL10 that's 100 CRED; at CL30 that's 200.
+          3. If your default cache can't cover the fee, the shortfall
+             becomes **GovCorp debt** — see [CRED Economy](/handbook/cred-economy).
+          4. You respawn at your region's hospital room with **25% of your
+             max HP** restored. Energy and Psyche are unchanged.
+
+          ## Rest pods
+
+          Rest pod rooms let you pay CRED to restore vitals. The rate
+          depends on your clearance:
+
+          | Clearance | Rate |
+          |-----------|------|
+          | Below CL30 | 2 points per CRED (discounted) |
+          | CL30+ | 1 point per CRED (standard) |
+
+          **Command:** `rest <amount> <vital> [<amount> <vital> ...]`
+
+          ```
+          rest 50 hp                    # Restore 50 HP
+          rest 30 en 20 ps              # Restore 30 Energy and 20 Psyche
+          rest full hp full en full ps  # Full restore on all vitals
+          ```
+
+          Valid vital names: `health`/`hp`, `energy`/`en`, `psyche`/`ps`.
+          Use `full` instead of a number to restore a vital to its max.
+
+          Cost is calculated as `ceil(total_points / rate)`. The payment
+          is split: 70% burned, 30% recycled to the gameplay pool.
+
       - slug: clearance-levels
         title: Clearance Levels
         kind: reference
-        position: 1
+        position: 3
         published: true
         summary: "How clearance works and what higher tiers unlock."
         metadata:
@@ -151,12 +393,17 @@ handbook_sections:
           ## What clearance gates
 
           - **Zones and rooms.** Some parts of the Grid refuse entry until
-            you've earned your way in. If you get bounced at a threshold,
-            you're not cleared yet — come back later.
+            you've earned your way in.
           - **Vendors and listings.** Certain shops, and certain items within
             shops, require a minimum clearance.
-          - **Commands.** A handful of commands only become available once
-            you've climbed high enough.
+          - **Gear.** Some equipment has a minimum clearance to equip.
+          - **BREACH encounters.** Encounters can set a minimum clearance.
+          - **Schematics.** Some crafting recipes require a clearance threshold.
+          - **Slipstream corridors.** Inter-region travel requires CL15+.
+          - **BREACH action economy.** Higher clearance gives you more actions
+            per round — see [BREACH Encounters](/handbook/breach-encounters).
+          - **Puzzle gate bypasses.** Every 30 clearance levels, you bypass one
+            additional puzzle gate in BREACH.
 
           ## Pacing
 
@@ -164,91 +411,581 @@ handbook_sections:
           feel the same at CL3 as it does at CL30.
 
           Check your current CL any time with `stat`.
-      - slug: achievements
-        title: Achievements & Badges
+
+      - slug: cred-economy
+        title: CRED Economy & Caches
         kind: reference
-        difficulty: beginner
-        position: 2
+        position: 4
         published: true
-        summary: "Unlockable badges across the Grid, Vault, WIRE, Uplink, and more — with XP and CRED rewards."
+        summary: "CRED currency, caches (wallets), transfers, vendors, the blockchain ledger, mining pools, and GovCorp debt."
         metadata:
           search_tags:
-            - achievements
-            - badges
-            - progression
-            - unlocks
-            - rewards
+            - cred
+            - economy
+            - cache
+            - wallet
+            - transfer
+            - chain
+            - debt
+            - garnishment
+            - vendor
+            - shop
+            - buy
+            - sell
         body: |
-          # Achievements & Badges
+          # CRED Economy & Caches
 
-          Achievements unlock permanently when you hit a milestone. Each
-          achievement awards **XP** toward your clearance level, and most
-          also drop **CRED** directly into your default cache.
+          **CRED** is the currency of THE PULSE GRID. It has a fixed total
+          supply of 1,000,000,000 split between two pools:
 
-          ## Categories
+          - **Mining pool (70%)** — earned passively through mining rigs.
+          - **Gameplay pool (30%)** — earned through missions, achievements, and events.
 
-          Achievements are grouped into five categories:
+          Both pools follow a halving schedule: as more CRED is mined or
+          awarded, the per-tick and per-reward payout gradually decreases.
 
-          - **GRID** — MUD exploration, items, NPC interaction, salvage.
-          - **MUSIC** — Pulse Vault listening, VODs, radio, artist pages.
-          - **SOCIAL** — WIRE pulses, Uplink packets, custom playlists.
-          - **META** — Hackr Logs and Codex reading.
-          - **PROGRESSION** — Clearance level milestones.
+          ## Caches (wallets)
 
-          ## How you unlock them
+          Caches are your CRED wallets. Each has a unique address
+          (format: `CACHE-XXXX-XXXX`) and can hold any amount. You can
+          create multiple caches, but one is always marked as your
+          **default** — mining rewards, achievement payouts, and vendor
+          refunds land there automatically.
 
-          Most achievements track automatically as you use the site:
+          | Command | Description |
+          |---------|-------------|
+          | `cache` | List all your caches with balances and flags. |
+          | `cache create` | Create a new cache. |
+          | `cache balance [addr\|nick]` | Check a cache's balance. |
+          | `cache history [addr\|nick]` | View last 15 transactions for a cache. |
+          | `cache send <amt> <to> [from <src>] [memo <text>]` | Transfer CRED between caches. |
+          | `cache default <addr\|nick>` | Set a cache as your default. |
+          | `cache name <addr\|nick> <nickname>` | Assign a nickname (max 20 chars). |
+          | `cache abandon <addr>` | Permanently disable a cache. Irreversible. |
 
-          - Move between rooms and `talk` / `take` / `use` / `salvage` in-Grid.
-          - Play tracks in the Vault (credit kicks in after ~30 seconds of playback).
-          - Read Hackr Logs and Codex entries.
-          - Visit band bios, release indexes, and individual releases.
-          - Watch VODs. Tune into radio stations.
-          - Post pulses on the WIRE. Send Uplink packets. Create playlists.
+          Aliases: `caches`, `cred`.
 
-          A handful of achievements are **hidden** — you'll only find out
-          what they are by earning them.
+          ## Blockchain ledger
 
-          ## Rewards
+          Every CRED transaction is recorded on a public append-only
+          ledger. Each entry has a SHA256 hash chained to the previous
+          transaction.
 
-          The standard ladder for tiered counter-based achievements:
+          | Command | Description |
+          |---------|-------------|
+          | `chain latest` | 10 most recent global transactions. |
+          | `chain tx <hash>` | Look up a specific transaction by hash. |
+          | `chain cache <address>` | Public transaction history + balance for any cache. |
+          | `chain supply` | CRED supply overview — mining pool, gameplay pool, burned, redeemed. |
 
-          | Tier        | XP      | CRED   |
-          |-------------|--------:|-------:|
-          | Tier 1      |  25     |   1    |
-          | Tier 2      | 100     |  10    |
-          | Tier 3      | 250     |  20    |
-          | Completionist | 500   |  50    |
-          | Single-event |  10    |   0    |
+          ## Vendors & shops
 
-          Clearance-level achievements grant CRED only — the XP that got you
-          to that level is its own reward.
+          Vendor mobs sell items at fixed prices. Walk into a vendor's
+          room and use these commands:
 
-          CRED payouts are minted from the Fracture Reserve and land in your
-          default cache automatically. Check `stat` or the `cache` command to
-          confirm the balance.
+          | Command | Description |
+          |---------|-------------|
+          | `shop` / `browse` | View the vendor's listings, prices, and stock. |
+          | `buy [qty] <item>` | Purchase from the vendor. |
+          | `sell [qty\|all] <item>` | Sell to the vendor. |
+          | `offer <item>` / `appraise <item>` | Preview the vendor's buy price before committing. |
 
-          ## Where to see your progress
+          Sell price is **50% of the buy price**. Purchases are split:
+          70% of the cost is **burned** (removed from the economy) and
+          30% is **recycled** back into the gameplay pool.
 
-          - `stat` in the Terminal lists every achievement you've earned, with
-            its badge icon, name, and XP value.
-          - When an achievement unlocks, a toast appears in the corner of the
-            screen anywhere on hackr.tv — even outside the Terminal.
-          - The Terminal shows the full `ACHIEVEMENT UNLOCKED` banner inline
-            when the trigger happens during a command.
+          Some vendors are **black markets** — clearance-gated, rotating
+          stock, and higher-tier items.
 
-          ## Catch-up on login
+          ## GovCorp debt & garnishment
 
-          When you log in, the system runs a quick sweep to award any
-          cumulative achievements you qualified for while away (e.g. you
-          hit 50 tracks played across multiple sessions but never triggered
-          a Terminal command to check). Expect a small burst of toasts on a
-          long-absence login.
+          If you owe CRED you don't have (typically from a RestorePoint™
+          fee — see [Vitals & Recovery](/handbook/vitals-recovery)), the
+          shortfall becomes **GovCorp debt**.
+
+          While in debt, **50% of all incoming CRED** (mining rewards,
+          gameplay rewards) is automatically garnished until the debt is
+          cleared. Player-to-player transfers are not garnished.
+
+          You can also pay debt voluntarily by paying at a GovCorp
+          facility or through the debt system.
+
+      - slug: equipment-loadout
+        title: Equipment & Loadout
+        kind: reference
+        position: 5
+        published: true
+        summary: "13 gear slots, equip/unequip, stat bonuses, rarity effects, and visible loadout."
+        metadata:
+          search_tags:
+            - equipment
+            - loadout
+            - gear
+            - equip
+            - slots
+            - armor
+            - effects
+        body: |
+          # Equipment & Loadout
+
+          Gear items can be equipped into 13 body slots. Equipped gear
+          grants stat bonuses, inventory expansion, and BREACH
+          advantages.
+
+          ## Slots
+
+          | Slot | Label |
+          |------|-------|
+          | deck | DECK |
+          | head | HEAD |
+          | eyes | EYES |
+          | ears | EARS |
+          | neck | NECK |
+          | chest | CHEST |
+          | back | BACK |
+          | left_wrist | L.WRIST |
+          | right_wrist | R.WRIST |
+          | hands | HANDS |
+          | waist | WAIST |
+          | legs | LEGS |
+          | feet | FEET |
+
+          One item per slot. Equipping into an occupied slot
+          automatically swaps the old item back to inventory.
+
+          ## Gear effects
+
+          Equipped gear effects stack additively across all slots. Common
+          effects:
+
+          - `bonus_max_health` / `bonus_max_energy` / `bonus_max_psyche` — raise your vital caps above 100.
+          - `bonus_inventory_slots` — expand inventory capacity beyond the base 16.
+          - `breach_bonus_action_chance` — chance of a free bonus action when you `analyze` in BREACH.
+
+          All numeric effects sum together. `examine` an item to see its
+          full effect list.
+
+          ## Restrictions
+
+          - Some gear requires a **minimum clearance** to equip.
+          - You cannot equip or unequip in danger zones.
+          - Unequipping gear that raised a vital cap will clamp your
+            current value down to the new cap if it exceeds it.
+
+          ## Visible gear
+
+          Other operatives can see your equipped head, eyes, chest, legs,
+          and feet when they `examine` you. `loadout` shows your full
+          equipment and aggregated effects.
+
+          ## Commands
+
+          | Command | Aliases | Description |
+          |---------|---------|-------------|
+          | `equip <item>` | `wear` | Equip gear to its designated slot. |
+          | `unequip <item\|slot>` | `remove` | Unequip by item name or slot name. |
+          | `loadout` | `lo` | View all equipped gear and total effects. |
+
+      - slug: deck-system
+        title: DECK System
+        kind: reference
+        position: 6
+        published: true
+        summary: "Your hacking hardware — battery, software slots, modules, firmware, fried state, and repair."
+        metadata:
+          search_tags:
+            - deck
+            - software
+            - modules
+            - firmware
+            - battery
+            - fried
+            - repair
+        body: |
+          # DECK System
+
+          Your **DECK** is the hardware interface you use to initiate and
+          fight BREACH encounters. Without an equipped DECK, you cannot
+          BREACH. A fried DECK is equally useless.
+
+          ## Anatomy of a DECK
+
+          - **Battery** — consumed when you execute software during BREACH.
+            Shown as current/max. Recharges for free at your den
+            (`deck charge`) or via consumable items.
+          - **Software slots** — how many software programs you can load
+            simultaneously. Each program has a slot cost (typically 1).
+          - **Module slots** — hardware peripheral slots. Modules must be
+            flashed with firmware before installation.
+
+          Higher-rarity DECKs have more battery, more software slots, and
+          more module slots.
+
+          ## Software
+
+          Software is your arsenal in BREACH. Load programs into your
+          DECK before combat — they determine what actions you can take
+          against protocols.
+
+          Each program has:
+          - A **software category** (offensive, defensive, utility, exploit) that determines damage bonuses against matching protocol weaknesses.
+          - A **battery cost** consumed on execution.
+          - A **slot cost** (how many DECK slots it occupies).
+          - An **effect magnitude** (base damage).
+          - Optionally, a **requires_module** property (execution fails if the required module isn't installed).
+
+          **Exploit** software is a special category — it instantly
+          destroys a protocol on type match, but the exploit is consumed
+          in the process. A type mismatch wastes the action without
+          consuming the exploit.
+
+          ## Modules & firmware
+
+          Modules are hardware peripherals. Before installing a module,
+          it must be **flashed** with firmware:
+
+          1. Obtain firmware (buy from a vendor, craft, or loot).
+          2. Flash it onto a module: `deck flash <firmware> onto <module>`.
+             This requires either an EEPROM Flasher tool in inventory or
+             being at a firmware vendor room.
+          3. Install the flashed module: `deck install <module>`.
+
+          Some software programs require a specific module to be installed
+          before they can execute.
+
+          ## Fried DECK
+
+          Failing a BREACH encounter can fry your DECK. Fried level
+          ranges from 1 to 5 — any fried level above 0 makes the DECK
+          completely unusable for BREACH. You can still equip it and view
+          its status, but you cannot initiate or participate in encounters.
+
+          ## Repair
+
+          Two ways to repair a fried DECK:
+
+          **NPC repair service** — visit a room with `room_type: repair_service`
+          and use the `repair` command. Cost formula:
+
+          `150 × fried_level × quality_multiplier`
+
+          Quality multiplier by DECK rarity: scrap/ubiquitous = 1,
+          common = 2, uncommon = 3, rare = 5, ultra-rare = 8,
+          unicorn = 12.
+
+          Example: a rare DECK at fried level 3 costs 150 × 3 × 5 =
+          2,250 CRED.
+
+          **DECK Repair Kit** — consumable items (Mk.I through Mk.V)
+          that reset fried level to 0 when used.
+
+          ## Commands
+
+          | Command | Aliases | Description |
+          |---------|---------|-------------|
+          | `deck` | `dk` | Show DECK status — battery, slots, loaded software, installed modules. |
+          | `deck load <software>` | — | Load software into DECK (costs slots). |
+          | `deck unload <software>` | — | Unload software from DECK. |
+          | `deck charge` | — | Recharge battery to full (free, must be at your den). |
+          | `deck flash <firmware> onto <module>` | — | Flash firmware onto a module. |
+          | `deck install <module>` | — | Install a flashed module into a module slot. |
+          | `deck uninstall <module>` | — | Remove a module from DECK to inventory. |
+          | `repair` | — | Repair fried DECK at an NPC repair service (costs CRED). |
+
+      - slug: breach-encounters
+        title: BREACH Encounters
+        kind: reference
+        position: 7
+        published: true
+        summary: "Protocol combat — initiating encounters, exec/analyze/reroute, detection, puzzles, failure tiers, and consequences."
+        metadata:
+          search_tags:
+            - breach
+            - combat
+            - protocols
+            - detection
+            - puzzle
+            - jackout
+            - encounter
+            - exec
+            - analyze
+            - reroute
+            - interface
+            - failure
+            - capture
+        body: |
+          # BREACH Encounters
+
+          A BREACH is a turn-based combat encounter against a hostile
+          system's protocols. It's the Grid's primary challenge loop —
+          where you put your DECK, loaded software, and clearance to the
+          test.
+
+          ## Prerequisites
+
+          - A DECK must be **equipped** (not fried).
+          - Software should be **loaded** into the DECK — without it
+            you have no way to damage protocols.
+
+          ## Initiating a BREACH
+
+          Find a room with BREACH encounters visible via `look`. Type
+          `breach <name>` to initiate (partial name matching works). If
+          a room has multiple encounters, `look` shows numbered targets.
+
+          Encounters have tiers: **standard**, **advanced**, **elite**,
+          and **ambient**. Higher tiers have tougher protocols, higher
+          detection rates, and harsher failure consequences.
+
+          ## The protocol grid
+
+          Each BREACH contains a set of protocols — hostile programs you
+          need to destroy or circumvent. Every protocol has:
+
+          - A **type** that determines its per-round effect.
+          - A **weakness** category — software matching the weakness deals 1.5× damage.
+          - **HP** that must be reduced to 0 to destroy it.
+
+          ### Protocol types
+
+          | Type | Per-Tick Effect |
+          |------|-----------------|
+          | TRACE | Adds to the detection clock. Multiple active TRACEs compound the bonus. |
+          | FEEDBACK | Drains PSYCHE −4 and ENERGY −4 each round. |
+          | LOCK | Drains INSPIRATION −15 each round, slowing your action ramp. |
+          | ADAPT | After 3 rounds active, begins mutating other protocols' weaknesses. |
+          | SPIKE | Drains HEALTH −6 each round. The only protocol that can directly kill you. |
+          | PURGE | Degrades your CRED reward by 10% per round (compounds: 100% → 90% → 81% → ...). |
+
+          Protocols fire at the **end of each round** after your actions.
+
+          ## Your actions
+
+          You start each round with a number of actions based on your
+          clearance and current inspiration level (see Action Economy
+          below). Each action costs 1 unless noted.
+
+          | Command | Cost | Description |
+          |---------|------|-------------|
+          | `exec <software> <target#>` | 1 action + battery | Execute loaded software against a protocol. |
+          | `analyze <target#>` | 1 action | Reveal a protocol's weakness. 15% chance of a free bonus action (boosted by gear). |
+          | `reroute <target#>` | 1 action | Delay a protocol's next tick. 30% chance to fizzle (do nothing). |
+          | `use <item>` | 1 action | Use a consumable during BREACH. |
+          | `interface <gate> <answer>` | 1 action | Submit a puzzle gate answer. |
+          | `interface <gate> probe <pair>` | **free** | Test a circuit connection (limited budget). |
+          | `jackout` | — | Abort the BREACH entirely (see below). |
+          | `status` / `look` | **free** | View current BREACH state. |
+          | `deck` | **free** | View DECK battery and loaded software. |
+
+          ### Software damage formula
+
+          `base_damage × weakness_bonus × energy_multiplier`
+
+          - **base_damage** = the software's effect_magnitude (typically 20).
+          - **weakness_bonus** = 1.5× if software category matches the protocol's weakness; 1.0× otherwise.
+          - **energy_multiplier** = based on your current energy (see [Vitals & Recovery](/handbook/vitals-recovery)).
+          - Final damage is floored, minimum 1.
+
+          ### Exploit software
+
+          Exploits are single-use programs that instantly destroy a
+          protocol if the exploit's type matches. A mismatch wastes
+          your action without consuming the exploit.
+
+          ## Detection & Point of No Return
+
+          The **detection clock** runs from 0 to 100. It ticks up every
+          round based on:
+
+          - **Base rate** — set per encounter template (typically 5).
+          - **TRACE bonus** — +4 per active TRACE protocol. With 2+
+            active TRACEs, this bonus doubles.
+          - **Wrong puzzle answers** — +5 per failed gate attempt.
+
+          When detection hits 100, the BREACH fails via
+          **detection overflow**.
+
+          The **Point of No Return (PNR)** is a detection threshold
+          (typically 75). Before PNR, jacking out is clean. After PNR,
+          jacking out costs extra vitals.
+
+          ## Puzzle gates
+
+          Some encounters include **circumvention gates** — puzzles that
+          offer an alternative win condition. Solve all required gates
+          OR destroy all protocols to win.
+
+          You get **3 base attempts** per gate, +1 if your psyche is
+          at or above 50% of max. Wrong answers cost +5 detection each.
+
+          Higher clearance lets you **bypass** gates — every 30 clearance
+          levels, one additional gate is automatically bypassed (hardest
+          last). At least one gate always remains.
+
+          ### Gate types
+
+          **Sequence** — reorder scrambled nodes into the correct
+          initialization order. `interface A NODE1 NODE2 NODE3`
+
+          **Logic Gate** — set input signals (HIGH/LOW) to produce a
+          target output through a logical operator (AND/OR/XOR/NAND/NOR).
+          `interface B HIGH LOW HIGH`
+
+          **Circuit** — connect node pairs to restore signal paths. You
+          get a limited number of free **probes** to test connections
+          before committing your answer.
+          `interface C probe ALPHA-BRAVO` (free probe)
+          `interface C ALPHA-BRAVO DELTA-ECHO` (submit answer)
+
+          **Credential** — decrypt an encrypted string using a partial
+          substitution map and hints. Higher difficulty adds red herring
+          substitutions and decoy ciphers.
+          `interface D MyPassword123`
+
+          ## Winning
+
+          You win a BREACH by destroying all protocols OR solving all
+          required puzzle gates. On success:
+
+          - **XP** is awarded (flat amount per template).
+          - **CRED** is awarded (may be degraded by PURGE protocols).
+          - **Pending data fragments** from utility software extraction
+            are granted.
+          - Achievement and mission triggers fire.
+
+          ## Jacking out
+
+          `jackout` (or `jo`) aborts the BREACH at any time.
+
+          - **Before PNR**: clean exit. Costs ENERGY −5.
+          - **After PNR**: dirty exit. Costs HEALTH −10, ENERGY −15,
+            PSYCHE −15.
+
+          Jacking out always forfeits all rewards and pending fragments.
+
+          ## Failure consequences
+
+          Failure severity depends on the encounter tier and failure mode.
+
+          | Tier | Vitals Drain | Zone Lockout | DECK Damage | Capture Chance |
+          |------|-------------|--------------|-------------|----------------|
+          | Ambient | EN −20, PS −20 | None | None | None |
+          | Standard | EN −20, PS −20 | 1–10 min | Software wipe | 25% |
+          | Advanced | EN −20, PS −20 | 1–10 min | Fry (level 2–3) + wipe | 50% |
+          | Elite | EN −20, PS −20 | 1–10 min | Fry (level 3–4) + wipe | 100% |
+
+          **Zone lockout** duration: `1 + floor(round_number / 3)` minutes
+          (clamped 1–10). You're ejected to the zone's entry room and
+          cannot re-enter until the lockout expires.
+
+          **Software wipe** destroys all loaded software in your DECK.
+
+          **DECK frying** sets a fried level (1–5) making the DECK
+          unusable. Higher clearance skews the roll toward lower fried
+          levels. See [DECK System](/handbook/deck-system) for repair.
+
+          **Capture** sends you to a GovCorp Perception Alignment Center.
+          See [GovCorp Containment](/handbook/govcorp-containment).
+
+          Note: if your HP hits 0 during BREACH, you go to RestorePoint™
+          instead — no DECK frying, no capture, no lockout.
+
+          ## Ambient encounters
+
+          Zones with a **danger level** can trigger random BREACH
+          encounters when you enter a room. Higher danger level = higher
+          chance. If you don't have a DECK equipped, an ambient encounter
+          auto-fails at tier 1 consequences.
+
+          ## Action economy
+
+          You start each BREACH with 1 action per round. As rounds pass,
+          your **inspiration** builds (+2 per round), gradually unlocking
+          more actions up to your clearance-based ceiling.
+
+          | Clearance | Rank | Max Actions |
+          |-----------|------|-------------|
+          | 0–4 | Script Kiddie | 1 |
+          | 5–9 | Packet Rat | 2 |
+          | 10–19 | Socket Jockey | 3 |
+          | 20–29 | Netcutter | 4 |
+          | 30–39 | Exploit Artist | 5 |
+          | 40–49 | Signal Ghost | 6 |
+          | 50–59 | Phantom Thread | 7 |
+          | 60–69 | Zero-Day Broker | 8 |
+          | 70–79 | Kernel Surgeon | 9 |
+          | 80–89 | Root Operator | 11 |
+          | 90–98 | Void Architect | 13 |
+          | 99 | ████████████ | 16 |
+
+          The ramp is gradual — you won't hit your ceiling until several
+          rounds in. LOCK protocols drain inspiration, slowing your ramp.
+
+      - slug: npc-dialogue
+        title: NPC Dialogue
+        kind: reference
+        position: 8
+        published: true
+        summary: "Branching conversation trees — talk, ask about topics, navigate depth, discover missions."
+        metadata:
+          search_tags:
+            - npc
+            - dialogue
+            - talk
+            - ask
+            - conversation
+            - topics
+        body: |
+          # NPC Dialogue
+
+          NPCs with dialogue trees offer branching conversations. Topics
+          can nest multiple levels deep, and some branches unlock
+          missions or advance story arcs.
+
+          ## Starting a conversation
+
+          `talk <npc>` initiates dialogue, shows the NPC's greeting
+          message and lists available root topics. Talking to an NPC
+          for the first time grants a small reputation boost with their
+          faction.
+
+          ## Navigating topics
+
+          `ask <npc> about <topic>` dives into a topic by keyword. If
+          the topic has sub-topics, those become the new available
+          options. Topics with children show a `[+]` indicator.
+
+          The terminal searches for your keyword in this order:
+
+          1. **Current depth** — topics at your current position.
+          2. **Ancestor levels** — walk up the tree toward root.
+          3. **Global search** — DFS across all branches.
+
+          If the keyword is ambiguous, you'll get a disambiguation
+          prompt.
+
+          ## Going back
+
+          | Command | Description |
+          |---------|-------------|
+          | `ask <npc> about back` | Go up one level. Also: `up`, `..` |
+          | `talk <npc>` (again) | Reset to greeting. Also: `reset`, `again`, `start`, `over` |
+
+          Leaf topics (no children) don't advance your position — sibling
+          topics remain reachable without navigating back.
+
+          ## Mission discovery
+
+          `ask <npc> about missions` shows all missions available from
+          that NPC. Some missions are gated behind dialogue depth — you
+          must navigate to a specific point in the tree before the
+          mission becomes visible. See [Missions & Quests](/handbook/missions).
+
       - slug: missions
         title: Missions & Quests
         kind: reference
         difficulty: beginner
-        position: 3
+        position: 9
         published: true
         summary: "Accept structured objectives from NPCs for XP, CRED, rep, items, and unlocks."
         metadata:
@@ -297,12 +1034,15 @@ handbook_sections:
           | `turn_in <slug>`     | Complete the mission (must be with the giver, all objectives met). |
           | `give <item> to <npc>` | Hand an item to an NPC — used for delivery objectives. |
 
+          Aliases: `quests` for `missions`, `quest` for `mission`,
+          `acc`/`ac` for `accept`, `turnin`/`ti` for `turn_in`.
+
           Objectives advance automatically as you do the matching action in
-          the Grid. The Terminal shows a short ✓ line on every objective
+          the Grid. The Terminal shows a short line on every objective
           that just completed; progress-only ticks are silent.
 
           When every objective on a mission is done, the Terminal surfaces
-          `▲ READY FOR TURN-IN`. Return to the giver's room and
+          `READY FOR TURN-IN`. Return to the giver's room and
           `turn_in <slug>`.
 
           ## Storylines and repeatable jobs
@@ -338,11 +1078,216 @@ handbook_sections:
           your active jobs, every job available from NPCs in your current
           room, and your recent completion history. It live-refreshes
           whenever you turn a mission in.
+
+      - slug: achievements
+        title: Achievements & Badges
+        kind: reference
+        difficulty: beginner
+        position: 10
+        published: true
+        summary: "Unlockable badges across the Grid, Vault, WIRE, Uplink, and more — with XP and CRED rewards."
+        metadata:
+          search_tags:
+            - achievements
+            - badges
+            - progression
+            - unlocks
+            - rewards
+        body: |
+          # Achievements & Badges
+
+          Achievements unlock permanently when you hit a milestone. Each
+          achievement awards **XP** toward your clearance level, and most
+          also drop **CRED** directly into your default cache.
+
+          ## Categories
+
+          Achievements are grouped into five categories:
+
+          - **GRID** — MUD exploration, items, NPC interaction, salvage, BREACH, crafting, transit.
+          - **MUSIC** — Pulse Vault listening, VODs, radio, artist pages.
+          - **SOCIAL** — WIRE pulses, Uplink packets, custom playlists.
+          - **META** — Hackr Logs and Codex reading.
+          - **PROGRESSION** — Clearance level milestones.
+
+          ## How you unlock them
+
+          Most achievements track automatically as you use the site:
+
+          - Move between rooms and `talk` / `take` / `use` / `salvage` in-Grid.
+          - Complete BREACH encounters, fabricate items, place fixtures.
+          - Ride transit routes and slipstream corridors.
+          - Play tracks in the Vault (credit kicks in after ~30 seconds of playback).
+          - Read Hackr Logs and Codex entries.
+          - Visit band bios, release indexes, and individual releases.
+          - Watch VODs. Tune into radio stations.
+          - Post pulses on the WIRE. Send Uplink packets. Create playlists.
+
+          A handful of achievements are **hidden** — you'll only find out
+          what they are by earning them.
+
+          ## Rewards
+
+          The standard ladder for tiered counter-based achievements:
+
+          | Tier        | XP      | CRED   |
+          |-------------|--------:|-------:|
+          | Tier 1      |  25     |   1    |
+          | Tier 2      | 100     |  10    |
+          | Tier 3      | 250     |  20    |
+          | Completionist | 500   |  50    |
+          | Single-event |  10    |   0    |
+
+          Clearance-level achievements grant CRED only — the XP that got you
+          to that level is its own reward.
+
+          CRED payouts are minted from the Fracture Reserve and land in your
+          default cache automatically. Check `stat` or the `cache` command to
+          confirm the balance.
+
+          ## Where to see your progress
+
+          - `stat` in the Terminal lists every achievement you've earned, with
+            its badge icon, name, and XP value.
+          - When an achievement unlocks, a toast appears in the corner of the
+            screen anywhere on hackr.tv — even outside the Terminal.
+          - The Terminal shows the full `ACHIEVEMENT UNLOCKED` banner inline
+            when the trigger happens during a command.
+
+          ## Catch-up on login
+
+          When you log in, the system runs a quick sweep to award any
+          cumulative achievements you qualified for while away (e.g. you
+          hit 50 tracks played across multiple sessions but never triggered
+          a Terminal command to check). Expect a small burst of toasts on a
+          long-absence login.
+
+      - slug: reputation-factions
+        title: Reputation & Factions
+        kind: reference
+        position: 11
+        published: true
+        summary: "Faction standing tiers, the faction hierarchy, how rep changes, and what it unlocks."
+        metadata:
+          search_tags:
+            - reputation
+            - factions
+            - standing
+            - tier
+            - rep
+        body: |
+          # Reputation & Factions
+
+          Every operative has a standing with each faction in the Grid.
+          Standing affects what NPCs will offer you, which missions
+          become available, and how certain systems treat you.
+
+          ## Standing tiers
+
+          Reputation ranges from −1000 to +1000. Your tier is determined
+          by your current value:
+
+          | Tier | Range | Color |
+          |------|-------|-------|
+          | BLACKLISTED | −1000 to −600 | Red |
+          | HOSTILE | −599 to −200 | Light red |
+          | FLAGGED | −199 to −50 | Orange |
+          | UNKNOWN | −49 to +49 | Gray |
+          | TRUSTED | +50 to +199 | Green |
+          | OPERATIVE | +200 to +499 | Cyan |
+          | SPECIALIST | +500 to +799 | Purple |
+          | ARCHITECT | +800 to +1000 | Gold |
+
+          ## Faction hierarchy
+
+          Factions are organized in a parent-child tree. **Leaf factions**
+          store your actual reputation value — it changes when you talk
+          to aligned NPCs, complete missions, or trigger events.
+          **Aggregate factions** compute their standing from their
+          children via weighted rep links.
+
+          You cannot adjust an aggregate faction's standing directly. It
+          changes when its child factions change.
+
+          ## How rep changes
+
+          - **Talking to an NPC** — `talk <npc>` grants +1 rep with the
+            mob's faction (first conversation per session).
+          - **Mission rewards** — missions can grant or deduct faction rep
+            on turn-in.
+          - **Events** — some BREACH outcomes, purchases, or story
+            triggers adjust standing.
+
+          ## Commands
+
+          | Command | Aliases | Description |
+          |---------|---------|-------------|
+          | `rep` | `reputation`, `standing` | Detailed faction tree with tiers, bars, values, and next-tier distance. |
+
+          The output shows parent→child hierarchy with indentation,
+          ASCII progress bars, and tier badge labels.
+
+      - slug: fabrication-schematics
+        title: Fabrication & Schematics
+        kind: reference
+        position: 12
+        published: true
+        summary: "Crafting items from schematics — ingredients, room gates, clearance requirements, and XP rewards."
+        metadata:
+          search_tags:
+            - fabrication
+            - crafting
+            - schematics
+            - ingredients
+            - fab
+        body: |
+          # Fabrication & Schematics
+
+          Schematics are crafting blueprints. Each schematic lists
+          ingredient items, an output item, and an XP reward. Gather
+          the materials, meet the requirements, and fabricate.
+
+          ## Browsing schematics
+
+          | Command | Aliases | Description |
+          |---------|---------|-------------|
+          | `schematics` | `schem`, `sch` | List all schematics grouped by availability (Ready / Available / Locked). |
+          | `schematic <slug>` | — | Detail view — ingredients, output, requirements, XP. |
+          | `fabricate <slug>` | `fab` | Craft the item. Consumes ingredients, grants output + XP. |
+
+          The `/schematics` SPA page shows the same information with tabs
+          for All, Ready (can craft now), Available (unlocked but missing
+          ingredients), and Locked.
+
+          ## Requirements
+
+          Schematics can be gated by:
+
+          - **Clearance** — minimum CL to craft.
+          - **Mission completion** — must complete a specific mission first.
+          - **Achievement** — must have earned a specific achievement.
+          - **Room type** — some schematics require you to be in a
+            specific room type (e.g. your den's workbench). The terminal
+            tells you what's required if you try in the wrong location.
+
+          ## Crafting process
+
+          When you `fabricate`:
+
+          1. Ingredients are consumed from your inventory (partial stacks
+             are drawn from, then full stacks as needed).
+          2. The output item is granted to your inventory.
+          3. XP is awarded.
+          4. Achievement and mission triggers fire.
+
+          Crafting fails if your inventory is full and can't hold the
+          output item.
+
       - slug: salvaging-decomposition
         title: Salvaging & Decomposition
         kind: reference
         difficulty: beginner
-        position: 4
+        position: 13
         published: true
         summary: "Salvaging destroys an item and awards XP. Items with decomposition yields also produce raw materials."
         metadata:
@@ -355,44 +1300,446 @@ handbook_sections:
         body: |
           # Salvaging & Decomposition
 
-          ## SALVAGE COMMAND
+          ## Salvage command
 
-          `salvage <item name>`
+          `salvage [qty|all] <item name>`
 
-          Destroys the named item from your inventory and awards XP equal to the
-          item's base value (minimum 1 XP). If you have a stack, one unit is consumed.
+          Destroys item(s) from your inventory and awards XP equal to the
+          item's base value per unit (minimum 1 XP). Supports quantity
+          syntax — `salvage 5 stim pack` or `salvage all circuit board`.
 
-          ## DECOMPOSITION YIELDS
+          ## Decomposition yields
 
-          Some items have **decomposition yields** — salvaging them produces additional
-          scrap-tier materials alongside the XP award. The output items are added
-          directly to your inventory. If you already own a stack of the output item,
-          the quantity increments automatically.
+          Some items have **decomposition yields** — salvaging them produces
+          additional scrap-tier materials alongside the XP award. The output
+          items are added directly to your inventory. If you already own a
+          stack of the output item, the quantity increments automatically.
 
-          Yields are deterministic: the same item always produces the same output. No RNG.
+          Yields are deterministic: the same item always produces the same
+          output. No RNG.
 
           Example — salvaging a **Basic GPU** yields:
           - Raw Silicon Wafer ×3
           - Corrupted Shader Fragment ×1
 
-          ## SCRAP TIER
+          ## Preview before salvaging
 
-          Scrap-rarity items are decomposition byproducts and raw materials. They
-          currently have no direct use, but are intended as inputs for a future
-          fabrication (crafting) system. Salvage them for XP or hold them.
+          Use `analyze <item>` (or `an <item>`) to preview what a salvage
+          will produce before committing. The preview shows yield items
+          and quantities.
 
-          ## RESTRICTIONS
+          ## Scrap tier
+
+          Scrap-rarity items are decomposition byproducts and raw materials.
+          They serve as inputs for the [fabrication system](/handbook/fabrication-schematics) —
+          check available schematics with `schematics` to see what you can craft.
+
+          ## Restrictions
 
           - **UNICORN** rarity items cannot be salvaged under any circumstances.
-          - Only one unit is salvaged per command. There is no `salvage all`.
-          - Yields are first-level only — output items do not recursively decompose
-            in a single command. To break down yielded items further, salvage them
-            individually.
+          - Equipped gear and placed fixtures cannot be salvaged — unequip
+            or unplace them first.
+          - Yields are first-level only — output items do not recursively
+            decompose in a single command.
 
-          ## ACHIEVEMENTS
+          ## Achievements
 
-          Salvaging and receiving yield materials may unlock achievements. Check
-          `stat` for your current salvage and yield counts.
+          Salvaging and receiving yield materials may unlock achievements.
+          Check `stat` for your current salvage and yield counts.
+
+      - slug: mining-rigs
+        title: Mining Rigs
+        kind: reference
+        position: 14
+        published: true
+        summary: "Passive CRED generation — rig components, slots, multipliers, stream bonus, and inactivity shutoff."
+        metadata:
+          search_tags:
+            - mining
+            - rig
+            - passive income
+            - components
+            - cred
+            - stream bonus
+        body: |
+          # Mining Rigs
+
+          Every operative is provisioned with a mining rig. Activate it
+          to earn CRED passively over time. Install better components to
+          boost your mining rate.
+
+          ## Components
+
+          A functional rig needs all five component types installed:
+
+          | Component | Role |
+          |-----------|------|
+          | Motherboard | Foundation. Defines CPU, GPU, RAM, and PSU slot counts. |
+          | PSU | Power supply. One required per motherboard. |
+          | CPU | Processor. At least one per motherboard. |
+          | GPU | Graphics card. At least one per motherboard. |
+          | RAM | Memory. At least one per motherboard. |
+
+          You can install **multiple motherboards** to expand slots for
+          other components. Each additional motherboard requires its own
+          PSU, CPU, GPU, and RAM minimum.
+
+          ## Rate calculation
+
+          Each component has a **rate multiplier** (default 1.0). All
+          component multipliers are **multiplied together** (not added):
+
+          ```
+          total_multiplier = MB × PSU × CPU × GPU × RAM × ...
+          effective_rate = floor(base_rate × total_multiplier)
+          ```
+
+          Example: CPU ×1.2, GPU ×1.5, RAM ×1.1 = 1.2 × 1.5 × 1.1 = 1.98×.
+
+          A missing required component makes the rig non-functional
+          (rate = 0).
+
+          ## Mining ticks
+
+          Rigs are evaluated every **5 minutes**. Per tick:
+
+          - Active rig: earns `effective_rate × halving_factor` CRED.
+          - **Stream presence bonus**: if a livestream is active and you're
+            in #live, mining rate is doubled.
+          - **Chat bonus**: actively chatting in #live during a stream
+            earns an additional flat 1 CRED per tick.
+
+          The **halving schedule** reduces payouts as the mining pool
+          depletes: full rate until 50% mined, then halved, then halved
+          again every 12.5%.
+
+          ## Inactivity shutoff
+
+          Rigs belonging to hackrs inactive for **7+ days** are
+          automatically deactivated. Log in and `rig on` to restart.
+
+          ## Commands
+
+          | Command | Description |
+          |---------|-------------|
+          | `rig` | Quick status — active/inactive, rate, functionality check. |
+          | `rig on` | Activate mining (rig must be functional). |
+          | `rig off` | Deactivate mining. |
+          | `rig inspect` | Detailed component list with slot counts and multipliers. |
+          | `rig install <component>` | Install a rig component. Must be at your den, rig must be off. |
+          | `rig uninstall <component>` | Remove a component to inventory. Must be at your den, rig must be off. |
+
+      - slug: personal-dens-storage
+        title: Personal Dens & Storage
+        kind: reference
+        position: 15
+        published: true
+        summary: "Home base — den creation, renaming, invites, locking, floor storage, and storage fixtures."
+        metadata:
+          search_tags:
+            - den
+            - home
+            - storage
+            - fixtures
+            - invite
+            - lock
+            - place
+            - store
+            - retrieve
+        body: |
+          # Personal Dens & Storage
+
+          Your den is your private room in the Grid — a home base for
+          storage, rig maintenance, DECK charging, and den-gated crafting.
+
+          ## Creating a den
+
+          Use a **Den Access Chip** item. This creates a room in the
+          Residential District with bidirectional exits to the corridor.
+          One den per operative.
+
+          ## Den commands
+
+          | Command | Description |
+          |---------|-------------|
+          | `den` | View den status — owner, floor items, fixtures, active invites. |
+          | `den rename <name>` | Rename your den (max 80 characters). |
+          | `den describe <text>` | Set or update your den's description. |
+          | `den invite <hackr>` | Grant a guest 1-hour access. |
+          | `den uninvite <hackr>` | Revoke an active invite. |
+          | `den lock` | Lock the den — blocks all entry AND exit. |
+          | `den unlock` | Unlock the den. |
+          | `home` | Quick-travel to your den from its corridor. |
+          | `out` | Exit your den to the corridor. |
+
+          ## Floor storage
+
+          Your den floor holds up to **16 items**. Drop items with
+          `drop` and pick them up with `take` as usual. Only you (and
+          invited guests) can see and interact with floor items.
+
+          ## Storage fixtures
+
+          Fixtures are placeable furniture items with built-in storage
+          capacity. Each fixture has a slot count (e.g. 8, 16, or 32)
+          independent of the floor limit.
+
+          You can place up to **3 fixtures** in your den.
+
+          | Command | Description |
+          |---------|-------------|
+          | `place <fixture>` / `install` | Install a fixture from your inventory. |
+          | `unplace <fixture>` / `uninstall` | Remove a fixture (must be empty first). |
+          | `store [qty\|all] <item> in <fixture>` | Move item from inventory into fixture storage. Also: `put`. |
+          | `retrieve [qty\|all] <item> from <fixture>` | Move item from fixture to inventory. |
+          | `peek <fixture>` / `search` | View a fixture's contents and remaining capacity. |
+
+          Guests can `peek` at fixtures but cannot store or retrieve.
+
+          ## Access rules
+
+          - **Owner**: always has access.
+          - **Invited guests**: can enter while their invite is active (1 hour).
+          - **Others**: denied entry.
+          - **Locked den**: blocks entry AND exit — you can lock yourself in.
+
+      - slug: transit-system
+        title: Transit System
+        kind: reference
+        position: 16
+        published: true
+        summary: "Public routes, private taxis, and slipstream inter-region corridors — commands, fares, and heat."
+        metadata:
+          search_tags:
+            - transit
+            - travel
+            - bus
+            - taxi
+            - slipstream
+            - board
+            - route
+            - hail
+        body: |
+          # Transit System
+
+          Three transit types move you across the Grid: public local
+          routes, private point-to-point transport, and inter-region
+          slipstream corridors.
+
+          ## Public transit (local routes)
+
+          Public routes run within a region with fixed stops. Board at
+          any stop, ride through intermediate stops, and disembark
+          where you want.
+
+          | Command | Description |
+          |---------|-------------|
+          | `transit` / `tr` | List available routes at your current stop. |
+          | `board <route> [forward\|reverse]` | Board a route. Direction optional — middle stops offer both. |
+          | `wait` / `ride` | Advance to the next stop. Also: `w`, `w8`. |
+          | `disembark` / `off` | Exit at the current stop. |
+          | `abandon` / `abort` | Cancel the journey entirely. |
+
+          Non-loop routes support **bidirectional** travel. At the first
+          or last stop, direction is automatic. At middle stops, you
+          choose.
+
+          ## Private transit (taxis)
+
+          Private transport is point-to-point. Hail a vehicle type and
+          specify a destination — any transit room in the region
+          (excluding slipstream origins).
+
+          ```
+          hail taxi Signal Hub
+          ```
+
+          Fares vary by transit type and distance.
+
+          ## Slipstream corridors (inter-region)
+
+          Slipstream routes are high-speed inter-region corridors that
+          move you between geographic regions. They require **CL15+**
+          to board.
+
+          Slipstream journeys are multi-leg: you traverse legs one at
+          a time, with **fork choices** at decision points that affect
+          risk and speed.
+
+          | Command | Description |
+          |---------|-------------|
+          | `slipstream` / `slip` | List available slipstream routes from your current room. |
+          | `slipstream <route>` | Board a slipstream route. |
+          | `advance` / `adv` | Traverse the next leg. |
+          | `choose <fork>` / `ch` | Select a path at a fork (case-insensitive). |
+          | `abandon` / `abort` | Abort the journey (return to origin room). |
+
+          ### Heat & detection
+
+          Each slipstream journey accumulates **heat** — a per-hackr
+          value that decays over time when you're not traveling. Higher
+          heat increases detection probability on each leg:
+
+          ```
+          detection_chance = base_risk + (heat × 0.003) + fork_modifier
+          ```
+
+          Capped at 95%. If detected:
+
+          - **With a functional DECK**: a mid-journey BREACH encounter
+            triggers. Win to continue; lose with consequences scaled by
+            heat.
+          - **Without a DECK** (or fried): vitals drain (EN −20, PS −20),
+            +15 heat, and the leg replays.
+
+          ### BREACH failure during slipstream
+
+          Outcome depends on your heat when the BREACH fails:
+
+          | Heat | Consequence |
+          |------|-------------|
+          | Below 41 | +10 heat, replay current leg. |
+          | 41–70 (severe) | HP −30, EN −30, PS −30, +20 heat, 5-minute corridor lockout. |
+          | 71+ (fatal) | HP −40, EN −40, PS −40, +35 heat, 10-minute corridor lockout. |
+
+          Vitals floor at 1 during slipstream — you can't die in transit.
+
+      - slug: govcorp-containment
+        title: GovCorp Containment & Escape
+        kind: reference
+        position: 17
+        published: true
+        summary: "Capture, the Perception Alignment Center, alert system, impound, bribe, and escape paths."
+        metadata:
+          search_tags:
+            - govcorp
+            - capture
+            - containment
+            - pac
+            - prison
+            - escape
+            - bribe
+            - impound
+            - alert
+        body: |
+          # GovCorp Containment & Escape
+
+          Fail a BREACH badly enough and GovCorp may capture you.
+          Capture sends you to a **Perception Alignment Center (PAC)** —
+          a restricted facility where you must escape or pay your way
+          out.
+
+          ## Capture probability
+
+          Capture only triggers on **detection overflow** or **gate
+          exhaustion** failures (not when HP hits 0):
+
+          | Encounter Tier | Capture Chance |
+          |----------------|---------------|
+          | Ambient | Never |
+          | Standard | 25% |
+          | Advanced | 50% |
+          | Elite | 100% (guaranteed) |
+
+          ## Gear impound
+
+          On capture, all equipped gear (including your DECK with loaded
+          software and installed modules) is **confiscated** and placed
+          in impound records. Elite-tier failures also have an
+          additional impound chance for non-equipped inventory.
+
+          ## The PAC facility
+
+          Each region has its own PAC facility. You wake up in a
+          containment cell with a restricted command set — most Grid
+          commands are blocked.
+
+          ### Alert level
+
+          Moving through the facility raises your **alert level** by 12
+          per room transition. If alert reaches 100, you're recaptured
+          and sent back to the containment cell.
+
+          Successful BREACH within the facility reduces alert by 25.
+          Containment and impound rooms are safe zones (no alert gain).
+
+          ## Escape paths
+
+          **1. BREACH your way out** — the containment cell has a
+          puzzle-only BREACH encounter (unlimited attempts, no clearance
+          bypass). Solving it opens the path to the sally port. The
+          sally port has its own BREACH — defeat it to escape entirely.
+
+          **2. Bribe a GovCorp agent** — pay a fee to walk out. This
+          forfeits ALL impounded gear permanently.
+
+          Bribe formula: **250 + (clearance × 15) CRED**.
+          At CL20 that's 550 CRED.
+
+          **3. Recover impound first, then escape** — pay the impound
+          bribe to recover your confiscated gear, then BREACH your way
+          out.
+
+          Impound recovery formula:
+          **500 + (clearance × 25) + floor(gear_value × 0.10) CRED**.
+
+          ## After escape
+
+          You're returned to the room you were in before capture (or
+          the facility exit room). Alert level resets. Any unrecovered
+          impound records remain — gear is forfeited if not recovered
+          during your stay.
+
+      - slug: account-security
+        title: Account & Security
+        kind: reference
+        position: 18
+        published: true
+        summary: "Two-factor authentication (TOTP), backup codes, and account controls."
+        metadata:
+          search_tags:
+            - 2fa
+            - totp
+            - two-factor
+            - security
+            - backup codes
+            - identity
+            - account
+        body: |
+          # Account & Security
+
+          ## Two-Factor Authentication (2FA)
+
+          hackr.tv supports optional **TOTP-based two-factor
+          authentication**. When enabled, login requires both your
+          password and a time-based code from an authenticator app.
+
+          ### Setup
+
+          1. Navigate to `/grid/identity/two-factor` (or find it under
+             your identity settings).
+          2. Scan the QR code with your authenticator app (Google
+             Authenticator, Authy, 1Password, etc.).
+          3. Enter your password and the current TOTP code to confirm.
+          4. Save your **backup codes** — these are one-time-use codes
+             that work if you lose access to your authenticator.
+
+          ### Backup codes
+
+          Backup codes are generated when you enable 2FA. Each code
+          can only be used once. If you run out, you can regenerate a
+          new set from the 2FA settings page (this invalidates all
+          remaining old codes).
+
+          ### Disabling 2FA
+
+          Requires both your password and a valid TOTP code. Once
+          disabled, login returns to password-only.
+
+          ## Identity page
+
+          The identity page at `/grid/identity` lets you update your
+          email, change your password, and manage 2FA settings.
 
   - slug: wire
     name: WIRE
@@ -509,12 +1856,15 @@ handbook_sections:
         kind: reference
         position: 0
         published: true
-        summary: "Common commands: look, go, take, examine, help."
+        summary: "Common commands: look, go, take, examine, help, social commands, and aliases."
         metadata:
           search_tags:
             - commands
             - terminal
             - help
+            - say
+            - who
+            - aliases
         body: |
           # GRID Terminal Basics
 
@@ -523,18 +1873,32 @@ handbook_sections:
 
           ## Core commands
 
+          | Command | Aliases | Purpose |
+          |---------|---------|---------|
+          | `look` | `l` | Describe the current room — exits, items, mobs, other hackrs. |
+          | `go <dir>` | `n`, `s`, `e`, `w`, `ne`, `se`, `sw`, `nw`, `up`, `down` | Move through an exit. Cardinal, intercardinal, and vertical shortcuts work. |
+          | `examine <target>` | `ex`, `x` | Inspect a mob, item, hackr, or fixture. |
+          | `take [qty\|all] <item>` | `get` | Pick up an item. |
+          | `drop [qty\|all] <item>` | — | Drop an item. |
+          | `inventory` | `inv`, `i` | Show your carried items and capacity. |
+          | `stat` | `st`, `stats` | Show XP, clearance, vitals, CRED, loadout, and achievements. |
+          | `help` | `?` | List all available commands. |
+          | `clear` | `cls`, `cl` | Clear the terminal screen. |
+
+          ## Social commands
+
           | Command | Purpose |
           |---------|---------|
-          | `look` | Describe the current room |
-          | `go <dir>` | Move through an exit |
-          | `examine <target>` | Inspect a mob, item, or operative |
-          | `take <item>` | Pick up an item |
-          | `inventory` / `inv` | Show your carried items |
-          | `stat` | Show XP, clearance, vitals, CRED |
-          | `help` | List available commands |
+          | `say <message>` | Broadcast a message to everyone in your current room. |
+          | `who` | List all online hackrs and the rooms they're in. |
+          | `examine <hackr>` | Inspect another operative — shows their visible loadout (head, eyes, chest, legs, feet). |
 
-          Commands are case-insensitive. Most have short aliases — `inv` for
-          `inventory`, `st` for `stat`.
+          ## Partial name matching
+
+          You don't have to type full names. The terminal resolves partial
+          matches automatically — type enough to be unique. If your input
+          matches multiple targets, you'll see a disambiguation prompt.
+          See [Inventory & Items](/handbook/inventory-items) for details.
 
           ## Not using the web client?
 
@@ -596,7 +1960,7 @@ handbook_sections:
           PULSE GRID, you'll need to log in with your operative credentials. At
           that point, you can access THE PULSE GRID where you will be at the
           same command parser described in
-          [GRID Terminal Basics](/handbook/grid-terminal-basics). All the  same
+          [GRID Terminal Basics](/handbook/grid-terminal-basics). All the same
           commands work.
 
           ## Why rotating credentials?
@@ -605,10 +1969,395 @@ handbook_sections:
           to keep the endpoint public-ish (anyone who visits the web can
           connect) without giving bots a permanent handle.
 
+  - slug: tactical-interface
+    name: TACTICAL INTERFACE
+    icon: "+"
+    position: 6
+    published: true
+    summary: "The multi-pane desktop tactical view — isometric map, status panels, and visual controls."
+    articles:
+      - slug: tactical-overview
+        title: Tactical UI Overview
+        kind: reference
+        position: 0
+        published: true
+        summary: "What the Tactical interface is, how to access it, layout, and differences from standard view."
+        metadata:
+          search_tags:
+            - tactical
+            - ui
+            - interface
+            - overview
+            - desktop
+        body: |
+          # Tactical UI Overview
+
+          The Tactical interface is an alternative way to play THE PULSE GRID.
+          Instead of a single text terminal, you get a multi-pane desktop
+          layout with a visual map, status panels, and a command terminal
+          side by side.
+
+          ## Access
+
+          Navigate to `/grid/1337` or click **TACTICAL VIEW** in the PULSE
+          GRID menu. The Tactical interface requires the `tactical_grid`
+          feature grant — if you don't see the link, you haven't been
+          granted access yet.
+
+          The Tactical interface is **desktop-only**. It uses a fixed
+          CSS Grid layout that requires a wide viewport.
+
+          ## Layout
+
+          The screen is divided into three main areas:
+
+          - **Top bar** — your alias, clearance level (with hover tooltip),
+            vitals bars (HP/EN/PS), connection status, and a link back to
+            standard view.
+          - **Left column** — split between the tabbed **Status Panel**
+            (upper) and the **Terminal** (lower). The terminal works exactly
+            like the standard view — type commands, see output.
+          - **Right column** — the **Zone Map**, an isometric visual
+            representation of your current zone.
+
+          ## Keyboard
+
+          Press **Tab** to focus the command input from anywhere.
+
+          ## Real-time features
+
+          The Tactical interface connects via WebSocket for real-time
+          updates:
+
+          - **GridChannel** — room events (movement, say, take, drop).
+          - **ZoneChannel** — zone-wide presence updates (see other
+            operatives move on the map in real time).
+
+          ## How it differs from standard
+
+          | Feature | Standard | Tactical |
+          |---------|----------|----------|
+          | Navigation | Type `go <dir>` | Click rooms on map or type commands |
+          | Room info | `look` output | Visual map + tooltip hovers |
+          | BREACH | Terminal output only | Dedicated slide-up panel with action buttons |
+          | Vendor | Terminal `shop`/`buy`/`sell` | Slide-in panel with quantity selectors |
+          | NPC | Terminal `talk`/`ask` | Slide-up panel with clickable topics |
+          | Transit | Terminal commands | Slide-down panel with route display |
+          | Status | `stat`, `inv`, `rep`, etc. | Always-visible tabbed sidebar |
+          | Presence | Not visible | Real-time dots on map |
+
+          Every command you can type in standard view still works in the
+          Tactical terminal. The panels are visual shortcuts — they send
+          the same commands under the hood.
+
+      - slug: tactical-zone-map
+        title: Zone Map & Navigation
+        kind: reference
+        position: 1
+        published: true
+        summary: "Isometric map — room rendering, click-to-navigate, fog of war, zoom, pan, and presence."
+        metadata:
+          search_tags:
+            - map
+            - isometric
+            - navigation
+            - fog of war
+            - zoom
+            - pan
+            - ghost rooms
+            - presence
+        body: |
+          # Zone Map & Navigation
+
+          The Zone Map occupies the right side of the Tactical layout. It
+          renders your current zone as an isometric (2.5D) tile grid.
+
+          ## Room rendering
+
+          Each room is a diamond-shaped isometric tile with colored side
+          walls. Room type determines the color:
+
+          - Hub rooms — amber
+          - Faction bases — purple
+          - Danger zones — red
+          - Shops — orange
+          - Den corridors — green
+          - Standard rooms — muted gray
+
+          Your current room has a bright border, full opacity, and a
+          pulsing "you are here" marker.
+
+          ## Fog of war
+
+          You can only see rooms you've **visited** plus their immediate
+          **adjacent** rooms (one hop out). Adjacent rooms you haven't
+          visited appear as dark tiles with a `?` marker — their name,
+          type, and contents are hidden until you visit.
+
+          Once visited, a room stays visible permanently on the map.
+
+          ## Click-to-navigate
+
+          Click any **adjacent** room to move there — the system sends
+          the appropriate `go <direction>` command. You can also click
+          **ghost rooms** (cross-zone exits) to navigate into the next
+          zone.
+
+          Non-adjacent rooms are visible but not clickable.
+
+          ## Ghost rooms
+
+          Exits that lead to other zones appear as semi-transparent
+          dashed tiles at the zone boundary, labeled with the
+          destination zone name. Click to navigate through.
+
+          **Vertical ghosts** (up/down exits to other z-levels) show as
+          purple (up) or orange (down) indicators with arrows.
+
+          ## Z-levels
+
+          Zones can span multiple vertical levels. The map shows the
+          current z-level at full opacity and fades other levels.
+          Vertical connectors between levels are drawn as lines with
+          colored arrows.
+
+          ## Zoom & pan
+
+          - **Scroll wheel** — zoom in/out (0.5× to 4×).
+          - **Click and drag** — pan the viewport.
+
+          ## Compass rose
+
+          Navigation buttons in the bottom-left of the map provide
+          compass-rose directional controls (8 directions + up/down).
+          Buttons are enabled or disabled based on available exits from
+          your current room.
+
+          ## Hackr presence
+
+          Other operatives in your zone appear as small dots on their
+          current room tile, updated in real time via the ZoneChannel
+          WebSocket. Hover to see aliases.
+
+      - slug: tactical-panels
+        title: Tactical Panels
+        kind: reference
+        position: 2
+        published: true
+        summary: "BREACH, Vendor, NPC, Transit, and Rest Pod panels — handles, interactions, and mutual exclusion."
+        metadata:
+          search_tags:
+            - panels
+            - breach panel
+            - vendor panel
+            - npc panel
+            - transit panel
+            - rest pod panel
+            - tactical
+        body: |
+          # Tactical Panels
+
+          Context-sensitive panels slide over the map when you're near
+          specific room features. Each panel has a **handle** (a
+          clickable tab on the map edge) and a **panel body** that
+          slides in with a 300ms animation.
+
+          Panels are **mutually exclusive** — opening one closes others.
+          Active BREACH takes priority over everything.
+
+          ## BREACH Panel
+
+          **Handle**: BREACH target buttons appear in the top-right
+          corner of the map when encounters are available.
+
+          **Trigger**: click a target button and confirm, or type
+          `breach <name>`.
+
+          **Layout** (slides up, covers 85% of map):
+          - **Header** — template name, tier (color-coded), round count,
+            actions remaining.
+          - **DECK snapshot** — name, battery bar (turns red below 25%).
+          - **Action bar** — clickable software buttons (color-coded by
+            category). Click a program, then click a protocol target to
+            execute. ANALYZE and REROUTE are quick-action buttons that
+            also prompt for a target.
+          - **Breach output** — scrollable terminal showing the result of
+            each action.
+          - **JACKOUT** — button with confirmation modal showing vitals
+            cost.
+
+          Software buttons are disabled when battery is insufficient.
+          All action buttons disable while a command is executing.
+
+          ## Vendor Panel
+
+          **Handle**: amber vertical tab on the right edge of the map.
+          Visible when the room has a vendor mob.
+
+          **Layout** (slides right, covers 50% of map):
+          - **BUY section** — vendor listings with prices, stock,
+            affordability indicator. Quantity selector (clamped by
+            stock and balance). Confirm modal.
+          - **SELL section** — your sellable inventory items with sell
+            prices. Quantity selector. Confirm modal.
+
+          Vendor avatar image (if set) displays above the listing.
+
+          ## NPC Panel
+
+          **Handle**: purple tab(s) on the bottom edge of the map, one
+          per qualifying NPC (those with dialogue or quest_giver status).
+
+          **Layout** (slides up, covers 50% of map):
+          - **DIALOGUE tab** — greeting text, clickable topic buttons,
+            breadcrumb path when deep in the tree, BACK/RESET navigation.
+            Terminal output from dialogue is captured and displayed in the
+            panel.
+          - **MISSIONS tab** — active missions (with objective progress
+            bars, TURN IN/ABANDON/DELIVER buttons) and available missions
+            (with description, gates, ACCEPT button). Confirmation modals
+            for all actions.
+
+          Opening an NPC panel automatically fires `talk to <npc>` to
+          trigger the greeting and any side effects (rep, achievements).
+
+          NPC avatar image (if set) displays in a "wing" panel above.
+
+          ## Transit Panel
+
+          **Handle**: cyan horizontal tab centered on the top edge of
+          the map. Visible when the room has transit routes or you have
+          an active journey.
+
+          **Layout** (slides down, covers 50% of map):
+          - **LOCAL tab** — public routes with stop lists. BOARD buttons
+            with direction choice (forward/reverse) at middle stops.
+          - **PRIVATE tab** — destination picker with fare display. HAIL
+            button.
+          - **SLIPSTREAM tab** — boardable routes with leg counts,
+            clearance requirements, and heat indicator (color-coded by
+            tier: cold/warm/hot/burning).
+          - **Active journey mode** — current stop, next stop, and
+            action buttons (ADVANCE, WAIT, DISEMBARK, CHOOSE FORK,
+            ABANDON).
+
+          Panel auto-closes when a journey ends.
+
+          ## Rest Pod Panel
+
+          **Handle**: green tab on the right edge of the map (below
+          vendor handle if both present). Visible in rest pod rooms.
+
+          **Layout** (slides in from right):
+          - Per-vital input controls (HP, EN, PS) showing current
+            deficit.
+          - FILL button per vital (max out that vital).
+          - FILL ALL button.
+          - Live cost preview based on point allocation.
+          - RESTORE button sends the `rest` command.
+
+      - slug: tactical-status-tabs
+        title: Status Tabs
+        kind: reference
+        position: 3
+        published: true
+        summary: "DECK, STATS, GEAR, INV, REP, CRED, MISSIONS, SCHEM — what each tab shows and its interactive elements."
+        metadata:
+          search_tags:
+            - tabs
+            - deck tab
+            - stats tab
+            - gear tab
+            - inventory tab
+            - rep tab
+            - cred tab
+            - missions tab
+            - schematics tab
+            - tactical
+        body: |
+          # Status Tabs
+
+          The Status Panel in the upper-left of the Tactical layout
+          contains **8 tabs**. Each provides a live view of a game
+          system, updated after every command.
+
+          ## DECK
+
+          Your equipped DECK with battery level, loaded software
+          (names, categories, slot cost, battery cost), and installed
+          modules with firmware status. If no DECK is equipped, shows
+          an empty state.
+
+          ## STATS
+
+          Condensed operative dossier:
+          - Alias and clearance level.
+          - XP progress bar toward next clearance (or "MAX CLEARANCE").
+          - Vitals (HP/EN/PS) with color-coded bars.
+          - CRED summary (default cache balance, total across all
+            caches). GovCorp debt warning if nonzero.
+          - Equipped DECK snapshot (name, rarity, battery, slots).
+          - Loadout summary (equipped/total slots).
+          - Achievement count (earned/total) + in-progress list with
+            mini progress bars.
+          - Faction standings summary with tier badges.
+
+          Cross-references to other tabs (CRED, DECK, GEAR, REP) are
+          shown as muted hints.
+
+          ## GEAR (Loadout)
+
+          Visual slot grid showing all 13 equipment slots with equipped
+          item names. DECK slot spans full width. Active effects from
+          equipped gear listed below.
+
+          ## INV (Inventory)
+
+          Items grouped by type (gear, software, consumable, material,
+          etc.) with rarity colors. Capacity progress bar
+          (green/amber/red by fill percentage).
+
+          Click an item for a detail modal showing name, rarity,
+          description, properties, and available actions (USE, EQUIP,
+          DROP, SALVAGE, SELL). Each action has a confirmation step.
+
+          When a vendor is present, items show inline SELL buttons with
+          the vendor's buy price.
+
+          ## REP (Reputation)
+
+          Faction standings matching the terminal `rep` output format —
+          one line per faction with name, tier badge, ASCII bar, value,
+          and next-tier hint. Parent→child hierarchy shown with
+          indentation.
+
+          ## CRED
+
+          Cache management:
+          - Total CRED balance across all caches.
+          - GovCorp debt with garnishment warning (if any).
+          - Per-cache display with DEFAULT and ABANDONED flags.
+          - **+ NEW CACHE** button (creates via `cache create`).
+          - **Rename** with modal input.
+          - **Send** with transfer modal — amount, destination
+            dropdown (your caches + custom address input).
+
+          ## MISSIONS
+
+          Active and completed missions. Active missions show objective
+          progress, quest giver name and room. TURN IN button appears
+          when all objectives are met.
+
+          ## SCHEM (Schematics)
+
+          Browsable schematic list with crafting status. Click a
+          schematic for ingredient detail. FAB button with confirmation
+          modal showing ingredient list and output item.
+
   - slug: tutorials
     name: Tutorials
     icon: ">"
-    position: 6
+    position: 7
     published: true
     summary: "Step-by-step walkthroughs. Follow them in order to learn a full subsystem end-to-end."
     articles:
@@ -657,3 +2406,295 @@ handbook_sections:
 
           Read [Clearance Levels](/handbook/clearance-levels) to understand
           how progression works.
+
+      - slug: tutorial-first-breach
+        title: Your First BREACH
+        kind: tutorial
+        difficulty: beginner
+        position: 1
+        published: true
+        summary: "Step-by-step walkthrough: equip a DECK, load software, find an encounter, and survive your first BREACH."
+        metadata:
+          search_tags:
+            - breach
+            - tutorial
+            - combat
+            - deck
+            - beginner
+        body: |
+          # Your First BREACH
+
+          BREACH encounters are protocol combat — the Grid's main
+          challenge. This walkthrough takes you from unarmed to
+          your first successful breach.
+
+          ## 1. Get a DECK
+
+          You need a DECK equipped to breach. If you completed the
+          Bootloader tutorial, you already have one. Otherwise, buy
+          one from a vendor or receive one from a mission reward.
+
+          Check with `deck` — if you see battery and slot info, you're
+          equipped. If not, find a DECK in your inventory and `equip` it.
+
+          ## 2. Load software
+
+          A DECK without loaded software can't do anything in a breach.
+          Check your inventory for software items and load them:
+
+          ```
+          deck load Ping Spike
+          deck load ICE Breaker
+          ```
+
+          Each program uses DECK slots (check with `deck`). Load as
+          many as your slots allow. Offensive software that matches a
+          protocol's weakness deals 1.5× damage — variety helps.
+
+          ## 3. Find an encounter
+
+          Explore until `look` shows a breach encounter in the room.
+          You'll see something like:
+
+          ```
+          [ BREACH TARGETS ]
+          Signal Relay Node [STANDARD]
+          ```
+
+          ## 4. Initiate
+
+          ```
+          breach Signal Relay Node
+          ```
+
+          You're now in a BREACH. The terminal shows the protocol grid —
+          each protocol has a type, HP, and position number.
+
+          ## 5. Gather intel
+
+          Before attacking blindly, analyze a protocol:
+
+          ```
+          analyze 1
+          ```
+
+          This reveals the protocol's weakness. Match your software to
+          it for bonus damage. You might get a free bonus action from
+          the analyze.
+
+          ## 6. Attack
+
+          Execute software against a protocol:
+
+          ```
+          exec Ping Spike 1
+          ```
+
+          This deals damage based on the software's strength and
+          whether it matches the protocol's weakness. Each exec costs
+          one action and battery.
+
+          ## 7. End of round
+
+          After you use all your actions, the round ends. Surviving
+          protocols fire their effects (TRACE adds detection, FEEDBACK
+          drains vitals, SPIKE drains HP, etc.). Watch the detection
+          clock — if it hits 100, you fail.
+
+          ## 8. Repeat or retreat
+
+          Keep analyzing and executing. Your action count ramps up over
+          rounds as inspiration builds. If things go badly, type
+          `jackout` to abort (costs some vitals but avoids failure
+          consequences).
+
+          ## 9. Victory
+
+          Destroy all protocols to win. You'll receive XP and CRED.
+
+          ## Tips
+
+          - Prioritize **SPIKE** protocols — they drain your HP directly
+            and can kill you.
+          - Prioritize **TRACE** protocols — they accelerate the
+            detection clock.
+          - Use `reroute` to delay a dangerous protocol for one round
+            (30% chance to fizzle, though).
+          - Keep an eye on your battery — running dry means you can't
+            execute software.
+          - If your DECK gets fried on a failed breach, visit a repair
+            service room or use a DECK Repair Kit.
+
+          ## Next steps
+
+          Read the full [BREACH Encounters](/handbook/breach-encounters)
+          reference for protocol types, puzzle gates, failure tiers,
+          and the action economy rank table.
+
+      - slug: tutorial-first-transit
+        title: Your First Transit Ride
+        kind: tutorial
+        difficulty: beginner
+        position: 2
+        published: true
+        summary: "Step-by-step: find a transit stop, board a route, ride through stops, and disembark."
+        metadata:
+          search_tags:
+            - transit
+            - tutorial
+            - bus
+            - travel
+            - beginner
+        body: |
+          # Your First Transit Ride
+
+          Public transit routes run between fixed stops within a region.
+          This walkthrough covers boarding, riding, and getting off.
+
+          ## 1. Find a transit room
+
+          Explore until `look` shows transit route information in the
+          room description. Transit rooms display available routes with
+          their stop lists. You can also type `transit` (or `tr`) to
+          see what's available.
+
+          ## 2. Check the route
+
+          The route listing shows stop names in order. Find your
+          destination in the list to confirm this route goes where you
+          want.
+
+          ## 3. Board
+
+          ```
+          board <route-name>
+          ```
+
+          If you're at the first or last stop, direction is automatic.
+          At a middle stop, you can specify:
+
+          ```
+          board <route-name> forward
+          board <route-name> reverse
+          ```
+
+          ## 4. Ride
+
+          Type `wait` (or `w`) to advance to the next stop. Repeat for
+          each stop along the route. Each stop moves you to a new room.
+
+          ## 5. Disembark
+
+          When you reach your destination:
+
+          ```
+          disembark
+          ```
+
+          You're now in the room corresponding to that stop. If you
+          want to bail early, `abandon` cancels the journey entirely.
+
+          ## Notes
+
+          - Public transit has a fare deducted from your default cache on boarding.
+          - Non-loop routes support bidirectional travel — you can ride
+            forward or reverse.
+          - For point-to-point travel, check if **private transit** is
+            available: `hail <type> <destination>`.
+          - For inter-region travel, see
+            [Your First Slipstream Journey](/handbook/tutorial-first-slipstream).
+
+      - slug: tutorial-first-slipstream
+        title: Your First Slipstream Journey
+        kind: tutorial
+        difficulty: intermediate
+        position: 3
+        published: true
+        summary: "Step-by-step: find a slipstream origin, manage heat, traverse legs, handle forks, and arrive in a new region."
+        metadata:
+          search_tags:
+            - slipstream
+            - tutorial
+            - inter-region
+            - travel
+            - heat
+        body: |
+          # Your First Slipstream Journey
+
+          Slipstream corridors are high-speed inter-region routes. They
+          move you between geographic regions but come with risk —
+          detection checks on each leg, heat accumulation, and possible
+          mid-journey BREACH encounters.
+
+          **Requires CL15+.**
+
+          ## 1. Find a slipstream origin
+
+          Slipstream origin rooms display route information when you
+          `look`. Type `slipstream` (or `slip`) to see available routes
+          with destinations, leg counts, and clearance requirements.
+
+          ## 2. Check your heat
+
+          Heat is a per-hackr value that persists between journeys and
+          decays slowly over time. Higher heat means higher detection
+          chance per leg. If you've been running slipstream routes
+          recently, consider waiting for heat to decay.
+
+          ## 3. Board
+
+          ```
+          slipstream <route-name>
+          ```
+
+          You're now in transit. The first leg begins.
+
+          ## 4. Advance through legs
+
+          ```
+          advance
+          ```
+
+          Each leg runs a detection check. If you pass, you proceed to
+          the next leg and accumulate heat. If detected:
+
+          - **With a functional DECK**: a BREACH encounter starts
+            mid-journey. Win to continue.
+          - **Without a DECK**: vitals drain and the leg replays.
+
+          ## 5. Handle forks
+
+          Some legs present a **fork** — a choice between paths with
+          different risk/speed tradeoffs. The terminal shows your
+          options:
+
+          ```
+          choose stealth
+          choose express
+          ```
+
+          Fork names are case-insensitive.
+
+          ## 6. Arrive
+
+          After the final leg, you arrive at the destination region's
+          slipstream access room. From there, explore the new region
+          normally.
+
+          ## Tips
+
+          - **Bring a charged DECK with loaded software** — if you hit
+            a detection check, you'll need to fight a BREACH encounter.
+            Without a DECK, you take vitals damage and retry the leg.
+          - **Watch your heat** — repeated slipstream use without breaks
+            compounds your detection risk. Let heat decay between trips.
+          - **BREACH failure consequences scale with heat**: below 41
+            heat is survivable (replay the leg), 41–70 is severe
+            (vitals drain + lockout), 71+ is fatal (heavy drain +
+            longer lockout). Vitals floor at 1 — you can't die in
+            transit.
+          - **Pack consumables** — stim packs and signal flares can help
+            during mid-journey BREACH encounters.
+
+          For the full mechanics, see the slipstream section of
+          [Transit System](/handbook/transit-system).
