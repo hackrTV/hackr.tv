@@ -39,7 +39,10 @@ module Api
 
         # Use existing scheduled stream or create new
         stream = if params[:stream_id].present?
-          s = artist.hackr_streams.find(params[:stream_id])
+          s = artist.hackr_streams.find_by(id: params[:stream_id])
+          unless s
+            return render json: {success: false, error: "Stream not found"}, status: :not_found
+          end
           if s.ended_at.present?
             return render json: {success: false, error: "Stream already ended"}, status: :unprocessable_entity
           end

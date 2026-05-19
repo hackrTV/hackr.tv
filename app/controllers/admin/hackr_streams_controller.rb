@@ -30,8 +30,10 @@ class Admin::HackrStreamsController < Admin::ApplicationController
 
   def update
     update_params = hackr_stream_params
-    # Auto-clear cancellation when rescheduling
-    if update_params[:scheduled_at].present? && @hackr_stream.cancelled_at.present?
+    # Auto-clear cancellation only when scheduled_at actually changes (not just resubmitted)
+    if @hackr_stream.cancelled_at.present? &&
+        update_params[:scheduled_at].present? &&
+        update_params[:scheduled_at].to_s != @hackr_stream.scheduled_at&.to_fs(:db)
       update_params[:cancelled_at] = nil
     end
 
