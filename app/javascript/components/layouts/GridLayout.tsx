@@ -1,9 +1,10 @@
 import React from 'react'
 import { HeaderMenu } from '~/components/navigation/HeaderMenu'
 import { FooterMenu } from '~/components/navigation/FooterMenu'
-import { PrereleaseBanner } from '~/components/prerelease/PrereleaseBanner'
+import { LiveNowBanner } from '~/components/stream/LiveNowBanner'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
+import { useStreamStatus } from '~/hooks/useStreamStatus'
 
 interface GridLayoutProps {
   children: React.ReactNode
@@ -12,11 +13,14 @@ interface GridLayoutProps {
 export const GridLayout: React.FC<GridLayoutProps> = ({ children }) => {
   const { isMobile } = useMobileDetect()
   const { setMobileMenuOpen } = useMobileMenu()
+  const { isLive, streamInfo } = useStreamStatus()
 
   return (
     <>
       <HeaderMenu />
-      <PrereleaseBanner />
+      {isLive && streamInfo && (
+        <LiveNowBanner stream={streamInfo} />
+      )}
       {!isMobile && <br />}
       <FooterMenu />
       <div className={isMobile ? 'mb-20 pb-50' : 'ml-10 mb-20 pb-50'} style={isMobile ? { padding: '0 5px' } : undefined}>

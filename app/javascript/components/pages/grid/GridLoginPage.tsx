@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GridLayout } from '~/components/layouts/GridLayout'
+import { PrereleaseBanner } from '~/components/prerelease/PrereleaseBanner'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useGridAuthContext } from '~/contexts/GridAuthContext'
 
@@ -51,6 +52,7 @@ export const GridLoginPage: React.FC = () => {
 
   return (
     <GridLayout>
+      <PrereleaseBanner />
       <div className="tui-window cyan-168 white-text" style={{ maxWidth: '600px', margin: '50px auto', display: 'block' }}>
         <fieldset className="cyan-168-border">
           <legend className="center">THE PULSE GRID :: ACCESS</legend>

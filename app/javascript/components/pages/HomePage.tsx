@@ -3,7 +3,10 @@ import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import { TerminalAnimation } from '~/components/terminal/TerminalAnimation'
 import { LiveStreamEmbed } from '~/components/LiveStreamEmbed'
 import { UplinkPanel } from '~/components/uplink/UplinkPanel'
+import { ScheduledStreamBanner } from '~/components/stream/ScheduledStreamBanner'
+import { StartingSoonHero } from '~/components/stream/StartingSoonHero'
 import { apiJson } from '~/utils/apiClient'
+import type { ScheduledStreamInfo } from '~/types/uplink'
 
 interface StreamData {
   is_live: boolean
@@ -16,6 +19,7 @@ interface StreamData {
   live_url?: string
   vod_url?: string
   started_at?: string
+  next_scheduled?: ScheduledStreamInfo | null
 }
 
 const HEARTBEAT_KEY = 'uplink_popout_heartbeat'
@@ -102,8 +106,15 @@ export const HomePage: React.FC = () => {
     )
   }
 
+  const isStartingSoon = !streamData?.is_live &&
+    streamData?.next_scheduled?.display_state === 'starting_soon'
+
+  const scheduledBanner = !streamData?.is_live && streamData?.next_scheduled
+    ? <ScheduledStreamBanner stream={streamData.next_scheduled} />
+    : undefined
+
   return (
-    <DefaultLayout>
+    <DefaultLayout topBanner={scheduledBanner} hideLiveBanner>
       {streamData?.is_live && streamData.live_url ? (
         <LiveStreamEmbed
           url={streamData.live_url}
@@ -122,6 +133,8 @@ export const HomePage: React.FC = () => {
             )
           }
         />
+      ) : isStartingSoon && streamData?.next_scheduled ? (
+        <StartingSoonHero stream={streamData.next_scheduled} />
       ) : (
         <TerminalAnimation />
       )}

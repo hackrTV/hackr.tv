@@ -49,13 +49,32 @@
     <% end %>
   </div>
 
+  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: SCHEDULING ::]</h3>
+
+  <div style="margin-bottom: 20px;">
+    <%= f.label :scheduled_at, "SCHEDULED FOR", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.datetime_local_field :scheduled_at, class: "tui-input", style: "width: 100%; max-width: 400px;" %>
+    <small style="color: #888;">When this stream is planned to go live. Leave blank for on-demand streams.</small>
+    <% if hackr_stream.errors[:scheduled_at].any? %>
+      <br><small class="red-255-text"><%= hackr_stream.errors[:scheduled_at].join(", ") %></small>
+    <% end %>
+  </div>
+
+  <% if hackr_stream.persisted? && hackr_stream.cancelled_at.present? %>
+    <div style="margin-bottom: 20px; padding: 10px; background: #1a0000; border: 1px solid #ff4444;">
+      <span class="red-255-text" style="font-weight: bold;">CANCELLED</span>
+      <span style="color: #888;"> at <%= hackr_stream.cancelled_at.strftime("%Y-%m-%d %H:%M") %></span>
+      <small style="color: #888; display: block; margin-top: 4px;">To reschedule, set a new scheduled date and save. The cancellation will be cleared automatically.</small>
+    </div>
+  <% end %>
+
   <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: STREAM TIMING ::]</h3>
 
   <div style="display: flex; gap: 20px; flex-wrap: wrap;">
     <div style="flex: 1; min-width: 200px;">
       <%= f.label :started_at, "STARTED AT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
       <%= f.datetime_local_field :started_at, class: "tui-input", style: "width: 100%;" %>
-      <small style="color: #888;">When the stream started (or will start)</small>
+      <small style="color: #888;">When the stream started (set automatically on Go Live)</small>
       <% if hackr_stream.errors[:started_at].any? %>
         <br><small class="red-255-text"><%= hackr_stream.errors[:started_at].join(", ") %></small>
       <% end %>

@@ -1,5 +1,5 @@
 class Admin::HackrStreamsController < Admin::ApplicationController
-  before_action :set_stream, only: [:edit, :update, :destroy, :go_live, :end_stream]
+  before_action :set_stream, only: [:edit, :update, :destroy, :go_live, :end_stream, :cancel]
 
   def index
     @hackr_streams = HackrStream.includes(:artist).recent
@@ -29,7 +29,13 @@ class Admin::HackrStreamsController < Admin::ApplicationController
   end
 
   def update
-    if @hackr_stream.update(hackr_stream_params)
+    update_params = hackr_stream_params
+    # Auto-clear cancellation when rescheduling
+    if update_params[:scheduled_at].present? && @hackr_stream.cancelled_at.present?
+      update_params[:cancelled_at] = nil
+    end
+
+    if @hackr_stream.update(update_params)
       set_flash_success("Stream updated successfully!")
       redirect_to admin_hackr_streams_path
     else
@@ -66,6 +72,15 @@ class Admin::HackrStreamsController < Admin::ApplicationController
     redirect_to admin_hackr_streams_path
   end
 
+  def cancel
+    @hackr_stream.cancel!
+    set_flash_success("Scheduled stream cancelled.")
+  rescue ActiveRecord::RecordInvalid => e
+    set_flash_error("Failed to cancel stream: #{e.record.errors.full_messages.join(", ")}")
+  ensure
+    redirect_to admin_hackr_streams_path
+  end
+
   private
 
   def set_stream
@@ -73,6 +88,6 @@ class Admin::HackrStreamsController < Admin::ApplicationController
   end
 
   def hackr_stream_params
-    params.require(:hackr_stream).permit(:artist_id, :live_url, :vod_url, :title, :is_live, :started_at, :ended_at)
+    params.require(:hackr_stream).permit(:artist_id, :live_url, :vod_url, :title, :is_live, :started_at, :ended_at, :scheduled_at, :cancelled_at)
   end
 end
