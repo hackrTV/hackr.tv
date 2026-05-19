@@ -1620,23 +1620,22 @@ namespace :data do
 
     sections_data.each do |section_attrs|
       section = HandbookSection.find_or_initialize_by(slug: section_attrs["slug"])
+      was_new = section.new_record?
 
-      if section.new_record?
-        section.assign_attributes(
-          name: section_attrs["name"],
-          icon: section_attrs["icon"],
-          summary: section_attrs["summary"],
-          position: section_attrs["position"] || 0,
-          published: section_attrs.fetch("published", true)
-        )
-        section.save!
-        sections_created += 1
-        puts "  ✓ Created section: #{section.name}"
-      end
+      section.assign_attributes(
+        name: section_attrs["name"],
+        icon: section_attrs["icon"],
+        summary: section_attrs["summary"],
+        position: section_attrs["position"] || 0,
+        published: section_attrs.fetch("published", true)
+      )
+      section.save!
+      sections_created += 1 if was_new
+      puts "  ✓ #{was_new ? "Created" : "Updated"} section: #{section.name}"
 
       (section_attrs["articles"] || []).each do |article_attrs|
         article = HandbookArticle.find_or_initialize_by(slug: article_attrs["slug"])
-        next unless article.new_record?
+        was_new_article = article.new_record?
 
         article.assign_attributes(
           handbook_section: section,
@@ -1650,8 +1649,8 @@ namespace :data do
           metadata: article_attrs["metadata"] || {}
         )
         article.save!
-        articles_created += 1
-        puts "    ✓ Created article: #{article.title}"
+        articles_created += 1 if was_new_article
+        puts "    ✓ #{was_new_article ? "Created" : "Updated"} article: #{article.title}"
       end
     end
 
