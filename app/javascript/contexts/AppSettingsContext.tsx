@@ -4,17 +4,20 @@ import { apiJson } from '~/utils/apiClient'
 interface AppSettings {
   prerelease_mode: string | null
   prerelease_banner_text: string | null
+  world_feed_visible: boolean
 }
 
 interface AppSettingsContextType {
   settings: AppSettings
   isLoading: boolean
   isPrereleaseMode: boolean
+  isWorldFeedVisible: boolean
 }
 
 const defaultSettings: AppSettings = {
   prerelease_mode: null,
-  prerelease_banner_text: null
+  prerelease_banner_text: null,
+  world_feed_visible: false
 }
 
 const AppSettingsContext = createContext<AppSettingsContextType | null>(null)
@@ -56,9 +59,10 @@ export const AppSettingsProvider: React.FC<AppSettingsProviderProps> = ({ childr
   }, [])
 
   const isPrereleaseMode = Boolean(settings.prerelease_mode)
+  const isWorldFeedVisible = Boolean(settings.world_feed_visible)
 
   return (
-    <AppSettingsContext.Provider value={{ settings, isLoading, isPrereleaseMode }}>
+    <AppSettingsContext.Provider value={{ settings, isLoading, isPrereleaseMode, isWorldFeedVisible }}>
       {children}
     </AppSettingsContext.Provider>
   )

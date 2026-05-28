@@ -47,6 +47,7 @@ module Grid
       end
 
       broadcast_toast(xp_result, minted_cred)
+      publish_world_event(xp_result)
       build_notification(xp_result, minted_cred)
     rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
       # RecordInvalid: the uniqueness validator on GridHackrAchievement
@@ -81,6 +82,15 @@ module Grid
       )
     rescue => e
       Rails.logger.error("[AchievementAwarder] broadcast failed: #{e.message}")
+    end
+
+    def publish_world_event(xp_result)
+      WorldEventFeed::Publisher.publish(
+        event_type: "achievement_unlocked",
+        hackr_alias: @hackr.hackr_alias,
+        data: {achievement_name: @achievement.name, badge_icon: @achievement.badge_icon}
+      )
+      WorldEventFeed::Publisher.publish_level_up(hackr_alias: @hackr.hackr_alias, xp_result: xp_result)
     end
 
     def build_notification(xp_result, minted_cred)

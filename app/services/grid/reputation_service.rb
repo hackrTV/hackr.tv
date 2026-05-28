@@ -95,6 +95,7 @@ module Grid
         raise
       end
 
+      publish_tier_change(result) if result && result[:tier_before][:key] != result[:tier_after][:key]
       result
     end
 
@@ -167,6 +168,21 @@ module Grid
     end
 
     private
+
+    def publish_tier_change(result)
+      direction = (result[:new_value] > result[:old_value]) ? "up" : "down"
+      faction_name = result[:subject].respond_to?(:name) ? result[:subject].name : result[:subject].to_s
+      WorldEventFeed::Publisher.publish(
+        event_type: "rep_tier_changed",
+        hackr_alias: @hackr.hackr_alias,
+        data: {
+          faction_name: faction_name,
+          new_tier: result[:tier_after][:label],
+          old_tier: result[:tier_before][:label],
+          direction: direction
+        }
+      )
+    end
 
     def resolve_subject(subject)
       case subject

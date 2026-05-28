@@ -5,7 +5,8 @@ module Api
     def index
       render json: {
         prerelease_mode: APP_SETTINGS[:prerelease_mode],
-        prerelease_banner_text: APP_SETTINGS[:prerelease_banner_text]
+        prerelease_banner_text: APP_SETTINGS[:prerelease_banner_text],
+        world_feed_visible: WorldEventSetting.visible?
       }
     end
   end

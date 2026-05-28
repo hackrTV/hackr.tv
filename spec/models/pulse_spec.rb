@@ -138,6 +138,9 @@ RSpec.describe Pulse, type: :model do
       it "broadcasts to pulse_wire channel after create" do
         hackr = create(:grid_hackr)
 
+        # Allow world event feed broadcast (root pulses also publish to feed)
+        allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+
         expect(ActionCable.server).to receive(:broadcast).with(
           "pulse_wire",
           hash_including(
@@ -158,7 +161,10 @@ RSpec.describe Pulse, type: :model do
       it "includes pulse id and pulsed_at in broadcast" do
         hackr = create(:grid_hackr)
 
-        expect(ActionCable.server).to receive(:broadcast) do |channel, data|
+        # Allow world event feed broadcast
+        allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+
+        expect(ActionCable.server).to receive(:broadcast).with("pulse_wire", anything) do |channel, data|
           expect(channel).to eq("pulse_wire")
           expect(data[:type]).to eq("new_pulse")
           expect(data[:pulse][:id]).to be_present
@@ -182,6 +188,9 @@ RSpec.describe Pulse, type: :model do
       end
 
       it "sets parent_pulse_id to nil for root pulses" do
+        # Allow world event feed broadcast
+        allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+
         expect(ActionCable.server).to receive(:broadcast).with(
           "pulse_wire",
           hash_including(

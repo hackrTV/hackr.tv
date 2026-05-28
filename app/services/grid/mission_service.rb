@@ -128,6 +128,11 @@ module Grid
       end
 
       invalidate_mission_ids_cache!
+      WorldEventFeed::Publisher.publish(
+        event_type: "mission_accepted",
+        hackr_alias: @hackr.hackr_alias,
+        data: {mission_name: mission.name, arc_name: mission.grid_mission_arc&.name}
+      )
       hackr_mission
     rescue ActiveRecord::RecordNotUnique => e
       # Only the partial index on active (hackr, mission) pairs is the

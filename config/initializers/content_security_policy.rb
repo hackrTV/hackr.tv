@@ -20,10 +20,11 @@ Rails.application.configure do
     policy.script_src :self, :https
 
     if Rails.env.development?
-      # Vite dev server needs additional permissions
+      # Vite dev server + ActionCable need ws: access.
+      # Allow all ws: in dev so LAN IP access works (e.g. 192.168.x.x).
       vite_host = ViteRuby.config.host_with_port
       policy.script_src(*policy.script_src, "http://#{vite_host}", :unsafe_eval)
-      policy.connect_src(*policy.connect_src, "ws://#{vite_host}", "http://#{vite_host}")
+      policy.connect_src(*policy.connect_src, "ws:", "http://#{vite_host}")
     end
 
     policy.script_src(*policy.script_src, :blob) if Rails.env.test?

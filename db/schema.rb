@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_19_194536) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_28_153223) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1406,6 +1406,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_194536) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  create_table "world_event_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "simulator_enabled", default: true, null: false
+    t.integer "target_events_per_minute", default: 12, null: false
+    t.datetime "updated_at", null: false
+    t.boolean "visible", default: false, null: false
+  end
+
+  create_table "world_event_simulants", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.json "state", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id"], name: "index_world_event_simulants_on_grid_hackr_id", unique: true
+  end
+
+  create_table "world_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.json "data", default: {}, null: false
+    t.string "event_type", null: false
+    t.string "hackr_alias", null: false
+    t.boolean "simulated", default: false, null: false
+    t.index ["created_at"], name: "index_world_events_on_created_at"
+    t.index ["event_type"], name: "index_world_events_on_event_type"
+    t.index ["simulated"], name: "index_world_events_on_simulated"
+  end
+
   create_table "zone_playlist_tracks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "position", null: false
@@ -1546,6 +1573,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_194536) do
   add_foreign_key "tracks", "releases"
   add_foreign_key "user_punishments", "grid_hackrs"
   add_foreign_key "user_punishments", "grid_hackrs", column: "issued_by_id"
+  add_foreign_key "world_event_simulants", "grid_hackrs"
   add_foreign_key "zone_playlist_tracks", "tracks"
   add_foreign_key "zone_playlist_tracks", "zone_playlists"
 end

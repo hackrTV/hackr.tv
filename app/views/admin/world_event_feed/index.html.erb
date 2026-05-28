@@ -1,0 +1,124 @@
+<h1 class="cyan-255-text">World Event Feed</h1>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+  <div class="tui-window" style="padding: 15px;">
+    <fieldset>
+      <legend class="cyan-255-text">Settings</legend>
+      <%= form_with(model: @settings, url: settings_admin_world_event_feed_index_path, method: :patch, local: true) do |f| %>
+        <div style="margin-bottom: 10px;">
+          <label style="color: #9ca3af;">Target Events/Minute:</label><br>
+          <%= f.number_field :target_events_per_minute, min: 1, max: 120, class: "tui-input", style: "width: 80px; font-family: monospace;" %>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <label style="color: #9ca3af;">
+            <%= f.check_box :simulator_enabled %> Simulator Enabled
+          </label>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <label style="color: <%= @settings.visible? ? '#34d399' : '#ef4444' %>;">
+            <%= f.check_box :visible %> Visible to Hackrs
+          </label>
+        </div>
+        <%= f.submit "Save", class: "tui-button", style: "font-family: monospace;" %>
+      <% end %>
+    </fieldset>
+  </div>
+
+  <div class="tui-window" style="padding: 15px;">
+    <fieldset>
+      <legend class="green-255-text">Status</legend>
+      <table style="width: 100%; font-family: monospace;">
+        <tr>
+          <td style="color: #9ca3af;">Organic Rate:</td>
+          <td style="color: #34d399;"><%= @organic_rate %>/min</td>
+        </tr>
+        <tr>
+          <td style="color: #9ca3af;">Target:</td>
+          <td style="color: #22d3ee;"><%= @settings.target_events_per_minute %>/min</td>
+        </tr>
+        <tr>
+          <td style="color: #9ca3af;">Simulator:</td>
+          <td style="color: <%= @settings.simulator_enabled? ? '#34d399' : '#ef4444' %>;"><%= @settings.simulator_enabled? ? "ON" : "OFF" %></td>
+        </tr>
+        <tr>
+          <td style="color: #9ca3af;">Visible:</td>
+          <td style="color: <%= @settings.visible? ? '#34d399' : '#ef4444' %>;"><%= @settings.visible? ? "YES" : "NO" %></td>
+        </tr>
+        <tr>
+          <td style="color: #9ca3af;">Total Events:</td>
+          <td style="color: #d0d0d0;"><%= @total_events %></td>
+        </tr>
+        <tr>
+          <td style="color: #9ca3af;">Organic:</td>
+          <td style="color: #34d399;"><%= @organic_count %></td>
+        </tr>
+        <tr>
+          <td style="color: #9ca3af;">Simulated:</td>
+          <td style="color: #a78bfa;"><%= @simulated_count %></td>
+        </tr>
+        <tr>
+          <td style="color: #9ca3af;">Simulants:</td>
+          <td style="color: #d0d0d0;"><%= @simulants.size %></td>
+        </tr>
+      </table>
+    </fieldset>
+  </div>
+
+  <div class="tui-window" style="padding: 15px;">
+    <fieldset>
+      <legend class="yellow-255-text">Manual Publish</legend>
+      <%= form_with(url: publish_admin_world_event_feed_index_path, method: :post, local: true) do |f| %>
+        <div style="margin-bottom: 8px;">
+          <label style="color: #9ca3af;">Event Type:</label><br>
+          <%= f.select :event_type, WorldEvent::EVENT_TYPES.map { |t| [t.titleize, t] }, {}, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <label style="color: #9ca3af;">Simulant:</label><br>
+          <%= f.select :hackr_alias, @simulants.map { |s| [s.hackr_alias, s.hackr_alias] }, { include_blank: "-- Select --" }, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <label style="color: #9ca3af;">Message (for manual type):</label><br>
+          <%= f.text_field :message, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <label style="color: #9ca3af;">Mission/Achievement/Template Name:</label><br>
+          <%= f.text_field :mission_name, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+        </div>
+        <%= f.submit "Publish", class: "tui-button", style: "font-family: monospace;" %>
+      <% end %>
+    </fieldset>
+  </div>
+</div>
+
+<div class="tui-window" style="padding: 15px;">
+  <fieldset>
+    <legend class="cyan-255-text">Recent Events (last 50)</legend>
+    <table style="width: 100%; font-family: monospace; font-size: 0.85em;">
+      <thead>
+        <tr style="border-bottom: 1px solid #333;">
+          <th style="text-align: left; padding: 4px 8px; color: #666;">Time</th>
+          <th style="text-align: left; padding: 4px 8px; color: #666;">Type</th>
+          <th style="text-align: left; padding: 4px 8px; color: #666;">Hackr</th>
+          <th style="text-align: left; padding: 4px 8px; color: #666;">Message</th>
+          <th style="text-align: center; padding: 4px 8px; color: #666;">Sim</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_events.each_with_index do |event, i| %>
+          <tr style="background: <%= i.even? ? '#111' : '#0a0a0a' %>;">
+            <td style="padding: 4px 8px; color: #666; white-space: nowrap;"><%= event.created_at.strftime("%H:%M:%S") %></td>
+            <td style="padding: 4px 8px; color: #22d3ee;"><%= event.event_type %></td>
+            <td style="padding: 4px 8px; color: #d0d0d0;"><%= event.hackr_alias %></td>
+            <td style="padding: 4px 8px; color: #9ca3af;"><%= WorldEventFeed::Publisher.render_message(event) %></td>
+            <td style="padding: 4px 8px; text-align: center; color: <%= event.simulated? ? '#a78bfa' : '#34d399' %>;"><%= event.simulated? ? "SIM" : "ORG" %></td>
+          </tr>
+        <% end %>
+        <% if @recent_events.empty? %>
+          <tr>
+            <td colspan="5" style="padding: 20px; text-align: center; color: #666;">No events yet. Start the simulator or publish manually.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </fieldset>
+</div>
