@@ -4,6 +4,7 @@ import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
 import { useTerminal } from '~/contexts/TerminalContext'
+import { useAppSettings } from '~/contexts/AppSettingsContext'
 
 export const HeaderMenu: React.FC = () => {
   const { hackr, isLoggedIn, disconnect, hasFeature } = useGridAuth()
@@ -13,6 +14,7 @@ export const HeaderMenu: React.FC = () => {
   const { isMobile } = useMobileDetect()
   const { mobileMenuOpen, setMobileMenuOpen } = useMobileMenu()
   const { openTerminal } = useTerminal()
+  const { isWorldFeedVisible } = useAppSettings()
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const menuRef = useRef<HTMLElement>(null)
 
@@ -170,6 +172,11 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/schedule" className={`mobile-menu-item${isActive('/schedule') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span> schedule
                 </Link>
+                {isWorldFeedVisible && (
+                  <Link to="/feed" className={`mobile-menu-item${isActive('/feed') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <span className="purple-168-text">/</span> feed
+                  </Link>
+                )}
                 <button
                   className="mobile-menu-item"
                   onClick={() => {
@@ -433,6 +440,13 @@ export const HeaderMenu: React.FC = () => {
                     <span className="purple-168-text">/</span>schedule
                   </Link>
                 </li>
+                {isWorldFeedVisible && (
+                  <li>
+                    <Link to="/feed" onClick={closeDropdown}>
+                      <span className="purple-168-text">/</span>feed
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <a href="#" onClick={(e) => { e.preventDefault(); closeDropdown(); openTerminal() }}>
                     <span className="purple-168-text">&gt;</span>terminal

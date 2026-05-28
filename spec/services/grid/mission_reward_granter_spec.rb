@@ -88,6 +88,9 @@ RSpec.describe Grid::MissionRewardGranter do
     it "broadcasts mission_completed to the AchievementChannel stream" do
       create(:grid_mission_reward, grid_mission: mission, reward_type: "xp", amount: 10)
 
+      # Allow world event feed broadcasts
+      allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+
       expect(ActionCable.server).to receive(:broadcast).with(
         "achievement_channel_#{hackr.id}",
         hash_including(type: "mission_completed")

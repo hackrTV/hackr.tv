@@ -41,3 +41,11 @@ production:
   data_audit_scan:
     class: DataAudit::ScanJob
     schedule: every 6 hours
+
+  world_event_simulator:
+    class: WorldEventFeed::SimulatorJob
+    schedule: every 30 seconds
+
+  world_event_retention:
+    class: WorldEventFeed::RetentionJob
+    schedule: at 5am every day

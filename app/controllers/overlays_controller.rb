@@ -63,4 +63,8 @@ class OverlaysController < ApplicationController
       render layout: "overlay_fullscreen"
     end
   end
+
+  # GET /overlays/world-feed
+  def world_feed
+  end
 end

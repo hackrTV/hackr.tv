@@ -459,6 +459,13 @@ module Grid
         end
       end
 
+      WorldEventFeed::Publisher.publish(
+        event_type: "breach_completed",
+        hackr_alias: @hackr.hackr_alias,
+        data: {template_name: template.name, tier: template.tier}
+      )
+      WorldEventFeed::Publisher.publish_level_up(hackr_alias: @hackr.hackr_alias, xp_result: xp_result)
+
       display = Grid::BreachRenderer.new(hackr_breach).render_success(xp_awarded, cred_awarded, template.name, fragments_granted)
       ResolveResult.new(
         hackr_breach: hackr_breach,

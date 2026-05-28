@@ -79,6 +79,9 @@ RSpec.describe Grid::AchievementAwarder do
     end
 
     it "broadcasts to the per-hackr AchievementChannel stream" do
+      # Allow world event feed broadcasts
+      allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+
       expect(ActionCable.server).to receive(:broadcast).with(
         "achievement_channel_#{hackr.id}",
         hash_including(type: "achievement_unlocked")

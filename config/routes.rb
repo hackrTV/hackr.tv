@@ -102,6 +102,9 @@ Rails.application.routes.draw do
   # Stream schedule (SPA)
   get "schedule", to: "pages#spa_root", as: :streams_schedule
 
+  # World Event Feed (SPA)
+  get "feed", to: "pages#spa_root", as: :world_feed
+
   # Codex (wiki) routes - SPA
   scope "codex" do
     get "/", to: "pages#spa_root", as: :codex
@@ -248,6 +251,9 @@ Rails.application.routes.draw do
       get "moderation_log", to: "moderation#moderation_log", as: :moderation_log
     end
 
+    # World Event Feed (public)
+    get "world_events", to: "world_events#index"
+
     # Error reporting (frontend JS errors)
     post "error_report", to: "error_reports#create"
 
@@ -284,6 +290,9 @@ Rails.application.routes.draw do
 
       # Code sync
       post "code/sync", to: "code#sync"
+
+      # World Event Feed
+      post "world_events", to: "world_events#create"
     end
   end
 
@@ -642,6 +651,14 @@ Rails.application.routes.draw do
     resources :overlay_elements, path: "overlays/elements", only: %i[index show]
     resources :overlay_lower_thirds, path: "overlays/lower-thirds", only: %i[index show]
     resources :overlay_scene_groups, path: "overlays/groups", only: %i[index show]
+
+    # World Event Feed admin
+    resources :world_event_feed, only: [:index] do
+      collection do
+        patch :settings, action: :update_settings
+        post :publish
+      end
+    end
   end
 
   # OBS Overlay routes (Rails server-rendered, NOT SPA)
@@ -654,6 +671,7 @@ Rails.application.routes.draw do
     get "codex/:slug", to: "overlays#codex", as: :overlay_codex
     get "ticker/:position", to: "overlays#ticker", as: :overlay_ticker
     get "scenes/:slug", to: "overlays#scene", as: :overlay_scene
+    get "world-feed", to: "overlays#world_feed", as: :overlay_world_feed
   end
 
   # Development-only error page testing routes

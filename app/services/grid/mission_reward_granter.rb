@@ -48,6 +48,7 @@ module Grid
       # sweep. These run outside the transaction so a broadcast failure
       # or achievement check error can't roll back the mission completion.
       broadcast_completion(outcome)
+      publish_world_events(outcome)
       outcome[:achievement_notifs] = fire_post_commit_achievement_checks
       outcome[:notification_html] = build_notification(outcome)
       outcome
@@ -164,6 +165,18 @@ module Grid
     rescue ActiveRecord::RecordInvalid => e
       Rails.logger.warn("[MissionRewardGranter] item grant failed: #{e.message}")
       nil
+    end
+
+    def publish_world_events(outcome)
+      WorldEventFeed::Publisher.publish(
+        event_type: "mission_completed",
+        hackr_alias: @hackr.hackr_alias,
+        data: {mission_name: @mission.name, arc_name: @mission.grid_mission_arc&.name}
+      )
+      WorldEventFeed::Publisher.publish_level_up(
+        hackr_alias: @hackr.hackr_alias,
+        xp_result: {leveled_up: outcome[:leveled_up], new_clearance: outcome[:new_clearance]}
+      )
     end
 
     def broadcast_completion(outcome)

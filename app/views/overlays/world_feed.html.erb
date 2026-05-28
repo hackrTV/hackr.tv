@@ -1,0 +1,293 @@
+<style>
+  .world-feed-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 960px;
+    height: 1080px;
+    background: rgba(0, 0, 0, 0.92);
+    font-family: var(--overlay-font);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 40px 60px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .world-feed-header {
+    position: absolute;
+    top: 30px;
+    left: 60px;
+    right: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #22d3ee;
+    padding-bottom: 12px;
+  }
+
+  .world-feed-header-title {
+    color: #22d3ee;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 4px;
+  }
+
+  .world-feed-header-status {
+    color: #666;
+    font-size: 18px;
+  }
+
+  .world-feed-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: calc(1080px - 160px);
+    overflow: hidden;
+  }
+
+  .world-feed-line {
+    font-size: 26px;
+    line-height: 1.4;
+    color: #d0d0d0;
+    white-space: normal;
+    word-wrap: break-word;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+  }
+
+  .world-feed-line .wf-alias {
+    color: #22d3ee;
+    font-weight: bold;
+  }
+
+  .world-feed-line .wf-action {
+    color: #9ca3af;
+  }
+
+  .world-feed-line .wf-target {
+    color: #a78bfa;
+  }
+
+  .world-feed-line .wf-value {
+    color: #fbbf24;
+  }
+
+  .world-feed-line .wf-time {
+    color: #4b5563;
+    font-size: 20px;
+    margin-right: 12px;
+  }
+
+  .world-feed-line.fading {
+    opacity: 0.3;
+  }
+
+  .world-feed-line.very-faded {
+    opacity: 0.15;
+  }
+
+  /* Typing cursor */
+  .wf-cursor {
+    display: inline-block;
+    width: 14px;
+    height: 26px;
+    background: #22d3ee;
+    vertical-align: bottom;
+    animation: wf-blink 0.6s step-end infinite;
+  }
+
+  @keyframes wf-blink {
+    50% { opacity: 0; }
+  }
+</style>
+
+<div class="world-feed-overlay" id="world-feed-overlay">
+  <div class="world-feed-header">
+    <span class="world-feed-header-title">HACKR.TV // WORLD FEED</span>
+    <span class="world-feed-header-status" id="world-feed-status">CONNECTED</span>
+  </div>
+  <div class="world-feed-lines" id="world-feed-lines"></div>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+(function() {
+  'use strict';
+
+  var MAX_LINES = 20;
+  var TYPING_SPEED_MS = 18;
+  var container = document.getElementById('world-feed-lines');
+  var statusEl = document.getElementById('world-feed-status');
+  var typeQueue = [];
+  var isTyping = false;
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  var seenIds = {};
+
+  function isDuplicate(id) {
+    if (seenIds[id]) return true;
+    seenIds[id] = true;
+    // Cap size — drop oldest entries when over 300
+    var keys = Object.keys(seenIds);
+    if (keys.length > 300) {
+      for (var i = 0; i < 150; i++) delete seenIds[keys[i]];
+    }
+    return false;
+  }
+
+  function formatEvent(event) {
+    var alias = escapeHtml(event.hackr_alias);
+    var d = event.data || {};
+    var parts = '<span class="wf-alias">' + alias + '</span> ';
+
+    switch (event.event_type) {
+      case 'clearance_up':
+        parts += '<span class="wf-action">reached</span> <span class="wf-value">CLEARANCE ' + escapeHtml(String(d.new_clearance)) + '</span>';
+        break;
+      case 'mission_accepted':
+        parts += '<span class="wf-action">accepted mission:</span> <span class="wf-target">' + escapeHtml(d.mission_name) + '</span>';
+        break;
+      case 'mission_completed':
+        parts += '<span class="wf-action">completed mission:</span> <span class="wf-target">' + escapeHtml(d.mission_name) + '</span>';
+        break;
+      case 'breach_completed':
+        parts += '<span class="wf-action">completed a</span> <span class="wf-value">' + escapeHtml(d.tier) + '</span><span class="wf-action">-tier BREACH:</span> <span class="wf-target">' + escapeHtml(d.template_name) + '</span>';
+        break;
+      case 'rep_tier_changed':
+        var verb = d.direction === 'down' ? 'dropped to' : 'reached';
+        parts += '<span class="wf-action">' + verb + '</span> <span class="wf-value">' + escapeHtml(d.new_tier) + '</span> <span class="wf-action">with</span> <span class="wf-target">' + escapeHtml(d.faction_name) + '</span>';
+        break;
+      case 'achievement_unlocked':
+        var icon = d.badge_icon ? escapeHtml(d.badge_icon) + ' ' : '';
+        parts += '<span class="wf-action">unlocked</span> <span class="wf-value">' + icon + escapeHtml(d.achievement_name) + '</span>';
+        break;
+      case 'hackr_registered':
+        parts += '<span class="wf-action">jacked into THE PULSE GRID for the first time</span>';
+        break;
+      case 'wire_post':
+        parts += '<span class="wf-action">posted to THE WIRE:</span> <span class="wf-target">"' + escapeHtml(d.content) + '"</span>';
+        break;
+      case 'manual':
+        parts = '<span class="wf-action">' + escapeHtml(d.message || event.message || '') + '</span>';
+        break;
+      default:
+        parts += '<span class="wf-action">' + escapeHtml(event.event_type) + '</span>';
+    }
+    return parts;
+  }
+
+  function applyFading() {
+    var lines = container.querySelectorAll('.world-feed-line');
+    for (var i = 0; i < lines.length; i++) {
+      var age = lines.length - 1 - i;
+      lines[i].classList.remove('fading', 'very-faded');
+      if (age > 14) {
+        lines[i].classList.add('very-faded');
+      } else if (age > 10) {
+        lines[i].classList.add('fading');
+      }
+    }
+  }
+
+  function trimLines() {
+    while (container.children.length > MAX_LINES) {
+      container.removeChild(container.firstChild);
+    }
+  }
+
+  function typeNextInQueue() {
+    if (typeQueue.length === 0) {
+      isTyping = false;
+      return;
+    }
+    isTyping = true;
+    var event = typeQueue.shift();
+    var html = formatEvent(event);
+
+    var line = document.createElement('div');
+    line.className = 'world-feed-line';
+    line.innerHTML = '';
+    container.appendChild(line);
+    trimLines();
+
+    // Type out the plain text version character by character,
+    // then replace with the styled HTML version
+    var plainText = line.ownerDocument.createElement('div');
+    plainText.innerHTML = html;
+    var fullPlain = plainText.textContent || plainText.innerText;
+    var charIndex = 0;
+
+    var cursor = document.createElement('span');
+    cursor.className = 'wf-cursor';
+
+    function typeChar() {
+      if (charIndex < fullPlain.length) {
+        line.textContent = fullPlain.substring(0, charIndex + 1);
+        line.appendChild(cursor);
+        charIndex++;
+        setTimeout(typeChar, TYPING_SPEED_MS + Math.random() * 10);
+      } else {
+        // Done typing — swap to styled HTML
+        line.innerHTML = html;
+        applyFading();
+        // Small pause before next event
+        setTimeout(typeNextInQueue, 200 + Math.random() * 400);
+      }
+    }
+
+    typeChar();
+  }
+
+  function addEvent(event) {
+    typeQueue.push(event);
+    if (!isTyping) {
+      typeNextInQueue();
+    }
+  }
+
+  // ActionCable subscription
+  if (typeof ActionCable !== 'undefined') {
+    var consumer = ActionCable.createConsumer();
+    consumer.subscriptions.create('WorldEventFeedChannel', {
+      connected: function() {
+        statusEl.textContent = 'CONNECTED';
+        statusEl.style.color = '#34d399';
+      },
+      disconnected: function() {
+        statusEl.textContent = 'DISCONNECTED';
+        statusEl.style.color = '#ef4444';
+      },
+      received: function(data) {
+        if (data.type === 'initial_events') {
+          // Load initial events without typing animation
+          (data.events || []).forEach(function(evt) {
+            if (isDuplicate(evt.id)) return;
+            var line = document.createElement('div');
+            line.className = 'world-feed-line';
+            line.innerHTML = formatEvent(evt);
+            container.appendChild(line);
+          });
+          trimLines();
+          applyFading();
+        } else if (data.type === 'world_event') {
+          if (!isDuplicate(data.event.id)) {
+            addEvent(data.event);
+          }
+        }
+      }
+    });
+  }
+
+  // Flicker integration
+  if (window.flickerManager) {
+    window.flickerManager.refresh();
+  }
+})();
+</script>

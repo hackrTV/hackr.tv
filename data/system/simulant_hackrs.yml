@@ -1,0 +1,130 @@
+# Population simulant accounts for the World Event Feed.
+# These are "22nd century hackrs" — background population that generates
+# plausible activity events to make the world feel alive.
+# All are login_disabled. None are playable accounts.
+simulants:
+  - Axiom-7
+  - BlkVoid
+  - Brynn Solis
+  - BurnLayer
+  - ByteRot
+  - C4scade
+  - Calyx
+  - Cerberus Node
+  - ChalkLine
+  - Chromakey
+  - Circuit Wraith
+  - Coldframe
+  - Copperwire
+  - Cortex-9
+  - CrashNull
+  - Cryogen
+  - DarkPulse
+  - DataGrave
+  - DeadSignal
+  - DeepNode
+  - Dex Malware
+  - Drift Halo
+  - Dustline
+  - Echo Null
+  - EdgRunner
+  - Ember Cask
+  - Fadeout
+  - Fenris Loop
+  - FluxGate
+  - Forge Ash
+  - Fragment-11
+  - FrostBit
+  - G0stShell
+  - GlassJaw
+  - GlitchMob
+  - GrayMatter
+  - Grindcore
+  - Halfpipe
+  - Hashbrown
+  - Hex Orbit
+  - Hollowpoint
+  - HotPatch
+  - Hydra Cell
+  - IcePick
+  - Inkblot
+  - Iron Veil
+  - JackNull
+  - Jinxed
+  - KernelPanic
+  - Killswitch
+  - Knightfall
+  - LatchKey
+  - LazerGrid
+  - LiveWire
+  - LoopBack
+  - LowGrav
+  - Malware Dex
+  - MaskOff
+  - Mercury Ash
+  - MeshPoint
+  - Midnight Run
+  - Mirage-4
+  - MoltFrame
+  - Morph Lock
+  - NeonBleed
+  - NetBurn
+  - Nightcrawl
+  - NullByte
+  - Onyx Drift
+  - OverClock
+  - Oxidize
+  - PatchWork
+  - Phase Lock
+  - Photon Vex
+  - PinDrop
+  - Pixel Rot
+  - Praxis Node
+  - PrimeRoot
+  - Proxy Ghost
+  - QBit
+  - QuickSilver
+  - Radix
+  - Razorback
+  - RedShift
+  - RefluxWave
+  - Riptide
+  - Rogue Spark
+  - RootKit Rex
+  - RuneGlyph
+  - SaltHash
+  - Sandstorm
+  - Scrapheap
+  - ShardLink
+  - Shellcode
+  - SilkThread
+  - Singularity
+  - Slipstream X
+  - SmokePing
+  - SnakeEyes
+  - SplitBit
+  - StaticLine
+  - SteelTrap
+  - StormDrain
+  - SubZero
+  - SwitchBlade
+  - SynFault
+  - TarPit
+  - Terraform
+  - ThreadBare
+  - Tombstone
+  - TraceRoute
+  - TripWire
+  - TurboVolt
+  - Umbra-6
+  - Uplink Raze
+  - VectorDash
+  - Vertigo
+  - VoltSpike
+  - Warden-XII
+  - WarpGate
+  - Watchfire
+  - WildCard
+  - XeroTrace
+  - ZenithArc
+  - ZeroDay

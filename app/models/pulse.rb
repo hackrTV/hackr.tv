@@ -119,6 +119,15 @@ class Pulse < ApplicationRecord
         parent_pulse_id: parent_pulse_id
       }
     })
+
+    # Publish root pulses (not splices) to the world event feed
+    if parent_pulse_id.nil?
+      WorldEventFeed::Publisher.publish(
+        event_type: "wire_post",
+        hackr_alias: grid_hackr&.hackr_alias || "Unknown",
+        data: {content: content.truncate(80)}
+      )
+    end
   end
 
   def broadcast_deletion

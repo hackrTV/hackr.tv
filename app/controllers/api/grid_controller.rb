@@ -754,6 +754,15 @@ class Api::GridController < ApplicationController
         }, status: :unprocessable_entity
       end
     end
+
+    # Publish after transaction commits so rollback doesn't leave phantom events
+    if @hackr&.persisted?
+      WorldEventFeed::Publisher.publish(
+        event_type: "hackr_registered",
+        hackr_alias: @hackr.hackr_alias,
+        data: {}
+      )
+    end
   end
 
   # DELETE /api/grid/disconnect - Disconnect from THE PULSE GRID

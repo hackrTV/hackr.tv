@@ -2838,6 +2838,65 @@ namespace :data do
       puts "  Run `git diff data/world/` to review changes."
     end
   end
+
+  desc "Load simulant hackrs for World Event Feed"
+  task simulants: :environment do
+    puts "\n--- Loading Simulant Hackrs ---"
+    yaml_file = Rails.root.join("data", "system", "simulant_hackrs.yml")
+
+    unless File.exist?(yaml_file)
+      puts "  ✗ File not found: #{yaml_file}"
+      next
+    end
+
+    data = YAML.load_file(yaml_file)
+    aliases = data["simulants"]
+    created = 0
+    skipped = 0
+
+    # Default password for simulants — they are login_disabled so this
+    # is never usable, but GridHackr requires a password on create.
+    default_password = "simulant-#{SecureRandom.hex(8)}"
+
+    aliases.each do |hackr_alias|
+      hackr = GridHackr.find_or_initialize_by(hackr_alias: hackr_alias)
+      if hackr.persisted?
+        # Ensure simulant row exists even if hackr was already created
+        if WorldEventSimulant.exists?(grid_hackr_id: hackr.id)
+          skipped += 1
+          next
+        end
+      else
+        hackr.assign_attributes(
+          email: "#{hackr_alias.parameterize}@simulant.hackr.tv",
+          role: "operative",
+          password: default_password,
+          skip_reserved_check: true,
+          login_disabled: true
+        )
+        hackr.save!
+      end
+
+      # Create simulant state row with randomized initial state
+      cl = rand(0..35)
+      WorldEventSimulant.find_or_create_by!(grid_hackr: hackr) do |sim|
+        sim.state = {
+          "clearance" => cl,
+          "breach_count" => rand(0..(cl * 2)),
+          "completed_missions" => [],
+          "active_mission" => nil,
+          "faction_standings" => {},
+          "achievements_earned" => [],
+          "deck_name" => nil
+        }
+      end
+
+      created += 1
+      puts "  ✓ Created simulant: #{hackr_alias} (CL#{cl})"
+    end
+
+    puts "Simulants: #{created} created, #{skipped} skipped, #{WorldEventSimulant.count} total"
+  end
 end
 
 # Helper module for data loading utilities
