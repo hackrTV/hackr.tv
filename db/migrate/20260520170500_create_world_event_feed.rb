@@ -15,7 +15,7 @@ class CreateWorldEventFeed < ActiveRecord::Migration[8.0]
     add_index :world_events, :simulated
 
     create_table :world_event_simulants do |t|
-      t.references :grid_hackr, null: false, foreign_key: true, index: { unique: true }
+      t.references :grid_hackr, null: false, foreign_key: true, index: {unique: true}
       t.json :state, null: false, default: {}
 
       t.timestamps
