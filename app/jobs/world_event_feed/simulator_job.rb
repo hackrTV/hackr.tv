@@ -25,7 +25,7 @@ module WorldEventFeed
       # Add variance: ±30%
       variance = (events_this_tick * 0.3).ceil
       events_this_tick = rand((events_this_tick - variance)..(events_this_tick + variance))
-      events_this_tick = events_this_tick.clamp(0, 20) # Safety cap per tick
+      events_this_tick = events_this_tick.clamp(0, 30) # Safety cap per tick (60/min max ÷ 2 ticks/min)
 
       return if events_this_tick <= 0
 

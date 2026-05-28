@@ -27,11 +27,11 @@ RSpec.describe WorldEventFeed::SimulatorJob do
       expect { described_class.new.perform }.not_to change { WorldEvent.count }
     end
 
-    it "does not exceed safety cap of 20 events per tick" do
-      WorldEventSetting.current.update!(target_events_per_minute: 120)
+    it "does not exceed safety cap of 30 events per tick" do
+      WorldEventSetting.current.update!(target_events_per_minute: 60)
       described_class.new.perform
-      # Even with 120/min target and 0 organic, one tick should not exceed 20
-      expect(WorldEvent.simulated.count).to be <= 20
+      # Even with 60/min target and 0 organic, one tick should not exceed 30
+      expect(WorldEvent.simulated.count).to be <= 30
     end
 
     it "generates zero events when organic rate exceeds target" do

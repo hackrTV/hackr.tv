@@ -2,6 +2,11 @@
 
 class WorldEventFeedChannel < ApplicationCable::Channel
   def subscribed
+    unless WorldEventSetting.visible? || current_hackr&.admin?
+      reject
+      return
+    end
+
     stream_from WorldEventFeed::Publisher::STREAM_NAME
 
     # Send recent events on subscribe so clients have initial state

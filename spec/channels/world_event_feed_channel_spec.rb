@@ -2,10 +2,12 @@ require "rails_helper"
 
 RSpec.describe WorldEventFeedChannel, type: :channel do
   before do
-    stub_connection
+    WorldEventSetting.create!(target_events_per_minute: 12, simulator_enabled: true, visible: true)
   end
 
-  describe "#subscribed" do
+  describe "#subscribed when visible" do
+    before { stub_connection }
+
     it "streams from world_event_feed" do
       subscribe
       expect(subscription).to be_confirmed
@@ -40,6 +42,33 @@ RSpec.describe WorldEventFeedChannel, type: :channel do
 
       events = transmissions.last["events"]
       expect(events.length).to eq(50)
+    end
+  end
+
+  describe "#subscribed when hidden" do
+    before do
+      WorldEventSetting.current.update!(visible: false)
+    end
+
+    it "rejects anonymous subscriptions" do
+      stub_connection(current_hackr: nil)
+      subscribe
+      expect(subscription).to be_rejected
+    end
+
+    it "rejects non-admin subscriptions" do
+      hackr = create(:grid_hackr, role: "operative")
+      stub_connection(current_hackr: hackr)
+      subscribe
+      expect(subscription).to be_rejected
+    end
+
+    it "allows admin subscriptions" do
+      admin = create(:grid_hackr, role: "admin")
+      stub_connection(current_hackr: admin)
+      subscribe
+      expect(subscription).to be_confirmed
+      expect(subscription).to have_stream_from("world_event_feed")
     end
   end
 end

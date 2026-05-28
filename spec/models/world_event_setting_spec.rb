@@ -7,8 +7,8 @@ RSpec.describe WorldEventSetting do
       expect(setting).not_to be_valid
     end
 
-    it "requires target_events_per_minute <= 120" do
-      setting = WorldEventSetting.new(target_events_per_minute: 121)
+    it "requires target_events_per_minute <= 60" do
+      setting = WorldEventSetting.new(target_events_per_minute: 61)
       expect(setting).not_to be_valid
     end
 

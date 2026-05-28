@@ -13,7 +13,7 @@
 #  updated_at               :datetime         not null
 #
 class WorldEventSetting < ApplicationRecord
-  validates :target_events_per_minute, numericality: {greater_than: 0, less_than_or_equal_to: 120}
+  validates :target_events_per_minute, numericality: {greater_than: 0, less_than_or_equal_to: 60}
 
   # Singleton pattern — one config row
   def self.current
