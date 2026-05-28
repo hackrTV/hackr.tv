@@ -5,15 +5,15 @@
 simulants:
   - Axiom-7
   - BlkVoid
-  - Brynn Solis
+  - BrynnSolis
   - BurnLayer
   - ByteRot
-  - C4scade
+  - C4sTc4deR
   - Calyx
-  - Cerberus Node
+  - Cerberus_Node
   - ChalkLine
   - Chromakey
-  - Circuit Wraith
+  - CircuitWraith
   - Coldframe
   - Copperwire
   - Cortex-9
@@ -26,13 +26,13 @@ simulants:
   - Dex Malware
   - Drift Halo
   - Dustline
-  - Echo Null
+  - Echo_Null
   - EdgRunner
-  - Ember Cask
+  - EmberCask
   - Fadeout
-  - Fenris Loop
+  - FenrisLoop
   - FluxGate
-  - Forge Ash
+  - ForgeAsher
   - Fragment-11
   - FrostBit
   - G0stShell
@@ -42,46 +42,46 @@ simulants:
   - Grindcore
   - Halfpipe
   - Hashbrown
-  - Hex Orbit
+  - HexOrbital
   - Hollowpoint
   - HotPatch
-  - Hydra Cell
+  - Hydra_Cell
   - IcePick
   - Inkblot
   - Iron Veil
   - JackNull
   - Jinxed
-  - KernelPanic
-  - Killswitch
+  - KernPan
+  - DeadmanSwitch
   - Knightfall
   - LatchKey
   - LazerGrid
   - LiveWire
   - LoopBack
   - LowGrav
-  - Malware Dex
+  - Malware_Dex
   - MaskOff
-  - Mercury Ash
+  - MercuryAshRansom
   - MeshPoint
-  - Midnight Run
+  - Midnight-Run
   - Mirage-4
   - MoltFrame
-  - Morph Lock
+  - MorphoLock
   - NeonBleed
   - NetBurn
   - Nightcrawl
   - NullByte
-  - Onyx Drift
-  - OverClock
-  - Oxidize
+  - OnyxDriftr
+  - OverClockd
+  - Oxidyze
   - PatchWork
-  - Phase Lock
-  - Photon Vex
+  - Phase_Lock
+  - PhotonVortex
   - PinDrop
-  - Pixel Rot
-  - Praxis Node
+  - PixelRot
+  - PraxNode
   - PrimeRoot
-  - Proxy Ghost
+  - ProxGhost
   - QBit
   - QuickSilver
   - Radix
@@ -89,11 +89,11 @@ simulants:
   - RedShift
   - RefluxWave
   - Riptide
-  - Rogue Spark
-  - RootKit Rex
+  - RogueSpark
+  - RootKit_Rex
   - RuneGlyph
   - SaltHash
-  - Sandstorm
+  - SANDSTORM
   - Scrapheap
   - ShardLink
   - Shellcode
