@@ -32,13 +32,14 @@ interface MissionsResponse {
   completed: HackrMission[]
 }
 
-export const MissionsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void }> = ({ refreshToken, onCommand }) => {
+export const MissionsTab: React.FC<{ refreshToken: number; isActive: boolean; onCommand?: (cmd: string) => void }> = ({ refreshToken, isActive, onCommand }) => {
   const { executing } = useTactical()
   const [data, setData] = useState<MissionsResponse | null>(null)
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<MissionsResponse>('/api/grid/missions').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
 

@@ -34,12 +34,13 @@ interface DeckResponse {
   }[]
 }
 
-export const DeckTab: React.FC<{ refreshToken: number }> = ({ refreshToken }) => {
+export const DeckTab: React.FC<{ refreshToken: number; isActive: boolean }> = ({ refreshToken, isActive }) => {
   const [data, setData] = useState<DeckResponse | null>(null)
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<DeckResponse>('/api/grid/deck').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
   if (!data.deck) return <div style={{ color: '#666', fontSize: '0.8em' }}>No DECK equipped</div>

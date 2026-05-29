@@ -66,15 +66,16 @@ function humanizeProperties (props: Record<string, unknown>): { label: string; v
   return result
 }
 
-export const SchematicsTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void }> = ({ refreshToken, onCommand }) => {
+export const SchematicsTab: React.FC<{ refreshToken: number; isActive: boolean; onCommand?: (cmd: string) => void }> = ({ refreshToken, isActive, onCommand }) => {
   const { executing } = useTactical()
   const [data, setData] = useState<SchematicsResponse | null>(null)
   const [confirm, setConfirm] = useState<Schematic | null>(null)
   const [detail, setDetail] = useState<OutputDef | null>(null)
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<SchematicsResponse>('/api/grid/schematics').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
 

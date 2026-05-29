@@ -91,7 +91,6 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
 
   useZonePresence({
     enabled: !!currentRoomId,
-    refreshToken,
     onPresenceUpdate: handlePresenceUpdate
   })
 
@@ -336,13 +335,6 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
       onWheel={handleWheel}
       onClick={dismissTooltip}
     >
-      <style>{`
-        @keyframes pulse-marker {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-      `}</style>
-
       {/* Zone label */}
       <div style={{
         position: 'absolute', top: 8, left: 12, zIndex: 10,

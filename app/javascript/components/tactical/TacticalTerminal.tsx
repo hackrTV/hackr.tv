@@ -19,21 +19,6 @@ export const TacticalTerminal: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      <style>{`
-        @keyframes rainbow-cycle {
-          0%   { color: #ff6b6b; }
-          17%  { color: #fbbf24; }
-          33%  { color: #34d399; }
-          50%  { color: #22d3ee; }
-          67%  { color: #60a5fa; }
-          83%  { color: #a78bfa; }
-          100% { color: #ff6b6b; }
-        }
-        .rarity-unicorn {
-          animation: rainbow-cycle 3s linear infinite;
-          font-weight: bold;
-        }
-      `}</style>
       <div
         ref={outputRef}
         onClick={handleOutputClick}

@@ -46,14 +46,14 @@ export const TacticalStatusPanel: React.FC<TacticalStatusPanelProps> = ({ refres
     const isActive = tab.key === activeTab
     return (
       <div key={tab.key} style={{ display: isActive ? 'block' : 'none', height: '100%' }}>
-        {tab.key === 'deck' && <DeckTab refreshToken={refreshToken} />}
-        {tab.key === 'stats' && <StatsTab refreshToken={refreshToken} />}
-        {tab.key === 'loadout' && <LoadoutTab refreshToken={refreshToken} />}
-        {tab.key === 'inventory' && <InventoryTab refreshToken={refreshToken} onCommand={onCommand} hasVendor={hasVendor} />}
-        {tab.key === 'rep' && <RepTab refreshToken={refreshToken} />}
-        {tab.key === 'cred' && <CredTab refreshToken={refreshToken} onCommand={onCommand} />}
-        {tab.key === 'missions' && <MissionsTab refreshToken={refreshToken} onCommand={onCommand} />}
-        {tab.key === 'schematics' && <SchematicsTab refreshToken={refreshToken} onCommand={onCommand} />}
+        {tab.key === 'deck' && <DeckTab refreshToken={refreshToken} isActive={isActive} />}
+        {tab.key === 'stats' && <StatsTab refreshToken={refreshToken} isActive={isActive} />}
+        {tab.key === 'loadout' && <LoadoutTab refreshToken={refreshToken} isActive={isActive} />}
+        {tab.key === 'inventory' && <InventoryTab refreshToken={refreshToken} isActive={isActive} onCommand={onCommand} hasVendor={hasVendor} />}
+        {tab.key === 'rep' && <RepTab refreshToken={refreshToken} isActive={isActive} />}
+        {tab.key === 'cred' && <CredTab refreshToken={refreshToken} isActive={isActive} onCommand={onCommand} />}
+        {tab.key === 'missions' && <MissionsTab refreshToken={refreshToken} isActive={isActive} onCommand={onCommand} />}
+        {tab.key === 'schematics' && <SchematicsTab refreshToken={refreshToken} isActive={isActive} onCommand={onCommand} />}
       </div>
     )
   }

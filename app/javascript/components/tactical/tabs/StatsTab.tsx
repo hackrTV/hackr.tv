@@ -86,12 +86,13 @@ const SectionLabel: React.FC<{ children: React.ReactNode; hint?: string }> = ({ 
 
 const formatCred = (amount: number): string => amount.toLocaleString()
 
-export const StatsTab: React.FC<{ refreshToken: number }> = ({ refreshToken }) => {
+export const StatsTab: React.FC<{ refreshToken: number; isActive: boolean }> = ({ refreshToken, isActive }) => {
   const [data, setData] = useState<StatsResponse | null>(null)
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<StatsResponse>('/api/grid/stats').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
 

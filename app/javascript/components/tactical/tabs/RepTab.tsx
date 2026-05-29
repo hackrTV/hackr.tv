@@ -33,12 +33,13 @@ function repBar (value: number): string {
   return `${left}│${right}`
 }
 
-export const RepTab: React.FC<{ refreshToken: number }> = ({ refreshToken }) => {
+export const RepTab: React.FC<{ refreshToken: number; isActive: boolean }> = ({ refreshToken, isActive }) => {
   const [data, setData] = useState<ReputationResponse | null>(null)
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<ReputationResponse>('/api/grid/reputation').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
 

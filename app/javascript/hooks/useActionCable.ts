@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { createConsumer, Cable, Channel } from '@rails/actioncable'
+import { Channel } from '@rails/actioncable'
+import { getActionCableConsumer } from '~/lib/actionCableConsumer'
 
 export interface GridEvent {
   type: 'movement' | 'say' | 'take' | 'drop' | 'system_broadcast'
@@ -19,7 +20,6 @@ interface UseActionCableOptions {
 }
 
 export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptions) => {
-  const cableRef = useRef<Cable | null>(null)
   const channelRef = useRef<Channel | null>(null)
   const reconnectTimeoutRef = useRef<number | null>(null)
   const reconnectAttemptsRef = useRef(0)
@@ -56,21 +56,16 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
     clearReconnectTimeout()
     setConnectionStatus(reconnectAttemptsRef.current > 0 ? 'reconnecting' : 'connecting')
 
-    // Clean up existing connection
+    // Clean up existing subscription
     if (channelRef.current) {
       channelRef.current.unsubscribe()
       channelRef.current = null
     }
 
-    // Create cable consumer if it doesn't exist
-    if (!cableRef.current) {
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsUrl = `${wsProtocol}//${window.location.host}/cable`
-      cableRef.current = createConsumer(wsUrl)
-    }
+    const cable = getActionCableConsumer()
 
     // Subscribe to GridChannel
-    channelRef.current = cableRef.current.subscriptions.create(
+    channelRef.current = cable.subscriptions.create(
       { channel: 'GridChannel' },
       {
         connected () {
@@ -99,10 +94,6 @@ export const useActionCable = ({ roomId, onEvent, enabled }: UseActionCableOptio
     if (channelRef.current) {
       channelRef.current.unsubscribe()
       channelRef.current = null
-    }
-    if (cableRef.current) {
-      cableRef.current.disconnect()
-      cableRef.current = null
     }
     setIsConnected(false)
     setConnectionStatus('disconnected')

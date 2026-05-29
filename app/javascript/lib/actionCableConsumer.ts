@@ -10,12 +10,10 @@ import { createConsumer, Cable } from '@rails/actioncable'
  * the returned cable — other hooks may still be using it. The cable
  * stays up for the lifetime of the page.
  *
- * Migration status: `useAchievementChannel` uses this. Pre-existing
- * hooks (`useActionCable`, `useStreamStatus`, `usePulseWire`,
- * `useUplink`) each still open their own consumer — migrating them
- * is tracked as follow-up work (each has its own reconnect / presence
- * logic that needs careful validation, out of scope for the
- * achievement feature).
+ * Migration status: `useAchievementChannel`, `useActionCable`, and
+ * `useZonePresence` use this. Pre-existing hooks (`useStreamStatus`,
+ * `usePulseWire`, `useUplink`) each still open their own consumer —
+ * migrating them is tracked as follow-up work.
  */
 let cable: Cable | null = null
 

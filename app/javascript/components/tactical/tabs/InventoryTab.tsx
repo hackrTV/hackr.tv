@@ -69,15 +69,16 @@ function humanizeProperties (props: Record<string, unknown>): { label: string; v
   return result
 }
 
-export const InventoryTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void; hasVendor?: boolean }> = ({ refreshToken, onCommand, hasVendor }) => {
+export const InventoryTab: React.FC<{ refreshToken: number; isActive: boolean; onCommand?: (cmd: string) => void; hasVendor?: boolean }> = ({ refreshToken, isActive, onCommand, hasVendor }) => {
   const { executing } = useTactical()
   const [data, setData] = useState<InventoryResponse | null>(null)
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
   const [pendingAction, setPendingAction] = useState<{ item: InventoryItem; action: string } | null>(null)
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<InventoryResponse>('/api/grid/inventory').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
 
