@@ -20,7 +20,7 @@ function formatCred (amount: number): string {
   return amount.toLocaleString('en-US')
 }
 
-export const CredTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string) => void }> = ({ refreshToken, onCommand }) => {
+export const CredTab: React.FC<{ refreshToken: number; isActive: boolean; onCommand?: (cmd: string) => void }> = ({ refreshToken, isActive, onCommand }) => {
   const { executing } = useTactical()
   const [data, setData] = useState<CredResponse | null>(null)
   const [nicknameTarget, setNicknameTarget] = useState<string | null>(null)
@@ -31,8 +31,9 @@ export const CredTab: React.FC<{ refreshToken: number; onCommand?: (cmd: string)
   const [transferAmount, setTransferAmount] = useState('')
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<CredResponse>('/api/grid/cred').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
 

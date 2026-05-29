@@ -26,7 +26,8 @@ const TacticalInner: React.FC = () => {
   const { hackr } = useGridAuth()
   const {
     currentRoomId, setCurrentRoomId, setOutput,
-    refreshToken, sendCommand, commandInputRef,
+    mapRefreshToken, dataRefreshToken, breachRefreshToken,
+    sendCommand, commandInputRef,
     inBreach, breachMeta, breachOutput,
     hasVendor, setHasVendor,
     hasTransit, setHasTransit,
@@ -108,6 +109,16 @@ const TacticalInner: React.FC = () => {
     trackEvent('panel_close', panel)
   }, [])
 
+  // Stable panel open/close callbacks
+  const openTransit = useCallback(() => openPanel('transit', setTransitOpen), [openPanel])
+  const openVendor = useCallback(() => openPanel('vendor', setVendorOpen), [openPanel])
+  const openRestPod = useCallback(() => openPanel('rest_pod', setRestPodOpen), [openPanel])
+  const closeTransit = useCallback(() => closePanel('transit', setTransitOpen), [closePanel])
+  const closeVendor = useCallback(() => closePanel('vendor', setVendorOpen), [closePanel])
+  const closeNpc = useCallback(() => closePanel('npc', setNpcOpen), [closePanel])
+  const closeRestPod = useCallback(() => closePanel('rest_pod', setRestPodOpen), [closePanel])
+  const handleNavigate = useCallback((dir: string) => sendCommand(`go ${dir}`), [sendCommand])
+
   // Tab anywhere → focus command input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -138,7 +149,7 @@ const TacticalInner: React.FC = () => {
   }, [hackr, setCurrentRoomId, setOutput])
 
   // ActionCable for room events (terminal output)
-  const handleEvent = React.useCallback((event: GridEvent) => {
+  const handleEvent = useCallback((event: GridEvent) => {
     const ts = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
     let message = ''
 
@@ -187,7 +198,7 @@ const TacticalInner: React.FC = () => {
       color: '#d0d0d0'
     }}>
       <div style={{ gridArea: 'topbar' }}>
-        <TacticalBar connectionStatus={connectionStatus} refreshToken={refreshToken} />
+        <TacticalBar connectionStatus={connectionStatus} refreshToken={dataRefreshToken} />
       </div>
 
       <div style={{
@@ -197,7 +208,7 @@ const TacticalInner: React.FC = () => {
         overflow: 'hidden'
       }}>
         <div style={{ flex: 2, minHeight: 0, overflow: 'hidden', borderBottom: '1px solid #333' }}>
-          <TacticalStatusPanel refreshToken={refreshToken} onCommand={sendCommand} hasVendor={hasVendor} />
+          <TacticalStatusPanel refreshToken={dataRefreshToken} onCommand={sendCommand} hasVendor={hasVendor} />
         </div>
         <div style={{ flex: 3, minHeight: 0, overflow: 'hidden', padding: '6px' }}>
           <TacticalTerminal />
@@ -206,9 +217,9 @@ const TacticalInner: React.FC = () => {
 
       <div style={{ gridArea: 'map', overflow: 'hidden', borderLeft: '1px solid #333', position: 'relative' }}>
         <ZoneMap
-          refreshToken={refreshToken}
+          refreshToken={mapRefreshToken}
           currentRoomId={currentRoomId}
-          onNavigate={(dir) => sendCommand(`go ${dir}`)}
+          onNavigate={handleNavigate}
           onBreachEncountersChange={handleBreachEncountersChange}
           onVendorPresenceChange={handleVendorPresenceChange}
           onTransitPresenceChange={handleTransitPresenceChange}
@@ -226,26 +237,26 @@ const TacticalInner: React.FC = () => {
           visible={inBreach}
           breachMeta={breachMeta}
           breachOutput={breachOutput}
-          refreshToken={refreshToken}
+          refreshToken={breachRefreshToken}
           onCommand={sendCommand}
         />
         {hasTransit && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
-          <TransitHandle onClick={() => openPanel('transit', setTransitOpen)} />
+          <TransitHandle onClick={openTransit} />
         )}
         <TransitPanel
           visible={transitOpen && !inBreach}
-          refreshToken={refreshToken}
+          refreshToken={dataRefreshToken}
           onCommand={sendCommand}
-          onClose={() => closePanel('transit', setTransitOpen)}
+          onClose={closeTransit}
         />
         {hasVendor && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
-          <VendorHandle onClick={() => openPanel('vendor', setVendorOpen)} />
+          <VendorHandle onClick={openVendor} />
         )}
         <VendorPanel
           visible={vendorOpen && !inBreach}
-          refreshToken={refreshToken}
+          refreshToken={dataRefreshToken}
           onCommand={sendCommand}
-          onClose={() => closePanel('vendor', setVendorOpen)}
+          onClose={closeVendor}
         />
         {hasNpc && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen &&
           npcMobs.map((mob, i) => {
@@ -263,19 +274,19 @@ const TacticalInner: React.FC = () => {
         }
         <NpcPanel
           visible={npcOpen && !inBreach}
-          refreshToken={refreshToken}
+          refreshToken={dataRefreshToken}
           onCommand={sendCommand}
-          onClose={() => closePanel('npc', setNpcOpen)}
+          onClose={closeNpc}
           selectedMobId={selectedNpcId}
         />
         {hasRestPod && !inBreach && !vendorOpen && !transitOpen && !npcOpen && !restPodOpen && (
-          <RestPodHandle onClick={() => openPanel('rest_pod', setRestPodOpen)} />
+          <RestPodHandle onClick={openRestPod} />
         )}
         <RestPodPanel
           visible={restPodOpen && !inBreach}
-          refreshToken={refreshToken}
+          refreshToken={dataRefreshToken}
           onCommand={sendCommand}
-          onClose={() => closePanel('rest_pod', setRestPodOpen)}
+          onClose={closeRestPod}
         />
       </div>
 

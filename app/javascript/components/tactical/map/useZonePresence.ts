@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { createConsumer, Cable, Channel } from '@rails/actioncable'
+import { Channel } from '@rails/actioncable'
+import { getActionCableConsumer } from '~/lib/actionCableConsumer'
 
 interface PresenceEvent {
   type: 'presence_update'
@@ -10,14 +11,19 @@ interface PresenceEvent {
 
 interface UseZonePresenceOptions {
   enabled: boolean
-  refreshToken: number
+  subscriptionToken: number
   onPresenceUpdate: (event: PresenceEvent) => void
 }
 
-export function useZonePresence ({ enabled, refreshToken, onPresenceUpdate }: UseZonePresenceOptions) {
-  const cableRef = useRef<Cable | null>(null)
+export function useZonePresence ({ enabled, subscriptionToken, onPresenceUpdate }: UseZonePresenceOptions) {
   const channelRef = useRef<Channel | null>(null)
   const [connected, setConnected] = useState(false)
+
+  // Ref keeps connect() stable regardless of callback identity changes
+  const onPresenceUpdateRef = useRef(onPresenceUpdate)
+  useEffect(() => {
+    onPresenceUpdateRef.current = onPresenceUpdate
+  }, [onPresenceUpdate])
 
   const connect = useCallback(() => {
     if (!enabled) return
@@ -27,13 +33,9 @@ export function useZonePresence ({ enabled, refreshToken, onPresenceUpdate }: Us
       channelRef.current = null
     }
 
-    if (!cableRef.current) {
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsUrl = `${wsProtocol}//${window.location.host}/cable`
-      cableRef.current = createConsumer(wsUrl)
-    }
+    const cable = getActionCableConsumer()
 
-    channelRef.current = cableRef.current.subscriptions.create(
+    channelRef.current = cable.subscriptions.create(
       { channel: 'ZoneChannel' },
       {
         connected () {
@@ -44,25 +46,24 @@ export function useZonePresence ({ enabled, refreshToken, onPresenceUpdate }: Us
         },
         received (data: PresenceEvent) {
           if (data.type === 'presence_update') {
-            onPresenceUpdate(data)
+            onPresenceUpdateRef.current(data)
           }
         }
       }
     )
-  }, [enabled, onPresenceUpdate])
+  }, [enabled])
 
   const disconnect = useCallback(() => {
     if (channelRef.current) {
       channelRef.current.unsubscribe()
       channelRef.current = null
     }
-    if (cableRef.current) {
-      cableRef.current.disconnect()
-      cableRef.current = null
-    }
     setConnected(false)
   }, [])
 
+  // Resubscribe when enabled changes or subscriptionToken bumps (room/zone change).
+  // ZoneChannel#subscribed picks its stream from current_hackr's zone at subscription
+  // time, so cross-zone movement requires a fresh subscription.
   useEffect(() => {
     if (enabled) {
       connect()
@@ -70,7 +71,7 @@ export function useZonePresence ({ enabled, refreshToken, onPresenceUpdate }: Us
       disconnect()
     }
     return () => disconnect()
-  }, [enabled, refreshToken, connect, disconnect])
+  }, [enabled, subscriptionToken, connect, disconnect])
 
   return { connected }
 }

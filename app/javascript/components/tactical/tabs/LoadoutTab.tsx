@@ -18,12 +18,13 @@ interface LoadoutResponse {
 
 const SLOT_ORDER = ['back', 'head', 'ears', 'eyes', 'neck', 'chest', 'left_wrist', 'right_wrist', 'hands', 'waist', 'legs', 'feet']
 
-export const LoadoutTab: React.FC<{ refreshToken: number }> = ({ refreshToken }) => {
+export const LoadoutTab: React.FC<{ refreshToken: number; isActive: boolean }> = ({ refreshToken, isActive }) => {
   const [data, setData] = useState<LoadoutResponse | null>(null)
 
   useEffect(() => {
+    if (!isActive) return
     apiJson<LoadoutResponse>('/api/grid/loadout').then(setData).catch(console.error)
-  }, [refreshToken])
+  }, [refreshToken, isActive])
 
   if (!data) return <div style={{ color: '#555', fontSize: '0.8em' }}>Loading...</div>
 

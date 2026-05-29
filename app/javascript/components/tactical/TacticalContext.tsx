@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useRef, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useCallback, useRef, useMemo, ReactNode } from 'react'
 import { apiJson } from '~/utils/apiClient'
 import { trackEvent } from '~/utils/analyticsCollector'
 import { CommandInputHandle } from '~/components/grid/CommandInput'
 import { NpcMobStub } from '~/types/zoneMap'
+
+const MAX_OUTPUT_LINES = 500
 
 interface GridCommandResponse {
   output?: string
@@ -36,7 +38,9 @@ interface TacticalContextValue {
   output: string[]
   currentRoomId: number | null
   executing: boolean
-  refreshToken: number
+  mapRefreshToken: number
+  dataRefreshToken: number
+  breachRefreshToken: number
   inBreach: boolean
   breachMeta: BreachMeta | null
   breachOutput: string[]
@@ -47,7 +51,7 @@ interface TacticalContextValue {
   npcMobs: NpcMobStub[]
   sendCommand: (command: string) => Promise<string | undefined>
   setOutput: React.Dispatch<React.SetStateAction<string[]>>
-  setCurrentRoomId: React.Dispatch<React.SetStateAction<number | null>>
+  setCurrentRoomId: (id: number | null) => void
   setHasVendor: React.Dispatch<React.SetStateAction<boolean>>
   setHasTransit: React.Dispatch<React.SetStateAction<boolean>>
   setHasNpc: React.Dispatch<React.SetStateAction<boolean>>
@@ -64,11 +68,16 @@ export const useTactical = () => {
   return ctx
 }
 
+const capOutput = (lines: string[]): string[] =>
+  lines.length > MAX_OUTPUT_LINES ? lines.slice(-MAX_OUTPUT_LINES) : lines
+
 export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [output, setOutput] = useState<string[]>([])
-  const [currentRoomId, setCurrentRoomId] = useState<number | null>(null)
+  const [output, setOutputRaw] = useState<string[]>([])
+  const [currentRoomId, setCurrentRoomIdRaw] = useState<number | null>(null)
   const [executing, setExecuting] = useState(false)
-  const [refreshToken, setRefreshToken] = useState(0)
+  const [mapRefreshToken, setMapRefreshToken] = useState(0)
+  const [dataRefreshToken, setDataRefreshToken] = useState(0)
+  const [breachRefreshToken, setBreachRefreshToken] = useState(0)
   const [inBreach, setInBreach] = useState(false)
   const [breachMeta, setBreachMeta] = useState<BreachMeta | null>(null)
   const [breachOutput, setBreachOutput] = useState<string[]>([])
@@ -80,6 +89,23 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
   const commandInputRef = useRef<CommandInputHandle | null>(null)
   const inBreachRef = useRef(false)
   const executingRef = useRef(false)
+  const currentRoomIdRef = useRef<number | null>(null)
+
+  // Wrap setOutput to enforce cap — all callers (including external handleEvent) get automatic capping
+  const setOutput: React.Dispatch<React.SetStateAction<string[]>> = useCallback(
+    (action: React.SetStateAction<string[]>) => {
+      setOutputRaw(prev => {
+        const next = typeof action === 'function' ? action(prev) : action
+        return capOutput(next)
+      })
+    }, []
+  )
+
+  // Wrap setCurrentRoomId to keep ref in sync (ref used by sendCommand to avoid stale closure)
+  const setCurrentRoomId = useCallback((id: number | null) => {
+    currentRoomIdRef.current = id
+    setCurrentRoomIdRaw(id)
+  }, [])
 
   const sendCommand = useCallback(async (command: string) => {
     // clear/cls are UI-only (no server round-trip, no gameplay) — intentionally untracked
@@ -112,8 +138,9 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
         setOutput(prev => [...prev, outputText])
       }
 
+      const roomChanged = data.room_id && data.room_id !== currentRoomIdRef.current
       if (data.room_id) {
-        setCurrentRoomId(prev => data.room_id !== prev ? data.room_id! : prev)
+        setCurrentRoomId(data.room_id)
       }
 
       // Breach state tracking (uses ref to avoid stale closure)
@@ -128,12 +155,14 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
         const newLines = [...echoLines]
         if (outputText) newLines.push(outputText)
         setBreachOutput(newLines)
+        setBreachRefreshToken(prev => prev + 1)
       } else if (wasInBreach && !nowInBreach) {
         // Breach just ended — show final output, then clear all breach state together
         inBreachRef.current = false
         const finalLines = [...echoLines]
         if (outputText) finalLines.push(outputText)
         setBreachOutput(finalLines)
+        setBreachRefreshToken(prev => prev + 1)
         // Delay clearing so panel can show final output during slide-down
         setTimeout(() => {
           setInBreach(false)
@@ -142,7 +171,14 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
         }, 400)
       }
 
-      setRefreshToken(prev => prev + 1)
+      // Targeted refresh: map on room change OR breach state transition (encounter
+      // availability changes on breach start/end without moving rooms), data always.
+      const breachStateChanged = nowInBreach !== wasInBreach
+      if (roomChanged || breachStateChanged) {
+        setMapRefreshToken(prev => prev + 1)
+      }
+      setDataRefreshToken(prev => prev + 1)
+
       return outputText
     } catch (err: unknown) {
       console.error('Command execution failed:', err)
@@ -153,14 +189,26 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
       executingRef.current = false
       setExecuting(false)
     }
-  }, [])
+  }, [setOutput, setCurrentRoomId])
+
+  const value = useMemo<TacticalContextValue>(() => ({
+    output, currentRoomId, executing,
+    mapRefreshToken, dataRefreshToken, breachRefreshToken,
+    inBreach, breachMeta, breachOutput,
+    hasVendor, hasTransit, hasNpc, hasRestPod, npcMobs,
+    sendCommand, setOutput, setCurrentRoomId,
+    setHasVendor, setHasTransit, setHasNpc, setHasRestPod, setNpcMobs,
+    commandInputRef
+  }), [
+    output, currentRoomId, executing,
+    mapRefreshToken, dataRefreshToken, breachRefreshToken,
+    inBreach, breachMeta, breachOutput,
+    hasVendor, hasTransit, hasNpc, hasRestPod, npcMobs,
+    sendCommand, setOutput, setCurrentRoomId, commandInputRef
+  ])
 
   return (
-    <TacticalContext.Provider value={{
-      output, currentRoomId, executing, refreshToken,
-      inBreach, breachMeta, breachOutput, hasVendor, hasTransit, hasNpc, hasRestPod, npcMobs,
-      sendCommand, setOutput, setCurrentRoomId, setHasVendor, setHasTransit, setHasNpc, setHasRestPod, setNpcMobs, commandInputRef
-    }}>
+    <TacticalContext.Provider value={value}>
       {children}
     </TacticalContext.Provider>
   )
