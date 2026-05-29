@@ -19,8 +19,29 @@ module Grid
     # sites pass GridFactions.
     VALID_SUBJECT_CLASSES = [GridFaction, GridZone].freeze
 
+    # Faction graph is cached as AR objects (GridFaction with preloaded
+    # rep-link associations). Marshal serialization preserves loaded
+    # associations — safe with :memory_store (dev) and :solid_cache_store
+    # (prod). If cache store changes, verify AR round-trip or convert to
+    # plain hashes. 5min TTL self-heals on deploy.
+    FACTION_GRAPH_TTL = 5.minutes
+    FACTION_GRAPH_RACE_TTL = 30.seconds
+    FACTION_GRAPH_KEY = "grid/reputation/v1/faction_graph"
+
+    def self.bust_faction_cache!
+      Rails.cache.delete(FACTION_GRAPH_KEY)
+    end
+
     def initialize(hackr)
       @hackr = hackr
+    end
+
+    # Batch-load all leaf rep values for this hackr so subsequent
+    # effective_rep / leaf_value calls are O(1) lookups instead of
+    # individual queries. Returns self for chaining.
+    def prime!
+      prime_preload!
+      self
     end
 
     # Adjust rep for a subject (faction or future region).
@@ -141,12 +162,17 @@ module Grid
     # either has a stored leaf value for this hackr OR is an aggregate whose
     # computed value is nonzero. Always includes factions passed in `always`.
     def faction_standings(include_zero: false, always: [])
-      factions = GridFaction.ordered
-        .includes(incoming_rep_links: :source_faction, outgoing_rep_links: :target_faction)
-        .to_a
+      factions = Rails.cache.fetch(FACTION_GRAPH_KEY,
+        expires_in: FACTION_GRAPH_TTL,
+        race_condition_ttl: FACTION_GRAPH_RACE_TTL) {
+        GridFaction.ordered
+          .includes(incoming_rep_links: :source_faction, outgoing_rep_links: :target_faction)
+          .to_a
+      }
       always_ids = Array(always).map { |f| resolve_subject(f)&.id }.compact.to_set
 
-      prime_preload!
+      was_primed = !@preload.nil?
+      prime_preload! unless was_primed
 
       factions.filter_map do |f|
         leaf = leaf_value(f)
@@ -164,7 +190,7 @@ module Grid
         }
       end
     ensure
-      reset_preload!
+      reset_preload! unless was_primed
     end
 
     private

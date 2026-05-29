@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_28_153223) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_29_005016) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -484,6 +484,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_153223) do
     t.datetime "updated_at", null: false
     t.integer "zone_entry_room_id"
     t.index ["api_token_digest"], name: "index_grid_hackrs_on_api_token_digest", unique: true
+    t.index ["current_room_id"], name: "index_grid_hackrs_on_current_room_id"
     t.index ["email"], name: "index_grid_hackrs_on_email", unique: true
     t.index ["hackr_alias"], name: "index_grid_hackrs_on_hackr_alias", unique: true
     t.index ["role"], name: "index_grid_hackrs_on_role"
@@ -542,6 +543,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_153223) do
     t.index ["grid_impound_record_id"], name: "index_grid_items_on_grid_impound_record_id"
     t.index ["grid_item_definition_id"], name: "index_grid_items_on_grid_item_definition_id"
     t.index ["grid_mining_rig_id"], name: "index_grid_items_on_grid_mining_rig_id"
+    t.index ["item_type"], name: "index_grid_items_on_item_type"
+    t.index ["room_id"], name: "index_grid_items_on_room_id"
   end
 
   create_table "grid_messages", force: :cascade do |t|
@@ -552,6 +555,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_153223) do
     t.integer "room_id"
     t.integer "target_hackr_id"
     t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id"], name: "index_grid_messages_on_grid_hackr_id"
+    t.index ["room_id"], name: "index_grid_messages_on_room_id"
+    t.index ["target_hackr_id"], name: "index_grid_messages_on_target_hackr_id"
   end
 
   create_table "grid_mining_rigs", force: :cascade do |t|
@@ -632,6 +638,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_153223) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.json "vendor_config"
+    t.index ["grid_faction_id"], name: "index_grid_mobs_on_grid_faction_id"
+    t.index ["grid_room_id", "mob_type"], name: "index_grid_mobs_on_grid_room_id_and_mob_type"
+    t.index ["grid_room_id"], name: "index_grid_mobs_on_grid_room_id"
   end
 
   create_table "grid_regions", force: :cascade do |t|
@@ -967,7 +976,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_153223) do
     t.string "slug"
     t.datetime "updated_at", null: false
     t.index ["ambient_playlist_id"], name: "index_grid_zones_on_ambient_playlist_id"
+    t.index ["grid_faction_id"], name: "index_grid_zones_on_grid_faction_id"
     t.index ["grid_region_id"], name: "index_grid_zones_on_grid_region_id"
+    t.index ["slug"], name: "index_grid_zones_on_slug", unique: true
   end
 
   create_table "hackr_log_reads", force: :cascade do |t|

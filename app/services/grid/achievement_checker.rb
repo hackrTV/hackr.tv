@@ -17,8 +17,24 @@ module Grid
   # query per source. Callers should discard the checker after use so
   # counts aren't served stale across requests.
   class AchievementChecker
+    GLOBAL_CACHE_TTL = 5.minutes
+    GLOBAL_CACHE_NS = "grid/achievements/v1"
+    ACHIEVEMENT_LIST_KEY = "#{GLOBAL_CACHE_NS}/all"
+
     def initialize(hackr)
       @hackr = hackr
+    end
+
+    # Cached global achievement list — shared across all hackrs, busted
+    # by after_commit on GridAchievement.
+    def self.all_achievements_cached
+      Rails.cache.fetch(ACHIEVEMENT_LIST_KEY, expires_in: GLOBAL_CACHE_TTL, race_condition_ttl: 30.seconds) {
+        GridAchievement.order(:category, :name).to_a
+      }
+    end
+
+    def self.bust_achievement_list_cache!
+      Rails.cache.delete(ACHIEVEMENT_LIST_KEY)
     end
 
     def check(trigger_type, context = {})
@@ -107,12 +123,10 @@ module Grid
       when "fabricate_count"
         derive(@hackr.stat("fabricate_count").to_i, data[:count].to_i)
       when "items_stored"
-        den = @hackr.den
-        current = den ? (den.den_floor_count + den.den_stored_in_fixtures_count) : 0
+        current = hackr_den ? (hackr_den.den_floor_count + hackr_den.den_stored_in_fixtures_count) : 0
         derive(current, data[:count].to_i)
       when "fixtures_placed"
-        den = @hackr.den
-        current = den ? den.placed_fixtures.distinct.count(:grid_item_definition_id) : 0
+        current = hackr_den ? hackr_den.placed_fixtures.distinct.count(:grid_item_definition_id) : 0
         derive(current, data[:count].to_i)
       when "breaches_completed_count"
         derive(@hackr.stat("breach_completed_count").to_i, data[:count].to_i)
@@ -163,9 +177,12 @@ module Grid
       @track_plays_count = @hackr.grid_hackr_track_plays.count
     end
 
+    # --- Global counts (shared across all hackrs, cached) -----------
+
     def pulse_vault_total
       return @pulse_vault_total if defined?(@pulse_vault_total)
-      @pulse_vault_total = Track.visible_in_pulse_vault.count
+      @pulse_vault_total = Rails.cache.fetch("#{GLOBAL_CACHE_NS}/pulse_vault_total",
+        expires_in: GLOBAL_CACHE_TTL) { Track.visible_in_pulse_vault.count }
     end
 
     def pulse_vault_played_count
@@ -181,7 +198,8 @@ module Grid
 
     def hackr_logs_published_total
       return @hackr_logs_published_total if defined?(@hackr_logs_published_total)
-      @hackr_logs_published_total = HackrLog.published.count
+      @hackr_logs_published_total = Rails.cache.fetch("#{GLOBAL_CACHE_NS}/hackr_logs_published_total",
+        expires_in: GLOBAL_CACHE_TTL) { HackrLog.published.count }
     end
 
     def hackr_logs_read_published_count
@@ -197,7 +215,8 @@ module Grid
 
     def codex_entries_published_total
       return @codex_entries_published_total if defined?(@codex_entries_published_total)
-      @codex_entries_published_total = CodexEntry.published.count
+      @codex_entries_published_total = Rails.cache.fetch("#{GLOBAL_CACHE_NS}/codex_entries_published_total",
+        expires_in: GLOBAL_CACHE_TTL) { CodexEntry.published.count }
     end
 
     def codex_entries_read_published_count
@@ -208,7 +227,8 @@ module Grid
 
     def band_ids
       return @band_ids if defined?(@band_ids)
-      @band_ids = Artist.bands.pluck(:id)
+      @band_ids = Rails.cache.fetch("#{GLOBAL_CACHE_NS}/band_ids",
+        expires_in: GLOBAL_CACHE_TTL) { Artist.bands.pluck(:id) }
     end
 
     def bios_viewed_for_bands_count
@@ -225,7 +245,8 @@ module Grid
 
     def released_release_ids
       return @released_release_ids if defined?(@released_release_ids)
-      @released_release_ids = Release.released.pluck(:id)
+      @released_release_ids = Rails.cache.fetch("#{GLOBAL_CACHE_NS}/released_release_ids",
+        expires_in: GLOBAL_CACHE_TTL) { Release.released.pluck(:id) }
     end
 
     def releases_viewed_for_released_count
@@ -266,7 +287,8 @@ module Grid
 
     def radio_stations_visible_total
       return @radio_stations_visible_total if defined?(@radio_stations_visible_total)
-      @radio_stations_visible_total = RadioStation.visible.count
+      @radio_stations_visible_total = Rails.cache.fetch("#{GLOBAL_CACHE_NS}/radio_stations_visible_total",
+        expires_in: GLOBAL_CACHE_TTL) { RadioStation.visible.count }
     end
 
     def radio_stations_tuned_visible_count
@@ -284,6 +306,12 @@ module Grid
       @missions_completed_count = @hackr.grid_hackr_missions
         .where(status: "completed")
         .sum(:turn_in_count)
+    end
+
+    # Memoized den lookup — shared across items_stored + fixtures_placed
+    def hackr_den
+      return @hackr_den if defined?(@hackr_den)
+      @hackr_den = @hackr.den
     end
 
     def matches?(achievement, context)

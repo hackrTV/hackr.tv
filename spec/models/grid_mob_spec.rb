@@ -14,6 +14,12 @@
 #  grid_faction_id :integer
 #  grid_room_id    :integer
 #
+# Indexes
+#
+#  index_grid_mobs_on_grid_faction_id            (grid_faction_id)
+#  index_grid_mobs_on_grid_room_id               (grid_room_id)
+#  index_grid_mobs_on_grid_room_id_and_mob_type  (grid_room_id,mob_type)
+#
 require "rails_helper"
 
 RSpec.describe GridMob, type: :model do

@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: world_events
+# Database name: primary
+#
+#  id          :integer          not null, primary key
+#  data        :json             not null
+#  event_type  :string           not null
+#  hackr_alias :string           not null
+#  simulated   :boolean          default(FALSE), not null
+#  created_at  :datetime         not null
+#
+# Indexes
+#
+#  index_world_events_on_created_at  (created_at)
+#  index_world_events_on_event_type  (event_type)
+#  index_world_events_on_simulated   (simulated)
+#
 require "rails_helper"
 
 RSpec.describe WorldEvent do

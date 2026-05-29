@@ -2,6 +2,10 @@
 
 module Grid
   class ZoneMapBuilder
+    TOPOLOGY_TTL = 5.minutes
+    TOPOLOGY_RACE_TTL = 30.seconds
+    CACHE_NS = "grid/zone_map/v1"
+
     ZoneMapResult = Struct.new(
       :zone, :rooms, :exits, :ghost_rooms,
       :current_room_id, :z_levels, :z_level,
@@ -14,119 +18,147 @@ module Grid
     end
 
     def build
+      topology = cached_topology
+      apply_hackr_overlay(topology)
+    end
+
+    def self.bust_cache!(zone_id)
+      Rails.cache.delete(topology_cache_key(zone_id))
+    end
+
+    def self.topology_cache_key(zone_id)
+      "#{CACHE_NS}/topology/zone:#{zone_id}"
+    end
+
+    private
+
+    def cached_topology
+      Rails.cache.fetch(
+        self.class.topology_cache_key(@zone.id),
+        expires_in: TOPOLOGY_TTL,
+        race_condition_ttl: TOPOLOGY_RACE_TTL
+      ) { build_topology }
+    end
+
+    # Zone-structural data — same for all hackrs in a zone. Cached.
+    # Returns plain hashes only (no AR objects) for safe serialization.
+    def build_topology
       rooms = @zone.grid_rooms.to_a
       room_ids = rooms.map(&:id)
       all_exits = GridExit.where(from_room_id: room_ids).to_a
 
-      # BFS positioning
       positions = bfs_positions(rooms, all_exits)
       z_levels_map = compute_z_levels(rooms, all_exits)
-
-      # Fog of war: compute visible set (visited + adjacent to current room)
-      visited_ids = GridRoomVisit.where(grid_hackr: @hackr, grid_room_id: room_ids)
-        .pluck(:grid_room_id).to_set
-      visited_ids.add(@hackr.current_room_id) if room_ids.include?(@hackr.current_room_id)
-
-      # Adjacent = rooms reachable in one step from current room
-      exits_by_from = all_exits.group_by(&:from_room_id)
-      adjacent_ids = Set.new
-      (exits_by_from[@hackr.current_room_id] || []).each do |ex|
-        adjacent_ids.add(ex.to_room_id)
-      end
-
-      # Visible = visited + adjacent (server only sends these)
-      visible_ids = visited_ids | adjacent_ids
-
-      # Hackr presence (only for visited rooms — no info leak through fog)
-      presence_data = GridHackr.where(current_room_id: room_ids)
-        .pluck(:current_room_id, :hackr_alias)
-      presence_by_room = presence_data.group_by(&:first)
-        .transform_values { |pairs| pairs.map(&:last) }
 
       zone_color = build_zone_color(@zone)
       room_id_set = Set.new(room_ids)
 
-      # Build room data — only visible rooms get full details
-      room_data = rooms.select { |r| visible_ids.include?(r.id) }.map do |r|
-        pos = positions[r.id] || [0, 0]
-        z = z_levels_map[r.id] || 0
-        visited = visited_ids.include?(r.id)
-
-        {
-          id: r.id,
-          name: visited ? r.name : "???",
-          slug: visited ? r.slug : nil,
-          room_type: visited ? r.room_type : nil,
-          map_x: pos[0],
-          map_y: pos[1],
-          map_z: z,
-          zone_id: r.grid_zone_id,
-          zone_color: zone_color,
-          visited: visited,
-          is_current: r.id == @hackr.current_room_id,
-          hackr_count: visited ? (presence_by_room[r.id]&.size || 0) : 0,
-          hackr_aliases: visited ? (presence_by_room[r.id] || []) : []
-        }
+      # All exits as plain hashes for overlay adjacency lookups
+      exit_hashes = all_exits.map do |e|
+        {from_room_id: e.from_room_id, to_room_id: e.to_room_id,
+         direction: e.direction, locked: e.locked?,
+         in_zone: room_id_set.include?(e.to_room_id)}
       end
 
-      # Build exit data — only exits between visible rooms
-      exit_data = all_exits
-        .select { |e| visible_ids.include?(e.from_room_id) && visible_ids.include?(e.to_room_id) }
-        .select { |e| room_id_set.include?(e.to_room_id) }
-        .map do |e|
-          {
-            from_room_id: e.from_room_id,
-            to_room_id: e.to_room_id,
-            direction: e.direction,
-            locked: e.locked?
-          }
-        end
-
-      # Ghost rooms — only those connected to visible rooms
+      # Ghost rooms — cross-zone exits point outside this zone
       cross_exit_room_ids = all_exits
-        .select { |e| visible_ids.include?(e.from_room_id) }
         .reject { |e| room_id_set.include?(e.to_room_id) }
         .map(&:to_room_id).uniq
       ghost_rooms_raw = GridRoom.where(id: cross_exit_room_ids)
         .includes(grid_zone: :grid_region).to_a
 
       ghost_rooms = ghost_rooms_raw.map do |gr|
-        connecting_exits = all_exits.select { |e| e.to_room_id == gr.id && visible_ids.include?(e.from_room_id) }
+        connecting_exit = all_exits.find { |e| e.to_room_id == gr.id }
         {
-          id: gr.id,
-          name: gr.name,
-          zone_id: gr.grid_zone_id,
-          zone_name: gr.grid_zone.name,
-          region_name: gr.grid_zone.grid_region.name,
-          local_room_id: connecting_exits.first&.from_room_id,
-          direction: connecting_exits.first&.direction
+          id: gr.id, name: gr.name, zone_id: gr.grid_zone_id,
+          zone_name: gr.grid_zone.name, region_name: gr.grid_zone.grid_region.name,
+          local_room_id: connecting_exit&.from_room_id,
+          direction: connecting_exit&.direction
         }
       end
 
-      current_z = z_levels_map[@hackr.current_room_id] || 0
-      z_level_list = z_levels_map.values.uniq.sort
-
       region = @zone.grid_region
 
-      ZoneMapResult.new(
-        zone: {
-          id: @zone.id,
-          name: @zone.name,
-          slug: @zone.slug,
+      {
+        zone_meta: {
+          id: @zone.id, name: @zone.name, slug: @zone.slug,
           danger_level: @zone.danger_level,
-          region_id: region&.id,
-          region_name: region&.name
+          region_id: region&.id, region_name: region&.name
         },
+        rooms: rooms.map { |r|
+          pos = positions[r.id] || [0, 0]
+          {
+            id: r.id, name: r.name, slug: r.slug, room_type: r.room_type,
+            map_x: pos[0], map_y: pos[1], map_z: z_levels_map[r.id] || 0,
+            zone_id: r.grid_zone_id, zone_color: zone_color
+          }
+        },
+        exits: exit_hashes,
+        ghost_rooms: ghost_rooms,
+        z_levels: z_levels_map.values.uniq.sort,
+        room_ids: room_ids
+      }
+    end
+
+    # Per-hackr overlay — fog-of-war, presence, visibility. Computed live.
+    def apply_hackr_overlay(topology)
+      room_ids = topology[:room_ids]
+
+      # Fog of war
+      visited_ids = GridRoomVisit.where(grid_hackr: @hackr, grid_room_id: room_ids)
+        .pluck(:grid_room_id).to_set
+      visited_ids.add(@hackr.current_room_id) if room_ids.include?(@hackr.current_room_id)
+
+      # Adjacent = one step from current room
+      exits_by_from = topology[:exits].group_by { |e| e[:from_room_id] }
+      adjacent_ids = Set.new
+      (exits_by_from[@hackr.current_room_id] || []).each { |e| adjacent_ids.add(e[:to_room_id]) }
+      visible_ids = visited_ids | adjacent_ids
+
+      # Presence
+      presence_data = GridHackr.where(current_room_id: room_ids)
+        .pluck(:current_room_id, :hackr_alias)
+      presence_by_room = presence_data.group_by(&:first)
+        .transform_values { |pairs| pairs.map(&:last) }
+
+      # Apply fog to rooms
+      room_data = topology[:rooms].select { |r| visible_ids.include?(r[:id]) }.map do |r|
+        visited = visited_ids.include?(r[:id])
+        {
+          id: r[:id],
+          name: visited ? r[:name] : "???",
+          slug: visited ? r[:slug] : nil,
+          room_type: visited ? r[:room_type] : nil,
+          map_x: r[:map_x], map_y: r[:map_y], map_z: r[:map_z],
+          zone_id: r[:zone_id], zone_color: r[:zone_color],
+          visited: visited,
+          is_current: r[:id] == @hackr.current_room_id,
+          hackr_count: visited ? (presence_by_room[r[:id]]&.size || 0) : 0,
+          hackr_aliases: visited ? (presence_by_room[r[:id]] || []) : []
+        }
+      end
+
+      # Filter exits to visible in-zone pairs
+      exit_data = topology[:exits]
+        .select { |e| e[:in_zone] && visible_ids.include?(e[:from_room_id]) && visible_ids.include?(e[:to_room_id]) }
+        .map { |e| {from_room_id: e[:from_room_id], to_room_id: e[:to_room_id], direction: e[:direction], locked: e[:locked]} }
+
+      # Filter ghost rooms to those connected from visible rooms
+      ghost_rooms = topology[:ghost_rooms].select { |gr| visible_ids.include?(gr[:local_room_id]) }
+
+      current_room = topology[:rooms].find { |r| r[:id] == @hackr.current_room_id }
+      current_z = current_room ? current_room[:map_z] : 0
+
+      ZoneMapResult.new(
+        zone: topology[:zone_meta],
         rooms: room_data,
         exits: exit_data,
         ghost_rooms: ghost_rooms,
         current_room_id: @hackr.current_room_id,
-        z_levels: z_level_list,
+        z_levels: topology[:z_levels],
         z_level: current_z
       )
     end
-
-    private
 
     def build_zone_color(zone)
       Grid::WorldMapBuilder::ZONE_COLORS[zone.id % Grid::WorldMapBuilder::ZONE_COLORS.length]

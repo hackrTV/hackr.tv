@@ -88,6 +88,8 @@ class GridFaction < ApplicationRecord
     name.presence || slug
   end
 
+  after_commit { Grid::ReputationService.bust_faction_cache! }
+
   private
 
   def parent_not_self

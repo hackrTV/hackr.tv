@@ -54,6 +54,8 @@ class GridRoom < ApplicationRecord
   validates :min_clearance, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :owner_id, uniqueness: {allow_nil: true}
 
+  after_commit :bust_zone_map_cache, if: :zone_map_relevant_change?
+
   # Profanity filter: only for dens (user-controlled name + description).
   # Non-den rooms are admin-seeded — no filter needed.
   # Uses ProfanityFilterable#profane_content? to stay in sync with the concern.
@@ -104,5 +106,20 @@ class GridRoom < ApplicationRecord
 
   def den_stored_in_fixtures_count
     GridItem.where(container_id: placed_fixtures.select(:id)).count
+  end
+
+  private
+
+  def zone_map_relevant_change?
+    saved_change_to_name? || saved_change_to_slug? || saved_change_to_room_type? ||
+      saved_change_to_min_clearance? || saved_change_to_grid_zone_id? ||
+      saved_change_to_locked? || previously_new_record?
+  end
+
+  def bust_zone_map_cache
+    Grid::ZoneMapBuilder.bust_cache!(grid_zone_id)
+    if saved_change_to_grid_zone_id?
+      Grid::ZoneMapBuilder.bust_cache!(grid_zone_id_before_last_save)
+    end
   end
 end

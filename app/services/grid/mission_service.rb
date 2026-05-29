@@ -19,8 +19,9 @@ module Grid
     class ObjectivesIncomplete < Error; end
     class NotAtTurnIn < Error; end
 
-    def initialize(hackr)
+    def initialize(hackr, reputation_service: nil)
       @hackr = hackr
+      @injected_reputation_service = reputation_service
     end
 
     # Missions this hackr could accept RIGHT NOW from a given room.
@@ -238,7 +239,7 @@ module Grid
     end
 
     def reputation_service
-      @reputation_service ||= Grid::ReputationService.new(@hackr)
+      @reputation_service ||= @injected_reputation_service || Grid::ReputationService.new(@hackr)
     end
 
     # For `reach_rep` / `reach_clearance` objectives, evaluate the hackr's

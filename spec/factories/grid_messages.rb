@@ -12,6 +12,12 @@
 #  room_id         :integer
 #  target_hackr_id :integer
 #
+# Indexes
+#
+#  index_grid_messages_on_grid_hackr_id    (grid_hackr_id)
+#  index_grid_messages_on_room_id          (room_id)
+#  index_grid_messages_on_target_hackr_id  (target_hackr_id)
+#
 FactoryBot.define do
   factory :grid_message do
     association :grid_hackr
