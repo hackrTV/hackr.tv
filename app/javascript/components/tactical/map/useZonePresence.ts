@@ -11,10 +11,11 @@ interface PresenceEvent {
 
 interface UseZonePresenceOptions {
   enabled: boolean
+  subscriptionToken: number
   onPresenceUpdate: (event: PresenceEvent) => void
 }
 
-export function useZonePresence ({ enabled, onPresenceUpdate }: UseZonePresenceOptions) {
+export function useZonePresence ({ enabled, subscriptionToken, onPresenceUpdate }: UseZonePresenceOptions) {
   const channelRef = useRef<Channel | null>(null)
   const [connected, setConnected] = useState(false)
 
@@ -60,6 +61,9 @@ export function useZonePresence ({ enabled, onPresenceUpdate }: UseZonePresenceO
     setConnected(false)
   }, [])
 
+  // Resubscribe when enabled changes or subscriptionToken bumps (room/zone change).
+  // ZoneChannel#subscribed picks its stream from current_hackr's zone at subscription
+  // time, so cross-zone movement requires a fresh subscription.
   useEffect(() => {
     if (enabled) {
       connect()
@@ -67,7 +71,7 @@ export function useZonePresence ({ enabled, onPresenceUpdate }: UseZonePresenceO
       disconnect()
     }
     return () => disconnect()
-  }, [enabled, connect, disconnect])
+  }, [enabled, subscriptionToken, connect, disconnect])
 
   return { connected }
 }

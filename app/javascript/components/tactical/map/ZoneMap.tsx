@@ -91,6 +91,7 @@ export const ZoneMap: React.FC<ZoneMapProps> = ({ refreshToken, currentRoomId, o
 
   useZonePresence({
     enabled: !!currentRoomId,
+    subscriptionToken: refreshToken,
     onPresenceUpdate: handlePresenceUpdate
   })
 

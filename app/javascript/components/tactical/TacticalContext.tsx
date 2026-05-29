@@ -171,8 +171,10 @@ export const TacticalProvider: React.FC<{ children: ReactNode }> = ({ children }
         }, 400)
       }
 
-      // Targeted refresh: map only on room change, data always (vitals/inventory/etc change on most commands)
-      if (roomChanged) {
+      // Targeted refresh: map on room change OR breach state transition (encounter
+      // availability changes on breach start/end without moving rooms), data always.
+      const breachStateChanged = nowInBreach !== wasInBreach
+      if (roomChanged || breachStateChanged) {
         setMapRefreshToken(prev => prev + 1)
       }
       setDataRefreshToken(prev => prev + 1)
