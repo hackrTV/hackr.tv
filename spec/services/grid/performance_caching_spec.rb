@@ -57,6 +57,24 @@ RSpec.describe "Performance caching" do
       expect(adjacent_room[:name]).to eq("???")
     end
 
+    it "shows ghost room when only one of multiple connecting exits is visible" do
+      zone2 = create(:grid_zone, grid_region: region)
+      ghost_room = create(:grid_room, grid_zone: zone2, name: "Ghost Target")
+      room_c = create(:grid_room, grid_zone: zone, name: "Hidden Room")
+
+      # Two exits from this zone to the same ghost room:
+      # one from a hidden room (room_c), one from the visited hub (room_a)
+      GridExit.create!(from_room: room_c, to_room: ghost_room, direction: "east")
+      GridExit.create!(from_room: room_a, to_room: ghost_room, direction: "west")
+
+      # hackr has NOT visited room_c, but has visited room_a
+      result = described_class.new(zone: zone, hackr: hackr).build
+
+      ghost = result.ghost_rooms.find { |g| g[:id] == ghost_room.id }
+      expect(ghost).not_to be_nil
+      expect(ghost[:local_room_id]).to eq(room_a.id)
+    end
+
     it "caches topology and serves from cache on second call" do
       described_class.new(zone: zone, hackr: hackr).build
 

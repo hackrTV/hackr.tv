@@ -67,13 +67,18 @@ module Grid
       ghost_rooms_raw = GridRoom.where(id: cross_exit_room_ids)
         .includes(grid_zone: :grid_region).to_a
 
+      # Store ALL connecting exits per ghost room so the per-hackr overlay
+      # can pick the first one from a visible room. Storing only one would
+      # drop the ghost if that single exit starts from a fog-hidden room.
+      exits_by_dest = all_exits.select { |e| cross_exit_room_ids.include?(e.to_room_id) }
+        .group_by(&:to_room_id)
+
       ghost_rooms = ghost_rooms_raw.map do |gr|
-        connecting_exit = all_exits.find { |e| e.to_room_id == gr.id }
+        connections = (exits_by_dest[gr.id] || []).map { |e| {from_room_id: e.from_room_id, direction: e.direction} }
         {
           id: gr.id, name: gr.name, zone_id: gr.grid_zone_id,
           zone_name: gr.grid_zone.name, region_name: gr.grid_zone.grid_region.name,
-          local_room_id: connecting_exit&.from_room_id,
-          direction: connecting_exit&.direction
+          connections: connections
         }
       end
 
@@ -143,8 +148,15 @@ module Grid
         .select { |e| e[:in_zone] && visible_ids.include?(e[:from_room_id]) && visible_ids.include?(e[:to_room_id]) }
         .map { |e| {from_room_id: e[:from_room_id], to_room_id: e[:to_room_id], direction: e[:direction], locked: e[:locked]} }
 
-      # Filter ghost rooms to those connected from visible rooms
-      ghost_rooms = topology[:ghost_rooms].select { |gr| visible_ids.include?(gr[:local_room_id]) }
+      # Filter ghost rooms — pick the first connection from a visible room
+      ghost_rooms = topology[:ghost_rooms].filter_map do |gr|
+        visible_conn = gr[:connections].find { |c| visible_ids.include?(c[:from_room_id]) }
+        next unless visible_conn
+        gr.except(:connections).merge(
+          local_room_id: visible_conn[:from_room_id],
+          direction: visible_conn[:direction]
+        )
+      end
 
       current_room = topology[:rooms].find { |r| r[:id] == @hackr.current_room_id }
       current_z = current_room ? current_room[:map_z] : 0
