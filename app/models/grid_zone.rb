@@ -17,7 +17,9 @@
 # Indexes
 #
 #  index_grid_zones_on_ambient_playlist_id  (ambient_playlist_id)
+#  index_grid_zones_on_grid_faction_id      (grid_faction_id)
 #  index_grid_zones_on_grid_region_id       (grid_region_id)
+#  index_grid_zones_on_slug                 (slug) UNIQUE
 #
 # Foreign Keys
 #
@@ -36,4 +38,18 @@ class GridZone < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :danger_level, numericality: {only_integer: true, in: 0..10}
+
+  after_commit :bust_zone_map_cache, if: :zone_map_relevant_change?
+
+  private
+
+  def zone_map_relevant_change?
+    saved_change_to_name? || saved_change_to_slug? || saved_change_to_danger_level? ||
+      saved_change_to_grid_faction_id? || saved_change_to_grid_region_id? ||
+      previously_new_record?
+  end
+
+  def bust_zone_map_cache
+    Grid::ZoneMapBuilder.bust_cache!(id)
+  end
 end

@@ -17,7 +17,9 @@
 # Indexes
 #
 #  index_grid_zones_on_ambient_playlist_id  (ambient_playlist_id)
+#  index_grid_zones_on_grid_faction_id      (grid_faction_id)
 #  index_grid_zones_on_grid_region_id       (grid_region_id)
+#  index_grid_zones_on_slug                 (slug) UNIQUE
 #
 # Foreign Keys
 #

@@ -28,4 +28,13 @@ class GridExit < ApplicationRecord
     format: {with: /\A[a-z0-9-]+\z/, message: "must be lowercase alphanumeric with hyphens"},
     length: {maximum: 80}
   validates :from_room_id, uniqueness: {scope: :direction, message: "already has an exit in this direction"}
+
+  after_commit :bust_zone_map_cache
+
+  private
+
+  def bust_zone_map_cache
+    zone_id = GridRoom.where(id: from_room_id).pick(:grid_zone_id)
+    Grid::ZoneMapBuilder.bust_cache!(zone_id) if zone_id
+  end
 end

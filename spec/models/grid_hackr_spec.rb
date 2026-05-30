@@ -26,6 +26,7 @@
 # Indexes
 #
 #  index_grid_hackrs_on_api_token_digest  (api_token_digest) UNIQUE
+#  index_grid_hackrs_on_current_room_id   (current_room_id)
 #  index_grid_hackrs_on_email             (email) UNIQUE
 #  index_grid_hackrs_on_hackr_alias       (hackr_alias) UNIQUE
 #  index_grid_hackrs_on_role              (role)

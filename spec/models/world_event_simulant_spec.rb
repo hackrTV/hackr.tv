@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: world_event_simulants
+# Database name: primary
+#
+#  id            :integer          not null, primary key
+#  state         :json             not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  grid_hackr_id :integer          not null
+#
+# Indexes
+#
+#  index_world_event_simulants_on_grid_hackr_id  (grid_hackr_id) UNIQUE
+#
+# Foreign Keys
+#
+#  grid_hackr_id  (grid_hackr_id => grid_hackrs.id)
+#
 require "rails_helper"
 
 RSpec.describe WorldEventSimulant do

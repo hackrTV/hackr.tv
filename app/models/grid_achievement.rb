@@ -120,4 +120,6 @@ class GridAchievement < ApplicationRecord
   scope :by_trigger, ->(type) { where(trigger_type: type) }
   scope :by_category, ->(cat) { where(category: cat) }
   scope :visible, -> { where(hidden: false) }
+
+  after_commit { Grid::AchievementChecker.bust_achievement_list_cache! }
 end

@@ -31,8 +31,8 @@ class Api::GridController < ApplicationController
       .pluck(:grid_achievement_id, :awarded_at)
       .to_h
 
-    checker = Grid::AchievementChecker.new(current_hackr)
-    achievements = GridAchievement.order(:category, :name).to_a
+    checker = achievement_checker
+    achievements = Grid::AchievementChecker.all_achievements_cached
 
     categories = Hash.new { |h, k| h[k] = [] }
     summary = Hash.new { |h, k| h[k] = {total: 0, earned: 0} }
@@ -74,11 +74,9 @@ class Api::GridController < ApplicationController
 
   # GET /api/grid/missions - Active + completed + available-in-current-room missions.
   def missions_index
-    service = Grid::MissionService.new(current_hackr)
-
-    active = service.active_hackr_missions.to_a
-    completed = service.completed_hackr_missions(limit: 20).to_a
-    available = service.available_missions(current_hackr.current_room).to_a
+    active = mission_service.active_hackr_missions.to_a
+    completed = mission_service.completed_hackr_missions(limit: 20).to_a
+    available = mission_service.available_missions(current_hackr.current_room).to_a
 
     render json: {
       active: active.map { |hm| hackr_mission_json(hm, include_progress: true) },
@@ -252,13 +250,13 @@ class Api::GridController < ApplicationController
     room = current_hackr.current_room
     return render(json: {error: "No current room."}, status: :unprocessable_entity) unless room
 
-    mob = room.grid_mobs.find_by(id: params[:mob_id].to_i)
+    mob = room.grid_mobs.includes(:grid_faction).find_by(id: params[:mob_id].to_i)
     return render(json: {error: "NPC not found in current room."}, status: :not_found) unless mob
     return render(json: {error: "Use the shop endpoint for vendors."}, status: :unprocessable_entity) if mob.vendor?
 
     navigator = Grid::DialogueNavigator.new(hackr: current_hackr, mob: mob)
 
-    # Missions scoped to this mob
+    # Missions scoped to this mob — uses controller-level memoized service
     service = mission_service
     available = GridMission.published
       .where(giver_mob_id: mob.id)
@@ -318,8 +316,7 @@ class Api::GridController < ApplicationController
 
   # GET /api/grid/reputation - Faction standings with parent→child hierarchy
   def reputation_index
-    service = Grid::ReputationService.new(current_hackr)
-    standings = service.faction_standings(include_zero: true)
+    standings = reputation_service.faction_standings(include_zero: true)
 
     # Walk parent→child hierarchy — same tree logic as rep_command
     children_by_parent = standings.group_by { |s| s[:faction].parent_id }
@@ -406,12 +403,12 @@ class Api::GridController < ApplicationController
 
     # Achievements: earned count, total visible, in-progress list
     earned_ids = current_hackr.grid_hackr_achievements.pluck(:grid_achievement_id).to_set
-    all_achievements = GridAchievement.select(:id, :name, :badge_icon, :hidden, :trigger_type, :trigger_data).to_a
+    all_achievements = Grid::AchievementChecker.all_achievements_cached
     visible = all_achievements.reject { |a| a.hidden && !earned_ids.include?(a.id) }
     earned_count = visible.count { |a| earned_ids.include?(a.id) }
 
     # In-progress: unearned achievements with measurable progress
-    checker = Grid::AchievementChecker.new(current_hackr)
+    checker = achievement_checker
     in_progress = visible.filter_map { |a|
       next if earned_ids.include?(a.id)
       prog = checker.progress(a)
@@ -420,8 +417,7 @@ class Api::GridController < ApplicationController
     }
 
     # Standings summary (compact — only factions with activity)
-    rep_service = Grid::ReputationService.new(current_hackr)
-    standings = rep_service.faction_standings
+    standings = reputation_service.faction_standings
     standings_summary = standings.map { |s|
       tier = s[:tier]
       {name: s[:faction].display_name, tier_label: tier[:label], tier_color: tier[:color], value: s[:effective]}
@@ -1420,11 +1416,21 @@ class Api::GridController < ApplicationController
     data
   end
 
-  # Memoized per-request. Reuses one MissionService instance across all
-  # mission_json calls in a serializer loop so ReputationService preload
-  # + completed_mission_ids don't re-query per row.
+  # Memoized per-request. Primed ReputationService is batch-loaded once
+  # and shared — avoids individual DB hits per faction in gate checks.
+  def reputation_service
+    @reputation_service ||= Grid::ReputationService.new(current_hackr).prime!
+  end
+
+  def achievement_checker
+    @achievement_checker ||= Grid::AchievementChecker.new(current_hackr)
+  end
+
+  # Reuses one MissionService instance across all mission_json calls in
+  # a serializer loop. Injects the primed reputation_service so rep gate
+  # checks are O(1) instead of O(1 query each).
   def mission_service
-    @mission_service ||= Grid::MissionService.new(current_hackr)
+    @mission_service ||= Grid::MissionService.new(current_hackr, reputation_service: reputation_service)
   end
 
   def hackr_mission_json(hackr_mission, include_progress: true)

@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: world_event_settings
+# Database name: primary
+#
+#  id                       :integer          not null, primary key
+#  simulator_enabled        :boolean          default(TRUE), not null
+#  target_events_per_minute :integer          default(12), not null
+#  visible                  :boolean          default(FALSE), not null
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#
 require "rails_helper"
 
 RSpec.describe WorldEventSetting do

@@ -31,6 +31,8 @@
 #  index_grid_items_on_grid_item_definition_id     (grid_item_definition_id)
 #  index_grid_items_on_grid_mining_rig_id          (grid_mining_rig_id)
 #  index_grid_items_on_hackr_equipped_slot_unique  (grid_hackr_id,equipped_slot) UNIQUE WHERE equipped_slot IS NOT NULL
+#  index_grid_items_on_item_type                   (item_type)
+#  index_grid_items_on_room_id                     (room_id)
 #
 # Foreign Keys
 #

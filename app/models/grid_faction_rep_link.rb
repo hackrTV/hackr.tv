@@ -33,6 +33,8 @@ class GridFactionRepLink < ApplicationRecord
   validate :no_self_link
   validate :no_cycle
 
+  after_commit { Grid::ReputationService.bust_faction_cache! }
+
   private
 
   def no_self_link
