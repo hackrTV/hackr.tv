@@ -133,10 +133,10 @@ RSpec.describe "Performance caching" do
         cache_key2 = Grid::ZoneMapBuilder.topology_cache_key(zone2.id)
 
         # Warm zone2 cache
-        room2 = create(:grid_room, grid_zone: zone2)
+        create(:grid_room, grid_zone: zone2)
         Grid::ZoneMapBuilder.new(zone: zone2, hackr: hackr).build
 
-        # Re-warm zone1 cache (was busted by room2 create... re-warm)
+        # Re-warm zone1 cache (was busted by zone2 room create)
         Grid::ZoneMapBuilder.new(zone: zone, hackr: hackr).build
 
         room.update!(grid_zone: zone2)
