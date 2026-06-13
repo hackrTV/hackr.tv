@@ -8,17 +8,30 @@
 %>
 <% if ticker %>
   <%
-    char_count = ticker.content.length
-    base_duration = (char_count * 10.0 / ticker.speed).round(1)
-    ticker_duration = [base_duration, 10].max
+    container_px = scene_element.width || 1920
+    copy_px = ticker.content.length * 9.6 + 41
+    copies = [2, (container_px.to_f / copy_px).ceil + 1].max
+    ticker_duration = [(copy_px / ticker.speed).round(1), 3].max
+    scroll_pct = (ticker.direction == "right" ? 100.0 : -100.0) / copies
   %>
-  <div class="scene-element overlay-ticker ticker-top ticker-scroll-<%= ticker.direction %>"
+  <style>
+    #ticker-<%= ticker_slug %>-overlay .ticker-content {
+      animation: ticker-seamless-<%= ticker_slug %> <%= ticker_duration %>s linear infinite !important;
+    }
+    @keyframes ticker-seamless-<%= ticker_slug %> {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(<%= scroll_pct.round(4) %>%); }
+    }
+  </style>
+  <div class="scene-element overlay-ticker ticker-top"
        id="ticker-<%= ticker_slug %>-overlay"
-       style="<%= style %> --ticker-duration: <%= ticker_duration %>s;"
+       style="<%= style %>"
        data-element-type="ticker_top"
-       data-slug="<%= ticker_slug %>">
+       data-slug="<%= ticker_slug %>"
+       data-speed="<%= ticker.speed %>"
+       data-copies="<%= copies %>">
     <div class="ticker-content">
-      <%= ticker.content %><span class="ticker-separator"></span><%= ticker.content %><span class="ticker-separator"></span><%= ticker.content %>
+      <% copies.times do %><%= ticker.content %><span class="ticker-separator"></span><% end %>
     </div>
   </div>
 <% else %>

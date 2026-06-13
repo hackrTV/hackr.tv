@@ -1,0 +1,107 @@
+<% content_for(:title) { "/root/overlays/scenes/#{@scene.slug} :: Edit Scene" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1100px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/overlays/scenes/<%= @scene.slug %> :: EDIT SCENE</legend>
+
+    <% if flash[:success] %>
+      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
+        <p class="green-255-text" style="margin: 0;">&#10003; SUCCESS</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
+      </div>
+    <% end %>
+
+    <% if flash[:error] %>
+      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
+      </div>
+    <% end %>
+
+    <div style="padding: 20px;">
+      <%= form_with model: @scene, url: admin_overlay_scene_path(@scene), method: :patch, local: true do |f| %>
+        <%= render "form", f: f %>
+      <% end %>
+
+      <!-- Inline Scene Elements Management -->
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #333;">
+        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SCENE ELEMENTS (<%= @scene_elements.count %>) ::]</h3>
+
+        <% if @scene_elements.any? %>
+          <table class="tui-table" style="width: 100%; margin-bottom: 20px;">
+            <thead>
+              <tr>
+                <th>Z</th>
+                <th>Element</th>
+                <th>Type</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @scene_elements.each do |se| %>
+                <tr>
+                  <td><%= se.z_index || 0 %></td>
+                  <td><strong><%= se.overlay_element.name %></strong></td>
+                  <td><code><%= se.overlay_element.element_type %></code></td>
+                  <td><%= se.x || 0 %></td>
+                  <td><%= se.y || 0 %></td>
+                  <td><%= se.width || "auto" %></td>
+                  <td><%= se.height || "auto" %></td>
+                  <td>
+                    <%= button_to "Remove", remove_element_admin_overlay_scene_path(@scene, scene_element_id: se.id), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 4px 8px;", data: { confirm: "Remove element '#{se.overlay_element.name}' from scene?" } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <p style="color: #666; margin-bottom: 20px;">No elements in this scene yet.</p>
+        <% end %>
+
+        <!-- Add Element Form -->
+        <div style="background: #111; border: 1px solid #333; padding: 15px;">
+          <h4 class="green-255-text" style="margin: 0 0 15px;">+ Add Element</h4>
+          <%= form_with url: add_element_admin_overlay_scene_path(@scene), method: :post, local: true do |f| %>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+              <div style="flex: 2;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85em;">ELEMENT</label>
+                <select name="overlay_scene_element[overlay_element_id]" class="tui-input" style="width: 100%; padding: 8px;">
+                  <% @available_elements.each do |el| %>
+                    <option value="<%= el.id %>"><%= el.name %> (<%= el.element_type %>)</option>
+                  <% end %>
+                </select>
+              </div>
+              <div style="flex: 0 0 70px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85em;">X</label>
+                <input type="number" name="overlay_scene_element[x]" value="0" class="tui-input" style="width: 100%; padding: 8px;">
+              </div>
+              <div style="flex: 0 0 70px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85em;">Y</label>
+                <input type="number" name="overlay_scene_element[y]" value="0" class="tui-input" style="width: 100%; padding: 8px;">
+              </div>
+              <div style="flex: 0 0 80px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85em;">WIDTH</label>
+                <input type="number" name="overlay_scene_element[width]" class="tui-input" style="width: 100%; padding: 8px;" placeholder="auto">
+              </div>
+              <div style="flex: 0 0 80px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85em;">HEIGHT</label>
+                <input type="number" name="overlay_scene_element[height]" class="tui-input" style="width: 100%; padding: 8px;" placeholder="auto">
+              </div>
+              <div style="flex: 0 0 70px;">
+                <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85em;">Z-INDEX</label>
+                <input type="number" name="overlay_scene_element[z_index]" value="0" class="tui-input" style="width: 100%; padding: 8px;">
+              </div>
+              <div>
+                <button type="submit" class="tui-button green-168" style="padding: 8px 20px;">Add</button>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</div>

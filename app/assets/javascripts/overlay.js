@@ -89,6 +89,54 @@
     this.running = false;
   };
 
+  // ========================================
+  // TICKER HELPERS
+  // ========================================
+  // Rebuilds ticker content with correct copy count and animation duration
+  // for seamless looping at the given speed (px/s).
+  function rebuildTicker(tickerEl, text, speed, direction) {
+    var content = tickerEl.querySelector('.ticker-content');
+    if (!content) return;
+
+    var CHAR_PX = 9.6;  // Terminus monospace at 1rem
+    var SEP_PX = 41;    // separator character + padding
+    var VIEWPORT = 1920;
+    var copyPx = text.length * CHAR_PX + SEP_PX;
+    var copies = Math.max(2, Math.ceil(VIEWPORT / copyPx) + 1);
+    var duration = Math.max(copyPx / speed, 3);
+    var scrollPct = (direction === 'right' ? 100.0 : -100.0) / copies;
+
+    // Build content: N copies of text + separator
+    var escaped = OverlayManager.prototype.escapeHtml(text);
+    var unit = escaped + '<span class="ticker-separator"></span>';
+    var html = '';
+    for (var i = 0; i < copies; i++) html += unit;
+    content.innerHTML = html;
+
+    // Replace the <style> block with recalculated keyframes + animation.
+    // Server-rendered style uses !important, so we must replace the whole
+    // rule rather than setting inline properties.
+    var slug = tickerEl.dataset.slug;
+    var styleId = 'ticker-style-' + slug;
+    var existing = document.getElementById(styleId);
+    if (existing) existing.remove();
+
+    var style = document.createElement('style');
+    style.id = styleId;
+    style.textContent =
+      '#ticker-' + slug + '-overlay .ticker-content {' +
+      '  animation: ticker-seamless-' + slug + ' ' + duration.toFixed(1) + 's linear infinite !important;' +
+      '}' +
+      '@keyframes ticker-seamless-' + slug + ' {' +
+      '  0% { transform: translateX(0); }' +
+      '  100% { transform: translateX(' + scrollPct.toFixed(4) + '%); }' +
+      '}';
+    document.head.appendChild(style);
+
+    tickerEl.dataset.speed = speed;
+    tickerEl.dataset.copies = copies;
+  }
+
   // OverlayManager class for handling real-time updates
   function OverlayManager() {
     this.consumer = null;
@@ -263,24 +311,8 @@
     var ticker = document.querySelector('#ticker-' + data.slug + '-overlay');
     if (!ticker) return;
 
-    var content = ticker.querySelector('.ticker-content');
-    if (content) {
-      // Use span separators for TUI style
-      content.innerHTML = this.escapeHtml(data.content) +
-        '<span class="ticker-separator"></span>' +
-        this.escapeHtml(data.content) +
-        '<span class="ticker-separator"></span>' +
-        this.escapeHtml(data.content);
-    }
-
-    // Update animation direction
-    ticker.classList.remove('ticker-scroll-left', 'ticker-scroll-right');
-    ticker.classList.add('ticker-scroll-' + data.direction);
-
-    // Update speed (recalculate duration)
-    var charCount = data.content.length;
-    var baseDuration = Math.max((charCount * 10) / data.speed, 10);
-    ticker.style.setProperty('--ticker-duration', baseDuration + 's');
+    // Rebuild content with correct copy count, speed, direction, and keyframes
+    rebuildTicker(ticker, data.content, data.speed, data.direction);
 
     // Show/hide based on active state
     ticker.style.display = data.active ? '' : 'none';

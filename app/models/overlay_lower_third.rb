@@ -19,6 +19,8 @@
 #  index_overlay_lower_thirds_on_slug    (slug) UNIQUE
 #
 class OverlayLowerThird < ApplicationRecord
+  has_paper_trail
+
   # Validations
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: {with: /\A[a-z0-9-]+\z/, message: "must be lowercase alphanumeric with hyphens"}

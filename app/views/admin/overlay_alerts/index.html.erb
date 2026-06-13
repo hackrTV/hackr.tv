@@ -1,0 +1,77 @@
+<% content_for(:title) { "/root/overlays/alerts :: Manage Alerts" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/overlays/alerts :: ALERT MANAGEMENT</legend>
+
+    <% if flash[:success] %>
+      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
+        <p class="green-255-text" style="margin: 0;">&#10003; SUCCESS</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
+      </div>
+    <% end %>
+
+    <% if flash[:error] %>
+      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
+      </div>
+    <% end %>
+
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+      <%= link_to "< Back to Overlays", admin_overlays_path, class: "tui-button green-168" %>
+      <%= link_to "+ Send Alert", new_admin_overlay_alert_path, class: "tui-button green-168" %>
+    </div>
+
+    <!-- Type Filter -->
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+      <span style="color: #888;">Filter:</span>
+      <%= link_to "All", admin_overlay_alerts_path, class: "tui-button #{params[:alert_type].blank? ? "green-168" : ""}", style: "padding: 4px 12px;" %>
+      <% OverlayAlert::ALERT_TYPES.each do |type| %>
+        <%= link_to type.titleize, admin_overlay_alerts_path(alert_type: type), class: "tui-button #{params[:alert_type] == type ? "green-168" : ""}", style: "padding: 4px 12px;" %>
+      <% end %>
+    </div>
+
+    <table class="tui-table" style="width: 100%;">
+      <thead>
+        <tr>
+          <th style="text-align: left;">Type</th>
+          <th style="text-align: left;">Title</th>
+          <th style="text-align: left;">Message</th>
+          <th style="text-align: center;">Status</th>
+          <th style="text-align: center;">Created</th>
+          <th style="text-align: center;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @alerts.each_with_index do |alert, i| %>
+          <tr class="admin-table-row" style="<%= "background: #112;" if i.odd? %>">
+            <td><code class="purple-168-text"><%= alert.alert_type %></code></td>
+            <td><%= alert.title || "-" %></td>
+            <td><%= truncate(alert.message, length: 50) || "-" %></td>
+            <td style="text-align: center;">
+              <% if alert.displayed? %>
+                <span style="color: #888;">Displayed</span>
+              <% elsif alert.expired? %>
+                <span class="red-168-text">Expired</span>
+              <% else %>
+                <span class="green-255-text">Pending</span>
+              <% end %>
+            </td>
+            <td style="text-align: center;"><%= alert.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <%= link_to "View", admin_overlay_alert_path(alert), class: "tui-button", style: "padding: 4px 10px;" %>
+              <%= button_to "Delete", admin_overlay_alert_path(alert), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 4px 10px;", data: { confirm: "Delete this alert?" } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @alerts.empty? %>
+          <tr>
+            <td colspan="6" style="text-align: center; color: #666;">No alerts found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+  </fieldset>
+</div>

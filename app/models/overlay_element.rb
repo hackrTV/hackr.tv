@@ -19,6 +19,8 @@
 #  index_overlay_elements_on_slug          (slug) UNIQUE
 #
 class OverlayElement < ApplicationRecord
+  has_paper_trail
+
   ELEMENT_TYPES = %w[
     now_playing
     pulsewire_feed

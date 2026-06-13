@@ -1,0 +1,12 @@
+<% content_for(:title) { "/root/overlays/scenes/new :: New Scene" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/overlays/scenes/new :: NEW SCENE</legend>
+    <div style="padding: 20px;">
+      <%= form_with model: @scene, url: admin_overlay_scenes_path, local: true do |f| %>
+        <%= render "form", f: f %>
+      <% end %>
+    </div>
+  </fieldset>
+</div>

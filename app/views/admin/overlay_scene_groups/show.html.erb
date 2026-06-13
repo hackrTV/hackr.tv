@@ -1,53 +1,43 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+<% content_for(:title) { "/root/overlays/groups/#{@scene_group.slug} :: Group Details" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1000px; margin: 30px auto;">
   <fieldset class="admin-panel-border">
-    <legend class="center"><%= @scene_group.name %></legend>
+    <legend class="center">/root/overlays/groups/<%= @scene_group.slug %> :: GROUP DETAILS</legend>
 
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <%= link_to "< Back to Groups", admin_overlay_scene_groups_path, class: "tui-button green-168", style: "padding: 10px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/overlays/scene_groups.yml</code>
-        </span>
-      </div>
+    <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
+      <%= link_to "< Back to Groups", admin_overlay_scene_groups_path, class: "tui-button green-168" %>
+      <%= link_to "Edit", edit_admin_overlay_scene_group_path(@scene_group), class: "tui-button", style: "padding: 8px 20px;" %>
+    </div>
 
-      <div class="tui-window purple-168 white-text" style="display: block; margin-bottom: 30px;">
-        <fieldset class="purple-168-border">
-          <legend>GROUP DETAILS</legend>
-          <div style="padding: 20px;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr style="border-bottom: 1px solid #444;">
-                <td style="padding: 10px; font-weight: bold; width: 200px;">Name</td>
-                <td style="padding: 10px;"><%= @scene_group.name %></td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; font-weight: bold;">Slug</td>
-                <td style="padding: 10px;"><code class="cyan-168-text"><%= @scene_group.slug %></code></td>
-              </tr>
-            </table>
-          </div>
-        </fieldset>
-      </div>
-
-      <div class="tui-window green-168 white-text">
-        <fieldset class="green-168-border">
-          <legend class="cyan-255-text">SCENES (<%= @scene_group.overlay_scenes.count %>)</legend>
-          <div style="padding: 20px; background: #0a0a0a;">
-            <% if @scene_group.overlay_scenes.any? %>
-              <% @scene_group.overlay_scene_group_scenes.includes(:overlay_scene).order(position: :asc).each do |sgs| %>
-                <div style="background: #1a1a1a; border: 2px solid #00ff00; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <strong style="color: #00d9ff; font-size: 1.1em;"><%= sgs.overlay_scene.name %></strong>
-                    <small style="color: #888; margin-left: 10px;">(<%= sgs.overlay_scene.scene_type %>)</small>
-                  </div>
-                  <%= link_to "View Scene", admin_overlay_scene_path(sgs.overlay_scene), class: "tui-button purple-168", style: "padding: 5px 15px;" %>
-                </div>
-              <% end %>
-            <% else %>
-              <p style="color: #888;">No scenes assigned to this group.</p>
-            <% end %>
-          </div>
-        </fieldset>
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 20px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <p style="color: #888; margin: 0;">Name</p>
+          <p style="margin: 5px 0 15px; font-size: 1.2rem;"><strong><%= @scene_group.name %></strong></p>
+        </div>
+        <div>
+          <p style="color: #888; margin: 0;">Slug</p>
+          <p style="margin: 5px 0 15px;"><code><%= @scene_group.slug %></code></p>
+        </div>
       </div>
     </div>
+
+    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SCENES (<%= @group_scenes.count %>) ::]</h3>
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
+      <% if @group_scenes.any? %>
+        <% @group_scenes.each do |sgs| %>
+          <div style="background: #1a1a1a; border: 1px solid #333; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong class="cyan-168-text" style="font-size: 1.1em;"><%= sgs.overlay_scene.name %></strong>
+              <small style="color: #888; margin-left: 10px;">(<%= sgs.overlay_scene.scene_type %>) — Position: <%= sgs.position %></small>
+            </div>
+            <%= link_to "View Scene", admin_overlay_scene_path(sgs.overlay_scene), class: "tui-button purple-168", style: "padding: 5px 15px;" %>
+          </div>
+        <% end %>
+      <% else %>
+        <p style="color: #666; text-align: center; margin: 0;">No scenes in this group.</p>
+      <% end %>
+    </div>
+
   </fieldset>
 </div>

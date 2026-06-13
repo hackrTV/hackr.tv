@@ -1,0 +1,80 @@
+<div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+  <% if @ticker.errors.any? %>
+    <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+      <p class="red-255-text"><%= @ticker.errors.full_messages.join(", ") %></p>
+    </div>
+  <% end %>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+    <div style="flex: 1;">
+      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px; font-family: monospace;" %>
+      <small style="color: #666;">Leave blank to auto-generate from name</small>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+      <%= f.label :content_type, "CONTENT TYPE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.select :content_type, OverlayTicker::CONTENT_TYPES.map { |t| [t.titleize, t] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;", id: "ticker_content_type" %>
+    </div>
+    <div style="flex: 1;" id="feed_source_field">
+      <%= f.label :feed_source, "FEED SOURCE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.select :feed_source, OverlayTicker::FEED_SOURCES.map { |s| [s.titleize, s] }, { include_blank: "— Select —" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <small style="color: #666;">Required for dynamic tickers</small>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+    <div style="flex: 1;">
+      <%= f.label :direction, "DIRECTION", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.select :direction, OverlayTicker::DIRECTIONS.map { |d| [d.titleize, d] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    </div>
+    <div style="flex: 1;">
+      <%= f.label :speed, "SPEED (px/sec)", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+      <%= f.number_field :speed, class: "tui-input", style: "width: 100%; padding: 8px;", min: 1 %>
+    </div>
+    <div style="flex: 1;">
+      <%= f.label :active, class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" do %>
+        <%= f.check_box :active, style: "margin-right: 8px;" %> ACTIVE
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 15px;" id="content_field">
+    <%= f.label :content, "CONTENT", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+    <%= f.text_area :content, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 100px;" %>
+    <small style="color: #666;">Static text to scroll. For dynamic tickers, content is populated by the feed source.</small>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= f.submit @ticker.new_record? ? "Create Ticker" : "Update Ticker", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+    <%= link_to "Cancel", admin_overlay_tickers_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% if @ticker.persisted? %>
+      <%= link_to "History", history_admin_overlay_ticker_path(@ticker), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <% end %>
+  </div>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  document.addEventListener('DOMContentLoaded', function() {
+    var contentType = document.getElementById('ticker_content_type');
+    var feedSourceField = document.getElementById('feed_source_field');
+    var contentField = document.getElementById('content_field');
+
+    function toggleFields() {
+      if (contentType.value === 'dynamic') {
+        feedSourceField.style.display = '';
+      } else {
+        feedSourceField.style.display = 'none';
+      }
+    }
+
+    contentType.addEventListener('change', toggleFields);
+    toggleFields();
+  });
+</script>

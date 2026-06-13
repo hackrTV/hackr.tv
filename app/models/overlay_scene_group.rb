@@ -14,6 +14,8 @@
 #  index_overlay_scene_groups_on_slug  (slug) UNIQUE
 #
 class OverlaySceneGroup < ApplicationRecord
+  has_paper_trail
+
   # Associations
   has_many :overlay_scene_group_scenes, -> { order(position: :asc) }, dependent: :destroy
   has_many :overlay_scenes, through: :overlay_scene_group_scenes

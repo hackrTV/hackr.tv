@@ -1,15 +1,26 @@
 <%
-  # Calculate animation duration based on content length and speed
-  # Speed is in pixels/second, assume ~10px per character
-  char_count = @ticker.content.length
-  base_duration = (char_count * 10.0 / @ticker.speed).round(1)
-  ticker_duration = [base_duration, 10].max # Minimum 10 seconds
+  # Seamless ticker: enough copies to fill viewport, scroll by one copy, loop.
+  # Single copy = text + separator. Duration = copy_width / speed (true px/s).
+  copy_px = @ticker.content.length * 9.6 + 41
+  copies = [2, (1920.0 / copy_px).ceil + 1].max
+  ticker_duration = [(copy_px / @ticker.speed).round(1), 3].max
+  scroll_pct = (@ticker.direction == "right" ? 100.0 : -100.0) / copies
 %>
-<div class="overlay-ticker ticker-<%= @ticker.slug %> ticker-scroll-<%= @ticker.direction %>"
+<style>
+  #ticker-<%= @ticker.slug %>-overlay .ticker-content {
+    animation: ticker-seamless-<%= @ticker.slug %> <%= ticker_duration %>s linear infinite !important;
+  }
+  @keyframes ticker-seamless-<%= @ticker.slug %> {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(<%= scroll_pct.round(4) %>%); }
+  }
+</style>
+<div class="overlay-ticker ticker-<%= @ticker.slug %>"
      id="ticker-<%= @ticker.slug %>-overlay"
      data-slug="<%= @ticker.slug %>"
-     style="--ticker-duration: <%= ticker_duration %>s;">
+     data-speed="<%= @ticker.speed %>"
+     data-copies="<%= copies %>">
   <div class="ticker-content">
-    <%= @ticker.content %><span class="ticker-separator"></span><%= @ticker.content %><span class="ticker-separator"></span><%= @ticker.content %>
+    <% copies.times do %><%= @ticker.content %><span class="ticker-separator"></span><% end %>
   </div>
 </div>

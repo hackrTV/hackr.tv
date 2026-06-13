@@ -1,0 +1,39 @@
+<% content_for(:title) { "/root/overlays/alerts/new :: Send Alert" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/overlays/alerts/new :: SEND ALERT</legend>
+    <div style="padding: 20px;">
+      <%= form_with model: @alert, url: admin_overlay_alerts_path, local: true do |f| %>
+        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+              <%= f.label :alert_type, "ALERT TYPE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+              <%= f.select :alert_type, OverlayAlert::ALERT_TYPES.map { |t| [t.titleize, t] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+            </div>
+            <div style="flex: 1;">
+              <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+              <%= f.text_field :title, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <%= f.label :message, "MESSAGE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+            <%= f.text_area :message, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">DATA (JSON)</label>
+            <textarea name="overlay_alert[data_json]" class="tui-input" style="width: 100%; padding: 8px; font-family: monospace; min-height: 80px;">{}</textarea>
+            <small style="color: #666;">Optional JSON data payload</small>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <%= f.submit "Send Alert", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+            <%= link_to "Cancel", admin_overlay_alerts_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </fieldset>
+</div>
