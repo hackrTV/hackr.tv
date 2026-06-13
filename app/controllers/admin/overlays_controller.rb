@@ -5,39 +5,51 @@ class Admin::OverlaysController < Admin::ApplicationController
     @scenes = OverlayScene.ordered
     @elements = OverlayElement.order(:element_type, :name)
     @lower_thirds = OverlayLowerThird.order(:name)
-    @tickers = OverlayTicker.all
+    @tickers = OverlayTicker.ordered
     @now_playing = OverlayNowPlaying.current
-    @tracks = Track.includes(:artist).order("artists.name, tracks.title")
     @pending_alerts = OverlayAlert.pending.count
   end
 
-  # PATCH /root/overlays/ticker/:ticker_slug
-  def update_ticker
-    @ticker = OverlayTicker.find_by!(slug: params[:ticker_slug])
-    if @ticker.update(ticker_params)
-      @ticker.broadcast_update!
-      set_flash_success("Ticker '#{@ticker.name}' updated!")
-    else
-      set_flash_error(@ticker.errors.full_messages.join(", "))
-    end
-    redirect_to admin_overlays_path
+  # GET /root/overlays/now-playing/edit
+  def edit_now_playing
+    @now_playing = OverlayNowPlaying.current
+    @tracks = Track.includes(:artist).order("artists.name, tracks.title")
   end
 
-  # POST /root/overlays/alert
-  def send_alert
-    OverlayAlert.queue!(
-      type: params[:alert_type] || "custom",
-      title: params[:alert_title],
-      message: params[:alert_message],
-      expires_in: 10.seconds
-    )
-    set_flash_success("Alert sent!")
-    redirect_to admin_overlays_path
+  # PATCH /root/overlays/now-playing
+  def update_now_playing
+    @now_playing = OverlayNowPlaying.current
+
+    if params[:clear].present?
+      OverlayNowPlaying.clear!
+      set_flash_success("Now playing cleared and broadcast.")
+      redirect_to admin_edit_overlay_now_playing_path
+      return
+    end
+
+    np = now_playing_params
+    if np[:track_id].present?
+      track = Track.find_by(id: np[:track_id])
+      if track
+        OverlayNowPlaying.set_track!(track, paused: np[:paused] == "1")
+        set_flash_success("Now playing set to '#{track.title}' and broadcast.")
+      else
+        set_flash_error("Track not found.")
+      end
+    elsif np[:custom_title].present?
+      OverlayNowPlaying.set_custom!(title: np[:custom_title], artist: np[:custom_artist])
+      set_flash_success("Now playing set to custom track and broadcast.")
+    else
+      OverlayNowPlaying.set_paused!(np[:paused] == "1")
+      set_flash_success("Now playing pause state updated and broadcast.")
+    end
+
+    redirect_to admin_edit_overlay_now_playing_path
   end
 
   private
 
-  def ticker_params
-    params.require(:overlay_ticker).permit(:content, :speed, :direction, :active)
+  def now_playing_params
+    params.require(:overlay_now_playing).permit(:track_id, :custom_title, :custom_artist, :paused)
   end
 end

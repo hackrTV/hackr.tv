@@ -1,0 +1,81 @@
+<% content_for(:title) { "/root/overlays/now-playing :: Edit Now Playing" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/overlays/now-playing :: NOW PLAYING</legend>
+
+    <% if flash[:success] %>
+      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
+        <p class="green-255-text" style="margin: 0;">&#10003; SUCCESS</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
+      </div>
+    <% end %>
+
+    <% if flash[:error] %>
+      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
+      </div>
+    <% end %>
+
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+      <%= link_to "< Back to Overlays", admin_overlays_path, class: "tui-button green-168" %>
+      <%= link_to "Preview", overlay_now_playing_path, target: "_blank", class: "tui-button purple-168" %>
+    </div>
+
+    <!-- Current State -->
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 20px;">
+      <h3 class="cyan-255-text" style="margin: 0 0 15px;">[:: CURRENT STATE ::]</h3>
+      <% if @now_playing.playing? %>
+        <p style="margin: 5px 0;"><strong>Title:</strong> <%= @now_playing.display_title %></p>
+        <p style="margin: 5px 0;"><strong>Artist:</strong> <%= @now_playing.display_artist %></p>
+        <% if @now_playing.display_album.present? %>
+          <p style="margin: 5px 0;"><strong>Album:</strong> <%= @now_playing.display_album %></p>
+        <% end %>
+        <p style="margin: 5px 0;"><strong>Status:</strong> <%= @now_playing.paused ? '<span class="yellow-168-text">Paused</span>'.html_safe : '<span class="green-255-text">Playing</span>'.html_safe %></p>
+      <% else %>
+        <p style="color: #666;">Nothing playing.</p>
+      <% end %>
+    </div>
+
+    <!-- Set Track -->
+    <%= form_with scope: :overlay_now_playing, url: admin_update_overlay_now_playing_path, method: :patch, local: true do |f| %>
+      <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 20px;">
+        <h3 class="green-255-text" style="margin: 0 0 15px;">[:: SET TRACK ::]</h3>
+
+        <div style="margin-bottom: 15px;">
+          <%= f.label :track_id, "TRACK", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+          <%= f.select :track_id, @tracks.map { |t| ["#{t.artist&.name} — #{t.title}", t.id] }, { include_blank: "— Select Track —" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+        </div>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+          <div style="flex: 1;">
+            <%= f.label :custom_title, "OR CUSTOM TITLE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+            <%= f.text_field :custom_title, class: "tui-input", style: "width: 100%; padding: 8px;", value: @now_playing.custom_title %>
+          </div>
+          <div style="flex: 1;">
+            <%= f.label :custom_artist, "CUSTOM ARTIST", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
+            <%= f.text_field :custom_artist, class: "tui-input", style: "width: 100%; padding: 8px;", value: @now_playing.custom_artist %>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <%= f.label :paused, class: "white-text", style: "font-weight: bold;" do %>
+            <%= f.check_box :paused, checked: @now_playing.paused, style: "margin-right: 8px;" %> PAUSED
+          <% end %>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <%= f.submit "Update & Broadcast", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Clear -->
+    <%= form_with url: admin_update_overlay_now_playing_path, method: :patch, local: true do %>
+      <input type="hidden" name="clear" value="1">
+      <button type="submit" class="tui-button red-168" style="padding: 10px 20px;" data-confirm="Clear now playing?">Clear Now Playing</button>
+    <% end %>
+
+  </fieldset>
+</div>

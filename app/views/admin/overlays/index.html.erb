@@ -6,25 +6,28 @@
 
     <% if flash[:success] %>
       <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
-        <p class="green-255-text" style="margin: 0;">✓ SUCCESS</p>
+        <p class="green-255-text" style="margin: 0;">&#10003; SUCCESS</p>
         <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
       </div>
     <% end %>
 
     <% if flash[:error] %>
       <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-        <p class="red-255-text" style="margin: 0;">✗ ERROR</p>
+        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
         <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
       </div>
     <% end %>
 
     <!-- Navigation -->
-    <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+    <div style="margin-bottom: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
       <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168" %>
-      <%= link_to "Manage Scenes", admin_overlay_scenes_path, class: "tui-button cyan-168" %>
-      <%= link_to "Manage Scene Groups", admin_overlay_scene_groups_path, class: "tui-button cyan-168" %>
-      <%= link_to "Manage Elements", admin_overlay_elements_path, class: "tui-button cyan-168" %>
-      <%= link_to "Manage Lower Thirds", admin_overlay_lower_thirds_path, class: "tui-button cyan-168" %>
+      <%= link_to "Scenes", admin_overlay_scenes_path, class: "tui-button cyan-168" %>
+      <%= link_to "Elements", admin_overlay_elements_path, class: "tui-button cyan-168" %>
+      <%= link_to "Scene Groups", admin_overlay_scene_groups_path, class: "tui-button cyan-168" %>
+      <%= link_to "Lower Thirds", admin_overlay_lower_thirds_path, class: "tui-button cyan-168" %>
+      <%= link_to "Tickers", admin_overlay_tickers_path, class: "tui-button cyan-168" %>
+      <%= link_to "Alerts", admin_overlay_alerts_path, class: "tui-button cyan-168" %>
+      <%= link_to "Now Playing", admin_edit_overlay_now_playing_path, class: "tui-button cyan-168" %>
     </div>
 
     <!-- Overlay URLs Section -->
@@ -62,7 +65,7 @@
           <% end %>
         </tbody>
       </table>
-      <p id="no-scenes-message" style="color: #666; text-align: center; display: none; margin: 15px 0;">No scenes in this group. <%= link_to "Add scenes to this group", admin_overlay_scene_groups_path, class: "cyan-168-text" %>.</p>
+      <p id="no-scenes-message" style="color: #666; text-align: center; display: none; margin: 15px 0;">No scenes in this group.</p>
       <% if @scenes.empty? %>
         <p style="color: #666; text-align: center; margin: 15px 0;">No scenes yet. <%= link_to "Create one", new_admin_overlay_scene_path, class: "cyan-168-text" %>.</p>
       <% end %>
@@ -124,7 +127,6 @@
         const value = selectedOption.value;
 
         if (value === 'all') {
-          // Show all
           elementRows.forEach(row => row.style.display = '');
           sceneRows.forEach(row => row.style.display = '');
           elementsTable.style.display = '';
@@ -135,7 +137,6 @@
           const sceneIds = (selectedOption.dataset.sceneIds || '').split(',').filter(Boolean);
           const elementTypes = (selectedOption.dataset.elementTypes || '').split(',').filter(Boolean);
 
-          // Filter scenes
           let visibleScenes = 0;
           sceneRows.forEach(row => {
             const sceneId = row.dataset.sceneId;
@@ -147,7 +148,6 @@
             }
           });
 
-          // Filter elements
           let visibleElements = 0;
           elementRows.forEach(row => {
             const elementType = row.dataset.elementType;
@@ -159,7 +159,6 @@
             }
           });
 
-          // Show/hide empty messages
           if (visibleElements === 0) {
             elementsTable.style.display = 'none';
             noElementsMsg.style.display = 'block';
@@ -180,92 +179,41 @@
     });
     </script>
 
-    <!-- Ticker Control Section -->
-    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TICKER CONTROL ::]</h3>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-      <% @tickers.each do |ticker| %>
-        <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
-          <h4 class="purple-168-text" style="margin: 0 0 15px;"><%= ticker.name %> (<%= ticker.slug.upcase %>)</h4>
-          <%= form_with url: admin_update_overlay_ticker_path(ticker_slug: ticker.slug), method: :patch, scope: :overlay_ticker, local: true do |f| %>
-            <div style="margin-bottom: 15px;">
-              <%= f.label :content, "CONTENT", style: "display: block; color: #888; margin-bottom: 5px;" %>
-              <%= f.text_area :content, value: ticker.content, class: "tui-input", rows: 3, style: "width: 100%;" %>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-              <div>
-                <%= f.label :speed, "SPEED (px/s)", style: "display: block; color: #888; margin-bottom: 5px;" %>
-                <%= f.number_field :speed, value: ticker.speed, class: "tui-input", style: "width: 100%;" %>
-              </div>
-              <div>
-                <%= f.label :direction, "DIRECTION", style: "display: block; color: #888; margin-bottom: 5px;" %>
-                <%= f.select :direction, [["Left", "left"], ["Right", "right"]], {selected: ticker.direction}, class: "tui-input", style: "width: 100%;" %>
-              </div>
-              <div>
-                <%= f.label :active, "ACTIVE", style: "display: block; color: #888; margin-bottom: 5px;" %>
-                <%= f.select :active, [["Yes", true], ["No", false]], {selected: ticker.active}, class: "tui-input", style: "width: 100%;" %>
-              </div>
-            </div>
-            <%= f.submit "Update Ticker", class: "tui-button cyan-168" %>
-          <% end %>
-        </div>
-      <% end %>
-      <% if @tickers.empty? %>
-        <div style="grid-column: span 2; background: #0a0a0a; border: 1px solid #444; padding: 20px; text-align: center; color: #666;">
-          No tickers configured. Run seeds to create default tickers.
-        </div>
-      <% end %>
-    </div>
+    <!-- Quick Status Summary -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+      <!-- Now Playing Status -->
+      <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
+        <h4 class="purple-168-text" style="margin: 0 0 10px;">NOW PLAYING</h4>
+        <% if @now_playing.playing? %>
+          <p style="margin: 0; font-size: 1.1rem;"><strong><%= @now_playing.display_title %></strong></p>
+          <p style="margin: 5px 0 0; color: #60a5fa;"><%= @now_playing.display_artist %></p>
+        <% else %>
+          <p style="margin: 0; color: #666;">Nothing playing.</p>
+        <% end %>
+        <p style="margin: 10px 0 0;"><%= link_to "Edit →", admin_edit_overlay_now_playing_path, class: "cyan-168-text" %></p>
+      </div>
 
-    <!-- Alert Control Section -->
-    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SEND ALERT ::]</h3>
-    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
-      <%= form_with url: admin_send_overlay_alert_path, method: :post, local: true do |f| %>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-          <div>
-            <%= label_tag :alert_type, "TYPE", style: "display: block; color: #888; margin-bottom: 5px;" %>
-            <%= select_tag :alert_type, options_for_select([
-              ["Custom", "custom"],
-              ["Subscriber", "subscriber"],
-              ["Donation", "donation"],
-              ["Raid", "raid"],
-              ["Follow", "follow"]
-            ]), class: "tui-input", style: "width: 100%;" %>
-          </div>
-          <div>
-            <%= label_tag :alert_title, "TITLE", style: "display: block; color: #888; margin-bottom: 5px;" %>
-            <%= text_field_tag :alert_title, nil, class: "tui-input", style: "width: 100%;", placeholder: "Alert Title" %>
-          </div>
-          <div>
-            <%= label_tag :alert_message, "MESSAGE", style: "display: block; color: #888; margin-bottom: 5px;" %>
-            <%= text_field_tag :alert_message, nil, class: "tui-input", style: "width: 100%;", placeholder: "Alert message" %>
-          </div>
-        </div>
-        <%= submit_tag "Send Alert", class: "tui-button purple-168" %>
+      <!-- Ticker Status -->
+      <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
+        <h4 class="purple-168-text" style="margin: 0 0 10px;">TICKERS</h4>
+        <p style="margin: 0;"><%= @tickers.count %> ticker(s) configured</p>
+        <p style="margin: 5px 0 0; color: #888;"><%= @tickers.select(&:active?).count %> active</p>
+        <p style="margin: 10px 0 0;"><%= link_to "Manage →", admin_overlay_tickers_path, class: "cyan-168-text" %></p>
+      </div>
+
+      <!-- Alert Status -->
+      <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
+        <h4 class="purple-168-text" style="margin: 0 0 10px;">ALERTS</h4>
         <% if @pending_alerts > 0 %>
-          <span style="margin-left: 15px; color: #fbbf24;"><%= @pending_alerts %> alert(s) pending</span>
+          <p style="margin: 0; color: #fbbf24;"><%= @pending_alerts %> pending</p>
+        <% else %>
+          <p style="margin: 0; color: #666;">No pending alerts.</p>
         <% end %>
-      <% end %>
+        <p style="margin: 10px 0 0;"><%= link_to "Manage →", admin_overlay_alerts_path, class: "cyan-168-text" %></p>
+      </div>
     </div>
 
-    <!-- Now Playing Status -->
-    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: NOW PLAYING STATUS ::]</h3>
-    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
-      <% if @now_playing.playing? %>
-        <p class="green-255-text" style="margin: 0 0 10px;">▶ CURRENTLY PLAYING</p>
-        <p style="margin: 0; font-size: 1.2rem;"><strong><%= @now_playing.display_title %></strong></p>
-        <p style="margin: 5px 0 0; color: #60a5fa;"><%= @now_playing.display_artist %></p>
-        <% if @now_playing.display_album.present? %>
-          <p style="margin: 5px 0 0; color: #888;"><%= @now_playing.display_album %></p>
-        <% end %>
-      <% else %>
-        <p style="margin: 0; color: #666;">Nothing currently playing. Play a track in the SPA to update.</p>
-      <% end %>
-      <p style="margin: 15px 0 0; color: #888; font-size: 0.9rem;">
-        Note: Now Playing is automatically updated when tracks play in hackr.fm
-      </p>
-    </div>
-
-    <!-- Lower Thirds List -->
+    <!-- Lower Thirds Summary -->
     <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: LOWER THIRDS ::]</h3>
     <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
       <% if @lower_thirds.any? %>
@@ -274,7 +222,6 @@
             <tr>
               <th>Name</th>
               <th>Primary Text</th>
-              <th>Secondary Text</th>
               <th>Status</th>
               <th>URL</th>
             </tr>
@@ -282,9 +229,8 @@
           <tbody>
             <% @lower_thirds.each do |lt| %>
               <tr class="admin-table-row">
-                <td><strong><%= lt.name %></strong></td>
-                <td><%= truncate(lt.primary_text, length: 30) %></td>
-                <td><%= truncate(lt.secondary_text, length: 30) || "-" %></td>
+                <td><strong><%= link_to lt.name, edit_admin_overlay_lower_third_path(lt), class: "white-text" %></strong></td>
+                <td><%= truncate(lt.primary_text, length: 40) %></td>
                 <td><%= lt.active ? '<span class="green-255-text">Active</span>'.html_safe : '<span class="red-168-text">Inactive</span>'.html_safe %></td>
                 <td>
                   <%= link_to "Open ↗", overlay_lower_third_path(slug: lt.slug), target: "_blank", class: "tui-button purple-168", style: "padding: 4px 8px; font-size: 0.8rem;" %>

@@ -24,6 +24,8 @@
 class OverlayScene < ApplicationRecord
   SCENE_TYPES = %w[fullscreen composition].freeze
 
+  has_paper_trail
+
   # Associations
   has_many :overlay_scene_elements, dependent: :destroy
   has_many :overlay_elements, through: :overlay_scene_elements

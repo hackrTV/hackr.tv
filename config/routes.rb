@@ -293,6 +293,9 @@ Rails.application.routes.draw do
 
       # World Event Feed
       post "world_events", to: "world_events#create"
+
+      # Overlay ticker feed
+      post "overlay/ticker_feed", to: "overlay#ticker_feed"
     end
   end
 
@@ -641,16 +644,35 @@ Rails.application.routes.draw do
     delete "uplink/punishments/:id", to: "uplink#lift_punishment", as: :lift_uplink_punishment
 
     # Overlay admin routes
-    # Runtime operations (ticker updates, alerts) are still functional
     get "overlays", to: "overlays#index", as: :overlays
-    patch "overlays/ticker/:ticker_slug", to: "overlays#update_ticker", as: :update_overlay_ticker
-    post "overlays/alert", to: "overlays#send_alert", as: :send_overlay_alert
+    get "overlays/now-playing/edit", to: "overlays#edit_now_playing", as: :edit_overlay_now_playing
+    patch "overlays/now-playing", to: "overlays#update_now_playing", as: :update_overlay_now_playing
 
-    # Read-only overlay resources (managed via data/overlays/*.yml)
-    resources :overlay_scenes, path: "overlays/scenes", only: %i[index show]
-    resources :overlay_elements, path: "overlays/elements", only: %i[index show]
-    resources :overlay_lower_thirds, path: "overlays/lower-thirds", only: %i[index show]
-    resources :overlay_scene_groups, path: "overlays/groups", only: %i[index show]
+    # Overlay CRUD resources
+    resources :overlay_scenes, path: "overlays/scenes" do
+      member do
+        post :add_element
+        delete :remove_element
+        get :history
+      end
+    end
+    resources :overlay_elements, path: "overlays/elements" do
+      member { get :history }
+    end
+    resources :overlay_lower_thirds, path: "overlays/lower-thirds" do
+      member { get :history }
+    end
+    resources :overlay_scene_groups, path: "overlays/groups" do
+      member do
+        post :add_scene
+        delete :remove_scene
+        get :history
+      end
+    end
+    resources :overlay_tickers, path: "overlays/tickers" do
+      member { get :history }
+    end
+    resources :overlay_alerts, path: "overlays/alerts", only: %i[index new create show destroy]
 
     # World Event Feed admin
     resources :world_event_feed, only: [:index] do

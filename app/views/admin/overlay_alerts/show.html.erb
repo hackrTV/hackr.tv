@@ -1,0 +1,50 @@
+<% content_for(:title) { "/root/overlays/alerts/#{@alert.id} :: Alert Details" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 800px; margin: 30px auto;">
+  <fieldset class="admin-panel-border">
+    <legend class="center">/root/overlays/alerts/<%= @alert.id %> :: ALERT DETAILS</legend>
+
+    <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
+      <%= link_to "< Back to Alerts", admin_overlay_alerts_path, class: "tui-button green-168" %>
+    </div>
+
+    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <p style="color: #888; margin: 0;">Alert Type</p>
+          <p style="margin: 5px 0 15px;"><code class="purple-168-text"><%= @alert.alert_type %></code></p>
+
+          <p style="color: #888; margin: 0;">Title</p>
+          <p style="margin: 5px 0 15px;"><%= @alert.title || "-" %></p>
+
+          <p style="color: #888; margin: 0;">Message</p>
+          <p style="margin: 5px 0 15px;"><%= @alert.message || "-" %></p>
+        </div>
+        <div>
+          <p style="color: #888; margin: 0;">Status</p>
+          <p style="margin: 5px 0 15px;">
+            <% if @alert.displayed? %>
+              <span style="color: #888;">Displayed at <%= @alert.displayed_at&.strftime("%H:%M:%S") %></span>
+            <% elsif @alert.expired? %>
+              <span class="red-168-text">Expired</span>
+            <% else %>
+              <span class="green-255-text">Pending</span>
+            <% end %>
+          </p>
+
+          <p style="color: #888; margin: 0;">Created</p>
+          <p style="margin: 5px 0 15px;"><%= @alert.created_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
+
+          <p style="color: #888; margin: 0;">Expires</p>
+          <p style="margin: 5px 0 15px;"><%= @alert.expires_at&.strftime("%Y-%m-%d %H:%M:%S") || "Never" %></p>
+        </div>
+      </div>
+
+      <% if @alert.data.present? && @alert.data.any? %>
+        <p style="color: #888; margin: 0;">Data</p>
+        <pre style="margin: 5px 0 0; background: #111; padding: 10px; border: 1px solid #333; overflow-x: auto;"><%= JSON.pretty_generate(@alert.data) %></pre>
+      <% end %>
+    </div>
+
+  </fieldset>
+</div>

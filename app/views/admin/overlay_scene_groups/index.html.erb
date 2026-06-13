@@ -1,46 +1,58 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
+<% content_for(:title) { "/root/overlays/groups :: Scene Groups" } %>
+
+<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto;">
   <fieldset class="admin-panel-border">
-    <legend class="center">SCENE GROUPS</legend>
+    <legend class="center">/root/overlays/groups :: SCENE GROUP MANAGEMENT</legend>
 
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <%= link_to "< Back to Overlays", admin_overlays_path, class: "tui-button green-168", style: "padding: 10px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/overlays/scene_groups.yml</code> → <code style="color: #888;">rails data:overlay_scene_groups</code>
-        </span>
+    <% if flash[:success] %>
+      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
+        <p class="green-255-text" style="margin: 0;">&#10003; SUCCESS</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
       </div>
+    <% end %>
 
-      <% if @scene_groups.empty? %>
-        <div class="tui-window yellow-168 white-text" style="display: block; margin: 20px 0;">
-          <fieldset class="yellow-168-border">
-            <legend>No Groups</legend>
-            <div style="padding: 20px; text-align: center;">
-              No scene groups found. Add them to <code>data/overlays/scene_groups.yml</code> and run <code>rails data:overlay_scene_groups</code>.
-            </div>
-          </fieldset>
-        </div>
-      <% else %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr style="border-bottom: 2px solid #00ffff;">
-                <th style="padding: 10px; text-align: left;">Name</th>
-                <th style="padding: 10px; text-align: left;">Slug</th>
-                <th style="padding: 10px; text-align: center;">Scenes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @scene_groups.each do |group| %>
-                <tr class="admin-table-row">
-                  <td style="padding: 10px;"><%= link_to group.name, admin_overlay_scene_group_path(group), class: "white-text" %></td>
-                  <td style="padding: 10px;"><code class="cyan-168-text"><%= group.slug %></code></td>
-                  <td style="padding: 10px; text-align: center;"><%= group.overlay_scenes.count %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      <% end %>
+    <% if flash[:error] %>
+      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
+        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
+        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
+      </div>
+    <% end %>
+
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+      <%= link_to "< Back to Overlays", admin_overlays_path, class: "tui-button green-168" %>
+      <%= link_to "+ New Group", new_admin_overlay_scene_group_path, class: "tui-button green-168" %>
     </div>
+
+    <table class="tui-table" style="width: 100%;">
+      <thead>
+        <tr>
+          <th style="text-align: left;">Name</th>
+          <th style="text-align: left;">Slug</th>
+          <th style="text-align: center;">Scenes</th>
+          <th style="text-align: center;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @scene_groups.each_with_index do |group, i| %>
+          <tr class="admin-table-row" style="<%= "background: #112;" if i.odd? %>">
+            <td><strong><%= group.name %></strong></td>
+            <td style="font-family: monospace; color: #888;"><%= group.slug %></td>
+            <td style="text-align: center;"><%= group.overlay_scenes.count %></td>
+            <td style="text-align: center; white-space: nowrap;">
+              <%= link_to "View", admin_overlay_scene_group_path(group), class: "tui-button", style: "padding: 4px 10px;" %>
+              <%= link_to "Edit", edit_admin_overlay_scene_group_path(group), class: "tui-button", style: "padding: 4px 10px;" %>
+              <%= link_to "History", history_admin_overlay_scene_group_path(group), class: "tui-button purple-168", style: "padding: 4px 10px;" %>
+              <%= button_to "Delete", admin_overlay_scene_group_path(group), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 4px 10px;", data: { confirm: "Delete group '#{group.name}'?" } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @scene_groups.empty? %>
+          <tr>
+            <td colspan="4" style="text-align: center; color: #666;">No scene groups yet.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
   </fieldset>
 </div>

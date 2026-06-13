@@ -107,13 +107,13 @@
 }
 
 @keyframes ticker-scroll-left {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100% / var(--ticker-copies, 3))); }
 }
 
 @keyframes ticker-scroll-right {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% { transform: translateX(calc(-100% / var(--ticker-copies, 3))); }
+  100% { transform: translateX(0); }
 }
 
 @keyframes type-in {
@@ -562,7 +562,7 @@
   width: 100%;
   overflow: hidden;
   background: var(--overlay-bg);
-  padding: 6px 0;
+  padding: 8px 0;
   border: 1px solid var(--overlay-purple);
 }
 
@@ -577,8 +577,7 @@
 .ticker-content {
   display: inline-block;
   white-space: nowrap;
-  padding-left: 100%;
-  font-size: 1rem;
+  font-size: 1.5rem;
   color: var(--overlay-purple);
   letter-spacing: 1px;
 }
