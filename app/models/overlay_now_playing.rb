@@ -92,17 +92,24 @@ class OverlayNowPlaying < ApplicationRecord
     )
   end
 
+  def absolute_album_cover_url(base_url)
+    path = album_cover_url
+    return nil unless path
+
+    "#{base_url}#{path}"
+  end
+
   def playing?
     track.present? || custom_title.present?
   end
 
-  def as_api_json
+  def as_api_json(base_url: nil)
     {
       playing: playing?,
       title: display_title,
       artist: display_artist,
       album: display_album,
-      album_cover: album_cover_url,
+      album_cover: base_url ? absolute_album_cover_url(base_url) : album_cover_url,
       track_id: track_id,
       paused: paused,
       is_live: is_live,

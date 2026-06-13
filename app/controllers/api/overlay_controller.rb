@@ -39,7 +39,7 @@ class Api::OverlayController < ApplicationController
 
   # GET /api/overlay/now-playing
   def now_playing
-    render json: OverlayNowPlaying.current.as_api_json
+    render json: OverlayNowPlaying.current.as_api_json(base_url: request.base_url)
   end
 
   # GET /api/overlay/tickers
@@ -95,7 +95,7 @@ class Api::OverlayController < ApplicationController
 
   # GET /api/overlay/scenes/:slug
   def scene
-    scene = OverlayScene.find_by(slug: params[:slug])
+    scene = OverlayScene.active.find_by(slug: params[:slug])
     return render json: {error: "Scene not found"}, status: :not_found unless scene
 
     elements = scene.overlay_scene_elements
