@@ -1,10 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Api::OverlayController, type: :controller do
+  let(:hackr) { create(:grid_hackr) }
   let(:artist) { create(:artist) }
   let(:track) { create(:track, artist: artist) }
 
   before do
+    session[:grid_hackr_id] = hackr.id
     allow(ActionCable.server).to receive(:broadcast)
   end
 

@@ -96,22 +96,25 @@ class OverlayNowPlaying < ApplicationRecord
     track.present? || custom_title.present?
   end
 
+  def as_api_json
+    {
+      playing: playing?,
+      title: display_title,
+      artist: display_artist,
+      album: display_album,
+      album_cover: album_cover_url,
+      track_id: track_id,
+      paused: paused,
+      is_live: is_live,
+      started_at: started_at&.iso8601
+    }
+  end
+
   # Broadcast to overlay channel
   def self.broadcast_change!
-    now_playing = current
     ActionCable.server.broadcast("overlay_updates", {
       type: "now_playing_changed",
-      data: {
-        track_id: now_playing.track_id,
-        title: now_playing.display_title,
-        artist: now_playing.display_artist,
-        album: now_playing.display_album,
-        album_cover: now_playing.album_cover_url,
-        started_at: now_playing.started_at&.iso8601,
-        is_live: now_playing.is_live,
-        playing: now_playing.playing?,
-        paused: now_playing.paused
-      }
+      data: current.as_api_json
     })
   end
 end

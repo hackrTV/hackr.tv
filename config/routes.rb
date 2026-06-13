@@ -236,6 +236,14 @@ Rails.application.routes.draw do
 
     # Overlay API routes
     post "overlay/now-playing", to: "overlay#set_now_playing"
+    get "overlay/now-playing", to: "overlay#now_playing"
+    get "overlay/tickers", to: "overlay#tickers"
+    get "overlay/lower-thirds", to: "overlay#lower_thirds"
+    get "overlay/scenes", to: "overlay#scenes"
+    get "overlay/scenes/:slug", to: "overlay#scene"
+    get "overlay/scene-groups", to: "overlay#scene_groups"
+    get "overlay/elements", to: "overlay#elements"
+    get "overlay/alerts/pending", to: "overlay#alerts_pending"
 
     # Uplink API routes
     namespace :uplink do
