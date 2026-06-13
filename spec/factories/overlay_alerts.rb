@@ -30,6 +30,11 @@ FactoryBot.define do
     displayed_at { nil }
     expires_at { nil }
 
+    trait :pending do
+      displayed { false }
+      expires_at { 1.hour.from_now }
+    end
+
     trait :displayed do
       displayed { true }
       displayed_at { Time.current }

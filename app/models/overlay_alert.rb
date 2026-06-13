@@ -64,8 +64,9 @@ class OverlayAlert < ApplicationRecord
       alert_type: alert_type,
       title: title,
       message: message,
-      data: data,
-      created_at: created_at.iso8601
+      data: data || {},
+      created_at: created_at.iso8601,
+      expires_at: expires_at&.iso8601
     }
   end
 end

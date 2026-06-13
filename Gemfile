@@ -56,6 +56,9 @@ gem "paper_trail"
 # Rate limiting and request throttling
 gem "rack-attack"
 
+# CORS for cross-origin API access (overlay read endpoints)
+gem "rack-cors"
+
 # Structured request logging (single-line JSON per request)
 gem "lograge"
 
