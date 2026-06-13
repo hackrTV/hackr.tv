@@ -42,13 +42,6 @@ RSpec.describe Admin::OverlaysController, type: :controller do
       expect(assigns(:now_playing)).to eq(OverlayNowPlaying.current)
     end
 
-    it "loads tracks" do
-      artist = create(:artist)
-      track = create(:track, artist: artist)
-      get :index
-      expect(assigns(:tracks)).to include(track)
-    end
-
     it "loads pending alerts count" do
       create(:overlay_alert, displayed: false)
       create(:overlay_alert, :displayed)
@@ -57,88 +50,62 @@ RSpec.describe Admin::OverlaysController, type: :controller do
     end
   end
 
-  describe "PATCH #update_ticker" do
-    let!(:ticker) { create(:overlay_ticker, slug: "top", content: "Original") }
-
-    before do
-      allow(ActionCable.server).to receive(:broadcast)
+  describe "GET #edit_now_playing" do
+    it "returns success" do
+      get :edit_now_playing
+      expect(response).to have_http_status(:ok)
     end
 
-    it "updates the ticker" do
-      patch :update_ticker, params: {
-        ticker_slug: "top",
-        overlay_ticker: {content: "Updated content"}
-      }
-
-      ticker.reload
-      expect(ticker.content).to eq("Updated content")
+    it "loads now playing" do
+      get :edit_now_playing
+      expect(assigns(:now_playing)).to eq(OverlayNowPlaying.current)
     end
 
-    it "broadcasts update" do
-      expect_any_instance_of(OverlayTicker).to receive(:broadcast_update!)
-      patch :update_ticker, params: {
-        ticker_slug: "top",
-        overlay_ticker: {content: "New content"}
-      }
-    end
-
-    it "redirects to index" do
-      patch :update_ticker, params: {
-        ticker_slug: "top",
-        overlay_ticker: {content: "New"}
-      }
-      expect(response).to redirect_to(admin_overlays_path)
-    end
-
-    it "sets success flash" do
-      patch :update_ticker, params: {
-        ticker_slug: "top",
-        overlay_ticker: {content: "New"}
-      }
-      expect(flash[:success]).to include(ticker.name)
-    end
-
-    it "sets error flash on invalid update" do
-      patch :update_ticker, params: {
-        ticker_slug: "top",
-        overlay_ticker: {content: ""}
-      }
-      expect(flash[:error]).to be_present
+    it "loads tracks" do
+      artist = create(:artist)
+      track = create(:track, artist: artist)
+      get :edit_now_playing
+      expect(assigns(:tracks)).to include(track)
     end
   end
 
-  describe "POST #send_alert" do
+  describe "PATCH #update_now_playing" do
     before do
       allow(ActionCable.server).to receive(:broadcast)
     end
 
-    it "queues an alert" do
-      expect {
-        post :send_alert, params: {
-          alert_type: "custom",
-          alert_title: "Test Alert",
-          alert_message: "Test message"
-        }
-      }.to change(OverlayAlert, :count).by(1)
-    end
+    it "sets track and broadcasts" do
+      artist = create(:artist)
+      track = create(:track, artist: artist)
 
-    it "sets default alert type to custom" do
-      post :send_alert, params: {
-        alert_title: "Test"
+      patch :update_now_playing, params: {
+        overlay_now_playing: {track_id: track.id, paused: "0"}
       }
 
-      alert = OverlayAlert.last
-      expect(alert.alert_type).to eq("custom")
+      np = OverlayNowPlaying.current
+      expect(np.track).to eq(track)
+      expect(flash[:success]).to include(track.title)
+      expect(response).to redirect_to(admin_edit_overlay_now_playing_path)
     end
 
-    it "redirects to index" do
-      post :send_alert, params: {alert_title: "Test"}
-      expect(response).to redirect_to(admin_overlays_path)
+    it "sets custom title and broadcasts" do
+      patch :update_now_playing, params: {
+        overlay_now_playing: {custom_title: "Test Song", custom_artist: "Test Artist"}
+      }
+
+      np = OverlayNowPlaying.current
+      expect(np.custom_title).to eq("Test Song")
+      expect(flash[:success]).to include("custom track")
+      expect(response).to redirect_to(admin_edit_overlay_now_playing_path)
     end
 
-    it "sets success flash" do
-      post :send_alert, params: {alert_title: "Test"}
-      expect(flash[:success]).to include("Alert sent")
+    it "clears now playing" do
+      patch :update_now_playing, params: {clear: "1"}
+
+      np = OverlayNowPlaying.current
+      expect(np.playing?).to be false
+      expect(flash[:success]).to include("cleared")
+      expect(response).to redirect_to(admin_edit_overlay_now_playing_path)
     end
   end
 
