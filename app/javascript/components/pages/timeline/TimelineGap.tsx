@@ -77,46 +77,86 @@ export const TimelineGap: React.FC<TimelineGapProps> = ({ isMobile }) => {
         </p>
       </div>
 
-      {/* Chen's PRISM — the sole anchor */}
+      {/* Chen's PRISM anchors */}
       <div style={{
         position: 'relative',
         zIndex: 1,
         textAlign: 'center',
         padding: '16px 24px',
         borderTop: '1px solid #1f2937',
-        borderBottom: '1px solid #1f2937'
+        borderBottom: '1px solid #1f2937',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px'
       }}>
-        {/* Dot */}
-        <div style={{
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          backgroundColor: '#9ca3af',
-          margin: '0 auto 10px auto',
-          boxShadow: '0 0 8px rgba(156, 163, 175, 0.3)'
-        }} />
-        <div style={{
-          fontSize: '0.75em',
-          color: '#6b7280',
-          fontFamily: 'monospace',
-          letterSpacing: '1px',
-          marginBottom: '4px'
-        }}>
-          2048
+        {/* PRISM Discovered */}
+        <div>
+          <div style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#9ca3af',
+            margin: '0 auto 10px auto',
+            boxShadow: '0 0 8px rgba(156, 163, 175, 0.3)'
+          }} />
+          <div style={{
+            fontSize: '0.75em',
+            color: '#6b7280',
+            fontFamily: 'monospace',
+            letterSpacing: '1px',
+            marginBottom: '4px'
+          }}>
+            2048
+          </div>
+          <div style={{
+            fontSize: '0.85em',
+            color: '#9ca3af',
+            fontWeight: 'bold'
+          }}>
+            PRISM Discovered
+          </div>
+          <div style={{
+            fontSize: '0.75em',
+            color: '#4b5563',
+            marginTop: '2px'
+          }}>
+            Dr. Marcus Chen discovers that perception operates on manipulable quantum states.
+          </div>
         </div>
-        <div style={{
-          fontSize: '0.85em',
-          color: '#9ca3af',
-          fontWeight: 'bold'
-        }}>
-          PRISM Discovered
-        </div>
-        <div style={{
-          fontSize: '0.75em',
-          color: '#4b5563',
-          marginTop: '2px'
-        }}>
-          Dr. Marcus Chen discovers that perception operates on manipulable quantum states.
+
+        {/* The Elegant Solution */}
+        <div>
+          <div style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#9ca3af',
+            margin: '0 auto 10px auto',
+            boxShadow: '0 0 8px rgba(156, 163, 175, 0.3)'
+          }} />
+          <div style={{
+            fontSize: '0.75em',
+            color: '#6b7280',
+            fontFamily: 'monospace',
+            letterSpacing: '1px',
+            marginBottom: '4px'
+          }}>
+            NOVEMBER 2099
+          </div>
+          <div style={{
+            fontSize: '0.85em',
+            color: '#9ca3af',
+            fontWeight: 'bold'
+          }}>
+            [INTERCEPTED] The Elegant Solution
+          </div>
+          <div style={{
+            fontSize: '0.75em',
+            color: '#4b5563',
+            marginTop: '2px'
+          }}>
+            Chen writes about PRISM from the creator's perspective.
+          </div>
         </div>
       </div>
     </div>
