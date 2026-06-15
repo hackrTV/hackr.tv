@@ -864,12 +864,12 @@ namespace :data do
 
       exit_record = GridExit.find_or_initialize_by(
         from_room: from_room,
-        to_room: to_room,
         direction: attrs["direction"]
       )
-      next unless exit_record.new_record?
-
+      exit_record.to_room = to_room
       exit_record.locked = attrs["locked"] || false
+      next unless exit_record.changed?
+
       exit_record.save!
       created += 1
       puts "  ✓ Created: #{from_room.name} -> #{attrs["direction"]} -> #{to_room.name}"
