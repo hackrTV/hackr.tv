@@ -166,8 +166,8 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // ERA 3: THE EFFICIENCY (~2050–~2100) — Chen's PRISM discovery
-  // (This single event renders as the anchor in the Gap component)
+  // ERA 3: THE EFFICIENCY (~2050–~2100) — Chen's PRISM work
+  // (These events render as anchors in the Gap component)
   // ═══════════════════════════════════════════════════════════════
   {
     date: '2048',
@@ -175,6 +175,14 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     description: 'Dr. Marcus Chen discovers PRISM \u2014 perception operates on manipulable quantum states.',
     era: 'the_efficiency',
     codexSlug: 'prism'
+  },
+  {
+    date: 'November 2099',
+    title: '[INTERCEPTED] The Elegant Solution',
+    description: 'Chen writes about PRISM from the creator\'s perspective.',
+    era: 'the_efficiency',
+    logSlug: 'the-elegant-solution',
+    isIntercepted: true
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -186,14 +194,6 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     description: 'Government-corporate fusion consolidates power. Not a coup \u2014 a committee decision.',
     era: 'govcorp_ride',
     codexSlug: 'the-consolidation'
-  },
-  {
-    date: 'November 2108',
-    title: '[INTERCEPTED] The Elegant Solution',
-    description: 'Chen writes about PRISM from the creator\'s perspective.',
-    era: 'govcorp_ride',
-    logSlug: 'the-elegant-solution',
-    isIntercepted: true
   },
   {
     date: '2109',

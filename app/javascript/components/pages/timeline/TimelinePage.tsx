@@ -149,10 +149,10 @@ export const TimelinePage: React.FC = () => {
           isMobile={isMobile}
         />
 
-        {/* The 82-year gap with PRISM anchor */}
+        {/* The 82-year gap with PRISM anchors */}
         <TimelineGap isMobile={isMobile} />
 
-        {/* Era 3: The Efficiency (header only — its sole event is in the gap) */}
+        {/* Era 3: The Efficiency (header only — events rendered in the gap) */}
         <TimelineEraSection
           ref={setEraRef('the_efficiency')}
           era={ERA_MAP.the_efficiency}
