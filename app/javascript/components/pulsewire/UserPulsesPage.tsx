@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import type { Pulse } from '../../types/pulse'
+import type { ProfileData, ProfileResponse, PinResponse } from '~/types/profile'
 import { PulseCard } from './PulseCard'
-import { apiJson } from '~/utils/apiClient'
+import { ProfileHeader } from './ProfileHeader'
+import { apiJson, ApiError } from '~/utils/apiClient'
 
 interface ProfilePulse extends Pulse {
   is_echo_on_profile?: boolean
@@ -15,115 +17,204 @@ interface PulsesResponse {
 
 export const UserPulsesPage: React.FC = () => {
   const { username } = useParams<{ username: string }>()
+  const [profile, setProfile] = useState<ProfileData | null>(null)
+  const [isSelf, setIsSelf] = useState(false)
+  const [pinnedPulses, setPinnedPulses] = useState<Pulse[]>([])
   const [pulses, setPulses] = useState<ProfilePulse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [authoredCount, setAuthoredCount] = useState(0)
-  const [echoedCount, setEchoedCount] = useState(0)
+  const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    const fetchUserPulses = async () => {
-      try {
-        setIsLoading(true)
+    const load = async () => {
+      if (!username) return
+      setIsLoading(true)
+      setError(null)
+      setNotFound(false)
 
-        // Fetch both authored pulses and echoed pulses in parallel
-        const [authoredData, echoedData] = await Promise.all([
+      try {
+        const [profileData, authoredData, echoedData] = await Promise.all([
+          apiJson<ProfileResponse>(`/api/profiles/${encodeURIComponent(username)}`),
           apiJson<PulsesResponse>(`/api/pulses?hackr=${username}&filter=active&per_page=100&include_splices=true`),
           apiJson<PulsesResponse>(`/api/pulses?echoed_by=${username}&filter=active&per_page=100&include_splices=true`)
         ])
 
-        // Mark echoed pulses and merge
-        const authoredPulses: ProfilePulse[] = authoredData.pulses.map((p: Pulse) => ({
-          ...p,
-          is_echo_on_profile: false
-        }))
+        setProfile(profileData.profile)
+        setIsSelf(profileData.is_self)
+        setPinnedPulses(profileData.profile.pinned_pulses)
 
+        const authoredPulses: ProfilePulse[] = authoredData.pulses.map((p) => ({ ...p, is_echo_on_profile: false }))
         const echoedPulses: ProfilePulse[] = echoedData.pulses
-          // Filter out pulses that the user also authored (don't show both)
-          .filter((p: Pulse) => p.grid_hackr.hackr_alias.toLowerCase() !== username?.toLowerCase())
-          .map((p: Pulse) => ({
-            ...p,
-            is_echo_on_profile: true
-          }))
+          .filter((p) => p.grid_hackr.hackr_alias.toLowerCase() !== username.toLowerCase())
+          .map((p) => ({ ...p, is_echo_on_profile: true }))
 
-        // Combine and sort by pulsed_at descending
         const combined = [...authoredPulses, ...echoedPulses].sort((a, b) =>
           new Date(b.pulsed_at).getTime() - new Date(a.pulsed_at).getTime()
         )
 
         setPulses(combined)
-        setAuthoredCount(authoredPulses.length)
-        setEchoedCount(echoedPulses.length)
         setIsLoading(false)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load user pulses')
+        if (err instanceof ApiError && err.status === 404) {
+          setNotFound(true)
+        } else {
+          setError(err instanceof Error ? err.message : 'Failed to load profile')
+        }
         setIsLoading(false)
       }
     }
 
-    if (username) {
-      fetchUserPulses()
-    }
+    load()
   }, [username])
 
+  const applyEcho = (list: ProfilePulse[], pulseId: number, newEchoCount: number, isEchoed: boolean) =>
+    list.map((p) => p.id === pulseId ? { ...p, echo_count: newEchoCount, is_echoed_by_current_hackr: isEchoed } : p)
+
   const handleEchoToggle = (pulseId: number, newEchoCount: number, isEchoed: boolean) => {
-    setPulses(prev => prev.map(p =>
-      p.id === pulseId
-        ? { ...p, echo_count: newEchoCount, is_echoed_by_current_hackr: isEchoed }
-        : p
-    ))
+    setPulses((prev) => applyEcho(prev, pulseId, newEchoCount, isEchoed))
+    setPinnedPulses((prev) => applyEcho(prev as ProfilePulse[], pulseId, newEchoCount, isEchoed))
   }
 
   const handlePulseCreated = (newPulse: Pulse) => {
-    setPulses(prev => [{ ...newPulse, is_echo_on_profile: false }, ...prev])
+    setPulses((prev) => [{ ...newPulse, is_echo_on_profile: false }, ...prev])
   }
 
   const handlePulseDeleted = (pulseId: number) => {
-    setPulses(prev => prev.filter(p => p.id !== pulseId))
+    setPulses((prev) => prev.filter((p) => p.id !== pulseId))
+    setPinnedPulses((prev) => prev.filter((p) => p.id !== pulseId))
+  }
+
+  const pinBusyRef = useRef(false)
+
+  const handlePinToggle = async (pulseId: number, currentlyPinned: boolean) => {
+    if (pinBusyRef.current) return
+    pinBusyRef.current = true
+    try {
+      const resp = await apiJson<PinResponse>(`/api/pulses/${pulseId}/pin`, {
+        method: currentlyPinned ? 'DELETE' : 'POST'
+      })
+      setPinnedPulses(resp.pinned_pulses)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to update pin')
+    } finally {
+      pinBusyRef.current = false
+    }
+  }
+
+  const handlePinMove = async (pulseId: number, direction: 'up' | 'down') => {
+    if (pinBusyRef.current) return
+    const ids = pinnedPulses.map((p) => p.id)
+    const idx = ids.indexOf(pulseId)
+    const swapWith = direction === 'up' ? idx - 1 : idx + 1
+    if (idx < 0 || swapWith < 0 || swapWith >= ids.length) return
+
+    const next = [...ids];
+    [next[idx], next[swapWith]] = [next[swapWith], next[idx]]
+
+    pinBusyRef.current = true
+    try {
+      const resp = await apiJson<PinResponse>('/api/profile/pins', {
+        method: 'PATCH',
+        body: JSON.stringify({ pulse_ids: next })
+      })
+      setPinnedPulses(resp.pinned_pulses)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to reorder pins')
+    } finally {
+      pinBusyRef.current = false
+    }
+  }
+
+  const handleBioSaved = (bio: string) => {
+    setProfile((prev) => prev ? { ...prev, bio } : prev)
   }
 
   if (isLoading) {
     return (
       <DefaultLayout>
         <div className="white-168-text" style={{ textAlign: 'center', padding: '40px' }}>
-          Loading pulses...
+          Loading profile...
         </div>
       </DefaultLayout>
     )
   }
 
-  if (error) {
+  if (notFound) {
+    return (
+      <DefaultLayout>
+        <div className="white-168-text" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '40px', textAlign: 'center' }}>
+          <h1>NO SIGNAL</h1>
+          <p>No hackr known as <strong>@{username}</strong> on the WIRE.</p>
+          <Link to="/wire" className="btn btn-primary">← Back to the WIRE</Link>
+        </div>
+      </DefaultLayout>
+    )
+  }
+
+  if (error || !profile) {
     return (
       <DefaultLayout>
         <div className="red-255-text" style={{ padding: '20px', border: '1px solid #ff0000', marginBottom: '20px' }}>
-          {error}
+          {error || 'Profile unavailable'}
         </div>
         <Link to="/wire" className="btn btn-primary">Back to Hotwire</Link>
       </DefaultLayout>
     )
   }
 
+  const pinnedIds = new Set(pinnedPulses.map((p) => p.id))
+  const canPin = (pulse: ProfilePulse) => isSelf && !pulse.is_echo_on_profile && pulse.grid_hackr.id === profile.id
+  // Pinned pulses render in the PINNED section, not again in the feed.
+  const timelinePulses = pulses.filter((p) => !pinnedIds.has(p.id))
+
   return (
     <DefaultLayout showAsciiArt={false}>
       <div className="user-pulses-page white-168-text" style={{ maxWidth: '800px', margin: '0 auto', paddingTop: '30px' }}>
-        <div className="user-header">
-          <h1>@{username}</h1>
-          <div className="user-stats">
-            {authoredCount} {authoredCount === 1 ? 'pulse' : 'pulses'} · {echoedCount} {echoedCount === 1 ? 'echo' : 'echoes'}
-          </div>
-        </div>
+        <ProfileHeader profile={profile} isSelf={isSelf} onBioSaved={handleBioSaved} />
 
-        <div className="back-link" style={{ marginBottom: '20px', marginTop: '10px' }}>
-          <Link to="/wire">← Back to the WIRE</Link>
+        {pinnedPulses.length > 0 && (
+          <div className="pinned-pulses" style={{
+            marginBottom: '24px',
+            padding: '16px',
+            border: '1px solid rgba(250, 204, 21, 0.35)',
+            background: 'rgba(250, 204, 21, 0.04)'
+          }}>
+            <div style={{ color: '#facc15', letterSpacing: '0.1em', fontSize: '0.8rem', marginBottom: '10px', fontFamily: '\'Courier New\', monospace' }}>
+              📌 PINNED
+            </div>
+            {pinnedPulses.map((pulse, idx) => (
+              <PulseCard
+                key={`pin-${pulse.id}`}
+                pulse={pulse}
+                showReplies={false}
+                indentSplice={false}
+                pinnable={isSelf}
+                isPinned
+                onPinToggle={handlePinToggle}
+                onEchoToggle={handleEchoToggle}
+                onPulseDeleted={handlePulseDeleted}
+                canMoveUp={isSelf && idx > 0}
+                canMoveDown={isSelf && idx < pinnedPulses.length - 1}
+                onMoveUp={() => handlePinMove(pulse.id, 'up')}
+                onMoveDown={() => handlePinMove(pulse.id, 'down')}
+              />
+            ))}
+          </div>
+        )}
+
+        <div style={{ color: '#7a8a9a', letterSpacing: '0.1em', fontSize: '0.8rem', marginBottom: '10px', fontFamily: '\'Courier New\', monospace' }}>
+          BROADCASTS
         </div>
 
         <div className="user-timeline">
-          {pulses.length === 0 ? (
+          {timelinePulses.length === 0 ? (
             <div className="empty-state">
-              <p>@{username} hasn't broadcast any pulses yet.</p>
+              <p>{pinnedPulses.length > 0
+                ? `@${profile.hackr_alias}'s broadcasts are all pinned above.`
+                : `@${profile.hackr_alias} hasn't broadcast any pulses yet.`}</p>
             </div>
           ) : (
-            pulses.map(pulse => (
+            timelinePulses.map((pulse) => (
               <div key={`${pulse.is_echo_on_profile ? 'echo-' : ''}${pulse.id}`}>
                 {pulse.is_echo_on_profile && (
                   <div className="echo-indicator" style={{
@@ -141,7 +232,7 @@ export const UserPulsesPage: React.FC = () => {
                     fontFamily: '\'Courier New\', Courier, monospace'
                   }}>
                     <span style={{ fontSize: '1.1rem' }}>↻</span>
-                    <span>@{username} echoed</span>
+                    <span>@{profile.hackr_alias} echoed</span>
                   </div>
                 )}
                 {pulse.is_splice && !pulse.is_echo_on_profile && (
@@ -171,6 +262,9 @@ export const UserPulsesPage: React.FC = () => {
                 <PulseCard
                   pulse={pulse}
                   indentSplice={false}
+                  pinnable={canPin(pulse)}
+                  isPinned={pinnedIds.has(pulse.id)}
+                  onPinToggle={handlePinToggle}
                   onEchoToggle={handleEchoToggle}
                   onPulseCreated={handlePulseCreated}
                   onPulseDeleted={handlePulseDeleted}
@@ -180,7 +274,7 @@ export const UserPulsesPage: React.FC = () => {
           )}
         </div>
 
-        <div className="back-link">
+        <div className="back-link" style={{ marginTop: '20px' }}>
           <Link to="/wire">← Back to the WIRE</Link>
         </div>
       </div>

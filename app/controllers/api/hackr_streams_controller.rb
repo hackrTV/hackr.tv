@@ -9,6 +9,7 @@ class Api::HackrStreamsController < ApplicationController
     response = if @stream
       {
         is_live: true,
+        id: @stream.id,
         artist: {
           id: @stream.artist.id,
           name: @stream.artist.name,

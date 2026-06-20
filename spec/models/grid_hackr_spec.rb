@@ -5,6 +5,7 @@
 #
 #  id                      :integer          not null, primary key
 #  api_token_digest        :string
+#  bio                     :text
 #  email                   :string
 #  hackr_alias             :string
 #  last_activity_at        :datetime

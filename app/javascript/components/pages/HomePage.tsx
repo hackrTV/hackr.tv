@@ -6,6 +6,8 @@ import { UplinkPanel } from '~/components/uplink/UplinkPanel'
 import { ScheduledStreamBanner } from '~/components/stream/ScheduledStreamBanner'
 import { StartingSoonHero } from '~/components/stream/StartingSoonHero'
 import { apiJson } from '~/utils/apiClient'
+import { useGridAuth } from '~/hooks/useGridAuth'
+import { useStreamWatch } from '~/hooks/useStreamWatch'
 import type { ScheduledStreamInfo } from '~/types/uplink'
 
 interface StreamData {
@@ -37,6 +39,11 @@ export const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [chatPoppedOut, setChatPoppedOut] = useState(isPopoutAlive)
   const [theaterMode, setTheaterMode] = useState(false)
+  const { hackr } = useGridAuth()
+
+  // Accrue livestream watch time while live + logged in (tab-visibility
+  // gated inside the hook). Anonymous viewers aren't tracked.
+  useStreamWatch(!!streamData?.is_live && !!hackr)
 
   const fetchStreamStatus = async () => {
     try {

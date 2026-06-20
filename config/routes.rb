@@ -117,6 +117,11 @@ Rails.application.routes.draw do
     get ":slug", to: "pages#spa_root", as: :handbook_article
   end
 
+  # Vanity profile URLs: /@alias redirects to the canonical /wire/alias.
+  # Rails-only (React Router can't match a partial-segment param); covers
+  # external links and address-bar entry, which hit Rails first.
+  get "/@:alias", to: redirect("/wire/%{alias}"), constraints: {alias: /[A-Za-z0-9_]+/}
+
   # PulseWire routes - SPA
   scope "wire" do
     get "/", to: "pages#spa_root", as: :wire
@@ -199,6 +204,7 @@ Rails.application.routes.draw do
     post "grid/reset_password", to: "grid#reset_password"
     post "grid/request_email_change", to: "grid#request_email_change"
     post "grid/confirm_email_change", to: "grid#confirm_email_change"
+    patch "grid/identity", to: "grid#update_identity"
     get "grid/zone_map", to: "grid#zone_map"
 
     # TOTP two-factor authentication
@@ -232,7 +238,13 @@ Rails.application.routes.draw do
       post "signal_drop", on: :member
       post "echo", to: "echoes#create"
       get "echoes", to: "echoes#index"
+      post "pin", to: "pulse_pins#create"
+      delete "pin", to: "pulse_pins#destroy"
     end
+
+    # Public WIRE profile + pin ordering
+    get "profiles/:alias", to: "profiles#show", constraints: {alias: /[^\/]+/}
+    patch "profile/pins", to: "pulse_pins#reorder"
 
     # Overlay API routes
     post "overlay/now-playing", to: "overlay#set_now_playing"

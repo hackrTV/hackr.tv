@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { GridLayout } from '~/components/layouts/GridLayout'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useGridAuthContext } from '~/contexts/GridAuthContext'
+import { BIO_MAX } from '~/types/profile'
 
 export const IdentityPage: React.FC = () => {
   const { hackr } = useGridAuth()
-  const { requestPasswordReset, requestEmailChange } = useGridAuthContext()
+  const { requestPasswordReset, requestEmailChange, updateProfile } = useGridAuthContext()
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
   const [loading, setLoading] = useState(false)
@@ -14,6 +15,15 @@ export const IdentityPage: React.FC = () => {
   const [emailLoading, setEmailLoading] = useState(false)
   const [emailMessage, setEmailMessage] = useState<string | null>(null)
   const [emailMessageType, setEmailMessageType] = useState<'success' | 'error'>('success')
+  const [bio, setBio] = useState(hackr?.bio ?? '')
+  const [bioSaving, setBioSaving] = useState(false)
+  const [bioMessage, setBioMessage] = useState<string | null>(null)
+  const [bioMessageType, setBioMessageType] = useState<'success' | 'error'>('success')
+
+  // Sync local bio when the hackr loads or changes elsewhere.
+  useEffect(() => {
+    setBio(hackr?.bio ?? '')
+  }, [hackr?.bio])
 
   const handleChangePassword = async () => {
     setLoading(true)
@@ -57,6 +67,27 @@ export const IdentityPage: React.FC = () => {
     }
   }
 
+  const handleSaveBio = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setBioSaving(true)
+    setBioMessage(null)
+    try {
+      const result = await updateProfile(bio)
+      if (result.success) {
+        setBioMessageType('success')
+        setBioMessage('Bio updated.')
+      } else {
+        setBioMessageType('error')
+        setBioMessage(result.error || 'Failed to update bio.')
+      }
+    } catch {
+      setBioMessageType('error')
+      setBioMessage('Network error. Please try again.')
+    } finally {
+      setBioSaving(false)
+    }
+  }
+
   return (
     <GridLayout>
       <div className="tui-window white-text" style={{ maxWidth: '600px', margin: '50px auto', display: 'block', background: '#1a1a2e', border: '1px solid #4a4a6a' }}>
@@ -81,6 +112,48 @@ export const IdentityPage: React.FC = () => {
               <span className="cyan-255-text">ROLE:</span> {hackr?.role}
             </p>
           </div>
+
+          <form onSubmit={handleSaveBio} style={{ margin: '20px 0', padding: '15px', border: '1px solid #4a4a6a' }}>
+            <p className="cyan-255-text" style={{ margin: '0 0 15px 0', fontWeight: 'bold', letterSpacing: '0.05em' }}>
+              BIO
+            </p>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value.slice(0, BIO_MAX))}
+              placeholder="Broadcast a short bio to the WIRE. @mention other hackrs to link them."
+              rows={4}
+              disabled={bioSaving}
+              className="tui-input"
+              style={{ width: '100%', resize: 'vertical', fontFamily: '\'Courier New\', monospace' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', flexWrap: 'wrap', gap: '10px' }}>
+              <span style={{ color: bio.length >= BIO_MAX ? '#ff4444' : '#888', fontSize: '0.85em' }}>
+                {bio.length}/{BIO_MAX}
+              </span>
+              <button
+                type="submit"
+                disabled={bioSaving}
+                className="tui-button"
+                style={{
+                  background: '#00ff00',
+                  color: '#0a0a0a',
+                  border: 'none',
+                  padding: '10px 20px',
+                  fontFamily: '\'Courier New\', monospace',
+                  fontWeight: 'bold',
+                  cursor: bioSaving ? 'not-allowed' : 'pointer',
+                  opacity: bioSaving ? 0.6 : 1
+                }}
+              >
+                {bioSaving ? 'SAVING...' : 'SAVE BIO'}
+              </button>
+            </div>
+            {bioMessage && (
+              <p style={{ margin: '10px 0 0 0', color: bioMessageType === 'success' ? '#00ff00' : '#ff4444' }}>
+                {bioMessage}
+              </p>
+            )}
+          </form>
 
           <div style={{ margin: '20px 0', padding: '15px', border: '1px solid #4a4a6a' }}>
             <p className="cyan-255-text" style={{ margin: '0 0 15px 0', fontWeight: 'bold', letterSpacing: '0.05em' }}>

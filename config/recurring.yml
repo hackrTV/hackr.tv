@@ -49,3 +49,7 @@ production:
   world_event_retention:
     class: WorldEventFeed::RetentionJob
     schedule: at 5am every day
+
+  live_watch_sweep:
+    class: LiveWatch::SweepJob
+    schedule: every 10 minutes

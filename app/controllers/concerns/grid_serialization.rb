@@ -9,6 +9,7 @@ module GridSerialization
       hackr_alias: hackr.hackr_alias,
       email: hackr.email,
       role: hackr.role,
+      bio: hackr.bio,
       current_room: hackr.current_room ? auth_room_json(hackr.current_room) : nil,
       features: hackr.admin? ? [FeatureGrant::PULSE_GRID] : hackr.feature_grants.pluck(:feature),
       otp_enabled: hackr.otp_required_for_login?

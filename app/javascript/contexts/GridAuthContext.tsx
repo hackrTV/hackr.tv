@@ -9,6 +9,7 @@ export interface GridHackr {
   current_room: GridRoom | null
   features: string[]
   otp_enabled?: boolean
+  bio?: string
 }
 
 export interface GridRoom {
@@ -100,6 +101,13 @@ interface ConfirmEmailChangeResponse {
   error?: string
 }
 
+interface UpdateProfileResponse {
+  success: boolean
+  message?: string
+  error?: string
+  hackr?: GridHackr
+}
+
 interface CurrentHackrResponse {
   logged_in: boolean
   hackr?: GridHackr
@@ -120,6 +128,7 @@ interface GridAuthContextType {
   resetPassword: (token: string, password: string, password_confirmation: string) => Promise<ResetPasswordResponse>
   requestEmailChange: (new_email: string) => Promise<RequestEmailChangeResponse>
   confirmEmailChange: (token: string) => Promise<ConfirmEmailChangeResponse>
+  updateProfile: (bio: string) => Promise<UpdateProfileResponse>
   disconnect: () => Promise<{ success: boolean; error?: string }>
   checkAuth: () => Promise<void>
   hasFeature: (feature: string) => boolean
@@ -396,6 +405,27 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     }
   }, [])
 
+  const updateProfile = useCallback(async (bio: string): Promise<UpdateProfileResponse> => {
+    setError(null)
+    try {
+      const data = await apiJson<UpdateProfileResponse>('/api/grid/identity', {
+        method: 'PATCH',
+        body: JSON.stringify({ bio })
+      })
+
+      if (data.success && data.hackr) {
+        setHackr(data.hackr)
+      }
+      return data
+    } catch (err) {
+      // apiFetch throws ApiError on 422; its message carries the backend
+      // error string (e.g. the GovCorp profanity rejection).
+      const errorMsg = err instanceof Error ? err.message : 'Failed to update profile.'
+      setError(errorMsg)
+      return { success: false, error: errorMsg }
+    }
+  }, [])
+
   const hasFeature = useCallback((feature: string): boolean => {
     if (!hackr) return false
     if (hackr.role === 'admin') return true
@@ -507,6 +537,7 @@ export const GridAuthProvider: React.FC<GridAuthProviderProps> = ({ children }) 
     resetPassword,
     requestEmailChange,
     confirmEmailChange,
+    updateProfile,
     disconnect,
     checkAuth,
     hasFeature,

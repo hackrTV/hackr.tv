@@ -40,6 +40,7 @@ class Pulse < ApplicationRecord
   belongs_to :thread_root, class_name: "Pulse", optional: true
   has_many :echoes, dependent: :destroy
   has_many :splices, class_name: "Pulse", foreign_key: :parent_pulse_id, dependent: :destroy
+  has_many :pulse_pins, dependent: :destroy
   has_many :hackrs_who_echoed, through: :echoes, source: :grid_hackr
 
   validates :content, presence: true, length: {maximum: 256}

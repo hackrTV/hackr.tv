@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_07_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -466,6 +466,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_000001) do
 
   create_table "grid_hackrs", force: :cascade do |t|
     t.string "api_token_digest"
+    t.text "bio"
     t.datetime "created_at", null: false
     t.integer "current_room_id"
     t.string "email"
@@ -1058,6 +1059,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_000001) do
     t.index ["hackr_stream_id"], name: "index_hackr_vod_watches_on_hackr_stream_id"
   end
 
+  create_table "hackr_watch_sessions", force: :cascade do |t|
+    t.integer "accumulated_seconds", default: 0, null: false
+    t.datetime "connected_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "disconnected_at"
+    t.integer "grid_hackr_id", null: false
+    t.integer "hackr_stream_id"
+    t.datetime "last_heartbeat_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id", "disconnected_at"], name: "idx_on_grid_hackr_id_disconnected_at_e34a883d93"
+    t.index ["grid_hackr_id"], name: "index_hackr_watch_sessions_on_grid_hackr_id"
+    t.index ["grid_hackr_id"], name: "index_hackr_watch_sessions_one_open_per_hackr", unique: true, where: "disconnected_at IS NULL"
+    t.index ["hackr_stream_id"], name: "index_hackr_watch_sessions_on_hackr_stream_id"
+    t.index ["last_heartbeat_at"], name: "index_hackr_watch_sessions_on_last_heartbeat_at"
+  end
+
   create_table "handbook_articles", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -1251,6 +1268,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_000001) do
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id"], name: "index_playlists_on_grid_hackr_id"
     t.index ["share_token"], name: "index_playlists_on_share_token", unique: true
+  end
+
+  create_table "pulse_pins", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "pulse_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id", "position"], name: "index_pulse_pins_on_grid_hackr_id_and_position"
+    t.index ["grid_hackr_id", "pulse_id"], name: "index_pulse_pins_on_grid_hackr_id_and_pulse_id", unique: true
+    t.index ["grid_hackr_id"], name: "index_pulse_pins_on_grid_hackr_id"
+    t.index ["pulse_id"], name: "index_pulse_pins_on_pulse_id"
   end
 
   create_table "pulses", force: :cascade do |t|
@@ -1562,6 +1591,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_000001) do
   add_foreign_key "hackr_streams", "artists"
   add_foreign_key "hackr_vod_watches", "grid_hackrs"
   add_foreign_key "hackr_vod_watches", "hackr_streams"
+  add_foreign_key "hackr_watch_sessions", "grid_hackrs"
+  add_foreign_key "hackr_watch_sessions", "hackr_streams"
   add_foreign_key "handbook_articles", "handbook_sections"
   add_foreign_key "moderation_logs", "chat_messages"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "actor_id"
@@ -1574,6 +1605,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_000001) do
   add_foreign_key "playlist_tracks", "playlists"
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "grid_hackrs"
+  add_foreign_key "pulse_pins", "grid_hackrs"
+  add_foreign_key "pulse_pins", "pulses"
   add_foreign_key "pulses", "grid_hackrs"
   add_foreign_key "pulses", "pulses", column: "parent_pulse_id"
   add_foreign_key "pulses", "pulses", column: "thread_root_id"

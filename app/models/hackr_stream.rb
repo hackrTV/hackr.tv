@@ -32,6 +32,7 @@ class HackrStream < ApplicationRecord
   belongs_to :artist
   belongs_to :track, primary_key: :slug, foreign_key: :track_slug, optional: true
   has_many :hackr_vod_watches, dependent: :destroy
+  has_many :hackr_watch_sessions, dependent: :nullify
 
   validates :live_url, presence: true, if: :is_live?
   validates :title, length: {maximum: 255}
