@@ -1,6 +1,7 @@
 module Api
   class PulsesController < ApplicationController
     include GridAuthentication
+    include PulseSerialization
 
     before_action :require_login_api, only: %i[create destroy signal_drop]
     before_action :set_pulse, only: %i[show destroy signal_drop]
@@ -164,31 +165,6 @@ module Api
 
     def pulse_params
       params.require(:pulse).permit(:content, :parent_pulse_id)
-    end
-
-    def pulse_json(pulse)
-      {
-        id: pulse.id,
-        content: pulse.content,
-        pulsed_at: pulse.pulsed_at,
-        echo_count: pulse.echo_count,
-        splice_count: pulse.splices.count, # Real-time count
-        signal_dropped: pulse.signal_dropped,
-        signal_dropped_at: pulse.signal_dropped_at,
-        parent_pulse_id: pulse.parent_pulse_id,
-        thread_root_id: pulse.thread_root_id,
-        is_splice: pulse.is_splice?,
-        is_echoed_by_current_hackr: logged_in? ? pulse.is_echo_by?(current_hackr) : false,
-        current_hackr_is_logged_in: logged_in?,
-        current_hackr_is_admin: logged_in? ? current_hackr.admin? : false,
-        grid_hackr: {
-          id: pulse.grid_hackr.id,
-          hackr_alias: pulse.grid_hackr.hackr_alias,
-          role: pulse.grid_hackr.role
-        },
-        created_at: pulse.created_at,
-        updated_at: pulse.updated_at
-      }
     end
   end
 end

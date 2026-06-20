@@ -16,6 +16,13 @@ interface PulseCardProps {
   onEchoToggle?: (pulseId: number, newEchoCount: number, isEchoed: boolean) => void
   onPulseCreated?: (pulse: Pulse) => void
   onPulseDeleted?: (pulseId: number) => void
+  pinnable?: boolean
+  isPinned?: boolean
+  onPinToggle?: (pulseId: number, isPinned: boolean) => void
+  canMoveUp?: boolean
+  canMoveDown?: boolean
+  onMoveUp?: () => void
+  onMoveDown?: () => void
 }
 
 export const PulseCard: React.FC<PulseCardProps> = ({
@@ -26,7 +33,14 @@ export const PulseCard: React.FC<PulseCardProps> = ({
   indentSplice = true,
   onEchoToggle,
   onPulseCreated,
-  onPulseDeleted
+  onPulseDeleted,
+  pinnable = false,
+  isPinned = false,
+  onPinToggle,
+  canMoveUp = false,
+  canMoveDown = false,
+  onMoveUp,
+  onMoveDown
 }) => {
   const { hackr: currentHackr } = useGridAuth()
   const [showReplyForm, setShowReplyForm] = useState(false)
@@ -187,6 +201,40 @@ export const PulseCard: React.FC<PulseCardProps> = ({
               title="Delete pulse"
             >
               ×
+            </button>
+          )}
+
+          {pinnable && (onMoveUp || onMoveDown) && (
+            <>
+              <button
+                className="pin-move-button"
+                onClick={onMoveUp}
+                disabled={!canMoveUp}
+                title="Move up"
+                style={{ background: 'none', border: 'none', cursor: canMoveUp ? 'pointer' : 'default', color: canMoveUp ? '#facc15' : '#555', padding: 0, fontSize: '0.95rem' }}
+              >
+                ↑
+              </button>
+              <button
+                className="pin-move-button"
+                onClick={onMoveDown}
+                disabled={!canMoveDown}
+                title="Move down"
+                style={{ background: 'none', border: 'none', cursor: canMoveDown ? 'pointer' : 'default', color: canMoveDown ? '#facc15' : '#555', padding: 0, fontSize: '0.95rem' }}
+              >
+                ↓
+              </button>
+            </>
+          )}
+
+          {pinnable && (
+            <button
+              className="pin-button"
+              onClick={() => onPinToggle?.(pulse.id, isPinned)}
+              title={isPinned ? 'Unpin from profile' : 'Pin to profile'}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: isPinned ? '#facc15' : '#888', padding: 0, fontSize: '0.85rem' }}
+            >
+              {isPinned ? '📌 UNPIN' : '📌 PIN'}
             </button>
           )}
         </div>

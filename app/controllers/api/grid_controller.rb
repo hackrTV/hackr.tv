@@ -2,7 +2,7 @@ class Api::GridController < ApplicationController
   include GridAuthentication
   include GridSerialization
 
-  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index npc_index rest_pod_index stats_index]
+  before_action :require_login_api, only: %i[current_hackr_info command disconnect request_password_reset request_email_change update_identity debit achievements_index missions_index schematics_index loadout_index deck_index transit_index zone_map inventory_index reputation_index cred_index shop_index npc_index rest_pod_index stats_index]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action -> { require_feature_api(FeatureGrant::TACTICAL_GRID) }, only: %i[zone_map shop_index npc_index rest_pod_index stats_index]
   before_action :require_admin_api, only: [:debit]
@@ -973,6 +973,22 @@ class Api::GridController < ApplicationController
     }
   end
 
+  # PATCH /api/grid/identity - Update the current hackr's editable profile
+  # fields (currently bio). Profanity on bio is rejected by the model.
+  # skip_reserved_check neutralizes the always-on reserved-alias re-check,
+  # since the alias is not changing here.
+  def update_identity
+    current_hackr.skip_reserved_check = true
+    current_hackr.assign_attributes(identity_params)
+
+    if current_hackr.save
+      render json: {success: true, hackr: auth_hackr_json(current_hackr)}
+    else
+      error = current_hackr.errors[:bio].first || current_hackr.errors.full_messages.to_sentence
+      render json: {success: false, error: error}, status: :unprocessable_entity
+    end
+  end
+
   # POST /api/grid/debit - External service debit (e.g., Synthia redemptions)
   # Authenticated via Bearer token (service account)
   def debit
@@ -1155,6 +1171,10 @@ class Api::GridController < ApplicationController
 
   def hackr_params
     params.permit(:hackr_alias, :password, :password_confirmation)
+  end
+
+  def identity_params
+    params.permit(:bio)
   end
 
   def broadcast_event(room, event)

@@ -5,6 +5,7 @@
 #
 #  id                      :integer          not null, primary key
 #  api_token_digest        :string
+#  bio                     :text
 #  email                   :string
 #  hackr_alias             :string
 #  last_activity_at        :datetime
@@ -50,7 +51,10 @@ class GridHackr < ApplicationRecord
   has_secure_password
   encrypts :otp_secret
 
-  filter_profanity :hackr_alias
+  validates :bio, length: {maximum: 512}, allow_blank: true
+  validate :bio_excludes_email
+
+  filter_profanity :hackr_alias, :bio
 
   # Reserved aliases that cannot be registered (exact matches, case-insensitive)
   RESERVED_ALIASES = %w[
@@ -83,6 +87,9 @@ class GridHackr < ApplicationRecord
 
   MINIMUM_ALIAS_LENGTH = 6
 
+  # Bios stay on-platform — reject anything that looks like an email address.
+  BIO_EMAIL_PATTERN = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i
+
   # Virtual attribute to enforce length validation during UI registration
   attr_accessor :enforce_alias_length
 
@@ -97,6 +104,9 @@ class GridHackr < ApplicationRecord
   has_many :grid_uplink_presences, dependent: :destroy
   has_many :playlists, dependent: :destroy
   has_many :pulses, dependent: :destroy
+  has_many :pulse_pins, dependent: :destroy
+  has_many :pinned_pulses, -> { order("pulse_pins.position ASC") }, through: :pulse_pins, source: :pulse
+  has_many :watch_sessions, class_name: "HackrWatchSession", dependent: :destroy
   has_many :echoes, dependent: :destroy
   has_many :chat_messages, dependent: :destroy
   has_many :user_punishments, dependent: :destroy
@@ -123,6 +133,7 @@ class GridHackr < ApplicationRecord
 
   validates :hackr_alias, presence: true, uniqueness: {case_sensitive: false}
   validates :hackr_alias, length: {minimum: MINIMUM_ALIAS_LENGTH, message: "must be at least #{MINIMUM_ALIAS_LENGTH} characters"}, if: :enforce_alias_length
+  validates :hackr_alias, format: {with: /\A[a-zA-Z0-9_]+\z/, message: "may only contain letters, numbers, and underscores"}, if: :enforce_alias_length
   validates :email, uniqueness: {case_sensitive: false}, allow_nil: true
   validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_nil: true
   validates :role, inclusion: {in: %w[operative operator admin], message: "%{value} is not a valid role"}
@@ -352,6 +363,12 @@ class GridHackr < ApplicationRecord
     else
       digits.each_cons(2).all? { |a, b| b - a == -1 || (a == 0 && b == 9) }
     end
+  end
+
+  def bio_excludes_email
+    return if bio.blank?
+
+    errors.add(:bio, "can't contain an email address") if bio.match?(BIO_EMAIL_PATTERN)
   end
 
   def alias_not_reserved
