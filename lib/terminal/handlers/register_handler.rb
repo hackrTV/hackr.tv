@@ -122,6 +122,11 @@ module Terminal
           current_room: starting_room,
           role: "operative"
         )
+        # Enforce the same handle rules as web registration (min length +
+        # [A-Za-z0-9_] format) so terminal-created handles work with the
+        # /@alias vanity URL and @mention parser. System/seed accounts
+        # (which may use spaces, e.g. "Sora Nexa") skip this by not setting it.
+        hackr.enforce_alias_length = true
 
         if hackr.save
           Grid::TutorialService.new(hackr).start!

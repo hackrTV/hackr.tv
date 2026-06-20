@@ -69,4 +69,18 @@ RSpec.describe PulsePin, type: :model do
     PulsePin.create!(grid_hackr: hackr, pulse: pulse)
     expect { pulse.destroy! }.to change(PulsePin, :count).by(-1)
   end
+
+  it "frees the cap and resequences when a pinned pulse is signal-dropped" do
+    pulses = Array.new(PulsePin::MAX_PINS) { create(:pulse, grid_hackr: hackr) }
+    pulses.each_with_index { |p, i| PulsePin.create!(grid_hackr: hackr, pulse: p, position: i) }
+
+    pulses[1].signal_drop!
+
+    expect(PulsePin.where(pulse_id: pulses[1].id)).not_to exist
+    expect(hackr.pulse_pins.ordered.pluck(:position)).to eq([0, 1])
+
+    # cap now has room for another pin
+    fresh = PulsePin.create(grid_hackr: hackr, pulse: create(:pulse, grid_hackr: hackr))
+    expect(fresh).to be_persisted
+  end
 end

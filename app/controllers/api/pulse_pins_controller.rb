@@ -34,12 +34,9 @@ module Api
       end
     end
 
-    # DELETE /api/pulses/:pulse_id/pin
+    # DELETE /api/pulses/:pulse_id/pin — PulsePin#after_destroy resequences.
     def destroy
-      PulsePin.transaction do
-        current_hackr.pulse_pins.find_by(pulse_id: params[:pulse_id])&.destroy
-        resequence!
-      end
+      current_hackr.pulse_pins.find_by(pulse_id: params[:pulse_id])&.destroy
       render json: {success: true, pinned_pulses: pinned_pulses_json(current_hackr)}
     end
 
@@ -67,13 +64,6 @@ module Api
 
     def next_position
       (current_hackr.pulse_pins.maximum(:position) || -1) + 1
-    end
-
-    # Close gaps after a removal so positions stay 0..n-1.
-    def resequence!
-      current_hackr.pulse_pins.ordered.each_with_index do |pin, idx|
-        pin.update_column(:position, idx) unless pin.position == idx
-      end
     end
   end
 end

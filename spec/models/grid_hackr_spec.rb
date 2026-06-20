@@ -233,6 +233,25 @@ RSpec.describe GridHackr, type: :model do
         end
       end
     end
+
+    describe "alias format" do
+      it "rejects non-conforming handles when enforce_alias_length is set" do
+        hackr = build(:grid_hackr, hackr_alias: "foo-bar")
+        hackr.enforce_alias_length = true
+        expect(hackr).not_to be_valid
+        expect(hackr.errors[:hackr_alias].join).to match(/letters, numbers, and underscores/)
+      end
+
+      it "allows letters, numbers, and underscores" do
+        hackr = build(:grid_hackr, hackr_alias: "neo_kat_42")
+        hackr.enforce_alias_length = true
+        expect(hackr).to be_valid
+      end
+
+      it "allows system/seed handles with spaces when the flag is off" do
+        expect(build(:grid_hackr, hackr_alias: "Sora Nexa")).to be_valid
+      end
+    end
   end
 
   describe "associations" do

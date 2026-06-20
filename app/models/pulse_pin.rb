@@ -39,7 +39,21 @@ class PulsePin < ApplicationRecord
 
   scope :ordered, -> { order(:position) }
 
+  after_destroy :resequence_siblings
+
+  # Renumber a hackr's pins to a contiguous 0..n-1 after any removal
+  # (unpin, owner pulse deleted, or pulse signal-dropped).
+  def self.resequence_for!(grid_hackr_id)
+    where(grid_hackr_id: grid_hackr_id).ordered.each_with_index do |pin, idx|
+      pin.update_column(:position, idx) unless pin.position == idx
+    end
+  end
+
   private
+
+  def resequence_siblings
+    self.class.resequence_for!(grid_hackr_id)
+  end
 
   def pulse_authored_by_pinner
     return if pulse.nil? || grid_hackr_id.nil?

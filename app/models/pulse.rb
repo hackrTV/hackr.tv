@@ -53,6 +53,7 @@ class Pulse < ApplicationRecord
   after_create_commit :broadcast_new_pulse
   after_destroy_commit :broadcast_deletion
   after_update_commit :broadcast_signal_drop, if: :saved_change_to_signal_dropped?
+  after_update :unpin_on_signal_drop, if: :saved_change_to_signal_dropped?
 
   scope :active, -> { where(signal_dropped: false) }
   scope :dropped, -> { where(signal_dropped: true) }
@@ -88,6 +89,13 @@ class Pulse < ApplicationRecord
   end
 
   private
+
+  # A signal-dropped pulse is hidden from its owner's profile, so its pin
+  # would silently occupy a cap slot the owner can't clear. Remove it (the
+  # PulsePin#after_destroy resequences the rest).
+  def unpin_on_signal_drop
+    pulse_pins.destroy_all if signal_dropped?
+  end
 
   def set_pulsed_at
     self.pulsed_at ||= Time.current
