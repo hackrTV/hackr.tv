@@ -34,6 +34,12 @@ gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 2.0"
+# Vips backend for image_processing (variant_processor is :vips on Rails 8+).
+# image_processing does NOT depend on this — without it, every variant raises
+# "ImageProcessing::Vips requires the ruby-vips gem" in production (the libvips
+# C library alone is not enough; this is the Ruby binding). Must be in the
+# default group so it survives BUNDLE_WITHOUT="development" in the prod image.
+gem "ruby-vips", "~> 2.0"
 
 # Browser detection for mobile/desktop layouts
 gem "browser"
