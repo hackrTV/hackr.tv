@@ -1,6 +1,8 @@
 # Unified Data Seeding System
 # YAML files provide initial seed data. The database is the source of truth.
-# Existing records are never overwritten — only new records are created.
+# Existing records are never overwritten — only new records are created
+# (exception: a release's cover image is re-attached when its blob file is
+# missing or the source changed, so covers self-heal on reseed — never a nuke).
 #
 # PRODUCTION GUARD: All world seed tasks are disabled in production because
 # the database is the authoritative source. Use the admin "Export World"
@@ -35,6 +37,8 @@
 # 26. livestream_archive (depends on audio) - derived playlist
 # 27. breach_templates  (no deps)
 # 28. breach_encounters (depends on breach_templates, rooms)
+
+require "digest"
 
 namespace :data do
   # Guard: prevent accidental world seeding in production.
@@ -161,10 +165,13 @@ namespace :data do
           release.save!
           releases_created += 1
           puts "  ✓ Created release: #{release.name} (#{artist.name})"
-
-          # Attach cover image on creation
-          DataLoaderHelpers.attach_cover_image(release, release_data["cover_image"], artist_slug) if release_data["cover_image"].present?
         end
+
+        # Attach cover on creation; also heal an existing release whose cover
+        # blob is missing or whose source changed. attach_cover_image is
+        # idempotent (digest + file-presence guarded), so this is a no-op when
+        # the cover is already present and unchanged.
+        DataLoaderHelpers.attach_cover_image(release, release_data["cover_image"], artist_slug) if release_data["cover_image"].present?
 
         # Seed tracks (skip existing)
         (release_data["tracks"] || []).each do |track_data|
@@ -2957,11 +2964,16 @@ module DataLoaderHelpers
     return unless cover_path
 
     if release.cover_image.attached?
-      source_mtime = File.mtime(cover_path)
-      blob_created = release.cover_image.blob.created_at
-      return if source_mtime <= blob_created
+      blob = release.cover_image.blob
+      source_checksum = Digest::MD5.base64digest(File.binread(cover_path))
+      file_present = ActiveStorage::Blob.service.exist?(blob.key)
+      # Idempotent: skip only when the attached blob matches the source AND its
+      # file actually exists on the storage service. Re-attach when the source
+      # content changed, or when the blob record exists but its file is missing
+      # (the record-without-file case that returns 500s in production).
+      return if source_checksum == blob.checksum && file_present
       release.cover_image.purge
-      puts "    → Re-attaching cover (source newer): #{filename}"
+      puts "    → Re-attaching cover (#{file_present ? "source changed" : "file missing"}): #{filename}"
     end
 
     release.cover_image.attach(
