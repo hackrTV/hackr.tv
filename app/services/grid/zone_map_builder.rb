@@ -8,8 +8,7 @@ module Grid
 
     ZoneMapResult = Struct.new(
       :zone, :rooms, :exits, :ghost_rooms,
-      :current_room_id, :z_levels, :z_level,
-      keyword_init: true
+      :current_room_id, :z_levels, :z_level
     )
 
     def initialize(zone:, hackr:)

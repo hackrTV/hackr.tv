@@ -50,6 +50,13 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      # ruby-vips loads the libvips C library at boot (Bundler.require), so the
+      # app can't start without it. Matches the libvips package in the prod
+      # Dockerfile. Without this: Bundler::GemRequireError "Could not open
+      # library 'vips.so.42'" on the first `bin/rails` invocation.
+      - name: Install libvips (ruby-vips native dependency)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libvips
+
       - name: Install pnpm
         uses: pnpm/action-setup@v6
 

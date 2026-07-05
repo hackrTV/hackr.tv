@@ -17,17 +17,17 @@ module Grid
         .where(active: true)
         .order("grid_item_definitions.rarity, grid_item_definitions.name")
         .map do |listing|
-          next if listing.min_clearance > clearance
+        next if listing.min_clearance > clearance
 
-          price = effective_price(listing: listing, mob: mob, clearance: clearance)
-          balance = cache&.balance || 0
+        price = effective_price(listing: listing, mob: mob, clearance: clearance)
+        balance = cache&.balance || 0
 
-          {
-            listing: listing,
-            effective_price: price,
-            affordable: balance >= price,
-            out_of_stock: listing.out_of_stock?
-          }
+        {
+          listing: listing,
+          effective_price: price,
+          affordable: balance >= price,
+          out_of_stock: listing.out_of_stock?
+        }
       end.compact
     end
 
