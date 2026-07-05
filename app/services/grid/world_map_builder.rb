@@ -13,8 +13,7 @@ module Grid
       :cross_exits,          # Array<Hash> — exits pointing outside the room set
       :conflicts,            # Array<String> — nudge descriptions
       :z_levels_present,     # Array<Integer> — all reachable z-levels
-      :components,           # Integer — connected component count
-      keyword_init: true
+      :components            # Integer — connected component count
     )
 
     DIRECTION_VECTORS = {

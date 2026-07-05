@@ -63,7 +63,7 @@ module Grid
     # for the first failing gate (or nil when all gates pass). Callers:
     # CommandParser renders `reason`; Api serializer returns flags;
     # internal accept! path re-uses the predicates. Single source of truth.
-    GateStatus = Struct.new(:clearance_met, :prereq_met, :rep_met, :reason, keyword_init: true) do
+    GateStatus = Struct.new(:clearance_met, :prereq_met, :rep_met, :reason) do
       def all_met?
         clearance_met && prereq_met && rep_met
       end
