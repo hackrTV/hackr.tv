@@ -30,7 +30,7 @@ data/
 │   ├── xeraen.yml             # Artist + albums + tracks
 │   ├── thecyberpulse.yml
 │   ├── heartbreak_havoc.yml
-│   └── ...                    # 15 artist files total
+│   └── ...                    # 16 artist files total
 ├── system/
 │   ├── hackrs.yml             # GridHackr users
 │   ├── channels.yml           # Uplink channels
@@ -38,18 +38,31 @@ data/
 │   ├── zone_playlists.yml     # Ambient zone playlists
 │   └── redirects.yml          # Domain redirects
 ├── world/
+│   ├── regions.yml            # Geographic regions (above zones)
 │   ├── factions.yml           # Grid factions
 │   ├── zones.yml              # Grid zones
 │   ├── rooms.yml              # Grid rooms
 │   ├── exits.yml              # Room exits
 │   ├── mobs.yml               # NPCs
-│   ├── items.yml              # Items
+│   ├── item_definitions.yml   # Canonical item catalog
+│   ├── items.yml              # Placed item instances
+│   ├── salvage_yields.yml     # Salvage output mappings
+│   ├── schematics.yml         # Fabrication recipes
 │   ├── achievements.yml       # Achievement/badge definitions
+│   ├── shop_listings.yml      # Shop vendor listings
 │   ├── missions.yml           # Mission arcs, missions, objectives, rewards
-│   └── shop_listings.yml      # Shop vendor listings
+│   ├── breach_templates.yml   # BREACH encounter templates
+│   ├── breach_encounters.yml  # Placed BREACH encounters
+│   ├── pac_facilities.yml     # GovCorp Perception Alignment Center facilities
+│   ├── transit_types.yml      # Transit vehicle types
+│   ├── transit_routes.yml     # Local transit routes + stops
+│   ├── slipstream_routes.yml  # Inter-region slipstream routes + legs
+│   ├── starting_rooms.yml     # Graduation starting rooms
+│   └── tutorial.yml           # Bootloader tutorial world data
 ├── content/
 │   ├── codex.yml              # Codex entries
 │   ├── hackr_logs.yml         # Blog posts
+│   ├── handbook.yml           # Handbook sections + articles
 │   └── wire.yml               # Seed pulses/echoes
 ├── playlists/
 │   └── key_playlists.yml      # Curated playlists
@@ -86,28 +99,32 @@ That's it - one file, one edit.
 
 Tasks run in dependency order (the `data:load` master task handles this automatically):
 
-1. **catalog** (artists, albums, tracks from per-artist files)
-2. **hackrs** (no deps)
-3. **channels** (no deps)
-4. **radio_stations** (no deps)
-5. **zone_playlists** (depends on tracks)
-6. **factions** (depends on artists)
-7. **zones** (depends on factions, zone_playlists)
-8. **rooms** (depends on zones)
-9. **exits** (depends on rooms)
-10. **mobs** (depends on rooms, factions)
-11. **items** (depends on rooms)
-12. **achievements** (no deps)
-13. **missions** (depends on mobs, rooms, factions, items, achievements)
-14. **shop_listings** (depends on mobs, items)
-15. **key_playlists** (depends on hackrs, tracks, radio_stations)
-16. **codex** (no deps)
-17. **hackr_logs** (depends on hackrs)
-18. **wire** (depends on hackrs)
-19. **vidz** (depends on artists)
-20. **overlays** (no deps)
-21. **redirects** (no deps)
-22. **livestream_archive** (depends on audio)
+1. **catalog** — artists, albums, tracks (from per-artist files)
+2. **system** — hackrs, channels, radio_stations, zone_playlists, redirects
+3. **world** — seeded in dependency order:
+   1. regions
+   2. factions (depends on artists)
+   3. zones (depends on regions, factions, zone_playlists)
+   4. rooms (depends on zones)
+   5. exits (depends on rooms)
+   6. mobs (depends on rooms, factions)
+   7. item_definitions
+   8. items (depends on rooms, item_definitions)
+   9. salvage_yields (depends on item_definitions)
+   10. schematics (depends on item_definitions)
+   11. achievements
+   12. shop_listings (depends on mobs, item_definitions)
+   13. missions (depends on mobs, rooms, factions, item_definitions, achievements)
+   14. breach_templates → breach_encounters (depends on rooms)
+   15. pac_facilities (depends on regions)
+   16. transit_types → transit_routes → slipstream_routes
+   17. starting_rooms
+   18. tutorial
+4. **playlists** — key_playlists (depends on hackrs, tracks, radio_stations)
+5. **content** — codex, hackr_logs, handbook, wire
+6. **vidz** — VODs/streams (depends on artists)
+7. **overlays** — elements, tickers, lower_thirds, scenes, scene_elements, scene_groups
+8. **redirects** — domain redirects
 
 ## Available Tasks
 
@@ -125,14 +142,14 @@ Tasks run in dependency order (the `data:load` master task handles this automati
 |------|-------|
 | `data:catalog` | artists, albums, tracks (from per-artist YAML files) |
 | `data:system` | hackrs, channels, radio_stations, zone_playlists, redirects |
-| `data:world` | factions, zones, rooms, exits, mobs, items, achievements, missions, shop_listings |
+| `data:world` | regions, factions, zones, rooms, exits, mobs, item definitions, items, salvage yields, schematics, achievements, shop listings, missions, breach templates/encounters, PAC facilities, transit types/routes, slipstream routes, starting rooms, tutorial |
 | `data:playlists` | key_playlists (also ensures catalog, hackrs, radio_stations) |
-| `data:content` | codex, hackr_logs, wire |
+| `data:content` | codex, hackr_logs, handbook, wire |
 | `data:overlays` | all overlay elements, tickers, lower_thirds, scenes, scene_elements, scene_groups |
 
 ### Individual Tasks
 
-`data:catalog`, `data:hackrs`, `data:channels`, `data:radio_stations`, `data:zone_playlists`, `data:factions`, `data:zones`, `data:rooms`, `data:exits`, `data:mobs`, `data:items`, `data:achievements`, `data:missions`, `data:shop_listings`, `data:key_playlists`, `data:codex`, `data:hackr_logs`, `data:wire`, `data:vidz`, `data:redirects`, `data:livestream_archive`, `data:audio`.
+`data:catalog`, `data:hackrs`, `data:channels`, `data:radio_stations`, `data:zone_playlists`, `data:regions`, `data:factions`, `data:zones`, `data:rooms`, `data:exits`, `data:mobs`, `data:item_definitions`, `data:items`, `data:salvage_yields`, `data:schematics`, `data:achievements`, `data:shop_listings`, `data:missions`, `data:breach_templates`, `data:breach_encounters`, `data:pac_facilities`, `data:transit_types`, `data:slipstream_routes`, `data:starting_rooms`, `data:tutorial`, `data:key_playlists`, `data:codex`, `data:hackr_logs`, `data:handbook`, `data:wire`, `data:vidz`, `data:redirects`, `data:livestream_archive`, `data:audio`.
 
 ### Audio Sideloading
 
