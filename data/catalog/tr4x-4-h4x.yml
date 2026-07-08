@@ -1,0 +1,119 @@
+artist:
+  name: "TR4X 4 H4X"
+  genre: "hackrtrax"
+  # ost (not band) keeps it off the /f/net bands directory; vault visibility is
+  # independent (tracks' show_in_pulse_vault), so its music still appears in the vault.
+  artist_type: ost
+
+releases:
+  - slug: volume-1
+    title: "Volume 1"
+    release_type: album
+    release_date: "2126-09-09"
+    cover_image: "t4h.jpg"
+    tracks:
+      - title: "Process Initiated"
+        slug: process-initiated
+        track_number: 1
+        duration: "3:03"
+        audio_file: process-initiated.ogg
+      - title: "System Bootstrap Phase Alpha"
+        slug: system-bootstrap-phase-alpha
+        track_number: 2
+        duration: "2:53"
+        audio_file: system-bootstrap-phase-alpha.ogg
+      - title: "initramfs"
+        slug: initramfs
+        track_number: 3
+        duration: "3:03"
+        audio_file: initramfs.ogg
+      - title: "Big Endian"
+        slug: big-endian
+        track_number: 4
+        duration: "3:25"
+        audio_file: big-endian.ogg
+      - title: "TOCTOU"
+        slug: toctou
+        track_number: 5
+        duration: "3:08"
+        audio_file: toctou.ogg
+      - title: "ps aux | grep root"
+        slug: ps-aux-grep-root
+        track_number: 6
+        duration: "4:47"
+        audio_file: ps-aux-grep-root.ogg
+      - title: "Map Reduce"
+        slug: map-reduce
+        track_number: 7
+        duration: "4:51"
+        audio_file: map-reduce.ogg
+      - title: "Name Collision"
+        slug: name-collision
+        track_number: 8
+        duration: "3:15"
+        audio_file: name-collision.ogg
+      - title: "Redline Recourse"
+        slug: redline-recourse
+        track_number: 9
+        duration: "2:29"
+        audio_file: redline-recourse.ogg
+      - title: "Input Buffer Overflow"
+        slug: input-buffer-overflow
+        track_number: 10
+        duration: "2:31"
+        audio_file: input-buffer-overflow.ogg
+      - title: "Recursive Removal"
+        slug: recursive-removal
+        track_number: 11
+        duration: "3:15"
+        audio_file: recursive-removal.ogg
+      - title: "Timing Attack"
+        slug: timing-attack
+        track_number: 12
+        duration: "3:54"
+        audio_file: timing-attack.ogg
+      - title: "Fault Interrupt Handler"
+        slug: fault-interrupt-handler
+        track_number: 13
+        duration: "2:53"
+        audio_file: fault-interrupt-handler.ogg
+      - title: "Spectrogram"
+        slug: spectrogram
+        track_number: 14
+        duration: "2:31"
+        audio_file: spectrogram.ogg
+      - title: "Rainbow Tables"
+        slug: rainbow-tables
+        track_number: 15
+        duration: "2:33"
+        audio_file: rainbow-tables.ogg
+      - title: "Cache Invalidation"
+        slug: cache-invalidation
+        track_number: 16
+        duration: "2:20"
+        audio_file: cache-invalidation.ogg
+      - title: "Filter Map"
+        slug: filter-map
+        track_number: 17
+        duration: "4:46"
+        audio_file: filter-map.ogg
+      - title: "Clicky"
+        slug: clicky
+        track_number: 18
+        duration: "3:15"
+        audio_file: clicky.ogg
+      - title: "Little Endian"
+        slug: little-endian
+        track_number: 19
+        duration: "4:11"
+        audio_file: little-endian.ogg
+      - title: "Process Complete"
+        slug: process-complete
+        track_number: 20
+        duration: "4:05"
+        audio_file: process-complete.ogg
+      - title: "Live To Hack Another Day"
+        slug: live-to-hack-another-day
+        track_number: 21
+        duration: "3:13"
+        audio_file: live-to-hack-another-day.ogg
