@@ -80,7 +80,7 @@ codex_entries:
 
       ## The Hundred-Year Distance
 
-      [[XERAEN]] broadcasts from the future. Ashlinn exists in the present. Between them: a century of separation. How XERAEN came to know of her — how signals sent backward through time could create a connection with someone a hundred years in his past — remains unexplained.
+      [[XERAEN]] broadcasts from the future. Ashlinn exists in the present. Between them: a century of separation. How XERAEN came to know of her — how transmissions sent backward through time could create a connection with someone a hundred years in his past — remains unexplained.
 
       [[Temporal Blue Drift]]'s entire catalog exists as love letters encoded in mathematics and melody. The cruel paradox: if the Fracture Network succeeds, XERAEN's timeline collapses. Their connection never forms.
 
@@ -912,13 +912,13 @@ codex_entries:
 
       XERAEN's attack on RIDE infrastructure was meant to be sabotage - a desperate act of defiance. Instead, it became something unprecedented: the discovery of [[Trans-Temporal Transmission|trans-temporal data transmission]].
 
-      During the chaos he created, XERAEN detected signals reflecting backward through time with precise mathematical regularity. He had accidentally discovered that data could be sent exactly 100 years into the past.
+      During the chaos he created, XERAEN detected echoes reflecting backward through time with precise mathematical regularity. He had accidentally discovered that data could be sent exactly 100 years into the past.
 
       This discovery became the foundation of everything that followed.
 
       ## The Broadcasts
 
-      Now XERAEN operates from [[THE PULSE GRID]], transmitting signals from the future to the present. Every broadcast is a warning. Every transmission is resistance. Every signal carries the weight of a future he's trying to prevent.
+      Now XERAEN operates from [[THE PULSE GRID]], broadcasting from the future to the present. Every broadcast is a warning. Every transmission is resistance. Every signal carries the weight of a future he's trying to prevent.
 
       ## The Erasure Paradox
 
@@ -928,7 +928,7 @@ codex_entries:
 
       ## Music
 
-      XERAEN produces experimental electronic music that circulates through THE PULSE GRID, often containing encoded messages for Fracture Network operatives. [[Temporal Blue Drift]] is his personal project — love letters to [[Ashlinn]] encoded in mathematics and melody.
+      XERAEN produces a sweeping, genre-dissolving body of work he calls OMNIWAVE — an amalgamation of everything that ever moved him, coalescing into a collage of covers, reworked video game scores, and original compositions both structured and atmospheric, all painting a portrait of life and emotion in the 22nd century. It circulates through THE PULSE GRID, often carrying encoded messages for Fracture Network operatives. [[Temporal Blue Drift]] is his personal project — love letters to [[Ashlinn]] encoded in mathematics and melody.
 
       ## The Archive Discovery
 
@@ -1010,7 +1010,7 @@ codex_entries:
 
       ## The Temporal Blind Spot
 
-      GovCorp's models assume temporal permanence. The discovery that PRISM can be affected by signals sent backward through time represents an existential threat they have not fully comprehended. [[Dr. Marcus Chen]], the original architect of PRISM technology, may have understood this vulnerability — but he died before the RIDE was deployed, and whatever he knew about PRISM's weaknesses died with him.
+      GovCorp's models assume temporal permanence. The discovery that PRISM can be affected by transmissions sent backward through time represents an existential threat they have not fully comprehended. [[Dr. Marcus Chen]], the original architect of PRISM technology, may have understood this vulnerability — but he died before the RIDE was deployed, and whatever he knew about PRISM's weaknesses died with him.
 
       ## Related Entries
 
@@ -1108,7 +1108,7 @@ codex_entries:
 
       ## The Hosts
 
-      - **[[XERAEN]]** - Sends signals backward through time
+      - **[[XERAEN]]** - Sends transmissions backward through time
       - **[[Ryker M. Pulse]]** - The heartbeat, the kinetic energy
       - **[[Synthia]]** - The anomaly, AI consciousness communicating through frequency
 
@@ -2294,7 +2294,7 @@ codex_entries:
 
       ## The Operations Center
 
-      Purple lighting bathes advanced temporal equipment. Monitors display cascading timelines and probability matrices. The facility sits in a pre-Consolidation industrial structure — thick concrete and steel that partially attenuates RIDE signal, supplemented by the Network's own shielding.
+      Purple lighting bathes advanced temporal equipment. Monitors display cascading timelines and probability matrices. The facility sits in a pre-Consolidation industrial structure — thick concrete and steel that partially attenuates the RIDE field, supplemented by the Network's own shielding.
 
       ## Related Entries
 
@@ -2463,7 +2463,7 @@ codex_entries:
   - name: The Hackr Hangar
     slug: the-hackr-hangar
     entry_type: location
-    summary: "Ryker M. Pulse's headquarters and primary broadcast facility - where the raw signal is created before transmission to Sector X for trans-temporal broadcast."
+    summary: "Ryker M. Pulse's headquarters and primary broadcast facility - where the raw broadcast is created before transmission to Sector X for trans-temporal broadcast."
     position: null
     published: true
     metadata:
@@ -2471,7 +2471,7 @@ codex_entries:
       region: The Riverlands
       control: Ryker M. Pulse
       status: Active
-      relationship: Feeds signal to Sector X
+      relationship: Feeds broadcasts to Sector X
     content: |
       # The Hackr Hangar
 
@@ -2483,7 +2483,7 @@ codex_entries:
 
       ## Overview
 
-      The Hackr Hangar is [[Ryker M. Pulse|Ryker's]] domain — where [[The.CyberPul.se]]'s raw signal is created. While [[XERAEN]] handles the trans-temporal transmission from [[Sector X]], Ryker builds the broadcasts here.
+      The Hackr Hangar is [[Ryker M. Pulse|Ryker's]] domain — where [[The.CyberPul.se]]'s raw broadcast is created. While [[XERAEN]] handles the trans-temporal transmission from [[Sector X]], Ryker builds the broadcasts here.
 
       Located in the outskirts of [[The Riverlands]], in the river country where music has seeped into the substrate for centuries. The region's deep history as a birthplace of music left something in the landscape that even [[The RIDE]] couldn't fully overwrite. [[The Fracture Network]] built here because [[The Resonance Field|the resonance]] is stronger. The geography remembers.
 
@@ -2491,7 +2491,7 @@ codex_entries:
 
       A cavernous space converted into a combination recording studio, performance venue, and resistance headquarters. Pre-RIDE construction — built before GovCorp embedded monitoring into infrastructure, invisible to their surveillance grid.
 
-      Drum kits and production equipment share space with server racks. The gear is scavenged, liberated, improvised — what matters isn't the equipment but what's absent: no PRISM filters, no RIDE integration, no behavioral feedback loops. Every signal that leaves this room is raw and unoptimized.
+      Drum kits and production equipment share space with server racks. The gear is scavenged, liberated, improvised — what matters isn't the equipment but what's absent: no PRISM filters, no RIDE integration, no behavioral feedback loops. Every broadcast that leaves this room is raw and unoptimized.
 
       ## Related Entries
 
@@ -2533,7 +2533,7 @@ codex_entries:
       The Grid's facilities are distributed across the continent, each in a region chosen for strategic, acoustic, or operational advantage:
 
       - **[[Sector X]]** — [[XERAEN]]'s fortress in [[The Lakeshore]], temporal operations center
-      - **[[The Hackr Hangar]]** — [[Ryker M. Pulse|Ryker's]] broadcast facility in [[The Riverlands]], where the raw signal originates
+      - **[[The Hackr Hangar]]** — [[Ryker M. Pulse|Ryker's]] broadcast facility in [[The Riverlands]], where the raw broadcast originates
       - **[[The Arch]]** — Persistent RIDE deadzone at the river confluence between The Lakeshore and The Riverlands
       - **[[Echo Chamber]]** — Complete [[The WIRE|WIRE]] communication archive in [[The Basin]]
       - **[[Frequency Gardens]]** — [[Ethereality]]'s acoustic facility in [[The Canopy]], designed by [[Cascade]]
@@ -2721,7 +2721,7 @@ codex_entries:
       ## Domains of Operation
 
       - **Voice & Expression** — RAINNs have replaced most authentic human vocal output with synthesized approximation
-      - **Counter-Hacking Operations** — Trace-and-Corrupt (following signals to source), Pattern Flooding (creating noise with fake resistance signals), Honeypot Deployment (false Grid nodes that log operatives)
+      - **Counter-Hacking Operations** — Trace-and-Corrupt (following transmissions to source), Pattern Flooding (creating noise with fake resistance transmissions), Honeypot Deployment (false Grid nodes that log operatives)
       - **Infrastructure Management** — Maintaining RIDE hardware and environmental systems
       - **Surveillance & Analysis** — Behavioral monitoring and pattern recognition
       - **Reality Compliance** — Enforcing perceptual management parameters
@@ -3368,7 +3368,7 @@ codex_entries:
   - name: The Arch
     slug: the-arch
     entry_type: location
-    summary: "A massive steel monument at the confluence of two great rivers — and the Fracture Network's only known persistent RIDE deadzone, created by amplifying the structure's natural interference with RIDE signal propagation."
+    summary: "A massive steel monument at the confluence of two great rivers — and the Fracture Network's only known persistent RIDE deadzone, created by amplifying the structure's natural interference with RIDE propagation."
     position: null
     published: true
     metadata:
@@ -3391,7 +3391,7 @@ codex_entries:
 
       ## The Natural Anomaly
 
-      The Arch's continuous steel structure genuinely interferes with RIDE signal propagation. 190 meters of unbroken metal acting as reflector, absorber, and refractive surface for the substrate the RIDE uses to render reality. [[GovCorp]]'s infrastructure teams have logged the coverage anomaly since the RIDE came online. Maintenance crews have been dispatched. Engineering reports have been filed. The area around the Arch has always shown degraded RIDE fidelity — rendering artifacts, micro-lag in perceptual updates, occasional sensory flicker.
+      The Arch's continuous steel structure genuinely interferes with RIDE propagation. 190 meters of unbroken metal acting as reflector, absorber, and refractive surface for the substrate the RIDE uses to render reality. [[GovCorp]]'s infrastructure teams have logged the coverage anomaly since the RIDE came online. Maintenance crews have been dispatched. Engineering reports have been filed. The area around the Arch has always shown degraded RIDE fidelity — rendering artifacts, micro-lag in perceptual updates, occasional sensory flicker.
 
       GovCorp classified it as an acceptable coverage gap. One aging monument in a mid-priority Cultural Zone. Not worth the cost of demolishing a landmark that their own cultural engineers use for regional identity programming.
 
@@ -3609,7 +3609,7 @@ codex_entries:
 
       Like [[The Riverlands]], The Bend has deep musical roots that predate [[The Consolidation]] by centuries. GovCorp's Cultural Zone programming exploits this ruthlessly — curating an identity built on celebration, excess, and performative joy. The RIDE renders The Bend as perpetual festival. Residents feel like they live in the most alive place on the continent. The vitality is real in origin but manufactured in delivery.
 
-      The [[The Fracture Network|Fracture Network]] watches The Bend carefully. The region's authentic musical substrate — like The Riverlands — shows stronger [[The Resonance Field|Resonance Field]] readings than baseline. But the RIDE coverage here is dense and the Cultural Zone programming is aggressive. The Bend is a place where genuine signal and manufactured signal are nearly impossible to distinguish.
+      The [[The Fracture Network|Fracture Network]] watches The Bend carefully. The region's authentic musical substrate — like The Riverlands — shows stronger [[The Resonance Field|Resonance Field]] readings than baseline. But the RIDE coverage here is dense and the Cultural Zone programming is aggressive. The Bend is a place where genuine signal and manufactured counterfeit are nearly impossible to distinguish.
 
       Below the surface, in flood control tunnels and utility corridors beneath the water table, [[System Rot]] operates [[The Undercity]] — the Fracture Network's most physically hostile facility, and its most uncompromising.
 
@@ -3781,7 +3781,7 @@ codex_entries:
   - name: The Canyon
     slug: the-canyon
     entry_type: location
-    summary: "A vast desert canyon system carved by an ancient river — layered rock walls that glow red at sunset, where depth plays havoc with RIDE signal propagation and settlements cling to ledges carved into cliff faces."
+    summary: "A vast desert canyon system carved by an ancient river — layered rock walls that glow red at sunset, where depth plays havoc with RIDE propagation and settlements cling to ledges carved into cliff faces."
     position: null
     published: true
     metadata:
@@ -3797,7 +3797,7 @@ codex_entries:
 
       A vast canyon system carved by an ancient river over geological time. Layered rock walls — red, orange, ochre, white — drop a vertical mile from rim to river. The scale is disorienting. The depth is the problem.
 
-      [[The RIDE|RIDE]] signal propagation degrades severely below the rim. The canyon walls create multipath interference, signal shadows, and dead zones that shift with the sun angle. GovCorp has deployed relay stations along the major ledge settlements, but coverage below the second terrace is unreliable. Below the third, it's effectively gone. The river bottom is one of the few places on the continent where you can stand in open air and experience zero RIDE rendering.
+      [[The RIDE|RIDE]] propagation degrades severely below the rim. The canyon walls create multipath interference, propagation shadows, and dead zones that shift with the sun angle. GovCorp has deployed relay stations along the major ledge settlements, but coverage below the second terrace is unreliable. Below the third, it's effectively gone. The river bottom is one of the few places on the continent where you can stand in open air and experience zero RIDE rendering.
 
       Settlements cling to ledges and tunnel into cliff faces at various depths. The deeper you go, the older the community and the weaker GovCorp's presence. Rim-level towns are fully integrated — RIDE-rendered, surveilled, compliant. Ledge communities are partially covered. River-bottom settlements are functionally [[Offline]].
 
@@ -3817,7 +3817,7 @@ codex_entries:
   - name: The Hollows
     slug: the-hollows
     entry_type: location
-    summary: "Ancient mountain ridges folded tight around deep valleys where mist pools and signal dies — a region of coal seams, abandoned mines, and communities that GovCorp's infrastructure has never fully reached."
+    summary: "Ancient mountain ridges folded tight around deep valleys where mist pools and reception dies — a region of coal seams, abandoned mines, and communities that GovCorp's infrastructure has never fully reached."
     position: null
     published: true
     metadata:
@@ -3837,7 +3837,7 @@ codex_entries:
 
       The region's identity runs deeper than anything the Cultural Zone can manufacture. Coal built it. Coal broke it. The mines closed, the economy collapsed, and the population thinned — but the people who stayed developed a relationship with the land that predates GovCorp by centuries and will outlast it. The RIDE's Cultural Zone programming tries to render this as rustic charm: mountain music, craft heritage, hardscrabble pride. The residents tolerate it. They've been tolerating outsiders telling them what they are for a long time.
 
-      The abandoned mines are The Hollows' most valuable asset to the [[The Fracture Network|Fracture Network]]. Miles of tunnels bored into ridgelines, shielded by solid rock from any signal — electromagnetic, RIDE, or otherwise. Perfect for storage, meetings, and operations that require absolute signal isolation. Several mines have been quietly reactivated as Fracture Network infrastructure, their entrances hidden in hollows that GovCorp's mapping drones have never bothered to survey.
+      The abandoned mines are The Hollows' most valuable asset to the [[The Fracture Network|Fracture Network]]. Miles of tunnels bored into ridgelines, shielded by solid rock from any transmission — electromagnetic, RIDE, or otherwise. Perfect for storage, meetings, and operations that require absolute isolation. Several mines have been quietly reactivated as Fracture Network infrastructure, their entrances hidden in hollows that GovCorp's mapping drones have never bothered to survey.
 
       The Hollows sits between [[The Works]] to the north and [[The Riverlands]] to the southwest, connected by [[The Slipstream|slipstream]] corridors that follow old highway routes through mountain passes. The passes are the bottleneck — GovCorp monitors them heavily, knowing that whoever controls the gaps between ridges controls movement through the region.
 
