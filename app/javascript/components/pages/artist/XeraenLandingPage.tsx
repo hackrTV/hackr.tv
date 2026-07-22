@@ -71,9 +71,10 @@ export const XeraenLandingPage: React.FC = () => {
                 The.CyberPul.se. <span style={{ color: colorScheme.primary, textShadow: `0 0 8px ${colorScheme.glow}` }}>Transmitting from {futureYear} — for as long as {futureYear} exists</span>.
               </p>
               <p style={{ color: '#aaa', marginBottom: '15px' }}>
-                The music has evolved from hardcore fury into something he calls OMNIWAVE — electronic
-                exploration where rhythmic guitars weave through synthesized frequencies and genre boundaries
-                dissolve. The sound changed. What it carries hasn't.
+                The music has evolved from hardcore fury into something he calls OMNIWAVE — an amalgamation
+                of everything that ever moved him: covers of songs, old video game scores, reinterpretations
+                and original compositions coalescing into one collage where genre boundaries dissolve. The
+                sound changed. What it carries hasn't.
               </p>
               <p style={{ color: '#888' }}>
                 If you're hearing this, the signal is still reaching you. That's what matters.

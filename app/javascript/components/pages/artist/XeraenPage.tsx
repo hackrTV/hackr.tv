@@ -77,7 +77,7 @@ const XeraenPage: React.FC = () => {
           </legend>
 
           <div className="band-profile-content">
-            {/* Signal Origin - Intro */}
+            {/* First Contact - Intro */}
             <div
               style={{
                 marginBottom: '30px',
@@ -98,7 +98,7 @@ const XeraenPage: React.FC = () => {
                   textShadow: `0 0 15px ${colorScheme.glowStrong}`
                 }}
               >
-                [:: SIGNAL ORIGIN ::]
+                [:: FIRST CONTACT ::]
               </h2>
               <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
                 <CodexText>
@@ -115,7 +115,7 @@ const XeraenPage: React.FC = () => {
                   textShadow: `0 0 10px ${colorScheme.glow}`
                 }}
               >
-                There was just a signal. Reaching backward. Hoping someone would hear.
+                There was just a signal. Reaching backward. Seeking to be heard.
               </p>
               <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px', fontSize: '1.05em' }}>
                 XERAEN doesn't perform. XERAEN transmits. Every track is a frequency aimed at a point in
@@ -194,12 +194,15 @@ const XeraenPage: React.FC = () => {
                     voltage of someone screaming into the void hoping the past would hear.
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                    But signals change over distance. What started as a sonic assault has transformed into
+                    But transmissions change over distance. What started as a sonic assault has transformed into
                     something XERAEN calls <span style={{ color: colorScheme.primary, fontWeight: 'bold' }}>OMNIWAVE</span> -
-                    an electronic-leaning exploration where rhythmic guitars weave through synthesized
-                    frequencies. Genre boundaries dissolve. The transmissions now include reinterpretations
-                    of other Fracture Network bands, their songs filtered through XERAEN's temporal emanations,
-                    broadcast back as something familiar yet displaced.
+                    every frequency at once. It's an amalgamation of everything that ever moved him, rhythmic
+                    guitars weaving through synthesized atmospheres until genre boundaries dissolve. It
+                    plays as collage: covers of songs, reinterpretations of other Fracture Network bands, even
+                    old video game scores pulled from the deep archive, all filtered through XERAEN's temporal
+                    emanations and broadcast back familiar yet displaced. Between the covers run his own
+                    compositions - some tightly structured, some pure atmosphere - painting a sweeping image
+                    of life and emotion in the 22nd century.
                   </p>
                   <p
                     style={{
@@ -210,7 +213,7 @@ const XeraenPage: React.FC = () => {
                       textShadow: `0 0 8px ${colorScheme.glow}`
                     }}
                   >
-                    From hardcore fury to OMNIWAVE frequencies - the signal evolves, but never stops transmitting.
+                    From hardcore fury to OMNIWAVE frequencies - the sound evolves, but the signal never stops.
                   </p>
                 </div>
               </fieldset>
@@ -256,8 +259,9 @@ const XeraenPage: React.FC = () => {
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     <CodexText>
                       In {futureYear}, XERAEN operates alone. [[The Fracture Network]] has cells, bands, operatives - but
-                      someone has to sit at the console. Someone has to maintain the signal. Someone has to keep
-                      transmitting even when there's no way to know if anyone is listening.
+                      someone has to sit at the console. Someone has to hold the frequency. Someone has to keep
+                      transmitting to the ones who decoded it and wrote back across a hundred years - the ones he
+                      can reach but never stand beside.
                     </CodexText>
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8' }}>
@@ -406,7 +410,7 @@ const XeraenPage: React.FC = () => {
                       The Weight of the Console
                     </h3>
                     <p style={{ color: '#ddd', lineHeight: '1.8' }}>
-                      Someone has to stay. Someone has to keep the signal alive while others fight, infiltrate,
+                      Someone has to stay. Someone has to keep the frequency open while others fight, infiltrate,
                       resist. XERAEN chose the console. Chose to be the voice rather than the fist. Chose
                       transmission over action. These tracks are what that choice sounds like - the profound
                       isolation of being the one who stays behind and broadcasts.
@@ -449,7 +453,7 @@ const XeraenPage: React.FC = () => {
                     </CodexText>
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
-                    The solo work is a countdown. Each transmission potentially the last. Each signal sent
+                    The solo work is a countdown. Each transmission potentially the last. Each one sent
                     with the knowledge that success means silence.
                   </p>
                   <p
@@ -506,7 +510,7 @@ const XeraenPage: React.FC = () => {
                   </div>
                   <p style={{ color: '#ddd', lineHeight: '1.8', marginBottom: '15px' }}>
                     If you're hearing this, the paradox holds. XERAEN still exists in {futureYear}, still
-                    maintains the signal, still sends transmissions backward through the century. The future
+                    holds the frequency, still sends transmissions backward through the century. The future
                     hasn't changed yet.
                   </p>
                   <p style={{ color: '#ccc', lineHeight: '1.8', marginBottom: '15px' }}>
@@ -544,8 +548,8 @@ const XeraenPage: React.FC = () => {
                 <p style={{ marginBottom: '10px' }}>I broadcast from a future I'm trying to prevent.</p>
                 <p style={{ marginBottom: '10px' }}>I send love letters to someone I'll never meet if we win.</p>
                 <p style={{ marginBottom: '10px' }}>I make music that documents my own eventual non-existence.</p>
-                <p style={{ marginBottom: '10px', marginTop: '20px' }}>The signal is all I have. The signal is all I am.</p>
-                <p style={{ marginBottom: '10px' }}>When it stops, so do I.</p>
+                <p style={{ marginBottom: '10px', marginTop: '20px' }}>The signal is all I have. It was never mine.</p>
+                <p style={{ marginBottom: '10px' }}>When I stop, it won't.</p>
                 <p style={{ marginBottom: '10px', marginTop: '20px' }}>But you'll remember the frequency.</p>
                 <p style={{ marginBottom: '10px' }}>Somewhere in the static, I'll still be reaching for you.</p>
               </blockquote>

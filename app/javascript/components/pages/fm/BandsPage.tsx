@@ -43,7 +43,7 @@ export const BandsPage: React.FC = () => {
     const futureYear = currentYear + 100
     const descriptions: { [key: string]: string } = {
       'thecyberpulse': `The original Fracture Network band, forging Hackrcore transmissions from ${futureYear} to rally The Listeners.`,
-      'xeraen': 'OMNIWAVE Genesis Vector - Electronic exploration with rhythmic guitars',
+      'xeraen': 'OMNIWAVE Genesis Vector - Every frequency at once. Covers, game scores, and originals painting the 22nd century.',
       'injection-vector': 'Physical infiltration specialists. When stealth fails, deathcore brutality prevails.',
       'wavelength-zero': 'Where technical precision meets raw emotion in perfect restorative atmospheric harmony.',
       'cipher-protocol': 'Data couriers wielding djent with precision. No vocals. The complexity carries what words cannot.',
