@@ -1587,10 +1587,11 @@ namespace :data do
     data = YAML.load_file(yaml_file)
     entries_data = data["codex_entries"]
     created = 0
+    updated = 0
 
     entries_data.each do |attrs|
       entry = CodexEntry.find_or_initialize_by(slug: attrs["slug"])
-      next unless entry.new_record?
+      was_new = entry.new_record?
 
       entry.assign_attributes(
         name: attrs["name"],
@@ -1602,11 +1603,12 @@ namespace :data do
         metadata: attrs["metadata"]
       )
       entry.save!
-      created += 1
-      puts "  ✓ Created: #{entry.name} (#{entry.entry_type})"
+      created += 1 if was_new
+      updated += 1 unless was_new
+      puts "  ✓ #{was_new ? "Created" : "Updated"}: #{entry.name} (#{entry.entry_type})"
     end
 
-    puts "Codex Entries: #{created} created, #{CodexEntry.count} total"
+    puts "Codex Entries: #{created} created, #{updated} updated, #{CodexEntry.count} total"
   end
 
   desc "Load handbook sections and articles from YAML"
@@ -1678,6 +1680,7 @@ namespace :data do
     data = YAML.load_file(yaml_file)
     logs_data = data["hackr_logs"]
     created = 0
+    updated = 0
 
     logs_data.each do |attrs|
       grid_hackr = GridHackr.find_by(hackr_alias: attrs["author"])
@@ -1687,7 +1690,7 @@ namespace :data do
       end
 
       log = HackrLog.find_or_initialize_by(slug: attrs["slug"])
-      next unless log.new_record?
+      was_new = log.new_record?
 
       # Parse lore date (subtract 100 years for database storage)
       published_at = nil
@@ -1705,11 +1708,12 @@ namespace :data do
         published_at: published_at
       )
       log.save!
-      created += 1
-      puts "  ✓ Created: #{log.title}"
+      created += 1 if was_new
+      updated += 1 unless was_new
+      puts "  ✓ #{was_new ? "Created" : "Updated"}: #{log.title}"
     end
 
-    puts "Hackr Logs: #{created} created, #{HackrLog.count} total"
+    puts "Hackr Logs: #{created} created, #{updated} updated, #{HackrLog.count} total"
   end
 
   desc "Load wire (pulses and echoes) from YAML"
