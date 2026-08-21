@@ -1,0 +1,32 @@
+<% content_for :title, "#{@repo.name} — Code" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "rouge", "data-turbo-track": "reload" %>
+<% end %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="code-wrap">
+    <div class="code-panel">
+      <% if @view_mode == :root %>
+        <div class="code-repo-header">
+          <h1><%= @repo.name %></h1>
+          <% if @repo.description.present? %>
+            <p><%= @repo.description %></p>
+          <% end %>
+          <div class="code-repo-header-meta">
+            <% if @repo.language.present? %><span><%= @repo.language %></span><% end %>
+            <% if @repo.stargazers_count.to_i.positive? %><span>★ <%= @repo.stargazers_count %></span><% end %>
+            <span><%= @repo.default_branch %></span>
+          </div>
+        </div>
+      <% end %>
+
+      <%= render "breadcrumb", repo_slug: @repo.slug, path: @path, is_blob: @view_mode == :blob %>
+
+      <% if @view_mode == :blob %>
+        <%= render "blob", blob: @blob %>
+      <% else %>
+        <%= render "tree", repo_slug: @repo.slug, entries: @entries %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

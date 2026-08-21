@@ -1,0 +1,19 @@
+<%# CodeTreeView.tsx port. Locals: repo_slug, entries. %>
+<% if entries.empty? %>
+  <div class="code-tree-empty">Empty directory</div>
+<% else %>
+  <div class="code-tree">
+    <% entries.each do |entry| %>
+      <%
+        entry_type = entry[:type] || entry["type"]
+        entry_path = entry[:path] || entry["path"]
+        entry_name = entry[:name] || entry["name"]
+        href = (entry_type == "tree") ? code_tree_path(repo_slug, entry_path) : code_blob_path(repo_slug, entry_path)
+      %>
+      <%= link_to href, class: "code-tree-entry#{" dir" if entry_type == "tree"}" do %>
+        <span class="code-tree-icon"><%= (entry_type == "tree") ? "▸" : " " %></span>
+        <span><%= entry_name %></span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

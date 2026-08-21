@@ -14,7 +14,14 @@ import { useCodexMappings } from '~/hooks/useCodexMappings'
 // the SPA would otherwise 404.
 const RAILS_ONLY_PATHS = [
   '/terminal',
-  '/root'
+  '/root',
+  // Hotwire-migrated (Phase 1) — full page load from the SPA:
+  '/logs',
+  '/codex',
+  '/handbook',
+  '/schedule',
+  '/timeline',
+  '/code'
 ]
 
 const isRailsOnlyPath = (href: string) =>

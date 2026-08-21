@@ -69,22 +69,22 @@ Rails.application.routes.draw do
   # Shared playlist - public (SPA)
   get "shared/:token", to: "pages#spa_root", as: :shared_playlist
 
-  # HackrLogs (blog) routes - SPA
+  # HackrLogs (blog) routes — Hotwire (migrated Phase 1)
   scope "logs" do
-    get "/", to: "pages#spa_root", as: :hackr_logs
-    get ":id", to: "pages#spa_root", as: :hackr_log
+    get "/", to: "logs#index", as: :hackr_logs
+    get ":id", to: "logs#show", as: :hackr_log
   end
 
-  # Code browser routes - SPA
+  # Code browser routes — Hotwire (migrated Phase 1)
   scope "code" do
-    get "/", to: "pages#spa_root", as: :code
-    get ":repo", to: "pages#spa_root", as: :code_repo
-    get ":repo/tree/*path", to: "pages#spa_root", as: :code_tree, format: false
-    get ":repo/blob/*path", to: "pages#spa_root", as: :code_blob, format: false
+    get "/", to: "code#index", as: :code
+    get ":repo", to: "code#show", as: :code_repo
+    get ":repo/tree/*path", to: "code#tree", as: :code_tree, format: false
+    get ":repo/blob/*path", to: "code#blob", as: :code_blob, format: false
   end
 
-  # Timeline route - SPA
-  get "timeline", to: "pages#spa_root", as: :timeline
+  # Timeline route — Hotwire (migrated Phase 1)
+  get "timeline", to: "timeline#show", as: :timeline
 
   # Achievements (login-gated SPA)
   get "achievements", to: "pages#spa_root", as: :achievements
@@ -99,22 +99,22 @@ Rails.application.routes.draw do
   get "deck", to: "pages#spa_root", as: :deck_page
   get "transit", to: "pages#spa_root", as: :transit_page
 
-  # Stream schedule (SPA)
-  get "schedule", to: "pages#spa_root", as: :streams_schedule
+  # Stream schedule — Hotwire (migrated Phase 1)
+  get "schedule", to: "schedule#show", as: :streams_schedule
 
   # World Event Feed (SPA)
   get "feed", to: "pages#spa_root", as: :world_feed
 
-  # Codex (wiki) routes - SPA
+  # Codex (wiki) routes — Hotwire (migrated Phase 1)
   scope "codex" do
-    get "/", to: "pages#spa_root", as: :codex
-    get ":slug", to: "pages#spa_root", as: :codex_entry
+    get "/", to: "codex#index", as: :codex
+    get ":slug", to: "codex#show", as: :codex_entry
   end
 
-  # Handbook (practical docs for GridHackr users) - SPA
+  # Handbook (practical docs for GridHackr users) — Hotwire (migrated Phase 1)
   scope "handbook" do
-    get "/", to: "pages#spa_root", as: :handbook
-    get ":slug", to: "pages#spa_root", as: :handbook_article
+    get "/", to: "handbook#index", as: :handbook
+    get ":slug", to: "handbook#show", as: :handbook_article
   end
 
   # Vanity profile URLs: /@alias redirects to the canonical /wire/alias.

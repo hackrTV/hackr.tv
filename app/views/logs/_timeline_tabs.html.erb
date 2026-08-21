@@ -1,0 +1,29 @@
+<%# Both tab variants render; CSS media queries show side tabs ≥1024px
+    (TimelineSideTabs.tsx) and inline tabs below (mobile/tablet). Locals:
+    timelines, current_timeline, sort. %>
+<% keys = LogsController::TIMELINE_ORDER.select { |tl| timelines.key?(tl) } %>
+
+<div class="logs-tabs-side">
+  <% keys.each do |tl| %>
+    <% config = LogsController::TIMELINE_CONFIG[tl] %>
+    <% info = timelines[tl] %>
+    <%= link_to hackr_logs_path(timeline: tl, page: 1, sort: sort), class: "logs-tab-side#{" active" if tl == current_timeline}" do %>
+      <% if config %>
+        <span class="tl-era"><%= timeline_era(info) %></span><br>
+        <span class="tl-name"><%= config[:name] %> (<%= info[:count] %>)</span>
+      <% else %>
+        <span class="tl-name"><%= tl %> (<%= info[:count] %>)</span>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="logs-tabs-inline">
+  <% keys.each do |tl| %>
+    <% config = LogsController::TIMELINE_CONFIG[tl] %>
+    <% info = timelines[tl] %>
+    <%= link_to hackr_logs_path(timeline: tl, page: 1, sort: sort), class: "tui-button logs-tab-inline#{" active" if tl == current_timeline}" do %>
+      <% if config %><%= timeline_era(info) %> — <%= config[:name] %> (<%= info[:count] %>)<% else %><%= tl %> (<%= info[:count] %>)<% end %>
+    <% end %>
+  <% end %>
+</div>

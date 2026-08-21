@@ -1,0 +1,26 @@
+<%# TimelineEvent.tsx port. Era colors arrive via CSS variables from the
+    section; intercepted events get the red treatment + CLASSIFIED watermark. %>
+<div class="tl-event<%= " intercepted" if event["isIntercepted"] %>">
+  <div class="tl-dot"></div>
+  <div class="tl-card">
+    <% if event["isIntercepted"] %>
+      <div class="tl-classified">CLASSIFIED</div>
+      <span class="tl-intercepted-badge">INTERCEPTED</span>
+    <% end %>
+    <div class="tl-date"><%= event["date"] %></div>
+    <div class="tl-event-title"><%= event["title"] %></div>
+    <% if event["description"].present? %>
+      <div class="tl-desc"><%= event["description"] %></div>
+    <% end %>
+    <% if event["logSlug"].present? || event["codexSlug"].present? %>
+      <div class="tl-links">
+        <% if event["logSlug"].present? %>
+          <%= link_to "Read Log →", hackr_log_path(event["logSlug"]), class: "tl-log-link" %>
+        <% end %>
+        <% if event["codexSlug"].present? %>
+          <%= link_to "View in Codex →", codex_entry_path(event["codexSlug"]), class: "tl-codex-link" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

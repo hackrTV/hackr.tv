@@ -1,0 +1,11 @@
+<%# ERB port of LiveNowBanner.tsx — server-rendered when a stream is live
+    at page load. Real-time appearance (go-live mid-page) lands in Phase 3. %>
+<div class="live-banner">
+  <div class="live-banner-sweep"></div>
+  <span class="live-banner-inner">
+    <span class="live-banner-label">[ LIVE NOW ]</span>
+    <span class="live-banner-title"> <%= stream.title %><%= " — #{stream.artist.name}" if stream.artist %></span>
+    <%= nav_link_to "/", css_class: "live-banner-watch" do %>WATCH LIVE →<% end %>
+  </span>
+</div>
+<div class="live-banner-spacer"></div>

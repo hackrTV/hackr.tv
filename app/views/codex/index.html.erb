@@ -1,0 +1,84 @@
+<% content_for :title, "The Codex — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="codex-wrap" data-controller="codex-filter">
+    <div class="tui-window cyan-168 white-text" style="display: block;">
+      <fieldset class="cyan-168-border">
+        <legend class="center">THE CODEX :: Knowledge Archive</legend>
+        <div class="codex-intro">
+          <p>A comprehensive archive of people, organizations, events, and technologies within the Fracture Network's records</p>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="codex-filters">
+      <div>
+        <label for="codex-search" class="codex-filter-label">SEARCH:</label>
+        <input id="codex-search" type="text" placeholder="Search by name or summary..."
+               class="tui-input codex-search"
+               data-codex-filter-target="search" data-action="input->codex-filter#filter">
+      </div>
+
+      <div>
+        <span class="codex-filter-label">FILTER BY TYPE:</span>
+        <div class="codex-type-buttons">
+          <button class="tui-button cyan-168" data-type="all"
+                  data-codex-filter-target="typeButton" data-action="click->codex-filter#setType">
+            All (<%= @entries.size %>)
+          </button>
+          <% @entry_types.each do |type| %>
+            <button class="tui-button grey-168" data-type="<%= type %>"
+                    data-codex-filter-target="typeButton" data-action="click->codex-filter#setType">
+              <%= CodexController::ENTRY_TYPE_ICONS[type] %> <%= type.capitalize %> (<%= @type_counts[type] %>)
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="codex-count" data-codex-filter-target="count">
+      Showing <%= @entries.size %> of <%= @entries.size %> entries
+    </div>
+
+    <div class="codex-grid" data-codex-filter-target="grid">
+      <% @entries.each do |entry| %>
+        <%
+          color = CodexController::ENTRY_TYPE_COLORS[entry.entry_type] || "#888"
+          metadata = entry.metadata || {}
+          haystack = ([entry.name, entry.summary] +
+            metadata.flat_map { |k, v| [k.to_s, Array(v).map(&:to_s)] }.flatten).compact.join(" ").downcase
+        %>
+        <%= link_to codex_entry_path(entry.slug), class: "codex-card-link",
+              data: {codex_filter_target: "card", entry_type: entry.entry_type, search: haystack} do %>
+          <div class="tui-window white-text codex-card" style="--type-color: <%= color %>;">
+            <div class="codex-card-inner">
+              <div class="codex-badge-row">
+                <span class="codex-type-badge"><%= CodexController::ENTRY_TYPE_ICONS[entry.entry_type] %> <%= entry.entry_type %></span>
+              </div>
+              <h3 class="codex-card-name"><%= entry.name %></h3>
+              <% if entry.summary.present? %>
+                <p class="codex-card-summary"><%= entry.summary %></p>
+              <% end %>
+              <% visible_meta = metadata.reject { |k, _| k.to_s == "search_tags" }.first(3) %>
+              <% if visible_meta.any? %>
+                <div class="codex-card-tags">
+                  <% visible_meta.each do |key, value| %>
+                    <span class="codex-card-tag"><%= key %>: <%= value %></span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="tui-window white-text codex-empty" data-codex-filter-target="empty" style="display: none;">
+      <p>
+        No entries found matching your criteria.
+        <br>
+        <span style="font-size: 0.9em;">Try adjusting your filters or search query...</span>
+      </p>
+    </div>
+  </div>
+<% end %>

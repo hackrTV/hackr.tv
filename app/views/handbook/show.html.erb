@@ -1,0 +1,59 @@
+<% content_for :title, "#{@article.title} — Hackr Handbook" %>
+<% kind_color = HandbookController::KIND_COLORS[@article.kind] || HandbookController::ACCENT %>
+
+<%= render layout: "handbook_chrome", locals: {current_section: @article.handbook_section.slug, current_article: @article.slug} do %>
+  <div class="tui-window cyan-168 white-text" style="--type-color: <%= kind_color %>;">
+    <fieldset class="cyan-168-border">
+      <legend class="center"><%= @article.handbook_section.name.upcase %></legend>
+      <div class="hb-panel">
+        <div class="hb-breadcrumb">
+          <%= link_to "Handbook", handbook_path %>
+          <span class="hb-breadcrumb-sep">/</span>
+          <span style="color: #a0a0a0;"><%= @article.handbook_section.name %></span>
+          <span class="hb-breadcrumb-sep">/</span>
+          <span style="color: #d0d0d0;"><%= @article.title %></span>
+        </div>
+
+        <div class="hb-badges">
+          <span class="hb-kind-badge"><%= @article.kind %></span>
+          <% if @article.difficulty.present? %>
+            <span class="hb-difficulty-badge"><%= @article.difficulty %></span>
+          <% end %>
+        </div>
+
+        <h1 class="hb-article-title"><%= @article.title %></h1>
+
+        <% if @article.summary.present? %>
+          <div class="hb-summary"><p><%= @article.summary %></p></div>
+        <% end %>
+
+        <% if @article.body.present? %>
+          <div class="codex-content"><%= markdown_content(@article.body) %></div>
+        <% end %>
+
+        <% if @prev_article || @next_article %>
+          <div class="hb-prevnext">
+            <div>
+              <% if @prev_article %>
+                <%= link_to handbook_article_path(@prev_article.slug), class: "hb-prevnext-card" do %>
+                  <div class="hb-prevnext-label">← PREVIOUS</div>
+                  <div class="hb-prevnext-title"><%= @prev_article.title %></div>
+                <% end %>
+              <% end %>
+            </div>
+            <div class="hb-prevnext-right">
+              <% if @next_article %>
+                <%= link_to handbook_article_path(@next_article.slug), class: "hb-prevnext-card" do %>
+                  <div class="hb-prevnext-label">NEXT →</div>
+                  <div class="hb-prevnext-title"><%= @next_article.title %></div>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="hb-updated">Last updated: <%= future_datetime(@article.updated_at) %></div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

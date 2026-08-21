@@ -1,0 +1,30 @@
+<%# CodeBlobView.tsx port: line-numbered rouge-highlighted source, or
+    rendered markdown for .md files. Locals: blob {content:, language:, name:, size:}. %>
+<%
+  content = blob[:content]
+  is_markdown = blob[:name].to_s.downcase.end_with?(".md")
+  lines = content.split("\n", -1)
+%>
+<div class="code-blob">
+  <div class="code-blob-header">
+    <span><%= lines.length %> lines</span>
+    <span><%= code_format_size(blob[:size]) %></span>
+  </div>
+
+  <% if is_markdown %>
+    <div class="code-md-wrap">
+      <div class="code-markdown-content">
+        <%= MarkdownRenderer.render_user(content) %>
+      </div>
+    </div>
+  <% else %>
+    <div class="code-blob-body">
+      <div class="code-gutter">
+        <% lines.each_index do |i| %>
+          <div><%= i + 1 %></div>
+        <% end %>
+      </div>
+      <pre class="code-pre"><%= rouge_highlight(content, blob[:language], blob[:name]) %></pre>
+    </div>
+  <% end %>
+</div>

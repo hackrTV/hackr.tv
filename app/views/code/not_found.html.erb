@@ -1,0 +1,7 @@
+<% content_for :title, "Not found — Code" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="code-wrap">
+    <div class="code-error">Repository or path not found. <%= link_to "← Back to code", code_path %></div>
+  </div>
+<% end %>

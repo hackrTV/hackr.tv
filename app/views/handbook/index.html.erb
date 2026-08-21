@@ -1,0 +1,63 @@
+<% content_for :title, "Hackr Handbook — hackr.tv" %>
+<% total_articles = @articles_by_section.values.sum(&:size) %>
+
+<%= render layout: "handbook_chrome", locals: {} do %>
+  <div class="tui-window cyan-168 white-text">
+    <fieldset class="cyan-168-border">
+      <legend class="center">HACKR HANDBOOK</legend>
+      <div class="hb-panel">
+        <h1 class="hb-h1">Operator's Field Manual</h1>
+        <p class="hb-intro">
+          Practical documentation for using hackr.tv — THE PULSE GRID, WIRE, Uplink, Vault,
+          the terminal interface, and everything in between.
+          <% if total_articles.positive? %>
+            <span class="hb-intro-count"><%= @sections.size %> sections · <%= total_articles %> articles</span>
+          <% end %>
+        </p>
+
+        <% if @recent.any? %>
+          <div class="hb-recent">
+            <h2>:: RECENTLY UPDATED ::</h2>
+            <ul>
+              <% @recent.each do |article| %>
+                <li>
+                  <%= link_to handbook_article_path(article.slug) do %>
+                    <span class="hb-recent-title"><%= article.title %></span><span class="hb-recent-section"> — <%= article.handbook_section.name %></span><span class="hb-recent-date"><%= future_datetime(article.updated_at) %></span>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <h2 class="hb-toc-heading">:: TABLE OF CONTENTS ::</h2>
+
+        <div class="hb-toc-grid">
+          <% @sections.each do |section| %>
+            <div class="hb-toc-section">
+              <h3>
+                <% if section.icon.present? %><span class="hb-section-icon"><%= section.icon %></span> <% end %><%= section.name %>
+              </h3>
+              <% if section.summary.present? %>
+                <p class="hb-toc-summary"><%= section.summary %></p>
+              <% end %>
+              <ul>
+                <% articles = @articles_by_section[section.id] || [] %>
+                <% articles.each do |article| %>
+                  <li>
+                    <%= link_to handbook_article_path(article.slug), class: "hb-toc-link" do %>
+                      <% if article.kind == "tutorial" %><span class="hb-tutorial-mark">▶</span><% end %><span class="hb-toc-title"><%= article.title %></span><% if article.difficulty.present? %><span class="hb-toc-difficulty">[<%= article.difficulty %>]</span><% end %>
+                    <% end %>
+                  </li>
+                <% end %>
+                <% if articles.empty? %>
+                  <li class="hb-toc-empty">No articles yet.</li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

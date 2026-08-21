@@ -1,0 +1,61 @@
+<% content_for :title, "Hackr Logs — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="logs-wrap">
+    <%= render "timeline_tabs", timelines: @timelines, current_timeline: @timeline, sort: @sort %>
+
+    <div class="logs-panel">
+      <div class="logs-header">
+        <h1 class="logs-title">HACKR LOGS</h1>
+      </div>
+
+      <div class="logs-subhead">
+        <p class="logs-subtitle"><%= @config[:subtitle] %></p>
+        <%= link_to (@sort == "desc") ? "Newest first ↓" : "Oldest first ↑",
+          hackr_logs_path(timeline: @timeline, page: 1, sort: (@sort == "desc") ? "asc" : "desc"),
+          class: "logs-sort" %>
+      </div>
+
+      <% if @logs.any? %>
+        <% @logs.each do |log| %>
+          <div class="logs-card">
+            <h2><%= link_to log.title, hackr_log_path(log.slug), class: "logs-card-title" %></h2>
+            <div class="logs-meta">
+              <span class="logs-meta-label">Published:</span>
+              <span class="logs-meta-value"><%= future_datetime(log.published_at) %></span>
+              <span class="logs-meta-sep">•</span>
+              <span class="logs-meta-label">By:</span>
+              <span class="logs-meta-value"><%= log.grid_hackr.hackr_alias %></span>
+            </div>
+            <div class="logs-excerpt"><%= markdown_plain_excerpt(log.body) %></div>
+            <div><%= link_to "Read more →", hackr_log_path(log.slug), class: "logs-readmore" %></div>
+          </div>
+        <% end %>
+
+        <% if @total_pages > 1 %>
+          <div class="logs-pagination">
+            <% if @page > 1 %>
+              <%= link_to "« Prev", hackr_logs_path(timeline: @timeline, page: @page - 1, sort: @sort), class: "logs-page-btn" %>
+            <% else %>
+              <span class="logs-page-btn disabled">« Prev</span>
+            <% end %>
+            <span class="logs-page-info">Page <%= @page %> of <%= @total_pages %></span>
+            <% if @page < @total_pages %>
+              <%= link_to "Next »", hackr_logs_path(timeline: @timeline, page: @page + 1, sort: @sort), class: "logs-page-btn" %>
+            <% else %>
+              <span class="logs-page-btn disabled">Next »</span>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="logs-empty">
+          <p>
+            No transmissions available yet.
+            <br>
+            <span style="font-size: 0.9em;">Check back soon for updates from the Fracture Network...</span>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

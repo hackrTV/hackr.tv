@@ -1,0 +1,40 @@
+<%# ERB port of DefaultLayout.tsx (the nav itself renders in the hotwire
+    layout). Wrap page content:
+      <%%= render layout: "shared/default_chrome", locals: {ascii: false} do %%> … <%% end %%>
+    Locals: ascii (default true), hide_live_banner (default false).
+    Live banner is server-rendered at page load; real-time go-live inserts
+    arrive with Phase 3 (StreamStatusChannel). %>
+<% ascii = local_assigns.fetch(:ascii, true) %>
+<% hide_live_banner = local_assigns.fetch(:hide_live_banner, false) %>
+
+<% if !hide_live_banner && (live_stream = HackrStream.includes(:artist).current_live) %>
+  <%= render "shared/live_now_banner", stream: live_stream %>
+<% end %>
+
+<br class="chrome-desktop-only">
+
+<% if ascii %>
+  <div class="chrome-ascii chrome-desktop-only white-168-text">
+    <%= nav_link_to "/" do %><pre id="greetings"> __  __                   __            ______  __  __
+/\ \/\ \                 /\ \          /\__  _\/\ \/\ \
+\ \ \_\ \     __      ___\ \ \/'\   _ _\/_/\ \/\ \ \ \ \
+ \ \  _  \  /'__`\   /'___\ \ , <  /\`'__\\ \ \ \ \ \ \ \
+  \ \ \ \ \/\ \L\._/\ \__/\ \ \\`\\ \ \/ _\ \ \ \ \ \_/ \
+   \ \_\ \_\ \__/.\_\ \____\\ \_\ \_\ \_\/\_\ \_\ \ `\___/
+    \/_/\/_/\/__/\/_/\/____/ \/_/\/_/\/_/\/_/\/_/  `\/__/</pre><% end %>
+  </div>
+  <br class="chrome-desktop-only">
+  <div class="chrome-mobile-logo chrome-mobile-only white-168-text">
+    <%= nav_link_to "/" do %>HACKR.TV<% end %>
+  </div>
+<% end %>
+
+<%= render "shared/footer_menu" %>
+
+<div class="chrome-content mb-20 pb-50">
+  <%= yield %>
+</div>
+
+<div class="chrome-mobile-menu chrome-mobile-only" data-controller="menu-button">
+  <button class="mobile-menu-toggle" data-action="click->menu-button#open">[≡] MENU</button>
+</div>
