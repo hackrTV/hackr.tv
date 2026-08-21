@@ -1,0 +1,18 @@
+<% content_for :title, "Map Spike — hackr.tv" %>
+<% t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC) %>
+
+<div style="padding: 12px 20px; font-family: 'Courier New', Courier, monospace;">
+  <h1 class="purple-168-text" style="margin-bottom: 4px;">MAP SPIKE — <%= @map.zone[:name] %></h1>
+  <p style="margin-bottom: 8px;">
+    hackr=<%= @hackr.hackr_alias %> ·
+    rooms=<%= @map.rooms.size %> · exits=<%= @map.exits.size %> · ghosts=<%= @map.ghost_rooms.size %> ·
+    builder=<%= @build_ms %>ms ·
+    <span data-spike-map-note>wheel = zoom · drag = pan · click room = select</span>
+    <span id="spike-map-selected" style="color: #fbbf24;"></span>
+  </p>
+
+  <%= render "zone_map_svg", map: @map %>
+
+  <% render_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000).round(1) %>
+  <p style="margin-top: 8px;">view render (builder + SVG ERB)=<%= render_ms %>ms</p>
+</div>

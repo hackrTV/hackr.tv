@@ -1,0 +1,8 @@
+<% content_for :title, "Player Spike A — hackr.tv" %>
+
+<div style="padding: 20px; font-family: 'Courier New', Courier, monospace;">
+  <h1 class="purple-168-text">PLAYER SPIKE — PAGE A</h1>
+  <%= render "spike_player" %>
+  <p><%= link_to "→ page B", hotwire_spike_player_b_path %></p>
+  <%= button_to "same-page refresh (redirect)", hotwire_spike_player_refresh_path %>
+</div>

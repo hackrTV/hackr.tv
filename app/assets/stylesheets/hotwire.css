@@ -1,0 +1,155 @@
+/* Hotwire-layout styles: ERB nav (desktop dropdowns + mobile overlay),
+ * flash messages, toast region. Nav rules ported verbatim from the inline
+ * <style> blocks in HeaderMenu.tsx; desktop/mobile variants are toggled by
+ * media query at 768px (replaces the JS useMobileDetect breakpoint). */
+
+.nav-mobile { display: none; }
+@media (max-width: 767px) {
+  .nav-desktop { display: none; }
+  .nav-mobile { display: block; }
+}
+
+/* --- Desktop nav (HeaderMenu.tsx desktop <style>) --- */
+.nav-desktop ul { list-style: none; margin: 0; padding: 0; }
+.header-dropdown {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  padding: 1px 3px;
+}
+.header-dropdown:hover { background-color: rgb(0, 168, 0); }
+.header-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: rgb(168, 168, 168);
+  min-width: 200px;
+  padding: 6px;
+  z-index: 9999;
+}
+.header-dropdown-content.open { display: block; }
+.header-dropdown-content ul {
+  border: 2px black solid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.header-dropdown-content ul li { display: block; margin: 6px; }
+.header-dropdown-content ul li a {
+  display: block;
+  color: black;
+  text-decoration: none;
+  padding: 2px 4px;
+}
+.header-dropdown-content ul li a:hover { background-color: rgb(0, 168, 0); }
+.header-nav-item { display: inline-block; margin-left: 10px; padding: 1px 3px; }
+.header-nav-item:hover { background-color: rgb(0, 168, 0); }
+.header-nav-item.active { background-color: rgba(124, 58, 237, 0.5); }
+.header-nav-item.active a { color: black; }
+.header-nav-item a { display: block; color: black; text-decoration: none; }
+.header-dropdown.active { background-color: rgba(124, 58, 237, 0.5); }
+.nav-dc { color: #dc2626; }
+
+/* --- Mobile nav (HeaderMenu.tsx mobile <style>) --- */
+.mobile-menu-toggle-wrap { padding: 5px 10px; position: relative; z-index: 1000; }
+.mobile-menu-toggle {
+  background: #0a0a0a;
+  border: 2px solid #7c3aed;
+  color: #7c3aed;
+  padding: 8px 16px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 0;
+  font-weight: bold;
+}
+.mobile-menu-toggle:active { background: #7c3aed; color: #0a0a0a; }
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 20px;
+}
+.mobile-menu-overlay.open { display: block; }
+.mobile-menu-container {
+  background: #0a0a0a;
+  border: 2px solid #7c3aed;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #7c3aed;
+}
+.mobile-menu-title {
+  color: #7c3aed;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 18px;
+  font-weight: bold;
+}
+.mobile-menu-close {
+  background: none;
+  border: 2px solid #ef4444;
+  color: #ef4444;
+  padding: 4px 12px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.mobile-menu-section { margin-bottom: 20px; }
+.mobile-menu-section-title {
+  color: #5cb3cc;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.mobile-menu-item {
+  color: #ccc;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  padding: 8px 12px;
+  display: block;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+.mobile-menu-item:active,
+.mobile-menu-item.active {
+  background: rgba(124, 58, 237, 0.2);
+  border-left: 3px solid #7c3aed;
+}
+.mobile-menu-item .purple-168-text { color: #a78bfa; }
+.mobile-menu-item .red-255-text { color: #ef4444; }
+
+/* --- Flash messages --- */
+.flash {
+  font-family: 'Courier New', Courier, monospace;
+  padding: 8px 12px;
+  margin: 4px 10px;
+  border: 2px solid;
+}
+.flash-error { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.flash-alert { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.flash-notice { color: #22c55e; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+
+/* --- Toast region (populated via Turbo Streams in Phase 3) --- */
+#toast-region {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10000;
+}
