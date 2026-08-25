@@ -1,0 +1,21 @@
+<%# The action button for a station card. Playlist-backed stations drive
+    the permanent player through radio_station_controller; raw-stream
+    stations use the page-local radio_stream_controller.
+    Locals: station, has_playlists, variant ("sector-x" | "default"). %>
+<% if has_playlists %>
+  <span data-controller="radio-station"
+        data-radio-station-station-id-value="<%= station.id %>"
+        data-radio-station-station-name-value="<%= station.name %>">
+    <button class="tui-button tune-in-btn station-card__button station-card__button--<%= variant %>"
+            data-radio-station-target="button" data-action="radio-station#play">▶ PLAY STATION</button>
+  </span>
+<% elsif station.stream_url.present? %>
+  <button class="tui-button tune-in-btn station-card__button station-card__button--stream-<%= variant %>"
+          data-action="radio-stream#tuneIn"
+          data-stream-url="<%= station.stream_url %>"
+          data-station-id="<%= station.id %>"
+          data-station-name="<%= station.name %>"
+          data-station-genre="<%= station.genre %>">► TUNE IN</button>
+<% else %>
+  <button class="tui-button station-card__button station-card__button--disabled" disabled>[COMING SOON]</button>
+<% end %>

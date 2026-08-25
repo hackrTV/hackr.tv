@@ -1,0 +1,60 @@
+<%# VodzShowPage.tsx port. The YouTube embed is the YouTubePlayer.tsx
+    click-to-play thumbnail, rebuilt as the vod-player Stimulus
+    controller — the first PLAYING state POSTs the watch credit
+    (achievement "Watched your first VOD"), so page loads without a real
+    play never count. %>
+<% slug = params[:artist_slug] %>
+
+<% if @vod.nil? %>
+  <% content_for :title, "Vidz — hackr.tv" %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window red-168-text vodz-error-window">
+      <fieldset>
+        <legend>Error</legend>
+        <p>Failed to load video</p>
+        <%= link_to "Back to Videos", "/#{slug}/vidz", class: "tui-button vodz-error-back" %>
+      </fieldset>
+    </div>
+  <% end %>
+<% else %>
+  <% content_for :title, "#{@vod.title.presence || "Untitled Stream"} — hackr.tv" %>
+  <% video_id = youtube_video_id(@vod.vod_url) %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window white-text vodz-window">
+      <fieldset class="vodz-fieldset">
+        <legend class="center vodz-legend"><%= @artist.name %> :: VIDZ</legend>
+        <div class="vodz-body">
+          <%= link_to "← Back to Videos", "/#{slug}/vidz", class: "vodz-back-link" %>
+
+          <div class="vodz-show-title-row">
+            <h2 class="vodz-show-title"><%= @vod.title.presence || "Untitled Stream" %></h2>
+            <% if @vod.live_url.present? %>
+              <span class="vodz-live-badge vodz-live-badge--lg">Livestream</span>
+            <% end %>
+          </div>
+
+          <p class="vodz-show-date"><%= @vod.started_at ? future_datetime(@vod.started_at) : "Unknown date" %></p>
+
+          <% if video_id %>
+            <div class="vodz-player" data-controller="vod-player"
+                 data-vod-player-video-id-value="<%= video_id %>"
+                 data-vod-player-watch-url-value="/api/artists/<%= slug %>/vods/<%= @vod.id %>/watch">
+              <div class="vodz-player__frame">
+                <div class="vodz-player__mount" data-vod-player-target="frame"></div>
+                <div class="vodz-player__thumb" data-vod-player-target="thumb" data-action="click->vod-player#play">
+                  <img src="https://img.youtube.com/vi/<%= video_id %>/maxresdefault.jpg" alt="" class="vodz-player__thumb-img">
+                  <div class="vodz-player__play-badge"><div class="vodz-player__play-arrow"></div></div>
+                </div>
+              </div>
+            </div>
+          <% else %>
+            <div class="vodz-player-fallback">
+              <p>Unable to load video player.</p>
+              <a href="<%= @vod.vod_url %>" target="_blank" rel="noopener noreferrer" class="tui-button vodz-player-fallback__link">Watch on YouTube</a>
+            </div>
+          <% end %>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+<% end %>

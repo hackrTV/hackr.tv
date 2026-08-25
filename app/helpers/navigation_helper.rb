@@ -8,6 +8,11 @@ module NavigationHelper
     /grid/login /grid/register /grid/verify /grid/forgot_password
     /grid/reset_password /grid/confirm_email_change /grid/identity
     / /wire /feed
+    /vault /fm /f/net /shared /sector
+    /thecyberpulse /xeraen /system-rot /wavelength-zero /voiceprint
+    /temporal-blue-drift /injection-vector /cipher-protocol /blitzbeam
+    /apex-overdrive /ethereality /neon-hearts /offline /heartbreak-havoc
+    /the-pulse-grid
   ].freeze
 
   def hotwire_path?(path)

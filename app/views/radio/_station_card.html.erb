@@ -1,0 +1,66 @@
+<%# One radio station card (RadioPage.tsx card variants):
+    - thecyberpulse while a stream is live → WATCH LIVE link to /
+    - sector-x → dark card with teal accents
+    - anything else → tui window in the station's color
+    Locals: station, live_stream. %>
+<% description = codex_text(station.description.to_s.gsub("2125", (Date.current.year + 100).to_s)) %>
+<% has_playlists = station.playlists.any? %>
+
+<% if station.slug == "thecyberpulse" && live_stream %>
+  <div class="tui-window white-text station-card station-card--live">
+    <fieldset class="station-card--live__fieldset">
+      <legend class="station-card--live__legend"><%= station.name %></legend>
+      <div class="station-card__body">
+        <div class="station-card__status">
+          <span class="live-indicator station-card__live-now">● LIVE NOW</span>
+          <span class="station-card--live__streamer">
+            <%= live_stream.artist ? "#{live_stream.artist.name} is streaming" : "Stream active" %>
+          </span>
+        </div>
+        <% if live_stream.title.present? %>
+          <p class="station-card__stream-title"><%= live_stream.title %></p>
+        <% end %>
+        <p class="station-card__description">
+          <%= codex_text("A live transmission is cutting through the noise. Tune in now on the root frequency.") %>
+        </p>
+        <%= link_to "▶ WATCH LIVE", "/", class: "tui-button tune-in-btn station-card__watch-live" %>
+      </div>
+    </fieldset>
+  </div>
+<% elsif station.slug == "sector-x" %>
+  <div class="tui-window white-text station-card station-card--sector-x">
+    <fieldset class="station-card--sector-x__fieldset">
+      <legend class="station-card--sector-x__legend"><%= station.name %></legend>
+      <div class="station-card__body">
+        <% if has_playlists %>
+          <div class="station-card__status">
+            <span class="live-indicator station-card--sector-x__live">● LIVE</span>
+            <span class="station-card--sector-x__genre"><strong>Genre:</strong> <span><%= station.genre %></span></span>
+          </div>
+        <% else %>
+          <p class="station-card__genre-row"><strong>Genre:</strong> <span><%= station.genre %></span></p>
+        <% end %>
+        <p class="station-card__description station-card--sector-x__description"><%= description %></p>
+        <%= render "station_button", station: station, has_playlists: has_playlists, variant: "sector-x" %>
+      </div>
+    </fieldset>
+  </div>
+<% else %>
+  <div class="tui-window <%= station.color %> white-text station-card">
+    <fieldset class="<%= station.color %>-border">
+      <legend><%= station.name %></legend>
+      <div class="station-card__body">
+        <% if has_playlists %>
+          <div class="station-card__status">
+            <span class="live-indicator station-card__live">● LIVE</span>
+            <span><strong>Genre:</strong> <%= station.genre %></span>
+          </div>
+        <% else %>
+          <p class="station-card__genre-row"><strong>Genre:</strong> <%= station.genre %></p>
+        <% end %>
+        <p class="station-card__description"><%= description %></p>
+        <%= render "station_button", station: station, has_playlists: has_playlists, variant: "default" %>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

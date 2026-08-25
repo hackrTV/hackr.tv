@@ -1,0 +1,23 @@
+<%# Single-track player card (ported from EmbeddedTrack.tsx) on the
+    established player contract: the card is a .track-row carrying
+    data-player-* attrs inside its own track-list controller, so a click
+    loads a one-track queue and the play button repaints from
+    player:state events. Locals: track. %>
+<div data-controller="track-list">
+  <div class="track-row embedded-track-player"
+       <%= tag.attributes(data: player_track_attrs(track).merge(
+             player_artist_path: artist_profile_path_for(track.artist),
+             action: "click->track-list#rowClicked contextmenu->track-list#rowContextMenu"
+           )) %>>
+    <% if track.release&.cover_image&.attached? %>
+      <div class="embedded-track-cover">
+        <%= image_tag url_for(track.release.cover_standard), alt: "#{track.title} cover", class: "embedded-track-img" %>
+      </div>
+    <% end %>
+    <div class="embedded-track-info">
+      <div class="embedded-track-title"><%= track.title %></div>
+      <div class="embedded-track-artist"><%= track.artist.name %></div>
+      <button class="play-track-btn embedded-track-btn">► PLAY</button>
+    </div>
+  </div>
+</div>

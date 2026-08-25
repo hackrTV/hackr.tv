@@ -1,0 +1,273 @@
+<%# ReleaseDetailPage.tsx port. Coming-soon releases render the encrypted
+    state: glitch banner, redacted metadata, masked tracklist and no
+    streaming links. Released ones get the playable tracklist wired to the
+    shared player row contract (track-list controller). Section accents
+    cycle per index on prismatic artist themes — indices are consumed
+    exactly like the React sectionIndex counter, including sections that
+    end up hidden by coming_soon. %>
+<% slug = params[:artist_slug] %>
+
+<% if @release.nil? %>
+  <% content_for :title, "Signal Lost — hackr.tv" %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> release-detail-window">
+      <fieldset class="ac-fieldset">
+        <legend class="ac-legend">SIGNAL LOST</legend>
+        <div class="release-detail-lost">
+          <p>Release not found.</p>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+<% else %>
+  <% content_for :title, "#{@release.name} — hackr.tv" %>
+  <% coming_soon = @release.coming_soon %>
+
+  <%# Release-level links win; otherwise aggregate from tracks (first
+      platform occurrence wins), exactly like the React page. %>
+  <% streaming_links = @release.streaming_links %>
+  <% if streaming_links.nil? %>
+    <% streaming_links = {} %>
+    <% @tracks.each do |t| %>
+      <% (t.streaming_links || {}).each { |platform, url| streaming_links[platform] ||= url } %>
+    <% end %>
+  <% end %>
+  <% sorted_links = sorted_streaming_links(streaming_links) %>
+
+  <% section_index = 0 %>
+  <% info_accent = accent_class(slug, section_index) %>
+  <% section_index += 1 %>
+  <% if @release.credits.present? %>
+    <% credits_accent = accent_class(slug, section_index) %>
+    <% section_index += 1 %>
+  <% end %>
+  <% tracklist_accent = accent_class(slug, section_index) %>
+  <% section_index += 1 %>
+  <% if @release.notes.present? %>
+    <% notes_accent = accent_class(slug, section_index) %>
+    <% section_index += 1 %>
+  <% end %>
+  <% if sorted_links.any? %>
+    <% streaming_accent = accent_class(slug, section_index) %>
+    <% section_index += 1 %>
+  <% end %>
+
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> release-detail-window">
+      <fieldset class="ac-fieldset">
+        <legend class="center ac-legend"><%= @release.name.upcase %></legend>
+
+        <div>
+          <% if coming_soon %>
+            <div class="release-detail-cs-banner">
+              <div class="release-detail-cs-banner__scanlines"></div>
+              <div class="release-detail-cs-banner__title">◈ SIGNAL INCOMING — TRANSMISSION PENDING ◈</div>
+              <div class="release-detail-cs-banner__sub">RELEASE DATA PARTIALLY DECRYPTED — FULL SIGNAL LOCK PENDING</div>
+            </div>
+          <% end %>
+
+          <div class="release-detail-header">
+            <div class="release-detail-cover <%= accent_class(slug, 0) %> <%= "release-detail-cover--coming-soon" if coming_soon %>">
+              <% if @release.cover_image.attached? %>
+                <%= image_tag url_for(@release.cover_image), alt: @release.name, class: "release-detail-cover__img" %>
+              <% else %>
+                <div class="release-detail-cover__placeholder">&#9834;</div>
+              <% end %>
+              <% if coming_soon %>
+                <div class="release-detail-cover__scanlines"></div>
+                <div class="release-detail-cover__tint"></div>
+              <% end %>
+            </div>
+
+            <div class="release-detail-info">
+              <div class="tui-window white-text release-detail-section <%= info_accent %>">
+                <fieldset class="release-detail-section__fieldset">
+                  <legend class="release-detail-section__legend">RELEASE INFO</legend>
+                  <table class="release-detail-info__table">
+                    <tbody>
+                      <tr>
+                        <td class="release-detail-info__label">Title:</td>
+                        <td class="release-detail-info__value release-detail-info__value--strong"><%= @release.name %></td>
+                      </tr>
+                      <tr>
+                        <td class="release-detail-info__label">Artist:</td>
+                        <td class="release-detail-info__value">
+                          <%= link_to @release.artist.name, "/#{slug}", class: "release-detail-info__artist-link" %>
+                        </td>
+                      </tr>
+                      <% if @release.catalog_number.present? || coming_soon %>
+                        <tr>
+                          <td class="release-detail-info__label">Catalog #:</td>
+                          <td class="release-detail-info__value release-detail-info__value--mono <%= "release-detail-info__value--redacted" if coming_soon %>">
+                            <%= coming_soon ? "███-███" : @release.catalog_number %>
+                          </td>
+                        </tr>
+                      <% end %>
+                      <% if @release.release_date || coming_soon %>
+                        <tr>
+                          <td class="release-detail-info__label">Release Date:</td>
+                          <% if coming_soon %>
+                            <td class="release-detail-info__value release-detail-info__value--incoming"><span class="release-detail-info__pending">PENDING TRANSMISSION</span></td>
+                          <% else %>
+                            <td class="release-detail-info__value"><%= @release.release_date %></td>
+                          <% end %>
+                        </tr>
+                      <% end %>
+                      <% if @release.media_format.present? || coming_soon %>
+                        <tr>
+                          <td class="release-detail-info__label">Media Format:</td>
+                          <td class="release-detail-info__value <%= "release-detail-info__value--redacted" if coming_soon %>">
+                            <%= coming_soon ? "████████" : @release.media_format %>
+                          </td>
+                        </tr>
+                      <% end %>
+                      <% if @release.classification.present? || coming_soon %>
+                        <tr>
+                          <td class="release-detail-info__label">Classification:</td>
+                          <td class="release-detail-info__value <%= "release-detail-info__value--redacted" if coming_soon %>">
+                            <%= coming_soon ? "[CLASSIFIED]" : @release.classification %>
+                          </td>
+                        </tr>
+                      <% end %>
+                      <% if @release.label.present? %>
+                        <tr>
+                          <td class="release-detail-info__label">Label:</td>
+                          <td class="release-detail-info__value"><%= @release.label %></td>
+                        </tr>
+                      <% end %>
+                      <% if @release.release_type.present? %>
+                        <tr>
+                          <td class="release-detail-info__label">Release Type:</td>
+                          <td class="release-detail-info__value"><%= @release.release_type.upcase %></td>
+                        </tr>
+                      <% end %>
+                      <% if coming_soon %>
+                        <tr>
+                          <td class="release-detail-info__label">Status:</td>
+                          <td class="release-detail-info__value release-detail-info__value--status">SIGNAL INCOMING</td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+
+          <% if @release.description.present? && !coming_soon %>
+            <div class="release-detail-description">
+              <p><%= @release.description %></p>
+            </div>
+          <% end %>
+
+          <% if @release.credits.present? && !coming_soon %>
+            <div class="tui-window white-text release-detail-section release-detail-section--block <%= credits_accent %>">
+              <fieldset class="release-detail-section__fieldset">
+                <legend class="release-detail-section__legend">CREDITS</legend>
+                <div class="release-detail-prose"><%= @release.credits %></div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <div class="tui-window white-text release-detail-section release-detail-section--block release-detail-tracklist <%= tracklist_accent %>">
+            <fieldset class="release-detail-section__fieldset">
+              <legend class="release-detail-section__legend"><%= coming_soon ? "TRACKLIST [ENCRYPTED]" : "TRACKLIST" %></legend>
+              <div class="release-detail-tracklist__body" data-controller="track-list">
+                <table class="release-detail-tracklist__table">
+                  <tbody>
+                    <% @tracks.each_with_index do |track, track_index| %>
+                      <% if coming_soon %>
+                        <tr class="release-detail-track release-detail-track--redacted <%= accent_class(slug, track_index) %>">
+                          <td class="release-detail-track__number release-detail-track__number--dim"><%= format("%02d", track.track_number.to_i) %></td>
+                          <td class="release-detail-track__redacted-name"><%= redacted_track_name(track_index) %></td>
+                          <td class="release-detail-track__play"><span class="release-detail-track__locked">◌</span></td>
+                          <td class="release-detail-track__duration release-detail-track__duration--dim">██:██</td>
+                          <td class="release-detail-track__video"></td>
+                        </tr>
+                      <% else %>
+                        <% playable = track.audio_file.attached? %>
+                        <%# Player row contract: data-player-* attrs + row click.
+                            Inner links replay React's stopPropagation via the
+                            :stop action option — rowClicked on an element with
+                            no data-player-url is a no-op, so only the
+                            navigation happens. %>
+                        <tr class="track-row release-detail-track <%= accent_class(slug, track_index) %> <%= "release-detail-track--unplayable" unless playable %>"
+                            <%= tag.attributes(data: player_track_attrs(track).merge(
+                                  player_artist_path: artist_profile_path_for(track.artist),
+                                  action: "click->track-list#rowClicked contextmenu->track-list#rowContextMenu"
+                                )) %>>
+                          <td class="release-detail-track__number"><%= format("%02d", track.track_number.to_i) %></td>
+                          <td class="release-detail-track__title-cell">
+                            <%= link_to track.title, "/#{slug}/trackz/#{track.slug}",
+                              class: "release-detail-track__title",
+                              data: {action: "click->track-list#rowClicked:stop"} %>
+                          </td>
+                          <td class="release-detail-track__play">
+                            <% if playable %><span class="release-detail-track__glyph"></span><% end %>
+                          </td>
+                          <td class="release-detail-track__duration"><%= track.duration || "—" %></td>
+                          <td class="release-detail-track__video">
+                            <% if (vod = track.hackr_streams.first) %>
+                              <%= link_to "▶ VIDEO", "/#{slug}/vidz/#{vod.id}",
+                                class: "release-detail-track__video-link", title: vod.title,
+                                data: {action: "click->track-list#rowClicked:stop"} %>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    <% end %>
+                  </tbody>
+                </table>
+                <% if coming_soon %>
+                  <div class="release-detail-disc-length release-detail-disc-length--redacted">Disc length&nbsp;&nbsp;██:██</div>
+                <% else %>
+                  <div class="release-detail-disc-length">Disc length&nbsp;&nbsp;<%= @disc_length %></div>
+                <% end %>
+              </div>
+            </fieldset>
+            <% if coming_soon %><div class="release-detail-tracklist__scanlines"></div><% end %>
+          </div>
+
+          <% if @release.notes.present? && !coming_soon %>
+            <div class="tui-window white-text release-detail-section release-detail-section--block <%= notes_accent %>">
+              <fieldset class="release-detail-section__fieldset">
+                <legend class="release-detail-section__legend">NOTES</legend>
+                <div class="release-detail-prose"><%= @release.notes %></div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <% if coming_soon %>
+            <div class="tui-window white-text release-detail-section release-detail-section--block release-detail-streaming--redacted">
+              <fieldset class="release-detail-section__fieldset">
+                <legend class="release-detail-section__legend">STREAMING FREQUENCIES</legend>
+                <div class="release-detail-streaming__placeholder">
+                  <div class="release-detail-streaming__placeholder-title">FREQUENCIES NOT YET ALLOCATED</div>
+                  <div class="release-detail-streaming__placeholder-sub">Signal will be broadcast when transmission lock is acquired</div>
+                </div>
+              </fieldset>
+            </div>
+          <% elsif sorted_links.any? %>
+            <div class="tui-window white-text release-detail-section release-detail-section--block <%= streaming_accent %>">
+              <fieldset class="release-detail-section__fieldset">
+                <legend class="release-detail-section__legend">STREAMING FREQUENCIES</legend>
+                <div class="release-detail-streaming__links">
+                  <%= link_to "▶ PULSE VAULT", vault_path(filter: @release.name), class: "release-detail-streaming__vault" %>
+                  <% sorted_links.each do |platform, url| %>
+                    <a href="<%= url %>" target="_blank" rel="noopener noreferrer" class="release-detail-streaming__link">→ <%= streaming_platform_name(platform) %></a>
+                  <% end %>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <div class="release-detail-nav">
+            <%= link_to "← #{@release.artist.name}", "/#{slug}", class: "release-detail-nav__back" %>
+            <%= link_to "ALL RELEASES", "/#{slug}/releases", class: "release-detail-nav__all" %>
+            <%= link_to "PULSE VAULT", "/vault", class: "release-detail-nav__vault" %>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+<% end %>

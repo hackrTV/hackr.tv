@@ -45,6 +45,23 @@ module ContentHelper
     fragment.to_html.html_safe
   end
 
+  # Port of CodexText.tsx for plain lore copy (station descriptions,
+  # artist blurbs): [[Entry]] / [[Entry|display]] become codex links,
+  # everything else is escaped. Not WireTextRenderer — that also censors
+  # external links, which is wrong for editorial text.
+  def codex_text(text)
+    mappings = CodexLinker.mappings
+    parts = text.to_s.split(/(\[\[[^\]]+\]\])/)
+    safe_join(parts.map { |part|
+      if part =~ /\A\[\[([^\]|]+)(?:\|([^\]]+))?\]\]\z/
+        slug = CodexLinker.generate_slug($1)
+        link_to($2.presence || mappings[slug] || $1, "/codex/#{slug}", class: "codex-link")
+      else
+        part
+      end
+    })
+  end
+
   # Port of CodeIndexPage formatDate: relative "3d ago" style.
   def code_relative_date(datetime)
     return "N/A" if datetime.blank?

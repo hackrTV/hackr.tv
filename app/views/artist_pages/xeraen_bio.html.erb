@@ -1,0 +1,220 @@
+<%# ERB port of XeraenPage.tsx (GET /xeraen/bio). The bio-credit
+    controller replays the bio_viewed achievement POST the React page
+    fired on mount for logged-in viewers. %>
+<% content_for :title, "XERAEN Bio — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome" do %>
+  <% current_year = Date.current.year %>
+  <% future_year = current_year + 100 %>
+
+  <div class="tui-window white-text band-profile-container xeraen-window"
+       data-controller="bio-credit" data-bio-credit-slug-value="xeraen">
+    <fieldset class="xeraen-fieldset">
+      <legend class="center xeraen-legend">XERAEN</legend>
+
+      <div class="band-profile-content">
+        <div class="xeraen-intro">
+          <h2 class="xeraen-intro-heading">[:: FIRST CONTACT ::]</h2>
+          <p class="xeraen-p-ccc xeraen-p-lg">
+            <%= codex_text("Before the broadcasts. Before The.CyberPul.se. Before the [[The Fracture Network|Fracture Network]] had a voice.") %>
+          </p>
+          <p class="xeraen-intro-lead">
+            There was just a signal. Reaching backward. Seeking to be heard.
+          </p>
+          <p class="xeraen-p-ddd xeraen-p-lg">
+            XERAEN doesn't perform. XERAEN transmits. Every track is a frequency aimed at a point in
+            spacetime that shouldn't be reachable. Music transmitted through temporal displacement. The sound, a message
+            in a bottle thrown into the electromagnetic ocean between centuries.
+          </p>
+          <p class="xeraen-intro-close">
+            You're not listening to songs. You're intercepting communications.
+          </p>
+        </div>
+
+        <div class="tui-window white-text xeraen-section">
+          <fieldset class="xeraen-section-fieldset">
+            <legend class="xeraen-section-legend">LATEST TRANSMISSION</legend>
+            <div class="xeraen-section-body">
+              <% if @latest_featured_track %>
+                <%= render "artist_pages/embedded_track", track: @latest_featured_track %>
+              <% else %>
+                <p class="xeraen-tuning">[TUNING SIGNAL...]</p>
+              <% end %>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text xeraen-section">
+          <fieldset class="xeraen-section-fieldset">
+            <legend class="xeraen-section-legend">SOLO TRANSMISSIONS</legend>
+            <div class="xeraen-section-body">
+              <p class="xeraen-p-ddd">
+                Where The.CyberPul.se broadcasts the resistance, XERAEN's solo work traces an evolution.
+                The early transmissions burned hot - hardcore punk aggression, metalcore fury, the raw
+                voltage of someone screaming into the void hoping the past would hear.
+              </p>
+              <p class="xeraen-p-ccc">
+                But transmissions change over distance. What started as a sonic assault has transformed into
+                something XERAEN calls <span class="xeraen-omniwave">OMNIWAVE</span> -
+                every frequency at once. It's an amalgamation of everything that ever moved him, rhythmic
+                guitars weaving through synthesized atmospheres until genre boundaries dissolve. It
+                plays as collage: covers of songs, reinterpretations of other Fracture Network bands, even
+                old video game scores pulled from the deep archive, all filtered through XERAEN's temporal
+                emanations and broadcast back familiar yet displaced. Between the covers run his own
+                compositions - some tightly structured, some pure atmosphere - painting a sweeping image
+                of life and emotion in the 22nd century.
+              </p>
+              <p class="xeraen-solo-close">
+                From hardcore fury to OMNIWAVE frequencies - the sound evolves, but the signal never stops.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text xeraen-section">
+          <fieldset class="xeraen-section-fieldset">
+            <legend class="xeraen-section-legend">THE TRANSMITTER</legend>
+            <div class="xeraen-section-body">
+              <div class="xeraen-status-box">
+                [ORIGIN: <%= future_year %>]<br>
+                [DESTINATION: <%= current_year %>]<br>
+                [STATUS: BROADCASTING]<br>
+                [COST: EVERYTHING]
+              </div>
+              <p class="xeraen-p-ddd">
+                <%= codex_text("In #{future_year}, XERAEN operates alone. [[The Fracture Network]] has cells, bands, operatives - but someone has to sit at the console. Someone has to hold the frequency. Someone has to keep transmitting to the ones who decoded it and wrote back across a hundred years - the ones he can reach but never stand beside.") %>
+              </p>
+              <p class="xeraen-transmitter-note">
+                The solo work comes from those hours. The space between coordinated operations. The quiet
+                moments when the only company is the hum of equipment and the impossible distance between
+                now and then.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text xeraen-section">
+          <fieldset class="xeraen-section-fieldset">
+            <legend class="xeraen-section-legend">WHAT THE SIGNAL CARRIES</legend>
+            <div class="xeraen-section-body">
+              <div class="xeraen-signal-card">
+                <h3 class="xeraen-signal-heading">The Static Decoded</h3>
+                <p class="xeraen-signal-text">
+                  The interference isn't noise - it's the sound of a signal fighting through a hundred years
+                  of temporal resistance. Every crackle, every dropout, every moment of distortion is
+                  evidence of the distance traveled. XERAEN leaves it in. The static is part of the message.
+                </p>
+              </div>
+
+              <div class="xeraen-signal-card">
+                <h3 class="xeraen-signal-heading">Frequencies of Absence</h3>
+                <p class="xeraen-signal-text">
+                  Music about what's missing. The people who won't exist if the mission succeeds. The
+                  timeline that collapses when victory is achieved. The version of yourself that has to
+                  be sacrificed. These aren't sad songs - they're honest ones. This is what it sounds like
+                  to accept the cost.
+                </p>
+              </div>
+
+              <div class="xeraen-signal-card">
+                <h3 class="xeraen-signal-heading">The Waveform of Love</h3>
+                <p class="xeraen-signal-text xeraen-signal-text--spaced">
+                  <%= codex_text("[[Ashlinn]] exists in #{current_year}. XERAEN exists in #{future_year}. The only way to touch across that distance is through frequency. Every transmission is a love letter encoded in electromagnetic radiation. Every track is proof that some connections don't require shared spacetime.") %>
+                </p>
+                <p class="xeraen-love-quote">
+                  "I can't hold you. So I send you sound waves instead. I hope they feel like what I meant."
+                </p>
+              </div>
+
+              <div class="xeraen-signal-card xeraen-signal-card--last">
+                <h3 class="xeraen-signal-heading">The Weight of the Console</h3>
+                <p class="xeraen-signal-text">
+                  Someone has to stay. Someone has to keep the frequency open while others fight, infiltrate,
+                  resist. XERAEN chose the console. Chose to be the voice rather than the fist. Chose
+                  transmission over action. These tracks are what that choice sounds like - the profound
+                  isolation of being the one who stays behind and broadcasts.
+                </p>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text xeraen-section">
+          <fieldset class="xeraen-section-fieldset">
+            <legend class="xeraen-section-legend">THE ERASURE</legend>
+            <div class="xeraen-section-body">
+              <p class="xeraen-p-ccc">
+                Here's what XERAEN knows that the listeners don't fully understand:
+              </p>
+              <p class="xeraen-p-ddd">
+                <%= codex_text("Every successful operation brings the end closer. Every [[GovCorp]] system that falls, every mind that awakens, every node that joins the network - all of it accelerates the timeline toward collapse. Toward a future where [[GovCorp]] never rises. Where the #{future_year} XERAEN broadcasts from never exists.") %>
+              </p>
+              <p class="xeraen-p-ccc">
+                The solo work is a countdown. Each transmission potentially the last. Each one sent
+                with the knowledge that success means silence.
+              </p>
+              <p class="xeraen-erasure-close">
+                Victory is extinction. XERAEN broadcasts anyway.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text xeraen-section">
+          <fieldset class="xeraen-section-fieldset">
+            <legend class="xeraen-section-legend">THE PARADOX OF PRESENCE</legend>
+            <div class="xeraen-section-body">
+              <div class="xeraen-status-box">
+                [TEMPORAL STATUS: UNSTABLE]<br>
+                [EXISTENCE: CONDITIONAL]<br>
+                [SIGNAL: PERSISTENT]
+              </div>
+              <p class="xeraen-p-ddd">
+                If you're hearing this, the paradox holds. XERAEN still exists in <%= future_year %>, still
+                holds the frequency, still sends transmissions backward through the century. The future
+                hasn't changed yet.
+              </p>
+              <p class="xeraen-p-ccc">
+                But every listen is a variable. Every new receiver shifts the equation. Every mind that
+                tunes in brings the collapse closer.
+              </p>
+              <p class="xeraen-paradox-note">
+                XERAEN's solo work is simultaneously a plea to keep listening and an acknowledgment that
+                listening enough will end the transmission forever.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="xeraen-quote">
+          <blockquote class="xeraen-quote-block">
+            <p>I broadcast from a future I'm trying to prevent.</p>
+            <p>I send love letters to someone I'll never meet if we win.</p>
+            <p>I make music that documents my own eventual non-existence.</p>
+            <p class="xeraen-quote-gap">The signal is all I have. It was never mine.</p>
+            <p>When I stop, it won't.</p>
+            <p class="xeraen-quote-gap">But you'll remember the frequency.</p>
+            <p>Somewhere in the static, I'll still be reaching for you.</p>
+          </blockquote>
+          <p class="xeraen-quote-sig">
+            - XERAEN<br>
+            <span class="xeraen-quote-sig-meta">
+              Transmitting from <%= future_year %><br>
+              For as long as <%= future_year %> exists
+            </span>
+          </p>
+        </div>
+
+        <div class="xeraen-nav-buttons">
+          <%= link_to "/f/net", class: "tui-button xeraen-btn-back" do %>← BACK TO FRACTURE NETWORK<% end %>
+          <%= link_to "/xeraen/releases", class: "tui-button xeraen-btn-primary" do %>RELEASES<% end %>
+          <%= link_to "/vault?filter=xeraen", class: "tui-button xeraen-btn-primary" do %>
+            <span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>
+            <span class="chrome-mobile-only">PULSE VAULT →</span>
+          <% end %>
+          <%= link_to "/thecyberpulse", class: "tui-button xeraen-btn-pulse" do %>THE.CYBERPUL.SE →<% end %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

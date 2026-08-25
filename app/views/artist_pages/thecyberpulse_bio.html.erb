@@ -1,0 +1,245 @@
+<%# ERB port of TheCyberPulsePage.tsx (GET /thecyberpulse/bio). The
+    bio-credit controller replays the bio_viewed achievement POST the
+    React page fired on mount for logged-in viewers. %>
+<% content_for :title, "The.CyberPul.se Bio — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome" do %>
+  <% current_year = Date.current.year %>
+  <% future_year = current_year + 100 %>
+
+  <div class="tui-window white-text band-profile-container tcp-window"
+       data-controller="bio-credit" data-bio-credit-slug-value="thecyberpulse">
+    <fieldset class="tcp-fieldset">
+      <legend class="center tcp-legend">THE.CYBERPUL.SE</legend>
+
+      <div class="band-profile-content">
+        <div class="tcp-intro">
+          <h2 class="tcp-intro-heading">[:: SIGNAL INCOMING ::]</h2>
+          <p class="tcp-intro-lead">
+            You're not supposed to be hearing this.
+          </p>
+          <p class="tcp-p-ccc tcp-p-lg">
+            <%= codex_text("This frequency shouldn't exist. This signal is being broadcast from a timeline [[GovCorp]] has spent a century trying to prevent. And yet - here we are. Here ") %><em>you</em> are. Listening.
+          </p>
+          <p class="tcp-intro-body">
+            <%= codex_text("The.CyberPul.se is the central nervous system of the [[The Fracture Network|Fracture Network]]. Not a band. Not a channel. A heartbeat transmitted backward through time from #{future_year} to #{current_year} — a hundred years of truth compressed into electromagnetic pulses you're decoding right now.") %>
+          </p>
+          <p class="tcp-intro-close">
+            Welcome to hackr.tv. The signal is live. The Pulse is strong.
+          </p>
+        </div>
+
+        <% if @latest_vod && @vod_video_id %>
+          <div class="tui-window white-text tcp-section">
+            <fieldset class="tcp-section-fieldset">
+              <legend class="tcp-section-legend">VISUAL TRANSMISSION</legend>
+              <div class="tcp-vod-body">
+                <div class="tcp-vod-center">
+                  <div class="tcp-vod-frame">
+                    <iframe class="tcp-vod-iframe"
+                            src="https://www.youtube-nocookie.com/embed/<%= @vod_video_id %>"
+                            title="<%= @latest_vod.title.presence || "Visual transmission" %>"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                  </div>
+                </div>
+                <% if @latest_vod.title.present? %>
+                  <p class="tcp-vod-title"><%= @latest_vod.title %></p>
+                <% end %>
+                <div class="tcp-vod-link-wrap">
+                  <%= nav_link_to "/thecyberpulse/vidz", css_class: "tcp-vod-link" do %>→ View All Transmissions<% end %>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        <% end %>
+
+        <div class="tui-window white-text tcp-section">
+          <fieldset class="tcp-section-fieldset">
+            <legend class="tcp-section-legend">THE BROADCAST</legend>
+            <div class="tcp-section-body">
+              <p class="tcp-broadcast-lead">
+                24/7. No dead air. No corporate sponsorship. No holding back.
+              </p>
+              <p class="tcp-p-ddd">
+                <%= codex_text("What you'll find here: multiple [[Fracture Network]] bands transmitting their frequencies through our signal. Live operations against [[GovCorp]] infrastructure. Interactive coordination through [[THE PULSE GRID]]. A community of listeners who've become operators, viewers who've become fighters, audience members who've realized they were always part of the show.") %>
+              </p>
+              <p class="tcp-callout tcp-callout--bold">
+                This isn't entertainment. This is a recruitment broadcast disguised as a streaming platform.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text tcp-section">
+          <fieldset class="tcp-section-fieldset">
+            <legend class="tcp-section-legend">THE HOSTS</legend>
+            <div class="tcp-section-body">
+              <div class="tcp-host-xeraen">
+                <h3 class="tcp-host-name">XERAEN</h3>
+                <p class="tcp-p-ddd">
+                  <%= codex_text("He broadcasts from #{future_year} - from a future where [[GovCorp]] has won, where [[rainns|RAINNs]] have replaced authentic human expression, where [[The Fracture Network]] fights a war most people don't know is happening.") %>
+                </p>
+                <p class="tcp-p-ccc">
+                  <%= codex_text("[[XERAEN]] sends signals backward through time. Not to warn you. Not to save you. To ") %><em>activate</em> you.
+                </p>
+                <p class="tcp-p-aaa">
+                  Every transmission you receive has already happened in his timeline. Every attack you witness
+                  is history to him - but to you, it's still possible. Still changeable. The paradox is the point:
+                  he's broadcasting from a future he's trying to prevent.
+                </p>
+                <p class="tcp-p-bbb">
+                  <%= codex_text("If [[The Fracture Network]] succeeds, XERAEN's timeline collapses. He ceases to exist. The broadcasts stop because there's nothing left to broadcast from.") %>
+                </p>
+                <p class="tcp-callout tcp-callout--quote">
+                  He fights knowing victory means erasure.
+                </p>
+              </div>
+
+              <hr class="tcp-host-divider">
+
+              <div>
+                <h3 class="tcp-host-name">RYKER M. PULSE</h3>
+                <p class="tcp-ryker-lead">
+                  If XERAEN is the signal, Ryker is the heartbeat.
+                </p>
+                <p class="tcp-p-ddd">
+                  Co-founder. Primary drummer. The voice that cuts through static and demands you <em>move</em>.
+                  While XERAEN works the code and maintains the transmission, Ryker brings the kinetic energy
+                  that turns broadcasts into rallying cries.
+                </p>
+                <p class="tcp-p-ccc">
+                  His drums don't keep time - they <em>drive</em> it. Every beat is a countdown. Every rhythm is
+                  a call to action. When Ryker's voice comes through the signal, it's not a whisper from the
+                  future. It's a shout. A challenge. A reminder that resistance isn't passive.
+                </p>
+                <p class="tcp-p-aaa">
+                  XERAEN sends the signal. Ryker makes sure it hits like a fist.
+                </p>
+                <p class="tcp-p-bbb">
+                  Where XERAEN embodies the solitary weight of maintaining hope across impossible distances,
+                  Ryker embodies defiance made physical. Unity through action. The belief that every small choice
+                  ripples forward - or in their case, backward - shaping futures that haven't been written yet.
+                </p>
+                <p class="tcp-p-ccc">
+                  He knows the math. He knows that success means erasure. He drums anyway. Louder. Faster.
+                  Like he's trying to leave dents in the timeline itself.
+                </p>
+                <p class="tcp-callout tcp-callout--quote">
+                  Some people whisper about change. Ryker beats it into existence.
+                </p>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text tcp-section">
+          <fieldset class="tcp-section-fieldset">
+            <legend class="tcp-section-legend">THE PULSE GRID</legend>
+            <div class="tcp-section-body">
+              <div class="tcp-status-box">
+                [CONNECTION: ACTIVE]<br>
+                [NODES: EXPANDING]<br>
+                [STATUS: SYNCHRONIZED]
+              </div>
+              <p class="tcp-p-ddd">
+                <%= codex_text("It's not a game. [[THE PULSE GRID]] is how [[the Fracture Network]] coordinates across timelines - a MUD interface where operators train, plan, and execute. What looks like a text adventure is actually FN infrastructure.") %>
+              </p>
+              <p class="tcp-p-ccc">
+                <%= codex_text("Every zone corresponds to real [[GovCorp]] territory. Every puzzle mirrors actual security protocols. Every player who masters the grid becomes capable of navigating its real-world equivalent.") %>
+              </p>
+              <p class="tcp-grid-close">
+                You thought you were playing. You were preparing.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text tcp-section">
+          <fieldset class="tcp-section-fieldset">
+            <legend class="tcp-section-legend">WHAT WE TRANSMIT</legend>
+            <div class="tcp-section-body">
+              <div class="tcp-transmit-card">
+                <h3 class="tcp-transmit-heading">The Bands</h3>
+                <p class="tcp-transmit-text">
+                  <%= codex_text("Over 10 frequencies. More than a dozen approaches to [[GovCorp]] resistance. From Injection Vector's kinetic warfare to Ethereality's transcendent liberation - each band represents a node in the network, a tactic in the arsenal, a way of fighting that speaks to different souls.") %>
+                </p>
+                <p class="tcp-transmit-note">
+                  We don't tell you which frequency to tune to. We broadcast them all. You find the signal that
+                  resonates with your resistance.
+                </p>
+              </div>
+
+              <div class="tcp-transmit-card">
+                <h3 class="tcp-transmit-heading">The Operations</h3>
+                <p class="tcp-transmit-text">
+                  <%= codex_text("Live attacks against [[The RIDE|GovCorp systems]]. Real-time infiltration of corporate infrastructure. Interactive missions where the audience doesn't just watch - they participate. Every livestream is an operation. Every viewer is potentially an operator.") %>
+                </p>
+              </div>
+
+              <div class="tcp-transmit-card tcp-transmit-card--last">
+                <h3 class="tcp-transmit-heading">The Signal</h3>
+                <p class="tcp-transmit-text">
+                  Purple light cutting through their manufactured darkness. A frequency they can't jam because
+                  it's not coming from anywhere they can locate. We exist in the space between their surveillance
+                  systems, in the temporal gap their algorithms can't process.
+                </p>
+                <p class="tcp-transmit-note">
+                  They know we're broadcasting. They just can't figure out <em>when</em> we're broadcasting from.
+                </p>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tui-window white-text tcp-section">
+          <fieldset class="tcp-section-fieldset">
+            <legend class="tcp-section-legend">THE PARADOX</legend>
+            <div class="tcp-section-body">
+              <p class="tcp-p-ccc">
+                Here's why we're GovCorp's nightmare:
+              </p>
+              <p class="tcp-p-ddd">
+                If they stop us in <%= future_year %>, the broadcasts have already been sent to <%= current_year %>. If they stop
+                the listeners in <%= current_year %>, the resistance in <%= future_year %> has already formed. We exist in both
+                timelines simultaneously - a signal that's already arrived and a future that hasn't happened yet.
+              </p>
+              <p class="tcp-paradox-close">
+                Causality bent. We broadcast through the fracture.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="tcp-cta">
+          <blockquote class="tcp-cta-quote">
+            <p>You found this signal for a reason.</p>
+            <p>
+              You're hearing this broadcast because somewhere in the electromagnetic spectrum between <%= current_year %> and <%= future_year %>,
+              your frequency matched ours.
+            </p>
+            <p>The Pulse is strong. The signal is live. The network is expanding.</p>
+          </blockquote>
+          <p class="tcp-cta-close">
+            Broadcasting to the past to stop the future of today.<br>
+            <em>Welcome to The.CyberPul.se.</em>
+          </p>
+        </div>
+
+        <div class="tcp-nav-buttons">
+          <%= link_to "/f/net", class: "tui-button tcp-btn-back" do %>← BACK TO FRACTURE NETWORK<% end %>
+          <%= link_to "/thecyberpulse/releases", class: "tui-button tcp-btn-primary" do %>RELEASES<% end %>
+          <%= link_to "/vault?filter=the.cyberpul.se", class: "tui-button tcp-btn-primary" do %>
+            <span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>
+            <span class="chrome-mobile-only">PULSE VAULT →</span>
+          <% end %>
+          <%= nav_link_to "/grid", css_class: "tui-button tcp-btn-grid" do %>
+            <span class="chrome-desktop-only">ENTER THE PULSE GRID →</span>
+            <span class="chrome-mobile-only">PULSE GRID →</span>
+          <% end %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

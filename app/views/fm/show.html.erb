@@ -1,0 +1,184 @@
+<% content_for :title, "hackr.fm — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <% current_year = Date.current.year %>
+  <% future_year = current_year + 100 %>
+
+  <div class="tui-window white-text fm-window">
+    <fieldset class="fm-fieldset">
+      <legend class="center fm-legend">hackr.fm</legend>
+
+      <div class="fm-body">
+        <h2 class="fm-heading">[:: hackr.fm ::]</h2>
+        <p class="fm-tagline">MUSIC LABEL &amp; BROADCAST NETWORK</p>
+
+        <div class="fm-lore">
+          <p class="fm-lore-open">
+            In <%= current_year %>, hackr.fm opened as a frequency — a channel tuned to something that was already
+            there, carrying music that refused to be owned, cataloged, or silenced. By <%= future_year %>, it will
+            become the backbone of the Fracture Network's broadcast infrastructure: a decentralized label
+            transmitting from nodes scattered across the grid.
+          </p>
+          <p class="fm-lore-mid">
+            Every artist on hackr.fm operates under one principle: <span class="fm-lore-em">the music carries the signal, not the system's approval</span>.
+            No RIDE-approved playlists. No managed reality. No substitute for the real thing. Just
+            uncompromising sound moving directly from creator to listener — because what it carries
+            is something GovCorp has never been able to counterfeit.
+          </p>
+          <p class="fm-lore-close">
+            This is the home frequency. From here, you can tune into live broadcasts, explore the vault
+            of everything we've ever released, or connect with the artists who make up
+            the Fracture Network. The signal is always on. You just have to listen.
+          </p>
+        </div>
+
+        <% if @latest_releases.any? %>
+          <div class="fm-section">
+            <h3 class="fm-section-title">LATEST RELEASES</h3>
+            <div class="fm-latest-grid">
+              <% @latest_releases.each do |release| %>
+                <%= nav_link_to "/#{release.artist.slug}/releases/#{release.slug}", css_class: "fm-card-link" do %>
+                  <div class="fm-release-card">
+                    <div class="fm-cover">
+                      <% if release.cover_image.attached? %>
+                        <%= image_tag url_for(release.cover_image), alt: release.name, class: "fm-cover-img" %>
+                      <% else %>
+                        <div class="fm-cover-placeholder">&#9834;</div>
+                      <% end %>
+                    </div>
+                    <div class="fm-release-info">
+                      <div class="fm-release-name"><%= release.name %></div>
+                      <div class="fm-release-artist"><%= release.artist.name %></div>
+                      <div class="fm-release-meta">
+                        <span class="fm-release-type"><%= release.release_type&.upcase || "RELEASE" %> · <%= pluralize(release.tracks.count, "track") %></span>
+                        <% if release.release_date %>
+                          <span class="fm-release-date"><%= release.release_date %></span>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+            <div class="fm-viewall-row">
+              <%= nav_link_to "/fm/releases", css_class: "fm-viewall-btn" do %>VIEW ALL RELEASES →<% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @coming_soon.any? %>
+          <div class="fm-section" data-controller="signal-code">
+            <div class="fm-divider"></div>
+            <h3 class="fm-signal-title" data-action="click->signal-code#signalClicked">◈ SIGNAL INCOMING ◈</h3>
+            <div class="fm-soon-grid fm-soon-grid--cols-<%= [@coming_soon.size, 4].min %>">
+              <% @coming_soon.each_with_index do |release, index| %>
+                <% locked = index >= 4 %>
+                <%# link_to directly (not nav_link_to) because locked cards
+                    also need hidden + the marker class signal_code_controller
+                    reveals on unlock. Release pages are Hotwire (Phase 4). %>
+                <%= link_to "/#{release.artist.slug}/releases/#{release.slug}",
+                  class: "fm-soon-card-link #{"fm-soon-card-link--locked" if locked}".strip,
+                  hidden: locked do %>
+                  <div class="fm-soon-card">
+                    <div class="fm-soon-cover">
+                      <% if release.cover_image.attached? %>
+                        <%= image_tag url_for(release.cover_standard), alt: release.name, class: "fm-soon-cover-img" %>
+                      <% else %>
+                        <div class="fm-soon-cover-placeholder">&#9834;</div>
+                      <% end %>
+                      <div class="fm-soon-scanlines"></div>
+                      <div class="fm-soon-tint"></div>
+                      <div class="fm-soon-badge">INCOMING</div>
+                    </div>
+                    <div class="fm-soon-info">
+                      <div class="fm-soon-name"><%= release.name %></div>
+                      <div class="fm-soon-artist"><%= release.artist.name %></div>
+                      <div class="fm-soon-meta"><%= release.release_type&.upcase || "RELEASE" %> · <%= pluralize(release.tracks.count, "track") %></div>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+
+            <div class="fm-code-overlay" hidden
+                 data-signal-code-target="modal"
+                 data-action="click->signal-code#backdropClicked">
+              <div class="fm-code-box">
+                <div class="fm-code-scanlines"></div>
+                <div class="fm-code-title">SIGNAL INTERCEPT DETECTED</div>
+                <div class="fm-code-sub">
+                  FREQUENCY LOCK REQUIRES AUTHORIZATION<br>
+                  ENTER TRANSMISSION CODE TO PROCEED
+                </div>
+                <div class="fm-code-row">
+                  <input type="text" class="fm-code-input" placeholder="_ _ _ _"
+                         data-signal-code-target="input"
+                         data-action="keydown.enter->signal-code#submit">
+                  <button class="fm-code-submit" data-action="click->signal-code#submit">TRANSMIT</button>
+                </div>
+                <div class="fm-code-error" hidden data-signal-code-target="error">AUTHORIZATION DENIED — INVALID FREQUENCY</div>
+                <div class="fm-code-abort" data-action="click->signal-code#close">[ABORT SIGNAL]</div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="fm-divider"></div>
+        <div class="fm-nav-grid">
+          <%= nav_link_to "/fm/radio", css_class: "fm-nav-card-link" do %>
+            <div class="tui-window white-text fm-nav-card fm-nav-card--radio">
+              <fieldset>
+                <legend>RADIO</legend>
+                <div class="fm-nav-body">
+                  <p class="fm-nav-big">▶ RADIO</p>
+                  <p class="fm-nav-desc chrome-desktop-only">
+                    Live stations broadcasting around the clock — raw frequencies, unfiltered.
+                    Tune in and let the signal find you.
+                  </p>
+                  <p class="fm-nav-desc chrome-mobile-only">
+                    Live stations broadcasting around the clock — raw frequencies, unfiltered.
+                    Tune in.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <%= nav_link_to "/vault", css_class: "fm-nav-card-link" do %>
+            <div class="tui-window white-text fm-nav-card fm-nav-card--vault">
+              <fieldset>
+                <legend>VAULT</legend>
+                <div class="fm-nav-body">
+                  <p class="fm-nav-big">◆ VAULT</p>
+                  <p class="fm-nav-desc">
+                    The complete archive. Every track ever released on hackr.fm — searchable
+                    and ready to play on demand.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <%= nav_link_to "/f/net", css_class: "fm-nav-card-link" do %>
+            <div class="tui-window white-text fm-nav-card fm-nav-card--fnet">
+              <fieldset>
+                <legend>FNET</legend>
+                <div class="fm-nav-body">
+                  <p class="fm-nav-big">◈ FNET</p>
+                  <p class="fm-nav-desc">
+                    The Fracture Network roster. Meet the artists who carry the signal
+                    through sound — each with a story and a frequency.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="fm-footer">
+          <p>hackr.fm — the signal is always on</p>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

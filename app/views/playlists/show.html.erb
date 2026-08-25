@@ -1,0 +1,86 @@
+<% content_for :title, "#{@playlist.name} — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%# track-list wraps the whole page so ▶ Play Playlist reaches the rows;
+      autoplay=true (from the index Play button) starts playback on load. %>
+  <div class="playlists-wrap" data-controller="track-list"
+       data-track-list-autoplay-value="<%= @autoplay %>">
+    <div class="playlist-back">
+      <%= link_to "← Back to Playlists", fm_playlists_path %>
+    </div>
+
+    <div class="tui-window playlist-info" data-controller="edit-toggle">
+      <fieldset class="tui-fieldset">
+        <legend class="playlist-card__legend"><%= @playlist.is_public ? "🔓 PUBLIC PLAYLIST" : "🔒 PRIVATE PLAYLIST" %></legend>
+        <div class="playlist-info__body">
+          <div data-edit-toggle-target="display">
+            <h1 class="playlist-info__name"><%= @playlist.name %></h1>
+            <% if @playlist.description.present? %>
+              <div class="playlist-info__description"><%= markdown_content(@playlist.description) %></div>
+            <% end %>
+            <div class="playlist-info__meta"><%= pluralize(@playlist.track_count, "track") %></div>
+            <div class="playlist-info__actions">
+              <button class="tui-button playlist-info__play" data-action="track-list#playAll"
+                      <%= "disabled" if @tracks.empty? %>>▶ Play Playlist</button>
+              <button class="tui-button playlist-info__edit" data-action="edit-toggle#edit">✎ Edit</button>
+              <% if @playlist.is_public %>
+                <span data-controller="clipboard"
+                      data-clipboard-text-value="<%= "#{request.base_url}/shared/#{@playlist.share_token}" %>"
+                      data-clipboard-copied-label-value="🔗 Copied!">
+                  <button class="tui-button playlist-info__share" data-clipboard-target="button"
+                          data-action="clipboard#copy">🔗 Share</button>
+                </span>
+              <% end %>
+            </div>
+          </div>
+
+          <div data-edit-toggle-target="form" hidden>
+            <%= form_with url: fm_playlist_path(@playlist), method: :patch, class: "playlist-form" do |f| %>
+              <div class="playlist-form__field">
+                <label for="edit_playlist_name">Name</label>
+                <%= f.text_field "playlist[name]", id: "edit_playlist_name", value: @playlist.name, required: true, maxlength: 100 %>
+              </div>
+              <div class="playlist-form__field">
+                <label for="edit_playlist_description">Description</label>
+                <%= f.text_area "playlist[description]", id: "edit_playlist_description", value: @playlist.description, rows: 3 %>
+              </div>
+              <div class="playlist-form__field">
+                <label class="playlist-form__checkbox">
+                  <%= f.check_box "playlist[is_public]", {checked: @playlist.is_public}, "true", "false" %>
+                  Make this playlist public (allows sharing)
+                </label>
+              </div>
+              <div class="playlist-form__actions">
+                <%= f.submit "Save", class: "tui-button playlist-form__submit" %>
+                <button type="button" class="tui-button playlist-form__cancel" data-action="edit-toggle#cancel">Cancel</button>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <% if @tracks.empty? %>
+      <div class="tui-window playlist-tracks">
+        <fieldset class="tui-fieldset">
+          <legend>EMPTY PLAYLIST</legend>
+          <div class="playlists-empty__body">
+            <p>This playlist is empty. Add tracks from the Pulse Vault!</p>
+            <%= link_to "Go to Pulse Vault", vault_path, class: "tui-button playlists-create-btn" %>
+          </div>
+        </fieldset>
+      </div>
+    <% else %>
+      <div class="tui-window playlist-tracks">
+        <fieldset class="tui-fieldset">
+          <legend>TRACKS (<%= @tracks.size %>) - Drag to reorder</legend>
+          <div class="playlist-tracks__scroll"
+               data-controller="playlist-reorder"
+               data-playlist-reorder-url-value="/api/playlists/<%= @playlist.id %>/reorder">
+            <%= render "tracks_table", tracks: @tracks, editable: true, playlist: @playlist %>
+          </div>
+        </fieldset>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,51 @@
+<% content_for :title, "Releases — hackr.fm — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="tui-window white-text fmr-window">
+    <fieldset class="fmr-fieldset">
+      <legend class="center fmr-legend">hackr.fm :: RELEASES</legend>
+
+      <div>
+        <% if @releases.empty? %>
+          <div class="fmr-empty">
+            <p>No releases cataloged yet.</p>
+          </div>
+        <% else %>
+          <div class="fmr-grid">
+            <% @releases.each do |release| %>
+              <%= nav_link_to "/#{release.artist.slug}/releases/#{release.slug}", css_class: "fm-card-link" do %>
+                <div class="fm-release-card">
+                  <div class="fm-cover">
+                    <% if release.cover_image.attached? %>
+                      <%= image_tag url_for(release.cover_image), alt: release.name, class: "fm-cover-img" %>
+                    <% else %>
+                      <div class="fm-cover-placeholder">&#9834;</div>
+                    <% end %>
+                  </div>
+                  <div class="fmr-release-info">
+                    <div class="fmr-release-name"><%= release.name %></div>
+                    <div class="fm-release-artist"><%= release.artist.name %></div>
+                    <div class="fm-release-meta">
+                      <span class="fm-release-type"><%= release.release_type&.upcase || "RELEASE" %> · <%= pluralize(release.tracks.count, "track") %></span>
+                      <% if release.release_date %>
+                        <span class="fm-release-date"><%= release.release_date %></span>
+                      <% end %>
+                    </div>
+                    <% if release.catalog_number.present? %>
+                      <div class="fmr-catalog"><%= release.catalog_number %></div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div class="fmr-nav-row">
+          <%= nav_link_to "/fm", css_class: "fmr-nav-back" do %>← hackr.fm<% end %>
+          <%= nav_link_to "/vault", css_class: "fmr-nav-vault" do %>PULSE VAULT →<% end %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

@@ -33,7 +33,28 @@ const RAILS_ONLY_PATHS = [
   // Hotwire-migrated (Phase 3):
   '/',
   '/wire',
-  '/feed'
+  '/feed',
+  // Hotwire-migrated (Phase 4) — the whole music cluster:
+  '/vault',
+  '/fm',
+  '/f/net',
+  '/shared',
+  '/sector',
+  '/thecyberpulse',
+  '/xeraen',
+  '/system-rot',
+  '/wavelength-zero',
+  '/voiceprint',
+  '/temporal-blue-drift',
+  '/injection-vector',
+  '/cipher-protocol',
+  '/blitzbeam',
+  '/apex-overdrive',
+  '/ethereality',
+  '/neon-hearts',
+  '/offline',
+  '/heartbreak-havoc',
+  '/the-pulse-grid'
 ]
 
 const isRailsOnlyPath = (href: string) =>

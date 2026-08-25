@@ -1,0 +1,54 @@
+<%# VodzPage.tsx port: the artist's VOD list. Thumbnails come straight
+    from img.youtube.com for any recognizable YouTube URL. An empty
+    XERAEN list never reaches this template (controller bounces it to
+    /thecyberpulse/vidz). %>
+<% slug = params[:artist_slug] %>
+
+<% if @artist.nil? %>
+  <% content_for :title, "Vidz — hackr.tv" %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window red-168-text vodz-error-window">
+      <fieldset>
+        <legend>Error</legend>
+        <p>Failed to load VODs</p>
+      </fieldset>
+    </div>
+  <% end %>
+<% else %>
+  <% content_for :title, "#{@artist.name} :: Vidz — hackr.tv" %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window white-text vodz-window">
+      <fieldset class="vodz-fieldset">
+        <legend class="center vodz-legend"><%= @artist.name %> :: VIDZ</legend>
+        <div class="vodz-body">
+          <% if @vods.empty? %>
+            <p class="vodz-empty">No videos available yet.</p>
+          <% else %>
+            <div class="vodz-list">
+              <% @vods.each do |vod| %>
+                <% video_id = youtube_video_id(vod.vod_url) %>
+                <%= link_to "/#{slug}/vidz/#{vod.id}", class: "vodz-item" do %>
+                  <% if video_id %>
+                    <div class="vodz-item__thumb">
+                      <img src="https://img.youtube.com/vi/<%= video_id %>/mqdefault.jpg" alt="" class="vodz-item__img">
+                      <div class="vodz-item__badge"><div class="vodz-item__arrow"></div></div>
+                    </div>
+                  <% end %>
+                  <div class="vodz-item__info">
+                    <div class="vodz-item__title-row">
+                      <h3 class="vodz-item__title"><%= vod.title.presence || "Untitled Stream" %></h3>
+                      <% if vod.live_url.present? %>
+                        <span class="vodz-live-badge">Livestream</span>
+                      <% end %>
+                    </div>
+                    <p class="vodz-item__date"><%= vod.started_at ? future_datetime(vod.started_at) : "Unknown date" %></p>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+<% end %>

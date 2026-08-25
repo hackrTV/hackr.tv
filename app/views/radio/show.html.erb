@@ -1,0 +1,54 @@
+<% content_for :title, "Radio — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div data-controller="radio-stream">
+    <div class="tui-window cyan-168 white-text radio-window">
+      <fieldset class="cyan-168-border">
+        <legend class="center">hackr.fm :: RADIO</legend>
+
+        <h2 class="cyan-255-text radio-heading">[:: FRACTURE NETWORK RADIO STATIONS ::]</h2>
+
+        <div class="radio-grid">
+          <% @stations.each do |station| %>
+            <%= render "station_card", station: station, live_stream: @live_stream %>
+          <% end %>
+        </div>
+
+        <div class="radio-infobox">
+          <h3 class="cyan-255-text">[:: BROADCAST INFO ::]</h3>
+          <p>
+            hackr.fm Radio transmits 24/7 from undisclosed locations across THE PULSE GRID.
+            Each station is a beacon of the Fracture Network, broadcasting truth through the digital noise.
+            Select a station above to begin streaming.
+          </p>
+        </div>
+      </fieldset>
+    </div>
+
+    <%# Local bar for raw-stream stations — separate from the permanent player %>
+    <div class="radio-bar" data-radio-stream-target="bar" hidden>
+      <div class="radio-bar__inner">
+        <button class="tui-button radio-bar__stop" data-action="radio-stream#stop">■ STOP</button>
+        <div class="radio-bar__info">
+          <div>
+            <span class="radio-bar__live">● LIVE</span>
+            <span class="radio-bar__sep">|</span>
+            <span class="radio-bar__station" data-radio-stream-target="stationName"></span>
+          </div>
+          <div class="radio-bar__genre-row">
+            <span class="radio-bar__genre-label">Genre: </span>
+            <span class="radio-bar__genre" data-radio-stream-target="genre"></span>
+          </div>
+        </div>
+        <div class="radio-bar__volume">
+          <span>Volume:</span>
+          <input type="range" min="0" max="100" value="70"
+                 data-radio-stream-target="volume" data-action="radio-stream#volumeChanged">
+        </div>
+        <button class="tui-button radio-bar__close" data-action="radio-stream#stop">✕</button>
+      </div>
+    </div>
+
+    <audio data-radio-stream-target="audio" preload="none" hidden></audio>
+  </div>
+<% end %>

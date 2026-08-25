@@ -51,6 +51,19 @@ FactoryBot.define do
       featured { true }
     end
 
+    # Real 2s tone (spike_tone.ogg) — decodable, so cuprite playback specs
+    # can assert currentTime advancing and queue auto-advance on ended.
+    # (test_audio.mp3 is an undecodable zero-byte stub; see Phase 0 notes.)
+    trait :with_audio do
+      after(:create) do |track|
+        track.audio_file.attach(
+          io: File.open(Rails.root.join("spec/fixtures/files/spike_tone.ogg")),
+          filename: "tone-#{track.slug}.ogg",
+          content_type: "audio/ogg"
+        )
+      end
+    end
+
     trait :without_streaming_links do
       streaming_links { nil }
     end
