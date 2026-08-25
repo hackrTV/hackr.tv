@@ -53,6 +53,8 @@ class Echo < ApplicationRecord
       hackr_alias: grid_hackr&.hackr_alias,
       echo_count: pulse.reload.echo_count
     })
+
+    broadcast_echo_count_html(pulse)
   end
 
   def broadcast_echo_removed
@@ -66,5 +68,19 @@ class Echo < ApplicationRecord
       hackr_id: grid_hackr_id,
       echo_count: reloaded_pulse.echo_count
     })
+
+    broadcast_echo_count_html(reloaded_pulse)
+  end
+
+  # Dual-publish (Hotwire migration Phase 3): updates ONLY the count span
+  # inside the echo button — the button's per-viewer echoed state is
+  # client-side and must not be clobbered by a global broadcast.
+  def broadcast_echo_count_html(pulse)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "wire_html",
+      target: "pulse_#{pulse.id}_echo_count",
+      partial: "wire/echo_count",
+      locals: {pulse: pulse}
+    )
   end
 end

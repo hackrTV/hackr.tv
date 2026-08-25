@@ -15,6 +15,7 @@ RSpec.describe WorldEventFeed::Publisher do
     end
 
     it "broadcasts to ActionCable" do
+      allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (Phase 3)
       expect(ActionCable.server).to receive(:broadcast).with(
         "world_event_feed",
         hash_including(type: "world_event")

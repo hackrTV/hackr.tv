@@ -1,0 +1,11 @@
+<% if @more %>
+  <%= turbo_frame_tag "wire-page-#{@page + 1}", src: wire_path(page: @page + 1),
+    loading: "lazy", target: "_top" do %>
+    <div class="wire-loading">Loading the Hotwire...</div>
+  <% end %>
+<% elsif @pulses.any? %>
+  <div class="end-of-feed">
+    <p>End of the WIRE</p>
+    <p class="wire-end-sub">W.I.R.E. // Wideband Information Relay Emitter</p>
+  </div>
+<% end %>

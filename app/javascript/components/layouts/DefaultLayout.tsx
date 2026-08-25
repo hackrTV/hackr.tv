@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { HeaderMenu } from '~/components/navigation/HeaderMenu'
 import { FooterMenu } from '~/components/navigation/FooterMenu'
 import { LiveNowBanner } from '~/components/stream/LiveNowBanner'
@@ -34,7 +33,8 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
       {showAsciiArt && !isMobile && (
         <>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'center' }} className="white-168-text">
-            <Link to="/" style={{ display: 'inline-block' }}>
+            {/* Hotwire-migrated path — full page load (plain anchor) */}
+            <a href="/" style={{ display: 'inline-block' }}>
               <pre id="greetings" style={{ fontSize: '11px' }}>
                 {` __  __                   __            ______  __  __
 /\\ \\/\\ \\                 /\\ \\          /\\__  _\\/\\ \\/\\ \\
@@ -44,7 +44,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
    \\ \\_\\ \\_\\ \\__/.\\_\\ \\____\\\\ \\_\\ \\_\\ \\_\\/\\_\\ \\_\\ \\ \`\\___/
     \\/_/\\/_/\\/__/\\/_/\\/____/ \\/_/\\/_/\\/_/\\/_/\\/_/  \`\\/__/`}
               </pre>
-            </Link>
+            </a>
           </div>
 
           <br />
@@ -54,9 +54,10 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children, showAsci
       {/* Mobile Header - simple text logo */}
       {showAsciiArt && isMobile && (
         <div style={{ textAlign: 'center', padding: '10px 0' }} className="white-168-text">
-          <Link to="/" style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '2px' }}>
+          {/* Hotwire-migrated path — full page load (plain anchor) */}
+          <a href="/" style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '2px' }}>
             HACKR.TV
-          </Link>
+          </a>
         </div>
       )}
 

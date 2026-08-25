@@ -1,0 +1,18 @@
+<%= turbo_frame_tag "profile-bio" do %>
+  <%# Lowercased action: LowercaseRedirect 301s cased paths, and browsers
+      turn a redirected PATCH into a GET (which 404s). %>
+  <%= form_with url: wire_bio_path(current_hackr.hackr_alias.downcase), method: :patch,
+    data: {controller: "char-count"} do %>
+    <%= text_area_tag :bio, current_hackr.bio, rows: 4, maxlength: 512, autofocus: true,
+      class: "wire-bio-textarea",
+      data: {char_count_target: "input", action: "input->char-count#update"} %>
+    <div class="wire-bio-edit-footer">
+      <%= submit_tag "SAVE", class: "wire-bio-save" %>
+      <%= link_to "CANCEL", wire_user_path(current_hackr.hackr_alias), class: "wire-bio-cancel", data: {turbo_frame: "_top"} %>
+      <span class="id-bio-counter wire-bio-counter" data-char-count-target="count"></span>
+    </div>
+    <% if @error %>
+      <p class="wire-bio-error"><%= @error %></p>
+    <% end %>
+  <% end %>
+<% end %>

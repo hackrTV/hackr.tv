@@ -1,0 +1,23 @@
+<%# AchievementToast.tsx (mission variant) port. Locals:
+    mission, arc_name, rewards (hash), leveled_up, new_clearance. %>
+<div class="toast toast--mission" data-controller="toast" data-action="click->toast#dismiss">
+  <div class="toast-kicker toast-kicker--mission">
+    MISSION COMPLETE
+    <% if arc_name.present? %><span class="toast-arc">[<%= arc_name %>]</span><% end %>
+  </div>
+  <div class="toast-title"><span class="toast-mission-name"><%= mission.name %></span></div>
+  <div class="toast-rewards">
+    <% if rewards[:xp].to_i > 0 %><span class="toast-xp">+<%= rewards[:xp] %> XP</span><% end %>
+    <% if rewards[:cred].to_i > 0 %><span class="toast-cred">+<%= rewards[:cred] %> CRED</span><% end %>
+    <% rewards[:rep].each do |r| %>
+      <span class="<%= (r[:delta] >= 0) ? "toast-rep-up" : "toast-rep-down" %>"><%= (r[:delta] >= 0) ? "+" : "" %><%= r[:delta] %> <%= r[:faction] %></span>
+    <% end %>
+    <% rewards[:items].each do |item| %>
+      <span class="toast-item">+ <%= item[:name] %></span>
+    <% end %>
+    <% rewards[:achievements].each do |a| %>
+      <span class="toast-achievement-grant">◆ <%= a[:name] %></span>
+    <% end %>
+    <% if leveled_up && new_clearance %><span class="toast-clearance">▲ CL <%= new_clearance %></span><% end %>
+  </div>
+</div>

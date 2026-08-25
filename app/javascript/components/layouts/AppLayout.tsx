@@ -1,7 +1,6 @@
 import React, { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { trackEvent } from '~/utils/analyticsCollector'
-import { HomePage } from '~/components/pages/HomePage'
 import { LoadingPage } from '~/components/shared/LoadingSpinner'
 
 // Lazy load pages for code splitting
@@ -33,12 +32,8 @@ const SchematicsPage = lazy(() => import('~/components/pages/grid/SchematicsPage
 const LoadoutPage = lazy(() => import('~/components/pages/grid/LoadoutPage'))
 const DeckPage = lazy(() => import('~/components/pages/grid/DeckPage'))
 const TransitPage = lazy(() => import('~/components/pages/grid/TransitPage'))
-const HotwirePage = lazy(() => import('~/components/pulsewire/HotwirePage').then(m => ({ default: m.HotwirePage })))
-const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage').then(m => ({ default: m.UserPulsesPage })))
-const SinglePulsePage = lazy(() => import('~/components/pulsewire/SinglePulsePage').then(m => ({ default: m.SinglePulsePage })))
 const UplinkPage = lazy(() => import('~/components/pages/uplink/UplinkPage').then(m => ({ default: m.UplinkPage })))
 const UplinkPopoutPage = lazy(() => import('~/components/pages/uplink/UplinkPopoutPage').then(m => ({ default: m.UplinkPopoutPage })))
-const WorldFeedPage = lazy(() => import('~/components/pages/feed/WorldFeedPage').then(m => ({ default: m.WorldFeedPage })))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 // Auth components
@@ -60,7 +55,6 @@ export const AppLayout: React.FC = () => {
       <AchievementToastContainer />
       <Suspense fallback={<LoadingPage message="Loading page..." />}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
           <Route path="/fm" element={<FmLandingPage />} />
           <Route path="/fm/releases" element={<FmReleasesPage />} />
           <Route path="/vault" element={<PulseVaultPage />} />
@@ -88,7 +82,6 @@ export const AppLayout: React.FC = () => {
           <Route path="/sector/x" element={<SectorXPage />} />
           {/* Wavelength Zero has a custom landing page */}
           <Route path="/wavelength-zero" element={<WavelengthZeroPage />} />
-          <Route path="/feed" element={<WorldFeedPage />} />
           {/* Dynamic artist routes — catches any artist slug */}
           <Route path="/:artistSlug" element={<BandProfilePage />} />
           <Route path="/:artistSlug/releases" element={<ReleaseListPage />} />
@@ -103,10 +96,6 @@ export const AppLayout: React.FC = () => {
           <Route path="/transit" element={<ProtectedRoute><TransitPage /></ProtectedRoute>} />
           <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
           <Route path="/grid/1337" element={<FeatureGate feature="tactical_grid"><GridTacticalPage /></FeatureGate>} />
-          {/* PulseWire routes */}
-          <Route path="/wire" element={<HotwirePage />} />
-          <Route path="/wire/:username" element={<UserPulsesPage />} />
-          <Route path="/wire/pulse/:id" element={<SinglePulsePage />} />
           {/* Uplink routes - protected */}
           <Route path="/uplink" element={<ProtectedRoute><UplinkPage /></ProtectedRoute>} />
           {/* Uplink popout - public for livestream viewing */}

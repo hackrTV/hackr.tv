@@ -1,0 +1,9 @@
+<% content_for :title, "NO SIGNAL — The WIRE — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="white-168-text wire-page wire-not-found">
+    <h1>NO SIGNAL</h1>
+    <p>No hackr known as <strong>@<%= params[:username] %></strong> on the WIRE.</p>
+    <%= link_to "← Back to the WIRE", wire_path, class: "btn btn-primary" %>
+  </div>
+<% end %>

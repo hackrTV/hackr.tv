@@ -1,0 +1,99 @@
+<%# PulseCard.tsx port. Locals:
+      pulse            — required
+      viewer           — GridHackr or nil. Broadcast renders pass nil
+                         (viewer-neutral); owner/admin controls render
+                         hidden and the pulse-card Stimulus controller
+                         reveals them from the layout's current-hackr meta.
+      echoed           — whether the VIEWER has echoed (broadcasts: false)
+      indicator        — nil | :echo | :splice (profile timeline banners)
+      indicator_alias  — alias for the echo banner
+      pinnable/pinned/can_up/can_down — profile pin controls %>
+<%
+  viewer = local_assigns.fetch(:viewer, nil)
+  echoed = local_assigns.fetch(:echoed, false)
+  indicator = local_assigns.fetch(:indicator, nil)
+  indicator_alias = local_assigns.fetch(:indicator_alias, nil)
+  pinnable = local_assigns.fetch(:pinnable, false)
+  pinned = local_assigns.fetch(:pinned, false)
+  can_up = local_assigns.fetch(:can_up, false)
+  can_down = local_assigns.fetch(:can_down, false)
+  own = viewer && viewer.id == pulse.grid_hackr_id
+  splice_count = pulse.splices.count
+%>
+<div id="<%= dom_id(pulse) %>" class="pulse-card<%= " is-splice" if pulse.is_splice? %><%= " signal-dropped" if pulse.signal_dropped? %>"
+  data-controller="pulse-card" data-pulse-card-owner-id-value="<%= pulse.grid_hackr_id %>">
+  <% if indicator == :echo %>
+    <div class="wire-echo-indicator"><span class="wire-indicator-icon">↻</span><span>@<%= indicator_alias %> echoed</span></div>
+  <% elsif indicator == :splice %>
+    <div class="wire-splice-indicator">
+      <span class="wire-indicator-icon">↩</span>
+      <span>replying to <%= link_to "thread", wire_pulse_path(pulse.thread_root_id || pulse.parent_pulse_id), class: "wire-indicator-link" %></span>
+    </div>
+  <% end %>
+
+  <div class="pulse-header">
+    <%= link_to wire_user_path(pulse.grid_hackr.hackr_alias), class: "hackr-link" do %>
+      <span class="hackr-alias">@<%= pulse.grid_hackr.hackr_alias %></span>
+      <% if pulse.grid_hackr.role == "admin" %><span class="admin-badge">ADMIN</span><% end %>
+    <% end %>
+    <span class="pulse-timestamp"><%= wire_timestamp(pulse.pulsed_at) %></span>
+  </div>
+
+  <div class="pulse-content">
+    <% if pulse.signal_dropped? %>
+      <div class="signal-dropped-notice">
+        <span class="glitch">[ SIGNAL DROPPED BY GOVCORP ]</span>
+        <% if pulse.signal_dropped_at %>
+          <div class="dropped-timestamp">Moderated: <%= wire_timestamp(pulse.signal_dropped_at) %></div>
+        <% end %>
+      </div>
+    <% else %>
+      <p><%= wire_text(pulse) %></p>
+    <% end %>
+  </div>
+
+  <% unless pulse.signal_dropped? %>
+    <div class="pulse-actions">
+      <%= render "wire/echo_button", pulse: pulse, echoed: echoed, animate: false %>
+
+      <button type="button" class="splice-button" title="Splice into thread" hidden
+        data-pulse-card-target="loginOnly" data-action="click->pulse-card#toggleReply">
+        <span class="splice-icon">↩</span>
+        <% if splice_count > 0 %><span class="splice-count"><%= splice_count %></span><% end %>
+      </button>
+
+      <% if splice_count > 0 %>
+        <%= link_to "View #{splice_count} #{(splice_count == 1) ? "reply" : "replies"}",
+          wire_pulse_path(pulse.thread_root_id || pulse.id), class: "thread-link" %>
+      <% elsif pulse.is_splice? %>
+        <%= link_to "View thread", wire_pulse_path(pulse.thread_root_id || pulse.parent_pulse_id), class: "thread-link" %>
+      <% end %>
+
+      <%= button_to "×", wire_destroy_pulse_path(pulse), method: :delete,
+        class: "delete-button", title: "Delete pulse", form_class: "wire-inline-form",
+        form: {hidden: !own, data: {pulse_card_target: "ownerOnly"}} %>
+
+      <% if pinnable %>
+        <% if pinned %>
+          <% if can_up %>
+            <%= button_to "↑", wire_pulse_pin_move_path(pulse, direction: "up"), method: :patch,
+              class: "pin-move-button", form_class: "wire-inline-form" %>
+          <% end %>
+          <% if can_down %>
+            <%= button_to "↓", wire_pulse_pin_move_path(pulse, direction: "down"), method: :patch,
+              class: "pin-move-button", form_class: "wire-inline-form" %>
+          <% end %>
+          <%= button_to "📌 UNPIN", wire_pulse_pin_path(pulse), method: :delete,
+            class: "pin-button pin-button--pinned", title: "Unpin from profile", form_class: "wire-inline-form" %>
+        <% else %>
+          <%= button_to "📌 PIN", wire_pulse_pin_path(pulse), method: :post,
+            class: "pin-button", title: "Pin to profile", form_class: "wire-inline-form" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="pulse-reply-form" hidden data-pulse-card-target="replyForm">
+      <%= render "wire/composer", parent_pulse: pulse %>
+    </div>
+  <% end %>
+</div>

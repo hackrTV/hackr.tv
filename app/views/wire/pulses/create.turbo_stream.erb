@@ -1,0 +1,7 @@
+<%# The author's own contextual card (the global broadcast copy is
+    viewer-neutral and replaces/gets replaced by dom_id — either order
+    lands correctly because pulse-card re-reveals on connect). %>
+<%= turbo_stream.remove "wire-empty" %>
+<%= turbo_stream.prepend "wire-feed", partial: "wire/pulse_card",
+  locals: {pulse: @pulse, viewer: current_hackr, echoed: false} %>
+<%= turbo_stream.replace "composer-error", partial: "wire/composer_error", locals: {error: nil} %>

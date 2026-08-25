@@ -1,0 +1,33 @@
+<% content_for :title, "World Feed — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="feed-wrapper">
+    <div class="feed-screen">
+      <%= turbo_stream_from "world_event_feed_html" %>
+
+      <div class="feed-header" data-controller="wire-status">
+        <span class="feed-header-title">HACKR.TV // WORLD FEED</span>
+        <span class="feed-header-status status-disconnected" data-wire-status-target="badge">[ CONNECTING ]</span>
+      </div>
+
+      <div class="feed-scanlines"></div>
+
+      <div class="feed-container">
+        <div id="feed-lines">
+          <%= render partial: "feed/line", collection: @events, as: :event %>
+        </div>
+        <% if @events.empty? %>
+          <div class="feed-empty" id="feed-empty">
+            <span class="feed-empty-text">Awaiting signal...</span>
+            <span class="feed-cursor">_</span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="feed-footer">
+        <span data-feed-count-target="label">0 events loaded</span>
+        <span>hackr.tv/feed</span>
+      </div>
+    </div>
+  </div>
+<% end %>

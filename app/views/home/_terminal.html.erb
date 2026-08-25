@@ -1,0 +1,15 @@
+<%# TerminalAnimation.tsx port — the line copy + typing engine live in
+    terminal_controller.ts (they were component-internal in the SPA too);
+    command input navigates via full page loads (cross-stack safe). %>
+<div class="terminal-container" data-controller="terminal">
+  <div class="terminal-output" data-terminal-target="output"></div>
+  <div class="terminal-input-line" data-terminal-target="inputLine" hidden>
+    <span class="terminal-prompt">&gt;&nbsp;</span>
+    <span class="terminal-typed-text" data-terminal-target="typed"></span>
+    <span class="terminal-cursor"></span>
+    <input type="text" class="terminal-hidden-input" data-terminal-target="input"
+      data-action="input->terminal#inputChanged keydown->terminal#inputKeydown"
+      aria-label="Terminal command input" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="terminal-error" data-terminal-target="error" hidden></div>
+</div>

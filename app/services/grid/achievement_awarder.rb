@@ -80,6 +80,21 @@ module Grid
           new_clearance: xp_result&.dig(:new_clearance)
         }
       )
+
+      # Dual-publish (Hotwire migration Phase 3): rendered toast for the
+      # Hotwire layout's #toast-region; the JSON above stays for the SPA's
+      # AchievementToastContainer until Phase 7.
+      Turbo::StreamsChannel.broadcast_append_to(
+        [@hackr, :toasts],
+        target: "toast-region",
+        partial: "shared/toast_achievement",
+        locals: {
+          achievement: @achievement,
+          cred_reward: minted_cred ? @achievement.cred_reward : 0,
+          leveled_up: xp_result&.dig(:leveled_up) || false,
+          new_clearance: xp_result&.dig(:new_clearance)
+        }
+      )
     rescue => e
       Rails.logger.error("[AchievementAwarder] broadcast failed: #{e.message}")
     end

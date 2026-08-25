@@ -1,0 +1,24 @@
+<%# LiveStreamEmbed.tsx port. Locals: stream (live HackrStream).
+    Theater mode is a class toggle (Stimulus); the Uplink chat sidebar is
+    a link-out panel until Phase 5 migrates chat. %>
+<div class="live-embed" data-controller="theater stream-watch">
+  <div class="live-now-bar">
+    <span class="live-now-label">● LIVE NOW</span>
+    <span class="live-now-title"><%= stream.title %><% if stream.artist %> — <%= stream.artist.name %><% end %></span>
+    <button type="button" class="theater-toggle" data-theater-target="button" data-action="click->theater#toggle">[=] THEATER</button>
+  </div>
+  <div class="live-embed-row">
+    <div class="live-video-container">
+      <div class="live-video-frame">
+        <iframe src="<%= stream.live_url %>" title="<%= stream.title %>"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+    <div class="live-side-panel">
+      <div class="live-side-panel-title">UPLINK</div>
+      <p class="live-side-panel-note">Live chat runs on the Uplink page until it docks here.</p>
+      <a href="/uplink" class="btn btn-primary live-side-panel-link">OPEN UPLINK</a>
+    </div>
+  </div>
+</div>

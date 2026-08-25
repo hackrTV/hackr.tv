@@ -7,6 +7,7 @@ module NavigationHelper
     /logs /codex /handbook /schedule /timeline /code
     /grid/login /grid/register /grid/verify /grid/forgot_password
     /grid/reset_password /grid/confirm_email_change /grid/identity
+    / /wire /feed
   ].freeze
 
   def hotwire_path?(path)

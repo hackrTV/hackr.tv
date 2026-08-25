@@ -641,3 +641,170 @@
 .prerelease-banner-mode { color: #f59e0b; font-weight: bold; margin-right: 8px; }
 .prerelease-banner-text { color: #fbbf24; }
 .prerelease-banner-spacer { height: 35px; }
+
+/* --- PulseWire pages (Phase 3) ---
+ * Ports of the inline style objects in HotwirePage / PulseCard /
+ * ProfileHeader / UserPulsesPage / SinglePulsePage; the class-based
+ * styles live in pulse_wire.css and are reused as-is. */
+
+.wire-page { max-width: 800px; margin: 0 auto; padding-top: 30px; }
+.wire-inline-form { display: inline; }
+.wire-loading { text-align: center; padding: 40px; }
+.wire-empty-sub { color: #444; font-size: 0.8rem; margin-top: 10px; }
+.wire-end-sub { color: #444; font-size: 0.75rem; margin-top: 10px; }
+.wire-section-title { color: #7a8a9a; letter-spacing: 0.1em; font-size: 0.8rem; margin-bottom: 10px; font-family: 'Courier New', monospace; }
+
+.wire-login-prompt { padding: 20px; text-align: center; background: rgba(124, 58, 237, 0.1); border: 1px solid #7c3aed; margin-bottom: 30px; }
+.wire-login-prompt-lede { margin: 0 0 10px 0; color: #a78bfa; }
+.wire-login-prompt-lede a { color: #60a5fa; text-decoration: none; }
+.wire-login-prompt-sub { margin: 0; color: #666; font-size: 0.8rem; font-family: 'Courier New', monospace; }
+
+.wire-external-link { color: #60a5fa; text-decoration: underline; }
+.wire-censored { color: #f87171; font-style: italic; }
+.codex-link { color: #22d3ee; }
+.bio-mention { color: #22d3ee; }
+
+.wire-echo-indicator, .wire-splice-indicator { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 8px 15px; margin-bottom: -3px; font-family: 'Courier New', Courier, monospace; }
+.wire-echo-indicator { color: #60a5fa; background: rgba(96, 165, 250, 0.1); border-left: 3px solid #60a5fa; border-top: 1px solid rgba(96, 165, 250, 0.3); border-right: 1px solid rgba(96, 165, 250, 0.3); }
+.wire-splice-indicator { color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-left: 3px solid #a78bfa; border-top: 1px solid rgba(167, 139, 250, 0.3); border-right: 1px solid rgba(167, 139, 250, 0.3); }
+.wire-indicator-icon { font-size: 1.1rem; }
+.wire-indicator-link { color: #c4b5fd; text-decoration: underline; }
+
+.pin-move-button { background: none; border: none; cursor: pointer; color: #facc15; padding: 0; font-size: 0.95rem; }
+.pin-button { background: none; border: none; cursor: pointer; color: #888; padding: 0; font-size: 0.85rem; }
+.pin-button--pinned { color: #facc15; }
+.pinned-pulses { margin-bottom: 24px; padding: 16px; border: 1px solid rgba(250, 204, 21, 0.35); background: rgba(250, 204, 21, 0.04); }
+.pinned-pulses-title { color: #facc15; letter-spacing: 0.1em; font-size: 0.8rem; margin-bottom: 10px; font-family: 'Courier New', monospace; }
+
+/* Profile header (ProfileHeader.tsx) */
+.wire-profile-header { border: 1px solid #2a3a4a; background: rgba(10, 20, 30, 0.6); padding: 24px; margin-bottom: 24px; font-family: 'Courier New', monospace; }
+.wire-profile-title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wire-profile-alias { margin: 0; font-size: 2em; color: #fff; }
+.wire-role-badge { border: 1px solid #888; color: #888; padding: 2px 8px; font-size: 0.7em; letter-spacing: 0.1em; text-transform: uppercase; }
+.wire-cl-badge { border: 1px solid #facc15; color: #facc15; padding: 2px 8px; font-size: 0.7em; letter-spacing: 0.1em; }
+.wire-share-button { margin-left: auto; background: none; border: 1px solid #2a3a4a; color: #22d3ee; padding: 4px 10px; cursor: pointer; font-family: inherit; font-size: 0.8em; }
+.wire-profile-meta { margin-top: 6px; color: #7a8a9a; font-size: 0.85em; display: flex; gap: 14px; flex-wrap: wrap; }
+.wire-online { color: #34d399; }
+.wire-profile-bio { margin-top: 16px; }
+.wire-bio-view { color: #c0d0e0; line-height: 1.5; }
+.wire-bio-text { white-space: pre-wrap; word-break: break-word; }
+.wire-bio-empty { color: #566b7a; font-style: italic; }
+.wire-bio-edit-link { margin-left: 10px; background: none; border: none; color: #22d3ee; cursor: pointer; font-family: inherit; font-size: 0.8em; text-decoration: none; }
+.wire-bio-textarea { width: 100%; resize: vertical; font-family: inherit; background: #0a141e; color: #e0e0e0; border: 1px solid #2a3a4a; padding: 8px; box-sizing: border-box; }
+.wire-bio-edit-footer { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.wire-bio-save { background: #22d3ee; color: #0a0a0a; border: none; padding: 6px 14px; cursor: pointer; font-family: inherit; font-weight: bold; }
+.wire-bio-cancel { background: none; color: #888; border: 1px solid #2a3a4a; padding: 6px 14px; cursor: pointer; font-family: inherit; text-decoration: none; }
+.wire-bio-counter { margin-left: auto; }
+.wire-bio-error { color: #ff4444; margin: 8px 0 0; }
+.wire-stat-tiles { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+.wire-stat-tile { border: 1px solid #1f2f3f; background: rgba(20, 30, 40, 0.5); padding: 10px; text-align: center; }
+.wire-stat-value { color: #fff; font-size: 1.4em; font-weight: bold; }
+.wire-stat-label { color: #7a8a9a; font-size: 0.65em; letter-spacing: 0.08em; margin-top: 4px; }
+
+.wire-not-found { padding-top: 40px; text-align: center; }
+.wire-thread-back { margin-bottom: 20px; margin-top: 10px; }
+
+/* --- World Feed terminal (Phase 3, WorldFeedPage.tsx port) --- */
+.feed-wrapper { display: flex; justify-content: center; padding: 20px; min-height: 80vh; }
+.feed-screen { width: 100%; max-width: 1000px; background: #0a0a0a; border: 2px solid #22d3ee; border-radius: 4px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.feed-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #1a3a3a; background: #050505; }
+.feed-header-title { color: #22d3ee; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 2px; }
+.feed-header-status { font-family: monospace; font-size: 12px; }
+.feed-scanlines { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 255, 0.015) 2px, rgba(0, 255, 255, 0.015) 4px); pointer-events: none; z-index: 1; }
+.feed-container { flex: 1; padding: 16px 20px; overflow-y: auto; min-height: 500px; max-height: 700px; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; }
+.feed-line { margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity 0.5s ease-out; }
+/* Age fade (the SPA computed opacity per line index) */
+#feed-lines .feed-line:nth-last-child(n+21) { opacity: 0.6; }
+#feed-lines .feed-line:nth-last-child(n+31) { opacity: 0.4; }
+#feed-lines .feed-line:nth-last-child(n+41) { opacity: 0.2; }
+.feed-line-prefix { color: #22d3ee; margin-right: 8px; font-weight: bold; }
+.feed-cursor { display: inline-block; color: #22d3ee; animation: feed-blink 0.6s step-end infinite; }
+@keyframes feed-blink { 50% { opacity: 0; } }
+.feed-empty { display: flex; align-items: center; gap: 4px; padding: 40px 0; }
+.feed-empty-text { color: #666; }
+.feed-footer { display: flex; justify-content: space-between; padding: 8px 20px; border-top: 1px solid #1a3a3a; background: #050505; font-family: monospace; font-size: 11px; color: #4b5563; }
+
+/* --- Achievement / mission toasts (Phase 3, AchievementToast.tsx port).
+ * The slide-in keyframe was referenced but never defined in the SPA —
+ * defined here, so Hotwire toasts actually animate. --- */
+#toast-region { position: fixed; bottom: 90px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { pointer-events: auto; cursor: pointer; background: #111; padding: 12px 16px; font-family: monospace; color: #d0d0d0; animation: achievement-toast-slide-in 0.3s ease-out; }
+.toast--achievement { border: 2px solid #fbbf24; box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+.toast--mission { border: 2px solid #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); }
+@keyframes achievement-toast-slide-in { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast-kicker { font-size: 0.8em; font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
+.toast-kicker--achievement { color: #fbbf24; }
+.toast-kicker--mission { color: #22d3ee; }
+.toast-category { margin-left: 8px; }
+.toast-category--music { color: #f472b6; }
+.toast-category--social { color: #60a5fa; }
+.toast-category--meta { color: #a3e635; }
+.toast-category--progression { color: #c084fc; }
+.toast-category--grid { color: #22d3ee; }
+.toast-arc { color: #a78bfa; margin-left: 8px; }
+.toast-title { font-size: 1.05em; margin-bottom: 4px; }
+.toast-badge-icon { color: #fbbf24; margin-right: 6px; }
+.toast-name { color: #22d3ee; font-weight: bold; }
+.toast-mission-name { color: #fbbf24; font-weight: bold; }
+.toast-description { color: #9ca3af; font-size: 0.85em; margin-bottom: 6px; }
+.toast-rewards { font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 10px; }
+.toast-xp { color: #34d399; }
+.toast-cred { color: #fbbf24; }
+.toast-clearance { color: #fbbf24; font-weight: bold; }
+.toast-rep-up { color: #34d399; }
+.toast-rep-down { color: #ef4444; }
+.toast-item { color: #60a5fa; }
+.toast-achievement-grant { color: #fbbf24; }
+
+/* --- Home page (Phase 3: TerminalAnimation / StartingSoonHero /
+ * ScheduledStreamBanner / LiveStreamEmbed ports) --- */
+.terminal-container { background: #0a0a0a; color: #33cc33; font-family: 'Terminus', 'Courier New', Courier, monospace; padding: 20px; margin: 20px auto 0 auto; border: 2px solid #33aa33; border-radius: 5px; min-height: calc(100vh - 400px); max-width: 1200px; box-shadow: 0 0 15px rgba(51, 170, 51, 0.2); }
+@media (max-width: 767px) { .terminal-container { margin: 5px; padding: 12px; font-size: 14px; min-height: auto; overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; } }
+.terminal-output { white-space: pre-wrap; line-height: 1.6; }
+.terminal-cursor { display: inline-block; width: 10px; height: 18px; background: #33cc33; animation: terminal-blink 1s infinite; vertical-align: -2px; }
+@keyframes terminal-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.terminal-link { color: #4db8e8; text-decoration: underline; }
+.terminal-link:hover { color: #66ccff; }
+.terminal-prompt { color: #5cd65c; font-weight: bold; }
+.terminal-header { color: #5cb3cc; }
+.terminal-error { color: #ff6633; line-height: 1.6; }
+.terminal-input-line { display: flex; align-items: center; position: relative; line-height: 1.6; }
+.terminal-typed-text { color: #33cc33; white-space: pre; }
+.terminal-hidden-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; border: none; background: transparent; color: transparent; font-family: inherit; font-size: inherit; cursor: text; }
+
+.starting-soon-hero { position: relative; overflow: hidden; text-align: center; padding: 60px; background: linear-gradient(90deg, #0a1a2e 0%, #0d2847 50%, #0a1a2e 100%); border: 1px solid #06b6d4; font-family: Terminus, 'Courier New', monospace; }
+.starting-soon-sweep { position: absolute; top: 0; bottom: 0; left: -100%; width: 60%; background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent); animation: starting-soon-pulse 3s linear infinite; }
+@keyframes starting-soon-pulse { 0% { left: -100%; } 100% { left: 100%; } }
+.starting-soon-title { color: #06b6d4; font-size: 1.6em; letter-spacing: 3px; font-weight: bold; }
+.starting-soon-stream-title { color: #e0f2fe; margin-top: 14px; font-size: 1.1em; }
+.starting-soon-artist { color: #888; margin-top: 6px; }
+
+.scheduled-banner { position: relative; overflow: hidden; border-top: 1px solid #06b6d4; border-bottom: 1px solid #06b6d4; padding: 20px; font-family: Terminus, monospace; text-align: center; }
+.scheduled-banner-sweep { position: absolute; top: 0; bottom: 0; left: -100%; width: 60%; background: linear-gradient(90deg, transparent, rgba(251, 146, 60, 0.15), transparent); animation: scheduled-pulse 2s linear infinite; }
+@keyframes scheduled-pulse { 0% { left: -100%; } 100% { left: 100%; } }
+.scheduled-banner-label { color: #06b6d4; font-weight: bold; margin-right: 8px; }
+.scheduled-banner-title { color: #e0f2fe; }
+.scheduled-banner-artist { color: #9ca3af; }
+.scheduled-banner-countdown { color: #22d3ee; margin-left: 12px; }
+.scheduled-banner-soon { color: #fb923c; font-weight: bold; }
+.scheduled-banner-link { color: #06b6d4; text-decoration: none; margin-left: 12px; }
+
+.live-embed { margin: 20px auto; max-width: 1200px; }
+.live-now-bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: linear-gradient(90deg, #001a00, #003300); border: 1px solid #00ff00; font-family: Terminus, monospace; }
+.live-now-label { color: #00ff00; font-weight: bold; animation: feed-blink 2s step-end infinite; }
+.live-now-title { color: #e0ffe0; flex: 1; }
+.theater-toggle { background: none; border: 1px solid #00ff00; color: #00ff00; padding: 4px 10px; cursor: pointer; font-family: inherit; }
+.live-embed-row { display: flex; gap: 16px; margin-top: 12px; align-items: flex-start; }
+.live-video-container { flex: 1; min-width: 0; }
+.live-video-frame { position: relative; padding-bottom: 56.25%; height: 0; }
+.live-video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+.live-side-panel { width: 320px; flex-shrink: 0; border: 1px solid #7c3aed; padding: 16px; font-family: Terminus, monospace; }
+.live-side-panel-title { color: #a78bfa; font-weight: bold; letter-spacing: 2px; margin-bottom: 8px; }
+.live-side-panel-note { color: #888; font-size: 0.85em; margin: 0 0 12px 0; }
+@media (max-width: 900px) { .live-embed-row { flex-direction: column; } .live-side-panel { width: auto; } }
+
+/* Theater mode: fixed overlay */
+.live-embed.theater-mode { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: #000; margin: 0; max-width: none; display: flex; flex-direction: column; padding: 10px; }
+.live-embed.theater-mode .live-embed-row { flex: 1; margin-top: 10px; }
+.live-embed.theater-mode .live-video-frame { padding-bottom: 0; height: 100%; }
+body.theater-open { overflow: hidden; }

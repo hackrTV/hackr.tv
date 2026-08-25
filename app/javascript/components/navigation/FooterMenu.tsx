@@ -25,9 +25,10 @@ export const FooterMenu: React.FC = () => {
       <div className="tui-statusbar">
         <ul>
           <li className={isActive('/') ? 'active' : undefined}>
-            <Link to="/">
+            {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
+            <a href="/">
               <span className="purple-168-text">0</span>&nbsp;hackr.tv&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/thecyberpulse') ? 'active' : undefined}>
             <Link to="/thecyberpulse">
@@ -50,9 +51,10 @@ export const FooterMenu: React.FC = () => {
             </Link>
           </li>
           <li className={isActive('/wire') ? 'active' : undefined}>
-            <Link to="/wire">
+            {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
+            <a href="/wire">
               <span className="purple-168-text">5</span>&nbsp;WIRE&nbsp;
-            </Link>
+            </a>
           </li>
           {isLoggedIn && (
             <li className={isActive('/uplink') ? 'active' : undefined}>

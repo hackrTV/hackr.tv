@@ -1,0 +1,9 @@
+<%# ThreadView.tsx tree: card + recursively indented replies.
+    Locals: pulse, children (hash parent_id → [pulses]), depth. %>
+<div class="thread-node" style="margin-left: <%= [depth, 6].min * 20 %>px;">
+  <%= render "wire/pulse_card", pulse: pulse, viewer: current_hackr,
+    echoed: @echoed_ids.include?(pulse.id) %>
+</div>
+<% (children[pulse.id] || []).sort_by(&:pulsed_at).each do |child| %>
+  <%= render "wire/thread_node", pulse: child, children: children, depth: depth + 1 %>
+<% end %>

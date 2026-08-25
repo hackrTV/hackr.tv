@@ -91,6 +91,16 @@ module WorldEventFeed
         type: "world_event",
         event: serialize(event)
       })
+
+      # Dual-publish (Hotwire migration Phase 3): the JSON broadcast above
+      # stays for the overlay pages + any remaining SPA listener; the
+      # Hotwire /feed page appends server-rendered lines.
+      Turbo::StreamsChannel.broadcast_append_to(
+        "world_event_feed_html",
+        target: "feed-lines",
+        partial: "feed/line",
+        locals: {event: event}
+      )
     rescue => e
       Rails.logger.error("[WorldEventFeed] broadcast failed: #{e.message}")
     end

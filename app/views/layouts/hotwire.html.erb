@@ -7,6 +7,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%# Viewer identity for Stimulus (broadcast-rendered pulse cards are
+        viewer-neutral; pulse-card reveals owner controls from this). %>
+    <% if logged_in? %>
+      <meta name="current-hackr-id" content="<%= current_hackr.id %>">
+    <% end %>
 
     <%= yield :head %>
 
@@ -35,7 +40,9 @@
       <%= yield %>
     </div>
 
-    <%# Turbo Streams append achievement/mission toasts here (Phase 3) %>
+    <%# Achievement/mission toasts (Phase 3): user-scoped stream, toasts
+        append here from AchievementAwarder / MissionRewardGranter. %>
+    <%= turbo_stream_from current_hackr, :toasts if logged_in? %>
     <div id="toast-region" aria-live="polite"></div>
 
     <%# Persistent audio player slot — survives Turbo visits; populated in Phase 4 %>
