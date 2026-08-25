@@ -32,18 +32,43 @@ Rails.application.routes.draw do
   get "trackz", to: "tracks#legacy_redirect", as: :legacy_tracks
   get "trackz/:id", to: "tracks#legacy_redirect_show", as: :legacy_track
 
-  # THE PULSE GRID routes (SPA)
+  # THE PULSE GRID routes. Game pages are still SPA; auth + account pages
+  # are Hotwire (migrated Phase 2). Route names for verify/reset/confirm
+  # are load-bearing — GridMailer builds email links with them.
   scope "grid" do
     get "/", to: "pages#spa_root", as: :grid
-    get "login", to: "pages#spa_root", as: :grid_login
-    get "register", to: "pages#spa_root", as: :grid_register
-    get "verify/:token", to: "pages#spa_root", as: :grid_verify
-    get "forgot_password", to: "pages#spa_root", as: :grid_forgot_password
-    get "identity", to: "pages#spa_root", as: :grid_identity
-    get "identity/two-factor", to: "pages#spa_root", as: :grid_two_factor
-    get "reset_password/:token", to: "pages#spa_root", as: :grid_password_reset
-    get "confirm_email_change/:token", to: "pages#spa_root", as: :grid_confirm_email_change
     get "1337", to: "pages#spa_root", as: :grid_tactical
+
+    scope module: :grid do
+      get "login", to: "sessions#new", as: :grid_login
+      post "login", to: "sessions#create"
+      get "login/verify", to: "sessions#totp", as: :grid_login_verify
+      post "login/verify", to: "sessions#verify_totp"
+
+      get "register", to: "registrations#new", as: :grid_register
+      post "register", to: "registrations#create"
+      get "verify/:token", to: "registrations#verify", as: :grid_verify
+      post "verify/:token", to: "registrations#complete", as: :grid_complete_registration
+
+      get "forgot_password", to: "passwords#forgot", as: :grid_forgot_password
+      post "forgot_password", to: "passwords#request_reset"
+      get "reset_password/:token", to: "passwords#edit", as: :grid_password_reset
+      post "reset_password/:token", to: "passwords#update", as: :grid_update_password
+
+      get "confirm_email_change/:token", to: "email_changes#show", as: :grid_confirm_email_change
+      post "confirm_email_change/:token", to: "email_changes#confirm", as: :grid_do_confirm_email_change
+
+      get "identity", to: "identities#show", as: :grid_identity
+      patch "identity", to: "identities#update"
+      post "identity/email_change", to: "email_changes#create", as: :grid_request_email_change
+      post "identity/password_reset", to: "passwords#request_for_current", as: :grid_request_password_reset
+
+      get "identity/two-factor", to: "two_factor#show", as: :grid_two_factor
+      get "identity/two-factor/setup", to: "two_factor#setup", as: :grid_two_factor_setup
+      post "identity/two-factor/enable", to: "two_factor#enable", as: :grid_two_factor_enable
+      delete "identity/two-factor", to: "two_factor#destroy"
+      post "identity/two-factor/backup_codes", to: "two_factor#backup_codes", as: :grid_two_factor_backup_codes
+    end
   end
 
   # Vault (promoted from /fm/pulse-vault)

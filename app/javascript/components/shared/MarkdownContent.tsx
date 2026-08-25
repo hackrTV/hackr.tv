@@ -21,7 +21,15 @@ const RAILS_ONLY_PATHS = [
   '/handbook',
   '/schedule',
   '/timeline',
-  '/code'
+  '/code',
+  // Hotwire-migrated (Phase 2) — auth + account pages:
+  '/grid/login',
+  '/grid/register',
+  '/grid/verify',
+  '/grid/forgot_password',
+  '/grid/reset_password',
+  '/grid/confirm_email_change',
+  '/grid/identity'
 ]
 
 const isRailsOnlyPath = (href: string) =>

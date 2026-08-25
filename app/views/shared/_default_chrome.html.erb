@@ -1,9 +1,10 @@
 <%# ERB port of DefaultLayout.tsx (the nav itself renders in the hotwire
-    layout). Wrap page content:
-      <%%= render layout: "shared/default_chrome", locals: {ascii: false} do %%> … <%% end %%>
-    Locals: ascii (default true), hide_live_banner (default false).
-    Live banner is server-rendered at page load; real-time go-live inserts
-    arrive with Phase 3 (StreamStatusChannel). %>
+    layout). Wrap page content in render layout: "shared/default_chrome"
+    with a block. Locals: ascii (default true), hide_live_banner (default
+    false). Live banner is server-rendered at page load; real-time go-live
+    inserts arrive with Phase 3 (StreamStatusChannel).
+    No inline close-tag examples here: an ERB comment ends at the first
+    percent-gt, escaped or not — the old example leaked onto every page. %>
 <% ascii = local_assigns.fetch(:ascii, true) %>
 <% hide_live_banner = local_assigns.fetch(:hide_live_banner, false) %>
 

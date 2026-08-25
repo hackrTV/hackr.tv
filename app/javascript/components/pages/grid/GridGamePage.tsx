@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { GridLayout } from '~/components/layouts/GridLayout'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useActionCable, GridEvent } from '~/hooks/useActionCable'
@@ -72,14 +71,13 @@ export const GridGamePage: React.FC = () => {
   const commandInputRef = useRef<CommandInputHandle>(null)
   const currentPlaylistIdRef = useRef<number | null>(null)
   const initialLoadDoneRef = useRef(false) // Track if initial load has completed
-  const navigate = useNavigate()
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!authLoading && !hackr) {
-      navigate('/grid/login')
+      window.location.replace('/grid/login')
     }
-  }, [hackr, authLoading, navigate])
+  }, [hackr, authLoading])
 
   // Set initial room ID and load initial output
   useEffect(() => {
@@ -223,7 +221,7 @@ export const GridGamePage: React.FC = () => {
     if (confirm('Disconnect from THE PULSE GRID?')) {
       await disconnect()
       initialLoadDoneRef.current = false // Reset for next login
-      navigate('/grid/login')
+      window.location.href = '/grid/login'
     }
   }
 

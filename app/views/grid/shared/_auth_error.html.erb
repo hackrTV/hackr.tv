@@ -1,0 +1,9 @@
+<%# Red error banner used across the auth pages. Locals: message
+    (nil-safe — renders nothing when blank); title (default "⚠ ERROR"). %>
+<% title = local_assigns.fetch(:title, "⚠ ERROR") %>
+<% if message.present? %>
+  <div class="auth-error">
+    <p class="red-255-text auth-error-title"><%= title %></p>
+    <p class="white-text auth-error-text"><%= message %></p>
+  </div>
+<% end %>

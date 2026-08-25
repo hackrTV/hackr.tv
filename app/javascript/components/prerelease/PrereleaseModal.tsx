@@ -67,13 +67,13 @@ export const PrereleaseModal: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link
-            to="/grid/login"
+          <a
+            href="/grid/login"
             className="tui-button green-168"
             style={{ padding: '10px 25px', fontSize: '14px' }}
           >
             LOG IN
-          </Link>
+          </a>
           <Link
             to="/"
             className="tui-button purple-168"

@@ -1,0 +1,10 @@
+<%# PrereleaseBanner.tsx port — fixed banner below the tui nav, plus a
+    spacer so content clears it. Renders only when prerelease_mode is set
+    ("alpha" / "prerelease" / nil, see config/initializers/app_settings.rb). %>
+<% if prerelease_mode.present? %>
+  <div class="prerelease-banner">
+    <span class="prerelease-banner-mode">[<%= prerelease_mode.to_s.upcase %>]</span>
+    <span class="prerelease-banner-text"><%= prerelease_banner_text.presence || "This application is in #{prerelease_mode} mode." %></span>
+  </div>
+  <div class="prerelease-banner-spacer"></div>
+<% end %>

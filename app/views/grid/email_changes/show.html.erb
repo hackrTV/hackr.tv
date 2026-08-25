@@ -1,0 +1,35 @@
+<% content_for :title, "Email Change — hackr.tv" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "THE PULSE GRID :: EMAIL CHANGE"} do %>
+  <% if @confirmed %>
+    <div class="center auth-head">
+      <h1 class="green-255-text auth-title auth-title--sm">EMAIL UPDATED</h1>
+      <p class="auth-note">Your email address has been changed successfully.</p>
+      <%= link_to "BACK TO IDENTITY", grid_identity_path, class: "tui-button purple-168" %>
+    </div>
+  <% elsif @error %>
+    <%= render "grid/shared/auth_error", message: @error, title: "VERIFICATION FAILED" %>
+
+    <div class="center auth-actions">
+      <p class="auth-note--dim">The verification link may have expired or already been used.</p>
+      <%= link_to "BACK TO IDENTITY", grid_identity_path, class: "tui-button purple-168" %>
+    </div>
+  <% else %>
+    <div class="center auth-head">
+      <h1 class="cyan-255-text auth-title auth-title--sm">CONFIRM EMAIL CHANGE</h1>
+      <p class="auth-sub auth-sub--sm">
+        Switch this account's email to<br>
+        <span class="green-255-text"><strong><%= @token.new_email %></strong></span>
+      </p>
+    </div>
+
+    <%# turbo=false: success renders a 200 page from the POST (the token is
+        single-use, so there is nothing to redirect to) — Turbo would
+        refuse a 200 form response. %>
+    <%= form_with url: grid_do_confirm_email_change_path(token: @token.token), data: {turbo: false} do %>
+      <div class="center auth-actions">
+        <%= submit_tag "CONFIRM EMAIL CHANGE", class: "tui-button purple-168 auth-submit" %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

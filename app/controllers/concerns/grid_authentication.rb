@@ -75,6 +75,35 @@ module GridAuthentication
     @current_hackr = nil
   end
 
+  # Complete a successful authentication: room safety, first-login tutorial
+  # bootstrap, session + Cable cookie, activity touch, achievement sweep.
+  # Shared by the JSON login/TOTP-verify actions and the Hotwire session
+  # controller so the side-effect chain can't drift between stacks. The
+  # 2FA-completing path passes tutorial_check: false — it never ran the
+  # tutorial bootstrap (pre-existing asymmetry, preserved).
+  def establish_grid_session(hackr, tutorial_check: true)
+    hackr.ensure_current_room!
+
+    # Start tutorial for hackrs who haven't seen it (e.g., seeded accounts)
+    if tutorial_check && hackr.stat("tutorial_active").nil? && hackr.stat("tutorial_completed").nil?
+      tutorial = Grid::TutorialService.new(hackr)
+      tutorial.start!
+      # Move to Bootloader hub (start! doesn't move — only sets state)
+      hub = tutorial.tutorial_hub_room
+      hackr.update!(current_room: hub) if hub
+      # Remove den chip if provisioned before tutorial was set up.
+      # Skip if hackr already has a den (chip was already used).
+      unless hackr.den.present?
+        hackr.grid_items.joins(:grid_item_definition)
+          .where(grid_item_definitions: {slug: "den-access-chip"}).destroy_all
+      end
+    end
+
+    log_in(hackr)
+    hackr.touch_activity!
+    Grid::AchievementSweepJob.perform_later(hackr.id)
+  end
+
   PENDING_2FA_EXPIRY = 10.minutes
 
   def pending_2fa_hackr

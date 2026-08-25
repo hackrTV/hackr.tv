@@ -247,6 +247,16 @@
         79
       ],
       "note": "Safe: CommandParser escapes all dynamic text via h() (ERB::Util.html_escape). Admin-only view behind require_admin + require_dev_tools. Same rendering pattern as the BREACH sandbox and NPC dialogue tester terminals."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "620a76a77382ea967f41a26d932e7edc8fbd8bee4ae15e6e57898301c865e940",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/grid/two_factor/setup.html.erb",
+      "line": 19,
+      "note": "QR SVG is RQRCode-generated path data from the otpauth provisioning URI; the staged secret is validated to strict Base32 ([A-Z2-7]{16,64}) in Grid::TwoFactorController#enable before reaching the renderer, and the secret is encoded as QR modules, never literal markup."
     }
   ],
   "updated": "2026-04-27 19:15:00 +0000",

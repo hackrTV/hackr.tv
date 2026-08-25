@@ -1,0 +1,42 @@
+<% content_for :title, "Grid Login — hackr.tv" %>
+
+<%= render "shared/prerelease_banner" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "THE PULSE GRID :: ACCESS"} do %>
+  <%= render "grid/shared/auth_error", message: @error %>
+
+  <div class="center auth-head">
+    <h1 class="cyan-255-text auth-title">THE PULSE GRID</h1>
+    <p class="auth-sub">FRACTURE NETWORK LOGIN</p>
+  </div>
+
+  <%= form_with url: grid_login_path, data: {turbo: false} do %>
+    <div class="auth-field">
+      <%= label_tag :hackr_alias, "HACKR ALIAS", class: "white-text auth-label" %>
+      <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "tui-input auth-input", placeholder: "Enter your alias", required: true, autofocus: true %>
+    </div>
+
+    <div class="auth-field">
+      <%= label_tag :password, "PASSWORD", class: "white-text auth-label" %>
+      <%= password_field_tag :password, nil, class: "tui-input auth-input", placeholder: "Enter password", required: true %>
+    </div>
+
+    <div class="center auth-actions">
+      <%= submit_tag "CONNECT", class: "tui-button purple-168 auth-submit" %>
+    </div>
+  <% end %>
+
+  <hr class="auth-hr">
+
+  <div class="center auth-alt">
+    <p class="white-text auth-alt-label">LOST YOUR CREDENTIALS?</p>
+    <%= link_to "RECOVER ACCESS", grid_forgot_password_path, class: "tui-button orange-168" %>
+  </div>
+
+  <hr class="auth-hr">
+
+  <div class="center auth-alt">
+    <p class="white-text auth-alt-label">NEW TO THE FRACTURE NETWORK?</p>
+    <%= link_to "REGISTER AS HACKR", grid_register_path, class: "tui-button green-168" %>
+  </div>
+<% end %>

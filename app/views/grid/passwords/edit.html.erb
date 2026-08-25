@@ -1,0 +1,41 @@
+<% content_for :title, "Reset Password — hackr.tv" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "PASSWORD RESET", dark: true} do %>
+  <div class="center auth-head">
+    <h1 class="cyan-255-text auth-title">RESET PASSWORD</h1>
+    <p class="auth-sub">ENTER NEW CREDENTIALS</p>
+  </div>
+
+  <% if @token_error %>
+    <%= render "grid/shared/auth_error", message: @token_error, title: "VERIFICATION FAILED" %>
+
+    <div class="center auth-actions">
+      <p class="auth-note--dim">The reset link may have expired or already been used.</p>
+      <%= link_to "REQUEST A NEW LINK", grid_forgot_password_path, class: "btn-terminal btn-terminal--wide" %>
+    </div>
+  <% else %>
+    <%= form_with url: grid_update_password_path(token: @token.token), class: "auth-alt" do %>
+      <div class="auth-dark-field">
+        <%= label_tag :password, class: "auth-dark-label" do %>
+          <span class="cyan-255-text">NEW PASSWORD:</span>
+        <% end %>
+        <%= password_field_tag :password, nil, class: "auth-dark-input", required: true, minlength: 8 %>
+      </div>
+
+      <div class="auth-dark-field">
+        <%= label_tag :password_confirmation, class: "auth-dark-label" do %>
+          <span class="cyan-255-text">CONFIRM PASSWORD:</span>
+        <% end %>
+        <%= password_field_tag :password_confirmation, nil, class: "auth-dark-input", required: true, minlength: 8 %>
+      </div>
+
+      <div class="center">
+        <%= submit_tag "RESET PASSWORD", class: "btn-terminal btn-terminal--wide" %>
+      </div>
+
+      <% if @error %>
+        <p class="center form-msg--spaced msg-error"><%= @error %></p>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

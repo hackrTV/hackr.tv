@@ -1,5 +1,4 @@
-import React, { type ReactNode } from 'react'
-import { Navigate } from 'react-router-dom'
+import React, { useEffect, type ReactNode } from 'react'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 
@@ -10,12 +9,16 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isLoggedIn, loading } = useGridAuth()
 
-  if (loading) {
-    return <LoadingSpinner message="Checking authentication..." />
-  }
+  // The login page is server-rendered (Hotwire, Phase 2) and no longer in
+  // this router — leaving the SPA requires a full page load.
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      window.location.replace('/grid/login')
+    }
+  }, [loading, isLoggedIn])
 
-  if (!isLoggedIn) {
-    return <Navigate to="/grid/login" replace />
+  if (loading || !isLoggedIn) {
+    return <LoadingSpinner message="Checking authentication..." />
   }
 
   return <>{children}</>

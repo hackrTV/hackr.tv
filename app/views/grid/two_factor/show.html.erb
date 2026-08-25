@@ -1,0 +1,80 @@
+<% content_for :title, "Two-Factor Auth — hackr.tv" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "TWO-FACTOR AUTH", dark: true} do %>
+  <div class="center auth-head">
+    <h1 class="cyan-255-text auth-title auth-title--sm">TWO-FACTOR AUTHENTICATION</h1>
+    <p class="auth-sub auth-sub--sm">HACKR: <%= current_hackr.hackr_alias %></p>
+  </div>
+
+  <% if @error %>
+    <div class="auth-error--thin"><p><%= @error %></p></div>
+  <% end %>
+  <% if flash[:x_tf_notice] %>
+    <p class="tf-msg"><%= flash[:x_tf_notice] %></p>
+  <% end %>
+
+  <% if @mode == "disable" %>
+    <div class="tf-section tf-section--disable">
+      <p class="cyan-255-text tf-step">DISABLE TWO-FACTOR AUTHENTICATION</p>
+      <%= form_with url: grid_two_factor_path, method: :delete do %>
+        <div class="tf-field">
+          <%= label_tag :password, "PASSWORD", class: "white-text tf-label" %>
+          <%= password_field_tag :password, nil, class: "tui-input auth-input", placeholder: "Enter your password", required: true, autofocus: true %>
+        </div>
+        <div class="tf-field">
+          <%= label_tag :code, "AUTHENTICATOR CODE", class: "white-text tf-label" %>
+          <%= text_field_tag :code, nil, class: "tui-input auth-input", placeholder: "6-digit code", maxlength: 6, autocomplete: "one-time-code", required: true %>
+        </div>
+        <div class="center tf-actions">
+          <%= submit_tag "CONFIRM DISABLE", class: "btn-danger" %>
+          <%= link_to "CANCEL", grid_two_factor_path, class: "btn-cancel" %>
+        </div>
+      <% end %>
+    </div>
+  <% elsif @mode == "regenerate" %>
+    <div class="tf-section tf-section--regen">
+      <p class="cyan-255-text tf-step">REGENERATE BACKUP CODES</p>
+      <p class="tf-scan-hint">This will invalidate all existing backup codes and generate 8 new ones.</p>
+      <%# turbo=false: success renders the shown-once backup codes as a 200
+          from the POST — Turbo would refuse a 200 form response. %>
+      <%= form_with url: grid_two_factor_backup_codes_path, data: {turbo: false} do %>
+        <div class="tf-field">
+          <%= label_tag :password, "PASSWORD", class: "white-text tf-label" %>
+          <%= password_field_tag :password, nil, class: "tui-input auth-input", placeholder: "Enter your password", required: true, autofocus: true %>
+        </div>
+        <div class="tf-field">
+          <%= label_tag :code, "AUTHENTICATOR CODE", class: "white-text tf-label" %>
+          <%= text_field_tag :code, nil, class: "tui-input auth-input", placeholder: "6-digit code", maxlength: 6, autocomplete: "one-time-code", required: true %>
+        </div>
+        <div class="center tf-actions">
+          <%= submit_tag "REGENERATE CODES", class: "btn-regen" %>
+          <%= link_to "CANCEL", grid_two_factor_path, class: "btn-cancel" %>
+        </div>
+      <% end %>
+    </div>
+  <% elsif @status[:enabled] %>
+    <div class="tf-section">
+      <p class="id-row"><span class="cyan-255-text">STATUS:</span> <span class="tf-status-active">ACTIVE</span></p>
+      <p class="id-row id-row--gap"><span class="cyan-255-text">BACKUP CODES REMAINING:</span> <%= @status[:backup_codes_remaining] %></p>
+      <div class="tf-actions--row">
+        <%= link_to "REGENERATE BACKUP CODES", grid_two_factor_path(mode: "regenerate"), class: "btn-outline-cyan" %>
+        <%= link_to "DISABLE TWO-FACTOR AUTH", grid_two_factor_path(mode: "disable"), class: "btn-outline-red" %>
+      </div>
+    </div>
+  <% else %>
+    <div class="tf-section">
+      <p class="id-row"><span class="cyan-255-text">STATUS:</span> INACTIVE</p>
+      <p class="tf-blurb">
+        Add an extra layer of security to your account. You will need an authenticator app
+        (Google Authenticator, Authy, or similar).
+      </p>
+      <div class="center">
+        <%= link_to "ENABLE TWO-FACTOR AUTH", grid_two_factor_setup_path, class: "btn-terminal btn-terminal--wide" %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="center tf-back">
+    <%= link_to "← BACK TO IDENTITY", grid_identity_path %>
+  </div>
+<% end %>

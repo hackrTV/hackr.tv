@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { trackEvent } from '~/utils/analyticsCollector'
 import { measureComponent } from '~/utils/perfCollector'
 import { useGridAuth } from '~/hooks/useGridAuth'
@@ -320,13 +319,12 @@ const TacticalInner: React.FC = () => {
 
 export const GridTacticalPage: React.FC = () => {
   const { hackr, loading: authLoading } = useGridAuth()
-  const navigate = useNavigate()
 
   useEffect(() => {
     if (!authLoading && !hackr) {
-      navigate('/grid/login')
+      window.location.replace('/grid/login')
     }
-  }, [hackr, authLoading, navigate])
+  }, [hackr, authLoading])
 
   if (authLoading) {
     return (

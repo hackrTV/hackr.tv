@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { Link } from 'react-router-dom'
 import { ChannelTabs } from './ChannelTabs'
 import { PacketList } from './PacketList'
 import { PacketInput } from './PacketInput'
@@ -369,15 +368,15 @@ export const UplinkPanel: React.FC<UplinkPanelProps> = ({
               color: '#999'
             }}
           >
-            <Link
-              to="/grid/login"
+            <a
+              href="/grid/login"
               style={{
                 color: '#7c3aed',
                 textDecoration: 'none'
               }}
             >
               Log in
-            </Link>
+            </a>
             {' '}to transmit packets
           </div>
         )

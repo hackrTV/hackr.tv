@@ -66,11 +66,7 @@ class Api::TotpController < ApplicationController
     method = service.verify!(params[:code])
 
     clear_pending_2fa
-
-    hackr.ensure_current_room!
-    log_in(hackr)
-    hackr.touch_activity!
-    Grid::AchievementSweepJob.perform_later(hackr.id)
+    establish_grid_session(hackr, tutorial_check: false)
 
     Rails.logger.info("[2FA] Login completed (#{method}): hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
     render json: {

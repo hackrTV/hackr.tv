@@ -1,0 +1,23 @@
+<% content_for :title, "Two-Factor Verification — hackr.tv" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "THE PULSE GRID :: ACCESS"} do %>
+  <%= render "grid/shared/auth_error", message: @error %>
+
+  <div class="center auth-head">
+    <h1 class="cyan-255-text auth-title">THE PULSE GRID</h1>
+    <p class="auth-sub">TWO-FACTOR VERIFICATION</p>
+  </div>
+
+  <%= form_with url: grid_login_verify_path, data: {turbo: false} do %>
+    <div class="auth-field">
+      <%= label_tag :totp_code, "AUTHENTICATION CODE", class: "white-text auth-label" %>
+      <%= text_field_tag :totp_code, nil, class: "tui-input auth-input", placeholder: "6-digit code or backup code",
+        maxlength: 10, autocomplete: "one-time-code", required: true, autofocus: true %>
+      <p class="auth-hint--totp">Enter the code from your authenticator app, or a backup code.</p>
+    </div>
+
+    <div class="center auth-actions">
+      <%= submit_tag "VERIFY", class: "tui-button purple-168 auth-submit" %>
+    </div>
+  <% end %>
+<% end %>

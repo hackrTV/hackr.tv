@@ -1,0 +1,64 @@
+<% content_for :title, "Identity — hackr.tv" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "IDENTITY", dark: true} do %>
+  <div class="center auth-head">
+    <h1 class="cyan-255-text auth-title">IDENTITY</h1>
+    <p class="auth-sub">HACKR SETTINGS</p>
+  </div>
+
+  <div class="id-section">
+    <p class="id-row"><span class="cyan-255-text">ALIAS:</span> <%= current_hackr.hackr_alias %></p>
+    <p class="id-row"><span class="cyan-255-text">EMAIL:</span> <%= current_hackr.email.presence || "N/A" %></p>
+    <p class="id-row"><span class="cyan-255-text">ROLE:</span> <%= current_hackr.role %></p>
+  </div>
+
+  <%= form_with url: grid_identity_path, method: :patch, class: "id-section", data: {controller: "char-count"} do %>
+    <p class="cyan-255-text id-section-title">BIO</p>
+    <%= text_area_tag :bio, @bio, rows: 4, maxlength: 512, class: "tui-input id-bio-textarea",
+      placeholder: "Broadcast a short bio to the WIRE. @mention other hackrs to link them.",
+      data: {char_count_target: "input", action: "input->char-count#update"} %>
+    <div class="id-bio-footer">
+      <span class="id-bio-counter" data-char-count-target="count"></span>
+      <%= submit_tag "SAVE BIO", class: "btn-terminal" %>
+    </div>
+    <% if @bio_error %>
+      <p class="form-msg msg-error"><%= @bio_error %></p>
+    <% elsif flash[:x_bio_notice] %>
+      <p class="form-msg msg-success"><%= flash[:x_bio_notice] %></p>
+    <% end %>
+  <% end %>
+
+  <div class="id-section">
+    <p class="cyan-255-text id-section-title">CHANGE EMAIL</p>
+    <%= form_with url: grid_request_email_change_path, class: "id-email-form" do %>
+      <%= email_field_tag :new_email, flash[:x_email_value], class: "tui-input id-email-input", placeholder: "New email address", required: true %>
+      <%= submit_tag "CHANGE EMAIL", class: "btn-terminal" %>
+    <% end %>
+    <% if flash[:x_email_error] %>
+      <p class="form-msg msg-error"><%= flash[:x_email_error] %></p>
+    <% elsif flash[:x_email_notice] %>
+      <p class="form-msg msg-success"><%= flash[:x_email_notice] %></p>
+    <% end %>
+  </div>
+
+  <div class="id-section">
+    <p class="cyan-255-text id-section-title">TWO-FACTOR AUTHENTICATION</p>
+    <p class="id-row">
+      <% if current_hackr.otp_required_for_login? %>
+        <span class="id-2fa-status-on">[ ACTIVE ]</span>
+      <% else %>
+        <span class="id-2fa-status-off">[ INACTIVE ]</span>
+      <% end %>
+    </p>
+    <%= link_to "MANAGE 2FA", grid_two_factor_path, class: "btn-terminal" %>
+  </div>
+
+  <div class="center auth-actions">
+    <%= button_to "RESET CREDENTIALS", grid_request_password_reset_path, class: "btn-terminal btn-terminal--wide" %>
+    <% if flash[:x_password_error] %>
+      <p class="form-msg--spaced msg-error"><%= flash[:x_password_error] %></p>
+    <% elsif flash[:x_password_notice] %>
+      <p class="form-msg--spaced msg-success"><%= flash[:x_password_notice] %></p>
+    <% end %>
+  </div>
+<% end %>

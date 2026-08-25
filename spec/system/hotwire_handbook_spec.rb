@@ -1,8 +1,8 @@
 require "rails_helper"
 
-# Phase 1: handbook behind login. The spec logs in through the React SPA
-# login page — which doubles as a cross-stack proof: session established on
-# an SPA page carries into Hotwire pages.
+# Phase 1: handbook behind login. The spec logs in through the login page
+# (React SPA when written; Hotwire since Phase 2 — same field names, same
+# flow) and proves the session carries across pages.
 RSpec.describe "Hotwire handbook pages", type: :system do
   let!(:hackr) { create(:grid_hackr, password: "hackthegrid") }
   let!(:section) { create(:handbook_section, name: "Getting Started") }
@@ -16,9 +16,9 @@ RSpec.describe "Hotwire handbook pages", type: :system do
       title: "Deck Basics", slug: "deck-basics", kind: "reference")
   end
 
-  it "logs in via the SPA, browses the handbook, and filters the sidebar" do
+  it "logs in via the login page, browses the handbook, and filters the sidebar" do
     visit "/handbook"
-    # Anonymous → redirected to the React login page
+    # Anonymous → redirected to the login page
     expect(page).to have_field("hackr_alias")
 
     fill_in "hackr_alias", with: hackr.hackr_alias

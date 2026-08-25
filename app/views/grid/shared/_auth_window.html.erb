@@ -1,0 +1,14 @@
+<%# Shared chrome for auth/account pages (Phase 2): default chrome (no
+    ascii header) wrapping the centered tui-window — the ERB equivalent of
+    GridLayout + the tui-window/fieldset shell every auth page repeated.
+    Locals: legend (required); dark (default false — ResetPassword,
+    Identity and TwoFactor use the #1a1a2e window without the cyan skin). %>
+<% dark = local_assigns.fetch(:dark, false) %>
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="tui-window white-text auth-window <%= dark ? "auth-window--dark" : "cyan-168" %>">
+    <fieldset class="<%= dark ? "" : "cyan-168-border" %>">
+      <legend class="center"><%= legend %></legend>
+      <%= yield %>
+    </fieldset>
+  </div>
+<% end %>
