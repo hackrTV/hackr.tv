@@ -1,0 +1,127 @@
+/* Uplink chat (Hotwire migration Phase 5). Translated from the SPA's
+   inline styles: UplinkPanel / Packet / PacketList / PacketInput /
+   ChannelTabs / PresenceIndicator / ReconnectingBanner + the popout
+   page chrome and the home-page dock. Loads from the layouts' shared
+   tracked-asset partial — never per-page (turbo-track signature rule). */
+
+/* ── Page + panel shell ────────────────────────────────────────────── */
+
+.uplink-page { max-width: 800px; margin: 0 auto; padding: 20px; height: calc(100vh - 200px); min-height: 500px; }
+
+.uplink-panel { height: 100%; display: flex; flex-direction: column; background-color: #0d0d0d; border: 1px solid #333; position: relative; overflow: hidden; font-family: Terminus, monospace; }
+
+/* Connection banner (ReconnectingBanner.tsx). display set here beats the
+   UA [hidden] rule, so re-assert it. */
+.uplink-banner { position: absolute; top: 0; left: 0; right: 0; padding: 8px 16px; background-color: rgba(0, 0, 0, 0.9); border-bottom: 2px solid #ffaa00; display: flex; align-items: center; justify-content: center; gap: 12px; z-index: 10; color: #ffaa00; font-size: 0.8rem; }
+.uplink-banner--disconnected { border-bottom-color: #ff5555; color: #ff5555; }
+.uplink-banner[hidden] { display: none; }
+
+.uplink-header { padding: 12px 16px; border-bottom: 1px solid #333; background-color: #111; display: flex; align-items: center; justify-content: space-between; }
+.uplink-title { margin: 0; font-size: 1rem; color: #7c3aed; font-family: inherit; }
+.uplink-header-right { display: flex; align-items: center; gap: 12px; }
+.uplink-header-alias { font-size: 0.75rem; color: #666; }
+.uplink-popout-button { background: none; border: 1px solid #444; color: #888; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; font-family: inherit; border-radius: 2px; }
+.uplink-popout-button:hover { border-color: #7c3aed; color: #7c3aed; }
+
+/* ── Channel tabs (ChannelTabs.tsx) ───────────────────────────────── */
+
+.channel-tabs { display: flex; border-bottom: 1px solid #333; background-color: #111; }
+.channel-tab { flex: 1; padding: 12px 16px; background-color: transparent; border: none; border-bottom: 2px solid transparent; color: #888; font-family: inherit; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; position: relative; text-align: center; text-decoration: none; }
+.channel-tab--active { background-color: #1a1a1a; border-bottom-color: #7c3aed; color: #7c3aed; }
+.channel-tab--disabled { color: #444; cursor: not-allowed; }
+.channel-tab-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #555; margin-left: 6px; vertical-align: 1px; }
+.channel-tab-dot--live { background-color: #00ff00; }
+.channel-tab-slow { position: absolute; top: 4px; right: 8px; font-size: 0.6rem; color: #555; }
+
+/* ── Presence (PresenceIndicator.tsx) ─────────────────────────────── */
+
+.presence-indicator { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: #0a0a0a; border-bottom: 1px solid #222; font-size: 0.75rem; color: #666; }
+.presence-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #ff5555; flex-shrink: 0; }
+.presence-dot--connected { background-color: #00ff00; }
+.presence-count { color: #00d4ff; }
+.presence-text--disconnected { color: #ff5555; }
+
+/* ── Message log (PacketList.tsx) ─────────────────────────────────── */
+
+turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.packet-log { flex: 1; overflow-y: auto; background-color: #0a0a0a; }
+.uplink-empty { padding: 24px; text-align: center; color: #555; }
+.uplink-empty p { margin: 0; }
+.packet-log:has(.packet) .uplink-empty { display: none; }
+
+/* ── Packet rows (Packet.tsx) ─────────────────────────────────────── */
+
+.packet { display: flex; align-items: flex-start; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #222; }
+.packet--bridged { opacity: 0.5; }
+.packet--dropped { opacity: 0.3; background-color: rgba(255, 0, 0, 0.05); }
+
+.packet-meta { flex-shrink: 0; margin-top: 2px; text-align: center; }
+.packet-time { color: #555; font-size: 0.75rem; display: block; }
+.packet-badge { font-size: 0.6rem; font-weight: bold; display: block; line-height: 1; margin-top: 2px; }
+.packet-badge--admin { color: #00d4ff; }
+.packet-badge--operator { color: #ffaa00; }
+.packet-badge--ttv { color: #a78bfa; }
+.packet-badge--yt { color: #ff5555; }
+.packet-badge--synthia { color: #00ff88; }
+
+.packet-body { flex: 1; min-width: 0; }
+.packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
+.packet-author--admin { color: #00d4ff; }
+.packet-author--operator { color: #ffaa00; }
+.packet-author--operative { color: #cc0088; }
+.packet-bridged-user { font-weight: bold; margin-right: 6px; color: #ccc; }
+.packet-bridged-user--ttv { color: #c4b5fd; }
+.packet-bridged-user--yt { color: #fca5a5; }
+.packet-content { color: #ccc; word-break: break-word; }
+.packet-content--synthia { color: #00ff88; }
+.packet--dropped .packet-content { color: #666; }
+
+.uplink-mention { color: #a78bfa; text-decoration: none; }
+.uplink-mention--self { color: #ffff00; font-weight: bold; background-color: rgba(255, 255, 0, 0.1); padding: 0 2px; }
+
+.uplink-inline-form { display: inline; }
+/* Author display beats the UA [hidden] rule — re-assert it, or the
+   viewer-neutral hidden mod controls render for everyone. */
+.uplink-inline-form[hidden] { display: none; }
+.packet-action-button { background: transparent; border: none; color: #555; cursor: pointer; padding: 2px 6px; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s; font-family: inherit; }
+.packet-action-button:hover { opacity: 1; }
+
+/* ── Compose form (PacketInput.tsx) ───────────────────────────────── */
+
+.packet-input { padding: 12px; background-color: #111; border-top: 1px solid #333; }
+.packet-input-error { padding: 8px 12px; margin-bottom: 8px; background-color: rgba(255, 0, 0, 0.1); border: 1px solid #ff5555; color: #ff5555; font-size: 0.85rem; }
+.packet-input-form { display: flex; gap: 8px; align-items: center; }
+.packet-input-field { flex: 1; position: relative; }
+.packet-input-text { width: 100%; padding: 10px 60px 10px 12px; background-color: #0a0a0a; border: 1px solid #333; color: #ccc; font-family: inherit; font-size: 0.9rem; outline: none; box-sizing: border-box; }
+.packet-input-field--over .packet-input-text { border-color: #ff5555; }
+.packet-input-count { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: #555; }
+.packet-input-count.warning { color: #ffaa00; }
+.packet-input-count.over-limit { color: #ff5555; }
+.packet-input-send { padding: 10px 20px; background-color: #7c3aed; border: none; color: #fff; font-family: inherit; font-size: 0.85rem; cursor: pointer; transition: background-color 0.2s; }
+.packet-input-send:disabled { cursor: not-allowed; opacity: 0.5; }
+.packet-input-send--cooldown { background-color: #333; color: #666; opacity: 1; }
+.packet-input-slow-note { margin-top: 4px; font-size: 0.7rem; color: #555; text-align: right; }
+
+/* ── Panel notices ────────────────────────────────────────────────── */
+
+.uplink-notice { padding: 16px; text-align: center; }
+.uplink-notice--blackout { background-color: rgba(255, 0, 0, 0.1); color: #ff5555; }
+.uplink-notice--squelch { background-color: rgba(255, 170, 0, 0.1); color: #ffaa00; }
+.uplink-login-prompt { padding: 16px; text-align: center; background-color: #111; border-top: 1px solid #333; color: #999; }
+.uplink-login-prompt a { color: #7c3aed; text-decoration: none; }
+
+.uplink-unavailable { padding: 20px; text-align: center; color: #666; background-color: #0a0a0a; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.uplink-unavailable p { margin: 0; }
+.uplink-unavailable-sub { margin-top: 10px; font-size: 0.85rem; }
+
+/* ── Popout window chrome (UplinkPopoutPage.tsx) ──────────────────── */
+
+.uplink-popout-body { margin: 0; }
+.uplink-popout { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: #0a0a0a; display: flex; flex-direction: column; }
+.uplink-popout .uplink-panel { flex: 1; }
+
+/* ── Home-page dock (Phase 5: replaces the OPEN UPLINK link panel) ── */
+
+.live-side-panel--uplink { padding: 0; display: flex; flex-direction: column; }
+.live-side-panel--uplink .uplink-panel { flex: 1; height: auto; min-height: 420px; border: none; }
+@media (max-width: 900px) { .live-side-panel--uplink .uplink-panel { min-height: 0; height: 480px; } }

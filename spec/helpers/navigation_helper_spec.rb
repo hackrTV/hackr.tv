@@ -22,8 +22,14 @@ RSpec.describe NavigationHelper, type: :helper do
       end
     end
 
+    it "covers the Phase 5 uplink family" do
+      %w[/uplink /uplink/popout /uplink/log].each do |path|
+        expect(helper.hotwire_path?(path)).to be(true), "expected #{path} to be a Hotwire path"
+      end
+    end
+
     it "keeps still-React routes as full page loads" do
-      %w[/grid /grid/1337 /uplink /achievements /missions /deck /transit].each do |path|
+      %w[/grid /grid/1337 /achievements /missions /deck /transit].each do |path|
         expect(helper.hotwire_path?(path)).to be(false), "expected #{path} to stay non-Turbo"
       end
     end

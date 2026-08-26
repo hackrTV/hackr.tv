@@ -41,13 +41,22 @@ class WireTextRenderer
 
     content.to_s.scan(TOKEN) do
       match = Regexp.last_match
-      out << h(content[pos...match.begin(0)]) if match.begin(0) > pos
+      out << plain(content[pos...match.begin(0)]) if match.begin(0) > pos
       out << render_token(match, mappings)
       pos = match.end(0)
     end
-    out << h(content[pos..]) if pos < content.length
+    out << plain(content[pos..]) if pos < content.length
 
     out.html_safe
+  end
+
+  protected
+
+  # Inter-token text. Subclasses may transform it (UplinkTextRenderer
+  # linkifies @mentions) but MUST return escaped output — render trusts
+  # this to build its html_safe string.
+  def plain(text)
+    h(text)
   end
 
   private

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "hackr.tv" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <% if logged_in? %>
+      <meta name="current-hackr-id" content="<%= current_hackr.id %>">
+      <meta name="current-hackr-alias" content="<%= current_hackr.hackr_alias %>">
+      <meta name="current-hackr-role" content="<%= current_hackr.role %>">
+    <% end %>
+
+    <%= yield :head %>
+
+    <%= render "layouts/hotwire_assets" %>
+  </head>
+
+  <%# Dedicated slim chrome for the popout window: no nav, no player, no
+      toasts — just the chat panel filling the viewport. %>
+  <body class="black-168 uplink-popout-body">
+    <%= yield %>
+  </body>
+</html>

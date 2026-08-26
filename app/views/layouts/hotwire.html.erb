@@ -7,36 +7,20 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <%# Viewer identity for Stimulus (broadcast-rendered pulse cards are
-        viewer-neutral; pulse-card reveals owner controls from this). %>
+    <%# Viewer identity for Stimulus (broadcast-rendered pulse cards and
+        uplink packets are viewer-neutral; pulse-card/packet reveal
+        owner/moderator controls and self-mentions from these). %>
     <% if logged_in? %>
       <meta name="current-hackr-id" content="<%= current_hackr.id %>">
+      <meta name="current-hackr-alias" content="<%= current_hackr.hackr_alias %>">
+      <meta name="current-hackr-role" content="<%= current_hackr.role %>">
     <% end %>
 
     <%= yield :head %>
 
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-    <link rel="manifest" href="/manifest.json">
-
-    <%# Same stylesheet set as the SPA layout so ported pages keep their look, plus hotwire.css for the ERB nav/flash/toasts %>
-    <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "audio_player", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "pulse_wire", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "hotwire", "data-turbo-track": "reload" %>
-    <%# Phase 4 artist cluster. ALL cluster CSS loads here, never per-page:
-        data-turbo-track=reload means Turbo hard-reloads when two pages'
-        tracked-asset sets differ, which kills the permanent player — every
-        Hotwire page must ship the identical tracked set. %>
-    <%= stylesheet_link_tag "band_profiles", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "artist_pages", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "artist_catalog", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application" %>
-    <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
-    <%= vite_client_tag %>
-    <%= vite_typescript_tag "hotwire.ts" %>
+    <%# Icons + the full tracked asset set — shared with the popout layout
+        so both carry the identical turbo-track signature. %>
+    <%= render "layouts/hotwire_assets" %>
   </head>
 
   <body class="black-168">

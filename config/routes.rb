@@ -190,9 +190,17 @@ Rails.application.routes.draw do
     get ":username", to: "wire#profile", as: :wire_user, constraints: {username: /[A-Za-z0-9_]+/}
   end
 
-  # Uplink routes - SPA
-  get "uplink", to: "pages#spa_root", as: :uplink
-  get "uplink/popout", to: "pages#spa_root", as: :uplink_popout
+  # Uplink chat — Hotwire (migrated Phase 5). The log endpoint serves the
+  # reconnect-recovery frame reload; packets are the form/moderation flow
+  # (JSON equivalents live on under /api/uplink for external consumers).
+  scope "uplink" do
+    get "/", to: "uplink#show", as: :uplink
+    get "popout", to: "uplink#popout", as: :uplink_popout
+    get "log", to: "uplink#log", as: :uplink_log
+    post "packets", to: "uplink/packets#create", as: :uplink_packets
+    post "packets/:id/drop", to: "uplink/packets#drop", as: :uplink_packet_drop
+    post "packets/:id/restore", to: "uplink/packets#restore", as: :uplink_packet_restore
+  end
 
   # Terminal SSH access credentials page
   get "terminal", to: "terminal#index", as: :terminal

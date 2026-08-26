@@ -54,7 +54,9 @@ const RAILS_ONLY_PATHS = [
   '/neon-hearts',
   '/offline',
   '/heartbreak-havoc',
-  '/the-pulse-grid'
+  '/the-pulse-grid',
+  // Hotwire-migrated (Phase 5):
+  '/uplink'
 ]
 
 const isRailsOnlyPath = (href: string) =>

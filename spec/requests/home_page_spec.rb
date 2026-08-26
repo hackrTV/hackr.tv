@@ -12,19 +12,35 @@ RSpec.describe "Home page", type: :request do
       expect(response.body).not_to include("live-embed")
     end
 
-    it "renders the live embed with the interim uplink panel when live" do
+    it "renders the live embed with the docked uplink chat when live (Phase 5)" do
       artist = create(:artist)
       create(:hackr_stream, artist: artist, title: "FRACTURE SESSIONS",
         is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")
+      live_channel = create(:chat_channel, :livestream_only, slug: "live", name: "#live")
+      create(:chat_message, chat_channel: live_channel, grid_hackr: create(:grid_hackr), content: "Docked chat packet")
 
       get "/"
 
       expect(response.body).to include("live-embed")
       expect(response.body).to include("FRACTURE SESSIONS")
       expect(response.body).to include("https://www.youtube.com/embed/abc123xyz00")
-      expect(response.body).to include("OPEN UPLINK")
       expect(response.body).to include("[=] THEATER")
+      expect(response.body).to include("live-side-panel--uplink")
+      expect(response.body).to include("Docked chat packet")
+      expect(response.body).to include("to transmit packets") # anonymous login prompt
+      expect(response.body).not_to include("OPEN UPLINK") # interim link panel replaced
       expect(response.body).not_to include("terminal-container")
+    end
+
+    it "falls back to the link panel when no livestream channel exists" do
+      artist = create(:artist)
+      create(:hackr_stream, artist: artist, title: "FRACTURE SESSIONS",
+        is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")
+
+      get "/"
+
+      expect(response.body).to include("OPEN UPLINK")
+      expect(response.body).not_to include("live-side-panel--uplink")
     end
 
     it "renders the scheduled banner and starting-soon hero" do

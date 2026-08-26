@@ -1,0 +1,23 @@
+<%# Shared head assets for every Hotwire layout (hotwire + uplink_popout).
+    ALL tracked CSS loads here, never per-page: data-turbo-track=reload
+    means Turbo hard-reloads when two pages' tracked-asset sets differ,
+    which kills the permanent player — every Hotwire page must ship the
+    identical tracked set (Phase 4 lesson, see gotchas). %>
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+
+<%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "audio_player", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "pulse_wire", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "hotwire", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "band_profiles", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "artist_pages", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "artist_catalog", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "uplink", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "application" %>
+<%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
+<%= vite_client_tag %>
+<%= vite_typescript_tag "hotwire.ts" %>

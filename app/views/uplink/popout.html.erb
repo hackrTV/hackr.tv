@@ -1,0 +1,8 @@
+<% content_for :title, "Uplink — hackr.tv" %>
+
+<div class="uplink-popout" data-controller="stream-status popout-heartbeat"
+  data-stream-status-live-value="<%= HackrStream.current_live.present? %>">
+  <%= render "uplink/panel", channel: @channel, channels: @channels,
+    packets: @packets, viewer: current_hackr,
+    tab_path: ->(slug) { uplink_popout_path(channel: slug) } %>
+</div>

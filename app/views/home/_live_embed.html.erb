@@ -1,6 +1,8 @@
-<%# LiveStreamEmbed.tsx port. Locals: stream (live HackrStream).
-    Theater mode is a class toggle (Stimulus); the Uplink chat sidebar is
-    a link-out panel until Phase 5 migrates chat. %>
+<%# LiveStreamEmbed.tsx port. Locals: stream (live HackrStream),
+    uplink_channel (livestream ChatChannel or nil), uplink_packets.
+    Theater mode is a class toggle (Stimulus); the sidebar docks the
+    embedded Uplink chat (Phase 5) pinned to the livestream channel —
+    no tab row, [^] pops the full window out. %>
 <div class="live-embed" data-controller="theater stream-watch">
   <div class="live-now-bar">
     <span class="live-now-label">● LIVE NOW</span>
@@ -15,10 +17,17 @@
           allowfullscreen></iframe>
       </div>
     </div>
-    <div class="live-side-panel">
-      <div class="live-side-panel-title">UPLINK</div>
-      <p class="live-side-panel-note">Live chat runs on the Uplink page until it docks here.</p>
-      <a href="/uplink" class="btn btn-primary live-side-panel-link">OPEN UPLINK</a>
-    </div>
+    <% if uplink_channel %>
+      <div class="live-side-panel live-side-panel--uplink">
+        <%= render "uplink/panel", channel: uplink_channel, channels: [],
+          packets: uplink_packets, viewer: current_hackr, popout_button: true %>
+      </div>
+    <% else %>
+      <div class="live-side-panel">
+        <div class="live-side-panel-title">UPLINK</div>
+        <p class="live-side-panel-note">No livestream channel is configured.</p>
+        <a href="/uplink" class="btn btn-primary live-side-panel-link">OPEN UPLINK</a>
+      </div>
+    <% end %>
   </div>
 </div>

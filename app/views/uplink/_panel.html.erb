@@ -1,0 +1,71 @@
+<%# UplinkPanel.tsx port. Locals:
+      channel  — active ChatChannel (nil when none configured)
+      channels — tab row (empty array hides it: home dock pins one channel)
+      packets  — chronological initial log (the SPA's initial_packets)
+      viewer   — GridHackr or nil
+      tab_path — proc slug→path for tab links (default /uplink?channel=)
+      popout_button — render the [^] opener
+    The turbo_stream_from subscription delivers packet HTML; the uplink
+    Stimulus controller separately subscribes LiveChatChannel for presence
+    counts + connection state (its packet JSON is ignored). %>
+<%
+  channels = local_assigns.fetch(:channels, [])
+  viewer = local_assigns.fetch(:viewer, nil)
+  tab_path = local_assigns.fetch(:tab_path, ->(slug) { uplink_path(channel: slug) })
+  popout_button = local_assigns.fetch(:popout_button, false)
+  live = HackrStream.current_live.present?
+  unavailable = channel && channel.requires_livestream? && !channel.currently_available?
+  viewable = channel.present? && channel.viewable_by?(viewer)
+%>
+<div class="uplink-panel" data-controller="uplink"
+  data-uplink-channel-value="<%= channel&.slug %>"
+  data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug) : "" %>">
+  <% if viewable %>
+    <%= turbo_stream_from "uplink_html", channel.slug %>
+  <% end %>
+
+  <div class="uplink-banner" data-uplink-target="banner">Establishing uplink...</div>
+
+  <div class="uplink-header">
+    <h2 class="uplink-title">UPLINK</h2>
+    <div class="uplink-header-right">
+      <% if viewer %><span class="uplink-header-alias">@<%= viewer.hackr_alias %></span><% end %>
+      <% if popout_button %>
+        <button type="button" class="uplink-popout-button" title="Pop out Uplink"
+          data-action="click->uplink#popout">[^]</button>
+      <% end %>
+    </div>
+  </div>
+
+  <% if channels.any? %>
+    <%= render "uplink/channel_tabs", channels: channels, active: channel&.slug, live: live, tab_path: tab_path %>
+  <% end %>
+
+  <div class="presence-indicator">
+    <span class="presence-dot" data-uplink-target="presenceDot"></span>
+    <span class="presence-text" data-uplink-target="presenceText">Connecting...</span>
+  </div>
+
+  <% if unavailable %>
+    <div class="uplink-unavailable">
+      <p><%= channel.name %> is only available during livestreams.</p>
+      <p class="uplink-unavailable-sub">Check back when we're live!</p>
+    </div>
+  <% elsif viewable %>
+    <%= render "uplink/log_frame", packets: packets, viewer: viewer %>
+
+    <% if viewer %>
+      <% if UserPunishment.blackedout?(viewer) %>
+        <div class="uplink-notice uplink-notice--blackout">You have been blackedout from Uplink.</div>
+      <% elsif UserPunishment.squelched?(viewer) %>
+        <div class="uplink-notice uplink-notice--squelch">You have been squelched. Please wait for your squelch to expire.</div>
+      <% else %>
+        <%= render "uplink/packet_form", channel: channel, disabled: !channel.accessible_by?(viewer) %>
+      <% end %>
+    <% else %>
+      <div class="uplink-login-prompt"><a href="/grid/login">Log in</a> to transmit packets</div>
+    <% end %>
+  <% else %>
+    <div class="uplink-unavailable"><p>No uplink channels available.</p></div>
+  <% end %>
+</div>

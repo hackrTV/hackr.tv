@@ -58,9 +58,10 @@ export const FooterMenu: React.FC = () => {
           </li>
           {isLoggedIn && (
             <li className={isActive('/uplink') ? 'active' : undefined}>
-              <Link to="/uplink">
+              {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
+              <a href="/uplink">
                 <span className="purple-168-text">6</span>&nbsp;Uplink&nbsp;
-              </Link>
+              </a>
             </li>
           )}
           <li className={isActive('/timeline') ? 'active' : undefined}>

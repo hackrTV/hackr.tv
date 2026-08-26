@@ -1,0 +1,20 @@
+<%# ChannelTabs.tsx port. Locals: channels, active (slug), live (bool),
+    tab_path (proc slug→path). Tabs are Turbo links; switching channels
+    is a full Turbo visit, which swaps the turbo_stream_from subscription
+    and the uplink controller's presence subscription naturally.
+    Unavailable channels render as disabled spans (not links). %>
+<div class="channel-tabs">
+  <% channels.each do |ch| %>
+    <% is_active = ch.slug == active %>
+    <% disabled = !ch.currently_available? && !is_active %>
+    <% classes = "channel-tab#{" channel-tab--active" if is_active}#{" channel-tab--disabled" if disabled}" %>
+    <% inner = capture do %>
+      <%= ch.name %><% if ch.requires_livestream? %><span class="channel-tab-dot<%= " channel-tab-dot--live" if live %>" title="<%= live ? "LIVE" : "Offline" %>"></span><% end %><% if ch.slow_mode_seconds > 0 && is_active %><span class="channel-tab-slow"><%= ch.slow_mode_seconds %>s</span><% end %>
+    <% end %>
+    <% if disabled %>
+      <span class="<%= classes %>" title="<%= ch.description %>"><%= inner %></span>
+    <% else %>
+      <%= link_to inner, tab_path.call(ch.slug), class: classes, title: ch.description %>
+    <% end %>
+  <% end %>
+</div>

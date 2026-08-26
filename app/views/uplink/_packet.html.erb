@@ -1,0 +1,54 @@
+<%# Packet.tsx port. Locals:
+      packet — required
+      viewer — GridHackr or nil. Broadcast renders pass nil
+               (viewer-neutral); the drop/restore controls render hidden
+               and the packet Stimulus controller reveals them from the
+               layout's current-hackr metas. It also fixes broadcast-form
+               CSRF tokens, localizes the timestamp, and highlights the
+               viewer's own @mentions. %>
+<%
+  viewer = local_assigns.fetch(:viewer, nil)
+  bot = packet.source == "SYNTHIA"
+  bridged = packet.source.present? && !bot
+  parsed = bridged ? parse_bridged_packet(packet.content) : nil
+  own = viewer && viewer.id == packet.grid_hackr_id
+  can_moderate = viewer&.at_least_operator?
+  platform = uplink_platform_class(packet.source)
+  role_badge = uplink_role_badge(packet.grid_hackr&.role)
+%>
+<div id="<%= dom_id(packet) %>"
+  class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %>"
+  data-controller="packet" data-packet-owner-id-value="<%= packet.grid_hackr_id %>">
+  <div class="packet-meta">
+    <time class="packet-time" datetime="<%= packet.created_at.iso8601 %>"
+      data-packet-target="time"><%= packet.created_at.strftime("%H:%M") %></time>
+    <% if (bridged || bot) && platform %>
+      <span class="packet-badge packet-badge--<%= platform %>"><%= packet.source %></span>
+    <% elsif role_badge %>
+      <span class="packet-badge packet-badge--<%= uplink_role_class(packet.grid_hackr.role) %>"><%= role_badge %></span>
+    <% end %>
+  </div>
+
+  <div class="packet-body">
+    <% if parsed %>
+      <span class="packet-bridged-user<%= " packet-bridged-user--#{platform}" if platform %>"><%= parsed[1] %>:</span>
+      <span class="packet-content"><% if packet.dropped? %>[PACKET DROPPED]<% else %><%= uplink_packet_text(packet, parsed[2]) %><% end %></span>
+    <% else %>
+      <% unless bot || bridged %>
+        <a class="packet-author packet-author--<%= uplink_role_class(packet.grid_hackr&.role) %>"
+          href="/wire/<%= packet.grid_hackr&.hackr_alias %>">@<%= packet.grid_hackr&.hackr_alias %></a>
+      <% end %>
+      <span class="packet-content<%= " packet-content--synthia" if bot %>"><% if packet.dropped? %>[PACKET DROPPED]<% else %><%= uplink_packet_text(packet) %><% end %></span>
+    <% end %>
+  </div>
+
+  <% if packet.dropped? %>
+    <%= button_to "↺", uplink_packet_restore_path(packet), method: :post,
+      class: "packet-action-button", title: "Restore packet", form_class: "uplink-inline-form",
+      form: {hidden: !can_moderate, data: {packet_target: "restoreControl"}} %>
+  <% else %>
+    <%= button_to "×", uplink_packet_drop_path(packet), method: :post,
+      class: "packet-action-button", title: "Drop packet", form_class: "uplink-inline-form",
+      form: {hidden: !(own || can_moderate), data: {packet_target: "dropControl"}} %>
+  <% end %>
+</div>
