@@ -1,0 +1,65 @@
+<%# The client already echoed the command (grid-command controller).
+    clear/cls normally never reaches the server (client intercept) but
+    the parser's clear event is honored if it does.
+    Stream ORDER matters: on a tactical breach ENTER the shell replace
+    must land before the enter narrative appends to the fresh
+    #breach-log. %>
+<%
+  tactical = params[:surface] == "tactical"
+  in_breach = current_hackr.active_breach.present?
+  output_target = (tactical && in_breach) ? "breach-log" : "grid-log"
+%>
+
+<% if tactical && @breach_changed %>
+  <%# Breach enter/exit: swap the whole overlay (enter = fresh log,
+      exit = hidden — SPA cleared breachOutput on exit too). %>
+  <%= turbo_stream.replace "tactical-breach-shell" do %>
+    <%= render "grid/tactical/breach_shell", breach: current_hackr.active_breach %>
+  <% end %>
+<% elsif tactical && in_breach %>
+  <%= turbo_stream.replace "tactical-breach-meta" do %>
+    <%= render "grid/tactical/breach_meta", breach: current_hackr.active_breach %>
+  <% end %>
+<% end %>
+
+<% if @result.clear? %>
+  <%= turbo_stream.update "grid-log", "" %>
+<% elsif @result.output.present? %>
+  <%= turbo_stream.append output_target do %>
+    <div class="grid-line"><%= grid_output(@result.output) %></div>
+  <% end %>
+<% end %>
+<% if @result.room_changed %>
+  <%= turbo_stream.replace "grid-room-stream" do %>
+    <%= render "grid/room_stream", room: @room %>
+  <% end %>
+<% end %>
+
+<%# Tactical surface fragments (Phase 6b) — rendered only for tactical
+    forms (hidden surface field); the legacy /grid page has none of
+    these targets, and rendering them for it would be wasted work. This
+    replaces the SPA's map/data/breach refresh tokens: the server
+    streams exactly what changed. %>
+<% if tactical %>
+  <%= turbo_stream.replace "tactical-bar-status" do %>
+    <%= render "grid/tactical/bar_status" %>
+  <% end %>
+  <% if @result.room_changed || @breach_changed %>
+    <%# New room or breach transition = new services/handles; replacing
+        the region also closes any open panel. %>
+    <%= turbo_stream.replace "tactical-room-flags" do %>
+      <%= render "grid/tactical/room_flags", flags: Grid::TacticalRoomFlags.new(current_hackr) %>
+    <% end %>
+  <% end %>
+  <% if @map %>
+    <%# Movement or breach transition — re-render the map fragment
+        (topology is cached; ~6ms). Pan/zoom survives via the
+        tactical-map controller on the stable region wrapper. %>
+    <%= turbo_stream.replace "tactical-map" do %>
+      <%= render "grid/tactical/zone_map", map: @map, current_room: @room %>
+    <% end %>
+  <% end %>
+  <%= turbo_stream.append "tactical-refresh-bus" do %>
+    <div data-controller="frame-refresher"></div>
+  <% end %>
+<% end %>

@@ -23,3 +23,227 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+/* ── Hotwire tactical surface (Phase 6b) — GridTacticalPage.tsx shell ── */
+
+.tactical-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; display: grid; grid-template-areas: "topbar topbar" "leftcol map" "help help"; grid-template-columns: 50fr 50fr; grid-template-rows: 44px 1fr 58px; background: #0a0a0a; font-family: 'Courier New', monospace; color: #d0d0d0; z-index: 40; }
+
+.tactical-bar { grid-area: topbar; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: #111; border-bottom: 1px solid #333; font-size: 0.8em; }
+.tactical-bar-left, .tactical-bar-right { display: flex; align-items: center; gap: 10px; }
+.tactical-bar-title { color: #a78bfa; font-weight: bold; letter-spacing: 1px; }
+.tactical-bar-sep { color: #444; }
+.tactical-bar-alias { color: #e0e0e0; }
+.tactical-bar-clearance { color: #fbbf24; }
+.tactical-bar-admin { color: #f87171; text-decoration: none; }
+.tactical-bar-link { color: #666; text-decoration: none; font-size: 0.9em; }
+.tactical-bar-link:hover { color: #a78bfa; }
+.tactical-bar-status { display: inline-flex; align-items: center; gap: 10px; }
+.tactical-vital { display: inline-flex; align-items: center; gap: 4px; }
+.tactical-vital-label { color: #666; font-size: 0.85em; }
+.tactical-vital-track { display: inline-block; width: 54px; height: 6px; background: #1a1a1a; border: 1px solid #333; border-radius: 2px; overflow: hidden; }
+.tactical-vital-fill { display: block; height: 100%; }
+.tactical-vital--hp .tactical-vital-fill { background: #34d399; }
+.tactical-vital--en .tactical-vital-fill { background: #fbbf24; }
+.tactical-vital--ps .tactical-vital-fill { background: #a78bfa; }
+.tactical-vital-value { color: #888; font-size: 0.85em; }
+
+.tactical-leftcol { grid-area: leftcol; display: flex; flex-direction: column; min-height: 0; border-right: 1px solid #222; }
+.tactical-status { flex: 2; min-height: 0; display: flex; flex-direction: column; border-bottom: 1px solid #222; }
+.tactical-tab-bar { flex-shrink: 0; display: flex; gap: 2px; background: #0d0d0d; border-bottom: 1px solid #222; padding: 0 4px; }
+.tactical-tab-button { background: transparent; border: none; border-bottom: 2px solid transparent; color: #666; font-family: inherit; font-size: 0.7em; padding: 6px 8px; cursor: pointer; letter-spacing: 0.5px; }
+.tactical-tab-button--active { color: #22d3ee; border-bottom-color: #22d3ee; }
+.tactical-tab-panels { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 10px; }
+.tactical-tab-panel[hidden] { display: none; }
+.tactical-loading, .tab-muted { color: #555; font-size: 0.8em; }
+
+.tactical-terminal { flex: 3; min-height: 0; display: flex; flex-direction: column; }
+.tactical-log { flex: 1; min-height: 0; overflow-y: auto; background: #0d0d0d; padding: 8px 10px; font-size: 0.75em; line-height: 1.2; white-space: pre-wrap; word-break: break-word; }
+.tactical-command-form { padding: 8px; background: #111; border-top: 1px solid #222; margin-top: 0; }
+
+.tactical-map-region { grid-area: map; position: relative; min-height: 0; overflow: hidden; background: #0a0a0a; }
+.tactical-map-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #333; letter-spacing: 3px; font-size: 0.8em; }
+
+.tactical-help { grid-area: help; display: flex; align-items: center; padding: 0 12px; background: #111; border-top: 1px solid #333; color: #555; font-size: 0.7em; }
+
+/* Tab content primitives (DeckTab/LoadoutTab/RepTab/MissionsTab ports) */
+.tab-block { font-size: 0.8em; max-width: none; }
+.tab-row { padding: 2px 0; }
+.tab-row--spread { display: flex; justify-content: space-between; gap: 8px; }
+.tab-line { padding: 3px 0; border-bottom: 1px solid #1a1a1a; }
+.tab-item-name { font-weight: bold; margin-bottom: 8px; }
+.tab-section-title { color: #666; font-size: 0.85em; margin: 12px 0 4px; }
+.tab-section-title--cyan { color: #22d3ee; }
+.tab-bar-track { display: block; background: #1a1a1a; border-radius: 2px; height: 6px; border: 1px solid #333; margin-bottom: 8px; overflow: hidden; }
+.tab-bar-fill { display: block; height: 100%; border-radius: 2px; background: #34d399; }
+.tab-bar-fill--low { background: #f87171; }
+.tab-dim { color: #888; }
+.tab-faint { color: #555; }
+.tab-strong { color: #e0e0e0; font-weight: bold; }
+.tab-positive { color: #34d399; }
+.tab-warn { color: #fbbf24; }
+.tab-accent { color: #22d3ee; }
+.tab-specs { font-size: 0.85em; color: #666; margin-top: 1px; }
+.tab-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.tab-loadout-deck { border-bottom: 1px solid #333; margin-bottom: 4px; }
+.tab-loadout-slot { border-bottom: 1px solid #1a1a1a; font-size: 0.95em; }
+.tab-empty-slot { color: #333; }
+.tab-rep { font-size: 0.75em; line-height: 1.6; }
+.tab-rep-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tab-rep-name { color: #d0d0d0; }
+.tab-rep-value { color: #9ca3af; }
+.tab-mission { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #1a1a1a; }
+.tab-completed { color: #444; font-size: 0.9em; }
+.tab-inline-form { display: inline; }
+.tab-inline-form[hidden] { display: none; }
+.tab-action-button { margin-top: 4px; border: none; padding: 3px 10px; font-size: 0.85em; font-weight: bold; cursor: pointer; border-radius: 3px; font-family: 'Courier New', monospace; background: #333; color: #ccc; }
+.tab-action-button--go { background: #34d399; color: #0a0a0a; }
+
+/* 6b-2: stats/inventory/cred/schematics tab primitives + dialogs */
+.tab-error { color: #f87171; }
+.tab-small { font-size: 0.85em; }
+.tab-purple { color: #a78bfa; margin-left: 6px; }
+.tab-qty { color: #6b7280; }
+.tab-rule { height: 1px; background: #333; margin: 8px 0; }
+.tab-vital-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.tab-vital-name { font-size: 0.85em; font-weight: bold; width: 52px; flex-shrink: 0; }
+.tab-vital-track { flex: 1; display: block; background: #1a1a1a; border-radius: 2px; height: 8px; border: 1px solid #333; overflow: hidden; }
+.tab-vital-fill { display: block; height: 100%; border-radius: 2px; }
+.tab-vital-nums { color: #888; font-size: 0.85em; min-width: 52px; text-align: right; }
+.tab-xp-next { color: #555; font-size: 0.8em; text-align: right; margin-bottom: 4px; }
+.tab-section-row { display: flex; justify-content: space-between; align-items: baseline; }
+.tab-section-title--amber { color: #fbbf24; font-weight: bold; }
+.tab-section-hint { color: #444; font-size: 0.75em; }
+.tab-debt { display: flex; justify-content: space-between; padding: 4px 6px; margin-top: 4px; background: #2a1a1a; border: 1px solid #f8717133; border-radius: 3px; color: #f87171; font-weight: bold; }
+.tab-deck-summary { display: flex; gap: 16px; font-size: 0.9em; }
+.tab-achievement { margin-bottom: 6px; }
+.tab-achievement-track { display: block; background: #1a1a1a; border-radius: 2px; height: 4px; border: 1px solid #333; overflow: hidden; }
+.tab-achievement-fill { display: block; height: 100%; border-radius: 2px; background: #a78bfa; }
+.tab-inv-group { margin-bottom: 10px; }
+.tab-inv-row { display: flex; align-items: baseline; gap: 6px; padding: 3px 0; border-bottom: 1px solid #1a1a1a; }
+.tab-inv-name { background: none; border: none; padding: 0; font-family: inherit; font-size: inherit; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.tab-inv-meta { white-space: nowrap; flex-shrink: 0; font-size: 0.9em; }
+.tab-mini-button { border: none; border-radius: 2px; padding: 1px 5px; font-size: 0.8em; cursor: pointer; font-weight: bold; font-family: 'Courier New', monospace; line-height: 1.4; flex-shrink: 0; }
+.tab-mini-button--sell { background: #fbbf24; color: #0a0a0a; }
+.tab-mini-button--fab { background: #34d399; color: #0a0a0a; }
+.tab-ghost-button { background: #1a1a1a; border: 1px solid #34d399; border-radius: 3px; padding: 3px 10px; color: #34d399; font-size: 0.85em; cursor: pointer; font-family: 'Courier New', monospace; margin-bottom: 8px; }
+.tab-link-button { background: none; border: none; color: #666; font-size: 0.85em; cursor: pointer; padding: 0; font-family: 'Courier New', monospace; text-decoration: underline; }
+.tab-cache { padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
+.tab-cache--abandoned { opacity: 0.5; }
+.tab-cache-actions { display: flex; gap: 8px; align-items: center; margin-top: 2px; }
+.tab-schematic { padding: 4px 0; border-bottom: 1px solid #1a1a1a; }
+.tab-schematic-ingredients { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.85em; margin-top: 2px; }
+.tab-schematic-gates { margin-top: 2px; }
+.tab-action-button--use { background: #34d399; color: #0a0a0a; }
+.tab-action-button--equip { background: #22d3ee; color: #0a0a0a; }
+.tab-action-button--drop { background: #fbbf24; color: #0a0a0a; }
+.tab-action-button--salvage { background: #f97316; color: #0a0a0a; }
+.tab-action-button--place { background: #22d3ee; color: #0a0a0a; }
+.tab-action-button--sell { background: #fbbf24; color: #0a0a0a; }
+
+.tactical-dialog { background: #1a1a1a; border: 1px solid #444; border-radius: 6px; padding: 0; color: #d0d0d0; font-family: 'Courier New', monospace; max-width: 460px; }
+.tactical-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
+.tactical-dialog-body { padding: 24px 28px; font-size: 0.95em; }
+.tab-dialog-title { font-weight: bold; font-size: 1.15em; }
+.tab-dialog-rarity { font-size: 0.8em; }
+.tab-dialog-meta { display: flex; gap: 12px; font-size: 0.85em; color: #888; margin: 8px 0 12px; }
+.tab-dialog-desc { color: #aaa; font-size: 0.9em; margin-bottom: 14px; line-height: 1.4; }
+.tab-dialog-props { border-top: 1px solid #333; padding-top: 10px; margin-bottom: 14px; font-size: 0.9em; }
+.tab-dialog-actions { display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #333; padding-top: 14px; flex-wrap: wrap; }
+.tab-dialog-cancel { background: transparent; color: #888; border: 1px solid #444; padding: 6px 16px; font-size: 0.9em; cursor: pointer; border-radius: 3px; font-family: 'Courier New', monospace; }
+.tab-dialog-label { color: #888; font-size: 0.85em; display: block; margin: 10px 0 4px; }
+.tactical-dialog-input { width: 100%; background: #111; border: 1px solid #444; border-radius: 3px; padding: 8px 10px; color: #d0d0d0; font-size: 0.95em; font-family: 'Courier New', monospace; box-sizing: border-box; }
+.tactical-dialog-input[hidden] { display: none; }
+
+/* 6b-3: handles + slide-in panels */
+.tactical-room-flags { position: absolute; inset: 0; pointer-events: none; }
+.tactical-room-flags > * { pointer-events: auto; }
+.tactical-handle { position: absolute; z-index: 25; background: #111; border: 1px solid #444; color: #a78bfa; font-family: 'Courier New', monospace; font-size: 0.7em; letter-spacing: 1px; padding: 6px 10px; cursor: pointer; }
+.tactical-handle:hover { border-color: #a78bfa; }
+.tactical-handle--transit { top: 0; left: 50%; transform: translateX(-50%); border-radius: 0 0 6px 6px; color: #22d3ee; }
+.tactical-handle--vendor { right: 0; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; border-radius: 6px 0 0 6px; color: #fbbf24; }
+.tactical-handle--rest-pod { right: 0; bottom: 25%; transform: translateY(50%); writing-mode: vertical-rl; border-radius: 6px 0 0 6px; color: #34d399; }
+.tactical-handle-form { position: absolute; bottom: 0; transform: translateX(-50%); z-index: 25; }
+.tactical-handle--npc { position: static; transform: none; border-radius: 6px 6px 0 0; color: #c084fc; }
+.tactical-backdrop { position: absolute; inset: 0; z-index: 29; background: rgba(0, 0, 0, 0.2); }
+.tactical-backdrop[hidden] { display: none; }
+
+.tactical-panel { position: absolute; z-index: 30; background: #0d0d0d; border: 1px solid #333; transition: transform 300ms ease-out; display: flex; flex-direction: column; overflow: hidden; }
+.tactical-panel[hidden] { display: none; }
+.tactical-panel--right { top: 0; right: 0; bottom: 0; width: 50%; transform: translateX(100%); }
+.tactical-panel--right-low { top: 0; right: 0; bottom: 0; width: 50%; transform: translateX(100%); }
+.tactical-panel--top { top: 0; left: 0; right: 0; height: 50%; transform: translateY(-100%); border-radius: 0 0 8px 8px; }
+.tactical-panel--bottom { left: 0; right: 0; bottom: 0; height: 50%; transform: translateY(100%); }
+.tactical-panel--open { transform: translate(0, 0); }
+.tactical-panel-close { position: absolute; top: 6px; right: 8px; z-index: 2; background: transparent; color: #888; border: 1px solid #444; padding: 2px 8px; font-size: 0.7em; cursor: pointer; font-family: 'Courier New', monospace; }
+.tactical-panel > turbo-frame { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.tactical-panel-inner { display: flex; flex-direction: column; min-height: 0; flex: 1; font-size: 0.8em; }
+.tactical-panel-header { flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 8px 70px 8px 12px; border-bottom: 1px solid #333; background: #111; }
+.tactical-panel-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 12px; }
+.tactical-avatar-wing { position: absolute; width: 180px; height: 180px; object-fit: cover; background: #0d0d0d; border: 2px solid #fbbf24; border-radius: 6px; }
+.tactical-avatar-wing--vendor { right: 100%; top: 0; border-right: none; border-radius: 6px 0 0 6px; }
+.tactical-avatar-wing--npc { bottom: 100%; right: 0; border-color: #c084fc; border-bottom: none; border-radius: 6px 6px 0 0; }
+.tactical-qty-input { width: 60px; background: #111; border: 1px solid #444; border-radius: 3px; color: #d0d0d0; font-family: 'Courier New', monospace; font-size: 0.9em; padding: 2px 6px; }
+.tactical-transit-badge { color: #f97316; border: 1px solid #f97316; border-radius: 3px; padding: 1px 6px; font-size: 0.8em; }
+.tactical-journey-breach { border: 1px solid #f87171; color: #f87171; padding: 6px 8px; margin: 6px 0; font-size: 0.85em; }
+.tactical-fork { border: 1px solid #fbbf24; background: #1a1a0a; padding: 8px; margin: 8px 0; }
+.tactical-stops { margin-top: 4px; }
+.tactical-mission-actions { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.tab-outline-button { background: transparent; color: #888; border: 1px solid #444; padding: 3px 10px; font-size: 0.85em; cursor: pointer; border-radius: 3px; font-family: 'Courier New', monospace; }
+.tab-outline-button--danger { color: #f87171; border-color: #f87171; }
+.tab-mini-button--deliver { background: #c084fc; color: #0a0a0a; }
+.tab-mini-button:disabled { background: #333; color: #666; cursor: not-allowed; }
+.tactical-npc-line { margin-bottom: 8px; line-height: 1.5; }
+.tactical-npc-breadcrumb { margin-bottom: 6px; }
+.tactical-npc-topics { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.tactical-topic-button { background: transparent; border: 1px solid #c084fc; color: #c084fc; padding: 4px 10px; font-size: 0.85em; cursor: pointer; border-radius: 3px; font-family: 'Courier New', monospace; }
+.tactical-npc-nav { display: flex; gap: 8px; }
+.tactical-rest-vital { margin-bottom: 12px; }
+.tactical-rest-label { font-weight: bold; letter-spacing: 1px; }
+.tactical-rest-controls { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.tactical-rest-footer { display: flex; gap: 10px; align-items: center; justify-content: flex-end; border-top: 1px solid #333; padding-top: 10px; }
+.tactical-buy-form { display: inline-flex; gap: 4px; align-items: center; }
+
+/* 6c: zone map */
+.tactical-map { position: absolute; inset: 0; background: #050505; touch-action: none; }
+.tactical-map svg { width: 100%; height: 100%; display: block; cursor: grab; }
+.tactical-map svg:active { cursor: grabbing; }
+.tactical-map-room--walkable { cursor: pointer; }
+
+/* 6d: breach overlay */
+.tactical-breach { position: absolute; top: 15%; left: 15%; right: 15%; bottom: 15%; z-index: 30; background: #0d0d0d; border: 1px solid #f87171; display: flex; flex-direction: column; overflow: hidden; font-size: 0.8em; }
+.tactical-breach[hidden] { display: none; }
+.tactical-breach-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; background: #1a0d0d; border-bottom: 1px solid #7f1d1d; flex-wrap: wrap; }
+.tactical-breach-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tactical-breach-header-right { display: flex; align-items: center; gap: 8px; }
+.tactical-breach-status { display: flex; gap: 18px; align-items: center; padding: 6px 12px; border-bottom: 1px solid #333; flex-wrap: wrap; }
+.tactical-breach-detection, .tactical-breach-battery { display: inline-flex; align-items: center; gap: 6px; }
+.tactical-breach-track { width: 120px; margin-bottom: 0; display: inline-block; }
+.tactical-breach-protocols { display: flex; gap: 8px; padding: 6px 12px; border-bottom: 1px solid #333; flex-wrap: wrap; }
+.tactical-breach-protocol { color: #fbbf24; border: 1px solid #7f1d1d; padding: 2px 8px; font-size: 0.85em; }
+.tactical-breach-protocol--down { color: #555; text-decoration: line-through; border-color: #333; }
+.tactical-breach-actions { display: flex; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid #333; flex-wrap: wrap; }
+.tactical-breach-exec { display: inline-flex; gap: 4px; align-items: center; }
+.tactical-software-button { background: #111; border: 1px solid #444; }
+.tactical-breach-log { flex: 1; min-height: 0; }
+.tactical-breach-targets { position: absolute; top: 40px; right: 12px; z-index: 25; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.tactical-breach-target { background: #1a0d0d; border: 1px solid #f87171; color: #f87171; font-family: 'Courier New', monospace; font-size: 0.75em; padding: 5px 10px; cursor: pointer; }
+.tactical-breach-target:disabled { border-color: #444; color: #555; cursor: not-allowed; }
+
+/* Breach target menus (TargetSelector port) */
+.target-menu-anchor { position: relative; display: inline-block; }
+.tactical-software-button { background: #1a1a1a; border: 1px solid #444; border-radius: 3px; padding: 3px 8px; font-size: 0.75em; cursor: pointer; font-family: 'Courier New', monospace; white-space: nowrap; }
+.tactical-software-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.tactical-software-cost { color: #666; margin-left: 4px; }
+.tactical-quick-button { background: #1a1a1a; border: 1px solid #333; border-radius: 3px; padding: 3px 8px; color: #22d3ee; font-size: 0.75em; cursor: pointer; font-family: 'Courier New', monospace; }
+.tactical-quick-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.tactical-breach-sep { color: #333; margin: 0 2px; }
+.target-menu { position: absolute; top: 100%; left: 0; margin-top: 4px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; padding: 8px; z-index: 50; min-width: 160px; }
+.target-menu[hidden] { display: none; }
+.target-menu-label { color: #888; font-size: 0.7em; margin-bottom: 6px; white-space: nowrap; }
+.target-menu-options { display: flex; gap: 4px; flex-wrap: wrap; }
+.target-menu-option { background: #222; border: 1px solid #555; border-radius: 3px; padding: 4px 10px; color: #d0d0d0; font-size: 0.75em; cursor: pointer; font-family: 'Courier New', monospace; white-space: nowrap; }
+.target-menu-option:hover { border-color: #a78bfa; }
+.target-menu-cancel { background: none; border: none; color: #666; font-size: 0.7em; cursor: pointer; margin-top: 4px; padding: 0; font-family: 'Courier New', monospace; }
+/* Map labels never intercept clicks (ZoneMap.tsx pointerEvents="none"). */
+.tactical-map text { pointer-events: none; }
+.tactical-npc-exchange { white-space: pre-wrap; word-break: break-word; margin-bottom: 8px; font-size: 0.95em; }

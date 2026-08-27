@@ -1,0 +1,100 @@
+<%# CredTab.tsx port. Rename/send dialogs interpolate typed values into
+    the exact SPA command strings via the command-arg controller. %>
+<div class="tab-block">
+  <div class="tab-row tab-row--spread"><span class="tab-warn">Total CRED</span><span class="tab-positive"><%= number_with_delimiter(@caches.sum(&:balance)) %></span></div>
+  <% if @debt > 0 %>
+    <div class="tab-row tab-row--spread tab-error"><span>GovCorp Debt</span><span>-<%= number_with_delimiter(@debt) %></span></div>
+  <% end %>
+  <div class="tab-rule"></div>
+
+  <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+    <%= hidden_field_tag :surface, "tactical" %>
+    <%= hidden_field_tag :input, "cache create" %>
+    <button type="submit" class="tab-ghost-button">+ NEW CACHE</button>
+  <% end %>
+
+  <% if @caches.empty? %>
+    <div class="tab-faint">No caches.</div>
+  <% end %>
+
+  <% @caches.each do |cache| %>
+    <div class="tab-cache<%= " tab-cache--abandoned" if cache.abandoned? %>">
+      <div class="tab-row tab-row--spread">
+        <span><span class="tab-positive"><%= cache.address %></span><% if cache.nickname.present? %> <span class="tab-purple"><%= cache.nickname %></span><% end %></span>
+        <span class="tab-positive"><%= number_with_delimiter(cache.balance) %> CRED</span>
+      </div>
+      <div class="tab-cache-actions">
+        <% if cache.is_default? %><span class="tab-accent tab-small">DEFAULT</span><% end %>
+        <% if cache.abandoned? %><span class="tab-error tab-small">ABANDONED</span><% end %>
+        <% unless cache.abandoned? %>
+          <span data-controller="dialog">
+            <button type="button" class="tab-link-button" data-action="click->dialog#open">rename</button>
+            <dialog class="tactical-dialog" data-dialog-target="dialog">
+              <div class="tactical-dialog-body">
+                <div class="tab-dialog-title tab-purple">SET NICKNAME</div>
+                <div class="tab-dialog-meta"><span class="tab-positive"><%= cache.address %></span></div>
+                <%= form_with url: grid_commands_path, data: {
+                  controller: "command-arg",
+                  command_arg_template_value: "cache name #{cache.address} {nickname}",
+                  action: "submit->command-arg#submit"
+                } do %>
+                  <%= hidden_field_tag :surface, "tactical" %>
+                  <%= hidden_field_tag :input, "", data: {command_arg_target: "command"} %>
+                  <input type="text" maxlength="20" placeholder="letters, numbers, hyphens, underscores"
+                    pattern="[A-Za-z0-9_\-]+" class="tactical-dialog-input" value="<%= cache.nickname %>"
+                    data-command-arg-target="field" data-arg-name="nickname">
+                  <div class="tab-dialog-actions">
+                    <button type="button" class="tab-dialog-cancel" data-action="click->dialog#close">CANCEL</button>
+                    <button type="submit" class="tab-action-button tab-action-button--place">SET</button>
+                  </div>
+                <% end %>
+              </div>
+            </dialog>
+          </span>
+          <% if cache.balance > 0 %>
+            <span data-controller="dialog">
+              <button type="button" class="tab-link-button" data-action="click->dialog#open">send</button>
+              <dialog class="tactical-dialog" data-dialog-target="dialog">
+                <div class="tactical-dialog-body">
+                  <div class="tab-dialog-title tab-warn">SEND CRED</div>
+                  <div class="tab-dialog-meta">From: <span class="tab-positive"><%= cache.nickname.presence || cache.address %></span> <span class="tab-faint">(<%= number_with_delimiter(cache.balance) %> available)</span></div>
+                  <%= form_with url: grid_commands_path, data: {
+                    controller: "command-arg",
+                    command_arg_template_value: "cache send {amount} {to}#{cache.is_default? ? "" : " from #{cache.nickname.presence || cache.address}"}",
+                    action: "submit->command-arg#submit"
+                  } do %>
+                    <%= hidden_field_tag :surface, "tactical" %>
+                    <%= hidden_field_tag :input, "", data: {command_arg_target: "command"} %>
+                    <label class="tab-dialog-label">Amount</label>
+                    <input type="text" inputmode="numeric" pattern="[0-9]+" placeholder="0"
+                      class="tactical-dialog-input" data-command-arg-target="field" data-arg-name="amount">
+                    <label class="tab-dialog-label">To (address or nickname)</label>
+                    <select class="tactical-dialog-input" data-command-arg-target="field" data-arg-name="to"
+                      data-action="change->command-arg#toggleCustom">
+                      <option value="">Select destination...</option>
+                      <% @caches.reject { |c| c.address == cache.address || c.abandoned? }.each do |c| %>
+                        <option value="<%= c.nickname.presence || c.address %>"><%= c.nickname.present? ? "#{c.nickname} (#{c.address})" : c.address %></option>
+                      <% end %>
+                      <option value="__custom__">Other address...</option>
+                    </select>
+                    <input type="text" placeholder="CACHE-XXXX-XXXX or nickname" hidden
+                      class="tactical-dialog-input" data-command-arg-target="field" data-arg-name="" data-arg-custom="true">
+                    <div class="tab-dialog-actions">
+                      <button type="button" class="tab-dialog-cancel" data-action="click->dialog#close">CANCEL</button>
+                      <button type="submit" class="tab-action-button tab-action-button--sell">SEND</button>
+                    </div>
+                  <% end %>
+                </div>
+              </dialog>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @debt > 0 %>
+    <div class="tab-rule"></div>
+    <div class="tab-error tab-small">50% CRED income garnished until debt cleared.</div>
+  <% end %>
+</div>

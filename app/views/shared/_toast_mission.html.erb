@@ -20,4 +20,7 @@
     <% end %>
     <% if leveled_up && new_clearance %><span class="toast-clearance">▲ CL <%= new_clearance %></span><% end %>
   </div>
+  <%# Phase 6e: re-points the SPA's grid:mission_completed CustomEvent —
+      the Hotwire missions page reloads its frame on this signal. %>
+  <div data-controller="mission-signal" hidden></div>
 </div>

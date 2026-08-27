@@ -1,0 +1,43 @@
+<%# LoadoutTab.tsx port. %>
+<%
+  slot_order = %w[back head ears eyes neck chest left_wrist right_wrist hands waist legs feet]
+  deck_item = @loadout["deck"]
+  gear = slot_order.map { |slot| [slot, @loadout[slot]] }
+  mid = (gear.size / 2.0).ceil
+%>
+<div class="tab-block">
+  <div class="tab-section-title">LOADOUT</div>
+  <div class="tab-row tab-row--spread tab-loadout-deck">
+    <span class="tab-accent"><%= GridHackr::Loadout::GEAR_SLOT_LABELS["deck"] || "DECK" %></span>
+    <% if deck_item %>
+      <span style="color: <%= deck_item.rarity_color %>;"><%= deck_item.name %></span>
+    <% else %>
+      <span class="tab-empty-slot">—</span>
+    <% end %>
+  </div>
+  <div class="tab-two-col">
+    <% [gear.first(mid), gear.drop(mid)].each do |column| %>
+      <div>
+        <% column.each do |slot, item| %>
+          <div class="tab-row tab-row--spread tab-loadout-slot">
+            <span class="tab-dim"><%= GridHackr::Loadout::GEAR_SLOT_LABELS[slot] || slot.upcase %></span>
+            <% if item %>
+              <span style="color: <%= item.rarity_color %>;"><%= item.name %></span>
+            <% else %>
+              <span class="tab-empty-slot">—</span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <% if @effects.any? %>
+    <div class="tab-section-title">ACTIVE EFFECTS</div>
+    <% @effects.each do |key, val| %>
+      <div class="tab-row tab-row--spread tab-dim">
+        <span><%= key.to_s.tr("_", " ") %></span>
+        <span class="tab-positive">+<%= val %></span>
+      </div>
+    <% end %>
+  <% end %>
+</div>

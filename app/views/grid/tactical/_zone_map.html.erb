@@ -1,0 +1,122 @@
+<%# Server-rendered isometric zone map (Phase 6c, from spike B).
+    Locals: map (ZoneMapBuilder result), current_room. Rooms adjacent to
+    the current room carry data-direction — clicking one submits
+    `go <direction>` through the main command form (tactical-map
+    controller). Presence badges carry data-presence-room for in-place
+    ZoneChannel updates; the whole fragment is replaced on movement
+    (zone-presence resubscribes on connect), with pan/zoom preserved by
+    the tactical-map controller on the stable region wrapper. %>
+<%
+  rooms_by_id = map.rooms.index_by { |r| r[:id] }
+
+  adjacent_directions = {}
+  if current_room
+    map.exits.each do |e|
+      adjacent_directions[e[:to_room_id]] ||= e[:direction] if e[:from_room_id] == current_room.id
+    end
+  end
+
+  render_rooms = map.rooms
+    .map { |r| {room: r, depth: r[:map_x] + r[:map_y], points: iso_tile_points(r[:map_x], r[:map_y], r[:map_z])} }
+    .sort_by { |rr| rr[:depth] }
+
+  seen_pairs = Set.new
+  connectors = map.exits.filter_map do |e|
+    from = rooms_by_id[e[:from_room_id]]
+    to = rooms_by_id[e[:to_room_id]]
+    next unless from && to
+    key = [e[:from_room_id], e[:to_room_id]].sort
+    next if seen_pairs.include?(key)
+    seen_pairs << key
+    {
+      from: iso_project(from[:map_x], from[:map_y], from[:map_z]),
+      to: iso_project(to[:map_x], to[:map_y], to[:map_z]),
+      locked: e[:locked]
+    }
+  end
+
+  ghosts = map.ghost_rooms.filter_map do |g|
+    local = rooms_by_id[g[:local_room_id]]
+    next unless local
+    vec = IsoMapHelper::DIRECTION_VECTORS[g[:direction]]
+    gz = local[:map_z] + ((g[:direction] == "up") ? 1 : ((g[:direction] == "down") ? -1 : 0))
+    gx = local[:map_x] + (vec ? vec[0] : 0)
+    gy = local[:map_y] + (vec ? vec[1] : 0)
+    {ghost: g, points: iso_tile_points(gx, gy, gz), from: iso_project(local[:map_x], local[:map_y], local[:map_z])}
+  end
+
+  all_pts = render_rooms.map { |rr| rr[:points][:center] } + ghosts.map { |gh| gh[:points][:center] }
+  min_x = (all_pts.map(&:first).min || 0) - IsoMapHelper::ISO_TILE_W
+  max_x = (all_pts.map(&:first).max || 0) + IsoMapHelper::ISO_TILE_W
+  min_y = (all_pts.map(&:last).min || 0) - IsoMapHelper::ISO_TILE_H * 2
+  max_y = (all_pts.map(&:last).max || 0) + IsoMapHelper::ISO_TILE_H * 2
+%>
+<div id="tactical-map" class="tactical-map" data-controller="zone-presence">
+  <svg data-tactical-map-target="svg"
+       viewBox="<%= min_x %> <%= min_y %> <%= max_x - min_x %> <%= max_y - min_y %>">
+    <g data-tactical-map-target="world">
+      <% connectors.each do |c| %>
+        <line x1="<%= c[:from][0] %>" y1="<%= c[:from][1] %>" x2="<%= c[:to][0] %>" y2="<%= c[:to][1] %>"
+              stroke="<%= c[:locked] ? "#7f1d1d" : "#2dd4bf" %>" stroke-width="3"
+              stroke-dasharray="<%= c[:locked] ? "8 6" : "" %>" opacity="0.5" />
+      <% end %>
+
+      <% ghosts.each do |gh| %>
+        <% p = gh[:points] %>
+        <%# A ghost whose connection starts at the CURRENT room is
+            click-navigable — data-direction rides the group, exactly
+            like real adjacent rooms (ZoneMap.tsx navigableExits parity;
+            XERAEN repro: edge-of-zone phantoms weren't clickable). %>
+        <% navigable = current_room && gh[:ghost][:local_room_id] == current_room.id %>
+        <g class="tactical-map-ghost<%= " tactical-map-room--walkable" if navigable %>"
+          opacity="<%= navigable ? 0.5 : 0.25 %>"<% if navigable %> data-direction="<%= gh[:ghost][:direction] %>"<% end %>>
+          <line x1="<%= gh[:from][0] %>" y1="<%= gh[:from][1] %>" x2="<%= p[:center][0] %>" y2="<%= p[:center][1] %>"
+                stroke="#555" stroke-width="1.5" stroke-dasharray="6 4" />
+          <polygon points="<%= iso_points_attr(p[:top], p[:right], p[:bottom], p[:left]) %>"
+                   fill="#0e0e0e" stroke="#555" stroke-width="1" stroke-dasharray="4 3">
+            <title><%= gh[:ghost][:name] %> — <%= gh[:ghost][:zone_name] %> (<%= gh[:ghost][:region_name] %>)<%= " — go #{gh[:ghost][:direction]}" if navigable %></title>
+          </polygon>
+          <text x="<%= p[:center][0] %>" y="<%= p[:center][1] - 2 %>" text-anchor="middle"
+                fill="#888" font-size="13" font-family="monospace"><%= gh[:ghost][:name].to_s.truncate(12) %></text>
+          <text x="<%= p[:center][0] %>" y="<%= p[:center][1] + 14 %>" text-anchor="middle"
+                fill="#555" font-size="11" font-family="monospace">⇢ <%= gh[:ghost][:zone_name] %></text>
+        </g>
+      <% end %>
+
+      <% render_rooms.each do |rr| %>
+        <% room = rr[:room] %>
+        <% p = rr[:points] %>
+        <% color = iso_tile_color(room) %>
+        <%
+          if room[:is_current]
+            top_fill, top_stroke, top_w, opacity = "#1a2a2a", "#fff", 2.5, 1.0
+          elsif room[:visited]
+            top_fill, top_stroke, top_w, opacity = "#111", color, 1.5, 0.9
+          else
+            top_fill, top_stroke, top_w, opacity = "#0c0c0c", "#444", 1.0, 0.55
+          end
+          wall = IsoMapHelper::ISO_WALL_H
+          direction = adjacent_directions[room[:id]]
+        %>
+        <g data-room-id="<%= room[:id] %>" data-room-name="<%= room[:name] %>"<% if direction %> data-direction="<%= direction %>"<% end %> opacity="<%= opacity %>" class="tactical-map-room<%= " tactical-map-room--walkable" if direction %>">
+          <polygon points="<%= iso_points_attr(p[:left], p[:bottom], [p[:bottom][0], p[:bottom][1] + wall], [p[:left][0], p[:left][1] + wall]) %>"
+                   fill="<%= iso_darken(color, 0.25) %>" stroke="<%= iso_darken(color, 0.45) %>" stroke-width="1" />
+          <polygon points="<%= iso_points_attr(p[:bottom], p[:right], [p[:right][0], p[:right][1] + wall], [p[:bottom][0], p[:bottom][1] + wall]) %>"
+                   fill="<%= iso_darken(color, 0.18) %>" stroke="<%= iso_darken(color, 0.45) %>" stroke-width="1" />
+          <polygon points="<%= iso_points_attr(p[:top], p[:right], p[:bottom], p[:left]) %>"
+                   fill="<%= top_fill %>" stroke="<%= top_stroke %>" stroke-width="<%= top_w %>">
+            <title><%= room[:name] %><%= " (#{room[:hackr_aliases].join(", ")})" if room[:hackr_count].positive? %><%= " — go #{direction}" if direction %></title>
+          </polygon>
+          <% if room[:visited] %>
+            <text x="<%= p[:center][0] %>" y="<%= p[:center][1] + 5 %>" text-anchor="middle"
+                  fill="<%= room[:is_current] ? "#fff" : color %>" font-size="15" font-family="monospace"><%= room[:name].truncate(18) %></text>
+          <% end %>
+          <g data-presence-room="<%= room[:id] %>"<% unless room[:hackr_count].positive? %> visibility="hidden"<% end %>>
+            <circle cx="<%= p[:top][0] %>" cy="<%= p[:top][1] - 10 %>" r="12" fill="#7c3aed" />
+            <text x="<%= p[:top][0] %>" y="<%= p[:top][1] - 5 %>" text-anchor="middle" fill="#fff" font-size="13" font-family="monospace" data-presence-count><%= room[:hackr_count] %></text>
+          </g>
+        </g>
+      <% end %>
+    </g>
+  </svg>
+</div>

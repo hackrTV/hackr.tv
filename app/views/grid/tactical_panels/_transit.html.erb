@@ -1,0 +1,183 @@
+<%# TransitPanel.tsx port. Every action posts the exact SPA command
+    (board/hail/advance/choose/wait/disembark/abandon/status). %>
+<%
+  heat_colors = {"cold" => "#34d399", "warm" => "#fbbf24", "hot" => "#f97316", "burning" => "#ef4444"}
+  journey = @journey
+%>
+<div class="tactical-panel-inner" data-controller="tactical-tabs">
+  <div class="tactical-panel-header">
+    <span class="tab-accent">TRANSIT<% if @region %> :: <%= @region.name %><% end %></span>
+    <% if journey %><span class="tactical-transit-badge">IN TRANSIT</span><% end %>
+  </div>
+
+  <div class="tactical-panel-scroll">
+    <% if journey %>
+      <div class="tactical-journey">
+        <div class="tab-row">
+          <span class="<%= journey.slipstream? ? "tab-purple" : "tab-positive" %>">[<%= journey.journey_type.to_s.sub("local_", "").upcase %>]</span>
+          <span class="tab-strong"> <%= journey.slipstream? ? journey.grid_slipstream_route&.name : journey.grid_transit_route&.name %></span>
+          <% if !journey.slipstream? && journey.direction == "reverse" %><span class="tab-faint"> (REV)</span><% end %>
+        </div>
+        <% if journey.breach_mid_journey %>
+          <div class="tactical-journey-breach">BREACH IN PROGRESS — resolve before continuing transit</div>
+        <% end %>
+        <% if journey.slipstream? %>
+          <div class="tab-purple tab-small">Progress: <%= journey.legs_completed %>/<%= journey.total_legs %> legs</div>
+          <div class="tab-bar-track"><span class="tab-bar-fill" style="width: <%= (journey.total_legs.to_i > 0) ? ((journey.legs_completed.to_f / journey.total_legs) * 100).round : 0 %>%; background: #a78bfa;"></span></div>
+          <% if journey.current_leg %><div class="tab-dim tab-small">Current leg: <%= journey.current_leg.name %></div><% end %>
+        <% else %>
+          <% if journey.current_stop %><div class="tab-dim tab-small">Current stop: <%= journey.current_stop.display_name %></div><% end %>
+          <% nxt = journey.grid_transit_route&.next_stop_after(journey.current_stop, direction: journey.direction) %>
+          <div class="tab-small"><% if nxt %><span class="tab-accent">Next stop: <%= nxt.display_name %></span><% else %><span class="tab-warn">End of the line</span><% end %></div>
+        <% end %>
+        <% if journey.slipstream? && journey.pending_fork? && journey.current_leg&.has_forks? %>
+          <div class="tactical-fork">
+            <div class="tab-warn tab-strong">FORK CHOICE</div>
+            <% journey.current_leg.fork_options.each do |opt| %>
+              <div class="tab-row tab-row--spread">
+                <span><span class="tab-strong"><%= opt["label"] %></span><% if opt["description"].present? %> <span class="tab-faint tab-small"><%= opt["description"] %></span><% end %></span>
+                <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                  <%= hidden_field_tag :surface, "tactical" %>
+                  <%= hidden_field_tag :input, "choose #{opt["key"]}" %>
+                  <button type="submit" class="tab-mini-button tab-mini-button--sell">CHOOSE</button>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="tactical-mission-actions">
+          <% unless journey.breach_mid_journey %>
+            <% if journey.slipstream? && !journey.pending_fork? %>
+              <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                <%= hidden_field_tag :surface, "tactical" %>
+                <%= hidden_field_tag :input, "advance" %>
+                <button type="submit" class="tab-action-button" style="background: #a78bfa; color: #0a0a0a;">ADVANCE</button>
+              <% end %>
+            <% elsif !journey.slipstream? %>
+              <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                <%= hidden_field_tag :surface, "tactical" %>
+                <%= hidden_field_tag :input, "wait" %>
+                <button type="submit" class="tab-action-button tab-action-button--go">WAIT</button>
+              <% end %>
+              <% if journey.journey_type == "local_public" %>
+                <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                  <%= hidden_field_tag :surface, "tactical" %>
+                  <%= hidden_field_tag :input, "disembark" %>
+                  <button type="submit" class="tab-action-button tab-action-button--drop">DISEMBARK</button>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+          <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {turbo_confirm: "Abandon this journey?"} do %>
+            <%= hidden_field_tag :surface, "tactical" %>
+            <%= hidden_field_tag :input, "abandon" %>
+            <button type="submit" class="tab-outline-button tab-outline-button--danger">ABANDON</button>
+          <% end %>
+          <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+            <%= hidden_field_tag :surface, "tactical" %>
+            <%= hidden_field_tag :input, "status" %>
+            <button type="submit" class="tab-outline-button">STATUS</button>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="tactical-tab-bar">
+        <button type="button" class="tactical-tab-button tactical-tab-button--active" data-tactical-tabs-target="button" data-tab="local" data-action="click->tactical-tabs#select">LOCAL</button>
+        <% if @private_types.any? %><button type="button" class="tactical-tab-button" data-tactical-tabs-target="button" data-tab="private" data-action="click->tactical-tabs#select">PRIVATE</button><% end %>
+        <button type="button" class="tactical-tab-button" data-tactical-tabs-target="button" data-tab="slipstream" data-action="click->tactical-tabs#select">SLIPSTREAM</button>
+      </div>
+
+      <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="local">
+        <% if @local_routes.empty? %>
+          <div class="tab-faint">No local routes at this stop.</div>
+        <% end %>
+        <% @local_routes.group_by { |r| r.grid_transit_type }.each do |type, routes| %>
+          <div class="tab-section-title" style="color: #34d399;">[<%= type.icon_key.presence || "TRANSIT" %>] <%= type.name %></div>
+          <% routes.each do |route| %>
+            <% stops = route.grid_transit_stops.to_a %>
+            <% boarding = stops.find { |s| s.grid_room_id == current_hackr.current_room&.id } %>
+            <div class="tab-mission">
+              <div class="tab-accent"><%= route.name %></div>
+              <div class="tab-faint tab-small"><%= stops.size %> stops<% if route.loop_route %> (loop)<% end %> | <%= type.base_fare %> CRED</div>
+              <div class="tactical-mission-actions">
+                <% if boarding && stops.last && stops.last.id != boarding.id %>
+                  <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                    <%= hidden_field_tag :surface, "tactical" %>
+                    <%= hidden_field_tag :input, "board #{route.slug}" %>
+                    <button type="submit" class="tab-mini-button tab-mini-button--fab">BOARD → <%= stops.last.display_name %></button>
+                  <% end %>
+                <% end %>
+                <% if boarding && stops.first && stops.first.id != boarding.id %>
+                  <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                    <%= hidden_field_tag :surface, "tactical" %>
+                    <%= hidden_field_tag :input, "board #{route.slug} reverse" %>
+                    <button type="submit" class="tab-mini-button tab-mini-button--fab">BOARD → <%= stops.first.display_name %></button>
+                  <% end %>
+                <% end %>
+              </div>
+              <div class="tactical-stops">
+                <% stops.each do |stop| %>
+                  <div class="tab-small"><span class="<%= stop.is_terminus ? "tab-warn" : "tab-dim" %>"><%= stop.is_terminus ? "◆" : "·" %></span> <span class="tab-dim"><%= stop.display_name %></span></div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @private_types.any? %>
+        <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="private" hidden>
+          <%= form_with url: grid_commands_path, data: {
+            controller: "command-arg",
+            command_arg_template_value: "hail {type} {destination}",
+            action: "submit->command-arg#submit"
+          } do %>
+            <%= hidden_field_tag :surface, "tactical" %>
+            <%= hidden_field_tag :input, "", data: {command_arg_target: "command"} %>
+            <label class="tab-dialog-label">Transport</label>
+            <select class="tactical-dialog-input" data-command-arg-target="field" data-arg-name="type">
+              <% @private_types.each do |type| %>
+                <option value="<%= type.slug %>"><%= type.name %> (<%= type.base_fare %> CRED)</option>
+              <% end %>
+            </select>
+            <label class="tab-dialog-label">Destination</label>
+            <select class="tactical-dialog-input" data-command-arg-target="field" data-arg-name="destination">
+              <option value="">Select destination...</option>
+              <% @private_destinations.each do |dest| %>
+                <option value="<%= dest[:name] %>"><%= dest[:name] %> (<%= dest[:zone_name] %>)</option>
+              <% end %>
+            </select>
+            <div class="tactical-mission-actions">
+              <button type="submit" class="tab-action-button tab-action-button--sell">HAIL</button>
+            </div>
+          <% end %>
+          <% if @private_destinations.empty? %><div class="tab-faint">No destinations available.</div><% end %>
+        </div>
+      <% end %>
+
+      <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="slipstream" hidden>
+        <% heat_color = heat_colors.fetch(@heat_tier.to_s, "#34d399") %>
+        <div class="tab-small" style="color: <%= heat_color %>;">Corridor Heat <%= @heat %>/100 (<%= @heat_tier %>)</div>
+        <div class="tab-bar-track"><span class="tab-bar-fill" style="width: <%= @heat %>%; background: <%= heat_color %>;"></span></div>
+        <% if @slip_routes.empty? %>
+          <div class="tab-faint">No Slipstream corridors from this region.</div>
+        <% end %>
+        <% @slip_routes.each do |route| %>
+          <div class="tab-mission">
+            <div class="tab-row tab-row--spread">
+              <span class="tab-purple tab-strong"><%= route.name %></span>
+              <span class="tab-faint tab-small">CL<%= route.min_clearance %>+</span>
+            </div>
+            <div class="tab-accent tab-small"><%= route.origin_region&.name %> → <%= route.destination_region&.name %></div>
+            <div class="tab-faint tab-small"><%= route.grid_slipstream_legs.size %> legs</div>
+            <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+              <%= hidden_field_tag :surface, "tactical" %>
+              <%= hidden_field_tag :input, "slipstream #{route.slug}" %>
+              <button type="submit" class="tab-mini-button" style="background: #a78bfa; color: #0a0a0a;">BOARD</button>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

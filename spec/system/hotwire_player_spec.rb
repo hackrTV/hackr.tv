@@ -39,7 +39,7 @@ RSpec.describe "Hotwire permanent player", type: :system do
     # Queue advances to the second track when the 2s tone ends. Generous
     # wait: under full-suite CPU load headless audio can stutter, which
     # stretches the 2s tone well past wall-clock (observed flake).
-    expect(page).to have_css("#track-title", text: "Second Tone", wait: 30)
+    expect(page).to have_css("#track-title", text: "Second Tone", wait: 60)
     expect(audio_js("paused")).to eq(false)
   end
 

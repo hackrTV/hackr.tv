@@ -800,7 +800,7 @@ module Grid
       # Back navigation — render position without stats/rep
       if DialogueNavigator.back_alias?(topic)
         if nav.at_root?
-          return dialogue_box("<span style='color: #9ca3af;'>You're already at the start of the conversation.</span>")
+          return record_dialogue!(mob, dialogue_box("<span style='color: #9ca3af;'>You're already at the start of the conversation.</span>"))
         end
         nav.go_back
         return render_dialogue_position(mob, nav)
@@ -810,7 +810,7 @@ module Grid
       # quest_giver's topic list doesn't need to enumerate every mission
       # slug or the literal "missions"/"work" keyword.
       mission_topic = mission_topic_response(mob, topic, room)
-      return dialogue_box(mission_topic) if mission_topic
+      return record_dialogue!(mob, dialogue_box(mission_topic)) if mission_topic
 
       # Navigate the dialogue tree at current depth
       result = nav.navigate(topic)
@@ -819,13 +819,14 @@ module Grid
         content = []
         content << "<span style='color: #c084fc;'>#{h(mob.name)}</span>: <span style='color: #60a5fa;'>\"#{h(result[:response])}\"</span>"
 
+        record_dialogue!(mob, dialogue_box(content.join("\n")))
         append_topic_list(content, result[:topics])
         dialogue_box(content.join("\n"))
       else
         available_topics = nav.current_topics
         available = available_topics.keys.map { |k| h(k) }.join(", ")
         content = "<span style='color: #c084fc;'>#{h(mob.name)}</span> doesn't know about '#{h(topic)}'. <span style='color: #9ca3af;'>Try asking about:</span> <span style='color: #fbbf24;'>#{available}</span>"
-        dialogue_box(content)
+        record_dialogue!(mob, dialogue_box(content))
       end
     end
 
@@ -2263,6 +2264,11 @@ module Grid
         content << "<span style='color: #c084fc;'>#{h(mob.name)}</span> waits for your question."
       end
 
+      # Panel mirror gets the response only — the slide-in renders topics
+      # and back/reset as BUTTONS, so the terminal's plain-text topic
+      # list and hint would just duplicate them.
+      record_dialogue!(mob, dialogue_box(content.join("\n")))
+
       append_topic_list(content, nav.current_topics)
 
       unless nav.at_root?
@@ -2270,6 +2276,17 @@ module Grid
       end
 
       dialogue_box(content.join("\n"))
+    end
+
+    # Panel mirror (Phase 6 post-review): the tactical NPC slide-in
+    # renders the hackr's LAST dialogue exchange — leaf/ancestor/mission/
+    # unknown-topic responses never move the persisted dialogue context,
+    # so the panel can't reconstruct them from state alone (the SPA
+    # mirrored the raw command output the same way). Single slot: only
+    # the most recent NPC conversation is kept.
+    def record_dialogue!(mob, output)
+      hackr.set_stat!("dialogue_last", {"mob_id" => mob.id, "output" => output})
+      output
     end
 
     def dialogue_box(content)

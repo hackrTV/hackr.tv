@@ -1,0 +1,62 @@
+<% content_for :title, "THE PULSE GRID — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hotwire-page grid-game" data-controller="grid-status">
+    <%= render "grid/room_stream", room: @room %>
+
+    <div class="grid-game-header">
+      <div class="grid-game-title-wrap">
+        <h1 class="grid-game-title"><span class="chrome-desktop-only">THE PULSE GRID</span><span class="chrome-mobile-only">GRID</span></h1>
+        <span class="grid-game-alias">@<%= current_hackr.hackr_alias %></span>
+        <span class="grid-status-dot" data-grid-status-target="dot" title="Connection"></span>
+      </div>
+      <div class="grid-game-header-right" data-controller="disconnect">
+        <button type="button" class="grid-killswitch" data-action="click->disconnect#logout">KILLSWITCH</button>
+      </div>
+    </div>
+
+    <div data-controller="grid-command">
+      <%# getWelcomeMessage port (desktop/mobile variants via chrome classes)
+          + the inline initial look output. 500-line cap + pin-to-bottom via
+          packet-log; broadcast lines append here from the room stream. %>
+      <div id="grid-log" class="grid-log" data-controller="packet-log"
+        data-packet-log-cap-value="500" data-grid-command-target="log">
+        <div class="grid-line grid-welcome chrome-desktop-only">════════════════════════════════════════════════════════════════
+  WELCOME TO THE PULSE GRID
+════════════════════════════════════════════════════════════════
+Connection established. Type 'help' for commands.
+════════════════════════════════════════════════════════════════
+   !! <span class="grid-welcome-warning">WARNING</span> !!
+     ~~ THE PULSE GRID IS IN PRE-ALPHA.
+     ~~ FREQUENT DATABASE FLUSHES _WILL_ OCCUR!
+     ~~ JUST RE-CREATE YOUR ACCOUNT IF YOU CANNOT LOGIN LATER
+   !! <span class="grid-welcome-warning">WARNING</span> !!
+════════════════════════════════════════════════════════════════</div>
+        <div class="grid-line grid-welcome chrome-mobile-only">══════════════════════════════════
+  WELCOME TO THE PULSE GRID
+══════════════════════════════════
+Connection established. Type 'help' for commands.
+══════════════════════════════════
+   !! <span class="grid-welcome-warning">WARNING</span> !!
+     ~~ PRE-ALPHA: DB FLUSHES OCCUR!
+     ~~ RE-CREATE ACCOUNT IF NEEDED
+   !! <span class="grid-welcome-warning">WARNING</span> !!
+══════════════════════════════════</div>
+        <% if @initial_output.present? %>
+          <div class="grid-line"><%= grid_output(@initial_output) %></div>
+        <% end %>
+      </div>
+
+      <%= form_with url: grid_commands_path, class: "grid-command-form", data: {
+        action: "submit->grid-command#submit turbo:submit-start->grid-command#started turbo:submit-end->grid-command#submitted"
+      } do %>
+        <%= text_field_tag :input, nil, autocomplete: "off", autofocus: true,
+          placeholder: "Enter command (type 'help' for commands)", class: "grid-command-input",
+          data: {grid_command_target: "input", action: "keydown->grid-command#keydown"} %>
+        <button type="submit" class="grid-command-send" data-grid-command-target="submit"><span class="chrome-desktop-only">EXECUTE</span><span class="chrome-mobile-only">GO</span></button>
+      <% end %>
+      <div class="grid-command-help chrome-desktop-only">Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear&nbsp;&nbsp;|&nbsp;&nbsp;↑/↓ for history</div>
+      <div class="grid-command-help chrome-mobile-only">Type 'help' for commands</div>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,80 @@
+<%# StatsTab.tsx port. %>
+<%
+  xp_in_level = @xp - @xp_current_floor
+  xp_range = @xp_next_ceil - @xp_current_floor
+  xp_pct = @max_clearance ? 100 : ((xp_range > 0) ? ((xp_in_level.to_f / xp_range) * 100).round : 0)
+  vitals = {
+    "HEALTH" => ["health", nil],
+    "ENERGY" => ["energy", "#fbbf24"],
+    "PSYCHE" => ["psyche", "#a78bfa"]
+  }
+%>
+<div class="tab-block tab-stats">
+  <div class="tab-row"><span class="tab-warn">CL<%= @clearance %></span><span class="tab-faint"> :: </span><span class="tab-accent"><%= current_hackr.hackr_alias %></span></div>
+
+  <div class="tab-vital-row">
+    <span class="tab-vital-name tab-dim">XP</span>
+    <span class="tab-vital-track"><span class="tab-vital-fill" style="width: <%= xp_pct %>%; background: #22d3ee;"></span></span>
+    <span class="tab-vital-nums"><%= number_with_delimiter(@xp) %></span>
+  </div>
+  <div class="tab-xp-next">
+    <% if @max_clearance %><span class="tab-warn">[MAX CLEARANCE]</span><% else %><%= number_with_delimiter(@xp_to_next) %> to CL<%= @clearance + 1 %><% end %>
+  </div>
+
+  <div class="tab-section-title tab-section-title--amber">VITALS</div>
+  <% vitals.each do |label, (vital, color)| %>
+    <% current = current_hackr.stat(vital).to_i %>
+    <% max = current_hackr.effective_max(vital).to_i %>
+    <% pct = (max > 0) ? ((current.to_f / max) * 100).round : 0 %>
+    <% color ||= (max > 0 && current.to_f / max <= 0.3) ? "#f87171" : "#34d399" %>
+    <div class="tab-vital-row">
+      <span class="tab-vital-name" style="color: <%= color %>;"><%= label %></span>
+      <span class="tab-vital-track"><span class="tab-vital-fill" style="width: <%= pct %>%; background: <%= color %>;"></span></span>
+      <span class="tab-vital-nums"><%= current %>/<%= max %></span>
+    </div>
+  <% end %>
+
+  <div class="tab-section-row"><span class="tab-section-title tab-section-title--amber">CRED</span><span class="tab-section-hint">→ CRED tab</span></div>
+  <div class="tab-row tab-row--spread"><span class="tab-dim">Default (<%= @default_cache ? (@default_cache.nickname.presence || @default_cache.address) : "none" %>)</span><span class="tab-positive"><%= number_with_delimiter(@default_cache&.balance || 0) %></span></div>
+  <div class="tab-row tab-row--spread"><span class="tab-dim">Total</span><span class="tab-positive"><%= number_with_delimiter(@total_balance) %></span></div>
+  <% if @debt > 0 %>
+    <div class="tab-debt"><span>GovCorp DEBT</span><span>-<%= number_with_delimiter(@debt) %></span></div>
+  <% end %>
+
+  <div class="tab-section-row"><span class="tab-section-title tab-section-title--amber">DECK</span><span class="tab-section-hint">→ DECK tab</span></div>
+  <% if @deck %>
+    <div style="color: <%= @deck.rarity_color %>;"><%= @deck.name %></div>
+    <div class="tab-dim tab-deck-summary">
+      <span>Battery: <%= @deck.deck_battery %>/<%= @deck.deck_battery_max %></span>
+      <span>Slots: <%= @deck.deck_slots_used %>/<%= @deck.deck_slot_count %></span>
+    </div>
+  <% else %>
+    <div class="tab-faint">No DECK equipped</div>
+  <% end %>
+
+  <div class="tab-section-row"><span class="tab-section-title tab-section-title--amber">LOADOUT</span><span class="tab-section-hint">→ GEAR tab</span></div>
+  <div class="tab-dim"><%= @equipped_count %>/<%= GridItem::GEAR_SLOTS.size %> slots equipped</div>
+
+  <div class="tab-section-title tab-section-title--amber">ACHIEVEMENTS</div>
+  <div class="tab-dim"><%= @achievements_earned %>/<%= @achievements_total %> earned</div>
+  <% @achievements_in_progress.each do |a| %>
+    <% pct = (a[:target] > 0) ? ((a[:current].to_f / a[:target]) * 100).round : 0 %>
+    <div class="tab-achievement">
+      <div class="tab-row tab-row--spread">
+        <span class="tab-rep-name"><% if a[:badge_icon] %><%= a[:badge_icon] %> <% end %><%= a[:name] %></span>
+        <span class="tab-faint"><%= a[:current] %>/<%= a[:target] %></span>
+      </div>
+      <span class="tab-achievement-track"><span class="tab-achievement-fill" style="width: <%= pct %>%;"></span></span>
+    </div>
+  <% end %>
+
+  <% if @standings_summary.any? %>
+    <div class="tab-section-row"><span class="tab-section-title tab-section-title--amber">STANDING</span><span class="tab-section-hint">→ REP tab</span></div>
+    <% @standings_summary.each do |s| %>
+      <div class="tab-row tab-row--spread">
+        <span class="tab-rep-name"><%= s[:faction].display_name %></span>
+        <span style="color: <%= s[:tier][:color] %>;">[<%= s[:tier][:label] %>]</span>
+      </div>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,91 @@
+/* Legacy PULSE GRID terminal (Hotwire migration Phase 6a). Translated
+   from GridGamePage/GameOutput/CommandInput inline styles + the
+   GridComingSoonPage. Loads from the layouts' shared tracked-asset
+   partial — never per-page (turbo-track signature rule). */
+
+.grid-game { max-width: 1000px; margin: 0 auto; padding: 10px; background-color: #1a1a1a; color: #d0d0d0; font-family: monospace; }
+
+.grid-game-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.grid-game-title-wrap { display: flex; align-items: center; gap: 10px; }
+.grid-game-title { margin: 0; font-size: 1.1em; color: #a78bfa; letter-spacing: 1px; }
+.grid-game-alias { color: #666; font-size: 0.85em; }
+.grid-status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #f87171; }
+.grid-status-dot--connected { background-color: #34d399; }
+.grid-killswitch { background-color: #dc2626; border: none; color: #fff; padding: 6px 12px; font-family: inherit; font-size: 0.8em; cursor: pointer; border-radius: 3px; }
+.grid-killswitch:hover { background-color: #b91c1c; }
+
+/* Terminal log (GameOutput.tsx). */
+.grid-log { height: 700px; overflow-y: auto; background-color: #0d0d0d; border: 1px solid #4b5563; padding: 10px; font-size: 0.75em; line-height: 1.2; white-space: pre-wrap; word-break: break-word; }
+.grid-line { min-height: 1em; }
+.grid-welcome { color: #a78bfa; font-size: 0.9em; }
+.grid-welcome-warning { color: #f87171; }
+.grid-echo-separator { height: 1px; background: #444; margin-top: 16px; margin-bottom: 12px; overflow: hidden; }
+.grid-echo { color: #22d3ee; }
+.grid-say-alias { color: #a78bfa; }
+.grid-error-line { color: #f87171; }
+
+/* Command form (CommandInput.tsx). */
+.grid-command-form { display: flex; gap: 8px; margin-top: 8px; }
+.grid-command-input { flex: 1; background-color: #262626; color: #e0e0e0; border: 1px solid #4b5563; padding: 6px 10px; font-family: monospace; font-size: 0.9em; border-radius: 3px; }
+.grid-command-input:disabled { opacity: 0.5; }
+.grid-command-send { flex-shrink: 0; background-color: #7c3aed; border: none; color: #fff; padding: 6px 14px; font-family: inherit; font-size: 0.85em; cursor: pointer; border-radius: 3px; }
+.grid-command-help { margin-top: 6px; color: #555; font-size: 0.7em; }
+
+@media (max-width: 768px) {
+  .grid-game { padding: 8px; }
+  .grid-log { height: calc(100vh - 200px); min-height: 300px; max-height: 500px; font-size: 0.7em; padding: 8px; }
+}
+
+/* Coming-soon gate (GridComingSoonPage.tsx). */
+.grid-coming-soon { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; color: #a78bfa; padding: 20px; text-align: center; }
+.grid-coming-soon-frame { margin: 15px 0; font-size: 0.9em; color: #444; letter-spacing: 2px; }
+.grid-coming-soon-title { font-size: 1.8em; font-weight: bold; color: #a78bfa; margin: 0 0 16px; letter-spacing: 3px; text-transform: uppercase; }
+.grid-coming-soon-lede { font-size: 1.1em; color: #c084fc; margin: 0 0 8px; }
+.grid-coming-soon-sub { font-size: 0.85em; color: #666; margin: 0 0 15px; }
+.grid-coming-soon-link { color: #7c3aed; text-decoration: none; font-size: 0.85em; }
+
+/* ── Grid meta pages (Phase 6e) ───────────────────────────────────── */
+.grid-meta { max-width: 1100px; margin: 0 auto; padding: 10px; font-family: 'Courier New', monospace; color: #d0d0d0; }
+.grid-meta-window { border: 1px solid #444; padding: 16px; background: #0d0d0d; position: relative; }
+.grid-meta-legend { position: absolute; top: -0.7em; left: 12px; background: #0d0d0d; padding: 0 8px; font-weight: bold; letter-spacing: 2px; font-size: 0.9em; }
+.grid-meta-summary { color: #888; font-size: 0.85em; margin-bottom: 10px; }
+.grid-meta-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.grid-meta-tab { background: transparent; border: 1px solid #333; color: #888; font-family: inherit; font-size: 0.75em; padding: 5px 10px; cursor: pointer; letter-spacing: 0.5px; }
+.grid-meta-tab--active { border-color: currentColor; background: #111; }
+.grid-meta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.grid-meta-card { border: 1px solid #222; background: #0a0a0a; padding: 10px 12px; font-size: 0.85em; display: flex; flex-direction: column; gap: 4px; }
+.grid-meta-card[hidden] { display: none; }
+.grid-meta [data-meta-filter-target="item"][hidden] { display: none; }
+.grid-meta-card--earned { border-color: #3a2f10; }
+.grid-meta-card-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.grid-meta-card-title { color: #e0e0e0; font-weight: bold; }
+.grid-meta-card-desc { color: #999; font-size: 0.9em; line-height: 1.35; }
+.grid-meta-card-footer { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.85em; margin-top: 4px; }
+.grid-meta-rewards { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.85em; }
+.grid-meta-status { font-size: 0.75em; padding: 1px 6px; border: 1px solid currentColor; }
+.grid-meta-status--ready { color: #34d399; }
+.grid-meta-status--available { color: #60a5fa; }
+.grid-meta-status--locked { color: #6b7280; }
+.grid-meta-section-title { color: #fbbf24; font-size: 0.85em; font-weight: bold; margin: 14px 0 6px; }
+.grid-meta-effects { display: flex; gap: 6px; flex-wrap: wrap; }
+.grid-meta-effect { background: #0f1f14; color: #34d399; font-size: 0.75em; padding: 1px 6px; border-radius: 2px; }
+.grid-meta-empty-slot { color: #555; font-style: italic; }
+.grid-meta-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0; }
+.grid-meta-route { border-bottom: 1px solid #1a1a1a; padding: 4px 0; }
+.grid-meta-route summary { cursor: pointer; }
+.grid-meta code { color: #22d3ee; background: #111; padding: 0 4px; }
+
+/* Terminal easter egg overlay (TerminalModal.tsx port) */
+.terminal-egg-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 99998; }
+.terminal-egg-backdrop[hidden] { display: none; }
+.terminal-egg { position: fixed; top: 0; left: 50%; transform: translate(-50%, -100%); width: min(96vw, 1100px); height: 95vh; max-height: 1000px; z-index: 99999; background: #0a0a0a; border: 1px solid #a78bfa; border-top: none; display: flex; flex-direction: column; transition: transform 0.4s ease; }
+.terminal-egg[hidden] { display: none; }
+.terminal-egg--open { transform: translate(-50%, 0); }
+.terminal-egg-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 14px; border-bottom: 1px solid #a78bfa; font-family: 'Courier New', monospace; color: #22d3ee; }
+.terminal-egg-title::before { content: '> '; animation: terminal-egg-blink 1s steps(1) infinite; }
+@keyframes terminal-egg-blink { 50% { opacity: 0; } }
+.terminal-egg-hints { color: #555; font-size: 0.7em; display: flex; gap: 10px; }
+.terminal-egg-hints kbd { border: 1px solid #444; padding: 0 4px; border-radius: 2px; }
+.terminal-egg-close { background: transparent; border: 1px solid #ef4444; color: #ef4444; font-family: inherit; font-size: 0.75em; padding: 3px 10px; cursor: pointer; }
+.terminal-egg-frame { flex: 1; border: none; width: 100%; background: #0a0a0a; }
+.terminal-egg-handle { height: 6px; background: linear-gradient(90deg, #a78bfa, #22d3ee); cursor: pointer; }

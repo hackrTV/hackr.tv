@@ -1,0 +1,42 @@
+<%# MissionsTab.tsx port — TURN IN posts the exact command the SPA sent. %>
+<div class="tab-block">
+  <% if @active.any? %>
+    <div class="tab-section-title tab-section-title--cyan">ACTIVE</div>
+    <% @active.each do |hm| %>
+      <% mission = hm.grid_mission %>
+      <% progress_by_obj = hm.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id) %>
+      <div class="tab-mission">
+        <div class="tab-row tab-row--spread">
+          <span class="tab-strong"><%= mission.name %></span>
+          <% if mission.giver_mob %>
+            <span class="tab-faint"><%= mission.giver_mob.name %><% if mission.giver_mob.grid_room %> @ <%= mission.giver_mob.grid_room.name %><% end %></span>
+          <% end %>
+        </div>
+        <% mission.grid_mission_objectives.each do |obj| %>
+          <% hobj = progress_by_obj[obj.id] %>
+          <% completed = hobj&.completed_at.present? %>
+          <div class="tab-row tab-row--spread <%= completed ? "tab-positive" : "tab-dim" %>">
+            <span><%= completed ? "✓" : "○" %> <%= obj.label %></span>
+            <span><%= hobj&.progress.to_i %>/<%= obj.target_count %></span>
+          </div>
+        <% end %>
+        <% if hm.all_objectives_completed? %>
+          <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {turbo: true} do %>
+            <%= hidden_field_tag :surface, "tactical" %>
+            <%= hidden_field_tag :input, "turn_in #{mission.slug}" %>
+            <button type="submit" class="tab-action-button tab-action-button--go">TURN IN</button>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="tab-muted">No active missions</div>
+  <% end %>
+
+  <% if @completed.any? %>
+    <div class="tab-section-title">COMPLETED (<%= @completed.size %>)</div>
+    <% @completed.first(5).each do |hm| %>
+      <div class="tab-completed">✓ <%= hm.grid_mission.name %></div>
+    <% end %>
+  <% end %>
+</div>

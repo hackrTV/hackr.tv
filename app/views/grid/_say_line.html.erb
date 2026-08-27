@@ -1,0 +1,4 @@
+<%# Room chat line ("say" event) — purple alias, no timestamp (SPA
+    parity). Locals: hackr_alias, message. Message is ERB-escaped — the
+    SPA interpolated it raw and leaned on DOMPurify. %>
+<div class="grid-line"><span class="grid-say-alias">[<%= hackr_alias %>]</span>: <%= message %></div>

@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
-import { useTerminal } from '~/contexts/TerminalContext'
 import { useAppSettings } from '~/contexts/AppSettingsContext'
 
 export const HeaderMenu: React.FC = () => {
@@ -12,7 +11,9 @@ export const HeaderMenu: React.FC = () => {
   const isActive = (path: string) => path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/')
   const { isMobile } = useMobileDetect()
   const { mobileMenuOpen, setMobileMenuOpen } = useMobileMenu()
-  const { openTerminal } = useTerminal()
+  // Terminal easter egg lives on the Hotwire layout now (Phase 6e);
+  // from the React 404 shell we just load the full /terminal page.
+  const openTerminal = () => { window.location.href = '/terminal' }
   const { isWorldFeedVisible } = useAppSettings()
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const menuRef = useRef<HTMLElement>(null)

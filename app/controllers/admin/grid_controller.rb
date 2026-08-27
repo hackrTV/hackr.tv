@@ -74,9 +74,10 @@ class Admin::GridController < Admin::ApplicationController
       )
     end
 
-    # Broadcast via ActionCable to all rooms
+    # Broadcast to all rooms — JSON (GridChannel) + Hotwire terminal line
+    # dual-publish (Phase 6a).
     GridRoom.find_each do |room|
-      GridChannel.broadcast_to(
+      Grid::RoomEventBroadcaster.publish_system_broadcast(
         room,
         {
           type: "system_broadcast",

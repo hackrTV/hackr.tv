@@ -147,9 +147,12 @@ module Grid
         .select { |e| e[:in_zone] && visible_ids.include?(e[:from_room_id]) && visible_ids.include?(e[:to_room_id]) }
         .map { |e| {from_room_id: e[:from_room_id], to_room_id: e[:to_room_id], direction: e[:direction], locked: e[:locked]} }
 
-      # Filter ghost rooms — pick the first connection from a visible room
+      # Filter ghost rooms — prefer a connection from the CURRENT room
+      # (an adjacent ghost must always be click-navigable), else the
+      # first connection from any visible room.
       ghost_rooms = topology[:ghost_rooms].filter_map do |gr|
-        visible_conn = gr[:connections].find { |c| visible_ids.include?(c[:from_room_id]) }
+        visible_conn = gr[:connections].find { |c| c[:from_room_id] == @hackr.current_room_id && visible_ids.include?(c[:from_room_id]) }
+        visible_conn ||= gr[:connections].find { |c| visible_ids.include?(c[:from_room_id]) }
         next unless visible_conn
         gr.except(:connections).merge(
           local_room_id: visible_conn[:from_room_id],

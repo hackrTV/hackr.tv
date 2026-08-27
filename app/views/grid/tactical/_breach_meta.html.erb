@@ -1,0 +1,134 @@
+<%# Breach header + deck snapshot + software action bar. Replaced per
+    command while in breach (round/actions/detection/protocol states
+    move every turn). All buttons compose the existing breach commands.
+    Locals: breach. %>
+<%
+  template = breach.grid_breach_template
+  protocols = breach.grid_breach_protocols.sort_by(&:position)
+  alive = protocols.select(&:alive?)
+  deck = current_hackr.equipped_deck
+  software = deck ? current_hackr.grid_items.where(deck_id: deck.id, item_type: "software").includes(:grid_item_definition) : []
+  battery_pct = (deck && deck.deck_battery_max.to_i > 0) ? ((deck.deck_battery.to_f / deck.deck_battery_max) * 100).round : 0
+  detection_pct = [breach.detection_level.to_i, 100].min
+  past_pnr = breach.detection_level.to_i >= breach.pnr_threshold.to_i
+%>
+<div id="tactical-breach-meta">
+  <div class="tactical-breach-header">
+    <div class="tactical-breach-title">
+      <span class="tab-error">BREACH ::</span>
+      <span class="tab-strong"><%= template.name %></span>
+      <span class="tab-warn tab-small">[<%= template.tier_label %>]</span>
+      <span class="tab-faint tab-small">ROUND <%= breach.round_number %></span>
+      <span class="tab-accent tab-small"><%= breach.actions_remaining %> action<%= (breach.actions_remaining == 1) ? "" : "s" %> left</span>
+    </div>
+    <div class="tactical-breach-header-right" data-controller="dialog">
+      <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+        <%= hidden_field_tag :surface, "tactical" %>
+        <%= hidden_field_tag :input, "status" %>
+        <button type="submit" class="tab-outline-button">STATUS</button>
+      <% end %>
+      <button type="button" class="tab-outline-button tab-outline-button--danger" data-action="click->dialog#open">JACKOUT</button>
+      <dialog class="tactical-dialog" data-dialog-target="dialog">
+        <div class="tactical-dialog-body">
+          <div class="tab-dialog-title tab-error">JACKOUT</div>
+          <div class="tab-dialog-desc">
+            Clean jackout costs 5 EN.<br>
+            Past the Point of No Return it costs 10 HP / 15 EN / 15 PS.
+            <% if past_pnr %><br><span class="tab-error">You are PAST the PNR.</span><% end %>
+          </div>
+          <div class="tab-dialog-actions">
+            <button type="button" class="tab-dialog-cancel" data-action="click->dialog#close">CANCEL</button>
+            <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+              <%= hidden_field_tag :surface, "tactical" %>
+              <%= hidden_field_tag :input, "jackout" %>
+              <button type="submit" class="tab-action-button" style="background: #f87171; color: #0a0a0a;">JACKOUT</button>
+            <% end %>
+          </div>
+        </div>
+      </dialog>
+    </div>
+  </div>
+
+  <div class="tactical-breach-status">
+    <span class="tactical-breach-detection" title="Detection / PNR <%= breach.pnr_threshold %>">
+      <span class="tab-dim tab-small">DETECTION</span>
+      <span class="tab-bar-track tactical-breach-track"><span class="tab-bar-fill" style="width: <%= detection_pct %>%; background: <%= past_pnr ? "#f87171" : "#fbbf24" %>;"></span></span>
+      <span class="<%= past_pnr ? "tab-error" : "tab-dim" %> tab-small"><%= breach.detection_level %>/100 (PNR <%= breach.pnr_threshold %>)</span>
+    </span>
+    <% if deck %>
+      <span class="tactical-breach-battery" title="DECK battery">
+        <span class="tab-dim tab-small">BAT</span>
+        <span class="tab-bar-track tactical-breach-track"><span class="tab-bar-fill<%= " tab-bar-fill--low" if battery_pct <= 25 %>" style="width: <%= battery_pct %>%;"></span></span>
+        <span class="tab-dim tab-small"><%= deck.deck_battery %>/<%= deck.deck_battery_max %></span>
+      </span>
+    <% end %>
+  </div>
+
+  <%# Protocol numbering is 1-based everywhere the player sees it: DB
+      positions are 0-based, the parser converts user input with
+      `num - 1`, and terminal output prints `position + 1`. The dropdown
+      VALUES must be position + 1 too — raw positions shifted every
+      target and made the last protocol unreachable (XERAEN repro). %>
+  <div class="tactical-breach-protocols">
+    <% protocols.each do |p| %>
+      <span class="tactical-breach-protocol<%= " tactical-breach-protocol--down" unless p.alive? %>">
+        [<%= p.position + 1 %>] <%= (p.analyze_level >= 1) ? p.type_label : "???" %><%= " ✕" unless p.alive? %>
+      </span>
+    <% end %>
+  </div>
+
+  <%# BreachPanel TargetSelector port: click a software/action button →
+      an anchored menu of alive protocols opens (one at a time); picking
+      one submits the complete command (`exec Name 3`). Menu items show
+      the analyzed type label or "???" like the chips. Per-command meta
+      replaces rebuild the bar closed. %>
+  <div class="tactical-breach-actions" data-controller="target-menu"
+    data-action="click@document->target-menu#outside keydown.esc@document->target-menu#closeAll">
+    <% software.each do |sw| %>
+      <% props = sw.properties || {} %>
+      <% battery_cost = props["battery_cost"].to_i %>
+      <% category = props["software_category"].to_s %>
+      <% cat_color = TacticalHelper::SOFTWARE_CATEGORY_COLORS[category] || "#9ca3af" %>
+      <div class="target-menu-anchor">
+        <button type="button" class="tactical-software-button"
+          style="color: <%= sw.rarity_color %>; border-color: <%= cat_color %>44;"
+          title="<%= category %> · PWR:<%= battery_cost %> DMG:<%= props["effect_magnitude"].to_i %>"
+          <%= "disabled" if alive.empty? %>
+          data-action="click->target-menu#toggle"><%= sw.name %><% if battery_cost > 0 %> <span class="tactical-software-cost">⚡<%= battery_cost %></span><% end %></button>
+        <div class="target-menu" hidden data-target-menu-target="menu">
+          <div class="target-menu-label">EXEC <%= sw.name %> →</div>
+          <div class="target-menu-options">
+            <% alive.each do |p| %>
+              <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {action: "submit->target-menu#closeAll"} do %>
+                <%= hidden_field_tag :surface, "tactical" %>
+                <%= hidden_field_tag :input, "exec #{sw.name} #{p.position + 1}" %>
+                <button type="submit" class="target-menu-option">[<%= p.position + 1 %>] <%= (p.analyze_level >= 1) ? p.type_label : "???" %></button>
+              <% end %>
+            <% end %>
+          </div>
+          <button type="button" class="target-menu-cancel" data-action="click->target-menu#closeAll">cancel</button>
+        </div>
+      </div>
+    <% end %>
+    <% if software.any? %><span class="tactical-breach-sep">|</span><% end %>
+    <% {"analyze" => "ANALYZE", "reroute" => "REROUTE"}.each do |cmd, label| %>
+      <div class="target-menu-anchor">
+        <button type="button" class="tactical-quick-button" <%= "disabled" if alive.empty? %>
+          data-action="click->target-menu#toggle"><%= label %></button>
+        <div class="target-menu" hidden data-target-menu-target="menu">
+          <div class="target-menu-label"><%= label %> →</div>
+          <div class="target-menu-options">
+            <% alive.each do |p| %>
+              <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {action: "submit->target-menu#closeAll"} do %>
+                <%= hidden_field_tag :surface, "tactical" %>
+                <%= hidden_field_tag :input, "#{cmd} #{p.position + 1}" %>
+                <button type="submit" class="target-menu-option">[<%= p.position + 1 %>] <%= (p.analyze_level >= 1) ? p.type_label : "???" %></button>
+              <% end %>
+            <% end %>
+          </div>
+          <button type="button" class="target-menu-cancel" data-action="click->target-menu#closeAll">cancel</button>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -54,12 +54,19 @@ Rails.application.routes.draw do
   get "trackz", to: "tracks#legacy_redirect", as: :legacy_tracks
   get "trackz/:id", to: "tracks#legacy_redirect_show", as: :legacy_track
 
-  # THE PULSE GRID routes. Game pages are still SPA; auth + account pages
-  # are Hotwire (migrated Phase 2). Route names for verify/reset/confirm
-  # are load-bearing — GridMailer builds email links with them.
+  # THE PULSE GRID routes. The legacy terminal (/grid) is Hotwire
+  # (migrated Phase 6a); the tactical page (/grid/1337) is still SPA
+  # until 6b. Auth + account pages are Hotwire (migrated Phase 2). Route
+  # names for verify/reset/confirm are load-bearing — GridMailer builds
+  # email links with them.
   scope "grid" do
-    get "/", to: "pages#spa_root", as: :grid
-    get "1337", to: "pages#spa_root", as: :grid_tactical
+    get "/", to: "grid/game#show", as: :grid
+    post "commands", to: "grid/commands#create", as: :grid_commands
+    # Tactical surface — Hotwire (migrated Phase 6b–6d).
+    get "1337", to: "grid/tactical#show", as: :grid_tactical
+    get "1337/tabs/:tab", to: "grid/tactical_tabs#show", as: :grid_tactical_tab
+    get "1337/panels/:panel", to: "grid/tactical_panels#show", as: :grid_tactical_panel
+    get "1337/map", to: "grid/tactical_map#show", as: :grid_tactical_map
 
     scope module: :grid do
       get "login", to: "sessions#new", as: :grid_login
@@ -137,18 +144,15 @@ Rails.application.routes.draw do
   # Timeline route — Hotwire (migrated Phase 1)
   get "timeline", to: "timeline#show", as: :timeline
 
-  # Achievements (login-gated SPA)
-  get "achievements", to: "pages#spa_root", as: :achievements
-
-  # Missions (login-gated SPA). Per-mission detail renders inline in
-  # the MissionsPage card grid — no dedicated per-slug React route, so
-  # we don't expose `/missions/:slug` as a Rails SPA path either.
-  get "missions", to: "pages#spa_root", as: :missions
-  get "schematics", to: "pages#spa_root", as: :schematics
-  get "loadout", to: "pages#spa_root", as: :loadout
+  # Grid meta pages — Hotwire (migrated Phase 6e). Read-only browsers;
+  # mutations stay terminal commands.
+  get "achievements", to: "grid/meta#achievements", as: :achievements
+  get "missions", to: "grid/meta#missions", as: :missions
+  get "schematics", to: "grid/meta#schematics", as: :schematics
+  get "loadout", to: "grid/meta#loadout", as: :loadout
   get "gear", to: redirect("/loadout")
-  get "deck", to: "pages#spa_root", as: :deck_page
-  get "transit", to: "pages#spa_root", as: :transit_page
+  get "deck", to: "grid/meta#deck", as: :deck_page
+  get "transit", to: "grid/meta#transit", as: :transit_page
 
   # Stream schedule — Hotwire (migrated Phase 1)
   get "schedule", to: "schedule#show", as: :streams_schedule

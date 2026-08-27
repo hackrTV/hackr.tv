@@ -1,0 +1,47 @@
+<%# DeckTab.tsx port. %>
+<% if @deck.nil? %>
+  <div class="tab-muted">No DECK equipped</div>
+<% else %>
+  <% battery_pct = (@deck.deck_battery_max.to_i > 0) ? ((@deck.deck_battery.to_f / @deck.deck_battery_max) * 100).round : 0 %>
+  <div class="tab-block">
+    <div class="tab-item-name" style="color: <%= @deck.rarity_color %>;"><%= @deck.name %></div>
+
+    <div class="tab-row tab-row--spread"><span>Battery</span><span><%= @deck.deck_battery %>/<%= @deck.deck_battery_max %></span></div>
+    <div class="tab-bar-track"><span class="tab-bar-fill<%= " tab-bar-fill--low" if battery_pct <= 25 %>" style="width: <%= battery_pct %>%"></span></div>
+
+    <div class="tab-row tab-row--spread tab-dim">
+      <span>Slots: <%= @deck.deck_slots_used %>/<%= @deck.deck_slot_count %></span>
+      <span>Modules: <%= @deck.deck_modules_used %>/<%= @deck.deck_module_slot_count %></span>
+    </div>
+
+    <% if @modules.any? %>
+      <div class="tab-section-title">INSTALLED MODULES</div>
+      <% @modules.each do |mod| %>
+        <div class="tab-line">
+          <span style="color: <%= mod.rarity_color %>;"><%= mod.name %></span>
+          <% if (firmware = mod.properties&.dig("firmware_name")) %>
+            <span class="tab-dim">&larr; <%= firmware %></span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if @software.any? %>
+      <div class="tab-section-title">LOADED SOFTWARE</div>
+      <% @software.each do |sw| %>
+        <% props = sw.properties || {} %>
+        <% specs = [] %>
+        <% specs << "#{props["battery_cost"].to_i} bat" if props["battery_cost"].to_i > 0 %>
+        <% specs << "#{props["effect_magnitude"].to_i} #{props["effect_type"] || "dmg"}" if props["effect_magnitude"].to_i > 0 %>
+        <% specs << Array(props["target_types"]).join("/") if Array(props["target_types"]).any? %>
+        <div class="tab-line">
+          <div class="tab-row tab-row--spread">
+            <span style="color: <%= sw.rarity_color %>;"><%= sw.name %><% if props["slot_cost"].to_i > 1 %> <span class="tab-dim">[<%= props["slot_cost"] %> slots]</span><% end %></span>
+            <span class="tab-faint"><%= props["software_category"] %></span>
+          </div>
+          <% if specs.any? %><div class="tab-specs"><%= specs.join(" · ") %></div><% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

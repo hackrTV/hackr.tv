@@ -1,0 +1,55 @@
+<%# RestPodPanel.tsx port. Allocation inputs feed the rest-pod
+    controller, which totals pts→CRED and composes the exact
+    `rest N vital…` command. %>
+<% if !@available %>
+  <div class="tab-muted">No Rest Pod here.</div>
+<% else %>
+  <%
+    vitals = {
+      "health" => ["HEALTH", "#34d399"],
+      "energy" => ["ENERGY", "#60a5fa"],
+      "psyche" => ["PSYCHE", "#c084fc"]
+    }
+  %>
+  <div class="tactical-panel-inner" data-controller="rest-pod" data-rest-pod-rate-value="<%= @rate %>" data-rest-pod-balance-value="<%= @balance %>">
+    <div class="tactical-panel-header">
+      <span class="tab-positive">REST POD</span>
+      <span class="tab-warn"><%= number_with_delimiter(@balance) %> CRED</span>
+      <span class="tab-faint"><%= @rate %> pts/CRED</span>
+    </div>
+    <div class="tactical-panel-scroll">
+      <%= form_with url: grid_commands_path, data: {rest_pod_target: "form", action: "submit->rest-pod#submit"} do %>
+        <%= hidden_field_tag :surface, "tactical" %>
+        <%= hidden_field_tag :input, "", data: {rest_pod_target: "command"} %>
+        <% vitals.each do |vital, (label, color)| %>
+          <% current = current_hackr.stat(vital).to_i %>
+          <% max = current_hackr.effective_max(vital).to_i %>
+          <% deficit = [max - current, 0].max %>
+          <% pct = (max > 0) ? ((current.to_f / max) * 100).round : 0 %>
+          <div class="tactical-rest-vital">
+            <div class="tab-row tab-row--spread">
+              <span style="color: <%= color %>;" class="tactical-rest-label"><%= label %></span>
+              <span class="tab-dim"><%= current %> / <%= max %><% if deficit > 0 %> <span class="tab-faint">(<%= deficit %> missing)</span><% end %></span>
+            </div>
+            <div class="tab-bar-track"><span class="tab-bar-fill" style="width: <%= pct %>%; background: <%= color %>;"></span></div>
+            <% if deficit > 0 %>
+              <div class="tactical-rest-controls">
+                <input type="number" min="0" max="<%= deficit %>" placeholder="pts" class="tactical-qty-input"
+                  data-rest-pod-target="alloc" data-vital="<%= vital %>" data-deficit="<%= deficit %>"
+                  data-action="input->rest-pod#recalc" aria-label="<%= label %> points">
+                <button type="button" class="tab-link-button" style="color: <%= color %>;" data-action="click->rest-pod#full" data-vital="<%= vital %>">FULL</button>
+              </div>
+            <% else %>
+              <div class="tab-positive tab-small">FULL</div>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="tactical-rest-footer">
+          <span data-rest-pod-target="total" class="tab-faint">Total: 0 pts → 0 CRED</span>
+          <button type="button" class="tab-ghost-button" data-action="click->rest-pod#fillAll">FILL ALL</button>
+          <button type="submit" class="tab-action-button tab-action-button--go" data-rest-pod-target="submit" disabled>RESTORE</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,20 @@
+<%# Rewards summary line. Locals: mission. (if/elsif, not case/when —
+    ERB can't have text nodes between case and the first when.) %>
+<% rewards = mission.grid_mission_rewards.to_a %>
+<% if rewards.any? %>
+  <div class="grid-meta-rewards">
+    <% rewards.each do |r| %>
+      <% if r.reward_type == "xp" %>
+        <span class="tab-positive">+<%= r.amount %> XP</span>
+      <% elsif r.reward_type == "cred" %>
+        <span class="tab-warn">+<%= r.amount %> CRED</span>
+      <% elsif r.reward_type == "faction_rep" %>
+        <span class="tab-purple"><%= (r.amount.to_i >= 0) ? "+" : "" %><%= r.amount %> rep<% if r.target_slug %> (<%= r.target_slug %>)<% end %></span>
+      <% elsif r.reward_type == "item_grant" %>
+        <span class="tab-accent"><%= r.target_slug %><% if r.quantity.to_i > 1 %> ×<%= r.quantity %><% end %></span>
+      <% elsif r.reward_type == "grant_achievement" %>
+        <span class="tab-warn">◆ achievement</span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

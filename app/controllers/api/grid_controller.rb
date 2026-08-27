@@ -1062,54 +1062,16 @@ class Api::GridController < ApplicationController
   def command
     Rails.logger.info "=== API COMMAND RECEIVED: #{params[:input]} from #{current_hackr.hackr_alias} ==="
 
-    # Ensure hackr has a room (handles stale sessions after DB reset)
-    current_hackr.ensure_current_room!
-
-    # Start tutorial for hackrs who haven't seen it (handles stale sessions)
-    if current_hackr.stat("tutorial_active").nil? && current_hackr.stat("tutorial_completed").nil?
-      tutorial = Grid::TutorialService.new(current_hackr)
-      tutorial.start!
-      hub = tutorial.tutorial_hub_room
-      current_hackr.update!(current_room: hub) if hub
-      unless current_hackr.den.present?
-        current_hackr.grid_items.joins(:grid_item_definition)
-          .where(grid_item_definitions: {slug: "den-access-chip"}).destroy_all
-      end
-    end
-
-    # Update last activity timestamp
-    current_hackr.touch_activity!
-
-    result = Grid::CommandParser.new(current_hackr, params[:input]).execute
-    output = result[:output]
-    event = result[:event]
-
-    Rails.logger.info "=== EVENT: #{event.inspect} ==="
-
-    # Broadcast event to affected rooms
-    if event
-      case event[:type]
-      when "movement"
-        # Broadcast to both old and new rooms
-        broadcast_event(GridRoom.find(event[:from_room_id]), event) if event[:from_room_id]
-        broadcast_event(GridRoom.find(event[:to_room_id]), event) if event[:to_room_id]
-        # Zone-level presence broadcast for tactical map
-        broadcast_zone_presence(event)
-      when "say", "take", "drop"
-        # Broadcast to current room
-        Rails.logger.info "=== Broadcasting #{event[:type]} to room #{current_hackr.current_room&.id} ==="
-        broadcast_event(current_hackr.current_room, event)
-      end
-    end
-
-    # Reload hackr to get updated current_room
-    current_hackr.reload
+    # Bootstrap + parse + event broadcasts (JSON and Turbo HTML
+    # dual-publish) live in the runner, shared with the Hotwire /grid
+    # page (Phase 6a).
+    result = Grid::CommandRunner.run(current_hackr, params[:input])
 
     breach_meta = breach_meta_for(current_hackr)
 
     render json: {
       success: true,
-      output: output,
+      output: result.output,
       room_id: current_hackr.current_room&.id,
       current_room: current_hackr.current_room ? room_json(current_hackr.current_room) : nil,
       in_breach: breach_meta.present?,
@@ -1156,26 +1118,6 @@ class Api::GridController < ApplicationController
 
   def identity_params
     params.permit(:bio)
-  end
-
-  def broadcast_event(room, event)
-    return unless room
-
-    Rails.logger.info "=== BROADCASTING to room #{room.id} (#{room.name}): #{event.inspect} ==="
-    GridChannel.broadcast_to(room, event)
-    Rails.logger.info "=== BROADCAST COMPLETE ==="
-  end
-
-  def broadcast_zone_presence(event)
-    from_room = GridRoom.find_by(id: event[:from_room_id])
-    to_room = GridRoom.find_by(id: event[:to_room_id])
-
-    zone_ids = [from_room&.grid_zone_id, to_room&.grid_zone_id].compact.uniq
-    presence_event = event.merge(type: "presence_update")
-
-    zone_ids.each do |zone_id|
-      ActionCable.server.broadcast(ZoneChannel.stream_name_for(zone_id), presence_event)
-    end
   end
 
   def loadout_item_json(item)

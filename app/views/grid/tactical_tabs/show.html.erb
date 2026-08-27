@@ -1,0 +1,5 @@
+<%# Frame response for one status tab. Partial resolved from a frozen
+    literal map (Brakeman: params-derived render paths flag). %>
+<%= turbo_frame_tag "tactical-tab-#{@tab}", target: "_top", data: {tactical_refresh: true} do %>
+  <%= render Grid::TacticalTabsController::TAB_PARTIALS.fetch(@tab) %>
+<% end %>

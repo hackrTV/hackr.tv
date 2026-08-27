@@ -40,5 +40,22 @@
     <div id="player-bar" data-turbo-permanent data-controller="player">
       <%= render "shared/player_bar" %>
     </div>
+
+    <%# Terminal easter egg (Phase 6e): Konami / Ctrl+` / typed
+        "/terminal" / window.hackr.terminal() / [data-terminal-open]
+        buttons. Iframe onto the Hotwire /terminal page — exactly what
+        the SPA's TerminalModal wrapped. %>
+    <div data-controller="terminal-egg">
+      <div class="terminal-egg-backdrop" hidden data-terminal-egg-target="backdrop" data-action="click->terminal-egg#close"></div>
+      <div class="terminal-egg" hidden data-terminal-egg-target="panel">
+        <div class="terminal-egg-header">
+          <span class="terminal-egg-title">TERMINAL ACCESS</span>
+          <span class="terminal-egg-hints"><span><kbd>ESC</kbd> close</span><span><kbd>Ctrl+`</kbd> toggle</span></span>
+          <button type="button" class="terminal-egg-close" data-action="click->terminal-egg#close">[X] CLOSE</button>
+        </div>
+        <iframe class="terminal-egg-frame" title="Terminal" data-terminal-egg-target="frame"></iframe>
+        <div class="terminal-egg-handle" data-action="click->terminal-egg#close"></div>
+      </div>
+    </div>
   </body>
 </html>

@@ -1,0 +1,14 @@
+<%# BREACH overlay (Phase 6d, BreachPanel.tsx port). Replaced wholesale
+    only on breach ENTER/EXIT (enter = fresh log, exit = hidden — the
+    SPA cleared breachOutput on exit too); during a breach the command
+    bus replaces only #tactical-breach-meta and appends output to
+    #breach-log. Locals: breach (active GridHackrBreach or nil). %>
+<div id="tactical-breach-shell" class="tactical-breach"<%= " hidden".html_safe unless breach %>>
+  <% if breach %>
+    <%= render "grid/tactical/breach_meta", breach: breach %>
+    <div id="breach-log" class="tactical-log tactical-breach-log" data-controller="packet-log" data-packet-log-cap-value="500"></div>
+  <% else %>
+    <div id="tactical-breach-meta"></div>
+    <div id="breach-log" hidden></div>
+  <% end %>
+</div>

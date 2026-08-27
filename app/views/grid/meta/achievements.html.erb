@@ -1,0 +1,47 @@
+<% content_for :title, "Achievements — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hotwire-page grid-meta grid-meta--achievements" data-controller="meta-filter">
+    <div class="grid-meta-window" style="border-color: #fbbf24;">
+      <div class="grid-meta-legend" style="color: #fbbf24;">ACHIEVEMENTS</div>
+      <div class="grid-meta-summary">Earned: <%= @total[:earned] %>/<%= @total[:total] %><% if @total[:total] > 0 %> (<%= ((@total[:earned].to_f / @total[:total]) * 100).round %>%)<% end %></div>
+
+      <div class="grid-meta-tabs">
+        <button type="button" class="grid-meta-tab grid-meta-tab--active" data-filter="all" data-meta-filter-target="button" data-action="click->meta-filter#select">ALL</button>
+        <% {"grid" => "#22d3ee", "music" => "#f472b6", "social" => "#60a5fa", "meta" => "#a3e635", "progression" => "#c084fc"}.each do |category, color| %>
+          <% next unless @categories.key?(category) %>
+          <button type="button" class="grid-meta-tab" style="color: <%= color %>;" data-filter="<%= category %>" data-meta-filter-target="button" data-action="click->meta-filter#select"><%= category.upcase %> (<%= @summary[category][:earned] %>/<%= @summary[category][:total] %>)</button>
+        <% end %>
+      </div>
+
+      <div class="grid-meta-grid">
+        <% @categories.each do |category, rows| %>
+          <% rows.each do |row| %>
+            <% a = row[:achievement] %>
+            <div class="grid-meta-card<%= " grid-meta-card--earned" if row[:earned] %>" data-filter="<%= category %>" data-meta-filter-target="item">
+              <div class="grid-meta-card-header">
+                <span class="grid-meta-card-title"><% if a.badge_icon %><%= a.badge_icon %> <% end %><%= a.name %></span>
+                <% if row[:earned] %><span class="tab-positive">✓</span><% end %>
+              </div>
+              <div class="tab-faint tab-small"><%= category.upcase %></div>
+              <% if a.description.present? %><div class="grid-meta-card-desc"><%= a.description %></div><% end %>
+              <% prog = row[:progress] %>
+              <% if prog && prog[:target].to_i > 0 %>
+                <div class="tab-dim tab-small">Progress: <%= prog[:current] %>/<%= prog[:target] %></div>
+                <div class="tab-bar-track"><span class="tab-bar-fill" style="width: <%= [((prog[:current].to_f / prog[:target]) * 100).round, 100].min %>%; background: #a78bfa;"></span></div>
+              <% end %>
+              <div class="grid-meta-card-footer">
+                <% if a.xp_reward.to_i > 0 %><span class="tab-positive">+<%= a.xp_reward %> XP</span><% end %>
+                <% if a.cred_reward.to_i > 0 %><span class="tab-warn">+<%= a.cred_reward %> CRED</span><% end %>
+                <% if row[:awarded_at] %><span class="tab-faint"><%= row[:awarded_at].strftime("%b %-d, %Y") %></span><% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+        <% if @total[:total].zero? %>
+          <div class="tab-faint">Nothing in this category yet.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
