@@ -3,8 +3,6 @@
 # read-only browsers over the same data the JSON API serves; mutations
 # stay terminal commands (the pages only hint them, like the SPA).
 class Grid::MetaController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
   before_action :require_pulse_grid
 

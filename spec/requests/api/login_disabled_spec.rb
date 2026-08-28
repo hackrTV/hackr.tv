@@ -41,7 +41,7 @@ RSpec.describe "Login disabled accounts", type: :request do
     end
   end
 
-  describe "POST /api/totp/verify" do
+  describe "POST /grid/login/verify (2FA step, Hotwire flow)" do
     let(:secret) { ROTP::Base32.random }
 
     before do
@@ -52,19 +52,20 @@ RSpec.describe "Login disabled accounts", type: :request do
     end
 
     it "blocks disabled hackr during 2FA verification" do
-      # Start login (sets pending session)
+      # Start login (sets pending session) via the API login endpoint
       post "/api/grid/login", params: {hackr_alias: hackr.hackr_alias, password: "hackthegrid"}, as: :json
       expect(response.parsed_body["requires_totp"]).to be true
 
       # Admin disables account between password and TOTP steps
       hackr.update!(login_disabled: true)
 
-      # TOTP verify should reject
+      # TOTP verify should reject and clear the pending session
       code = ROTP::TOTP.new(secret).now
-      post "/api/totp/verify", params: {code: code}, as: :json
+      post "/grid/login/verify", params: {totp_code: code}
 
-      expect(response).to have_http_status(:forbidden)
-      expect(response.parsed_body["error"]).to include("disabled")
+      expect(response).to redirect_to("/grid/login")
+      expect(flash[:error]).to include("disabled")
+      expect(session[:pending_2fa_hackr_id]).to be_nil
     end
   end
 end

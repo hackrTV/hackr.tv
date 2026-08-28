@@ -1,10 +1,9 @@
 # Packet compose + moderation for the Hotwire uplink pages (Phase 5).
-# Mirrors Api::Uplink::PacketsController; the model broadcasts handle the
-# live log updates for every subscriber (dual-publish). JSON stays on the
-# API controller for external consumers.
+# The model broadcasts handle the live log updates for every subscriber
+# (dual-publish: Turbo HTML + LiveChatChannel JSON for relay/synthia).
+# The SPA-era /api/uplink JSON namespace was retired post-Phase 7;
+# external tools write via /api/admin/uplink/send_packet.
 class Uplink::PacketsController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
   before_action :set_packet, only: %i[drop restore]
 

@@ -1,8 +1,6 @@
 # Server-rendered lore timeline (Hotwire migration Phase 1) — ports
 # TimelinePage.tsx and friends. Data from TimelineData (YAML-backed).
 class TimelineController < ApplicationController
-  layout "hotwire"
-
   # Rendering order mirrors the SPA: Listeners → Trade (atmospheric) →
   # Gap (with PRISM anchors) → Efficiency (header only) → GovCorp & RIDE →
   # Fracture → Fracture Network.

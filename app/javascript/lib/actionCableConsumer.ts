@@ -5,15 +5,11 @@ import { createConsumer, Cable } from '@rails/actioncable'
  * shared across every channel subscription. Lazy-initialized on
  * first access — module import is side-effect-free.
  *
- * Hooks should subscribe via `getActionCableConsumer().subscriptions.create(...)`
- * and call `.unsubscribe()` on cleanup. Do NOT call `.disconnect()` on
- * the returned cable — other hooks may still be using it. The cable
+ * Stimulus controllers subscribe via
+ * `getActionCableConsumer().subscriptions.create(...)` and call
+ * `.unsubscribe()` on disconnect. Do NOT call `.disconnect()` on the
+ * returned cable — other controllers may still be using it. The cable
  * stays up for the lifetime of the page.
- *
- * Migration status: `useAchievementChannel`, `useActionCable`, and
- * `useZonePresence` use this. Pre-existing hooks (`useStreamStatus`,
- * `usePulseWire`, `useUplink`) each still open their own consumer —
- * migrating them is tracked as follow-up work.
  */
 let cable: Cable | null = null
 

@@ -3,8 +3,6 @@
 class FmController < ApplicationController
   include GridAuthentication
 
-  layout "hotwire"
-
   def show
     # Mirrors Api::ReleasesController#latest and #coming_soon (the two
     # fetches the React landing page made on mount).

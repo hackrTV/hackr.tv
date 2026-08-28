@@ -3,8 +3,6 @@
 # the SPA routes. Reuses Code::RepoReaderService; rouge replaces
 # highlight.js. The JSON API stays for external consumers.
 class CodeController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
   before_action :set_repo, only: %i[show tree blob]
 

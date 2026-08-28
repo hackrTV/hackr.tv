@@ -3,8 +3,6 @@
 # Responds with the viewer's own echo button; other viewers get the
 # count-only update from the model's dual-publish broadcast.
 class Wire::EchoesController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
 
   # POST /wire/pulses/:id/echo

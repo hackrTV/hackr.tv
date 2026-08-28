@@ -18,14 +18,14 @@
     <div class="tab-faint">Inventory empty</div>
   <% end %>
 
-  <% Api::GridController::INVENTORY_TYPE_ORDER.each do |type| %>
+  <% Grid::TacticalTabsController::INVENTORY_TYPE_ORDER.each do |type| %>
     <% type_items = @grouped[type] %>
     <% next unless type_items&.any? %>
     <div class="tab-inv-group">
-      <div class="tab-section-title"><%= Api::GridController::INVENTORY_TYPE_LABELS[type] || type.upcase %> (<%= type_items.size %>)</div>
+      <div class="tab-section-title"><%= Grid::TacticalTabsController::INVENTORY_TYPE_LABELS[type] || type.upcase %> (<%= type_items.size %>)</div>
       <% type_items.sort_by { |i| [-(GridItem::RARITIES.index(i.rarity) || 0), i.name.to_s] }.each do |item| %>
         <%
-          actions = (Api::GridController::INVENTORY_ITEM_ACTIONS[item.item_type] || %w[drop]).dup
+          actions = (Grid::TacticalTabsController::INVENTORY_ITEM_ACTIONS[item.item_type] || %w[drop]).dup
           actions.delete("salvage") if item.unicorn?
           listing = @vendor_listings_by_def && !item.unicorn? && item.value.to_i > 0 ? @vendor_listings_by_def[item.grid_item_definition_id] : nil
           sell_price = (@vendor_listings_by_def && !item.unicorn? && item.value.to_i > 0) ? Grid::ShopService.sell_price_for(item: item, listing: listing) : nil

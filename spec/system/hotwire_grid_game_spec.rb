@@ -132,7 +132,7 @@ RSpec.describe "Hotwire grid game", type: :system do
     expect(GridMessage.count).to eq(command_count) # nothing hit the server
   end
 
-  it "keeps the permanent player alive navigating vault → /grid (HOTWIRE_PATHS)" do
+  it "keeps the permanent player alive navigating vault → /grid (Turbo nav)" do
     artist = create(:artist, name: "Wave Artist")
     release = create(:release, artist: artist)
     create(:track, :with_audio, artist: artist, release: release, title: "Grid Tone")

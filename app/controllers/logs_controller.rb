@@ -2,8 +2,6 @@
 # LogsIndexPage.tsx + LogDetailPage.tsx. The JSON API (Api::LogsController)
 # stays untouched for any remaining consumers until Phase 7.
 class LogsController < ApplicationController
-  layout "hotwire"
-
   TIMELINE_ORDER = %w[2120s pre_fracture govcorp_files 2020s].freeze
   TIMELINE_CONFIG = {
     "2120s" => {name: "THE FRACTURE NETWORK", subtitle: "Transmissions from the Fracture Network"},

@@ -1,8 +1,6 @@
 # Server-rendered stream schedule (Hotwire migration Phase 1) — ports
 # StreamSchedulePage.tsx over the same queries as Api::HackrStreamsController#schedule.
 class ScheduleController < ApplicationController
-  layout "hotwire"
-
   STATE_BADGES = {
     "upcoming" => {label: "UPCOMING", color: "#06b6d4"},
     "starting_soon" => {label: "STARTING SOON", color: "#f59e0b"},

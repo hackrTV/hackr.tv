@@ -1,49 +1,33 @@
 require "rails_helper"
 
 RSpec.describe NavigationHelper, type: :helper do
-  # HOTWIRE_PATHS gates nav_link_to: unlisted paths get data-turbo=false →
-  # a FULL page load, which kills the permanent audio player. Every
-  # Hotwire-served route family must be listed. (Phase 4 regression: the
-  # artist slugs were missed, so navigating to /thecyberpulse or /xeraen
-  # from the vault stopped playback.)
-  describe "#hotwire_path?" do
-    it "covers the whole Phase 4 music cluster, including every artist slug" do
-      %w[
-        /vault /fm /fm/radio /fm/releases /fm/playlists /f/net
-        /shared/some-token /sector/x
-        /thecyberpulse /thecyberpulse/bio /thecyberpulse/releases /thecyberpulse/vidz
-        /xeraen /xeraen/bio /xeraen/releases
-        /system-rot /wavelength-zero /voiceprint /temporal-blue-drift
-        /injection-vector /cipher-protocol /blitzbeam /apex-overdrive
-        /ethereality /neon-hearts /offline /heartbreak-havoc /the-pulse-grid
-        /system-rot/releases /blitzbeam/trackz/some-track
-      ].each do |path|
-        expect(helper.hotwire_path?(path)).to be(true), "expected #{path} to be a Hotwire path"
-      end
+  # Phase 7 decommission: the HOTWIRE_PATHS registry is gone. nav_link_to
+  # must never emit data-turbo=false — a full page load kills the
+  # permanent audio player, so every nav link stays Turbo-navigable.
+  describe "#nav_link_to" do
+    it "renders a plain Turbo-navigable link" do
+      html = helper.nav_link_to("/vault") { "VAULT" }
+      expect(html).to include('href="/vault"')
+      expect(html).to include("VAULT")
+      expect(html).not_to include("data-turbo")
     end
 
-    it "covers the Phase 5 uplink family" do
-      %w[/uplink /uplink/popout /uplink/log].each do |path|
-        expect(helper.hotwire_path?(path)).to be(true), "expected #{path} to be a Hotwire path"
-      end
+    it "passes the css class through" do
+      html = helper.nav_link_to("/wire", css_class: "nav-item") { "WIRE" }
+      expect(html).to include('class="nav-item"')
+      expect(html).not_to include("data-turbo")
     end
+  end
 
-    it "covers the whole Phase 6 grid family (terminal + tactical + meta)" do
-      %w[
-        /grid /grid/commands /grid/1337 /grid/1337/tabs/deck /grid/1337/map
-        /achievements /missions /schematics /loadout /gear /deck /transit
-      ].each do |path|
-        expect(helper.hotwire_path?(path)).to be(true), "expected #{path} to be a Hotwire path"
-      end
-    end
+  describe "#nav_active?" do
+    it "matches root exactly and other paths by prefix" do
+      allow(helper.request).to receive(:path).and_return("/")
+      expect(helper.nav_active?("/")).to be(true)
+      expect(helper.nav_active?("/vault")).to be(false)
 
-    it "keeps unknown paths non-Turbo" do
-      expect(helper.hotwire_path?("/definitely-not-a-page")).to be(false)
-    end
-
-    it "does not let the root entry swallow other paths" do
-      expect(helper.hotwire_path?("/")).to be(true)
-      expect(helper.hotwire_path?("/definitely-not-a-page")).to be(false)
+      allow(helper.request).to receive(:path).and_return("/fm/radio")
+      expect(helper.nav_active?("/fm")).to be(true)
+      expect(helper.nav_active?("/")).to be(false)
     end
   end
 end

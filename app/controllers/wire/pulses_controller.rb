@@ -2,8 +2,6 @@
 # Api::PulsesController#create/#destroy; the model broadcasts handle the
 # live inserts (dual-publish).
 class Wire::PulsesController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
 
   # POST /wire/pulses

@@ -1,39 +1,9 @@
 module NavigationHelper
-  # Path prefixes served by Hotwire (Turbo-navigable). Everything else is
-  # still the React SPA, so nav links get data-turbo=false and cross-stack
-  # navigation is a full page load (the SPA mounts on DOMContentLoaded,
-  # which never fires on a Turbo visit). Grows as migration phases land.
-  HOTWIRE_PATHS = %w[
-    /logs /codex /handbook /schedule /timeline /code
-    /grid/login /grid/register /grid/verify /grid/forgot_password
-    /grid/reset_password /grid/confirm_email_change /grid/identity
-    / /wire /feed
-    /vault /fm /f/net /shared /sector
-    /thecyberpulse /xeraen /system-rot /wavelength-zero /voiceprint
-    /temporal-blue-drift /injection-vector /cipher-protocol /blitzbeam
-    /apex-overdrive /ethereality /neon-hearts /offline /heartbreak-havoc
-    /the-pulse-grid
-    /uplink
-    /grid
-    /achievements /missions /schematics /loadout /gear /deck /transit
-  ].freeze
-
-  # Still-React holdouts nested inside otherwise-Hotwire families.
-  # Emptied when /grid/1337 flipped (Phase 6b–6d); mechanism kept for
-  # any future nested holdout.
-  SPA_EXCEPTIONS = %w[].freeze
-
-  def hotwire_path?(path)
-    return false if SPA_EXCEPTIONS.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }
-
-    HOTWIRE_PATHS.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }
-  end
-
-  # Nav link that is Turbo-navigable only for migrated paths.
+  # Nav link helper. The migration-era hotwire_path? gate (data-turbo=false
+  # for SPA paths) is gone — every path is Turbo-navigable now.
   def nav_link_to(path, css_class: nil, &block)
     options = {}
     options[:class] = css_class if css_class
-    options[:data] = {turbo: false} unless hotwire_path?(path)
     link_to(path, **options, &block)
   end
 

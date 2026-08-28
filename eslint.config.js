@@ -1,8 +1,6 @@
 import js from '@eslint/js'
 import tseslint from '@typescript-eslint/eslint-plugin'
 import tsparser from '@typescript-eslint/parser'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
 import globals from 'globals'
 
 export default [
@@ -20,15 +18,12 @@ export default [
     ]
   },
   {
-    files: ['**/*.{js,mjs,cjs,ts,tsx}'],
+    files: ['**/*.{js,mjs,cjs,ts}'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true
-        },
         project: './tsconfig.json'
       },
       globals: {
@@ -38,15 +33,11 @@ export default [
       }
     },
     plugins: {
-      '@typescript-eslint': tseslint,
-      'react': react,
-      'react-hooks': reactHooks
+      '@typescript-eslint': tseslint
     },
     rules: {
       ...js.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
 
       // Standard-style rules
       'indent': ['error', 2],
@@ -63,24 +54,12 @@ export default [
       // TypeScript-specific
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-
-      // React-specific
-      'react/react-in-jsx-scope': 'off', // Not needed in React 17+
-      'react/prop-types': 'off', // Using TypeScript for prop validation
-      'react/no-unescaped-entities': 'off', // Allow apostrophes and quotes in JSX text
-      'react-hooks/set-state-in-effect': 'warn', // Fetch-in-effect and WebSocket patterns are intentional
-      'react-hooks/preserve-manual-memoization': 'warn' // React Compiler advisory, not blocking
-    },
-    settings: {
-      react: {
-        version: 'detect'
-      }
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
     }
   },
   {
     // Relaxed rules for test files
-    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/test/**/*.{ts,tsx}'],
+    files: ['**/*.test.ts', '**/*.spec.ts', '**/test/**/*.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off'

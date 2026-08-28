@@ -8,8 +8,6 @@
 # The staged secret travels through the enable form as a hidden field,
 # exactly like the SPA held it in component state.
 class Grid::TwoFactorController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
 
   # GET /grid/identity/two-factor (+ ?mode=disable / ?mode=regenerate)

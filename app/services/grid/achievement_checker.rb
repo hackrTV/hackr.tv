@@ -7,8 +7,8 @@ module Grid
   # actual award + reward pipeline to AchievementAwarder.
   #
   # Returns an array of inline HTML notification strings — Terminal
-  # commands append these to the command output. The AchievementChannel
-  # toast broadcast fires from AchievementAwarder (async for the client).
+  # commands append these to the command output. The Turbo toast
+  # broadcast fires from AchievementAwarder (async for the client).
   #
   # Source counts used by `progress` are memoized per-instance — the
   # AchievementsPage endpoint iterates ~40 achievements but many share

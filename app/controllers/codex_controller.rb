@@ -3,8 +3,6 @@
 # client-side over the fully rendered index (matches the SPA, which loaded
 # all entries once) via codex_filter_controller.ts. The JSON API stays.
 class CodexController < ApplicationController
-  layout "hotwire"
-
   ENTRY_TYPE_COLORS = {
     "person" => "#a78bfa", "organization" => "#60a5fa", "event" => "#f472b6",
     "location" => "#34d399", "technology" => "#fbbf24", "faction" => "#f87171",

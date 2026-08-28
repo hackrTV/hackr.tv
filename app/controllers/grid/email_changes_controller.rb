@@ -6,8 +6,6 @@
 # instead of auto-confirming on mount — a server-side GET that consumed
 # the single-use token would be burned by email-scanner link prefetchers.
 class Grid::EmailChangesController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login, only: [:create]
 
   # POST /grid/identity/email_change — request a change (from identity).

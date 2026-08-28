@@ -180,30 +180,9 @@ module Grid
     end
 
     def broadcast_completion(outcome)
-      ActionCable.server.broadcast(
-        AchievementChannel.stream_name_for(@hackr),
-        {
-          type: "mission_completed",
-          mission: {
-            slug: @mission.slug,
-            name: @mission.name,
-            arc_name: @mission.grid_mission_arc&.name
-          },
-          rewards: {
-            xp: outcome[:xp_granted],
-            cred: outcome[:minted_cred] ? outcome[:cred_granted] : 0,
-            rep: outcome[:rep_awards].map { |r| {faction: r[:faction].display_name, delta: r[:applied_delta]} },
-            items: outcome[:items_granted].map { |i| {name: i.name} },
-            achievements: outcome[:achievements_granted].map { |a| {slug: a[:achievement].slug, name: a[:achievement].name} }
-          },
-          leveled_up: outcome[:leveled_up],
-          new_clearance: outcome[:new_clearance]
-        }
-      )
-
-      # Dual-publish (Hotwire migration Phase 3): rendered toast for the
-      # Hotwire layout's #toast-region; JSON stays for the SPA until
-      # Phase 7 (MissionsPage also re-reads it via the window event).
+      # Rendered toast for the layout's #toast-region; the mission-signal
+      # Stimulus controller also reloads the /missions frame from it (the
+      # SPA-era AchievementChannel JSON half was retired in Phase 7).
       Turbo::StreamsChannel.broadcast_append_to(
         [@hackr, :toasts],
         target: "toast-region",

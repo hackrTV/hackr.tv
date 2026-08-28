@@ -92,32 +92,8 @@ RSpec.describe "Api::Admin::Uplink", type: :request do
       end
     end
 
-    context "regression: regular API still enforces squelch/blackout" do
-      let(:operative) { create(:grid_hackr) }
-
-      it "regular uplink API blocks squelched user" do
-        issuer = create(:grid_hackr, :admin)
-        UserPunishment.squelch!(operative, issued_by: issuer)
-        operative_token = operative.generate_api_token!
-
-        post "/api/uplink/channels/#{channel.slug}/packets",
-          params: {packet: {content: "Should be blocked"}},
-          headers: {"Authorization" => "Bearer #{operative.hackr_alias}:#{operative_token}"}
-
-        expect(response).to have_http_status(:forbidden)
-      end
-
-      it "regular uplink API blocks blackedout user" do
-        issuer = create(:grid_hackr, :admin)
-        UserPunishment.blackout!(operative, issued_by: issuer)
-        operative_token = operative.generate_api_token!
-
-        post "/api/uplink/channels/#{channel.slug}/packets",
-          params: {packet: {content: "Should be blocked"}},
-          headers: {"Authorization" => "Bearer #{operative.hackr_alias}:#{operative_token}"}
-
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
+    # Squelch/blackout enforcement on the user transmit path is pinned in
+    # spec/requests/uplink_pages_spec.rb (POST /uplink/packets) — the
+    # SPA-era /api/uplink namespace was retired post-Phase 7.
   end
 end

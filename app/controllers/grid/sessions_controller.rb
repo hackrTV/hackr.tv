@@ -1,14 +1,12 @@
 # Server-rendered login + 2FA interstitial (Hotwire migration Phase 2) —
-# ports GridLoginPage.tsx. The JSON auth endpoints (Api::GridController /
-# Api::TotpController) stay for the remaining SPA pages until Phase 7;
-# this controller mirrors their logic exactly via establish_grid_session.
+# ports GridLoginPage.tsx. Shares session semantics with the JSON
+# login endpoint (Api::GridController#login, kept for programmatic
+# clients) via establish_grid_session.
 #
-# The login + verify forms are data-turbo=false: success redirects into
-# the SPA-served /grid, which must be a full page load (the SPA mounts on
-# DOMContentLoaded, which never fires on a Turbo visit).
+# The login + verify forms are data-turbo=false: session-changing
+# success must be a full page load so the layout re-renders with the
+# new identity metas and the cable consumer reconnects.
 class Grid::SessionsController < ApplicationController
-  layout "hotwire"
-
   before_action :require_logout, only: [:new]
 
   def new

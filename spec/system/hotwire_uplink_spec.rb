@@ -167,7 +167,7 @@ RSpec.describe "Hotwire uplink", type: :system do
     expect(heartbeat).to be_present
   end
 
-  it "keeps the permanent player alive navigating vault → uplink (HOTWIRE_PATHS)" do
+  it "keeps the permanent player alive navigating vault → uplink (Turbo nav)" do
     artist = create(:artist, name: "Wave Artist")
     release = create(:release, artist: artist)
     create(:track, :with_audio, artist: artist, release: release, title: "Uplink Tone")

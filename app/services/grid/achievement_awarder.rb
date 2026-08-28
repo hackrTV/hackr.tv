@@ -2,7 +2,7 @@
 
 module Grid
   # Applies rewards (join-row insert, XP grant, CRED mint) and pushes the
-  # unlock toast to the hackr's AchievementChannel stream. Returns the
+  # unlock toast to the hackr's Turbo toast stream. Returns the
   # inline HTML notification string for Terminal commands, or nil when the
   # achievement is already earned (race-guard).
   #
@@ -63,27 +63,8 @@ module Grid
     private
 
     def broadcast_toast(xp_result, minted_cred)
-      ActionCable.server.broadcast(
-        AchievementChannel.stream_name_for(@hackr),
-        {
-          type: "achievement_unlocked",
-          achievement: {
-            slug: @achievement.slug,
-            name: @achievement.name,
-            description: @achievement.description,
-            badge_icon: @achievement.badge_icon,
-            category: @achievement.category,
-            xp_reward: @achievement.xp_reward,
-            cred_reward: minted_cred ? @achievement.cred_reward : 0
-          },
-          leveled_up: xp_result&.dig(:leveled_up) || false,
-          new_clearance: xp_result&.dig(:new_clearance)
-        }
-      )
-
-      # Dual-publish (Hotwire migration Phase 3): rendered toast for the
-      # Hotwire layout's #toast-region; the JSON above stays for the SPA's
-      # AchievementToastContainer until Phase 7.
+      # Rendered toast for the layout's #toast-region (the SPA-era
+      # AchievementChannel JSON half was retired in Phase 7).
       Turbo::StreamsChannel.broadcast_append_to(
         [@hackr, :toasts],
         target: "toast-region",

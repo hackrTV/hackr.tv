@@ -6,8 +6,6 @@
 class BandProfilesController < ApplicationController
   include GridAuthentication
 
-  layout "hotwire"
-
   def show
     @slug = params[:artist_slug].to_s
     @profile = BandProfile::CONFIG[@slug]
