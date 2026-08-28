@@ -23,3 +23,9 @@
 <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
 <%= vite_client_tag %>
 <%= vite_typescript_tag "hotwire.ts" %>
+<% if Rails.env.test? %>
+  <%# System specs: kill CSS transitions/animations. Slow CI runners
+      assert content mid-animation and Ferrum's coordinate clicks then
+      land on moved elements (e.g. the sliding tactical panel). %>
+  <style>*, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }</style>
+<% end %>

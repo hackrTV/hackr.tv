@@ -130,9 +130,13 @@ RSpec.describe "Hotwire tactical", type: :system do
     end
 
     # Leaf topic round-trips the bus; the refresh bus reloads the open
-    # panel; the response renders in the slide-in.
+    # panel; the response renders in the slide-in. Two-stage wait: the
+    # terminal log proves the command round-trip finished, THEN the
+    # panel frame gets its own window for the refresh-bus reload —
+    # single-stage wait: 10 flaked consistently on CI runners.
+    expect(page).to have_content("The old grid never died.", wait: 30)
     within("#tactical-room-flags") do
-      expect(page).to have_content("The old grid never died.", wait: 10)
+      expect(page).to have_content("The old grid never died.", wait: 30)
     end
   end
 
