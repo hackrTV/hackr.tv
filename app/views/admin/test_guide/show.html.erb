@@ -1,0 +1,77 @@
+<% content_for :title, "/root :: Test Guide :: #{@article.title}" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "admin_test_guide" %>
+<% end %>
+
+<div class="tguide">
+  <div class="tguide-topnav">
+    <span>
+      <%= link_to "« All articles", admin_test_guide_path %>
+      <% if @previous_article %> · <%= link_to "‹ #{@previous_article.title}", admin_test_guide_article_path(@previous_article.slug) %><% end %>
+    </span>
+    <span class="tguide-topnav-meta"><%= @article.area %> · ~<%= @article.minutes %> min · <%= @article.position + 1 %> of <%= TestGuide.articles.size %></span>
+    <span>
+      <% if @next_article %><%= link_to "#{@next_article.title} ›", admin_test_guide_article_path(@next_article.slug) %><% end %>
+    </span>
+  </div>
+
+  <div class="tguide-article" id="test-guide-article" data-run-id="<%= @active_run&.id %>">
+    <%= @article.body_html %>
+  </div>
+
+  <% if @active_run %>
+    <div class="tguide-recorder">
+      <div class="tguide-recorder-run">
+        Recording to <strong><%= @active_run.label %></strong>
+        <% if @result %> — currently <span class="tguide-chip tguide-chip--<%= @result.status %>"><%= @result.status.upcase %></span><% end %>
+      </div>
+      <%= form_with url: admin_test_guide_result_path(@article.slug), method: :post do %>
+        <%= text_area_tag :notes, @result&.notes, placeholder: "Notes (required for FAIL/BLOCKED — which step, what deviated)", rows: 2, class: "tguide-textarea" %>
+        <div class="tguide-recorder-actions">
+          <button type="submit" name="status" value="pass" class="tguide-btn tguide-btn--pass">PASS</button>
+          <button type="submit" name="status" value="fail" class="tguide-btn tguide-btn--fail">FAIL</button>
+          <button type="submit" name="status" value="blocked" class="tguide-btn tguide-btn--blocked">BLOCKED</button>
+          <button type="submit" name="status" value="skip" class="tguide-btn tguide-btn--skip">SKIP</button>
+          <% if @next_article %>
+            <%= link_to "Skip ahead ›", admin_test_guide_article_path(@next_article.slug), class: "tguide-btn", style: "margin-left: auto;" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  // Per-step checkboxes persisted per run in localStorage (no run open →
+  // still usable, keyed to "browse"). Wraps step content so completed
+  // steps can strike through.
+  (function () {
+    var container = document.getElementById('test-guide-article');
+    if (!container) return;
+    var runId = container.dataset.runId || 'browse';
+    var key = 'test_guide_steps:' + runId;
+    var state = {};
+    try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { state = {}; }
+
+    container.querySelectorAll('li.tg-step').forEach(function (li) {
+      var id = li.dataset.step;
+      var body = document.createElement('span');
+      body.className = 'tg-step-body';
+      while (li.firstChild) body.appendChild(li.firstChild);
+
+      var box = document.createElement('input');
+      box.type = 'checkbox';
+      box.className = 'tg-check';
+      box.checked = !!state[id];
+      if (box.checked) li.classList.add('tg-done');
+      box.addEventListener('change', function () {
+        state[id] = box.checked;
+        li.classList.toggle('tg-done', box.checked);
+        try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) {}
+      });
+
+      li.appendChild(box);
+      li.appendChild(body);
+    });
+  })();
+</script>

@@ -323,6 +323,12 @@ Rails.application.routes.draw do
   namespace :admin, path: "root" do
     root "dashboard#index"
 
+    # Manual testing guide (docs/testing/*.md rendered in-app) + run tracking
+    get "test_guide", to: "test_guide#index", as: :test_guide
+    get "test_guide/:slug", to: "test_guide#show", as: :test_guide_article
+    post "test_guide/:slug/result", to: "test_guide#record_result", as: :test_guide_result
+    resources :test_runs, only: %i[index create show update destroy]
+
     # Analytics dashboard
     get "analytics", to: "analytics_dashboard#index", as: :analytics_dashboard
 

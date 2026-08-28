@@ -1,0 +1,410 @@
+/* Manual testing guide (/root/test_guide + /root/test_runs) — a modern,
+   readable island inside the TuiCSS admin. Serif prose for long-form
+   instructions, sans UI chrome, card layout. Scoped under .tguide. */
+
+.tguide {
+  --tg-bg: #101014;
+  --tg-card: #17171c;
+  --tg-card-2: #1d1d24;
+  --tg-border: #2a2a33;
+  --tg-text: #e8e4da;
+  --tg-muted: #9b978f;
+  --tg-faint: #66635c;
+  --tg-accent: #22d3ee;
+  --tg-pass: #34d399;
+  --tg-fail: #f87171;
+  --tg-blocked: #fbbf24;
+  --tg-skip: #a78bfa;
+  --tg-serif: "Charter", "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+  --tg-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --tg-mono: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+  --tg-radius: 10px;
+
+  font-family: var(--tg-sans);
+  color: var(--tg-text);
+  background: var(--tg-bg);
+  max-width: 980px;
+  margin: 28px auto 80px;
+  padding: 0 20px;
+  line-height: 1.6;
+  font-size: 15px;
+}
+.tguide * { box-sizing: border-box; }
+.tguide a { color: var(--tg-accent); text-decoration: none; }
+.tguide a:hover { text-decoration: underline; }
+
+/* ---- Page header ---- */
+.tguide-header { margin-bottom: 26px; }
+.tguide-header h1 {
+  font-family: var(--tg-serif);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  margin: 0 0 6px;
+  color: var(--tg-text);
+}
+.tguide-header .tguide-sub {
+  color: var(--tg-muted);
+  font-size: 14px;
+  max-width: 62ch;
+}
+.tguide-header .tguide-sub code {
+  font-family: var(--tg-mono);
+  font-size: 12.5px;
+  background: var(--tg-card-2);
+  border: 1px solid var(--tg-border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  color: var(--tg-pass);
+}
+
+/* ---- Cards ---- */
+.tguide-card {
+  background: var(--tg-card);
+  border: 1px solid var(--tg-border);
+  border-radius: var(--tg-radius);
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.tguide-card h2 {
+  font-family: var(--tg-sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--tg-muted);
+  margin: 0 0 12px;
+}
+
+/* ---- Progress ---- */
+.tguide-progress-track {
+  height: 8px;
+  background: var(--tg-card-2);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.tguide-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--tg-accent), var(--tg-pass));
+  transition: width 0.3s ease;
+}
+.tguide-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--tg-muted);
+}
+
+/* ---- Buttons ---- */
+.tguide-btn {
+  display: inline-block;
+  font-family: var(--tg-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--tg-border);
+  background: var(--tg-card-2);
+  color: var(--tg-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
+}
+.tguide-btn:hover { border-color: var(--tg-accent); background: #22262e; }
+.tguide-btn:active { transform: translateY(1px); }
+.tguide-btn--primary {
+  background: var(--tg-accent);
+  border-color: var(--tg-accent);
+  color: #08252b;
+}
+.tguide-btn--primary:hover { background: #4adef3; border-color: #4adef3; }
+.tguide-btn--pass:hover { border-color: var(--tg-pass); color: var(--tg-pass); }
+.tguide-btn--fail:hover { border-color: var(--tg-fail); color: var(--tg-fail); }
+.tguide-btn--blocked:hover { border-color: var(--tg-blocked); color: var(--tg-blocked); }
+.tguide-btn--skip:hover { border-color: var(--tg-skip); color: var(--tg-skip); }
+.tguide-btn--danger:hover { border-color: var(--tg-fail); color: var(--tg-fail); }
+
+.tguide-input, .tguide-textarea {
+  width: 100%;
+  font-family: var(--tg-sans);
+  font-size: 14px;
+  color: var(--tg-text);
+  background: var(--tg-bg);
+  border: 1px solid var(--tg-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+.tguide-input:focus, .tguide-textarea:focus {
+  outline: none;
+  border-color: var(--tg-accent);
+}
+
+/* ---- Status chips ---- */
+.tguide-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 2px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--tg-border);
+  color: var(--tg-faint);
+  background: var(--tg-card-2);
+  min-width: 74px;
+  text-align: center;
+}
+.tguide-chip--pass { color: #0b2e21; background: var(--tg-pass); border-color: var(--tg-pass); }
+.tguide-chip--fail { color: #33110f; background: var(--tg-fail); border-color: var(--tg-fail); }
+.tguide-chip--blocked { color: #33260a; background: var(--tg-blocked); border-color: var(--tg-blocked); }
+.tguide-chip--skip { color: #221540; background: var(--tg-skip); border-color: var(--tg-skip); }
+
+/* ---- Article list rows ---- */
+.tguide-area { margin-bottom: 26px; }
+.tguide-area > h2 {
+  font-family: var(--tg-serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--tg-text);
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--tg-border);
+}
+.tguide-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  transition: background 0.12s ease;
+}
+.tguide-row:hover { background: var(--tg-card); }
+.tguide-row .tguide-row-title {
+  flex: 1;
+  font-family: var(--tg-serif);
+  font-size: 15.5px;
+  color: var(--tg-text);
+}
+.tguide-row .tguide-row-title:hover { color: var(--tg-accent); text-decoration: none; }
+.tguide-row .tguide-row-minutes {
+  font-size: 12.5px;
+  color: var(--tg-faint);
+  white-space: nowrap;
+}
+.tguide-row .tguide-row-notes {
+  flex: 1;
+  font-size: 13px;
+  color: var(--tg-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Article page ---- */
+.tguide-topnav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--tg-muted);
+  margin-bottom: 18px;
+}
+.tguide-topnav .tguide-topnav-meta { color: var(--tg-faint); white-space: nowrap; }
+
+.tguide-article {
+  font-family: var(--tg-serif);
+  font-size: 17px;
+  line-height: 1.75;
+  max-width: 70ch;
+}
+.tguide-article h1 {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 4px 0 14px;
+  color: var(--tg-text);
+}
+.tguide-article h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 26px 0 10px;
+  color: var(--tg-accent);
+}
+.tguide-article p { margin: 0 0 12px; }
+.tguide-article code {
+  font-family: var(--tg-mono);
+  font-size: 13.5px;
+  background: var(--tg-card-2);
+  border: 1px solid var(--tg-border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  color: var(--tg-pass);
+}
+.tguide-article pre {
+  background: var(--tg-card);
+  border: 1px solid var(--tg-border);
+  border-radius: var(--tg-radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+.tguide-article pre code { background: none; border: none; padding: 0; }
+.tguide-article table {
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-family: var(--tg-sans);
+  font-size: 14px;
+}
+.tguide-article th, .tguide-article td {
+  border: 1px solid var(--tg-border);
+  padding: 6px 12px;
+}
+.tguide-article th { background: var(--tg-card-2); text-align: left; }
+.tguide-article ul { padding-left: 24px; margin: 0 0 12px; }
+.tguide-article a { color: var(--tg-accent); }
+
+/* Steps: numbered cards with persistent checkboxes */
+.tguide-article ol {
+  list-style: none;
+  counter-reset: tg-steps;
+  padding: 0;
+  margin: 0 0 14px;
+}
+.tguide-article li.tg-step {
+  counter-increment: tg-steps;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--tg-card);
+  border: 1px solid var(--tg-border);
+  border-radius: var(--tg-radius);
+  padding: 12px 16px 12px 52px;
+  margin: 8px 0;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
+}
+.tguide-article li.tg-step::before {
+  content: counter(tg-steps);
+  position: absolute;
+  left: 16px;
+  top: 12px;
+  font-family: var(--tg-sans);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tg-accent);
+  border: 1px solid var(--tg-border);
+  border-radius: 6px;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tguide-article li.tg-step:hover { border-color: #3a3a46; }
+.tguide-article li.tg-step > input.tg-check {
+  appearance: none;
+  flex: none;
+  width: 19px;
+  height: 19px;
+  margin-top: 4px;
+  border: 1.5px solid var(--tg-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.tguide-article li.tg-step > input.tg-check:checked {
+  background: var(--tg-pass);
+  border-color: var(--tg-pass);
+}
+.tguide-article li.tg-step > input.tg-check:checked::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0b2e21;
+}
+.tguide-article li.tg-step.tg-done { opacity: 0.55; }
+.tguide-article li.tg-step.tg-done .tg-step-body { text-decoration: line-through; text-decoration-color: var(--tg-faint); }
+.tguide-article li.tg-step .tg-step-body { flex: 1; }
+
+/* ---- Sticky recording bar (wizard) ---- */
+.tguide-recorder {
+  position: sticky;
+  bottom: 14px;
+  z-index: 30;
+  background: color-mix(in srgb, var(--tg-card) 92%, black);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--tg-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 26px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+.tguide-recorder .tguide-recorder-run {
+  font-size: 12.5px;
+  color: var(--tg-muted);
+  margin-bottom: 8px;
+}
+.tguide-recorder .tguide-recorder-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* ---- Summary stats ---- */
+.tguide-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tguide-stat {
+  background: var(--tg-card-2);
+  border: 1px solid var(--tg-border);
+  border-radius: var(--tg-radius);
+  padding: 10px 12px;
+  text-align: center;
+}
+.tguide-stat .tguide-stat-n {
+  font-family: var(--tg-serif);
+  font-size: 24px;
+  font-weight: 700;
+  display: block;
+}
+.tguide-stat .tguide-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--tg-muted);
+}
+.tguide-stat--pass .tguide-stat-n { color: var(--tg-pass); }
+.tguide-stat--fail .tguide-stat-n { color: var(--tg-fail); }
+.tguide-stat--blocked .tguide-stat-n { color: var(--tg-blocked); }
+.tguide-stat--skip .tguide-stat-n { color: var(--tg-skip); }
+
+/* ---- Failure cards ---- */
+.tguide-failure {
+  background: color-mix(in srgb, var(--tg-fail) 8%, var(--tg-card));
+  border: 1px solid color-mix(in srgb, var(--tg-fail) 40%, var(--tg-border));
+  border-radius: var(--tg-radius);
+  padding: 12px 16px;
+  margin-bottom: 10px;
+}
+.tguide-failure a { color: var(--tg-fail); font-weight: 600; }
+.tguide-failure .tguide-failure-notes {
+  font-size: 14px;
+  color: var(--tg-text);
+  white-space: pre-wrap;
+  margin-top: 4px;
+}
+
+.tguide-inline-form { display: inline; }
+.tguide-meta-line { font-size: 13px; color: var(--tg-muted); }

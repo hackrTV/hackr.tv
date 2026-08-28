@@ -1,0 +1,42 @@
+<% content_for :title, "/root :: Test Runs" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "admin_test_guide" %>
+<% end %>
+
+<div class="tguide">
+  <div class="tguide-header">
+    <h1>Test Run History</h1>
+    <div class="tguide-sub"><%= link_to "« Test guide", admin_test_guide_path %></div>
+  </div>
+
+  <% if @runs.empty? %>
+    <div class="tguide-card"><span class="tguide-meta-line">No runs yet. Start one from the test guide index.</span></div>
+  <% end %>
+
+  <% @runs.each do |run| %>
+    <% results = run.manual_test_results %>
+    <% pct = run.progress(@total_articles) %>
+    <div class="tguide-card">
+      <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+        <%= link_to run.label, admin_test_run_path(run), style: "font-family: var(--tg-serif); font-size: 18px; font-weight: 700;" %>
+        <% if run.completed? %>
+          <span class="tguide-chip tguide-chip--pass">COMPLETE</span>
+        <% else %>
+          <span class="tguide-chip tguide-chip--blocked">OPEN</span>
+        <% end %>
+        <span class="tguide-meta-line" style="margin-left: auto;">
+          <%= run.grid_hackr.hackr_alias %> · <%= run.created_at.strftime("%Y-%m-%d %H:%M") %>
+        </span>
+      </div>
+      <div class="tguide-progress-track"><div class="tguide-progress-fill" style="width: <%= pct %>%"></div></div>
+      <div class="tguide-progress-meta">
+        <span>
+          <%= results.count %>/<%= @total_articles %> recorded ·
+          <%= results.count { |r| r.status == "pass" } %> pass ·
+          <%= results.count { |r| r.status == "fail" } %> fail
+        </span>
+        <%= button_to "Delete", admin_test_run_path(run), method: :delete, class: "tguide-btn tguide-btn--danger", form: {class: "tguide-inline-form", data: {confirm: "Delete run \"#{run.label}\" and its results?"}} %>
+      </div>
+    </div>
+  <% end %>
+</div>
