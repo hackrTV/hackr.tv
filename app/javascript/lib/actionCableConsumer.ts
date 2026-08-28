@@ -1,4 +1,4 @@
-import { createConsumer, Cable } from '@rails/actioncable'
+import { createConsumer, Consumer } from '@rails/actioncable'
 
 /**
  * Singleton ActionCable consumer. One WebSocket per app session,
@@ -11,9 +11,9 @@ import { createConsumer, Cable } from '@rails/actioncable'
  * returned cable — other controllers may still be using it. The cable
  * stays up for the lifetime of the page.
  */
-let cable: Cable | null = null
+let cable: Consumer | null = null
 
-export const getActionCableConsumer = (): Cable => {
+export const getActionCableConsumer = (): Consumer => {
   if (!cable) {
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     cable = createConsumer(`${wsProtocol}//${window.location.host}/cable`)

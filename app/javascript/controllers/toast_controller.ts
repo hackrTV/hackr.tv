@@ -12,7 +12,7 @@ export default class extends Controller<HTMLElement> {
     const region = this.element.parentElement
     if (region) {
       const toasts = region.querySelectorAll('.toast')
-      for (let i = 0; i < toasts.length - MAX_STACK; i++) toasts[i].remove()
+      for (let i = 0; i < toasts.length - MAX_STACK; i++) toasts[i]?.remove()
     }
     this.timer = window.setTimeout(() => this.dismiss(), AUTO_DISMISS_MS)
   }
