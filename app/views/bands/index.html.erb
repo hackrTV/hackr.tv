@@ -1,0 +1,72 @@
+<% content_for :title, "Fracture Network — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <% current_year = Date.current.year %>
+
+  <div class="tui-window white-text fnet-window">
+    <fieldset class="fnet-fieldset">
+      <legend class="center fnet-legend">
+        <span class="chrome-desktop-only">hackr.fm :: FRACTURE NETWORK</span>
+        <span class="chrome-mobile-only">FRACTURE NETWORK</span>
+      </legend>
+
+      <div>
+        <h2 class="fnet-heading">[:: FRACTURE NETWORK ::]</h2>
+
+        <div class="fnet-infobox">
+          <p><%= @artists.size %> artists broadcasting from the underground | Each with a story, each with a frequency</p>
+        </div>
+
+        <% if @artists.any? %>
+          <div class="fnet-grid">
+            <% @artists.each do |artist| %>
+              <div class="tui-window white-text fnet-card">
+                <fieldset>
+                  <legend><%= artist.name.to_s.upcase %></legend>
+
+                  <div class="fnet-card-body">
+                    <div class="fnet-desc-wrap">
+                      <p class="fnet-desc"><%= band_description(artist.slug) %></p>
+                    </div>
+
+                    <div class="fnet-genre-box">
+                      <p><span class="fnet-genre"><%= artist.genre %></span> • <%= artist.tracks.count %> tracks</p>
+                    </div>
+
+                    <div class="fnet-actions">
+                      <% profile_path = artist_profile_path_for(artist) %>
+                      <% if profile_path.present? %>
+                        <%= nav_link_to profile_path, css_class: "tui-button purple-168 fnet-btn" do %>
+                          <span class="chrome-desktop-only">VIEW PROFILE</span>
+                          <span class="chrome-mobile-only">PROFILE</span>
+                        <% end %>
+                      <% else %>
+                        <button class="tui-button fnet-btn fnet-btn--disabled" disabled>COMING SOON</button>
+                      <% end %>
+
+                      <%= nav_link_to "/#{artist.slug}/releases", css_class: "tui-button cyan-168 fnet-btn" do %>RELEASES<% end %>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="fnet-empty">
+            <p>No artists in the Fracture Network yet.</p>
+          </div>
+        <% end %>
+
+        <div class="fnet-about">
+          <h3>[:: ABOUT THE FRACTURE NETWORK ::]</h3>
+          <p>
+            These bands carry truth and beauty through time under the loose banner of the Fracture Network.
+            Every artist here is connected to THE PULSE GRID — creating, collaborating, and carrying forward
+            an uncompromising artistic vision that no system can contain. From <%= current_year %> to <%= current_year + 100 %>, the signal
+            continues.
+          </p>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

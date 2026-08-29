@@ -1,0 +1,34 @@
+<% if @profile %>
+  <% content_for :title, "#{@profile[:name]} — hackr.tv" %>
+<% end %>
+
+
+<%# ERB port of BandProfileLayout.tsx. The React page mounts DefaultLayout
+    with its defaults, so the ascii header stays on (unlike the vault).
+    Band colors come from the css modifier class in band_profiles.css.
+    bio-credit mirrors the SPA bio_viewed POST and no-ops when logged out
+    or when the slug value is blank. %>
+<%= render layout: "shared/default_chrome", locals: {} do %>
+  <% if @profile %>
+    <div class="tui-window white-text band-profile-container <%= @profile[:css] %>" data-controller="bio-credit" data-bio-credit-slug-value="<%= @artist&.slug %>">
+      <fieldset class="band-profile-fieldset">
+        <legend class="center band-profile-legend"><%= @profile[:name].upcase %></legend>
+
+        <div class="band-profile-content">
+          <%= render "band_profiles/#{@profile[:partial]}" %>
+
+          <div class="band-profile-buttons">
+            <%= link_to "← BACK TO FRACTURE NETWORK", "/f/net", class: "tui-button band-profile-back-button" %>
+            <%= link_to "RELEASES", "/#{@slug}/releases", class: "tui-button band-profile-button" %>
+            <%= link_to "/vault?filter=#{ERB::Util.url_encode(@profile[:filter_name])}", class: "tui-button band-profile-button" do %>
+              <span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>
+              <span class="chrome-mobile-only">PULSE VAULT →</span>
+            <% end %>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  <% else %>
+    <%= render "not_found" %>
+  <% end %>
+<% end %>

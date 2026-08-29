@@ -9,24 +9,46 @@ Rails.application.routes.draw do
   get "xeraen/vidz", to: redirect("/thecyberpulse/vidz")
   get "xeraen/vidz/:id", to: redirect("/thecyberpulse/vidz/%{id}")
 
-  # Artist routes - SPA (consolidated per-artist pattern)
-  # Each artist gets: profile, releases, track detail, vidz
-  %w[thecyberpulse xeraen system-rot wavelength-zero voiceprint temporal-blue-drift
-    injection-vector cipher-protocol blitzbeam apex-overdrive ethereality
-    neon-hearts offline heartbreak-havoc the-pulse-grid].each do |artist_slug|
-    scope artist_slug do
-      get "/", to: "pages#spa_root"
-      get "bio", to: "pages#spa_root"
-      get "releases", to: "pages#spa_root"
-      get "releases/:id", to: "pages#spa_root"
-      get "trackz/:id", to: "pages#spa_root"
-      get "vidz", to: "pages#spa_root"
-      get "vidz/:id", to: "pages#spa_root"
+  # Artist routes — Hotwire (migrated Phase 4).
+  # thecyberpulse + xeraen keep bespoke landing/bio pages (vidz lives on
+  # thecyberpulse; the xeraen redirects above cover the old paths) and
+  # wavelength-zero its custom profile; the other slugs render band
+  # profiles (five configured in BandProfile::CONFIG, the rest fall back
+  # to the not-found variant, matching the SPA). The catalog
+  # (releases/trackz) is shared by all slugs. Unrouted /bio and /vidz on
+  # generic slugs 404 like the SPA's client-side router did.
+  artist_slugs = %w[thecyberpulse xeraen system-rot wavelength-zero voiceprint
+    temporal-blue-drift injection-vector cipher-protocol blitzbeam
+    apex-overdrive ethereality neon-hearts offline heartbreak-havoc
+    the-pulse-grid]
+
+  %w[thecyberpulse xeraen].each do |artist_slug|
+    scope artist_slug, defaults: {artist_slug: artist_slug} do
+      get "/", to: "artist_pages##{artist_slug}_landing"
+      get "bio", to: "artist_pages##{artist_slug}_bio"
+    end
+  end
+  scope "thecyberpulse", defaults: {artist_slug: "thecyberpulse"} do
+    get "vidz", to: "artist_catalog#vidz"
+    get "vidz/:id", to: "artist_catalog#vidz_show"
+  end
+
+  get "wavelength-zero", to: "artist_pages#wavelength_zero", defaults: {artist_slug: "wavelength-zero"}
+
+  (artist_slugs - %w[thecyberpulse xeraen wavelength-zero]).each do |artist_slug|
+    get artist_slug, to: "band_profiles#show", defaults: {artist_slug: artist_slug}
+  end
+
+  artist_slugs.each do |artist_slug|
+    scope artist_slug, defaults: {artist_slug: artist_slug} do
+      get "releases", to: "artist_catalog#releases"
+      get "releases/:id", to: "artist_catalog#release"
+      get "trackz/:id", to: "artist_catalog#track"
     end
   end
 
-  # Sector X routes - SPA
-  get "sector/x", to: "pages#spa_root", as: :sector_x
+  # Sector X — Hotwire (migrated Phase 4)
+  get "sector/x", to: "artist_pages#sector_x", as: :sector_x
 
   # Legacy routes for backward compatibility (redirects to new paths)
   get "trackz", to: "tracks#legacy_redirect", as: :legacy_tracks
@@ -71,28 +93,32 @@ Rails.application.routes.draw do
     end
   end
 
-  # Vault (promoted from /fm/pulse-vault)
-  get "vault", to: "pages#spa_root", as: :vault
+  # Vault (promoted from /fm/pulse-vault) — Hotwire (migrated Phase 4)
+  get "vault", to: "vault#show", as: :vault
   get "fm/pulse-vault", to: redirect("/vault")
   get "pulse-vault", to: redirect("/vault")
 
-  # hackr.fm routes - SPA
+  # hackr.fm routes — Hotwire (migrated Phase 4)
   scope "fm" do
-    get "/", to: "pages#spa_root", as: :fm
-    get "releases", to: "pages#spa_root", as: :fm_releases
-    get "radio", to: "pages#spa_root", as: :fm_radio
-    get "playlists", to: "pages#spa_root", as: :fm_playlists
-    get "playlists/:id", to: "pages#spa_root", as: :fm_playlist
+    get "/", to: "fm#show", as: :fm
+    get "releases", to: "fm#releases", as: :fm_releases
+    get "radio", to: "radio#show", as: :fm_radio
+    get "playlists", to: "playlists#index", as: :fm_playlists
+    post "playlists", to: "playlists#create"
+    get "playlists/:id", to: "playlists#show", as: :fm_playlist
+    patch "playlists/:id", to: "playlists#update"
+    delete "playlists/:id", to: "playlists#destroy"
+    delete "playlists/:id/tracks/:playlist_track_id", to: "playlists#remove_track", as: :fm_playlist_remove_track
   end
 
-  # Fracture Network - SPA
+  # Fracture Network roster — Hotwire (migrated Phase 4)
   scope "f" do
-    get "net", to: "pages#spa_root", as: :f_net
+    get "net", to: "bands#index", as: :f_net
   end
   get "fnet", to: redirect("/f/net")
 
-  # Shared playlist - public (SPA)
-  get "shared/:token", to: "pages#spa_root", as: :shared_playlist
+  # Shared playlist - public — Hotwire (migrated Phase 4)
+  get "shared/:token", to: "shared_playlists#show", as: :shared_playlist
 
   # HackrLogs (blog) routes — Hotwire (migrated Phase 1)
   scope "logs" do

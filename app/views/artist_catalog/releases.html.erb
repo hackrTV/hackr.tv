@@ -1,0 +1,61 @@
+<%# ReleaseListPage.tsx port. Coming-soon releases lead the grid with the
+    glitch/scanline INCOMING treatment; released ones follow, newest
+    first. Card accents cycle per index on prismatic artist themes. %>
+<% content_for :title, "#{@artist_name} :: Releases — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="tui-window white-text ac-theme <%= artist_theme_class(params[:artist_slug]) %> release-list-window">
+    <fieldset class="ac-fieldset">
+      <legend class="center ac-legend"><%= @artist_name %> :: RELEASES</legend>
+
+      <div>
+        <% if @releases.empty? && @coming_soon.empty? %>
+          <div class="release-list-empty">
+            <p>No releases cataloged yet.</p>
+          </div>
+        <% else %>
+          <div class="release-list-grid">
+            <% cards = @coming_soon.map { |r| [r, true] } + @releases.map { |r| [r, false] } %>
+            <% cards.each_with_index do |(release, coming_soon), index| %>
+              <%= link_to "/#{params[:artist_slug]}/releases/#{release.slug}", class: "release-list-card-link" do %>
+                <div class="release-list-card <%= coming_soon ? "release-list-card--coming-soon" : accent_class(params[:artist_slug], index) %>">
+                  <div class="release-list-card__cover">
+                    <% if release.cover_image.attached? %>
+                      <%= image_tag url_for(coming_soon ? release.cover_standard : release.cover_image),
+                        alt: release.name, class: "release-list-card__img" %>
+                    <% else %>
+                      <div class="release-list-card__placeholder">&#9834;</div>
+                    <% end %>
+                    <% if coming_soon %>
+                      <div class="release-list-card__scanlines"></div>
+                      <div class="release-list-card__tint"></div>
+                      <div class="release-list-card__badge">INCOMING</div>
+                    <% end %>
+                  </div>
+                  <div class="release-list-card__info">
+                    <div class="release-list-card__name"><%= release.name %></div>
+                    <div class="release-list-card__meta">
+                      <span class="release-list-card__type"><%= release.release_type&.upcase || "RELEASE" %></span>
+                      <span class="release-list-card__count"><%= pluralize(release.tracks.count, "track") %></span>
+                    </div>
+                    <% if release.release_date && !coming_soon %>
+                      <div class="release-list-card__date"><%= release.release_date %></div>
+                    <% end %>
+                    <% if release.catalog_number.present? %>
+                      <div class="release-list-card__catalog"><%= release.catalog_number %></div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div class="release-list-nav">
+          <%= link_to "← #{@artist_name}", "/#{params[:artist_slug]}", class: "release-list-nav__back" %>
+          <%= link_to "PULSE VAULT →", "/vault", class: "release-list-nav__vault" %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

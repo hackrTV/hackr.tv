@@ -1,0 +1,80 @@
+<%# ERB port of TheCyberPulseLandingPage.tsx (GET /thecyberpulse). %>
+<% content_for :title, "The.CyberPul.se — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome" do %>
+  <% future_year = Date.current.year + 100 %>
+
+  <div class="tui-window white-text tcp-landing-window">
+    <fieldset class="tcp-landing-fieldset">
+      <legend class="center tcp-landing-legend">THE.CYBERPUL.SE</legend>
+
+      <div class="tcp-landing-content">
+        <h2 class="tcp-landing-heading">[:: THE.CYBERPUL.SE ::]</h2>
+        <p class="tcp-landing-subtitle">SIGNAL ORIGIN &amp; BROADCAST HUB</p>
+
+        <div class="tcp-landing-lore">
+          <p class="tcp-landing-lore-open">
+            XERAEN transmits. Ryker keeps the beat. Synthia holds the frequency steady.
+            Together they are The.CyberPul.se — <span class="tcp-landing-highlight">broadcasting from <%= future_year %> across a century
+            that shouldn't be crossable</span>.
+          </p>
+          <p class="tcp-landing-lore-mid">
+            What they carry reaches you right now, a hundred years before it was sent.
+            You're not supposed to be hearing this. But here you are.
+          </p>
+          <p class="tcp-landing-lore-close">
+            You found the frequency. Everything else is below.
+          </p>
+        </div>
+
+        <div class="tcp-landing-cards">
+          <%= link_to "/thecyberpulse/bio", class: "tcp-landing-card-link" do %>
+            <div class="tui-window white-text tcp-landing-card tcp-landing-card--bio">
+              <fieldset>
+                <legend>BIO</legend>
+                <div class="tcp-landing-card-body">
+                  <p class="tcp-landing-card-icon tcp-landing-card-icon--bio">◈ BIO</p>
+                  <p class="tcp-landing-card-desc">
+                    Who they are. How this started. What it costs them to keep transmitting.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <%= link_to "/thecyberpulse/releases", class: "tcp-landing-card-link" do %>
+            <div class="tui-window white-text tcp-landing-card tcp-landing-card--releases">
+              <fieldset>
+                <legend>RELEASES</legend>
+                <div class="tcp-landing-card-body">
+                  <p class="tcp-landing-card-icon tcp-landing-card-icon--releases">◆ RELEASES</p>
+                  <p class="tcp-landing-card-desc">
+                    Albums, EPs, and singles from across the timeline. Every signal committed to record.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <%= nav_link_to "/thecyberpulse/vidz", css_class: "tcp-landing-card-link" do %>
+            <div class="tui-window white-text tcp-landing-card tcp-landing-card--vidz">
+              <fieldset>
+                <legend>VIDZ</legend>
+                <div class="tcp-landing-card-body">
+                  <p class="tcp-landing-card-icon tcp-landing-card-icon--vidz">▶ VIDZ</p>
+                  <p class="tcp-landing-card-desc">
+                    Visual transmissions. Live operations, broadcasts, and archived footage from the signal.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="tcp-landing-footer">
+          <p>broadcasting from <%= future_year %> — the signal is always on</p>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

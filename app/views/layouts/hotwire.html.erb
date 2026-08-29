@@ -26,6 +26,13 @@
     <%= stylesheet_link_tag "audio_player", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "pulse_wire", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "hotwire", "data-turbo-track": "reload" %>
+    <%# Phase 4 artist cluster. ALL cluster CSS loads here, never per-page:
+        data-turbo-track=reload means Turbo hard-reloads when two pages'
+        tracked-asset sets differ, which kills the permanent player — every
+        Hotwire page must ship the identical tracked set. %>
+    <%= stylesheet_link_tag "band_profiles", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "artist_pages", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "artist_catalog", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application" %>
     <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
     <%= vite_client_tag %>
@@ -45,7 +52,9 @@
     <%= turbo_stream_from current_hackr, :toasts if logged_in? %>
     <div id="toast-region" aria-live="polite"></div>
 
-    <%# Persistent audio player slot — survives Turbo visits; populated in Phase 4 %>
-    <div id="player-bar" data-turbo-permanent></div>
+    <%# Persistent audio player (Phase 4) — survives Turbo visits. %>
+    <div id="player-bar" data-turbo-permanent data-controller="player">
+      <%= render "shared/player_bar" %>
+    </div>
   </body>
 </html>

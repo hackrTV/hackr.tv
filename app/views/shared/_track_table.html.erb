@@ -1,0 +1,89 @@
+<%# Filterable track table (ported from audio/TrackTable.tsx). Desktop
+    renders the full table, mobile a card list — both carry the same
+    data-player-* rows (PlayerHelper#player_track_attrs); the track-list
+    controller builds the queue from whichever set is displayed.
+    Locals: tracks, filter (initial filter string, may be ""). %>
+<div data-controller="track-list">
+  <div class="track-search">
+    <label for="track-search">
+      <span class="chrome-desktop-only">SEARCH TRACKS :: Filter by track, artist, release, or genre</span>
+      <span class="chrome-mobile-only">SEARCH TRACKS</span>
+    </label>
+    <input type="text" id="track-search" placeholder="Type to filter tracks..."
+           value="<%= filter %>" data-track-list-target="filter"
+           data-action="input->track-list#filterChanged">
+  </div>
+
+  <div class="tui-fieldset track-table-fieldset">
+    <legend>
+      <span class="chrome-desktop-only">TRACK LIBRARY</span>
+      <span class="chrome-mobile-only">TRACKS (<span data-track-list-target="count"><%= tracks.size %></span>)</span>
+    </legend>
+
+    <table class="tui-table track-table chrome-desktop-only">
+      <thead>
+        <tr>
+          <th>&nbsp;Track</th>
+          <th>&nbsp;Artist</th>
+          <th>&nbsp;Release</th>
+          <th>&nbsp;Genre</th>
+          <th class="track-table__stream-head">Stream</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% tracks.each do |track| %>
+          <% playable = track.audio_file.attached? %>
+          <tr class="track-row <%= "track-row--unplayable" unless playable %>"
+              <%= tag.attributes(data: player_track_attrs(track).merge(
+                    track_set: "desktop",
+                    search_text: "#{track.title} #{track.artist.name} #{track.release&.name} #{track.artist.genre}".downcase,
+                    player_artist_path: artist_profile_path_for(track.artist),
+                    action: "click->track-list#rowClicked contextmenu->track-list#rowContextMenu"
+                  )) %>>
+            <td>
+              <strong class="track-row__title <%= "track-row__title--muted" unless playable %>"><span class="track-row__marker" hidden>► </span><%= track.title %></strong>
+            </td>
+            <td class="track-row__cell">&nbsp;<%= track.artist.name %>&nbsp;</td>
+            <td class="track-row__cell track-row__cell--dim">&nbsp;<%= track.release&.name || "-" %>&nbsp;</td>
+            <td class="track-row__cell track-row__cell--dim">&nbsp;<%= track.artist.genre || "-" %>&nbsp;</td>
+            <td class="track-table__stream">
+              <% if playable %>
+                <button class="tui-button play-track-btn">► PLAY</button>
+              <% else %>
+                <span class="track-row__cell--muted">-</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="track-cards chrome-mobile-only">
+      <% tracks.each do |track| %>
+        <% playable = track.audio_file.attached? %>
+        <div class="track-row track-card <%= "track-row--unplayable" unless playable %>"
+             <%= tag.attributes(data: player_track_attrs(track).merge(
+                   track_set: "mobile",
+                   search_text: "#{track.title} #{track.artist.name} #{track.release&.name} #{track.artist.genre}".downcase,
+                   player_artist_path: artist_profile_path_for(track.artist),
+                   action: "click->track-list#rowClicked contextmenu->track-list#rowContextMenu"
+                 )) %>>
+          <div class="track-card__cover">
+            <% if track.release&.cover_image&.attached? %>
+              <%= image_tag url_for(track.release.cover_thumbnail), alt: track.release.name, class: "track-card__img" %>
+              <% if playable %><div class="track-card__overlay"></div><% end %>
+            <% elsif playable %>
+              <div class="track-card__play-fallback">►</div>
+            <% else %>
+              <div class="track-card__no-audio">-</div>
+            <% end %>
+          </div>
+          <div class="track-card__info">
+            <div class="track-card__title"><%= track.title %></div>
+            <div class="track-card__artist"><%= track.artist.name %></div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

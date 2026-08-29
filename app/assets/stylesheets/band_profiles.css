@@ -1,0 +1,708 @@
+/*
+ * Band profile pages (Hotwire, Phase 4) — inline styles from
+ * BandProfileLayout.tsx and the five migrated bandProfileConfig.tsx
+ * entries (system-rot, voiceprint, blitzbeam, ethereality, offline),
+ * ported to classes. Loaded per-page via content_for :head, which sits
+ * BEFORE tuicss/default in the hotwire layout head — selectors that
+ * compete with tuicss (.tui-window, .tui-button) are therefore chained
+ * to two classes so they win on specificity, not on source order.
+ * Mobile normalization for .band-profile-container/.band-profile-content
+ * already lives in default.css and applies here unchanged; the only
+ * rules recreated below are the ones default.css keyed on style
+ * attributes, which class-based markup no longer carries.
+ */
+
+/* --- Shared chrome (BandProfileLayout.tsx) --- */
+
+.tui-window.band-profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+}
+
+.band-profile-window-body { padding: 20px; }
+
+.band-profile-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.band-profile-buttons .tui-button { text-align: center; }
+
+.band-profile-buttons .band-profile-button { font-weight: bold; }
+
+.band-profile-buttons .band-profile-back-button { color: #888; }
+
+.band-profile-not-found {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .tui-window.band-profile-container { max-width: 100%; }
+
+  .band-profile-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* SPA equivalents matched div[style*="padding: 20px"] in default.css. */
+  .band-profile-content .band-profile-window-body,
+  .band-profile-content .eth-block,
+  .band-profile-content .off-block {
+    padding: 12px;
+  }
+}
+
+/* --- System Rot (#39ff14 neon green on black) --- */
+
+.band-profile-container.band-profile--system-rot {
+  background: #0a0a0a;
+  border: 2px solid #39ff14;
+}
+
+.band-profile--system-rot .band-profile-fieldset { border-color: #39ff14; }
+
+.band-profile--system-rot .band-profile-legend { color: #39ff14; }
+
+.band-profile--system-rot .band-profile-button {
+  background: #39ff14;
+  color: #000;
+}
+
+.band-profile--system-rot .band-profile-back-button {
+  background: #222;
+  border: 1px solid #444;
+}
+
+.sr-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(57, 255, 20, 0.05), rgba(0, 0, 0, 0.95));
+  border: 2px solid #39ff14;
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.3), inset 0 0 20px rgba(57, 255, 20, 0.1);
+}
+
+.sr-intro-heading {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #39ff14;
+  letter-spacing: 3px;
+  font-size: 1.8em;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(57, 255, 20, 0.8);
+}
+
+.sr-intro-lede {
+  color: #ccc;
+  line-height: 1.7;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.sr-intro-body {
+  color: #ddd;
+  line-height: 1.8;
+  font-size: 1.05em;
+}
+
+.tui-window.sr-philosophy {
+  margin-bottom: 30px;
+  background: #000000;
+  border: 2px solid #39ff14;
+  box-shadow: 0 0 25px rgba(57, 255, 20, 0.2);
+}
+
+.sr-philosophy fieldset { border-color: #39ff14; }
+
+.sr-philosophy legend {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+  letter-spacing: 2px;
+}
+
+.sr-belief {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(57, 255, 20, 0.05);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+.sr-belief h3 {
+  color: #39ff14;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+}
+
+.sr-belief p {
+  color: #ddd;
+  line-height: 1.8;
+}
+
+.sr-creed {
+  color: #39ff14;
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border-left: 4px solid #39ff14;
+  line-height: 1.8;
+  font-size: 1.05em;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+}
+
+/* --- Voiceprint (#00d9ff cyan archive terminal) --- */
+/* The config's legend_style "monospace" was applied as font-style in the
+   SPA — an invalid value the browser ignored — so no legend override. */
+
+.band-profile-container.band-profile--voiceprint {
+  background: #000000;
+  border: 2px solid #00d9ff;
+}
+
+.band-profile--voiceprint .band-profile-fieldset { border-color: #00d9ff; }
+
+.band-profile--voiceprint .band-profile-legend { color: #00d9ff; }
+
+.band-profile--voiceprint .band-profile-button {
+  background: #00d9ff;
+  color: #000;
+}
+
+.band-profile--voiceprint .band-profile-back-button {
+  background: #000;
+  border: 1px solid #333;
+}
+
+.vp-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.08), rgba(0, 0, 0, 0.95));
+  border: 2px solid #00d9ff;
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.3), inset 0 0 20px rgba(0, 217, 255, 0.08);
+}
+
+.vp-sample-id {
+  color: #00d9ff;
+  font-family: monospace;
+  margin-bottom: 25px;
+  font-size: 0.95em;
+  padding: 12px;
+  background: rgba(0, 217, 255, 0.1);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  text-shadow: 0 0 10px rgba(0, 217, 255, 0.6);
+}
+
+.vp-listen {
+  color: #00d9ff;
+  line-height: 1.8;
+  margin-bottom: 18px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 217, 255, 0.7);
+}
+
+.vp-intro-heard {
+  color: #bbb;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.vp-intro-synth {
+  color: #aaa;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.vp-intro-close {
+  color: #ddd;
+  line-height: 1.8;
+  font-size: 1.05em;
+}
+
+.tui-window.vp-archive {
+  margin-bottom: 30px;
+  background: #000000;
+  border: 2px solid #00d9ff;
+  box-shadow: 0 0 25px rgba(0, 217, 255, 0.25);
+}
+
+.vp-archive fieldset { border-color: #00d9ff; }
+
+.vp-archive legend {
+  color: #00d9ff;
+  font-family: monospace;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+/* The JSX declared border-left 4px and then a border shorthand after it,
+   so the shorthand won and the SPA rendered a uniform 1px border. Kept. */
+.vp-log {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(0, 217, 255, 0.05);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+}
+
+.vp-log-label {
+  color: #00d9ff;
+  font-family: monospace;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(0, 217, 255, 0.6);
+}
+
+.vp-log-text {
+  color: #ddd;
+  line-height: 1.8;
+}
+
+.vp-mission {
+  color: #00d9ff;
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #00d9ff;
+  font-family: monospace;
+  line-height: 1.8;
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3), inset 0 0 15px rgba(0, 217, 255, 0.1);
+  text-shadow: 0 0 8px rgba(0, 217, 255, 0.6);
+}
+
+.vp-mission-text { color: #ddd; }
+
+/* --- BlitzBeam+ (pink/cyan/yellow hypertrance) --- */
+
+.band-profile-container.band-profile--blitzbeam {
+  background: #000000;
+  border: 2px solid #00ffff;
+}
+
+.band-profile--blitzbeam .band-profile-fieldset { border-color: #00ffff; }
+
+.band-profile--blitzbeam .band-profile-legend { color: #ffff00; }
+
+.band-profile--blitzbeam .band-profile-button {
+  background: linear-gradient(90deg, #ff0080, #00ffff, #ffff00);
+  color: white;
+  border: none;
+}
+
+.band-profile--blitzbeam .band-profile-back-button {
+  background: #0a0a0a;
+  border: 1px solid #ff0080;
+}
+
+.bb-intro {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #000000;
+  border: 2px solid #ff0080;
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+}
+
+.bb-intro-heading {
+  text-align: center;
+  margin-bottom: 15px;
+  background: linear-gradient(90deg, #ff0080, #00ffff, #ffff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 1.8em;
+}
+
+.bb-intro-sub {
+  color: #00ffff;
+  font-size: 1.1em;
+  margin-bottom: 15px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.bb-intro-body {
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.bb-intro-tags {
+  color: #ffff00;
+  line-height: 1.6;
+  font-weight: bold;
+}
+
+.tui-window.bb-philosophy {
+  margin-bottom: 30px;
+  background: #000000;
+  border: 2px solid #ffff00;
+  box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);
+}
+
+.bb-philosophy fieldset { border-color: #ffff00; }
+
+.bb-philosophy legend {
+  color: #ff0080;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.bb-block {
+  margin-bottom: 25px;
+  padding: 15px;
+}
+
+.bb-block h3 {
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bb-block p {
+  color: #ccc;
+  line-height: 1.7;
+}
+
+.bb-block--pink {
+  background: rgba(255, 0, 128, 0.1);
+  border-left: 4px solid #ff0080;
+}
+
+.bb-block--pink h3 { color: #ff0080; }
+
+.bb-block--cyan {
+  background: rgba(0, 255, 255, 0.1);
+  border-left: 4px solid #00ffff;
+}
+
+.bb-block--cyan h3 { color: #00ffff; }
+
+.bb-block--yellow {
+  background: rgba(255, 255, 0, 0.1);
+  border-left: 4px solid #ffff00;
+}
+
+.bb-block--yellow h3 { color: #ffff00; }
+
+.bb-outro {
+  margin-top: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(0, 255, 255, 0.2), rgba(255, 255, 0, 0.2));
+  border: 2px solid #ff0080;
+  line-height: 1.9;
+  font-size: 1.1em;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.bb-outro-pink {
+  color: #ff0080;
+  font-weight: bold;
+}
+
+.bb-outro-cyan {
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.bb-outro-yellow {
+  color: #ffff00;
+  font-weight: bold;
+}
+
+.bb-outro-close { color: #fff; }
+
+/* --- Ethereality (lavender/periwinkle trance) --- */
+
+.band-profile-container.band-profile--ethereality {
+  background: #0a0a1a;
+  border: 2px solid #b8c5f2;
+}
+
+.band-profile--ethereality .band-profile-fieldset { border-color: #b8c5f2; }
+
+.band-profile--ethereality .band-profile-legend { color: #ffffff; }
+
+.band-profile--ethereality .band-profile-button {
+  background: linear-gradient(90deg, #e6e6fa, #b8c5f2);
+  color: white;
+  border: none;
+}
+
+.band-profile--ethereality .band-profile-back-button {
+  background: #0a0a1a;
+  border: 1px solid #e6e6fa;
+}
+
+.eth-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(230, 230, 250, 0.1), rgba(184, 197, 242, 0.1));
+  border: 1px solid rgba(230, 230, 250, 0.5);
+  box-shadow: 0 0 30px rgba(230, 230, 250, 0.3);
+}
+
+.eth-intro-heading {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #e6e6fa;
+  letter-spacing: 3px;
+  font-size: 1.6em;
+  text-shadow: 0 0 20px rgba(230, 230, 250, 0.6);
+}
+
+.eth-intro-sub {
+  color: #b8c5f2;
+  font-size: 1em;
+  margin-bottom: 15px;
+  text-align: center;
+  letter-spacing: 2px;
+  font-style: italic;
+}
+
+.eth-intro-body {
+  color: #ddd;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.eth-intro-tags {
+  color: #e6e6fa;
+  line-height: 1.7;
+  font-style: italic;
+}
+
+.tui-window.eth-philosophy {
+  margin-bottom: 30px;
+  background: rgba(10, 10, 26, 0.9);
+  border: 1px solid rgba(230, 230, 250, 0.5);
+  box-shadow: 0 0 30px rgba(230, 230, 250, 0.3);
+}
+
+.eth-philosophy fieldset { border-color: #e6e6fa; }
+
+.eth-philosophy legend {
+  color: #e6e6fa;
+  letter-spacing: 2px;
+  font-style: italic;
+}
+
+.eth-block {
+  margin-bottom: 25px;
+  padding: 20px;
+}
+
+.eth-block h3 {
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  font-size: 1.05em;
+  font-style: italic;
+}
+
+.eth-block p {
+  color: #ddd;
+  line-height: 1.9;
+}
+
+.eth-block--lavender {
+  background: linear-gradient(135deg, rgba(230, 230, 250, 0.15), rgba(230, 230, 250, 0.05));
+  border-left: 3px solid #e6e6fa;
+}
+
+.eth-block--lavender h3 { color: #e6e6fa; }
+
+.eth-block--periwinkle {
+  background: linear-gradient(135deg, rgba(184, 197, 242, 0.15), rgba(184, 197, 242, 0.05));
+  border-left: 3px solid #b8c5f2;
+}
+
+.eth-block--periwinkle h3 { color: #b8c5f2; }
+
+.eth-quote { color: #b8c5f2; }
+
+.eth-outro {
+  margin-top: 30px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(230, 230, 250, 0.2), rgba(184, 197, 242, 0.2));
+  border: 2px solid rgba(230, 230, 250, 0.6);
+  line-height: 2;
+  font-size: 1.1em;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(230, 230, 250, 0.4);
+  font-style: italic;
+}
+
+.eth-outro-filter {
+  color: #e6e6fa;
+  display: block;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+}
+
+.eth-outro-deep {
+  color: #b8c5f2;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.eth-outro-beauty {
+  color: #fff;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.eth-outro-real {
+  color: #e6e6fa;
+  letter-spacing: 2px;
+}
+
+/* --- Offline (bronze/tan analog grunge) --- */
+
+.band-profile-container.band-profile--offline {
+  background: #0a0a0a;
+  border: 2px solid #8b7355;
+}
+
+.band-profile--offline .band-profile-fieldset { border-color: #8b7355; }
+
+.band-profile--offline .band-profile-legend { color: #d2691e; }
+
+.band-profile--offline .band-profile-button {
+  background: #cd7f32;
+  color: #000;
+}
+
+.band-profile--offline .band-profile-back-button {
+  background: #1a1a1a;
+  border: 1px solid #8b7355;
+}
+
+.off-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), rgba(139, 115, 85, 0.1));
+  border: 2px solid #8b7355;
+  box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
+}
+
+.off-intro-heading {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #cd7f32;
+  letter-spacing: 2px;
+  font-size: 1.7em;
+  text-transform: uppercase;
+}
+
+.off-intro-sub {
+  color: #d2691e;
+  font-size: 1em;
+  margin-bottom: 15px;
+  text-align: center;
+  font-style: italic;
+}
+
+.off-intro-body {
+  color: #ccc;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.off-intro-tags {
+  color: #8b7355;
+  line-height: 1.7;
+  font-weight: bold;
+}
+
+.tui-window.off-philosophy {
+  margin-bottom: 30px;
+  background: #0a0a0a;
+  border: 2px solid #cd7f32;
+  box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
+}
+
+.off-philosophy fieldset { border-color: #cd7f32; }
+
+.off-philosophy legend {
+  color: #cd7f32;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.off-block {
+  margin-bottom: 25px;
+  padding: 20px;
+}
+
+.off-block h3 {
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.off-block p {
+  color: #ccc;
+  line-height: 1.9;
+}
+
+.off-block--bronze {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05));
+  border-left: 4px solid #cd7f32;
+}
+
+.off-block--bronze h3 { color: #cd7f32; }
+
+.off-block--tan {
+  background: linear-gradient(135deg, rgba(139, 115, 85, 0.15), rgba(139, 115, 85, 0.05));
+  border-left: 4px solid #8b7355;
+}
+
+.off-block--tan h3 { color: #8b7355; }
+
+.off-lyric { color: #d2691e; }
+
+.off-outro {
+  margin-top: 30px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(139, 115, 85, 0.2));
+  border: 3px solid #8b7355;
+  line-height: 2;
+  font-size: 1.1em;
+  text-align: center;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.off-outro-void {
+  color: #cd7f32;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.off-outro-space {
+  color: #d2691e;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.off-outro-free {
+  color: #ccc;
+  display: block;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.off-outro-signal {
+  color: #8b7355;
+  letter-spacing: 1px;
+}

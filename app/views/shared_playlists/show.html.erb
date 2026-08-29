@@ -1,0 +1,42 @@
+<% content_for :title, "#{@playlist.name} — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="playlists-wrap" data-controller="track-list">
+    <div class="tui-window playlist-info">
+      <fieldset class="tui-fieldset">
+        <legend class="playlist-card__legend">🔓 SHARED PLAYLIST</legend>
+        <div class="playlist-info__body">
+          <h1 class="playlist-info__name"><%= @playlist.name %></h1>
+          <% if @playlist.description.present? %>
+            <div class="playlist-info__description"><%= markdown_content(@playlist.description) %></div>
+          <% end %>
+          <div class="playlist-info__meta"><%= pluralize(@playlist.track_count, "track") %></div>
+          <div class="playlist-info__actions">
+            <button class="tui-button playlist-info__play" data-action="track-list#playAll"
+                    <%= "disabled" if @tracks.empty? %>>▶ Play Playlist</button>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <% if @tracks.empty? %>
+      <div class="tui-window playlist-tracks">
+        <fieldset class="tui-fieldset">
+          <legend>EMPTY PLAYLIST</legend>
+          <div class="playlists-empty__body">
+            <p>This playlist is empty.</p>
+          </div>
+        </fieldset>
+      </div>
+    <% else %>
+      <div class="tui-window playlist-tracks">
+        <fieldset class="tui-fieldset">
+          <legend>TRACKS (<%= @tracks.size %>)</legend>
+          <div class="playlist-tracks__scroll">
+            <%= render "playlists/tracks_table", tracks: @tracks, editable: false, playlist: nil %>
+          </div>
+        </fieldset>
+      </div>
+    <% end %>
+  </div>
+<% end %>

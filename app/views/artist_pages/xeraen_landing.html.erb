@@ -1,0 +1,67 @@
+<%# ERB port of XeraenLandingPage.tsx (GET /xeraen). %>
+<% content_for :title, "XERAEN — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome" do %>
+  <% future_year = Date.current.year + 100 %>
+
+  <div class="tui-window white-text xeraen-landing-window">
+    <fieldset class="xeraen-landing-fieldset">
+      <legend class="center xeraen-landing-legend">XERAEN</legend>
+
+      <div class="xeraen-landing-content">
+        <h2 class="xeraen-landing-heading">[:: XERAEN ::]</h2>
+        <p class="xeraen-landing-subtitle">OMNIWAVE GENESIS VECTOR</p>
+
+        <div class="xeraen-landing-lore">
+          <p class="xeraen-landing-lore-open">
+            Systems architect turned fugitive. Founder of the Fracture Network. The voice behind
+            The.CyberPul.se. <span class="xeraen-landing-highlight">Transmitting from <%= future_year %> — for as long as <%= future_year %> exists</span>.
+          </p>
+          <p class="xeraen-landing-lore-mid">
+            The music has evolved from hardcore fury into something he calls OMNIWAVE — an amalgamation
+            of everything that ever moved him: covers of songs, old video game scores, reinterpretations
+            and original compositions coalescing into one collage where genre boundaries dissolve. The
+            sound changed. What it carries hasn't.
+          </p>
+          <p class="xeraen-landing-lore-close">
+            If you're hearing this, the signal is still reaching you. That's what matters.
+          </p>
+        </div>
+
+        <div class="xeraen-landing-cards">
+          <%= link_to "/xeraen/bio", class: "xeraen-landing-card-link" do %>
+            <div class="tui-window white-text xeraen-landing-card xeraen-landing-card--bio">
+              <fieldset>
+                <legend>BIO</legend>
+                <div class="xeraen-landing-card-body">
+                  <p class="xeraen-landing-card-icon xeraen-landing-card-icon--bio">◈ BIO</p>
+                  <p class="xeraen-landing-card-desc">
+                    The story behind the signal. How a systems architect broke time open and what he lost doing it.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <%= link_to "/xeraen/releases", class: "xeraen-landing-card-link" do %>
+            <div class="tui-window white-text xeraen-landing-card xeraen-landing-card--releases">
+              <fieldset>
+                <legend>RELEASES</legend>
+                <div class="xeraen-landing-card-body">
+                  <p class="xeraen-landing-card-icon xeraen-landing-card-icon--releases">◆ RELEASES</p>
+                  <p class="xeraen-landing-card-desc">
+                    Every transmission committed to record. Hardcore fury to OMNIWAVE and everything between.
+                  </p>
+                </div>
+              </fieldset>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="xeraen-landing-footer">
+          <p>transmitting from <%= future_year %> — for as long as <%= future_year %> exists</p>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

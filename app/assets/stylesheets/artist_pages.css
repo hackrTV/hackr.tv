@@ -1,0 +1,1047 @@
+/* Bespoke artist pages (Hotwire, Phase 4) — every inline style from the
+ * six React pages under components/pages/artist/, namespaced per page:
+ *   .tcp-landing-*    TheCyberPulseLandingPage.tsx  (/thecyberpulse)
+ *   .tcp-*            TheCyberPulsePage.tsx         (/thecyberpulse/bio)
+ *   .xeraen-landing-* XeraenLandingPage.tsx         (/xeraen)
+ *   .xeraen-*         XeraenPage.tsx                (/xeraen/bio)
+ *   .sectorx-*        SectorXPage.tsx               (/sector/x)
+ *   .wz-*             WavelengthZeroPage.tsx        (/wavelength-zero)
+ *   .embedded-track-* EmbeddedTrack.tsx             (xeraen bio player card)
+ *
+ * Loaded per-page via content_for :head, which yields BEFORE the layout's
+ * tuicss/hotwire stylesheet tags — so any rule that must beat a tuicss or
+ * hotwire class on the same element uses a compound selector
+ * (.tui-window.tcp-window, .tui-button.tcp-btn-primary, ...) to win on
+ * specificity, the same way the React inline styles always won.
+ *
+ * Mobile blocks replicate each page's isMobile (max-width: 767px)
+ * differences; pages whose React source had no isMobile logic (Sector X,
+ * Wavelength Zero) intentionally have none. The band-profile-container /
+ * band-profile-content mobile fixes in default.css apply to the two bio
+ * pages exactly as they did to the React originals. */
+
+/* --- The.CyberPul.se landing (/thecyberpulse) ----------------------- */
+
+.tui-window.tcp-landing-window {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: block;
+  background: #0a0a0a;
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-landing-fieldset { border-color: #8B00FF; }
+
+.tcp-landing-legend {
+  color: #8B00FF;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  letter-spacing: 3px;
+}
+
+.tcp-landing-content { padding: 30px; }
+
+.tcp-landing-heading {
+  text-align: center;
+  margin-bottom: 5px;
+  color: #8B00FF;
+  font-size: 1.8em;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  letter-spacing: 3px;
+}
+
+.tcp-landing-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 0.9em;
+}
+
+.tcp-landing-lore {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95));
+  border: 1px solid #8B00FF;
+  line-height: 1.8;
+}
+
+.tcp-landing-lore-open { color: #ccc; margin-bottom: 15px; }
+.tcp-landing-lore-mid { color: #aaa; margin-bottom: 15px; }
+.tcp-landing-lore-close { color: #888; }
+
+.tcp-landing-highlight {
+  color: #8B00FF;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-landing-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.tcp-landing-card-link { text-decoration: none; }
+
+.tui-window.tcp-landing-card {
+  background: #0d0d0d;
+  cursor: pointer;
+  height: 100%;
+}
+
+.tui-window.tcp-landing-card--bio { border: 1px solid #8B00FF; }
+.tui-window.tcp-landing-card--releases { border: 1px solid #9B59B6; }
+.tui-window.tcp-landing-card--vidz { border: 1px solid #ef4444; }
+
+.tcp-landing-card--bio fieldset { border-color: #8B00FF; height: 100%; }
+.tcp-landing-card--releases fieldset { border-color: #9B59B6; height: 100%; }
+.tcp-landing-card--vidz fieldset { border-color: #ef4444; height: 100%; }
+
+.tcp-landing-card--bio legend { color: #8B00FF; }
+.tcp-landing-card--releases legend { color: #9B59B6; }
+.tcp-landing-card--vidz legend { color: #ef4444; }
+
+.tcp-landing-card-body { padding: 15px; }
+
+.tcp-landing-card-icon {
+  font-size: 1.4em;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.tcp-landing-card-icon--bio {
+  color: #8B00FF;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+.tcp-landing-card-icon--releases { color: #9B59B6; }
+.tcp-landing-card-icon--vidz { color: #ef4444; }
+
+.tcp-landing-card-desc {
+  color: #999;
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+.tcp-landing-footer {
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #8B00FF;
+}
+
+.tcp-landing-footer p {
+  color: #8B00FF;
+  font-size: 0.85em;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+@media (max-width: 767px) {
+  .tui-window.tcp-landing-window { max-width: 100%; box-shadow: none; }
+  .tcp-landing-legend { letter-spacing: 1px; }
+  .tcp-landing-content { padding: 15px; }
+  .tcp-landing-heading { font-size: 1.3em; }
+  .tcp-landing-lore { padding: 15px; }
+  .tcp-landing-cards { grid-template-columns: 1fr; gap: 15px; }
+  .tcp-landing-card-body { padding: 10px; }
+}
+
+/* --- XERAEN landing (/xeraen) --------------------------------------- */
+
+.tui-window.xeraen-landing-window {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: block;
+  background: #0a0a0a;
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-landing-fieldset { border-color: #8B00FF; }
+
+.xeraen-landing-legend {
+  color: #8B00FF;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  letter-spacing: 3px;
+}
+
+.xeraen-landing-content { padding: 30px; }
+
+.xeraen-landing-heading {
+  text-align: center;
+  margin-bottom: 5px;
+  color: #8B00FF;
+  font-size: 1.8em;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  letter-spacing: 3px;
+}
+
+.xeraen-landing-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 0.9em;
+}
+
+.xeraen-landing-lore {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95));
+  border: 1px solid #8B00FF;
+  line-height: 1.8;
+}
+
+.xeraen-landing-lore-open { color: #ccc; margin-bottom: 15px; }
+.xeraen-landing-lore-mid { color: #aaa; margin-bottom: 15px; }
+.xeraen-landing-lore-close { color: #888; }
+
+.xeraen-landing-highlight {
+  color: #8B00FF;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-landing-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.xeraen-landing-card-link { text-decoration: none; }
+
+.tui-window.xeraen-landing-card {
+  background: #0d0d0d;
+  cursor: pointer;
+  height: 100%;
+}
+
+.tui-window.xeraen-landing-card--bio { border: 1px solid #8B00FF; }
+.tui-window.xeraen-landing-card--releases { border: 1px solid #9B59B6; }
+
+.xeraen-landing-card--bio fieldset { border-color: #8B00FF; height: 100%; }
+.xeraen-landing-card--releases fieldset { border-color: #9B59B6; height: 100%; }
+
+.xeraen-landing-card--bio legend { color: #8B00FF; }
+.xeraen-landing-card--releases legend { color: #9B59B6; }
+
+.xeraen-landing-card-body { padding: 15px; }
+
+.xeraen-landing-card-icon {
+  font-size: 1.4em;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.xeraen-landing-card-icon--bio {
+  color: #8B00FF;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+.xeraen-landing-card-icon--releases { color: #9B59B6; }
+
+.xeraen-landing-card-desc {
+  color: #999;
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+.xeraen-landing-footer {
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #8B00FF;
+}
+
+.xeraen-landing-footer p {
+  color: #8B00FF;
+  font-size: 0.85em;
+  font-style: italic;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+@media (max-width: 767px) {
+  .tui-window.xeraen-landing-window { max-width: 100%; box-shadow: none; }
+  .xeraen-landing-legend { letter-spacing: 1px; }
+  .xeraen-landing-content { padding: 15px; }
+  .xeraen-landing-heading { font-size: 1.3em; }
+  .xeraen-landing-lore { padding: 15px; }
+  .xeraen-landing-cards { grid-template-columns: 1fr; gap: 15px; }
+  .xeraen-landing-card-body { padding: 10px; }
+}
+
+/* --- The.CyberPul.se bio (/thecyberpulse/bio) ------------------------ */
+
+.tui-window.tcp-window {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+  background: #0a0a0a;
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-fieldset { border-color: #8B00FF; }
+
+.tcp-legend {
+  color: #8B00FF;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  letter-spacing: 3px;
+}
+
+.tcp-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95));
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6), inset 0 0 20px rgba(139, 0, 255, 0.1);
+}
+
+.tcp-intro-heading {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #8B00FF;
+  letter-spacing: 3px;
+  font-size: 1.8em;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+}
+
+.tcp-intro-lead {
+  color: #8B00FF;
+  line-height: 1.8;
+  margin-bottom: 18px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-intro-body {
+  color: #ddd;
+  line-height: 1.8;
+  font-size: 1.05em;
+}
+
+.tcp-intro-close {
+  color: #8B00FF;
+  line-height: 1.8;
+  margin-top: 20px;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+/* Body copy shades — each maps to a recurring inline
+ * color / lineHeight 1.8 / marginBottom 15px trio in the source. */
+.tcp-p-ccc { color: #ccc; line-height: 1.8; margin-bottom: 15px; }
+.tcp-p-ddd { color: #ddd; line-height: 1.8; margin-bottom: 15px; }
+.tcp-p-aaa { color: #aaa; line-height: 1.8; margin-bottom: 15px; }
+.tcp-p-bbb { color: #bbb; line-height: 1.8; margin-bottom: 15px; }
+.tcp-p-lg { font-size: 1.05em; }
+
+.tui-window.tcp-section {
+  margin-bottom: 30px;
+  background: #000000;
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 25px rgba(139, 0, 255, 0.2);
+}
+
+.tcp-section-fieldset { border-color: #8B00FF; }
+
+.tcp-section-legend {
+  color: #8B00FF;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.8);
+  letter-spacing: 2px;
+}
+
+.tcp-section-body { padding: 20px; }
+
+.tcp-vod-body { padding: 20px; }
+
+.tcp-vod-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.tcp-vod-frame {
+  position: relative;
+  width: 560px;
+  height: 315px;
+  max-width: 100%;
+  background: #000;
+}
+
+.tcp-vod-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.tcp-vod-title {
+  text-align: center;
+  color: #ccc;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.tcp-vod-link-wrap { text-align: center; }
+
+.tcp-vod-link {
+  color: #8B00FF;
+  text-decoration: none;
+  font-size: 0.9em;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-broadcast-lead {
+  color: #8B00FF;
+  margin-bottom: 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-callout {
+  line-height: 1.8;
+  font-size: 1.1em;
+  padding: 15px;
+  background: rgba(139, 0, 255, 0.1);
+  border-left: 4px solid #8B00FF;
+}
+
+.tcp-callout--bold {
+  color: #9B59B6;
+  font-weight: bold;
+}
+
+.tcp-callout--quote {
+  color: #8B00FF;
+  font-style: italic;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-host-xeraen { margin-bottom: 30px; }
+
+.tcp-host-name {
+  color: #8B00FF;
+  margin-bottom: 15px;
+  font-size: 1.4em;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-ryker-lead {
+  color: #9B59B6;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.tcp-host-divider {
+  border: none;
+  border-top: 1px solid #8B00FF;
+  margin: 30px 0;
+  opacity: 0.5;
+}
+
+.tcp-status-box {
+  font-family: monospace;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(139, 0, 255, 0.1);
+  border: 1px solid #8B00FF;
+  color: #8B00FF;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-grid-close {
+  color: #8B00FF;
+  line-height: 1.8;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-transmit-card {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(139, 0, 255, 0.05);
+  border: 1px solid rgba(139, 0, 255, 0.3);
+}
+
+.tcp-transmit-card--last { margin-bottom: 15px; }
+
+.tcp-transmit-heading {
+  color: #8B00FF;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-transmit-text { color: #ddd; line-height: 1.8; }
+.tcp-transmit-note { color: #aaa; line-height: 1.8; margin-top: 10px; }
+
+.tcp-paradox-close {
+  color: #8B00FF;
+  line-height: 1.8;
+  font-size: 1.15em;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
+}
+
+.tcp-cta {
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(139, 0, 255, 0.15), rgba(0, 0, 0, 0.95));
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
+  margin-bottom: 30px;
+}
+
+.tcp-cta-quote {
+  color: #ddd;
+  line-height: 2;
+  font-size: 1.1em;
+  margin: 0;
+  padding: 0 20px;
+  border-left: 4px solid #8B00FF;
+}
+
+.tcp-cta-quote p { margin-bottom: 10px; }
+
+.tcp-cta-close {
+  color: #8B00FF;
+  margin-top: 25px;
+  font-size: 1.4em;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  letter-spacing: 2px;
+}
+
+.tcp-nav-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.tui-button.tcp-btn-back {
+  background: #222;
+  color: #888;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.tui-button.tcp-btn-primary {
+  background: #8B00FF;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(139, 0, 255, 0.6);
+  text-align: center;
+}
+
+.tui-button.tcp-btn-grid {
+  background: #9B59B6;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(155, 89, 182, 0.6);
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .tui-window.tcp-window { max-width: 100%; box-shadow: none; }
+  .tcp-legend { letter-spacing: 1px; }
+  .tcp-vod-body { padding: 10px; }
+  .tcp-vod-frame { width: 100%; height: auto; aspect-ratio: 16 / 9; }
+  .tcp-nav-buttons { flex-direction: column; gap: 10px; }
+}
+
+/* --- XERAEN bio (/xeraen/bio) ---------------------------------------- */
+
+.tui-window.xeraen-window {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+  background: #0a0a0a;
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-fieldset { border-color: #8B00FF; }
+
+.xeraen-legend {
+  color: #8B00FF;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  letter-spacing: 3px;
+}
+
+.xeraen-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95));
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6), inset 0 0 20px rgba(139, 0, 255, 0.1);
+}
+
+.xeraen-intro-heading {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #8B00FF;
+  letter-spacing: 3px;
+  font-size: 1.8em;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+}
+
+.xeraen-intro-lead {
+  color: #8B00FF;
+  line-height: 1.8;
+  margin-bottom: 18px;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-intro-close {
+  color: #8B00FF;
+  line-height: 1.8;
+  font-size: 1.1em;
+  font-style: italic;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-p-ccc { color: #ccc; line-height: 1.8; margin-bottom: 15px; }
+.xeraen-p-ddd { color: #ddd; line-height: 1.8; margin-bottom: 15px; }
+.xeraen-p-lg { font-size: 1.05em; }
+
+.tui-window.xeraen-section {
+  margin-bottom: 30px;
+  background: #000000;
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 25px rgba(139, 0, 255, 0.2);
+}
+
+.xeraen-section-fieldset { border-color: #8B00FF; }
+
+.xeraen-section-legend {
+  color: #8B00FF;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.8);
+  letter-spacing: 2px;
+}
+
+.xeraen-section-body { padding: 20px; }
+
+.xeraen-tuning {
+  color: #8B00FF;
+  font-family: monospace;
+  text-align: center;
+}
+
+.xeraen-omniwave {
+  color: #8B00FF;
+  font-weight: bold;
+}
+
+.xeraen-solo-close {
+  color: #8B00FF;
+  line-height: 1.8;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-status-box {
+  font-family: monospace;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(139, 0, 255, 0.1);
+  border: 1px solid #8B00FF;
+  color: #8B00FF;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-transmitter-note { color: #ccc; line-height: 1.8; }
+
+.xeraen-signal-card {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(139, 0, 255, 0.05);
+  border: 1px solid rgba(139, 0, 255, 0.3);
+}
+
+.xeraen-signal-card--last { margin-bottom: 15px; }
+
+.xeraen-signal-heading {
+  color: #8B00FF;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-signal-text { color: #ddd; line-height: 1.8; }
+.xeraen-signal-text--spaced { margin-bottom: 15px; }
+
+.xeraen-love-quote {
+  color: #8B00FF;
+  line-height: 1.8;
+  font-style: italic;
+  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-erasure-close {
+  color: #8B00FF;
+  line-height: 1.8;
+  font-size: 1.15em;
+  font-weight: bold;
+  font-style: italic;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
+}
+
+.xeraen-paradox-note { color: #aaa; line-height: 1.8; }
+
+.xeraen-quote {
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(139, 0, 255, 0.15), rgba(0, 0, 0, 0.95));
+  border: 2px solid #8B00FF;
+  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
+  margin-bottom: 30px;
+}
+
+.xeraen-quote-block {
+  color: #ddd;
+  line-height: 2;
+  font-size: 1.1em;
+  margin: 0;
+  padding: 0 20px;
+  border-left: 4px solid #8B00FF;
+}
+
+.xeraen-quote-block p { margin-bottom: 10px; }
+.xeraen-quote-block p.xeraen-quote-gap { margin-top: 20px; }
+
+.xeraen-quote-sig {
+  color: #8B00FF;
+  margin-top: 25px;
+  font-size: 1.2em;
+  font-style: italic;
+  text-align: right;
+  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
+  letter-spacing: 1px;
+}
+
+.xeraen-quote-sig-meta {
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.xeraen-nav-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.tui-button.xeraen-btn-back {
+  background: #222;
+  color: #888;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.tui-button.xeraen-btn-primary {
+  background: #8B00FF;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(139, 0, 255, 0.6);
+  text-align: center;
+}
+
+.tui-button.xeraen-btn-pulse {
+  background: #6B00CC;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(107, 0, 204, 0.6);
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .tui-window.xeraen-window { max-width: 100%; box-shadow: none; }
+  .xeraen-legend { letter-spacing: 1px; }
+  .xeraen-nav-buttons { flex-direction: column; gap: 10px; }
+  .tui-button.xeraen-btn-primary,
+  .tui-button.xeraen-btn-pulse { box-shadow: none; }
+}
+
+/* --- Embedded track card (EmbeddedTrack.tsx, used on /xeraen/bio) ----
+ * Keeps the React component's .embedded-track-player class so the
+ * band-profile mobile fixes in default.css keep applying. Active-state
+ * styling keys off the player contract's .track-row--active /
+ * .play-track-btn--active classes (toggled by track_list_controller). */
+
+.embedded-track-player {
+  border: 2px solid #7c3aed;
+  padding: 20px;
+  margin-bottom: 20px;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.embedded-track-player.track-row--active { background: #2d1b4e; }
+
+.embedded-track-cover {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border: 2px solid #7c3aed;
+  overflow: hidden;
+}
+
+.embedded-track-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.embedded-track-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.embedded-track-title {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-row--active .embedded-track-title { color: #a78bfa; }
+
+.embedded-track-artist {
+  color: #a78bfa;
+  font-size: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.play-track-btn.embedded-track-btn {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: monospace;
+}
+
+.play-track-btn.embedded-track-btn:hover { background: #9333ea; }
+
+.play-track-btn.embedded-track-btn.play-track-btn--active {
+  background: #9333ea;
+  color: #00d9ff;
+}
+
+/* --- Sector X (/sector/x) -------------------------------------------- */
+
+.tui-window.sectorx-window {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+  background: #0a0a0a;
+  border: 2px solid #14b8a6;
+  box-shadow: 0 0 30px rgba(20, 184, 166, 0.6);
+}
+
+.sectorx-fieldset { border-color: #14b8a6; }
+
+.sectorx-legend {
+  color: #14b8a6;
+  text-shadow: 0 0 15px rgba(20, 184, 166, 0.8);
+  letter-spacing: 3px;
+}
+
+.sectorx-body {
+  padding: 40px;
+  text-align: center;
+}
+
+.sectorx-coming-soon {
+  color: #14b8a6;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
+
+.sectorx-tagline { color: #888; }
+
+/* --- Wavelength Zero (/wavelength-zero) ------------------------------
+ * Note: where the React source listed borderLeft before the border
+ * shorthand in the same style object (intro, philosophy, manifesto),
+ * the shorthand overwrote it — the rendered border was uniform. These
+ * rules port the computed result. */
+
+.tui-window.wz-window {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+  border: 3px solid transparent;
+  background-color: #0a0a0a;
+  background-image: linear-gradient(#0a0a0a, #0a0a0a), linear-gradient(90deg, #ff0080, #ff8c00, #ffed00, #00ff00, #00d9ff, #8b00ff);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.wz-fieldset { border: none; }
+
+.wz-legend {
+  background: linear-gradient(90deg, #ff0080, #ff8c00, #ffed00, #00ff00, #00d9ff, #8b00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.wz-intro {
+  margin-bottom: 30px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(255, 0, 128, 0.08), rgba(139, 0, 255, 0.05));
+  border: 2px solid rgba(255, 0, 128, 0.3);
+  box-shadow: 0 0 30px rgba(255, 0, 128, 0.2), inset 0 0 20px rgba(139, 0, 255, 0.1);
+}
+
+.wz-intro-lead {
+  color: #ff0080;
+  line-height: 1.9;
+  margin-bottom: 20px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-shadow: 0 0 15px rgba(255, 0, 128, 0.8);
+}
+
+.wz-intro-numb {
+  color: #bbb;
+  line-height: 1.8;
+  margin-bottom: 18px;
+  font-size: 1.05em;
+}
+
+.wz-intro-remember {
+  color: #aaa;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+
+.wz-intro-close {
+  color: #ddd;
+  line-height: 1.8;
+  font-style: italic;
+  font-size: 1.1em;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.tui-window.wz-philosophy {
+  margin-bottom: 30px;
+  background: rgba(139, 0, 255, 0.05);
+  border: 2px solid rgba(139, 0, 255, 0.3);
+  box-shadow: 0 0 25px rgba(139, 0, 255, 0.2);
+}
+
+.wz-philosophy-fieldset { border: none; }
+
+.wz-philosophy-legend {
+  color: #8b00ff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
+  font-size: 1.1em;
+}
+
+.wz-philosophy-body { padding: 20px; }
+
+.wz-offer {
+  margin-bottom: 25px;
+  padding: 15px;
+}
+
+.wz-offer--see {
+  background: linear-gradient(135deg, rgba(255, 0, 128, 0.1), rgba(255, 140, 0, 0.05));
+  border: 1px solid rgba(255, 0, 128, 0.3);
+  border-bottom: 2px solid rgba(255, 0, 128, 0.4);
+}
+
+.wz-offer--remember {
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 255, 0, 0.05));
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  border-bottom: 2px solid rgba(0, 217, 255, 0.4);
+}
+
+.wz-offer--feel {
+  background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(139, 0, 255, 0.05));
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-bottom: 2px solid rgba(0, 255, 0, 0.4);
+}
+
+.wz-offer-heading {
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-size: 1em;
+  letter-spacing: 1px;
+}
+
+.wz-offer--see .wz-offer-heading {
+  color: #ff0080;
+  text-shadow: 0 0 10px rgba(255, 0, 128, 0.7);
+}
+
+.wz-offer--remember .wz-offer-heading {
+  color: #00d9ff;
+  text-shadow: 0 0 10px rgba(0, 217, 255, 0.7);
+}
+
+.wz-offer--feel .wz-offer-heading {
+  color: #00ff00;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+}
+
+.wz-offer-text { color: #ddd; line-height: 1.8; }
+
+.wz-manifesto {
+  color: #ddd;
+  margin-top: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(255, 0, 128, 0.15), rgba(139, 0, 255, 0.1));
+  border: 2px solid rgba(255, 0, 128, 0.4);
+  line-height: 1.9;
+  font-style: italic;
+  font-size: 1.05em;
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.3), inset 0 0 15px rgba(139, 0, 255, 0.1);
+}
+
+.wz-nav-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.tui-button.wz-btn-back {
+  background: #1a1a1a;
+  color: #888;
+  border: 1px solid #333;
+}
+
+.tui-button.wz-btn-primary {
+  background: linear-gradient(90deg, #ff0080, #8b00ff);
+  color: white;
+  font-weight: bold;
+  border: none;
+}

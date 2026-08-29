@@ -3,27 +3,9 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { trackEvent } from '~/utils/analyticsCollector'
 import { LoadingPage } from '~/components/shared/LoadingSpinner'
 
-// Lazy load pages for code splitting
-const PulseVaultPage = lazy(() => import('~/components/pages/fm/PulseVaultPage').then(m => ({ default: m.PulseVaultPage })))
-const FmLandingPage = lazy(() => import('~/components/pages/fm/FmLandingPage').then(m => ({ default: m.FmLandingPage })))
-const FmReleasesPage = lazy(() => import('~/components/pages/fm/FmReleasesPage').then(m => ({ default: m.FmReleasesPage })))
-const RadioPage = lazy(() => import('~/components/pages/fm/RadioPage').then(m => ({ default: m.RadioPage })))
-const BandsPage = lazy(() => import('~/components/pages/fm/BandsPage').then(m => ({ default: m.BandsPage })))
-const PlaylistsPage = lazy(() => import('~/components/pages/playlists/PlaylistsPage').then(m => ({ default: m.PlaylistsPage })))
-const PlaylistDetailPage = lazy(() => import('~/components/pages/playlists/PlaylistDetailPage').then(m => ({ default: m.PlaylistDetailPage })))
-const SharedPlaylistPage = lazy(() => import('~/components/pages/playlists/SharedPlaylistPage').then(m => ({ default: m.SharedPlaylistPage })))
-const TheCyberPulseLandingPage = lazy(() => import('~/components/pages/artist/TheCyberPulseLandingPage').then(m => ({ default: m.TheCyberPulseLandingPage })))
-const TheCyberPulsePage = lazy(() => import('~/components/pages/artist/TheCyberPulsePage'))
-const XeraenLandingPage = lazy(() => import('~/components/pages/artist/XeraenLandingPage').then(m => ({ default: m.XeraenLandingPage })))
-const XeraenPage = lazy(() => import('~/components/pages/artist/XeraenPage'))
-const VodzPage = lazy(() => import('~/components/pages/artist/VodzPage'))
-const VodzShowPage = lazy(() => import('~/components/pages/artist/VodzShowPage'))
-const SectorXPage = lazy(() => import('~/components/pages/artist/SectorXPage'))
-const BandProfilePage = lazy(() => import('~/components/pages/artist/BandProfilePage'))
-const WavelengthZeroPage = lazy(() => import('~/components/pages/artist/WavelengthZeroPage'))
-const TrackDetailPage = lazy(() => import('~/components/pages/tracks/TrackDetailPage'))
-const ReleaseListPage = lazy(() => import('~/components/pages/releases/ReleaseListPage'))
-const ReleaseDetailPage = lazy(() => import('~/components/pages/releases/ReleaseDetailPage'))
+// Lazy load pages for code splitting.
+// The music cluster (fm, vault, playlists, artists, releases, bands)
+// migrated to Hotwire in Phase 4 — only THE PULSE GRID + Uplink remain.
 const GridGamePage = lazy(() => import('~/components/pages/grid/GridGamePage').then(m => ({ default: m.GridGamePage })))
 const GridTacticalPage = lazy(() => import('~/components/pages/grid/GridTacticalPage').then(m => ({ default: m.GridTacticalPage })))
 const AchievementsPage = lazy(() => import('~/components/pages/grid/AchievementsPage'))
@@ -55,38 +37,6 @@ export const AppLayout: React.FC = () => {
       <AchievementToastContainer />
       <Suspense fallback={<LoadingPage message="Loading page..." />}>
         <Routes>
-          <Route path="/fm" element={<FmLandingPage />} />
-          <Route path="/fm/releases" element={<FmReleasesPage />} />
-          <Route path="/vault" element={<PulseVaultPage />} />
-          <Route path="/fm/radio" element={<RadioPage />} />
-          <Route path="/f/net" element={<BandsPage />} />
-          {/* Playlist routes - protected */}
-          <Route path="/fm/playlists" element={<ProtectedRoute><PlaylistsPage /></ProtectedRoute>} />
-          <Route path="/fm/playlists/:id" element={<ProtectedRoute><PlaylistDetailPage /></ProtectedRoute>} />
-          {/* Shared playlist - public */}
-          <Route path="/shared/:token" element={<SharedPlaylistPage />} />
-          <Route path="/thecyberpulse" element={<TheCyberPulseLandingPage />} />
-          <Route path="/thecyberpulse/bio" element={<TheCyberPulsePage />} />
-          <Route path="/thecyberpulse/releases" element={<ReleaseListPage />} />
-          <Route path="/thecyberpulse/releases/:releaseSlug" element={<ReleaseDetailPage />} />
-          <Route path="/thecyberpulse/trackz/:trackSlug" element={<TrackDetailPage />} />
-          <Route path="/thecyberpulse/vidz" element={<VodzPage />} />
-          <Route path="/thecyberpulse/vidz/:id" element={<VodzShowPage />} />
-          <Route path="/xeraen" element={<XeraenLandingPage />} />
-          <Route path="/xeraen/bio" element={<XeraenPage />} />
-          <Route path="/xeraen/releases" element={<ReleaseListPage />} />
-          <Route path="/xeraen/releases/:releaseSlug" element={<ReleaseDetailPage />} />
-          <Route path="/xeraen/trackz/:trackSlug" element={<TrackDetailPage />} />
-          <Route path="/xeraen/vidz" element={<VodzPage />} />
-          <Route path="/xeraen/vidz/:id" element={<VodzShowPage />} />
-          <Route path="/sector/x" element={<SectorXPage />} />
-          {/* Wavelength Zero has a custom landing page */}
-          <Route path="/wavelength-zero" element={<WavelengthZeroPage />} />
-          {/* Dynamic artist routes — catches any artist slug */}
-          <Route path="/:artistSlug" element={<BandProfilePage />} />
-          <Route path="/:artistSlug/releases" element={<ReleaseListPage />} />
-          <Route path="/:artistSlug/releases/:releaseSlug" element={<ReleaseDetailPage />} />
-          <Route path="/:artistSlug/trackz/:trackSlug" element={<TrackDetailPage />} />
           {/* THE PULSE GRID routes */}
           <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
           <Route path="/missions" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />

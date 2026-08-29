@@ -1,7 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { AudioProvider } from '~/contexts/AudioContext'
 import { MobileMenuProvider } from '~/contexts/MobileMenuContext'
 import { AppSettingsProvider } from '~/contexts/AppSettingsContext'
 import { TerminalProvider } from '~/contexts/TerminalContext'
@@ -54,9 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <GridAuthProvider>
                 <MobileMenuProvider>
                   <TerminalProvider>
-                    <AudioProvider>
-                      <AppLayout />
-                    </AudioProvider>
+                    <AppLayout />
                   </TerminalProvider>
                 </MobileMenuProvider>
               </GridAuthProvider>

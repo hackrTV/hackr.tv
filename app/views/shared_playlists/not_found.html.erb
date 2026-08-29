@@ -1,0 +1,15 @@
+<% content_for :title, "Playlist Not Found — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="playlists-wrap playlists-wrap--narrow">
+    <div class="tui-window">
+      <fieldset class="tui-fieldset">
+        <legend>ERROR</legend>
+        <div class="playlists-empty__body">
+          <p class="playlist-error">This shared playlist doesn't exist or is no longer public.</p>
+          <%= link_to "Go to hackr.fm", "/fm/radio", class: "tui-button playlists-create-btn" %>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+<% end %>

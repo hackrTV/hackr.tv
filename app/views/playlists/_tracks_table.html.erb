@@ -1,0 +1,44 @@
+<%# Playlist tracks table (detail + shared pages). Rows carry the
+    data-player-* contract so track-list#playAll can queue them; the
+    editable variant adds drag handles, move buttons, and Remove.
+    Locals: tracks (playlist_tracks w/ track preloaded), editable, playlist (nil when read-only). %>
+<table class="playlist-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Track</th>
+      <th>Artist</th>
+      <th>Release</th>
+      <th>Duration</th>
+      <% if editable %><th class="playlist-table__actions-head">Actions</th><% end %>
+    </tr>
+  </thead>
+  <tbody <%= 'data-playlist-reorder-target="body"'.html_safe if editable %>>
+    <% tracks.each_with_index do |playlist_track, index| %>
+      <% track = playlist_track.track %>
+      <tr class="track-row playlist-table__row" <%= "draggable=true" if editable %>
+          <%= tag.attributes(data: player_track_attrs(track).merge(track_ref_id: track.id)) %>>
+        <td class="playlist-table__position">
+          <% if editable %><span class="playlist-table__grip">☰</span><% end %>
+          <span <%= 'data-playlist-reorder-target="position"'.html_safe if editable %>><%= index + 1 %></span>
+        </td>
+        <td class="playlist-table__title"><%= track.title %></td>
+        <td class="playlist-table__dim"><%= track.artist.name %></td>
+        <td class="playlist-table__dim"><%= track.release&.name || "-" %></td>
+        <td class="playlist-table__dim"><%= track.duration.presence || "--:--" %></td>
+        <% if editable %>
+          <td class="playlist-table__actions">
+            <button type="button" class="tui-button playlist-table__move" title="Move up"
+                    data-action="playlist-reorder#moveUp">↑</button>
+            <button type="button" class="tui-button playlist-table__move" title="Move down"
+                    data-action="playlist-reorder#moveDown">↓</button>
+            <%= button_to "Remove", fm_playlist_remove_track_path(playlist, playlist_track.id),
+                  method: :delete, class: "tui-button playlist-table__remove",
+                  form_class: "playlist-table__remove-form",
+                  form: {data: {turbo_confirm: "Remove \"#{track.title}\" from this playlist?"}} %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

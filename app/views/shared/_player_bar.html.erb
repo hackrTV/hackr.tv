@@ -1,0 +1,107 @@
+<%# Permanent audio player (Phase 4). The wrapper #player-bar in the layout
+    is data-turbo-permanent, so this markup — and the <audio> inside it —
+    survives every Turbo visit. Rendered once per full page load; pages feed
+    it tracks via document events (see player_controller.ts). %>
+<audio data-player-target="audio" id="audio-element" preload="auto" hidden></audio>
+
+<div class="player-bar" data-player-target="bar" hidden>
+  <div class="player-bar__inner">
+    <div class="player-cover" data-player-target="cover" hidden
+         data-action="mouseenter->player#showCoverOverlay mouseleave->player#hideCoverOverlay">
+      <img id="player-cover" alt="Album Cover" data-player-target="coverImg">
+    </div>
+    <div class="player-cover-overlay" data-player-target="coverOverlay" hidden>
+      <img alt="Album Cover" data-player-target="coverOverlayImg">
+    </div>
+
+    <button id="play-pause-btn" class="tui-button player-play-pause" tabindex="-1"
+            data-player-target="playPause" data-action="player#togglePlayPause">► PLAY</button>
+
+    <span class="player-nav" data-player-target="controls">
+      <button class="tui-button player-nav-btn" tabindex="-1" title="Previous track"
+              data-action="player#previous">⏮</button>
+      <button class="tui-button player-nav-btn" tabindex="-1" title="Next track"
+              data-action="player#next">⏭</button>
+      <button class="tui-button player-nav-btn player-shuffle-btn" tabindex="-1" title="Shuffle: Off"
+              data-player-target="shuffleButton" data-action="player#toggleShuffle">⤮</button>
+    </span>
+
+    <div class="player-info">
+      <div class="player-station" data-player-target="station" hidden>
+        <span class="player-station__name">📻 <span data-player-target="stationName"></span></span>
+      </div>
+      <div class="player-track-info">
+        <span id="track-title" data-player-target="title">No track loaded</span><span
+          class="player-track-info__sep"> - </span><span id="track-artist" data-player-target="artist">-</span>
+      </div>
+      <div class="player-seek">
+        <span id="current-time" data-player-target="currentTime">0:00</span>
+        <input type="range" id="seek-bar" min="0" max="100" value="0" tabindex="-1"
+               data-player-target="seekBar"
+               data-action="mousedown->player#seekStart touchstart->player#seekStart input->player#seekInput mouseup->player#seekEnd touchend->player#seekEnd">
+        <span id="duration" data-player-target="duration">0:00</span>
+      </div>
+    </div>
+
+    <div class="player-volume">
+      <label for="volume-control">Volume:</label>
+      <input type="range" id="volume-control" min="0" max="100" value="70" tabindex="-1"
+             data-action="player#volumeInput">
+    </div>
+
+    <% if logged_in? %>
+      <div class="player-add-to-playlist" data-controller="add-to-playlist"
+           data-add-to-playlist-direction-value="up" data-player-target="addToPlaylist">
+        <button class="tui-button add-to-playlist__toggle" data-action="add-to-playlist#toggle">+ Playlist</button>
+        <div class="add-to-playlist__panel" data-add-to-playlist-target="panel" hidden>
+          <div class="add-to-playlist__header">
+            <div class="add-to-playlist__heading">Add to Playlist</div>
+            <div class="add-to-playlist__track" data-add-to-playlist-target="trackLabel"></div>
+          </div>
+          <div class="add-to-playlist__message" data-add-to-playlist-target="message" hidden></div>
+          <div class="add-to-playlist__body">
+            <form class="add-to-playlist__create" data-add-to-playlist-target="createForm" hidden
+                  data-action="submit->add-to-playlist#create">
+              <input type="text" placeholder="Playlist name..." maxlength="100"
+                     data-add-to-playlist-target="createName">
+              <button type="submit" class="tui-button">Create</button>
+            </form>
+            <button class="tui-button add-to-playlist__new" data-action="add-to-playlist#showCreate">+ Create New Playlist</button>
+            <div class="add-to-playlist__list" data-add-to-playlist-target="list"></div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="player-queue" data-player-target="queue">
+      <button class="tui-button player-queue__toggle" tabindex="-1" title="Show queue"
+              data-player-target="queueToggle" data-action="player#toggleQueue">☰ Queue<span data-player-target="queueCount"></span></button>
+      <div class="player-queue-panel" data-player-target="queuePanel" hidden>
+        <div class="player-queue-panel__header">
+          <div class="player-queue-panel__title">Up Next</div>
+          <button class="tui-button player-queue-panel__close" data-action="player#closeQueue">✕</button>
+        </div>
+        <div class="player-queue-panel__list" data-player-target="queueList"></div>
+        <div class="player-queue-panel__more" data-player-target="queueMore" hidden></div>
+      </div>
+    </div>
+
+    <button id="close-player-btn" class="tui-button player-close" tabindex="-1"
+            data-action="player#close">✕</button>
+  </div>
+</div>
+
+<template data-player-target="queueItemTemplate">
+  <div class="player-queue-item" data-action="click->player#queueItemClicked">
+    <img class="player-queue-item__cover" alt="">
+    <div class="player-queue-item__info">
+      <div class="player-queue-item__title-row">
+        <span class="player-queue-item__marker" hidden>▶</span>
+        <span class="player-queue-item__title"></span>
+      </div>
+      <div class="player-queue-item__artist"></div>
+    </div>
+    <span class="player-queue-item__badge-current" hidden>NOW PLAYING</span>
+    <span class="player-queue-item__badge-next" hidden>UP NEXT</span>
+  </div>
+</template>

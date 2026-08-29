@@ -1,0 +1,79 @@
+<%# ERB port of WavelengthZeroPage.tsx (GET /wavelength-zero). The
+    bio-credit controller replays the bio_viewed achievement POST the
+    React page fired on mount for logged-in viewers. %>
+<% content_for :title, "Wavelength Zero — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome" do %>
+  <div class="tui-window white-text wz-window"
+       data-controller="bio-credit" data-bio-credit-slug-value="wavelength-zero">
+    <fieldset class="wz-fieldset">
+      <legend class="center wz-legend">WAVELENGTH ZERO</legend>
+
+      <div>
+        <div class="wz-intro">
+          <p class="wz-intro-lead">
+            When was the last time you felt something real?
+          </p>
+          <p class="wz-intro-numb">
+            They've given you comfort. Safety. A world where nothing hurts because nothing touches you.
+            Every edge smoothed. Every color muted to gray. Every moment of chaos filtered into calm.
+          </p>
+          <p class="wz-intro-remember">
+            But you remember, don't you? Before the feeds. Before the filters. Before they convinced you
+            that numbness was peace.
+          </p>
+          <p class="wz-intro-close">
+            We're here to remind you what color looks like.
+          </p>
+        </div>
+
+        <div class="tui-window white-text wz-philosophy">
+          <fieldset class="wz-philosophy-fieldset">
+            <legend class="wz-philosophy-legend">WHAT WE OFFER</legend>
+
+            <div class="wz-philosophy-body">
+              <div class="wz-offer wz-offer--see">
+                <h3 class="wz-offer-heading">See</h3>
+                <p class="wz-offer-text">
+                  Bend light through a prism and watch it split. That's what we do with their lies - refract them
+                  until you can see every hidden color. Gray isn't neutral. It's every wavelength dampened until
+                  you can't distinguish truth from control.
+                </p>
+              </div>
+
+              <div class="wz-offer wz-offer--remember">
+                <h3 class="wz-offer-heading">Remember</h3>
+                <p class="wz-offer-text">
+                  They can edit your feeds. Curate your reality. Filter every input until the world fits their narrative.
+                  But they can't touch what you've already felt. Your memories are the weapon they can't confiscate.
+                  That ache in your chest when you think of something real? That's yours. Keep it.
+                </p>
+              </div>
+
+              <div class="wz-offer wz-offer--feel">
+                <h3 class="wz-offer-heading">Feel</h3>
+                <p class="wz-offer-text">
+                  Their monochrome world is collapsing. You can feel it in the moments when the feed glitches and
+                  something raw breaks through. That chaos terrifies them - but it's real. Pain is real. Joy is real.
+                  Grief, hope, rage, love - all of it more real than the comfortable gray they're selling.
+                </p>
+              </div>
+
+              <p class="wz-manifesto">
+                We're not asking you to fight.<br>
+                We're asking you to feel something.<br>
+                Everything else follows.
+              </p>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="wz-nav-buttons">
+          <%= link_to "/f/net", class: "tui-button wz-btn-back" do %>← BACK TO FRACTURE NETWORK<% end %>
+          <%= link_to "/wavelength-zero/releases", class: "tui-button wz-btn-primary" do %>RELEASES<% end %>
+          <%= link_to "/vault?filter=wavelength%20zero", class: "tui-button wz-btn-primary" do %>LISTEN IN THE PULSE VAULT →<% end %>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

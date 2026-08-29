@@ -1,0 +1,73 @@
+<% content_for :title, "My Playlists — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="playlists-wrap" data-controller="dialog">
+    <div class="playlists-header">
+      <h1 class="playlists-title">MY PLAYLISTS</h1>
+      <button class="tui-button playlists-create-btn" data-action="dialog#open">+ Create Playlist</button>
+    </div>
+
+    <% if @playlists.empty? %>
+      <div class="tui-window playlists-empty">
+        <fieldset class="tui-fieldset">
+          <legend>NO PLAYLISTS YET</legend>
+          <div class="playlists-empty__body">
+            <p>Create your first playlist to organize your favorite tracks!</p>
+            <button class="tui-button playlists-create-btn" data-action="dialog#open">Create Your First Playlist</button>
+          </div>
+        </fieldset>
+      </div>
+    <% else %>
+      <div class="playlists-grid">
+        <% @playlists.each do |playlist| %>
+          <div class="tui-window playlist-card">
+            <fieldset class="tui-fieldset">
+              <legend class="playlist-card__legend"><%= playlist.is_public ? "🔓 PUBLIC" : "🔒 PRIVATE" %></legend>
+              <div class="playlist-card__body">
+                <%= link_to playlist.name, fm_playlist_path(playlist), class: "playlist-card__name" %>
+                <% if playlist.description.present? %>
+                  <p class="playlist-card__description"><%= playlist.description %></p>
+                <% end %>
+                <div class="playlist-card__meta">
+                  <div><%= pluralize(playlist.track_count, "track") %></div>
+                  <div>Created <%= playlist.created_at.strftime("%b %-d, %Y") %></div>
+                </div>
+                <div class="playlist-card__actions">
+                  <%= link_to "▶ Play", fm_playlist_path(playlist, autoplay: true), class: "tui-button playlist-card__play" %>
+                  <div class="playlist-card__actions-row">
+                    <%= link_to "View", fm_playlist_path(playlist), class: "tui-button playlist-card__view" %>
+                    <%= button_to "Delete", fm_playlist_path(playlist), method: :delete,
+                          class: "tui-button playlist-card__delete", form_class: "playlist-card__delete-form",
+                          form: {data: {turbo_confirm: "Delete playlist \"#{playlist.name}\"?\n\nThis action cannot be undone."}} %>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <dialog class="playlist-dialog" data-dialog-target="dialog">
+      <div class="tui-window playlist-dialog__window">
+        <fieldset class="tui-fieldset">
+          <legend>CREATE PLAYLIST</legend>
+          <%= form_with url: fm_playlists_path, method: :post, class: "playlist-form" do |f| %>
+            <div class="playlist-form__field">
+              <label for="playlist_name">Name</label>
+              <%= f.text_field "playlist[name]", id: "playlist_name", required: true, maxlength: 100 %>
+            </div>
+            <div class="playlist-form__field">
+              <label for="playlist_description">Description (optional)</label>
+              <%= f.text_area "playlist[description]", id: "playlist_description", rows: 3 %>
+            </div>
+            <div class="playlist-form__actions">
+              <%= f.submit "Create", class: "tui-button playlist-form__submit" %>
+              <button type="button" class="tui-button playlist-form__cancel" data-action="dialog#close">Cancel</button>
+            </div>
+          <% end %>
+        </fieldset>
+      </div>
+    </dialog>
+  </div>
+<% end %>

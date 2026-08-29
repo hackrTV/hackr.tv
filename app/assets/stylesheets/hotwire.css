@@ -808,3 +808,845 @@
 .live-embed.theater-mode .live-embed-row { flex: 1; margin-top: 10px; }
 .live-embed.theater-mode .live-video-frame { padding-bottom: 0; height: 100%; }
 body.theater-open { overflow: hidden; }
+
+/* --- Pulse Vault + shared track table (Phase 4) --- */
+.vault-window {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: block;
+  background: #1a1a1a;
+  border: 2px solid #666;
+}
+
+.vault-fieldset { border-color: #666; }
+
+.vault-legend { color: #a78bfa; }
+
+.vault-heading { text-align: center; margin-bottom: 15px; color: #a78bfa; }
+
+.vault-infobox {
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #0a0a0a;
+  border: 1px solid #444;
+}
+
+.vault-infobox p { color: #999; text-align: center; margin: 0; }
+
+.track-search { margin-bottom: 20px; }
+
+.track-search label { color: #888; display: block; margin-bottom: 8px; }
+
+.track-search input {
+  width: 100%;
+  padding: 10px;
+  background: #0a0a0a;
+  border: 1px solid #555;
+  color: #ccc;
+  font-family: monospace;
+  font-size: 1em;
+}
+
+.track-table-fieldset { border-color: #555; }
+.track-table-fieldset legend { color: #888; }
+
+.track-table { width: 100%; border-collapse: separate; border-spacing: 0 2px; }
+
+.track-table th { text-align: left; color: #888; }
+
+.track-table__stream-head { text-align: center !important; width: 120px; min-width: 120px; }
+
+.track-table__stream { text-align: center; width: 135px; min-width: 135px; }
+
+.track-row { cursor: pointer; }
+
+.track-row__title { color: #ccc; }
+.track-row__title--muted { color: #666; }
+
+.track-row__cell { color: #aaa; }
+.track-row__cell--dim { color: #999; }
+.track-row__cell--muted { color: #555; }
+
+.track-row--unplayable .track-row__cell,
+.track-row--unplayable .track-row__cell--dim { color: #555; }
+
+.play-track-btn { padding: 2px 12px; font-size: 0.85em; background: #7c3aed; color: white; }
+
+/* Mobile card list (React TrackTable's <768px view) */
+.track-cards { max-height: 60vh; overflow-y: auto; }
+
+.track-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #333;
+}
+
+.track-card.track-row--active { background: rgba(124, 58, 237, 0.15) !important; }
+
+.track-card__cover { flex-shrink: 0; width: 40px; height: 40px; position: relative; }
+
+.track-card__img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid #444;
+  border-radius: 2px;
+  display: block;
+}
+
+.track-row--active .track-card__img { border: 2px solid #7c3aed; }
+
+.track-card__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 14px;
+  border-radius: 2px;
+}
+
+.track-card__overlay::after { content: "►"; }
+
+.track-row--active .track-card__overlay { background: rgba(124, 58, 237, 0.7); }
+.track-row--active .track-card__overlay::after { content: "❚❚"; }
+
+.track-card__play-fallback, .track-card__no-audio {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+}
+
+.track-card__play-fallback { background: #333; color: #aaa; }
+.track-card__no-audio { background: #222; border: 1px solid #444; color: #555; }
+
+.track-card__info { flex: 1; min-width: 0; overflow: hidden; }
+
+.track-card__title {
+  color: #ccc;
+  font-weight: bold;
+  font-size: 0.95em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-row--active .track-card__title, .track-row--active .track-card__artist { color: #00ffff; }
+
+.track-card__artist {
+  color: #888;
+  font-size: 0.85em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+@media (max-width: 767px) {
+  .track-search label { font-size: 0.85em; }
+  .track-search input { padding: 12px; font-size: 16px; }  /* 16px prevents iOS zoom on focus */
+  .track-table-fieldset legend { font-size: 0.85em; }
+  .vault-heading { font-size: 1.1em; }
+}
+
+/* --- hackr.fm Radio (Phase 4) --- */
+.radio-window { max-width: 1200px; margin: 0 auto; display: block; }
+
+.radio-heading { text-align: center; margin-bottom: 15px; }
+
+.radio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.live-indicator { animation: livePulse 4s ease-in-out infinite; }
+
+.station-card__body { padding: 15px; }
+
+.station-card__status { margin-bottom: 10px; }
+
+.station-card__live { color: #00d9ff; font-weight: bold; font-size: 0.9em; margin-right: 10px; }
+
+.station-card__genre-row { margin-bottom: 10px; }
+
+.station-card__description { margin-bottom: 15px; line-height: 1.6; }
+
+.station-card__button { width: 100%; }
+
+.station-card__button--default { background: #222; color: white; }
+.station-card__button--default.tune-in-btn--current { background: #9333ea; }
+.station-card__button--stream-default { background: #222; color: white; }
+
+.station-card__button--sector-x { background: #14b8a6; color: white; box-shadow: 10px 10px #333; }
+.station-card__button--sector-x.tune-in-btn--current { background: #0d9488; }
+.station-card__button--stream-sector-x { background: #14b8a6; color: white; }
+
+.station-card__button--disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* TCP live-now variant */
+.station-card--live { background: #0d0d0d; border: 1px solid #00d9ff; }
+.station-card--live__fieldset { border-color: #00d9ff; }
+.station-card--live__legend { color: #00d9ff; }
+.station-card__live-now { color: #ff3333; font-weight: bold; font-size: 0.9em; margin-right: 10px; }
+.station-card--live__streamer { color: #00d9ff; font-weight: bold; }
+.station-card__stream-title { margin-bottom: 10px; color: #aaa; }
+.station-card--live .station-card__description { color: #999; }
+
+.station-card__watch-live {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #ff3333;
+  color: white;
+  box-shadow: 10px 10px #333;
+  text-decoration: none;
+}
+
+/* Sector X variant */
+.station-card--sector-x { background: #0d0d0d; border: 1px solid #444; }
+.station-card--sector-x__fieldset { border-color: #555; }
+.station-card--sector-x__legend { color: #14b8a6; }
+.station-card--sector-x__live { color: #14b8a6; font-weight: bold; font-size: 0.9em; margin-right: 10px; }
+.station-card--sector-x__genre { color: #888; }
+.station-card--sector-x__genre span { color: #aaa; }
+.station-card--sector-x__description { color: #999; }
+
+.radio-infobox {
+  margin-top: 30px;
+  padding: 20px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+}
+
+.radio-infobox h3 { margin-bottom: 10px; }
+.radio-infobox p { line-height: 1.6; color: #ccc; margin: 0; }
+
+/* Local raw-stream bar (separate from the permanent player) */
+.radio-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0a0a0a;
+  border-top: 2px solid #00d9ff;
+  padding: 15px 20px;
+  z-index: 1000;
+}
+
+.radio-bar__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.radio-bar__stop { background: #00d9ff; color: #000; min-width: 80px; font-weight: bold; }
+
+.radio-bar__info { flex: 1; }
+
+.radio-bar__live { color: #00d9ff; font-weight: bold; }
+.radio-bar__sep { color: #666; margin: 0 10px; }
+.radio-bar__station { color: #00d9ff; font-weight: bold; }
+.radio-bar__genre-row { margin-top: 5px; }
+.radio-bar__genre-label { color: #888; font-size: 0.9em; }
+.radio-bar__genre { color: #aaa; font-size: 0.9em; }
+
+.radio-bar__volume { display: flex; align-items: center; gap: 10px; }
+.radio-bar__volume span { color: #888; font-size: 0.9em; }
+
+.radio-bar__volume input[type="range"] {
+  width: 100px;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.radio-bar__volume input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #00d9ff;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.radio-bar__volume input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #00d9ff;
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+}
+
+.radio-bar__close { background: #444; color: #aaa; }
+
+/* --- Playlists (Phase 4) --- */
+.playlists-wrap { padding: 20px; max-width: 1400px; margin: 0 auto; }
+.playlists-wrap--narrow { max-width: 800px; }
+
+.playlists-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.playlists-title { color: #00d9ff; font-size: 2em; margin: 0; }
+
+.playlists-create-btn { background: #7c3aed; color: #fff; padding: 10px 20px; text-decoration: none; }
+
+.playlists-empty { max-width: 600px; margin: 40px auto; text-align: center; display: block; }
+
+.playlists-empty__body { padding: 40px 20px; }
+.playlists-empty__body p { color: #aaa; margin-bottom: 20px; font-size: 1.1em; }
+
+.playlist-error { color: #ff6b6b; }
+
+.playlists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.playlist-card__legend { color: #7c3aed; }
+.playlist-card__body { padding: 15px; }
+
+.playlist-card__name {
+  display: block;
+  color: #00d9ff;
+  text-decoration: none;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+
+.playlist-card__description { color: #aaa; font-size: 0.9em; margin: 0 0 15px 0; word-break: break-word; }
+
+.playlist-card__meta { color: #666; font-size: 0.85em; margin-bottom: 15px; }
+
+.playlist-card__actions { display: flex; gap: 8px; flex-direction: column; }
+.playlist-card__actions-row { display: flex; gap: 8px; }
+.playlist-card__actions-row form { flex: 1; display: flex; }
+
+.playlist-card__play { text-align: center; text-decoration: none; background: #7c3aed; color: #fff; font-size: 0.85em; }
+.playlist-card__view { flex: 1; text-align: center; text-decoration: none; background: #444; color: #fff; font-size: 0.85em; }
+.playlist-card__delete { width: 100%; background: #444; color: #ff6b6b; font-size: 0.85em; }
+
+.playlist-back { margin-bottom: 20px; }
+.playlist-back a { color: #00d9ff; text-decoration: none; font-size: 0.9em; }
+
+.playlist-info, .playlist-tracks { margin-bottom: 20px; display: block; width: 100%; }
+
+.playlist-info__body { padding: 20px; }
+
+.playlist-info__name { color: #00d9ff; margin: 0 0 10px 0; font-size: 2em; }
+
+.playlist-info__description { color: #aaa; margin: 0 0 15px 0; }
+.playlist-info__description p { margin: 0; }
+.playlist-info__description a { color: #60a5fa; text-decoration: underline; }
+
+.playlist-info__meta { color: #666; font-size: 0.9em; margin-bottom: 20px; }
+
+.playlist-info__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.playlist-info__play { background: #7c3aed; color: #fff; }
+.playlist-info__play:disabled { opacity: 0.5; }
+.playlist-info__edit { background: #444; color: #fff; }
+.playlist-info__share { background: #444; color: #00d9ff; }
+
+.playlist-form__field { margin-bottom: 15px; }
+
+.playlist-form__field label { display: block; margin-bottom: 5px; color: #00d9ff; }
+
+.playlist-form__field input[type="text"], .playlist-form__field textarea {
+  width: 100%;
+  padding: 8px;
+  background: #1a1a1a;
+  border: 1px solid #7c3aed;
+  color: #fff;
+  font-family: monospace;
+}
+
+.playlist-form__field textarea { resize: vertical; }
+
+.playlist-form__checkbox { display: flex !important; align-items: center; cursor: pointer; }
+.playlist-form__checkbox input { margin-right: 8px; }
+
+.playlist-form__actions { display: flex; gap: 10px; }
+.playlist-form__submit { background: #7c3aed; color: #fff; }
+.playlist-form__cancel { background: #444; color: #aaa; }
+
+.playlist-dialog {
+  background: transparent;
+  border: none;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+}
+
+.playlist-dialog::backdrop { background: rgba(0, 0, 0, 0.85); }
+
+.playlist-dialog__window { display: block; width: 100%; background: #0a0a0a; }
+.playlist-dialog__window .playlist-form { padding: 15px; }
+
+.playlist-tracks__scroll { overflow-x: auto; }
+
+.playlist-table { width: 100%; border-collapse: collapse; }
+
+.playlist-table th { padding: 10px; text-align: left; color: #00d9ff; border-bottom: 2px solid #7c3aed; }
+.playlist-table__actions-head { text-align: center !important; }
+
+.playlist-table__row { border-bottom: 1px solid #333; }
+.playlist-table__row--dragging { opacity: 0.5; }
+.playlist-table__row[draggable="true"] { cursor: grab; }
+
+.playlist-table td { padding: 10px; }
+.playlist-table__position { color: #666; }
+.playlist-table__grip { margin-right: 8px; color: #666; }
+.playlist-table__title { color: #ccc; }
+.playlist-table__dim { color: #aaa; }
+
+.playlist-table__actions { text-align: center; white-space: nowrap; }
+.playlist-table__actions .playlist-table__remove-form { display: inline-block; }
+
+.playlist-table__move { background: #333; color: #aaa; font-size: 0.8em; padding: 4px 8px; margin-right: 4px; }
+.playlist-table__remove { background: #444; color: #ff6b6b; font-size: 0.8em; padding: 4px 8px; }
+
+/* --- hackr.fm landing + releases + FNet roster (Phase 4) --- */
+
+@keyframes signal-pulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 10px #7c3aed, 0 0 20px #7c3aed; }
+  50% { opacity: 0.7; text-shadow: 0 0 5px #7c3aed; }
+}
+@keyframes scanline-move {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 4px; }
+}
+@keyframes glitch-shift {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 2px); }
+}
+@keyframes border-glow {
+  0%, 100% { border-color: #7c3aed; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
+  50% { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+}
+
+/* Landing window (FmLandingPage.tsx) */
+.fm-window {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: block;
+  background: #1a1a1a;
+  border: 2px solid #7c3aed;
+}
+.fm-fieldset { border-color: #7c3aed; }
+.fm-legend { color: #7c3aed; }
+.fm-body { padding: 30px; }
+
+.fm-heading { text-align: center; margin-bottom: 5px; color: #7c3aed; font-size: 1.8em; }
+.fm-tagline { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.9em; }
+
+.fm-lore {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  line-height: 1.8;
+}
+.fm-lore-open { color: #ccc; margin-bottom: 15px; }
+.fm-lore-mid { color: #aaa; margin-bottom: 15px; }
+.fm-lore-em { color: #7c3aed; }
+.fm-lore-close { color: #888; }
+
+.fm-section { margin-bottom: 30px; }
+.fm-section-title {
+  color: #7c3aed;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+  letter-spacing: 2px;
+}
+
+/* Latest releases grid + shared release card (also used on /fm/releases) */
+.fm-latest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.fm-card-link { display: block; text-decoration: none; color: inherit; }
+.fm-release-card {
+  background: #0d0d0d;
+  border: 1px solid #7c3aed;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.15);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+.fm-release-card:hover {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+  transform: scale(1.02);
+}
+.fm-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.fm-cover-img { width: 100%; height: 100%; object-fit: cover; }
+.fm-cover-placeholder { color: #333; font-size: 3em; font-family: monospace; }
+.fm-release-info { padding: 12px; }
+.fm-release-name { color: #7c3aed; font-weight: bold; font-size: 1em; margin-bottom: 4px; }
+.fm-release-artist { color: #999; font-size: 0.85em; margin-bottom: 6px; }
+.fm-release-meta { display: flex; justify-content: space-between; align-items: center; }
+.fm-release-type { color: #666; font-size: 0.8em; }
+.fm-release-date { color: #555; font-size: 0.8em; }
+
+.fm-viewall-row { text-align: center; margin-top: 20px; }
+.fm-viewall-btn {
+  display: inline-block;
+  padding: 10px 25px;
+  background: transparent;
+  color: #7c3aed;
+  text-decoration: none;
+  border: 1px solid #7c3aed;
+  letter-spacing: 2px;
+  font-size: 0.9em;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.fm-viewall-btn:hover { background: #7c3aed; color: white; }
+
+.fm-divider { border-top: 1px solid #333; margin-bottom: 25px; }
+
+/* Coming soon (SIGNAL INCOMING) */
+.fm-signal-title {
+  color: #7c3aed;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+  letter-spacing: 3px;
+  animation: signal-pulse 2s ease-in-out infinite;
+  cursor: default;
+  user-select: none;
+}
+.fm-soon-grid { display: grid; gap: 15px; }
+.fm-soon-grid--cols-1 { grid-template-columns: repeat(1, 1fr); }
+.fm-soon-grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
+.fm-soon-grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+.fm-soon-grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+.fm-soon-card-link { display: block; text-decoration: none; color: inherit; }
+.fm-soon-card-link[hidden] { display: none; }
+.fm-soon-card {
+  background: #0a0a0a;
+  border: 1px solid #7c3aed;
+  animation: border-glow 3s ease-in-out infinite;
+  transition: transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.fm-soon-card:hover { transform: scale(1.02); }
+.fm-soon-card:hover img { animation: glitch-shift 0.3s ease-in-out 3; }
+.fm-soon-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #111;
+  position: relative;
+  overflow: hidden;
+}
+.fm-soon-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.5) brightness(0.6) contrast(1.1);
+}
+.fm-soon-cover-placeholder {
+  color: #333;
+  font-size: 2em;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.fm-soon-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px);
+  animation: scanline-move 0.5s linear infinite;
+  pointer-events: none;
+}
+.fm-soon-tint {
+  position: absolute;
+  inset: 0;
+  background: rgba(124, 58, 237, 0.15);
+  pointer-events: none;
+}
+.fm-soon-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(124, 58, 237, 0.85);
+  color: #fff;
+  padding: 2px 8px;
+  font-size: 0.65em;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+.fm-soon-info { padding: 10px; }
+.fm-soon-name { color: #7c3aed; font-weight: bold; font-size: 0.9em; margin-bottom: 3px; }
+.fm-soon-artist { color: #888; font-size: 0.75em; margin-bottom: 4px; }
+.fm-soon-meta { color: #555; font-size: 0.7em; letter-spacing: 1px; }
+
+/* Signal code modal */
+.fm-code-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fm-code-overlay[hidden] { display: none; }
+.fm-code-box {
+  background: #0a0a0a;
+  border: 1px solid #7c3aed;
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  font-family: monospace;
+}
+.fm-code-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(124, 58, 237, 0.03) 2px, rgba(124, 58, 237, 0.03) 4px);
+  pointer-events: none;
+}
+.fm-code-title {
+  color: #7c3aed;
+  font-size: 0.8em;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.fm-code-sub {
+  color: #444;
+  font-size: 0.75em;
+  margin-bottom: 15px;
+  text-align: center;
+  line-height: 1.6;
+}
+.fm-code-row { display: flex; gap: 10px; }
+.fm-code-input {
+  flex: 1;
+  min-width: 0;
+  background: #111;
+  border: 1px solid #333;
+  color: #ccc;
+  padding: 10px 14px;
+  font-family: monospace;
+  font-size: 1.1em;
+  letter-spacing: 4px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+/* React swapped the input border to red while the error was showing. */
+.fm-code-box:has(.fm-code-error:not([hidden])) .fm-code-input { border-color: #ef4444; }
+.fm-code-submit {
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.85em;
+  letter-spacing: 1px;
+}
+.fm-code-error {
+  color: #ef4444;
+  font-size: 0.75em;
+  margin-top: 10px;
+  text-align: center;
+  letter-spacing: 2px;
+}
+.fm-code-abort {
+  color: #333;
+  font-size: 0.7em;
+  margin-top: 15px;
+  text-align: center;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+/* Nav cards (RADIO / VAULT / FNET) */
+.fm-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.fm-nav-card-link { display: block; height: 100%; text-decoration: none; }
+.fm-nav-card { background: #0d0d0d; cursor: pointer; height: 100%; }
+.fm-nav-card fieldset { height: 100%; }
+.fm-nav-body { padding: 15px; }
+.fm-nav-big { font-size: 1.4em; margin-bottom: 10px; text-align: center; }
+.fm-nav-desc { color: #999; font-size: 0.9em; line-height: 1.6; }
+.fm-nav-card--radio { border: 1px solid #ef4444; }
+.fm-nav-card--radio fieldset { border-color: #ef4444; }
+.fm-nav-card--radio legend { color: #ef4444; }
+.fm-nav-card--radio .fm-nav-big { color: #ef4444; }
+.fm-nav-card--vault { border: 1px solid #a855f7; }
+.fm-nav-card--vault fieldset { border-color: #a855f7; }
+.fm-nav-card--vault legend { color: #a855f7; }
+.fm-nav-card--vault .fm-nav-big { color: #a855f7; }
+.fm-nav-card--fnet { border: 1px solid #10b981; }
+.fm-nav-card--fnet fieldset { border-color: #10b981; }
+.fm-nav-card--fnet legend { color: #10b981; }
+.fm-nav-card--fnet .fm-nav-big { color: #10b981; }
+
+.fm-footer { text-align: center; padding: 15px; border-top: 1px solid #333; }
+.fm-footer p { color: #555; font-size: 0.85em; }
+
+@media (max-width: 767px) {
+  .fm-window { max-width: 100%; }
+  .fm-body { padding: 15px; }
+  .fm-heading { font-size: 1.3em; }
+  .fm-lore { padding: 15px; }
+  .fm-latest-grid { grid-template-columns: 1fr; gap: 15px; }
+  .fm-soon-grid { gap: 10px; }
+  .fm-soon-grid--cols-1,
+  .fm-soon-grid--cols-2,
+  .fm-soon-grid--cols-3,
+  .fm-soon-grid--cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .fm-nav-grid { grid-template-columns: 1fr; gap: 15px; }
+  .fm-nav-body { padding: 10px; }
+}
+
+/* Releases catalog window (FmReleasesPage.tsx) */
+.fmr-window {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+  background: #1a1a1a;
+  border: 2px solid #7c3aed;
+}
+.fmr-fieldset { border-color: #7c3aed; }
+.fmr-legend { color: #7c3aed; letter-spacing: 3px; }
+.fmr-empty {
+  padding: 40px;
+  text-align: center;
+  background: rgba(124, 58, 237, 0.05);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+.fmr-empty p { color: #aaa; }
+.fmr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.fmr-release-info { padding: 15px; }
+.fmr-release-name {
+  color: #7c3aed;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+  text-shadow: 0 0 8px rgba(124, 58, 237, 0.6);
+}
+.fmr-catalog { color: #555; font-size: 0.8em; margin-top: 3px; font-family: monospace; }
+.fmr-nav-row { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
+.fmr-nav-back {
+  padding: 10px 20px;
+  background: #222;
+  color: #888;
+  text-decoration: none;
+  border: 1px solid #444;
+}
+.fmr-nav-vault {
+  padding: 10px 20px;
+  background: #7c3aed;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+}
+
+@media (max-width: 767px) {
+  .fmr-window { max-width: 100%; }
+  .fmr-grid { grid-template-columns: 1fr; }
+}
+
+/* FNet roster window (BandsPage.tsx) */
+.fnet-window {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: block;
+  background: #1a1a1a;
+  border: 2px solid #666;
+}
+.fnet-fieldset { border-color: #666; }
+.fnet-legend { color: #10b981; }
+.fnet-heading { text-align: center; margin-bottom: 15px; color: #10b981; }
+.fnet-infobox { margin-bottom: 30px; padding: 15px; background: #0a0a0a; border: 1px solid #444; }
+.fnet-infobox p { color: #999; text-align: center; }
+.fnet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+}
+.fnet-card { background: #0d0d0d; border: 1px solid #444; }
+.fnet-card fieldset { border-color: #555; }
+.fnet-card legend { color: #10b981; }
+.fnet-card-body { padding: 15px; }
+.fnet-desc-wrap { margin-bottom: 20px; }
+.fnet-desc { color: #aaa; line-height: 1.6; font-style: italic; font-size: 1em; }
+.fnet-genre-box { margin-bottom: 15px; padding: 10px; background: #0a0a0a; border: 1px solid #333; }
+.fnet-genre-box p { color: #666; font-size: 0.85em; }
+.fnet-genre { color: #888; font-weight: bold; }
+.fnet-actions { margin-top: 20px; display: flex; gap: 10px; }
+.fnet-btn { flex: 1; text-align: center; font-size: 1em; }
+.fnet-btn--disabled { opacity: 0.5; cursor: not-allowed; }
+.fnet-empty { padding: 40px; text-align: center; background: #1a1a1a; }
+.fnet-empty p { color: #999; font-size: 1.2em; }
+.fnet-about { margin-top: 30px; padding: 20px; background: #0a0a0a; border: 1px solid #333; }
+.fnet-about h3 { margin-bottom: 10px; color: #10b981; }
+.fnet-about p { line-height: 1.6; color: #888; }
+
+@media (max-width: 767px) {
+  .fnet-window { max-width: 100%; }
+  .fnet-grid { grid-template-columns: 1fr; gap: 15px; }
+  .fnet-card-body { padding: 10px; }
+  .fnet-desc-wrap { margin-bottom: 12px; }
+  .fnet-desc { font-size: 0.9em; }
+  .fnet-actions { margin-top: 12px; }
+  .fnet-btn { font-size: 0.85em; }
+}

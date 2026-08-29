@@ -8,28 +8,9 @@ module Api
         artist = Artist.find_by(slug: params[:artist_id]) || Artist.find(params[:artist_id])
         @tracks = artist.tracks.visible_in_pulse_vault.includes(:release).order(Arel.sql("releases.release_date DESC NULLS LAST, tracks.track_number ASC")).joins(:release)
       else
-        # Get all tracks with Pulse Vault ordering
-        @tracks = Track.visible_in_pulse_vault.includes(:artist, :release).order(
-          Arel.sql(<<-SQL.squish
-            CASE artists.name
-              WHEN 'The.CyberPul.se' THEN 0
-              WHEN 'XERAEN' THEN 1
-              WHEN 'Wavelength Zero' THEN 2
-              WHEN 'Voiceprint' THEN 3
-              WHEN 'Temporal Blue Drift' THEN 4
-              WHEN 'heartbreak_havoc.sh' THEN 5
-              WHEN 'System Rot' THEN 6
-              WHEN 'Apex Overdrive' THEN 7
-              WHEN 'Cipher Protocol' THEN 8
-              WHEN 'Neon Hearts' THEN 9
-              ELSE 10
-            END,
-            CASE WHEN artists.name IN ('The.CyberPul.se', 'XERAEN', 'Wavelength Zero', 'Voiceprint', 'Temporal Blue Drift', 'heartbreak_havoc.sh', 'System Rot', 'Apex Overdrive', 'Cipher Protocol', 'Neon Hearts') THEN '' ELSE artists.name END,
-            releases.release_date DESC,
-            tracks.track_number ASC
-          SQL
-                  )
-        ).joins(:artist, :release)
+        # Get all tracks with Pulse Vault ordering (scope shared with the
+        # Hotwire vault page — Phase 4)
+        @tracks = Track.visible_in_pulse_vault.includes(:artist, :release).pulse_vault_ordered
       end
 
       render json: @tracks.map { |track|

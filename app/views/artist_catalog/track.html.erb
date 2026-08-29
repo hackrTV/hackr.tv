@@ -1,0 +1,161 @@
+<%# TrackDetailPage.tsx port. The EmbeddedTrack widget becomes a player
+    row (shared track-list contract): the embed box carries the
+    data-player-* attrs, so clicking it loads/toggles the track in the
+    persistent player bar and the ► PLAY button text repaints from
+    player:state events. Coming-soon tracks never reach this template —
+    the controller redirects them to their release page. %>
+<% slug = params[:artist_slug] %>
+
+<% if @track.nil? %>
+  <% content_for :title, "Signal Lost — hackr.tv" %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> track-detail-window">
+      <fieldset class="ac-fieldset">
+        <legend class="ac-legend">SIGNAL LOST</legend>
+        <div class="track-detail-lost">
+          <p>Track frequency not found. The transmission may have been intercepted.</p>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+<% else %>
+  <% content_for :title, "#{@track.title} — hackr.tv" %>
+  <% release = @track.release %>
+  <% playable = @track.audio_file.attached? %>
+  <% streaming = @track.streaming_links || {} %>
+  <% lyrics_accent_index = 1 %>
+
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> track-detail-window">
+      <fieldset class="ac-fieldset">
+        <legend class="center ac-legend"><%= @track.title.upcase %></legend>
+
+        <div>
+          <div class="track-detail-header">
+            <div class="track-detail-embed-wrap" data-controller="track-list">
+              <div class="track-row track-detail-embed <%= "track-detail-embed--unplayable" unless playable %>"
+                   <%= tag.attributes(data: player_track_attrs(@track).merge(
+                         player_artist_path: artist_profile_path_for(@track.artist),
+                         action: "click->track-list#rowClicked contextmenu->track-list#rowContextMenu"
+                       )) %>>
+                <% if release&.cover_image&.attached? %>
+                  <div class="track-detail-embed__cover">
+                    <%= image_tag url_for(release.cover_standard), alt: "#{@track.title} cover", class: "track-detail-embed__img" %>
+                  </div>
+                <% end %>
+                <div class="track-detail-embed__info">
+                  <div class="track-detail-embed__title"><%= @track.title %></div>
+                  <div class="track-detail-embed__artist"><%= @track.artist.name %></div>
+                  <% if playable %>
+                    <button type="button" class="play-track-btn track-detail-embed__btn">► PLAY</button>
+                  <% else %>
+                    <button type="button" class="track-detail-embed__btn track-detail-embed__btn--disabled" disabled>NO AUDIO FILE</button>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <div class="track-detail-info">
+              <div class="tui-window white-text track-detail-section <%= accent_class(slug, 0) %>">
+                <fieldset class="track-detail-section__fieldset">
+                  <legend class="track-detail-section__legend">TRACK INFO</legend>
+                  <table class="track-detail-info__table">
+                    <tbody>
+                      <tr>
+                        <td class="track-detail-info__label">Title:</td>
+                        <td class="track-detail-info__value track-detail-info__value--strong"><%= @track.title %></td>
+                      </tr>
+                      <tr>
+                        <td class="track-detail-info__label">Artist:</td>
+                        <td class="track-detail-info__value">
+                          <%= link_to @track.artist.name, "/#{slug}", class: "track-detail-info__link" %>
+                        </td>
+                      </tr>
+                      <% if release %>
+                        <tr>
+                          <td class="track-detail-info__label">Release:</td>
+                          <td class="track-detail-info__value">
+                            <%= link_to release.name, "/#{slug}/releases/#{release.slug}", class: "track-detail-info__link" %>
+                          </td>
+                        </tr>
+                      <% end %>
+                      <% if release&.release_type.present? %>
+                        <tr>
+                          <td class="track-detail-info__label">Release Type:</td>
+                          <td class="track-detail-info__value"><%= release.release_type.upcase %></td>
+                        </tr>
+                      <% end %>
+                      <% if @track.release_date %>
+                        <tr>
+                          <td class="track-detail-info__label">Release Date:</td>
+                          <td class="track-detail-info__value"><%= @track.release_date %></td>
+                        </tr>
+                      <% end %>
+                      <% if @track.duration.present? %>
+                        <tr>
+                          <td class="track-detail-info__label">Duration:</td>
+                          <td class="track-detail-info__value"><%= @track.duration %></td>
+                        </tr>
+                      <% end %>
+                      <% if @track.featured %>
+                        <tr>
+                          <td class="track-detail-info__label">Status:</td>
+                          <td class="track-detail-info__value track-detail-info__value--featured">★ FEATURED</td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+
+                  <% if streaming.any? %>
+                    <div class="track-detail-links">
+                      <%= link_to "▶ PULSE VAULT", vault_path(filter: @track.title), class: "track-detail-links__vault" %>
+                      <% sorted_streaming_links(streaming).each do |platform, url| %>
+                        <a href="<%= url %>" target="_blank" rel="noopener noreferrer" class="track-detail-links__external">→ <%= streaming_platform_name(platform) %></a>
+                      <% end %>
+                    </div>
+                  <% end %>
+
+                  <% if @track.hackr_streams.any? %>
+                    <div class="track-detail-vidz">
+                      <% @track.hackr_streams.each do |vod| %>
+                        <% embed_id = youtube_embed_id(vod.vod_url) %>
+                        <%= link_to "/#{slug}/vidz/#{vod.id}", class: "track-detail-vidz__link", title: vod.title do %>
+                          <div class="track-detail-vidz__thumb">
+                            <% if embed_id %>
+                              <img src="https://img.youtube.com/vi/<%= embed_id %>/mqdefault.jpg" alt="" class="track-detail-vidz__img">
+                            <% end %>
+                            <div class="track-detail-vidz__badge"><div class="track-detail-vidz__arrow"></div></div>
+                          </div>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+
+          <% if @track.lyrics.present? %>
+            <div class="track-detail-lyrics <%= accent_class(slug, lyrics_accent_index) %>">
+              <fieldset class="track-detail-section__fieldset">
+                <legend class="track-detail-section__legend">DECODED LYRICS</legend>
+                <div class="track-detail-lyrics__body"><%= markdown_content(@track.lyrics) %></div>
+              </fieldset>
+            </div>
+          <% end %>
+
+          <div class="track-detail-nav">
+            <% if release %>
+              <%= link_to "← BACK TO #{release.name.upcase}", "/#{slug}/releases/#{release.slug}", class: "track-detail-nav__back" %>
+            <% end %>
+            <%= link_to "#{@track.artist.name} HOME →", "/#{slug}", class: "track-detail-nav__home" %>
+            <% if release %>
+              <%= link_to "RELEASE: #{release.name} →", "/#{slug}/releases/#{release.slug}", class: "track-detail-nav__release" %>
+            <% end %>
+            <%= link_to "ALL TRACKS IN PULSE VAULT →", "/vault", class: "track-detail-nav__vault" %>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  <% end %>
+<% end %>

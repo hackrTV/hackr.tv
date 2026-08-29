@@ -58,6 +58,35 @@ class Track < ApplicationRecord
   scope :release_order, -> { order(:track_number, :title) }
   scope :visible_in_pulse_vault, -> { joins(:release).where(show_in_pulse_vault: true).where(releases: {coming_soon: false}).where.associated(:audio_file_attachment) }
 
+  # Pulse Vault display order: house artists in a fixed sequence, then
+  # everyone else alphabetically; newest release first within an artist.
+  # Shared by Api::TracksController and the Hotwire vault page (Phase 4)
+  # so the two can't drift. Fully literal SQL — no interpolation — so
+  # Brakeman can verify it.
+  scope :pulse_vault_ordered, -> {
+    joins(:artist, :release).order(
+      Arel.sql(<<-SQL.squish
+        CASE artists.name
+          WHEN 'The.CyberPul.se' THEN 0
+          WHEN 'XERAEN' THEN 1
+          WHEN 'Wavelength Zero' THEN 2
+          WHEN 'Voiceprint' THEN 3
+          WHEN 'Temporal Blue Drift' THEN 4
+          WHEN 'heartbreak_havoc.sh' THEN 5
+          WHEN 'System Rot' THEN 6
+          WHEN 'Apex Overdrive' THEN 7
+          WHEN 'Cipher Protocol' THEN 8
+          WHEN 'Neon Hearts' THEN 9
+          ELSE 10
+        END,
+        CASE WHEN artists.name IN ('The.CyberPul.se', 'XERAEN', 'Wavelength Zero', 'Voiceprint', 'Temporal Blue Drift', 'heartbreak_havoc.sh', 'System Rot', 'Apex Overdrive', 'Cipher Protocol', 'Neon Hearts') THEN '' ELSE artists.name END,
+        releases.release_date DESC,
+        tracks.track_number ASC
+      SQL
+              )
+    )
+  }
+
   def to_param
     slug
   end

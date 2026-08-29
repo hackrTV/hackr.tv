@@ -31,24 +31,24 @@ export const FooterMenu: React.FC = () => {
             </a>
           </li>
           <li className={isActive('/thecyberpulse') ? 'active' : undefined}>
-            <Link to="/thecyberpulse">
+            <a href="/thecyberpulse">
               <span className="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/xeraen') ? 'active' : undefined}>
-            <Link to="/xeraen">
+            <a href="/xeraen">
               <span className="purple-168-text">2</span>&nbsp;XERAEN.net&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/fm') || isActive('/vault') ? 'active' : undefined}>
-            <Link to="/fm">
+            <a href="/fm">
               <span className="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/f/net') ? 'active' : undefined}>
-            <Link to="/f/net">
+            <a href="/f/net">
               <span className="purple-168-text">4</span>&nbsp;FNet&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/wire') ? 'active' : undefined}>
             {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
