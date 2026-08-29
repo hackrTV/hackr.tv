@@ -85,16 +85,17 @@ RSpec.describe Grid::MissionRewardGranter do
       }.to change { hackr.grid_hackr_achievements.count }.by(1)
     end
 
-    it "broadcasts mission_completed to the AchievementChannel stream" do
+    it "appends the completion toast to the hackr's toast stream" do
       create(:grid_mission_reward, grid_mission: mission, reward_type: "xp", amount: 10)
 
-      allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (Phase 3)
+      allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
 
-      expect(ActionCable.server).to receive(:broadcast).with(
-        "achievement_channel_#{hackr.id}",
-        hash_including(type: "mission_completed")
-      )
       described_class.new(hackr, hackr_mission).grant!
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with(
+        [hackr, :toasts],
+        hash_including(target: "toast-region", partial: "shared/toast_mission")
+      )
     end
 
     it "advances reach_clearance objectives on OTHER active missions when XP triggers a level-up" do

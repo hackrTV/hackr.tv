@@ -3,8 +3,6 @@
 class BandsController < ApplicationController
   include GridAuthentication
 
-  layout "hotwire"
-
   def index
     # Mirrors Api::ArtistsController#index (no type param => bands) plus
     # the case-insensitive name sort the React page applied client-side.

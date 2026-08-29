@@ -5,8 +5,6 @@
 class PlaylistsController < ApplicationController
   include GridAuthentication
 
-  layout "hotwire"
-
   before_action :require_login
   before_action :set_playlist, only: %i[show update destroy remove_track]
 

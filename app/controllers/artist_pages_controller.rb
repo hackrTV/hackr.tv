@@ -5,8 +5,6 @@
 class ArtistPagesController < ApplicationController
   include GridAuthentication
 
-  layout "hotwire"
-
   # Port of TheCyberPulsePage extractVideoId — same URL shapes, same
   # 11-character video ids.
   YOUTUBE_ID_PATTERNS = [

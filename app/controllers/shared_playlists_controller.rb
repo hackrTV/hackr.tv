@@ -2,8 +2,6 @@
 # SharedPlaylistPage.tsx. Same visibility rule as the API: token match AND
 # is_public.
 class SharedPlaylistsController < ApplicationController
-  layout "hotwire"
-
   def show
     @playlist = Playlist.find_by(share_token: params[:token], is_public: true)
     return render :not_found, status: :not_found unless @playlist

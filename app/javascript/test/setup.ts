@@ -1,5 +1,3 @@
-import '@testing-library/jest-dom'
-
 // Mock HTMLMediaElement methods that aren't implemented in jsdom
 window.HTMLMediaElement.prototype.load = function () {
   // Trigger canplay event after a short delay to simulate loading

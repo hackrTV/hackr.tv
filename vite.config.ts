@@ -17,10 +17,6 @@ export default defineConfig({
       protocol: 'ws',
     },
   },
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'react',
-  },
   resolve: {
     alias: {
       '~': path.resolve(__dirname, './app/javascript'),

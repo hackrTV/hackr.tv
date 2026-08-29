@@ -6,8 +6,6 @@
 # subscription purely for presence counts + connection state (packets on
 # that JSON channel are ignored — relay/synthia stay its real consumers).
 class UplinkController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login, only: [:show]
 
   RECENT_PACKETS = 20 # LiveChatChannel#send_recent_packets parity

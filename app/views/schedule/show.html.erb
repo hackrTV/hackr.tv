@@ -44,8 +44,7 @@
                   <span class="sched-past-duration">(<%= stream_duration(stream.started_at, stream.ended_at) %>)</span>
                 <% end %>
                 <% if stream.vod_url.present? %>
-                  <%# VOD pages are still SPA (migrate in Phase 4) — full page load %>
-                  <%= link_to "[VOD]", "/#{stream.artist.slug}/vidz/#{stream.id}", class: "sched-vod", data: {turbo: false} %>
+                  <%= link_to "[VOD]", "/#{stream.artist.slug}/vidz/#{stream.id}", class: "sched-vod" %>
                 <% end %>
               </div>
             </div>

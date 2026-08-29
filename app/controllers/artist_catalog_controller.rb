@@ -5,8 +5,6 @@
 class ArtistCatalogController < ApplicationController
   include GridAuthentication
 
-  layout "hotwire"
-
   # GET /:artist_slug/releases
   def releases
     @artist = Artist.find_by(slug: params[:artist_slug])
@@ -30,8 +28,8 @@ class ArtistCatalogController < ApplicationController
     @artist_name = (@releases.first || @coming_soon.first)&.artist&.name ||
       params[:artist_slug].upcase
 
-    # View credit inline (the SPA fired
-    # POST /api/artists/:slug/release_index_viewed on mount).
+    # View credit inline — feeds the release_indexes_viewed_all
+    # achievement.
     if current_hackr && @artist
       HackrPageView.record!(current_hackr, "release_index", @artist.id)
       Grid::AchievementChecker.new(current_hackr).check("release_indexes_viewed_all")

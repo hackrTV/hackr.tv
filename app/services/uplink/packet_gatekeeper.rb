@@ -3,10 +3,10 @@
 module Uplink
   # Single source of truth for "may this hackr transmit on this channel
   # right now" — blackout, squelch, role access, slow mode, in that
-  # order. Shared by the JSON API (Api::Uplink::PacketsController) and
-  # the Hotwire form flow (Uplink::PacketsController) so the two entry
-  # points can't drift. Error strings are the API's originals; both
-  # controllers render them verbatim.
+  # order. Used by the Hotwire form flow (Uplink::PacketsController);
+  # the admin send_packet API bypasses it deliberately (service
+  # accounts). Error strings predate the Hotwire flow and are rendered
+  # verbatim.
   class PacketGatekeeper
     Result = Struct.new(:error, :wait_seconds, :status) do
       def ok?

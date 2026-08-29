@@ -3,8 +3,6 @@
 # SinglePulsePage.tsx (/wire/pulse/:id). The JSON API stays for the
 # overlay + remaining SPA pages until Phase 7.
 class WireController < ApplicationController
-  layout "hotwire"
-
   PER_PAGE = 50
   PROFILE_PER_PAGE = 100
 

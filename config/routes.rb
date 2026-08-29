@@ -54,9 +54,9 @@ Rails.application.routes.draw do
   get "trackz", to: "tracks#legacy_redirect", as: :legacy_tracks
   get "trackz/:id", to: "tracks#legacy_redirect_show", as: :legacy_track
 
-  # THE PULSE GRID routes. The legacy terminal (/grid) is Hotwire
-  # (migrated Phase 6a); the tactical page (/grid/1337) is still SPA
-  # until 6b. Auth + account pages are Hotwire (migrated Phase 2). Route
+  # THE PULSE GRID routes. Terminal (/grid, Phase 6a), tactical
+  # (/grid/1337, Phase 6b–6d), and auth + account pages (Phase 2) are all
+  # server-rendered. Route
   # names for verify/reset/confirm are load-bearing — GridMailer builds
   # email links with them.
   scope "grid" do
@@ -195,8 +195,9 @@ Rails.application.routes.draw do
   end
 
   # Uplink chat — Hotwire (migrated Phase 5). The log endpoint serves the
-  # reconnect-recovery frame reload; packets are the form/moderation flow
-  # (JSON equivalents live on under /api/uplink for external consumers).
+  # reconnect-recovery frame reload; packets are the form/moderation flow.
+  # External tools (relay + synthia) read via LiveChatChannel and post
+  # via /api/admin/uplink/send_packet.
   scope "uplink" do
     get "/", to: "uplink#show", as: :uplink
     get "popout", to: "uplink#popout", as: :uplink_popout
@@ -211,13 +212,10 @@ Rails.application.routes.draw do
 
   # API routes (for SPA)
   namespace :api, defaults: {format: :json} do
-    get "settings", to: "settings#index"
-
     resources :artists, only: %i[index show] do
       resources :tracks, only: [:index]
       member do
         post :bio_viewed
-        post :release_index_viewed
       end
     end
     resources :tracks, only: %i[index show] do
@@ -225,86 +223,27 @@ Rails.application.routes.draw do
         post :play_credit
       end
     end
-    resources :releases, only: %i[index show] do
-      get :latest, on: :collection
-      get :coming_soon, on: :collection
-      member do
-        post :viewed
-      end
-    end
-    get "codex/mappings", to: "codex#mappings"
-    get "codex", to: "codex#index"
-    get "codex/:slug", to: "codex#show"
-    post "codex/:slug/read", to: "codex#mark_read"
-
-    get "handbook/mappings", to: "handbook#mappings"
-    get "handbook/recent", to: "handbook#recent"
-    get "handbook", to: "handbook#index"
-    get "handbook/:slug", to: "handbook#show"
     get "radio_stations", to: "radio#index"
     get "radio_stations/:id/playlists", to: "radio#station_playlists"
     post "radio_stations/:id/tune_in", to: "radio#tune_in"
-    get "hackr_stream", to: "hackr_streams#show"
-    get "streams/schedule", to: "hackr_streams#schedule"
-    get "artists/:artist_slug/vods", to: "hackr_streams#index"
-    get "artists/:artist_slug/vods/:id", to: "hackr_streams#vod_show"
     post "artists/:artist_slug/vods/:id/watch", to: "hackr_streams#watch"
 
-    # Grid API routes
+    # Grid API routes. The SPA's per-tab JSON loaders are retired
+    # (Phase 7); what stays is the programmatic client surface (login +
+    # command, envelope spec-locked), session utilities used by Stimulus
+    # and admin pages (current_hackr, disconnect), and the Bearer-token
+    # external debit endpoint.
     get "grid/current_hackr", to: "grid#current_hackr_info"
-    get "grid/achievements", to: "grid#achievements_index"
-    get "grid/missions", to: "grid#missions_index"
-    get "grid/schematics", to: "grid#schematics_index"
-    get "grid/loadout", to: "grid#loadout_index"
-    get "grid/deck", to: "grid#deck_index"
-    get "grid/inventory", to: "grid#inventory_index"
-    get "grid/reputation", to: "grid#reputation_index"
-    get "grid/stats", to: "grid#stats_index"
-    get "grid/cred", to: "grid#cred_index"
-    get "grid/shop", to: "grid#shop_index"
-    get "grid/npc", to: "grid#npc_index"
-    get "grid/rest_pod", to: "grid#rest_pod_index"
-    get "grid/transit", to: "grid#transit_index"
     post "grid/login", to: "grid#login"
-    post "grid/register", to: "grid#register"
-    get "grid/verify/:token", to: "grid#verify_token"
-    post "grid/complete_registration", to: "grid#complete_registration"
     delete "grid/disconnect", to: "grid#disconnect"
     post "grid/command", to: "grid#command"
     post "grid/debit", to: "grid#debit"
-    post "grid/forgot_password", to: "grid#forgot_password"
-    post "grid/request_password_reset", to: "grid#request_password_reset"
-    post "grid/reset_password", to: "grid#reset_password"
-    post "grid/request_email_change", to: "grid#request_email_change"
-    post "grid/confirm_email_change", to: "grid#confirm_email_change"
-    patch "grid/identity", to: "grid#update_identity"
-    get "grid/zone_map", to: "grid#zone_map"
-
-    # TOTP two-factor authentication
-    get "totp/status", to: "totp#status"
-    post "totp/setup", to: "totp#setup"
-    post "totp/enable", to: "totp#enable"
-    post "totp/verify", to: "totp#verify"
-    delete "totp/disable", to: "totp#disable"
-    post "totp/regenerate_backup_codes", to: "totp#regenerate_backup_codes"
-    post "totp/admin_reset", to: "totp#admin_reset"
-
-    # Code browser API routes
-    get "code", to: "code#index"
-    get "code/:repo", to: "code#show"
-    get "code/:repo/tree/*path", to: "code#tree", format: false
-    get "code/:repo/blob/*path", to: "code#blob", format: false
-
-    # Hackr Logs API routes
-    resources :logs, only: %i[index show]
-    post "logs/:id/read", to: "logs#mark_read"
 
     # Playlists API routes
     resources :playlists do
       post "reorder", on: :member
       resources :tracks, controller: "playlist_tracks", only: %i[create destroy]
     end
-    get "shared_playlists/:share_token", to: "shared_playlists#show"
 
     # PulseWire API routes
     resources :pulses, only: %i[index show create destroy] do
@@ -329,20 +268,6 @@ Rails.application.routes.draw do
     get "overlay/scene-groups", to: "overlay#scene_groups"
     get "overlay/elements", to: "overlay#elements"
     get "overlay/alerts/pending", to: "overlay#alerts_pending"
-
-    # Uplink API routes
-    namespace :uplink do
-      resources :channels, only: %i[index show], param: :slug do
-        resources :packets, only: %i[index create], param: :id
-      end
-      delete "packets/:id", to: "packets#destroy", as: :packet
-
-      # Moderation
-      post "users/:id/squelch", to: "moderation#squelch", as: :squelch_user
-      post "users/:id/blackout", to: "moderation#blackout", as: :blackout_user
-      delete "users/:id/punishment", to: "moderation#lift_punishment", as: :lift_punishment
-      get "moderation_log", to: "moderation#moderation_log", as: :moderation_log
-    end
 
     # World Event Feed (public)
     get "world_events", to: "world_events#index"
@@ -787,19 +712,6 @@ Rails.application.routes.draw do
     get "ticker/:position", to: "overlays#ticker", as: :overlay_ticker
     get "scenes/:slug", to: "overlays#scene", as: :overlay_scene
     get "world-feed", to: "overlays#world_feed", as: :overlay_world_feed
-  end
-
-  # Hotwire migration playground (Phase 0) — smoke page + spikes.
-  # Non-production only; system specs exercise these in test.
-  unless Rails.env.production?
-    scope "dev/hotwire", as: :hotwire_spike do
-      get "smoke", to: "hotwire_spikes#smoke", as: :smoke
-      get "player/a", to: "hotwire_spikes#player_a", as: :player_a
-      get "player/b", to: "hotwire_spikes#player_b", as: :player_b
-      post "player/refresh", to: "hotwire_spikes#player_refresh", as: :player_refresh
-      get "audio", to: "hotwire_spikes#audio", as: :audio
-      get "map", to: "hotwire_spikes#map", as: :map
-    end
   end
 
   # Development-only error page testing routes

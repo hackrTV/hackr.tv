@@ -12,7 +12,6 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
@@ -27,6 +26,6 @@
       "~/*": ["./app/javascript/*"]
     }
   },
-  "include": ["app/javascript/**/*.ts", "app/javascript/**/*.tsx"],
+  "include": ["app/javascript/**/*.ts"],
   "exclude": ["node_modules"]
 }

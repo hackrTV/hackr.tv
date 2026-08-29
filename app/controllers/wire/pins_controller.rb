@@ -3,8 +3,6 @@
 # destroy, reorder). Responses replace the profile's pinned box +
 # timeline so pin state stays consistent everywhere on the page.
 class Wire::PinsController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
 
   # POST /wire/pulses/:id/pin

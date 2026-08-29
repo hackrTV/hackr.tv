@@ -3,8 +3,6 @@
 # (bio here; email change + password reset in their controllers) and
 # come back with section-scoped x_* flash messages.
 class Grid::IdentitiesController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
 
   def show

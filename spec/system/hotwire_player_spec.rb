@@ -43,7 +43,7 @@ RSpec.describe "Hotwire permanent player", type: :system do
     expect(audio_js("paused")).to eq(false)
   end
 
-  it "survives real nav-menu navigation to an artist page (HOTWIRE_PATHS regression)" do
+  it "survives real nav-menu navigation to an artist page (Turbo nav regression)" do
     create(:artist, name: "The.CyberPul.se", slug: "thecyberpulse")
     create(:track, :with_audio, artist: artist, release: release, title: "Nav Tone")
 
@@ -51,8 +51,8 @@ RSpec.describe "Hotwire permanent player", type: :system do
     find(".track-row", text: "Nav Tone").click
     expect(page).to have_button("❚❚ PAUSE", id: "play-pause-btn", wait: 10)
 
-    # The reported bug: artist slugs missing from HOTWIRE_PATHS made these
-    # nav links data-turbo=false → full page load → player killed.
+    # The reported Phase 4 bug: artist nav links forced full page loads,
+    # killing the permanent player. Nav must stay Turbo-navigable.
     find(".header-dropdown", text: "The.CyberPul.se").click
     find(".header-dropdown-content a[href='/thecyberpulse']", visible: :all).click
 

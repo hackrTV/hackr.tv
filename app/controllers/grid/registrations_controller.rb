@@ -3,8 +3,6 @@
 # completion form). Mirrors Api::GridController#register / #verify_token /
 # #complete_registration, which stay for the SPA until Phase 7.
 class Grid::RegistrationsController < ApplicationController
-  layout "hotwire"
-
   before_action :require_logout
 
   def new

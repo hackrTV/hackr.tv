@@ -11,12 +11,11 @@ module ContentHelper
   end
 
   # Markdown for content pages: [[codex links]] resolved, rendered +
-  # sanitized, then internal anchors to not-yet-migrated paths marked
-  # data-turbo=false (a Turbo visit into the React SPA shell would blank —
-  # the SPA mounts on DOMContentLoaded, which never fires on Turbo visits).
+  # sanitized, then internal anchors normalized for same-tab Turbo
+  # navigation.
   def markdown_content(text)
     html = MarkdownRenderer.render_user(CodexLinker.transform_markdown(text))
-    hotwireize_links(html)
+    normalize_internal_links(html)
   end
 
   # Port of LogsIndexPage truncateMarkdown: strip md symbols, links → text,
@@ -30,17 +29,15 @@ module ContentHelper
     plain[0, max_length].strip + "..."
   end
 
-  def hotwireize_links(html)
+  def normalize_internal_links(html)
     fragment = Nokogiri::HTML5.fragment(html)
     fragment.css("a[href]").each do |a|
       href = a["href"].to_s
       next unless href.start_with?("/")
       # Internal links: same-tab navigation (Redcarpet's link_attributes adds
-      # target=_blank + nofollow to every link — correct for external only;
-      # the SPA rendered internal links as Router links without either).
+      # target=_blank + nofollow to every link — correct for external only).
       a.remove_attribute("target")
       a.remove_attribute("rel")
-      a["data-turbo"] = "false" unless hotwire_path?(href)
     end
     fragment.to_html.html_safe
   end

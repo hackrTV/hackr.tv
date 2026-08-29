@@ -5,6 +5,24 @@
 class Grid::TacticalTabsController < Grid::TacticalBaseController
   TABS = %w[deck stats loadout inventory rep cred missions schematics].freeze
 
+  # Inventory display maps, used by the inventory tab partial (moved here
+  # from the retired API tab loaders in Phase 7).
+  INVENTORY_TYPE_ORDER = %w[gear consumable tool software module firmware material data rig_component fixture collectible faction].freeze
+  INVENTORY_TYPE_LABELS = {
+    "gear" => "GEAR", "consumable" => "CONSUMABLES", "tool" => "TOOLS",
+    "software" => "SOFTWARE", "module" => "MODULES", "firmware" => "FIRMWARE",
+    "material" => "MATERIALS", "data" => "DATA", "rig_component" => "RIG COMPONENTS",
+    "fixture" => "FIXTURES", "collectible" => "COLLECTIBLES", "faction" => "FACTION"
+  }.freeze
+  INVENTORY_ITEM_ACTIONS = {
+    "gear" => %w[equip use drop salvage], "consumable" => %w[use drop salvage],
+    "tool" => %w[use drop salvage], "fixture" => %w[place salvage],
+    "software" => %w[use drop salvage], "firmware" => %w[use drop salvage],
+    "module" => %w[use drop salvage], "material" => %w[use drop salvage],
+    "data" => %w[use drop salvage], "rig_component" => %w[use drop salvage],
+    "collectible" => %w[use drop salvage], "faction" => %w[use drop]
+  }.freeze
+
   # Literal partial paths (Brakeman: never render params-derived paths).
   TAB_PARTIALS = {
     "deck" => "grid/tactical_tabs/deck",

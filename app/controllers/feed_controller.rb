@@ -2,8 +2,6 @@
 # WorldFeedPage.tsx. Initial render mirrors the channel's last-50
 # hydration; live lines append via the Publisher's dual-publish.
 class FeedController < ApplicationController
-  layout "hotwire"
-
   before_action :require_feed_visible
 
   INITIAL_EVENTS = 50

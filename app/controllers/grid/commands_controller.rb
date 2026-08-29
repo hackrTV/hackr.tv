@@ -4,8 +4,6 @@
 # movement the per-room subscription swap. The client echoes the command
 # itself (grid-command Stimulus), so no echo here.
 class Grid::CommandsController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
   before_action :require_pulse_grid
 

@@ -183,7 +183,7 @@ RSpec.describe "Hotwire tactical", type: :system do
     expect(page).to have_css("#breach-log .grid-line", text: "ANALYZE → Protocol [#{last_number}]", wait: 10)
   end
 
-  it "keeps the permanent player alive navigating vault → tactical (HOTWIRE_PATHS)" do
+  it "keeps the permanent player alive navigating vault → tactical (Turbo nav)" do
     artist = create(:artist, name: "Wave Artist")
     release = create(:release, artist: artist)
     create(:track, :with_audio, artist: artist, release: release, title: "Tac Tone")

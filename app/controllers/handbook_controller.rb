@@ -2,8 +2,6 @@
 # HandbookIndexPage/HandbookArticlePage/HandbookLayout/HandbookSidebar.
 # Login-gated like the SPA (ProtectedRoute) and the JSON API (which stays).
 class HandbookController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
 
   KIND_COLORS = {"tutorial" => "#fbbf24", "reference" => "#22d3ee"}.freeze

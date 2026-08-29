@@ -3,8 +3,6 @@
 # "RESET CREDENTIALS" action. Mirrors Api::GridController#forgot_password /
 # #reset_password / #request_password_reset.
 class Grid::PasswordsController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login, only: [:request_for_current]
 
   # GET /grid/forgot_password

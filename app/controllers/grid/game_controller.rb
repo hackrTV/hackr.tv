@@ -4,8 +4,6 @@
 # per-room grid_room_html Turbo stream; commands POST to
 # Grid::CommandsController.
 class Grid::GameController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
   before_action :require_pulse_grid
 

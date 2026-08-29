@@ -2,8 +2,6 @@
 # tactical_grid feature gate. Mirrors the SPA's FeatureGate wrapping of
 # /grid/1337 (has_feature? admits admins implicitly).
 class Grid::TacticalBaseController < ApplicationController
-  layout "hotwire"
-
   before_action :require_login
   before_action :require_tactical_grid
 

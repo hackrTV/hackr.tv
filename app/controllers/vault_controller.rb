@@ -2,8 +2,6 @@
 class VaultController < ApplicationController
   include GridAuthentication
 
-  layout "hotwire"
-
   def show
     @tracks = Track.visible_in_pulse_vault
       .includes(:artist, release: {cover_image_attachment: :blob})

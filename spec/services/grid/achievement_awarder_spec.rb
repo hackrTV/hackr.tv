@@ -78,14 +78,15 @@ RSpec.describe Grid::AchievementAwarder do
       expect(result).to be_nil
     end
 
-    it "broadcasts to the per-hackr AchievementChannel stream" do
-      allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (Phase 3)
+    it "appends the unlock toast to the hackr's toast stream" do
+      allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
 
-      expect(ActionCable.server).to receive(:broadcast).with(
-        "achievement_channel_#{hackr.id}",
-        hash_including(type: "achievement_unlocked")
-      )
       described_class.new(hackr, achievement).award!
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with(
+        [hackr, :toasts],
+        hash_including(target: "toast-region", partial: "shared/toast_achievement")
+      )
     end
 
     it "skips CRED mint when cred_reward is zero" do

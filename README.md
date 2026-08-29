@@ -6,19 +6,19 @@
 
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.3-red.svg)](https://rubyonrails.org/)
-[![React](https://img.shields.io/badge/React-19.2-61dafb.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/Tests-3296%20passing-brightgreen.svg)](#testing)
+[![Hotwire](https://img.shields.io/badge/Hotwire-Turbo%20%2B%20Stimulus-ffd700.svg)](https://hotwired.dev/)
+[![Tests](https://img.shields.io/badge/Tests-3400%2B%20passing-brightgreen.svg)](#testing)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 ---
 
 ## Features
 
-### React SPA Architecture
-- **Full Single Page Application** - Built with React 19, TypeScript, and React Router v7
-- **Persistent Audio Player** - Music continues playing across all navigation
-- **Code Splitting** - Lazy loading for optimal performance
-- **Error Boundaries** - Graceful error handling with custom 404 page and frontend error reporting
+### Hotwire Architecture
+- **Server-Rendered Everything** - Turbo Drive/Frames/Streams with Stimulus (TypeScript) controllers; no client-side framework
+- **Persistent Audio Player** - `data-turbo-permanent` player bar survives every navigation
+- **Live Updates** - Turbo Stream broadcasts over Action Cable (chat, wire, grid rooms, toasts) with JSON dual-publish for external consumers
+- **Frontend Error Reporting** - window error/rejection reporter posting to `/api/error_report`
 - **Server-Rendered Admin** - Admin section remains traditional Rails for simplicity
 
 ### hackr.tv Platform
@@ -238,22 +238,21 @@
 
 ## Tech Stack
 
-- **Frontend:** React 19, TypeScript, React Router v7, Vite 8
+- **Frontend:** Hotwire (Turbo 8 + Stimulus 3), TypeScript, Vite 8
 - **Backend:** Ruby 3.4.7, Rails 8.1.3, Puma
 - **Database:** SQLite3 (primary + cable/cache/queue + a dedicated telemetry DB), Active Storage (local Disk service) for file attachments
 - **Real-time:** Action Cable 8.1 with Solid Cable adapter
 - **Background Jobs:** Solid Queue for async processing
 - **Caching:** Solid Cache
 - **Email:** Action Mailer with email tracking (SentEmail + EmailObserver)
-- **Testing:** RSpec (backend), Vitest + Testing Library (frontend), FactoryBot, Faker
+- **Testing:** RSpec incl. Capybara/Cuprite system specs (backend + browser), Vitest (Stimulus units), FactoryBot, Faker
 - **Code Quality:** StandardRB, ESLint, Brakeman (security scanner)
 - **Observability:** lograge (structured logging), web-vitals (frontend performance)
 - **Assets:** Propshaft, TuiCSS (terminal UI framework)
 - **Image Processing:** image_processing + ruby-vips (Active Storage variants; requires the libvips C library)
 - **Authentication:** bcrypt for password hashing, rotp + rqrcode for TOTP 2FA (Grid Hackr accounts)
 - **Auditing:** PaperTrail for version history on 40 models
-- **Markdown:** react-markdown, remark-gfm, rehype-sanitize, rehype-raw, highlight.js (code browser)
-- **UI Libraries:** @dnd-kit (drag-and-drop), dompurify (HTML sanitization)
+- **Markdown:** Redcarpet + Rouge (server-rendered, code browser highlighting)
 - **Content Safety:** Obscenity gem for profanity filtering
 
 ---
@@ -265,7 +264,7 @@
 - Bundler
 - SQLite3
 - libvips (system library, for Active Storage image variants — `sudo apt-get install libvips`)
-- Node.js (for React frontend)
+- Node.js (for the Vite/TypeScript frontend build)
 - pnpm (package manager)
 
 ### Installation
@@ -438,21 +437,17 @@ Meta
 ```
 hackr.tv/
 ├── app/
-│   ├── javascript/                    # React SPA (TypeScript)
+│   ├── javascript/                    # Hotwire frontend (TypeScript)
 │   │   ├── entrypoints/
-│   │   │   └── application.tsx        # React app entry point
-│   │   ├── components/
-│   │   │   ├── layouts/               # AppLayout, Header, Footer
-│   │   │   ├── pages/                 # React pages (music, grid, tactical, wire, feed, code, timeline, ...)
-│   │   │   ├── audio/                 # PlayerBar, SeekBar, QueuePanel
-│   │   │   ├── tactical/              # Tactical Grid UI (zone map, panels, status tabs)
-│   │   │   └── playlists/             # CreatePlaylistModal, AddToPlaylistDropdown
-│   │   ├── contexts/                  # AudioContext, TacticalContext, GridAuthContext
-│   │   ├── hooks/                     # 16 custom hooks (useGridAuth, useUplink, useCommandHistory,
-│   │   │                              #   useTransit, useZonePresence, useStreamWatch, useCountdown, ...)
-│   │   └── utils/                     # sanitizeHtml (DOMPurify), errorReporter, perfCollector, analyticsCollector
+│   │   │   └── hotwire.ts             # Turbo + Stimulus entry point
+│   │   ├── controllers/               # ~45 Stimulus controllers (player, uplink, tactical map,
+│   │   │                              #   breach target menus, terminal egg, packet log, ...)
+│   │   ├── lib/                       # Shared ActionCable consumer singleton
+│   │   ├── services/                  # errorReporter
+│   │   └── utils/                     # csrfFetch, perfCollector, analyticsCollector
 │   ├── controllers/
-│   │   ├── api/                       # JSON API for React SPA (36 controllers)
+│   │   ├── api/                       # JSON APIs (music/overlay/admin + programmatic grid clients)
+│   │   ├── grid/                      # Server-rendered PULSE GRID (terminal, tactical, meta, auth)
 │   │   ├── admin/                     # Server-rendered admin CRUD (61 controllers)
 │   │   └── application_controller.rb  # Multi-domain routing
 │   ├── models/                        # 100 Active Record models (48 grid_-prefixed)
@@ -467,13 +462,12 @@ hackr.tv/
 │   │   └── email_observer.rb          # Email tracking
 │   ├── views/
 │   │   ├── layouts/
-│   │   │   ├── application.html.erb   # React SPA shell
+│   │   │   ├── application.html.erb   # Hotwire layout (permanent player, toasts, terminal egg)
 │   │   │   └── admin.html.erb         # Admin layout
 │   │   └── admin/                     # Admin views (server-rendered)
 │   ├── components/
 │   │   └── band_profile_component.rb  # Reusable band profile (ViewComponent)
-│   └── channels/                      # 9 Action Cable channels
-│       ├── achievement_channel.rb     # Per-hackr achievement/mission broadcasts
+│   └── channels/                      # 8 Action Cable channels
 │       ├── grid_channel.rb            # Real-time multiplayer
 │       ├── zone_channel.rb            # Tactical map per-zone presence
 │       ├── live_chat_channel.rb       # Uplink comms
@@ -752,7 +746,7 @@ bin/rails data:overlays             # Overlay scenes, elements, tickers, lower t
 ## Roadmap
 
 ### Completed
-- React SPA Migration - Full SPA with React 19, TypeScript, React Router v7
+- Hotwire Migration - React SPA fully replaced by Turbo + Stimulus (Phases 0-7), permanent audio player preserved
 - Database-Backed Radio Stations - Full CRUD admin interface with playlist management
 - User Playlists - Create/edit/delete with Grid Hackr auth and public sharing
 - Queue Panel - Current + next 3 tracks display with click-to-jump
