@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import type { StreamInfo } from '~/types/uplink'
 
 const MENU_HEIGHT = 26 // matches .tui-nav height in tuicss
@@ -48,7 +47,8 @@ export const LiveNowBanner: React.FC<LiveNowBannerProps> = ({
           <span style={{ color: '#e0ffe0' }}>
             {' '}{stream.title}{stream.artist ? ` — ${stream.artist}` : ''}
           </span>
-          <Link to="/" style={{
+          {/* Hotwire-migrated path — full page load (plain anchor) */}
+          <a href="/" style={{
             color: '#00cc00',
             marginLeft: '16px',
             fontSize: '14px',
@@ -56,7 +56,7 @@ export const LiveNowBanner: React.FC<LiveNowBannerProps> = ({
             fontWeight: 'bold'
           }}>
             WATCH LIVE →
-          </Link>
+          </a>
         </span>
       </div>
 

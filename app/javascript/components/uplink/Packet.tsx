@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import type { Packet as PacketType, UplinkHackr } from '../../types/uplink'
 import { processUrls } from '../../utils/urlContent'
 
@@ -62,10 +61,11 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
       // Odd indices are the captured groups (usernames)
       if (index % 2 === 1) {
         const isCurrentUser = currentHackr?.hackr_alias.toLowerCase() === part.toLowerCase()
+        // /wire is Hotwire-migrated — plain anchor, full page load
         return (
-          <Link
+          <a
             key={`${keyPrefix}-${index}`}
-            to={`/wire/${part}`}
+            href={`/wire/${part}`}
             style={{
               color: isCurrentUser ? '#ffff00' : '#a78bfa',
               textDecoration: 'none',
@@ -75,7 +75,7 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
             }}
           >
             @{part}
-          </Link>
+          </a>
         )
       }
       return part
@@ -208,12 +208,13 @@ export const Packet: React.FC<PacketProps> = ({ packet, currentHackr, onDrop }) 
                     marginRight: '6px'
                   }}
                 >
-                  <Link
-                    to={`/wire/${packet.grid_hackr.hackr_alias}`}
+                  {/* /wire is Hotwire-migrated — plain anchor, full page load */}
+                  <a
+                    href={`/wire/${packet.grid_hackr.hackr_alias}`}
                     style={{ color: 'inherit', textDecoration: 'none' }}
                   >
                     @{packet.grid_hackr.hackr_alias}
-                  </Link>
+                  </a>
                 </span>
               )}
 

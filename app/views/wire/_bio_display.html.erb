@@ -1,0 +1,11 @@
+<%# Bio view state inside the profile-bio turbo frame. Locals: hackr, is_self. %>
+<div class="wire-bio-view">
+  <% if hackr.bio.present? %>
+    <span class="wire-bio-text"><%= bio_text(hackr.bio) %></span>
+  <% else %>
+    <span class="wire-bio-empty"><%= is_self ? "No bio yet — broadcast something about yourself." : "No bio on record." %></span>
+  <% end %>
+  <% if is_self %>
+    <%= link_to "✎ EDIT", wire_bio_edit_path(hackr.hackr_alias.downcase), class: "wire-bio-edit-link", data: {turbo_frame: "profile-bio"} %>
+  <% end %>
+</div>

@@ -1,0 +1,12 @@
+<%# ScheduledStreamBanner.tsx port. Locals: stream (next scheduled). %>
+<div class="scheduled-banner" data-controller="countdown"
+  data-countdown-deadline-value="<%= stream.scheduled_at.iso8601 %>">
+  <div class="scheduled-banner-sweep" data-countdown-target="sweep" hidden></div>
+  <span class="scheduled-banner-label">NEXT STREAM:</span>
+  <span class="scheduled-banner-title"><%= stream.title %></span>
+  <% if stream.artist %>
+    <span class="scheduled-banner-artist">— <%= stream.artist.name %> will be LIVE at <%= stream.scheduled_at.strftime("%b %-d, %-I:%M %p") %></span>
+  <% end %>
+  <span class="scheduled-banner-countdown" data-countdown-target="label"></span>
+  <a href="/schedule" class="scheduled-banner-link">[ FULL SCHEDULE ]</a>
+</div>

@@ -29,7 +29,11 @@ const RAILS_ONLY_PATHS = [
   '/grid/forgot_password',
   '/grid/reset_password',
   '/grid/confirm_email_change',
-  '/grid/identity'
+  '/grid/identity',
+  // Hotwire-migrated (Phase 3):
+  '/',
+  '/wire',
+  '/feed'
 ]
 
 const isRailsOnlyPath = (href: string) =>

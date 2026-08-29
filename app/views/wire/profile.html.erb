@@ -1,0 +1,42 @@
+<% content_for :title, "@#{@hackr.hackr_alias} — The WIRE — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hotwire-page white-168-text wire-page">
+    <%= turbo_stream_from "wire_html" %>
+
+    <%= render "wire/profile_header", hackr: @hackr, stats: @stats, is_self: @is_self %>
+
+    <% if flash[:x_pin_error] %>
+      <div class="alert alert-error"><%= flash[:x_pin_error] %></div>
+    <% end %>
+
+    <% if @pinned.any? %>
+      <div class="pinned-pulses">
+        <div class="pinned-pulses-title">📌 PINNED</div>
+        <% @pinned.each_with_index do |pulse, idx| %>
+          <%= render "wire/pulse_card", pulse: pulse, viewer: current_hackr,
+            echoed: @echoed_ids.include?(pulse.id),
+            pinnable: @is_self, pinned: true,
+            can_up: @is_self && idx > 0, can_down: @is_self && idx < @pinned.length - 1 %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="wire-section-title">BROADCASTS</div>
+
+    <div class="user-timeline">
+      <% if @timeline.empty? %>
+        <div class="empty-state">
+          <p><%= @pinned.any? ? "@#{@hackr.hackr_alias}'s broadcasts are all pinned above." : "@#{@hackr.hackr_alias} hasn't broadcast any pulses yet." %></p>
+        </div>
+      <% else %>
+        <% @timeline.each do |pulse, kind| %>
+          <%= render "wire/pulse_card", pulse: pulse, viewer: current_hackr,
+            echoed: @echoed_ids.include?(pulse.id),
+            indicator: kind, indicator_alias: @hackr.hackr_alias,
+            pinnable: @is_self && pulse.grid_hackr_id == @hackr.id && !pulse.is_splice? %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

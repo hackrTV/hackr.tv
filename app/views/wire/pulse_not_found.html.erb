@@ -1,0 +1,8 @@
+<% content_for :title, "Pulse not found — The WIRE — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="white-168-text wire-page">
+    <div class="alert alert-error">Pulse not found</div>
+    <%= link_to "Back to Hotwire", wire_path, class: "btn btn-primary" %>
+  </div>
+<% end %>

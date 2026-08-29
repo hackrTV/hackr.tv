@@ -1,0 +1,42 @@
+<% content_for :title, "The WIRE — hackr.tv" %>
+
+<% if @page > 1 %>
+  <%# Lazy-frame pagination response: Turbo extracts just this frame. %>
+  <%= render "wire/feed_page" %>
+<% else %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="hotwire-page white-168-text wire-page">
+      <%= turbo_stream_from "wire_html" %>
+
+      <div class="hotwire-header" data-controller="wire-status">
+        <h1 title="Wideband Information Relay Emitter">The WIRE</h1>
+        <span class="status-disconnected" data-wire-status-target="badge">◌ CONNECTING</span>
+      </div>
+
+      <% if logged_in? %>
+        <%= render "wire/composer" %>
+      <% else %>
+        <div class="wire-login-prompt">
+          <p class="wire-login-prompt-lede">
+            <a href="/grid/login">Log in</a> to broadcast on the WIRE
+          </p>
+          <p class="wire-login-prompt-sub">Wideband Information Relay Emitter</p>
+        </div>
+      <% end %>
+
+      <div id="wire-feed">
+        <% if @pulses.any? %>
+          <%= render partial: "wire/pulse_card", collection: @pulses, as: :pulse,
+            locals: {viewer: current_hackr} %>
+        <% else %>
+          <div class="empty-state" id="wire-empty">
+            <p>The WIRE is silent. Broadcast the first pulse.</p>
+            <p class="wire-empty-sub">Wideband Information Relay Emitter</p>
+          </div>
+        <% end %>
+      </div>
+
+      <%= render "wire/feed_pager" %>
+    </div>
+  <% end %>
+<% end %>

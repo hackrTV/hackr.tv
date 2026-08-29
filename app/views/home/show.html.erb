@@ -1,0 +1,17 @@
+<% content_for :title, "hackr.tv" %>
+
+<div data-controller="stream-status" data-stream-status-live-value="<%= @live.present? %>">
+  <% if @next_scheduled && !@live %>
+    <%= render "home/scheduled_banner", stream: @next_scheduled %>
+  <% end %>
+
+  <%= render layout: "shared/default_chrome", locals: {hide_live_banner: true} do %>
+    <% if @live %>
+      <%= render "home/live_embed", stream: @live %>
+    <% elsif @next_scheduled&.display_state == :starting_soon %>
+      <%= render "home/starting_soon", stream: @next_scheduled %>
+    <% else %>
+      <%= render "home/terminal" %>
+    <% end %>
+  <% end %>
+</div>

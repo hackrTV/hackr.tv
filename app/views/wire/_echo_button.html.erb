@@ -1,0 +1,10 @@
+<%# EchoButton.tsx port. The count span has its own id so the global
+    echo-count broadcast can update it without touching the viewer's
+    echoed state. Locals: pulse, echoed, animate. %>
+<%= form_with url: wire_pulse_echo_path(pulse), class: "wire-inline-form", id: "pulse_#{pulse.id}_echo" do %>
+  <button type="submit" class="echo-button<%= " echoed" if echoed %><%= " animating" if local_assigns.fetch(:animate, false) %>"
+    title="<%= echoed ? "Remove echo" : "Echo this pulse" %>">
+    <span class="echo-icon">⟳</span>
+    <%= render "wire/echo_count", pulse: pulse %>
+  </button>
+<% end %>

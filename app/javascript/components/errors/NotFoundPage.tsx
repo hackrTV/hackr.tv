@@ -82,7 +82,7 @@ export const NotFoundPage: React.FC = () => {
           <br /><br />
           Quick navigation:
           <br />
-          &nbsp;&nbsp;• <Link to="/" style={{ color: '#00ff00', textDecoration: 'underline' }}>Return to hackr.tv origin</Link>
+          &nbsp;&nbsp;• <a href="/" style={{ color: '#00ff00', textDecoration: 'underline' }}>Return to hackr.tv origin</a>
           <br />
           &nbsp;&nbsp;• <a href="#" onClick={(e) => { e.preventDefault(); openTerminal() }} style={{ color: '#22d3ee', textDecoration: 'underline' }}>Access the Terminal</a>
           <br />

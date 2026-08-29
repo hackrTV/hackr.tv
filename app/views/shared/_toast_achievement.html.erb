@@ -1,0 +1,21 @@
+<%# AchievementToast.tsx (achievement variant) port. Locals:
+    achievement, cred_reward, leveled_up, new_clearance. %>
+<% category = achievement.category.presence || "grid" %>
+<div class="toast toast--achievement" data-controller="toast" data-action="click->toast#dismiss">
+  <div class="toast-kicker toast-kicker--achievement">
+    ACHIEVEMENT UNLOCKED
+    <span class="toast-category toast-category--<%= category %>">[<%= category.upcase %>]</span>
+  </div>
+  <div class="toast-title">
+    <% if achievement.badge_icon.present? %><span class="toast-badge-icon"><%= achievement.badge_icon %></span><% end %>
+    <span class="toast-name"><%= achievement.name %></span>
+  </div>
+  <% if achievement.description.present? %>
+    <div class="toast-description"><%= achievement.description %></div>
+  <% end %>
+  <div class="toast-rewards">
+    <% if achievement.xp_reward.to_i > 0 %><span class="toast-xp">+<%= achievement.xp_reward %> XP</span><% end %>
+    <% if cred_reward.to_i > 0 %><span class="toast-cred">+<%= cred_reward %> CRED</span><% end %>
+    <% if leveled_up && new_clearance %><span class="toast-clearance">▲ CL <%= new_clearance %></span><% end %>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<%# ProfileHeader.tsx port. Locals: hackr, stats, is_self. %>
+<div class="wire-profile-header">
+  <div class="wire-profile-title-row">
+    <h1 class="wire-profile-alias">@<%= hackr.hackr_alias %></h1>
+    <span class="wire-role-badge" style="border-color: <%= role_color(hackr.role) %>; color: <%= role_color(hackr.role) %>;"><%= hackr.role %></span>
+    <span class="wire-cl-badge">CL<%= hackr.stat("clearance").to_i %></span>
+    <button type="button" class="wire-share-button"
+      data-controller="clipboard"
+      data-clipboard-text-value="<%= "#{request.base_url}/@#{hackr.hackr_alias}" %>"
+      data-clipboard-target="button"
+      data-action="click->clipboard#copy">⧉ SHARE</button>
+  </div>
+
+  <div class="wire-profile-meta">
+    <span>MEMBER SINCE <%= hackr.created_at.strftime("%B %-d, %Y").upcase %></span>
+    <% if hackr.last_activity_at %>
+      <span class="<%= (Time.current - hackr.last_activity_at) < 5.minutes ? "wire-online" : "" %>">● <%= last_active_label(hackr.last_activity_at) %></span>
+    <% end %>
+  </div>
+
+  <div class="wire-profile-bio">
+    <%= turbo_frame_tag "profile-bio" do %>
+      <%= render "wire/bio_display", hackr: hackr, is_self: is_self %>
+    <% end %>
+  </div>
+
+  <div class="wire-stat-tiles">
+    <% [["WIRE PULSES", stats[:pulses]],
+        ["ECHOES", stats[:echoes_received]],
+        ["PACKETS", stats[:packets]],
+        ["ACHIEVEMENTS", stats[:achievements]],
+        ["BREACHES", stats[:breaches_completed]],
+        ["WATCH TIME", watch_time_label(stats[:watch_seconds])]].each do |label, value| %>
+      <div class="wire-stat-tile">
+        <div class="wire-stat-value"><%= value %></div>
+        <div class="wire-stat-label"><%= label %></div>
+      </div>
+    <% end %>
+  </div>
+</div>

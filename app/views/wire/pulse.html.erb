@@ -1,0 +1,22 @@
+<% content_for :title, "Thread — The WIRE — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="single-pulse-page white-168-text wire-page">
+    <%= turbo_stream_from "wire_html" %>
+
+    <div class="thread-view">
+      <div class="thread-header">
+        <h2>Thread</h2>
+        <div class="thread-stats"><%= @thread.length %> <%= (@thread.length == 1) ? "pulse" : "pulses" %></div>
+      </div>
+
+      <div class="back-link wire-thread-back">
+        <%= link_to "← Back to the WIRE", wire_path %>
+      </div>
+
+      <div class="thread-container">
+        <%= render "wire/thread_node", pulse: @root, children: @children, depth: 0 %>
+      </div>
+    </div>
+  </div>
+<% end %>

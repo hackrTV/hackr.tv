@@ -6,10 +6,11 @@ RSpec.describe PagesController, type: :request do
 
   describe "SPA routes" do
     describe "GET /" do
-      it "renders the SPA root" do
+      it "renders the Hotwire home page (migrated Phase 3)" do
         get "/"
         expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
+        expect(response.body).to include("terminal-container")
+        expect(response.body).not_to include('<div id="root">')
       end
     end
 

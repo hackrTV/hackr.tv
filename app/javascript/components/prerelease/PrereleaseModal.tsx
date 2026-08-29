@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { useAppSettings } from '~/contexts/AppSettingsContext'
 
 export const PrereleaseModal: React.FC = () => {
@@ -74,13 +73,13 @@ export const PrereleaseModal: React.FC = () => {
           >
             LOG IN
           </a>
-          <Link
-            to="/"
+          <a
+            href="/"
             className="tui-button purple-168"
             style={{ padding: '10px 25px', fontSize: '14px' }}
           >
             GO HOME
-          </Link>
+          </a>
         </div>
       </div>
     </div>

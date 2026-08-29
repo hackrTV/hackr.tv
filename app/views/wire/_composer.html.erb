@@ -1,0 +1,27 @@
+<%# PulseComposer.tsx port. Locals: parent_pulse (nil for the feed
+    composer). 256-char limit; the input accepts +50 so the over-limit
+    error state is visible, exactly like the SPA. %>
+<% parent_pulse = local_assigns.fetch(:parent_pulse, nil) %>
+<div class="pulse-composer">
+  <%= form_with url: wire_pulses_path, data: {
+    controller: "composer",
+    composer_limit_value: 256,
+    action: "turbo:submit-end->composer#submitted"
+  } do %>
+    <%= hidden_field_tag :parent_pulse_id, parent_pulse&.id %>
+    <div class="form-group">
+      <%= text_area_tag :content, nil, rows: 3, maxlength: 306, class: "form-control pulse-input",
+        placeholder: parent_pulse ? "Splice into @#{parent_pulse.grid_hackr.hackr_alias}'s pulse..." : "Broadcast on the WIRE...",
+        data: {composer_target: "input", action: "input->composer#update keydown->composer#keydown"} %>
+      <div class="pulse-composer-footer">
+        <span class="char-count" data-composer-target="count"></span>
+        <button type="submit" class="btn btn-primary" disabled data-composer-target="submit">
+          <%= parent_pulse ? "Splice" : "Broadcast" %>
+        </button>
+      </div>
+    </div>
+    <% unless parent_pulse %>
+      <div id="composer-error"></div>
+    <% end %>
+  <% end %>
+</div>

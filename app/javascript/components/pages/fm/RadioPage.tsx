@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { FmLayout } from '~/components/layouts/FmLayout'
 import { LoadingSpinner } from '~/components/shared/LoadingSpinner'
 import type { TrackData } from '~/types/track'
@@ -317,8 +316,9 @@ export const RadioPage: React.FC = () => {
                               <CodexText>A live transmission is cutting through the noise. Tune in now on the root frequency.</CodexText>
                             </p>
 
-                            <Link
-                              to="/"
+                            {/* Hotwire-migrated path — full page load (plain anchor) */}
+                            <a
+                              href="/"
                               className="tui-button tune-in-btn"
                               style={{
                                 display: 'block',
@@ -331,7 +331,7 @@ export const RadioPage: React.FC = () => {
                               }}
                             >
                               ▶ WATCH LIVE
-                            </Link>
+                            </a>
                           </div>
                         </fieldset>
                       </div>

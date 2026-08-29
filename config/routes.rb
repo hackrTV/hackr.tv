@@ -2,8 +2,8 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   get "up" => "rails/health#show", :as => :rails_health_check
 
-  # Root route (SPA)
-  root "pages#spa_root"
+  # Root route — Hotwire (migrated Phase 3)
+  root "home#show"
 
   # XERAEN vidz redirect to thecyberpulse
   get "xeraen/vidz", to: redirect("/thecyberpulse/vidz")
@@ -127,8 +127,8 @@ Rails.application.routes.draw do
   # Stream schedule — Hotwire (migrated Phase 1)
   get "schedule", to: "schedule#show", as: :streams_schedule
 
-  # World Event Feed (SPA)
-  get "feed", to: "pages#spa_root", as: :world_feed
+  # World Event Feed — Hotwire (migrated Phase 3)
+  get "feed", to: "feed#show", as: :world_feed
 
   # Codex (wiki) routes — Hotwire (migrated Phase 1)
   scope "codex" do
@@ -147,11 +147,21 @@ Rails.application.routes.draw do
   # external links and address-bar entry, which hit Rails first.
   get "/@:alias", to: redirect("/wire/%{alias}"), constraints: {alias: /[A-Za-z0-9_]+/}
 
-  # PulseWire routes - SPA
+  # PulseWire routes — Hotwire (migrated Phase 3). The pulse/:id page and
+  # the pulses/* form endpoints are declared before :username so the
+  # profile glob can't swallow them.
   scope "wire" do
-    get "/", to: "pages#spa_root", as: :wire
-    get "pulse/:id", to: "pages#spa_root", as: :wire_pulse
-    get ":username", to: "pages#spa_root", as: :wire_user
+    get "/", to: "wire#index", as: :wire
+    post "pulses", to: "wire/pulses#create", as: :wire_pulses
+    delete "pulses/:id", to: "wire/pulses#destroy", as: :wire_destroy_pulse
+    post "pulses/:id/echo", to: "wire/echoes#create", as: :wire_pulse_echo
+    post "pulses/:id/pin", to: "wire/pins#create", as: :wire_pulse_pin
+    delete "pulses/:id/pin", to: "wire/pins#destroy"
+    patch "pulses/:id/pin/move", to: "wire/pins#move", as: :wire_pulse_pin_move
+    get "pulse/:id", to: "wire#pulse", as: :wire_pulse
+    get ":username/bio/edit", to: "wire/bios#edit", as: :wire_bio_edit, constraints: {username: /[A-Za-z0-9_]+/}
+    patch ":username/bio", to: "wire/bios#update", as: :wire_bio, constraints: {username: /[A-Za-z0-9_]+/}
+    get ":username", to: "wire#profile", as: :wire_user, constraints: {username: /[A-Za-z0-9_]+/}
   end
 
   # Uplink routes - SPA

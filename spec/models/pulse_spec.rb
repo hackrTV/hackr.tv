@@ -138,8 +138,7 @@ RSpec.describe Pulse, type: :model do
       it "broadcasts to pulse_wire channel after create" do
         hackr = create(:grid_hackr)
 
-        # Allow world event feed broadcast (root pulses also publish to feed)
-        allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+        allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (Phase 3)
 
         expect(ActionCable.server).to receive(:broadcast).with(
           "pulse_wire",
@@ -161,8 +160,7 @@ RSpec.describe Pulse, type: :model do
       it "includes pulse id and pulsed_at in broadcast" do
         hackr = create(:grid_hackr)
 
-        # Allow world event feed broadcast
-        allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+        allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (Phase 3)
 
         expect(ActionCable.server).to receive(:broadcast).with("pulse_wire", anything) do |channel, data|
           expect(channel).to eq("pulse_wire")
@@ -188,8 +186,7 @@ RSpec.describe Pulse, type: :model do
       end
 
       it "sets parent_pulse_id to nil for root pulses" do
-        # Allow world event feed broadcast
-        allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+        allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (Phase 3)
 
         expect(ActionCable.server).to receive(:broadcast).with(
           "pulse_wire",

@@ -129,6 +129,19 @@ class Pulse < ApplicationRecord
       }
     })
 
+    # Dual-publish (Hotwire migration Phase 3): the JSON broadcast above
+    # stays for the overlay pulsewire page + any remaining SPA listener;
+    # Hotwire feed pages subscribe to the separate "wire_html" stream.
+    # Root pulses only — the feed lists roots; splices live on thread pages.
+    if parent_pulse_id.nil?
+      Turbo::StreamsChannel.broadcast_prepend_to(
+        "wire_html",
+        target: "wire-feed",
+        partial: "wire/pulse_card",
+        locals: {pulse: self, viewer: nil, echoed: false}
+      )
+    end
+
     # Publish root pulses (not splices) to the world event feed
     if parent_pulse_id.nil?
       WorldEventFeed::Publisher.publish(
@@ -144,6 +157,8 @@ class Pulse < ApplicationRecord
       type: "pulse_deleted",
       pulse_id: id
     })
+
+    Turbo::StreamsChannel.broadcast_remove_to("wire_html", target: "pulse_#{id}")
   end
 
   def broadcast_signal_drop
@@ -153,5 +168,14 @@ class Pulse < ApplicationRecord
       type: "pulse_dropped",
       pulse_id: id
     })
+
+    # Replace the card with its dropped-state render (viewer-neutral; the
+    # pulse-card Stimulus controller re-reveals owner/admin controls).
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "wire_html",
+      target: "pulse_#{id}",
+      partial: "wire/pulse_card",
+      locals: {pulse: self, viewer: nil, echoed: false}
+    )
   end
 end

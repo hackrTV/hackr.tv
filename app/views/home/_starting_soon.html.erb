@@ -1,0 +1,9 @@
+<%# StartingSoonHero.tsx port. Locals: stream. %>
+<div class="starting-soon-hero">
+  <div class="starting-soon-sweep"></div>
+  <div class="starting-soon-title">STREAM STARTING SOON</div>
+  <div class="starting-soon-stream-title"><%= stream.title %></div>
+  <% if stream.artist %>
+    <div class="starting-soon-artist"><%= stream.artist.name %></div>
+  <% end %>
+</div>

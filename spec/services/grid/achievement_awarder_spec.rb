@@ -79,8 +79,7 @@ RSpec.describe Grid::AchievementAwarder do
     end
 
     it "broadcasts to the per-hackr AchievementChannel stream" do
-      # Allow world event feed broadcasts
-      allow(ActionCable.server).to receive(:broadcast).with("world_event_feed", anything)
+      allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (Phase 3)
 
       expect(ActionCable.server).to receive(:broadcast).with(
         "achievement_channel_#{hackr.id}",

@@ -1,0 +1,9 @@
+<%# One terminal line. The full text ships in a data attribute; the
+    typed-line controller types it into the span through a global queue
+    (16ms/char + a random 150–450ms gap), for initial render and live
+    appends alike. %>
+<div class="feed-line" data-controller="typed-line"
+  data-typed-line-text-value="<%= WorldEventFeed::Publisher.render_message(event) %>">
+  <span class="feed-line-prefix">&gt;</span>
+  <span class="feed-line-text" style="color: <%= feed_event_color(event.event_type) %>" data-typed-line-target="text"></span>
+</div>
