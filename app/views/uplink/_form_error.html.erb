@@ -1,0 +1,6 @@
+<%# Error slot replaced by packet create responses. Locals: error,
+    wait_seconds. The packet-form controller's errorTargetConnected
+    shows the message and starts the wait_seconds cooldown. %>
+<div id="uplink-form-error" data-packet-form-target="error"<% if wait_seconds %> data-wait-seconds="<%= wait_seconds %>"<% end %>>
+  <% if error %><div class="packet-input-error"><%= error %></div><% end %>
+</div>

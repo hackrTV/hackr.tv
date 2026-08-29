@@ -102,7 +102,11 @@ RSpec.describe ChatMessage, type: :model do
         channel = create(:chat_channel, slug: "ambient")
         hackr = create(:grid_hackr)
 
-        expect(ActionCable.server).to receive(:broadcast).with(
+        allow(ActionCable.server).to receive(:broadcast).and_call_original
+
+        create(:chat_message, chat_channel: channel, grid_hackr: hackr, content: "Test broadcast message")
+
+        expect(ActionCable.server).to have_received(:broadcast).with(
           "uplink:ambient",
           hash_including(
             type: "new_packet",
@@ -115,8 +119,25 @@ RSpec.describe ChatMessage, type: :model do
             )
           )
         )
+      end
+    end
 
-        create(:chat_message, chat_channel: channel, grid_hackr: hackr, content: "Test broadcast message")
+    describe "#broadcast_new_packet_html (dual-publish)" do
+      it "appends the packet partial to the channel's uplink_html stream" do
+        channel = create(:chat_channel, slug: "ambient")
+
+        allow(Turbo::StreamsChannel).to receive(:broadcast_append_to).and_call_original
+
+        message = create(:chat_message, chat_channel: channel, content: "Hotwire broadcast test")
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with(
+          ["uplink_html", "ambient"],
+          hash_including(
+            target: "uplink-log",
+            partial: "uplink/packet",
+            locals: {packet: message, viewer: nil}
+          )
+        )
       end
     end
   end
@@ -136,12 +157,31 @@ RSpec.describe ChatMessage, type: :model do
     it "broadcasts packet_dropped message" do
       message = create(:chat_message)
 
-      expect(ActionCable.server).to receive(:broadcast).with(
+      allow(ActionCable.server).to receive(:broadcast).and_call_original
+
+      message.drop!
+
+      expect(ActionCable.server).to have_received(:broadcast).with(
         message.chat_channel.stream_name,
         hash_including(type: "packet_dropped", packet_id: message.id)
       )
+    end
+
+    it "replaces the packet partial on the uplink_html stream (dual-publish)" do
+      message = create(:chat_message)
+
+      allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to).and_call_original
 
       message.drop!
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
+        ["uplink_html", message.chat_channel.slug],
+        hash_including(
+          target: "chat_message_#{message.id}",
+          partial: "uplink/packet",
+          locals: {packet: message, viewer: nil}
+        )
+      )
     end
   end
 
@@ -160,12 +200,31 @@ RSpec.describe ChatMessage, type: :model do
     it "broadcasts packet_restored message" do
       message = create(:chat_message, :dropped)
 
-      expect(ActionCable.server).to receive(:broadcast).with(
+      allow(ActionCable.server).to receive(:broadcast).and_call_original
+
+      message.restore!
+
+      expect(ActionCable.server).to have_received(:broadcast).with(
         message.chat_channel.stream_name,
         hash_including(type: "packet_restored", packet_id: message.id)
       )
+    end
+
+    it "replaces the packet partial on the uplink_html stream (dual-publish)" do
+      message = create(:chat_message, :dropped)
+
+      allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to).and_call_original
 
       message.restore!
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
+        ["uplink_html", message.chat_channel.slug],
+        hash_including(
+          target: "chat_message_#{message.id}",
+          partial: "uplink/packet",
+          locals: {packet: message, viewer: nil}
+        )
+      )
     end
   end
 end

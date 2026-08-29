@@ -30,6 +30,12 @@ class ChatChannel < ApplicationRecord
   scope :active, -> { where(is_active: true) }
   scope :requiring_livestream, -> { where(requires_livestream: true) }
 
+  # The channel the home-page dock and popout pin to (conventionally
+  # slug "live", but resolved structurally so a rename can't strand them).
+  def self.livestream_default
+    active.requiring_livestream.order(:id).first
+  end
+
   # Check if channel is currently available (considering livestream requirement)
   def currently_available?
     return false unless is_active?

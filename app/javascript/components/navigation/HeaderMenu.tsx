@@ -254,9 +254,9 @@ export const HeaderMenu: React.FC = () => {
               {isLoggedIn && (
                 <div className="mobile-menu-section">
                   <div className="mobile-menu-section-title">6. UPLINK</div>
-                  <Link to="/uplink" className={`mobile-menu-item${isActive('/uplink') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  <a href="/uplink" className={`mobile-menu-item${isActive('/uplink') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                     <span className="purple-168-text">/</span>transmit
-                  </Link>
+                  </a>
                 </div>
               )}
 
@@ -563,12 +563,12 @@ export const HeaderMenu: React.FC = () => {
             </a>
           </li>
 
-          {/* Uplink (logged in only) */}
+          {/* Uplink (logged in only) — Hotwire-migrated path, full page load (plain anchor) */}
           {isLoggedIn && (
             <li className={`header-nav-item${isActive('/uplink') ? ' active' : ''}`}>
-              <Link to="/uplink">
+              <a href="/uplink">
                 <span className="purple-168-text">6</span> Uplink&nbsp;
-              </Link>
+              </a>
             </li>
           )}
 

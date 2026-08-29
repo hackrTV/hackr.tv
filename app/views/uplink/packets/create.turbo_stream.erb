@@ -1,0 +1,7 @@
+<%# The author's own contextual packet (the global broadcast copy is
+    viewer-neutral and idempotent by dom_id — either arrival order lands
+    correctly because the packet controller re-reveals on connect). %>
+<%= turbo_stream.append "uplink-log", partial: "uplink/packet",
+  locals: {packet: @packet, viewer: current_hackr} %>
+<%= turbo_stream.replace "uplink-form-error", partial: "uplink/form_error",
+  locals: {error: nil, wait_seconds: nil} %>

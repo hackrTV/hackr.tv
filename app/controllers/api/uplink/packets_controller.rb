@@ -25,45 +25,13 @@ module Api
 
       # POST /api/uplink/channels/:channel_slug/packets
       def create
-        # Check if user is blackedout
-        if UserPunishment.blackedout?(current_hackr)
-          return render json: {
-            success: false,
-            error: "You have been blackedout from Uplink."
-          }, status: :forbidden
-        end
-
-        # Check if user is squelched
-        if UserPunishment.squelched?(current_hackr)
-          return render json: {
-            success: false,
-            error: "You have been squelched. Please wait for your squelch to expire."
-          }, status: :forbidden
-        end
-
-        # Check channel accessibility
-        unless @channel.accessible_by?(current_hackr)
-          return render json: {
-            success: false,
-            error: "You cannot access this channel."
-          }, status: :forbidden
-        end
-
-        # Check slow mode
-        if @channel.slow_mode_seconds > 0
-          last_message = @channel.chat_messages
-            .where(grid_hackr: current_hackr)
-            .order(created_at: :desc)
-            .first
-
-          if last_message && last_message.created_at > @channel.slow_mode_seconds.seconds.ago
-            wait_time = (@channel.slow_mode_seconds - (Time.current - last_message.created_at)).ceil
-            return render json: {
-              success: false,
-              error: "Slow mode active. Please wait #{wait_time} seconds.",
-              wait_seconds: wait_time
-            }, status: :too_many_requests
-          end
+        # Blackout / squelch / role access / slow mode — shared with the
+        # Hotwire form flow (Phase 5) via the gatekeeper.
+        gate = ::Uplink::PacketGatekeeper.check(current_hackr, @channel)
+        unless gate.ok?
+          payload = {success: false, error: gate.error}
+          payload[:wait_seconds] = gate.wait_seconds if gate.wait_seconds
+          return render json: payload, status: gate.status
         end
 
         # Get current livestream if channel requires it

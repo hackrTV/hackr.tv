@@ -7,7 +7,8 @@
 
   <%= render layout: "shared/default_chrome", locals: {hide_live_banner: true} do %>
     <% if @live %>
-      <%= render "home/live_embed", stream: @live %>
+      <%= render "home/live_embed", stream: @live,
+        uplink_channel: @uplink_channel, uplink_packets: @uplink_packets %>
     <% elsif @next_scheduled&.display_state == :starting_soon %>
       <%= render "home/starting_soon", stream: @next_scheduled %>
     <% else %>

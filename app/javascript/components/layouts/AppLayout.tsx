@@ -4,8 +4,8 @@ import { trackEvent } from '~/utils/analyticsCollector'
 import { LoadingPage } from '~/components/shared/LoadingSpinner'
 
 // Lazy load pages for code splitting.
-// The music cluster (fm, vault, playlists, artists, releases, bands)
-// migrated to Hotwire in Phase 4 — only THE PULSE GRID + Uplink remain.
+// The music cluster migrated to Hotwire in Phase 4 and Uplink in
+// Phase 5 — only THE PULSE GRID remains.
 const GridGamePage = lazy(() => import('~/components/pages/grid/GridGamePage').then(m => ({ default: m.GridGamePage })))
 const GridTacticalPage = lazy(() => import('~/components/pages/grid/GridTacticalPage').then(m => ({ default: m.GridTacticalPage })))
 const AchievementsPage = lazy(() => import('~/components/pages/grid/AchievementsPage'))
@@ -14,8 +14,6 @@ const SchematicsPage = lazy(() => import('~/components/pages/grid/SchematicsPage
 const LoadoutPage = lazy(() => import('~/components/pages/grid/LoadoutPage'))
 const DeckPage = lazy(() => import('~/components/pages/grid/DeckPage'))
 const TransitPage = lazy(() => import('~/components/pages/grid/TransitPage'))
-const UplinkPage = lazy(() => import('~/components/pages/uplink/UplinkPage').then(m => ({ default: m.UplinkPage })))
-const UplinkPopoutPage = lazy(() => import('~/components/pages/uplink/UplinkPopoutPage').then(m => ({ default: m.UplinkPopoutPage })))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
 // Auth components
@@ -46,10 +44,6 @@ export const AppLayout: React.FC = () => {
           <Route path="/transit" element={<ProtectedRoute><TransitPage /></ProtectedRoute>} />
           <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
           <Route path="/grid/1337" element={<FeatureGate feature="tactical_grid"><GridTacticalPage /></FeatureGate>} />
-          {/* Uplink routes - protected */}
-          <Route path="/uplink" element={<ProtectedRoute><UplinkPage /></ProtectedRoute>} />
-          {/* Uplink popout - public for livestream viewing */}
-          <Route path="/uplink/popout" element={<UplinkPopoutPage />} />
           {/* 404 catch-all - must be last */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

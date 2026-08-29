@@ -43,8 +43,14 @@ class ChatMessage < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :for_channel, ->(channel) { where(chat_channel: channel) }
 
+  # Dual-publish (Phase 5): the JSON broadcasts feed LiveChatChannel
+  # subscribers (relay, synthia — external consumers, never retire);
+  # the Turbo Stream broadcasts feed the Hotwire uplink pages on their
+  # own stream name so HTML frames never reach JSON subscribers.
   after_create_commit :broadcast_new_packet
+  after_create_commit :broadcast_new_packet_html
   after_update_commit :broadcast_dropped_change, if: :saved_change_to_dropped?
+  after_update_commit :broadcast_dropped_change_html, if: :saved_change_to_dropped?
 
   # Drop a message (moderation action)
   def drop!
@@ -78,6 +84,27 @@ class ChatMessage < ApplicationRecord
         packet: packet_json
       })
     end
+  end
+
+  def broadcast_new_packet_html
+    Turbo::StreamsChannel.broadcast_append_to(
+      ["uplink_html", chat_channel.slug],
+      target: "uplink-log",
+      partial: "uplink/packet",
+      locals: {packet: self, viewer: nil}
+    )
+  end
+
+  # Drop and restore are both a whole-packet replace: the partial renders
+  # the redacted or restored state from `dropped`, and per-viewer controls
+  # re-reveal via the packet Stimulus controller on connect.
+  def broadcast_dropped_change_html
+    Turbo::StreamsChannel.broadcast_replace_to(
+      ["uplink_html", chat_channel.slug],
+      target: ActionView::RecordIdentifier.dom_id(self),
+      partial: "uplink/packet",
+      locals: {packet: self, viewer: nil}
+    )
   end
 
   def packet_json

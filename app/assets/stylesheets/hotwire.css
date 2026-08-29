@@ -649,6 +649,9 @@
 
 .wire-page { max-width: 800px; margin: 0 auto; padding-top: 30px; }
 .wire-inline-form { display: inline; }
+/* Author display beats the UA [hidden] rule — without this the hidden
+   owner-only delete form renders for every viewer (Phase 5 find). */
+.wire-inline-form[hidden] { display: none; }
 .wire-loading { text-align: center; padding: 40px; }
 .wire-empty-sub { color: #444; font-size: 0.8rem; margin-top: 10px; }
 .wire-end-sub { color: #444; font-size: 0.75rem; margin-top: 10px; }

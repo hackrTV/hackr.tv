@@ -1,20 +1,12 @@
 require "rails_helper"
 
 RSpec.describe PagesController, type: :request do
-  # The SPA shell now serves only THE PULSE GRID + Uplink; everything else
-  # is Hotwire. Per-page rendering is covered by the dedicated request
-  # specs (wire/feed/home/vault/fm/radio/playlists/artist specs) — this
-  # file just pins which stack owns which route family.
+  # The SPA shell now serves only THE PULSE GRID; everything else is
+  # Hotwire. Per-page rendering is covered by the dedicated request
+  # specs (wire/feed/home/vault/fm/radio/playlists/artist/uplink specs) —
+  # this file just pins which stack owns which route family.
 
   describe "SPA routes (still React)" do
-    describe "GET /uplink" do
-      it "renders the SPA root" do
-        get "/uplink"
-        expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
-      end
-    end
-
     describe "GET /grid" do
       it "renders the SPA root" do
         get "/grid"
@@ -49,6 +41,15 @@ RSpec.describe PagesController, type: :request do
         expect(response).to have_http_status(:success)
         expect(response.body).not_to include('<div id="root">')
         expect(response.body).to include("PULSE VAULT")
+      end
+    end
+
+    describe "GET /uplink/popout" do
+      it "is served by the Hotwire uplink popout (migrated Phase 5)" do
+        get "/uplink/popout"
+        expect(response).to have_http_status(:success)
+        expect(response.body).not_to include('<div id="root">')
+        expect(response.body).to include("UPLINK")
       end
     end
   end

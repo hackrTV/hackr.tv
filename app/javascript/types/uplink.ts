@@ -1,42 +1,7 @@
-export interface UplinkHackr {
-  id: number
-  hackr_alias: string
-  role: string
-  is_squelched?: boolean
-  is_blackedout?: boolean
-}
-
-export interface ChatChannel {
-  slug: string
-  name: string
-  description: string
-  is_active: boolean
-  requires_livestream: boolean
-  currently_available: boolean
-  accessible: boolean
-  slow_mode_seconds: number
-  minimum_role: string
-}
-
-export interface Packet {
-  id: number
-  content: string
-  created_at: string
-  dropped: boolean
-  grid_hackr: UplinkHackr
-  hackr_stream_id: number | null
-  source: string | null
-}
-
-export interface UplinkMessage {
-  type: 'new_packet' | 'packet_dropped' | 'packet_restored' | 'initial_packets' | 'presence_update'
-  packet?: Packet
-  packets?: Packet[]
-  packet_id?: number
-  channel?: string
-  count?: number
-  presence_count?: number
-}
+// Stream-status types only. The uplink CHAT types that used to live here
+// left with the Phase 5 Hotwire migration (chat is server-rendered now);
+// these remain because useStreamStatus + LiveNowBanner — still React
+// until Phase 6 — consume the StreamStatusChannel payloads.
 
 export interface StreamStatusMessage {
   type: 'stream_status' | 'stream_live' | 'stream_ended' | 'scheduled_stream_updated'
@@ -59,55 +24,4 @@ export interface ScheduledStreamInfo {
   artist_slug: string | null
   scheduled_at: string
   display_state: 'upcoming' | 'starting_soon' | 'expired' | 'cancelled' | 'live' | 'ended' | 'unscheduled'
-}
-
-export interface ChannelsResponse {
-  channels: ChatChannel[]
-  current_hackr: UplinkHackr | null
-}
-
-export interface ChannelResponse {
-  channel: ChatChannel
-  current_hackr: UplinkHackr | null
-}
-
-export interface PacketsResponse {
-  packets: Packet[]
-  channel: string
-  current_hackr: UplinkHackr | null
-}
-
-export interface CreatePacketResponse {
-  success: boolean
-  message?: string
-  packet?: Packet
-  error?: string
-  wait_seconds?: number
-}
-
-export interface ModerationLogEntry {
-  id: number
-  action: string
-  reason: string | null
-  duration_minutes: number | null
-  created_at: string
-  actor: {
-    id: number
-    hackr_alias: string
-  }
-  target: {
-    id: number
-    hackr_alias: string
-  } | null
-  chat_message_id: number | null
-}
-
-export interface ModerationLogResponse {
-  logs: ModerationLogEntry[]
-  meta: {
-    total: number
-    page: number
-    per_page: number
-    total_pages: number
-  }
 }

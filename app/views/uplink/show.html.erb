@@ -1,0 +1,13 @@
+<% content_for :title, "Uplink — hackr.tv" %>
+
+<%# stream-status refreshes the page when live state flips, so the tabs'
+    live dot and the live channel's availability re-render server-side
+    (the SPA's useStreamStatus isLive equivalent). %>
+<div data-controller="stream-status" data-stream-status-live-value="<%= HackrStream.current_live.present? %>">
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="hotwire-page uplink-page">
+      <%= render "uplink/panel", channel: @channel, channels: @channels,
+        packets: @packets, viewer: current_hackr, popout_button: true %>
+    </div>
+  <% end %>
+</div>

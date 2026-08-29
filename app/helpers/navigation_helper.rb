@@ -13,6 +13,7 @@ module NavigationHelper
     /temporal-blue-drift /injection-vector /cipher-protocol /blitzbeam
     /apex-overdrive /ethereality /neon-hearts /offline /heartbreak-havoc
     /the-pulse-grid
+    /uplink
   ].freeze
 
   def hotwire_path?(path)

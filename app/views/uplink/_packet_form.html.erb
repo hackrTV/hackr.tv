@@ -1,0 +1,25 @@
+<%# PacketInput.tsx port. Locals: channel, disabled (viewer lacks the
+    channel's minimum role — input renders but can't submit; the server
+    gate is authoritative either way). 512-char limit; the input accepts
+    +10 so the over-limit error state is visible, exactly like the SPA.
+    Slow-mode/squelch errors return a form_error replace whose
+    wait_seconds attribute starts the controller's cooldown. %>
+<div class="packet-input" data-controller="packet-form"
+  data-packet-form-slow-mode-value="<%= channel.slow_mode_seconds %>"
+  data-packet-form-limit-value="512">
+  <%= render "uplink/form_error", error: nil, wait_seconds: nil %>
+  <%= form_with url: uplink_packets_path, class: "packet-input-form",
+    data: {action: "turbo:submit-end->packet-form#submitted"} do %>
+    <%= hidden_field_tag :channel_slug, channel.slug %>
+    <div class="packet-input-field">
+      <%= text_field_tag :content, nil, maxlength: 522, autocomplete: "off",
+        placeholder: "Transmit a packet...", disabled: disabled, class: "packet-input-text",
+        data: {packet_form_target: "input", action: "input->packet-form#update"} %>
+      <span class="packet-input-count" data-packet-form-target="count">0/512</span>
+    </div>
+    <button type="submit" class="packet-input-send" disabled data-packet-form-target="submit">TX</button>
+  <% end %>
+  <% if channel.slow_mode_seconds > 0 %>
+    <div class="packet-input-slow-note">Slow mode: <%= channel.slow_mode_seconds %>s between packets</div>
+  <% end %>
+</div>

@@ -1,0 +1,14 @@
+<%# The message log, framed so the uplink controller can reload it after
+    a cable reconnect (recovers packets broadcast during the gap — the
+    SPA's initial_packets re-merge). target=_top: packet links navigate
+    the page, and Turbo Stream appends land on #uplink-log. The empty
+    state is always rendered; CSS hides it once a .packet exists, so
+    broadcast-appended packets clear it without a dedicated remove. %>
+<%= turbo_frame_tag "uplink-log-frame", target: "_top", data: {uplink_target: "logFrame"} do %>
+  <div id="uplink-log" class="packet-log" data-controller="packet-log">
+    <div class="uplink-empty">
+      <p>No packets yet. Be the first to transmit.</p>
+    </div>
+    <%= render partial: "uplink/packet", collection: packets, as: :packet, locals: {viewer: viewer} %>
+  </div>
+<% end %>
