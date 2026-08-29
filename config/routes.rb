@@ -716,6 +716,19 @@ Rails.application.routes.draw do
     get "world-feed", to: "overlays#world_feed", as: :overlay_world_feed
   end
 
+  # Hotwire migration playground (Phase 0) — smoke page + spikes.
+  # Non-production only; system specs exercise these in test.
+  unless Rails.env.production?
+    scope "dev/hotwire", as: :hotwire_spike do
+      get "smoke", to: "hotwire_spikes#smoke", as: :smoke
+      get "player/a", to: "hotwire_spikes#player_a", as: :player_a
+      get "player/b", to: "hotwire_spikes#player_b", as: :player_b
+      post "player/refresh", to: "hotwire_spikes#player_refresh", as: :player_refresh
+      get "audio", to: "hotwire_spikes#audio", as: :audio
+      get "map", to: "hotwire_spikes#map", as: :map
+    end
+  end
+
   # Development-only error page testing routes
   if Rails.env.development?
     get "test/404", to: proc { |_env| [404, {}, [File.read(Rails.public_path.join("404.html"))]] }

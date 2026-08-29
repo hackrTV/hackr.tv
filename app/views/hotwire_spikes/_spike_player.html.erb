@@ -1,0 +1,11 @@
+<%# Spike A: identical permanent element on both player pages. Turbo Drive
+    transplants #spike-player into each new body, so the <audio> inside
+    never reloads and playback continues. Phase 4 moves this pattern into
+    the layout's #player-bar slot. %>
+<div id="spike-player" data-turbo-permanent data-controller="spike-player"
+     style="border: 2px solid #7c3aed; padding: 12px; margin: 12px 0; font-family: 'Courier New', monospace;">
+  <audio data-spike-player-target="audio" src="<%= hotwire_spike_audio_path %>" loop preload="auto"></audio>
+  <button data-action="click->spike-player#toggle" style="margin-right: 12px;">PLAY/PAUSE</button>
+  <span>t=<span data-spike-player-target="time">0.0</span>s</span>
+  <span style="margin-left: 12px;" data-spike-player-target="status">idle</span>
+</div>

@@ -1,0 +1,238 @@
+<%# ERB port of HeaderMenu.tsx (Hotwire layout only). Desktop dropdowns +
+    mobile overlay, toggled by CSS media query at 768px (replaces
+    useMobileDetect). Numbered items shift with login state, mirroring the
+    React logic exactly. The /terminal easter-egg item returns in Phase 6
+    when the terminal modal exists on Hotwire pages. %>
+<%
+  timeline_n = logged_in? ? 7 : 6
+  codex_n = timeline_n + 1
+  logs_n = logged_in? ? 10 : 8
+  grid_n = logged_in? ? 11 : 9
+%>
+
+<%# ---------- Desktop ---------- %>
+<nav class="tui-nav nav-desktop">
+  <ul>
+    <li class="header-dropdown<%= " active" if nav_active?("/") %>" data-controller="nav-dropdown" data-action="click->nav-dropdown#toggle">
+      <span class="purple-168-text">0</span>&nbsp;hackr.tv&nbsp;
+      <div class="header-dropdown-content" data-nav-dropdown-target="panel">
+        <ul>
+          <li><%= nav_link_to "/" do %><span class="purple-168-text">/</span>root<% end %></li>
+          <li><%= nav_link_to "/schedule" do %><span class="purple-168-text">/</span>schedule<% end %></li>
+          <% if world_feed_visible? %>
+            <li><%= nav_link_to "/feed" do %><span class="purple-168-text">/</span>feed<% end %></li>
+          <% end %>
+        </ul>
+      </div>
+    </li>
+
+    <li class="header-dropdown<%= " active" if nav_active?("/thecyberpulse") %>" data-controller="nav-dropdown" data-action="click->nav-dropdown#toggle">
+      <span class="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;
+      <div class="header-dropdown-content" data-nav-dropdown-target="panel">
+        <ul>
+          <li><%= nav_link_to "/thecyberpulse" do %><span class="purple-168-text">/</span>root<% end %></li>
+          <li><%= nav_link_to "/thecyberpulse/bio" do %><span class="purple-168-text">/</span>bio<% end %></li>
+          <li><%= nav_link_to "/thecyberpulse/releases" do %><span class="purple-168-text">/</span>releases<% end %></li>
+          <li><%= nav_link_to "/thecyberpulse/vidz" do %><span class="purple-168-text">/</span>vidz<% end %></li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="header-dropdown<%= " active" if nav_active?("/xeraen") %>" data-controller="nav-dropdown" data-action="click->nav-dropdown#toggle">
+      <span class="purple-168-text">2</span>&nbsp;XERAEN.net&nbsp;
+      <div class="header-dropdown-content" data-nav-dropdown-target="panel">
+        <ul>
+          <li><%= nav_link_to "/xeraen" do %><span class="purple-168-text">/</span>root<% end %></li>
+          <li><%= nav_link_to "/xeraen/bio" do %><span class="purple-168-text">/</span>bio<% end %></li>
+          <li><%= nav_link_to "/xeraen/releases" do %><span class="purple-168-text">/</span>releases<% end %></li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="header-dropdown<%= " active" if nav_active?("/fm") || nav_active?("/vault") %>" data-controller="nav-dropdown" data-action="click->nav-dropdown#toggle">
+      <span class="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;
+      <div class="header-dropdown-content" data-nav-dropdown-target="panel">
+        <ul>
+          <li><%= nav_link_to "/fm" do %><span class="purple-168-text">/</span>root<% end %></li>
+          <li><%= nav_link_to "/fm/radio" do %><span class="purple-168-text">/</span>radio<% end %></li>
+          <li><%= nav_link_to "/fm/releases" do %><span class="purple-168-text">/</span>releases<% end %></li>
+          <li><%= nav_link_to "/vault" do %><span class="purple-168-text">/</span>vault<% end %></li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="header-nav-item<%= " active" if nav_active?("/f/net") %>">
+      <%= nav_link_to "/f/net" do %><span class="purple-168-text">4</span> FNet&nbsp;<% end %>
+    </li>
+
+    <li class="header-nav-item<%= " active" if nav_active?("/wire") %>">
+      <%= nav_link_to "/wire" do %><span class="purple-168-text">5</span> WIRE&nbsp;<% end %>
+    </li>
+
+    <% if logged_in? %>
+      <li class="header-nav-item<%= " active" if nav_active?("/uplink") %>">
+        <%= nav_link_to "/uplink" do %><span class="purple-168-text">6</span> Uplink&nbsp;<% end %>
+      </li>
+    <% end %>
+
+    <li class="header-nav-item<%= " active" if nav_active?("/timeline") %>">
+      <%= nav_link_to "/timeline" do %><span class="purple-168-text"><%= timeline_n %></span> Timeline&nbsp;<% end %>
+    </li>
+
+    <li class="header-nav-item<%= " active" if nav_active?("/codex") %>">
+      <%= nav_link_to "/codex" do %><span class="purple-168-text"><%= codex_n %></span> Codex&nbsp;<% end %>
+    </li>
+
+    <% if logged_in? %>
+      <li class="header-nav-item<%= " active" if nav_active?("/handbook") %>">
+        <%= nav_link_to "/handbook" do %><span class="purple-168-text">9</span> Handbook&nbsp;<% end %>
+      </li>
+    <% end %>
+
+    <li class="header-nav-item<%= " active" if nav_active?("/logs") %>">
+      <%= nav_link_to "/logs" do %><span class="purple-168-text"><%= logs_n %></span> Logs&nbsp;<% end %>
+    </li>
+
+    <li class="header-dropdown<%= " active" if %w[/grid /code /achievements /missions /schematics /loadout /deck].any? { |p| nav_active?(p) } %>" data-controller="nav-dropdown" data-action="click->nav-dropdown#toggle">
+      <span class="purple-168-text"><%= grid_n %></span>&nbsp;THE PULSE GRID&nbsp;
+      <div class="header-dropdown-content" data-nav-dropdown-target="panel">
+        <ul>
+          <li><%= nav_link_to "/grid" do %><span class="purple-168-text">/</span>grid<% end %></li>
+          <% if logged_in? %>
+            <% if current_hackr.has_feature?("tactical_grid") %>
+              <li><%= nav_link_to "/grid/1337" do %><span class="purple-168-text">/</span>tactical<% end %></li>
+            <% end %>
+            <li><%= nav_link_to "/grid/identity" do %><span class="purple-168-text">/</span>identity<% end %></li>
+            <li><%= nav_link_to "/achievements" do %><span class="purple-168-text">/</span>achievements<% end %></li>
+            <li><%= nav_link_to "/missions" do %><span class="purple-168-text">/</span>missions<% end %></li>
+            <li><%= nav_link_to "/schematics" do %><span class="purple-168-text">/</span>schematics<% end %></li>
+            <li><%= nav_link_to "/loadout" do %><span class="purple-168-text">/</span>loadout<% end %></li>
+            <li><%= nav_link_to "/deck" do %><span class="purple-168-text">/</span>deck<% end %></li>
+            <li><%= nav_link_to "/fm/playlists" do %><span class="purple-168-text">/</span>playlists<% end %></li>
+            <li><%= nav_link_to "/code" do %><span class="purple-168-text">/</span>code<% end %></li>
+          <% else %>
+            <li><%= nav_link_to "/grid/login" do %><span class="purple-168-text">/</span>login<% end %></li>
+            <li><%= nav_link_to "/grid/register" do %><span class="purple-168-text">/</span>register<% end %></li>
+          <% end %>
+        </ul>
+      </div>
+    </li>
+
+    <% if admin_hackr? %>
+      <li class="header-nav-item">
+        <%= nav_link_to "/root" do %><span class="red-255-text">12</span> /root<% end %>
+      </li>
+    <% end %>
+
+    <% if logged_in? %>
+      <li class="header-nav-item" data-controller="disconnect">
+        <a href="#" class="nav-dc" title="Disconnect" aria-label="Disconnect" data-action="click->disconnect#logout"><span>×</span> DC&nbsp;</a>
+      </li>
+    <% end %>
+  </ul>
+</nav>
+
+<%# ---------- Mobile ---------- %>
+<div class="nav-mobile" data-controller="mobile-menu">
+  <div class="mobile-menu-toggle-wrap">
+    <button class="mobile-menu-toggle" data-action="click->mobile-menu#open">[≡] MENU</button>
+  </div>
+
+  <div class="mobile-menu-overlay" data-mobile-menu-target="overlay" data-action="click->mobile-menu#backdropClose">
+    <div class="mobile-menu-container" data-action="click->mobile-menu#maybeClose">
+      <div class="mobile-menu-header">
+        <div class="mobile-menu-title">[ NAVIGATION ]</div>
+        <button class="mobile-menu-close" data-action="click->mobile-menu#close">[X]</button>
+      </div>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">MAIN</div>
+        <%= nav_link_to "/", css_class: "mobile-menu-item#{" active" if nav_active?("/")}" do %><span class="purple-168-text">0</span> / hackr.tv<% end %>
+        <%= nav_link_to "/schedule", css_class: "mobile-menu-item#{" active" if nav_active?("/schedule")}" do %><span class="purple-168-text">/</span> schedule<% end %>
+        <% if world_feed_visible? %>
+          <%= nav_link_to "/feed", css_class: "mobile-menu-item#{" active" if nav_active?("/feed")}" do %><span class="purple-168-text">/</span> feed<% end %>
+        <% end %>
+      </div>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">1. THE.CYBERPUL.SE</div>
+        <%= nav_link_to "/thecyberpulse", css_class: "mobile-menu-item#{" active" if nav_active?("/thecyberpulse")}" do %><span class="purple-168-text">/</span>root<% end %>
+        <%= nav_link_to "/thecyberpulse/bio", css_class: "mobile-menu-item#{" active" if nav_active?("/thecyberpulse/bio")}" do %><span class="purple-168-text">/</span>bio<% end %>
+        <%= nav_link_to "/thecyberpulse/releases", css_class: "mobile-menu-item#{" active" if nav_active?("/thecyberpulse/releases")}" do %><span class="purple-168-text">/</span>releases<% end %>
+        <%= nav_link_to "/thecyberpulse/vidz", css_class: "mobile-menu-item#{" active" if nav_active?("/thecyberpulse/vidz")}" do %><span class="purple-168-text">/</span>vidz<% end %>
+      </div>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">2. XERAEN.NET</div>
+        <%= nav_link_to "/xeraen", css_class: "mobile-menu-item#{" active" if nav_active?("/xeraen")}" do %><span class="purple-168-text">/</span>root<% end %>
+        <%= nav_link_to "/xeraen/bio", css_class: "mobile-menu-item#{" active" if nav_active?("/xeraen/bio")}" do %><span class="purple-168-text">/</span>bio<% end %>
+        <%= nav_link_to "/xeraen/releases", css_class: "mobile-menu-item#{" active" if nav_active?("/xeraen/releases")}" do %><span class="purple-168-text">/</span>releases<% end %>
+      </div>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">3. HACKR.FM</div>
+        <%= nav_link_to "/fm", css_class: "mobile-menu-item#{" active" if nav_active?("/fm")}" do %><span class="purple-168-text">/</span>root<% end %>
+        <%= nav_link_to "/fm/radio", css_class: "mobile-menu-item#{" active" if nav_active?("/fm/radio")}" do %><span class="purple-168-text">/</span>radio<% end %>
+        <%= nav_link_to "/fm/releases", css_class: "mobile-menu-item#{" active" if nav_active?("/fm/releases")}" do %><span class="purple-168-text">/</span>releases<% end %>
+        <%= nav_link_to "/vault", css_class: "mobile-menu-item#{" active" if nav_active?("/vault")}" do %><span class="purple-168-text">/</span>vault<% end %>
+      </div>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">4. FNET</div>
+        <%= nav_link_to "/f/net", css_class: "mobile-menu-item#{" active" if nav_active?("/f/net")}" do %><span class="purple-168-text">/</span> fracture network<% end %>
+      </div>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">5. WIRE</div>
+        <%= nav_link_to "/wire", css_class: "mobile-menu-item#{" active" if nav_active?("/wire")}" do %><span class="purple-168-text">/</span> hotwire<% end %>
+      </div>
+
+      <% if logged_in? %>
+        <div class="mobile-menu-section">
+          <div class="mobile-menu-section-title">6. UPLINK</div>
+          <%= nav_link_to "/uplink", css_class: "mobile-menu-item#{" active" if nav_active?("/uplink")}" do %><span class="purple-168-text">/</span> transmit<% end %>
+        </div>
+      <% end %>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">MORE</div>
+        <%= nav_link_to "/timeline", css_class: "mobile-menu-item#{" active" if nav_active?("/timeline")}" do %><span class="purple-168-text"><%= timeline_n %></span> Timeline<% end %>
+        <%= nav_link_to "/codex", css_class: "mobile-menu-item#{" active" if nav_active?("/codex")}" do %><span class="purple-168-text"><%= codex_n %></span> Codex<% end %>
+        <% if logged_in? %>
+          <%= nav_link_to "/handbook", css_class: "mobile-menu-item#{" active" if nav_active?("/handbook")}" do %><span class="purple-168-text">9</span> Handbook<% end %>
+        <% end %>
+        <%= nav_link_to "/logs", css_class: "mobile-menu-item#{" active" if nav_active?("/logs")}" do %><span class="purple-168-text"><%= logs_n %></span> Logs<% end %>
+      </div>
+
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title"><%= grid_n %>. THE PULSE GRID</div>
+        <%= nav_link_to "/grid", css_class: "mobile-menu-item#{" active" if nav_active?("/grid")}" do %><span class="purple-168-text">/</span>grid<% end %>
+        <% if logged_in? %>
+          <%= nav_link_to "/grid/identity", css_class: "mobile-menu-item#{" active" if nav_active?("/grid")}" do %><span class="purple-168-text">/</span>identity<% end %>
+          <% if current_hackr.has_feature?("tactical_grid") %>
+            <%= nav_link_to "/grid/1337", css_class: "mobile-menu-item#{" active" if nav_active?("/grid/1337")}" do %><span class="purple-168-text">/</span>tactical<% end %>
+          <% end %>
+          <%= nav_link_to "/achievements", css_class: "mobile-menu-item#{" active" if nav_active?("/achievements")}" do %><span class="purple-168-text">/</span>achievements<% end %>
+          <%= nav_link_to "/missions", css_class: "mobile-menu-item#{" active" if nav_active?("/missions")}" do %><span class="purple-168-text">/</span>missions<% end %>
+          <%= nav_link_to "/schematics", css_class: "mobile-menu-item#{" active" if nav_active?("/schematics")}" do %><span class="purple-168-text">/</span>schematics<% end %>
+          <%= nav_link_to "/loadout", css_class: "mobile-menu-item#{" active" if nav_active?("/loadout")}" do %><span class="purple-168-text">/</span>loadout<% end %>
+          <%= nav_link_to "/deck", css_class: "mobile-menu-item#{" active" if nav_active?("/deck")}" do %><span class="purple-168-text">/</span>deck<% end %>
+          <%= nav_link_to "/fm/playlists", css_class: "mobile-menu-item#{" active" if nav_active?("/fm")}" do %><span class="purple-168-text">/</span>playlists<% end %>
+          <%= nav_link_to "/code", css_class: "mobile-menu-item#{" active" if nav_active?("/code")}" do %><span class="purple-168-text">/</span>code<% end %>
+        <% else %>
+          <%= nav_link_to "/grid/login", css_class: "mobile-menu-item#{" active" if nav_active?("/grid")}" do %><span class="purple-168-text">/</span>login<% end %>
+          <%= nav_link_to "/grid/register", css_class: "mobile-menu-item#{" active" if nav_active?("/grid")}" do %><span class="purple-168-text">/</span>register<% end %>
+        <% end %>
+        <% if admin_hackr? %>
+          <%= nav_link_to "/root", css_class: "mobile-menu-item" do %><span class="red-255-text">12</span> /root<% end %>
+        <% end %>
+      </div>
+
+      <% if logged_in? %>
+        <div class="mobile-menu-section" data-controller="disconnect">
+          <a href="#" class="mobile-menu-item nav-dc" title="Disconnect" aria-label="Disconnect" data-action="click->disconnect#logout">× DC</a>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "hackr.tv" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <%# Same stylesheet set as the SPA layout so ported pages keep their look, plus hotwire.css for the ERB nav/flash/toasts %>
+    <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "audio_player", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "pulse_wire", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "hotwire", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
+    <%= vite_client_tag %>
+    <%= vite_typescript_tag "hotwire.ts" %>
+  </head>
+
+  <body class="black-168">
+    <%= render "shared/nav" %>
+    <%= render "shared/flash" %>
+
+    <div id="main-content">
+      <%= yield %>
+    </div>
+
+    <%# Turbo Streams append achievement/mission toasts here (Phase 3) %>
+    <div id="toast-region" aria-live="polite"></div>
+
+    <%# Persistent audio player slot — survives Turbo visits; populated in Phase 4 %>
+    <div id="player-bar" data-turbo-permanent></div>
+  </body>
+</html>

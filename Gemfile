@@ -78,6 +78,10 @@ gem "faraday-retry", require: false # Silences Faraday v2 retry middleware warni
 # ViewComponent for reusable components
 gem "view_component"
 
+# Hotwire (Turbo Drive/Frames/Streams + Stimulus) — incremental React→Hotwire migration
+gem "turbo-rails"
+gem "stimulus-rails"
+
 group :development, :test do
   # Load environment variables from .env file in dev/test.
   # In production, ENV vars are injected into the container by Docker Compose.
@@ -97,6 +101,10 @@ group :development, :test do
   gem "faker", "~> 3.8"
   gem "rails-controller-testing"
   gem "shoulda-matchers", "~> 8.0"
+
+  # System specs (JS-capable, headless Chrome via CDP)
+  gem "capybara"
+  gem "cuprite"
 end
 
 group :development do
