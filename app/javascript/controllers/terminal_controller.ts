@@ -158,6 +158,10 @@ export default class extends Controller<HTMLElement> {
     }
 
     const line = this.lines[lineIndex]
+    if (!line) {
+      this.finish()
+      return
+    }
     const speed = Math.max(1, Math.floor(8 / SPEED_MULTIPLIER))
 
     if (charIndex === 0 && line.delay > 0) {
