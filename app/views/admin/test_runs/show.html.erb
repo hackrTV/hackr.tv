@@ -1,0 +1,64 @@
+<% content_for :title, "/root :: Test Run :: #{@run.label}" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "admin_test_guide" %>
+<% end %>
+
+<div class="tguide">
+  <div class="tguide-header">
+    <h1><%= @run.label %></h1>
+    <div class="tguide-sub">
+      <%= link_to "« Run history", admin_test_runs_path %> · <%= link_to "Test guide", admin_test_guide_path %>
+      <span style="margin-left: 10px;">
+        started <%= @run.created_at.strftime("%Y-%m-%d %H:%M") %> by <%= @run.grid_hackr.hackr_alias %>
+        <% if @run.completed? %> · completed <%= @run.completed_at.strftime("%Y-%m-%d %H:%M") %><% end %>
+      </span>
+    </div>
+  </div>
+
+  <div class="tguide-card">
+    <% pct = @run.progress(@articles.size) %>
+    <div class="tguide-stats">
+      <div class="tguide-stat tguide-stat--pass"><span class="tguide-stat-n"><%= @results.values.count { |r| r.status == "pass" } %></span><span class="tguide-stat-label">Pass</span></div>
+      <div class="tguide-stat tguide-stat--fail"><span class="tguide-stat-n"><%= @results.values.count { |r| r.status == "fail" } %></span><span class="tguide-stat-label">Fail</span></div>
+      <div class="tguide-stat tguide-stat--blocked"><span class="tguide-stat-n"><%= @results.values.count { |r| r.status == "blocked" } %></span><span class="tguide-stat-label">Blocked</span></div>
+      <div class="tguide-stat tguide-stat--skip"><span class="tguide-stat-n"><%= @results.values.count { |r| r.status == "skip" } %></span><span class="tguide-stat-label">Skip</span></div>
+      <div class="tguide-stat"><span class="tguide-stat-n"><%= @articles.size - @results.size %></span><span class="tguide-stat-label">Unrecorded</span></div>
+    </div>
+    <div class="tguide-progress-track"><div class="tguide-progress-fill" style="width: <%= pct %>%"></div></div>
+    <div class="tguide-progress-meta">
+      <span><%= pct %>% recorded</span>
+      <% unless @run.completed? %>
+        <%= button_to "MARK RUN COMPLETE", admin_test_run_path(@run), method: :patch, class: "tguide-btn tguide-btn--primary", form: {class: "tguide-inline-form"} %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @failures.any? %>
+    <div class="tguide-area">
+      <h2>Failures</h2>
+      <% @failures.each do |result| %>
+        <% article = @articles.find { |a| a.slug == result.article_slug } %>
+        <div class="tguide-failure">
+          <%= link_to article&.title || result.article_slug, admin_test_guide_article_path(result.article_slug) %>
+          <div class="tguide-failure-notes"><%= result.notes %></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="tguide-area">
+    <h2>All articles</h2>
+    <% @articles.each do |article| %>
+      <% result = @results[article.slug] %>
+      <div class="tguide-row">
+        <% if result %>
+          <span class="tguide-chip tguide-chip--<%= result.status %>"><%= result.status.upcase %></span>
+        <% else %>
+          <span class="tguide-chip">—</span>
+        <% end %>
+        <%= link_to article.title, admin_test_guide_article_path(article.slug), class: "tguide-row-title" %>
+        <span class="tguide-row-notes"><%= result&.notes.presence&.truncate(90) %></span>
+      </div>
+    <% end %>
+  </div>
+</div>

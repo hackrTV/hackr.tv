@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_28_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1109,6 +1109,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
     t.index ["slug"], name: "index_handbook_sections_on_slug", unique: true
   end
 
+  create_table "manual_test_results", force: :cascade do |t|
+    t.string "article_slug", null: false
+    t.datetime "created_at", null: false
+    t.integer "manual_test_run_id", null: false
+    t.text "notes"
+    t.string "status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["manual_test_run_id", "article_slug"], name: "index_manual_test_results_on_run_and_slug", unique: true
+    t.index ["manual_test_run_id"], name: "index_manual_test_results_on_manual_test_run_id"
+  end
+
+  create_table "manual_test_runs", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "grid_hackr_id", null: false
+    t.string "label", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grid_hackr_id"], name: "index_manual_test_runs_on_grid_hackr_id"
+  end
+
   create_table "moderation_logs", force: :cascade do |t|
     t.string "action", null: false
     t.integer "actor_id", null: false
@@ -1594,6 +1614,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
   add_foreign_key "hackr_watch_sessions", "grid_hackrs"
   add_foreign_key "hackr_watch_sessions", "hackr_streams"
   add_foreign_key "handbook_articles", "handbook_sections"
+  add_foreign_key "manual_test_results", "manual_test_runs"
+  add_foreign_key "manual_test_runs", "grid_hackrs"
   add_foreign_key "moderation_logs", "chat_messages"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "actor_id"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "target_id"

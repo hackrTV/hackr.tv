@@ -1,0 +1,60 @@
+<% content_for :title, "/root :: Test Guide" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "admin_test_guide" %>
+<% end %>
+
+<div class="tguide">
+  <div class="tguide-header">
+    <h1>Manual Testing Guide</h1>
+    <div class="tguide-sub">
+      A full manual pass over every feature — public site, THE PULSE GRID, and /root.
+      <%= TestGuide.articles.size %> articles, ~<%= @total_minutes / 60 %>h<%= @total_minutes % 60 %>m total.
+      Source: <code>docs/testing/</code> (readable offline).
+    </div>
+  </div>
+
+  <div class="tguide-card">
+    <% if @active_run %>
+      <h2>Active run — <%= @active_run.label %></h2>
+      <% pct = @active_run.progress(TestGuide.articles.size) %>
+      <div class="tguide-progress-track"><div class="tguide-progress-fill" style="width: <%= pct %>%"></div></div>
+      <div class="tguide-progress-meta">
+        <span><%= @results.size %>/<%= TestGuide.articles.size %> recorded · <%= @results.values.count { |r| r.status == "fail" } %> failed</span>
+        <span><%= pct %>%</span>
+      </div>
+      <div style="margin-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <% next_unrecorded = TestGuide.articles.find { |a| !@results.key?(a.slug) } %>
+        <% if next_unrecorded %>
+          <%= link_to "Continue: #{next_unrecorded.title} →", admin_test_guide_article_path(next_unrecorded.slug), class: "tguide-btn tguide-btn--primary" %>
+        <% end %>
+        <%= link_to "Run dashboard", admin_test_run_path(@active_run), class: "tguide-btn" %>
+        <%= link_to "Run history", admin_test_runs_path, class: "tguide-btn" %>
+      </div>
+    <% else %>
+      <h2>Start a test run</h2>
+      <%= form_with url: admin_test_runs_path, method: :post, html: {style: "display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"} do %>
+        <%= text_field_tag :label, nil, placeholder: "Run label (environment + date)", class: "tguide-input", style: "max-width: 340px;" %>
+        <button type="submit" class="tguide-btn tguide-btn--primary">START TEST RUN</button>
+        <%= link_to "Run history", admin_test_runs_path, class: "tguide-btn" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% @areas.each do |area, articles| %>
+    <div class="tguide-area">
+      <h2><%= area %></h2>
+      <% articles.each do |article| %>
+        <% result = @results[article.slug] %>
+        <div class="tguide-row">
+          <% if result %>
+            <span class="tguide-chip tguide-chip--<%= result.status %>"><%= result.status.upcase %></span>
+          <% else %>
+            <span class="tguide-chip">—</span>
+          <% end %>
+          <%= link_to article.title, admin_test_guide_article_path(article.slug), class: "tguide-row-title" %>
+          <span class="tguide-row-minutes">~<%= article.minutes %> min</span>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
