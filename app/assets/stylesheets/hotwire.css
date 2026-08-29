@@ -145,6 +145,7 @@
 .flash-error { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
 .flash-alert { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
 .flash-notice { color: #22c55e; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+.flash-success { color: #22c55e; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
 
 /* --- Toast region (populated via Turbo Streams in Phase 3) --- */
 #toast-region {
@@ -532,3 +533,111 @@
 .code-markdown-content img { max-width: 100%; }
 .code-error { max-width: 900px; margin: 30px auto; text-align: center; color: #f87171; }
 .code-error a { color: #a78bfa; text-decoration: none; }
+
+/* --- Grid auth + account pages (Phase 2) ---
+ * Ports of the inline style objects from GridLoginPage / GridRegisterPage /
+ * GridVerifyPage / ForgotPasswordPage / ResetPasswordPage /
+ * GridConfirmEmailChangePage / IdentityPage / TwoFactorPage. */
+
+.auth-window { max-width: 600px; margin: 50px auto; display: block; }
+.auth-window--dark { background: #1a1a2e; border: 1px solid #4a4a6a; }
+.auth-window--dark fieldset { border-color: #4a4a6a; }
+
+.auth-error { background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0; border-radius: 4px; }
+.auth-error-title { margin: 0; font-weight: bold; }
+.auth-error-text { margin: 5px 0 0 0; }
+.auth-error--thin { background: #330000; border: 1px solid #ff4444; padding: 10px; margin: 0 0 20px 0; }
+.auth-error--thin p { margin: 0; color: #ff4444; }
+
+.auth-head { margin: 30px 0; }
+.auth-title { font-size: 2.5em; letter-spacing: 0.1em; margin: 0; }
+.auth-title--sm { font-size: 2em; }
+.auth-sub { margin: 10px 0; font-size: 1.2em; }
+.auth-sub--sm { font-size: 1.1em; }
+.auth-note { margin: 10px 0; color: #ccc; }
+.auth-note--dim { margin: 20px 0; color: #999; }
+.auth-loading { margin: 50px 0; font-size: 1.2em; }
+
+.auth-field { margin-bottom: 20px; }
+.auth-label { display: block; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.05em; }
+.auth-input { width: 100%; }
+.auth-hint { display: block; margin-top: 5px; }
+.auth-hint--totp { margin: 8px 0 0 0; font-size: 0.85em; color: #888; }
+
+.auth-actions { margin: 30px 0; }
+.auth-submit { font-size: 1.1em; padding: 10px 30px; }
+.auth-hr { border-color: #00ffff; margin: 30px 0; }
+.auth-alt { margin: 20px 0; }
+.auth-alt-label { margin-bottom: 10px; }
+
+.auth-success-head { font-size: 2.5em; letter-spacing: 0.1em; margin: 0; }
+.auth-success-lede { margin: 20px 0; font-size: 1.2em; line-height: 1.6; }
+.auth-success-note { margin: 20px 0; color: #ccc; }
+.auth-success-fine { margin: 20px 0; color: #bbb; font-size: 0.9em; }
+
+/* Dark-window forms (reset password) */
+.auth-dark-field { margin: 0 0 15px 0; }
+.auth-dark-label { display: block; margin-bottom: 5px; }
+.auth-dark-input { width: 100%; background: #0a0a1e; border: 1px solid #4a4a6a; color: #00ff00; padding: 8px; font-family: 'Courier New', monospace; box-sizing: border-box; }
+
+/* Terminal-green buttons (IdentityPage / TwoFactorPage / ResetPasswordPage) */
+.btn-terminal { background: #00ff00; color: #0a0a0a; border: none; padding: 10px 20px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn-terminal--wide { padding: 10px 30px; }
+.btn-terminal:disabled { cursor: not-allowed; opacity: 0.6; }
+.btn-cancel { background: transparent; color: #888; border: 1px solid #4a4a6a; padding: 10px 20px; font-family: 'Courier New', monospace; cursor: pointer; margin-left: 10px; text-decoration: none; display: inline-block; }
+.btn-outline-cyan { background: transparent; color: #00ffff; border: 1px solid #00ffff; padding: 10px 20px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn-outline-red { background: transparent; color: #ff4444; border: 1px solid #ff4444; padding: 10px 20px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn-regen { background: #00ffff; color: #0a0a0a; border: none; padding: 10px 30px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; }
+.btn-danger { background: #ff4444; color: #fff; border: none; padding: 10px 30px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; }
+
+.msg-success { color: #00ff00; }
+.msg-error { color: #ff4444; }
+.form-msg { margin: 10px 0 0 0; }
+.form-msg--spaced { margin: 15px 0 0 0; }
+
+/* Identity page */
+.id-section { margin: 20px 0; padding: 15px; border: 1px solid #4a4a6a; }
+.id-section-title { margin: 0 0 15px 0; font-weight: bold; letter-spacing: 0.05em; }
+.id-row { margin: 0 0 10px 0; }
+.id-row:last-child { margin: 0; }
+.id-row--gap { margin-bottom: 20px; }
+.id-bio-textarea { width: 100%; resize: vertical; font-family: 'Courier New', monospace; }
+.id-bio-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 10px; }
+.id-bio-counter { color: #888; font-size: 0.85em; }
+.id-bio-counter.at-max { color: #ff4444; }
+.id-email-form { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.id-email-input { flex: 1; min-width: 200px; }
+.id-2fa-status-on { color: #00ff00; }
+.id-2fa-status-off { color: #888; }
+
+/* Two-factor page */
+.tf-section { padding: 15px; border: 1px solid #4a4a6a; margin: 20px 0; }
+.tf-section--regen { border-color: #00ffff; }
+.tf-section--disable { border-color: #ff4444; }
+.tf-blurb { margin: 0 0 20px 0; color: #aaa; font-size: 0.9em; }
+.tf-step { margin: 0 0 15px 0; font-weight: bold; }
+.tf-step--gap { margin: 25px 0 15px 0; }
+.tf-scan-hint { margin: 0 0 15px 0; color: #aaa; font-size: 0.9em; }
+.tf-secret-hint { margin: 20px 0 5px 0; color: #aaa; font-size: 0.85em; }
+.tf-qr-box { margin: 20px 0; background: #fff; padding: 15px; display: inline-block; line-height: 0; }
+.tf-secret-box { background: #0a0a1a; padding: 10px; border: 1px solid #4a4a6a; font-family: 'Courier New', monospace; letter-spacing: 0.15em; word-break: break-all; }
+.tf-field { margin-bottom: 15px; }
+.tf-label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9em; }
+.tf-actions { margin: 20px 0; }
+.tf-actions--row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.tf-status-active { color: #00ff00; }
+.tf-msg { color: #00ff00; margin: 0 0 20px 0; }
+.tf-back { margin: 20px 0; }
+.tf-back a { color: #00ffff; }
+.backup-warning { background: #331100; border: 1px solid #ff8800; padding: 10px; margin-bottom: 20px; }
+.backup-warning-title { margin: 0; color: #ff8800; font-weight: bold; }
+.backup-warning-text { margin: 5px 0 0 0; color: #ffaa44; font-size: 0.85em; }
+.backup-codes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #0a0a1a; padding: 15px; border: 1px solid #4a4a6a; font-family: 'Courier New', monospace; font-size: 1.1em; letter-spacing: 0.1em; }
+.backup-codes-grid div { padding: 5px 0; }
+.backup-saved-actions { margin: 25px 0 10px 0; }
+
+/* Prerelease banner (PrereleaseBanner.tsx port; fixed below the 26px tui nav) */
+.prerelease-banner { background: linear-gradient(90deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%); border: 1px solid #f59e0b; border-left: none; border-right: none; padding: 8px 16px; text-align: center; font-family: Terminus, 'Courier New', monospace; font-size: 15px; position: fixed; top: 26px; left: 0; right: 0; z-index: 8; }
+.prerelease-banner-mode { color: #f59e0b; font-weight: bold; margin-right: 8px; }
+.prerelease-banner-text { color: #fbbf24; }
+.prerelease-banner-spacer { height: 35px; }

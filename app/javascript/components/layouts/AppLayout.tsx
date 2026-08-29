@@ -33,14 +33,6 @@ const SchematicsPage = lazy(() => import('~/components/pages/grid/SchematicsPage
 const LoadoutPage = lazy(() => import('~/components/pages/grid/LoadoutPage'))
 const DeckPage = lazy(() => import('~/components/pages/grid/DeckPage'))
 const TransitPage = lazy(() => import('~/components/pages/grid/TransitPage'))
-const GridLoginPage = lazy(() => import('~/components/pages/grid/GridLoginPage').then(m => ({ default: m.GridLoginPage })))
-const GridRegisterPage = lazy(() => import('~/components/pages/grid/GridRegisterPage').then(m => ({ default: m.GridRegisterPage })))
-const GridVerifyPage = lazy(() => import('~/components/pages/grid/GridVerifyPage').then(m => ({ default: m.GridVerifyPage })))
-const ForgotPasswordPage = lazy(() => import('~/components/pages/grid/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })))
-const IdentityPage = lazy(() => import('~/components/pages/grid/IdentityPage').then(m => ({ default: m.IdentityPage })))
-const TwoFactorPage = lazy(() => import('~/components/pages/grid/TwoFactorPage'))
-const ResetPasswordPage = lazy(() => import('~/components/pages/grid/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })))
-const GridConfirmEmailChangePage = lazy(() => import('~/components/pages/grid/GridConfirmEmailChangePage').then(m => ({ default: m.GridConfirmEmailChangePage })))
 const HotwirePage = lazy(() => import('~/components/pulsewire/HotwirePage').then(m => ({ default: m.HotwirePage })))
 const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage').then(m => ({ default: m.UserPulsesPage })))
 const SinglePulsePage = lazy(() => import('~/components/pulsewire/SinglePulsePage').then(m => ({ default: m.SinglePulsePage })))
@@ -111,14 +103,6 @@ export const AppLayout: React.FC = () => {
           <Route path="/transit" element={<ProtectedRoute><TransitPage /></ProtectedRoute>} />
           <Route path="/grid" element={<FeatureGate feature="pulse_grid"><GridGamePage /></FeatureGate>} />
           <Route path="/grid/1337" element={<FeatureGate feature="tactical_grid"><GridTacticalPage /></FeatureGate>} />
-          <Route path="/grid/login" element={<GridLoginPage />} />
-          <Route path="/grid/register" element={<GridRegisterPage />} />
-          <Route path="/grid/forgot_password" element={<ForgotPasswordPage />} />
-          <Route path="/grid/verify/:token" element={<GridVerifyPage />} />
-          <Route path="/grid/identity" element={<ProtectedRoute><IdentityPage /></ProtectedRoute>} />
-          <Route path="/grid/identity/two-factor" element={<ProtectedRoute><TwoFactorPage /></ProtectedRoute>} />
-          <Route path="/grid/reset_password/:token" element={<ResetPasswordPage />} />
-          <Route path="/grid/confirm_email_change/:token" element={<GridConfirmEmailChangePage />} />
           {/* PulseWire routes */}
           <Route path="/wire" element={<HotwirePage />} />
           <Route path="/wire/:username" element={<UserPulsesPage />} />

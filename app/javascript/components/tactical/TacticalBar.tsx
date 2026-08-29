@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useGridAuth } from '~/hooks/useGridAuth'
-import { useNavigate } from 'react-router-dom'
 import { apiJson } from '~/utils/apiClient'
 
 interface TacticalBarProps {
@@ -40,7 +39,6 @@ const CompactVital: React.FC<{ label: string; current: number; max: number; colo
 
 export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus, refreshToken }) => {
   const { hackr, disconnect } = useGridAuth()
-  const navigate = useNavigate()
   const [vitals, setVitals] = useState<LoadoutData['vitals'] | null>(null)
   const [clearance, setClearance] = useState<number | null>(null)
   const [clHover, setClHover] = useState(false)
@@ -52,7 +50,7 @@ export const TacticalBar: React.FC<TacticalBarProps> = ({ connectionStatus, refr
   const handleDisconnect = async () => {
     if (confirm('Disconnect from THE PULSE GRID?')) {
       await disconnect()
-      navigate('/grid/login')
+      window.location.href = '/grid/login'
     }
   }
 

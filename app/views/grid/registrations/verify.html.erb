@@ -1,0 +1,48 @@
+<% content_for :title, "Complete Registration — hackr.tv" %>
+
+<% if @token&.valid_for_use? %>
+  <%= render layout: "grid/shared/auth_window", locals: {legend: "THE PULSE GRID :: COMPLETE REGISTRATION"} do %>
+    <%= render "grid/shared/auth_error", message: @error, title: "ERROR" %>
+
+    <div class="center auth-head">
+      <h1 class="cyan-255-text auth-title auth-title--sm">ALMOST THERE</h1>
+      <p class="auth-sub auth-sub--sm">
+        Email verified: <span class="green-255-text"><%= @token.email %></span>
+      </p>
+      <p class="auth-note">Choose your alias and set a password to complete registration.</p>
+    </div>
+
+    <%# data-turbo=false: success redirects into the SPA-served /grid,
+        which must be a full page load. %>
+    <%= form_with url: grid_complete_registration_path(token: @token.token), data: {turbo: false} do %>
+      <div class="auth-field">
+        <%= label_tag :hackr_alias, "HACKR ALIAS", class: "white-text auth-label" %>
+        <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "tui-input auth-input", placeholder: "Choose your alias", required: true, autofocus: true %>
+        <small class="gray-text auth-hint">This will be your identity in THE PULSE GRID.<br>Minimum 6 characters.</small>
+      </div>
+
+      <div class="auth-field">
+        <%= label_tag :password, "PASSWORD", class: "white-text auth-label" %>
+        <%= password_field_tag :password, nil, class: "tui-input auth-input", placeholder: "Enter secure password", required: true %>
+      </div>
+
+      <div class="auth-field">
+        <%= label_tag :password_confirmation, "CONFIRM PASSWORD", class: "white-text auth-label" %>
+        <%= password_field_tag :password_confirmation, nil, class: "tui-input auth-input", placeholder: "Re-enter password", required: true %>
+      </div>
+
+      <div class="center auth-actions">
+        <%= submit_tag "JOIN GRID", class: "tui-button purple-168 auth-submit" %>
+      </div>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= render layout: "grid/shared/auth_window", locals: {legend: "THE PULSE GRID :: VERIFICATION"} do %>
+    <%= render "grid/shared/auth_error", message: @error, title: "VERIFICATION FAILED" %>
+
+    <div class="center auth-actions">
+      <p class="auth-note--dim">The verification link may have expired or already been used.</p>
+      <%= link_to "REGISTER AGAIN", grid_register_path, class: "tui-button purple-168" %>
+    </div>
+  <% end %>
+<% end %>

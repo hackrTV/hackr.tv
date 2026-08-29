@@ -1,3 +1,6 @@
+<%# Data-carrying flash keys (x_* — e.g. the identity page's per-section
+    messages) are consumed by specific views, never rendered as banners. %>
 <% flash.each do |type, message| %>
+  <% next if type.to_s.start_with?("x_") %>
   <div class="flash flash-<%= type %>" role="alert"><%= message %></div>
 <% end %>

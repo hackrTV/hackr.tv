@@ -590,26 +590,7 @@ class Api::GridController < ApplicationController
         return render json: {success: true, requires_totp: true}
       end
 
-      hackr.ensure_current_room!
-
-      # Start tutorial for hackrs who haven't seen it (e.g., seeded accounts)
-      if hackr.stat("tutorial_active").nil? && hackr.stat("tutorial_completed").nil?
-        tutorial = Grid::TutorialService.new(hackr)
-        tutorial.start!
-        # Move to Bootloader hub (start! doesn't move — only sets state)
-        hub = tutorial.tutorial_hub_room
-        hackr.update!(current_room: hub) if hub
-        # Remove den chip if provisioned before tutorial was set up.
-        # Skip if hackr already has a den (chip was already used).
-        unless hackr.den.present?
-          hackr.grid_items.joins(:grid_item_definition)
-            .where(grid_item_definitions: {slug: "den-access-chip"}).destroy_all
-        end
-      end
-
-      log_in(hackr)
-      hackr.touch_activity!
-      Grid::AchievementSweepJob.perform_later(hackr.id)
+      establish_grid_session(hackr)
       Rails.logger.info("[AUTH] Login success: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
       render json: {
         success: true,

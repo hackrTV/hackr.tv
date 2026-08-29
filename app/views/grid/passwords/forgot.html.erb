@@ -1,0 +1,52 @@
+<% content_for :title, "Recover Access — hackr.tv" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "THE PULSE GRID :: RECOVERY"} do %>
+  <% if @sent_email %>
+    <div class="center auth-head">
+      <h1 class="green-255-text auth-success-head">CHECK YOUR INBOX</h1>
+      <p class="auth-success-lede">
+        If an account exists for<br>
+        <span class="cyan-255-text"><strong><%= @sent_email %></strong></span>
+      </p>
+      <p class="auth-success-note">a password reset link has been sent. Click it to set a new password.</p>
+      <p class="auth-success-fine">The link expires in 24 hours.</p>
+    </div>
+
+    <hr class="auth-hr">
+
+    <div class="center auth-alt">
+      <p class="white-text auth-alt-label">DIDN'T RECEIVE IT?</p>
+      <%= link_to "TRY AGAIN", grid_forgot_password_path, class: "tui-button purple-168" %>
+    </div>
+
+    <div class="center auth-alt">
+      <%= link_to "BACK TO LOGIN", grid_login_path, class: "tui-button green-168" %>
+    </div>
+  <% else %>
+    <%= render "grid/shared/auth_error", message: @error, title: "ERROR" %>
+
+    <div class="center auth-head">
+      <h1 class="cyan-255-text auth-title">RECOVER ACCESS</h1>
+      <p class="auth-sub">RESET YOUR CREDENTIALS</p>
+    </div>
+
+    <%= form_with url: grid_forgot_password_path do %>
+      <div class="auth-field">
+        <%= label_tag :email, "EMAIL ADDRESS", class: "white-text auth-label" %>
+        <%= email_field_tag :email, params[:email], class: "tui-input auth-input", placeholder: "Enter your registered email", required: true, autofocus: true %>
+        <small class="gray-text auth-hint">We'll send you a link to reset your password.</small>
+      </div>
+
+      <div class="center auth-actions">
+        <%= submit_tag "SEND RESET LINK", class: "tui-button purple-168 auth-submit" %>
+      </div>
+    <% end %>
+
+    <hr class="auth-hr">
+
+    <div class="center auth-alt">
+      <p class="white-text auth-alt-label">REMEMBER YOUR CREDENTIALS?</p>
+      <%= link_to "BACK TO LOGIN", grid_login_path, class: "tui-button green-168" %>
+    </div>
+  <% end %>
+<% end %>

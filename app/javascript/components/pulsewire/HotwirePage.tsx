@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { Link } from 'react-router-dom'
 import { DefaultLayout } from '~/components/layouts/DefaultLayout'
 import type { Pulse, PulseWireMessage, GridHackr } from '../../types/pulse'
 import { PulseComposer } from './PulseComposer'
@@ -196,9 +195,9 @@ export const HotwirePage: React.FC = () => {
               marginBottom: '30px'
             }}>
               <p style={{ margin: '0 0 10px 0', color: '#a78bfa' }}>
-                <Link to="/grid/login" style={{ color: '#60a5fa', textDecoration: 'none' }}>
+                <a href="/grid/login" style={{ color: '#60a5fa', textDecoration: 'none' }}>
                 Log in
-                </Link>
+                </a>
                 {' '}to broadcast on the WIRE
               </p>
               <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontFamily: '\'Courier New\', monospace' }}>

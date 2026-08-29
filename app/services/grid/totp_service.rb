@@ -16,10 +16,10 @@ module Grid
 
     # Generate a fresh TOTP secret and return setup data.
     # Does NOT persist anything — secret is only saved on enable.
-    def generate_setup_data
+    # Pass secret: to rebuild the QR for an already-staged secret (the
+    # Hotwire enable form re-renders it on validation errors).
+    def generate_setup_data(secret: ROTP::Base32.random)
       raise AlreadyEnabled, "2FA is already enabled." if @hackr.otp_required_for_login?
-
-      secret = ROTP::Base32.random
       totp = ROTP::TOTP.new(secret, issuer: ISSUER)
       uri = totp.provisioning_uri(@hackr.hackr_alias)
 

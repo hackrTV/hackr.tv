@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useGridAuth } from '~/hooks/useGridAuth'
 import { useMobileDetect } from '~/hooks/useMobileDetect'
 import { useMobileMenu } from '~/contexts/MobileMenuContext'
@@ -8,7 +8,6 @@ import { useAppSettings } from '~/contexts/AppSettingsContext'
 
 export const HeaderMenu: React.FC = () => {
   const { hackr, isLoggedIn, disconnect, hasFeature } = useGridAuth()
-  const navigate = useNavigate()
   const { pathname } = useLocation()
   const isActive = (path: string) => path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/')
   const { isMobile } = useMobileDetect()
@@ -36,7 +35,7 @@ export const HeaderMenu: React.FC = () => {
     e.preventDefault()
     if (confirm('Disconnect from THE PULSE GRID?')) {
       await disconnect()
-      navigate('/grid/login')
+      window.location.href = '/grid/login'
     }
   }
 
@@ -287,19 +286,19 @@ export const HeaderMenu: React.FC = () => {
                 </Link>
                 {!isLoggedIn && (
                   <>
-                    <Link to="/grid/login" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <a href="/grid/login" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`}>
                       <span className="purple-168-text">/</span>login
-                    </Link>
-                    <Link to="/grid/register" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    </a>
+                    <a href="/grid/register" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`}>
                       <span className="purple-168-text">/</span>register
-                    </Link>
+                    </a>
                   </>
                 )}
                 {isLoggedIn && (
                   <>
-                    <Link to="/grid/identity" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    <a href="/grid/identity" className={`mobile-menu-item${isActive('/grid') ? ' active' : ''}`}>
                       <span className="purple-168-text">/</span>identity
-                    </Link>
+                    </a>
                     {hasFeature('tactical_grid') && (
                       <Link to="/grid/1337" className={`mobile-menu-item${isActive('/grid/1337') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                         <span className="purple-168-text">/</span>tactical
@@ -612,14 +611,14 @@ export const HeaderMenu: React.FC = () => {
                 {!isLoggedIn && (
                   <>
                     <li>
-                      <Link to="/grid/login" onClick={closeDropdown}>
+                      <a href="/grid/login">
                         <span className="purple-168-text">/</span>login
-                      </Link>
+                      </a>
                     </li>
                     <li>
-                      <Link to="/grid/register" onClick={closeDropdown}>
+                      <a href="/grid/register">
                         <span className="purple-168-text">/</span>register
-                      </Link>
+                      </a>
                     </li>
                   </>
                 )}
@@ -633,9 +632,9 @@ export const HeaderMenu: React.FC = () => {
                       </li>
                     )}
                     <li>
-                      <Link to="/grid/identity" onClick={closeDropdown}>
+                      <a href="/grid/identity">
                         <span className="purple-168-text">/</span>identity
-                      </Link>
+                      </a>
                     </li>
                     <li>
                       <Link to="/achievements" onClick={closeDropdown}>

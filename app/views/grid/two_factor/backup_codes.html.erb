@@ -1,0 +1,28 @@
+<% content_for :title, "Backup Codes — hackr.tv" %>
+
+<%= render layout: "grid/shared/auth_window", locals: {legend: "TWO-FACTOR AUTH", dark: true} do %>
+  <div class="center auth-head">
+    <h1 class="cyan-255-text auth-title auth-title--sm">TWO-FACTOR AUTHENTICATION</h1>
+    <p class="auth-sub auth-sub--sm">HACKR: <%= current_hackr.hackr_alias %></p>
+  </div>
+
+  <div class="tf-section">
+    <div class="backup-warning">
+      <p class="backup-warning-title">⚠ SAVE THESE BACKUP CODES — SHOWN ONCE ONLY</p>
+      <p class="backup-warning-text">
+        If you lose access to your authenticator app, use these codes to log in.
+        Each code can only be used once.
+      </p>
+    </div>
+
+    <div class="backup-codes-grid">
+      <% @backup_codes.each do |code| %>
+        <div><%= code %></div>
+      <% end %>
+    </div>
+
+    <div class="center backup-saved-actions">
+      <%= link_to "I HAVE SAVED THESE CODES", grid_two_factor_path, class: "btn-terminal btn-terminal--wide" %>
+    </div>
+  </div>
+<% end %>
