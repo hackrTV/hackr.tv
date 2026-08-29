@@ -156,7 +156,7 @@ module Grid
       when "loadout", "lo"
         loadout_command
       when "deck", "dk"
-        args&.empty? ? deck_show_command : deck_subcommand(args)
+        args.blank? ? deck_show_command : deck_subcommand(args)
       when "breach", "br"
         breach_initiate_command(args&.join(" "))
       when "repair"
