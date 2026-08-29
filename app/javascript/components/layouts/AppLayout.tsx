@@ -41,21 +41,11 @@ const IdentityPage = lazy(() => import('~/components/pages/grid/IdentityPage').t
 const TwoFactorPage = lazy(() => import('~/components/pages/grid/TwoFactorPage'))
 const ResetPasswordPage = lazy(() => import('~/components/pages/grid/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })))
 const GridConfirmEmailChangePage = lazy(() => import('~/components/pages/grid/GridConfirmEmailChangePage').then(m => ({ default: m.GridConfirmEmailChangePage })))
-const LogsIndexPage = lazy(() => import('~/components/pages/logs/LogsIndexPage').then(m => ({ default: m.LogsIndexPage })))
-const LogDetailPage = lazy(() => import('~/components/pages/logs/LogDetailPage').then(m => ({ default: m.LogDetailPage })))
-const CodexIndexPage = lazy(() => import('~/components/pages/codex/CodexIndexPage').then(m => ({ default: m.CodexIndexPage })))
-const CodexEntryPage = lazy(() => import('~/components/pages/codex/CodexEntryPage').then(m => ({ default: m.CodexEntryPage })))
-const HandbookIndexPage = lazy(() => import('~/components/pages/handbook/HandbookIndexPage').then(m => ({ default: m.HandbookIndexPage })))
-const HandbookArticlePage = lazy(() => import('~/components/pages/handbook/HandbookArticlePage').then(m => ({ default: m.HandbookArticlePage })))
-const TimelinePage = lazy(() => import('~/components/pages/timeline/TimelinePage').then(m => ({ default: m.TimelinePage })))
 const HotwirePage = lazy(() => import('~/components/pulsewire/HotwirePage').then(m => ({ default: m.HotwirePage })))
 const UserPulsesPage = lazy(() => import('~/components/pulsewire/UserPulsesPage').then(m => ({ default: m.UserPulsesPage })))
 const SinglePulsePage = lazy(() => import('~/components/pulsewire/SinglePulsePage').then(m => ({ default: m.SinglePulsePage })))
 const UplinkPage = lazy(() => import('~/components/pages/uplink/UplinkPage').then(m => ({ default: m.UplinkPage })))
 const UplinkPopoutPage = lazy(() => import('~/components/pages/uplink/UplinkPopoutPage').then(m => ({ default: m.UplinkPopoutPage })))
-const CodeIndexPage = lazy(() => import('~/components/pages/code/CodeIndexPage').then(m => ({ default: m.CodeIndexPage })))
-const CodeRepoPage = lazy(() => import('~/components/pages/code/CodeRepoPage'))
-const StreamSchedulePage = lazy(() => import('~/components/pages/streams/StreamSchedulePage').then(m => ({ default: m.StreamSchedulePage })))
 const WorldFeedPage = lazy(() => import('~/components/pages/feed/WorldFeedPage').then(m => ({ default: m.WorldFeedPage })))
 const NotFoundPage = lazy(() => import('~/components/errors/NotFoundPage').then(m => ({ default: m.NotFoundPage })))
 
@@ -106,8 +96,6 @@ export const AppLayout: React.FC = () => {
           <Route path="/sector/x" element={<SectorXPage />} />
           {/* Wavelength Zero has a custom landing page */}
           <Route path="/wavelength-zero" element={<WavelengthZeroPage />} />
-          {/* Stream schedule — public */}
-          <Route path="/schedule" element={<StreamSchedulePage />} />
           <Route path="/feed" element={<WorldFeedPage />} />
           {/* Dynamic artist routes — catches any artist slug */}
           <Route path="/:artistSlug" element={<BandProfilePage />} />
@@ -131,17 +119,6 @@ export const AppLayout: React.FC = () => {
           <Route path="/grid/identity/two-factor" element={<ProtectedRoute><TwoFactorPage /></ProtectedRoute>} />
           <Route path="/grid/reset_password/:token" element={<ResetPasswordPage />} />
           <Route path="/grid/confirm_email_change/:token" element={<GridConfirmEmailChangePage />} />
-          {/* Hackr Logs routes */}
-          <Route path="/logs" element={<LogsIndexPage />} />
-          <Route path="/logs/:slug" element={<LogDetailPage />} />
-          {/* Codex routes */}
-          <Route path="/codex" element={<CodexIndexPage />} />
-          <Route path="/codex/:slug" element={<CodexEntryPage />} />
-          {/* Handbook routes - login required */}
-          <Route path="/handbook" element={<ProtectedRoute><HandbookIndexPage /></ProtectedRoute>} />
-          <Route path="/handbook/:slug" element={<ProtectedRoute><HandbookArticlePage /></ProtectedRoute>} />
-          {/* Timeline route */}
-          <Route path="/timeline" element={<TimelinePage />} />
           {/* PulseWire routes */}
           <Route path="/wire" element={<HotwirePage />} />
           <Route path="/wire/:username" element={<UserPulsesPage />} />
@@ -150,11 +127,6 @@ export const AppLayout: React.FC = () => {
           <Route path="/uplink" element={<ProtectedRoute><UplinkPage /></ProtectedRoute>} />
           {/* Uplink popout - public for livestream viewing */}
           <Route path="/uplink/popout" element={<UplinkPopoutPage />} />
-          {/* Code browser routes - protected */}
-          <Route path="/code" element={<ProtectedRoute><CodeIndexPage /></ProtectedRoute>} />
-          <Route path="/code/:repo" element={<ProtectedRoute><CodeRepoPage /></ProtectedRoute>} />
-          <Route path="/code/:repo/tree/*" element={<ProtectedRoute><CodeRepoPage /></ProtectedRoute>} />
-          <Route path="/code/:repo/blob/*" element={<ProtectedRoute><CodeRepoPage /></ProtectedRoute>} />
           {/* 404 catch-all - must be last */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

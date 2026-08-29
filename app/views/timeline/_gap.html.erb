@@ -1,0 +1,33 @@
+<%# TimelineGap.tsx port: the 82-year gap with cycling fragments and Chen's
+    two PRISM anchor events. %>
+<%
+  gap_fragments = [
+    "The Trade...",
+    "The Efficiency...",
+    "The Forgetting...",
+    "82 years of managed silence.",
+    "No one was listening."
+  ]
+%>
+<div class="tl-gap">
+  <div class="tl-gap-spine"></div>
+  <div class="tl-gap-text" data-controller="fade-cycle"
+       data-fade-cycle-fragments-value="<%= gap_fragments.to_json %>"
+       data-fade-cycle-show-ms-value="2800" data-fade-cycle-fade-ms-value="1200">
+    <p data-fade-cycle-target="text"></p>
+  </div>
+  <div class="tl-gap-anchors">
+    <div>
+      <div class="tl-gap-dot"></div>
+      <div class="tl-gap-date">2048</div>
+      <div class="tl-gap-title">PRISM Discovered</div>
+      <div class="tl-gap-desc">Dr. Marcus Chen discovers that perception operates on manipulable quantum states.</div>
+    </div>
+    <div>
+      <div class="tl-gap-dot"></div>
+      <div class="tl-gap-date">NOVEMBER 2099</div>
+      <div class="tl-gap-title">[INTERCEPTED] The Elegant Solution</div>
+      <div class="tl-gap-desc">Chen writes about PRISM from the creator's perspective.</div>
+    </div>
+  </div>
+</div>

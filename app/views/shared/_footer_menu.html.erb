@@ -1,0 +1,47 @@
+<%# ERB port of FooterMenu.tsx (tui-statusbar). Desktop-only (CSS hides on
+    mobile). Numbering shifts with login state, mirroring the React logic —
+    note the footer has no Handbook entry, so numbers differ from the header. %>
+<div class="tui-statusbar">
+  <ul>
+    <li class="<%= "active" if nav_active?("/") %>">
+      <%= nav_link_to "/" do %><span class="purple-168-text">0</span>&nbsp;hackr.tv&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/thecyberpulse") %>">
+      <%= nav_link_to "/thecyberpulse" do %><span class="purple-168-text">1</span>&nbsp;The.CyberPul.se&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/xeraen") %>">
+      <%= nav_link_to "/xeraen" do %><span class="purple-168-text">2</span>&nbsp;XERAEN.net&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/fm") || nav_active?("/vault") %>">
+      <%= nav_link_to "/fm" do %><span class="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/f/net") %>">
+      <%= nav_link_to "/f/net" do %><span class="purple-168-text">4</span>&nbsp;FNet&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/wire") %>">
+      <%= nav_link_to "/wire" do %><span class="purple-168-text">5</span>&nbsp;WIRE&nbsp;<% end %>
+    </li>
+    <% if logged_in? %>
+      <li class="<%= "active" if nav_active?("/uplink") %>">
+        <%= nav_link_to "/uplink" do %><span class="purple-168-text">6</span>&nbsp;Uplink&nbsp;<% end %>
+      </li>
+    <% end %>
+    <li class="<%= "active" if nav_active?("/timeline") %>">
+      <%= nav_link_to "/timeline" do %><span class="purple-168-text"><%= logged_in? ? 7 : 6 %></span>&nbsp;Timeline&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/codex") %>">
+      <%= nav_link_to "/codex" do %><span class="purple-168-text"><%= logged_in? ? 8 : 7 %></span>&nbsp;Codex&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/logs") %>">
+      <%= nav_link_to "/logs" do %><span class="purple-168-text"><%= logged_in? ? 9 : 8 %></span>&nbsp;Logs&nbsp;<% end %>
+    </li>
+    <li class="<%= "active" if nav_active?("/grid") || nav_active?("/code") %>">
+      <%= nav_link_to "/grid" do %><span class="purple-168-text"><%= logged_in? ? 10 : 9 %></span>&nbsp;THE PULSE GRID&nbsp;<% end %>
+    </li>
+    <% if admin_hackr? %>
+      <li>
+        <%= nav_link_to "/root" do %><span class="red-255-text">11</span>&nbsp;/root<% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

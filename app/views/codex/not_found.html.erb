@@ -1,0 +1,15 @@
+<% content_for :title, "Entry not found — The Codex" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="codex-entry-wrap">
+    <div class="tui-window red-168 white-text">
+      <fieldset class="red-168-border">
+        <legend class="center">ERROR</legend>
+        <div class="codex-error-body">
+          <p>Codex entry not found</p>
+          <%= link_to "← Back to Codex", codex_path, class: "tui-button cyan-168" %>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+<% end %>

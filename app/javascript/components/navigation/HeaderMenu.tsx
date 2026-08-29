@@ -169,9 +169,10 @@ export const HeaderMenu: React.FC = () => {
                 <Link to="/" className={`mobile-menu-item${isActive('/') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">0</span> / hackr.tv
                 </Link>
-                <Link to="/schedule" className={`mobile-menu-item${isActive('/schedule') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                {/* Hotwire-migrated path — full page load (plain anchor) */}
+                <a href="/schedule" className={`mobile-menu-item${isActive('/schedule') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">/</span> schedule
-                </Link>
+                </a>
                 {isWorldFeedVisible && (
                   <Link to="/feed" className={`mobile-menu-item${isActive('/feed') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                     <span className="purple-168-text">/</span> feed
@@ -259,20 +260,24 @@ export const HeaderMenu: React.FC = () => {
 
               <div className="mobile-menu-section">
                 <div className="mobile-menu-section-title">MORE</div>
-                <Link to="/timeline" className={`mobile-menu-item${isActive('/timeline') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                {/* Hotwire-migrated path — full page load (plain anchor) */}
+                <a href="/timeline" className={`mobile-menu-item${isActive('/timeline') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Timeline
-                </Link>
-                <Link to="/codex" className={`mobile-menu-item${isActive('/codex') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                </a>
+                {/* Hotwire-migrated path — full page load (plain anchor) */}
+                <a href="/codex" className={`mobile-menu-item${isActive('/codex') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Codex
-                </Link>
+                </a>
                 {isLoggedIn && (
-                  <Link to="/handbook" className={`mobile-menu-item${isActive('/handbook') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                  // Hotwire-migrated path — full page load (plain anchor)
+                  <a href="/handbook" className={`mobile-menu-item${isActive('/handbook') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                     <span className="purple-168-text">9</span> Handbook
-                  </Link>
+                  </a>
                 )}
-                <Link to="/logs" className={`mobile-menu-item${isActive('/logs') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
+                <a href="/logs" className={`mobile-menu-item${isActive('/logs') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                   <span className="purple-168-text">{isLoggedIn ? '10' : '8'}</span> Logs
-                </Link>
+                </a>
               </div>
 
               <div className="mobile-menu-section">
@@ -318,9 +323,10 @@ export const HeaderMenu: React.FC = () => {
                     <Link to="/fm/playlists" className={`mobile-menu-item${isActive('/fm') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>playlists
                     </Link>
-                    <Link to="/code" className={`mobile-menu-item${isActive('/code') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+                    {/* Hotwire-migrated path — full page load (plain anchor) */}
+                    <a href="/code" className={`mobile-menu-item${isActive('/code') ? ' active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                       <span className="purple-168-text">/</span>code
-                    </Link>
+                    </a>
                   </>
                 )}
                 {hackr?.role === 'admin' && (
@@ -436,9 +442,10 @@ export const HeaderMenu: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/schedule" onClick={closeDropdown}>
+                  {/* Hotwire-migrated path — full page load (plain anchor) */}
+                  <a href="/schedule" onClick={closeDropdown}>
                     <span className="purple-168-text">/</span>schedule
-                  </Link>
+                  </a>
                 </li>
                 {isWorldFeedVisible && (
                   <li>
@@ -561,34 +568,35 @@ export const HeaderMenu: React.FC = () => {
             </li>
           )}
 
-          {/* Timeline */}
+          {/* Timeline — Hotwire-migrated path, full page load (plain anchor) */}
           <li className={`header-nav-item${isActive('/timeline') ? ' active' : ''}`}>
-            <Link to="/timeline">
+            <a href="/timeline">
               <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span> Timeline&nbsp;
-            </Link>
+            </a>
           </li>
 
-          {/* Codex */}
+          {/* Codex — Hotwire-migrated path, full page load (plain anchor) */}
           <li className={`header-nav-item${isActive('/codex') ? ' active' : ''}`}>
-            <Link to="/codex">
+            <a href="/codex">
               <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span> Codex&nbsp;
-            </Link>
+            </a>
           </li>
 
           {/* Handbook (logged in only) */}
           {isLoggedIn && (
             <li className={`header-nav-item${isActive('/handbook') ? ' active' : ''}`}>
-              <Link to="/handbook">
+              {/* Hotwire-migrated path — full page load (plain anchor) */}
+              <a href="/handbook">
                 <span className="purple-168-text">9</span> Handbook&nbsp;
-              </Link>
+              </a>
             </li>
           )}
 
-          {/* Logs */}
+          {/* Logs — Hotwire-migrated path, full page load (plain anchor) */}
           <li className={`header-nav-item${isActive('/logs') ? ' active' : ''}`}>
-            <Link to="/logs">
+            <a href="/logs">
               <span className="purple-168-text">{isLoggedIn ? '10' : '8'}</span> Logs&nbsp;
-            </Link>
+            </a>
           </li>
 
           {/* THE PULSE GRID */}
@@ -660,9 +668,10 @@ export const HeaderMenu: React.FC = () => {
                       </Link>
                     </li>
                     <li>
-                      <Link to="/code" onClick={closeDropdown}>
+                      {/* Hotwire-migrated path — full page load (plain anchor) */}
+                      <a href="/code" onClick={closeDropdown}>
                         <span className="purple-168-text">/</span>code
-                      </Link>
+                      </a>
                     </li>
                   </>
                 )}

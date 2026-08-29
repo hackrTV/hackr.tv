@@ -3,7 +3,7 @@ module NavigationHelper
   # still the React SPA, so nav links get data-turbo=false and cross-stack
   # navigation is a full page load (the SPA mounts on DOMContentLoaded,
   # which never fires on a Turbo visit). Grows as migration phases land.
-  HOTWIRE_PATHS = [].freeze
+  HOTWIRE_PATHS = %w[/logs /codex /handbook /schedule /timeline /code].freeze
 
   def hotwire_path?(path)
     HOTWIRE_PATHS.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }

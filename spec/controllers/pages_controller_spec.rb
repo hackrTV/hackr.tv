@@ -86,10 +86,11 @@ RSpec.describe PagesController, type: :request do
     end
 
     describe "GET /logs" do
-      it "renders the SPA root" do
+      it "is served by the Hotwire logs page, not the SPA (migrated Phase 1)" do
         get "/logs"
         expect(response).to have_http_status(:success)
-        expect(response.body).to include('<div id="root">')
+        expect(response.body).not_to include('<div id="root">')
+        expect(response.body).to include("HACKR LOGS")
       end
     end
   end

@@ -1,0 +1,75 @@
+<%# HandbookLayout.tsx port: sidebar rail (≥1024px, sticky) + mobile jump
+    select (<1024px) + main content. Wrap page content:
+      <%%= render layout: "handbook_chrome", locals: {current_section: ..., current_article: ...} do %%> … <%% end %%>
+    Requires @sections + @articles_by_section (HandbookController#load_tree). %>
+<% current_section = local_assigns[:current_section] %>
+<% current_article = local_assigns[:current_article] %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hb-wrap">
+    <aside class="hb-aside">
+      <nav class="hb-sidebar" aria-label="Handbook navigation" data-controller="handbook-sidebar">
+        <div>
+          <%= link_to "HACKR HANDBOOK", handbook_path, class: "hb-sidebar-home" %>
+          <div class="hb-sidebar-tag">Operator's field manual</div>
+        </div>
+
+        <input type="search" placeholder="Search articles..." class="tui-input hb-search"
+               data-handbook-sidebar-target="search" data-action="input->handbook-sidebar#filter">
+
+        <div>
+          <% @sections.each do |section| %>
+            <% articles = @articles_by_section[section.id] || [] %>
+            <% open = current_section.nil? || section.slug == current_section %>
+            <div class="hb-section" data-handbook-sidebar-target="section" data-open="<%= open %>">
+              <button class="hb-section-toggle<%= " active" if section.slug == current_section %>"
+                      data-action="click->handbook-sidebar#toggle">
+                <span class="hb-caret" data-handbook-sidebar-target="caret"><%= open ? "▾" : "▸" %></span>
+                <% if section.icon.present? %><span class="hb-section-icon"><%= section.icon %></span><% end %>
+                <span><%= section.name %></span>
+              </button>
+              <ul class="hb-articles" data-handbook-sidebar-target="articles" style="<%= "display: none;" unless open %>">
+                <% articles.each do |article| %>
+                  <%
+                    tags = Array((article.metadata || {})["search_tags"]).map(&:to_s)
+                    haystack = ([article.title, article.summary, section.name] + tags).compact.join(" ").downcase
+                  %>
+                  <li>
+                    <%= link_to handbook_article_path(article.slug),
+                          class: "hb-article-link#{" active" if article.slug == current_article}",
+                          data: {handbook_sidebar_target: "article", search: haystack} do %>
+                      <% if article.kind == "tutorial" %><span class="hb-tutorial-mark">▶</span><% end %><%= article.title %>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <div class="hb-no-match" data-handbook-sidebar-target="empty" style="display: none;">
+            No articles match your search.
+          </div>
+        </div>
+      </nav>
+
+      <div class="hb-mobile-jump">
+        <label for="handbook-mobile-jump">JUMP TO ARTICLE</label>
+        <select id="handbook-mobile-jump" class="tui-input"
+                data-controller="jump-select" data-action="change->jump-select#go"
+                data-root-path="<%= handbook_path %>">
+          <option value="" <%= "selected" if current_article.nil? %>>— Handbook Home —</option>
+          <% @sections.each do |section| %>
+            <optgroup label="<%= section.name %>">
+              <% (@articles_by_section[section.id] || []).each do |article| %>
+                <option value="<%= handbook_article_path(article.slug) %>" <%= "selected" if article.slug == current_article %>>
+                  <%= "▶ " if article.kind == "tutorial" %><%= article.title %>
+                </option>
+              <% end %>
+            </optgroup>
+          <% end %>
+        </select>
+      </div>
+    </aside>
+
+    <main><%= yield %></main>
+  </div>
+<% end %>

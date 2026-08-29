@@ -1,0 +1,58 @@
+<% content_for :title, "#{@entry.name} — The Codex" %>
+<% color = CodexController::ENTRY_TYPE_COLORS[@entry.entry_type] || "#888" %>
+<% icon = CodexController::ENTRY_TYPE_ICONS[@entry.entry_type] || "📄" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="codex-entry-wrap" style="--type-color: <%= color %>;">
+    <div class="codex-back-row">
+      <%= link_to "← Back to Codex", codex_path, class: "tui-button cyan-168" %>
+    </div>
+
+    <div class="tui-window cyan-168 white-text">
+      <fieldset class="cyan-168-border">
+        <legend class="center">CODEX ENTRY</legend>
+        <div class="codex-entry-panel">
+          <div>
+            <span class="codex-entry-badge"><%= icon %> <%= @entry.entry_type %></span>
+          </div>
+
+          <h1 class="codex-entry-name"><%= @entry.name %></h1>
+
+          <% if @entry.summary.present? %>
+            <div class="codex-entry-summary">
+              <p><%= @entry.summary %></p>
+            </div>
+          <% end %>
+
+          <% metadata = (@entry.metadata || {}).reject { |k, _| k.to_s == "search_tags" } %>
+          <% if metadata.any? %>
+            <div class="codex-entry-meta">
+              <% metadata.each do |key, value| %>
+                <div>
+                  <div class="codex-entry-meta-key"><%= key.to_s.tr("_", " ") %></div>
+                  <div class="codex-entry-meta-value"><%= value %></div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if @entry.content.present? %>
+            <div class="codex-content">
+              <%= markdown_content(@entry.content) %>
+            </div>
+          <% end %>
+
+          <% if @entry.updated_at %>
+            <div class="codex-entry-updated">
+              Last updated: <%= future_datetime(@entry.updated_at) %>
+            </div>
+          <% end %>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="codex-back-row-bottom">
+      <%= link_to "← Back to Codex", codex_path, class: "tui-button cyan-168" %>
+    </div>
+  </div>
+<% end %>

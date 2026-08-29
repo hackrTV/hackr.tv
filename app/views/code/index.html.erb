@@ -1,0 +1,56 @@
+<% content_for :title, "Code — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="code-wrap" data-controller="repo-filter">
+    <div class="code-panel">
+      <div class="code-header">
+        <h1>CODE</h1>
+        <p>Open source projects from hackrTV</p>
+      </div>
+
+      <div class="code-filters">
+        <input type="text" placeholder="Search repositories..." class="code-search"
+               data-repo-filter-target="search" data-action="input->repo-filter#filter">
+        <div class="code-lang-buttons">
+          <button class="code-lang-btn active" data-repo-filter-target="langButton"
+                  data-action="click->repo-filter#setLanguage">All</button>
+          <% @languages.each do |lang| %>
+            <button class="code-lang-btn" data-language="<%= lang %>"
+                    data-repo-filter-target="langButton" data-action="click->repo-filter#setLanguage"><%= lang %></button>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="code-repo-grid" data-repo-filter-target="grid">
+        <% @repos.each do |repo| %>
+          <%= link_to code_repo_path(repo.slug), class: "code-repo-link",
+                data: {repo_filter_target: "card", language: repo.language,
+                       search: [repo.name, repo.description].compact.join(" ").downcase} do %>
+            <div class="code-repo-card">
+              <div class="code-repo-top">
+                <h3><%= repo.name %></h3>
+                <div class="code-repo-meta">
+                  <% if repo.stargazers_count.to_i.positive? %><span>★ <%= repo.stargazers_count %></span><% end %>
+                  <span><%= code_relative_date(repo.github_pushed_at) %></span>
+                </div>
+              </div>
+              <% if repo.description.present? %>
+                <p class="code-repo-desc"><%= repo.description %></p>
+              <% end %>
+              <% if repo.language.present? %>
+                <div class="code-repo-lang">
+                  <span class="code-lang-dot" style="background-color: <%= CodeController::LANGUAGE_COLORS[repo.language] || "#888" %>;"></span>
+                  <span><%= repo.language %></span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="code-empty" data-repo-filter-target="empty" style="<%= "display: none;" if @repos.any? %>">
+        <p><%= @repos.any? ? "No matching repositories found." : "No repositories available yet." %></p>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -53,6 +53,9 @@ gem "vite_rails"
 # Markdown rendering
 gem "redcarpet"
 
+# Server-side syntax highlighting (code browser — Hotwire Phase 1)
+gem "rouge"
+
 # Profanity filtering for user-generated content
 gem "obscenity"
 

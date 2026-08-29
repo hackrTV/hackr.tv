@@ -62,19 +62,22 @@ export const FooterMenu: React.FC = () => {
             </li>
           )}
           <li className={isActive('/timeline') ? 'active' : undefined}>
-            <Link to="/timeline">
+            {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
+            <a href="/timeline">
               <span className="purple-168-text">{isLoggedIn ? '7' : '6'}</span>&nbsp;Timeline&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/codex') ? 'active' : undefined}>
-            <Link to="/codex">
+            {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
+            <a href="/codex">
               <span className="purple-168-text">{isLoggedIn ? '8' : '7'}</span>&nbsp;Codex&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/logs') ? 'active' : undefined}>
-            <Link to="/logs">
+            {/* Hotwire-migrated path — full page load (plain anchor, not <Link>) */}
+            <a href="/logs">
               <span className="purple-168-text">{isLoggedIn ? '9' : '8'}</span>&nbsp;Logs&nbsp;
-            </Link>
+            </a>
           </li>
           <li className={isActive('/grid') || isActive('/code') ? 'active' : undefined}>
             <Link to="/grid">

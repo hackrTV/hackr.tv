@@ -1,0 +1,13 @@
+<% content_for :title, "Article not found — Hackr Handbook" %>
+
+<%= render layout: "handbook_chrome", locals: {} do %>
+  <div class="tui-window red-168 white-text">
+    <fieldset class="red-168-border">
+      <legend class="center">ERROR</legend>
+      <div class="hb-error-body">
+        <p>Article not found.</p>
+        <%= link_to "← Back to Handbook", handbook_path, class: "tui-button cyan-168", style: "margin-top: 16px; display: inline-block;" %>
+      </div>
+    </fieldset>
+  </div>
+<% end %>

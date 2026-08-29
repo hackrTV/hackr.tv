@@ -1,0 +1,31 @@
+<% content_for :title, "The Timeline — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="tl-wrap" data-controller="timeline">
+    <div class="tl-header">
+      <h1>THE TIMELINE</h1>
+      <p>A living archive of THE.CYBERPUL.SE universe &mdash; 2024 through 2126</p>
+    </div>
+
+    <%# Nav: desktop fixed side rail / mobile sticky top strip (CSS-toggled) %>
+    <nav class="tl-nav">
+      <% TimelineData.eras.each do |era| %>
+        <button class="tl-nav-btn<%= " active" if era["key"] == "listeners" %>" data-era="<%= era["key"] %>"
+                data-timeline-target="navButton" data-action="click->timeline#scrollTo"
+                style="--era-primary: <%= era.dig("colors", "primary") %>; --era-bg: <%= era.dig("colors", "background") %>; --era-border: <%= era.dig("colors", "border") %>; --era-text: <%= era.dig("colors", "text") %>;">
+          <span class="tl-nav-years"><%= era["yearRange"] %></span><%= era["name"] %>
+        </button>
+      <% end %>
+    </nav>
+
+    <%= render "era_section", era: @eras["listeners"], events: @events_by_era["listeners"] %>
+    <%= render "era_section", era: @eras["the_trade"], events: [] %>
+    <%= render "gap" %>
+    <%= render "era_section", era: @eras["the_efficiency"], events: [] %>
+    <%= render "era_section", era: @eras["govcorp_ride"], events: @events_by_era["govcorp_ride"] %>
+    <%= render "era_section", era: @eras["the_fracture"], events: @events_by_era["the_fracture"] %>
+    <%= render "era_section", era: @eras["fracture_network"], events: @events_by_era["fracture_network"] %>
+
+    <div class="tl-end">SIGNAL CONTINUES...</div>
+  </div>
+<% end %>

@@ -1,0 +1,46 @@
+<%# TimelineEraSection.tsx port. The Trade renders atmosphere only; The
+    Efficiency renders a note (its PRISM events live in the gap partial). %>
+<%
+  colors = era["colors"]
+  is_trade = era["key"] == "the_trade"
+  is_efficiency = era["key"] == "the_efficiency"
+  trade_fragments = [
+    "Convenience won every argument against freedom.",
+    "Surveillance capitalism became so embedded that resistance sounded quaint.",
+    "Nobody remembers when it started mattering.",
+    "The consolidation years.",
+    "The forgetting."
+  ]
+%>
+<div id="<%= era["key"] %>" class="tl-era" data-timeline-target="era"
+     style="--era-primary: <%= colors["primary"] %>; --era-bg: <%= colors["background"] %>; --era-border: <%= colors["border"] %>; --era-text: <%= colors["text"] %>;">
+  <div class="tl-era-header">
+    <div class="tl-era-years"><%= era["yearRange"] %></div>
+    <h2 class="tl-era-name"><%= era["name"] %></h2>
+    <div class="tl-era-subtitle"><%= era["subtitle"] %></div>
+  </div>
+
+  <% if is_trade %>
+    <div class="tl-atmosphere" data-controller="fade-cycle"
+         data-fade-cycle-fragments-value="<%= trade_fragments.to_json %>"
+         data-fade-cycle-show-ms-value="3500" data-fade-cycle-fade-ms-value="1500">
+      <p data-fade-cycle-target="text"></p>
+    </div>
+  <% end %>
+
+  <% if is_efficiency %>
+    <div class="tl-efficiency-note">
+      Little is known about how this era unfolded. The historical record is fragmented
+      &mdash; decades compressed into silence. What survived are traces: corporate memos,
+      policy language, and one name that keeps surfacing.
+    </div>
+  <% end %>
+
+  <% if !is_trade && events.any? %>
+    <div class="tl-spine">
+      <% events.each do |event| %>
+        <%= render "event", event: event %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

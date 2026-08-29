@@ -1,0 +1,59 @@
+<% content_for :title, "Stream Schedule — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {} do %>
+  <div class="sched-wrap">
+    <h1 class="sched-title">STREAM SCHEDULE</h1>
+    <p class="sched-subtitle">Upcoming livestreams and past broadcasts</p>
+
+    <h2 class="sched-heading sched-heading-upcoming">[:: UPCOMING ::]</h2>
+    <% if @upcoming.any? %>
+      <div class="sched-list">
+        <% @upcoming.each do |stream| %>
+          <% badge = ScheduleController::STATE_BADGES[stream.display_state.to_s] || ScheduleController::STATE_BADGES["upcoming"] %>
+          <div class="sched-card" style="border-left-color: <%= badge[:color] %>;">
+            <div class="sched-card-row">
+              <div>
+                <span class="sched-badge" style="color: <%= badge[:color] %>;">[<%= badge[:label] %>]</span>
+                <span class="sched-stream-title"><%= stream.title.presence || "Untitled Stream" %></span>
+                <span class="sched-sep">—</span>
+                <span class="sched-artist"><%= stream.artist.name %></span>
+              </div>
+              <div class="sched-when"><%= stream.scheduled_at ? future_datetime(stream.scheduled_at, include_time: true) : "—" %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="sched-none">No upcoming streams scheduled.</p>
+    <% end %>
+
+    <h2 class="sched-heading sched-heading-past">[:: PAST BROADCASTS ::]</h2>
+    <% if @past.any? %>
+      <div class="sched-list">
+        <% @past.each do |stream| %>
+          <div class="sched-card sched-card-past">
+            <div class="sched-card-row">
+              <div>
+                <span class="sched-past-title"><%= stream.title.presence || "Untitled Stream" %></span>
+                <span class="sched-sep sched-sep-past">—</span>
+                <span class="sched-past-artist"><%= stream.artist.name %></span>
+              </div>
+              <div class="sched-past-meta">
+                <span class="sched-past-date"><%= stream.started_at ? future_datetime(stream.started_at, include_time: true) : "—" %></span>
+                <% if stream.started_at && stream.ended_at %>
+                  <span class="sched-past-duration">(<%= stream_duration(stream.started_at, stream.ended_at) %>)</span>
+                <% end %>
+                <% if stream.vod_url.present? %>
+                  <%# VOD pages are still SPA (migrate in Phase 4) — full page load %>
+                  <%= link_to "[VOD]", "/#{stream.artist.slug}/vidz/#{stream.id}", class: "sched-vod", data: {turbo: false} %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="sched-none">No past broadcasts yet.</p>
+    <% end %>
+  </div>
+<% end %>

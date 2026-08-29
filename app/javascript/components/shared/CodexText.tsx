@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { generateSlug, getRouteForSlug, getFallbackDisplayName } from '../../utils/codexLinks'
 
 interface CodexTextProps {
@@ -50,15 +49,17 @@ export const CodexText: React.FC<CodexTextProps> = ({ children, className, style
       // Get route (checks fallbacks for entries without Codex pages)
       const route = getRouteForSlug(slug)
 
+      // Plain anchor: /codex is served by Rails (Hotwire) since Phase 1 —
+      // cross-stack navigation must be a full page load.
       parts.push(
-        <Link
+        <a
           key={`${keyPrefix}-${slug}-${match.index}`}
-          to={route}
+          href={route}
           className="codex-link"
           style={{ color: 'inherit', textDecoration: 'underline' }}
         >
           {displayText}
-        </Link>
+        </a>
       )
 
       lastIndex = match.index + match[0].length

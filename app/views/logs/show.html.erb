@@ -1,0 +1,37 @@
+<% content_for :title, "#{@log.title} — Hackr Logs" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="logs-wrap">
+    <%= render "timeline_tabs", timelines: @timelines, current_timeline: @log.timeline, sort: @sort %>
+
+    <div class="log-detail-panel">
+      <h1 class="log-detail-title"><%= @log.title %></h1>
+
+      <div class="log-detail-meta">
+        <div class="log-detail-meta-row">
+          <div>
+            <span class="logs-meta-label">Published:</span>
+            <span class="logs-meta-value"><%= future_datetime(@log.published_at, include_time: true) %></span>
+          </div>
+          <div>
+            <span class="logs-meta-label">Author:</span>
+            <span class="logs-meta-value"><%= @log.grid_hackr.hackr_alias %></span>
+            <% if admin_hackr? && @log.grid_hackr_id == current_hackr.id %>
+              <span class="log-detail-admin">[ADMIN]</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-detail-body">
+        <div class="log-detail-prose content-markdown">
+          <%= markdown_content(@log.body) %>
+        </div>
+      </div>
+
+      <div class="log-detail-nav">
+        <%= link_to "← Back to All Logs", hackr_logs_path(timeline: @log.timeline, sort: @sort), class: "log-back" %>
+      </div>
+    </div>
+  </div>
+<% end %>

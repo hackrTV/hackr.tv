@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import type { ScheduledStreamInfo } from '~/types/uplink'
 import { useCountdown } from '~/hooks/useCountdown'
 import { formatFutureDate } from '~/utils/dateUtils'
@@ -67,14 +66,15 @@ export const ScheduledStreamBanner: React.FC<ScheduledStreamBannerProps> = ({
               </span>
             </>
           )}
-          <Link to="/schedule" style={{
+          {/* Hotwire-migrated path — full page load (plain anchor) */}
+          <a href="/schedule" style={{
             color: '#0891b2',
             marginLeft: '16px',
             fontSize: '13px',
             textDecoration: 'none'
           }}>
             [ SCHEDULE ]
-          </Link>
+          </a>
         </span>
       </div>
 

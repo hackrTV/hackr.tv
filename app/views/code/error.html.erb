@@ -1,0 +1,7 @@
+<% content_for :title, "Cannot display — Code" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="code-wrap">
+    <div class="code-error"><%= @error_message %> <%= link_to "← Back to #{@repo.name}", code_repo_path(@repo.slug) %></div>
+  </div>
+<% end %>
