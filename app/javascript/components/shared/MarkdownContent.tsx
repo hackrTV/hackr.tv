@@ -56,7 +56,16 @@ const RAILS_ONLY_PATHS = [
   '/heartbreak-havoc',
   '/the-pulse-grid',
   // Hotwire-migrated (Phase 5):
-  '/uplink'
+  '/uplink',
+  // Hotwire-migrated (Phase 6) — the whole grid family:
+  '/grid',
+  '/achievements',
+  '/missions',
+  '/schematics',
+  '/loadout',
+  '/gear',
+  '/deck',
+  '/transit'
 ]
 
 const isRailsOnlyPath = (href: string) =>

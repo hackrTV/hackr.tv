@@ -1,0 +1,15 @@
+<%# TacticalBar.tsx dynamic fragment: clearance + compact vitals.
+    Replaced by every tactical command response (the SPA refetched
+    /api/grid/loadout on dataRefreshToken). %>
+<span id="tactical-bar-status" class="tactical-bar-status">
+  <span class="tactical-bar-clearance" title="CLEARANCE: <%= current_hackr.stat("clearance") %>">CL<%= current_hackr.stat("clearance") %></span>
+  <% {"HP" => ["health", "hp"], "EN" => ["energy", "en"], "PS" => ["psyche", "ps"]}.each do |label, (vital, css)| %>
+    <% current = current_hackr.stat(vital).to_i %>
+    <% max = current_hackr.effective_max(vital).to_i %>
+    <span class="tactical-vital tactical-vital--<%= css %>" title="<%= vital.upcase %>: <%= current %>/<%= max %>">
+      <span class="tactical-vital-label"><%= label %></span>
+      <span class="tactical-vital-track"><span class="tactical-vital-fill" style="width: <%= max.positive? ? ((current.to_f / max) * 100).round : 0 %>%"></span></span>
+      <span class="tactical-vital-value"><%= current %></span>
+    </span>
+  <% end %>
+</span>

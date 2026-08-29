@@ -1,0 +1,77 @@
+<% content_for :title, "Loadout — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hotwire-page grid-meta">
+    <div class="grid-meta-window" style="border-color: #22d3ee;">
+      <div class="grid-meta-legend" style="color: #22d3ee;">LOADOUT</div>
+      <% all_slots = ["deck"] + %w[back head ears eyes neck chest left_wrist right_wrist hands waist legs feet] %>
+      <div class="grid-meta-summary"><%= @loadout.values.compact.size %>/<%= all_slots.size %> slots equipped</div>
+
+      <div class="grid-meta-grid">
+        <% all_slots.each do |slot| %>
+          <% item = @loadout[slot] %>
+          <div class="grid-meta-card">
+            <div class="tab-faint tab-small"><%= GridHackr::Loadout::GEAR_SLOT_LABELS[slot] || slot.upcase %></div>
+            <% if item %>
+              <div class="grid-meta-card-header">
+                <span style="color: <%= item.rarity_color %>;" class="grid-meta-card-title"><%= item.name %></span>
+                <span style="color: <%= item.rarity_color %>;" class="tab-small">[<%= item.rarity_label %>]</span>
+              </div>
+              <% if item.description.present? %><div class="grid-meta-card-desc"><%= item.description %></div><% end %>
+              <% effects = (item.gear_effects || {}).reject { |_, v| v == 0 || v == false } %>
+              <% if effects.any? %>
+                <div class="grid-meta-effects">
+                  <% effects.each do |k, v| %><span class="grid-meta-effect">+<%= v %> <%= k.to_s.tr("_", " ") %></span><% end %>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="grid-meta-empty-slot">-- empty --</div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @effects.any? %>
+        <div class="grid-meta-section-title">ACTIVE EFFECTS</div>
+        <div class="grid-meta-effects">
+          <% @effects.each do |k, v| %><span class="grid-meta-effect"><%= k.to_s.tr("_", " ") %>: +<%= v %></span><% end %>
+        </div>
+      <% end %>
+
+      <div class="grid-meta-section-title">VITALS</div>
+      <% {"HEALTH" => ["health", "#34d399"], "ENERGY" => ["energy", "#60a5fa"], "PSYCHE" => ["psyche", "#c084fc"]}.each do |label, (vital, color)| %>
+        <% current = current_hackr.stat(vital).to_i %>
+        <% max = current_hackr.effective_max(vital).to_i %>
+        <div class="tab-row tab-row--spread">
+          <span style="color: <%= color %>;"><%= label %></span>
+          <span class="tab-dim"><%= current %>/<%= max %><% if max > 100 %> <span class="tab-positive">(+<%= max - 100 %>)</span><% end %></span>
+        </div>
+      <% end %>
+
+      <% if @inventory_gear.any? %>
+        <div class="grid-meta-section-title">GEAR IN INVENTORY</div>
+        <div class="grid-meta-grid">
+          <% @inventory_gear.each do |item| %>
+            <div class="grid-meta-card">
+              <div class="grid-meta-card-header">
+                <span style="color: <%= item.rarity_color %>;" class="grid-meta-card-title"><%= item.name %></span>
+                <span class="tab-faint tab-small"><%= GridHackr::Loadout::GEAR_SLOT_LABELS[item.gear_slot] || item.gear_slot&.upcase %></span>
+              </div>
+              <% if item.description.present? %><div class="grid-meta-card-desc"><%= item.description %></div><% end %>
+              <% effects = (item.gear_effects || {}).reject { |_, v| v == 0 || v == false } %>
+              <% if effects.any? %>
+                <div class="grid-meta-effects">
+                  <% effects.each do |k, v| %><span class="grid-meta-effect">+<%= v %> <%= k.to_s.tr("_", " ") %></span><% end %>
+                </div>
+              <% end %>
+              <% if item.required_clearance.to_i > 0 %><div class="tab-faint tab-small">CL<%= item.required_clearance %>+</div><% end %>
+              <div class="tab-faint tab-small"><code>equip <%= item.name %></code></div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="grid-meta-card-footer tab-faint">Use <code>equip &lt;item&gt;</code> / <code>unequip &lt;item&gt;</code> in the Terminal to manage.</div>
+    </div>
+  </div>
+<% end %>

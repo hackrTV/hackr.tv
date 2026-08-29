@@ -1,9 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { useTerminal } from '~/contexts/TerminalContext'
 
 export const NotFoundPage: React.FC = () => {
-  const { openTerminal } = useTerminal()
+  const openTerminal = () => { window.location.href = '/terminal' }
   return (
     <div
       style={{

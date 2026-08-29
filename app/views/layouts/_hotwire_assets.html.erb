@@ -17,7 +17,15 @@
 <%= stylesheet_link_tag "artist_pages", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag "artist_catalog", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag "uplink", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "grid_game", "data-turbo-track": "reload" %>
+<%= stylesheet_link_tag "tactical", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag "application" %>
 <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
 <%= vite_client_tag %>
 <%= vite_typescript_tag "hotwire.ts" %>
+<% if Rails.env.test? %>
+  <%# System specs: kill CSS transitions/animations. Slow CI runners
+      assert content mid-animation and Ferrum's coordinate clicks then
+      land on moved elements (e.g. the sliding tactical panel). %>
+  <style>*, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }</style>
+<% end %>

@@ -14,9 +14,18 @@ module NavigationHelper
     /apex-overdrive /ethereality /neon-hearts /offline /heartbreak-havoc
     /the-pulse-grid
     /uplink
+    /grid
+    /achievements /missions /schematics /loadout /gear /deck /transit
   ].freeze
 
+  # Still-React holdouts nested inside otherwise-Hotwire families.
+  # Emptied when /grid/1337 flipped (Phase 6b–6d); mechanism kept for
+  # any future nested holdout.
+  SPA_EXCEPTIONS = %w[].freeze
+
   def hotwire_path?(path)
+    return false if SPA_EXCEPTIONS.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }
+
     HOTWIRE_PATHS.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }
   end
 

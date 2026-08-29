@@ -1,0 +1,72 @@
+<% content_for :title, "Transit — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hotwire-page grid-meta" data-controller="meta-filter">
+    <div class="grid-meta-window" style="border-color: #22d3ee;">
+      <div class="grid-meta-legend" style="color: #22d3ee;">TRANSIT SYSTEM<% if @region %> :: <%= @region.name %><% end %></div>
+
+      <div class="grid-meta-tabs">
+        <button type="button" class="grid-meta-tab grid-meta-tab--active" data-filter="local" data-meta-filter-target="button" data-action="click->meta-filter#select" style="color: #34d399;">LOCAL TRANSIT</button>
+        <button type="button" class="grid-meta-tab" data-filter="slipstream" data-meta-filter-target="button" data-action="click->meta-filter#select" style="color: #a78bfa;">SLIPSTREAM</button>
+        <button type="button" class="grid-meta-tab" data-filter="network" data-meta-filter-target="button" data-action="click->meta-filter#select" style="color: #22d3ee;">REGION NETWORK</button>
+      </div>
+
+      <div data-filter="local" data-meta-filter-target="item">
+        <% if @local_routes.empty? %>
+          <div class="tab-faint">No transit routes from this location.</div>
+        <% end %>
+        <% @local_routes.group_by { |r| r.grid_transit_type }.each do |type, routes| %>
+          <div class="grid-meta-section-title" style="color: #34d399;">[<%= type.icon_key.presence || "TRANSIT" %>] <%= type.name %></div>
+          <% routes.each do |route| %>
+            <details class="grid-meta-route">
+              <summary><span class="tab-accent"><%= route.name %></span> <span class="tab-faint tab-small"><%= route.grid_transit_stops.size %> stops<% if route.loop_route %> (loop)<% end %> | <%= type.base_fare %> CRED</span></summary>
+              <div class="tactical-stops">
+                <% route.grid_transit_stops.each do |stop| %>
+                  <div class="tab-small"><span class="<%= stop.is_terminus ? "tab-warn" : "tab-dim" %>"><%= stop.is_terminus ? "◆" : "·" %></span> <span class="tab-dim"><%= stop.display_name %></span></div>
+                <% end %>
+              </div>
+            </details>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div data-filter="slipstream" data-meta-filter-target="item" hidden>
+        <% heat_colors = {"cold" => "#34d399", "warm" => "#fbbf24", "hot" => "#f97316", "burning" => "#ef4444"} %>
+        <% heat_color = heat_colors.fetch(@heat_tier.to_s, "#34d399") %>
+        <div class="tab-small" style="color: <%= heat_color %>;">Corridor Heat <%= @heat %>/100 (<%= @heat_tier %>)</div>
+        <div class="tab-bar-track"><span class="tab-bar-fill" style="width: <%= @heat %>%; background: <%= heat_color %>;"></span></div>
+        <% if @slip_routes.empty? %>
+          <div class="tab-faint">No Slipstream corridors from this region.</div>
+        <% end %>
+        <% @slip_routes.each do |route| %>
+          <div class="grid-meta-card">
+            <div class="grid-meta-card-header">
+              <span class="tab-purple grid-meta-card-title">[SLIP] <%= route.name %></span>
+              <span class="tab-faint tab-small">CL<%= route.min_clearance %>+</span>
+            </div>
+            <div class="tab-accent tab-small"><%= route.origin_region&.name %> → <%= route.destination_region&.name %></div>
+            <% route.grid_slipstream_legs.each do |leg| %>
+              <div class="tab-dim tab-small">· <%= leg.name %><% if leg.has_forks? %> <span class="tab-warn">[FORK]</span><% end %></div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <div data-filter="network" data-meta-filter-target="item" hidden>
+        <% if @region_transit.empty? %>
+          <div class="tab-faint">No transit assignments on record.</div>
+        <% end %>
+        <div class="grid-meta-grid">
+          <% @region_transit.each do |(_slug, region_name), types| %>
+            <div class="grid-meta-card">
+              <div class="tab-purple grid-meta-card-title"><%= region_name %></div>
+              <% types.each do |t| %>
+                <div class="tab-small"><span class="<%= (t.type_category == "public") ? "tab-positive" : "tab-accent" %>"><%= (t.type_category == "public") ? "■" : "◇" %></span> <span class="tab-dim"><%= t.type_name %></span></div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

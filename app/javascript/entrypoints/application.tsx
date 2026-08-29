@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { MobileMenuProvider } from '~/contexts/MobileMenuContext'
 import { AppSettingsProvider } from '~/contexts/AppSettingsContext'
-import { TerminalProvider } from '~/contexts/TerminalContext'
 import { GridAuthProvider } from '~/contexts/GridAuthContext'
 import { AppLayout } from '~/components/layouts/AppLayout'
 import { ErrorBoundary } from '~/components/errors/ErrorBoundary'
@@ -52,9 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <AppSettingsProvider>
               <GridAuthProvider>
                 <MobileMenuProvider>
-                  <TerminalProvider>
-                    <AppLayout />
-                  </TerminalProvider>
+                  <AppLayout />
                 </MobileMenuProvider>
               </GridAuthProvider>
             </AppSettingsProvider>

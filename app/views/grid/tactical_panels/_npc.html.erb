@@ -1,0 +1,150 @@
+<%# NpcPanel.tsx + DialogueSection + MissionsSection port. Dialogue
+    state lives server-side (DialogueNavigator persists the path), so
+    the frame reload after each ask/talk re-renders the tree — no client
+    dialogue state at all. %>
+<% if @mob.nil? %>
+  <div class="tab-muted">No one to talk to here.</div>
+<% else %>
+  <div class="tactical-panel-inner" data-controller="tactical-tabs">
+    <% if @mob.avatar.attached? %>
+      <img class="tactical-avatar-wing tactical-avatar-wing--npc" src="<%= url_for(@mob.avatar_panel) %>" alt="<%= @mob.name %>">
+    <% end %>
+    <div class="tactical-panel-header">
+      <span class="tab-purple">NPC :: <%= @mob.name %></span>
+      <% if @mob.grid_faction %><span class="tab-faint">[<%= @mob.grid_faction.display_name %>]</span><% end %>
+    </div>
+    <% has_missions = @available_missions.any? || @active_missions.any? %>
+    <% if has_missions %>
+      <div class="tactical-tab-bar">
+        <button type="button" class="tactical-tab-button tactical-tab-button--active" data-tactical-tabs-target="button" data-tab="dialogue" data-action="click->tactical-tabs#select">DIALOGUE</button>
+        <button type="button" class="tactical-tab-button" data-tactical-tabs-target="button" data-tab="missions" data-action="click->tactical-tabs#select">MISSIONS</button>
+      </div>
+    <% end %>
+    <div class="tactical-panel-scroll">
+      <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="dialogue">
+        <%# Last-exchange mirror: leaf/ancestor/mission/unknown-topic
+            responses never move the persisted context, so the panel
+            shows the recorded last exchange (the SPA's dialogueOutput);
+            greeting/state reconstruction is the fallback. %>
+        <% last = current_hackr.stat("dialogue_last") %>
+        <% if last.is_a?(Hash) && last["mob_id"] == @mob.id && last["output"].present? %>
+          <div class="tactical-npc-exchange"><%= grid_output(last["output"]) %></div>
+        <% elsif @navigator.at_root? %>
+          <% if @mob.dialogue_tree.blank? %>
+            <div class="tab-faint">This NPC has nothing to say.</div>
+          <% elsif @navigator.greeting %>
+            <div class="tactical-npc-line"><span class="tab-purple"><%= @mob.name %></span> : <span class="tab-accent">"<%= @navigator.greeting %>"</span></div>
+          <% end %>
+        <% else %>
+          <% response = @navigator.node_at(@navigator.current_path)&.dig("response") %>
+          <% if response %>
+            <div class="tactical-npc-line"><span class="tab-purple"><%= @mob.name %></span> : <span class="tab-accent">"<%= response %>"</span></div>
+          <% end %>
+        <% end %>
+        <% unless @navigator.at_root? %>
+          <div class="tab-faint tab-small tactical-npc-breadcrumb"><%= @navigator.current_path.join(" > ") %></div>
+        <% end %>
+        <div class="tactical-npc-topics">
+          <% @navigator.current_topics.each do |key, node| %>
+            <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+              <%= hidden_field_tag :surface, "tactical" %>
+              <%= hidden_field_tag :input, "ask #{@mob.name} about #{key}" %>
+              <button type="submit" class="tactical-topic-button"><%= key %><% if Grid::DialogueNavigator.has_children?(node) %> ›<% end %></button>
+            <% end %>
+          <% end %>
+        </div>
+        <% unless @navigator.at_root? %>
+          <div class="tactical-npc-nav">
+            <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+              <%= hidden_field_tag :surface, "tactical" %>
+              <%= hidden_field_tag :input, "ask #{@mob.name} about back" %>
+              <button type="submit" class="tab-ghost-button">← BACK</button>
+            <% end %>
+            <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+              <%= hidden_field_tag :surface, "tactical" %>
+              <%= hidden_field_tag :input, "talk to #{@mob.name} again" %>
+              <button type="submit" class="tab-ghost-button">RESET</button>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <% if has_missions %>
+        <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="missions" hidden>
+          <% if @active_missions.any? %>
+            <div class="tab-section-title tab-section-title--cyan">ACTIVE</div>
+            <% @active_missions.each do |hm| %>
+              <% mission = hm.grid_mission %>
+              <% progress_by_obj = hm.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id) %>
+              <div class="tab-mission">
+                <div class="tab-row tab-row--spread">
+                  <span class="tab-accent tab-strong"><%= mission.name %></span>
+                  <% if hm.all_objectives_completed? %><span class="tab-warn tab-small">READY</span><% end %>
+                </div>
+                <% mission.grid_mission_objectives.each do |obj| %>
+                  <% hobj = progress_by_obj[obj.id] %>
+                  <% completed = hobj&.completed_at.present? %>
+                  <div class="tab-row tab-row--spread <%= completed ? "tab-positive" : "tab-dim" %>">
+                    <span><%= completed ? "✓" : "▸" %> <%= obj.label %></span>
+                    <span><%= hobj&.progress.to_i %>/<%= obj.target_count %></span>
+                  </div>
+                  <% if obj.objective_type == "deliver_item" && obj.target_slug.present? && !completed %>
+                    <% held = @inventory_by_name[obj.target_slug].to_i %>
+                    <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                      <%= hidden_field_tag :surface, "tactical" %>
+                      <%= hidden_field_tag :input, "give #{obj.label} to #{@mob.name}" %>
+                      <button type="submit" class="tab-mini-button tab-mini-button--deliver" <%= "disabled" if held < obj.target_count.to_i %>>DELIVER<% if obj.target_count.to_i > 1 %> (<%= held %>/<%= obj.target_count %>)<% end %></button>
+                    <% end %>
+                  <% end %>
+                <% end %>
+                <div class="tactical-mission-actions">
+                  <% if hm.all_objectives_completed? %>
+                    <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {turbo_confirm: "TURN IN #{mission.name}?"} do %>
+                      <%= hidden_field_tag :surface, "tactical" %>
+                      <%= hidden_field_tag :input, "turn_in #{mission.slug}" %>
+                      <button type="submit" class="tab-action-button tab-action-button--go">TURN IN</button>
+                    <% end %>
+                  <% end %>
+                  <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {turbo_confirm: "ABANDON #{mission.name}?"} do %>
+                    <%= hidden_field_tag :surface, "tactical" %>
+                    <%= hidden_field_tag :input, "abandon #{mission.slug}" %>
+                    <button type="submit" class="tab-outline-button tab-outline-button--danger">ABANDON</button>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <% if @available_missions.any? %>
+            <div class="tab-section-title" style="color: #34d399;">AVAILABLE</div>
+            <% @available_missions.each do |mission| %>
+              <% gates = @mission_service.gate_status(mission) %>
+              <div class="tab-mission">
+                <div class="tab-row tab-row--spread">
+                  <span class="tab-strong"><%= mission.name %></span>
+                  <% if mission.repeatable %><span class="tab-faint tab-small">REPEATABLE</span><% end %>
+                </div>
+                <% if mission.description.present? %><div class="tab-dim tab-small"><%= mission.description %></div><% end %>
+                <div class="tab-error tab-small">
+                  <% unless gates.clearance_met %>[CLEARANCE <%= mission.min_clearance %>] <% end %>
+                  <% unless gates.prereq_met %>[PREREQUISITE REQUIRED] <% end %>
+                  <% unless gates.rep_met %>[REPUTATION TOO LOW]<% end %>
+                </div>
+                <% mission.grid_mission_objectives.each do |obj| %>
+                  <div class="tab-dim tab-small">▸ <%= obj.label %> (0/<%= obj.target_count %>)</div>
+                <% end %>
+                <% if gates.all_met? %>
+                  <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {turbo_confirm: "ACCEPT #{mission.name}?"} do %>
+                    <%= hidden_field_tag :surface, "tactical" %>
+                    <%= hidden_field_tag :input, "accept #{mission.slug}" %>
+                    <button type="submit" class="tab-action-button tab-action-button--go">ACCEPT</button>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

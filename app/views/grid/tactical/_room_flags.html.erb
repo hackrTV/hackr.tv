@@ -1,0 +1,80 @@
+<%# Handle buttons + panel shells for the current room's services
+    (GridTacticalPage handle conditionals port). Replaced wholesale by
+    the command bus on movement, which also closes any open panel.
+    Locals: flags (Grid::TacticalRoomFlags). %>
+<div id="tactical-room-flags" class="tactical-room-flags" data-controller="tactical-panel">
+  <% if flags.in_breach? %>
+    <%# In breach: no handles, no encounter buttons — the breach shell
+        owns the surface until jackout/resolution. %>
+  <% else %>
+  <% if flags.breach_encounters.any? %>
+    <div class="tactical-breach-targets">
+      <% flags.breach_encounters.each do |encounter| %>
+        <span data-controller="dialog">
+          <button type="button" class="tactical-breach-target" data-action="click->dialog#open" <%= "disabled" unless flags.deck_ready? %>>
+            <%= encounter.name %> <span class="tab-small">[<%= encounter.tier_label %>]</span>
+          </button>
+          <dialog class="tactical-dialog" data-dialog-target="dialog">
+            <div class="tactical-dialog-body">
+              <div class="tab-dialog-title tab-error">INITIATE BREACH</div>
+              <div class="tab-dialog-meta"><span><%= encounter.name %></span><span>[<%= encounter.tier_label %>]</span><span>CL<%= encounter.min_clearance %>+</span></div>
+              <div class="tab-dialog-desc">Are you ready?</div>
+              <div class="tab-dialog-actions">
+                <button type="button" class="tab-dialog-cancel" data-action="click->dialog#close">CANCEL</button>
+                <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
+                  <%= hidden_field_tag :surface, "tactical" %>
+                  <%= hidden_field_tag :input, "breach #{encounter.name}" %>
+                  <button type="submit" class="tab-action-button" style="background: #f87171; color: #0a0a0a;">CONFIRM</button>
+                <% end %>
+              </div>
+            </div>
+          </dialog>
+        </span>
+      <% end %>
+      <% unless flags.deck_ready? %>
+        <div class="tab-error tab-small"><%= flags.deck ? "DECK FRIED" : "NO DECK EQUIPPED" %></div>
+      <% end %>
+    </div>
+  <% end %>
+  <% if flags.transit? %>
+    <button type="button" class="tactical-handle tactical-handle--transit" data-tactical-panel-target="handle"
+      data-panel="transit" data-action="click->tactical-panel#open">TRANSIT</button>
+  <% end %>
+  <% if flags.vendor? %>
+    <button type="button" class="tactical-handle tactical-handle--vendor" data-tactical-panel-target="handle"
+      data-panel="vendor" data-action="click->tactical-panel#open">VENDOR</button>
+  <% end %>
+  <% if flags.rest_pod? %>
+    <button type="button" class="tactical-handle tactical-handle--rest-pod" data-tactical-panel-target="handle"
+      data-panel="rest_pod" data-action="click->tactical-panel#open">REST POD</button>
+  <% end %>
+  <% flags.npc_mobs.each_with_index do |mob, i| %>
+    <%# Opening an NPC fires the SPA's initial `talk to` for its side
+        effects (rep, achievements) AND slides the panel open. %>
+    <%= form_with url: grid_commands_path, class: "tactical-handle-form",
+      html: {style: "left: calc(50% + #{(i - (flags.npc_mobs.size - 1) / 2.0) * 72}px);"} do %>
+      <%= hidden_field_tag :surface, "tactical" %>
+      <%= hidden_field_tag :input, "talk to #{mob.name}" %>
+      <button type="submit" class="tactical-handle tactical-handle--npc" data-tactical-panel-target="handle"
+        data-panel="npc" data-mob-id="<%= mob.id %>" data-action="tactical-panel#open"><%= mob.name %></button>
+    <% end %>
+  <% end %>
+  <% end %>
+
+  <div class="tactical-backdrop" data-tactical-panel-target="backdrop" hidden data-action="click->tactical-panel#close"></div>
+
+  <% {
+    "transit" => {css: "top", path: grid_tactical_panel_path(panel: "transit")},
+    "vendor" => {css: "right", path: grid_tactical_panel_path(panel: "vendor")},
+    "rest_pod" => {css: "right-low", path: grid_tactical_panel_path(panel: "rest_pod")},
+    "npc" => {css: "bottom", path: nil}
+  }.each do |name, config| %>
+    <div class="tactical-panel tactical-panel--<%= config[:css] %>" hidden
+      data-tactical-panel-target="panel" data-panel="<%= name %>"<% if config[:path] %> data-src="<%= config[:path] %>"<% end %>>
+      <button type="button" class="tactical-panel-close" data-action="click->tactical-panel#close">CLOSE</button>
+      <%= turbo_frame_tag "tactical-panel-#{name}", target: "_top", data: {tactical_refresh: true} do %>
+        <div class="tactical-loading">Loading...</div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

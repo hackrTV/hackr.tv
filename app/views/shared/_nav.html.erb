@@ -98,6 +98,7 @@
       <div class="header-dropdown-content" data-nav-dropdown-target="panel">
         <ul>
           <li><%= nav_link_to "/grid" do %><span class="purple-168-text">/</span>grid<% end %></li>
+          <li><button type="button" class="nav-terminal-button" data-terminal-open><span class="purple-168-text">/</span>terminal</button></li>
           <% if logged_in? %>
             <% if current_hackr.has_feature?("tactical_grid") %>
               <li><%= nav_link_to "/grid/1337" do %><span class="purple-168-text">/</span>tactical<% end %></li>

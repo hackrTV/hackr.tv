@@ -1,0 +1,71 @@
+<%# VendorPanel.tsx port. BUY/SELL tabs; every action posts the exact
+    command string (buy N Name / sell Name) through the bus. %>
+<% if @vendor.nil? %>
+  <div class="tab-muted">No vendor here.</div>
+<% else %>
+  <div class="tactical-panel-inner" data-controller="tactical-tabs">
+    <% if @vendor.avatar.attached? %>
+      <img class="tactical-avatar-wing tactical-avatar-wing--vendor" src="<%= url_for(@vendor.avatar_panel) %>" alt="<%= @vendor.name %>">
+    <% end %>
+    <div class="tactical-panel-header">
+      <span class="tab-warn">VENDOR :: <%= @vendor.name %></span>
+      <% if @vendor.shop_type == "black_market" %><span class="tab-error tab-small">BLACK MARKET</span><% end %>
+      <span class="tab-warn"><%= number_with_delimiter(@balance) %> CRED</span>
+    </div>
+    <div class="tactical-tab-bar">
+      <button type="button" class="tactical-tab-button tactical-tab-button--active" data-tactical-tabs-target="button" data-tab="buy" data-action="click->tactical-tabs#select">BUY</button>
+      <button type="button" class="tactical-tab-button" data-tactical-tabs-target="button" data-tab="sell" data-action="click->tactical-tabs#select">SELL</button>
+    </div>
+    <div class="tactical-panel-scroll">
+      <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="buy">
+        <% if @listings.empty? %>
+          <div class="tab-faint">Nothing for sale.</div>
+        <% end %>
+        <% @listings.each do |entry| %>
+          <% listing = entry[:listing] %>
+          <% max_qty = listing.unlimited_stock? ? 99 : listing.stock.to_i %>
+          <div class="tab-inv-row">
+            <span class="tab-inv-name" style="color: <%= listing.rarity_color %>;"><%= listing.name %> <span class="tab-small">[<%= listing.rarity_label %>]</span></span>
+            <span class="<%= entry[:affordable] ? "tab-positive" : "tab-error" %>"><%= number_with_delimiter(entry[:effective_price]) %></span>
+            <span class="tab-faint tab-small"><%= entry[:out_of_stock] ? "OUT" : (listing.unlimited_stock? ? "∞" : listing.stock) %></span>
+            <% unless entry[:out_of_stock] %>
+              <%= form_with url: grid_commands_path, class: "tab-inline-form tactical-buy-form", data: {
+                controller: "command-arg",
+                command_arg_template_value: "buy {qty} #{listing.name}",
+                action: "submit->command-arg#submit"
+              } do %>
+                <%= hidden_field_tag :surface, "tactical" %>
+                <%= hidden_field_tag :input, "", data: {command_arg_target: "command"} %>
+                <% if max_qty > 1 %>
+                  <input type="number" value="1" min="1" max="<%= max_qty %>" class="tactical-qty-input"
+                    data-command-arg-target="field" data-arg-name="qty" aria-label="Quantity">
+                <% else %>
+                  <input type="hidden" value="1" data-command-arg-target="field" data-arg-name="qty">
+                <% end %>
+                <button type="submit" class="tab-mini-button<%= entry[:affordable] ? " tab-mini-button--fab" : "" %>" <%= "disabled" unless entry[:affordable] %>>BUY</button>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="sell" hidden>
+        <% if @sellable.blank? %>
+          <div class="tab-faint">Nothing to sell.</div>
+        <% end %>
+        <% Array(@sellable).each do |entry| %>
+          <% item = entry[:item] %>
+          <div class="tab-inv-row">
+            <span class="tab-inv-name" style="color: <%= item.rarity_color %>;"><%= item.name %> <span class="tab-small">[<%= item.rarity_label %>]<% if item.quantity > 1 %> x<%= item.quantity %><% end %></span></span>
+            <span class="tab-positive"><%= number_with_delimiter(entry[:price]) %></span>
+            <%= form_with url: grid_commands_path, class: "tab-inline-form",
+              data: {turbo_confirm: "SELL #{item.name}? You receive #{entry[:price]} CRED."} do %>
+              <%= hidden_field_tag :surface, "tactical" %>
+              <%= hidden_field_tag :input, "sell #{item.name}" %>
+              <button type="submit" class="tab-mini-button tab-mini-button--sell">SELL</button>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -28,15 +28,22 @@ RSpec.describe NavigationHelper, type: :helper do
       end
     end
 
-    it "keeps still-React routes as full page loads" do
-      %w[/grid /grid/1337 /achievements /missions /deck /transit].each do |path|
-        expect(helper.hotwire_path?(path)).to be(false), "expected #{path} to stay non-Turbo"
+    it "covers the whole Phase 6 grid family (terminal + tactical + meta)" do
+      %w[
+        /grid /grid/commands /grid/1337 /grid/1337/tabs/deck /grid/1337/map
+        /achievements /missions /schematics /loadout /gear /deck /transit
+      ].each do |path|
+        expect(helper.hotwire_path?(path)).to be(true), "expected #{path} to be a Hotwire path"
       end
+    end
+
+    it "keeps unknown paths non-Turbo" do
+      expect(helper.hotwire_path?("/definitely-not-a-page")).to be(false)
     end
 
     it "does not let the root entry swallow other paths" do
       expect(helper.hotwire_path?("/")).to be(true)
-      expect(helper.hotwire_path?("/grid")).to be(false)
+      expect(helper.hotwire_path?("/definitely-not-a-page")).to be(false)
     end
   end
 end

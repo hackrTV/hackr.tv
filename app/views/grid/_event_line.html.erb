@@ -1,0 +1,6 @@
+<%# Broadcast terminal line (movement/take/drop/system_broadcast) —
+    GridGamePage.tsx handleEvent port. Locals: color, bold, timestamp,
+    text. The [HH:MM] renders app-TZ as fallback; local-time re-renders
+    it client-local (the SPA stamped client-side). Color values come from
+    RoomEventBroadcaster::COLORS literals. %>
+<div class="grid-line" style="color: <%= color %>;<%= " font-weight: bold;" if bold %>">[<time data-controller="local-time" datetime="<%= timestamp.iso8601 %>"><%= timestamp.strftime("%H:%M") %></time>] <%= text %></div>

@@ -1,0 +1,3 @@
+<%= turbo_frame_tag "tactical-panel-#{@panel}", target: "_top", data: {tactical_refresh: true} do %>
+  <%= render Grid::TacticalPanelsController::PANEL_PARTIALS.fetch(@panel) %>
+<% end %>

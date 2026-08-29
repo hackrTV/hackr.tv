@@ -1,0 +1,83 @@
+<% content_for :title, "TACTICAL — hackr.tv" %>
+
+<%# GridTacticalPage.tsx shell port: fixed fullscreen grid
+    topbar/leftcol/map/help. Commands ride the shared 6a bus with
+    surface=tactical; per-room events append to #grid-log via the room
+    stream; tabs/panels are lazy frames reloaded by the refresh bus. %>
+<div class="tactical-root" data-controller="grid-status tactical-keys">
+  <%= render "grid/room_stream", room: @room %>
+  <div id="tactical-refresh-bus" hidden></div>
+
+  <header class="tactical-bar" id="tactical-bar">
+    <div class="tactical-bar-left">
+      <span class="tactical-bar-title">TACTICAL</span>
+      <span class="tactical-bar-sep">|</span>
+      <span class="tactical-bar-alias"><%= current_hackr.hackr_alias %></span>
+      <%= render "grid/tactical/bar_status" %>
+      <span class="grid-status-dot" data-grid-status-target="dot" title="Connection"></span>
+      <% if current_hackr.admin? %>
+        <a href="/root" class="tactical-bar-admin" data-turbo="false">ADMIN</a>
+      <% end %>
+    </div>
+    <div class="tactical-bar-right" data-controller="disconnect">
+      <a href="/grid" class="tactical-bar-link">STANDARD VIEW</a>
+      <button type="button" class="grid-killswitch" data-action="click->disconnect#logout">KILLSWITCH</button>
+    </div>
+  </header>
+
+  <div class="tactical-leftcol">
+    <div class="tactical-status" data-controller="tactical-tabs">
+      <div class="tactical-tab-bar">
+        <% Grid::TacticalTabsController::TABS.zip(%w[DECK STATS GEAR INV REP CRED MISSIONS SCHEM]).each_with_index do |(tab, label), i| %>
+          <button type="button" class="tactical-tab-button<%= " tactical-tab-button--active" if i.zero? %>"
+            data-tactical-tabs-target="button" data-tab="<%= tab %>"
+            data-action="click->tactical-tabs#select"><%= label %></button>
+        <% end %>
+      </div>
+      <div class="tactical-tab-panels">
+        <% Grid::TacticalTabsController::TABS.each_with_index do |tab, i| %>
+          <div class="tactical-tab-panel" data-tactical-tabs-target="panel" data-tab="<%= tab %>"<%= " hidden".html_safe unless i.zero? %>>
+            <%= turbo_frame_tag "tactical-tab-#{tab}", src: grid_tactical_tab_path(tab: tab),
+              loading: "lazy", target: "_top", data: {tactical_refresh: true} do %>
+              <div class="tactical-loading">Loading...</div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="tactical-terminal" data-controller="grid-command">
+      <div id="grid-log" class="tactical-log" data-controller="packet-log"
+        data-packet-log-cap-value="500" data-grid-command-target="log">
+        <% if @initial_output.present? %>
+          <div class="grid-line"><%= grid_output(@initial_output) %></div>
+        <% end %>
+      </div>
+      <%= form_with url: grid_commands_path, class: "grid-command-form tactical-command-form", data: {
+        action: "submit->grid-command#submit turbo:submit-start->grid-command#started turbo:submit-end->grid-command#submitted"
+      } do %>
+        <%= hidden_field_tag :surface, "tactical" %>
+        <%= text_field_tag :input, nil, autocomplete: "off", autofocus: true,
+          placeholder: "Enter command (type 'help' for commands)", class: "grid-command-input",
+          data: {grid_command_target: "input", action: "keydown->grid-command#keydown"} %>
+        <button type="submit" class="grid-command-send" data-grid-command-target="submit">EXECUTE</button>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="tactical-map-region" data-controller="tactical-map"
+    data-action="wheel->tactical-map#zoom:!passive pointerdown->tactical-map#panStart pointermove->tactical-map#panMove pointerup->tactical-map#panEnd pointerleave->tactical-map#panEnd click->tactical-map#select">
+    <% if @map %>
+      <%= render "grid/tactical/zone_map", map: @map, current_room: @room %>
+    <% else %>
+      <div id="tactical-map"><div class="tactical-map-placeholder">NO ZONE SIGNAL</div></div>
+    <% end %>
+    <%= render "grid/tactical/room_flags", flags: Grid::TacticalRoomFlags.new(current_hackr) %>
+  </div>
+
+  <%= render "grid/tactical/breach_shell", breach: current_hackr.active_breach %>
+
+  <footer class="tactical-help">
+    Commands: look, go [dir], take/drop [item], say [msg], talk/ask [npc], inventory, who, help, clear&nbsp;&nbsp;|&nbsp;&nbsp;↑/↓ history&nbsp;&nbsp;|&nbsp;&nbsp;Tab focuses input&nbsp;&nbsp;|&nbsp;&nbsp;click map rooms to move
+  </footer>
+</div>

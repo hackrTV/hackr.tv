@@ -1,0 +1,19 @@
+<%# DeckPage SoftwareCard port. Locals: sw (GridItem, software). %>
+<%
+  props = sw.properties || {}
+  category = props["software_category"].to_s
+  specs = []
+  specs << "Slots: #{props["slot_cost"]}" if props["slot_cost"].to_i > 1
+  specs << "Power: #{props["battery_cost"]}" if props["battery_cost"].to_i > 0
+  specs << "#{props["effect_type"] || "DMG"}: #{props["effect_magnitude"]}" if props["effect_magnitude"].to_i > 0
+  targets = Array(props["target_types"])
+  specs << "Targets: #{targets.join("/")}" if targets.any?
+%>
+<div class="tab-line">
+  <div class="tab-row tab-row--spread">
+    <span style="color: <%= sw.rarity_color %>;"><%= sw.name %></span>
+    <span class="tab-small" style="color: <%= TacticalHelper::SOFTWARE_CATEGORY_COLORS[category] || "#888" %>;"><%= category %></span>
+  </div>
+  <% if specs.any? %><div class="tab-specs"><%= specs.join(" | ") %></div><% end %>
+  <% if sw.description.present? %><div class="tab-faint tab-small"><%= sw.description %></div><% end %>
+</div>

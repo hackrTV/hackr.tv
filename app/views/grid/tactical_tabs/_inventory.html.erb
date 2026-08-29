@@ -1,0 +1,98 @@
+<%# InventoryTab.tsx port. Item rows open a per-item <dialog> with
+    details + action forms; the SPA's second confirm modal collapses
+    into turbo_confirm (hint text included). All actions post the exact
+    command strings through the bus. %>
+<%
+  capacity_used = @items.size
+  capacity_max = current_hackr.inventory_capacity
+  capacity_pct = (capacity_max > 0) ? ((capacity_used.to_f / capacity_max) * 100).round : 0
+  full = capacity_used >= capacity_max
+%>
+<div class="tab-block">
+  <div class="tab-row tab-row--spread <%= full ? "tab-error" : "tab-dim" %>">
+    <span>Inventory</span><span><%= capacity_used %>/<%= capacity_max %> slots</span>
+  </div>
+  <div class="tab-bar-track"><span class="tab-bar-fill<%= full ? " tab-bar-fill--low" : ((capacity_used > capacity_max * 0.75) ? " tab-bar-fill--warn" : "") %>" style="width: <%= capacity_pct %>%"></span></div>
+
+  <% if @grouped.empty? %>
+    <div class="tab-faint">Inventory empty</div>
+  <% end %>
+
+  <% Api::GridController::INVENTORY_TYPE_ORDER.each do |type| %>
+    <% type_items = @grouped[type] %>
+    <% next unless type_items&.any? %>
+    <div class="tab-inv-group">
+      <div class="tab-section-title"><%= Api::GridController::INVENTORY_TYPE_LABELS[type] || type.upcase %> (<%= type_items.size %>)</div>
+      <% type_items.sort_by { |i| [-(GridItem::RARITIES.index(i.rarity) || 0), i.name.to_s] }.each do |item| %>
+        <%
+          actions = (Api::GridController::INVENTORY_ITEM_ACTIONS[item.item_type] || %w[drop]).dup
+          actions.delete("salvage") if item.unicorn?
+          listing = @vendor_listings_by_def && !item.unicorn? && item.value.to_i > 0 ? @vendor_listings_by_def[item.grid_item_definition_id] : nil
+          sell_price = (@vendor_listings_by_def && !item.unicorn? && item.value.to_i > 0) ? Grid::ShopService.sell_price_for(item: item, listing: listing) : nil
+        %>
+        <div class="tab-inv-row" data-controller="dialog">
+          <% if sell_price.to_i > 0 %>
+            <%= form_with url: grid_commands_path, class: "tab-inline-form", data: {turbo_confirm: "SELL #{item.name}? Sells for #{sell_price} CRED."} do %>
+              <%= hidden_field_tag :surface, "tactical" %>
+              <%= hidden_field_tag :input, "sell #{item.name}" %>
+              <button type="submit" class="tab-mini-button tab-mini-button--sell">SELL</button>
+            <% end %>
+          <% end %>
+          <button type="button" class="tab-inv-name" style="color: <%= item.rarity_color %>;" data-action="click->dialog#open"><%= item.name %></button>
+          <span class="tab-inv-meta">
+            <% if item.quantity > 1 %><span class="tab-qty">x<%= item.quantity %></span> <% end %>
+            <span style="color: <%= item.rarity_color %>;">[<%= item.rarity_label %>]</span>
+          </span>
+
+          <dialog class="tactical-dialog" data-dialog-target="dialog">
+            <div class="tactical-dialog-body">
+              <div class="tab-row tab-row--spread">
+                <span class="tab-dialog-title" style="color: <%= item.rarity_color %>;"><%= item.name %></span>
+                <span style="color: <%= item.rarity_color %>;" class="tab-dialog-rarity"><%= item.rarity_label %></span>
+              </div>
+              <div class="tab-dialog-meta">
+                <span><%= TacticalHelper::ITEM_TYPE_LABELS[item.item_type] || item.item_type %></span>
+                <% max_stack = item.grid_item_definition&.max_stack %>
+                <% if max_stack.to_i > 1 %><span>Stack: <%= item.quantity %>/<%= max_stack %></span>
+                <% elsif item.quantity > 1 %><span>Qty: <%= item.quantity %></span><% end %>
+              </div>
+              <% if item.description.present? %>
+                <div class="tab-dialog-desc"><%= item.description %></div>
+              <% end %>
+              <% props = tactical_item_properties(item.properties) %>
+              <% if props.any? %>
+                <div class="tab-dialog-props">
+                  <% props.each do |label, value| %>
+                    <div class="tab-row tab-row--spread"><span class="tab-dim"><%= label %></span><span class="tab-positive"><%= value %></span></div>
+                  <% end %>
+                </div>
+              <% end %>
+              <div class="tab-dialog-actions">
+                <button type="button" class="tab-dialog-cancel" data-action="click->dialog#close">CLOSE</button>
+                <% actions.each do |action| %>
+                  <% config = TacticalHelper::ACTION_CONFIG[action] %>
+                  <% next unless config %>
+                  <% hint = tactical_action_hint(action, item) %>
+                  <%= form_with url: grid_commands_path, class: "tab-inline-form",
+                    data: {turbo_confirm: "#{config[:label]} #{item.name}?#{" #{hint}" if hint.present?}"} do %>
+                    <%= hidden_field_tag :surface, "tactical" %>
+                    <%= hidden_field_tag :input, "#{action} #{item.name}" %>
+                    <button type="submit" class="tab-action-button tab-action-button--<%= config[:css] %>"><%= config[:label] %></button>
+                  <% end %>
+                <% end %>
+                <% if sell_price.to_i > 0 %>
+                  <%= form_with url: grid_commands_path, class: "tab-inline-form",
+                    data: {turbo_confirm: "SELL #{item.name}? Sells for #{sell_price} CRED."} do %>
+                    <%= hidden_field_tag :surface, "tactical" %>
+                    <%= hidden_field_tag :input, "sell #{item.name}" %>
+                    <button type="submit" class="tab-action-button tab-action-button--sell">SELL</button>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </dialog>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

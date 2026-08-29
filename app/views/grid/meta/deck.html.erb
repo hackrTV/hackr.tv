@@ -1,0 +1,54 @@
+<% content_for :title, "DECK — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hotwire-page grid-meta">
+    <div class="grid-meta-window" style="border-color: #22d3ee;">
+      <div class="grid-meta-legend" style="color: #22d3ee;">DECK STATUS</div>
+
+      <% if @deck.nil? %>
+        <div class="tab-muted">No DECK equipped.</div>
+        <div class="tab-faint tab-small">Equip one via <code>equip &lt;deck name&gt;</code> in the Terminal.</div>
+      <% else %>
+        <div class="grid-meta-card-header">
+          <span class="grid-meta-card-title" style="color: <%= @deck.rarity_color %>;"><%= @deck.name %></span>
+          <span style="color: <%= @deck.rarity_color %>;" class="tab-small">[<%= @deck.rarity_label %>]</span>
+        </div>
+
+        <% battery_pct = (@deck.deck_battery_max.to_i > 0) ? ((@deck.deck_battery.to_f / @deck.deck_battery_max) * 100).round : 0 %>
+        <% slots_pct = (@deck.deck_slot_count.to_i > 0) ? ((@deck.deck_slots_used.to_f / @deck.deck_slot_count) * 100).round : 0 %>
+        <div class="grid-meta-two-col">
+          <div>
+            <div class="tab-row tab-row--spread tab-dim"><span>BATTERY</span><span><%= @deck.deck_battery %>/<%= @deck.deck_battery_max %></span></div>
+            <div class="tab-bar-track"><span class="tab-bar-fill<%= " tab-bar-fill--low" if battery_pct <= 25 %>" style="width: <%= battery_pct %>%; background: #fbbf24;"></span></div>
+            <div class="tab-row tab-row--spread tab-dim"><span>SOFTWARE SLOTS</span><span><%= @deck.deck_slots_used %>/<%= @deck.deck_slot_count %></span></div>
+            <div class="tab-bar-track"><span class="tab-bar-fill" style="width: <%= slots_pct %>%; background: #22d3ee;"></span></div>
+          </div>
+          <div>
+            <div class="tab-dim">Module Slots: <%= @deck.deck_modules_used %>/<%= @deck.deck_module_slot_count %></div>
+            <div class="tab-faint tab-small"><code>deck load &lt;name&gt;</code> / <code>deck unload &lt;name&gt;</code></div>
+          </div>
+        </div>
+
+        <% if @modules.any? %>
+          <div class="grid-meta-section-title">INSTALLED MODULES</div>
+          <% @modules.each do |mod| %>
+            <div class="tab-line">
+              <span style="color: <%= mod.rarity_color %>;"><%= mod.name %></span>
+              <% if (fw = mod.properties&.dig("firmware_name")) %><span class="tab-purple tab-small">&larr; <%= fw %></span><% end %>
+              <% if mod.description.present? %><div class="tab-faint tab-small"><%= mod.description %></div><% end %>
+            </div>
+          <% end %>
+        <% end %>
+
+        <div class="grid-meta-section-title">LOADED SOFTWARE</div>
+        <% if @software.empty? %><div class="tab-faint">No software loaded.</div><% end %>
+        <%= render partial: "grid/meta/software_card", collection: @software, as: :sw %>
+
+        <% if @inventory_software.any? %>
+          <div class="grid-meta-section-title">INVENTORY SOFTWARE</div>
+          <%= render partial: "grid/meta/software_card", collection: @inventory_software, as: :sw %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

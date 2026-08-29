@@ -1,0 +1,66 @@
+<%# SchematicsTab.tsx port. FAB posts `fabricate <slug>`; the detail
+    dialog shows the output item like the inventory dialog. %>
+<div class="tab-block">
+  <% if @schematics.empty? %>
+    <div class="tab-faint">No schematics on file.</div>
+  <% end %>
+  <% @schematics.each do |schematic| %>
+    <%
+      out = schematic.output_definition
+      craftable = schematic.craftable_by?(current_hackr,
+        completed_mission_slugs: @completed_mission_slugs,
+        earned_achievement_slugs: @earned_achievement_slugs,
+        current_room: current_hackr.current_room)
+      has_ingredients = schematic.ingredients.all? { |i| (@inventory_qtys[i.input_definition_id] || 0) >= i.quantity }
+    %>
+    <div class="tab-schematic" data-controller="dialog">
+      <div class="tab-row tab-row--spread">
+        <button type="button" class="tab-inv-name" style="color: <%= out.rarity_color %>;" data-action="click->dialog#open"><%= schematic.name %></button>
+        <% if craftable && has_ingredients %>
+          <%= form_with url: grid_commands_path, class: "tab-inline-form",
+            data: {turbo_confirm: "Fabricate #{out.name}#{schematic.output_quantity > 1 ? " ×#{schematic.output_quantity}" : ""}?"} do %>
+            <%= hidden_field_tag :surface, "tactical" %>
+            <%= hidden_field_tag :input, "fabricate #{schematic.slug}" %>
+            <button type="submit" class="tab-mini-button tab-mini-button--fab">FAB</button>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="tab-schematic-ingredients">
+        <% schematic.ingredients.ordered.each do |ing| %>
+          <% owned = @inventory_qtys[ing.input_definition_id] || 0 %>
+          <span class="<%= (owned >= ing.quantity) ? "tab-positive" : "tab-faint" %>"><%= ing.input_definition.name %> <%= owned %>/<%= ing.quantity %></span>
+        <% end %>
+      </div>
+      <% unless craftable %>
+        <div class="tab-schematic-gates tab-error tab-small">
+          <% if schematic.required_clearance.to_i > current_hackr.stat("clearance").to_i %>[CLEARANCE <%= schematic.required_clearance %>]<% end %>
+          <% if schematic.required_mission_slug.present? && !@completed_mission_slugs.include?(schematic.required_mission_slug) %>[MISSION REQUIRED]<% end %>
+          <% if schematic.required_achievement_slug.present? && !@earned_achievement_slugs.include?(schematic.required_achievement_slug) %>[ACHIEVEMENT REQUIRED]<% end %>
+          <% if schematic.required_room_type.present? && current_hackr.current_room&.room_type != schematic.required_room_type %>[REQUIRES <%= schematic.room_type_label.to_s.upcase %>]<% end %>
+        </div>
+      <% end %>
+
+      <dialog class="tactical-dialog" data-dialog-target="dialog">
+        <div class="tactical-dialog-body">
+          <div class="tab-row tab-row--spread">
+            <span class="tab-dialog-title" style="color: <%= out.rarity_color %>;"><%= out.name %><% if schematic.output_quantity > 1 %> ×<%= schematic.output_quantity %><% end %></span>
+            <span style="color: <%= out.rarity_color %>;" class="tab-dialog-rarity"><%= out.rarity_label %></span>
+          </div>
+          <div class="tab-dialog-meta"><span><%= TacticalHelper::ITEM_TYPE_LABELS[out.item_type] || out.item_type %></span><% if schematic.xp_reward.to_i > 0 %><span>+<%= schematic.xp_reward %> XP</span><% end %></div>
+          <% if out.description.present? %><div class="tab-dialog-desc"><%= out.description %></div><% end %>
+          <% props = tactical_item_properties(out.properties) %>
+          <% if props.any? %>
+            <div class="tab-dialog-props">
+              <% props.each do |label, value| %>
+                <div class="tab-row tab-row--spread"><span class="tab-dim"><%= label %></span><span class="tab-positive"><%= value %></span></div>
+              <% end %>
+            </div>
+          <% end %>
+          <div class="tab-dialog-actions">
+            <button type="button" class="tab-dialog-cancel" data-action="click->dialog#close">CLOSE</button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+  <% end %>
+</div>

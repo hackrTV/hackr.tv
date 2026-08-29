@@ -1,0 +1,8 @@
+<%# Per-room Turbo Stream subscription. A movement command response
+    replaces this wholesale, which swaps the subscription to the new
+    room (the SPA resubscribed GridChannel on room_id change). %>
+<div id="grid-room-stream" data-grid-room-id="<%= room&.id %>">
+  <% if room %>
+    <%= turbo_stream_from "grid_room_html", room.id %>
+  <% end %>
+</div>

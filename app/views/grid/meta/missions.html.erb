@@ -1,0 +1,93 @@
+<% content_for :title, "Missions — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%# The frame lets the mission-completed toast signal reload the page
+      content live (the SPA refetched on the grid:mission_completed
+      CustomEvent). %>
+  <%= turbo_frame_tag "grid-missions", target: "_top", data: {controller: "mission-refresh"} do %>
+    <div class="hotwire-page grid-meta" data-controller="meta-filter">
+      <div class="grid-meta-window" style="border-color: #22d3ee;">
+        <div class="grid-meta-legend" style="color: #22d3ee;">MISSIONS</div>
+
+        <div class="grid-meta-tabs">
+          <button type="button" class="grid-meta-tab grid-meta-tab--active" data-filter="active" data-meta-filter-target="button" data-action="click->meta-filter#select" style="color: #22d3ee;">ACTIVE (<%= @active.size %>)</button>
+          <button type="button" class="grid-meta-tab" data-filter="available" data-meta-filter-target="button" data-action="click->meta-filter#select" style="color: #34d399;">AVAILABLE (<%= @available.size %>)</button>
+          <button type="button" class="grid-meta-tab" data-filter="completed" data-meta-filter-target="button" data-action="click->meta-filter#select" style="color: #fbbf24;">COMPLETED (<%= @completed.size %>)</button>
+        </div>
+
+        <div class="grid-meta-grid" data-filter="active" data-meta-filter-target="item">
+          <% if @active.empty? %>
+            <div class="tab-faint">No active missions. Find mission givers out in the Grid.</div>
+          <% end %>
+          <% @active.each do |hm| %>
+            <% mission = hm.grid_mission %>
+            <% progress_by_obj = hm.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id) %>
+            <div class="grid-meta-card">
+              <div class="grid-meta-card-header">
+                <span class="grid-meta-card-title"><%= mission.name %></span>
+                <% if hm.all_objectives_completed? %><span class="tab-warn tab-small">READY FOR TURN-IN</span><% end %>
+              </div>
+              <% if mission.description.present? %><div class="grid-meta-card-desc"><%= mission.description %></div><% end %>
+              <% mission.grid_mission_objectives.each do |obj| %>
+                <% hobj = progress_by_obj[obj.id] %>
+                <% completed = hobj&.completed_at.present? %>
+                <div class="tab-row tab-row--spread <%= completed ? "tab-positive" : "tab-dim" %>">
+                  <span><%= completed ? "✓" : "▸" %> <%= obj.label %></span>
+                  <% if obj.target_count.to_i > 1 %><span><%= hobj&.progress.to_i %>/<%= obj.target_count %></span><% end %>
+                </div>
+              <% end %>
+              <%= render "grid/meta/mission_rewards", mission: mission %>
+              <div class="grid-meta-card-footer"><span class="tab-faint">Return to <%= mission.giver_mob&.name || "the giver" %> and use <code>turn_in <%= mission.slug %></code></span></div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="grid-meta-grid" data-filter="available" data-meta-filter-target="item" hidden>
+          <% if @available.empty? %>
+            <div class="tab-faint">No available missions here. Explore for mission givers.</div>
+          <% end %>
+          <% @available.each do |mission| %>
+            <% gates = @gate_statuses[mission] %>
+            <div class="grid-meta-card">
+              <div class="grid-meta-card-header">
+                <span class="grid-meta-card-title"><%= mission.name %></span>
+                <% if mission.repeatable %><span class="tab-faint tab-small">REPEATABLE</span><% end %>
+              </div>
+              <% if mission.description.present? %><div class="grid-meta-card-desc"><%= mission.description %></div><% end %>
+              <% if gates && !gates.all_met? %>
+                <div class="tab-error tab-small">
+                  <% unless gates.clearance_met %>[CLEARANCE <%= mission.min_clearance %>] <% end %>
+                  <% unless gates.prereq_met %>[PREREQUISITE REQUIRED] <% end %>
+                  <% unless gates.rep_met %>[REPUTATION TOO LOW]<% end %>
+                </div>
+              <% end %>
+              <% mission.grid_mission_objectives.each do |obj| %>
+                <div class="tab-dim tab-small">▸ <%= obj.label %><% if obj.target_count.to_i > 1 %> (0/<%= obj.target_count %>)<% end %></div>
+              <% end %>
+              <%= render "grid/meta/mission_rewards", mission: mission %>
+              <div class="grid-meta-card-footer"><span class="tab-faint">Use <code>accept <%= mission.slug %></code> in the Terminal while in the giver's room</span></div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="grid-meta-grid" data-filter="completed" data-meta-filter-target="item" hidden>
+          <% if @completed.empty? %>
+            <div class="tab-faint">No completed missions yet.</div>
+          <% end %>
+          <% @completed.each do |hm| %>
+            <% mission = hm.grid_mission %>
+            <div class="grid-meta-card grid-meta-card--earned">
+              <div class="grid-meta-card-header">
+                <span class="grid-meta-card-title">✓ <%= mission.name %></span>
+                <% if hm.turn_in_count.to_i > 1 %><span class="tab-faint tab-small">×<%= hm.turn_in_count %></span><% end %>
+              </div>
+              <% if mission.giver_mob %><div class="tab-faint tab-small"><%= mission.giver_mob.name %></div><% end %>
+              <% if hm.completed_at %><div class="tab-faint tab-small">Completed <%= hm.completed_at.strftime("%b %-d, %Y") %></div><% end %>
+              <%= render "grid/meta/mission_rewards", mission: mission %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

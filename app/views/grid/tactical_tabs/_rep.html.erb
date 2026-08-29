@@ -1,0 +1,26 @@
+<%# RepTab.tsx port — fixed-width terminal columns via NBSP padding. %>
+<% if @standings.empty? %>
+  <div class="tab-muted">No factions on file. The Grid doesn't know you yet.</div>
+<% else %>
+  <%
+    nbsp = " "
+    max_name = @standings.map { |e|
+      indent_len = (e[:depth] > 0) ? 2 * (e[:depth] - 1) + 3 : 0
+      indent_len + e[:standing][:faction].display_name.length
+    }.max
+    sep = nbsp * 2
+  %>
+  <div class="tab-rep">
+    <% @standings.each do |entry| %>
+      <% s = entry[:standing] %>
+      <% indent = (entry[:depth] > 0) ? (nbsp * 2 * (entry[:depth] - 1)) + "└─ " : "" %>
+      <% name_col = "#{indent}#{s[:faction].display_name}".ljust(max_name, nbsp) %>
+      <% tier_col = "[#{s[:tier][:label]}]".ljust(13, nbsp) %>
+      <% val_col = ((s[:effective] >= 0) ? "+#{s[:effective]}" : s[:effective].to_s).rjust(5, nbsp) %>
+      <% next_col = s[:next_tier] ? "#{s[:next_tier][:min] - s[:effective]} to #{s[:next_tier][:label]}" : "[MAX]" %>
+      <div class="tab-rep-row">
+        <span class="tab-rep-name"><%= name_col %></span><%= sep %><span style="color: <%= s[:tier][:color] %>;"><%= tier_col %></span><%= sep %><span style="color: <%= s[:tier][:color] %>;"><%= tactical_rep_bar(s[:effective]) %></span><%= sep %><span class="tab-rep-value"><%= val_col %></span><%= sep %><span class="<%= s[:next_tier] ? "tab-faint" : "tab-warn" %>"><%= next_col %></span><% if s[:aggregate] %><%= sep %><span class="tab-faint">↻</span><% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

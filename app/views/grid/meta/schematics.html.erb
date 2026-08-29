@@ -1,0 +1,67 @@
+<% content_for :title, "Schematics — hackr.tv" %>
+
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="hotwire-page grid-meta" data-controller="meta-filter">
+    <div class="grid-meta-window" style="border-color: #a78bfa;">
+      <div class="grid-meta-legend" style="color: #a78bfa;">FABRICATION SCHEMATICS</div>
+
+      <%
+        statuses = @schematics.map { |s|
+          craftable = s.craftable_by?(current_hackr,
+            completed_mission_slugs: @completed_mission_slugs,
+            earned_achievement_slugs: @earned_achievement_slugs,
+            current_room: current_hackr.current_room)
+          has_ingredients = s.ingredients.all? { |i| (@inventory_qtys[i.input_definition_id] || 0) >= i.quantity }
+          status = if craftable && has_ingredients
+            "ready"
+          else
+            craftable ? "available" : "locked"
+          end
+          [s, status]
+        }
+        counts = statuses.group_by(&:last).transform_values(&:size)
+      %>
+
+      <div class="grid-meta-tabs">
+        <button type="button" class="grid-meta-tab grid-meta-tab--active" data-filter="all" data-meta-filter-target="button" data-action="click->meta-filter#select">ALL (<%= statuses.size %>)</button>
+        <button type="button" class="grid-meta-tab" style="color: #34d399;" data-filter="ready" data-meta-filter-target="button" data-action="click->meta-filter#select">READY (<%= counts["ready"] || 0 %>)</button>
+        <button type="button" class="grid-meta-tab" style="color: #60a5fa;" data-filter="available" data-meta-filter-target="button" data-action="click->meta-filter#select">AVAILABLE (<%= counts["available"] || 0 %>)</button>
+        <button type="button" class="grid-meta-tab" style="color: #6b7280;" data-filter="locked" data-meta-filter-target="button" data-action="click->meta-filter#select">LOCKED (<%= counts["locked"] || 0 %>)</button>
+      </div>
+
+      <div class="grid-meta-grid">
+        <% if statuses.empty? %>
+          <div class="tab-faint">No schematics on file.</div>
+        <% end %>
+        <% statuses.each do |schematic, status| %>
+          <% out = schematic.output_definition %>
+          <div class="grid-meta-card" data-filter="<%= status %>" data-meta-filter-target="item">
+            <div class="grid-meta-card-header">
+              <span class="grid-meta-card-title"><%= schematic.name %></span>
+              <span class="grid-meta-status grid-meta-status--<%= status %>"><%= status.upcase %></span>
+            </div>
+            <div class="tab-faint tab-small"><%= schematic.slug %></div>
+            <% if schematic.description.present? %><div class="grid-meta-card-desc"><%= schematic.description %></div><% end %>
+            <div class="tab-row">Output: <span style="color: <%= out.rarity_color %>;"><%= out.name %></span><% if schematic.output_quantity.to_i > 1 %> ×<%= schematic.output_quantity %><% end %></div>
+            <% schematic.ingredients.ordered.each do |ing| %>
+              <% owned = @inventory_qtys[ing.input_definition_id] || 0 %>
+              <% met = owned >= ing.quantity %>
+              <div class="tab-row tab-row--spread <%= met ? "tab-positive" : "tab-error" %>">
+                <span><%= met ? "✓" : "✕" %> <%= ing.input_definition.name %></span>
+                <span><%= owned %>/<%= ing.quantity %></span>
+              </div>
+            <% end %>
+            <div class="grid-meta-card-footer">
+              <% if schematic.xp_reward.to_i > 0 %><span class="tab-positive">+<%= schematic.xp_reward %> XP</span><% end %>
+              <% if schematic.required_clearance.to_i > 0 %><span class="tab-faint">CL<%= schematic.required_clearance %>+</span><% end %>
+              <% if schematic.required_room_type.present? %><span class="tab-faint"><%= schematic.room_type_label %></span><% end %>
+            </div>
+            <% if status == "ready" %>
+              <div class="tab-faint tab-small">Use <code>fab <%= schematic.slug %></code> in the Terminal</div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
