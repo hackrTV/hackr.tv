@@ -12,7 +12,7 @@
     <li class="<%= "active" if nav_active?("/xeraen") %>">
       <%= nav_link_to "/xeraen" do %><span class="purple-168-text">2</span>&nbsp;XERAEN.net&nbsp;<% end %>
     </li>
-    <li class="<%= "active" if nav_active?("/fm") || nav_active?("/vault") %>">
+    <li class="<%= "active" if nav_active?("/fm") || nav_active?("/vault") || band_namespace_active? %>">
       <%= nav_link_to "/fm" do %><span class="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;<% end %>
     </li>
     <li class="<%= "active" if nav_active?("/f/net") %>">

@@ -19,6 +19,27 @@ RSpec.describe NavigationHelper, type: :helper do
     end
   end
 
+  describe "#band_namespace_active?" do
+    it "is true on band namespaces, including nested catalog paths" do
+      allow(helper.request).to receive(:path).and_return("/system-rot")
+      expect(helper.band_namespace_active?).to be(true)
+
+      allow(helper.request).to receive(:path).and_return("/blitzbeam/releases/7")
+      expect(helper.band_namespace_active?).to be(true)
+    end
+
+    it "is false on the headliner namespaces and elsewhere" do
+      allow(helper.request).to receive(:path).and_return("/thecyberpulse/bio")
+      expect(helper.band_namespace_active?).to be(false)
+
+      allow(helper.request).to receive(:path).and_return("/xeraen")
+      expect(helper.band_namespace_active?).to be(false)
+
+      allow(helper.request).to receive(:path).and_return("/wire")
+      expect(helper.band_namespace_active?).to be(false)
+    end
+  end
+
   describe "#nav_active?" do
     it "matches root exactly and other paths by prefix" do
       allow(helper.request).to receive(:path).and_return("/")

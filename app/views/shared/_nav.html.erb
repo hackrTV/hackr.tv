@@ -49,7 +49,7 @@
       </div>
     </li>
 
-    <li class="header-dropdown<%= " active" if nav_active?("/fm") || nav_active?("/vault") %>" data-controller="nav-dropdown" data-action="click->nav-dropdown#toggle">
+    <li class="header-dropdown<%= " active" if nav_active?("/fm") || nav_active?("/vault") || band_namespace_active? %>" data-controller="nav-dropdown" data-action="click->nav-dropdown#toggle">
       <span class="purple-168-text">3</span>&nbsp;hackr.fm&nbsp;
       <div class="header-dropdown-content" data-nav-dropdown-target="panel">
         <ul>

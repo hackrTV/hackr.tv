@@ -1,10 +1,10 @@
 require "rails_helper"
 
 # Phase 4: Hotwire band profile pages (replaces BandProfilePage.tsx,
-# BandProfileLayout.tsx, and the five migrated bandProfileConfig.tsx
-# entries). These paths hit pages#spa_root until the Phase 4 routes pass
-# points each artist scope root at band_profiles#show, so this spec is
-# expected red until then.
+# BandProfileLayout.tsx, and the migrated bandProfileConfig.tsx entries —
+# all eleven since the post-launch port of the six the Phase 4 pass
+# missed). Slugs routed to band_profiles#show but absent from
+# BandProfile::CONFIG fall back to the not-found variant.
 RSpec.describe "Band profile pages", type: :request do
   describe "GET /system-rot" do
     it "renders the System Rot profile without the SPA shell" do
@@ -89,9 +89,82 @@ RSpec.describe "Band profile pages", type: :request do
     end
   end
 
-  describe "GET /temporal-blue-drift (unconfigured slug)" do
-    it "renders the minimal not-found page with a 200 like the SPA" do
+  describe "GET /injection-vector" do
+    it "renders the Injection Vector profile" do
+      get "/injection-vector"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("INJECTION VECTOR")
+      expect(response.body).to include("[:: THE BREACH IN THE SYSTEM ::]")
+      expect(response.body).to include("TACTICAL DOCTRINE")
+      expect(response.body).to include("band-profile--injection-vector")
+      expect(response.body).to include('href="/vault?filter=injection%20vector"')
+    end
+  end
+
+  describe "GET /cipher-protocol" do
+    it "renders the Cipher Protocol profile" do
+      get "/cipher-protocol"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("CIPHER PROTOCOL")
+      expect(response.body).to include("[:: THE DATA COURIERS ::]")
+      expect(response.body).to include("OPERATIONAL PARAMETERS")
+      expect(response.body).to include('href="/vault?filter=cipher%20protocol"')
+    end
+  end
+
+  describe "GET /apex-overdrive" do
+    it "renders the Apex Overdrive profile" do
+      get "/apex-overdrive"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("APEX OVERDRIVE")
+      expect(response.body).to include("⚡ EUPHORIA AS DEFIANCE ⚡")
+      expect(response.body).to include("THE SUMMIT PHILOSOPHY")
+      expect(response.body).to include('href="/vault?filter=apex%20overdrive"')
+    end
+  end
+
+  describe "GET /neon-hearts" do
+    it "renders the Neon Hearts profile" do
+      get "/neon-hearts"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("NEON HEARTS (ネオンハーツ)")
+      expect(response.body).to include("💖 Sugar-Coated Revolution 💖")
+      expect(response.body).to include("💖 The Cute Rebellion 💖")
+      expect(response.body).to include('href="/vault?filter=neon%20hearts"')
+    end
+  end
+
+  describe "GET /temporal-blue-drift" do
+    it "renders the Temporal Blue Drift profile" do
       get "/temporal-blue-drift"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("TEMPORAL BLUE DRIFT")
+      expect(response.body).to include("WHAT I'M TRYING TO TELL YOU")
+      expect(response.body).to include("A Hundred Years Between")
+      expect(response.body).to include('href="/vault?filter=temporal%20blue%20drift"')
+    end
+  end
+
+  describe "GET /heartbreak-havoc" do
+    it "renders the heartbreak_havoc.sh profile" do
+      get "/heartbreak-havoc"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("HEARTBREAK_HAVOC.SH")
+      expect(response.body).to include("TACTICAL DOCTRINE")
+      expect(response.body).to include("Nightcore Assault")
+      expect(response.body).to include('href="/vault?filter=heartbreak%20havoc"')
+    end
+  end
+
+  describe "GET /the-pulse-grid (unconfigured slug)" do
+    it "renders the minimal not-found page with a 200 like the SPA" do
+      get "/the-pulse-grid"
 
       expect(response).to have_http_status(:ok)
       expect(response.body).not_to include('<div id="root">')

@@ -1,6 +1,6 @@
 <% content_for :title, "#{@playlist.name} — hackr.tv" %>
 
-<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+<%= render layout: "shared/default_chrome" do %>
   <%# track-list wraps the whole page so ▶ Play Playlist reaches the rows;
       autoplay=true (from the index Play button) starts playback on load. %>
   <div class="playlists-wrap" data-controller="track-list"
