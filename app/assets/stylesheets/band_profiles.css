@@ -1,8 +1,9 @@
 /*
  * Band profile pages (Hotwire, Phase 4) — inline styles from
- * BandProfileLayout.tsx and the five migrated bandProfileConfig.tsx
- * entries (system-rot, voiceprint, blitzbeam, ethereality, offline),
- * ported to classes. Loaded per-page via content_for :head, which sits
+ * BandProfileLayout.tsx and the eleven migrated bandProfileConfig.tsx
+ * entries (system-rot, voiceprint, injection-vector, cipher-protocol,
+ * blitzbeam, apex-overdrive, ethereality, neon-hearts, offline,
+ * temporal-blue-drift, heartbreak-havoc), ported to classes. Loaded per-page via content_for :head, which sits
  * BEFORE tuicss/default in the hotwire layout head — selectors that
  * compete with tuicss (.tui-window, .tui-button) are therefore chained
  * to two classes so they win on specificity, not on source order.
@@ -705,4 +706,775 @@
 .off-outro-signal {
   color: #8b7355;
   letter-spacing: 1px;
+}
+
+/* --- Injection Vector (#ff6600 tactical orange on black) --- */
+
+.band-profile-container.band-profile--injection-vector {
+  background: #0a0a0a;
+  border: 2px solid #ff6600;
+}
+
+.band-profile--injection-vector .band-profile-fieldset { border-color: #ff6600; }
+
+.band-profile--injection-vector .band-profile-legend { color: #ff6600; }
+
+.band-profile--injection-vector .band-profile-button {
+  background: #ff6600;
+  color: #000;
+}
+
+.band-profile--injection-vector .band-profile-back-button {
+  background: #222;
+  border: 1px solid #444;
+}
+
+.iv-intro {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #000000;
+  border: 1px solid #ff6600;
+}
+
+.iv-intro-heading {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #ff6600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.iv-intro-body {
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.iv-intro-close {
+  color: #888;
+  line-height: 1.6;
+}
+
+.tui-window.iv-philosophy {
+  margin-bottom: 30px;
+  background: #000000;
+  border: 1px solid #ff6600;
+}
+
+.iv-philosophy fieldset { border-color: #ff6600; }
+
+.iv-philosophy legend { color: #ff6600; }
+
+.iv-doctrine { margin-bottom: 25px; }
+
+.iv-doctrine h3 {
+  color: #ff6600;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.iv-doctrine p {
+  color: #ccc;
+  line-height: 1.7;
+}
+
+.iv-creed {
+  color: #ff6600;
+  margin-top: 30px;
+  padding: 15px;
+  background: #000000;
+  border-left: 3px solid #ff6600;
+  line-height: 1.7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* --- Cipher Protocol (#00ff9f data-courier green on black) --- */
+
+.band-profile-container.band-profile--cipher-protocol {
+  background: #000000;
+  border: 2px solid #00ff9f;
+}
+
+.band-profile--cipher-protocol .band-profile-fieldset { border-color: #00ff9f; }
+
+.band-profile--cipher-protocol .band-profile-legend { color: #00ff9f; }
+
+.band-profile--cipher-protocol .band-profile-button {
+  background: #00ff9f;
+  color: #000;
+}
+
+.band-profile--cipher-protocol .band-profile-back-button {
+  background: #0a0a0a;
+  border: 1px solid #00ff9f;
+}
+
+.cp-intro {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #000000;
+  border: 1px solid #00ff9f;
+  font-family: monospace;
+}
+
+.cp-intro-heading {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #00ff9f;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.cp-status {
+  color: #00ff9f;
+  font-size: 0.85em;
+  margin-bottom: 15px;
+}
+
+.cp-intro-body {
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.cp-intro-aesthetic {
+  color: #888;
+  line-height: 1.6;
+}
+
+.tui-window.cp-philosophy {
+  margin-bottom: 30px;
+  background: #000000;
+  border: 1px solid #00ff9f;
+}
+
+.cp-philosophy fieldset { border-color: #00ff9f; }
+
+.cp-philosophy legend {
+  color: #00ff9f;
+  font-family: monospace;
+}
+
+.cp-param {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: #0a0a0a;
+  border-left: 3px solid #00ff9f;
+}
+
+.cp-param-label {
+  color: #00ff9f;
+  font-family: monospace;
+  font-size: 0.85em;
+  margin-bottom: 10px;
+}
+
+.cp-param-text {
+  color: #ccc;
+  line-height: 1.7;
+}
+
+.cp-readout {
+  color: #00ff9f;
+  margin-top: 30px;
+  padding: 20px;
+  background: #000000;
+  border: 1px solid #00ff9f;
+  font-family: monospace;
+  line-height: 1.8;
+}
+
+.cp-readout-note { color: #ccc; }
+
+/* --- Apex Overdrive (#1e90ff blue / #ffd700 gold euphoric hardstyle) --- */
+
+.band-profile-container.band-profile--apex-overdrive {
+  background: #0a0a1a;
+  border: 2px solid #ffd700;
+}
+
+.band-profile--apex-overdrive .band-profile-fieldset { border-color: #ffd700; }
+
+.band-profile--apex-overdrive .band-profile-legend { color: #ffffff; }
+
+.band-profile--apex-overdrive .band-profile-button {
+  background: linear-gradient(90deg, #1e90ff, #ffd700);
+  color: #000;
+}
+
+.band-profile--apex-overdrive .band-profile-back-button {
+  background: #0a0a1a;
+  border: 1px solid #1e90ff;
+}
+
+.ao-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.1), rgba(255, 215, 0, 0.1));
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+}
+
+.ao-intro-heading {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 1.8em;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.ao-intro-tagline {
+  color: #1e90ff;
+  font-size: 1.1em;
+  margin-bottom: 15px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.ao-intro-body {
+  color: #ddd;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+.ao-intro-genre {
+  color: #ffd700;
+  line-height: 1.7;
+  font-weight: bold;
+}
+
+.tui-window.ao-philosophy {
+  margin-bottom: 30px;
+  background: rgba(10, 10, 26, 0.9);
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+}
+
+.ao-philosophy fieldset { border-color: #ffd700; }
+
+.ao-philosophy legend {
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.ao-tenet {
+  margin-bottom: 25px;
+  padding: 20px;
+}
+
+.ao-tenet--blue {
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.2), rgba(30, 144, 255, 0.05));
+  border-left: 4px solid #1e90ff;
+}
+
+.ao-tenet--gold {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
+  border-left: 4px solid #ffd700;
+}
+
+.ao-tenet h3 {
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.1em;
+}
+
+.ao-tenet--blue h3 { color: #1e90ff; }
+
+.ao-tenet--gold h3 { color: #ffd700; }
+
+.ao-tenet p {
+  color: #ddd;
+  line-height: 1.8;
+}
+
+.ao-chant { color: #1e90ff; }
+
+.ao-creed {
+  margin-top: 30px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.3), rgba(255, 215, 0, 0.3));
+  border: 3px solid #ffd700;
+  line-height: 2;
+  font-size: 1.15em;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+}
+
+.ao-creed-peak {
+  color: #ffd700;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: block;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+}
+
+.ao-creed-winning {
+  color: #1e90ff;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.ao-creed-euphoria {
+  color: #fff;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.ao-creed-summit {
+  color: #ffd700;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+/* --- Neon Hearts (#ff1493 hot pink / #00bfff electric blue kawaii camouflage) --- */
+
+.band-profile-container.band-profile--neon-hearts {
+  background: #0a0a1a;
+  border: 2px solid #00bfff;
+}
+
+.band-profile--neon-hearts .band-profile-fieldset { border-color: #00bfff; }
+
+.band-profile--neon-hearts .band-profile-legend { color: #ff69b4; }
+
+.band-profile--neon-hearts .band-profile-button {
+  background: linear-gradient(90deg, #ff1493, #00bfff);
+  color: #000;
+}
+
+.band-profile--neon-hearts .band-profile-back-button {
+  background: #0a0a1a;
+  border: 1px solid #ff1493;
+}
+
+.nh-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(255, 20, 147, 0.15), rgba(0, 191, 255, 0.15));
+  border: 2px solid #ff1493;
+  box-shadow: 0 0 30px rgba(255, 20, 147, 0.4);
+}
+
+.nh-intro-heading {
+  text-align: center;
+  margin-bottom: 15px;
+  background: linear-gradient(90deg, #ff1493, #00bfff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+  font-size: 1.7em;
+}
+
+.nh-intro-lede {
+  color: #ff69b4;
+  font-size: 1em;
+  margin-bottom: 15px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.nh-intro-body {
+  color: #ddd;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+.nh-intro-genre {
+  color: #00bfff;
+  line-height: 1.6;
+  font-weight: bold;
+}
+
+.tui-window.nh-philosophy {
+  margin-bottom: 30px;
+  background: rgba(10, 10, 26, 0.9);
+  border: 2px solid #ff1493;
+  box-shadow: 0 0 30px rgba(255, 20, 147, 0.4);
+}
+
+.nh-philosophy fieldset { border-color: #ff1493; }
+
+.nh-philosophy legend {
+  color: #ff69b4;
+  letter-spacing: 2px;
+}
+
+.nh-block {
+  margin-bottom: 25px;
+  padding: 20px;
+}
+
+.nh-block--pink {
+  background: linear-gradient(135deg, rgba(255, 20, 147, 0.2), rgba(255, 20, 147, 0.05));
+  border-left: 4px solid #ff1493;
+}
+
+.nh-block--blue {
+  background: linear-gradient(135deg, rgba(0, 191, 255, 0.2), rgba(0, 191, 255, 0.05));
+  border-left: 4px solid #00bfff;
+}
+
+.nh-block h3 {
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  font-size: 1.05em;
+}
+
+.nh-block--pink h3 { color: #ff1493; }
+
+.nh-block--blue h3 { color: #00bfff; }
+
+.nh-block p {
+  color: #ddd;
+  line-height: 1.8;
+}
+
+.nh-block--tiers p:not(:last-child) { margin-bottom: 12px; }
+
+.nh-accent-pink { color: #ff1493; }
+
+.nh-accent-blue { color: #00bfff; }
+
+.nh-accent-hotpink { color: #ff69b4; }
+
+.nh-creed {
+  margin-top: 30px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(255, 20, 147, 0.3), rgba(0, 191, 255, 0.3));
+  border: 3px solid #ff1493;
+  line-height: 2;
+  font-size: 1.1em;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
+}
+
+.nh-creed span { display: block; }
+
+.nh-creed-lead {
+  color: #ff1493;
+  font-weight: bold;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.nh-creed-blue {
+  color: #00bfff;
+  margin-bottom: 12px;
+}
+
+.nh-creed-white {
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.nh-creed-close {
+  color: #ff69b4;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* --- Temporal Blue Drift (#6b9bd1 blue / #9b7ebd purple timeshift) --- */
+/* The config's legend_style "italic" was applied as font-style in the
+   SPA — a valid value, so the legend override keeps it. */
+
+.band-profile-container.band-profile--temporal-blue-drift {
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+  border: 2px solid #6b9bd1;
+}
+
+.band-profile--temporal-blue-drift .band-profile-fieldset { border-color: #6b9bd1; }
+
+.band-profile--temporal-blue-drift .band-profile-legend {
+  color: #b19cd9;
+  font-style: italic;
+}
+
+.band-profile--temporal-blue-drift .band-profile-button {
+  background: linear-gradient(90deg, #6b9bd1, #9b7ebd);
+  color: white;
+  border: none;
+}
+
+.band-profile--temporal-blue-drift .band-profile-back-button {
+  background: #1a1a2e;
+  border: 1px solid #6b9bd1;
+}
+
+/* The SPA set borderLeft before the border shorthand on .tbd-intro and
+   .tbd-transmission, so the 4px left accent was overridden; the
+   declaration order below reproduces that rendered result. */
+
+.tbd-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(107, 155, 209, 0.15), rgba(155, 126, 189, 0.08));
+  border-left: 4px solid #6b9bd1;
+  border: 2px solid rgba(107, 155, 209, 0.4);
+  box-shadow: 0 0 30px rgba(107, 155, 209, 0.2), inset 0 0 20px rgba(155, 126, 189, 0.1);
+}
+
+.tbd-intro-ashlinn {
+  color: #b19cd9;
+  line-height: 1.9;
+  margin-bottom: 25px;
+  font-style: italic;
+  font-size: 1.2em;
+  text-shadow: 0 0 10px rgba(177, 156, 217, 0.6);
+}
+
+.tbd-intro-writing {
+  color: #ddd;
+  line-height: 1.9;
+  margin-bottom: 18px;
+  font-size: 1.05em;
+}
+
+.tbd-intro-body {
+  color: #ccc;
+  line-height: 1.9;
+  margin-bottom: 18px;
+}
+
+.tbd-intro-close {
+  color: #b19cd9;
+  line-height: 1.9;
+  font-style: italic;
+  font-size: 1.1em;
+  text-shadow: 0 0 12px rgba(177, 156, 217, 0.7);
+}
+
+.tui-window.tbd-philosophy {
+  margin-bottom: 30px;
+  background: rgba(107, 155, 209, 0.08);
+  border: 2px solid #6b9bd1;
+  box-shadow: 0 0 25px rgba(107, 155, 209, 0.25);
+}
+
+.tbd-philosophy fieldset { border-color: #6b9bd1; }
+
+.tbd-philosophy legend {
+  color: #6b9bd1;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(107, 155, 209, 0.8);
+}
+
+.tbd-signal {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(107, 155, 209, 0.1), rgba(155, 126, 189, 0.05));
+  border: 1px solid rgba(107, 155, 209, 0.3);
+  border-bottom: 2px solid rgba(107, 155, 209, 0.4);
+}
+
+.tbd-signal h3 {
+  color: #6b9bd1;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-size: 0.95em;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(107, 155, 209, 0.6);
+}
+
+.tbd-signal p {
+  color: #ddd;
+  line-height: 1.9;
+}
+
+.tbd-signal--purple {
+  background: linear-gradient(135deg, rgba(155, 126, 189, 0.1), rgba(107, 155, 209, 0.05));
+  border: 1px solid rgba(155, 126, 189, 0.3);
+  border-bottom: 2px solid rgba(155, 126, 189, 0.4);
+}
+
+.tbd-signal--purple h3 {
+  color: #9b7ebd;
+  text-shadow: 0 0 8px rgba(155, 126, 189, 0.6);
+}
+
+.tbd-signal-lead { margin-bottom: 15px; }
+
+.tbd-signal .tbd-signal-vow {
+  color: #b19cd9;
+  font-style: italic;
+  text-shadow: 0 0 10px rgba(177, 156, 217, 0.7);
+}
+
+.tbd-transmission {
+  color: #ddd;
+  margin-top: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(155, 126, 189, 0.15), rgba(107, 155, 209, 0.1));
+  border-left: 4px solid #9b7ebd;
+  border: 2px solid rgba(155, 126, 189, 0.4);
+  line-height: 1.9;
+  font-style: italic;
+  box-shadow: 0 0 20px rgba(155, 126, 189, 0.3), inset 0 0 15px rgba(107, 155, 209, 0.1);
+}
+
+.tbd-transmission-sign {
+  color: #b19cd9;
+  text-shadow: 0 0 10px rgba(177, 156, 217, 0.7);
+}
+
+/* --- heartbreak_havoc.sh (#ff0066 pink / #00e5cc cyan nightcore) --- */
+
+.band-profile-container.band-profile--heartbreak-havoc {
+  background: #0a0a0f;
+  border: 2px solid #ff0066;
+}
+
+.band-profile--heartbreak-havoc .band-profile-fieldset { border-color: #ff0066; }
+
+.band-profile--heartbreak-havoc .band-profile-legend { color: #00e5cc; }
+
+.band-profile--heartbreak-havoc .band-profile-button {
+  background: #ff0066;
+  color: #000;
+}
+
+.band-profile--heartbreak-havoc .band-profile-back-button {
+  background: #0a0a0f;
+  border: 1px solid #00e5cc;
+}
+
+.hh-intro {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(0, 229, 204, 0.08));
+  border: 2px solid #ff0066;
+  box-shadow: 0 0 30px rgba(255, 0, 102, 0.4), 0 0 60px rgba(0, 229, 204, 0.2);
+}
+
+.hh-terminal {
+  color: #00e5cc;
+  font-family: monospace;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  padding: 12px;
+  background: rgba(0, 229, 204, 0.1);
+  border: 1px solid rgba(0, 229, 204, 0.4);
+  text-shadow: 0 0 8px rgba(0, 229, 204, 0.8);
+}
+
+.hh-lede {
+  color: #ff0066;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-shadow: 0 0 15px rgba(255, 0, 102, 0.8);
+}
+
+.hh-body {
+  color: #ddd;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.hh-genres {
+  color: #00e5cc;
+  line-height: 1.7;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 229, 204, 0.6);
+}
+
+.tui-window.hh-doctrine {
+  margin-bottom: 30px;
+  background: #0a0a0f;
+  border: 2px solid #ff0066;
+  box-shadow: 0 0 30px rgba(255, 0, 102, 0.4);
+}
+
+.hh-doctrine fieldset { border-color: #ff0066; }
+
+.hh-doctrine legend {
+  color: #ff0066;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 0, 102, 0.8);
+}
+
+.hh-block {
+  margin-bottom: 25px;
+  padding: 20px;
+}
+
+.hh-block h3 {
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  font-size: 1.05em;
+}
+
+.hh-block p {
+  color: #ddd;
+  line-height: 1.8;
+}
+
+.hh-block--pink {
+  background: linear-gradient(135deg, rgba(255, 0, 102, 0.15), rgba(255, 0, 102, 0.05));
+  border-left: 4px solid #ff0066;
+}
+
+.hh-block--pink h3 {
+  color: #ff0066;
+  text-shadow: 0 0 8px rgba(255, 0, 102, 0.6);
+}
+
+.hh-block--cyan {
+  background: linear-gradient(135deg, rgba(0, 229, 204, 0.15), rgba(0, 229, 204, 0.05));
+  border-left: 4px solid #00e5cc;
+}
+
+.hh-block--cyan h3 {
+  color: #00e5cc;
+  text-shadow: 0 0 8px rgba(0, 229, 204, 0.6);
+}
+
+.hh-finale {
+  margin-top: 30px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(255, 0, 102, 0.2), rgba(0, 229, 204, 0.15));
+  border: 3px solid #ff0066;
+  line-height: 2;
+  font-size: 1.1em;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(255, 0, 102, 0.5), 0 0 60px rgba(0, 229, 204, 0.3);
+}
+
+.hh-finale-status {
+  color: #00e5cc;
+  font-family: monospace;
+  display: block;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+}
+
+.hh-finale-alert {
+  color: #ff0066;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(255, 0, 102, 0.8);
+}
+
+.hh-finale-exec {
+  color: #00e5cc;
+  display: block;
+  font-family: monospace;
+  font-size: 1.2em;
+  text-shadow: 0 0 15px rgba(0, 229, 204, 0.8);
 }

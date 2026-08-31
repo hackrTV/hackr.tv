@@ -8,7 +8,7 @@
 
 <% if @track.nil? %>
   <% content_for :title, "Signal Lost — hackr.tv" %>
-  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%= render layout: "shared/default_chrome" do %>
     <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> track-detail-window">
       <fieldset class="ac-fieldset">
         <legend class="ac-legend">SIGNAL LOST</legend>
@@ -25,7 +25,7 @@
   <% streaming = @track.streaming_links || {} %>
   <% lyrics_accent_index = 1 %>
 
-  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%= render layout: "shared/default_chrome" do %>
     <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> track-detail-window">
       <fieldset class="ac-fieldset">
         <legend class="center ac-legend"><%= @track.title.upcase %></legend>

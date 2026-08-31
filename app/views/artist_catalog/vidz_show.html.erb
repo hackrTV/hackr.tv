@@ -7,7 +7,7 @@
 
 <% if @vod.nil? %>
   <% content_for :title, "Vidz — hackr.tv" %>
-  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%= render layout: "shared/default_chrome" do %>
     <div class="tui-window red-168-text vodz-error-window">
       <fieldset>
         <legend>Error</legend>
@@ -19,7 +19,7 @@
 <% else %>
   <% content_for :title, "#{@vod.title.presence || "Untitled Stream"} — hackr.tv" %>
   <% video_id = youtube_video_id(@vod.vod_url) %>
-  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%= render layout: "shared/default_chrome" do %>
     <div class="tui-window white-text vodz-window">
       <fieldset class="vodz-fieldset">
         <legend class="center vodz-legend"><%= @artist.name %> :: VIDZ</legend>

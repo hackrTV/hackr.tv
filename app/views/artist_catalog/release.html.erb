@@ -9,7 +9,7 @@
 
 <% if @release.nil? %>
   <% content_for :title, "Signal Lost — hackr.tv" %>
-  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%= render layout: "shared/default_chrome" do %>
     <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> release-detail-window">
       <fieldset class="ac-fieldset">
         <legend class="ac-legend">SIGNAL LOST</legend>
@@ -52,7 +52,7 @@
     <% section_index += 1 %>
   <% end %>
 
-  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <%= render layout: "shared/default_chrome" do %>
     <div class="tui-window white-text ac-theme <%= artist_theme_class(slug) %> release-detail-window">
       <fieldset class="ac-fieldset">
         <legend class="center ac-legend"><%= @release.name.upcase %></legend>

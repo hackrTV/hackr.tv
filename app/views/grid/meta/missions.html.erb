@@ -1,6 +1,6 @@
 <% content_for :title, "Missions — hackr.tv" %>
 
-<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+<%= render layout: "shared/default_chrome" do %>
   <%# The frame lets the mission-completed toast signal reload the page
       content live (the SPA refetched on the grid:mission_completed
       CustomEvent). %>

@@ -3,7 +3,7 @@
     first. Card accents cycle per index on prismatic artist themes. %>
 <% content_for :title, "#{@artist_name} :: Releases — hackr.tv" %>
 
-<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+<%= render layout: "shared/default_chrome" do %>
   <div class="tui-window white-text ac-theme <%= artist_theme_class(params[:artist_slug]) %> release-list-window">
     <fieldset class="ac-fieldset">
       <legend class="center ac-legend"><%= @artist_name %> :: RELEASES</legend>

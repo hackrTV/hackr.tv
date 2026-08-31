@@ -10,7 +10,12 @@
 }
 
 /* --- Desktop nav (HeaderMenu.tsx desktop <style>) --- */
+/* Flex instead of inline-block flow: JSX stripped the whitespace between
+ * <li> tags, but ERB emits it, adding a stray word-space gap per item that
+ * the React nav never had. Flex ignores inter-element whitespace. */
 .nav-desktop ul { list-style: none; margin: 0; padding: 0; }
+.nav-desktop > ul { display: flex; flex-wrap: wrap; }
+.tui-statusbar ul { display: flex; }
 .header-dropdown {
   position: relative;
   display: inline-block;

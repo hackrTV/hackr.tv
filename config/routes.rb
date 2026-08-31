@@ -13,8 +13,8 @@ Rails.application.routes.draw do
   # thecyberpulse + xeraen keep bespoke landing/bio pages (vidz lives on
   # thecyberpulse; the xeraen redirects above cover the old paths) and
   # wavelength-zero its custom profile; the other slugs render band
-  # profiles (five configured in BandProfile::CONFIG, the rest fall back
-  # to the not-found variant, matching the SPA). The catalog
+  # profiles (eleven configured in BandProfile::CONFIG, the rest fall
+  # back to the not-found variant, matching the SPA). The catalog
   # (releases/trackz) is shared by all slugs. Unrouted /bio and /vidz on
   # generic slugs 404 like the SPA's client-side router did.
   artist_slugs = %w[thecyberpulse xeraen system-rot wavelength-zero voiceprint

@@ -13,6 +13,14 @@ module NavigationHelper
     request.path == path || request.path.start_with?("#{path}/")
   end
 
+  # Every artist slug except the two with their own nav entries. On these
+  # namespaces the hackr.fm item lights up (header + footer).
+  BAND_NAV_SLUGS = (ArtistCatalogHelper::ARTIST_THEME_SLUGS - %w[thecyberpulse xeraen]).freeze
+
+  def band_namespace_active?
+    BAND_NAV_SLUGS.any? { |slug| nav_active?("/#{slug}") }
+  end
+
   def world_feed_visible?
     WorldEventSetting.visible?
   end
