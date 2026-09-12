@@ -78,7 +78,7 @@
   - **Livestream watch-time** - Tracked via `StreamWatchChannel` (visibility-gated heartbeat) and surfaced as a profile stat
   - **Profile stat tiles** - Cross-domain stats (pulses, echoes, packets, achievements, hackr logs, missions, breaches, rooms, watch-time) via `Grid::ProfileStats` (cached)
 - **Public Profile API** - `GET /api/profiles/:alias` returns a public, case-insensitive profile JSON
-- **Admin Moderation** - SignalDrop system for content moderation
+- **Admin Moderation** - PulseDrop system for content moderation
 
 ### Uplink - Comms System
 - **Channel-Based Comms** - Real-time messaging with multiple configurable channels
@@ -683,7 +683,7 @@ bin/rails data:overlays             # Overlay scenes, elements, tickers, lower t
 - **sent_emails** - to, from, subject, mailer_class, mailer_action, emailable (polymorphic)
 
 ### Social & Streaming
-- **pulses** - content (256 char max), parent_pulse_id, thread_root_id, echo_count, splice_count, pulsed_at, signal_dropped, is_seed, belongs_to :grid_hackr
+- **pulses** - content (256 char max), parent_pulse_id, thread_root_id, echo_count, splice_count, pulsed_at, pulse_dropped, is_seed, belongs_to :grid_hackr
 - **echoes** - echoed_at, belongs_to :pulse (counter_cache), belongs_to :grid_hackr
 - **pulse_pins** - pinned pulses on a profile (max 3, position order)
 - **hackr_watch_sessions** - livestream watch-time sessions (heartbeat, close-stale, partial unique index on live sessions)

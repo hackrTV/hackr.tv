@@ -524,7 +524,7 @@ slipstream_routes:
     legs:
       - position: 1
         name: "Foothills Entry"
-        description: "Terrain begins to fold. Signal weakens."
+        description: "Terrain begins to fold. Coverage weakens."
         breach_template_slug: null
         fork_options:
           - key: A
@@ -805,7 +805,7 @@ slipstream_routes:
             risk_modifier: 10
       - position: 2
         name: "Canyon Rim"
-        description: "The ground drops away. Signal falters at depth."
+        description: "The ground drops away. Coverage falters at depth."
         breach_template_slug: null
         fork_options: []
 
@@ -1573,7 +1573,7 @@ slipstream_routes:
             risk_modifier: 10
       - position: 2
         name: "Hollows Insert"
-        description: "Mountains folding around you. Signal dying."
+        description: "Mountains folding around you. Coverage dying."
         breach_template_slug: null
         fork_options: []
 
@@ -1647,7 +1647,7 @@ slipstream_routes:
         fork_options: []
       - position: 3
         name: "Hollows Insert"
-        description: "Mountains closing in. Signal dying."
+        description: "Mountains closing in. Coverage dying."
         breach_template_slug: null
         fork_options: []
 

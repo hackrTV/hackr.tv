@@ -315,7 +315,7 @@ RSpec.describe "Grid tactical pages", type: :request do
       expect(response.body).to include('id="tactical-breach-shell" class="tactical-breach" hidden')
     end
 
-    it "renders the live breach overlay with meta, protocols, and jackout" do
+    it "renders the live breach overlay with meta, protocols, and abort" do
       breach = create(:grid_hackr_breach, grid_hackr: hackr, detection_level: 30, round_number: 2)
       grant_tactical!
       log_in!
@@ -325,7 +325,7 @@ RSpec.describe "Grid tactical pages", type: :request do
       expect(response.body).to include("BREACH ::")
       expect(response.body).to include(breach.grid_breach_template.name)
       expect(response.body).to include("ROUND 2")
-      expect(response.body).to include("JACKOUT")
+      expect(response.body).to include("ABORT RUN")
       expect(response.body).to include('id="breach-log"')
       expect(response.body).to include(%(value="status"))
     end

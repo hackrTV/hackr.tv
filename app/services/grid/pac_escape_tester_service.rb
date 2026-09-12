@@ -63,7 +63,7 @@ module Grid
     end
 
     # Restore hackr to pre-capture state:
-    # 1. Jackout active breach if any
+    # 1. Abort active breach if any
     # 2. Free-release remaining impound records
     # 3. Clear captured state
     # 4. Restore original room
@@ -72,12 +72,12 @@ module Grid
       snapshot = @hackr.stats&.dig(SNAPSHOT_KEY)
       return unless snapshot
 
-      # Jackout active breach first (containment cell, sally port, etc.)
+      # Abort active breach first (containment cell, sally port, etc.)
       if @hackr.in_breach?
         begin
-          BreachService.jackout!(hackr: @hackr)
+          BreachService.abort!(hackr: @hackr)
         rescue => e
-          Rails.logger.error("[PacEscapeTesterService] jackout failed: #{e.message}")
+          Rails.logger.error("[PacEscapeTesterService] abort failed: #{e.message}")
         ensure
           @hackr.reload
         end

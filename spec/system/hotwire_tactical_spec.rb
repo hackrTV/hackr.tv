@@ -87,7 +87,7 @@ RSpec.describe "Hotwire tactical", type: :system do
     expect(page).to have_css("button[data-panel='vendor']", wait: 10) # handles back
   end
 
-  it "runs a breach through the overlay: status output, then jackout closes it" do
+  it "runs a breach through the overlay: status output, then abort closes it" do
     create(:grid_hackr_breach, grid_hackr: hackr)
 
     log_in!
@@ -102,10 +102,10 @@ RSpec.describe "Hotwire tactical", type: :system do
     expect(page).to have_css("#breach-log .grid-line", wait: 10) # output routed to breach log
 
     within("#tactical-breach-shell") do
-      click_button "JACKOUT" # opens the dialog
+      click_button "ABORT RUN" # opens the dialog
     end
     within("dialog[open]") do
-      click_button "JACKOUT"
+      click_button "ABORT RUN"
     end
 
     expect(page).to have_css("#tactical-breach-shell[hidden]", visible: :all, wait: 10)

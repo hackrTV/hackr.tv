@@ -34,10 +34,10 @@ RSpec.describe "Api::Profiles", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it "omits signal-dropped pulses from the pinned set" do
+    it "omits pulse-dropped pulses from the pinned set" do
       dropped = create(:pulse, grid_hackr: hackr)
       PulsePin.create!(grid_hackr: hackr, pulse: dropped)
-      dropped.signal_drop!
+      dropped.pulse_drop!
 
       get "/api/profiles/ghostwire"
 

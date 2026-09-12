@@ -27,12 +27,12 @@
         <%= hidden_field_tag :input, "status" %>
         <button type="submit" class="tab-outline-button">STATUS</button>
       <% end %>
-      <button type="button" class="tab-outline-button tab-outline-button--danger" data-action="click->dialog#open">JACKOUT</button>
+      <button type="button" class="tab-outline-button tab-outline-button--danger" data-action="click->dialog#open">ABORT RUN</button>
       <dialog class="tactical-dialog" data-dialog-target="dialog">
         <div class="tactical-dialog-body">
-          <div class="tab-dialog-title tab-error">JACKOUT</div>
+          <div class="tab-dialog-title tab-error">ABORT RUN</div>
           <div class="tab-dialog-desc">
-            Clean jackout costs 5 EN.<br>
+            A clean abort costs 5 EN.<br>
             Past the Point of No Return it costs 10 HP / 15 EN / 15 PS.
             <% if past_pnr %><br><span class="tab-error">You are PAST the PNR.</span><% end %>
           </div>
@@ -40,8 +40,8 @@
             <button type="button" class="tab-dialog-cancel" data-action="click->dialog#close">CANCEL</button>
             <%= form_with url: grid_commands_path, class: "tab-inline-form" do %>
               <%= hidden_field_tag :surface, "tactical" %>
-              <%= hidden_field_tag :input, "jackout" %>
-              <button type="submit" class="tab-action-button" style="background: #f87171; color: #0a0a0a;">JACKOUT</button>
+              <%= hidden_field_tag :input, "abort" %>
+              <button type="submit" class="tab-action-button" style="background: #f87171; color: #0a0a0a;">ABORT RUN</button>
             <% end %>
           </div>
         </div>

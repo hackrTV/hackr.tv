@@ -12,7 +12,7 @@ class OverlaysController < ApplicationController
 
   # GET /overlays/pulsewire
   def pulsewire
-    @pulses = Pulse.where(signal_dropped: false)
+    @pulses = Pulse.where(pulse_dropped: false)
       .where(parent_pulse_id: nil)
       .includes(:grid_hackr)
       .order(pulsed_at: :desc)

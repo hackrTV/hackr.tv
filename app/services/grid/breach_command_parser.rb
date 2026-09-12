@@ -30,8 +30,8 @@ module Grid
         use_command(args.join(" "))
       when "interface", "if"
         interface_command(args)
-      when "jackout", "jo"
-        jackout_command
+      when "abort", "ab"
+        abort_command
       when "status", "st", "look", "l"
         status_command
       when "deck", "dk"
@@ -206,10 +206,10 @@ module Grid
         notifications += mission_progressor.record(:use_item, item_name: result.item_name)
       end
 
-      if result.emergency_jackout
-        # Trigger clean jackout (bypasses PNR via emergency override)
-        jackout_result = Grid::BreachService.jackout!(hackr: hackr, emergency: true)
-        output << jackout_result.display
+      if result.emergency_cutoff
+        # Trigger clean abort (bypasses PNR via emergency override)
+        abort_result = Grid::BreachService.abort!(hackr: hackr, emergency: true)
+        output << abort_result.display
         output << "<span style='color: #34d399;'>You disconnect cleanly.</span>"
       else
         append_round_or_status(output)
@@ -292,8 +292,8 @@ module Grid
       "<span style='color: #f87171;'>#{h(e.message)}</span>"
     end
 
-    def jackout_command
-      result = Grid::BreachService.jackout!(hackr: hackr)
+    def abort_command
+      result = Grid::BreachService.abort!(hackr: hackr)
 
       output = []
       output << result.display
@@ -349,7 +349,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>reroute &lt;target#&gt;</span>           <span style='color: #9ca3af;'>Delay a protocol 1 round (1 action, 30% chance protocol fizzles on retry)</span>"
       output << "<span style='color: #fbbf24;'>use &lt;item&gt;</span>                   <span style='color: #9ca3af;'>Use a consumable from inventory (1 action)</span>"
       output << "<span style='color: #fbbf24;'>interface &lt;gate&gt; &lt;answer&gt;</span>    <span style='color: #9ca3af;'>Submit answer to a circumvention gate (1 action)</span>"
-      output << "<span style='color: #fbbf24;'>jackout</span>                      <span style='color: #9ca3af;'>Abort the encounter</span>"
+      output << "<span style='color: #fbbf24;'>abort</span>                        <span style='color: #9ca3af;'>Abort the encounter</span>"
       output << ""
       output << "<span style='color: #6b7280;'>Free commands (no action cost):</span>"
       output << "<span style='color: #fbbf24;'>if &lt;gate&gt; probe &lt;N1&gt;-&lt;N2&gt;</span>    <span style='color: #9ca3af;'>Test a circuit connection (limited budget)</span>"
@@ -357,7 +357,7 @@ module Grid
       output << "<span style='color: #fbbf24;'>deck</span>                         <span style='color: #9ca3af;'>Show loaded software + battery</span>"
       output << "<span style='color: #fbbf24;'>help</span>                         <span style='color: #9ca3af;'>This reference</span>"
       output << ""
-      output << "<span style='color: #6b7280;'>Aliases: sh=exec, an=analyze, rr=reroute, if=interface, jo=jackout, st=status, dk=deck, ?=help</span>"
+      output << "<span style='color: #6b7280;'>Aliases: sh=exec, an=analyze, rr=reroute, if=interface, ab=abort, st=status, dk=deck, ?=help</span>"
       output.join("\n")
     end
 

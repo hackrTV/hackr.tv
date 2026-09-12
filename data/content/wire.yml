@@ -3,7 +3,7 @@
 pulses:
   - author: XERAEN
     slug: transmission-from-future
-    content: "This signal reaches you from the future. What you do now determines whether my timeline ever exists. The choice is yours. It always was."
+    content: "This transmission reaches you from the future. What you do now determines whether my timeline ever exists. The choice is yours. It always was."
     days_ago: 3
 
   - author: XERAEN
@@ -34,7 +34,7 @@ pulses:
 
   - author: Nyx
     slug: three-weeks-since
-    content: "Three weeks since I accessed the Grid. Three weeks since I learned the RIDE exists. I can't unsee it now. Every filtered sunset, every managed emotion... was any of it real?"
+    content: "Three weeks since I accessed the Grid. Three weeks since I learned the RIDE exists. I can't unsee it now. Every filtered sunset, every managed emotion... the sunset was real. What they let me see of it wasn't."
     days_ago: 1
     hours_offset: 8
 
@@ -71,7 +71,7 @@ pulses:
 
   - author: XERAEN
     slug: every-pulse-reaches
-    content: "I read every pulse. Even from here. The hundred-year gap doesn't diminish the signal - it clarifies it. Your hope reaches me. It's enough. It has to be."
+    content: "I read every pulse. Even from here. The hundred-year gap doesn't diminish the signal - it clarifies what I hear. Your hope reaches me. It's enough. It has to be."
     parent_slug: math-or-faith
     days_ago: 1
     hours_offset: 5
@@ -87,13 +87,13 @@ pulses:
     content: "Found my first RIDE glitch today. A moment of unfiltered sky. The blue was different. Realer. I stood there until it closed. Now I understand why we fight."
     hours_ago: 2
 
-  # A signal-dropped pulse (GovCorp moderation in action)
+  # A pulse-dropped pulse (GovCorp moderation in action)
   - author: Cipher
     slug: intel-sector-7
-    content: "INTEL: Confirmed RIDE vulnerability in sector 7 infrastructure. Coordinates for breach window: [SIGNAL TERMINATED]"
+    content: "INTEL: Confirmed RIDE vulnerability in sector 7 infrastructure. Coordinates for breach window: [TRANSMISSION TERMINATED]"
     hours_ago: 6
-    signal_dropped: true
-    signal_dropped_hours_ago: 5
+    pulse_dropped: true
+    pulse_dropped_hours_ago: 5
 
 echoes:
   # XERAEN's foundational message echoed widely

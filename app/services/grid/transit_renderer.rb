@@ -255,10 +255,10 @@ module Grid
         lines.join("\n")
       end
 
-      def render_breach_jackout_resume(journey)
+      def render_breach_abort_resume(journey)
         lines = []
         lines << ""
-        lines << "<span style='color: #fbbf24;'>[SLIP] Jacked out of BREACH. Transit continues — heat increased.</span>"
+        lines << "<span style='color: #fbbf24;'>[SLIP] BREACH run aborted. Transit continues — heat increased.</span>"
         lines << ""
         leg = journey.current_leg
         if leg

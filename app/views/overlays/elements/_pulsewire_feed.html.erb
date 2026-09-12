@@ -1,6 +1,6 @@
 <%
   max_items = settings['max_items'] || 5
-  pulses = Pulse.where(signal_dropped: false)
+  pulses = Pulse.where(pulse_dropped: false)
     .where(parent_pulse_id: nil)
     .includes(:grid_hackr)
     .order(pulsed_at: :desc)

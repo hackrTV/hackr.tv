@@ -6,7 +6,7 @@ module Grid
     EndRoundResult = Data.define(:hackr_breach, :state, :protocol_messages, :display, :failure_display)
     ResolveResult = Data.define(:hackr_breach, :xp_awarded, :cred_awarded, :xp_result, :display)
     FailureResult = Data.define(:hackr_breach, :vitals_hit, :zone_lockout_minutes, :fried_level, :software_wiped, :captured, :display)
-    JackoutResult = Data.define(:hackr_breach, :clean, :vitals_hit, :display)
+    AbortResult = Data.define(:hackr_breach, :clean, :vitals_hit, :display)
 
     class AlreadyInBreach < StandardError; end
     class NoDeckEquipped < StandardError; end
@@ -66,8 +66,8 @@ module Grid
       new(hackr_breach.grid_hackr).resolve_failure!(hackr_breach, failure_mode: failure_mode)
     end
 
-    def self.jackout!(hackr:, emergency: false)
-      new(hackr).jackout!(emergency: emergency)
+    def self.abort!(hackr:, emergency: false)
+      new(hackr).abort!(emergency: emergency)
     end
 
     # List voluntary encounters in a room, respecting cooldowns and gates.
@@ -598,11 +598,11 @@ module Grid
       )
     end
 
-    def jackout!(emergency: false)
+    def abort!(emergency: false)
       hackr_breach = @hackr.active_breach
       raise NotInBreach, "You are not in a BREACH encounter." unless hackr_breach
 
-      return resolve_sandbox_end!(hackr_breach, "jacked_out") if hackr_breach.sandbox?
+      return resolve_sandbox_end!(hackr_breach, "aborted") if hackr_breach.sandbox?
 
       clean = emergency || !hackr_breach.pnr_crossed?
       vitals_hit = []
@@ -619,30 +619,30 @@ module Grid
           vitals_hit << drain_vital!("psyche", 15)
         end
 
-        hackr_breach.update!(state: "jacked_out", ended_at: Time.current)
+        hackr_breach.update!(state: "aborted", ended_at: Time.current)
 
         # Transition encounter to cooldown
         transition_encounter_cooldown!(hackr_breach)
 
-        # Log jackout action
+        # Log abort action
         GridHackrBreachLog.create!(
           grid_hackr_breach: hackr_breach,
           round: hackr_breach.round_number,
-          action_type: "jackout",
+          action_type: "abort",
           result: {clean: clean}
         )
       end
 
       vitals_hit.compact!
-      display = Grid::BreachRenderer.new(hackr_breach).render_jackout(clean, vitals_hit)
-      JackoutResult.new(hackr_breach: hackr_breach, clean: clean, vitals_hit: vitals_hit, display: display)
+      display = Grid::BreachRenderer.new(hackr_breach).render_abort(clean, vitals_hit)
+      AbortResult.new(hackr_breach: hackr_breach, clean: clean, vitals_hit: vitals_hit, display: display)
     end
 
     private
 
     # End a sandbox breach: mark terminal state, restore hackr snapshot.
     # Works inside or outside an existing transaction (resolve_failure! is
-    # called from end_round!'s transaction; resolve_success!/jackout! are not).
+    # called from end_round!'s transaction; resolve_success!/abort! are not).
     def resolve_sandbox_end!(hackr_breach, end_state, failure_mode: nil)
       wrap = !ActiveRecord::Base.connection.transaction_open?
       run = proc do
@@ -665,8 +665,8 @@ module Grid
         ResolveResult.new(hackr_breach: hackr_breach, xp_awarded: 0, cred_awarded: 0, xp_result: {leveled_up: false}, display: display)
       when "failure"
         FailureResult.new(hackr_breach: hackr_breach, vitals_hit: [], zone_lockout_minutes: nil, fried_level: nil, software_wiped: false, captured: false, display: display)
-      when "jacked_out"
-        JackoutResult.new(hackr_breach: hackr_breach, clean: true, vitals_hit: [], display: display)
+      when "aborted"
+        AbortResult.new(hackr_breach: hackr_breach, clean: true, vitals_hit: [], display: display)
       end
     end
 

@@ -230,15 +230,15 @@ module Grid
             display = Grid::TransitRenderer.render_breach_failed_replay(journey)
             ResumeResult.new(journey: journey.reload, continued: true, display: display)
           end
-        when "jacked_out"
-          # Jackout — treat as light failure
+        when "aborted"
+          # Abort — treat as light failure
           @hackr.add_slipstream_heat!(8)
           journey.update!(
             breach_mid_journey: false,
             pending_fork: journey.current_leg&.has_forks? || false,
             meta: journey.meta.except("current_fork")
           )
-          display = Grid::TransitRenderer.render_breach_jackout_resume(journey)
+          display = Grid::TransitRenderer.render_breach_abort_resume(journey)
           ResumeResult.new(journey: journey.reload, continued: true, display: display)
         else
           # Unknown state — just clear the flag

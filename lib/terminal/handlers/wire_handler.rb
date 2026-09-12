@@ -113,14 +113,14 @@ module Terminal
       end
 
       def display_timeline
-        pulses = Pulse.where(signal_dropped: false)
+        pulses = Pulse.where(pulse_dropped: false)
           .where(parent_pulse_id: nil)
           .includes(:grid_hackr)
           .order(pulsed_at: :desc)
           .limit(ITEMS_PER_PAGE)
           .offset((@current_page - 1) * ITEMS_PER_PAGE)
 
-        total_count = Pulse.where(signal_dropped: false).where(parent_pulse_id: nil).count
+        total_count = Pulse.where(pulse_dropped: false).where(parent_pulse_id: nil).count
         total_pages = (total_count.to_f / ITEMS_PER_PAGE).ceil
 
         println ""
@@ -277,7 +277,7 @@ module Terminal
           return
         end
 
-        pulses = user.pulses.where(signal_dropped: false)
+        pulses = user.pulses.where(pulse_dropped: false)
           .where(parent_pulse_id: nil)
           .order(pulsed_at: :desc)
           .limit(10)

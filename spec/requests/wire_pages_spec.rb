@@ -41,10 +41,10 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("The WIRE is silent. Broadcast the first pulse.")
     end
 
-    it "excludes signal-dropped and splice pulses from the feed" do
+    it "excludes pulse-dropped and splice pulses from the feed" do
       make_pulse(other, content: "Visible pulse")
       dropped = make_pulse(other, content: "Dropped pulse")
-      dropped.signal_drop!
+      dropped.pulse_drop!
       root = make_pulse(other, content: "Thread root")
       create(:pulse, grid_hackr: hackr, content: "A reply", parent_pulse_id: root.id)
 

@@ -3,27 +3,27 @@
 # Table name: pulses
 # Database name: primary
 #
-#  id                :integer          not null, primary key
-#  content           :text             not null
-#  echo_count        :integer          default(0), not null
-#  is_seed           :boolean          default(FALSE), not null
-#  pulsed_at         :datetime         not null
-#  signal_dropped    :boolean          default(FALSE), not null
-#  signal_dropped_at :datetime
-#  splice_count      :integer          default(0), not null
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  grid_hackr_id     :integer          not null
-#  parent_pulse_id   :integer
-#  thread_root_id    :integer
+#  id               :integer          not null, primary key
+#  content          :text             not null
+#  echo_count       :integer          default(0), not null
+#  is_seed          :boolean          default(FALSE), not null
+#  pulse_dropped    :boolean          default(FALSE), not null
+#  pulse_dropped_at :datetime
+#  pulsed_at        :datetime         not null
+#  splice_count     :integer          default(0), not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  grid_hackr_id    :integer          not null
+#  parent_pulse_id  :integer
+#  thread_root_id   :integer
 #
 # Indexes
 #
 #  index_pulses_on_grid_hackr_id    (grid_hackr_id)
 #  index_pulses_on_is_seed          (is_seed)
 #  index_pulses_on_parent_pulse_id  (parent_pulse_id)
+#  index_pulses_on_pulse_dropped    (pulse_dropped)
 #  index_pulses_on_pulsed_at        (pulsed_at)
-#  index_pulses_on_signal_dropped   (signal_dropped)
 #  index_pulses_on_thread_root_id   (thread_root_id)
 #
 # Foreign Keys
@@ -59,12 +59,12 @@ RSpec.describe Pulse, type: :model do
       expect(pulse).to be_valid
     end
 
-    it "prevents splicing a signal-dropped pulse" do
-      parent = create(:pulse, :signal_dropped)
+    it "prevents splicing a pulse-dropped pulse" do
+      parent = create(:pulse, :pulse_dropped)
       splice = build(:pulse, parent_pulse: parent)
 
       expect(splice).not_to be_valid
-      expect(splice.errors[:parent_pulse_id]).to include("cannot splice a signal-dropped pulse")
+      expect(splice.errors[:parent_pulse_id]).to include("cannot splice a pulse-dropped pulse")
     end
 
     it "allows splicing an active pulse" do
@@ -202,20 +202,20 @@ RSpec.describe Pulse, type: :model do
 
   describe "scopes" do
     describe ".active" do
-      it "returns only non-signal-dropped pulses" do
+      it "returns only non-pulse-dropped pulses" do
         active1 = create(:pulse)
         active2 = create(:pulse)
-        create(:pulse, :signal_dropped)
+        create(:pulse, :pulse_dropped)
 
         expect(Pulse.active).to contain_exactly(active1, active2)
       end
     end
 
     describe ".dropped" do
-      it "returns only signal-dropped pulses" do
+      it "returns only pulse-dropped pulses" do
         create(:pulse)
-        dropped1 = create(:pulse, :signal_dropped)
-        dropped2 = create(:pulse, :signal_dropped)
+        dropped1 = create(:pulse, :pulse_dropped)
+        dropped2 = create(:pulse, :pulse_dropped)
 
         expect(Pulse.dropped).to contain_exactly(dropped1, dropped2)
       end
@@ -289,29 +289,29 @@ RSpec.describe Pulse, type: :model do
     end
   end
 
-  describe "#signal_drop!" do
-    it "marks pulse as signal_dropped and sets timestamp" do
+  describe "#pulse_drop!" do
+    it "marks pulse as pulse_dropped and sets timestamp" do
       pulse = create(:pulse)
-      expect(pulse.signal_dropped).to be false
+      expect(pulse.pulse_dropped).to be false
 
-      pulse.signal_drop!
+      pulse.pulse_drop!
       pulse.reload
 
-      expect(pulse.signal_dropped).to be true
-      expect(pulse.signal_dropped_at).to be_within(1.second).of(Time.current)
+      expect(pulse.pulse_dropped).to be true
+      expect(pulse.pulse_dropped_at).to be_within(1.second).of(Time.current)
     end
   end
 
   describe "#restore!" do
-    it "unmarks signal_dropped and clears timestamp" do
-      pulse = create(:pulse, :signal_dropped)
-      expect(pulse.signal_dropped).to be true
+    it "unmarks pulse_dropped and clears timestamp" do
+      pulse = create(:pulse, :pulse_dropped)
+      expect(pulse.pulse_dropped).to be true
 
       pulse.restore!
       pulse.reload
 
-      expect(pulse.signal_dropped).to be false
-      expect(pulse.signal_dropped_at).to be_nil
+      expect(pulse.pulse_dropped).to be false
+      expect(pulse.pulse_dropped_at).to be_nil
     end
   end
 

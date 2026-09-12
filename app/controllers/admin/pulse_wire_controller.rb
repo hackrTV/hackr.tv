@@ -1,5 +1,5 @@
 class Admin::PulseWireController < Admin::ApplicationController
-  before_action :set_pulse, only: [:signal_drop, :restore, :destroy]
+  before_action :set_pulse, only: [:pulse_drop, :restore, :destroy]
 
   def index
     @pulses = Pulse.includes(:grid_hackr).timeline
@@ -43,15 +43,15 @@ class Admin::PulseWireController < Admin::ApplicationController
     end
   end
 
-  def signal_drops
+  def pulse_drops
     @pulses = Pulse.includes(:grid_hackr).dropped.timeline
   end
 
-  def signal_drop
-    if @pulse.signal_drop!
-      set_flash_success("Pulse by @#{@pulse.grid_hackr.hackr_alias} has been signal-dropped.")
+  def pulse_drop
+    if @pulse.pulse_drop!
+      set_flash_success("Pulse by @#{@pulse.grid_hackr.hackr_alias} has been pulse-dropped.")
     else
-      set_flash_error("Failed to signal-drop pulse.")
+      set_flash_error("Failed to pulse-drop pulse.")
     end
     redirect_back(fallback_location: admin_pulse_wire_index_path)
   end
@@ -62,7 +62,7 @@ class Admin::PulseWireController < Admin::ApplicationController
     else
       set_flash_error("Failed to restore pulse.")
     end
-    redirect_back(fallback_location: signal_drops_admin_pulse_wire_index_path)
+    redirect_back(fallback_location: pulse_drops_admin_pulse_wire_index_path)
   end
 
   def destroy
@@ -75,7 +75,7 @@ class Admin::PulseWireController < Admin::ApplicationController
     redirect_back(fallback_location: admin_pulse_wire_index_path)
   end
 
-  def bulk_signal_drop
+  def bulk_pulse_drop
     pulse_ids = params[:pulse_ids] || []
 
     if pulse_ids.empty?
@@ -86,10 +86,10 @@ class Admin::PulseWireController < Admin::ApplicationController
 
     count = 0
     Pulse.where(id: pulse_ids).find_each do |pulse|
-      count += 1 if pulse.signal_drop!
+      count += 1 if pulse.pulse_drop!
     end
 
-    set_flash_success("Signal-dropped #{count} pulse#{"s" unless count == 1}.")
+    set_flash_success("Pulse-dropped #{count} pulse#{"s" unless count == 1}.")
     redirect_back(fallback_location: admin_pulse_wire_index_path)
   end
 

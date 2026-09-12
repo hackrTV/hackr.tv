@@ -16,7 +16,7 @@ minutes: 20
    (censored/inert — must NOT be a live outbound link).
 4. **Echo** someone else's pulse from the second browser. → Echo count
    bumps live for both; echo attribution shown.
-5. **Signal drop** (admin/moderation feature) on a pulse from the admin
+5. **Pulse drop** (admin/moderation feature) on a pulse from the admin
    browser. → Pulse drops per rules.
 6. Delete your own pulse (the "×" control). → Gone for both browsers.
    The delete control must NOT be visible on other people's pulses for

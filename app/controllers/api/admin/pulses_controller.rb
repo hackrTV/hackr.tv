@@ -91,7 +91,7 @@ module Api
           pulsed_at: pulse.pulsed_at&.iso8601,
           echo_count: pulse.echo_count,
           splice_count: pulse.splices.count,
-          signal_dropped: pulse.signal_dropped,
+          pulse_dropped: pulse.pulse_dropped,
           parent_pulse_id: pulse.parent_pulse_id,
           thread_root_id: pulse.thread_root_id,
           is_splice: pulse.is_splice?,

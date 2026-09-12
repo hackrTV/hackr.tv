@@ -19,7 +19,7 @@ stations:
 
   - name: "XERAEN's Frequency"
     slug: "xeraen"
-    description: "Trans-temporal broadcasts from the timeline that GovCorp controls. XERAEN's warning signals echoing backward through time."
+    description: "Trans-temporal broadcasts from the timeline that GovCorp controls. XERAEN's warnings echoing backward through time."
     genre: "Hackr News and Motivation"
     color: "purple-168"
     stream_url: ""  # To be configured

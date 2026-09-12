@@ -75,7 +75,7 @@ breach_templates:
 
   - slug: data-vault-theta
     name: "Encrypted Data Vault \u0398"
-    description: "A hardened GovCorp data vault. PURGE protocols bleed your rewards while SPIKE countermeasures target your neural link directly. Speed matters."
+    description: "A hardened GovCorp data vault. PURGE protocols bleed your rewards while SPIKE countermeasures target your DECK's uplink directly. Speed matters."
     tier: standard
     min_clearance: 10
     pnr_threshold: 65
@@ -169,7 +169,7 @@ breach_templates:
 
   - slug: ambient-rainn-sweep
     name: "RAINN Patrol Sweep"
-    description: "A RAINN patrol unit locks onto your signal. It's fast, but fragile."
+    description: "A RAINN patrol unit locks onto your transmission. It's fast, but fragile."
     tier: ambient
     min_clearance: 0
     danger_level_min: 2
@@ -196,8 +196,8 @@ breach_templates:
         weakness: offensive
 
   - slug: ambient-govcorp-interceptor
-    name: "GovCorp Signal Interceptor"
-    description: "A GovCorp interception node has triangulated your position. SPIKE protocol targets your neural link directly."
+    name: "GovCorp Transmission Interceptor"
+    description: "A GovCorp interception node has triangulated your position. SPIKE protocol targets your DECK's uplink directly."
     tier: ambient
     min_clearance: 5
     danger_level_min: 4
@@ -553,7 +553,7 @@ breach_templates:
         charge_rounds: 1
 
   - slug: signal-jammer-array
-    name: "Signal Jammer Array"
+    name: "Frequency Jammer Array"
     description: "A countermeasure array designed to shut hackrs down. Dual LOCK protocols drain INSPIRATION in waves — your action economy collapses if you don't break one early."
     tier: standard
     min_clearance: 10
@@ -613,7 +613,7 @@ breach_templates:
 
   - slug: govcorp-firewall-node
     name: "GovCorp Firewall Node"
-    description: "A perimeter firewall protecting a GovCorp sector gateway. Dual LOCK protocols kill your momentum while SPIKE hits your neural link. Break one LOCK immediately or you're dead in the water."
+    description: "A perimeter firewall protecting a GovCorp sector gateway. Dual LOCK protocols kill your momentum while SPIKE hits your DECK's uplink. Break one LOCK immediately or you're dead in the water."
     tier: advanced
     min_clearance: 20
     pnr_threshold: 62
@@ -821,7 +821,7 @@ breach_templates:
 
   - slug: rainn-hive-nexus
     name: "RAINN Hive Nexus"
-    description: "A RAINN hive-mind coordination node. Triple TRACE makes the detection clock a freight train. Dual FEEDBACK grinds your vitals while SPIKE goes for the kill. Analyze fast, hit harder, or jack out early."
+    description: "A RAINN hive-mind coordination node. Triple TRACE makes the detection clock a freight train. Dual FEEDBACK grinds your vitals while SPIKE goes for the kill. Analyze fast, hit harder, or cut the run early."
     tier: elite
     min_clearance: 45
     pnr_threshold: 50
@@ -862,7 +862,7 @@ breach_templates:
 
   - slug: govcorp-central-cortex
     name: "GovCorp Central Cortex"
-    description: "The beating heart of a GovCorp regional operations center. Every protocol class, maximum density. Dual SPIKE shreds your neural link. Dual LOCK shuts you down. PURGE punishes hesitation. This is the endgame."
+    description: "The beating heart of a GovCorp regional operations center. Every protocol class, maximum density. Dual SPIKE shreds your DECK's uplink. Dual LOCK shuts you down. PURGE punishes hesitation. This is the endgame."
     tier: elite
     min_clearance: 55
     pnr_threshold: 45
@@ -966,8 +966,8 @@ breach_templates:
         charge_rounds: 2
 
   - slug: ambient-rogue-signal
-    name: "Rogue Signal Burst"
-    description: "An unidentified signal burst. Origin unknown. PURGE starts immediately — the longer you engage, the less you walk away with."
+    name: "Rogue Transmission Burst"
+    description: "An unidentified transmission burst. Origin unknown. PURGE starts immediately — the longer you engage, the less you walk away with."
     tier: ambient
     min_clearance: 10
     danger_level_min: 3
@@ -1000,7 +1000,7 @@ breach_templates:
 
   - slug: ambient-govcorp-drone-swarm
     name: "GovCorp Drone Swarm"
-    description: "A coordinated drone surveillance swarm. Dual TRACE doubles detection speed. SPIKE targets your neural link. FEEDBACK drains everything else. Heavy response — they know what you are."
+    description: "A coordinated drone surveillance swarm. Dual TRACE doubles detection speed. SPIKE targets your DECK's uplink. FEEDBACK drains everything else. Heavy response — they know what you are."
     tier: ambient
     min_clearance: 15
     danger_level_min: 5

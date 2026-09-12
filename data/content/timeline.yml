@@ -2,7 +2,7 @@
 eras:
 - key: listeners
   name: THE LISTENERS
-  subtitle: Signals received in the present day
+  subtitle: Transmissions received in the present day
   yearRange: 2024–2026
   startYear: 2024
   endYear: 2026
@@ -74,12 +74,12 @@ eras:
     text: "#67e8f9"
 events:
 - date: September 2024
-  title: First Signal Detected
-  description: Mel Reeves detects anomalous structured signals in quantum noise.
+  title: First Transmission Detected
+  description: Mel Reeves detects anomalous structured transmissions in quantum noise.
   era: listeners
 - date: March 2025
   title: The Listeners Found
-  description: Mel finds The Listeners — others detecting the same signals.
+  description: Mel finds The Listeners — others detecting the same transmissions.
   era: listeners
 - date: June 2025
   title: Music from Nowhere
@@ -205,7 +205,7 @@ events:
   era: fracture_network
   logSlug: before-the-beat
 - date: February 2116
-  title: Signal Architecture
+  title: Grid Architecture
   description: XERAEN designs the transmission framework.
   era: fracture_network
   logSlug: signal-architecture
@@ -261,15 +261,10 @@ events:
   era: fracture_network
   logSlug: music-as-a-weapon
 - date: May 2119
-  title: Signal Coherence
+  title: Channel Coherence
   description: The network stabilizes. Rhythm never sleeps.
   era: fracture_network
   logSlug: signal-coherence
-- date: August 2119
-  title: Street Level
-  description: Koda's awakening — 47 seconds of unfiltered reality.
-  era: fracture_network
-  logSlug: street-level
 - date: November 2119
   title: The Voice Archive
   description: The Archivist begins cataloguing the voice archive.
@@ -297,6 +292,11 @@ events:
   era: fracture_network
   logSlug: infiltration-report
   isIntercepted: true
+- date: August 2120
+  title: Street Level
+  description: Koda's awakening — 47 seconds of unfiltered reality.
+  era: fracture_network
+  logSlug: street-level
 - date: September 2120
   title: Pop Resistance
   description: Sora Nexa launches pop resistance. XERAEN writes about Ashlinn.
@@ -319,7 +319,7 @@ events:
   logSlug: threat-assessment-fracture-network
   isIntercepted: true
 - date: September 2122
-  title: Seven Years of Signal
+  title: Seven Years On Air
   description: XERAEN reflects on seven years of broadcasting.
   era: fracture_network
   logSlug: seven-years

@@ -2,7 +2,7 @@
 tickers:
   - name: Top Ticker
     slug: top
-    content: "SYSTEM NOTIFICATION: All transmissions monitored by PRISM // Maintain signal discipline // Trust no one"
+    content: "SYSTEM NOTIFICATION: All transmissions monitored // Maintain comms discipline // Trust no one"
     direction: left
     speed: 80
     active: true

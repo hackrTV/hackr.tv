@@ -3,27 +3,27 @@
 # Table name: pulses
 # Database name: primary
 #
-#  id                :integer          not null, primary key
-#  content           :text             not null
-#  echo_count        :integer          default(0), not null
-#  is_seed           :boolean          default(FALSE), not null
-#  pulsed_at         :datetime         not null
-#  signal_dropped    :boolean          default(FALSE), not null
-#  signal_dropped_at :datetime
-#  splice_count      :integer          default(0), not null
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  grid_hackr_id     :integer          not null
-#  parent_pulse_id   :integer
-#  thread_root_id    :integer
+#  id               :integer          not null, primary key
+#  content          :text             not null
+#  echo_count       :integer          default(0), not null
+#  is_seed          :boolean          default(FALSE), not null
+#  pulse_dropped    :boolean          default(FALSE), not null
+#  pulse_dropped_at :datetime
+#  pulsed_at        :datetime         not null
+#  splice_count     :integer          default(0), not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  grid_hackr_id    :integer          not null
+#  parent_pulse_id  :integer
+#  thread_root_id   :integer
 #
 # Indexes
 #
 #  index_pulses_on_grid_hackr_id    (grid_hackr_id)
 #  index_pulses_on_is_seed          (is_seed)
 #  index_pulses_on_parent_pulse_id  (parent_pulse_id)
+#  index_pulses_on_pulse_dropped    (pulse_dropped)
 #  index_pulses_on_pulsed_at        (pulsed_at)
-#  index_pulses_on_signal_dropped   (signal_dropped)
 #  index_pulses_on_thread_root_id   (thread_root_id)
 #
 # Foreign Keys
@@ -45,18 +45,18 @@ class Pulse < ApplicationRecord
 
   validates :content, presence: true, length: {maximum: 256}
   validates :pulsed_at, presence: true
-  validate :cannot_splice_signal_dropped_pulse
+  validate :cannot_splice_pulse_dropped_pulse
   filter_profanity :content
 
   before_validation :set_pulsed_at, on: :create
   before_save :set_thread_root
   after_create_commit :broadcast_new_pulse
   after_destroy_commit :broadcast_deletion
-  after_update_commit :broadcast_signal_drop, if: :saved_change_to_signal_dropped?
-  after_update :unpin_on_signal_drop, if: :saved_change_to_signal_dropped?
+  after_update_commit :broadcast_pulse_drop, if: :saved_change_to_pulse_dropped?
+  after_update :unpin_on_pulse_drop, if: :saved_change_to_pulse_dropped?
 
-  scope :active, -> { where(signal_dropped: false) }
-  scope :dropped, -> { where(signal_dropped: true) }
+  scope :active, -> { where(pulse_dropped: false) }
+  scope :dropped, -> { where(pulse_dropped: true) }
   scope :timeline, -> { order(pulsed_at: :desc) }
   scope :roots, -> { where(parent_pulse_id: nil) }
   scope :splices_for, ->(pulse_id) { where(parent_pulse_id: pulse_id).order(pulsed_at: :asc) }
@@ -70,12 +70,12 @@ class Pulse < ApplicationRecord
     echoes.exists?(grid_hackr_id: hackr.id)
   end
 
-  def signal_drop!
-    update(signal_dropped: true, signal_dropped_at: Time.current)
+  def pulse_drop!
+    update(pulse_dropped: true, pulse_dropped_at: Time.current)
   end
 
   def restore!
-    update(signal_dropped: false, signal_dropped_at: nil)
+    update(pulse_dropped: false, pulse_dropped_at: nil)
   end
 
   def thread_pulses
@@ -90,11 +90,11 @@ class Pulse < ApplicationRecord
 
   private
 
-  # A signal-dropped pulse is hidden from its owner's profile, so its pin
+  # A pulse-dropped pulse is hidden from its owner's profile, so its pin
   # would silently occupy a cap slot the owner can't clear. Remove it (the
   # PulsePin#after_destroy resequences the rest).
-  def unpin_on_signal_drop
-    pulse_pins.destroy_all if signal_dropped?
+  def unpin_on_pulse_drop
+    pulse_pins.destroy_all if pulse_dropped?
   end
 
   def set_pulsed_at
@@ -108,9 +108,9 @@ class Pulse < ApplicationRecord
     end
   end
 
-  def cannot_splice_signal_dropped_pulse
-    if parent_pulse_id.present? && parent_pulse&.signal_dropped?
-      errors.add(:parent_pulse_id, "cannot splice a signal-dropped pulse")
+  def cannot_splice_pulse_dropped_pulse
+    if parent_pulse_id.present? && parent_pulse&.pulse_dropped?
+      errors.add(:parent_pulse_id, "cannot splice a pulse-dropped pulse")
     end
   end
 
@@ -161,8 +161,8 @@ class Pulse < ApplicationRecord
     Turbo::StreamsChannel.broadcast_remove_to("wire_html", target: "pulse_#{id}")
   end
 
-  def broadcast_signal_drop
-    return unless signal_dropped?
+  def broadcast_pulse_drop
+    return unless pulse_dropped?
 
     ActionCable.server.broadcast("pulse_wire", {
       type: "pulse_dropped",

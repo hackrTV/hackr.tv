@@ -68,7 +68,7 @@ RSpec.describe "BREACH Phase 2C — Item Systems" do
 
       expect(result.item_name).to eq("MedPatch")
       expect(result.effect_output).to include("Health restored")
-      expect(result.emergency_jackout).to be false
+      expect(result.emergency_cutoff).to be false
 
       breach.reload
       expect(breach.actions_remaining).to eq(0) # started with 1 action
@@ -163,35 +163,35 @@ RSpec.describe "BREACH Phase 2C — Item Systems" do
     end
   end
 
-  # ── Emergency Jack-Out ────────────────────────────────────
+  # ── Emergency Cutoff ──────────────────────────────────────
 
-  describe "emergency jack-out chip" do
+  describe "emergency cutoff chip" do
     let(:chip_def) do
       create(:grid_item_definition,
-        slug: "test-emergency-jackout",
-        name: "Emergency Jack-Out Chip",
+        slug: "test-emergency-cutoff",
+        name: "Emergency Cutoff Chip",
         item_type: "consumable",
-        properties: {"effect_type" => "emergency_jackout"})
+        properties: {"effect_type" => "emergency_cutoff"})
     end
 
-    it "returns emergency_jackout flag" do
+    it "returns emergency_cutoff flag" do
       create(:grid_item, :in_inventory, grid_item_definition: chip_def, grid_hackr: hackr)
       breach = start_breach!
       breach.update!(detection_level: 80) # past PNR
 
-      result = Grid::BreachActionService.use_item!(hackr: hackr, item_name: "Emergency Jack-Out Chip")
-      expect(result.emergency_jackout).to be true
+      result = Grid::BreachActionService.use_item!(hackr: hackr, item_name: "Emergency Cutoff Chip")
+      expect(result.emergency_cutoff).to be true
     end
 
-    it "enables clean jackout past PNR" do
+    it "enables clean abort past PNR" do
       create(:grid_item, :in_inventory, grid_item_definition: chip_def, grid_hackr: hackr)
       breach = start_breach!
       breach.update!(detection_level: 80, pnr_threshold: 75)
 
-      Grid::BreachActionService.use_item!(hackr: hackr, item_name: "Emergency Jack-Out Chip")
+      Grid::BreachActionService.use_item!(hackr: hackr, item_name: "Emergency Cutoff Chip")
 
-      # Emergency jackout should be clean despite PNR
-      result = Grid::BreachService.jackout!(hackr: hackr, emergency: true)
+      # Emergency abort should be clean despite PNR
+      result = Grid::BreachService.abort!(hackr: hackr, emergency: true)
       expect(result.clean).to be true
     end
   end
@@ -393,13 +393,13 @@ RSpec.describe "BREACH Phase 2C — Item Systems" do
         expect(fragment_item).to be_nil
       end
 
-      it "forfeits fragments on jackout" do
+      it "forfeits fragments on abort" do
         fragment_def
 
         start_breach!
         Grid::BreachActionService.exec!(hackr: hackr, program_name: "Fragment Extractor", target_position: 0)
 
-        Grid::BreachService.jackout!(hackr: hackr)
+        Grid::BreachService.abort!(hackr: hackr)
 
         fragment_item = hackr.grid_items.joins(:grid_item_definition)
           .find_by(grid_item_definitions: {slug: "trace-fragment"})

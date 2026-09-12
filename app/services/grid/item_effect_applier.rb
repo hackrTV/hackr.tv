@@ -7,7 +7,7 @@ module Grid
   #   - h(text) (HTML escape helper)
   module ItemEffectApplier
     # Apply the effect of an item. Returns display string.
-    # Pass breach: to enable BREACH-scoped effects (signal_flare, emergency_jackout, inspire).
+    # Pass breach: to enable BREACH-scoped effects (signal_flare, emergency_cutoff, inspire).
     def apply_item_effect(item, breach: nil)
       props = (item.properties || {}).with_indifferent_access
       effect_type = props[:effect_type]
@@ -34,8 +34,8 @@ module Grid
         apply_inspire(item, props, breach)
       when "signal_flare"
         apply_signal_flare(item, props, breach)
-      when "emergency_jackout"
-        apply_emergency_jackout(item, props, breach)
+      when "emergency_cutoff"
+        apply_emergency_cutoff(item, props, breach)
       when "xp_boost"
         amount = props[:amount].to_i
         result = hackr.grant_xp!(amount)
@@ -89,12 +89,12 @@ module Grid
       "<span style='color: #22d3ee;'>You use #{h(item.name)}. Detection reduced by #{reduction}%. (#{new_detection}%)</span>"
     end
 
-    def apply_emergency_jackout(item, _props, breach)
+    def apply_emergency_cutoff(item, _props, breach)
       unless breach
-        return "<span style='color: #9ca3af;'>You use #{h(item.name)}... but there's nothing to jack out of.</span>"
+        return "<span style='color: #9ca3af;'>You use #{h(item.name)}... but there's no run to abort.</span>"
       end
-      # Returns a sentinel that the caller checks to trigger a clean jackout
-      :emergency_jackout
+      # Returns a sentinel that the caller checks to trigger a clean abort
+      :emergency_cutoff
     end
 
     def apply_repair_deck(item, props)

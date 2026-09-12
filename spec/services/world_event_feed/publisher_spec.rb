@@ -115,7 +115,7 @@ RSpec.describe WorldEventFeed::Publisher do
 
     it "formats hackr_registered" do
       event = WorldEvent.new(event_type: "hackr_registered", hackr_alias: "Neo", data: {})
-      expect(described_class.render_message(event)).to eq("Neo jacked into THE PULSE GRID for the first time")
+      expect(described_class.render_message(event)).to eq("Neo connected to THE PULSE GRID for the first time")
     end
 
     it "formats wire_post with truncation" do

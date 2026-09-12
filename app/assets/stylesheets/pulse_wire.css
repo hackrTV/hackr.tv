@@ -189,7 +189,7 @@
   margin-left: 20px;
 }
 
-.pulse-card.signal-dropped {
+.pulse-card.pulse-dropped {
   border-left-color: #f87171;
   background: rgba(128, 0, 0, 0.2);
 }
@@ -244,8 +244,8 @@
   word-wrap: break-word;
 }
 
-/* Signal Dropped */
-.signal-dropped-notice {
+/* Pulse Dropped */
+.pulse-dropped-notice {
   color: #f87171;
   text-align: center;
   padding: 15px;
@@ -253,7 +253,7 @@
   background: rgba(248, 113, 113, 0.1);
 }
 
-.signal-dropped-notice .glitch {
+.pulse-dropped-notice .glitch {
   display: inline-block;
   animation: glitch 1s infinite;
 }
