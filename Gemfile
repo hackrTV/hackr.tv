@@ -33,7 +33,7 @@ gem "bootsnap", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 2.0"
+gem "image_processing", "~> 2.1"
 # Vips backend for image_processing (variant_processor is :vips on Rails 8+).
 # image_processing does NOT depend on this — without it, every variant raises
 # "ImageProcessing::Vips requires the ruby-vips gem" in production (the libvips
