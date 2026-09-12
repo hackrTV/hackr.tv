@@ -34,7 +34,7 @@ class PulsePin < ApplicationRecord
 
   validates :pulse_id, uniqueness: {scope: :grid_hackr_id}
   validate :pulse_authored_by_pinner
-  validate :pulse_not_signal_dropped
+  validate :pulse_not_pulse_dropped
   validate :within_pin_limit, on: :create
 
   scope :ordered, -> { order(:position) }
@@ -42,7 +42,7 @@ class PulsePin < ApplicationRecord
   after_destroy :resequence_siblings
 
   # Renumber a hackr's pins to a contiguous 0..n-1 after any removal
-  # (unpin, owner pulse deleted, or pulse signal-dropped).
+  # (unpin, owner pulse deleted, or pulse pulse-dropped).
   def self.resequence_for!(grid_hackr_id)
     where(grid_hackr_id: grid_hackr_id).ordered.each_with_index do |pin, idx|
       pin.update_column(:position, idx) unless pin.position == idx
@@ -62,11 +62,11 @@ class PulsePin < ApplicationRecord
     errors.add(:pulse, "must be one of your own pulses")
   end
 
-  def pulse_not_signal_dropped
+  def pulse_not_pulse_dropped
     return if pulse.nil?
-    return unless pulse.signal_dropped?
+    return unless pulse.pulse_dropped?
 
-    errors.add(:pulse, "cannot pin a signal-dropped pulse")
+    errors.add(:pulse, "cannot pin a pulse-dropped pulse")
   end
 
   def within_pin_limit

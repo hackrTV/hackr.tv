@@ -150,18 +150,18 @@ RSpec.describe Grid::BreachService do
     end
   end
 
-  describe ".jackout!" do
+  describe ".abort!" do
     let!(:breach_result) { described_class.start!(hackr: hackr, encounter: encounter) }
 
-    it "clean jackout before PNR" do
-      result = described_class.jackout!(hackr: hackr)
+    it "clean abort before PNR" do
+      result = described_class.abort!(hackr: hackr)
       expect(result.clean).to be true
-      expect(result.hackr_breach.state).to eq("jacked_out")
+      expect(result.hackr_breach.state).to eq("aborted")
     end
 
-    it "dirty jackout after PNR" do
+    it "dirty abort after PNR" do
       breach_result.hackr_breach.update!(detection_level: 80) # past 75% PNR
-      result = described_class.jackout!(hackr: hackr)
+      result = described_class.abort!(hackr: hackr)
       expect(result.clean).to be false
       expect(result.vitals_hit.size).to be >= 2
     end
@@ -169,7 +169,7 @@ RSpec.describe Grid::BreachService do
     it "raises NotInBreach when no active breach" do
       expect {
         hackr2 = create(:grid_hackr)
-        described_class.jackout!(hackr: hackr2)
+        described_class.abort!(hackr: hackr2)
       }.to raise_error(Grid::BreachService::NotInBreach)
     end
   end

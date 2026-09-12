@@ -705,7 +705,7 @@ handbook_sections:
             - protocols
             - detection
             - puzzle
-            - jackout
+            - abort
             - encounter
             - exec
             - analyze
@@ -773,7 +773,7 @@ handbook_sections:
           | `use <item>` | 1 action | Use a consumable during BREACH. |
           | `interface <gate> <answer>` | 1 action | Submit a puzzle gate answer. |
           | `interface <gate> probe <pair>` | **free** | Test a circuit connection (limited budget). |
-          | `jackout` | — | Abort the BREACH entirely (see below). |
+          | `abort` | — | Abort the BREACH entirely (see below). |
           | `status` / `look` | **free** | View current BREACH state. |
           | `deck` | **free** | View DECK battery and loaded software. |
 
@@ -806,8 +806,8 @@ handbook_sections:
           **detection overflow**.
 
           The **Point of No Return (PNR)** is a detection threshold
-          (typically 75). Before PNR, jacking out is clean. After PNR,
-          jacking out costs extra vitals.
+          (typically 75). Before PNR, aborting is clean. After PNR,
+          aborting costs extra vitals.
 
           ## Puzzle gates
 
@@ -853,15 +853,15 @@ handbook_sections:
             are granted.
           - Achievement and mission triggers fire.
 
-          ## Jacking out
+          ## Aborting the run
 
-          `jackout` (or `jo`) aborts the BREACH at any time.
+          `abort` (or `ab`) aborts the BREACH at any time.
 
           - **Before PNR**: clean exit. Costs ENERGY −5.
           - **After PNR**: dirty exit. Costs HEALTH −10, ENERGY −15,
             PSYCHE −15.
 
-          Jacking out always forfeits all rewards and pending fragments.
+          Aborting always forfeits all rewards and pending fragments.
 
           ## Failure consequences
 
@@ -910,7 +910,7 @@ handbook_sections:
           | 10–19 | Socket Jockey | 3 |
           | 20–29 | Netcutter | 4 |
           | 30–39 | Exploit Artist | 5 |
-          | 40–49 | Signal Ghost | 6 |
+          | 40–49 | Static Ghost | 6 |
           | 50–59 | Phantom Thread | 7 |
           | 60–69 | Zero-Day Broker | 8 |
           | 70–79 | Kernel Surgeon | 9 |
@@ -1049,7 +1049,7 @@ handbook_sections:
 
           Some missions have a **prerequisite** — you need to complete the
           prereq before the next one opens up. Related missions can be
-          grouped into an **arc** (e.g. "Signal Recovery") for flavor.
+          grouped into an **arc** (e.g. "Archive Recovery") for flavor.
 
           Missions flagged **repeatable** can be accepted again and again.
           Each turn-in counts toward any `missions_completed_count`
@@ -1551,7 +1551,7 @@ handbook_sections:
           (excluding slipstream origins).
 
           ```
-          hail taxi Signal Hub
+          hail taxi Transit Hub
           ```
 
           Fares vary by transit type and distance.
@@ -1746,7 +1746,7 @@ handbook_sections:
     icon: "~"
     position: 2
     published: true
-    summary: "Asynchronous broadcast feed — post pulses, echo what you agree with, signal drops."
+    summary: "Asynchronous broadcast feed — post pulses, echo what you agree with, pulse drops."
     articles:
       - slug: wire-overview
         title: WIRE — Broadcast Feed
@@ -1777,9 +1777,9 @@ handbook_sections:
           An echo amplifies someone else's pulse onto your timeline. Similar to
           a repost, but with optional commentary.
 
-          ## Signal drops
+          ## Pulse drops
 
-          Moderators can **signal drop** a pulse to remove it from public
+          Moderators can **pulse drop** a pulse to remove it from public
           view. If your own pulse gets dropped, you'll be notified.
 
   - slug: uplink
@@ -2183,7 +2183,7 @@ handbook_sections:
             also prompt for a target.
           - **Breach output** — scrollable terminal showing the result of
             each action.
-          - **JACKOUT** — button with confirmation modal showing vitals
+          - **ABORT RUN** — button with confirmation modal showing vitals
             cost.
 
           Software buttons are disabled when battery is insufficient.
@@ -2458,13 +2458,13 @@ handbook_sections:
 
           ```
           [ BREACH TARGETS ]
-          Signal Relay Node [STANDARD]
+          Broadcast Relay Node [STANDARD]
           ```
 
           ## 4. Initiate
 
           ```
-          breach Signal Relay Node
+          breach Broadcast Relay Node
           ```
 
           You're now in a BREACH. The terminal shows the protocol grid —
@@ -2505,7 +2505,7 @@ handbook_sections:
 
           Keep analyzing and executing. Your action count ramps up over
           rounds as inspiration builds. If things go badly, type
-          `jackout` to abort (costs some vitals but avoids failure
+          `abort` to cut the run (costs some vitals but avoids failure
           consequences).
 
           ## 9. Victory

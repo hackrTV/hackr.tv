@@ -90,8 +90,8 @@ RSpec.describe Api::Admin::PulsesController, type: :controller do
       expect(response).to have_http_status(:not_found)
     end
 
-    it "rejects splice to a signal-dropped pulse" do
-      parent_pulse.signal_drop!
+    it "rejects splice to a pulse-dropped pulse" do
+      parent_pulse.pulse_drop!
 
       post :splice, params: {
         parent_pulse_id: parent_pulse.id,
@@ -100,7 +100,7 @@ RSpec.describe Api::Admin::PulsesController, type: :controller do
 
       expect(response).to have_http_status(:unprocessable_entity)
       body = JSON.parse(response.body)
-      expect(body["error"]).to include("signal-dropped")
+      expect(body["error"]).to include("pulse-dropped")
     end
   end
 end

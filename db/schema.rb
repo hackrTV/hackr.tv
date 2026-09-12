@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_28_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_12_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1309,17 +1309,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_120000) do
     t.integer "grid_hackr_id", null: false
     t.boolean "is_seed", default: false, null: false
     t.integer "parent_pulse_id"
+    t.boolean "pulse_dropped", default: false, null: false
+    t.datetime "pulse_dropped_at"
     t.datetime "pulsed_at", null: false
-    t.boolean "signal_dropped", default: false, null: false
-    t.datetime "signal_dropped_at"
     t.integer "splice_count", default: 0, null: false
     t.integer "thread_root_id"
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id"], name: "index_pulses_on_grid_hackr_id"
     t.index ["is_seed"], name: "index_pulses_on_is_seed"
     t.index ["parent_pulse_id"], name: "index_pulses_on_parent_pulse_id"
+    t.index ["pulse_dropped"], name: "index_pulses_on_pulse_dropped"
     t.index ["pulsed_at"], name: "index_pulses_on_pulsed_at"
-    t.index ["signal_dropped"], name: "index_pulses_on_signal_dropped"
     t.index ["thread_root_id"], name: "index_pulses_on_thread_root_id"
   end
 

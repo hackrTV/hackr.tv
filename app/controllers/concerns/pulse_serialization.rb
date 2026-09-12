@@ -10,10 +10,10 @@ module PulseSerialization
   private
 
   # A hackr's pinned pulses in display order, profanity/serialization
-  # shared with the timeline. Signal-dropped pulses are hidden.
+  # shared with the timeline. Pulse-dropped pulses are hidden.
   def pinned_pulses_json(hackr)
     hackr.pinned_pulses
-      .where(signal_dropped: false)
+      .where(pulse_dropped: false)
       .includes(:grid_hackr)
       .map { |pulse| pulse_json(pulse) }
   end
@@ -25,8 +25,8 @@ module PulseSerialization
       pulsed_at: pulse.pulsed_at,
       echo_count: pulse.echo_count,
       splice_count: pulse.splices.count, # Real-time count
-      signal_dropped: pulse.signal_dropped,
-      signal_dropped_at: pulse.signal_dropped_at,
+      pulse_dropped: pulse.pulse_dropped,
+      pulse_dropped_at: pulse.pulse_dropped_at,
       parent_pulse_id: pulse.parent_pulse_id,
       thread_root_id: pulse.thread_root_id,
       is_splice: pulse.is_splice?,

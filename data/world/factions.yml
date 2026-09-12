@@ -20,7 +20,7 @@ factions:
     color_scheme: purple
     position: 20
     artist_slug: thecyberpulse
-    description: "The broadcast spine of the resistance. XERAEN, Ryker, and Synthia push signal through the noise."
+    description: "The broadcast spine of the resistance. XERAEN, Ryker, and Synthia carry the signal through the noise."
 
   - name: Blackout
     slug: blackout
@@ -36,7 +36,7 @@ factions:
     kind: collective
     color_scheme: cyan
     position: 40
-    description: "Signal artists and culture-shapers. The Fracture Network's public face."
+    description: "Broadcast artists and culture-shapers. The Fracture Network's public face."
 
   - name: Offline
     slug: offline
@@ -44,7 +44,7 @@ factions:
     kind: collective
     color_scheme: gray
     position: 50
-    description: "Analog refugees. They left the grid; they didn't leave the fight."
+    description: "Analog refugees. They unplugged; they didn't leave the fight."
 
   - name: GovCorp
     slug: govcorp

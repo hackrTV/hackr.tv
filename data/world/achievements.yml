@@ -67,7 +67,7 @@ achievements:
     cred_reward: 0
 
   - slug: synthia_signal
-    name: "Synthia Signal"
+    name: "Synthia Contact"
     description: "Made contact with Synthia."
     badge_icon: "S"
     category: grid
@@ -218,7 +218,7 @@ achievements:
 
   # --- Pulse Vault track plays (30s+ counted) ---
   - slug: first_signal
-    name: "Signal Acquired"
+    name: "Tuned In"
     description: "Played your first track for 30+ seconds."
     badge_icon: ">>"
     category: music
@@ -370,7 +370,7 @@ achievements:
     cred_reward: 20
 
   - slug: vod_20
-    name: "Signal Archivist"
+    name: "Transmission Archivist"
     description: "Watched 20 VODs."
     badge_icon: "VDX"
     category: music
@@ -386,7 +386,7 @@ achievements:
 
   # --- WIRE pulses ---
   - slug: first_pulse
-    name: "Signal Sent"
+    name: "Pulse Sent"
     description: "Posted your first pulse to the WIRE."
     badge_icon: "W"
     category: social
@@ -419,7 +419,7 @@ achievements:
     cred_reward: 10
 
   - slug: wire_100
-    name: "Signal Flooder"
+    name: "Pulse Flooder"
     description: "Posted 100 pulses to the WIRE."
     badge_icon: "WF"
     category: social
@@ -486,7 +486,7 @@ achievements:
     cred_reward: 20
 
   - slug: uplink_5000
-    name: "Signal Saturator"
+    name: "Uplink Saturator"
     description: "Sent 5,000 Uplink packets."
     badge_icon: "UPS"
     category: social
@@ -854,7 +854,7 @@ achievements:
     cred_reward: 30
 
   - slug: first_slipstream
-    name: "Ghost in the Machine"
+    name: "Stowaway"
     description: "Completed your first Slipstream transit."
     badge_icon: "SLP"
     category: grid

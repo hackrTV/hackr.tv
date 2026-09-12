@@ -13,7 +13,7 @@ RSpec.describe "Timeline page", type: :request do
       expect(response.body).to include("id=\"#{era["key"]}\"")
     end
     # Spot-check events across eras
-    expect(response.body).to include("First Signal Detected")
+    expect(response.body).to include("First Transmission Detected")
     expect(response.body).to include("PRISM Discovered")
     expect(response.body).to include("SIGNAL CONTINUES...")
   end

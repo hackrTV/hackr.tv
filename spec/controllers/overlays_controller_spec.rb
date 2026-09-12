@@ -32,9 +32,9 @@ RSpec.describe OverlaysController, type: :controller do
       expect(assigns(:pulses)).to include(pulse)
     end
 
-    it "excludes signal-dropped pulses" do
+    it "excludes pulse-dropped pulses" do
       active_pulse = create(:pulse, grid_hackr: hackr)
-      dropped_pulse = create(:pulse, :signal_dropped, grid_hackr: hackr)
+      dropped_pulse = create(:pulse, :pulse_dropped, grid_hackr: hackr)
 
       get :pulsewire
 

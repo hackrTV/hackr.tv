@@ -6,7 +6,7 @@ module Grid
       :protocol_destroyed, :battery_consumed, :all_destroyed, :exploit, :fragment, :debuff_hint)
     AnalyzeResult = Data.define(:target_position, :level_reached, :info_revealed, :bonus_action, :debuff_hint)
     RerouteResult = Data.define(:target_position, :protocol_type_label)
-    UseItemResult = Data.define(:item_name, :effect_output, :emergency_jackout)
+    UseItemResult = Data.define(:item_name, :effect_output, :emergency_cutoff)
     InterfaceResult = Data.define(:gate_id, :correct, :gate_state, :attempts_remaining, :all_solved, :all_failed, :feedback)
     CircuitProbeResult = Data.define(:gate_id, :probe_pair, :connected, :probes_remaining, :feedback)
 
@@ -279,7 +279,7 @@ module Grid
       raise ItemNotFound, "No consumable named '#{item_name}' in your inventory." unless item
 
       effect_output = nil
-      emergency_jackout = false
+      emergency_cutoff = false
       saved_name = item.name
 
       ActiveRecord::Base.transaction do
@@ -291,9 +291,9 @@ module Grid
         # Apply item effect (from ItemEffectApplier module)
         result = apply_item_effect(item, breach: breach)
 
-        if result == :emergency_jackout
-          emergency_jackout = true
-          effect_output = "<span style='color: #22d3ee; font-weight: bold;'>EMERGENCY JACK-OUT INITIATED — PNR override engaged.</span>"
+        if result == :emergency_cutoff
+          emergency_cutoff = true
+          effect_output = "<span style='color: #22d3ee; font-weight: bold;'>EMERGENCY ABORT INITIATED — PNR override engaged.</span>"
         else
           effect_output = result
         end
@@ -312,14 +312,14 @@ module Grid
           item_name: saved_name,
           item_slug: item.grid_item_definition&.slug,
           effect_type: item.properties&.dig("effect_type"),
-          emergency_jackout: emergency_jackout
+          emergency_cutoff: emergency_cutoff
         })
       end
 
       UseItemResult.new(
         item_name: saved_name,
         effect_output: effect_output,
-        emergency_jackout: emergency_jackout
+        emergency_cutoff: emergency_cutoff
       )
     end
 

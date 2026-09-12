@@ -248,7 +248,7 @@ schematics:
 
   - slug: fab-signal-disruptor
     name: Fabricate Signal Disruptor
-    description: "Build a targeted signal disruption program."
+    description: "Build a targeted comms-disruption program."
     output_slug: signal-disruptor
     output_quantity: 1
     xp_reward: 40
@@ -415,7 +415,7 @@ schematics:
 
   - slug: fab-signal-intercept-array
     name: Fabricate Signal Intercept Array
-    description: "Assemble a passive signal capture array for advanced BREACH exploits."
+    description: "Assemble a passive transmission-capture array for advanced BREACH exploits."
     output_slug: signal-intercept-array
     output_quantity: 1
     xp_reward: 150

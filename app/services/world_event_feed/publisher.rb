@@ -75,7 +75,7 @@ module WorldEventFeed
         icon = d["badge_icon"].present? ? "#{d["badge_icon"]} " : ""
         "#{alias_str} unlocked #{icon}#{d["achievement_name"]}"
       when "hackr_registered"
-        "#{alias_str} jacked into THE PULSE GRID for the first time"
+        "#{alias_str} connected to THE PULSE GRID for the first time"
       when "wire_post"
         content = d["content"].to_s.truncate(80)
         "#{alias_str} posted to THE WIRE: \"#{content}\""

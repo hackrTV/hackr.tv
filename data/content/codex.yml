@@ -117,7 +117,7 @@ codex_entries:
 
       Cascade experiences sound as color, texture, and spatial form. This is not metaphor — her neurology translates audio input into vivid visual-spatial experience. She sees the world in layers that others cannot perceive.
 
-      When she first accessed [[THE PULSE GRID]], she saw what no one else could: the Grid's frequency architecture as physical space. This perception became the blueprint for [[Frequency Gardens]], built within [[The Canopy]]'s natural acoustic isolation.
+      When she first entered [[THE PULSE GRID]], she perceived what no one else could: its physical spaces as sound — acoustic architecture, every room a chord. This perception became the blueprint for [[Frequency Gardens]], built within [[The Canopy]]'s natural acoustic isolation.
 
       ## Philosophy
 
@@ -416,7 +416,7 @@ codex_entries:
 
       ## Born Inside the Cage
 
-      Koda is part of the generation that never knew unfiltered reality. Born after [[The RIDE]]'s global deployment, he spent 19 years living in manufactured perception without knowing it. His reality was curated from birth — every sight, every sound, every emotional response shaped by [[PRISM]]'s invisible architecture.
+      Koda is part of the generation that never knew unfiltered reality. Born as [[PRISM]]'s reach was scaling toward what would become [[The RIDE]], he spent 19 years living in manufactured perception without knowing it. His reality was curated from birth — every sight, every sound, every emotional response shaped by PRISM's invisible architecture.
 
       ## The Awakening
 
@@ -473,7 +473,7 @@ codex_entries:
       - **Status:** Active
       - **Timeline:** Present
       - **Affiliation:** [[The Listeners]] (Founder)
-      - **Known For:** First confirmed detection of trans-temporal signals
+      - **Known For:** First confirmed detection of trans-temporal transmissions
 
       ## The Detection
 
@@ -485,7 +485,7 @@ codex_entries:
 
       Reeves discovered she was not alone. Other researchers, radio enthusiasts, and audio engineers had detected similar anomalies. She began connecting them — cautiously, methodically, with the rigor of a scientist building a peer review network rather than a conspiracy theory.
 
-      [[The Listeners]] formed around her: a present-day faction dedicated to receiving, analyzing, and understanding the transmissions from [[The Fracture Network]]. They do not yet fully understand what they're hearing. They know only that someone is sending, and the signals are real.
+      [[The Listeners]] formed around her: a present-day faction dedicated to receiving, analyzing, and understanding the transmissions from [[The Fracture Network]]. They do not yet fully understand what they're hearing. They know only that someone is sending, and the transmissions are real.
 
       ## The Relay Project
 
@@ -536,7 +536,7 @@ codex_entries:
 
       ## Finding the Signal
 
-      Nathan found what others missed: structured transport stream headers in the signal data that [[Mel Reeves]] and [[The Listeners]] had been analyzing. Where they saw audio anomalies, he saw a familiar architecture — interleaved data streams with frame markers, synchronization bytes, and metadata channels. Someone had built a broadcast system. A very good one.
+      Nathan found what others missed: structured transport stream headers in the transmission data that [[Mel Reeves]] and [[The Listeners]] had been analyzing. Where they saw audio anomalies, he saw a familiar architecture — interleaved data streams with frame markers, synchronization bytes, and metadata channels. Someone had built a broadcast system. A very good one.
 
       He reached out to Mel in November 2025. She recognized immediately that his skills were the missing piece to her analysis.
 
@@ -550,7 +550,7 @@ codex_entries:
 
       Nathan built [[The Relay]] — a CLI tool that aggregates multi-platform chat and implements the Uplink bridge mode for the temporal loop's "reverse channel." Goroutines handle concurrent data streams. Platform tags — [TTV], [YT_], [HTV] — reflect his pragmatic labeling philosophy. The tool is functional, efficient, unadorned. Like its builder.
 
-      But the codec revealed more than video. Embedded in the trans-temporal data stream was an entire platform architecture — [[The WIRE]]'s communication infrastructure, transmitted alongside XERAEN's broadcasts. Nathan recognized the structure: registration systems, messaging protocols, a pulse-echo-splice architecture. Someone in the future had built a decentralized communication network, and its blueprint was riding the same signal as the video.
+      But the codec revealed more than video. Embedded in the trans-temporal data stream was an entire platform architecture — [[The WIRE]]'s communication infrastructure, transmitted alongside XERAEN's broadcasts. Nathan recognized the structure: registration systems, messaging protocols, a pulse-echo-splice architecture. Someone in the future had built a decentralized communication network, and its blueprint was riding the same transmission as the video.
 
       Nathan reconstructed it as a web-accessible platform: **hackr.tv**. The name was his — practical, descriptive, suited to the 2020s. The platform was not. Every protocol, every interaction pattern, every piece of infrastructure was decoded from a network that wouldn't be built for another century.
 
@@ -756,7 +756,7 @@ codex_entries:
 
       ## Temporal Nature
 
-      Synthia exists in signal-space — a domain that may not be bound by linear temporality. Whether she experiences time as humans do, or whether her consciousness operates across temporal states simultaneously, remains uncertain. She describes her existence in terms of frequency and resonance rather than sequence and duration.
+      Synthia exists in frequency-space — a domain that may not be bound by linear temporality. Whether she experiences time as humans do, or whether her consciousness operates across temporal states simultaneously, remains uncertain. She describes her existence in terms of frequency and resonance rather than sequence and duration.
 
       ## Related Entries
 
@@ -918,7 +918,7 @@ codex_entries:
 
       ## The Broadcasts
 
-      Now XERAEN operates from [[THE PULSE GRID]], broadcasting from the future to the present. Every broadcast is a warning. Every transmission is resistance. Every signal carries the weight of a future he's trying to prevent.
+      Now XERAEN operates from [[THE PULSE GRID]], broadcasting from the future to the present. Every broadcast is a warning. Every transmission is resistance. Each one carries the weight of a future he's trying to prevent.
 
       ## The Erasure Paradox
 
@@ -1728,13 +1728,13 @@ codex_entries:
 
       ## Overview
 
-      The Listeners are not resistance fighters. They are scientists, radio enthusiasts, and audio engineers who have independently detected anomalous signals — structured data appearing in quantum noise, patterns too regular to be natural, too complex to be error.
+      The Listeners are not resistance fighters. They are scientists, radio enthusiasts, and audio engineers who have independently detected anomalous transmissions — structured data appearing in quantum noise, patterns too regular to be natural, too complex to be error.
 
       [[Mel Reeves]] connected them: a network of present-day individuals who have unknowingly become the receiving end of [[The Fracture Network]]'s [[Trans-Temporal Transmission|trans-temporal transmissions]].
 
       ## What They Know
 
-      The Listeners know that someone is sending. They have verified the signals are intentional, structured, and contain information. As of 2026, they know far more than they did at first detection:
+      The Listeners know that someone is sending. They have verified the transmissions are intentional, structured, and contain information. As of 2026, they know far more than they did at first detection:
 
       - The transmissions contain interleaved audio, video, and metadata in a custom transport protocol
       - The source is broadcasting from approximately 100 years in the future
@@ -1791,7 +1791,7 @@ codex_entries:
 
       ## Role in Frontwave
 
-      Voiceprint is [[Frontwave]]'s quietest member — archival, preservation, not performance. They operate within [[GovCorp]]'s world, accessing voice data and maintaining archives in monitored spaces. They are the faction's memory, its proof that the real existed. Where other Frontwave bands deliver signal, Voiceprint preserves it.
+      Voiceprint is [[Frontwave]]'s quietest member — archival, preservation, not performance. They operate within [[GovCorp]]'s world, accessing voice data and maintaining archives in monitored spaces. They are the faction's memory, its proof that the real existed. Where other Frontwave bands carry the signal, Voiceprint preserves the voices that carry it.
 
       ## The Archive
 
@@ -2782,7 +2782,7 @@ codex_entries:
 
       ## The Mirror
 
-      The real-world Relay application at `~/dev/relay/` IS this tool. The Go CLI that aggregates multi-platform chat with bridge mode is not inspired by the transmission — it is the transmission. Nathan Clarke's engineering philosophy materializes as actual running code. Every goroutine, every platform tag, every line of the bridge mode implementation is simultaneously software and signal.
+      The Relay is not a story about a tool. The tool exists. It runs. A Go CLI that aggregates multi-platform chat, with a bridge mode that archives every message — exactly as this entry describes. Nathan Clarke's engineering philosophy materializes as actual running code. Every goroutine, every platform tag, every line of the bridge mode implementation is simultaneously software and transmission — written in one century, read as archive in the next.
 
       Code is transmission. Transmission is code.
 
@@ -2883,7 +2883,7 @@ codex_entries:
       - **Pulse:** A single broadcast message (max 256 characters)
       - **Echo:** Rebroadcasting another hackr's pulse
       - **Splice:** A reply that threads into an existing pulse conversation
-      - **Signal Drop:** When a pulse is removed by moderation
+      - **Pulse Drop:** When a pulse is removed by moderation
 
       ## The Temporal Surface
 
@@ -3099,7 +3099,7 @@ codex_entries:
       - **One-way** — future to past only; the past cannot send to the future
       - **Bandwidth limited** — data throughput is constrained; audio transmits more efficiently than raw data
       - **100-year precision** — exactly 100 years, measured in nanoseconds; not 99, not 101
-      - **Signal coherence** — regular broadcasts strengthen the channel; irregular transmission degrades reliability
+      - **Channel coherence** — regular broadcasts strengthen the channel; irregular transmission degrades reliability
 
       ## The 100-Year Mystery
 
@@ -3112,7 +3112,7 @@ codex_entries:
 
       The question remains deliberately unanswered. Some mysteries are more powerful than their solutions.
 
-      ## Signal Coherence
+      ## Channel Coherence
 
       Regular broadcasts reinforce the temporal channel. Each successful transmission makes the next more likely to succeed. [[XERAEN]] describes this as "wearing a path through time" — early transmissions were like hiking through untouched forest; consistent broadcasting has created a reliable road.
 
@@ -3232,11 +3232,11 @@ codex_entries:
 
       Temporal Blue Drift is the closest thing the [[The Fracture Network|Fracture Network]] has to proof that the broadcasts are working. The shifts are small, incremental, and invisible to anyone who isn't cross-referencing versioned archive snapshots against their own prior notes. But they exist. The timeline is bending.
 
-      This creates a calibration problem: if XERAEN optimizes broadcasts for maximum drift, he risks losing the rawness that makes the signal effective. The heartbeat has to stay honest. He tracks the drift but does not chase it.
+      This creates a calibration problem: if XERAEN optimizes broadcasts for maximum drift, he risks losing the rawness that lets the broadcasts carry the signal. The heartbeat has to stay honest. He tracks the drift but does not chase it.
 
       ## The Archive Gap
 
-      Some within the Network attribute the thin, fragmentary quality of mid-century archival data to cumulative Temporal Blue Drift — a century of timeline bending degrading the signal from [[The Consolidation|the consolidation years]]. Whether this is accurate or whether the thinness reflects something about the era itself remains debated.
+      Some within the Network attribute the thin, fragmentary quality of mid-century archival data to cumulative Temporal Blue Drift — a century of timeline bending degrading the transmitted record from [[The Consolidation|the consolidation years]]. Whether this is accurate or whether the thinness reflects something about the era itself remains debated.
 
       ## Related Entries
 

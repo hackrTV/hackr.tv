@@ -247,7 +247,7 @@ Rails.application.routes.draw do
 
     # PulseWire API routes
     resources :pulses, only: %i[index show create destroy] do
-      post "signal_drop", on: :member
+      post "pulse_drop", on: :member
       post "echo", to: "echoes#create"
       get "echoes", to: "echoes#index"
       post "pin", to: "pulse_pins#create"
@@ -629,12 +629,12 @@ Rails.application.routes.draw do
     # PulseWire moderation (still functional - runtime operations)
     resources :pulse_wire, only: %i[index destroy] do
       collection do
-        get "signal_drops"
-        post "bulk_signal_drop"
+        get "pulse_drops"
+        post "bulk_pulse_drop"
         delete "bulk_destroy"
       end
       member do
-        post "signal_drop"
+        post "pulse_drop"
         post "restore"
       end
     end

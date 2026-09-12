@@ -3,10 +3,10 @@ module Api
     include GridAuthentication
     include PulseSerialization
 
-    before_action :require_login_api, only: %i[create destroy signal_drop]
-    before_action :set_pulse, only: %i[show destroy signal_drop]
+    before_action :require_login_api, only: %i[create destroy pulse_drop]
+    before_action :set_pulse, only: %i[show destroy pulse_drop]
     before_action :authorize_pulse_owner, only: [:destroy]
-    before_action :require_admin, only: [:signal_drop]
+    before_action :require_admin, only: [:pulse_drop]
 
     # GET /api/pulses
     # Params: page (default 1), per_page (default 50), filter (all/active/dropped), hackr (username), parent_pulse_id (for replies), echoed_by (username)
@@ -118,12 +118,12 @@ module Api
       }
     end
 
-    # POST /api/pulses/:id/signal_drop
-    def signal_drop
-      if @pulse.signal_drop!
+    # POST /api/pulses/:id/pulse_drop
+    def pulse_drop
+      if @pulse.pulse_drop!
         render json: {
           success: true,
-          message: "Pulse signal-dropped by GovCorp",
+          message: "Pulse pulse-dropped by GovCorp",
           pulse: pulse_json(@pulse)
         }
       else

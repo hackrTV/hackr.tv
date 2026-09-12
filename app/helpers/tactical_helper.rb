@@ -10,7 +10,7 @@ module TacticalHelper
     "heal" => "Restores Health", "energy_restore" => "Restores Energy", "psyche_restore" => "Restores Psyche",
     "energize" => "Restores Energy", "psyche_boost" => "Restores Psyche",
     "inspire" => "Grants Inspiration", "deck_recharge" => "Recharges DECK Battery", "repair_deck" => "Repairs Fried DECK",
-    "signal_flare" => "Reduces Detection", "emergency_jackout" => "Emergency BREACH Exit",
+    "signal_flare" => "Reduces Detection", "emergency_cutoff" => "Emergency BREACH Exit",
     "dmg" => "Damage", "detection_reduction" => "Detection Reduction"
   }.freeze
 

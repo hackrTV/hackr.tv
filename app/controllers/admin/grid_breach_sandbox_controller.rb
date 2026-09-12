@@ -62,7 +62,7 @@ class Admin::GridBreachSandboxController < Admin::ApplicationController
     @hackr = @breach.grid_hackr
 
     if @breach.active?
-      Grid::BreachService.jackout!(hackr: @hackr)
+      Grid::BreachService.abort!(hackr: @hackr)
     end
 
     set_flash_success("Sandbox breach aborted for #{@hackr.hackr_alias}.")

@@ -10,7 +10,7 @@ RSpec.describe "Artist pages", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.body).not_to include('<div id="root">')
-      expect(response.body).to include("SIGNAL ORIGIN &amp; BROADCAST HUB")
+      expect(response.body).to include("TRANSMISSION ORIGIN &amp; BROADCAST HUB")
       expect(response.body).to include("You found the frequency. Everything else is below.")
       expect(response.body).to include("/thecyberpulse/bio")
       expect(response.body).to include("/thecyberpulse/releases")

@@ -38,8 +38,8 @@ RSpec.describe PulsePin, type: :model do
     expect(pin.errors[:pulse]).to include("must be one of your own pulses")
   end
 
-  it "rejects pinning a signal-dropped pulse" do
-    dropped = create(:pulse, :signal_dropped, grid_hackr: hackr)
+  it "rejects pinning a pulse-dropped pulse" do
+    dropped = create(:pulse, :pulse_dropped, grid_hackr: hackr)
     expect(PulsePin.new(grid_hackr: hackr, pulse: dropped)).not_to be_valid
   end
 
@@ -70,11 +70,11 @@ RSpec.describe PulsePin, type: :model do
     expect { pulse.destroy! }.to change(PulsePin, :count).by(-1)
   end
 
-  it "frees the cap and resequences when a pinned pulse is signal-dropped" do
+  it "frees the cap and resequences when a pinned pulse is pulse-dropped" do
     pulses = Array.new(PulsePin::MAX_PINS) { create(:pulse, grid_hackr: hackr) }
     pulses.each_with_index { |p, i| PulsePin.create!(grid_hackr: hackr, pulse: p, position: i) }
 
-    pulses[1].signal_drop!
+    pulses[1].pulse_drop!
 
     expect(PulsePin.where(pulse_id: pulses[1].id)).not_to exist
     expect(hackr.pulse_pins.ordered.pluck(:position)).to eq([0, 1])

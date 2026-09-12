@@ -1022,7 +1022,7 @@ rooms:
 
   - name: "Archive Hall"
     slug: archive-hall
-    description: "Floor-to-ceiling shelving stretches the full length of the room, every slot filled with indexed containers of transmissions captured from THE WIRE. The temperature holds at exactly sixty-two degrees. A century of intercepted signal lives here, organized by date, frequency, and origin point."
+    description: "Floor-to-ceiling shelving stretches the full length of the room, every slot filled with indexed containers of transmissions captured from THE WIRE. The temperature holds at exactly sixty-two degrees. A century of intercepted transmissions lives here, organized by date, frequency, and origin point."
     zone_slug: echo-chamber
     room_type: standard
 
@@ -1052,7 +1052,7 @@ rooms:
 
   - name: "Climate Control"
     slug: echo-chamber-climate-control
-    description: "Banks of dehumidifiers and temperature regulators hum in a windowless utility room. The system maintains preservation-grade conditions throughout the facility. One degree of drift could degrade a century's worth of captured signal."
+    description: "Banks of dehumidifiers and temperature regulators hum in a windowless utility room. The system maintains preservation-grade conditions throughout the facility. One degree of drift could degrade a century's worth of captured transmissions."
     zone_slug: echo-chamber
     room_type: standard
 
@@ -1076,7 +1076,7 @@ rooms:
 
   - name: "Emergency Seal"
     slug: emergency-seal
-    description: "Heavy blast doors stand ready to isolate the archive from the rest of the facility. Manual release levers and analog failsafes ensure the seal functions without power. If the archive is compromised, this room becomes a tomb for what it protects. ---"
+    description: "Heavy blast doors stand ready to isolate the archive from the rest of the facility. Manual release levers and analog failsafes ensure the seal functions without power. If the archive is compromised, this room becomes a tomb for what it protects."
     zone_slug: echo-chamber
     room_type: standard
 
@@ -1148,7 +1148,7 @@ rooms:
 
   - name: "Searchlight"
     slug: searchlight
-    description: "A pair of high-powered beams sweep the sky from a rooftop platform, carving white arcs through the Basin haze. The lights advertise nothing specific. They exist to remind the skyline that something is happening down here. ---"
+    description: "A pair of high-powered beams sweep the sky from a rooftop platform, carving white arcs through the Basin haze. The lights advertise nothing specific. They exist to remind the skyline that something is happening down here."
     zone_slug: the-strip
     room_type: standard
 
@@ -1220,7 +1220,7 @@ rooms:
 
   - name: "Writer's Room"
     slug: writers-room
-    description: "A windowless conference room with a long table buried under scripts, notecards, and empty takeout containers. A whiteboard covers one wall, dense with story arcs in three colors of marker. The room smells like stale coffee and desperation. ---"
+    description: "A windowless conference room with a long table buried under scripts, notecards, and empty takeout containers. A whiteboard covers one wall, dense with story arcs in three colors of marker. The room smells like stale coffee and desperation."
     zone_slug: studio-row
     room_type: standard
 
@@ -1292,7 +1292,7 @@ rooms:
 
   - name: "Tour Route"
     slug: tour-route
-    description: "A designated path through the lot marked with ropes and signage, guiding visitors past carefully selected points of interest. The route avoids anything genuinely operational. What the tour shows is another production in itself. ---"
+    description: "A designated path through the lot marked with ropes and signage, guiding visitors past carefully selected points of interest. The route avoids anything genuinely operational. What the tour shows is another production in itself."
     zone_slug: the-lot
     room_type: standard
 
@@ -1364,7 +1364,7 @@ rooms:
 
   - name: "Tear-Down"
     slug: tear-down
-    description: "A section of the backlot where decommissioned sets are dismantled and sorted for salvage or disposal. Walls lean against each other in stacks, their painted surfaces facing outward like postcards from places that never existed. The dumpsters here are full of someone's vision. ---"
+    description: "A section of the backlot where decommissioned sets are dismantled and sorted for salvage or disposal. Walls lean against each other in stacks, their painted surfaces facing outward like postcards from places that never existed. The dumpsters here are full of someone's vision."
     zone_slug: the-backlot
     room_type: standard
 
@@ -1436,7 +1436,7 @@ rooms:
 
   - name: "Traffic Light"
     slug: traffic-light
-    description: "An intersection controlled by a signal that cycles through its colors for no one in particular. The crosswalk lines have faded to ghosts on the asphalt. During rush hour, the light creates a brief gathering of strangers who will never acknowledge each other. ---"
+    description: "An intersection controlled by a signal that cycles through its colors for no one in particular. The crosswalk lines have faded to ghosts on the asphalt. During rush hour, the light creates a brief gathering of strangers who will never acknowledge each other."
     zone_slug: the-sprawl
     room_type: standard
 
@@ -1508,7 +1508,7 @@ rooms:
 
   - name: "Hilltop View"
     slug: hilltop-view
-    description: "A vantage point at the road's highest elevation, where the entire basin opens up below in a panorama of rooftops, palms, and distant mountains. The air is clearer up here, the heat less oppressive. Even the RIDE looks beautiful from this distance. ---"
+    description: "A vantage point at the road's highest elevation, where the entire basin opens up below in a panorama of rooftops, palms, and distant mountains. The air is clearer up here, the heat less oppressive. Even the basin's glow looks beautiful from this distance."
     zone_slug: palm-line
     room_type: standard
 
@@ -1580,7 +1580,7 @@ rooms:
 
   - name: "The Office"
     slug: the-office
-    description: "A windowless room on the second floor, furnished with a desk, a safe, and a bank of security monitors. The room is soundproofed against the bass from below. Whatever happens on the floor, the decisions that shape it are made here. ---"
+    description: "A windowless room on the second floor, furnished with a desk, a safe, and a bank of security monitors. The room is soundproofed against the bass from below. Whatever happens on the floor, the decisions that shape it are made here."
     zone_slug: the-velvet-room
     room_type: standard
 
@@ -1652,7 +1652,7 @@ rooms:
 
   - name: "Last Call"
     slug: last-call
-    description: "The rooftop in the final hour before closing, the crowd thinned and the music fading. The bartenders begin to consolidate bottles. The city below continues without pause, indifferent to the small civilization winding down above it. ---"
+    description: "The rooftop in the final hour before closing, the crowd thinned and the music fading. The bartenders begin to consolidate bottles. The city below continues without pause, indifferent to the small civilization winding down above it."
     zone_slug: skybar
     room_type: standard
 
@@ -1724,7 +1724,7 @@ rooms:
 
   - name: "Street Entrance"
     slug: street-entrance
-    description: "A minimalist glass door at street level, marked only by a small plaque with the gallery name. The understatement is intentional, a signal that if you need to be told what this place is, it may not be for you. The door is always unlocked during hours. ---"
+    description: "A minimalist glass door at street level, marked only by a small plaque with the gallery name. The understatement is intentional, a signal that if you need to be told what this place is, it may not be for you. The door is always unlocked during hours."
     zone_slug: the-gallery
     room_type: standard
 
@@ -1796,7 +1796,7 @@ rooms:
 
   - name: "Dog Walk"
     slug: dog-walk
-    description: "A stretch of the perimeter path where dog owners cluster in the early morning and late afternoon, their animals pulling at leashes or running off them. Plastic bag dispensers are mounted on posts at each end. The grass beside the path is worn to dirt. ---"
+    description: "A stretch of the perimeter path where dog owners cluster in the early morning and late afternoon, their animals pulling at leashes or running off them. Plastic bag dispensers are mounted on posts at each end. The grass beside the path is worn to dirt."
     zone_slug: the-reservoir
     room_type: standard
 
@@ -1868,7 +1868,7 @@ rooms:
 
   - name: "The Channel"
     slug: the-channel
-    description: "The aqueduct's final stretch before it reaches the treatment facility, running straight and deep between featureless walls. The scale of the channel dwarfs anything walking through it. The sky above is a narrow strip between concrete edges. ---"
+    description: "The aqueduct's final stretch before it reaches the treatment facility, running straight and deep between featureless walls. The scale of the channel dwarfs anything walking through it. The sky above is a narrow strip between concrete edges."
     zone_slug: the-aqueduct
     room_type: standard
 
@@ -1940,7 +1940,7 @@ rooms:
 
   - name: "The Turn"
     slug: the-turn
-    description: "A bend in the channel where the navigable route shifts direction, marked by buoys and range markers. The current pushes against vessel hulls at the turn, requiring correction. Pilots earn their pay at this point. ---"
+    description: "A bend in the channel where the navigable route shifts direction, marked by buoys and range markers. The current pushes against vessel hulls at the turn, requiring correction. Pilots earn their pay at this point."
     zone_slug: the-channel
     room_type: standard
 
@@ -2012,7 +2012,7 @@ rooms:
 
   - name: "Creosote Flat"
     slug: creosote-flat
-    description: "An expanse of evenly spaced bushes stretches to the horizon, each plant maintaining its territory through chemical warfare in the soil. The smell after rain is sharp and resinous, one of the few honest scents left in the Basin. Most days, it just smells like heat. ---"
+    description: "An expanse of evenly spaced bushes stretches to the horizon, each plant maintaining its territory through chemical warfare in the soil. The smell after rain is sharp and resinous, one of the few honest scents left in the Basin. Most days, it just smells like heat."
     zone_slug: desert-edge
     room_type: standard
 
@@ -2084,7 +2084,7 @@ rooms:
 
   - name: "The Furnace"
     slug: the-furnace
-    description: "A dead-end alley between a bakery exhaust and a laundromat vent, where the combined heat output creates a microclimate ten to fifteen degrees above the surrounding area. Nothing grows here. The concrete has darkened to the color of ash. Even the rats avoid it at midday. ---"
+    description: "A dead-end alley between a bakery exhaust and a laundromat vent, where the combined heat output creates a microclimate ten to fifteen degrees above the surrounding area. Nothing grows here. The concrete has darkened to the color of ash. Even the rats avoid it at midday."
     zone_slug: heat-sink
     room_type: standard
 
@@ -2108,7 +2108,7 @@ rooms:
 
   - name: "Broadcast Booth"
     slug: broadcast-booth
-    description: "A converted utility closet reinforced with soundproofing foam and scavenged acoustic tile. A mixing board and transmitter occupy a steel shelf bolted to the wall. The signal reaches the surface through wiring threaded up through three levels of infrastructure. The booth smells of solder and damp concrete."
+    description: "A converted utility closet reinforced with soundproofing foam and scavenged acoustic tile. A mixing board and transmitter occupy a steel shelf bolted to the wall. The broadcast reaches the surface through wiring threaded up through three levels of infrastructure. The booth smells of solder and damp concrete."
     zone_slug: the-undercity
     room_type: standard
 
@@ -2804,7 +2804,7 @@ rooms:
 
   - name: "Glass Bridge"
     slug: glass-bridge
-    description: "A pedestrian span arcs over the waterfront road, its transparent floor showing traffic below. Rain collects in the slight curve of the glass panels, distorting the headlights underneath. The bridge connects the market district to the observation wheel platform. ---"
+    description: "A pedestrian span arcs over the waterfront road, its transparent floor showing traffic below. Rain collects in the slight curve of the glass panels, distorting the headlights underneath. The bridge connects the market district to the observation wheel platform."
     zone_slug: the-waterfront
     room_type: standard
 
@@ -2876,7 +2876,7 @@ rooms:
 
   - name: "Rainy Corner"
     slug: rainy-corner
-    description: "The intersection where two commercial streets meet at an angle, creating a triangular plaza. An awning over the corner cafe extends just far enough to shelter four outdoor tables. Pedestrians cross in clusters between light changes, umbrellas bumping. ---"
+    description: "The intersection where two commercial streets meet at an angle, creating a triangular plaza. An awning over the corner cafe extends just far enough to shelter four outdoor tables. Pedestrians cross in clusters between light changes, umbrellas bumping."
     zone_slug: the-pearl
     room_type: standard
 
@@ -2948,7 +2948,7 @@ rooms:
 
   - name: "Last Set"
     slug: last-set
-    description: "The final hour of a show, when the crowd has thinned and the band plays loose. Spilled beer dries tacky on the floor, and the bartender starts wiping down. The energy shifts from performance to something more like conversation. ---"
+    description: "The final hour of a show, when the crowd has thinned and the band plays loose. Spilled beer dries tacky on the floor, and the bartender starts wiping down. The energy shifts from performance to something more like conversation."
     zone_slug: vinyl-row
     room_type: standard
 
@@ -3020,7 +3020,7 @@ rooms:
 
   - name: "Driftwood Art"
     slug: driftwood-art
-    description: "Sculptures assembled from beach debris occupy a roped-off section of the boardwalk — twisted wood, sea glass, rusted hardware shaped into figures and abstractions. A hand-painted sign credits no one, just reads \"from the sea.\" New pieces appear; old ones disappear. ---"
+    description: "Sculptures assembled from beach debris occupy a roped-off section of the boardwalk — twisted wood, sea glass, rusted hardware shaped into figures and abstractions. A hand-painted sign credits no one, just reads \"from the sea.\" New pieces appear; old ones disappear."
     zone_slug: the-boardwalk
     room_type: standard
 
@@ -3092,7 +3092,7 @@ rooms:
 
   - name: "Loading Zone"
     slug: loading-zone
-    description: "A service alley behind the market stalls where delivery trucks idle and vendors haul crates on hand trucks. Broken pallets and flattened boxes stack against the wall. The pavement here is always wet, stained with produce runoff and motor oil. ---"
+    description: "A service alley behind the market stalls where delivery trucks idle and vendors haul crates on hand trucks. Broken pallets and flattened boxes stack against the wall. The pavement here is always wet, stained with produce runoff and motor oil."
     zone_slug: the-market
     room_type: standard
 
@@ -3164,7 +3164,7 @@ rooms:
 
   - name: "Open Air"
     slug: open-air
-    description: "A clearing at the facility's edge where the engineered acoustics surrender to the forest. The canopy opens slightly, admitting rain and the ambient sound of wind through old-growth evergreens. Performers sometimes play here to hear their work stripped of all architectural enhancement. ---"
+    description: "A clearing at the facility's edge where the engineered acoustics surrender to the forest. The canopy opens slightly, admitting rain and the ambient sound of wind through old-growth evergreens. Performers sometimes play here to hear their work stripped of all architectural enhancement."
     zone_slug: frequency-gardens
     room_type: standard
 
@@ -3236,7 +3236,7 @@ rooms:
 
   - name: "Animal Path"
     slug: animal-path
-    description: "A narrow trail worn through the undergrowth by repeated passage — deer, most likely, given the height of the clearance. The path follows the path of least resistance, contouring around logs and through gaps. Tracks pressed into the mud are fresh, half-filled with rain. ---"
+    description: "A narrow trail worn through the undergrowth by repeated passage — deer, most likely, given the height of the clearance. The path follows the path of least resistance, contouring around logs and through gaps. Tracks pressed into the mud are fresh, half-filled with rain."
     zone_slug: the-understory
     room_type: standard
 
@@ -3308,7 +3308,7 @@ rooms:
 
   - name: "The Gorge"
     slug: the-gorge
-    description: "The creek drops through a narrow slot in the rock below the bridge, the walls vertical and close. The sound amplifies in the confined space, a low roar disproportionate to the water's volume. Mist rises from the turbulence and drifts across the bridge above. ---"
+    description: "The creek drops through a narrow slot in the rock below the bridge, the walls vertical and close. The sound amplifies in the confined space, a low roar disproportionate to the water's volume. Mist rises from the turbulence and drifts across the bridge above."
     zone_slug: moss-bridge
     room_type: standard
 
@@ -3380,7 +3380,7 @@ rooms:
 
   - name: "Hollow Core"
     slug: hollow-core
-    description: "The very center of the tree, where the oldest wood has completely decomposed, leaving empty space. The air here is still and cool, insulated by the surrounding trunk. Sound from outside is reduced to a distant murmur, the cedar walls absorbing everything. ---"
+    description: "The very center of the tree, where the oldest wood has completely decomposed, leaving empty space. The air here is still and cool, insulated by the surrounding trunk. Sound from outside is reduced to a distant murmur, the cedar walls absorbing everything."
     zone_slug: cedar-hall
     room_type: standard
 
@@ -3452,7 +3452,7 @@ rooms:
 
   - name: "Star Window"
     slug: star-window
-    description: "A view straight up from the clearing's center, unobstructed by canopy. On clear nights — rare in this climate — the sky opens in a circle of stars framed by black treetops. Most nights it shows only the undersides of clouds catching distant light. ---"
+    description: "A view straight up from the clearing's center, unobstructed by canopy. On clear nights — rare in this climate — the sky opens in a circle of stars framed by black treetops. Most nights it shows only the undersides of clouds catching distant light."
     zone_slug: the-clearing
     room_type: standard
 
@@ -3524,7 +3524,7 @@ rooms:
 
   - name: "Above the Trees"
     slug: above-the-trees
-    description: "An exposed ridgeline where the last stunted trees give way to bare rock and alpine scrub. On days when the cloud layer sits below, the forest is invisible beneath a white sea, and peaks rise like dark islands. The sun, when visible here, feels like a different climate entirely. ---"
+    description: "An exposed ridgeline where the last stunted trees give way to bare rock and alpine scrub. On days when the cloud layer sits below, the forest is invisible beneath a white sea, and peaks rise like dark islands. The sun, when visible here, feels like a different climate entirely."
     zone_slug: cloud-line
     room_type: standard
 
@@ -3596,7 +3596,7 @@ rooms:
 
   - name: "The Foundation"
     slug: the-foundation
-    description: "The root plate of the forest itself — the collective anchoring system of hundreds of trees, visible in cross-section along a creek bank's eroded face. Layers of root generation stack in the soil, the oldest dark and compressed, the newest pale and flexible. The entire forest stands on this interlock. ---"
+    description: "The root plate of the forest itself — the collective anchoring system of hundreds of trees, visible in cross-section along a creek bank's eroded face. Layers of root generation stack in the soil, the oldest dark and compressed, the newest pale and flexible. The entire forest stands on this interlock."
     zone_slug: root-system
     room_type: standard
 
@@ -3668,7 +3668,7 @@ rooms:
 
   - name: "Thunder Point"
     slug: thunder-point
-    description: "An overlook where the falls' sound is loudest, the noise reflecting off a concave rock wall and focusing at this spot. Conversation is impossible. The vibration is physical, felt in the sternum, and the mist is dense enough to obscure the falls themselves. ---"
+    description: "An overlook where the falls' sound is loudest, the noise reflecting off a concave rock wall and focusing at this spot. Conversation is impossible. The vibration is physical, felt in the sternum, and the mist is dense enough to obscure the falls themselves."
     zone_slug: the-falls
     room_type: standard
 
@@ -3740,7 +3740,7 @@ rooms:
 
   - name: "Crater Lake"
     slug: crater-lake
-    description: "Deep blue water filling the lowest point of the crater, its color a product of depth and clarity. The lake has no visible inlet or outlet, fed entirely by rain, snowmelt, and subterranean seep. The surface is often perfectly still, reflecting the crater walls like a mirror. ---"
+    description: "Deep blue water filling the lowest point of the crater, its color a product of depth and clarity. The lake has no visible inlet or outlet, fed entirely by rain, snowmelt, and subterranean seep. The surface is often perfectly still, reflecting the crater walls like a mirror."
     zone_slug: the-crater
     room_type: standard
 
@@ -3812,7 +3812,7 @@ rooms:
 
   - name: "Summit Trail"
     slug: summit-trail
-    description: "The final approach to a volcanic peak, traversing exposed rock above treeline. The trail is marked by cairns — stacked stones at irregular intervals, some ancient, some recent. The air thins perceptibly, and the view expands with each switchback until the horizon includes other peaks, other ranges, other weather. ---"
+    description: "The final approach to a volcanic peak, traversing exposed rock above treeline. The trail is marked by cairns — stacked stones at irregular intervals, some ancient, some recent. The air thins perceptibly, and the view expands with each switchback until the horizon includes other peaks, other ranges, other weather."
     zone_slug: timberline
     room_type: standard
 
@@ -3884,7 +3884,7 @@ rooms:
 
   - name: "Silent Floor"
     slug: silent-floor
-    description: "A section of old-growth forest where the duff is so deep and the canopy so complete that ambient sound drops to near nothing. Footsteps make no sound on the compressed needles. The silence is not empty but dense, filled with the absence of wind, traffic, machinery — everything the RIDE usually carries. ---"
+    description: "A section of old-growth forest where the duff is so deep and the canopy so complete that ambient sound drops to near nothing. Footsteps make no sound on the compressed needles. The silence is not empty but dense, filled with the absence of traffic and machinery — everything the RIDE-run city usually carries."
     zone_slug: old-growth
     room_type: standard
 
@@ -4034,7 +4034,7 @@ rooms:
 
   - name: "The Landing"
     slug: the-landing
-    description: "A flat area of packed dirt and rock where the switchback trail levels out after the first major descent. The rim is visible above but already feels remote. RIDE signal is noticeably weaker — colors seem slightly different, sounds slightly sharper."
+    description: "A flat area of packed dirt and rock where the switchback trail levels out after the first major descent. The rim is visible above but already feels remote. RIDE coverage is noticeably weaker — colors seem slightly different, sounds slightly sharper."
     zone_slug: second-terrace
     room_type: standard
 
@@ -4052,7 +4052,7 @@ rooms:
 
   - name: "Relay Station"
     slug: relay-station
-    description: "A small equipment cache bolted to the canyon wall behind a natural rock screen. Signal relay hardware maintains partial RIDE coverage at this depth — enough to function but prone to dropout and distortion. The installation is camouflaged to look like geological survey equipment."
+    description: "A small equipment cache bolted to the canyon wall behind a natural rock screen. Relay hardware maintains partial RIDE coverage at this depth — enough to function but prone to dropout and distortion. The installation is camouflaged to look like geological survey equipment."
     zone_slug: second-terrace
     room_type: standard
 
@@ -4100,7 +4100,7 @@ rooms:
 
   - name: "The Descent"
     slug: second-terrace-the-descent
-    description: "The trail drops steeply through a break in the cliff band, using natural fractures in the rock as steps. The stone changes color with each layer — red to ochre to cream to gray. RIDE signal cuts in and out with every turn, the canyon walls creating interference patterns that shift by the hour."
+    description: "The trail drops steeply through a break in the cliff band, using natural fractures in the rock as steps. The stone changes color with each layer — red to ochre to cream to gray. RIDE coverage cuts in and out with every turn, the canyon walls creating interference patterns that shift by the hour."
     zone_slug: second-terrace
     room_type: standard
 
@@ -4154,7 +4154,7 @@ rooms:
 
   - name: "Wind Cave"
     slug: wind-cave
-    description: "A solution cavity carved into the limestone by millennia of chemical weathering, large enough to stand in. The cave breathes — air moves in and out as atmospheric pressure changes, creating a low sound that is felt more than heard. RIDE signal does not penetrate the rock."
+    description: "A solution cavity carved into the limestone by millennia of chemical weathering, large enough to stand in. The cave breathes — air moves in and out as atmospheric pressure changes, creating a low sound that is felt more than heard. The RIDE field does not penetrate the rock."
     zone_slug: red-ledge
     room_type: standard
 
@@ -4172,7 +4172,7 @@ rooms:
 
   - name: "The View"
     slug: red-ledge-the-view
-    description: "An unobstructed vantage from the Red Ledge looking straight down to the river and straight up to the rim. The full depth of the canyon is visible from this single point — a mile of layered stone compressed into a vertical frame. RIDE signal is fragmentary here, and the colors of the rock seem more saturated than they did above."
+    description: "An unobstructed vantage from the Red Ledge looking straight down to the river and straight up to the rim. The full depth of the canyon is visible from this single point — a mile of layered stone compressed into a vertical frame. RIDE coverage is fragmentary here, and the colors of the rock seem more saturated than they did above."
     zone_slug: red-ledge
     room_type: standard
 
@@ -4202,7 +4202,7 @@ rooms:
 
   - name: "Canyon Floor"
     slug: canyon-floor
-    description: "The flat rock shelf that forms the base of the canyon, carved and polished by the river over geological time. The stone is dark schist, the oldest visible rock — nearly two billion years compressed into this single layer. There is no RIDE signal here. Reality is unmediated and unfiltered."
+    description: "The flat rock shelf that forms the base of the canyon, carved and polished by the river over geological time. The stone is dark schist, the oldest visible rock — nearly two billion years compressed into this single layer. There is no RIDE coverage here. Reality is unmediated and unfiltered."
     zone_slug: river-bottom
     room_type: standard
 
@@ -4244,7 +4244,7 @@ rooms:
 
   - name: "Echo Wall"
     slug: echo-wall
-    description: "A concave section of canyon wall that focuses sound back to a point on the river shore. A whisper aimed at the right angle returns clearly from two hundred feet away. The wall is smooth limestone, polished by ancient floods to an acoustic surface. Down here, with no signal and no filter, the echo is the realest sound there is."
+    description: "A concave section of canyon wall that focuses sound back to a point on the river shore. A whisper aimed at the right angle returns clearly from two hundred feet away. The wall is smooth limestone, polished by ancient floods to an acoustic surface. Down here, with no feed and no filter, the echo is the realest sound there is."
     zone_slug: river-bottom
     room_type: standard
 
@@ -4614,9 +4614,9 @@ rooms:
     zone_slug: flatline
     room_type: standard
 
-  - name: "Dead Signal"
+  - name: "Dead Air"
     slug: dead-signal
-    description: "A transmission tower stands skeletal against the sky, its antenna array intact but receiving nothing. The tower's warning lights are dark. Whatever signal it was built to carry has been absent long enough that the access road to its base has grown over with grass."
+    description: "A transmission tower stands skeletal against the sky, its antenna array intact but receiving nothing. The tower's warning lights are dark. Whatever transmission it was built to carry has been absent long enough that the access road to its base has grown over with grass."
     zone_slug: flatline
     room_type: standard
 
@@ -4646,7 +4646,7 @@ rooms:
 
   - name: "The Static"
     slug: the-static
-    description: "Atmospheric interference creates a low hiss that is not quite silence, filling the space where signal should be. Equipment brought here registers noise on every frequency — random, patternless, without source. The static is not broadcast. It is the sound of nothing arriving."
+    description: "Atmospheric interference creates a low hiss that is not quite silence, filling the space where a broadcast should be. Equipment brought here registers noise on every frequency — random, patternless, without source. The static is not broadcast. It is the sound of nothing arriving."
     zone_slug: flatline
     room_type: standard
 
@@ -4658,13 +4658,13 @@ rooms:
 
   - name: "No Service"
     slug: no-service
-    description: "The last indication of network coverage ended miles back. Here, devices search for signal and find nothing — no tower, no relay, no reflection strong enough to register. The absence is not jamming. There is simply no infrastructure. The Flats forgot this place, or never knew it."
+    description: "The last indication of network coverage ended miles back. Here, devices search for a carrier and find nothing — no tower, no relay, no reflection strong enough to register. The absence is not jamming. There is simply no infrastructure. The Flats forgot this place, or never knew it."
     zone_slug: flatline
     room_type: standard
 
   - name: "The Silence"
     slug: the-silence
-    description: "Without signal, without traffic, without machinery, what remains is the sound of wind over open ground. It is not peaceful — it is the sound of a frequency band with nothing on it. The silence has weight. It presses on the ears like pressure differential."
+    description: "Without transmission, without traffic, without machinery, what remains is the sound of wind over open ground. It is not peaceful — it is the sound of a frequency band with nothing on it. The silence has weight. It presses on the ears like pressure differential."
     zone_slug: flatline
     room_type: standard
 
@@ -4676,7 +4676,7 @@ rooms:
 
   - name: "Last Light"
     slug: last-light
-    description: "The western edge of Flatline, where the sun sets into an unobstructed horizon and the last light stretches shadows to infinite length. There is nothing beyond this point that the Grid maps or the signal reaches. The light lingers here longer than it should, as if it too has nowhere further to go."
+    description: "The western edge of Flatline, where the sun sets into an unobstructed horizon and the last light stretches shadows to infinite length. There is nothing beyond this point that the Grid maps or any broadcast reaches. The light lingers here longer than it should, as if it too has nowhere further to go."
     zone_slug: flatline
     room_type: standard
 
@@ -4712,19 +4712,19 @@ rooms:
 
   - name: "Reality Seam"
     slug: reality-seam
-    description: "Two versions of the same ridgeline overlap at slightly different angles. The ground holds boot prints that fill with dust and then un-fill. Equipment readings spin without cause."
+    description: "The RIDE's ridgeline hangs offset above the real one, at a slightly wrong angle. The ground holds boot prints that fill with dust and then un-fill. Equipment readings spin without cause."
     zone_slug: the-fault-line
     room_type: standard
 
   - name: "The Gradient"
     slug: the-fault-line-the-gradient
-    description: "The transition happens in degrees — stable ground fading through static into raw noise. Compass needles drift in lazy circles. The temperature changes three times in ten meters."
+    description: "The transition happens in degrees — the overlay fading through static into raw noise. Compass needles drift in lazy circles. The temperature changes three times in ten meters."
     zone_slug: the-fault-line
     room_type: standard
 
-  - name: "Signal Break"
+  - name: "Transmission Break"
     slug: signal-break
-    description: "Transmission equipment on both sides has burned through this corridor, leaving a strip of dead air. Nothing renders here — not GovCorp's version, not anyone else's. Just rock, wind, and the actual sky."
+    description: "Transmission equipment on both sides has burned through this corridor, leaving a strip of dead air. No overlay reaches here — not GovCorp's, not anyone's. Just rock, wind, and the actual sky."
     zone_slug: the-fault-line
     room_type: standard
 
@@ -4736,19 +4736,19 @@ rooms:
 
   - name: "The Overlap"
     slug: the-overlap
-    description: "Two competing signal fields crash into each other and neither wins. The landscape strobes between versions — mountain meadow, then bare scree, then meadow again. Standing still is the only sane option."
+    description: "Two competing transmission fields crash into each other and neither wins. The overlay strobes over the real meadow — bare scree flickering across it, then gone, then back again. Standing still is the only sane option."
     zone_slug: the-fault-line
     room_type: standard
 
   - name: "Raw Terrain"
     slug: raw-terrain
-    description: "Past the last interference pattern, the land just exists. No rendering, no correction, no signal of any kind. Bare granite and alpine scrub under a sky that looks somehow more blue than it should."
+    description: "Past the last interference pattern, the land just exists. No overlay, no correction, no broadcast of any kind. Bare granite and alpine scrub under a sky that looks somehow more blue than it should."
     zone_slug: the-fault-line
     room_type: standard
 
   - name: "The Edge"
     slug: the-edge
-    description: "The boundary where interference ends and clean mountain begins. One step back and the air hums with competing signals. One step forward and there is nothing but wind and stone and silence."
+    description: "The boundary where interference ends and clean mountain begins. One step back and the air hums with competing transmissions. One step forward and there is nothing but wind and stone and silence."
     zone_slug: the-fault-line
     room_type: standard
 
@@ -6650,13 +6650,13 @@ rooms:
 
   - name: "Broadcast Suite"
     slug: broadcast-suite
-    description: "Acoustic foam lines the walls, and a transmission rig occupies the far corner — antenna cables running up through the ceiling to the roof. This is where the signal goes out. The equipment is mismatched, scavenged, rebuilt, but XERAEN has tuned it into something that works."
+    description: "Acoustic foam lines the walls, and a transmission rig occupies the far corner — antenna cables running up through the ceiling to the roof. This is where the broadcast goes out. The equipment is mismatched, scavenged, rebuilt, but XERAEN has tuned it into something that works."
     zone_slug: sector-x
     room_type: standard
 
   - name: "Equipment Bay"
     slug: equipment-bay
-    description: "Metal shelving units stocked with components, tools, backup hardware, and spare cable in organized bins. Everything labeled in XERAEN's hand. A soldering station occupies one workbench, a signal analyzer the other. The overhead fluorescent has been replaced with a directional LED that doesn't leak light through the windows."
+    description: "Metal shelving units stocked with components, tools, backup hardware, and spare cable in organized bins. Everything labeled in XERAEN's hand. A soldering station occupies one workbench, a spectrum analyzer the other. The overhead fluorescent has been replaced with a directional LED that doesn't leak light through the windows."
     zone_slug: sector-x
     room_type: standard
 
@@ -6674,7 +6674,7 @@ rooms:
 
   - name: "The Vault"
     slug: sector-x-the-vault
-    description: "A repurposed industrial safe room with walls thick enough to block signal in both directions. Sensitive materials are stored here — physical drives, printed documents, anything too dangerous to keep on a networked system. The door requires a combination known to two people."
+    description: "A repurposed industrial safe room with walls thick enough to block transmission in both directions. Sensitive materials are stored here — physical drives, printed documents, anything too dangerous to keep on a networked system. The door requires a combination known to two people."
     zone_slug: sector-x
     room_type: standard
 
@@ -8276,7 +8276,7 @@ rooms:
 
   - name: "Power Lunch"
     slug: power-lunch
-    description: "A restaurant occupying the northeast corner of the forty-second floor, every table positioned for a harbor view. White tablecloths, heavy silverware, no music. Conversations happen at volumes calibrated so that neighboring tables hear the cadence but not the content. ---"
+    description: "A restaurant occupying the northeast corner of the forty-second floor, every table positioned for a harbor view. White tablecloths, heavy silverware, no music. Conversations happen at volumes calibrated so that neighboring tables hear the cadence but not the content."
     zone_slug: the-exchange
     room_type: standard
 
@@ -8348,7 +8348,7 @@ rooms:
 
   - name: "Tower Shadow"
     slug: midtown-tower-shadow
-    description: "The northwest corner of the block sits in permanent shadow cast by the tallest building in the district. Even at midday, the temperature drops three degrees at the shadow line. Vendors on the shaded side wear heavier coats than those ten meters away in the sun. ---"
+    description: "The northwest corner of the block sits in permanent shadow cast by the tallest building in the district. Even at midday, the temperature drops three degrees at the shadow line. Vendors on the shaded side wear heavier coats than those ten meters away in the sun."
     zone_slug: midtown
     room_type: standard
 
@@ -8420,7 +8420,7 @@ rooms:
 
   - name: "After Party"
     slug: after-party
-    description: "A rooftop terrace accessible only through the theater's back stairwell, furnished with mismatched chairs and string lights that were temporary a decade ago. The view faces east over the harbor. Bottles accumulate on every flat surface by the end of the night, and the conversations run until the sky grays. ---"
+    description: "A rooftop terrace accessible only through the theater's back stairwell, furnished with mismatched chairs and string lights that were temporary a decade ago. The view faces east over the harbor. Bottles accumulate on every flat surface by the end of the night, and the conversations run until the sky grays."
     zone_slug: the-marquee
     room_type: standard
 
@@ -8492,13 +8492,13 @@ rooms:
 
   - name: "Park Bench"
     slug: the-green-park-bench
-    description: "A wooden bench with iron armrests facing a grove of old oaks, set back from the main path where foot traffic fades to nothing. The slats are weathered pale and carved with initials layered over initials. From here, the city is just a hum behind the trees, almost ignorable. ---"
+    description: "A wooden bench with iron armrests facing a grove of old oaks, set back from the main path where foot traffic fades to nothing. The slats are weathered pale and carved with initials layered over initials. From here, the city is just a hum behind the trees, almost ignorable."
     zone_slug: the-green
     room_type: standard
 
   - name: "Neon Arcade"
     slug: neon-arcade
-    description: "Rows of game cabinets flash in competing colors, their screens cycling attract modes to an empty room that won't fill until after midnight. The carpet is dark enough to hide everything. Somewhere in the back, past the visible machines, the layout stops making sense — too many turns for the building's footprint."
+    description: "Rows of game cabinets flash in competing colors, their screens cycling attract modes to an empty room that won't fill until after midnight. The carpet is dark enough to hide everything. Somewhere in the back, past the visible machines, the layout turns maze-like — easy to lose count of the turns."
     zone_slug: neon-district
     room_type: standard
 
@@ -8564,7 +8564,7 @@ rooms:
 
   - name: "Black Light Lounge"
     slug: black-light-lounge
-    description: "Ultraviolet fixtures strip the room of its natural palette and replace it with phosphorescent blues and purples. White clothing blazes. Teeth glow. Drinks in certain glasses emit light. The furniture is low and dark, arranged in clusters that create private spaces within the larger room. Whatever this place looks like in daylight, nobody has seen it. ---"
+    description: "Ultraviolet fixtures strip the room of its natural palette and replace it with phosphorescent blues and purples. White clothing blazes. Teeth glow. Drinks in certain glasses emit light. The furniture is low and dark, arranged in clusters that create private spaces within the larger room. Whatever this place looks like in daylight, nobody has seen it."
     zone_slug: neon-district
     room_type: standard
 
@@ -8636,7 +8636,7 @@ rooms:
 
   - name: "Sky Garden"
     slug: sky-garden
-    description: "A rooftop converted to green space, its perimeter walls high enough to block the wind but low enough to preserve the skyline view. Raised beds hold ornamental grasses and small trees that have been shaped by persistent harbor gusts into permanent leans. Benches face outward toward the water. ---"
+    description: "A rooftop converted to green space, its perimeter walls high enough to block the wind but low enough to preserve the skyline view. Raised beds hold ornamental grasses and small trees that have been shaped by persistent harbor gusts into permanent leans. Benches face outward toward the water."
     zone_slug: the-heights
     room_type: standard
 
@@ -8708,7 +8708,7 @@ rooms:
 
   - name: "Sunset View"
     slug: the-rooftop-sunset-view
-    description: "The western edge of the roof, where the parapet meets a wider observation area paved in concrete. From here, the sun drops behind the skyline of the adjacent peninsula, turning the harbor water orange and black. The wind dies at this hour, and the city's hum settles into a lower register. ---"
+    description: "The western edge of the roof, where the parapet meets a wider observation area paved in concrete. From here, the sun drops behind the skyline of the adjacent peninsula, turning the harbor water orange and black. The wind dies at this hour, and the city's hum settles into a lower register."
     zone_slug: the-rooftop
     room_type: standard
 
@@ -8780,7 +8780,7 @@ rooms:
 
   - name: "The Pylon"
     slug: the-pylon
-    description: "A support column rising from the water to the bridge deck, its concrete surface crusted with barnacles to the tide line and stained green above it. A ladder of corroded rungs runs up one face, ending at an inspection hatch that hasn't been opened in years. Waves slap against the base in irregular rhythms. ---"
+    description: "A support column rising from the water to the bridge deck, its concrete surface crusted with barnacles to the tide line and stained green above it. A ladder of corroded rungs runs up one face, ending at an inspection hatch that hasn't been opened in years. Waves slap against the base in irregular rhythms."
     zone_slug: the-span
     room_type: standard
 
@@ -8852,7 +8852,7 @@ rooms:
 
   - name: "Still Water"
     slug: still-water
-    description: "A dead-end branch of the canal where the flow ceases entirely, the water so motionless it holds a perfect reflection of the buildings overhead. The surface is dark and glassy, broken only by the occasional ring of an insect touching down. The air here is cooler and smells of wet stone. ---"
+    description: "A dead-end branch of the canal where the flow ceases entirely, the water so motionless it holds a perfect reflection of the buildings overhead. The surface is dark and glassy, broken only by the occasional ring of an insect touching down. The air here is cooler and smells of wet stone."
     zone_slug: canal-walk
     room_type: standard
 
@@ -8924,7 +8924,7 @@ rooms:
 
   - name: "Old Dry Dock"
     slug: old-dry-dock
-    description: "A rectangular basin cut into the waterfront, its walls of fitted stone descending six meters to a floor of cracked concrete. The dock gates are jammed in the open position, and harbor water fills it to within a meter of the rim. Rust stains run down the walls from iron fittings that once held ships in place. ---"
+    description: "A rectangular basin cut into the waterfront, its walls of fitted stone descending six meters to a floor of cracked concrete. The dock gates are jammed in the open position, and harbor water fills it to within a meter of the rim. Rust stains run down the walls from iron fittings that once held ships in place."
     zone_slug: the-wharf
     room_type: standard
 
@@ -8996,7 +8996,7 @@ rooms:
 
   - name: "Cold Current"
     slug: cold-current
-    description: "A temperature boundary where the deep harbor water meets the warmer outflow from the river, visible as a slight color difference on the surface. The colder water is darker, clearer. Where the two meet, the surface dimples and swirls in patterns that shift with the tide. The air above it drops five degrees. ---"
+    description: "A temperature boundary where the deep harbor water meets the warmer outflow from the river, visible as a slight color difference on the surface. The colder water is darker, clearer. Where the two meet, the surface dimples and swirls in patterns that shift with the tide. The air above it drops five degrees."
     zone_slug: harbor-deep
     room_type: standard
 
@@ -9068,7 +9068,7 @@ rooms:
 
   - name: "Sunset Point"
     slug: pier-41-sunset-point
-    description: "The pier's western railing at its farthest extension, where the view opens past the harbor mouth to the horizon. In the hour before dark, light comes in horizontal and turns the water into hammered metal. Spectators line the rail three deep on clear evenings, cameras raised, mostly silent. ---"
+    description: "The pier's western railing at its farthest extension, where the view opens past the harbor mouth to the horizon. In the hour before dark, light comes in horizontal and turns the water into hammered metal. Spectators line the rail three deep on clear evenings, cameras raised, mostly silent."
     zone_slug: pier-41
     room_type: standard
 
@@ -9140,7 +9140,7 @@ rooms:
 
   - name: "Mud Flat"
     slug: tidewater-mud-flat
-    description: "At low tide, an expanse of gray mud stretches from the seawall to the water's edge, its surface pocked with worm casts and bubbling with trapped gas. The footing is treacherous — solid-looking surface giving way to knee-deep muck without warning. The smell is anaerobic, dense, and ancient. ---"
+    description: "At low tide, an expanse of gray mud stretches from the seawall to the water's edge, its surface pocked with worm casts and bubbling with trapped gas. The footing is treacherous — solid-looking surface giving way to knee-deep muck without warning. The smell is anaerobic, dense, and ancient."
     zone_slug: tidewater
     room_type: standard
 
@@ -9212,7 +9212,7 @@ rooms:
 
   - name: "The Battlement"
     slug: the-battlement
-    description: "The fort's highest point, a narrow platform atop the main tower accessible by a spiral stair worn concave at each step. The wind is constant here, strong enough to lean into. The view extends past the harbor to the open ocean, and on clear days the curve of the coastline is visible in both directions. ---"
+    description: "The fort's highest point, a narrow platform atop the main tower accessible by a spiral stair worn concave at each step. The wind is constant here, strong enough to lean into. The view extends past the harbor to the open ocean, and on clear days the curve of the coastline is visible in both directions."
     zone_slug: the-battery
     room_type: standard
 
@@ -9284,7 +9284,7 @@ rooms:
 
   - name: "The Dead Stop"
     slug: the-dead-stop
-    description: "A concrete barrier at the end of a truncated track, its face scarred by buffer impacts. The rails end three meters short of it, cut and capped. Beyond the barrier, the tunnel wall is raw stone — this is where the excavation stopped, the extension never completed, the passage ending in solid rock. ---"
+    description: "A concrete barrier at the end of a truncated track, its face scarred by buffer impacts. The rails end three meters short of it, cut and capped. Beyond the barrier, the tunnel wall is raw stone — this is where the excavation stopped, the extension never completed, the passage ending in solid rock."
     zone_slug: the-tunnel
     room_type: standard
 
@@ -9428,7 +9428,7 @@ rooms:
 
   - name: "Observation Floor"
     slug: observation-floor
-    description: "The highest occupied floor in Tower Row, above the Sky Lounge and below the mechanical level. Coin-operated telescopes line the windows, though most visitors just press their faces to the glass. The river bends south from here, and on the eastern bluffs the broadcast towers are visible — including one that does not appear on any GovCorp registry. ---"
+    description: "The highest occupied floor in Tower Row, above the Sky Lounge and below the mechanical level. Coin-operated telescopes line the windows, though most visitors just press their faces to the glass. The river bends south from here, and on the eastern bluffs the broadcast towers are visible — including one that does not appear on any GovCorp registry."
     zone_slug: tower-row
     room_type: standard
 
@@ -9500,7 +9500,7 @@ rooms:
 
   - name: "Iron Stairs"
     slug: iron-stairs
-    description: "A narrow interior stairwell with cast-iron railings worn smooth by decades of hands. The treads are original wood, creaking with each step. Light enters from a single window on each landing, thickened by dust. The building's age shows in the settling — every door frame is slightly off-square. ---"
+    description: "A narrow interior stairwell with cast-iron railings worn smooth by decades of hands. The treads are original wood, creaking with each step. Light enters from a single window on each landing, thickened by dust. The building's age shows in the settling — every door frame is slightly off-square."
     zone_slug: the-loft-district
     room_type: standard
 
@@ -9572,7 +9572,7 @@ rooms:
 
   - name: "After Hours"
     slug: after-hours
-    description: "A locked door at the end of a hallway past a kitchen that closes at two. Inside, the room is small and the lighting is red and the music is whatever the DJ brought on a personal drive. No sign, no listing, no Cultural Zone programming. The crowd here knows the door code because someone trusted them with it. ---"
+    description: "A locked door at the end of a hallway past a kitchen that closes at two. Inside, the room is small and the lighting is red and the music is whatever the DJ brought on a personal drive. No sign, no listing, no Cultural Zone programming. The crowd here knows the door code because someone trusted them with it."
     zone_slug: prospect-row
     room_type: standard
 
@@ -9620,13 +9620,13 @@ rooms:
 
   - name: "Broadcast Room"
     slug: broadcast-room
-    description: "The nerve center of Ryker's operation, sealed behind a reinforced door. Transmission equipment lines the walls — some of it modified GovCorp hardware, some of it built from scratch. A red indicator light confirms when a broadcast is live, pushing signal through routing paths that change with every transmission. This is where The WIRE originates."
+    description: "The nerve center of Ryker's operation, sealed behind a reinforced door. Transmission equipment lines the walls — some of it modified GovCorp hardware, some of it built from scratch. A red indicator light confirms when a broadcast is live, pushing the broadcast through routing paths that change with every transmission. This is where The WIRE originates."
     zone_slug: hackr-hangar
     room_type: standard
 
   - name: "Server Rack"
     slug: server-rack
-    description: "A temperature-controlled alcove behind the broadcast room, humming with processing hardware mounted in industrial racks. The servers handle signal encryption, stream routing, and the computational load of staying invisible on a network GovCorp believes it fully controls. A dedicated cooling unit keeps the air ten degrees below the rest of the building."
+    description: "A temperature-controlled alcove behind the broadcast room, humming with processing hardware mounted in industrial racks. The servers handle transmission encryption, stream routing, and the computational load of staying invisible on a network GovCorp believes it fully controls. A dedicated cooling unit keeps the air ten degrees below the rest of the building."
     zone_slug: hackr-hangar
     room_type: standard
 
@@ -9644,7 +9644,7 @@ rooms:
 
   - name: "Roof Antenna"
     slug: roof-antenna
-    description: "A cluster of antenna arrays mounted on the hangar's flat roof, disguised within a larger array of climate-system hardware and ventilation units. The main transmission mast is indistinguishable from a standard commercial antenna unless you know the frequency it carries. From the roof, the river is visible to the west and the lights of Tower Row glow to the north. ---"
+    description: "A cluster of antenna arrays mounted on the hangar's flat roof, disguised within a larger array of climate-system hardware and ventilation units. The main transmission mast is indistinguishable from a standard commercial antenna unless you know the frequency it carries. From the roof, the river is visible to the west and the lights of Tower Row glow to the north."
     zone_slug: hackr-hangar
     room_type: standard
 
@@ -9710,13 +9710,13 @@ rooms:
 
   - name: "Faraday Booth"
     slug: faraday-booth
-    description: "One of several enclosed booths along the underground level's perimeter, each wrapped in copper mesh that blocks all wireless signal. Inside, conversations happen in complete electronic silence — no monitoring, no recording, no leakage. The booths are funded independently by all four factions, the one piece of infrastructure every corner of the Fracture Network agrees on."
+    description: "One of several enclosed booths along the underground level's perimeter, each wrapped in copper mesh that blocks all wireless transmission. Inside, conversations happen in complete electronic silence — no monitoring, no recording, no leakage. The booths are funded independently by all four factions, the one piece of infrastructure every corner of the Fracture Network agrees on."
     zone_slug: blackshadez
     room_type: standard
 
   - name: "Emergency Tunnel"
     slug: emergency-tunnel
-    description: "A concrete passage leading from the underground level to an exit point two blocks north, emerging through a drainage access in a vacant lot. The tunnel is maintained but unlit — users carry their own light. Dante tests the route monthly. In the event of a raid on the surface club, the underground level can be evacuated in under four minutes. ---"
+    description: "A concrete passage leading from the underground level to an exit point two blocks north, emerging through a drainage access in a vacant lot. The tunnel is maintained but unlit — users carry their own light. Dante tests the route monthly. In the event of a raid on the surface club, the underground level can be evacuated in under four minutes."
     zone_slug: blackshadez
     room_type: standard
 
@@ -9788,7 +9788,7 @@ rooms:
 
   - name: "Back Door"
     slug: back-door
-    description: "A metal door propped open with a cinder block on hot nights, opening onto the gravel lot. The doorframe is dented from years of equipment loads being angled through. Standing in the doorway, the cool of the bar fights the heat of the night, and both lose. ---"
+    description: "A metal door propped open with a cinder block on hot nights, opening onto the gravel lot. The doorframe is dented from years of equipment loads being angled through. Standing in the doorway, the cool of the bar fights the heat of the night, and both lose."
     zone_slug: the-juke
     room_type: standard
 
@@ -9860,7 +9860,7 @@ rooms:
 
   - name: "Wind Ridge"
     slug: wind-ridge
-    description: "The exposed top of the bluff where the trail runs closest to the edge, open to the prevailing wind off the river. Grass and scrub lay flat in the constant push of air. The wind strips the humidity away up here, and on clear days the visibility extends for miles in every direction. The station platform is visible below, and beyond it, the city. ---"
+    description: "The exposed top of the bluff where the trail runs closest to the edge, open to the prevailing wind off the river. Grass and scrub lay flat in the constant push of air. The wind strips the humidity away up here, and on clear days the visibility extends for miles in every direction. The station platform is visible below, and beyond it, the city."
     zone_slug: bluff-station
     room_type: standard
 
@@ -9932,7 +9932,7 @@ rooms:
 
   - name: "The Gangplank"
     slug: the-gangplank
-    description: "A heavy timber ramp connecting the dock to the embankment at a grade steep enough to require cleats nailed into the wood. The gangplank shifts with the river level — higher in spring, lower in late summer when the water drops and the mud banks show. The wood is dark with age and river water and the grain has lifted into splinters. ---"
+    description: "A heavy timber ramp connecting the dock to the embankment at a grade steep enough to require cleats nailed into the wood. The gangplank shifts with the river level — higher in spring, lower in late summer when the water drops and the mud banks show. The wood is dark with age and river water and the grain has lifted into splinters."
     zone_slug: the-landing
     room_type: standard
 
@@ -10004,7 +10004,7 @@ rooms:
 
   - name: "Cistern Well"
     slug: cistern-well
-    description: "A brick-walled cistern sunk into the ground behind the house, its mouth covered by a wooden lid weighted with a stone. The cistern collects rainwater through a gutter system running from the roof. The water inside is dark and cool and tastes of brick and leaf tannin. A hand pump bolted to the rim draws water when the house system fails. ---"
+    description: "A brick-walled cistern sunk into the ground behind the house, its mouth covered by a wooden lid weighted with a stone. The cistern collects rainwater through a gutter system running from the roof. The water inside is dark and cool and tastes of brick and leaf tannin. A hand pump bolted to the rim draws water when the house system fails."
     zone_slug: channel-house
     room_type: standard
 
@@ -10076,7 +10076,7 @@ rooms:
 
   - name: "Pump House"
     slug: pump-house
-    description: "A cinder-block structure at the levee's base on the town side, housing the pumps that move accumulating water over the levee and into the river during flood events. The diesel engines inside are maintained but old, and the building vibrates when they run. A gauge on the exterior wall shows the current water table level. The door is padlocked, the key held by municipal services. ---"
+    description: "A cinder-block structure at the levee's base on the town side, housing the pumps that move accumulating water over the levee and into the river during flood events. The diesel engines inside are maintained but old, and the building vibrates when they run. A gauge on the exterior wall shows the current water table level. The door is padlocked, the key held by municipal services."
     zone_slug: the-levee
     room_type: standard
 
@@ -10148,7 +10148,7 @@ rooms:
 
   - name: "Crawdad Rock"
     slug: crawdad-rock
-    description: "A flat limestone shelf extending into the river from the bank, its surface pocked with small pools where crawfish hide beneath loose stones. The rock is warm in the sun and slick where algae grows near the water line. Kids from the surrounding areas come here to flip rocks and catch crawfish with their hands, carrying them home in buckets. ---"
+    description: "A flat limestone shelf extending into the river from the bank, its surface pocked with small pools where crawfish hide beneath loose stones. The rock is warm in the sun and slick where algae grows near the water line. Kids from the surrounding areas come here to flip rocks and catch crawfish with their hands, carrying them home in buckets."
     zone_slug: rivers-edge
     room_type: standard
 
@@ -10220,7 +10220,7 @@ rooms:
 
   - name: "The Other Side"
     slug: the-other-side
-    description: "The exit point of the Bottleneck passages, opening onto a wider street where the compressed geography finally relents. The change is immediate — light, air movement, the sound of traffic returning. The wall beside the exit is tagged with an arrow pointing back in, and beneath it, a number. The number changes periodically, and the people who use the passage know why. ---"
+    description: "The exit point of the Bottleneck passages, opening onto a wider street where the compressed geography finally relents. The change is immediate — light, air movement, the sound of traffic returning. The wall beside the exit is tagged with an arrow pointing back in, and beneath it, a number. The number changes periodically, and the people who use the passage know why."
     zone_slug: the-bottleneck
     room_type: standard
 
@@ -10292,7 +10292,7 @@ rooms:
 
   - name: "Abandoned Boat"
     slug: abandoned-boat
-    description: "A flat-bottom wooden boat half-sunk in the shallows, its hull rotted through on the downstream side and its interior filled with rainwater and accumulated leaves. The boat has been here long enough for algae to coat the submerged surfaces and for a small tree to root in the sediment inside the hull. The mooring rope, still tied to a bank tree, is green with mold. ---"
+    description: "A flat-bottom wooden boat half-sunk in the shallows, its hull rotted through on the downstream side and its interior filled with rainwater and accumulated leaves. The boat has been here long enough for algae to coat the submerged surfaces and for a small tree to root in the sediment inside the hull. The mooring rope, still tied to a bank tree, is green with mold."
     zone_slug: the-oxbow
     room_type: standard
 
@@ -10364,7 +10364,7 @@ rooms:
 
   - name: "Boot Trap"
     slug: boot-trap
-    description: "A section of path where the mud is deep enough and adhesive enough to pull a boot off a foot, requiring each step to be planned and executed with both hands free. The clay here has a specific consistency — the kind that grips and holds and does not let go without a fight. Locals know the path through. Everyone else learns the hard way. ---"
+    description: "A section of path where the mud is deep enough and adhesive enough to pull a boot off a foot, requiring each step to be planned and executed with both hands free. The clay here has a specific consistency — the kind that grips and holds and does not let go without a fight. Locals know the path through. Everyone else learns the hard way."
     zone_slug: mudwater
     room_type: standard
 
@@ -10436,7 +10436,7 @@ rooms:
 
   - name: "Night Watch"
     slug: cottonmouth-night-watch
-    description: "A clearing on a low rise at Cottonmouth's eastern edge where the tree line thins and the sky opens. The clearing offers sightlines down the road and into the surrounding woods. Someone has placed a camp chair and a fire ring here, used regularly, the ashes fresh. The position is chosen for visibility, and the person who sits here at night is not watching for wildlife. ---"
+    description: "A clearing on a low rise at Cottonmouth's eastern edge where the tree line thins and the sky opens. The clearing offers sightlines down the road and into the surrounding woods. Someone has placed a camp chair and a fire ring here, used regularly, the ashes fresh. The position is chosen for visibility, and the person who sits here at night is not watching for wildlife."
     zone_slug: cottonmouth
     room_type: standard
 
@@ -10838,7 +10838,7 @@ rooms:
 
   - name: "Testing Lab"
     slug: testing-lab
-    description: "Shielded from the rest of the workshop by lead-lined walls, this room houses Cipher's signal testing equipment. Oscilloscopes, spectrum analyzers, and custom-built frequency scanners crowd a central table. Every device the Forge produces passes through here before it leaves."
+    description: "Shielded from the rest of the workshop by lead-lined walls, this room houses Cipher's transmission testing equipment. Oscilloscopes, spectrum analyzers, and custom-built frequency scanners crowd a central table. Every device the Forge produces passes through here before it leaves."
     zone_slug: the-forge
     room_type: standard
 
@@ -10868,7 +10868,7 @@ rooms:
 
   - name: "Secure Storage"
     slug: the-forge-secure-storage
-    description: "A vault door salvaged from a demolished bank seals this room from the rest of the Forge. Inside, finished devices await distribution — transmitters, signal scramblers, encrypted communication rigs. Cipher keeps the only key, and the inventory exists nowhere in writing."
+    description: "A vault door salvaged from a demolished bank seals this room from the rest of the Forge. Inside, finished devices await distribution — transmitters, frequency scramblers, encrypted communication rigs. Cipher keeps the only key, and the inventory exists nowhere in writing."
     zone_slug: the-forge
     room_type: standard
 
@@ -11361,7 +11361,7 @@ rooms:
 
   - name: "Slipstream Gate North"
     slug: canyon-slip-north
-    description: "Behind a geological survey station on the northern rim. The rock walls of the access corridor show layers of geological time — red sandstone, limestone, shale. GovCorp's signal fails at depth; the Network rides that failure."
+    description: "Behind a geological survey station on the northern rim. The rock walls of the access corridor show layers of geological time — red sandstone, limestone, shale. GovCorp's coverage fails at depth; the Network rides that failure."
     zone_slug: the-rim
     room_type: transit
 
@@ -11616,7 +11616,7 @@ rooms:
 
   - name: "Slipstream Gate North"
     slug: hollows-slip-north
-    description: "A service tunnel beneath the rail siding at Coal Run, where the narrow-gauge track connects to standard gauge infrastructure. The corridor climbs through mountain passes toward the harbor city. Signal dies in the hollows."
+    description: "A service tunnel beneath the rail siding at Coal Run, where the narrow-gauge track connects to standard gauge infrastructure. The corridor climbs through mountain passes toward the harbor city. Reception dies in the hollows."
     zone_slug: coal-run
     room_type: transit
 

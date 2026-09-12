@@ -1752,13 +1752,13 @@ namespace :data do
         pulse.assign_attributes(
           pulsed_at: pulsed_at,
           is_seed: true,
-          signal_dropped: attrs["signal_dropped"] || false
+          pulse_dropped: attrs["pulse_dropped"] || false
         )
 
-        if attrs["signal_dropped"]
+        if attrs["pulse_dropped"]
           dropped_at = Time.current
-          dropped_at -= attrs["signal_dropped_hours_ago"].hours if attrs["signal_dropped_hours_ago"]
-          pulse.signal_dropped_at = dropped_at
+          dropped_at -= attrs["pulse_dropped_hours_ago"].hours if attrs["pulse_dropped_hours_ago"]
+          pulse.pulse_dropped_at = dropped_at
         end
 
         # Handle parent pulse (threading)

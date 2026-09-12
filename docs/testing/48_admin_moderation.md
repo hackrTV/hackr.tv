@@ -12,7 +12,7 @@ minutes: 15
 2. Drop a TEST pulse (post one as the operative first). → Public
    `/wire` shows it dropped/hidden per rules, live.
 3. Restore it. → Back publicly.
-4. Signal-drops view: the signal-drop queue/log renders.
+4. Pulse-drops view: the pulse-drop queue/log renders.
 5. Admin-authored pulse via API: `POST /api/admin/pulses` (Bearer). →
    Appears on `/wire` attributed correctly. Splice (thread) endpoint if
    used: spot-check per current workflow.

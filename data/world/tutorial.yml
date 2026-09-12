@@ -322,9 +322,9 @@ mobs:
             factions:
               response: "THE PULSE GRID is contested between the Fracture Network and GovCorp. Your actions build reputation with different factions, unlocking access and opportunities."
         the-grid:
-          response: "THE PULSE GRID is a decentralized network spanning multiple geographic regions. Each region has zones with different danger levels, factions, and resources. The Grid is always watching."
+          response: "THE PULSE GRID is a decentralized network spanning multiple geographic regions. Each region has zones with different danger levels, factions, and resources. GovCorp is always watching."
         fracture:
-          response: "The Fracture Network is a decentralized resistance movement operating within THE PULSE GRID. You're one of us now. We believe information should be free — GovCorp disagrees."
+          response: "The Fracture Network is a decentralized resistance movement operating within THE PULSE GRID. You're one of us now. We believe people deserve what's real — GovCorp disagrees."
         govcorp:
           response: "GovCorp controls the RIDE infrastructure — the augmented reality layer that defines modern life. They see everything. Their RAINN division runs automated network defense. Get caught breaching and you'll see their Perception Alignment Centers firsthand."
 

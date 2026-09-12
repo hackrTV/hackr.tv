@@ -173,9 +173,9 @@ RSpec.describe "BREACH Phase 2B — Encounter Infrastructure" do
       expect(enc.state).to eq("cooldown")
     end
 
-    it "transitions encounter to cooldown on jackout" do
+    it "transitions encounter to cooldown on abort" do
       start_breach!(enc: enc)
-      Grid::BreachService.jackout!(hackr: hackr)
+      Grid::BreachService.abort!(hackr: hackr)
 
       enc.reload
       expect(enc.state).to eq("cooldown")
@@ -260,11 +260,11 @@ RSpec.describe "BREACH Phase 2B — Encounter Infrastructure" do
       expect(log.target).to eq("0")
     end
 
-    it "logs jackout actions" do
-      Grid::BreachService.jackout!(hackr: hackr)
+    it "logs abort actions" do
+      Grid::BreachService.abort!(hackr: hackr)
 
       log = GridHackrBreachLog.last
-      expect(log.action_type).to eq("jackout")
+      expect(log.action_type).to eq("abort")
       expect(log.result["clean"]).to be true
     end
 

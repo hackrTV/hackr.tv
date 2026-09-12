@@ -82,8 +82,8 @@ RSpec.describe "Api::Admin::Pulses", type: :request do
       expect(body["pulse"]["thread_root_id"]).to eq(parent.id)
     end
 
-    it "rejects splice to signal-dropped pulse" do
-      parent.signal_drop!
+    it "rejects splice to pulse-dropped pulse" do
+      parent.pulse_drop!
 
       post "/api/admin/pulses/splice",
         params: {parent_pulse_id: parent.id, content: "Reply"},

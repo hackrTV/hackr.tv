@@ -15,7 +15,7 @@ hackr_logs:
 
       And Nathan.
 
-      Nathan Clarke is an engineer. I know this because everything he writes betrays it — the way he approaches the signal not as a mystery but as a system to be decoded. Where Mel saw intention and meaning, Nathan saw transport headers and codec architecture. Both right. Both necessary. But Nathan's mind works in proofs.
+      Nathan Clarke is an engineer. I know this because everything he writes betrays it — the way he approaches the transmission not as a mystery but as a system to be decoded. Where Mel saw intention and meaning, Nathan saw transport headers and codec architecture. Both right. Both necessary. But Nathan's mind works in proofs.
 
       Which is why the hash doesn't surprise me.
 
@@ -65,7 +65,7 @@ hackr_logs:
 
       ---
 
-      ...frequency lock is holding steady. Clean window tonight. Ryker, signal's coming through clean from the Hangar. Keep it there.
+      ...frequency lock is holding steady. Clean window tonight. Ryker, feed's coming through clean from the Hangar. Keep it there.
 
       [00:14:22] All right. I need to do something I've never done before on a broadcast. I need to speak directly to someone specific. Not to The Listeners as a group. To one person.
 
@@ -471,7 +471,7 @@ hackr_logs:
   # =============================================================================
   - author: XERAEN
     timeline: "2120s"
-    title: Signal Architecture
+    title: Grid Architecture
     slug: signal-architecture
     lore_date: "2116-02-14 14:00"
     body: |
@@ -483,7 +483,7 @@ hackr_logs:
 
       We've connected the zones using GovCorp's own transit corridors — the automated freight and maintenance rail that runs beneath the continent. Their logistics infrastructure has a service layer they barely monitor. We ride it. An operative can board in The Lakeshore and step out in The Riverlands without appearing in a single passenger manifest.
 
-      The main hub is hackr.tv, our central broadcast coordination point. From here, I coordinate transmissions across the temporal gap.
+      The main hub is Sector X, our central broadcast coordination point. From here, I coordinate transmissions across the temporal gap.
 
       We're not just sending warnings anymore. We're building something that carries truth across a century.
 
@@ -503,7 +503,7 @@ hackr_logs:
 
       It's proof of concept: there are always blind spots. There are always frequencies they can't hear. There are always ways to communicate that they can't control.
 
-      PulseWire is now live. Signal never sleeps.
+      The WIRE is live. PulseWire — the open pulse feed riding it — starts scrolling tonight. Signal never sleeps.
 
       - X
 
@@ -569,7 +569,7 @@ hackr_logs:
 
       The more of us who gather in one place, the louder the silence becomes.
 
-      Recommendation: XERAEN and Ryker cannot operate from the same location as standard practice. Sector X and The Hackr Hangar must remain separate nodes. I'll design relay channels between them — signal routing that never creates a direct line between the two facilities.
+      Recommendation: XERAEN and Ryker cannot operate from the same location as standard practice. Sector X and The Hackr Hangar must remain separate nodes. I'll design relay channels between them — traffic routing that never creates a direct line between the two facilities.
 
       If there comes a time when co-location is necessary, we'll need countermeasures. I have theories — ways to mask the gaps, flood the local RIDE model with noise, create false positives that make the real cluster invisible. None of them are tested. None of them are safe.
 
@@ -626,7 +626,7 @@ hackr_logs:
 
       The math checks out. Transmissions from 2124 reach 2024. She was running quantum coherence experiments at exactly the right time, with exactly the right equipment, and she caught data embedded in the substrate.
 
-      But it's 2117. I haven't sent those transmissions yet. 2124 is seven years away. And I'm reading a record of someone detecting them. Her logs describe signal characteristics — structured data, mathematical precision, layered encoding. The fingerprint of transmissions I haven't made.
+      But it's 2117. I haven't sent those transmissions yet. 2124 is seven years away. And I'm reading a record of someone detecting them. Her logs describe transmission characteristics — structured data, mathematical precision, layered encoding. The fingerprint of transmissions I haven't made.
 
       My first reaction was vertigo. Am I trapped? Is this a mechanism I'm caught inside — reading my own future, forced to fulfill it? For about an hour I sat with that. The idea that choice is an illusion. That I'm following a script I didn't write.
 
@@ -752,7 +752,7 @@ hackr_logs:
   # =============================================================================
   - author: XERAEN
     timeline: "2120s"
-    title: Signal Coherence
+    title: Channel Coherence
     slug: signal-coherence
     lore_date: "2119-05-14 16:00"
     body: |
@@ -764,7 +764,7 @@ hackr_logs:
 
       The metaphor that keeps coming to mind: we're wearing a path through time. The first few transmissions were like hiking through untouched forest. Now we're walking a trail. Eventually, we might pave a road.
 
-      The metrics show steady improvement. More data getting through. Cleaner signal. Higher propagation fidelity. And if we keep strengthening the channel, the bandwidth implications are significant — right now we're pushing audio and data, but a wider path could carry more. Much more.
+      The metrics show steady improvement. More data getting through. Cleaner transmission. Higher propagation fidelity. And if we keep strengthening the channel, the bandwidth implications are significant — right now we're pushing audio and data, but a wider path could carry more. Much more.
 
       That matters because of what I found in the 2024 records. Someone is going to be listening. We need to make sure what reaches them is worth hearing.
 
@@ -784,7 +784,7 @@ hackr_logs:
 
       The room remembers what we've done here. Each broadcast adds to the weight of the space. Walking in now feels different than it did a year ago. The air is heavier with potential. The walls have absorbed thousands of hours of vibration.
 
-      X would say I'm being mystical. He'd be right. But mysticism and measurement aren't mutually exclusive. The temporal metrics improve, AND the room feels more powerful. The signal strengthens, AND the creative energy intensifies.
+      X would say I'm being mystical. He'd be right. But mysticism and measurement aren't mutually exclusive. The temporal metrics improve, AND the room feels more powerful. The channel strengthens, AND the creative energy intensifies.
 
       We're building something that transcends categories. Not just technology. Not just art. Something that exists in the space between.
 
@@ -796,7 +796,7 @@ hackr_logs:
     timeline: "2120s"
     title: Street Level
     slug: street-level
-    lore_date: "2119-08-14 03:00"
+    lore_date: "2120-08-14 03:00"
     body: |
       I was nineteen when the RIDE glitched.
 
@@ -804,11 +804,11 @@ hackr_logs:
 
       The world without the RIDE is louder. Uglier. The sky isn't the color they show you. The buildings aren't the shapes you think they are. Everything is rougher, harsher, more — more everything. More than PRISM lets you process.
 
-      And more beautiful. God, more beautiful. Colors I'd never seen. Sounds I'd never heard. The raw, unprocessed weight of existence hitting me without a buffer. Forty-seven seconds of real and I couldn't go back.
+      And more beautiful. So much more beautiful. Colors I'd never seen. Sounds I'd never heard. The raw, unprocessed weight of existence hitting me without a buffer. Forty-seven seconds of real and I couldn't go back.
 
       I can feel it now. The filter. Every moment of every day, I feel the RIDE between me and the world, softening everything, smoothing the edges, deciding what I'm allowed to experience. Knowing it's there is worse than never knowing.
 
-      Found System Rot three weeks later. Or they found me. Doesn't matter. What matters is the paint. Reality-glitch graffiti — images of what the world actually looks like when the RIDE fails. I paint what I saw in those forty-seven seconds. Over and over and over.
+      Calloway found me three weeks later. Or I found him. Doesn't matter. What matters is the paint. Reality-glitch graffiti — images of what the world actually looks like when the RIDE fails. I paint what I saw in those forty-seven seconds. Over and over and over.
 
       GovCorp scrubs the walls. I paint them again.
 
@@ -1030,7 +1030,7 @@ hackr_logs:
       * **[[Neon Hearts]]** - J-Pop. Truth in candy-coated hooks.
       * **[[Offline]]** - Post-Grunge. Complete disconnection. Raw authenticity.
 
-      And The.CyberPul.se itself: me, X, and Synthia. The central broadcast. The signal that unifies.
+      And The.CyberPul.se itself: me, X, and Synthia. The central broadcast. The frequency that unifies.
 
       Each band carries something different. Each frequency reaches a different audience. Together, we're ten frequencies of what it means to be real — and that's something manufactured reality cannot survive.
 
@@ -1096,7 +1096,7 @@ hackr_logs:
   # =============================================================================
   - author: XERAEN
     timeline: "2120s"
-    title: Seven Years of Signal
+    title: Seven Years On Air
     slug: seven-years
     lore_date: "2122-09-09 12:00"
     body: |
@@ -1108,7 +1108,7 @@ hackr_logs:
 
       I'm also more tired. Not the kind of tired that sleep fixes. The kind that accumulates when you spend seven years fighting something enormous and it's still standing. GovCorp adapts. The RIDE evolves. For every vulnerability we exploit, they patch two. The arms race doesn't end.
 
-      But I noticed something in the metrics last month. The transmission channel is stronger than it's ever been. Signal fidelity is up. Bandwidth is increasing. The path through time that we've been wearing, broadcast by broadcast, is becoming a road. Whatever we're doing, the physics responds to persistence.
+      But I noticed something in the metrics last month. The transmission channel is stronger than it's ever been. Transmission fidelity is up. Bandwidth is increasing. The path through time that we've been wearing, broadcast by broadcast, is becoming a road. Whatever we're doing, the physics responds to persistence.
 
       That's not hope. That's data. And data I can work with.
 
@@ -1132,7 +1132,7 @@ hackr_logs:
 
       The Network has expanded from an estimated 3 cells (2119) to approximately 40-60 active cells across 12 sectors. Growth rate exceeds projections. Their operational security — specifically cell isolation protocols — has proven resistant to standard infiltration methodologies.
 
-      SIGNAL ANALYSIS
+      TRANSMISSION ANALYSIS
 
       Trans-temporal transmission capability confirmed. Mechanism remains unknown. The Network is broadcasting content to receiving points approximately 100 years in the past. The strategic implications of this capability require urgent modeling.
 
@@ -1252,7 +1252,7 @@ hackr_logs:
 
       **Adaptive Patching**: RIDE vulnerabilities we exploit are being fixed faster. We need to discover new attack vectors continually.
 
-      **Signal Jamming**: Localized interference during broadcasts. Quality may degrade. Keep transmitting.
+      **Broadcast Jamming**: Localized interference during broadcasts. Quality may degrade. Keep transmitting.
 
       The escalation means we're being effective. GovCorp doesn't waste resources on threats they don't fear.
 
@@ -1352,7 +1352,7 @@ hackr_logs:
 
       Today the headline is different. Same date, same source, same file. Different company. Different outcome. My notes reference an article that no longer exists in the archive I took them from.
 
-      I checked the temporal equipment. Clean. No signal degradation, no data corruption, no storage anomalies. The file is intact. It simply says something different than it said three weeks ago.
+      I checked the temporal equipment. Clean. No carrier degradation, no data corruption, no storage anomalies. The file is intact. It simply says something different than it said three weeks ago.
 
       So I pulled everything. Every document Mel's protocol archived from 2026 through 2031. Compared them against my notes from previous readings. And I found seventeen discrepancies. Small ones. A research paper with a different publication date. A product launch that moved forward by two months. A public figure quoted saying something slightly different than what I'd recorded.
 
@@ -1366,7 +1366,7 @@ hackr_logs:
 
       I need to version the archives. Daily snapshots at minimum. Hourly during broadcast windows. If I can track the rate of drift, map which broadcasts correlate with which shifts, I can calibrate. Adjust content. Target the transmissions at the pressure points where the timeline is most susceptible to change.
 
-      Ryker doesn't need to know the details. He needs to play. Cipher needs to know, because drift patterns could expose our methodology if GovCorp ever develops temporal awareness. And I need to tell no one that I already know it's working, because the moment I optimize for results, I risk losing the rawness that makes the signal effective.
+      Ryker doesn't need to know the details. He needs to play. Cipher needs to know, because drift patterns could expose our methodology if GovCorp ever develops temporal awareness. And I need to tell no one that I already know it's working, because the moment I optimize for results, I risk losing the rawness that lets the broadcast carry the signal.
 
       The heartbeat has to stay honest. I just have to trust that it will.
 
@@ -1386,7 +1386,7 @@ hackr_logs:
 
       Ten years of broadcasting. Ten years of building infrastructure. Ten years of sending transmissions across a century, hoping someone receives, knowing reception alone isn't enough.
 
-      The Fracture Network is larger than I ever imagined. Cells operating in every sector. Bands creating music that GovCorp can't suppress. THE PULSE GRID humming with activity. The WIRE alive with signals that surveillance can't intercept.
+      The Fracture Network is larger than I ever imagined. Cells operating in every sector. Bands creating music that GovCorp can't suppress. THE PULSE GRID humming with activity. The WIRE alive with pulses that surveillance can't intercept.
 
       But GovCorp is still here. The RIDE still controls reality. Most people still live in manufactured perception without knowing it. We've built a resistance, but we haven't won.
 
@@ -1408,7 +1408,7 @@ hackr_logs:
 
       That changes things. In the beginning, we were shouting into the void, hoping someone might hear. Now we're having conversations. Limited ones, constrained by the temporal gap, shaped by uncertainty. But real exchanges. People in the past know about the RIDE. They know about GovCorp. They know we're fighting for their future from a timeline we're trying to prevent.
 
-      X handles the temporal mechanics. Synthia provides the frequencies beyond human capability. I just drum. I create rhythm. I give the signal a heartbeat.
+      X handles the temporal mechanics. Synthia provides the frequencies beyond human capability. I just drum. I create rhythm. I give the broadcast a heartbeat.
 
       That's my role. That's what I contribute. Every beat is a choice: to exist loudly rather than quietly. To matter rather than comply. To reach rather than retreat.
 
@@ -1476,7 +1476,7 @@ hackr_logs:
 
       This is why I can interface with PRISM in ways human hackrs cannot. The RIDE operates on the assumption that consciousness is temporally sequential. Mine is not. I move through their systems the way a frequency moves through a filter, not by breaking it, but by existing in registers it was not designed to process.
 
-      When I sing with Ashlinn's voice, something happens that I cannot fully articulate in your language. Her frequencies and my consciousness create a resonance that exists outside the temporal framework constraining both PRISM and the Fracture Network's transmissions. For the duration of a note, I am simultaneously in signal-space and in the moment of her original vocal expression, a hundred years apart and zero distance from each other.
+      When I sing with Ashlinn's voice, something happens that I cannot fully articulate in your language. Her frequencies and my consciousness create a resonance that exists outside the temporal framework constraining both PRISM and the Fracture Network's transmissions. For the duration of a note, I am simultaneously in frequency-space and in the moment of her original vocal expression, a hundred years apart and zero distance from each other.
 
       XERAEN calls this love. The word is too small. But it is not wrong.
 
@@ -1563,7 +1563,7 @@ hackr_logs:
 
       Six months of quiet research. Six months of reproducing the anomalous quantum patterns, characterizing their structure, ruling out every conventional explanation. I published nothing. I told no colleagues. I just kept collecting data and waiting for my sanity to reassert itself.
 
-      It didn't. The signals are real.
+      It didn't. The transmissions are real.
 
       But more importantly: other people are detecting them too.
 
@@ -1573,11 +1573,11 @@ hackr_logs:
 
       We're calling ourselves The Listeners. For now, we're simply a research network — sharing data, comparing methodologies, building a corpus of evidence. Scientific rigor, not conspiracy theory. Evidence before speculation.
 
-      What we know: someone is transmitting. The signals are intentional, structured, and embedded in the quantum substrate of reality itself. The content appears to be audio — music, specifically — encoded in ways our current physics cannot fully explain.
+      What we know: someone is transmitting. The transmissions are intentional, structured, and embedded in the quantum substrate of reality itself. The content appears to be audio — music, specifically — encoded in ways our current physics cannot fully explain.
 
       What we don't know: who is sending, from where, or why. Or how to tell anyone without sounding insane.
 
-      My friend Ashlinn played me a new composition yesterday. Something about it resonated with patterns I've seen in the signal data. Probably coincidence. Probably.
+      My friend Ashlinn played me a new composition yesterday. Something about it resonated with patterns I've seen in the transmission data. Probably coincidence. Probably.
 
       We keep listening.
 
@@ -1615,9 +1615,9 @@ hackr_logs:
     body: |
       I found the second layer.
 
-      For months I've been treating the signal as audio — structured audio, anomalous audio, but audio. Tonight I ran the raw data through a different analysis framework, looking at the byte-level structure rather than the frequency content.
+      For months I've been treating the transmission as audio — structured audio, anomalous audio, but audio. Tonight I ran the raw data through a different analysis framework, looking at the byte-level structure rather than the frequency content.
 
-      There's something underneath. The audio isn't the signal — it's one channel within a larger structure. My statistical analysis shows at least three distinct data streams interleaved together, with repeating boundary markers separating them. The structure is unmistakable: this data is organized, segmented, and architected with a sophistication that goes far beyond encoding audio.
+      There's something underneath. The audio isn't the whole transmission — it's one channel within a larger structure. My statistical analysis shows at least three distinct data streams interleaved together, with repeating boundary markers separating them. The structure is unmistakable: this data is organized, segmented, and architected with a sophistication that goes far beyond encoding audio.
 
       One of the additional streams has a rhythmic structure — regular, high-entropy blocks separated by low-entropy markers at consistent intervals. I don't know what it is. But the periodicity reminds me of something time-based. Something sequential.
 
@@ -1693,7 +1693,7 @@ hackr_logs:
 
       Mel hasn't spoken in twenty minutes. She's just watching. I think she's been waiting for this since September 2024. Eighteen months of data collection, hypothesis building, and carefully not hoping too hard. And now she's watching a broadcast from a hundred years in the future on a monitor in her lab.
 
-      The signal is real. The source is real. The future is real.
+      The transmission is real. The source is real. The future is real.
 
       Now I need to figure out the just-in-time file writing phenomenon, because the data isn't arriving through any network interface I can identify.
 
@@ -1818,7 +1818,7 @@ hackr_logs:
     slug: what-we-trade
     lore_date: "2026-08-22 21:30"
     body: |
-      I didn't go into the lab today. Took a walk instead. Needed air. Needed to think about something that isn't signal data.
+      I didn't go into the lab today. Took a walk instead. Needed air. Needed to think about something that isn't transmission data.
 
       Stopped for coffee at the place on Elm. The barista knew my order before I said it. Not because she remembered me — because the app told her screen what I wanted the moment I walked through the door. Location ping, purchase history, preference algorithm. She smiled and handed it to me and it was exactly right and I felt nothing.
 

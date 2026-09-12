@@ -114,9 +114,9 @@ module Grid
       lines.join("\n")
     end
 
-    def render_jackout(clean, vitals_hit)
+    def render_abort(clean, vitals_hit)
       color = clean ? "#34d399" : "#f87171"
-      label = clean ? "JACK-OUT CLEAN" : "JACK-OUT COMPROMISED"
+      label = clean ? "ABORT CLEAN" : "ABORT COMPROMISED"
       lines = []
       lines << ""
       lines << "<span style='color: #{color}; font-weight: bold;'>[ #{label} ]</span>"
@@ -127,7 +127,7 @@ module Grid
     end
 
     def render_pnr_warning
-      "<span style='color: #f87171; font-weight: bold;'>\u26a0 SYSTEM ALERT: Intrusion signature locked. Jack-out route compromised.</span>"
+      "<span style='color: #f87171; font-weight: bold;'>\u26a0 SYSTEM ALERT: Intrusion signature locked. Exit route compromised.</span>"
     end
 
     def render_sandbox_end(end_state, failure_mode: nil)
@@ -135,7 +135,7 @@ module Grid
       label = case end_state
       when "success" then "S A N D B O X   C O M P L E T E"
       when "failure" then "S A N D B O X   F A I L E D"
-      when "jacked_out" then "S A N D B O X   J A C K - O U T"
+      when "aborted" then "S A N D B O X   A B O R T"
       end
       cause = case end_state
       when "success" then "All protocols neutralized."
@@ -145,7 +145,7 @@ module Grid
         when :gate_exhaustion then "All circumvention gates locked out."
         else "Detection reached 100%."
         end
-      when "jacked_out" then "Disconnected from encounter."
+      when "aborted" then "Disconnected from encounter."
       end
 
       lines = []

@@ -21,7 +21,7 @@ class WireController < ApplicationController
     @is_self = logged_in? && current_hackr.id == @hackr.id
     @stats = Grid::ProfileStats.for(@hackr)
     @pinned = @hackr.pulse_pins.order(:position).includes(pulse: :grid_hackr)
-      .map(&:pulse).reject(&:signal_dropped?)
+      .map(&:pulse).reject(&:pulse_dropped?)
 
     own = Pulse.active.where(grid_hackr: @hackr).timeline
       .includes(:grid_hackr).limit(PROFILE_PER_PAGE).to_a

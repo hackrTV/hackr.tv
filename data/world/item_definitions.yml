@@ -290,7 +290,7 @@ item_definitions:
   # ── Tools (world-placed) ───────────────────────────────────────
   - slug: frequency-modulator
     name: Frequency Modulator
-    description: "A device for tuning into Synthia's signal. Essential for PRISM communication."
+    description: "A device for tuning into Synthia's frequency. Essential for PRISM communication."
     item_type: tool
     rarity: uncommon
     value: 30
@@ -340,7 +340,7 @@ item_definitions:
 
   - slug: data-shard
     name: Data Shard
-    description: "A fragment of volatile memory, partially wiped. May contain recoverable signal."
+    description: "A fragment of volatile memory, partially wiped. May contain recoverable data."
     item_type: material
     rarity: scrap
     value: 3
@@ -497,7 +497,7 @@ item_definitions:
 
   - slug: signal-disruptor
     name: Signal Disruptor
-    description: "Disrupts protocol communication signals. Extra effective against TRACE."
+    description: "Disrupts protocol comms traffic. Extra effective against TRACE."
     item_type: software
     rarity: common
     value: 0
@@ -647,20 +647,20 @@ item_definitions:
       effect_type: signal_flare
       amount: 15
 
-  - slug: emergency-jackout-chip
-    name: Emergency Jack-Out Chip
-    description: "One-use neural bypass chip. Forces a clean disconnect even past the Point of No Return. Don't leave home without one."
+  - slug: emergency-cutoff-chip
+    name: Emergency Cutoff Chip
+    description: "One-use cutoff chip that hard-kills the DECK's uplink. Forces a clean disconnect even past the Point of No Return. Don't leave home without one."
     item_type: consumable
     rarity: rare
     value: 750
     max_stack: 2
     properties:
-      effect_type: emergency_jackout
+      effect_type: emergency_cutoff
 
   # ── DECK Modules (Hardware Peripherals) ─────────────────────
   - slug: breach-amplifier
     name: BREACH Amplification Antenna
-    description: "A compact directional antenna that boosts signal penetration during BREACH encounters. Requires firmware to operate."
+    description: "A compact directional antenna that boosts transmission penetration during BREACH encounters. Requires firmware to operate."
     item_type: module
     rarity: uncommon
     value: 300
@@ -670,7 +670,7 @@ item_definitions:
 
   - slug: signal-intercept-array
     name: Signal Intercept Array
-    description: "A passive signal capture array that enables advanced exploit software to interface with hostile protocols. Firmware required."
+    description: "A passive transmission-capture array that enables advanced exploit software to interface with hostile protocols. Firmware required."
     item_type: module
     rarity: rare
     value: 600
@@ -681,7 +681,7 @@ item_definitions:
   # ── Firmware (Module Software) ──────────────────────────────
   - slug: amplifier-firmware-v1
     name: Amplifier Firmware v1.0
-    description: "Basic firmware package for BREACH Amplification Antennas. Enables signal boost capabilities."
+    description: "Basic firmware package for BREACH Amplification Antennas. Enables transmission-boost capabilities."
     item_type: firmware
     rarity: uncommon
     value: 150
@@ -723,7 +723,7 @@ item_definitions:
 
   - slug: feedback-fragment
     name: FEEDBACK Fragment
-    description: "A data shard extracted from a FEEDBACK protocol during BREACH. Contains neural drain waveform patterns. Used in software fabrication."
+    description: "A data shard extracted from a FEEDBACK protocol during BREACH. Contains vitals-drain waveform patterns. Used in software fabrication."
     item_type: data
     rarity: uncommon
     value: 25
@@ -825,7 +825,7 @@ item_definitions:
   # ── Faction Items ──────────────────────────────────────────────
   - slug: fracture-beacon
     name: Fracture Beacon
-    description: "Emits a signal recognizable only to Fracture Network operatives across temporal boundaries. Possession alone is a statement."
+    description: "A marker Fracture Network operatives recognize in any era. Possession alone is a statement."
     item_type: faction
     rarity: ultra_rare
     value: 5000

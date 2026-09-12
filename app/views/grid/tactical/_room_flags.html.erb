@@ -5,7 +5,7 @@
 <div id="tactical-room-flags" class="tactical-room-flags" data-controller="tactical-panel">
   <% if flags.in_breach? %>
     <%# In breach: no handles, no encounter buttons — the breach shell
-        owns the surface until jackout/resolution. %>
+        owns the surface until abort/resolution. %>
   <% else %>
   <% if flags.breach_encounters.any? %>
     <div class="tactical-breach-targets">

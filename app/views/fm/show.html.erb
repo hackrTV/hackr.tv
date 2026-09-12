@@ -69,7 +69,7 @@
         <% if @coming_soon.any? %>
           <div class="fm-section" data-controller="signal-code">
             <div class="fm-divider"></div>
-            <h3 class="fm-signal-title" data-action="click->signal-code#signalClicked">◈ SIGNAL INCOMING ◈</h3>
+            <h3 class="fm-signal-title" data-action="click->signal-code#signalClicked">◈ TRANSMISSION INCOMING ◈</h3>
             <div class="fm-soon-grid fm-soon-grid--cols-<%= [@coming_soon.size, 4].min %>">
               <% @coming_soon.each_with_index do |release, index| %>
                 <% locked = index >= 4 %>
@@ -105,7 +105,7 @@
                  data-action="click->signal-code#backdropClicked">
               <div class="fm-code-box">
                 <div class="fm-code-scanlines"></div>
-                <div class="fm-code-title">SIGNAL INTERCEPT DETECTED</div>
+                <div class="fm-code-title">TRANSMISSION INTERCEPT DETECTED</div>
                 <div class="fm-code-sub">
                   FREQUENCY LOCK REQUIRES AUTHORIZATION<br>
                   ENTER TRANSMISSION CODE TO PROCEED
@@ -117,7 +117,7 @@
                   <button class="fm-code-submit" data-action="click->signal-code#submit">TRANSMIT</button>
                 </div>
                 <div class="fm-code-error" hidden data-signal-code-target="error">AUTHORIZATION DENIED — INVALID FREQUENCY</div>
-                <div class="fm-code-abort" data-action="click->signal-code#close">[ABORT SIGNAL]</div>
+                <div class="fm-code-abort" data-action="click->signal-code#close">[ABORT INTERCEPT]</div>
               </div>
             </div>
           </div>

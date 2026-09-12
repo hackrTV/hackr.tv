@@ -12,7 +12,7 @@ RSpec.describe "Hotwire world feed", type: :system do
 
     expect(page).to have_content("HACKR.TV // WORLD FEED")
     # typed-line runs at 16ms/char — wait for the full line
-    expect(page).to have_content("GhostWire jacked into THE PULSE GRID for the first time", wait: 10)
+    expect(page).to have_content("GhostWire connected to THE PULSE GRID for the first time", wait: 10)
     expect(page).to have_content("1 events loaded")
   end
 

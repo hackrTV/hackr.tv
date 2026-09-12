@@ -40,7 +40,7 @@
 #  origin_room_id            (origin_room_id => grid_rooms.id) ON DELETE => nullify
 #
 class GridHackrBreach < ApplicationRecord
-  STATES = %w[active success failure jacked_out].freeze
+  STATES = %w[active success failure aborted].freeze
 
   belongs_to :grid_hackr
   belongs_to :grid_breach_template

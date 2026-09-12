@@ -1,6 +1,6 @@
 <div class="tui-window red-168 white-text" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
   <fieldset class="red-168-border">
-    <legend class="center">/root/pulsewire/signal_drops :: MODERATION GRAVEYARD</legend>
+    <legend class="center">/root/pulsewire/pulse_drops :: MODERATION GRAVEYARD</legend>
 
     <div style="padding: 20px;">
       <!-- Flash Messages -->
@@ -27,7 +27,7 @@
       <!-- Info Banner -->
       <div style="background: #1a0000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
         <p class="red-255-text" style="margin: 0;">
-          ⚠ SIGNAL-DROPPED PULSES :: These pulses have been removed from the WIRE by admin moderation.
+          ⚠ PULSE-DROPPED PULSES :: These pulses have been removed from the WIRE by admin moderation.
         </p>
         <p style="color: #888; margin: 10px 0 0 0; font-size: 0.9em;">
           You can restore pulses to make them visible again, or permanently delete them.
@@ -36,7 +36,7 @@
 
       <!-- Stats -->
       <div style="margin-bottom: 20px; color: #666;">
-        <strong class="red-255-text"><%= @pulses.count %></strong> signal-dropped pulse<%= @pulses.count == 1 ? '' : 's' %>
+        <strong class="red-255-text"><%= @pulses.count %></strong> pulse-dropped pulse<%= @pulses.count == 1 ? '' : 's' %>
       </div>
 
       <!-- Pulses Table -->
@@ -68,7 +68,7 @@
                       <%= pulse.content %>
                     </div>
                     <div style="margin-top: 8px;">
-                      <span class="red-255-text">⚠ SIGNAL DROPPED</span>
+                      <span class="red-255-text">⚠ PULSE DROPPED</span>
                     </div>
                     <div style="margin-top: 5px;">
                       <small style="color: #666;">
@@ -84,7 +84,7 @@
                   </td>
                   <td style="text-align: center;">
                     <small style="color: #888;">
-                      <%= time_ago_in_words(pulse.signal_dropped_at) %> ago
+                      <%= time_ago_in_words(pulse.pulse_dropped_at) %> ago
                     </small>
                   </td>
                   <td style="text-align: center; white-space: nowrap;">
@@ -115,7 +115,7 @@
       <% else %>
         <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
           <p style="color: #666; font-size: 1.2em;">
-            No signal-dropped pulses. The moderation graveyard is empty.
+            No pulse-dropped pulses. The moderation graveyard is empty.
           </p>
           <p style="color: #444; margin-top: 10px;">
             All pulses on the WIRE are currently active.

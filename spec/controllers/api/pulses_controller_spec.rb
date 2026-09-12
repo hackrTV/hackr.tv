@@ -18,9 +18,9 @@ RSpec.describe Api::PulsesController, type: :controller do
         expect(json["pulses"].length).to eq(2)
       end
 
-      it "excludes signal-dropped pulses by default" do
+      it "excludes pulse-dropped pulses by default" do
         active_pulse = create(:pulse, grid_hackr: hackr)
-        dropped_pulse = create(:pulse, :signal_dropped, grid_hackr: hackr)
+        dropped_pulse = create(:pulse, :pulse_dropped, grid_hackr: hackr)
 
         get :index, format: :json
 
@@ -78,7 +78,7 @@ RSpec.describe Api::PulsesController, type: :controller do
     context "with status filter" do
       it "returns active pulses when filter=active" do
         active_pulse = create(:pulse, grid_hackr: hackr)
-        dropped_pulse = create(:pulse, :signal_dropped, grid_hackr: hackr)
+        dropped_pulse = create(:pulse, :pulse_dropped, grid_hackr: hackr)
 
         get :index, params: {filter: "active"}, format: :json
 
@@ -90,7 +90,7 @@ RSpec.describe Api::PulsesController, type: :controller do
 
       it "returns dropped pulses when filter=dropped" do
         active_pulse = create(:pulse, grid_hackr: hackr)
-        dropped_pulse = create(:pulse, :signal_dropped, grid_hackr: hackr)
+        dropped_pulse = create(:pulse, :pulse_dropped, grid_hackr: hackr)
 
         get :index, params: {filter: "dropped"}, format: :json
 
@@ -371,29 +371,29 @@ RSpec.describe Api::PulsesController, type: :controller do
     end
   end
 
-  describe "POST #signal_drop" do
+  describe "POST #pulse_drop" do
     context "when authenticated as admin" do
       before { session[:grid_hackr_id] = admin_hackr.id }
 
       let!(:pulse) { create(:pulse, grid_hackr: hackr) }
 
-      it "marks pulse as signal-dropped" do
+      it "marks pulse as pulse-dropped" do
         expect {
-          post :signal_drop, params: {id: pulse.id}, format: :json
+          post :pulse_drop, params: {id: pulse.id}, format: :json
           pulse.reload
-        }.to change { pulse.signal_dropped }.from(false).to(true)
+        }.to change { pulse.pulse_dropped }.from(false).to(true)
 
         expect(response).to have_http_status(:success)
         json = JSON.parse(response.body)
         expect(json["success"]).to be true
-        expect(json["message"]).to include("signal-dropped")
+        expect(json["message"]).to include("pulse-dropped")
       end
 
-      it "sets signal_dropped_at timestamp" do
-        post :signal_drop, params: {id: pulse.id}, format: :json
+      it "sets pulse_dropped_at timestamp" do
+        post :pulse_drop, params: {id: pulse.id}, format: :json
         pulse.reload
 
-        expect(pulse.signal_dropped_at).to be_present
+        expect(pulse.pulse_dropped_at).to be_present
       end
     end
 
@@ -403,18 +403,18 @@ RSpec.describe Api::PulsesController, type: :controller do
       let!(:pulse) { create(:pulse, grid_hackr: other_hackr) }
 
       it "returns 403 forbidden" do
-        post :signal_drop, params: {id: pulse.id}, format: :json
+        post :pulse_drop, params: {id: pulse.id}, format: :json
 
         expect(response).to have_http_status(:forbidden)
         json = JSON.parse(response.body)
         expect(json["error"]).to include("Admin access required")
       end
 
-      it "does not signal-drop the pulse" do
+      it "does not pulse-drop the pulse" do
         expect {
-          post :signal_drop, params: {id: pulse.id}, format: :json
+          post :pulse_drop, params: {id: pulse.id}, format: :json
           pulse.reload
-        }.not_to change { pulse.signal_dropped }
+        }.not_to change { pulse.pulse_dropped }
       end
     end
 
@@ -422,7 +422,7 @@ RSpec.describe Api::PulsesController, type: :controller do
       let!(:pulse) { create(:pulse, grid_hackr: hackr) }
 
       it "returns 401 unauthorized" do
-        post :signal_drop, params: {id: pulse.id}, format: :json
+        post :pulse_drop, params: {id: pulse.id}, format: :json
 
         expect(response).to have_http_status(:unauthorized)
       end

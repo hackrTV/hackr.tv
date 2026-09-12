@@ -17,7 +17,7 @@ RSpec.describe Admin::PulseWireController, type: :controller do
     it "loads all pulses by default" do
       pulse1 = create(:pulse, grid_hackr: user_hackr)
       pulse2 = create(:pulse, grid_hackr: admin_hackr)
-      pulse3 = create(:pulse, :signal_dropped, grid_hackr: user_hackr)
+      pulse3 = create(:pulse, :pulse_dropped, grid_hackr: user_hackr)
 
       get :index
 
@@ -36,7 +36,7 @@ RSpec.describe Admin::PulseWireController, type: :controller do
 
     context "with status filter" do
       let!(:active_pulse) { create(:pulse, grid_hackr: user_hackr) }
-      let!(:dropped_pulse) { create(:pulse, :signal_dropped, grid_hackr: user_hackr) }
+      let!(:dropped_pulse) { create(:pulse, :pulse_dropped, grid_hackr: user_hackr) }
 
       it "filters to active pulses only" do
         get :index, params: {status: "active"}
@@ -122,28 +122,28 @@ RSpec.describe Admin::PulseWireController, type: :controller do
     end
   end
 
-  describe "GET #signal_drops" do
+  describe "GET #pulse_drops" do
     let!(:active_pulse) { create(:pulse, grid_hackr: user_hackr) }
-    let!(:dropped_pulse) { create(:pulse, :signal_dropped, grid_hackr: user_hackr) }
+    let!(:dropped_pulse) { create(:pulse, :pulse_dropped, grid_hackr: user_hackr) }
 
     it "returns success" do
-      get :signal_drops
+      get :pulse_drops
       expect(response).to have_http_status(:ok)
     end
 
-    it "loads only signal-dropped pulses" do
-      get :signal_drops
+    it "loads only pulse-dropped pulses" do
+      get :pulse_drops
 
       expect(assigns(:pulses)).to include(dropped_pulse)
       expect(assigns(:pulses)).not_to include(active_pulse)
     end
 
     it "orders by pulsed_at descending" do
-      create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 3.days.ago)
-      create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 1.day.ago)
-      create(:pulse, :signal_dropped, grid_hackr: user_hackr, pulsed_at: 2.days.ago)
+      create(:pulse, :pulse_dropped, grid_hackr: user_hackr, pulsed_at: 3.days.ago)
+      create(:pulse, :pulse_dropped, grid_hackr: user_hackr, pulsed_at: 1.day.ago)
+      create(:pulse, :pulse_dropped, grid_hackr: user_hackr, pulsed_at: 2.days.ago)
 
-      get :signal_drops
+      get :pulse_drops
 
       # Ensure correct ordering: most recent first
       pulses = assigns(:pulses).to_a
@@ -152,53 +152,53 @@ RSpec.describe Admin::PulseWireController, type: :controller do
     end
   end
 
-  describe "POST #signal_drop" do
+  describe "POST #pulse_drop" do
     let!(:pulse) { create(:pulse, grid_hackr: user_hackr) }
 
-    it "marks the pulse as signal-dropped" do
+    it "marks the pulse as pulse-dropped" do
       expect {
-        post :signal_drop, params: {id: pulse.id}
+        post :pulse_drop, params: {id: pulse.id}
         pulse.reload
-      }.to change { pulse.signal_dropped }.from(false).to(true)
+      }.to change { pulse.pulse_dropped }.from(false).to(true)
     end
 
-    it "sets signal_dropped_at timestamp" do
-      post :signal_drop, params: {id: pulse.id}
+    it "sets pulse_dropped_at timestamp" do
+      post :pulse_drop, params: {id: pulse.id}
       pulse.reload
 
-      expect(pulse.signal_dropped_at).to be_present
-      expect(pulse.signal_dropped_at).to be_within(1.second).of(Time.current)
+      expect(pulse.pulse_dropped_at).to be_present
+      expect(pulse.pulse_dropped_at).to be_within(1.second).of(Time.current)
     end
 
     it "redirects back with success flash" do
-      post :signal_drop, params: {id: pulse.id}
+      post :pulse_drop, params: {id: pulse.id}
 
       expect(response).to redirect_to(admin_pulse_wire_index_path)
-      expect(flash[:success]).to include("signal-dropped")
+      expect(flash[:success]).to include("pulse-dropped")
     end
   end
 
   describe "POST #restore" do
-    let!(:dropped_pulse) { create(:pulse, :signal_dropped, grid_hackr: user_hackr) }
+    let!(:dropped_pulse) { create(:pulse, :pulse_dropped, grid_hackr: user_hackr) }
 
     it "restores the pulse" do
       expect {
         post :restore, params: {id: dropped_pulse.id}
         dropped_pulse.reload
-      }.to change { dropped_pulse.signal_dropped }.from(true).to(false)
+      }.to change { dropped_pulse.pulse_dropped }.from(true).to(false)
     end
 
-    it "clears signal_dropped_at timestamp" do
+    it "clears pulse_dropped_at timestamp" do
       post :restore, params: {id: dropped_pulse.id}
       dropped_pulse.reload
 
-      expect(dropped_pulse.signal_dropped_at).to be_nil
+      expect(dropped_pulse.pulse_dropped_at).to be_nil
     end
 
     it "redirects back with success flash" do
       post :restore, params: {id: dropped_pulse.id}
 
-      expect(response).to redirect_to(signal_drops_admin_pulse_wire_index_path)
+      expect(response).to redirect_to(pulse_drops_admin_pulse_wire_index_path)
       expect(flash[:success]).to include("restored")
     end
   end
@@ -236,43 +236,43 @@ RSpec.describe Admin::PulseWireController, type: :controller do
     end
   end
 
-  describe "POST #bulk_signal_drop" do
+  describe "POST #bulk_pulse_drop" do
     let!(:pulse1) { create(:pulse, grid_hackr: user_hackr) }
     let!(:pulse2) { create(:pulse, grid_hackr: user_hackr) }
     let!(:pulse3) { create(:pulse, grid_hackr: admin_hackr) }
 
-    it "signal-drops multiple pulses" do
-      post :bulk_signal_drop, params: {pulse_ids: [pulse1.id, pulse2.id]}
+    it "pulse-drops multiple pulses" do
+      post :bulk_pulse_drop, params: {pulse_ids: [pulse1.id, pulse2.id]}
 
       pulse1.reload
       pulse2.reload
       pulse3.reload
 
-      expect(pulse1.signal_dropped).to be true
-      expect(pulse2.signal_dropped).to be true
-      expect(pulse3.signal_dropped).to be false
+      expect(pulse1.pulse_dropped).to be true
+      expect(pulse2.pulse_dropped).to be true
+      expect(pulse3.pulse_dropped).to be false
     end
 
     it "sets flash with count" do
-      post :bulk_signal_drop, params: {pulse_ids: [pulse1.id, pulse2.id]}
+      post :bulk_pulse_drop, params: {pulse_ids: [pulse1.id, pulse2.id]}
 
-      expect(flash[:success]).to match(/Signal-dropped 2 pulses/)
+      expect(flash[:success]).to match(/Pulse-dropped 2 pulses/)
     end
 
     it "shows error if no pulses selected" do
-      post :bulk_signal_drop, params: {pulse_ids: []}
+      post :bulk_pulse_drop, params: {pulse_ids: []}
 
       expect(flash[:error]).to include("No pulses selected")
     end
 
     it "handles singular vs plural flash message" do
-      post :bulk_signal_drop, params: {pulse_ids: [pulse1.id]}
+      post :bulk_pulse_drop, params: {pulse_ids: [pulse1.id]}
 
-      expect(flash[:success]).to match(/Signal-dropped 1 pulse\./)
+      expect(flash[:success]).to match(/Pulse-dropped 1 pulse\./)
     end
 
     it "redirects back" do
-      post :bulk_signal_drop, params: {pulse_ids: [pulse1.id]}
+      post :bulk_pulse_drop, params: {pulse_ids: [pulse1.id]}
 
       expect(response).to redirect_to(admin_pulse_wire_index_path)
     end
