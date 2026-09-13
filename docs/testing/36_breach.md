@@ -43,8 +43,8 @@ the room-flags strip).
 8. Win: clear the required protocols. → Victory output, rewards
    (XP/CRED/salvage per template), overlay closes back to the normal
    tactical view, map/flags refresh.
-9. Start another breach and **JACKOUT** (confirm dialog; past-PNR
-   jackout has costs). → Exit applies the appropriate penalty; state
+9. Start another breach and **ABORT** (confirm dialog; past-PNR
+   abort has costs). → Exit applies the appropriate penalty; state
    returns to normal; vitals/CRED reflect any cost.
 10. After any breach ends, the refresh bus updates bar vitals + open
     tab; `stat` agrees.
