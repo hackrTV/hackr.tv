@@ -100,7 +100,7 @@
 - **Item Fabrication** - 29 schematics with ingredient recipes, clearance/location gates, `/schematics` SPA page
 - **Item Catalog** - 85 item definitions across 12 types (gear, software, consumable, material, module, firmware, fixture, tool, data, faction, collectible, rig_component)
 - **Salvage System** - Item decomposition with deterministic yield items, analyze command for preview
-- **BREACH Encounter System** - Turn-based hacking encounters with DECK equip → software load → breach → protocol dismantling → detection clock → success/failure/jackout
+- **BREACH Encounter System** - Turn-based hacking encounters with DECK equip → software load → breach → protocol dismantling → detection clock → success/failure/abort
   - 5 protocol types (TRACE/FEEDBACK/LOCK/ADAPT/SPIKE) with synergies and rerouting
   - 4 puzzle gate types (sequence, logic gate, circuit, credential decryption) with procedural generation
   - OR win condition: destroy all protocols OR solve all circumvention gates
@@ -642,7 +642,7 @@ bin/rails data:overlays             # Overlay scenes, elements, tickers, lower t
 - **grid_breach_encounters** - placed encounters in rooms with state machine (available→active→cooldown→available/depleted)
 - **grid_hackr_breaches** - active/completed breach instances per hackr with round tracking, detection, meta (JSON)
 - **grid_breach_protocols** - individual protocols within a breach (type, health, ticks, status)
-- **grid_hackr_breach_logs** - append-only action log (exec/analyze/reroute/jackout)
+- **grid_hackr_breach_logs** - append-only action log (exec/analyze/reroute/abort)
 - **grid_impound_records** - gear impound tracking for GovCorp capture (status, bribe cost, recovery)
 
 ### THE PULSE GRID — Transit
