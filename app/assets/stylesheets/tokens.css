@@ -1,0 +1,50 @@
+/* Design tokens — semantic palette for the TUI surfaces (unification audit
+   Phase 1, 2026-09-12; plan in SMR backlog.md "TUI frontend unification").
+
+   Scope: consumed by the app-owned sheets (hotwire, tactical, grid_game,
+   uplink, audio_player, pulse_wire). NOT consumed by: tuicss.css (vendored
+   DOS base — frozen), overlay.css (OBS-facing, has its own --overlay-* root),
+   band_profiles/artist_pages/artist_catalog (per-artist branding, scoped
+   themes), admin_test_guide.css (deliberate serif island).
+
+   Sanctioned sub-identities intentionally NOT tokenized here: auth terminal
+   phosphor set (#0a0a1e / #4a4a6a / #330000 / #ff0000 / #00ffff), terminal
+   easter-egg greens (#33cc33 / #33aa33), uplink role badge colors, wire echo
+   blue (#60a5fa), pinned gold (#facc15), tactical topic violet (#c084fc).
+
+   The *-rgb triplets exist for rgba() alpha variants:
+   rgba(var(--accent-rgb), 0.5). Keep them in sync with their hex twin. */
+
+:root {
+  /* status */
+  --ok: #34d399;
+  --ok-rgb: 52, 211, 153;
+  --err: #f87171;
+  --err-rgb: 248, 113, 113;
+  --err-strong: #dc2626; /* solid danger fills (killswitch) — white text on top */
+  --warn: #fbbf24;
+  --warn-rgb: 251, 191, 36;
+  --live: #00ff00; /* live/on-air phosphor green — brighter than --ok on purpose */
+
+  /* accents */
+  --accent: #7c3aed;
+  --accent-rgb: 124, 58, 237;
+  --accent-bright: #a78bfa;
+  --accent-bright-rgb: 167, 139, 250;
+  --accent-alt: #22d3ee;
+  --accent-alt-rgb: 34, 211, 238;
+  --accent-music: #00d9ff; /* player/radio/playlist surfaces — merge into
+                              --accent-alt later if the two-cyan split dies */
+
+  /* surfaces */
+  --bg-0: #0a0a0a; /* page-level black */
+  --bg-1: #111111; /* panel black (absorbs former #0d0d0d) */
+  --bg-2: #1a1a1a; /* raised black */
+
+  /* text */
+  --fg: #d0d0d0; /* body text (absorbs former #ccc) */
+  --fg-bright: #e0e0e0;
+
+  /* type */
+  --font-tui: Terminus, "Courier New", monospace;
+}

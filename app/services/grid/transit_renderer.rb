@@ -171,7 +171,7 @@ module Grid
       def render_slipstream_breach(journey, leg)
         lines = []
         lines << ""
-        lines << "<span style='color: #ef4444; font-weight: bold;'>\u26a0 SLIPSTREAM DETECTION — BREACH TRIGGERED</span>"
+        lines << "<span style='color: #ef4444; font-weight: bold;'>\u25b2 SLIPSTREAM DETECTION — BREACH TRIGGERED</span>"
         lines << "<span style='color: #f87171;'>GovCorp surveillance has flagged anomalous traffic on this corridor.</span>"
         lines << "<span style='color: #f87171;'>Resolve the BREACH to continue transit.</span>"
         lines.join("\n")
@@ -181,7 +181,7 @@ module Grid
         route = journey.grid_slipstream_route
         lines = []
         lines << ""
-        lines << "<span style='color: #ef4444; font-weight: bold;'>\u26a0 SLIPSTREAM DETECTION — SCAN INTERCEPTED</span>"
+        lines << "<span style='color: #ef4444; font-weight: bold;'>\u25b2 SLIPSTREAM DETECTION — SCAN INTERCEPTED</span>"
         lines << "<span style='color: #f87171;'>GovCorp surveillance flagged anomalous traffic. Without a functional DECK, you absorb the hit raw.</span>"
         lines << "<span style='color: #f87171;'>ENERGY -20 | PSYCHE -20 | Heat increased.</span>"
         lines << ""

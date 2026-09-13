@@ -204,7 +204,7 @@ module Grid
       output << "\n<span style='color: #a78bfa;'>════════════════════════════════════════════════════════════════</span>"
       output << "<span style='color: #22d3ee; font-weight: bold;'>#{room.name.upcase}</span> <span style='color: #666;'>::</span> <span style='color: #fbbf24;'>#{room.grid_zone.name}</span> <span style='color: #666;'>::</span> <span style='color: #a78bfa;'>#{room.grid_zone.grid_region&.name || "Unknown Region"}</span>"
       output << ""
-      output << "<span style='color: #d0d0d0;'>#{codex_linkify(room.description)}</span>" if room.description
+      output << "<span class='grid-room-desc' style='color: #d0d0d0;'>#{codex_linkify(room.description)}</span>" if room.description
 
       # Den banner
       if room.den?
@@ -2340,7 +2340,7 @@ module Grid
 
       if vendor.black_market?
         clearance = hackr.stat("clearance")
-        output << "<span style='color: #f87171; font-weight: bold;'>⚠ BLACK MARKET</span> <span style='color: #9ca3af;'>:: #{h(vendor.name)}</span>"
+        output << "<span style='color: #f87171; font-weight: bold;'>▲ BLACK MARKET</span> <span style='color: #9ca3af;'>:: #{h(vendor.name)}</span>"
         output << "<span style='color: #6b7280;'>Prices adjusted for CLEARANCE #{clearance}. Higher clearance = better rates.</span>"
       else
         output << "<span style='color: #22d3ee; font-weight: bold;'>VENDOR :: #{h(vendor.name)}</span>"
@@ -2832,7 +2832,7 @@ module Grid
       lines << "  <span style='color: #fbbf24;'>Slots:</span>      <span style='color: #d0d0d0;'>PSU #{rig.psus.count}/#{rig.total_psu_slots} | CPU #{rig.cpus.count}/#{rig.total_cpu_slots} | GPU #{rig.gpus.count}/#{rig.total_gpu_slots} | RAM #{rig.rams.count}/#{rig.total_ram_slots}</span>"
       unless functional
         rig.functionality_errors.each do |err|
-          lines << "  <span style='color: #f87171;'>⚠ #{h(err)}</span>"
+          lines << "  <span style='color: #f87171;'>▲ #{h(err)}</span>"
         end
       end
       if rig.last_tick_at
@@ -2846,7 +2846,7 @@ module Grid
       return "<span style='color: #9ca3af;'>Your rig is already running.</span>" if rig.active?
 
       unless rig.functional?
-        errors = rig.functionality_errors.map { |e| "  <span style='color: #f87171;'>⚠ #{h(e)}</span>" }.join("\n")
+        errors = rig.functionality_errors.map { |e| "  <span style='color: #f87171;'>▲ #{h(e)}</span>" }.join("\n")
         return "<span style='color: #f87171;'>Rig is non-functional. Fix the following:</span>\n#{errors}"
       end
 
@@ -2920,7 +2920,7 @@ module Grid
 
       unless was_functional
         rig.functionality_errors.each do |err|
-          output += "\n<span style='color: #f87171;'>⚠ #{h(err)}</span>"
+          output += "\n<span style='color: #f87171;'>▲ #{h(err)}</span>"
         end
       end
 
@@ -2983,7 +2983,7 @@ module Grid
       lines << "  <span style='color: #fbbf24;'>Effective Rate:</span>   <span style='color: #34d399;'>#{rig.effective_rate} CRED/tick (base)</span>"
       unless rig.functional?
         lines << ""
-        rig.functionality_errors.each { |err| lines << "  <span style='color: #f87171;'>⚠ #{h(err)}</span>" }
+        rig.functionality_errors.each { |err| lines << "  <span style='color: #f87171;'>▲ #{h(err)}</span>" }
       end
       lines << "<span style='color: #a78bfa;'>════════════════════════════════════════════════════════</span>"
       lines.join("\n")

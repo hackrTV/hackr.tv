@@ -62,7 +62,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
-      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  B R E A C H   C O M P L E T E                               \u2551</span>"
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  B R E A C H   C O M P L E T E</span>"
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
       lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #d0d0d0;'>#{h(template_name)}</span>"
       lines << "<span style='color: #34d399;'>\u2551</span>  <span style='color: #fbbf24;'>XP:</span> <span style='color: #34d399;'>+#{xp_awarded}</span>" if xp_awarded > 0
@@ -83,7 +83,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
-      lines << "<span style='color: #f87171; font-weight: bold;'>\u2551  B R E A C H   F A I L E D                                   \u2551</span>"
+      lines << "<span style='color: #f87171; font-weight: bold;'>\u2551  B R E A C H   F A I L E D</span>"
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
       cause = case failure_mode
       when :health_zero
@@ -102,12 +102,12 @@ module Grid
       end
       if fried_level
         lines << border_red
-        lines << "#{border_red}  <span style='color: #ef4444; font-weight: bold;'>\u26a0 DECK FRIED \u2014 neural feedback cascade (level #{fried_level}/5)</span>"
+        lines << "#{border_red}  <span style='color: #ef4444; font-weight: bold;'>\u25b2 DECK FRIED \u2014 neural feedback cascade (level #{fried_level}/5)</span>"
         lines << "#{border_red}  <span style='color: #f87171;'>All loaded software destroyed.</span>"
         lines << "#{border_red}  <span style='color: #9ca3af;'>Repair at a service node or craft a DECK Repair Kit (Mk.#{fried_level}+).</span>"
       elsif software_wiped
         lines << border_red
-        lines << "#{border_red}  <span style='color: #ef4444; font-weight: bold;'>\u26a0 DECK OVERLOADED \u2014 all loaded software wiped.</span>"
+        lines << "#{border_red}  <span style='color: #ef4444; font-weight: bold;'>\u25b2 DECK OVERLOADED \u2014 all loaded software wiped.</span>"
         lines << "#{border_red}  <span style='color: #9ca3af;'>Reload software from inventory before your next BREACH.</span>"
       end
       lines << "<span style='color: #f87171; font-weight: bold;'>\u255a#{SEPARATOR}\u255d</span>"
@@ -127,7 +127,7 @@ module Grid
     end
 
     def render_pnr_warning
-      "<span style='color: #f87171; font-weight: bold;'>\u26a0 SYSTEM ALERT: Intrusion signature locked. Exit route compromised.</span>"
+      "<span style='color: #f87171; font-weight: bold;'>\u25b2 SYSTEM ALERT: Intrusion signature locked. Exit route compromised.</span>"
     end
 
     def render_sandbox_end(end_state, failure_mode: nil)
@@ -151,7 +151,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #{color}; font-weight: bold;'>\u2554#{SEPARATOR}\u2557</span>"
-      lines << "<span style='color: #{color}; font-weight: bold;'>\u2551  #{label}#{" " * [62 - label.length - 4, 0].max}\u2551</span>"
+      lines << "<span style='color: #{color}; font-weight: bold;'>\u2551  #{label}</span>"
       lines << "<span style='color: #{color}; font-weight: bold;'>\u2560#{SEPARATOR}\u2563</span>"
       lines << "<span style='color: #{color};'>\u2551</span>  <span style='color: #d0d0d0;'>#{cause}</span>"
       lines << "<span style='color: #{color};'>\u2551</span>"
@@ -269,7 +269,7 @@ module Grid
         when "failed"
           ["#f87171", "\u2717", "FAILED"]
         when "locked"
-          ["#6b7280", "\u25a1", "locked (solve #{gate["depends_on"]} first)"]
+          ["#6b7280", "\u2591", "locked (solve #{gate["depends_on"]} first)"]
         else # active
           attempts_text = if gate["max_attempts"].to_i == Grid::BreachService::UNLIMITED_ATTEMPTS
             "unlimited attempts"

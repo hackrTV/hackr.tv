@@ -101,7 +101,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2554#{separator}\u2557</span>"
-      lines << "<span style='color: #f87171; font-weight: bold;'>\u2551  \u26a0 RESTOREPOINT\u2122 :: GovCorp Emergency Services              \u2551</span>"
+      lines << "<span style='color: #f87171; font-weight: bold;'>\u2551  \u25b2 RESTOREPOINT\u2122 :: GovCorp Emergency Services</span>"
       lines << "<span style='color: #f87171; font-weight: bold;'>\u2560#{separator}\u2563</span>"
       lines << "<span style='color: #f87171;'>\u2551</span>  <span style='color: #d0d0d0;'>Neural link severed. Emergency recovery engaged.</span>"
       lines << "<span style='color: #f87171;'>\u2551</span>"
@@ -116,11 +116,11 @@ module Grid
         # Partial payment
         lines << "#{border}  <span style='color: #9ca3af;'>Cache balance insufficient. #{debt_result[:paid]} CRED deducted.</span>"
         lines << "#{border}  <span style='color: #ef4444;'>GovCorp debt incurred: #{debt_result[:debt_incurred]} CRED</span>"
-        lines << "#{border}  <span style='color: #ef4444;'>\u26a0 CRED income garnished at 50% until debt cleared.</span>"
+        lines << "#{border}  <span style='color: #ef4444;'>\u25b2 CRED income garnished at 50% until debt cleared.</span>"
       else
         # No funds at all
         lines << "#{border}  <span style='color: #ef4444;'>No funds available. Full debt incurred: #{fee} CRED</span>"
-        lines << "#{border}  <span style='color: #ef4444;'>\u26a0 CRED income garnished at 50% until debt cleared.</span>"
+        lines << "#{border}  <span style='color: #ef4444;'>\u25b2 CRED income garnished at 50% until debt cleared.</span>"
       end
 
       if debt_result[:total_debt] > 0
