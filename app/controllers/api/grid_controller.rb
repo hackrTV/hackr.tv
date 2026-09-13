@@ -9,6 +9,11 @@ class Api::GridController < ApplicationController
   # the session utilities Stimulus and admin pages use (current_hackr,
   # disconnect), and the Bearer-token external debit endpoint.
   before_action :require_login_api, only: %i[current_hackr_info command disconnect debit]
+  # Admin preview (controlled rollout): the grid game is admin-only for
+  # now — remove this line to reopen the programmatic command surface.
+  # login/current_hackr/disconnect stay open (site-wide session
+  # utilities: nav logout, admin moderation pages).
+  before_action :require_admin_preview_api, only: [:command]
   before_action -> { require_feature_api(FeatureGrant::PULSE_GRID) }, only: [:command]
   before_action :require_admin_api, only: [:debit]
 

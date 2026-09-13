@@ -1,13 +1,29 @@
 require "rails_helper"
 
 RSpec.describe Api::PulsesController, type: :controller do
-  let(:hackr) { create(:grid_hackr) }
+  # Admin roles for the acting hackrs: the WIRE JSON API is admin-only
+  # while in admin preview (admin_preview_spec pins the gate itself).
+  # The reads were public before the preview and reopen with it.
+  let(:hackr) { create(:grid_hackr, :admin) }
   let(:admin_hackr) { create(:grid_hackr, :admin) }
-  let(:other_hackr) { create(:grid_hackr) }
+  let(:other_hackr) { create(:grid_hackr, :admin) }
 
   describe "GET #index" do
-    context "without authentication" do
-      it "returns active pulses (no auth required for reading)" do
+    before { session[:grid_hackr_id] = admin_hackr.id }
+
+    context "when anonymous (admin preview)" do
+      it "returns 403 forbidden" do
+        session.delete(:grid_hackr_id)
+
+        get :index, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+        expect(JSON.parse(response.body)["error"]).to include("not opened")
+      end
+    end
+
+    context "as an admin viewer" do
+      it "returns active pulses" do
         create(:pulse, grid_hackr: hackr)
         create(:pulse, grid_hackr: other_hackr)
 
@@ -218,6 +234,8 @@ RSpec.describe Api::PulsesController, type: :controller do
   end
 
   describe "GET #show" do
+    before { session[:grid_hackr_id] = admin_hackr.id }
+
     let!(:pulse) { create(:pulse, grid_hackr: hackr) }
 
     it "returns the pulse" do
@@ -398,7 +416,12 @@ RSpec.describe Api::PulsesController, type: :controller do
     end
 
     context "when authenticated as non-admin" do
-      before { session[:grid_hackr_id] = hackr.id }
+      # While the admin preview is on, non-admins are stopped by the
+      # preview gate (same 403, different message); the require_admin
+      # moderation gate resumes as the blocker when the preview lifts.
+      let(:non_admin) { create(:grid_hackr) }
+
+      before { session[:grid_hackr_id] = non_admin.id }
 
       let!(:pulse) { create(:pulse, grid_hackr: other_hackr) }
 
@@ -407,7 +430,7 @@ RSpec.describe Api::PulsesController, type: :controller do
 
         expect(response).to have_http_status(:forbidden)
         json = JSON.parse(response.body)
-        expect(json["error"]).to include("Admin access required")
+        expect(json["error"]).to include("not opened")
       end
 
       it "does not pulse-drop the pulse" do

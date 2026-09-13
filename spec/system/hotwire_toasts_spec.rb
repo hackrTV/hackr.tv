@@ -3,7 +3,9 @@ require "rails_helper"
 # Phase 3: achievement toasts on Hotwire pages via the user-scoped
 # [hackr, :toasts] stream (dual-published next to the SPA's JSON).
 RSpec.describe "Hotwire toasts", type: :system do
-  let!(:hackr) { create(:grid_hackr, password: "hackthegrid") }
+  # Admin role: the toast page under test is /wire, which is admin-only
+  # while in admin preview.
+  let!(:hackr) { create(:grid_hackr, :admin, password: "hackthegrid") }
   let!(:achievement) do
     create(:grid_achievement, name: "Signal Tapper", category: "social",
       badge_icon: "📡", xp_reward: 50, cred_reward: 10, description: "Tapped the signal.")

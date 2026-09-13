@@ -4,6 +4,10 @@ module Api
     include PulseSerialization
 
     before_action :require_login_api, only: %i[create destroy pulse_drop]
+    # Admin preview (controlled rollout): the WIRE is admin-only for now
+    # — remove this line to reopen the JSON surface. After the login
+    # check so unauthenticated writes keep answering 401.
+    before_action :require_admin_preview_api
     before_action :set_pulse, only: %i[show destroy pulse_drop]
     before_action :authorize_pulse_owner, only: [:destroy]
     before_action :require_admin, only: [:pulse_drop]

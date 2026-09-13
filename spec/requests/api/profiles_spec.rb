@@ -4,9 +4,15 @@ RSpec.describe "Api::Profiles", type: :request do
   # Stored alias is mixed-case; URLs reach the controller lowercased (the
   # LowercaseRedirect Rack middleware canonicalizes paths), so requesting
   # the lowercase form also exercises the case-insensitive lookup.
-  let(:hackr) { create(:grid_hackr, hackr_alias: "GhostWire", bio: "Just a ghost in the wire.") }
+  # Admin roles: the endpoint is admin-only while the WIRE is in admin
+  # preview (admin_preview_spec pins the gate itself).
+  let(:hackr) { create(:grid_hackr, :admin, hackr_alias: "GhostWire", bio: "Just a ghost in the wire.") }
+  let(:viewer) { create(:grid_hackr, :admin) }
 
-  before { Rails.cache.clear }
+  before do
+    Rails.cache.clear
+    login_as(viewer)
+  end
 
   def login_as(h)
     post "/api/grid/login", params: {hackr_alias: h.hackr_alias, password: "hackthegrid"}, as: :json

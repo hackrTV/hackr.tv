@@ -1,0 +1,8 @@
+<%# ADMIN PREVIEW banner (AdminPreview concern) — shown to admins on
+    pages gated admin-only ahead of public rollout. %>
+<% if @admin_preview %>
+  <div class="admin-preview-banner" role="status">
+    <span class="admin-preview-banner-tag">ADMIN PREVIEW</span>
+    <span>This page is visible to admins only for now.</span>
+  </div>
+<% end %>

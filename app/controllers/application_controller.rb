@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
 
   include RequestAnalysis
   include GridAuthentication
+  include AdminPreview
   include CoverUrlHelpers
   include StructuredLogging
 

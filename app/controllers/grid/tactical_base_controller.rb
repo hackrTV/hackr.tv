@@ -3,6 +3,7 @@
 # /grid/1337 (has_feature? admits admins implicitly).
 class Grid::TacticalBaseController < ApplicationController
   before_action :require_login
+  admin_preview!
   before_action :require_tactical_grid
 
   private

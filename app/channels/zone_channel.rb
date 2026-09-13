@@ -9,6 +9,13 @@ class ZoneChannel < ApplicationCable::Channel
       return
     end
 
+    # Admin preview (controlled rollout): the grid is admin-only for now
+    # — remove this check when the tactical surface reopens.
+    unless current_hackr.admin?
+      reject
+      return
+    end
+
     current_hackr.reload
     zone_id = current_hackr.current_room&.grid_zone_id
 

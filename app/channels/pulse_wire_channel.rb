@@ -1,8 +1,18 @@
 class PulseWireChannel < ApplicationCable::Channel
   def subscribed
-    # All hackrs can subscribe to the global PulseWire feed
-    # No authentication required to view, but needed to post (handled in controller)
-    Rails.logger.info "=== PulseWireChannel: #{current_hackr&.hackr_alias || "Anonymous"} subscribed to the Wire ==="
+    # Admin preview (controlled rollout): the WIRE is admin-only for now
+    # — restore the open subscribe when it reopens (it was public: no
+    # auth to view, login only to post). /terminal's server-side
+    # subscriber (lib/terminal/realtime_subscriber.rb) reads the
+    # pulse_wire stream at the pubsub layer, not through this channel,
+    # so it is unaffected.
+    unless current_hackr&.admin?
+      Rails.logger.warn "=== PulseWireChannel: Rejected non-admin subscribe (admin preview) ==="
+      reject
+      return
+    end
+
+    Rails.logger.info "=== PulseWireChannel: #{current_hackr.hackr_alias} subscribed to the Wire ==="
     stream_from "pulse_wire"
   end
 

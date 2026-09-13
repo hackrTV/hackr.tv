@@ -4,6 +4,7 @@
 # stay terminal commands (the pages only hint them, like the SPA).
 class Grid::MetaController < ApplicationController
   before_action :require_login
+  admin_preview!
   before_action :require_pulse_grid
 
   # GET /achievements

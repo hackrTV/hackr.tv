@@ -7,6 +7,10 @@ module Api
     include PulseSerialization
 
     before_action :require_login_api
+    # Admin preview (controlled rollout): the WIRE is admin-only for now
+    # — remove this line to reopen the JSON surface. After the login
+    # check so unauthenticated requests keep answering 401.
+    before_action :require_admin_preview_api
 
     # POST /api/pulses/:pulse_id/pin
     def create

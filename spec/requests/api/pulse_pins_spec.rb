@@ -1,7 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "Api::PulsePins", type: :request do
-  let(:hackr) { create(:grid_hackr) }
+  # Admin role: the endpoint is admin-only while the WIRE is in admin
+  # preview (admin_preview_spec pins the gate itself).
+  let(:hackr) { create(:grid_hackr, :admin) }
   let(:pulse) { create(:pulse, grid_hackr: hackr) }
 
   def login_as(h)

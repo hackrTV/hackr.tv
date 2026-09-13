@@ -25,7 +25,14 @@
 
   <body class="black-168">
     <%= render "shared/nav" %>
-    <%= render "shared/flash" %>
+
+    <%# Fixed to the bottom edge (above the statusbar): the fixed
+        .tui-nav wraps to a variable number of rows with login state and
+        viewport width, so top-of-flow notices render underneath it. %>
+    <div class="bottom-notices">
+      <%= render "shared/flash" %>
+      <%= render "shared/admin_preview_banner" %>
+    </div>
 
     <div id="main-content">
       <%= yield %>

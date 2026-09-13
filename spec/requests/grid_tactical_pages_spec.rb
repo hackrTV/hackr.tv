@@ -6,8 +6,11 @@ require "rails_helper"
 RSpec.describe "Grid tactical pages", type: :request do
   let(:zone) { create(:grid_zone) }
   let(:room) { create(:grid_room, grid_zone: zone, name: "Relay Nexus") }
+  # Admin role: the grid is admin-only while in admin preview
+  # (admin_preview_spec pins the gate itself); the feature-grant gate
+  # underneath resumes for non-admins when the preview is lifted.
   let!(:hackr) do
-    create(:grid_hackr, password: "hackthegrid", current_room: room,
+    create(:grid_hackr, :admin, password: "hackthegrid", current_room: room,
       stats: {"tutorial_completed" => true})
   end
 
@@ -31,8 +34,10 @@ RSpec.describe "Grid tactical pages", type: :request do
       expect(response).to have_http_status(:redirect)
     end
 
-    it "renders the coming-soon gate without the tactical_grid grant" do
-      log_in!
+    it "renders the coming-soon gate for non-admins (admin preview)" do
+      plain = create(:grid_hackr, password: "hackthegrid", current_room: room)
+      grant_tactical!(plain)
+      log_in!(plain)
 
       get "/grid/1337"
 

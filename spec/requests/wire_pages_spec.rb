@@ -3,7 +3,11 @@ require "rails_helper"
 # Server-rendered PulseWire pages + form endpoints (Hotwire migration
 # Phase 3). The JSON API keeps its own specs.
 RSpec.describe "Wire pages", type: :request do
-  let!(:hackr) { create(:grid_hackr, password: "hackthegrid") }
+  # Admin role for the viewer/actor: the WIRE is admin-only while in
+  # admin preview (admin_preview_spec pins the gate itself). `other`
+  # stays a plain operative — poster-role behavior (link censorship)
+  # depends on it.
+  let!(:hackr) { create(:grid_hackr, :admin, password: "hackthegrid") }
   let!(:other) { create(:grid_hackr, password: "hackthegrid") }
 
   def log_in!(as = hackr)
@@ -28,20 +32,22 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("turbo-cable-stream-source") # live stream subscription
     end
 
-    it "shows the login prompt when anonymous" do
+    it "shows the coming-soon gate when anonymous (admin preview)" do
       get "/wire"
 
-      expect(response.body).to include("to broadcast on the WIRE")
+      expect(response.body).to include("will open soon")
       expect(response.body).not_to include("Broadcast on the WIRE...")
     end
 
     it "renders the empty state" do
+      log_in!
       get "/wire"
 
       expect(response.body).to include("The WIRE is silent. Broadcast the first pulse.")
     end
 
     it "excludes pulse-dropped and splice pulses from the feed" do
+      log_in!
       make_pulse(other, content: "Visible pulse")
       dropped = make_pulse(other, content: "Dropped pulse")
       dropped.pulse_drop!
@@ -57,6 +63,7 @@ RSpec.describe "Wire pages", type: :request do
 
     it "paginates via a lazy frame" do
       55.times { |i| make_pulse(other, content: "Pulse number #{i}") }
+      log_in!
 
       get "/wire"
       expect(response.body).to include("wire-page-2")
@@ -69,6 +76,7 @@ RSpec.describe "Wire pages", type: :request do
       make_pulse(other, content: "see https://example.com now")
       admin = create(:grid_hackr, :admin, password: "hackthegrid")
       make_pulse(admin, content: "read https://example.com today")
+      log_in!
 
       get "/wire"
 
@@ -78,10 +86,11 @@ RSpec.describe "Wire pages", type: :request do
   end
 
   describe "POST /wire/pulses" do
-    it "requires login" do
-      post "/wire/pulses", params: {content: "nope"}
+    it "is gated for anonymous posters (admin preview)" do
+      post "/wire/pulses", params: {content: "nope"},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
-      expect(response).to redirect_to("/grid/login")
+      expect(response).to have_http_status(:forbidden)
     end
 
     it "creates a root pulse and responds with turbo streams" do
@@ -180,6 +189,7 @@ RSpec.describe "Wire pages", type: :request do
       hackr.pulse_pins.create!(pulse: pinned, position: 0)
       echoed = make_pulse(other, content: "Echoed by profile owner")
       Echo.create!(pulse: echoed, grid_hackr: hackr)
+      log_in!
 
       get "/wire/#{hackr.hackr_alias.downcase}"
 
@@ -197,6 +207,7 @@ RSpec.describe "Wire pages", type: :request do
     end
 
     it "canonicalizes case via the LowercaseRedirect middleware" do
+      log_in!
       get "/wire/#{hackr.hackr_alias.upcase}"
 
       expect(response).to have_http_status(:moved_permanently)
@@ -206,6 +217,7 @@ RSpec.describe "Wire pages", type: :request do
     end
 
     it "renders NO SIGNAL for unknown hackrs" do
+      log_in!
       get "/wire/ghost_alias"
 
       expect(response).to have_http_status(:not_found)
@@ -262,6 +274,7 @@ RSpec.describe "Wire pages", type: :request do
       root = make_pulse(other, content: "Thread root pulse")
       reply = create(:pulse, grid_hackr: hackr, content: "Nested reply", parent_pulse_id: root.id)
       create(:pulse, grid_hackr: other, content: "Deep reply", parent_pulse_id: reply.id)
+      log_in!
 
       get "/wire/pulse/#{root.id}"
 
@@ -276,6 +289,7 @@ RSpec.describe "Wire pages", type: :request do
     it "resolves a splice to its root thread" do
       root = make_pulse(other, content: "The root")
       reply = create(:pulse, grid_hackr: hackr, content: "The reply", parent_pulse_id: root.id)
+      log_in!
 
       get "/wire/pulse/#{reply.id}"
 
@@ -284,6 +298,7 @@ RSpec.describe "Wire pages", type: :request do
     end
 
     it "404s for unknown pulses" do
+      log_in!
       get "/wire/pulse/999999"
 
       expect(response).to have_http_status(:not_found)
