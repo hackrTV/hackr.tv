@@ -1,6 +1,7 @@
 # Inline bio edit on the own wire profile (Phase 3) — turbo-frame form
 # over the same model rules as Grid::IdentitiesController#update.
 class Wire::BiosController < ApplicationController
+  admin_preview! title: "The WIRE"
   before_action :require_login
   before_action :require_self
 

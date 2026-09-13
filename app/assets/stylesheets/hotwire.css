@@ -140,17 +140,59 @@
 .mobile-menu-item .purple-168-text { color: #a78bfa; }
 .mobile-menu-item .red-255-text { color: #ef4444; }
 
+/* --- Bottom notice region (flash + ADMIN PREVIEW banner) ---
+ * Fixed to the bottom edge, above the fixed .tui-statusbar: the fixed
+ * .tui-nav at the top wraps to a variable number of rows with login
+ * state and viewport width, so nothing at the top of normal flow has a
+ * reliable clearance — top-of-flow notices rendered underneath it.
+ * z-index sits above page content, below the nav dropdowns (9999) and
+ * toasts (10000). Empty when no flash/banner (zero height, invisible). */
+.bottom-notices {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 26px;
+  z-index: 2500;
+}
+/* The bottom statusbar is display:none under 768px — drop to the edge. */
+@media (max-width: 767px) {
+  .bottom-notices { bottom: 0; }
+}
+
 /* --- Flash messages --- */
 .flash {
   font-family: 'Courier New', Courier, monospace;
   padding: 8px 12px;
   margin: 4px 10px;
   border: 2px solid;
+  background: #0a0a0a;
 }
-.flash-error { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-.flash-alert { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-.flash-notice { color: #22c55e; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
-.flash-success { color: #22c55e; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+/* Solid backgrounds (the old 10% rgba tints over #0a0a0a): the flashes
+ * float over page content now, so translucency would bleed through. */
+.flash-error { color: #ef4444; border-color: #ef4444; background: #211010; }
+.flash-alert { color: #ef4444; border-color: #ef4444; background: #211010; }
+.flash-notice { color: #22c55e; border-color: #22c55e; background: #0c1d12; }
+.flash-success { color: #22c55e; border-color: #22c55e; background: #0c1d12; }
+
+/* --- ADMIN PREVIEW banner (controlled rollout, AdminPreview concern) ---
+ * Positioned by the .bottom-notices wrapper; flashes stack above it. */
+.admin-preview-banner {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  padding: 5px 12px;
+  border-top: 2px dashed #f59e0b;
+  border-bottom: 2px dashed #f59e0b;
+  color: #f59e0b;
+  background: rgba(24, 14, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.admin-preview-banner-tag {
+  font-weight: bold;
+  letter-spacing: 1px;
+}
 
 /* --- Toast region (populated via Turbo Streams in Phase 3) --- */
 #toast-region {

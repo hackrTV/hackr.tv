@@ -6,6 +6,10 @@ module Api
     include GridAuthentication
     include PulseSerialization
 
+    # Admin preview (controlled rollout): WIRE profiles are admin-only
+    # for now — remove this line to restore the public endpoint.
+    before_action :require_admin_preview_api
+
     # last_active is coarsened to this granularity so the public endpoint
     # can't be polled for fine-grained presence tracking.
     LAST_ACTIVE_GRANULARITY = 5.minutes

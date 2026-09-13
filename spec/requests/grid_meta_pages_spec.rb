@@ -5,8 +5,10 @@ require "rails_helper"
 RSpec.describe "Grid meta pages", type: :request do
   let(:zone) { create(:grid_zone) }
   let(:room) { create(:grid_room, grid_zone: zone, name: "Relay Nexus") }
+  # Admin role: the grid is admin-only while in admin preview
+  # (admin_preview_spec pins the gate itself).
   let!(:hackr) do
-    create(:grid_hackr, password: "hackthegrid", current_room: room,
+    create(:grid_hackr, :admin, password: "hackthegrid", current_room: room,
       stats: {"tutorial_completed" => true})
   end
 

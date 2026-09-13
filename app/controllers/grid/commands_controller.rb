@@ -5,6 +5,7 @@
 # itself (grid-command Stimulus), so no echo here.
 class Grid::CommandsController < ApplicationController
   before_action :require_login
+  admin_preview!
   before_action :require_pulse_grid
 
   # POST /grid/commands

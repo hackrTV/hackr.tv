@@ -5,8 +5,11 @@ require "rails_helper"
 # live in another via the wire_html stream (dual-publish keeps the JSON
 # channel for overlays).
 RSpec.describe "Hotwire wire feed", type: :system do
-  let!(:hackr) { create(:grid_hackr, password: "hackthegrid") }
-  let!(:other) { create(:grid_hackr, password: "hackthegrid") }
+  # Admin roles: the WIRE is admin-only while in admin preview
+  # (admin_preview_spec pins the gate); viewer sessions log in too since
+  # anonymous visitors now get the coming-soon page.
+  let!(:hackr) { create(:grid_hackr, :admin, password: "hackthegrid") }
+  let!(:other) { create(:grid_hackr, :admin, password: "hackthegrid") }
 
   def log_in!(as)
     visit "/grid/login"
@@ -39,6 +42,7 @@ RSpec.describe "Hotwire wire feed", type: :system do
 
   it "delivers a pulse posted in one session to another live (exit criterion)" do
     using_session(:viewer) do
+      log_in!(hackr)
       visit "/wire"
       expect(page).to have_content("The WIRE")
       expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, wait: 10)
@@ -63,6 +67,7 @@ RSpec.describe "Hotwire wire feed", type: :system do
     pulse = create(:pulse, grid_hackr: other, content: "Echo relay target")
 
     using_session(:viewer) do
+      log_in!(other)
       visit "/wire"
       expect(page).to have_content("Echo relay target")
       expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, wait: 10)
@@ -86,6 +91,7 @@ RSpec.describe "Hotwire wire feed", type: :system do
     pulse = create(:pulse, grid_hackr: hackr, content: "Doomed broadcast")
 
     using_session(:viewer) do
+      log_in!(other)
       visit "/wire"
       expect(page).to have_content("Doomed broadcast")
       expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, wait: 10)

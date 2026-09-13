@@ -3,6 +3,7 @@
 # Responds with the viewer's own echo button; other viewers get the
 # count-only update from the model's dual-publish broadcast.
 class Wire::EchoesController < ApplicationController
+  admin_preview! title: "The WIRE"
   before_action :require_login
 
   # POST /wire/pulses/:id/echo

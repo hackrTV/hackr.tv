@@ -7,6 +7,14 @@ class GridChannel < ApplicationCable::Channel
       return
     end
 
+    # Admin preview (controlled rollout): the grid is admin-only for now
+    # — remove this check to reopen the room stream to granted hackrs.
+    unless current_hackr.admin?
+      Rails.logger.warn "=== GridChannel: Rejected non-admin subscribe (admin preview) ==="
+      reject
+      return
+    end
+
     # Reload hackr to get fresh current_room data from database
     current_hackr.reload
 

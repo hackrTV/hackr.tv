@@ -1,7 +1,9 @@
 require "rails_helper"
 
 RSpec.describe Api::EchoesController, type: :controller do
-  let(:hackr) { create(:grid_hackr) }
+  # Admin role for the acting hackr: the WIRE JSON API is admin-only
+  # while in admin preview (admin_preview_spec pins the gate itself).
+  let(:hackr) { create(:grid_hackr, :admin) }
   let(:other_hackr) { create(:grid_hackr) }
   let(:pulse) { create(:pulse, grid_hackr: other_hackr) }
 

@@ -8,8 +8,10 @@ RSpec.describe "Hotwire grid game", type: :system do
   let(:zone) { create(:grid_zone) }
   let(:room) { create(:grid_room, grid_zone: zone, name: "Neon Atrium") }
 
+  # Admin role: the grid is admin-only while in admin preview
+  # (admin_preview_spec pins the gate itself).
   def make_hackr(alias_name)
-    hackr = create(:grid_hackr, hackr_alias: alias_name, password: "hackthegrid",
+    hackr = create(:grid_hackr, :admin, hackr_alias: alias_name, password: "hackthegrid",
       current_room: room, stats: {"tutorial_completed" => true})
     create(:feature_grant, grid_hackr: hackr, feature: FeatureGrant::PULSE_GRID)
     hackr

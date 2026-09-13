@@ -5,6 +5,7 @@
 # Grid::CommandsController.
 class Grid::GameController < ApplicationController
   before_action :require_login
+  admin_preview!
   before_action :require_pulse_grid
 
   # GET /grid

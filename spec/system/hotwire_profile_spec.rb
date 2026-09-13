@@ -2,7 +2,9 @@ require "rails_helper"
 
 # Phase 3: wire profiles — inline bio frame, pins, timeline indicators.
 RSpec.describe "Hotwire wire profile", type: :system do
-  let!(:hackr) { create(:grid_hackr, password: "hackthegrid", bio: "Ghost in the wire") }
+  # Admin role for the viewer/owner: the WIRE is admin-only while in
+  # admin preview (admin_preview_spec pins the gate).
+  let!(:hackr) { create(:grid_hackr, :admin, password: "hackthegrid", bio: "Ghost in the wire") }
   let!(:other) { create(:grid_hackr, password: "hackthegrid") }
 
   def log_in!(as = hackr)
@@ -18,6 +20,7 @@ RSpec.describe "Hotwire wire profile", type: :system do
     echoed = create(:pulse, grid_hackr: other, content: "Someone else's signal")
     Echo.create!(pulse: echoed, grid_hackr: hackr)
 
+    log_in!
     visit "/wire/#{hackr.hackr_alias.downcase}"
 
     expect(page).to have_content("@#{hackr.hackr_alias}")
