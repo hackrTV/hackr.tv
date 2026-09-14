@@ -132,7 +132,7 @@
                     <%= hackr.hackr_alias %>
                     <% if hackr.service_account? %>
                       <span style="color: #ff8800; font-size: 0.8em;">[SVC]</span>
-                      <%= button_to "✕", admin_grid_toggle_service_account_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, class: "tui-button", style: "padding: 1px 5px; font-size: 0.7em; margin-left: 3px; background: transparent; color: #ff8800; border: 1px solid #ff8800;", data: { confirm: "Remove service account flag from #{hackr.hackr_alias}?" } %>
+                      <%= button_to "✕", admin_grid_toggle_service_account_path(hackr_id: hackr.id), method: :post, aria: {label: "Remove service account flag"}, form: { style: "display: inline;" }, class: "tui-button", style: "padding: 1px 5px; font-size: 0.7em; margin-left: 3px; background: transparent; color: #ff8800; border: 1px solid #ff8800;", data: { confirm: "Remove service account flag from #{hackr.hackr_alias}?" } %>
                     <% else %>
                       <%= button_to "SVC", admin_grid_toggle_service_account_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, class: "tui-button", style: "padding: 1px 5px; font-size: 0.7em; margin-left: 3px; background: transparent; color: #666; border: 1px solid #444;", data: { confirm: "Mark #{hackr.hackr_alias} as a service account? API tokens will bypass login-disabled." } %>
                     <% end %>

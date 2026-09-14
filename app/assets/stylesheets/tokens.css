@@ -33,8 +33,13 @@
   --accent-bright-rgb: 167, 139, 250;
   --accent-alt: #22d3ee;
   --accent-alt-rgb: 34, 211, 238;
-  --accent-music: #00d9ff; /* player/radio/playlist surfaces — merge into
-                              --accent-alt later if the two-cyan split dies */
+
+  /* edges + muted text (gray consolidation 2026-09-13; #555 collapsed
+     into --fg-faint) */
+  --edge: #333333;
+  --edge-bright: #444444;
+  --fg-muted: #888888;
+  --fg-faint: #666666;
 
   /* surfaces */
   --bg-0: #0a0a0a; /* page-level black */

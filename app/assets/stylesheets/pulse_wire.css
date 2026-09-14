@@ -5,7 +5,7 @@
   display: inline-block;
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid #444;
+  border: 1px solid var(--edge-bright);
   color: var(--accent-bright);
   font-size: 1rem;
   cursor: pointer;
@@ -26,13 +26,13 @@
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  border-color: #333;
-  color: #666;
+  border-color: var(--edge);
+  color: var(--fg-faint);
 }
 
 .btn:disabled:hover {
   background: transparent;
-  border-color: #333;
+  border-color: var(--edge);
 }
 
 .btn-primary {
@@ -67,7 +67,7 @@
   width: 100%;
   padding: 10px;
   background: #000;
-  border: 1px solid #444;
+  border: 1px solid var(--edge-bright);
   color: #fff;
   font-size: 1rem;
 }
@@ -108,7 +108,7 @@
 }
 
 .status-disconnected {
-  color: #666;
+  color: var(--fg-faint);
 }
 
 @keyframes pulse-glow {
@@ -137,7 +137,7 @@
   min-height: 80px;
   padding: 12px;
   background: #000;
-  border: 1px solid #444;
+  border: 1px solid var(--edge-bright);
   color: #fff;
   font-size: 1rem;
   resize: vertical;
@@ -158,7 +158,7 @@
 
 .char-count {
   font-size: 0.9rem;
-  color: #888;
+  color: var(--fg-muted);
 }
 
 .char-count.warning {
@@ -228,7 +228,7 @@
 
 .pulse-timestamp {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--fg-muted);
 }
 
 .pulse-content {
@@ -283,7 +283,7 @@
 .splice-button,
 .delete-button {
   background: transparent;
-  border: 1px solid #444;
+  border: 1px solid var(--edge-bright);
   color: var(--accent-bright);
   padding: 6px 12px;
   cursor: pointer;
@@ -332,7 +332,7 @@
 
 .delete-button {
   color: var(--err);
-  border-color: #444;
+  border-color: var(--edge-bright);
   margin-left: auto;
   font-size: 1.2rem;
   padding: 4px 10px;
@@ -358,7 +358,7 @@
 .pulse-reply-form {
   margin-top: 15px;
   padding-top: 15px;
-  border-top: 1px dashed #333;
+  border-top: 1px dashed var(--edge);
 }
 
 /* Thread View */
@@ -429,7 +429,7 @@
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #888;
+  color: var(--fg-muted);
 }
 
 .loading-more {
@@ -441,8 +441,8 @@
 .end-of-feed {
   text-align: center;
   padding: 30px;
-  color: #888;
-  border-top: 1px dashed #444;
+  color: var(--fg-muted);
+  border-top: 1px dashed var(--edge-bright);
   margin-top: 20px;
 }
 

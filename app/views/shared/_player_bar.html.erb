@@ -18,11 +18,11 @@
             data-player-target="playPause" data-action="player#togglePlayPause">► PLAY</button>
 
     <span class="player-nav" data-player-target="controls">
-      <button class="tui-button player-nav-btn" tabindex="-1" title="Previous track"
+      <button class="tui-button player-nav-btn" tabindex="-1" title="Previous track" aria-label="Previous track"
               data-action="player#previous">⏮</button>
-      <button class="tui-button player-nav-btn" tabindex="-1" title="Next track"
+      <button class="tui-button player-nav-btn" tabindex="-1" title="Next track" aria-label="Next track"
               data-action="player#next">⏭</button>
-      <button class="tui-button player-nav-btn player-shuffle-btn" tabindex="-1" title="Shuffle: Off"
+      <button class="tui-button player-nav-btn player-shuffle-btn" tabindex="-1" title="Shuffle: Off" aria-label="Toggle shuffle"
               data-player-target="shuffleButton" data-action="player#toggleShuffle">⤮</button>
     </span>
 
@@ -74,19 +74,19 @@
     <% end %>
 
     <div class="player-queue" data-player-target="queue">
-      <button class="tui-button player-queue__toggle" tabindex="-1" title="Show queue"
+      <button class="tui-button player-queue__toggle" tabindex="-1" title="Show queue" aria-label="Show queue"
               data-player-target="queueToggle" data-action="player#toggleQueue">☰ Queue<span data-player-target="queueCount"></span></button>
       <div class="player-queue-panel" data-player-target="queuePanel" hidden>
         <div class="player-queue-panel__header">
           <div class="player-queue-panel__title">Up Next</div>
-          <button class="tui-button player-queue-panel__close" data-action="player#closeQueue">✕</button>
+          <button class="tui-button player-queue-panel__close" aria-label="Close queue" data-action="player#closeQueue">✕</button>
         </div>
         <div class="player-queue-panel__list" data-player-target="queueList"></div>
         <div class="player-queue-panel__more" data-player-target="queueMore" hidden></div>
       </div>
     </div>
 
-    <button id="close-player-btn" class="tui-button player-close" tabindex="-1"
+    <button id="close-player-btn" class="tui-button player-close" tabindex="-1" aria-label="Close player"
             data-action="player#close">✕</button>
   </div>
 </div>

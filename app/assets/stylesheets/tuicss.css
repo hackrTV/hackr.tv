@@ -1841,3 +1841,12 @@ input[type=button] {
 .tui-overlap.active {
   display: block !important;
 }
+
+/* Keyboard focus (a11y pass 2026-09-13): hard DOS-style ring on every
+   focusable element. tokens.css supplies --accent-alt where loaded; the
+   literal fallback covers token-less layouts (admin). */
+button:focus-visible, a:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent-alt, #22d3ee);
+  outline-offset: 1px;
+}

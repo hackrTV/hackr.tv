@@ -70,18 +70,18 @@
       <% end %>
 
       <%= button_to "×", wire_destroy_pulse_path(pulse), method: :delete,
-        class: "delete-button", title: "Delete pulse", form_class: "wire-inline-form",
+        class: "delete-button", title: "Delete pulse", aria: {label: "Delete pulse"}, form_class: "wire-inline-form",
         form: {hidden: !own, data: {pulse_card_target: "ownerOnly"}} %>
 
       <% if pinnable %>
         <% if pinned %>
           <% if can_up %>
             <%= button_to "↑", wire_pulse_pin_move_path(pulse, direction: "up"), method: :patch,
-              class: "pin-move-button", form_class: "wire-inline-form" %>
+              class: "pin-move-button", aria: {label: "Move pin up"}, form_class: "wire-inline-form" %>
           <% end %>
           <% if can_down %>
             <%= button_to "↓", wire_pulse_pin_move_path(pulse, direction: "down"), method: :patch,
-              class: "pin-move-button", form_class: "wire-inline-form" %>
+              class: "pin-move-button", aria: {label: "Move pin down"}, form_class: "wire-inline-form" %>
           <% end %>
           <%= button_to "📌 UNPIN", wire_pulse_pin_path(pulse), method: :delete,
             class: "pin-button pin-button--pinned", title: "Unpin from profile", form_class: "wire-inline-form" %>
