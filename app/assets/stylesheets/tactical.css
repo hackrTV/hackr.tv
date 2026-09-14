@@ -28,53 +28,53 @@
 
 .tactical-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; display: grid; grid-template-areas: "topbar topbar" "leftcol map" "help help"; grid-template-columns: 50fr 50fr; grid-template-rows: 44px 1fr 58px; background: var(--bg-0); font-family: var(--font-tui); font-size: 20px; color: var(--fg); z-index: 40; }
 
-.tactical-bar { grid-area: topbar; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--bg-1); border-bottom: 1px solid #333; font-size: 0.8em; }
+.tactical-bar { grid-area: topbar; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--bg-1); border-bottom: 1px solid #333; font-size: 16px; }
 .tactical-bar-left, .tactical-bar-right { display: flex; align-items: center; gap: 10px; }
 .tactical-bar-title { color: var(--accent-bright); font-weight: bold; letter-spacing: 1px; }
 .tactical-bar-sep { color: #444; }
 .tactical-bar-alias { color: var(--fg-bright); }
 .tactical-bar-clearance { color: var(--warn); }
 .tactical-bar-admin { color: var(--err); text-decoration: none; }
-.tactical-bar-link { color: #666; text-decoration: none; font-size: 0.9em; }
+.tactical-bar-link { color: #666; text-decoration: none; font-size: 18px; }
 .tactical-bar-link:hover { color: var(--accent-bright); }
 .tactical-bar-status { display: inline-flex; align-items: center; gap: 10px; }
 .tactical-vital { display: inline-flex; align-items: center; gap: 4px; }
-.tactical-vital-label { color: #666; font-size: 0.85em; }
-.tactical-vital-track { display: inline-block; width: 54px; height: 6px; background: var(--bg-2); border: 1px solid #333; border-radius: 2px; overflow: hidden; }
+.tactical-vital-label { color: #666; font-size: 18px; }
+.tactical-vital-track { display: inline-block; width: 54px; height: 6px; background: var(--bg-2); border: 1px solid #333; overflow: hidden; }
 .tactical-vital-fill { display: block; height: 100%; }
 .tactical-vital--hp .tactical-vital-fill { background: var(--ok); }
 .tactical-vital--en .tactical-vital-fill { background: var(--warn); }
 .tactical-vital--ps .tactical-vital-fill { background: var(--accent-bright); }
-.tactical-vital-value { color: #888; font-size: 0.85em; }
+.tactical-vital-value { color: #888; font-size: 18px; }
 
 .tactical-leftcol { grid-area: leftcol; display: flex; flex-direction: column; min-height: 0; border-right: 1px solid #222; }
 .tactical-status { flex: 2; min-height: 0; display: flex; flex-direction: column; border-bottom: 1px solid #222; }
 .tactical-tab-bar { flex-shrink: 0; display: flex; gap: 2px; background: var(--bg-1); border-bottom: 1px solid #222; padding: 0 4px; }
-.tactical-tab-button { background: transparent; border: none; border-bottom: 2px solid transparent; color: #666; font-family: inherit; font-size: 0.7em; padding: 6px 8px; cursor: pointer; letter-spacing: 0.5px; }
+.tactical-tab-button { background: transparent; border: none; border-bottom: 2px solid transparent; color: #666; font-family: inherit; font-size: 14px; padding: 6px 8px; cursor: pointer; letter-spacing: 0.5px; }
 .tactical-tab-button--active { color: var(--accent-alt); border-bottom-color: var(--accent-alt); }
 .tactical-tab-panels { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 10px; }
 .tactical-tab-panel[hidden] { display: none; }
-.tactical-loading, .tab-muted { color: #555; font-size: 0.8em; }
+.tactical-loading, .tab-muted { color: #555; font-size: 16px; }
 
 .tactical-terminal { flex: 3; min-height: 0; display: flex; flex-direction: column; }
 .tactical-log { flex: 1; min-height: 0; overflow-y: auto; background: var(--bg-1); padding: 8px 10px; font-size: 16px; line-height: 1.2; white-space: pre-wrap; word-break: break-word; }
 .tactical-command-form { padding: 8px; background: var(--bg-1); border-top: 1px solid #222; margin-top: 0; }
 
 .tactical-map-region { grid-area: map; position: relative; min-height: 0; overflow: hidden; background: var(--bg-0); }
-.tactical-map-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #333; letter-spacing: 3px; font-size: 0.8em; }
+.tactical-map-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #333; letter-spacing: 3px; font-size: 16px; }
 
-.tactical-help { grid-area: help; display: flex; align-items: center; padding: 0 12px; background: var(--bg-1); border-top: 1px solid #333; color: #555; font-size: 0.7em; }
+.tactical-help { grid-area: help; display: flex; align-items: center; padding: 0 12px; background: var(--bg-1); border-top: 1px solid #333; color: #555; font-size: 14px; }
 
 /* Tab content primitives (DeckTab/LoadoutTab/RepTab/MissionsTab ports) */
-.tab-block { font-size: 0.8em; max-width: none; }
+.tab-block { font-size: 16px; max-width: none; }
 .tab-row { padding: 2px 0; }
 .tab-row--spread { display: flex; justify-content: space-between; gap: 8px; }
 .tab-line { padding: 3px 0; border-bottom: 1px solid var(--bg-2); }
 .tab-item-name { font-weight: bold; margin-bottom: 8px; }
-.tab-section-title { color: #666; font-size: 0.85em; margin: 12px 0 4px; }
+.tab-section-title { color: #666; font-size: 14px; margin: 12px 0 4px; }
 .tab-section-title--cyan { color: var(--accent-alt); }
-.tab-bar-track { display: block; background: var(--bg-2); border-radius: 2px; height: 6px; border: 1px solid #333; margin-bottom: 8px; overflow: hidden; }
-.tab-bar-fill { display: block; height: 100%; border-radius: 2px; background: var(--ok); }
+.tab-bar-track { display: block; background: var(--bg-2); height: 6px; border: 1px solid #333; margin-bottom: 8px; overflow: hidden; }
+.tab-bar-fill { display: block; height: 100%; background: var(--ok); }
 .tab-bar-fill--low { background: var(--err); }
 .tab-dim { color: #888; }
 .tab-faint { color: #555; }
@@ -82,56 +82,56 @@
 .tab-positive { color: var(--ok); }
 .tab-warn { color: var(--warn); }
 .tab-accent { color: var(--accent-alt); }
-.tab-specs { font-size: 0.85em; color: #666; margin-top: 1px; }
+.tab-specs { font-size: 14px; color: #666; margin-top: 1px; }
 .tab-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
 .tab-loadout-deck { border-bottom: 1px solid #333; margin-bottom: 4px; }
-.tab-loadout-slot { border-bottom: 1px solid var(--bg-2); font-size: 0.95em; }
+.tab-loadout-slot { border-bottom: 1px solid var(--bg-2); font-size: 16px; }
 .tab-empty-slot { color: #333; }
-.tab-rep { font-size: 0.75em; line-height: 1.6; }
+.tab-rep { font-size: 12px; line-height: 1.6; }
 .tab-rep-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tab-rep-name { color: var(--fg); }
 .tab-rep-value { color: #9ca3af; }
 .tab-mission { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--bg-2); }
-.tab-completed { color: #444; font-size: 0.9em; }
+.tab-completed { color: #444; font-size: 16px; }
 .tab-inline-form { display: inline; }
 .tab-inline-form[hidden] { display: none; }
-.tab-action-button { margin-top: 4px; border: none; padding: 3px 10px; font-size: 0.85em; font-weight: bold; cursor: pointer; border-radius: 3px; font-family: var(--font-tui); background: #333; color: var(--fg); }
+.tab-action-button { margin-top: 4px; border: none; padding: 3px 10px; font-size: 14px; font-weight: bold; cursor: pointer; font-family: var(--font-tui); background: #333; color: var(--fg); }
 .tab-action-button--go { background: var(--ok); color: var(--bg-0); }
 
 /* 6b-2: stats/inventory/cred/schematics tab primitives + dialogs */
 .tab-error { color: var(--err); }
-.tab-small { font-size: 0.85em; }
+.tab-small { font-size: 14px; }
 .tab-purple { color: var(--accent-bright); margin-left: 6px; }
 .tab-qty { color: #6b7280; }
 .tab-rule { height: 1px; background: #333; margin: 8px 0; }
 .tab-vital-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
-.tab-vital-name { font-size: 0.85em; font-weight: bold; width: 52px; flex-shrink: 0; }
-.tab-vital-track { flex: 1; display: block; background: var(--bg-2); border-radius: 2px; height: 8px; border: 1px solid #333; overflow: hidden; }
-.tab-vital-fill { display: block; height: 100%; border-radius: 2px; }
-.tab-vital-nums { color: #888; font-size: 0.85em; min-width: 52px; text-align: right; }
-.tab-xp-next { color: #555; font-size: 0.8em; text-align: right; margin-bottom: 4px; }
+.tab-vital-name { font-size: 14px; font-weight: bold; width: 52px; flex-shrink: 0; }
+.tab-vital-track { flex: 1; display: block; background: var(--bg-2); height: 8px; border: 1px solid #333; overflow: hidden; }
+.tab-vital-fill { display: block; height: 100%; }
+.tab-vital-nums { color: #888; font-size: 14px; min-width: 52px; text-align: right; }
+.tab-xp-next { color: #555; font-size: 14px; text-align: right; margin-bottom: 4px; }
 .tab-section-row { display: flex; justify-content: space-between; align-items: baseline; }
 .tab-section-title--amber { color: var(--warn); font-weight: bold; }
-.tab-section-hint { color: #444; font-size: 0.75em; }
-.tab-debt { display: flex; justify-content: space-between; padding: 4px 6px; margin-top: 4px; background: #2a1a1a; border: 1px solid rgba(var(--err-rgb), 0.2); border-radius: 3px; color: var(--err); font-weight: bold; }
-.tab-deck-summary { display: flex; gap: 16px; font-size: 0.9em; }
+.tab-section-hint { color: #444; font-size: 12px; }
+.tab-debt { display: flex; justify-content: space-between; padding: 4px 6px; margin-top: 4px; background: #2a1a1a; border: 1px solid rgba(var(--err-rgb), 0.2); color: var(--err); font-weight: bold; }
+.tab-deck-summary { display: flex; gap: 16px; font-size: 16px; }
 .tab-achievement { margin-bottom: 6px; }
-.tab-achievement-track { display: block; background: var(--bg-2); border-radius: 2px; height: 4px; border: 1px solid #333; overflow: hidden; }
-.tab-achievement-fill { display: block; height: 100%; border-radius: 2px; background: var(--accent-bright); }
+.tab-achievement-track { display: block; background: var(--bg-2); height: 4px; border: 1px solid #333; overflow: hidden; }
+.tab-achievement-fill { display: block; height: 100%; background: var(--accent-bright); }
 .tab-inv-group { margin-bottom: 10px; }
 .tab-inv-row { display: flex; align-items: baseline; gap: 6px; padding: 3px 0; border-bottom: 1px solid var(--bg-2); }
 .tab-inv-name { background: none; border: none; padding: 0; font-family: inherit; font-size: inherit; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-.tab-inv-meta { white-space: nowrap; flex-shrink: 0; font-size: 0.9em; }
-.tab-mini-button { border: none; border-radius: 2px; padding: 1px 5px; font-size: 0.8em; cursor: pointer; font-weight: bold; font-family: var(--font-tui); line-height: 1.4; flex-shrink: 0; }
+.tab-inv-meta { white-space: nowrap; flex-shrink: 0; font-size: 16px; }
+.tab-mini-button { border: none; padding: 1px 5px; font-size: 14px; cursor: pointer; font-weight: bold; font-family: var(--font-tui); line-height: 1.4; flex-shrink: 0; }
 .tab-mini-button--sell { background: var(--warn); color: var(--bg-0); }
 .tab-mini-button--fab { background: var(--ok); color: var(--bg-0); }
-.tab-ghost-button { background: var(--bg-2); border: 1px solid var(--ok); border-radius: 3px; padding: 3px 10px; color: var(--ok); font-size: 0.85em; cursor: pointer; font-family: var(--font-tui); margin-bottom: 8px; }
-.tab-link-button { background: none; border: none; color: #666; font-size: 0.85em; cursor: pointer; padding: 0; font-family: var(--font-tui); text-decoration: underline; }
+.tab-ghost-button { background: var(--bg-2); border: 1px solid var(--ok); padding: 3px 10px; color: var(--ok); font-size: 14px; cursor: pointer; font-family: var(--font-tui); margin-bottom: 8px; }
+.tab-link-button { background: none; border: none; color: #666; font-size: 14px; cursor: pointer; padding: 0; font-family: var(--font-tui); text-decoration: underline; }
 .tab-cache { padding: 6px 0; border-bottom: 1px solid var(--bg-2); }
 .tab-cache--abandoned { opacity: 0.5; }
 .tab-cache-actions { display: flex; gap: 8px; align-items: center; margin-top: 2px; }
 .tab-schematic { padding: 4px 0; border-bottom: 1px solid var(--bg-2); }
-.tab-schematic-ingredients { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.85em; margin-top: 2px; }
+.tab-schematic-ingredients { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; margin-top: 2px; }
 .tab-schematic-gates { margin-top: 2px; }
 .tab-action-button--use { background: var(--ok); color: var(--bg-0); }
 .tab-action-button--equip { background: var(--accent-alt); color: var(--bg-0); }
@@ -140,30 +140,30 @@
 .tab-action-button--place { background: var(--accent-alt); color: var(--bg-0); }
 .tab-action-button--sell { background: var(--warn); color: var(--bg-0); }
 
-.tactical-dialog { background: var(--bg-2); border: 1px solid #444; border-radius: 6px; padding: 0; color: var(--fg); font-family: var(--font-tui); max-width: 460px; }
+.tactical-dialog { background: var(--bg-2); border: 1px solid #444; padding: 0; color: var(--fg); font-family: var(--font-tui); max-width: 460px; }
 .tactical-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
-.tactical-dialog-body { padding: 24px 28px; font-size: 0.95em; }
-.tab-dialog-title { font-weight: bold; font-size: 1.15em; }
-.tab-dialog-rarity { font-size: 0.8em; }
-.tab-dialog-meta { display: flex; gap: 12px; font-size: 0.85em; color: #888; margin: 8px 0 12px; }
-.tab-dialog-desc { color: #aaa; font-size: 0.9em; margin-bottom: 14px; line-height: 1.4; }
-.tab-dialog-props { border-top: 1px solid #333; padding-top: 10px; margin-bottom: 14px; font-size: 0.9em; }
+.tactical-dialog-body { padding: 24px 28px; font-size: 20px; }
+.tab-dialog-title { font-weight: bold; font-size: 22px; }
+.tab-dialog-rarity { font-size: 16px; }
+.tab-dialog-meta { display: flex; gap: 12px; font-size: 18px; color: #888; margin: 8px 0 12px; }
+.tab-dialog-desc { color: #aaa; font-size: 18px; margin-bottom: 14px; line-height: 1.4; }
+.tab-dialog-props { border-top: 1px solid #333; padding-top: 10px; margin-bottom: 14px; font-size: 18px; }
 .tab-dialog-actions { display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #333; padding-top: 14px; flex-wrap: wrap; }
-.tab-dialog-cancel { background: transparent; color: #888; border: 1px solid #444; padding: 6px 16px; font-size: 0.9em; cursor: pointer; border-radius: 3px; font-family: var(--font-tui); }
-.tab-dialog-label { color: #888; font-size: 0.85em; display: block; margin: 10px 0 4px; }
-.tactical-dialog-input { width: 100%; background: var(--bg-1); border: 1px solid #444; border-radius: 3px; padding: 8px 10px; color: var(--fg); font-size: 0.95em; font-family: var(--font-tui); box-sizing: border-box; }
+.tab-dialog-cancel { background: transparent; color: #888; border: 1px solid #444; padding: 6px 16px; font-size: 18px; cursor: pointer; font-family: var(--font-tui); }
+.tab-dialog-label { color: #888; font-size: 18px; display: block; margin: 10px 0 4px; }
+.tactical-dialog-input { width: 100%; background: var(--bg-1); border: 1px solid #444; padding: 8px 10px; color: var(--fg); font-size: 20px; font-family: var(--font-tui); box-sizing: border-box; }
 .tactical-dialog-input[hidden] { display: none; }
 
 /* 6b-3: handles + slide-in panels */
 .tactical-room-flags { position: absolute; inset: 0; pointer-events: none; }
 .tactical-room-flags > * { pointer-events: auto; }
-.tactical-handle { position: absolute; z-index: 25; background: var(--bg-1); border: 1px solid #444; color: var(--accent-bright); font-family: var(--font-tui); font-size: 0.7em; letter-spacing: 1px; padding: 6px 10px; cursor: pointer; }
+.tactical-handle { position: absolute; z-index: 25; background: var(--bg-1); border: 1px solid #444; color: var(--accent-bright); font-family: var(--font-tui); font-size: 14px; letter-spacing: 1px; padding: 6px 10px; cursor: pointer; }
 .tactical-handle:hover { border-color: var(--accent-bright); }
-.tactical-handle--transit { top: 0; left: 50%; transform: translateX(-50%); border-radius: 0 0 6px 6px; color: var(--accent-alt); }
-.tactical-handle--vendor { right: 0; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; border-radius: 6px 0 0 6px; color: var(--warn); }
-.tactical-handle--rest-pod { right: 0; bottom: 25%; transform: translateY(50%); writing-mode: vertical-rl; border-radius: 6px 0 0 6px; color: var(--ok); }
+.tactical-handle--transit { top: 0; left: 50%; transform: translateX(-50%); color: var(--accent-alt); }
+.tactical-handle--vendor { right: 0; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; color: var(--warn); }
+.tactical-handle--rest-pod { right: 0; bottom: 25%; transform: translateY(50%); writing-mode: vertical-rl; color: var(--ok); }
 .tactical-handle-form { position: absolute; bottom: 0; transform: translateX(-50%); z-index: 25; }
-.tactical-handle--npc { position: static; transform: none; border-radius: 6px 6px 0 0; color: #c084fc; }
+.tactical-handle--npc { position: static; transform: none; color: #c084fc; }
 .tactical-backdrop { position: absolute; inset: 0; z-index: 29; background: rgba(0, 0, 0, 0.2); }
 .tactical-backdrop[hidden] { display: none; }
 
@@ -171,31 +171,31 @@
 .tactical-panel[hidden] { display: none; }
 .tactical-panel--right { top: 0; right: 0; bottom: 0; width: 50%; transform: translateX(100%); }
 .tactical-panel--right-low { top: 0; right: 0; bottom: 0; width: 50%; transform: translateX(100%); }
-.tactical-panel--top { top: 0; left: 0; right: 0; height: 50%; transform: translateY(-100%); border-radius: 0 0 8px 8px; }
+.tactical-panel--top { top: 0; left: 0; right: 0; height: 50%; transform: translateY(-100%); }
 .tactical-panel--bottom { left: 0; right: 0; bottom: 0; height: 50%; transform: translateY(100%); }
 .tactical-panel--open { transform: translate(0, 0); }
-.tactical-panel-close { position: absolute; top: 6px; right: 8px; z-index: 2; background: transparent; color: #888; border: 1px solid #444; padding: 2px 8px; font-size: 0.7em; cursor: pointer; font-family: var(--font-tui); }
+.tactical-panel-close { position: absolute; top: 6px; right: 8px; z-index: 2; background: transparent; color: #888; border: 1px solid #444; padding: 2px 8px; font-size: 14px; cursor: pointer; font-family: var(--font-tui); }
 .tactical-panel > turbo-frame { display: flex; flex-direction: column; min-height: 0; flex: 1; }
-.tactical-panel-inner { display: flex; flex-direction: column; min-height: 0; flex: 1; font-size: 0.8em; }
+.tactical-panel-inner { display: flex; flex-direction: column; min-height: 0; flex: 1; font-size: 16px; }
 .tactical-panel-header { flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 8px 70px 8px 12px; border-bottom: 1px solid #333; background: var(--bg-1); }
 .tactical-panel-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 12px; }
-.tactical-avatar-wing { position: absolute; width: 180px; height: 180px; object-fit: cover; background: var(--bg-1); border: 2px solid var(--warn); border-radius: 6px; }
-.tactical-avatar-wing--vendor { right: 100%; top: 0; border-right: none; border-radius: 6px 0 0 6px; }
-.tactical-avatar-wing--npc { bottom: 100%; right: 0; border-color: #c084fc; border-bottom: none; border-radius: 6px 6px 0 0; }
-.tactical-qty-input { width: 60px; background: var(--bg-1); border: 1px solid #444; border-radius: 3px; color: var(--fg); font-family: var(--font-tui); font-size: 0.9em; padding: 2px 6px; }
-.tactical-transit-badge { color: #f97316; border: 1px solid #f97316; border-radius: 3px; padding: 1px 6px; font-size: 0.8em; }
-.tactical-journey-breach { border: 1px solid var(--err); color: var(--err); padding: 6px 8px; margin: 6px 0; font-size: 0.85em; }
+.tactical-avatar-wing { position: absolute; width: 180px; height: 180px; object-fit: cover; background: var(--bg-1); border: 2px solid var(--warn); }
+.tactical-avatar-wing--vendor { right: 100%; top: 0; border-right: none; }
+.tactical-avatar-wing--npc { bottom: 100%; right: 0; border-color: #c084fc; border-bottom: none; }
+.tactical-qty-input { width: 60px; background: var(--bg-1); border: 1px solid #444; color: var(--fg); font-family: var(--font-tui); font-size: 18px; padding: 2px 6px; }
+.tactical-transit-badge { color: #f97316; border: 1px solid #f97316; padding: 1px 6px; font-size: 16px; }
+.tactical-journey-breach { border: 1px solid var(--err); color: var(--err); padding: 6px 8px; margin: 6px 0; font-size: 14px; }
 .tactical-fork { border: 1px solid var(--warn); background: #1a1a0a; padding: 8px; margin: 8px 0; }
 .tactical-stops { margin-top: 4px; }
 .tactical-mission-actions { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
-.tab-outline-button { background: transparent; color: #888; border: 1px solid #444; padding: 3px 10px; font-size: 0.85em; cursor: pointer; border-radius: 3px; font-family: var(--font-tui); }
+.tab-outline-button { background: transparent; color: #888; border: 1px solid #444; padding: 3px 10px; font-size: 14px; cursor: pointer; font-family: var(--font-tui); }
 .tab-outline-button--danger { color: var(--err); border-color: var(--err); }
 .tab-mini-button--deliver { background: #c084fc; color: var(--bg-0); }
 .tab-mini-button:disabled { background: #333; color: #666; cursor: not-allowed; }
 .tactical-npc-line { margin-bottom: 8px; line-height: 1.5; }
 .tactical-npc-breadcrumb { margin-bottom: 6px; }
 .tactical-npc-topics { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-.tactical-topic-button { background: transparent; border: 1px solid #c084fc; color: #c084fc; padding: 4px 10px; font-size: 0.85em; cursor: pointer; border-radius: 3px; font-family: var(--font-tui); }
+.tactical-topic-button { background: transparent; border: 1px solid #c084fc; color: #c084fc; padding: 4px 10px; font-size: 14px; cursor: pointer; font-family: var(--font-tui); }
 .tactical-npc-nav { display: flex; gap: 8px; }
 .tactical-rest-vital { margin-bottom: 12px; }
 .tactical-rest-label { font-weight: bold; letter-spacing: 1px; }
@@ -210,7 +210,7 @@
 .tactical-map-room--walkable { cursor: pointer; }
 
 /* 6d: breach overlay */
-.tactical-breach { position: absolute; top: 15%; left: 15%; right: 15%; bottom: 15%; z-index: 30; background: var(--bg-1); border: 1px solid var(--err); display: flex; flex-direction: column; overflow: hidden; font-size: 0.8em; }
+.tactical-breach { position: absolute; top: 15%; left: 15%; right: 15%; bottom: 15%; z-index: 30; background: var(--bg-1); border: 1px solid var(--err); display: flex; flex-direction: column; overflow: hidden; font-size: 16px; }
 .tactical-breach[hidden] { display: none; }
 .tactical-breach-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; background: #1a0d0d; border-bottom: 1px solid #7f1d1d; flex-wrap: wrap; }
 .tactical-breach-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -219,31 +219,31 @@
 .tactical-breach-detection, .tactical-breach-battery { display: inline-flex; align-items: center; gap: 6px; }
 .tactical-breach-track { width: 120px; margin-bottom: 0; display: inline-block; }
 .tactical-breach-protocols { display: flex; gap: 8px; padding: 6px 12px; border-bottom: 1px solid #333; flex-wrap: wrap; }
-.tactical-breach-protocol { color: var(--warn); border: 1px solid #7f1d1d; padding: 2px 8px; font-size: 0.85em; }
+.tactical-breach-protocol { color: var(--warn); border: 1px solid #7f1d1d; padding: 2px 8px; font-size: 14px; }
 .tactical-breach-protocol--down { color: #555; text-decoration: line-through; border-color: #333; }
 .tactical-breach-actions { display: flex; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid #333; flex-wrap: wrap; }
 .tactical-breach-exec { display: inline-flex; gap: 4px; align-items: center; }
 .tactical-software-button { background: var(--bg-1); border: 1px solid #444; }
 .tactical-breach-log { flex: 1; min-height: 0; }
 .tactical-breach-targets { position: absolute; top: 40px; right: 12px; z-index: 25; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-.tactical-breach-target { background: #1a0d0d; border: 1px solid var(--err); color: var(--err); font-family: var(--font-tui); font-size: 0.75em; padding: 5px 10px; cursor: pointer; }
+.tactical-breach-target { background: #1a0d0d; border: 1px solid var(--err); color: var(--err); font-family: var(--font-tui); font-size: 12px; padding: 5px 10px; cursor: pointer; }
 .tactical-breach-target:disabled { border-color: #444; color: #555; cursor: not-allowed; }
 
 /* Breach target menus (TargetSelector port) */
 .target-menu-anchor { position: relative; display: inline-block; }
-.tactical-software-button { background: var(--bg-2); border: 1px solid #444; border-radius: 3px; padding: 3px 8px; font-size: 0.75em; cursor: pointer; font-family: var(--font-tui); white-space: nowrap; }
+.tactical-software-button { background: var(--bg-2); border: 1px solid #444; padding: 3px 8px; font-size: 12px; cursor: pointer; font-family: var(--font-tui); white-space: nowrap; }
 .tactical-software-button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tactical-software-cost { color: #666; margin-left: 4px; }
-.tactical-quick-button { background: var(--bg-2); border: 1px solid #333; border-radius: 3px; padding: 3px 8px; color: var(--accent-alt); font-size: 0.75em; cursor: pointer; font-family: var(--font-tui); }
+.tactical-quick-button { background: var(--bg-2); border: 1px solid #333; padding: 3px 8px; color: var(--accent-alt); font-size: 12px; cursor: pointer; font-family: var(--font-tui); }
 .tactical-quick-button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tactical-breach-sep { color: #333; margin: 0 2px; }
-.target-menu { position: absolute; top: 100%; left: 0; margin-top: 4px; background: var(--bg-2); border: 1px solid #444; border-radius: 4px; padding: 8px; z-index: 50; min-width: 160px; }
+.target-menu { position: absolute; top: 100%; left: 0; margin-top: 4px; background: var(--bg-2); border: 1px solid #444; padding: 8px; z-index: 50; min-width: 160px; }
 .target-menu[hidden] { display: none; }
-.target-menu-label { color: #888; font-size: 0.7em; margin-bottom: 6px; white-space: nowrap; }
+.target-menu-label { color: #888; font-size: 14px; margin-bottom: 6px; white-space: nowrap; }
 .target-menu-options { display: flex; gap: 4px; flex-wrap: wrap; }
-.target-menu-option { background: #222; border: 1px solid #555; border-radius: 3px; padding: 4px 10px; color: var(--fg); font-size: 0.75em; cursor: pointer; font-family: var(--font-tui); white-space: nowrap; }
+.target-menu-option { background: #222; border: 1px solid #555; padding: 4px 10px; color: var(--fg); font-size: 16px; cursor: pointer; font-family: var(--font-tui); white-space: nowrap; }
 .target-menu-option:hover { border-color: var(--accent-bright); }
-.target-menu-cancel { background: none; border: none; color: #666; font-size: 0.7em; cursor: pointer; margin-top: 4px; padding: 0; font-family: var(--font-tui); }
+.target-menu-cancel { background: none; border: none; color: #666; font-size: 14px; cursor: pointer; margin-top: 4px; padding: 0; font-family: var(--font-tui); }
 /* Map labels never intercept clicks (ZoneMap.tsx pointerEvents="none"). */
 .tactical-map text { pointer-events: none; }
-.tactical-npc-exchange { white-space: pre-wrap; word-break: break-word; margin-bottom: 8px; font-size: 0.95em; }
+.tactical-npc-exchange { white-space: pre-wrap; word-break: break-word; margin-bottom: 8px; font-size: 16px; }

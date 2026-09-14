@@ -11,5 +11,5 @@ html, body {
   font-family: "Terminus";
   font-size: 18px;
   background-color: black;
-  color: var(--textColor);
+  color: var(--fg, #d0d0d0); /* was orphan var(--textColor), never defined */
 }

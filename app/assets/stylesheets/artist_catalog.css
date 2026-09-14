@@ -146,10 +146,10 @@
   --ac-accent-glow: rgba(124, 58, 237, 0.5);
   background: #0a0a0a;
   box-shadow: none;
-  animation: ac-border-glow 3s ease-in-out infinite;
+  animation: border-glow 3s ease-in-out infinite;
 }
 .release-list-card--coming-soon:hover .release-list-card__img {
-  animation: ac-glitch-shift 0.3s ease-in-out 3;
+  animation: glitch-shift 0.3s ease-in-out 3;
 }
 
 .release-list-card__cover {
@@ -172,7 +172,7 @@
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px);
-  animation: ac-scanline-move 0.5s linear infinite;
+  animation: scanline-move 0.5s linear infinite;
   pointer-events: none;
 }
 .release-list-card__tint {
@@ -876,21 +876,6 @@
 .vodz-error-back { margin-top: 20px; display: inline-block; }
 
 /* --- Keyframes --------------------------------------------------------- */
-@keyframes ac-scanline-move {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 4px; }
-}
-@keyframes ac-glitch-shift {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-2px, 1px); }
-  40% { transform: translate(2px, -1px); }
-  60% { transform: translate(-1px, -1px); }
-  80% { transform: translate(1px, 2px); }
-}
-@keyframes ac-border-glow {
-  0%, 100% { border-color: #7c3aed; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
-  50% { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
-}
 @keyframes ac-cs-scanline {
   0% { background-position: 0 0; }
   100% { background-position: 0 4px; }

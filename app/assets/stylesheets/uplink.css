@@ -20,13 +20,13 @@
 .uplink-title { margin: 0; font-size: 1rem; color: var(--accent); font-family: inherit; }
 .uplink-header-right { display: flex; align-items: center; gap: 12px; }
 .uplink-header-alias { font-size: 0.75rem; color: #666; }
-.uplink-popout-button { background: none; border: 1px solid #444; color: #888; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; font-family: inherit; border-radius: 2px; }
+.uplink-popout-button { background: none; border: 1px solid #444; color: #888; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; font-family: inherit; }
 .uplink-popout-button:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── Channel tabs (ChannelTabs.tsx) ───────────────────────────────── */
 
 .channel-tabs { display: flex; border-bottom: 1px solid #333; background-color: var(--bg-1); }
-.channel-tab { flex: 1; padding: 12px 16px; background-color: transparent; border: none; border-bottom: 2px solid transparent; color: #888; font-family: inherit; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; position: relative; text-align: center; text-decoration: none; }
+.channel-tab { flex: 1; padding: 12px 16px; background-color: transparent; border: none; border-bottom: 2px solid transparent; color: #888; font-family: inherit; font-size: 0.9rem; cursor: pointer; position: relative; text-align: center; text-decoration: none; }
 .channel-tab--active { background-color: var(--bg-2); border-bottom-color: var(--accent); color: var(--accent); }
 .channel-tab--disabled { color: #444; cursor: not-allowed; }
 .channel-tab-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #555; margin-left: 6px; vertical-align: 1px; }
@@ -83,7 +83,7 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 /* Author display beats the UA [hidden] rule — re-assert it, or the
    viewer-neutral hidden mod controls render for everyone. */
 .uplink-inline-form[hidden] { display: none; }
-.packet-action-button { background: transparent; border: none; color: #555; cursor: pointer; padding: 2px 6px; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s; font-family: inherit; }
+.packet-action-button { background: transparent; border: none; color: #555; cursor: pointer; padding: 2px 6px; font-size: 0.7rem; opacity: 0.6; font-family: inherit; }
 .packet-action-button:hover { opacity: 1; }
 
 /* ── Compose form (PacketInput.tsx) ───────────────────────────────── */
@@ -97,7 +97,7 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-input-count { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: #555; }
 .packet-input-count.warning { color: #ffaa00; }
 .packet-input-count.over-limit { color: var(--err); }
-.packet-input-send { padding: 10px 20px; background-color: var(--accent); border: none; color: #fff; font-family: inherit; font-size: 0.85rem; cursor: pointer; transition: background-color 0.2s; }
+.packet-input-send { padding: 10px 20px; background-color: var(--accent); border: none; color: #fff; font-family: inherit; font-size: 0.85rem; cursor: pointer; }
 .packet-input-send:disabled { cursor: not-allowed; opacity: 0.5; }
 .packet-input-send--cooldown { background-color: #333; color: #666; opacity: 1; }
 .packet-input-slow-note { margin-top: 4px; font-size: 0.7rem; color: #555; text-align: right; }
