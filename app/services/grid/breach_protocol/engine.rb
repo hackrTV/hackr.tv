@@ -175,7 +175,7 @@ module Grid
       private_class_method :tick_purge!
 
       def self.alert_msg(text)
-        "<span style='color: #f87171; font-weight: bold;'>⚠ #{text}</span>"
+        "<span style='color: #f87171; font-weight: bold;'>▲ #{text}</span>"
       end
       private_class_method :alert_msg
 

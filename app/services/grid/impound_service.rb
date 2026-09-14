@@ -212,7 +212,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #ef4444; font-weight: bold;'>\u2554#{separator}\u2557</span>"
-      lines << "<span style='color: #ef4444; font-weight: bold;'>\u2551  GEAR CONFISCATED \u2014 GovCorp Impound Notice               \u2551</span>"
+      lines << "<span style='color: #ef4444; font-weight: bold;'>\u2551  GEAR CONFISCATED \u2014 GovCorp Impound Notice</span>"
       lines << "<span style='color: #ef4444; font-weight: bold;'>\u2560#{separator}\u2563</span>"
       lines << "#{border}  <span style='color: #d0d0d0;'>GovCorp Compliance Division has seized your loadout.</span>"
       lines << border
@@ -233,7 +233,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2554#{separator}\u2557</span>"
-      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  GEAR RECOVERED                                            \u2551</span>"
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  GEAR RECOVERED</span>"
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2560#{separator}\u2563</span>"
       lines << "#{border}  <span style='color: #fbbf24;'>Bribe paid: #{cost} CRED</span>"
       lines << border

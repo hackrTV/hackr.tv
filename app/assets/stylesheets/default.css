@@ -1,63 +1,17 @@
-.mb-10 {
-  margin-bottom: 10px;
-}
-.mb-15 {
-  margin-bottom: 15px;
-}
+/* Spacing utilities: only the classes with live view usages survive
+   (hygiene sweep 2026-09-13 deleted 14 unused ones, including a
+   double-defined .pl-15). Prefer component-scoped rules over adding
+   new ones here. */
 .mb-20 {
   margin-bottom: 20px;
 }
 
-.ml-5 {
-  margin-left: 5px;
-}
 .ml-10 {
   margin-left: 10px;
 }
-.ml-20 {
-  margin-left: 20px;
-}
-.ml-25 {
-  margin-left: 25px;
-}
 
-.mt-30 {
-  margin-top: 30px;
-}
-.mt-40 {
-  margin-top: 40px;
-}
-
-.pa-25 {
-  padding: 25px 25px 25px 25px;
-}
-
-.pb-3 {
-  padding-bottom: 15px;
-}
 .pb-50 {
   padding-bottom: 50px;
-}
-
-.pl-5 {
-  padding-left: 5px;
-}
-.pl-10 {
-  padding-left: 10px;
-}
-.pl-15 {
-  padding-left: 15px;
-}
-.pl-15 {
-  padding-left: 25px;
-}
-
-.pr-15 {
-  padding-right: 15px;
-}
-
-.pt-5 {
-  padding-top: 5px;
 }
 
 /* Grid Ambient Volume Slider */
@@ -74,15 +28,15 @@
 .grid-volume-slider::-webkit-slider-track {
   width: 100%;
   height: 4px;
-  background: #333;
-  border-radius: 2px;
+  background: var(--edge);
+
 }
 
 .grid-volume-slider::-moz-range-track {
   width: 100%;
   height: 4px;
-  background: #333;
-  border-radius: 2px;
+  background: var(--edge);
+
 }
 
 .grid-volume-slider::-webkit-slider-thumb {
@@ -90,8 +44,8 @@
   appearance: none;
   width: 12px;
   height: 12px;
-  background: #666;
-  border-radius: 50%;
+  background: var(--fg-faint);
+
   cursor: pointer;
   border: none;
 }
@@ -99,18 +53,18 @@
 .grid-volume-slider::-moz-range-thumb {
   width: 12px;
   height: 12px;
-  background: #666;
-  border-radius: 50%;
+  background: var(--fg-faint);
+
   cursor: pointer;
   border: none;
 }
 
 .grid-volume-slider:hover::-webkit-slider-thumb {
-  background: #888;
+  background: var(--fg-muted);
 }
 
 .grid-volume-slider:hover::-moz-range-thumb {
-  background: #888;
+  background: var(--fg-muted);
 }
 
 /* Admin Panel Styles */
@@ -123,7 +77,7 @@
 }
 
 .admin-table-row {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--edge);
 }
 
 /* Mobile Responsive Overrides */

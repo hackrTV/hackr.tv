@@ -63,7 +63,7 @@ module Grid
 
       display = []
       display << ""
-      display << "<span style='color: #ef4444; font-weight: bold;'>\u26a0 AMBIENT BREACH \u2014 you've been detected!</span>"
+      display << "<span style='color: #ef4444; font-weight: bold;'>\u25b2 AMBIENT BREACH \u2014 you've been detected!</span>"
       display << ""
       display << result.display
       display << ""
@@ -111,7 +111,7 @@ module Grid
 
       display = []
       display << ""
-      display << "<span style='color: #ef4444; font-weight: bold;'>\u26a0 AMBIENT BREACH \u2014 #{ERB::Util.html_escape(template.name)}</span>"
+      display << "<span style='color: #ef4444; font-weight: bold;'>\u25b2 AMBIENT BREACH \u2014 #{ERB::Util.html_escape(template.name)}</span>"
       display << "<span style='color: #f87171;'>#{ERB::Util.html_escape(reason)}</span>"
       display << ""
       display << "<span style='color: #f87171;'>ENERGY -20 | PSYCHE -20</span>"

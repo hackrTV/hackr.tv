@@ -1,7 +1,6 @@
 @font-face {
   font-family: "Terminus";
-  src: url("terminus.woff2") format("woff2"),
-       url("terminus.woff") format("woff");
+  src: url("terminus-unified.woff2") format("woff2"); /* keep in sync with tuicss.css (unified 2026-09-12) */
   font-weight: normal;
   font-style: normal;
 }
@@ -12,5 +11,5 @@ html, body {
   font-family: "Terminus";
   font-size: 18px;
   background-color: black;
-  color: var(--textColor);
+  color: var(--fg, #d0d0d0); /* was orphan var(--textColor), never defined */
 }

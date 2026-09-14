@@ -43,7 +43,7 @@
                 <td style="text-align: center;"><%= listing.rotation_pool? ? "✓" : "—" %></td>
                 <td style="text-align: center;">
                   <%= link_to "Edit", edit_admin_grid_shop_listing_path(listing), class: "tui-button", style: "padding: 2px 6px; font-size: 0.8em;" %>
-                  <%= button_to "×", remove_listing_admin_grid_mob_path(@mob, listing_id: listing.id), method: :delete, class: "tui-button red-168", style: "padding: 2px 6px; font-size: 0.8em; display: inline;", data: { confirm: "Remove listing '#{listing.name}'?" } %>
+                  <%= button_to "×", remove_listing_admin_grid_mob_path(@mob, listing_id: listing.id), method: :delete, aria: {label: "Remove listing"}, class: "tui-button red-168", style: "padding: 2px 6px; font-size: 0.8em; display: inline;", data: { confirm: "Remove listing '#{listing.name}'?" } %>
                 </td>
               </tr>
             <% end %>

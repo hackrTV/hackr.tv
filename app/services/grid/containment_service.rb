@@ -72,7 +72,7 @@ module Grid
       elsif level >= 40 then "#fbbf24"
       else "#34d399"
       end
-      "<span style='color: #9ca3af;'>\u26a0 FACILITY ALERT:</span> " \
+      "<span style='color: #9ca3af;'>\u25b2 FACILITY ALERT:</span> " \
         "<span style='color: #{color};'>#{"█" * filled}#{"░" * empty}</span> " \
         "<span style='color: #{color};'>#{level}%</span>"
     end
@@ -264,7 +264,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #ef4444; font-weight: bold;'>\u2554#{separator}\u2557</span>"
-      lines << "<span style='color: #ef4444; font-weight: bold;'>\u2551  \u26a0 DETAINED \u2014 GovCorp Perception Alignment Center       \u2551</span>"
+      lines << "<span style='color: #ef4444; font-weight: bold;'>\u2551  \u25b2 DETAINED \u2014 GovCorp Perception Alignment Center</span>"
       lines << "<span style='color: #ef4444; font-weight: bold;'>\u2560#{separator}\u2563</span>"
       lines << "#{border}  <span style='color: #d0d0d0;'>GovCorp countermeasures have locked your position.</span>"
       lines << "#{border}  <span style='color: #d0d0d0;'>Neural trace confirmed. Physical extraction complete.</span>"
@@ -292,7 +292,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #ef4444; font-weight: bold;'>\u2554#{separator}\u2557</span>"
-      lines << "<span style='color: #ef4444; font-weight: bold;'>\u2551  APPREHENDED                                               \u2551</span>"
+      lines << "<span style='color: #ef4444; font-weight: bold;'>\u2551  APPREHENDED</span>"
       lines << "<span style='color: #ef4444; font-weight: bold;'>\u2560#{separator}\u2563</span>"
       lines << "#{border}  <span style='color: #d0d0d0;'>GovCorp security detected your movement.</span>"
       lines << "#{border}  <span style='color: #d0d0d0;'>Returned to containment. Alert level reset.</span>"
@@ -308,7 +308,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2554#{separator}\u2557</span>"
-      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  EXTRACTION SUCCESSFUL                                      \u2551</span>"
+      lines << "<span style='color: #34d399; font-weight: bold;'>\u2551  EXTRACTION SUCCESSFUL</span>"
       lines << "<span style='color: #34d399; font-weight: bold;'>\u2560#{separator}\u2563</span>"
       lines << "#{border}  <span style='color: #d0d0d0;'>Facility containment cleared. GovCorp trace broken.</span>"
       zone_name = destination.grid_zone&.name || "Unknown"
@@ -324,7 +324,7 @@ module Grid
       lines = []
       lines << ""
       lines << "<span style='color: #fbbf24; font-weight: bold;'>\u2554#{separator}\u2557</span>"
-      lines << "<span style='color: #fbbf24; font-weight: bold;'>\u2551  COMPLIANCE RESOLUTION \u2014 Administrative Release             \u2551</span>"
+      lines << "<span style='color: #fbbf24; font-weight: bold;'>\u2551  COMPLIANCE RESOLUTION \u2014 Administrative Release</span>"
       lines << "<span style='color: #fbbf24; font-weight: bold;'>\u2560#{separator}\u2563</span>"
       lines << "#{border}  <span style='color: #fbbf24;'>Resolution fee: #{fee} CRED</span>"
       if total_items > 0
