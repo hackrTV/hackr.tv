@@ -12,52 +12,28 @@
   <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: STREAM CONFIGURATION ::]</h3>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :artist_id, "ARTIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.select :artist_id,
+    <%= f.tui_select :artist_id,
         options_for_select(@artists.map { |a| [a.name, a.id] }, hackr_stream.artist_id),
         { include_blank: "Select artist..." },
-        class: "tui-input", style: "width: 100%; max-width: 400px;" %>
-    <% if hackr_stream.errors[:artist_id].any? %>
-      <br><small class="red-255-text"><%= hackr_stream.errors[:artist_id].join(", ") %></small>
-    <% end %>
+        style: "max-width: 400px;", label: "ARTIST" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :title, "STREAM TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :title, class: "tui-input", placeholder: "e.g., Live Performance - The Fracture Tour", style: "width: 100%;" %>
-    <small style="color: #888;">Optional - describe what's being streamed</small>
-    <% if hackr_stream.errors[:title].any? %>
-      <br><small class="red-255-text"><%= hackr_stream.errors[:title].join(", ") %></small>
-    <% end %>
+    <%= f.tui_text_field :title, placeholder: "e.g., Live Performance - The Fracture Tour", label: "STREAM TITLE", hint: "Optional - describe what's being streamed" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :live_url, "LIVE STREAM URL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :live_url, class: "tui-input", placeholder: "YouTube watch or embed URL, Twitch embed URL, etc.", style: "width: 100%; font-family: monospace;" %>
-    <small style="color: #888;">YouTube URLs are automatically converted to embed format - Required when going live</small>
-    <% if hackr_stream.errors[:live_url].any? %>
-      <br><small class="red-255-text"><%= hackr_stream.errors[:live_url].join(", ") %></small>
-    <% end %>
+    <%= f.tui_text_field :live_url, placeholder: "YouTube watch or embed URL, Twitch embed URL, etc.", label: "LIVE STREAM URL", hint: "YouTube URLs are automatically converted to embed format - Required when going live" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :vod_url, "VOD URL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :vod_url, class: "tui-input", placeholder: "YouTube watch or embed URL for archived stream", style: "width: 100%; font-family: monospace;" %>
-    <small style="color: #888;">Optional - URL for the video-on-demand version after stream ends</small>
-    <% if hackr_stream.errors[:vod_url].any? %>
-      <br><small class="red-255-text"><%= hackr_stream.errors[:vod_url].join(", ") %></small>
-    <% end %>
+    <%= f.tui_text_field :vod_url, placeholder: "YouTube watch or embed URL for archived stream", hint: "Optional - URL for the video-on-demand version after stream ends" %>
   </div>
 
   <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: SCHEDULING ::]</h3>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :scheduled_at, "SCHEDULED FOR", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.datetime_local_field :scheduled_at, class: "tui-input", style: "width: 100%; max-width: 400px;" %>
-    <small style="color: #888;">When this stream is planned to go live. Leave blank for on-demand streams.</small>
-    <% if hackr_stream.errors[:scheduled_at].any? %>
-      <br><small class="red-255-text"><%= hackr_stream.errors[:scheduled_at].join(", ") %></small>
-    <% end %>
+    <%= f.tui_datetime_local_field :scheduled_at, style: "max-width: 400px;", label: "SCHEDULED FOR", hint: "When this stream is planned to go live. Leave blank for on-demand streams." %>
   </div>
 
   <% if hackr_stream.persisted? && hackr_stream.cancelled_at.present? %>
@@ -72,21 +48,11 @@
 
   <div style="display: flex; gap: 20px; flex-wrap: wrap;">
     <div style="flex: 1; min-width: 200px;">
-      <%= f.label :started_at, "STARTED AT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.datetime_local_field :started_at, class: "tui-input", style: "width: 100%;" %>
-      <small style="color: #888;">When the stream started (set automatically on Go Live)</small>
-      <% if hackr_stream.errors[:started_at].any? %>
-        <br><small class="red-255-text"><%= hackr_stream.errors[:started_at].join(", ") %></small>
-      <% end %>
+      <%= f.tui_datetime_local_field :started_at, hint: "When the stream started (set automatically on Go Live)" %>
     </div>
 
     <div style="flex: 1; min-width: 200px;">
-      <%= f.label :ended_at, "ENDED AT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.datetime_local_field :ended_at, class: "tui-input", style: "width: 100%;" %>
-      <small style="color: #888;">When the stream ended</small>
-      <% if hackr_stream.errors[:ended_at].any? %>
-        <br><small class="red-255-text"><%= hackr_stream.errors[:ended_at].join(", ") %></small>
-      <% end %>
+      <%= f.tui_datetime_local_field :ended_at, hint: "When the stream ended" %>
     </div>
   </div>
 

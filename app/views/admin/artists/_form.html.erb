@@ -7,23 +7,19 @@
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_text_field :name %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px; font-family: monospace;" %>
+      <%= f.tui_text_field :slug %>
     </div>
   </div>
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :artist_type, "TYPE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.select :artist_type, Artist::ARTIST_TYPES.map { |t| [t, t] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_select :artist_type, Artist::ARTIST_TYPES.map { |t| [t, t] }, {}, label: "TYPE" %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :genre, "GENRE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.text_field :genre, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_text_field :genre %>
     </div>
   </div>
 

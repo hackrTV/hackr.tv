@@ -11,18 +11,15 @@
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px; font-family: monospace;" %>
+      <%= f.tui_text_field :slug %>
     </div>
     <div style="flex: 2;">
-      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_text_field :name %>
     </div>
   </div>
 
   <div style="margin-bottom: 15px;">
-    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-    <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 70px;" %>
+    <%= f.tui_text_area :description, style: "min-height: 70px;" %>
   </div>
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
@@ -63,35 +60,27 @@
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :min_clearance, "MIN CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.number_field :min_clearance, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0 %>
+      <%= f.tui_number_field :min_clearance, min: 0 %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :min_rep_faction_id, "MIN REP FACTION", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.select :min_rep_faction_id,
+      <%= f.tui_select :min_rep_faction_id,
             options_from_collection_for_select(@factions, :id, :display_name, @mission.min_rep_faction_id),
-            { include_blank: "— None —" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+            { include_blank: "— None —" }, label: "MIN REP FACTION" %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :min_rep_value, "MIN REP VALUE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.number_field :min_rep_value, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_number_field :min_rep_value %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.number_field :position, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0 %>
+      <%= f.tui_number_field :position, min: 0 %>
     </div>
   </div>
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :repeatable, class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" do %>
-        <%= f.check_box :repeatable, style: "margin-right: 8px;" %> REPEATABLE
-      <% end %>
+      <%= f.tui_check_box :repeatable %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :published, class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" do %>
-        <%= f.check_box :published, style: "margin-right: 8px;" %> PUBLISHED
-      <% end %>
+      <%= f.tui_check_box :published %>
     </div>
   </div>
 

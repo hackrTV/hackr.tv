@@ -2,12 +2,11 @@
 
 <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px; max-width: 700px;">
   <div style="margin-bottom: 15px;">
-    <label for="grid_starting_room_name" class="white-text">Name</label>
-    <%= f.text_field :name, class: "tui-input white-text full-width", style: "width: 100%;" %>
+    <%= f.tui_text_field :name %>
   </div>
 
   <div style="margin-bottom: 15px;">
-    <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">Room</label>
+    <label class="tui-field-label">Room</label>
     <input type="hidden" name="grid_starting_room[grid_room_id]" id="room-cb-hidden" value="<%= f.object.grid_room_id %>">
     <div class="admin-combobox">
       <input type="text" id="room-cb-input" class="admin-combobox-input<%= ' selected' if f.object.grid_room_id.present? %>" autocomplete="off"
@@ -21,15 +20,12 @@
   </div>
 
   <div style="margin-bottom: 15px;">
-    <label for="grid_starting_room_blurb" class="white-text">Blurb</label>
-    <p style="color: #6b7280; font-size: 0.85em; margin: 2px 0 6px;">Shown to hackrs when choosing their starting location after tutorial.</p>
-    <%= f.text_area :blurb, class: "tui-input white-text full-width", style: "width: 100%; min-height: 100px;" %>
+    <%= f.tui_text_area :blurb, hint: "Shown to hackrs when choosing their starting location after tutorial.", style: "min-height: 100px;" %>
   </div>
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div>
-      <label for="grid_starting_room_position" class="white-text">Position</label>
-      <%= f.number_field :position, class: "tui-input white-text", style: "width: 80px;" %>
+      <%= f.tui_number_field :position, style: "width: 80px;" %>
     </div>
 
     <div style="display: flex; align-items: center; gap: 8px; padding-top: 20px;">

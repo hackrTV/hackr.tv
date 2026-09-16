@@ -4,6 +4,8 @@ class Admin::ApplicationController < ApplicationController
 
   layout "admin"
 
+  default_form_builder TuiFormBuilder
+
   before_action :require_admin
 
   private

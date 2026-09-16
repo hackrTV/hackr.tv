@@ -1850,3 +1850,42 @@ select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--accent-alt, #22d3ee);
   outline-offset: 1px;
 }
+
+/* Admin form-field chrome (Phase 2 CS2) — emitted by TuiFormBuilder
+   (app/form_builders/tui_form_builder.rb), which is the default builder
+   for Admin::ApplicationController forms. Literal colors on purpose:
+   the admin layout does not load tokens.css. Layout/spacing between
+   fields stays on caller wrappers; .tui-field owns only inner chrome. */
+.tui-field-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: white;
+}
+
+.tui-field .tui-input {
+  width: 100%;
+  padding: 8px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.tui-field--check .tui-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.tui-field-hint {
+  display: block;
+  margin-top: 6px;
+  color: #888888;
+}
+
+.tui-field-error {
+  display: block;
+  margin-top: 6px;
+  color: rgb(255, 0, 0);
+}

@@ -7,40 +7,31 @@
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_text_field :name %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px; font-family: monospace;" %>
-      <small style="color: #666;">Leave blank to auto-generate from name</small>
+      <%= f.tui_text_field :slug, hint: "Leave blank to auto-generate from name" %>
     </div>
   </div>
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :scene_type, "SCENE TYPE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.select :scene_type, OverlayScene::SCENE_TYPES.map { |t| [t.titleize, t] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_select :scene_type, OverlayScene::SCENE_TYPES.map { |t| [t.titleize, t] }, {} %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :position, "POSITION (sort order)", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.number_field :position, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+      <%= f.tui_number_field :position, label: "POSITION (sort order)" %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :active, class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" do %>
-        <%= f.check_box :active, style: "margin-right: 8px;" %> ACTIVE
-      <% end %>
+      <%= f.tui_check_box :active %>
     </div>
   </div>
 
   <div style="display: flex; gap: 20px; margin-bottom: 15px;">
     <div style="flex: 1;">
-      <%= f.label :width, "WIDTH (px)", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.number_field :width, class: "tui-input", style: "width: 100%; padding: 8px;", min: 1 %>
+      <%= f.tui_number_field :width, min: 1, label: "WIDTH (px)" %>
     </div>
     <div style="flex: 1;">
-      <%= f.label :height, "HEIGHT (px)", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-      <%= f.number_field :height, class: "tui-input", style: "width: 100%; padding: 8px;", min: 1 %>
+      <%= f.tui_number_field :height, min: 1, label: "HEIGHT (px)" %>
     </div>
   </div>
 

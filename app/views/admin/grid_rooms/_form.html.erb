@@ -13,36 +13,31 @@
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_text_field :name %>
   </div>
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_text_field :slug %>
   </div>
 </div>
 
 <div style="margin-top: 15px;">
-  <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-  <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :room_type, "ROOM TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.select :room_type,
+    <%= f.tui_select :room_type,
           [["Standard", "standard"], ["Hub", "hub"], ["Faction Base", "faction_base"], ["GovCorp", "govcorp"], ["Special", "special"], ["Safe Zone", "safe_zone"], ["Transit", "transit"], ["Shop", "shop"], ["Danger Zone", "danger_zone"], ["Den", "den"], ["Hospital", "hospital"], ["Firmware Vendor", "firmware_vendor"], ["Repair Service", "repair_service"], ["Rest Pod", "rest_pod"], ["Containment", "containment"], ["Impound", "impound"], ["Sally Port Anteroom", "sally_port_anteroom"], ["Sally Port", "sally_port"]],
-          { selected: @room.room_type || "standard" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+          { selected: @room.room_type || "standard" } %>
   </div>
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :min_clearance, "MIN CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.number_field :min_clearance, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0 %>
+    <%= f.tui_number_field :min_clearance, min: 0 %>
   </div>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :grid_zone_id, "ZONE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.label :grid_zone_id, "ZONE", class: "tui-field-label" %>
     <input type="hidden" name="grid_room[grid_zone_id]" id="zone-cb-hidden" value="<%= @room.grid_zone_id %>">
     <div class="admin-combobox">
       <input type="text" id="zone-cb-input" class="admin-combobox-input<%= ' selected' if @room.grid_zone_id.present? %>" autocomplete="off"
@@ -55,8 +50,7 @@
     </p>
   </div>
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :ambient_playlist_id, "AMBIENT PLAYLIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.collection_select :ambient_playlist_id, @playlists, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_collection_select :ambient_playlist_id, @playlists, :id, :name, { include_blank: "(none)" }, label: "AMBIENT PLAYLIST" %>
   </div>
 </div>
 
