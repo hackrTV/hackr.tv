@@ -8,18 +8,15 @@
         <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
           <div style="display: flex; gap: 20px; margin-bottom: 15px;">
             <div style="flex: 1;">
-              <%= f.label :alert_type, "ALERT TYPE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-              <%= f.select :alert_type, OverlayAlert::ALERT_TYPES.map { |t| [t.titleize, t] }, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+              <%= f.tui_select :alert_type, OverlayAlert::ALERT_TYPES.map { |t| [t.titleize, t] }, {} %>
             </div>
             <div style="flex: 1;">
-              <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-              <%= f.text_field :title, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+              <%= f.tui_text_field :title %>
             </div>
           </div>
 
           <div style="margin-bottom: 15px;">
-            <%= f.label :message, "MESSAGE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-            <%= f.text_area :message, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+            <%= f.tui_text_area :message, style: "min-height: 80px;" %>
           </div>
 
           <div style="margin-bottom: 15px;">

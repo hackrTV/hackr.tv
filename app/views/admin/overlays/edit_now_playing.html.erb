@@ -44,25 +44,20 @@
         <h3 class="green-255-text" style="margin: 0 0 15px;">[:: SET TRACK ::]</h3>
 
         <div style="margin-bottom: 15px;">
-          <%= f.label :track_id, "TRACK", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-          <%= f.select :track_id, @tracks.map { |t| ["#{t.artist&.name} — #{t.title}", t.id] }, { include_blank: "— Select Track —" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+          <%= f.tui_select :track_id, @tracks.map { |t| ["#{t.artist&.name} — #{t.title}", t.id] }, { include_blank: "— Select Track —" }, label: "TRACK" %>
         </div>
 
         <div style="display: flex; gap: 20px; margin-bottom: 15px;">
           <div style="flex: 1;">
-            <%= f.label :custom_title, "OR CUSTOM TITLE", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-            <%= f.text_field :custom_title, class: "tui-input", style: "width: 100%; padding: 8px;", value: @now_playing.custom_title %>
+            <%= f.tui_text_field :custom_title, value: @now_playing.custom_title, label: "OR CUSTOM TITLE" %>
           </div>
           <div style="flex: 1;">
-            <%= f.label :custom_artist, "CUSTOM ARTIST", class: "white-text", style: "display: block; margin-bottom: 5px; font-weight: bold;" %>
-            <%= f.text_field :custom_artist, class: "tui-input", style: "width: 100%; padding: 8px;", value: @now_playing.custom_artist %>
+            <%= f.tui_text_field :custom_artist, value: @now_playing.custom_artist %>
           </div>
         </div>
 
         <div style="margin-bottom: 15px;">
-          <%= f.label :paused, class: "white-text", style: "font-weight: bold;" do %>
-            <%= f.check_box :paused, checked: @now_playing.paused, style: "margin-right: 8px;" %> PAUSED
-          <% end %>
+          <%= f.tui_check_box :paused, checked: @now_playing.paused %>
         </div>
 
         <div style="display: flex; gap: 10px;">

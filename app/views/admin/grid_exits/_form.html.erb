@@ -11,29 +11,24 @@
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :from_room_id, "FROM ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.select :from_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.from_room_id), { include_blank: "(select room)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_select :from_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.from_room_id), { include_blank: "(select room)" }, label: "FROM ROOM" %>
   </div>
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :to_room_id, "TO ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.select :to_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.to_room_id), { include_blank: "(select room)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_select :to_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.to_room_id), { include_blank: "(select room)" }, label: "TO ROOM" %>
   </div>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :direction, "DIRECTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.select :direction,
+    <%= f.tui_select :direction,
           [["North", "north"], ["South", "south"], ["East", "east"], ["West", "west"], ["Up", "up"], ["Down", "down"]],
-          { include_blank: "(select direction)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+          { include_blank: "(select direction)" } %>
   </div>
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :locked, "LOCKED", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.check_box :locked, style: "margin-top: 8px;" %>
+    <%= f.tui_check_box :locked, style: "margin-top: 8px;" %>
   </div>
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :requires_item_id, "REQUIRES ITEM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.collection_select :requires_item_id, GridItem.all, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_collection_select :requires_item_id, GridItem.all, :id, :name, { include_blank: "(none)" }, label: "REQUIRES ITEM" %>
   </div>
 </div>
 

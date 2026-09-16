@@ -13,18 +13,15 @@
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_text_field :name %>
   </div>
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_text_field :slug %>
   </div>
 </div>
 
 <div style="margin-top: 15px;">
-  <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-  <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
 </div>
 
 <%
@@ -44,7 +41,7 @@
       <% cb_id = rf[:field].to_s.sub(/_id$/, "").dasherize %>
       <% current_room = @region.send(rf[:field].to_s.sub(/_id$/, "")) %>
       <div style="flex: 1; min-width: 250px;">
-        <%= f.label rf[:field], rf[:label], class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+        <%= f.label rf[:field], rf[:label], class: "tui-field-label" %>
         <input type="hidden" name="grid_region[<%= rf[:field] %>]" id="<%= cb_id %>-hidden" value="<%= @region.send(rf[:field]) %>">
         <div class="admin-combobox">
           <input type="text" id="<%= cb_id %>-input" class="admin-combobox-input<%= ' selected' if current_room %>" autocomplete="off"

@@ -7,43 +7,34 @@
 
   <div style="display: flex; gap: 20px; flex-wrap: wrap;">
     <div style="flex: 1; min-width: 300px; margin-bottom: 20px;">
-      <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :title, class: "tui-input", style: "width: 100%;" %>
+      <%= f.tui_text_field :title %>
     </div>
     <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <%= f.tui_text_field :slug %>
     </div>
   </div>
 
   <div style="display: flex; gap: 20px; flex-wrap: wrap;">
     <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.label :grid_hackr_id, "AUTHOR", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.collection_select :grid_hackr_id, @hackrs, :id, :hackr_alias,
+      <%= f.tui_collection_select :grid_hackr_id, @hackrs, :id, :hackr_alias,
           { include_blank: "— Select Author —" },
-          class: "tui-input", style: "width: 100%;" %>
+          label: "AUTHOR" %>
     </div>
     <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
-      <%= f.label :timeline, "TIMELINE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :timeline, class: "tui-input", style: "width: 100%;" %>
+      <%= f.tui_text_field :timeline %>
     </div>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :body, "BODY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_area :body, class: "tui-input", style: "width: 100%; min-height: 300px;" %>
+    <%= f.tui_text_area :body, style: "min-height: 300px;" %>
   </div>
 
   <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
     <div style="margin-bottom: 20px;">
-      <%= f.label :published, class: "white-text", style: "display: inline-flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;" do %>
-        <%= f.check_box :published, style: "width: 20px; height: 20px;" %>
-        <span>PUBLISHED</span>
-      <% end %>
+      <%= f.tui_check_box :published, style: "width: 20px; height: 20px;" %>
     </div>
     <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.label :published_at, "PUBLISHED AT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.datetime_field :published_at, class: "tui-input", style: "width: 100%;" %>
+      <%= f.tui_datetime_field :published_at %>
     </div>
   </div>
 

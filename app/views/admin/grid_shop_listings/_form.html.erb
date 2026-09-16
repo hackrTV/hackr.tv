@@ -10,17 +10,15 @@
 
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
     <div>
-      <%= f.label :grid_mob_id, "VENDOR", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.select :grid_mob_id,
+      <%= f.tui_select :grid_mob_id,
           @vendors.map { |v| ["#{v.name} (#{v.grid_room.name})", v.id] },
-          {}, class: "tui-input", style: "width: 100%;" %>
+          {}, label: "VENDOR" %>
     </div>
 
     <div>
-      <%= f.label :grid_item_definition_id, "ITEM DEFINITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.select :grid_item_definition_id,
+      <%= f.tui_select :grid_item_definition_id,
           @definitions.map { |d| ["#{d.name} [#{d.item_type} / #{d.rarity_label}]", d.id] },
-          { include_blank: "Select definition..." }, class: "tui-input", style: "width: 100%;" %>
+          { include_blank: "Select definition..." }, label: "ITEM DEFINITION" %>
       <% if listing.errors[:grid_item_definition].any? %>
         <br><small class="red-255-text"><%= listing.errors[:grid_item_definition].join(", ") %></small>
       <% end %>
@@ -29,8 +27,7 @@
 
   <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 15px;">
     <div>
-      <%= f.label :min_clearance, "MIN CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :min_clearance, class: "tui-input", style: "width: 200px;", min: 0 %>
+      <%= f.tui_number_field :min_clearance, style: "width: 200px;", min: 0 %>
     </div>
   </div>
 
@@ -38,14 +35,11 @@
 
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
     <div>
-      <%= f.label :base_price, "BUY PRICE (CRED)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :base_price, class: "tui-input", style: "width: 100%;", min: 1 %>
+      <%= f.tui_number_field :base_price, min: 1, label: "BUY PRICE (CRED)" %>
     </div>
 
     <div>
-      <%= f.label :sell_price, "SELL PRICE (CRED)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :sell_price, class: "tui-input", style: "width: 100%;", min: 0 %>
-      <small style="color: #888;">Leave blank for auto (50% of buy price)</small>
+      <%= f.tui_number_field :sell_price, min: 0, label: "SELL PRICE (CRED)", hint: "Leave blank for auto (50% of buy price)" %>
     </div>
   </div>
 
@@ -53,25 +47,19 @@
 
   <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px;">
     <div>
-      <%= f.label :stock, "CURRENT STOCK", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :stock, class: "tui-input", style: "width: 100%;", min: 0 %>
-      <small style="color: #888;">Blank = unlimited</small>
+      <%= f.tui_number_field :stock, min: 0, label: "CURRENT STOCK", hint: "Blank = unlimited" %>
     </div>
 
     <div>
-      <%= f.label :max_stock, "MAX STOCK", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :max_stock, class: "tui-input", style: "width: 100%;", min: 1 %>
-      <small style="color: #888;">Blank = unlimited</small>
+      <%= f.tui_number_field :max_stock, min: 1, hint: "Blank = unlimited" %>
     </div>
 
     <div>
-      <%= f.label :restock_amount, "RESTOCK AMT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :restock_amount, class: "tui-input", style: "width: 100%;", min: 1 %>
+      <%= f.tui_number_field :restock_amount, min: 1, label: "RESTOCK AMT" %>
     </div>
 
     <div>
-      <%= f.label :restock_interval_hours, "RESTOCK (hrs)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :restock_interval_hours, class: "tui-input", style: "width: 100%;", min: 1 %>
+      <%= f.tui_number_field :restock_interval_hours, min: 1, label: "RESTOCK (hrs)" %>
     </div>
   </div>
 

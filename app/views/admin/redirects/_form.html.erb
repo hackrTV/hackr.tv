@@ -10,30 +10,15 @@
   <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: REDIRECT INFO ::]</h3>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :path, "PATH", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :path, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "/old-path" %>
-    <small style="color: #888;">The incoming path to match (e.g. /old-page)</small>
-    <% if redirect.errors[:path].any? %>
-      <br><small class="red-255-text"><%= redirect.errors[:path].join(", ") %></small>
-    <% end %>
+    <%= f.tui_text_field :path, placeholder: "/old-path", hint: "The incoming path to match (e.g. /old-page)" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :destination_url, "DESTINATION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :destination_url, class: "tui-input", style: "width: 100%; font-family: monospace;", placeholder: "/new-path or https://example.com/page" %>
-    <small style="color: #888;">Where to redirect to (path or full URL)</small>
-    <% if redirect.errors[:destination_url].any? %>
-      <br><small class="red-255-text"><%= redirect.errors[:destination_url].join(", ") %></small>
-    <% end %>
+    <%= f.tui_text_field :destination_url, placeholder: "/new-path or https://example.com/page", label: "DESTINATION", hint: "Where to redirect to (path or full URL)" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :domain, "DOMAIN", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :domain, class: "tui-input", style: "width: 100%; font-family: monospace; max-width: 400px;", placeholder: "hackr.tv" %>
-    <small style="color: #888;">Optional. Leave blank for all domains.</small>
-    <% if redirect.errors[:domain].any? %>
-      <br><small class="red-255-text"><%= redirect.errors[:domain].join(", ") %></small>
-    <% end %>
+    <%= f.tui_text_field :domain, style: "max-width: 400px;", placeholder: "hackr.tv", hint: "Optional. Leave blank for all domains." %>
   </div>
 
   <div style="margin-top: 30px; display: flex; gap: 10px;">

@@ -11,40 +11,32 @@
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_text_field :name %>
   </div>
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_text_field :slug %>
   </div>
 </div>
 
 <div style="margin-top: 15px;">
-  <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-  <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :danger_level, "DANGER LEVEL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.number_field :danger_level, class: "tui-input", style: "width: 100%; padding: 8px;", min: 0, max: 10 %>
-    <small style="color: #888;">0 = safe, 10 = max ambient encounters</small>
+    <%= f.tui_number_field :danger_level, min: 0, max: 10, hint: "0 = safe, 10 = max ambient encounters" %>
   </div>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :grid_region_id, "REGION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.collection_select :grid_region_id, @regions, :id, :name, {}, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_collection_select :grid_region_id, @regions, :id, :name, {}, label: "REGION" %>
   </div>
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :grid_faction_id, "FACTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.collection_select :grid_faction_id, @factions, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_collection_select :grid_faction_id, @factions, :id, :name, { include_blank: "(none)" }, label: "FACTION" %>
   </div>
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :ambient_playlist_id, "AMBIENT PLAYLIST", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.collection_select :ambient_playlist_id, @playlists, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_collection_select :ambient_playlist_id, @playlists, :id, :name, { include_blank: "(none)" }, label: "AMBIENT PLAYLIST" %>
   </div>
 </div>
 

@@ -3,75 +3,53 @@
 
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
     <div>
-      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :name, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
-      <% if template.errors[:name].any? %>
-        <br><small class="red-255-text"><%= template.errors[:name].join(", ") %></small>
-      <% end %>
+      <%= f.tui_text_field :name %>
     </div>
     <div>
-      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
-      <small style="color: #888;">lowercase letters, numbers, hyphens only</small>
-      <% if template.errors[:slug].any? %>
-        <br><small class="red-255-text"><%= template.errors[:slug].join(", ") %></small>
-      <% end %>
+      <%= f.tui_text_field :slug, hint: "lowercase letters, numbers, hyphens only" %>
     </div>
   </div>
 
   <div style="margin-top: 15px;">
-    <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_area :description, class: "tui-input", style: "width: 100%; font-family: monospace; height: 80px;" %>
+    <%= f.tui_text_area :description, style: "height: 80px;" %>
   </div>
 
   <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
     <div>
-      <%= f.label :tier, "TIER", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.select :tier, @tiers.map { |t| [t.upcase.tr("_", " "), t] }, {}, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <%= f.tui_select :tier, @tiers.map { |t| [t.upcase.tr("_", " "), t] }, {} %>
     </div>
     <div>
-      <%= f.label :min_clearance, "MIN CLEARANCE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :min_clearance, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0, max: 99 %>
+      <%= f.tui_number_field :min_clearance, min: 0, max: 99 %>
     </div>
     <div>
-      <%= f.label :pnr_threshold, "PNR THRESHOLD (%)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :pnr_threshold, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 1, max: 100 %>
+      <%= f.tui_number_field :pnr_threshold, min: 1, max: 100, label: "PNR THRESHOLD (%)" %>
     </div>
     <div>
-      <%= f.label :base_detection_rate, "BASE DETECT RATE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :base_detection_rate, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 1 %>
+      <%= f.tui_number_field :base_detection_rate, min: 1, label: "BASE DETECT RATE" %>
     </div>
   </div>
 
   <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
     <div>
-      <%= f.label :xp_reward, "XP REWARD", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :xp_reward, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+      <%= f.tui_number_field :xp_reward, min: 0 %>
     </div>
     <div>
-      <%= f.label :cred_reward, "CRED REWARD", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :cred_reward, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+      <%= f.tui_number_field :cred_reward, min: 0 %>
     </div>
     <div>
-      <%= f.label :cooldown_min, "COOLDOWN MIN (s)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :cooldown_min, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+      <%= f.tui_number_field :cooldown_min, min: 0, label: "COOLDOWN MIN (s)" %>
     </div>
     <div>
-      <%= f.label :cooldown_max, "COOLDOWN MAX (s)", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :cooldown_max, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+      <%= f.tui_number_field :cooldown_max, min: 0, label: "COOLDOWN MAX (s)" %>
     </div>
   </div>
 
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
     <div>
-      <%= f.label :requires_mission_slug, "REQUIRES MISSION SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :requires_mission_slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
-      <small style="color: #888;">Optional — mission that must be active/completed</small>
+      <%= f.tui_text_field :requires_mission_slug, hint: "Optional — mission that must be active/completed" %>
     </div>
     <div>
-      <%= f.label :requires_item_slug, "REQUIRES ITEM SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :requires_item_slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
-      <small style="color: #888;">Optional — key item required to breach</small>
+      <%= f.tui_text_field :requires_item_slug, hint: "Optional — key item required to breach" %>
     </div>
   </div>
 
@@ -79,16 +57,13 @@
 
   <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
     <div>
-      <%= f.label :danger_level_min, "MIN DANGER LEVEL", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :danger_level_min, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0, max: 10 %>
+      <%= f.tui_number_field :danger_level_min, min: 0, max: 10, label: "MIN DANGER LEVEL" %>
       <small style="color: #888;">Zone danger_level must be >= this to spawn</small>
     </div>
     <div>
-      <%= f.label :zone_slugs_csv, "ZONE SLUGS", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :zone_slugs_csv,
+      <%= f.tui_text_field :zone_slugs_csv,
             value: (template.zone_slugs.is_a?(Array) ? template.zone_slugs.join(", ") : ""),
-            class: "tui-input", style: "width: 100%; font-family: monospace;" %>
-      <small style="color: #888;">Comma-separated zone slugs. Empty = any zone.</small>
+            label: "ZONE SLUGS", hint: "Comma-separated zone slugs. Empty = any zone." %>
     </div>
   </div>
 
@@ -110,8 +85,7 @@
 
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
     <div>
-      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :position, class: "tui-input", style: "width: 100%; font-family: monospace;", min: 0 %>
+      <%= f.tui_number_field :position, min: 0 %>
     </div>
     <div style="display: flex; align-items: flex-end;">
       <label style="color: white; cursor: pointer;">

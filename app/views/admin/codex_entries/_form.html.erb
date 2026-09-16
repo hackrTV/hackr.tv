@@ -7,50 +7,38 @@
 
   <div style="display: flex; gap: 20px; flex-wrap: wrap;">
     <div style="flex: 1; min-width: 300px; margin-bottom: 20px;">
-      <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :name, class: "tui-input", style: "width: 100%;" %>
+      <%= f.tui_text_field :name %>
     </div>
     <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
+      <%= f.tui_text_field :slug %>
     </div>
   </div>
 
   <div style="display: flex; gap: 20px; flex-wrap: wrap;">
     <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.label :entry_type, "ENTRY TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.select :entry_type,
+      <%= f.tui_select :entry_type,
           options_for_select(CodexEntry::ENTRY_TYPES.map { |t| [t.titleize, t] }, @entry.entry_type),
-          {},
-          class: "tui-input", style: "width: 100%;" %>
+          {} %>
     </div>
     <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
-      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :position, class: "tui-input", style: "width: 100%;" %>
+      <%= f.tui_number_field :position %>
     </div>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :summary, "SUMMARY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_area :summary, class: "tui-input", style: "width: 100%; min-height: 80px;" %>
+    <%= f.tui_text_area :summary, style: "min-height: 80px;" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :content, "CONTENT", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_area :content, class: "tui-input", style: "width: 100%; min-height: 200px;" %>
+    <%= f.tui_text_area :content, style: "min-height: 200px;" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :metadata_json, "METADATA", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_area :metadata_json, value: (@entry.metadata.present? ? JSON.pretty_generate(@entry.metadata) : "{}"), class: "tui-input", style: "width: 100%; min-height: 100px; font-family: monospace;" %>
-    <small style="color: #888;">JSON object</small>
+    <%= f.tui_text_area :metadata_json, value: (@entry.metadata.present? ? JSON.pretty_generate(@entry.metadata) : "{}"), style: "min-height: 100px;", label: "METADATA", hint: "JSON object" %>
   </div>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :published, class: "white-text", style: "display: inline-flex; align-items: center; gap: 10px; font-weight: bold; cursor: pointer;" do %>
-      <%= f.check_box :published, style: "width: 20px; height: 20px;" %>
-      <span>PUBLISHED</span>
-    <% end %>
+    <%= f.tui_check_box :published, style: "width: 20px; height: 20px;" %>
   </div>
 
   <div style="margin-top: 20px;">

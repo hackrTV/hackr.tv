@@ -13,26 +13,23 @@
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :name, "NAME", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :name, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_text_field :name %>
   </div>
   <div style="flex: 1; min-width: 250px;">
-    <%= f.label :mob_type, "MOB TYPE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.select :mob_type,
+    <%= f.tui_select :mob_type,
           [["Quest Giver", "quest_giver"], ["Vendor", "vendor"], ["Lore", "lore"], ["Special", "special"]],
-          { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;",
+          { include_blank: "(none)" },
           id: "mob-type-select" %>
   </div>
 </div>
 
 <div style="margin-top: 15px;">
-  <%= f.label :description, "DESCRIPTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-  <%= f.text_area :description, class: "tui-input", style: "width: 100%; padding: 8px; min-height: 80px;" %>
+  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
 </div>
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :grid_room_id, "ROOM", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
+    <%= f.label :grid_room_id, "ROOM", class: "tui-field-label" %>
     <input type="hidden" name="grid_mob[grid_room_id]" id="room-cb-hidden" value="<%= @mob.grid_room_id %>">
     <div class="admin-combobox">
       <input type="text" id="room-cb-input" class="admin-combobox-input<%= ' selected' if @mob.grid_room_id.present? %>" autocomplete="off"
@@ -45,8 +42,7 @@
     </p>
   </div>
   <div style="flex: 1; min-width: 200px;">
-    <%= f.label :grid_faction_id, "FACTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.collection_select :grid_faction_id, @factions, :id, :name, { include_blank: "(none)" }, class: "tui-input", style: "width: 100%; padding: 8px;" %>
+    <%= f.tui_collection_select :grid_faction_id, @factions, :id, :name, { include_blank: "(none)" }, label: "FACTION" %>
   </div>
 </div>
 

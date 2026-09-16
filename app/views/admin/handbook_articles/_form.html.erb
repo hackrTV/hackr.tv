@@ -3,57 +3,44 @@
 
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
     <div>
-      <%= f.label :handbook_section_id, "SECTION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.select :handbook_section_id,
+      <%= f.tui_select :handbook_section_id,
           @sections.map { |s| [s.name, s.id] },
-          {}, class: "tui-input", style: "width: 100%;" %>
+          {}, label: "SECTION" %>
     </div>
 
     <div>
-      <%= f.label :title, "TITLE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.text_field :title, class: "tui-input", style: "width: 100%;" %>
+      <%= f.tui_text_field :title %>
     </div>
   </div>
 
   <div style="margin-top: 15px;">
-    <%= f.label :slug, "SLUG", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_field :slug, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
-    <small style="color: #666;">Auto-generated from title if left blank. Globally unique across the handbook.</small>
+    <%= f.tui_text_field :slug, hint: "Auto-generated from title if left blank. Globally unique across the handbook." %>
   </div>
 
   <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
     <div>
-      <%= f.label :kind, "KIND", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.select :kind,
+      <%= f.tui_select :kind,
           HandbookArticle::KINDS.map { |k| [k.titleize, k] },
-          {}, class: "tui-input", style: "width: 100%;" %>
+          {} %>
     </div>
 
     <div>
-      <%= f.label :difficulty, "DIFFICULTY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.select :difficulty,
+      <%= f.tui_select :difficulty,
           HandbookArticle::DIFFICULTIES.map { |d| [d.titleize, d] },
-          {include_blank: "—"}, class: "tui-input", style: "width: 100%;" %>
-      <small style="color: #666;">Optional. Useful for tutorials.</small>
+          {include_blank: "—"}, hint: "Optional. Useful for tutorials." %>
     </div>
 
     <div>
-      <%= f.label :position, "POSITION", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-      <%= f.number_field :position, class: "tui-input", style: "width: 100%;", min: 0 %>
-      <small style="color: #666;">Order within section.</small>
+      <%= f.tui_number_field :position, min: 0, hint: "Order within section." %>
     </div>
 
     <div>
-      <%= f.label :published, class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" do %>
-        <%= f.check_box :published, style: "margin-right: 8px;" %> PUBLISHED
-      <% end %>
+      <%= f.tui_check_box :published %>
     </div>
   </div>
 
   <div style="margin-top: 15px;">
-    <%= f.label :summary, "SUMMARY", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-    <%= f.text_area :summary, class: "tui-input", style: "width: 100%; min-height: 60px;" %>
-    <small style="color: #666;">One-sentence hook shown in sidebar/landing.</small>
+    <%= f.tui_text_area :summary, style: "min-height: 60px;", hint: "One-sentence hook shown in sidebar/landing." %>
   </div>
 
   <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: BODY (MARKDOWN) ::]</h3>
