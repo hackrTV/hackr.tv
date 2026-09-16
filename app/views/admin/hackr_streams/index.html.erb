@@ -38,9 +38,9 @@
 
       <!-- Actions -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
         <div style="margin-left: auto; display: flex; gap: 10px;">
-          <%= link_to "➕ New Stream", new_admin_hackr_stream_path, class: "tui-button purple-168", style: "padding: 8px 20px;" %>
+          <%= tui_button "➕ New Stream", new_admin_hackr_stream_path, color: :purple, style: "padding: 8px 20px;" %>
         </div>
       </div>
 
@@ -118,8 +118,8 @@
                   <td style="text-align: center;">
                     <div style="display: flex; gap: 5px; justify-content: center; white-space: nowrap;">
                       <% if stream.is_live %>
-                        <%= button_to "⏸ End Stream", end_stream_admin_hackr_stream_path(stream),
-                            class: "tui-button orange-168",
+                        <%= tui_button_to "⏸ End Stream", end_stream_admin_hackr_stream_path(stream),
+                            color: :orange,
                             style: "padding: 2px 10px; font-size: 0.9em;",
                             form: { style: "display: contents;" },
                             data: { confirm: "End this livestream?" } %>
@@ -135,8 +135,8 @@
                           ✗ Cancelled
                         </span>
                       <% elsif stream.live_url.present? %>
-                        <%= button_to "▶ Go Live", go_live_admin_hackr_stream_path(stream),
-                            class: "tui-button green-168",
+                        <%= tui_button_to "▶ Go Live", go_live_admin_hackr_stream_path(stream),
+                            color: :green,
                             style: "padding: 2px 10px; font-size: 0.9em;",
                             form: { style: "display: contents;" },
                             data: { confirm: "Start livestream for #{stream.artist.name}?" } %>
@@ -148,20 +148,20 @@
                         </span>
                       <% end %>
                       <% if stream.scheduled_at.present? && stream.cancelled_at.nil? && !stream.is_live? && stream.ended_at.nil? %>
-                        <%= button_to "✗ Cancel", cancel_admin_hackr_stream_path(stream),
-                            class: "tui-button orange-168",
+                        <%= tui_button_to "✗ Cancel", cancel_admin_hackr_stream_path(stream),
+                            color: :orange,
                             style: "padding: 2px 10px; font-size: 0.9em;",
                             form: { style: "display: contents;" },
                             data: { confirm: "Cancel scheduled stream?" } %>
                       <% end %>
-                      <%= link_to "✎ Edit", edit_admin_hackr_stream_path(stream),
-                          class: "tui-button cyan-168",
+                      <%= tui_button "✎ Edit", edit_admin_hackr_stream_path(stream),
+                          color: :cyan,
                           style: "padding: 2px 10px; font-size: 0.9em;" %>
-                      <%= button_to "✗ Delete", admin_hackr_stream_path(stream),
+                      <%= tui_button_to "✗ Delete", admin_hackr_stream_path(stream),
                           method: :delete,
                           form: { style: "display: contents;" },
                           data: { confirm: "Delete stream for #{stream.artist.name}?" },
-                          class: "tui-button red-168",
+                          color: :red,
                           style: "padding: 2px 10px; font-size: 0.9em;" %>
                     </div>
                   </td>

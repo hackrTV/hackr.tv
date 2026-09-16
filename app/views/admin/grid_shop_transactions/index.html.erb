@@ -5,7 +5,7 @@
     <div style="padding: 20px;">
       <!-- Filters -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= link_to "<- Listings", admin_grid_shop_listings_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= tui_button "<- Listings", admin_grid_shop_listings_path, color: :green, style: "padding: 8px 20px;" %>
 
         <%= form_tag admin_grid_shop_transactions_path, method: :get, style: "display: flex; gap: 10px; align-items: center;" do %>
           <%= text_field_tag :hackr_alias, params[:hackr_alias], placeholder: "Hackr alias", class: "tui-input", style: "width: 150px; padding: 6px 10px;" %>
@@ -15,7 +15,7 @@
           <%= select_tag :transaction_type,
               options_for_select([["All Types", ""], ["Purchases", "buy"], ["Sales", "sell"]], params[:transaction_type]),
               class: "tui-input", style: "padding: 6px 10px;" %>
-          <%= submit_tag "Filter", class: "tui-button cyan-168", style: "padding: 6px 16px;" %>
+          <%= tui_submit "Filter", color: :cyan, style: "padding: 6px 16px;" %>
         <% end %>
       </div>
 
@@ -67,7 +67,7 @@
       <% end %>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= link_to "<- Grid Admin", admin_grid_path, class: "tui-button green-168" %>
+        <%= tui_button "<- Grid Admin", admin_grid_path, color: :green %>
       </div>
     </div>
   </fieldset>

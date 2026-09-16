@@ -15,8 +15,8 @@
       <div id="draft-banner" style="display: none; background: #1a1a00; border: 2px solid #fbbf24; padding: 12px 15px; margin-bottom: 20px;">
         <span style="color: #fbbf24; font-weight: bold;">DRAFT FOUND</span>
         <span style="color: #ccc; margin-left: 10px;">Unsaved wizard progress detected.</span>
-        <button type="button" id="draft-restore" class="tui-button green-168" style="margin-left: 15px; padding: 4px 12px; font-size: 0.85em;">Restore</button>
-        <button type="button" id="draft-discard" class="tui-button red-168" style="margin-left: 8px; padding: 4px 12px; font-size: 0.85em;">Discard</button>
+        <%= tui_button "Restore", color: :green, type: "button", id: "draft-restore", style: "margin-left: 15px; padding: 4px 12px; font-size: 0.85em;" %>
+        <%= tui_button "Discard", color: :red, type: "button", id: "draft-discard", style: "margin-left: 8px; padding: 4px 12px; font-size: 0.85em;" %>
       </div>
 
       <%# === STEP INDICATOR === %>
@@ -323,7 +323,7 @@
             </thead>
             <tbody id="objectives-tbody"></tbody>
           </table>
-          <button type="button" id="add-objective-btn" class="tui-button green-168" style="padding: 6px 14px; font-size: 0.85em;">+ Add Objective</button>
+          <%= tui_button "+ Add Objective", color: :green, type: "button", id: "add-objective-btn", style: "padding: 6px 14px; font-size: 0.85em;" %>
         </div>
 
         <%# ================================================================ %>
@@ -349,7 +349,7 @@
             </thead>
             <tbody id="rewards-tbody"></tbody>
           </table>
-          <button type="button" id="add-reward-btn" class="tui-button green-168" style="padding: 6px 14px; font-size: 0.85em;">+ Add Reward</button>
+          <%= tui_button "+ Add Reward", color: :green, type: "button", id: "add-reward-btn", style: "padding: 6px 14px; font-size: 0.85em;" %>
         </div>
 
         <%# ================================================================ %>
@@ -363,12 +363,12 @@
       <%# === NAV BUTTONS === %>
       <div style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <button type="button" id="btn-back" class="tui-button" style="padding: 10px 20px; display: none;">BACK</button>
+          <%= tui_button "BACK", type: "button", id: "btn-back", style: "padding: 10px 20px; display: none;" %>
         </div>
         <div style="display: flex; gap: 10px;">
-          <%= link_to "Cancel", admin_grid_missions_path, class: "tui-button", style: "padding: 10px 20px;" %>
-          <button type="button" id="btn-next" class="tui-button green-168" style="padding: 10px 20px; font-weight: bold;">NEXT</button>
-          <button type="submit" id="btn-submit" class="tui-button green-168" style="padding: 10px 20px; font-weight: bold; display: none;">CREATE MISSION</button>
+          <%= tui_button "Cancel", admin_grid_missions_path, style: "padding: 10px 20px;" %>
+          <%= tui_button "NEXT", color: :green, type: "button", id: "btn-next", style: "padding: 10px 20px; font-weight: bold;" %>
+          <%= tui_button "CREATE MISSION", color: :green, type: "submit", id: "btn-submit", style: "padding: 10px 20px; font-weight: bold; display: none;" %>
         </div>
       </div>
 

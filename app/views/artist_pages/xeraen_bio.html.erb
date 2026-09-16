@@ -206,13 +206,13 @@
         </div>
 
         <div class="xeraen-nav-buttons">
-          <%= link_to "/f/net", class: "tui-button xeraen-btn-back" do %>← BACK TO FRACTURE NETWORK<% end %>
-          <%= link_to "/xeraen/releases", class: "tui-button xeraen-btn-primary" do %>RELEASES<% end %>
-          <%= link_to "/vault?filter=xeraen", class: "tui-button xeraen-btn-primary" do %>
+          <%= tui_button "/f/net", class: "xeraen-btn-back" do %>← BACK TO FRACTURE NETWORK<% end %>
+          <%= tui_button "/xeraen/releases", class: "xeraen-btn-primary" do %>RELEASES<% end %>
+          <%= tui_button "/vault?filter=xeraen", class: "xeraen-btn-primary" do %>
             <span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>
             <span class="chrome-mobile-only">PULSE VAULT →</span>
           <% end %>
-          <%= link_to "/thecyberpulse", class: "tui-button xeraen-btn-pulse" do %>THE.CYBERPUL.SE →<% end %>
+          <%= tui_button "/thecyberpulse", class: "xeraen-btn-pulse" do %>THE.CYBERPUL.SE →<% end %>
         </div>
       </div>
     </fieldset>

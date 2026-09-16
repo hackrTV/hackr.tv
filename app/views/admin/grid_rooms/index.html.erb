@@ -16,8 +16,8 @@
       <% end %>
 
       <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
-        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168" %>
-        <%= link_to "+ New Room", new_admin_grid_room_path, class: "tui-button green-168" %>
+        <%= tui_button "← Dashboard", admin_root_path, color: :green %>
+        <%= tui_button "+ New Room", new_admin_grid_room_path, color: :green %>
         <span style="color: #333;">|</span>
         <label class="white-text" style="font-weight: bold;">FILTER:</label>
         <input type="text" id="room-filter" class="tui-input" style="padding: 6px 10px; width: 250px;" placeholder="name, slug, zone, type..." autocomplete="off">
@@ -54,9 +54,9 @@
                     <% end %>
                   </td>
                   <td style="text-align: right; white-space: nowrap;">
-                    <%= link_to "Edit", edit_admin_grid_room_path(room), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= link_to "History", history_admin_grid_room_path(room), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= button_to "Delete", admin_grid_room_path(room), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{room.name}'?" } %>
+                    <%= tui_button "Edit", edit_admin_grid_room_path(room), style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= tui_button "History", history_admin_grid_room_path(room), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= tui_button_to "Delete", admin_grid_room_path(room), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{room.name}'?" } %>
                   </td>
                 </tr>
               <% end %>

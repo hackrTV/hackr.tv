@@ -20,9 +20,9 @@
 
       <%# Nav %>
       <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
-        <%= link_to "Mob", edit_admin_grid_mob_path(@mob), class: "tui-button", style: "padding: 6px 14px;" %>
-        <%= button_to "END SESSION", finish_admin_grid_npc_dialogue_tester_path, method: :delete, class: "tui-button red-168", style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "End dialogue test? Hackr will be warped back to original room." }, form: { id: "end-form" } %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
+        <%= tui_button "Mob", edit_admin_grid_mob_path(@mob), style: "padding: 6px 14px;" %>
+        <%= tui_button_to "END SESSION", finish_admin_grid_npc_dialogue_tester_path, method: :delete, color: :red, style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "End dialogue test? Hackr will be warped back to original room." }, form: { id: "end-form" } %>
       </div>
 
       <%# Terminal output — styled to match frontend GameOutput.tsx %>
@@ -50,8 +50,8 @@
         <span class="yellow-255-text" style="font-weight: bold;">NPC DIALOGUE TEST ENDED</span>
         <span style="color: #ccc;"> — Hackr returned to original room.</span>
         <br><br>
-        <%= link_to "Back to Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 8px 16px;" %>
-        <%= link_to "New Test", new_admin_grid_npc_dialogue_tester_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 8px 16px;" %>
+        <%= tui_button "Back to Inspector", admin_grid_hackr_path(@hackr), style: "padding: 8px 16px;" %>
+        <%= tui_button "New Test", new_admin_grid_npc_dialogue_tester_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 8px 16px;" %>
       </div>
     </div>
   </fieldset>

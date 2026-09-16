@@ -32,8 +32,8 @@
                     data-action="playlist-reorder#moveUp">↑</button>
             <button type="button" class="tui-button playlist-table__move" title="Move down"
                     data-action="playlist-reorder#moveDown">↓</button>
-            <%= button_to "Remove", fm_playlist_remove_track_path(playlist, playlist_track.id),
-                  method: :delete, class: "tui-button playlist-table__remove",
+            <%= tui_button_to "Remove", fm_playlist_remove_track_path(playlist, playlist_track.id),
+                  method: :delete, class: "playlist-table__remove",
                   form_class: "playlist-table__remove-form",
                   form: {data: {turbo_confirm: "Remove \"#{track.title}\" from this playlist?"}} %>
           </td>

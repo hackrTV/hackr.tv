@@ -10,9 +10,9 @@
               class: "tui-input", style: "padding: 4px 8px;", onchange: "this.form.submit()" %>
         <label class="white-text" style="font-weight: bold; margin-left: 10px;">HACKR:</label>
         <%= text_field_tag :hackr_alias, @hackr_alias_filter, class: "tui-input", style: "padding: 4px 8px;", placeholder: "hackr alias" %>
-        <%= submit_tag "Filter", class: "tui-button green-168", style: "padding: 4px 12px;" %>
+        <%= tui_submit "Filter", color: :green, style: "padding: 4px 12px;" %>
         <% if @status_filter.present? || @hackr_alias_filter.present? %>
-          <%= link_to "× clear", admin_grid_hackr_missions_path, class: "tui-button", style: "padding: 4px 10px; font-size: 0.8em;" %>
+          <%= tui_button "× clear", admin_grid_hackr_missions_path, style: "padding: 4px 10px; font-size: 0.8em;" %>
         <% end %>
       <% end %>
 
@@ -52,7 +52,7 @@
                 <td style="color: #9ca3af;"><%= hm.completed_at&.strftime("%Y-%m-%d %H:%M") || "—" %></td>
                 <td style="text-align: center; color: #fbbf24;"><%= hm.turn_in_count %></td>
                 <td style="text-align: right;">
-                  <%= link_to "View", admin_grid_hackr_mission_path(hm), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                  <%= tui_button "View", admin_grid_hackr_mission_path(hm), style: "padding: 2px 8px; font-size: 0.8em;" %>
                 </td>
               </tr>
             <% end %>
@@ -61,7 +61,7 @@
       </div>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= link_to "<- Missions", admin_grid_missions_path, class: "tui-button green-168" %>
+        <%= tui_button "<- Missions", admin_grid_missions_path, color: :green %>
       </div>
     </div>
   </fieldset>

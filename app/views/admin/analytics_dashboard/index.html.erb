@@ -7,8 +7,8 @@
       <div style="margin-bottom: 20px; display: flex; gap: 10px;">
         <% { "7" => "7d", "30" => "30d", "90" => "90d", "0" => "ALL" }.each do |val, label| %>
           <% active = @range_days.to_s == val %>
-          <%= link_to label, admin_analytics_dashboard_path(range: val),
-              class: "tui-button #{active ? 'green-168' : ''}",
+          <%= tui_button label, admin_analytics_dashboard_path(range: val),
+              color: (active ? :green : nil),
               style: "padding: 6px 14px; #{active ? 'font-weight: bold;' : ''}" %>
         <% end %>
       </div>
@@ -207,8 +207,8 @@
       </div>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= link_to "← Error Tracker", admin_error_groups_path, class: "tui-button red-168" %>
-        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+        <%= tui_button "← Error Tracker", admin_error_groups_path, color: :red %>
+        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
   </fieldset>

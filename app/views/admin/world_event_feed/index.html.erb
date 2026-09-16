@@ -19,7 +19,7 @@
             <%= f.check_box :visible %> Visible to Hackrs
           </label>
         </div>
-        <%= f.submit "Save", class: "tui-button", style: "font-family: monospace;" %>
+        <%= tui_submit "Save", form: f, style: "font-family: monospace;" %>
       <% end %>
     </fieldset>
   </div>
@@ -84,7 +84,7 @@
           <label style="color: #9ca3af;">Mission/Achievement/Template Name:</label><br>
           <%= f.text_field :mission_name, class: "tui-input", style: "width: 100%; font-family: monospace;" %>
         </div>
-        <%= f.submit "Publish", class: "tui-button", style: "font-family: monospace;" %>
+        <%= tui_submit "Publish", form: f, style: "font-family: monospace;" %>
       <% end %>
     </fieldset>
   </div>

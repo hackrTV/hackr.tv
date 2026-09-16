@@ -21,7 +21,7 @@
       </div>
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
       </div>
 
       <%# === RIG STATUS === %>
@@ -55,9 +55,9 @@
           <%# Activate / Deactivate %>
           <div style="margin-top: 15px; display: flex; gap: 10px;">
             <% if @rig.active? %>
-              <%= button_to "Deactivate", force_deactivate_rig_admin_grid_hackr_path(@hackr), method: :post, class: "tui-button yellow-168", style: "padding: 6px 14px;", form: { data: { turbo_confirm: "Deactivate #{@hackr.hackr_alias}'s mining rig?" } } %>
+              <%= tui_button_to "Deactivate", force_deactivate_rig_admin_grid_hackr_path(@hackr), method: :post, color: :yellow, style: "padding: 6px 14px;", form: { data: { turbo_confirm: "Deactivate #{@hackr.hackr_alias}'s mining rig?" } } %>
             <% else %>
-              <%= button_to "Force Activate", force_activate_rig_admin_grid_hackr_path(@hackr), method: :post, class: "tui-button green-168", style: "padding: 6px 14px;", form: { data: { turbo_confirm: "Force-activate #{@hackr.hackr_alias}'s mining rig? (bypasses functional check)" } } %>
+              <%= tui_button_to "Force Activate", force_activate_rig_admin_grid_hackr_path(@hackr), method: :post, color: :green, style: "padding: 6px 14px;", form: { data: { turbo_confirm: "Force-activate #{@hackr.hackr_alias}'s mining rig? (bypasses functional check)" } } %>
             <% end %>
           </div>
         </div>
@@ -124,7 +124,7 @@
                     <td style="text-align: center; font-family: monospace;">&times;<%= comp.rate_multiplier %></td>
                     <td style="color: <%= comp.rarity_color %>;"><%= comp.rarity_label %></td>
                     <td style="text-align: center;">
-                      <%= button_to "Uninstall", force_uninstall_component_admin_grid_hackr_path(@hackr, item_id: comp.id), method: :post, class: "tui-button red-168", style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-uninstall #{comp.name} from rig? Item returns to inventory." } } %>
+                      <%= tui_button_to "Uninstall", force_uninstall_component_admin_grid_hackr_path(@hackr, item_id: comp.id), method: :post, color: :red, style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-uninstall #{comp.name} from rig? Item returns to inventory." } } %>
                     </td>
                   </tr>
                 <% end %>
@@ -154,7 +154,7 @@
                 </select>
               </div>
               <div>
-                <button type="submit" class="tui-button yellow-168" style="padding: 6px 14px;">Force Install</button>
+                <%= tui_button "Force Install", color: :yellow, type: "submit", style: "padding: 6px 14px;" %>
               </div>
             <% end %>
           <% else %>
@@ -164,7 +164,7 @@
       </div>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button green-168" %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), color: :green %>
       </div>
     </div>
   </fieldset>

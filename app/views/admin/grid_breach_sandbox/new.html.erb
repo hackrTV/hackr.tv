@@ -17,8 +17,8 @@
       </div>
 
       <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
-        <%= link_to "All Hackrs", admin_grid_hackrs_path, class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
+        <%= tui_button "All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
       </div>
 
       <%# Hackr info %>
@@ -64,7 +64,7 @@
         </div>
 
         <div style="margin-top: 20px;">
-          <%= submit_tag "START SANDBOX", class: "tui-button yellow-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start sandbox BREACH on #{@hackr.hackr_alias}?" } %>
+          <%= tui_submit "START SANDBOX", color: :yellow, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start sandbox BREACH on #{@hackr.hackr_alias}?" } %>
         </div>
       <% end %>
     </div>

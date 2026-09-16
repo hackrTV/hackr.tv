@@ -19,8 +19,8 @@
     <% end %>
 
     <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-      <%= link_to "< Back to Overlays", admin_overlays_path, class: "tui-button green-168" %>
-      <%= link_to "+ New Element", new_admin_overlay_element_path, class: "tui-button green-168" %>
+      <%= tui_button "< Back to Overlays", admin_overlays_path, color: :green %>
+      <%= tui_button "+ New Element", new_admin_overlay_element_path, color: :green %>
     </div>
 
     <table class="tui-table" style="width: 100%;">
@@ -43,10 +43,10 @@
             <td style="text-align: center;"><%= element.overlay_scenes.count %> scene(s)</td>
             <td style="text-align: center;"><%= element.active ? '<span class="green-255-text">Active</span>'.html_safe : '<span class="red-168-text">Inactive</span>'.html_safe %></td>
             <td style="text-align: center; white-space: nowrap;">
-              <%= link_to "View", admin_overlay_element_path(element), class: "tui-button", style: "padding: 4px 10px;" %>
-              <%= link_to "Edit", edit_admin_overlay_element_path(element), class: "tui-button", style: "padding: 4px 10px;" %>
-              <%= link_to "History", history_admin_overlay_element_path(element), class: "tui-button purple-168", style: "padding: 4px 10px;" %>
-              <%= button_to "Delete", admin_overlay_element_path(element), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 4px 10px;", data: { confirm: "Delete element '#{element.name}'?" } %>
+              <%= tui_button "View", admin_overlay_element_path(element), style: "padding: 4px 10px;" %>
+              <%= tui_button "Edit", edit_admin_overlay_element_path(element), style: "padding: 4px 10px;" %>
+              <%= tui_button "History", history_admin_overlay_element_path(element), color: :purple, style: "padding: 4px 10px;" %>
+              <%= tui_button_to "Delete", admin_overlay_element_path(element), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 4px 10px;", data: { confirm: "Delete element '#{element.name}'?" } %>
             </td>
           </tr>
         <% end %>

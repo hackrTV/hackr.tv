@@ -34,11 +34,11 @@
             <%= text_field_tag :search, params[:search], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "error title..." %>
           </div>
           <div>
-            <button type="submit" class="tui-button cyan-168" style="padding: 6px 14px;">Filter</button>
+            <%= tui_button "Filter", color: :cyan, type: "submit", style: "padding: 6px 14px;" %>
           </div>
           <% if params.values_at(:status, :component, :severity, :search).any?(&:present?) %>
             <div>
-              <%= link_to "Clear", admin_error_groups_path, class: "tui-button", style: "padding: 6px 14px;" %>
+              <%= tui_button "Clear", admin_error_groups_path, style: "padding: 6px 14px;" %>
             </div>
           <% end %>
         <% end %>
@@ -97,10 +97,10 @@
                   </td>
                   <td style="text-align: center; white-space: nowrap;">
                     <% if eff_status == "open" %>
-                      <%= button_to "Resolve", resolve_admin_error_group_path(group), method: :post, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
-                      <%= button_to "Ignore", ignore_admin_error_group_path(group, duration: "24h"), method: :post, class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
+                      <%= tui_button_to "Resolve", resolve_admin_error_group_path(group), method: :post, color: :green, style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
+                      <%= tui_button_to "Ignore", ignore_admin_error_group_path(group, duration: "24h"), method: :post, style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
                     <% else %>
-                      <%= button_to "Reopen", reopen_admin_error_group_path(group), method: :post, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
+                      <%= tui_button_to "Reopen", reopen_admin_error_group_path(group), method: :post, color: :red, style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
                     <% end %>
                   </td>
                 </tr>
@@ -112,13 +112,13 @@
         <%# Pagination %>
         <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
           <% if @offset > 0 %>
-            <%= link_to "← Prev", admin_error_groups_path(request.query_parameters.merge("offset" => [@offset - @per_page, 0].max)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+            <%= tui_button "← Prev", admin_error_groups_path(request.query_parameters.merge("offset" => [@offset - @per_page, 0].max)), color: :green, style: "padding: 6px 14px;" %>
           <% end %>
           <span style="color: #888;">
             Page <%= (@offset / @per_page) + 1 %> of <%= [(@total_count.to_f / @per_page).ceil, 1].max %>
           </span>
           <% if @offset + @per_page < @total_count %>
-            <%= link_to "Next →", admin_error_groups_path(request.query_parameters.merge("offset" => @offset + @per_page)), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+            <%= tui_button "Next →", admin_error_groups_path(request.query_parameters.merge("offset" => @offset + @per_page)), color: :green, style: "padding: 6px 14px;" %>
           <% end %>
         </div>
       <% else %>
@@ -128,7 +128,7 @@
       <% end %>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
   </fieldset>

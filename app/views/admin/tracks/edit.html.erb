@@ -13,8 +13,8 @@
 
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <%= link_to "← Back to #{@release.name}", edit_admin_release_path(@release), class: "tui-button green-168", style: "padding: 8px 20px;" %>
-        <%= link_to "All Releases", admin_releases_path, class: "tui-button cyan-168", style: "padding: 8px 20px;" %>
+        <%= tui_button "← Back to #{@release.name}", edit_admin_release_path(@release), color: :green, style: "padding: 8px 20px;" %>
+        <%= tui_button "All Releases", admin_releases_path, color: :cyan, style: "padding: 8px 20px;" %>
       </div>
 
       <div style="padding: 10px; margin-bottom: 20px; background: #0a0a0a; border: 1px solid #333;">
@@ -119,10 +119,10 @@
 
           <% if @track.audio_file.attached? %>
             <div style="margin-left: auto;">
-              <%= button_to "Remove Audio",
+              <%= tui_button_to "Remove Audio",
                   purge_audio_admin_track_path(@track),
                   method: :delete,
-                  class: "tui-button red-168",
+                  color: :red,
                   style: "padding: 8px 20px; font-size: 0.85em;",
                   data: { turbo_confirm: "Remove audio file from '#{@track.title}'?" } %>
             </div>
@@ -136,14 +136,14 @@
 
         <%# Actions %>
         <div style="margin-top: 30px; display: flex; gap: 10px;">
-          <%= f.submit "Save Track",
-              class: "tui-button purple-168",
+          <%= tui_submit "Save Track", form: f,
+              color: :purple,
               style: "padding: 10px 30px; font-size: 1.1em;" %>
-          <%= link_to "Cancel", edit_admin_release_path(@release),
-              class: "tui-button grey-168",
+          <%= tui_button "Cancel", edit_admin_release_path(@release),
+              color: :grey,
               style: "padding: 10px 30px; font-size: 1.1em;" %>
-          <%= link_to "History", history_admin_track_path(@track),
-              class: "tui-button purple-168",
+          <%= tui_button "History", history_admin_track_path(@track),
+              color: :purple,
               style: "padding: 10px 30px; font-size: 1.1em;" %>
         </div>
       <% end %>

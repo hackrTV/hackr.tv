@@ -15,7 +15,7 @@
       </div>
 
       <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
       </div>
 
       <%# === NAMED FIELDS MODE === %>
@@ -86,7 +86,7 @@
           </div>
 
           <div style="margin-top: 20px;">
-            <%= submit_tag "WRITE STATS", class: "tui-button red-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Overwrite stats for #{@hackr.hackr_alias}?" } %>
+            <%= tui_submit "WRITE STATS", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Overwrite stats for #{@hackr.hackr_alias}?" } %>
           </div>
         <% end %>
       </div>
@@ -102,7 +102,7 @@
             ><%= JSON.pretty_generate(@hackr.current_stats) %></textarea>
           </div>
           <div style="margin-top: 15px;">
-            <%= submit_tag "WRITE RAW JSON", class: "tui-button red-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Replace ALL stats for #{@hackr.hackr_alias} with raw JSON?" } %>
+            <%= tui_submit "WRITE RAW JSON", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Replace ALL stats for #{@hackr.hackr_alias} with raw JSON?" } %>
           </div>
         <% end %>
       </div>

@@ -44,7 +44,7 @@
                     <% end %>
                   </td>
                   <td style="text-align: right;">
-                    <%= link_to "Remove", remove_stop_admin_grid_transit_route_path(@route, stop_id: s.id), data: { turbo_method: :delete, turbo_confirm: "Remove stop '#{s.display_name}'?" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= tui_button "Remove", remove_stop_admin_grid_transit_route_path(@route, stop_id: s.id), data: { turbo_method: :delete, turbo_confirm: "Remove stop '#{s.display_name}'?" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em;" %>
                   </td>
                 </tr>
               <% end %>
@@ -74,7 +74,7 @@
             <%= check_box_tag "grid_transit_stop[is_terminus]", "1", false, style: "margin-top: 5px;" %>
           </div>
           <div>
-            <%= submit_tag "Add Stop", class: "tui-button green-168", style: "padding: 8px 20px;" %>
+            <%= tui_submit "Add Stop", color: :green, style: "padding: 8px 20px;" %>
           </div>
         </div>
       <% end %>

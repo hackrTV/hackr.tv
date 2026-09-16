@@ -22,7 +22,7 @@
     </div>
 
     <div class="center auth-actions">
-      <%= submit_tag "CONNECT", class: "tui-button purple-168 auth-submit" %>
+      <%= tui_submit "CONNECT", color: :purple, class: "auth-submit" %>
     </div>
   <% end %>
 
@@ -30,13 +30,13 @@
 
   <div class="center auth-alt">
     <p class="white-text auth-alt-label">LOST YOUR CREDENTIALS?</p>
-    <%= link_to "RECOVER ACCESS", grid_forgot_password_path, class: "tui-button orange-168" %>
+    <%= tui_button "RECOVER ACCESS", grid_forgot_password_path, color: :orange %>
   </div>
 
   <hr class="auth-hr">
 
   <div class="center auth-alt">
     <p class="white-text auth-alt-label">NEW TO THE FRACTURE NETWORK?</p>
-    <%= link_to "REGISTER AS HACKR", grid_register_path, class: "tui-button green-168" %>
+    <%= tui_button "REGISTER AS HACKR", grid_register_path, color: :green %>
   </div>
 <% end %>

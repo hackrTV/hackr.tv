@@ -51,7 +51,7 @@
                 </label>
               </div>
               <div class="playlist-form__actions">
-                <%= f.submit "Save", class: "tui-button playlist-form__submit" %>
+                <%= tui_submit "Save", form: f, class: "playlist-form__submit" %>
                 <button type="button" class="tui-button playlist-form__cancel" data-action="edit-toggle#cancel">Cancel</button>
               </div>
             <% end %>
@@ -66,7 +66,7 @@
           <legend>EMPTY PLAYLIST</legend>
           <div class="playlists-empty__body">
             <p>This playlist is empty. Add tracks from the Pulse Vault!</p>
-            <%= link_to "Go to Pulse Vault", vault_path, class: "tui-button playlists-create-btn" %>
+            <%= tui_button "Go to Pulse Vault", vault_path, class: "playlists-create-btn" %>
           </div>
         </fieldset>
       </div>

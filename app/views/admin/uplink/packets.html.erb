@@ -20,7 +20,7 @@
 
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-        <%= link_to "← Uplink Dashboard", admin_uplink_index_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= tui_button "← Uplink Dashboard", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
       </div>
 
       <!-- Filters -->
@@ -38,12 +38,12 @@
           <div style="flex: 0 0 auto;">
             <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Status</label>
             <div style="display: flex; gap: 5px;">
-              <%= link_to "All", packets_admin_uplink_index_path(channel: params[:channel], username: params[:username], search: params[:search]),
-                  class: "tui-button #{params[:status].blank? ? 'cyan-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
-              <%= link_to "Active", packets_admin_uplink_index_path(status: 'active', channel: params[:channel], username: params[:username], search: params[:search]),
-                  class: "tui-button #{params[:status] == 'active' ? 'green-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
-              <%= link_to "Dropped", packets_admin_uplink_index_path(status: 'dropped', channel: params[:channel], username: params[:username], search: params[:search]),
-                  class: "tui-button #{params[:status] == 'dropped' ? 'red-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+              <%= tui_button "All", packets_admin_uplink_index_path(channel: params[:channel], username: params[:username], search: params[:search]),
+                  color: (params[:status].blank? ? :cyan : :grey), style: "padding: 5px 12px;" %>
+              <%= tui_button "Active", packets_admin_uplink_index_path(status: 'active', channel: params[:channel], username: params[:username], search: params[:search]),
+                  color: (params[:status] == 'active' ? :green : :grey), style: "padding: 5px 12px;" %>
+              <%= tui_button "Dropped", packets_admin_uplink_index_path(status: 'dropped', channel: params[:channel], username: params[:username], search: params[:search]),
+                  color: (params[:status] == 'dropped' ? :red : :grey), style: "padding: 5px 12px;" %>
             </div>
           </div>
 
@@ -60,8 +60,8 @@
           </div>
 
           <div style="flex: 0 0 auto; display: flex; gap: 5px;">
-            <%= f.submit "Apply Filters", class: "tui-button purple-168", style: "padding: 8px 20px;" %>
-            <%= link_to "Clear", packets_admin_uplink_index_path, class: "tui-button grey-168", style: "padding: 8px 20px;" %>
+            <%= tui_submit "Apply Filters", form: f, color: :purple, style: "padding: 8px 20px;" %>
+            <%= tui_button "Clear", packets_admin_uplink_index_path, color: :grey, style: "padding: 8px 20px;" %>
           </div>
         <% end %>
       </div>
@@ -112,11 +112,11 @@
                   </td>
                   <td style="text-align: center; white-space: nowrap;">
                     <% if packet.dropped %>
-                      <%= button_to "Restore", admin_restore_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.9em;" %>
+                      <%= tui_button_to "Restore", admin_restore_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, color: :green, style: "padding: 2px 8px; font-size: 0.9em;" %>
                     <% else %>
-                      <%= button_to "Drop", admin_drop_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, data: { confirm: "Drop this packet?" }, class: "tui-button orange-168", style: "padding: 2px 8px; font-size: 0.9em;" %>
+                      <%= tui_button_to "Drop", admin_drop_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, data: { confirm: "Drop this packet?" }, color: :orange, style: "padding: 2px 8px; font-size: 0.9em;" %>
                     <% end %>
-                    <%= button_to "Delete", admin_destroy_uplink_packet_path(packet), method: :delete, form: { style: "display: inline;" }, data: { confirm: "Permanently delete this packet? This cannot be undone!" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
+                    <%= tui_button_to "Delete", admin_destroy_uplink_packet_path(packet), method: :delete, form: { style: "display: inline;" }, data: { confirm: "Permanently delete this packet? This cannot be undone!" }, color: :red, style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
                   </td>
                 </tr>
               <% end %>

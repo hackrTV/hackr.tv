@@ -17,14 +17,14 @@
 
       <%# === ACTION BAR === %>
       <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-        <%= link_to "<- All Hackrs", admin_grid_hackrs_path, class: "tui-button", style: "padding: 6px 14px;" %>
-        <%= link_to "Items", admin_grid_hackr_items_path(@hackr), class: "tui-button green-168", style: "padding: 6px 14px;" %>
+        <%= tui_button "<- All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
+        <%= tui_button "Items", admin_grid_hackr_items_path(@hackr), color: :green, style: "padding: 6px 14px;" %>
         <% if dev_tools_enabled? %>
-          <%= link_to "Edit Stats", edit_stats_admin_grid_hackr_path(@hackr), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
-          <%= link_to "Warp", warp_admin_grid_hackr_path(@hackr), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
-          <%= link_to "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
-          <%= link_to "NPC Tester", new_admin_grid_npc_dialogue_tester_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
-          <%= link_to "PAC Tester", new_admin_grid_pac_escape_tester_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 6px 14px;" %>
+          <%= tui_button "Edit Stats", edit_stats_admin_grid_hackr_path(@hackr), color: :yellow, style: "padding: 6px 14px;" %>
+          <%= tui_button "Warp", warp_admin_grid_hackr_path(@hackr), color: :yellow, style: "padding: 6px 14px;" %>
+          <%= tui_button "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 6px 14px;" %>
+          <%= tui_button "NPC Tester", new_admin_grid_npc_dialogue_tester_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 6px 14px;" %>
+          <%= tui_button "PAC Tester", new_admin_grid_pac_escape_tester_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 6px 14px;" %>
         <% end %>
       </div>
 
@@ -140,7 +140,7 @@
             <div style="margin-top: 15px;">
               <span style="color: #888;">Impound Records:</span>
               <span class="yellow-168-text" style="font-weight: bold;"><%= @impound_records.count %> total (<%= @impound_records.impounded.count %> active)</span>
-              <%= link_to "View Impounds →", admin_grid_impound_records_path(hackr_alias: @hackr.hackr_alias), class: "tui-button yellow-168", style: "padding: 3px 10px; margin-left: 8px; font-size: 0.85em;" %>
+              <%= tui_button "View Impounds →", admin_grid_impound_records_path(hackr_alias: @hackr.hackr_alias), color: :yellow, style: "padding: 3px 10px; margin-left: 8px; font-size: 0.85em;" %>
             </div>
           <% end %>
         </div>
@@ -245,7 +245,7 @@
             <% end %>
             <% if dev_tools_enabled? %>
               <div style="margin-top: 12px;">
-                <%= link_to "Manage Rig →", mining_rig_admin_grid_hackr_path(@hackr), class: "tui-button yellow-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                <%= tui_button "Manage Rig →", mining_rig_admin_grid_hackr_path(@hackr), color: :yellow, style: "padding: 4px 12px; font-size: 0.85em;" %>
               </div>
             <% end %>
           <% else %>

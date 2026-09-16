@@ -18,9 +18,9 @@
 
       <div style="display: flex; gap: 10px; margin-bottom: 25px;">
         <% if @hackr %>
-          <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+          <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
         <% end %>
-        <%= link_to "All Hackrs", admin_grid_hackrs_path, class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= tui_button "All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
       </div>
 
       <%= form_with url: admin_grid_pac_escape_tester_path, method: :post, local: true, id: "pac-tester-form" do %>
@@ -83,7 +83,7 @@
         </div>
 
         <div style="margin-top: 20px;">
-          <%= submit_tag "CAPTURE INTO PAC", class: "tui-button red-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Force-capture hackr into PAC? (State will be restored on End Test)" } %>
+          <%= tui_submit "CAPTURE INTO PAC", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Force-capture hackr into PAC? (State will be restored on End Test)" } %>
         </div>
       <% end %>
     </div>

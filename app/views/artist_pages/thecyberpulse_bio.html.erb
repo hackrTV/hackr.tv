@@ -228,13 +228,13 @@
         </div>
 
         <div class="tcp-nav-buttons">
-          <%= link_to "/f/net", class: "tui-button tcp-btn-back" do %>← BACK TO FRACTURE NETWORK<% end %>
-          <%= link_to "/thecyberpulse/releases", class: "tui-button tcp-btn-primary" do %>RELEASES<% end %>
-          <%= link_to "/vault?filter=the.cyberpul.se", class: "tui-button tcp-btn-primary" do %>
+          <%= tui_button "/f/net", class: "tcp-btn-back" do %>← BACK TO FRACTURE NETWORK<% end %>
+          <%= tui_button "/thecyberpulse/releases", class: "tcp-btn-primary" do %>RELEASES<% end %>
+          <%= tui_button "/vault?filter=the.cyberpul.se", class: "tcp-btn-primary" do %>
             <span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>
             <span class="chrome-mobile-only">PULSE VAULT →</span>
           <% end %>
-          <%= nav_link_to "/grid", css_class: "tui-button tcp-btn-grid" do %>
+          <%= nav_link_to "/grid", css_class: tui_button_classes(nil, "tcp-btn-grid") do %>
             <span class="chrome-desktop-only">ENTER THE PULSE GRID →</span>
             <span class="chrome-mobile-only">PULSE GRID →</span>
           <% end %>

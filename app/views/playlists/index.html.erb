@@ -33,11 +33,11 @@
                   <div>Created <%= playlist.created_at.strftime("%b %-d, %Y") %></div>
                 </div>
                 <div class="playlist-card__actions">
-                  <%= link_to "▶ Play", fm_playlist_path(playlist, autoplay: true), class: "tui-button playlist-card__play" %>
+                  <%= tui_button "▶ Play", fm_playlist_path(playlist, autoplay: true), class: "playlist-card__play" %>
                   <div class="playlist-card__actions-row">
-                    <%= link_to "View", fm_playlist_path(playlist), class: "tui-button playlist-card__view" %>
-                    <%= button_to "Delete", fm_playlist_path(playlist), method: :delete,
-                          class: "tui-button playlist-card__delete", form_class: "playlist-card__delete-form",
+                    <%= tui_button "View", fm_playlist_path(playlist), class: "playlist-card__view" %>
+                    <%= tui_button_to "Delete", fm_playlist_path(playlist), method: :delete,
+                          class: "playlist-card__delete", form_class: "playlist-card__delete-form",
                           form: {data: {turbo_confirm: "Delete playlist \"#{playlist.name}\"?\n\nThis action cannot be undone."}} %>
                   </div>
                 </div>
@@ -62,7 +62,7 @@
               <%= f.text_area "playlist[description]", id: "playlist_description", rows: 3 %>
             </div>
             <div class="playlist-form__actions">
-              <%= f.submit "Create", class: "tui-button playlist-form__submit" %>
+              <%= tui_submit "Create", form: f, class: "playlist-form__submit" %>
               <button type="button" class="tui-button playlist-form__cancel" data-action="dialog#close">Cancel</button>
             </div>
           <% end %>

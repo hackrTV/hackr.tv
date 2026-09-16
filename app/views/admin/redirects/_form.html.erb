@@ -37,11 +37,11 @@
   </div>
 
   <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= f.submit redirect.persisted? ? "Save Redirect" : "Create Redirect",
-        class: "tui-button purple-168",
+    <%= tui_submit redirect.persisted? ? "Save Redirect" : "Create Redirect", form: f,
+        color: :purple,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= link_to "Cancel", admin_redirects_path,
-        class: "tui-button grey-168",
+    <%= tui_button "Cancel", admin_redirects_path,
+        color: :grey,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
   </div>
 <% end %>

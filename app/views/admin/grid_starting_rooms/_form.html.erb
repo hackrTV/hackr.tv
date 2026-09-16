@@ -39,8 +39,8 @@
   </div>
 
   <div style="margin-top: 20px;">
-    <%= f.submit(f.object.persisted? ? "Update" : "Create", class: "tui-button green-168") %>
-    <%= link_to "Cancel", admin_grid_starting_rooms_path, class: "tui-button", style: "margin-left: 10px;" %>
+    <%= tui_submit(f.object.persisted? ? "Update" : "Create", color: :green) %>
+    <%= tui_button "Cancel", admin_grid_starting_rooms_path, style: "margin-left: 10px;" %>
   </div>
 </div>
 

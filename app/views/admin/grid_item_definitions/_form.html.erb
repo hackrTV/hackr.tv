@@ -103,7 +103,7 @@
               <%= ff.hidden_field :_destroy, value: "0", class: "destroy-flag" %>
               <button type="button" class="tui-button red-168 yield-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" data-persisted="true">&times;</button>
             <% else %>
-              <button type="button" class="tui-button red-168 yield-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+              <%= tui_button "×", color: :red, class: "yield-destroy-btn", type: "button", style: "padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" %>
             <% end %>
           </td>
         </tr>
@@ -113,7 +113,7 @@
   <% if definition.errors[:salvage_yields].any? %>
     <small class="red-255-text"><%= definition.errors[:salvage_yields].join(", ") %></small>
   <% end %>
-  <button type="button" id="add-yield-btn" class="tui-button green-168" style="padding: 4px 12px; font-size: 0.85em; margin-top: 5px;">+ Add Yield</button>
+  <%= tui_button "+ Add Yield", color: :green, type: "button", id: "add-yield-btn", style: "padding: 4px 12px; font-size: 0.85em; margin-top: 5px;" %>
 
   <template id="yield-row-template">
     <tr>
@@ -135,7 +135,7 @@
           class="tui-input" style="width: 70px; padding: 4px; text-align: center;" min="1" value="1">
       </td>
       <td style="text-align: center;">
-        <button type="button" class="tui-button red-168 yield-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+        <%= tui_button "×", color: :red, class: "yield-destroy-btn", type: "button", style: "padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" %>
       </td>
     </tr>
   </template>
@@ -173,13 +173,13 @@
   </script>
 
   <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= f.submit definition.persisted? ? "Save Definition" : "Create Definition",
-          class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= link_to "Cancel", admin_grid_item_definitions_path,
-          class: "tui-button grey-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= tui_submit definition.persisted? ? "Save Definition" : "Create Definition", form: f,
+          color: :purple, style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= tui_button "Cancel", admin_grid_item_definitions_path,
+          color: :grey, style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% if definition.persisted? %>
-      <%= link_to "History", history_admin_grid_item_definition_path(definition),
-            class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+      <%= tui_button "History", history_admin_grid_item_definition_path(definition),
+            color: :purple, style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% end %>
   </div>
 <% end %>

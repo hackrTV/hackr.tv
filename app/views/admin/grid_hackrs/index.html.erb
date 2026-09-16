@@ -59,14 +59,14 @@
                   <% end %>
                 </td>
                 <td style="text-align: right; white-space: nowrap;">
-                  <%= link_to "Inspect", admin_grid_hackr_path(hackr), class: "tui-button green-168", style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= link_to "Items", admin_grid_hackr_items_path(hackr), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                  <%= tui_button "Inspect", admin_grid_hackr_path(hackr), color: :green, style: "padding: 2px 8px; font-size: 0.8em;" %>
+                  <%= tui_button "Items", admin_grid_hackr_items_path(hackr), style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                   <% if dev_tools_enabled? %>
-                    <%= link_to "Stats", edit_stats_admin_grid_hackr_path(hackr), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= link_to "Warp", warp_admin_grid_hackr_path(hackr), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= link_to "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: hackr.id), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= link_to "NPC", new_admin_grid_npc_dialogue_tester_path(hackr_id: hackr.id), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= link_to "PAC", new_admin_grid_pac_escape_tester_path(hackr_id: hackr.id), class: "tui-button yellow-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= tui_button "Stats", edit_stats_admin_grid_hackr_path(hackr), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= tui_button "Warp", warp_admin_grid_hackr_path(hackr), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= tui_button "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: hackr.id), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= tui_button "NPC", new_admin_grid_npc_dialogue_tester_path(hackr_id: hackr.id), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= tui_button "PAC", new_admin_grid_pac_escape_tester_path(hackr_id: hackr.id), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
                   <% end %>
                 </td>
               </tr>

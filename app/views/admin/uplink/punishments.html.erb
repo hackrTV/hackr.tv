@@ -20,7 +20,7 @@
 
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-        <%= link_to "← Uplink Dashboard", admin_uplink_index_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= tui_button "← Uplink Dashboard", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
       </div>
 
       <!-- Issue New Punishment -->
@@ -52,7 +52,7 @@
           </div>
 
           <div style="flex: 0 0 auto;">
-            <button type="submit" class="tui-button red-168" style="padding: 8px 20px;">Issue Punishment</button>
+            <%= tui_button "Issue Punishment", color: :red, type: "submit", style: "padding: 8px 20px;" %>
           </div>
         <% end %>
       </div>
@@ -60,17 +60,17 @@
       <!-- Filters -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
         <label style="color: #888; padding: 8px 0;">Filter:</label>
-        <%= link_to "All", punishments_admin_uplink_index_path,
-            class: "tui-button #{params[:status].blank? && params[:type].blank? ? 'cyan-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
-        <%= link_to "Active", punishments_admin_uplink_index_path(status: 'active'),
-            class: "tui-button #{params[:status] == 'active' ? 'green-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
-        <%= link_to "Expired", punishments_admin_uplink_index_path(status: 'expired'),
-            class: "tui-button #{params[:status] == 'expired' ? 'red-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+        <%= tui_button "All", punishments_admin_uplink_index_path,
+            color: (params[:status].blank? && params[:type].blank? ? :cyan : :grey), style: "padding: 5px 12px;" %>
+        <%= tui_button "Active", punishments_admin_uplink_index_path(status: 'active'),
+            color: (params[:status] == 'active' ? :green : :grey), style: "padding: 5px 12px;" %>
+        <%= tui_button "Expired", punishments_admin_uplink_index_path(status: 'expired'),
+            color: (params[:status] == 'expired' ? :red : :grey), style: "padding: 5px 12px;" %>
         <span style="color: #444;">|</span>
-        <%= link_to "Squelches", punishments_admin_uplink_index_path(type: 'squelch'),
-            class: "tui-button #{params[:type] == 'squelch' ? 'orange-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
-        <%= link_to "Blackouts", punishments_admin_uplink_index_path(type: 'blackout'),
-            class: "tui-button #{params[:type] == 'blackout' ? 'red-168' : 'grey-168'}", style: "padding: 5px 12px;" %>
+        <%= tui_button "Squelches", punishments_admin_uplink_index_path(type: 'squelch'),
+            color: (params[:type] == 'squelch' ? :orange : :grey), style: "padding: 5px 12px;" %>
+        <%= tui_button "Blackouts", punishments_admin_uplink_index_path(type: 'blackout'),
+            color: (params[:type] == 'blackout' ? :red : :grey), style: "padding: 5px 12px;" %>
       </div>
 
       <!-- Stats -->
@@ -135,7 +135,7 @@
                   </td>
                   <td style="text-align: center;">
                     <% unless punishment.expired? %>
-                      <%= button_to "Lift", admin_lift_uplink_punishment_path(punishment), method: :delete, class: "tui-button green-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+                      <%= tui_button_to "Lift", admin_lift_uplink_punishment_path(punishment), method: :delete, color: :green, style: "padding: 4px 12px; font-size: 0.85em;" %>
                     <% end %>
                   </td>
                 </tr>

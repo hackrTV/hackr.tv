@@ -123,15 +123,15 @@
 
   <%# Actions %>
   <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= f.submit "Save Release",
-        class: "tui-button purple-168",
+    <%= tui_submit "Save Release", form: f,
+        color: :purple,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= link_to "Cancel", admin_releases_path,
-        class: "tui-button grey-168",
+    <%= tui_button "Cancel", admin_releases_path,
+        color: :grey,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% if release.persisted? %>
-      <%= link_to "History", history_admin_release_path(release),
-          class: "tui-button purple-168",
+      <%= tui_button "History", history_admin_release_path(release),
+          color: :purple,
           style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% end %>
   </div>

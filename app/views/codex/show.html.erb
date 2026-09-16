@@ -5,7 +5,7 @@
 <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
   <div class="codex-entry-wrap" style="--type-color: <%= color %>;">
     <div class="codex-back-row">
-      <%= link_to "← Back to Codex", codex_path, class: "tui-button cyan-168" %>
+      <%= tui_button "← Back to Codex", codex_path, color: :cyan %>
     </div>
 
     <div class="tui-window cyan-168 white-text">
@@ -52,7 +52,7 @@
     </div>
 
     <div class="codex-back-row-bottom">
-      <%= link_to "← Back to Codex", codex_path, class: "tui-button cyan-168" %>
+      <%= tui_button "← Back to Codex", codex_path, color: :cyan %>
     </div>
   </div>
 <% end %>

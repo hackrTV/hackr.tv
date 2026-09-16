@@ -15,8 +15,8 @@
 
       <%# Nav %>
       <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
-        <%= button_to "ABORT", abort_admin_grid_breach_sandbox_path(@breach), method: :delete, class: "tui-button red-168", style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "Abort sandbox breach?" }, form: { id: "abort-form" } %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
+        <%= tui_button_to "ABORT", abort_admin_grid_breach_sandbox_path(@breach), method: :delete, color: :red, style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "Abort sandbox breach?" }, form: { id: "abort-form" } %>
       </div>
 
       <%# Terminal output — styled to match frontend GameOutput.tsx %>
@@ -44,8 +44,8 @@
         <span class="yellow-255-text" style="font-weight: bold;">SANDBOX BREACH ENDED</span>
         <span style="color: #ccc;"> — Vitals and DECK battery restored.</span>
         <br><br>
-        <%= link_to "Back to Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 8px 16px;" %>
-        <%= link_to "New Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), class: "tui-button yellow-168", style: "padding: 8px 16px;" %>
+        <%= tui_button "Back to Inspector", admin_grid_hackr_path(@hackr), style: "padding: 8px 16px;" %>
+        <%= tui_button "New Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 8px 16px;" %>
       </div>
     </div>
   </fieldset>

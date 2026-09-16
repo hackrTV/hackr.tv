@@ -5,7 +5,7 @@
     <div style="padding: 20px;">
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <%= link_to "← Back to Playlists", admin_zone_playlists_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= tui_button "← Back to Playlists", admin_zone_playlists_path, color: :green, style: "padding: 8px 20px;" %>
         <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
           Edit via: <code style="color: #888;">data/system/zone_playlists.yml</code> → <code style="color: #888;">rails data:zone_playlists</code>
         </span>

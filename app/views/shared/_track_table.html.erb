@@ -48,7 +48,7 @@
             <td class="track-row__cell track-row__cell--dim">&nbsp;<%= track.artist.genre || "-" %>&nbsp;</td>
             <td class="track-table__stream">
               <% if playable %>
-                <button class="tui-button play-track-btn">► PLAY</button>
+                <%= tui_button "► PLAY", class: "play-track-btn" %>
               <% else %>
                 <span class="track-row__cell--muted">-</span>
               <% end %>

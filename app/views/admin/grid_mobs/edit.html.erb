@@ -42,8 +42,8 @@
                 <td style="text-align: center;"><%= listing.active? ? "✓" : "—" %></td>
                 <td style="text-align: center;"><%= listing.rotation_pool? ? "✓" : "—" %></td>
                 <td style="text-align: center;">
-                  <%= link_to "Edit", edit_admin_grid_shop_listing_path(listing), class: "tui-button", style: "padding: 2px 6px; font-size: 0.8em;" %>
-                  <%= button_to "×", remove_listing_admin_grid_mob_path(@mob, listing_id: listing.id), method: :delete, aria: {label: "Remove listing"}, class: "tui-button red-168", style: "padding: 2px 6px; font-size: 0.8em; display: inline;", data: { confirm: "Remove listing '#{listing.name}'?" } %>
+                  <%= tui_button "Edit", edit_admin_grid_shop_listing_path(listing), style: "padding: 2px 6px; font-size: 0.8em;" %>
+                  <%= tui_button_to "×", remove_listing_admin_grid_mob_path(@mob, listing_id: listing.id), method: :delete, aria: {label: "Remove listing"}, color: :red, style: "padding: 2px 6px; font-size: 0.8em; display: inline;", data: { confirm: "Remove listing '#{listing.name}'?" } %>
                 </td>
               </tr>
             <% end %>
@@ -78,13 +78,13 @@
             <input type="number" name="grid_shop_listing[min_clearance]" class="tui-input" style="width: 100%; padding: 6px;" min="0" value="0">
           </div>
           <div style="padding-bottom: 4px;">
-            <button type="submit" class="tui-button green-168" style="padding: 6px 14px; font-weight: bold;">+ Add</button>
+            <%= tui_button "+ Add", color: :green, type: "submit", style: "padding: 6px 14px; font-weight: bold;" %>
           </div>
         </div>
       <% end %>
 
       <div style="margin-top: 15px;">
-        <%= link_to "Full Listing Manager →", admin_grid_shop_listings_path(mob_id: @mob.id), class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= tui_button "Full Listing Manager →", admin_grid_shop_listings_path(mob_id: @mob.id), style: "padding: 6px 14px;" %>
       </div>
     </div>
   </fieldset>

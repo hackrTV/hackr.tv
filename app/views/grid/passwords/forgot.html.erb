@@ -16,11 +16,11 @@
 
     <div class="center auth-alt">
       <p class="white-text auth-alt-label">DIDN'T RECEIVE IT?</p>
-      <%= link_to "TRY AGAIN", grid_forgot_password_path, class: "tui-button purple-168" %>
+      <%= tui_button "TRY AGAIN", grid_forgot_password_path, color: :purple %>
     </div>
 
     <div class="center auth-alt">
-      <%= link_to "BACK TO LOGIN", grid_login_path, class: "tui-button green-168" %>
+      <%= tui_button "BACK TO LOGIN", grid_login_path, color: :green %>
     </div>
   <% else %>
     <%= render "grid/shared/auth_error", message: @error, title: "ERROR" %>
@@ -38,7 +38,7 @@
       </div>
 
       <div class="center auth-actions">
-        <%= submit_tag "SEND RESET LINK", class: "tui-button purple-168 auth-submit" %>
+        <%= tui_submit "SEND RESET LINK", color: :purple, class: "auth-submit" %>
       </div>
     <% end %>
 
@@ -46,7 +46,7 @@
 
     <div class="center auth-alt">
       <p class="white-text auth-alt-label">REMEMBER YOUR CREDENTIALS?</p>
-      <%= link_to "BACK TO LOGIN", grid_login_path, class: "tui-button green-168" %>
+      <%= tui_button "BACK TO LOGIN", grid_login_path, color: :green %>
     </div>
   <% end %>
 <% end %>

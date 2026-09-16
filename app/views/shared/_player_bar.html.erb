@@ -64,7 +64,7 @@
                   data-action="submit->add-to-playlist#create">
               <input type="text" placeholder="Playlist name..." maxlength="100"
                      data-add-to-playlist-target="createName">
-              <button type="submit" class="tui-button">Create</button>
+              <%= tui_button "Create", type: "submit" %>
             </form>
             <button class="tui-button add-to-playlist__new" data-action="add-to-playlist#showCreate">+ Create New Playlist</button>
             <div class="add-to-playlist__list" data-add-to-playlist-target="list"></div>

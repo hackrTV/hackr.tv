@@ -17,7 +17,7 @@
       </div>
 
       <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
       </div>
 
       <%# Current location %>
@@ -58,7 +58,7 @@
         </div>
 
         <div style="margin-top: 20px;">
-          <%= submit_tag "WARP", class: "tui-button yellow-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Warp #{@hackr.hackr_alias} to selected room?" } %>
+          <%= tui_submit "WARP", color: :yellow, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Warp #{@hackr.hackr_alias} to selected room?" } %>
         </div>
       <% end %>
     </div>

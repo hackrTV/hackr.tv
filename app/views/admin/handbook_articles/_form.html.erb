@@ -76,15 +76,15 @@
   </div>
 
   <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= f.submit article.persisted? ? "Save Article" : "Create Article",
-        class: "tui-button purple-168",
+    <%= tui_submit article.persisted? ? "Save Article" : "Create Article", form: f,
+        color: :purple,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= link_to "Cancel", admin_handbook_articles_path,
-        class: "tui-button grey-168",
+    <%= tui_button "Cancel", admin_handbook_articles_path,
+        color: :grey,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% if article.persisted? %>
-      <%= link_to "History", history_admin_handbook_article_path(article),
-          class: "tui-button purple-168",
+      <%= tui_button "History", history_admin_handbook_article_path(article),
+          color: :purple,
           style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% end %>
   </div>
