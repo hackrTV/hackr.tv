@@ -40,6 +40,9 @@ RSpec.describe "Hotwire permanent player", type: :system do
     # wait: under full-suite CPU load headless audio can stutter, which
     # stretches the 2s tone well past wall-clock (observed flake).
     expect(page).to have_css("#track-title", text: "Second Tone", wait: 60)
+    # Title swaps before the advance's play() promise resolves — paused is
+    # briefly true. Wait for the bar to report playing before probing.
+    expect(page).to have_button("❚❚ PAUSE", id: "play-pause-btn", wait: 10)
     expect(audio_js("paused")).to eq(false)
   end
 
