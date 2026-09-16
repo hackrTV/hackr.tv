@@ -36,7 +36,7 @@
                     <div class="fnet-actions">
                       <% profile_path = artist_profile_path_for(artist) %>
                       <% if profile_path.present? %>
-                        <%= nav_link_to profile_path, css_class: "tui-button purple-168 fnet-btn" do %>
+                        <%= nav_link_to profile_path, css_class: tui_button_classes(:purple, "fnet-btn") do %>
                           <span class="chrome-desktop-only">VIEW PROFILE</span>
                           <span class="chrome-mobile-only">PROFILE</span>
                         <% end %>
@@ -44,7 +44,7 @@
                         <button class="tui-button fnet-btn fnet-btn--disabled" disabled>COMING SOON</button>
                       <% end %>
 
-                      <%= nav_link_to "/#{artist.slug}/releases", css_class: "tui-button cyan-168 fnet-btn" do %>RELEASES<% end %>
+                      <%= nav_link_to "/#{artist.slug}/releases", css_class: tui_button_classes(:cyan, "fnet-btn") do %>RELEASES<% end %>
                     </div>
                   </div>
                 </fieldset>

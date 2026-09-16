@@ -16,7 +16,7 @@
       <% end %>
 
       <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= link_to "+ New Exit", new_admin_grid_exit_path, class: "tui-button green-168" %>
+        <%= tui_button "+ New Exit", new_admin_grid_exit_path, color: :green %>
       </div>
 
       <% if @exits.any? %>
@@ -39,9 +39,9 @@
                   <td class="cyan-255-text"><%= exit_record.to_room&.name || "—" %></td>
                   <td style="text-align: center;"><%= exit_record.locked? ? "LOCKED" : "—" %></td>
                   <td style="text-align: right; white-space: nowrap;">
-                    <%= link_to "Edit", edit_admin_grid_exit_path(exit_record), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= link_to "History", history_admin_grid_exit_path(exit_record), class: "tui-button purple-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= button_to "Delete", admin_grid_exit_path(exit_record), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete this exit?" } %>
+                    <%= tui_button "Edit", edit_admin_grid_exit_path(exit_record), style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= tui_button "History", history_admin_grid_exit_path(exit_record), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
+                    <%= tui_button_to "Delete", admin_grid_exit_path(exit_record), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete this exit?" } %>
                   </td>
                 </tr>
               <% end %>

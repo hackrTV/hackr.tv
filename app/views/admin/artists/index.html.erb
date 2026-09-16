@@ -20,8 +20,8 @@
 
       <!-- Navigation -->
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= link_to "← Dashboard", admin_root_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
-        <%= link_to "+ New Artist", new_admin_artist_path, class: "tui-button green-168", style: "padding: 8px 20px;" %>
+        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
+        <%= tui_button "+ New Artist", new_admin_artist_path, color: :green, style: "padding: 8px 20px;" %>
       </div>
 
       <!-- Artists Table -->
@@ -43,9 +43,9 @@
                   <td style="font-family: monospace; color: #888;">/<%= artist.slug %></td>
                   <td style="text-align: center;"><%= artist.tracks.size %></td>
                   <td style="text-align: center; white-space: nowrap;">
-                    <%= link_to "Edit", edit_admin_artist_path(artist), class: "tui-button", style: "padding: 4px 10px;" %>
-                    <%= link_to "History", history_admin_artist_path(artist), class: "tui-button purple-168", style: "padding: 4px 10px;" %>
-                    <%= button_to "Delete", admin_artist_path(artist), method: :delete, form: { style: "display: inline;" }, class: "tui-button red-168", style: "padding: 4px 10px;", data: { confirm: "Delete artist '#{artist.name}'?" } %>
+                    <%= tui_button "Edit", edit_admin_artist_path(artist), style: "padding: 4px 10px;" %>
+                    <%= tui_button "History", history_admin_artist_path(artist), color: :purple, style: "padding: 4px 10px;" %>
+                    <%= tui_button_to "Delete", admin_artist_path(artist), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 4px 10px;", data: { confirm: "Delete artist '#{artist.name}'?" } %>
                   </td>
                 </tr>
               <% end %>

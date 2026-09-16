@@ -32,7 +32,7 @@
       </div>
 
       <div class="center auth-actions">
-        <%= submit_tag "JOIN GRID", class: "tui-button purple-168 auth-submit" %>
+        <%= tui_submit "JOIN GRID", color: :purple, class: "auth-submit" %>
       </div>
     <% end %>
   <% end %>
@@ -42,7 +42,7 @@
 
     <div class="center auth-actions">
       <p class="auth-note--dim">The verification link may have expired or already been used.</p>
-      <%= link_to "REGISTER AGAIN", grid_register_path, class: "tui-button purple-168" %>
+      <%= tui_button "REGISTER AGAIN", grid_register_path, color: :purple %>
     </div>
   <% end %>
 <% end %>

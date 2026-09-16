@@ -18,10 +18,10 @@
 
       <div style="display: flex; gap: 10px; margin-bottom: 25px;">
         <% if @hackr %>
-          <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
+          <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
         <% end %>
-        <%= link_to "All Hackrs", admin_grid_hackrs_path, class: "tui-button", style: "padding: 6px 14px;" %>
-        <%= link_to "All Mobs", admin_grid_mobs_path, class: "tui-button", style: "padding: 6px 14px;" %>
+        <%= tui_button "All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
+        <%= tui_button "All Mobs", admin_grid_mobs_path, style: "padding: 6px 14px;" %>
       </div>
 
       <%= form_with url: admin_grid_npc_dialogue_tester_path, method: :post, local: true, id: "tester-form" do %>
@@ -72,7 +72,7 @@
         </div>
 
         <div style="margin-top: 20px;">
-          <%= submit_tag "START DIALOGUE TEST", class: "tui-button yellow-168", style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start NPC Dialogue Test? Hackr will be warped to mob's room." } %>
+          <%= tui_submit "START DIALOGUE TEST", color: :yellow, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start NPC Dialogue Test? Hackr will be warped to mob's room." } %>
         </div>
       <% end %>
     </div>

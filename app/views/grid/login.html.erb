@@ -35,7 +35,7 @@
       </div>
 
       <div class="center" style="margin: 30px 0;">
-        <%= f.submit "CONNECT", class: "tui-button purple-168", style: "font-size: 1.1em; padding: 10px 30px;" %>
+        <%= tui_submit "CONNECT", form: f, color: :purple, style: "font-size: 1.1em; padding: 10px 30px;" %>
       </div>
     <% end %>
 
@@ -43,7 +43,7 @@
 
     <div class="center" style="margin: 20px 0;">
       <p class="white-text" style="margin-bottom: 10px;">NEW TO THE RESISTANCE?</p>
-      <%= link_to "REGISTER AS HACKR", grid_register_path, class: "tui-button green-168" %>
+      <%= tui_button "REGISTER AS HACKR", grid_register_path, color: :green %>
     </div>
   </fieldset>
 </div>

@@ -38,9 +38,9 @@
 
       <div style="margin-top: 20px;">
         <% if @journey.active? && dev_tools_enabled? %>
-          <%= link_to "Force Abandon", force_abandon_admin_grid_transit_journey_path(@journey), data: { turbo_method: :post, turbo_confirm: "Force-abandon this journey?" }, class: "tui-button red-168", style: "padding: 8px 20px;" %>
+          <%= tui_button "Force Abandon", force_abandon_admin_grid_transit_journey_path(@journey), data: { turbo_method: :post, turbo_confirm: "Force-abandon this journey?" }, color: :red, style: "padding: 8px 20px;" %>
         <% end %>
-        <%= link_to "Back", admin_grid_transit_journeys_path, class: "tui-button", style: "padding: 8px 20px; margin-left: 10px;" %>
+        <%= tui_button "Back", admin_grid_transit_journeys_path, style: "padding: 8px 20px; margin-left: 10px;" %>
       </div>
     </div>
   </fieldset>

@@ -5,14 +5,14 @@
     <div class="center auth-head">
       <h1 class="green-255-text auth-title auth-title--sm">EMAIL UPDATED</h1>
       <p class="auth-note">Your email address has been changed successfully.</p>
-      <%= link_to "BACK TO IDENTITY", grid_identity_path, class: "tui-button purple-168" %>
+      <%= tui_button "BACK TO IDENTITY", grid_identity_path, color: :purple %>
     </div>
   <% elsif @error %>
     <%= render "grid/shared/auth_error", message: @error, title: "VERIFICATION FAILED" %>
 
     <div class="center auth-actions">
       <p class="auth-note--dim">The verification link may have expired or already been used.</p>
-      <%= link_to "BACK TO IDENTITY", grid_identity_path, class: "tui-button purple-168" %>
+      <%= tui_button "BACK TO IDENTITY", grid_identity_path, color: :purple %>
     </div>
   <% else %>
     <div class="center auth-head">
@@ -28,7 +28,7 @@
         refuse a 200 form response. %>
     <%= form_with url: grid_do_confirm_email_change_path(token: @token.token), data: {turbo: false} do %>
       <div class="center auth-actions">
-        <%= submit_tag "CONFIRM EMAIL CHANGE", class: "tui-button purple-168 auth-submit" %>
+        <%= tui_submit "CONFIRM EMAIL CHANGE", color: :purple, class: "auth-submit" %>
       </div>
     <% end %>
   <% end %>

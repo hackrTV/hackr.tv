@@ -19,7 +19,7 @@
           <%= select_tag :state, options_for_select([["All States", ""], ["active", "active"], ["completed", "completed"], ["abandoned", "abandoned"], ["ejected", "ejected"]], params[:state]), class: "tui-input", style: "font-family: monospace;", onchange: "this.form.submit()" %>
           <%= select_tag :journey_type, options_for_select([["All Types", ""], ["slipstream", "slipstream"], ["local_public", "local_public"], ["local_private", "local_private"]], params[:journey_type]), class: "tui-input", style: "font-family: monospace;", onchange: "this.form.submit()" %>
           <% if params[:state].present? || params[:journey_type].present? %>
-            <%= link_to "Clear", admin_grid_transit_journeys_path, class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+            <%= tui_button "Clear", admin_grid_transit_journeys_path, style: "padding: 2px 8px; font-size: 0.8em;" %>
           <% end %>
         </div>
       <% end %>
@@ -59,9 +59,9 @@
                 </td>
                 <td style="text-align: center; color: #6b7280;"><%= j.started_at&.strftime("%Y-%m-%d %H:%M") %></td>
                 <td style="text-align: right; white-space: nowrap;">
-                  <%= link_to "View", admin_grid_transit_journey_path(j), class: "tui-button", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                  <%= tui_button "View", admin_grid_transit_journey_path(j), style: "padding: 2px 8px; font-size: 0.8em;" %>
                   <% if j.active? && dev_tools_enabled? %>
-                    <%= link_to "Abandon", force_abandon_admin_grid_transit_journey_path(j), data: { turbo_method: :post, turbo_confirm: "Force-abandon journey ##{j.id}?" }, class: "tui-button red-168", style: "padding: 2px 8px; font-size: 0.8em;" %>
+                    <%= tui_button "Abandon", force_abandon_admin_grid_transit_journey_path(j), data: { turbo_method: :post, turbo_confirm: "Force-abandon journey ##{j.id}?" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em;" %>
                   <% end %>
                 </td>
               </tr>

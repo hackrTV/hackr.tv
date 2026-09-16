@@ -114,7 +114,7 @@
               <%= ff.hidden_field :_destroy, value: "0", class: "destroy-flag" %>
               <button type="button" class="tui-button red-168 ingredient-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" data-persisted="true">&times;</button>
             <% else %>
-              <button type="button" class="tui-button red-168 ingredient-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+              <%= tui_button "×", color: :red, class: "ingredient-destroy-btn", type: "button", style: "padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" %>
             <% end %>
           </td>
         </tr>
@@ -124,7 +124,7 @@
   <% if schematic.errors[:ingredients].any? %>
     <small class="red-255-text"><%= schematic.errors[:ingredients].join(", ") %></small>
   <% end %>
-  <button type="button" id="add-ingredient-btn" class="tui-button green-168" style="padding: 4px 12px; font-size: 0.85em; margin-top: 5px;">+ Add Ingredient</button>
+  <%= tui_button "+ Add Ingredient", color: :green, type: "button", id: "add-ingredient-btn", style: "padding: 4px 12px; font-size: 0.85em; margin-top: 5px;" %>
 
   <template id="ingredient-row-template">
     <tr>
@@ -146,7 +146,7 @@
           class="tui-input" style="width: 70px; padding: 4px; text-align: center;" min="1" value="1">
       </td>
       <td style="text-align: center;">
-        <button type="button" class="tui-button red-168 ingredient-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;">&times;</button>
+        <%= tui_button "×", color: :red, class: "ingredient-destroy-btn", type: "button", style: "padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" %>
       </td>
     </tr>
   </template>
@@ -182,13 +182,13 @@
   </script>
 
   <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= f.submit schematic.persisted? ? "Save Schematic" : "Create Schematic",
-          class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= link_to "Cancel", admin_grid_schematics_path,
-          class: "tui-button grey-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= tui_submit schematic.persisted? ? "Save Schematic" : "Create Schematic", form: f,
+          color: :purple, style: "padding: 10px 30px; font-size: 1.1em;" %>
+    <%= tui_button "Cancel", admin_grid_schematics_path,
+          color: :grey, style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% if schematic.persisted? %>
-      <%= link_to "History", history_admin_grid_schematic_path(schematic),
-            class: "tui-button purple-168", style: "padding: 10px 30px; font-size: 1.1em;" %>
+      <%= tui_button "History", history_admin_grid_schematic_path(schematic),
+            color: :purple, style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% end %>
   </div>
 <% end %>

@@ -18,9 +18,9 @@
           <%= render "band_profiles/#{@profile[:partial]}" %>
 
           <div class="band-profile-buttons">
-            <%= link_to "← BACK TO FRACTURE NETWORK", "/f/net", class: "tui-button band-profile-back-button" %>
-            <%= link_to "RELEASES", "/#{@slug}/releases", class: "tui-button band-profile-button" %>
-            <%= link_to "/vault?filter=#{ERB::Util.url_encode(@profile[:filter_name])}", class: "tui-button band-profile-button" do %>
+            <%= tui_button "← BACK TO FRACTURE NETWORK", "/f/net", class: "band-profile-back-button" %>
+            <%= tui_button "RELEASES", "/#{@slug}/releases", class: "band-profile-button" %>
+            <%= tui_button "/vault?filter=#{ERB::Util.url_encode(@profile[:filter_name])}", class: "band-profile-button" do %>
               <span class="chrome-desktop-only">LISTEN IN THE PULSE VAULT →</span>
               <span class="chrome-mobile-only">PULSE VAULT →</span>
             <% end %>

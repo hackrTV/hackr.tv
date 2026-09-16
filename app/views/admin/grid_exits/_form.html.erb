@@ -38,9 +38,9 @@
 </div>
 
 <div style="margin-top: 30px; display: flex; gap: 10px;">
-  <%= f.submit @exit.new_record? ? "Create Exit" : "Update Exit", class: "tui-button green-168", style: "padding: 10px 20px; font-weight: bold;" %>
-  <%= link_to "Cancel", admin_grid_exits_path, class: "tui-button", style: "padding: 10px 20px; margin-left: 10px;" %>
+  <%= tui_submit @exit.new_record? ? "Create Exit" : "Update Exit", form: f, color: :green, style: "padding: 10px 20px; font-weight: bold;" %>
+  <%= tui_button "Cancel", admin_grid_exits_path, style: "padding: 10px 20px; margin-left: 10px;" %>
   <% if @exit.persisted? %>
-    <%= link_to "History", history_admin_grid_exit_path(@exit), class: "tui-button purple-168", style: "padding: 10px 20px; margin-left: 10px;" %>
+    <%= tui_button "History", history_admin_grid_exit_path(@exit), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
   <% end %>
 </div>

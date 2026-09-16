@@ -87,15 +87,15 @@
   </div>
 
   <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= f.submit listing.persisted? ? "Save Listing" : "Create Listing",
-        class: "tui-button purple-168",
+    <%= tui_submit listing.persisted? ? "Save Listing" : "Create Listing", form: f,
+        color: :purple,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= link_to "Cancel", admin_grid_shop_listings_path,
-        class: "tui-button grey-168",
+    <%= tui_button "Cancel", admin_grid_shop_listings_path,
+        color: :grey,
         style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% if listing.persisted? %>
-      <%= link_to "History", history_admin_grid_shop_listing_path(listing),
-          class: "tui-button purple-168",
+      <%= tui_button "History", history_admin_grid_shop_listing_path(listing),
+          color: :purple,
           style: "padding: 10px 30px; font-size: 1.1em;" %>
     <% end %>
   </div>

@@ -16,8 +16,8 @@
 
       <%# Nav %>
       <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <%= link_to "<- Inspector", admin_grid_hackr_path(@hackr), class: "tui-button", style: "padding: 6px 14px;" %>
-        <%= button_to "END TEST", finish_admin_grid_pac_escape_tester_path, method: :delete, class: "tui-button red-168", style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "End PAC escape test? Hackr will be restored to original state." }, form: { id: "end-form" } %>
+        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
+        <%= tui_button_to "END TEST", finish_admin_grid_pac_escape_tester_path, method: :delete, color: :red, style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "End PAC escape test? Hackr will be restored to original state." }, form: { id: "end-form" } %>
       </div>
 
       <%# Terminal output — styled to match frontend GameOutput.tsx %>

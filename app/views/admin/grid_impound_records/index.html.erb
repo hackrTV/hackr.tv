@@ -34,11 +34,11 @@
             <%= select_tag :status, options_for_select([["All Statuses", ""], "impounded", "recovered", "forfeited"], params[:status]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
           </div>
           <div>
-            <button type="submit" class="tui-button cyan-168" style="padding: 6px 14px;">Filter</button>
+            <%= tui_button "Filter", color: :cyan, type: "submit", style: "padding: 6px 14px;" %>
           </div>
           <% if params[:hackr_alias].present? || params[:status].present? %>
             <div>
-              <%= link_to "Clear", admin_grid_impound_records_path, class: "tui-button", style: "padding: 6px 14px;" %>
+              <%= tui_button "Clear", admin_grid_impound_records_path, style: "padding: 6px 14px;" %>
             </div>
           <% end %>
         <% end %>
@@ -91,8 +91,8 @@
                     <td style="text-align: center;">
                       <% if record.impounded? %>
                         <div style="display: flex; gap: 6px; justify-content: center;">
-                          <%= button_to "Recover", force_recover_admin_grid_impound_record_path(record), method: :post, class: "tui-button yellow-168", style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-recover impound ##{record.id}? Items return to inventory, no CRED charged." } } %>
-                          <%= button_to "Forfeit", force_forfeit_admin_grid_impound_record_path(record), method: :post, class: "tui-button red-168", style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-forfeit impound ##{record.id}? All items will be PERMANENTLY DESTROYED." } } %>
+                          <%= tui_button_to "Recover", force_recover_admin_grid_impound_record_path(record), method: :post, color: :yellow, style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-recover impound ##{record.id}? Items return to inventory, no CRED charged." } } %>
+                          <%= tui_button_to "Forfeit", force_forfeit_admin_grid_impound_record_path(record), method: :post, color: :red, style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-forfeit impound ##{record.id}? All items will be PERMANENTLY DESTROYED." } } %>
                         </div>
                       <% else %>
                         <span style="color: #333;">—</span>
@@ -111,8 +111,8 @@
       <% end %>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= link_to "← Grid Dashboard", admin_grid_path, class: "tui-button green-168" %>
-        <%= link_to "← Admin Dashboard", admin_root_path, class: "tui-button green-168" %>
+        <%= tui_button "← Grid Dashboard", admin_grid_path, color: :green %>
+        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
   </fieldset>

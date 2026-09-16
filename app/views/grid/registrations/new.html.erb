@@ -18,7 +18,7 @@
 
     <div class="center auth-alt">
       <p class="white-text auth-alt-label">DIDN'T RECEIVE IT?</p>
-      <%= link_to "TRY AGAIN", grid_register_path, class: "tui-button purple-168" %>
+      <%= tui_button "TRY AGAIN", grid_register_path, color: :purple %>
     </div>
   <% else %>
     <%= render "grid/shared/auth_error", message: @error, title: "ERROR" %>
@@ -36,7 +36,7 @@
       </div>
 
       <div class="center auth-actions">
-        <%= submit_tag "SEND VERIFICATION", class: "tui-button purple-168 auth-submit" %>
+        <%= tui_submit "SEND VERIFICATION", color: :purple, class: "auth-submit" %>
       </div>
     <% end %>
 
@@ -44,7 +44,7 @@
 
     <div class="center auth-alt">
       <p class="white-text auth-alt-label">ALREADY REGISTERED?</p>
-      <%= link_to "LOG IN", grid_login_path, class: "tui-button green-168" %>
+      <%= tui_button "LOG IN", grid_login_path, color: :green %>
     </div>
   <% end %>
 <% end %>

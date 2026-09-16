@@ -8,10 +8,10 @@
     <div style="padding: 10px; display: flex; flex-direction: column; flex: 1; min-height: 0;">
       <%# Toolbar %>
       <div id="me-toolbar" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center;">
-        <%= link_to "<- Regions", admin_grid_regions_path, class: "tui-button", style: "padding: 4px 12px; font-size: 0.85em;" %>
+        <%= tui_button "<- Regions", admin_grid_regions_path, style: "padding: 4px 12px; font-size: 0.85em;" %>
 
-        <button id="me-scope-region" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">Region</button>
-        <button id="me-scope-zone" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">Zone</button>
+        <%= tui_button "Region", id: "me-scope-region", style: "padding: 4px 10px; font-size: 0.85em;" %>
+        <%= tui_button "Zone", id: "me-scope-zone", style: "padding: 4px 10px; font-size: 0.85em;" %>
         <span style="color: #333; margin: 0 2px;">|</span>
 
         <%# Region picker (shown in region scope) %>
@@ -30,16 +30,16 @@
           <div id="me-zone-status" style="display: none;"></div>
         </div>
 
-        <button id="me-reset-layout" class="tui-button cyan-168" style="padding: 4px 12px; font-size: 0.85em;">Reset Layout</button>
-        <button id="me-zoom-in" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">+</button>
-        <button id="me-zoom-out" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">-</button>
-        <button id="me-zoom-reset" class="tui-button" style="padding: 4px 10px; font-size: 0.85em;">1:1</button>
+        <%= tui_button "Reset Layout", color: :cyan, id: "me-reset-layout", style: "padding: 4px 12px; font-size: 0.85em;" %>
+        <%= tui_button "+", id: "me-zoom-in", style: "padding: 4px 10px; font-size: 0.85em;" %>
+        <%= tui_button "-", id: "me-zoom-out", style: "padding: 4px 10px; font-size: 0.85em;" %>
+        <%= tui_button "1:1", id: "me-zoom-reset", style: "padding: 4px 10px; font-size: 0.85em;" %>
         <span style="color: #333; margin: 0 4px;">|</span>
         <span id="me-z-buttons" style="display: inline-flex; gap: 4px; align-items: center;"></span>
         <span style="color: #333; margin: 0 4px;">|</span>
-        <button id="me-25d-toggle" class="tui-button cyan-168" style="padding: 4px 12px; font-size: 0.85em;">2D</button>
+        <%= tui_button "2D", color: :cyan, id: "me-25d-toggle", style: "padding: 4px 12px; font-size: 0.85em;" %>
         <span style="color: #333; margin: 0 4px;">|</span>
-        <%= link_to "Export World", admin_grid_world_export_path, class: "tui-button green-168", style: "padding: 4px 12px; font-size: 0.85em;" %>
+        <%= tui_button "Export World", admin_grid_world_export_path, color: :green, style: "padding: 4px 12px; font-size: 0.85em;" %>
         <span id="me-status" style="color: #666; font-size: 0.85em; margin-left: auto;"></span>
       </div>
 
@@ -99,8 +99,8 @@
     </span>
   </div>
   <div style="display: flex; gap: 10px;">
-    <button id="me-exit-confirm" class="tui-button green-168" style="padding: 6px 16px;">Create</button>
-    <button id="me-exit-cancel" class="tui-button" style="padding: 6px 16px;">Cancel</button>
+    <%= tui_button "Create", color: :green, id: "me-exit-confirm", style: "padding: 6px 16px;" %>
+    <%= tui_button "Cancel", id: "me-exit-cancel", style: "padding: 6px 16px;" %>
   </div>
 </div>
 
@@ -141,8 +141,8 @@
     <select id="me-room-zone-select" class="tui-input" style="width: 100%; padding: 6px;"></select>
   </div>
   <div style="display: flex; gap: 10px;">
-    <button id="me-room-confirm" class="tui-button green-168" style="padding: 6px 16px;">Create</button>
-    <button id="me-room-cancel" class="tui-button" style="padding: 6px 16px;">Cancel</button>
+    <%= tui_button "Create", color: :green, id: "me-room-confirm", style: "padding: 6px 16px;" %>
+    <%= tui_button "Cancel", id: "me-room-cancel", style: "padding: 6px 16px;" %>
   </div>
 </div>
 
