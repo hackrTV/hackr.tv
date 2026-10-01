@@ -1,9 +1,9 @@
 /* Artist catalog pages (Hotwire, Phase 4) — ReleaseListPage,
  * ReleaseDetailPage, TrackDetailPage, VodzPage and VodzShowPage inline
- * styles, ported. Loaded via content_for :head, which lands BEFORE the
- * framework stylesheets in the hotwire layout — selectors that share an
- * element with tuicss/hotwire classes (.tui-window, .play-track-btn,
- * .tui-button) are compounded so they win the cascade on specificity.
+ * styles, ported. Loads globally AFTER tuicss/hotwire via
+ * layouts/_hotwire_assets, so plain single-class selectors override
+ * framework rules by sheet order — no compound chains (Phase 2 CS3
+ * fold, 2026-09-16).
  *
  * None of the five source pages branch on isMobile — their responsive
  * behavior is flex-wrap + auto-fill grids, which port directly, so there
@@ -696,7 +696,7 @@
 }
 
 /* --- Vidz (VodzPage / VodzShowPage — fixed purple scheme) -------------- */
-.tui-window.vodz-window {
+.vodz-window {
   max-width: 1200px;
   margin: 0 auto;
   display: block;
@@ -872,7 +872,7 @@
   color: #fff;
 }
 
-.tui-window.vodz-error-window { max-width: 800px; margin: 0 auto; display: block; }
+.vodz-error-window { max-width: 800px; margin: 0 auto; display: block; }
 .vodz-error-back { margin-top: 20px; display: inline-block; }
 
 /* --- Keyframes --------------------------------------------------------- */

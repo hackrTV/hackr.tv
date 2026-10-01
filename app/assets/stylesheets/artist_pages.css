@@ -8,11 +8,11 @@
  *   .wz-*             WavelengthZeroPage.tsx        (/wavelength-zero)
  *   .embedded-track-* EmbeddedTrack.tsx             (xeraen bio player card)
  *
- * Loaded per-page via content_for :head, which yields BEFORE the layout's
- * tuicss/hotwire stylesheet tags — so any rule that must beat a tuicss or
- * hotwire class on the same element uses a compound selector
- * (.tui-window.tcp-window, .tui-button.tcp-btn-primary, ...) to win on
- * specificity, the same way the React inline styles always won.
+ * Loads globally AFTER tuicss/hotwire via layouts/_hotwire_assets
+ * (identical tracked set on every page), so plain single-class selectors
+ * (.tcp-window, .tcp-btn-primary, ...) override framework rules by sheet
+ * order — no compound .tui-window.x chains (de-chained in the Phase 2
+ * CS3 fold, 2026-09-16).
  *
  * Mobile blocks replicate each page's isMobile (max-width: 767px)
  * differences; pages whose React source had no isMobile logic (Sector X,
@@ -22,7 +22,7 @@
 
 /* --- The.CyberPul.se landing (/thecyberpulse) ----------------------- */
 
-.tui-window.tcp-landing-window {
+.tcp-landing-window {
   max-width: 1000px;
   margin: 0 auto;
   display: block;
@@ -83,15 +83,15 @@
 
 .tcp-landing-card-link { text-decoration: none; }
 
-.tui-window.tcp-landing-card {
+.tcp-landing-card {
   background: #0d0d0d;
   cursor: pointer;
   height: 100%;
 }
 
-.tui-window.tcp-landing-card--bio { border: 1px solid #8B00FF; }
-.tui-window.tcp-landing-card--releases { border: 1px solid #9B59B6; }
-.tui-window.tcp-landing-card--vidz { border: 1px solid #ef4444; }
+.tcp-landing-card--bio { border: 1px solid #8B00FF; }
+.tcp-landing-card--releases { border: 1px solid #9B59B6; }
+.tcp-landing-card--vidz { border: 1px solid #ef4444; }
 
 .tcp-landing-card--bio fieldset { border-color: #8B00FF; height: 100%; }
 .tcp-landing-card--releases fieldset { border-color: #9B59B6; height: 100%; }
@@ -135,7 +135,7 @@
 }
 
 @media (max-width: 767px) {
-  .tui-window.tcp-landing-window { max-width: 100%; box-shadow: none; }
+  .tcp-landing-window { max-width: 100%; box-shadow: none; }
   .tcp-landing-legend { letter-spacing: 1px; }
   .tcp-landing-content { padding: 15px; }
   .tcp-landing-heading { font-size: 1.3em; }
@@ -146,7 +146,7 @@
 
 /* --- XERAEN landing (/xeraen) --------------------------------------- */
 
-.tui-window.xeraen-landing-window {
+.xeraen-landing-window {
   max-width: 1000px;
   margin: 0 auto;
   display: block;
@@ -207,14 +207,14 @@
 
 .xeraen-landing-card-link { text-decoration: none; }
 
-.tui-window.xeraen-landing-card {
+.xeraen-landing-card {
   background: #0d0d0d;
   cursor: pointer;
   height: 100%;
 }
 
-.tui-window.xeraen-landing-card--bio { border: 1px solid #8B00FF; }
-.tui-window.xeraen-landing-card--releases { border: 1px solid #9B59B6; }
+.xeraen-landing-card--bio { border: 1px solid #8B00FF; }
+.xeraen-landing-card--releases { border: 1px solid #9B59B6; }
 
 .xeraen-landing-card--bio fieldset { border-color: #8B00FF; height: 100%; }
 .xeraen-landing-card--releases fieldset { border-color: #9B59B6; height: 100%; }
@@ -256,7 +256,7 @@
 }
 
 @media (max-width: 767px) {
-  .tui-window.xeraen-landing-window { max-width: 100%; box-shadow: none; }
+  .xeraen-landing-window { max-width: 100%; box-shadow: none; }
   .xeraen-landing-legend { letter-spacing: 1px; }
   .xeraen-landing-content { padding: 15px; }
   .xeraen-landing-heading { font-size: 1.3em; }
@@ -267,7 +267,7 @@
 
 /* --- The.CyberPul.se bio (/thecyberpulse/bio) ------------------------ */
 
-.tui-window.tcp-window {
+.tcp-window {
   max-width: 1200px;
   margin: 0 auto;
   display: block;
@@ -334,7 +334,7 @@
 .tcp-p-bbb { color: #bbb; line-height: 1.8; margin-bottom: 15px; }
 .tcp-p-lg { font-size: 1.05em; }
 
-.tui-window.tcp-section {
+.tcp-section {
   margin-bottom: 30px;
   background: #000000;
   border: 2px solid #8B00FF;
@@ -526,14 +526,14 @@
   margin-top: 30px;
 }
 
-.tui-button.tcp-btn-back {
+.tcp-btn-back {
   background: #222;
   color: #888;
   border: 1px solid #444;
   text-align: center;
 }
 
-.tui-button.tcp-btn-primary {
+.tcp-btn-primary {
   background: #8B00FF;
   color: white;
   font-weight: bold;
@@ -541,7 +541,7 @@
   text-align: center;
 }
 
-.tui-button.tcp-btn-grid {
+.tcp-btn-grid {
   background: #9B59B6;
   color: white;
   font-weight: bold;
@@ -550,7 +550,7 @@
 }
 
 @media (max-width: 767px) {
-  .tui-window.tcp-window { max-width: 100%; box-shadow: none; }
+  .tcp-window { max-width: 100%; box-shadow: none; }
   .tcp-legend { letter-spacing: 1px; }
   .tcp-vod-body { padding: 10px; }
   .tcp-vod-frame { width: 100%; height: auto; aspect-ratio: 16 / 9; }
@@ -559,7 +559,7 @@
 
 /* --- XERAEN bio (/xeraen/bio) ---------------------------------------- */
 
-.tui-window.xeraen-window {
+.xeraen-window {
   max-width: 1200px;
   margin: 0 auto;
   display: block;
@@ -615,7 +615,7 @@
 .xeraen-p-ddd { color: #ddd; line-height: 1.8; margin-bottom: 15px; }
 .xeraen-p-lg { font-size: 1.05em; }
 
-.tui-window.xeraen-section {
+.xeraen-section {
   margin-bottom: 30px;
   background: #000000;
   border: 2px solid #8B00FF;
@@ -743,14 +743,14 @@
   margin-top: 30px;
 }
 
-.tui-button.xeraen-btn-back {
+.xeraen-btn-back {
   background: #222;
   color: #888;
   border: 1px solid #444;
   text-align: center;
 }
 
-.tui-button.xeraen-btn-primary {
+.xeraen-btn-primary {
   background: #8B00FF;
   color: white;
   font-weight: bold;
@@ -758,7 +758,7 @@
   text-align: center;
 }
 
-.tui-button.xeraen-btn-pulse {
+.xeraen-btn-pulse {
   background: #6B00CC;
   color: white;
   font-weight: bold;
@@ -767,11 +767,11 @@
 }
 
 @media (max-width: 767px) {
-  .tui-window.xeraen-window { max-width: 100%; box-shadow: none; }
+  .xeraen-window { max-width: 100%; box-shadow: none; }
   .xeraen-legend { letter-spacing: 1px; }
   .xeraen-nav-buttons { flex-direction: column; gap: 10px; }
-  .tui-button.xeraen-btn-primary,
-  .tui-button.xeraen-btn-pulse { box-shadow: none; }
+  .xeraen-btn-primary,
+  .xeraen-btn-pulse { box-shadow: none; }
 }
 
 /* --- Embedded track card (EmbeddedTrack.tsx, used on /xeraen/bio) ----
@@ -854,7 +854,7 @@
 
 /* --- Sector X (/sector/x) -------------------------------------------- */
 
-.tui-window.sectorx-window {
+.sectorx-window {
   max-width: 1200px;
   margin: 0 auto;
   display: block;
@@ -890,7 +890,7 @@
  * the shorthand overwrote it — the rendered border was uniform. These
  * rules port the computed result. */
 
-.tui-window.wz-window {
+.wz-window {
   max-width: 1200px;
   margin: 0 auto;
   display: block;
@@ -950,7 +950,7 @@
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-.tui-window.wz-philosophy {
+.wz-philosophy {
   margin-bottom: 30px;
   background: rgba(139, 0, 255, 0.05);
   border: 2px solid rgba(139, 0, 255, 0.3);
@@ -1033,13 +1033,13 @@
   margin-top: 30px;
 }
 
-.tui-button.wz-btn-back {
+.wz-btn-back {
   background: #1a1a1a;
   color: #888;
   border: 1px solid #333;
 }
 
-.tui-button.wz-btn-primary {
+.wz-btn-primary {
   background: linear-gradient(90deg, #ff0080, #8b00ff);
   color: white;
   font-weight: bold;

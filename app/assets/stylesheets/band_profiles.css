@@ -3,10 +3,11 @@
  * BandProfileLayout.tsx and the eleven migrated bandProfileConfig.tsx
  * entries (system-rot, voiceprint, injection-vector, cipher-protocol,
  * blitzbeam, apex-overdrive, ethereality, neon-hearts, offline,
- * temporal-blue-drift, heartbreak-havoc), ported to classes. Loaded per-page via content_for :head, which sits
- * BEFORE tuicss/default in the hotwire layout head — selectors that
- * compete with tuicss (.tui-window, .tui-button) are therefore chained
- * to two classes so they win on specificity, not on source order.
+ * temporal-blue-drift, heartbreak-havoc), ported to classes. Loads
+ * globally AFTER tuicss via layouts/_hotwire_assets (identical tracked
+ * set on every page), so plain single-class selectors override tuicss
+ * base rules by sheet order — no compound .tui-window.x chains
+ * (de-chained in the Phase 2 CS3 fold, 2026-09-16).
  * Mobile normalization for .band-profile-container/.band-profile-content
  * already lives in default.css and applies here unchanged; the only
  * rules recreated below are the ones default.css keyed on style
@@ -15,7 +16,7 @@
 
 /* --- Shared chrome (BandProfileLayout.tsx) --- */
 
-.tui-window.band-profile-container {
+.band-profile-container {
   max-width: 1200px;
   margin: 0 auto;
   display: block;
@@ -42,7 +43,7 @@
 }
 
 @media (max-width: 767px) {
-  .tui-window.band-profile-container { max-width: 100%; }
+  .band-profile-container { max-width: 100%; }
 
   .band-profile-buttons {
     flex-direction: column;
@@ -110,7 +111,7 @@
   font-size: 1.05em;
 }
 
-.tui-window.sr-philosophy {
+.sr-philosophy {
   margin-bottom: 30px;
   background: #000000;
   border: 2px solid #39ff14;
@@ -226,7 +227,7 @@
   font-size: 1.05em;
 }
 
-.tui-window.vp-archive {
+.vp-archive {
   margin-bottom: 30px;
   background: #000000;
   border: 2px solid #00d9ff;
@@ -340,7 +341,7 @@
   font-weight: bold;
 }
 
-.tui-window.bb-philosophy {
+.bb-philosophy {
   margin-bottom: 30px;
   background: #000000;
   border: 2px solid #ffff00;
@@ -481,7 +482,7 @@
   font-style: italic;
 }
 
-.tui-window.eth-philosophy {
+.eth-philosophy {
   margin-bottom: 30px;
   background: rgba(10, 10, 26, 0.9);
   border: 1px solid rgba(230, 230, 250, 0.5);
@@ -623,7 +624,7 @@
   font-weight: bold;
 }
 
-.tui-window.off-philosophy {
+.off-philosophy {
   margin-bottom: 30px;
   background: #0a0a0a;
   border: 2px solid #cd7f32;
@@ -755,7 +756,7 @@
   line-height: 1.6;
 }
 
-.tui-window.iv-philosophy {
+.iv-philosophy {
   margin-bottom: 30px;
   background: #000000;
   border: 1px solid #ff6600;
@@ -843,7 +844,7 @@
   line-height: 1.6;
 }
 
-.tui-window.cp-philosophy {
+.cp-philosophy {
   margin-bottom: 30px;
   background: #000000;
   border: 1px solid #00ff9f;
@@ -948,7 +949,7 @@
   font-weight: bold;
 }
 
-.tui-window.ao-philosophy {
+.ao-philosophy {
   margin-bottom: 30px;
   background: rgba(10, 10, 26, 0.9);
   border: 2px solid #ffd700;
@@ -1099,7 +1100,7 @@
   font-weight: bold;
 }
 
-.tui-window.nh-philosophy {
+.nh-philosophy {
   margin-bottom: 30px;
   background: rgba(10, 10, 26, 0.9);
   border: 2px solid #ff1493;
@@ -1257,7 +1258,7 @@
   text-shadow: 0 0 12px rgba(177, 156, 217, 0.7);
 }
 
-.tui-window.tbd-philosophy {
+.tbd-philosophy {
   margin-bottom: 30px;
   background: rgba(107, 155, 209, 0.08);
   border: 2px solid #6b9bd1;
@@ -1392,7 +1393,7 @@
   text-shadow: 0 0 10px rgba(0, 229, 204, 0.6);
 }
 
-.tui-window.hh-doctrine {
+.hh-doctrine {
   margin-bottom: 30px;
   background: #0a0a0f;
   border: 2px solid #ff0066;
