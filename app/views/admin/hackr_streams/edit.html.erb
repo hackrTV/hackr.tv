@@ -1,11 +1,8 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/streams/edit :: UPDATE STREAM</legend>
+<%= render TuiWindowComponent.new(title: "/root/streams/edit :: UPDATE STREAM", variant: :admin, width: 900) do %>
 
     <div style="padding: 20px;">
       <%= tui_button "← Back to Streams", admin_hackr_streams_path, color: :green, style: "padding: 8px 20px; margin-bottom: 20px; display: inline-block;" %>
 
       <%= render "form", hackr_stream: @hackr_stream %>
     </div>
-  </fieldset>
-</div>
+<% end %>

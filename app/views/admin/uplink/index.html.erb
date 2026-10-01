@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/uplink :: UPLINK CONTROL</legend>
+<%= render TuiWindowComponent.new(title: "/root/uplink :: UPLINK CONTROL", variant: :admin, width: 1600) do %>
 
     <div style="padding: 20px;">
       <!-- Flash Messages -->
@@ -29,7 +27,7 @@
       <!-- Channels Section -->
       <div style="margin-bottom: 30px;">
         <h3 style="color: #7c3aed; margin-bottom: 15px;">CHANNELS</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -71,14 +69,14 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       </div>
 
       <!-- Active Punishments Section -->
       <div style="margin-bottom: 30px;">
         <h3 style="color: #ff5555; margin-bottom: 15px;">ACTIVE PUNISHMENTS (<%= @active_punishments.count %>)</h3>
         <% if @active_punishments.any? %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -123,7 +121,7 @@
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         <% else %>
           <div style="padding: 20px; text-align: center; background: #1a1a1a; color: #666;">
             No active punishments.
@@ -135,7 +133,7 @@
       <div style="margin-bottom: 30px;">
         <h3 style="color: #00d4ff; margin-bottom: 15px;">RECENT PACKETS</h3>
         <% if @recent_packets.any? %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a; max-height: 400px; overflow-y: auto;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "max-height: 400px; overflow-y: auto;") do %>
             <% @recent_packets.each do |packet| %>
               <div style="padding: 8px 12px; border-bottom: 1px solid #222; <%= packet.dropped ? 'opacity: 0.5; background: rgba(255,0,0,0.05);' : '' %>">
                 <span style="color: #555; font-size: 0.75rem;"><%= packet.created_at.strftime("%H:%M") %></span>
@@ -144,7 +142,7 @@
                 <span style="color: #ccc;"><%= packet.dropped ? "[DROPPED]" : packet.content.truncate(100) %></span>
               </div>
             <% end %>
-          </div>
+          <% end %>
           <div style="margin-top: 10px;">
             <%= link_to "View All Packets →", packets_admin_uplink_index_path, style: "color: #7c3aed;" %>
           </div>
@@ -159,7 +157,7 @@
       <div>
         <h3 style="color: #a78bfa; margin-bottom: 15px;">RECENT MODERATION ACTIVITY</h3>
         <% if @moderation_logs.any? %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <% @moderation_logs.each do |log| %>
               <div style="padding: 8px 12px; border-bottom: 1px solid #222;">
                 <span style="color: #555; font-size: 0.75rem;"><%= log.created_at.strftime("%Y-%m-%d %H:%M") %></span>
@@ -173,7 +171,7 @@
                 <% end %>
               </div>
             <% end %>
-          </div>
+          <% end %>
           <div style="margin-top: 10px;">
             <%= link_to "View Full Log →", moderation_log_admin_uplink_index_path, style: "color: #7c3aed;" %>
           </div>
@@ -184,5 +182,4 @@
         <% end %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

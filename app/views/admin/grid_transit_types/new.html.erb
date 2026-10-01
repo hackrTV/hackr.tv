@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/transit_types/new :: NEW TRANSIT TYPE</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/transit_types/new :: NEW TRANSIT TYPE", variant: :admin, width: 1200) do %>
     <div style="padding: 20px;">
       <% if flash[:error] %>
         <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
@@ -9,5 +7,4 @@
       <% end %>
       <%= render "form", transit_type: @transit_type %>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,8 +1,6 @@
 <% content_for(:title) { "/root/overlays/alerts/#{@alert.id} :: Alert Details" } %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 800px; margin: 30px auto;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/overlays/alerts/<%= @alert.id %> :: ALERT DETAILS</legend>
+<%= render TuiWindowComponent.new(title: "/root/overlays/alerts/#{@alert.id} :: ALERT DETAILS", variant: :admin, width: 800) do %>
 
     <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
       <%= tui_button "< Back to Alerts", admin_overlay_alerts_path, color: :green %>
@@ -46,5 +44,4 @@
       <% end %>
     </div>
 
-  </fieldset>
-</div>
+<% end %>

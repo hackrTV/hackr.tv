@@ -1,8 +1,6 @@
 <%= render "admin/shared/combobox" %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/hackrs/<%= @hackr.hackr_alias %>/items :: INVENTORY MANAGER</legend>
+<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias}/items :: INVENTORY MANAGER", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -25,7 +23,7 @@
       <%# === GRANT ITEM === %>
       <div style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: GRANT ITEM ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
           <%= form_with url: admin_grant_grid_hackr_item_path(@hackr), method: :post, local: true, id: "grant-form", style: "display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;" do %>
             <div style="flex: 1; min-width: 300px;">
               <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">ITEM DEFINITION</label>
@@ -50,14 +48,14 @@
           <p style="color: #666; margin-top: 8px; font-size: 0.85em;" id="grant-status">
             Capacity: <%= @inventory.size %> / <%= @hackr.inventory_capacity %> slots used
           </p>
-        </div>
+        <% end %>
       </div>
 
       <%# === EQUIPPED GEAR === %>
       <% if @equipped.any? %>
         <div style="margin-bottom: 30px;">
           <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: EQUIPPED (<%= @equipped.size %>) ::]</h3>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -84,14 +82,14 @@
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         </div>
       <% end %>
 
       <%# === INVENTORY === %>
       <div style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: INVENTORY (<%= @inventory.size %> / <%= @hackr.inventory_capacity %>) ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <% if @inventory.any? %>
             <table class="tui-table" style="width: 100%;">
               <thead>
@@ -127,11 +125,10 @@
           <% else %>
             <p style="color: #666; padding: 15px;">Inventory empty</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {

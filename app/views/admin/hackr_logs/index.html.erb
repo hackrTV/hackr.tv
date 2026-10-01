@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/hackr_logs :: MANAGE LOGS</legend>
+<%= render TuiWindowComponent.new(title: "/root/hackr_logs :: MANAGE LOGS", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <!-- Flash Messages -->
@@ -26,7 +24,7 @@
 
       <!-- Logs Table -->
       <% if @logs.any? %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; margin-top: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -65,12 +63,11 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       <% else %>
         <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
           <p style="color: #666; font-size: 1.2em;">No log entries yet. Write your first one!</p>
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/handbook/articles :: ARTICLES</legend>
+<%= render TuiWindowComponent.new(title: "/root/handbook/articles :: ARTICLES", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -30,7 +28,7 @@
       </div>
 
       <% if @articles.any? %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -75,7 +73,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       <% else %>
         <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
           <p style="color: #666; font-size: 1.2em;">No handbook articles yet.</p>
@@ -86,5 +84,4 @@
         <%= tui_button "<- Admin Dashboard", admin_root_path, color: :cyan %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

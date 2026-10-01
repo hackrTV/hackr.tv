@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/transit_routes/<%= @route.slug %> :: TRANSIT ROUTE</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/transit_routes/#{@route.slug} :: TRANSIT ROUTE", variant: :admin, width: 1200) do %>
     <div style="padding: 20px;">
       <p><strong>Name:</strong> <%= @route.name %></p>
       <p><strong>Type:</strong> <%= @route.grid_transit_type.name %></p>
@@ -9,7 +7,7 @@
 
       <% if @stops.any? %>
         <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: STOPS ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -30,7 +28,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       <% end %>
 
       <div style="margin-top: 20px;">
@@ -38,5 +36,4 @@
         <%= tui_button "Back", admin_grid_transit_routes_path, style: "padding: 8px 20px; margin-left: 10px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

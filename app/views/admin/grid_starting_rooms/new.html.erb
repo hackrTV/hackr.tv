@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/starting_rooms/new :: NEW STARTING ROOM</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/starting_rooms/new :: NEW STARTING ROOM", variant: :admin, width: 1200) do %>
 
     <div style="padding: 20px;">
       <% if flash[:error] %>
@@ -13,5 +11,4 @@
         <%= render "form", f: f %>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

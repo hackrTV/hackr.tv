@@ -1,8 +1,6 @@
 <%= render "admin/shared/combobox" %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/breach-sandbox :: BREACH SANDBOX</legend>
+<%= render TuiWindowComponent.new(title: "/root/breach-sandbox :: BREACH SANDBOX", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:error] %>
@@ -22,7 +20,7 @@
       </div>
 
       <%# Hackr info %>
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px; margin-bottom: 20px;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px; margin-bottom: 20px;") do %>
         <span style="color: #888;">Hackr:</span>
         <span class="cyan-255-text" style="font-weight: bold;"><%= @hackr.hackr_alias %></span>
         <span style="color: #888;"> (CL <%= @hackr.stat("clearance") %>)</span>
@@ -43,11 +41,11 @@
           <br>
           <span class="red-255-text" style="font-weight: bold;">WARNING: Active BREACH in progress. Cannot start sandbox.</span>
         <% end %>
-      </div>
+      <% end %>
 
       <%# Template selector %>
       <%= form_with url: admin_grid_breach_sandbox_index_path(hackr_id: @hackr.id), method: :post, local: true, id: "sandbox-form" do %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
           <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">BREACH TEMPLATE</label>
 
           <input type="hidden" name="template_id" id="sandbox-template-id" value="">
@@ -61,15 +59,14 @@
           <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="sandbox-status">
             <%= @templates.size %> templates — start typing to filter
           </p>
-        </div>
+        <% end %>
 
         <div style="margin-top: 20px;">
           <%= tui_submit "START SANDBOX", color: :yellow, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start sandbox BREACH on #{@hackr.hackr_alias}?" } %>
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {

@@ -1,8 +1,6 @@
 <%= render "admin/shared/combobox" %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1100px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/missions :: NEW MISSION WIZARD</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/missions :: NEW MISSION WIZARD", variant: :admin, width: 1100) do %>
 
     <div style="padding: 20px;">
       <% if flash[:error] %>
@@ -374,8 +372,7 @@
 
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <style>
   .step-dot { background: #111; color: #555; transition: all 0.2s; }

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center"><%= @radio_station.name %></legend>
+<%= render TuiWindowComponent.new(title: "#{@radio_station.name}", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
@@ -10,9 +8,7 @@
         </span>
       </div>
 
-      <div class="tui-window purple-168 white-text" style="display: block; margin-bottom: 30px;">
-        <fieldset class="purple-168-border">
-          <legend>STATION DETAILS</legend>
+      <%= render TuiWindowComponent.new(title: "STATION DETAILS", variant: :plain, color: :purple, legend_class: nil, style: "margin-bottom: 30px;") do %>
           <div style="padding: 20px;">
             <table style="width: 100%; border-collapse: collapse;">
               <tr style="border-bottom: 1px solid #444;">
@@ -41,12 +37,9 @@
               </tr>
             </table>
           </div>
-        </fieldset>
-      </div>
+      <% end %>
 
-      <div class="tui-window green-168 white-text">
-        <fieldset class="green-168-border">
-          <legend class="cyan-255-text">PLAYLISTS (<%= @radio_station.playlists.count %>)</legend>
+      <%= render TuiWindowComponent.new(title: "PLAYLISTS (#{@radio_station.playlists.count})", variant: :plain, color: :green, legend_class: "cyan-255-text") do %>
           <div style="padding: 20px; background: #0a0a0a;">
             <% if @radio_station.playlists.any? %>
               <% @radio_station.radio_station_playlists.includes(:playlist).order(position: :asc).each do |rsp| %>
@@ -64,8 +57,6 @@
               Manage playlists via: <code style="color: #888;">data/playlists/key_playlists.yml</code>
             </p>
           </div>
-        </fieldset>
-      </div>
+      <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

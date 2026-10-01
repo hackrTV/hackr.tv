@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/hackr_missions :: HACKR MISSION LOG</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/hackr_missions :: HACKR MISSION LOG", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <%= form_with url: admin_grid_hackr_missions_path, method: :get, local: true, style: "display: flex; gap: 10px; align-items: center; margin-bottom: 20px;" do %>
@@ -20,7 +18,7 @@
         <p style="color: #fbbf24;">No hackr found with alias '<%= @hackr_alias_filter %>'.</p>
       <% end %>
 
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
         <table class="tui-table" style="width: 100%;">
           <thead>
             <tr>
@@ -58,11 +56,10 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
         <%= tui_button "<- Missions", admin_grid_missions_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

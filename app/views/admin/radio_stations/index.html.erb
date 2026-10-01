@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">RADIO STATIONS</legend>
+<%= render TuiWindowComponent.new(title: "RADIO STATIONS", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
@@ -11,16 +9,13 @@
       </div>
 
       <% if @radio_stations.empty? %>
-        <div class="tui-window yellow-168 white-text" style="display: block; margin: 20px 0;">
-          <fieldset class="yellow-168-border">
-            <legend>No Stations</legend>
+        <%= render TuiWindowComponent.new(title: "No Stations", variant: :plain, color: :yellow, legend_class: nil, style: "margin: 20px 0;") do %>
             <div style="padding: 20px; text-align: center;">
               No radio stations found. Add them to <code>data/system/radio_stations.yml</code> and run <code>rails data:radio_stations</code>.
             </div>
-          </fieldset>
-        </div>
+        <% end %>
       <% else %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr style="border-bottom: 2px solid #00ffff;">
@@ -45,8 +40,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/hackrs :: HACKR INSPECTOR</legend>
+<%= render TuiWindowComponent.new(title: "/root/hackrs :: HACKR INSPECTOR", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -24,7 +22,7 @@
       <style>
         .hackr-table td, .hackr-table th { padding: 6px 8px; }
       </style>
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
         <table class="tui-table hackr-table" style="width: 100%; border-spacing: 0 2px; border-collapse: separate;">
           <thead>
             <tr>
@@ -73,11 +71,10 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {

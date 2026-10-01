@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/hackrs/<%= @hackr.hackr_alias %>/mining_rig :: MINING RIG MANAGER</legend>
+<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias}/mining_rig :: MINING RIG MANAGER", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -27,7 +25,7 @@
       <%# === RIG STATUS === %>
       <div style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RIG STATUS ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;">
             <div><span style="color: #888;">Active:</span>
               <span style="color: <%= @rig.active? ? '#34d399' : '#f87171' %>; font-weight: bold;"><%= @rig.active? ? "ACTIVE" : "INACTIVE" %></span>
@@ -60,13 +58,13 @@
               <%= tui_button_to "Force Activate", force_activate_rig_admin_grid_hackr_path(@hackr), method: :post, color: :green, style: "padding: 6px 14px;", form: { data: { turbo_confirm: "Force-activate #{@hackr.hackr_alias}'s mining rig? (bypasses functional check)" } } %>
             <% end %>
           </div>
-        </div>
+        <% end %>
       </div>
 
       <%# === SLOT BREAKDOWN === %>
       <div style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SLOT BREAKDOWN ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -98,14 +96,14 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       </div>
 
       <%# === INSTALLED COMPONENTS === %>
       <div style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: INSTALLED COMPONENTS (<%= @components.size %>) ::]</h3>
         <% if @components.any? %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -130,7 +128,7 @@
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         <% else %>
           <div style="padding: 30px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
             <p style="color: #666;">No components installed</p>
@@ -141,7 +139,7 @@
       <%# === FORCE INSTALL === %>
       <div style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: FORCE INSTALL COMPONENT ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <% if @inventory_components.any? %>
             <%= form_with url: force_install_component_admin_grid_hackr_path(@hackr), method: :post, local: true, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do |f| %>
               <div>
@@ -160,12 +158,11 @@
           <% else %>
             <p style="color: #666;">No rig components available in hackr's inventory.</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
         <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

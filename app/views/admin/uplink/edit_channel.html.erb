@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 800px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/uplink/channels/<%= @channel.slug %> :: EDIT CHANNEL</legend>
+<%= render TuiWindowComponent.new(title: "/root/uplink/channels/#{@channel.slug} :: EDIT CHANNEL", variant: :admin, width: 800) do %>
 
     <div style="padding: 20px;">
       <!-- Flash Messages -->
@@ -62,5 +60,4 @@
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,0 +1,12 @@
+<%= tag.div(**root_options) do %>
+  <% if fieldset? %>
+    <fieldset <%= tag.attributes(class: fieldset_classes) if fieldset_classes %>>
+      <% if title %>
+        <legend <%= tag.attributes(class: legend_class) if legend_class %>><%= title %></legend>
+      <% end %>
+      <%= content %>
+    </fieldset>
+  <% else %>
+    <%= content %>
+  <% end %>
+<% end %>

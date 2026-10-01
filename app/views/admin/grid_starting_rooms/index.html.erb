@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/starting_rooms :: STARTING ROOMS</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/starting_rooms :: STARTING ROOMS", variant: :admin, width: 1200) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -18,7 +16,7 @@
         <%= tui_button "+ New Starting Room", new_admin_grid_starting_room_path, color: :green %>
       </div>
 
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a; overflow-x: auto;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
         <table class="tui-table" style="width: 100%; min-width: 800px;">
           <thead>
             <tr>
@@ -53,11 +51,10 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
       <% if @starting_rooms.empty? %>
         <p style="color: #6b7280; text-align: center; padding: 20px;">No starting rooms configured. New hackrs completing the tutorial will stay in their current room.</p>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

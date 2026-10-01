@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/zone_playlists/<%= @zone_playlist.slug %> :: <%= @zone_playlist.name.upcase %></legend>
+<%= render TuiWindowComponent.new(title: "/root/zone_playlists/#{@zone_playlist.slug} :: #{@zone_playlist.name.upcase}", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <!-- Navigation -->
@@ -12,7 +10,7 @@
       </div>
 
       <!-- Playlist Details -->
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a; margin-bottom: 20px; padding: 20px;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-bottom: 20px; padding: 20px;") do %>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
           <div>
             <p style="color: #888; margin-bottom: 5px;">SLUG</p>
@@ -35,14 +33,14 @@
             <p class="cyan-255-text"><%= @tracks.count %> tracks</p>
           </div>
         </div>
-      </div>
+      <% end %>
 
       <!-- Current Tracks -->
       <div style="margin-bottom: 30px;">
         <h3 style="color: #ccc; margin-bottom: 15px;">TRACKS</h3>
 
         <% if @tracks.any? %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -66,7 +64,7 @@
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         <% else %>
           <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
             <p style="color: #666; font-size: 1.2em;">No tracks in this playlist.</p>
@@ -74,5 +72,4 @@
         <% end %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

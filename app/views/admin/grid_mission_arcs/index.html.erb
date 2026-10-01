@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/mission_arcs :: MISSION ARCS</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/mission_arcs :: MISSION ARCS", variant: :admin, width: 1200) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -19,7 +17,7 @@
         <%= tui_button "+ New Arc", new_admin_grid_mission_arc_path, color: :green %>
       </div>
 
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
         <table class="tui-table" style="width: 100%;">
           <thead>
             <tr>
@@ -54,12 +52,11 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
         <%= tui_button "<- Grid Admin", admin_grid_path, color: :green %>
         <%= tui_button "Missions", admin_grid_missions_path, style: "margin-left: 10px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

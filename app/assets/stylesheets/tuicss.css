@@ -1889,3 +1889,17 @@ select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
   margin-top: 6px;
   color: rgb(255, 0, 0);
 }
+
+/* TuiWindowComponent layout variants (Phase 2 CS4). --page centers a page
+   wrapper; --panel is an inner block. Widths vary per call site (max-width
+   inline via the component's width: option). */
+.tui-window--page {
+  display: block;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.tui-window--panel {
+  display: block;
+  background: #0a0a0a;
+}

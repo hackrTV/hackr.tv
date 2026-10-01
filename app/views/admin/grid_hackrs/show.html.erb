@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/hackrs/<%= @hackr.hackr_alias %> :: HACKR INSPECTOR</legend>
+<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias} :: HACKR INSPECTOR", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -46,7 +44,7 @@
       <%# === IDENTITY === %>
       <div id="identity" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: IDENTITY ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
             <div><span style="color: #888;">ID:</span> <span class="white-text"><%= @hackr.id %></span></div>
             <div><span style="color: #888;">Alias:</span> <span class="cyan-255-text" style="font-weight: bold;"><%= @hackr.hackr_alias %></span></div>
@@ -59,13 +57,13 @@
             <div><span style="color: #888;">2FA:</span> <span style="color: <%= @hackr.otp_required_for_login? ? '#34d399' : '#666' %>;"><%= @hackr.otp_required_for_login? ? "ENABLED" : "off" %></span></div>
             <div><span style="color: #888;">Login:</span> <span style="color: <%= @hackr.login_disabled? ? '#f87171' : '#34d399' %>;"><%= @hackr.login_disabled? ? "DISABLED" : "enabled" %></span></div>
           </div>
-        </div>
+        <% end %>
       </div>
 
       <%# === VITALS === %>
       <div id="vitals" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: VITALS ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
             <% %w[health energy psyche].each do |vital| %>
               <% val = @stats[vital].to_i %>
@@ -87,13 +85,13 @@
             <div><span style="color: #888;">Inspiration:</span> <span class="white-text"><%= @stats["inspiration"] %></span></div>
             <div><span style="color: #888;">Bonus Inv Slots:</span> <span class="white-text"><%= @stats["bonus_inventory_slots"] %></span></div>
           </div>
-        </div>
+        <% end %>
       </div>
 
       <%# === LOCATION === %>
       <div id="location" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: LOCATION ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <% room = @hackr.current_room %>
           <% if room %>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
@@ -112,13 +110,13 @@
               <span class="yellow-255-text"><%= @hackr.stat("facility_alert_level") %></span>
             </div>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <%# === ECONOMY === %>
       <div id="economy" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ECONOMY ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <% if @cache %>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
               <div><span style="color: #888;">CRED Balance:</span> <span class="green-255-text" style="font-weight: bold;"><%= @cred_balance %></span></div>
@@ -143,13 +141,13 @@
               <%= tui_button "View Impounds →", admin_grid_impound_records_path(hackr_alias: @hackr.hackr_alias), color: :yellow, style: "padding: 3px 10px; margin-left: 8px; font-size: 0.85em;" %>
             </div>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <%# === BREACH === %>
       <div id="breach" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ACTIVE BREACH ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <% if @active_breach %>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
               <div><span style="color: #888;">Template:</span> <span class="cyan-255-text"><%= @active_breach.grid_breach_template&.name || "—" %></span></div>
@@ -170,13 +168,13 @@
           <% else %>
             <p style="color: #666;">No active breach</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <%# === LOADOUT === %>
       <div id="loadout" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: LOADOUT ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px;">
             <% GridHackr::Loadout::GEAR_SLOT_LABELS.each do |slot, label| %>
               <% item = @loadout[slot] %>
@@ -190,13 +188,13 @@
               </div>
             <% end %>
           </div>
-        </div>
+        <% end %>
       </div>
 
       <%# === INVENTORY === %>
       <div id="inventory" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: INVENTORY (<%= @inventory.size %> / <%= @hackr.inventory_capacity %>) ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <% if @inventory.any? %>
             <table class="tui-table" style="width: 100%;">
               <thead>
@@ -223,13 +221,13 @@
           <% else %>
             <p style="color: #666; padding: 15px;">Inventory empty</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <%# === MINING RIG === %>
       <div id="mining" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: MINING RIG ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <% if @mining_rig %>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
               <div><span style="color: #888;">Status:</span> <span style="color: <%= @mining_rig.active? ? '#34d399' : '#f87171' %>;"><%= @mining_rig.active? ? "ACTIVE" : "INACTIVE" %></span></div>
@@ -251,13 +249,13 @@
           <% else %>
             <p style="color: #666;">No mining rig provisioned</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <%# === REPUTATION === %>
       <div id="reputation" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: FACTION REPUTATION ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <% if @reputations.any? %>
             <table class="tui-table" style="width: 100%;">
               <thead>
@@ -280,13 +278,13 @@
           <% else %>
             <p style="color: #666; padding: 15px;">No faction reputation records</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <%# === MISSIONS === %>
       <div id="missions" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ACTIVE MISSIONS (<%= @active_missions.size %>) ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <% if @active_missions.any? %>
             <table class="tui-table" style="width: 100%;">
               <thead>
@@ -309,13 +307,13 @@
           <% else %>
             <p style="color: #666; padding: 15px;">No active missions</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <%# === FEATURE GRANTS === %>
       <div id="features" style="margin-bottom: 30px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: FEATURE GRANTS ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
           <% if @feature_grants.any? %>
             <% @feature_grants.each do |grant| %>
               <span style="display: inline-block; padding: 4px 10px; margin: 3px; border: 1px solid #333; color: #fbbf24;"><%= grant.feature %></span>
@@ -323,8 +321,7 @@
           <% else %>
             <p style="color: #666;">No feature grants (admin role has all features)</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

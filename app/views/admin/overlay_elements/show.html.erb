@@ -1,8 +1,6 @@
 <% content_for(:title) { "/root/overlays/elements/#{@element.slug} :: Element Details" } %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/overlays/elements/<%= @element.slug %> :: ELEMENT DETAILS</legend>
+<%= render TuiWindowComponent.new(title: "/root/overlays/elements/#{@element.slug} :: ELEMENT DETAILS", variant: :admin, width: 900) do %>
 
     <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
       <%= tui_button "< Back to Elements", admin_overlay_elements_path, color: :green %>
@@ -63,5 +61,4 @@
       <% end %>
     </div>
 
-  </fieldset>
-</div>
+<% end %>

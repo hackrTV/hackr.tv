@@ -1,13 +1,11 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid_economy :: CRED ECONOMY</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid_economy :: CRED ECONOMY", variant: :admin) do %>
 
     <div style="padding: 20px;">
 
       <!-- Supply Overview -->
       <div style="margin-bottom: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SUPPLY OVERVIEW ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
           <table style="width: 100%; font-family: monospace;">
             <tr>
               <td style="color: #fbbf24; padding: 4px 10px;">Total Supply:</td>
@@ -34,14 +32,14 @@
               <td class="purple-168-text"><%= format_cred(@supply[:total_redeemed]) %></td>
             </tr>
           </table>
-        </div>
+        <% end %>
       </div>
 
       <% if @flagged_ips.any? %>
         <!-- Anti-Abuse Flags -->
         <div style="margin-bottom: 40px;">
           <h3 class="red-255-text" style="margin-bottom: 15px;">[:: ANTI-ABUSE FLAGS ::]</h3>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -58,14 +56,14 @@
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         </div>
       <% end %>
 
       <!-- All Caches -->
       <div style="margin-bottom: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: CACHES (<%= @caches.count %>) ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -104,14 +102,14 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       </div>
 
       <!-- Active Mining Rigs -->
       <div style="margin-bottom: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ACTIVE MINING RIGS (<%= @active_rigs.count %>) ::]</h3>
         <% if @active_rigs.any? %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -136,7 +134,7 @@
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         <% else %>
           <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
             <p style="color: #666;">No active mining rigs</p>
@@ -153,7 +151,7 @@
           </span>
         </h3>
         <% if @recent_transactions.any? %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -191,7 +189,7 @@
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         <% else %>
           <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
             <p style="color: #666;">No transactions yet. Run <code>rails data:economy</code> to seed genesis.</p>
@@ -205,5 +203,4 @@
         <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

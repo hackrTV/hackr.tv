@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/achievements :: ACHIEVEMENT DEFINITIONS</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/achievements :: ACHIEVEMENT DEFINITIONS", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -29,7 +27,7 @@
         <% end %>
       </div>
 
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
         <table class="tui-table" style="width: 100%;">
           <thead>
             <tr>
@@ -73,12 +71,12 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
       <!-- Manual Award Section -->
       <div style="margin-top: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: MANUAL AWARD ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
           <% @achievements.select { |a| a.trigger_type == "manual" }.each do |achievement| %>
             <%= form_with url: award_admin_grid_achievement_path(achievement), method: :post, local: true, style: "display: inline-flex; gap: 10px; align-items: center; margin-bottom: 10px;" do %>
               <span class="cyan-255-text" style="min-width: 200px;"><%= achievement.badge_icon %> <%= achievement.name %></span>
@@ -89,12 +87,11 @@
           <% unless @achievements.any? { |a| a.trigger_type == "manual" } %>
             <p style="color: #666;">No manual achievements defined. Create one with trigger_type "manual" to award here.</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
         <%= tui_button "<- Grid Admin", admin_grid_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1600px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/uplink/moderation_log :: AUDIT TRAIL</legend>
+<%= render TuiWindowComponent.new(title: "/root/uplink/moderation_log :: AUDIT TRAIL", variant: :admin, width: 1600) do %>
 
     <div style="padding: 20px;">
       <!-- Navigation -->
@@ -42,7 +40,7 @@
 
       <!-- Logs Table -->
       <% if @logs.any? %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -105,12 +103,11 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       <% else %>
         <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
           <p style="color: #666; font-size: 1.2em;">No moderation logs found.</p>
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/history :: <%= @model_name.upcase %> VERSION HISTORY</legend>
+<%= render TuiWindowComponent.new(title: "/root/history :: #{@model_name.upcase} VERSION HISTORY", variant: :admin, width: 1200) do %>
 
     <div style="padding: 20px;">
       <div style="margin-bottom: 20px;">
@@ -15,7 +13,7 @@
           No version history recorded for this record.
         </div>
       <% else %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -94,7 +92,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       <% end %>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; display: flex; gap: 10px;">
@@ -102,5 +100,4 @@
         <%= tui_button "Edit", url_for(action: :edit, id: @record), color: :cyan %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

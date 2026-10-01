@@ -1,6 +1,4 @@
-<div class="tui-window cyan-168 white-text" style="max-width: 600px; margin: 50px auto;">
-  <fieldset class="cyan-168-border">
-    <legend class="center">THE PULSE GRID :: ACCESS</legend>
+<%= render TuiWindowComponent.new(title: "THE PULSE GRID :: ACCESS", variant: :plain, width: 600, color: :cyan, style: "margin: 50px auto;") do %>
 
     <% if flash[:error] %>
       <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0; border-radius: 4px;">
@@ -45,5 +43,4 @@
       <p class="white-text" style="margin-bottom: 10px;">NEW TO THE RESISTANCE?</p>
       <%= tui_button "REGISTER AS HACKR", grid_register_path, color: :green %>
     </div>
-  </fieldset>
-</div>
+<% end %>

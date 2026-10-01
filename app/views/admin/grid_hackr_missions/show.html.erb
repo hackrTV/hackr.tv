@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1000px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/hackr_missions/<%= @hackr_mission.id %> :: HACKR MISSION</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/hackr_missions/#{@hackr_mission.id} :: HACKR MISSION", variant: :admin, width: 1000) do %>
 
     <div style="padding: 20px;">
       <h3 class="cyan-255-text"><%= @hackr_mission.grid_mission.name %></h3>
@@ -50,5 +48,4 @@
         <%= tui_button "<- Hackr Missions", admin_grid_hackr_missions_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

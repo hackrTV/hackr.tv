@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/transit_journeys/<%= @journey.id %> :: TRANSIT JOURNEY</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/transit_journeys/#{@journey.id} :: TRANSIT JOURNEY", variant: :admin, width: 1200) do %>
     <div style="padding: 20px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div>
@@ -43,5 +41,4 @@
         <%= tui_button "Back", admin_grid_transit_journeys_path, style: "padding: 8px 20px; margin-left: 10px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/factions :: FACTION DEFINITIONS</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/factions :: FACTION DEFINITIONS", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -21,7 +19,7 @@
         <%= tui_button "Hackr Reps →", admin_grid_hackr_reputations_path, style: "margin-left: 8px;" %>
       </div>
 
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
         <table class="tui-table" style="width: 100%;">
           <thead>
             <tr>
@@ -52,7 +50,7 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
       <!-- Rep Link Graph -->
       <div style="margin-top: 40px;">
@@ -60,7 +58,7 @@
         <p style="color: #888; margin-bottom: 15px;">Directed edges: adjusting <b>source</b> rep shifts computed rep for <b>target</b> by <code>weight × source_value</code>. Leave a row blank to delete it on save.</p>
 
         <%= form_with url: update_rep_links_admin_grid_factions_path, method: :post, local: true do %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
             <table class="tui-table" style="width: 100%;">
               <thead>
                 <tr>
@@ -97,7 +95,7 @@
             <div style="margin-top: 15px;">
               <%= tui_submit "Save Rep Links", color: :green, style: "padding: 8px 16px; font-weight: bold;" %>
             </div>
-          </div>
+          <% end %>
         <% end %>
       </div>
 
@@ -105,5 +103,4 @@
         <%= tui_button "← Grid Admin", admin_grid_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

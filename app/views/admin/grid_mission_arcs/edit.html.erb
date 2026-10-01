@@ -1,10 +1,7 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/mission_arcs/<%= @arc.slug %> :: EDIT ARC</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/mission_arcs/#{@arc.slug} :: EDIT ARC", variant: :admin, width: 900) do %>
     <div style="padding: 20px;">
       <%= form_with model: @arc, url: admin_grid_mission_arc_path(@arc), local: true do |f| %>
         <%= render "form", f: f %>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>
