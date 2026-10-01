@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid_transactions :: TRANSACTION LOG</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid_transactions :: TRANSACTION LOG", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <%# Filter form %>
@@ -46,7 +44,7 @@
       <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TRANSACTIONS (<%= @total_count %> total, showing <%= @offset + 1 %>–<%= [@offset + @per_page, @total_count].min %>) ::]</h3>
 
       <% if @transactions.any? %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -95,7 +93,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
 
         <%# Pagination %>
         <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
@@ -120,5 +118,4 @@
         <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

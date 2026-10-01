@@ -1,18 +1,13 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/mobs/<%= @mob.id %> :: EDIT MOB</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/mobs/#{@mob.id} :: EDIT MOB", variant: :admin, width: 900) do %>
     <div style="padding: 20px;">
       <%= form_with model: [:admin, @mob], url: admin_grid_mob_path(@mob), local: true do |f| %>
         <%= render "form", f: f %>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <% if @mob.vendor? %>
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 900px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/mobs/<%= @mob.id %>/listings :: SHOP LISTINGS</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/mobs/#{@mob.id}/listings :: SHOP LISTINGS", variant: :admin, width: 900) do %>
     <div style="padding: 20px;">
       <% if @listings.any? %>
         <table class="tui-table" style="width: 100%; margin-bottom: 20px;">
@@ -87,6 +82,5 @@
         <%= tui_button "Full Listing Manager →", admin_grid_shop_listings_path(mob_id: @mob.id), style: "padding: 6px 14px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>
 <% end %>

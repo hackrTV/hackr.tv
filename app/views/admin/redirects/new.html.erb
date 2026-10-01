@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 800px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/redirects/new :: NEW REDIRECT</legend>
+<%= render TuiWindowComponent.new(title: "/root/redirects/new :: NEW REDIRECT", variant: :admin, width: 800) do %>
 
     <div style="padding: 20px;">
       <div style="margin-bottom: 20px;">
@@ -9,5 +7,4 @@
 
       <%= render "form", redirect: @redirect %>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/hackrs/<%= @hackr.hackr_alias %>/stats :: STAT EDITOR</legend>
+<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias}/stats :: STAT EDITOR", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:error] %>
@@ -22,7 +20,7 @@
       <div id="fields-mode">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STAT FIELDS ::]</h3>
         <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true do %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
 
               <%# Vitals %>
@@ -83,7 +81,7 @@
                 <span style="color: #888;">(unchecking clears containment state)</span>
               </label>
             </div>
-          </div>
+          <% end %>
 
           <div style="margin-top: 20px;">
             <%= tui_submit "WRITE STATS", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Overwrite stats for #{@hackr.hackr_alias}?" } %>
@@ -96,16 +94,15 @@
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RAW JSON ::]</h3>
         <p style="color: #888; margin-bottom: 10px;">Full stats JSON. Replaces entire stats column.</p>
         <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true do %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
             <textarea name="raw_json" class="tui-input"
               style="width: 100%; min-height: 200px; padding: 10px; font-family: monospace; font-size: 0.9em;"
             ><%= JSON.pretty_generate(@hackr.current_stats) %></textarea>
-          </div>
+          <% end %>
           <div style="margin-top: 15px;">
             <%= tui_submit "WRITE RAW JSON", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Replace ALL stats for #{@hackr.hackr_alias} with raw JSON?" } %>
           </div>
         <% end %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

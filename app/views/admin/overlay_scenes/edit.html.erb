@@ -1,8 +1,6 @@
 <% content_for(:title) { "/root/overlays/scenes/#{@scene.slug} :: Edit Scene" } %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1100px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/overlays/scenes/<%= @scene.slug %> :: EDIT SCENE</legend>
+<%= render TuiWindowComponent.new(title: "/root/overlays/scenes/#{@scene.slug} :: EDIT SCENE", variant: :admin, width: 1100) do %>
 
     <% if flash[:success] %>
       <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
@@ -103,5 +101,4 @@
         </div>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

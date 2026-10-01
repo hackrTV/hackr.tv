@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/data_audit :: RED FLAGS</legend>
+<%= render TuiWindowComponent.new(title: "/root/data_audit :: RED FLAGS", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -84,7 +82,7 @@
 
       <% if @flags.any? %>
         <style>.audit-flags-table tbody tr td, .audit-flags-table thead tr th { padding: 8px 10px; }</style>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table audit-flags-table" style="width: 100%;">
             <thead>
               <tr>
@@ -157,7 +155,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
 
         <%# Pagination %>
         <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
@@ -181,5 +179,4 @@
         <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

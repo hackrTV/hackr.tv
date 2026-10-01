@@ -1,8 +1,6 @@
 <%= render "admin/shared/combobox" %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/pac-escape-tester :: PAC ESCAPE TESTER</legend>
+<%= render TuiWindowComponent.new(title: "/root/pac-escape-tester :: PAC ESCAPE TESTER", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:error] %>
@@ -25,7 +23,7 @@
 
       <%= form_with url: admin_grid_pac_escape_tester_path, method: :post, local: true, id: "pac-tester-form" do %>
         <%# Hackr selector %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px; margin-bottom: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px; margin-bottom: 20px;") do %>
           <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">HACKR</label>
 
           <input type="hidden" name="hackr_id" id="hackr-id" value="<%= @hackr&.id %>">
@@ -44,11 +42,11 @@
               <%= @hackrs.size %> hackrs — start typing to filter
             <% end %>
           </p>
-        </div>
+        <% end %>
 
         <%# Hackr info (shown when pre-selected) %>
         <% if @hackr %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 15px; margin-bottom: 20px;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px; margin-bottom: 20px;") do %>
             <span style="color: #888;">Hackr:</span>
             <span class="cyan-255-text" style="font-weight: bold;"><%= @hackr.hackr_alias %></span>
             <span style="color: #888;"> (CL <%= @hackr.stat("clearance") %>)</span>
@@ -69,26 +67,25 @@
               <br>
               <span class="red-255-text" style="font-weight: bold;">WARNING: Already captured in PAC.</span>
             <% end %>
-          </div>
+          <% end %>
         <% end %>
 
         <%# Options %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px; margin-bottom: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px; margin-bottom: 20px;") do %>
           <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">OPTIONS</label>
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="checkbox" name="impound" value="1" style="width: 16px; height: 16px; accent-color: #f87171;">
             <span style="color: #f87171;">Impound equipped gear</span>
             <span style="color: #666; font-size: 0.85em;"> — confiscate loadout on capture (tests impound recovery / bribe forfeit)</span>
           </label>
-        </div>
+        <% end %>
 
         <div style="margin-top: 20px;">
           <%= tui_submit "CAPTURE INTO PAC", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Force-capture hackr into PAC? (State will be restored on End Test)" } %>
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {

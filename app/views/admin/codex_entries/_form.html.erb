@@ -1,4 +1,4 @@
-<div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+<%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
   <% if @entry.errors.any? %>
     <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
       <p class="red-255-text"><%= @entry.errors.full_messages.join(", ") %></p>
@@ -48,4 +48,4 @@
       <%= tui_button "History", history_admin_codex_entry_path(@entry), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
     <% end %>
   </div>
-</div>
+<% end %>

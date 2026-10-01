@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/slipstream_routes/<%= @route.slug %> :: SLIPSTREAM ROUTE</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/slipstream_routes/#{@route.slug} :: SLIPSTREAM ROUTE", variant: :admin, width: 1200) do %>
     <div style="padding: 20px;">
       <p><strong>Name:</strong> <%= @route.name %></p>
       <p><strong>Origin:</strong> <%= @route.origin_region.name %> &rarr; <strong>Destination:</strong> <%= @route.destination_region.name %></p>
@@ -28,5 +26,4 @@
         <%= tui_button "Back", admin_grid_slipstream_routes_path, style: "padding: 8px 20px; margin-left: 10px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

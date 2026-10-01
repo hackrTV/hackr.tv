@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/releases/new :: NEW RELEASE</legend>
+<%= render TuiWindowComponent.new(title: "/root/releases/new :: NEW RELEASE", variant: :admin, width: 1200) do %>
 
     <div style="padding: 20px;">
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -9,5 +7,4 @@
 
       <%= render "form", release: @release %>
     </div>
-  </fieldset>
-</div>
+<% end %>

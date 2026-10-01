@@ -2,9 +2,7 @@
 <% total_articles = @articles_by_section.values.sum(&:size) %>
 
 <%= render layout: "handbook_chrome", locals: {} do %>
-  <div class="tui-window cyan-168 white-text">
-    <fieldset class="cyan-168-border">
-      <legend class="center">HACKR HANDBOOK</legend>
+  <%= render TuiWindowComponent.new(title: "HACKR HANDBOOK", variant: :plain, color: :cyan) do %>
       <div class="hb-panel">
         <h1 class="hb-h1">Operator's Field Manual</h1>
         <p class="hb-intro">
@@ -58,6 +56,5 @@
           <% end %>
         </div>
       </div>
-    </fieldset>
-  </div>
+  <% end %>
 <% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/reputation_events :: REP LOG</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/reputation_events :: REP LOG", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <!-- Filters -->
@@ -27,7 +25,7 @@
         <p class="yellow-168-text" style="margin-bottom: 15px;">No hackr found with alias '<%= params[:hackr_alias] %>'.</p>
       <% end %>
 
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
         <table class="tui-table" style="width: 100%;">
           <thead>
             <tr>
@@ -63,7 +61,7 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
       <p style="color: #666; margin-top: 10px;">Showing most recent <%= [Admin::GridReputationEventsController::PAGE_SIZE, @events.size].min %> events.</p>
 
@@ -72,5 +70,4 @@
         <%= tui_button "Hackr Reps →", admin_grid_hackr_reputations_path, style: "margin-left: 8px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

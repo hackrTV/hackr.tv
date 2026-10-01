@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/error_groups/<%= @error_group.id %> :: ERROR DETAIL</legend>
+<%= render TuiWindowComponent.new(title: "/root/error_groups/#{@error_group.id} :: ERROR DETAIL", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <%# Group summary %>
@@ -145,5 +143,4 @@
         <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -2,14 +2,11 @@
 
 <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
   <div class="codex-entry-wrap">
-    <div class="tui-window red-168 white-text">
-      <fieldset class="red-168-border">
-        <legend class="center">ERROR</legend>
+    <%= render TuiWindowComponent.new(title: "ERROR", variant: :plain, color: :red) do %>
         <div class="codex-error-body">
           <p>Codex entry not found</p>
           <%= tui_button "← Back to Codex", codex_path, color: :cyan %>
         </div>
-      </fieldset>
-    </div>
+    <% end %>
   </div>
 <% end %>

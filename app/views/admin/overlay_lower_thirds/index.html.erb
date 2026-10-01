@@ -1,8 +1,6 @@
 <% content_for(:title) { "/root/overlays/lower-thirds :: Manage Lower Thirds" } %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/overlays/lower-thirds :: LOWER THIRD MANAGEMENT</legend>
+<%= render TuiWindowComponent.new(title: "/root/overlays/lower-thirds :: LOWER THIRD MANAGEMENT", variant: :admin, width: 1200) do %>
 
     <% if flash[:success] %>
       <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
@@ -57,5 +55,4 @@
       </tbody>
     </table>
 
-  </fieldset>
-</div>
+<% end %>

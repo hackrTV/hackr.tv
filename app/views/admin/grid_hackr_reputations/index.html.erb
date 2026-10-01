@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/reputations :: HACKR STANDINGS</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/reputations :: HACKR STANDINGS", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -36,7 +34,7 @@
       <% end %>
 
       <!-- Listing -->
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
         <table class="tui-table" style="width: 100%;">
           <thead>
             <tr>
@@ -62,12 +60,12 @@
             <% end %>
           </tbody>
         </table>
-      </div>
+      <% end %>
 
       <!-- Manual Adjust -->
       <div style="margin-top: 40px;">
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: MANUAL ADJUST ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
           <%= form_with url: adjust_admin_grid_hackr_reputations_path, method: :post, local: true do %>
             <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
               <div>
@@ -94,7 +92,7 @@
               <%= tui_submit "Apply", color: :green, style: "padding: 6px 16px;" %>
             </div>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
@@ -102,5 +100,4 @@
         <%= tui_button "Rep Log →", admin_grid_reputation_events_path, style: "margin-left: 8px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

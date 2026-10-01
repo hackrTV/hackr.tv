@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/mobs :: MANAGE GRID MOBS</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/mobs :: MANAGE GRID MOBS", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -24,7 +22,7 @@
       </div>
 
       <% if @mobs.any? %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a; overflow-x: auto;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
           <table id="mob-table" class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -54,7 +52,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
 
         <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
           <%= @mobs.count %> mobs
@@ -65,8 +63,7 @@
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {

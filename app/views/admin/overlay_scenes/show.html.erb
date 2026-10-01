@@ -1,8 +1,6 @@
 <% content_for(:title) { "/root/overlays/scenes/#{@scene.slug} :: Scene Details" } %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1000px; margin: 30px auto;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/overlays/scenes/<%= @scene.slug %> :: SCENE DETAILS</legend>
+<%= render TuiWindowComponent.new(title: "/root/overlays/scenes/#{@scene.slug} :: SCENE DETAILS", variant: :admin, width: 1000) do %>
 
     <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
       <%= tui_button "< Back to Scenes", admin_overlay_scenes_path, color: :green %>
@@ -77,5 +75,4 @@
       <% end %>
     </div>
 
-  </fieldset>
-</div>
+<% end %>

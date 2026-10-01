@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/error_groups :: ERROR TRACKER</legend>
+<%= render TuiWindowComponent.new(title: "/root/error_groups :: ERROR TRACKER", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:success] %>
@@ -48,7 +46,7 @@
 
       <% if @error_groups.any? %>
         <style>.error-groups-table tbody tr td, .error-groups-table thead tr th { padding: 8px 10px; }</style>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table error-groups-table" style="width: 100%;">
             <thead>
               <tr>
@@ -107,7 +105,7 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
 
         <%# Pagination %>
         <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
@@ -131,5 +129,4 @@
         <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

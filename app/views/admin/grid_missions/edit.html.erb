@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/grid/missions/<%= @mission.slug %> :: EDIT MISSION</legend>
+<%= render TuiWindowComponent.new(title: "/root/grid/missions/#{@mission.slug} :: EDIT MISSION", variant: :admin, width: 1200) do %>
     <div style="padding: 20px;">
       <%= form_with model: @mission, url: admin_grid_mission_path(@mission), local: true do |f| %>
         <%= render "form", f: f %>
@@ -11,5 +9,4 @@
         <%= tui_button_to "Delete Mission", admin_grid_mission_path(@mission), method: :delete, color: :red, style: "padding: 6px 14px;", data: { confirm: "Delete mission '#{@mission.name}'? This will also delete all objectives, rewards, and player progress." } %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/handbook/articles :: EDIT "<%= @article.title %>"</legend>
+<%= render TuiWindowComponent.new(title: %(/root/handbook/articles :: EDIT "#{@article.title}"), variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:error] %>
@@ -11,5 +9,4 @@
 
       <%= render "form", article: @article %>
     </div>
-  </fieldset>
-</div>
+<% end %>

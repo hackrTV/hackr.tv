@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/breach-sandbox/<%= @breach.id %> :: SANDBOX TERMINAL</legend>
+<%= render TuiWindowComponent.new(title: "/root/breach-sandbox/#{@breach.id} :: SANDBOX TERMINAL", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <%# Banner %>
@@ -48,8 +46,7 @@
         <%= tui_button "New Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 8px 16px;" %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {

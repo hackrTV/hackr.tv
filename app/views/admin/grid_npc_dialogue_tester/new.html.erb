@@ -1,8 +1,6 @@
 <%= render "admin/shared/combobox" %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/npc-dialogue-tester :: NPC DIALOGUE TESTER</legend>
+<%= render TuiWindowComponent.new(title: "/root/npc-dialogue-tester :: NPC DIALOGUE TESTER", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <% if flash[:error] %>
@@ -27,7 +25,7 @@
       <%= form_with url: admin_grid_npc_dialogue_tester_path, method: :post, local: true, id: "tester-form" do %>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           <%# Hackr selector %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
             <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">HACKR</label>
 
             <input type="hidden" name="hackr_id" id="hackr-id" value="<%= @hackr&.id %>">
@@ -46,10 +44,10 @@
                 <%= @hackrs.size %> hackrs — start typing to filter
               <% end %>
             </p>
-          </div>
+          <% end %>
 
           <%# Mob selector %>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
             <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">NPC (MOB)</label>
 
             <input type="hidden" name="mob_id" id="mob-id" value="<%= @mob&.id %>">
@@ -68,7 +66,7 @@
                 <%= @mobs.size %> mobs — start typing to filter
               <% end %>
             </p>
-          </div>
+          <% end %>
         </div>
 
         <div style="margin-top: 20px;">
@@ -76,8 +74,7 @@
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {

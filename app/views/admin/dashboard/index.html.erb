@@ -1,82 +1,56 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root :: ADMIN DASHBOARD</legend>
+<%= render TuiWindowComponent.new(title: "/root :: ADMIN DASHBOARD", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <!-- Quick Stats -->
       <h2 class="cyan-255-text" style="margin-bottom: 20px;">[:: SYSTEM STATS ::]</h2>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
-        <div class="tui-window green-168 white-text">
-          <fieldset class="green-168-border">
-            <legend>Online Hackrs</legend>
+        <%= render TuiWindowComponent.new(title: "Online Hackrs", variant: :plain, color: :green, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:online_hackrs_count] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
 
-        <div class="tui-window yellow-168 white-text">
-          <fieldset class="yellow-168-border">
-            <legend>Total Emails Sent</legend>
+        <%= render TuiWindowComponent.new(title: "Total Emails Sent", variant: :plain, color: :yellow, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:total_emails_sent] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
 
-        <div class="tui-window yellow-168 white-text">
-          <fieldset class="yellow-168-border">
-            <legend>Emails Sent (30d)</legend>
+        <%= render TuiWindowComponent.new(title: "Emails Sent (30d)", variant: :plain, color: :yellow, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:emails_sent_30d] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
 
-        <div class="tui-window yellow-168 white-text">
-          <fieldset class="yellow-168-border">
-            <legend>Emails Sent (24h)</legend>
+        <%= render TuiWindowComponent.new(title: "Emails Sent (24h)", variant: :plain, color: :yellow, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:emails_sent_24h] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
 
-        <div class="tui-window purple-168 white-text">
-          <fieldset class="purple-168-border">
-            <legend>Artists</legend>
+        <%= render TuiWindowComponent.new(title: "Artists", variant: :plain, color: :purple, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:artists_count] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
 
-        <div class="tui-window purple-168 white-text">
-          <fieldset class="purple-168-border">
-            <legend>Tracks</legend>
+        <%= render TuiWindowComponent.new(title: "Tracks", variant: :plain, color: :purple, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:tracks_count] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
 
-        <div class="tui-window purple-168 white-text">
-          <fieldset class="purple-168-border">
-            <legend>Hackr Logs</legend>
+        <%= render TuiWindowComponent.new(title: "Hackr Logs", variant: :plain, color: :purple, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:hackr_logs_count] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
 
-        <div class="tui-window purple-168 white-text">
-          <fieldset class="purple-168-border">
-            <legend>Codex Entries</legend>
+        <%= render TuiWindowComponent.new(title: "Codex Entries", variant: :plain, color: :purple, legend_class: nil) do %>
             <div style="padding: 15px; text-align: center;">
               <p style="font-size: 2.5em; margin: 0;"><%= @stats[:codex_entries_count] %></p>
             </div>
-          </fieldset>
-        </div>
+        <% end %>
       </div>
 
       <!-- Quick Actions -->
@@ -100,7 +74,7 @@
         <!-- Recent Tracks -->
         <div>
           <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT TRACKS ::]</h3>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <% if @recent_tracks.any? %>
               <table class="tui-table" style="width: 100%;">
                 <thead>
@@ -124,13 +98,13 @@
             <% else %>
               <p style="padding: 20px; text-align: center; color: #666;">No tracks yet</p>
             <% end %>
-          </div>
+          <% end %>
         </div>
 
         <!-- Recent Logs -->
         <div>
           <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT LOGS ::]</h3>
-          <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
             <% if @recent_logs.any? %>
               <table class="tui-table" style="width: 100%;">
                 <thead>
@@ -159,14 +133,14 @@
             <% else %>
               <p style="padding: 20px; text-align: center; color: #666;">No logs yet</p>
             <% end %>
-          </div>
+          <% end %>
         </div>
       </div>
 
       <!-- GRID Activity -->
       <div>
         <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ONLINE HACKRS ::]</h3>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <% if @online_hackrs.any? %>
             <table class="tui-table" style="width: 100%;">
               <thead>
@@ -192,7 +166,7 @@
           <% else %>
             <p style="padding: 20px; text-align: center; color: #666;">No hackrs online</p>
           <% end %>
-        </div>
+        <% end %>
       </div>
 
       <!-- Navigation Links -->
@@ -200,5 +174,4 @@
         <%= tui_button "← Back to Site", root_path, color: :green %>
       </div>
     </div>
-  </fieldset>
-</div>
+<% end %>

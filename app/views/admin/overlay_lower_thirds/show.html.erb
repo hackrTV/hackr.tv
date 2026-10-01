@@ -1,8 +1,6 @@
 <% content_for(:title) { "/root/overlays/lower-thirds/#{@lower_third.slug} :: Lower Third Details" } %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 800px; margin: 30px auto;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/overlays/lower-thirds/<%= @lower_third.slug %> :: LOWER THIRD DETAILS</legend>
+<%= render TuiWindowComponent.new(title: "/root/overlays/lower-thirds/#{@lower_third.slug} :: LOWER THIRD DETAILS", variant: :admin, width: 800) do %>
 
     <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
       <%= tui_button "< Back to Lower Thirds", admin_overlay_lower_thirds_path, color: :green %>
@@ -37,5 +35,4 @@
       <p style="margin: 5px 0 0;"><code class="cyan-168-text"><%= overlay_lower_third_url(slug: @lower_third.slug) %></code></p>
     </div>
 
-  </fieldset>
-</div>
+<% end %>

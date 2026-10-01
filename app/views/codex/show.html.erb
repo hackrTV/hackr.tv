@@ -8,9 +8,7 @@
       <%= tui_button "← Back to Codex", codex_path, color: :cyan %>
     </div>
 
-    <div class="tui-window cyan-168 white-text">
-      <fieldset class="cyan-168-border">
-        <legend class="center">CODEX ENTRY</legend>
+    <%= render TuiWindowComponent.new(title: "CODEX ENTRY", variant: :plain, color: :cyan) do %>
         <div class="codex-entry-panel">
           <div>
             <span class="codex-entry-badge"><%= icon %> <%= @entry.entry_type %></span>
@@ -48,8 +46,7 @@
             </div>
           <% end %>
         </div>
-      </fieldset>
-    </div>
+    <% end %>
 
     <div class="codex-back-row-bottom">
       <%= tui_button "← Back to Codex", codex_path, color: :cyan %>

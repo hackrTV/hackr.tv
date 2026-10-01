@@ -1,13 +1,11 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/tracks/new :: NEW TRACK</legend>
+<%= render TuiWindowComponent.new(title: "/root/tracks/new :: NEW TRACK", variant: :admin, width: 1200) do %>
 
     <div style="padding: 20px;">
       <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
         <%= tui_button "← All Tracks", admin_tracks_path, color: :green, style: "padding: 8px 20px;" %>
       </div>
 
-      <div class="tui-window white-text" style="display: block; background: #0a0a0a; padding: 20px;">
+      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
         <% if @track.errors.any? %>
           <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
             <p class="red-255-text"><%= @track.errors.full_messages.join(", ") %></p>
@@ -51,7 +49,6 @@
             <%= tui_button "Cancel", admin_tracks_path, style: "padding: 10px 20px; margin-left: 10px;" %>
           </div>
         <% end %>
-      </div>
+      <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

@@ -1,8 +1,6 @@
 <% content_for(:title) { "/root/overlays :: OBS Overlays" } %>
 
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/overlays :: OBS OVERLAY CONTROL CENTER</legend>
+<%= render TuiWindowComponent.new(title: "/root/overlays :: OBS OVERLAY CONTROL CENTER", variant: :admin) do %>
 
     <% if flash[:success] %>
       <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
@@ -244,5 +242,4 @@
       <% end %>
     </div>
 
-  </fieldset>
-</div>
+<% end %>

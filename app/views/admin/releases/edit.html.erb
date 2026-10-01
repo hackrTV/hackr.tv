@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1200px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/releases/<%= @release.slug %> :: EDIT RELEASE</legend>
+<%= render TuiWindowComponent.new(title: "/root/releases/#{@release.slug} :: EDIT RELEASE", variant: :admin, width: 1200) do %>
 
     <div style="padding: 20px;">
       <!-- Flash Messages -->
@@ -42,7 +40,7 @@
 
       <% tracks = @release.tracks.order(:track_number, :title) %>
       <% if tracks.any? %>
-        <div class="tui-window white-text" style="display: block; background: #0a0a0a;">
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
@@ -100,12 +98,11 @@
               <% end %>
             </tbody>
           </table>
-        </div>
+        <% end %>
       <% else %>
         <div style="padding: 20px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
           <p style="color: #666;">No tracks on this release.</p>
         </div>
       <% end %>
     </div>
-  </fieldset>
-</div>
+<% end %>

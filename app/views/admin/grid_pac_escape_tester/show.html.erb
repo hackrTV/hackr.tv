@@ -1,6 +1,4 @@
-<div class="tui-window white-text admin-panel" style="display: block; max-width: 1400px; margin: 30px auto; padding: 20px;">
-  <fieldset class="admin-panel-border">
-    <legend class="center">/root/pac-escape-tester :: PAC TERMINAL</legend>
+<%= render TuiWindowComponent.new(title: "/root/pac-escape-tester :: PAC TERMINAL", variant: :admin) do %>
 
     <div style="padding: 20px;">
       <%# Banner %>
@@ -42,8 +40,7 @@
 
       <%# No auto-end overlay — terminal stays active post-escape so admin can look around. Use END TEST button to restore. %>
     </div>
-  </fieldset>
-</div>
+<% end %>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {
