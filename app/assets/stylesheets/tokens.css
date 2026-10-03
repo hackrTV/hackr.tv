@@ -3,8 +3,7 @@
 
    Scope: consumed by the app-owned sheets (hotwire, tactical, grid_game,
    uplink, audio_player, pulse_wire). NOT consumed by: tuicss.css (vendored
-   DOS base — frozen), overlay.css (OBS-facing, has its own --overlay-* root),
-   band_profiles/artist_pages/artist_catalog (per-artist branding, scoped
+   DOS base — frozen), band_profiles/artist_pages/artist_catalog (per-artist branding, scoped
    themes), admin_test_guide.css (deliberate serif island).
 
    Sanctioned sub-identities intentionally NOT tokenized here: auth terminal

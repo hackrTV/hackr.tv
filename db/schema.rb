@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_12_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1160,32 +1160,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_12_130000) do
     t.index ["expires_at"], name: "index_overlay_alerts_on_expires_at"
   end
 
-  create_table "overlay_elements", force: :cascade do |t|
-    t.boolean "active", default: true
-    t.datetime "created_at", null: false
-    t.string "element_type", null: false
-    t.string "name", null: false
-    t.json "settings", default: {}
-    t.string "slug", null: false
-    t.datetime "updated_at", null: false
-    t.index ["active"], name: "index_overlay_elements_on_active"
-    t.index ["element_type"], name: "index_overlay_elements_on_element_type"
-    t.index ["slug"], name: "index_overlay_elements_on_slug", unique: true
-  end
-
-  create_table "overlay_lower_thirds", force: :cascade do |t|
-    t.boolean "active", default: true
-    t.datetime "created_at", null: false
-    t.string "logo_url"
-    t.string "name", null: false
-    t.string "primary_text", null: false
-    t.string "secondary_text"
-    t.string "slug", null: false
-    t.datetime "updated_at", null: false
-    t.index ["active"], name: "index_overlay_lower_thirds_on_active"
-    t.index ["slug"], name: "index_overlay_lower_thirds_on_slug", unique: true
-  end
-
   create_table "overlay_now_playing", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "custom_artist"
@@ -1196,74 +1170,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_12_130000) do
     t.integer "track_id"
     t.datetime "updated_at", null: false
     t.index ["track_id"], name: "index_overlay_now_playing_on_track_id"
-  end
-
-  create_table "overlay_scene_elements", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.integer "height"
-    t.integer "overlay_element_id", null: false
-    t.integer "overlay_scene_id", null: false
-    t.json "overrides", default: {}
-    t.datetime "updated_at", null: false
-    t.integer "width"
-    t.integer "x", default: 0
-    t.integer "y", default: 0
-    t.integer "z_index", default: 0
-    t.index ["overlay_element_id"], name: "index_overlay_scene_elements_on_overlay_element_id"
-    t.index ["overlay_scene_id", "overlay_element_id"], name: "idx_scene_elements_composite"
-    t.index ["overlay_scene_id"], name: "index_overlay_scene_elements_on_overlay_scene_id"
-    t.index ["z_index"], name: "index_overlay_scene_elements_on_z_index"
-  end
-
-  create_table "overlay_scene_group_scenes", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.integer "overlay_scene_group_id", null: false
-    t.integer "overlay_scene_id", null: false
-    t.integer "position", default: 0, null: false
-    t.datetime "updated_at", null: false
-    t.index ["overlay_scene_group_id", "overlay_scene_id"], name: "index_scene_group_scenes_unique", unique: true
-    t.index ["overlay_scene_group_id", "position"], name: "index_scene_group_scenes_position"
-    t.index ["overlay_scene_group_id"], name: "index_overlay_scene_group_scenes_on_overlay_scene_group_id"
-    t.index ["overlay_scene_id"], name: "index_overlay_scene_group_scenes_on_overlay_scene_id"
-  end
-
-  create_table "overlay_scene_groups", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.string "slug", null: false
-    t.datetime "updated_at", null: false
-    t.index ["slug"], name: "index_overlay_scene_groups_on_slug", unique: true
-  end
-
-  create_table "overlay_scenes", force: :cascade do |t|
-    t.boolean "active", default: true
-    t.datetime "created_at", null: false
-    t.integer "height", default: 1080
-    t.string "name", null: false
-    t.integer "position", default: 0
-    t.string "scene_type", default: "composition", null: false
-    t.json "settings", default: {}
-    t.string "slug", null: false
-    t.datetime "updated_at", null: false
-    t.integer "width", default: 1920
-    t.index ["active"], name: "index_overlay_scenes_on_active"
-    t.index ["scene_type"], name: "index_overlay_scenes_on_scene_type"
-    t.index ["slug"], name: "index_overlay_scenes_on_slug", unique: true
-  end
-
-  create_table "overlay_tickers", force: :cascade do |t|
-    t.boolean "active", default: true
-    t.text "content", null: false
-    t.string "content_type", default: "static", null: false
-    t.datetime "created_at", null: false
-    t.string "direction", default: "left"
-    t.string "feed_source"
-    t.string "name", null: false
-    t.string "slug", null: false
-    t.integer "speed", default: 50
-    t.datetime "updated_at", null: false
-    t.index ["active"], name: "index_overlay_tickers_on_active"
-    t.index ["slug"], name: "index_overlay_tickers_on_slug", unique: true
   end
 
   create_table "playlist_tracks", force: :cascade do |t|
@@ -1620,10 +1526,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_12_130000) do
   add_foreign_key "moderation_logs", "grid_hackrs", column: "actor_id"
   add_foreign_key "moderation_logs", "grid_hackrs", column: "target_id"
   add_foreign_key "overlay_now_playing", "tracks"
-  add_foreign_key "overlay_scene_elements", "overlay_elements"
-  add_foreign_key "overlay_scene_elements", "overlay_scenes"
-  add_foreign_key "overlay_scene_group_scenes", "overlay_scene_groups"
-  add_foreign_key "overlay_scene_group_scenes", "overlay_scenes"
   add_foreign_key "playlist_tracks", "playlists"
   add_foreign_key "playlist_tracks", "tracks"
   add_foreign_key "playlists", "grid_hackrs"

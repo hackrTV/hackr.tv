@@ -1,7 +1,6 @@
 # Server-rendered PulseWire pages (Hotwire migration Phase 3) — ports
 # HotwirePage.tsx (/wire), UserPulsesPage.tsx (/wire/:username) and
-# SinglePulsePage.tsx (/wire/pulse/:id). The JSON API stays for the
-# overlay + remaining SPA pages until Phase 7.
+# SinglePulsePage.tsx (/wire/pulse/:id).
 class WireController < ApplicationController
   admin_preview! title: "The WIRE"
 

@@ -27,16 +27,10 @@
 # 15. hackr_logs       (depends on hackrs)
 # 16. wire             (depends on hackrs) - sets is_seed: true
 # 18. vidz             (depends on artists) - HackrStream VODs
-# 19. overlay_elements (no deps)
-# 20. overlay_tickers  (no deps)
-# 21. overlay_lower_thirds (no deps)
-# 22. overlay_scenes   (no deps)
-# 23. overlay_scene_elements (depends on scenes, elements)
-# 24. overlay_scene_groups (depends on scenes)
-# 25. redirects        (no deps)
-# 26. livestream_archive (depends on audio) - derived playlist
-# 27. breach_templates  (no deps)
-# 28. breach_encounters (depends on breach_templates, rooms)
+# 19. redirects        (no deps)
+# 20. livestream_archive (depends on audio) - derived playlist
+# 21. breach_templates  (no deps)
+# 22. breach_encounters (depends on breach_templates, rooms)
 
 require "digest"
 
@@ -64,7 +58,6 @@ namespace :data do
     Rake::Task["data:playlists"].invoke
     Rake::Task["data:content"].invoke
     Rake::Task["data:vidz"].invoke
-    Rake::Task["data:overlays"].invoke
 
     if ENV["S3_BUCKET"].present?
       puts "\n" + "-" * 80
@@ -224,12 +217,6 @@ namespace :data do
   desc "Load content (codex, hackr_logs, wire, handbook)"
   task content: [:codex, :hackr_logs, :wire, :handbook]
 
-  desc "Load overlays"
-  task overlays: [
-    :overlay_elements, :overlay_tickers, :overlay_lower_thirds,
-    :overlay_scenes, :overlay_scene_elements, :overlay_scene_groups
-  ]
-
   # === Reset Tasks ===
   desc "Clear seed content only (preserves user data)"
   task reset_content: :environment do
@@ -257,13 +244,6 @@ namespace :data do
     Pulse.destroy_all
     HackrLog.destroy_all
     CodexEntry.destroy_all
-    OverlaySceneGroupScene.destroy_all if defined?(OverlaySceneGroupScene)
-    OverlaySceneGroup.destroy_all if defined?(OverlaySceneGroup)
-    OverlaySceneElement.destroy_all
-    OverlayScene.destroy_all
-    OverlayLowerThird.destroy_all
-    OverlayTicker.destroy_all
-    OverlayElement.destroy_all
     PlaylistTrack.destroy_all
     Playlist.destroy_all
     GridHackrBreachLog.destroy_all
@@ -1804,228 +1784,6 @@ namespace :data do
     end
 
     puts "Wire: #{created_pulses} pulses created, #{created_echoes} echoes created"
-  end
-
-  desc "Load overlay elements from YAML"
-  task overlay_elements: :environment do
-    puts "\n--- Loading Overlay Elements ---"
-    yaml_file = Rails.root.join("data", "overlays", "elements.yml")
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    elements_data = data["elements"]
-    created = 0
-
-    elements_data.each do |attrs|
-      element = OverlayElement.find_or_initialize_by(slug: attrs["slug"])
-      next unless element.new_record?
-
-      element.assign_attributes(
-        name: attrs["name"],
-        element_type: attrs["element_type"]
-      )
-      element.save!
-      created += 1
-      puts "  ✓ Created: #{element.name}"
-    end
-
-    puts "Overlay Elements: #{created} created, #{OverlayElement.count} total"
-  end
-
-  desc "Load overlay tickers from YAML"
-  task overlay_tickers: :environment do
-    puts "\n--- Loading Overlay Tickers ---"
-    yaml_file = Rails.root.join("data", "overlays", "tickers.yml")
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    tickers_data = data["tickers"]
-    created = 0
-
-    tickers_data.each do |attrs|
-      ticker = OverlayTicker.find_or_initialize_by(slug: attrs["slug"])
-      next unless ticker.new_record?
-
-      ticker.assign_attributes(
-        name: attrs["name"],
-        content: attrs["content"],
-        direction: attrs["direction"],
-        speed: attrs["speed"],
-        active: attrs["active"]
-      )
-      ticker.save!
-      created += 1
-      puts "  ✓ Created: #{ticker.name}"
-    end
-
-    puts "Overlay Tickers: #{created} created, #{OverlayTicker.count} total"
-  end
-
-  desc "Load overlay lower thirds from YAML"
-  task overlay_lower_thirds: :environment do
-    puts "\n--- Loading Overlay Lower Thirds ---"
-    yaml_file = Rails.root.join("data", "overlays", "lower_thirds.yml")
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    lower_thirds_data = data["lower_thirds"]
-    created = 0
-
-    lower_thirds_data.each do |attrs|
-      lt = OverlayLowerThird.find_or_initialize_by(slug: attrs["slug"])
-      next unless lt.new_record?
-
-      lt.assign_attributes(
-        name: attrs["name"],
-        primary_text: attrs["primary_text"],
-        secondary_text: attrs["secondary_text"],
-        active: attrs["active"]
-      )
-      lt.save!
-      created += 1
-      puts "  ✓ Created: #{lt.name}"
-    end
-
-    puts "Overlay Lower Thirds: #{created} created, #{OverlayLowerThird.count} total"
-  end
-
-  desc "Load overlay scenes from YAML"
-  task overlay_scenes: :environment do
-    puts "\n--- Loading Overlay Scenes ---"
-    yaml_file = Rails.root.join("data", "overlays", "scenes.yml")
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    scenes_data = data["scenes"]
-    created = 0
-
-    scenes_data.each do |attrs|
-      scene = OverlayScene.find_or_initialize_by(slug: attrs["slug"])
-      next unless scene.new_record?
-
-      scene.assign_attributes(
-        name: attrs["name"],
-        scene_type: attrs["scene_type"],
-        width: attrs["width"],
-        height: attrs["height"]
-      )
-      scene.save!
-      created += 1
-      puts "  ✓ Created: #{scene.name}"
-    end
-
-    puts "Overlay Scenes: #{created} created, #{OverlayScene.count} total"
-  end
-
-  desc "Load overlay scene elements from YAML"
-  task overlay_scene_elements: :environment do
-    puts "\n--- Loading Overlay Scene Elements ---"
-    yaml_file = Rails.root.join("data", "overlays", "scene_elements.yml")
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    scene_elements_data = data["scene_elements"]
-    created = 0
-
-    scene_elements_data.each do |attrs|
-      scene = OverlayScene.find_by(slug: attrs["scene_slug"])
-      element = OverlayElement.find_by(slug: attrs["element_slug"])
-
-      unless scene && element
-        puts "  ✗ Scene or element not found: #{attrs["scene_slug"]} / #{attrs["element_slug"]}"
-        next
-      end
-
-      se = OverlaySceneElement.find_or_initialize_by(
-        overlay_scene: scene,
-        overlay_element: element
-      )
-      next unless se.new_record?
-
-      se.assign_attributes(
-        x: attrs["x"],
-        y: attrs["y"],
-        width: attrs["width"],
-        height: attrs["height"],
-        z_index: attrs["z_index"]
-      )
-      se.save!
-      created += 1
-      puts "  ✓ Created: #{element.name} in #{scene.name}"
-    end
-
-    puts "Overlay Scene Elements: #{created} created, #{OverlaySceneElement.count} total"
-  end
-
-  desc "Load overlay scene groups from YAML"
-  task overlay_scene_groups: :environment do
-    puts "\n--- Loading Overlay Scene Groups ---"
-    yaml_file = Rails.root.join("data", "overlays", "scene_groups.yml")
-
-    unless File.exist?(yaml_file)
-      puts "  ✗ File not found: #{yaml_file}"
-      next
-    end
-
-    data = YAML.load_file(yaml_file)
-    groups_data = data["scene_groups"] || []
-
-    if groups_data.empty?
-      puts "  No scene groups defined"
-      next
-    end
-
-    created = 0
-    groups_data.each do |attrs|
-      group = OverlaySceneGroup.find_or_initialize_by(slug: attrs["slug"])
-      was_new = group.new_record?
-
-      if was_new
-        group.assign_attributes(
-          name: attrs["name"],
-          description: attrs["description"]
-        )
-        group.save!
-        created += 1
-        puts "  ✓ Created: #{group.name}"
-
-        # Seed scenes in group (only on new groups)
-        scene_slugs = attrs["scenes"] || []
-        scene_slugs.each_with_index do |slug, index|
-          scene = OverlayScene.find_by(slug: slug)
-          next unless scene
-
-          OverlaySceneGroupScene.create!(
-            overlay_scene_group: group,
-            overlay_scene: scene,
-            position: index + 1
-          )
-          puts "    + Added scene: #{scene.name}"
-        end
-      end
-    end
-
-    puts "Overlay Scene Groups: #{created} created"
   end
 
   desc "Load redirects from YAML"

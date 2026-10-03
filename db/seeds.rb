@@ -10,7 +10,6 @@
 #   data/content/    - Codex entries, hackr logs, wire (pulses/echoes)
 #   data/vidz.yml    - HackrStream VOD/stream records
 #   data/playlists/  - Key playlists with radio station links
-#   data/overlays/   - Elements, scenes, scene elements, tickers, lower thirds
 #   (derived)        - Livestream archive playlist (built from tracks with audio)
 #
 # To reload data:

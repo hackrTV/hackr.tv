@@ -1,9 +1,0 @@
-<% content_for(:title) { "/root/overlays/elements/new :: New Element" } %>
-
-<%= render TuiWindowComponent.new(title: "/root/overlays/elements/new :: NEW ELEMENT", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @element, url: admin_overlay_elements_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
-    </div>
-<% end %>

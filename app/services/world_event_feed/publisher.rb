@@ -93,8 +93,8 @@ module WorldEventFeed
       })
 
       # Dual-publish (Hotwire migration Phase 3): the JSON broadcast above
-      # stays for the overlay pages + any remaining SPA listener; the
-      # Hotwire /feed page appends server-rendered lines.
+      # feeds the external HUD app (WorldEventFeedChannel); the Hotwire
+      # /feed page appends server-rendered lines.
       Turbo::StreamsChannel.broadcast_append_to(
         "world_event_feed_html",
         target: "feed-lines",

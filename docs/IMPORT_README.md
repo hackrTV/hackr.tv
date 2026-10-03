@@ -12,7 +12,7 @@ This document explains how to load seed data into the Rails database from the YA
 bin/rails data:load
 ```
 
-This loads everything in dependency order: catalog, system, world, playlists, content, vidz, overlays, and redirects.
+This loads everything in dependency order: catalog, system, world, playlists, content, vidz, and redirects.
 
 To also sideload audio files from S3:
 
@@ -66,13 +66,6 @@ data/
 │   └── wire.yml               # Seed pulses/echoes
 ├── playlists/
 │   └── key_playlists.yml      # Curated playlists
-├── overlays/
-│   ├── elements.yml           # Overlay elements
-│   ├── tickers.yml            # Ticker overlays
-│   ├── lower_thirds.yml       # Lower third overlays
-│   ├── scenes.yml             # Overlay scenes
-│   ├── scene_elements.yml     # Scene-element assignments
-│   └── scene_groups.yml       # Scene groups
 └── vidz.yml                   # VODs/streams
 ```
 
@@ -123,8 +116,7 @@ Tasks run in dependency order (the `data:load` master task handles this automati
 4. **playlists** — key_playlists (depends on hackrs, tracks, radio_stations)
 5. **content** — codex, hackr_logs, handbook, wire
 6. **vidz** — VODs/streams (depends on artists)
-7. **overlays** — elements, tickers, lower_thirds, scenes, scene_elements, scene_groups
-8. **redirects** — domain redirects
+7. **redirects** — domain redirects
 
 ## Available Tasks
 
@@ -145,7 +137,6 @@ Tasks run in dependency order (the `data:load` master task handles this automati
 | `data:world` | regions, factions, zones, rooms, exits, mobs, item definitions, items, salvage yields, schematics, achievements, shop listings, missions, breach templates/encounters, PAC facilities, transit types/routes, slipstream routes, starting rooms, tutorial |
 | `data:playlists` | key_playlists (also ensures catalog, hackrs, radio_stations) |
 | `data:content` | codex, hackr_logs, handbook, wire |
-| `data:overlays` | all overlay elements, tickers, lower_thirds, scenes, scene_elements, scene_groups |
 
 ### Individual Tasks
 

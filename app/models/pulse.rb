@@ -130,7 +130,7 @@ class Pulse < ApplicationRecord
     })
 
     # Dual-publish (Hotwire migration Phase 3): the JSON broadcast above
-    # stays for the overlay pulsewire page + any remaining SPA listener;
+    # feeds PulseWireChannel + /terminal's server-side pulse_wire subscriber;
     # Hotwire feed pages subscribe to the separate "wire_html" stream.
     # Root pulses only — the feed lists roots; splices live on thread pages.
     if parent_pulse_id.nil?
