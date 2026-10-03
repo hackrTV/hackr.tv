@@ -141,26 +141,20 @@
 - **Compass Nav** - 8-direction + up/down navigation buttons derived from available exits
 
 ### World Event Feed
-- **Real-time Event Feed** - Live feed mixing organic game activity with simulated population activity, for on-stream OBS overlay and the in-site `/feed` page
+- **Real-time Event Feed** - Live feed mixing organic game activity with simulated population activity, for the on-stream HUD app and the in-site `/feed` page
 - **9 Event Types** - clearance_up, mission_accepted, mission_completed, breach_completed, rep_tier_changed, achievement_unlocked, hackr_registered, wire_post, manual
 - **Population Simulator** - 125 seeded simulant accounts with consistent state progression; `SimulatorJob` targets a configurable events-per-minute rate, backfilling the deficit below organic activity
 - **Visibility Toggle** - Ships gated (`visible=false`); when off, the feed nav hides, the page redirects, the channel rejects non-admins, and the public API returns empty
-- **Overlay** - `/overlays/world-feed` OBS browser source with terminal typing animation and reconnect-safe dedup
+- **HUD Feed** - `GET /api/world_events` backlog + `WorldEventFeedChannel` live stream for the external HUD app
 - **Admin Panel** - `/root/world_event_feed` for settings (target rate, simulator toggle, visibility), manual publish, and recent-event review
 - **Admin API** - `POST /api/admin/world_events` (Bearer token) for external publishers (e.g. Synthia)
 
 ### OBS Overlay System
-- **Now Playing Overlay** - Display currently playing track for livestreams
-- **PulseWire Overlay** - Show live social activity during streams
-- **Grid Activity Overlay** - Stream multiplayer Grid activity
-- **Scene Management** - Compose multiple overlay elements with x/y/size/z positioning
-- **Scene Groups** - Collections of scenes for easy switching during streams (admin at `/root/overlays/groups`)
-- **Lower Thirds** - Text overlays with custom slugs and styling
-- **Tickers** - Scrolling marquee text with static or dynamic (feed-sourced) content
-- **Alert System** - Alert notifications via Action Cable
-- **Full Admin CRUD** - All overlay data managed in-app (scenes, elements, lower thirds, groups, tickers, alerts, now-playing) with PaperTrail version history — no YAML editing required
-- **Read-Only JSON API** - 8 public `GET /api/overlay/*` endpoints (`now-playing`, `tickers`, `lower-thirds`, `scenes`, `scenes/:slug`, `scene-groups`, `elements`, `alerts/pending`) with CORS for external/cross-origin OBS browser-source apps to bootstrap and recover on reconnect
-- **Real-time Updates** - All overlays update via WebSocket broadcasts
+OBS overlays are rendered by the external HUD app; hackr.tv supplies the data it reads.
+- **Now Playing** - The site player writes `POST /api/overlay/now-playing`; admin override at `/root/overlays/now-playing/edit`
+- **Alert Queue** - Alerts queued in admin (`/root/overlays/alerts`) for HUD to display
+- **Data API** - Public `GET /api/overlay/now-playing` + `GET /api/overlay/alerts/pending` with CORS for cross-origin HUD browser sources (bootstrap + reconnect resync)
+- **Real-time Updates** - `OverlayChannel` pushes `now_playing_changed` / `new_alert`
 
 ### Hackr Streams
 - **Livestream Management** - Go live/end stream functionality for artists
@@ -232,7 +226,7 @@
 - **Content Security Policy** - CSP with nonce-based inline script execution
 - **XSS Protection** - Prevents cross-site scripting while allowing dynamic scripts (shared DOMPurify `sanitizeHtml` utility)
 - **Rate Limiting** - Rack::Attack for request throttling
-- **Scoped CORS** - `rack-cors` limited to `GET /api/overlay/*` for cross-origin overlay apps
+- **Scoped CORS** - `rack-cors` limited to `GET /api/overlay/*` for the cross-origin HUD app
 
 ---
 
@@ -473,7 +467,7 @@ hackr.tv/
 │       ├── live_chat_channel.rb       # Uplink comms
 │       ├── stream_status_channel.rb   # Livestream state changes
 │       ├── stream_watch_channel.rb    # Livestream watch-time tracking
-│       ├── overlay_channel.rb         # OBS overlay broadcasts
+│       ├── overlay_channel.rb         # HUD now-playing + alert broadcasts
 │       ├── pulse_wire_channel.rb      # PulseWire social feed updates
 │       └── world_event_feed_channel.rb # World Event Feed broadcasts
 ├── data/                              # YAML seed data
@@ -484,8 +478,7 @@ hackr.tv/
 │   │                                  #   shop listings, breach templates/encounters, PAC facilities,
 │   │                                  #   transit routes/types, slipstream routes, starting rooms, tutorial
 │   ├── content/                       # Codex, hackr_logs, wire, handbook
-│   ├── playlists/                     # Curated playlists
-│   └── overlays/                      # Overlay scenes, elements, tickers, lower thirds, scene groups
+│   └── playlists/                     # Curated playlists
 ├── lib/
 │   ├── tasks/
 │   │   └── data.rake                  # Unified data loading system
@@ -561,7 +554,6 @@ bin/rails data:world                # Factions, regions, zones, rooms, exits, mo
                                     #   PAC facilities, transit routes/types,
                                     #   slipstream routes, starting rooms, tutorial
 bin/rails data:content              # Codex, hackr_logs, wire, handbook
-bin/rails data:overlays             # Overlay scenes, elements, tickers, lower thirds, groups
 ```
 
 **Features:**
@@ -715,15 +707,8 @@ bin/rails data:overlays             # Overlay scenes, elements, tickers, lower t
 - **zone_playlist_tracks** - position, belongs_to :zone_playlist, belongs_to :track
 
 ### OBS Overlays
-- **overlay_scenes** - name, slug, scene_type (fullscreen/composition)
-- **overlay_elements** - element_type, config (JSON)
-- **overlay_scene_elements** - position_x, position_y, width, height, z_index, belongs_to :overlay_scene, belongs_to :overlay_element
-- **overlay_scene_groups** - name, slug, has_many :overlay_scenes
-- **overlay_scene_group_scenes** - position, belongs_to :overlay_scene_group, belongs_to :overlay_scene
-- **overlay_now_playings** - track metadata singleton
+- **overlay_now_playing** - track metadata singleton
 - **overlay_alerts** - message, alert_type
-- **overlay_tickers** - text, content_type (static/dynamic), feed_source, speed
-- **overlay_lower_thirds** - title, subtitle, slug
 
 ---
 
@@ -769,9 +754,8 @@ bin/rails data:overlays             # Overlay scenes, elements, tickers, lower t
 - The Codex wiki - 7 entry types, markdown with auto-linking, admin CRUD, public SPA
 - PulseWire social network - Pulses, Echoes, Splices, real-time updates, admin moderation
 - WIRE Profiles - Vanity @handles, bio, pinned pulses, livestream watch-time, public profile API
-- OBS Overlay system - Scenes, groups, now playing, lower thirds, tickers, alerts + full admin CRUD
-- Overlay Read API - 8 public JSON endpoints with CORS for external OBS apps
-- World Event Feed - Real-time feed with 125-simulant population simulator, overlay, and admin panel
+- HUD data surface - Now-playing + alert queue API/cable for the external OBS HUD app
+- World Event Feed - Real-time feed with 125-simulant population simulator, HUD feed, and admin panel
 - Hackr Streams - Livestream management with go live/VOD support
 - Scheduled Streams - Countdown/live banners and public schedule page
 - Zone Playlists - Per-zone ambient music for THE PULSE GRID

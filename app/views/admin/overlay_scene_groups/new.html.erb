@@ -1,9 +1,0 @@
-<% content_for(:title) { "/root/overlays/groups/new :: New Scene Group" } %>
-
-<%= render TuiWindowComponent.new(title: "/root/overlays/groups/new :: NEW SCENE GROUP", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @scene_group, url: admin_overlay_scene_groups_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
-    </div>
-<% end %>

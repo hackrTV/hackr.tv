@@ -1,51 +1,39 @@
 ---
-title: Admin — Overlay System
+title: Admin — Overlay Data (HUD)
 area: Admin
-minutes: 25
+minutes: 10
 ---
-# Admin — Overlays (OBS system)
+# Admin — Overlay Data (HUD)
 
-Overlay CRUD in `/root` → Overlays + the public overlay pages under
-`/overlays/*` + the read API consumed by the HUD app.
+OBS overlays are rendered by the external HUD app. hackr.tv keeps only
+the data HUD reads: the now-playing singleton and the alert queue, plus
+the read API and `OverlayChannel` pushes. (End-to-end HUD checks live in
+article 50.)
 
-## Steps — dashboard + scenes
+## Steps — dashboard
 
-1. `/root` → Overlays. → Status hub with links (scenes, elements,
-   groups, tickers, lower-thirds, alerts, now-playing).
-2. Scenes index → open a scene. → Element composition with x/y/size/z;
-   scene groups list membership.
-3. Open the scene's public page (`/overlays/scenes/<slug>` or per its
-   URL scheme). → Renders chrome-less on the overlay layout.
-4. Create a TEST scene with one element placed; view it publicly; then
-   delete it.
+1. `/root` → Overlays. → Status hub: Now Playing + Alerts cards, nav to
+   both, and the HUD data-surface table (now-playing, alerts/pending,
+   world_events, OverlayChannel, WorldEventFeedChannel).
 
-## Steps — elements + tickers + lower thirds
+## Steps — now playing
 
-5. Elements index → settings JSON editor renders; a bad JSON edit
-   flashes a warning instead of silently saving.
-6. Tickers: edit a ticker's content (static) → its overlay page
-   updates. For a dynamic ticker, push content via
-   `POST /api/admin/overlay/ticker_feed` (Bearer) → content updates.
-7. Lower thirds: update one → its overlay page reflects it live
-   (auto-broadcast on update).
+2. Now Playing: set a custom title/artist from admin. →
+   `GET /api/overlay/now-playing` returns it ("API JSON ↗" button opens
+   it); clearing restores player-driven state (the player overwrites on
+   next track).
+3. Pick a catalog track + Paused, save. → JSON shows the track with
+   `paused: true` and an absolute `album_cover` URL.
 
-## Steps — now playing + alerts
+## Steps — alerts
 
-8. Now Playing singleton: set a custom title/artist from admin. →
-   `GET /api/overlay/now-playing` returns it; clearing restores
-   player-driven state (the player overwrites on next track).
-9. Alerts: create a TEST alert. → It appears in
-   `GET /api/overlay/alerts/pending`; the alert overlay page consumes
-   it (FIFO); the queue index in admin shows/destroys it.
+4. Alerts: create a TEST alert. → It appears in
+   `GET /api/overlay/alerts/pending` (FIFO, expires after 10s); the
+   queue index in admin shows/destroys it.
 
-## Steps — world feed overlay
+## Steps — retired surfaces stay gone
 
-10. `/overlays/world-feed` renders and appends live events (article 21
-    step 5 — re-verify quickly here in overlay context).
-
-## Note
-
-The scene/element/ticker/lower-third READ API endpoints are slated for
-removal once the external HUD app fully replaces native overlays —
-if they're gone when you read this, steps 6's push + 8/9's reads still
-apply via the admin UI + overlay pages.
+5. `/overlays/now-playing`, `/overlays/scenes/<any>`, and
+   `GET /api/overlay/tickers` all 404. (The native overlay pages,
+   scenes/elements/tickers/lower-thirds, and their read API were removed
+   2026-10 — HUD builds scenes from its own SceneDefinitions.)

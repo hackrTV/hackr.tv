@@ -1,7 +1,7 @@
 class OverlayChannel < ApplicationCable::Channel
   def subscribed
-    # OBS browser sources subscribe to receive real-time overlay updates
-    # No authentication required - overlays are public
+    # The external HUD app (OBS browser sources) subscribes for live
+    # now_playing_changed + new_alert pushes. No authentication — public.
     Rails.logger.info "=== OverlayChannel: Overlay client subscribed ==="
     stream_from "overlay_updates"
   end
@@ -11,8 +11,6 @@ class OverlayChannel < ApplicationCable::Channel
   end
 
   def receive(data)
-    # Handle incoming WebSocket messages if needed
-    # Currently overlays are read-only, but could support future features
-    # like marking alerts as displayed
+    # Read-only channel — HUD never sends.
   end
 end

@@ -18,7 +18,5 @@ minutes: 5
 4. Admin push: `/root` → World Feed → create a manual event (or
    `POST /api/admin/world_events` with the Bearer token). → Appears
    live in the open `/feed`.
-5. The OBS overlay variant `/overlays/world-feed` renders the same
-   stream (chrome-less, overlay layout) and also appends live.
-6. `GET /api/world_events` returns recent events as JSON (feeds the
-   HUD app).
+5. `GET /api/world_events` returns recent events as JSON (feeds the
+   HUD app, which also follows `WorldEventFeedChannel` live).

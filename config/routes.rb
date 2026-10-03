@@ -258,15 +258,9 @@ Rails.application.routes.draw do
     get "profiles/:alias", to: "profiles#show", constraints: {alias: /[^\/]+/}
     patch "profile/pins", to: "pulse_pins#reorder"
 
-    # Overlay API routes
+    # Overlay API — the HUD app's data surface (player writes now-playing)
     post "overlay/now-playing", to: "overlay#set_now_playing"
     get "overlay/now-playing", to: "overlay#now_playing"
-    get "overlay/tickers", to: "overlay#tickers"
-    get "overlay/lower-thirds", to: "overlay#lower_thirds"
-    get "overlay/scenes", to: "overlay#scenes"
-    get "overlay/scenes/:slug", to: "overlay#scene"
-    get "overlay/scene-groups", to: "overlay#scene_groups"
-    get "overlay/elements", to: "overlay#elements"
     get "overlay/alerts/pending", to: "overlay#alerts_pending"
 
     # World Event Feed (public)
@@ -311,9 +305,6 @@ Rails.application.routes.draw do
 
       # World Event Feed
       post "world_events", to: "world_events#create"
-
-      # Overlay ticker feed
-      post "overlay/ticker_feed", to: "overlay#ticker_feed"
     end
   end
 
@@ -667,35 +658,10 @@ Rails.application.routes.draw do
     post "uplink/users/:id/blackout", to: "uplink#blackout_user", as: :blackout_uplink_user
     delete "uplink/punishments/:id", to: "uplink#lift_punishment", as: :lift_uplink_punishment
 
-    # Overlay admin routes
+    # Overlay admin — controls the data the HUD app reads (now-playing + alerts)
     get "overlays", to: "overlays#index", as: :overlays
     get "overlays/now-playing/edit", to: "overlays#edit_now_playing", as: :edit_overlay_now_playing
     patch "overlays/now-playing", to: "overlays#update_now_playing", as: :update_overlay_now_playing
-
-    # Overlay CRUD resources
-    resources :overlay_scenes, path: "overlays/scenes" do
-      member do
-        post :add_element
-        delete :remove_element
-        get :history
-      end
-    end
-    resources :overlay_elements, path: "overlays/elements" do
-      member { get :history }
-    end
-    resources :overlay_lower_thirds, path: "overlays/lower-thirds" do
-      member { get :history }
-    end
-    resources :overlay_scene_groups, path: "overlays/groups" do
-      member do
-        post :add_scene
-        delete :remove_scene
-        get :history
-      end
-    end
-    resources :overlay_tickers, path: "overlays/tickers" do
-      member { get :history }
-    end
     resources :overlay_alerts, path: "overlays/alerts", only: %i[index new create show destroy]
 
     # World Event Feed admin
@@ -705,19 +671,6 @@ Rails.application.routes.draw do
         post :publish
       end
     end
-  end
-
-  # OBS Overlay routes (Rails server-rendered, NOT SPA)
-  scope :overlays do
-    get "now-playing", to: "overlays#now_playing", as: :overlay_now_playing
-    get "pulsewire", to: "overlays#pulsewire", as: :overlay_pulsewire
-    get "grid-activity", to: "overlays#grid_activity", as: :overlay_grid_activity
-    get "alerts", to: "overlays#alerts", as: :overlay_alerts
-    get "lower-third/:slug", to: "overlays#lower_third", as: :overlay_lower_third
-    get "codex/:slug", to: "overlays#codex", as: :overlay_codex
-    get "ticker/:position", to: "overlays#ticker", as: :overlay_ticker
-    get "scenes/:slug", to: "overlays#scene", as: :overlay_scene
-    get "world-feed", to: "overlays#world_feed", as: :overlay_world_feed
   end
 
   # Development-only error page testing routes

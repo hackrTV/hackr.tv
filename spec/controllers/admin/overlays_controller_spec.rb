@@ -13,30 +13,6 @@ RSpec.describe Admin::OverlaysController, type: :controller do
       expect(response).to have_http_status(:ok)
     end
 
-    it "loads scenes" do
-      scene = create(:overlay_scene)
-      get :index
-      expect(assigns(:scenes)).to include(scene)
-    end
-
-    it "loads elements" do
-      element = create(:overlay_element)
-      get :index
-      expect(assigns(:elements)).to include(element)
-    end
-
-    it "loads lower thirds" do
-      lower_third = create(:overlay_lower_third)
-      get :index
-      expect(assigns(:lower_thirds)).to include(lower_third)
-    end
-
-    it "loads tickers" do
-      ticker = create(:overlay_ticker)
-      get :index
-      expect(assigns(:tickers)).to include(ticker)
-    end
-
     it "loads now playing" do
       get :index
       expect(assigns(:now_playing)).to eq(OverlayNowPlaying.current)
@@ -48,12 +24,32 @@ RSpec.describe Admin::OverlaysController, type: :controller do
       get :index
       expect(assigns(:pending_alerts)).to eq(1)
     end
+
+    context "with views rendered" do
+      render_views
+
+      it "renders the HUD data dashboard" do
+        get :index
+        expect(response.body).to include("HUD DATA SURFACE")
+        expect(response.body).to include("/api/overlay/now-playing")
+      end
+    end
   end
 
   describe "GET #edit_now_playing" do
     it "returns success" do
       get :edit_now_playing
       expect(response).to have_http_status(:ok)
+    end
+
+    context "with views rendered" do
+      render_views
+
+      it "links the now-playing API JSON instead of the retired preview page" do
+        get :edit_now_playing
+        expect(response.body).to include("/api/overlay/now-playing")
+        expect(response.body).not_to include('href="/overlays/now-playing"')
+      end
     end
 
     it "loads now playing" do

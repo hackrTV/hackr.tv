@@ -44,5 +44,14 @@ module HackrRails
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Action Cable origin check. Same-origin is always allowed
+    # (allow_same_origin_as_host); the external HUD app (OBS browser
+    # sources) connects from a local Vite server, so localhost origins on
+    # any port are allowed too. Auth cookies are SameSite=Lax, so a
+    # localhost socket to a remote host connects anonymous — fine for the
+    # channels HUD reads (OverlayChannel, WorldEventFeedChannel).
+    # Replaces Rails' development-only localhost default.
+    config.action_cable.allowed_request_origins = [%r{\Ahttps?://(localhost|127\.0\.0\.1)(:\d+)?\z}]
   end
 end
