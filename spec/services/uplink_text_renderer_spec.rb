@@ -76,4 +76,31 @@ RSpec.describe UplinkTextRenderer do
       expect(render("")).to eq("")
     end
   end
+
+  describe "emotes alongside mentions" do
+    before { allow(Emote).to receive(:render_map).and_return({"wave" => "/img/wave.webp"}) }
+
+    it "links a mention that starts right after an emote" do
+      html = render(":wave:@xeraen")
+
+      expect(html).to include('class="emote"')
+      expect(html).to include(%(href="/wire/xeraen"))
+    end
+
+    it "renders an emote that starts right after a mention" do
+      html = render("@xeraen:wave: hi")
+
+      expect(html).to include(%(href="/wire/xeraen"))
+      expect(html).to include('alt=":wave:"')
+    end
+
+    it "still escapes everything else" do
+      html = render("<i>@xeraen</i> :wave: <b>")
+
+      expect(html).to include("&lt;i&gt;")
+      expect(html).to include("&lt;b&gt;")
+      expect(html).to include("uplink-mention")
+      expect(html).to include('class="emote"')
+    end
+  end
 end

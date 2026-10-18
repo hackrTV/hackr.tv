@@ -1,0 +1,25 @@
+/* Emotes — shared by Uplink packets and WIRE pulses: the inline <img
+   class="emote"> the text renderers emit for ":slug:" tokens, and the
+   emote-picker composer dropdown. Loads once from layouts/_hotwire_assets
+   (tracked-asset rule — never per-page). Tokens from tokens.css; TUI
+   surface rules apply (no radius, no easing, even px). */
+
+/* ── Inline emote (renderer output + picker previews) ─────────────── */
+
+.emote { height: 28px; width: auto; max-width: 56px; vertical-align: middle; object-fit: contain; }
+
+/* ── Picker dropdown ─────────────────────────────────────────────── */
+
+/* Wrap the composer field so the menu can pin to it. Uplink reuses its
+   existing .packet-input-field (already position:relative). */
+.emote-anchor { position: relative; }
+
+.emote-menu { position: absolute; left: 0; right: 0; z-index: 20; margin: 0; padding: 0; list-style: none; max-height: 288px; overflow-y: auto; background-color: var(--bg-2); border: 1px solid var(--edge-bright); font-family: var(--font-tui); font-size: 14px; }
+/* Author display beats the UA [hidden] rule — re-assert it. */
+.emote-menu[hidden] { display: none; }
+.emote-menu--up { bottom: 100%; margin-bottom: 2px; }
+.emote-menu--down { top: 100%; margin-top: 2px; }
+
+.emote-option { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; color: var(--fg); cursor: pointer; }
+.emote-option--active { background-color: var(--accent); color: #fff; }
+.emote-option-slug { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -641,6 +641,14 @@ Rails.application.routes.draw do
 
     resources :redirects
 
+    # Emotes — admin-managed :slug: images rendered in Uplink + WIRE text
+    resources :emotes do
+      member do
+        delete :purge_image
+        get :history
+      end
+    end
+
     # Uplink admin routes (moderation is still functional)
     resources :uplink, only: [:index] do
       collection do

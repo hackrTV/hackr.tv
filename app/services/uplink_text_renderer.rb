@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 # Chat packet text (Packet.tsx renderContent port): WireTextRenderer's
-# codex/link/censor rules, plus @mention links on the plain-text
-# segments between tokens — mirroring the SPA's URL-pass-then-mentions
-# order (mentions never render inside link labels). Mention links are
-# viewer-neutral; the packet Stimulus controller highlights the viewer's
-# own alias from the layout's current-hackr-alias meta.
+# codex/link/censor rules + :slug: emote images, plus @mention links on
+# the plain text left between tokens and emotes — mirroring the SPA's
+# URL-pass-then-mentions order (mentions never render inside link labels).
+# Mention links are viewer-neutral; the packet Stimulus controller
+# highlights the viewer's own alias from the layout's current-hackr-alias
+# meta.
 class UplinkTextRenderer < WireTextRenderer
   # The SPA matched @alias anywhere in the string; this adds the bio
   # renderer's guard so email local parts (me@gmail.com) don't mislink —
@@ -14,7 +15,9 @@ class UplinkTextRenderer < WireTextRenderer
 
   protected
 
-  def plain(text)
+  # WireTextRenderer#plain's hook: receives each emote-free span, so
+  # ":wave:@xeraen" still links the mention (its span starts at "@").
+  def plain_text(text)
     out = +""
     pos = 0
     text.scan(MENTION) do
