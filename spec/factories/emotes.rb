@@ -38,6 +38,17 @@ FactoryBot.define do
       end
     end
 
+    # 168x56 PNG (3:1) for the aspect-ratio paths.
+    trait :wide do
+      after(:build) do |emote|
+        emote.image.attach(
+          io: File.open(Rails.root.join("spec", "fixtures", "files", "test_emote_wide.png")),
+          filename: "test_emote_wide.png",
+          content_type: "image/png"
+        )
+      end
+    end
+
     trait :disabled do
       enabled { false }
     end

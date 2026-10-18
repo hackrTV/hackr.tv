@@ -78,7 +78,7 @@ RSpec.describe UplinkTextRenderer do
   end
 
   describe "emotes alongside mentions" do
-    before { allow(Emote).to receive(:render_map).and_return({"wave" => "/img/wave.webp"}) }
+    before { allow(Emote).to receive(:render_map).and_return({"wave" => {url: "/img/wave.webp", width: 28, height: 28}}) }
 
     it "links a mention that starts right after an emote" do
       html = render(":wave:@xeraen")

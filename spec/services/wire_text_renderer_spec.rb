@@ -106,7 +106,7 @@ RSpec.describe WireTextRenderer do
   end
 
   describe "emotes" do
-    let(:emote_map) { {"wave" => "/rails/active_storage/blobs/redirect/abc/wave.gif"} }
+    let(:emote_map) { {"wave" => {url: "/rails/active_storage/blobs/redirect/abc/wave.gif", width: 56, height: 28}} }
 
     before { allow(Emote).to receive(:render_map).and_return(emote_map) }
 
@@ -118,6 +118,7 @@ RSpec.describe WireTextRenderer do
       expect(html).to include('alt=":wave:"')
       expect(html).to include('title=":wave:"')
       expect(html).to include('class="emote"')
+      expect(html).to include('width="56" height="28"') # the box the server computed, any aspect ratio
       expect(html).to include("hi ")
       expect(html).to include(" all")
     end

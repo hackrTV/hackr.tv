@@ -19,6 +19,7 @@ class Admin::EmotesController < Admin::ApplicationController
   def create
     @emote = Emote.new(emote_params)
     if @emote.save
+      @emote.analyze_image # dims on the edit page now, not after AnalyzeJob
       set_flash_success("Emote #{@emote.token} created.")
       redirect_to edit_admin_emote_path(@emote)
     else
@@ -32,6 +33,7 @@ class Admin::EmotesController < Admin::ApplicationController
 
   def update
     if @emote.update(emote_params)
+      @emote.analyze_image
       set_flash_success("Emote #{@emote.token} updated.")
       redirect_to edit_admin_emote_path(@emote)
     else

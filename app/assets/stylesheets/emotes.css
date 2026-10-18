@@ -6,7 +6,10 @@
 
 /* ── Inline emote (renderer output + picker previews) ─────────────── */
 
-.emote { height: 28px; width: auto; max-width: 56px; vertical-align: middle; object-fit: contain; }
+/* Any aspect ratio: the server sets width/height attrs from the image
+   (Emote#chat_size), width:auto lets that ratio rule, max-width caps at
+   4:1 and object-fit letterboxes anything wider. */
+.emote { height: 28px; width: auto; max-width: 112px; vertical-align: middle; object-fit: contain; }
 
 /* ── Picker dropdown ─────────────────────────────────────────────── */
 

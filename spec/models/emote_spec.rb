@@ -86,11 +86,12 @@ RSpec.describe Emote, type: :model do
   end
 
   describe "#chat_image / #chat_url" do
-    it "serves static images as a 56x56 webp variant via a representation path" do
+    it "serves static images as a webp variant fitted to 224x56 (no crop) via a representation path" do
       emote = create(:emote, slug: "wave")
 
       expect(emote).not_to be_gif
       expect(emote.chat_image).to be_a(ActiveStorage::VariantWithRecord)
+      expect(emote.chat_image.variation.transformations).to include(resize_to_limit: [224, 56], format: :webp)
       expect(emote.chat_url).to start_with("/rails/active_storage/representations/redirect/")
     end
 
@@ -100,6 +101,40 @@ RSpec.describe Emote, type: :model do
       expect(emote).to be_gif
       expect(emote.chat_url).to start_with("/rails/active_storage/blobs/redirect/")
       expect(emote.chat_url).to end_with("/test_emote.gif")
+    end
+  end
+
+  describe "#chat_size / #chat_attrs" do
+    it "is a 28px square for a square image" do
+      emote = create(:emote, slug: "wave")
+      emote.analyze_image
+
+      expect(emote.chat_size).to eq([28, 28])
+    end
+
+    it "keeps a wide image's aspect ratio at 28px tall" do
+      emote = create(:emote, :wide, slug: "banner")
+      emote.analyze_image
+
+      expect(emote.chat_size).to eq([84, 28]) # 168x56 source
+      expect(emote.chat_attrs).to eq(url: emote.chat_url, width: 84, height: 28)
+    end
+
+    it "caps the width at 4:1 and never drops below 1px" do
+      emote = create(:emote, slug: "wave")
+
+      emote.image.blob.update!(metadata: {"width" => 2000, "height" => 28, "analyzed" => true})
+      expect(emote.chat_size).to eq([112, 28])
+
+      emote.image.blob.update!(metadata: {"width" => 1, "height" => 2000, "analyzed" => true})
+      expect(emote.chat_size).to eq([1, 28])
+    end
+
+    it "falls back to a square when the blob has no dimensions" do
+      emote = create(:emote, slug: "wave")
+      emote.image.blob.update!(metadata: {"analyzed" => true})
+
+      expect(emote.chat_size).to eq([28, 28])
     end
   end
 
@@ -113,7 +148,18 @@ RSpec.describe Emote, type: :model do
       map = Emote.render_map
 
       expect(map.keys).to eq(["wave"])
-      expect(map["wave"]).to start_with("/rails/active_storage/")
+      expect(map["wave"][:url]).to start_with("/rails/active_storage/")
+      expect(map["wave"]).to include(width: 28, height: 28)
+    end
+
+    it "analyzes images AnalyzeJob has not reached yet, so dimensions are never guessed" do
+      emote = create(:emote, :wide, slug: "banner")
+      emote.image.blob.update!(metadata: {})
+
+      map = Emote.render_map
+
+      expect(map["banner"]).to include(width: 84, height: 28)
+      expect(emote.image.blob.reload).to be_analyzed
     end
 
     it "expires the cached map on every create/update/destroy" do

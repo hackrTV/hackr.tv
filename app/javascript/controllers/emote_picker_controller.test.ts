@@ -8,19 +8,19 @@ import EmotePickerController from './emote_picker_controller'
 // close it on turbo:submit-end.
 
 const EMOTES = [
-  { slug: 'smile', url: '/img/smile.webp' },
-  { slug: 'smirk', url: '/img/smirk.webp' },
-  { slug: 'big_smile', url: '/img/big_smile.webp' },
-  { slug: 'wave', url: '/img/wave.gif' },
-  { slug: 'r1', url: '/img/r1.webp' },
-  { slug: 'r2', url: '/img/r2.webp' },
-  { slug: 'r3', url: '/img/r3.webp' },
-  { slug: 'r4', url: '/img/r4.webp' },
-  { slug: 'r5', url: '/img/r5.webp' },
-  { slug: 'r6', url: '/img/r6.webp' },
-  { slug: 'r7', url: '/img/r7.webp' },
-  { slug: 'r8', url: '/img/r8.webp' },
-  { slug: 'r9', url: '/img/r9.webp' }
+  { slug: 'smile', url: '/img/smile.webp', width: 28, height: 28 },
+  { slug: 'smirk', url: '/img/smirk.webp', width: 28, height: 28 },
+  { slug: 'big_smile', url: '/img/big_smile.webp', width: 28, height: 28 },
+  { slug: 'wave', url: '/img/wave.gif', width: 56, height: 28 },
+  { slug: 'r1', url: '/img/r1.webp', width: 28, height: 28 },
+  { slug: 'r2', url: '/img/r2.webp', width: 28, height: 28 },
+  { slug: 'r3', url: '/img/r3.webp', width: 28, height: 28 },
+  { slug: 'r4', url: '/img/r4.webp', width: 28, height: 28 },
+  { slug: 'r5', url: '/img/r5.webp', width: 28, height: 28 },
+  { slug: 'r6', url: '/img/r6.webp', width: 28, height: 28 },
+  { slug: 'r7', url: '/img/r7.webp', width: 28, height: 28 },
+  { slug: 'r8', url: '/img/r8.webp', width: 28, height: 28 },
+  { slug: 'r9', url: '/img/r9.webp', width: 28, height: 28 }
 ]
 
 const FIELD_ACTIONS = 'input->emote-picker#update keydown->emote-picker#keydown keyup->emote-picker#caretMoved click->emote-picker#update'
@@ -106,6 +106,9 @@ describe('EmotePickerController', () => {
       const img = menu().querySelector('img')!
       expect(img.getAttribute('src')).toBe('/img/wave.gif')
       expect(img.className).toBe('emote')
+      // Box comes from the server payload, so wide emotes preview wide.
+      expect(img.getAttribute('width')).toBe('56')
+      expect(img.getAttribute('height')).toBe('28')
     })
 
     it('stays closed for a bare colon, clock text, mid-word colons, and unknown slugs', async () => {

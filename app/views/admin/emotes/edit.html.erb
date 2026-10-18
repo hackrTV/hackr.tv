@@ -23,13 +23,14 @@
         <% if persisted_image %>
           <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #111; border: 1px solid #333;">
-              <%= image_tag @emote.chat_url, alt: @emote.token, style: "height: 28px; width: auto; max-width: 56px; vertical-align: middle;" %>
+              <%= image_tag @emote.chat_url, alt: @emote.token, style: "height: 28px; width: auto; max-width: 112px; vertical-align: middle;" %>
               <span style="color: #d0d0d0; font-family: monospace;">how it renders in chat → <%= @emote.token %></span>
             </div>
             <div>
               <p style="color: #888; font-size: 0.85em; margin: 0 0 10px 0;">
                 <%= @emote.image.content_type.delete_prefix("image/").upcase %> · <%= number_to_human_size(@emote.image.byte_size) %>
-                <% if @emote.gif? %>· animated GIF, served as uploaded<% else %>· served as a 56×56 WebP variant<% end %>
+                <% if @emote.image.metadata["width"] %>· <%= @emote.image.metadata["width"] %>×<%= @emote.image.metadata["height"] %> (<%= @emote.chat_size.join("×") %> in chat)<% end %>
+                <% if @emote.gif? %>· animated GIF, served as uploaded<% else %>· served as a WebP variant fitted to 224×56<% end %>
               </p>
               <%= tui_button_to "Remove Image", purge_image_admin_emote_path(@emote), method: :delete,
                   color: :red,
