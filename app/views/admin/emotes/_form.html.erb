@@ -24,7 +24,7 @@
     <div style="margin-bottom: 20px;">
       <%= f.tui_file_field :image, label: emote.image.attached? ? "REPLACE IMAGE" : "IMAGE",
           accept: "image/png,image/gif,image/webp",
-          hint: "PNG, GIF, or WebP, 512 KB max. Square ~112px looks best. PNG/WebP are resized to 56×56 WebP for chat; GIFs are served as uploaded so animation survives (animated WebP would be flattened — use GIF)." %>
+          hint: "PNG, GIF, or WebP, 512 KB max, any aspect ratio (wide FrankerFaceZ-style emotes work; beyond 4:1 they get letterboxed). Chat shows emotes 28px tall, so upload at least 56px tall for hi-dpi screens (FFZ 4× files are ideal). PNG/WebP are shrunk to fit 224×56 and served as WebP; GIFs are served as uploaded so animation survives (animated WebP would be flattened — use GIF)." %>
     </div>
   </div>
 

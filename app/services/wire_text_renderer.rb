@@ -73,10 +73,10 @@ class WireTextRenderer
     cursor = 0
     while (match = EMOTE.match(text, cursor))
       slug = match[1].downcase
-      url = map[slug]
-      if url
+      emote = map[slug]
+      if emote
         out << plain_text(text[pos...match.begin(0)]) if match.begin(0) > pos
-        out << emote_img(slug, url)
+        out << emote_img(slug, emote)
         pos = cursor = match.end(0)
       else
         # Unknown token: retry one char on so ":nope:wave:" still finds ":wave:".
@@ -101,9 +101,13 @@ class WireTextRenderer
     @emote_map ||= Emote.render_map
   end
 
-  def emote_img(slug, url)
+  # emote = an Emote.render_map entry ({url:, width:, height:}). The size
+  # attrs reserve the box before the image loads, so streamed-in packets
+  # do not reflow, and a wide emote gets a wide box, not a 28px square.
+  def emote_img(slug, emote)
     token = ":#{slug}:"
-    tag.img(src: url, alt: token, title: token, class: "emote", width: 28, height: 28, loading: "eager").to_s
+    tag.img(src: emote[:url], alt: token, title: token, class: "emote",
+      width: emote[:width], height: emote[:height], loading: "eager").to_s
   end
 
   def render_token(match, mappings)

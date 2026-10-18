@@ -7,13 +7,16 @@ import { Controller } from '@hotwired/stimulus'
 // outside mousedown closes. It talks to the host controller (packet-form /
 // composer) only through the bubbled `input` event it dispatches after an
 // insert, so counters and submit state recompute without coupling. The
-// emote list is the server-rendered `emotes` value ({slug, url}[]); the
+// emote list is the server-rendered `emotes` value ({slug, url, width,
+// height}[]; width/height = the chat box, any aspect ratio); the
 // menu <ul> is a target the ERB places inside a position:relative anchor
 // with an .emote-menu--up|down modifier.
 
 interface Emote {
   slug: string
   url: string
+  width: number
+  height: number
 }
 
 interface Token {
@@ -189,8 +192,8 @@ export default class extends Controller<HTMLElement> {
     const img = document.createElement('img')
     img.src = emote.url
     img.alt = ''
-    img.width = 28
-    img.height = 28
+    img.width = emote.width
+    img.height = emote.height
     img.className = 'emote'
 
     const slug = document.createElement('span')

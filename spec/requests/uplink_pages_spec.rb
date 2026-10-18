@@ -150,6 +150,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include(":nope:") # unknown tokens stay literal
       expect(response.body).to include('data-controller="packet-form emote-picker"')
       expect(response.body).to include("&quot;slug&quot;:&quot;wave&quot;")
+      expect(response.body).to include("&quot;width&quot;:28,&quot;height&quot;:28") # picker previews get the same box
       expect(response.body).not_to include("hidden_one") # disabled: not in the payload
       expect(response.body).to include('data-emote-picker-target="menu"')
     end
@@ -240,6 +241,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(ChatMessage.last.content).to eq("o/ :wave:") # relay/synthia/terminal see plain text
       expect(response.body).to include('alt=":wave:"')
       expect(response.body).to include('src="/rails/active_storage/representations/redirect/')
+      expect(response.body).to include('width="28" height="28"') # from the analyzed 56x56 fixture
     end
 
     it "attaches the live stream on livestream channels" do

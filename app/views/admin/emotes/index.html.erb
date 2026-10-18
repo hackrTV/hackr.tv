@@ -47,7 +47,7 @@
                   <td style="text-align: center; padding: 5px;">
                     <%= link_to edit_admin_emote_path(emote) do %>
                       <% if emote.image.attached? %>
-                        <%= image_tag emote.chat_url, alt: emote.token, style: "height: 28px; width: auto; max-width: 56px; vertical-align: middle;" %>
+                        <%= image_tag emote.chat_url, alt: emote.token, style: "height: 28px; width: auto; max-width: 112px; vertical-align: middle;" %>
                       <% else %>
                         <div style="width: 50px; height: 28px; margin: 0 auto; background: #1a1a1a; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7em; color: #666;">
                           NO IMG
@@ -62,6 +62,7 @@
                     <% if emote.image.attached? %>
                       <%= emote.image.content_type.delete_prefix("image/").upcase %> ·
                       <%= number_to_human_size(emote.image.byte_size) %>
+                      <% if emote.image.metadata["width"] %>· <%= emote.image.metadata["width"] %>×<%= emote.image.metadata["height"] %> (<%= emote.chat_size.join("×") %> in chat)<% end %>
                       <% if emote.gif? %><span style="color: #a855f7;">· animated (served as-is)</span><% end %>
                     <% else %>
                       —
