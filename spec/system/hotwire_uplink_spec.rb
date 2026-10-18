@@ -46,6 +46,25 @@ RSpec.describe "Hotwire uplink", type: :system do
     expect(ChatMessage.last.content).to eq("First uplink transmission.")
   end
 
+  it "autocompletes :slug: emotes from the composer and renders them in the log" do
+    create(:emote, slug: "wave")
+    log_in!(hackr)
+    visit "/uplink"
+    await_uplink!
+
+    find_field("content").send_keys("o/ :wa")
+    expect(page).to have_css(".emote-menu .emote-option-slug", text: ":wave:")
+
+    find_field("content").send_keys(:enter) # picks the emote, must NOT submit
+    expect(page).to have_field("content", with: "o/ :wave: ")
+    expect(page).to have_no_css(".emote-menu .emote-option")
+    expect(ChatMessage.count).to eq(0)
+
+    click_button "TX"
+    expect(page).to have_css("#uplink-log img.emote[alt=':wave:']", wait: 10)
+    expect(ChatMessage.last.content).to include(":wave:")
+  end
+
   it "delivers packets sent in one session to another live (exit criterion)" do
     using_session(:viewer) do
       log_in!(hackr)

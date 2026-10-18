@@ -136,6 +136,23 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include(%(href="https://example.com/x"))
       expect(response.body).not_to include("[LINK CENSORED BY GOVCORP]")
     end
+
+    it "renders :slug: emotes as images and ships the picker payload on the composer" do
+      create(:emote, slug: "wave")
+      create(:emote, :disabled, slug: "hidden_one")
+      create(:chat_message, chat_channel: channel, grid_hackr: other, content: "o/ :wave: :nope:")
+      log_in!
+
+      get "/uplink"
+
+      expect(response.body).to include('class="emote"')
+      expect(response.body).to include('alt=":wave:"')
+      expect(response.body).to include(":nope:") # unknown tokens stay literal
+      expect(response.body).to include('data-controller="packet-form emote-picker"')
+      expect(response.body).to include("&quot;slug&quot;:&quot;wave&quot;")
+      expect(response.body).not_to include("hidden_one") # disabled: not in the payload
+      expect(response.body).to include('data-emote-picker-target="menu"')
+    end
   end
 
   describe "GET /uplink/popout" do
@@ -211,6 +228,18 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include('action="replace" target="uplink-form-error"')
       expect(ChatMessage.last.grid_hackr).to eq(hackr)
       expect(ChatMessage.last.hackr_stream).to be_nil
+    end
+
+    it "stores the raw :slug: token and renders the image only in the HTML" do
+      create(:emote, slug: "wave")
+      log_in!
+
+      post "/uplink/packets", params: {channel_slug: "ambient", content: "o/ :wave:"},
+        headers: turbo_stream_headers
+
+      expect(ChatMessage.last.content).to eq("o/ :wave:") # relay/synthia/terminal see plain text
+      expect(response.body).to include('alt=":wave:"')
+      expect(response.body).to include('src="/rails/active_storage/representations/redirect/')
     end
 
     it "attaches the live stream on livestream channels" do

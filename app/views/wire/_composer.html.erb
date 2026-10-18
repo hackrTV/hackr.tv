@@ -1,18 +1,27 @@
 <%# PulseComposer.tsx port. Locals: parent_pulse (nil for the feed
     composer). 256-char limit; the input accepts +50 so the over-limit
-    error state is visible, exactly like the SPA. %>
+    error state is visible, exactly like the SPA. The emote-picker
+    controller rides on the same form (":slug:" autocomplete; menu opens
+    downward inside .emote-anchor) and only talks to composer via the
+    input event it dispatches. %>
 <% parent_pulse = local_assigns.fetch(:parent_pulse, nil) %>
 <div class="pulse-composer">
   <%= form_with url: wire_pulses_path, data: {
-    controller: "composer",
+    controller: "composer emote-picker",
     composer_limit_value: 256,
-    action: "turbo:submit-end->composer#submitted"
+    emote_picker_emotes_value: emote_picker_payload.to_json,
+    action: "turbo:submit-end->composer#submitted turbo:submit-end->emote-picker#close"
   } do %>
     <%= hidden_field_tag :parent_pulse_id, parent_pulse&.id %>
     <div class="form-group">
-      <%= text_area_tag :content, nil, rows: 3, maxlength: 306, class: "form-control pulse-input",
-        placeholder: parent_pulse ? "Splice into @#{parent_pulse.grid_hackr.hackr_alias}'s pulse..." : "Broadcast on the WIRE...",
-        data: {composer_target: "input", action: "input->composer#update keydown->composer#keydown"} %>
+      <div class="emote-anchor">
+        <%= text_area_tag :content, nil, rows: 3, maxlength: 306, class: "form-control pulse-input",
+          placeholder: parent_pulse ? "Splice into @#{parent_pulse.grid_hackr.hackr_alias}'s pulse..." : "Broadcast on the WIRE...",
+          role: "combobox", aria: {autocomplete: "list", expanded: "false"},
+          data: {composer_target: "input", emote_picker_target: "input",
+            action: "input->composer#update keydown->composer#keydown input->emote-picker#update keydown->emote-picker#keydown keyup->emote-picker#caretMoved click->emote-picker#update"} %>
+        <ul class="emote-menu emote-menu--down" role="listbox" hidden data-emote-picker-target="menu"></ul>
+      </div>
       <div class="pulse-composer-footer">
         <span class="char-count" data-composer-target="count"></span>
         <button type="submit" class="btn btn-primary" disabled data-composer-target="submit">

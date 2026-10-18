@@ -1,0 +1,49 @@
+<%= render TuiWindowComponent.new(title: "/root/emotes/#{@emote.slug_in_database} :: EDIT EMOTE", variant: :admin, width: 900) do %>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <%= tui_button "← All Emotes", admin_emotes_path, color: :green, style: "padding: 8px 20px;" %>
+      </div>
+
+      <!-- Image Preview & Purge (outside the main form: nested button_to breaks it).
+           After a failed update the attachment may hold the REJECTED, unsaved blob —
+           only a persisted blob has a signed URL, so preview nothing in that case. -->
+      <% persisted_image = @emote.image.attached? && @emote.image.blob.persisted? %>
+      <div style="margin-bottom: 20px; padding: 15px; background: #0a0a0a; border: 1px solid #333;">
+        <label class="white-text" style="display: block; margin-bottom: 10px; font-weight: bold;">CURRENT IMAGE</label>
+        <% if persisted_image %>
+          <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #111; border: 1px solid #333;">
+              <%= image_tag @emote.chat_url, alt: @emote.token, style: "height: 28px; width: auto; max-width: 56px; vertical-align: middle;" %>
+              <span style="color: #d0d0d0; font-family: monospace;">how it renders in chat → <%= @emote.token %></span>
+            </div>
+            <div>
+              <p style="color: #888; font-size: 0.85em; margin: 0 0 10px 0;">
+                <%= @emote.image.content_type.delete_prefix("image/").upcase %> · <%= number_to_human_size(@emote.image.byte_size) %>
+                <% if @emote.gif? %>· animated GIF, served as uploaded<% else %>· served as a 56×56 WebP variant<% end %>
+              </p>
+              <%= tui_button_to "Remove Image", purge_image_admin_emote_path(@emote), method: :delete,
+                  color: :red,
+                  style: "padding: 6px 16px; font-size: 0.85em;",
+                  form: {data: {confirm: "Remove the image from #{@emote.token}? It stops rendering until a new one is uploaded."}} %>
+            </div>
+          </div>
+        <% elsif @emote.image.attached? %>
+          <p style="color: #888; margin: 0;">Upload rejected — the previous image is unchanged. Reload to preview it.</p>
+        <% else %>
+          <p style="color: #666; margin: 0;">No image attached — this emote will not render until one is uploaded.</p>
+        <% end %>
+      </div>
+
+      <%= render "form", emote: @emote %>
+    </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -131,18 +131,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   end
 
   create_table "data_audit_flags", force: :cascade do |t|
-    t.string "check_name", null: false
-    t.datetime "created_at", null: false
-    t.string "domain", null: false
     t.string "fingerprint", null: false
+    t.string "check_name", null: false
+    t.string "title", null: false
+    t.string "severity", default: "warning", null: false
+    t.string "domain", null: false
+    t.string "subject_type"
+    t.integer "subject_id"
+    t.string "status", default: "open", null: false
+    t.datetime "snooze_until"
     t.datetime "first_flagged_at", null: false
     t.datetime "last_seen_at", null: false
-    t.string "severity", default: "warning", null: false
-    t.datetime "snooze_until"
-    t.string "status", default: "open", null: false
-    t.integer "subject_id"
-    t.string "subject_type"
-    t.string "title", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["check_name"], name: "index_data_audit_flags_on_check_name"
     t.index ["domain"], name: "index_data_audit_flags_on_domain"
@@ -165,19 +165,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
     t.index ["pulse_id"], name: "index_echoes_on_pulse_id"
   end
 
-  create_table "error_groups", force: :cascade do |t|
-    t.string "component", null: false
+  create_table "emotes", force: :cascade do |t|
+    t.string "slug", null: false
+    t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_emotes_on_slug", unique: true
+  end
+
+  create_table "error_groups", force: :cascade do |t|
     t.string "fingerprint", null: false
-    t.datetime "first_seen_at"
-    t.datetime "ignore_until"
-    t.datetime "last_seen_at"
-    t.integer "occurrence_count", default: 0, null: false
-    t.datetime "resolved_at"
-    t.integer "resolved_by_hackr_id"
+    t.string "title", null: false
+    t.string "component", null: false
     t.string "severity", default: "error", null: false
     t.string "status", default: "open", null: false
-    t.string "title", null: false
+    t.datetime "ignore_until"
+    t.integer "occurrence_count", default: 0, null: false
+    t.datetime "first_seen_at"
+    t.datetime "last_seen_at"
+    t.datetime "resolved_at"
+    t.integer "resolved_by_hackr_id"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["component"], name: "index_error_groups_on_component"
     t.index ["fingerprint"], name: "index_error_groups_on_fingerprint", unique: true
@@ -186,22 +194,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   end
 
   create_table "error_occurrences", force: :cascade do |t|
-    t.text "backtrace"
-    t.string "component", null: false
-    t.datetime "created_at", null: false
     t.integer "error_group_id", null: false
-    t.string "exception_class"
-    t.string "hackr_alias"
-    t.integer "hackr_id"
-    t.string "ip_address"
-    t.string "message", null: false
-    t.text "metadata"
     t.datetime "occurred_at", null: false
-    t.string "rails_env"
+    t.string "component", null: false
+    t.string "exception_class"
+    t.string "message", null: false
+    t.text "backtrace"
+    t.string "request_url"
     t.string "request_method"
     t.text "request_params"
-    t.string "request_url"
+    t.string "ip_address"
     t.string "user_agent"
+    t.integer "hackr_id"
+    t.string "hackr_alias"
+    t.string "rails_env"
+    t.text "metadata"
+    t.datetime "created_at", null: false
     t.index ["error_group_id", "occurred_at"], name: "index_error_occurrences_on_error_group_id_and_occurred_at", order: { occurred_at: :desc }
     t.index ["error_group_id"], name: "index_error_occurrences_on_error_group_id"
     t.index ["occurred_at"], name: "index_error_occurrences_on_occurred_at"
@@ -466,7 +474,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
 
   create_table "grid_hackrs", force: :cascade do |t|
     t.string "api_token_digest"
-    t.text "bio"
     t.datetime "created_at", null: false
     t.integer "current_room_id"
     t.string "email"
@@ -484,6 +491,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
     t.json "stats"
     t.datetime "updated_at", null: false
     t.integer "zone_entry_room_id"
+    t.text "bio"
     t.index ["api_token_digest"], name: "index_grid_hackrs_on_api_token_digest", unique: true
     t.index ["current_room_id"], name: "index_grid_hackrs_on_current_room_id"
     t.index ["email"], name: "index_grid_hackrs_on_email", unique: true
@@ -512,9 +520,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
     t.json "properties", default: {}, null: false
     t.string "rarity", null: false
     t.string "slug", null: false
-    t.boolean "tutorial", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "value", default: 0, null: false
+    t.boolean "tutorial", default: false, null: false
     t.index ["item_type"], name: "index_grid_item_definitions_on_item_type"
     t.index ["slug"], name: "index_grid_item_definitions_on_slug", unique: true
   end
@@ -695,10 +703,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   end
 
   create_table "grid_room_visits", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "first_visited_at", null: false
     t.integer "grid_hackr_id", null: false
     t.integer "grid_room_id", null: false
+    t.datetime "first_visited_at", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id", "grid_room_id"], name: "index_grid_room_visits_unique", unique: true
     t.index ["grid_hackr_id"], name: "index_grid_room_visits_on_grid_hackr_id"
@@ -1033,17 +1041,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
 
   create_table "hackr_streams", force: :cascade do |t|
     t.integer "artist_id", null: false
-    t.datetime "cancelled_at"
     t.datetime "created_at", null: false
     t.datetime "ended_at"
     t.boolean "is_live", default: false, null: false
     t.string "live_url"
-    t.datetime "scheduled_at"
     t.datetime "started_at"
     t.string "title"
     t.string "track_slug"
     t.datetime "updated_at", null: false
     t.string "vod_url"
+    t.datetime "scheduled_at"
+    t.datetime "cancelled_at"
     t.index ["artist_id"], name: "index_hackr_streams_on_artist_id"
     t.index ["scheduled_at"], name: "index_hackr_streams_on_scheduled_at"
   end
@@ -1060,13 +1068,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   end
 
   create_table "hackr_watch_sessions", force: :cascade do |t|
-    t.integer "accumulated_seconds", default: 0, null: false
-    t.datetime "connected_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "disconnected_at"
     t.integer "grid_hackr_id", null: false
     t.integer "hackr_stream_id"
+    t.datetime "connected_at", null: false
     t.datetime "last_heartbeat_at", null: false
+    t.datetime "disconnected_at"
+    t.integer "accumulated_seconds", default: 0, null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id", "disconnected_at"], name: "idx_on_grid_hackr_id_disconnected_at_e34a883d93"
     t.index ["grid_hackr_id"], name: "index_hackr_watch_sessions_on_grid_hackr_id"
@@ -1110,21 +1118,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   end
 
   create_table "manual_test_results", force: :cascade do |t|
-    t.string "article_slug", null: false
-    t.datetime "created_at", null: false
     t.integer "manual_test_run_id", null: false
-    t.text "notes"
+    t.string "article_slug", null: false
     t.string "status", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["manual_test_run_id", "article_slug"], name: "index_manual_test_results_on_run_and_slug", unique: true
     t.index ["manual_test_run_id"], name: "index_manual_test_results_on_manual_test_run_id"
   end
 
   create_table "manual_test_runs", force: :cascade do |t|
+    t.string "label", null: false
+    t.integer "grid_hackr_id", null: false
     t.datetime "completed_at"
     t.datetime "created_at", null: false
-    t.integer "grid_hackr_id", null: false
-    t.string "label", null: false
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id"], name: "index_manual_test_runs_on_grid_hackr_id"
   end
@@ -1197,10 +1205,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   end
 
   create_table "pulse_pins", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.integer "grid_hackr_id", null: false
-    t.integer "position", default: 0, null: false
     t.integer "pulse_id", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id", "position"], name: "index_pulse_pins_on_grid_hackr_id_and_position"
     t.index ["grid_hackr_id", "pulse_id"], name: "index_pulse_pins_on_grid_hackr_id_and_pulse_id", unique: true
@@ -1215,9 +1223,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
     t.integer "grid_hackr_id", null: false
     t.boolean "is_seed", default: false, null: false
     t.integer "parent_pulse_id"
+    t.datetime "pulsed_at", null: false
     t.boolean "pulse_dropped", default: false, null: false
     t.datetime "pulse_dropped_at"
-    t.datetime "pulsed_at", null: false
     t.integer "splice_count", default: 0, null: false
     t.integer "thread_root_id"
     t.datetime "updated_at", null: false
@@ -1375,27 +1383,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_120000) do
   end
 
   create_table "world_event_settings", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.boolean "simulator_enabled", default: true, null: false
     t.integer "target_events_per_minute", default: 12, null: false
+    t.boolean "simulator_enabled", default: true, null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "visible", default: false, null: false
   end
 
   create_table "world_event_simulants", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.integer "grid_hackr_id", null: false
     t.json "state", default: {}, null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["grid_hackr_id"], name: "index_world_event_simulants_on_grid_hackr_id", unique: true
   end
 
   create_table "world_events", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.json "data", default: {}, null: false
     t.string "event_type", null: false
     t.string "hackr_alias", null: false
+    t.json "data", default: {}, null: false
     t.boolean "simulated", default: false, null: false
+    t.datetime "created_at", null: false
     t.index ["created_at"], name: "index_world_events_on_created_at"
     t.index ["event_type"], name: "index_world_events_on_event_type"
     t.index ["simulated"], name: "index_world_events_on_simulated"
