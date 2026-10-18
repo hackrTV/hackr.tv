@@ -1,0 +1,97 @@
+<%= render TuiWindowComponent.new(title: "/root/emotes :: MANAGE EMOTES", variant: :admin) do %>
+
+    <div style="padding: 20px;">
+      <!-- Flash Messages -->
+      <% if flash[:success] %>
+        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
+          <p class="green-255-text">✓ SUCCESS</p>
+          <p class="white-text"><%= flash[:success] %></p>
+        </div>
+      <% end %>
+
+      <% if flash[:error] %>
+        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+          <p class="red-255-text">⚠ ERROR</p>
+          <p class="white-text"><%= flash[:error] %></p>
+        </div>
+      <% end %>
+
+      <!-- Navigation -->
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
+        <%= tui_button "+ New Emote", new_admin_emote_path, color: :green, style: "padding: 8px 20px;" %>
+      </div>
+
+      <p style="color: #888; font-size: 0.85em; margin: 0 0 20px 0;">
+        Hackrs type <code style="color: #c4b5fd;">:slug:</code> in Uplink or on the WIRE (autocomplete opens after the colon).
+        Disabled emotes stop rendering in new packets; already-rendered chat history keeps its images.
+      </p>
+
+      <!-- Emotes Table -->
+      <% if @emotes.any? %>
+        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
+          <table class="tui-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th style="text-align: center; width: 60px;">Preview</th>
+                <th style="text-align: left;">Token</th>
+                <th style="text-align: left;">Image</th>
+                <th style="text-align: center;">Status</th>
+                <th style="text-align: center;">Updated</th>
+                <th style="text-align: center; width: 220px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @emotes.each do |emote| %>
+                <tr class="admin-table-row">
+                  <td style="text-align: center; padding: 5px;">
+                    <%= link_to edit_admin_emote_path(emote) do %>
+                      <% if emote.image.attached? %>
+                        <%= image_tag emote.chat_url, alt: emote.token, style: "height: 28px; width: auto; max-width: 56px; vertical-align: middle;" %>
+                      <% else %>
+                        <div style="width: 50px; height: 28px; margin: 0 auto; background: #1a1a1a; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7em; color: #666;">
+                          NO IMG
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= link_to emote.token, edit_admin_emote_path(emote), style: "color: #0ff; text-decoration: none; font-family: monospace;" %>
+                  </td>
+                  <td style="color: #888; font-size: 0.85em;">
+                    <% if emote.image.attached? %>
+                      <%= emote.image.content_type.delete_prefix("image/").upcase %> ·
+                      <%= number_to_human_size(emote.image.byte_size) %>
+                      <% if emote.gif? %><span style="color: #a855f7;">· animated (served as-is)</span><% end %>
+                    <% else %>
+                      —
+                    <% end %>
+                  </td>
+                  <td style="text-align: center;">
+                    <% if emote.enabled? %>
+                      <span style="color: #4ade80; font-size: 0.85em;">ENABLED</span>
+                    <% else %>
+                      <span style="color: #666; font-size: 0.85em;">DISABLED</span>
+                    <% end %>
+                  </td>
+                  <td style="text-align: center; color: #888;"><%= emote.updated_at.strftime("%Y-%m-%d") %></td>
+                  <td style="text-align: center; white-space: nowrap;">
+                    <%= tui_button "Edit", edit_admin_emote_path(emote), color: :cyan, style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    <%= tui_button "History", history_admin_emote_path(emote), color: :purple, style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    <%= tui_button_to "Delete", admin_emote_path(emote), method: :delete,
+                        color: :red,
+                        style: "padding: 4px 12px; font-size: 0.85em;",
+                        form: {style: "display: inline;", data: {confirm: "Delete #{emote.token}? Copies already rendered into chat history will break."}} %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
+      <% else %>
+        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
+          <p style="color: #666; font-size: 1.2em;">No emotes yet.</p>
+        </div>
+      <% end %>
+    </div>
+<% end %>

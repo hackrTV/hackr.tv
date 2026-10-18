@@ -1,0 +1,8 @@
+<%= render TuiWindowComponent.new(title: "/root/emotes/new :: NEW EMOTE", variant: :admin, width: 900) do %>
+    <div style="padding: 20px;">
+      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <%= tui_button "← All Emotes", admin_emotes_path, color: :green, style: "padding: 8px 20px;" %>
+      </div>
+      <%= render "form", emote: @emote %>
+    </div>
+<% end %>

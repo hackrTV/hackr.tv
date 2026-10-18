@@ -10,6 +10,13 @@
 #   https://…           → admin: link; non-admin: censor span
 #                         (trailing sentence punctuation stays plain text)
 #
+# plus, on the plain text between those tokens, emotes (2026-10):
+#
+#   :slug:              → <img class="emote"> when an enabled Emote with an
+#                         image has that slug (case-insensitive). Unknown
+#                         tokens stay literal text. Never fires inside URLs,
+#                         link labels or codex refs — those are tokens.
+#
 # One alternation scan; everything between tokens is HTML-escaped, so the
 # html_safe output is built exclusively from escaped fragments.
 class WireTextRenderer
@@ -23,6 +30,8 @@ class WireTextRenderer
   }xi
   TRAILING_PUNCTUATION = /[.,;:!?\])’']+\z/
   CENSOR_TEXT = "[LINK CENSORED BY GOVCORP]"
+  # Candidate emote token; only slugs present in Emote.render_map render.
+  EMOTE = /:([a-z0-9_]{2,32}):/i
 
   def self.render(content, poster_is_admin: false)
     new(poster_is_admin: poster_is_admin).render(content)
@@ -52,14 +61,50 @@ class WireTextRenderer
 
   protected
 
-  # Inter-token text. Subclasses may transform it (UplinkTextRenderer
+  # Inter-token text: known :slug: tokens become <img>, every span between
+  # them goes through plain_text (the subclass hook). Returns escaped output.
+  def plain(text)
+    return plain_text(text) unless text.include?(":")
+    map = emote_map
+    return plain_text(text) if map.empty?
+
+    out = +""
+    pos = 0
+    cursor = 0
+    while (match = EMOTE.match(text, cursor))
+      slug = match[1].downcase
+      url = map[slug]
+      if url
+        out << plain_text(text[pos...match.begin(0)]) if match.begin(0) > pos
+        out << emote_img(slug, url)
+        pos = cursor = match.end(0)
+      else
+        # Unknown token: retry one char on so ":nope:wave:" still finds ":wave:".
+        cursor = match.begin(0) + 1
+      end
+    end
+    out << plain_text(text[pos..]) if pos < text.length
+    out
+  end
+
+  # Emote-free plain text. Subclasses may transform it (UplinkTextRenderer
   # linkifies @mentions) but MUST return escaped output — render trusts
   # this to build its html_safe string.
-  def plain(text)
+  def plain_text(text)
     h(text)
   end
 
   private
+
+  # One lookup per render (= per packet/pulse); the map itself is Rails.cached.
+  def emote_map
+    @emote_map ||= Emote.render_map
+  end
+
+  def emote_img(slug, url)
+    token = ":#{slug}:"
+    tag.img(src: url, alt: token, title: token, class: "emote", width: 28, height: 28, loading: "eager").to_s
+  end
 
   def render_token(match, mappings)
     if match[1] # [[wiki ref]]

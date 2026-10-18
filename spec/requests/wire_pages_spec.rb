@@ -83,6 +83,21 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("[LINK CENSORED BY GOVCORP]")
       expect(response.body).to include('<a href="https://example.com"')
     end
+
+    it "renders :slug: emotes in pulses and ships the picker payload on the composer" do
+      create(:emote, :gif, slug: "party")
+      make_pulse(other, content: "tonight :party: :nope:")
+      log_in!
+
+      get "/wire"
+
+      expect(response.body).to include('alt=":party:"')
+      expect(response.body).to include('src="/rails/active_storage/blobs/redirect/') # gif: original blob
+      expect(response.body).to include(":nope:")
+      expect(response.body).to include('data-controller="composer emote-picker"')
+      expect(response.body).to include("&quot;slug&quot;:&quot;party&quot;")
+      expect(response.body).to include('class="emote-menu emote-menu--down"')
+    end
   end
 
   describe "POST /wire/pulses" do

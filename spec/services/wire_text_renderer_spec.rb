@@ -104,4 +104,71 @@ RSpec.describe WireTextRenderer do
       expect(render("")).to eq("")
     end
   end
+
+  describe "emotes" do
+    let(:emote_map) { {"wave" => "/rails/active_storage/blobs/redirect/abc/wave.gif"} }
+
+    before { allow(Emote).to receive(:render_map).and_return(emote_map) }
+
+    it "renders a known :slug: as an inline image carrying the token as alt/title" do
+      html = render("hi :wave: all")
+
+      expect(html).to be_html_safe
+      expect(html).to include('<img src="/rails/active_storage/blobs/redirect/abc/wave.gif"')
+      expect(html).to include('alt=":wave:"')
+      expect(html).to include('title=":wave:"')
+      expect(html).to include('class="emote"')
+      expect(html).to include("hi ")
+      expect(html).to include(" all")
+    end
+
+    it "matches case-insensitively and normalizes the token" do
+      html = render("go :WaVe:")
+
+      expect(html).to include('class="emote"')
+      expect(html).to include('alt=":wave:"')
+      expect(html).not_to include(":WaVe:")
+    end
+
+    it "leaves unknown tokens and clock text literal" do
+      expect(render("hmm :nope: at 12:30:45")).to eq("hmm :nope: at 12:30:45")
+    end
+
+    it "recovers after an unknown token so :nope:wave: still renders wave" do
+      html = render(":nope:wave:")
+
+      expect(html).to include(":nope")
+      expect(html).to include('alt=":wave:"')
+    end
+
+    it "never fires inside link labels or URLs" do
+      html = render("[:wave:](https://example.com/:wave:) https://example.com/:wave:", admin: true)
+
+      expect(html).not_to include("<img")
+      expect(html).to include(">:wave:</a>")
+      expect(html).to include('href="https://example.com/:wave:"')
+    end
+
+    it "keeps the text around emotes escaped" do
+      html = render("<b>:wave:</b>")
+
+      expect(html).to include("&lt;b&gt;")
+      expect(html).to include('class="emote"')
+      expect(html).not_to include("<b>")
+    end
+
+    it "looks the map up once per render, and not at all without a colon" do
+      expect(Emote).to receive(:render_map).once.and_return(emote_map)
+      render("a :wave: b :wave: c")
+
+      expect(Emote).not_to receive(:render_map)
+      expect(render("no tokens here")).to eq("no tokens here")
+    end
+
+    it "renders literally when no emotes exist" do
+      allow(Emote).to receive(:render_map).and_return({})
+
+      expect(render("still :wave:")).to eq("still :wave:")
+    end
+  end
 end
