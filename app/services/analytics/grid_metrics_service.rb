@@ -170,8 +170,8 @@ module Analytics
       }.to_h
 
       GridHackr
-        .where("#{col} >= ?", days.days.ago) # rubocop:disable Rails/WhereEquals -- column is allowlisted above
-        .group("strftime('%Y-%m-%d', #{col})") # rubocop:disable Rails/GroupByAssociation -- raw SQLite strftime
+        .where("#{col} >= ?", days.days.ago)
+        .group("strftime('%Y-%m-%d', #{col})")
         .count
         .each { |date, count| buckets[date] = count if buckets.key?(date) }
 
