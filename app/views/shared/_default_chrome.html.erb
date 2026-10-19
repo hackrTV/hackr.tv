@@ -1,15 +1,18 @@
 <%# ERB port of DefaultLayout.tsx (the nav itself renders in the hotwire
     layout). Wrap page content in render layout: "shared/default_chrome"
     with a block. Locals: ascii (default true), hide_live_banner (default
-    false). Live banner is server-rendered at page load; real-time go-live
-    inserts arrive with Phase 3 (StreamStatusChannel).
+    false). Live banner is server-rendered at page load into the layout's
+    .top-notices slot (content_for) so it sits below the nav; go-live
+    mid-page triggers a Turbo reload (StreamStatusChannel).
     No inline close-tag examples here: an ERB comment ends at the first
     percent-gt, escaped or not — the old example leaked onto every page. %>
 <% ascii = local_assigns.fetch(:ascii, true) %>
 <% hide_live_banner = local_assigns.fetch(:hide_live_banner, false) %>
 
 <% if !hide_live_banner && (live_stream = HackrStream.includes(:artist).current_live) %>
-  <%= render "shared/live_now_banner", stream: live_stream %>
+  <% content_for :top_notices do %>
+    <%= render "shared/live_now_banner", stream: live_stream %>
+  <% end %>
 <% end %>
 
 <br class="chrome-desktop-only">

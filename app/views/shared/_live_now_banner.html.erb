@@ -1,5 +1,8 @@
 <%# ERB port of LiveNowBanner.tsx — server-rendered when a stream is live
-    at page load. Real-time appearance (go-live mid-page) lands in Phase 3. %>
+    at page load. _default_chrome pushes it into the layout's
+    .top-notices header slot, which sits below the nav in normal flow (no
+    fixed offset, no spacer). Go-live mid-page triggers a Turbo reload via
+    the stream-status controller. %>
 <div class="live-banner">
   <div class="live-banner-sweep"></div>
   <span class="live-banner-inner">
@@ -8,4 +11,3 @@
     <%= nav_link_to "/", css_class: "live-banner-watch" do %>WATCH LIVE →<% end %>
   </span>
 </div>
-<div class="live-banner-spacer"></div>

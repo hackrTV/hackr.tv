@@ -25,6 +25,8 @@ RSpec.describe "Home page", type: :request do
       expect(response.body).to include("FRACTURE SESSIONS")
       expect(response.body).to include("https://www.youtube.com/embed/abc123xyz00")
       expect(response.body).to include("[=] THEATER")
+      expect(response.body).to include('class="theater-exit"') # floating exit shown in theater mode
+      expect(response.body).to include('data-controller="theater stream-watch uplink-dock"')
       expect(response.body).to include("live-side-panel--uplink")
       expect(response.body).to include("Docked chat packet")
       expect(response.body).to include("to transmit packets") # anonymous login prompt

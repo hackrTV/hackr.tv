@@ -24,15 +24,25 @@
   </head>
 
   <body class="black-168">
-    <%= render "shared/nav" %>
-
-    <%# Fixed to the bottom edge (above the statusbar): the fixed
-        .tui-nav wraps to a variable number of rows with login state and
-        viewport width, so top-of-flow notices render underneath it. %>
-    <div class="bottom-notices">
-      <%= render "shared/flash" %>
-      <%= render "shared/admin_preview_banner" %>
-    </div>
+    <%# Site header: the nav plus every top-of-page notice, in normal
+        flow. The nav used to be position:fixed with no reserved height
+        and wraps to a variable number of rows with login state and
+        viewport width, so anything at the top of flow (scheduled banner,
+        live banner, flashes) rendered underneath it and no fixed offset
+        was safe. Everything in .top-notices now lands directly below the
+        nav whatever its height; the header is sticky on desktop so nav +
+        notices stay pinned (hotwire.css "Site header"). Pages add banners
+        with content_for :top_notices. The site-header controller publishes
+        the rendered height as --site-header-h on <html> for viewport-fixed
+        surfaces (.tactical-root) to start below it. %>
+    <header class="site-header" data-controller="site-header">
+      <%= render "shared/nav" %>
+      <div class="top-notices">
+        <%= yield :top_notices %>
+        <%= render "shared/flash" %>
+        <%= render "shared/admin_preview_banner" %>
+      </div>
+    </header>
 
     <main id="main-content">
       <%= yield %>

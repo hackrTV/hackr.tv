@@ -26,7 +26,10 @@
 
 /* ── Hotwire tactical surface (Phase 6b) — GridTacticalPage.tsx shell ── */
 
-.tactical-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; display: grid; grid-template-areas: "topbar topbar" "leftcol map" "help help"; grid-template-columns: 50fr 50fr; grid-template-rows: 44px 1fr 58px; background: var(--bg-0); font-family: var(--font-tui); font-size: 20px; color: var(--fg); z-index: 40; }
+/* Starts below the site header (nav + notices): its height is published
+   as --site-header-h by the site-header Stimulus controller because the
+   nav wraps to a variable number of rows. 0px fallback = under it. */
+.tactical-root { position: fixed; top: var(--site-header-h, 0px); left: 0; right: 0; bottom: 0; overflow: hidden; display: grid; grid-template-areas: "topbar topbar" "leftcol map" "help help"; grid-template-columns: 50fr 50fr; grid-template-rows: 44px 1fr 58px; background: var(--bg-0); font-family: var(--font-tui); font-size: 20px; color: var(--fg); z-index: 40; }
 
 .tactical-bar { grid-area: topbar; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--bg-1); border-bottom: 1px solid var(--edge); font-size: 16px; }
 .tactical-bar-left, .tactical-bar-right { display: flex; align-items: center; gap: 10px; }

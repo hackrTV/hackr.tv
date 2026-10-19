@@ -140,42 +140,45 @@
 .mobile-menu-item .purple-168-text { color: var(--accent-bright); }
 .mobile-menu-item .red-255-text { color: var(--err); }
 
-/* --- Bottom notice region (flash + ADMIN PREVIEW banner) ---
- * Fixed to the bottom edge, above the fixed .tui-statusbar: the fixed
- * .tui-nav at the top wraps to a variable number of rows with login
- * state and viewport width, so nothing at the top of normal flow has a
- * reliable clearance — top-of-flow notices rendered underneath it.
- * z-index sits above page content, below the nav dropdowns (9999) and
- * toasts (10000). Empty when no flash/banner (zero height, invisible). */
-.bottom-notices {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 26px;
-  z-index: 2500;
-}
-/* The bottom statusbar is display:none under 768px — drop to the edge. */
+/* --- Site header: nav + .top-notices slot (application layout) ---
+ * The nav is in normal flow (tuicss .tui-nav is no longer fixed), so
+ * every notice in .top-notices — LIVE NOW / NEXT STREAM / prerelease
+ * banners via content_for, then flashes and the ADMIN PREVIEW banner —
+ * lands directly below it however many rows it wraps to. The header is
+ * sticky on desktop so nav + notices stay pinned while the page
+ * scrolls; under 768px the nav is the single [≡] MENU button and the
+ * header stays static so banners don't eat the viewport. z-index 3000
+ * sits above page content and the player bar (1000), below theater mode
+ * (9999) and toasts; the desktop dropdowns stack inside it. Empty slot =
+ * zero height. The site-header Stimulus controller publishes the rendered
+ * height as --site-header-h on <html> so viewport-fixed surfaces
+ * (.tactical-root) can start below it. */
+.site-header { position: sticky; top: 0; z-index: 3000; }
 @media (max-width: 767px) {
-  .bottom-notices { bottom: 0; }
+  .site-header { position: static; }
 }
+.top-notices { background: var(--bg-0); }
 
 /* --- Flash messages --- */
 .flash {
   font-family: var(--font-tui);
   padding: 8px 12px;
-  margin: 4px 10px;
+  margin: 0;
   border: 2px solid;
+  border-left: 0;
+  border-right: 0;
   background: var(--bg-0);
 }
-/* Solid backgrounds (the old 10% rgba tints over var(--bg-0)): the flashes
- * float over page content now, so translucency would bleed through. */
+/* Solid backgrounds (the old 10% rgba tints over var(--bg-0)): the header
+ * is sticky, so page content scrolls under the flashes — translucency
+ * would bleed through. */
 .flash-error { color: var(--err); border-color: var(--err); background: #211010; }
 .flash-alert { color: var(--err); border-color: var(--err); background: #211010; }
 .flash-notice { color: var(--ok); border-color: var(--ok); background: #0c1d12; }
 .flash-success { color: var(--ok); border-color: var(--ok); background: #0c1d12; }
 
 /* --- ADMIN PREVIEW banner (controlled rollout, AdminPreview concern) ---
- * Positioned by the .bottom-notices wrapper; flashes stack above it. */
+ * Rendered in the header's .top-notices slot, below any flashes. */
 .admin-preview-banner {
   font-family: var(--font-tui);
   font-size: 13px;
@@ -222,7 +225,9 @@
 .tui-statusbar ul li:hover { background-color: rgb(0, 168, 0); }
 .tui-statusbar ul li.active { background-color: rgba(var(--accent-rgb), 0.5); }
 
-/* --- Live Now banner (LiveNowBanner.tsx port) --- */
+/* --- Live Now banner (LiveNowBanner.tsx port) --- rendered into the
+ * header's .top-notices slot by _default_chrome, so it sits below the nav
+ * and pins with it (no fixed offset / spacer). */
 .live-banner {
   background: linear-gradient(90deg, #001a00 0%, #003300 50%, #001a00 100%);
   border-top: 1px solid var(--live);
@@ -231,11 +236,7 @@
   text-align: center;
   font-family: var(--font-tui);
   font-size: 18px;
-  position: fixed;
-  top: 26px;
-  left: 0;
-  right: 0;
-  z-index: 8;
+  position: relative;
   overflow: hidden;
   contain: paint;
 }
@@ -252,7 +253,6 @@
 .live-banner-label { color: var(--live); font-weight: bold; text-shadow: 0 0 10px var(--live); }
 .live-banner-title { color: #e0ffe0; }
 .live-banner-watch { color: #00cc00; margin-left: 16px; font-size: 14px; text-decoration: none; font-weight: bold; }
-.live-banner-spacer { height: 70px; }
 @keyframes live-pulse {
   0% { left: -100%; }
   100% { left: 100%; }
@@ -683,11 +683,10 @@
 .backup-codes-grid div { padding: 5px 0; }
 .backup-saved-actions { margin: 25px 0 10px 0; }
 
-/* Prerelease banner (PrereleaseBanner.tsx port; fixed below the 26px tui nav) */
-.prerelease-banner { background: linear-gradient(90deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%); border: 1px solid #f59e0b; border-left: none; border-right: none; padding: 8px 16px; text-align: center; font-family: var(--font-tui); font-size: 15px; position: fixed; top: 26px; left: 0; right: 0; z-index: 8; }
+/* Prerelease banner (PrereleaseBanner.tsx port; the login page renders it into the header's .top-notices slot) */
+.prerelease-banner { background: linear-gradient(90deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%); border: 1px solid #f59e0b; border-left: none; border-right: none; padding: 8px 16px; text-align: center; font-family: var(--font-tui); font-size: 15px; position: relative; }
 .prerelease-banner-mode { color: #f59e0b; font-weight: bold; margin-right: 8px; }
 .prerelease-banner-text { color: var(--warn); }
-.prerelease-banner-spacer { height: 35px; }
 
 /* --- PulseWire pages (Phase 3) ---
  * Ports of the inline style objects in HotwirePage / PulseCard /
@@ -837,24 +836,51 @@
 .scheduled-banner-soon { color: #fb923c; font-weight: bold; }
 .scheduled-banner-link { color: #06b6d4; text-decoration: none; margin-left: 12px; }
 
+/* --- Live embed (LiveStreamEmbed.tsx port) ---
+ * The row stretches both columns to the video's 16:9 height, and the
+ * docked Uplink panel is absolutely positioned inside its column
+ * (uplink.css "Home-page dock") so it fills exactly that height and
+ * scrolls its log instead of sizing to its content. */
 .live-embed { margin: 20px auto; max-width: 1200px; }
 .live-now-bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: linear-gradient(90deg, #001a00, #003300); border: 1px solid var(--live); font-family: var(--font-tui); }
 .live-now-label { color: var(--live); font-weight: bold; animation: feed-blink 2s step-end infinite; }
 .live-now-title { color: #e0ffe0; flex: 1; }
 .theater-toggle { background: none; border: 1px solid var(--live); color: var(--live); padding: 4px 10px; cursor: pointer; font-family: inherit; }
-.live-embed-row { display: flex; gap: 16px; margin-top: 12px; align-items: flex-start; }
-.live-video-container { flex: 1; min-width: 0; }
-.live-video-frame { position: relative; padding-bottom: 56.25%; height: 0; }
+.live-embed-row { display: flex; gap: 16px; margin-top: 12px; align-items: stretch; }
+.live-video-container { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.live-video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }
 .live-video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 .live-side-panel { width: 320px; flex-shrink: 0; border: 1px solid var(--accent); padding: 16px; font-family: var(--font-tui); }
 .live-side-panel-title { color: var(--accent-bright); font-weight: bold; letter-spacing: 2px; margin-bottom: 8px; }
 .live-side-panel-note { color: var(--fg-muted); font-size: 0.85em; margin: 0 0 12px 0; }
 @media (max-width: 900px) { .live-embed-row { flex-direction: column; } .live-side-panel { width: auto; } }
 
-/* Theater mode: fixed overlay */
-.live-embed.theater-mode { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: #000; margin: 0; max-width: none; display: flex; flex-direction: column; padding: 10px; }
-.live-embed.theater-mode .live-embed-row { flex: 1; margin-top: 10px; }
-.live-embed.theater-mode .live-video-frame { padding-bottom: 0; height: 100%; }
+/* Popped-out Uplink: while the /uplink/popout window is alive (its
+ * localStorage heartbeat, consumed by the uplink-dock controller, which
+ * toggles .uplink-popped on the embed) the docked chat column is hidden
+ * and the video takes the whole row — the whole viewport in theater. */
+.live-embed.uplink-popped .live-side-panel--uplink { display: none; }
+
+/* Theater mode: fixed overlay. The LIVE NOW bar (and its toggle) is
+ * hidden so the embed and the docked Uplink get the whole viewport; the
+ * floating .theater-exit control, or Escape, leaves. Above 900px the
+ * video fills the row height beside a 380px chat column; below it the
+ * row stacks — video at 16:9, chat takes the remaining height (video
+ * fills it when the chat is popped out). */
+.live-embed.theater-mode { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: #000; margin: 0; max-width: none; display: flex; flex-direction: column; padding: 0; }
+.live-embed.theater-mode .live-now-bar { display: none; }
+.live-embed.theater-mode .live-embed-row { flex: 1; min-height: 0; margin-top: 0; gap: 0; }
+.live-embed.theater-mode .live-video-frame { flex: 1; aspect-ratio: auto; }
+.live-embed.theater-mode .live-side-panel { width: 380px; border: none; border-left: 1px solid var(--edge); }
+.theater-exit { display: none; position: absolute; top: 9px; right: 12px; z-index: 2; background: rgba(0, 0, 0, 0.8); border: 1px solid var(--live); color: var(--live); padding: 4px 10px; cursor: pointer; font-family: var(--font-tui); }
+.live-embed.theater-mode .theater-exit { display: block; }
+@media (max-width: 900px) {
+  .live-embed.theater-mode .live-video-container { flex: 0 0 auto; }
+  .live-embed.theater-mode .live-video-frame { flex: 0 0 auto; aspect-ratio: 16 / 9; }
+  .live-embed.theater-mode .live-side-panel { width: auto; flex: 1; min-height: 0; border-left: none; border-top: 1px solid var(--edge); }
+  .live-embed.theater-mode.uplink-popped .live-video-container { flex: 1; min-height: 0; }
+  .live-embed.theater-mode.uplink-popped .live-video-frame { flex: 1; aspect-ratio: auto; }
+}
 body.theater-open { overflow: hidden; }
 
 /* --- Pulse Vault + shared track table (Phase 4) --- */

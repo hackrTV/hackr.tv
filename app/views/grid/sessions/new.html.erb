@@ -1,6 +1,8 @@
 <% content_for :title, "Grid Login — hackr.tv" %>
 
-<%= render "shared/prerelease_banner" %>
+<% content_for :top_notices do %>
+  <%= render "shared/prerelease_banner" %>
+<% end %>
 
 <%= render layout: "grid/shared/auth_window", locals: {legend: "THE PULSE GRID :: ACCESS"} do %>
   <%= render "grid/shared/auth_error", message: @error %>

@@ -120,8 +120,18 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .uplink-popout { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-0); display: flex; flex-direction: column; }
 .uplink-popout .uplink-panel { flex: 1; }
 
-/* ── Home-page dock (Phase 5: replaces the OPEN UPLINK link panel) ── */
+/* ── Home-page dock (Phase 5: replaces the OPEN UPLINK link panel) ──
+   .live-embed-row (hotwire.css) stretches the column to the video's
+   height; the panel is absolutely positioned inside it so it fills
+   exactly that height and scrolls its log rather than growing the row
+   (what the SPA's absolute-inset sideContent wrapper did). Below 900px
+   the row stacks and the column gets a fixed height for the panel to
+   fill. In theater mode the column is the full viewport height and the
+   floating [x] EXIT control sits over the header's right edge, so the
+   header leaves room for it. */
 
-.live-side-panel--uplink { padding: 0; display: flex; flex-direction: column; }
-.live-side-panel--uplink .uplink-panel { flex: 1; height: auto; min-height: 420px; border: none; }
-@media (max-width: 900px) { .live-side-panel--uplink .uplink-panel { min-height: 0; height: 480px; } }
+.live-side-panel--uplink { padding: 0; position: relative; }
+.live-side-panel--uplink .uplink-panel { position: absolute; top: 0; left: 0; right: 0; bottom: 0; height: auto; border: none; }
+@media (max-width: 900px) { .live-side-panel--uplink { height: 480px; } }
+.live-embed.theater-mode .live-side-panel--uplink { height: auto; }
+.live-embed.theater-mode .uplink-header { padding-right: 104px; }
