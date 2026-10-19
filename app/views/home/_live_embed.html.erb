@@ -1,14 +1,20 @@
 <%# LiveStreamEmbed.tsx port. Locals: stream (live HackrStream),
     uplink_channel (livestream ChatChannel or nil), uplink_packets.
-    Theater mode is a class toggle (Stimulus); the sidebar docks the
+    Theater mode is a class toggle (Stimulus): the LIVE NOW bar is hidden
+    so the embed + docked chat fill the viewport, and the floating
+    .theater-exit control (or Escape) leaves. The sidebar docks the
     embedded Uplink chat (Phase 5) pinned to the livestream channel —
-    no tab row, [^] pops the full window out. %>
-<div class="live-embed" data-controller="theater stream-watch">
+    no tab row, [^] pops the full window out; it is sized to the
+    embed's height (hotwire.css / uplink.css dock rules). While that
+    popout window is alive (uplink-dock controller, localStorage
+    heartbeat) the dock is hidden and the video takes its room. %>
+<div class="live-embed" data-controller="theater stream-watch uplink-dock">
   <div class="live-now-bar">
     <span class="live-now-label">● LIVE NOW</span>
     <span class="live-now-title"><%= stream.title %><% if stream.artist %> — <%= stream.artist.name %><% end %></span>
-    <button type="button" class="theater-toggle" data-theater-target="button" data-action="click->theater#toggle">[=] THEATER</button>
+    <button type="button" class="theater-toggle" title="Theater mode" data-theater-target="button" data-action="click->theater#toggle">[=] THEATER</button>
   </div>
+  <button type="button" class="theater-exit" title="Exit theater mode (Esc)" data-action="click->theater#toggle">[x] EXIT</button>
   <div class="live-embed-row">
     <div class="live-video-container">
       <div class="live-video-frame">

@@ -1164,13 +1164,18 @@ input[type=button] {
   color: black !important;
 }
 
+/* hackr.tv: in normal flow (upstream TuiCss fixes it to the top). The
+   nav wraps to a variable number of rows, so a fixed nav left no
+   reliable clearance for whatever rendered under it; the application
+   layout wraps it in a sticky .site-header with the top-notices slot
+   instead (hotwire.css "Site header"). */
 .tui-nav {
   width: 100%;
   background-color: rgb(168, 168, 168);
   padding: 0px 2px;
   z-index: 3000;
   display: block;
-  position: fixed;
+  position: relative;
 }
 
 .tui-nav ul li {

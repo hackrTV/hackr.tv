@@ -1,10 +1,15 @@
 <% content_for :title, "hackr.tv" %>
 
-<div data-controller="stream-status" data-stream-status-live-value="<%= @live.present? %>">
-  <% if @next_scheduled && !@live %>
+<%# The countdown banner goes into the layout's header slot (below the
+    nav, never under it) — the React HomePage passed it to DefaultLayout
+    as topBanner for the same reason. %>
+<% if @next_scheduled && !@live %>
+  <% content_for :top_notices do %>
     <%= render "home/scheduled_banner", stream: @next_scheduled %>
   <% end %>
+<% end %>
 
+<div data-controller="stream-status" data-stream-status-live-value="<%= @live.present? %>">
   <%= render layout: "shared/default_chrome", locals: {hide_live_banner: true} do %>
     <% if @live %>
       <%= render "home/live_embed", stream: @live,
