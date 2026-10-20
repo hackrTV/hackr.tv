@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -59,7 +59,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_120000) do
     t.integer "slow_mode_seconds", default: 0, null: false
     t.string "slug", null: false
     t.datetime "updated_at", null: false
+    t.string "category", default: "COMMS", null: false
+    t.integer "position", default: 0, null: false
     t.index ["is_active"], name: "index_chat_channels_on_is_active"
+    t.index ["position", "id"], name: "index_chat_channels_on_position_and_id"
     t.index ["slug"], name: "index_chat_channels_on_slug", unique: true
   end
 

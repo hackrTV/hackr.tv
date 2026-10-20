@@ -94,9 +94,11 @@ export default class extends Controller {
   private pendingCanPlay: (() => void) | null = null
   private pageTitle: string | null = null
   private randomStartPending = false
+  private barObserver: ResizeObserver | null = null
 
   connect (): void {
     this.wire()
+    this.observeBar()
     if (this.audioTarget.volume === 1 && !this.currentTrack) {
       this.audioTarget.volume = 0.7
     }
@@ -131,6 +133,26 @@ export default class extends Controller {
     document.addEventListener('player:toggle', this.onToggleEvent)
     document.removeEventListener('turbo:load', this.onTurboLoad)
     document.addEventListener('turbo:load', this.onTurboLoad)
+  }
+
+  // Publishes the fixed player bar's rendered height as --player-bar-h on
+  // <html> (0 while hidden), the way site-header publishes
+  // --site-header-h, so full-viewport surfaces (the Uplink shell) can
+  // keep their bottom edge — the composer — above the bar. The bar is
+  // position:fixed, so #player-bar itself has no height: observe the bar.
+  // connect() re-fires after every Turbo transplant, so tear down first.
+  private observeBar (): void {
+    this.barObserver?.disconnect()
+    this.barObserver = null
+    this.publishBarHeight()
+    if (typeof ResizeObserver === 'undefined') return
+    this.barObserver = new ResizeObserver(() => this.publishBarHeight())
+    this.barObserver.observe(this.barTarget)
+  }
+
+  private publishBarHeight (): void {
+    const height = this.barTarget.hidden ? 0 : Math.round(this.barTarget.getBoundingClientRect().height)
+    document.documentElement.style.setProperty('--player-bar-h', `${height}px`)
   }
 
   // --- inbound events ------------------------------------------------
@@ -172,6 +194,7 @@ export default class extends Controller {
 
     this.currentTrack = track
     this.barTarget.hidden = false
+    this.publishBarHeight()
     this.updateNowPlaying(track.id)
     this.renderTrackInfo()
 
@@ -254,6 +277,7 @@ export default class extends Controller {
     this.audioTarget.pause()
     this.stopWatchdog()
     this.barTarget.hidden = true
+    this.publishBarHeight()
     this.setPlaying(false)
     this.currentTrack = null
     this.updateNowPlaying(null)

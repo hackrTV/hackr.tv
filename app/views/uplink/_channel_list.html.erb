@@ -1,0 +1,29 @@
+<%# Sidebar channel list for the /uplink shell (the dock/popout keep the
+    horizontal _channel_tabs). Channels group under their category in
+    first-appearance order of the .ordered list; rows are Turbo links
+    (switching channels is a full visit, which swaps the stream
+    subscriptions naturally). Unavailable channels render as disabled
+    spans, like the tabs. Locals: channels, active (slug), live (bool). %>
+<div class="uplink-channels">
+  <% uplink_channel_groups(channels).each do |category, group| %>
+    <div class="uplink-category"><%= category %></div>
+    <% group.each do |ch| %>
+      <% is_active = ch.slug == active %>
+      <% disabled = !ch.currently_available? && !is_active %>
+      <% classes = class_names("uplink-channel", "uplink-channel--active": is_active, "uplink-channel--disabled": disabled) %>
+      <% inner = capture do %>
+        <span class="uplink-channel-name"><%= ch.name %></span>
+        <%= uplink_live_dot(live) if ch.requires_livestream? %>
+        <% if ch.slow_mode? %><span class="uplink-channel-slow"><%= ch.slow_mode_seconds %>s</span><% end %>
+      <% end %>
+      <% if disabled %>
+        <span class="<%= classes %>" aria-disabled="true" title="<%= ch.description %>"><%= inner %></span>
+      <% else %>
+        <%= link_to inner, uplink_path(channel: ch.slug), class: classes, title: ch.description, aria: {current: ("page" if is_active)} %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% if channels.empty? %>
+    <p class="uplink-channels-empty">NO CHANNELS</p>
+  <% end %>
+</div>

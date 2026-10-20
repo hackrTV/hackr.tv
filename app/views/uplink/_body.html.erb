@@ -1,0 +1,45 @@
+<%# Channel body shared by the dock/popout panel (_panel) and the /uplink
+    shell (_shell) — the state block below the header: livestream-offline
+    notice, log frame + composer (or the blackout / squelch / login
+    replacements), or the no-channel fallback. One partial so the three
+    surfaces can't drift. Locals:
+      channel, viewer, packets
+      shell — true on /uplink: multiline composer, client-side packet
+              grouping on the log, and the log wrapped so the shell can
+              float its "new packets" jump pill over it. %>
+<%
+  viewer = local_assigns.fetch(:viewer, nil)
+  shell = local_assigns.fetch(:shell, false)
+  unavailable = channel && channel.requires_livestream? && !channel.currently_available?
+  viewable = channel.present? && channel.viewable_by?(viewer)
+%>
+<% if unavailable %>
+  <div class="uplink-unavailable">
+    <p><%= channel.name %> is only available during livestreams.</p>
+    <p class="uplink-unavailable-sub">Check back when we're live!</p>
+  </div>
+<% elsif viewable %>
+  <% if shell %>
+    <div class="uplink-logwrap">
+      <%= render "uplink/log_frame", packets: packets, viewer: viewer, group: true %>
+      <button type="button" class="uplink-jump" hidden data-uplink-shell-target="jump"
+        data-action="click->uplink-shell#jump">[v] <span data-uplink-shell-target="jumpCount">NEW PACKETS</span></button>
+    </div>
+  <% else %>
+    <%= render "uplink/log_frame", packets: packets, viewer: viewer %>
+  <% end %>
+
+  <% if viewer %>
+    <% if UserPunishment.blackedout?(viewer) %>
+      <div class="uplink-notice uplink-notice--blackout">You have been blackedout from Uplink.</div>
+    <% elsif UserPunishment.squelched?(viewer) %>
+      <div class="uplink-notice uplink-notice--squelch">You have been squelched. Please wait for your squelch to expire.</div>
+    <% else %>
+      <%= render "uplink/packet_form", channel: channel, disabled: !channel.accessible_by?(viewer), multiline: shell %>
+    <% end %>
+  <% else %>
+    <div class="uplink-login-prompt"><a href="/grid/login">Log in</a> to transmit packets</div>
+  <% end %>
+<% else %>
+  <div class="uplink-unavailable"><p>No uplink channels available.</p></div>
+<% end %>

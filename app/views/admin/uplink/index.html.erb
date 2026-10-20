@@ -32,6 +32,7 @@
             <thead>
               <tr>
                 <th style="text-align: left;">Channel</th>
+                <th style="text-align: center;">Sidebar</th>
                 <th style="text-align: center;">Status</th>
                 <th style="text-align: center;">Requires Stream</th>
                 <th style="text-align: center;">Slow Mode</th>
@@ -45,6 +46,9 @@
                   <td>
                     <strong class="cyan-255-text"><%= channel.name %></strong>
                     <br><small style="color: #666;"><%= channel.slug %></small>
+                  </td>
+                  <td style="text-align: center;">
+                    <%= channel.category %> <small style="color: #666;">#<%= channel.position %></small>
                   </td>
                   <td style="text-align: center;">
                     <% if channel.is_active %>

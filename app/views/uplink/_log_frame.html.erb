@@ -3,9 +3,12 @@
     SPA's initial_packets re-merge). target=_top: packet links navigate
     the page, and Turbo Stream appends land on #uplink-log. The empty
     state is always rendered; CSS hides it once a .packet exists, so
-    broadcast-appended packets clear it without a dedicated remove. %>
+    broadcast-appended packets clear it without a dedicated remove.
+    group: true (the /uplink shell) turns on the packet-log controller's
+    Discord-style consecutive-author grouping. %>
+<% group = local_assigns.fetch(:group, false) %>
 <%= turbo_frame_tag "uplink-log-frame", target: "_top", data: {uplink_target: "logFrame"} do %>
-  <div id="uplink-log" class="packet-log" data-controller="packet-log">
+  <div id="uplink-log" class="packet-log" data-controller="packet-log"<% if group %> data-packet-log-group-value="true"<% end %>>
     <div class="uplink-empty">
       <p>No packets yet. Be the first to transmit.</p>
     </div>

@@ -4,10 +4,12 @@
 # Database name: primary
 #
 #  id                  :integer          not null, primary key
+#  category            :string           default("COMMS"), not null
 #  description         :text
 #  is_active           :boolean          default(TRUE), not null
 #  minimum_role        :string           default("operative"), not null
 #  name                :string           not null
+#  position            :integer          default(0), not null
 #  requires_livestream :boolean          default(FALSE), not null
 #  slow_mode_seconds   :integer          default(0), not null
 #  slug                :string           not null
@@ -16,8 +18,9 @@
 #
 # Indexes
 #
-#  index_chat_channels_on_is_active  (is_active)
-#  index_chat_channels_on_slug       (slug) UNIQUE
+#  index_chat_channels_on_is_active        (is_active)
+#  index_chat_channels_on_position_and_id  (position,id)
+#  index_chat_channels_on_slug             (slug) UNIQUE
 #
 require "rails_helper"
 
@@ -158,6 +161,36 @@ RSpec.describe ChatChannel, type: :model do
 
       it "allows admins" do
         expect(channel.accessible_by?(admin)).to be true
+      end
+    end
+  end
+
+  describe "sidebar category + position (Uplink shell)" do
+    it "upcases and trims the category, defaulting blank to COMMS" do
+      expect(create(:chat_channel, category: " broadcast ").category).to eq("BROADCAST")
+      expect(create(:chat_channel, category: "").category).to eq("COMMS")
+      expect(create(:chat_channel, category: nil).category).to eq("COMMS")
+    end
+
+    it "rejects categories with punctuation or over 24 chars" do
+      expect(build(:chat_channel, category: "no/slash")).not_to be_valid
+      expect(build(:chat_channel, category: "x" * 25)).not_to be_valid
+      expect(build(:chat_channel, category: "OPS ROOM_2")).to be_valid
+    end
+
+    it "requires a non-negative integer position" do
+      expect(build(:chat_channel, position: -1)).not_to be_valid
+      expect(build(:chat_channel, position: 1.5)).not_to be_valid
+      expect(build(:chat_channel, position: 0)).to be_valid
+    end
+
+    describe ".ordered" do
+      it "sorts by position then id" do
+        late = create(:chat_channel, position: 10)
+        early = create(:chat_channel, position: 0)
+        early_too = create(:chat_channel, position: 0)
+
+        expect(ChatChannel.ordered.to_a).to eq([early, early_too, late])
       end
     end
   end

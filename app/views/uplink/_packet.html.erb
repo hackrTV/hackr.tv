@@ -5,7 +5,9 @@
                and the packet Stimulus controller reveals them from the
                layout's current-hackr metas. It also fixes broadcast-form
                CSRF tokens, localizes the timestamp, and highlights the
-               viewer's own @mentions. %>
+               viewer's own @mentions.
+    data-author-key / data-at feed the packet-log controller's
+    client-side consecutive-author grouping (the /uplink shell). %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   bot = packet.source == "SYNTHIA"
@@ -18,7 +20,8 @@
 %>
 <div id="<%= dom_id(packet) %>"
   class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %>"
-  data-controller="packet" data-packet-owner-id-value="<%= packet.grid_hackr_id %>">
+  data-controller="packet" data-packet-owner-id-value="<%= packet.grid_hackr_id %>"
+  data-author-key="<%= uplink_author_key(packet, parsed) %>" data-at="<%= (packet.created_at.to_f * 1000).to_i %>">
   <div class="packet-meta">
     <time class="packet-time" datetime="<%= packet.created_at.iso8601 %>"
       data-packet-target="time"><%= packet.created_at.strftime("%H:%M") %></time>

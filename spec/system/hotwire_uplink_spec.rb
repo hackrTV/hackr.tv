@@ -52,10 +52,11 @@ RSpec.describe "Hotwire uplink", type: :system do
     visit "/uplink"
     await_uplink!
 
-    find_field("content").send_keys("o/ :wa")
-    expect(page).to have_css(".emote-menu .emote-option-slug", text: ":wave:")
-
-    find_field("content").send_keys(:enter) # picks the emote, must NOT submit
+    # One send_keys: Cuprite clicks the field before every send_keys, and
+    # a click that lands inside the ":wa" token moves the caret off it and
+    # closes the picker (as it would for a real click), so the Enter that
+    # picks has to ride the same keystroke batch as the typing.
+    find_field("content").send_keys("o/ :wa", :enter) # Enter picks the emote, must NOT submit
     expect(page).to have_field("content", with: "o/ :wave: ")
     expect(page).to have_no_css(".emote-menu .emote-option")
     expect(ChatMessage.count).to eq(0)
@@ -104,7 +105,9 @@ RSpec.describe "Hotwire uplink", type: :system do
       log_in!(operator)
       visit "/uplink"
       await_uplink!
-      # Revealed by the packet controller from the role meta.
+      # Revealed by the packet controller from the role meta; the shell
+      # shows packet controls on hover (Discord rhythm).
+      find("#chat_message_#{packet.id}").hover
       within("#chat_message_#{packet.id}") do
         expect(page).to have_css("button[title='Drop packet']", wait: 5)
         find("button[title='Drop packet']").click
@@ -119,6 +122,7 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
 
     using_session(:moderator) do
+      find("#chat_message_#{packet.id}").hover
       within("#chat_message_#{packet.id}") do
         expect(page).to have_css("button[title='Restore packet']", wait: 5)
         find("button[title='Restore packet']").click
@@ -131,7 +135,7 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
   end
 
-  it "switches channels via the tabs" do
+  it "switches channels via the sidebar" do
     trace = create(:chat_channel, slug: "trace", name: "#trace")
     create(:chat_message, chat_channel: trace, grid_hackr: other, content: "Trace channel packet")
 
@@ -143,7 +147,42 @@ RSpec.describe "Hotwire uplink", type: :system do
 
     expect(page).to have_current_path("/uplink?channel=trace")
     expect(page).to have_content("Trace channel packet")
-    expect(page).to have_css(".channel-tab--active", text: "#trace")
+    expect(page).to have_css(".uplink-channel--active", text: "#trace")
+    expect(page).to have_css(".uplink-chanhead-name", text: "#trace")
+  end
+
+  it "groups consecutive packets by one author, sends multi-line packets on Enter, and reveals only your own roster row" do
+    create(:chat_message, chat_channel: channel, grid_hackr: other, content: "first from other")
+    create(:chat_message, chat_channel: channel, grid_hackr: other, content: "second from other")
+
+    using_session(:lurker) do
+      log_in!(other)
+      visit "/uplink"
+      await_uplink!
+    end
+
+    log_in!(hackr)
+    visit "/uplink"
+    await_uplink!
+
+    # Discord rhythm: the second consecutive packet collapses its author line.
+    expect(page).to have_css(".packet--cont", text: "second from other")
+    expect(page).not_to have_css(".packet--cont", text: "first from other")
+
+    # Shift+Enter keeps typing, Enter sends; the stored packet keeps the newline.
+    find_field("content").send_keys("line one", [:shift, :enter], "line two")
+    expect(ChatMessage.count).to eq(2)
+    find_field("content").send_keys(:enter)
+    expect(page).to have_css("#uplink-log .packet-content", text: "line one\nline two", wait: 10)
+    expect(ChatMessage.last.content).to eq("line one\nline two")
+    expect(page).to have_field("content", with: "")
+
+    # Operatives pane: the lurker is a callsign, you are you.
+    within("#uplink-members") do
+      expect(page).to have_content(Uplink::Callsign.label(other.id), wait: 10)
+      expect(page).not_to have_content(other.hackr_alias)
+      expect(page).to have_css(".uplink-member--self", text: "@#{hackr.hackr_alias}", wait: 10)
+    end
   end
 
   it "docks the chat on the live home page and sends from there" do

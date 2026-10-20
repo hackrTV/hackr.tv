@@ -25,7 +25,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.location).to include("/grid/login")
     end
 
-    it "renders the panel with recent packets, form, and stream subscription" do
+    it "renders the shell with recent packets, composer, and stream subscription" do
       create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Ambient signal check")
       create(:chat_message, :dropped, chat_channel: channel, grid_hackr: other, content: "Redacted transmission")
       log_in!
@@ -42,7 +42,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include("No packets yet") # empty-state div always renders (CSS hides it)
     end
 
-    it "switches channels via ?channel= and marks the active tab" do
+    it "switches channels via ?channel= and marks the active sidebar row" do
       trace = create(:chat_channel, slug: "trace", name: "#trace")
       create(:chat_message, chat_channel: trace, grid_hackr: other, content: "Trace-only packet")
       log_in!
@@ -51,7 +51,96 @@ RSpec.describe "Uplink pages", type: :request do
 
       expect(response.body).to include('data-uplink-channel-value="trace"')
       expect(response.body).to include("Trace-only packet")
-      expect(response.body).to include("channel-tab channel-tab--active")
+      expect(response.body).to include("uplink-channel uplink-channel--active")
+      expect(response.body).to include('<h2 class="uplink-chanhead-name">#trace</h2>')
+    end
+
+    it "renders the NODE shell chrome: rail, categorized sidebar in position order, channel header with the topic" do
+      create(:chat_channel, :livestream_only, slug: "live", name: "#live", category: "BROADCAST", position: 0)
+      channel.update!(category: "COMMS", position: 10, description: "Always-on ambient comms.")
+      create(:chat_channel, slug: "ops", name: "#ops", category: "COMMS", position: 20)
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include('class="uplink-shell" data-controller="uplink uplink-shell"')
+      expect(body).to include("hackr.tv NODE")
+      expect(body.index("BROADCAST")).to be < body.index("COMMS") # category order follows position
+      expect(body.index(">#ambient<")).to be < body.index(">#ops<")
+      expect(body).to include('<h2 class="uplink-chanhead-name">#ambient</h2>')
+      expect(body).to include("Always-on ambient comms.") # description as the topic
+      expect(body).not_to include("chrome-content") # no default chrome around the shell
+      expect(body).to include(%(@#{hackr.hackr_alias})) # user panel
+    end
+
+    it "hooks the shell's log and composer: grouping on, multiline textarea, head metas" do
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include('data-packet-log-group-value="true"')
+      expect(body).to include("<textarea") # shell composer is multiline
+      expect(body).to include('data-packet-form-multiline-value="true"')
+      expect(body).to include(%(<meta name="uplink-callsign" content="#{Uplink::Callsign.token(hackr.id)}">))
+      expect(body).to include('turbo-cache-control" content="no-cache"')
+    end
+
+    it "lists the viewer in the roster from the first paint without writing a presence row" do
+      log_in!
+
+      get "/uplink"
+
+      expect(response.body).to include('id="uplink-members"')
+      expect(response.body).to include("OPERATIVE — 1")
+      expect(response.body).to include(%(data-callsign="#{Uplink::Callsign.token(hackr.id)}"))
+      expect(GridUplinkPresence.count).to eq(0) # the cable subscription creates it, not the GET
+    end
+
+    it "lists connected operatives as callsigns only, never aliases" do
+      lurker = create(:grid_hackr, :operator)
+      GridUplinkPresence.touch!(lurker, channel)
+      log_in!
+
+      get "/uplink"
+
+      roster = response.body[/<div id="uplink-members".*?<\/div>/m]
+      expect(roster).to include("OPERATOR — 1")
+      expect(roster).to include("OPERATIVE — 1") # the viewer
+      expect(roster).to include(Uplink::Callsign.label(lurker.id))
+      expect(roster).to include(%(data-callsign="#{Uplink::Callsign.token(lurker.id)}"))
+      expect(roster).not_to include(lurker.hackr_alias)
+      expect(roster).not_to include(hackr.hackr_alias) # own row is revealed client-side only
+      expect(roster).not_to include(%(data-callsign="#{lurker.id}"))
+    end
+
+    it "stages the live stream above the log on livestream channels only" do
+      live = create(:chat_channel, :livestream_only, slug: "live", name: "#live")
+      create(:hackr_stream, artist: create(:artist), title: "NODE SESSIONS", is_live: true,
+        live_url: "https://www.youtube.com/embed/abc123xyz00")
+      log_in!
+
+      get "/uplink", params: {channel: "live"}
+      expect(response.body).to include('class="uplink-stage"')
+      expect(response.body).to include('data-src="https://www.youtube.com/embed/abc123xyz00"')
+      expect(response.body).to include("NODE SESSIONS")
+      expect(response.body).to include("[-] HIDE VIDEO")
+      expect(response.body).to include("Transmit a packet...") # channel is open while live
+
+      get "/uplink", params: {channel: "ambient"}
+      expect(response.body).not_to include('class="uplink-stage"')
+      expect(live.reload).to be_currently_available
+    end
+
+    it "tags packets with the author key + timestamp the log groups on" do
+      create(:chat_message, chat_channel: channel, grid_hackr: other, content: "grouped?")
+      log_in!
+
+      get "/uplink"
+
+      expect(response.body).to include(%(data-author-key="h#{other.id}"))
+      expect(response.body).to match(/data-at="\d{13}"/)
     end
 
     it "falls back to the default channel for unknown slugs" do
@@ -180,6 +269,25 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include("to transmit packets") # anonymous login prompt
       expect(response.body).to include("turbo-cable-stream-source")
     end
+
+    it "keeps the panel single-line and shell-free (as does the home dock)" do
+      create(:hackr_stream, artist: create(:artist), is_live: true,
+        live_url: "https://www.youtube.com/watch?v=abc123xyz00")
+      log_in!
+
+      get "/uplink/popout"
+      expect(response.body).to include('<input type="text" name="content"')
+      expect(response.body).not_to include("<textarea")
+      expect(response.body).not_to include("uplink-shell")
+      expect(response.body).not_to include("packet-input-emote")
+      expect(response.body).not_to include("data-packet-log-group-value")
+      expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
+
+      get "/"
+      expect(response.body).to include("live-side-panel--uplink")
+      expect(response.body).to include('<input type="text" name="content"')
+      expect(response.body).not_to include("uplink-shell")
+    end
   end
 
   describe "GET /uplink/log" do
@@ -229,6 +337,15 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include('action="replace" target="uplink-form-error"')
       expect(ChatMessage.last.grid_hackr).to eq(hackr)
       expect(ChatMessage.last.hackr_stream).to be_nil
+    end
+
+    it "normalizes textarea newlines: CRLF to LF, blank-line runs capped, edges trimmed" do
+      log_in!
+
+      post "/uplink/packets", params: {channel_slug: "ambient", content: "  one\r\n\r\n\r\n\r\ntwo\r\nthree  "},
+        headers: turbo_stream_headers
+
+      expect(ChatMessage.last.content).to eq("one\n\ntwo\nthree")
     end
 
     it "stores the raw :slug: token and renders the image only in the HTML" do

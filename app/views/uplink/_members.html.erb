@@ -1,0 +1,23 @@
+<%# Members pane body (OPERATIVES). Replaced wholesale by
+    Uplink::MembersBroadcaster on the ["uplink_members", slug] stream
+    whenever a presence row appears or goes — rendered viewer-neutral:
+    callsigns (Uplink::Callsign) only, never aliases. The members Stimulus
+    controller re-reveals the viewer's own row from the page's
+    uplink-callsign + current-hackr-alias metas on every (re)connect.
+    The root id is the broadcast target. Locals: roster (Uplink::Roster). %>
+<div id="<%= Uplink::MembersBroadcaster::TARGET %>" class="uplink-members" data-controller="members">
+  <% if roster.empty? %>
+    <p class="uplink-members-empty">NO OPERATIVES CONNECTED</p>
+  <% else %>
+    <% roster.groups.each do |role, members| %>
+      <section class="uplink-members-group">
+        <h3 class="uplink-members-heading"><%= role.upcase %> — <%= members.size %></h3>
+        <ul class="uplink-members-list">
+          <% members.each do |member| %>
+            <li class="uplink-member uplink-member--<%= role %>" data-callsign="<%= member.token %>"><span class="uplink-member-dot"></span><span class="uplink-member-name"><%= member.label %></span></li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  <% end %>
+</div>

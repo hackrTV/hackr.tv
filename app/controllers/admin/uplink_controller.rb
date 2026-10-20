@@ -4,7 +4,7 @@ class Admin::UplinkController < Admin::ApplicationController
 
   # GET /root/uplink
   def index
-    @channels = ChatChannel.all
+    @channels = ChatChannel.ordered
     @active_punishments = UserPunishment.active.includes(:grid_hackr, :issued_by)
     @recent_packets = ChatMessage.recent.limit(20).includes(:grid_hackr, :chat_channel)
     @moderation_logs = ModerationLog.recent.limit(10).includes(:actor, :target)
@@ -200,7 +200,7 @@ class Admin::UplinkController < Admin::ApplicationController
   end
 
   def channel_params
-    params.require(:chat_channel).permit(:name, :description, :is_active, :requires_livestream, :slow_mode_seconds, :minimum_role)
+    params.require(:chat_channel).permit(:name, :description, :is_active, :requires_livestream, :slow_mode_seconds, :minimum_role, :category, :position)
   end
 
   def find_hackr_by_id_or_username

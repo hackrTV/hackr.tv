@@ -1,5 +1,5 @@
-# Server-rendered Uplink chat (Hotwire migration Phase 5) — ports
-# UplinkPage.tsx / UplinkPopoutPage.tsx. The log is rendered with the
+# Server-rendered Uplink chat (Hotwire migration Phase 5; Discord-shaped
+# shell on /uplink since 2026-10) — ports UplinkPage.tsx / UplinkPopoutPage.tsx. The log is rendered with the
 # recent packets (the SPA's initial_packets merge); live inserts arrive
 # over Turbo Streams from ChatMessage's dual-publish broadcasts. The
 # uplink Stimulus controller additionally holds a LiveChatChannel
@@ -10,19 +10,22 @@ class UplinkController < ApplicationController
 
   RECENT_PACKETS = 20 # LiveChatChannel#send_recent_packets parity
 
-  # GET /uplink
+  # GET /uplink — the NODE shell (uplink/_shell): channel sidebar, channel
+  # pane with the live stage on livestream channels, operatives roster.
   def show
-    @channels = ChatChannel.active.order(:id).to_a
+    @channels = ChatChannel.active.ordered.to_a
     @channel = resolve_channel(@channels, default_slug: "ambient")
     return redirect_to uplink_path if channel_off_limits?
 
     load_packets
+    @live_stream = HackrStream.includes(:artist).current_live
+    @roster = Uplink::Roster.for(viewable? ? @channel : nil, viewer: current_hackr)
   end
 
   # GET /uplink/popout — public (livestream viewing), slim layout,
   # livestream channels only (UplinkPopoutPage livestreamOnly parity).
   def popout
-    @channels = ChatChannel.active.requiring_livestream.order(:id).to_a
+    @channels = ChatChannel.active.requiring_livestream.ordered.to_a
     @channel = resolve_channel(@channels, default_slug: ChatChannel.livestream_default&.slug)
     return redirect_to uplink_popout_path if channel_off_limits?
 
@@ -60,8 +63,14 @@ class UplinkController < ApplicationController
     params[:channel].present?
   end
 
+  def viewable?
+    return @viewable if defined?(@viewable)
+
+    @viewable = @channel.present? && @channel.viewable_by?(current_hackr)
+  end
+
   def load_packets
-    @packets = if @channel&.viewable_by?(current_hackr)
+    @packets = if viewable?
       @channel.chat_messages.active.recent.limit(RECENT_PACKETS).includes(:grid_hackr).reverse
     else
       []

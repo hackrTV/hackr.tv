@@ -7,14 +7,15 @@
       popout_button — render the [^] opener
     The turbo_stream_from subscription delivers packet HTML; the uplink
     Stimulus controller separately subscribes LiveChatChannel for presence
-    counts + connection state (its packet JSON is ignored). %>
+    counts + connection state (its packet JSON is ignored). The body
+    below the header (log + composer / notices) is uplink/_body, shared
+    with the /uplink shell. %>
 <%
   channels = local_assigns.fetch(:channels, [])
   viewer = local_assigns.fetch(:viewer, nil)
   tab_path = local_assigns.fetch(:tab_path, ->(slug) { uplink_path(channel: slug) })
   popout_button = local_assigns.fetch(:popout_button, false)
   live = HackrStream.current_live.present?
-  unavailable = channel && channel.requires_livestream? && !channel.currently_available?
   viewable = channel.present? && channel.viewable_by?(viewer)
 %>
 <div class="uplink-panel" data-controller="uplink"
@@ -46,26 +47,5 @@
     <span class="presence-text" data-uplink-target="presenceText">Connecting...</span>
   </div>
 
-  <% if unavailable %>
-    <div class="uplink-unavailable">
-      <p><%= channel.name %> is only available during livestreams.</p>
-      <p class="uplink-unavailable-sub">Check back when we're live!</p>
-    </div>
-  <% elsif viewable %>
-    <%= render "uplink/log_frame", packets: packets, viewer: viewer %>
-
-    <% if viewer %>
-      <% if UserPunishment.blackedout?(viewer) %>
-        <div class="uplink-notice uplink-notice--blackout">You have been blackedout from Uplink.</div>
-      <% elsif UserPunishment.squelched?(viewer) %>
-        <div class="uplink-notice uplink-notice--squelch">You have been squelched. Please wait for your squelch to expire.</div>
-      <% else %>
-        <%= render "uplink/packet_form", channel: channel, disabled: !channel.accessible_by?(viewer) %>
-      <% end %>
-    <% else %>
-      <div class="uplink-login-prompt"><a href="/grid/login">Log in</a> to transmit packets</div>
-    <% end %>
-  <% else %>
-    <div class="uplink-unavailable"><p>No uplink channels available.</p></div>
-  <% end %>
+  <%= render "uplink/body", channel: channel, viewer: viewer, packets: packets %>
 </div>
