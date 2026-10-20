@@ -7,6 +7,8 @@ channels:
     requires_livestream: false
     slow_mode_seconds: 0
     minimum_role: operative
+    category: COMMS
+    position: 10
 
   - slug: live
     name: "#live"
@@ -15,3 +17,5 @@ channels:
     requires_livestream: true
     slow_mode_seconds: 3
     minimum_role: operative
+    category: BROADCAST
+    position: 0

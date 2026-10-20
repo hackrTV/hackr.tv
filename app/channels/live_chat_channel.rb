@@ -2,6 +2,11 @@ class LiveChatChannel < ApplicationCable::Channel
   # Thread-safe presence tracking (use Redis in production for multi-server)
   @@presence_counts = Hash.new(0)
   @@presence_mutex = Mutex.new
+  # Subscriptions per hackr per channel (this process): the shell plus a
+  # popout, or two tabs, share one GridUplinkPresence row, and only the
+  # last unsubscribe removes it — otherwise the operatives roster would
+  # drop the hackr until the other tab's next 60s touch.
+  @@hackr_subscriptions = Hash.new(0)
 
   # Refresh presence TTL server-side while the WebSocket is alive — no client ping needed
   periodically every: 60.seconds do
@@ -47,6 +52,7 @@ class LiveChatChannel < ApplicationCable::Channel
     # Track presence (count + economy presence)
     update_presence_count(chat_channel, 1)
     track_uplink_presence(chat_channel)
+    retain_presence(chat_channel)
   end
 
   def unsubscribed
@@ -55,7 +61,7 @@ class LiveChatChannel < ApplicationCable::Channel
       if chat_channel
         Rails.logger.info "=== LiveChatChannel: #{current_hackr&.hackr_alias || "Anonymous"} disconnected from #{@channel_slug} ==="
         update_presence_count(chat_channel, -1)
-        remove_uplink_presence(chat_channel)
+        remove_uplink_presence(chat_channel) if release_presence(chat_channel)
       end
     end
   end
@@ -114,6 +120,31 @@ class LiveChatChannel < ApplicationCable::Channel
     GridUplinkPresence.remove!(current_hackr, chat_channel)
   rescue => e
     Rails.logger.error "=== LiveChatChannel: Presence removal error: #{e.message} ==="
+  end
+
+  def presence_key(chat_channel)
+    "#{chat_channel.slug}:#{current_hackr.id}"
+  end
+
+  def retain_presence(chat_channel)
+    return unless current_hackr
+    @@presence_mutex.synchronize { @@hackr_subscriptions[presence_key(chat_channel)] += 1 }
+  end
+
+  # true when this was the hackr's last subscription to the channel.
+  def release_presence(chat_channel)
+    return false unless current_hackr
+    @@presence_mutex.synchronize do
+      key = presence_key(chat_channel)
+      remaining = [@@hackr_subscriptions[key] - 1, 0].max
+      if remaining.zero?
+        @@hackr_subscriptions.delete(key)
+        true
+      else
+        @@hackr_subscriptions[key] = remaining
+        false
+      end
+    end
   end
 
   def update_presence_count(chat_channel, delta)

@@ -469,3 +469,49 @@ describe('player controller', () => {
     })
   })
 })
+
+// --player-bar-h: the fixed bar's height published on <html> for
+// full-viewport surfaces (the Uplink shell keeps its composer above it).
+describe('PlayerController --player-bar-h', () => {
+  let resize: (() => void) | undefined
+  let height = 92
+
+  const published = (): string => document.documentElement.style.getPropertyValue('--player-bar-h')
+
+  beforeEach(() => {
+    resize = undefined
+    height = 92
+    vi.stubGlobal('ResizeObserver', class {
+      constructor (callback: () => void) { resize = callback }
+      observe (): void { /* jsdom stub */ }
+      disconnect (): void { /* jsdom stub */ }
+    })
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(() => ({ height } as unknown as DOMRect))
+  })
+
+  afterEach(async () => {
+    application?.stop()
+    document.body.innerHTML = ''
+    document.documentElement.style.removeProperty('--player-bar-h')
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+    await Promise.resolve()
+  })
+
+  it('publishes 0px while hidden, the bar height when shown, and follows resizes', async () => {
+    await mountPlayer(false)
+    expect(published()).toBe('0px')
+
+    bar().hidden = false
+    resize?.()
+    expect(published()).toBe('92px')
+
+    height = 110
+    resize?.()
+    expect(published()).toBe('110px')
+
+    bar().hidden = true
+    resize?.()
+    expect(published()).toBe('0px')
+  })
+})

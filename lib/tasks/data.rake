@@ -528,7 +528,9 @@ namespace :data do
         is_active: attrs["is_active"],
         requires_livestream: attrs["requires_livestream"],
         slow_mode_seconds: attrs["slow_mode_seconds"],
-        minimum_role: attrs["minimum_role"]
+        minimum_role: attrs["minimum_role"],
+        category: attrs.fetch("category", "COMMS"),
+        position: attrs.fetch("position", 0)
       )
       channel.save!
       created += 1

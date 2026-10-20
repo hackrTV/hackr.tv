@@ -117,6 +117,25 @@ export default class extends Controller<HTMLElement> {
     }
   }
 
+  // Emote button: open the menu at the caret with every emote listed (the
+  // menu scrolls), or close it if it's already open. pick() inserts at
+  // the caret. A disabled field (cooldown, role gate) stays untouched.
+  browse (): void {
+    if (this.isOpen) {
+      this.close()
+      return
+    }
+    const field = this.inputTarget
+    if (field.disabled) return
+    const caret = field.selectionStart ?? field.value.length
+    this.matches = this.emotesValue.slice()
+    if (this.matches.length === 0) return
+    this.token = { start: caret, end: caret, query: '' }
+    this.active = 0
+    this.render()
+    field.focus()
+  }
+
   close (): void {
     this.menuTarget.hidden = true
     this.menuTarget.replaceChildren()

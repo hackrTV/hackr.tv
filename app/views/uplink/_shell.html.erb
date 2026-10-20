@@ -1,0 +1,83 @@
+<%# The /uplink page: a Discord-shaped NODE shell with the hackr.tv TUI
+    laid over it — rail / channel sidebar / channel pane / operatives
+    pane. Only /uplink renders this; the home dock and popout keep
+    uplink/_panel, and all three share uplink/_body (log + composer +
+    notices) and the packet/form partials, so the broadcast contracts
+    (#uplink-log, #uplink-form-error, #chat_message_N) are identical.
+    The uplink Stimulus controller sits on the root (ancestor of the
+    banner, presence and logFrame targets, exactly as on .uplink-panel);
+    uplink-shell owns the chrome: drawers under 768px, the members
+    toggle, the stage collapse, the jump pill and the / hotkey.
+    Locals: channel, channels, packets, viewer, live_stream, roster. %>
+<%
+  viewable = channel.present? && channel.viewable_by?(viewer)
+  live = live_stream.present?
+  staged = live && channel&.requires_livestream? && live_stream.live_url.present?
+%>
+<div class="uplink-shell" data-controller="uplink uplink-shell" data-members="open" data-drawer=""
+  data-uplink-channel-value="<%= channel&.slug %>"
+  data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug) : "" %>"
+  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey">
+  <nav class="uplink-rail" aria-label="Nodes">
+    <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
+  </nav>
+
+  <aside class="uplink-sidebar" data-uplink-shell-target="sidebar" aria-label="Channels">
+    <header class="uplink-sidebar-header">
+      <span class="uplink-sidebar-kicker">UPLINK</span>
+      <span class="uplink-sidebar-node">hackr.tv NODE</span>
+    </header>
+    <%= render "uplink/channel_list", channels: channels, active: channel&.slug, live: live %>
+    <footer class="uplink-userpanel">
+      <span class="uplink-userpanel-alias uplink-userpanel-alias--<%= uplink_role_class(viewer.role) %>">@<%= viewer.hackr_alias %></span>
+      <span class="uplink-userpanel-role"><%= viewer.role.upcase %></span>
+      <%= link_to "WIRE", wire_user_path(viewer.hackr_alias), class: "uplink-userpanel-link", title: "Your WIRE profile" %>
+    </footer>
+  </aside>
+
+  <div class="uplink-main" data-uplink-shell-target="main">
+    <%# Stream sources live inside the pane, never as direct children of
+        the grid root: an empty element is still a grid item and would
+        take a cell. %>
+    <% if viewable %>
+      <%= turbo_stream_from "uplink_html", channel.slug %>
+      <%= turbo_stream_from Uplink::MembersBroadcaster::STREAM, channel.slug %>
+    <% end %>
+    <div class="uplink-banner" data-uplink-target="banner">Establishing uplink...</div>
+
+    <header class="uplink-chanhead">
+      <button type="button" class="uplink-chanhead-button uplink-chanhead-menu" title="Channels"
+        aria-label="Open channel list" data-action="click->uplink-shell#toggleSidebar">[#]</button>
+      <h2 class="uplink-chanhead-name"><%= channel&.name || "UPLINK" %></h2>
+      <%= uplink_live_dot(live) if channel&.requires_livestream? %>
+      <% if channel&.description.present? %>
+        <span class="uplink-chanhead-topic" title="<%= channel.description %>"><%= channel.description %></span>
+      <% end %>
+      <% if channel&.slow_mode? %>
+        <span class="uplink-chanhead-chip" title="Slow mode: <%= channel.slow_mode_seconds %>s between packets">SLOW <%= channel.slow_mode_seconds %>s</span>
+      <% end %>
+      <span class="uplink-chanhead-presence">
+        <span class="presence-dot" data-uplink-target="presenceDot"></span>
+        <span class="presence-text" data-uplink-target="presenceText">Connecting...</span>
+      </span>
+      <button type="button" class="uplink-chanhead-button uplink-popout-button" title="Pop out Uplink"
+        data-action="click->uplink#popout">[^]</button>
+      <button type="button" class="uplink-chanhead-button uplink-chanhead-members" title="Operatives"
+        aria-controls="uplink-members-pane" aria-pressed="true"
+        data-uplink-shell-target="membersToggle" data-action="click->uplink-shell#toggleMembers">[o]<span class="uplink-chanhead-label"> OPERATIVES</span></button>
+    </header>
+
+    <% if staged %>
+      <%= render "uplink/stage", stream: live_stream %>
+    <% end %>
+
+    <%= render "uplink/body", channel: channel, viewer: viewer, packets: packets, shell: true %>
+  </div>
+
+  <aside class="uplink-members-pane" id="uplink-members-pane" data-uplink-shell-target="members" aria-label="Operatives">
+    <header class="uplink-members-title">OPERATIVES</header>
+    <%= render "uplink/members", roster: roster %>
+  </aside>
+
+  <div class="uplink-backdrop" data-action="click->uplink-shell#closeDrawers"></div>
+</div>

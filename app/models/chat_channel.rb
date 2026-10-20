@@ -4,10 +4,12 @@
 # Database name: primary
 #
 #  id                  :integer          not null, primary key
+#  category            :string           default("COMMS"), not null
 #  description         :text
 #  is_active           :boolean          default(TRUE), not null
 #  minimum_role        :string           default("operative"), not null
 #  name                :string           not null
+#  position            :integer          default(0), not null
 #  requires_livestream :boolean          default(FALSE), not null
 #  slow_mode_seconds   :integer          default(0), not null
 #  slug                :string           not null
@@ -16,8 +18,9 @@
 #
 # Indexes
 #
-#  index_chat_channels_on_is_active  (is_active)
-#  index_chat_channels_on_slug       (slug) UNIQUE
+#  index_chat_channels_on_is_active        (is_active)
+#  index_chat_channels_on_position_and_id  (position,id)
+#  index_chat_channels_on_slug             (slug) UNIQUE
 #
 class ChatChannel < ApplicationRecord
   has_many :chat_messages, dependent: :destroy
@@ -26,14 +29,28 @@ class ChatChannel < ApplicationRecord
   validates :name, presence: true
   validates :slow_mode_seconds, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :minimum_role, inclusion: {in: GridHackr::ROLE_LEVELS.keys, message: "%{value} is not a valid role"}
+  validates :category, presence: true, length: {maximum: 24},
+    format: {with: /\A[A-Z0-9 _-]+\z/, message: "only allows uppercase letters, numbers, spaces, underscores, and hyphens"}
+  validates :position, numericality: {only_integer: true, greater_than_or_equal_to: 0}
+
+  # Sidebar heading (Uplink shell). Upcased so admin input lands as a
+  # heading; blank falls back to the default group.
+  before_validation { self.category = category.to_s.strip.upcase.presence || "COMMS" }
 
   scope :active, -> { where(is_active: true) }
   scope :requiring_livestream, -> { where(requires_livestream: true) }
+  # Sidebar order: position, then id. Category order is first appearance
+  # within this ordering (UplinkHelper#uplink_channel_groups).
+  scope :ordered, -> { order(:position, :id) }
 
   # The channel the home-page dock and popout pin to (conventionally
   # slug "live", but resolved structurally so a rename can't strand them).
   def self.livestream_default
     active.requiring_livestream.order(:id).first
+  end
+
+  def slow_mode?
+    slow_mode_seconds > 0
   end
 
   # Check if channel is currently available (considering livestream requirement)

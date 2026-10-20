@@ -1,32 +1,54 @@
 <%# PacketInput.tsx port. Locals: channel, disabled (viewer lacks the
     channel's minimum role — input renders but can't submit; the server
-    gate is authoritative either way). 512-char limit; the input accepts
-    +10 so the over-limit error state is visible, exactly like the SPA.
+    gate is authoritative either way), multiline (the /uplink shell:
+    auto-growing textarea, Enter sends / Shift+Enter newline, and an
+    emote button that opens the picker in browse mode; the dock + popout
+    keep the single-line input). 512-char limit; the field accepts +10
+    so the over-limit error state is visible, exactly like the SPA.
     Slow-mode/squelch errors return a form_error replace whose
     wait_seconds attribute starts the controller's cooldown.
-    The emote-picker controller shares the root + input (":slug:"
+    The emote-picker controller shares the root + field (":slug:"
     autocomplete; its <ul> menu opens upward inside .packet-input-field)
     and only talks to packet-form via the input event it dispatches. %>
-<div class="packet-input" data-controller="packet-form emote-picker"
+<%
+  multiline = local_assigns.fetch(:multiline, false)
+  # The picker's keydown is listed before the composer's so an Enter that
+  # picks an emote is already consumed when packet-form sees it.
+  field_actions = [
+    "input->packet-form#update", "input->emote-picker#update", "keydown->emote-picker#keydown",
+    ("keydown->packet-form#keydown" if multiline),
+    "keyup->emote-picker#caretMoved", "click->emote-picker#update"
+  ].compact.join(" ")
+  field_options = {maxlength: 522, autocomplete: "off",
+    placeholder: "Transmit a packet...", disabled: disabled, class: "packet-input-text",
+    role: "combobox", aria: {autocomplete: "list", expanded: "false"},
+    data: {packet_form_target: "input", emote_picker_target: "input", action: field_actions}}
+%>
+<div class="packet-input<%= " packet-input--multiline" if multiline %>" data-controller="packet-form emote-picker"
   data-packet-form-slow-mode-value="<%= channel.slow_mode_seconds %>"
-  data-packet-form-limit-value="512"
+  data-packet-form-limit-value="512"<% if multiline %>
+  data-packet-form-multiline-value="true"<% end %>
   data-emote-picker-emotes-value="<%= emote_picker_payload.to_json %>">
   <%= render "uplink/form_error", error: nil, wait_seconds: nil %>
   <%= form_with url: uplink_packets_path, class: "packet-input-form",
     data: {action: "turbo:submit-end->packet-form#submitted turbo:submit-end->emote-picker#close"} do %>
     <%= hidden_field_tag :channel_slug, channel.slug %>
     <div class="packet-input-field">
-      <%= text_field_tag :content, nil, maxlength: 522, autocomplete: "off",
-        placeholder: "Transmit a packet...", disabled: disabled, class: "packet-input-text",
-        role: "combobox", aria: {autocomplete: "list", expanded: "false"},
-        data: {packet_form_target: "input", emote_picker_target: "input",
-          action: "input->packet-form#update input->emote-picker#update keydown->emote-picker#keydown keyup->emote-picker#caretMoved click->emote-picker#update"} %>
+      <% if multiline %>
+        <%= text_area_tag :content, nil, field_options.merge(rows: 1) %>
+      <% else %>
+        <%= text_field_tag :content, nil, field_options %>
+      <% end %>
       <ul class="emote-menu emote-menu--up" role="listbox" hidden data-emote-picker-target="menu"></ul>
       <span class="packet-input-count" data-packet-form-target="count">0/512</span>
     </div>
+    <% if multiline %>
+      <button type="button" class="packet-input-emote" title="Emotes" aria-label="Emotes"
+        data-action="click->emote-picker#browse">:)</button>
+    <% end %>
     <button type="submit" class="packet-input-send" disabled data-packet-form-target="submit">TX</button>
   <% end %>
-  <% if channel.slow_mode_seconds > 0 %>
+  <% if channel.slow_mode? %>
     <div class="packet-input-slow-note">Slow mode: <%= channel.slow_mode_seconds %>s between packets</div>
   <% end %>
 </div>

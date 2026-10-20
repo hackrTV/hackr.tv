@@ -4,9 +4,7 @@
    page chrome and the home-page dock. Loads from the layouts' shared
    tracked-asset partial — never per-page (turbo-track signature rule). */
 
-/* ── Page + panel shell ────────────────────────────────────────────── */
-
-.uplink-page { max-width: 800px; margin: 0 auto; padding: 20px; height: calc(100vh - 200px); min-height: 500px; }
+/* ── Panel shell (home dock + popout; /uplink is the NODE shell below) ─ */
 
 .uplink-panel { height: 100%; display: flex; flex-direction: column; background-color: var(--bg-1); border: 1px solid var(--edge); position: relative; overflow: hidden; font-family: var(--font-tui); }
 
@@ -29,7 +27,8 @@
 .channel-tab { flex: 1; padding: 12px 16px; background-color: transparent; border: none; border-bottom: 2px solid transparent; color: var(--fg-muted); font-family: inherit; font-size: 0.9rem; cursor: pointer; position: relative; text-align: center; text-decoration: none; }
 .channel-tab--active { background-color: var(--bg-2); border-bottom-color: var(--accent); color: var(--accent); }
 .channel-tab--disabled { color: var(--edge-bright); cursor: not-allowed; }
-.channel-tab-dot { display: inline-block; width: 6px; height: 6px; background-color: var(--fg-faint); margin-left: 6px; vertical-align: 1px; }
+.channel-tab-dot { display: inline-block; width: 6px; height: 6px; background-color: var(--fg-faint); vertical-align: 1px; }
+.channel-tab .channel-tab-dot { margin-left: 6px; }
 .channel-tab-dot--live { background-color: var(--live); }
 .channel-tab-slow { position: absolute; top: 4px; right: 8px; font-size: 0.6rem; color: var(--fg-faint); }
 
@@ -66,13 +65,14 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
-.packet-author--admin { color: #00d4ff; }
-.packet-author--operator { color: #ffaa00; }
-.packet-author--operative { color: #cc0088; }
+/* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster. */
+.packet-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin { color: #00d4ff; }
+.packet-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator { color: #ffaa00; }
+.packet-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative { color: #cc0088; }
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
-.packet-content { color: var(--fg); word-break: break-word; }
+.packet-content { color: var(--fg); word-break: break-word; white-space: pre-wrap; } /* shell composer is multiline; the span has no incidental whitespace */
 .packet-content--synthia { color: #00ff88; }
 .packet--dropped .packet-content { color: var(--fg-faint); }
 
@@ -135,3 +135,139 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 @media (max-width: 900px) { .live-side-panel--uplink { height: 480px; } }
 .live-embed.theater-mode .live-side-panel--uplink { height: auto; }
 .live-embed.theater-mode .uplink-header { padding-right: 104px; }
+
+/* ── /uplink NODE shell (uplink/_shell, 2026-10) ───────────────────────
+   Discord anatomy, hackr.tv TUI: rail / channel sidebar / channel pane /
+   operatives pane. In-flow root sized to the viewport minus the sticky
+   site header (--site-header-h, site-header controller) and the fixed
+   player bar (--player-bar-h, player controller; 0 while hidden) — in
+   flow rather than fixed so no z-index arbitration with the header,
+   toasts or drawers is needed and the static <768px header still works.
+   Everything here is scoped under .uplink-shell; the dock/popout rules
+   above are untouched. Even-px Terminus sizes, no radius, no easing. */
+
+.uplink-shell { --uplink-rail-w: 56px; --uplink-sidebar-w: 232px; --uplink-members-w: 220px;
+  position: relative; display: grid; grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: var(--uplink-rail-w) var(--uplink-sidebar-w) minmax(0, 1fr) var(--uplink-members-w);
+  height: calc(100vh - var(--site-header-h, 0px) - var(--player-bar-h, 0px));
+  height: calc(100dvh - var(--site-header-h, 0px) - var(--player-bar-h, 0px));
+  min-height: 320px; overflow: hidden; background-color: var(--bg-0); color: var(--fg);
+  font-family: var(--font-tui); font-size: 16px; border-top: 1px solid var(--edge); }
+.uplink-shell[data-members="closed"] { grid-template-columns: var(--uplink-rail-w) var(--uplink-sidebar-w) minmax(0, 1fr); }
+.uplink-shell[data-members="closed"] .uplink-members-pane { display: none; }
+.uplink-shell :focus-visible { outline: 1px solid var(--accent-bright); outline-offset: -1px; }
+/* Guard: an empty element is still a grid item (the stream sources once
+   sat here and shoved every pane one cell over), so only the four panes
+   + backdrop may occupy the grid. Stream sources live in .uplink-main. */
+.uplink-shell > :not(.uplink-rail, .uplink-sidebar, .uplink-main, .uplink-members-pane, .uplink-backdrop) { display: none; }
+
+/* Rail: one NODE (hackr.tv). */
+.uplink-rail { display: flex; flex-direction: column; align-items: center; padding-top: 10px; background-color: var(--bg-0); border-right: 1px solid var(--edge); }
+.uplink-rail-node { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--edge-bright); color: var(--fg-muted); font-size: 12px; text-decoration: none; letter-spacing: 1px; }
+.uplink-rail-node:hover { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-rail-node--active { border-color: var(--accent); color: var(--accent-bright); background-color: var(--bg-2); box-shadow: -4px 0 0 0 var(--accent); }
+
+/* Sidebar: NODE header, categories + channel rows, user panel. */
+.uplink-sidebar { display: flex; flex-direction: column; min-height: 0; background-color: var(--bg-1); border-right: 1px solid var(--edge); }
+.uplink-sidebar-header { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-bottom: 1px solid var(--edge); }
+.uplink-sidebar-kicker { color: var(--accent); font-size: 16px; font-weight: bold; letter-spacing: 2px; }
+.uplink-sidebar-node { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-channels { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0; }
+.uplink-category { padding: 12px 12px 4px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-channel { display: flex; align-items: center; gap: 6px; margin: 0 6px; padding: 6px 8px 6px 10px; border-left: 2px solid transparent; color: var(--fg-muted); font-size: 16px; text-decoration: none; }
+a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
+.uplink-channel--active { background-color: var(--bg-2); border-left-color: var(--accent); color: var(--fg-bright); }
+.uplink-channel--disabled { color: var(--edge-bright); cursor: not-allowed; }
+.uplink-channel-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.uplink-channel-slow { color: var(--fg-faint); font-size: 12px; }
+.uplink-channels-empty { padding: 12px; color: var(--fg-faint); font-size: 14px; }
+.uplink-userpanel { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background-color: var(--bg-0); border-top: 1px solid var(--edge); font-size: 14px; }
+.uplink-userpanel-alias { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; }
+.uplink-userpanel-role { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-userpanel-link { color: var(--fg-faint); font-size: 12px; text-decoration: none; border: 1px solid var(--edge-bright); padding: 2px 6px; }
+.uplink-userpanel-link:hover { color: var(--accent-bright); border-color: var(--accent); }
+
+/* Channel pane: header, stage, log, composer. The uplink banner is
+   absolute inside .uplink-main (position: relative), as in the panel. */
+.uplink-main { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; background-color: var(--bg-0); }
+.uplink-chanhead { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 0 12px; height: 44px; background-color: var(--bg-1); border-bottom: 1px solid var(--edge); }
+.uplink-chanhead-name { margin: 0; color: var(--fg-bright); font-size: 18px; font-family: inherit; white-space: nowrap; }
+.uplink-chanhead-topic { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-faint); font-size: 14px; border-left: 1px solid var(--edge-bright); padding-left: 10px; }
+.uplink-chanhead-chip { color: var(--warn); font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
+.uplink-chanhead-presence { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; color: var(--fg-faint); font-size: 12px; white-space: nowrap; }
+.uplink-chanhead-button { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.uplink-chanhead-button:hover { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-chanhead-members[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-chanhead-menu { display: none; }
+
+.uplink-stage { flex-shrink: 0; background-color: #000; border-bottom: 1px solid var(--edge); } /* true black letterbox around the video, like .uplink-banner */
+.uplink-stage-bar { display: flex; align-items: center; gap: 12px; padding: 4px 12px; background-color: var(--bg-1); font-size: 14px; }
+.uplink-stage-live { color: var(--live); font-weight: bold; animation: feed-blink 2s step-end infinite; }
+.uplink-stage-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-muted); }
+.uplink-stage-toggle { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 2px 8px; font-family: inherit; font-size: 12px; cursor: pointer; }
+.uplink-stage-toggle:hover { border-color: var(--live); color: var(--live); }
+.uplink-stage-frame { aspect-ratio: 16 / 9; width: min(100%, calc(36dvh * 16 / 9)); margin: 0 auto; }
+.uplink-stage-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.uplink-stage--collapsed .uplink-stage-frame { display: none; }
+
+.uplink-logwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.uplink-jump { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 5; background-color: var(--bg-2); border: 1px solid var(--accent); color: var(--accent-bright); padding: 4px 12px; font-family: inherit; font-size: 12px; letter-spacing: 1px; cursor: pointer; }
+.uplink-jump:hover { background-color: var(--accent); color: var(--fg-bright); }
+.uplink-shell .uplink-empty { flex: 1; display: flex; align-items: center; justify-content: center; }
+.uplink-shell .uplink-empty p::before { content: "// STANDBY // "; color: var(--edge-bright); }
+.uplink-shell .uplink-unavailable p:first-child::before { content: "// OFFLINE // "; color: var(--edge-bright); }
+
+/* Packets in the shell: Discord rhythm — author line, content below,
+   consecutive packets by one author collapse (.packet--cont, set by the
+   packet-log controller) to content-only with the time on hover. */
+.uplink-shell .packet { position: relative; padding: 2px 16px 2px 8px; border-bottom: none; }
+.uplink-shell .packet:hover { background-color: var(--bg-1); }
+.uplink-shell .packet:not(.packet--cont) { margin-top: 10px; }
+.uplink-shell .packet-meta { width: 48px; }
+.uplink-shell .packet-time { font-size: 12px; }
+.uplink-shell .packet-author, .uplink-shell .packet-bridged-user { display: block; margin: 0 0 2px; font-size: 16px; }
+.uplink-shell .packet-content { display: block; }
+.uplink-shell .packet--cont .packet-author, .uplink-shell .packet--cont .packet-bridged-user, .uplink-shell .packet--cont .packet-badge { display: none; }
+.uplink-shell .packet--cont .packet-meta { visibility: hidden; }
+.uplink-shell .packet--cont:hover .packet-meta, .uplink-shell .packet--cont:focus-within .packet-meta { visibility: visible; }
+.uplink-shell .uplink-inline-form { position: absolute; top: 2px; right: 8px; opacity: 0; }
+.uplink-shell .packet:hover .uplink-inline-form, .uplink-shell .packet:focus-within .uplink-inline-form { opacity: 1; }
+
+/* Composer: auto-growing textarea, emote button, counter in the corner. */
+.uplink-shell .packet-input { padding: 10px 12px 12px; }
+.packet-input--multiline .packet-input-form { align-items: flex-end; }
+.packet-input--multiline .packet-input-text { resize: none; min-height: 40px; max-height: 160px; overflow-y: auto; line-height: 1.4; }
+.packet-input--multiline .packet-input-count { top: auto; bottom: 8px; transform: none; }
+.packet-input-emote { background-color: var(--bg-0); border: 1px solid var(--edge); color: var(--fg-muted); padding: 10px 12px; font-family: inherit; font-size: 14px; cursor: pointer; }
+.packet-input-emote:hover { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-shell .uplink-notice, .uplink-shell .uplink-login-prompt { flex-shrink: 0; }
+
+/* Operatives pane: role groups of anonymized callsigns. */
+.uplink-members-pane { display: flex; flex-direction: column; min-height: 0; background-color: var(--bg-1); border-left: 1px solid var(--edge); }
+.uplink-members-title { flex-shrink: 0; padding: 0 12px; height: 44px; display: flex; align-items: center; color: var(--accent); font-size: 14px; letter-spacing: 2px; border-bottom: 1px solid var(--edge); }
+.uplink-members { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0; }
+.uplink-members-empty { padding: 12px; color: var(--fg-faint); font-size: 14px; }
+.uplink-members-heading { margin: 0; padding: 12px 12px 4px; color: var(--fg-faint); font-size: 12px; font-weight: normal; letter-spacing: 1px; font-family: inherit; }
+.uplink-members-list { margin: 0; padding: 0; list-style: none; }
+.uplink-member { display: flex; align-items: center; gap: 8px; padding: 4px 12px; font-size: 14px; }
+.uplink-member:hover { background-color: var(--bg-2); }
+.uplink-member-dot { flex-shrink: 0; width: 6px; height: 6px; background-color: var(--live); }
+.uplink-member--self .uplink-member-name { color: var(--accent-bright); font-weight: bold; }
+
+/* Under 768px: single column; sidebar + operatives become drawers over
+   the channel pane (uplink-shell controller: data-drawer, backdrop,
+   inert main, Escape). The rail folds into the sidebar header. */
+.uplink-backdrop { display: none; }
+@media (max-width: 767px) {
+  .uplink-shell, .uplink-shell[data-members="closed"] { grid-template-columns: minmax(0, 1fr); }
+  .uplink-rail { display: none; }
+  .uplink-chanhead-menu { display: inline-block; }
+  .uplink-chanhead-topic { display: none; }
+  .uplink-chanhead-label { display: none; }
+  .uplink-sidebar, .uplink-members-pane { display: none; position: absolute; top: 0; bottom: 0; width: min(280px, 85%); z-index: 20; }
+  .uplink-sidebar { left: 0; }
+  .uplink-members-pane { right: 0; }
+  .uplink-shell[data-drawer="sidebar"] .uplink-sidebar, .uplink-shell[data-drawer="members"] .uplink-members-pane { display: flex; }
+  .uplink-shell[data-drawer="sidebar"] .uplink-backdrop, .uplink-shell[data-drawer="members"] .uplink-backdrop { display: block; position: absolute; inset: 0; z-index: 15; background-color: rgba(0, 0, 0, 0.6); } /* scrim: no token for translucent black (cf. .uplink-banner) */
+  .uplink-shell .packet { padding-right: 8px; }
+}

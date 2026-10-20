@@ -21,7 +21,7 @@ class Uplink::PacketsController < ApplicationController
     @packet = @channel.chat_messages.build(
       grid_hackr: current_hackr,
       hackr_stream: hackr_stream,
-      content: params[:content]
+      content: normalize_content(params[:content])
     )
 
     if @packet.save
@@ -74,6 +74,13 @@ class Uplink::PacketsController < ApplicationController
   end
 
   private
+
+  # The shell composer is a textarea: browsers submit CRLF, which would
+  # count two chars against the 512 cap the client counts as one. Store
+  # LF, cap blank-line runs, and trim the edges.
+  def normalize_content(raw)
+    raw.to_s.gsub(/\r\n?/, "\n").gsub(/\n{3,}/, "\n\n").strip
+  end
 
   def set_packet
     @packet = ChatMessage.find_by(id: params[:id])

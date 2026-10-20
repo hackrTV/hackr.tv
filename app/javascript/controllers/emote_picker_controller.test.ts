@@ -84,6 +84,44 @@ describe('EmotePickerController', () => {
     application?.stop()
   })
 
+  describe('browse (the shell emote button)', () => {
+    function controller (): EmotePickerController & { browse: () => void } {
+      return application.getControllerForElementAndIdentifier(
+        document.querySelector('[data-controller="emote-picker"]')!, 'emote-picker'
+      ) as EmotePickerController & { browse: () => void }
+    }
+
+    it('lists every emote at the caret, inserts the pick there, and toggles closed', async () => {
+      await start(inputFixture())
+      type('hey  there', 4)
+
+      controller().browse()
+      expect(menu().hidden).toBe(false)
+      expect(options().length).toBe(EMOTES.length)
+      expect(document.activeElement).toBe(field())
+
+      key('Enter')
+      expect(field().value).toBe('hey :smile: there')
+      expect(menu().hidden).toBe(true)
+
+      controller().browse()
+      expect(menu().hidden).toBe(false)
+      controller().browse()
+      expect(menu().hidden).toBe(true)
+    })
+
+    it('does nothing without emotes or on a disabled field', async () => {
+      await start(inputFixture([]))
+      controller().browse()
+      expect(menu().hidden).toBe(true)
+
+      await start(inputFixture())
+      field().disabled = true
+      controller().browse()
+      expect(menu().hidden).toBe(true)
+    })
+  })
+
   describe('opening', () => {
     it('opens on ":" + a char, prefix matches first, infix after, capped at 8 rows', async () => {
       await start(inputFixture())

@@ -1,0 +1,18 @@
+<%# Stream stage for livestream channels inside the /uplink shell: the
+    live embed above the log (home + theater mode are untouched). The
+    iframe src is set from data-src by the uplink-shell controller so a
+    collapsed stage (remembered per browser) never plays audio. Locals:
+    stream (live HackrStream). %>
+<section class="uplink-stage" data-uplink-shell-target="stage">
+  <div class="uplink-stage-bar">
+    <span class="uplink-stage-live">● LIVE NOW</span>
+    <span class="uplink-stage-title"><%= stream.title %><% if stream.artist %> — <%= stream.artist.name %><% end %></span>
+    <button type="button" class="uplink-stage-toggle" aria-expanded="true"
+      data-uplink-shell-target="stageToggle" data-action="click->uplink-shell#toggleStage">[-] HIDE VIDEO</button>
+  </div>
+  <div class="uplink-stage-frame">
+    <iframe data-src="<%= stream.live_url %>" title="<%= stream.title %>"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen data-uplink-shell-target="stageFrame"></iframe>
+  </div>
+</section>

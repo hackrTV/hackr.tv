@@ -4,10 +4,12 @@
 # Database name: primary
 #
 #  id                  :integer          not null, primary key
+#  category            :string           default("COMMS"), not null
 #  description         :text
 #  is_active           :boolean          default(TRUE), not null
 #  minimum_role        :string           default("operative"), not null
 #  name                :string           not null
+#  position            :integer          default(0), not null
 #  requires_livestream :boolean          default(FALSE), not null
 #  slow_mode_seconds   :integer          default(0), not null
 #  slug                :string           not null
@@ -16,8 +18,9 @@
 #
 # Indexes
 #
-#  index_chat_channels_on_is_active  (is_active)
-#  index_chat_channels_on_slug       (slug) UNIQUE
+#  index_chat_channels_on_is_active        (is_active)
+#  index_chat_channels_on_position_and_id  (position,id)
+#  index_chat_channels_on_slug             (slug) UNIQUE
 #
 FactoryBot.define do
   factory :chat_channel do
