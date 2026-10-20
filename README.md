@@ -4,7 +4,7 @@
 
 **hackr.tv** is a multi-domain music streaming and discovery platform featuring **THE PULSE GRID** - a multiplayer MUD (Multi-User Dungeon) set in 2126. Explore the resistance movement through music and interactive experiences.
 
-[![Ruby](https://img.shields.io/badge/Ruby-3.4.7-red.svg)](https://www.ruby-lang.org/)
+[![Ruby](https://img.shields.io/badge/Ruby-3.4.10-red.svg)](https://www.ruby-lang.org/)
 [![Rails](https://img.shields.io/badge/Rails-8.1.3-red.svg)](https://rubyonrails.org/)
 [![Hotwire](https://img.shields.io/badge/Hotwire-Turbo%20%2B%20Stimulus-ffd700.svg)](https://hotwired.dev/)
 [![Tests](https://img.shields.io/badge/Tests-3400%2B%20passing-brightgreen.svg)](#testing)
@@ -233,7 +233,7 @@ OBS overlays are rendered by the external HUD app; hackr.tv supplies the data it
 ## Tech Stack
 
 - **Frontend:** Hotwire (Turbo 8 + Stimulus 3), TypeScript, Vite 8
-- **Backend:** Ruby 3.4.7, Rails 8.1.3, Puma
+- **Backend:** Ruby 3.4.10, Rails 8.1.3, Puma
 - **Database:** SQLite3 (primary + cable/cache/queue + a dedicated telemetry DB), Active Storage (local Disk service) for file attachments
 - **Real-time:** Action Cable 8.1 with Solid Cable adapter
 - **Background Jobs:** Solid Queue for async processing
@@ -254,7 +254,7 @@ OBS overlays are rendered by the external HUD app; hackr.tv supplies the data it
 ## Getting Started
 
 ### Prerequisites
-- Ruby 3.4.7
+- Ruby 3.4.10
 - Bundler
 - SQLite3
 - libvips (system library, for Active Storage image variants — `sudo apt-get install libvips`)
