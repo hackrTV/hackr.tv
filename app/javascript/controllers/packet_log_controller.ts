@@ -20,9 +20,22 @@ import { Controller } from '@hotwired/stimulus'
 //     unread counts foreign packets that arrive while scrolled up.
 //   Re-pins through late layout shifts (emote image loads, the composer
 //     growing and shrinking the log).
+//   Scrollback — a `top` target (the .uplink-log-top sentinel _log_frame
+//     renders in shell mode, carrying data-src = the channel's log URL
+//     and data-more) is watched with an IntersectionObserver; while it
+//     is in view and more history exists, one page at a time is fetched
+//     from data-src&before=<first packet id> (uplink/_packets: packets
+//     only, chronological, plus a <template data-log-end> marker on the
+//     last page) and spliced in right after the sentinel. The viewport is
+//     anchored by hand (scrollTop += the height added) — the shell sets
+//     overflow-anchor: none so the browser's own anchoring can't double
+//     it — and the spliced packets never count as unread. Grouping
+//     continues across the page boundary because the old first packet
+//     regroups behind its new predecessor like any other insertion.
 
 const GROUP_WINDOW_MS = 5 * 60 * 1000
 const BOTTOM_SLACK_PX = 50
+const SCROLLBACK_MARGIN = '160px 0px 0px 0px'
 
 function isPacket (node: Node | null | undefined): node is HTMLElement {
   return node instanceof HTMLElement && node.classList.contains('packet')
@@ -30,12 +43,18 @@ function isPacket (node: Node | null | undefined): node is HTMLElement {
 
 export default class extends Controller<HTMLElement> {
   static values = { cap: Number, group: Boolean }
+  static targets = ['top']
 
   declare readonly capValue: number
   declare readonly groupValue: boolean
+  declare readonly hasTopTarget: boolean
+  declare readonly topTarget: HTMLElement
 
   private observer: MutationObserver | null = null
   private resizeObserver: ResizeObserver | null = null
+  private topObserver: IntersectionObserver | null = null
+  private loading = false
+  private history = new Set<string>()
   private atBottom = true
   private unread = 0
 
@@ -61,6 +80,12 @@ export default class extends Controller<HTMLElement> {
       this.resizeObserver = new ResizeObserver(() => { if (this.atBottom) this.scrollToBottom() })
       this.resizeObserver.observe(this.element)
     }
+    if (this.hasTopTarget && typeof IntersectionObserver !== 'undefined') {
+      this.topObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) void this.loadOlder()
+      }, { root: this.element, rootMargin: SCROLLBACK_MARGIN })
+      this.topObserver.observe(this.topTarget)
+    }
     this.publishState()
   }
 
@@ -71,6 +96,68 @@ export default class extends Controller<HTMLElement> {
     this.observer = null
     this.resizeObserver?.disconnect()
     this.resizeObserver = null
+    this.topObserver?.disconnect()
+    this.topObserver = null
+  }
+
+  // Fetch the page before the first packet and splice it in after the
+  // sentinel. One in flight at a time; a failed page leaves data-more
+  // alone so the next time the sentinel scrolls into view retries.
+  async loadOlder (): Promise<void> {
+    if (!this.hasTopTarget || this.loading || this.topTarget.dataset.more !== 'true') return
+    const src = this.topTarget.dataset.src
+    const first = this.firstPacketId()
+    if (!src || !first) return
+
+    this.loading = true
+    this.topTarget.dataset.loading = 'true'
+    try {
+      const url = new URL(src, window.location.origin)
+      url.searchParams.set('before', first)
+      const response = await fetch(url.toString(), { headers: { Accept: 'text/html' }, credentials: 'same-origin' })
+      if (!response.ok) return
+      this.splice(await response.text())
+    } catch {
+      // Network failure: retry on the next intersection.
+    } finally {
+      this.loading = false
+      delete this.topTarget.dataset.loading
+      // Re-observing delivers a fresh entry: a short page can leave the
+      // sentinel in view with no transition to fire on.
+      if (this.topObserver && this.topTarget.dataset.more === 'true') {
+        this.topObserver.unobserve(this.topTarget)
+        this.topObserver.observe(this.topTarget)
+      }
+    }
+  }
+
+  private splice (html: string): void {
+    // A contextual fragment parses into this document (a <template>'s
+    // inert document fails instanceof HTMLElement under jsdom).
+    const fragment = document.createRange().createContextualFragment(html)
+    const end = fragment.querySelector('template[data-log-end]')
+    end?.remove()
+    const packets = Array.from(fragment.querySelectorAll<HTMLElement>('.packet'))
+    packets.forEach(packet => this.history.add(packet.id))
+
+    const follower = this.topTarget.nextElementSibling
+    const height = this.element.scrollHeight
+    const top = this.element.scrollTop
+    this.topTarget.after(fragment)
+    // Group the seam before measuring: a continuation packet is shorter
+    // than a group head (no author line, no gap), so the height added is
+    // only known once the new packets and the old first one are regrouped
+    // (the MutationObserver would do it a microtask too late).
+    packets.forEach(packet => this.regroup(packet))
+    this.regroup(follower)
+    this.element.scrollTop = top + (this.element.scrollHeight - height)
+    if (end) this.topTarget.dataset.more = 'false'
+  }
+
+  private firstPacketId (): string | null {
+    const first = this.element.querySelector<HTMLElement>('.packet')
+    const match = first?.id.match(/(\d+)$/)
+    return match ? match[1] : null
   }
 
   private onMutations (records: MutationRecord[]): void {
@@ -82,7 +169,8 @@ export default class extends Controller<HTMLElement> {
       const replaced = new Set(Array.from(record.removedNodes, node => (node as Element).id).filter(Boolean))
       record.addedNodes.forEach(node => {
         if (!isPacket(node)) return
-        if (!replaced.has(node.id) && this.fromOthers(node)) arrived += 1
+        const spliced = this.history.delete(node.id)
+        if (!spliced && !replaced.has(node.id) && this.fromOthers(node)) arrived += 1
         this.regroup(node)
         this.regroup(node.nextElementSibling)
       })

@@ -43,53 +43,61 @@ minutes: 25
 8. Switch channels via the sidebar (`?channel=` URLs). → Log swaps to
    that channel's history; sends go to the right channel; the active
    row is highlighted and the header shows the channel name.
-9. **Slow mode**: send two packets rapidly. → Second is throttled with
-   a cooldown message/disabled TX until the window passes; focus
-   returns to the composer when the cooldown ends.
-10. Emoji/plain text render; an @mention of the other session renders
+9. **Scrollback**: in a channel with more than 20 packets, scroll to
+   the top of the log. → The strip above the first packet reads
+   `// RETRIEVING ARCHIVE //` and up to 40 older packets slide in above
+   it without the packet you were reading moving; author groups
+   continue across the seam; the `[v] NEW PACKETS` pill never appears
+   for history. Keep going → at the oldest packet the strip reads
+   `// BEGINNING OF CHANNEL //` and stops. The dock and popout have no
+   scrollback.
+10. **Slow mode**: send two packets rapidly. → Second is throttled with
+    a cooldown message/disabled TX until the window passes; focus
+    returns to the composer when the cooldown ends.
+11. Emoji/plain text render; an @mention of the other session renders
     highlighted for them (self-mention styling).
 
 ## Steps — operatives pane
 
-11. With the second browser on the same channel. → It appears in the
+12. With the second browser on the same channel. → It appears in the
     OPERATIVES pane under its role heading as a callsign (`SIG-XXXXXX`),
     never its alias; your own row shows your real @alias. Close the
     second browser → its row leaves within a few seconds (debounced
     broadcast; needs the job worker running).
-12. A livestream channel (`#live`) while a stream is live. → The stream
+13. A livestream channel (`#live`) while a stream is live. → The stream
     embeds above the log inside the shell; `[-] HIDE VIDEO` collapses it
     (and stops its audio), remembered on reload. The home page embed and
     theater mode are unchanged.
 
 ## Steps — moderation (operative + admin)
 
-13. As admin (moderator role) in `/uplink`: hover another user's packet
+14. As admin (moderator role) in `/uplink`: hover another user's packet
     and drop it. → Packet shows dropped state for everyone live.
-14. Restore it. → Restored live.
-15. The drop control is NOT visible to the non-moderator operative on
+15. Restore it. → Restored live.
+16. The drop control is NOT visible to the non-moderator operative on
     others' packets.
-16. **Squelch** the operative from `/root` → Uplink (punishments). → In
+17. **Squelch** the operative from `/root` → Uplink (punishments). → In
     the operative's `/uplink`, the composer is replaced by the squelch
     notice; sending is impossible. Lift the squelch → composer returns
     (after reload).
-17. **Blackout** the operative. → Uplink is fully blocked with the
+18. **Blackout** the operative. → Uplink is fully blocked with the
     blackout notice. Lift it afterwards.
 
 ## Steps — popout + recovery
 
-18. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
+19. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
     classic single-line panel; live receive + send both work; heartbeat
     keeps it registered while open. The home-page dock is likewise the
     classic panel.
-19. Kill the connection (devtools offline ~10s, restore). → The log
+20. Kill the connection (devtools offline ~10s, restore). → The log
     recovers missed messages (reconnect frame reload) rather than
     silently gapping.
 
 ## Steps — external bridge spot-check (if relay/synthia are running)
 
-20. Send from hackr.tv `/uplink`, including a two-line packet. →
+21. Send from hackr.tv `/uplink`, including a two-line packet. →
     Appears in relay's terminal view (line breaks are plain `\n`).
-21. Send via synthia (or
+22. Send via synthia (or
     `POST /api/admin/uplink/send_packet` with the Bearer token). → The
     packet appears live in `/uplink` attributed to the service account;
     the bridge account never shows in the OPERATIVES pane.

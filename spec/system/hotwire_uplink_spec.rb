@@ -185,6 +185,53 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
   end
 
+  it "scrolls back through the channel's history page by page without moving the viewport, grouping across pages" do
+    now = Time.current
+    ChatMessage.insert_all((1..70).map { |i|
+      {chat_channel_id: channel.id, grid_hackr_id: other.id, content: "archive #{i}",
+       created_at: now - (70 - i).seconds, updated_at: now}
+    })
+    oldest = channel.chat_messages.order(:id).first
+
+    log_in!(hackr)
+    visit "/uplink"
+    await_uplink!
+    expect(page).to have_content("archive 70")
+    expect(page).to have_css(".uplink-log-top[data-more='true']", visible: :all)
+
+    # 20 on render, then 40 + 10 as the top sentinel scrolls into view
+    # (a page may already be loading if the first 20 didn't fill the log).
+    # Scrolling to the top and reading the first packet's text position
+    # happen in one script, so no splice can land in between; after the
+    # page arrives the text must not have moved. (The packet's box does
+    # shift: it loses its author line when it becomes a continuation of
+    # the spliced group — the text the viewer is reading stays put.)
+    measure = <<~JS
+      (() => {
+        const log = document.getElementById("uplink-log")
+        log.scrollTop = 0
+        const first = log.querySelector(".packet")
+        return [first.id, first.querySelector(".packet-content").getBoundingClientRect().top]
+      })()
+    JS
+    3.times do
+      break if page.has_css?(".uplink-log-top[data-more='false']", visible: :all, wait: 0)
+      count = page.all(".packet").size
+      id, top = page.evaluate_script(measure)
+      expect(page).to have_css(".packet", minimum: count + 1, wait: 10)
+      expect(page).to have_no_css(".uplink-log-top[data-loading]", visible: :all, wait: 10)
+      after = page.evaluate_script("document.querySelector('##{id} .packet-content').getBoundingClientRect().top")
+      expect(after).to be_within(1).of(top)
+    end
+
+    expect(page).to have_css("#chat_message_#{oldest.id}")
+    expect(page).to have_css(".packet", count: 70)
+    expect(page).to have_css(".uplink-log-top[data-more='false']") # visible: the beginning-of-channel strip
+    expect(page).to have_css(".packet:not(.packet--cont)", count: 1) # one author, one group across both seams
+    expect(page).to have_css("#chat_message_#{oldest.id}:not(.packet--cont)")
+    expect(page).not_to have_css(".uplink-jump", visible: :visible) # history is never "new packets"
+  end
+
   it "docks the chat on the live home page and sends from there" do
     create(:hackr_stream, artist: create(:artist), title: "DOCK SESSIONS",
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")

@@ -5,11 +5,14 @@
     surfaces can't drift. Locals:
       channel, viewer, packets
       shell — true on /uplink: multiline composer, client-side packet
-              grouping on the log, and the log wrapped so the shell can
-              float its "new packets" jump pill over it. %>
+              grouping + scrollback on the log, and the log wrapped so
+              the shell can float its "new packets" jump pill over it.
+      more — shell only: whether packets older than the first exist
+             (the scrollback sentinel's initial state). %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   shell = local_assigns.fetch(:shell, false)
+  more = local_assigns.fetch(:more, false)
   unavailable = channel && channel.requires_livestream? && !channel.currently_available?
   viewable = channel.present? && channel.viewable_by?(viewer)
 %>
@@ -21,7 +24,7 @@
 <% elsif viewable %>
   <% if shell %>
     <div class="uplink-logwrap">
-      <%= render "uplink/log_frame", packets: packets, viewer: viewer, group: true %>
+      <%= render "uplink/log_frame", packets: packets, viewer: viewer, group: true, more: more, channel: channel %>
       <button type="button" class="uplink-jump" hidden data-uplink-shell-target="jump"
         data-action="click->uplink-shell#jump">[v] <span data-uplink-shell-target="jumpCount">NEW PACKETS</span></button>
     </div>

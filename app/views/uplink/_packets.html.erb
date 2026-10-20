@@ -1,0 +1,9 @@
+<%# One scrollback page (GET /uplink/log?channel=&before=<id>): packets
+    only, chronological, for the packet-log controller to splice in
+    after its top sentinel. No frame, no empty state. Locals:
+      packets, viewer — as uplink/_packet
+      more — false when these are the channel's oldest packets; the
+             trailing marker is read and removed client-side and flips
+             the sentinel to "// BEGINNING OF CHANNEL //". %>
+<%= render partial: "uplink/packet", collection: packets, as: :packet, locals: {viewer: viewer} %>
+<% unless more %><template data-log-end></template><% end %>

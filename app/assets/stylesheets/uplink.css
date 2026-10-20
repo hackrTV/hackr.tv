@@ -217,6 +217,18 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .uplink-empty p::before { content: "// STANDBY // "; color: var(--edge-bright); }
 .uplink-shell .uplink-unavailable p:first-child::before { content: "// OFFLINE // "; color: var(--edge-bright); }
 
+/* Scrollback: the packet-log controller watches .uplink-log-top and
+   splices older pages in after it, anchoring the viewport by hand —
+   overflow-anchor: none keeps the browser from anchoring it a second
+   time. The sentinel is a fixed-height strip (observable, never shifts
+   layout) that announces the page in flight and, once data-more is
+   false, the channel's beginning. */
+.uplink-shell .packet-log { overflow-anchor: none; }
+.uplink-shell .uplink-log-top { height: 28px; line-height: 28px; text-align: center; font-size: 12px; letter-spacing: 1px; color: var(--fg-faint); }
+.uplink-shell .uplink-log-top[data-loading="true"]::before { content: "// RETRIEVING ARCHIVE //"; }
+.uplink-shell .uplink-log-top[data-more="false"]::before { content: "// BEGINNING OF CHANNEL //"; color: var(--edge-bright); }
+.uplink-shell .packet-log:not(:has(.packet)) .uplink-log-top { display: none; }
+
 /* Packets in the shell: Discord rhythm — author line, content below,
    consecutive packets by one author collapse (.packet--cont, set by the
    packet-log controller) to content-only with the time on hover. */

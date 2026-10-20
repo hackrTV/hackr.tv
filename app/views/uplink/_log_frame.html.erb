@@ -5,13 +5,28 @@
     state is always rendered; CSS hides it once a .packet exists, so
     broadcast-appended packets clear it without a dedicated remove.
     group: true (the /uplink shell) turns on the packet-log controller's
-    Discord-style consecutive-author grouping. %>
-<% group = local_assigns.fetch(:group, false) %>
+    Discord-style consecutive-author grouping and renders the scrollback
+    sentinel: the controller watches it with an IntersectionObserver and
+    fetches older pages from data-src (GET /uplink/log?before=) while
+    data-more is true, splicing them in right after it. `more` says
+    whether packets older than the first one exist; `channel` builds the
+    page URL. The dock/popout never render it. %>
+<%
+  group = local_assigns.fetch(:group, false)
+  more = local_assigns.fetch(:more, false)
+  channel = local_assigns.fetch(:channel, nil)
+%>
 <%= turbo_frame_tag "uplink-log-frame", target: "_top", data: {uplink_target: "logFrame"} do %>
   <div id="uplink-log" class="packet-log" data-controller="packet-log"<% if group %> data-packet-log-group-value="true"<% end %>>
     <div class="uplink-empty">
       <p>No packets yet. Be the first to transmit.</p>
     </div>
+    <%# The sentinel sits immediately before the first packet so a spliced
+        page becomes its direct predecessor (grouping reads siblings). %>
+    <% if group %>
+      <div class="uplink-log-top" data-packet-log-target="top" data-more="<%= more %>"
+        data-src="<%= uplink_log_path(channel: channel&.slug) %>"></div>
+    <% end %>
     <%= render partial: "uplink/packet", collection: packets, as: :packet, locals: {viewer: viewer} %>
   </div>
 <% end %>

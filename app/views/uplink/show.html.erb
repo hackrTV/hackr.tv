@@ -11,6 +11,6 @@
     sidebar's live dot, the live channel's availability and the stage
     re-render server-side (the SPA's useStreamStatus isLive equivalent). %>
 <div data-controller="stream-status" data-stream-status-live-value="<%= @live_stream.present? %>">
-  <%= render "uplink/shell", channel: @channel, channels: @channels, packets: @packets,
+  <%= render "uplink/shell", channel: @channel, channels: @channels, packets: @packets, more: @more_packets,
     viewer: current_hackr, live_stream: @live_stream, roster: @roster %>
 </div>
