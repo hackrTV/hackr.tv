@@ -1,1 +1,5 @@
-<%= render "uplink/log_frame", packets: @packets, viewer: current_hackr %>
+<%# Reconnect reload of the log frame. shell=1 (the /uplink shell's
+    reload URL) keeps the frame in shell mode: grouping + the scrollback
+    sentinel; the dock/popout reload the plain frame. %>
+<%= render "uplink/log_frame", packets: @packets, viewer: current_hackr,
+  group: @shell, more: @more_packets, channel: @channel %>

@@ -133,6 +133,21 @@ RSpec.describe "Uplink pages", type: :request do
       expect(live.reload).to be_currently_available
     end
 
+    it "seeds the scrollback sentinel from whether older packets exist and reloads the frame in shell mode" do
+      log_in!
+
+      get "/uplink"
+      expect(response.body).to include('class="uplink-log-top" data-packet-log-target="top" data-more="false"')
+      expect(response.body).to include('data-src="/uplink/log?channel=ambient"')
+      expect(response.body).to include('data-uplink-log-src-value="/uplink/log?channel=ambient&amp;shell=1"')
+
+      create_list(:chat_message, 21, chat_channel: channel, grid_hackr: other)
+      get "/uplink"
+      expect(response.body).to include('class="uplink-log-top" data-packet-log-target="top" data-more="true"')
+      expect(response.body.scan(/id="chat_message_\d+"/).size).to eq(20)
+      expect(response.body.index("uplink-log-top")).to be < response.body.index("chat_message_") # sentinel sits right before the packets
+    end
+
     it "tags packets with the author key + timestamp the log groups on" do
       create(:chat_message, chat_channel: channel, grid_hackr: other, content: "grouped?")
       log_in!
@@ -281,6 +296,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).not_to include("uplink-shell")
       expect(response.body).not_to include("packet-input-emote")
       expect(response.body).not_to include("data-packet-log-group-value")
+      expect(response.body).not_to include("uplink-log-top") # no scrollback sentinel
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
@@ -312,6 +328,62 @@ RSpec.describe "Uplink pages", type: :request do
       get "/uplink/log", params: {channel: "ambient"} # anonymous, non-livestream
 
       expect(response).to have_http_status(:forbidden)
+
+      get "/uplink/log", params: {channel: "ambient", before: 1}
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "reloads the frame in shell mode with shell=1 (grouping + scrollback sentinel), plain otherwise" do
+      create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Recovered packet")
+      log_in!
+
+      get "/uplink/log", params: {channel: "ambient", shell: 1}
+      expect(response.body).to include('id="uplink-log-frame"')
+      expect(response.body).to include('data-packet-log-group-value="true"')
+      expect(response.body).to include('class="uplink-log-top" data-packet-log-target="top" data-more="false"')
+      expect(response.body).to include('data-src="/uplink/log?channel=ambient"')
+
+      get "/uplink/log", params: {channel: "ambient"}
+      expect(response.body).to include('id="uplink-log-frame"')
+      expect(response.body).not_to include("data-packet-log-group-value")
+      expect(response.body).not_to include("uplink-log-top")
+    end
+
+    it "pages older packets before an id: packets only, chronological, capped at 40, dropped excluded, end marker on the last page" do
+      now = Time.current
+      ChatMessage.insert_all((1..45).map { |i|
+        {chat_channel_id: channel.id, grid_hackr_id: other.id, content: "archive packet #{i}",
+         dropped: i == 30, created_at: now - (45 - i).seconds, updated_at: now}
+      })
+      ids = channel.chat_messages.order(:id).pluck(:id)
+      log_in!
+
+      get "/uplink/log", params: {channel: "ambient", before: ids.last}
+
+      expect(response).to have_http_status(:ok)
+      body = response.body
+      expect(body).not_to include("uplink-log-frame")
+      expect(body).not_to include("uplink-log-top")
+      expect(body).not_to include("No packets yet")
+      expect(body.scan(/archive packet (\d+)</).flatten.map(&:to_i)).to eq((4..44).to_a - [30]) # 40 newest below the cursor, oldest first
+      expect(body).not_to include("data-log-end") # three remain
+      expect(body).to include(%(data-author-key="h#{other.id}")) # grouping attrs ride along
+
+      get "/uplink/log", params: {channel: "ambient", before: ids[3]}
+      expect(response.body.scan(/archive packet (\d+)</).flatten.map(&:to_i)).to eq([1, 2, 3])
+      expect(response.body).to include("<template data-log-end></template>")
+
+      get "/uplink/log", params: {channel: "ambient", before: ids.first}
+      expect(response.body).to include("<template data-log-end></template>")
+      expect(response.body).not_to include("archive packet")
+    end
+
+    it "400s on a non-positive before cursor" do
+      log_in!
+
+      get "/uplink/log", params: {channel: "ambient", before: "abc"}
+
+      expect(response).to have_http_status(:bad_request)
     end
   end
 

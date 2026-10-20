@@ -155,4 +155,158 @@ describe('PacketLogController', () => {
     expect(log().children.length).toBe(2)
     expect(document.getElementById('chat_message_1')).toBeNull()
   })
+  describe('scrollback', () => {
+    let intersect: (() => void) | null
+    let observe: ReturnType<typeof vi.fn>
+    let unobserve: ReturnType<typeof vi.fn>
+    let fetchMock: ReturnType<typeof vi.fn>
+
+    const sentinel = (): HTMLElement => document.querySelector('.uplink-log-top')!
+    const ids = (): string[] => Array.from(log().querySelectorAll('.packet'), node => node.id)
+
+    function shellFixture (packets: string[], more = 'true'): string {
+      return `
+        <div id="uplink-log" data-controller="packet-log" data-packet-log-group-value="true">
+          <div class="uplink-empty"><p>No packets yet.</p></div>
+          <div class="uplink-log-top" data-packet-log-target="top" data-more="${more}" data-src="/uplink/log?channel=ambient"></div>
+          ${packets.join('\n')}
+        </div>`
+    }
+
+    function respond (html: string): void {
+      fetchMock.mockResolvedValue({ ok: true, text: async () => html })
+    }
+
+    async function settle (): Promise<void> {
+      for (let i = 0; i < 4; i++) await flush()
+    }
+
+    // jsdom has no layout: the log is 100px per packet, scrollTop is a
+    // plain stored number, so the anchoring math is observable.
+    function layout (): void {
+      Object.defineProperty(log(), 'scrollHeight', { configurable: true, get: () => log().querySelectorAll('.packet').length * 100 })
+      Object.defineProperty(log(), 'clientHeight', { value: 100, configurable: true })
+      Object.defineProperty(log(), 'scrollTop', { value: 0, configurable: true, writable: true })
+    }
+
+    // Reading history: the viewer is at the top, so the log is not pinned.
+    function scrollToTop (): void {
+      log().scrollTop = 0
+      log().dispatchEvent(new Event('scroll'))
+    }
+
+    beforeEach(() => {
+      intersect = null
+      observe = vi.fn()
+      unobserve = vi.fn()
+      fetchMock = vi.fn()
+      vi.stubGlobal('fetch', fetchMock)
+      vi.stubGlobal('IntersectionObserver', class {
+        constructor (callback: IntersectionObserverCallback) {
+          intersect = () => callback([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver)
+        }
+
+        observe = observe
+        unobserve = unobserve
+        disconnect (): void { /* jsdom stub */ }
+      })
+    })
+
+    it('fetches the page before the first packet, splices it after the sentinel, anchors the viewport and regroups the boundary', async () => {
+      await start(shellFixture([packet(41, 'h1', T0 + 1000), packet(42, 'h1', T0 + 2000)]))
+      layout()
+      scrollToTop()
+      expect(observe).toHaveBeenCalledWith(sentinel())
+      respond(packet(39, 'h2', T0 - 1000) + packet(40, 'h1', T0))
+
+      intersect!()
+      await settle()
+
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(String(fetchMock.mock.calls[0][0])).toContain('/uplink/log?channel=ambient&before=41')
+      expect(ids()).toEqual(['chat_message_39', 'chat_message_40', 'chat_message_41', 'chat_message_42'])
+      expect(sentinel().nextElementSibling!.id).toBe('chat_message_39')
+      expect(log().scrollTop).toBe(200) // two packets of height landed above the viewport; no re-pin
+      expect(cont(40)).toBe(false) // author changed from 39
+      expect(cont(41)).toBe(true) // old first packet now continues 40
+      expect(sentinel().dataset.more).toBe('true')
+      expect(sentinel().dataset.loading).toBeUndefined()
+      expect(unobserve).toHaveBeenCalledTimes(1) // re-observed: a short page may leave it in view
+      expect(observe).toHaveBeenCalledTimes(2)
+    })
+
+    it('reads the end marker: beginning of channel, no further fetches', async () => {
+      await start(shellFixture([packet(2, 'h1', T0)]))
+      layout()
+      respond(packet(1, 'h1', T0 - 1000) + '<template data-log-end></template>')
+
+      intersect!()
+      await settle()
+      expect(ids()).toEqual(['chat_message_1', 'chat_message_2'])
+      expect(sentinel().dataset.more).toBe('false')
+      expect(log().querySelector('template[data-log-end]')).toBeNull()
+      expect(observe).toHaveBeenCalledTimes(1) // nothing left to watch for
+
+      intersect!()
+      await settle()
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('fetches one page at a time', async () => {
+      await start(shellFixture([packet(5, 'h1', T0)]))
+      layout()
+      let release: (value: { ok: boolean, text: () => Promise<string> }) => void = () => {}
+      fetchMock.mockReturnValue(new Promise(resolve => { release = resolve }))
+
+      intersect!()
+      intersect!()
+      await flush()
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(sentinel().dataset.loading).toBe('true')
+
+      release({ ok: true, text: async () => packet(4, 'h1', T0 - 1000) })
+      await settle()
+      expect(ids()).toEqual(['chat_message_4', 'chat_message_5'])
+      expect(sentinel().dataset.loading).toBeUndefined()
+    })
+
+    it('never counts spliced history as unread and leaves data-more alone on a failed page', async () => {
+      const meta = document.createElement('meta')
+      meta.name = 'current-hackr-id'
+      meta.content = '7'
+      document.head.appendChild(meta)
+      await start(shellFixture([packet(3, 'h2', T0, 8)]))
+      layout()
+      scrolledUp()
+      respond(packet(1, 'h2', T0 - 2000, 8) + packet(2, 'h2', T0 - 1000, 8))
+
+      intersect!()
+      await settle()
+      expect(ids()).toEqual(['chat_message_1', 'chat_message_2', 'chat_message_3'])
+      expect(states.at(-1)).toEqual({ atBottom: false, unread: 0 })
+
+      fetchMock.mockResolvedValue({ ok: false, text: async () => '' })
+      intersect!()
+      await settle()
+      expect(ids().length).toBe(3)
+      expect(sentinel().dataset.more).toBe('true') // retried next time it scrolls into view
+      expect(sentinel().dataset.loading).toBeUndefined()
+    })
+
+    it('does nothing when the sentinel says there is no history', async () => {
+      await start(shellFixture([packet(1, 'h1', T0)], 'false'))
+      layout()
+
+      intersect!()
+      await settle()
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('is inert without a sentinel (dock, popout, grid log)', async () => {
+      await start(fixture([packet(1, 'h1', T0)]))
+
+      expect(observe).not.toHaveBeenCalled()
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+  })
 })

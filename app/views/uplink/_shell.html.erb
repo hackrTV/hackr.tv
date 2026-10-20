@@ -8,7 +8,8 @@
     banner, presence and logFrame targets, exactly as on .uplink-panel);
     uplink-shell owns the chrome: drawers under 768px, the members
     toggle, the stage collapse, the jump pill and the / hotkey.
-    Locals: channel, channels, packets, viewer, live_stream, roster. %>
+    Locals: channel, channels, packets, viewer, live_stream, roster,
+    more (older packets exist — seeds the scrollback sentinel). %>
 <%
   viewable = channel.present? && channel.viewable_by?(viewer)
   live = live_stream.present?
@@ -16,7 +17,7 @@
 %>
 <div class="uplink-shell" data-controller="uplink uplink-shell" data-members="open" data-drawer=""
   data-uplink-channel-value="<%= channel&.slug %>"
-  data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug) : "" %>"
+  data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
   data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey">
   <nav class="uplink-rail" aria-label="Nodes">
     <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
@@ -71,7 +72,8 @@
       <%= render "uplink/stage", stream: live_stream %>
     <% end %>
 
-    <%= render "uplink/body", channel: channel, viewer: viewer, packets: packets, shell: true %>
+    <%= render "uplink/body", channel: channel, viewer: viewer, packets: packets, shell: true,
+      more: local_assigns.fetch(:more, false) %>
   </div>
 
   <aside class="uplink-members-pane" id="uplink-members-pane" data-uplink-shell-target="members" aria-label="Operatives">
