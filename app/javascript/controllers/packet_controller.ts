@@ -10,6 +10,13 @@ import { Controller } from '@hotwired/stimulus'
 //   2. rewrites descendant form CSRF tokens from the page meta;
 //   3. localizes the HH:MM timestamp (Packet.tsx rendered client-local);
 //   4. highlights the viewer's own @mentions.
+// Replies: the hover control dispatches packet:reply {id, sender} (bubbles
+// to document, where the shell composer's packet-form listens — the
+// composer is not an ancestor); the quote line's click scrolls the parent
+// into view and flashes it when it is in the log.
+
+const FLASH_MS = 1200
+
 export default class extends Controller<HTMLElement> {
   static targets = ['time', 'dropControl', 'restoreControl']
   static values = { ownerId: Number }
@@ -24,6 +31,25 @@ export default class extends Controller<HTMLElement> {
     this.revealControls()
     this.highlightSelfMentions()
     this.fixCsrfTokens()
+  }
+
+  reply (event: Event): void {
+    const id = this.packetId()
+    if (!id) return
+    const sender = event.currentTarget instanceof HTMLElement ? event.currentTarget.dataset.replySender ?? '' : ''
+    this.dispatch('reply', { detail: { id, sender } })
+  }
+
+  // A parent above the loaded history isn't in the DOM: nothing happens
+  // (item 9's around= mode is the eventual answer).
+  jumpToParent (): void {
+    const id = this.element.dataset.replyTo
+    if (!id || !/^\d+$/.test(id)) return
+    const parent = document.getElementById(`chat_message_${id}`)
+    if (!parent) return
+    if (typeof parent.scrollIntoView === 'function') parent.scrollIntoView({ block: 'center' })
+    parent.classList.add('packet--flash')
+    window.setTimeout(() => parent.classList.remove('packet--flash'), FLASH_MS)
   }
 
   private localizeTimes (): void {
@@ -69,6 +95,11 @@ export default class extends Controller<HTMLElement> {
     this.element.querySelectorAll<HTMLInputElement>('input[name="authenticity_token"]').forEach(input => {
       input.value = token
     })
+  }
+
+  private packetId (): string | null {
+    const match = this.element.id.match(/(\d+)$/)
+    return match ? match[1] : null
   }
 
   private meta (name: string): string | null {

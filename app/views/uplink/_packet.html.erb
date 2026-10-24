@@ -7,7 +7,13 @@
                CSRF tokens, localizes the timestamp, and highlights the
                viewer's own @mentions.
     data-author-key / data-at feed the packet-log controller's
-    client-side consecutive-author grouping (the /uplink shell). %>
+    client-side consecutive-author grouping (the /uplink shell).
+    Replies: data-reply-to + a quote line "[>] sender excerpt" above the
+    content, viewer-neutral (a dropped parent reads [PACKET DROPPED] —
+    the model re-broadcasts reply rows when their parent drops/restores);
+    clicking the quote jumps to the parent when it is in the log. The
+    hover reply control dispatches packet:reply for the shell composer;
+    CSS hides it on the dock/popout, whose composer has no reply bar. %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   bot = packet.source == "SYNTHIA"
@@ -17,11 +23,22 @@
   can_moderate = viewer&.at_least_operator?
   platform = uplink_platform_class(packet.source)
   role_badge = uplink_role_badge(packet.grid_hackr&.role)
+  parent = packet.reply_to
+  parent_class = if parent.nil?
+    nil
+  elsif parent.source == "SYNTHIA"
+    "synthia"
+  elsif parent.source.present?
+    "bridged"
+  else
+    uplink_role_class(parent.grid_hackr&.role)
+  end
 %>
 <div id="<%= dom_id(packet) %>"
-  class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %>"
+  class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %><%= " packet--reply" if parent %>"
   data-controller="packet" data-packet-owner-id-value="<%= packet.grid_hackr_id %>"
-  data-author-key="<%= uplink_author_key(packet, parsed) %>" data-at="<%= (packet.created_at.to_f * 1000).to_i %>">
+  data-author-key="<%= uplink_author_key(packet, parsed) %>" data-at="<%= (packet.created_at.to_f * 1000).to_i %>"<% if parent %>
+  data-reply-to="<%= parent.id %>"<% end %>>
   <div class="packet-meta">
     <time class="packet-time" datetime="<%= packet.created_at.iso8601 %>"
       data-packet-target="time"><%= packet.created_at.strftime("%H:%M") %></time>
@@ -33,6 +50,14 @@
   </div>
 
   <div class="packet-body">
+    <% if parent %>
+      <button type="button" class="packet-reply-quote" title="Jump to the original packet"
+        data-action="click->packet#jumpToParent">
+        <span class="packet-reply-mark">[&gt;]</span>
+        <span class="packet-reply-author packet-reply-author--<%= parent_class %>"><%= uplink_packet_sender(parent) %></span>
+        <span class="packet-reply-excerpt"><%= uplink_packet_excerpt(parent) %></span>
+      </button>
+    <% end %>
     <% if parsed %>
       <span class="packet-bridged-user<%= " packet-bridged-user--#{platform}" if platform %>"><%= parsed[1] %>:</span>
       <span class="packet-content"><% if packet.dropped? %>[PACKET DROPPED]<% else %><%= uplink_packet_text(packet, parsed[2]) %><% end %></span>
@@ -45,13 +70,17 @@
     <% end %>
   </div>
 
-  <% if packet.dropped? %>
-    <%= button_to "↺", uplink_packet_restore_path(packet), method: :post,
-      class: "packet-action-button", title: "Restore packet", form_class: "uplink-inline-form",
-      form: {hidden: !can_moderate, data: {packet_target: "restoreControl"}} %>
-  <% else %>
-    <%= button_to "×", uplink_packet_drop_path(packet), method: :post,
-      class: "packet-action-button", title: "Drop packet", form_class: "uplink-inline-form",
-      form: {hidden: !(own || can_moderate), data: {packet_target: "dropControl"}} %>
-  <% end %>
+  <div class="packet-actions">
+    <% if packet.dropped? %>
+      <%= button_to "↺", uplink_packet_restore_path(packet), method: :post,
+        class: "packet-action-button", title: "Restore packet", form_class: "uplink-inline-form",
+        form: {hidden: !can_moderate, data: {packet_target: "restoreControl"}} %>
+    <% else %>
+      <button type="button" class="packet-action-button packet-reply-button" title="Reply to packet"
+        data-action="click->packet#reply" data-reply-sender="<%= uplink_packet_sender(packet, parsed) %>">↩</button>
+      <%= button_to "×", uplink_packet_drop_path(packet), method: :post,
+        class: "packet-action-button", title: "Drop packet", form_class: "uplink-inline-form",
+        form: {hidden: !(own || can_moderate), data: {packet_target: "dropControl"}} %>
+    <% end %>
+  </div>
 </div>

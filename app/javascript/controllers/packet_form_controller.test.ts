@@ -19,16 +19,24 @@ function fixture (opts: { slowMode?: number, limit?: number } = {}): string {
     </form>`
 }
 
-// The /uplink shell composer: textarea + multiline value, Enter sends.
-function textareaFixture (opts: { slowMode?: number, limit?: number } = {}): string {
+// The /uplink shell composer: textarea + multiline value, Enter sends;
+// with `reply`, the hidden reply_to_id + reply bar and the document
+// listener for packet:reply.
+function textareaFixture (opts: { slowMode?: number, limit?: number, reply?: boolean, disabled?: boolean } = {}): string {
   return `
     <div data-controller="packet-form"
          data-packet-form-slow-mode-value="${opts.slowMode ?? 0}"
          data-packet-form-limit-value="${opts.limit ?? 20}"
-         data-packet-form-multiline-value="true">
+         data-packet-form-multiline-value="true"${opts.reply ? ' data-action="packet:reply@document->packet-form#reply"' : ''}>
+      ${opts.reply ? `
+      <div class="packet-reply-bar" hidden data-packet-form-target="replyBar">
+        REPLYING TO <span data-packet-form-target="replySender"></span>
+        <button type="button" data-action="click->packet-form#cancelReply">[x]</button>
+      </div>` : ''}
       <form>
+        ${opts.reply ? '<input type="hidden" name="reply_to_id" data-packet-form-target="replyTo">' : ''}
         <div class="packet-input-field">
-          <textarea data-packet-form-target="input" data-action="input->packet-form#update keydown->packet-form#keydown"></textarea>
+          <textarea data-packet-form-target="input" data-action="input->packet-form#update keydown->packet-form#keydown"${opts.disabled ? ' disabled' : ''}></textarea>
           <ul class="emote-menu" hidden></ul>
           <span data-packet-form-target="count"></span>
         </div>
@@ -123,6 +131,97 @@ describe('PacketFormController', () => {
       vi.advanceTimersByTime(2000)
       expect(input().disabled).toBe(false)
       expect(document.activeElement).toBe(input())
+    })
+  })
+
+  describe('replies (shell composer)', () => {
+    const replyTo = (): HTMLInputElement => document.querySelector('[data-packet-form-target="replyTo"]')!
+    const bar = (): HTMLElement => document.querySelector('[data-packet-form-target="replyBar"]')!
+
+    function armReply (id: string, sender = '@xeraen'): void {
+      document.body.dispatchEvent(new CustomEvent('packet:reply', { bubbles: true, detail: { id, sender } }))
+    }
+
+    function escape (): KeyboardEvent {
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      input().dispatchEvent(event)
+      return event
+    }
+
+    it('arms the hidden reply_to_id and the bar from packet:reply, focuses the field; [x] disarms', async () => {
+      await start(textareaFixture({ reply: true }))
+      expect(bar().hidden).toBe(true)
+
+      armReply('42')
+      expect(replyTo().value).toBe('42')
+      expect(bar().hidden).toBe(false)
+      expect(bar().textContent).toContain('REPLYING TO @xeraen')
+      expect(document.activeElement).toBe(input())
+
+      armReply('7', 'TTV viewer') // re-arming swaps the target
+      expect(replyTo().value).toBe('7')
+      expect(bar().textContent).toContain('TTV viewer')
+
+      ;(bar().querySelector('button') as HTMLButtonElement).click()
+      expect(replyTo().value).toBe('')
+      expect(bar().hidden).toBe(true)
+    })
+
+    it('ignores garbage ids and a role-gated (disabled) field, but still arms during a cooldown', async () => {
+      vi.useFakeTimers()
+      await start(textareaFixture({ reply: true, disabled: true }))
+      armReply('42')
+      expect(replyTo().value).toBe('')
+      expect(bar().hidden).toBe(true)
+
+      await start(textareaFixture({ reply: true, slowMode: 3 }))
+      armReply('../etc')
+      armReply('')
+      expect(replyTo().value).toBe('')
+
+      type('msg')
+      controller().submitted(new CustomEvent('turbo:submit-end', { detail: { success: true } }))
+      expect(input().disabled).toBe(true) // cooling down
+      armReply('42')
+      expect(replyTo().value).toBe('42')
+      expect(bar().hidden).toBe(false)
+    })
+
+    it('Escape disarms an armed reply and is otherwise left alone (an open emote menu gets it first)', async () => {
+      await start(textareaFixture({ reply: true }))
+      expect(escape().defaultPrevented).toBe(false) // nothing armed: the shell may use it
+
+      armReply('42')
+      const consumed = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      consumed.preventDefault() // the emote picker closed its menu with this one
+      input().dispatchEvent(consumed)
+      expect(replyTo().value).toBe('42')
+
+      expect(escape().defaultPrevented).toBe(true)
+      expect(replyTo().value).toBe('')
+      expect(bar().hidden).toBe(true)
+    })
+
+    it('disarms after a successful send, keeps the reply on failure', async () => {
+      await start(textareaFixture({ reply: true }))
+      armReply('42')
+      type('reply text')
+
+      controller().submitted(new CustomEvent('turbo:submit-end', { detail: { success: false } }))
+      expect(replyTo().value).toBe('42')
+      expect(input().value).toBe('reply text')
+
+      controller().submitted(new CustomEvent('turbo:submit-end', { detail: { success: true } }))
+      expect(replyTo().value).toBe('')
+      expect(bar().hidden).toBe(true)
+      expect(input().value).toBe('')
+    })
+
+    it('is inert on a composer without reply targets (dock, popout)', async () => {
+      await start(textareaFixture().replace('data-packet-form-multiline-value="true"', 'data-packet-form-multiline-value="true" data-action="packet:reply@document->packet-form#reply"'))
+      armReply('42')
+      expect(document.querySelector('[name="reply_to_id"]')).toBeNull()
+      expect(escape().defaultPrevented).toBe(false)
     })
   })
 

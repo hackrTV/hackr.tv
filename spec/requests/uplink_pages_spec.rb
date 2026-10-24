@@ -244,6 +244,43 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).not_to include("[LINK CENSORED BY GOVCORP]")
     end
 
+    it "renders replies: quote line + data-reply-to, bridged and dropped parents, the hover reply control, the composer's reply bar" do
+      parent = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "  the   original   transmission " + ("x" * 90))
+      reply = create(:chat_message, chat_channel: channel, grid_hackr: hackr, reply_to: parent, content: "quoting you")
+      bridge = create(:grid_hackr, hackr_alias: "svc_bridge", service_account: true)
+      bridged = create(:chat_message, chat_channel: channel, grid_hackr: bridge, source: "TTV", content: "[Twitch] viewer42: hi from twitch")
+      to_bridged = create(:chat_message, chat_channel: channel, grid_hackr: hackr, reply_to: bridged, content: "hey viewer")
+      gone = create(:chat_message, :dropped, chat_channel: channel, grid_hackr: other, content: "secret")
+      to_gone = create(:chat_message, chat_channel: channel, grid_hackr: hackr, reply_to: gone, content: "too late")
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include(%(id="chat_message_#{reply.id}"))
+      expect(body).to match(%r{id="chat_message_#{reply.id}"[^>]*class="packet packet--reply"[^>]*data-reply-to="#{parent.id}"}m)
+      expect(body).to include(%(<span class="packet-reply-author packet-reply-author--operative">@#{other.hackr_alias}</span>))
+      expect(body).to include(%(<span class="packet-reply-excerpt">the original transmission #{"x" * 51}...</span>)) # squished, 80 chars
+      expect(body).to include('data-action="click->packet#jumpToParent"')
+      expect(body).to include(%(<span class="packet-reply-author packet-reply-author--bridged">TTV viewer42</span>))
+      expect(body).to include(%(<span class="packet-reply-excerpt">hi from twitch</span>))
+      expect(body).to match(%r{id="chat_message_#{to_gone.id}".*?<span class="packet-reply-excerpt">\[PACKET DROPPED\]</span>}m)
+      expect(body).not_to include("secret")
+      expect(body).not_to match(%r{id="chat_message_#{parent.id}"[^>]*data-reply-to}) # plain packets carry none
+      expect(body).to match(%r{id="chat_message_#{to_bridged.id}"[^>]*data-reply-to="#{bridged.id}"})
+
+      # Hover control on every live packet (not the dropped one), carrying the sender label
+      expect(body).to include(%(data-action="click->packet#reply" data-reply-sender="@#{other.hackr_alias}"))
+      expect(body).to include(%(data-reply-sender="TTV viewer42"))
+      expect(body).not_to match(%r{id="chat_message_#{gone.id}".*?packet-reply-button.*?id="chat_message_#{to_gone.id}"}m)
+
+      # Composer: hidden reply_to_id + reply bar, listening on document
+      expect(body).to include('data-action="packet:reply@document->packet-form#reply"')
+      expect(body).to include('name="reply_to_id"')
+      expect(body).to include('class="packet-reply-bar" hidden data-packet-form-target="replyBar"')
+      expect(body).to include('data-action="click->packet-form#cancelReply"')
+    end
+
     it "renders :slug: emotes as images and ships the picker payload on the composer" do
       create(:emote, slug: "wave")
       create(:emote, :disabled, slug: "hidden_one")
@@ -300,6 +337,8 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).not_to include("packet-input-emote")
       expect(response.body).not_to include("data-packet-log-group-value")
       expect(response.body).not_to include("uplink-log-top") # no scrollback sentinel
+      expect(response.body).not_to include("packet-reply-bar") # no reply composer (the packet's reply control is CSS-hidden)
+      expect(response.body).not_to include('name="reply_to_id"')
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
@@ -459,6 +498,48 @@ RSpec.describe "Uplink pages", type: :request do
       expect(toast).to include(%(<span class="toast-sender">@#{hackr.hackr_alias}</span>))
       expect(toast).to include("yo @#{other.hackr_alias.upcase} look at this") # squished excerpt
       expect(toast).to include('data-controller="toast"')
+    end
+
+    it "creates a reply to an active packet of the channel and renders the quote in the appended row" do
+      parent = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "original")
+      log_in!
+
+      expect {
+        post "/uplink/packets", params: {channel_slug: "ambient", content: "my reply", reply_to_id: parent.id},
+          headers: turbo_stream_headers
+      }.to change(ChatMessage, :count).by(1)
+
+      expect(response).to have_http_status(:ok)
+      reply = ChatMessage.last
+      expect(reply.reply_to).to eq(parent)
+      expect(response.body).to include('action="append" target="uplink-log"')
+      expect(response.body).to include(%(data-reply-to="#{parent.id}"))
+      expect(response.body).to include(%(<span class="packet-reply-author packet-reply-author--operative">@#{other.hackr_alias}</span>))
+      expect(response.body).to include('<span class="packet-reply-excerpt">original</span>')
+      expect(response.body).to include("my reply")
+    end
+
+    it "refuses a reply to a dropped, foreign-channel or unknown packet with a form error and keeps nothing" do
+      dropped = create(:chat_message, :dropped, chat_channel: channel, grid_hackr: other)
+      elsewhere = create(:chat_message, chat_channel: create(:chat_channel, slug: "trace"), grid_hackr: other)
+      log_in!
+
+      [dropped.id, elsewhere.id, 0, "abc", 10**9].each do |target|
+        expect {
+          post "/uplink/packets", params: {channel_slug: "ambient", content: "orphan", reply_to_id: target},
+            headers: turbo_stream_headers
+        }.not_to change(ChatMessage, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include('action="replace" target="uplink-form-error"')
+        expect(response.body).to include(Uplink::PacketsController::REPLY_TARGET_GONE)
+      end
+
+      # A blank reply_to_id is a plain packet (the hidden field submits empty).
+      post "/uplink/packets", params: {channel_slug: "ambient", content: "plain", reply_to_id: ""},
+        headers: turbo_stream_headers
+      expect(response).to have_http_status(:ok)
+      expect(ChatMessage.last.reply_to).to be_nil
     end
 
     it "attaches the live stream on livestream channels" do

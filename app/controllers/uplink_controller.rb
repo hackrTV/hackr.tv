@@ -95,7 +95,7 @@ class UplinkController < ApplicationController
     @more_packets = false
     return unless viewable?
 
-    scope = @channel.chat_messages.active.includes(:grid_hackr)
+    scope = @channel.chat_messages.active.includes(:grid_hackr, reply_to: :grid_hackr)
     scope = scope.where("id < ?", before) if before
     rows = scope.order(id: :desc).limit(limit + 1).to_a
     @more_packets = rows.size > limit

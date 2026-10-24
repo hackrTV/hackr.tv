@@ -14,7 +14,9 @@ import { Controller } from '@hotwired/stimulus'
 //     inside a 5-minute window gets .packet--cont (CSS collapses its
 //     author line). Decided client-side because broadcast packets render
 //     viewer-neutral and don't know their predecessor; packets stay
-//     direct children, and a removal/replace regroups the follower.
+//     direct children, and a removal/replace regroups the follower. A
+//     reply (data-reply-to) always starts a group: its quote line sits
+//     above its own author line.
 //   packet-log:state {atBottom, unread, mentions} — dispatched on scroll +
 //     mutation so a host (uplink-shell) can float a "new packets" jump
 //     pill; unread counts foreign packets that arrive while scrolled up,
@@ -201,7 +203,7 @@ export default class extends Controller<HTMLElement> {
     if (!this.groupValue || !isPacket(node)) return
     const prev = node.previousElementSibling
     const key = node.dataset.authorKey
-    const continues = isPacket(prev) && !!key && prev.dataset.authorKey === key &&
+    const continues = node.dataset.replyTo === undefined && isPacket(prev) && !!key && prev.dataset.authorKey === key &&
       Math.abs(Number(node.dataset.at) - Number(prev.dataset.at)) < GROUP_WINDOW_MS
     node.classList.toggle('packet--cont', continues)
   }

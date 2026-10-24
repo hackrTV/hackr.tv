@@ -13,6 +13,7 @@
 #  chat_channel_id :integer          not null
 #  grid_hackr_id   :integer          not null
 #  hackr_stream_id :integer
+#  reply_to_id     :integer
 #
 # Indexes
 #
@@ -21,12 +22,14 @@
 #  index_chat_messages_on_dropped                         (dropped)
 #  index_chat_messages_on_grid_hackr_id                   (grid_hackr_id)
 #  index_chat_messages_on_hackr_stream_id                 (hackr_stream_id)
+#  index_chat_messages_on_reply_to_id                     (reply_to_id)
 #
 # Foreign Keys
 #
 #  chat_channel_id  (chat_channel_id => chat_channels.id)
 #  grid_hackr_id    (grid_hackr_id => grid_hackrs.id)
 #  hackr_stream_id  (hackr_stream_id => hackr_streams.id)
+#  reply_to_id      (reply_to_id => chat_messages.id) ON DELETE => nullify
 #
 require "rails_helper"
 
@@ -205,6 +208,81 @@ RSpec.describe ChatMessage, type: :model do
           )
         )
       end
+    end
+  end
+
+  describe "replies" do
+    let(:channel) { create(:chat_channel, slug: "ambient") }
+    let(:parent) { create(:chat_message, chat_channel: channel, content: "parent packet") }
+
+    it "quotes one parent in the same channel, hard-delete of the parent nulls the reference" do
+      reply = create(:chat_message, chat_channel: channel, reply_to: parent, content: "a reply")
+
+      expect(reply.reply_to).to eq(parent)
+      expect(parent.replies).to eq([reply])
+
+      parent.destroy!
+      expect(reply.reload.reply_to_id).to be_nil
+    end
+
+    it "rejects a parent from another channel" do
+      elsewhere = create(:chat_message, chat_channel: create(:chat_channel, slug: "trace"))
+      reply = build(:chat_message, chat_channel: channel, reply_to: elsewhere)
+
+      expect(reply).not_to be_valid
+      expect(reply.errors[:reply_to]).to include("must be in the same channel")
+    end
+
+    it "still drops and restores a reply whose parent was dropped (no dropped-parent validation)" do
+      reply = create(:chat_message, chat_channel: channel, reply_to: parent)
+      parent.drop!
+
+      expect(reply.drop!).to be(true)
+      expect(reply.restore!).to be(true)
+      expect(reply.reload).not_to be_dropped
+    end
+
+    it "carries reply_to_id in the JSON packet (additive for relay/synthia/terminal)" do
+      allow(ActionCable.server).to receive(:broadcast).and_call_original
+
+      reply = create(:chat_message, chat_channel: channel, reply_to: parent, content: "json reply")
+
+      expect(ActionCable.server).to have_received(:broadcast).with(
+        "uplink:ambient",
+        hash_including(type: "new_packet", packet: hash_including(id: reply.id, reply_to_id: parent.id))
+      )
+      expect(ActionCable.server).to have_received(:broadcast).with(
+        "uplink:ambient",
+        hash_including(type: "new_packet", packet: hash_including(id: parent.id, reply_to_id: nil))
+      )
+    end
+
+    it "re-broadcasts the newest reply rows when the parent drops or restores, so their quotes follow" do
+      stub_const("ChatMessage::REPLY_REFRESH_CAP", 2)
+      replies = 3.times.map { |i| create(:chat_message, chat_channel: channel, reply_to: parent, content: "reply #{i}") }
+      dropped_reply = create(:chat_message, :dropped, chat_channel: channel, reply_to: parent)
+      allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to).and_call_original
+
+      parent.drop!
+
+      stream = ["uplink_html", "ambient"]
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
+        stream, hash_including(target: "chat_message_#{parent.id}", partial: "uplink/packet", locals: {packet: parent, viewer: nil})
+      )
+      replies.last(2).each do |reply|
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
+          stream, hash_including(target: "chat_message_#{reply.id}", locals: {packet: reply, viewer: nil})
+        )
+      end
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_replace_to).with(
+        stream, hash_including(target: "chat_message_#{replies.first.id}")
+      ) # beyond the cap
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_replace_to).with(
+        stream, hash_including(target: "chat_message_#{dropped_reply.id}")
+      ) # dropped replies are not in anyone's log
+
+      html = ApplicationController.render(partial: "uplink/packet", locals: {packet: replies.last.reload, viewer: nil})
+      expect(html).to include(%(<span class="packet-reply-excerpt">[PACKET DROPPED]</span>))
     end
   end
 

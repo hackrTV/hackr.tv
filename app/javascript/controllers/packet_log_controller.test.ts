@@ -102,6 +102,21 @@ describe('PacketLogController', () => {
     expect(cont(2)).toBe(false)
   })
 
+  it('never collapses a reply (data-reply-to) under the previous packet, but groups its follower', async () => {
+    await start(fixture([
+      packet(1, 'h1', T0),
+      packet(2, 'h1', T0 + 1000).replace('class="packet"', 'class="packet" data-reply-to="1"'),
+      packet(3, 'h1', T0 + 2000)
+    ]))
+    expect(cont(1)).toBe(false)
+    expect(cont(2)).toBe(false) // the quote line needs the author line above it
+    expect(cont(3)).toBe(true)
+
+    append(packet(4, 'h1', T0 + 3000).replace('class="packet"', 'class="packet" data-reply-to="3"'))
+    await flush()
+    expect(cont(4)).toBe(false)
+  })
+
   it('leaves grouping off without the group value', async () => {
     await start(fixture([packet(1, 'h1', T0), packet(2, 'h1', T0 + 1000)], false))
 

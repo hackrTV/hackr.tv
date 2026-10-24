@@ -13,6 +13,7 @@
 #  chat_channel_id :integer          not null
 #  grid_hackr_id   :integer          not null
 #  hackr_stream_id :integer
+#  reply_to_id     :integer
 #
 # Indexes
 #
@@ -21,12 +22,14 @@
 #  index_chat_messages_on_dropped                         (dropped)
 #  index_chat_messages_on_grid_hackr_id                   (grid_hackr_id)
 #  index_chat_messages_on_hackr_stream_id                 (hackr_stream_id)
+#  index_chat_messages_on_reply_to_id                     (reply_to_id)
 #
 # Foreign Keys
 #
 #  chat_channel_id  (chat_channel_id => chat_channels.id)
 #  grid_hackr_id    (grid_hackr_id => grid_hackrs.id)
 #  hackr_stream_id  (hackr_stream_id => hackr_streams.id)
+#  reply_to_id      (reply_to_id => chat_messages.id) ON DELETE => nullify
 #
 class ChatMessage < ApplicationRecord
   include ProfanityFilterable
@@ -34,11 +37,18 @@ class ChatMessage < ApplicationRecord
   belongs_to :chat_channel
   belongs_to :grid_hackr
   belongs_to :hackr_stream, optional: true
+  # Replies (Phase 2 item 2): one quoted parent in the same channel. The
+  # FK nulls the reference if the parent is hard-deleted; a *dropped*
+  # parent stays referenced and the quote line renders [PACKET DROPPED].
+  belongs_to :reply_to, class_name: "ChatMessage", optional: true, inverse_of: :replies
+  has_many :replies, class_name: "ChatMessage", foreign_key: :reply_to_id, inverse_of: :reply_to
 
   validates :content, presence: true, length: {maximum: 512}
+  validate :reply_to_in_channel
   filter_profanity :content
 
   MENTION_CAP = 5 # @mention toasts per packet
+  REPLY_REFRESH_CAP = 20 # reply rows re-rendered when their parent is dropped/restored
 
   scope :active, -> { where(dropped: false) }
   scope :dropped, -> { where(dropped: true) }
@@ -133,14 +143,32 @@ class ChatMessage < ApplicationRecord
 
   # Drop and restore are both a whole-packet replace: the partial renders
   # the redacted or restored state from `dropped`, and per-viewer controls
-  # re-reveal via the packet Stimulus controller on connect.
+  # re-reveal via the packet Stimulus controller on connect. Replies quote
+  # this packet, so their rows are replaced too (newest REPLY_REFRESH_CAP)
+  # and the quote flips to/from [PACKET DROPPED] live.
   def broadcast_dropped_change_html
+    replace_packet_html(self)
+    replies.active.includes(:grid_hackr).order(id: :desc).limit(REPLY_REFRESH_CAP).each do |reply|
+      replace_packet_html(reply)
+    end
+  end
+
+  def replace_packet_html(packet)
     Turbo::StreamsChannel.broadcast_replace_to(
       ["uplink_html", chat_channel.slug],
-      target: ActionView::RecordIdentifier.dom_id(self),
+      target: ActionView::RecordIdentifier.dom_id(packet),
       partial: "uplink/packet",
-      locals: {packet: self, viewer: nil}
+      locals: {packet: packet, viewer: nil}
     )
+  end
+
+  # Same channel is the invariant; "parent not dropped" is checked only at
+  # creation (Uplink::PacketsController) — a validation here would make
+  # drop!/restore! fail on a reply once its parent was dropped.
+  def reply_to_in_channel
+    return unless reply_to && reply_to.chat_channel_id != chat_channel_id
+
+    errors.add(:reply_to, "must be in the same channel")
   end
 
   def packet_json
@@ -155,7 +183,8 @@ class ChatMessage < ApplicationRecord
         role: grid_hackr&.role
       },
       hackr_stream_id: hackr_stream_id,
-      source: source
+      source: source,
+      reply_to_id: reply_to_id
     }
   end
 end

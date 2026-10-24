@@ -9,7 +9,12 @@
     wait_seconds attribute starts the controller's cooldown.
     The emote-picker controller shares the root + field (":slug:"
     autocomplete; its <ul> menu opens upward inside .packet-input-field)
-    and only talks to packet-form via the input event it dispatches. %>
+    and only talks to packet-form via the input event it dispatches.
+    Replies (shell only): a hidden reply_to_id + the reply bar
+    ("REPLYING TO <sender> [x]", hidden until armed). The root listens for
+    packet:reply on document — the packet's hover control is not a
+    descendant of the composer — and packet-form#reply arms the field;
+    Escape, [x] and a successful send disarm it. %>
 <%
   multiline = local_assigns.fetch(:multiline, false)
   # The picker's keydown is listed before the composer's so an Enter that
@@ -27,12 +32,23 @@
 <div class="packet-input<%= " packet-input--multiline" if multiline %>" data-controller="packet-form emote-picker"
   data-packet-form-slow-mode-value="<%= channel.slow_mode_seconds %>"
   data-packet-form-limit-value="512"<% if multiline %>
-  data-packet-form-multiline-value="true"<% end %>
+  data-packet-form-multiline-value="true" data-action="packet:reply@document->packet-form#reply"<% end %>
   data-emote-picker-emotes-value="<%= emote_picker_payload.to_json %>">
   <%= render "uplink/form_error", error: nil, wait_seconds: nil %>
+  <% if multiline %>
+    <div class="packet-reply-bar" hidden data-packet-form-target="replyBar">
+      <span class="packet-reply-mark">[&gt;]</span>
+      <span>REPLYING TO <span class="packet-reply-bar-sender" data-packet-form-target="replySender"></span></span>
+      <button type="button" class="packet-reply-bar-cancel" title="Cancel reply" aria-label="Cancel reply"
+        data-action="click->packet-form#cancelReply">[x]</button>
+    </div>
+  <% end %>
   <%= form_with url: uplink_packets_path, class: "packet-input-form",
     data: {action: "turbo:submit-end->packet-form#submitted turbo:submit-end->emote-picker#close"} do %>
     <%= hidden_field_tag :channel_slug, channel.slug %>
+    <% if multiline %>
+      <%= hidden_field_tag :reply_to_id, nil, data: {packet_form_target: "replyTo"} %>
+    <% end %>
     <div class="packet-input-field">
       <% if multiline %>
         <%= text_area_tag :content, nil, field_options.merge(rows: 1) %>

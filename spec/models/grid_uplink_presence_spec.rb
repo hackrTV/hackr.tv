@@ -1,5 +1,20 @@
 require "rails_helper"
 
+# == Schema Information
+#
+# Table name: grid_uplink_presences
+# Database name: primary
+#
+#  id              :integer          not null, primary key
+#  last_seen_at    :datetime         not null
+#  chat_channel_id :integer          not null
+#  grid_hackr_id   :integer          not null
+#
+# Indexes
+#
+#  index_grid_uplink_presences_on_last_seen_at  (last_seen_at)
+#  index_grid_uplink_presences_unique           (grid_hackr_id,chat_channel_id) UNIQUE
+#
 RSpec.describe GridUplinkPresence, type: :model do
   include ActiveJob::TestHelper
 
