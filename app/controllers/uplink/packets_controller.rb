@@ -7,6 +7,8 @@ class Uplink::PacketsController < ApplicationController
   before_action :require_login
   before_action :set_packet, only: %i[drop restore]
 
+  REPLY_TARGET_GONE = "Cannot reply: that packet was dropped or is in another channel."
+
   # POST /uplink/packets
   def create
     @channel = ChatChannel.find_by(slug: params[:channel_slug])
@@ -17,11 +19,21 @@ class Uplink::PacketsController < ApplicationController
       return render_form_error(gate.error, wait_seconds: gate.wait_seconds, status: gate.status)
     end
 
+    reply_to = nil
+    if params[:reply_to_id].present?
+      # Replies quote one active packet of this channel; anything else
+      # (other channel, dropped, deleted, garbage id) is a form error so
+      # the composer keeps the text and the viewer can cancel the reply.
+      reply_to = @channel.chat_messages.active.find_by(id: params[:reply_to_id])
+      return render_form_error(REPLY_TARGET_GONE, status: :unprocessable_entity) unless reply_to
+    end
+
     hackr_stream = @channel.requires_livestream ? HackrStream.current_live : nil
     @packet = @channel.chat_messages.build(
       grid_hackr: current_hackr,
       hackr_stream: hackr_stream,
-      content: normalize_content(params[:content])
+      content: normalize_content(params[:content]),
+      reply_to: reply_to
     )
 
     if @packet.save

@@ -271,6 +271,58 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
   end
 
+  it "replies from the hover control: the bar names the author, Escape disarms, the reply quotes the parent for both sessions and jumps to it" do
+    parent = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Original transmission")
+
+    using_session(:author) do
+      log_in!(other)
+      visit "/uplink"
+      await_uplink!
+    end
+
+    log_in!(hackr)
+    visit "/uplink"
+    await_uplink!
+    fill_in "content", with: "my own first"
+    click_button "TX"
+    expect(page).to have_css("#uplink-log .packet-content", text: "my own first", wait: 10)
+
+    # The control shows on hover (Cuprite treats opacity:0 as invisible).
+    arm = lambda do
+      find("#chat_message_#{parent.id}").hover
+      within("#chat_message_#{parent.id}") { find("button[title='Reply to packet']", wait: 5).click }
+      expect(page).to have_css(".packet-reply-bar-sender", text: "@#{other.hackr_alias}")
+      expect(find("#reply_to_id", visible: :all).value).to eq(parent.id.to_s)
+    end
+
+    arm.call
+    find_field("content").send_keys(:escape)
+    expect(page).to have_no_css(".packet-reply-bar")
+    expect(find("#reply_to_id", visible: :all).value).to eq("")
+
+    arm.call
+    find_field("content").send_keys("replying here", :enter)
+    expect(page).to have_css(".packet--reply[data-reply-to='#{parent.id}']", wait: 10)
+    within(".packet--reply") do
+      expect(page).to have_css(".packet-reply-quote", text: "[>] @#{other.hackr_alias} Original transmission")
+      expect(page).to have_content("replying here")
+    end
+    expect(page).to have_no_css(".packet-reply-bar") # disarmed by the send
+    expect(page).to have_field("content", with: "")
+    expect(ChatMessage.last.reply_to).to eq(parent)
+    # Right after your own packet, a reply still starts its own group.
+    expect(page).to have_css(".packet--reply:not(.packet--cont)")
+
+    find(".packet--reply .packet-reply-quote").click
+    expect(page).to have_css("#chat_message_#{parent.id}.packet--flash")
+    expect(page).to have_no_css(".packet--flash", wait: 5)
+
+    using_session(:author) do
+      expect(page).to have_css(".packet--reply .packet-reply-quote", text: "@#{other.hackr_alias} Original transmission", wait: 10)
+      expect(page).to have_content("replying here")
+    end
+  end
+
   it "docks the chat on the live home page and sends from there" do
     create(:hackr_stream, artist: create(:artist), title: "DOCK SESSIONS",
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")

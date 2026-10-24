@@ -48,7 +48,8 @@ module Api
             role: packet.grid_hackr&.role
           },
           hackr_stream_id: packet.hackr_stream_id,
-          source: packet.source
+          source: packet.source,
+          reply_to_id: packet.reply_to_id
         }
       end
     end

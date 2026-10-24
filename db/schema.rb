@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -76,11 +76,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
     t.integer "hackr_stream_id"
     t.string "source"
     t.datetime "updated_at", null: false
+    t.integer "reply_to_id"
     t.index ["chat_channel_id", "created_at"], name: "index_chat_messages_on_chat_channel_id_and_created_at"
     t.index ["chat_channel_id"], name: "index_chat_messages_on_chat_channel_id"
     t.index ["dropped"], name: "index_chat_messages_on_dropped"
     t.index ["grid_hackr_id"], name: "index_chat_messages_on_grid_hackr_id"
     t.index ["hackr_stream_id"], name: "index_chat_messages_on_hackr_stream_id"
+    t.index ["reply_to_id"], name: "index_chat_messages_on_reply_to_id"
   end
 
   create_table "code_repositories", force: :cascade do |t|
@@ -1437,6 +1439,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "chat_messages", "chat_channels"
+  add_foreign_key "chat_messages", "chat_messages", column: "reply_to_id", on_delete: :nullify
   add_foreign_key "chat_messages", "grid_hackrs"
   add_foreign_key "chat_messages", "hackr_streams"
   add_foreign_key "codex_entry_reads", "codex_entries"

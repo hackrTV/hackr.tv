@@ -18,6 +18,30 @@ module UplinkHelper
     content.match(BRIDGED_CONTENT)
   end
 
+  # Who sent it, as a short label: "@alias" for native packets,
+  # "TTV username" for bridged ones, "SYNTHIA" for the bot. Shared by the
+  # mention toast and the reply quote line. `parsed` is the bridged match
+  # when the caller already has it.
+  def uplink_packet_sender(packet, parsed = nil)
+    return "SYNTHIA" if packet.source == "SYNTHIA"
+
+    if packet.source.present?
+      parsed ||= parse_bridged_packet(packet.content)
+      return "#{packet.source} #{parsed[1]}" if parsed
+    end
+
+    "@#{packet.grid_hackr&.hackr_alias}"
+  end
+
+  # One-line plain-text excerpt of a packet (bridged packets lose their
+  # "[Platform] user:" prefix); dropped packets read as redacted.
+  def uplink_packet_excerpt(packet, parsed = nil, length: 80)
+    return "[PACKET DROPPED]" if packet.dropped?
+
+    parsed ||= parse_bridged_packet(packet.content) if packet.source.present? && packet.source != "SYNTHIA"
+    (parsed ? parsed[2] : packet.content).to_s.squish.truncate(length)
+  end
+
   def uplink_platform_class(source)
     PLATFORM_CLASSES[source]
   end

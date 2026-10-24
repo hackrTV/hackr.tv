@@ -13,6 +13,7 @@
 #  chat_channel_id :integer          not null
 #  grid_hackr_id   :integer          not null
 #  hackr_stream_id :integer
+#  reply_to_id     :integer
 #
 # Indexes
 #
@@ -21,12 +22,14 @@
 #  index_chat_messages_on_dropped                         (dropped)
 #  index_chat_messages_on_grid_hackr_id                   (grid_hackr_id)
 #  index_chat_messages_on_hackr_stream_id                 (hackr_stream_id)
+#  index_chat_messages_on_reply_to_id                     (reply_to_id)
 #
 # Foreign Keys
 #
 #  chat_channel_id  (chat_channel_id => chat_channels.id)
 #  grid_hackr_id    (grid_hackr_id => grid_hackrs.id)
 #  hackr_stream_id  (hackr_stream_id => hackr_streams.id)
+#  reply_to_id      (reply_to_id => chat_messages.id) ON DELETE => nullify
 #
 FactoryBot.define do
   factory :chat_message do

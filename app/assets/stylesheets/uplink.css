@@ -66,9 +66,9 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
 /* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster. */
-.packet-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin { color: #00d4ff; }
-.packet-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator { color: #ffaa00; }
-.packet-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative { color: #cc0088; }
+.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin { color: #00d4ff; }
+.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator { color: #ffaa00; }
+.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative { color: #cc0088; }
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
@@ -79,6 +79,20 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .uplink-mention { color: var(--accent-bright); text-decoration: none; }
 .uplink-mention--self { color: #ffff00; font-weight: bold; background-color: rgba(255, 255, 0, 0.1); padding: 0 2px; }
 
+/* Replies: one quote line above the content ("[>] sender excerpt", the
+   packet controller jumps to the parent on click); the parent flashes —
+   a TUI blink, no transition, cleared by the controller. */
+.packet-reply-quote { display: block; max-width: 100%; margin: 0 0 2px; padding: 0; background: none; border: none; text-align: left; font-family: inherit; font-size: 12px; line-height: 16px; color: var(--fg-faint); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.packet-reply-quote:hover .packet-reply-excerpt { color: var(--fg); }
+.packet-reply-mark { color: var(--edge-bright); margin-right: 4px; }
+.packet-reply-author { font-weight: bold; margin-right: 6px; color: var(--fg-muted); }
+.packet-reply-author--synthia { color: #00ff88; }
+.packet--flash { background-color: rgba(var(--accent-rgb), 0.25); }
+
+/* Per-packet controls: reply (shell only — the dock/popout composer has
+   no reply bar) + the viewer-neutral hidden drop/restore form. */
+.packet-actions { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.packet-reply-button { display: none; }
 .uplink-inline-form { display: inline; }
 /* Author display beats the UA [hidden] rule — re-assert it, or the
    viewer-neutral hidden mod controls render for everyone. */
@@ -246,11 +260,21 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .packet--cont .packet-author, .uplink-shell .packet--cont .packet-bridged-user, .uplink-shell .packet--cont .packet-badge { display: none; }
 .uplink-shell .packet--cont .packet-meta { visibility: hidden; }
 .uplink-shell .packet--cont:hover .packet-meta, .uplink-shell .packet--cont:focus-within .packet-meta { visibility: visible; }
-.uplink-shell .uplink-inline-form { position: absolute; top: 2px; right: 8px; opacity: 0; }
-.uplink-shell .packet:hover .uplink-inline-form, .uplink-shell .packet:focus-within .uplink-inline-form { opacity: 1; }
+.uplink-shell .packet-actions { position: absolute; top: 2px; right: 8px; opacity: 0; }
+.uplink-shell .packet:hover .packet-actions, .uplink-shell .packet:focus-within .packet-actions { opacity: 1; }
+.uplink-shell .packet-reply-button { display: inline-block; }
+.uplink-shell .packet-reply-quote { font-size: 14px; line-height: 18px; }
+.uplink-shell .packet.packet--flash { background-color: rgba(var(--accent-rgb), 0.25); } /* beats .packet:hover */
 
-/* Composer: auto-growing textarea, emote button, counter in the corner. */
+/* Composer: auto-growing textarea, emote button, counter in the corner.
+   Reply bar: "[>] REPLYING TO <sender> [x]" above the field while a reply
+   is armed (packet-form#reply / #cancelReply / Escape). */
 .uplink-shell .packet-input { padding: 10px 12px 12px; }
+.packet-reply-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; padding: 4px 8px; background-color: var(--bg-0); border: 1px solid var(--edge); border-left: 2px solid var(--accent); color: var(--fg-muted); font-size: 12px; letter-spacing: 1px; }
+.packet-reply-bar[hidden] { display: none; }
+.packet-reply-bar-sender { color: var(--accent-bright); font-weight: bold; letter-spacing: 0; }
+.packet-reply-bar-cancel { margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.packet-reply-bar-cancel:hover { color: var(--fg-bright); }
 .packet-input--multiline .packet-input-form { align-items: flex-end; }
 .packet-input--multiline .packet-input-text { resize: none; min-height: 40px; max-height: 160px; overflow-y: auto; line-height: 1.4; }
 .packet-input--multiline .packet-input-count { top: auto; bottom: 8px; transform: none; }
