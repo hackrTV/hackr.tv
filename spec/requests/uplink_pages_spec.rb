@@ -66,6 +66,9 @@ RSpec.describe "Uplink pages", type: :request do
       body = response.body
       expect(body).to include('class="uplink-shell" data-controller="uplink uplink-shell"')
       expect(body).to include("hackr.tv NODE")
+      expect(body).to include('data-uplink-shell-channel-value="ambient"')
+      expect(body).to include('data-channel="ops"')
+      expect(body).to include('<span class="uplink-channel-badge" hidden title="You were mentioned">@</span>')
       expect(body.index("BROADCAST")).to be < body.index("COMMS") # category order follows position
       expect(body.index(">#ambient<")).to be < body.index(">#ops<")
       expect(body).to include('<h2 class="uplink-chanhead-name">#ambient</h2>')
@@ -431,6 +434,31 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include('alt=":wave:"')
       expect(response.body).to include('src="/rails/active_storage/representations/redirect/')
       expect(response.body).to include('width="28" height="28"') # from the analyzed 56x56 fixture
+    end
+
+    it "toasts mentioned hackrs on their own stream with a link to the channel" do
+      allow(Turbo::StreamsChannel).to receive(:broadcast_append_to).and_call_original
+      log_in!
+
+      post "/uplink/packets", params: {channel_slug: "ambient", content: "yo @#{other.hackr_alias.upcase} look  at\nthis"},
+        headers: turbo_stream_headers
+
+      packet = ChatMessage.last
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with(
+        [other, :toasts], hash_including(target: "toast-region", partial: "shared/toast_mention", locals: {packet: packet})
+      )
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to).with([hackr, :toasts], anything)
+
+      toast = ApplicationController.render(partial: "shared/toast_mention", locals: {packet: packet})
+      expect(toast).to include('class="toast toast--mention"')
+      expect(toast).to include('href="/uplink?channel=ambient"')
+      expect(toast).to include('data-channel="ambient"')
+      expect(toast).to include(%(data-packet-id="#{packet.id}"))
+      expect(toast).to include("@MENTION")
+      expect(toast).to include("#ambient")
+      expect(toast).to include(%(<span class="toast-sender">@#{hackr.hackr_alias}</span>))
+      expect(toast).to include("yo @#{other.hackr_alias.upcase} look at this") # squished excerpt
+      expect(toast).to include('data-controller="toast"')
     end
 
     it "attaches the live stream on livestream channels" do

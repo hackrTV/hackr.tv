@@ -1,0 +1,26 @@
+<%# @mention toast (Uplink Phase 2 item 1). ChatMessage#notify_mentions
+    appends it to each mentioned hackr's #toast-region over their own
+    [hackr, :toasts] stream, so it is viewer-neutral by construction. The
+    whole toast is a link to the channel; data-channel lets the /uplink
+    shell badge that sidebar row, or drop the toast when the viewer is
+    already in the channel (the packet is in their log, highlighted).
+    Locals: packet. %>
+<%
+  channel = packet.chat_channel
+  bot = packet.source == "SYNTHIA"
+  parsed = (packet.source.present? && !bot) ? parse_bridged_packet(packet.content) : nil
+  sender = if parsed
+    "#{packet.source} #{parsed[1]}"
+  elsif bot
+    "SYNTHIA"
+  else
+    "@#{packet.grid_hackr&.hackr_alias}"
+  end
+  excerpt = (parsed ? parsed[2] : packet.content).to_s.squish.truncate(80)
+%>
+<%= link_to uplink_path(channel: channel.slug), class: "toast toast--mention",
+  data: {controller: "toast", action: "click->toast#dismiss", channel: channel.slug, packet_id: packet.id} do %>
+  <div class="toast-kicker toast-kicker--mention">@MENTION <span class="toast-channel"><%= channel.name %></span></div>
+  <div class="toast-title"><span class="toast-sender"><%= sender %></span></div>
+  <div class="toast-description"><%= excerpt %></div>
+<% end %>

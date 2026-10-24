@@ -96,7 +96,73 @@ RSpec.describe ChatMessage, type: :model do
     end
   end
 
+  describe "#mentioned_hackrs" do
+    let!(:channel) { create(:chat_channel, slug: "ambient") }
+    let!(:author) { create(:grid_hackr, hackr_alias: "Author") }
+    let!(:xeraen) { create(:grid_hackr, hackr_alias: "XERAEN") }
+    let!(:lurker) { create(:grid_hackr, hackr_alias: "lurker_01") }
+
+    def mentions(content, **attrs)
+      build(:chat_message, chat_channel: channel, grid_hackr: author, content: content, **attrs).mentioned_hackrs
+    end
+
+    it "resolves @aliases case-insensitively, deduped, in mention order" do
+      expect(mentions("yo @xeraen and @LURKER_01 and @Xeraen again")).to eq([xeraen, lurker])
+    end
+
+    it "ignores unknown aliases, the author, service accounts and email local parts" do
+      relay = create(:grid_hackr, hackr_alias: "svc_bridge", service_account: true)
+
+      expect(mentions("@nobody @author @svc_bridge me@xeraen.net")).to eq([])
+      expect(relay).to be_service_account
+    end
+
+    it "skips hackrs who cannot view the channel" do
+      ops = create(:chat_channel, :operator_only, slug: "ops")
+      operator = create(:grid_hackr, :operator, hackr_alias: "op_one")
+
+      packet = build(:chat_message, chat_channel: ops, grid_hackr: author, content: "@xeraen @op_one")
+      expect(packet.mentioned_hackrs).to eq([operator])
+    end
+
+    it "caps at MENTION_CAP recipients" do
+      aliases = (1..7).map { |i| create(:grid_hackr, hackr_alias: "crew_#{i}").hackr_alias }
+
+      expect(mentions(aliases.map { |a| "@#{a}" }.join(" ")).map(&:hackr_alias)).to eq(aliases.first(5))
+    end
+
+    it "lets bridged packets reach hackrs (a Twitch viewer pinging the streamer)" do
+      expect(mentions("twitch_fan: @xeraen great set", source: "TTV")).to eq([xeraen])
+    end
+  end
+
   describe "callbacks" do
+    describe "#notify_mentions" do
+      it "appends a mention toast to each mentioned hackr's own toasts stream, and nothing to the author's" do
+        channel = create(:chat_channel, slug: "ambient")
+        author = create(:grid_hackr, hackr_alias: "Author")
+        xeraen = create(:grid_hackr, hackr_alias: "XERAEN")
+        allow(Turbo::StreamsChannel).to receive(:broadcast_append_to).and_call_original
+
+        packet = create(:chat_message, chat_channel: channel, grid_hackr: author, content: "ping @xeraen")
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with(
+          [xeraen, :toasts],
+          hash_including(target: "toast-region", partial: "shared/toast_mention", locals: {packet: packet})
+        ).once
+        expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to).with([author, :toasts], anything)
+      end
+
+      it "stays quiet for packets without resolvable mentions" do
+        channel = create(:chat_channel, slug: "ambient")
+        allow(Turbo::StreamsChannel).to receive(:broadcast_append_to).and_call_original
+
+        create(:chat_message, chat_channel: channel, content: "no pings here @ghost")
+
+        expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to).with(anything, hash_including(partial: "shared/toast_mention"))
+      end
+    end
+
     describe "#broadcast_new_packet" do
       it "broadcasts to channel stream after create" do
         channel = create(:chat_channel, slug: "ambient")

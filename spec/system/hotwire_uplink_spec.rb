@@ -232,6 +232,45 @@ RSpec.describe "Hotwire uplink", type: :system do
     expect(page).not_to have_css(".uplink-jump", visible: :visible) # history is never "new packets"
   end
 
+  it "toasts an @mention to a hackr reading another channel, badges that sidebar row, and the toast opens the channel" do
+    create(:chat_channel, slug: "trace", name: "#trace")
+
+    using_session(:mentioned) do
+      log_in!(other)
+      visit "/uplink?channel=trace"
+      await_uplink!
+      # uplink_html + uplink_members + the layout's per-hackr toasts stream
+      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 3, wait: 10)
+    end
+
+    using_session(:sender) do
+      log_in!(hackr)
+      visit "/uplink"
+      await_uplink!
+      fill_in "content", with: "ping @#{other.hackr_alias.upcase} over here"
+      click_button "TX"
+      expect(page).to have_content("over here", wait: 10)
+    end
+
+    using_session(:mentioned) do
+      expect(page).to have_css(".toast--mention", wait: 10)
+      within(".toast--mention") do
+        expect(page).to have_content("@MENTION")
+        expect(page).to have_content("#ambient")
+        expect(page).to have_content("@#{hackr.hackr_alias}")
+        expect(page).to have_content("over here")
+      end
+      expect(page).to have_css(".uplink-channel--mention[data-channel='ambient'] .uplink-channel-badge", text: "@")
+      expect(page).to have_no_css(".uplink-channel--mention[data-channel='trace']")
+
+      find(".toast--mention").click
+      expect(page).to have_current_path("/uplink?channel=ambient")
+      expect(page).to have_css(".uplink-mention--self", text: "@#{other.hackr_alias.upcase}", wait: 10)
+      expect(page).to have_no_css(".toast--mention")
+      expect(page).to have_no_css(".uplink-channel-badge") # the visit re-rendered the list
+    end
+  end
+
   it "docks the chat on the live home page and sends from there" do
     create(:hackr_stream, artist: create(:artist), title: "DOCK SESSIONS",
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")

@@ -38,6 +38,8 @@ class ChatMessage < ApplicationRecord
   validates :content, presence: true, length: {maximum: 512}
   filter_profanity :content
 
+  MENTION_CAP = 5 # @mention toasts per packet
+
   scope :active, -> { where(dropped: false) }
   scope :dropped, -> { where(dropped: true) }
   scope :recent, -> { order(created_at: :desc) }
@@ -49,6 +51,7 @@ class ChatMessage < ApplicationRecord
   # own stream name so HTML frames never reach JSON subscribers.
   after_create_commit :broadcast_new_packet
   after_create_commit :broadcast_new_packet_html
+  after_create_commit :notify_mentions
   after_update_commit :broadcast_dropped_change, if: :saved_change_to_dropped?
   after_update_commit :broadcast_dropped_change_html, if: :saved_change_to_dropped?
 
@@ -62,7 +65,40 @@ class ChatMessage < ApplicationRecord
     update(dropped: false, dropped_at: nil)
   end
 
+  # Hackrs this packet @mentions who may actually read it, in mention
+  # order: resolved server-side and case-insensitively (the rendered
+  # @alias links stay unvalidated, so the client never learns which
+  # aliases exist), minus the author, service accounts (relay/synthia)
+  # and anyone the channel is hidden from, capped at MENTION_CAP. The
+  # lookup itself is bounded at twice the cap. Bridged packets count:
+  # a Twitch viewer's "@xeraen" reaches XERAEN on /uplink.
+  def mentioned_hackrs
+    aliases = content.to_s.scan(UplinkTextRenderer::MENTION).map { |_, name| name.downcase }.uniq.first(MENTION_CAP * 2)
+    return [] if aliases.empty?
+
+    GridHackr.where("LOWER(hackr_alias) IN (?)", aliases)
+      .where(service_account: false)
+      .where.not(id: grid_hackr_id)
+      .select { |hackr| chat_channel.viewable_by?(hackr) }
+      .sort_by { |hackr| aliases.index(hackr.hackr_alias.downcase) }
+      .first(MENTION_CAP)
+  end
+
   private
+
+  # One mention toast per recipient on their own [hackr, :toasts] stream
+  # (the layout's #toast-region) — viewer-neutral by construction. Inline
+  # like the other broadcasts: the test env has no job adapter.
+  def notify_mentions
+    mentioned_hackrs.each do |hackr|
+      Turbo::StreamsChannel.broadcast_append_to(
+        [hackr, :toasts],
+        target: "toast-region",
+        partial: "shared/toast_mention",
+        locals: {packet: self}
+      )
+    end
+  end
 
   def broadcast_new_packet
     ActionCable.server.broadcast(chat_channel.stream_name, {

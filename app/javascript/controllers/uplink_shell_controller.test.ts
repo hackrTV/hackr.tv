@@ -10,9 +10,12 @@ let mobile = false
 
 function fixture (withStage = true): string {
   return `
-    <div class="uplink-shell" data-controller="uplink-shell" data-members="open" data-drawer=""
-         data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey">
-      <aside data-uplink-shell-target="sidebar"><a href="/uplink?channel=ambient" id="first-channel">#ambient</a></aside>
+    <div class="uplink-shell" data-controller="uplink-shell" data-members="open" data-drawer="" data-uplink-shell-channel-value="ambient"
+         data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast">
+      <aside data-uplink-shell-target="sidebar">
+        <a href="/uplink?channel=ambient" id="first-channel" class="uplink-channel uplink-channel--active" data-channel="ambient">#ambient<span class="uplink-channel-badge" hidden>@</span></a>
+        <a href="/uplink?channel=trace" class="uplink-channel" data-channel="trace">#trace<span class="uplink-channel-badge" hidden>@</span></a>
+      </aside>
       <div data-uplink-shell-target="main">
         <button type="button" data-uplink-shell-target="membersToggle" data-action="click->uplink-shell#toggleMembers" aria-pressed="true">[o]</button>
         <button type="button" id="sidebar-toggle" data-action="click->uplink-shell#toggleSidebar">[#]</button>
@@ -152,6 +155,46 @@ describe('UplinkShellController', () => {
 
     document.querySelector('.packet-input-form')!.dispatchEvent(new CustomEvent('turbo:submit-end', { bubbles: true, detail: { success: true } }))
     expect(log.scrollTop).toBe(500)
+  })
+
+  it('badges the sidebar row for a mention toast from another channel and drops one for this channel', async () => {
+    await start()
+    document.body.insertAdjacentHTML('beforeend', '<div id="toast-region"></div>')
+    const region = document.getElementById('toast-region')!
+    const toast = (channel: string): HTMLElement => {
+      region.insertAdjacentHTML('beforeend', `<a class="toast toast--mention" data-channel="${channel}">@MENTION</a>`)
+      const el = region.lastElementChild as HTMLElement
+      el.dispatchEvent(new CustomEvent('toast:connected', { bubbles: true, detail: { channel } }))
+      return el
+    }
+
+    toast('trace')
+    const row = document.querySelector<HTMLElement>('.uplink-channel[data-channel="trace"]')!
+    expect(row.classList.contains('uplink-channel--mention')).toBe(true)
+    expect(row.querySelector<HTMLElement>('.uplink-channel-badge')!.hidden).toBe(false)
+    expect(region.children.length).toBe(1) // the toast stays
+
+    const own = toast('ambient')
+    expect(own.isConnected).toBe(false) // already reading this channel
+    expect(document.querySelector('.uplink-channel[data-channel="ambient"]')!.classList.contains('uplink-channel--mention')).toBe(false)
+
+    toast('../nope') // unknown / unsafe slugs are ignored
+    expect(document.querySelectorAll('.uplink-channel--mention').length).toBe(1)
+  })
+
+  it('prefixes the jump pill with @ MENTION when unread packets mention the viewer', async () => {
+    await start()
+    const log = document.getElementById('uplink-log')!
+
+    log.dispatchEvent(new CustomEvent('packet-log:state', { bubbles: true, detail: { atBottom: false, unread: 2, mentions: 1 } }))
+    expect(jump().hidden).toBe(false)
+    expect(jump().textContent).toContain('@ MENTION · 2 NEW PACKETS')
+    expect(jump().classList.contains('uplink-jump--mention')).toBe(true)
+
+    log.dispatchEvent(new CustomEvent('packet-log:state', { bubbles: true, detail: { atBottom: false, unread: 3, mentions: 0 } }))
+    expect(jump().textContent).toContain('3 NEW PACKETS')
+    expect(jump().textContent).not.toContain('MENTION')
+    expect(jump().classList.contains('uplink-jump--mention')).toBe(false)
   })
 
   it('focuses the composer on "/" unless typing in a field', async () => {

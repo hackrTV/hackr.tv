@@ -10,8 +10,15 @@ import { Controller } from '@hotwired/stimulus'
 //   - the live stage collapse (persisted); a collapsed stage has no
 //     iframe src, so it never plays audio;
 //   - the "[v] N NEW PACKETS" jump pill, fed by packet-log:state events
-//     from the log; the viewer's own sends always jump to the bottom;
-//   - "/" focuses the composer from anywhere outside a field.
+//     from the log (prefixed "@ MENTION" when an unread packet mentions
+//     the viewer); the viewer's own sends always jump to the bottom;
+//   - "/" focuses the composer from anywhere outside a field;
+//   - mention toasts (toast:connected on document, carrying the packet's
+//     channel): badge that sidebar row's hidden "@" when the mention is
+//     in another channel; drop the toast when it is this channel — the
+//     packet is already in the log, highlighted, and the pill covers a
+//     reader who scrolled up. The next visit re-renders the list, which
+//     clears the badge (item 5 persists unread state).
 // State lives on the shell root (data-members / data-drawer), so the
 // roster being replaced by a broadcast never resets it.
 
@@ -24,6 +31,9 @@ type Drawer = '' | 'sidebar' | 'members'
 
 export default class extends Controller<HTMLElement> {
   static targets = ['sidebar', 'members', 'main', 'jump', 'jumpCount', 'membersToggle', 'stage', 'stageFrame', 'stageToggle']
+  static values = { channel: String }
+
+  declare readonly channelValue: string
 
   declare readonly sidebarTarget: HTMLElement
   declare readonly membersTarget: HTMLElement
@@ -87,11 +97,15 @@ export default class extends Controller<HTMLElement> {
 
   // ── Log ────────────────────────────────────────────────────────────
 
-  logState (event: CustomEvent<{ atBottom: boolean, unread: number }>): void {
+  logState (event: CustomEvent<{ atBottom: boolean, unread: number, mentions?: number }>): void {
     const { atBottom, unread } = event.detail
+    const mentions = event.detail.mentions ?? 0
     const show = !atBottom && unread > 0
     this.jumpTarget.hidden = !show
-    if (show) this.jumpCountTarget.textContent = `${unread} NEW PACKET${unread === 1 ? '' : 'S'}`
+    this.jumpTarget.classList.toggle('uplink-jump--mention', show && mentions > 0)
+    if (!show) return
+    const packets = `${unread} NEW PACKET${unread === 1 ? '' : 'S'}`
+    this.jumpCountTarget.textContent = mentions > 0 ? `@ MENTION · ${packets}` : packets
   }
 
   jump (): void {
@@ -104,6 +118,22 @@ export default class extends Controller<HTMLElement> {
   sent (event: Event): void {
     if (!(event.target instanceof HTMLElement) || !event.target.closest('.packet-input-form')) return
     if ((event as CustomEvent).detail?.success) window.requestAnimationFrame(() => this.jump())
+  }
+
+  // ── Mentions ───────────────────────────────────────────────────────
+
+  toast (event: CustomEvent<{ channel?: string | null }>): void {
+    const slug = event.detail?.channel
+    if (!slug || !/^[\w-]+$/.test(slug)) return // validated, not escaped: jsdom has no CSS.escape
+    if (slug === this.channelValue) {
+      if (event.target instanceof HTMLElement) event.target.remove()
+      return
+    }
+    const row = this.element.querySelector<HTMLElement>(`.uplink-channel[data-channel="${slug}"]`)
+    if (!row) return
+    row.classList.add('uplink-channel--mention')
+    const badge = row.querySelector<HTMLElement>('.uplink-channel-badge')
+    if (badge) badge.hidden = false
   }
 
   // ── Keys ───────────────────────────────────────────────────────────

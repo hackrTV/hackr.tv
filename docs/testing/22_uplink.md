@@ -55,7 +55,14 @@ minutes: 25
     a cooldown message/disabled TX until the window passes; focus
     returns to the composer when the cooldown ends.
 11. Emoji/plain text render; an @mention of the other session renders
-    highlighted for them (self-mention styling).
+    highlighted for them (self-mention styling). **Mention toast**: with
+    the other session reading a different channel (or any other page),
+    mention them. → A `@MENTION` toast slides in bottom-right naming the
+    sender, the channel and an excerpt; in the shell that channel's
+    sidebar row gets a `@` badge. Clicking the toast opens the channel
+    (badge gone, packet highlighted). Mention them while they read the
+    same channel scrolled up. → No toast; the jump pill reads
+    `[v] @ MENTION · N NEW PACKETS`.
 
 ## Steps — operatives pane
 

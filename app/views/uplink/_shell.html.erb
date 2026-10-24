@@ -7,7 +7,8 @@
     The uplink Stimulus controller sits on the root (ancestor of the
     banner, presence and logFrame targets, exactly as on .uplink-panel);
     uplink-shell owns the chrome: drawers under 768px, the members
-    toggle, the stage collapse, the jump pill and the / hotkey.
+    toggle, the stage collapse, the jump pill, the / hotkey and the
+    sidebar @ badge from mention toasts.
     Locals: channel, channels, packets, viewer, live_stream, roster,
     more (older packets exist — seeds the scrollback sentinel). %>
 <%
@@ -18,7 +19,8 @@
 <div class="uplink-shell" data-controller="uplink uplink-shell" data-members="open" data-drawer=""
   data-uplink-channel-value="<%= channel&.slug %>"
   data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
-  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey">
+  data-uplink-shell-channel-value="<%= channel&.slug %>"
+  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast">
   <nav class="uplink-rail" aria-label="Nodes">
     <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
   </nav>
