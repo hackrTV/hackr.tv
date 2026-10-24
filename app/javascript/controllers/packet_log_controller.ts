@@ -15,9 +15,12 @@ import { Controller } from '@hotwired/stimulus'
 //     author line). Decided client-side because broadcast packets render
 //     viewer-neutral and don't know their predecessor; packets stay
 //     direct children, and a removal/replace regroups the follower.
-//   packet-log:state {atBottom, unread} — dispatched on scroll + mutation
-//     so a host (uplink-shell) can float a "new packets" jump pill;
-//     unread counts foreign packets that arrive while scrolled up.
+//   packet-log:state {atBottom, unread, mentions} — dispatched on scroll +
+//     mutation so a host (uplink-shell) can float a "new packets" jump
+//     pill; unread counts foreign packets that arrive while scrolled up,
+//     mentions how many of those @mention the viewer (matched here
+//     against the current-hackr-alias meta, independent of the packet
+//     controller's highlight timing).
 //   Re-pins through late layout shifts (emote image loads, the composer
 //     growing and shrinking the log).
 //   Scrollback — a `top` target (the .uplink-log-top sentinel _log_frame
@@ -57,11 +60,12 @@ export default class extends Controller<HTMLElement> {
   private history = new Set<string>()
   private atBottom = true
   private unread = 0
+  private mentions = 0
 
   private scrollHandler = (): void => {
     const wasAtBottom = this.atBottom
     this.atBottom = this.checkAtBottom()
-    if (this.atBottom) this.unread = 0
+    if (this.atBottom) this.clearUnread()
     if (wasAtBottom !== this.atBottom) this.publishState()
   }
 
@@ -163,6 +167,7 @@ export default class extends Controller<HTMLElement> {
   private onMutations (records: MutationRecord[]): void {
     this.trim()
     let arrived = 0
+    let mentioned = 0
     records.forEach(record => {
       // A Turbo replace (drop/restore) removes and adds the same id in one
       // record: regroup it, but it is not a new packet.
@@ -170,7 +175,10 @@ export default class extends Controller<HTMLElement> {
       record.addedNodes.forEach(node => {
         if (!isPacket(node)) return
         const spliced = this.history.delete(node.id)
-        if (!spliced && !replaced.has(node.id) && this.fromOthers(node)) arrived += 1
+        if (!spliced && !replaced.has(node.id) && this.fromOthers(node)) {
+          arrived += 1
+          if (this.mentionsViewer(node)) mentioned += 1
+        }
         this.regroup(node)
         this.regroup(node.nextElementSibling)
       })
@@ -180,6 +188,7 @@ export default class extends Controller<HTMLElement> {
       this.scrollToBottom()
     } else if (arrived > 0) {
       this.unread += arrived
+      this.mentions += mentioned
       this.publishState()
     }
   }
@@ -202,8 +211,20 @@ export default class extends Controller<HTMLElement> {
     return !viewer || packet.dataset.packetOwnerIdValue !== viewer
   }
 
+  private mentionsViewer (packet: HTMLElement): boolean {
+    const alias = document.querySelector<HTMLMetaElement>('meta[name="current-hackr-alias"]')?.content?.toLowerCase()
+    if (!alias) return false
+    return Array.from(packet.querySelectorAll<HTMLElement>('.uplink-mention'))
+      .some(el => el.dataset.alias?.toLowerCase() === alias)
+  }
+
+  private clearUnread (): void {
+    this.unread = 0
+    this.mentions = 0
+  }
+
   private publishState (): void {
-    this.dispatch('state', { detail: { atBottom: this.atBottom, unread: this.unread } })
+    this.dispatch('state', { detail: { atBottom: this.atBottom, unread: this.unread, mentions: this.mentions } })
   }
 
   private trim (): void {
@@ -220,6 +241,6 @@ export default class extends Controller<HTMLElement> {
   private scrollToBottom (): void {
     this.element.scrollTop = this.element.scrollHeight
     this.atBottom = true
-    this.unread = 0
+    this.clearUnread()
   }
 }

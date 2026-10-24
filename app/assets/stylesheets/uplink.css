@@ -180,6 +180,9 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-channel--disabled { color: var(--edge-bright); cursor: not-allowed; }
 .uplink-channel-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .uplink-channel-slow { color: var(--fg-faint); font-size: 12px; }
+/* Mention badge: hidden in the markup, revealed by uplink-shell when a mention toast lands for another channel. */
+.uplink-channel-badge { min-width: 16px; padding: 0 4px; font-size: 12px; line-height: 16px; text-align: center; font-weight: bold; background-color: var(--accent); color: var(--fg-bright); }
+.uplink-channel--mention { color: var(--fg-bright); }
 .uplink-channels-empty { padding: 12px; color: var(--fg-faint); font-size: 14px; }
 .uplink-userpanel { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background-color: var(--bg-0); border-top: 1px solid var(--edge); font-size: 14px; }
 .uplink-userpanel-alias { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; }
@@ -213,6 +216,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-logwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .uplink-jump { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 5; background-color: var(--bg-2); border: 1px solid var(--accent); color: var(--accent-bright); padding: 4px 12px; font-family: inherit; font-size: 12px; letter-spacing: 1px; cursor: pointer; }
 .uplink-jump:hover { background-color: var(--accent); color: var(--fg-bright); }
+.uplink-jump--mention { border-color: #ffff00; color: #ffff00; } /* matches .uplink-mention--self */
 .uplink-shell .uplink-empty { flex: 1; display: flex; align-items: center; justify-content: center; }
 .uplink-shell .uplink-empty p::before { content: "// STANDBY // "; color: var(--edge-bright); }
 .uplink-shell .uplink-unavailable p:first-child::before { content: "// OFFLINE // "; color: var(--edge-bright); }

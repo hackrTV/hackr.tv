@@ -197,14 +197,6 @@
   letter-spacing: 1px;
 }
 
-/* --- Toast region (populated via Turbo Streams in Phase 3) --- */
-#toast-region {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 10000;
-}
-
 /* --- Page chrome (DefaultLayout.tsx port) --- */
 .chrome-mobile-only { display: none; }
 @media (max-width: 767px) {
@@ -776,10 +768,19 @@
 /* --- Achievement / mission toasts (Phase 3, AchievementToast.tsx port).
  * The slide-in keyframe was referenced but never defined in the SPA —
  * defined here, so Hotwire toasts actually animate. --- */
+/* The only #toast-region rule: a Phase-0 placeholder also set top: 16px, which
+ * stretched the fixed region full-height and parked every toast top-right over
+ * the nav (removed 2026-10-19). bottom: 90px clears the player bar. */
 #toast-region { position: fixed; bottom: 90px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
 .toast { pointer-events: auto; cursor: pointer; background: var(--bg-1); padding: 12px 16px; font-family: var(--font-tui); color: var(--fg); animation: achievement-toast-slide-in 0.3s ease-out; }
 .toast--achievement { border: 2px solid var(--warn); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
 .toast--mission { border: 2px solid var(--accent-alt); box-shadow: 0 0 20px rgba(var(--accent-alt-rgb), 0.4); }
+/* Uplink @mention toast (shared/_toast_mention): the toast is a link to the channel. */
+.toast--mention { display: block; max-width: 320px; border: 2px solid var(--accent); box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4); text-decoration: none; }
+.toast-kicker--mention { color: var(--accent-bright); }
+.toast-channel { margin-left: 8px; color: var(--fg-muted); font-weight: normal; }
+.toast-sender { color: var(--fg-bright); font-weight: bold; }
+.toast--mention .toast-description { margin-bottom: 0; white-space: pre-wrap; }
 @keyframes achievement-toast-slide-in { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .toast-kicker { font-size: 0.8em; font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
 .toast-kicker--achievement { color: var(--warn); }

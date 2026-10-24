@@ -118,16 +118,41 @@ describe('PacketLogController', () => {
     document.head.appendChild(meta)
     await start(fixture([packet(1, 'h1', T0)]))
     scrolledUp()
-    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
 
     append(packet(2, 'h2', T0 + 1000, 8)) // someone else
     append(packet(3, 'h1', T0 + 2000, 7)) // own packet: not unread
     await flush()
-    expect(states.at(-1)).toEqual({ atBottom: false, unread: 1 })
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 1, mentions: 0 })
 
     Object.defineProperty(log(), 'scrollTop', { value: 700, configurable: true, writable: true })
     log().dispatchEvent(new Event('scroll'))
-    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+  })
+
+  it('counts unread packets that @mention the viewer (case-insensitive, never own packets) and clears with unread', async () => {
+    const id = document.createElement('meta')
+    id.name = 'current-hackr-id'
+    id.content = '7'
+    const alias = document.createElement('meta')
+    alias.name = 'current-hackr-alias'
+    alias.content = 'XERAEN'
+    document.head.append(id, alias)
+    await start(fixture([packet(1, 'h1', T0)]))
+    scrolledUp()
+
+    const mention = (idn: number, owner: number, who: string): string =>
+      packet(idn, `h${owner}`, T0 + idn * 1000, owner).replace(`p${idn}`, `<a class="uplink-mention" data-alias="${who}">@${who}</a>`)
+    append(mention(2, 8, 'xeraen')) // someone else, mentions me
+    append(mention(3, 8, 'other')) // someone else, mentions someone else
+    append(mention(4, 7, 'XERAEN')) // my own packet: neither unread nor a mention
+    await flush()
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 2, mentions: 1 })
+
+    Object.defineProperty(log(), 'scrollTop', { value: 700, configurable: true, writable: true })
+    log().dispatchEvent(new Event('scroll'))
+    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+    document.head.querySelector('meta[name="current-hackr-alias"]')?.remove()
   })
 
   it('does not count a replaced (dropped/restored) packet as new', async () => {
@@ -140,7 +165,7 @@ describe('PacketLogController', () => {
 
     document.getElementById('chat_message_1')!.outerHTML = packet(1, 'h2', T0, 8).replace('p1', '[PACKET DROPPED]')
     await flush()
-    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
     expect(cont(2)).toBe(true) // still grouped behind the replaced row
   })
 
@@ -283,7 +308,7 @@ describe('PacketLogController', () => {
       intersect!()
       await settle()
       expect(ids()).toEqual(['chat_message_1', 'chat_message_2', 'chat_message_3'])
-      expect(states.at(-1)).toEqual({ atBottom: false, unread: 0 })
+      expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
 
       fetchMock.mockResolvedValue({ ok: false, text: async () => '' })
       intersect!()
