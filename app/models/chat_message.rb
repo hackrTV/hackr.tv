@@ -61,6 +61,7 @@ class ChatMessage < ApplicationRecord
   # own stream name so HTML frames never reach JSON subscribers.
   after_create_commit :broadcast_new_packet
   after_create_commit :broadcast_new_packet_html
+  after_create_commit :broadcast_bump
   after_create_commit :notify_mentions
   after_update_commit :broadcast_dropped_change, if: :saved_change_to_dropped?
   after_update_commit :broadcast_dropped_change_html, if: :saved_change_to_dropped?
@@ -108,6 +109,19 @@ class ChatMessage < ApplicationRecord
         locals: {packet: self}
       )
     end
+  end
+
+  # One tiny append per packet on the channel's ["uplink_bump", slug]
+  # stream: every /uplink shell reading ANOTHER channel subscribes to it
+  # and bumps that sidebar row's unread badge (no per-hackr fan-out; the
+  # payload is an empty <i>, viewer-neutral by construction). Declared
+  # before notify_mentions so the count lands before the toast recolors it.
+  def broadcast_bump
+    Turbo::StreamsChannel.broadcast_append_to(
+      [Uplink::Unread::STREAM, chat_channel.slug],
+      target: Uplink::Unread.bump_target(chat_channel.slug),
+      html: "<i></i>"
+    )
   end
 
   def broadcast_new_packet

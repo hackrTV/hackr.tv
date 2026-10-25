@@ -151,6 +151,67 @@ RSpec.describe "Hotwire uplink", type: :system do
     expect(page).to have_css(".uplink-chanhead-name", text: "#trace")
   end
 
+  it "badges a sidebar row live for packets landing in another channel, clears it on visit (a NEW PACKETS line marks where they start), and acks what you watch at the bottom so it never comes back" do
+    trace = create(:chat_channel, slug: "trace", name: "#trace")
+    mark = -> { UplinkChannelRead.find_by(grid_hackr: other, chat_channel: trace)&.last_read_message_id }
+
+    using_session(:reader) do
+      log_in!(other)
+      visit "/uplink"
+      await_uplink!
+      # uplink_html + uplink_members + toasts + #trace's bump stream
+      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 4, wait: 10)
+      expect(page).to have_no_css(".uplink-channel--unread")
+    end
+
+    using_session(:sender) do
+      log_in!(hackr)
+      visit "/uplink?channel=trace"
+      await_uplink!
+      fill_in "content", with: "trace packet one"
+      click_button "TX"
+      expect(page).to have_content("trace packet one", wait: 10)
+      fill_in "content", with: "trace packet two"
+      click_button "TX"
+      expect(page).to have_content("trace packet two", wait: 10)
+    end
+
+    using_session(:reader) do
+      expect(page).to have_css(".uplink-channel--unread[data-channel='trace'] .uplink-channel-badge", text: "2", wait: 10)
+      expect(page).to have_no_css(".uplink-channel--unread[data-channel='ambient']")
+
+      click_link "#trace"
+      expect(page).to have_current_path("/uplink?channel=trace")
+      expect(page).to have_content("trace packet two")
+      expect(page).to have_no_css(".uplink-channel--unread") # the visit marked it read
+      expect(page).to have_css(".uplink-unseen", text: "// NEW PACKETS //")
+      expect(find("#uplink-log").text).to match(/NEW PACKETS.*trace packet one.*trace packet two/m) # the line sits right above the first packet you hadn't seen
+      await_uplink!
+      expect(mark.call).to eq(ChatMessage.find_by!(content: "trace packet two").id)
+    end
+
+    using_session(:sender) do
+      fill_in "content", with: "trace packet three"
+      click_button "TX"
+      expect(page).to have_content("trace packet three", wait: 10)
+    end
+
+    using_session(:reader) do
+      expect(page).to have_content("trace packet three", wait: 10) # watched at the bottom
+      three = ChatMessage.find_by!(content: "trace packet three")
+      20.times do # the ack posts ~1.5s after the packet lands
+        break if mark.call == three.id
+
+        sleep 0.25
+      end
+      expect(mark.call).to eq(three.id)
+
+      click_link "#ambient"
+      expect(page).to have_current_path("/uplink?channel=ambient")
+      expect(page).to have_no_css(".uplink-channel--unread") # nothing you watched comes back as unread
+    end
+  end
+
   it "groups consecutive packets by one author, sends multi-line packets on Enter, and reveals only your own roster row" do
     create(:chat_message, chat_channel: channel, grid_hackr: other, content: "first from other")
     create(:chat_message, chat_channel: channel, grid_hackr: other, content: "second from other")
@@ -239,8 +300,8 @@ RSpec.describe "Hotwire uplink", type: :system do
       log_in!(other)
       visit "/uplink?channel=trace"
       await_uplink!
-      # uplink_html + uplink_members + the layout's per-hackr toasts stream
-      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 3, wait: 10)
+      # uplink_html + uplink_members + the layout's per-hackr toasts stream + #ambient's bump stream
+      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 4, wait: 10)
     end
 
     using_session(:sender) do
@@ -260,7 +321,7 @@ RSpec.describe "Hotwire uplink", type: :system do
         expect(page).to have_content("@#{hackr.hackr_alias}")
         expect(page).to have_content("over here")
       end
-      expect(page).to have_css(".uplink-channel--mention[data-channel='ambient'] .uplink-channel-badge", text: "@")
+      expect(page).to have_css(".uplink-channel--mention[data-channel='ambient'] .uplink-channel-badge", text: "1") # the toast recolors, the packet's bump counts
       expect(page).to have_no_css(".uplink-channel--mention[data-channel='trace']")
 
       find(".toast--mention").click

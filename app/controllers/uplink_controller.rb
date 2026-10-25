@@ -10,6 +10,8 @@ class UplinkController < ApplicationController
 
   RECENT_PACKETS = 20 # LiveChatChannel#send_recent_packets parity
   HISTORY_PACKETS = 40 # one scrollback page (GET /uplink/log?before=)
+  UNSEEN_PACKETS = 100 # the shell opens at the NEW PACKETS line when this many or fewer are unseen
+  UNSEEN_CONTEXT = 5 # seen packets kept above the line for context
 
   # GET /uplink — the NODE shell (uplink/_shell): channel sidebar, channel
   # pane with the live stage on livestream channels, operatives roster.
@@ -18,9 +20,15 @@ class UplinkController < ApplicationController
     @channel = resolve_channel(@channels, default_slug: "ambient")
     return redirect_to uplink_path if channel_off_limits?
 
-    load_packets
+    @unseen_from = read_mark # the viewer's old mark: read before Uplink::Unread.sync moves it
+    load_packets_for_viewer
+    @unseen_divider = unseen_divider?(@unseen_from)
     @live_stream = HackrStream.includes(:artist).current_live
     @roster = Uplink::Roster.for(viewable? ? @channel : nil, viewer: current_hackr)
+    # Marks this channel read at its newest packet, seeds caught-up marks
+    # for channels the viewer never saw, counts the rest for the sidebar.
+    @unread = Uplink::Unread.sync(current_hackr, @channels.select { |c| c.viewable_by?(current_hackr) },
+      reading: viewable? ? @channel : nil)
   end
 
   # GET /uplink/popout — public (livestream viewing), slim layout,
@@ -54,7 +62,9 @@ class UplinkController < ApplicationController
       return head :bad_request unless before.positive?
 
       load_packets(before: before, limit: HISTORY_PACKETS)
-      render partial: "uplink/packets", locals: {packets: @packets, viewer: current_hackr, more: @more_packets}
+      mark = params[:unseen_from].presence&.to_i # the shell's sentinel passes the viewer's old mark along
+      locals = {packets: @packets, viewer: current_hackr, more: @more_packets, unseen_from: mark, unseen_divider: unseen_divider?(mark)}
+      render partial: "uplink/packets", locals: locals
     else
       @shell = params[:shell].present?
       load_packets
@@ -84,6 +94,40 @@ class UplinkController < ApplicationController
     return @viewable if defined?(@viewable)
 
     @viewable = @channel.present? && @channel.viewable_by?(current_hackr)
+  end
+
+  # The viewer's read mark for this channel (nil on a first sight).
+  def read_mark
+    return unless viewable?
+
+    UplinkChannelRead.where(grid_hackr: current_hackr, chat_channel: @channel).pick(:last_read_message_id)
+  end
+
+  # The shell's first page: the newest RECENT_PACKETS — unless more than
+  # that and at most UNSEEN_PACKETS are unseen, in which case the page
+  # starts UNSEEN_CONTEXT seen packets before the mark and runs through
+  # every unseen one, so the log opens at the "// NEW PACKETS //" line
+  # (uplink/_log_frame; the packet-log controller scrolls to it). A flood
+  # beyond the cap opens at the newest; the line is drawn by whichever
+  # scrollback page holds the boundary.
+  def load_packets_for_viewer
+    unseen = @unseen_from ? @channel.chat_messages.active.where("id > ?", @unseen_from).count : 0
+    return load_packets unless unseen.between?(RECENT_PACKETS + 1, UNSEEN_PACKETS)
+
+    scope = @channel.chat_messages.active.includes(:grid_hackr, reply_to: :grid_hackr)
+    context = scope.where("id <= ?", @unseen_from).order(id: :desc).limit(UNSEEN_CONTEXT + 1).to_a
+    @more_packets = context.size > UNSEEN_CONTEXT
+    @packets = context.first(UNSEEN_CONTEXT).reverse + scope.where("id > ?", @unseen_from).order(id: :asc).to_a
+  end
+
+  # Does this page hold the boundary the line marks? A packet above the
+  # mark preceded by one at or below it — or the channel's first packet
+  # with everything unseen. false with no mark (first sight), nothing
+  # unseen here, or a boundary further up (a scrollback page draws it).
+  def unseen_divider?(mark)
+    return false if mark.nil? || @packets.empty? || @packets.last.id <= mark
+
+    @packets.first.id <= mark || !@more_packets
   end
 
   # Newest `limit` active packets (older than `before` when paging),

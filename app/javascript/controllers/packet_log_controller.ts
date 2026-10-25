@@ -17,6 +17,9 @@ import { Controller } from '@hotwired/stimulus'
 //     direct children, and a removal/replace regroups the follower. A
 //     reply (data-reply-to) always starts a group: its quote line sits
 //     above its own author line.
+//   the "// NEW PACKETS //" separator (data-packet-log-target="unseen",
+//     uplink/_log_frame): opened scrolled to when it sits above the fold;
+//     grouping never continues across it (not a .packet sibling).
 //   packet-log:state {atBottom, unread, mentions} — dispatched on scroll +
 //     mutation so a host (uplink-shell) can float a "new packets" jump
 //     pill; unread counts foreign packets that arrive while scrolled up,
@@ -41,6 +44,7 @@ import { Controller } from '@hotwired/stimulus'
 const GROUP_WINDOW_MS = 5 * 60 * 1000
 const BOTTOM_SLACK_PX = 50
 const SCROLLBACK_MARGIN = '160px 0px 0px 0px'
+const UNSEEN_MARGIN_PX = 8
 
 function isPacket (node: Node | null | undefined): node is HTMLElement {
   return node instanceof HTMLElement && node.classList.contains('packet')
@@ -48,11 +52,13 @@ function isPacket (node: Node | null | undefined): node is HTMLElement {
 
 export default class extends Controller<HTMLElement> {
   static values = { cap: Number, group: Boolean }
-  static targets = ['top']
+  static targets = ['top', 'unseen']
 
   declare readonly capValue: number
   declare readonly groupValue: boolean
   declare readonly hasTopTarget: boolean
+  declare readonly hasUnseenTarget: boolean
+  declare readonly unseenTarget: HTMLElement
   declare readonly topTarget: HTMLElement
 
   private observer: MutationObserver | null = null
@@ -78,6 +84,7 @@ export default class extends Controller<HTMLElement> {
   connect (): void {
     this.regroupAll()
     this.scrollToBottom()
+    this.revealUnseen()
     this.element.addEventListener('scroll', this.scrollHandler)
     this.element.addEventListener('load', this.loadHandler, true)
     this.observer = new MutationObserver(records => this.onMutations(records))
@@ -188,6 +195,7 @@ export default class extends Controller<HTMLElement> {
     })
     if (this.atBottom) {
       this.scrollToBottom()
+      if (arrived > 0) this.publishState() // seen at the bottom: the shell acks it as read
     } else if (arrived > 0) {
       this.unread += arrived
       this.mentions += mentioned
@@ -234,6 +242,19 @@ export default class extends Controller<HTMLElement> {
     while (this.element.children.length > this.capValue) {
       this.element.firstElementChild?.remove()
     }
+  }
+
+  // The "// NEW PACKETS //" separator (uplink/_log_frame) is where the
+  // packets the viewer hasn't seen start: when pinning to the bottom
+  // leaves it above the fold, open scrolled to it instead (Discord's
+  // unread marker). The viewer is then "scrolled up": arrivals go to
+  // the jump pill and the read ack waits for the bottom.
+  private revealUnseen (): void {
+    if (!this.hasUnseenTarget) return
+    const delta = this.unseenTarget.getBoundingClientRect().top - this.element.getBoundingClientRect().top
+    if (delta >= 0) return
+    this.element.scrollTop += delta - UNSEEN_MARGIN_PX
+    this.atBottom = this.checkAtBottom()
   }
 
   private checkAtBottom (): boolean {

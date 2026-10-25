@@ -7,15 +7,19 @@
     The uplink Stimulus controller sits on the root (ancestor of the
     banner, presence and logFrame targets, exactly as on .uplink-panel);
     uplink-shell owns the chrome: drawers under 768px, the members
-    toggle, the stage collapse, the jump pill, the / hotkey and the
-    sidebar @ badge from mention toasts; popover owns the operative
+    toggle, the stage collapse, the jump pill, the / hotkey, the
+    sidebar's unread badges (bump stream + read acks) and their mention
+    recolor from toasts; popover owns the operative
     record card (a turbo-frame in the channel pane that packet author
     links load — see uplink/profiles/show) and the operator menu (a
     second frame, a grid child, that the [...] on packets and roster rows
     loads — see uplink/punishments/menu); one of the two is open at a
     time.
     Locals: channel, channels, packets, viewer, live_stream, roster,
-    more (older packets exist — seeds the scrollback sentinel). %>
+    more (older packets exist — seeds the scrollback sentinel), unread
+    (Uplink::Unread.sync result for the sidebar), unseen_from (the viewer's
+    read mark before this visit, nil on first sight) + unseen_divider (this
+    page holds the NEW PACKETS boundary — UplinkController). %>
 <%
   viewable = channel.present? && channel.viewable_by?(viewer)
   live = live_stream.present?
@@ -25,6 +29,7 @@
   data-uplink-channel-value="<%= channel&.slug %>"
   data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
   data-uplink-shell-channel-value="<%= channel&.slug %>"
+  data-uplink-shell-ack-url-value="<%= viewable ? uplink_reads_path : "" %>"
   data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown turbo:submit-end->popover#submitted">
   <nav class="uplink-rail" aria-label="Nodes">
     <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
@@ -35,7 +40,8 @@
       <span class="uplink-sidebar-kicker">UPLINK</span>
       <span class="uplink-sidebar-node">hackr.tv NODE</span>
     </header>
-    <%= render "uplink/channel_list", channels: channels, active: channel&.slug, live: live %>
+    <%= render "uplink/channel_list", channels: channels, active: channel&.slug, live: live,
+      unread: local_assigns.fetch(:unread, {}) %>
     <footer class="uplink-userpanel">
       <span class="uplink-userpanel-alias uplink-userpanel-alias--<%= uplink_role_class(viewer.role) %>">@<%= viewer.hackr_alias %></span>
       <span class="uplink-userpanel-role"><%= viewer.role.upcase %></span>
@@ -80,7 +86,8 @@
     <% end %>
 
     <%= render "uplink/body", channel: channel, viewer: viewer, packets: packets, shell: true,
-      more: local_assigns.fetch(:more, false) %>
+      more: local_assigns.fetch(:more, false), unseen_from: local_assigns.fetch(:unseen_from, nil),
+      unseen_divider: local_assigns.fetch(:unseen_divider, false) %>
 
     <%# Operative record popover: empty + hidden until a packet author is
         clicked; absolute inside .uplink-main (the popover controller

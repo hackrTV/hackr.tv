@@ -2,19 +2,26 @@ import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { Application } from '@hotwired/stimulus'
 import UplinkShellController from './uplink_shell_controller'
 
-// Fixture mirrors uplink/_shell's chrome: sidebar + members panes, the
-// main pane, backdrop, jump pill, stage, composer. matchMedia is stubbed
-// per example to flip the mobile breakpoint.
+// Fixture mirrors uplink/_shell's chrome: sidebar (rows with unread
+// badges + the hidden bump block) + members panes, the main pane with a
+// log of packets, backdrop, jump pill, stage, composer. matchMedia is
+// stubbed per example to flip the mobile breakpoint.
 
 let mobile = false
 
 function fixture (withStage = true): string {
   return `
-    <div class="uplink-shell" data-controller="uplink-shell" data-members="open" data-drawer="" data-uplink-shell-channel-value="ambient"
+    <div class="uplink-shell" data-controller="uplink-shell" data-members="open" data-drawer="" data-uplink-shell-channel-value="ambient" data-uplink-shell-ack-url-value="/uplink/reads"
          data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast">
       <aside data-uplink-shell-target="sidebar">
-        <a href="/uplink?channel=ambient" id="first-channel" class="uplink-channel uplink-channel--active" data-channel="ambient">#ambient<span class="uplink-channel-badge" hidden>@</span></a>
-        <a href="/uplink?channel=trace" class="uplink-channel" data-channel="trace">#trace<span class="uplink-channel-badge" hidden>@</span></a>
+        <a href="/uplink?channel=ambient" id="first-channel" class="uplink-channel uplink-channel--active" data-channel="ambient">#ambient<span class="uplink-channel-badge" hidden data-count="0"></span></a>
+        <a href="/uplink?channel=trace" class="uplink-channel" data-channel="trace">#trace<span class="uplink-channel-badge" hidden data-count="0"></span></a>
+        <a href="/uplink?channel=ops" class="uplink-channel uplink-channel--unread" data-channel="ops">#ops<span class="uplink-channel-badge" data-count="99">99</span></a>
+        <div class="uplink-bumps" hidden data-uplink-shell-target="bumps">
+          <span id="uplink-bump-trace" data-channel="trace"></span>
+          <span id="uplink-bump-ops" data-channel="ops"></span>
+          <span id="uplink-bump-nope" data-channel="../nope"></span>
+        </div>
       </aside>
       <div data-uplink-shell-target="main">
         <button type="button" data-uplink-shell-target="membersToggle" data-action="click->uplink-shell#toggleMembers" aria-pressed="true">[o]</button>
@@ -24,7 +31,7 @@ function fixture (withStage = true): string {
           <button type="button" data-uplink-shell-target="stageToggle" data-action="click->uplink-shell#toggleStage">[-] HIDE VIDEO</button>
           <iframe data-src="https://www.youtube.com/embed/abc" data-uplink-shell-target="stageFrame"></iframe>
         </section>` : ''}
-        <div id="uplink-log"></div>
+        <div id="uplink-log"><div id="chat_message_41" class="packet" data-packet-owner-id-value="8"></div></div>
         <button type="button" hidden data-uplink-shell-target="jump" data-action="click->uplink-shell#jump">[v] <span data-uplink-shell-target="jumpCount"></span></button>
         <form class="packet-input-form"><textarea class="packet-input-text"></textarea></form>
         <input id="other-field">
@@ -75,7 +82,33 @@ describe('UplinkShellController', () => {
     await Promise.resolve()
     application?.stop()
     vi.unstubAllGlobals()
+    vi.useRealTimers()
+    document.head.querySelector('meta[name="current-hackr-id"]')?.remove()
   })
+
+  const badge = (slug: string): HTMLElement => document.querySelector(`.uplink-channel[data-channel="${slug}"] .uplink-channel-badge`)!
+  const row = (slug: string): HTMLElement => document.querySelector(`.uplink-channel[data-channel="${slug}"]`)!
+
+  // Turbo's append into a bump slot, as ChatMessage#broadcast_bump sends it.
+  async function bump (slug: string): Promise<void> {
+    document.getElementById(`uplink-bump-${slug}`)!.insertAdjacentHTML('beforeend', '<i></i>')
+    await Promise.resolve()
+  }
+
+  function viewerMeta (id: string): void {
+    const meta = document.createElement('meta')
+    meta.name = 'current-hackr-id'
+    meta.content = id
+    document.head.appendChild(meta)
+  }
+
+  function state (detail: { atBottom: boolean, unread: number }): void {
+    document.getElementById('uplink-log')!.dispatchEvent(new CustomEvent('packet-log:state', { bubbles: true, detail }))
+  }
+
+  function landed (id: number, owner: string): void {
+    document.getElementById('uplink-log')!.insertAdjacentHTML('beforeend', `<div id="chat_message_${id}" class="packet" data-packet-owner-id-value="${owner}"></div>`)
+  }
 
   it('opens the members pane by default on wide viewports and persists the toggle', async () => {
     await start()
@@ -157,7 +190,7 @@ describe('UplinkShellController', () => {
     expect(log.scrollTop).toBe(500)
   })
 
-  it('badges the sidebar row for a mention toast from another channel and drops one for this channel', async () => {
+  it('recolors the sidebar row for a mention toast from another channel (the bump shows the count) and drops one for this channel', async () => {
     await start()
     document.body.insertAdjacentHTML('beforeend', '<div id="toast-region"></div>')
     const region = document.getElementById('toast-region')!
@@ -169,17 +202,117 @@ describe('UplinkShellController', () => {
     }
 
     toast('trace')
-    const row = document.querySelector<HTMLElement>('.uplink-channel[data-channel="trace"]')!
-    expect(row.classList.contains('uplink-channel--mention')).toBe(true)
-    expect(row.querySelector<HTMLElement>('.uplink-channel-badge')!.hidden).toBe(false)
+    expect(row('trace').classList.contains('uplink-channel--mention')).toBe(true)
+    expect(badge('trace').hidden).toBe(true) // no count yet: the packet's own bump brings it
     expect(region.children.length).toBe(1) // the toast stays
+    await bump('trace')
+    expect(badge('trace').hidden).toBe(false)
+    expect(badge('trace').textContent).toBe('1')
 
     const own = toast('ambient')
     expect(own.isConnected).toBe(false) // already reading this channel
-    expect(document.querySelector('.uplink-channel[data-channel="ambient"]')!.classList.contains('uplink-channel--mention')).toBe(false)
+    expect(row('ambient').classList.contains('uplink-channel--mention')).toBe(false)
 
     toast('../nope') // unknown / unsafe slugs are ignored
     expect(document.querySelectorAll('.uplink-channel--mention').length).toBe(1)
+  })
+
+  it('bumps a row\'s unread badge per <i> appended into its bump slot, capped at 99+, and empties the slot', async () => {
+    await start()
+    expect(badge('trace').hidden).toBe(true)
+
+    await bump('trace')
+    expect(badge('trace').hidden).toBe(false)
+    expect(badge('trace').textContent).toBe('1')
+    expect(badge('trace').dataset.count).toBe('1')
+    expect(row('trace').classList.contains('uplink-channel--unread')).toBe(true)
+    expect(document.getElementById('uplink-bump-trace')!.children.length).toBe(0)
+
+    await bump('trace')
+    expect(badge('trace').textContent).toBe('2')
+
+    await bump('ops') // server-rendered 99 → 100 reads 99+
+    expect(badge('ops').textContent).toBe('99+')
+    expect(badge('ops').dataset.count).toBe('100')
+
+    await bump('nope') // a slot naming an unsafe slug never reaches querySelector
+    expect(document.querySelectorAll('.uplink-channel--unread').length).toBe(2)
+    expect(badge('ambient').hidden).toBe(true) // this channel has no slot
+  })
+
+  it('acks this channel as read when a foreign packet lands at the bottom: debounced, newest id, never for own packets or ids already acked', async () => {
+    vi.useFakeTimers()
+    viewerMeta('7')
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true })
+    vi.stubGlobal('fetch', fetchMock)
+    await start()
+
+    state({ atBottom: true, unread: 0 }) // connect's state: packet 41 was marked by the render
+    vi.advanceTimersByTime(2000)
+    expect(fetchMock).not.toHaveBeenCalled()
+
+    landed(42, '8')
+    state({ atBottom: true, unread: 0 })
+    landed(43, '8')
+    state({ atBottom: true, unread: 0 }) // within the debounce: one POST for the newest id
+    vi.advanceTimersByTime(1499)
+    expect(fetchMock).not.toHaveBeenCalled()
+    vi.advanceTimersByTime(1)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe('/uplink/reads')
+    expect(init.method).toBe('POST')
+    expect(init.keepalive).toBe(false)
+    expect(String(init.body)).toBe('channel=ambient&last_read_message_id=43')
+
+    state({ atBottom: true, unread: 0 }) // nothing new
+    vi.advanceTimersByTime(2000)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    landed(44, '7') // own packet: its POST already marked it
+    state({ atBottom: true, unread: 0 })
+    vi.advanceTimersByTime(2000)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    landed(45, '8')
+    state({ atBottom: false, unread: 1 }) // scrolled up: not seen
+    vi.advanceTimersByTime(2000)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    state({ atBottom: true, unread: 0 }) // jumped down, then left before the debounce
+    shell().remove() // navigation: disconnect flushes, keepalive (application.stop() alone never disconnects)
+    await Promise.resolve()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    const [, leaving] = fetchMock.mock.calls[1] as [string, RequestInit]
+    expect(leaving.keepalive).toBe(true)
+    expect(String(leaving.body)).toBe('channel=ambient&last_read_message_id=45')
+  })
+
+  it('flushes a pending ack on pagehide and stays quiet without an ack url', async () => {
+    vi.useFakeTimers()
+    viewerMeta('7')
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true })
+    vi.stubGlobal('fetch', fetchMock)
+    await start()
+
+    landed(42, '8')
+    state({ atBottom: true, unread: 0 })
+    window.dispatchEvent(new Event('pagehide'))
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect((fetchMock.mock.calls[0][1] as RequestInit).keepalive).toBe(true)
+    vi.advanceTimersByTime(2000)
+    expect(fetchMock).toHaveBeenCalledTimes(1) // the timer was cleared by the flush
+
+    shell().remove() // nothing pending: leaving posts nothing
+    await Promise.resolve()
+    application.stop()
+    await start(fixture().replace('data-uplink-shell-ack-url-value="/uplink/reads"', ''))
+    landed(50, '8')
+    state({ atBottom: true, unread: 0 })
+    vi.advanceTimersByTime(2000)
+    shell().remove()
+    await Promise.resolve()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('prefixes the jump pill with @ MENTION when unread packets mention the viewer', async () => {

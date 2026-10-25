@@ -68,13 +68,145 @@ RSpec.describe "Uplink pages", type: :request do
       expect(body).to include("hackr.tv NODE")
       expect(body).to include('data-uplink-shell-channel-value="ambient"')
       expect(body).to include('data-channel="ops"')
-      expect(body).to include('<span class="uplink-channel-badge" hidden title="You were mentioned">@</span>')
+      expect(body).to include('<span class="uplink-channel-badge" hidden="hidden" title="Unread packets" data-count="0"></span>')
       expect(body.index("BROADCAST")).to be < body.index("COMMS") # category order follows position
       expect(body.index(">#ambient<")).to be < body.index(">#ops<")
       expect(body).to include('<h2 class="uplink-chanhead-name">#ambient</h2>')
       expect(body).to include("Always-on ambient comms.") # description as the topic
       expect(body).not_to include("chrome-content") # no default chrome around the shell
       expect(body).to include(%(@#{hackr.hackr_alias})) # user panel
+    end
+
+    it "counts unread packets per sidebar row: caught up on first sight, then a badge per channel (99+ capped, --mention when one @mentions you), never on the channel on screen, with a bump slot + stream per counted channel" do
+      trace = create(:chat_channel, slug: "trace", name: "#trace")
+      ops = create(:chat_channel, slug: "ops", name: "#ops")
+      create(:chat_channel, :operator_only, slug: "secret", name: "#secret")
+      create(:chat_message, chat_channel: trace, grid_hackr: other, content: "before you ever looked")
+      log_in!
+
+      get "/uplink"
+
+      expect(response).to have_http_status(:ok)
+      expect(UplinkChannelRead.where(grid_hackr: hackr).pluck(:chat_channel_id)).to contain_exactly(channel.id, trace.id, ops.id) # viewable channels only
+      expect(response.body).not_to include("uplink-channel--unread") # first sight: caught up, nothing counts
+      expect(response.body).to include('data-uplink-shell-ack-url-value="/uplink/reads"')
+
+      create(:chat_message, chat_channel: trace, grid_hackr: other, content: "one")
+      create(:chat_message, chat_channel: trace, grid_hackr: other, content: "two, @#{hackr.hackr_alias}")
+      create(:chat_message, :dropped, chat_channel: trace, grid_hackr: other, content: "dropped: not counted")
+      now = Time.current
+      ChatMessage.insert_all(Array.new(100) { |i| {chat_channel_id: ops.id, grid_hackr_id: other.id, content: "flood #{i}", created_at: now, updated_at: now} })
+
+      get "/uplink"
+
+      body = response.body
+      row = ->(slug) { body[/<a [^>]*data-channel="#{slug}"[^>]*>.*?<\/a>/m] }
+      expect(row.call("trace")).to include("uplink-channel uplink-channel--unread uplink-channel--mention")
+      expect(row.call("trace")).to include('<span class="uplink-channel-badge" title="Unread packets" data-count="2">2</span>')
+      expect(row.call("ops")).to include("uplink-channel--unread")
+      expect(row.call("ops")).not_to include("uplink-channel--mention")
+      expect(row.call("ops")).to include('data-count="100">99+</span>')
+      expect(row.call("ambient")).to include("uplink-channel--active")
+      expect(row.call("ambient")).not_to include("uplink-channel--unread")
+      expect(row.call("ambient")).to include('hidden="hidden" title="Unread packets" data-count="0"></span>')
+      bumps = body[/<div class="uplink-bumps" hidden data-uplink-shell-target="bumps">.*?<\/div>/m]
+      expect(bumps.scan("<turbo-cable-stream-source").size).to eq(2) # trace + ops: never the channel on screen, never a channel outside clearance
+      expect(bumps).to include('<span id="uplink-bump-trace" data-channel="trace"></span>')
+      expect(bumps).to include('<span id="uplink-bump-ops" data-channel="ops"></span>')
+      expect(bumps).not_to include("uplink-bump-ambient")
+      expect(bumps).not_to include("uplink-bump-secret")
+      expect(body).not_to include("uplink-bump-secret")
+
+      create(:chat_message, chat_channel: channel, grid_hackr: other, content: "lands in #ambient after you looked")
+      get "/uplink", params: {channel: "trace"}
+
+      body = response.body
+      expect(UplinkChannelRead.find_by!(grid_hackr: hackr, chat_channel: trace).last_read_message_id).to eq(ChatMessage.where(chat_channel: trace).maximum(:id)) # the visit marks it read (dropped ids count as seen)
+      expect(body[/<a [^>]*data-channel="trace"[^>]*>.*?<\/a>/m]).to include('data-count="0"></span>')
+      expect(body[/<a [^>]*data-channel="ambient"[^>]*>.*?<\/a>/m]).to include('data-count="1">1</span>')
+      expect(body[/<a [^>]*data-channel="ops"[^>]*>.*?<\/a>/m]).to include('data-count="100">99+</span>') # untouched
+    end
+
+    it "draws the NEW PACKETS separator before the first packet above the viewer's previous mark — never on first sight, never once the visit moved the mark, never on a reload" do
+      trace = create(:chat_channel, slug: "trace", name: "#trace")
+      seen = create(:chat_message, chat_channel: trace, grid_hackr: other, content: "seen before")
+      log_in!
+
+      get "/uplink", params: {channel: "trace"} # first sight: caught up, no separator, no mark on the sentinel url
+      expect(response.body).not_to include("uplink-unseen")
+      expect(response.body).to include(%(data-src="/uplink/log?channel=trace"></div>))
+
+      one = create(:chat_message, chat_channel: trace, grid_hackr: other, content: "fresh one")
+      two = create(:chat_message, chat_channel: trace, grid_hackr: other, content: "fresh two")
+      get "/uplink", params: {channel: "trace"}
+
+      body = response.body
+      separator = '<div class="uplink-unseen" role="separator" aria-label="New packets" data-packet-log-target="unseen">// NEW PACKETS //</div>'
+      expect(body.scan("uplink-unseen").size).to eq(1)
+      expect(body).to include(separator)
+      expect(body.index("chat_message_#{seen.id}")).to be < body.index(separator)
+      expect(body.index(separator)).to be < body.index("chat_message_#{one.id}")
+      expect(body.index("chat_message_#{one.id}")).to be < body.index("chat_message_#{two.id}")
+      expect(body).to include(%(data-src="/uplink/log?channel=trace&amp;unseen_from=#{seen.id}"></div>)) # the mark rides the sentinel url
+
+      get "/uplink", params: {channel: "trace"} # the visit moved the mark: nothing above it now
+      expect(response.body).not_to include("uplink-unseen")
+
+      get "/uplink/log", params: {channel: "trace", shell: 1} # reconnect reload: no mark, no separator
+      expect(response.body).not_to include("uplink-unseen")
+    end
+
+    it "opens at the separator when up to 100 packets are unseen (5 seen for context, then every unseen one), and for a flood beyond that leaves the line to the scrollback page that holds the boundary" do
+      trace = create(:chat_channel, slug: "trace", name: "#trace")
+      now = Time.current
+      rows = ->(n, label) { ChatMessage.insert_all(Array.new(n) { |i| {chat_channel_id: trace.id, grid_hackr_id: other.id, content: "#{label} #{i}", created_at: now, updated_at: now} }) }
+      rows.call(8, "old")
+      log_in!
+      get "/uplink", params: {channel: "trace"} # caught up at old 7
+      mark = ChatMessage.where(chat_channel: trace).maximum(:id)
+
+      rows.call(30, "fresh")
+      get "/uplink", params: {channel: "trace"}
+
+      body = response.body
+      ids = body.scan(/id="chat_message_(\d+)"/).flatten.map(&:to_i)
+      expect(ids.size).to eq(35) # 5 context + 30 unseen, not the newest 20
+      expect(ids).to eq(ids.sort)
+      expect(ids.first).to eq(mark - 4)
+      expect(ids.last).to eq(ChatMessage.where(chat_channel: trace).maximum(:id))
+      expect(body.scan("uplink-unseen").size).to eq(1)
+      expect(body.index("uplink-unseen")).to be > body.index("chat_message_#{mark}")
+      expect(body.index("uplink-unseen")).to be < body.index("chat_message_#{mark + 1}")
+      expect(body).to include('class="uplink-log-top" data-packet-log-target="top" data-more="true"') # old 0..2 are still above
+
+      rows.call(120, "flood") # beyond UNSEEN_PACKETS: newest 20, no line on the page
+      flood_mark = ChatMessage.where(chat_channel: trace).maximum(:id) - 120
+      get "/uplink", params: {channel: "trace"} # the previous visit left the mark at fresh 29
+      body = response.body
+      expect(body.scan(%(id="chat_message_)).size).to eq(20)
+      expect(body).not_to include("uplink-unseen")
+      expect(body).to include(%(data-src="/uplink/log?channel=trace&amp;unseen_from=#{flood_mark}"></div>))
+
+      # Scroll back page by page (40 each): fully unseen pages carry no line; the page that straddles the mark draws it, once.
+      first = body.scan(/id="chat_message_(\d+)"/).flatten.map(&:to_i).min
+      pages = []
+      4.times do
+        get "/uplink/log", params: {channel: "trace", before: first, unseen_from: flood_mark}
+        pages << response.body
+        first = response.body.scan(/id="chat_message_(\d+)"/).flatten.map(&:to_i).min
+        break if response.body.include?("chat_message_#{flood_mark}\"")
+      end
+      expect(pages.size).to eq(3) # flood 60..99, flood 20..59, then flood 0..19 + fresh 10..29
+      expect(pages[0]).not_to include("uplink-unseen")
+      expect(pages[1]).not_to include("uplink-unseen")
+      body = pages[2]
+      expect(body.scan("uplink-unseen").size).to eq(1)
+      expect(body).to include('<div class="uplink-unseen" role="separator" aria-label="New packets">// NEW PACKETS //</div>') # no scroll target on a spliced page
+      expect(body.index("uplink-unseen")).to be > body.index("chat_message_#{flood_mark}\"")
+      expect(body.index("uplink-unseen")).to be < body.index("chat_message_#{flood_mark + 1}\"")
+
+      get "/uplink/log", params: {channel: "trace", before: first} # no mark: never a line
+      expect(response.body).not_to include("uplink-unseen")
     end
 
     it "hooks the shell's log and composer: grouping on, multiline textarea, head metas" do
@@ -145,6 +277,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include('data-uplink-log-src-value="/uplink/log?channel=ambient&amp;shell=1"')
 
       create_list(:chat_message, 21, chat_channel: channel, grid_hackr: other)
+      log_in!(other) # a fresh viewer gets the newest page (this hackr, with 21 unseen, would get the whole run behind the NEW PACKETS line)
       get "/uplink"
       expect(response.body).to include('class="uplink-log-top" data-packet-log-target="top" data-more="true"')
       expect(response.body.scan(/id="chat_message_\d+"/).size).to eq(20)
@@ -362,6 +495,17 @@ RSpec.describe "Uplink pages", type: :request do
   end
 
   describe "GET /uplink/popout" do
+    it "carries no unread badges, bump slots or read-ack url (the dock neither: both render _panel)" do
+      get "/uplink/popout"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("uplink-channel-badge")
+      expect(response.body).not_to include("uplink-bumps")
+      expect(response.body).not_to include("uplink-shell-ack-url")
+      expect(response.body).not_to include("uplink-unseen")
+      expect(UplinkChannelRead.count).to eq(0)
+    end
+
     let!(:live_channel) { create(:chat_channel, :livestream_only, slug: "live", name: "#live") }
 
     it "is public, slim-chromed, and shows the offline state when nothing is live" do
@@ -784,6 +928,47 @@ RSpec.describe "Uplink pages", type: :request do
     end
   end
 
+  describe "POST /uplink/reads (the shell's read ack)" do
+    let!(:first) { create(:chat_message, chat_channel: channel, grid_hackr: other, content: "first") }
+    let!(:second) { create(:chat_message, chat_channel: channel, grid_hackr: other, content: "second") }
+
+    it "requires login" do
+      post "/uplink/reads", params: {channel: "ambient", last_read_message_id: first.id}
+
+      expect(response).to have_http_status(:redirect)
+      expect(UplinkChannelRead.count).to eq(0)
+    end
+
+    it "raises the viewer's mark to that packet (204) and never lowers it" do
+      log_in!
+
+      post "/uplink/reads", params: {channel: "ambient", last_read_message_id: second.id}
+      expect(response).to have_http_status(:no_content)
+      expect(UplinkChannelRead.find_by!(grid_hackr: hackr, chat_channel: channel).last_read_message_id).to eq(second.id)
+
+      post "/uplink/reads", params: {channel: "ambient", last_read_message_id: first.id} # a tab that fell behind
+      expect(response).to have_http_status(:no_content)
+      expect(UplinkChannelRead.find_by!(grid_hackr: hackr, chat_channel: channel).last_read_message_id).to eq(second.id)
+      expect(UplinkChannelRead.count).to eq(1)
+    end
+
+    it "refuses an unknown channel (404), one outside the viewer's clearance (403) and a packet from elsewhere (422)" do
+      create(:chat_channel, :operator_only, slug: "secret")
+      elsewhere = create(:chat_message, chat_channel: create(:chat_channel, slug: "trace"), grid_hackr: other)
+      log_in!
+
+      post "/uplink/reads", params: {channel: "nope", last_read_message_id: first.id}
+      expect(response).to have_http_status(:not_found)
+      post "/uplink/reads", params: {channel: "secret", last_read_message_id: first.id}
+      expect(response).to have_http_status(:forbidden)
+      post "/uplink/reads", params: {channel: "ambient", last_read_message_id: elsewhere.id}
+      expect(response).to have_http_status(:unprocessable_entity)
+      post "/uplink/reads", params: {channel: "ambient", last_read_message_id: 0}
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(UplinkChannelRead.count).to eq(0)
+    end
+  end
+
   describe "POST /uplink/packets" do
     it "requires login" do
       post "/uplink/packets", params: {channel_slug: "ambient", content: "hi"}
@@ -806,6 +991,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include('action="replace" target="uplink-form-error"')
       expect(ChatMessage.last.grid_hackr).to eq(hackr)
       expect(ChatMessage.last.hackr_stream).to be_nil
+      expect(UplinkChannelRead.find_by!(grid_hackr: hackr, chat_channel: channel).last_read_message_id).to eq(ChatMessage.last.id) # your own packet is read
     end
 
     it "normalizes textarea newlines: CRLF to LF, blank-line runs capped, edges trimmed" do

@@ -191,6 +191,21 @@ RSpec.describe ChatMessage, type: :model do
       end
     end
 
+    describe "#broadcast_bump (unread badges)" do
+      it "appends an empty <i> to the channel's bump slot on the uplink_bump stream" do
+        channel = create(:chat_channel, slug: "ambient")
+        allow(Turbo::StreamsChannel).to receive(:broadcast_append_to).and_call_original
+
+        create(:chat_message, chat_channel: channel, content: "bump me")
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with(
+          ["uplink_bump", "ambient"],
+          target: "uplink-bump-ambient",
+          html: "<i></i>"
+        ).once
+      end
+    end
+
     describe "#broadcast_new_packet_html (dual-publish)" do
       it "appends the packet partial to the channel's uplink_html stream" do
         channel = create(:chat_channel, slug: "ambient")

@@ -1,7 +1,7 @@
 ---
 title: Uplink Comms
 area: Social & Comms
-minutes: 30
+minutes: 35
 ---
 # Uplink (/uplink)
 
@@ -43,7 +43,21 @@ minutes: 30
 8. Switch channels via the sidebar (`?channel=` URLs). → Log swaps to
    that channel's history; sends go to the right channel; the active
    row is highlighted and the header shows the channel name.
-9. **Scrollback**: in a channel with more than 20 packets, scroll to
+9. **Unread badges**: with the second browser on `#trace`, send two
+   packets there from the first browser while it reads `#ambient`. →
+   Its `#trace` sidebar row brightens with a `2` badge live (no
+   reload); the active channel never badges. Click `#trace` → the
+   badge is gone and a `// NEW PACKETS //` line sits right above the
+   first packet you had not seen (packets after it start a fresh
+   author group). With more unseen than the log normally holds (up to
+   100) the log opens scrolled to the line with a few earlier packets
+   above it for context; beyond that it opens at the newest and the
+   line appears where the unseen start as you scroll back.
+   Back to `#ambient` → still no badge (the visit marked it read). Stay on `#trace` at the bottom while the other
+   browser sends there, wait two seconds, switch away. → No badge for
+   what you watched. Scroll up in `#trace`, let a packet land, switch
+   away. → It counts (you never saw it). Over 99 unread reads `99+`.
+10. **Scrollback**: in a channel with more than 20 packets, scroll to
    the top of the log. → The strip above the first packet reads
    `// RETRIEVING ARCHIVE //` and up to 40 older packets slide in above
    it without the packet you were reading moving; author groups
@@ -51,20 +65,21 @@ minutes: 30
    for history. Keep going → at the oldest packet the strip reads
    `// BEGINNING OF CHANNEL //` and stops. The dock and popout have no
    scrollback.
-10. **Slow mode**: send two packets rapidly. → Second is throttled with
+11. **Slow mode**: send two packets rapidly. → Second is throttled with
     a cooldown message/disabled TX until the window passes; focus
     returns to the composer when the cooldown ends.
-11. Emoji/plain text render; an @mention of the other session renders
+12. Emoji/plain text render; an @mention of the other session renders
     highlighted for them (self-mention styling). **Mention toast**: with
     the other session reading a different channel (or any other page),
     mention them. → A `@MENTION` toast slides in bottom-right naming the
     sender, the channel and an excerpt; in the shell that channel's
-    sidebar row gets a `@` badge. Clicking the toast opens the channel
+    sidebar badge turns accent (the count itself comes from the packet's
+    bump). Clicking the toast opens the channel
     (badge gone, packet highlighted). Mention them while they read the
     same channel scrolled up. → No toast; the jump pill reads
     `[v] @ MENTION · N NEW PACKETS`.
 
-12. **Replies**: hover another packet → `↩` appears beside the drop
+13. **Replies**: hover another packet → `↩` appears beside the drop
     control; click it. → The composer shows `[>] REPLYING TO @alias [x]`
     and takes focus; Escape (or `[x]`) clears it. Arm it again and send.
     → The reply renders with a `[>] @alias excerpt` quote line above
@@ -73,7 +88,7 @@ minutes: 30
     view and flashes. Drop the original as admin → the quote reads
     `[PACKET DROPPED]` live; restore → the excerpt returns. The dock and
     popout show quote lines but have no reply control.
-13. **Operative record**: click a packet author's `@alias`. → A card pops
+14. **Operative record**: click a packet author's `@alias`. → A card pops
     up beside it — alias in its role color, role badge, `CL<n>`, member
     since, last active, bio, PACKETS / WIRE PULSES / ECHOES /
     ACHIEVEMENTS tiles, `[WIRE PROFILE]` — and the page does not
@@ -84,24 +99,24 @@ minutes: 30
 
 ## Steps — operatives pane
 
-14. With the second browser on the same channel. → It appears in the
+15. With the second browser on the same channel. → It appears in the
     OPERATIVES pane under its role heading as a callsign (`SIG-XXXXXX`),
     never its alias; your own row shows your real @alias. Close the
     second browser → its row leaves within a few seconds (debounced
     broadcast; needs the job worker running).
-15. A livestream channel (`#live`) while a stream is live. → The stream
+16. A livestream channel (`#live`) while a stream is live. → The stream
     embeds above the log inside the shell; `[-] HIDE VIDEO` collapses it
     (and stops its audio), remembered on reload. The home page embed and
     theater mode are unchanged.
 
 ## Steps — moderation (operative + admin)
 
-16. As admin (moderator role) in `/uplink`: hover another user's packet
+17. As admin (moderator role) in `/uplink`: hover another user's packet
     and drop it. → Packet shows dropped state for everyone live.
-17. Restore it. → Restored live.
-18. The drop control is NOT visible to the non-moderator operative on
+18. Restore it. → Restored live.
+19. The drop control is NOT visible to the non-moderator operative on
     others' packets.
-19. **Operator menu**: as admin, hover the operative's packet → a `...`
+20. **Operator menu**: as admin, hover the operative's packet → a `...`
     appears beside the drop control; click it. → A small MODERATE menu
     parks under it naming `@alias` in its role color: a REASON field,
     DROP PACKET, SQUELCH 10M / 1H / 24H, BLACKOUT, `[x]`. Enter in the
@@ -116,28 +131,28 @@ minutes: 30
     admins or bridged accounts show no `...`; an operator (not admin) sees
     it only on operatives. BLACKOUT, then LIFT PUNISHMENTS from either
     menu → toasts confirm, the status lines follow.
-20. **Squelch** the operative from `/root` → Uplink (punishments) or the
+21. **Squelch** the operative from `/root` → Uplink (punishments) or the
     operator menu. → In the operative's `/uplink`, the composer is
     replaced by the squelch notice on their next load; sending is
     impossible. Lift the squelch → composer returns (after reload).
-21. **Blackout** the operative. → Uplink is fully blocked with the
+22. **Blackout** the operative. → Uplink is fully blocked with the
     blackout notice. Lift it afterwards.
 
 ## Steps — popout + recovery
 
-22. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
+23. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
     classic single-line panel; live receive + send both work; heartbeat
     keeps it registered while open. The home-page dock is likewise the
     classic panel. Neither has an operator menu: no `...` on packets.
-23. Kill the connection (devtools offline ~10s, restore). → The log
+24. Kill the connection (devtools offline ~10s, restore). → The log
     recovers missed messages (reconnect frame reload) rather than
     silently gapping.
 
 ## Steps — external bridge spot-check (if relay/synthia are running)
 
-24. Send from hackr.tv `/uplink`, including a two-line packet. →
+25. Send from hackr.tv `/uplink`, including a two-line packet. →
     Appears in relay's terminal view (line breaks are plain `\n`).
-25. Send via synthia (or
+26. Send via synthia (or
     `POST /api/admin/uplink/send_packet` with the Bearer token). → The
     packet appears live in `/uplink` attributed to the service account;
     the bridge account never shows in the OPERATIVES pane.

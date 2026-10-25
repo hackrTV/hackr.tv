@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1363,6 +1363,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
     t.index ["release_id"], name: "index_tracks_on_release_id"
   end
 
+  create_table "uplink_channel_reads", force: :cascade do |t|
+    t.integer "grid_hackr_id", null: false
+    t.integer "chat_channel_id", null: false
+    t.integer "last_read_message_id", default: 0, null: false
+    t.datetime "read_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_channel_id"], name: "index_uplink_channel_reads_on_chat_channel_id"
+    t.index ["grid_hackr_id", "chat_channel_id"], name: "index_uplink_channel_reads_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_uplink_channel_reads_on_grid_hackr_id"
+  end
+
   create_table "user_punishments", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "expires_at"
@@ -1555,6 +1567,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
   add_foreign_key "terminal_sessions", "grid_hackrs"
   add_foreign_key "tracks", "artists"
   add_foreign_key "tracks", "releases"
+  add_foreign_key "uplink_channel_reads", "chat_channels"
+  add_foreign_key "uplink_channel_reads", "grid_hackrs"
   add_foreign_key "user_punishments", "grid_hackrs"
   add_foreign_key "user_punishments", "grid_hackrs", column: "issued_by_id"
   add_foreign_key "world_event_simulants", "grid_hackrs"

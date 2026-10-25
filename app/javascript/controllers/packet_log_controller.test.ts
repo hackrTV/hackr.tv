@@ -132,6 +132,15 @@ describe('PacketLogController', () => {
     meta.content = '7'
     document.head.appendChild(meta)
     await start(fixture([packet(1, 'h1', T0)]))
+    const connected = states.at(-1)
+    append(packet(9, 'h2', T0 + 500, 8)) // seen at the bottom: published (the shell acks it), not unread
+    await flush()
+    expect(states.at(-1)).not.toBe(connected)
+    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+    const seen = states.at(-1)
+    append(packet(10, 'h1', T0 + 600, 7)) // own packet at the bottom: nothing to publish
+    await flush()
+    expect(states.at(-1)).toBe(seen)
     scrolledUp()
     expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
 
@@ -143,6 +152,46 @@ describe('PacketLogController', () => {
     Object.defineProperty(log(), 'scrollTop', { value: 700, configurable: true, writable: true })
     log().dispatchEvent(new Event('scroll'))
     expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+  })
+
+  // uplink/_log_frame's separator; stubs go between the body write and
+  // Application.start() (connect runs on the start's microtask).
+  const divider = '<div class="uplink-unseen" data-packet-log-target="unseen">// NEW PACKETS //</div>'
+
+  async function startWithUnseen (dividerTop: number): Promise<{ el: HTMLElement, published: Array<{ atBottom: boolean, unread: number, mentions: number }> }> {
+    document.body.innerHTML = fixture([packet(1, 'h1', T0), divider, packet(2, 'h1', T0 + 1000), packet(3, 'h1', T0 + 2000)])
+    const el = log()
+    Object.defineProperty(el, 'scrollHeight', { value: 1000, configurable: true })
+    Object.defineProperty(el, 'clientHeight', { value: 300, configurable: true })
+    el.getBoundingClientRect = () => ({ top: 100 } as DOMRect)
+    el.querySelector<HTMLElement>('.uplink-unseen')!.getBoundingClientRect = () => ({ top: dividerTop } as DOMRect)
+    const published: Array<{ atBottom: boolean, unread: number, mentions: number }> = []
+    el.addEventListener('packet-log:state', event => published.push((event as CustomEvent).detail))
+    application = Application.start()
+    application.register('packet-log', PacketLogController)
+    await Promise.resolve()
+    return { el, published }
+  }
+
+  it('opens scrolled to the NEW PACKETS separator when it sits above the fold (scrolled up: no yank, the ack waits) and never groups across it', async () => {
+    const { el, published } = await startWithUnseen(-300) // 400px above the log's top edge once pinned to the bottom
+
+    expect(el.scrollTop).toBe(592) // 1000 (bottom) − 400 − 8
+    expect(published.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
+    expect(cont(2)).toBe(false) // the separator breaks the group
+    expect(cont(3)).toBe(true)
+
+    append(packet(4, 'h2', T0 + 3000, 8))
+    await flush()
+    expect(el.scrollTop).toBe(592) // reading the unseen: no yank
+    expect(published.at(-1)).toEqual({ atBottom: false, unread: 1, mentions: 0 })
+  })
+
+  it('keeps the bottom pin when the separator is already in view', async () => {
+    const { el, published } = await startWithUnseen(150)
+
+    expect(el.scrollTop).toBe(1000)
+    expect(published.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
   })
 
   it('counts unread packets that @mention the viewer (case-insensitive, never own packets) and clears with unread', async () => {

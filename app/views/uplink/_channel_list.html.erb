@@ -3,22 +3,33 @@
     first-appearance order of the .ordered list; rows are Turbo links
     (switching channels is a full visit, which swaps the stream
     subscriptions naturally). Unavailable channels render as disabled
-    spans, like the tabs. Every row carries data-channel + a hidden
-    @ badge the shell reveals when a mention toast lands for another
-    channel (cleared by the next visit's re-render; item 5 persists).
-    Locals: channels, active (slug), live (bool). %>
+    spans, like the tabs. Every row carries data-channel + an unread
+    badge (Uplink::Unread: active packets above the viewer's read mark,
+    hidden at 0, "99+" capped; --unread brightens the name, --mention
+    recolors the badge when one of them @mentions the viewer — the
+    mention toast adds that class live too). The hidden block after the
+    groups holds one turbo_stream_from + bump slot per counted channel:
+    ChatMessage#broadcast_bump appends an <i> there per packet and
+    uplink-shell turns it into +1 on the row. The channel on screen has
+    neither (its mark moves with the page + the shell's acks).
+    Locals: channels, active (slug), live (bool), unread (Hash channel
+    id → Uplink::Unread::Entry, every viewable channel but the active). %>
+<% unread = local_assigns.fetch(:unread, {}) %>
 <div class="uplink-channels">
   <% uplink_channel_groups(channels).each do |category, group| %>
     <div class="uplink-category"><%= category %></div>
     <% group.each do |ch| %>
       <% is_active = ch.slug == active %>
       <% disabled = !ch.currently_available? && !is_active %>
-      <% classes = class_names("uplink-channel", "uplink-channel--active": is_active, "uplink-channel--disabled": disabled) %>
+      <% entry = unread[ch.id] %>
+      <% classes = class_names("uplink-channel", "uplink-channel--active": is_active, "uplink-channel--disabled": disabled,
+        "uplink-channel--unread": entry&.any?, "uplink-channel--mention": entry&.mentioned) %>
       <% inner = capture do %>
         <span class="uplink-channel-name"><%= ch.name %></span>
         <%= uplink_live_dot(live) if ch.requires_livestream? %>
         <% if ch.slow_mode? %><span class="uplink-channel-slow"><%= ch.slow_mode_seconds %>s</span><% end %>
-        <span class="uplink-channel-badge" hidden title="You were mentioned">@</span>
+        <%= tag.span(entry&.any? ? entry.label : nil, class: "uplink-channel-badge", hidden: !entry&.any?,
+          title: "Unread packets", data: {count: entry&.count.to_i}) %>
       <% end %>
       <% if disabled %>
         <span class="<%= classes %>" aria-disabled="true" title="<%= ch.description %>" data-channel="<%= ch.slug %>"><%= inner %></span>
@@ -31,4 +42,13 @@
   <% if channels.empty? %>
     <p class="uplink-channels-empty">NO CHANNELS</p>
   <% end %>
+  <%# Live bump slots. Hidden: stream sources and empty spans render
+      nothing anyway, and a hidden parent still connects them. %>
+  <div class="uplink-bumps" hidden data-uplink-shell-target="bumps">
+    <% channels.each do |ch| %>
+      <% next unless unread.key?(ch.id) %>
+      <%= turbo_stream_from Uplink::Unread::STREAM, ch.slug %>
+      <span id="<%= Uplink::Unread.bump_target(ch.slug) %>" data-channel="<%= ch.slug %>"></span>
+    <% end %>
+  </div>
 </div>
