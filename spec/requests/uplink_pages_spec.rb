@@ -338,7 +338,8 @@ RSpec.describe "Uplink pages", type: :request do
       expect(row).to include(%(data-popover-url-param="/uplink/operatives/#{token.downcase}/menu"))
       expect(row).to include('data-popover-frame-param="uplink-modmenu" data-popover-align-param="end">...</button>')
       expect(roster).not_to include(lurker.hackr_alias)
-      expect(roster).not_to include(lurker.id.to_s)
+      expect(roster.scan(%r{/uplink/[^"]*})).to all(match(%r{\A/uplink/operatives/[0-9a-f]{6}/menu\z})) # every roster url is token-addressed: no /hackrs/:id oracle
+      expect(roster).not_to match(%r{hackr[-_]id|[="/]#{lurker.id}["/]}) # the id rides no attribute value or path segment (a bare include would match any digit in a token or count)
     end
 
     it "renders :slug: emotes as images and ships the picker payload on the composer" do
