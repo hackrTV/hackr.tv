@@ -300,6 +300,47 @@ RSpec.describe "Uplink pages", type: :request do
       expect(body).to include(%(data-popover-url-param="/uplink/profiles/#{other.hackr_alias.downcase}")) # canonical lowercase: mixed case 301s
     end
 
+    it "mounts the operator menu: the second popover frame as a grid child, hidden [...] triggers on native packets and roster rows carrying the menu url (callsign token only, lowercase)" do
+      create(:chat_message, chat_channel: channel, grid_hackr: other, content: "mod me")
+      create(:chat_message, chat_channel: channel, grid_hackr: other, source: "TTV", content: "[Twitch] viewer: bridged")
+      lurker = create(:grid_hackr)
+      GridUplinkPresence.touch!(lurker, channel)
+      log_in!(operator)
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include("keydown@document->popover#keydown turbo:submit-end->popover#submitted")
+      frame = body[/<turbo-frame[^>]*id="uplink-modmenu"[^>]*>/]
+      expect(frame).to include('target="_top"')
+      expect(frame).to include("hidden")
+      expect(frame).to include('class="uplink-modmenu-frame"')
+      expect(frame).to include('data-popover-target="frame"')
+      expect(body).to match(%r{<div class="uplink-backdrop"[^\n]*></div>\s*#{Regexp.escape(frame)}</turbo-frame>\s*</div>}m) # a grid child, after the backdrop
+
+      packet = ChatMessage.find_by(content: "mod me")
+      expect(body).to include(%(data-packet-author-role-value="operative"))
+      triggers = body.scan(/<button type="button" class="packet-action-button packet-mod-button".*?<\/button>/m) # ([^>]* would stop at the -> in data-action)
+      expect(triggers.size).to eq(1) # the bridged packet (service account author) gets none
+      expect(triggers.first).to include("hidden") # revealed client-side by the packet controller
+      expect(triggers.first).to include('data-packet-target="modControl"')
+      expect(triggers.first).to include(%(data-action="click->popover#open"))
+      expect(triggers.first).to include(%(data-popover-url-param="/uplink/packets/#{packet.id}/menu"))
+      expect(triggers.first).to include('data-popover-frame-param="uplink-modmenu"')
+      expect(triggers.first).to include('data-popover-align-param="end"')
+
+      roster = body[/<div id="uplink-members".*?<\/div>/m]
+      token = Uplink::Callsign.token(lurker.id)
+      row = roster[/<li class="uplink-member uplink-member--operative" data-callsign="#{token}"[^>]*>.*?<\/li>/m]
+      expect(row).to include('data-role="operative"')
+      expect(row).to include('class="uplink-member-mod"')
+      expect(row).to include("hidden")
+      expect(row).to include(%(data-popover-url-param="/uplink/operatives/#{token.downcase}/menu"))
+      expect(row).to include('data-popover-frame-param="uplink-modmenu" data-popover-align-param="end">...</button>')
+      expect(roster).not_to include(lurker.hackr_alias)
+      expect(roster).not_to include(lurker.id.to_s)
+    end
+
     it "renders :slug: emotes as images and ships the picker payload on the composer" do
       create(:emote, slug: "wave")
       create(:emote, :disabled, slug: "hidden_one")
@@ -362,6 +403,8 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).not_to include('id="uplink-popover"') # no record popover frame / controller …
       expect(response.body).not_to include("popover#outside")
       expect(response.body).to include("click->popover#open") # … so the author link's action is inert and it visits the WIRE profile
+      expect(response.body).not_to include('id="uplink-modmenu"') # no operator menu frame either; the packet's […] stays CSS-hidden
+      expect(response.body).to include('data-popover-frame-param="uplink-modmenu"')
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
@@ -525,6 +568,217 @@ RSpec.describe "Uplink pages", type: :request do
       get "/uplink/profiles/#{other.hackr_alias.downcase}"
 
       expect(response).to redirect_to("/wire/#{other.hackr_alias.downcase}")
+    end
+  end
+
+  describe "operator menu (GET …/menu, POST …/squelch | blackout | lift)" do
+    let!(:admin) { create(:grid_hackr, :admin, password: "hackthegrid") }
+    let!(:packet) { create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Menu target") }
+    let(:token) { Uplink::Callsign.token(other.id).downcase }
+
+    def frame_headers
+      {"Turbo-Frame" => "uplink-modmenu"}
+    end
+
+    def menu_body
+      response.body[/<turbo-frame id="uplink-modmenu">.*<\/turbo-frame>/m]
+    end
+
+    it "requires login, and an operator" do
+      get "/uplink/packets/#{packet.id}/menu", headers: frame_headers
+      expect(response).to have_http_status(:redirect)
+      expect(response.location).to include("/grid/login")
+
+      log_in!(hackr)
+      get "/uplink/packets/#{packet.id}/menu", headers: frame_headers
+      expect(response).to have_http_status(:forbidden)
+      post "/uplink/packets/#{packet.id}/squelch", params: {duration_minutes: 10}, headers: turbo_stream_headers
+      expect(response).to have_http_status(:forbidden)
+      post "/uplink/operatives/#{token}/blackout", headers: turbo_stream_headers
+      expect(response).to have_http_status(:forbidden)
+      expect(UserPunishment.count).to eq(0)
+    end
+
+    it "renders a packet's menu into the frame: the author's alias + role color, drop, three squelch durations, blackout, no lift, a reason field guarded against Enter" do
+      log_in!(operator)
+
+      get "/uplink/packets/#{packet.id}/menu", headers: frame_headers
+
+      expect(response).to have_http_status(:ok)
+      menu = menu_body
+      expect(menu).to include('class="uplink-modmenu" role="dialog"')
+      expect(menu).to include(%(aria-label="Moderate @#{other.hackr_alias}"))
+      expect(menu).to include(%(<span class="uplink-modmenu-target uplink-modmenu-target--operative">@#{other.hackr_alias}</span>))
+      expect(menu).to include('data-action="click->popover#dismiss"')
+      expect(menu).to include(%(<form class="uplink-modmenu-form" data-turbo-frame="_top" action="/uplink/packets/#{packet.id}/squelch" accept-charset="UTF-8" method="post">))
+      expect(menu).to match(/<button type="submit" class="uplink-modmenu-guard" disabled hidden[^>]*><\/button>\s*<input type="text" name="reason"/)
+      expect(menu).to include(%(formaction="/uplink/packets/#{packet.id}/drop">DROP PACKET</button>))
+      expect(menu).not_to include("RESTORE PACKET")
+      %w[10 60 1440].zip(%w[10M 1H 24H]).each do |minutes, label|
+        expect(menu).to include(%(formaction="/uplink/packets/#{packet.id}/squelch"\n              name="duration_minutes" value="#{minutes}">SQUELCH #{label}</button>))
+      end
+      expect(menu).to include(%(formaction="/uplink/packets/#{packet.id}/blackout">BLACKOUT</button>))
+      expect(menu).not_to include("LIFT PUNISHMENT")
+      expect(menu).not_to include("uplink-modmenu-status")
+    end
+
+    it "shows standing punishments with time left, hides the matching action, offers lift (plural when both), and restore for a dropped packet" do
+      create(:user_punishment, :squelch, grid_hackr: other, issued_by: operator, expires_at: 9.minutes.from_now + 30.seconds)
+      create(:user_punishment, :blackout, grid_hackr: other, issued_by: operator)
+      create(:user_punishment, :squelch, :expired, grid_hackr: other, issued_by: operator) # history, not status
+      packet.drop!
+      log_in!(admin)
+
+      get "/uplink/packets/#{packet.id}/menu", headers: frame_headers
+
+      menu = menu_body
+      expect(menu).to include('<p class="uplink-modmenu-status">SQUELCHED · 10M LEFT</p>')
+      expect(menu).to include('<p class="uplink-modmenu-status">BLACKED OUT · PERMANENT</p>')
+      expect(menu.scan("uplink-modmenu-status").size).to eq(2)
+      expect(menu).to include(%(formaction="/uplink/packets/#{packet.id}/restore">RESTORE PACKET</button>))
+      expect(menu).not_to include("SQUELCH 10M")
+      expect(menu).not_to include(">BLACKOUT<")
+      expect(menu).to include(%(formaction="/uplink/packets/#{packet.id}/lift">LIFT PUNISHMENTS</button>))
+    end
+
+    it "renders a callsign's menu from its presence row: the callsign only — never the alias — and no packet actions; a stale token gets the empty state (404)" do
+      GridUplinkPresence.touch!(other, channel)
+      log_in!(operator)
+
+      get "/uplink/operatives/#{token}/menu", headers: frame_headers
+
+      expect(response).to have_http_status(:ok)
+      menu = menu_body
+      expect(menu).to include(%(<span class="uplink-modmenu-target uplink-modmenu-target--operative">SIG-#{token.upcase}</span>))
+      expect(menu).not_to include(other.hackr_alias)
+      expect(menu).not_to include("/uplink/packets/")
+      expect(menu).to include(%(formaction="/uplink/operatives/#{token}/squelch"))
+      expect(menu).to include(%(formaction="/uplink/operatives/#{token}/blackout"))
+
+      GridUplinkPresence.remove!(other, channel)
+      get "/uplink/operatives/#{token}/menu", headers: frame_headers
+      expect(response).to have_http_status(:not_found)
+      expect(menu_body).to include("// NO JURISDICTION //")
+      expect(menu_body).to include("SIG-#{token.upcase} is no longer connected.")
+      expect(menu_body).not_to include("formaction")
+
+      get "/uplink/operatives/#{token.upcase}/menu", headers: frame_headers
+      expect(response).to have_http_status(:moved_permanently) # LowercaseRedirect: hence lowercase tokens in every generated URL
+    end
+
+    it "keeps peers, superiors, oneself and service accounts out of jurisdiction, for the menu (403 frame) and the actions (403 toast)" do
+      peer = create(:grid_hackr, :operator)
+      bot = create(:grid_hackr, service_account: true)
+      own = create(:chat_message, chat_channel: channel, grid_hackr: operator, content: "mine")
+      peer_packet = create(:chat_message, chat_channel: channel, grid_hackr: peer, content: "peer")
+      admin_packet = create(:chat_message, chat_channel: channel, grid_hackr: admin, content: "root")
+      bot_packet = create(:chat_message, chat_channel: channel, grid_hackr: bot, source: "TTV", content: "[Twitch] v: hi")
+      log_in!(operator)
+
+      [own, peer_packet, admin_packet, bot_packet].each do |target|
+        get "/uplink/packets/#{target.id}/menu", headers: frame_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(menu_body).to include("// NO JURISDICTION //")
+        expect(menu_body).to include("@#{target.grid_hackr.hackr_alias} is outside your clearance.")
+
+        post "/uplink/packets/#{target.id}/squelch", params: {duration_minutes: 10}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to include(%(action="append" target="toast-region"))
+        expect(response.body).to include("toast--moderation toast--moderation-error")
+        expect(response.body).to include("is outside your clearance.")
+      end
+      expect(UserPunishment.count).to eq(0)
+
+      log_in!(admin)
+      get "/uplink/packets/#{peer_packet.id}/menu", headers: frame_headers
+      expect(response).to have_http_status(:ok) # admins outrank operators
+      expect(menu_body).to include("uplink-modmenu-target--operator")
+      get "/uplink/packets/#{admin_packet.id}/menu", headers: frame_headers
+      expect(response).to have_http_status(:forbidden) # not a fellow admin
+
+      get "/uplink/packets/0/menu", headers: frame_headers
+      expect(response).to have_http_status(:not_found)
+      expect(menu_body).to include("That packet is gone.")
+
+      get "/uplink/packets/#{packet.id}/menu"
+      expect(response).to redirect_to("/uplink") # no frame to land in
+    end
+
+    it "squelches the packet's author for the chosen duration with the reason, logs it, and toasts the operator" do
+      log_in!(operator)
+
+      post "/uplink/packets/#{packet.id}/squelch", params: {duration_minutes: 60, reason: "spam"}, headers: turbo_stream_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+      expect(response.body).to include(%(action="append" target="toast-region"))
+      expect(response.body).to include('class="toast toast--moderation"')
+      expect(response.body).to include('data-controller="toast"')
+      expect(response.body).to include(%(<div class="toast-title">@#{other.hackr_alias} squelched for 1h.</div>))
+      punishment = UserPunishment.last
+      expect(punishment).to have_attributes(grid_hackr: other, issued_by: operator, punishment_type: "squelch", reason: "spam")
+      expect(punishment.expires_at).to be_within(5.seconds).of(60.minutes.from_now)
+      expect(UserPunishment.squelched?(other)).to be(true)
+      expect(ModerationLog.last).to have_attributes(action: "squelch", actor: operator, target: other, duration_minutes: 60, reason: "spam")
+
+      post "/uplink/packets/#{packet.id}/squelch", params: {duration_minutes: 10}, headers: turbo_stream_headers
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("toast--moderation-error")
+      expect(response.body).to include("is already squelched.")
+      expect(UserPunishment.count).to eq(1)
+
+      post "/uplink/packets/#{packet.id}/blackout", params: {duration_minutes: 7}, headers: turbo_stream_headers
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("Pick a duration from the menu.")
+      expect(UserPunishment.count).to eq(1)
+    end
+
+    it "blacks out permanently by default (a blank duration), through a callsign too, keeping the alias out of the toast" do
+      GridUplinkPresence.touch!(other, channel)
+      log_in!(admin)
+
+      post "/uplink/operatives/#{token}/blackout", params: {duration_minutes: ""}, headers: turbo_stream_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("SIG-#{token.upcase} blacked out permanently.")
+      expect(response.body).not_to include(other.hackr_alias)
+      expect(UserPunishment.last).to have_attributes(grid_hackr: other, issued_by: admin, punishment_type: "blackout", expires_at: nil, reason: nil)
+      expect(ModerationLog.last).to have_attributes(action: "blackout", actor: admin, target: other, duration_minutes: nil)
+
+      GridUplinkPresence.remove!(other, channel)
+      post "/uplink/operatives/#{token}/lift", headers: turbo_stream_headers
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include("SIG-#{token.upcase} is no longer connected.")
+      expect(UserPunishment.blackedout?(other)).to be(true)
+    end
+
+    it "lifts every active punishment, logging each, and refuses when there is nothing to lift" do
+      create(:user_punishment, :squelch, :temporary, grid_hackr: other, issued_by: operator)
+      create(:user_punishment, :blackout, grid_hackr: other, issued_by: operator)
+      expired = create(:user_punishment, :squelch, :expired, grid_hackr: other, issued_by: operator)
+      log_in!(operator)
+
+      post "/uplink/packets/#{packet.id}/lift", headers: turbo_stream_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("@#{other.hackr_alias} lifted: squelched + blacked out.")
+      expect(UserPunishment.active_for(other)).to be_empty
+      expect(UserPunishment.exists?(expired.id)).to be(true) # history stays
+      expect(ModerationLog.where(actor: operator, target: other).pluck(:action)).to contain_exactly("unsquelch", "unblackout")
+
+      post "/uplink/packets/#{packet.id}/lift", headers: turbo_stream_headers
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("has no active punishment.")
+    end
+
+    it "falls back to a flash redirect for plain form posts" do
+      log_in!(operator)
+
+      post "/uplink/packets/#{packet.id}/squelch", params: {duration_minutes: 10}
+
+      expect(response).to redirect_to("/uplink")
+      expect(flash[:success]).to eq("@#{other.hackr_alias} squelched for 10m.")
+      expect(UserPunishment.squelched?(other)).to be(true)
     end
   end
 

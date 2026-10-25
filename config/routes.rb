@@ -206,6 +206,20 @@ Rails.application.routes.draw do
     post "packets", to: "uplink/packets#create", as: :uplink_packets
     post "packets/:id/drop", to: "uplink/packets#drop", as: :uplink_packet_drop
     post "packets/:id/restore", to: "uplink/packets#restore", as: :uplink_packet_restore
+    # Operator menu (Phase 2 item 4): inline squelch / blackout / lift. The
+    # target is reached through a packet (its author) or a roster callsign,
+    # never a bare hackr id, so the menu is no id-to-alias oracle. Callsign
+    # URLs are lowercase: LowercaseRedirect 301s mixed-case paths, POSTs too.
+    get "packets/:id/menu", to: "uplink/punishments#menu", as: :uplink_packet_menu
+    post "packets/:id/squelch", to: "uplink/punishments#squelch", as: :uplink_packet_squelch
+    post "packets/:id/blackout", to: "uplink/punishments#blackout", as: :uplink_packet_blackout
+    post "packets/:id/lift", to: "uplink/punishments#lift", as: :uplink_packet_lift
+    scope "operatives/:token", constraints: {token: /[0-9a-f]{6}/}, as: :uplink_operative do
+      get "menu", to: "uplink/punishments#menu"
+      post "squelch", to: "uplink/punishments#squelch"
+      post "blackout", to: "uplink/punishments#blackout"
+      post "lift", to: "uplink/punishments#lift"
+    end
   end
 
   # Terminal SSH access credentials page

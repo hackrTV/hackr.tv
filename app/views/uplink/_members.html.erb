@@ -3,8 +3,13 @@
     whenever a presence row appears or goes — rendered viewer-neutral:
     callsigns (Uplink::Callsign) only, never aliases. The members Stimulus
     controller re-reveals the viewer's own row from the page's
-    uplink-callsign + current-hackr-alias metas on every (re)connect.
-    The root id is the broadcast target. Locals: roster (Uplink::Roster). %>
+    uplink-callsign + current-hackr-alias metas on every (re)connect, and
+    reveals the hover [...] (operator menu, popover#open into the shell's
+    uplink-modmenu frame) on the rows an operator outranks (data-role,
+    current-hackr-role meta) — never their own. The menu URL carries the
+    callsign token only (lowercase: LowercaseRedirect), resolved
+    server-side. The root id is the broadcast target. Locals: roster
+    (Uplink::Roster). %>
 <div id="<%= Uplink::MembersBroadcaster::TARGET %>" class="uplink-members" data-controller="members">
   <% if roster.empty? %>
     <p class="uplink-members-empty">NO OPERATIVES CONNECTED</p>
@@ -14,7 +19,7 @@
         <h3 class="uplink-members-heading"><%= role.upcase %> — <%= members.size %></h3>
         <ul class="uplink-members-list">
           <% members.each do |member| %>
-            <li class="uplink-member uplink-member--<%= role %>" data-callsign="<%= member.token %>"><span class="uplink-member-dot"></span><span class="uplink-member-name"><%= member.label %></span></li>
+            <li class="uplink-member uplink-member--<%= role %>" data-callsign="<%= member.token %>" data-role="<%= role %>"><span class="uplink-member-dot"></span><span class="uplink-member-name"><%= member.label %></span><button type="button" class="uplink-member-mod" title="Moderate" aria-label="Moderate <%= member.label %>" hidden data-action="click->popover#open" data-popover-url-param="<%= uplink_operative_menu_path(member.token.downcase) %>" data-popover-frame-param="uplink-modmenu" data-popover-align-param="end">...</button></li>
           <% end %>
         </ul>
       </section>

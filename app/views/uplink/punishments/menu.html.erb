@@ -1,0 +1,57 @@
+<%# Operator menu, rendered into uplink/_shell's uplink-modmenu
+    turbo-frame (the popover controller places, focuses and closes it;
+    a finished submit inside closes it too — the reply is a toast). One
+    form, one optional reason, one submit button per action pointing at
+    its own formaction; the host frame targets _top so the stream
+    replies land on the page. Token targets show their callsign only.
+    @error: the empty state (stale callsign, out-of-clearance target). %>
+<%= turbo_frame_tag "uplink-modmenu" do %>
+  <% if @error %>
+    <div class="uplink-modmenu uplink-modmenu--empty" role="dialog" aria-label="Moderation" tabindex="-1">
+      <header class="uplink-modmenu-head">
+        <span class="uplink-modmenu-kicker">// NO JURISDICTION //</span>
+        <button type="button" class="uplink-modmenu-close" aria-label="Close" data-action="click->popover#dismiss">[x]</button>
+      </header>
+      <p class="uplink-modmenu-note"><%= @error %></p>
+    </div>
+  <% else %>
+    <%
+      squelched = @active.any? { |p| p.punishment_type == "squelch" }
+      blacked_out = @active.any? { |p| p.punishment_type == "blackout" }
+    %>
+    <div class="uplink-modmenu" role="dialog" aria-label="Moderate <%= @label %>" tabindex="-1">
+      <header class="uplink-modmenu-head">
+        <span class="uplink-modmenu-kicker">MODERATE</span>
+        <span class="uplink-modmenu-target uplink-modmenu-target--<%= uplink_role_class(@target.role) %>"><%= @label %></span>
+        <button type="button" class="uplink-modmenu-close" aria-label="Close" data-action="click->popover#dismiss">[x]</button>
+      </header>
+      <% @active.each do |punishment| %>
+        <p class="uplink-modmenu-status"><%= (punishment.punishment_type == "squelch") ? "SQUELCHED" : "BLACKED OUT" %> · <%= punishment.permanent? ? "PERMANENT" : "#{uplink_time_left(punishment.expires_at)} LEFT" %></p>
+      <% end %>
+      <%= form_with url: @paths[:squelch], method: :post, class: "uplink-modmenu-form", data: {turbo_frame: "_top"} do %>
+        <%# Enter in the reason field must not fire the first item: a
+            disabled default button blocks implicit submission. %>
+        <button type="submit" class="uplink-modmenu-guard" disabled hidden tabindex="-1" aria-hidden="true"></button>
+        <input type="text" name="reason" class="uplink-modmenu-reason" maxlength="120" autocomplete="off"
+          placeholder="REASON (OPTIONAL)" aria-label="Reason">
+        <% if @packet&.dropped? %>
+          <button type="submit" class="uplink-modmenu-item" formaction="<%= uplink_packet_restore_path(@packet) %>">RESTORE PACKET</button>
+        <% elsif @packet %>
+          <button type="submit" class="uplink-modmenu-item" formaction="<%= uplink_packet_drop_path(@packet) %>">DROP PACKET</button>
+        <% end %>
+        <% unless squelched %>
+          <% Uplink::PunishmentsController::DURATIONS.each do |minutes, label| %>
+            <button type="submit" class="uplink-modmenu-item" formaction="<%= @paths[:squelch] %>"
+              name="duration_minutes" value="<%= minutes %>">SQUELCH <%= label.upcase %></button>
+          <% end %>
+        <% end %>
+        <% unless blacked_out %>
+          <button type="submit" class="uplink-modmenu-item uplink-modmenu-item--danger" formaction="<%= @paths[:blackout] %>">BLACKOUT</button>
+        <% end %>
+        <% if @active.any? %>
+          <button type="submit" class="uplink-modmenu-item uplink-modmenu-item--lift" formaction="<%= @paths[:lift] %>">LIFT PUNISHMENT<%= "S" if @active.many? %></button>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

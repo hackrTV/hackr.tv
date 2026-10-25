@@ -17,7 +17,11 @@
     The author link opens the shell's operative record popover
     (popover#open, url in the action param); the dock/popout have no
     popover controller, so the action is inert and the link visits the
-    WIRE profile as before. %>
+    WIRE profile as before. The hover [...] (native packets only) opens the
+    operator menu the same way, into the shell's uplink-modmenu frame:
+    rendered hidden, revealed by the packet controller for operators who
+    outrank the author (data-packet-author-role-value), CSS-hidden off
+    the shell. %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   bot = packet.source == "SYNTHIA"
@@ -41,6 +45,7 @@
 <div id="<%= dom_id(packet) %>"
   class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %><%= " packet--reply" if parent %>"
   data-controller="packet" data-packet-owner-id-value="<%= packet.grid_hackr_id %>"
+  data-packet-author-role-value="<%= uplink_role_class(packet.grid_hackr.role) %>"
   data-author-key="<%= uplink_author_key(packet, parsed) %>" data-at="<%= (packet.created_at.to_f * 1000).to_i %>"<% if parent %>
   data-reply-to="<%= parent.id %>"<% end %>>
   <div class="packet-meta">
@@ -86,6 +91,12 @@
       <%= button_to "×", uplink_packet_drop_path(packet), method: :post,
         class: "packet-action-button", title: "Drop packet", form_class: "uplink-inline-form",
         form: {hidden: !(own || can_moderate), data: {packet_target: "dropControl"}} %>
+    <% end %>
+    <% unless bot || bridged %>
+      <button type="button" class="packet-action-button packet-mod-button" title="Moderate" hidden
+        data-packet-target="modControl" data-action="click->popover#open"
+        data-popover-url-param="<%= uplink_packet_menu_path(packet) %>" data-popover-frame-param="uplink-modmenu"
+        data-popover-align-param="end">...</button>
     <% end %>
   </div>
 </div>

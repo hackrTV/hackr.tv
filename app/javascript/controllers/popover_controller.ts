@@ -1,18 +1,25 @@
 import { Controller, type ActionEvent } from '@hotwired/stimulus'
 
-// Frame-backed popover for the /uplink shell (operative record card).
-// Clicking a packet author loads the URL in its data-popover-url-param
-// (GET /uplink/profiles/:alias) into the uplink-popover turbo-frame and
-// parks the frame under the click, clamped to the pane it lives in (its
-// offset parent, .uplink-main), flipping above when there's no room
-// below. The card takes focus once loaded. Escape and the card's [x]
-// close it and hand focus back to the author link; an outside mousedown,
-// a second click on the same author, and leaving the page
-// (turbo:before-cache / disconnect) close it too. A modified click
-// (ctrl/meta/shift/alt, middle) falls through to the link's href — the
-// WIRE profile. Roster rows never open it: they carry no alias. The
-// dock/popout render the same author links without this controller, so
-// their action is inert and the link navigates.
+// Frame-backed popovers for the /uplink shell: the operative record card
+// (uplink-popover, in the channel pane) and the operator menu
+// (uplink-modmenu, a grid child so it stacks over the mobile drawers).
+// A trigger's click loads the URL in its data-popover-url-param into the
+// frame named by its data-popover-frame-param (the first frame target
+// when absent) and parks the frame under the trigger — left edges
+// aligned, or right edges when data-popover-align-param is "end" (the
+// […] menus hang leftwards from their button) — clamped to the frame's
+// offset parent, flipping above when there's no room below. One
+// popover is open at a time; opening another closes the first. The
+// loaded content's [tabindex="-1"] root takes focus. Escape and the
+// content's [x] close it and hand focus back to the trigger; an outside
+// mousedown, a second click on the same trigger, a finished form submit
+// inside the frame (the menu's actions reply with a stream) and leaving
+// the page (turbo:before-cache / disconnect) close it too. A modified
+// click (ctrl/meta/shift/alt, middle) falls through to the trigger's
+// href — the author link's WIRE profile. Roster rows carry no alias and
+// open the card never, the menu only for operators (members controller).
+// The dock/popout render the same triggers without this controller, so
+// their action is inert: links navigate, buttons stay CSS-hidden.
 
 const GAP_PX = 4
 const MARGIN_PX = 8
@@ -20,9 +27,11 @@ const MARGIN_PX = 8
 export default class extends Controller<HTMLElement> {
   static targets = ['frame']
 
-  declare readonly frameTarget: HTMLElement
+  declare readonly frameTargets: HTMLElement[]
 
   private anchor: HTMLElement | null = null
+  private frame: HTMLElement | null = null
+  private align: 'start' | 'end' = 'start'
 
   connect (): void {
     document.addEventListener('turbo:before-cache', this.close)
@@ -37,27 +46,39 @@ export default class extends Controller<HTMLElement> {
     const url: unknown = event.params?.url
     if (typeof url !== 'string' || url === '') return
     if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+    const frame = this.frameNamed(event.params?.frame)
+    if (!frame) return
     event.preventDefault()
     const anchor = event.currentTarget as HTMLElement
-    if (anchor === this.anchor && !this.frameTarget.hidden) {
+    if (anchor === this.anchor && frame === this.frame && !frame.hidden) {
       this.close()
       return
     }
+    this.close()
     this.anchor = anchor
-    const frame = this.frameTarget
+    this.frame = frame
+    this.align = event.params?.align === 'end' ? 'end' : 'start'
     frame.innerHTML = ''
-    frame.removeAttribute('src') // same author again: a fresh src always loads
+    frame.removeAttribute('src') // same trigger again: a fresh src always loads
     frame.hidden = false
     frame.setAttribute('src', url)
     this.place()
   }
 
   // turbo:frame-load bubbles from every frame in the shell (the log's
-  // reconnect reload too): only the popover's own load places + focuses.
+  // reconnect reload too): only the open popover's own load places + focuses.
   loaded (event: Event): void {
-    if (event.target !== this.frameTarget || this.frameTarget.hidden) return
+    const frame = this.frame
+    if (!frame || event.target !== frame || frame.hidden) return
     this.place()
-    this.frameTarget.querySelector<HTMLElement>('.uplink-popover')?.focus()
+    frame.querySelector<HTMLElement>('[tabindex="-1"]')?.focus()
+  }
+
+  // A form inside the open frame finished submitting: its reply is a
+  // stream (toast, packet replace), so the popover's job is done.
+  submitted (event: Event): void {
+    if (!this.frame || !(event.target instanceof Node) || !this.frame.contains(event.target)) return
+    this.dismiss()
   }
 
   dismiss (): void {
@@ -67,40 +88,50 @@ export default class extends Controller<HTMLElement> {
   }
 
   keydown (event: KeyboardEvent): void {
-    if (event.key !== 'Escape' || event.defaultPrevented || this.frameTarget.hidden) return
+    if (event.key !== 'Escape' || event.defaultPrevented || !this.isOpen) return
     event.preventDefault()
     this.dismiss()
   }
 
   outside (event: Event): void {
-    if (this.frameTarget.hidden || !(event.target instanceof Node)) return
-    if (this.frameTarget.contains(event.target) || this.anchor?.contains(event.target)) return
+    if (!this.isOpen || !(event.target instanceof Node)) return
+    if (this.frame?.contains(event.target) || this.anchor?.contains(event.target)) return
     this.close()
   }
 
   close = (): void => {
-    const frame = this.frameTarget
+    const frame = this.frame
     this.anchor = null
-    if (frame.hidden) return
+    this.frame = null
+    if (!frame || frame.hidden) return
     frame.hidden = true
     frame.removeAttribute('src')
     frame.innerHTML = ''
   }
 
+  private get isOpen (): boolean {
+    return this.frame !== null && !this.frame.hidden
+  }
+
+  private frameNamed (name: unknown): HTMLElement | null {
+    if (typeof name === 'string' && name !== '') return this.frameTargets.find(frame => frame.id === name) ?? null
+    return this.frameTargets[0] ?? null
+  }
+
   // Coordinates are relative to the frame's offset parent (the pane the
-  // frame is absolutely positioned in); before the card loads the frame
-  // has its CSS width and no height, so the vertical clamp settles on
-  // turbo:frame-load.
+  // frame is absolutely positioned in); before the content loads the
+  // frame has its CSS width and no height, so the vertical clamp settles
+  // on turbo:frame-load.
   private place (): void {
     const anchor = this.anchor
-    if (!anchor) return
-    const frame = this.frameTarget
+    const frame = this.frame
+    if (!anchor || !frame) return
     const parent = frame.offsetParent instanceof HTMLElement ? frame.offsetParent : this.element
     const box = parent.getBoundingClientRect()
     const at = anchor.getBoundingClientRect()
     const width = frame.offsetWidth
     const height = frame.offsetHeight
-    let left = at.left - box.left
+    let left = (this.align === 'end' ? at.right - width : at.left) - box.left
     let top = at.bottom - box.top + GAP_PX
     if (left + width > parent.clientWidth - MARGIN_PX) left = parent.clientWidth - width - MARGIN_PX
     if (top + height > parent.clientHeight - MARGIN_PX) top = at.top - box.top - height - GAP_PX // flip above

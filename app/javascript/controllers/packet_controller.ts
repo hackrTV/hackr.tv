@@ -1,12 +1,15 @@
 import { Controller } from '@hotwired/stimulus'
+import { isModerator, outranks } from '~/utils/uplinkRoles'
 
 // Per-viewer state for uplink packets (pulse-card pattern).
 // Broadcast-inserted packets render viewer-neutral, so on connect this
 // controller:
 //   1. reveals the drop control for the packet's author and for
-//      operators/admins, and the restore control for operators/admins —
-//      read from the layout's current-hackr metas (cosmetic only; the
-//      server re-checks on every action);
+//      operators/admins, the restore control for operators/admins, and
+//      the […] operator-menu control for operators/admins who outrank
+//      the author (never their own packet) — read from the layout's
+//      current-hackr metas + the packet's author role value (cosmetic
+//      only; the server re-checks on every action);
 //   2. rewrites descendant form CSRF tokens from the page meta;
 //   3. localizes the HH:MM timestamp (Packet.tsx rendered client-local);
 //   4. highlights the viewer's own @mentions.
@@ -18,13 +21,15 @@ import { Controller } from '@hotwired/stimulus'
 const FLASH_MS = 1200
 
 export default class extends Controller<HTMLElement> {
-  static targets = ['time', 'dropControl', 'restoreControl']
-  static values = { ownerId: Number }
+  static targets = ['time', 'dropControl', 'restoreControl', 'modControl']
+  static values = { ownerId: Number, authorRole: String }
 
   declare readonly timeTargets: HTMLTimeElement[]
   declare readonly dropControlTargets: HTMLElement[]
   declare readonly restoreControlTargets: HTMLElement[]
+  declare readonly modControlTargets: HTMLElement[]
   declare readonly ownerIdValue: number
+  declare readonly authorRoleValue: string
 
   connect (): void {
     this.localizeTimes()
@@ -70,12 +75,16 @@ export default class extends Controller<HTMLElement> {
     const viewerId = this.metaNumber('current-hackr-id')
     if (viewerId === null) return
     const role = this.meta('current-hackr-role')
-    const moderator = role === 'operator' || role === 'admin'
-    if (moderator || viewerId === this.ownerIdValue) {
+    const moderator = isModerator(role)
+    const own = viewerId === this.ownerIdValue
+    if (moderator || own) {
       this.dropControlTargets.forEach(el => { el.hidden = false })
     }
     if (moderator) {
       this.restoreControlTargets.forEach(el => { el.hidden = false })
+    }
+    if (moderator && !own && outranks(role, this.authorRoleValue)) {
+      this.modControlTargets.forEach(el => { el.hidden = false })
     }
   }
 

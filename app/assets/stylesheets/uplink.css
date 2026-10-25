@@ -66,9 +66,9 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
 /* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster, the record popover. */
-.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin { color: #00d4ff; }
-.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator { color: #ffaa00; }
-.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative { color: #cc0088; }
+.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin { color: #00d4ff; }
+.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator { color: #ffaa00; }
+.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative { color: #cc0088; }
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
@@ -92,7 +92,7 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 /* Per-packet controls: reply (shell only — the dock/popout composer has
    no reply bar) + the viewer-neutral hidden drop/restore form. */
 .packet-actions { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
-.packet-reply-button { display: none; }
+.packet-reply-button, .packet-mod-button { display: none; }
 .uplink-inline-form { display: inline; }
 /* Author display beats the UA [hidden] rule — re-assert it, or the
    viewer-neutral hidden mod controls render for everyone. */
@@ -172,8 +172,9 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .uplink-shell :focus-visible { outline: 1px solid var(--accent-bright); outline-offset: -1px; }
 /* Guard: an empty element is still a grid item (the stream sources once
    sat here and shoved every pane one cell over), so only the four panes
-   + backdrop may occupy the grid. Stream sources live in .uplink-main. */
-.uplink-shell > :not(.uplink-rail, .uplink-sidebar, .uplink-main, .uplink-members-pane, .uplink-backdrop) { display: none; }
+   + backdrop may occupy the grid (the operator menu frame is absolute, so
+   it takes no cell). Stream sources live in .uplink-main. */
+.uplink-shell > :not(.uplink-rail, .uplink-sidebar, .uplink-main, .uplink-members-pane, .uplink-backdrop, .uplink-modmenu-frame) { display: none; }
 
 /* Rail: one NODE (hackr.tv). */
 .uplink-rail { display: flex; flex-direction: column; align-items: center; padding-top: 10px; background-color: var(--bg-0); border-right: 1px solid var(--edge); }
@@ -262,7 +263,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .packet--cont:hover .packet-meta, .uplink-shell .packet--cont:focus-within .packet-meta { visibility: visible; }
 .uplink-shell .packet-actions { position: absolute; top: 2px; right: 8px; opacity: 0; }
 .uplink-shell .packet:hover .packet-actions, .uplink-shell .packet:focus-within .packet-actions { opacity: 1; }
-.uplink-shell .packet-reply-button { display: inline-block; }
+.uplink-shell .packet-reply-button, .uplink-shell .packet-mod-button:not([hidden]) { display: inline-block; }
 .uplink-shell .packet-reply-quote { font-size: 14px; line-height: 18px; }
 .uplink-shell .packet.packet--flash { background-color: rgba(var(--accent-rgb), 0.25); } /* beats .packet:hover */
 
@@ -297,8 +298,8 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-popover--missing .uplink-popover-alias { color: var(--fg-faint); font-size: 14px; letter-spacing: 1px; }
 .uplink-popover-badge { flex-shrink: 0; padding: 0 4px; border: 1px solid currentColor; font-size: 12px; line-height: 16px; font-weight: bold; letter-spacing: 1px; }
 .uplink-popover-cl { flex-shrink: 0; color: var(--warn); font-size: 12px; letter-spacing: 1px; }
-.uplink-popover-close { flex-shrink: 0; margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
-.uplink-popover-close:hover { color: var(--fg-bright); }
+.uplink-popover-close, .uplink-modmenu-close { flex-shrink: 0; margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.uplink-popover-close:hover, .uplink-modmenu-close:hover { color: var(--fg-bright); }
 .uplink-popover-meta { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
 .uplink-popover-active--online { color: var(--live); }
 .uplink-popover-bio { margin: 10px 0 0; max-height: 72px; overflow: hidden; color: var(--fg-muted); line-height: 18px; white-space: pre-wrap; word-break: break-word; } /* four lines */
@@ -309,6 +310,34 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-popover-stat-label { display: block; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
 .uplink-popover-link { display: inline-block; margin-top: 12px; padding: 2px 6px; border: 1px solid var(--edge-bright); color: var(--fg-faint); font-size: 12px; text-decoration: none; }
 .uplink-popover-link:hover { border-color: var(--accent); color: var(--accent-bright); }
+
+/* Operator menu (popover controller, second frame — uplink/punishments/
+   menu): the hover […] on a packet or a roster row (operator+, revealed
+   client-side for the rows the viewer outranks; the server re-checks)
+   loads GET …/menu here. The frame is a grid child, absolute against the
+   shell root, so it stacks over the operatives drawer (z 20) and the
+   backdrop (z 15) under 768px, where the channel pane is inert. One
+   form: an optional reason, then one full-width item per action. */
+.uplink-modmenu-frame { display: block; position: absolute; z-index: 25; width: min(240px, calc(100% - 16px)); background-color: var(--bg-1); border: 1px solid var(--edge-bright); box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6); }
+.uplink-modmenu-frame[hidden] { display: none; }
+.uplink-modmenu-frame[busy]:empty::before { content: "// CHECKING CLEARANCE //"; display: block; padding: 8px 12px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-modmenu { padding: 8px; font-size: 14px; }
+.uplink-shell .uplink-modmenu:focus-visible { outline: none; }
+.uplink-modmenu-head { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 0 4px 6px; border-bottom: 1px solid var(--edge); }
+.uplink-modmenu-kicker { flex-shrink: 0; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-modmenu-target { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; }
+.uplink-modmenu-status { margin: 6px 4px 0; color: var(--warn); font-size: 12px; letter-spacing: 1px; }
+.uplink-modmenu-note { margin: 6px 4px 0; color: var(--fg-faint); }
+.uplink-modmenu-form { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.uplink-modmenu-reason { margin-bottom: 4px; padding: 4px 6px; background-color: var(--bg-0); border: 1px solid var(--edge); color: var(--fg); font-family: inherit; font-size: 12px; letter-spacing: 1px; }
+.uplink-modmenu-reason::placeholder { color: var(--fg-faint); }
+.uplink-modmenu-item { display: block; width: 100%; padding: 4px 6px; background: none; border: 1px solid transparent; color: var(--fg-muted); font-family: inherit; font-size: 14px; letter-spacing: 1px; text-align: left; cursor: pointer; }
+.uplink-modmenu-item:hover { background-color: var(--bg-2); border-color: var(--edge); color: var(--fg-bright); }
+.uplink-modmenu-item--danger { color: var(--err); }
+.uplink-modmenu-item--danger:hover { background-color: rgba(var(--err-rgb), 0.15); color: var(--err); }
+.uplink-modmenu-item--lift { color: var(--ok); }
+.uplink-modmenu-item--lift:hover { color: var(--ok); }
+.uplink-modmenu-item[disabled] { opacity: 0.5; cursor: default; } /* Turbo disables the submitter in flight */
 
 /* Operatives pane: role groups of anonymized callsigns. */
 .uplink-members-pane { display: flex; flex-direction: column; min-height: 0; background-color: var(--bg-1); border-left: 1px solid var(--edge); }
@@ -321,6 +350,10 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-member:hover { background-color: var(--bg-2); }
 .uplink-member-dot { flex-shrink: 0; width: 6px; height: 6px; background-color: var(--live); }
 .uplink-member--self .uplink-member-name { color: var(--accent-bright); font-weight: bold; }
+/* Operator menu trigger on roster rows: in the markup hidden; the members controller unhides it for the rows an operator outranks; the row's hover shows it. */
+.uplink-member-mod { margin-left: auto; padding: 0 4px; background: none; border: none; color: var(--fg-faint); font-family: inherit; font-size: 14px; line-height: 16px; cursor: pointer; opacity: 0; }
+.uplink-member:hover .uplink-member-mod, .uplink-member:focus-within .uplink-member-mod { opacity: 1; }
+.uplink-member-mod:hover { color: var(--fg-bright); }
 
 /* Under 768px: single column; sidebar + operatives become drawers over
    the channel pane (uplink-shell controller: data-drawer, backdrop,

@@ -1,7 +1,7 @@
 ---
 title: Uplink Comms
 area: Social & Comms
-minutes: 25
+minutes: 30
 ---
 # Uplink (/uplink)
 
@@ -101,28 +101,43 @@ minutes: 25
 17. Restore it. → Restored live.
 18. The drop control is NOT visible to the non-moderator operative on
     others' packets.
-19. **Squelch** the operative from `/root` → Uplink (punishments). → In
-    the operative's `/uplink`, the composer is replaced by the squelch
-    notice; sending is impossible. Lift the squelch → composer returns
-    (after reload).
-20. **Blackout** the operative. → Uplink is fully blocked with the
+19. **Operator menu**: as admin, hover the operative's packet → a `...`
+    appears beside the drop control; click it. → A small MODERATE menu
+    parks under it naming `@alias` in its role color: a REASON field,
+    DROP PACKET, SQUELCH 10M / 1H / 24H, BLACKOUT, `[x]`. Enter in the
+    reason field does nothing; Escape or clicking elsewhere closes it.
+    Type a reason and click SQUELCH 10M. → The menu closes, a MODERATION
+    toast reads `@alias squelched for 10m.`, and `/root/uplink`'s
+    moderation log has the row with the reason. Reopen the menu. → It
+    shows `SQUELCHED · 10M LEFT`, no squelch items, and LIFT PUNISHMENT.
+    In the OPERATIVES pane hover the operative's callsign row. → The same
+    `...` is there; its menu names only `SIG-XXXXXX` (never the alias) and
+    has no DROP PACKET. Your own row, other admins' rows and packets by
+    admins or bridged accounts show no `...`; an operator (not admin) sees
+    it only on operatives. BLACKOUT, then LIFT PUNISHMENTS from either
+    menu → toasts confirm, the status lines follow.
+20. **Squelch** the operative from `/root` → Uplink (punishments) or the
+    operator menu. → In the operative's `/uplink`, the composer is
+    replaced by the squelch notice on their next load; sending is
+    impossible. Lift the squelch → composer returns (after reload).
+21. **Blackout** the operative. → Uplink is fully blocked with the
     blackout notice. Lift it afterwards.
 
 ## Steps — popout + recovery
 
-21. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
+22. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
     classic single-line panel; live receive + send both work; heartbeat
     keeps it registered while open. The home-page dock is likewise the
-    classic panel.
-22. Kill the connection (devtools offline ~10s, restore). → The log
+    classic panel. Neither has an operator menu: no `...` on packets.
+23. Kill the connection (devtools offline ~10s, restore). → The log
     recovers missed messages (reconnect frame reload) rather than
     silently gapping.
 
 ## Steps — external bridge spot-check (if relay/synthia are running)
 
-23. Send from hackr.tv `/uplink`, including a two-line packet. →
+24. Send from hackr.tv `/uplink`, including a two-line packet. →
     Appears in relay's terminal view (line breaks are plain `\n`).
-24. Send via synthia (or
+25. Send via synthia (or
     `POST /api/admin/uplink/send_packet` with the Bearer token). → The
     packet appears live in `/uplink` attributed to the service account;
     the bridge account never shows in the OPERATIVES pane.

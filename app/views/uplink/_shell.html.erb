@@ -10,7 +10,10 @@
     toggle, the stage collapse, the jump pill, the / hotkey and the
     sidebar @ badge from mention toasts; popover owns the operative
     record card (a turbo-frame in the channel pane that packet author
-    links load — see uplink/profiles/show).
+    links load — see uplink/profiles/show) and the operator menu (a
+    second frame, a grid child, that the [...] on packets and roster rows
+    loads — see uplink/punishments/menu); one of the two is open at a
+    time.
     Locals: channel, channels, packets, viewer, live_stream, roster,
     more (older packets exist — seeds the scrollback sentinel). %>
 <%
@@ -22,7 +25,7 @@
   data-uplink-channel-value="<%= channel&.slug %>"
   data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
   data-uplink-shell-channel-value="<%= channel&.slug %>"
-  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown">
+  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown turbo:submit-end->popover#submitted">
   <nav class="uplink-rail" aria-label="Nodes">
     <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
   </nav>
@@ -92,4 +95,11 @@
   </aside>
 
   <div class="uplink-backdrop" data-action="click->uplink-shell#closeDrawers"></div>
+
+  <%# Operator menu (operator+): the popover controller's second frame,
+      loaded from a packet's or roster row's [...] (GET …/menu). A grid
+      child, not a pane child: under 768px the roster is a drawer over an
+      inert channel pane, and the menu must stack above both (the grid
+      guard in uplink.css lets this one through). %>
+  <%= turbo_frame_tag "uplink-modmenu", target: "_top", hidden: true, class: "uplink-modmenu-frame", data: {popover_target: "frame"} %>
 </div>

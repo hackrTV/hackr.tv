@@ -2,15 +2,21 @@ import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { Application } from '@hotwired/stimulus'
 import PacketController from './packet_controller'
 
-// Fixture mirrors two uplink/_packet rows: a parent and a reply carrying
-// data-reply-to + the quote line, each with the hover reply control.
+// Fixture mirrors uplink/_packet rows: a parent and a reply carrying
+// data-reply-to + the quote line, each with the hover reply control and
+// the three hidden per-viewer controls (drop / restore forms, the […]
+// operator-menu button) the controller reveals from the current-hackr
+// metas + the author's role value.
 
-function packet (id: number, opts: { replyTo?: number, sender?: string } = {}): string {
+function packet (id: number, opts: { replyTo?: number, sender?: string, owner?: number, role?: string } = {}): string {
   return `
-    <div id="chat_message_${id}" class="packet" data-controller="packet" data-packet-owner-id-value="7"${opts.replyTo ? ` data-reply-to="${opts.replyTo}"` : ''}>
+    <div id="chat_message_${id}" class="packet" data-controller="packet" data-packet-owner-id-value="${opts.owner ?? 7}" data-packet-author-role-value="${opts.role ?? 'operative'}"${opts.replyTo ? ` data-reply-to="${opts.replyTo}"` : ''}>
       ${opts.replyTo ? '<button type="button" class="packet-reply-quote" data-action="click->packet#jumpToParent">[&gt;]</button>' : ''}
       <span class="packet-content">p${id}</span>
       <button type="button" class="packet-reply-button" data-action="click->packet#reply" data-reply-sender="${opts.sender ?? '@someone'}">↩</button>
+      <form class="uplink-inline-form" hidden data-packet-target="dropControl"><button>×</button></form>
+      <form class="uplink-inline-form" hidden data-packet-target="restoreControl"><button>↺</button></form>
+      <button type="button" class="packet-mod-button" hidden data-packet-target="modControl">…</button>
     </div>`
 }
 
@@ -18,20 +24,75 @@ describe('PacketController', () => {
   let application: Application
 
   const el = (id: number): HTMLElement => document.getElementById(`chat_message_${id}`)!
+  const metas: HTMLMetaElement[] = []
 
-  beforeEach(async () => {
-    vi.useFakeTimers()
-    document.body.innerHTML = `<div id="uplink-log">${packet(1, { sender: '@xeraen' })}${packet(2, { replyTo: 1 })}${packet(3, { replyTo: 999 })}</div>`
+  function meta (name: string, content: string): void {
+    const m = document.createElement('meta')
+    m.name = name
+    m.content = content
+    document.head.appendChild(m)
+    metas.push(m)
+  }
+
+  // The viewer: hackr 1; packets by 7 (operative), 8 (operator), 9 (admin) and their own.
+  async function start (html = `${packet(1, { sender: '@xeraen' })}${packet(2, { replyTo: 1 })}${packet(3, { replyTo: 999 })}`): Promise<void> {
+    document.body.innerHTML = `<div id="uplink-log">${html}</div>`
     application = Application.start()
     application.register('packet', PacketController)
     await Promise.resolve()
+  }
+
+  const ROSTER = `${packet(1, { owner: 7, role: 'operative' })}${packet(2, { owner: 8, role: 'operator' })}${packet(3, { owner: 9, role: 'admin' })}${packet(4, { owner: 1, role: 'operator' })}`
+
+  function revealed (id: number, control: 'dropControl' | 'restoreControl' | 'modControl'): boolean {
+    return !el(id).querySelector<HTMLElement>(`[data-packet-target="${control}"]`)!.hidden
+  }
+
+  beforeEach(async () => {
+    vi.useFakeTimers()
+    await start()
   })
 
   afterEach(async () => {
     document.body.innerHTML = ''
+    metas.splice(0).forEach(m => m.remove())
     await Promise.resolve()
     application?.stop()
     vi.useRealTimers()
+  })
+
+  it('reveals nothing to a logged-out viewer and only the own drop control to an operative', async () => {
+    expect(revealed(1, 'dropControl')).toBe(false)
+
+    application.stop()
+    meta('current-hackr-id', '1')
+    meta('current-hackr-role', 'operative')
+    await start(ROSTER)
+
+    expect([1, 2, 3].map(id => revealed(id, 'dropControl'))).toEqual([false, false, false])
+    expect(revealed(4, 'dropControl')).toBe(true) // own packet
+    expect([1, 2, 3, 4].map(id => revealed(id, 'restoreControl'))).toEqual([false, false, false, false])
+    expect([1, 2, 3, 4].map(id => revealed(id, 'modControl'))).toEqual([false, false, false, false])
+  })
+
+  it('reveals drop + restore everywhere to an operator, and the operator menu only on packets by operatives they outrank — never their own', async () => {
+    application.stop()
+    meta('current-hackr-id', '1')
+    meta('current-hackr-role', 'operator')
+    await start(ROSTER)
+
+    expect([1, 2, 3, 4].map(id => revealed(id, 'dropControl'))).toEqual([true, true, true, true])
+    expect([1, 2, 3, 4].map(id => revealed(id, 'restoreControl'))).toEqual([true, true, true, true])
+    expect([1, 2, 3, 4].map(id => revealed(id, 'modControl'))).toEqual([true, false, false, false])
+  })
+
+  it('reveals the operator menu to an admin on operators and operatives, not on admins', async () => {
+    application.stop()
+    meta('current-hackr-id', '1')
+    meta('current-hackr-role', 'admin')
+    await start(ROSTER)
+
+    expect([1, 2, 3, 4].map(id => revealed(id, 'modControl'))).toEqual([true, true, false, false])
   })
 
   it('dispatches packet:reply with the packet id and sender label from the hover control', () => {
