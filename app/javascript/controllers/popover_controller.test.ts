@@ -5,28 +5,37 @@ import PopoverController from './popover_controller'
 // Fixture mirrors uplink/_shell: the popover controller on the shell root
 // with its document-level actions, the hidden uplink-popover turbo-frame
 // in the channel pane, packet author links carrying the profile URL as
-// an action param, and a second frame (the log's) whose loads must be
-// ignored. jsdom has no layout: rects and offset sizes are stubbed, and
-// the frame's offsetParent is null so the shell root stands in as the
-// clamp box.
+// an action param, the packet's [...] + a roster row's [...] naming the
+// second frame (uplink-modmenu, a grid child) in their frame param, and
+// a further frame (the log's) whose loads must be ignored. jsdom has no
+// layout: rects and offset sizes are stubbed, and the frames'
+// offsetParent is null so the shell root stands in as the clamp box.
 
 function fixture (): string {
   return `
     <div class="uplink-shell" data-controller="popover"
-         data-action="turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown">
+         data-action="turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown turbo:submit-end->popover#submitted">
       <div class="uplink-main">
         <h2 id="outside">#ambient</h2>
         <turbo-frame id="uplink-log-frame"><div id="uplink-log">
           <a id="a1" class="packet-author" href="/wire/xeraen" data-action="click->popover#open" data-popover-url-param="/uplink/profiles/xeraen">@xeraen</a>
+          <button id="m1" type="button" class="packet-mod-button" data-action="click->popover#open" data-popover-url-param="/uplink/packets/1/menu" data-popover-frame-param="uplink-modmenu" data-popover-align-param="end">...</button>
           <a id="a2" class="packet-author" href="/wire/ghost" data-action="click->popover#open" data-popover-url-param="/uplink/profiles/ghost">@ghost</a>
           <a id="a3" class="packet-author" href="/wire/nobody" data-action="click->popover#open">@nobody</a>
+          <button id="m9" type="button" data-action="click->popover#open" data-popover-url-param="/uplink/packets/9/menu" data-popover-frame-param="uplink-nowhere">…</button>
         </div></turbo-frame>
+        <form id="composer" class="packet-input-form"></form>
         <turbo-frame id="uplink-popover" class="uplink-popover-frame" target="_top" hidden data-popover-target="frame"></turbo-frame>
       </div>
+      <aside class="uplink-members-pane">
+        <li class="uplink-member" data-callsign="A1B2C3"><button id="r1" type="button" class="uplink-member-mod" data-action="click->popover#open" data-popover-url-param="/uplink/operatives/a1b2c3/menu" data-popover-frame-param="uplink-modmenu" data-popover-align-param="end">...</button></li>
+      </aside>
+      <turbo-frame id="uplink-modmenu" class="uplink-modmenu-frame" target="_top" hidden data-popover-target="frame"></turbo-frame>
     </div>`
 }
 
 const CARD = '<div class="uplink-popover" tabindex="-1">@xeraen <button type="button" class="uplink-popover-close" data-action="click->popover#dismiss">[x]</button></div>'
+const MENU = '<div class="uplink-modmenu" tabindex="-1"><form class="uplink-modmenu-form"><button type="submit" class="uplink-modmenu-item">SQUELCH 10M</button></form></div>'
 
 type Box = { left: number, top: number, width: number, height: number }
 
@@ -43,7 +52,9 @@ describe('PopoverController', () => {
 
   const shell = (): HTMLElement => document.querySelector('.uplink-shell')!
   const frame = (): HTMLElement => document.getElementById('uplink-popover')!
+  const menu = (): HTMLElement => document.getElementById('uplink-modmenu')!
   const author = (id: string): HTMLAnchorElement => document.getElementById(id) as HTMLAnchorElement
+  const trigger = (id: string): HTMLButtonElement => document.getElementById(id) as HTMLButtonElement
 
   function click (el: Element, init: MouseEventInit = {}): MouseEvent {
     const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0, ...init })
@@ -73,8 +84,11 @@ describe('PopoverController', () => {
     size(shell(), { clientWidth: 800, clientHeight: 600 })
     rect(shell(), { left: 0, top: 0, width: 800, height: 600 })
     size(frame(), { offsetWidth: 320, offsetHeight: 0 })
+    size(menu(), { offsetWidth: 240, offsetHeight: 0 })
     rect(author('a1'), { left: 100, top: 300, width: 60, height: 16 })
     rect(author('a2'), { left: 700, top: 560, width: 60, height: 16 })
+    rect(trigger('m1'), { left: 760, top: 300, width: 16, height: 16 })
+    rect(trigger('r1'), { left: 990, top: 120, width: 16, height: 16 }) // in the roster pane, right of the clamp box
     application = Application.start()
     application.register('popover', PopoverController)
     await Promise.resolve()
@@ -164,6 +178,65 @@ describe('PopoverController', () => {
     click(author('a2'))
     expect(frame().hidden).toBe(false)
     expect(frame().getAttribute('src')).toBe('/uplink/profiles/ghost')
+  })
+
+  it('routes a trigger naming a frame to that frame — one popover open at a time — and places/focuses on that frame\'s own load', () => {
+    click(author('a1'))
+    expect(frame().hidden).toBe(false)
+
+    const event = click(trigger('m1'))
+    expect(event.defaultPrevented).toBe(true)
+    expect(frame().hidden).toBe(true) // the card gave way
+    expect(frame().hasAttribute('src')).toBe(false)
+    expect(menu().hidden).toBe(false)
+    expect(menu().getAttribute('src')).toBe('/uplink/packets/1/menu')
+    expect(menu().style.left).toBe('536px') // align end: the trigger's right edge (776) - 240
+    expect(menu().style.top).toBe('320px')
+
+    load(frame(), CARD) // the other frame loading is not ours
+    expect(document.activeElement).not.toBe(frame().querySelector('.uplink-popover'))
+
+    load(menu(), MENU)
+    expect(document.activeElement).toBe(menu().querySelector('.uplink-modmenu'))
+
+    click(author('a2')) // and back: the menu gives way to the card
+    expect(menu().hidden).toBe(true)
+    expect(menu().innerHTML).toBe('')
+    expect(frame().hidden).toBe(false)
+    expect(frame().getAttribute('src')).toBe('/uplink/profiles/ghost')
+  })
+
+  it('opens the menu from a roster row (clamped into the shell), toggles it on the same row, and ignores a trigger naming an unknown frame', () => {
+    click(trigger('r1'))
+    expect(menu().hidden).toBe(false)
+    expect(menu().getAttribute('src')).toBe('/uplink/operatives/a1b2c3/menu')
+    expect(menu().style.left).toBe('552px') // 1006 - 240 = 766, clamped to 800 - 240 - 8
+    expect(menu().style.top).toBe('140px')
+
+    click(trigger('r1'))
+    expect(menu().hidden).toBe(true)
+
+    expect(click(trigger('m9')).defaultPrevented).toBe(false)
+    expect(menu().hidden).toBe(true)
+    expect(frame().hidden).toBe(true)
+  })
+
+  it('closes the open frame when a form inside it finishes submitting, handing focus back to its trigger; other forms are none of its business', () => {
+    click(trigger('m1'))
+    load(menu(), MENU)
+    document.getElementById('composer')!.dispatchEvent(new CustomEvent('turbo:submit-end', { bubbles: true, detail: { success: true } }))
+    expect(menu().hidden).toBe(false)
+
+    menu().querySelector('form')!.dispatchEvent(new CustomEvent('turbo:submit-end', { bubbles: true, detail: { success: true } }))
+    expect(menu().hidden).toBe(true)
+    expect(menu().hasAttribute('src')).toBe(false)
+    expect(document.activeElement).toBe(trigger('m1'))
+
+    click(trigger('r1'))
+    load(menu(), MENU)
+    expect(press('Escape', menu().querySelector('.uplink-modmenu')!).defaultPrevented).toBe(true)
+    expect(menu().hidden).toBe(true)
+    expect(document.activeElement).toBe(trigger('r1'))
   })
 
   it('leaves an Escape another layer already handled alone, and closes before the page is cached', () => {

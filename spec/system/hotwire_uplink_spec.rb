@@ -354,6 +354,80 @@ RSpec.describe "Hotwire uplink", type: :system do
     expect(page).to have_no_css(".uplink-popover")
   end
 
+  it "moderates inline from the operator menu: squelches a roster callsign (the target's composer locks on their next load), then blacks out and lifts from the author's packet" do
+    packet = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Menu target")
+
+    using_session(:target) do
+      log_in!(other)
+      visit "/uplink"
+      await_uplink!
+      expect(page).to have_field("content")
+    end
+
+    log_in!(operator)
+    visit "/uplink"
+    await_uplink!
+
+    # Roster: the target's callsign row (never its alias) grows a […] on
+    # hover for operators; the menu names the callsign only.
+    row = find(".uplink-member[data-callsign='#{Uplink::Callsign.token(other.id)}']", wait: 10)
+    row.hover
+    row.find(".uplink-member-mod").click
+    within("#uplink-modmenu") do
+      expect(page).to have_content("MODERATE", wait: 10)
+      expect(page).to have_content(Uplink::Callsign.label(other.id))
+      expect(page).not_to have_content(other.hackr_alias)
+      expect(page).not_to have_button("DROP PACKET")
+      fill_in "reason", with: "spam"
+      find_field("reason").send_keys(:enter) # must not fire the first item
+    end
+    expect(UserPunishment.count).to eq(0)
+    within("#uplink-modmenu") { click_button "SQUELCH 10M" }
+    expect(page).to have_css(".toast--moderation", text: "#{Uplink::Callsign.label(other.id)} squelched for 10m.", wait: 10)
+    expect(page).to have_css("#uplink-modmenu", visible: :hidden) # closed on submit
+    expect(page).to have_current_path("/uplink")
+    expect(UserPunishment.active_for(other, "squelch").count).to eq(1)
+    expect(ModerationLog.last).to have_attributes(action: "squelch", actor: operator, target: other, duration_minutes: 10, reason: "spam")
+
+    using_session(:target) do
+      visit "/uplink"
+      expect(page).to have_css(".uplink-notice--squelch")
+      expect(page).not_to have_field("content")
+    end
+
+    # Packet path: the author's @alias heads the menu, the standing
+    # squelch shows, its item is gone; blackout, then lift everything.
+    find("#chat_message_#{packet.id}").hover
+    within("#chat_message_#{packet.id}") { find("button[title='Moderate']", wait: 5).click }
+    within("#uplink-modmenu") do
+      expect(page).to have_content("@#{other.hackr_alias}", wait: 10)
+      expect(page).to have_content("SQUELCHED · 10M LEFT")
+      expect(page).not_to have_button("SQUELCH 10M")
+      expect(page).to have_button("DROP PACKET")
+      click_button "BLACKOUT"
+    end
+    expect(page).to have_css(".toast--moderation", text: "@#{other.hackr_alias} blacked out permanently.", wait: 10)
+    expect(UserPunishment.blackedout?(other)).to be(true)
+
+    find("#chat_message_#{packet.id}").hover
+    within("#chat_message_#{packet.id}") { find("button[title='Moderate']").click }
+    within("#uplink-modmenu") do
+      expect(page).to have_content("BLACKED OUT · PERMANENT", wait: 10)
+      click_button "LIFT PUNISHMENTS"
+    end
+    expect(page).to have_css(".toast--moderation", text: "lifted: squelched + blacked out.", wait: 10)
+    expect(UserPunishment.active_for(other)).to be_empty
+
+    using_session(:target) do
+      visit "/uplink"
+      expect(page).to have_field("content")
+      # No controls of its own: operatives never see a […].
+      find("#chat_message_#{packet.id}").hover
+      expect(page).not_to have_css("#chat_message_#{packet.id} button[title='Moderate']")
+      expect(page).not_to have_css(".uplink-member-mod:not([hidden])", visible: :all)
+    end
+  end
+
   it "docks the chat on the live home page and sends from there" do
     create(:hackr_stream, artist: create(:artist), title: "DOCK SESSIONS",
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")

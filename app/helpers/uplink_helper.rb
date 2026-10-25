@@ -69,6 +69,16 @@ module UplinkHelper
     tag.span(class: class_names("channel-tab-dot", "channel-tab-dot--live": live), title: live ? "LIVE" : "Offline")
   end
 
+  # Time left on a punishment, for the operator menu's status line:
+  # "9M", "23H", "3D" (rounded up — a fresh 10-minute squelch reads 10M).
+  def uplink_time_left(expires_at)
+    seconds = [expires_at - Time.current, 0].max
+    return "#{(seconds / 60).ceil}M" if seconds < 1.hour
+    return "#{(seconds / 3600).ceil}H" if seconds < 1.day
+
+    "#{(seconds / 86_400).ceil}D"
+  end
+
   # Author identity for the packet-log controller's consecutive-author
   # grouping. Bridged packets all share the bridge's service hackr, so
   # the key carries the parsed platform username; Synthia is one bot.
