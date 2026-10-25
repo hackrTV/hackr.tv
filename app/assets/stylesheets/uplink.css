@@ -195,9 +195,11 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-channel--disabled { color: var(--edge-bright); cursor: not-allowed; }
 .uplink-channel-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .uplink-channel-slow { color: var(--fg-faint); font-size: 12px; }
-/* Mention badge: hidden in the markup, revealed by uplink-shell when a mention toast lands for another channel. */
-.uplink-channel-badge { min-width: 16px; padding: 0 4px; font-size: 12px; line-height: 16px; text-align: center; font-weight: bold; background-color: var(--accent); color: var(--fg-bright); }
-.uplink-channel--mention { color: var(--fg-bright); }
+/* Unread badge: the count of packets above the viewer's read mark (server-rendered, bumped live by uplink-shell, hidden at 0, capped "99+").
+   --unread brightens the name; --mention (server, or the mention toast landing live) recolors the badge. */
+.uplink-channel-badge { min-width: 16px; padding: 0 4px; font-size: 12px; line-height: 16px; text-align: center; font-weight: bold; background-color: var(--fg-muted); color: var(--bg-0); }
+.uplink-channel--unread, .uplink-channel--mention { color: var(--fg-bright); }
+.uplink-channel--mention .uplink-channel-badge { background-color: var(--accent); color: var(--fg-bright); }
 .uplink-channels-empty { padding: 12px; color: var(--fg-faint); font-size: 14px; }
 .uplink-userpanel { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background-color: var(--bg-0); border-top: 1px solid var(--edge); font-size: 14px; }
 .uplink-userpanel-alias { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; }
@@ -247,6 +249,9 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .uplink-log-top[data-loading="true"]::before { content: "// RETRIEVING ARCHIVE //"; }
 .uplink-shell .uplink-log-top[data-more="false"]::before { content: "// BEGINNING OF CHANNEL //"; color: var(--edge-bright); }
 .uplink-shell .packet-log:not(:has(.packet)) .uplink-log-top { display: none; }
+/* "// NEW PACKETS //" separator (unread badges, item 5): server-rendered before the first packet above the viewer's previous read mark. */
+.uplink-shell .uplink-unseen { display: flex; align-items: center; gap: 8px; margin: 6px 0; padding: 0 8px; font-size: 12px; line-height: 16px; letter-spacing: 1px; color: var(--warn); }
+.uplink-shell .uplink-unseen::before, .uplink-shell .uplink-unseen::after { content: ""; flex: 1; border-top: 1px solid currentColor; }
 
 /* Packets in the shell: Discord rhythm — author line, content below,
    consecutive packets by one author collapse (.packet--cont, set by the

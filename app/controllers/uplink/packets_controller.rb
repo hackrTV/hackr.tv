@@ -39,6 +39,7 @@ class Uplink::PacketsController < ApplicationController
     if @packet.save
       # Same trigger site as the API create.
       Grid::AchievementChecker.new(current_hackr).check("uplink_packets_count")
+      UplinkChannelRead.mark!(current_hackr, @channel, @packet.id) # your own packet is read
       respond_to do |format|
         format.turbo_stream # append own contextual packet + clear the error slot
         format.html { redirect_to uplink_path(channel: @channel.slug) }

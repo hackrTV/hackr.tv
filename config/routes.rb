@@ -204,6 +204,7 @@ Rails.application.routes.draw do
     get "log", to: "uplink#log", as: :uplink_log
     get "profiles/:alias", to: "uplink/profiles#show", as: :uplink_profile, constraints: {alias: /[A-Za-z0-9_]+/}
     post "packets", to: "uplink/packets#create", as: :uplink_packets
+    post "reads", to: "uplink/reads#create", as: :uplink_reads
     post "packets/:id/drop", to: "uplink/packets#drop", as: :uplink_packet_drop
     post "packets/:id/restore", to: "uplink/packets#restore", as: :uplink_packet_restore
     # Operator menu (Phase 2 item 4): inline squelch / blackout / lift. The

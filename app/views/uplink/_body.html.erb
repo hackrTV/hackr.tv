@@ -8,11 +8,16 @@
               grouping + scrollback on the log, and the log wrapped so
               the shell can float its "new packets" jump pill over it.
       more — shell only: whether packets older than the first exist
-             (the scrollback sentinel's initial state). %>
+             (the scrollback sentinel's initial state).
+      unseen_from, unseen_divider — shell only: the viewer's old read
+               mark and whether this page draws the NEW PACKETS line
+               (uplink/_log_frame). %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   shell = local_assigns.fetch(:shell, false)
   more = local_assigns.fetch(:more, false)
+  unseen_from = local_assigns.fetch(:unseen_from, nil)
+  unseen_divider = local_assigns.fetch(:unseen_divider, false)
   unavailable = channel && channel.requires_livestream? && !channel.currently_available?
   viewable = channel.present? && channel.viewable_by?(viewer)
 %>
@@ -24,7 +29,8 @@
 <% elsif viewable %>
   <% if shell %>
     <div class="uplink-logwrap">
-      <%= render "uplink/log_frame", packets: packets, viewer: viewer, group: true, more: more, channel: channel %>
+      <%= render "uplink/log_frame", packets: packets, viewer: viewer, group: true, more: more, channel: channel,
+        unseen_from: unseen_from, unseen_divider: unseen_divider %>
       <button type="button" class="uplink-jump" hidden data-uplink-shell-target="jump"
         data-action="click->uplink-shell#jump">[v] <span data-uplink-shell-target="jumpCount">NEW PACKETS</span></button>
     </div>

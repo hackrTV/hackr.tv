@@ -13,12 +13,21 @@ import { Controller } from '@hotwired/stimulus'
 //     from the log (prefixed "@ MENTION" when an unread packet mentions
 //     the viewer); the viewer's own sends always jump to the bottom;
 //   - "/" focuses the composer from anywhere outside a field;
+//   - unread badges: the sidebar renders each other channel's count
+//     (packets above the viewer's read mark); a hidden block of bump
+//     slots (one per counted channel, fed by the uplink_bump streams)
+//     gets an <i> appended per packet, and a MutationObserver turns each
+//     into +1 on that row's badge (capped "99+"). The viewer's own mark
+//     for THIS channel moves by ack: when a foreign packet lands while
+//     the log sits at the bottom (packet-log:state), the last packet's
+//     id is POSTed to the ack url after a short debounce — and at once,
+//     keepalive, on the way out — so switching channels never shows the
+//     packets you just watched as unread;
 //   - mention toasts (toast:connected on document, carrying the packet's
-//     channel): badge that sidebar row's hidden "@" when the mention is
-//     in another channel; drop the toast when it is this channel — the
-//     packet is already in the log, highlighted, and the pill covers a
-//     reader who scrolled up. The next visit re-renders the list, which
-//     clears the badge (item 5 persists unread state).
+//     channel): recolor that sidebar row (--mention; the bump shows the
+//     count) when the mention is in another channel; drop the toast when
+//     it is this channel — the packet is already in the log, highlighted,
+//     and the pill covers a reader who scrolled up.
 // State lives on the shell root (data-members / data-drawer), so the
 // roster being replaced by a broadcast never resets it.
 
@@ -26,14 +35,18 @@ const MOBILE_QUERY = '(max-width: 767px)'
 const MEMBERS_OPEN_MIN_WIDTH = 1100
 const MEMBERS_KEY = 'uplink:members'
 const STAGE_KEY = 'uplink:stage'
+const ACK_DELAY_MS = 1500
+const BADGE_CAP = 99
+const SLUG = /^[\w-]+$/ // validated, not escaped: jsdom has no CSS.escape
 
 type Drawer = '' | 'sidebar' | 'members'
 
 export default class extends Controller<HTMLElement> {
-  static targets = ['sidebar', 'members', 'main', 'jump', 'jumpCount', 'membersToggle', 'stage', 'stageFrame', 'stageToggle']
-  static values = { channel: String }
+  static targets = ['sidebar', 'members', 'main', 'jump', 'jumpCount', 'membersToggle', 'stage', 'stageFrame', 'stageToggle', 'bumps']
+  static values = { channel: String, ackUrl: String }
 
   declare readonly channelValue: string
+  declare readonly ackUrlValue: string
 
   declare readonly sidebarTarget: HTMLElement
   declare readonly membersTarget: HTMLElement
@@ -46,8 +59,14 @@ export default class extends Controller<HTMLElement> {
   declare readonly stageTarget: HTMLElement
   declare readonly stageFrameTarget: HTMLIFrameElement
   declare readonly stageToggleTarget: HTMLButtonElement
+  // The bump block renders in the shell's sidebar only.
+  declare readonly hasBumpsTarget: boolean
+  declare readonly bumpsTarget: HTMLElement
 
   private mobile: MediaQueryList | null = null
+  private bumpObserver: MutationObserver | null = null
+  private ackTimer = 0
+  private acked = 0
 
   connect (): void {
     this.applyMembersPreference()
@@ -55,6 +74,12 @@ export default class extends Controller<HTMLElement> {
     this.mobile = typeof window.matchMedia === 'function' ? window.matchMedia(MOBILE_QUERY) : null
     this.mobile?.addEventListener('change', this.closeDrawers)
     document.addEventListener('turbo:before-cache', this.closeDrawers)
+    window.addEventListener('pagehide', this.flushAck)
+    this.acked = this.lastPacket()?.id ?? 0 // the render marked everything on screen
+    if (this.hasBumpsTarget) {
+      this.bumpObserver = new MutationObserver(records => this.onBumps(records))
+      this.bumpObserver.observe(this.bumpsTarget, { childList: true, subtree: true })
+    }
     this.autofocusComposer()
   }
 
@@ -62,6 +87,10 @@ export default class extends Controller<HTMLElement> {
     this.mobile?.removeEventListener('change', this.closeDrawers)
     this.mobile = null
     document.removeEventListener('turbo:before-cache', this.closeDrawers)
+    window.removeEventListener('pagehide', this.flushAck)
+    this.bumpObserver?.disconnect()
+    this.bumpObserver = null
+    this.flushAck()
     this.setDrawer('')
     if (this.hasStageTarget) this.stageFrameTarget.removeAttribute('src')
   }
@@ -100,6 +129,7 @@ export default class extends Controller<HTMLElement> {
   logState (event: CustomEvent<{ atBottom: boolean, unread: number, mentions?: number }>): void {
     const { atBottom, unread } = event.detail
     const mentions = event.detail.mentions ?? 0
+    if (atBottom) this.scheduleAck()
     const show = !atBottom && unread > 0
     this.jumpTarget.hidden = !show
     this.jumpTarget.classList.toggle('uplink-jump--mention', show && mentions > 0)
@@ -120,20 +150,92 @@ export default class extends Controller<HTMLElement> {
     if ((event as CustomEvent).detail?.success) window.requestAnimationFrame(() => this.jump())
   }
 
-  // ── Mentions ───────────────────────────────────────────────────────
+  // ── Unread badges ──────────────────────────────────────────────────
 
   toast (event: CustomEvent<{ channel?: string | null }>): void {
     const slug = event.detail?.channel
-    if (!slug || !/^[\w-]+$/.test(slug)) return // validated, not escaped: jsdom has no CSS.escape
+    if (!slug || !SLUG.test(slug)) return
     if (slug === this.channelValue) {
       if (event.target instanceof HTMLElement) event.target.remove()
       return
     }
-    const row = this.element.querySelector<HTMLElement>(`.uplink-channel[data-channel="${slug}"]`)
-    if (!row) return
-    row.classList.add('uplink-channel--mention')
-    const badge = row.querySelector<HTMLElement>('.uplink-channel-badge')
-    if (badge) badge.hidden = false
+    this.row(slug)?.classList.add('uplink-channel--mention') // the packet's bump shows the count
+  }
+
+  // Each <i> appended into a bump slot (data-channel) is one packet in
+  // that channel: +1 on the row's badge, then the slot is emptied again.
+  private onBumps (records: MutationRecord[]): void {
+    records.forEach(record => {
+      const slot = record.target
+      if (!(slot instanceof HTMLElement) || !slot.dataset.channel) return
+      record.addedNodes.forEach(node => {
+        if (!(node instanceof Element)) return
+        node.remove()
+        this.bump(slot.dataset.channel ?? '')
+      })
+    })
+  }
+
+  private bump (slug: string): void {
+    const row = this.row(slug)
+    const badge = row?.querySelector<HTMLElement>('.uplink-channel-badge')
+    if (!row || !badge) return
+    const count = Number(badge.dataset.count ?? 0) + 1
+    badge.dataset.count = String(count)
+    badge.textContent = count > BADGE_CAP ? `${BADGE_CAP}+` : String(count)
+    badge.hidden = false
+    row.classList.add('uplink-channel--unread')
+  }
+
+  private row (slug: string): HTMLElement | null {
+    if (!SLUG.test(slug)) return null
+    return this.element.querySelector<HTMLElement>(`.uplink-channel[data-channel="${slug}"]`)
+  }
+
+  // ── Read acks (this channel) ───────────────────────────────────────
+
+  private scheduleAck (): void {
+    if (!this.ackUrlValue || !this.pendingAck()) return
+    window.clearTimeout(this.ackTimer)
+    this.ackTimer = window.setTimeout(() => this.ack(false), ACK_DELAY_MS)
+  }
+
+  private flushAck = (): void => {
+    window.clearTimeout(this.ackTimer)
+    this.ackTimer = 0
+    if (this.ackUrlValue && this.pendingAck()) this.ack(true)
+  }
+
+  // The newest packet, when it is above the last acked id and not the
+  // viewer's own (an own send is marked read by its POST already).
+  private pendingAck (): number | null {
+    const last = this.lastPacket()
+    if (!last || last.id <= this.acked) return null
+    if (last.own) {
+      this.acked = last.id
+      return null
+    }
+    return last.id
+  }
+
+  private ack (keepalive: boolean): void {
+    this.ackTimer = 0
+    const id = this.pendingAck()
+    if (id === null) return
+    this.acked = id
+    const body = new URLSearchParams({ channel: this.channelValue, last_read_message_id: String(id) })
+    void fetch(this.ackUrlValue, { method: 'POST', body, credentials: 'same-origin', keepalive }).catch(() => {
+      // Lost ack: the next packet at the bottom (or the next render) marks it.
+    })
+  }
+
+  private lastPacket (): { id: number, own: boolean } | null {
+    const packets = this.element.querySelectorAll<HTMLElement>('#uplink-log .packet')
+    const last = packets[packets.length - 1]
+    const id = Number(last?.id.match(/(\d+)$/)?.[1])
+    if (!last || !Number.isFinite(id)) return null
+    const viewer = document.querySelector<HTMLMetaElement>('meta[name="current-hackr-id"]')?.content
+    return { id, own: !!viewer && last.dataset.packetOwnerIdValue === viewer }
   }
 
   // ── Keys ───────────────────────────────────────────────────────────

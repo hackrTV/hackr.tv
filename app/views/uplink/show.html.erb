@@ -12,5 +12,6 @@
     re-render server-side (the SPA's useStreamStatus isLive equivalent). %>
 <div data-controller="stream-status" data-stream-status-live-value="<%= @live_stream.present? %>">
   <%= render "uplink/shell", channel: @channel, channels: @channels, packets: @packets, more: @more_packets,
-    viewer: current_hackr, live_stream: @live_stream, roster: @roster %>
+    viewer: current_hackr, live_stream: @live_stream, roster: @roster, unread: @unread,
+    unseen_from: @unseen_from, unseen_divider: @unseen_divider %>
 </div>

@@ -4,6 +4,19 @@
       packets, viewer — as uplink/_packet
       more — false when these are the channel's oldest packets; the
              trailing marker is read and removed client-side and flips
-             the sentinel to "// BEGINNING OF CHANNEL //". %>
-<%= render partial: "uplink/packet", collection: packets, as: :packet, locals: {viewer: viewer} %>
+             the sentinel to "// BEGINNING OF CHANNEL //".
+      unseen_from, unseen_divider — the viewer's read mark from the
+             sentinel URL and whether this page holds the boundary: the
+             "// NEW PACKETS //" separator (as uplink/_log_frame draws it,
+             minus the target: it is never scrolled to here). %>
+<%
+  unseen_from = local_assigns.fetch(:unseen_from, nil)
+  unseen_divider = local_assigns.fetch(:unseen_divider, false)
+  seen, fresh = unseen_divider ? packets.partition { |packet| packet.id <= unseen_from } : [packets, []]
+%>
+<%= render partial: "uplink/packet", collection: seen, as: :packet, locals: {viewer: viewer} %>
+<% if fresh.any? %>
+  <div class="uplink-unseen" role="separator" aria-label="New packets">// NEW PACKETS //</div>
+  <%= render partial: "uplink/packet", collection: fresh, as: :packet, locals: {viewer: viewer} %>
+<% end %>
 <% unless more %><template data-log-end></template><% end %>

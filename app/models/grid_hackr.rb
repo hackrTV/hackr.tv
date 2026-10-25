@@ -122,6 +122,7 @@ class GridHackr < ApplicationRecord
   has_many :grid_hackr_track_plays, dependent: :destroy
   has_many :hackr_log_reads, dependent: :destroy
   has_many :codex_entry_reads, dependent: :destroy
+  has_many :uplink_channel_reads, dependent: :destroy
   has_many :hackr_page_views, dependent: :destroy
   has_many :hackr_vod_watches, dependent: :destroy
   has_many :hackr_radio_tunes, dependent: :destroy
