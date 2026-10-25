@@ -73,48 +73,56 @@ minutes: 25
     view and flashes. Drop the original as admin → the quote reads
     `[PACKET DROPPED]` live; restore → the excerpt returns. The dock and
     popout show quote lines but have no reply control.
+13. **Operative record**: click a packet author's `@alias`. → A card pops
+    up beside it — alias in its role color, role badge, `CL<n>`, member
+    since, last active, bio, PACKETS / WIRE PULSES / ECHOES /
+    ACHIEVEMENTS tiles, `[WIRE PROFILE]` — and the page does not
+    navigate. Escape, `[x]`, clicking elsewhere or clicking the same
+    author again closes it; ctrl/middle-click the author → the WIRE
+    profile opens as before. Roster callsigns open nothing. In the dock
+    and popout the author link still goes straight to the WIRE profile.
 
 ## Steps — operatives pane
 
-13. With the second browser on the same channel. → It appears in the
+14. With the second browser on the same channel. → It appears in the
     OPERATIVES pane under its role heading as a callsign (`SIG-XXXXXX`),
     never its alias; your own row shows your real @alias. Close the
     second browser → its row leaves within a few seconds (debounced
     broadcast; needs the job worker running).
-14. A livestream channel (`#live`) while a stream is live. → The stream
+15. A livestream channel (`#live`) while a stream is live. → The stream
     embeds above the log inside the shell; `[-] HIDE VIDEO` collapses it
     (and stops its audio), remembered on reload. The home page embed and
     theater mode are unchanged.
 
 ## Steps — moderation (operative + admin)
 
-15. As admin (moderator role) in `/uplink`: hover another user's packet
+16. As admin (moderator role) in `/uplink`: hover another user's packet
     and drop it. → Packet shows dropped state for everyone live.
-16. Restore it. → Restored live.
-17. The drop control is NOT visible to the non-moderator operative on
+17. Restore it. → Restored live.
+18. The drop control is NOT visible to the non-moderator operative on
     others' packets.
-18. **Squelch** the operative from `/root` → Uplink (punishments). → In
+19. **Squelch** the operative from `/root` → Uplink (punishments). → In
     the operative's `/uplink`, the composer is replaced by the squelch
     notice; sending is impossible. Lift the squelch → composer returns
     (after reload).
-19. **Blackout** the operative. → Uplink is fully blocked with the
+20. **Blackout** the operative. → Uplink is fully blocked with the
     blackout notice. Lift it afterwards.
 
 ## Steps — popout + recovery
 
-20. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
+21. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
     classic single-line panel; live receive + send both work; heartbeat
     keeps it registered while open. The home-page dock is likewise the
     classic panel.
-21. Kill the connection (devtools offline ~10s, restore). → The log
+22. Kill the connection (devtools offline ~10s, restore). → The log
     recovers missed messages (reconnect frame reload) rather than
     silently gapping.
 
 ## Steps — external bridge spot-check (if relay/synthia are running)
 
-22. Send from hackr.tv `/uplink`, including a two-line packet. →
+23. Send from hackr.tv `/uplink`, including a two-line packet. →
     Appears in relay's terminal view (line breaks are plain `\n`).
-23. Send via synthia (or
+24. Send via synthia (or
     `POST /api/admin/uplink/send_packet` with the Bearer token). → The
     packet appears live in `/uplink` attributed to the service account;
     the bridge account never shows in the OPERATIVES pane.

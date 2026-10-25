@@ -8,7 +8,9 @@
     banner, presence and logFrame targets, exactly as on .uplink-panel);
     uplink-shell owns the chrome: drawers under 768px, the members
     toggle, the stage collapse, the jump pill, the / hotkey and the
-    sidebar @ badge from mention toasts.
+    sidebar @ badge from mention toasts; popover owns the operative
+    record card (a turbo-frame in the channel pane that packet author
+    links load — see uplink/profiles/show).
     Locals: channel, channels, packets, viewer, live_stream, roster,
     more (older packets exist — seeds the scrollback sentinel). %>
 <%
@@ -16,11 +18,11 @@
   live = live_stream.present?
   staged = live && channel&.requires_livestream? && live_stream.live_url.present?
 %>
-<div class="uplink-shell" data-controller="uplink uplink-shell" data-members="open" data-drawer=""
+<div class="uplink-shell" data-controller="uplink uplink-shell popover" data-members="open" data-drawer=""
   data-uplink-channel-value="<%= channel&.slug %>"
   data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
   data-uplink-shell-channel-value="<%= channel&.slug %>"
-  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast">
+  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown">
   <nav class="uplink-rail" aria-label="Nodes">
     <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
   </nav>
@@ -76,6 +78,12 @@
 
     <%= render "uplink/body", channel: channel, viewer: viewer, packets: packets, shell: true,
       more: local_assigns.fetch(:more, false) %>
+
+    <%# Operative record popover: empty + hidden until a packet author is
+        clicked; absolute inside .uplink-main (the popover controller
+        clamps it to this pane). target=_top: links in the card navigate
+        the page. %>
+    <%= turbo_frame_tag "uplink-popover", target: "_top", hidden: true, class: "uplink-popover-frame", data: {popover_target: "frame"} %>
   </div>
 
   <aside class="uplink-members-pane" id="uplink-members-pane" data-uplink-shell-target="members" aria-label="Operatives">

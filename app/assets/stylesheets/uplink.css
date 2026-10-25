@@ -65,10 +65,10 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
-/* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster. */
-.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin { color: #00d4ff; }
-.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator { color: #ffaa00; }
-.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative { color: #cc0088; }
+/* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster, the record popover. */
+.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin { color: #00d4ff; }
+.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator { color: #ffaa00; }
+.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative { color: #cc0088; }
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
@@ -281,6 +281,34 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .packet-input-emote { background-color: var(--bg-0); border: 1px solid var(--edge); color: var(--fg-muted); padding: 10px 12px; font-family: inherit; font-size: 14px; cursor: pointer; }
 .packet-input-emote:hover { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-shell .uplink-notice, .uplink-shell .uplink-login-prompt { flex-shrink: 0; }
+
+/* Operative record popover (popover controller): the uplink-popover
+   turbo-frame parked under the clicked author, clamped to .uplink-main
+   (its offset parent), flipped above when there's no room below. Turbo's
+   [busy] marks the fetch in flight on an emptied frame. The card's border
+   is its focus indicator (the frame is focused programmatically). */
+.uplink-popover-frame { display: block; position: absolute; z-index: 12; width: min(320px, calc(100% - 16px)); background-color: var(--bg-1); border: 1px solid var(--accent); box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6); }
+.uplink-popover-frame[hidden] { display: none; }
+.uplink-popover-frame[busy]:empty::before { content: "// RETRIEVING RECORD //"; display: block; padding: 12px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-popover { padding: 12px; font-size: 14px; }
+.uplink-shell .uplink-popover:focus-visible { outline: none; }
+.uplink-popover-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.uplink-popover-alias { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 18px; font-weight: bold; }
+.uplink-popover--missing .uplink-popover-alias { color: var(--fg-faint); font-size: 14px; letter-spacing: 1px; }
+.uplink-popover-badge { flex-shrink: 0; padding: 0 4px; border: 1px solid currentColor; font-size: 12px; line-height: 16px; font-weight: bold; letter-spacing: 1px; }
+.uplink-popover-cl { flex-shrink: 0; color: var(--warn); font-size: 12px; letter-spacing: 1px; }
+.uplink-popover-close { flex-shrink: 0; margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.uplink-popover-close:hover { color: var(--fg-bright); }
+.uplink-popover-meta { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-popover-active--online { color: var(--live); }
+.uplink-popover-bio { margin: 10px 0 0; max-height: 72px; overflow: hidden; color: var(--fg-muted); line-height: 18px; white-space: pre-wrap; word-break: break-word; } /* four lines */
+.uplink-popover-bio--empty { color: var(--fg-faint); }
+.uplink-popover-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin-top: 12px; background-color: var(--edge); border: 1px solid var(--edge); }
+.uplink-popover-stat { padding: 6px 8px; background-color: var(--bg-0); text-align: center; }
+.uplink-popover-stat-value { display: block; color: var(--fg-bright); font-size: 16px; font-weight: bold; }
+.uplink-popover-stat-label { display: block; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-popover-link { display: inline-block; margin-top: 12px; padding: 2px 6px; border: 1px solid var(--edge-bright); color: var(--fg-faint); font-size: 12px; text-decoration: none; }
+.uplink-popover-link:hover { border-color: var(--accent); color: var(--accent-bright); }
 
 /* Operatives pane: role groups of anonymized callsigns. */
 .uplink-members-pane { display: flex; flex-direction: column; min-height: 0; background-color: var(--bg-1); border-left: 1px solid var(--edge); }

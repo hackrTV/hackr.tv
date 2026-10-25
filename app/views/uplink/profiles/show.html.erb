@@ -1,0 +1,35 @@
+<%# Operative record card, rendered into uplink/_shell's uplink-popover
+    turbo-frame (the popover controller places, focuses and closes it).
+    A compact WIRE profile header: alias + role in the shell's role
+    colors, clearance, member since, last active, bio, four stat tiles,
+    link to the full WIRE profile. The host frame targets _top, so every
+    link here (incl. bio @mentions) navigates the page, not the frame. %>
+<% role = uplink_role_class(@hackr.role) %>
+<%= turbo_frame_tag "uplink-popover" do %>
+  <div class="uplink-popover" role="dialog" aria-label="Operative record: @<%= @hackr.hackr_alias %>" tabindex="-1">
+    <header class="uplink-popover-head">
+      <span class="uplink-popover-alias uplink-popover-alias--<%= role %>">@<%= @hackr.hackr_alias %></span>
+      <span class="uplink-popover-badge uplink-popover-badge--<%= role %>"><%= (@hackr.role || "operative").upcase %></span>
+      <span class="uplink-popover-cl">CL<%= @hackr.stat("clearance").to_i %></span>
+      <button type="button" class="uplink-popover-close" aria-label="Close" data-action="click->popover#dismiss">[x]</button>
+    </header>
+    <div class="uplink-popover-meta">
+      <span>MEMBER SINCE <%= @hackr.created_at.strftime("%b %-d, %Y").upcase %></span>
+      <% if @hackr.last_activity_at %>
+        <span class="uplink-popover-active<%= " uplink-popover-active--online" if Time.current - @hackr.last_activity_at < 5.minutes %>">● <%= last_active_label(@hackr.last_activity_at).upcase %></span>
+      <% end %>
+    </div>
+    <% if @hackr.bio.present? %>
+      <p class="uplink-popover-bio"><%= bio_text(@hackr.bio) %></p>
+    <% else %>
+      <p class="uplink-popover-bio uplink-popover-bio--empty">No bio on record.</p>
+    <% end %>
+    <div class="uplink-popover-stats">
+      <% [["PACKETS", @stats[:packets]], ["WIRE PULSES", @stats[:pulses]],
+          ["ECHOES", @stats[:echoes_received]], ["ACHIEVEMENTS", @stats[:achievements]]].each do |label, value| %>
+        <div class="uplink-popover-stat"><span class="uplink-popover-stat-value"><%= value %></span><span class="uplink-popover-stat-label"><%= label %></span></div>
+      <% end %>
+    </div>
+    <%= link_to "[WIRE PROFILE]", wire_user_path(@hackr.hackr_alias.downcase), class: "uplink-popover-link", data: {turbo_frame: "_top"} %>
+  </div>
+<% end %>

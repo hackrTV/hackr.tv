@@ -323,6 +323,37 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
   end
 
+  it "opens the operative record from a packet author without leaving the page, and closes it on Escape and outside clicks" do
+    other.update!(bio: "Grid runner since the first breach.", stats: {"clearance" => 4}, last_activity_at: Time.current)
+    create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Signal check")
+    create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Second packet")
+    log_in!(hackr)
+    visit "/uplink"
+    await_uplink!
+
+    first(".packet-author", text: "@#{other.hackr_alias}").click
+    within("#uplink-popover") do
+      expect(page).to have_css(".uplink-popover-alias", text: "@#{other.hackr_alias}", wait: 10)
+      expect(page).to have_css(".uplink-popover-badge", text: "OPERATIVE")
+      expect(page).to have_content("CL4")
+      expect(page).to have_content("ONLINE NOW")
+      expect(page).to have_content("Grid runner since the first breach.")
+      expect(page).to have_css(".uplink-popover-stat", text: /2\s*PACKETS/)
+      expect(page).to have_link("[WIRE PROFILE]", href: "/wire/#{other.hackr_alias.downcase}")
+    end
+    expect(page).to have_current_path("/uplink") # the author link's own href (the WIRE profile) was not followed
+    expect(page.evaluate_script("document.activeElement.className")).to eq("uplink-popover")
+
+    find(".uplink-popover").send_keys(:escape)
+    expect(page).to have_no_css(".uplink-popover")
+    expect(page).to have_css("#uplink-popover", visible: :hidden)
+
+    first(".packet-author", text: "@#{other.hackr_alias}").click
+    expect(page).to have_css(".uplink-popover-alias", text: "@#{other.hackr_alias}", wait: 10)
+    find(".uplink-chanhead-name").click # anywhere outside the card
+    expect(page).to have_no_css(".uplink-popover")
+  end
+
   it "docks the chat on the live home page and sends from there" do
     create(:hackr_stream, artist: create(:artist), title: "DOCK SESSIONS",
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")

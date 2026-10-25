@@ -202,6 +202,7 @@ Rails.application.routes.draw do
     get "/", to: "uplink#show", as: :uplink
     get "popout", to: "uplink#popout", as: :uplink_popout
     get "log", to: "uplink#log", as: :uplink_log
+    get "profiles/:alias", to: "uplink/profiles#show", as: :uplink_profile, constraints: {alias: /[A-Za-z0-9_]+/}
     post "packets", to: "uplink/packets#create", as: :uplink_packets
     post "packets/:id/drop", to: "uplink/packets#drop", as: :uplink_packet_drop
     post "packets/:id/restore", to: "uplink/packets#restore", as: :uplink_packet_restore

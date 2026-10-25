@@ -1,0 +1,11 @@
+<%# Unknown alias (404): the frame still gets a card, so the viewer sees
+    the miss instead of a stuck "retrieving" state. %>
+<%= turbo_frame_tag "uplink-popover" do %>
+  <div class="uplink-popover uplink-popover--missing" role="dialog" aria-label="Operative record" tabindex="-1">
+    <header class="uplink-popover-head">
+      <span class="uplink-popover-alias">// NO RECORD //</span>
+      <button type="button" class="uplink-popover-close" aria-label="Close" data-action="click->popover#dismiss">[x]</button>
+    </header>
+    <p class="uplink-popover-bio uplink-popover-bio--empty">@<%= params[:alias] %> is not on this NODE.</p>
+  </div>
+<% end %>
