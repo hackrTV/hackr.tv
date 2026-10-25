@@ -64,7 +64,7 @@ RSpec.describe "Uplink pages", type: :request do
       get "/uplink"
 
       body = response.body
-      expect(body).to include('class="uplink-shell" data-controller="uplink uplink-shell"')
+      expect(body).to include('class="uplink-shell" data-controller="uplink uplink-shell popover"')
       expect(body).to include("hackr.tv NODE")
       expect(body).to include('data-uplink-shell-channel-value="ambient"')
       expect(body).to include('data-channel="ops"')
@@ -281,6 +281,25 @@ RSpec.describe "Uplink pages", type: :request do
       expect(body).to include('data-action="click->packet-form#cancelReply"')
     end
 
+    it "mounts the operative record popover: controller + document actions on the shell, the hidden _top frame in the pane, author links carrying the profile url" do
+      create(:chat_message, chat_channel: channel, grid_hackr: other, content: "who am I")
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include('data-controller="uplink uplink-shell popover"')
+      expect(body).to include("turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown")
+      frame = body[/<turbo-frame[^>]*id="uplink-popover"[^>]*>/]
+      expect(frame).to include('target="_top"')
+      expect(frame).to include("hidden")
+      expect(frame).to include('class="uplink-popover-frame"')
+      expect(frame).to include('data-popover-target="frame"')
+      expect(body).to match(%r{<div class="uplink-main"[^>]*>.*?#{Regexp.escape(frame)}.*?</div>\s*<aside class="uplink-members-pane"}m) # inside the pane, not a grid child
+      expect(body).to include(%(href="/wire/#{other.hackr_alias}" data-action="click->popover#open"))
+      expect(body).to include(%(data-popover-url-param="/uplink/profiles/#{other.hackr_alias.downcase}")) # canonical lowercase: mixed case 301s
+    end
+
     it "renders :slug: emotes as images and ships the picker payload on the composer" do
       create(:emote, slug: "wave")
       create(:emote, :disabled, slug: "hidden_one")
@@ -328,6 +347,7 @@ RSpec.describe "Uplink pages", type: :request do
     it "keeps the panel single-line and shell-free (as does the home dock)" do
       create(:hackr_stream, artist: create(:artist), is_live: true,
         live_url: "https://www.youtube.com/watch?v=abc123xyz00")
+      create(:chat_message, chat_channel: live_channel, grid_hackr: other, content: "Popout packet")
       log_in!
 
       get "/uplink/popout"
@@ -339,6 +359,9 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).not_to include("uplink-log-top") # no scrollback sentinel
       expect(response.body).not_to include("packet-reply-bar") # no reply composer (the packet's reply control is CSS-hidden)
       expect(response.body).not_to include('name="reply_to_id"')
+      expect(response.body).not_to include('id="uplink-popover"') # no record popover frame / controller …
+      expect(response.body).not_to include("popover#outside")
+      expect(response.body).to include("click->popover#open") # … so the author link's action is inert and it visits the WIRE profile
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
@@ -426,6 +449,82 @@ RSpec.describe "Uplink pages", type: :request do
       get "/uplink/log", params: {channel: "ambient", before: "abc"}
 
       expect(response).to have_http_status(:bad_request)
+    end
+  end
+
+  describe "GET /uplink/profiles/:alias" do
+    def frame_headers
+      {"Turbo-Frame" => "uplink-popover"}
+    end
+
+    it "requires login" do
+      get "/uplink/profiles/#{other.hackr_alias.downcase}", headers: frame_headers
+
+      expect(response).to have_http_status(:redirect)
+      expect(response.location).to include("/grid/login")
+    end
+
+    it "renders the operative record card into the popover frame: alias + role in shell colors, clearance, member since, online now, bio with mention links, stat tiles, WIRE link" do
+      other.update!(bio: "Grid runner. Ask @#{hackr.hackr_alias} about the breach.", stats: {"clearance" => 7}, last_activity_at: 2.minutes.ago)
+      create_list(:chat_message, 2, chat_channel: channel, grid_hackr: other)
+      create(:pulse, grid_hackr: other, echo_count: 3)
+      log_in!
+
+      get "/uplink/profiles/#{other.hackr_alias.downcase}", headers: frame_headers
+
+      expect(response).to have_http_status(:ok)
+      body = response.body
+      expect(body).to include('<turbo-frame id="uplink-popover">')
+      expect(body).not_to include("header-nav") # frame layout, no site chrome
+      expect(body).to include(%(<div class="uplink-popover" role="dialog" aria-label="Operative record: @#{other.hackr_alias}" tabindex="-1">))
+      expect(body).to include(%(<span class="uplink-popover-alias uplink-popover-alias--operative">@#{other.hackr_alias}</span>))
+      expect(body).to include('<span class="uplink-popover-badge uplink-popover-badge--operative">OPERATIVE</span>')
+      expect(body).to include('<span class="uplink-popover-cl">CL7</span>')
+      expect(body).to include('data-action="click->popover#dismiss"')
+      expect(body).to include("MEMBER SINCE #{other.created_at.strftime("%b %-d, %Y").upcase}")
+      expect(body).to include('<span class="uplink-popover-active uplink-popover-active--online">● ONLINE NOW</span>')
+      expect(body).to include(%(<p class="uplink-popover-bio">#{BioTextRenderer.render(other.bio)}</p>)) # @mention → link, as on the WIRE
+      expect(body).to include(%(class="bio-mention"))
+      expect(body).to include('<span class="uplink-popover-stat-value">2</span><span class="uplink-popover-stat-label">PACKETS</span>')
+      expect(body).to include('<span class="uplink-popover-stat-value">1</span><span class="uplink-popover-stat-label">WIRE PULSES</span>')
+      expect(body).to include('<span class="uplink-popover-stat-value">3</span><span class="uplink-popover-stat-label">ECHOES</span>')
+      expect(body).to include('<span class="uplink-popover-stat-value">0</span><span class="uplink-popover-stat-label">ACHIEVEMENTS</span>')
+      expect(body).to include(%(<a class="uplink-popover-link" data-turbo-frame="_top" href="/wire/#{other.hackr_alias.downcase}">[WIRE PROFILE]</a>))
+    end
+
+    it "looks the alias up case-insensitively (the alias is stored mixed-case, the url is lowercase); operators get their color, no bio reads as such, last active in days" do
+      operator.update!(bio: nil, last_activity_at: 3.days.ago)
+      expect(operator.hackr_alias).not_to eq(operator.hackr_alias.downcase)
+      log_in!
+
+      get "/uplink/profiles/#{operator.hackr_alias.downcase}", headers: frame_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(uplink-popover-alias--operator">@#{operator.hackr_alias}</span>))
+      expect(response.body).to include('uplink-popover-badge--operator">OPERATOR</span>')
+      expect(response.body).to include('<p class="uplink-popover-bio uplink-popover-bio--empty">No bio on record.</p>')
+      expect(response.body).to include('<span class="uplink-popover-active">● ACTIVE 3D AGO</span>')
+      expect(response.body).not_to include("uplink-popover-active--online")
+    end
+
+    it "404s with a NO RECORD card on unknown aliases" do
+      log_in!
+
+      get "/uplink/profiles/nobody_here", headers: frame_headers
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include('<turbo-frame id="uplink-popover">')
+      expect(response.body).to include("// NO RECORD //")
+      expect(response.body).to include("@nobody_here is not on this NODE.")
+      expect(response.body).to include('data-action="click->popover#dismiss"')
+    end
+
+    it "sends a non-frame request to the WIRE profile instead" do
+      log_in!
+
+      get "/uplink/profiles/#{other.hackr_alias.downcase}"
+
+      expect(response).to redirect_to("/wire/#{other.hackr_alias.downcase}")
     end
   end
 

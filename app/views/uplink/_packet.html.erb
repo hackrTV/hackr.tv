@@ -13,7 +13,11 @@
     the model re-broadcasts reply rows when their parent drops/restores);
     clicking the quote jumps to the parent when it is in the log. The
     hover reply control dispatches packet:reply for the shell composer;
-    CSS hides it on the dock/popout, whose composer has no reply bar. %>
+    CSS hides it on the dock/popout, whose composer has no reply bar.
+    The author link opens the shell's operative record popover
+    (popover#open, url in the action param); the dock/popout have no
+    popover controller, so the action is inert and the link visits the
+    WIRE profile as before. %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   bot = packet.source == "SYNTHIA"
@@ -63,8 +67,9 @@
       <span class="packet-content"><% if packet.dropped? %>[PACKET DROPPED]<% else %><%= uplink_packet_text(packet, parsed[2]) %><% end %></span>
     <% else %>
       <% unless bot || bridged %>
-        <a class="packet-author packet-author--<%= uplink_role_class(packet.grid_hackr&.role) %>"
-          href="/wire/<%= packet.grid_hackr&.hackr_alias %>">@<%= packet.grid_hackr&.hackr_alias %></a>
+        <a class="packet-author packet-author--<%= uplink_role_class(packet.grid_hackr.role) %>"
+          href="/wire/<%= packet.grid_hackr.hackr_alias %>" data-action="click->popover#open"
+          data-popover-url-param="<%= uplink_profile_path(packet.grid_hackr.hackr_alias.downcase) %>">@<%= packet.grid_hackr.hackr_alias %></a>
       <% end %>
       <span class="packet-content<%= " packet-content--synthia" if bot %>"><% if packet.dropped? %>[PACKET DROPPED]<% else %><%= uplink_packet_text(packet) %><% end %></span>
     <% end %>
