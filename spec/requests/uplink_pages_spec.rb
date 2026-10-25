@@ -663,8 +663,9 @@ RSpec.describe "Uplink pages", type: :request do
       expect(menu_body).to include("SIG-#{token.upcase} is no longer connected.")
       expect(menu_body).not_to include("formaction")
 
-      get "/uplink/operatives/#{token.upcase}/menu", headers: frame_headers
+      get "/uplink/operatives/ABCDEF/menu", headers: frame_headers # a fixed lettered token: the real one is all digits ~6% of the time and then has no case to redirect
       expect(response).to have_http_status(:moved_permanently) # LowercaseRedirect: hence lowercase tokens in every generated URL
+      expect(response.headers["Location"]).to end_with("/uplink/operatives/abcdef/menu")
     end
 
     it "keeps peers, superiors, oneself and service accounts out of jurisdiction, for the menu (403 frame) and the actions (403 toast)" do
