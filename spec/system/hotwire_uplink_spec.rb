@@ -159,8 +159,8 @@ RSpec.describe "Hotwire uplink", type: :system do
       log_in!(other)
       visit "/uplink"
       await_uplink!
-      # uplink_html + uplink_members + toasts + #trace's bump stream
-      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 4, wait: 10)
+      # uplink_html + uplink_members + uplink_typing + toasts + #trace's bump stream
+      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 5, wait: 10)
       expect(page).to have_no_css(".uplink-channel--unread")
     end
 
@@ -300,8 +300,8 @@ RSpec.describe "Hotwire uplink", type: :system do
       log_in!(other)
       visit "/uplink?channel=trace"
       await_uplink!
-      # uplink_html + uplink_members + the layout's per-hackr toasts stream + #ambient's bump stream
-      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 4, wait: 10)
+      # uplink_html + uplink_members + uplink_typing + the layout's per-hackr toasts stream + #ambient's bump stream
+      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, count: 5, wait: 10)
     end
 
     using_session(:sender) do
@@ -594,6 +594,35 @@ RSpec.describe "Hotwire uplink", type: :system do
         expect(page).to have_css(".packet-reaction.packet-reaction--own", text: "1", wait: 10)
       end
     end
+  end
+
+  it "shows who is composing: the other session's alias while they type, never your own, cleared by the send" do
+    using_session(:viewer) do
+      log_in!(hackr)
+      visit "/uplink"
+      await_uplink!
+      expect(page).to have_css("#uplink-typing")
+      expect(page).to have_no_css("#uplink-typing.uplink-typing--active")
+    end
+
+    log_in!(other)
+    visit "/uplink"
+    await_uplink!
+    find_field("content").send_keys("hel")
+
+    using_session(:viewer) do
+      expect(page).to have_css("#uplink-typing.uplink-typing--active", text: "@#{other.hackr_alias} is transmitting...", wait: 10)
+    end
+    expect(page).to have_no_css("#uplink-typing.uplink-typing--active") # never your own
+
+    find_field("content").send_keys("lo", :enter)
+    expect(page).to have_content("hello", wait: 10)
+
+    using_session(:viewer) do
+      expect(page).to have_content("hello", wait: 10)
+      expect(page).to have_no_css("#uplink-typing.uplink-typing--active", wait: 10)
+    end
+    Uplink::Typing.reset!
   end
 
   it "docks the chat on the live home page and sends from there" do

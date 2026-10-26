@@ -17,8 +17,15 @@ import { Controller } from '@hotwired/stimulus'
 // Escape (after the emote picker had its turn) and a successful send
 // disarm it. The dock/popout composer has no reply targets and ignores
 // the event.
+// Typing (shell only): while the field has text, packet-form:typing is
+// dispatched on the first input and then at most every
+// TYPING_THROTTLE_MS; packet-form:stop-typing on a successful send, a
+// blur or an emptied field. Both bubble to the shell root, whose uplink
+// controller performs them on the cable (uplink/_shell wires the
+// actions; the dock/popout composer is single-line and never dispatches).
 
 const MAX_FIELD_HEIGHT_PX = 160
+const TYPING_THROTTLE_MS = 3000 // Uplink::Typing::THROTTLE
 
 type ComposerField = HTMLInputElement | HTMLTextAreaElement
 
@@ -43,6 +50,8 @@ export default class extends Controller<HTMLElement> {
   private cooldownRemaining = 0
   private baseDisabled = false
   private refocusAfterCooldown = false
+  private typing = false
+  private typingAt = 0
 
   connect (): void {
     this.baseDisabled = this.inputTarget.disabled
@@ -63,12 +72,18 @@ export default class extends Controller<HTMLElement> {
     this.inputTarget.closest('.packet-input-field')?.classList.toggle('packet-input-field--over', over)
     this.refreshDisabled()
     this.autogrow()
+    this.reportTyping()
+  }
+
+  blur (): void {
+    this.stopTyping()
   }
 
   submitted (event: Event): void {
     const detail = (event as CustomEvent).detail
     if (detail?.success) {
       this.inputTarget.value = ''
+      this.stopTyping()
       this.cancelReply()
       if (this.slowModeValue > 0) this.startCooldown(this.slowModeValue)
       this.update()
@@ -120,6 +135,28 @@ export default class extends Controller<HTMLElement> {
 
   private get canReply (): boolean {
     return this.hasReplyToTarget && this.hasReplyBarTarget
+  }
+
+  // ── Typing ─────────────────────────────────────────────────────────
+
+  private reportTyping (): void {
+    if (!this.multilineValue) return
+    if (this.inputTarget.value.trim() === '') {
+      this.stopTyping()
+      return
+    }
+    const now = Date.now()
+    if (this.typing && now - this.typingAt < TYPING_THROTTLE_MS) return
+    this.typing = true
+    this.typingAt = now
+    this.dispatch('typing')
+  }
+
+  private stopTyping (): void {
+    if (!this.typing) return
+    this.typing = false
+    this.typingAt = 0
+    this.dispatch('stop-typing')
   }
 
   private get replying (): boolean {

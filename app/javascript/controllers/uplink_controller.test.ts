@@ -10,7 +10,7 @@ vi.mock('~/lib/actionCableConsumer', () => {
   const subscriptions: Array<Record<string, (...args: unknown[]) => void>> = []
   const create = vi.fn((_params: unknown, callbacks: Record<string, (...args: unknown[]) => void>) => {
     subscriptions.push(callbacks)
-    return { unsubscribe: vi.fn(), ...callbacks }
+    return { unsubscribe: vi.fn(), perform: vi.fn(), ...callbacks }
   })
   return {
     getActionCableConsumer: vi.fn(() => ({ subscriptions: { create } })),
@@ -134,6 +134,17 @@ describe('UplinkController', () => {
 
     expect(cableMock.__create).not.toHaveBeenCalled()
     expect(text().textContent).toBe('Disconnected')
+  })
+
+  it('performs typing / stop_typing on the subscription from the composer events the shell routes here', async () => {
+    await start(FIXTURE.replace('data-controller="uplink"', 'data-controller="uplink" data-action="packet-form:typing->uplink#typing packet-form:stop-typing->uplink#stopTyping"'))
+    const sub = cableMock.__create.mock.results[0]!.value as { perform: ReturnType<typeof vi.fn> }
+    const composer = document.querySelector('[data-uplink-target="logFrame"]')! // any descendant, as the composer is
+
+    composer.dispatchEvent(new CustomEvent('packet-form:typing', { bubbles: true }))
+    composer.dispatchEvent(new CustomEvent('packet-form:stop-typing', { bubbles: true }))
+
+    expect(sub.perform.mock.calls).toEqual([['typing'], ['stop_typing']])
   })
 
   it('unsubscribes on disconnect', async () => {

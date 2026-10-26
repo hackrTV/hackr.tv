@@ -1,0 +1,10 @@
+<%# Typing line (Phase 2 item 8), shell only: who is composing in this
+    channel, by alias, replaced on Uplink::Typing's ["uplink_typing",
+    slug] stream on every touch/stop. Viewer-neutral: the typing
+    Stimulus controller renders the text client-side (minus the viewer's
+    own alias, from the layout's current-hackr-alias meta), leaves the
+    strip blank when nobody is left, and clears it TTL after the last
+    broadcast (a typer who vanished without a stop). The strip keeps its
+    height either way so the composer never shifts. Locals: aliases. %>
+<div id="uplink-typing" class="uplink-typing" role="status" aria-live="polite" data-controller="typing"
+  data-typing-aliases-value="<%= aliases.to_json %>" data-typing-ttl-value="<%= Uplink::Typing::TTL * 1000 %>"></div>

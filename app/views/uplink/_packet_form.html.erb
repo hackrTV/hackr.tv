@@ -14,14 +14,18 @@
     ("REPLYING TO <sender> [x]", hidden until armed). The root listens for
     packet:reply on document — the packet's hover control is not a
     descendant of the composer — and packet-form#reply arms the field;
-    Escape, [x] and a successful send disarm it. %>
+    Escape, [x] and a successful send disarm it. Typing (shell only):
+    packet-form dispatches packet-form:typing (throttled) while the
+    field has text and packet-form:stop-typing on send / blur / an
+    emptied field; the shell root's uplink controller relays them to
+    the cable (uplink/_shell wires the actions; the dock/popout don't). %>
 <%
   multiline = local_assigns.fetch(:multiline, false)
   # The picker's keydown is listed before the composer's so an Enter that
   # picks an emote is already consumed when packet-form sees it.
   field_actions = [
     "input->packet-form#update", "input->emote-picker#update", "keydown->emote-picker#keydown",
-    ("keydown->packet-form#keydown" if multiline),
+    ("keydown->packet-form#keydown" if multiline), ("blur->packet-form#blur" if multiline),
     "keyup->emote-picker#caretMoved", "click->emote-picker#update"
   ].compact.join(" ")
   field_options = {maxlength: 522, autocomplete: "off",

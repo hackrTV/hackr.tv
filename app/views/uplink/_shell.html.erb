@@ -9,7 +9,10 @@
     uplink-shell owns the chrome: drawers under 768px, the members
     toggle, the stage collapse, the jump pill, the / hotkey, the
     sidebar's unread badges (bump stream + read acks) and their mention
-    recolor from toasts; popover owns the operative
+    recolor from toasts; uplink also relays the composer's typing
+    events (packet-form:typing / stop-typing, bubbled from _packet_form)
+    to its LiveChatChannel subscription, and the typing line above the
+    composer listens on the ["uplink_typing", slug] stream; popover owns the operative
     record card (a turbo-frame in the channel pane that packet author
     links load — see uplink/profiles/show), the operator menu (a
     second frame, a grid child, that the [...] on packets and roster rows
@@ -33,7 +36,7 @@
   data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
   data-uplink-shell-channel-value="<%= channel&.slug %>"
   data-uplink-shell-ack-url-value="<%= viewable ? uplink_reads_path : "" %>"
-  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown turbo:submit-end->popover#submitted">
+  data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown turbo:submit-end->popover#submitted packet-form:typing->uplink#typing packet-form:stop-typing->uplink#stopTyping">
   <nav class="uplink-rail" aria-label="Nodes">
     <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
   </nav>
@@ -59,6 +62,7 @@
     <% if viewable %>
       <%= turbo_stream_from "uplink_html", channel.slug %>
       <%= turbo_stream_from Uplink::MembersBroadcaster::STREAM, channel.slug %>
+      <%= turbo_stream_from Uplink::Typing::STREAM, channel.slug %>
     <% end %>
     <div class="uplink-banner" data-uplink-target="banner">Establishing uplink...</div>
 

@@ -3,6 +3,7 @@ import { getActionCableConsumer } from '~/lib/actionCableConsumer'
 
 interface Subscription {
   unsubscribe: () => void
+  perform: (action: string, data?: Record<string, unknown>) => boolean
 }
 
 interface UplinkMessage {
@@ -24,7 +25,10 @@ interface FrameElementLike {
 // reconnect it reloads the log frame so packets broadcast during the gap
 // are recovered — the SPA's initial_packets re-merge equivalent.
 // ActionCable's ConnectionMonitor handles retry/backoff, so there is no
-// manual reconnect button.
+// manual reconnect button. The shell also routes the composer's
+// packet-form:typing / stop-typing events here (uplink/_shell's
+// data-action; the dock/popout wire nothing) and they ride the same
+// subscription as `typing` / `stop_typing` actions for Uplink::Typing.
 export default class extends Controller<HTMLElement> {
   static targets = ['banner', 'presenceDot', 'presenceText', 'logFrame']
   static values = { channel: String, logSrc: String }
@@ -67,6 +71,14 @@ export default class extends Controller<HTMLElement> {
 
   popout (): void {
     window.open('/uplink/popout', 'hackr_uplink_popout', 'popup=yes,width=420,height=680')
+  }
+
+  typing (): void {
+    this.sub?.perform('typing')
+  }
+
+  stopTyping (): void {
+    this.sub?.perform('stop_typing')
   }
 
   private handleConnected (): void {

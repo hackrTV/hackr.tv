@@ -318,6 +318,13 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .packet-input-emote { background-color: var(--bg-0); border: 1px solid var(--edge); color: var(--fg-muted); padding: 10px 12px; font-family: inherit; font-size: 14px; cursor: pointer; }
 .packet-input-emote:hover { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-shell .uplink-notice, .uplink-shell .uplink-login-prompt { flex-shrink: 0; }
+/* Typing line (item 8): the strip between log and composer. Its text is
+   the typing controller's (aliases from the uplink_typing stream,
+   minus the viewer); blank when nobody — the strip keeps its
+   height so the composer never shifts. Indented to the packet content
+   column (meta 48 + padding 8 + gap 8). */
+.uplink-shell .uplink-typing { flex-shrink: 0; height: 20px; padding: 0 12px 0 64px; overflow: hidden; color: var(--fg-faint); font-size: 12px; line-height: 20px; letter-spacing: 1px; white-space: nowrap; text-overflow: ellipsis; }
+.uplink-shell .uplink-typing--active { color: var(--fg-muted); }
 
 /* Operative record popover (popover controller): the uplink-popover
    turbo-frame parked under the clicked author, clamped to .uplink-main
