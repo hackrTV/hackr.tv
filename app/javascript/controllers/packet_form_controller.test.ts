@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { Application } from '@hotwired/stimulus'
 import PacketFormController from './packet_form_controller'
 
@@ -63,7 +63,10 @@ describe('PacketFormController', () => {
     ) as PacketFormController & { submitted: (e: Event) => void }
   }
 
+  // A test that starts twice must stop the first app, or its observers
+  // keep binding every later fixture a second time (double actions).
   async function start (html: string): Promise<void> {
+    application?.stop()
     document.body.innerHTML = html
     application = Application.start()
     application.register('packet-form', PacketFormController)
@@ -222,6 +225,59 @@ describe('PacketFormController', () => {
       armReply('42')
       expect(document.querySelector('[name="reply_to_id"]')).toBeNull()
       expect(escape().defaultPrevented).toBe(false)
+    })
+  })
+
+  describe('typing (shell composer)', () => {
+    let seen: string[]
+    let aborter: AbortController
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      seen = []
+      aborter = new AbortController() // document listeners must not outlive the example
+      document.addEventListener('packet-form:typing', () => seen.push('typing'), { signal: aborter.signal })
+      document.addEventListener('packet-form:stop-typing', () => seen.push('stop'), { signal: aborter.signal })
+    })
+
+    afterEach(() => aborter.abort())
+
+    it('dispatches typing on the first keystroke then at most every 3s, and stop-typing when the field empties, blurs or sends', async () => {
+      await start(textareaFixture().replace('keydown->packet-form#keydown', 'keydown->packet-form#keydown blur->packet-form#blur'))
+      expect(seen).toEqual([]) // connect's update() on an empty field says nothing
+
+      type('h')
+      type('he')
+      expect(seen).toEqual(['typing'])
+      vi.advanceTimersByTime(2999)
+      type('hel')
+      expect(seen).toEqual(['typing'])
+      vi.advanceTimersByTime(1)
+      type('hell')
+      expect(seen).toEqual(['typing', 'typing'])
+
+      type('')
+      expect(seen).toEqual(['typing', 'typing', 'stop'])
+      type('   ')
+      expect(seen).toEqual(['typing', 'typing', 'stop']) // whitespace is not composing
+
+      type('x')
+      input().dispatchEvent(new Event('blur'))
+      expect(seen).toEqual(['typing', 'typing', 'stop', 'typing', 'stop'])
+      input().dispatchEvent(new Event('blur')) // already stopped: quiet
+      expect(seen.length).toBe(5)
+
+      type('y')
+      controller().submitted(new CustomEvent('turbo:submit-end', { detail: { success: true } }))
+      expect(seen).toEqual(['typing', 'typing', 'stop', 'typing', 'stop', 'typing', 'stop'])
+      expect(input().value).toBe('')
+    })
+
+    it('never dispatches from the single-line composer (dock, popout)', async () => {
+      await start(fixture())
+      type('hello')
+      input().dispatchEvent(new Event('blur'))
+      expect(seen).toEqual([])
     })
   })
 

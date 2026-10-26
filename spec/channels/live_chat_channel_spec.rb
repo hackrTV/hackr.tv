@@ -70,4 +70,51 @@ RSpec.describe LiveChatChannel, type: :channel do
     expect(subscription).to be_confirmed
     expect(GridUplinkPresence.in_channel(live).count).to eq(0)
   end
+
+  describe "typing (Phase 2 item 8)" do
+    after { Uplink::Typing.reset! }
+
+    it "relays typing / stop_typing from a hackr who may transmit, and stops them on unsubscribe" do
+      allow(Uplink::Typing).to receive(:touch).and_call_original
+      allow(Uplink::Typing).to receive(:stop).and_call_original
+      stub_connection current_hackr: hackr
+      subscribe(chat_channel: "ambient")
+
+      perform(:typing)
+      expect(Uplink::Typing).to have_received(:touch).with(channel, hackr).once
+      expect(Uplink::Typing.aliases(channel)).to eq([hackr.hackr_alias])
+
+      perform(:stop_typing)
+      expect(Uplink::Typing).to have_received(:stop).with(channel, hackr).once
+      expect(Uplink::Typing.aliases(channel)).to eq([])
+
+      perform(:typing)
+      subscription.unsubscribe_from_channel
+      expect(Uplink::Typing).to have_received(:stop).with(channel, hackr).twice
+      expect(Uplink::Typing.aliases(channel)).to eq([])
+    end
+
+    it "ignores anonymous viewers, squelched hackrs and action-less messages" do
+      allow(Uplink::Typing).to receive(:touch).and_call_original
+      live = create(:chat_channel, :livestream_only, slug: "live")
+      create(:hackr_stream, artist: create(:artist), is_live: true, live_url: "https://www.youtube.com/embed/x")
+      stub_connection current_hackr: nil
+      subscribe(chat_channel: "live")
+      expect(subscription).to be_confirmed
+      perform(:typing)
+      expect(Uplink::Typing).not_to have_received(:touch)
+      expect(Uplink::Typing.aliases(live)).to eq([])
+
+      stub_connection current_hackr: hackr
+      subscribe(chat_channel: "ambient")
+      create(:user_punishment, :squelch, grid_hackr: hackr) # after subscribing: the composer locks on their next load, typing stops now
+      perform(:typing)
+      expect(Uplink::Typing).not_to have_received(:touch)
+
+      perform(:receive, {type: "test"}) # relay/synthia-shaped silence
+      expect(Uplink::Typing).not_to have_received(:touch)
+      expect(Uplink::Typing.aliases(channel)).to eq([])
+      subscription.unsubscribe_from_channel
+    end
+  end
 end

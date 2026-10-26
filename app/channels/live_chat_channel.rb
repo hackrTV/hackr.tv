@@ -62,15 +62,42 @@ class LiveChatChannel < ApplicationCable::Channel
         Rails.logger.info "=== LiveChatChannel: #{current_hackr&.hackr_alias || "Anonymous"} disconnected from #{@channel_slug} ==="
         update_presence_count(chat_channel, -1)
         remove_uplink_presence(chat_channel) if release_presence(chat_channel)
+        Uplink::Typing.stop(chat_channel, current_hackr) if current_hackr
       end
     end
   end
 
+  # Action-less inbound messages: none expected (relay/synthia subscribe
+  # and read; presence is refreshed by the periodic callback).
   def receive(data)
-    # No inbound messages expected — presence is refreshed via periodically callback
+  end
+
+  # Typing indicator (Phase 2 item 8): the /uplink shell composer performs
+  # `typing` (throttled) while its field has text and `stop_typing` on
+  # send / blur / an emptied field; Uplink::Typing fans the channel's
+  # composing aliases out on its own Turbo stream. Cosmetic, so the gate is
+  # "could transmit" minus slow mode: a logged-in hackr the channel is
+  # open to who is neither squelched nor blacked out. Anonymous viewers
+  # (popout) and the dock never send.
+  def typing(_data = {})
+    with_typing_channel { |chat_channel| Uplink::Typing.touch(chat_channel, current_hackr) }
+  end
+
+  def stop_typing(_data = {})
+    with_typing_channel { |chat_channel| Uplink::Typing.stop(chat_channel, current_hackr) }
   end
 
   private
+
+  def with_typing_channel
+    return unless current_hackr && @channel_slug
+
+    chat_channel = ChatChannel.find_by(slug: @channel_slug)
+    return unless chat_channel&.accessible_by?(current_hackr)
+    return if UserPunishment.squelched?(current_hackr) || UserPunishment.blackedout?(current_hackr)
+
+    yield chat_channel
+  end
 
   def send_recent_packets(chat_channel)
     recent_packets = chat_channel.chat_messages

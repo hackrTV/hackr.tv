@@ -5,8 +5,9 @@
     surfaces can't drift. Locals:
       channel, viewer, packets
       shell — true on /uplink: multiline composer, client-side packet
-              grouping + scrollback on the log, and the log wrapped so
-              the shell can float its "new packets" jump pill over it.
+              grouping + scrollback on the log, the log wrapped so the
+              shell can float its "new packets" jump pill over it, and
+              the typing line (uplink/_typing) between log and composer.
       more — shell only: whether packets older than the first exist
              (the scrollback sentinel's initial state).
       unseen_from, unseen_divider — shell only: the viewer's old read
@@ -34,6 +35,7 @@
       <button type="button" class="uplink-jump" hidden data-uplink-shell-target="jump"
         data-action="click->uplink-shell#jump">[v] <span data-uplink-shell-target="jumpCount">NEW PACKETS</span></button>
     </div>
+    <%= render "uplink/typing", aliases: Uplink::Typing.aliases(channel) %>
   <% else %>
     <%= render "uplink/log_frame", packets: packets, viewer: viewer %>
   <% end %>

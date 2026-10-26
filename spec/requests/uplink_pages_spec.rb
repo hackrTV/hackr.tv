@@ -556,12 +556,15 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).not_to include('id="uplink-reactmenu"') # no reaction picker frame; the packet's :) is CSS-hidden, the chips still toggle …
       expect(response.body).to include("packet-react-button", "packet-reactions")
       expect(response.body).to include(%(<meta name="uplink-callsign" content="#{Uplink::Callsign.token(hackr.id)}">)) # … and the reactions controller marks the viewer's own here too
+      expect(response.body).not_to include("uplink-typing") # no typing line, stream or composer relay
+      expect(response.body).not_to include("packet-form#blur")
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
       expect(response.body).to include("live-side-panel--uplink")
       expect(response.body).to include(%(<meta name="uplink-callsign" content="#{Uplink::Callsign.token(hackr.id)}">))
       expect(response.body).not_to include('id="uplink-reactmenu"')
+      expect(response.body).not_to include("uplink-typing")
       expect(response.body).to include('<input type="text" name="content"')
       expect(response.body).not_to include("uplink-shell")
     end
@@ -1728,6 +1731,29 @@ RSpec.describe "Uplink pages", type: :request do
         post "/uplink/packets/0/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
         expect(response).to have_http_status(:not_found)
       end
+    end
+  end
+
+  describe "typing line (Phase 2 item 8)" do
+    after { Uplink::Typing.reset! }
+
+    it "renders the strip between log and composer with the live aliases, subscribes the uplink_typing stream and routes the composer's typing events to the cable" do
+      Uplink::Typing.touch(channel, other)
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to match(%r{<div id="uplink-typing" class="uplink-typing" role="status" aria-live="polite" data-controller="typing"\s+data-typing-aliases-value="\[&quot;#{other.hackr_alias}&quot;\]" data-typing-ttl-value="5000"></div>})
+      expect(body.index('id="uplink-typing"')).to be > body.index('class="uplink-logwrap"')
+      expect(body.index('id="uplink-typing"')).to be < body.index('class="packet-input')
+      expect(body).to include(%(signed-stream-name="#{Turbo::StreamsChannel.signed_stream_name(["uplink_typing", "ambient"])}"))
+      expect(body).to include(%(turbo:submit-end->popover#submitted packet-form:typing->uplink#typing packet-form:stop-typing->uplink#stopTyping"))
+      expect(body).to include("keydown-&gt;packet-form#keydown blur-&gt;packet-form#blur") # the tag helper escapes the field's data-action
+
+      Uplink::Typing.stop(channel, other)
+      get "/uplink"
+      expect(response.body).to include('data-typing-aliases-value="[]" data-typing-ttl-value="5000"')
     end
   end
 end
