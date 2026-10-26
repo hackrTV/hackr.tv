@@ -1,32 +1,33 @@
 import { Controller } from '@hotwired/stimulus'
 import { isModerator, outranks } from '~/utils/uplinkRoles'
+import { jumpToPacket } from '~/utils/packetJump'
 
 // Per-viewer state for uplink packets (pulse-card pattern).
 // Broadcast-inserted packets render viewer-neutral, so on connect this
 // controller:
 //   1. reveals the drop control for the packet's author and for
-//      operators/admins, the restore control for operators/admins, and
-//      the […] operator-menu control for operators/admins who outrank
-//      the author (never their own packet) — read from the layout's
-//      current-hackr metas + the packet's author role value (cosmetic
-//      only; the server re-checks on every action);
+//      operators/admins, the restore and pin/unpin controls for
+//      operators/admins (pinning is curation: any packet, their own
+//      included), and the […] operator-menu control for operators/admins
+//      who outrank the author (never their own packet) — read from the
+//      layout's current-hackr metas + the packet's author role value
+//      (cosmetic only; the server re-checks on every action);
 //   2. rewrites descendant form CSRF tokens from the page meta;
 //   3. localizes the HH:MM timestamp (Packet.tsx rendered client-local);
 //   4. highlights the viewer's own @mentions.
 // Replies: the hover control dispatches packet:reply {id, sender} (bubbles
 // to document, where the shell composer's packet-form listens — the
 // composer is not an ancestor); the quote line's click scrolls the parent
-// into view and flashes it when it is in the log.
-
-const FLASH_MS = 1200
+// into view and flashes it when it is in the log (utils/packetJump).
 
 export default class extends Controller<HTMLElement> {
-  static targets = ['time', 'dropControl', 'restoreControl', 'modControl']
+  static targets = ['time', 'dropControl', 'restoreControl', 'pinControl', 'modControl']
   static values = { ownerId: Number, authorRole: String }
 
   declare readonly timeTargets: HTMLTimeElement[]
   declare readonly dropControlTargets: HTMLElement[]
   declare readonly restoreControlTargets: HTMLElement[]
+  declare readonly pinControlTargets: HTMLElement[]
   declare readonly modControlTargets: HTMLElement[]
   declare readonly ownerIdValue: number
   declare readonly authorRoleValue: string
@@ -45,16 +46,9 @@ export default class extends Controller<HTMLElement> {
     this.dispatch('reply', { detail: { id, sender } })
   }
 
-  // A parent above the loaded history isn't in the DOM: nothing happens
-  // (item 9's around= mode is the eventual answer).
+  // A parent above the loaded history isn't in the DOM: nothing happens.
   jumpToParent (): void {
-    const id = this.element.dataset.replyTo
-    if (!id || !/^\d+$/.test(id)) return
-    const parent = document.getElementById(`chat_message_${id}`)
-    if (!parent) return
-    if (typeof parent.scrollIntoView === 'function') parent.scrollIntoView({ block: 'center' })
-    parent.classList.add('packet--flash')
-    window.setTimeout(() => parent.classList.remove('packet--flash'), FLASH_MS)
+    jumpToPacket(this.element.dataset.replyTo)
   }
 
   private localizeTimes (): void {
@@ -82,6 +76,7 @@ export default class extends Controller<HTMLElement> {
     }
     if (moderator) {
       this.restoreControlTargets.forEach(el => { el.hidden = false })
+      this.pinControlTargets.forEach(el => { el.hidden = false })
     }
     if (moderator && !own && outranks(role, this.authorRoleValue)) {
       this.modControlTargets.forEach(el => { el.hidden = false })

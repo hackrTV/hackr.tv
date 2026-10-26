@@ -62,13 +62,14 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-badge--ttv { color: var(--accent-bright); }
 .packet-badge--yt { color: var(--err); }
 .packet-badge--synthia { color: #00ff88; }
+.packet-badge--pinned { color: var(--warn); }
 
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
 /* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster, the record popover. */
-.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin { color: #00d4ff; }
-.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator { color: #ffaa00; }
-.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative { color: #cc0088; }
+.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin { color: #00d4ff; }
+.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator { color: #ffaa00; }
+.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative { color: #cc0088; }
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
@@ -90,13 +91,15 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet--flash { background-color: rgba(var(--accent-rgb), 0.25); }
 
 /* Per-packet controls: reply (shell only — the dock/popout composer has
-   no reply bar) + the viewer-neutral hidden drop/restore form. */
+   no reply bar) + the viewer-neutral hidden drop/restore form. The pin
+   form is shell-only too (the dock/popout show no pins). */
 .packet-actions { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
 .packet-reply-button, .packet-mod-button { display: none; }
 .uplink-inline-form { display: inline; }
 /* Author display beats the UA [hidden] rule — re-assert it, or the
    viewer-neutral hidden mod controls render for everyone. */
 .uplink-inline-form[hidden] { display: none; }
+.uplink-pin-form { display: none; }
 .packet-action-button { background: transparent; border: none; color: var(--fg-faint); cursor: pointer; padding: 2px 6px; font-size: 0.7rem; opacity: 0.6; font-family: inherit; }
 .packet-action-button:hover { opacity: 1; }
 
@@ -214,11 +217,17 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-chanhead-name { margin: 0; color: var(--fg-bright); font-size: 18px; font-family: inherit; white-space: nowrap; }
 .uplink-chanhead-topic { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-faint); font-size: 14px; border-left: 1px solid var(--edge-bright); padding-left: 10px; }
 .uplink-chanhead-chip { color: var(--warn); font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
-.uplink-chanhead-presence { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; color: var(--fg-faint); font-size: 12px; white-space: nowrap; }
+.uplink-chanhead-presence { display: inline-flex; align-items: center; gap: 6px; min-width: 0; margin-left: auto; color: var(--fg-faint); font-size: 12px; white-space: nowrap; }
+/* The presence line is the only header item allowed to give way: under
+   768px with the pins button added, the buttons would otherwise push
+   [o] OPERATIVES off the pane. */
+.uplink-chanhead-presence .presence-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .uplink-chanhead-button { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; cursor: pointer; white-space: nowrap; }
 .uplink-chanhead-button:hover { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-chanhead-members[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-chanhead-menu { display: none; }
+.uplink-chanhead-count { color: var(--warn); } /* the pinned count; muted like the rest at zero */
+.uplink-chanhead-count[data-count="0"] { color: inherit; }
 
 .uplink-stage { flex-shrink: 0; background-color: #000; border-bottom: 1px solid var(--edge); } /* true black letterbox around the video, like .uplink-banner */
 .uplink-stage-bar { display: flex; align-items: center; gap: 12px; padding: 4px 12px; background-color: var(--bg-1); font-size: 14px; }
@@ -269,6 +278,10 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .packet-actions { position: absolute; top: 2px; right: 8px; opacity: 0; }
 .uplink-shell .packet:hover .packet-actions, .uplink-shell .packet:focus-within .packet-actions { opacity: 1; }
 .uplink-shell .packet-reply-button, .uplink-shell .packet-mod-button:not([hidden]) { display: inline-block; }
+.uplink-shell .uplink-pin-form:not([hidden]) { display: inline; }
+.packet-pin-button--on { color: var(--warn); opacity: 1; } /* this packet is pinned: the control reads "unpin" */
+/* Pinned marker: an inset bar — no padding shift, survives .packet--cont (which hides the PIN badge with the rest of the meta). */
+.uplink-shell .packet--pinned { box-shadow: inset 2px 0 0 0 var(--warn); }
 .uplink-shell .packet-reply-quote { font-size: 14px; line-height: 18px; }
 .uplink-shell .packet.packet--flash { background-color: rgba(var(--accent-rgb), 0.25); } /* beats .packet:hover */
 
@@ -303,8 +316,8 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-popover--missing .uplink-popover-alias { color: var(--fg-faint); font-size: 14px; letter-spacing: 1px; }
 .uplink-popover-badge { flex-shrink: 0; padding: 0 4px; border: 1px solid currentColor; font-size: 12px; line-height: 16px; font-weight: bold; letter-spacing: 1px; }
 .uplink-popover-cl { flex-shrink: 0; color: var(--warn); font-size: 12px; letter-spacing: 1px; }
-.uplink-popover-close, .uplink-modmenu-close { flex-shrink: 0; margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
-.uplink-popover-close:hover, .uplink-modmenu-close:hover { color: var(--fg-bright); }
+.uplink-popover-close, .uplink-modmenu-close, .uplink-pins-close { flex-shrink: 0; margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.uplink-popover-close:hover, .uplink-modmenu-close:hover, .uplink-pins-close:hover { color: var(--fg-bright); }
 .uplink-popover-meta { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
 .uplink-popover-active--online { color: var(--live); }
 .uplink-popover-bio { margin: 10px 0 0; max-height: 72px; overflow: hidden; color: var(--fg-muted); line-height: 18px; white-space: pre-wrap; word-break: break-word; } /* four lines */
@@ -343,6 +356,36 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-modmenu-item--lift { color: var(--ok); }
 .uplink-modmenu-item--lift:hover { color: var(--ok); }
 .uplink-modmenu-item[disabled] { opacity: 0.5; cursor: default; } /* Turbo disables the submitter in flight */
+
+/* Pinned packets panel (popover controller, third frame): the uplink-pins
+   turbo-frame parked under the header's [◆] (align end), over the log
+   top, clamped to .uplink-main. Rows are jump buttons (sender / age /
+   two-line excerpt) with UNPIN beside them for operators. */
+.uplink-pins-frame { display: block; position: absolute; z-index: 12; width: min(440px, calc(100% - 16px)); background-color: var(--bg-1); border: 1px solid var(--warn); box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6); }
+.uplink-pins-frame[hidden] { display: none; }
+.uplink-pins-frame[busy]:empty::before { content: "// RETRIEVING PINS //"; display: block; padding: 8px 12px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-pins { padding: 8px; font-size: 14px; }
+.uplink-shell .uplink-pins:focus-visible { outline: none; }
+.uplink-pins-head { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 0 4px 6px; border-bottom: 1px solid var(--edge); }
+.uplink-pins-kicker { flex-shrink: 0; color: var(--warn); font-size: 12px; letter-spacing: 1px; }
+.uplink-pins-channel { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-bright); font-weight: bold; }
+.uplink-pins-note { margin: 6px 4px 0; color: var(--fg-faint); }
+.uplink-pins-count { margin: 6px 4px 0; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-pins-rows { margin: 0; padding: 0; list-style: none; max-height: min(480px, 60vh); overflow-y: auto; }
+.uplink-pin { display: flex; align-items: flex-start; gap: 6px; padding: 6px 4px; border-bottom: 1px solid var(--edge); }
+.uplink-pin:last-child { border-bottom: none; }
+.uplink-pin:hover { background-color: var(--bg-2); }
+.uplink-pin-jump { flex: 1; min-width: 0; display: block; padding: 0; background: none; border: none; text-align: left; font-family: inherit; color: var(--fg-muted); cursor: pointer; }
+.uplink-pin-meta { display: flex; gap: 8px; font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.uplink-pin-sender { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; letter-spacing: 0; }
+.uplink-pin-sender--synthia { color: #00ff88; }
+.uplink-pin-age { flex-shrink: 0; color: var(--fg-faint); }
+.uplink-pin-excerpt { display: block; margin-top: 2px; max-height: 36px; overflow: hidden; color: var(--fg); font-size: 14px; line-height: 18px; word-break: break-word; } /* two lines */
+.uplink-pin-jump:hover .uplink-pin-excerpt { color: var(--fg-bright); }
+.uplink-pin-unpin-form { flex-shrink: 0; }
+.uplink-pin-unpin { padding: 0 4px; background: none; border: 1px solid transparent; color: var(--fg-faint); font-family: inherit; font-size: 12px; line-height: 16px; letter-spacing: 1px; cursor: pointer; }
+.uplink-pin-unpin:hover { border-color: var(--edge); color: var(--err); }
+.uplink-pin-unpin[disabled] { opacity: 0.5; cursor: default; } /* Turbo disables the submitter in flight */
 
 /* Operatives pane: role groups of anonymized callsigns. */
 .uplink-members-pane { display: flex; flex-direction: column; min-height: 0; background-color: var(--bg-1); border-left: 1px solid var(--edge); }

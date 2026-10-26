@@ -550,6 +550,9 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include("click->popover#open") # … so the author link's action is inert and it visits the WIRE profile
       expect(response.body).not_to include('id="uplink-modmenu"') # no operator menu frame either; the packet's […] stays CSS-hidden
       expect(response.body).to include('data-popover-frame-param="uplink-modmenu"')
+      expect(response.body).not_to include("uplink-chanhead-pins") # no pins button, count or panel frame; the packet's ◆ form is CSS-hidden
+      expect(response.body).not_to include('id="uplink-pins"')
+      expect(response.body).to include("uplink-pin-form")
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
@@ -1227,6 +1230,263 @@ RSpec.describe "Uplink pages", type: :request do
 
       expect(response).to have_http_status(:forbidden)
       expect(packet.reload.dropped).to be(true)
+    end
+  end
+
+  describe "channel pins (GET /uplink/pins, POST /uplink/packets/:id/pin | unpin)" do
+    let!(:packet) { create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Pin candidate") }
+
+    def frame_headers
+      {"Turbo-Frame" => "uplink-pins"}
+    end
+
+    def panel_body
+      response.body[/<turbo-frame id="uplink-pins">.*<\/turbo-frame>/m]
+    end
+
+    it "renders the header's [◆] with the count of pinned active packets, the marker + PIN badge on those rows, and the hidden ◆ control (pin or unpin) on every active row" do
+      pinned = create(:chat_message, :pinned, chat_channel: channel, grid_hackr: other, content: "Pinned signal")
+      create(:chat_message, :pinned, :dropped, chat_channel: channel, grid_hackr: other, content: "Pinned then dropped")
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include(%(class="uplink-chanhead-button uplink-chanhead-pins" title="Pinned packets"))
+      expect(body).to include(%(data-action="click->popover#open" data-popover-url-param="/uplink/pins?channel=ambient"))
+      expect(body).to match(%r{data-popover-frame-param="uplink-pins" data-popover-align-param="end">\[◆\]<span class="uplink-chanhead-label"> PINNED</span>\s+<span id="uplink-pins-count" class="uplink-chanhead-count" data-count="1">1</span>\s*</button>})
+      pins_frame = body[/<turbo-frame [^>]*id="uplink-pins"[^>]*>/] # turbo_frame_tag puts the id last
+      expect(pins_frame).to include('target="_top"', "hidden", 'class="uplink-pins-frame"', 'data-popover-target="frame"')
+      expect(body).to match(/id="chat_message_#{pinned.id}"\s+class="packet packet--pinned"/)
+      expect(body).to include('<span class="packet-badge packet-badge--pinned" title="Pinned">PIN</span>')
+      expect(body.scan("packet-badge--pinned").size).to eq(1) # the plain packet has none (the dropped one is not in the log)
+      expect(body).not_to match(/id="chat_message_#{packet.id}"\s+class="packet packet--pinned"/)
+      # The hover control: pin on the plain row, unpin on the pinned one; hidden until the packet controller reveals it for operators.
+      pin_form = body[%r{<form[^>]*action="/uplink/packets/#{packet.id}/pin"[^>]*>.*?</form>}m]
+      expect(pin_form).to include('hidden="hidden"', 'data-packet-target="pinControl"', 'class="uplink-inline-form uplink-pin-form"', 'method="post"')
+      expect(pin_form).to include('<button class="packet-action-button packet-pin-button" title="Pin packet" type="submit">◆</button>')
+      unpin_form = body[%r{<form[^>]*action="/uplink/packets/#{pinned.id}/unpin"[^>]*>.*?</form>}m]
+      expect(unpin_form).to include('hidden="hidden"', 'data-packet-target="pinControl"')
+      expect(unpin_form).to include('<button class="packet-action-button packet-pin-button packet-pin-button--on" title="Unpin packet" type="submit">◆</button>')
+    end
+
+    it "omits the header button and count on an unviewable channel" do
+      live = create(:chat_channel, :livestream_only, slug: "live", name: "#live")
+      create(:chat_message, :pinned, chat_channel: live, grid_hackr: other, content: "Offline pin")
+      log_in!
+
+      get "/uplink", params: {channel: "live"}
+
+      expect(response.body).to include("#live is only available during livestreams.")
+      expect(response.body).not_to include("uplink-chanhead-pins")
+      expect(response.body).not_to include("uplink-pins-count")
+    end
+
+    describe "GET /uplink/pins" do
+      it "requires login, and outside a frame goes to the channel" do
+        get "/uplink/pins", params: {channel: "ambient"}, headers: frame_headers
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to include("/grid/login")
+
+        log_in!
+        get "/uplink/pins", params: {channel: "ambient"}
+        expect(response).to redirect_to("/uplink?channel=ambient")
+      end
+
+      it "lists the channel's pinned active packets newest pin first — sender, age, excerpt, jump — and no UNPIN for an operative" do
+        first = create(:chat_message, :pinned, chat_channel: channel, grid_hackr: other, pinned_at: 2.hours.ago, created_at: 3.hours.ago,
+          content: "First pin, a fairly long announcement that keeps going on and on. " * 4)
+        second = create(:chat_message, :pinned, chat_channel: channel, grid_hackr: operator, content: "Second pin", pinned_at: 1.hour.ago, created_at: 2.days.ago)
+        create(:chat_message, :pinned, :dropped, chat_channel: channel, grid_hackr: other, content: "Dropped pin")
+        create(:chat_message, :pinned, chat_channel: create(:chat_channel, slug: "trace"), grid_hackr: other, content: "Other channel pin")
+        bridged = create(:chat_message, :pinned, chat_channel: channel, grid_hackr: other, content: "[Twitch] viewer_42: hello from twitch",
+          source: "TTV", pinned_at: 30.minutes.ago, created_at: 50.minutes.ago)
+        create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Never pinned")
+        log_in!(hackr)
+
+        get "/uplink/pins", params: {channel: "ambient"}, headers: frame_headers
+
+        expect(response).to have_http_status(:ok)
+        panel = panel_body
+        expect(panel).to include('class="uplink-pins" role="dialog" tabindex="-1"')
+        expect(panel).to include('aria-label="Pinned packets in #ambient"')
+        expect(panel).to include('<span class="uplink-pins-kicker">PINNED</span>')
+        expect(panel).to include('<span class="uplink-pins-channel">#ambient</span>')
+        expect(panel).to include('data-action="click->popover#dismiss"')
+        expect(panel).to include('<div id="uplink-pins-list" class="uplink-pins-body">')
+        expect(panel).to include('<p class="uplink-pins-count">3 / 50</p>')
+        expect(panel.scan(/id="uplink-pin-(\d+)"/).flatten.map(&:to_i)).to eq([bridged.id, second.id, first.id])
+        expect(panel).to include(%(<button type="button" class="uplink-pin-jump" title="Jump to packet"\n    data-action="click->popover#jump" data-popover-id-param="#{first.id}">))
+        expect(panel).to include(%(<span class="uplink-pin-sender uplink-pin-sender--operative">@#{other.hackr_alias}</span>))
+        expect(panel).to include(%(<span class="uplink-pin-sender uplink-pin-sender--operator">@#{operator.hackr_alias}</span>))
+        expect(panel).to include('<span class="uplink-pin-sender uplink-pin-sender--bridged">TTV viewer_42</span>')
+        expect(panel).to include('<span class="uplink-pin-excerpt">hello from twitch</span>')
+        expect(panel).to include('<span class="uplink-pin-age">3H</span>')
+        expect(panel).to include('<span class="uplink-pin-age">2D</span>')
+        expect(panel).to include('<span class="uplink-pin-age">50M</span>')
+        expect(panel).to match(/<span class="uplink-pin-excerpt">First pin, a fairly long announcement.{80,140}\.\.\.<\/span>/) # 160-char excerpt
+        expect(panel).not_to include("Dropped pin")
+        expect(panel).not_to include("Other channel pin")
+        expect(panel).not_to include("Never pinned")
+        expect(panel).not_to include("UNPIN") # operatives read, never curate
+      end
+
+      it "gives operators an UNPIN per row that asks the popover to stay and the reply to re-render the list" do
+        pinned = create(:chat_message, :pinned, chat_channel: channel, grid_hackr: other, content: "Curated")
+        log_in!(operator)
+
+        get "/uplink/pins", params: {channel: "ambient"}, headers: frame_headers
+
+        panel = panel_body
+        expect(panel).to include(%(<form data-popover-stay="true" data-turbo-frame="_top" class="uplink-pin-unpin-form" method="post" action="/uplink/packets/#{pinned.id}/unpin?from=pins">))
+        expect(panel).to include('<button class="uplink-pin-unpin" title="Unpin packet" type="submit">UNPIN</button>')
+        expect(panel.scan(">UNPIN</button>").size).to eq(1)
+      end
+
+      it "renders the empty state (with the how-to for operators), refuses an off-limits channel inside the frame (403) and 404s an unknown one" do
+        log_in!
+        get "/uplink/pins", params: {channel: "ambient"}, headers: frame_headers
+        expect(response).to have_http_status(:ok)
+        expect(panel_body).to include('<p class="uplink-pins-note">No pinned packets.</p>')
+        expect(panel_body).not_to include("uplink-pins-count")
+
+        create(:chat_channel, :operator_only, slug: "ops", name: "#ops")
+        get "/uplink/pins", params: {channel: "ops"}, headers: frame_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(panel_body).to include('class="uplink-pins uplink-pins--empty"')
+        expect(panel_body).to include("// NO CHANNEL //")
+        expect(panel_body).to include("#ops is outside your clearance.")
+        expect(panel_body).not_to include("uplink-pins-list")
+
+        get "/uplink/pins", params: {channel: "nope"}, headers: frame_headers
+        expect(response).to have_http_status(:not_found)
+        expect(panel_body).to include("That channel is gone.")
+      end
+
+      it "tells operators how to pin when the channel has none" do
+        log_in!(operator)
+
+        get "/uplink/pins", params: {channel: "ambient"}, headers: frame_headers
+
+        expect(panel_body).to include("No pinned packets. Hover a packet and hit ◆ to pin it.")
+      end
+    end
+
+    describe "POST /uplink/packets/:id/pin" do
+      it "lets an operator pin any active packet — their own too: the row re-renders pinned, the header count follows, the moderation log gets a row" do
+        own = create(:chat_message, chat_channel: channel, grid_hackr: operator, content: "Operator's own")
+        log_in!(operator)
+
+        post "/uplink/packets/#{packet.id}/pin", headers: turbo_stream_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(%(action="replace" target="chat_message_#{packet.id}"))
+        expect(response.body).to match(/id="chat_message_#{packet.id}"\s+class="packet packet--pinned"/)
+        expect(response.body).to include('title="Unpin packet"')
+        expect(response.body).to include(%(action="replace" target="uplink-pins-count"))
+        expect(response.body).to include('<span id="uplink-pins-count" class="uplink-chanhead-count" data-count="1">1</span>')
+        expect(response.body).not_to include("uplink-pins-list") # the panel did not send this
+        expect(packet.reload).to be_pinned
+        expect(packet.pinned_by).to eq(operator)
+        expect(ModerationLog.last).to have_attributes(action: "pin_packet", actor: operator, target: other, chat_message: packet)
+
+        post "/uplink/packets/#{own.id}/pin", headers: turbo_stream_headers
+        expect(response).to have_http_status(:ok)
+        expect(own.reload).to be_pinned
+        expect(response.body).to include('data-count="2"')
+        expect(ModerationLog.count).to eq(2)
+      end
+
+      it "is a quiet success on a packet already pinned (a stale row): no second log row" do
+        packet.pin!(operator)
+        log_in!(operator)
+
+        expect { post "/uplink/packets/#{packet.id}/pin", headers: turbo_stream_headers }.not_to change(ModerationLog, :count)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('data-count="1"')
+      end
+
+      it "refuses a dropped packet and a full channel with an error toast (422), and 404s an unknown packet" do
+        log_in!(operator)
+        packet.drop!
+        post "/uplink/packets/#{packet.id}/pin", headers: turbo_stream_headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include(%(action="append" target="toast-region"))
+        expect(response.body).to include("toast--moderation-error")
+        expect(response.body).to include("Cannot pin a dropped packet.")
+        expect(packet.reload).not_to be_pinned
+
+        stub_const("ChatMessage::PIN_CAP", 1)
+        create(:chat_message, :pinned, chat_channel: channel, grid_hackr: other, content: "The one pin")
+        fresh = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "One too many")
+        post "/uplink/packets/#{fresh.id}/pin", headers: turbo_stream_headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include("#ambient already has 1 pinned packets.")
+        expect(fresh.reload).not_to be_pinned
+        expect(ModerationLog.count).to eq(0)
+
+        post "/uplink/packets/0/pin", headers: turbo_stream_headers
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "forbids operatives — the author included" do
+        log_in!(other)
+
+        post "/uplink/packets/#{packet.id}/pin", headers: turbo_stream_headers
+
+        expect(response).to have_http_status(:forbidden)
+        expect(packet.reload).not_to be_pinned
+        expect(ModerationLog.count).to eq(0)
+      end
+    end
+
+    describe "POST /uplink/packets/:id/unpin" do
+      before { packet.pin!(operator) }
+
+      it "lets an operator unpin: the row re-renders plain, the count follows, the log gets a row; from=pins re-renders the panel's list too" do
+        log_in!(operator)
+
+        post "/uplink/packets/#{packet.id}/unpin", headers: turbo_stream_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(%(action="replace" target="chat_message_#{packet.id}"))
+        expect(response.body).not_to include("packet--pinned")
+        expect(response.body).to include('title="Pin packet"')
+        expect(response.body).to include('data-count="0"')
+        expect(response.body).not_to include("uplink-pins-list")
+        expect(packet.reload).not_to be_pinned
+        expect(packet.pinned_by).to be_nil
+        expect(ModerationLog.last).to have_attributes(action: "unpin_packet", actor: operator, target: other, chat_message: packet)
+
+        second = create(:chat_message, :pinned, chat_channel: channel, grid_hackr: other, content: "Still pinned")
+        third = create(:chat_message, :pinned, chat_channel: channel, grid_hackr: other, content: "Leaving")
+        post "/uplink/packets/#{third.id}/unpin", params: {from: "pins"}, headers: turbo_stream_headers
+        expect(response.body).to include(%(action="replace" target="uplink-pins-list"))
+        expect(response.body).to include('<p class="uplink-pins-count">1 / 50</p>')
+        expect(response.body).to include(%(id="uplink-pin-#{second.id}"))
+        expect(response.body).not_to include(%(id="uplink-pin-#{third.id}"))
+        expect(response.body).to include(">UNPIN</button>")
+
+        post "/uplink/packets/#{second.id}/unpin", params: {from: "pins"}, headers: turbo_stream_headers
+        expect(response.body).to include("No pinned packets. Hover a packet and hit ◆ to pin it.")
+      end
+
+      it "is a quiet success on a packet that is not pinned" do
+        packet.unpin!
+        log_in!(operator)
+
+        expect { post "/uplink/packets/#{packet.id}/unpin", headers: turbo_stream_headers }.not_to change(ModerationLog, :count)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "forbids operatives" do
+        log_in!(hackr)
+
+        post "/uplink/packets/#{packet.id}/unpin", headers: turbo_stream_headers
+
+        expect(response).to have_http_status(:forbidden)
+        expect(packet.reload).to be_pinned
+      end
     end
   end
 end

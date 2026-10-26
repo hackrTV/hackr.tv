@@ -1,0 +1,20 @@
+<%# One pinned packet in the panel: sender (colored like the reply quote),
+    age, excerpt. The row is a button that jumps to the packet's row when
+    it is in the loaded log (popover#jump: scroll + flash, then the panel
+    closes); a pin above the loaded history does nothing until item 9's
+    around= mode. UNPIN for operators — from=pins makes the reply
+    re-render this list. Locals: packet, viewer. %>
+<li class="uplink-pin" id="uplink-pin-<%= packet.id %>">
+  <button type="button" class="uplink-pin-jump" title="Jump to packet"
+    data-action="click->popover#jump" data-popover-id-param="<%= packet.id %>">
+    <span class="uplink-pin-meta">
+      <span class="uplink-pin-sender uplink-pin-sender--<%= uplink_packet_sender_class(packet) %>"><%= uplink_packet_sender(packet) %></span>
+      <span class="uplink-pin-age"><%= uplink_time_ago(packet.created_at) %></span>
+    </span>
+    <span class="uplink-pin-excerpt"><%= uplink_packet_excerpt(packet, length: 160) %></span>
+  </button>
+  <% if viewer.at_least_operator? %>
+    <%= button_to "UNPIN", uplink_packet_unpin_path(packet, from: "pins"), method: :post, class: "uplink-pin-unpin",
+      title: "Unpin packet", form_class: "uplink-pin-unpin-form", form: {data: {popover_stay: true, turbo_frame: "_top"}} %>
+  <% end %>
+</li>

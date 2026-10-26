@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeEach } from 'vitest'
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { Application } from '@hotwired/stimulus'
 import PopoverController from './popover_controller'
 
@@ -6,8 +6,9 @@ import PopoverController from './popover_controller'
 // with its document-level actions, the hidden uplink-popover turbo-frame
 // in the channel pane, packet author links carrying the profile URL as
 // an action param, the packet's [...] + a roster row's [...] naming the
-// second frame (uplink-modmenu, a grid child) in their frame param, and
-// a further frame (the log's) whose loads must be ignored. jsdom has no
+// second frame (uplink-modmenu, a grid child) in their frame param, the
+// header's [◆] naming the third (uplink-pins, in the pane), and a
+// further frame (the log's) whose loads must be ignored. jsdom has no
 // layout: rects and offset sizes are stubbed, and the frames'
 // offsetParent is null so the shell root stands in as the clamp box.
 
@@ -17,7 +18,9 @@ function fixture (): string {
          data-action="turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown turbo:submit-end->popover#submitted">
       <div class="uplink-main">
         <h2 id="outside">#ambient</h2>
+        <button id="pins" type="button" class="uplink-chanhead-pins" data-action="click->popover#open" data-popover-url-param="/uplink/pins?channel=ambient" data-popover-frame-param="uplink-pins" data-popover-align-param="end">[◆] 1</button>
         <turbo-frame id="uplink-log-frame"><div id="uplink-log">
+          <div id="chat_message_1" class="packet">p1</div>
           <a id="a1" class="packet-author" href="/wire/xeraen" data-action="click->popover#open" data-popover-url-param="/uplink/profiles/xeraen">@xeraen</a>
           <button id="m1" type="button" class="packet-mod-button" data-action="click->popover#open" data-popover-url-param="/uplink/packets/1/menu" data-popover-frame-param="uplink-modmenu" data-popover-align-param="end">...</button>
           <a id="a2" class="packet-author" href="/wire/ghost" data-action="click->popover#open" data-popover-url-param="/uplink/profiles/ghost">@ghost</a>
@@ -26,6 +29,7 @@ function fixture (): string {
         </div></turbo-frame>
         <form id="composer" class="packet-input-form"></form>
         <turbo-frame id="uplink-popover" class="uplink-popover-frame" target="_top" hidden data-popover-target="frame"></turbo-frame>
+        <turbo-frame id="uplink-pins" class="uplink-pins-frame" target="_top" hidden data-popover-target="frame"></turbo-frame>
       </div>
       <aside class="uplink-members-pane">
         <li class="uplink-member" data-callsign="A1B2C3"><button id="r1" type="button" class="uplink-member-mod" data-action="click->popover#open" data-popover-url-param="/uplink/operatives/a1b2c3/menu" data-popover-frame-param="uplink-modmenu" data-popover-align-param="end">...</button></li>
@@ -36,6 +40,10 @@ function fixture (): string {
 
 const CARD = '<div class="uplink-popover" tabindex="-1">@xeraen <button type="button" class="uplink-popover-close" data-action="click->popover#dismiss">[x]</button></div>'
 const MENU = '<div class="uplink-modmenu" tabindex="-1"><form class="uplink-modmenu-form"><button type="submit" class="uplink-modmenu-item">SQUELCH 10M</button></form></div>'
+const PINS = '<div class="uplink-pins" tabindex="-1"><div id="uplink-pins-list">' +
+  '<button type="button" class="uplink-pin-jump" data-action="click->popover#jump" data-popover-id-param="1">jump 1</button>' +
+  '<button type="button" class="uplink-pin-jump" data-action="click->popover#jump" data-popover-id-param="404">jump 404</button>' +
+  '<form class="uplink-pin-unpin-form" data-popover-stay="true"><button type="submit">UNPIN</button></form></div></div>'
 
 type Box = { left: number, top: number, width: number, height: number }
 
@@ -53,6 +61,7 @@ describe('PopoverController', () => {
   const shell = (): HTMLElement => document.querySelector('.uplink-shell')!
   const frame = (): HTMLElement => document.getElementById('uplink-popover')!
   const menu = (): HTMLElement => document.getElementById('uplink-modmenu')!
+  const pins = (): HTMLElement => document.getElementById('uplink-pins')!
   const author = (id: string): HTMLAnchorElement => document.getElementById(id) as HTMLAnchorElement
   const trigger = (id: string): HTMLButtonElement => document.getElementById(id) as HTMLButtonElement
 
@@ -85,6 +94,8 @@ describe('PopoverController', () => {
     rect(shell(), { left: 0, top: 0, width: 800, height: 600 })
     size(frame(), { offsetWidth: 320, offsetHeight: 0 })
     size(menu(), { offsetWidth: 240, offsetHeight: 0 })
+    size(pins(), { offsetWidth: 440, offsetHeight: 0 })
+    rect(trigger('pins'), { left: 600, top: 10, width: 120, height: 24 })
     rect(author('a1'), { left: 100, top: 300, width: 60, height: 16 })
     rect(author('a2'), { left: 700, top: 560, width: 60, height: 16 })
     rect(trigger('m1'), { left: 760, top: 300, width: 16, height: 16 })
@@ -237,6 +248,47 @@ describe('PopoverController', () => {
     expect(press('Escape', menu().querySelector('.uplink-modmenu')!).defaultPrevented).toBe(true)
     expect(menu().hidden).toBe(true)
     expect(document.activeElement).toBe(trigger('r1'))
+  })
+
+  it('opens the pins panel from the header button into its own frame (align end), stays open when a data-popover-stay form inside finishes — a plain form still closes — and gives way to the next popover', () => {
+    click(trigger('pins'))
+    expect(pins().hidden).toBe(false)
+    expect(pins().getAttribute('src')).toBe('/uplink/pins?channel=ambient')
+    expect(pins().style.left).toBe('280px') // the button's right edge (720) - 440
+    expect(pins().style.top).toBe('38px') // 34 + 4
+    load(pins(), PINS)
+    expect(document.activeElement).toBe(pins().querySelector('.uplink-pins'))
+
+    pins().querySelector('form')!.dispatchEvent(new CustomEvent('turbo:submit-end', { bubbles: true, detail: { success: true } }))
+    expect(pins().hidden).toBe(false) // UNPIN's reply re-renders the list in place
+
+    click(trigger('m1'))
+    expect(pins().hidden).toBe(true) // one popover at a time
+    expect(pins().innerHTML).toBe('')
+    load(menu(), MENU)
+    menu().querySelector('form')!.dispatchEvent(new CustomEvent('turbo:submit-end', { bubbles: true, detail: { success: true } }))
+    expect(menu().hidden).toBe(true)
+  })
+
+  it('jumps from a pins-panel row: scrolls to + flashes the packet and closes the panel; a pin that is not in the log leaves it open', async () => {
+    const scrollIntoView = vi.fn()
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { value: scrollIntoView, configurable: true })
+    click(trigger('pins'))
+    load(pins(), PINS)
+    await Promise.resolve() // Stimulus binds the injected rows' actions on the mutation microtask
+    const rows = pins().querySelectorAll<HTMLButtonElement>('.uplink-pin-jump')
+
+    rows[1].click() // id 404: above the loaded history
+    expect(pins().hidden).toBe(false)
+    expect(scrollIntoView).not.toHaveBeenCalled()
+    expect(document.querySelector('.packet--flash')).toBeNull()
+
+    rows[0].click()
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'center' })
+    expect(scrollIntoView.mock.instances[0]).toBe(document.getElementById('chat_message_1'))
+    expect(document.getElementById('chat_message_1')!.classList.contains('packet--flash')).toBe(true)
+    expect(pins().hidden).toBe(true)
+    expect(pins().innerHTML).toBe('')
   })
 
   it('leaves an Escape another layer already handled alone, and closes before the page is cached', () => {

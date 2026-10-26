@@ -5,7 +5,7 @@
 # external tools write via /api/admin/uplink/send_packet.
 class Uplink::PacketsController < ApplicationController
   before_action :require_login
-  before_action :set_packet, only: %i[drop restore]
+  before_action :set_packet, only: %i[drop restore pin unpin]
 
   REPLY_TARGET_GONE = "Cannot reply: that packet was dropped or is in another channel."
 
@@ -86,6 +86,42 @@ class Uplink::PacketsController < ApplicationController
     replace_packet
   end
 
+  # POST /uplink/packets/:id/pin — operator+ (Phase 2 item 6). Curation,
+  # not moderation: any active packet of the channel qualifies, whoever
+  # wrote it (an operator's own announcement included), so there is no
+  # jurisdiction check and the control sits beside drop, not in the
+  # operator menu. Capped per channel; a packet already pinned is a quiet
+  # success (the row that sent this was stale).
+  def pin
+    return head :forbidden unless current_hackr.at_least_operator?
+    return refuse("Cannot pin a dropped packet.") if @packet.dropped?
+
+    unless @packet.pinned?
+      channel = @packet.chat_channel
+      if channel.pinned_packets.count >= ChatMessage::PIN_CAP
+        return refuse("#{channel.name} already has #{ChatMessage::PIN_CAP} pinned packets.")
+      end
+
+      if @packet.pin!(current_hackr)
+        ModerationLog.log_action(actor: current_hackr, action: "pin_packet", chat_message: @packet, target: @packet.grid_hackr)
+      end
+    end
+
+    replace_packet(pins: true)
+  end
+
+  # POST /uplink/packets/:id/unpin — operator+. `from=pins` says the pins
+  # panel sent it: the reply re-renders the panel's list too.
+  def unpin
+    return head :forbidden unless current_hackr.at_least_operator?
+
+    if @packet.pinned? && @packet.unpin!
+      ModerationLog.log_action(actor: current_hackr, action: "unpin_packet", chat_message: @packet, target: @packet.grid_hackr)
+    end
+
+    replace_packet(pins: true)
+  end
+
   private
 
   # The shell composer is a textarea: browsers submit CRLF, which would
@@ -101,17 +137,36 @@ class Uplink::PacketsController < ApplicationController
   end
 
   # Immediate feedback for the acting viewer; everyone else gets the
-  # model's broadcast replace (idempotent by dom_id).
-  def replace_packet
+  # model's broadcast replace (idempotent by dom_id). `pins:` adds the
+  # shell header's pinned count, and the pins panel's list when the panel
+  # sent the request (from=pins) — it stays open and re-renders in place.
+  def replace_packet(pins: false)
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          helpers.dom_id(@packet),
-          partial: "uplink/packet",
-          locals: {packet: @packet, viewer: current_hackr}
-        )
+        streams = [turbo_stream.replace(helpers.dom_id(@packet), partial: "uplink/packet", locals: {packet: @packet, viewer: current_hackr})]
+        if pins
+          channel = @packet.chat_channel
+          streams << turbo_stream.replace("uplink-pins-count", partial: "uplink/pins_count", locals: {channel: channel})
+          if params[:from] == "pins"
+            streams << turbo_stream.replace("uplink-pins-list", partial: "uplink/pins/list", locals: {channel: channel, viewer: current_hackr})
+          end
+        end
+        render turbo_stream: streams
       end
       format.html { redirect_back fallback_location: uplink_path }
+    end
+  end
+
+  # A pin refused (dropped packet, full channel): the row that sent it is
+  # stale or the channel is full — an error toast says so, as the operator
+  # menu's refusals do.
+  def refuse(message)
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.append("toast-region", partial: "shared/toast_moderation",
+          locals: {message: message, error: true}), status: :unprocessable_entity
+      end
+      format.html { redirect_back fallback_location: uplink_path, flash: {error: message} }
     end
   end
 

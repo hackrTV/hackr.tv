@@ -1,0 +1,7 @@
+<%# The shell header's pinned-packet count, inside the [◆] button. The
+    model re-broadcasts it on every pin/unpin and on a pinned packet's
+    drop/restore (ChatMessage#broadcast_pins_count_html, viewer-neutral),
+    and the pin endpoints replace it for the acting operator at once.
+    Local: channel. %>
+<% count = channel.pinned_packets.count %>
+<span id="uplink-pins-count" class="uplink-chanhead-count" data-count="<%= count %>"><%= count %></span>

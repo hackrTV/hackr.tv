@@ -28,7 +28,7 @@
 #  target_id        (target_id => grid_hackrs.id)
 #
 class ModerationLog < ApplicationRecord
-  ACTIONS = %w[squelch blackout unsquelch unblackout drop_packet restore_packet].freeze
+  ACTIONS = %w[squelch blackout unsquelch unblackout drop_packet restore_packet pin_packet unpin_packet].freeze
 
   belongs_to :actor, class_name: "GridHackr"
   belongs_to :target, class_name: "GridHackr", optional: true

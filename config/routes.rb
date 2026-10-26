@@ -207,6 +207,12 @@ Rails.application.routes.draw do
     post "reads", to: "uplink/reads#create", as: :uplink_reads
     post "packets/:id/drop", to: "uplink/packets#drop", as: :uplink_packet_drop
     post "packets/:id/restore", to: "uplink/packets#restore", as: :uplink_packet_restore
+    # Channel pins (Phase 2 item 6): operator+ pin/unpin from a packet's ◆
+    # (POSTs like drop/restore — one button_to each), the header's [◆]
+    # loads the channel's pinned packets into the shell's uplink-pins frame.
+    post "packets/:id/pin", to: "uplink/packets#pin", as: :uplink_packet_pin
+    post "packets/:id/unpin", to: "uplink/packets#unpin", as: :uplink_packet_unpin
+    get "pins", to: "uplink/pins#show", as: :uplink_pins
     # Operator menu (Phase 2 item 4): inline squelch / blackout / lift. The
     # target is reached through a packet (its author) or a roster callsign,
     # never a bare hackr id, so the menu is no id-to-alias oracle. Callsign

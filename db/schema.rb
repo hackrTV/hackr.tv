@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -77,7 +77,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.string "source"
     t.datetime "updated_at", null: false
     t.integer "reply_to_id"
+    t.datetime "pinned_at"
+    t.integer "pinned_by_id"
     t.index ["chat_channel_id", "created_at"], name: "index_chat_messages_on_chat_channel_id_and_created_at"
+    t.index ["chat_channel_id", "pinned_at"], name: "index_chat_messages_pinned", where: "pinned_at IS NOT NULL"
     t.index ["chat_channel_id"], name: "index_chat_messages_on_chat_channel_id"
     t.index ["dropped"], name: "index_chat_messages_on_dropped"
     t.index ["grid_hackr_id"], name: "index_chat_messages_on_grid_hackr_id"
@@ -1453,6 +1456,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
   add_foreign_key "chat_messages", "chat_channels"
   add_foreign_key "chat_messages", "chat_messages", column: "reply_to_id", on_delete: :nullify
   add_foreign_key "chat_messages", "grid_hackrs"
+  add_foreign_key "chat_messages", "grid_hackrs", column: "pinned_by_id", on_delete: :nullify
   add_foreign_key "chat_messages", "hackr_streams"
   add_foreign_key "codex_entry_reads", "codex_entries"
   add_foreign_key "codex_entry_reads", "grid_hackrs"
