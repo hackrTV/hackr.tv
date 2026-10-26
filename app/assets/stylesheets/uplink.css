@@ -243,8 +243,13 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-userpanel { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background-color: var(--bg-0); border-top: 1px solid var(--edge); font-size: 14px; }
 .uplink-userpanel-alias { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; }
 .uplink-userpanel-role { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
-.uplink-userpanel-link { color: var(--fg-faint); font-size: 12px; text-decoration: none; border: 1px solid var(--edge-bright); padding: 2px 6px; }
-.uplink-userpanel-link:hover { color: var(--accent-bright); border-color: var(--accent); }
+/* Ghost buttons: the shell's bordered 12px controls — the channel
+   header's buttons, the stage toggle, the user panel's link, the jump
+   pill, the search's GO — share one base and one hover; each rule
+   below keeps only what differs. */
+.uplink-chanhead-button, .uplink-stage-toggle, .uplink-userpanel-link, .uplink-jump, .uplink-search-go { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; text-decoration: none; cursor: pointer; }
+.uplink-chanhead-button:hover, .uplink-userpanel-link:hover, .uplink-search-go:hover { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-userpanel-link { color: var(--fg-faint); padding: 2px 6px; }
 
 /* Channel pane: header, stage, log, composer. The uplink banner is
    absolute inside .uplink-main (position: relative), as in the panel. */
@@ -258,8 +263,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
    768px with the pins button added, the buttons would otherwise push
    [o] OPERATIVES off the pane. */
 .uplink-chanhead-presence .presence-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.uplink-chanhead-button { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; cursor: pointer; white-space: nowrap; }
-.uplink-chanhead-button:hover { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-chanhead-button { white-space: nowrap; }
 .uplink-chanhead-members[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-chanhead-menu { display: none; }
 .uplink-chanhead-search[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-bright); }
@@ -270,14 +274,14 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-stage-bar { display: flex; align-items: center; gap: 12px; padding: 4px 12px; background-color: var(--bg-1); font-size: 14px; }
 .uplink-stage-live { color: var(--live); font-weight: bold; animation: feed-blink 2s step-end infinite; }
 .uplink-stage-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-muted); }
-.uplink-stage-toggle { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 2px 8px; font-family: inherit; font-size: 12px; cursor: pointer; }
+.uplink-stage-toggle { padding: 2px 8px; }
 .uplink-stage-toggle:hover { border-color: var(--live); color: var(--live); }
 .uplink-stage-frame { aspect-ratio: 16 / 9; width: min(100%, calc(36dvh * 16 / 9)); margin: 0 auto; }
 .uplink-stage-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
 .uplink-stage--collapsed .uplink-stage-frame { display: none; }
 
 .uplink-logwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.uplink-jump { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 5; background-color: var(--bg-2); border: 1px solid var(--accent); color: var(--accent-bright); padding: 4px 12px; font-family: inherit; font-size: 12px; letter-spacing: 1px; cursor: pointer; }
+.uplink-jump { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 5; background-color: var(--bg-2); border-color: var(--accent); color: var(--accent-bright); padding: 4px 12px; letter-spacing: 1px; }
 .uplink-jump:hover { background-color: var(--accent); color: var(--fg-bright); }
 .uplink-jump--mention { border-color: #ffff00; color: #ffff00; } /* matches .uplink-mention--self */
 .uplink-jump--present { border-color: var(--warn); color: var(--warn); } /* a located log: the present lies below */
@@ -495,8 +499,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-search-field { flex: 1; min-width: 0; height: 28px; padding: 0 8px; background-color: var(--bg-0); border: 1px solid var(--edge-bright); color: var(--fg); font-family: inherit; font-size: 14px; }
 .uplink-search-field::placeholder { color: var(--fg-faint); }
 .uplink-search-field:focus { border-color: var(--accent); }
-.uplink-search-go { flex-shrink: 0; height: 28px; padding: 0 8px; background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); font-family: inherit; font-size: 12px; cursor: pointer; }
-.uplink-search-go:hover { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-search-go { flex-shrink: 0; height: 28px; padding: 0 8px; }
 .uplink-search-frame { display: block; flex: 1; min-height: 0; overflow-y: auto; }
 .uplink-search-frame[busy] .uplink-results { opacity: 0.5; } /* a scan in flight: the old hits dim until the new ones land */
 .uplink-results { padding: 4px 0 8px; font-size: 14px; }

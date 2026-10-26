@@ -33,11 +33,20 @@ class GridUplinkPresence < ApplicationRecord
   scope :in_channel, ->(channel) { where(chat_channel: channel) }
   scope :for_hackr, ->(hackr) { where(grid_hackr: hackr) }
 
-  def self.touch!(hackr, channel)
+  # The unique index settles two first touches racing for one row (the
+  # same hackr subscribing from two processes at once — LiveChatChannel's
+  # subscription refcount is in-process only): the loser retries once
+  # and updates the winner's row instead (no second broadcast — the
+  # winner's create scheduled it).
+  def self.touch!(hackr, channel, attempt: 0)
     presence = find_or_initialize_by(grid_hackr: hackr, chat_channel: channel)
     presence.last_seen_at = Time.current
     presence.save!
     presence
+  rescue ActiveRecord::RecordNotUnique
+    raise if attempt.positive?
+
+    touch!(hackr, channel, attempt: 1)
   end
 
   # destroy (not delete) so the roster hears about it.

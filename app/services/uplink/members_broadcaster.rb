@@ -6,7 +6,15 @@
 # (2s), later changes in the window ride that job — a stream going live
 # makes hundreds of viewers join within seconds, and one render per
 # channel per burst is plenty. The job clears the key before rendering,
-# so a change that lands mid-render schedules the next one. Rides its
+# so a change that lands mid-render schedules the next one. The claim is
+# `write(unless_exist:)`, which solid_cache runs as a locked read-then-
+# write inside a transaction — serialized on our SQLite cache DB, where
+# Rails opens every transaction BEGIN IMMEDIATE (on Postgres/MySQL a row
+# that does not exist yet cannot be locked, so two first claimers could
+# both win there: one duplicate render, nothing worse). solid_cache fails
+# safe on a transient DB error (busy timeout) by returning "held", so the
+# worst case on this stack is one skipped render until the next change;
+# CLAIM_TTL also bounds a claim whose job never ran. Rides its
 # own ["uplink_members", slug] stream so the home dock and popout, which
 # hold the uplink_html stream, never receive roster HTML they can't use.
 # The same render also pushes the channel's sidebar count
