@@ -553,10 +553,15 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).not_to include("uplink-chanhead-pins") # no pins button, count or panel frame; the packet's ◆ form is CSS-hidden
       expect(response.body).not_to include('id="uplink-pins"')
       expect(response.body).to include("uplink-pin-form")
+      expect(response.body).not_to include('id="uplink-reactmenu"') # no reaction picker frame; the packet's :) is CSS-hidden, the chips still toggle …
+      expect(response.body).to include("packet-react-button", "packet-reactions")
+      expect(response.body).to include(%(<meta name="uplink-callsign" content="#{Uplink::Callsign.token(hackr.id)}">)) # … and the reactions controller marks the viewer's own here too
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
       expect(response.body).to include("live-side-panel--uplink")
+      expect(response.body).to include(%(<meta name="uplink-callsign" content="#{Uplink::Callsign.token(hackr.id)}">))
+      expect(response.body).not_to include('id="uplink-reactmenu"')
       expect(response.body).to include('<input type="text" name="content"')
       expect(response.body).not_to include("uplink-shell")
     end
@@ -1486,6 +1491,242 @@ RSpec.describe "Uplink pages", type: :request do
 
         expect(response).to have_http_status(:forbidden)
         expect(packet.reload).to be_pinned
+      end
+    end
+  end
+
+  describe "reactions (GET | POST /uplink/packets/:id/reactions)" do
+    let!(:packet) { create(:chat_message, chat_channel: channel, grid_hackr: other, content: "React to me") }
+    let!(:wave) { create(:emote, slug: "wave") }
+
+    def token(of)
+      Uplink::Callsign.token(of.id)
+    end
+
+    def frame_headers
+      {"Turbo-Frame" => "uplink-reactmenu"}
+    end
+
+    def menu_body
+      response.body[/<turbo-frame id="uplink-reactmenu">.*<\/turbo-frame>/m]
+    end
+
+    # The chip row nests no div: the slice ends at its own close.
+    def chips(id = packet.id)
+      response.body[/<div id="reactions_chat_message_#{id}".*?<\/div>/m]
+    end
+
+    # The let! packet's own create broadcast rendered its chip row, which
+    # loaded `reactions` (empty) on this very instance: read it fresh.
+    def reactions
+      packet.reload.reactions
+    end
+
+    it "renders the chip row under every packet (hidden while empty): one ':emote: N' toggle per emote in first-reaction order, reactors as callsign tokens, a token for an emote that is gone; plus the hover :) and the picker frame" do
+      plain = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Nothing here")
+      create(:chat_message_reaction, chat_message: packet, grid_hackr: other, emote_slug: "wave")
+      create(:chat_message_reaction, chat_message: packet, grid_hackr: hackr, emote_slug: "gone")
+      create(:chat_message_reaction, chat_message: packet, grid_hackr: hackr, emote_slug: "wave")
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      row = chips
+      expect(row).to start_with(%(<div id="reactions_chat_message_#{packet.id}" class="packet-reactions" data-controller="reactions">))
+      expect(row).to include(%(<form class="packet-reaction-form" method="post" action="/uplink/packets/#{packet.id}/reactions?emote_slug=wave"><button class="packet-reaction" title=":wave: × 2" data-reactors="#{token(other)},#{token(hackr)}" data-emote="wave" type="submit">))
+      expect(row).to include(%(<img src="#{wave.chat_url}" alt=":wave:" title=":wave:" class="emote" width="28" height="28" loading="eager"><span class="packet-reaction-count">2</span>))
+      expect(row).to include(%(action="/uplink/packets/#{packet.id}/reactions?emote_slug=gone"><button class="packet-reaction" title=":gone: × 1" data-reactors="#{token(hackr)}" data-emote="gone" type="submit">))
+      expect(row).to include('<span class="packet-reaction-token">:gone:</span><span class="packet-reaction-count">1</span>')
+      expect(row.index("emote_slug=wave")).to be < row.index("emote_slug=gone")
+      expect(row).not_to include(hackr.hackr_alias, other.hackr_alias) # reactors are tokens, never aliases
+      expect(chips(plain.id)).to match(%r{<div id="reactions_chat_message_#{plain.id}" class="packet-reactions" data-controller="reactions" hidden>\s*</div>})
+      expect(body).to match(%r{<button type="button" class="packet-action-button packet-react-button" title="React to packet"\s+data-action="click->popover#open" data-popover-url-param="/uplink/packets/#{packet.id}/reactions"\s+data-popover-frame-param="uplink-reactmenu">:\)</button>})
+      frame = body[/<turbo-frame [^>]*id="uplink-reactmenu"[^>]*>/] # turbo_frame_tag puts the id last
+      expect(frame).to include('target="_top"', 'hidden="hidden"', 'class="uplink-reactmenu-frame"', 'data-popover-target="frame"')
+      expect(body).to include(%(<meta name="uplink-callsign" content="#{token(hackr)}">))
+    end
+
+    it "hides the chips while the packet is dropped (the reactions wait) and shows them again on restore" do
+      create(:chat_message_reaction, chat_message: packet, grid_hackr: hackr, emote_slug: "wave")
+      log_in!(operator)
+
+      post "/uplink/packets/#{packet.id}/drop", headers: turbo_stream_headers
+      expect(chips).to match(%r{<div id="reactions_chat_message_#{packet.id}" class="packet-reactions" data-controller="reactions" hidden>\s*</div>})
+      expect(reactions.count).to eq(1)
+
+      post "/uplink/packets/#{packet.id}/restore", headers: turbo_stream_headers
+      expect(chips).to include(%(title=":wave: × 1" data-reactors="#{token(hackr)}"))
+    end
+
+    describe "GET /uplink/packets/:id/reactions" do
+      it "requires login, and outside a frame goes to the channel" do
+        get "/uplink/packets/#{packet.id}/reactions", headers: frame_headers
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to include("/grid/login")
+
+        log_in!
+        get "/uplink/packets/#{packet.id}/reactions"
+        expect(response).to redirect_to("/uplink?channel=ambient")
+      end
+
+      it "lists every chat-ready emote as a pick in slug order, the viewer's own reactions marked, disabled emotes left out" do
+        create(:emote, slug: "gg")
+        create(:emote, :disabled, slug: "off")
+        create(:chat_message_reaction, chat_message: packet, grid_hackr: hackr, emote_slug: "gg")
+        create(:chat_message_reaction, chat_message: packet, grid_hackr: other, emote_slug: "wave")
+        log_in!
+
+        get "/uplink/packets/#{packet.id}/reactions", headers: frame_headers
+
+        expect(response).to have_http_status(:ok)
+        menu = menu_body
+        expect(menu).to include('class="uplink-reactmenu" role="dialog" tabindex="-1"')
+        expect(menu).to include(%(aria-label="React to @#{other.hackr_alias}"))
+        expect(menu).to include('<span class="uplink-reactmenu-kicker">REACT</span>')
+        expect(menu).to include(%(<span class="uplink-reactmenu-target uplink-reactmenu-target--operative">@#{other.hackr_alias}</span>))
+        expect(menu).to include('data-action="click->popover#dismiss">[x]</button>')
+        expect(menu).to include(%(<form class="uplink-reactmenu-form" data-turbo-frame="_top" action="/uplink/packets/#{packet.id}/reactions" accept-charset="UTF-8" method="post">))
+        expect(menu).to match(%r{<button type="submit" name="emote_slug" value="gg" title=":gg:"\s+class="uplink-reactmenu-emote uplink-reactmenu-emote--on"\s+aria-pressed="true"><img [^>]*alt=":gg:"[^>]*></button>})
+        expect(menu).to match(%r{<button type="submit" name="emote_slug" value="wave" title=":wave:"\s+class="uplink-reactmenu-emote"\s+aria-pressed="false"><img [^>]*alt=":wave:"})
+        expect(menu).not_to include('value="off"')
+        expect(menu.index('value="gg"')).to be < menu.index('value="wave"')
+      end
+
+      it "renders the empty states in the frame at the real status: no emotes, a gone or dropped packet, an off-limits channel" do
+        log_in!
+        Emote.destroy_all
+        get "/uplink/packets/#{packet.id}/reactions", headers: frame_headers
+        expect(response).to have_http_status(:ok)
+        expect(menu_body).to include('<p class="uplink-reactmenu-note">No emotes on the node yet.</p>')
+        expect(menu_body).not_to include("uplink-reactmenu-form")
+
+        packet.drop!
+        get "/uplink/packets/#{packet.id}/reactions", headers: frame_headers
+        expect(response).to have_http_status(:not_found)
+        expect(menu_body).to include('class="uplink-reactmenu uplink-reactmenu--empty"', "// NO PACKET //", '<p class="uplink-reactmenu-note">That packet is gone.</p>')
+        expect(menu_body).not_to include("uplink-reactmenu-form")
+
+        get "/uplink/packets/0/reactions", headers: frame_headers
+        expect(response).to have_http_status(:not_found)
+        expect(menu_body).to include("That packet is gone.")
+
+        live = create(:chat_channel, :livestream_only, slug: "live", name: "#live")
+        offline = create(:chat_message, chat_channel: live, grid_hackr: other, content: "Offline")
+        get "/uplink/packets/#{offline.id}/reactions", headers: frame_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(menu_body).to include("// NO PACKET //", "#live is outside your clearance.")
+      end
+    end
+
+    describe "POST /uplink/packets/:id/reactions" do
+      it "requires login" do
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to include("/grid/login")
+        expect(reactions).to be_empty
+      end
+
+      it "toggles the viewer's reaction: on (the chip row replaces, their token on the chip), off on a second post, stacking on another viewer's emote in first-reaction order" do
+        create(:emote, slug: "gg")
+        create(:chat_message_reaction, chat_message: packet, grid_hackr: other, emote_slug: "gg")
+        log_in!
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(%(<turbo-stream action="replace" target="reactions_chat_message_#{packet.id}">))
+        expect(response.body).not_to include("toast-region")
+        row = chips
+        expect(row).to include(%(title=":gg: × 1" data-reactors="#{token(other)}" data-emote="gg"))
+        expect(row).to include(%(title=":wave: × 1" data-reactors="#{token(hackr)}" data-emote="wave"))
+        expect(row.index('data-emote="gg"')).to be < row.index('data-emote="wave"')
+        expect(reactions.pluck(:grid_hackr_id, :emote_slug)).to eq([[other.id, "gg"], [hackr.id, "wave"]])
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "gg"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:ok)
+        expect(chips).to include(%(title=":gg: × 2" data-reactors="#{token(other)},#{token(hackr)}" data-emote="gg"))
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:ok)
+        expect(chips).not_to include('data-emote="wave"')
+        expect(chips).to include('title=":gg: × 2"')
+        expect(reactions.pluck(:grid_hackr_id, :emote_slug)).to eq([[other.id, "gg"], [hackr.id, "gg"]])
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "gg"}, headers: turbo_stream_headers
+        expect(chips).to include(%(title=":gg: × 1" data-reactors="#{token(other)}"))
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"} # plain HTML: back to the channel
+        expect(response).to redirect_to("/uplink?channel=ambient")
+        expect(reactions.where(grid_hackr: hackr).pluck(:emote_slug)).to eq(["wave"])
+      end
+
+      it "removes a reaction whose emote is no longer chat-ready, but never adds one: an error toast at 422" do
+        create(:emote, :disabled, slug: "off")
+        create(:chat_message_reaction, chat_message: packet, grid_hackr: hackr, emote_slug: "off")
+        log_in!
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "off"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:ok)
+        expect(reactions).to be_empty
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "off"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include('<turbo-stream action="append" target="toast-region">', "toast--moderation-error")
+        expect(response.body).to include('<div class="toast-kicker toast-kicker--moderation">REACTIONS</div>', "Unknown emote.")
+        expect(reactions).to be_empty
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "nope"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: ""}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(reactions).to be_empty
+      end
+
+      it "caps a packet at REACTION_CAP distinct emotes: joining an existing chip still works, a new emote does not" do
+        stub_const("ChatMessage::REACTION_CAP", 1)
+        create(:emote, slug: "gg")
+        create(:chat_message_reaction, chat_message: packet, grid_hackr: other, emote_slug: "gg")
+        log_in!
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include("This packet already has 1 reaction.")
+        expect(reactions.count).to eq(1)
+
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "gg"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:ok)
+        expect(chips).to include('title=":gg: × 2"')
+      end
+
+      it "refuses a dropped packet, a squelched or blacked-out viewer and an off-limits channel at the real status; 404 for a gone packet" do
+        log_in!
+        packet.drop!
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include("Cannot react to a dropped packet.")
+        packet.restore!
+
+        UserPunishment.squelch!(hackr, issued_by: operator, duration_minutes: 10)
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to include("You have been squelched. Please wait for your squelch to expire.")
+
+        UserPunishment.blackout!(hackr, issued_by: operator)
+        post "/uplink/packets/#{packet.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to include("You have been blackedout from Uplink.")
+        expect(reactions).to be_empty
+
+        log_in!(other)
+        live = create(:chat_channel, :livestream_only, slug: "live", name: "#live")
+        offline = create(:chat_message, chat_channel: live, grid_hackr: other, content: "Offline")
+        post "/uplink/packets/#{offline.id}/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).to include("#live is outside your clearance.")
+
+        post "/uplink/packets/0/reactions", params: {emote_slug: "wave"}, headers: turbo_stream_headers
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

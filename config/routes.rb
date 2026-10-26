@@ -213,6 +213,12 @@ Rails.application.routes.draw do
     post "packets/:id/pin", to: "uplink/packets#pin", as: :uplink_packet_pin
     post "packets/:id/unpin", to: "uplink/packets#unpin", as: :uplink_packet_unpin
     get "pins", to: "uplink/pins#show", as: :uplink_pins
+    # Reactions (Phase 2 item 7): GET is the emote picker (the packet's
+    # hover :) loads it into the shell's uplink-reactmenu frame), POST
+    # toggles the viewer's reaction with that emote (the picker's buttons
+    # and the chips themselves both post here).
+    get "packets/:id/reactions", to: "uplink/reactions#menu", as: :uplink_packet_reactions
+    post "packets/:id/reactions", to: "uplink/reactions#toggle"
     # Operator menu (Phase 2 item 4): inline squelch / blackout / lift. The
     # target is reached through a packet (its author) or a roster callsign,
     # never a bare hackr id, so the menu is no id-to-alias oracle. Callsign

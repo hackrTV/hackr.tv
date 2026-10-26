@@ -114,7 +114,7 @@ class UplinkController < ApplicationController
     unseen = @unseen_from ? @channel.chat_messages.active.where("id > ?", @unseen_from).count : 0
     return load_packets unless unseen.between?(RECENT_PACKETS + 1, UNSEEN_PACKETS)
 
-    scope = @channel.chat_messages.active.includes(:grid_hackr, reply_to: :grid_hackr)
+    scope = @channel.chat_messages.active.includes(:grid_hackr, :reactions, reply_to: :grid_hackr)
     context = scope.where("id <= ?", @unseen_from).order(id: :desc).limit(UNSEEN_CONTEXT + 1).to_a
     @more_packets = context.size > UNSEEN_CONTEXT
     @packets = context.first(UNSEEN_CONTEXT).reverse + scope.where("id > ?", @unseen_from).order(id: :asc).to_a
@@ -139,7 +139,7 @@ class UplinkController < ApplicationController
     @more_packets = false
     return unless viewable?
 
-    scope = @channel.chat_messages.active.includes(:grid_hackr, reply_to: :grid_hackr)
+    scope = @channel.chat_messages.active.includes(:grid_hackr, :reactions, reply_to: :grid_hackr)
     scope = scope.where("id < ?", before) if before
     rows = scope.order(id: :desc).limit(limit + 1).to_a
     @more_packets = rows.size > limit

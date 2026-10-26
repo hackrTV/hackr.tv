@@ -2,9 +2,6 @@
 <% content_for :head do %>
   <%# Never restore a stale log / roster / open drawer from a snapshot. %>
   <meta name="turbo-cache-control" content="no-cache">
-  <%# The viewer's own anonymized callsign token — the members controller
-      matches it against the roster rows to reveal "you". %>
-  <meta name="uplink-callsign" content="<%= Uplink::Callsign.token(current_hackr.id) %>">
 <% end %>
 
 <%# stream-status refreshes the page when live state flips, so the
