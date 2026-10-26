@@ -7,9 +7,13 @@
     The uplink Stimulus controller sits on the root (ancestor of the
     banner, presence and logFrame targets, exactly as on .uplink-panel);
     uplink-shell owns the chrome: drawers under 768px, the members
-    toggle, the stage collapse, the jump pill, the / hotkey, the
-    sidebar's unread badges (bump stream + read acks) and their mention
-    recolor from toasts; uplink also relays the composer's typing
+    toggle, the stage collapse, the jump pill (which reads JUMP TO
+    PRESENT on a located log), the / hotkey, the sidebar's unread badges
+    (bump stream + read acks) and their mention recolor from toasts, and
+    the operatives pane's search face (data-pane="search": the form
+    whose GET lands in the uplink-search frame — Uplink::SearchController
+    — and the hits' links, resolved in place when the log has the
+    packet); uplink also relays the composer's typing
     events (packet-form:typing / stop-typing, bubbled from _packet_form)
     to its LiveChatChannel subscription, and the typing line above the
     composer listens on the ["uplink_typing", slug] stream; popover owns the operative
@@ -25,17 +29,22 @@
     more (older packets exist — seeds the scrollback sentinel), unread
     (Uplink::Unread.sync result for the sidebar), unseen_from (the viewer's
     read mark before this visit, nil on first sight) + unseen_divider (this
-    page holds the NEW PACKETS boundary — UplinkController). %>
+    page holds the NEW PACKETS boundary — UplinkController), more_after +
+    focus (a located log: /uplink?around=), search_query (?q= — the pane
+    opens on its search face with these results). %>
 <%
   viewable = channel.present? && channel.viewable_by?(viewer)
   live = live_stream.present?
   staged = live && channel&.requires_livestream? && live_stream.live_url.present?
+  search_query = local_assigns.fetch(:search_query, "").to_s
+  searching = viewable && search_query.present?
 %>
-<div class="uplink-shell" data-controller="uplink uplink-shell popover" data-members="open" data-drawer=""
+<div class="uplink-shell" data-controller="uplink uplink-shell popover" data-members="open" data-drawer="" data-pane="<%= searching ? "search" : "members" %>"
   data-uplink-channel-value="<%= channel&.slug %>"
   data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
   data-uplink-shell-channel-value="<%= channel&.slug %>"
   data-uplink-shell-ack-url-value="<%= viewable ? uplink_reads_path : "" %>"
+  data-uplink-shell-present-url-value="<%= uplink_path(channel: channel&.slug, q: search_query.presence) %>"
   data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast turbo:frame-load->popover#loaded mousedown@document->popover#outside keydown@document->popover#keydown turbo:submit-end->popover#submitted packet-form:typing->uplink#typing packet-form:stop-typing->uplink#stopTyping">
   <nav class="uplink-rail" aria-label="Nodes">
     <%= link_to "h.tv", uplink_path, class: "uplink-rail-node uplink-rail-node--active", title: "hackr.tv NODE", aria: {current: "page"} %>
@@ -85,6 +94,9 @@
         <button type="button" class="uplink-chanhead-button uplink-chanhead-pins" title="Pinned packets"
           data-action="click->popover#open" data-popover-url-param="<%= uplink_pins_path(channel: channel.slug) %>"
           data-popover-frame-param="uplink-pins" data-popover-align-param="end">[◆]<span class="uplink-chanhead-label"> PINNED</span> <%= render "uplink/pins_count", channel: channel %></button>
+        <button type="button" class="uplink-chanhead-button uplink-chanhead-search" title="Search packets"
+          aria-controls="uplink-members-pane" aria-pressed="<%= searching %>"
+          data-uplink-shell-target="searchToggle" data-action="click->uplink-shell#toggleSearch">[/]<span class="uplink-chanhead-label"> SEARCH</span></button>
       <% end %>
       <button type="button" class="uplink-chanhead-button uplink-popout-button" title="Pop out Uplink"
         data-action="click->uplink#popout">[^]</button>
@@ -99,7 +111,8 @@
 
     <%= render "uplink/body", channel: channel, viewer: viewer, packets: packets, shell: true,
       more: local_assigns.fetch(:more, false), unseen_from: local_assigns.fetch(:unseen_from, nil),
-      unseen_divider: local_assigns.fetch(:unseen_divider, false) %>
+      unseen_divider: local_assigns.fetch(:unseen_divider, false),
+      more_after: local_assigns.fetch(:more_after, false), focus: local_assigns.fetch(:focus, nil) %>
 
     <%# Operative record popover: empty + hidden until a packet author is
         clicked; absolute inside .uplink-main (the popover controller
@@ -114,8 +127,31 @@
   </div>
 
   <aside class="uplink-members-pane" id="uplink-members-pane" data-uplink-shell-target="members" aria-label="Operatives">
-    <header class="uplink-members-title">OPERATIVES</header>
+    <header class="uplink-members-title uplink-members-title--roster">OPERATIVES</header>
     <%= render "uplink/members", roster: roster %>
+    <% if viewable %>
+      <%# Search (Phase 2 item 9): the pane's other face. data-pane="search"
+          on the shell root (uplink-shell#toggleSearch, or ?q= on load)
+          shows this instead of the roster, wider, even with the roster
+          preference closed. The form's GET lands in the uplink-search
+          frame (Uplink::SearchController); the frame starts with the hint,
+          or with the ?q= results (src, fetched on connect). %>
+      <section class="uplink-search" aria-label="Search packets" data-uplink-shell-target="search">
+        <header class="uplink-members-title uplink-search-title">SEARCH
+          <button type="button" class="uplink-search-close" aria-label="Close search" data-action="click->uplink-shell#closeSearch">[x]</button>
+        </header>
+        <form class="uplink-search-form" role="search" action="<%= uplink_search_path %>" method="get" data-turbo-frame="uplink-search">
+          <input type="hidden" name="channel" value="<%= channel.slug %>">
+          <input type="text" name="q" value="<%= search_query %>" class="uplink-search-field" placeholder="Scan <%= channel.name %>..." autocomplete="off" maxlength="<%= Uplink::SearchController::QUERY_MAX %>" aria-label="Search <%= channel.name %>"
+            data-uplink-shell-target="searchField" data-action="keydown->uplink-shell#searchKey">
+          <button type="submit" class="uplink-search-go" title="Search" aria-label="Search">[&gt;]</button>
+        </form>
+        <%= turbo_frame_tag "uplink-search", target: "_top", class: "uplink-search-frame",
+          src: (uplink_search_path(channel: channel.slug, q: search_query) if searching) do %>
+          <%= render "uplink/search/results", channel: channel, query: "", results: [], capped: false, error: nil %>
+        <% end %>
+      </section>
+    <% end %>
   </aside>
 
   <div class="uplink-backdrop" data-action="click->uplink-shell#closeDrawers"></div>

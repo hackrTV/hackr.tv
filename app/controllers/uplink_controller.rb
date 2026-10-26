@@ -9,20 +9,32 @@ class UplinkController < ApplicationController
   before_action :require_login, only: [:show]
 
   RECENT_PACKETS = 20 # LiveChatChannel#send_recent_packets parity
-  HISTORY_PACKETS = 40 # one scrollback page (GET /uplink/log?before=)
+  HISTORY_PACKETS = 40 # one scrollback page (GET /uplink/log?before= | after=)
+  AROUND_PACKETS = 20 # either side of a located packet (GET /uplink?around=)
   UNSEEN_PACKETS = 100 # the shell opens at the NEW PACKETS line when this many or fewer are unseen
   UNSEEN_CONTEXT = 5 # seen packets kept above the line for context
 
   # GET /uplink — the NODE shell (uplink/_shell): channel sidebar, channel
   # pane with the live stage on livestream channels, operatives roster.
+  # ?around=<id> (a search hit or a pin beyond the loaded history) opens
+  # the log on that packet instead of the newest ones — the page then
+  # scrolls forward to the present page by page (GET /uplink/log?after=)
+  # — and ?q= opens the pane's search face on that query (a hit's link
+  # carries both, so the results survive the visit).
   def show
     @channels = ChatChannel.active.ordered.to_a
     @channel = resolve_channel(@channels, default_slug: "ambient")
     return redirect_to uplink_path if channel_off_limits?
 
-    @unseen_from = read_mark # the viewer's old mark: read before Uplink::Unread.sync moves it
-    load_packets_for_viewer
-    @unseen_divider = unseen_divider?(@unseen_from)
+    @search_query = Uplink::SearchController.normalize(params[:q])
+    if params[:around].present?
+      # Not an active packet of this channel: the plain page, search kept.
+      return redirect_to uplink_path(channel: @channel&.slug, q: @search_query.presence) unless load_packets_around(params[:around].to_i)
+    else
+      @unseen_from = read_mark # the viewer's old mark: read before Uplink::Unread.sync moves it
+      load_packets_for_viewer
+      @unseen_divider = unseen_divider?(@unseen_from)
+    end
     @live_stream = HackrStream.includes(:artist).current_live
     @roster = Uplink::Roster.for(viewable? ? @channel : nil, viewer: current_hackr)
     # Marks this channel read at its newest packet, seeds caught-up marks
@@ -52,6 +64,10 @@ class UplinkController < ApplicationController
   #     HISTORY_PACKETS older than that id, chronological, plus an end
   #     marker when the channel's beginning was reached; the packet-log
   #     controller splices them in above the first packet.
+  #   * `after=<id>`: the mirror for a located log (show's around= mode):
+  #     the HISTORY_PACKETS newer than that id, chronological, plus the
+  #     end marker once the newest packet is among them; spliced in above
+  #     the bottom sentinel.
   def log
     @channel = ChatChannel.active.find_by(slug: params[:channel])
     return head :not_found unless @channel
@@ -65,6 +81,12 @@ class UplinkController < ApplicationController
       mark = params[:unseen_from].presence&.to_i # the shell's sentinel passes the viewer's old mark along
       locals = {packets: @packets, viewer: current_hackr, more: @more_packets, unseen_from: mark, unseen_divider: unseen_divider?(mark)}
       render partial: "uplink/packets", locals: locals
+    elsif params[:after].present?
+      after = params[:after].to_i
+      return head :bad_request unless after.positive?
+
+      load_packets_after(after)
+      render partial: "uplink/packets", locals: {packets: @packets, viewer: current_hackr, more: @more_after}
     else
       @shell = params[:shell].present?
       load_packets
@@ -128,6 +150,40 @@ class UplinkController < ApplicationController
     return false if mark.nil? || @packets.empty? || @packets.last.id <= mark
 
     @packets.first.id <= mark || !@more_packets
+  end
+
+  # A located log (GET /uplink?around=): the packet with AROUND_PACKETS
+  # active ones either side, the top sentinel seeded as usual and the
+  # bottom one when newer packets remain. No NEW PACKETS line — the
+  # viewer asked for a place, not for what they missed. false when the
+  # id is not an active packet of this channel.
+  def load_packets_around(id)
+    return false unless viewable? && id.positive?
+
+    scope = @channel.chat_messages.active.includes(:grid_hackr, :reactions, reply_to: :grid_hackr)
+    target = scope.find_by(id: id)
+    return false unless target
+
+    older = scope.where("id < ?", id).order(id: :desc).limit(AROUND_PACKETS + 1).to_a
+    newer = scope.where("id > ?", id).order(id: :asc).limit(AROUND_PACKETS + 1).to_a
+    @more_packets = older.size > AROUND_PACKETS
+    @more_after = newer.size > AROUND_PACKETS
+    @packets = older.first(AROUND_PACKETS).reverse + [target] + newer.first(AROUND_PACKETS)
+    @focus = target.id
+    true
+  end
+
+  # The `limit` active packets newer than `after`, chronological, for the
+  # bottom sentinel; one extra row says whether newer ones remain.
+  def load_packets_after(after, limit: HISTORY_PACKETS)
+    @packets = []
+    @more_after = false
+    return unless viewable?
+
+    rows = @channel.chat_messages.active.includes(:grid_hackr, :reactions, reply_to: :grid_hackr)
+      .where("id > ?", after).order(id: :asc).limit(limit + 1).to_a
+    @more_after = rows.size > limit
+    @packets = rows.first(limit)
   end
 
   # Newest `limit` active packets (older than `before` when paging),

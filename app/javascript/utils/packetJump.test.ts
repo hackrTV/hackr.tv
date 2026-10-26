@@ -31,6 +31,16 @@ describe('jumpToPacket', () => {
     expect(scrollIntoView).toHaveBeenCalledTimes(2)
   })
 
+  it('flashes for as long as the caller asks (a located log lingers on its focus)', () => {
+    const packet = document.getElementById('chat_message_7')!
+
+    expect(jumpToPacket(7, 2400)).toBe(true)
+    vi.advanceTimersByTime(1200)
+    expect(packet.classList.contains('packet--flash')).toBe(true)
+    vi.advanceTimersByTime(1200)
+    expect(packet.classList.contains('packet--flash')).toBe(false)
+  })
+
   it('does nothing for a packet that is not in the log, or for anything that is not an id', () => {
     expect(jumpToPacket('999')).toBe(false)
     expect(jumpToPacket('7abc')).toBe(false)

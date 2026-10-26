@@ -1,0 +1,27 @@
+<%# The search frame's body: a kicker + note for the empty states (no
+    channel, blank query, no match) or the count line + one row per hit
+    (uplink/search/_result, newest first). Locals: channel, query,
+    results, capped (more than RESULT_CAP matched — the newest are shown),
+    error (the no-channel message, or nil). %>
+<%
+  results = local_assigns.fetch(:results, [])
+  capped = local_assigns.fetch(:capped, false)
+  error = local_assigns.fetch(:error, nil)
+  cap = Uplink::SearchController::RESULT_CAP
+%>
+<div class="uplink-results<%= " uplink-results--empty" if error %>" role="region" aria-label="Search results">
+  <% if error %>
+    <p class="uplink-results-kicker">// NO CHANNEL //</p>
+    <p class="uplink-results-note"><%= error %></p>
+  <% elsif query.blank? %>
+    <p class="uplink-results-note">Type a term and hit Enter to scan <%= channel.name %>.</p>
+  <% elsif results.empty? %>
+    <p class="uplink-results-kicker">// NO MATCH //</p>
+    <p class="uplink-results-note">Nothing in <%= channel.name %> contains "<%= query %>".</p>
+  <% else %>
+    <p class="uplink-results-count"><% if capped %><%= cap %>+ RESULTS FOR "<%= query %>" (NEWEST <%= cap %> SHOWN)<% else %><%= results.size %> RESULT<%= "S" unless results.size == 1 %> FOR "<%= query %>"<% end %></p>
+    <ol class="uplink-results-rows">
+      <%= render partial: "uplink/search/result", collection: results, as: :packet, locals: {channel: channel, query: query} %>
+    </ol>
+  <% end %>
+</div>

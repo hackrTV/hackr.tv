@@ -55,6 +55,16 @@ module UplinkHelper
     (parsed ? parsed[2] : packet.content).to_s.squish.truncate(length)
   end
 
+  # A search hit's text: every case-insensitive occurrence of the query
+  # wrapped in a <mark>, the rest escaped. Plain text in (the excerpt),
+  # safe HTML out — the result row never runs the packet renderer.
+  def uplink_search_highlight(text, query)
+    return h(text) if query.blank?
+
+    pieces = text.to_s.split(/(#{Regexp.escape(query)})/i)
+    safe_join(pieces.map { |piece| piece.casecmp?(query) ? tag.mark(piece, class: "uplink-result-hit") : piece })
+  end
+
   def uplink_platform_class(source)
     PLATFORM_CLASSES[source]
   end

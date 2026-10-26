@@ -16,17 +16,25 @@
     says this page holds the boundary — then the "// NEW PACKETS //"
     separator renders before the first packet above the mark, the
     controller opens the log scrolled to it when it would sit above the
-    fold, and the packet after it always starts a new author group. %>
+    fold, and the packet after it always starts a new author group.
+    A located log (/uplink?around=, shell only): `focus` is the packet
+    the controller opens on (centered + flashed, instead of the bottom)
+    and `more_after` renders the bottom sentinel, the top one's mirror:
+    while data-more is true the controller fetches newer pages from
+    data-src&after=<last packet id> and splices them in before it,
+    parking live appends until the present is reached. %>
 <%
   group = local_assigns.fetch(:group, false)
   more = local_assigns.fetch(:more, false)
   channel = local_assigns.fetch(:channel, nil)
   unseen_from = local_assigns.fetch(:unseen_from, nil)
   unseen_divider = local_assigns.fetch(:unseen_divider, false)
+  more_after = local_assigns.fetch(:more_after, false)
+  focus = local_assigns.fetch(:focus, nil)
   seen, fresh = unseen_divider ? packets.partition { |packet| packet.id <= unseen_from } : [packets, []]
 %>
 <%= turbo_frame_tag "uplink-log-frame", target: "_top", data: {uplink_target: "logFrame"} do %>
-  <div id="uplink-log" class="packet-log" data-controller="packet-log"<% if group %> data-packet-log-group-value="true"<% end %>>
+  <div id="uplink-log" class="packet-log" data-controller="packet-log"<% if group %> data-packet-log-group-value="true"<% end %><% if focus %> data-packet-log-focus-value="<%= focus %>"<% end %>>
     <div class="uplink-empty">
       <p>No packets yet. Be the first to transmit.</p>
     </div>
@@ -40,6 +48,10 @@
     <% if fresh.any? %>
       <div class="uplink-unseen" role="separator" aria-label="New packets" data-packet-log-target="unseen">// NEW PACKETS //</div>
       <%= render partial: "uplink/packet", collection: fresh, as: :packet, locals: {viewer: viewer} %>
+    <% end %>
+    <% if group && more_after %>
+      <div class="uplink-log-bottom" data-packet-log-target="bottom" data-more="true"
+        data-src="<%= uplink_log_path(channel: channel&.slug) %>"></div>
     <% end %>
   </div>
 <% end %>

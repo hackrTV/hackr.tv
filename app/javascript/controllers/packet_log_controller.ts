@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { jumpToPacket } from '~/utils/packetJump'
 
 // PacketList.tsx pin-to-bottom port, shared with the /grid terminal and
 // breach log: stay pinned while the user is within 50px of the bottom;
@@ -40,32 +41,52 @@ import { Controller } from '@hotwired/stimulus'
 //     it — and the spliced packets never count as unread. Grouping
 //     continues across the page boundary because the old first packet
 //     regroups behind its new predecessor like any other insertion.
+//   A located log (/uplink?around=<id>, Phase 2 item 9): focus=<id>
+//     opens on that packet — centered + flashed — instead of the bottom,
+//     and a `bottom` target (the .uplink-log-bottom sentinel _log_frame
+//     renders when newer packets exist) pages forward the same way:
+//     data-src&after=<last packet id>, spliced in before the sentinel,
+//     the end marker flipping data-more off. Until then the log is
+//     behind the present: a live append would land below the loaded
+//     end, out of order, so it is parked and released — minus what the
+//     final page already carried — once the present is reached; the
+//     state event says atPresent so the host's pill can offer the way
+//     there. The reconnect reload (uplink controller) replaces the frame
+//     with the newest page, so a cable drop ends a located view.
 
 const GROUP_WINDOW_MS = 5 * 60 * 1000
 const BOTTOM_SLACK_PX = 50
 const SCROLLBACK_MARGIN = '160px 0px 0px 0px'
+const SCROLLFORWARD_MARGIN = '0px 0px 160px 0px'
 const UNSEEN_MARGIN_PX = 8
+const FOCUS_FLASH_MS = 2400
 
 function isPacket (node: Node | null | undefined): node is HTMLElement {
   return node instanceof HTMLElement && node.classList.contains('packet')
 }
 
 export default class extends Controller<HTMLElement> {
-  static values = { cap: Number, group: Boolean }
-  static targets = ['top', 'unseen']
+  static values = { cap: Number, group: Boolean, focus: Number }
+  static targets = ['top', 'unseen', 'bottom']
 
   declare readonly capValue: number
   declare readonly groupValue: boolean
+  declare readonly focusValue: number
   declare readonly hasTopTarget: boolean
   declare readonly hasUnseenTarget: boolean
+  declare readonly hasBottomTarget: boolean
   declare readonly unseenTarget: HTMLElement
   declare readonly topTarget: HTMLElement
+  declare readonly bottomTarget: HTMLElement
 
   private observer: MutationObserver | null = null
   private resizeObserver: ResizeObserver | null = null
   private topObserver: IntersectionObserver | null = null
+  private bottomObserver: IntersectionObserver | null = null
   private loading = false
+  private loadingNewer = false
   private history = new Set<string>()
+  private parked: HTMLElement[] = []
   private atBottom = true
   private unread = 0
   private mentions = 0
@@ -83,7 +104,7 @@ export default class extends Controller<HTMLElement> {
 
   connect (): void {
     this.regroupAll()
-    this.scrollToBottom()
+    if (!this.focus()) this.scrollToBottom()
     this.revealUnseen()
     this.element.addEventListener('scroll', this.scrollHandler)
     this.element.addEventListener('load', this.loadHandler, true)
@@ -99,6 +120,12 @@ export default class extends Controller<HTMLElement> {
       }, { root: this.element, rootMargin: SCROLLBACK_MARGIN })
       this.topObserver.observe(this.topTarget)
     }
+    if (this.hasBottomTarget && typeof IntersectionObserver !== 'undefined') {
+      this.bottomObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) void this.loadNewer()
+      }, { root: this.element, rootMargin: SCROLLFORWARD_MARGIN })
+      this.bottomObserver.observe(this.bottomTarget)
+    }
     this.publishState()
   }
 
@@ -111,6 +138,23 @@ export default class extends Controller<HTMLElement> {
     this.resizeObserver = null
     this.topObserver?.disconnect()
     this.topObserver = null
+    this.bottomObserver?.disconnect()
+    this.bottomObserver = null
+    this.parked = []
+  }
+
+  // A located log opens on its focus packet, centered + flashed; the
+  // viewer is then wherever that lands, not pinned to the bottom.
+  private focus (): boolean {
+    if (!this.focusValue || !jumpToPacket(this.focusValue, FOCUS_FLASH_MS)) return false
+    this.atBottom = this.checkAtBottom()
+    return true
+  }
+
+  // The present is below the loaded end while the bottom sentinel still
+  // has pages to fetch.
+  private get atPresent (): boolean {
+    return !this.hasBottomTarget || this.bottomTarget.dataset.more !== 'true'
   }
 
   // Fetch the page before the first packet and splice it in after the
@@ -167,16 +211,81 @@ export default class extends Controller<HTMLElement> {
     if (end) this.topTarget.dataset.more = 'false'
   }
 
+  // Fetch the page after the last packet and splice it in before the
+  // bottom sentinel. Same discipline as loadOlder: one in flight, a
+  // failed page retried on the next intersection.
+  async loadNewer (): Promise<void> {
+    if (!this.hasBottomTarget || this.loadingNewer || this.atPresent) return
+    const src = this.bottomTarget.dataset.src
+    const last = this.lastPacketId()
+    if (!src || !last) return
+
+    const sentinel = this.bottomTarget // gone once the present is reached
+    this.loadingNewer = true
+    sentinel.dataset.loading = 'true'
+    try {
+      const url = new URL(src, window.location.origin)
+      url.searchParams.set('after', last)
+      const response = await fetch(url.toString(), { headers: { Accept: 'text/html' }, credentials: 'same-origin' })
+      if (!response.ok) return
+      this.spliceNewer(await response.text())
+    } catch {
+      // Network failure: retry on the next intersection.
+    } finally {
+      this.loadingNewer = false
+      delete sentinel.dataset.loading
+      if (this.bottomObserver && !this.atPresent) {
+        this.bottomObserver.unobserve(sentinel)
+        this.bottomObserver.observe(sentinel)
+      }
+    }
+  }
+
+  // Newer packets go below the viewport, so nothing to anchor; the first
+  // one regroups behind the old last packet. The end marker means the
+  // present: the sentinel retires outright — a later live append must
+  // find a packet as its previous sibling to group behind — and the
+  // parked appends come out.
+  private spliceNewer (html: string): void {
+    const fragment = document.createRange().createContextualFragment(html)
+    const end = fragment.querySelector('template[data-log-end]')
+    end?.remove()
+    const packets = Array.from(fragment.querySelectorAll<HTMLElement>('.packet'))
+    packets.forEach(packet => this.history.add(packet.id))
+    this.bottomTarget.before(fragment)
+    packets.forEach(packet => this.regroup(packet))
+    if (end) {
+      this.bottomTarget.remove()
+      this.release()
+    }
+    this.atBottom = this.checkAtBottom()
+    this.publishState()
+  }
+
+  // Live packets parked while the log was behind the present: append the
+  // ones the final page did not already carry — as the arrivals they are
+  // (counted, grouped, pinned to like any other append).
+  private release (): void {
+    this.parked.splice(0).forEach(packet => {
+      if (!document.getElementById(packet.id)) this.element.append(packet)
+    })
+  }
+
   private firstPacketId (): string | null {
     const first = this.element.querySelector<HTMLElement>('.packet')
-    const match = first?.id.match(/(\d+)$/)
-    return match ? match[1] : null
+    return first?.id.match(/(\d+)$/)?.[1] ?? null
+  }
+
+  private lastPacketId (): string | null {
+    const packets = this.element.querySelectorAll<HTMLElement>('.packet')
+    return packets[packets.length - 1]?.id.match(/(\d+)$/)?.[1] ?? null
   }
 
   private onMutations (records: MutationRecord[]): void {
     this.trim()
     let arrived = 0
     let mentioned = 0
+    let landed = false // anything but a spliced page: an append, a replace, a removal
     records.forEach(record => {
       // A Turbo replace (drop/restore) removes and adds the same id in one
       // record: regroup it, but it is not a new packet.
@@ -184,6 +293,14 @@ export default class extends Controller<HTMLElement> {
       record.addedNodes.forEach(node => {
         if (!isPacket(node)) return
         const spliced = this.history.delete(node.id)
+        if (!spliced && !replaced.has(node.id) && !this.atPresent) {
+          // Behind the present: a live append would sit below the loaded
+          // end, out of order. Park it until the forward pages get there.
+          node.remove()
+          this.parked.push(node)
+          return
+        }
+        if (!spliced) landed = true
         if (!spliced && !replaced.has(node.id) && this.fromOthers(node)) {
           arrived += 1
           if (this.mentionsViewer(node)) mentioned += 1
@@ -191,10 +308,14 @@ export default class extends Controller<HTMLElement> {
         this.regroup(node)
         this.regroup(node.nextElementSibling)
       })
-      if (record.removedNodes.length > 0) this.regroup(record.nextSibling)
+      if (record.removedNodes.length > 0) {
+        if (Array.from(record.removedNodes).some(isPacket)) landed = true
+        this.regroup(record.nextSibling)
+      }
     })
     if (this.atBottom) {
-      this.scrollToBottom()
+      // A spliced page alone never re-pins: the viewer is reading there.
+      if (landed) this.scrollToBottom()
       if (arrived > 0) this.publishState() // seen at the bottom: the shell acks it as read
     } else if (arrived > 0) {
       this.unread += arrived
@@ -234,7 +355,7 @@ export default class extends Controller<HTMLElement> {
   }
 
   private publishState (): void {
-    this.dispatch('state', { detail: { atBottom: this.atBottom, unread: this.unread, mentions: this.mentions } })
+    this.dispatch('state', { detail: { atBottom: this.atBottom, unread: this.unread, mentions: this.mentions, atPresent: this.atPresent } })
   }
 
   private trim (): void {

@@ -1,17 +1,21 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { Application } from '@hotwired/stimulus'
+import { Turbo } from '@hotwired/turbo-rails'
 import UplinkShellController from './uplink_shell_controller'
 
+vi.mock('@hotwired/turbo-rails', () => ({ Turbo: { visit: vi.fn() } }))
+
 // Fixture mirrors uplink/_shell's chrome: sidebar (rows with unread
-// badges + the hidden bump block) + members panes, the main pane with a
-// log of packets, backdrop, jump pill, stage, composer. matchMedia is
-// stubbed per example to flip the mobile breakpoint.
+// badges + the hidden bump block) + members panes (the roster and the
+// search face with two hits), the main pane with a log of packets,
+// backdrop, jump pill, stage, composer. matchMedia is stubbed per
+// example to flip the mobile breakpoint.
 
 let mobile = false
 
 function fixture (withStage = true): string {
   return `
-    <div class="uplink-shell" data-controller="uplink-shell" data-members="open" data-drawer="" data-uplink-shell-channel-value="ambient" data-uplink-shell-ack-url-value="/uplink/reads"
+    <div class="uplink-shell" data-controller="uplink-shell" data-members="open" data-drawer="" data-pane="members" data-uplink-shell-channel-value="ambient" data-uplink-shell-ack-url-value="/uplink/reads" data-uplink-shell-present-url-value="/uplink?channel=ambient"
          data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast">
       <aside data-uplink-shell-target="sidebar">
         <a href="/uplink?channel=ambient" id="first-channel" class="uplink-channel uplink-channel--active" data-channel="ambient">#ambient<span class="uplink-channel-badge" hidden data-count="0"></span></a>
@@ -26,6 +30,7 @@ function fixture (withStage = true): string {
       <div data-uplink-shell-target="main">
         <button type="button" data-uplink-shell-target="membersToggle" data-action="click->uplink-shell#toggleMembers" aria-pressed="true">[o]</button>
         <button type="button" id="sidebar-toggle" data-action="click->uplink-shell#toggleSidebar">[#]</button>
+        <button type="button" data-uplink-shell-target="searchToggle" data-action="click->uplink-shell#toggleSearch" aria-pressed="false">[/]</button>
         ${withStage ? `
         <section class="uplink-stage" data-uplink-shell-target="stage">
           <button type="button" data-uplink-shell-target="stageToggle" data-action="click->uplink-shell#toggleStage">[-] HIDE VIDEO</button>
@@ -36,7 +41,16 @@ function fixture (withStage = true): string {
         <form class="packet-input-form"><textarea class="packet-input-text"></textarea></form>
         <input id="other-field">
       </div>
-      <aside data-uplink-shell-target="members"><button id="first-member">x</button></aside>
+      <aside data-uplink-shell-target="members"><button id="first-member">x</button>
+        <section class="uplink-search" data-uplink-shell-target="search">
+          <button type="button" id="search-close" data-action="click->uplink-shell#closeSearch">[x]</button>
+          <input type="text" class="uplink-search-field" data-uplink-shell-target="searchField" data-action="keydown->uplink-shell#searchKey">
+          <turbo-frame id="uplink-search">
+            <a id="hit-41" href="/uplink?around=41&channel=ambient" data-action="click->uplink-shell#locate" data-uplink-shell-id-param="41">hit</a>
+            <a id="hit-404" href="/uplink?around=404&channel=ambient" data-action="click->uplink-shell#locate" data-uplink-shell-id-param="404">miss</a>
+          </turbo-frame>
+        </section>
+      </aside>
       <div class="uplink-backdrop" data-action="click->uplink-shell#closeDrawers"></div>
     </div>`
 }
@@ -68,6 +82,7 @@ describe('UplinkShellController', () => {
   beforeEach(() => {
     mobile = false
     localStorage.clear()
+    vi.mocked(Turbo.visit).mockClear()
     vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
       matches: query.includes('max-width') ? mobile : query.includes('pointer: fine'),
       media: query,
@@ -102,7 +117,7 @@ describe('UplinkShellController', () => {
     document.head.appendChild(meta)
   }
 
-  function state (detail: { atBottom: boolean, unread: number }): void {
+  function state (detail: { atBottom: boolean, unread: number, mentions?: number, atPresent?: boolean }): void {
     document.getElementById('uplink-log')!.dispatchEvent(new CustomEvent('packet-log:state', { bubbles: true, detail }))
   }
 
@@ -339,5 +354,108 @@ describe('UplinkShellController', () => {
     document.getElementById('other-field')!.blur()
     expect(press('/').defaultPrevented).toBe(true)
     expect(document.activeElement).toBe(composer())
+  })
+
+  describe('search face (Phase 2 item 9)', () => {
+    const toggle = (): HTMLButtonElement => document.querySelector('[data-uplink-shell-target="searchToggle"]')!
+    const field = (): HTMLInputElement => document.querySelector('.uplink-search-field')!
+    const membersToggle = (): HTMLButtonElement => document.querySelector('[data-uplink-shell-target="membersToggle"]')!
+
+    it('flips the pane to search with the field focused — the roster preference untouched — Escape in the field closes it back to the toggle, [o] returns to the roster and opens it, [x] and a second [/] close it', async () => {
+      localStorage.setItem('uplink:members', 'closed')
+      await start()
+      expect(shell().dataset.members).toBe('closed')
+      expect(shell().dataset.pane).toBe('members')
+
+      toggle().click()
+      expect(shell().dataset.pane).toBe('search')
+      expect(toggle().getAttribute('aria-pressed')).toBe('true')
+      expect(document.activeElement).toBe(field())
+      expect(shell().dataset.members).toBe('closed') // the CSS shows the pane for the face regardless
+
+      expect(press('Escape', field()).defaultPrevented).toBe(true)
+      expect(shell().dataset.pane).toBe('members')
+      expect(toggle().getAttribute('aria-pressed')).toBe('false')
+      expect(document.activeElement).toBe(toggle())
+
+      toggle().click()
+      membersToggle().click()
+      expect(shell().dataset.pane).toBe('members')
+      expect(shell().dataset.members).toBe('open')
+      expect(localStorage.getItem('uplink:members')).toBe('open')
+
+      toggle().click()
+      toggle().click()
+      expect(shell().dataset.pane).toBe('members')
+
+      toggle().click()
+      document.getElementById('search-close')!.click()
+      expect(shell().dataset.pane).toBe('members')
+      expect(document.activeElement).toBe(toggle())
+    })
+
+    it('runs the face as the members drawer under 768px: [/] opens it, [x] closes it, a backdrop close leaves [/] reopening it', async () => {
+      mobile = true
+      await start()
+
+      toggle().click()
+      expect(shell().dataset.drawer).toBe('members')
+      expect(shell().dataset.pane).toBe('search')
+      expect(main().hasAttribute('inert')).toBe(true)
+      expect(document.activeElement).toBe(field())
+
+      document.getElementById('search-close')!.click()
+      expect(shell().dataset.drawer).toBe('')
+      expect(shell().dataset.pane).toBe('members')
+      expect(main().hasAttribute('inert')).toBe(false)
+
+      toggle().click()
+      backdrop().click()
+      expect(shell().dataset.drawer).toBe('')
+      expect(shell().dataset.pane).toBe('search') // the face is kept behind the closed drawer…
+      toggle().click() // …so [/] reopens rather than closing an invisible face
+      expect(shell().dataset.drawer).toBe('members')
+      expect(shell().dataset.pane).toBe('search')
+    })
+
+    it('locates a hit in place when the log has the packet — the visit swallowed — and lets the link go otherwise', async () => {
+      await start()
+      const scrollIntoView = vi.fn()
+      Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { value: scrollIntoView, configurable: true })
+      const outcomes: boolean[] = []
+      const guard = new AbortController() // jsdom cannot navigate: record the controller's verdict, then swallow the click
+      document.addEventListener('click', event => { outcomes.push(event.defaultPrevented); event.preventDefault() }, { signal: guard.signal })
+
+      document.getElementById('hit-41')!.click()
+      expect(outcomes).toEqual([true])
+      expect(scrollIntoView.mock.instances[0]).toBe(document.getElementById('chat_message_41'))
+      expect(document.getElementById('chat_message_41')!.classList.contains('packet--flash')).toBe(true)
+
+      document.getElementById('hit-404')!.click()
+      expect(outcomes).toEqual([true, false])
+      expect(scrollIntoView).toHaveBeenCalledTimes(1)
+      guard.abort()
+    })
+
+    it('leads back to the present: on a located log the pill reads JUMP TO PRESENT and visits the present url, as does an own send', async () => {
+      await start()
+
+      state({ atBottom: true, unread: 0, atPresent: false })
+      expect(jump().hidden).toBe(false)
+      expect(jump().classList.contains('uplink-jump--present')).toBe(true)
+      expect(jump().textContent).toContain('JUMP TO PRESENT')
+      jump().click()
+      expect(Turbo.visit).toHaveBeenCalledWith('/uplink?channel=ambient')
+
+      vi.stubGlobal('requestAnimationFrame', (cb: () => void) => { cb(); return 0 })
+      composer().closest('form')!.dispatchEvent(new CustomEvent('turbo:submit-end', { bubbles: true, detail: { success: true } }))
+      expect(Turbo.visit).toHaveBeenCalledTimes(2)
+
+      state({ atBottom: false, unread: 2, atPresent: true })
+      expect(jump().classList.contains('uplink-jump--present')).toBe(false)
+      expect(jump().textContent).toContain('2 NEW PACKETS')
+      jump().click()
+      expect(Turbo.visit).toHaveBeenCalledTimes(2) // a plain scroll to the bottom
+    })
   })
 })

@@ -1,10 +1,14 @@
-<%# One scrollback page (GET /uplink/log?channel=&before=<id>): packets
-    only, chronological, for the packet-log controller to splice in
-    after its top sentinel. No frame, no empty state. Locals:
+<%# One scrollback page (GET /uplink/log?channel=&before=<id>, or
+    after=<id> for a located log paging forward): packets only,
+    chronological, for the packet-log controller to splice in after its
+    top sentinel (or before its bottom one). No frame, no empty state.
+    Locals:
       packets, viewer — as uplink/_packet
-      more — false when these are the channel's oldest packets; the
-             trailing marker is read and removed client-side and flips
-             the sentinel to "// BEGINNING OF CHANNEL //".
+      more — false when these are the channel's oldest (before=) or
+             newest (after=) packets; the trailing marker is read and
+             removed client-side and flips the sentinel: the top one to
+             "// BEGINNING OF CHANNEL //", the bottom one away (and the
+             parked live appends are released).
       unseen_from, unseen_divider — the viewer's read mark from the
              sentinel URL and whether this page holds the boundary: the
              "// NEW PACKETS //" separator (as uplink/_log_frame draws it,

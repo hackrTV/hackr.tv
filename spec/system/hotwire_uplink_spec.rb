@@ -523,7 +523,7 @@ RSpec.describe "Hotwire uplink", type: :system do
       within("#uplink-pins") do
         expect(page).to have_content("Pin me down", wait: 10)
         expect(page).not_to have_button("UNPIN")
-        click_button "Jump to packet"
+        click_link "Jump to packet" # in the loaded log: in place
       end
       expect(page).to have_css("#uplink-pins", visible: :hidden) # the jump closes the panel
       expect(page).to have_css("#chat_message_#{packet.id}.packet--flash")
@@ -623,6 +623,79 @@ RSpec.describe "Hotwire uplink", type: :system do
       expect(page).to have_no_css("#uplink-typing.uplink-typing--active", wait: 10)
     end
     Uplink::Typing.reset!
+  end
+
+  it "searches the channel from the header: hits with the match marked, one in the log flashes in place, one beyond it reopens the log around it — the search kept, the present a pill away — and paging forward reaches the present" do
+    # 150 packets: the first page plus whatever scrollback fetches to fill
+    # the viewport never reach packet 3, so its hit has to be a visit.
+    now = Time.current
+    ChatMessage.insert_all((1..150).map { |i|
+      {chat_channel_id: channel.id, grid_hackr_id: other.id, content: [3, 148].include?(i) ? "needle #{i} in the stack" : "hay #{i}",
+       created_at: now - (150 - i).seconds, updated_at: now}
+    })
+    ids = channel.chat_messages.order(:id).pluck(:id)
+    old, recent = ids[2], ids[147]
+
+    log_in!(hackr)
+    visit "/uplink"
+    await_uplink!
+    expect(page).to have_content("hay 150")
+    expect(page).not_to have_css("#chat_message_#{old}")
+
+    find(".uplink-chanhead-search").click
+    expect(page).to have_css(".uplink-shell[data-pane='search']")
+    expect(page.evaluate_script("document.activeElement.className")).to eq("uplink-search-field")
+    find(".uplink-search-field").send_keys("NEEDLE", :enter)
+    within("#uplink-search") do
+      expect(page).to have_content('2 RESULTS FOR "NEEDLE"', wait: 10)
+      expect(page).to have_css(".uplink-result", count: 2)
+      expect(page).to have_css("mark.uplink-result-hit", text: "needle", count: 2)
+      expect(page).to have_css("#uplink-result-#{recent} .uplink-result-sender", text: "@#{other.hackr_alias}")
+      find("#uplink-result-#{recent} a").click # in the loaded log: in place
+    end
+    expect(page).to have_css("#chat_message_#{recent}.packet--flash")
+    expect(page).to have_current_path("/uplink")
+    expect(page).to have_css(".uplink-shell[data-pane='search']") # the hits stay
+
+    within("#uplink-search") { find("#uplink-result-#{old} a").click } # beyond the loaded 20: the visit
+    expect(page).to have_current_path("/uplink?around=#{old}&channel=ambient&q=NEEDLE")
+    await_uplink!
+    expect(page).to have_css("#chat_message_#{old}.packet--flash")
+    expect(page).to have_css("#chat_message_#{ids[22]}") # 20 after it
+    expect(page).to have_css(".uplink-jump.uplink-jump--present", text: "JUMP TO PRESENT")
+    expect(page).to have_css(".uplink-shell[data-pane='search']")
+    expect(find(".uplink-search-field").value).to eq("NEEDLE")
+    within("#uplink-search") { expect(page).to have_content('2 RESULTS FOR "NEEDLE"', wait: 10) } # reloaded from ?q=
+
+    find(".uplink-jump").click # back to the present, the search still open
+    expect(page).to have_current_path("/uplink?channel=ambient&q=NEEDLE")
+    await_uplink!
+    expect(page).to have_content("hay 150")
+    expect(page).not_to have_css(".uplink-jump", visible: :visible)
+    expect(page).to have_css(".uplink-shell[data-pane='search']")
+
+    within("#uplink-search") { find("#uplink-result-#{old} a").click }
+    expect(page).to have_current_path("/uplink?around=#{old}&channel=ambient&q=NEEDLE")
+    await_uplink!
+    expect(page).to have_css("#chat_message_#{old}.packet--flash")
+    # Scrolling to the loaded end brings the bottom sentinel into view and
+    # a newer page (40) splices in below — the viewport stays — until the
+    # present; 127 newer packets take four pages.
+    6.times do
+      break unless page.has_css?(".uplink-log-bottom", visible: :all, wait: 0)
+      count = page.all(".packet").size
+      page.execute_script("document.getElementById('uplink-log').scrollTop = 1e9")
+      expect(page).to have_css(".packet", minimum: count + 1, wait: 10)
+      expect(page).to have_no_css(".uplink-log-bottom[data-loading]", visible: :all, wait: 10)
+    end
+    expect(page).to have_css("#chat_message_#{ids.last}", wait: 10)
+    expect(page).to have_css(".packet", count: 150)
+    expect(page).not_to have_css(".uplink-log-bottom", visible: :all) # at the present: the sentinel retired
+    expect(page).not_to have_css(".uplink-jump", visible: :visible)
+
+    find(".uplink-search-field").send_keys(:escape)
+    expect(page).to have_css(".uplink-shell[data-pane='members']")
+    expect(page).to have_content("OPERATIVES")
   end
 
   it "docks the chat on the live home page and sends from there" do

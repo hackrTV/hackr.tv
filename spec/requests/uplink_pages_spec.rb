@@ -558,6 +558,8 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include(%(<meta name="uplink-callsign" content="#{Uplink::Callsign.token(hackr.id)}">)) # … and the reactions controller marks the viewer's own here too
       expect(response.body).not_to include("uplink-typing") # no typing line, stream or composer relay
       expect(response.body).not_to include("packet-form#blur")
+      expect(response.body).not_to include("uplink-search") # no search face or button; no located-log mode either
+      expect(response.body).not_to include("uplink-log-bottom")
       expect(response.body).to include("channel-tab channel-tab--active") # tabs stay
 
       get "/"
@@ -565,6 +567,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.body).to include(%(<meta name="uplink-callsign" content="#{Uplink::Callsign.token(hackr.id)}">))
       expect(response.body).not_to include('id="uplink-reactmenu"')
       expect(response.body).not_to include("uplink-typing")
+      expect(response.body).not_to include("uplink-search")
       expect(response.body).to include('<input type="text" name="content"')
       expect(response.body).not_to include("uplink-shell")
     end
@@ -1324,7 +1327,7 @@ RSpec.describe "Uplink pages", type: :request do
         expect(panel).to include('<div id="uplink-pins-list" class="uplink-pins-body">')
         expect(panel).to include('<p class="uplink-pins-count">3 / 50</p>')
         expect(panel.scan(/id="uplink-pin-(\d+)"/).flatten.map(&:to_i)).to eq([bridged.id, second.id, first.id])
-        expect(panel).to include(%(<button type="button" class="uplink-pin-jump" title="Jump to packet"\n    data-action="click->popover#jump" data-popover-id-param="#{first.id}">))
+        expect(panel).to include(%(<a class="uplink-pin-jump" href="/uplink?around=#{first.id}&amp;channel=ambient" title="Jump to packet"\n    data-action="click->popover#jump" data-popover-id-param="#{first.id}">)) # a link: the located log when the jump can't be in place
         expect(panel).to include(%(<span class="uplink-pin-sender uplink-pin-sender--operative">@#{other.hackr_alias}</span>))
         expect(panel).to include(%(<span class="uplink-pin-sender uplink-pin-sender--operator">@#{operator.hackr_alias}</span>))
         expect(panel).to include('<span class="uplink-pin-sender uplink-pin-sender--bridged">TTV viewer_42</span>')
@@ -1754,6 +1757,240 @@ RSpec.describe "Uplink pages", type: :request do
       Uplink::Typing.stop(channel, other)
       get "/uplink"
       expect(response.body).to include('data-typing-aliases-value="[]" data-typing-ttl-value="5000"')
+    end
+  end
+
+  describe "search (Phase 2 item 9: GET /uplink/search, GET /uplink?around=, GET /uplink/log?after=)" do
+    def frame_headers
+      {"Turbo-Frame" => "uplink-search"}
+    end
+
+    def results_body
+      response.body[/<turbo-frame id="uplink-search">.*<\/turbo-frame>/m]
+    end
+
+    it "mounts the header's [/] SEARCH and the pane's search face behind the roster: the form into the uplink-search frame, the hint as its first content, the present url on the root" do
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include(%(data-drawer="" data-pane="members"))
+      expect(body).to include(%(data-uplink-shell-present-url-value="/uplink?channel=ambient"))
+      expect(body).to include(%(class="uplink-chanhead-button uplink-chanhead-search" title="Search packets"\n          aria-controls="uplink-members-pane" aria-pressed="false"\n          data-uplink-shell-target="searchToggle" data-action="click->uplink-shell#toggleSearch">[/]<span class="uplink-chanhead-label"> SEARCH</span></button>))
+      expect(body.index("uplink-chanhead-search")).to be > body.index("uplink-chanhead-pins")
+      expect(body.index("uplink-chanhead-search")).to be < body.index("uplink-popout-button")
+      pane = body[/<aside class="uplink-members-pane".*?<\/aside>/m]
+      expect(pane).to include('<header class="uplink-members-title uplink-members-title--roster">OPERATIVES</header>')
+      expect(pane).to include('<section class="uplink-search" aria-label="Search packets" data-uplink-shell-target="search">')
+      expect(pane.index("uplink-search")).to be > pane.index('id="uplink-members"')
+      expect(pane).to include('<form class="uplink-search-form" role="search" action="/uplink/search" method="get" data-turbo-frame="uplink-search">')
+      expect(pane).to include('<input type="hidden" name="channel" value="ambient">')
+      expect(pane).to include(%(<input type="text" name="q" value="" class="uplink-search-field" placeholder="Scan #ambient..." autocomplete="off" maxlength="100" aria-label="Search #ambient"\n            data-uplink-shell-target="searchField" data-action="keydown->uplink-shell#searchKey">))
+      expect(pane).to include('data-action="click->uplink-shell#closeSearch">[x]</button>')
+      frame = pane[/<turbo-frame [^>]*id="uplink-search"[^>]*>/]
+      expect(frame).to include('target="_top"', 'class="uplink-search-frame"')
+      expect(frame).not_to include("src=")
+      expect(pane).to include("Type a term and hit Enter to scan #ambient.")
+    end
+
+    it "opens the pane on its search face with the hits when the page url carries ?q=, the present url keeping the query" do
+      log_in!
+
+      get "/uplink", params: {q: " needle "}
+
+      body = response.body
+      expect(body).to include(%(data-drawer="" data-pane="search"))
+      expect(body).to include(%(data-uplink-shell-present-url-value="/uplink?channel=ambient&amp;q=needle"))
+      expect(body).to include(%(aria-controls="uplink-members-pane" aria-pressed="true"\n          data-uplink-shell-target="searchToggle"))
+      expect(body).to include(%(name="q" value="needle"))
+      frame = body[/<turbo-frame [^>]*id="uplink-search"[^>]*>/]
+      expect(frame).to include('src="/uplink/search?channel=ambient&amp;q=needle"')
+    end
+
+    describe "GET /uplink/search" do
+      it "requires login, and outside a frame goes to the channel" do
+        get "/uplink/search", params: {channel: "ambient", q: "x"}, headers: frame_headers
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to include("/grid/login")
+
+        log_in!
+        get "/uplink/search", params: {channel: "ambient", q: "x"}
+        expect(response).to redirect_to("/uplink?channel=ambient")
+      end
+
+      it "renders the empty states inside the frame at the real status: unknown channel 404, off-limits 403, blank query hint, no match" do
+        log_in!
+
+        get "/uplink/search", params: {channel: "nope", q: "x"}, headers: frame_headers
+        expect(response).to have_http_status(:not_found)
+        expect(results_body).to include('<div class="uplink-results uplink-results--empty" role="region" aria-label="Search results">')
+        expect(results_body).to include("// NO CHANNEL //", "That channel is gone.")
+
+        create(:chat_channel, :operator_only, slug: "ops", name: "#ops")
+        get "/uplink/search", params: {channel: "ops", q: "x"}, headers: frame_headers
+        expect(response).to have_http_status(:forbidden)
+        expect(results_body).to include("// NO CHANNEL //", "#ops is outside your clearance.")
+
+        get "/uplink/search", params: {channel: "ambient", q: "   "}, headers: frame_headers
+        expect(response).to have_http_status(:ok)
+        expect(results_body).to include("Type a term and hit Enter to scan #ambient.")
+        expect(results_body).not_to include("uplink-results-count")
+
+        get "/uplink/search", params: {channel: "ambient", q: "<nothing>"}, headers: frame_headers
+        expect(response).to have_http_status(:ok)
+        expect(results_body).to include("// NO MATCH //", "Nothing in #ambient contains \"&lt;nothing&gt;\".")
+      end
+
+      it "lists the channel's active packets containing the query, case-insensitively, newest first, each a link to the packet with every match marked and the text escaped" do
+        first = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Needle one <b>bold</b>")
+        create(:chat_message, chat_channel: channel, grid_hackr: other, content: "hay")
+        create(:chat_message, :dropped, chat_channel: channel, grid_hackr: other, content: "needle dropped")
+        trace = create(:chat_channel, slug: "trace", name: "#trace")
+        create(:chat_message, chat_channel: trace, grid_hackr: other, content: "needle elsewhere")
+        second = create(:chat_message, chat_channel: channel, grid_hackr: operator, content: "a NEEDLE, then a needle")
+        bridged = create(:chat_message, chat_channel: channel, grid_hackr: other, source: "TTV", content: "[Twitch] viewer_42: needles too")
+        log_in!
+
+        get "/uplink/search", params: {channel: "ambient", q: "needle"}, headers: frame_headers
+
+        expect(response).to have_http_status(:ok)
+        body = results_body
+        expect(body).to include('<p class="uplink-results-count">3 RESULTS FOR "needle"</p>')
+        expect(body.scan(/id="uplink-result-(\d+)"/).flatten.map(&:to_i)).to eq([bridged.id, second.id, first.id])
+        expect(body).to include(%(<a class="uplink-result-jump" href="/uplink?around=#{first.id}&amp;channel=ambient&amp;q=needle" title="Go to packet"\n    data-action="click->uplink-shell#locate" data-uplink-shell-id-param="#{first.id}">))
+        expect(body).to include(%(<span class="uplink-result-sender uplink-result-sender--operative">@#{other.hackr_alias}</span>))
+        expect(body).to include(%(<span class="uplink-result-sender uplink-result-sender--operator">@#{operator.hackr_alias}</span>))
+        expect(body).to include('<span class="uplink-result-sender uplink-result-sender--bridged">TTV viewer_42</span>')
+        expect(body).to include('<span class="uplink-result-age">NOW</span>')
+        expect(body).to include('<span class="uplink-result-text"><mark class="uplink-result-hit">Needle</mark> one &lt;b&gt;bold&lt;/b&gt;</span>')
+        expect(body).to include('<span class="uplink-result-text">a <mark class="uplink-result-hit">NEEDLE</mark>, then a <mark class="uplink-result-hit">needle</mark></span>')
+        expect(body).to include('<span class="uplink-result-text"><mark class="uplink-result-hit">needle</mark>s too</span>') # the bridged prefix is off the excerpt
+        expect(body).not_to include("needle dropped", "needle elsewhere", ">hay<")
+
+        get "/uplink/search", params: {channel: "ambient", q: "bold"}, headers: frame_headers
+        expect(results_body).to include('<p class="uplink-results-count">1 RESULT FOR "bold"</p>')
+      end
+
+      it "takes % and _ literally and cuts the query at 100 characters" do
+        create(:chat_message, chat_channel: channel, grid_hackr: other, content: "100% sure")
+        create(:chat_message, chat_channel: channel, grid_hackr: other, content: "100 percent sure")
+        create(:chat_message, chat_channel: channel, grid_hackr: other, content: "a_b")
+        create(:chat_message, chat_channel: channel, grid_hackr: other, content: "acb")
+        log_in!
+
+        get "/uplink/search", params: {channel: "ambient", q: "100%"}, headers: frame_headers
+        expect(results_body).to include('1 RESULT FOR "100%"', "<mark class=\"uplink-result-hit\">100%</mark> sure")
+        expect(results_body).not_to include("percent")
+
+        get "/uplink/search", params: {channel: "ambient", q: "a_b"}, headers: frame_headers
+        expect(results_body).to include('1 RESULT FOR "a_b"', "<mark class=\"uplink-result-hit\">a_b</mark>")
+        expect(results_body).not_to include("acb")
+
+        get "/uplink/search", params: {channel: "ambient", q: "x" * 120}, headers: frame_headers
+        expect(results_body).to include("contains \"#{"x" * 100}\".")
+        expect(results_body).not_to include("x" * 101)
+      end
+
+      it "shows the newest 50 of a bigger match and says so" do
+        now = Time.current
+        ChatMessage.insert_all((1..55).map { |i|
+          {chat_channel_id: channel.id, grid_hackr_id: other.id, content: "archive #{i}",
+           created_at: now - (55 - i).seconds, updated_at: now}
+        })
+        ids = channel.chat_messages.order(:id).pluck(:id)
+        log_in!
+
+        get "/uplink/search", params: {channel: "ambient", q: "archive"}, headers: frame_headers
+
+        expect(results_body).to include('<p class="uplink-results-count">50+ RESULTS FOR "archive" (NEWEST 50 SHOWN)</p>')
+        expect(results_body.scan(/id="uplink-result-(\d+)"/).flatten.map(&:to_i)).to eq(ids.last(50).reverse)
+      end
+    end
+
+    describe "GET /uplink?around=" do
+      it "opens the log on the packet with 20 either side, the focus value, the bottom sentinel while newer packets remain, and never a NEW PACKETS line" do
+        now = Time.current
+        ChatMessage.insert_all((1..70).map { |i|
+          {chat_channel_id: channel.id, grid_hackr_id: other.id, content: "archive #{i}",
+           created_at: now - (70 - i).seconds, updated_at: now}
+        })
+        ids = channel.chat_messages.order(:id).pluck(:id)
+        UplinkChannelRead.mark!(hackr, channel, ids[5]) # 64 unseen: the plain page would open at the mark with the line
+        log_in!
+
+        get "/uplink", params: {channel: "ambient", around: ids[30]}
+
+        body = response.body
+        expect(body).to include(%(data-controller="packet-log" data-packet-log-group-value="true" data-packet-log-focus-value="#{ids[30]}">))
+        expect(body.scan(/archive (\d+)</).flatten.map(&:to_i)).to eq((11..51).to_a)
+        expect(body).to include('class="uplink-log-top" data-packet-log-target="top" data-more="true"')
+        expect(body).to include(%(<div class="uplink-log-bottom" data-packet-log-target="bottom" data-more="true"\n        data-src="/uplink/log?channel=ambient"></div>))
+        expect(body.index("uplink-log-bottom")).to be > body.index("archive 51<")
+        expect(body).not_to include("uplink-unseen")
+        expect(body).to include(%(data-pane="members"))
+
+        get "/uplink", params: {channel: "ambient", around: ids[65]} # four newer: the present is loaded
+        expect(response.body.scan(/archive (\d+)</).flatten.map(&:to_i)).to eq((46..70).to_a)
+        expect(response.body).to include(%(data-packet-log-focus-value="#{ids[65]}"))
+        expect(response.body).not_to include("uplink-log-bottom")
+
+        get "/uplink", params: {channel: "ambient", around: ids[2]} # two older: the beginning is loaded
+        expect(response.body.scan(/archive (\d+)</).flatten.map(&:to_i)).to eq((1..23).to_a)
+        expect(response.body).to include('class="uplink-log-top" data-packet-log-target="top" data-more="false"')
+      end
+
+      it "falls back to the plain channel page — the search kept — for an unknown, dropped or foreign packet" do
+        dropped = create(:chat_message, :dropped, chat_channel: channel, grid_hackr: other, content: "gone")
+        trace = create(:chat_channel, slug: "trace", name: "#trace")
+        foreign = create(:chat_message, chat_channel: trace, grid_hackr: other, content: "elsewhere")
+        log_in!
+
+        get "/uplink", params: {channel: "ambient", around: 999_999, q: "x"}
+        expect(response).to redirect_to("/uplink?channel=ambient&q=x")
+
+        get "/uplink", params: {channel: "ambient", around: dropped.id}
+        expect(response).to redirect_to("/uplink?channel=ambient")
+
+        get "/uplink", params: {channel: "ambient", around: foreign.id}
+        expect(response).to redirect_to("/uplink?channel=ambient")
+
+        get "/uplink", params: {channel: "ambient", around: "abc"}
+        expect(response).to redirect_to("/uplink?channel=ambient")
+      end
+    end
+
+    describe "GET /uplink/log?after=" do
+      it "pages newer packets after an id: packets only, chronological, capped at 40, dropped excluded, end marker once the newest is among them; 400 on a bad cursor, 403 off limits" do
+        now = Time.current
+        ChatMessage.insert_all((1..45).map { |i|
+          {chat_channel_id: channel.id, grid_hackr_id: other.id, content: "archive packet #{i}",
+           dropped: i == 30, created_at: now - (45 - i).seconds, updated_at: now}
+        })
+        ids = channel.chat_messages.order(:id).pluck(:id)
+
+        get "/uplink/log", params: {channel: "ambient", after: ids.first} # anonymous
+        expect(response).to have_http_status(:forbidden)
+
+        log_in!
+        get "/uplink/log", params: {channel: "ambient", after: ids.first}
+        expect(response).to have_http_status(:ok)
+        body = response.body
+        expect(body).not_to include("uplink-log-frame", "uplink-log-top", "uplink-log-bottom", "No packets yet")
+        expect(body.scan(/archive packet (\d+)</).flatten.map(&:to_i)).to eq((2..42).to_a - [30]) # 40 oldest above the cursor, oldest first
+        expect(body).not_to include("data-log-end") # three remain
+
+        get "/uplink/log", params: {channel: "ambient", after: ids[41]}
+        expect(response.body.scan(/archive packet (\d+)</).flatten.map(&:to_i)).to eq([43, 44, 45])
+        expect(response.body).to include("<template data-log-end></template>")
+
+        get "/uplink/log", params: {channel: "ambient", after: ids.last}
+        expect(response.body).to include("<template data-log-end></template>")
+        expect(response.body).not_to include("archive packet")
+
+        get "/uplink/log", params: {channel: "ambient", after: "abc"}
+        expect(response).to have_http_status(:bad_request)
+      end
     end
   end
 end

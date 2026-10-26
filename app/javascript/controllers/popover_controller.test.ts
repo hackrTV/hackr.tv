@@ -41,8 +41,8 @@ function fixture (): string {
 const CARD = '<div class="uplink-popover" tabindex="-1">@xeraen <button type="button" class="uplink-popover-close" data-action="click->popover#dismiss">[x]</button></div>'
 const MENU = '<div class="uplink-modmenu" tabindex="-1"><form class="uplink-modmenu-form"><button type="submit" class="uplink-modmenu-item">SQUELCH 10M</button></form></div>'
 const PINS = '<div class="uplink-pins" tabindex="-1"><div id="uplink-pins-list">' +
-  '<button type="button" class="uplink-pin-jump" data-action="click->popover#jump" data-popover-id-param="1">jump 1</button>' +
-  '<button type="button" class="uplink-pin-jump" data-action="click->popover#jump" data-popover-id-param="404">jump 404</button>' +
+  '<a href="/uplink?around=1&channel=ambient" class="uplink-pin-jump" data-action="click->popover#jump" data-popover-id-param="1">jump 1</a>' +
+  '<a href="/uplink?around=404&channel=ambient" class="uplink-pin-jump" data-action="click->popover#jump" data-popover-id-param="404">jump 404</a>' +
   '<form class="uplink-pin-unpin-form" data-popover-stay="true"><button type="submit">UNPIN</button></form></div></div>'
 
 type Box = { left: number, top: number, width: number, height: number }
@@ -270,25 +270,31 @@ describe('PopoverController', () => {
     expect(menu().hidden).toBe(true)
   })
 
-  it('jumps from a pins-panel row: scrolls to + flashes the packet and closes the panel; a pin that is not in the log leaves it open', async () => {
+  it('jumps from a pins-panel row: scrolls to + flashes the packet and closes the panel, swallowing the visit; a pin that is not in the log lets its link go and leaves the panel open', async () => {
     const scrollIntoView = vi.fn()
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { value: scrollIntoView, configurable: true })
+    const outcomes: boolean[] = []
+    const guard = new AbortController() // jsdom cannot navigate: record the controller's verdict, then swallow the click
+    document.addEventListener('click', event => { outcomes.push(event.defaultPrevented); event.preventDefault() }, { signal: guard.signal })
     click(trigger('pins'))
     load(pins(), PINS)
     await Promise.resolve() // Stimulus binds the injected rows' actions on the mutation microtask
-    const rows = pins().querySelectorAll<HTMLButtonElement>('.uplink-pin-jump')
+    const rows = pins().querySelectorAll<HTMLAnchorElement>('.uplink-pin-jump')
 
-    rows[1].click() // id 404: above the loaded history
+    rows[1].click() // id 404: beyond the loaded history — /uplink?around=404 opens the log on it
+    expect(outcomes.at(-1)).toBe(false)
     expect(pins().hidden).toBe(false)
     expect(scrollIntoView).not.toHaveBeenCalled()
     expect(document.querySelector('.packet--flash')).toBeNull()
 
     rows[0].click()
+    expect(outcomes.at(-1)).toBe(true)
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'center' })
     expect(scrollIntoView.mock.instances[0]).toBe(document.getElementById('chat_message_1'))
     expect(document.getElementById('chat_message_1')!.classList.contains('packet--flash')).toBe(true)
     expect(pins().hidden).toBe(true)
     expect(pins().innerHTML).toBe('')
+    guard.abort()
   })
 
   it('leaves an Escape another layer already handled alone, and closes before the page is cached', () => {

@@ -9,7 +9,7 @@
   <% else %>
     <p class="uplink-pins-count"><%= pins.size %> / <%= ChatMessage::PIN_CAP %></p>
     <ol class="uplink-pins-rows">
-      <%= render partial: "uplink/pins/pin", collection: pins, as: :packet, locals: {viewer: viewer} %>
+      <%= render partial: "uplink/pins/pin", collection: pins, as: :packet, locals: {channel: channel, viewer: viewer} %>
     </ol>
   <% end %>
 </div>
