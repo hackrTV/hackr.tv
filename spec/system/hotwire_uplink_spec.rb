@@ -6,6 +6,8 @@ require "rails_helper"
 # keeps serving relay/synthia (dual-publish). Presence counts ride the
 # JSON channel into the uplink Stimulus controller.
 RSpec.describe "Hotwire uplink", type: :system do
+  include ActiveJob::TestHelper # the roster job (Uplink::MembersBroadcastJob) is enqueued by the server thread; the sidebar-count example performs it
+
   let!(:hackr) { create(:grid_hackr, password: "hackthegrid") }
   let!(:other) { create(:grid_hackr, password: "hackthegrid") }
   let!(:operator) { create(:grid_hackr, :operator, password: "hackthegrid") }
@@ -659,8 +661,8 @@ RSpec.describe "Hotwire uplink", type: :system do
 
     within("#uplink-search") { find("#uplink-result-#{old} a").click } # beyond the loaded 20: the visit
     expect(page).to have_current_path("/uplink?around=#{old}&channel=ambient&q=NEEDLE")
+    expect(page).to have_css("#chat_message_#{old}.packet--flash", wait: 10) # before the cable wait: the flash lasts 2.4s and a loaded suite connects slower than that
     await_uplink!
-    expect(page).to have_css("#chat_message_#{old}.packet--flash")
     expect(page).to have_css("#chat_message_#{ids[22]}") # 20 after it
     expect(page).to have_css(".uplink-jump.uplink-jump--present", text: "JUMP TO PRESENT")
     expect(page).to have_css(".uplink-shell[data-pane='search']")
@@ -676,8 +678,8 @@ RSpec.describe "Hotwire uplink", type: :system do
 
     within("#uplink-search") { find("#uplink-result-#{old} a").click }
     expect(page).to have_current_path("/uplink?around=#{old}&channel=ambient&q=NEEDLE")
+    expect(page).to have_css("#chat_message_#{old}.packet--flash", wait: 10)
     await_uplink!
-    expect(page).to have_css("#chat_message_#{old}.packet--flash")
     # Scrolling to the loaded end brings the bottom sentinel into view and
     # a newer page (40) splices in below — the viewport stays — until the
     # present; 127 newer packets take four pages.
@@ -696,6 +698,83 @@ RSpec.describe "Hotwire uplink", type: :system do
     find(".uplink-search-field").send_keys(:escape)
     expect(page).to have_css(".uplink-shell[data-pane='members']")
     expect(page).to have_content("OPERATIVES")
+  end
+
+  it "folds a sidebar category (the channel on screen and unread rows stay; remembered), walks the list with the arrows, jumps channels from the Ctrl+K switcher, counts operatives per row live, and badges the tab title" do
+    trace = create(:chat_channel, slug: "trace", name: "#trace", category: "OPERATIONS", position: 20)
+    create(:chat_message, chat_channel: trace, grid_hackr: other, content: "trace opener")
+
+    log_in!(hackr)
+    visit "/uplink"
+    await_uplink!
+
+    # Per-row counts: you count on the channel on screen; #trace is empty (hidden at 0).
+    expect(page).to have_css("#uplink-count-ambient", text: "1")
+    expect(page).to have_css("#uplink-count-trace", visible: :hidden)
+    expect(page).to have_title("Uplink — hackr.tv")
+
+    using_session(:lurker) do
+      log_in!(other)
+      visit "/uplink?channel=trace"
+      await_uplink!
+      expect(page).to have_css(".presence-text", text: /operatives? connected/, wait: 10) # the cable subscription that writes their presence row (the count is in-process and can still hold an earlier example's)
+    end
+    # Their row scheduled the trailing roster job (the test adapter only enqueues it); performed, it
+    # replaces #trace's count on the bump stream this session holds for #trace.
+    20.times do
+      break if GridUplinkPresence.where(grid_hackr: other, chat_channel: trace).exists?
+
+      sleep 0.25
+    end
+    expect(GridUplinkPresence.where(grid_hackr: other, chat_channel: trace)).to exist
+    perform_enqueued_jobs
+    expect(page).to have_css("#uplink-count-trace", text: "1", wait: 10)
+
+    # Fold OPERATIONS: #trace hides, the heading reads [+]; remembered on reload.
+    find(".uplink-category-group[data-category='OPERATIONS'] .uplink-category").click
+    expect(page).to have_css(".uplink-category-group[data-category='OPERATIONS'][data-collapsed]")
+    expect(page).to have_css(".uplink-category-group[data-category='OPERATIONS'] .uplink-category", text: /\[\+\]\s+OPERATIONS/) # flex items: Capybara's text breaks the line between the glyph and the name
+    expect(page).to have_no_css(".uplink-channel[data-channel='trace']")
+    visit "/uplink"
+    await_uplink!
+    expect(page).to have_css(".uplink-category-group[data-category='OPERATIONS'][data-collapsed]")
+    expect(page).to have_no_css(".uplink-channel[data-channel='trace']")
+
+    # A packet landing in the folded channel brings its row out, badged; the tab title counts it.
+    using_session(:lurker) do
+      fill_in "content", with: "trace packet for the title"
+      click_button "TX"
+      expect(page).to have_content("trace packet for the title", wait: 10)
+    end
+    expect(page).to have_css(".uplink-channel--unread[data-channel='trace'] .uplink-channel-badge", text: "1", wait: 10)
+    expect(page).to have_title("(1) Uplink — hackr.tv")
+
+    # Keyboard ring: the active row is the Tab stop; Down walks to the heading, then the row; Enter follows the link.
+    # (Cuprite's send_keys on an anchor lands on body — focus by JS, then type on the real keyboard.)
+    expect(page).to have_css(".uplink-channel[data-channel='trace']")
+    page.execute_script("document.querySelector('.uplink-channel--active').focus()")
+    page.driver.browser.keyboard.type(:down)
+    expect(page.evaluate_script("document.activeElement.textContent.trim()")).to eq("[+] OPERATIONS")
+    page.driver.browser.keyboard.type(:down)
+    expect(page.evaluate_script("document.activeElement.dataset.channel")).to eq("trace")
+    page.driver.browser.keyboard.type(:enter)
+    expect(page).to have_current_path("/uplink?channel=trace")
+    expect(page).to have_css(".uplink-chanhead-name", text: "#trace")
+    expect(page).to have_title("Uplink — hackr.tv") # the visit read it: nothing waits
+    await_uplink!
+
+    # Quick switcher: Ctrl+K from the composer, type, Enter → the channel.
+    find_field("content").send_keys([:control, "k"])
+    expect(page).to have_css(".uplink-switcher-field:focus")
+    expect(page).to have_css(".uplink-switcher-option", count: 2)
+    expect(page).to have_css(".uplink-switcher-option[aria-selected='true'][data-channel='ambient']") # sidebar order; the channel on screen is marked, not preselected
+    expect(page).to have_css(".uplink-switcher-option[data-channel='trace'] .uplink-switcher-here", text: "HERE")
+    find(".uplink-switcher-field").send_keys("amb")
+    expect(page).to have_css(".uplink-switcher-option", count: 1)
+    find(".uplink-switcher-field").send_keys(:enter)
+    expect(page).to have_current_path("/uplink?channel=ambient")
+    expect(page).to have_css(".uplink-chanhead-name", text: "#ambient")
+    expect(page).to have_no_css(".uplink-switcher-field:focus")
   end
 
   it "docks the chat on the live home page and sends from there" do

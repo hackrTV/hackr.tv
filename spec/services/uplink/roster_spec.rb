@@ -56,4 +56,23 @@ RSpec.describe Uplink::Roster do
     expect(described_class.for(nil, viewer: operative)).to be_empty
     expect(described_class.for(nil).groups).to eq({})
   end
+
+  describe ".counts (the sidebar rows)" do
+    it "counts valid, non-service presence rows per channel for every channel given, the viewer added on the channel they view until their row lands" do
+      present!(operative)
+      present!(admin)
+      present!(operator, other_channel)
+      present!(create(:grid_hackr, service_account: true))
+      present!(create(:grid_hackr), at: (Grid::EconomyConfig::PRESENCE_TTL + 1.minute).ago)
+      third = create(:chat_channel)
+
+      expect(described_class.counts([channel, other_channel, third])).to eq(channel.id => 2, other_channel.id => 1, third.id => 0)
+      expect(described_class.counts([channel, third], viewer: operator, viewing: third)).to eq(channel.id => 2, third.id => 1)
+      expect(described_class.counts([channel], viewer: operative, viewing: channel)).to eq(channel.id => 2) # already there: not twice
+      expect(described_class.counts([channel], viewer: create(:grid_hackr, service_account: true), viewing: channel)).to eq(channel.id => 2)
+      expect(described_class.counts([channel], viewer: operator, viewing: other_channel)).to eq(channel.id => 2) # viewing a channel not listed
+      expect(described_class.counts([], viewer: operator, viewing: channel)).to eq({})
+      expect(GridUplinkPresence.where(grid_hackr: operator, chat_channel: third).count).to eq(0) # no write on a read
+    end
+  end
 end

@@ -5,26 +5,48 @@ import UplinkShellController from './uplink_shell_controller'
 
 vi.mock('@hotwired/turbo-rails', () => ({ Turbo: { visit: vi.fn() } }))
 
-// Fixture mirrors uplink/_shell's chrome: sidebar (rows with unread
-// badges + the hidden bump block) + members panes (the roster and the
-// search face with two hits), the main pane with a log of packets,
-// backdrop, jump pill, stage, composer. matchMedia is stubbed per
-// example to flip the mobile breakpoint.
+// Fixture mirrors uplink/_shell's chrome: sidebar (the switcher button,
+// category groups of rows with unread badges + the hidden bump block)
+// + members panes (the roster and the search face with two hits), the
+// main pane with a log of packets, backdrop, jump pill, stage, composer,
+// the quick switcher dialog. matchMedia is stubbed per example to flip
+// the mobile breakpoint.
 
 let mobile = false
 
-function fixture (withStage = true): string {
+function channelRow (slug: string, extra = '', count = 0, tabindex = -1): string {
+  const badge = count > 0 ? `<span class="uplink-channel-badge" data-count="${count}">${count}</span>` : '<span class="uplink-channel-badge" hidden data-count="0"></span>'
+  return `<a href="/uplink?channel=${slug}" ${slug === 'ambient' ? 'id="first-channel" ' : ''}class="uplink-channel${extra}" data-channel="${slug}" tabindex="${tabindex}"><span class="uplink-channel-name">#${slug}</span>${badge}</a>`
+}
+
+function fixture (withStage = true, opsCount = 99): string {
   return `
     <div class="uplink-shell" data-controller="uplink-shell" data-members="open" data-drawer="" data-pane="members" data-uplink-shell-channel-value="ambient" data-uplink-shell-ack-url-value="/uplink/reads" data-uplink-shell-present-url-value="/uplink?channel=ambient"
          data-action="packet-log:state->uplink-shell#logState turbo:submit-end->uplink-shell#sent keydown@document->uplink-shell#hotkey toast:connected@document->uplink-shell#toast">
       <aside data-uplink-shell-target="sidebar">
-        <a href="/uplink?channel=ambient" id="first-channel" class="uplink-channel uplink-channel--active" data-channel="ambient">#ambient<span class="uplink-channel-badge" hidden data-count="0"></span></a>
-        <a href="/uplink?channel=trace" class="uplink-channel" data-channel="trace">#trace<span class="uplink-channel-badge" hidden data-count="0"></span></a>
-        <a href="/uplink?channel=ops" class="uplink-channel uplink-channel--unread" data-channel="ops">#ops<span class="uplink-channel-badge" data-count="99">99</span></a>
-        <div class="uplink-bumps" hidden data-uplink-shell-target="bumps">
-          <span id="uplink-bump-trace" data-channel="trace"></span>
-          <span id="uplink-bump-ops" data-channel="ops"></span>
-          <span id="uplink-bump-nope" data-channel="../nope"></span>
+        <button type="button" id="switch-button" data-action="click->uplink-shell#openSwitcher">[&gt;] JUMP TO CHANNEL</button>
+        <div class="uplink-channels" data-action="keydown->uplink-shell#channelKey">
+          <div class="uplink-category-group" data-category="COMMS">
+            <button type="button" class="uplink-category" aria-expanded="true" tabindex="-1" data-action="click->uplink-shell#toggleCategory"><span class="uplink-category-glyph">[-]</span> COMMS</button>
+            <div class="uplink-category-rows">
+              ${channelRow('ambient', ' uplink-channel--active', 0, 0)}
+              ${channelRow('trace')}
+            </div>
+          </div>
+          <div class="uplink-category-group" data-category="OPERATIONS">
+            <button type="button" class="uplink-category" aria-expanded="true" tabindex="-1" data-action="click->uplink-shell#toggleCategory"><span class="uplink-category-glyph">[-]</span> OPERATIONS</button>
+            <div class="uplink-category-rows">
+              ${channelRow('ops', ' uplink-channel--unread', opsCount)}
+              ${channelRow('recon')}
+              <span class="uplink-channel uplink-channel--disabled" aria-disabled="true" data-channel="live"><span class="uplink-channel-name">#live</span></span>
+            </div>
+          </div>
+          <div class="uplink-bumps" hidden data-uplink-shell-target="bumps">
+            <span id="uplink-bump-trace" data-channel="trace"></span>
+            <span id="uplink-bump-ops" data-channel="ops"></span>
+            <span id="uplink-bump-recon" data-channel="recon"></span>
+            <span id="uplink-bump-nope" data-channel="../nope"></span>
+          </div>
         </div>
       </aside>
       <div data-uplink-shell-target="main">
@@ -52,6 +74,12 @@ function fixture (withStage = true): string {
         </section>
       </aside>
       <div class="uplink-backdrop" data-action="click->uplink-shell#closeDrawers"></div>
+      <div class="uplink-switcher" hidden data-uplink-shell-target="switcher" data-action="mousedown->uplink-shell#switcherOutside">
+        <div class="uplink-switcher-box" role="dialog">
+          <input type="text" class="uplink-switcher-field" data-uplink-shell-target="switcherField" data-action="input->uplink-shell#switcherInput keydown->uplink-shell#switcherKey">
+          <ul class="uplink-switcher-list" data-uplink-shell-target="switcherList" data-action="click->uplink-shell#switcherPick"></ul>
+        </div>
+      </div>
     </div>`
 }
 
@@ -72,8 +100,9 @@ describe('UplinkShellController', () => {
     return event
   }
 
-  async function start (html = fixture()): Promise<void> {
+  async function start (html = fixture(), title = 'Uplink — hackr.tv'): Promise<void> {
     document.body.innerHTML = html
+    document.title = title
     application = Application.start()
     application.register('uplink-shell', UplinkShellController)
     await Promise.resolve()
@@ -343,6 +372,212 @@ describe('UplinkShellController', () => {
     expect(jump().textContent).toContain('3 NEW PACKETS')
     expect(jump().textContent).not.toContain('MENTION')
     expect(jump().classList.contains('uplink-jump--mention')).toBe(false)
+  })
+
+  describe('deferred shell UX: categories, keyboard ring, quick switcher, tab title', () => {
+    const group = (name: string): HTMLElement => document.querySelector(`.uplink-category-group[data-category="${name}"]`)!
+    const heading = (name: string): HTMLButtonElement => group(name).querySelector('.uplink-category')!
+    const glyph = (name: string): string => heading(name).querySelector('.uplink-category-glyph')!.textContent!
+    const switcher = (): HTMLElement => document.querySelector('[data-uplink-shell-target="switcher"]')!
+    const field = (): HTMLInputElement => document.querySelector('[data-uplink-shell-target="switcherField"]')!
+    const options = (): HTMLElement[] => Array.from(document.querySelectorAll<HTMLElement>('.uplink-switcher-option'))
+    const listed = (): string[] => options().map(option => option.dataset.channel!)
+    const selected = (): string | undefined => options().find(option => option.getAttribute('aria-selected') === 'true')?.dataset.channel
+    const stops = (): string[] => Array.from(document.querySelectorAll<HTMLElement>('.uplink-category, .uplink-channel')).filter(el => el.getAttribute('tabindex') === '0').map(el => el.dataset.channel ?? el.textContent!.trim())
+
+    function type (value: string): void {
+      field().value = value
+      field().dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    function mention (channel: string): void {
+      document.body.dispatchEvent(new CustomEvent('toast:connected', { bubbles: true, detail: { channel } }))
+    }
+
+    it('collapses a category from its heading — rows hide but the active and unread ones, [+] and aria-expanded flip, remembered across loads — and a bump or a mention toast brings a hidden row out', async () => {
+      await start()
+      heading('OPERATIONS').click()
+      expect(group('OPERATIONS').hasAttribute('data-collapsed')).toBe(true)
+      expect(heading('OPERATIONS').getAttribute('aria-expanded')).toBe('false')
+      expect(glyph('OPERATIONS')).toBe('[+]')
+      expect(row('ops').hidden).toBe(false) // unread: stays in view
+      expect(row('recon').hidden).toBe(true)
+      expect(document.querySelector<HTMLElement>('.uplink-channel[data-channel="live"]')!.hidden).toBe(true) // the disabled span too
+      expect(localStorage.getItem('uplink:collapsed')).toBe('["OPERATIONS"]')
+
+      heading('COMMS').click()
+      expect(row('ambient').hidden).toBe(false) // the channel on screen stays
+      expect(row('trace').hidden).toBe(true)
+      expect(localStorage.getItem('uplink:collapsed')).toBe('["COMMS","OPERATIONS"]')
+
+      await bump('trace')
+      expect(row('trace').hidden).toBe(false) // unread now: out it comes
+      expect(group('COMMS').hasAttribute('data-collapsed')).toBe(true) // the group stays folded
+      mention('recon')
+      expect(row('recon').hidden).toBe(false)
+      expect(row('recon').classList.contains('uplink-channel--mention')).toBe(true)
+
+      heading('COMMS').click()
+      expect(group('COMMS').hasAttribute('data-collapsed')).toBe(false)
+      expect(glyph('COMMS')).toBe('[-]')
+      expect(localStorage.getItem('uplink:collapsed')).toBe('["OPERATIONS"]')
+
+      application.stop()
+      await start()
+      expect(group('OPERATIONS').hasAttribute('data-collapsed')).toBe(true) // remembered
+      expect(row('recon').hidden).toBe(true)
+      expect(group('COMMS').hasAttribute('data-collapsed')).toBe(false)
+
+      localStorage.setItem('uplink:collapsed', '{"not":"a list"}') // garbage in storage is ignored
+      application.stop()
+      await start()
+      expect(document.querySelectorAll('[data-collapsed]').length).toBe(0)
+    })
+
+    it('keeps the list one Tab stop — tabindex 0 on the active row — and walks headings + shown rows with the arrows (wrapping, Home/End; Left/Right fold a heading, Left climbs from a row; hidden rows skipped, disabled spans never in)', async () => {
+      await start()
+      expect(stops()).toEqual(['ambient'])
+
+      row('ambient').focus()
+      expect(press('ArrowDown', row('ambient')).defaultPrevented).toBe(true)
+      expect(document.activeElement).toBe(row('trace'))
+      expect(stops()).toEqual(['trace']) // the stop moves with focus
+      press('ArrowDown', row('trace'))
+      expect(document.activeElement).toBe(heading('OPERATIONS'))
+      press('ArrowDown', heading('OPERATIONS'))
+      expect(document.activeElement).toBe(row('ops'))
+      press('End', row('ops'))
+      expect(document.activeElement).toBe(row('recon')) // #live's disabled span is not in the ring
+      press('ArrowDown', row('recon'))
+      expect(document.activeElement).toBe(heading('COMMS')) // wraps
+      press('ArrowUp', heading('COMMS'))
+      expect(document.activeElement).toBe(row('recon'))
+      press('Home', row('recon'))
+      expect(document.activeElement).toBe(heading('COMMS'))
+
+      press('ArrowLeft', heading('COMMS')) // fold
+      expect(group('COMMS').hasAttribute('data-collapsed')).toBe(true)
+      expect(localStorage.getItem('uplink:collapsed')).toBe('["COMMS"]')
+      expect(stops()).toEqual(['ambient']) // the active row takes the stop back
+      press('ArrowDown', heading('COMMS'))
+      expect(document.activeElement).toBe(row('ambient'))
+      press('ArrowDown', row('ambient'))
+      expect(document.activeElement).toBe(heading('OPERATIONS')) // #trace, hidden, is skipped
+      press('ArrowDown', heading('OPERATIONS'))
+      press('ArrowLeft', row('ops'))
+      expect(document.activeElement).toBe(heading('OPERATIONS')) // a row climbs to its heading
+      expect(press('ArrowRight', row('ops')).defaultPrevented).toBe(false) // nothing to the right of a row
+      press('Home', heading('OPERATIONS'))
+      press('ArrowRight', heading('COMMS')) // unfold
+      expect(group('COMMS').hasAttribute('data-collapsed')).toBe(false)
+      expect(row('trace').hidden).toBe(false)
+
+      expect(press('ArrowDown', row('ambient'), { ctrlKey: true }).defaultPrevented).toBe(false) // modified keys are not the list's
+      expect(press('ArrowDown', composer()).defaultPrevented).toBe(false) // nor keys elsewhere
+      expect(press('ArrowDown', document.getElementById('switch-button')!).defaultPrevented).toBe(false) // the button above the list is outside the ring
+    })
+
+    it('opens the quick switcher on Ctrl/Cmd+K or the sidebar button with every row listed (the channel on screen marked HERE, badges carried), filters as you type — name first, then category — walks with Up/Down, visits on Enter or click, and closes on Escape back to where focus was, on Tab, on a second Ctrl+K, on a scrim press', async () => {
+      await start()
+      expect(switcher().hidden).toBe(true)
+      composer().focus()
+      expect(press('k', document.body, { ctrlKey: true }).defaultPrevented).toBe(true)
+      expect(switcher().hidden).toBe(false)
+      expect(document.activeElement).toBe(field())
+      expect(listed()).toEqual(['ambient', 'trace', 'ops', 'recon']) // links only, sidebar order
+      expect(options()[0]!.querySelector('.uplink-switcher-here')!.textContent).toBe('HERE')
+      expect(options()[0]!.querySelector('.uplink-switcher-cat')!.textContent).toBe('COMMS')
+      expect(options()[2]!.querySelector('.uplink-switcher-badge')!.textContent).toBe('99')
+      expect(options()[1]!.querySelector('.uplink-switcher-badge')).toBeNull()
+      expect(selected()).toBe('ambient')
+      expect(field().getAttribute('aria-activedescendant')).toBe('uplink-switcher-option-ambient')
+
+      type('#R')
+      expect(listed()).toEqual(['recon', 'trace', 'ops']) // starts with it, contains it, its category (OPERATIONS) does
+      expect(selected()).toBe('recon')
+      press('ArrowDown', field())
+      expect(selected()).toBe('trace')
+      press('ArrowUp', field())
+      press('ArrowUp', field())
+      expect(selected()).toBe('ops') // wraps
+      expect(field().getAttribute('aria-activedescendant')).toBe('uplink-switcher-option-ops')
+      type('zzz')
+      expect(options()).toEqual([])
+      expect(document.querySelector('.uplink-switcher-empty')!.textContent).toBe('NO CHANNEL MATCHES')
+      expect(field().hasAttribute('aria-activedescendant')).toBe(false)
+      press('Enter', field()) // nothing to pick
+      expect(Turbo.visit).not.toHaveBeenCalled()
+      expect(switcher().hidden).toBe(false)
+
+      expect(press('Escape', field()).defaultPrevented).toBe(true)
+      expect(switcher().hidden).toBe(true)
+      expect(document.activeElement).toBe(composer()) // back where focus was
+
+      document.getElementById('switch-button')!.click()
+      expect(switcher().hidden).toBe(false)
+      expect(field().value).toBe('') // a fresh query each time
+      type('tr')
+      press('Enter', field())
+      expect(Turbo.visit).toHaveBeenCalledWith('/uplink?channel=trace')
+      expect(switcher().hidden).toBe(true)
+
+      press('k', document.body, { metaKey: true })
+      expect(switcher().hidden).toBe(false)
+      press('k', field(), { ctrlKey: true }) // toggles closed from the field too
+      expect(switcher().hidden).toBe(true)
+
+      press('k', document.body, { ctrlKey: true })
+      options()[0]!.click() // the channel on screen: just closes
+      expect(switcher().hidden).toBe(true)
+      expect(Turbo.visit).toHaveBeenCalledTimes(1)
+
+      press('k', document.body, { ctrlKey: true })
+      options()[3]!.querySelector('.uplink-switcher-name')!.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      expect(Turbo.visit).toHaveBeenLastCalledWith('/uplink?channel=recon')
+
+      press('k', document.body, { ctrlKey: true })
+      switcher().dispatchEvent(new MouseEvent('mousedown', { bubbles: true })) // the scrim
+      expect(switcher().hidden).toBe(true)
+      press('k', document.body, { ctrlKey: true })
+      expect(options()[1]!.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))).toBe(false) // inside the box: the field keeps focus
+      expect(switcher().hidden).toBe(false)
+      press('Tab', field())
+      expect(switcher().hidden).toBe(true)
+      expect(press('k', document.body, { ctrlKey: true, altKey: true }).defaultPrevented).toBe(false) // not the chord
+    })
+
+    it('badges the tab title with the unread total — the sidebar badges plus this channel\'s — with @ when one mentions you, capped 99+, cleared when nothing waits, dropped on the way out unless the next page\'s title is in', async () => {
+      await start(fixture(true, 3), '(7) Uplink — hackr.tv') // a stale prefix is not part of the base
+      expect(document.title).toBe('(3) Uplink — hackr.tv') // #ops' server-rendered badge
+      await bump('trace')
+      expect(document.title).toBe('(4) Uplink — hackr.tv')
+      state({ atBottom: false, unread: 2 })
+      expect(document.title).toBe('(6) Uplink — hackr.tv')
+      state({ atBottom: false, unread: 2, mentions: 1 })
+      expect(document.title).toBe('(@6) Uplink — hackr.tv')
+      state({ atBottom: true, unread: 0 })
+      expect(document.title).toBe('(4) Uplink — hackr.tv')
+      mention('recon')
+      expect(document.title).toBe('(4) Uplink — hackr.tv') // no count yet: the packet's bump brings it
+      await bump('recon')
+      expect(document.title).toBe('(@5) Uplink — hackr.tv')
+      for (let i = 0; i < 95; i++) await bump('trace')
+      expect(document.title).toBe('(@99+) Uplink — hackr.tv')
+
+      document.body.innerHTML = '' // the body swapped out: disconnect
+      await Promise.resolve()
+      expect(document.title).toBe('Uplink — hackr.tv') // restored on disconnect
+      application.stop()
+
+      await start(fixture(true, 0))
+      expect(document.title).toBe('Uplink — hackr.tv') // nothing waits
+      await bump('trace')
+      expect(document.title).toBe('(1) Uplink — hackr.tv')
+      document.title = 'Vault — hackr.tv' // Turbo merged the next page's head before the swap
+      document.body.innerHTML = ''
+      await Promise.resolve()
+      expect(document.title).toBe('Vault — hackr.tv')
+    })
   })
 
   it('focuses the composer on "/" unless typing in a field', async () => {

@@ -7,37 +7,53 @@
     badge (Uplink::Unread: active packets above the viewer's read mark,
     hidden at 0, "99+" capped; --unread brightens the name, --mention
     recolors the badge when one of them @mentions the viewer — the
-    mention toast adds that class live too). The hidden block after the
-    groups holds one turbo_stream_from + bump slot per counted channel:
-    ChatMessage#broadcast_bump appends an <i> there per packet and
-    uplink-shell turns it into +1 on the row. The channel on screen has
-    neither (its mark moves with the page + the shell's acks).
+    mention toast adds that class live too) and, on the channels in the
+    viewer's clearance, its connected count (uplink/_channel_count,
+    replaced live on the channel's members + bump streams). The hidden
+    block after the groups holds one turbo_stream_from + bump slot per
+    counted channel: ChatMessage#broadcast_bump appends an <i> there per
+    packet and uplink-shell turns it into +1 on the row. The channel on
+    screen has neither (its mark moves with the page + the shell's acks).
+    Categories collapse (the heading is a button, uplink-shell
+    #toggleCategory: the group's rows hide but the active and unread
+    ones — a bump reveals its row — remembered per browser) and the list
+    is one Tab stop: roving tabindex, 0 on the active row and -1
+    elsewhere, uplink-shell#channelKey walking headings + shown rows
+    with the arrow keys.
     Locals: channels, active (slug), live (bool), unread (Hash channel
-    id → Uplink::Unread::Entry, every viewable channel but the active). %>
+    id → Uplink::Unread::Entry, every viewable channel but the active),
+    counts (Hash channel id → connected count, viewable channels only). %>
 <% unread = local_assigns.fetch(:unread, {}) %>
-<div class="uplink-channels">
-  <% uplink_channel_groups(channels).each do |category, group| %>
-    <div class="uplink-category"><%= category %></div>
-    <% group.each do |ch| %>
-      <% is_active = ch.slug == active %>
-      <% disabled = !ch.currently_available? && !is_active %>
-      <% entry = unread[ch.id] %>
-      <% classes = class_names("uplink-channel", "uplink-channel--active": is_active, "uplink-channel--disabled": disabled,
-        "uplink-channel--unread": entry&.any?, "uplink-channel--mention": entry&.mentioned) %>
-      <% inner = capture do %>
-        <span class="uplink-channel-name"><%= ch.name %></span>
-        <%= uplink_live_dot(live) if ch.requires_livestream? %>
-        <% if ch.slow_mode? %><span class="uplink-channel-slow"><%= ch.slow_mode_seconds %>s</span><% end %>
-        <%= tag.span(entry&.any? ? entry.label : nil, class: "uplink-channel-badge", hidden: !entry&.any?,
-          title: "Unread packets", data: {count: entry&.count.to_i}) %>
-      <% end %>
-      <% if disabled %>
-        <span class="<%= classes %>" aria-disabled="true" title="<%= ch.description %>" data-channel="<%= ch.slug %>"><%= inner %></span>
-      <% else %>
-        <%= link_to inner, uplink_path(channel: ch.slug), class: classes, title: ch.description,
-          data: {channel: ch.slug}, aria: {current: ("page" if is_active)} %>
-      <% end %>
-    <% end %>
+<% counts = local_assigns.fetch(:counts, {}) %>
+<div class="uplink-channels" data-action="keydown->uplink-shell#channelKey">
+  <% uplink_channel_groups(channels).each_with_index do |(category, group), index| %>
+    <div class="uplink-category-group" data-category="<%= category %>">
+      <button type="button" class="uplink-category" aria-expanded="true" aria-controls="uplink-category-rows-<%= index %>" tabindex="-1"
+        data-action="click->uplink-shell#toggleCategory"><span class="uplink-category-glyph" aria-hidden="true">[-]</span> <%= category %></button>
+      <div class="uplink-category-rows" id="uplink-category-rows-<%= index %>">
+        <% group.each do |ch| %>
+          <% is_active = ch.slug == active %>
+          <% disabled = !ch.currently_available? && !is_active %>
+          <% entry = unread[ch.id] %>
+          <% classes = class_names("uplink-channel", "uplink-channel--active": is_active, "uplink-channel--disabled": disabled,
+            "uplink-channel--unread": entry&.any?, "uplink-channel--mention": entry&.mentioned) %>
+          <% inner = capture do %>
+            <span class="uplink-channel-name"><%= ch.name %></span>
+            <%= uplink_live_dot(live) if ch.requires_livestream? %>
+            <% if ch.slow_mode? %><span class="uplink-channel-slow"><%= ch.slow_mode_seconds %>s</span><% end %>
+            <%= render "uplink/channel_count", channel: ch, count: counts[ch.id] if counts.key?(ch.id) %>
+            <%= tag.span(entry&.any? ? entry.label : nil, class: "uplink-channel-badge", hidden: !entry&.any?,
+              title: "Unread packets", data: {count: entry&.count.to_i}) %>
+          <% end %>
+          <% if disabled %>
+            <span class="<%= classes %>" aria-disabled="true" title="<%= ch.description %>" data-channel="<%= ch.slug %>"><%= inner %></span>
+          <% else %>
+            <%= link_to inner, uplink_path(channel: ch.slug), class: classes, title: ch.description, tabindex: (is_active ? 0 : -1),
+              data: {channel: ch.slug}, aria: {current: ("page" if is_active)} %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
   <% end %>
   <% if channels.empty? %>
     <p class="uplink-channels-empty">NO CHANNELS</p>

@@ -217,6 +217,9 @@ Rails.application.routes.draw do
     # pane to a form whose GET lands in the shell's uplink-search frame; a
     # hit is a link to /uplink?channel=&around=<id> (the log opens on it).
     get "search", to: "uplink/search#show", as: :uplink_search
+    # Roster reload: the uplink Stimulus controller refetches the shell's
+    # uplink-members-frame here after a cable reconnect, as it does the log.
+    get "members", to: "uplink/members#show", as: :uplink_members
     # Reactions (Phase 2 item 7): GET is the emote picker (the packet's
     # hover :) loads it into the shell's uplink-reactmenu frame), POST
     # toggles the viewer's reaction with that emote (the picker's buttons

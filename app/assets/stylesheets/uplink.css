@@ -199,7 +199,7 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
    sat here and shoved every pane one cell over), so only the four panes
    + backdrop may occupy the grid (the operator menu frame is absolute, so
    it takes no cell). Stream sources live in .uplink-main. */
-.uplink-shell > :not(.uplink-rail, .uplink-sidebar, .uplink-main, .uplink-members-pane, .uplink-backdrop, .uplink-modmenu-frame) { display: none; }
+.uplink-shell > :not(.uplink-rail, .uplink-sidebar, .uplink-main, .uplink-members-pane, .uplink-backdrop, .uplink-modmenu-frame, .uplink-switcher) { display: none; }
 
 /* Rail: one NODE (hackr.tv). */
 .uplink-rail { display: flex; flex-direction: column; align-items: center; padding-top: 10px; background-color: var(--bg-0); border-right: 1px solid var(--edge); }
@@ -213,13 +213,27 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .uplink-sidebar-kicker { color: var(--accent); font-size: 16px; font-weight: bold; letter-spacing: 2px; }
 .uplink-sidebar-node { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
 .uplink-channels { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0; }
-.uplink-category { padding: 12px 12px 4px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+/* Category headings are buttons (uplink-shell#toggleCategory): a
+   collapsed group hides its rows but the active and unread ones — the
+   controller sets [hidden] per row, so the keyboard ring and the CSS
+   agree. The glyph flips [-]/[+]. */
+.uplink-category { display: flex; align-items: center; gap: 4px; width: 100%; padding: 12px 12px 4px; background: none; border: none; color: var(--fg-faint); font-family: inherit; font-size: 12px; letter-spacing: 1px; text-align: left; cursor: pointer; }
+.uplink-category:hover { color: var(--fg-muted); }
+.uplink-category-glyph { color: var(--edge-bright); letter-spacing: 0; }
+.uplink-category-group[data-collapsed] .uplink-category-glyph { color: var(--fg-muted); }
+.uplink-channel[hidden] { display: none; }
+/* Quick switcher affordance under the NODE header (Ctrl+K from anywhere). */
+.uplink-sidebar-switch { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin: 8px 8px 0; height: 28px; padding: 0 8px; background-color: var(--bg-0); border: 1px solid var(--edge); color: var(--fg-faint); font-family: inherit; font-size: 12px; letter-spacing: 1px; text-align: left; cursor: pointer; }
+.uplink-sidebar-switch:hover { border-color: var(--edge-bright); color: var(--fg-muted); }
+.uplink-sidebar-key { margin-left: auto; font-family: inherit; font-size: 12px; letter-spacing: 0; color: var(--edge-bright); }
 .uplink-channel { display: flex; align-items: center; gap: 6px; margin: 0 6px; padding: 6px 8px 6px 10px; border-left: 2px solid transparent; color: var(--fg-muted); font-size: 16px; text-decoration: none; }
 a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-channel--active { background-color: var(--bg-2); border-left-color: var(--accent); color: var(--fg-bright); }
 .uplink-channel--disabled { color: var(--edge-bright); cursor: not-allowed; }
 .uplink-channel-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .uplink-channel-slow { color: var(--fg-faint); font-size: 12px; }
+.uplink-channel-count { color: var(--fg-faint); font-size: 12px; } /* connected operatives (uplink/_channel_count), replaced live */
+.uplink-channel-count[hidden] { display: none; }
 /* Unread badge: the count of packets above the viewer's read mark (server-rendered, bumped live by uplink-shell, hidden at 0, capped "99+").
    --unread brightens the name; --mention (server, or the mention toast landing live) recolors the badge. */
 .uplink-channel-badge { min-width: 16px; padding: 0 4px; font-size: 12px; line-height: 16px; text-align: center; font-weight: bold; background-color: var(--fg-muted); color: var(--bg-0); }
@@ -451,6 +465,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 /* Operatives pane: role groups of anonymized callsigns. */
 .uplink-members-pane { display: flex; flex-direction: column; min-height: 0; background-color: var(--bg-1); border-left: 1px solid var(--edge); }
 .uplink-members-title { flex-shrink: 0; padding: 0 12px; height: 44px; display: flex; align-items: center; color: var(--accent); font-size: 14px; letter-spacing: 2px; border-bottom: 1px solid var(--edge); }
+.uplink-members-frame { display: flex; flex-direction: column; flex: 1; min-height: 0; } /* the reconnect-reload frame around the roster */
 .uplink-members { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0; }
 .uplink-members-empty { padding: 12px; color: var(--fg-faint); font-size: 14px; }
 .uplink-members-heading { margin: 0; padding: 12px 12px 4px; color: var(--fg-faint); font-size: 12px; font-weight: normal; letter-spacing: 1px; font-family: inherit; }
@@ -472,7 +487,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
    never flips the face back. */
 .uplink-search { display: none; }
 .uplink-shell[data-pane="search"] .uplink-search { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-.uplink-shell[data-pane="search"] .uplink-members-title--roster, .uplink-shell[data-pane="search"] .uplink-members { display: none; }
+.uplink-shell[data-pane="search"] .uplink-members-title--roster, .uplink-shell[data-pane="search"] .uplink-members-frame { display: none; }
 .uplink-search-title { justify-content: space-between; }
 .uplink-search-close { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; letter-spacing: 0; cursor: pointer; }
 .uplink-search-close:hover { color: var(--fg-bright); }
@@ -500,6 +515,28 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-result-jump:hover .uplink-result-text { color: var(--fg-bright); }
 .uplink-result-hit { background-color: rgba(var(--accent-rgb), 0.35); color: var(--fg-bright); } /* the browser's mark is yellow-on-black */
 
+/* Quick switcher (uplink-shell#openSwitcher: Ctrl/Cmd+K anywhere or the
+   sidebar's [>]): a grid child like the operator menu frame — absolute,
+   so no cell; above the drawers (20) and their backdrop (15) — the
+   dialog parked near the top, its options built client-side from the
+   sidebar rows. Closed = [hidden]. */
+.uplink-switcher { position: absolute; inset: 0; z-index: 30; display: flex; justify-content: center; align-items: flex-start; padding: 10vh 16px 0; background-color: rgba(0, 0, 0, 0.6); } /* scrim as the drawers' */
+.uplink-switcher[hidden] { display: none; }
+.uplink-switcher-box { width: min(480px, 100%); background-color: var(--bg-1); border: 1px solid var(--edge-bright); }
+.uplink-switcher-field { display: block; width: 100%; height: 36px; padding: 0 12px; background-color: var(--bg-0); border: none; border-bottom: 1px solid var(--edge); color: var(--fg); font-family: inherit; font-size: 16px; }
+.uplink-switcher-field::placeholder { color: var(--fg-faint); }
+.uplink-switcher-field:focus { outline: none; border-bottom-color: var(--accent); }
+.uplink-switcher-list { margin: 0; padding: 4px 0; list-style: none; }
+.uplink-switcher-option { display: flex; align-items: center; gap: 8px; padding: 6px 12px; color: var(--fg-muted); cursor: pointer; }
+.uplink-switcher-option:hover { color: var(--fg-bright); }
+.uplink-switcher-option[aria-selected="true"] { background-color: var(--bg-2); color: var(--fg-bright); box-shadow: inset 2px 0 0 0 var(--accent); }
+.uplink-switcher-cat { flex-shrink: 0; min-width: 72px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-switcher-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.uplink-switcher-here { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-switcher-badge { min-width: 16px; padding: 0 4px; font-size: 12px; line-height: 16px; text-align: center; font-weight: bold; background-color: var(--fg-muted); color: var(--bg-0); }
+.uplink-switcher-empty { padding: 8px 12px; color: var(--fg-faint); font-size: 14px; }
+.uplink-switcher-hint { margin: 0; padding: 6px 12px; border-top: 1px solid var(--edge); color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+
 /* Under 768px: single column; sidebar + operatives become drawers over
    the channel pane (uplink-shell controller: data-drawer, backdrop,
    inert main, Escape). The rail folds into the sidebar header. */
@@ -513,6 +550,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
   .uplink-chanhead-menu { display: inline-block; }
   .uplink-chanhead-topic { display: none; }
   .uplink-chanhead-label { display: none; }
+  .uplink-sidebar-key { display: none; } /* no keyboard to hint at */
   .uplink-sidebar, .uplink-members-pane { position: absolute; top: 0; bottom: 0; width: min(280px, 85%); z-index: 20; }
   .uplink-sidebar { left: 0; }
   .uplink-members-pane { right: 0; }

@@ -40,7 +40,19 @@ import { jumpToPacket } from '~/utils/packetJump'
 //     channel): recolor that sidebar row (--mention; the bump shows the
 //     count) when the mention is in another channel; drop the toast when
 //     it is this channel — the packet is already in the log, highlighted,
-//     and the pill covers a reader who scrolled up.
+//     and the pill covers a reader who scrolled up;
+//   - the sidebar's categories collapse (the heading is a button; the
+//     rows hide but the active and unread ones, and a bump reveals its
+//     row; remembered in localStorage) and the list is one Tab stop:
+//     the active row holds tabindex 0 and the arrows walk headings +
+//     shown rows (Home/End; Left/Right fold a heading, Left on a row
+//     climbs to its heading);
+//   - the quick switcher (Ctrl/Cmd+K anywhere, or the sidebar's [>]):
+//     a dialog whose options are the sidebar's rows, filtered as you
+//     type (name first, then category), Up/Down + Enter visiting the
+//     channel, Escape closing it back to where focus was;
+//   - the tab title: "(N) …" while packets wait — the sidebar badges
+//     plus this channel's unread — and "(@N)" when one mentions you.
 // State lives on the shell root (data-members / data-drawer), so the
 // roster being replaced by a broadcast never resets it.
 
@@ -48,15 +60,18 @@ const MOBILE_QUERY = '(max-width: 767px)'
 const MEMBERS_OPEN_MIN_WIDTH = 1100
 const MEMBERS_KEY = 'uplink:members'
 const STAGE_KEY = 'uplink:stage'
+const COLLAPSED_KEY = 'uplink:collapsed'
 const ACK_DELAY_MS = 1500
 const BADGE_CAP = 99
+const SWITCHER_MAX = 8
+const TITLE_PREFIX = /^\(@?\d+\+?\) /
 const SLUG = /^[\w-]+$/ // validated, not escaped: jsdom has no CSS.escape
 
 type Drawer = '' | 'sidebar' | 'members'
 type Pane = 'members' | 'search'
 
 export default class extends Controller<HTMLElement> {
-  static targets = ['sidebar', 'members', 'main', 'jump', 'jumpCount', 'membersToggle', 'stage', 'stageFrame', 'stageToggle', 'bumps', 'searchToggle', 'searchField']
+  static targets = ['sidebar', 'members', 'main', 'jump', 'jumpCount', 'membersToggle', 'stage', 'stageFrame', 'stageToggle', 'bumps', 'searchToggle', 'searchField', 'switcher', 'switcherField', 'switcherList']
   static values = { channel: String, ackUrl: String, presentUrl: String }
 
   declare readonly channelValue: string
@@ -82,25 +97,41 @@ export default class extends Controller<HTMLElement> {
   declare readonly searchToggleTarget: HTMLButtonElement
   declare readonly hasSearchFieldTarget: boolean
   declare readonly searchFieldTarget: HTMLInputElement
+  // The quick switcher renders in the shell only (the test fixtures may leave it out).
+  declare readonly hasSwitcherTarget: boolean
+  declare readonly switcherTarget: HTMLElement
+  declare readonly switcherFieldTarget: HTMLInputElement
+  declare readonly switcherListTarget: HTMLElement
 
   private mobile: MediaQueryList | null = null
   private bumpObserver: MutationObserver | null = null
   private ackTimer = 0
   private acked = 0
   private present = true
+  private hereUnread = 0
+  private hereMentions = 0
+  private baseTitle = ''
+  private titled = ''
+  private switcherReturn: HTMLElement | null = null
+  private switcherIndex = 0
 
   connect (): void {
+    this.baseTitle = document.title.replace(TITLE_PREFIX, '')
     this.applyMembersPreference()
     this.applyStagePreference()
+    this.applyCollapsed()
+    this.syncRoving()
     this.mobile = typeof window.matchMedia === 'function' ? window.matchMedia(MOBILE_QUERY) : null
     this.mobile?.addEventListener('change', this.closeDrawers)
     document.addEventListener('turbo:before-cache', this.closeDrawers)
+    document.addEventListener('turbo:before-cache', this.closeSwitcher)
     window.addEventListener('pagehide', this.flushAck)
     this.acked = this.lastPacket()?.id ?? 0 // the render marked everything on screen
     if (this.hasBumpsTarget) {
       this.bumpObserver = new MutationObserver(records => this.onBumps(records))
       this.bumpObserver.observe(this.bumpsTarget, { childList: true, subtree: true })
     }
+    this.updateTitle()
     this.autofocusComposer()
   }
 
@@ -108,11 +139,14 @@ export default class extends Controller<HTMLElement> {
     this.mobile?.removeEventListener('change', this.closeDrawers)
     this.mobile = null
     document.removeEventListener('turbo:before-cache', this.closeDrawers)
+    document.removeEventListener('turbo:before-cache', this.closeSwitcher)
     window.removeEventListener('pagehide', this.flushAck)
     this.bumpObserver?.disconnect()
     this.bumpObserver = null
     this.flushAck()
     this.setDrawer('')
+    this.closeSwitcher()
+    if (document.title === this.titled) document.title = this.baseTitle // unless Turbo already put the next page's in
     if (this.hasStageTarget) this.stageFrameTarget.removeAttribute('src')
   }
 
@@ -137,6 +171,238 @@ export default class extends Controller<HTMLElement> {
 
   closeDrawers = (): void => {
     this.setDrawer('')
+  }
+
+  // ── Sidebar: categories + the keyboard ring ────────────────────────
+
+  toggleCategory (event: Event): void {
+    const group = (event.currentTarget as HTMLElement).closest<HTMLElement>('.uplink-category-group')
+    if (!group) return
+    this.setCollapsed(group, !group.hasAttribute('data-collapsed'))
+    this.storeCollapsed()
+  }
+
+  // Arrow keys over headings + shown rows (the list is one Tab stop).
+  channelKey (event: KeyboardEvent): void {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
+    const current = event.target
+    if (!(current instanceof HTMLElement)) return
+    const ring = this.ring()
+    const index = ring.indexOf(current)
+    if (index < 0) return
+    let next: HTMLElement | undefined
+    switch (event.key) {
+    case 'ArrowDown': next = ring[(index + 1) % ring.length]; break
+    case 'ArrowUp': next = ring[(index - 1 + ring.length) % ring.length]; break
+    case 'Home': next = ring[0]; break
+    case 'End': next = ring[ring.length - 1]; break
+    case 'ArrowLeft':
+    case 'ArrowRight': {
+      const group = current.closest<HTMLElement>('.uplink-category-group')
+      if (!group) return
+      if (current.matches('.uplink-category')) { // fold / unfold the heading
+        event.preventDefault()
+        this.setCollapsed(group, event.key === 'ArrowLeft')
+        this.storeCollapsed()
+        return
+      }
+      if (event.key === 'ArrowRight') return
+      next = group.querySelector<HTMLElement>('.uplink-category') ?? undefined // a row climbs to its heading
+      break
+    }
+    default: return
+    }
+    if (!next) return
+    event.preventDefault()
+    this.setRoving(next)
+    next.focus()
+  }
+
+  private applyCollapsed (): void {
+    const names = this.readCollapsed()
+    this.groups().forEach(group => {
+      if (names.includes(group.dataset.category ?? '')) this.setCollapsed(group, true)
+    })
+  }
+
+  private setCollapsed (group: HTMLElement, collapsed: boolean): void {
+    group.toggleAttribute('data-collapsed', collapsed)
+    const button = group.querySelector<HTMLButtonElement>('.uplink-category')
+    button?.setAttribute('aria-expanded', String(!collapsed))
+    const glyph = button?.querySelector('.uplink-category-glyph')
+    if (glyph) glyph.textContent = collapsed ? '[+]' : '[-]'
+    group.querySelectorAll<HTMLElement>('.uplink-channel').forEach(row => { row.hidden = collapsed && !this.keptRow(row) })
+    this.syncRoving()
+  }
+
+  // The rows a collapsed category keeps showing: the one on screen and the unread ones.
+  private keptRow (row: HTMLElement): boolean {
+    return row.matches('.uplink-channel--active, .uplink-channel--unread, .uplink-channel--mention')
+  }
+
+  private readCollapsed (): string[] {
+    try {
+      const parsed: unknown = JSON.parse(this.read(COLLAPSED_KEY) ?? '[]')
+      return Array.isArray(parsed) ? parsed.filter((name): name is string => typeof name === 'string') : []
+    } catch {
+      return []
+    }
+  }
+
+  private storeCollapsed (): void {
+    const names = this.groups().filter(group => group.hasAttribute('data-collapsed')).map(group => group.dataset.category ?? '')
+    this.store(COLLAPSED_KEY, JSON.stringify(names))
+  }
+
+  private groups (): HTMLElement[] {
+    return Array.from(this.element.querySelectorAll<HTMLElement>('.uplink-category-group'))
+  }
+
+  // Headings + shown rows, in sidebar order.
+  private ring (): HTMLElement[] {
+    return Array.from(this.sidebarTarget.querySelectorAll<HTMLElement>('.uplink-category, a.uplink-channel')).filter(el => !el.hidden)
+  }
+
+  private setRoving (stop: HTMLElement): void {
+    this.ring().forEach(item => { item.tabIndex = item === stop ? 0 : -1 })
+  }
+
+  // The stop: the active row when shown, else the current stop if still shown, else the first item.
+  private syncRoving (): void {
+    const ring = this.ring()
+    if (ring.length === 0) return
+    const current = ring.find(el => el.getAttribute('tabindex') === '0')
+    this.setRoving(ring.find(el => el.classList.contains('uplink-channel--active')) ?? current ?? ring[0]!)
+  }
+
+  // ── Quick switcher (Ctrl/Cmd+K) ────────────────────────────────────
+
+  openSwitcher (): void {
+    if (!this.hasSwitcherTarget) return
+    this.switcherReturn = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    this.switcherTarget.hidden = false
+    this.switcherFieldTarget.value = ''
+    this.renderSwitcher('')
+    this.switcherFieldTarget.focus()
+  }
+
+  closeSwitcher = (): void => {
+    if (!this.hasSwitcherTarget || this.switcherTarget.hidden) return
+    this.switcherTarget.hidden = true
+    const back = this.switcherReturn
+    this.switcherReturn = null
+    if (back?.isConnected) back.focus()
+  }
+
+  switcherInput (): void {
+    this.renderSwitcher(this.switcherFieldTarget.value)
+  }
+
+  switcherKey (event: KeyboardEvent): void {
+    if (event.defaultPrevented) return
+    const options = this.switcherOptions()
+    switch (event.key) {
+    case 'ArrowDown': this.selectOption((this.switcherIndex + 1) % Math.max(options.length, 1)); break
+    case 'ArrowUp': this.selectOption((this.switcherIndex - 1 + options.length) % Math.max(options.length, 1)); break
+    case 'Enter': this.pickOption(options[this.switcherIndex]); break
+    case 'Escape':
+    case 'Tab': this.closeSwitcher(); break
+    default: return
+    }
+    event.preventDefault()
+  }
+
+  switcherPick (event: Event): void {
+    if (!(event.target instanceof Element)) return
+    const option = event.target.closest<HTMLElement>('.uplink-switcher-option')
+    if (option) this.pickOption(option)
+  }
+
+  // A press on the scrim closes; one inside the box must not take the field's focus.
+  switcherOutside (event: MouseEvent): void {
+    if (event.target === this.switcherTarget) {
+      this.closeSwitcher()
+    } else if (!(event.target instanceof HTMLInputElement)) {
+      event.preventDefault()
+    }
+  }
+
+  private renderSwitcher (raw: string): void {
+    const query = raw.trim().replace(/^#/, '').toLowerCase()
+    const list = this.switcherListTarget
+    list.replaceChildren()
+    const rows = Array.from(this.sidebarTarget.querySelectorAll<HTMLAnchorElement>('a.uplink-channel'))
+    const ranked = rows.map(row => ({ row, rank: this.switcherRank(row, query) })).filter(item => item.rank > 0)
+    ranked.sort((a, b) => b.rank - a.rank) // stable: sidebar order within a rank
+    ranked.slice(0, SWITCHER_MAX).forEach(({ row }) => list.appendChild(this.switcherOption(row)))
+    if (ranked.length === 0) {
+      const empty = document.createElement('li')
+      empty.className = 'uplink-switcher-empty'
+      empty.textContent = 'NO CHANNEL MATCHES'
+      list.appendChild(empty)
+    }
+    this.selectOption(0)
+  }
+
+  // 3: the name starts with the query, 2: contains it, 1: its category does (or no query), 0: out.
+  private switcherRank (row: HTMLAnchorElement, query: string): number {
+    if (!query) return 1
+    const name = this.channelName(row).toLowerCase().replace(/^#/, '')
+    if (name.startsWith(query)) return 3
+    if (name.includes(query)) return 2
+    return this.channelCategory(row).toLowerCase().includes(query) ? 1 : 0
+  }
+
+  private switcherOption (row: HTMLAnchorElement): HTMLLIElement {
+    const option = document.createElement('li')
+    option.className = 'uplink-switcher-option'
+    option.setAttribute('role', 'option')
+    option.id = `uplink-switcher-option-${row.dataset.channel ?? ''}`
+    option.dataset.href = row.getAttribute('href') ?? ''
+    option.dataset.channel = row.dataset.channel ?? ''
+    const parts: Array<[string, string]> = [['uplink-switcher-cat', this.channelCategory(row)], ['uplink-switcher-name', this.channelName(row)]]
+    if (row.classList.contains('uplink-channel--active')) parts.push(['uplink-switcher-here', 'HERE'])
+    const badge = row.querySelector<HTMLElement>('.uplink-channel-badge')
+    if (badge && !badge.hidden && badge.textContent) parts.push(['uplink-switcher-badge', badge.textContent])
+    parts.forEach(([className, text]) => {
+      const span = document.createElement('span')
+      span.className = className
+      span.textContent = text
+      option.appendChild(span)
+    })
+    return option
+  }
+
+  private selectOption (index: number): void {
+    const options = this.switcherOptions()
+    this.switcherIndex = options.length > 0 ? Math.min(index, options.length - 1) : 0
+    options.forEach((option, i) => option.setAttribute('aria-selected', String(i === this.switcherIndex)))
+    const selected = options[this.switcherIndex]
+    if (selected) {
+      this.switcherFieldTarget.setAttribute('aria-activedescendant', selected.id)
+    } else {
+      this.switcherFieldTarget.removeAttribute('aria-activedescendant')
+    }
+  }
+
+  private pickOption (option: HTMLElement | undefined): void {
+    if (!option) return
+    const href = option.dataset.href
+    const here = option.dataset.channel === this.channelValue
+    this.closeSwitcher()
+    if (href && !here) Turbo.visit(href)
+  }
+
+  private switcherOptions (): HTMLElement[] {
+    return Array.from(this.switcherListTarget.querySelectorAll<HTMLElement>('.uplink-switcher-option'))
+  }
+
+  private channelName (row: HTMLElement): string {
+    return (row.querySelector('.uplink-channel-name') ?? row).textContent?.trim() ?? ''
+  }
+
+  private channelCategory (row: HTMLElement): string {
+    return row.closest<HTMLElement>('.uplink-category-group')?.dataset.category ?? ''
   }
 
   // ── Search face ────────────────────────────────────────────────────
@@ -202,6 +468,9 @@ export default class extends Controller<HTMLElement> {
     const { atBottom, unread } = event.detail
     const mentions = event.detail.mentions ?? 0
     this.present = event.detail.atPresent ?? true
+    this.hereUnread = unread
+    this.hereMentions = mentions
+    this.updateTitle()
     if (atBottom && this.present) this.scheduleAck()
     const show = !this.present || (!atBottom && unread > 0)
     this.jumpTarget.hidden = !show
@@ -242,7 +511,11 @@ export default class extends Controller<HTMLElement> {
       if (event.target instanceof HTMLElement) event.target.remove()
       return
     }
-    this.row(slug)?.classList.add('uplink-channel--mention') // the packet's bump shows the count
+    const row = this.row(slug)
+    if (!row) return
+    row.classList.add('uplink-channel--mention') // the packet's bump shows the count
+    row.hidden = false // out of a collapsed category
+    this.updateTitle()
   }
 
   // Each <i> appended into a bump slot (data-channel) is one packet in
@@ -268,6 +541,8 @@ export default class extends Controller<HTMLElement> {
     badge.textContent = count > BADGE_CAP ? `${BADGE_CAP}+` : String(count)
     badge.hidden = false
     row.classList.add('uplink-channel--unread')
+    row.hidden = false // out of a collapsed category
+    this.updateTitle()
   }
 
   private row (slug: string): HTMLElement | null {
@@ -321,10 +596,38 @@ export default class extends Controller<HTMLElement> {
     return { id, own: !!viewer && last.dataset.packetOwnerIdValue === viewer }
   }
 
+  // ── Tab title ──────────────────────────────────────────────────────
+
+  // "(N) Uplink — hackr.tv" while packets wait: the sidebar badges plus
+  // this channel's unread (the pill's count), "(@N)" when one @mentions
+  // the viewer; the plain title when nothing does.
+  private updateTitle (): void {
+    let total = this.hereUnread
+    let mention = this.hereMentions > 0
+    this.element.querySelectorAll<HTMLElement>('.uplink-channel-badge').forEach(badge => {
+      if (badge.hidden) return
+      total += Number(badge.dataset.count ?? 0) || 0
+      if (badge.closest('.uplink-channel--mention')) mention = true
+    })
+    const count = total > BADGE_CAP ? `${BADGE_CAP}+` : String(total)
+    this.titled = total > 0 ? `(${mention ? '@' : ''}${count}) ${this.baseTitle}` : this.baseTitle
+    document.title = this.titled
+  }
+
   // ── Keys ───────────────────────────────────────────────────────────
 
   hotkey (event: KeyboardEvent): void {
     if (event.defaultPrevented) return
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'k') {
+      if (!this.hasSwitcherTarget) return
+      event.preventDefault()
+      if (this.switcherTarget.hidden) {
+        this.openSwitcher()
+      } else {
+        this.closeSwitcher()
+      }
+      return
+    }
     if (event.key === 'Escape') {
       if (!this.drawer) return
       event.preventDefault()
@@ -358,7 +661,8 @@ export default class extends Controller<HTMLElement> {
     this.mainTarget.toggleAttribute('inert', name !== '')
     if (name === '') return
     const pane = name === 'sidebar' ? this.sidebarTarget : this.membersTarget
-    pane.querySelector<HTMLElement>('a, button')?.focus()
+    const stop = name === 'sidebar' ? this.ring().find(el => el.getAttribute('tabindex') === '0') : undefined // the list's Tab stop (the active row)
+    ;(stop ?? pane.querySelector<HTMLElement>('a, button'))?.focus()
   }
 
   private setMembers (open: boolean): void {

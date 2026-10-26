@@ -1,0 +1,8 @@
+<%# A sidebar row's connected count (Uplink::Roster.counts: valid presence
+    rows, service accounts excluded). The id is the replace target
+    Uplink::MembersBroadcaster pushes on the channel's members + bump
+    streams whenever its roster changes, so the number moves live on
+    every shell that lists the channel. Hidden at 0. Locals: channel,
+    count. %>
+<%= tag.span((count if count > 0), id: Uplink::MembersBroadcaster.count_target(channel.slug), class: "uplink-channel-count",
+  hidden: count.zero?, title: "#{count} #{"operative".pluralize(count)} connected") %>
