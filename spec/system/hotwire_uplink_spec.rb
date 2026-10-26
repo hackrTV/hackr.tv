@@ -548,6 +548,54 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
   end
 
+  it "reacts from the hover picker: the chip lands live for both sessions, outlined only where it is yours; a chip click stacks or removes a reaction" do
+    create(:emote, slug: "wave")
+    packet = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "React to me")
+
+    using_session(:viewer) do
+      log_in!(hackr)
+      visit "/uplink"
+      await_uplink!
+      expect(page).to have_css("#reactions_chat_message_#{packet.id}", visible: :hidden) # nothing yet: the row is hidden
+    end
+
+    log_in!(operator)
+    visit "/uplink"
+    await_uplink!
+    find("#chat_message_#{packet.id}").hover
+    within("#chat_message_#{packet.id}") { find("button[title='React to packet']").click }
+    within("#uplink-reactmenu") do
+      expect(page).to have_css(".uplink-reactmenu-kicker", text: "REACT", wait: 10)
+      find("button[title=':wave:']").click
+    end
+    expect(page).to have_css("#uplink-reactmenu", visible: :hidden) # the pick closes the picker
+    within("#reactions_chat_message_#{packet.id}") do
+      expect(page).to have_css(".packet-reaction.packet-reaction--own[aria-pressed='true']", text: "1", wait: 10)
+    end
+    expect(packet.reload.reactions.pluck(:grid_hackr_id, :emote_slug)).to eq([[operator.id, "wave"]])
+
+    using_session(:viewer) do
+      within("#reactions_chat_message_#{packet.id}") do
+        expect(page).to have_css(".packet-reaction:not(.packet-reaction--own)[aria-pressed='false']", text: "1", wait: 10)
+        find(".packet-reaction").click # stack on it
+        expect(page).to have_css(".packet-reaction.packet-reaction--own", text: "2", wait: 10)
+      end
+    end
+
+    within("#reactions_chat_message_#{packet.id}") do
+      expect(page).to have_css(".packet-reaction.packet-reaction--own", text: "2", wait: 10)
+      find(".packet-reaction").click # take mine back
+      expect(page).to have_css(".packet-reaction:not(.packet-reaction--own)", text: "1", wait: 10)
+    end
+    expect(packet.reload.reactions.pluck(:grid_hackr_id, :emote_slug)).to eq([[hackr.id, "wave"]])
+
+    using_session(:viewer) do
+      within("#reactions_chat_message_#{packet.id}") do
+        expect(page).to have_css(".packet-reaction.packet-reaction--own", text: "1", wait: 10)
+      end
+    end
+  end
+
   it "docks the chat on the live home page and sends from there" do
     create(:hackr_stream, artist: create(:artist), title: "DOCK SESSIONS",
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")

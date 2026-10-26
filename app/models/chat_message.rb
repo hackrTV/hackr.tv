@@ -49,6 +49,9 @@ class ChatMessage < ApplicationRecord
   # Channel pins (Phase 2 item 6): operator+ curation of any active packet.
   # The pinner's FK nulls if that hackr is hard-deleted; the pin stays.
   belongs_to :pinned_by, class_name: "GridHackr", optional: true
+  # Reactions (Phase 2 item 7): one row per hackr per emote, in reaction
+  # order so the chips keep first-reaction order. The FK cascades.
+  has_many :reactions, -> { order(:id) }, class_name: "ChatMessageReaction", inverse_of: :chat_message
 
   validates :content, presence: true, length: {maximum: 512}
   validate :reply_to_in_channel
@@ -57,6 +60,7 @@ class ChatMessage < ApplicationRecord
   MENTION_CAP = 5 # @mention toasts per packet
   REPLY_REFRESH_CAP = 20 # reply rows re-rendered when their parent is dropped/restored
   PIN_CAP = 50 # pinned packets per channel (Discord's limit)
+  REACTION_CAP = 20 # distinct emotes per packet (Discord's limit)
 
   scope :active, -> { where(dropped: false) }
   scope :dropped, -> { where(dropped: true) }
@@ -101,6 +105,28 @@ class ChatMessage < ApplicationRecord
 
   def unpin!
     update(pinned_at: nil, pinned_by: nil)
+  end
+
+  # Reactions grouped for the chips: [[emote_slug, [callsign tokens]], …]
+  # in first-reaction order (the association is id-ordered). Tokens, not
+  # ids: the row is broadcast viewer-neutral and the reactions Stimulus
+  # controller matches the viewer's own token (Uplink::Callsign).
+  def reaction_groups
+    reactions.each_with_object({}) { |reaction, groups|
+      (groups[reaction.emote_slug] ||= []) << Uplink::Callsign.token(reaction.grid_hackr_id)
+    }.to_a
+  end
+
+  # The chip row alone (uplink/_reactions, replaced by its id) — not the
+  # whole packet, so a reaction never disturbs the row's hover state or
+  # its grouping. Public: ChatMessageReaction's commit callback calls it.
+  def broadcast_reactions_html
+    Turbo::StreamsChannel.broadcast_replace_to(
+      ["uplink_html", chat_channel.slug],
+      target: ActionView::RecordIdentifier.dom_id(self, :reactions),
+      partial: "uplink/reactions",
+      locals: {packet: self}
+    )
   end
 
   # Hackrs this packet @mentions who may actually read it, in mention

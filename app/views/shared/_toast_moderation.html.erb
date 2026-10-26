@@ -1,10 +1,12 @@
-<%# Operator menu reply (Uplink::PunishmentsController): appended to the
-    acting operator's #toast-region in the turbo_stream response, so it
-    never reaches another viewer. Locals: message, error (true = the
-    action was refused). The toast controller auto-dismisses it; it
-    announces no channel, so the shell leaves it alone. %>
+<%# Operator menu reply (Uplink::PunishmentsController, the pin and
+    reaction refusals too): appended to the acting viewer's #toast-region
+    in the turbo_stream response, so it never reaches another viewer.
+    Locals: message, error (true = the action was refused), kicker
+    (optional, MODERATION by default). The toast controller
+    auto-dismisses it; it announces no channel, so the shell leaves it
+    alone. %>
 <div class="toast toast--moderation<%= " toast--moderation-error" if error %>" role="status"
   data-controller="toast" data-action="click->toast#dismiss">
-  <div class="toast-kicker toast-kicker--moderation">MODERATION</div>
+  <div class="toast-kicker toast-kicker--moderation"><%= local_assigns.fetch(:kicker, "MODERATION") %></div>
   <div class="toast-title"><%= message %></div>
 </div>

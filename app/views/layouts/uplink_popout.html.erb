@@ -11,6 +11,11 @@
       <meta name="current-hackr-id" content="<%= current_hackr.id %>">
       <meta name="current-hackr-alias" content="<%= current_hackr.hackr_alias %>">
       <meta name="current-hackr-role" content="<%= current_hackr.role %>">
+      <%# The viewer's anonymized Uplink callsign token (Uplink::Callsign):
+          the members controller reveals "you" in the roster and the
+          reactions controller marks the viewer's own chips — on every
+          surface the packets render (shell, dock, popout). %>
+      <meta name="uplink-callsign" content="<%= Uplink::Callsign.token(current_hackr.id) %>">
     <% end %>
 
     <%= yield :head %>

@@ -25,7 +25,11 @@
     packet (the marker), and the hover ◆ pin/unpin form (operator+,
     revealed by the packet controller, CSS-hidden off the shell) — the
     pin endpoints and the model both replace the whole row, so the
-    marker and the control flip together. %>
+    marker and the control flip together. Reactions: the chip row under
+    the content (uplink/_reactions — its own id, replaced alone on every
+    reaction) and the hover :) that opens the emote picker into the
+    shell's uplink-reactmenu frame (popover#open; CSS-hidden off the
+    shell, where the chips themselves still toggle). %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   bot = packet.source == "SYNTHIA"
@@ -78,6 +82,7 @@
       <% end %>
       <span class="packet-content<%= " packet-content--synthia" if bot %>"><% if packet.dropped? %>[PACKET DROPPED]<% else %><%= uplink_packet_text(packet) %><% end %></span>
     <% end %>
+    <%= render "uplink/reactions", packet: packet %>
   </div>
 
   <div class="packet-actions">
@@ -86,6 +91,9 @@
         class: "packet-action-button", title: "Restore packet", form_class: "uplink-inline-form",
         form: {hidden: !can_moderate, data: {packet_target: "restoreControl"}} %>
     <% else %>
+      <button type="button" class="packet-action-button packet-react-button" title="React to packet"
+        data-action="click->popover#open" data-popover-url-param="<%= uplink_packet_reactions_path(packet) %>"
+        data-popover-frame-param="uplink-reactmenu">:)</button>
       <button type="button" class="packet-action-button packet-reply-button" title="Reply to packet"
         data-action="click->packet#reply" data-reply-sender="<%= uplink_packet_sender(packet, parsed) %>">↩</button>
       <%= button_to "◆", packet.pinned? ? uplink_packet_unpin_path(packet) : uplink_packet_pin_path(packet), method: :post,

@@ -4,7 +4,7 @@ import { isModerator, outranks } from '~/utils/uplinkRoles'
 // Operatives roster (uplink/_members). Rows are anonymized callsigns —
 // the roster is broadcast viewer-neutral — so on every connect (initial
 // render and each Turbo Stream replace) this reveals, from the page
-// metas (uplink-callsign: the viewer's own token, set by uplink/show;
+// metas (uplink-callsign: the viewer's own token, set by the layouts;
 // current-hackr-alias; current-hackr-role):
 //   - the viewer's own row, as their real alias;
 //   - for operators/admins, the hover […] operator-menu button on the

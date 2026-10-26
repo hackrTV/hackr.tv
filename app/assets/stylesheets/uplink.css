@@ -67,9 +67,9 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
 /* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster, the record popover. */
-.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin { color: #00d4ff; }
-.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator { color: #ffaa00; }
-.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative { color: #cc0088; }
+.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin, .uplink-reactmenu-target--admin { color: #00d4ff; }
+.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator, .uplink-reactmenu-target--operator { color: #ffaa00; }
+.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative, .uplink-reactmenu-target--operative { color: #cc0088; }
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
@@ -94,7 +94,7 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
    no reply bar) + the viewer-neutral hidden drop/restore form. The pin
    form is shell-only too (the dock/popout show no pins). */
 .packet-actions { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
-.packet-reply-button, .packet-mod-button { display: none; }
+.packet-reply-button, .packet-react-button, .packet-mod-button { display: none; }
 .uplink-inline-form { display: inline; }
 /* Author display beats the UA [hidden] rule — re-assert it, or the
    viewer-neutral hidden mod controls render for everyone. */
@@ -102,6 +102,23 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .uplink-pin-form { display: none; }
 .packet-action-button { background: transparent; border: none; color: var(--fg-faint); cursor: pointer; padding: 2px 6px; font-size: 0.7rem; opacity: 0.6; font-family: inherit; }
 .packet-action-button:hover { opacity: 1; }
+
+/* Reactions (Phase 2 item 7): a chip row under the content — one
+   ":emote: N" button per emote, a POST toggle of the viewer's own
+   reaction. Rendered viewer-neutral on every surface; the reactions
+   controller marks the viewer's own chips (--own) from the
+   uplink-callsign meta and disables them for a logged-out viewer. The
+   row is hidden while empty (author display beats the UA [hidden] rule). */
+.packet-reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.packet-reactions[hidden] { display: none; }
+.packet-reaction-form { display: inline; }
+.packet-reaction { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 6px; background-color: var(--bg-2); border: 1px solid var(--edge); color: var(--fg-muted); font-family: inherit; font-size: 12px; line-height: 16px; cursor: pointer; }
+.packet-reaction:hover { border-color: var(--edge-bright); color: var(--fg-bright); }
+.packet-reaction--own { border-color: var(--accent); background-color: rgba(var(--accent-rgb), 0.15); color: var(--accent-bright); }
+.packet-reaction--own:hover { border-color: var(--accent-bright); color: var(--accent-bright); }
+.packet-reaction[disabled] { opacity: 0.6; cursor: default; } /* logged out, or Turbo's in-flight submitter */
+.packet-reaction .emote { height: 18px; max-width: 72px; }
+.packet-reaction-token { color: var(--fg-faint); }
 
 /* ── Compose form (PacketInput.tsx) ───────────────────────────────── */
 
@@ -277,12 +294,13 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .packet--cont:hover .packet-meta, .uplink-shell .packet--cont:focus-within .packet-meta { visibility: visible; }
 .uplink-shell .packet-actions { position: absolute; top: 2px; right: 8px; opacity: 0; }
 .uplink-shell .packet:hover .packet-actions, .uplink-shell .packet:focus-within .packet-actions { opacity: 1; }
-.uplink-shell .packet-reply-button, .uplink-shell .packet-mod-button:not([hidden]) { display: inline-block; }
+.uplink-shell .packet-reply-button, .uplink-shell .packet-react-button, .uplink-shell .packet-mod-button:not([hidden]) { display: inline-block; }
 .uplink-shell .uplink-pin-form:not([hidden]) { display: inline; }
 .packet-pin-button--on { color: var(--warn); opacity: 1; } /* this packet is pinned: the control reads "unpin" */
 /* Pinned marker: an inset bar — no padding shift, survives .packet--cont (which hides the PIN badge with the rest of the meta). */
 .uplink-shell .packet--pinned { box-shadow: inset 2px 0 0 0 var(--warn); }
 .uplink-shell .packet-reply-quote { font-size: 14px; line-height: 18px; }
+.uplink-shell .packet-reactions { margin-top: 2px; }
 .uplink-shell .packet.packet--flash { background-color: rgba(var(--accent-rgb), 0.25); } /* beats .packet:hover */
 
 /* Composer: auto-growing textarea, emote button, counter in the corner.
@@ -316,8 +334,8 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-popover--missing .uplink-popover-alias { color: var(--fg-faint); font-size: 14px; letter-spacing: 1px; }
 .uplink-popover-badge { flex-shrink: 0; padding: 0 4px; border: 1px solid currentColor; font-size: 12px; line-height: 16px; font-weight: bold; letter-spacing: 1px; }
 .uplink-popover-cl { flex-shrink: 0; color: var(--warn); font-size: 12px; letter-spacing: 1px; }
-.uplink-popover-close, .uplink-modmenu-close, .uplink-pins-close { flex-shrink: 0; margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
-.uplink-popover-close:hover, .uplink-modmenu-close:hover, .uplink-pins-close:hover { color: var(--fg-bright); }
+.uplink-popover-close, .uplink-modmenu-close, .uplink-pins-close, .uplink-reactmenu-close { flex-shrink: 0; margin-left: auto; background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.uplink-popover-close:hover, .uplink-modmenu-close:hover, .uplink-pins-close:hover, .uplink-reactmenu-close:hover { color: var(--fg-bright); }
 .uplink-popover-meta { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
 .uplink-popover-active--online { color: var(--live); }
 .uplink-popover-bio { margin: 10px 0 0; max-height: 72px; overflow: hidden; color: var(--fg-muted); line-height: 18px; white-space: pre-wrap; word-break: break-word; } /* four lines */
@@ -386,6 +404,30 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-pin-unpin { padding: 0 4px; background: none; border: 1px solid transparent; color: var(--fg-faint); font-family: inherit; font-size: 12px; line-height: 16px; letter-spacing: 1px; cursor: pointer; }
 .uplink-pin-unpin:hover { border-color: var(--edge); color: var(--err); }
 .uplink-pin-unpin[disabled] { opacity: 0.5; cursor: default; } /* Turbo disables the submitter in flight */
+
+/* Reaction picker (popover controller, fourth frame — uplink/reactions/
+   menu): a packet's hover :) loads GET …/reactions here, parked under
+   the control, clamped to .uplink-main. One form, one square button per
+   chat-ready emote (the viewer's own reactions marked --on); a pick
+   posts the toggle and the finished submit closes the picker. */
+.uplink-reactmenu-frame { display: block; position: absolute; z-index: 12; width: min(296px, calc(100% - 16px)); background-color: var(--bg-1); border: 1px solid var(--edge-bright); box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6); }
+.uplink-reactmenu-frame[hidden] { display: none; }
+.uplink-reactmenu-frame[busy]:empty::before { content: "// LOADING EMOTES //"; display: block; padding: 8px 12px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-reactmenu { padding: 8px; font-size: 14px; }
+.uplink-shell .uplink-reactmenu:focus-visible { outline: none; }
+.uplink-reactmenu-head { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 0 4px 6px; border-bottom: 1px solid var(--edge); }
+.uplink-reactmenu-kicker { flex-shrink: 0; color: var(--accent-bright); font-size: 12px; letter-spacing: 1px; }
+.uplink-reactmenu--empty .uplink-reactmenu-kicker { color: var(--fg-faint); }
+.uplink-reactmenu-target { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; }
+.uplink-reactmenu-target--synthia { color: #00ff88; }
+.uplink-reactmenu-note { margin: 6px 4px 0; color: var(--fg-faint); }
+.uplink-reactmenu-form { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 6px; max-height: min(232px, 50vh); overflow-y: auto; }
+.uplink-reactmenu-emote { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: none; border: 1px solid transparent; cursor: pointer; }
+.uplink-reactmenu-emote:hover { background-color: var(--bg-2); border-color: var(--edge); }
+.uplink-reactmenu-emote--on { border-color: var(--accent); background-color: rgba(var(--accent-rgb), 0.15); }
+.uplink-reactmenu-emote--on:hover { border-color: var(--accent-bright); }
+.uplink-reactmenu-emote[disabled] { opacity: 0.5; cursor: default; } /* Turbo disables the submitter in flight */
+.uplink-reactmenu-emote .emote { max-width: 40px; }
 
 /* Operatives pane: role groups of anonymized callsigns. */
 .uplink-members-pane { display: flex; flex-direction: column; min-height: 0; background-color: var(--bg-1); border-left: 1px solid var(--edge); }

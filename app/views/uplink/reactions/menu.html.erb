@@ -1,0 +1,33 @@
+<%# Emote picker for reactions, rendered into uplink/_shell's
+    uplink-reactmenu turbo-frame (the popover controller places, focuses
+    and closes it; a finished submit inside closes it too — the reply is
+    the packet's chip row). One form, one submit button per chat-ready
+    emote carrying its slug; the viewer's current reactions are marked
+    so a pick reads as "remove". The host frame targets _top so the
+    stream reply lands on the page. @error: the empty state (gone or
+    dropped packet, off-limits channel). %>
+<%= turbo_frame_tag "uplink-reactmenu" do %>
+  <div class="uplink-reactmenu<%= " uplink-reactmenu--empty" if @error %>" role="dialog" tabindex="-1"
+    aria-label="<%= @error ? "React" : "React to #{uplink_packet_sender(@packet)}" %>">
+    <header class="uplink-reactmenu-head">
+      <span class="uplink-reactmenu-kicker"><%= @error ? "// NO PACKET //" : "REACT" %></span>
+      <% unless @error %>
+        <span class="uplink-reactmenu-target uplink-reactmenu-target--<%= uplink_packet_sender_class(@packet) %>"><%= uplink_packet_sender(@packet) %></span>
+      <% end %>
+      <button type="button" class="uplink-reactmenu-close" aria-label="Close" data-action="click->popover#dismiss">[x]</button>
+    </header>
+    <% if @error %>
+      <p class="uplink-reactmenu-note"><%= @error %></p>
+    <% elsif @emotes.empty? %>
+      <p class="uplink-reactmenu-note">No emotes on the node yet.</p>
+    <% else %>
+      <%= form_with url: uplink_packet_reactions_path(@packet), method: :post, class: "uplink-reactmenu-form", data: {turbo_frame: "_top"} do %>
+        <% @emotes.each do |slug, emote| %>
+          <button type="submit" name="emote_slug" value="<%= slug %>" title=":<%= slug %>:"
+            class="uplink-reactmenu-emote<%= " uplink-reactmenu-emote--on" if @mine.include?(slug) %>"
+            aria-pressed="<%= @mine.include?(slug) %>"><%= emote_image_tag(slug, emote) %></button>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

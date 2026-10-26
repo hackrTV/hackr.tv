@@ -32,6 +32,12 @@
 class Emote < ApplicationRecord
   has_paper_trail
   has_one_attached :image
+  # Uplink reactions reference emotes by slug, like packet text: a
+  # destroyed emote takes its reactions along (nothing to render them
+  # with), a renamed one keeps them (the chips show the new token on
+  # their next render; nothing is re-broadcast).
+  has_many :reactions, class_name: "ChatMessageReaction", foreign_key: :emote_slug, primary_key: :slug,
+    inverse_of: false, dependent: :delete_all
 
   SLUG_FORMAT = /\A[a-z0-9_]+\z/
   IMAGE_CONTENT_TYPES = %w[image/png image/gif image/webp].freeze
@@ -56,6 +62,7 @@ class Emote < ApplicationRecord
 
   # Attach/purge touch the record, so every image change lands here too.
   after_commit { self.class.expire_render_map }
+  after_update :rename_reactions, if: :saved_change_to_slug?
 
   # {"slug" => {url:, width:, height:}} for every chat-ready emote.
   # Cached: renderers fetch it once per render, the composers once per page.
@@ -128,6 +135,10 @@ class Emote < ApplicationRecord
   end
 
   private
+
+  def rename_reactions
+    ChatMessageReaction.where(emote_slug: slug_before_last_save).update_all(emote_slug: slug)
+  end
 
   def normalize_slug
     self.slug = slug.to_s.strip.downcase.presence

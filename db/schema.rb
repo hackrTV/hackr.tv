@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -64,6 +64,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_130000) do
     t.index ["is_active"], name: "index_chat_channels_on_is_active"
     t.index ["position", "id"], name: "index_chat_channels_on_position_and_id"
     t.index ["slug"], name: "index_chat_channels_on_slug", unique: true
+  end
+
+  create_table "chat_message_reactions", force: :cascade do |t|
+    t.integer "chat_message_id", null: false
+    t.integer "grid_hackr_id", null: false
+    t.string "emote_slug", limit: 32, null: false
+    t.datetime "created_at", null: false
+    t.index ["chat_message_id", "grid_hackr_id", "emote_slug"], name: "index_chat_message_reactions_unique", unique: true
+    t.index ["grid_hackr_id"], name: "index_chat_message_reactions_on_grid_hackr_id"
   end
 
   create_table "chat_messages", force: :cascade do |t|
@@ -1453,6 +1462,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_130000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "chat_message_reactions", "chat_messages", on_delete: :cascade
+  add_foreign_key "chat_message_reactions", "grid_hackrs", on_delete: :cascade
   add_foreign_key "chat_messages", "chat_channels"
   add_foreign_key "chat_messages", "chat_messages", column: "reply_to_id", on_delete: :nullify
   add_foreign_key "chat_messages", "grid_hackrs"

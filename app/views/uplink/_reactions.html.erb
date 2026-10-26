@@ -1,0 +1,25 @@
+<%# Reaction chips for one packet (Phase 2 item 7): one ":emote: N" button
+    per emote, grouped in first-reaction order, each a POST toggle of the
+    viewer's own reaction with that emote. Viewer-neutral — the model
+    replaces this block (by its id) for everyone on every reaction, and
+    the reply to the acting viewer is the same partial — so the reactors
+    ride along as callsign tokens (never ids or aliases) and the
+    reactions Stimulus controller marks the viewer's own chips from the
+    uplink-callsign meta on every (re)connect, and disables the chips
+    for a logged-out viewer (the popout). Hidden while there is nothing
+    to show; a dropped packet shows nothing (its reactions wait for a
+    restore). An emote that is no longer chat-ready reads as its token.
+    Locals: packet. %>
+<%
+  groups = packet.dropped? ? [] : packet.reaction_groups
+  emotes = groups.empty? ? {} : Emote.render_map
+%>
+<div id="<%= dom_id(packet, :reactions) %>" class="packet-reactions" data-controller="reactions"<%= " hidden" if groups.empty? %>>
+  <% groups.each do |slug, tokens| %>
+    <%= button_to uplink_packet_reactions_path(packet, emote_slug: slug), method: :post, class: "packet-reaction",
+      title: ":#{slug}: × #{tokens.size}", form_class: "packet-reaction-form",
+      data: {reactors: tokens.join(","), emote: slug} do %>
+      <% if (emote = emotes[slug]) %><%= emote_image_tag(slug, emote) %><% else %><span class="packet-reaction-token">:<%= slug %>:</span><% end %><span class="packet-reaction-count"><%= tokens.size %></span>
+    <% end %>
+  <% end %>
+</div>
