@@ -61,4 +61,34 @@ RSpec.describe GridUplinkPresence, type: :model do
       expect(described_class.count).to eq(1)
     end
   end
+
+  describe ".touch! racing a concurrent first touch (the unique index)" do
+    it "retries once onto the winner's row, without a second broadcast" do
+      winner = described_class.touch!(hackr, channel)
+      winner.update_column(:last_seen_at, 30.seconds.ago)
+      # The loser's find ran before the winner's insert landed: it comes
+      # back empty, and the loser's own insert hits the unique index.
+      finds = 0
+      allow(described_class).to receive(:find_or_initialize_by).and_wrap_original do |original, *args|
+        finds += 1
+        (finds == 1) ? described_class.new(grid_hackr: hackr, chat_channel: channel) : original.call(*args)
+      end
+
+      presence = nil
+      expect { presence = described_class.touch!(hackr, channel) }
+        .not_to have_enqueued_job(Uplink::MembersBroadcastJob)
+
+      expect(presence).to eq(winner)
+      expect(finds).to eq(2)
+      expect(winner.reload.last_seen_at).to be_within(2.seconds).of(Time.current)
+      expect(described_class.count).to eq(1)
+    end
+
+    it "gives up after the one retry" do
+      described_class.touch!(hackr, channel)
+      allow(described_class).to receive(:find_or_initialize_by) { described_class.new(grid_hackr: hackr, chat_channel: channel) }
+
+      expect { described_class.touch!(hackr, channel) }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+  end
 end
