@@ -4,7 +4,7 @@ import PacketController from './packet_controller'
 
 // Fixture mirrors uplink/_packet rows: a parent and a reply carrying
 // data-reply-to + the quote line, each with the hover reply control and
-// the three hidden per-viewer controls (drop / restore forms, the […]
+// the four hidden per-viewer controls (drop / restore / pin forms, the […]
 // operator-menu button) the controller reveals from the current-hackr
 // metas + the author's role value.
 
@@ -16,6 +16,7 @@ function packet (id: number, opts: { replyTo?: number, sender?: string, owner?: 
       <button type="button" class="packet-reply-button" data-action="click->packet#reply" data-reply-sender="${opts.sender ?? '@someone'}">↩</button>
       <form class="uplink-inline-form" hidden data-packet-target="dropControl"><button>×</button></form>
       <form class="uplink-inline-form" hidden data-packet-target="restoreControl"><button>↺</button></form>
+      <form class="uplink-inline-form uplink-pin-form" hidden data-packet-target="pinControl"><button>◆</button></form>
       <button type="button" class="packet-mod-button" hidden data-packet-target="modControl">…</button>
     </div>`
 }
@@ -44,7 +45,7 @@ describe('PacketController', () => {
 
   const ROSTER = `${packet(1, { owner: 7, role: 'operative' })}${packet(2, { owner: 8, role: 'operator' })}${packet(3, { owner: 9, role: 'admin' })}${packet(4, { owner: 1, role: 'operator' })}`
 
-  function revealed (id: number, control: 'dropControl' | 'restoreControl' | 'modControl'): boolean {
+  function revealed (id: number, control: 'dropControl' | 'restoreControl' | 'pinControl' | 'modControl'): boolean {
     return !el(id).querySelector<HTMLElement>(`[data-packet-target="${control}"]`)!.hidden
   }
 
@@ -61,8 +62,9 @@ describe('PacketController', () => {
     vi.useRealTimers()
   })
 
-  it('reveals nothing to a logged-out viewer and only the own drop control to an operative', async () => {
+  it('reveals nothing to a logged-out viewer and only the own drop control to an operative — never pin', async () => {
     expect(revealed(1, 'dropControl')).toBe(false)
+    expect(revealed(1, 'pinControl')).toBe(false)
 
     application.stop()
     meta('current-hackr-id', '1')
@@ -72,10 +74,11 @@ describe('PacketController', () => {
     expect([1, 2, 3].map(id => revealed(id, 'dropControl'))).toEqual([false, false, false])
     expect(revealed(4, 'dropControl')).toBe(true) // own packet
     expect([1, 2, 3, 4].map(id => revealed(id, 'restoreControl'))).toEqual([false, false, false, false])
+    expect([1, 2, 3, 4].map(id => revealed(id, 'pinControl'))).toEqual([false, false, false, false])
     expect([1, 2, 3, 4].map(id => revealed(id, 'modControl'))).toEqual([false, false, false, false])
   })
 
-  it('reveals drop + restore everywhere to an operator, and the operator menu only on packets by operatives they outrank — never their own', async () => {
+  it('reveals drop + restore + pin everywhere to an operator (pinning is curation: their own packet too), and the operator menu only on packets by operatives they outrank — never their own', async () => {
     application.stop()
     meta('current-hackr-id', '1')
     meta('current-hackr-role', 'operator')
@@ -83,6 +86,7 @@ describe('PacketController', () => {
 
     expect([1, 2, 3, 4].map(id => revealed(id, 'dropControl'))).toEqual([true, true, true, true])
     expect([1, 2, 3, 4].map(id => revealed(id, 'restoreControl'))).toEqual([true, true, true, true])
+    expect([1, 2, 3, 4].map(id => revealed(id, 'pinControl'))).toEqual([true, true, true, true])
     expect([1, 2, 3, 4].map(id => revealed(id, 'modControl'))).toEqual([true, false, false, false])
   })
 

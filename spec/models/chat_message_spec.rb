@@ -7,12 +7,14 @@
 #  content         :text             not null
 #  dropped         :boolean          default(FALSE), not null
 #  dropped_at      :datetime
+#  pinned_at       :datetime
 #  source          :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  chat_channel_id :integer          not null
 #  grid_hackr_id   :integer          not null
 #  hackr_stream_id :integer
+#  pinned_by_id    :integer
 #  reply_to_id     :integer
 #
 # Indexes
@@ -23,12 +25,14 @@
 #  index_chat_messages_on_grid_hackr_id                   (grid_hackr_id)
 #  index_chat_messages_on_hackr_stream_id                 (hackr_stream_id)
 #  index_chat_messages_on_reply_to_id                     (reply_to_id)
+#  index_chat_messages_pinned                             (chat_channel_id,pinned_at) WHERE pinned_at IS NOT NULL
 #
 # Foreign Keys
 #
 #  chat_channel_id  (chat_channel_id => chat_channels.id)
 #  grid_hackr_id    (grid_hackr_id => grid_hackrs.id)
 #  hackr_stream_id  (hackr_stream_id => hackr_streams.id)
+#  pinned_by_id     (pinned_by_id => grid_hackrs.id) ON DELETE => nullify
 #  reply_to_id      (reply_to_id => chat_messages.id) ON DELETE => nullify
 #
 require "rails_helper"
@@ -384,6 +388,67 @@ RSpec.describe ChatMessage, type: :model do
           locals: {packet: message, viewer: nil}
         )
       )
+    end
+  end
+
+  describe "pins (Phase 2 item 6)" do
+    let(:channel) { create(:chat_channel, slug: "ambient") }
+    let(:operator) { create(:grid_hackr, :operator) }
+
+    it "pins and unpins with the pinner, lists a channel's pinned active packets newest pin first, and parks a dropped pin until its restore" do
+      older = create(:chat_message, chat_channel: channel, content: "older")
+      newer = create(:chat_message, chat_channel: channel, content: "newer")
+      plain = create(:chat_message, chat_channel: channel, content: "plain")
+      expect(older).not_to be_pinned
+
+      older.pin!(operator)
+      newer.pin!(operator)
+      expect(older.reload).to be_pinned
+      expect(older.pinned_at).to be_within(1.second).of(Time.current)
+      expect(older.pinned_by).to eq(operator)
+      expect(channel.pinned_packets).to eq([newer, older])
+
+      newer.drop!
+      expect(channel.pinned_packets).to eq([older]) # parked, not unpinned
+      expect(newer.reload).to be_pinned
+      newer.restore!
+      expect(channel.pinned_packets).to eq([newer, older])
+
+      older.unpin!
+      expect(older.reload).not_to be_pinned
+      expect(older.pinned_by).to be_nil
+      expect(channel.pinned_packets).to eq([newer])
+      expect(plain.reload).not_to be_pinned
+      expect(ModerationLog::ACTIONS).to include("pin_packet", "unpin_packet")
+    end
+
+    it "re-broadcasts the row and the shell header's pinned count on pin/unpin, and the count again when a pinned packet drops or restores" do
+      message = create(:chat_message, chat_channel: channel, content: "pin me")
+      allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to).and_call_original
+      count_replaces = -> { ["uplink_html", "ambient"] }
+
+      message.pin!(operator)
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
+        ["uplink_html", "ambient"],
+        hash_including(target: "chat_message_#{message.id}", partial: "uplink/packet", locals: {packet: message, viewer: nil})
+      ).once
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
+        ["uplink_html", "ambient"],
+        target: "uplink-pins-count", partial: "uplink/pins_count", locals: {channel: channel}
+      ).once
+
+      message.drop!
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(count_replaces.call, hash_including(target: "uplink-pins-count")).twice
+      message.restore!
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(count_replaces.call, hash_including(target: "uplink-pins-count")).exactly(3).times
+      message.unpin!
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(count_replaces.call, hash_including(target: "uplink-pins-count")).exactly(4).times
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(count_replaces.call, hash_including(target: "chat_message_#{message.id}")).exactly(4).times # pin, drop, restore, unpin
+
+      plain = create(:chat_message, chat_channel: channel, content: "never pinned")
+      plain.drop!
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(count_replaces.call, hash_including(target: "uplink-pins-count")).exactly(4).times # a plain drop leaves the count alone
     end
   end
 end

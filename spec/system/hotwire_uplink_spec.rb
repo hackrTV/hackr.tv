@@ -489,6 +489,65 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
   end
 
+  it "pins a packet from the hover control: marker + header count land live for both sessions, the pins panel lists it and jumps to it, UNPIN clears it without closing the panel" do
+    packet = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Pin me down")
+
+    using_session(:viewer) do
+      log_in!(hackr)
+      visit "/uplink"
+      await_uplink!
+      expect(page).to have_css(".uplink-chanhead-pins", text: "0")
+      find("#chat_message_#{packet.id}").hover
+      expect(page).not_to have_css("#chat_message_#{packet.id} button[title='Pin packet']") # operatives never curate
+    end
+
+    log_in!(operator)
+    visit "/uplink"
+    await_uplink!
+    find("#chat_message_#{packet.id}").hover
+    within("#chat_message_#{packet.id}") do
+      expect(page).to have_css("button[title='Pin packet']", wait: 5)
+      find("button[title='Pin packet']").click
+    end
+    expect(page).to have_css("#chat_message_#{packet.id}.packet--pinned", wait: 10)
+    expect(page).to have_css("#uplink-pins-count", text: "1", wait: 10)
+    expect(packet.reload).to be_pinned
+    expect(packet.pinned_by).to eq(operator)
+    expect(ModerationLog.last).to have_attributes(action: "pin_packet", actor: operator, target: other)
+
+    using_session(:viewer) do
+      expect(page).to have_css("#chat_message_#{packet.id}.packet--pinned", wait: 10)
+      expect(page).to have_css("#uplink-pins-count", text: "1", wait: 10)
+      # Anyone reads the panel; only operators get UNPIN. A row click jumps.
+      find(".uplink-chanhead-pins").click
+      within("#uplink-pins") do
+        expect(page).to have_content("Pin me down", wait: 10)
+        expect(page).not_to have_button("UNPIN")
+        click_button "Jump to packet"
+      end
+      expect(page).to have_css("#uplink-pins", visible: :hidden) # the jump closes the panel
+      expect(page).to have_css("#chat_message_#{packet.id}.packet--flash")
+    end
+
+    find(".uplink-chanhead-pins").click
+    within("#uplink-pins") do
+      expect(page).to have_content("Pin me down", wait: 10)
+      expect(page).to have_content("1 / 50")
+      click_button "UNPIN"
+      expect(page).to have_content("No pinned packets", wait: 10) # re-rendered in place: the panel stays open
+    end
+    expect(page).to have_css("#uplink-pins", visible: :visible)
+    expect(page).to have_css("#uplink-pins-count", text: "0")
+    expect(page).not_to have_css("#chat_message_#{packet.id}.packet--pinned")
+    expect(packet.reload).not_to be_pinned
+    expect(ModerationLog.last).to have_attributes(action: "unpin_packet", actor: operator, target: other)
+
+    using_session(:viewer) do
+      expect(page).not_to have_css("#chat_message_#{packet.id}.packet--pinned", wait: 10)
+      expect(page).to have_css("#uplink-pins-count", text: "0")
+    end
+  end
+
   it "docks the chat on the live home page and sends from there" do
     create(:hackr_stream, artist: create(:artist), title: "DOCK SESSIONS",
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")

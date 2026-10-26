@@ -1,0 +1,15 @@
+<%# The pins panel's body: "n / cap" + one row per pinned active packet
+    (uplink/pins/_pin, newest pin first), or the empty note. Replaced in
+    place by Uplink::PacketsController#unpin when the panel sent the
+    request (from=pins). Locals: channel, viewer. %>
+<% pins = channel.pinned_packets.includes(:grid_hackr).limit(ChatMessage::PIN_CAP).to_a %>
+<div id="uplink-pins-list" class="uplink-pins-body">
+  <% if pins.empty? %>
+    <p class="uplink-pins-note">No pinned packets.<%= " Hover a packet and hit ◆ to pin it." if viewer.at_least_operator? %></p>
+  <% else %>
+    <p class="uplink-pins-count"><%= pins.size %> / <%= ChatMessage::PIN_CAP %></p>
+    <ol class="uplink-pins-rows">
+      <%= render partial: "uplink/pins/pin", collection: pins, as: :packet, locals: {viewer: viewer} %>
+    </ol>
+  <% end %>
+</div>

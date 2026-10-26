@@ -21,7 +21,11 @@
     operator menu the same way, into the shell's uplink-modmenu frame:
     rendered hidden, revealed by the packet controller for operators who
     outrank the author (data-packet-author-role-value), CSS-hidden off
-    the shell. %>
+    the shell. Pins: .packet--pinned + a PIN badge on a pinned active
+    packet (the marker), and the hover ◆ pin/unpin form (operator+,
+    revealed by the packet controller, CSS-hidden off the shell) — the
+    pin endpoints and the model both replace the whole row, so the
+    marker and the control flip together. %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   bot = packet.source == "SYNTHIA"
@@ -32,18 +36,11 @@
   platform = uplink_platform_class(packet.source)
   role_badge = uplink_role_badge(packet.grid_hackr&.role)
   parent = packet.reply_to
-  parent_class = if parent.nil?
-    nil
-  elsif parent.source == "SYNTHIA"
-    "synthia"
-  elsif parent.source.present?
-    "bridged"
-  else
-    uplink_role_class(parent.grid_hackr&.role)
-  end
+  parent_class = parent && uplink_packet_sender_class(parent)
+  pinned = packet.pinned? && !packet.dropped?
 %>
 <div id="<%= dom_id(packet) %>"
-  class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %><%= " packet--reply" if parent %>"
+  class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %><%= " packet--reply" if parent %><%= " packet--pinned" if pinned %>"
   data-controller="packet" data-packet-owner-id-value="<%= packet.grid_hackr_id %>"
   data-packet-author-role-value="<%= uplink_role_class(packet.grid_hackr.role) %>"
   data-author-key="<%= uplink_author_key(packet, parsed) %>" data-at="<%= (packet.created_at.to_f * 1000).to_i %>"<% if parent %>
@@ -55,6 +52,9 @@
       <span class="packet-badge packet-badge--<%= platform %>"><%= packet.source %></span>
     <% elsif role_badge %>
       <span class="packet-badge packet-badge--<%= uplink_role_class(packet.grid_hackr.role) %>"><%= role_badge %></span>
+    <% end %>
+    <% if pinned %>
+      <span class="packet-badge packet-badge--pinned" title="Pinned">PIN</span>
     <% end %>
   </div>
 
@@ -88,6 +88,10 @@
     <% else %>
       <button type="button" class="packet-action-button packet-reply-button" title="Reply to packet"
         data-action="click->packet#reply" data-reply-sender="<%= uplink_packet_sender(packet, parsed) %>">↩</button>
+      <%= button_to "◆", packet.pinned? ? uplink_packet_unpin_path(packet) : uplink_packet_pin_path(packet), method: :post,
+        class: class_names("packet-action-button packet-pin-button", "packet-pin-button--on": packet.pinned?),
+        title: packet.pinned? ? "Unpin packet" : "Pin packet", form_class: "uplink-inline-form uplink-pin-form",
+        form: {hidden: !can_moderate, data: {packet_target: "pinControl"}} %>
       <%= button_to "×", uplink_packet_drop_path(packet), method: :post,
         class: "packet-action-button", title: "Drop packet", form_class: "uplink-inline-form",
         form: {hidden: !(own || can_moderate), data: {packet_target: "dropControl"}} %>

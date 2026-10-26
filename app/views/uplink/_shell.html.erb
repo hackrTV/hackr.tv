@@ -11,10 +11,11 @@
     sidebar's unread badges (bump stream + read acks) and their mention
     recolor from toasts; popover owns the operative
     record card (a turbo-frame in the channel pane that packet author
-    links load — see uplink/profiles/show) and the operator menu (a
+    links load — see uplink/profiles/show), the operator menu (a
     second frame, a grid child, that the [...] on packets and roster rows
-    loads — see uplink/punishments/menu); one of the two is open at a
-    time.
+    loads — see uplink/punishments/menu) and the pinned packets panel (a
+    third frame in the channel pane that the header's [◆] loads — see
+    uplink/pins/show); one of the three is open at a time.
     Locals: channel, channels, packets, viewer, live_stream, roster,
     more (older packets exist — seeds the scrollback sentinel), unread
     (Uplink::Unread.sync result for the sidebar), unseen_from (the viewer's
@@ -74,6 +75,11 @@
         <span class="presence-dot" data-uplink-target="presenceDot"></span>
         <span class="presence-text" data-uplink-target="presenceText">Connecting...</span>
       </span>
+      <% if viewable %>
+        <button type="button" class="uplink-chanhead-button uplink-chanhead-pins" title="Pinned packets"
+          data-action="click->popover#open" data-popover-url-param="<%= uplink_pins_path(channel: channel.slug) %>"
+          data-popover-frame-param="uplink-pins" data-popover-align-param="end">[◆]<span class="uplink-chanhead-label"> PINNED</span> <%= render "uplink/pins_count", channel: channel %></button>
+      <% end %>
       <button type="button" class="uplink-chanhead-button uplink-popout-button" title="Pop out Uplink"
         data-action="click->uplink#popout">[^]</button>
       <button type="button" class="uplink-chanhead-button uplink-chanhead-members" title="Operatives"
@@ -94,6 +100,9 @@
         clamps it to this pane). target=_top: links in the card navigate
         the page. %>
     <%= turbo_frame_tag "uplink-popover", target: "_top", hidden: true, class: "uplink-popover-frame", data: {popover_target: "frame"} %>
+    <%# Pinned packets panel: the popover controller's third frame, parked
+        under the header's [◆] (align end) over the log top. %>
+    <%= turbo_frame_tag "uplink-pins", target: "_top", hidden: true, class: "uplink-pins-frame", data: {popover_target: "frame"} %>
   </div>
 
   <aside class="uplink-members-pane" id="uplink-members-pane" data-uplink-shell-target="members" aria-label="Operatives">

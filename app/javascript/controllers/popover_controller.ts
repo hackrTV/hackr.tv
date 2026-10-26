@@ -1,8 +1,11 @@
 import { Controller, type ActionEvent } from '@hotwired/stimulus'
+import { jumpToPacket } from '~/utils/packetJump'
 
 // Frame-backed popovers for the /uplink shell: the operative record card
-// (uplink-popover, in the channel pane) and the operator menu
-// (uplink-modmenu, a grid child so it stacks over the mobile drawers).
+// (uplink-popover, in the channel pane), the operator menu
+// (uplink-modmenu, a grid child so it stacks over the mobile drawers) and
+// the pinned packets panel (uplink-pins, in the channel pane under the
+// header's [◆]).
 // A trigger's click loads the URL in its data-popover-url-param into the
 // frame named by its data-popover-frame-param (the first frame target
 // when absent) and parks the frame under the trigger — left edges
@@ -13,8 +16,11 @@ import { Controller, type ActionEvent } from '@hotwired/stimulus'
 // loaded content's [tabindex="-1"] root takes focus. Escape and the
 // content's [x] close it and hand focus back to the trigger; an outside
 // mousedown, a second click on the same trigger, a finished form submit
-// inside the frame (the menu's actions reply with a stream) and leaving
-// the page (turbo:before-cache / disconnect) close it too. A modified
+// inside the frame (the menu's actions reply with a stream — unless the
+// form carries data-popover-stay: the pins panel's UNPIN replies by
+// re-rendering the panel's list, so it stays) and leaving the page
+// (turbo:before-cache / disconnect) close it too. A pins-panel row's
+// click (jump, id param) scrolls to that packet and closes. A modified
 // click (ctrl/meta/shift/alt, middle) falls through to the trigger's
 // href — the author link's WIRE profile. Roster rows carry no alias and
 // open the card never, the menu only for operators (members controller).
@@ -75,10 +81,20 @@ export default class extends Controller<HTMLElement> {
   }
 
   // A form inside the open frame finished submitting: its reply is a
-  // stream (toast, packet replace), so the popover's job is done.
+  // stream (toast, packet replace), so the popover's job is done — unless
+  // the form asked to stay (the reply re-renders the frame's content).
   submitted (event: Event): void {
-    if (!this.frame || !(event.target instanceof Node) || !this.frame.contains(event.target)) return
+    if (!this.frame || !(event.target instanceof Element) || !this.frame.contains(event.target)) return
+    if (event.target.closest('[data-popover-stay]')) return
     this.dismiss()
+  }
+
+  // A pins-panel row: scroll to + flash the packet when it is in the log
+  // and close the panel. A pin above the loaded history leaves it open.
+  jump (event: ActionEvent): void {
+    const id: unknown = event.params?.id
+    if (typeof id !== 'string' && typeof id !== 'number') return
+    if (jumpToPacket(id)) this.close()
   }
 
   dismiss (): void {

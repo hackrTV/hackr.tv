@@ -1,0 +1,24 @@
+<%# Pinned packets panel, rendered into uplink/_shell's uplink-pins
+    turbo-frame (the popover controller places, focuses and closes it).
+    The body is its own partial (uplink/pins/_list) because an UNPIN sent
+    from here re-renders it in place: the form carries data-popover-stay,
+    so the finished submit leaves the panel open while the reply replaces
+    #uplink-pins-list. The host frame targets _top. @error: the empty
+    state (unknown or off-limits channel). %>
+<%= turbo_frame_tag "uplink-pins" do %>
+  <div class="uplink-pins<%= " uplink-pins--empty" if @error %>" role="dialog" tabindex="-1"
+    aria-label="<%= @error ? "Pinned packets" : "Pinned packets in #{@channel.name}" %>">
+    <header class="uplink-pins-head">
+      <span class="uplink-pins-kicker"><%= @error ? "// NO CHANNEL //" : "PINNED" %></span>
+      <% unless @error %>
+        <span class="uplink-pins-channel"><%= @channel.name %></span>
+      <% end %>
+      <button type="button" class="uplink-pins-close" aria-label="Close" data-action="click->popover#dismiss">[x]</button>
+    </header>
+    <% if @error %>
+      <p class="uplink-pins-note"><%= @error %></p>
+    <% else %>
+      <%= render "uplink/pins/list", channel: @channel, viewer: current_hackr %>
+    <% end %>
+  </div>
+<% end %>

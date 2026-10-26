@@ -33,6 +33,19 @@ module UplinkHelper
     "@#{packet.grid_hackr&.hackr_alias}"
   end
 
+  # Color class for compact sender labels (the reply quote, the pins
+  # panel): the author's role for native packets, "synthia" for the bot,
+  # "bridged" for relayed platform packets.
+  def uplink_packet_sender_class(packet)
+    if packet.source == "SYNTHIA"
+      "synthia"
+    elsif packet.source.present?
+      "bridged"
+    else
+      uplink_role_class(packet.grid_hackr&.role)
+    end
+  end
+
   # One-line plain-text excerpt of a packet (bridged packets lose their
   # "[Platform] user:" prefix); dropped packets read as redacted.
   def uplink_packet_excerpt(packet, parsed = nil, length: 80)
@@ -77,6 +90,18 @@ module UplinkHelper
     return "#{(seconds / 3600).ceil}H" if seconds < 1.day
 
     "#{(seconds / 86_400).ceil}D"
+  end
+
+  # Age of a packet for the pins panel: "NOW", "5M", "3H", "4D" (floored —
+  # 90 minutes reads 1H). Timezone-free, so the panel needs no client-side
+  # localizing like the log's timestamps.
+  def uplink_time_ago(time)
+    seconds = [Time.current - time, 0].max
+    return "NOW" if seconds < 60
+    return "#{(seconds / 60).floor}M" if seconds < 1.hour
+    return "#{(seconds / 3600).floor}H" if seconds < 1.day
+
+    "#{(seconds / 86_400).floor}D"
   end
 
   # Author identity for the packet-log controller's consecutive-author

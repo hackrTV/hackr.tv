@@ -1,7 +1,7 @@
 ---
 title: Uplink Comms
 area: Social & Comms
-minutes: 35
+minutes: 37
 ---
 # Uplink (/uplink)
 
@@ -131,20 +131,32 @@ minutes: 35
     admins or bridged accounts show no `...`; an operator (not admin) sees
     it only on operatives. BLACKOUT, then LIFT PUNISHMENTS from either
     menu → toasts confirm, the status lines follow.
-21. **Squelch** the operative from `/root` → Uplink (punishments) or the
+21. **Pins**: as admin, hover a packet → a `◆` sits between `↩` and the
+    drop `×`; click it. → The row gains an amber left bar + a `PIN` badge
+    for everyone live, and the header's `[◆] PINNED` count ticks to 1 (the
+    operative sees both, but no `◆` on hover). Click `[◆] PINNED`. → A
+    PINNED panel parks under it listing the packet (sender, age, excerpt)
+    with UNPIN beside it; `[x]`, Escape or clicking elsewhere closes it.
+    Open it as the operative → same list, no UNPIN; click the row → the
+    panel closes and the packet flashes in the log. Drop the pinned
+    packet → the count reads 0 (the pin parks); restore it → 1. In the
+    admin's panel, UNPIN → the row vanishes, the panel stays open reading
+    `No pinned packets…`, the count reads 0, the bar is gone everywhere.
+    The popout/dock show no `◆`, no count, no panel.
+22. **Squelch** the operative from `/root` → Uplink (punishments) or the
     operator menu. → In the operative's `/uplink`, the composer is
     replaced by the squelch notice on their next load; sending is
     impossible. Lift the squelch → composer returns (after reload).
-22. **Blackout** the operative. → Uplink is fully blocked with the
+23. **Blackout** the operative. → Uplink is fully blocked with the
     blackout notice. Lift it afterwards.
 
 ## Steps — popout + recovery
 
-23. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
+24. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
     classic single-line panel; live receive + send both work; heartbeat
     keeps it registered while open. The home-page dock is likewise the
     classic panel. Neither has an operator menu: no `...` on packets.
-24. Kill the connection (devtools offline ~10s, restore). → The log
+25. Kill the connection (devtools offline ~10s, restore). → The log
     recovers missed messages (reconnect frame reload) rather than
     silently gapping.
 

@@ -49,6 +49,12 @@ class ChatChannel < ApplicationRecord
     active.requiring_livestream.order(:id).first
   end
 
+  # Pinned, still-active packets, newest pin first (the /uplink header
+  # count + pins panel). A dropped pin is parked until its restore.
+  def pinned_packets
+    chat_messages.active.pinned.order(pinned_at: :desc, id: :desc)
+  end
+
   def slow_mode?
     slow_mode_seconds > 0
   end
