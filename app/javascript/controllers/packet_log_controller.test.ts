@@ -23,7 +23,7 @@ function fixture (packets: string[], group = true): string {
 
 describe('PacketLogController', () => {
   let application: Application
-  let states: Array<{ atBottom: boolean, unread: number }>
+  let states: Array<{ atBottom: boolean, unread: number, mentions?: number, atPresent?: boolean }>
 
   const log = (): HTMLElement => document.getElementById('uplink-log')!
   const cont = (id: number): boolean => document.getElementById(`chat_message_${id}`)!.classList.contains('packet--cont')
@@ -136,22 +136,22 @@ describe('PacketLogController', () => {
     append(packet(9, 'h2', T0 + 500, 8)) // seen at the bottom: published (the shell acks it), not unread
     await flush()
     expect(states.at(-1)).not.toBe(connected)
-    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0, atPresent: true })
     const seen = states.at(-1)
     append(packet(10, 'h1', T0 + 600, 7)) // own packet at the bottom: nothing to publish
     await flush()
     expect(states.at(-1)).toBe(seen)
     scrolledUp()
-    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0, atPresent: true })
 
     append(packet(2, 'h2', T0 + 1000, 8)) // someone else
     append(packet(3, 'h1', T0 + 2000, 7)) // own packet: not unread
     await flush()
-    expect(states.at(-1)).toEqual({ atBottom: false, unread: 1, mentions: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 1, mentions: 0, atPresent: true })
 
     Object.defineProperty(log(), 'scrollTop', { value: 700, configurable: true, writable: true })
     log().dispatchEvent(new Event('scroll'))
-    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0, atPresent: true })
   })
 
   // uplink/_log_frame's separator; stubs go between the body write and
@@ -177,21 +177,21 @@ describe('PacketLogController', () => {
     const { el, published } = await startWithUnseen(-300) // 400px above the log's top edge once pinned to the bottom
 
     expect(el.scrollTop).toBe(592) // 1000 (bottom) − 400 − 8
-    expect(published.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
+    expect(published.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0, atPresent: true })
     expect(cont(2)).toBe(false) // the separator breaks the group
     expect(cont(3)).toBe(true)
 
     append(packet(4, 'h2', T0 + 3000, 8))
     await flush()
     expect(el.scrollTop).toBe(592) // reading the unseen: no yank
-    expect(published.at(-1)).toEqual({ atBottom: false, unread: 1, mentions: 0 })
+    expect(published.at(-1)).toEqual({ atBottom: false, unread: 1, mentions: 0, atPresent: true })
   })
 
   it('keeps the bottom pin when the separator is already in view', async () => {
     const { el, published } = await startWithUnseen(150)
 
     expect(el.scrollTop).toBe(1000)
-    expect(published.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+    expect(published.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0, atPresent: true })
   })
 
   it('counts unread packets that @mention the viewer (case-insensitive, never own packets) and clears with unread', async () => {
@@ -211,11 +211,11 @@ describe('PacketLogController', () => {
     append(mention(3, 8, 'other')) // someone else, mentions someone else
     append(mention(4, 7, 'XERAEN')) // my own packet: neither unread nor a mention
     await flush()
-    expect(states.at(-1)).toEqual({ atBottom: false, unread: 2, mentions: 1 })
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 2, mentions: 1, atPresent: true })
 
     Object.defineProperty(log(), 'scrollTop', { value: 700, configurable: true, writable: true })
     log().dispatchEvent(new Event('scroll'))
-    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: true, unread: 0, mentions: 0, atPresent: true })
     document.head.querySelector('meta[name="current-hackr-alias"]')?.remove()
   })
 
@@ -229,7 +229,7 @@ describe('PacketLogController', () => {
 
     document.getElementById('chat_message_1')!.outerHTML = packet(1, 'h2', T0, 8).replace('p1', '[PACKET DROPPED]')
     await flush()
-    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
+    expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0, atPresent: true })
     expect(cont(2)).toBe(true) // still grouped behind the replaced row
   })
 
@@ -372,7 +372,7 @@ describe('PacketLogController', () => {
       intersect!()
       await settle()
       expect(ids()).toEqual(['chat_message_1', 'chat_message_2', 'chat_message_3'])
-      expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0 })
+      expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0, atPresent: true })
 
       fetchMock.mockResolvedValue({ ok: false, text: async () => '' })
       intersect!()
@@ -396,6 +396,111 @@ describe('PacketLogController', () => {
 
       expect(observe).not.toHaveBeenCalled()
       expect(fetchMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('located log (/uplink?around=)', () => {
+    let intersect: (() => void) | null
+    let fetchMock: ReturnType<typeof vi.fn>
+    const scrollIntoView = vi.fn()
+
+    const bottom = (): HTMLElement | null => document.querySelector('.uplink-log-bottom')
+    const ids = (): string[] => Array.from(log().querySelectorAll('.packet'), node => node.id)
+
+    // uplink/_log_frame on a located log: the focus value, the top sentinel
+    // at the channel's beginning, the bottom one with newer pages to fetch.
+    function locatedFixture (packets: string[]): string {
+      return `
+        <div id="uplink-log" data-controller="packet-log" data-packet-log-group-value="true" data-packet-log-focus-value="12">
+          <div class="uplink-empty"><p>No packets yet.</p></div>
+          <div class="uplink-log-top" data-packet-log-target="top" data-more="false" data-src="/uplink/log?channel=ambient"></div>
+          ${packets.join('\n')}
+          <div class="uplink-log-bottom" data-packet-log-target="bottom" data-more="true" data-src="/uplink/log?channel=ambient"></div>
+        </div>`
+    }
+
+    async function settle (): Promise<void> {
+      for (let i = 0; i < 4; i++) await flush()
+    }
+
+    beforeEach(() => {
+      intersect = null
+      fetchMock = vi.fn()
+      vi.stubGlobal('fetch', fetchMock)
+      // The bottom observer is built after the top one: the last callback captured is its.
+      vi.stubGlobal('IntersectionObserver', class {
+        constructor (callback: IntersectionObserverCallback) {
+          intersect = () => callback([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver)
+        }
+
+        observe (): void { /* jsdom stub */ }
+        unobserve (): void { /* jsdom stub */ }
+        disconnect (): void { /* jsdom stub */ }
+      })
+      // jsdom has no layout: scrolling a row into view lands the viewport mid-log.
+      scrollIntoView.mockReset().mockImplementation(function (this: HTMLElement) {
+        const container = this.closest<HTMLElement>('#uplink-log')!
+        Object.defineProperty(container, 'scrollHeight', { value: 1000, configurable: true })
+        Object.defineProperty(container, 'clientHeight', { value: 300, configurable: true })
+        container.scrollTop = 350
+      })
+      Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { value: scrollIntoView, configurable: true })
+    })
+
+    it('opens on the focus packet — centered + flashed, not pinned to the bottom — and reports the log behind the present', async () => {
+      await start(locatedFixture([packet(10, 'h1', T0), packet(11, 'h1', T0 + 1000), packet(12, 'h2', T0 + 2000), packet(13, 'h2', T0 + 3000)]))
+
+      expect(scrollIntoView).toHaveBeenCalledTimes(1)
+      expect(scrollIntoView).toHaveBeenCalledWith({ block: 'center' })
+      expect(scrollIntoView.mock.instances[0]).toBe(document.getElementById('chat_message_12'))
+      expect(document.getElementById('chat_message_12')!.classList.contains('packet--flash')).toBe(true)
+      expect(log().scrollTop).toBe(350) // where the focus landed, not the bottom
+      expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0, atPresent: false })
+      expect(cont(13)).toBe(true) // grouped as usual
+    })
+
+    it('parks live appends while behind the present, pages forward from the last packet, retires the sentinel at the end and releases what the final page did not carry', async () => {
+      await start(locatedFixture([packet(10, 'h1', T0), packet(11, 'h1', T0 + 1000), packet(12, 'h2', T0 + 2000)]))
+
+      append(packet(20, 'h3', T0 + 20000) + packet(21, 'h3', T0 + 21000)) // Turbo appends from the present
+      await flush()
+      expect(ids()).toEqual(['chat_message_10', 'chat_message_11', 'chat_message_12']) // parked, out of sight
+      expect(states.at(-1)).toEqual({ atBottom: false, unread: 0, mentions: 0, atPresent: false })
+
+      fetchMock.mockResolvedValue({ ok: true, text: async () => packet(13, 'h2', T0 + 3000) + packet(20, 'h3', T0 + 20000) + '<template data-log-end></template>' })
+      intersect!()
+      await settle()
+
+      expect(String(fetchMock.mock.calls[0][0])).toContain('/uplink/log?channel=ambient&after=12')
+      expect(ids()).toEqual(['chat_message_10', 'chat_message_11', 'chat_message_12', 'chat_message_13', 'chat_message_20', 'chat_message_21'])
+      expect(bottom()).toBeNull() // the present: the sentinel is gone, so 21 sits right behind 20
+      expect(cont(13)).toBe(true) // continues 12 across the seam
+      expect(cont(21)).toBe(true) // the released packet continues the page's 20
+      expect(states.at(-1)).toEqual({ atBottom: false, unread: 1, mentions: 0, atPresent: true }) // 21 is a live arrival; 20 came with the page
+
+      append(packet(22, 'h3', T0 + 22000)) // at the present: appends stay
+      await flush()
+      expect(ids().at(-1)).toBe('chat_message_22')
+      expect(states.at(-1)).toEqual({ atBottom: false, unread: 2, mentions: 0, atPresent: true })
+    })
+
+    it('keeps the sentinel and the parked packets through a failed page', async () => {
+      await start(locatedFixture([packet(12, 'h2', T0 + 2000)]))
+      append(packet(20, 'h3', T0 + 20000))
+      await flush()
+      fetchMock.mockResolvedValue({ ok: false, text: async () => '' })
+
+      intersect!()
+      await settle()
+      expect(ids()).toEqual(['chat_message_12'])
+      expect(bottom()!.dataset.more).toBe('true')
+      expect(bottom()!.dataset.loading).toBeUndefined()
+
+      fetchMock.mockResolvedValue({ ok: true, text: async () => '<template data-log-end></template>' })
+      intersect!()
+      await settle()
+      expect(ids()).toEqual(['chat_message_12', 'chat_message_20']) // released once the present is confirmed
+      expect(bottom()).toBeNull()
     })
   })
 })

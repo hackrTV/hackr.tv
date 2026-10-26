@@ -213,6 +213,10 @@ Rails.application.routes.draw do
     post "packets/:id/pin", to: "uplink/packets#pin", as: :uplink_packet_pin
     post "packets/:id/unpin", to: "uplink/packets#unpin", as: :uplink_packet_unpin
     get "pins", to: "uplink/pins#show", as: :uplink_pins
+    # Search (Phase 2 item 9): the header's [/] SEARCH flips the operatives
+    # pane to a form whose GET lands in the shell's uplink-search frame; a
+    # hit is a link to /uplink?channel=&around=<id> (the log opens on it).
+    get "search", to: "uplink/search#show", as: :uplink_search
     # Reactions (Phase 2 item 7): GET is the emote picker (the packet's
     # hover :) loads it into the shell's uplink-reactmenu frame), POST
     # toggles the viewer's reaction with that emote (the picker's buttons

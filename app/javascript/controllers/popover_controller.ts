@@ -19,8 +19,10 @@ import { jumpToPacket } from '~/utils/packetJump'
 // inside the frame (the menu's actions reply with a stream — unless the
 // form carries data-popover-stay: the pins panel's UNPIN replies by
 // re-rendering the panel's list, so it stays) and leaving the page
-// (turbo:before-cache / disconnect) close it too. A pins-panel row's
-// click (jump, id param) scrolls to that packet and closes. A modified
+// (turbo:before-cache / disconnect) close it too. A pins-panel row
+// (jump, id param) scrolls to that packet and closes when the log has
+// it, swallowing the row's own visit; otherwise the link goes through
+// to /uplink?around=<id>, which opens the log on it. A modified
 // click (ctrl/meta/shift/alt, middle) falls through to the trigger's
 // href — the author link's WIRE profile. Roster rows carry no alias and
 // open the card never, the menu only for operators (members controller).
@@ -90,11 +92,15 @@ export default class extends Controller<HTMLElement> {
   }
 
   // A pins-panel row: scroll to + flash the packet when it is in the log
-  // and close the panel. A pin above the loaded history leaves it open.
-  jump (event: ActionEvent): void {
+  // and close the panel, swallowing the link's visit. A pin beyond the
+  // loaded history (or a modified click) lets the link go.
+  jump (event: MouseEvent & ActionEvent): void {
     const id: unknown = event.params?.id
     if (typeof id !== 'string' && typeof id !== 'number') return
-    if (jumpToPacket(id)) this.close()
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+    if (!jumpToPacket(id)) return
+    event.preventDefault()
+    this.close()
   }
 
   dismiss (): void {

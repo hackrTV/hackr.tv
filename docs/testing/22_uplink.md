@@ -1,7 +1,7 @@
 ---
 title: Uplink Comms
 area: Social & Comms
-minutes: 40
+minutes: 43
 ---
 # Uplink (/uplink)
 
@@ -115,26 +115,40 @@ minutes: 40
     field or click away from it → it clears at once. The dock and popout
     show no typing line and never report typing.
 
+17. **Search**: hit `[/] SEARCH` in the header. → The operatives pane
+    becomes a SEARCH face (wider) with the field focused; type a word
+    from an old packet and press Enter. → Hits list newest first with
+    the matches marked, sender + age per row. Click a hit that is in
+    the log → it scrolls into view and blinks; the hits stay. Click one
+    beyond the loaded history → the page reloads with the log opened on
+    that packet (blinking, 20 packets either side), the search still in
+    the pane, and the pill reads `[v] JUMP TO PRESENT`; scroll to the
+    end → newer pages slide in until the present (packets sent
+    meanwhile appear then, in order), or hit the pill → the newest
+    packets, search kept. `[x]`, Escape in the field or `[o]` bring
+    the roster back. `%` and `_` match themselves. The dock and popout
+    have no search.
+
 ## Steps — operatives pane
 
-17. With the second browser on the same channel. → It appears in the
+18. With the second browser on the same channel. → It appears in the
     OPERATIVES pane under its role heading as a callsign (`SIG-XXXXXX`),
     never its alias; your own row shows your real @alias. Close the
     second browser → its row leaves within a few seconds (debounced
     broadcast; needs the job worker running).
-18. A livestream channel (`#live`) while a stream is live. → The stream
+19. A livestream channel (`#live`) while a stream is live. → The stream
     embeds above the log inside the shell; `[-] HIDE VIDEO` collapses it
     (and stops its audio), remembered on reload. The home page embed and
     theater mode are unchanged.
 
 ## Steps — moderation (operative + admin)
 
-19. As admin (moderator role) in `/uplink`: hover another user's packet
+20. As admin (moderator role) in `/uplink`: hover another user's packet
     and drop it. → Packet shows dropped state for everyone live.
-20. Restore it. → Restored live.
-21. The drop control is NOT visible to the non-moderator operative on
+21. Restore it. → Restored live.
+22. The drop control is NOT visible to the non-moderator operative on
     others' packets.
-22. **Operator menu**: as admin, hover the operative's packet → a `...`
+23. **Operator menu**: as admin, hover the operative's packet → a `...`
     appears beside the drop control; click it. → A small MODERATE menu
     parks under it naming `@alias` in its role color: a REASON field,
     DROP PACKET, SQUELCH 10M / 1H / 24H, BLACKOUT, `[x]`. Enter in the
@@ -149,7 +163,7 @@ minutes: 40
     admins or bridged accounts show no `...`; an operator (not admin) sees
     it only on operatives. BLACKOUT, then LIFT PUNISHMENTS from either
     menu → toasts confirm, the status lines follow.
-23. **Pins**: as admin, hover a packet → a `◆` sits between `↩` and the
+24. **Pins**: as admin, hover a packet → a `◆` sits between `↩` and the
     drop `×`; click it. → The row gains an amber left bar + a `PIN` badge
     for everyone live, and the header's `[◆] PINNED` count ticks to 1 (the
     operative sees both, but no `◆` on hover). Click `[◆] PINNED`. → A
@@ -161,28 +175,28 @@ minutes: 40
     admin's panel, UNPIN → the row vanishes, the panel stays open reading
     `No pinned packets…`, the count reads 0, the bar is gone everywhere.
     The popout/dock show no `◆`, no count, no panel.
-24. **Squelch** the operative from `/root` → Uplink (punishments) or the
+25. **Squelch** the operative from `/root` → Uplink (punishments) or the
     operator menu. → In the operative's `/uplink`, the composer is
     replaced by the squelch notice on their next load; sending is
     impossible. Lift the squelch → composer returns (after reload).
-25. **Blackout** the operative. → Uplink is fully blocked with the
+26. **Blackout** the operative. → Uplink is fully blocked with the
     blackout notice. Lift it afterwards.
 
 ## Steps — popout + recovery
 
-26. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
+27. Open `/uplink/popout` (`[^]`). → Slim chrome-less window with the
     classic single-line panel; live receive + send both work; heartbeat
     keeps it registered while open. The home-page dock is likewise the
     classic panel. Neither has an operator menu: no `...` on packets.
-27. Kill the connection (devtools offline ~10s, restore). → The log
+28. Kill the connection (devtools offline ~10s, restore). → The log
     recovers missed messages (reconnect frame reload) rather than
     silently gapping.
 
 ## Steps — external bridge spot-check (if relay/synthia are running)
 
-28. Send from hackr.tv `/uplink`, including a two-line packet. →
+29. Send from hackr.tv `/uplink`, including a two-line packet. →
     Appears in relay's terminal view (line breaks are plain `\n`).
-29. Send via synthia (or
+30. Send via synthia (or
     `POST /api/admin/uplink/send_packet` with the Bearer token). → The
     packet appears live in `/uplink` attributed to the service account;
     the bridge account never shows in the OPERATIVES pane.

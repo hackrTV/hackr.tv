@@ -10,5 +10,6 @@
 <div data-controller="stream-status" data-stream-status-live-value="<%= @live_stream.present? %>">
   <%= render "uplink/shell", channel: @channel, channels: @channels, packets: @packets, more: @more_packets,
     viewer: current_hackr, live_stream: @live_stream, roster: @roster, unread: @unread,
-    unseen_from: @unseen_from, unseen_divider: @unseen_divider %>
+    unseen_from: @unseen_from, unseen_divider: @unseen_divider,
+    more_after: @more_after, focus: @focus, search_query: @search_query %>
 </div>

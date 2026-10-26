@@ -67,9 +67,9 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
 /* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster, the record popover. */
-.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin, .uplink-reactmenu-target--admin { color: #00d4ff; }
-.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator, .uplink-reactmenu-target--operator { color: #ffaa00; }
-.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative, .uplink-reactmenu-target--operative { color: #cc0088; }
+.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin, .uplink-reactmenu-target--admin, .uplink-result-sender--admin { color: #00d4ff; }
+.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator, .uplink-reactmenu-target--operator, .uplink-result-sender--operator { color: #ffaa00; }
+.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative, .uplink-reactmenu-target--operative, .uplink-result-sender--operative { color: #cc0088; }
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
@@ -189,6 +189,11 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
   font-family: var(--font-tui); font-size: 16px; border-top: 1px solid var(--edge); }
 .uplink-shell[data-members="closed"] { grid-template-columns: var(--uplink-rail-w) var(--uplink-sidebar-w) minmax(0, 1fr); }
 .uplink-shell[data-members="closed"] .uplink-members-pane { display: none; }
+/* The search face keeps the pane up whatever the roster preference says,
+   wider for the hits' text. Same specificity as the closed rules above,
+   later in the file — the mobile block below outranks both. */
+.uplink-shell[data-pane="search"] { --uplink-members-w: 320px; grid-template-columns: var(--uplink-rail-w) var(--uplink-sidebar-w) minmax(0, 1fr) var(--uplink-members-w); }
+.uplink-shell[data-pane="search"] .uplink-members-pane { display: flex; }
 .uplink-shell :focus-visible { outline: 1px solid var(--accent-bright); outline-offset: -1px; }
 /* Guard: an empty element is still a grid item (the stream sources once
    sat here and shoved every pane one cell over), so only the four panes
@@ -243,6 +248,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-chanhead-button:hover { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-chanhead-members[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-chanhead-menu { display: none; }
+.uplink-chanhead-search[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-bright); }
 .uplink-chanhead-count { color: var(--warn); } /* the pinned count; muted like the rest at zero */
 .uplink-chanhead-count[data-count="0"] { color: inherit; }
 
@@ -260,6 +266,8 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-jump { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 5; background-color: var(--bg-2); border: 1px solid var(--accent); color: var(--accent-bright); padding: 4px 12px; font-family: inherit; font-size: 12px; letter-spacing: 1px; cursor: pointer; }
 .uplink-jump:hover { background-color: var(--accent); color: var(--fg-bright); }
 .uplink-jump--mention { border-color: #ffff00; color: #ffff00; } /* matches .uplink-mention--self */
+.uplink-jump--present { border-color: var(--warn); color: var(--warn); } /* a located log: the present lies below */
+.uplink-jump--present:hover { background-color: var(--warn); color: var(--bg-0); }
 .uplink-shell .uplink-empty { flex: 1; display: flex; align-items: center; justify-content: center; }
 .uplink-shell .uplink-empty p::before { content: "// STANDBY // "; color: var(--edge-bright); }
 .uplink-shell .uplink-unavailable p:first-child::before { content: "// OFFLINE // "; color: var(--edge-bright); }
@@ -275,6 +283,10 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .uplink-log-top[data-loading="true"]::before { content: "// RETRIEVING ARCHIVE //"; }
 .uplink-shell .uplink-log-top[data-more="false"]::before { content: "// BEGINNING OF CHANNEL //"; color: var(--edge-bright); }
 .uplink-shell .packet-log:not(:has(.packet)) .uplink-log-top { display: none; }
+/* A located log (/uplink?around=) pages forward through .uplink-log-bottom
+   the same way; the strip goes once the present is reached. */
+.uplink-shell .uplink-log-bottom { height: 28px; line-height: 28px; text-align: center; font-size: 12px; letter-spacing: 1px; color: var(--fg-faint); }
+.uplink-shell .uplink-log-bottom[data-loading="true"]::before { content: "// RETRIEVING NEWER //"; }
 /* "// NEW PACKETS //" separator (unread badges, item 5): server-rendered before the first packet above the viewer's previous read mark. */
 .uplink-shell .uplink-unseen { display: flex; align-items: center; gap: 8px; margin: 6px 0; padding: 0 8px; font-size: 12px; line-height: 16px; letter-spacing: 1px; color: var(--warn); }
 .uplink-shell .uplink-unseen::before, .uplink-shell .uplink-unseen::after { content: ""; flex: 1; border-top: 1px solid currentColor; }
@@ -400,7 +412,7 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-pin { display: flex; align-items: flex-start; gap: 6px; padding: 6px 4px; border-bottom: 1px solid var(--edge); }
 .uplink-pin:last-child { border-bottom: none; }
 .uplink-pin:hover { background-color: var(--bg-2); }
-.uplink-pin-jump { flex: 1; min-width: 0; display: block; padding: 0; background: none; border: none; text-align: left; font-family: inherit; color: var(--fg-muted); cursor: pointer; }
+.uplink-pin-jump { flex: 1; min-width: 0; display: block; padding: 0; background: none; border: none; text-align: left; font-family: inherit; color: var(--fg-muted); text-decoration: none; cursor: pointer; }
 .uplink-pin-meta { display: flex; gap: 8px; font-size: 12px; line-height: 16px; letter-spacing: 1px; }
 .uplink-pin-sender { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; letter-spacing: 0; }
 .uplink-pin-sender--synthia { color: #00ff88; }
@@ -452,19 +464,61 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-member:hover .uplink-member-mod, .uplink-member:focus-within .uplink-member-mod { opacity: 1; }
 .uplink-member-mod:hover { color: var(--fg-bright); }
 
+/* Search face of the operatives pane (uplink-shell controller,
+   data-pane="search" on the root; Phase 2 item 9): the roster + its
+   title step aside for a SEARCH title with [x], the form (field + [>])
+   and the uplink-search frame — the hits, each a link to the packet with
+   the matches marked. State lives on the root, so a roster broadcast
+   never flips the face back. */
+.uplink-search { display: none; }
+.uplink-shell[data-pane="search"] .uplink-search { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.uplink-shell[data-pane="search"] .uplink-members-title--roster, .uplink-shell[data-pane="search"] .uplink-members { display: none; }
+.uplink-search-title { justify-content: space-between; }
+.uplink-search-close { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; letter-spacing: 0; cursor: pointer; }
+.uplink-search-close:hover { color: var(--fg-bright); }
+.uplink-search-form { display: flex; flex-shrink: 0; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--edge); }
+.uplink-search-field { flex: 1; min-width: 0; height: 28px; padding: 0 8px; background-color: var(--bg-0); border: 1px solid var(--edge-bright); color: var(--fg); font-family: inherit; font-size: 14px; }
+.uplink-search-field::placeholder { color: var(--fg-faint); }
+.uplink-search-field:focus { border-color: var(--accent); }
+.uplink-search-go { flex-shrink: 0; height: 28px; padding: 0 8px; background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); font-family: inherit; font-size: 12px; cursor: pointer; }
+.uplink-search-go:hover { border-color: var(--accent); color: var(--accent-bright); }
+.uplink-search-frame { display: block; flex: 1; min-height: 0; overflow-y: auto; }
+.uplink-search-frame[busy] .uplink-results { opacity: 0.5; } /* a scan in flight: the old hits dim until the new ones land */
+.uplink-results { padding: 4px 0 8px; font-size: 14px; }
+.uplink-results-kicker { margin: 8px 12px 0; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.uplink-results-note { margin: 6px 12px 0; color: var(--fg-faint); word-break: break-word; }
+.uplink-results-count { margin: 4px 12px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; word-break: break-word; }
+.uplink-results-rows { margin: 0; padding: 0; list-style: none; }
+.uplink-result { border-top: 1px solid var(--edge); }
+.uplink-result-jump { display: block; padding: 6px 12px; color: var(--fg-muted); text-decoration: none; }
+.uplink-result-jump:hover { background-color: var(--bg-2); }
+.uplink-result-meta { display: flex; gap: 8px; font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.uplink-result-sender { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; letter-spacing: 0; }
+.uplink-result-sender--synthia { color: #00ff88; }
+.uplink-result-age { flex-shrink: 0; color: var(--fg-faint); }
+.uplink-result-text { display: block; margin-top: 2px; color: var(--fg); font-size: 14px; line-height: 18px; word-break: break-word; }
+.uplink-result-jump:hover .uplink-result-text { color: var(--fg-bright); }
+.uplink-result-hit { background-color: rgba(var(--accent-rgb), 0.35); color: var(--fg-bright); } /* the browser's mark is yellow-on-black */
+
 /* Under 768px: single column; sidebar + operatives become drawers over
    the channel pane (uplink-shell controller: data-drawer, backdrop,
    inert main, Escape). The rail folds into the sidebar header. */
 .uplink-backdrop { display: none; }
+@media (max-width: 1099px) {
+  .uplink-shell[data-pane="search"] .uplink-chanhead-label { display: none; } /* the wider face leaves the header no room for button labels */
+}
 @media (max-width: 767px) {
-  .uplink-shell, .uplink-shell[data-members="closed"] { grid-template-columns: minmax(0, 1fr); }
+  .uplink-shell, .uplink-shell[data-members="closed"], .uplink-shell[data-pane="search"] { grid-template-columns: minmax(0, 1fr); }
   .uplink-rail { display: none; }
   .uplink-chanhead-menu { display: inline-block; }
   .uplink-chanhead-topic { display: none; }
   .uplink-chanhead-label { display: none; }
-  .uplink-sidebar, .uplink-members-pane { display: none; position: absolute; top: 0; bottom: 0; width: min(280px, 85%); z-index: 20; }
+  .uplink-sidebar, .uplink-members-pane { position: absolute; top: 0; bottom: 0; width: min(280px, 85%); z-index: 20; }
   .uplink-sidebar { left: 0; }
   .uplink-members-pane { right: 0; }
+  /* Closed drawers hide the panes: keyed on the root's data-drawer so the
+     rule outranks the desktop search-face rule; the open drawer follows. */
+  .uplink-shell[data-drawer] .uplink-sidebar, .uplink-shell[data-drawer] .uplink-members-pane { display: none; }
   .uplink-shell[data-drawer="sidebar"] .uplink-sidebar, .uplink-shell[data-drawer="members"] .uplink-members-pane { display: flex; }
   .uplink-shell[data-drawer="sidebar"] .uplink-backdrop, .uplink-shell[data-drawer="members"] .uplink-backdrop { display: block; position: absolute; inset: 0; z-index: 15; background-color: rgba(0, 0, 0, 0.6); } /* scrim: no token for translucent black (cf. .uplink-banner) */
   .uplink-shell .packet { padding-right: 8px; }

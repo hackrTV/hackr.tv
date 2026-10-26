@@ -53,7 +53,9 @@ class ChatMessage < ApplicationRecord
   # order so the chips keep first-reaction order. The FK cascades.
   has_many :reactions, -> { order(:id) }, class_name: "ChatMessageReaction", inverse_of: :chat_message
 
-  validates :content, presence: true, length: {maximum: 512}
+  CONTENT_MAX = 512 # chars; the composers' limit value and maxlength (+10 for the visible over-limit state) mirror it
+
+  validates :content, presence: true, length: {maximum: CONTENT_MAX}
   validate :reply_to_in_channel
   filter_profanity :content
 

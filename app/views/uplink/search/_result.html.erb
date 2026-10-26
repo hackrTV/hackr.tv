@@ -1,0 +1,16 @@
+<%# One search hit: sender (colored like the reply quote), age, the
+    packet's text with every match marked. The row is a link to the
+    packet carrying the query along: uplink-shell#locate scrolls + flashes
+    the row when the log has it and otherwise lets the link visit
+    /uplink?around=<id>&channel=&q=, which opens the log on the packet
+    with this search still in the pane. Locals: packet, channel, query. %>
+<li class="uplink-result" id="uplink-result-<%= packet.id %>">
+  <a class="uplink-result-jump" href="<%= uplink_path(channel: channel.slug, around: packet.id, q: query) %>" title="Go to packet"
+    data-action="click->uplink-shell#locate" data-uplink-shell-id-param="<%= packet.id %>">
+    <span class="uplink-result-meta">
+      <span class="uplink-result-sender uplink-result-sender--<%= uplink_packet_sender_class(packet) %>"><%= uplink_packet_sender(packet) %></span>
+      <span class="uplink-result-age"><%= uplink_time_ago(packet.created_at) %></span>
+    </span>
+    <span class="uplink-result-text"><%= uplink_search_highlight(uplink_packet_excerpt(packet, length: ChatMessage::CONTENT_MAX), query) %></span>
+  </a>
+</li>

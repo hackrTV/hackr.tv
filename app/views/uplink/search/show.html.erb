@@ -1,0 +1,10 @@
+<%# Search results, rendered into uplink/_shell's uplink-search
+    turbo-frame (the pane's form targets it). The body is a partial
+    because the shell renders the same markup as the frame's first
+    content (the hint, or the results for a ?q= on the page URL). The
+    host frame targets _top, so a row's link visits the page unless the
+    uplink-shell controller jumps in place. @error: the empty state
+    (unknown or off-limits channel). %>
+<%= turbo_frame_tag "uplink-search" do %>
+  <%= render "uplink/search/results", channel: @channel, query: @query, results: @results, capped: @capped, error: @error %>
+<% end %>

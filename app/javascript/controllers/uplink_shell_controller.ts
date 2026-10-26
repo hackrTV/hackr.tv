@@ -1,4 +1,6 @@
-import { Controller } from '@hotwired/stimulus'
+import { Controller, type ActionEvent } from '@hotwired/stimulus'
+import { Turbo } from '@hotwired/turbo-rails'
+import { jumpToPacket } from '~/utils/packetJump'
 
 // Chrome for the /uplink NODE shell (uplink/_shell). The uplink
 // controller on the same root keeps doing presence + reconnect; this one
@@ -11,7 +13,18 @@ import { Controller } from '@hotwired/stimulus'
 //     iframe src, so it never plays audio;
 //   - the "[v] N NEW PACKETS" jump pill, fed by packet-log:state events
 //     from the log (prefixed "@ MENTION" when an unread packet mentions
-//     the viewer); the viewer's own sends always jump to the bottom;
+//     the viewer); the viewer's own sends always jump to the bottom. On
+//     a located log (/uplink?around=, the log behind the present) it
+//     reads "[v] JUMP TO PRESENT" and visits the present url instead —
+//     an own send does too;
+//   - the operatives pane's search face (data-pane="search" on the
+//     root; the roster preference in data-members is untouched, so
+//     closing the search returns to it): the header's [/] opens it with
+//     the field focused — as the members drawer under 768px — and [x],
+//     Escape in the field or [o] (back to the roster) close it. A hit's
+//     link (locate, id param) scrolls to + flashes the packet when the
+//     log has it, swallowing the visit; otherwise the link goes through
+//     to /uplink?around=<id>, which opens the log on it;
 //   - "/" focuses the composer from anywhere outside a field;
 //   - unread badges: the sidebar renders each other channel's count
 //     (packets above the viewer's read mark); a hidden block of bump
@@ -40,13 +53,15 @@ const BADGE_CAP = 99
 const SLUG = /^[\w-]+$/ // validated, not escaped: jsdom has no CSS.escape
 
 type Drawer = '' | 'sidebar' | 'members'
+type Pane = 'members' | 'search'
 
 export default class extends Controller<HTMLElement> {
-  static targets = ['sidebar', 'members', 'main', 'jump', 'jumpCount', 'membersToggle', 'stage', 'stageFrame', 'stageToggle', 'bumps']
-  static values = { channel: String, ackUrl: String }
+  static targets = ['sidebar', 'members', 'main', 'jump', 'jumpCount', 'membersToggle', 'stage', 'stageFrame', 'stageToggle', 'bumps', 'searchToggle', 'searchField']
+  static values = { channel: String, ackUrl: String, presentUrl: String }
 
   declare readonly channelValue: string
   declare readonly ackUrlValue: string
+  declare readonly presentUrlValue: string
 
   declare readonly sidebarTarget: HTMLElement
   declare readonly membersTarget: HTMLElement
@@ -62,11 +77,17 @@ export default class extends Controller<HTMLElement> {
   // The bump block renders in the shell's sidebar only.
   declare readonly hasBumpsTarget: boolean
   declare readonly bumpsTarget: HTMLElement
+  // The search face (toggle + field) renders on viewable channels only.
+  declare readonly hasSearchToggleTarget: boolean
+  declare readonly searchToggleTarget: HTMLButtonElement
+  declare readonly hasSearchFieldTarget: boolean
+  declare readonly searchFieldTarget: HTMLInputElement
 
   private mobile: MediaQueryList | null = null
   private bumpObserver: MutationObserver | null = null
   private ackTimer = 0
   private acked = 0
+  private present = true
 
   connect (): void {
     this.applyMembersPreference()
@@ -101,18 +122,69 @@ export default class extends Controller<HTMLElement> {
     this.toggleDrawer('sidebar')
   }
 
+  // [o]: from the search face, back to the roster (opened); else the toggle.
   toggleMembers (): void {
+    const fromSearch = this.pane === 'search'
+    this.setPane('members')
     if (this.isMobile) {
       this.toggleDrawer('members')
       return
     }
-    const open = this.element.dataset.members !== 'open'
+    const open = fromSearch || this.element.dataset.members !== 'open'
     this.setMembers(open)
     this.store(MEMBERS_KEY, open ? 'open' : 'closed')
   }
 
   closeDrawers = (): void => {
     this.setDrawer('')
+  }
+
+  // ── Search face ────────────────────────────────────────────────────
+
+  toggleSearch (): void {
+    const showing = this.pane === 'search' && (!this.isMobile || this.drawer === 'members')
+    if (showing) {
+      this.closeSearch()
+    } else {
+      this.openSearch()
+    }
+  }
+
+  closeSearch (): void {
+    const wasOpen = this.pane === 'search'
+    this.setPane('members')
+    if (this.isMobile && this.drawer === 'members') this.setDrawer('')
+    if (wasOpen && this.hasSearchToggleTarget) this.searchToggleTarget.focus()
+  }
+
+  // Escape in the field closes the face (the popover's and the drawers'
+  // Escape handlers on document see it handled).
+  searchKey (event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || event.defaultPrevented) return
+    event.preventDefault()
+    this.closeSearch()
+  }
+
+  // A hit's link: in place when the log has the packet (the visit
+  // swallowed), else the link's own visit opens the log around it.
+  locate (event: MouseEvent & ActionEvent): void {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+    if (jumpToPacket(event.params?.id)) event.preventDefault()
+  }
+
+  private openSearch (): void {
+    this.setPane('search')
+    if (this.isMobile) this.setDrawer('members')
+    if (this.hasSearchFieldTarget) this.searchFieldTarget.focus()
+  }
+
+  private get pane (): Pane {
+    return this.element.dataset.pane === 'search' ? 'search' : 'members'
+  }
+
+  private setPane (pane: Pane): void {
+    this.element.dataset.pane = pane
+    if (this.hasSearchToggleTarget) this.searchToggleTarget.setAttribute('aria-pressed', String(pane === 'search'))
   }
 
   // ── Stage ──────────────────────────────────────────────────────────
@@ -126,19 +198,30 @@ export default class extends Controller<HTMLElement> {
 
   // ── Log ────────────────────────────────────────────────────────────
 
-  logState (event: CustomEvent<{ atBottom: boolean, unread: number, mentions?: number }>): void {
+  logState (event: CustomEvent<{ atBottom: boolean, unread: number, mentions?: number, atPresent?: boolean }>): void {
     const { atBottom, unread } = event.detail
     const mentions = event.detail.mentions ?? 0
-    if (atBottom) this.scheduleAck()
-    const show = !atBottom && unread > 0
+    this.present = event.detail.atPresent ?? true
+    if (atBottom && this.present) this.scheduleAck()
+    const show = !this.present || (!atBottom && unread > 0)
     this.jumpTarget.hidden = !show
-    this.jumpTarget.classList.toggle('uplink-jump--mention', show && mentions > 0)
+    this.jumpTarget.classList.toggle('uplink-jump--present', !this.present)
+    this.jumpTarget.classList.toggle('uplink-jump--mention', show && this.present && mentions > 0)
     if (!show) return
+    if (!this.present) {
+      this.jumpCountTarget.textContent = 'JUMP TO PRESENT'
+      return
+    }
     const packets = `${unread} NEW PACKET${unread === 1 ? '' : 'S'}`
     this.jumpCountTarget.textContent = mentions > 0 ? `@ MENTION · ${packets}` : packets
   }
 
+  // The bottom of the log — or, on a located log, the present itself.
   jump (): void {
+    if (!this.present && this.presentUrlValue) {
+      Turbo.visit(this.presentUrlValue)
+      return
+    }
     const log = this.element.querySelector<HTMLElement>('#uplink-log')
     if (log) log.scrollTop = log.scrollHeight
   }
