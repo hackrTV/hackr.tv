@@ -23,15 +23,17 @@ interface FrameElementLike {
 // LiveChatChannel subscription purely for presence counts and connection
 // state (the JSON channel's real consumers are relay/synthia). On cable
 // reconnect it reloads the log frame so packets broadcast during the gap
-// are recovered — the SPA's initial_packets re-merge equivalent.
+// are recovered — the SPA's initial_packets re-merge equivalent — and,
+// on the /uplink shell, the roster frame the same way (presence rows
+// that came or went meanwhile were broadcast to a socket that was down).
 // ActionCable's ConnectionMonitor handles retry/backoff, so there is no
 // manual reconnect button. The shell also routes the composer's
 // packet-form:typing / stop-typing events here (uplink/_shell's
 // data-action; the dock/popout wire nothing) and they ride the same
 // subscription as `typing` / `stop_typing` actions for Uplink::Typing.
 export default class extends Controller<HTMLElement> {
-  static targets = ['banner', 'presenceDot', 'presenceText', 'logFrame']
-  static values = { channel: String, logSrc: String }
+  static targets = ['banner', 'presenceDot', 'presenceText', 'logFrame', 'membersFrame']
+  static values = { channel: String, logSrc: String, membersSrc: String }
 
   declare readonly bannerTarget: HTMLElement
   declare readonly hasBannerTarget: boolean
@@ -41,8 +43,12 @@ export default class extends Controller<HTMLElement> {
   declare readonly hasPresenceTextTarget: boolean
   declare readonly logFrameTarget: HTMLElement
   declare readonly hasLogFrameTarget: boolean
+  // The roster frame renders on the /uplink shell only (uplink/_shell).
+  declare readonly membersFrameTarget: HTMLElement
+  declare readonly hasMembersFrameTarget: boolean
   declare readonly channelValue: string
   declare readonly logSrcValue: string
+  declare readonly membersSrcValue: string
 
   private sub: Subscription | null = null
   private everConnected = false
@@ -83,7 +89,10 @@ export default class extends Controller<HTMLElement> {
 
   private handleConnected (): void {
     this.hideBanner()
-    if (this.everConnected) this.reloadLog()
+    if (this.everConnected) {
+      this.reloadLog()
+      this.reloadRoster()
+    }
     this.everConnected = true
     this.renderPresence()
   }
@@ -112,11 +121,22 @@ export default class extends Controller<HTMLElement> {
 
   private reloadLog (): void {
     if (!this.hasLogFrameTarget || !this.logSrcValue) return
-    const frame = this.logFrameTarget as unknown as FrameElementLike
+    this.reloadFrame(this.logFrameTarget, this.logSrcValue)
+  }
+
+  private reloadRoster (): void {
+    if (!this.hasMembersFrameTarget || !this.membersSrcValue) return
+    this.reloadFrame(this.membersFrameTarget, this.membersSrcValue)
+  }
+
+  // A frame rendered inline has no src: the first reload gives it one
+  // (which fetches), later ones reload.
+  private reloadFrame (element: HTMLElement, src: string): void {
+    const frame = element as unknown as FrameElementLike
     if (frame.src) {
       frame.reload()
     } else {
-      frame.src = this.logSrcValue
+      frame.src = src
     }
   }
 

@@ -1,0 +1,7 @@
+<%# The roster alone, for the shell's uplink-members-frame reload after a
+    cable reconnect (Uplink::MembersController). The same partial the
+    ["uplink_members", slug] broadcasts replace, so the frame's content
+    and the stream's agree. Locals: @roster. %>
+<%= turbo_frame_tag "uplink-members-frame" do %>
+  <%= render "uplink/members", roster: @roster %>
+<% end %>

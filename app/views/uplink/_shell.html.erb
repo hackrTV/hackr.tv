@@ -13,9 +13,14 @@
     the operatives pane's search face (data-pane="search": the form
     whose GET lands in the uplink-search frame — Uplink::SearchController
     — and the hits' links, resolved in place when the log has the
-    packet); uplink also relays the composer's typing
+    packet), the sidebar's collapsible categories + keyboard ring and
+    its quick switcher (Ctrl/Cmd+K or the sidebar's [>]; a grid child
+    like the operator menu frame), and the tab-title count; uplink also
+    relays the composer's typing
     events (packet-form:typing / stop-typing, bubbled from _packet_form)
-    to its LiveChatChannel subscription, and the typing line above the
+    to its LiveChatChannel subscription, reloads the roster frame
+    (uplink-members-frame — GET /uplink/members) after a cable
+    reconnect as it does the log, and the typing line above the
     composer listens on the ["uplink_typing", slug] stream; popover owns the operative
     record card (a turbo-frame in the channel pane that packet author
     links load — see uplink/profiles/show), the operator menu (a
@@ -31,7 +36,8 @@
     read mark before this visit, nil on first sight) + unseen_divider (this
     page holds the NEW PACKETS boundary — UplinkController), more_after +
     focus (a located log: /uplink?around=), search_query (?q= — the pane
-    opens on its search face with these results). %>
+    opens on its search face with these results), counts (connected
+    count per viewable channel id, for the sidebar rows). %>
 <%
   viewable = channel.present? && channel.viewable_by?(viewer)
   live = live_stream.present?
@@ -42,6 +48,7 @@
 <div class="uplink-shell" data-controller="uplink uplink-shell popover" data-members="open" data-drawer="" data-pane="<%= searching ? "search" : "members" %>"
   data-uplink-channel-value="<%= channel&.slug %>"
   data-uplink-log-src-value="<%= viewable ? uplink_log_path(channel: channel.slug, shell: 1) : "" %>"
+  data-uplink-members-src-value="<%= viewable ? uplink_members_path(channel: channel.slug) : "" %>"
   data-uplink-shell-channel-value="<%= channel&.slug %>"
   data-uplink-shell-ack-url-value="<%= viewable ? uplink_reads_path : "" %>"
   data-uplink-shell-present-url-value="<%= uplink_path(channel: channel&.slug, q: search_query.presence) %>"
@@ -55,8 +62,10 @@
       <span class="uplink-sidebar-kicker">UPLINK</span>
       <span class="uplink-sidebar-node">hackr.tv NODE</span>
     </header>
+    <button type="button" class="uplink-sidebar-switch" title="Jump to a channel (Ctrl+K)"
+      data-action="click->uplink-shell#openSwitcher">[&gt;] JUMP TO CHANNEL<kbd class="uplink-sidebar-key">^K</kbd></button>
     <%= render "uplink/channel_list", channels: channels, active: channel&.slug, live: live,
-      unread: local_assigns.fetch(:unread, {}) %>
+      unread: local_assigns.fetch(:unread, {}), counts: local_assigns.fetch(:counts, {}) %>
     <footer class="uplink-userpanel">
       <span class="uplink-userpanel-alias uplink-userpanel-alias--<%= uplink_role_class(viewer.role) %>">@<%= viewer.hackr_alias %></span>
       <span class="uplink-userpanel-role"><%= viewer.role.upcase %></span>
@@ -128,7 +137,12 @@
 
   <aside class="uplink-members-pane" id="uplink-members-pane" data-uplink-shell-target="members" aria-label="Operatives">
     <header class="uplink-members-title uplink-members-title--roster">OPERATIVES</header>
-    <%= render "uplink/members", roster: roster %>
+    <%# The roster inside a frame the uplink controller refetches after a
+        cable reconnect (GET /uplink/members — Uplink::MembersController);
+        the broadcasts keep replacing #uplink-members inside it. %>
+    <%= turbo_frame_tag "uplink-members-frame", class: "uplink-members-frame", data: {uplink_target: "membersFrame"} do %>
+      <%= render "uplink/members", roster: roster %>
+    <% end %>
     <% if viewable %>
       <%# Search (Phase 2 item 9): the pane's other face. data-pane="search"
           on the shell root (uplink-shell#toggleSearch, or ?q= on load)
@@ -153,6 +167,22 @@
       </section>
     <% end %>
   </aside>
+
+  <%# Quick switcher: Ctrl/Cmd+K anywhere or the sidebar's [>] opens it
+      (uplink-shell#openSwitcher); the options are built client-side
+      from the sidebar rows. A grid child like the operator menu frame
+      below: absolute, above the mobile drawers and their backdrop,
+      never inert with the channel pane. Closed = hidden. %>
+  <div class="uplink-switcher" hidden data-uplink-shell-target="switcher" data-action="mousedown->uplink-shell#switcherOutside">
+    <div class="uplink-switcher-box" role="dialog" aria-modal="true" aria-label="Jump to a channel">
+      <input type="text" class="uplink-switcher-field" placeholder="Jump to a channel..." autocomplete="off" spellcheck="false"
+        role="combobox" aria-expanded="true" aria-autocomplete="list" aria-controls="uplink-switcher-list" aria-label="Jump to a channel"
+        data-uplink-shell-target="switcherField" data-action="input->uplink-shell#switcherInput keydown->uplink-shell#switcherKey">
+      <ul class="uplink-switcher-list" id="uplink-switcher-list" role="listbox" aria-label="Channels"
+        data-uplink-shell-target="switcherList" data-action="click->uplink-shell#switcherPick"></ul>
+      <p class="uplink-switcher-hint">UP/DOWN MOVE &middot; ENTER GO &middot; ESC CLOSE</p>
+    </div>
+  </div>
 
   <div class="uplink-backdrop" data-action="click->uplink-shell#closeDrawers"></div>
 

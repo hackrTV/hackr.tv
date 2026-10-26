@@ -37,10 +37,13 @@ class UplinkController < ApplicationController
     end
     @live_stream = HackrStream.includes(:artist).current_live
     @roster = Uplink::Roster.for(viewable? ? @channel : nil, viewer: current_hackr)
+    viewable_channels = @channels.select { |c| c.viewable_by?(current_hackr) }
     # Marks this channel read at its newest packet, seeds caught-up marks
     # for channels the viewer never saw, counts the rest for the sidebar.
-    @unread = Uplink::Unread.sync(current_hackr, @channels.select { |c| c.viewable_by?(current_hackr) },
-      reading: viewable? ? @channel : nil)
+    @unread = Uplink::Unread.sync(current_hackr, viewable_channels, reading: viewable? ? @channel : nil)
+    # Connected counts for the sidebar rows (viewable channels only; the
+    # viewer counts on this channel before their presence row lands).
+    @counts = Uplink::Roster.counts(viewable_channels, viewer: current_hackr, viewing: viewable? ? @channel : nil)
   end
 
   # GET /uplink/popout — public (livestream viewing), slim layout,

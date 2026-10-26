@@ -21,6 +21,28 @@ module Uplink
       new(channel, viewer: viewer)
     end
 
+    # Connected count per channel for the sidebar rows (uplink/_channel_count):
+    # the rows `members` reads, one grouped query for every channel at
+    # once. The viewer counts on the channel they are viewing (`viewing`)
+    # before their presence row lands, exactly as `members` synthesizes
+    # them. {channel_id => count}, every channel present (0 when empty).
+    def self.counts(channels, viewer: nil, viewing: nil)
+      ids = channels.map(&:id)
+      present = GridUplinkPresence.valid.where(chat_channel_id: ids)
+        .joins(:grid_hackr).where(grid_hackrs: {service_account: false})
+        .group(:chat_channel_id).count
+      counts = ids.to_h { |id| [id, present[id].to_i] }
+      counts[viewing.id] += 1 if viewing && counts.key?(viewing.id) && synthesize?(viewer, viewing)
+      counts
+    end
+
+    def self.synthesize?(viewer, channel)
+      return false unless viewer && !viewer.service_account?
+
+      !GridUplinkPresence.valid.in_channel(channel).for_hackr(viewer).exists?
+    end
+    private_class_method :synthesize?
+
     # viewer: the hackr looking at the shell. They are connected the moment
     # it renders, but their presence row only lands when the cable
     # subscribes a beat later — so they are synthesized into the roster

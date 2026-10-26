@@ -125,6 +125,46 @@ describe('UplinkController', () => {
     expect(reload).toHaveBeenCalledTimes(1)
   })
 
+  it('reloads the roster frame on re-connects too (the shell wraps it in one): never the first time, a src first, reload() after', async () => {
+    await start(`
+      <div data-controller="uplink" data-uplink-channel-value="main" data-uplink-members-src-value="/uplink/members?channel=main">
+        <turbo-frame data-uplink-target="membersFrame"></turbo-frame>
+      </div>`)
+    const frame = document.querySelector('[data-uplink-target="membersFrame"]') as HTMLElement & { src: string | null, reload: () => void }
+    const reload = vi.fn()
+    frame.reload = reload
+    ;(frame as { src: string | null }).src = null
+
+    callbacks().connected!() // first connect: nothing to recover
+    expect((frame as { src: string | null }).src).toBeNull()
+
+    callbacks().disconnected!()
+    callbacks().connected!()
+    expect((frame as { src: string | null }).src).toBe('/uplink/members?channel=main')
+    expect(reload).not.toHaveBeenCalled()
+
+    callbacks().disconnected!()
+    callbacks().connected!()
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('leaves the roster alone without the frame (dock/popout) or without a src (a channel outside clearance)', async () => {
+    await start() // the dock fixture: no members frame
+    callbacks().disconnected!()
+    expect(() => callbacks().connected!()).not.toThrow()
+
+    await start(`
+      <div data-controller="uplink" data-uplink-channel-value="main" data-uplink-log-src-value="/uplink/log" data-uplink-members-src-value="">
+        <turbo-frame data-uplink-target="logFrame"></turbo-frame>
+        <turbo-frame data-uplink-target="membersFrame"></turbo-frame>
+      </div>`)
+    const frame = document.querySelector('[data-uplink-target="membersFrame"]') as HTMLElement & { src?: string | null }
+    callbacks().connected!()
+    callbacks().disconnected!()
+    callbacks().connected!()
+    expect(frame.src).toBeUndefined()
+  })
+
   it('renders disconnected without subscribing when no channel value', async () => {
     await start(`
       <div data-controller="uplink" data-uplink-channel-value="">

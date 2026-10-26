@@ -9,10 +9,16 @@
 # so a change that lands mid-render schedules the next one. Rides its
 # own ["uplink_members", slug] stream so the home dock and popout, which
 # hold the uplink_html stream, never receive roster HTML they can't use.
+# The same render also pushes the channel's sidebar count
+# (uplink/_channel_count): on that members stream to the shells on the
+# channel and on the channel's bump stream (Uplink::Unread::STREAM — the
+# one every shell elsewhere holds per channel in its clearance) to the
+# rest. No new subscriptions, and no count for a channel you can't open.
 module Uplink
   module MembersBroadcaster
     STREAM = "uplink_members"
     TARGET = "uplink-members"
+    COUNT_TARGET = "uplink-count" # + "-<slug>": the sidebar row's count span
     DEBOUNCE = 2.seconds
     CLAIM_TTL = 10.seconds
 
@@ -27,12 +33,21 @@ module Uplink
     end
 
     def self.broadcast(channel)
+      roster = Roster.for(channel)
       Turbo::StreamsChannel.broadcast_replace_to(
         [STREAM, channel.slug],
         target: TARGET,
         partial: "uplink/members",
-        locals: {roster: Roster.for(channel)}
+        locals: {roster: roster}
       )
+      count = ApplicationController.render(partial: "uplink/channel_count", locals: {channel: channel, count: roster.members.size}).strip # the partial's trailing newline
+      [[STREAM, channel.slug], [Unread::STREAM, channel.slug]].each do |stream|
+        Turbo::StreamsChannel.broadcast_replace_to(stream, target: count_target(channel.slug), html: count)
+      end
+    end
+
+    def self.count_target(slug)
+      "#{COUNT_TARGET}-#{slug}"
     end
 
     def self.claim_key(channel_id)

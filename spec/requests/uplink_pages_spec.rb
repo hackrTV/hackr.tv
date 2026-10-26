@@ -494,6 +494,113 @@ RSpec.describe "Uplink pages", type: :request do
     end
   end
 
+  describe "sidebar shell UX (deferred from Phase 1: category groups, keyboard ring, quick switcher, counts, roster frame)" do
+    it "renders collapsible category groups (heading buttons over rows wrappers) in a roving-tabindex list (0 on the active row), the quick switcher dialog + its sidebar button, and the roster inside its reload frame with the members url on the root" do
+      create(:chat_channel, slug: "ops", name: "#ops", category: "OPERATIONS", position: 20)
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include('data-uplink-members-src-value="/uplink/members?channel=ambient"')
+      expect(body).to include(%(<button type="button" class="uplink-sidebar-switch" title="Jump to a channel (Ctrl+K)"\n      data-action="click->uplink-shell#openSwitcher">[&gt;] JUMP TO CHANNEL<kbd class="uplink-sidebar-key">^K</kbd></button>))
+      expect(body).to include('<div class="uplink-channels" data-action="keydown->uplink-shell#channelKey">')
+      expect(body).to include('<div class="uplink-category-group" data-category="COMMS">')
+      expect(body).to include(%(<button type="button" class="uplink-category" aria-expanded="true" aria-controls="uplink-category-rows-0" tabindex="-1"\n        data-action="click->uplink-shell#toggleCategory"><span class="uplink-category-glyph" aria-hidden="true">[-]</span> COMMS</button>))
+      expect(body).to include('<div class="uplink-category-rows" id="uplink-category-rows-0">')
+      expect(body).to include('<div class="uplink-category-group" data-category="OPERATIONS">')
+      expect(body).to include('aria-controls="uplink-category-rows-1"')
+      expect(body).to match(/<a class="uplink-channel uplink-channel--active"[^>]*tabindex="0"[^>]*data-channel="ambient"/)
+      expect(body).to match(/<a class="uplink-channel"[^>]*tabindex="-1"[^>]*data-channel="ops"/)
+      expect(body).to include('<div class="uplink-switcher" hidden data-uplink-shell-target="switcher" data-action="mousedown->uplink-shell#switcherOutside">')
+      expect(body).to include('<div class="uplink-switcher-box" role="dialog" aria-modal="true" aria-label="Jump to a channel">')
+      expect(body).to include('role="combobox" aria-expanded="true" aria-autocomplete="list" aria-controls="uplink-switcher-list"')
+      expect(body).to include('data-uplink-shell-target="switcherField" data-action="input->uplink-shell#switcherInput keydown->uplink-shell#switcherKey"')
+      expect(body).to include('<ul class="uplink-switcher-list" id="uplink-switcher-list" role="listbox" aria-label="Channels"')
+      expect(body).to match(%r{</aside>\s*<div class="uplink-switcher".*?</div>\s*</div>\s*<div class="uplink-backdrop"}m) # a grid child between the operatives pane and the backdrop, like the operator menu frame
+      expect(body).to match(%r{<turbo-frame class="uplink-members-frame" data-uplink-target="membersFrame" id="uplink-members-frame">\s*<div id="uplink-members"}m)
+    end
+
+    it "counts connected operatives per row for the channels in the viewer's clearance: valid presence rows, service accounts out, the viewer counted on the channel on screen until their row lands, hidden at 0, no span outside clearance" do
+      ops = create(:chat_channel, slug: "ops", name: "#ops")
+      create(:chat_channel, slug: "quiet", name: "#quiet")
+      secret = create(:chat_channel, slug: "secret", name: "#secret", minimum_role: "operator")
+      GridUplinkPresence.touch!(other, ops)
+      GridUplinkPresence.touch!(operator, ops)
+      GridUplinkPresence.touch!(create(:grid_hackr, :admin, service_account: true), ops)
+      GridUplinkPresence.touch!(other, channel).update_column(:last_seen_at, (Grid::EconomyConfig::PRESENCE_TTL + 1.minute).ago)
+      GridUplinkPresence.touch!(operator, secret)
+      log_in!
+
+      get "/uplink"
+
+      body = response.body
+      expect(body).to include('<span id="uplink-count-ops" class="uplink-channel-count" title="2 operatives connected">2</span>')
+      expect(body).to include('<span id="uplink-count-ambient" class="uplink-channel-count" title="1 operative connected">1</span>') # you, before your row lands; the stale row doesn't count
+      expect(body).to include('<span id="uplink-count-quiet" class="uplink-channel-count" hidden="hidden" title="0 operatives connected"></span>')
+      expect(body).not_to include("uplink-count-secret")
+      expect(body).to include('data-channel="secret"') # the row is there, countless
+      expect(GridUplinkPresence.where(grid_hackr: hackr).count).to eq(0) # no write on a read
+
+      GridUplinkPresence.touch!(hackr, channel)
+      get "/uplink", params: {channel: "ops"}
+
+      body = response.body
+      expect(body).to include('<span id="uplink-count-ops" class="uplink-channel-count" title="3 operatives connected">3</span>') # you, on #ops now
+      expect(body).to include('<span id="uplink-count-ambient" class="uplink-channel-count" title="1 operative connected">1</span>') # your real row, once
+    end
+  end
+
+  describe "GET /uplink/members (the roster reload after a cable reconnect)" do
+    def frame_headers
+      {"Turbo-Frame" => "uplink-members-frame"}
+    end
+
+    it "requires login" do
+      get "/uplink/members", params: {channel: "ambient"}, headers: frame_headers
+
+      expect(response).to have_http_status(:redirect)
+      expect(response.location).to include("/grid/login")
+    end
+
+    it "renders the roster inside the frame, anonymized, with the viewer synthesized" do
+      GridUplinkPresence.touch!(other, channel)
+      log_in!
+
+      get "/uplink/members", params: {channel: "ambient"}, headers: frame_headers
+
+      expect(response).to have_http_status(:ok)
+      body = response.body
+      expect(body).to match(%r{<turbo-frame id="uplink-members-frame">\s*<div id="uplink-members"}m)
+      expect(body).to include("OPERATIVE — 2")
+      expect(body).to include(Uplink::Callsign.label(other.id))
+      expect(body).to include(%(data-callsign="#{Uplink::Callsign.token(hackr.id)}"))
+      expect(body).not_to include(other.hackr_alias)
+      expect(body).not_to include(hackr.hackr_alias)
+      expect(body).not_to include("uplink-shell") # the frame alone
+      expect(GridUplinkPresence.where(grid_hackr: hackr).count).to eq(0)
+    end
+
+    it "renders the frame empty at 404 for a channel that is gone and at 403 outside clearance, and bounces a frameless request to the channel" do
+      GridUplinkPresence.touch!(other, channel)
+      create(:chat_channel, slug: "secret", name: "#secret", minimum_role: "operator")
+      log_in!
+
+      get "/uplink/members", params: {channel: "nope"}, headers: frame_headers
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include('<turbo-frame id="uplink-members-frame">')
+      expect(response.body).to include("NO OPERATIVES CONNECTED")
+
+      get "/uplink/members", params: {channel: "secret"}, headers: frame_headers
+      expect(response).to have_http_status(:forbidden)
+      expect(response.body).to include("NO OPERATIVES CONNECTED")
+      expect(response.body).not_to include(Uplink::Callsign.label(hackr.id))
+
+      get "/uplink/members", params: {channel: "ambient"}
+      expect(response).to redirect_to("/uplink?channel=ambient")
+    end
+  end
+
   describe "GET /uplink/popout" do
     it "carries no unread badges, bump slots or read-ack url (the dock neither: both render _panel)" do
       get "/uplink/popout"
@@ -501,6 +608,10 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).not_to include("uplink-channel-badge")
       expect(response.body).not_to include("uplink-bumps")
+      expect(response.body).not_to include("uplink-channel-count")
+      expect(response.body).not_to include("uplink-category")
+      expect(response.body).not_to include("uplink-switcher")
+      expect(response.body).not_to include("uplink-members-frame")
       expect(response.body).not_to include("uplink-shell-ack-url")
       expect(response.body).not_to include("uplink-unseen")
       expect(UplinkChannelRead.count).to eq(0)
