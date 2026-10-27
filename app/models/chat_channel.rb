@@ -43,6 +43,44 @@ class ChatChannel < ApplicationRecord
   # within this ordering (UplinkHelper#uplink_channel_groups).
   scope :ordered, -> { order(:position, :id) }
 
+  # /root/uplink's ↑/↓: a move renumbers the whole sidebar order in steps
+  # of POSITION_STEP first (the order is kept; ties — seeded channels all
+  # at 0 — become distinct so a swap can take), then the channel and its
+  # neighbour inside its category trade numbers. Nothing else moves:
+  # the category's set of positions is unchanged, so the group keeps its
+  # place among the headings.
+  POSITION_STEP = 10
+  MOVES = {"up" => -1, "down" => 1}.freeze
+
+  # Where a new channel lands by default: after the current last one.
+  def self.next_position
+    (maximum(:position) || -POSITION_STEP) + POSITION_STEP
+  end
+
+  # Returns the neighbour swapped past, or nil at the group's edge (then
+  # only the renumbering happened, which changes no order).
+  def move!(direction)
+    step = MOVES.fetch(direction.to_s)
+    neighbour = nil
+    self.class.transaction do
+      ordered = self.class.ordered.to_a
+      ordered.each_with_index do |channel, index|
+        channel.update_column(:position, index * POSITION_STEP) if channel.position != index * POSITION_STEP
+      end
+      siblings = ordered.select { |channel| channel.category == category }
+      index = siblings.index { |channel| channel.id == id }
+      neighbour = siblings[index + step] if (index + step).between?(0, siblings.size - 1)
+      if neighbour
+        mine = siblings[index]
+        mine.position, neighbour.position = neighbour.position, mine.position
+        mine.update_column(:position, mine.position)
+        neighbour.update_column(:position, neighbour.position)
+      end
+    end
+    reload
+    neighbour
+  end
+
   # The channel the home-page dock and popout pin to (conventionally
   # slug "live", but resolved structurally so a rename can't strand them).
   def self.livestream_default

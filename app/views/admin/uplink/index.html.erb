@@ -22,17 +22,21 @@
         <%= tui_button "📡 Packets", packets_admin_uplink_index_path, color: :cyan, style: "padding: 8px 20px;" %>
         <%= tui_button "🚫 Punishments", punishments_admin_uplink_index_path, color: :orange, style: "padding: 8px 20px;" %>
         <%= tui_button "📋 Mod Log", moderation_log_admin_uplink_index_path, color: :purple, style: "padding: 8px 20px;" %>
+        <%= tui_button "+ New Channel", admin_new_uplink_channel_path, color: :green, style: "padding: 8px 20px;" %>
       </div>
 
-      <!-- Channels Section -->
+      <!-- Channels Section: grouped the way the /uplink sidebar renders
+           (category headings in order of their first channel, channels by
+           position inside), so a category/position edit shows its effect
+           here. ↑/↓ swap a channel with its neighbour inside its group. -->
       <div style="margin-bottom: 30px;">
-        <h3 style="color: #7c3aed; margin-bottom: 15px;">CHANNELS</h3>
+        <h3 style="color: #7c3aed; margin-bottom: 15px;">CHANNELS <small style="color: #666; font-weight: normal;">— as the Uplink sidebar orders them</small></h3>
         <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
           <table class="tui-table" style="width: 100%;">
             <thead>
               <tr>
                 <th style="text-align: left;">Channel</th>
-                <th style="text-align: center;">Sidebar</th>
+                <th style="text-align: center;">Position</th>
                 <th style="text-align: center;">Status</th>
                 <th style="text-align: center;">Requires Stream</th>
                 <th style="text-align: center;">Slow Mode</th>
@@ -41,14 +45,21 @@
               </tr>
             </thead>
             <tbody>
-              <% @channels.each do |channel| %>
+              <% uplink_channel_groups(@channels).each do |category, channels| %>
+                <tr class="uplink-admin-group">
+                  <td colspan="7" style="text-align: left; padding-top: 14px; color: #7c3aed; letter-spacing: 1px;">
+                    ▸ <%= category %>
+                    <small style="color: #666; letter-spacing: 0;"><%= pluralize(channels.size, "channel") %></small>
+                  </td>
+                </tr>
+                <% channels.each_with_index do |channel, index| %>
                 <tr>
-                  <td>
+                  <td style="padding-left: 24px;">
                     <strong class="cyan-255-text"><%= channel.name %></strong>
                     <br><small style="color: #666;"><%= channel.slug %></small>
                   </td>
                   <td style="text-align: center;">
-                    <%= channel.category %> <small style="color: #666;">#<%= channel.position %></small>
+                    <small style="color: #666;">#<%= channel.position %></small>
                   </td>
                   <td style="text-align: center;">
                     <% if channel.is_active %>
@@ -66,10 +77,18 @@
                   <td style="text-align: center;">
                     <%= channel.minimum_role %>
                   </td>
-                  <td style="text-align: center;">
+                  <td style="text-align: center; white-space: nowrap;">
                     <%= tui_button "Edit", admin_edit_uplink_channel_path(slug: channel.slug), color: :cyan, style: "padding: 4px 12px; font-size: 0.85em;" %>
+                    <%= tui_button_to "↑", admin_move_uplink_channel_path(slug: channel.slug, direction: "up"), method: :post, color: :grey,
+                        disabled: index.zero?, title: "Move up within #{category}", style: "padding: 4px 10px; font-size: 0.85em;", form: {style: "display: inline;"} %>
+                    <%= tui_button_to "↓", admin_move_uplink_channel_path(slug: channel.slug, direction: "down"), method: :post, color: :grey,
+                        disabled: index == channels.size - 1, title: "Move down within #{category}", style: "padding: 4px 10px; font-size: 0.85em;", form: {style: "display: inline;"} %>
+                    <%= tui_button_to channel.is_active ? "Deactivate" : "Activate", admin_toggle_uplink_channel_path(slug: channel.slug), method: :post,
+                        color: channel.is_active ? :orange : :green, title: channel.is_active ? "Hide the channel from everyone" : "Open the channel again",
+                        style: "padding: 4px 12px; font-size: 0.85em;", form: {style: "display: inline;"} %>
                   </td>
                 </tr>
+                <% end %>
               <% end %>
             </tbody>
           </table>

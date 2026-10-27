@@ -1,0 +1,79 @@
+<%# New + edit channel (/root/uplink/channels). Locals: channel, categories
+    (every group in use, for the category field's datalist). The slug is
+    typed on create only — it keys /uplink?channel= and the live stream
+    names — and shown fixed on edit. %>
+<% if flash[:error] %>
+  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
+    <p class="red-255-text">⚠ ERROR</p>
+    <p class="white-text"><%= flash[:error] %></p>
+  </div>
+<% end %>
+
+<%= form_with model: channel,
+    url: channel.new_record? ? admin_uplink_channels_path : admin_uplink_channel_path(channel.slug),
+    method: channel.new_record? ? :post : :patch, local: true do |f| %>
+  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: CHANNEL ::]</h3>
+
+  <div style="max-width: 560px;">
+    <div style="margin-bottom: 20px;">
+      <% if channel.new_record? %>
+        <%= f.tui_text_field :slug, label: "SLUG", maxlength: 32, autocomplete: "off", spellcheck: "false",
+            hint: "Lowercase letters, numbers, _ and -. Keys the channel's URL (/uplink?channel=slug) and its live streams; fixed once created." %>
+      <% else %>
+        <div class="tui-field">
+          <span class="tui-field-label">SLUG</span>
+          <div><code class="cyan-255-text" style="font-size: 1.1em;"><%= channel.slug %></code></div>
+          <small class="tui-field-hint">Fixed: it keys the channel's URL (/uplink?channel=<%= channel.slug %>) and its live streams.</small>
+        </div>
+      <% end %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_text_field :name, label: "CHANNEL NAME", hint: "Shown in the sidebar and the channel header, e.g. #ops." %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_text_area :description, label: "DESCRIPTION", rows: 3, hint: "The topic line under the channel name." %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_check_box :is_active, label: "ACTIVE", style: "width: 20px; height: 20px;",
+          hint: "When disabled, the channel will not be accessible." %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_check_box :requires_livestream, label: "REQUIRES LIVESTREAM", style: "width: 20px; height: 20px;",
+          hint: "When enabled, the channel is only available during live broadcasts." %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_number_field :slow_mode_seconds, label: "SLOW MODE (SECONDS)", min: 0, max: 300, style: "width: 150px;",
+          hint: "0 = disabled. Users must wait this many seconds between messages." %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_text_field :category, label: "SIDEBAR CATEGORY", list: "channel-categories", maxlength: 24, autocomplete: "off", spellcheck: "false", style: "width: 250px;",
+          hint: "The heading the channel sits under in the Uplink sidebar. Pick a group in use or type a new one (auto-uppercased). Groups order by their first channel's position." %>
+      <datalist id="channel-categories">
+        <% categories.each do |category| %>
+          <option value="<%= category %>"></option>
+        <% end %>
+      </datalist>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_number_field :position, label: "SIDEBAR POSITION", min: 0, style: "width: 150px;",
+          hint: "Lower sorts first inside the group. The ↑ / ↓ on the channel list swap neighbours for you." %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.tui_select :minimum_role, [["Operative", "operative"], ["Operator", "operator"], ["Admin", "admin"]], {}, label: "MINIMUM ROLE",
+          hint: "Only users with this role or higher can access the channel." %>
+    </div>
+  </div>
+
+  <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <%= tui_submit channel.new_record? ? "Create Channel" : "Save Changes", form: f, color: :purple, style: "padding: 10px 30px;" %>
+    <%= tui_button "Cancel", admin_uplink_index_path, color: :grey, style: "padding: 10px 30px;" %>
+  </div>
+<% end %>

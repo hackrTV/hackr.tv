@@ -193,5 +193,52 @@ RSpec.describe ChatChannel, type: :model do
         expect(ChatChannel.ordered.to_a).to eq([early, early_too, late])
       end
     end
+
+    describe ".next_position" do
+      it "lands after the current last channel, 0 when there are none" do
+        expect(ChatChannel.next_position).to eq(0)
+        create(:chat_channel, position: 10)
+        expect(ChatChannel.next_position).to eq(20)
+      end
+    end
+
+    describe "#move! (the /root/uplink ↑/↓)" do
+      let!(:live) { create(:chat_channel, slug: "live", category: "BROADCAST", position: 0) }
+      let!(:ambient) { create(:chat_channel, slug: "ambient", category: "COMMS", position: 0) }
+      let!(:ops) { create(:chat_channel, slug: "ops", category: "COMMS", position: 0) }
+      let!(:misc) { create(:chat_channel, slug: "misc", category: "COMMS", position: 0) }
+
+      it "resolves ties by renumbering the sidebar order in steps of 10, then swaps with the neighbour inside the category" do
+        expect(ops.move!("down")).to eq(misc)
+        expect(ChatChannel.ordered.pluck(:slug, :position)).to eq([["live", 0], ["ambient", 10], ["misc", 20], ["ops", 30]])
+        expect(ops.position).to eq(30)
+
+        expect(ops.move!(:up)).to eq(misc)
+        expect(ChatChannel.ordered.pluck(:slug)).to eq(%w[live ambient ops misc])
+      end
+
+      it "returns nil at the group's edge and never crosses into another heading (the renumbering alone changes no order)" do
+        expect(live.move!("down")).to be_nil
+        expect(ambient.move!("up")).to be_nil
+        expect(ChatChannel.ordered.pluck(:slug, :position)).to eq([["live", 0], ["ambient", 10], ["ops", 20], ["misc", 30]])
+      end
+
+      it "keeps the headings in place when a group's first channel swaps down: the group's set of positions is unchanged" do
+        ambient.update_column(:position, 0)
+        live.update_column(:position, 10)
+        ops.update_column(:position, 20)
+        misc.update_column(:position, 30)
+        expect(ChatChannel.ordered.group_by(&:category).keys).to eq(%w[COMMS BROADCAST])
+
+        expect(ambient.move!("down")).to eq(ops)
+
+        expect(ChatChannel.ordered.pluck(:slug, :position)).to eq([["ops", 0], ["live", 10], ["ambient", 20], ["misc", 30]])
+        expect(ChatChannel.ordered.group_by(&:category).keys).to eq(%w[COMMS BROADCAST])
+      end
+
+      it "rejects an unknown direction" do
+        expect { ops.move!("sideways") }.to raise_error(KeyError)
+      end
+    end
   end
 end

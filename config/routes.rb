@@ -692,8 +692,15 @@ Rails.application.routes.draw do
         get "moderation_log"
       end
     end
+    # Channels: new/create + the sidebar tools on the index (↑/↓ swap a
+    # channel with its neighbour inside its category; toggle flips
+    # is_active). Slug-keyed; the slug is fixed after create.
+    get "uplink/channels/new", to: "uplink#new_channel", as: :new_uplink_channel
+    post "uplink/channels", to: "uplink#create_channel", as: :uplink_channels
     get "uplink/channels/:slug/edit", to: "uplink#edit_channel", as: :edit_uplink_channel
     patch "uplink/channels/:slug", to: "uplink#update_channel", as: :uplink_channel
+    post "uplink/channels/:slug/move", to: "uplink#move_channel", as: :move_uplink_channel
+    post "uplink/channels/:slug/toggle", to: "uplink#toggle_channel", as: :toggle_uplink_channel
     delete "uplink/packets/:id", to: "uplink#destroy_packet", as: :destroy_uplink_packet
     post "uplink/packets/:id/drop", to: "uplink#drop_packet", as: :drop_uplink_packet
     post "uplink/packets/:id/restore", to: "uplink#restore_packet", as: :restore_uplink_packet
