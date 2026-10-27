@@ -14,10 +14,20 @@
 # and operatives; nobody moderates a peer, a superior, themselves or a
 # service account (the bridges). Clients hide the […] in those cases from
 # the role metas; this is the check that counts.
+#
+# A packet's menu comes in three shapes (@mode). :moderate — a native
+# author the viewer outranks: drop/restore + the punishments. :own — the
+# viewer's own packet, any role: DROP PACKET (RESTORE for an operator's
+# own dropped one), no punishments (nobody moderates themselves).
+# :bridged — a packet by a bridge or bot service account, operator+:
+# drop/restore only (the account behind a Twitch line is the bridge, not
+# whoever typed it). Since 2026-10-26 the shell has no hover ×: every
+# drop there goes through this menu (the dock/popout keep × ↺).
 class Uplink::PunishmentsController < ApplicationController
   before_action :require_login
-  before_action :require_operator
+  before_action :require_operator, if: -> { params[:token] } # a token resolves presence rows: operators only, before any lookup
   before_action :resolve_target
+  before_action :require_jurisdiction
 
   # Minutes the menu offers for a squelch (blank = permanent; the menu
   # only sends blank for blackouts).
@@ -28,7 +38,7 @@ class Uplink::PunishmentsController < ApplicationController
   def menu
     return redirect_to uplink_path unless turbo_frame_request?
 
-    @active = UserPunishment.active_for(@target).order(:created_at).to_a
+    @active = (@mode == :moderate) ? UserPunishment.active_for(@target).order(:created_at).to_a : []
     @paths = if @packet
       {squelch: uplink_packet_squelch_path(@packet), blackout: uplink_packet_blackout_path(@packet), lift: uplink_packet_lift_path(@packet)}
     else
@@ -66,16 +76,37 @@ class Uplink::PunishmentsController < ApplicationController
       @token = params[:token].downcase
       @label = "#{Uplink::Callsign::PREFIX}-#{@token.upcase}"
       @target = resolve_token(@token)
-      return refuse(:not_found, "#{@label} is no longer connected.") unless @target
+      @mode = :moderate
+      refuse(:not_found, "#{@label} is no longer connected.") unless @target
     else
       @packet = ChatMessage.find_by(id: params[:id])
       return refuse(:not_found, "That packet is gone.") unless @packet
 
       @target = @packet.grid_hackr
-      @label = "@#{@target.hackr_alias}"
+      @mode = if @target.id == current_hackr.id
+        :own
+      elsif @target.service_account?
+        :bridged
+      else
+        :moderate
+      end
+      # A bridged packet is named by its bridged sender ("TTV viewer"),
+      # never by the bridge account's alias.
+      @label = (@mode == :bridged) ? helpers.uplink_packet_sender(@packet) : "@#{@target.hackr_alias}"
     end
+  end
 
-    refuse(:forbidden, "#{@label} is outside your clearance.") unless moderatable?(@target)
+  # :moderate needs an operator with the target in jurisdiction, for the
+  # menu and every action. :own and :bridged open the menu only — their
+  # items are the packet endpoints (Uplink::PacketsController) — so a
+  # squelch/blackout/lift aimed at oneself or a bridge is refused here.
+  def require_jurisdiction
+    allowed = case @mode
+    when :own then action_name == "menu"
+    when :bridged then action_name == "menu" && current_hackr.at_least_operator?
+    else current_hackr.at_least_operator? && moderatable?(@target)
+    end
+    refuse(:forbidden, "#{@label} is outside your clearance.") unless allowed
   end
 
   def moderatable?(target)

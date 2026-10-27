@@ -91,16 +91,35 @@ RSpec.describe "Hotwire uplink", type: :system do
     end
   end
 
-  it "round-trips moderation: drop redacts everywhere, restore brings it back" do
+  it "round-trips moderation through the packet menu (the shell has no hover ×): drop redacts everywhere, restore brings it back; an operative drops their own packet the same way" do
     packet = create(:chat_message, chat_channel: channel, grid_hackr: other, content: "Moderation target")
+    mine = create(:chat_message, chat_channel: channel, grid_hackr: hackr, content: "My own packet")
 
     using_session(:viewer) do
       log_in!(hackr)
       visit "/uplink"
       await_uplink!
       expect(page).to have_content("Moderation target")
-      # Operatives get no controls on someone else's packet.
+      # Operatives get no controls on someone else's packet, and no × anywhere on the shell.
+      find("#chat_message_#{packet.id}").hover
+      expect(page).not_to have_css("#chat_message_#{packet.id} button[title='Packet menu']")
       expect(page).not_to have_css("#chat_message_#{packet.id} button[title='Drop packet']")
+      # Their own packet: the [...] opens a YOUR PACKET menu holding DROP PACKET alone.
+      find("#chat_message_#{mine.id}").hover
+      within("#chat_message_#{mine.id}") do
+        expect(page).not_to have_css("button[title='Drop packet']")
+        find("button[title='Packet menu']", wait: 5).click
+      end
+      within("#uplink-modmenu") do
+        expect(page).to have_content("YOUR PACKET", wait: 10)
+        expect(page).not_to have_button("SQUELCH 10M")
+        click_button "DROP PACKET"
+      end
+      expect(page).to have_css("#chat_message_#{mine.id}", text: "[PACKET DROPPED]", wait: 10)
+      expect(page).not_to have_content("My own packet")
+      # Dropped: only operators restore, so nothing is offered any more.
+      find("#chat_message_#{mine.id}").hover
+      expect(page).not_to have_css("#chat_message_#{mine.id} button[title='Packet menu']")
     end
 
     using_session(:moderator) do
@@ -111,23 +130,35 @@ RSpec.describe "Hotwire uplink", type: :system do
       # shows packet controls on hover (Discord rhythm).
       find("#chat_message_#{packet.id}").hover
       within("#chat_message_#{packet.id}") do
-        expect(page).to have_css("button[title='Drop packet']", wait: 5)
-        find("button[title='Drop packet']").click
+        expect(page).not_to have_css("button[title='Drop packet']")
+        find("button[title='Packet menu']", wait: 5).click
       end
-      expect(page).to have_content("[PACKET DROPPED]", wait: 10)
+      within("#uplink-modmenu") do
+        expect(page).to have_content("@#{other.hackr_alias}", wait: 10)
+        click_button "DROP PACKET"
+      end
+      expect(page).to have_css("#chat_message_#{packet.id}", text: "[PACKET DROPPED]", wait: 10)
       expect(page).not_to have_content("Moderation target")
     end
 
     using_session(:viewer) do
-      expect(page).to have_content("[PACKET DROPPED]", wait: 10)
+      expect(page).to have_css("#chat_message_#{packet.id}", text: "[PACKET DROPPED]", wait: 10)
       expect(page).not_to have_content("Moderation target")
     end
 
     using_session(:moderator) do
       find("#chat_message_#{packet.id}").hover
+      # The dropped fade sits on the row's meta + body, not the row: the
+      # hover [...] — the only restore path here — keeps its full strength.
+      expect(page.evaluate_script("getComputedStyle(document.querySelector('#chat_message_#{packet.id}')).opacity")).to eq("1")
+      expect(page.evaluate_script("getComputedStyle(document.querySelector('#chat_message_#{packet.id} .packet-body')).opacity")).to eq("0.3")
       within("#chat_message_#{packet.id}") do
-        expect(page).to have_css("button[title='Restore packet']", wait: 5)
-        find("button[title='Restore packet']").click
+        expect(page).not_to have_css("button[title='Restore packet']")
+        find("button[title='Packet menu']", wait: 5).click
+      end
+      within("#uplink-modmenu") do
+        expect(page).to have_button("RESTORE PACKET", wait: 10)
+        click_button "RESTORE PACKET"
       end
       expect(page).to have_content("Moderation target", wait: 10)
     end
@@ -461,7 +492,7 @@ RSpec.describe "Hotwire uplink", type: :system do
     # Packet path: the author's @alias heads the menu, the standing
     # squelch shows, its item is gone; blackout, then lift everything.
     find("#chat_message_#{packet.id}").hover
-    within("#chat_message_#{packet.id}") { find("button[title='Moderate']", wait: 5).click }
+    within("#chat_message_#{packet.id}") { find("button[title='Packet menu']", wait: 5).click }
     within("#uplink-modmenu") do
       expect(page).to have_content("@#{other.hackr_alias}", wait: 10)
       expect(page).to have_content("SQUELCHED · 10M LEFT")
@@ -473,7 +504,7 @@ RSpec.describe "Hotwire uplink", type: :system do
     expect(UserPunishment.blackedout?(other)).to be(true)
 
     find("#chat_message_#{packet.id}").hover
-    within("#chat_message_#{packet.id}") { find("button[title='Moderate']").click }
+    within("#chat_message_#{packet.id}") { find("button[title='Packet menu']").click }
     within("#uplink-modmenu") do
       expect(page).to have_content("BLACKED OUT · PERMANENT", wait: 10)
       click_button "LIFT PUNISHMENTS"
@@ -484,9 +515,16 @@ RSpec.describe "Hotwire uplink", type: :system do
     using_session(:target) do
       visit "/uplink"
       expect(page).to have_field("content")
-      # No controls of its own: operatives never see a […].
+      # On their own packet the […] is the YOUR PACKET menu — DROP PACKET,
+      # nothing to moderate; the roster offers operatives no […] at all.
       find("#chat_message_#{packet.id}").hover
-      expect(page).not_to have_css("#chat_message_#{packet.id} button[title='Moderate']")
+      within("#chat_message_#{packet.id}") { find("button[title='Packet menu']", wait: 5).click }
+      within("#uplink-modmenu") do
+        expect(page).to have_content("YOUR PACKET", wait: 10)
+        expect(page).to have_button("DROP PACKET")
+        expect(page).not_to have_button("SQUELCH 10M")
+        expect(page).not_to have_button("BLACKOUT")
+      end
       expect(page).not_to have_css(".uplink-member-mod:not([hidden])", visible: :all)
     end
   end

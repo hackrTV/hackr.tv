@@ -70,6 +70,7 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin, .uplink-reactmenu-target--admin, .uplink-result-sender--admin { color: #00d4ff; }
 .packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator, .uplink-reactmenu-target--operator, .uplink-result-sender--operator { color: #ffaa00; }
 .packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative, .uplink-reactmenu-target--operative, .uplink-result-sender--operative { color: #cc0088; }
+.uplink-modmenu-target--bridged { color: var(--fg-muted); } /* a bridged packet's menu names its TTV/YT sender, not a hackr */
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }
 .packet-bridged-user--yt { color: #fca5a5; }
@@ -326,6 +327,16 @@ a.uplink-channel:hover { background-color: var(--bg-2); color: var(--fg); }
 .uplink-shell .packet:hover .packet-actions, .uplink-shell .packet:focus-within .packet-actions { opacity: 1; }
 .uplink-shell .packet-reply-button, .uplink-shell .packet-react-button, .uplink-shell .packet-mod-button:not([hidden]) { display: inline-block; }
 .uplink-shell .uplink-pin-form:not([hidden]) { display: inline; }
+/* Every drop/restore on the shell goes through the [...] packet menu;
+   the × and ↺ forms stay for the dock/popout (one render per packet). */
+.uplink-shell .uplink-drop-form, .uplink-shell .uplink-restore-form { display: none; }
+/* A dropped row fades as a whole (.packet--dropped: the dock/popout
+   too), which took the shell's hover [...] — its only restore path —
+   down to ~0.18 of an already faint glyph. Here the fade sits on the
+   meta + body instead, so the action row keeps its full strength (the
+   tint is scaled to what 0.05 × 0.3 showed). */
+.uplink-shell .packet--dropped { opacity: 1; background-color: rgba(255, 0, 0, 0.015); }
+.uplink-shell .packet--dropped .packet-meta, .uplink-shell .packet--dropped .packet-body { opacity: 0.3; }
 .packet-pin-button--on { color: var(--warn); opacity: 1; } /* this packet is pinned: the control reads "unpin" */
 /* Pinned marker: an inset bar — no padding shift, survives .packet--cont (which hides the PIN badge with the rest of the meta). */
 .uplink-shell .packet--pinned { box-shadow: inset 2px 0 0 0 var(--warn); }

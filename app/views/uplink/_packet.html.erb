@@ -17,11 +17,14 @@
     The author link opens the shell's operative record popover
     (popover#open, url in the action param); the dock/popout have no
     popover controller, so the action is inert and the link visits the
-    WIRE profile as before. The hover [...] (native packets only) opens the
-    operator menu the same way, into the shell's uplink-modmenu frame:
-    rendered hidden, revealed by the packet controller for operators who
-    outrank the author (data-packet-author-role-value), CSS-hidden off
-    the shell. Pins: .packet--pinned + a PIN badge on a pinned active
+    WIRE profile as before. The hover [...] opens the packet's menu the same way, into the
+    shell's uplink-modmenu frame: rendered hidden, revealed by the
+    packet controller for the author (own packet) and for operators who
+    outrank the author (data-packet-author-role-value — "bridge" for
+    bridged/bot packets, below every viewer), CSS-hidden off the shell.
+    On the shell it is the only drop/restore path (2026-10-26): the ×
+    and ↺ forms stay in the markup for the dock/popout (one render
+    serves every surface) and are CSS-hidden there. Pins: .packet--pinned + a PIN badge on a pinned active
     packet (the marker), and the hover ◆ pin/unpin form (operator+,
     revealed by the packet controller, CSS-hidden off the shell) — the
     pin endpoints and the model both replace the whole row, so the
@@ -46,7 +49,7 @@
 <div id="<%= dom_id(packet) %>"
   class="packet<%= " packet--dropped" if packet.dropped? %><%= " packet--bridged" if bridged %><%= " packet--reply" if parent %><%= " packet--pinned" if pinned %>"
   data-controller="packet" data-packet-owner-id-value="<%= packet.grid_hackr_id %>"
-  data-packet-author-role-value="<%= uplink_role_class(packet.grid_hackr.role) %>"
+  data-packet-author-role-value="<%= (bot || bridged) ? "bridge" : uplink_role_class(packet.grid_hackr.role) %>"
   data-author-key="<%= uplink_author_key(packet, parsed) %>" data-at="<%= (packet.created_at.to_f * 1000).to_i %>"<% if parent %>
   data-reply-to="<%= parent.id %>"<% end %>>
   <div class="packet-meta">
@@ -88,7 +91,7 @@
   <div class="packet-actions">
     <% if packet.dropped? %>
       <%= button_to "↺", uplink_packet_restore_path(packet), method: :post,
-        class: "packet-action-button", title: "Restore packet", form_class: "uplink-inline-form",
+        class: "packet-action-button", title: "Restore packet", form_class: "uplink-inline-form uplink-restore-form",
         form: {hidden: !can_moderate, data: {packet_target: "restoreControl"}} %>
     <% else %>
       <button type="button" class="packet-action-button packet-react-button" title="React to packet"
@@ -101,14 +104,12 @@
         title: packet.pinned? ? "Unpin packet" : "Pin packet", form_class: "uplink-inline-form uplink-pin-form",
         form: {hidden: !can_moderate, data: {packet_target: "pinControl"}} %>
       <%= button_to "×", uplink_packet_drop_path(packet), method: :post,
-        class: "packet-action-button", title: "Drop packet", form_class: "uplink-inline-form",
+        class: "packet-action-button", title: "Drop packet", form_class: "uplink-inline-form uplink-drop-form",
         form: {hidden: !(own || can_moderate), data: {packet_target: "dropControl"}} %>
     <% end %>
-    <% unless bot || bridged %>
-      <button type="button" class="packet-action-button packet-mod-button" title="Moderate" hidden
-        data-packet-target="modControl" data-action="click->popover#open"
-        data-popover-url-param="<%= uplink_packet_menu_path(packet) %>" data-popover-frame-param="uplink-modmenu"
-        data-popover-align-param="end">...</button>
-    <% end %>
+    <button type="button" class="packet-action-button packet-mod-button" title="Packet menu" hidden
+      data-packet-target="modControl" data-action="click->popover#open"
+      data-popover-url-param="<%= uplink_packet_menu_path(packet) %>" data-popover-frame-param="uplink-modmenu"
+      data-popover-align-param="end">...</button>
   </div>
 </div>
