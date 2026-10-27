@@ -1,5 +1,16 @@
+# /root/uplink — channels (new / edit / sidebar order / active toggle),
+# packets, punishments and the moderation log. Channels are slug-keyed and
+# the slug is fixed after create (it keys /uplink?channel= and the live
+# stream names). The index lists channels grouped the way the /uplink
+# sidebar renders them (UplinkHelper#uplink_channel_groups over
+# ChatChannel.ordered) so a category/position change shows its effect
+# right there; ↑/↓ on a row swap it with its neighbour inside its
+# category (ChatChannel#move!). data/system/channels.yml + `rake
+# data:channels` only seed slugs that do not exist yet, so they never
+# overwrite what is set here.
 class Admin::UplinkController < Admin::ApplicationController
-  before_action :set_channel, only: %i[edit_channel update_channel]
+  before_action :set_channel, only: %i[edit_channel update_channel move_channel toggle_channel]
+  before_action :load_categories, only: %i[new_channel create_channel edit_channel update_channel]
   before_action :set_punishment, only: [:lift_punishment]
 
   # GET /root/uplink
@@ -8,6 +19,24 @@ class Admin::UplinkController < Admin::ApplicationController
     @active_punishments = UserPunishment.active.includes(:grid_hackr, :issued_by)
     @recent_packets = ChatMessage.recent.limit(20).includes(:grid_hackr, :chat_channel)
     @moderation_logs = ModerationLog.recent.limit(10).includes(:actor, :target)
+  end
+
+  # GET /root/uplink/channels/new — defaults land the channel at the end
+  # of the sidebar (position after the current last) in the default group.
+  def new_channel
+    @channel = ChatChannel.new(position: ChatChannel.next_position)
+  end
+
+  # POST /root/uplink/channels
+  def create_channel
+    @channel = ChatChannel.new(channel_params(with_slug: true))
+    if @channel.save
+      set_flash_success("Channel #{@channel.name} created under #{@channel.category}.")
+      redirect_to admin_uplink_index_path
+    else
+      flash.now[:error] = "Failed to create channel: #{@channel.errors.full_messages.join(", ")}"
+      render :new_channel, status: :unprocessable_entity
+    end
   end
 
   # GET /root/uplink/channels/:slug/edit
@@ -20,9 +49,30 @@ class Admin::UplinkController < Admin::ApplicationController
       set_flash_success("Channel #{@channel.name} updated successfully.")
       redirect_to admin_uplink_index_path
     else
-      set_flash_error("Failed to update channel: #{@channel.errors.full_messages.join(", ")}")
-      render :edit_channel
+      flash.now[:error] = "Failed to update channel: #{@channel.errors.full_messages.join(", ")}"
+      render :edit_channel, status: :unprocessable_entity
     end
+  end
+
+  # POST /root/uplink/channels/:slug/move?direction=up|down — swap with the
+  # neighbour inside the channel's category; a no-op at the group's edge.
+  def move_channel
+    direction = params[:direction].to_s
+    return redirect_to(admin_uplink_index_path, flash: {error: "Move direction must be up or down."}) unless ChatChannel::MOVES.key?(direction)
+
+    if (neighbour = @channel.move!(direction))
+      set_flash_success("Channel #{@channel.name} moved #{direction}, past #{neighbour.name}, in #{@channel.category}.")
+    else
+      set_flash_error("Channel #{@channel.name} is already at the #{(direction == "up") ? "top" : "bottom"} of #{@channel.category}.")
+    end
+    redirect_to admin_uplink_index_path
+  end
+
+  # POST /root/uplink/channels/:slug/toggle — flip is_active from the index.
+  def toggle_channel
+    @channel.update!(is_active: !@channel.is_active)
+    set_flash_success("Channel #{@channel.name} #{@channel.is_active ? "activated" : "deactivated"}.")
+    redirect_to admin_uplink_index_path
   end
 
   # GET /root/uplink/packets
@@ -195,12 +245,21 @@ class Admin::UplinkController < Admin::ApplicationController
     @channel = ChatChannel.find_by!(slug: params[:slug])
   end
 
+  # The category field's datalist: every group in use, so a channel can
+  # be dropped into an existing heading by picking it (or typed into a
+  # new one).
+  def load_categories
+    @categories = ChatChannel.distinct.order(:category).pluck(:category)
+  end
+
   def set_punishment
     @punishment = UserPunishment.find(params[:id])
   end
 
-  def channel_params
-    params.require(:chat_channel).permit(:name, :description, :is_active, :requires_livestream, :slow_mode_seconds, :minimum_role, :category, :position)
+  def channel_params(with_slug: false)
+    permitted = %i[name description is_active requires_livestream slow_mode_seconds minimum_role category position]
+    permitted.unshift(:slug) if with_slug
+    params.require(:chat_channel).permit(*permitted)
   end
 
   def find_hackr_by_id_or_username

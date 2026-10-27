@@ -1,0 +1,8 @@
+<%= render TuiWindowComponent.new(title: "/root/uplink/channels/new :: NEW CHANNEL", variant: :admin, width: 800) do %>
+    <div style="padding: 20px;">
+      <div style="margin-bottom: 20px;">
+        <%= tui_button "← Back to Uplink", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
+      </div>
+      <%= render "channel_form", channel: @channel, categories: @categories %>
+    </div>
+<% end %>
