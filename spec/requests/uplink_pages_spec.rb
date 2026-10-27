@@ -433,7 +433,7 @@ RSpec.describe "Uplink pages", type: :request do
       expect(body).to include(%(data-popover-url-param="/uplink/profiles/#{other.hackr_alias.downcase}")) # canonical lowercase: mixed case 301s
     end
 
-    it "mounts the operator menu: the second popover frame as a grid child, hidden [...] triggers on native packets and roster rows carrying the menu url (callsign token only, lowercase)" do
+    it "mounts the packet menu: the second popover frame as a grid child, hidden [...] triggers on every packet (bridged ones carry the bridge role) and on roster rows, with the menu url (callsign token only, lowercase); the × / ↺ forms are classed for the shell to hide" do
       create(:chat_message, chat_channel: channel, grid_hackr: other, content: "mod me")
       create(:chat_message, chat_channel: channel, grid_hackr: other, source: "TTV", content: "[Twitch] viewer: bridged")
       lurker = create(:grid_hackr)
@@ -452,15 +452,20 @@ RSpec.describe "Uplink pages", type: :request do
       expect(body).to match(%r{<div class="uplink-backdrop"[^\n]*></div>\s*#{Regexp.escape(frame)}</turbo-frame>\s*</div>}m) # a grid child, after the backdrop
 
       packet = ChatMessage.find_by(content: "mod me")
+      bridged = ChatMessage.find_by(source: "TTV")
       expect(body).to include(%(data-packet-author-role-value="operative"))
+      expect(body).to include(%(data-packet-author-role-value="bridge")) # below every viewer: operator+ get the drop-only menu
       triggers = body.scan(/<button type="button" class="packet-action-button packet-mod-button".*?<\/button>/m) # ([^>]* would stop at the -> in data-action)
-      expect(triggers.size).to eq(1) # the bridged packet (service account author) gets none
+      expect(triggers.size).to eq(2)
+      expect(triggers.last).to include(%(data-popover-url-param="/uplink/packets/#{bridged.id}/menu"))
+      expect(triggers.first).to include('title="Packet menu"')
       expect(triggers.first).to include("hidden") # revealed client-side by the packet controller
       expect(triggers.first).to include('data-packet-target="modControl"')
       expect(triggers.first).to include(%(data-action="click->popover#open"))
       expect(triggers.first).to include(%(data-popover-url-param="/uplink/packets/#{packet.id}/menu"))
       expect(triggers.first).to include('data-popover-frame-param="uplink-modmenu"')
       expect(triggers.first).to include('data-popover-align-param="end"')
+      expect(body.scan('class="uplink-inline-form uplink-drop-form"').size).to eq(2) # the dock/popout's ×; .uplink-shell hides it
 
       roster = body[/<div id="uplink-members".*?<\/div>/m]
       token = Uplink::Callsign.token(lurker.id)
@@ -937,27 +942,35 @@ RSpec.describe "Uplink pages", type: :request do
       expect(response.headers["Location"]).to end_with("/uplink/operatives/abcdef/menu")
     end
 
-    it "keeps peers, superiors, oneself and service accounts out of jurisdiction, for the menu (403 frame) and the actions (403 toast)" do
+    it "keeps peers, superiors, oneself and service accounts out of jurisdiction for the actions (403 toast), and peers and superiors out of the menu (403 frame)" do
       peer = create(:grid_hackr, :operator)
       bot = create(:grid_hackr, service_account: true)
       own = create(:chat_message, chat_channel: channel, grid_hackr: operator, content: "mine")
       peer_packet = create(:chat_message, chat_channel: channel, grid_hackr: peer, content: "peer")
-      admin_packet = create(:chat_message, chat_channel: channel, grid_hackr: admin, content: "root")
+      admin_packet = create(:chat_message, chat_channel: channel, grid_hackr: create(:grid_hackr, :admin), content: "root") # another admin's: the logged-in admin's own would get the YOUR PACKET menu
       bot_packet = create(:chat_message, chat_channel: channel, grid_hackr: bot, source: "TTV", content: "[Twitch] v: hi")
       log_in!(operator)
 
-      [own, peer_packet, admin_packet, bot_packet].each do |target|
+      [peer_packet, admin_packet].each do |target|
         get "/uplink/packets/#{target.id}/menu", headers: frame_headers
         expect(response).to have_http_status(:forbidden)
         expect(menu_body).to include("// NO JURISDICTION //")
         expect(menu_body).to include("@#{target.grid_hackr.hackr_alias} is outside your clearance.")
+      end
 
+      [own, peer_packet, admin_packet, bot_packet].each do |target|
         post "/uplink/packets/#{target.id}/squelch", params: {duration_minutes: 10}, headers: turbo_stream_headers
         expect(response).to have_http_status(:forbidden)
         expect(response.body).to include(%(action="append" target="toast-region"))
         expect(response.body).to include("toast--moderation toast--moderation-error")
         expect(response.body).to include("is outside your clearance.")
       end
+      expect(response.body).to include("TTV v is outside your clearance.") # the bridged packet speaks of its sender, never of the bridge account
+      expect(response.body).not_to include(bot.hackr_alias)
+      post "/uplink/packets/#{bot_packet.id}/blackout", headers: turbo_stream_headers
+      expect(response).to have_http_status(:forbidden)
+      post "/uplink/packets/#{own.id}/lift", headers: turbo_stream_headers
+      expect(response).to have_http_status(:forbidden)
       expect(UserPunishment.count).to eq(0)
 
       log_in!(admin)
@@ -973,6 +986,80 @@ RSpec.describe "Uplink pages", type: :request do
 
       get "/uplink/packets/#{packet.id}/menu"
       expect(response).to redirect_to("/uplink") # no frame to land in
+    end
+
+    it "renders the viewer's own packet as a YOUR PACKET menu for any role — DROP PACKET alone, no reason, no punishments; once dropped, RESTORE for an operator, a note for an operative" do
+      mine = create(:chat_message, chat_channel: channel, grid_hackr: hackr, content: "mine")
+      log_in!(hackr)
+
+      get "/uplink/packets/#{mine.id}/menu", headers: frame_headers
+
+      expect(response).to have_http_status(:ok)
+      menu = menu_body
+      expect(menu).to include('class="uplink-modmenu" role="dialog" aria-label="Your packet"')
+      expect(menu).to include('<span class="uplink-modmenu-kicker">YOUR PACKET</span>')
+      expect(menu).not_to include("uplink-modmenu-target")
+      expect(menu).not_to include(hackr.hackr_alias)
+      expect(menu).to include(%(<form class="uplink-modmenu-form" data-turbo-frame="_top" action="/uplink/packets/#{mine.id}/drop" accept-charset="UTF-8" method="post">))
+      expect(menu).to include('<button type="submit" class="uplink-modmenu-item">DROP PACKET</button>')
+      expect(menu).not_to include('name="reason"')
+      expect(menu).not_to include("uplink-modmenu-guard")
+      expect(menu).not_to include("SQUELCH")
+      expect(menu).not_to include("BLACKOUT")
+      expect(menu).not_to include("formaction")
+
+      mine.drop!
+      get "/uplink/packets/#{mine.id}/menu", headers: frame_headers
+      expect(response).to have_http_status(:ok)
+      expect(menu_body).to include('<p class="uplink-modmenu-note">Dropped. Only operators restore packets.</p>')
+      expect(menu_body).not_to include("RESTORE PACKET")
+      expect(menu_body).not_to include("/uplink/packets/")
+
+      theirs = create(:chat_message, chat_channel: channel, grid_hackr: operator, content: "an operator's own")
+      theirs.drop!
+      log_in!(operator)
+      get "/uplink/packets/#{theirs.id}/menu", headers: frame_headers
+      expect(response).to have_http_status(:ok)
+      expect(menu_body).to include('<span class="uplink-modmenu-kicker">YOUR PACKET</span>')
+      expect(menu_body).to include(%(action="/uplink/packets/#{theirs.id}/restore"))
+      expect(menu_body).to include('<button type="submit" class="uplink-modmenu-item">RESTORE PACKET</button>')
+      expect(menu_body).not_to include("DROP PACKET")
+      expect(menu_body).not_to include("SQUELCH")
+      expect(menu_body).not_to include("LIFT")
+    end
+
+    it "renders a bridged packet's menu for operator+ as drop/restore only, naming the bridged sender — never the bridge account's alias — and keeps operatives out" do
+      bridge = create(:grid_hackr, service_account: true)
+      bridged = create(:chat_message, chat_channel: channel, grid_hackr: bridge, source: "TTV", content: "[Twitch] viewer_42: hello")
+      log_in!(hackr)
+
+      get "/uplink/packets/#{bridged.id}/menu", headers: frame_headers
+      expect(response).to have_http_status(:forbidden)
+      expect(menu_body).to include("// NO JURISDICTION //")
+      expect(menu_body).to include("TTV viewer_42 is outside your clearance.")
+      expect(menu_body).not_to include(bridge.hackr_alias)
+
+      log_in!(operator)
+      get "/uplink/packets/#{bridged.id}/menu", headers: frame_headers
+
+      expect(response).to have_http_status(:ok)
+      menu = menu_body
+      expect(menu).to include('class="uplink-modmenu" role="dialog" aria-label="Moderate TTV viewer_42"')
+      expect(menu).to include('<span class="uplink-modmenu-kicker">MODERATE</span>')
+      expect(menu).to include('<span class="uplink-modmenu-target uplink-modmenu-target--bridged">TTV viewer_42</span>')
+      expect(menu).not_to include(bridge.hackr_alias)
+      expect(menu).to include(%(action="/uplink/packets/#{bridged.id}/drop"))
+      expect(menu).to include('<button type="submit" class="uplink-modmenu-item">DROP PACKET</button>')
+      expect(menu).not_to include('name="reason"')
+      expect(menu).not_to include("SQUELCH")
+      expect(menu).not_to include("BLACKOUT")
+      expect(menu).not_to include("uplink-modmenu-status")
+
+      bridged.drop!
+      get "/uplink/packets/#{bridged.id}/menu", headers: frame_headers
+      expect(menu_body).to include(%(action="/uplink/packets/#{bridged.id}/restore"))
+      expect(menu_body).to include('<button type="submit" class="uplink-modmenu-item">RESTORE PACKET</button>')
+      expect(menu_body).not_to include("DROP PACKET")
     end
 
     it "squelches the packet's author for the chosen duration with the reason, logs it, and toasts the operator" do

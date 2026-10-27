@@ -8,8 +8,11 @@ import { jumpToPacket } from '~/utils/packetJump'
 //   1. reveals the drop control for the packet's author and for
 //      operators/admins, the restore and pin/unpin controls for
 //      operators/admins (pinning is curation: any packet, their own
-//      included), and the […] operator-menu control for operators/admins
-//      who outrank the author (never their own packet) — read from the
+//      included) — the dock/popout's controls; the shell CSS-hides drop
+//      and restore — and the […] packet-menu control for the author
+//      (their own packet; once dropped, only if they can restore it)
+//      and for operators/admins who outrank the author (bridged/bot
+//      packets carry the "bridge" role, below everyone) — read from the
 //      layout's current-hackr metas + the packet's author role value
 //      (cosmetic only; the server re-checks on every action);
 //   2. rewrites descendant form CSRF tokens from the page meta;
@@ -78,7 +81,8 @@ export default class extends Controller<HTMLElement> {
       this.restoreControlTargets.forEach(el => { el.hidden = false })
       this.pinControlTargets.forEach(el => { el.hidden = false })
     }
-    if (moderator && !own && outranks(role, this.authorRoleValue)) {
+    const dropped = this.element.classList.contains('packet--dropped')
+    if ((own && (!dropped || moderator)) || (moderator && !own && outranks(role, this.authorRoleValue))) {
       this.modControlTargets.forEach(el => { el.hidden = false })
     }
   }

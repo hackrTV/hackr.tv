@@ -1,7 +1,7 @@
 ---
 title: Uplink Comms
 area: Social & Comms
-minutes: 46
+minutes: 47
 ---
 # Uplink (/uplink)
 
@@ -92,8 +92,8 @@ minutes: 46
     same channel scrolled up. → No toast; the jump pill reads
     `[v] @ MENTION · N NEW PACKETS`.
 
-14. **Replies**: hover another packet → `↩` appears beside the drop
-    control; click it. → The composer shows `[>] REPLYING TO @alias [x]`
+14. **Replies**: hover another packet → `↩` appears among the hover
+    controls; click it. → The composer shows `[>] REPLYING TO @alias [x]`
     and takes focus; Escape (or `[x]`) clears it. Arm it again and send.
     → The reply renders with a `[>] @alias excerpt` quote line above
     your text, for both browsers, and never collapses under your
@@ -157,12 +157,22 @@ minutes: 46
 ## Steps — moderation (operative + admin)
 
 21. As admin (moderator role) in `/uplink`: hover another user's packet
-    and drop it. → Packet shows dropped state for everyone live.
-22. Restore it. → Restored live.
-23. The drop control is NOT visible to the non-moderator operative on
-    others' packets.
+    → no `×` anywhere on the shell; click its `...` → DROP PACKET. →
+    Packet shows dropped state for everyone live. Hover it again → the
+    row stays faded but its `...` reads as clearly as on a live packet
+    → RESTORE PACKET. → Restored live. (The dock and popout keep their
+    `×` / `↺`.)
+22. As the operative, hover your own packet → its `...` opens a YOUR
+    PACKET menu holding DROP PACKET alone (no reason, no punishments);
+    drop it. → `[PACKET DROPPED]` for everyone; hovering it now shows no
+    `...` (only operators restore). Hover someone else's packet → no
+    `...`, no `×`.
+23. A bridged packet (relay/synthia, or one seeded with `source: "TTV"`):
+    as admin its `...` opens MODERATE `TTV <user>` with DROP PACKET only
+    — no squelch/blackout, and the bridge account's alias appears
+    nowhere. The operative gets no `...` on it.
 24. **Operator menu**: as admin, hover the operative's packet → a `...`
-    appears beside the drop control; click it. → A small MODERATE menu
+    appears among the hover controls; click it. → A small MODERATE menu
     parks under it naming `@alias` in its role color: a REASON field,
     DROP PACKET, SQUELCH 10M / 1H / 24H, BLACKOUT, `[x]`. Enter in the
     reason field does nothing; Escape or clicking elsewhere closes it.
@@ -173,11 +183,12 @@ minutes: 46
     In the OPERATIVES pane hover the operative's callsign row. → The same
     `...` is there; its menu names only `SIG-XXXXXX` (never the alias) and
     has no DROP PACKET. Your own row, other admins' rows and packets by
-    admins or bridged accounts show no `...`; an operator (not admin) sees
-    it only on operatives. BLACKOUT, then LIFT PUNISHMENTS from either
-    menu → toasts confirm, the status lines follow.
+    admins show no `...` (your own packets show the YOUR PACKET one); an
+    operator (not admin) sees it on operatives, bridged packets and their
+    own packets only. BLACKOUT, then LIFT PUNISHMENTS from either menu →
+    toasts confirm, the status lines follow.
 25. **Pins**: as admin, hover a packet → a `◆` sits between `↩` and the
-    drop `×`; click it. → The row gains an amber left bar + a `PIN` badge
+    `...`; click it. → The row gains an amber left bar + a `PIN` badge
     for everyone live, and the header's `[◆] PINNED` count ticks to 1 (the
     operative sees both, but no `◆` on hover). Click `[◆] PINNED`. → A
     PINNED panel parks under it listing the packet (sender, age, excerpt)

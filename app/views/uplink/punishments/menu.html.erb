@@ -4,7 +4,11 @@
     form, one optional reason, one submit button per action pointing at
     its own formaction; the host frame targets _top so the stream
     replies land on the page. Token targets show their callsign only.
-    @error: the empty state (stale callsign, out-of-clearance target). %>
+    @mode :own (YOUR PACKET) and :bridged (MODERATE <bridged sender>)
+    are packet-only menus: one DROP / RESTORE item, no reason, no
+    punishments — the shell's every drop goes through here since the
+    hover × left it (2026-10-26). @error: the empty state (stale
+    callsign, out-of-clearance target). %>
 <%= turbo_frame_tag "uplink-modmenu" do %>
   <% if @error %>
     <div class="uplink-modmenu uplink-modmenu--empty" role="dialog" aria-label="Moderation" tabindex="-1">
@@ -18,13 +22,29 @@
     <%
       squelched = @active.any? { |p| p.punishment_type == "squelch" }
       blacked_out = @active.any? { |p| p.punishment_type == "blackout" }
+      own = @mode == :own
     %>
-    <div class="uplink-modmenu" role="dialog" aria-label="Moderate <%= @label %>" tabindex="-1">
+    <div class="uplink-modmenu" role="dialog" aria-label="<%= own ? "Your packet" : "Moderate #{@label}" %>" tabindex="-1">
       <header class="uplink-modmenu-head">
-        <span class="uplink-modmenu-kicker">MODERATE</span>
-        <span class="uplink-modmenu-target uplink-modmenu-target--<%= uplink_role_class(@target.role) %>"><%= @label %></span>
+        <span class="uplink-modmenu-kicker"><%= own ? "YOUR PACKET" : "MODERATE" %></span>
+        <% unless own %>
+          <span class="uplink-modmenu-target uplink-modmenu-target--<%= (@mode == :bridged) ? "bridged" : uplink_role_class(@target.role) %>"><%= @label %></span>
+        <% end %>
         <button type="button" class="uplink-modmenu-close" aria-label="Close" data-action="click->popover#dismiss">[x]</button>
       </header>
+      <% if @mode != :moderate %>
+        <% if !@packet.dropped? %>
+          <%= form_with url: uplink_packet_drop_path(@packet), method: :post, class: "uplink-modmenu-form", data: {turbo_frame: "_top"} do %>
+            <button type="submit" class="uplink-modmenu-item">DROP PACKET</button>
+          <% end %>
+        <% elsif current_hackr.at_least_operator? %>
+          <%= form_with url: uplink_packet_restore_path(@packet), method: :post, class: "uplink-modmenu-form", data: {turbo_frame: "_top"} do %>
+            <button type="submit" class="uplink-modmenu-item">RESTORE PACKET</button>
+          <% end %>
+        <% else %>
+          <p class="uplink-modmenu-note">Dropped. Only operators restore packets.</p>
+        <% end %>
+      <% else %>
       <% @active.each do |punishment| %>
         <p class="uplink-modmenu-status"><%= (punishment.punishment_type == "squelch") ? "SQUELCHED" : "BLACKED OUT" %> · <%= punishment.permanent? ? "PERMANENT" : "#{uplink_time_left(punishment.expires_at)} LEFT" %></p>
       <% end %>
@@ -51,6 +71,7 @@
         <% if @active.any? %>
           <button type="submit" class="uplink-modmenu-item uplink-modmenu-item--lift" formaction="<%= @paths[:lift] %>">LIFT PUNISHMENT<%= "S" if @active.many? %></button>
         <% end %>
+      <% end %>
       <% end %>
     </div>
   <% end %>
