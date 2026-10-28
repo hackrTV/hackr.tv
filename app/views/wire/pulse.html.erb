@@ -3,7 +3,7 @@
 <%# Deep-link page for a thread: the root's entry with its thread frame
     already filled (the same fragment a feed row loads on ↩). %>
 <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-  <div class="wire-page" data-controller="wire-keys" data-action="keydown@document->wire-keys#key">
+  <div class="wire-page" data-controller="wire-keys" data-action="keydown@document->wire-keys#key click->wire-keys#click">
     <%= turbo_stream_from "wire_html" %>
 
     <div class="wire-bar">

@@ -16,7 +16,7 @@
         open from the first paint. wire-view: v / [≡] MUTT writes the
         wire_view cookie and revisits. %>
     <div class="wire-page" data-view="ledger" data-controller="wire-keys wire-feed wire-pane wire-view"<%= raw(' data-pane="open"') if @pane_open %>
-      data-action="keydown@document->wire-keys#key wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle wire-keys:view->wire-view#toggle">
+      data-action="keydown@document->wire-keys#key click->wire-keys#click wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle wire-keys:view->wire-view#toggle">
       <div class="wire-bar" data-controller="wire-status">
         <h1 class="wire-bar-title" title="Wideband Information Relay Emitter">The WIRE</h1>
         <span class="wire-bar-sub">WIDEBAND INFORMATION RELAY EMITTER</span>

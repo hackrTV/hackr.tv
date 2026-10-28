@@ -10,7 +10,7 @@
     the ledger's. Under 1100px it degrades to a plain stack. %>
 <div class="wire-page wire-mutt" data-view="mutt"
   data-controller="wire-keys wire-feed wire-pane wire-view" data-wire-view-total-value="<%= @total %>"
-  data-action="keydown@document->wire-keys#key wire:cursor->wire-pane#follow wire:cursor->wire-view#cursor wire-row:pane->wire-pane#claim wire-keys:view->wire-view#toggle">
+  data-action="keydown@document->wire-keys#key click->wire-keys#click wire:cursor->wire-pane#follow wire:cursor->wire-view#cursor wire-row:pane->wire-pane#claim wire-keys:view->wire-view#toggle">
   <div class="wire-bar" data-controller="wire-status">
     <h1 class="wire-bar-title" title="Wideband Information Relay Emitter">The WIRE</h1>
     <span class="wire-bar-sub">MUTT MODE · ALL TRAFFIC · NEWEST FIRST</span>

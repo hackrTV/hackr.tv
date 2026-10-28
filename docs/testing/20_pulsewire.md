@@ -47,13 +47,16 @@ Keyboard: `?` shows the legend.
    prompt, `/` focuses the top prompt, `x` on your own row arms it (red
    ×) and a second `x` within 1.5s deletes, `?` toggles the legend,
    `Esc` closes it and clears the cursor. Keys do nothing while typing.
+   Click a row's text (not a link or button in it). → It becomes the
+   cursor row too; `e`/`o`/`r` then act on it.
 9. **Context pane** (desktop ≥1280px wide, first visit): `[>] CONTEXT`
    in the bar reads pressed and a 380px pane sits beside the feed
    reading `// SELECT A PULSE //`. Press `j` twice. → The cursor row
    gets a purple left bar and the pane shows `THREAD #id · n PULSES`,
    the root in full (local date + time), its replies and a splice
-   prompt; the row's inline thread does NOT unfold. Move with `j`/`k`.
-   → The pane follows the cursor (a short beat later).
+   prompt; the row's inline thread does NOT unfold. Move with `j`/`k`,
+   or click another row. → The pane follows the cursor (a short beat
+   later).
 10. In the pane, post a splice. → It lands in the pane; the row's `↩ n`
     bumps. Press `r` on the row. → The pane's prompt takes focus. Click
     a reply's `↩` in the pane. → The prompt re-aims (placeholder "Reply
@@ -78,9 +81,9 @@ Keyboard: `?` shows the legend.
     the body clipped to one line), a `-*-WIRE: ALL TRAFFIC [Pulses:n
     New:0]---(1/n)---(p%)---` status line, the pager (the thread of the
     cursor line, opened at once on the newest), the `>` prompt, a key
-    bar. `j`/`k` move the cursor and the pager follows; the status line
-    tracks `(i/n)`; `Enter` = open; the index and pager scroll on their
-    own, the page never does.
+    bar. `j`/`k` (or a click on a line) move the cursor and the pager
+    follows; the status line tracks `(i/n)`; `Enter` = open; the index
+    and pager scroll on their own, the page never does.
 15. **Flags**: your own pulses show `F`; echo a line (`e`) → `E` appears
     next to it; a dropped pulse shows `D`. From the second browser,
     broadcast a pulse. → It lands at the top with `N` (bright text) and

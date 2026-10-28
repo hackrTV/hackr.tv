@@ -111,6 +111,7 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("wire-author--admin")
       expect(response.body).to include("wire-badge--admin")
       expect(response.body).to include('data-controller="wire-keys wire-feed wire-pane wire-view"')
+      expect(response.body).to include("click->wire-keys#click") # a row click is a cursor move
       expect(response.body).to include("[&gt;] CONTEXT")
       expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
       expect(response.body).to include("// SELECT A PULSE //")
@@ -141,6 +142,7 @@ RSpec.describe "Wire pages", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('class="wire-page wire-mutt" data-view="mutt"')
       expect(response.body).to include('data-wire-view-total-value="1"')
+      expect(response.body).to include("click->wire-keys#click")
       expect(response.body).to include("wire-ix-head")
       expect(response.body).to include("wire-mutt-status")
       expect(response.body).to include("wire-mutt-keys")

@@ -226,6 +226,11 @@ RSpec.describe "Hotwire wire feed", type: :system do
     expect(page).to have_current_path("/wire")
     expect(page).to have_no_css(".wire-row--sel")
 
+    find("#pulse_#{root.id} .wire-text").click # a click on the row is a cursor move: the thread is back
+    expect(page).to have_css("#pulse_#{root.id}.wire-row--cursor")
+    expect(page).to have_css("#pulse_#{root.id}.wire-row--sel")
+    within("#wire-pane") { expect(page).to have_content("Spliced from the pane.") }
+
     find("body").send_keys("c")
     expect(page).to have_no_css(".wire-page[data-pane='open']")
     within("#pulse_#{root.id}") { find(".splice-button").click }
@@ -307,6 +312,11 @@ RSpec.describe "Hotwire wire feed", type: :system do
     expect(page).to have_css("#pulse_#{fresh.id} .wire-fl--n", visible: :hidden)
     expect(page).to have_css(".wire-mutt-status", text: "New:0]")
     expect(page).to have_css(".wire-mutt-status", text: "(1/3)")
+
+    find("#pulse_#{mine.id} .wire-text").click # a click on a line moves the cursor, the pager follows
+    expect(page).to have_css("#pulse_#{mine.id}.wire-row--cursor")
+    expect(page).to have_css(".wire-mutt-status", text: "(3/3)")
+    within("#wire-pane") { expect(page).to have_content("My index line") }
 
     find("body").send_keys("v")
     expect(page).to have_no_css(".wire-page.wire-mutt")

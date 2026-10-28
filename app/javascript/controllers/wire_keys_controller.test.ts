@@ -6,6 +6,7 @@ function row (id: number, opts: { own?: boolean, dropped?: boolean } = {}): stri
   return `
     <div id="pulse_${id}" class="wire-row${opts.dropped ? ' wire-row--dropped' : ''}" data-pulse-id="${id}">
       <a class="wire-author" href="/wire/ghost">@ghost</a>
+      <p class="wire-text">pulse ${id}</p>
       <button class="echo-button">↻</button>
       <a class="splice-button" href="/wire/pulse/${id}">↩</a>
       <form class="wire-inline-form"${opts.own ? '' : ' hidden'}><button type="button" class="delete-button">×</button></form>
@@ -13,7 +14,7 @@ function row (id: number, opts: { own?: boolean, dropped?: boolean } = {}): stri
 }
 
 const page = (rows: string, pane = '', view = ''): string => `
-  <div class="wire-page"${view ? ` data-view="${view}"` : ''} data-controller="wire-keys" data-action="keydown@document->wire-keys#key">
+  <div class="wire-page"${view ? ` data-view="${view}"` : ''} data-controller="wire-keys" data-action="keydown@document->wire-keys#key click->wire-keys#click">
     <form><textarea class="wire-prompt-input"></textarea></form>
     <div id="wire-feed">${rows}</div>
     <aside class="wire-pane"><turbo-frame id="wire-pane">${pane}</turbo-frame></aside>
@@ -202,6 +203,43 @@ describe('WireKeysController', () => {
     expect(opened).not.toHaveBeenCalled()
     press('Enter')
     expect(opened).toHaveBeenCalledTimes(1)
+  })
+
+  it('a plain click on a row\'s own surface makes it the cursor; links, buttons, modified clicks, pane rows and a text selection are left alone', async () => {
+    await start(page(row(1, { own: true }) + row(2), row(9)))
+    const moved = vi.fn()
+    document.querySelector('.wire-page')!.addEventListener('wire:cursor', moved)
+    document.querySelector('#pulse_1 .wire-author')!.addEventListener('click', e => e.preventDefault())
+    const click = (el: Element, init: MouseEventInit = {}): void => {
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0, ...init }))
+    }
+
+    click(document.querySelector('#pulse_2 .wire-text')!)
+    expect(cursor()).toBe('pulse_2')
+    expect(moved).toHaveBeenCalledTimes(1)
+    expect((moved.mock.calls[0]![0] as Event).target).toBe(document.getElementById('pulse_2'))
+
+    click(document.querySelector('#pulse_1 .wire-author')!)
+    click(document.querySelector('#pulse_1 .echo-button')!)
+    click(document.querySelector('#pulse_1 .wire-text')!, { shiftKey: true })
+    click(document.querySelector('#pulse_1 .wire-text')!, { button: 1 })
+    click(document.querySelector('#pulse_9 .wire-text')!)
+    expect(cursor()).toBe('pulse_2')
+
+    const range = document.createRange()
+    range.selectNodeContents(document.querySelector('#pulse_1 .wire-text')!)
+    document.getSelection()!.addRange(range)
+    click(document.querySelector('#pulse_1 .wire-text')!)
+    expect(cursor()).toBe('pulse_2')
+    document.getSelection()!.removeAllRanges()
+
+    press('k') // onto pulse_1, then arm it
+    press('x')
+    expect(document.getElementById('pulse_1')!.classList.contains('wire-row--armed')).toBe(true)
+    click(document.querySelector('#pulse_2 .wire-text')!) // a click elsewhere disarms like any other key
+    expect(cursor()).toBe('pulse_2')
+    expect(document.getElementById('pulse_1')!.classList.contains('wire-row--armed')).toBe(false)
+    expect(moved).toHaveBeenCalledTimes(3)
   })
 
   it('opens MUTT mode with the cursor on the first row, a tick after connect', async () => {
