@@ -48,7 +48,8 @@
   <time class="wire-time" datetime="<%= pulse.pulsed_at.iso8601 %>" title="<%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M %Z") %>"
     data-wire-row-target="time"><%= pulse.pulsed_at.strftime("%H:%M") %></time>
   <div class="wire-who">
-    <%= link_to "@#{author.hackr_alias}", wire_user_path(author.hackr_alias.downcase), class: "wire-author wire-author--#{role}" %>
+    <%= link_to "@#{author.hackr_alias}", wire_user_path(author.hackr_alias.downcase), class: "wire-author wire-author--#{role}",
+      data: {action: "click->wire-row#author"} %>
     <% if badge %><span class="wire-badge wire-badge--<%= role %>"><%= badge %></span><% end %>
     <% if pinned %><span class="wire-badge wire-badge--pin" title="Pinned to profile">PIN</span><% end %>
     <% if indicator == :echo %><span class="wire-badge wire-badge--echo" title="@<%= indicator_alias %> echoed this">ECHO</span><% end %>

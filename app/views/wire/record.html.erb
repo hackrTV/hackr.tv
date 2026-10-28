@@ -1,0 +1,25 @@
+<%# Turbo-Frame response of GET /wire/:username for the feed's context
+    pane (frame id wire-pane, 2026-10): the operative record — the
+    profile's status line, bio and stat strip without the timeline — and
+    a link to the full profile. %>
+<% role = uplink_role_class(@hackr.role) %>
+<%= turbo_frame_tag "wire-pane", target: "_top" do %>
+  <div class="wire-pane-head">
+    <span class="wire-pane-kicker">OPERATIVE</span>
+    <span class="wire-pane-meta">RECORD</span>
+    <%= link_to "[>] PROFILE", wire_user_path(@hackr.hackr_alias.downcase), class: "wire-pane-page", title: "Open the WIRE profile" %>
+    <button type="button" class="wire-pane-close" aria-label="Close the context pane" data-action="click->wire-pane#close">[x]</button>
+  </div>
+  <div class="wire-pane-body">
+    <div class="wire-record">
+      <div class="wire-record-head">
+        <span class="wire-handle wire-author--<%= role %>">@<%= @hackr.hackr_alias %></span>
+        <%= render "wire/status_meta", hackr: @hackr %>
+      </div>
+      <div class="wire-bio">
+        <%= render "wire/bio_display", hackr: @hackr, is_self: false %>
+      </div>
+      <%= render "wire/stats", stats: @stats %>
+    </div>
+  </div>
+<% end %>

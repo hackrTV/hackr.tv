@@ -1,7 +1,12 @@
 # Server-rendered PulseWire pages (Hotwire migration Phase 3; ledger rows
 # since 2026-10) — /wire (feed), /wire/:username (profile) and
 # /wire/pulse/:id (a thread: the deep-link page, or, as a Turbo-Frame
-# request, the thread fragment a feed row expands inline).
+# request, the thread fragment a feed row expands inline). The feed's
+# context pane (turbo-frame#wire-pane) asks the same two URLs and gets
+# its own renders — the thread with its root in full, the operative
+# record without the timeline — keyed on that frame id alone, so other
+# frame requests (the bio frame following its redirect) still get the
+# page.
 class WireController < ApplicationController
   admin_preview! title: "The WIRE"
 
@@ -18,6 +23,12 @@ class WireController < ApplicationController
 
   def profile
     @hackr = GridHackr.where("LOWER(hackr_alias) = ?", params[:username].downcase).first
+    if turbo_frame_request_id == "wire-pane"
+      return render :record_missing, status: :not_found unless @hackr
+
+      @stats = Grid::ProfileStats.for(@hackr)
+      return render :record
+    end
     return render :profile_not_found, status: :not_found unless @hackr
 
     @is_self = logged_in? && current_hackr.id == @hackr.id
@@ -53,6 +64,8 @@ class WireController < ApplicationController
     by_id = @thread.index_by(&:id)
     @nodes = @thread.reject { |p| p.id == @root.id }.sort_by(&:pulsed_at)
       .map { |p| [p, by_id[p.parent_pulse_id]] }
+
+    return render :pane if turbo_frame_request_id == "wire-pane"
 
     render :thread if turbo_frame_request?
   end

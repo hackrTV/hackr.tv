@@ -1,14 +1,15 @@
 ---
 title: PulseWire + WIRE Profiles
 area: Social & Comms
-minutes: 24
+minutes: 30
 ---
 # PulseWire (/wire) + Profiles
 
 The WIRE is a ledger (2026-10): one dense row per pulse — `HH:MM` gutter,
 role-colored `@alias` + ADMIN/OP badge, body, `↻ n` echoes / `↩ n` replies
 on the right — under a one-line `>` prompt, with threads expanding inline
-under their root. Keyboard: `?` shows the legend.
+under their root or, on wide screens, reading in the context pane beside
+the feed. Keyboard: `?` shows the legend.
 
 ## Steps — feed + posting
 
@@ -45,29 +46,53 @@ under their root. Keyboard: `?` shows the legend.
    prompt, `/` focuses the top prompt, `x` on your own row arms it (red
    ×) and a second `x` within 1.5s deletes, `?` toggles the legend,
    `Esc` closes it and clears the cursor. Keys do nothing while typing.
-9. Single-pulse permalink: open `/wire/pulse/<id>`. → `< WIRE  Thread
-   n pulses`, the root row with its thread already open.
-10. Phone width (<768px). → Each row is a meta line (time · alias ·
+9. **Context pane** (desktop ≥1280px wide, first visit): `[>] CONTEXT`
+   in the bar reads pressed and a 380px pane sits beside the feed
+   reading `// SELECT A PULSE //`. Press `j` twice. → The cursor row
+   gets a purple left bar and the pane shows `THREAD #id · n PULSES`,
+   the root in full (local date + time), its replies and a splice
+   prompt; the row's inline thread does NOT unfold. Move with `j`/`k`.
+   → The pane follows the cursor (a short beat later).
+10. In the pane, post a splice. → It lands in the pane; the row's `↩ n`
+    bumps. Press `r` on the row. → The pane's prompt takes focus. Click
+    a reply's `↩` in the pane. → The prompt re-aims (placeholder "Reply
+    to @alias..."). `[>] PAGE` opens the thread page.
+11. Click an `@alias` in a row (plain click). → The pane shows the
+    OPERATIVE record (alias, role, CL, member since, activity, bio, six
+    stats) with `[>] PROFILE`; the URL stays `/wire`. Ctrl/middle-click
+    an alias. → The profile opens as usual. `a` on the cursor row does
+    the same as the plain click.
+12. Press `c` (or the pane's `[x]`, or `[>] CONTEXT`). → The pane closes;
+    `↩` now unfolds threads inline as in step 5. Reload. → Still closed
+    (remembered per browser); `c` again reopens it and, with a cursor
+    row, shows that thread at once — an inline thread you had open for
+    that row folds (one copy of a thread on the page).
+13. Narrow the window under 1100px. → The pane and `[>] CONTEXT` go away
+    and threads stay inline; widen it again. → They return (the pane
+    empty until a row is selected).
+14. Single-pulse permalink: open `/wire/pulse/<id>`. → `< WIRE  Thread
+    n pulses`, the root row with its thread already open.
+15. Phone width (<768px). → Each row is a meta line (time · alias ·
     badge · counts) over the body; your `×` is visible without hover;
     the thread indents under the row; the `[?] KEYS` button is hidden.
 
 ## Steps — profiles
 
-11. Visit `/wire/<operative-alias>`. → Status line: `< WIRE  @alias
+16. Visit `/wire/<operative-alias>`. → Status line: `< WIRE  @alias
     ROLE  CLn  MEMBER SINCE <date>  ● activity  [⧉ SHARE]`, the bio
     line, a 6-cell stat strip (WIRE PULSES, ECHOES, PACKETS,
     ACHIEVEMENTS, BREACHES, WATCH TIME); `// BROADCASTS //` rows below
     — own pulses + pulses they echoed (an `ECHO` badge under the alias;
     replies carry the `[>] re` quote line).
-12. Vanity URL `/@<alias>`. → 301s to the profile; case-insensitive
+17. Vanity URL `/@<alias>`. → 301s to the profile; case-insensitive
     (`/@ALIAS` works).
-13. **Bio edit** (own profile): `✎ EDIT` inline, save. → Renders with
+18. **Bio edit** (own profile): `✎ EDIT` inline, save. → Renders with
     @mention linking; an email address in the bio must be REJECTED by
     validation.
-14. **Pin** (`◆ PIN`): pin one of your pulses (max 3). → `// PINNED 1/3
+19. **Pin** (`◆ PIN`): pin one of your pulses (max 3). → `// PINNED 1/3
     //` rows at the top with a gold left bar + `PIN` badge; the pinned
     pulse is not duplicated below.
-15. Pin 3, try a 4th. → Rejected with a clear message.
-16. **Reorder pins** (`↑`/`↓`). → Order persists on reload.
-17. Unpin (`◆ UNPIN`). → Removed from PINNED, back in BROADCASTS once.
-18. View someone else's profile. → No `✎ EDIT`, no pin controls, no `×`.
+20. Pin 3, try a 4th. → Rejected with a clear message.
+21. **Reorder pins** (`↑`/`↓`). → Order persists on reload.
+22. Unpin (`◆ UNPIN`). → Removed from PINNED, back in BROADCASTS once.
+23. View someone else's profile. → No `✎ EDIT`, no pin controls, no `×`.

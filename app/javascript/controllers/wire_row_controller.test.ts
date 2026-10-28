@@ -5,7 +5,9 @@ import WireRowController from './wire_row_controller'
 // Fixture mirrors wire/_pulse_entry: a root row with its sibling thread
 // frame (data-thread-frame), the hidden owner-only delete form, a
 // datetime stamp; plus a thread row inside a loaded frame whose ↩ aims
-// the thread's prompt at that pulse.
+// the thread's prompt at that pulse. Thread opens and author clicks are
+// offered to a context pane first (wire-row:pane): a listener that
+// cancels the event stands in for a claiming pane.
 
 function root (id: number, owner: number, loaded = false): string {
   return `
@@ -13,7 +15,7 @@ function root (id: number, owner: number, loaded = false): string {
       <div id="pulse_${id}" class="wire-row" data-controller="wire-row" data-wire-row-owner-id-value="${owner}" data-pulse-id="${id}" data-thread-frame="pulse_${id}_thread"
            data-action="wire:open->wire-row#openThread wire:reply->wire-row#reply">
         <time class="wire-time" datetime="2026-10-26T14:03:00Z" data-wire-row-target="time">14:03</time>
-        <a class="wire-author wire-author--operative" href="/wire/ghost">@ghost</a>
+        <a class="wire-author wire-author--operative" href="/wire/ghost" data-action="click->wire-row#author">@ghost</a>
         <a class="splice-button" href="/wire/pulse/${id}" data-turbo-frame="pulse_${id}_thread" data-action="click->wire-row#toggleThread" aria-expanded="false">↩</a>
         <form class="wire-inline-form" hidden data-wire-row-target="ownerOnly"><input type="hidden" name="authenticity_token" value="stale"><button class="delete-button">×</button></form>
       </div>
@@ -37,6 +39,7 @@ function thread (rootId: number): string {
 describe('WireRowController', () => {
   let application: Application
   const metas: HTMLMetaElement[] = []
+  let listeners = new AbortController()
 
   function meta (name: string, content: string): void {
     const m = document.createElement('meta')
@@ -61,7 +64,15 @@ describe('WireRowController', () => {
     application?.stop()
     document.body.innerHTML = ''
     metas.splice(0).forEach(m => m.remove())
+    listeners.abort()
+    listeners = new AbortController()
   })
+
+  const click = (el: Element, init: MouseEventInit = {}): MouseEvent => {
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, ...init })
+    el.dispatchEvent(event)
+    return event
+  }
 
   it('reveals the delete form for the owner only and rewrites broadcast CSRF tokens', async () => {
     meta('current-hackr-id', '7')
@@ -150,5 +161,49 @@ describe('WireRowController', () => {
     expect(parent.value).toBe('1')
     expect(input.placeholder).toBe('Splice into @ghost\'s thread...')
     expect(document.activeElement).toBe(input)
+  })
+
+  it('offers thread opens and plain author clicks to a claiming pane first, leaving the frame and the profile visit alone', async () => {
+    await start(root(1, 7))
+    const offers: unknown[] = []
+    document.addEventListener('wire-row:pane', event => {
+      offers.push((event as CustomEvent).detail)
+      event.preventDefault()
+    }, { signal: listeners.signal })
+    const row = document.getElementById('pulse_1')!
+    const frame = document.getElementById('pulse_1_thread') as HTMLElement
+
+    expect(click(row.querySelector('.splice-button')!).defaultPrevented).toBe(true)
+    row.dispatchEvent(new CustomEvent('wire:open'))
+    row.dispatchEvent(new CustomEvent('wire:reply'))
+    expect(offers).toEqual([
+      { url: '/wire/pulse/1', select: '1', focus: false },
+      { url: '/wire/pulse/1', select: '1', focus: false },
+      { url: '/wire/pulse/1', select: '1', focus: true }
+    ])
+    expect(frame.innerHTML).toBe('')
+
+    const author = row.querySelector('.wire-author')!
+    expect(click(author).defaultPrevented).toBe(true)
+    expect(offers[3]).toEqual({ url: '/wire/ghost' })
+    expect(click(author, { metaKey: true }).defaultPrevented).toBe(false)
+    expect(click(author, { button: 1 }).defaultPrevented).toBe(false)
+    expect(offers).toHaveLength(4)
+  })
+
+  it('runs its own behavior when nobody claims the offer, and never offers a reply row\'s thread', async () => {
+    await start(root(1, 7, true))
+    const offers = vi.fn()
+    document.addEventListener('wire-row:pane', offers, { signal: listeners.signal })
+    const frame = document.getElementById('pulse_1_thread') as HTMLElement
+
+    click(document.querySelector('#pulse_1 .splice-button')!)
+    expect(frame.hidden).toBe(true) // folded, as without a pane
+    expect(offers).toHaveBeenCalledTimes(1)
+
+    document.getElementById('pulse_2')!.dispatchEvent(new CustomEvent('wire:open'))
+    expect(offers).toHaveBeenCalledTimes(1)
+    expect(click(document.querySelector('#pulse_1 .wire-author')!).defaultPrevented).toBe(false)
+    expect(offers).toHaveBeenCalledTimes(2)
   })
 })

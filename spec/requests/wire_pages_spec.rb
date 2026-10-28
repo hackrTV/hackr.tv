@@ -110,7 +110,10 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to match(/<turbo-frame[^>]*id="pulse_#{pulse.id}_thread"/)
       expect(response.body).to include("wire-author--admin")
       expect(response.body).to include("wire-badge--admin")
-      expect(response.body).to include('data-controller="wire-keys wire-feed"')
+      expect(response.body).to include('data-controller="wire-keys wire-feed wire-pane"')
+      expect(response.body).to include("[&gt;] CONTEXT")
+      expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
+      expect(response.body).to include("// SELECT A PULSE //")
       expect(response.body).not_to include("⟳")
       expect(response.body).not_to include("📌")
     end
@@ -282,6 +285,42 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("@ghost_alias")
     end
 
+    it "answers the context pane (frame wire-pane) with the operative record alone" do
+      hackr.update!(bio: "Ghost in the wire")
+      make_pulse(hackr, content: "Timeline broadcast")
+      log_in!
+
+      get "/wire/#{hackr.hackr_alias.downcase}", headers: {"Turbo-Frame" => "wire-pane"}
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
+      expect(response.body).to include("OPERATIVE")
+      expect(response.body).to include("[&gt;] PROFILE")
+      expect(response.body).to include("@#{hackr.hackr_alias}")
+      expect(response.body).to include("MEMBER SINCE")
+      expect(response.body).to include("Ghost in the wire")
+      expect(response.body).to include("WIRE PULSES")
+      expect(response.body).not_to include("✎ EDIT") # read-only, even for the owner
+      expect(response.body).not_to include("Timeline broadcast")
+      expect(response.body).not_to include("// BROADCASTS //")
+
+      get "/wire/ghost_alias", headers: {"Turbo-Frame" => "wire-pane"}
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include("// NO RECORD //")
+    end
+
+    it "keeps the full page for other frame requests (the bio frame following its redirect)" do
+      log_in!
+
+      get "/wire/#{hackr.hackr_alias.downcase}", headers: {"Turbo-Frame" => "profile-bio"}
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(id="profile-bio"))
+      expect(response.body).to include("// BROADCASTS //")
+      expect(response.body).not_to include("[&gt;] PROFILE")
+    end
+
     it "shows the bio edit frame only to the profile owner" do
       hackr.update!(bio: "Ghost in the wire")
       log_in!
@@ -387,13 +426,38 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).not_to include("site-header")
     end
 
-    it "renders the fragment into whatever frame asked" do
-      root = make_pulse(other, content: "Paneable")
+    it "answers the context pane (frame wire-pane) with the root in full above the same thread fragment" do
+      root = make_pulse(other, content: "Paneable root")
+      create(:pulse, grid_hackr: hackr, content: "Pane reply", parent_pulse_id: root.id)
       log_in!
 
       get "/wire/pulse/#{root.id}", headers: {"Turbo-Frame" => "wire-pane"}
 
+      expect(response).to have_http_status(:ok)
       expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
+      expect(response.body).to include("wire-pane-head")
+      expect(response.body).to include("##{root.id} · 2 PULSES")
+      expect(response.body).to include("[&gt;] PAGE")
+      expect(response.body).to include("Paneable root") # the pane shows the root itself…
+      expect(response.body).not_to include(%(id="pulse_#{root.id}")) # …without the feed row's ids
+      expect(response.body).to include(%(id="pulse_#{root.id}_thread_list"))
+      expect(response.body).to include("Pane reply")
+      expect(response.body).to include("Splice into @#{other.hackr_alias}&#39;s thread...")
+      expect(response.body).not_to include("site-header")
+    end
+
+    it "shows a dropped root as dropped in the pane, without a prompt" do
+      root = make_pulse(other, content: "Doomed root")
+      create(:pulse, grid_hackr: hackr, content: "Its reply", parent_pulse_id: root.id)
+      root.pulse_drop!
+      log_in!
+
+      get "/wire/pulse/#{root.id}", headers: {"Turbo-Frame" => "wire-pane"}
+
+      expect(response.body).to include("[ PULSE DROPPED BY GOVCORP ]")
+      expect(response.body).not_to include("Doomed root")
+      expect(response.body).to include("Its reply")
+      expect(response.body).not_to include("wire-prompt-input")
     end
   end
 end
