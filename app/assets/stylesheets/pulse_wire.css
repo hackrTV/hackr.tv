@@ -77,7 +77,8 @@
 .wire-empty-sub, .wire-end-sub { color: var(--edge-bright); font-size: 12px; margin-top: 6px; }
 
 /* ── Row ───────────────────────────────────────────────────────────── */
-.wire-row { display: grid; grid-template-columns: 44px 150px minmax(0, 1fr) auto; grid-template-areas: "time who body side"; gap: 0 10px; align-items: start; padding: 2px 8px; scroll-margin-top: calc(var(--site-header-h, 0px) + 8px); scroll-margin-bottom: calc(var(--player-bar-h, 0px) + 8px); }
+.wire-row { display: grid; grid-template-columns: 44px 150px minmax(0, 1fr) auto; grid-template-areas: "time who body side"; gap: 0 10px; align-items: start; padding: 2px 8px; scroll-margin-top: calc(var(--site-header-h, 0px) + 8px); scroll-margin-bottom: calc(var(--player-bar-h, 0px) + 8px); cursor: pointer; } /* a click is a cursor move (wire-keys#click): no I-bar over the text */
+.wire-row--dropped, #wire-pane .wire-row { cursor: auto; } /* not walkable: the click does nothing */
 .wire-row:hover, .wire-row--cursor { background-color: var(--bg-1); }
 .wire-row--cursor { outline: 1px solid var(--accent); outline-offset: -1px; } /* an outline, so it never fights the pin bar */
 .wire-row--pinned { box-shadow: inset 2px 0 0 0 var(--warn); }

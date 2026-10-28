@@ -230,6 +230,8 @@ RSpec.describe "Hotwire wire feed", type: :system do
     expect(page).to have_css("#pulse_#{root.id}.wire-row--cursor")
     expect(page).to have_css("#pulse_#{root.id}.wire-row--sel")
     within("#wire-pane") { expect(page).to have_content("Spliced from the pane.") }
+    expect(page.evaluate_script("getComputedStyle(document.querySelector('#pulse_#{root.id} .wire-text')).cursor")).to eq("pointer") # no I-bar over a clickable row
+    expect(page.evaluate_script("getComputedStyle(document.querySelector('#wire-pane .wire-row .wire-text')).cursor")).to eq("auto") # pane rows are not walkable
 
     find("body").send_keys("c")
     expect(page).to have_no_css(".wire-page[data-pane='open']")
