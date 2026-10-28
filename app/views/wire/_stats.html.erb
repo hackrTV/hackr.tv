@@ -1,0 +1,13 @@
+<%# The hairline stat strip — six cells on the profile header, re-gridded
+    to two columns inside the context pane's record. Locals: stats
+    (Grid::ProfileStats.for). %>
+<div class="wire-stats">
+  <% [["WIRE PULSES", stats[:pulses]],
+      ["ECHOES", stats[:echoes_received]],
+      ["PACKETS", stats[:packets]],
+      ["ACHIEVEMENTS", stats[:achievements]],
+      ["BREACHES", stats[:breaches_completed]],
+      ["WATCH TIME", watch_time_label(stats[:watch_seconds])]].each do |label, value| %>
+    <div class="wire-stat"><b class="wire-stat-value"><%= value %></b><span class="wire-stat-label"><%= label %></span></div>
+  <% end %>
+</div>

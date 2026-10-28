@@ -5,12 +5,7 @@
   <div class="wire-bar">
     <%= link_to "< WIRE", wire_path, class: "wire-back" %>
     <h1 class="wire-handle wire-author--<%= role %>">@<%= hackr.hackr_alias %></h1>
-    <span class="wire-badge wire-badge--outline wire-badge--<%= role %>"><%= hackr.role.upcase %></span>
-    <span class="wire-cl">CL<%= hackr.stat("clearance").to_i %></span>
-    <span class="wire-bar-meta">MEMBER SINCE <%= hackr.created_at.strftime("%Y-%m-%d") %></span>
-    <% if hackr.last_activity_at %>
-      <span class="wire-bar-meta<%= " wire-online" if (Time.current - hackr.last_activity_at) < 5.minutes %>">● <%= last_active_label(hackr.last_activity_at).upcase %></span>
-    <% end %>
+    <%= render "wire/status_meta", hackr: hackr %>
     <button type="button" class="wire-share"
       data-controller="clipboard"
       data-clipboard-text-value="<%= "#{request.base_url}/@#{hackr.hackr_alias}" %>"
@@ -24,14 +19,5 @@
     <% end %>
   </div>
 
-  <div class="wire-stats">
-    <% [["WIRE PULSES", stats[:pulses]],
-        ["ECHOES", stats[:echoes_received]],
-        ["PACKETS", stats[:packets]],
-        ["ACHIEVEMENTS", stats[:achievements]],
-        ["BREACHES", stats[:breaches_completed]],
-        ["WATCH TIME", watch_time_label(stats[:watch_seconds])]].each do |label, value| %>
-      <div class="wire-stat"><b class="wire-stat-value"><%= value %></b><span class="wire-stat-label"><%= label %></span></div>
-    <% end %>
-  </div>
+  <%= render "wire/stats", stats: stats %>
 </div>

@@ -7,9 +7,13 @@ import { Controller } from '@hotwired/stimulus'
 // typing (input/textarea/select/contenteditable) and with a modifier
 // held. Rows are re-read from the DOM on every key — broadcasts
 // prepend, replace and remove them — and the cursor is kept by id, so a
-// replaced row (a drop) stays the cursor; rows inside open threads are
-// walked in document order. x is press-twice (1.5s) on the owner's own
-// row: no native confirm dialog on a TUI.
+// replaced row (a drop) stays the cursor; rows inside open inline
+// threads are walked in document order, rows inside the context pane
+// never (the pane is read, not walked). Every cursor move dispatches
+// wire:cursor on the row (the pane follows it); c dispatches
+// wire-keys:pane (the pane toggles); a clicks the row's author link
+// (record in the pane, else the profile). x is press-twice (1.5s) on
+// the owner's own row: no native confirm dialog on a TUI.
 const ARM_MS = 1500
 
 export default class extends Controller<HTMLElement> {
@@ -49,7 +53,9 @@ export default class extends Controller<HTMLElement> {
     case 'G': this.last(); break
     case 'e': this.press('.echo-button'); break
     case 'o': this.emit('wire:open'); break
-    case 'r': this.emit('wire:reply'); break
+    case 'r': event.preventDefault(); this.emit('wire:reply'); break // a prompt may take focus now: no stray "r"
+    case 'a': this.press('.wire-author'); break
+    case 'c': this.dispatch('pane'); break
     case 'x': this.deleteCursor(); break
     case '/': event.preventDefault(); this.focusPrompt(); break
     case '?': this.toggleLegend(); break
@@ -69,7 +75,7 @@ export default class extends Controller<HTMLElement> {
 
   private rows (): HTMLElement[] {
     return Array.from(this.element.querySelectorAll<HTMLElement>('.wire-row'))
-      .filter(row => !row.closest('[hidden]') && !row.classList.contains('wire-row--dropped'))
+      .filter(row => !row.closest('[hidden], #wire-pane') && !row.classList.contains('wire-row--dropped'))
   }
 
   private cursor (): HTMLElement | null {
@@ -98,6 +104,7 @@ export default class extends Controller<HTMLElement> {
     this.cursorId = row?.id ?? null
     this.applyCursor()
     row?.scrollIntoView({ block: 'nearest' })
+    row?.dispatchEvent(new CustomEvent('wire:cursor', { bubbles: true }))
   }
 
   private applyCursor (): void {

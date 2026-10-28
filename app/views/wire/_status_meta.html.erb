@@ -1,0 +1,10 @@
+<%# The operative's status spans — role badge, clearance, member since,
+    activity — after the handle on the profile's status line and in the
+    context pane's record. Locals: hackr. %>
+<% role = uplink_role_class(hackr.role) %>
+<span class="wire-badge wire-badge--outline wire-badge--<%= role %>"><%= hackr.role.upcase %></span>
+<span class="wire-cl">CL<%= hackr.stat("clearance").to_i %></span>
+<span class="wire-bar-meta">MEMBER SINCE <%= hackr.created_at.strftime("%Y-%m-%d") %></span>
+<% if hackr.last_activity_at %>
+  <span class="wire-bar-meta<%= " wire-online" if (Time.current - hackr.last_activity_at) < 5.minutes %>">● <%= last_active_label(hackr.last_activity_at).upcase %></span>
+<% end %>

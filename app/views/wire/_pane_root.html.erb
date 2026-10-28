@@ -1,0 +1,19 @@
+<%# The selected root inside the context pane: full local stamp (the
+    wire-pane stamp target localizes it), role-colored author, body. No
+    counts or controls here — the feed's row is the live one. Locals:
+    pulse. %>
+<% author = pulse.grid_hackr %>
+<% role = uplink_role_class(author.role) %>
+<% badge = uplink_role_badge(author.role) %>
+<div class="wire-pane-root">
+  <div class="wire-pane-root-meta">
+    <time class="wire-pane-root-time" datetime="<%= pulse.pulsed_at.iso8601 %>" data-wire-pane-target="stamp"><%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M") %></time>
+    <%= link_to "@#{author.hackr_alias}", wire_user_path(author.hackr_alias.downcase), class: "wire-author wire-author--#{role}", data: {action: "click->wire-pane#author"} %>
+    <% if badge %><span class="wire-badge wire-badge--<%= role %>"><%= badge %></span><% end %>
+  </div>
+  <% if pulse.pulse_dropped? %>
+    <p class="wire-text wire-text--dropped">[ PULSE DROPPED BY GOVCORP ]</p>
+  <% else %>
+    <p class="wire-text"><%= wire_text(pulse) %></p>
+  <% end %>
+</div>

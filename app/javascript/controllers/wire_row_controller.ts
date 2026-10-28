@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { localizeTimeElement } from '~/utils/localTime'
 
 // Per-viewer state for a WIRE ledger row (wire/_pulse_row) and its
 // inline thread. Broadcast-inserted rows render viewer-neutral (no
@@ -13,8 +14,13 @@ import { Controller } from '@hotwired/stimulus'
 // row's data-thread-frame: the ↩ link loads it through Turbo on the
 // first click (data-turbo-frame) and this controller folds/unfolds it
 // after that; `o` / `r` from wire-keys arrive as wire:open / wire:reply.
-// A row inside a thread list has no frame of its own — its ↩ aims the
-// enclosing thread's reply prompt at this pulse instead.
+// A row inside a thread list (an inline frame or the context pane) has
+// no frame of its own — its ↩ aims the enclosing thread's reply prompt
+// at this pulse instead.
+// Thread opens (↩ / o / r on a root) and plain author clicks are first
+// OFFERED to the page's context pane through a cancelable wire-row:pane
+// event (detail: url, select, focus); when the pane claims it the row
+// does nothing more, otherwise the inline frame / profile visit runs.
 export default class extends Controller<HTMLElement> {
   static targets = ['ownerOnly', 'time']
   static values = { ownerId: Number }
@@ -56,6 +62,10 @@ export default class extends Controller<HTMLElement> {
   // ↩ on a root row: the first click is a plain frame navigation (Turbo
   // fetches the thread into the frame); later clicks fold/unfold.
   toggleThread (event: Event): void {
+    if (this.offerThread()) {
+      event.preventDefault()
+      return
+    }
     const frame = this.frame()
     if (!frame || !this.loaded(frame)) return
     event.preventDefault()
@@ -64,6 +74,7 @@ export default class extends Controller<HTMLElement> {
 
   // wire:open (the `o` key).
   openThread (): void {
+    if (this.offerThread()) return
     const frame = this.frame()
     if (!frame) return
     if (!this.loaded(frame)) {
@@ -77,12 +88,13 @@ export default class extends Controller<HTMLElement> {
   // prompt at this pulse — a reply row names itself, a root row resets
   // the prompt to itself (opening the thread first when still folded).
   reply (): void {
-    const thread = this.element.closest<HTMLElement>('turbo-frame.wire-thread')
+    const thread = this.element.closest<HTMLElement>('turbo-frame.wire-thread, turbo-frame#wire-pane')
     if (thread) {
       const alias = this.element.querySelector('.wire-author')?.textContent?.trim()
       this.aimPrompt(thread, this.pulseId(), alias)
       return
     }
+    if (this.offerThread(true)) return
     const frame = this.frame()
     if (!frame) return
     if (!this.loaded(frame)) {
@@ -92,6 +104,27 @@ export default class extends Controller<HTMLElement> {
     }
     if (frame.hidden) this.fold(frame)
     this.aimPrompt(frame, this.pulseId())
+  }
+
+  // A plain click on the author link: the pane shows the record when it
+  // claims the offer; modified clicks always reach the profile page.
+  author (event: MouseEvent): void {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+    const href = (event.currentTarget as HTMLElement).getAttribute('href')
+    if (href && this.offer({ url: href })) event.preventDefault()
+  }
+
+  // Root rows only (the ones with an inline frame): a reply row inside
+  // an open thread keeps its own ↩ / o behavior.
+  private offerThread (focus = false): boolean {
+    if (!this.element.dataset.threadFrame) return false
+    const id = this.pulseId()
+    const url = this.spliceLink()?.getAttribute('href') ?? `/wire/pulse/${id}` // wire-pane's threadUrl
+    return this.offer({ url, select: id, focus })
+  }
+
+  private offer (detail: { url: string, select?: string, focus?: boolean }): boolean {
+    return this.dispatch('pane', { detail, cancelable: true }).defaultPrevented
   }
 
   private fold (frame: HTMLElement): void {
@@ -149,14 +182,6 @@ export default class extends Controller<HTMLElement> {
   }
 
   private localizeTimes (): void {
-    this.timeTargets.forEach(el => {
-      const stamp = el.getAttribute('datetime')
-      if (!stamp) return
-      const date = new Date(stamp)
-      if (Number.isNaN(date.getTime())) return
-      // hourCycle h23, not hour12: false — the latter resolves to h24 in Chromium ("24:30").
-      el.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-      el.title = date.toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-    })
+    this.timeTargets.forEach(el => localizeTimeElement(el))
   }
 }

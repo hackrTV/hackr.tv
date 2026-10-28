@@ -5,41 +5,59 @@
   <%= render "wire/feed_page" %>
 <% else %>
   <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-    <div class="wire-page" data-controller="wire-keys wire-feed" data-action="keydown@document->wire-keys#key">
-      <%= turbo_stream_from "wire_html" %>
-
+    <%# wire-pane: the context pane beside the ledger (wide viewports) —
+        rows offer their thread/author loads through wire-row:pane, the
+        cursor is followed through wire:cursor, c toggles via
+        wire-keys:pane. Open → data-pane="open" switches the page to the
+        two-column grid (pulse_wire.css). %>
+    <div class="wire-page" data-controller="wire-keys wire-feed wire-pane"
+      data-action="keydown@document->wire-keys#key wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle">
       <div class="wire-bar" data-controller="wire-status">
         <h1 class="wire-bar-title" title="Wideband Information Relay Emitter">The WIRE</h1>
         <span class="wire-bar-sub">WIDEBAND INFORMATION RELAY EMITTER</span>
         <span class="status-disconnected" data-wire-status-target="badge">◌ CONNECTING</span>
+        <button type="button" class="wire-bar-pane" title="Context pane (c)" aria-pressed="false"
+          data-wire-pane-target="toggle" data-action="click->wire-pane#toggle">[&gt;] CONTEXT</button>
         <button type="button" class="wire-bar-keys" title="Keyboard shortcuts" data-action="click->wire-keys#toggleLegend">[?] KEYS</button>
       </div>
 
-      <% if logged_in? %>
-        <%= render "wire/composer" %>
-      <% else %>
-        <div class="wire-login-prompt">
-          <p class="wire-login-prompt-lede">
-            <a href="/grid/login">Log in</a> to broadcast on the WIRE
-          </p>
-          <p class="wire-login-prompt-sub">Wideband Information Relay Emitter</p>
-        </div>
-      <% end %>
+      <div class="wire-main">
+        <%= turbo_stream_from "wire_html" %>
 
-      <div id="wire-feed" class="wire-feed">
-        <% if @pulses.any? %>
-          <% @pulses.each do |pulse| %>
-            <%= render "wire/pulse_entry", pulse: pulse, viewer: current_hackr, echoed: @echoed_ids.include?(pulse.id) %>
-          <% end %>
+        <% if logged_in? %>
+          <%= render "wire/composer" %>
         <% else %>
-          <div class="empty-state" id="wire-empty">
-            <p>The WIRE is silent. Broadcast the first pulse.</p>
-            <p class="wire-empty-sub">Wideband Information Relay Emitter</p>
+          <div class="wire-login-prompt">
+            <p class="wire-login-prompt-lede">
+              <a href="/grid/login">Log in</a> to broadcast on the WIRE
+            </p>
+            <p class="wire-login-prompt-sub">Wideband Information Relay Emitter</p>
           </div>
         <% end %>
+
+        <div id="wire-feed" class="wire-feed">
+          <% if @pulses.any? %>
+            <% @pulses.each do |pulse| %>
+              <%= render "wire/pulse_entry", pulse: pulse, viewer: current_hackr, echoed: @echoed_ids.include?(pulse.id) %>
+            <% end %>
+          <% else %>
+            <div class="empty-state" id="wire-empty">
+              <p>The WIRE is silent. Broadcast the first pulse.</p>
+              <p class="wire-empty-sub">Wideband Information Relay Emitter</p>
+            </div>
+          <% end %>
+        </div>
+
+        <%= render "wire/feed_pager" %>
       </div>
 
-      <%= render "wire/feed_pager" %>
+      <aside class="wire-pane" aria-label="Context pane">
+        <%= turbo_frame_tag "wire-pane", target: "_top", data: {wire_pane_target: "frame"} %>
+        <div class="wire-pane-empty">
+          <span>// SELECT A PULSE //</span>
+          <span class="wire-pane-empty-sub">j / k walk the ledger · ↩ opens a thread · @alias opens a record</span>
+        </div>
+      </aside>
       <%= render "wire/keys_legend" %>
     </div>
   <% end %>

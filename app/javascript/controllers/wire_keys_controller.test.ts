@@ -5,16 +5,18 @@ import WireKeysController from './wire_keys_controller'
 function row (id: number, opts: { own?: boolean, dropped?: boolean } = {}): string {
   return `
     <div id="pulse_${id}" class="wire-row${opts.dropped ? ' wire-row--dropped' : ''}" data-pulse-id="${id}">
+      <a class="wire-author" href="/wire/ghost">@ghost</a>
       <button class="echo-button">↻</button>
       <a class="splice-button" href="/wire/pulse/${id}">↩</a>
       <form class="wire-inline-form"${opts.own ? '' : ' hidden'}><button type="button" class="delete-button">×</button></form>
     </div>`
 }
 
-const page = (rows: string): string => `
+const page = (rows: string, pane = ''): string => `
   <div class="wire-page" data-controller="wire-keys" data-action="keydown@document->wire-keys#key">
     <form><textarea class="wire-prompt-input"></textarea></form>
     <div id="wire-feed">${rows}</div>
+    <aside class="wire-pane"><turbo-frame id="wire-pane">${pane}</turbo-frame></aside>
     <div class="wire-legend" hidden data-wire-keys-target="legend">keys</div>
   </div>`
 
@@ -90,10 +92,12 @@ describe('WireKeysController', () => {
     press('j')
     press('e')
     press('o')
-    press('r')
+    const reply = new KeyboardEvent('keydown', { key: 'r', bubbles: true, cancelable: true })
+    document.body.dispatchEvent(reply)
     expect(echo).toHaveBeenCalledTimes(1)
     expect(opened).toHaveBeenCalledTimes(1)
     expect(replied).toHaveBeenCalledTimes(1)
+    expect(reply.defaultPrevented).toBe(true) // the prompt it focuses must not receive the "r"
   })
 
   it('x arms the owner\'s row and deletes on the second press; disarms after 1.5s or on another key', async () => {
@@ -152,5 +156,29 @@ describe('WireKeysController', () => {
     press('Escape')
     expect(legend.hidden).toBe(true)
     expect(cursor()).toBeUndefined()
+  })
+
+  it('announces cursor moves (wire:cursor), c asks for the pane (wire-keys:pane), a clicks the author link, and pane rows are never walked', async () => {
+    await start(page(row(1) + row(2), row(9)))
+    const pageEl = document.querySelector<HTMLElement>('.wire-page')!
+    const moved = vi.fn()
+    const pane = vi.fn()
+    const author = vi.fn()
+    pageEl.addEventListener('wire:cursor', moved)
+    pageEl.addEventListener('wire-keys:pane', pane)
+    document.querySelector('#pulse_1 .wire-author')!.addEventListener('click', e => { e.preventDefault(); author() })
+
+    press('j')
+    expect(moved).toHaveBeenCalledTimes(1)
+    expect((moved.mock.calls[0]![0] as Event).target).toBe(document.getElementById('pulse_1'))
+    press('a')
+    expect(author).toHaveBeenCalledTimes(1)
+    press('c')
+    expect(pane).toHaveBeenCalledTimes(1)
+
+    press('G')
+    expect(cursor()).toBe('pulse_2')
+    press('j')
+    expect(cursor()).toBe('pulse_2')
   })
 })

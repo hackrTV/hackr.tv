@@ -19,6 +19,14 @@ RSpec.describe "Hotwire wire feed", type: :system do
     expect(page).to have_current_path("/grid")
   end
 
+  # The context pane opens by default at the suite's 1400px and claims
+  # thread opens; the inline examples close it first (the c key).
+  def close_pane!
+    expect(page).to have_css(".wire-page[data-pane='open']")
+    find("body").send_keys("c")
+    expect(page).to have_no_css(".wire-page[data-pane='open']")
+  end
+
   it "composes with a live counter and prepends the pulse without reload" do
     log_in!(hackr)
     visit "/wire"
@@ -114,6 +122,7 @@ RSpec.describe "Hotwire wire feed", type: :system do
     create(:pulse, grid_hackr: other, content: "Earlier splice", parent_pulse_id: root.id)
     log_in!(hackr)
     visit "/wire"
+    close_pane!
     page.execute_script("window.__turbo_marker = true")
 
     within("#pulse_#{root.id}") { find(".splice-button").click }
@@ -140,6 +149,7 @@ RSpec.describe "Hotwire wire feed", type: :system do
     log_in!(hackr)
     visit "/wire"
     expect(page).to have_content("Key target")
+    close_pane!
 
     find("body").send_keys("j", "j")
     expect(page).to have_css("#pulse_#{target.id}.wire-row--cursor")
@@ -168,6 +178,7 @@ RSpec.describe "Hotwire wire feed", type: :system do
     log_in!(hackr)
     visit "/wire"
     expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, wait: 10)
+    close_pane!
     within("#pulse_#{root.id}") { find(".splice-button").click }
     expect(page).to have_content("Its splice")
 
@@ -176,6 +187,78 @@ RSpec.describe "Hotwire wire feed", type: :system do
     expect(page).to have_content("[ PULSE DROPPED BY GOVCORP ]", wait: 10)
     expect(page).to have_css("#pulse_#{root.id}_entry") # the entry survives the row replace
     expect(page).to have_no_content("Its splice") # a dropped root's thread is emptied
+  end
+
+  it "reads threads in the context pane: the cursor is followed, splices land there, r aims its prompt, an alias shows the record, c closes it and ↩ falls back inline" do
+    root = create(:pulse, grid_hackr: other, content: "Root of the pane thread")
+    create(:pulse, grid_hackr: other, content: "Earlier splice", parent_pulse_id: root.id)
+    create(:pulse, grid_hackr: other, content: "Newest pulse")
+    log_in!(hackr)
+    visit "/wire"
+    expect(page).to have_css(".wire-page[data-pane='open']") # open by default at 1400px
+    expect(page).to have_css(".wire-bar-pane[aria-pressed='true']")
+    expect(page).to have_content("// SELECT A PULSE //")
+    page.execute_script("window.__turbo_marker = true")
+
+    find("body").send_keys("j", "j") # the cursor is followed into the pane
+    expect(page).to have_css("#pulse_#{root.id}.wire-row--sel")
+    within("#wire-pane") do
+      expect(page).to have_content("THREAD")
+      expect(page).to have_content("Root of the pane thread")
+      expect(page).to have_content("Earlier splice")
+      fill_in "content", with: "Spliced from the pane."
+      click_button "Splice"
+      expect(page).to have_content("Spliced from the pane.")
+    end
+    expect(page).to have_css("#pulse_#{root.id} .splice-count", text: "2")
+    expect(page).to have_no_css("#pulse_#{root.id}_thread .wire-row") # the inline frame stayed empty
+
+    find("body").send_keys("r")
+    expect(page.evaluate_script("document.activeElement.closest('#wire-pane') !== null")).to eq(true)
+    expect(find("#wire-pane .wire-prompt-input").value).to eq("") # no stray "r"
+    find("#wire-pane .wire-prompt-input").send_keys(:escape)
+
+    within("#pulse_#{root.id}") { click_link "@#{other.hackr_alias}" }
+    within("#wire-pane") do
+      expect(page).to have_content("OPERATIVE")
+      expect(page).to have_link("[>] PROFILE")
+    end
+    expect(page).to have_current_path("/wire")
+    expect(page).to have_no_css(".wire-row--sel")
+
+    find("body").send_keys("c")
+    expect(page).to have_no_css(".wire-page[data-pane='open']")
+    within("#pulse_#{root.id}") { find(".splice-button").click }
+    within("#pulse_#{root.id}_thread") { expect(page).to have_content("Earlier splice") }
+    expect(page.evaluate_script("window.__turbo_marker")).to eq(true) # frames + streams, no navigation
+
+    find("body").send_keys("c") # reopening onto the cursor row moves that thread into the pane: one list on the page
+    expect(page).to have_css(".wire-page[data-pane='open']")
+    within("#wire-pane") { expect(page).to have_content("Earlier splice") }
+    expect(page).to have_no_css("#pulse_#{root.id}_thread .wire-row")
+    expect(page).to have_css("#pulse_#{root.id}_thread_list", count: 1, visible: :all)
+    find("body").send_keys("c")
+
+    visit "/wire" # the choice is remembered
+    expect(page).to have_content("Root of the pane thread")
+    expect(page).to have_no_css(".wire-page[data-pane='open']")
+    expect(page).to have_css(".wire-bar-pane[aria-pressed='false']")
+  end
+
+  it "keeps threads inline under the pane's minimum width" do
+    root = create(:pulse, grid_hackr: other, content: "Narrow root")
+    create(:pulse, grid_hackr: other, content: "Narrow splice", parent_pulse_id: root.id)
+    log_in!(hackr)
+    page.driver.resize(1024, 800)
+    visit "/wire"
+
+    expect(page).to have_content("Narrow root")
+    expect(page).to have_no_css(".wire-page[data-pane='open']")
+    expect(page).to have_no_css(".wire-bar-pane", visible: true)
+    within("#pulse_#{root.id}") { find(".splice-button").click }
+    within("#pulse_#{root.id}_thread") { expect(page).to have_content("Narrow splice") }
+  ensure
+    page.driver.resize(1400, 900)
   end
 
   it "shows the owner's delete control without hover on a phone-width viewport" do

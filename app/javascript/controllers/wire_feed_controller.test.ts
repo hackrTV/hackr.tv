@@ -67,9 +67,11 @@ describe('WireFeedController', () => {
     expect(document.querySelector('.wire-day')).toBe(first) // not rebuilt
   })
 
-  it('skips entries inside open threads', async () => {
+  it('skips entries inside open threads and the context pane', async () => {
     const threadRows = `<turbo-frame id="pulse_1_thread" class="wire-thread">${entry(2, localNoon(2))}</turbo-frame>`
     await start(entry(1, localNoon(0), threadRows))
+    document.querySelector('.wire-page')!.insertAdjacentHTML('beforeend', `<aside class="wire-pane"><turbo-frame id="wire-pane">${entry(3, localNoon(4))}</turbo-frame></aside>`)
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     expect(labels()).toHaveLength(1)
     expect(document.querySelector('turbo-frame .wire-day')).toBeNull()

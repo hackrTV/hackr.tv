@@ -1,7 +1,9 @@
 /* PulseWire — The WIRE. Ledger rows since 2026-10 (the card layout is
    gone): one dense log row per pulse — HH:MM gutter | role-colored
    author + badges | body | counts — inside the normal page chrome,
-   threads expanding inline under their root, a "> " prompt bar on top.
+   threads expanding inline under their root, a "> " prompt bar on top,
+   and, on wide viewports, a context pane beside the feed (the selected
+   root's thread or an operative's record; wire-pane controller).
    Terminal rules: even-px Terminus sizes (12/14/16/18), no radius, no
    transitions, square dots, tokens (+ the sanctioned wire echo blue
    #60a5fa; pins read in --warn like Uplink's). The .btn/.alert/.form-*
@@ -41,8 +43,8 @@
 .wire-back:hover { color: var(--accent-bright); }
 .wire-online { color: var(--ok); }
 /* Ghost buttons (the Uplink shell's 12px bordered controls). */
-.wire-bar-keys, .wire-tx, .wire-share, .wire-bio-save, .wire-bio-cancel { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; text-decoration: none; white-space: nowrap; cursor: pointer; }
-.wire-bar-keys:hover, .wire-tx:not(:disabled):hover, .wire-share:hover, .wire-bio-save:hover, .wire-bio-cancel:hover { border-color: var(--accent); color: var(--accent-bright); }
+.wire-bar-keys, .wire-bar-pane, .wire-tx, .wire-share, .wire-bio-save, .wire-bio-cancel { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.wire-bar-keys:hover, .wire-bar-pane:hover, .wire-bar-pane[aria-pressed="true"], .wire-tx:not(:disabled):hover, .wire-share:hover, .wire-bio-save:hover, .wire-bio-cancel:hover { border-color: var(--accent); color: var(--accent-bright); }
 
 /* ── Prompt bar ("> ") ─────────────────────────────────────────────── */
 .wire-prompt-wrap { margin: 10px 0 6px; padding: 0 8px; }
@@ -77,6 +79,7 @@
 .wire-row:hover, .wire-row--cursor { background-color: var(--bg-1); }
 .wire-row--cursor { outline: 1px solid var(--accent); outline-offset: -1px; } /* an outline, so it never fights the pin bar */
 .wire-row--pinned { box-shadow: inset 2px 0 0 0 var(--warn); }
+.wire-row--sel { background-color: var(--bg-1); box-shadow: inset 2px 0 0 0 var(--accent); } /* the pane's selection (feed only — no pin bar to fight) */
 .wire-time { grid-area: time; color: var(--fg-faint); font-size: 12px; line-height: 20px; white-space: nowrap; }
 .wire-who { grid-area: who; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; min-width: 0; }
 .wire-author { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; text-decoration: none; }
@@ -124,13 +127,53 @@
 .wire-thread-reply .wire-prompt-mark { line-height: 26px; }
 .wire-thread-reply .wire-prompt-input { min-height: 26px; padding: 4px 0; font-size: 14px; line-height: 18px; }
 
+/* ── Context pane (wire-pane; ≥1100px, open ≥1280px by default) ────
+   data-pane="open" on .wire-page turns the column into a two-column
+   grid: the ledger keeps its 1100px, the pane takes 380px beside it.
+   The pane is sticky under the site header and scrolls inside; the
+   turbo-frame#wire-pane holds the thread (root block + the inline
+   thread fragment restyled to stacked 14/18 rows) or the record. */
+.wire-page[data-pane="open"] { max-width: 1500px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "bar bar" "main pane"; column-gap: 20px; align-items: start; }
+.wire-page[data-pane="open"] .wire-bar { grid-area: bar; }
+.wire-main { grid-area: main; min-width: 0; }
+.wire-pane { grid-area: pane; display: none; position: sticky; top: calc(var(--site-header-h, 0px) + 8px); box-sizing: border-box; flex-direction: column; min-height: 240px; max-height: calc(100vh - var(--site-header-h, 0px) - var(--player-bar-h, 0px) - 16px); margin-top: 10px; background-color: var(--bg-1); border: 1px solid var(--edge); }
+.wire-page[data-pane="open"] .wire-pane { display: flex; }
+#wire-pane { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+#wire-pane:empty { display: none; }
+#wire-pane[busy]:empty { display: block; padding: 12px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+#wire-pane[busy]:empty::before { content: "// RETRIEVING //"; }
+.wire-pane-empty { display: none; flex-direction: column; gap: 6px; padding: 24px 12px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; text-align: center; }
+#wire-pane:empty:not([busy]) ~ .wire-pane-empty { display: flex; }
+.wire-pane-empty-sub { color: var(--edge-bright); letter-spacing: 0; }
+.wire-pane-head { display: flex; align-items: center; gap: 8px; flex-shrink: 0; height: 32px; padding: 0 10px; border-bottom: 1px solid var(--edge); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
+.wire-pane-kicker { color: var(--accent-bright); font-weight: bold; }
+.wire-pane-meta { overflow: hidden; text-overflow: ellipsis; color: var(--fg-faint); }
+.wire-pane-page { margin-left: auto; color: var(--fg-faint); text-decoration: none; }
+.wire-pane-page:hover { color: var(--accent-bright); }
+.wire-pane-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0; }
+.wire-pane-root { padding: 0 10px 8px; border-bottom: 1px solid var(--edge); }
+.wire-pane-root-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; margin-bottom: 2px; }
+.wire-pane-root-time { color: var(--fg-faint); font-size: 12px; white-space: nowrap; }
+#wire-pane .wire-thread-missing { padding: 12px 10px; }
+#wire-pane .wire-thread-list { padding-top: 4px; font-size: 14px; line-height: 18px; }
+#wire-pane .wire-row { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "time who side" "body body body"; gap: 0 8px; padding: 3px 10px; }
+#wire-pane .wire-time { line-height: 18px; }
+#wire-pane .wire-thread-reply { margin-top: 6px; }
+#wire-pane .wire-thread-reply .wire-prompt-wrap { margin: 0; padding: 0 10px 4px; }
+#wire-pane .wire-prompt { background-color: var(--bg-0); }
+/* The operative record: the profile's status line stacked, bio, stats two-up. */
+.wire-record { display: flex; flex-direction: column; gap: 6px; padding: 0 2px 8px; }
+.wire-record-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 0 8px; }
+#wire-pane .wire-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#wire-pane .wire-stat { padding: 4px 8px; }
+
 /* ── Key legend (?) ────────────────────────────────────────────────── */
 .wire-legend { position: fixed; right: 16px; bottom: calc(var(--player-bar-h, 0px) + 16px); z-index: 20; width: min(320px, calc(100vw - 32px)); box-sizing: border-box; padding: 8px 12px 12px; background: var(--bg-1); border: 1px solid var(--accent); box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6); font-size: 14px; line-height: 18px; }
 .wire-legend[hidden] { display: none; }
 .wire-legend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .wire-legend-title { color: var(--accent-bright); font-size: 12px; letter-spacing: 1px; }
-.wire-legend-close { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
-.wire-legend-close:hover { color: var(--fg-bright); }
+.wire-legend-close, .wire-pane-close { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.wire-legend-close:hover, .wire-pane-close:hover { color: var(--fg-bright); }
 .wire-legend-rows { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; margin: 0; }
 .wire-legend-rows dt { color: var(--fg-bright); font-weight: bold; white-space: nowrap; }
 .wire-legend-rows dd { margin: 0; color: var(--fg-muted); }
@@ -156,6 +199,12 @@
 .wire-stat { display: flex; align-items: baseline; gap: 8px; min-width: 0; padding: 4px 10px; background: var(--bg-0); }
 .wire-stat-value { color: var(--fg-bright); font-size: 16px; }
 .wire-stat-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+
+/* ── Narrow (<1100px): no context pane — threads stay inline. ──────── */
+@media (max-width: 1099px) {
+  .wire-page[data-pane="open"] { display: block; max-width: 1100px; }
+  .wire-page[data-pane="open"] .wire-pane, .wire-bar-pane { display: none; }
+}
 
 /* ── Mobile (<768px): meta line over the body; counts are the tap
    targets; the owner's × is always visible (no hover on touch) ──── */

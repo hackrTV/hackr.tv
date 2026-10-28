@@ -1,0 +1,19 @@
+<%# Turbo-Frame response of GET /wire/pulse/:id for the feed's context
+    pane (frame id wire-pane, 2026-10): a head with the deep link, the
+    root in full, then the same thread fragment a row expands inline
+    (replies + the reply prompt), so splices, live appends, counts and
+    errors keep their ids and streams. The root is a dedicated block,
+    not a wire-row: the feed's row keeps the pulse_N ids the broadcasts
+    target (the pane reloads when that row is replaced). %>
+<%= turbo_frame_tag "wire-pane", target: "_top" do %>
+  <div class="wire-pane-head">
+    <span class="wire-pane-kicker">THREAD</span>
+    <span class="wire-pane-meta">#<%= @root.id %> · <%= @thread.length %> <%= (@thread.length == 1) ? "PULSE" : "PULSES" %></span>
+    <%= link_to "[>] PAGE", wire_pulse_path(@root), class: "wire-pane-page", title: "Open the thread page" %>
+    <button type="button" class="wire-pane-close" aria-label="Close the context pane" data-action="click->wire-pane#close">[x]</button>
+  </div>
+  <div class="wire-pane-body">
+    <%= render "wire/pane_root", pulse: @root %>
+    <%= render "wire/thread", root: @root, nodes: @nodes, reply_counts: @reply_counts, echoed_ids: @echoed_ids %>
+  </div>
+<% end %>

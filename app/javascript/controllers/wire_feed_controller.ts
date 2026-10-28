@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 // "// 2026-10-25 //"), computed client-side from each entry's data-at so
 // they fall on the viewer's local days and survive live prepends and
 // lazy page frames (mirrors the Uplink log's client-side grouping).
-// Entries inside open threads are skipped. Reconciled on connect and
+// Entries inside open threads and the context pane are skipped. Reconciled on connect and
 // whenever entries (or the frames that hold them) come and go — not on
 // every text change under the page, like the prompt's counter; the
 // observer is paused while the separators themselves are written.
@@ -47,7 +47,7 @@ export default class extends Controller<HTMLElement> {
 
   private entries (): HTMLElement[] {
     return Array.from(this.element.querySelectorAll<HTMLElement>('.wire-entry[data-at]'))
-      .filter(entry => !entry.closest('turbo-frame.wire-thread'))
+      .filter(entry => !entry.closest('turbo-frame.wire-thread, #wire-pane'))
   }
 
   private touchesEntries (record: MutationRecord): boolean {
