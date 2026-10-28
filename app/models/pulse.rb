@@ -37,7 +37,12 @@ class Pulse < ApplicationRecord
 
   belongs_to :grid_hackr
   belongs_to :parent_pulse, class_name: "Pulse", optional: true
-  belongs_to :thread_root, class_name: "Pulse", optional: true
+  # splice_count = replies anywhere in this pulse's thread (the ledger's
+  # "↩ n" on a root opens the whole thread, so the number matches what
+  # opens). Non-root pulses keep 0. before_save :set_thread_root runs
+  # before the counter's after_create, so the FK is set in time. Seeds
+  # that insert_all skip it — db/migrate/20261026180000 holds the repair SQL.
+  belongs_to :thread_root, class_name: "Pulse", optional: true, counter_cache: :splice_count
   has_many :echoes, dependent: :destroy
   has_many :splices, class_name: "Pulse", foreign_key: :parent_pulse_id, dependent: :destroy
   has_many :pulse_pins, dependent: :destroy
@@ -131,15 +136,26 @@ class Pulse < ApplicationRecord
 
     # Dual-publish (Hotwire migration Phase 3): the JSON broadcast above
     # feeds PulseWireChannel + /terminal's server-side pulse_wire subscriber;
-    # Hotwire feed pages subscribe to the separate "wire_html" stream.
-    # Root pulses only — the feed lists roots; splices live on thread pages.
+    # Hotwire wire pages subscribe to the separate "wire_html" stream.
+    # Root pulses prepend a feed entry (row + empty thread frame); splices
+    # append a row into their root's thread list (viewers who haven't
+    # expanded that thread have no target, so Turbo ignores it) and
+    # refresh the root's reply count (ledger redesign, 2026-10).
     if parent_pulse_id.nil?
       Turbo::StreamsChannel.broadcast_prepend_to(
         "wire_html",
         target: "wire-feed",
-        partial: "wire/pulse_card",
+        partial: "wire/pulse_entry",
         locals: {pulse: self, viewer: nil, echoed: false}
       )
+    else
+      Turbo::StreamsChannel.broadcast_append_to(
+        "wire_html",
+        target: "pulse_#{thread_root_id}_thread_list",
+        partial: "wire/pulse_entry",
+        locals: {pulse: self, viewer: nil, echoed: false, in_thread: true}
+      )
+      broadcast_splice_count
     end
 
     # Publish root pulses (not splices) to the world event feed
@@ -158,7 +174,9 @@ class Pulse < ApplicationRecord
       pulse_id: id
     })
 
-    Turbo::StreamsChannel.broadcast_remove_to("wire_html", target: "pulse_#{id}")
+    # The entry wrapper (row + thread frame) goes together.
+    Turbo::StreamsChannel.broadcast_remove_to("wire_html", target: "pulse_#{id}_entry")
+    broadcast_splice_count if thread_root_id
   end
 
   def broadcast_pulse_drop
@@ -169,13 +187,45 @@ class Pulse < ApplicationRecord
       pulse_id: id
     })
 
-    # Replace the card with its dropped-state render (viewer-neutral; the
-    # pulse-card Stimulus controller re-reveals owner/admin controls).
+    # Replace the row alone with its dropped-state render (viewer-neutral;
+    # the wire-row Stimulus controller re-reveals owner controls). The
+    # sibling thread frame survives, but a dropped root can't be spliced,
+    # so its open thread (and reply prompt) is emptied.
     Turbo::StreamsChannel.broadcast_replace_to(
       "wire_html",
       target: "pulse_#{id}",
-      partial: "wire/pulse_card",
+      partial: "wire/pulse_row",
       locals: {pulse: self, viewer: nil, echoed: false}
+    )
+    if parent_pulse_id.nil?
+      Turbo::StreamsChannel.broadcast_update_to("wire_html", target: "pulse_#{id}_thread", html: "")
+    end
+  end
+
+  # The root's "↩ n" span is replaced alone (like the echo count), so a
+  # viewer's own row state is never clobbered by a global broadcast. A
+  # reply to a reply also refreshes that reply's direct count, which open
+  # threads show on their rows.
+  def broadcast_splice_count
+    root = Pulse.find_by(id: thread_root_id)
+    return unless root
+
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "wire_html",
+      target: "pulse_#{root.id}_splice_count",
+      partial: "wire/splice_count",
+      locals: {pulse: root}
+    )
+    return if parent_pulse_id == root.id
+
+    parent = Pulse.find_by(id: parent_pulse_id)
+    return unless parent
+
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "wire_html",
+      target: "pulse_#{parent.id}_splice_count",
+      partial: "wire/splice_count",
+      locals: {pulse: parent, count: parent.splices.count}
     )
   end
 end

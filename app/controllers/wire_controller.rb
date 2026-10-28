@@ -1,6 +1,7 @@
-# Server-rendered PulseWire pages (Hotwire migration Phase 3) — ports
-# HotwirePage.tsx (/wire), UserPulsesPage.tsx (/wire/:username) and
-# SinglePulsePage.tsx (/wire/pulse/:id).
+# Server-rendered PulseWire pages (Hotwire migration Phase 3; ledger rows
+# since 2026-10) — /wire (feed), /wire/:username (profile) and
+# /wire/pulse/:id (a thread: the deep-link page, or, as a Turbo-Frame
+# request, the thread fragment a feed row expands inline).
 class WireController < ApplicationController
   admin_preview! title: "The WIRE"
 
@@ -24,10 +25,11 @@ class WireController < ApplicationController
     @pinned = @hackr.pulse_pins.order(:position).includes(pulse: :grid_hackr)
       .map(&:pulse).reject(&:pulse_dropped?)
 
+    # parent_pulse → grid_hackr feeds a splice row's "[>] re @alias" line.
     own = Pulse.active.where(grid_hackr: @hackr).timeline
-      .includes(:grid_hackr).limit(PROFILE_PER_PAGE).to_a
+      .includes(:grid_hackr, parent_pulse: :grid_hackr).limit(PROFILE_PER_PAGE).to_a
     echoed = Pulse.active.joins(:echoes).where(echoes: {grid_hackr_id: @hackr.id})
-      .includes(:grid_hackr).to_a
+      .includes(:grid_hackr, parent_pulse: :grid_hackr).to_a
 
     pinned_ids = @pinned.map(&:id).to_set
     @timeline = build_profile_timeline(own, echoed, pinned_ids)
@@ -36,12 +38,23 @@ class WireController < ApplicationController
 
   def pulse
     @pulse = Pulse.includes(:grid_hackr).find_by(id: params[:id])
-    return render :pulse_not_found, status: :not_found unless @pulse
+    unless @pulse
+      return render :thread_missing, status: :not_found if turbo_frame_request?
+
+      return render :pulse_not_found, status: :not_found
+    end
 
     @root = @pulse.thread_root || @pulse
     @thread = @root.thread_pulses.includes(:grid_hackr).to_a
-    @children = @thread.group_by(&:parent_pulse_id)
+    @reply_counts = @thread.map(&:parent_pulse_id).tally # direct replies per pulse
     @echoed_ids = echoed_ids_for(@thread)
+    # Replies flat + oldest first, each paired with its parent from the
+    # loaded thread (no per-row query) — wire/_thread.
+    by_id = @thread.index_by(&:id)
+    @nodes = @thread.reject { |p| p.id == @root.id }.sort_by(&:pulsed_at)
+      .map { |p| [p, by_id[p.parent_pulse_id]] }
+
+    render :thread if turbo_frame_request?
   end
 
   private

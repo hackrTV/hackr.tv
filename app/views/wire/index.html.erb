@@ -5,12 +5,14 @@
   <%= render "wire/feed_page" %>
 <% else %>
   <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-    <div class="hotwire-page white-168-text wire-page">
+    <div class="wire-page" data-controller="wire-keys wire-feed" data-action="keydown@document->wire-keys#key">
       <%= turbo_stream_from "wire_html" %>
 
-      <div class="hotwire-header" data-controller="wire-status">
-        <h1 title="Wideband Information Relay Emitter">The WIRE</h1>
+      <div class="wire-bar" data-controller="wire-status">
+        <h1 class="wire-bar-title" title="Wideband Information Relay Emitter">The WIRE</h1>
+        <span class="wire-bar-sub">WIDEBAND INFORMATION RELAY EMITTER</span>
         <span class="status-disconnected" data-wire-status-target="badge">◌ CONNECTING</span>
+        <button type="button" class="wire-bar-keys" title="Keyboard shortcuts" data-action="click->wire-keys#toggleLegend">[?] KEYS</button>
       </div>
 
       <% if logged_in? %>
@@ -24,10 +26,11 @@
         </div>
       <% end %>
 
-      <div id="wire-feed">
+      <div id="wire-feed" class="wire-feed">
         <% if @pulses.any? %>
-          <%= render partial: "wire/pulse_card", collection: @pulses, as: :pulse,
-            locals: {viewer: current_hackr} %>
+          <% @pulses.each do |pulse| %>
+            <%= render "wire/pulse_entry", pulse: pulse, viewer: current_hackr, echoed: @echoed_ids.include?(pulse.id) %>
+          <% end %>
         <% else %>
           <div class="empty-state" id="wire-empty">
             <p>The WIRE is silent. Broadcast the first pulse.</p>
@@ -37,6 +40,7 @@
       </div>
 
       <%= render "wire/feed_pager" %>
+      <%= render "wire/keys_legend" %>
     </div>
   <% end %>
 <% end %>

@@ -28,7 +28,7 @@ RSpec.describe "Hotwire wire profile", type: :system do
     expect(page).to have_content("WIRE PULSES")
     expect(page).to have_content("Ghost in the wire")
     expect(page).to have_content("My own broadcast")
-    expect(page).to have_content("@#{hackr.hackr_alias} echoed")
+    within("#pulse_#{echoed.id}") { expect(page).to have_css(".wire-badge--echo", text: "ECHO") }
     expect(page).to have_content("Someone else's signal")
   end
 
@@ -56,7 +56,7 @@ RSpec.describe "Hotwire wire profile", type: :system do
     visit "/wire/#{hackr.hackr_alias.downcase}"
 
     within("#pulse_#{a.id}") { find(".pin-button").click }
-    expect(page).to have_content("📌 PINNED")
+    expect(page).to have_content("// PINNED 1/3 //")
     within("#pulse_#{b.id}") { find(".pin-button").click }
 
     within(".pinned-pulses") do

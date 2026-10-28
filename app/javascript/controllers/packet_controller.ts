@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import { isModerator, outranks } from '~/utils/uplinkRoles'
 import { jumpToPacket } from '~/utils/packetJump'
 
-// Per-viewer state for uplink packets (pulse-card pattern).
+// Per-viewer state for uplink packets (wire-row pattern).
 // Broadcast-inserted packets render viewer-neutral, so on connect this
 // controller:
 //   1. reveals the drop control for the packet's author and for
@@ -63,7 +63,7 @@ export default class extends Controller<HTMLElement> {
       el.textContent = date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hourCycle: 'h23' // hour12: false resolves to h24 in Chromium ("24:30")
       })
     })
   }

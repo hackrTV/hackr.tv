@@ -1,36 +1,39 @@
-<%# PulseComposer.tsx port. Locals: parent_pulse (nil for the feed
-    composer). 256-char limit; the input accepts +50 so the over-limit
-    error state is visible, exactly like the SPA. The emote-picker
-    controller rides on the same form (":slug:" autocomplete; menu opens
-    downward inside .emote-anchor) and only talks to composer via the
-    input event it dispatches. %>
-<% parent_pulse = local_assigns.fetch(:parent_pulse, nil) %>
-<div class="pulse-composer">
-  <%= form_with url: wire_pulses_path, data: {
+<%# The "> " prompt bar (ledger redesign, 2026-10; PulseComposer.tsx
+    lineage). Locals: parent_pulse (nil for the feed prompt; a thread's
+    reply prompt passes its root), error_id (the error slot's id —
+    "composer-error" on the feed, "pulse_N_reply_error" in a thread).
+    256-char limit; the input accepts +50 so the over-limit state is
+    visible. Single line that grows (composer#update), Enter sends,
+    Shift+Enter newline. The emote-picker controller rides the same
+    form (":slug:" autocomplete; menu opens downward inside
+    .emote-anchor) and talks to composer only via the input event it
+    dispatches — its keydown runs first so an open menu owns Enter. A
+    thread prompt can be re-aimed at a reply (wire-row#reply sets the
+    hidden parent + placeholder); a successful send resets both. %>
+<%
+  parent_pulse = local_assigns.fetch(:parent_pulse, nil)
+  error_id = local_assigns.fetch(:error_id, "composer-error")
+%>
+<div class="wire-prompt-wrap">
+  <%= form_with url: wire_pulses_path, class: "wire-prompt", data: {
     controller: "composer emote-picker",
     composer_limit_value: 256,
     emote_picker_emotes_value: emote_picker_payload.to_json,
     action: "turbo:submit-end->composer#submitted turbo:submit-end->emote-picker#close"
   } do %>
-    <%= hidden_field_tag :parent_pulse_id, parent_pulse&.id %>
-    <div class="form-group">
-      <div class="emote-anchor">
-        <%= text_area_tag :content, nil, rows: 3, maxlength: 306, class: "form-control pulse-input",
-          placeholder: parent_pulse ? "Splice into @#{parent_pulse.grid_hackr.hackr_alias}'s pulse..." : "Broadcast on the WIRE...",
-          role: "combobox", aria: {autocomplete: "list", expanded: "false"},
-          data: {composer_target: "input", emote_picker_target: "input",
-            action: "input->composer#update keydown->composer#keydown input->emote-picker#update keydown->emote-picker#keydown keyup->emote-picker#caretMoved click->emote-picker#update"} %>
-        <ul class="emote-menu emote-menu--down" role="listbox" hidden data-emote-picker-target="menu"></ul>
-      </div>
-      <div class="pulse-composer-footer">
-        <span class="char-count" data-composer-target="count"></span>
-        <button type="submit" class="btn btn-primary" disabled data-composer-target="submit">
-          <%= parent_pulse ? "Splice" : "Broadcast" %>
-        </button>
-      </div>
+    <%= hidden_field_tag :parent_pulse_id, parent_pulse&.id, data: {composer_target: "parent"} %>
+    <span class="wire-prompt-mark" aria-hidden="true">&gt;</span>
+    <div class="emote-anchor wire-prompt-field">
+      <% placeholder = parent_pulse ? "Splice into @#{parent_pulse.grid_hackr.hackr_alias}'s thread..." : "Broadcast on the WIRE..." %>
+      <%= text_area_tag :content, nil, rows: 1, maxlength: 306, class: "wire-prompt-input", placeholder: placeholder,
+        role: "combobox", aria: {autocomplete: "list", expanded: "false"},
+        data: {composer_target: "input", emote_picker_target: "input", default_placeholder: placeholder,
+          action: "input->composer#update input->emote-picker#update keydown->emote-picker#keydown keydown->composer#keydown keyup->emote-picker#caretMoved click->emote-picker#update"} %>
+      <ul class="emote-menu emote-menu--down" role="listbox" hidden data-emote-picker-target="menu"></ul>
     </div>
-    <% unless parent_pulse %>
-      <div id="composer-error"></div>
-    <% end %>
+    <span class="char-count" data-composer-target="count"></span>
+    <button type="submit" class="wire-tx" disabled data-composer-target="submit"
+      title="<%= parent_pulse ? "Splice" : "Broadcast" %>">[&gt;] <%= parent_pulse ? "SPLICE" : "TX" %></button>
   <% end %>
+  <%= render "wire/composer_error", id: error_id, error: nil %>
 </div>

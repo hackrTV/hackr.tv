@@ -24,7 +24,7 @@ class Wire::EchoesController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("pulse_#{@pulse.id}_echo",
-          partial: "wire/echo_button", locals: {pulse: @pulse, echoed: @echoed, animate: @echoed})
+          partial: "wire/echo_button", locals: {pulse: @pulse, echoed: @echoed})
       end
       format.html { redirect_back fallback_location: wire_path }
     end

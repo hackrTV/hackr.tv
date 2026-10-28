@@ -1,10 +1,7 @@
+# Role colors + badges come from UplinkHelper (uplink_role_class /
+# uplink_role_badge) so a hackr reads the same on the WIRE and in chat
+# (tokens.css --role-*; ledger redesign 2026-10).
 module WireHelper
-  ROLE_COLORS = {
-    "admin" => "#ff4444",
-    "operator" => "#c084fc",
-    "operative" => "#22d3ee"
-  }.freeze
-
   def wire_text(pulse)
     WireTextRenderer.render(pulse.content, poster_is_admin: pulse.grid_hackr.role == "admin")
   end
@@ -13,19 +10,12 @@ module WireHelper
     BioTextRenderer.render(text)
   end
 
-  # PulseCard.tsx formatTimestamp: relative under 7 days, "Mon D" after.
-  def wire_timestamp(time)
-    seconds = Time.current - time
-    return "just now" if seconds < 60
-    return "#{(seconds / 60).floor}m ago" if seconds < 1.hour
-    return "#{(seconds / 1.hour).floor}h ago" if seconds < 1.day
-    return "#{(seconds / 1.day).floor}d ago" if seconds < 7.days
+  # One-line plain-text excerpt for the "[>] re @alias · …" quote line
+  # on a splice row; a dropped parent reads as redacted.
+  def wire_excerpt(pulse, length: 80)
+    return "[PULSE DROPPED]" if pulse.pulse_dropped?
 
-    time.strftime("%b %-d")
-  end
-
-  def role_color(role)
-    ROLE_COLORS.fetch(role, "#888")
+    pulse.content.to_s.squish.truncate(length)
   end
 
   # ProfileHeader.tsx formatLastActive (+ its 5-minute "online now" rule).

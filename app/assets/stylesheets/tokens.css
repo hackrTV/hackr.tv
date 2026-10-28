@@ -8,8 +8,10 @@
 
    Sanctioned sub-identities intentionally NOT tokenized here: auth terminal
    phosphor set (#0a0a1e / #4a4a6a / #330000 / #ff0000 / #00ffff), terminal
-   easter-egg greens (#33cc33 / #33aa33), uplink role badge colors, wire echo
-   blue (#60a5fa), pinned gold (#facc15), tactical topic violet (#c084fc).
+   easter-egg greens (#33cc33 / #33aa33), wire echo blue (#60a5fa),
+   tactical topic violet (#c084fc). Pins read in --warn on both the WIRE
+   and Uplink (the old #facc15 gold is gone, 2026-10); role colors became
+   tokens (--role-*) when the WIRE adopted Uplink's set the same month.
 
    The *-rgb triplets exist for rgba() alpha variants:
    rgba(var(--accent-rgb), 0.5). Keep them in sync with their hex twin. */
@@ -32,6 +34,11 @@
   --accent-bright-rgb: 167, 139, 250;
   --accent-alt: #22d3ee;
   --accent-alt-rgb: 34, 211, 238;
+
+  /* roles (author names, badges — uplink + wire) */
+  --role-admin: #00d4ff;
+  --role-operator: #ffaa00;
+  --role-operative: #cc0088;
 
   /* edges + muted text (gray consolidation 2026-09-13; #555 collapsed
      into --fg-faint) */

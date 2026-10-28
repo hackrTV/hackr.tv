@@ -1,0 +1,8 @@
+<%# A reply posted from a thread's prompt: the author's own row lands in
+    the open thread list (the broadcast copy dedupes by id), the root's
+    "↩ n" refreshes, the prompt's error slot clears. %>
+<%= turbo_stream.append "pulse_#{@root.id}_thread_list", partial: "wire/pulse_entry",
+  locals: {pulse: @pulse, viewer: current_hackr, echoed: false, in_thread: true} %>
+<%= turbo_stream.replace "pulse_#{@root.id}_splice_count", partial: "wire/splice_count", locals: {pulse: @root} %>
+<%= turbo_stream.replace "pulse_#{@root.id}_reply_error", partial: "wire/composer_error",
+  locals: {id: "pulse_#{@root.id}_reply_error", error: nil} %>

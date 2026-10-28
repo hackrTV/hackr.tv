@@ -1,0 +1,5 @@
+<%# The "↩ n" number, replaced alone by the model's splice broadcasts
+    (like _echo_count). Locals: pulse, count (default: the pulse's
+    thread-wide splice_count; nil or 0 renders empty). %>
+<% count = local_assigns.fetch(:count) { pulse.splice_count } %>
+<span id="pulse_<%= pulse.id %>_splice_count" class="splice-count"><%= count if count && count > 0 %></span>

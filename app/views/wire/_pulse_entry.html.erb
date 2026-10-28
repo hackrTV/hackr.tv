@@ -1,0 +1,21 @@
+<%# One feed/profile/thread entry (ledger redesign, 2026-10): the row and,
+    for a root pulse, its inline thread frame as SIBLINGS — empty until
+    opened, or pre-filled through `thread_content` (the deep-link page) —
+    so a drop broadcast that replaces #pulse_N leaves an open thread
+    alone, while delete removes #pulse_N_entry whole. Prepend (feed) and
+    append (thread list) broadcasts render this partial.
+    Locals: pulse (required); viewer, echoed, indicator, indicator_alias,
+    pinnable, pinned, can_up, can_down, in_thread, parent, reply_count
+    (see pulse_row); thread_content. %>
+<%
+  thread = !pulse.is_splice?
+  row_locals = local_assigns.slice(:viewer, :echoed, :indicator, :indicator_alias, :pinnable, :pinned,
+    :can_up, :can_down, :in_thread, :parent, :reply_count)
+  row_locals[:thread_frame] = "pulse_#{pulse.id}_thread" if thread
+%>
+<div id="pulse_<%= pulse.id %>_entry" class="wire-entry" data-at="<%= (pulse.pulsed_at.to_f * 1000).to_i %>">
+  <%= render "wire/pulse_row", pulse: pulse, **row_locals %>
+  <% if thread %>
+    <%= turbo_frame_tag "pulse_#{pulse.id}_thread", class: "wire-thread", target: "_top" do %><%= local_assigns[:thread_content] %><% end %>
+  <% end %>
+</div>

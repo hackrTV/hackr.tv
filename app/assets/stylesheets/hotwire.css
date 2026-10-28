@@ -681,69 +681,21 @@
 .prerelease-banner-text { color: var(--warn); }
 
 /* --- PulseWire pages (Phase 3) ---
- * Ports of the inline style objects in HotwirePage / PulseCard /
- * ProfileHeader / UserPulsesPage / SinglePulsePage; the class-based
- * styles live in pulse_wire.css and are reused as-is. */
+ * The page/row/profile families live in pulse_wire.css (ledger rows,
+ * 2026-10). Kept here: the text-renderer output classes and the
+ * logged-out prompt, which predate the redesign. */
 
-.wire-page { max-width: 800px; margin: 0 auto; padding-top: 30px; }
-.wire-inline-form { display: inline; }
-/* Author display beats the UA [hidden] rule — without this the hidden
-   owner-only delete form renders for every viewer (Phase 5 find). */
-.wire-inline-form[hidden] { display: none; }
-.wire-loading { text-align: center; padding: 40px; }
-.wire-empty-sub { color: var(--edge-bright); font-size: 0.8rem; margin-top: 10px; }
-.wire-end-sub { color: var(--edge-bright); font-size: 0.75rem; margin-top: 10px; }
-.wire-section-title { color: #7a8a9a; letter-spacing: 0.1em; font-size: 0.8rem; margin-bottom: 10px; font-family: var(--font-tui); }
-
-.wire-login-prompt { padding: 20px; text-align: center; background: rgba(var(--accent-rgb), 0.1); border: 1px solid var(--accent); margin-bottom: 30px; }
+.wire-login-prompt { padding: 20px; text-align: center; background: rgba(var(--accent-rgb), 0.1); border: 1px solid var(--accent); margin: 10px 8px; }
 .wire-login-prompt-lede { margin: 0 0 10px 0; color: var(--accent-bright); }
 .wire-login-prompt-lede a { color: #60a5fa; text-decoration: none; }
-.wire-login-prompt-sub { margin: 0; color: var(--fg-faint); font-size: 0.8rem; font-family: var(--font-tui); }
+.wire-login-prompt-sub { margin: 0; color: var(--fg-faint); font-size: 12px; font-family: var(--font-tui); }
 
 .wire-external-link { color: #60a5fa; text-decoration: underline; }
 .wire-censored { color: var(--err); font-style: italic; }
 .codex-link { color: var(--accent-alt); }
 .bio-mention { color: var(--accent-alt); }
 
-.wire-echo-indicator, .wire-splice-indicator { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 8px 15px; margin-bottom: -3px; font-family: var(--font-tui); }
-.wire-echo-indicator { color: #60a5fa; background: rgba(96, 165, 250, 0.1); border-left: 3px solid #60a5fa; border-top: 1px solid rgba(96, 165, 250, 0.3); border-right: 1px solid rgba(96, 165, 250, 0.3); }
-.wire-splice-indicator { color: var(--accent-bright); background: rgba(var(--accent-bright-rgb), 0.1); border-left: 3px solid var(--accent-bright); border-top: 1px solid rgba(var(--accent-bright-rgb), 0.3); border-right: 1px solid rgba(var(--accent-bright-rgb), 0.3); }
-.wire-indicator-icon { font-size: 1.1rem; }
-.wire-indicator-link { color: #c4b5fd; text-decoration: underline; }
-
-.pin-move-button { background: none; border: none; cursor: pointer; color: #facc15; padding: 0; font-size: 0.95rem; }
-.pin-button { background: none; border: none; cursor: pointer; color: var(--fg-muted); padding: 0; font-size: 0.85rem; }
-.pin-button--pinned { color: #facc15; }
-.pinned-pulses { margin-bottom: 24px; padding: 16px; border: 1px solid rgba(250, 204, 21, 0.35); background: rgba(250, 204, 21, 0.04); }
-.pinned-pulses-title { color: #facc15; letter-spacing: 0.1em; font-size: 0.8rem; margin-bottom: 10px; font-family: var(--font-tui); }
-
-/* Profile header (ProfileHeader.tsx) */
-.wire-profile-header { border: 1px solid #2a3a4a; background: rgba(10, 20, 30, 0.6); padding: 24px; margin-bottom: 24px; font-family: var(--font-tui); }
-.wire-profile-title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.wire-profile-alias { margin: 0; font-size: 2em; color: #fff; }
-.wire-role-badge { border: 1px solid var(--fg-muted); color: var(--fg-muted); padding: 2px 8px; font-size: 0.7em; letter-spacing: 0.1em; text-transform: uppercase; }
-.wire-cl-badge { border: 1px solid #facc15; color: #facc15; padding: 2px 8px; font-size: 0.7em; letter-spacing: 0.1em; }
-.wire-share-button { margin-left: auto; background: none; border: 1px solid #2a3a4a; color: var(--accent-alt); padding: 4px 10px; cursor: pointer; font-family: inherit; font-size: 0.8em; }
-.wire-profile-meta { margin-top: 6px; color: #7a8a9a; font-size: 0.85em; display: flex; gap: 14px; flex-wrap: wrap; }
-.wire-online { color: var(--ok); }
-.wire-profile-bio { margin-top: 16px; }
-.wire-bio-view { color: #c0d0e0; line-height: 1.5; }
-.wire-bio-text { white-space: pre-wrap; word-break: break-word; }
-.wire-bio-empty { color: #566b7a; font-style: italic; }
-.wire-bio-edit-link { margin-left: 10px; background: none; border: none; color: var(--accent-alt); cursor: pointer; font-family: inherit; font-size: 0.8em; text-decoration: none; }
-.wire-bio-textarea { width: 100%; resize: vertical; font-family: inherit; background: #0a141e; color: var(--fg-bright); border: 1px solid #2a3a4a; padding: 8px; box-sizing: border-box; }
-.wire-bio-edit-footer { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.wire-bio-save { background: var(--accent-alt); color: var(--bg-0); border: none; padding: 6px 14px; cursor: pointer; font-family: inherit; font-weight: bold; }
-.wire-bio-cancel { background: none; color: var(--fg-muted); border: 1px solid #2a3a4a; padding: 6px 14px; cursor: pointer; font-family: inherit; text-decoration: none; }
-.wire-bio-counter { margin-left: auto; }
-.wire-bio-error { color: var(--err); margin: 8px 0 0; }
-.wire-stat-tiles { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
-.wire-stat-tile { border: 1px solid #1f2f3f; background: rgba(20, 30, 40, 0.5); padding: 10px; text-align: center; }
-.wire-stat-value { color: #fff; font-size: 1.4em; font-weight: bold; }
-.wire-stat-label { color: #7a8a9a; font-size: 0.65em; letter-spacing: 0.08em; margin-top: 4px; }
-
 .wire-not-found { padding-top: 40px; text-align: center; }
-.wire-thread-back { margin-bottom: 20px; margin-top: 10px; }
 
 /* --- World Feed terminal (Phase 3, WorldFeedPage.tsx port) --- */
 .feed-wrapper { display: flex; justify-content: center; padding: 20px; min-height: 80vh; }

@@ -1,8 +1,9 @@
-<%# One lazily-loaded pagination chunk: this page's cards + the next
+<%# One lazily-loaded pagination chunk: this page's entries + the next
     lazy frame (or the end-of-feed marker). target=_top on the frame is
     set by the pager partial; links inside must navigate the page. %>
 <%= turbo_frame_tag "wire-page-#{@page}", target: "_top" do %>
-  <%= render partial: "wire/pulse_card", collection: @pulses, as: :pulse,
-    locals: {viewer: current_hackr} %>
+  <% @pulses.each do |pulse| %>
+    <%= render "wire/pulse_entry", pulse: pulse, viewer: current_hackr, echoed: @echoed_ids.include?(pulse.id) %>
+  <% end %>
   <%= render "wire/feed_pager" %>
 <% end %>
