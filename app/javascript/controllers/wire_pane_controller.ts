@@ -1,12 +1,17 @@
 import { Controller } from '@hotwired/stimulus'
 import { localizeTimeElement } from '~/utils/localTime'
+import { readCookie, writeCookie } from '~/utils/cookie'
+import { WIDE_MIN_WIDTH, WIDE_QUERY } from '~/utils/wireLayout'
 
 // The feed's context pane: a column beside the ledger (viewports ≥
-// PANE_MIN_WIDTH; open by default from OPEN_DEFAULT_MIN_WIDTH, remembered
-// in localStorage) showing the selected root's thread or an operative's
-// record, loaded into turbo-frame#wire-pane from the same URLs the rows
-// link to (WireController branches on the frame id). Mounted on
-// .wire-page beside wire-keys and wire-feed; open → data-pane="open".
+// WIDE_MIN_WIDTH; open by default from OPEN_DEFAULT_MIN_WIDTH, remembered
+// in the wire_pane cookie the server renders from) showing the selected
+// root's thread or an operative's record, loaded into
+// turbo-frame#wire-pane from the same URLs the rows link to
+// (WireController branches on the frame id). Mounted on .wire-page
+// beside wire-keys and wire-feed; open → data-pane="open". In MUTT mode
+// (.wire-page[data-view="mutt"]) the pane is the pager: always on, the
+// toggles inert.
 // Rows OFFER their loads through a cancelable wire-row:pane event: an
 // active pane claims it (preventDefault + load), otherwise the row's
 // inline frame / profile visit runs. wire-keys' wire:cursor is followed
@@ -17,10 +22,8 @@ import { localizeTimeElement } from '~/utils/localTime'
 // root, or the streams would hit the inline copy first. A Turbo cache
 // restore brings the frame back with its src; the selection is
 // re-marked from it.
-const PANE_MIN_WIDTH = 1100
-const PANE_QUERY = `(min-width: ${PANE_MIN_WIDTH}px)`
 const OPEN_DEFAULT_MIN_WIDTH = 1280
-const STORAGE_KEY = 'wire:pane'
+const COOKIE = 'wire_pane'
 const FOLLOW_MS = 200
 const THREAD_PATH = /^\/wire\/pulse\/(\d+)$/
 
@@ -53,10 +56,11 @@ export default class extends Controller<HTMLElement> {
 
   connect (): void {
     this.clearMarks()
-    this.media = typeof window.matchMedia === 'function' ? window.matchMedia(PANE_QUERY) : null
+    this.media = typeof window.matchMedia === 'function' ? window.matchMedia(WIDE_QUERY) : null
     this.media?.addEventListener('change', this.mediaChanged)
-    const stored = this.read()
+    const stored = readCookie(COOKIE)
     this.open = stored ? stored === 'open' : window.innerWidth >= OPEN_DEFAULT_MIN_WIDTH
+    if (!stored) this.store() // the first visit's default is the choice until changed — rendered first-paint next time
     this.apply()
     if (this.hasFrameTarget) {
       this.frameTarget.addEventListener('turbo:frame-load', this.frameLoaded)
@@ -86,6 +90,7 @@ export default class extends Controller<HTMLElement> {
   // [>] CONTEXT, the c key (wire-keys:pane). Opening onto a cursor row
   // shows that thread right away.
   toggle (): void {
+    if (this.mutt()) return
     this.setOpen(!this.open)
     if (!this.active()) return
     const cursor = this.element.querySelector<HTMLElement>('.wire-row--cursor')
@@ -96,6 +101,7 @@ export default class extends Controller<HTMLElement> {
 
   // The pane's [x].
   close (): void {
+    if (this.mutt()) return
     this.setOpen(false)
   }
 
@@ -177,11 +183,15 @@ export default class extends Controller<HTMLElement> {
 
   private setOpen (open: boolean): void {
     this.open = open
-    this.store(open ? 'open' : 'closed')
+    this.store()
     this.apply()
   }
 
   private apply (): void {
+    if (this.mutt()) { // the shell's own grid places the pager; data-pane would drag the two-column rules in
+      delete this.element.dataset.pane
+      return
+    }
     const active = this.active()
     if (active) this.element.dataset.pane = 'open'
     else delete this.element.dataset.pane
@@ -190,7 +200,12 @@ export default class extends Controller<HTMLElement> {
   }
 
   private active (): boolean {
-    return this.open && (this.media ? this.media.matches : window.innerWidth >= PANE_MIN_WIDTH)
+    if (this.mutt()) return true
+    return this.open && (this.media ? this.media.matches : window.innerWidth >= WIDE_MIN_WIDTH)
+  }
+
+  private mutt (): boolean {
+    return this.element.dataset.view === 'mutt'
   }
 
   private empty (): void {
@@ -244,11 +259,7 @@ export default class extends Controller<HTMLElement> {
     return new URL(url, window.location.href).href
   }
 
-  private read (): string | null {
-    try { return window.localStorage.getItem(STORAGE_KEY) } catch { return null }
-  }
-
-  private store (value: string): void {
-    try { window.localStorage.setItem(STORAGE_KEY, value) } catch { /* private mode / blocked storage */ }
+  private store (): void {
+    writeCookie(COOKIE, this.open ? 'open' : 'closed')
   }
 }

@@ -255,10 +255,65 @@ RSpec.describe "Hotwire wire feed", type: :system do
     expect(page).to have_content("Narrow root")
     expect(page).to have_no_css(".wire-page[data-pane='open']")
     expect(page).to have_no_css(".wire-bar-pane", visible: true)
+    expect(page).to have_no_css(".wire-bar-view", visible: true)
     within("#pulse_#{root.id}") { find(".splice-button").click }
     within("#pulse_#{root.id}_thread") { expect(page).to have_content("Narrow splice") }
+    find("body").send_keys("v") # MUTT needs the width too
+    expect(page).to have_no_css(".wire-page.wire-mutt")
+    expect(page).to have_content("Narrow splice")
   ensure
     page.driver.resize(1400, 900)
+  end
+
+  it "reads the WIRE as mutt: v flips to the index/pager shell, the cursor opens on the first line, flags mark own/echoed/new, v returns" do
+    mine = create(:pulse, grid_hackr: hackr, content: "My index line", pulsed_at: 2.minutes.ago)
+    target = create(:pulse, grid_hackr: other, content: "Index target", pulsed_at: 1.minute.ago)
+    create(:pulse, grid_hackr: other, content: "Target splice", parent_pulse_id: target.id)
+
+    using_session(:poster) do
+      log_in!(other)
+      visit "/wire"
+      expect(page).to have_content("Index target")
+    end
+
+    log_in!(hackr)
+    visit "/wire"
+    expect(page).to have_css(".wire-bar-view", text: "[≡] MUTT")
+    find("body").send_keys("v")
+    expect(page).to have_css(".wire-page.wire-mutt") # the cookie + an in-place visit
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all, wait: 10)
+    expect(page).to have_css("#pulse_#{target.id}.wire-row--cursor") # the newest line
+    within("#wire-pane") { expect(page).to have_content("Target splice") } # the pager followed
+    expect(page).to have_css(".wire-mutt-status", text: "[Pulses:2 New:0]")
+    expect(page).to have_css(".wire-mutt-status", text: "(1/2)")
+    expect(page).to have_css("#pulse_#{mine.id} .wire-fl--f", visible: true)
+    expect(page).to have_css("#pulse_#{target.id} .wire-fl--f", visible: :hidden)
+    expect(page).to have_css("#pulse_#{target.id} .wire-fl--e", visible: :hidden)
+    find("body").send_keys("e")
+    expect(page).to have_css("#pulse_#{target.id} .wire-fl--e", visible: true)
+
+    using_session(:poster) do
+      fill_in "content", with: "Fresh arrival."
+      click_button "Broadcast"
+      expect(page).to have_content("Fresh arrival.")
+    end
+
+    expect(page).to have_content("Fresh arrival.", wait: 10)
+    fresh = Pulse.find_by!(content: "Fresh arrival.")
+    expect(page).to have_css("#pulse_#{fresh.id} .wire-fl--n", visible: true)
+    expect(page).to have_css(".wire-mutt-status", text: "[Pulses:3 New:1]")
+    find("body").send_keys("k") # reading it clears N
+    expect(page).to have_css("#pulse_#{fresh.id}.wire-row--cursor")
+    expect(page).to have_css("#pulse_#{fresh.id} .wire-fl--n", visible: :hidden)
+    expect(page).to have_css(".wire-mutt-status", text: "New:0]")
+    expect(page).to have_css(".wire-mutt-status", text: "(1/3)")
+
+    find("body").send_keys("v")
+    expect(page).to have_no_css(".wire-page.wire-mutt")
+    expect(page).to have_css(".wire-bar-view", text: "[≡] MUTT")
+    visit "/wire"
+    expect(page).to have_content("Index target")
+    expect(page).to have_no_css(".wire-page.wire-mutt") # remembered
   end
 
   it "shows the owner's delete control without hover on a phone-width viewport" do

@@ -110,12 +110,51 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to match(/<turbo-frame[^>]*id="pulse_#{pulse.id}_thread"/)
       expect(response.body).to include("wire-author--admin")
       expect(response.body).to include("wire-badge--admin")
-      expect(response.body).to include('data-controller="wire-keys wire-feed wire-pane"')
+      expect(response.body).to include('data-controller="wire-keys wire-feed wire-pane wire-view"')
       expect(response.body).to include("[&gt;] CONTEXT")
       expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
       expect(response.body).to include("// SELECT A PULSE //")
+      expect(response.body).to include("[≡] MUTT")
+      expect(response.body).to include(%(<span class="wire-ix-id" aria-hidden="true">#{pulse.id}</span>)) # MUTT's index cells ride every row
+      expect(response.body).to include("wire-fl--d")
       expect(response.body).not_to include("⟳")
       expect(response.body).not_to include("📌")
+    end
+
+    it "renders the ledger with the pane open from the wire_pane cookie" do
+      log_in!
+      cookies[:wire_pane] = "open"
+
+      get "/wire"
+
+      expect(response.body).to match(/<div class="wire-page" data-view="ledger"[^>]* data-pane="open"/)
+      expect(response.body).to include("chrome-content")
+    end
+
+    it "renders MUTT mode from the wire_view cookie: the index/pager shell without the page chrome" do
+      pulse = make_pulse(hackr, content: "Index line")
+      log_in!
+      cookies[:wire_view] = "mutt"
+
+      get "/wire"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('class="wire-page wire-mutt" data-view="mutt"')
+      expect(response.body).to include('data-wire-view-total-value="1"')
+      expect(response.body).to include("wire-ix-head")
+      expect(response.body).to include("wire-mutt-status")
+      expect(response.body).to include("wire-mutt-keys")
+      expect(response.body).to include("[≡] LEDGER")
+      expect(response.body).to include("// NO PULSE SELECTED //")
+      expect(response.body).to include(%(id="pulse_#{pulse.id}_entry"))
+      expect(response.body).to include("Broadcast on the WIRE...")
+      expect(response.body).to include("turbo-cable-stream-source")
+      expect(response.body).not_to include("chrome-content")
+      expect(response.body).not_to include("[&gt;] CONTEXT")
+
+      get "/wire", params: {page: 2} # lazy pages are frames whatever the view
+      expect(response.body).to include(%(id="wire-page-2"))
+      expect(response.body).not_to include("wire-mutt")
     end
   end
 

@@ -19,9 +19,9 @@ function row (id: number, root = true): string {
     </div>`
 }
 
-function page (rows: string, pane = '', src: string | null = null): string {
+function page (rows: string, pane = '', src: string | null = null, view = ''): string {
   return `
-    <div class="wire-page" data-controller="wire-pane" data-action="wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle">
+    <div class="wire-page"${view ? ` data-view="${view}"` : ''} data-controller="wire-pane" data-action="wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle">
       <div class="wire-bar"><button class="wire-bar-pane" aria-pressed="false" data-wire-pane-target="toggle" data-action="click->wire-pane#toggle">[>] CONTEXT</button></div>
       <div class="wire-main"><div id="wire-feed">${rows}</div></div>
       <aside class="wire-pane">
@@ -72,10 +72,12 @@ describe('WirePaneController', () => {
     document.getElementById(rowId)!.dispatchEvent(new CustomEvent('wire:cursor', { bubbles: true }))
   }
 
+  const cookie = (): string | null => document.cookie.match(/(?:^|; )wire_pane=([^;]*)/)?.[1] ?? null
+
   beforeEach(() => {
     wide = true
     mediaListener = null
-    localStorage.clear()
+    document.cookie = 'wire_pane=; path=/; max-age=0'
     vi.stubGlobal('matchMedia', vi.fn(() => ({
       get matches (): boolean { return wide },
       addEventListener: (_: string, fn: () => void): void => { mediaListener = fn },
@@ -92,24 +94,40 @@ describe('WirePaneController', () => {
     vi.unstubAllGlobals()
   })
 
-  it('opens by default on a wide first visit, stays closed under 1280px, and honors the remembered choice', async () => {
+  it('opens by default on a wide first visit (writing the cookie), stays closed under 1280px, and honors the remembered choice', async () => {
     await start(page(row(1)))
     expect(pageEl().dataset.pane).toBe('open')
     expect(toggle().getAttribute('aria-pressed')).toBe('true')
+    expect(cookie()).toBe('open') // the server renders it open from here on
 
+    document.cookie = 'wire_pane=; path=/; max-age=0'
     width(1200)
     await start(page(row(1)))
     expect(pageEl().dataset.pane).toBeUndefined()
     expect(toggle().getAttribute('aria-pressed')).toBe('false')
+    expect(cookie()).toBe('closed')
 
-    localStorage.setItem('wire:pane', 'open')
+    document.cookie = 'wire_pane=open; path=/'
     await start(page(row(1)))
     expect(pageEl().dataset.pane).toBe('open')
 
     width(1400)
-    localStorage.setItem('wire:pane', 'closed')
+    document.cookie = 'wire_pane=closed; path=/'
     await start(page(row(1)))
     expect(pageEl().dataset.pane).toBeUndefined()
+  })
+
+  it('is the pager in MUTT mode: always on without data-pane (the shell lays it out), the toggles inert', async () => {
+    document.cookie = 'wire_pane=closed; path=/'
+    await start(page(row(1), '', null, 'mutt'))
+    expect(pageEl().dataset.pane).toBeUndefined()
+
+    toggle().click()
+    pageEl().dispatchEvent(new CustomEvent('wire-keys:pane'))
+    expect(pageEl().dataset.pane).toBeUndefined()
+    expect(cookie()).toBe('closed') // untouched
+    expect(offer('pulse_1', { url: '/wire/pulse/1', select: '1' }).defaultPrevented).toBe(true)
+    expect(frame().getAttribute('src')).toBe('/wire/pulse/1')
   })
 
   it('toggles from the bar, the c key (wire-keys:pane) and the pane\'s [x], remembering the choice; opening onto a cursor row shows it', async () => {
@@ -118,12 +136,12 @@ describe('WirePaneController', () => {
     toggle().click()
     expect(pageEl().dataset.pane).toBeUndefined()
     expect(toggle().getAttribute('aria-pressed')).toBe('false')
-    expect(localStorage.getItem('wire:pane')).toBe('closed')
+    expect(cookie()).toBe('closed')
 
     document.getElementById('pulse_2')!.classList.add('wire-row--cursor')
     pageEl().dispatchEvent(new CustomEvent('wire-keys:pane'))
     expect(pageEl().dataset.pane).toBe('open')
-    expect(localStorage.getItem('wire:pane')).toBe('open')
+    expect(cookie()).toBe('open')
     expect(frame().getAttribute('src')).toBe('/wire/pulse/2')
     expect(sel()).toBe('pulse_2')
 
@@ -261,7 +279,7 @@ describe('WirePaneController', () => {
     expect(pageEl().dataset.pane).toBeUndefined()
     expect(frame().hasAttribute('src')).toBe(false)
     expect(sel()).toBeUndefined()
-    expect(localStorage.getItem('wire:pane')).toBeNull()
+    expect(cookie()).toBe('open') // availability is not a choice
 
     wide = true
     mediaListener?.()

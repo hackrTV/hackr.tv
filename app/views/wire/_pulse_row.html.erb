@@ -19,7 +19,11 @@
                          a splice outside a thread quotes it ("[>] re
                          @alias · …"), inside one only a non-root parent
       reply_count      — the ↩ number (default: the root's thread-wide
-                         splice_count; nil hides the number) %>
+                         splice_count; nil hides the number)
+    The #id cell and the N F E D flag cells exist for MUTT mode's index
+    (CSS shows them there): N live arrival (wire-view), F from the
+    viewer (wire-row's --own), E echoed by the viewer (:has(.echoed)),
+    D dropped (--dropped). %>
 <%
   viewer = local_assigns.fetch(:viewer, nil)
   echoed = local_assigns.fetch(:echoed, false)
@@ -47,6 +51,8 @@
   data-action="wire:open->wire-row#openThread wire:reply->wire-row#reply">
   <time class="wire-time" datetime="<%= pulse.pulsed_at.iso8601 %>" title="<%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M %Z") %>"
     data-wire-row-target="time"><%= pulse.pulsed_at.strftime("%H:%M") %></time>
+  <span class="wire-ix-id" aria-hidden="true"><%= pulse.id %></span>
+  <span class="wire-ix-flags" aria-hidden="true"><i class="wire-fl wire-fl--n">N</i><i class="wire-fl wire-fl--f">F</i><i class="wire-fl wire-fl--e">E</i><i class="wire-fl wire-fl--d">D</i></span>
   <div class="wire-who">
     <%= link_to "@#{author.hackr_alias}", wire_user_path(author.hackr_alias.downcase), class: "wire-author wire-author--#{role}",
       data: {action: "click->wire-row#author"} %>
