@@ -1,0 +1,48 @@
+<%# MUTT mode (cookie wire_view=mutt, 2026-10): the ledger as mutt's
+    index + pager — a full-height shell outside the page chrome, sized
+    like the Uplink shell. Top to bottom: the bar, the index header row,
+    the index (the same entries the ledger renders, reshaped by CSS into
+    one-liners: cursor column, #id, N F E D flags, time, operative,
+    counts, excerpt), the status line, the pager (the context pane,
+    always on), the > prompt, the key bar. wire-view fills the status
+    line, flags live arrivals N and switches back (v / [≡] LEDGER);
+    wire-keys opens on the first line; the pane/feed/row controllers are
+    the ledger's. Under 1100px it degrades to a plain stack. %>
+<div class="wire-page wire-mutt" data-view="mutt"
+  data-controller="wire-keys wire-feed wire-pane wire-view" data-wire-view-total-value="<%= @total %>"
+  data-action="keydown@document->wire-keys#key wire:cursor->wire-pane#follow wire:cursor->wire-view#cursor wire-row:pane->wire-pane#claim wire-keys:view->wire-view#toggle">
+  <div class="wire-bar" data-controller="wire-status">
+    <h1 class="wire-bar-title" title="Wideband Information Relay Emitter">The WIRE</h1>
+    <span class="wire-bar-sub">MUTT MODE · ALL TRAFFIC · NEWEST FIRST</span>
+    <span class="status-disconnected" data-wire-status-target="badge">◌ CONNECTING</span>
+    <button type="button" class="wire-bar-view" title="Back to the ledger (v)" aria-pressed="true" data-action="click->wire-view#toggle">[≡] LEDGER</button>
+    <button type="button" class="wire-bar-keys" title="Keyboard shortcuts" data-action="click->wire-keys#toggleLegend">[?] KEYS</button>
+  </div>
+
+  <div class="wire-ix-head" aria-hidden="true">
+    <span></span><span>#</span><span>FL</span><span>TIME</span><span>OPERATIVE</span><span class="wire-ix-head-counts">↻ ↩</span><span>PULSE</span>
+  </div>
+
+  <div class="wire-index">
+    <%= turbo_stream_from "wire_html" %>
+    <%= render "wire/feed_entries" %>
+    <%= render "wire/feed_pager" %>
+  </div>
+
+  <div class="wire-mutt-status" data-wire-view-target="status"></div>
+
+  <aside class="wire-pane" aria-label="Pager">
+    <%= turbo_frame_tag "wire-pane", target: "_top", data: {wire_pane_target: "frame"} %>
+    <div class="wire-pane-empty">
+      <span>// NO PULSE SELECTED //</span>
+      <span class="wire-pane-empty-sub">j / k walk the index · enter opens</span>
+    </div>
+  </aside>
+
+  <%= render(logged_in? ? "wire/composer" : "wire/login_prompt") %>
+
+  <div class="wire-mutt-keys" aria-hidden="true">
+    <span><b>j/k</b>move</span><span><b>enter</b>open</span><span><b>e</b>echo</span><span><b>r</b>reply</span><span><b>a</b>operative</span><span><b>x x</b>delete</span><span><b>g/G</b>top/end</span><span><b>/</b>compose</span><span><b>v</b>ledger</span><span><b>?</b>keys</span>
+  </div>
+  <%= render "wire/keys_legend" %>
+</div>

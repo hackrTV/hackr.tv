@@ -1,7 +1,7 @@
 ---
 title: PulseWire + WIRE Profiles
 area: Social & Comms
-minutes: 30
+minutes: 36
 ---
 # PulseWire (/wire) + Profiles
 
@@ -9,7 +9,8 @@ The WIRE is a ledger (2026-10): one dense row per pulse — `HH:MM` gutter,
 role-colored `@alias` + ADMIN/OP badge, body, `↻ n` echoes / `↩ n` replies
 on the right — under a one-line `>` prompt, with threads expanding inline
 under their root or, on wide screens, reading in the context pane beside
-the feed. Keyboard: `?` shows the legend.
+the feed — or, as MUTT mode (`v`), a one-line index over a pager.
+Keyboard: `?` shows the legend.
 
 ## Steps — feed + posting
 
@@ -70,29 +71,52 @@ the feed. Keyboard: `?` shows the legend.
 13. Narrow the window under 1100px. → The pane and `[>] CONTEXT` go away
     and threads stay inline; widen it again. → They return (the pane
     empty until a row is selected).
-14. Single-pulse permalink: open `/wire/pulse/<id>`. → `< WIRE  Thread
+14. **MUTT mode** (desktop ≥1100px): press `v` (or `[≡] MUTT`). → The
+    page reloads as a full-height split with no page chrome: bar, a
+    `# FL TIME OPERATIVE ↻ ↩ PULSE` header, the index (one line per
+    pulse: `>` on the cursor line, #id, flags, time, alias, counts,
+    the body clipped to one line), a `-*-WIRE: ALL TRAFFIC [Pulses:n
+    New:0]---(1/n)---(p%)---` status line, the pager (the thread of the
+    cursor line, opened at once on the newest), the `>` prompt, a key
+    bar. `j`/`k` move the cursor and the pager follows; the status line
+    tracks `(i/n)`; `Enter` = open; the index and pager scroll on their
+    own, the page never does.
+15. **Flags**: your own pulses show `F`; echo a line (`e`) → `E` appears
+    next to it; a dropped pulse shows `D`. From the second browser,
+    broadcast a pulse. → It lands at the top with `N` (bright text) and
+    the status line reads `New:1`; move the cursor onto it (`k`). → `N`
+    clears, `New:0`.
+16. Reply from the pager (`r`, type, Enter). → Lands in the pager, the
+    line's `↩ n` bumps. Click an alias. → The pager shows the OPERATIVE
+    record (`[>] PROFILE` leads out). Press `v`. → Back to the ledger;
+    reload → still the ledger (cookie); `v` again → MUTT (remembered on
+    reload too, no flash of the other layout).
+17. Narrow the window under 1100px while in MUTT. → It degrades to a
+    plain stack with `[≡] LEDGER` still available; on the ledger under
+    1100px `[≡] MUTT` is hidden and `v` does nothing.
+18. Single-pulse permalink: open `/wire/pulse/<id>`. → `< WIRE  Thread
     n pulses`, the root row with its thread already open.
-15. Phone width (<768px). → Each row is a meta line (time · alias ·
+19. Phone width (<768px). → Each row is a meta line (time · alias ·
     badge · counts) over the body; your `×` is visible without hover;
     the thread indents under the row; the `[?] KEYS` button is hidden.
 
 ## Steps — profiles
 
-16. Visit `/wire/<operative-alias>`. → Status line: `< WIRE  @alias
+20. Visit `/wire/<operative-alias>`. → Status line: `< WIRE  @alias
     ROLE  CLn  MEMBER SINCE <date>  ● activity  [⧉ SHARE]`, the bio
     line, a 6-cell stat strip (WIRE PULSES, ECHOES, PACKETS,
     ACHIEVEMENTS, BREACHES, WATCH TIME); `// BROADCASTS //` rows below
     — own pulses + pulses they echoed (an `ECHO` badge under the alias;
     replies carry the `[>] re` quote line).
-17. Vanity URL `/@<alias>`. → 301s to the profile; case-insensitive
+21. Vanity URL `/@<alias>`. → 301s to the profile; case-insensitive
     (`/@ALIAS` works).
-18. **Bio edit** (own profile): `✎ EDIT` inline, save. → Renders with
+22. **Bio edit** (own profile): `✎ EDIT` inline, save. → Renders with
     @mention linking; an email address in the bio must be REJECTED by
     validation.
-19. **Pin** (`◆ PIN`): pin one of your pulses (max 3). → `// PINNED 1/3
+23. **Pin** (`◆ PIN`): pin one of your pulses (max 3). → `// PINNED 1/3
     //` rows at the top with a gold left bar + `PIN` badge; the pinned
     pulse is not duplicated below.
-20. Pin 3, try a 4th. → Rejected with a clear message.
-21. **Reorder pins** (`↑`/`↓`). → Order persists on reload.
-22. Unpin (`◆ UNPIN`). → Removed from PINNED, back in BROADCASTS once.
-23. View someone else's profile. → No `✎ EDIT`, no pin controls, no `×`.
+24. Pin 3, try a 4th. → Rejected with a clear message.
+25. **Reorder pins** (`↑`/`↓`). → Order persists on reload.
+26. Unpin (`◆ UNPIN`). → Removed from PINNED, back in BROADCASTS once.
+27. View someone else's profile. → No `✎ EDIT`, no pin controls, no `×`.

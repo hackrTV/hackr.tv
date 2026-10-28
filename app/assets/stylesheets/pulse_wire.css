@@ -3,7 +3,9 @@
    author + badges | body | counts — inside the normal page chrome,
    threads expanding inline under their root, a "> " prompt bar on top,
    and, on wide viewports, a context pane beside the feed (the selected
-   root's thread or an operative's record; wire-pane controller).
+   root's thread or an operative's record; wire-pane controller) — or,
+   as MUTT mode, the same entries as a one-line index over a pager in a
+   full-height shell (.wire-mutt; wire-view controller).
    Terminal rules: even-px Terminus sizes (12/14/16/18), no radius, no
    transitions, square dots, tokens (+ the sanctioned wire echo blue
    #60a5fa; pins read in --warn like Uplink's). The .btn/.alert/.form-*
@@ -43,8 +45,8 @@
 .wire-back:hover { color: var(--accent-bright); }
 .wire-online { color: var(--ok); }
 /* Ghost buttons (the Uplink shell's 12px bordered controls). */
-.wire-bar-keys, .wire-bar-pane, .wire-tx, .wire-share, .wire-bio-save, .wire-bio-cancel { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; text-decoration: none; white-space: nowrap; cursor: pointer; }
-.wire-bar-keys:hover, .wire-bar-pane:hover, .wire-bar-pane[aria-pressed="true"], .wire-tx:not(:disabled):hover, .wire-share:hover, .wire-bio-save:hover, .wire-bio-cancel:hover { border-color: var(--accent); color: var(--accent-bright); }
+.wire-bar-keys, .wire-bar-pane, .wire-bar-view, .wire-tx, .wire-share, .wire-bio-save, .wire-bio-cancel { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.wire-bar-keys:hover, .wire-bar-pane:hover, .wire-bar-pane[aria-pressed="true"], .wire-bar-view:hover, .wire-bar-view[aria-pressed="true"], .wire-tx:not(:disabled):hover, .wire-share:hover, .wire-bio-save:hover, .wire-bio-cancel:hover { border-color: var(--accent); color: var(--accent-bright); }
 
 /* ── Prompt bar ("> ") ─────────────────────────────────────────────── */
 .wire-prompt-wrap { margin: 10px 0 6px; padding: 0 8px; }
@@ -166,6 +168,56 @@
 .wire-record-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 0 8px; }
 #wire-pane .wire-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #wire-pane .wire-stat { padding: 4px 8px; }
+
+/* ── MUTT mode (.wire-mutt; cookie wire_view=mutt; ≥1100px) ─────────
+   mutt's index + pager: a full-height shell outside the page chrome
+   (the Uplink shell's sizing — viewport minus the sticky header and the
+   player bar), the ledger's entries reshaped into one-line index rows
+   (cursor column, #id, N F E D flags, time, operative, counts,
+   excerpt), the status line, the pager (the context pane, always on),
+   the > prompt, the key bar. The index cells live in every row and
+   only show here. */
+.wire-ix-id, .wire-ix-flags, .wire-ix-head, .wire-mutt-status, .wire-mutt-keys { display: none; }
+.wire-page.wire-mutt { max-width: none; margin: 0; padding: 0; min-height: 320px; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 11fr) auto minmax(0, 9fr) auto auto; grid-template-areas: "bar" "ixhead" "index" "status" "pager" "prompt" "keys"; border-top: 1px solid var(--edge);
+  height: calc(100vh - var(--site-header-h, 0px) - var(--player-bar-h, 0px));
+  height: calc(100dvh - var(--site-header-h, 0px) - var(--player-bar-h, 0px)); }
+.wire-mutt .wire-bar { grid-area: bar; padding: 6px 12px; }
+.wire-mutt .wire-ix-head { grid-area: ixhead; display: grid; grid-template-columns: 16px 56px 40px 44px 150px 96px minmax(0, 1fr); gap: 0 10px; padding: 2px 8px; border-bottom: 1px solid var(--edge); color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
+.wire-ix-head-counts { text-align: right; }
+.wire-mutt .wire-index { grid-area: index; min-height: 0; overflow-y: auto; padding-top: 2px; }
+.wire-mutt .wire-mutt-status { grid-area: status; display: flex; height: 20px; padding: 0 8px; overflow: hidden; background-color: var(--bg-1); color: var(--fg-muted); font-size: 14px; line-height: 20px; white-space: nowrap; }
+.wire-mutt-fill { flex: 1; overflow: hidden; }
+.wire-mutt .wire-pane { grid-area: pager; display: flex; position: static; min-height: 0; max-height: none; margin: 0; border-width: 0 0 1px; }
+.wire-mutt .wire-pane-close { display: none; } /* the pager is intrinsic */
+.wire-mutt .wire-prompt-wrap, .wire-mutt .wire-login-prompt { grid-area: prompt; margin: 0; padding: 4px 8px; }
+.wire-mutt .wire-mutt-keys { grid-area: keys; display: flex; gap: 14px; height: 24px; padding: 0 12px; overflow: hidden; background-color: var(--bg-1); border-top: 1px solid var(--edge); color: var(--fg-muted); font-size: 12px; line-height: 24px; letter-spacing: 1px; white-space: nowrap; }
+.wire-mutt-keys b { margin-right: 4px; color: var(--fg-bright); }
+/* Index rows: one line each, in mutt's column order. */
+.wire-mutt .wire-index .wire-row { grid-template-columns: 16px 56px 40px 44px 150px 96px minmax(0, 1fr); grid-template-areas: "cur id fl time who side body"; align-items: baseline; padding: 1px 8px; }
+.wire-mutt .wire-index .wire-row::before { content: ""; grid-area: cur; color: var(--accent-bright); font-weight: bold; }
+.wire-mutt .wire-index .wire-row--cursor::before { content: ">"; }
+.wire-mutt .wire-index .wire-ix-id { display: block; grid-area: id; overflow: hidden; color: var(--fg-faint); font-size: 12px; }
+.wire-mutt .wire-index .wire-ix-flags { display: flex; grid-area: fl; color: var(--fg-faint); font-size: 12px; }
+.wire-fl { width: 1ch; visibility: hidden; font-style: normal; }
+.wire-row--new .wire-fl--n { visibility: visible; color: var(--warn); }
+.wire-row--own .wire-fl--f { visibility: visible; color: var(--fg-muted); }
+.wire-row:has(.echo-button.echoed) .wire-fl--e { visibility: visible; color: #60a5fa; }
+.wire-row--dropped .wire-fl--d { visibility: visible; color: var(--err); }
+.wire-mutt .wire-index .wire-who { flex-wrap: nowrap; overflow: hidden; }
+.wire-mutt .wire-index .wire-side { justify-content: flex-end; }
+.wire-mutt .wire-index .wire-body { overflow: hidden; }
+.wire-mutt .wire-index .wire-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wire-mutt .wire-index .wire-row--new .wire-text { color: var(--fg-bright); }
+.wire-mutt .wire-index .wire-thread { display: none; } /* threads read in the pager */
+.wire-mutt .wire-index .wire-day { margin: 2px 0; }
+.wire-mutt .wire-index .wire-loading, .wire-mutt .wire-index .end-of-feed { padding: 6px 8px; }
+/* Narrow (<1100px): the ledger hides its MUTT button; a MUTT page still
+   open there degrades to a plain stack, its LEDGER button the way out. */
+@media (max-width: 1099px) {
+  .wire-page:not(.wire-mutt) .wire-bar-view { display: none; }
+  .wire-page.wire-mutt { display: block; height: auto; overflow: visible; }
+  .wire-mutt .wire-index { overflow: visible; }
+}
 
 /* ── Key legend (?) ────────────────────────────────────────────────── */
 .wire-legend { position: fixed; right: 16px; bottom: calc(var(--player-bar-h, 0px) + 16px); z-index: 20; width: min(320px, calc(100vw - 32px)); box-sizing: border-box; padding: 8px 12px 12px; background: var(--bg-1); border: 1px solid var(--accent); box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6); font-size: 14px; line-height: 18px; }

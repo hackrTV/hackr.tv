@@ -1,0 +1,15 @@
+<%# The feed's entries — the ledger and the MUTT index share them:
+    #wire-feed of root entries (prepend target), or the empty state the
+    first broadcast removes. %>
+<div id="wire-feed" class="wire-feed">
+  <% if @pulses.any? %>
+    <% @pulses.each do |pulse| %>
+      <%= render "wire/pulse_entry", pulse: pulse, viewer: current_hackr, echoed: @echoed_ids.include?(pulse.id) %>
+    <% end %>
+  <% else %>
+    <div class="empty-state" id="wire-empty">
+      <p>The WIRE is silent. Broadcast the first pulse.</p>
+      <p class="wire-empty-sub">Wideband Information Relay Emitter</p>
+    </div>
+  <% end %>
+</div>

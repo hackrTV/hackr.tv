@@ -12,8 +12,8 @@ function row (id: number, opts: { own?: boolean, dropped?: boolean } = {}): stri
     </div>`
 }
 
-const page = (rows: string, pane = ''): string => `
-  <div class="wire-page" data-controller="wire-keys" data-action="keydown@document->wire-keys#key">
+const page = (rows: string, pane = '', view = ''): string => `
+  <div class="wire-page"${view ? ` data-view="${view}"` : ''} data-controller="wire-keys" data-action="keydown@document->wire-keys#key">
     <form><textarea class="wire-prompt-input"></textarea></form>
     <div id="wire-feed">${rows}</div>
     <aside class="wire-pane"><turbo-frame id="wire-pane">${pane}</turbo-frame></aside>
@@ -171,6 +171,10 @@ describe('WireKeysController', () => {
     press('j')
     expect(moved).toHaveBeenCalledTimes(1)
     expect((moved.mock.calls[0]![0] as Event).target).toBe(document.getElementById('pulse_1'))
+    press('Escape')
+    expect(moved).toHaveBeenCalledTimes(2) // the cleared cursor, announced from the page
+    expect((moved.mock.calls[1]![0] as Event).target).toBe(pageEl)
+    press('j')
     press('a')
     expect(author).toHaveBeenCalledTimes(1)
     press('c')
@@ -180,5 +184,35 @@ describe('WireKeysController', () => {
     expect(cursor()).toBe('pulse_2')
     press('j')
     expect(cursor()).toBe('pulse_2')
+  })
+
+  it('v asks for the view switch (wire-keys:view); Enter opens the cursor row only with nothing focused', async () => {
+    await start(page(row(1)))
+    const pageEl = document.querySelector<HTMLElement>('.wire-page')!
+    const view = vi.fn()
+    const opened = vi.fn()
+    pageEl.addEventListener('wire-keys:view', view)
+    document.getElementById('pulse_1')!.addEventListener('wire:open', opened)
+
+    press('v')
+    expect(view).toHaveBeenCalledTimes(1)
+
+    press('j')
+    press('Enter', document.querySelector('.echo-button')!)
+    expect(opened).not.toHaveBeenCalled()
+    press('Enter')
+    expect(opened).toHaveBeenCalledTimes(1)
+  })
+
+  it('opens MUTT mode with the cursor on the first row, a tick after connect', async () => {
+    vi.useFakeTimers()
+    await start(page(row(1) + row(2), '', 'mutt'))
+    const moved = vi.fn()
+    document.querySelector('.wire-page')!.addEventListener('wire:cursor', moved)
+    expect(cursor()).toBeUndefined()
+
+    vi.advanceTimersByTime(1)
+    expect(cursor()).toBe('pulse_1')
+    expect(moved).toHaveBeenCalledTimes(1)
   })
 })

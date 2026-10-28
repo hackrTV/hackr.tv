@@ -11,9 +11,12 @@ import { Controller } from '@hotwired/stimulus'
 // threads are walked in document order, rows inside the context pane
 // never (the pane is read, not walked). Every cursor move dispatches
 // wire:cursor on the row (the pane follows it); c dispatches
-// wire-keys:pane (the pane toggles); a clicks the row's author link
-// (record in the pane, else the profile). x is press-twice (1.5s) on
-// the owner's own row: no native confirm dialog on a TUI.
+// wire-keys:pane (the pane toggles); v dispatches wire-keys:view (the
+// view switches); a clicks the row's author link (record in the pane,
+// else the profile); Enter with nothing focused opens like o (MUTT's
+// index). MUTT mode starts with the cursor on the first row, a tick
+// after connect so the siblings' bindings are up. x is press-twice
+// (1.5s) on the owner's own row: no native confirm dialog on a TUI.
 const ARM_MS = 1500
 
 export default class extends Controller<HTMLElement> {
@@ -35,6 +38,9 @@ export default class extends Controller<HTMLElement> {
     this.closeLegend()
     this.observer = new MutationObserver(() => this.applyCursor())
     this.observer.observe(this.element, { childList: true, subtree: true })
+    if (this.element.dataset.view === 'mutt') {
+      window.setTimeout(() => { if (this.observer && !this.cursor()) this.first() }, 0)
+    }
   }
 
   disconnect (): void {
@@ -56,6 +62,8 @@ export default class extends Controller<HTMLElement> {
     case 'r': event.preventDefault(); this.emit('wire:reply'); break // a prompt may take focus now: no stray "r"
     case 'a': this.press('.wire-author'); break
     case 'c': this.dispatch('pane'); break
+    case 'v': this.dispatch('view'); break
+    case 'Enter': if (event.target === document.body) this.emit('wire:open'); break
     case 'x': this.deleteCursor(); break
     case '/': event.preventDefault(); this.focusPrompt(); break
     case '?': this.toggleLegend(); break
@@ -104,7 +112,7 @@ export default class extends Controller<HTMLElement> {
     this.cursorId = row?.id ?? null
     this.applyCursor()
     row?.scrollIntoView({ block: 'nearest' })
-    row?.dispatchEvent(new CustomEvent('wire:cursor', { bubbles: true }))
+    ;(row ?? this.element).dispatchEvent(new CustomEvent('wire:cursor', { bubbles: true })) // a cleared cursor is announced from the page
   }
 
   private applyCursor (): void {

@@ -6,7 +6,10 @@
 # its own renders — the thread with its root in full, the operative
 # record without the timeline — keyed on that frame id alone, so other
 # frame requests (the bio frame following its redirect) still get the
-# page.
+# page. Two per-browser layout choices ride plain cookies the wire-view
+# / wire-pane controllers write (wire_view=mutt, wire_pane=open), so
+# the first paint is already the chosen shell: MUTT mode is a second
+# render of the feed (wire/_mutt — index + pager, no page chrome).
 class WireController < ApplicationController
   admin_preview! title: "The WIRE"
 
@@ -17,8 +20,11 @@ class WireController < ApplicationController
     @page = [params[:page].to_i, 1].max
     @pulses = Pulse.active.roots.timeline.includes(:grid_hackr)
       .limit(PER_PAGE).offset((@page - 1) * PER_PAGE)
-    @more = Pulse.active.roots.count > @page * PER_PAGE
+    @total = Pulse.active.roots.count
+    @more = @total > @page * PER_PAGE
     @echoed_ids = echoed_ids_for(@pulses)
+    @view = (cookies[:wire_view] == "mutt") ? "mutt" : "ledger"
+    @pane_open = cookies[:wire_pane] == "open"
   end
 
   def profile

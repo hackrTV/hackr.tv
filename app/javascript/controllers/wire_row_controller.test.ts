@@ -79,7 +79,9 @@ describe('WireRowController', () => {
     await start(root(1, 7) + root(2, 8))
 
     expect(document.querySelector<HTMLElement>('#pulse_1 form')!.hidden).toBe(false)
+    expect(document.getElementById('pulse_1')!.classList.contains('wire-row--own')).toBe(true) // MUTT's F flag
     expect(document.querySelector<HTMLElement>('#pulse_2 form')!.hidden).toBe(true)
+    expect(document.getElementById('pulse_2')!.classList.contains('wire-row--own')).toBe(false)
     expect(document.querySelector<HTMLInputElement>('#pulse_1 input[name="authenticity_token"]')!.value).toBe('fresh-token')
   })
 

@@ -5,7 +5,8 @@ import { localizeTimeElement } from '~/utils/localTime'
 // inline thread. Broadcast-inserted rows render viewer-neutral (no
 // session), so on connect this controller:
 //   1. reveals the owner-only delete form when the viewer owns the
-//      pulse — read from the layout's current-hackr-id meta;
+//      pulse — read from the layout's current-hackr-id meta — and
+//      classes the row --own (MUTT's F flag);
 //   2. rewrites descendant form CSRF tokens from the page meta — forms
 //      rendered by Turbo::StreamsChannel carry the renderer session's
 //      token, which the viewer's session would reject;
@@ -46,6 +47,7 @@ export default class extends Controller<HTMLElement> {
     const viewerId = this.currentHackrId()
     if (viewerId !== null && viewerId === this.ownerIdValue) {
       this.ownerOnlyTargets.forEach(el => { el.hidden = false })
+      this.element.classList.add('wire-row--own')
     }
     this.fixCsrfTokens()
     this.localizeTimes()
