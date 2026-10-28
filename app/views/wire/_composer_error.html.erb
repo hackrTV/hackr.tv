@@ -1,4 +1,6 @@
-<div id="composer-error">
+<%# Error slot under a prompt, replaced by Wire::PulsesController#create.
+    Locals: id (default "composer-error"), error. %>
+<div id="<%= local_assigns.fetch(:id, "composer-error") %>" class="wire-prompt-error">
   <% if local_assigns[:error].present? %>
     <div class="alert alert-error"><%= error %></div>
   <% end %>

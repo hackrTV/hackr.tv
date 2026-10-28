@@ -57,8 +57,8 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 .packet-meta { flex-shrink: 0; margin-top: 2px; text-align: center; }
 .packet-time { color: var(--fg-faint); font-size: 0.75rem; display: block; }
 .packet-badge { font-size: 0.6rem; font-weight: bold; display: block; line-height: 1; margin-top: 2px; }
-.packet-badge--admin { color: #00d4ff; }
-.packet-badge--operator { color: #ffaa00; }
+.packet-badge--admin { color: var(--role-admin); }
+.packet-badge--operator { color: var(--role-operator); }
 .packet-badge--ttv { color: var(--accent-bright); }
 .packet-badge--yt { color: var(--err); }
 .packet-badge--synthia { color: #00ff88; }
@@ -66,10 +66,10 @@ turbo-frame#uplink-log-frame { flex: 1; display: flex; flex-direction: column; m
 
 .packet-body { flex: 1; min-width: 0; }
 .packet-author { font-weight: bold; margin-right: 6px; text-decoration: none; }
-/* Role colors (sanctioned hexes) — packet authors, the shell user panel, the operatives roster, the record popover. */
-.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin, .uplink-reactmenu-target--admin, .uplink-result-sender--admin { color: #00d4ff; }
-.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator, .uplink-reactmenu-target--operator, .uplink-result-sender--operator { color: #ffaa00; }
-.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative, .uplink-reactmenu-target--operative, .uplink-result-sender--operative { color: #cc0088; }
+/* Role colors (tokens.css --role-*, shared with the WIRE) — packet authors, the shell user panel, the operatives roster, the record popover. */
+.packet-author--admin, .packet-reply-author--admin, .uplink-userpanel-alias--admin, .uplink-member--admin, .uplink-popover-alias--admin, .uplink-popover-badge--admin, .uplink-modmenu-target--admin, .uplink-pin-sender--admin, .uplink-reactmenu-target--admin, .uplink-result-sender--admin { color: var(--role-admin); }
+.packet-author--operator, .packet-reply-author--operator, .uplink-userpanel-alias--operator, .uplink-member--operator, .uplink-popover-alias--operator, .uplink-popover-badge--operator, .uplink-modmenu-target--operator, .uplink-pin-sender--operator, .uplink-reactmenu-target--operator, .uplink-result-sender--operator { color: var(--role-operator); }
+.packet-author--operative, .packet-reply-author--operative, .uplink-userpanel-alias--operative, .uplink-member--operative, .uplink-popover-alias--operative, .uplink-popover-badge--operative, .uplink-modmenu-target--operative, .uplink-pin-sender--operative, .uplink-reactmenu-target--operative, .uplink-result-sender--operative { color: var(--role-operative); }
 .uplink-modmenu-target--bridged { color: var(--fg-muted); } /* a bridged packet's menu names its TTV/YT sender, not a hackr */
 .packet-bridged-user { font-weight: bold; margin-right: 6px; color: var(--fg); }
 .packet-bridged-user--ttv { color: #c4b5fd; }

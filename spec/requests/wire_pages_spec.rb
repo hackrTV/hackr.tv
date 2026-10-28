@@ -98,6 +98,22 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("&quot;slug&quot;:&quot;party&quot;")
       expect(response.body).to include('class="emote-menu emote-menu--down"')
     end
+
+    it "renders ledger rows: entry + row + thread frame per root, role-colored authors, no absent glyphs" do
+      pulse = make_pulse(hackr, content: "Ledger row")
+      log_in!
+
+      get "/wire"
+
+      expect(response.body).to include(%(id="pulse_#{pulse.id}_entry"))
+      expect(response.body).to include(%(id="pulse_#{pulse.id}"))
+      expect(response.body).to match(/<turbo-frame[^>]*id="pulse_#{pulse.id}_thread"/)
+      expect(response.body).to include("wire-author--admin")
+      expect(response.body).to include("wire-badge--admin")
+      expect(response.body).to include('data-controller="wire-keys wire-feed"')
+      expect(response.body).not_to include("⟳")
+      expect(response.body).not_to include("📌")
+    end
   end
 
   describe "POST /wire/pulses" do
@@ -132,6 +148,20 @@ RSpec.describe "Wire pages", type: :request do
       expect(Pulse.last.parent_pulse_id).to eq(root.id)
     end
 
+    it "appends a splice into the open thread and refreshes the root's reply count" do
+      root = make_pulse(other, content: "Root")
+      log_in!
+
+      post "/wire/pulses", params: {content: "A splice", parent_pulse_id: root.id},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
+      expect(response.body).to match(/action="append"[^>]*target="pulse_#{root.id}_thread_list"/)
+      expect(response.body).to match(/action="replace"[^>]*target="pulse_#{root.id}_splice_count"/)
+      expect(response.body).to include("A splice")
+      expect(root.reload.splice_count).to eq(1)
+    end
+
     it "renders the composer error for invalid content" do
       log_in!
 
@@ -140,6 +170,18 @@ RSpec.describe "Wire pages", type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.body).to include("composer-error")
+    end
+
+    it "reports a failed splice under its thread's prompt" do
+      root = make_pulse(other, content: "Root")
+      log_in!
+
+      post "/wire/pulses", params: {content: "x" * 300, parent_pulse_id: root.id},
+        headers: {"Accept" => "text/vnd.turbo-stream.html"}
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include("pulse_#{root.id}_reply_error")
+      expect(response.body).not_to include(%(target="composer-error"))
     end
   end
 
@@ -212,10 +254,10 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("@#{hackr.hackr_alias}")
       expect(response.body).to include("MEMBER SINCE")
       expect(response.body).to include("WIRE PULSES")
-      expect(response.body).to include("📌 PINNED")
+      expect(response.body).to include("// PINNED 1/3 //")
       expect(response.body).to include("Pinned broadcast")
       expect(response.body).to include("Profile broadcast")
-      expect(response.body).to include("echoed") # echo indicator
+      expect(response.body).to include("wire-badge--echo") # echo indicator
       expect(response.body).to include("Echoed by profile owner")
       expect(response.body.scan("Pinned broadcast").length).to eq(1) # dedup vs timeline
       expect(pulse).to be_present
@@ -312,12 +354,46 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("The reply")
     end
 
-    it "404s for unknown pulses" do
+    it "404s for unknown pulses — a stub frame for a Turbo-Frame request" do
       log_in!
       get "/wire/pulse/999999"
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include("Pulse not found")
+
+      get "/wire/pulse/999999", headers: {"Turbo-Frame" => "pulse_999999_thread"}
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to match(/<turbo-frame[^>]*id="pulse_999999_thread"/)
+      expect(response.body).to include("// PULSE NOT FOUND //")
+    end
+
+    it "answers a Turbo-Frame request with the thread fragment: replies oldest first, quotes off the root, the reply prompt" do
+      root = make_pulse(other, content: "Thread root pulse")
+      reply = create(:pulse, grid_hackr: hackr, content: "Nested reply", parent_pulse_id: root.id)
+      create(:pulse, grid_hackr: other, content: "Deep reply", parent_pulse_id: reply.id)
+      log_in!
+
+      get "/wire/pulse/#{root.id}", headers: {"Turbo-Frame" => "pulse_#{root.id}_thread"}
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to match(/<turbo-frame[^>]*id="pulse_#{root.id}_thread"/)
+      expect(response.body).to include(%(id="pulse_#{root.id}_thread_list"))
+      expect(response.body).not_to include("Thread root pulse") # the root is the row above the frame
+      expect(response.body.index("Nested reply")).to be < response.body.index("Deep reply")
+      expect(response.body.scan("wire-quote-mark").length).to eq(1) # only the deep reply quotes a non-root parent
+      expect(response.body).to include("Splice into @#{other.hackr_alias}&#39;s thread...")
+      expect(response.body).to include(%(id="pulse_#{root.id}_reply_error"))
+      expect(response.body).not_to include("site-header")
+    end
+
+    it "renders the fragment into whatever frame asked" do
+      root = make_pulse(other, content: "Paneable")
+      log_in!
+
+      get "/wire/pulse/#{root.id}", headers: {"Turbo-Frame" => "wire-pane"}
+
+      expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
     end
   end
 end

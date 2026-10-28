@@ -185,11 +185,11 @@ RSpec.describe Emote, type: :model do
       expect(html).to include('src="/rails/active_storage/representations/redirect/')
     end
 
-    it "renders emote images into the pulse card the same way" do
+    it "renders emote images into the wire row the same way" do
       create(:emote, :gif, slug: "party")
       pulse = create(:pulse, content: "tonight :party:")
 
-      html = ApplicationController.render(partial: "wire/pulse_card", locals: {pulse: pulse, viewer: nil, echoed: false})
+      html = ApplicationController.render(partial: "wire/pulse_row", locals: {pulse: pulse, viewer: nil, echoed: false})
 
       expect(html).to include('alt=":party:"')
       expect(html).to include('src="/rails/active_storage/blobs/redirect/')

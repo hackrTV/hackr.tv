@@ -1,0 +1,100 @@
+<%# The ledger row (replaces the PulseCard port, 2026-10): HH:MM gutter |
+    role-colored author + badges | body | counts + owner controls.
+    Locals:
+      pulse            — required
+      viewer           — GridHackr or nil. Broadcast renders pass nil
+                         (viewer-neutral); the owner-only delete form
+                         renders hidden and the wire-row Stimulus
+                         controller reveals it from the layout's
+                         current-hackr meta (and localizes the time).
+      echoed           — whether the VIEWER has echoed (broadcasts: false)
+      indicator        — nil | :echo (profile timeline: ECHO badge) with
+      indicator_alias  — who echoed
+      pinnable/pinned/can_up/can_down — profile pin controls
+      thread_frame     — id of this row's inline thread frame (roots in
+                         the feed/profile/deep-link page): ↩ toggles it
+      in_thread        — row inside a thread list: ↩ retargets the
+                         thread's reply prompt at this pulse
+      parent           — preloaded parent (default pulse.parent_pulse);
+                         a splice outside a thread quotes it ("[>] re
+                         @alias · …"), inside one only a non-root parent
+      reply_count      — the ↩ number (default: the root's thread-wide
+                         splice_count; nil hides the number) %>
+<%
+  viewer = local_assigns.fetch(:viewer, nil)
+  echoed = local_assigns.fetch(:echoed, false)
+  indicator = local_assigns.fetch(:indicator, nil)
+  indicator_alias = local_assigns.fetch(:indicator_alias, nil)
+  pinnable = local_assigns.fetch(:pinnable, false)
+  pinned = local_assigns.fetch(:pinned, false)
+  can_up = local_assigns.fetch(:can_up, false)
+  can_down = local_assigns.fetch(:can_down, false)
+  thread_frame = local_assigns.fetch(:thread_frame, nil)
+  in_thread = local_assigns.fetch(:in_thread, false)
+  root_id = pulse.thread_root_id || pulse.id
+  parent = local_assigns.fetch(:parent) { pulse.parent_pulse }
+  show_quote = in_thread ? (parent && parent.id != root_id) : pulse.is_splice?
+  reply_count = local_assigns.fetch(:reply_count) { pulse.is_splice? ? nil : pulse.splice_count }
+  own = viewer && viewer.id == pulse.grid_hackr_id
+  author = pulse.grid_hackr
+  role = uplink_role_class(author.role)
+  badge = uplink_role_badge(author.role)
+%>
+<div id="<%= dom_id(pulse) %>"
+  class="wire-row<%= " wire-row--dropped" if pulse.pulse_dropped? %><%= " wire-row--pinned" if pinned %>"
+  data-controller="wire-row" data-wire-row-owner-id-value="<%= pulse.grid_hackr_id %>"
+  data-pulse-id="<%= pulse.id %>"<% if thread_frame %> data-thread-frame="<%= thread_frame %>"<% end %>
+  data-action="wire:open->wire-row#openThread wire:reply->wire-row#reply">
+  <time class="wire-time" datetime="<%= pulse.pulsed_at.iso8601 %>" title="<%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M %Z") %>"
+    data-wire-row-target="time"><%= pulse.pulsed_at.strftime("%H:%M") %></time>
+  <div class="wire-who">
+    <%= link_to "@#{author.hackr_alias}", wire_user_path(author.hackr_alias.downcase), class: "wire-author wire-author--#{role}" %>
+    <% if badge %><span class="wire-badge wire-badge--<%= role %>"><%= badge %></span><% end %>
+    <% if pinned %><span class="wire-badge wire-badge--pin" title="Pinned to profile">PIN</span><% end %>
+    <% if indicator == :echo %><span class="wire-badge wire-badge--echo" title="@<%= indicator_alias %> echoed this">ECHO</span><% end %>
+  </div>
+  <div class="wire-body">
+    <% if pulse.pulse_dropped? %>
+      <p class="wire-text wire-text--dropped">[ PULSE DROPPED BY GOVCORP ]<% if pulse.pulse_dropped_at %> <span class="wire-dropped-at">moderated <time datetime="<%= pulse.pulse_dropped_at.iso8601 %>" data-wire-row-target="time"><%= pulse.pulse_dropped_at.strftime("%H:%M") %></time></span><% end %></p>
+    <% else %>
+      <% if show_quote && parent %>
+        <%= link_to wire_pulse_path(root_id), class: "wire-quote", title: "Replying to @#{parent.grid_hackr.hackr_alias}" do %><span class="wire-quote-mark">[&gt;]</span> re <span class="wire-quote-author wire-author--<%= uplink_role_class(parent.grid_hackr.role) %>">@<%= parent.grid_hackr.hackr_alias %></span> · <%= wire_excerpt(parent) %><% end %>
+      <% end %>
+      <p class="wire-text"><%= wire_text(pulse) %></p>
+    <% end %>
+  </div>
+  <% unless pulse.pulse_dropped? %>
+    <div class="wire-side">
+      <%= render "wire/echo_button", pulse: pulse, echoed: echoed %>
+      <% if in_thread %>
+        <button type="button" class="splice-button" title="Reply to @<%= author.hackr_alias %>"
+          data-action="click->wire-row#reply">↩<%= render "wire/splice_count", pulse: pulse, count: reply_count %></button>
+      <% else %>
+        <%# A root with a frame toggles it (the first click is a Turbo frame visit); elsewhere the link deep-links the thread page. %>
+        <%= link_to wire_pulse_path(root_id), class: "splice-button", title: thread_frame ? "Thread" : "View thread",
+          data: (thread_frame ? {turbo_frame: thread_frame, action: "click->wire-row#toggleThread"} : {}),
+          aria: (thread_frame ? {expanded: "false", controls: thread_frame} : {}) do %>↩<%= render "wire/splice_count", pulse: pulse, count: reply_count %><% end %>
+      <% end %>
+      <%= button_to "×", wire_destroy_pulse_path(pulse), method: :delete,
+        class: "delete-button", title: "Delete pulse", aria: {label: "Delete pulse"}, form_class: "wire-inline-form",
+        form: {hidden: !own, data: {wire_row_target: "ownerOnly"}} %>
+      <% if pinnable %>
+        <% if pinned %>
+          <% if can_up %>
+            <%= button_to "↑", wire_pulse_pin_move_path(pulse, direction: "up"), method: :patch,
+              class: "pin-move-button", aria: {label: "Move pin up"}, form_class: "wire-inline-form" %>
+          <% end %>
+          <% if can_down %>
+            <%= button_to "↓", wire_pulse_pin_move_path(pulse, direction: "down"), method: :patch,
+              class: "pin-move-button", aria: {label: "Move pin down"}, form_class: "wire-inline-form" %>
+          <% end %>
+          <%= button_to "◆ UNPIN", wire_pulse_pin_path(pulse), method: :delete,
+            class: "pin-button pin-button--pinned", title: "Unpin from profile", form_class: "wire-inline-form" %>
+        <% else %>
+          <%= button_to "◆ PIN", wire_pulse_pin_path(pulse), method: :post,
+            class: "pin-button", title: "Pin to profile", form_class: "wire-inline-form" %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

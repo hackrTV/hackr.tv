@@ -134,6 +134,80 @@ RSpec.describe Pulse, type: :model do
       end
     end
 
+    describe "splice_count (counter cache on thread_root)" do
+      it "counts replies anywhere in the thread on the root only" do
+        root = create(:pulse)
+        reply = create(:pulse, parent_pulse: root)
+        create(:pulse, parent_pulse: reply)
+
+        expect(root.reload.splice_count).to eq(2)
+        expect(reply.reload.splice_count).to eq(0)
+      end
+
+      it "decrements on destroy and survives the root's cascade" do
+        root = create(:pulse)
+        reply = create(:pulse, parent_pulse: root)
+        deep = create(:pulse, parent_pulse: reply)
+
+        deep.destroy
+        expect(root.reload.splice_count).to eq(1)
+        expect { root.destroy }.to change(Pulse, :count).by(-2)
+      end
+    end
+
+    describe "wire_html broadcasts (ledger rows)" do
+      before do
+        allow(ActionCable.server).to receive(:broadcast)
+        %i[broadcast_prepend_to broadcast_append_to broadcast_replace_to broadcast_remove_to broadcast_update_to].each do |m|
+          allow(Turbo::StreamsChannel).to receive(m)
+        end
+      end
+
+      it "prepends a root entry to the feed" do
+        create(:pulse)
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_prepend_to)
+          .with("wire_html", hash_including(target: "wire-feed", partial: "wire/pulse_entry"))
+      end
+
+      it "appends a splice into its root's thread list and refreshes the root's count" do
+        root = create(:pulse)
+        create(:pulse, parent_pulse: root)
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
+          .with("wire_html", hash_including(target: "pulse_#{root.id}_thread_list", partial: "wire/pulse_entry"))
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to)
+          .with("wire_html", hash_including(target: "pulse_#{root.id}_splice_count", partial: "wire/splice_count"))
+      end
+
+      it "also refreshes the parent's direct count for a reply to a reply" do
+        root = create(:pulse)
+        reply = create(:pulse, parent_pulse: root)
+        create(:pulse, parent_pulse: reply)
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to)
+          .with("wire_html", hash_including(target: "pulse_#{reply.id}_splice_count", locals: {pulse: reply, count: 1}))
+      end
+
+      it "replaces the row alone on drop and empties a root's thread" do
+        root = create(:pulse)
+        root.pulse_drop!
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to)
+          .with("wire_html", hash_including(target: "pulse_#{root.id}", partial: "wire/pulse_row"))
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_update_to)
+          .with("wire_html", hash_including(target: "pulse_#{root.id}_thread", html: ""))
+      end
+
+      it "removes the whole entry on delete" do
+        root = create(:pulse)
+        root.destroy
+
+        expect(Turbo::StreamsChannel).to have_received(:broadcast_remove_to)
+          .with("wire_html", target: "pulse_#{root.id}_entry")
+      end
+    end
+
     describe "#broadcast_to_wire" do
       it "broadcasts to pulse_wire channel after create" do
         hackr = create(:grid_hackr)
@@ -174,6 +248,7 @@ RSpec.describe Pulse, type: :model do
 
       it "includes parent_pulse_id for splices" do
         parent = create(:pulse)
+        allow(ActionCable.server).to receive(:broadcast) # Turbo dual-publish streams broadcast too (splices append into their thread)
 
         expect(ActionCable.server).to receive(:broadcast).with(
           "pulse_wire",

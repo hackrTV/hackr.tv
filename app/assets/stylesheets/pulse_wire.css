@@ -1,467 +1,173 @@
-/* PulseWire - The Wire TUI Styling */
-
-/* Buttons */
-.btn {
-  display: inline-block;
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid var(--edge-bright);
-  color: var(--accent-bright);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-}
-
-.btn:hover {
-  border-color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.2);
-  color: #c4b5fd;
-}
-
-.btn:active {
-  background: rgba(var(--accent-rgb), 0.4);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  border-color: var(--edge);
-  color: var(--fg-faint);
-}
-
-.btn:disabled:hover {
-  background: transparent;
-  border-color: var(--edge);
-}
-
-.btn-primary {
-  border-color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.2);
-}
-
-.btn-primary:hover {
-  border-color: var(--accent-bright);
-  background: rgba(var(--accent-rgb), 0.4);
-  color: #e9d5ff;
-}
-
-.alert {
-  padding: 12px;
-  margin-top: 10px;
-  font-size: 0.9rem;
-  border: 1px solid;
-}
-
-.alert-error {
-  color: #fca5a5;
-  border-color: var(--err);
-  background: rgba(var(--err-rgb), 0.1);
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-control {
-  width: 100%;
-  padding: 10px;
-  background: #000;
-  border: 1px solid var(--edge-bright);
-  color: #fff;
-  font-size: 1rem;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5);
-}
-
-/* Headers */
-.hotwire-header,
-.user-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--accent);
-}
-
-.hotwire-header h1,
-.user-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--accent-bright);
-}
-
-.wire-status {
-  font-size: 0.9rem;
-}
-
-.status-connected {
-  color: var(--ok);
-  animation: pulse-glow 2s infinite;
-}
-
-.status-disconnected {
-  color: var(--fg-faint);
-}
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.user-stats {
-  color: #60a5fa;
-}
-
-/* Pulse Composer */
-.pulse-composer {
-  margin-bottom: 30px;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid var(--accent);
-}
-
-.pulse-composer .form-group {
-  margin: 0;
-}
-
-.pulse-input {
-  width: 100%;
-  min-height: 80px;
-  padding: 12px;
-  background: #000;
-  border: 1px solid var(--edge-bright);
-  color: #fff;
-  font-size: 1rem;
-  resize: vertical;
-}
-
-.pulse-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5);
-}
-
-.pulse-composer-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.char-count {
-  font-size: 0.9rem;
-  color: var(--fg-muted);
-}
-
-.char-count.warning {
-  color: var(--warn);
-}
-
-.char-count.over-limit {
-  color: var(--err);
-  font-weight: bold;
-}
-
-/* Pulse Cards */
-.pulse-card {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.3);
-  border-left: 3px solid var(--accent);
-  transition: all 0.2s;
-}
-
-.pulse-card:hover {
-  background: rgba(0, 0, 0, 0.5);
-  border-left-color: var(--accent-bright);
-}
-
-.pulse-card.is-splice {
-  border-left-color: #60a5fa;
-  margin-left: 20px;
-}
-
-.pulse-card.pulse-dropped {
-  border-left-color: var(--err);
-  background: rgba(128, 0, 0, 0.2);
-}
-
-.pulse-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.hackr-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: var(--accent-bright);
-}
-
-.hackr-link:hover {
-  color: #c4b5fd;
-  text-decoration: underline;
-}
-
-.hackr-alias {
-  font-weight: bold;
-}
-
-.admin-badge {
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  background: var(--err);
-  color: #000;
-  font-weight: bold;
-}
-
-.pulse-timestamp {
-  font-size: 0.85rem;
-  color: var(--fg-muted);
-}
-
-.pulse-content {
-  margin-bottom: 15px;
-  line-height: 1.6;
-  font-size: 1rem;
-  color: #fff;
-}
-
-.pulse-content p {
-  margin: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-/* Pulse Dropped */
-.pulse-dropped-notice {
-  color: var(--err);
-  text-align: center;
-  padding: 15px;
-  border: 1px dashed var(--err);
-  background: rgba(var(--err-rgb), 0.1);
-}
-
-.pulse-dropped-notice .glitch {
-  display: inline-block;
-  animation: glitch 1s infinite;
-}
-
-@keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-}
-
-.dropped-timestamp {
-  font-size: 0.8rem;
-  color: #fca5a5;
-  margin-top: 8px;
-}
-
-/* Pulse Actions */
-.pulse-actions {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.echo-button,
-.splice-button,
-.delete-button {
-  background: transparent;
-  border: 1px solid var(--edge-bright);
-  color: var(--accent-bright);
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.2s;
-}
-
-.echo-button:hover,
-.splice-button:hover {
-  border-color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.2);
-}
-
-.echo-button.echoed {
-  color: #60a5fa;
-  border-color: #60a5fa;
-  background: rgba(96, 165, 250, 0.1);
-}
-
-.echo-button.animating {
-  animation: ripple 0.6s ease-out;
-}
-
-@keyframes ripple {
-  0% {
-    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
-  }
-  100% {
-    box-shadow: 0 0 0 20px rgba(96, 165, 250, 0);
-  }
-}
-
-.echo-icon,
-.splice-icon {
-  font-size: 1.1rem;
-}
-
-.echo-count,
-.splice-count {
-  font-size: 0.85rem;
-  color: #60a5fa;
-}
-
-.delete-button {
-  color: var(--err);
-  border-color: var(--edge-bright);
-  margin-left: auto;
-  font-size: 1.2rem;
-  padding: 4px 10px;
-}
-
-.delete-button:hover {
-  border-color: var(--err);
-  background: rgba(var(--err-rgb), 0.2);
-}
-
-.thread-link {
-  color: #60a5fa;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.thread-link:hover {
-  text-decoration: underline;
-  color: #93c5fd;
-}
-
-/* Reply Form */
-.pulse-reply-form {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px dashed var(--edge);
-}
-
-/* Thread View */
-.thread-view {
-  margin-bottom: 30px;
-}
-
-.thread-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--accent);
-}
-
-.thread-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  text-transform: uppercase;
-  color: var(--accent-bright);
-}
-
-.thread-stats {
-  color: #60a5fa;
-}
-
-.thread-container {
-  position: relative;
-}
-
-.thread-item {
-  position: relative;
-  margin-bottom: 15px;
-}
-
-.thread-connector {
-  position: absolute;
-  left: -15px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg, var(--accent) 0%, transparent 100%);
-}
-
-.thread-replies {
-  position: relative;
-}
-
-/* Back Link */
-.back-link {
-  margin-top: 30px;
-  text-align: center;
-}
-
-.back-link a {
-  color: var(--accent-bright);
-  text-decoration: none;
-  font-size: 1rem;
-}
-
-.back-link a:hover {
-  text-decoration: underline;
-  color: #c4b5fd;
-}
-
-/* Empty States & Loading */
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--fg-muted);
-}
-
-.loading-more {
-  text-align: center;
-  padding: 20px;
-  color: #60a5fa;
-}
-
-.end-of-feed {
-  text-align: center;
-  padding: 30px;
-  color: var(--fg-muted);
-  border-top: 1px dashed var(--edge-bright);
-  margin-top: 20px;
-}
-
-/* Responsive */
+/* PulseWire — The WIRE. Ledger rows since 2026-10 (the card layout is
+   gone): one dense log row per pulse — HH:MM gutter | role-colored
+   author + badges | body | counts — inside the normal page chrome,
+   threads expanding inline under their root, a "> " prompt bar on top.
+   Terminal rules: even-px Terminus sizes (12/14/16/18), no radius, no
+   transitions, square dots, tokens (+ the sanctioned wire echo blue
+   #60a5fa; pins read in --warn like Uplink's). The .btn/.alert/.form-*
+   families at the top are shared with the admin pulse_wire views; the
+   .status-* badge with the world feed. */
+
+/* ── Shared (admin pulse_wire views, feed/show) ────────────────────── */
+.btn { display: inline-block; padding: 8px 16px; background: transparent; border: 1px solid var(--edge-bright); color: var(--accent-bright); font-size: 1rem; cursor: pointer; text-decoration: none; }
+.btn:hover { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.2); color: #c4b5fd; }
+.btn:active { background: rgba(var(--accent-rgb), 0.4); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--edge); color: var(--fg-faint); }
+.btn:disabled:hover { background: transparent; border-color: var(--edge); }
+.btn-primary { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.2); }
+.btn-primary:hover { border-color: var(--accent-bright); background: rgba(var(--accent-rgb), 0.4); color: #e9d5ff; }
+
+.alert { padding: 12px; margin-top: 10px; font-size: 0.9rem; border: 1px solid; }
+.alert-error { color: #fca5a5; border-color: var(--err); background: rgba(var(--err-rgb), 0.1); }
+
+.form-group { margin-bottom: 15px; }
+.form-control { width: 100%; padding: 10px; background: #000; border: 1px solid var(--edge-bright); color: #fff; font-size: 1rem; }
+.form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5); }
+
+.status-connected { color: var(--ok); animation: pulse-glow 2s infinite; }
+.status-disconnected { color: var(--fg-faint); }
+@keyframes pulse-glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--fg-muted); }
+
+/* ── Page + bar ────────────────────────────────────────────────────── */
+.wire-page { max-width: 1100px; margin: 0 auto; padding: 16px 0 40px; color: var(--fg); font-family: var(--font-tui); font-size: 16px; line-height: 20px; }
+.wire-bar { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 0 8px 6px; border-bottom: 1px solid var(--edge); }
+.wire-bar-title { margin: 0; color: var(--accent-bright); font-family: inherit; font-size: 18px; font-weight: bold; letter-spacing: 2px; }
+.wire-bar-sub { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.wire-bar-meta { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
+.wire-bar .status-connected, .wire-bar .status-disconnected { margin-left: auto; font-size: 12px; white-space: nowrap; }
+.wire-back { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; text-decoration: none; white-space: nowrap; }
+.wire-back:hover { color: var(--accent-bright); }
+.wire-online { color: var(--ok); }
+/* Ghost buttons (the Uplink shell's 12px bordered controls). */
+.wire-bar-keys, .wire-tx, .wire-share, .wire-bio-save, .wire-bio-cancel { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.wire-bar-keys:hover, .wire-tx:not(:disabled):hover, .wire-share:hover, .wire-bio-save:hover, .wire-bio-cancel:hover { border-color: var(--accent); color: var(--accent-bright); }
+
+/* ── Prompt bar ("> ") ─────────────────────────────────────────────── */
+.wire-prompt-wrap { margin: 10px 0 6px; padding: 0 8px; }
+.wire-prompt { display: flex; align-items: flex-start; gap: 8px; min-height: 32px; padding: 0 8px; background: var(--bg-0); border: 1px solid var(--edge-bright); }
+.wire-prompt:focus-within { border-color: var(--accent); }
+.wire-prompt-mark { color: var(--accent-bright); font-weight: bold; line-height: 30px; }
+.wire-prompt-field { flex: 1; min-width: 0; }
+.wire-prompt-input { display: block; width: 100%; box-sizing: border-box; margin: 0; padding: 5px 0; min-height: 30px; max-height: 160px; background: none; border: none; color: var(--fg); font-family: inherit; font-size: 16px; line-height: 20px; resize: none; outline: none; overflow-y: auto; }
+.wire-prompt-input::placeholder { color: var(--fg-faint); }
+.wire-prompt .char-count { align-self: center; color: var(--fg-faint); font-size: 12px; white-space: nowrap; }
+.char-count.warning { color: var(--warn); }
+.char-count.over-limit { color: var(--err); font-weight: bold; }
+.wire-tx { align-self: center; }
+.wire-tx:disabled { opacity: 0.5; cursor: not-allowed; }
+.wire-prompt-error .alert { margin-top: 6px; padding: 6px 8px; font-size: 12px; }
+
+/* ── Feed: entries, day separators, rules ──────────────────────────── */
+.wire-feed, .wire-entry, .wire-thread-list { display: flex; flex-direction: column; }
+/* "// TODAY · 2026-10-26 //" (wire-feed controller, viewer-local days)
+   and the profile's "// PINNED n/3 //" / "// BROADCASTS //" rules. */
+.wire-day, .wire-rule { display: flex; align-items: center; gap: 8px; margin: 6px 0; padding: 0 8px; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
+.wire-day::before, .wire-day::after, .wire-rule::before, .wire-rule::after { content: ""; flex: 1; border-top: 1px solid var(--edge); }
+.wire-rule--pinned { color: var(--warn); }
+.pinned-pulses { margin-bottom: 4px; }
+.wire-loading { padding: 12px; text-align: center; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.end-of-feed { padding: 16px 8px 0; text-align: center; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.end-of-feed p { margin: 0; }
+.wire-empty-sub, .wire-end-sub { color: var(--edge-bright); font-size: 12px; margin-top: 6px; }
+
+/* ── Row ───────────────────────────────────────────────────────────── */
+.wire-row { display: grid; grid-template-columns: 44px 150px minmax(0, 1fr) auto; grid-template-areas: "time who body side"; gap: 0 10px; align-items: start; padding: 2px 8px; scroll-margin-top: calc(var(--site-header-h, 0px) + 8px); scroll-margin-bottom: calc(var(--player-bar-h, 0px) + 8px); }
+.wire-row:hover, .wire-row--cursor { background-color: var(--bg-1); }
+.wire-row--cursor { outline: 1px solid var(--accent); outline-offset: -1px; } /* an outline, so it never fights the pin bar */
+.wire-row--pinned { box-shadow: inset 2px 0 0 0 var(--warn); }
+.wire-time { grid-area: time; color: var(--fg-faint); font-size: 12px; line-height: 20px; white-space: nowrap; }
+.wire-who { grid-area: who; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; min-width: 0; }
+.wire-author { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; text-decoration: none; }
+.wire-author:hover { text-decoration: underline; }
+.wire-author--admin, .wire-badge--admin { color: var(--role-admin); }
+.wire-author--operator, .wire-badge--operator { color: var(--role-operator); }
+.wire-author--operative, .wire-badge--operative { color: var(--role-operative); }
+.wire-badge { color: var(--fg-faint); font-size: 12px; line-height: 16px; font-weight: bold; letter-spacing: 1px; white-space: nowrap; }
+.wire-badge--pin { color: var(--warn); }
+.wire-badge--echo { color: #60a5fa; }
+.wire-badge--outline { padding: 0 4px; border: 1px solid currentColor; font-weight: normal; }
+.wire-body { grid-area: body; min-width: 0; }
+.wire-text { margin: 0; color: var(--fg); white-space: pre-wrap; overflow-wrap: anywhere; }
+.wire-text--dropped { color: var(--err); opacity: 0.6; }
+.wire-dropped-at { color: var(--fg-faint); font-size: 12px; }
+.wire-row--dropped .wire-time, .wire-row--dropped .wire-who { opacity: 0.4; }
+.wire-quote { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-faint); font-size: 12px; line-height: 16px; text-decoration: none; }
+.wire-quote:hover { color: var(--fg); }
+.wire-quote-mark { color: var(--edge-bright); }
+.wire-quote-author { font-weight: bold; }
+.wire-side { grid-area: side; display: flex; align-items: center; justify-content: flex-end; gap: 4px; white-space: nowrap; }
+.echo-button, .splice-button, .delete-button, .pin-button, .pin-move-button { display: inline-flex; align-items: center; gap: 4px; min-height: 20px; margin: 0; padding: 0 4px; background: none; border: none; color: var(--fg-faint); font-family: inherit; font-size: 12px; line-height: 20px; text-decoration: none; cursor: pointer; }
+.echo-button:hover, .splice-button:hover, .pin-button:hover, .pin-move-button:hover { color: var(--accent-bright); }
+.echo-button.echoed { color: #60a5fa; }
+.splice-button[aria-expanded="true"] { color: var(--accent-bright); }
+.echo-count, .splice-count { min-width: 1ch; }
+.delete-button { color: var(--err); opacity: 0.6; }
+.delete-button:hover { opacity: 1; }
+.wire-row--armed .delete-button { opacity: 1; background: var(--err-strong); color: #fff; } /* first x pressed: one more deletes */
+.pin-button--pinned, .pin-move-button { color: var(--warn); }
+.wire-inline-form { display: inline; }
+/* Author display beats the UA [hidden] rule — without this the hidden
+   owner-only delete form renders for every viewer (Phase 5 find). */
+.wire-inline-form[hidden] { display: none; }
+
+/* ── Inline thread (the root's sibling frame) ──────────────────────── */
+.wire-thread { display: block; margin: 0 0 4px 62px; padding-left: 10px; border-left: 1px solid var(--edge); } /* 44 + 10 + 8: flush with the author column */
+.wire-thread:empty, .wire-thread[hidden] { display: none; }
+.wire-thread .wire-row { grid-template-columns: 44px 120px minmax(0, 1fr) auto; font-size: 14px; line-height: 18px; }
+.wire-thread .wire-time { line-height: 18px; }
+.wire-thread-missing { padding: 4px 0; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.wire-thread-reply { margin-top: 4px; }
+.wire-thread-reply .wire-prompt-wrap { margin: 0; padding: 0 8px 4px 0; }
+.wire-thread-reply .wire-prompt { min-height: 28px; }
+.wire-thread-reply .wire-prompt-mark { line-height: 26px; }
+.wire-thread-reply .wire-prompt-input { min-height: 26px; padding: 4px 0; font-size: 14px; line-height: 18px; }
+
+/* ── Key legend (?) ────────────────────────────────────────────────── */
+.wire-legend { position: fixed; right: 16px; bottom: calc(var(--player-bar-h, 0px) + 16px); z-index: 20; width: min(320px, calc(100vw - 32px)); box-sizing: border-box; padding: 8px 12px 12px; background: var(--bg-1); border: 1px solid var(--accent); box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6); font-size: 14px; line-height: 18px; }
+.wire-legend[hidden] { display: none; }
+.wire-legend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.wire-legend-title { color: var(--accent-bright); font-size: 12px; letter-spacing: 1px; }
+.wire-legend-close { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.wire-legend-close:hover { color: var(--fg-bright); }
+.wire-legend-rows { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; margin: 0; }
+.wire-legend-rows dt { color: var(--fg-bright); font-weight: bold; white-space: nowrap; }
+.wire-legend-rows dd { margin: 0; color: var(--fg-muted); }
+
+/* ── Profile: status line, bio, stat strip ─────────────────────────── */
+.wire-profile { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.wire-handle { margin: 0; font-family: inherit; font-size: 18px; font-weight: bold; }
+.wire-cl { color: var(--warn); font-size: 12px; }
+.wire-share { margin-left: auto; }
+.wire-bio { padding: 0 8px; font-size: 14px; line-height: 18px; }
+.wire-bio-view { color: var(--fg); }
+.wire-bio-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.wire-bio-empty { color: var(--fg-faint); }
+.wire-bio-edit-link { margin-left: 8px; color: var(--accent-alt); font-size: 12px; letter-spacing: 1px; text-decoration: none; white-space: nowrap; }
+.wire-bio-edit-link:hover { color: var(--fg-bright); }
+.wire-bio-textarea { display: block; width: 100%; box-sizing: border-box; padding: 6px 8px; background: var(--bg-0); border: 1px solid var(--edge-bright); color: var(--fg-bright); font-family: inherit; font-size: 14px; line-height: 18px; resize: vertical; }
+.wire-bio-textarea:focus { outline: none; border-color: var(--accent); }
+.wire-bio-edit-footer { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.wire-bio-save { border-color: var(--accent); color: var(--accent-bright); }
+.wire-bio-counter { margin-left: auto; color: var(--fg-faint); font-size: 12px; }
+.wire-bio-error { margin: 6px 0 0; color: var(--err); font-size: 12px; }
+.wire-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; margin: 0 8px; background: var(--edge); border: 1px solid var(--edge); }
+.wire-stat { display: flex; align-items: baseline; gap: 8px; min-width: 0; padding: 4px 10px; background: var(--bg-0); }
+.wire-stat-value { color: var(--fg-bright); font-size: 16px; }
+.wire-stat-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+
+/* ── Mobile (<768px): meta line over the body; counts are the tap
+   targets; the owner's × is always visible (no hover on touch) ──── */
 @media (max-width: 767px) {
-  .pulse-card.is-splice {
-    margin-left: 10px;
-  }
-
-  .thread-connector {
-    left: -8px;
-  }
-
-  .pulse-actions {
-    flex-wrap: wrap;
-  }
-
-  .delete-button {
-    margin-left: 0;
-    order: -1;
-  }
+  .wire-page { padding-top: 8px; }
+  .wire-bar-sub, .wire-bar-keys, .wire-legend { display: none; }
+  .wire-row, .wire-thread .wire-row { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "time who side" "body body body"; gap: 0 8px; padding: 4px 10px; }
+  .wire-who { font-size: 14px; }
+  .wire-thread { margin-left: 16px; padding-left: 8px; }
+  .wire-thread-reply .wire-prompt-wrap { padding-right: 0; }
+  .echo-button, .splice-button, .delete-button, .pin-button, .pin-move-button { min-height: 28px; padding: 0 6px; }
+  .wire-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wire-share { margin-left: 0; }
+  .wire-prompt .char-count:not(.warning):not(.over-limit) { display: none; } /* room for the placeholder; shows as the cap nears */
 }

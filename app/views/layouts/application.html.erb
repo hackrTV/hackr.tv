@@ -8,7 +8,7 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%# Viewer identity for Stimulus (broadcast-rendered pulse cards and
-        uplink packets are viewer-neutral; pulse-card/packet reveal
+        uplink packets are viewer-neutral; wire-row/packet reveal
         owner/moderator controls and self-mentions from these). %>
     <% if logged_in? %>
       <meta name="current-hackr-id" content="<%= current_hackr.id %>">

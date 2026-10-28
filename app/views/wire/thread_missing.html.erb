@@ -1,0 +1,5 @@
+<%# Turbo-Frame request for a pulse that is gone: a stub in the asking
+    frame instead of the full 404 page ("Content missing" otherwise). %>
+<%= turbo_frame_tag turbo_frame_request_id, target: "_top" do %>
+  <div class="wire-thread-missing">// PULSE NOT FOUND //</div>
+<% end %>

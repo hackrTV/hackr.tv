@@ -1,0 +1,6 @@
+<%# Turbo-Frame response of GET /wire/pulse/:id — the thread fragment
+    inside whichever frame asked (a row's pulse_N_thread today; a context
+    pane tomorrow). turbo-rails swaps in its bare frame layout. %>
+<%= turbo_frame_tag turbo_frame_request_id, target: "_top" do %>
+  <%= render "wire/thread", root: @root, nodes: @nodes, reply_counts: @reply_counts, echoed_ids: @echoed_ids %>
+<% end %>

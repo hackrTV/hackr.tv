@@ -1,0 +1,20 @@
+<%# A thread's contents (ledger redesign, 2026-10): every reply in the
+    thread, flat and chronological, each with a "[>] re @alias" quote
+    line when it answers something other than the root (so live
+    appends and a reload agree on the order), then one reply prompt
+    aimed at the root — a reply row's ↩ retargets it (wire-row#reply).
+    Rendered into the root's inline frame (feed/profile rows, the
+    deep-link page) by wire/thread.html.erb; the frame itself is the
+    caller's. Locals: root, nodes ([[pulse, parent], …] oldest first),
+    reply_counts (parent_id → direct replies), echoed_ids. %>
+<div id="pulse_<%= root.id %>_thread_list" class="wire-thread-list">
+  <% nodes.each do |pulse, parent| %>
+    <%= render "wire/pulse_entry", pulse: pulse, viewer: current_hackr, echoed: echoed_ids.include?(pulse.id),
+      in_thread: true, parent: parent, reply_count: reply_counts.fetch(pulse.id, 0) %>
+  <% end %>
+</div>
+<% if logged_in? && !root.pulse_dropped? %>
+  <div class="wire-thread-reply">
+    <%= render "wire/composer", parent_pulse: root, error_id: "pulse_#{root.id}_reply_error" %>
+  </div>
+<% end %>
