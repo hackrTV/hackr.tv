@@ -35,7 +35,7 @@
 .empty-state { text-align: center; padding: 40px 20px; color: var(--fg-muted); }
 
 /* ── Page + bar ────────────────────────────────────────────────────── */
-.wire-page { max-width: 1100px; margin: 0 auto; padding: 16px 0 40px; color: var(--fg); font-family: var(--font-tui); font-size: 16px; line-height: 20px; }
+.wire-page { max-width: 1100px; margin: 0; padding: 16px 0 40px; color: var(--fg); font-family: var(--font-tui); font-size: 16px; line-height: 20px; }
 .wire-bar { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 0 8px 6px; border-bottom: 1px solid var(--edge); }
 .wire-bar-title { margin: 0; color: var(--accent-bright); font-family: inherit; font-size: 18px; font-weight: bold; letter-spacing: 2px; }
 .wire-bar-sub { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }

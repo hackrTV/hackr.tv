@@ -17,6 +17,8 @@ Keyboard: `?` shows the legend.
 1. Visit `/wire` as the operative. → Rows, newest first, split by
    `// TODAY · <date> //` / `// <date> //` separators in YOUR local day;
    times are local (hover a time for the full date). `● LIVE` in the bar.
+   The ledger column (and a profile's) hugs the LEFT edge like the home
+   console — never centered in a wide window (2026-10-29).
 2. Type in the `>` prompt and press Enter. → Appears at the top WITHOUT a
    reload under TODAY; the counter ("255 / 256"…) reads remaining; the
    prompt clears. Shift+Enter inserts a newline; `[>] TX` sends too. In
