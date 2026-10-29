@@ -9,12 +9,16 @@
   <% end %>
 <% end %>
 
+<%# The console draws its own banner (left, beside the status block), so
+    the chrome's centered ASCII is off for that state only — the live
+    embed and the starting-soon hero keep it. %>
+<% console = @live.nil? && @next_scheduled&.display_state != :starting_soon %>
 <div data-controller="stream-status" data-stream-status-live-value="<%= @live.present? %>">
-  <%= render layout: "shared/default_chrome", locals: {hide_live_banner: true} do %>
+  <%= render layout: "shared/default_chrome", locals: {hide_live_banner: true, ascii: !console} do %>
     <% if @live %>
       <%= render "home/live_embed", stream: @live,
         uplink_channel: @uplink_channel, uplink_packets: @uplink_packets %>
-    <% elsif @next_scheduled&.display_state == :starting_soon %>
+    <% elsif !console %>
       <%= render "home/starting_soon", stream: @next_scheduled %>
     <% else %>
       <%= render "home/terminal" %>

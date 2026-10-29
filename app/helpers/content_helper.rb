@@ -10,6 +10,13 @@ module ContentHelper
     formatted
   end
 
+  # The home console's status block: the same +100 years as a compact
+  # terminal stamp, "2126-10-21 20:00".
+  def future_stamp(datetime)
+    return "" if datetime.blank?
+    (datetime + 100.years).strftime("%Y-%m-%d %H:%M")
+  end
+
   # Markdown for content pages: [[codex links]] resolved, rendered +
   # sanitized, then internal anchors normalized for same-tab Turbo
   # navigation.

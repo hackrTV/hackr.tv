@@ -5,20 +5,41 @@ require "rails_helper"
 RSpec.describe "Hotwire home page", type: :system do
   let!(:hackr) { create(:grid_hackr, password: "hackthegrid") }
 
-  it "types the boot sequence, skips on keydown, and rejects unknown commands" do
+  it "boots the console, skips on keydown, and runs the prompt" do
     visit "/"
 
     expect(page).to have_content("HACKR.TV BROADCAST SYSTEM", wait: 10)
 
-    # Keydown skips straight to the full render + interactive prompt
+    # Keydown skips straight to the full screen + interactive prompt
     # (dispatched directly — cuprite doesn't emit keydown for bare modifiers)
     page.execute_script("document.dispatchEvent(new KeyboardEvent('keydown', {key: 'x'}))")
-    expect(page).to have_content("TRANSMISSION READY. SELECT YOUR DESTINATION.", wait: 10)
-    expect(page).to have_content("FEATURED ARTISTS:")
-    expect(page).to have_content("PLATFORM SERVICES:")
+    expect(page).to have_css(".console[data-boot='done']", wait: 10)
+    expect(page).to have_content("// TRANSMISSION READY. SELECT YOUR DESTINATION. //")
+    expect(page).to have_content("// FEATURED ARTISTS //")
+    expect(page).to have_content("// PLATFORM SERVICES //")
+    within(".console-status") { expect(page).to have_content("ANONYMOUS · [>] CONNECT") }
 
-    find(".terminal-hidden-input", visible: :all).send_keys("xyzzy", :enter)
+    find(".console-input", visible: :all).send_keys("xyzzy", :enter)
     expect(page).to have_content("UNKNOWN COMMAND: xyzzy")
+
+    find(".console-input", visible: :all).send_keys("?", :enter)
+    expect(page).to have_content("COMMANDS: 0 1 2 fm vault grid wire codex logs schedule · clear")
+
+    find(".console-input", visible: :all).send_keys("fm", :enter)
+    expect(page).to have_current_path("/fm", wait: 10)
+  end
+
+  it "names the logged-in operative and offers the Uplink row" do
+    visit "/grid/login"
+    fill_in "hackr_alias", with: hackr.hackr_alias
+    fill_in "password", with: "hackthegrid"
+    click_button "CONNECT"
+    expect(page).to have_current_path("/grid")
+
+    visit "/"
+    expect(page).to have_css(".console[data-boot='done']", wait: 10)
+    within(".console-status") { expect(page).to have_link("@#{hackr.hackr_alias}", href: "/wire/#{hackr.hackr_alias.downcase}") }
+    expect(page).to have_css(".console-row a[data-command='uplink']", text: "Uplink")
   end
 
   it "hides the docked Uplink while a popout window is alive" do

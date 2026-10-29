@@ -20,7 +20,7 @@ RSpec.describe PagesController, type: :request do
       it "renders the Hotwire home page (migrated Phase 3)" do
         get "/"
         expect(response).to have_http_status(:success)
-        expect(response.body).to include("terminal-container")
+        expect(response.body).to include('data-controller="terminal"')
         expect(response.body).not_to include('<div id="root">')
       end
     end
