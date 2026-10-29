@@ -760,21 +760,65 @@
 .toast-item { color: #60a5fa; }
 .toast-achievement-grant { color: var(--warn); }
 
-/* --- Home page (Phase 3: TerminalAnimation / StartingSoonHero /
- * ScheduledStreamBanner / LiveStreamEmbed ports) --- */
-.terminal-container { background: var(--bg-0); color: #33cc33; font-family: var(--font-tui); padding: 20px; margin: 20px auto 0 auto; border: 2px solid #33aa33; min-height: calc(100vh - 400px); max-width: 1200px; box-shadow: 0 0 15px rgba(51, 170, 51, 0.2); }
-@media (max-width: 767px) { .terminal-container { margin: 5px; padding: 12px; font-size: 14px; min-height: auto; overflow-x: hidden; word-wrap: break-word; overflow-wrap: break-word; } }
-.terminal-output { white-space: pre-wrap; line-height: 1.6; }
-.terminal-cursor { display: inline-block; width: 10px; height: 18px; background: #33cc33; animation: terminal-blink 1s infinite; vertical-align: -2px; }
+/* --- Home console (home/_terminal; terminal controller, 2026-10-28) ---
+ * The boot screen as a left-anchored terminal on the ledger's tokens:
+ * Terminus 16/20, hairline "// RULES //", phosphor green (--live) only
+ * for the prompt mark, the cursor and ONLINE. The ASCII banner and the
+ * status block share the head row from 768px; every artist / service is
+ * one aligned line (tag | name | description). Lines are invisible while
+ * data-boot="pending" and the controller flicks them on in order
+ * (visibility, so nothing reflows); without scripting they simply show.
+ * The /terminal easter-egg page styles itself inline — nothing here.
+ * The starting-soon hero / countdown banner / live embed follow. --- */
+.console { max-width: 1100px; margin: 0; padding: 4px 0 24px; color: var(--fg); font-family: var(--font-tui); font-size: 16px; line-height: 20px; }
+.console[data-boot="pending"] .console-line:not(.console-line--on) { visibility: hidden; }
+@media (scripting: none) { .console .console-line { visibility: visible; } }
+.console-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 40px; padding: 0 8px 8px; border-bottom: 1px solid var(--edge); }
+.console-banner { display: block; color: var(--fg-bright); text-decoration: none; }
+.console-banner:hover { color: var(--accent-bright); }
+.console-banner pre { margin: 0; font-family: inherit; font-size: 12px; line-height: 14px; }
+.console-status { display: flex; flex-direction: column; flex: 1 1 360px; min-width: 0; }
+.console-status-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 0 12px; }
+.console-key { color: var(--fg-faint); font-size: 12px; line-height: 20px; letter-spacing: 1px; }
+.console-val { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.console-dim { color: var(--fg-faint); }
+.console-hot { color: var(--live); }
+.console-link { color: var(--accent-alt); text-decoration: none; }
+.console-link:hover { color: var(--fg-bright); text-decoration: underline; }
+.console-welcome { margin: 8px 0 0; padding: 0 8px; }
+.console-rule { display: flex; align-items: center; gap: 8px; margin: 6px 0 2px; padding: 0 8px; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
+.console-rule::before, .console-rule::after { content: ""; flex: 1; border-top: 1px solid var(--edge); }
+.console-row { display: grid; grid-template-columns: var(--console-tag, 10ch) 16ch minmax(0, 1fr); gap: 0 12px; align-items: baseline; padding: 0 8px; }
+.console-section--artists { --console-tag: 3ch; }
+.console-tag { color: var(--fg-faint); white-space: nowrap; }
+.console-row .console-link { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.console-desc { min-width: 0; color: var(--fg-muted); }
+.console-reply { padding: 0 8px; color: var(--fg-muted); }
+.console-reply[hidden] { display: none; }
+.console-echo { color: var(--fg-faint); }
+.console-err { color: var(--err); }
+.console-prompt { display: flex; align-items: center; position: relative; padding: 0 8px; }
+.console-prompt[hidden] { display: none; } /* the flex display would beat the UA [hidden] rule (the WIRE inline-form find) */
+.console-mark { margin-right: 8px; color: var(--live); font-weight: bold; }
+.console-typed { white-space: pre; }
+.console-cursor { display: inline-block; width: 8px; height: 16px; background: var(--live); animation: terminal-blink 1s step-end infinite; vertical-align: -2px; }
 @keyframes terminal-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-.terminal-link { color: #4db8e8; text-decoration: underline; }
-.terminal-link:hover { color: #66ccff; }
-.terminal-prompt { color: #5cd65c; font-weight: bold; }
-.terminal-header { color: #5cb3cc; }
-.terminal-error { color: #ff6633; line-height: 1.6; }
-.terminal-input-line { display: flex; align-items: center; position: relative; line-height: 1.6; }
-.terminal-typed-text { color: #33cc33; white-space: pre; }
-.terminal-hidden-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; border: none; background: transparent; color: transparent; font-family: inherit; font-size: inherit; cursor: text; }
+.console-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; border: none; background: transparent; color: transparent; font: inherit; cursor: text; }
+.console-hint { padding: 2px 8px 0; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+@media (max-width: 767px) {
+  .console { padding-top: 0; font-size: 14px; line-height: 18px; }
+  .console-head { gap: 6px 0; }
+  .console-status { flex-basis: 100%; }
+  .console-status-row { grid-template-columns: 72px minmax(0, 1fr); }
+  .console-key { line-height: 18px; }
+  .console-val { white-space: normal; }
+  .console-row { grid-template-columns: var(--console-tag, 10ch) minmax(0, 1fr); grid-template-areas: "tag name" "tag desc"; gap: 0 8px; }
+  .console-tag { grid-area: tag; }
+  .console-row .console-link { grid-area: name; }
+  .console-desc { grid-area: desc; font-size: 12px; line-height: 16px; }
+  .console-cursor { height: 14px; }
+}
+@media (max-width: 379px) { .console-banner pre { font-size: 10px; line-height: 12px; } }
 
 .starting-soon-hero { position: relative; overflow: hidden; text-align: center; padding: 60px; background: linear-gradient(90deg, #0a1a2e 0%, #0d2847 50%, #0a1a2e 100%); border: 1px solid #06b6d4; font-family: var(--font-tui); }
 .starting-soon-sweep { position: absolute; top: 0; bottom: 0; left: -100%; width: 60%; background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent); animation: live-pulse 3s linear infinite; }

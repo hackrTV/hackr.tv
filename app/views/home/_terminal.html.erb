@@ -1,15 +1,124 @@
-<%# TerminalAnimation.tsx port — the line copy + typing engine live in
-    terminal_controller.ts (they were component-internal in the SPA too);
-    command input navigates via full page loads (cross-stack safe). %>
-<div class="terminal-container" data-controller="terminal">
-  <div class="terminal-output" data-terminal-target="output"></div>
-  <div class="terminal-input-line" data-terminal-target="inputLine" hidden>
-    <span class="terminal-prompt">&gt;&nbsp;</span>
-    <span class="terminal-typed-text" data-terminal-target="typed"></span>
-    <span class="terminal-cursor"></span>
-    <input type="text" class="terminal-hidden-input" data-terminal-target="input"
-      data-action="input->terminal#inputChanged keydown->terminal#inputKeydown"
-      aria-label="Terminal command input" autocomplete="off" spellcheck="false">
+<%# The home console (2026-10-28): the boot screen as a server-rendered,
+    left-anchored terminal — the ASCII banner beside a system status
+    block, one line per artist / service, a "> " prompt — on the WIRE
+    ledger's tokens (Terminus 16/20, hairline "// RULES //", phosphor
+    green only for the mark, the cursor and ONLINE). The terminal
+    controller flicks the lines on in order like a boot log (a keydown
+    or click skips; phones and reduced-motion render at once) and runs
+    the prompt: a typed tag matches a row link's data-command and
+    Turbo-visits it, ? lists them, clear wipes the replies. Everything
+    typed is served; without scripting the screen is simply visible.
+    Assigns: @next_scheduled, @last_broadcast (HomeController). %>
+<% year = Time.current.year %>
+<% artists = [
+  ["0", "/thecyberpulse", "The.CyberPul.se", "Flagship Standard Bearers of the Hackrs of CyberSpace"],
+  ["1", "/wavelength-zero", "Wavelength Zero", "Emotive Signal refraction"],
+  ["2", "/voiceprint", "Voiceprint", "Archived human expression"]
+] %>
+<% services = [
+  ["FM", "/fm", "hackr.fm", "Radio & music streaming"],
+  ["VAULT", "/vault", "Pulse Vault", "The hackr.fm track archive"],
+  ["GRID", "/grid", "THE PULSE GRID", "Text-based interface for CyberSpace hacking endeavors in #{year + 100}"],
+  ["WIRE", "/wire", "The WIRE", "Wideband Information Relay Emitter"],
+  (["UPLINK", "/uplink", "Uplink", "Operative comms"] if logged_in?),
+  ["CODEX", "/codex", "The Codex", "Context archive & wiki"],
+  ["LOGS", "/logs", "Hackr Logs", "Updates from the Fracture Network"],
+  ["SCHEDULE", "/schedule", "Schedule", "Upcoming & past broadcasts"]
+].compact %>
+<div class="console" data-controller="terminal" data-boot="pending"
+  data-action="keydown@document->terminal#skip click->terminal#skip">
+  <div class="console-head">
+    <%= link_to "/", class: "console-banner console-line", data: {terminal_target: "line"} do %><pre id="greetings"> __  __                   __            ______  __  __
+/\ \/\ \                 /\ \          /\__  _\/\ \/\ \
+\ \ \_\ \     __      ___\ \ \/'\   _ _\/_/\ \/\ \ \ \ \
+ \ \  _  \  /'__`\   /'___\ \ , <  /\`'__\\ \ \ \ \ \ \ \
+  \ \ \ \ \/\ \L\._/\ \__/\ \ \\`\\ \ \/ _\ \ \ \ \ \_/ \
+   \ \_\ \_\ \__/.\_\ \____\\ \_\ \_\ \_\/\_\ \_\ \ `\___/
+    \/_/\/_/\/__/\/_/\/____/ \/_/\/_/\/_/\/_/\/_/  `\/__/</pre><% end %>
+    <div class="console-status">
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">SYSTEM</span>
+        <span class="console-val">HACKR.TV BROADCAST SYSTEM <span class="console-dim">v3.14.1592</span></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">STATUS</span>
+        <span class="console-val"><span class="console-hot">● ONLINE</span></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">YEAR</span>
+        <span class="console-val"><%= year %> <span class="console-dim">· ORIGIN POINT</span></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">SIGNAL</span>
+        <span class="console-val"><%= year %> → <%= year + 100 %></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">OPERATIVE</span>
+        <span class="console-val">
+          <% if logged_in? %>
+            <%= link_to "@#{current_hackr.hackr_alias}", "/wire/#{current_hackr.hackr_alias.downcase}", class: "console-link" %>
+            <% if (badge = uplink_role_badge(current_hackr.role)) %><span class="console-dim">· <%= badge %></span><% end %>
+          <% else %>
+            ANONYMOUS <span class="console-dim">·</span> <%= link_to "[>] CONNECT", "/grid/login", class: "console-link" %>
+          <% end %>
+        </span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">NEXT TX</span>
+        <span class="console-val">
+          <% if @next_scheduled %>
+            <%= future_stamp(@next_scheduled.scheduled_at) %> <span class="console-dim">·</span> <%= link_to @next_scheduled.title, "/schedule", class: "console-link" %><% if @next_scheduled.artist %> <span class="console-dim">· <%= @next_scheduled.artist.name %></span><% end %>
+          <% else %>
+            UNSCHEDULED <span class="console-dim">·</span> <%= link_to "[>] SCHEDULE", "/schedule", class: "console-link" %>
+          <% end %>
+        </span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">LAST TX</span>
+        <span class="console-val">
+          <% if @last_broadcast %>
+            <%= future_stamp(@last_broadcast.started_at) %> <span class="console-dim">·</span> <%= link_to @last_broadcast.title, "/schedule", class: "console-link" %><% if @last_broadcast.artist %> <span class="console-dim">· <%= @last_broadcast.artist.name %></span><% end %>
+          <% else %>
+            <span class="console-dim">NO RECORD</span>
+          <% end %>
+        </span>
+      </div>
+    </div>
   </div>
-  <div class="terminal-error" data-terminal-target="error" hidden></div>
+
+  <p class="console-welcome console-line" data-terminal-target="line">Welcome to hackr.tv — the multimedia <%= link_to "Fracture Network", "/codex/the-fracture-network", class: "console-link" %> platform broadcasting urgent transmissions <%= link_to "across time", "/timeline", class: "console-link" %> and space from <%= year + 100 %>.</p>
+
+  <section class="console-section console-section--artists" aria-label="Featured artists">
+    <div class="console-rule console-line" data-terminal-target="line"><span>// FEATURED ARTISTS //</span></div>
+    <% artists.each do |tag, href, name, desc| %>
+      <div class="console-row console-line" data-terminal-target="line">
+        <span class="console-tag">[<%= tag %>]</span>
+        <%= link_to name, href, class: "console-link", data: {command: tag.downcase} %>
+        <span class="console-desc"><%= desc %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section console-section--services" aria-label="Platform services">
+    <div class="console-rule console-line" data-terminal-target="line"><span>// PLATFORM SERVICES //</span></div>
+    <% services.each do |tag, href, name, desc| %>
+      <div class="console-row console-line" data-terminal-target="line">
+        <span class="console-tag">[<%= tag %>]</span>
+        <%= link_to name, href, class: "console-link", data: {command: tag.downcase} %>
+        <span class="console-desc"><%= desc %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <div class="console-rule console-line" data-terminal-target="line"><span>// TRANSMISSION READY. SELECT YOUR DESTINATION. //</span></div>
+
+  <div class="console-reply" data-terminal-target="reply" hidden></div>
+  <div class="console-prompt" data-terminal-target="inputLine" hidden>
+    <span class="console-mark">&gt;</span>
+    <span class="console-typed" data-terminal-target="typed"></span><span class="console-cursor"></span>
+    <input type="text" class="console-input" data-terminal-target="input"
+      data-action="input->terminal#inputChanged keydown->terminal#inputKeydown"
+      aria-label="Console command" autocomplete="off" autocapitalize="off" spellcheck="false">
+  </div>
+  <div class="console-hint console-line" data-terminal-target="line">type a tag <span class="console-dim">(<%= services.map { |tag, *| tag.downcase }.join(" ") %>)</span> or an artist index <span class="console-dim">(<%= artists.map(&:first).join(" ") %>)</span> · enter · ? help</div>
 </div>
