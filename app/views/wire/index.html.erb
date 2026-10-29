@@ -15,8 +15,9 @@
         two-column grid (pulse_wire.css); the wire_pane cookie renders it
         open from the first paint. wire-view: v / [≡] MUTT writes the
         wire_view cookie and revisits. %>
-    <div class="wire-page" data-view="ledger" data-controller="wire-keys wire-feed wire-pane wire-view"<%= raw(' data-pane="open"') if @pane_open %>
-      data-action="keydown@document->wire-keys#key wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle wire-keys:view->wire-view#toggle">
+    <%# data-turbo-prefetch="false" (all four WIRE pages): links here are claimed into frames other than their own target by wire-row/wire-pane, and a hover-prefetched response (fetched for the link's target, or with no frame at all) would be handed to that frame load — "Content missing". %>
+    <div class="wire-page" data-view="ledger" data-turbo-prefetch="false" data-controller="wire-keys wire-feed wire-pane wire-view"<%= raw(' data-pane="open"') if @pane_open %>
+      data-action="keydown@document->wire-keys#key click->wire-keys#click wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle wire-keys:back->wire-pane#back wire-keys:view->wire-view#toggle">
       <div class="wire-bar" data-controller="wire-status">
         <h1 class="wire-bar-title" title="Wideband Information Relay Emitter">The WIRE</h1>
         <span class="wire-bar-sub">WIDEBAND INFORMATION RELAY EMITTER</span>

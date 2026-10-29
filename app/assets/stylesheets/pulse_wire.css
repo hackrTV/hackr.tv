@@ -77,7 +77,8 @@
 .wire-empty-sub, .wire-end-sub { color: var(--edge-bright); font-size: 12px; margin-top: 6px; }
 
 /* ── Row ───────────────────────────────────────────────────────────── */
-.wire-row { display: grid; grid-template-columns: 44px 150px minmax(0, 1fr) auto; grid-template-areas: "time who body side"; gap: 0 10px; align-items: start; padding: 2px 8px; scroll-margin-top: calc(var(--site-header-h, 0px) + 8px); scroll-margin-bottom: calc(var(--player-bar-h, 0px) + 8px); }
+.wire-row { display: grid; grid-template-columns: 44px 150px minmax(0, 1fr) auto; grid-template-areas: "time who body side"; gap: 0 10px; align-items: start; padding: 2px 8px; scroll-margin-top: calc(var(--site-header-h, 0px) + 8px); scroll-margin-bottom: calc(var(--player-bar-h, 0px) + 8px); cursor: pointer; } /* a click is a cursor move (wire-keys#click): no I-bar over the text */
+.wire-row--dropped, #wire-pane .wire-row { cursor: auto; } /* not walkable: the click does nothing */
 .wire-row:hover, .wire-row--cursor { background-color: var(--bg-1); }
 .wire-row--cursor { outline: 1px solid var(--accent); outline-offset: -1px; } /* an outline, so it never fights the pin bar */
 .wire-row--pinned { box-shadow: inset 2px 0 0 0 var(--warn); }
@@ -151,6 +152,8 @@
 .wire-pane-kicker { color: var(--accent-bright); font-weight: bold; }
 .wire-pane-meta { overflow: hidden; text-overflow: ellipsis; color: var(--fg-faint); }
 .wire-pane-page { margin-left: auto; color: var(--fg-faint); text-decoration: none; }
+.wire-pane-back { margin-left: auto; } /* the record head: BACK, then PROFILE at its normal gap */
+.wire-pane-back ~ .wire-pane-page { margin-left: 0; }
 .wire-pane-page:hover { color: var(--accent-bright); }
 .wire-pane-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0; }
 .wire-pane-root { padding: 0 10px 8px; border-bottom: 1px solid var(--edge); }
@@ -224,8 +227,9 @@
 .wire-legend[hidden] { display: none; }
 .wire-legend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .wire-legend-title { color: var(--accent-bright); font-size: 12px; letter-spacing: 1px; }
-.wire-legend-close, .wire-pane-close { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.wire-legend-close, .wire-pane-close, .wire-pane-back { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; letter-spacing: inherit; cursor: pointer; }
 .wire-legend-close:hover, .wire-pane-close:hover { color: var(--fg-bright); }
+.wire-pane-back:hover { color: var(--accent-bright); }
 .wire-legend-rows { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; margin: 0; }
 .wire-legend-rows dt { color: var(--fg-bright); font-weight: bold; white-space: nowrap; }
 .wire-legend-rows dd { margin: 0; color: var(--fg-muted); }

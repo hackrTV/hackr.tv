@@ -21,7 +21,7 @@ function row (id: number, root = true): string {
 
 function page (rows: string, pane = '', src: string | null = null, view = ''): string {
   return `
-    <div class="wire-page"${view ? ` data-view="${view}"` : ''} data-controller="wire-pane" data-action="wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle">
+    <div class="wire-page"${view ? ` data-view="${view}"` : ''} data-controller="wire-pane" data-action="wire:cursor->wire-pane#follow wire-row:pane->wire-pane#claim wire-keys:pane->wire-pane#toggle wire-keys:back->wire-pane#back">
       <div class="wire-bar"><button class="wire-bar-pane" aria-pressed="false" data-wire-pane-target="toggle" data-action="click->wire-pane#toggle">[>] CONTEXT</button></div>
       <div class="wire-main"><div id="wire-feed">${rows}</div></div>
       <aside class="wire-pane">
@@ -219,6 +219,34 @@ describe('WirePaneController', () => {
     offer('pulse_1', { url: '/wire/ghost' })
     expect(frame().getAttribute('src')).toBe('/wire/ghost')
     expect(sel()).toBeUndefined()
+  })
+
+  it('goes back from a record to the thread it was opened over ([<] BACK / wire-keys:back), or to the placeholder when that row is gone', async () => {
+    await start(page(row(1) + row(2), thread(1), '/wire/pulse/1'))
+    expect(sel()).toBe('pulse_1')
+    const back = (): void => { pageEl().dispatchEvent(new CustomEvent('wire-keys:back')) }
+
+    back() // a thread is shown: nothing behind it
+    expect(frame().getAttribute('src')).toBe('/wire/pulse/1')
+    expect(sel()).toBe('pulse_1')
+
+    offer('pulse_1', { url: '/wire/ghost' }) // the record over it
+    expect(frame().getAttribute('src')).toBe('/wire/ghost')
+    expect(sel()).toBeUndefined()
+    frame().innerHTML = '<div class="wire-pane-head"><button type="button" class="wire-pane-back" data-action="click->wire-pane#back">[<] BACK</button></div>'
+    await Promise.resolve()
+    frame().querySelector<HTMLElement>('.wire-pane-back')!.click()
+    expect(frame().getAttribute('src')).toBe('/wire/pulse/1')
+    expect(sel()).toBe('pulse_1')
+
+    offer('pulse_2', { url: '/wire/pulse/2', select: '2' })
+    offer('pulse_2', { url: '/wire/ghost' })
+    document.getElementById('pulse_2_entry')!.remove() // that thread's row left while the record showed
+    await new Promise(resolve => setTimeout(resolve, 0))
+    back()
+    expect(frame().getAttribute('src')).toBeNull() // nothing to return to: the placeholder
+    expect(frame().children.length).toBe(0)
+    expect(pageEl().dataset.pane).toBe('open') // back never closes the pane
   })
 
   it('focuses the prompt once a reply load lands and localizes the root stamp', async () => {

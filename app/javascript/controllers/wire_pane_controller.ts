@@ -11,7 +11,9 @@ import { WIDE_MIN_WIDTH, WIDE_QUERY } from '~/utils/wireLayout'
 // (WireController branches on the frame id). Mounted on .wire-page
 // beside wire-keys and wire-feed; open → data-pane="open". In MUTT mode
 // (.wire-page[data-view="mutt"]) the pane is the pager: always on, the
-// toggles inert.
+// toggles inert. A record sits one level over the thread it was opened
+// from: [<] BACK in its head / the q key (wire-keys:back) restore that
+// thread, or the placeholder when none was behind.
 // Rows OFFER their loads through a cancelable wire-row:pane event: an
 // active pane claims it (preventDefault + load), otherwise the row's
 // inline frame / profile visit runs. wire-keys' wire:cursor is followed
@@ -43,6 +45,7 @@ export default class extends Controller<HTMLElement> {
   private open = false
   private media: MediaQueryList | null = null
   private selectedId: string | null = null
+  private lastThread: Load | null = null // what a record was opened over
   private pendingFocus = false
   private followTimer: number | null = null
   private observer: MutationObserver | null = null
@@ -122,6 +125,15 @@ export default class extends Controller<HTMLElement> {
     this.load({ url: href, select: null })
   }
 
+  // [<] BACK on a record, the q key: the thread behind it (if its row is
+  // still here), else the placeholder. A shown thread has nothing behind.
+  back (): void {
+    if (!this.active() || !this.hasFrameTarget || this.selectedId !== null || this.frameTarget.children.length === 0) return
+    const behind = this.lastThread
+    if (behind?.select && document.getElementById(`pulse_${behind.select}`)) this.load(behind)
+    else this.empty()
+  }
+
   // wire:cursor from wire-keys: follow root rows after a beat.
   follow (event: Event): void {
     const row = event.target
@@ -140,7 +152,10 @@ export default class extends Controller<HTMLElement> {
     if (!this.hasFrameTarget) return
     const frame = this.frameTarget
     const shown = select !== null && select === this.selectedId && frame.children.length > 0 && this.current() === this.resolve(url)
-    if (select !== null) this.foldInline(select)
+    if (select !== null) {
+      this.foldInline(select)
+      this.lastThread = { url, select }
+    }
     this.select(select)
     if (shown) {
       if (focus) this.focusPrompt()
@@ -211,6 +226,7 @@ export default class extends Controller<HTMLElement> {
   private empty (): void {
     this.cancelFollow()
     this.select(null)
+    this.lastThread = null
     this.pendingFocus = false
     if (!this.hasFrameTarget) return
     this.frameTarget.removeAttribute('src')
@@ -238,7 +254,10 @@ export default class extends Controller<HTMLElement> {
     if (!this.active()) return
     const src = this.frameTarget.getAttribute('src')
     const match = src ? THREAD_PATH.exec(new URL(src, window.location.href).pathname) : null
-    if (match?.[1] && this.frameTarget.children.length > 0) this.select(match[1])
+    if (match?.[1] && this.frameTarget.children.length > 0) {
+      this.select(match[1])
+      this.lastThread = { url: src!, select: match[1] }
+    }
   }
 
   private focusPrompt (): void {

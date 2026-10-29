@@ -1,9 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Keyboard layer for the WIRE pages (mounted on .wire-page with
-// keydown@document->wire-keys#key): a cursor row moved with j/k (g/G
-// first/last) that e/r/o/x act on, / focuses the prompt, ? toggles the
-// legend, Escape closes it and clears the cursor. Keys are ignored while
+// keydown@document->wire-keys#key and click->wire-keys#click): a cursor
+// row moved with j/k (g/G first/last) that e/r/o/x act on, / focuses
+// the prompt, ? toggles the legend, Escape closes it and clears the
+// cursor. A plain click on a row's own surface puts the cursor there
+// too — mouse and keys share the one cursor. Keys are ignored while
 // typing (input/textarea/select/contenteditable) and with a modifier
 // held. Rows are re-read from the DOM on every key — broadcasts
 // prepend, replace and remove them — and the cursor is kept by id, so a
@@ -11,8 +13,9 @@ import { Controller } from '@hotwired/stimulus'
 // threads are walked in document order, rows inside the context pane
 // never (the pane is read, not walked). Every cursor move dispatches
 // wire:cursor on the row (the pane follows it); c dispatches
-// wire-keys:pane (the pane toggles); v dispatches wire-keys:view (the
-// view switches); a clicks the row's author link (record in the pane,
+// wire-keys:pane (the pane toggles); q dispatches wire-keys:back (the
+// pane leaves a record for its thread); v dispatches wire-keys:view
+// (the view switches); a clicks the row's author link (record in the pane,
 // else the profile); Enter with nothing focused opens like o (MUTT's
 // index). MUTT mode starts with the cursor on the first row, a tick
 // after connect so the siblings' bindings are up. x is press-twice
@@ -62,6 +65,7 @@ export default class extends Controller<HTMLElement> {
     case 'r': event.preventDefault(); this.emit('wire:reply'); break // a prompt may take focus now: no stray "r"
     case 'a': this.press('.wire-author'); break
     case 'c': this.dispatch('pane'); break
+    case 'q': this.dispatch('back'); break
     case 'v': this.dispatch('view'); break
     case 'Enter': if (event.target === document.body) this.emit('wire:open'); break
     case 'x': this.deleteCursor(); break
@@ -71,6 +75,21 @@ export default class extends Controller<HTMLElement> {
     default: return
     }
     if (event.key !== 'x') this.disarm()
+  }
+
+  // A plain click on a row — not on a link, button or form control in
+  // it (those act for themselves; the author link's record would be
+  // clobbered by the follow), not inside the pane, not ending a text
+  // selection — makes it the cursor row: the pane follows as after j/k.
+  click (event: MouseEvent): void {
+    if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+    const target = event.target
+    if (!(target instanceof Element) || target.closest('a, button, input, textarea, select, label')) return
+    const row = target.closest<HTMLElement>('.wire-row')
+    if (!row || !this.rows().includes(row)) return
+    if (document.getSelection()?.isCollapsed === false) return
+    this.disarm()
+    this.setCursor(row)
   }
 
   toggleLegend (): void {

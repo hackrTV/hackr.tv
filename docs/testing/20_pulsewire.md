@@ -47,13 +47,16 @@ Keyboard: `?` shows the legend.
    prompt, `/` focuses the top prompt, `x` on your own row arms it (red
    ×) and a second `x` within 1.5s deletes, `?` toggles the legend,
    `Esc` closes it and clears the cursor. Keys do nothing while typing.
+   Click a row's text (not a link or button in it). → It becomes the
+   cursor row too; `e`/`o`/`r` then act on it.
 9. **Context pane** (desktop ≥1280px wide, first visit): `[>] CONTEXT`
    in the bar reads pressed and a 380px pane sits beside the feed
    reading `// SELECT A PULSE //`. Press `j` twice. → The cursor row
    gets a purple left bar and the pane shows `THREAD #id · n PULSES`,
    the root in full (local date + time), its replies and a splice
-   prompt; the row's inline thread does NOT unfold. Move with `j`/`k`.
-   → The pane follows the cursor (a short beat later).
+   prompt; the row's inline thread does NOT unfold. Move with `j`/`k`,
+   or click another row. → The pane follows the cursor (a short beat
+   later).
 10. In the pane, post a splice. → It lands in the pane; the row's `↩ n`
     bumps. Press `r` on the row. → The pane's prompt takes focus. Click
     a reply's `↩` in the pane. → The prompt re-aims (placeholder "Reply
@@ -62,7 +65,9 @@ Keyboard: `?` shows the legend.
     OPERATIVE record (alias, role, CL, member since, activity, bio, six
     stats) with `[>] PROFILE`; the URL stays `/wire`. Ctrl/middle-click
     an alias. → The profile opens as usual. `a` on the cursor row does
-    the same as the plain click.
+    the same as the plain click. `[<] BACK` in the record's head (or
+    `q`). → The thread is back, its row marked again; with no thread
+    behind it, the pane returns to `// SELECT A PULSE //`.
 12. Press `c` (or the pane's `[x]`, or `[>] CONTEXT`). → The pane closes;
     `↩` now unfolds threads inline as in step 5. Reload. → Still closed
     (remembered per browser); `c` again reopens it and, with a cursor
@@ -78,9 +83,9 @@ Keyboard: `?` shows the legend.
     the body clipped to one line), a `-*-WIRE: ALL TRAFFIC [Pulses:n
     New:0]---(1/n)---(p%)---` status line, the pager (the thread of the
     cursor line, opened at once on the newest), the `>` prompt, a key
-    bar. `j`/`k` move the cursor and the pager follows; the status line
-    tracks `(i/n)`; `Enter` = open; the index and pager scroll on their
-    own, the page never does.
+    bar. `j`/`k` (or a click on a line) move the cursor and the pager
+    follows; the status line tracks `(i/n)`; `Enter` = open; the index
+    and pager scroll on their own, the page never does.
 15. **Flags**: your own pulses show `F`; echo a line (`e`) → `E` appears
     next to it; a dropped pulse shows `D`. From the second browser,
     broadcast a pulse. → It lands at the top with `N` (bright text) and
@@ -88,7 +93,8 @@ Keyboard: `?` shows the legend.
     clears, `New:0`.
 16. Reply from the pager (`r`, type, Enter). → Lands in the pager, the
     line's `↩ n` bumps. Click an alias. → The pager shows the OPERATIVE
-    record (`[>] PROFILE` leads out). Press `v`. → Back to the ledger;
+    record (`[>] PROFILE` leads out); `q` or `[<] BACK` returns to the
+    thread. Press `v`. → Back to the ledger;
     reload → still the ledger (cookie); `v` again → MUTT (remembered on
     reload too, no flash of the other layout).
 17. Narrow the window under 1100px while in MUTT. → It degrades to a
