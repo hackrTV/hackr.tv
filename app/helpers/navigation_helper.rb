@@ -14,7 +14,7 @@ module NavigationHelper
   end
 
   # Every artist slug except the two with their own nav entries. On these
-  # namespaces the hackr.fm item lights up (header + footer).
+  # namespaces the hackr.fm item lights up.
   BAND_NAV_SLUGS = (ArtistCatalogHelper::ARTIST_THEME_SLUGS - %w[thecyberpulse xeraen]).freeze
 
   def band_namespace_active?

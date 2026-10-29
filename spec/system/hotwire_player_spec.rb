@@ -28,8 +28,7 @@ RSpec.describe "Hotwire permanent player", type: :system do
     expect(page).to have_button("❚❚ PAUSE", id: "play-pause-btn", wait: 10)
 
     # --- Turbo visit away: playback must survive the body swap ---
-    # (scripted Turbo.visit: the fixed statusbar sits under the player bar,
-    # so its links aren't clickable while the bar is up — same as the SPA)
+    # (scripted Turbo.visit: the step is about the body swap, not the nav)
     page.execute_script("window.Turbo.visit('/wire')")
     expect(page).to have_current_path("/wire")
 

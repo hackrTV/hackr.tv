@@ -8,7 +8,8 @@ minutes: 13
 ## Steps
 
 1. Visit `/` logged out. → Home page renders: hero/terminal styling, nav,
-   footer. No console errors.
+   no footer menu (dropped 2026-10-28; only the player bar is fixed at the
+   bottom). No console errors.
 2. Log in as the operative and revisit `/`. → Logged-in nav state (alias
    visible / grid entry present).
 3. **Stream offline state**: with no live stream, the live panel /
