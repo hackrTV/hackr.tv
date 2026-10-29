@@ -112,6 +112,7 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include("wire-badge--admin")
       expect(response.body).to include('data-controller="wire-keys wire-feed wire-pane wire-view"')
       expect(response.body).to include("click->wire-keys#click") # a row click is a cursor move
+      expect(response.body).to include('class="wire-page" data-view="ledger" data-turbo-prefetch="false"') # hover prefetch would feed the pane a frameless page
       expect(response.body).to include("[&gt;] CONTEXT")
       expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
       expect(response.body).to include("// SELECT A PULSE //")
@@ -143,6 +144,7 @@ RSpec.describe "Wire pages", type: :request do
       expect(response.body).to include('class="wire-page wire-mutt" data-view="mutt"')
       expect(response.body).to include('data-wire-view-total-value="1"')
       expect(response.body).to include("click->wire-keys#click")
+      expect(response.body).to include('data-view="mutt" data-turbo-prefetch="false"')
       expect(response.body).to include("wire-ix-head")
       expect(response.body).to include("wire-mutt-status")
       expect(response.body).to include("wire-mutt-keys")
@@ -295,6 +297,7 @@ RSpec.describe "Wire pages", type: :request do
       get "/wire/#{hackr.hackr_alias.downcase}"
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include('<div class="wire-page" data-turbo-prefetch="false"')
       expect(response.body).to include("@#{hackr.hackr_alias}")
       expect(response.body).to include("MEMBER SINCE")
       expect(response.body).to include("WIRE PULSES")
@@ -334,6 +337,7 @@ RSpec.describe "Wire pages", type: :request do
       get "/wire/#{hackr.hackr_alias.downcase}", headers: {"Turbo-Frame" => "wire-pane"}
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include("[&lt;] BACK") # one level up: the thread the record was opened over
       expect(response.body).to match(/<turbo-frame[^>]*id="wire-pane"/)
       expect(response.body).to include("OPERATIVE")
       expect(response.body).to include("[&gt;] PROFILE")
@@ -349,6 +353,7 @@ RSpec.describe "Wire pages", type: :request do
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include("// NO RECORD //")
+      expect(response.body).to include("[&lt;] BACK")
     end
 
     it "keeps the full page for other frame requests (the bio frame following its redirect)" do
@@ -416,6 +421,7 @@ RSpec.describe "Wire pages", type: :request do
       get "/wire/pulse/#{root.id}"
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include('<div class="wire-page" data-turbo-prefetch="false"')
       expect(response.body).to include("Thread")
       expect(response.body).to include("3 pulses")
       expect(response.body).to include("Thread root pulse")

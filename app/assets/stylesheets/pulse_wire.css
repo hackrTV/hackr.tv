@@ -152,6 +152,8 @@
 .wire-pane-kicker { color: var(--accent-bright); font-weight: bold; }
 .wire-pane-meta { overflow: hidden; text-overflow: ellipsis; color: var(--fg-faint); }
 .wire-pane-page { margin-left: auto; color: var(--fg-faint); text-decoration: none; }
+.wire-pane-back { margin-left: auto; } /* the record head: BACK, then PROFILE at its normal gap */
+.wire-pane-back ~ .wire-pane-page { margin-left: 0; }
 .wire-pane-page:hover { color: var(--accent-bright); }
 .wire-pane-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 0; }
 .wire-pane-root { padding: 0 10px 8px; border-bottom: 1px solid var(--edge); }
@@ -225,8 +227,9 @@
 .wire-legend[hidden] { display: none; }
 .wire-legend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .wire-legend-title { color: var(--accent-bright); font-size: 12px; letter-spacing: 1px; }
-.wire-legend-close, .wire-pane-close { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; cursor: pointer; }
+.wire-legend-close, .wire-pane-close, .wire-pane-back { background: none; border: none; padding: 0 4px; color: var(--fg-faint); font-family: inherit; font-size: 12px; letter-spacing: inherit; cursor: pointer; }
 .wire-legend-close:hover, .wire-pane-close:hover { color: var(--fg-bright); }
+.wire-pane-back:hover { color: var(--accent-bright); }
 .wire-legend-rows { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; margin: 0; }
 .wire-legend-rows dt { color: var(--fg-bright); font-weight: bold; white-space: nowrap; }
 .wire-legend-rows dd { margin: 0; color: var(--fg-muted); }

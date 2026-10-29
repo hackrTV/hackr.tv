@@ -1,12 +1,14 @@
 <%# Turbo-Frame response of GET /wire/:username for the feed's context
     pane (frame id wire-pane, 2026-10): the operative record — the
     profile's status line, bio and stat strip without the timeline — and
-    a link to the full profile. %>
+    a link to the full profile. [<] BACK returns to the thread it was
+    opened over (wire-pane#back; the q key does the same). %>
 <% role = uplink_role_class(@hackr.role) %>
 <%= turbo_frame_tag "wire-pane", target: "_top" do %>
   <div class="wire-pane-head">
     <span class="wire-pane-kicker">OPERATIVE</span>
     <span class="wire-pane-meta">RECORD</span>
+    <button type="button" class="wire-pane-back" title="Back to the thread" data-action="click->wire-pane#back">[&lt;] BACK</button>
     <%= link_to "[>] PROFILE", wire_user_path(@hackr.hackr_alias.downcase), class: "wire-pane-page", title: "Open the WIRE profile" %>
     <button type="button" class="wire-pane-close" aria-label="Close the context pane" data-action="click->wire-pane#close">[x]</button>
   </div>

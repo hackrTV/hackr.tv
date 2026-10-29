@@ -1,5 +1,10 @@
 <%# Context-pane request for an alias that is gone: a stub in the pane
     instead of the NO SIGNAL page. %>
 <%= turbo_frame_tag turbo_frame_request_id, target: "_top" do %>
+  <div class="wire-pane-head">
+    <span class="wire-pane-kicker">OPERATIVE</span>
+    <button type="button" class="wire-pane-back" title="Back to the thread" data-action="click->wire-pane#back">[&lt;] BACK</button>
+    <button type="button" class="wire-pane-close" aria-label="Close the context pane" data-action="click->wire-pane#close">[x]</button>
+  </div>
   <div class="wire-thread-missing">// NO RECORD //</div>
 <% end %>

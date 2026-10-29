@@ -8,9 +8,9 @@
     line, flags live arrivals N and switches back (v / [≡] LEDGER);
     wire-keys opens on the first line; the pane/feed/row controllers are
     the ledger's. Under 1100px it degrades to a plain stack. %>
-<div class="wire-page wire-mutt" data-view="mutt"
+<div class="wire-page wire-mutt" data-view="mutt" data-turbo-prefetch="false"
   data-controller="wire-keys wire-feed wire-pane wire-view" data-wire-view-total-value="<%= @total %>"
-  data-action="keydown@document->wire-keys#key click->wire-keys#click wire:cursor->wire-pane#follow wire:cursor->wire-view#cursor wire-row:pane->wire-pane#claim wire-keys:view->wire-view#toggle">
+  data-action="keydown@document->wire-keys#key click->wire-keys#click wire:cursor->wire-pane#follow wire:cursor->wire-view#cursor wire-row:pane->wire-pane#claim wire-keys:back->wire-pane#back wire-keys:view->wire-view#toggle">
   <div class="wire-bar" data-controller="wire-status">
     <h1 class="wire-bar-title" title="Wideband Information Relay Emitter">The WIRE</h1>
     <span class="wire-bar-sub">MUTT MODE · ALL TRAFFIC · NEWEST FIRST</span>
@@ -42,7 +42,7 @@
   <%= render(logged_in? ? "wire/composer" : "wire/login_prompt") %>
 
   <div class="wire-mutt-keys" aria-hidden="true">
-    <span><b>j/k</b>move</span><span><b>enter</b>open</span><span><b>e</b>echo</span><span><b>r</b>reply</span><span><b>a</b>operative</span><span><b>x x</b>delete</span><span><b>g/G</b>top/end</span><span><b>/</b>compose</span><span><b>v</b>ledger</span><span><b>?</b>keys</span>
+    <span><b>j/k</b>move</span><span><b>enter</b>open</span><span><b>e</b>echo</span><span><b>r</b>reply</span><span><b>a</b>operative</span><span><b>q</b>back</span><span><b>x x</b>delete</span><span><b>g/G</b>top/end</span><span><b>/</b>compose</span><span><b>v</b>ledger</span><span><b>?</b>keys</span>
   </div>
   <%= render "wire/keys_legend" %>
 </div>

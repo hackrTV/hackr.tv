@@ -65,7 +65,9 @@ Keyboard: `?` shows the legend.
     OPERATIVE record (alias, role, CL, member since, activity, bio, six
     stats) with `[>] PROFILE`; the URL stays `/wire`. Ctrl/middle-click
     an alias. → The profile opens as usual. `a` on the cursor row does
-    the same as the plain click.
+    the same as the plain click. `[<] BACK` in the record's head (or
+    `q`). → The thread is back, its row marked again; with no thread
+    behind it, the pane returns to `// SELECT A PULSE //`.
 12. Press `c` (or the pane's `[x]`, or `[>] CONTEXT`). → The pane closes;
     `↩` now unfolds threads inline as in step 5. Reload. → Still closed
     (remembered per browser); `c` again reopens it and, with a cursor
@@ -91,7 +93,8 @@ Keyboard: `?` shows the legend.
     clears, `New:0`.
 16. Reply from the pager (`r`, type, Enter). → Lands in the pager, the
     line's `↩ n` bumps. Click an alias. → The pager shows the OPERATIVE
-    record (`[>] PROFILE` leads out). Press `v`. → Back to the ledger;
+    record (`[>] PROFILE` leads out); `q` or `[<] BACK` returns to the
+    thread. Press `v`. → Back to the ledger;
     reload → still the ledger (cookie); `v` again → MUTT (remembered on
     reload too, no flash of the other layout).
 17. Narrow the window under 1100px while in MUTT. → It degrades to a

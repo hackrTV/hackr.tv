@@ -252,6 +252,69 @@ RSpec.describe "Hotwire wire feed", type: :system do
     expect(page).to have_css(".wire-bar-pane[aria-pressed='false']")
   end
 
+  # A real pointer rests on a link before the click, and Turbo's hover
+  # prefetch (100ms) fetches it for the link's OWN target — no frame
+  # header inside a _top frame or in the feed, pulse_N_thread for a ↩ —
+  # then hands that response to whatever frame load follows. The WIRE
+  # pages opt out (data-turbo-prefetch="false"); without it every click
+  # below read "Content missing" in the pane.
+  def hover_then_click(selector, **opts)
+    find(selector, **opts).hover
+    sleep 0.3
+    find(selector, **opts).click
+  end
+
+  it "loads the record / thread into the pane from a hovered alias or ↩ — in the pane, in a row, in MUTT" do
+    root = create(:pulse, grid_hackr: other, content: "Pane alias root")
+    create(:pulse, grid_hackr: hackr, content: "Pane alias splice", parent_pulse_id: root.id)
+    log_in!(hackr)
+    visit "/wire"
+    expect(page).to have_css(".wire-page[data-pane='open']")
+
+    find("#pulse_#{root.id} .wire-text").click
+    within("#wire-pane") do
+      expect(page).to have_content("Pane alias splice")
+      hover_then_click(".wire-pane-root .wire-author") # the root block's alias
+      expect(page).to have_content("OPERATIVE")
+      expect(page).to have_content("@#{other.hackr_alias}")
+    end
+    expect(page).to have_current_path("/wire")
+
+    find("#pulse_#{root.id} .wire-text").click
+    within("#wire-pane") do
+      expect(page).to have_content("Pane alias splice")
+      hover_then_click(".wire-thread-list .wire-row .wire-author", text: "@#{hackr.hackr_alias}") # a reply row's alias
+      expect(page).to have_content("OPERATIVE")
+      expect(page).to have_content("@#{hackr.hackr_alias}")
+      click_button "[<] BACK" # one level up: the thread it was opened over
+      expect(page).to have_content("Pane alias splice")
+      expect(page).to have_no_content("OPERATIVE")
+    end
+    expect(page).to have_css("#pulse_#{root.id}.wire-row--sel")
+
+    hover_then_click("#pulse_#{root.id} .wire-author") # the feed row's alias
+    within("#wire-pane") { expect(page).to have_content("OPERATIVE") }
+    hover_then_click("#pulse_#{root.id} .splice-button") # the feed row's ↩ (prefetched for its inline frame)
+    within("#wire-pane") { expect(page).to have_content("Pane alias splice") }
+    expect(page).to have_no_css("#pulse_#{root.id}_thread .wire-row")
+    expect(page).to have_current_path("/wire")
+
+    find("body").send_keys("v")
+    expect(page).to have_css(".wire-page.wire-mutt")
+    find("#pulse_#{root.id} .wire-text").click
+    within("#wire-pane") do
+      expect(page).to have_content("Pane alias splice")
+      hover_then_click(".wire-pane-root .wire-author")
+      expect(page).to have_content("OPERATIVE")
+    end
+    expect(page).to have_no_content("Content missing")
+    find("body").send_keys("q") # the pager's way back
+    within("#wire-pane") { expect(page).to have_content("Pane alias splice") }
+    expect(page).to have_css("#pulse_#{root.id}.wire-row--sel")
+    expect(page).to have_current_path("/wire")
+    find("body").send_keys("v")
+  end
+
   it "keeps threads inline under the pane's minimum width" do
     root = create(:pulse, grid_hackr: other, content: "Narrow root")
     create(:pulse, grid_hackr: other, content: "Narrow splice", parent_pulse_id: root.id)

@@ -13,8 +13,9 @@ import { Controller } from '@hotwired/stimulus'
 // threads are walked in document order, rows inside the context pane
 // never (the pane is read, not walked). Every cursor move dispatches
 // wire:cursor on the row (the pane follows it); c dispatches
-// wire-keys:pane (the pane toggles); v dispatches wire-keys:view (the
-// view switches); a clicks the row's author link (record in the pane,
+// wire-keys:pane (the pane toggles); q dispatches wire-keys:back (the
+// pane leaves a record for its thread); v dispatches wire-keys:view
+// (the view switches); a clicks the row's author link (record in the pane,
 // else the profile); Enter with nothing focused opens like o (MUTT's
 // index). MUTT mode starts with the cursor on the first row, a tick
 // after connect so the siblings' bindings are up. x is press-twice
@@ -64,6 +65,7 @@ export default class extends Controller<HTMLElement> {
     case 'r': event.preventDefault(); this.emit('wire:reply'); break // a prompt may take focus now: no stray "r"
     case 'a': this.press('.wire-author'); break
     case 'c': this.dispatch('pane'); break
+    case 'q': this.dispatch('back'); break
     case 'v': this.dispatch('view'); break
     case 'Enter': if (event.target === document.body) this.emit('wire:open'); break
     case 'x': this.deleteCursor(); break

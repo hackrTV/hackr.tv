@@ -187,16 +187,20 @@ describe('WireKeysController', () => {
     expect(cursor()).toBe('pulse_2')
   })
 
-  it('v asks for the view switch (wire-keys:view); Enter opens the cursor row only with nothing focused', async () => {
+  it('v asks for the view switch (wire-keys:view), q for the way back (wire-keys:back); Enter opens the cursor row only with nothing focused', async () => {
     await start(page(row(1)))
     const pageEl = document.querySelector<HTMLElement>('.wire-page')!
     const view = vi.fn()
+    const back = vi.fn()
     const opened = vi.fn()
     pageEl.addEventListener('wire-keys:view', view)
+    pageEl.addEventListener('wire-keys:back', back)
     document.getElementById('pulse_1')!.addEventListener('wire:open', opened)
 
     press('v')
     expect(view).toHaveBeenCalledTimes(1)
+    press('q')
+    expect(back).toHaveBeenCalledTimes(1)
 
     press('j')
     press('Enter', document.querySelector('.echo-button')!)
