@@ -29,6 +29,13 @@
 class HackrStream < ApplicationRecord
   EXPIRY_WINDOW = 1.hour
 
+  # The VIDZ archive lives under /thecyberpulse (routes; /xeraen/vidz*
+  # redirects there) and hosts XERAEN's recordings beside TCP's — the
+  # voice of TCP broadcasts on TCP's channel. A finished broadcast has a
+  # VOD page only when its artist is one of these (ContentHelper#vod_page_path).
+  VIDZ_HOST_SLUG = "thecyberpulse"
+  VIDZ_ARTIST_SLUGS = %w[thecyberpulse xeraen].freeze
+
   belongs_to :artist
   belongs_to :track, primary_key: :slug, foreign_key: :track_slug, optional: true
   has_many :hackr_vod_watches, dependent: :destroy
@@ -57,6 +64,9 @@ class HackrStream < ApplicationRecord
       .where(is_live: false)
       .order(started_at: :desc)
   }
+  scope :with_vod, -> { where.not(vod_url: [nil, ""]) }
+  # Everything the /thecyberpulse/vidz pages list and show.
+  scope :vidz_archive, -> { with_vod.joins(:artist).where(artists: {slug: VIDZ_ARTIST_SLUGS}) }
 
   def self.current_live
     live.first
@@ -64,6 +74,10 @@ class HackrStream < ApplicationRecord
 
   def self.next_scheduled
     upcoming.first
+  end
+
+  def vod?
+    vod_url.present?
   end
 
   def go_live!(stream_url, stream_title = nil)

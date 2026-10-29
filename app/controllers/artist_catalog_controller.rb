@@ -83,7 +83,10 @@ class ArtistCatalogController < ApplicationController
     end
   end
 
-  # GET /thecyberpulse/vidz and /xeraen/vidz
+  # GET /thecyberpulse/vidz — the VIDZ archive: TCP's recordings and
+  # XERAEN's (HackrStream.vidz_archive; /xeraen/vidz* redirects here in
+  # routes). Before 2026-10-29 the list was @artist's own streams, so an
+  # XERAEN VOD was listed nowhere and its page 404'd after the redirect.
   def vidz
     @artist = Artist.find_by(slug: params[:artist_slug])
 
@@ -92,22 +95,15 @@ class ArtistCatalogController < ApplicationController
       return
     end
 
-    # Mirrors Api::HackrStreamsController#index.
-    @vods = @artist.hackr_streams
-      .where.not(vod_url: [nil, ""])
+    @vods = HackrStream.vidz_archive
       .order(started_at: :desc, created_at: :desc)
       .to_a
-
-    # VodzPage bounced an empty XERAEN vidz list over to thecyberpulse.
-    if @vods.empty? && @artist.slug == "xeraen"
-      redirect_to "/thecyberpulse/vidz"
-    end
   end
 
-  # GET /thecyberpulse/vidz/:id and /xeraen/vidz/:id
+  # GET /thecyberpulse/vidz/:id (and /xeraen/vidz/:id via the redirect)
   def vidz_show
     @artist = Artist.find_by(slug: params[:artist_slug])
-    @vod = @artist&.hackr_streams&.find_by(id: params[:id])
+    @vod = @artist && HackrStream.vidz_archive.includes(:artist).find_by(id: params[:id])
 
     render status: :not_found if @vod.nil?
   end

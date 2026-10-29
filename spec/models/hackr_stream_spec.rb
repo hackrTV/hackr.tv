@@ -89,6 +89,25 @@ RSpec.describe HackrStream, type: :model do
     end
   end
 
+  describe ".vidz_archive" do
+    it "returns recorded streams of the archive artists (TCP + XERAEN) only" do
+      tcp = create(:hackr_stream, :with_vod, artist: create(:artist, :thecyberpulse))
+      xeraen = create(:hackr_stream, :with_vod, artist: create(:artist, :xeraen))
+      create(:hackr_stream, :with_vod, artist: create(:artist)) # outside the archive
+      create(:hackr_stream, artist: tcp.artist, vod_url: nil) # no recording
+
+      expect(described_class.vidz_archive).to contain_exactly(tcp, xeraen)
+    end
+  end
+
+  describe "#vod?" do
+    it "is true only with a vod_url" do
+      expect(build(:hackr_stream, :with_vod).vod?).to be(true)
+      expect(build(:hackr_stream, vod_url: nil).vod?).to be(false)
+      expect(build(:hackr_stream, vod_url: "").vod?).to be(false)
+    end
+  end
+
   describe ".next_scheduled" do
     it "returns the soonest upcoming stream" do
       artist = create(:artist)

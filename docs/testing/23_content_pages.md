@@ -48,5 +48,6 @@ minutes: 20
 
 13. Visit `/schedule`. → Upcoming streams with local-time rendering
     (times shown in YOUR timezone — check against a known UTC value);
-    past broadcasts with durations; `[VOD]` links on past streams that
-    have one.
+    past broadcasts with durations; `[VOD]` links on past TCP / XERAEN
+    streams that have a recording (other artists' recordings have no
+    page, so no link).

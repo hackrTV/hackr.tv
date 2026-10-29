@@ -168,6 +168,18 @@ RSpec.describe "Artist catalog pages", type: :request do
 
       expect(response.body).to include("No videos available yet.")
     end
+
+    it "lists XERAEN's recordings in the archive, not other artists'" do
+      artist
+      create(:hackr_stream, :with_vod, artist: create(:artist, :xeraen), title: "Chaddin Session")
+      create(:hackr_stream, :with_vod, artist: create(:artist), title: "Guest Set")
+
+      get "/thecyberpulse/vidz"
+
+      expect(response.body).to include("The.CyberPul.se :: VIDZ")
+      expect(response.body).to include("Chaddin Session")
+      expect(response.body).not_to include("Guest Set")
+    end
   end
 
   describe "GET /xeraen/vidz" do
@@ -212,6 +224,37 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include("Failed to load video")
       expect(response.body).to include("Back to Videos")
+    end
+
+    it "shows an XERAEN recording on the archive, crediting the watch against XERAEN" do
+      artist
+      stream = create(:hackr_stream, artist: create(:artist, :xeraen), title: "Chaddin Session",
+        vod_url: "https://www.youtube.com/embed/dQw4w9WgXcQ")
+
+      get "/thecyberpulse/vidz/#{stream.id}"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("Chaddin Session")
+      expect(response.body).to include('data-vod-player-video-id-value="dQw4w9WgXcQ"')
+      expect(response.body).to include("data-vod-player-watch-url-value=\"/api/artists/xeraen/vods/#{stream.id}/watch\"")
+    end
+
+    it "redirects the legacy XERAEN VOD path onto the archive" do
+      get "/xeraen/vidz/42"
+
+      expect(response).to redirect_to("/thecyberpulse/vidz/42")
+    end
+
+    it "404s for a stream outside the archive or without a recording" do
+      artist
+      elsewhere = create(:hackr_stream, :with_vod, artist: create(:artist))
+      unrecorded = create(:hackr_stream, artist: artist, vod_url: nil)
+
+      get "/thecyberpulse/vidz/#{elsewhere.id}"
+      expect(response).to have_http_status(:not_found)
+
+      get "/thecyberpulse/vidz/#{unrecorded.id}"
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

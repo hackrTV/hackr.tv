@@ -1,7 +1,6 @@
-<%# VodzPage.tsx port: the artist's VOD list. Thumbnails come straight
-    from img.youtube.com for any recognizable YouTube URL. An empty
-    XERAEN list never reaches this template (controller bounces it to
-    /thecyberpulse/vidz). %>
+<%# VodzPage.tsx port: the VIDZ archive — TCP's and XERAEN's recordings
+    (HackrStream.vidz_archive; /xeraen/vidz redirects here). Thumbnails
+    come straight from img.youtube.com for any recognizable YouTube URL. %>
 <% slug = params[:artist_slug] %>
 
 <% if @artist.nil? %>

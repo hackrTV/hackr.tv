@@ -27,13 +27,15 @@ minutes: 15
 
 ## Steps — vidz (VODs)
 
-8. Visit `/thecyberpulse/vidz`. → VOD list renders (only streams with a
-   vod_url).
+8. Visit `/thecyberpulse/vidz`. → The VIDZ archive renders: TCP's and
+   XERAEN's streams that have a vod_url (XERAEN's recordings live here;
+   no other artist's appear).
 9. Open a VOD. → `/thecyberpulse/vidz/<id>` renders with the embedded
    player. While logged in, watching credits a VOD watch (feeds
    `vods_watched`) via the watch ping — check the network tab for the
-   `POST .../watch` beacon.
-10. Visit `/xeraen/vidz` when XERAEN has no VODs. → Bounces to
-    `/thecyberpulse/vidz`.
+   `POST /api/artists/<the stream's artist>/vods/<id>/watch` beacon
+   (`xeraen` for an XERAEN recording).
+10. Visit `/xeraen/vidz` and `/xeraen/vidz/<id>`. → Both redirect onto
+    `/thecyberpulse/vidz…`; an XERAEN recording's page loads there.
 11. From `/schedule`, click a past stream's `[VOD]` link. → Lands on the
     vidz page via Turbo (player survives).
