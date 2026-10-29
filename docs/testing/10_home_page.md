@@ -10,7 +10,10 @@ minutes: 15
 1. Visit `/` logged out at desktop width. → The home console (2026-10-28):
    the ASCII banner sits at the LEFT with the status block beside it
    (SYSTEM / STATUS ● ONLINE / YEAR / SIGNAL / OPERATIVE ANONYMOUS ·
-   [>] CONNECT / NEXT TX / LAST TX), then the welcome line, `// FEATURED
+   [>] CONNECT / NEXT TX / LAST TX — the LAST TX title opens the
+   recording on `/thecyberpulse/vidz/<id>` when the broadcast has a
+   `vod_url`, marked `· VOD` at the end of the row; otherwise it opens
+   `/schedule` like NEXT TX), then the welcome line, `// FEATURED
    ARTISTS //` and `// PLATFORM SERVICES //` as one aligned line per entry
    (`[TAG]  Name  description`), the `// TRANSMISSION READY //` rule and a
    `>` prompt. The lines flick on top to bottom in about a second; any

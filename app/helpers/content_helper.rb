@@ -17,6 +17,15 @@ module ContentHelper
     (datetime + 100.years).strftime("%Y-%m-%d %H:%M")
   end
 
+  # The VOD page for a finished broadcast — /thecyberpulse/vidz/:id, the
+  # archive that hosts TCP's and XERAEN's recordings — or nil when there
+  # is nothing to land on (no vod_url, or an artist without vidz pages).
+  # The home console's LAST TX links through here, falling back to /schedule.
+  def vod_page_path(stream)
+    return nil unless stream.vod? && HackrStream::VIDZ_ARTIST_SLUGS.include?(stream.artist.slug)
+    "/#{HackrStream::VIDZ_HOST_SLUG}/vidz/#{stream.id}"
+  end
+
   # Markdown for content pages: [[codex links]] resolved, rendered +
   # sanitized, then internal anchors normalized for same-tab Turbo
   # navigation.

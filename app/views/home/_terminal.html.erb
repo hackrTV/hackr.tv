@@ -77,7 +77,9 @@
         <span class="console-key">LAST TX</span>
         <span class="console-val">
           <% if @last_broadcast %>
-            <%= future_stamp(@last_broadcast.started_at) %> <span class="console-dim">·</span> <%= link_to @last_broadcast.title, "/schedule", class: "console-link" %><% if @last_broadcast.artist %> <span class="console-dim">· <%= @last_broadcast.artist.name %></span><% end %>
+            <%# The title opens the recording when one is attached (the VIDZ archive), else the schedule. %>
+            <% vod_path = vod_page_path(@last_broadcast) %>
+            <%= future_stamp(@last_broadcast.started_at) %> <span class="console-dim">·</span> <%= link_to @last_broadcast.title, vod_path || "/schedule", class: "console-link" %><% if @last_broadcast.artist %> <span class="console-dim">· <%= @last_broadcast.artist.name %></span><% end %><% if vod_path %> <span class="console-dim">· VOD</span><% end %>
           <% else %>
             <span class="console-dim">NO RECORD</span>
           <% end %>

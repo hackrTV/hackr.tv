@@ -40,12 +40,34 @@ RSpec.describe "Home page", type: :request do
 
       expect(response.body).to include("LAST TX")
       expect(response.body).to include("2126-10-21 20:00") # century-shifted, compact
-      expect(response.body).to include("NODE SESSIONS 07")
+      expect(response.body).to include('href="/schedule">NODE SESSIONS 07</a>') # no recording → the schedule
+      expect(response.body).not_to include("· VOD")
       expect(response.body).to include("NEXT TX")
       expect(response.body).to include((next_at + 100.years).strftime("%Y-%m-%d %H:%M"))
       expect(response.body).to include("NODE SESSIONS 08")
       expect(response.body).not_to include("UNSCHEDULED")
       expect(response.body).not_to include("NO RECORD")
+    end
+
+    it "links LAST TX to the recording on the VIDZ archive when one is attached — XERAEN's too" do
+      create(:artist, :thecyberpulse)
+      xeraen = create(:artist, :xeraen)
+      recorded = create(:hackr_stream, :with_vod, artist: xeraen, title: "Chaddin Session")
+
+      get "/"
+
+      expect(response.body).to include("href=\"/thecyberpulse/vidz/#{recorded.id}\">Chaddin Session</a>")
+      expect(response.body).to include("· VOD")
+    end
+
+    it "keeps LAST TX on the schedule when the recording has no page (an artist outside the archive)" do
+      recorded = create(:hackr_stream, :with_vod, title: "Guest Set")
+
+      get "/"
+
+      expect(response.body).to include('href="/schedule">Guest Set</a>')
+      expect(response.body).not_to include("/vidz/#{recorded.id}")
+      expect(response.body).not_to include("· VOD")
     end
 
     it "renders the live embed with the docked uplink chat when live (Phase 5)" do

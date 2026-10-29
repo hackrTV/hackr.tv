@@ -38,7 +38,7 @@
           <% if video_id %>
             <div class="vodz-player" data-controller="vod-player"
                  data-vod-player-video-id-value="<%= video_id %>"
-                 data-vod-player-watch-url-value="/api/artists/<%= slug %>/vods/<%= @vod.id %>/watch">
+                 data-vod-player-watch-url-value="/api/artists/<%= @vod.artist.slug %>/vods/<%= @vod.id %>/watch">
               <div class="vodz-player__frame">
                 <div class="vodz-player__mount" data-vod-player-target="frame"></div>
                 <div class="vodz-player__thumb" data-vod-player-target="thumb" data-action="click->vod-player#play">

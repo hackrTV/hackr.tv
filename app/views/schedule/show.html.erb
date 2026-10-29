@@ -43,8 +43,8 @@
                 <% if stream.started_at && stream.ended_at %>
                   <span class="sched-past-duration">(<%= stream_duration(stream.started_at, stream.ended_at) %>)</span>
                 <% end %>
-                <% if stream.vod_url.present? %>
-                  <%= link_to "[VOD]", "/#{stream.artist.slug}/vidz/#{stream.id}", class: "sched-vod" %>
+                <% if (vod_path = vod_page_path(stream)) %>
+                  <%= link_to "[VOD]", vod_path, class: "sched-vod" %>
                 <% end %>
               </div>
             </div>
