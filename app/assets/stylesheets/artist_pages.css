@@ -2,11 +2,11 @@
  * six React pages under components/pages/artist/, namespaced per page:
  *   .tcp-landing-*    TheCyberPulseLandingPage.tsx  (/thecyberpulse)
  *   .tcp-*            TheCyberPulsePage.tsx         (/thecyberpulse/bio)
- *   .xeraen-landing-* XeraenLandingPage.tsx         (/xeraen)
- *   .xeraen-*         XeraenPage.tsx                (/xeraen/bio)
+ *   .console--xeraen / .xt-*  the XERAEN console (/xeraen, /xeraen/bio;
+ *                     2026-10-28 — on hotwire.css's .console family)
  *   .sectorx-*        SectorXPage.tsx               (/sector/x)
  *   .wz-*             WavelengthZeroPage.tsx        (/wavelength-zero)
- *   .embedded-track-* EmbeddedTrack.tsx             (xeraen bio player card)
+ *   .embedded-track-* the bio's LATEST TRANSMISSION track row
  *
  * Loads globally AFTER tuicss/hotwire via layouts/_hotwire_assets
  * (identical tracked set on every page), so plain single-class selectors
@@ -144,125 +144,50 @@
   .tcp-landing-card-body { padding: 10px; }
 }
 
-/* --- XERAEN landing (/xeraen) --------------------------------------- */
+/* --- XERAEN console (/xeraen, /xeraen/bio; 2026-10-28) ---------------
+ * Both pages are .console screens (hotwire.css "Home console": bar,
+ * status rows, // RULES //, destination rows, the > prompt) — the
+ * glowing tui-window landing with its two cards and the eight stacked
+ * bio fieldsets are gone. Brand purple (#8B00FF, the per-artist
+ * off-token color) stays as the sparse accent: the title, the badge,
+ * OMNIWAVE, the closers. Prose is 16/20 at 100ch with one blank line
+ * between paragraphs; the bio's readouts are status rows. */
+.console--xeraen { --xt-brand: #8B00FF; max-width: 960px; }
+.console--xeraen .console-bar-title, .console--xeraen .console-bar-badge { color: var(--xt-brand); }
+.console--xeraen .console-status { padding: 4px 8px 0; }
+.console--xeraen .console-status-row { grid-template-columns: 120px minmax(0, 1fr); }
+.xt-brand { color: var(--xt-brand); }
+.xt-prose { padding: 6px 8px 0; }
+.xt-prose p { max-width: 100ch; margin: 0 0 20px; color: var(--fg); }
+.xt-prose p:last-child { margin-bottom: 10px; }
+.xt-prose .xt-lead { color: var(--fg-bright); font-weight: bold; }
+.xt-prose .xt-dim, .xt-dim { color: var(--fg-muted); }
+.xt-prose .xt-brand { color: var(--xt-brand); }
+.xt-sub { margin: 0 0 4px; color: var(--xt-brand); font-size: 16px; line-height: 20px; font-weight: bold; letter-spacing: 1px; }
+.xt-tuning { margin: 4px 0 6px; padding: 0 8px; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.xt-quote { max-width: 100ch; margin: 6px 8px 10px; padding: 0 0 0 12px; border-left: 1px solid var(--edge); color: var(--fg-bright); }
+.xt-quote p { margin: 0; }
+.xt-quote p.xt-quote-gap { margin-top: 20px; }
+.xt-sig { margin: 0 0 6px; padding: 0 8px; color: var(--xt-brand); }
 
-.xeraen-landing-window {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: block;
-  background: #0a0a0a;
-  border: 2px solid #8B00FF;
-  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-landing-fieldset { border-color: #8B00FF; }
-
-.xeraen-landing-legend {
-  color: #8B00FF;
-  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
-  letter-spacing: 3px;
-}
-
-.xeraen-landing-content { padding: 30px; }
-
-.xeraen-landing-heading {
-  text-align: center;
-  margin-bottom: 5px;
-  color: #8B00FF;
-  font-size: 1.8em;
-  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
-  letter-spacing: 3px;
-}
-
-.xeraen-landing-subtitle {
-  text-align: center;
-  color: #666;
-  margin-bottom: 30px;
-  font-size: 0.9em;
-}
-
-.xeraen-landing-lore {
-  margin-bottom: 30px;
-  padding: 20px;
-  background: linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95));
-  border: 1px solid #8B00FF;
-  line-height: 1.8;
-}
-
-.xeraen-landing-lore-open { color: #ccc; margin-bottom: 15px; }
-.xeraen-landing-lore-mid { color: #aaa; margin-bottom: 15px; }
-.xeraen-landing-lore-close { color: #888; }
-
-.xeraen-landing-highlight {
-  color: #8B00FF;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-landing-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.xeraen-landing-card-link { text-decoration: none; }
-
-.xeraen-landing-card {
-  background: #0d0d0d;
-  cursor: pointer;
-  height: 100%;
-}
-
-.xeraen-landing-card--bio { border: 1px solid #8B00FF; }
-.xeraen-landing-card--releases { border: 1px solid #9B59B6; }
-
-.xeraen-landing-card--bio fieldset { border-color: #8B00FF; height: 100%; }
-.xeraen-landing-card--releases fieldset { border-color: #9B59B6; height: 100%; }
-
-.xeraen-landing-card--bio legend { color: #8B00FF; }
-.xeraen-landing-card--releases legend { color: #9B59B6; }
-
-.xeraen-landing-card-body { padding: 15px; }
-
-.xeraen-landing-card-icon {
-  font-size: 1.4em;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.xeraen-landing-card-icon--bio {
-  color: #8B00FF;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
-.xeraen-landing-card-icon--releases { color: #9B59B6; }
-
-.xeraen-landing-card-desc {
-  color: #999;
-  font-size: 0.9em;
-  line-height: 1.6;
-}
-
-.xeraen-landing-footer {
-  text-align: center;
-  padding: 15px;
-  border-top: 1px solid #8B00FF;
-}
-
-.xeraen-landing-footer p {
-  color: #8B00FF;
-  font-size: 0.85em;
-  font-style: italic;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
+/* LATEST TRANSMISSION: one track row on the player contract (.track-row +
+ * data-player-*; track_list repaints .play-track-btn / --active) —
+ * cover thumb | title / artist · release | ► PLAY. */
+.embedded-track-player { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 0 12px; align-items: center; margin: 2px 0 6px; padding: 2px 8px; cursor: pointer; }
+.embedded-track-player:hover, .embedded-track-player.track-row--active { background: var(--bg-1); }
+.embedded-track-cover { width: 40px; height: 40px; overflow: hidden; }
+.embedded-track-cover--none { display: flex; align-items: center; justify-content: center; border: 1px solid var(--edge); color: var(--fg-faint); }
+.embedded-track-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.embedded-track-info { min-width: 0; }
+.embedded-track-title { color: var(--fg-bright); font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track-row--active .embedded-track-title { color: var(--xt-brand); }
+.embedded-track-artist { color: var(--fg-faint); font-size: 12px; line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.play-track-btn.embedded-track-btn { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; white-space: nowrap; cursor: pointer; }
+.play-track-btn.embedded-track-btn:hover, .play-track-btn.embedded-track-btn.play-track-btn--active { border-color: var(--xt-brand); color: var(--xt-brand); }
 
 @media (max-width: 767px) {
-  .xeraen-landing-window { max-width: 100%; box-shadow: none; }
-  .xeraen-landing-legend { letter-spacing: 1px; }
-  .xeraen-landing-content { padding: 15px; }
-  .xeraen-landing-heading { font-size: 1.3em; }
-  .xeraen-landing-lore { padding: 15px; }
-  .xeraen-landing-cards { grid-template-columns: 1fr; gap: 15px; }
-  .xeraen-landing-card-body { padding: 10px; }
+  .console--xeraen .console-status-row { grid-template-columns: 112px minmax(0, 1fr); } /* TEMPORAL STATUS at 12px + 1px tracking */
+  .xt-prose p { margin-bottom: 18px; }
 }
 
 /* --- The.CyberPul.se bio (/thecyberpulse/bio) ------------------------ */
@@ -555,301 +480,6 @@
   .tcp-vod-body { padding: 10px; }
   .tcp-vod-frame { width: 100%; height: auto; aspect-ratio: 16 / 9; }
   .tcp-nav-buttons { flex-direction: column; gap: 10px; }
-}
-
-/* --- XERAEN bio (/xeraen/bio) ---------------------------------------- */
-
-.xeraen-window {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: block;
-  background: #0a0a0a;
-  border: 2px solid #8B00FF;
-  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-fieldset { border-color: #8B00FF; }
-
-.xeraen-legend {
-  color: #8B00FF;
-  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
-  letter-spacing: 3px;
-}
-
-.xeraen-intro {
-  margin-bottom: 30px;
-  padding: 25px;
-  background: linear-gradient(135deg, rgba(139, 0, 255, 0.08), rgba(0, 0, 0, 0.95));
-  border: 2px solid #8B00FF;
-  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6), inset 0 0 20px rgba(139, 0, 255, 0.1);
-}
-
-.xeraen-intro-heading {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #8B00FF;
-  letter-spacing: 3px;
-  font-size: 1.8em;
-  text-transform: uppercase;
-  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
-}
-
-.xeraen-intro-lead {
-  color: #8B00FF;
-  line-height: 1.8;
-  margin-bottom: 18px;
-  font-size: 1.2em;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-intro-close {
-  color: #8B00FF;
-  line-height: 1.8;
-  font-size: 1.1em;
-  font-style: italic;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-p-ccc { color: #ccc; line-height: 1.8; margin-bottom: 15px; }
-.xeraen-p-ddd { color: #ddd; line-height: 1.8; margin-bottom: 15px; }
-.xeraen-p-lg { font-size: 1.05em; }
-
-.xeraen-section {
-  margin-bottom: 30px;
-  background: #000000;
-  border: 2px solid #8B00FF;
-  box-shadow: 0 0 25px rgba(139, 0, 255, 0.2);
-}
-
-.xeraen-section-fieldset { border-color: #8B00FF; }
-
-.xeraen-section-legend {
-  color: #8B00FF;
-  text-shadow: 0 0 10px rgba(139, 0, 255, 0.8);
-  letter-spacing: 2px;
-}
-
-.xeraen-section-body { padding: 20px; }
-
-.xeraen-tuning {
-  color: #8B00FF;
-  font-family: monospace;
-  text-align: center;
-}
-
-.xeraen-omniwave {
-  color: #8B00FF;
-  font-weight: bold;
-}
-
-.xeraen-solo-close {
-  color: #8B00FF;
-  line-height: 1.8;
-  font-size: 1.1em;
-  font-weight: bold;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-status-box {
-  font-family: monospace;
-  margin-bottom: 20px;
-  padding: 15px;
-  background: rgba(139, 0, 255, 0.1);
-  border: 1px solid #8B00FF;
-  color: #8B00FF;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-transmitter-note { color: #ccc; line-height: 1.8; }
-
-.xeraen-signal-card {
-  margin-bottom: 25px;
-  padding: 15px;
-  background: rgba(139, 0, 255, 0.05);
-  border: 1px solid rgba(139, 0, 255, 0.3);
-}
-
-.xeraen-signal-card--last { margin-bottom: 15px; }
-
-.xeraen-signal-heading {
-  color: #8B00FF;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-signal-text { color: #ddd; line-height: 1.8; }
-.xeraen-signal-text--spaced { margin-bottom: 15px; }
-
-.xeraen-love-quote {
-  color: #8B00FF;
-  line-height: 1.8;
-  font-style: italic;
-  text-shadow: 0 0 8px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-erasure-close {
-  color: #8B00FF;
-  line-height: 1.8;
-  font-size: 1.15em;
-  font-weight: bold;
-  font-style: italic;
-  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
-}
-
-.xeraen-paradox-note { color: #aaa; line-height: 1.8; }
-
-.xeraen-quote {
-  padding: 25px;
-  background: linear-gradient(135deg, rgba(139, 0, 255, 0.15), rgba(0, 0, 0, 0.95));
-  border: 2px solid #8B00FF;
-  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
-  margin-bottom: 30px;
-}
-
-.xeraen-quote-block {
-  color: #ddd;
-  line-height: 2;
-  font-size: 1.1em;
-  margin: 0;
-  padding: 0 20px;
-  border-left: 4px solid #8B00FF;
-}
-
-.xeraen-quote-block p { margin-bottom: 10px; }
-.xeraen-quote-block p.xeraen-quote-gap { margin-top: 20px; }
-
-.xeraen-quote-sig {
-  color: #8B00FF;
-  margin-top: 25px;
-  font-size: 1.2em;
-  font-style: italic;
-  text-align: right;
-  text-shadow: 0 0 10px rgba(139, 0, 255, 0.6);
-  letter-spacing: 1px;
-}
-
-.xeraen-quote-sig-meta {
-  font-size: 0.9em;
-  color: #aaa;
-}
-
-.xeraen-nav-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  margin-top: 30px;
-}
-
-.xeraen-btn-back {
-  background: #222;
-  color: #888;
-  border: 1px solid #444;
-  text-align: center;
-}
-
-.xeraen-btn-primary {
-  background: #8B00FF;
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(139, 0, 255, 0.6);
-  text-align: center;
-}
-
-.xeraen-btn-pulse {
-  background: #6B00CC;
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(107, 0, 204, 0.6);
-  text-align: center;
-}
-
-@media (max-width: 767px) {
-  .xeraen-window { max-width: 100%; box-shadow: none; }
-  .xeraen-legend { letter-spacing: 1px; }
-  .xeraen-nav-buttons { flex-direction: column; gap: 10px; }
-  .xeraen-btn-primary,
-  .xeraen-btn-pulse { box-shadow: none; }
-}
-
-/* --- Embedded track card (EmbeddedTrack.tsx, used on /xeraen/bio) ----
- * Keeps the React component's .embedded-track-player class so the
- * band-profile mobile fixes in default.css keep applying. Active-state
- * styling keys off the player contract's .track-row--active /
- * .play-track-btn--active classes (toggled by track_list_controller). */
-
-.embedded-track-player {
-  border: 2px solid #7c3aed;
-  padding: 20px;
-  margin-bottom: 20px;
-  background: #1a1a1a;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.embedded-track-player.track-row--active { background: #2d1b4e; }
-
-.embedded-track-cover {
-  flex-shrink: 0;
-  width: 100px;
-  height: 100px;
-  border: 2px solid #7c3aed;
-  overflow: hidden;
-}
-
-.embedded-track-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.embedded-track-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.embedded-track-title {
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.track-row--active .embedded-track-title { color: #a78bfa; }
-
-.embedded-track-artist {
-  color: #a78bfa;
-  font-size: 14px;
-  margin-bottom: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.play-track-btn.embedded-track-btn {
-  background: #7c3aed;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: monospace;
-}
-
-.play-track-btn.embedded-track-btn:hover { background: #9333ea; }
-
-.play-track-btn.embedded-track-btn.play-track-btn--active {
-  background: #9333ea;
-  color: #00d9ff;
 }
 
 /* --- Sector X (/sector/x) -------------------------------------------- */

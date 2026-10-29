@@ -13,10 +13,7 @@ class ArtistCatalogController < ApplicationController
     # the one artist the React page filtered to client-side. Same
     # visibility rule: a release whose tracks are all hidden from the
     # Pulse Vault stays hidden here too.
-    @releases = Release.includes(:artist, cover_image_attachment: :blob)
-      .where(artist: @artist, coming_soon: false)
-      .order(Arel.sql("release_date DESC NULLS LAST"))
-      .reject { |r| r.tracks.any? && r.tracks.where(show_in_pulse_vault: true).none? }
+    @releases = Release.includes(:artist, cover_image_attachment: :blob).catalog_visible(@artist)
 
     @coming_soon = Release.includes(:artist, cover_image_attachment: :blob)
       .where(artist: @artist, coming_soon: true)

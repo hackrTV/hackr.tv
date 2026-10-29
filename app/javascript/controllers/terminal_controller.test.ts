@@ -8,8 +8,8 @@ vi.mock('@hotwired/turbo-rails', () => ({ Turbo: { visit: vi.fn() } }))
 // The home console: the server-rendered screen is revealed line by line
 // (skippable), then the prompt runs commands off the rows' data-command.
 
-const HTML = (boot = 'pending'): string => `
-<div class="console" data-controller="terminal" data-boot="${boot}" data-action="keydown@document->terminal#skip click->terminal#skip">
+const HTML = (boot = 'pending', attrs = ''): string => `
+<div class="console" data-controller="terminal" data-boot="${boot}" ${attrs} data-action="keydown@document->terminal#skip click->terminal#skip">
   <a class="console-banner console-line" data-terminal-target="line" href="/">banner</a>
   <div class="console-line" data-terminal-target="line">HACKR.TV BROADCAST SYSTEM</div>
   <div class="console-rule console-line" data-terminal-target="line">// FEATURED ARTISTS //</div>
@@ -27,8 +27,8 @@ describe('TerminalController', () => {
   let mobile = false
   let reducedMotion = false
 
-  const start = async (boot = 'pending'): Promise<void> => {
-    document.body.innerHTML = HTML(boot)
+  const start = async (boot = 'pending', attrs = ''): Promise<void> => {
+    document.body.innerHTML = HTML(boot, attrs)
     application = Application.start()
     application.register('terminal', TerminalController)
     await Promise.resolve()
@@ -111,6 +111,12 @@ describe('TerminalController', () => {
     await start('done')
     expect(revealed()).toBe(5)
     expect(prompt().hidden).toBe(false)
+  })
+
+  it('leaves the keyboard alone when autofocus is off (a long page)', async () => {
+    await start('done', 'data-terminal-autofocus-value="false"')
+    expect(prompt().hidden).toBe(false)
+    expect(document.activeElement).not.toBe(input())
   })
 
   it('runs the prompt: a tag visits its row, ? lists the tags, unknown and clear reply', async () => {
