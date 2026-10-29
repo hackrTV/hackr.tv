@@ -15,7 +15,6 @@
  * the React nav never had. Flex ignores inter-element whitespace. */
 .nav-desktop ul { list-style: none; margin: 0; padding: 0; }
 .nav-desktop > ul { display: flex; flex-wrap: wrap; }
-.tui-statusbar ul { display: flex; }
 .header-dropdown {
   position: relative;
   display: inline-block;
@@ -202,7 +201,6 @@
 @media (max-width: 767px) {
   .chrome-desktop-only { display: none; }
   .chrome-mobile-only { display: block; }
-  .tui-statusbar { display: none; }
   .chrome-content { padding: 0 10px; }
 }
 @media (min-width: 768px) {
@@ -214,8 +212,6 @@
 .chrome-mobile-logo { text-align: center; padding: 10px 0; }
 .chrome-mobile-logo a { font-size: 24px; font-weight: bold; letter-spacing: 2px; }
 .chrome-mobile-menu { padding: 0 20px 40px 20px; margin-top: -25px; text-align: center; position: relative; z-index: 1000; }
-.tui-statusbar ul li:hover { background-color: rgb(0, 168, 0); }
-.tui-statusbar ul li.active { background-color: rgba(var(--accent-rgb), 0.5); }
 
 /* --- Live Now banner (LiveNowBanner.tsx port) --- rendered into the
  * header's .top-notices slot by _default_chrome, so it sits below the nav
