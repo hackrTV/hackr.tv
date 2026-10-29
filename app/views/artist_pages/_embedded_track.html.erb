@@ -1,8 +1,9 @@
-<%# Single-track player card (ported from EmbeddedTrack.tsx) on the
-    established player contract: the card is a .track-row carrying
+<%# Single-track player row (the XERAEN bio's LATEST TRANSMISSION) on the
+    established player contract: the row is a .track-row carrying
     data-player-* attrs inside its own track-list controller, so a click
-    loads a one-track queue and the play button repaints from
-    player:state events. Locals: track. %>
+    loads a one-track queue and the ► PLAY button repaints from
+    player:state events. One console line: cover thumb | title / artist
+    · release | the button. Locals: track. %>
 <div data-controller="track-list">
   <div class="track-row embedded-track-player"
        <%= tag.attributes(data: player_track_attrs(track).merge(
@@ -13,11 +14,13 @@
       <div class="embedded-track-cover">
         <%= image_tag url_for(track.release.cover_standard), alt: "#{track.title} cover", class: "embedded-track-img" %>
       </div>
+    <% else %>
+      <div class="embedded-track-cover embedded-track-cover--none" aria-hidden="true">&#9834;</div>
     <% end %>
     <div class="embedded-track-info">
       <div class="embedded-track-title"><%= track.title %></div>
-      <div class="embedded-track-artist"><%= track.artist.name %></div>
-      <button class="play-track-btn embedded-track-btn">► PLAY</button>
+      <div class="embedded-track-artist"><%= track.artist.name %><% if track.release %> · <%= track.release.name %><% end %></div>
     </div>
+    <button class="play-track-btn embedded-track-btn">► PLAY</button>
   </div>
 </div>

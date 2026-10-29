@@ -112,13 +112,5 @@
 
   <div class="console-rule console-line" data-terminal-target="line"><span>// TRANSMISSION READY. SELECT YOUR DESTINATION. //</span></div>
 
-  <div class="console-reply" data-terminal-target="reply" hidden></div>
-  <div class="console-prompt" data-terminal-target="inputLine" hidden>
-    <span class="console-mark">&gt;</span>
-    <span class="console-typed" data-terminal-target="typed"></span><span class="console-cursor"></span>
-    <input type="text" class="console-input" data-terminal-target="input"
-      data-action="input->terminal#inputChanged keydown->terminal#inputKeydown"
-      aria-label="Console command" autocomplete="off" autocapitalize="off" spellcheck="false">
-  </div>
-  <div class="console-hint console-line" data-terminal-target="line">type a tag <span class="console-dim">(<%= services.map { |tag, *| tag.downcase }.join(" ") %>)</span> or an artist index <span class="console-dim">(<%= artists.map(&:first).join(" ") %>)</span> · enter · ? help</div>
+  <%= render "shared/console_prompt", hint: safe_join(["type a tag ", tag.span("(#{services.map { |tag, *| tag.downcase }.join(" ")})", class: "console-dim"), " or an artist index ", tag.span("(#{artists.map(&:first).join(" ")})", class: "console-dim"), " · enter · ? help"]) %>
 </div>

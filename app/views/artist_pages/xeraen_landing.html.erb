@@ -1,67 +1,92 @@
-<%# ERB port of XeraenLandingPage.tsx (GET /xeraen). %>
+<%# GET /xeraen — the XERAEN console (2026-10-28; the glowing tui-window
+    landing with its two cards is gone): the operative record as a
+    terminal screen in the home console's idiom — bar, status block
+    (the catalog's released / incoming releases live), the lore,
+    destination rows, the "> " prompt. The terminal controller reveals
+    the lines and runs the prompt (home_streams.md § Home console).
+    Assigns: @releases, @coming_soon (ArtistPagesController#xeraen_landing). %>
 <% content_for :title, "XERAEN — hackr.tv" %>
+<% current_year = Date.current.year %>
+<% future_year = current_year + 100 %>
+<% latest = @releases&.first %>
 
-<%= render layout: "shared/default_chrome" do %>
-  <% future_year = Date.current.year + 100 %>
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="console console--xeraen" data-controller="terminal" data-boot="pending"
+    data-action="keydown@document->terminal#skip click->terminal#skip">
+    <div class="console-bar console-line" data-terminal-target="line">
+      <h1 class="console-bar-title">XERAEN</h1>
+      <span class="console-bar-sub">OMNIWAVE GENESIS VECTOR</span>
+      <span class="console-bar-right"><span class="console-bar-badge">● TRANSMITTING</span></span>
+    </div>
 
-  <div class="tui-window white-text xeraen-landing-window">
-    <fieldset class="xeraen-landing-fieldset">
-      <legend class="center xeraen-landing-legend">XERAEN</legend>
-
-      <div class="xeraen-landing-content">
-        <h2 class="xeraen-landing-heading">[:: XERAEN ::]</h2>
-        <p class="xeraen-landing-subtitle">OMNIWAVE GENESIS VECTOR</p>
-
-        <div class="xeraen-landing-lore">
-          <p class="xeraen-landing-lore-open">
-            Systems architect turned fugitive. Founder of the Fracture Network. The voice behind
-            The.CyberPul.se. <span class="xeraen-landing-highlight">Transmitting from <%= future_year %> — for as long as <%= future_year %> exists</span>.
-          </p>
-          <p class="xeraen-landing-lore-mid">
-            The music has evolved from hardcore fury into something he calls OMNIWAVE — an amalgamation
-            of everything that ever moved him: covers of songs, old video game scores, reinterpretations
-            and original compositions coalescing into one collage where genre boundaries dissolve. The
-            sound changed. What it carries hasn't.
-          </p>
-          <p class="xeraen-landing-lore-close">
-            If you're hearing this, the signal is still reaching you. That's what matters.
-          </p>
-        </div>
-
-        <div class="xeraen-landing-cards">
-          <%= link_to "/xeraen/bio", class: "xeraen-landing-card-link" do %>
-            <div class="tui-window white-text xeraen-landing-card xeraen-landing-card--bio">
-              <fieldset>
-                <legend>BIO</legend>
-                <div class="xeraen-landing-card-body">
-                  <p class="xeraen-landing-card-icon xeraen-landing-card-icon--bio">◈ BIO</p>
-                  <p class="xeraen-landing-card-desc">
-                    The story behind the broadcasts. How a systems architect broke time open and what he lost doing it.
-                  </p>
-                </div>
-              </fieldset>
-            </div>
-          <% end %>
-
-          <%= link_to "/xeraen/releases", class: "xeraen-landing-card-link" do %>
-            <div class="tui-window white-text xeraen-landing-card xeraen-landing-card--releases">
-              <fieldset>
-                <legend>RELEASES</legend>
-                <div class="xeraen-landing-card-body">
-                  <p class="xeraen-landing-card-icon xeraen-landing-card-icon--releases">◆ RELEASES</p>
-                  <p class="xeraen-landing-card-desc">
-                    Every transmission committed to record. Hardcore fury to OMNIWAVE and everything between.
-                  </p>
-                </div>
-              </fieldset>
-            </div>
-          <% end %>
-        </div>
-
-        <div class="xeraen-landing-footer">
-          <p>transmitting from <%= future_year %> — for as long as <%= future_year %> exists</p>
-        </div>
+    <div class="console-status">
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">HANDLE</span>
+        <span class="console-val">XERAEN <span class="console-dim">· Systems architect turned fugitive</span></span>
       </div>
-    </fieldset>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">NETWORK</span>
+        <span class="console-val">Founder of the <%= link_to "Fracture Network", "/codex/the-fracture-network", class: "console-link" %></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">VOICE OF</span>
+        <span class="console-val"><%= link_to "The.CyberPul.se", "/thecyberpulse", class: "console-link" %></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">SIGNAL</span>
+        <span class="console-val"><span class="xt-brand">OMNIWAVE</span> <span class="console-dim">· hardcore fury → every frequency at once</span></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">ORIGIN</span>
+        <span class="console-val"><%= future_year %> → <%= current_year %></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">RELEASES</span>
+        <span class="console-val">
+          <% if latest %>
+            <%= pluralize(@releases.size, "cataloged", plural: "cataloged") %> <span class="console-dim">· latest</span>
+            <%= link_to latest.name, "/xeraen/releases/#{latest.slug}", class: "console-link" %>
+            <span class="console-dim">· <%= latest.release_type&.upcase || "RELEASE" %><% if latest.release_date %> · <%= latest.release_date.strftime("%Y-%m-%d") %><% end %></span>
+          <% else %>
+            <span class="console-dim">NONE CATALOGED</span>
+          <% end %>
+        </span>
+      </div>
+      <% if @coming_soon %>
+        <div class="console-status-row console-line" data-terminal-target="line">
+          <span class="console-key">INCOMING</span>
+          <span class="console-val">
+            <%= link_to @coming_soon.name, "/xeraen/releases/#{@coming_soon.slug}", class: "console-link" %>
+            <span class="console-dim">· <%= @coming_soon.release_type&.upcase || "RELEASE" %></span>
+          </span>
+        </div>
+      <% end %>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">STATUS</span>
+        <span class="console-val"><span class="xt-brand">● TRANSMITTING</span> <span class="console-dim">· from <%= future_year %> — for as long as <%= future_year %> exists</span></span>
+      </div>
+    </div>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// THE RECORD //</span></div>
+    <div class="xt-prose">
+      <p class="console-line" data-terminal-target="line">
+        Systems architect turned fugitive. Founder of the Fracture Network. The voice behind
+        The.CyberPul.se. <span class="xt-brand">Transmitting from <%= future_year %> — for as long as <%= future_year %> exists</span>.
+      </p>
+      <p class="console-line" data-terminal-target="line">
+        The music has evolved from hardcore fury into something he calls OMNIWAVE — an amalgamation
+        of everything that ever moved him: covers of songs, old video game scores, reinterpretations
+        and original compositions coalescing into one collage where genre boundaries dissolve. The
+        sound changed. What it carries hasn't.
+      </p>
+      <p class="xt-dim console-line" data-terminal-target="line">
+        If you're hearing this, the signal is still reaching you. That's what matters.
+      </p>
+    </div>
+
+    <%= render "artist_pages/xeraen_destinations", except: "XERAEN" %>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// TRANSMITTING FROM <%= future_year %> — FOR AS LONG AS <%= future_year %> EXISTS //</span></div>
+    <%= render "shared/console_prompt", hint: safe_join(["type a tag ", tag.span("(bio releases vault tcp fnet)", class: "console-dim"), " · enter · ? help"]) %>
   </div>
 <% end %>

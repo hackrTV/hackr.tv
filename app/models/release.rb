@@ -52,6 +52,16 @@ class Release < ApplicationRecord
 
   scope :released, -> { where(coming_soon: false) }
 
+  # The catalog's released list for one artist (ArtistCatalogController
+  # #releases, the XERAEN console's status block): newest first, and a
+  # release whose tracks are all hidden from the Pulse Vault stays out.
+  # Returns an Array (the reject needs the tracks).
+  def self.catalog_visible(artist)
+    released.where(artist: artist)
+      .order(Arel.sql("release_date DESC NULLS LAST"))
+      .reject { |r| r.tracks.any? && r.tracks.where(show_in_pulse_vault: true).none? }
+  end
+
   def to_param
     slug
   end

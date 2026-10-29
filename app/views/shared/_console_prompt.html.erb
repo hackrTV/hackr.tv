@@ -1,0 +1,14 @@
+<%# The "> " prompt shared by the console screens (home, the XERAEN
+    pages): replies land above the prompt, the hint line names the tags
+    the page's a[data-command] links answer to. The terminal controller
+    on the page root owns the targets (home_streams.md § Home console).
+    Locals: hint (text, or html_safe markup). %>
+<div class="console-reply" data-terminal-target="reply" hidden></div>
+<div class="console-prompt" data-terminal-target="inputLine" hidden>
+  <span class="console-mark">&gt;</span>
+  <span class="console-typed" data-terminal-target="typed"></span><span class="console-cursor"></span>
+  <input type="text" class="console-input" data-terminal-target="input"
+    data-action="input->terminal#inputChanged keydown->terminal#inputKeydown"
+    aria-label="Console command" autocomplete="off" autocapitalize="off" spellcheck="false">
+</div>
+<div class="console-hint console-line" data-terminal-target="line"><%= hint %></div>

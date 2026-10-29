@@ -33,6 +33,14 @@ class ArtistPagesController < ApplicationController
   end
 
   def xeraen_landing
+    # The console's status block: the catalog's released / incoming
+    # releases under the catalog's own visibility rule.
+    artist = Artist.find_by(slug: "xeraen")
+    return if artist.nil?
+
+    @releases = Release.catalog_visible(artist)
+    @coming_soon = Release.where(artist: artist, coming_soon: true)
+      .order(Arel.sql("release_date ASC NULLS LAST")).first
   end
 
   def xeraen_bio

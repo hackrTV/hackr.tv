@@ -8,12 +8,17 @@ import { Turbo } from '@hotwired/turbo-rails'
 // link's data-command and Turbo-visits its href (the permanent player
 // survives — the old full page load was a migration-era precaution),
 // ? / help lists the commands, clear wipes the replies. The line copy
-// lives in the partial, not here.
+// lives in the partial, not here. A long page (the XERAEN bio) passes
+// data-boot="done" + autofocus false: no reveal, and the prompt does
+// not take the keyboard away from scrolling.
 const LINE_MS = 30
 const PAUSE_MS = 140 // after the banner, before a rule
 
 export default class extends Controller<HTMLElement> {
   static targets = ['line', 'inputLine', 'typed', 'input', 'reply']
+  static values = { autofocus: { type: Boolean, default: true } }
+
+  declare readonly autofocusValue: boolean
 
   declare readonly lineTargets: HTMLElement[]
   declare readonly inputLineTarget: HTMLElement
@@ -121,7 +126,7 @@ export default class extends Controller<HTMLElement> {
     this.lineTargets.forEach(line => line.classList.add('console-line--on'))
     this.element.dataset.boot = 'done'
     this.inputLineTarget.hidden = false
-    window.requestAnimationFrame(() => this.inputTarget.focus({ preventScroll: true }))
+    if (this.autofocusValue) window.requestAnimationFrame(() => this.inputTarget.focus({ preventScroll: true }))
   }
 
   private clearTimer (): void {
