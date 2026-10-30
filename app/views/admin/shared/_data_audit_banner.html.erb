@@ -1,8 +1,12 @@
+<%# RED FLAGS strip — one 22px line flush under the nav (admin_chrome.css
+    .admin-banner), rendered only while flags are open. %>
 <% count = DataAudit::FlagCache.open_count %>
 <% if count > 0 %>
-  <div style="background: #1a0a00; border-bottom: 2px solid #ff6600; padding: 8px 20px; text-align: center;">
-    <span style="color: #ff6600; font-weight: bold;">⚑ RED FLAGS: <%= count %> open</span>
-    <span style="color: #666; margin: 0 8px;">|</span>
-    <%= link_to "View All →", admin_data_audit_flags_path, style: "color: #ff9944; text-decoration: none;" %>
+  <div class="admin-banner admin-banner--flags" role="status">
+    <div class="admin-banner-inner">
+      <span class="admin-banner-label">⚑ RED FLAGS: <%= count %> open</span>
+      <span class="admin-banner-sep" aria-hidden="true">|</span>
+      <%= link_to "View All →", admin_data_audit_flags_path %>
+    </div>
   </div>
 <% end %>
