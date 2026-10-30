@@ -1,0 +1,113 @@
+/* root_console.css — the /root music screens (2026-10-30): artists,
+ * releases and tracks as console screens on the family in console.css
+ * (the home console's idiom — bar, status rows, // RULES //, [TAG] rows,
+ * the > prompt — and the catalog's .cc-* ledger / cover-head rows). Admin
+ * layout only (layouts/admin.html.erb), after tokens / tuicss / default /
+ * console. The record screen IS the edit screen: the status rows hold
+ * the fields (.rc-field rows), prose sections are textareas, the commit
+ * row is the console's ghost buttons. Brand for /root is the admin's
+ * cyan (--accent-alt): the bar title, the badge, focus rings.
+ *
+ * Naming: .rc-* (root console). Widths: the console sits in the nav's
+ * 1400px box, left-anchored inside it like the nav's own content. */
+.console--root { --xt-brand: var(--accent-alt); max-width: 1400px; margin: 0 auto; padding: 12px 20px 32px; box-sizing: border-box; }
+.console--root .console-bar-title, .console--root .console-bar-badge { color: var(--accent-alt); }
+.console--root .console-bar-title a { color: inherit; text-decoration: none; }
+.console--root .console-bar-title a:hover { text-decoration: underline; }
+.console--root .console-status { padding: 4px 8px 0; }
+.console--root .console-status-row { grid-template-columns: 120px minmax(0, 1fr); min-height: 24px; align-items: center; }
+.console--root .console-key { line-height: 24px; }
+.console--root .cc-head .console-status { padding: 0; }
+
+/* Field rows: the status row's value cell holds an input (or several,
+ * wrapping) plus an inline hint / error. */
+.rc-field .console-val { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; white-space: normal; overflow: visible; text-overflow: clip; }
+.rc-input, .rc-select, .rc-textarea { box-sizing: border-box; margin: 0; padding: 0 6px; border: 1px solid var(--edge); background: var(--bg-1); color: var(--fg-bright); font: inherit; font-size: 16px; line-height: 20px; height: 24px; }
+.rc-input { width: 40ch; max-width: 100%; }
+.rc-input--short { width: 12ch; }
+.rc-input--date { width: 20ch; } /* Chrome's date widget needs the room */
+.rc-input--wide { width: 72ch; }
+.rc-input::placeholder { color: var(--fg-faint); }
+.rc-select { padding-right: 4px; max-width: 100%; }
+.rc-input:focus, .rc-select:focus, .rc-textarea:focus { outline: none; border-color: var(--accent-alt); background: var(--bg-0); }
+.rc-input:invalid { border-color: var(--err); }
+.rc-textarea { display: block; width: calc(100% - 16px); max-width: 100ch; height: auto; min-height: 96px; margin: 4px 8px 6px; padding: 4px 6px; resize: vertical; overflow: hidden; }
+.rc-textarea--lyrics { min-height: 320px; }
+.rc-check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; }
+.rc-check input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent-alt); }
+.rc-hint { color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.rc-hint a { color: var(--accent-alt); text-decoration: none; }
+.rc-hint a:hover { text-decoration: underline; }
+.rc-err { color: var(--err); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.rc-sub { padding: 2px 8px 0; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+
+/* Ghost buttons (the console bar's link chrome) — submit, link, danger. */
+.rc-btn { display: inline-block; box-sizing: border-box; margin: 0; background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 10px; font: inherit; font-size: 12px; line-height: 14px; letter-spacing: 1px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.rc-btn:hover { border-color: var(--accent-alt); color: var(--accent-alt); }
+.rc-btn--hot { border-color: var(--live); color: var(--live); }
+.rc-btn--hot:hover { background: var(--live); border-color: var(--live); color: var(--bg-0); }
+.rc-btn--danger:hover { border-color: var(--err); color: var(--err); }
+.rc-btn[disabled] { opacity: 0.4; cursor: default; }
+.rc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 8px; }
+.rc-actions--end { margin-left: auto; }
+.rc-actions form { display: inline; margin: 0; }
+.rc-hidden-forms { display: none; }
+
+/* Flash as a console reply under the bar: [OK] / [ERR] + the message. */
+.rc-flash { display: grid; grid-template-columns: 5ch minmax(0, 1fr); gap: 0 12px; margin: 4px 0 0; padding: 2px 8px; }
+.rc-flash--ok .console-tag { color: var(--ok); }
+.rc-flash--err .console-tag { color: var(--err); }
+
+/* The cover column of the head: the art (console.css .cc-art) over its
+ * REPLACE / REMOVE controls. */
+.rc-art-stack { display: flex; flex-direction: column; gap: 6px; width: 180px; flex: 0 0 auto; }
+.rc-art-stack .cc-art { width: 180px; height: 180px; }
+.rc-pick { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.rc-pick-input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.rc-audio { height: 24px; max-width: 320px; vertical-align: middle; }
+
+/* Ledger rows. Artists: [NN] · name over slug · TYPE · genre | releases |
+ * tracks | ghost links. Releases / tracks: console.css's .cc-row (the
+ * 40px cover) with a status and a ghost-link column appended. */
+.rc-row { display: grid; grid-template-columns: 5ch minmax(0, 1fr) 12ch 12ch auto; gap: 0 12px; align-items: center; padding: 2px 8px; }
+.rc-row .console-tag, .rc-track .console-tag { grid-area: auto; }
+.rc-row--cover { grid-template-columns: 5ch 40px minmax(0, 1fr) 14ch auto; }
+.rc-cell { color: var(--fg-muted); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
+.rc-cell--r { text-align: right; }
+.rc-links { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+.rc-links .console-link, .rc-links .rc-btn { font-size: 12px; letter-spacing: 1px; }
+.rc-row:hover, .rc-track:hover { background: var(--bg-1); }
+.rc-on { color: var(--ok); }
+.rc-off { color: var(--fg-faint); }
+.rc-hot { color: var(--accent-alt); }
+.rc-star { color: var(--warn); }
+
+/* Track rows (the release screen's // TRACKS //, the tracks ledger):
+ * NN · title over slug · AUDIO · ★ · VAULT · time · links. The ledger's
+ * variant leads with the cover (.rc-track--cover). */
+.rc-track { display: grid; grid-template-columns: 3ch minmax(0, 1fr) 8ch 3ch 7ch 6ch auto; gap: 0 12px; align-items: center; padding: 2px 8px; }
+.rc-track--cover { grid-template-columns: 5ch 40px minmax(0, 1fr) 8ch 3ch 7ch 6ch auto; }
+.rc-track-time { text-align: right; white-space: nowrap; color: var(--fg-faint); }
+.rc-empty { margin: 4px 0 6px; padding: 0 8px; color: var(--fg-muted); }
+
+/* The tracks ledger's FILTER row. */
+.rc-filter .rc-input { width: 48ch; }
+.rc-count { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.console-section[hidden], .rc-row[hidden], .rc-track[hidden] { display: none; }
+
+@media (max-width: 767px) {
+  .console--root { padding: 8px 12px 24px; }
+  .console--root .console-status-row { grid-template-columns: 84px minmax(0, 1fr); }
+  /* Field rows stack the key over its input so [AM] APPLE MUSIC and the inputs get the width. */
+  .console--root .rc-field { grid-template-columns: minmax(0, 1fr); min-height: 0; padding-bottom: 4px; }
+  .console--root .rc-field .console-key { line-height: 16px; }
+  .rc-input, .rc-input--wide { width: 100%; }
+  .rc-row { grid-template-columns: 5ch minmax(0, 1fr) auto; }
+  .rc-row .rc-cell:not(.rc-links) { display: none; }
+  .rc-row--cover { grid-template-columns: 5ch 40px minmax(0, 1fr) auto; }
+  .rc-track { grid-template-columns: 3ch minmax(0, 1fr) 6ch auto; }
+  .rc-track--cover { grid-template-columns: 5ch 40px minmax(0, 1fr) 6ch auto; }
+  .rc-track .rc-cell:not(.rc-links):not(.rc-track-time) { display: none; }
+  .rc-art-stack { width: 120px; }
+  .rc-art-stack .cc-art { width: 120px; height: 120px; }
+}

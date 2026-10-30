@@ -1,0 +1,39 @@
+<%# One track in a /root ledger (a release's // TRACKS //, the tracks
+    screen): NN · [the cover] · title over slug · TRACK NN · date · AUDIO /
+    NO AUDIO · ★ · VAULT / HIDDEN · time · [HISTORY] [DEL]. The title
+    opens the record screen; NN is its prompt command. Locals: track, num;
+    cover (lead with the release cover, [NN] numbering); release_col
+    (name the release in the meta); search (the ledger-filter haystack);
+    delete_form_id (a [DEL] button submitting that hidden form). %>
+<% playable = root_audio_ready?(track) %>
+<% href = edit_admin_track_path(track) %>
+<% cover = local_assigns[:cover] %>
+<% search = local_assigns[:search] %>
+<div class="rc-track <%= "rc-track--cover" if cover %> console-line"
+     <%= tag.attributes(data: {terminal_target: "line", ledger_filter_target: search && "row", search: search}.compact) %>>
+  <span class="console-tag"><%= cover ? "[#{num}]" : num %></span>
+  <% if cover %>
+    <% art = root_cover_ready?(track.release) %>
+    <%= link_to href, class: "cc-cover", tabindex: -1, aria: {hidden: true}, data: (art ? peek_attrs(url_for(track.release.cover_large)) : {}) do %>
+      <% if art %>
+        <%= image_tag url_for(track.release.cover_thumbnail), alt: "", class: "cc-cover-img" %>
+      <% else %>
+        <span class="cc-cover-none">&#9834;</span>
+      <% end %>
+    <% end %>
+  <% end %>
+  <div class="cc-text">
+    <%= link_to track.title, href, class: "console-link cc-name", data: {command: num} %>
+    <div class="cc-meta"><%= track.slug %> · TRACK <%= format("%02d", track.track_number.to_i) %><% if local_assigns[:release_col] %> · <%= track.release.name %><% end %><% if track.release_date %> · <%= track.release_date.strftime("%Y-%m-%d") %><% end %></div>
+  </div>
+  <span class="rc-cell <%= playable ? "rc-on" : "rc-off" %>"><%= playable ? "AUDIO" : "NO AUDIO" %></span>
+  <span class="rc-cell <%= track.featured ? "rc-star" : "rc-off" %>"><%= track.featured ? "★" : "—" %></span>
+  <span class="rc-cell <%= track.show_in_pulse_vault ? "rc-on" : "rc-off" %>"><%= track.show_in_pulse_vault ? "VAULT" : "HIDDEN" %></span>
+  <span class="rc-cell rc-track-time"><%= track.duration.presence || "—" %></span>
+  <span class="rc-cell rc-links">
+    <%= link_to "[HISTORY]", history_admin_track_path(track), class: "console-link" %>
+    <% if local_assigns[:delete_form_id] %>
+      <button type="submit" form="<%= local_assigns[:delete_form_id] %>" class="rc-btn rc-btn--danger">[DEL]</button>
+    <% end %>
+  </span>
+</div>

@@ -699,7 +699,7 @@
  * The click-to-play YouTube embed (YouTubePlayer.tsx → the vod-player
  * controller). The rest of the VodzPage / VodzShowPage scheme went with
  * the console (2026-10-29: vidz.html.erb / vidz_show.html.erb are
- * .console screens on the "Catalog console" block below). */
+ * .console screens on console.css's "Catalog console" block). */
 /* Click-to-play YouTube embed (YouTubePlayer.tsx). 16:9 via the padded
  * frame; the YT API replaces the mount div with its iframe. */
 .vodz-player__frame {
@@ -790,73 +790,7 @@
   50% { opacity: 0.4; }
 }
 
-/* --- Catalog console (XERAEN prototype, 2026-10-29) -------------------
- * /:artist/releases, /releases/:slug and /trackz/:slug for the console
- * artists (XERAEN, The.CyberPul.se — ArtistCatalogController::
- * CONSOLE_CATALOG_SLUGS picks the console_releases / console_release /
- * console_track templates; every other slug keeps the card grid and
- * fieldset stack above), plus the VIDZ archive + show (/thecyberpulse/
- * vidz, always a console). Brand from .console--<slug>'s --xt-brand
- * (artist_pages.css). Index rows:
- * [NN] · 40px cover · name over meta. Release: the cover beside the
- * status rows, track rows on the player contract (.track-row +
- * data-player-*; track_list repaints .play-track-btn / --active). */
-.cc-row { display: grid; grid-template-columns: 5ch 40px minmax(0, 1fr); gap: 0 12px; align-items: center; padding: 2px 8px; }
-.cc-row .console-tag { grid-area: auto; } /* hotwire.css's phone rule names a "tag" area for .console-row; this grid has none, and the ident would land the tag in an implicit cell */
-.cc-cover { display: block; width: 40px; height: 40px; overflow: hidden; }
-.cc-cover-img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.cc-cover-none { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; border: 1px solid var(--edge); color: var(--fg-faint); }
-.cc-text { min-width: 0; }
-.cc-name { display: block; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cc-meta { color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cc-empty, .cc-lost, .cc-note { margin: 4px 0 6px; padding: 0 8px; }
-
-.cc-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: flex-start; padding: 8px 8px 0; }
-.cc-art { width: 180px; height: 180px; flex: 0 0 auto; overflow: hidden; }
-.cc-art-img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.cc-art-none { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; border: 1px solid var(--edge); color: var(--fg-faint); font-size: 40px; }
-.cc-art--incoming { opacity: 0.55; }
-.cc-head .console-status { flex: 1 1 360px; padding: 0; }
-
-.cc-tracks { padding: 2px 0 4px; }
-.cc-track { display: grid; grid-template-columns: 3ch minmax(0, 1fr) auto 6ch 8ch; gap: 0 12px; align-items: center; padding: 2px 8px; }
-.track-row.cc-track { cursor: pointer; }
-.track-row.cc-track:hover, .track-row.cc-track.track-row--active { background: var(--bg-1); }
-.cc-track-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.track-row--active .cc-track-title { color: var(--xt-brand); }
-.cc-track--mute .cc-track-title { color: var(--fg-muted); }
-.cc-track-extra { font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
-.cc-track-time { text-align: right; white-space: nowrap; }
-.cc-track-play { text-align: right; font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
-.play-track-btn.cc-play { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 2px 6px; font-family: inherit; font-size: 12px; line-height: 14px; letter-spacing: 0; white-space: nowrap; cursor: pointer; }
-.play-track-btn.cc-play:hover, .play-track-btn.cc-play.play-track-btn--active { border-color: var(--xt-brand); color: var(--xt-brand); }
-
-@media (max-width: 767px) {
-  .cc-art { width: 120px; height: 120px; }
-  .cc-track { grid-template-columns: 3ch minmax(0, 1fr) 6ch 8ch; grid-template-areas: "num title time play" "num extra extra extra"; gap: 0 8px; }
-  .cc-track .console-tag { grid-area: num; }
-  .cc-track-title { grid-area: title; }
-  .cc-track-time { grid-area: time; }
-  .cc-track-play { grid-area: play; }
-  .cc-track-extra { grid-area: extra; }
-  .cc-track-extra:empty { display: none; }
-}
-
-/* Track screen (/xeraen/trackz/:slug): the // ALSO ON <RELEASE> // rows are
- * navigation only — [NN] title time, no player cell — so they drop the
- * extra/play columns of the release rows above. */
-.cc-track--nav { grid-template-columns: 3ch minmax(0, 1fr) 6ch; }
-@media (max-width: 767px) {
-  .cc-track--nav { grid-template-columns: 3ch minmax(0, 1fr) 6ch; grid-template-areas: "num title time"; }
-}
-
-/* VIDZ console (/thecyberpulse/vidz + /:id): archive rows with a 64×36
- * YouTube thumb, the player at 960px, the show's "also in the archive"
- * nav rows ([NN] title … date). */
-.cc-row--vidz { grid-template-columns: 5ch 64px minmax(0, 1fr); }
-.cc-cover--wide { width: 64px; height: 36px; }
-.cc-player { max-width: 960px; padding: 6px 8px; }
-.cc-track--wide { grid-template-columns: 3ch minmax(0, 1fr) auto; }
-@media (max-width: 767px) {
-  .cc-track--wide { grid-template-columns: 3ch minmax(0, 1fr) auto; grid-template-areas: "num title time"; }
-}
+/* The catalog console block (.cc-*: ledger rows, the cover head, track
+ * rows, the VIDZ rows) lives in console.css since 2026-10-30 — the /root
+ * music screens use the same rows. Brand still comes from
+ * .console--<slug>'s --xt-brand in artist_pages.css. */

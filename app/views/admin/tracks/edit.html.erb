@@ -1,131 +1,70 @@
-<%= render TuiWindowComponent.new(title: "/root/tracks/#{@track.slug} :: EDIT TRACK", variant: :admin, width: 1000) do %>
+<%# /root/tracks/:slug/edit — the track record as a console screen
+    (2026-10-30; show redirects here; the public console_track's twin
+    with fields where it has readouts — lyrics as one tall textarea).
+    Bar (title · ARTIST · RELEASE · TRACK NN · path; ★ FEATURED badge;
+    [<] the release's record screen, [>] PUBLIC when the artist is
+    routed, [HISTORY]), the form (admin/tracks/_form: cover context +
+    status rows, lyrics, frequencies) closed by // COMMIT //, then
+    // ALSO ON <RELEASE> // — the release's other tracks as nav rows
+    (NN opens them; the hop while editing a record), destinations, the
+    > prompt. Hidden forms at the end: purge-audio, delete-track
+    (data-confirm). URLs use slug_in_database. Assigns: @track,
+    @release (as saved), @siblings, @releases. %>
+<% slug = @track.slug_in_database %>
+<% title = @track.title_in_database %>
+<% content_for :title, "/root/tracks/#{slug} :: #{title}" %>
+<% num = format("%02d", @track.track_number_in_database.to_i) %>
+<% sibling_numbers = @siblings.map { |t| format("%02d", t.track_number.to_i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <div class="console-bar">
+    <h1 class="console-bar-title"><%= title %></h1>
+    <span class="console-bar-sub"><%= @release.artist.name %> · <%= @release.name %> · TRACK <%= num %> · /root/tracks/<%= slug %></span>
+    <span class="console-bar-right">
+      <% if @track.featured_in_database %><span class="console-bar-badge">★ FEATURED</span><% end %>
+      <%= link_to "[<] #{@release.name.upcase}", edit_admin_release_path(@release), class: "console-bar-link" %>
+      <% if (pub = root_public_track_path(@track)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
+      <%= link_to "[HISTORY]", history_admin_track_path(slug), class: "console-bar-link" %>
+    </span>
+  </div>
+  <%= render "admin/music/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
+  <%= form_with model: @track, url: admin_track_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, track: @track %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE TRACK]</button>
+      <%= link_to "[CANCEL]", edit_admin_release_path(@release), class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-track" class="rc-btn rc-btn--danger">[DELETE TRACK]</button>
+      </span>
+    </div>
+  <% end %>
 
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <%= tui_button "← Back to #{@release.name}", edit_admin_release_path(@release), color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "All Releases", admin_releases_path, color: :cyan, style: "padding: 8px 20px;" %>
-      </div>
-
-      <div style="padding: 10px; margin-bottom: 20px; background: #0a0a0a; border: 1px solid #333;">
-        <span style="color: #888;">Release:</span>
-        <span style="color: #0ff;"><%= @release.name %></span>
-        <span style="color: #666;">by</span>
-        <span style="color: #0ff;"><%= @track.artist.name %></span>
-      </div>
-
-      <%# Flash Errors %>
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= form_with model: [:admin, @track], local: true do |f| %>
-        <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: TRACK INFO ::]</h3>
-
-        <div style="margin-bottom: 20px;">
-          <%= f.tui_text_field :title %>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <%= f.tui_text_field :slug %>
-        </div>
-
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 120px; margin-bottom: 20px;">
-            <%= f.tui_number_field :track_number, min: 1, label: "TRACK #" %>
-          </div>
-          <div style="flex: 1; min-width: 120px; margin-bottom: 20px;">
-            <%= f.tui_text_field :duration, placeholder: "3:45" %>
-          </div>
-          <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
-            <%= f.tui_date_field :release_date %>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
-          <div>
-            <%= f.tui_check_box :featured, style: "width: 20px; height: 20px;" %>
-          </div>
-          <div>
-            <%= f.tui_check_box :show_in_pulse_vault, style: "width: 20px; height: 20px;" %>
-          </div>
-        </div>
-
-        <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: AUDIO FILE ::]</h3>
-
-        <% if @track.audio_file.attached? %>
-          <div style="margin-bottom: 15px; padding: 10px; background: #0a0a0a; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <span class="green-255-text">✓ Audio file attached</span>
-              <span style="color: #888; margin-left: 10px; font-family: monospace; font-size: 0.85em;">
-                <%= @track.audio_file.filename %>
-                (<%= number_to_human_size(@track.audio_file.byte_size) %>)
-              </span>
-            </div>
+  <% if @siblings.any? %>
+    <section class="console-section" aria-label="Also on <%= @release.name %>">
+      <div class="console-rule"><span>// ALSO ON <%= @release.name.upcase %> //</span></div>
+      <div class="cc-tracks">
+        <% @siblings.each do |sibling| %>
+          <% sibling_num = format("%02d", sibling.track_number.to_i) %>
+          <div class="cc-track cc-track--nav">
+            <span class="console-tag"><%= sibling_num %></span>
+            <%= link_to sibling.title, edit_admin_track_path(sibling), class: "console-link cc-track-title", data: {command: sibling_num} %>
+            <span class="cc-track-time console-dim"><%= sibling.duration.presence || "—" %></span>
           </div>
         <% end %>
+      </div>
+    </section>
+  <% end %>
 
-        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-          <div>
-            <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">
-              <%= @track.audio_file.attached? ? "REPLACE AUDIO" : "UPLOAD AUDIO" %>
-            </label>
-            <%= f.file_field :audio_file, accept: "audio/ogg,audio/mpeg,audio/wav,audio/flac,audio/mp4",
-                id: "audio-file-input",
-                style: "display: none;" %>
-            <label for="audio-file-input" class="tui-button purple-168"
-                   style="padding: 8px 20px; font-size: 0.85em; cursor: pointer; display: inline-block;">
-              CHOOSE FILE
-            </label>
-            <span id="audio-filename" style="color: #888; font-size: 0.85em; margin-left: 10px;"></span>
-            <small style="color: #666; display: block; margin-top: 8px;">OGG, MP3, WAV, FLAC, or M4A.</small>
-            <script nonce="<%= content_security_policy_nonce %>">
-              document.getElementById('audio-file-input').addEventListener('change', function(e) {
-                var name = e.target.files[0] ? e.target.files[0].name : '';
-                document.getElementById('audio-filename').textContent = name;
-              });
-            </script>
-          </div>
+  <%= render "admin/music/destinations" %>
 
-          <% if @track.audio_file.attached? %>
-            <div style="margin-left: auto;">
-              <%= tui_button_to "Remove Audio",
-                  purge_audio_admin_track_path(@track),
-                  method: :delete,
-                  color: :red,
-                  style: "padding: 8px 20px; font-size: 0.85em;",
-                  data: { turbo_confirm: "Remove audio file from '#{@track.title}'?" } %>
-            </div>
-          <% end %>
-        </div>
+  <div class="console-rule"><span>// END OF TRANSMISSION //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(numbers: sibling_numbers, noun: "a track number") %>
 
-        <div style="margin-bottom: 20px;">
-          <%= f.tui_text_area :lyrics, style: "min-height: 200px; line-height: 1.6;" %>
-        </div>
-
-        <%# Actions %>
-        <div style="margin-top: 30px; display: flex; gap: 10px;">
-          <%= tui_submit "Save Track", form: f,
-              color: :purple,
-              style: "padding: 10px 30px; font-size: 1.1em;" %>
-          <%= tui_button "Cancel", edit_admin_release_path(@release),
-              color: :grey,
-              style: "padding: 10px 30px; font-size: 1.1em;" %>
-          <%= tui_button "History", history_admin_track_path(@track),
-              color: :purple,
-              style: "padding: 10px 30px; font-size: 1.1em;" %>
-        </div>
-      <% end %>
-    </div>
-<% end %>
+  <div class="rc-hidden-forms">
+    <% if root_audio_ready?(@track) %>
+      <%= root_delete_form("purge-audio", purge_audio_admin_track_path(slug), confirm: "Remove the audio file from '#{title}'?") %>
+    <% end %>
+    <%= root_delete_form("delete-track", admin_track_path(slug), confirm: "Delete track '#{title}'? This cannot be undone.") %>
+  </div>
+</div>

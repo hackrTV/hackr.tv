@@ -1,108 +1,70 @@
-<%= render TuiWindowComponent.new(title: "/root/releases/#{@release.slug} :: EDIT RELEASE", variant: :admin, width: 1200) do %>
+<%# /root/releases/:slug/edit — the release record as a console screen
+    (2026-10-30; show redirects here; the public console_release's twin
+    with fields where it has readouts). Bar (name · ARTIST · TYPE · path;
+    ◌ SIGNAL INCOMING badge; [<] RELEASES, [>] PUBLIC when the artist is
+    routed, [HISTORY]), the form (admin/releases/_form: cover column +
+    status rows, prose, frequencies) closed by // COMMIT //, then the
+    // TRACKS // ledger (NN · title · AUDIO · ★ · VAULT · time · [HISTORY]
+    [DEL]) + [+] ADD TRACK prefilled, destinations, the > prompt (NN
+    opens a track). Hidden forms at the end: purge-cover, delete-release
+    (typed slug confirmation — confirm-slug controller), delete-track-<id>
+    (data-confirm). URLs use slug_in_database. Assigns: @release,
+    @artists, @tracks. %>
+<% slug = @release.slug_in_database %>
+<% name = @release.name_in_database %>
+<% content_for :title, "/root/releases/#{slug} :: #{name}" %>
+<% numbers = @tracks.to_a.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <div class="console-bar">
+    <h1 class="console-bar-title"><%= name %></h1>
+    <span class="console-bar-sub"><%= @release.artist.name %> · <%= @release.release_type_in_database&.upcase || "RELEASE" %> · /root/releases/<%= slug %></span>
+    <span class="console-bar-right">
+      <% if @release.coming_soon_in_database %><span class="console-bar-badge">◌ SIGNAL INCOMING</span><% end %>
+      <%= link_to "[<] RELEASES", admin_releases_path, class: "console-bar-link" %>
+      <% if (pub = root_public_release_path(@release)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
+      <%= link_to "[HISTORY]", history_admin_release_path(slug), class: "console-bar-link" %>
+    </span>
+  </div>
+  <%= render "admin/music/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <%= tui_button "← All Releases", admin_releases_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Cover Image Preview & Purge -->
-      <div style="margin-bottom: 20px; padding: 15px; background: #0a0a0a; border: 1px solid #333;">
-        <label class="white-text" style="display: block; margin-bottom: 10px; font-weight: bold;">COVER IMAGE</label>
-        <% if @release.cover_image.attached? %>
-          <div style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
-            <%= image_tag @release.cover_image, style: "width: 150px; height: 150px; object-fit: cover; border: 1px solid #333;" %>
-            <div>
-              <p style="color: #888; font-size: 0.85em; margin: 0 0 10px 0;">Cover image attached.</p>
-              <%= tui_button_to "Remove Cover", purge_cover_admin_release_path(@release), method: :delete,
-                  color: :red,
-                  style: "padding: 6px 16px; font-size: 0.85em;",
-                  form: { data: { turbo_confirm: "Remove the cover image?" } } %>
-            </div>
-          </div>
-        <% else %>
-          <p style="color: #555; margin: 0;">No cover image attached.</p>
-        <% end %>
-      </div>
-
-      <%= render "form", release: @release %>
-
-      <!-- Tracks Section -->
-      <h3 class="cyan-255-text" style="margin: 40px 0 15px 0;">[:: TRACKLIST ::]</h3>
-
-      <% tracks = @release.tracks.order(:track_number, :title) %>
-      <% if tracks.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center; width: 40px;">#</th>
-                <th style="text-align: left;">Title</th>
-                <th style="text-align: center;">Duration</th>
-                <th style="text-align: center;">Audio</th>
-                <th style="text-align: center;">Featured</th>
-                <th style="text-align: center;">Vault</th>
-                <th style="text-align: center; width: 140px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% tracks.each do |track| %>
-                <tr class="admin-table-row">
-                  <td style="text-align: center; color: #666; font-family: monospace;">
-                    <%= track.track_number&.to_s&.rjust(2, "0") || "—" %>
-                  </td>
-                  <td>
-                    <strong><%= track.title %></strong>
-                    <div style="font-family: monospace; color: #888; font-size: 0.85em;">/<%= track.slug %></div>
-                  </td>
-                  <td style="text-align: center; color: #888; font-family: monospace;">
-                    <%= track.duration || "—" %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if track.audio_file.attached? %>
-                      <span class="green-255-text">✓</span>
-                    <% else %>
-                      <span style="color: #666;">✗</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if track.featured %>
-                      <span class="purple-255-text">★</span>
-                    <% else %>
-                      <span style="color: #333;">—</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if track.show_in_pulse_vault %>
-                      <span class="green-255-text">✓</span>
-                    <% else %>
-                      <span style="color: #f87171;">✗</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_track_path(track), color: :cyan, style: "padding: 4px 12px; font-size: 0.85em;" %>
-                    <%= tui_button_to "Delete", admin_track_path(track), method: :delete,
-                        color: :red,
-                        style: "padding: 4px 12px; font-size: 0.85em;",
-                        form: { style: "display: inline;", data: { turbo_confirm: "Delete track '#{track.title}'?" } } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 20px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666;">No tracks on this release.</p>
-        </div>
-      <% end %>
+  <%= form_with model: @release, url: admin_release_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, release: @release %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE RELEASE]</button>
+      <%= link_to "[CANCEL]", admin_releases_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-release" class="rc-btn rc-btn--danger">[DELETE RELEASE<% if @tracks.any? %> + <%= @tracks.size %> TRACK<%= "S" unless @tracks.size == 1 %><% end %>]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section" aria-label="Tracks">
+    <div class="console-rule"><span>// TRACKS //</span></div>
+    <% if @tracks.empty? %>
+      <p class="rc-empty">NO TRACKS ON THIS RELEASE <span class="console-dim">· [+] ADD TRACK opens a prefilled record</span></p>
+    <% end %>
+    <% @tracks.each_with_index do |track, i| %>
+      <%= render "admin/music/track_row", track: track, num: root_num(i), delete_form_id: "delete-track-#{track.id}" %>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[+] ADD TRACK", new_admin_track_path(release_id: @release.id), class: "rc-btn", data: {command: "new"} %>
+    </div>
+  </section>
+
+  <%= render "admin/music/destinations" %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(numbers: numbers, noun: "a track number", extra: ["new"]) %>
+
+  <div class="rc-hidden-forms">
+    <% if root_cover_ready?(@release) %>
+      <%= root_delete_form("purge-cover", purge_cover_admin_release_path(slug), confirm: "Remove the cover image from '#{name}'?") %>
+    <% end %>
+    <%= form_with url: admin_release_path(slug), method: :delete, id: "delete-release", local: true,
+      data: {controller: "confirm-slug", confirm_slug_slug_value: slug, action: "submit->confirm-slug#check"} do %><% end %>
+    <% @tracks.each do |track| %>
+      <%= root_delete_form("delete-track-#{track.id}", admin_track_path(track), confirm: "Delete track '#{track.title}'?") %>
+    <% end %>
+  </div>
+</div>

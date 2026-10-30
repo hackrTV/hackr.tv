@@ -1,0 +1,169 @@
+/* console.css — the console family (2026-10-30).
+ *
+ * The screen idiom the home page introduced (home/_terminal, 2026-10-28)
+ * and the artist pages, the catalog, the VIDZ archive and the /root music
+ * screens adopted: a .console root on the ledger's tokens (Terminus
+ * 16/20), a .console-bar status line, .console-status rows, hairline
+ * // RULES //, aligned [TAG] rows, the "> " prompt, and the catalog's
+ * .cc-* ledger / cover-head / track rows. Loaded by layouts/
+ * _hotwire_assets (every public page — the tracked set must stay
+ * identical) AND by the admin layout, which is why it is its own sheet:
+ * hotwire.css and artist_catalog.css are public-only and used to hold
+ * these blocks. Needs tokens.css. Page-specific modifiers stay in that
+ * page's sheet: .console--xeraen / .console--thecyberpulse + .xt-* in
+ * artist_pages.css, .console--root + .rc-* in root_console.css (admin).
+ *
+ * --xt-brand (the sparse brand color: the active track title, the ► PLAY
+ * hover) defaults to the accent here; an artist's .console--<slug> block
+ * overrides it (artist_pages.css loads after this sheet). */
+.console { --xt-brand: var(--accent-bright); }
+
+/* --- Home console (home/_terminal; terminal controller, 2026-10-28) ---
+ * The boot screen as a left-anchored terminal on the ledger's tokens:
+ * Terminus 16/20, hairline "// RULES //", phosphor green (--live) only
+ * for the prompt mark, the cursor and ONLINE. The ASCII banner and the
+ * status block share the head row from 768px; every artist / service is
+ * one aligned line (tag | name | description). Lines are invisible while
+ * data-boot="pending" and the controller flicks them on in order
+ * (visibility, so nothing reflows); without scripting they simply show.
+ * The /terminal easter-egg page styles itself inline — nothing here.
+ * The starting-soon hero / countdown banner / live embed follow. --- */
+.console { max-width: 1100px; margin: 0; padding: 4px 0 24px; color: var(--fg); font-family: var(--font-tui); font-size: 16px; line-height: 20px; }
+.console[data-boot="pending"] .console-line:not(.console-line--on) { visibility: hidden; }
+@media (scripting: none) { .console .console-line { visibility: visible; } }
+.console-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 40px; padding: 0 8px 8px; border-bottom: 1px solid var(--edge); }
+.console-banner { display: block; color: var(--fg-bright); text-decoration: none; }
+.console-banner:hover { color: var(--accent-bright); }
+.console-banner pre { margin: 0; font-family: inherit; font-size: 12px; line-height: 14px; }
+.console-status { display: flex; flex-direction: column; flex: 1 1 360px; min-width: 0; }
+.console-status-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 0 12px; }
+.console-key { color: var(--fg-faint); font-size: 12px; line-height: 20px; letter-spacing: 1px; }
+.console-val { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.console-dim { color: var(--fg-faint); }
+.console-hot { color: var(--live); }
+.console-link { color: var(--accent-alt); text-decoration: none; }
+.console-link:hover { color: var(--fg-bright); text-decoration: underline; }
+.console-welcome { margin: 8px 0 0; padding: 0 8px; }
+.console-rule { display: flex; align-items: center; gap: 8px; margin: 6px 0 2px; padding: 0 8px; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
+.console-rule::before, .console-rule::after { content: ""; flex: 1; border-top: 1px solid var(--edge); }
+.console-row { display: grid; grid-template-columns: var(--console-tag, 10ch) 16ch minmax(0, 1fr); gap: 0 12px; align-items: baseline; padding: 0 8px; }
+.console-section--artists { --console-tag: 3ch; }
+.console-tag { color: var(--fg-faint); white-space: nowrap; }
+.console-row .console-link { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.console-desc { min-width: 0; color: var(--fg-muted); }
+.console-reply { padding: 0 8px; color: var(--fg-muted); }
+.console-reply[hidden] { display: none; }
+.console-echo { color: var(--fg-faint); }
+.console-err { color: var(--err); }
+.console-prompt { display: flex; align-items: center; position: relative; padding: 0 8px; }
+.console-prompt[hidden] { display: none; } /* the flex display would beat the UA [hidden] rule (the WIRE inline-form find) */
+.console-mark { margin-right: 8px; color: var(--live); font-weight: bold; }
+.console-typed { white-space: pre; }
+.console-cursor { display: inline-block; width: 8px; height: 16px; background: var(--live); animation: terminal-blink 1s step-end infinite; vertical-align: -2px; }
+@keyframes terminal-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.console-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; border: none; background: transparent; color: transparent; font: inherit; cursor: text; }
+.console-hint { padding: 2px 8px 0; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+/* A console page's status line (the XERAEN pages): title · sub · a right-aligned badge or ghost links. */
+.console-bar { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; padding: 0 8px 6px; border-bottom: 1px solid var(--edge); }
+.console-bar-title { margin: 0; color: var(--accent-bright); font-family: inherit; font-size: 18px; font-weight: bold; letter-spacing: 2px; }
+.console-bar-sub { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.console-bar-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.console-bar-badge { color: var(--live); font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
+.console-bar-link { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; text-decoration: none; white-space: nowrap; }
+.console-bar-link:hover { border-color: var(--accent); color: var(--accent-bright); }
+@media (max-width: 767px) {
+  .console { padding-top: 0; font-size: 14px; line-height: 18px; }
+  .console-head { gap: 6px 0; }
+  .console-status { flex-basis: 100%; }
+  .console-status-row { grid-template-columns: 72px minmax(0, 1fr); }
+  .console-key { line-height: 18px; }
+  .console-val { white-space: normal; }
+  .console-row { grid-template-columns: var(--console-tag, 10ch) minmax(0, 1fr); grid-template-areas: "tag name" "tag desc"; gap: 0 8px; }
+  .console-tag { grid-area: tag; }
+  .console-row .console-link { grid-area: name; }
+  .console-desc { grid-area: desc; font-size: 12px; line-height: 16px; }
+  .console-cursor { height: 14px; }
+}
+@media (max-width: 379px) { .console-banner pre { font-size: 10px; line-height: 12px; } }
+
+/* --- Image peek (peek controller, 2026-10-29) ---------------------------
+ * One shared fixed panel beside a hovered thumb — the catalog ledger's
+ * covers, the release / track cover, the XERAEN bio's track row, the
+ * VIDZ archive's YouTube thumbs — with the large rendition
+ * (Release#cover_large / maxresdefault). Hover-only (the controller
+ * checks (hover: hover)); pointer-events off so it never traps the
+ * mouse; the toasts' 9999 stays above it. */
+.peek { position: fixed; z-index: 9000; padding: 4px; border: 1px solid var(--edge-bright); background: var(--bg-0); pointer-events: none; }
+.peek[hidden] { display: none; }
+.peek-img { display: block; width: auto; height: auto; max-width: min(480px, calc(100vw - 32px)); max-height: 70vh; }
+
+/* --- Catalog console (XERAEN prototype, 2026-10-29) -------------------
+ * /:artist/releases, /releases/:slug and /trackz/:slug for the console
+ * artists (XERAEN, The.CyberPul.se — ArtistCatalogController::
+ * CONSOLE_CATALOG_SLUGS picks the console_releases / console_release /
+ * console_track templates; every other slug keeps the card grid and
+ * fieldset stack above), plus the VIDZ archive + show (/thecyberpulse/
+ * vidz, always a console). Brand from .console--<slug>'s --xt-brand
+ * (artist_pages.css). Index rows:
+ * [NN] · 40px cover · name over meta. Release: the cover beside the
+ * status rows, track rows on the player contract (.track-row +
+ * data-player-*; track_list repaints .play-track-btn / --active). */
+.cc-row { display: grid; grid-template-columns: 5ch 40px minmax(0, 1fr); gap: 0 12px; align-items: center; padding: 2px 8px; }
+.cc-row .console-tag { grid-area: auto; } /* hotwire.css's phone rule names a "tag" area for .console-row; this grid has none, and the ident would land the tag in an implicit cell */
+.cc-cover { display: block; width: 40px; height: 40px; overflow: hidden; }
+.cc-cover-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cc-cover-none { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; border: 1px solid var(--edge); color: var(--fg-faint); }
+.cc-text { min-width: 0; }
+.cc-name { display: block; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cc-meta { color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cc-empty, .cc-lost, .cc-note { margin: 4px 0 6px; padding: 0 8px; }
+
+.cc-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: flex-start; padding: 8px 8px 0; }
+.cc-art { width: 180px; height: 180px; flex: 0 0 auto; overflow: hidden; }
+.cc-art-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cc-art-none { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; border: 1px solid var(--edge); color: var(--fg-faint); font-size: 40px; }
+.cc-art--incoming { opacity: 0.55; }
+.cc-head .console-status { flex: 1 1 360px; padding: 0; }
+
+.cc-tracks { padding: 2px 0 4px; }
+.cc-track { display: grid; grid-template-columns: 3ch minmax(0, 1fr) auto 6ch 8ch; gap: 0 12px; align-items: center; padding: 2px 8px; }
+.track-row.cc-track { cursor: pointer; }
+.track-row.cc-track:hover, .track-row.cc-track.track-row--active { background: var(--bg-1); }
+.cc-track-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track-row--active .cc-track-title { color: var(--xt-brand); }
+.cc-track--mute .cc-track-title { color: var(--fg-muted); }
+.cc-track-extra { font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
+.cc-track-time { text-align: right; white-space: nowrap; }
+.cc-track-play { text-align: right; font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
+.play-track-btn.cc-play { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 2px 6px; font-family: inherit; font-size: 12px; line-height: 14px; letter-spacing: 0; white-space: nowrap; cursor: pointer; }
+.play-track-btn.cc-play:hover, .play-track-btn.cc-play.play-track-btn--active { border-color: var(--xt-brand); color: var(--xt-brand); }
+
+@media (max-width: 767px) {
+  .cc-art { width: 120px; height: 120px; }
+  .cc-track { grid-template-columns: 3ch minmax(0, 1fr) 6ch 8ch; grid-template-areas: "num title time play" "num extra extra extra"; gap: 0 8px; }
+  .cc-track .console-tag { grid-area: num; }
+  .cc-track-title { grid-area: title; }
+  .cc-track-time { grid-area: time; }
+  .cc-track-play { grid-area: play; }
+  .cc-track-extra { grid-area: extra; }
+  .cc-track-extra:empty { display: none; }
+}
+
+/* Track screen (/xeraen/trackz/:slug): the // ALSO ON <RELEASE> // rows are
+ * navigation only — [NN] title time, no player cell — so they drop the
+ * extra/play columns of the release rows above. */
+.cc-track--nav { grid-template-columns: 3ch minmax(0, 1fr) 6ch; }
+@media (max-width: 767px) {
+  .cc-track--nav { grid-template-columns: 3ch minmax(0, 1fr) 6ch; grid-template-areas: "num title time"; }
+}
+
+/* VIDZ console (/thecyberpulse/vidz + /:id): archive rows with a 64×36
+ * YouTube thumb, the player at 960px, the show's "also in the archive"
+ * nav rows ([NN] title … date). */
+.cc-row--vidz { grid-template-columns: 5ch 64px minmax(0, 1fr); }
+.cc-cover--wide { width: 64px; height: 36px; }
+.cc-player { max-width: 960px; padding: 6px 8px; }
+.cc-track--wide { grid-template-columns: 3ch minmax(0, 1fr) auto; }
+@media (max-width: 767px) {
+  .cc-track--wide { grid-template-columns: 3ch minmax(0, 1fr) auto; grid-template-areas: "num title time"; }
+}

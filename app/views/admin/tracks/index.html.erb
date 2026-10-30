@@ -1,148 +1,58 @@
-<%= render TuiWindowComponent.new(title: "/root/tracks :: MANAGE TRACKS", variant: :admin) do %>
+<%# /root/tracks — the tracks ledger as a console screen (2026-10-30;
+    console.css family + root_console.css): bar, ON RECORD row, the FILTER
+    row (ledger-filter controller: title / slug / artist / release, a
+    release group hides when none of its rows match), one
+    // <ARTIST> · <RELEASE> (TYPE) // rule per release with its tracks as
+    rows ([NN] · cover · title over slug · TRACK NN · date · AUDIO · ★ ·
+    VAULT · time · [HISTORY]), destinations, the > prompt (NN opens the
+    record screen). Assigns: @tracks, @groups, @with_audio, @in_vault,
+    @featured. %>
+<% content_for :title, "/root/tracks :: TRACKS" %>
+<% numbers = @tracks.to_a.each_index.map { |i| root_num(i) } %>
+<% counter = 0 %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <div class="console-bar">
+    <h1 class="console-bar-title">TRACKS</h1>
+    <span class="console-bar-sub">ROOT · MUSIC · /root/tracks</span>
+    <span class="console-bar-right">
+      <%= link_to "[+] NEW TRACK", new_admin_track_path, class: "console-bar-link", data: {command: "new"} %>
+      <%= link_to "[>] VAULT", "/vault", class: "console-bar-link" %>
+    </span>
+  </div>
+  <%= render "admin/music/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "+ New Track", new_admin_track_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Search Filter -->
-      <% if @tracks.any? %>
-        <div style="margin-bottom: 20px;">
-          <label for="track-search" style="color: #888; display: block; margin-bottom: 8px;">
-            SEARCH TRACKS :: Filter by track title, artist, or release
-          </label>
-          <input
-            type="text"
-            id="track-search"
-            placeholder="Type to filter tracks..."
-            style="width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace; font-size: 1em;"
-          />
-          <div style="margin-top: 8px; color: #666; font-size: 0.9em;">
-            <span id="track-count"><%= @tracks.count %></span> / <%= @tracks.count %> tracks visible
-          </div>
-        </div>
-      <% end %>
-
-      <!-- Tracks Table -->
-      <% if @tracks.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Track</th>
-                <th style="text-align: left;">Artist</th>
-                <th style="text-align: left;">Release</th>
-                <th style="text-align: center;">Featured</th>
-                <th style="text-align: center;">Audio</th>
-                <th style="text-align: center;">Pulse Vault</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @tracks.each do |track| %>
-                <tr class="track-row" class="admin-table-row"
-                    data-track-title="<%= track.title.downcase %>"
-                    data-artist-name="<%= track.artist.name.downcase %>"
-                    data-release-name="<%= track.release&.name&.downcase || '' %>">
-                  <td>
-                    <strong><%= track.title %></strong>
-                    <br>
-                    <small style="color: #666; font-family: monospace;">/<%= track.slug %></small>
-                  </td>
-                  <td><%= track.artist.name %></td>
-                  <td><%= track.release&.name || "—" %></td>
-                  <td style="text-align: center;">
-                    <% if track.featured %>
-                      <span class="purple-255-text">★</span>
-                    <% else %>
-                      <span style="color: #333;">—</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if track.audio_file.attached? %>
-                      <span class="green-255-text">✓</span>
-                    <% else %>
-                      <span style="color: #666;">✗</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if track.show_in_pulse_vault %>
-                      <span class="green-255-text">✓</span>
-                    <% else %>
-                      <span style="color: #f87171;">✗</span>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No tracks yet. Create your first one or import from YAML!</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(@tracks.size, "track") %> <span class="console-dim">· <%= @with_audio %> with audio · <%= @in_vault %> in the vault · <%= @featured %> featured · <%= pluralize(@groups.size, "release") %></span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="title · slug · artist · release" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= @tracks.size %> / <%= @tracks.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
 
-<% if @tracks.any? %>
-  <script nonce="<%= content_security_policy_nonce %>">
-    document.addEventListener('DOMContentLoaded', function() {
-      const searchInput = document.getElementById('track-search');
-      const trackRows = document.querySelectorAll('.track-row');
-      const trackCountEl = document.getElementById('track-count');
-      const totalTracks = trackRows.length;
+  <% if @tracks.empty? %>
+    <div class="console-rule"><span>// TRACKS //</span></div>
+    <p class="rc-empty">NO TRACKS ON RECORD <span class="console-dim">· [+] NEW TRACK starts the archive</span></p>
+  <% end %>
+  <% @groups.each do |release, tracks| %>
+    <section class="console-section" aria-label="<%= release.artist.name %> · <%= release.name %>" data-ledger-filter-target="group">
+      <div class="console-rule"><span>// <%= release.artist.name.upcase %> · <%= release.name.upcase %> (<%= release.release_type&.upcase || "RELEASE" %><% if release.coming_soon %> · INCOMING<% end %>) //</span></div>
+      <% tracks.each do |track| %>
+        <%= render "admin/music/track_row", track: track, num: root_num(counter), cover: true, search: root_track_search(track) %>
+        <% counter += 1 %>
+      <% end %>
+    </section>
+  <% end %>
 
-      function filterTracks() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        let visibleCount = 0;
+  <%= render "admin/music/destinations", except: "TRACKS" %>
 
-        trackRows.forEach(row => {
-          const trackTitle = row.dataset.trackTitle || '';
-          const artistName = row.dataset.artistName || '';
-          const releaseName = row.dataset.releaseName || '';
-
-          const matches = trackTitle.includes(searchTerm) ||
-                         artistName.includes(searchTerm) ||
-                         releaseName.includes(searchTerm);
-
-          if (matches) {
-            row.style.display = '';
-            visibleCount++;
-          } else {
-            row.style.display = 'none';
-          }
-        });
-
-        trackCountEl.textContent = visibleCount;
-      }
-
-      searchInput.addEventListener('input', filterTracks);
-
-      // Focus search on Tab key
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab' && !e.shiftKey && document.activeElement !== searchInput) {
-          e.preventDefault();
-          searchInput.focus();
-          searchInput.select();
-        }
-      });
-    });
-  </script>
-<% end %>
+  <div class="console-rule"><span>// EVERY TRANSMISSION COMMITTED TO RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(except: "TRACKS", numbers: numbers, noun: "a track number", extra: ["new"]) %>
+</div>

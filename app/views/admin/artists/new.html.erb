@@ -1,7 +1,23 @@
-<%= render TuiWindowComponent.new(title: "/root/artists/new :: NEW ARTIST", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @artist, url: admin_artists_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/artists/new — a new artist on the record screen's shell. %>
+<% content_for :title, "/root/artists/new :: NEW ARTIST" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <div class="console-bar">
+    <h1 class="console-bar-title">NEW ARTIST</h1>
+    <span class="console-bar-sub">ROOT · ARTIST · /root/artists/new</span>
+    <span class="console-bar-right"><%= link_to "[<] ARTISTS", admin_artists_path, class: "console-bar-link" %></span>
+  </div>
+  <%= render "admin/music/flash" %>
+
+  <%= form_with model: @artist, url: admin_artists_path, local: true do |f| %>
+    <%= render "form", f: f, artist: @artist %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE ARTIST]</button>
+      <%= link_to "[CANCEL]", admin_artists_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/music/destinations" %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint %>
+</div>

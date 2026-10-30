@@ -6,9 +6,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%# tokens first: the console family (console.css) and the /root music
+        screens (root_console.css) read the semantic palette; the TuiCss
+        base + default.css admin rules follow as before. No Turbo here —
+        the admin is plain full-page navigation; admin.ts is Stimulus
+        alone (terminal / peek / ledger-filter / file-pick / autogrow /
+        confirm-slug) and the terminal controller's prompt falls back to a
+        full load when Turbo is absent (utils/visit.ts). %>
+    <%= stylesheet_link_tag "tokens", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "tuicss", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "default", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "console", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "root_console", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "tuicss", "data-turbo-track": "reload", type: "module" %>
+    <%= vite_client_tag %>
+    <%= vite_typescript_tag "admin.ts" %>
     <%= yield :head %>
     <script nonce="<%= content_security_policy_nonce %>">
       // Rails UJS confirmation handler

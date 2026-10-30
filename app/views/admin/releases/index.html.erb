@@ -1,108 +1,59 @@
-<%= render TuiWindowComponent.new(title: "/root/releases :: MANAGE RELEASES", variant: :admin) do %>
+<%# /root/releases — the releases ledger as a console screen (2026-10-30;
+    console.css family + root_console.css): bar, CATALOG / LATEST /
+    INCOMING rows, one // <ARTIST> // rule per artist with its releases
+    as rows ([NN] · cover · name over TYPE · date · tracks · length ·
+    catalog # · slug · state · [HISTORY]; incoming first, then newest),
+    destinations, the > prompt (NN opens the record screen).
+    Assigns: @releases, @groups, @incoming, @latest, @track_count. %>
+<% content_for :title, "/root/releases :: RELEASES" %>
+<% numbers = @releases.to_a.each_index.map { |i| root_num(i) } %>
+<% counter = 0 %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <div class="console-bar">
+    <h1 class="console-bar-title">RELEASES</h1>
+    <span class="console-bar-sub">ROOT · MUSIC · /root/releases</span>
+    <span class="console-bar-right">
+      <%= link_to "[+] NEW RELEASE", new_admin_release_path, class: "console-bar-link", data: {command: "new"} %>
+      <%= link_to "[>] FM", "/fm/releases", class: "console-bar-link" %>
+    </span>
+  </div>
+  <%= render "admin/music/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "+ New Release", new_admin_release_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Releases Table -->
-      <% if @releases.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center; width: 60px;">Cover</th>
-                <th style="text-align: left;">Release</th>
-                <th style="text-align: left;">Artist</th>
-                <th style="text-align: left;">Type</th>
-                <th style="text-align: center;">Release Date</th>
-                <th style="text-align: center;">Tracks</th>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: center; width: 140px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @releases.each do |release| %>
-                <tr class="admin-table-row">
-                  <td style="text-align: center; padding: 5px;">
-                    <%= link_to edit_admin_release_path(release) do %>
-                      <% if release.cover_image.attached? %>
-                        <%= image_tag release.cover_thumbnail, style: "width: 50px; height: 50px; object-fit: cover; border: 1px solid #333;" %>
-                      <% else %>
-                        <div style="width: 50px; height: 50px; background: #1a1a1a; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7em; color: #666;">
-                          NO IMG
-                        </div>
-                      <% end %>
-                    <% end %>
-                  </td>
-                  <td>
-                    <%= link_to edit_admin_release_path(release), style: "color: #0ff; text-decoration: none;" do %>
-                      <strong><%= release.name %></strong>
-                      <div style="font-family: monospace; color: #888; font-size: 0.85em;">/<%= release.slug %></div>
-                    <% end %>
-                  </td>
-                  <td><%= release.artist.name %></td>
-                  <td style="color: #888;"><%= release.release_type&.titleize || "—" %></td>
-                  <td style="text-align: center; color: #888;">
-                    <%= release.release_date&.strftime("%Y-%m-%d") || "TBA" %>
-                  </td>
-                  <td style="text-align: center;"><%= release.tracks.count %></td>
-                  <td style="text-align: center;">
-                    <% if release.coming_soon %>
-                      <span style="color: #a855f7; font-size: 0.85em;">INCOMING</span>
-                    <% else %>
-                      <span style="color: #4ade80; font-size: 0.85em;">LIVE</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_release_path(release), color: :cyan, style: "padding: 4px 12px; font-size: 0.85em;" %>
-                    <%= tui_button "History", history_admin_release_path(release), color: :purple, style: "padding: 4px 12px; font-size: 0.85em;" %>
-                    <%= tui_button_to "Delete", admin_release_path(release), method: :delete,
-                        color: :red,
-                        style: "padding: 4px 12px; font-size: 0.85em;",
-                        form: { style: "display: inline;", class: "delete-release-form", data: { release_slug: release.slug } } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No releases yet.</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">CATALOG</span>
+      <span class="console-val"><%= pluralize(@releases.size, "release") %> <span class="console-dim">· <%= pluralize(@track_count, "track") %> · <%= pluralize(@groups.size, "artist") %><% if @incoming.any? %> · <%= @incoming.size %> incoming<% end %></span></span>
     </div>
-<% end %>
+    <% if @latest %>
+      <div class="console-status-row">
+        <span class="console-key">LATEST</span>
+        <span class="console-val"><%= link_to @latest.name, edit_admin_release_path(@latest), class: "console-link" %> <span class="console-dim">· <%= @latest.artist.name %> · <%= @latest.release_type&.upcase || "RELEASE" %> · <%= @latest.release_date.strftime("%Y-%m-%d") %></span></span>
+      </div>
+    <% end %>
+    <% if (incoming = @incoming.first) %>
+      <div class="console-status-row">
+        <span class="console-key">INCOMING</span>
+        <span class="console-val"><%= link_to incoming.name, edit_admin_release_path(incoming), class: "console-link" %> <span class="console-dim">· <%= incoming.artist.name %> · <%= incoming.release_type&.upcase || "RELEASE" %> · PENDING TRANSMISSION<% if @incoming.size > 1 %> · +<%= @incoming.size - 1 %> more<% end %></span></span>
+      </div>
+    <% end %>
+  </div>
 
-<script nonce="<%= content_security_policy_nonce %>">
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.delete-release-form').forEach(function(form) {
-      form.addEventListener('submit', function(e) {
-        var slug = form.dataset.releaseSlug;
-        var input = prompt('Type "' + slug + '" to confirm deletion:');
-        if (input !== slug) {
-          e.preventDefault();
-          if (input !== null) alert('Slug did not match. Deletion cancelled.');
-        }
-      });
-    });
-  });
-</script>
+  <% if @releases.empty? %>
+    <div class="console-rule"><span>// CATALOG //</span></div>
+    <p class="rc-empty">NO RELEASES ON RECORD <span class="console-dim">· [+] NEW RELEASE starts the catalog</span></p>
+  <% end %>
+  <% @groups.each do |artist, releases| %>
+    <section class="console-section" aria-label="<%= artist.name %>">
+      <div class="console-rule"><span>// <%= artist.name.upcase %> · <%= pluralize(releases.size, "RELEASE").upcase %> //</span></div>
+      <% releases.each do |release| %>
+        <%= render "admin/music/release_row", release: release, num: root_num(counter) %>
+        <% counter += 1 %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <%= render "admin/music/destinations", except: "RELEASES" %>
+
+  <div class="console-rule"><span>// EVERY TRANSMISSION COMMITTED TO RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(except: "RELEASES", numbers: numbers, noun: "a release number", extra: ["new"]) %>
+</div>

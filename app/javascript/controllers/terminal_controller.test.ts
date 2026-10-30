@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Application } from '@hotwired/stimulus'
-import { Turbo } from '@hotwired/turbo-rails'
+import { visit } from '~/utils/visit'
 import TerminalController from './terminal_controller'
 
-vi.mock('@hotwired/turbo-rails', () => ({ Turbo: { visit: vi.fn() } }))
+vi.mock('~/utils/visit', () => ({ visit: vi.fn() }))
 
 // The home console: the server-rendered screen is revealed line by line
 // (skippable), then the prompt runs commands off the rows' data-command.
@@ -55,7 +55,7 @@ describe('TerminalController', () => {
       removeEventListener: () => undefined
     }))
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => { callback(0); return 0 })
-    vi.mocked(Turbo.visit).mockClear()
+    vi.mocked(visit).mockClear()
   })
 
   afterEach(async () => {
@@ -129,7 +129,7 @@ describe('TerminalController', () => {
     expect(reply().textContent).toContain('UNKNOWN COMMAND: xyzzy')
     expect(reply().querySelector('.console-err')?.textContent).toBe('UNKNOWN COMMAND: xyzzy')
     expect(input().value).toBe('')
-    expect(Turbo.visit).not.toHaveBeenCalled()
+    expect(visit).not.toHaveBeenCalled()
 
     type('?')
     expect(reply().textContent).toContain('COMMANDS: 0 fm · clear')
@@ -142,6 +142,6 @@ describe('TerminalController', () => {
 
     type('FM')
     expect(reply().textContent).toContain('CONNECTING /fm ...')
-    expect(Turbo.visit).toHaveBeenCalledWith('http://localhost:3000/fm')
+    expect(visit).toHaveBeenCalledWith('http://localhost:3000/fm')
   })
 })

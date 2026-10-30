@@ -1,0 +1,24 @@
+<%# One release in a /root ledger (the releases screen, an artist's
+    // RELEASES //): [NN] · the 40px cover (hover peek) · name over
+    ARTIST · TYPE · date · tracks · length · catalog # · slug · state ·
+    [HISTORY]. The name opens the record screen; NN is its prompt command.
+    Locals: release, num, artist_col (name the artist in the meta). %>
+<% status, klass = root_release_status(release) %>
+<% href = edit_admin_release_path(release) %>
+<% cover = root_cover_ready?(release) %>
+<div class="cc-row rc-row rc-row--cover console-line" data-terminal-target="line">
+  <span class="console-tag">[<%= num %>]</span>
+  <%= link_to href, class: "cc-cover", tabindex: -1, aria: {hidden: true}, data: (cover ? peek_attrs(url_for(release.cover_large)) : {}) do %>
+    <% if cover %>
+      <%= image_tag url_for(release.cover_thumbnail), alt: "", class: "cc-cover-img" %>
+    <% else %>
+      <span class="cc-cover-none">&#9834;</span>
+    <% end %>
+  <% end %>
+  <div class="cc-text">
+    <%= link_to release.name, href, class: "console-link cc-name", data: {command: num} %>
+    <div class="cc-meta"><% if local_assigns[:artist_col] %><%= release.artist.name %> · <% end %><%= release.release_type&.upcase || "RELEASE" %> · <%= release.release_date&.strftime("%Y-%m-%d") || "UNDATED" %> · <%= pluralize(release.tracks.size, "track") %><% if (length = release_length(release)) %> · <%= length %><% end %><% if release.catalog_number.present? %> · <%= release.catalog_number %><% end %> · <%= release.slug %></div>
+  </div>
+  <span class="rc-cell rc-cell--r <%= klass %>"><%= status %></span>
+  <span class="rc-cell rc-links"><%= link_to "[HISTORY]", history_admin_release_path(release), class: "console-link" %></span>
+</div>
