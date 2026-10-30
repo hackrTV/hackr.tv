@@ -1,7 +1,7 @@
 ---
 title: Artist Pages + Band Directory
 area: Music & Player
-minutes: 15
+minutes: 20
 ---
 # Artist Pages + Band Directory
 
@@ -27,26 +27,49 @@ minutes: 15
    the permanent player and repaints to `❚❚ PAUSE`), the closing quote,
    destinations and the prompt — which must NOT grab focus on load (Space
    still scrolls the page).
-5. Play a track from an artist page. → Player works; navigate between
+5. Visit `/xeraen/releases` and open a release. → The catalog console
+   (2026-10-29 prototype, XERAEN only — `/thecyberpulse/releases` still
+   shows the card grid, article 14): the index is a ledger — bar with
+   `[<] XERAEN` / `[>] VAULT`, CATALOG / LATEST / INCOMING rows, then
+   `// INCOMING //` and `// CATALOG //` rules with one row per release
+   (`[01]`, a 40px cover, the name, `TYPE · date · n tracks · length`);
+   typing a row's number at the prompt opens it. The release page: bar
+   (name · `XERAEN · EP`, `[<] RELEASES` / `[>] VAULT`), the cover beside
+   ARTIST / TYPE / RELEASED / LABEL / TRACKS rows, `// TRACKS //` rows
+   (`01 Title … 2:44 ► PLAY`; plays on the permanent player and repaints
+   to `❚❚ PAUSE`; the title opens the track page), `// FREQUENCIES //`
+   as `[LISTEN] [YT] [SP] …` rows, destinations, the prompt. A
+   coming-soon release shows `◌ SIGNAL INCOMING`, masked tracks and
+   `NOT YET ALLOCATED`; an unknown slug shows `// SIGNAL LOST //` with a
+   404. Open a track from the list: the track page is the same screen —
+   bar (title · `XERAEN · TRACK 02`, `★ FEATURED` when featured,
+   `[<] XORDIUM` / `[>] VAULT`), the cover beside ARTIST / RELEASE / TRACK
+   (`02 of 03`) / RELEASED / LENGTH rows, `// TRANSMISSION //` as one
+   player row (► PLAY works), `// DECODED LYRICS //`, `// FREQUENCIES //`
+   (`[LISTEN] [SP] [AM] [YT]`, plus `[VOD]` rows when a recording is
+   attached), `// ALSO ON XORDIUM //` sibling rows (their numbers work at
+   the prompt). A coming-soon track still redirects to its release; an
+   unknown slug is `// SIGNAL LOST //` with a 404.
+6. Play a track from an artist page. → Player works; navigate between
    artist pages → player survives (invariant).
 
 ## Steps — other artists + landing pages
 
-6. Spot-check three more artist slugs (e.g. `/system-rot`,
+7. Spot-check three more artist slugs (e.g. `/system-rot`,
    `/wavelength-zero`, `/voiceprint`). → Landing pages render with
    track lists.
-7. Visit `/sector/x`. → Sector X page renders.
+8. Visit `/sector/x`. → Sector X page renders.
 
 ## Steps — band directory
 
-8. Visit `/f/net`. → Band directory renders. OST-type artists (e.g.
+9. Visit `/f/net`. → Band directory renders. OST-type artists (e.g.
    TR4X 4 H4X) must NOT appear here — bands only.
-9. Open a band profile page. → Band page renders (config-driven layout,
+10. Open a band profile page. → Band page renders (config-driven layout,
    colors, members/links as configured).
-10. Check `/the-pulse-grid` (band/canon page). → Renders.
+11. Check `/the-pulse-grid` (band/canon page). → Renders.
 
 ## Steps — mobile variants
 
-11. Load `/thecyberpulse` at a phone viewport. → Usable layout (the
+12. Load `/thecyberpulse` at a phone viewport. → Usable layout (the
     dedicated mobile views were retired with the SPA; responsive layout
     must hold).
