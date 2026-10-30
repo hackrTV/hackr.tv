@@ -1,0 +1,58 @@
+/* admin_chrome.css — the admin layout's chrome: the /root nav bar and the
+ * layout-level banner strips under it (RED FLAGS). Loaded by
+ * layouts/admin.html.erb only (after tokens / tuicss / default / console /
+ * root_console).
+ *
+ * One 22px row each, the public .tui-nav's height (18px root Terminus +
+ * 1px/3px li padding = 22px): here 16px/20px Terminus — the console
+ * family's size, so the dozen top items stay on one row down to ~1100px —
+ * plus 1px vertical padding and a 1px hairline bottom (was 15px padding,
+ * a 2px rule and a 20px margin = 76px; the flags strip 8px padding + 2px =
+ * 39px). Content sits in the same 1400px box as the admin TuiWindow pages
+ * and .console--root, left-anchored inside it. Section colors stay on the
+ * TuiCss palette classes the links carry (cyan content, green streams /
+ * grid, purple social, red exit); the brand is the /root console's cyan.
+ * Dropdowns are the same pure-CSS hover menus as before (no Turbo, no
+ * Stimulus in the admin nav), re-sized to 22px rows and capped to the
+ * viewport — the Grid menu's 25 entries used to run past a 900px screen.
+ * Every row item is an explicit 22px border-box (20px line + 1px pads):
+ * the arrow / flag glyphs (← ▾ ⚑) fall back to another font whose
+ * baseline sits differently, and mixed fonts on one line grow the line
+ * box past a fixed line-height (measured 24px without this — gotchas). */
+
+.admin-chrome { font-family: var(--font-tui); font-size: 16px; line-height: 20px; }
+
+/* --- Row items: one fixed 22px box each --- */
+.admin-nav-brand,
+.admin-nav-who,
+.admin-nav-items > li,
+.admin-banner-inner > * { box-sizing: border-box; height: 22px; padding-top: 1px; padding-bottom: 1px; }
+
+/* --- Nav --- */
+.admin-nav { background: var(--bg-0); border-bottom: 1px solid var(--accent-alt); }
+.admin-nav-inner,
+.admin-banner-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; max-width: 1400px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
+.admin-nav-brand { color: var(--accent-alt); font-weight: bold; letter-spacing: 1px; text-decoration: none; }
+.admin-nav-brand:hover { text-decoration: underline; }
+.admin-nav-who { color: var(--fg-faint); white-space: nowrap; }
+.admin-nav-items { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.admin-nav-items > li { position: relative; padding-left: 4px; padding-right: 4px; white-space: nowrap; }
+.admin-nav-items > li:hover { background: var(--bg-2); }
+.admin-nav-items a,
+.admin-nav-dropdown-trigger { display: block; text-decoration: none; cursor: pointer; user-select: none; }
+.admin-nav-sep { color: var(--edge); }
+.admin-nav-dropdown-trigger::after { content: " ▾"; font-size: 0.7em; }
+.admin-nav-dropdown-menu { display: none; position: absolute; top: 100%; left: 0; z-index: 1000; min-width: 160px; max-height: calc(100vh - 32px); overflow-y: auto; margin: 0; padding: 2px 0; list-style: none; background: var(--bg-2); border: 1px solid var(--accent-alt); }
+.admin-nav-dropdown:hover .admin-nav-dropdown-menu { display: block; }
+.admin-nav-dropdown--end .admin-nav-dropdown-menu { left: auto; right: 0; } /* the last menu (Meta) opens inward, not past the viewport edge */
+.admin-nav-dropdown-menu li a { display: block; padding: 0 12px; line-height: 22px; white-space: nowrap; }
+.admin-nav-dropdown-menu li a:hover { background: var(--edge); }
+
+/* --- Banner strips (one line each, flush under the nav) --- */
+.admin-banner { border-bottom: 1px solid; }
+.admin-banner a { text-decoration: none; }
+.admin-banner a:hover { text-decoration: underline; }
+.admin-banner-sep { color: var(--fg-faint); }
+.admin-banner--flags { background: #1a0a00; border-color: #ff6600; color: #ff6600; }
+.admin-banner--flags .admin-banner-label { font-weight: bold; }
+.admin-banner--flags a { color: #ff9944; }
