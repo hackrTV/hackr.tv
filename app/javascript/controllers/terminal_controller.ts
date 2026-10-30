@@ -1,16 +1,17 @@
 import { Controller } from '@hotwired/stimulus'
-import { Turbo } from '@hotwired/turbo-rails'
+import { visit } from '~/utils/visit'
 
 // The home console (home/_terminal). The screen is server-rendered; this
 // flicks its lines on in order like a boot log (a keydown or a click
 // skips to the end; phones, reduced motion and a Turbo cache restore
 // render at once), then runs the "> " prompt: a typed tag matches a row
-// link's data-command and Turbo-visits its href (the permanent player
-// survives — the old full page load was a migration-era precaution),
-// ? / help lists the commands, clear wipes the replies. The line copy
-// lives in the partial, not here. A long page (the XERAEN bio) passes
-// data-boot="done" + autofocus false: no reveal, and the prompt does
-// not take the keyboard away from scrolling.
+// link's data-command and visits its href — Turbo.visit where Turbo is
+// loaded (the permanent player survives), a full load on the admin
+// layout, which runs Stimulus alone (utils/visit.ts). ? / help lists
+// the commands, clear wipes the replies. The line copy lives in the
+// partial, not here. A long page (the XERAEN bio, every /root form)
+// passes data-boot="done" + autofocus false: no reveal, and the prompt
+// does not take the keyboard away from scrolling or the fields.
 const LINE_MS = 30
 const PAUSE_MS = 140 // after the banner, before a rule
 
@@ -83,7 +84,7 @@ export default class extends Controller<HTMLElement> {
     const link = links.get(key)
     if (link) {
       this.say(`CONNECTING ${link.getAttribute('href') ?? ''} ...`)
-      Turbo.visit(link.href)
+      visit(link.href)
     } else {
       this.say(`UNKNOWN COMMAND: ${command}`, 'console-err')
     }

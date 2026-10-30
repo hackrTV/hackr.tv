@@ -760,73 +760,9 @@
 .toast-item { color: #60a5fa; }
 .toast-achievement-grant { color: var(--warn); }
 
-/* --- Home console (home/_terminal; terminal controller, 2026-10-28) ---
- * The boot screen as a left-anchored terminal on the ledger's tokens:
- * Terminus 16/20, hairline "// RULES //", phosphor green (--live) only
- * for the prompt mark, the cursor and ONLINE. The ASCII banner and the
- * status block share the head row from 768px; every artist / service is
- * one aligned line (tag | name | description). Lines are invisible while
- * data-boot="pending" and the controller flicks them on in order
- * (visibility, so nothing reflows); without scripting they simply show.
- * The /terminal easter-egg page styles itself inline — nothing here.
- * The starting-soon hero / countdown banner / live embed follow. --- */
-.console { max-width: 1100px; margin: 0; padding: 4px 0 24px; color: var(--fg); font-family: var(--font-tui); font-size: 16px; line-height: 20px; }
-.console[data-boot="pending"] .console-line:not(.console-line--on) { visibility: hidden; }
-@media (scripting: none) { .console .console-line { visibility: visible; } }
-.console-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 40px; padding: 0 8px 8px; border-bottom: 1px solid var(--edge); }
-.console-banner { display: block; color: var(--fg-bright); text-decoration: none; }
-.console-banner:hover { color: var(--accent-bright); }
-.console-banner pre { margin: 0; font-family: inherit; font-size: 12px; line-height: 14px; }
-.console-status { display: flex; flex-direction: column; flex: 1 1 360px; min-width: 0; }
-.console-status-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 0 12px; }
-.console-key { color: var(--fg-faint); font-size: 12px; line-height: 20px; letter-spacing: 1px; }
-.console-val { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.console-dim { color: var(--fg-faint); }
-.console-hot { color: var(--live); }
-.console-link { color: var(--accent-alt); text-decoration: none; }
-.console-link:hover { color: var(--fg-bright); text-decoration: underline; }
-.console-welcome { margin: 8px 0 0; padding: 0 8px; }
-.console-rule { display: flex; align-items: center; gap: 8px; margin: 6px 0 2px; padding: 0 8px; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
-.console-rule::before, .console-rule::after { content: ""; flex: 1; border-top: 1px solid var(--edge); }
-.console-row { display: grid; grid-template-columns: var(--console-tag, 10ch) 16ch minmax(0, 1fr); gap: 0 12px; align-items: baseline; padding: 0 8px; }
-.console-section--artists { --console-tag: 3ch; }
-.console-tag { color: var(--fg-faint); white-space: nowrap; }
-.console-row .console-link { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.console-desc { min-width: 0; color: var(--fg-muted); }
-.console-reply { padding: 0 8px; color: var(--fg-muted); }
-.console-reply[hidden] { display: none; }
-.console-echo { color: var(--fg-faint); }
-.console-err { color: var(--err); }
-.console-prompt { display: flex; align-items: center; position: relative; padding: 0 8px; }
-.console-prompt[hidden] { display: none; } /* the flex display would beat the UA [hidden] rule (the WIRE inline-form find) */
-.console-mark { margin-right: 8px; color: var(--live); font-weight: bold; }
-.console-typed { white-space: pre; }
-.console-cursor { display: inline-block; width: 8px; height: 16px; background: var(--live); animation: terminal-blink 1s step-end infinite; vertical-align: -2px; }
-@keyframes terminal-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-.console-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; border: none; background: transparent; color: transparent; font: inherit; cursor: text; }
-.console-hint { padding: 2px 8px 0; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
-/* A console page's status line (the XERAEN pages): title · sub · a right-aligned badge or ghost links. */
-.console-bar { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; padding: 0 8px 6px; border-bottom: 1px solid var(--edge); }
-.console-bar-title { margin: 0; color: var(--accent-bright); font-family: inherit; font-size: 18px; font-weight: bold; letter-spacing: 2px; }
-.console-bar-sub { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
-.console-bar-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.console-bar-badge { color: var(--live); font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
-.console-bar-link { background: none; border: 1px solid var(--edge-bright); color: var(--fg-muted); padding: 4px 8px; font-family: inherit; font-size: 12px; line-height: 14px; text-decoration: none; white-space: nowrap; }
-.console-bar-link:hover { border-color: var(--accent); color: var(--accent-bright); }
-@media (max-width: 767px) {
-  .console { padding-top: 0; font-size: 14px; line-height: 18px; }
-  .console-head { gap: 6px 0; }
-  .console-status { flex-basis: 100%; }
-  .console-status-row { grid-template-columns: 72px minmax(0, 1fr); }
-  .console-key { line-height: 18px; }
-  .console-val { white-space: normal; }
-  .console-row { grid-template-columns: var(--console-tag, 10ch) minmax(0, 1fr); grid-template-areas: "tag name" "tag desc"; gap: 0 8px; }
-  .console-tag { grid-area: tag; }
-  .console-row .console-link { grid-area: name; }
-  .console-desc { grid-area: desc; font-size: 12px; line-height: 16px; }
-  .console-cursor { height: 14px; }
-}
-@media (max-width: 379px) { .console-banner pre { font-size: 10px; line-height: 12px; } }
+/* The home console family (.console*, .console-bar*) lives in console.css
+ * since 2026-10-30 — the admin layout loads it too (the /root music
+ * screens). It used to sit here (2026-10-28). */
 
 .starting-soon-hero { position: relative; overflow: hidden; text-align: center; padding: 60px; background: linear-gradient(90deg, #0a1a2e 0%, #0d2847 50%, #0a1a2e 100%); border: 1px solid #06b6d4; font-family: var(--font-tui); }
 .starting-soon-sweep { position: absolute; top: 0; bottom: 0; left: -100%; width: 60%; background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent); animation: live-pulse 3s linear infinite; }
@@ -1727,13 +1663,5 @@ body.theater-open { overflow: hidden; }
 }
 .nav-terminal-button { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; display: block; width: 100%; text-align: left; }
 
-/* --- Image peek (peek controller, 2026-10-29) ---------------------------
- * One shared fixed panel beside a hovered thumb — the catalog ledger's
- * covers, the release / track cover, the XERAEN bio's track row, the
- * VIDZ archive's YouTube thumbs — with the large rendition
- * (Release#cover_large / maxresdefault). Hover-only (the controller
- * checks (hover: hover)); pointer-events off so it never traps the
- * mouse; the toasts' 9999 stays above it. */
-.peek { position: fixed; z-index: 9000; padding: 4px; border: 1px solid var(--edge-bright); background: var(--bg-0); pointer-events: none; }
-.peek[hidden] { display: none; }
-.peek-img { display: block; width: auto; height: auto; max-width: min(480px, calc(100vw - 32px)); max-height: 70vh; }
+/* The hover peek panel (.peek, peek controller) lives in console.css
+ * since 2026-10-30 (shared with the admin layout). */

@@ -2,8 +2,8 @@
  * six React pages under components/pages/artist/, namespaced per page:
  *   .console--xeraen / .console--thecyberpulse / .xt-*  the artist
  *                     consoles (/xeraen + /bio 2026-10-28, /thecyberpulse
- *                     + /bio 2026-10-29 — on hotwire.css's .console
- *                     family; the catalog console in artist_catalog.css
+ *                     + /bio 2026-10-29 — on console.css's .console
+ *                     family; the catalog console (console.css .cc-*)
  *                     shares them)
  *   .tcp-embed        the TCP bio's VISUAL TRANSMISSION iframe
  *   .sectorx-*        SectorXPage.tsx               (/sector/x)
@@ -24,7 +24,7 @@
 
 /* --- Artist consoles (/xeraen + /bio 2026-10-28; /thecyberpulse + /bio
  * 2026-10-29) -----------------------------------------------------------
- * Each page is a .console screen (hotwire.css "Home console": bar,
+ * Each page is a .console screen (console.css "Home console": bar,
  * status rows, // RULES //, destination rows, the > prompt) — the
  * glowing tui-window landings with their cards and the stacked bio
  * fieldsets are gone. One .console--<slug> block per artist sets

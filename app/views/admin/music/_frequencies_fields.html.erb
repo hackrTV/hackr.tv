@@ -1,0 +1,22 @@
+<%# // FREQUENCIES // as fields: one row per streaming platform (the
+    catalog's order and tags), posted as <object>[streaming_links][<platform>].
+    Blank = no link on that platform; all blank = nil
+    (Admin::MusicParams#normalize_streaming_links!). Locals: f, links (the
+    record's hash or nil), hint (text under the rows, optional). %>
+<% links = (links || {}).to_h.transform_keys(&:to_s) %>
+<div class="console-rule"><span>// FREQUENCIES //</span></div>
+<div class="console-status">
+  <% root_streaming_platforms.each do |platform| %>
+    <div class="console-status-row rc-field">
+      <label class="console-key" for="<%= f.object_name %>_streaming_links_<%= platform %>">[<%= streaming_tag(platform) %>] <%= streaming_platform_name(platform).upcase %></label>
+      <span class="console-val">
+        <%= url_field_tag "#{f.object_name}[streaming_links][#{platform}]", links[platform],
+          id: "#{f.object_name}_streaming_links_#{platform}", class: "rc-input rc-input--wide",
+          placeholder: "https://…", autocomplete: "off" %>
+      </span>
+    </div>
+  <% end %>
+</div>
+<% if local_assigns[:hint].present? %>
+  <p class="rc-sub"><%= local_assigns[:hint] %></p>
+<% end %>

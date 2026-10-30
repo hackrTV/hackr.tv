@@ -1,7 +1,65 @@
-<%= render TuiWindowComponent.new(title: "/root/artists/#{@artist.slug} :: EDIT ARTIST", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @artist, url: admin_artist_path(@artist), method: :patch, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/artists/:slug/edit — the artist record as a console screen
+    (2026-10-30; show redirects here). Bar (name · ROOT · ARTIST · path;
+    [<] ARTISTS, [>] PUBLIC when the slug is routed, [HISTORY]), the
+    fields as status rows, // COMMIT // ([SAVE] [CANCEL] · [DELETE] only
+    while nothing references the artist), // RELEASES // ledger rows
+    opening the release screens + [+] NEW RELEASE prefilled, destinations,
+    the > prompt. The delete form is hidden at the end; its ghost button
+    points at it (form=). URLs use slug_in_database — a rejected slug
+    must not build the form's action. Assigns: @artist, @releases. %>
+<% slug = @artist.slug_in_database %>
+<% content_for :title, "/root/artists/#{slug} :: #{@artist.name_in_database}" %>
+<% deletable = @artist.releases.empty? && @artist.tracks.empty? %>
+<% numbers = @releases.to_a.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <div class="console-bar">
+    <h1 class="console-bar-title"><%= @artist.name_in_database %></h1>
+    <span class="console-bar-sub">ROOT · ARTIST · /root/artists/<%= slug %></span>
+    <span class="console-bar-right">
+      <%= link_to "[<] ARTISTS", admin_artists_path, class: "console-bar-link" %>
+      <% if (pub = root_public_catalog_path(@artist)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
+      <%= link_to "[HISTORY]", history_admin_artist_path(slug), class: "console-bar-link" %>
+    </span>
+  </div>
+  <%= render "admin/music/flash" %>
+
+  <%= form_with model: @artist, url: admin_artist_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, artist: @artist %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ARTIST]</button>
+      <%= link_to "[CANCEL]", admin_artists_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <% if deletable %>
+          <button type="submit" form="delete-artist" class="rc-btn rc-btn--danger">[DELETE ARTIST]</button>
+        <% else %>
+          <span class="rc-hint">DELETE LOCKED · releases or tracks still reference this artist</span>
+        <% end %>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section" aria-label="Releases">
+    <div class="console-rule"><span>// RELEASES //</span></div>
+    <% if @releases.empty? %>
+      <p class="rc-empty">NO RELEASES ON RECORD <span class="console-dim">· the signal is still forming</span></p>
+    <% end %>
+    <% @releases.each_with_index do |release, i| %>
+      <%= render "admin/music/release_row", release: release, num: root_num(i) %>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[+] NEW RELEASE", new_admin_release_path(artist_id: @artist.id), class: "rc-btn", data: {command: "new"} %>
+    </div>
+  </section>
+
+  <%= render "admin/music/destinations" %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(numbers: numbers, noun: "a release number", extra: ["new"]) %>
+
+  <div class="rc-hidden-forms">
+    <% if deletable %>
+      <%= root_delete_form("delete-artist", admin_artist_path(slug), confirm: "Delete artist '#{@artist.name_in_database}'?") %>
+    <% end %>
+  </div>
+</div>

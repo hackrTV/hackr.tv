@@ -1,59 +1,59 @@
-<%= render TuiWindowComponent.new(title: "/root/artists :: MANAGE ARTISTS", variant: :admin, width: 1200) do %>
+<%# /root/artists — the artists ledger as a console screen (2026-10-30;
+    console.css family + root_console.css): bar, ON RECORD / CATALOG rows,
+    // ARTISTS // rows ([NN] · name over slug · TYPE · genre · releases ·
+    tracks · [EDIT] [HISTORY]), destinations, the > prompt (NN opens the
+    record screen). data-boot="done": a work screen boots instantly.
+    Assigns: @artists, @type_counts, @release_count, @incoming_count,
+    @track_count. %>
+<% content_for :title, "/root/artists :: ARTISTS" %>
+<% numbers = @artists.to_a.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <div class="console-bar">
+    <h1 class="console-bar-title">ARTISTS</h1>
+    <span class="console-bar-sub">ROOT · MUSIC · /root/artists</span>
+    <span class="console-bar-right">
+      <%= link_to "[+] NEW ARTIST", new_admin_artist_path, class: "console-bar-link", data: {command: "new"} %>
+      <%= link_to "[>] FNET", "/f/net", class: "console-bar-link" %>
+    </span>
+  </div>
+  <%= render "admin/music/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "+ New Artist", new_admin_artist_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Artists Table -->
-      <% if @artists.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: left;">Slug</th>
-                <th style="text-align: center;">Tracks</th>
-                <th style="text-align: center;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @artists.each_with_index do |artist, i| %>
-                <tr class="admin-table-row" style="<%= " background: #112;" if i.odd? %>">
-                  <td><strong><%= artist.name %></strong></td>
-                  <td style="font-family: monospace; color: #888;">/<%= artist.slug %></td>
-                  <td style="text-align: center;"><%= artist.tracks.size %></td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_artist_path(artist), style: "padding: 4px 10px;" %>
-                    <%= tui_button "History", history_admin_artist_path(artist), color: :purple, style: "padding: 4px 10px;" %>
-                    <%= tui_button_to "Delete", admin_artist_path(artist), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 4px 10px;", data: { confirm: "Delete artist '#{artist.name}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No artists yet. Create your first one!</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(@artists.size, "artist") %> <span class="console-dim">· <%= Artist::ARTIST_TYPES.map { |t| "#{@type_counts[t] || 0} #{t}" }.join(" · ") %></span></span>
     </div>
-<% end %>
+    <div class="console-status-row">
+      <span class="console-key">CATALOG</span>
+      <span class="console-val"><%= pluralize(@release_count, "release") %> <span class="console-dim">· <%= pluralize(@track_count, "track") %><% if @incoming_count > 0 %> · <%= @incoming_count %> incoming<% end %></span></span>
+    </div>
+  </div>
+
+  <section class="console-section" aria-label="Artists">
+    <div class="console-rule"><span>// ARTISTS //</span></div>
+    <% if @artists.empty? %>
+      <p class="rc-empty">NO ARTISTS ON RECORD <span class="console-dim">· [+] NEW ARTIST starts the record</span></p>
+    <% end %>
+    <% @artists.each_with_index do |artist, i| %>
+      <% num = root_num(i) %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to artist.name, edit_admin_artist_path(artist), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= artist.slug %> · <%= artist.artist_type.upcase %><% if artist.genre.present? %> · <%= artist.genre %><% end %></div>
+        </div>
+        <span class="rc-cell rc-cell--r"><%= pluralize(artist.releases.size, "release") %></span>
+        <span class="rc-cell rc-cell--r"><%= pluralize(artist.tracks.size, "track") %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[EDIT]", edit_admin_artist_path(artist), class: "console-link" %>
+          <%= link_to "[HISTORY]", history_admin_artist_path(artist), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/music/destinations", except: "ARTISTS" %>
+
+  <div class="console-rule"><span>// EVERY ACT COMMITTED TO RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(except: "ARTISTS", numbers: numbers, noun: "an artist number", extra: ["new"]) %>
+</div>
