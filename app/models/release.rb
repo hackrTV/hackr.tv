@@ -45,6 +45,23 @@ class Release < ApplicationRecord
     cover_image.variant(resize_to_fill: [300, 300], format: :jpeg, saver: {quality: 85})
   end
 
+  # The hover peek's rendition (the peek controller on the console
+  # pages): the cover at up to 800px, so the 40/180px thumbs open large.
+  def cover_large
+    cover_image.variant(resize_to_limit: [800, 800], format: :jpeg, saver: {quality: 85})
+  end
+
+  # One released track (2026-10-30): on the console catalog such a release
+  # has no screen of its own — its ledger row opens the track page, which
+  # carries the release's rows and prose, and /releases/<slug> redirects
+  # there (ArtistCatalogController#release,
+  # ArtistConsoleHelper#console_release_path). Coming-soon stays a
+  # release: the tracklist is masked there and the track page redirects
+  # to it.
+  def single?
+    !coming_soon && tracks.size == 1
+  end
+
   serialize :streaming_links, coder: JSON
 
   validates :name, presence: true

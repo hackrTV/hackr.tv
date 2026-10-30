@@ -11,7 +11,7 @@
              action: "click->track-list#rowClicked contextmenu->track-list#rowContextMenu"
            )) %>>
     <% if track.release&.cover_image&.attached? %>
-      <div class="embedded-track-cover">
+      <div class="embedded-track-cover" <%= tag.attributes(data: peek_attrs(url_for(track.release.cover_large))) %>>
         <%= image_tag url_for(track.release.cover_standard), alt: "#{track.title} cover", class: "embedded-track-img" %>
       </div>
     <% else %>

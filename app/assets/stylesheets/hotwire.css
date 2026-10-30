@@ -1726,3 +1726,14 @@ body.theater-open { overflow: hidden; }
   .fnet-btn { font-size: 0.85em; }
 }
 .nav-terminal-button { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; display: block; width: 100%; text-align: left; }
+
+/* --- Image peek (peek controller, 2026-10-29) ---------------------------
+ * One shared fixed panel beside a hovered thumb — the catalog ledger's
+ * covers, the release / track cover, the XERAEN bio's track row, the
+ * VIDZ archive's YouTube thumbs — with the large rendition
+ * (Release#cover_large / maxresdefault). Hover-only (the controller
+ * checks (hover: hover)); pointer-events off so it never traps the
+ * mouse; the toasts' 9999 stays above it. */
+.peek { position: fixed; z-index: 9000; padding: 4px; border: 1px solid var(--edge-bright); background: var(--bg-0); pointer-events: none; }
+.peek[hidden] { display: none; }
+.peek-img { display: block; width: auto; height: auto; max-width: min(480px, calc(100vw - 32px)); max-height: 70vh; }

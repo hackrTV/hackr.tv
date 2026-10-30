@@ -150,7 +150,7 @@
     </blockquote>
     <p class="xt-sig">— XERAEN <span class="console-dim">· transmitting from <%= future_year %> · for as long as <%= future_year %> exists</span></p>
 
-    <%= render "artist_pages/xeraen_destinations", except: "BIO" %>
-    <%= render "shared/console_prompt", hint: safe_join(["type a tag ", tag.span("(xeraen releases vault tcp fnet)", class: "console-dim"), " · enter · ? help"]) %>
+    <%= render "artist_pages/console_destinations", artist: "xeraen", except: "BIO" %>
+    <%= render "shared/console_prompt", hint: console_prompt_hint("xeraen", except: "BIO") %>
   </div>
 <% end %>

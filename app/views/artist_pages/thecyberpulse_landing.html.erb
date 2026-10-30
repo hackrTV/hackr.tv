@@ -1,80 +1,101 @@
-<%# ERB port of TheCyberPulseLandingPage.tsx (GET /thecyberpulse). %>
+<%# GET /thecyberpulse — The.CyberPul.se console (2026-10-29; the glowing
+    tui-window landing with its three cards is gone): the broadcast hub as
+    a terminal screen in the home console's idiom, the XERAEN landing's
+    twin — bar, status block (hosts, network, the catalog's released /
+    incoming releases, the VIDZ archive), the lore, destination rows, the
+    "> " prompt. The terminal controller reveals the lines and runs the
+    prompt (home_streams.md § Home console). Assigns: @releases,
+    @coming_soon, @archive_count, @latest_vod
+    (ArtistPagesController#thecyberpulse_landing). %>
 <% content_for :title, "The.CyberPul.se — hackr.tv" %>
+<% current_year = Date.current.year %>
+<% future_year = current_year + 100 %>
+<% latest = @releases&.first %>
 
-<%= render layout: "shared/default_chrome" do %>
-  <% future_year = Date.current.year + 100 %>
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="console console--thecyberpulse" data-controller="terminal" data-boot="pending"
+    data-action="keydown@document->terminal#skip click->terminal#skip">
+    <div class="console-bar console-line" data-terminal-target="line">
+      <h1 class="console-bar-title">THE.CYBERPUL.SE</h1>
+      <span class="console-bar-sub">TRANSMISSION ORIGIN &amp; BROADCAST HUB</span>
+      <span class="console-bar-right"><span class="console-bar-badge">● BROADCASTING</span></span>
+    </div>
 
-  <div class="tui-window white-text tcp-landing-window">
-    <fieldset class="tcp-landing-fieldset">
-      <legend class="center tcp-landing-legend">THE.CYBERPUL.SE</legend>
-
-      <div class="tcp-landing-content">
-        <h2 class="tcp-landing-heading">[:: THE.CYBERPUL.SE ::]</h2>
-        <p class="tcp-landing-subtitle">TRANSMISSION ORIGIN &amp; BROADCAST HUB</p>
-
-        <div class="tcp-landing-lore">
-          <p class="tcp-landing-lore-open">
-            XERAEN transmits. Ryker keeps the beat. Synthia holds the frequency steady.
-            Together they are The.CyberPul.se — <span class="tcp-landing-highlight">broadcasting from <%= future_year %> across a century
-            that shouldn't be crossable</span>.
-          </p>
-          <p class="tcp-landing-lore-mid">
-            What they carry reaches you right now, a hundred years before it was sent.
-            You're not supposed to be hearing this. But here you are.
-          </p>
-          <p class="tcp-landing-lore-close">
-            You found the frequency. Everything else is below.
-          </p>
-        </div>
-
-        <div class="tcp-landing-cards">
-          <%= link_to "/thecyberpulse/bio", class: "tcp-landing-card-link" do %>
-            <div class="tui-window white-text tcp-landing-card tcp-landing-card--bio">
-              <fieldset>
-                <legend>BIO</legend>
-                <div class="tcp-landing-card-body">
-                  <p class="tcp-landing-card-icon tcp-landing-card-icon--bio">◈ BIO</p>
-                  <p class="tcp-landing-card-desc">
-                    Who they are. How this started. What it costs them to keep transmitting.
-                  </p>
-                </div>
-              </fieldset>
-            </div>
-          <% end %>
-
-          <%= link_to "/thecyberpulse/releases", class: "tcp-landing-card-link" do %>
-            <div class="tui-window white-text tcp-landing-card tcp-landing-card--releases">
-              <fieldset>
-                <legend>RELEASES</legend>
-                <div class="tcp-landing-card-body">
-                  <p class="tcp-landing-card-icon tcp-landing-card-icon--releases">◆ RELEASES</p>
-                  <p class="tcp-landing-card-desc">
-                    Albums, EPs, and singles from across the timeline. Every transmission committed to record.
-                  </p>
-                </div>
-              </fieldset>
-            </div>
-          <% end %>
-
-          <%= nav_link_to "/thecyberpulse/vidz", css_class: "tcp-landing-card-link" do %>
-            <div class="tui-window white-text tcp-landing-card tcp-landing-card--vidz">
-              <fieldset>
-                <legend>VIDZ</legend>
-                <div class="tcp-landing-card-body">
-                  <p class="tcp-landing-card-icon tcp-landing-card-icon--vidz">▶ VIDZ</p>
-                  <p class="tcp-landing-card-desc">
-                    Visual transmissions. Live operations, broadcasts, and archived footage from the broadcast.
-                  </p>
-                </div>
-              </fieldset>
-            </div>
-          <% end %>
-        </div>
-
-        <div class="tcp-landing-footer">
-          <p>broadcasting from <%= future_year %> — the signal is always on</p>
-        </div>
+    <div class="console-status">
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">HOSTS</span>
+        <span class="console-val"><%= link_to "XERAEN", "/xeraen", class: "console-link" %> <span class="console-dim">· Ryker M. Pulse · Synthia</span></span>
       </div>
-    </fieldset>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">NETWORK</span>
+        <span class="console-val">Central nervous system of the <%= link_to "Fracture Network", "/codex/the-fracture-network", class: "console-link" %></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">ORIGIN</span>
+        <span class="console-val"><%= future_year %> → <%= current_year %></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">FORMAT</span>
+        <span class="console-val">24/7 <span class="console-dim">· no dead air · no corporate sponsorship · no holding back</span></span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">RELEASES</span>
+        <span class="console-val">
+          <% if latest %>
+            <%= pluralize(@releases.size, "cataloged", plural: "cataloged") %> <span class="console-dim">· latest</span>
+            <%= link_to latest.name, console_release_path("thecyberpulse", latest), class: "console-link" %>
+            <span class="console-dim">· <%= latest.release_type&.upcase || "RELEASE" %><% if latest.release_date %> · <%= latest.release_date.strftime("%Y-%m-%d") %><% end %></span>
+          <% else %>
+            <span class="console-dim">NONE CATALOGED</span>
+          <% end %>
+        </span>
+      </div>
+      <% if @coming_soon %>
+        <div class="console-status-row console-line" data-terminal-target="line">
+          <span class="console-key">INCOMING</span>
+          <span class="console-val">
+            <%= link_to @coming_soon.name, "/thecyberpulse/releases/#{@coming_soon.slug}", class: "console-link" %>
+            <span class="console-dim">· <%= @coming_soon.release_type&.upcase || "RELEASE" %></span>
+          </span>
+        </div>
+      <% end %>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">VIDZ</span>
+        <span class="console-val">
+          <% if @latest_vod %>
+            <%= pluralize(@archive_count, "archived", plural: "archived") %> <span class="console-dim">· latest</span>
+            <%= link_to @latest_vod.title.presence || "Untitled Stream", "/thecyberpulse/vidz/#{@latest_vod.id}", class: "console-link" %>
+            <% if @latest_vod.started_at %><span class="console-dim">· <%= future_stamp(@latest_vod.started_at) %></span><% end %>
+          <% else %>
+            <span class="console-dim">NONE ARCHIVED</span>
+          <% end %>
+        </span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">STATUS</span>
+        <span class="console-val"><span class="xt-brand">● BROADCASTING</span> <span class="console-dim">· from <%= future_year %> — the signal is always on</span></span>
+      </div>
+    </div>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// THE SIGNAL //</span></div>
+    <div class="xt-prose">
+      <p class="console-line" data-terminal-target="line">
+        XERAEN transmits. Ryker keeps the beat. Synthia holds the frequency steady.
+        Together they are The.CyberPul.se — <span class="xt-brand">broadcasting from <%= future_year %> across a century
+        that shouldn't be crossable</span>.
+      </p>
+      <p class="console-line" data-terminal-target="line">
+        What they carry reaches you right now, a hundred years before it was sent.
+        You're not supposed to be hearing this. But here you are.
+      </p>
+      <p class="xt-dim console-line" data-terminal-target="line">
+        You found the frequency. Everything else is below.
+      </p>
+    </div>
+
+    <%= render "artist_pages/console_destinations", artist: "thecyberpulse", except: "TCP" %>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// BROADCASTING FROM <%= future_year %> — THE SIGNAL IS ALWAYS ON //</span></div>
+    <%= render "shared/console_prompt", hint: console_prompt_hint("thecyberpulse", except: "TCP") %>
   </div>
 <% end %>

@@ -15,6 +15,19 @@ class ArtistPagesController < ApplicationController
   ].freeze
 
   def thecyberpulse_landing
+    # The console's status block (the XERAEN landing's twin): the VIDZ
+    # archive's size + newest recording, and the catalog's released /
+    # incoming releases under the catalog's own visibility rule.
+    archive = HackrStream.vidz_archive.order(started_at: :desc, created_at: :desc)
+    @archive_count = archive.count
+    @latest_vod = archive.first
+
+    artist = Artist.find_by(slug: "thecyberpulse")
+    return if artist.nil?
+
+    @releases = Release.catalog_visible(artist)
+    @coming_soon = Release.where(artist: artist, coming_soon: true)
+      .order(Arel.sql("release_date ASC NULLS LAST")).first
   end
 
   def thecyberpulse_bio

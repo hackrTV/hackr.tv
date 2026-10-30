@@ -1,10 +1,12 @@
-<%# GET /xeraen/releases — the catalog as a console screen (2026-10-29,
-    a prototype on XERAEN only: ArtistCatalogController::CONSOLE_CATALOG_SLUGS
-    picks this over releases.html.erb, whose card grid still serves every
-    other slug). The home console's idiom: a bar, status rows, then the
+<%# GET /:artist_slug/releases for the console artists (XERAEN, then
+    The.CyberPul.se — ArtistCatalogController::CONSOLE_CATALOG_SLUGS picks
+    this over releases.html.erb, whose card grid still serves every other
+    slug; 2026-10-29): the catalog as a console screen. The home console's idiom: a bar, status rows, then the
     ledger — // INCOMING // and // CATALOG // rules with one row per
     release ([NN] · 40px cover · name over TYPE · date · tracks · length),
-    destinations and the > prompt (a row's NN is its command).
+    destinations and the > prompt (a row's NN is its command). A single's
+    row opens its track page — one released track gets no release screen
+    (console_release_path, 2026-10-30).
     Assigns: @artist, @artist_name, @releases, @coming_soon. %>
 <% content_for :title, "#{@artist_name} :: Releases — hackr.tv" %>
 <% slug = params[:artist_slug] %>
@@ -13,14 +15,14 @@
 <% incoming_first = @coming_soon.first %>
 
 <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-  <div class="console console--xeraen cc-index" data-controller="terminal" data-boot="pending"
+  <div class="console console--<%= slug %> cc-index" data-controller="terminal" data-boot="pending"
     data-action="keydown@document->terminal#skip click->terminal#skip">
     <div class="console-bar console-line" data-terminal-target="line">
       <h1 class="console-bar-title"><%= @artist_name %></h1>
       <span class="console-bar-sub">RELEASES · THE RECORD</span>
       <span class="console-bar-right">
-        <%= link_to "[<] #{@artist_name}", "/#{slug}", class: "console-bar-link" %>
-        <%= link_to "[>] VAULT", vault_path(filter: slug), class: "console-bar-link" %>
+        <%= link_to "[<] #{console_home_tag(slug)}", "/#{slug}", class: "console-bar-link" %>
+        <%= link_to "[>] VAULT", vault_path(filter: @artist&.name || slug), class: "console-bar-link" %>
       </span>
     </div>
 
@@ -38,7 +40,7 @@
       <% if latest %>
         <div class="console-status-row console-line" data-terminal-target="line">
           <span class="console-key">LATEST</span>
-          <span class="console-val"><%= link_to latest.name, "/#{slug}/releases/#{latest.slug}", class: "console-link" %> <span class="console-dim">· <%= latest.release_type&.upcase || "RELEASE" %><% if latest.release_date %> · <%= latest.release_date.strftime("%Y-%m-%d") %><% end %></span></span>
+          <span class="console-val"><%= link_to latest.name, console_release_path(slug, latest), class: "console-link" %> <span class="console-dim">· <%= latest.release_type&.upcase || "RELEASE" %><% if latest.release_date %> · <%= latest.release_date.strftime("%Y-%m-%d") %><% end %></span></span>
         </div>
       <% end %>
       <% if incoming_first %>
@@ -59,10 +61,10 @@
       <section class="console-section" aria-label="<%= aria %>">
         <div class="console-rule console-line" data-terminal-target="line"><span><%= label %></span></div>
         <% group.each do |(release, _, num)| %>
-          <% href = "/#{slug}/releases/#{release.slug}" %>
+          <% href = console_release_path(slug, release) %>
           <div class="cc-row console-line" data-terminal-target="line">
             <span class="console-tag">[<%= num %>]</span>
-            <%= link_to href, class: "cc-cover", tabindex: -1, aria: {hidden: true} do %>
+            <%= link_to href, class: "cc-cover", tabindex: -1, aria: {hidden: true}, data: (release.cover_image.attached? ? peek_attrs(url_for(release.cover_large)) : {}) do %>
               <% if release.cover_image.attached? %>
                 <%= image_tag url_for(release.cover_thumbnail), alt: "", class: "cc-cover-img" %>
               <% else %>
@@ -78,12 +80,9 @@
       </section>
     <% end %>
 
-    <%= render "artist_pages/xeraen_destinations", except: "RELEASES" %>
+    <%= render "artist_pages/console_destinations", artist: slug, except: "RELEASES" %>
 
     <div class="console-rule console-line" data-terminal-target="line"><span>// EVERY TRANSMISSION COMMITTED TO RECORD //</span></div>
-    <%= render "shared/console_prompt", hint: safe_join([
-      "type a release number ", tag.span("(#{rows.map(&:last).join(" ")})", class: "console-dim"),
-      " or a tag ", tag.span("(xeraen bio vault tcp fnet)", class: "console-dim"), " · enter · ? help"
-    ]) %>
+    <%= render "shared/console_prompt", hint: console_prompt_hint(slug, except: "RELEASES", numbers: rows.map(&:last), noun: "a release number") %>
   </div>
 <% end %>
