@@ -5,6 +5,14 @@
 class ArtistCatalogController < ApplicationController
   include GridAuthentication
 
+  # The catalog console (2026-10-29): /releases, /releases/:id and
+  # /trackz/:id as left-anchored terminal screens on the home console
+  # family (console_releases / console_release / console_track, artist_catalog.css
+  # "Catalog console"). A prototype on XERAEN only — the other slugs keep
+  # the card grid + fieldset stack until XERAEN settles the design (or
+  # drops it); widening is one slug here plus the brand var in CSS.
+  CONSOLE_CATALOG_SLUGS = %w[xeraen].freeze
+
   # GET /:artist_slug/releases
   def releases
     @artist = Artist.find_by(slug: params[:artist_slug])
@@ -13,9 +21,9 @@ class ArtistCatalogController < ApplicationController
     # the one artist the React page filtered to client-side. Same
     # visibility rule: a release whose tracks are all hidden from the
     # Pulse Vault stays hidden here too.
-    @releases = Release.includes(:artist, cover_image_attachment: :blob).catalog_visible(@artist)
+    @releases = Release.includes(:artist, :tracks, cover_image_attachment: :blob).catalog_visible(@artist)
 
-    @coming_soon = Release.includes(:artist, cover_image_attachment: :blob)
+    @coming_soon = Release.includes(:artist, :tracks, cover_image_attachment: :blob)
       .where(artist: @artist, coming_soon: true)
       .order(Arel.sql("release_date ASC NULLS LAST"))
       .to_a
@@ -31,6 +39,8 @@ class ArtistCatalogController < ApplicationController
       HackrPageView.record!(current_hackr, "release_index", @artist.id)
       Grid::AchievementChecker.new(current_hackr).check("release_indexes_viewed_all")
     end
+
+    render :console_releases if console_catalog?
   end
 
   # GET /:artist_slug/releases/:id
@@ -45,14 +55,14 @@ class ArtistCatalogController < ApplicationController
     @release = nil if @release && hidden_from_vault?(@release)
 
     if @release.nil?
-      render status: :not_found
+      render (console_catalog? ? :console_release : :release), status: :not_found
       return
     end
 
     @tracks = @release.tracks.includes(:hackr_streams, release: {cover_image_attachment: :blob})
       .with_attached_audio_file
       .order(:track_number, :title)
-    @disc_length = format_duration(@tracks.sum { |t| parse_duration(t.duration) })
+    @disc_length = helpers.format_seconds(@tracks.sum { |t| helpers.duration_seconds(t.duration) })
 
     # View credit inline (the SPA fired POST /api/releases/:slug/viewed);
     # coming-soon releases are excluded, matching the API.
@@ -60,6 +70,8 @@ class ArtistCatalogController < ApplicationController
       HackrPageView.record!(current_hackr, "release", @release.id)
       Grid::AchievementChecker.new(current_hackr).check("releases_viewed_all")
     end
+
+    render :console_release if console_catalog?
   end
 
   # GET /:artist_slug/trackz/:id
@@ -72,7 +84,7 @@ class ArtistCatalogController < ApplicationController
     end
 
     if @track.nil?
-      render status: :not_found
+      render (console_catalog? ? :console_track : :track), status: :not_found
       return
     end
 
@@ -80,7 +92,16 @@ class ArtistCatalogController < ApplicationController
     # React page navigated (replace) to the release page. Redirect here.
     if @track.release&.coming_soon
       redirect_to "/#{@track.artist.slug}/releases/#{@track.release.slug}"
+      return
     end
+
+    return unless console_catalog?
+
+    # The console screen (console_track) reads the release tracklist in
+    # disc order for its "NN of N" readout and the // ALSO ON <RELEASE> //
+    # rows the prompt numbers open.
+    @release_tracks = @track.release.tracks.order(:track_number, :title).to_a
+    render :console_track
   end
 
   # GET /thecyberpulse/vidz — the VIDZ archive: TCP's recordings and
@@ -114,28 +135,12 @@ class ArtistCatalogController < ApplicationController
     params[:id].to_i.to_s == params[:id]
   end
 
+  def console_catalog?
+    CONSOLE_CATALOG_SLUGS.include?(params[:artist_slug])
+  end
+
   def hidden_from_vault?(release)
     !release.coming_soon && release.tracks.any? &&
       release.tracks.where(show_in_pulse_vault: true).none?
-  end
-
-  # Ported from Api::ReleasesController — disc length is the summed track
-  # durations, rendered M:SS.
-  def parse_duration(duration_str)
-    return 0 if duration_str.blank?
-    parts = duration_str.split(":").map(&:to_i)
-    if parts.length == 2
-      parts[0] * 60 + parts[1]
-    elsif parts.length == 3
-      parts[0] * 3600 + parts[1] * 60 + parts[2]
-    else
-      0
-    end
-  end
-
-  def format_duration(total_seconds)
-    minutes = total_seconds / 60
-    seconds = total_seconds % 60
-    "#{minutes}:#{seconds.to_s.rjust(2, "0")}"
   end
 end

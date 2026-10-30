@@ -1,0 +1,189 @@
+<%# GET /xeraen/releases/:id — a release as a console screen (2026-10-29,
+    a prototype on XERAEN only; release.html.erb's fieldset stack still
+    serves the other slugs — ArtistCatalogController::CONSOLE_CATALOG_SLUGS).
+    Bar, the cover beside the status rows, // DESCRIPTION // and
+    // CREDITS // prose, // TRACKS // on the player row contract
+    (track-list controller + data-player-*, ► PLAY repaints; a coming-soon
+    release masks the list like the SPA's encrypted state), // NOTES //,
+    // FREQUENCIES // as tag rows (the vault filter + each platform),
+    destinations, the > prompt (a track's NN opens its page). A nil
+    @release is SIGNAL LOST (the controller renders it with 404).
+    Assigns: @release, @tracks, @disc_length. %>
+<% slug = params[:artist_slug] %>
+<% artist_name = @release&.artist&.name || slug.upcase %>
+
+<% if @release.nil? %>
+  <% content_for :title, "Signal Lost — hackr.tv" %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="console console--xeraen cc-release" data-controller="terminal" data-boot="done">
+      <div class="console-bar">
+        <h1 class="console-bar-title"><%= artist_name %></h1>
+        <span class="console-bar-sub">RELEASE · SIGNAL LOST</span>
+        <span class="console-bar-right"><%= link_to "[<] RELEASES", "/#{slug}/releases", class: "console-bar-link" %></span>
+      </div>
+      <div class="console-rule"><span>// SIGNAL LOST //</span></div>
+      <p class="cc-lost">Release not found. <span class="console-dim">· nothing on record under that name</span></p>
+      <%= render "artist_pages/xeraen_destinations" %>
+      <%= render "shared/console_prompt", hint: safe_join(["type a tag ", tag.span("(xeraen bio releases vault tcp fnet)", class: "console-dim"), " · enter · ? help"]) %>
+    </div>
+  <% end %>
+<% else %>
+  <% content_for :title, "#{@release.name} — hackr.tv" %>
+  <% coming_soon = @release.coming_soon %>
+  <%# Release-level links win; otherwise aggregate from the tracks (first
+      platform occurrence wins), as the shared page does. %>
+  <% streaming_links = @release.streaming_links %>
+  <% if streaming_links.nil? %>
+    <% streaming_links = {} %>
+    <% @tracks.each { |t| (t.streaming_links || {}).each { |platform, url| streaming_links[platform] ||= url } } %>
+  <% end %>
+  <% sorted_links = sorted_streaming_links(streaming_links) %>
+  <% numbers = @tracks.map { |t| format("%02d", t.track_number.to_i) } %>
+
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="console console--xeraen cc-release" data-controller="terminal" data-boot="pending"
+      data-action="keydown@document->terminal#skip click->terminal#skip">
+      <div class="console-bar console-line" data-terminal-target="line">
+        <h1 class="console-bar-title"><%= @release.name %></h1>
+        <span class="console-bar-sub"><%= artist_name %> · <%= @release.release_type&.upcase || "RELEASE" %></span>
+        <span class="console-bar-right">
+          <% if coming_soon %><span class="console-bar-badge">◌ SIGNAL INCOMING</span><% end %>
+          <%= link_to "[<] RELEASES", "/#{slug}/releases", class: "console-bar-link" %>
+          <% unless coming_soon %><%= link_to "[>] VAULT", vault_path(filter: @release.name), class: "console-bar-link" %><% end %>
+        </span>
+      </div>
+
+      <div class="cc-head">
+        <div class="cc-art console-line <%= "cc-art--incoming" if coming_soon %>" data-terminal-target="line">
+          <% if @release.cover_image.attached? %>
+            <%= image_tag url_for(@release.cover_standard), alt: @release.name, class: "cc-art-img" %>
+          <% else %>
+            <div class="cc-art-none" aria-hidden="true">&#9834;</div>
+          <% end %>
+        </div>
+        <div class="console-status">
+          <div class="console-status-row console-line" data-terminal-target="line">
+            <span class="console-key">ARTIST</span>
+            <span class="console-val"><%= link_to artist_name, "/#{slug}", class: "console-link" %></span>
+          </div>
+          <div class="console-status-row console-line" data-terminal-target="line">
+            <span class="console-key">TYPE</span>
+            <span class="console-val"><%= @release.release_type&.upcase || "RELEASE" %></span>
+          </div>
+          <div class="console-status-row console-line" data-terminal-target="line">
+            <span class="console-key">RELEASED</span>
+            <span class="console-val"><% if coming_soon %><span class="xt-brand">PENDING TRANSMISSION</span><% else %><%= @release.release_date&.strftime("%Y-%m-%d") || "—" %><% end %></span>
+          </div>
+          <% if @release.label.present? %>
+            <div class="console-status-row console-line" data-terminal-target="line">
+              <span class="console-key">LABEL</span>
+              <span class="console-val"><%= @release.label %></span>
+            </div>
+          <% end %>
+          <% if @release.catalog_number.present? || coming_soon %>
+            <div class="console-status-row console-line" data-terminal-target="line">
+              <span class="console-key">CATALOG #</span>
+              <span class="console-val"><% if coming_soon %><span class="console-dim">███-███</span><% else %><%= @release.catalog_number %><% end %></span>
+            </div>
+          <% end %>
+          <% if @release.media_format.present? || coming_soon %>
+            <div class="console-status-row console-line" data-terminal-target="line">
+              <span class="console-key">FORMAT</span>
+              <span class="console-val"><% if coming_soon %><span class="console-dim">████████</span><% else %><%= @release.media_format %><% end %></span>
+            </div>
+          <% end %>
+          <% if @release.classification.present? || coming_soon %>
+            <div class="console-status-row console-line" data-terminal-target="line">
+              <span class="console-key">CLASS</span>
+              <span class="console-val"><% if coming_soon %><span class="console-dim">[CLASSIFIED]</span><% else %><%= @release.classification %><% end %></span>
+            </div>
+          <% end %>
+          <div class="console-status-row console-line" data-terminal-target="line">
+            <span class="console-key">TRACKS</span>
+            <span class="console-val"><%= @tracks.size %> <span class="console-dim">· <%= coming_soon ? "██:██" : @disc_length %></span></span>
+          </div>
+          <% if coming_soon %>
+            <div class="console-status-row console-line" data-terminal-target="line">
+              <span class="console-key">STATUS</span>
+              <span class="console-val"><span class="xt-brand">◌ SIGNAL INCOMING</span> <span class="console-dim">· full signal lock pending</span></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @release.description.present? && !coming_soon %>
+        <div class="console-rule console-line" data-terminal-target="line"><span>// DESCRIPTION //</span></div>
+        <div class="xt-prose"><p class="console-line" data-terminal-target="line"><%= @release.description %></p></div>
+      <% end %>
+      <% if @release.credits.present? && !coming_soon %>
+        <div class="console-rule console-line" data-terminal-target="line"><span>// CREDITS //</span></div>
+        <div class="xt-prose"><p class="console-line" data-terminal-target="line"><%= @release.credits %></p></div>
+      <% end %>
+
+      <div class="console-rule console-line" data-terminal-target="line"><span><%= coming_soon ? "// TRACKS · ENCRYPTED //" : "// TRACKS //" %></span></div>
+      <div class="cc-tracks" data-controller="track-list">
+        <% @tracks.each_with_index do |track, i| %>
+          <% num = format("%02d", track.track_number.to_i) %>
+          <% if coming_soon %>
+            <div class="cc-track cc-track--locked console-line" data-terminal-target="line">
+              <span class="console-tag"><%= num %></span>
+              <span class="cc-track-title console-dim"><%= redacted_track_name(i) %></span>
+              <span class="cc-track-extra"></span>
+              <span class="cc-track-time console-dim">██:██</span>
+              <span class="cc-track-play console-dim">◌</span>
+            </div>
+          <% else %>
+            <% playable = track.audio_file.attached? %>
+            <%# Player row contract: data-player-* + the row click; the inner links stop the row (`:stop`) so only the navigation happens. %>
+            <div class="track-row cc-track console-line <%= "cc-track--mute" unless playable %>"
+                 <%= tag.attributes(data: player_track_attrs(track).merge(
+                       player_artist_path: artist_profile_path_for(track.artist),
+                       terminal_target: "line",
+                       action: "click->track-list#rowClicked contextmenu->track-list#rowContextMenu"
+                     )) %>>
+              <span class="console-tag"><%= num %></span>
+              <%= link_to track.title, "/#{slug}/trackz/#{track.slug}", class: "console-link cc-track-title",
+                data: {command: num, action: "click->track-list#rowClicked:stop"} %>
+              <span class="cc-track-extra"><% if (vod = track.hackr_streams.find { |stream| vod_page_path(stream) }) %><%= link_to "[▶ VIDEO]", vod_page_path(vod), class: "console-link", title: vod.title, data: {action: "click->track-list#rowClicked:stop"} %><% end %></span>
+              <span class="cc-track-time console-dim"><%= track.duration || "—" %></span>
+              <span class="cc-track-play"><% if playable %><button class="play-track-btn cc-play">► PLAY</button><% else %><span class="console-dim">NO AUDIO</span><% end %></span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @release.notes.present? && !coming_soon %>
+        <div class="console-rule console-line" data-terminal-target="line"><span>// NOTES //</span></div>
+        <div class="xt-prose"><p class="console-line" data-terminal-target="line"><%= @release.notes %></p></div>
+      <% end %>
+
+      <div class="console-rule console-line" data-terminal-target="line"><span>// FREQUENCIES //</span></div>
+      <% if coming_soon %>
+        <p class="cc-note console-line" data-terminal-target="line"><span class="console-dim">NOT YET ALLOCATED · transmission begins when broadcast lock is acquired</span></p>
+      <% else %>
+        <section class="console-section" aria-label="Streaming frequencies">
+          <div class="console-row console-line" data-terminal-target="line">
+            <span class="console-tag">[LISTEN]</span>
+            <%= link_to "Pulse Vault", vault_path(filter: @release.name), class: "console-link", data: {command: "listen"} %>
+            <span class="console-desc">This release in the vault — every track, in order</span>
+          </div>
+          <% sorted_links.each do |platform, url| %>
+            <div class="console-row console-line" data-terminal-target="line">
+              <span class="console-tag">[<%= streaming_tag(platform) %>]</span>
+              <a href="<%= url %>" target="_blank" rel="noopener noreferrer" class="console-link"><%= streaming_platform_name(platform) %> ↗</a>
+              <span class="console-desc"><%= link_host(url) %></span>
+            </div>
+          <% end %>
+        </section>
+      <% end %>
+
+      <%= render "artist_pages/xeraen_destinations" %>
+
+      <div class="console-rule console-line" data-terminal-target="line"><span>// END OF RECORD //</span></div>
+      <%= render "shared/console_prompt", hint: safe_join([
+        (coming_soon || numbers.empty?) ? "" : safe_join(["type a track number ", tag.span("(#{numbers.join(" ")})", class: "console-dim"), " or "]),
+        "type a tag ", tag.span("(xeraen bio releases vault tcp fnet)", class: "console-dim"), " · enter · ? help"
+      ]) %>
+    </div>
+  <% end %>
+<% end %>

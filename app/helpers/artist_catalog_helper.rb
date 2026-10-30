@@ -73,4 +73,45 @@ module ArtistCatalogHelper
   def redacted_track_name(index)
     REDACTED_TRACK_NAMES[index % REDACTED_TRACK_NAMES.length]
   end
+
+  # Disc length (ported from Api::ReleasesController): track durations
+  # ("M:SS" or "H:MM:SS") summed and rendered M:SS. The release action's
+  # @disc_length and the catalog console's index rows both go through
+  # here.
+  def duration_seconds(duration_str)
+    return 0 if duration_str.blank?
+    parts = duration_str.split(":").map(&:to_i)
+    case parts.length
+    when 2 then parts[0] * 60 + parts[1]
+    when 3 then parts[0] * 3600 + parts[1] * 60 + parts[2]
+    else 0
+    end
+  end
+
+  def format_seconds(total_seconds)
+    "#{total_seconds / 60}:#{(total_seconds % 60).to_s.rjust(2, "0")}"
+  end
+
+  # M:SS for a release with timed tracks, nil otherwise.
+  def release_length(release)
+    seconds = release.tracks.sum { |t| duration_seconds(t.duration) }
+    seconds.positive? ? format_seconds(seconds) : nil
+  end
+
+  # The catalog console's [TAG] for a streaming platform row.
+  STREAMING_TAGS = {
+    "bandcamp" => "BC", "youtube" => "YT", "spotify" => "SP",
+    "apple_music" => "AM", "soundcloud" => "SC"
+  }.freeze
+
+  def streaming_tag(platform)
+    STREAMING_TAGS[platform.to_s.downcase] || platform.to_s[0, 2].upcase
+  end
+
+  # "open.spotify.com" for a frequency row's description.
+  def link_host(url)
+    URI.parse(url.to_s).host.to_s.delete_prefix("www.")
+  rescue URI::InvalidURIError
+    ""
+  end
 end

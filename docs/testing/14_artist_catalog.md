@@ -9,7 +9,8 @@ minutes: 15
 
 1. Visit `/thecyberpulse/releases`. → Release index for the artist:
    released grid + coming-soon strip; registers a release-index view
-   (achievement source) silently.
+   (achievement source) silently. (XERAEN's catalog is the console
+   prototype instead — article 13 step 5.)
 2. Open a release (`/thecyberpulse/releases/<slug>`). → Detail page:
    cover, track list, disc length; play works.
 3. A release whose tracks are all vault-hidden must 404 here; a
@@ -19,7 +20,8 @@ minutes: 15
 ## Steps — trackz
 
 5. Open a track page (`/<artist>/trackz/<slug>`). → Track detail renders
-   (cover, release link, duration); play works.
+   (cover, release link, duration); play works. (XERAEN's track page is
+   the console prototype instead — article 13 step 5.)
 6. A track belonging to a coming-soon release. → Redirects to the
    release page instead of rendering.
 7. Legacy `/trackz/:id` URL (old bookmark shape). → Redirects to the
