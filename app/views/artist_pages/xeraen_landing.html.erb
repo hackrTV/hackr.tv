@@ -45,7 +45,7 @@
         <span class="console-val">
           <% if latest %>
             <%= pluralize(@releases.size, "cataloged", plural: "cataloged") %> <span class="console-dim">· latest</span>
-            <%= link_to latest.name, "/xeraen/releases/#{latest.slug}", class: "console-link" %>
+            <%= link_to latest.name, console_release_path("xeraen", latest), class: "console-link" %>
             <span class="console-dim">· <%= latest.release_type&.upcase || "RELEASE" %><% if latest.release_date %> · <%= latest.release_date.strftime("%Y-%m-%d") %><% end %></span>
           <% else %>
             <span class="console-dim">NONE CATALOGED</span>
@@ -84,9 +84,9 @@
       </p>
     </div>
 
-    <%= render "artist_pages/xeraen_destinations", except: "XERAEN" %>
+    <%= render "artist_pages/console_destinations", artist: "xeraen", except: "XERAEN" %>
 
     <div class="console-rule console-line" data-terminal-target="line"><span>// TRANSMITTING FROM <%= future_year %> — FOR AS LONG AS <%= future_year %> EXISTS //</span></div>
-    <%= render "shared/console_prompt", hint: safe_join(["type a tag ", tag.span("(bio releases vault tcp fnet)", class: "console-dim"), " · enter · ? help"]) %>
+    <%= render "shared/console_prompt", hint: console_prompt_hint("xeraen", except: "XERAEN") %>
   </div>
 <% end %>

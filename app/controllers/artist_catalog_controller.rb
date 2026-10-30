@@ -8,10 +8,12 @@ class ArtistCatalogController < ApplicationController
   # The catalog console (2026-10-29): /releases, /releases/:id and
   # /trackz/:id as left-anchored terminal screens on the home console
   # family (console_releases / console_release / console_track, artist_catalog.css
-  # "Catalog console"). A prototype on XERAEN only — the other slugs keep
-  # the card grid + fieldset stack until XERAEN settles the design (or
-  # drops it); widening is one slug here plus the brand var in CSS.
-  CONSOLE_CATALOG_SLUGS = %w[xeraen].freeze
+  # "Catalog console"). XERAEN first, The.CyberPul.se the same day — the
+  # other slugs keep the card grid + fieldset stack until XERAEN settles
+  # the design (or drops it); widening is one slug here, a destination
+  # row set in ArtistConsoleHelper and a .console--<slug> brand block in
+  # artist_pages.css.
+  CONSOLE_CATALOG_SLUGS = %w[xeraen thecyberpulse].freeze
 
   # GET /:artist_slug/releases
   def releases
@@ -59,17 +61,26 @@ class ArtistCatalogController < ApplicationController
       return
     end
 
-    @tracks = @release.tracks.includes(:hackr_streams, release: {cover_image_attachment: :blob})
-      .with_attached_audio_file
-      .order(:track_number, :title)
-    @disc_length = helpers.format_seconds(@tracks.sum { |t| helpers.duration_seconds(t.duration) })
-
     # View credit inline (the SPA fired POST /api/releases/:slug/viewed);
-    # coming-soon releases are excluded, matching the API.
+    # coming-soon releases are excluded, matching the API. Before the
+    # single redirect, so a single still counts toward releases_viewed_all.
     if current_hackr && !@release.coming_soon
       HackrPageView.record!(current_hackr, "release", @release.id)
       Grid::AchievementChecker.new(current_hackr).check("releases_viewed_all")
     end
+
+    # A single on the console is its track's page (Release#single?): the
+    # ledger links there directly; this catches the release URL arriving
+    # from elsewhere (the FM cards, the API's redirect signal, bookmarks).
+    if console_catalog? && @release.single?
+      redirect_to "/#{params[:artist_slug]}/trackz/#{@release.tracks.first.slug}"
+      return
+    end
+
+    @tracks = @release.tracks.includes(:hackr_streams, release: {cover_image_attachment: :blob})
+      .with_attached_audio_file
+      .order(:track_number, :title)
+    @disc_length = helpers.format_seconds(@tracks.sum { |t| helpers.duration_seconds(t.duration) })
 
     render :console_release if console_catalog?
   end
@@ -97,6 +108,13 @@ class ArtistCatalogController < ApplicationController
 
     return unless console_catalog?
 
+    # A single's track page stands in for its release page (the ledger
+    # links straight here), so the release view credit lands here too.
+    if current_hackr && @track.release&.single?
+      HackrPageView.record!(current_hackr, "release", @track.release.id)
+      Grid::AchievementChecker.new(current_hackr).check("releases_viewed_all")
+    end
+
     # The console screen (console_track) reads the release tracklist in
     # disc order for its "NN of N" readout and the // ALSO ON <RELEASE> //
     # rows the prompt numbers open.
@@ -116,7 +134,7 @@ class ArtistCatalogController < ApplicationController
       return
     end
 
-    @vods = HackrStream.vidz_archive
+    @vods = HackrStream.vidz_archive.includes(:artist)
       .order(started_at: :desc, created_at: :desc)
       .to_a
   end
@@ -124,7 +142,11 @@ class ArtistCatalogController < ApplicationController
   # GET /thecyberpulse/vidz/:id (and /xeraen/vidz/:id via the redirect)
   def vidz_show
     @artist = Artist.find_by(slug: params[:artist_slug])
-    @vod = @artist && HackrStream.vidz_archive.includes(:artist).find_by(id: params[:id])
+    # The whole archive, newest first: the recording itself plus the
+    # console's // ALSO IN THE ARCHIVE // rows, numbered as the index
+    # numbers them.
+    @archive = @artist ? HackrStream.vidz_archive.includes(:artist).order(started_at: :desc, created_at: :desc).to_a : []
+    @vod = @archive.find { |stream| stream.id == params[:id].to_i }
 
     render status: :not_found if @vod.nil?
   end

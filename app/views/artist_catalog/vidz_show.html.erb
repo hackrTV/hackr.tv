@@ -1,60 +1,105 @@
-<%# VodzShowPage.tsx port. The YouTube embed is the YouTubePlayer.tsx
-    click-to-play thumbnail, rebuilt as the vod-player Stimulus
-    controller — the first PLAYING state POSTs the watch credit
-    (achievement "Watched your first VOD"), so page loads without a real
-    play never count. %>
+<%# GET /thecyberpulse/vidz/:id — a recording as a console screen
+    (2026-10-29; the VodzShowPage port's glowing window is gone): bar
+    (title · HOST · VIDZ, ● LIVESTREAM badge, [<] VIDZ), ARTIST / RECORDED
+    / FORMAT rows, // PLAYBACK // with the click-to-play YouTube embed
+    (YouTubePlayer.tsx rebuilt as the vod-player controller — the first
+    PLAYING state POSTs the watch credit, so page loads without a real
+    play never count), // ALSO IN THE ARCHIVE // nav rows numbered as the
+    index numbers them, destinations, the > prompt. A nil @vod is SIGNAL
+    LOST (rendered with 404). Assigns: @artist, @archive (newest first),
+    @vod. %>
 <% slug = params[:artist_slug] %>
+<% host_name = @artist&.name || slug.upcase %>
 
 <% if @vod.nil? %>
   <% content_for :title, "Vidz — hackr.tv" %>
-  <%= render layout: "shared/default_chrome" do %>
-    <div class="tui-window red-168-text vodz-error-window">
-      <fieldset>
-        <legend>Error</legend>
-        <p>Failed to load video</p>
-        <%= tui_button "Back to Videos", "/#{slug}/vidz", class: "vodz-error-back" %>
-      </fieldset>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="console console--<%= slug %> cc-vidz" data-controller="terminal" data-boot="done">
+      <div class="console-bar">
+        <h1 class="console-bar-title"><%= host_name %></h1>
+        <span class="console-bar-sub">VIDZ · SIGNAL LOST</span>
+        <span class="console-bar-right"><%= link_to "[<] VIDZ", "/#{slug}/vidz", class: "console-bar-link" %></span>
+      </div>
+      <div class="console-rule"><span>// SIGNAL LOST //</span></div>
+      <p class="cc-lost">Recording not found. <span class="console-dim">· nothing in the archive under that id</span></p>
+      <%= render "artist_pages/console_destinations", artist: slug %>
+      <%= render "shared/console_prompt", hint: console_prompt_hint(slug) %>
     </div>
   <% end %>
 <% else %>
-  <% content_for :title, "#{@vod.title.presence || "Untitled Stream"} — hackr.tv" %>
+  <% title = @vod.title.presence || "Untitled Stream" %>
+  <% content_for :title, "#{title} — hackr.tv" %>
   <% video_id = youtube_video_id(@vod.vod_url) %>
-  <%= render layout: "shared/default_chrome" do %>
-    <div class="tui-window white-text vodz-window">
-      <fieldset class="vodz-fieldset">
-        <legend class="center vodz-legend"><%= @artist.name %> :: VIDZ</legend>
-        <div class="vodz-body">
-          <%= link_to "← Back to Videos", "/#{slug}/vidz", class: "vodz-back-link" %>
+  <% livestream = @vod.live_url.present? %>
+  <% others = @archive.each_with_index.reject { |(stream, _)| stream.id == @vod.id }.map { |(stream, i)| [stream, format("%02d", i + 1)] } %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="console console--<%= slug %> cc-vidz" data-controller="terminal" data-boot="pending"
+      data-action="keydown@document->terminal#skip click->terminal#skip">
+      <div class="console-bar console-line" data-terminal-target="line">
+        <h1 class="console-bar-title"><%= title %></h1>
+        <span class="console-bar-sub"><%= host_name %> · VIDZ</span>
+        <span class="console-bar-right">
+          <% if livestream %><span class="console-bar-badge">● LIVESTREAM</span><% end %>
+          <%= link_to "[<] VIDZ", "/#{slug}/vidz", class: "console-bar-link" %>
+        </span>
+      </div>
 
-          <div class="vodz-show-title-row">
-            <h2 class="vodz-show-title"><%= @vod.title.presence || "Untitled Stream" %></h2>
-            <% if @vod.live_url.present? %>
-              <span class="vodz-live-badge vodz-live-badge--lg">Livestream</span>
-            <% end %>
-          </div>
+      <div class="console-status">
+        <div class="console-status-row console-line" data-terminal-target="line">
+          <span class="console-key">ARTIST</span>
+          <span class="console-val"><%= link_to @vod.artist.name, "/#{@vod.artist.slug}", class: "console-link" %></span>
+        </div>
+        <div class="console-status-row console-line" data-terminal-target="line">
+          <span class="console-key">RECORDED</span>
+          <span class="console-val"><%= @vod.started_at ? future_stamp(@vod.started_at) : "UNKNOWN DATE" %></span>
+        </div>
+        <div class="console-status-row console-line" data-terminal-target="line">
+          <span class="console-key">FORMAT</span>
+          <span class="console-val"><%= livestream ? "LIVESTREAM RECORDING" : "RECORDING" %><% if video_id %> <span class="console-dim">· YouTube</span><% end %></span>
+        </div>
+      </div>
 
-          <p class="vodz-show-date"><%= @vod.started_at ? future_datetime(@vod.started_at) : "Unknown date" %></p>
-
-          <% if video_id %>
-            <div class="vodz-player" data-controller="vod-player"
-                 data-vod-player-video-id-value="<%= video_id %>"
-                 data-vod-player-watch-url-value="/api/artists/<%= @vod.artist.slug %>/vods/<%= @vod.id %>/watch">
-              <div class="vodz-player__frame">
-                <div class="vodz-player__mount" data-vod-player-target="frame"></div>
-                <div class="vodz-player__thumb" data-vod-player-target="thumb" data-action="click->vod-player#play">
-                  <img src="https://img.youtube.com/vi/<%= video_id %>/maxresdefault.jpg" alt="" class="vodz-player__thumb-img">
-                  <div class="vodz-player__play-badge"><div class="vodz-player__play-arrow"></div></div>
-                </div>
+      <div class="console-rule console-line" data-terminal-target="line"><span>// PLAYBACK //</span></div>
+      <% if video_id %>
+        <div class="cc-player console-line" data-terminal-target="line">
+          <div class="vodz-player" data-controller="vod-player"
+               data-vod-player-video-id-value="<%= video_id %>"
+               data-vod-player-watch-url-value="/api/artists/<%= @vod.artist.slug %>/vods/<%= @vod.id %>/watch">
+            <div class="vodz-player__frame">
+              <div class="vodz-player__mount" data-vod-player-target="frame"></div>
+              <div class="vodz-player__thumb" data-vod-player-target="thumb" data-action="click->vod-player#play">
+                <img src="https://img.youtube.com/vi/<%= video_id %>/maxresdefault.jpg" alt="" class="vodz-player__thumb-img">
+                <div class="vodz-player__play-badge"><div class="vodz-player__play-arrow"></div></div>
               </div>
             </div>
-          <% else %>
-            <div class="vodz-player-fallback">
-              <p>Unable to load video player.</p>
-              <a href="<%= @vod.vod_url %>" target="_blank" rel="noopener noreferrer" class="tui-button vodz-player-fallback__link">Watch on YouTube</a>
+          </div>
+        </div>
+      <% else %>
+        <p class="cc-note console-line" data-terminal-target="line">Unable to load video player. <span class="console-dim">· not a YouTube URL this console can embed</span></p>
+        <div class="console-row console-line" data-terminal-target="line">
+          <span class="console-tag">[LINK]</span>
+          <a href="<%= @vod.vod_url %>" target="_blank" rel="noopener noreferrer" class="console-link">Open the recording ↗</a>
+          <span class="console-desc"><%= link_host(@vod.vod_url) %></span>
+        </div>
+      <% end %>
+
+      <% if others.any? %>
+        <div class="console-rule console-line" data-terminal-target="line"><span>// ALSO IN THE ARCHIVE //</span></div>
+        <div class="cc-tracks">
+          <% others.each do |stream, num| %>
+            <div class="cc-track cc-track--wide console-line" data-terminal-target="line">
+              <span class="console-tag"><%= num %></span>
+              <%= link_to stream.title.presence || "Untitled Stream", "/#{slug}/vidz/#{stream.id}", class: "console-link cc-track-title", data: {command: num} %>
+              <span class="cc-track-time console-dim"><%= stream.started_at ? future_stamp(stream.started_at) : "UNKNOWN DATE" %></span>
             </div>
           <% end %>
         </div>
-      </fieldset>
+      <% end %>
+
+      <%= render "artist_pages/console_destinations", artist: slug %>
+
+      <div class="console-rule console-line" data-terminal-target="line"><span>// END OF TRANSMISSION //</span></div>
+      <%= render "shared/console_prompt", hint: console_prompt_hint(slug, numbers: others.map(&:last), noun: "a recording number") %>
     </div>
   <% end %>
 <% end %>

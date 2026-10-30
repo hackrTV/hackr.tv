@@ -1,0 +1,17 @@
+<%# The artist console's destination rows (the home console's idiom —
+    home_streams.md § Home console): one aligned line per link, the [TAG]
+    doubling as the prompt command (the terminal controller reads
+    a[data-command]). Rows per artist: ArtistConsoleHelper. Locals:
+    artist (slug), except — the page's own tag, left out. %>
+<% except = local_assigns[:except] %>
+<section class="console-section" aria-label="Destinations">
+  <div class="console-rule console-line" data-terminal-target="line"><span>// DESTINATIONS //</span></div>
+  <% console_destinations(artist).each do |tag_name, href, name, desc| %>
+    <% next if tag_name == except %>
+    <div class="console-row console-line" data-terminal-target="line">
+      <span class="console-tag">[<%= tag_name %>]</span>
+      <%= link_to name, href, class: "console-link", data: {command: tag_name.downcase} %>
+      <span class="console-desc"><%= desc %></span>
+    </div>
+  <% end %>
+</section>

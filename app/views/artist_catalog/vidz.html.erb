@@ -1,53 +1,88 @@
-<%# VodzPage.tsx port: the VIDZ archive — TCP's and XERAEN's recordings
-    (HackrStream.vidz_archive; /xeraen/vidz redirects here). Thumbnails
-    come straight from img.youtube.com for any recognizable YouTube URL. %>
+<%# GET /thecyberpulse/vidz — the VIDZ archive as a console screen
+    (2026-10-29; the VodzPage port's glowing window is gone): TCP's and
+    XERAEN's recordings (HackrStream.vidz_archive; /xeraen/vidz redirects
+    here) in the home console's idiom — bar, ARCHIVE / LATEST rows, then
+    // ARCHIVE // rows ([NN] · 64×36 YouTube thumb · title over date ·
+    artist · LIVESTREAM), destinations, the > prompt (a row's NN opens the
+    recording). The host is always The.CyberPul.se (the only routed slug);
+    a missing host row is SIGNAL LOST with 404. Assigns: @artist, @vods. %>
 <% slug = params[:artist_slug] %>
 
 <% if @artist.nil? %>
   <% content_for :title, "Vidz — hackr.tv" %>
-  <%= render layout: "shared/default_chrome" do %>
-    <div class="tui-window red-168-text vodz-error-window">
-      <fieldset>
-        <legend>Error</legend>
-        <p>Failed to load VODs</p>
-      </fieldset>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="console console--<%= slug %> cc-vidz" data-controller="terminal" data-boot="done">
+      <div class="console-bar">
+        <h1 class="console-bar-title"><%= slug.upcase %></h1>
+        <span class="console-bar-sub">VIDZ · SIGNAL LOST</span>
+      </div>
+      <div class="console-rule"><span>// SIGNAL LOST //</span></div>
+      <p class="cc-lost">Archive offline. <span class="console-dim">· no host on record</span></p>
+      <%= render "artist_pages/console_destinations", artist: slug, except: "VIDZ" %>
+      <%= render "shared/console_prompt", hint: console_prompt_hint(slug, except: "VIDZ") %>
     </div>
   <% end %>
 <% else %>
   <% content_for :title, "#{@artist.name} :: Vidz — hackr.tv" %>
-  <%= render layout: "shared/default_chrome" do %>
-    <div class="tui-window white-text vodz-window">
-      <fieldset class="vodz-fieldset">
-        <legend class="center vodz-legend"><%= @artist.name %> :: VIDZ</legend>
-        <div class="vodz-body">
-          <% if @vods.empty? %>
-            <p class="vodz-empty">No videos available yet.</p>
-          <% else %>
-            <div class="vodz-list">
-              <% @vods.each do |vod| %>
-                <% video_id = youtube_video_id(vod.vod_url) %>
-                <%= link_to "/#{slug}/vidz/#{vod.id}", class: "vodz-item" do %>
-                  <% if video_id %>
-                    <div class="vodz-item__thumb">
-                      <img src="https://img.youtube.com/vi/<%= video_id %>/mqdefault.jpg" alt="" class="vodz-item__img">
-                      <div class="vodz-item__badge"><div class="vodz-item__arrow"></div></div>
-                    </div>
-                  <% end %>
-                  <div class="vodz-item__info">
-                    <div class="vodz-item__title-row">
-                      <h3 class="vodz-item__title"><%= vod.title.presence || "Untitled Stream" %></h3>
-                      <% if vod.live_url.present? %>
-                        <span class="vodz-live-badge">Livestream</span>
-                      <% end %>
-                    </div>
-                    <p class="vodz-item__date"><%= vod.started_at ? future_datetime(vod.started_at) : "Unknown date" %></p>
-                  </div>
+  <% latest = @vods.first %>
+  <% live_count = @vods.count { |vod| vod.live_url.present? } %>
+  <% numbers = @vods.each_index.map { |i| format("%02d", i + 1) } %>
+  <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+    <div class="console console--<%= slug %> cc-vidz" data-controller="terminal" data-boot="pending"
+      data-action="keydown@document->terminal#skip click->terminal#skip">
+      <div class="console-bar console-line" data-terminal-target="line">
+        <h1 class="console-bar-title"><%= @artist.name %></h1>
+        <span class="console-bar-sub">VIDZ · VISUAL TRANSMISSIONS</span>
+        <span class="console-bar-right">
+          <%= link_to "[<] #{console_home_tag(slug)}", "/#{slug}", class: "console-bar-link" %>
+          <%= link_to "[>] SCHEDULE", "/schedule", class: "console-bar-link" %>
+        </span>
+      </div>
+
+      <div class="console-status">
+        <div class="console-status-row console-line" data-terminal-target="line">
+          <span class="console-key">ARCHIVE</span>
+          <span class="console-val"><% if @vods.any? %><%= pluralize(@vods.size, "recording") %><% if live_count.positive? %> <span class="console-dim">· <%= pluralize(live_count, "livestream") %></span><% end %><% else %><span class="console-dim">NONE ARCHIVED</span><% end %></span>
+        </div>
+        <% if latest %>
+          <div class="console-status-row console-line" data-terminal-target="line">
+            <span class="console-key">LATEST</span>
+            <span class="console-val"><%= link_to latest.title.presence || "Untitled Stream", "/#{slug}/vidz/#{latest.id}", class: "console-link" %> <span class="console-dim">· <%= latest.started_at ? future_stamp(latest.started_at) : "UNKNOWN DATE" %></span></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="console-rule console-line" data-terminal-target="line"><span>// ARCHIVE //</span></div>
+      <% if @vods.empty? %>
+        <p class="cc-empty console-line" data-terminal-target="line">NO RECORDINGS ARCHIVED YET <span class="console-dim">· the broadcast is still running</span></p>
+      <% else %>
+        <section class="console-section" aria-label="Archive">
+          <% @vods.each_with_index do |vod, i| %>
+            <% num = numbers[i] %>
+            <% href = "/#{slug}/vidz/#{vod.id}" %>
+            <% video_id = youtube_video_id(vod.vod_url) %>
+            <div class="cc-row cc-row--vidz console-line" data-terminal-target="line">
+              <span class="console-tag">[<%= num %>]</span>
+              <%= link_to href, class: "cc-cover cc-cover--wide", tabindex: -1, aria: {hidden: true}, data: (video_id ? youtube_peek_attrs(video_id) : {}) do %>
+                <% if video_id %>
+                  <img src="https://img.youtube.com/vi/<%= video_id %>/mqdefault.jpg" alt="" class="cc-cover-img">
+                <% else %>
+                  <span class="cc-cover-none">&#9654;</span>
                 <% end %>
               <% end %>
+              <div class="cc-text">
+                <%= link_to vod.title.presence || "Untitled Stream", href, class: "console-link cc-name", data: {command: num} %>
+                <div class="cc-meta"><%= vod.started_at ? future_stamp(vod.started_at) : "UNKNOWN DATE" %> · <%= vod.artist.name %><% if vod.live_url.present? %> · <span class="xt-brand">LIVESTREAM</span><% end %></div>
+              </div>
             </div>
           <% end %>
-        </div>
-      </fieldset>
+        </section>
+      <% end %>
+
+      <%= render "artist_pages/console_destinations", artist: slug, except: "VIDZ" %>
+
+      <div class="console-rule console-line" data-terminal-target="line"><span>// EVERY BROADCAST COMMITTED TO RECORD //</span></div>
+      <%= render "shared/console_prompt", hint: console_prompt_hint(slug, except: "VIDZ", numbers: numbers, noun: "a recording number") %>
     </div>
   <% end %>
 <% end %>

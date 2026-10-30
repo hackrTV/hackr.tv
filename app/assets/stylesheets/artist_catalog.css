@@ -695,107 +695,11 @@
   box-shadow: 0 0 15px var(--ac-glow);
 }
 
-/* --- Vidz (VodzPage / VodzShowPage — fixed purple scheme) -------------- */
-.vodz-window {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: block;
-  background: #0a0a0a;
-  border: 2px solid #8B00FF;
-  box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
-}
-.vodz-fieldset { border-color: #8B00FF; }
-.vodz-legend {
-  color: #8B00FF;
-  text-shadow: 0 0 15px rgba(139, 0, 255, 0.8);
-  letter-spacing: 3px;
-}
-.vodz-body { padding: 30px; }
-.vodz-empty { text-align: center; color: #888; }
-
-.vodz-list { display: grid; gap: 20px; }
-.vodz-item {
-  display: flex;
-  gap: 20px;
-  padding: 15px;
-  background: #111;
-  border: 1px solid #333;
-  border-radius: 4px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s ease;
-}
-.vodz-item:hover {
-  border-color: #8B00FF;
-  box-shadow: 0 0 15px rgba(139, 0, 255, 0.6);
-}
-.vodz-item__thumb {
-  width: 200px;
-  height: 112px;
-  flex-shrink: 0;
-  border-radius: 2px;
-  position: relative;
-  overflow: hidden;
-}
-.vodz-item__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-.vodz-item__badge {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.vodz-item__arrow {
-  width: 0;
-  height: 0;
-  border-left: 14px solid #fff;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  margin-left: 3px;
-}
-.vodz-item__info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-.vodz-item__title-row { display: flex; align-items: center; gap: 10px; }
-.vodz-item__title { margin: 0; color: #fff; font-size: 1.1rem; }
-.vodz-item__date { margin: 0; color: #888; font-size: 0.9rem; }
-
-.vodz-live-badge {
-  background: #dc2626;
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 3px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.vodz-live-badge--lg { padding: 3px 10px; font-size: 0.75rem; }
-
-/* Show page */
-.vodz-back-link {
-  color: #8B00FF;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 20px;
-}
-.vodz-show-title-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-.vodz-show-title { margin: 0; color: #fff; }
-.vodz-show-date { margin: 0 0 25px; color: #888; }
-
+/* --- VOD player (the VIDZ console's // PLAYBACK //) --------------------
+ * The click-to-play YouTube embed (YouTubePlayer.tsx → the vod-player
+ * controller). The rest of the VodzPage / VodzShowPage scheme went with
+ * the console (2026-10-29: vidz.html.erb / vidz_show.html.erb are
+ * .console screens on the "Catalog console" block below). */
 /* Click-to-play YouTube embed (YouTubePlayer.tsx). 16:9 via the padded
  * frame; the YT API replaces the mount div with its iframe. */
 .vodz-player__frame {
@@ -858,23 +762,6 @@
   margin-left: 5px;
 }
 
-.vodz-player-fallback {
-  padding: 60px;
-  background: #111;
-  border-radius: 4px;
-  text-align: center;
-  color: #888;
-}
-.vodz-player-fallback .vodz-player-fallback__link {
-  margin-top: 15px;
-  display: inline-block;
-  background: #8B00FF;
-  color: #fff;
-}
-
-.vodz-error-window { max-width: 800px; margin: 0 auto; display: block; }
-.vodz-error-back { margin-top: 20px; display: inline-block; }
-
 /* --- Keyframes --------------------------------------------------------- */
 @keyframes ac-cs-scanline {
   0% { background-position: 0 0; }
@@ -904,11 +791,13 @@
 }
 
 /* --- Catalog console (XERAEN prototype, 2026-10-29) -------------------
- * /xeraen/releases, /xeraen/releases/:slug and /xeraen/trackz/:slug on hotwire.css's .console
- * family (ArtistCatalogController::CONSOLE_CATALOG_SLUGS picks the
- * console_releases / console_release / console_track templates; every other slug keeps
- * the card grid and fieldset stack above). Brand purple is
- * .console--xeraen's --xt-brand (artist_pages.css). Index rows:
+ * /:artist/releases, /releases/:slug and /trackz/:slug for the console
+ * artists (XERAEN, The.CyberPul.se — ArtistCatalogController::
+ * CONSOLE_CATALOG_SLUGS picks the console_releases / console_release /
+ * console_track templates; every other slug keeps the card grid and
+ * fieldset stack above), plus the VIDZ archive + show (/thecyberpulse/
+ * vidz, always a console). Brand from .console--<slug>'s --xt-brand
+ * (artist_pages.css). Index rows:
  * [NN] · 40px cover · name over meta. Release: the cover beside the
  * status rows, track rows on the player contract (.track-row +
  * data-player-*; track_list repaints .play-track-btn / --active). */
@@ -959,4 +848,15 @@
 .cc-track--nav { grid-template-columns: 3ch minmax(0, 1fr) 6ch; }
 @media (max-width: 767px) {
   .cc-track--nav { grid-template-columns: 3ch minmax(0, 1fr) 6ch; grid-template-areas: "num title time"; }
+}
+
+/* VIDZ console (/thecyberpulse/vidz + /:id): archive rows with a 64×36
+ * YouTube thumb, the player at 960px, the show's "also in the archive"
+ * nav rows ([NN] title … date). */
+.cc-row--vidz { grid-template-columns: 5ch 64px minmax(0, 1fr); }
+.cc-cover--wide { width: 64px; height: 36px; }
+.cc-player { max-width: 960px; padding: 6px 8px; }
+.cc-track--wide { grid-template-columns: 3ch minmax(0, 1fr) auto; }
+@media (max-width: 767px) {
+  .cc-track--wide { grid-template-columns: 3ch minmax(0, 1fr) auto; grid-template-areas: "num title time"; }
 }

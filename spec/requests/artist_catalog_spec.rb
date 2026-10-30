@@ -5,7 +5,8 @@ require "rails_helper"
 # VodzShowPage.tsx). Written against the final paths — routes are wired
 # separately, so these fail with routing errors until then.
 RSpec.describe "Artist catalog pages", type: :request do
-  let(:artist) { create(:artist, :thecyberpulse) }
+  let(:artist) { create(:artist, name: "System Rot", slug: "system-rot") } # a band outside the console: the shared catalog
+  let(:tcp) { create(:artist, :thecyberpulse) }
   let(:release) { create(:release, artist: artist, name: "Neon Signals") }
 
   describe "GET /:artist_slug/releases" do
@@ -13,17 +14,17 @@ RSpec.describe "Artist catalog pages", type: :request do
       create(:track, :with_audio, artist: artist, release: release)
       soon = create(:release, artist: artist, coming_soon: true, name: "Ghost Frequency")
 
-      get "/thecyberpulse/releases"
+      get "/system-rot/releases"
 
       expect(response).to have_http_status(:success)
       expect(response.body).not_to include('<div id="root">')
-      expect(response.body).to include("The.CyberPul.se :: RELEASES")
+      expect(response.body).to include("System Rot :: RELEASES")
       expect(response.body).to include("Neon Signals")
       expect(response.body).to include("Ghost Frequency")
       expect(response.body).to include("INCOMING")
       expect(response.body.index("Ghost Frequency")).to be < response.body.index("Neon Signals")
-      expect(response.body).to include("/thecyberpulse/releases/#{release.slug}")
-      expect(response.body).to include("/thecyberpulse/releases/#{soon.slug}")
+      expect(response.body).to include("/system-rot/releases/#{release.slug}")
+      expect(response.body).to include("/system-rot/releases/#{soon.slug}")
     end
 
     it "hides releases whose tracks are all hidden from the vault" do
@@ -31,7 +32,7 @@ RSpec.describe "Artist catalog pages", type: :request do
       visible = create(:release, artist: artist, name: "Visible Signals")
       create(:track, artist: artist, release: visible)
 
-      get "/thecyberpulse/releases"
+      get "/system-rot/releases"
 
       expect(response.body).to include("Visible Signals")
       expect(response.body).not_to include("Neon Signals")
@@ -40,10 +41,10 @@ RSpec.describe "Artist catalog pages", type: :request do
     it "renders the empty state for an artist with no releases" do
       artist
 
-      get "/thecyberpulse/releases"
+      get "/system-rot/releases"
 
       expect(response.body).to include("No releases cataloged yet.")
-      expect(response.body).to include("THECYBERPULSE :: RELEASES")
+      expect(response.body).to include("SYSTEM-ROT :: RELEASES")
     end
   end
 
@@ -52,7 +53,7 @@ RSpec.describe "Artist catalog pages", type: :request do
       track = create(:track, :with_audio, artist: artist, release: release, title: "Neon Drift")
       create(:track, artist: artist, release: release, title: "Silent Cut", track_number: 2)
 
-      get "/thecyberpulse/releases/#{release.slug}"
+      get "/system-rot/releases/#{release.slug}"
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("NEON SIGNALS")
@@ -60,9 +61,9 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response.body).to include('data-controller="track-list"')
       expect(response.body).to include("data-player-id=\"#{track.id}\"")
       expect(response.body).to include("data-player-url=")
-      expect(response.body).to include("data-player-artist=\"The.CyberPul.se\"")
+      expect(response.body).to include("data-player-artist=\"System Rot\"")
       expect(response.body).to include("Neon Drift")
-      expect(response.body).to include("/thecyberpulse/trackz/#{track.slug}")
+      expect(response.body).to include("/system-rot/trackz/#{track.slug}")
       # Track without audio renders, but carries no player URL.
       expect(response.body).to include("Silent Cut")
       expect(response.body).to include("Disc length")
@@ -73,7 +74,7 @@ RSpec.describe "Artist catalog pages", type: :request do
       soon = create(:release, artist: artist, coming_soon: true, name: "Ghost Frequency")
       create(:track, :with_audio, artist: artist, release: soon, title: "Hidden Anthem")
 
-      get "/thecyberpulse/releases/#{soon.slug}"
+      get "/system-rot/releases/#{soon.slug}"
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("SIGNAL INCOMING — TRANSMISSION PENDING")
@@ -89,7 +90,7 @@ RSpec.describe "Artist catalog pages", type: :request do
     it "renders SIGNAL LOST with 404 for unknown releases" do
       artist
 
-      get "/thecyberpulse/releases/does-not-exist"
+      get "/system-rot/releases/does-not-exist"
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include("SIGNAL LOST")
@@ -99,7 +100,7 @@ RSpec.describe "Artist catalog pages", type: :request do
     it "renders SIGNAL LOST for releases hidden from the vault" do
       create(:track, artist: artist, release: release, show_in_pulse_vault: false)
 
-      get "/thecyberpulse/releases/#{release.slug}"
+      get "/system-rot/releases/#{release.slug}"
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include("SIGNAL LOST")
@@ -109,11 +110,11 @@ RSpec.describe "Artist catalog pages", type: :request do
   # The catalog console (2026-10-29): a prototype on XERAEN only —
   # ArtistCatalogController::CONSOLE_CATALOG_SLUGS swaps the templates;
   # the other slugs keep the card grid / fieldset stack above.
-  describe "XERAEN catalog console" do
+  describe "catalog console (XERAEN, The.CyberPul.se)" do
     let(:xeraen) { create(:artist, :xeraen) }
 
     it "renders /xeraen/releases as a ledger — incoming first, numbered rows, no card grid" do
-      ep = create(:release, :ep, artist: xeraen, name: "XORDIUM", slug: "xordium", release_date: Date.new(2124, 10, 17))
+      ep = create(:release, :ep, :with_cover, artist: xeraen, name: "XORDIUM", slug: "xordium", release_date: Date.new(2124, 10, 17))
       create(:track, :with_audio, artist: xeraen, release: ep, title: "XORDIUM", duration: "2:44")
       create(:track, artist: xeraen, release: ep, title: "Settle The Score", track_number: 2, duration: "2:41")
       soon = create(:release, :single, artist: xeraen, coming_soon: true, name: "Refocus", slug: "refocus")
@@ -133,6 +134,8 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response.body).to include('data-command="02" href="/xeraen/releases/xordium"')
       expect(response.body).to include("/xeraen/releases/xordium")
       expect(response.body).to include("EP · 2124-10-17 · 2 tracks · 5:25")
+      expect(response.body).to include('class="cc-cover" tabindex="-1" aria-hidden="true" data-controller="peek" data-peek-src-value="/rails/active_storage/representations/') # the cover thumb peeks its large rendition
+      expect(response.body).to include('data-action="mouseenter-&gt;peek#show mouseleave-&gt;peek#hide"')
       expect(response.body).to include("PENDING TRANSMISSION</span> · 1 track")
       expect(response.body).not_to include("Ghost Record")
       expect(response.body).to include("1 release")
@@ -189,7 +192,7 @@ RSpec.describe "Artist catalog pages", type: :request do
 
       get "/xeraen/releases/refocus"
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:success) # a coming-soon single keeps its release screen — the track page redirects here
       expect(response.body).to include("◌ SIGNAL INCOMING")
       expect(response.body).to include("PENDING TRANSMISSION")
       expect(response.body).to include("// TRACKS · ENCRYPTED //")
@@ -219,10 +222,62 @@ RSpec.describe "Artist catalog pages", type: :request do
     it "resolves a numeric id too" do
       ep = create(:release, artist: xeraen, name: "XORDIUM")
       create(:track, artist: xeraen, release: ep)
+      create(:track, artist: xeraen, release: ep, title: "Settle The Score", track_number: 2) # two tracks: a release screen, not a single
 
       get "/xeraen/releases/#{ep.id}"
 
       expect(response.body).to include('<h1 class="console-bar-title">XORDIUM</h1>')
+    end
+
+    it "folds a single — one released track — into its track page: the ledger links there, the release URL redirects, the view credit lands" do
+      single = create(:release, :single, artist: xeraen, name: "Encrypted Shroud", slug: "encrypted-shroud", release_date: Date.new(2125, 7, 19),
+        label: "hackr.fm", catalog_number: "HFM-007", description: "One signal, no filler.", credits: "Written and produced by XERAEN", notes: "Mastered at 2125 loudness.",
+        streaming_links: {"bandcamp" => "https://xeraen.bandcamp.com/track/encrypted-shroud", "spotify" => "https://open.spotify.com/album/1"})
+      track = create(:track, :with_audio, artist: xeraen, release: single, title: "Encrypted Shroud", duration: "3:12",
+        streaming_links: {"spotify" => "https://open.spotify.com/track/1"})
+      ep = create(:release, :ep, artist: xeraen, name: "XORDIUM", slug: "xordium", release_date: Date.new(2124, 10, 17))
+      create(:track, artist: xeraen, release: ep, title: "XORDIUM")
+      create(:track, artist: xeraen, release: ep, title: "Settle The Score", track_number: 2)
+      hackr = create(:grid_hackr)
+      post "/grid/login", params: {hackr_alias: hackr.hackr_alias, password: "hackthegrid"}
+
+      get "/xeraen/releases"
+
+      expect(response.body).to include("data-command=\"01\" href=\"/xeraen/trackz/#{track.slug}\"") # the single (newest) opens its track page
+      expect(response.body).to include('data-command="02" href="/xeraen/releases/xordium"') # two tracks: a release screen
+      expect(response.body).to include("SINGLE · 2125-07-19 · 1 track · 3:12")
+      expect(response.body).not_to include("/xeraen/releases/encrypted-shroud") # the LATEST row too
+
+      get "/xeraen/releases/encrypted-shroud"
+
+      expect(response).to redirect_to("/xeraen/trackz/#{track.slug}")
+      expect(HackrPageView.where(grid_hackr: hackr, page_type: "release", resource_id: single.id)).to exist # credited before the redirect
+
+      HackrPageView.delete_all
+      get "/xeraen/trackz/#{track.slug}"
+
+      expect(response).to have_http_status(:success)
+      expect(HackrPageView.where(grid_hackr: hackr, page_type: "release", resource_id: single.id)).to exist # and on the track page, which is the release page now
+      expect(response.body).to include('class="console console--xeraen cc-track-page"')
+      expect(response.body).to include("XERAEN · SINGLE")
+      expect(response.body).not_to include("XERAEN · TRACK 01")
+      expect(response.body).to include("[&lt;] RELEASES")
+      expect(response.body).not_to include("[&lt;] ENCRYPTED SHROUD")
+      expect(response.body).to include('Encrypted Shroud <span class="console-dim">· SINGLE</span>') # the RELEASE row, no link
+      expect(response.body).not_to include('<span class="console-dim">of 01</span>')
+      expect(response.body).to include("hackr.fm")
+      expect(response.body).to include("HFM-007")
+      expect(response.body).to include("// DESCRIPTION //")
+      expect(response.body).to include("One signal, no filler.")
+      expect(response.body).to include("// CREDITS //")
+      expect(response.body).to include("Written and produced by XERAEN")
+      expect(response.body).to include("// NOTES //")
+      expect(response.body).to include("Mastered at 2125 loudness.")
+      expect(response.body).to include("[BC]") # the release's frequency
+      expect(response.body).to include("https://open.spotify.com/track/1") # the track's wins the shared platform
+      expect(response.body).not_to include("https://open.spotify.com/album/1")
+      expect(response.body).not_to include("// ALSO ON")
+      expect(response.body).not_to include('href="/xeraen/releases/encrypted-shroud"') # nothing points back at the folded release screen
     end
 
     it "renders /xeraen/trackz/:slug as a console screen on the player row contract" do
@@ -286,7 +341,10 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response.body).not_to include("[VOD]")
       expect(response.body).not_to include("[▶ VIDEO]")
       expect(response.body).not_to include("Dry Run")
-      expect(response.body).to include('01 <span class="console-dim">of 01</span>')
+      expect(response.body).to include("XERAEN · SINGLE") # one released track: this page is the release's too
+      expect(response.body).to include("[&lt;] RELEASES")
+      expect(response.body).not_to include('<span class="console-dim">of 01</span>')
+      expect(response.body).to include("// DESCRIPTION //") # the release's
       expect(response.body).to include("[LISTEN]")
       expect(response.body).not_to include("type a track number")
     end
@@ -308,10 +366,43 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response.body).not_to include("track-detail-window")
     end
 
+    it "serves The.CyberPul.se on the same screens with its own destinations" do
+      ep = create(:release, :ep, artist: tcp, name: "Neon Signals", slug: "neon-signals", release_date: Date.new(2125, 3, 3))
+      track = create(:track, :with_audio, artist: tcp, release: ep, title: "Neon Drift", duration: "3:45")
+      create(:track, artist: tcp, release: ep, title: "Static Bloom", track_number: 2, duration: "4:02") # two tracks: a release screen, not a single
+
+      get "/thecyberpulse/releases"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('class="console console--thecyberpulse cc-index"')
+      expect(response.body).not_to include("release-list-grid")
+      expect(response.body).to include("[&lt;] TCP")
+      expect(response.body).to include("/vault?filter=The.CyberPul.se")
+      expect(response.body).to include('data-command="01" href="/thecyberpulse/releases/neon-signals"')
+      expect(response.body).to include('data-command="vidz"')
+      expect(response.body).to include('data-command="grid"')
+      expect(response.body).not_to include('data-command="releases"')
+      expect(response.body).to include("(01)")
+      expect(response.body).to include("(tcp bio vidz vault grid xeraen fnet)")
+
+      get "/thecyberpulse/releases/neon-signals"
+
+      expect(response.body).to include('class="console console--thecyberpulse cc-release"')
+      expect(response.body).to include("href=\"/thecyberpulse/trackz/#{track.slug}\"")
+      expect(response.body).to include("► PLAY")
+
+      get "/thecyberpulse/trackz/#{track.slug}"
+
+      expect(response.body).to include('class="console console--thecyberpulse cc-track-page"')
+      expect(response.body).not_to include("TRACK INFO")
+      expect(response.body).to include("[&lt;] NEON SIGNALS")
+      expect(response.body).to include('data-command="tcp"')
+    end
+
     it "leaves the other slugs on the shared catalog" do
       create(:track, artist: artist, release: release)
 
-      get "/thecyberpulse/releases"
+      get "/system-rot/releases"
 
       expect(response.body).to include("release-list-grid")
       expect(response.body).not_to include("cc-index")
@@ -323,7 +414,7 @@ RSpec.describe "Artist catalog pages", type: :request do
       track = create(:track, :with_audio, artist: artist, release: release, title: "Neon Drift",
         lyrics: "Static hums in the wires", duration: "3:45")
 
-      get "/thecyberpulse/trackz/#{track.slug}"
+      get "/system-rot/trackz/#{track.slug}"
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("NEON DRIFT")
@@ -343,15 +434,15 @@ RSpec.describe "Artist catalog pages", type: :request do
       soon = create(:release, artist: artist, coming_soon: true)
       track = create(:track, artist: artist, release: soon)
 
-      get "/thecyberpulse/trackz/#{track.slug}"
+      get "/system-rot/trackz/#{track.slug}"
 
-      expect(response).to redirect_to("/thecyberpulse/releases/#{soon.slug}")
+      expect(response).to redirect_to("/system-rot/releases/#{soon.slug}")
     end
 
     it "renders SIGNAL LOST with 404 for unknown tracks" do
       artist
 
-      get "/thecyberpulse/trackz/does-not-exist"
+      get "/system-rot/trackz/does-not-exist"
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include("SIGNAL LOST")
@@ -361,34 +452,39 @@ RSpec.describe "Artist catalog pages", type: :request do
 
   describe "GET /thecyberpulse/vidz" do
     it "lists VODs with livestream badges and hides streams without a VOD" do
-      create(:hackr_stream, :livestream_with_vod, artist: artist, title: "Broadcast One")
-      create(:hackr_stream, artist: artist, title: "No VOD Yet")
+      create(:hackr_stream, :livestream_with_vod, artist: tcp, title: "Broadcast One")
+      create(:hackr_stream, artist: tcp, title: "No VOD Yet")
+      create(:hackr_stream, artist: tcp, title: "Thumbed", vod_url: "https://www.youtube.com/embed/dQw4w9WgXcQ", started_at: 3.days.ago)
 
       get "/thecyberpulse/vidz"
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("The.CyberPul.se :: VIDZ")
+      expect(response.body).to include('class="console console--thecyberpulse cc-vidz"')
       expect(response.body).to include("Broadcast One")
-      expect(response.body).to include("Livestream")
+      expect(response.body).to include("LIVESTREAM")
       expect(response.body).not_to include("No VOD Yet")
+      expect(response.body).to include("// ARCHIVE //")
+      expect(response.body).to include('data-command="01"')
+      expect(response.body).to include("2 recordings")
+      expect(response.body).to include('data-controller="peek" data-peek-src-value="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" data-peek-fallback-value="https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg"') # the thumb peeks the full frame
     end
 
     it "renders the empty state when the artist has no VODs" do
-      artist
+      tcp
 
       get "/thecyberpulse/vidz"
 
-      expect(response.body).to include("No videos available yet.")
+      expect(response.body).to include("NO RECORDINGS ARCHIVED YET")
     end
 
     it "lists XERAEN's recordings in the archive, not other artists'" do
-      artist
+      tcp
       create(:hackr_stream, :with_vod, artist: create(:artist, :xeraen), title: "Chaddin Session")
       create(:hackr_stream, :with_vod, artist: create(:artist), title: "Guest Set")
 
       get "/thecyberpulse/vidz"
 
-      expect(response.body).to include("The.CyberPul.se :: VIDZ")
+      expect(response.body).to include('class="console console--thecyberpulse cc-vidz"')
       expect(response.body).to include("Chaddin Session")
       expect(response.body).not_to include("Guest Set")
     end
@@ -406,8 +502,9 @@ RSpec.describe "Artist catalog pages", type: :request do
 
   describe "GET /thecyberpulse/vidz/:id" do
     it "renders the click-to-play player wired for the watch credit" do
-      stream = create(:hackr_stream, artist: artist, title: "Broadcast One",
+      stream = create(:hackr_stream, artist: tcp, title: "Broadcast One",
         vod_url: "https://www.youtube.com/embed/dQw4w9WgXcQ")
+      two = create(:hackr_stream, :with_vod, artist: tcp, title: "Broadcast Two", started_at: 2.days.ago)
 
       get "/thecyberpulse/vidz/#{stream.id}"
 
@@ -416,30 +513,36 @@ RSpec.describe "Artist catalog pages", type: :request do
       expect(response.body).to include('data-controller="vod-player"')
       expect(response.body).to include('data-vod-player-video-id-value="dQw4w9WgXcQ"')
       expect(response.body).to include("data-vod-player-watch-url-value=\"/api/artists/thecyberpulse/vods/#{stream.id}/watch\"")
-      expect(response.body).to include("← Back to Videos")
+      expect(response.body).to include("[&lt;] VIDZ")
+      expect(response.body).to include("// PLAYBACK //")
+      expect(response.body).to include("// ALSO IN THE ARCHIVE //")
+      expect(response.body).to include("data-command=\"02\" href=\"/thecyberpulse/vidz/#{two.id}\"")
+      expect(response.body).not_to include('data-command="01"') # the page's own recording is not a row
     end
 
     it "falls back to a YouTube link when the video id is unrecognizable" do
-      stream = create(:hackr_stream, artist: artist, vod_url: "https://example.com/not-youtube")
+      stream = create(:hackr_stream, artist: tcp, vod_url: "https://example.com/not-youtube")
 
       get "/thecyberpulse/vidz/#{stream.id}"
 
       expect(response.body).to include("Unable to load video player.")
-      expect(response.body).to include("Watch on YouTube")
+      expect(response.body).to include("Open the recording ↗")
+      expect(response.body).to include("example.com")
     end
 
     it "renders the error state with 404 for unknown VODs" do
-      artist
+      tcp
 
       get "/thecyberpulse/vidz/999999"
 
       expect(response).to have_http_status(:not_found)
-      expect(response.body).to include("Failed to load video")
-      expect(response.body).to include("Back to Videos")
+      expect(response.body).to include("// SIGNAL LOST //")
+      expect(response.body).to include("Recording not found.")
+      expect(response.body).to include('class="console console--thecyberpulse cc-vidz"')
     end
 
     it "shows an XERAEN recording on the archive, crediting the watch against XERAEN" do
-      artist
+      tcp
       stream = create(:hackr_stream, artist: create(:artist, :xeraen), title: "Chaddin Session",
         vod_url: "https://www.youtube.com/embed/dQw4w9WgXcQ")
 
@@ -458,9 +561,9 @@ RSpec.describe "Artist catalog pages", type: :request do
     end
 
     it "404s for a stream outside the archive or without a recording" do
-      artist
+      tcp
       elsewhere = create(:hackr_stream, :with_vod, artist: create(:artist))
-      unrecorded = create(:hackr_stream, artist: artist, vod_url: nil)
+      unrecorded = create(:hackr_stream, artist: tcp, vod_url: nil)
 
       get "/thecyberpulse/vidz/#{elsewhere.id}"
       expect(response).to have_http_status(:not_found)

@@ -1,6 +1,7 @@
-<%# GET /xeraen/releases/:id — a release as a console screen (2026-10-29,
-    a prototype on XERAEN only; release.html.erb's fieldset stack still
-    serves the other slugs — ArtistCatalogController::CONSOLE_CATALOG_SLUGS).
+<%# GET /:artist_slug/releases/:id for the console artists (XERAEN, then
+    The.CyberPul.se — ArtistCatalogController::CONSOLE_CATALOG_SLUGS;
+    2026-10-29): a release as a console screen. release.html.erb's
+    fieldset stack still serves the other slugs.
     Bar, the cover beside the status rows, // DESCRIPTION // and
     // CREDITS // prose, // TRACKS // on the player row contract
     (track-list controller + data-player-*, ► PLAY repaints; a coming-soon
@@ -15,7 +16,7 @@
 <% if @release.nil? %>
   <% content_for :title, "Signal Lost — hackr.tv" %>
   <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-    <div class="console console--xeraen cc-release" data-controller="terminal" data-boot="done">
+    <div class="console console--<%= slug %> cc-release" data-controller="terminal" data-boot="done">
       <div class="console-bar">
         <h1 class="console-bar-title"><%= artist_name %></h1>
         <span class="console-bar-sub">RELEASE · SIGNAL LOST</span>
@@ -23,8 +24,8 @@
       </div>
       <div class="console-rule"><span>// SIGNAL LOST //</span></div>
       <p class="cc-lost">Release not found. <span class="console-dim">· nothing on record under that name</span></p>
-      <%= render "artist_pages/xeraen_destinations" %>
-      <%= render "shared/console_prompt", hint: safe_join(["type a tag ", tag.span("(xeraen bio releases vault tcp fnet)", class: "console-dim"), " · enter · ? help"]) %>
+      <%= render "artist_pages/console_destinations", artist: slug %>
+      <%= render "shared/console_prompt", hint: console_prompt_hint(slug) %>
     </div>
   <% end %>
 <% else %>
@@ -41,7 +42,7 @@
   <% numbers = @tracks.map { |t| format("%02d", t.track_number.to_i) } %>
 
   <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-    <div class="console console--xeraen cc-release" data-controller="terminal" data-boot="pending"
+    <div class="console console--<%= slug %> cc-release" data-controller="terminal" data-boot="pending"
       data-action="keydown@document->terminal#skip click->terminal#skip">
       <div class="console-bar console-line" data-terminal-target="line">
         <h1 class="console-bar-title"><%= @release.name %></h1>
@@ -54,7 +55,7 @@
       </div>
 
       <div class="cc-head">
-        <div class="cc-art console-line <%= "cc-art--incoming" if coming_soon %>" data-terminal-target="line">
+        <div class="cc-art console-line <%= "cc-art--incoming" if coming_soon %>" data-terminal-target="line" <%= tag.attributes(data: peek_attrs(url_for(@release.cover_large))) if @release.cover_image.attached? %>>
           <% if @release.cover_image.attached? %>
             <%= image_tag url_for(@release.cover_standard), alt: @release.name, class: "cc-art-img" %>
           <% else %>
@@ -177,13 +178,10 @@
         </section>
       <% end %>
 
-      <%= render "artist_pages/xeraen_destinations" %>
+      <%= render "artist_pages/console_destinations", artist: slug %>
 
       <div class="console-rule console-line" data-terminal-target="line"><span>// END OF RECORD //</span></div>
-      <%= render "shared/console_prompt", hint: safe_join([
-        (coming_soon || numbers.empty?) ? "" : safe_join(["type a track number ", tag.span("(#{numbers.join(" ")})", class: "console-dim"), " or "]),
-        "type a tag ", tag.span("(xeraen bio releases vault tcp fnet)", class: "console-dim"), " · enter · ? help"
-      ]) %>
+      <%= render "shared/console_prompt", hint: console_prompt_hint(slug, numbers: coming_soon ? [] : numbers) %>
     </div>
   <% end %>
 <% end %>
