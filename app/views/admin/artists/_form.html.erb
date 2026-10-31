@@ -1,19 +1,10 @@
-<%# The artist record's fields as console status rows. Locals: f, artist. %>
+<%# The artist record's fields as console status rows (ConsoleFormBuilder
+    rc_* rows). Locals: f, artist. %>
 <div class="console-status">
-  <div class="console-status-row rc-field">
-    <label class="console-key" for="artist_name">NAME</label>
-    <span class="console-val"><%= f.text_field :name, class: "rc-input", required: true, autocomplete: "off" %><%= root_errors(artist, :name) %></span>
-  </div>
-  <div class="console-status-row rc-field">
-    <label class="console-key" for="artist_slug">SLUG</label>
-    <span class="console-val"><%= f.text_field :slug, class: "rc-input", required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots" %><span class="rc-hint">/<%= artist.slug.presence || "slug" %> · lowercase, hyphens · the public pages are routed per slug</span><%= root_errors(artist, :slug) %></span>
-  </div>
-  <div class="console-status-row rc-field">
-    <label class="console-key" for="artist_artist_type">TYPE</label>
-    <span class="console-val"><%= f.select :artist_type, Artist::ARTIST_TYPES.map { |t| [t.upcase, t] }, {}, class: "rc-select" %><span class="rc-hint">BAND is listed on /f/net · OST and VOICEOVER stay off the directory (the vault is independent)</span><%= root_errors(artist, :artist_type) %></span>
-  </div>
-  <div class="console-status-row rc-field">
-    <label class="console-key" for="artist_genre">GENRE</label>
-    <span class="console-val"><%= f.text_field :genre, class: "rc-input", autocomplete: "off", placeholder: "Industrial / Dark Synth" %></span>
-  </div>
+  <%= f.rc_text_field :name, required: true, autocomplete: "off" %>
+  <%= f.rc_text_field :slug, required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots",
+    hint: "/#{artist.slug.presence || "slug"} · lowercase, hyphens · the public pages are routed per slug" %>
+  <%= f.rc_select :artist_type, Artist::ARTIST_TYPES.map { |t| [t.upcase, t] }, {}, label: "TYPE",
+    hint: "BAND is listed on /f/net · OST and VOICEOVER stay off the directory (the vault is independent)" %>
+  <%= f.rc_text_field :genre, autocomplete: "off", placeholder: "Industrial / Dark Synth" %>
 </div>

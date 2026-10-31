@@ -4,7 +4,9 @@ class Admin::ApplicationController < ApplicationController
 
   layout "admin"
 
-  default_form_builder TuiFormBuilder
+  # The /root console's rc_* fields (console-ui-for-all-admin, 2026-10-30);
+  # the legacy tui_* family still answers through its superclass.
+  default_form_builder ConsoleFormBuilder
 
   before_action :require_admin
 

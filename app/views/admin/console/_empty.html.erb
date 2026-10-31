@@ -1,0 +1,3 @@
+<%# An empty ledger's line: the text, a dim hint after it. Locals: text,
+    hint (optional). %>
+<p class="rc-empty"><%= text %><% if local_assigns[:hint].present? %> <span class="console-dim">· <%= hint %></span><% end %></p>

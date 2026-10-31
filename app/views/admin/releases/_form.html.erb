@@ -1,10 +1,10 @@
 <%# The release record's fields on the console: the cover column (art +
     [^] REPLACE / UPLOAD inside this form, [x] REMOVE pointing at the
-    hidden purge form — a button_to can't nest) beside the status rows,
-    then // DESCRIPTION // // CREDITS // // NOTES // as growing textareas
-    and // FREQUENCIES // (admin/music/_frequencies_fields). The commit
-    row belongs to the caller. Locals: f, release; @artists for the
-    select. %>
+    hidden purge form — a button_to can't nest) beside the status rows
+    (ConsoleFormBuilder rc_* rows), then // DESCRIPTION // // CREDITS //
+    // NOTES // as growing textareas and // FREQUENCIES //
+    (admin/music/_frequencies_fields). The commit row belongs to the
+    caller. Locals: f, release; @artists for the select. %>
 <% cover = root_cover_ready?(release) %>
 <div class="cc-head">
   <div class="rc-art-stack">
@@ -28,60 +28,26 @@
   </div>
 
   <div class="console-status">
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_name">NAME</label>
-      <span class="console-val"><%= f.text_field :name, class: "rc-input", required: true, autocomplete: "off" %><%= root_errors(release, :name) %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_slug">SLUG</label>
-      <span class="console-val"><%= f.text_field :slug, class: "rc-input", required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots" %><span class="rc-hint">/<%= release.artist&.slug || "artist" %>/releases/<%= release.slug.presence || "slug" %> · unique per artist</span><%= root_errors(release, :slug) %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_artist_id">ARTIST</label>
-      <span class="console-val"><%= f.select :artist_id, options_for_select(@artists.map { |a| [a.name, a.id] }, release.artist_id), {include_blank: "— select artist —"}, class: "rc-select", required: true %><%= root_errors(release, :artist) %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_release_type">TYPE</label>
-      <span class="console-val"><%= f.select :release_type, options_for_select(Admin::MusicConsoleHelper::RELEASE_TYPES.map { |t| [t.upcase, t] }, release.release_type), {include_blank: "—"}, class: "rc-select" %><span class="rc-hint">a one-track SINGLE renders as its track page on the console catalog</span></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_release_date">RELEASED</label>
-      <span class="console-val"><%= f.date_field :release_date, class: "rc-input rc-input--date" %><span class="rc-hint">blank = undated</span></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_label">LABEL</label>
-      <span class="console-val"><%= f.text_field :label, class: "rc-input", autocomplete: "off", placeholder: "hackr.fm" %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_catalog_number">CATALOG #</label>
-      <span class="console-val"><%= f.text_field :catalog_number, class: "rc-input rc-input--short", autocomplete: "off", placeholder: "HFM-001" %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_media_format">FORMAT</label>
-      <span class="console-val"><%= f.text_field :media_format, class: "rc-input", autocomplete: "off", placeholder: "Digital" %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="release_classification">CLASS</label>
-      <span class="console-val"><%= f.text_field :classification, class: "rc-input", autocomplete: "off", placeholder: "Transmission" %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <span class="console-key">STATUS</span>
-      <span class="console-val">
-        <label class="rc-check"><%= f.check_box :coming_soon %> ◌ SIGNAL INCOMING</label>
-        <span class="rc-hint">masks the record on the public pages · the tracklist reads encrypted · out of the vault and /fm</span>
-      </span>
-    </div>
+    <%= f.rc_text_field :name, required: true, autocomplete: "off" %>
+    <%= f.rc_text_field :slug, required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots",
+      hint: "/#{release.artist&.slug || "artist"}/releases/#{release.slug.presence || "slug"} · unique per artist" %>
+    <%= f.rc_select :artist_id, options_for_select(@artists.map { |a| [a.name, a.id] }, release.artist_id), {include_blank: "— select artist —"}, required: true %>
+    <%= f.rc_select :release_type, options_for_select(Admin::MusicConsoleHelper::RELEASE_TYPES.map { |t| [t.upcase, t] }, release.release_type), {include_blank: "—"},
+      label: "TYPE", hint: "a one-track SINGLE renders as its track page on the console catalog" %>
+    <%= f.rc_date_field :release_date, label: "RELEASED", hint: "blank = undated" %>
+    <%= f.rc_text_field :label, autocomplete: "off", placeholder: "hackr.fm" %>
+    <%= f.rc_text_field :catalog_number, label: "CATALOG #", width: :short, autocomplete: "off", placeholder: "HFM-001" %>
+    <%= f.rc_text_field :media_format, label: "FORMAT", autocomplete: "off", placeholder: "Digital" %>
+    <%= f.rc_text_field :classification, label: "CLASS", autocomplete: "off", placeholder: "Transmission" %>
+    <%= f.rc_flags("STATUS", hint: "masks the record on the public pages · the tracklist reads encrypted · out of the vault and /fm") do %>
+      <%= f.rc_check_box :coming_soon, label: "◌ SIGNAL INCOMING" %>
+    <% end %>
   </div>
 </div>
 
-<div class="console-rule"><span>// DESCRIPTION //</span></div>
-<%= f.text_area :description, class: "rc-textarea", rows: 4, data: {controller: "autogrow", action: "input->autogrow#grow"} %>
-
-<div class="console-rule"><span>// CREDITS //</span></div>
-<%= f.text_area :credits, class: "rc-textarea", rows: 3, data: {controller: "autogrow", action: "input->autogrow#grow"} %>
-
-<div class="console-rule"><span>// NOTES //</span></div>
-<%= f.text_area :notes, class: "rc-textarea", rows: 3, data: {controller: "autogrow", action: "input->autogrow#grow"} %>
+<%= f.rc_text_area :description, rows: 4 %>
+<%= f.rc_text_area :credits, rows: 3 %>
+<%= f.rc_text_area :notes, rows: 3 %>
 
 <%= render "admin/music/frequencies_fields", f: f, links: release.streaming_links,
   hint: "all blank = the public page aggregates the tracks' links instead" %>

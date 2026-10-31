@@ -1,11 +1,12 @@
-<%# The /root music screens' destination rows (the home console's idiom):
-    one aligned line per section, the [TAG] doubling as the prompt command.
-    Rows: Admin::MusicConsoleHelper::ROOT_DESTINATIONS. Locals: except —
-    the screen's own tag, left out. %>
+<%# A /root console screen's destination rows (the home console's idiom):
+    one aligned line per screen of the section, the [TAG] doubling as
+    the prompt command, [ROOT] last. Rows: Admin::ConsoleHelper::
+    ROOT_SECTIONS. Locals: section (the ROOT_SECTIONS key), except — the
+    screen's own tag, left out. %>
 <% except = local_assigns[:except] %>
 <section class="console-section" aria-label="Destinations">
   <div class="console-rule console-line" data-terminal-target="line"><span>// DESTINATIONS //</span></div>
-  <% root_destinations(except: except).each do |tag_name, href, name, desc| %>
+  <% root_destinations(section, except: except).each do |tag_name, href, name, desc| %>
     <div class="console-row console-line" data-terminal-target="line">
       <span class="console-tag">[<%= tag_name %>]</span>
       <%= link_to name, href, class: "console-link", data: {command: tag_name.downcase} %>

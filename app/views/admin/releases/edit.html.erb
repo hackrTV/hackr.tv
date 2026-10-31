@@ -25,7 +25,7 @@
       <%= link_to "[HISTORY]", history_admin_release_path(slug), class: "console-bar-link" %>
     </span>
   </div>
-  <%= render "admin/music/flash" %>
+  <%= render "admin/console/flash" %>
 
   <%= form_with model: @release, url: admin_release_path(slug), method: :patch, local: true do |f| %>
     <%= render "form", f: f, release: @release %>
@@ -52,10 +52,10 @@
     </div>
   </section>
 
-  <%= render "admin/music/destinations" %>
+  <%= render "admin/console/destinations", section: :music %>
 
   <div class="console-rule"><span>// END OF RECORD //</span></div>
-  <%= render "shared/console_prompt", hint: root_prompt_hint(numbers: numbers, noun: "a track number", extra: ["new"]) %>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:music, numbers: numbers, noun: "a track number", extra: ["new"]) %>
 
   <div class="rc-hidden-forms">
     <% if root_cover_ready?(@release) %>

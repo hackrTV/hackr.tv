@@ -37,6 +37,13 @@ module HackrRails
     # config.eager_load_paths << Rails.root.join("extras")
     config.autoload_paths << Rails.root.join("app/observers")
 
+    # PaperTrail stores each version's object as YAML and loads it with
+    # YAML.safe_load against this list (Rails 7.1+ defaults it to
+    # [Symbol]); a Time inside raised Psych::DisallowedClass, which
+    # Admin::Versionable rescued into "no changes" on every /root HISTORY
+    # row (found 2026-10-30, console-ui-for-all-admin Phase 0).
+    config.active_record.yaml_column_permitted_classes = [Symbol, Date, Time, ActiveSupport::TimeWithZone, ActiveSupport::HashWithIndifferentAccess, BigDecimal]
+
     # Active Record Encryption (used for TOTP secret storage)
     config.active_record.encryption.primary_key = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
     config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]

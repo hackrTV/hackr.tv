@@ -14,7 +14,7 @@ module Admin::Versionable
 
         @model_name = model_class.model_name.human
         @model_class = model_class
-        @back_path = url_for(action: :index)
+        @back_path = url_for(action: :index, only_path: true)
         @entries = build_timeline(@record, children)
 
         render "admin/shared/version_history"

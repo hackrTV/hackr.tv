@@ -1,103 +1,71 @@
-<%= render TuiWindowComponent.new(title: "/root/history :: #{@model_name.upcase} VERSION HISTORY", variant: :admin, width: 1200) do %>
+<%# admin/shared/version_history — a Versionable record's PaperTrail
+    timeline as a console screen (2026-10-30; Admin::Versionable#history
+    renders it for every versioned resource). Bar (the record's name ·
+    ROOT · <MODEL> · HISTORY · slug; [<] BACK to the ledger, [EDIT] the
+    record — the prompt's back / edit), the VERSIONS readout, the
+    // VERSIONS // ledger ([NN] · CREATE / UPDATE / DESTROY · SOURCE (a
+    child row names its model) · BY · WHEN · the first eight changed
+    keys as `key: from > to` lines, +N more), the > prompt. Assigns:
+    @record, @model_name, @entries ({version:, source:, changes:},
+    newest first), @back_path. %>
+<% name = @record.respond_to?(:name) ? @record.name : (@record.respond_to?(:title) ? @record.title : "##{@record.id}") %>
+<% content_for :title, "/root/history :: #{name}" %>
+<% child_count = @entries.count { |entry| entry[:source] != @model_name } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · #{@model_name.upcase} · HISTORY#{" · #{@record.slug}" if @record.respond_to?(:slug)}"} do %>
+    <%= link_to "[<] BACK", @back_path, class: "console-bar-link", data: {command: "back"} %>
+    <%= link_to "[EDIT]", url_for(action: :edit, id: @record, only_path: true), class: "console-bar-link", data: {command: "edit"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px;">
-        <span class="cyan-255-text" style="font-size: 1.1em;"><%= @record.respond_to?(:name) ? @record.name : @record.respond_to?(:title) ? @record.title : "##{@record.id}" %></span>
-        <% if @record.respond_to?(:slug) %>
-          <span style="color: #666; font-family: monospace; margin-left: 10px;"><%= @record.slug %></span>
-        <% end %>
-      </div>
-
-      <% if @entries.empty? %>
-        <div style="padding: 20px; color: #666;">
-          No version history recorded for this record.
-        </div>
-      <% else %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Event</th>
-                <th style="text-align: left;">Source</th>
-                <th style="text-align: left;">Changed By</th>
-                <th style="text-align: left;">Changed At</th>
-                <th style="text-align: left;">Changes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @entries.each_with_index do |entry, i| %>
-                <% version = entry[:version] %>
-                <% changes = entry[:changes] %>
-                <% is_child = entry[:source] != @model_name %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td style="padding: 8px 4px;">
-                    <% case version.event %>
-                    <% when "create" %>
-                      <span class="green-255-text">CREATE</span>
-                    <% when "update" %>
-                      <span class="yellow-168-text">UPDATE</span>
-                    <% when "destroy" %>
-                      <span class="red-255-text">DESTROY</span>
-                    <% end %>
-                  </td>
-                  <td style="padding: 8px 4px; white-space: nowrap;">
-                    <% if is_child %>
-                      <span style="color: #22d3ee; font-size: 0.85em;"><%= entry[:source] %></span>
-                    <% else %>
-                      <span style="color: #888;"><%= entry[:source] %></span>
-                    <% end %>
-                  </td>
-                  <td style="padding: 8px 4px;">
-                    <% if version.whodunnit.present? %>
-                      <% hackr = GridHackr.find_by(id: version.whodunnit) %>
-                      <span class="cyan-255-text"><%= hackr&.hackr_alias || "hackr##{version.whodunnit}" %></span>
-                    <% else %>
-                      <span style="color: #666;">system</span>
-                    <% end %>
-                  </td>
-                  <td style="padding: 8px 4px; color: #888; font-family: monospace; white-space: nowrap;">
-                    <%= version.created_at.strftime("%Y-%m-%d %H:%M:%S") %>
-                  </td>
-                  <td style="padding: 8px 4px; max-width: 500px;">
-                    <% if changes.any? %>
-                      <% changes.first(8).each do |change| %>
-                        <div style="margin-bottom: 4px;">
-                          <span style="color: #a78bfa; font-family: monospace;"><%= change[:key].delete_suffix("_id") %></span>
-                          <% if change[:from].present? && change[:to].present? %>
-                            <span style="color: #666;"> : </span>
-                            <span class="red-255-text" style="font-family: monospace; font-size: 0.85em; text-decoration: line-through;"><%= truncate(change[:from].to_s, length: 60) %></span>
-                            <span style="color: #666;"> &rarr; </span>
-                            <span class="green-255-text" style="font-family: monospace; font-size: 0.85em;"><%= truncate(change[:to].to_s, length: 60) %></span>
-                          <% elsif change[:to].present? %>
-                            <span style="color: #666;"> : </span>
-                            <span class="green-255-text" style="font-family: monospace; font-size: 0.85em;"><%= truncate(change[:to].to_s, length: 60) %></span>
-                          <% elsif change[:from].present? %>
-                            <span style="color: #666;"> : </span>
-                            <span class="red-255-text" style="font-family: monospace; font-size: 0.85em; text-decoration: line-through;"><%= truncate(change[:from].to_s, length: 60) %></span>
-                            <span style="color: #666;"> &rarr; </span>
-                            <span style="color: #666;">null</span>
-                          <% end %>
-                        </div>
-                      <% end %>
-                      <% if changes.size > 8 %>
-                        <span style="color: #666;">+<%= changes.size - 8 %> more</span>
-                      <% end %>
-                    <% elsif version.event == "create" && !is_child %>
-                      <span style="color: #666;">initial creation</span>
-                    <% else %>
-                      <span style="color: #666;">—</span>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; display: flex; gap: 10px;">
-        <%= tui_button "<- Back", @back_path, color: :green %>
-        <%= tui_button "Edit", url_for(action: :edit, id: @record), color: :cyan %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">VERSIONS</span>
+      <span class="console-val"><%= pluralize(@entries.size, "version") %> <span class="console-dim">· newest first<% if child_count > 0 %> · <%= pluralize(child_count, "child change") %><% end %></span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--versions" aria-label="Versions">
+    <div class="console-rule"><span>// VERSIONS //</span></div>
+    <% if @entries.empty? %>
+      <%= render "admin/console/empty", text: "NO VERSIONS ON RECORD", hint: "nothing has changed since tracking began" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>NN</span><span>EVENT</span><span>SOURCE</span><span>BY</span><span>WHEN</span><span>CHANGES</span>
+      </div>
+    <% end %>
+    <% @entries.each_with_index do |entry, i| %>
+      <% version = entry[:version] %>
+      <% changes = entry[:changes] %>
+      <% child = entry[:source] != @model_name %>
+      <% who = version.whodunnit.present? ? (GridHackr.find_by(id: version.whodunnit)&.hackr_alias || "hackr##{version.whodunnit}") : nil %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= root_num(i, total: @entries.size) %>]</span>
+        <span class="rc-cell <%= {"create" => "rc-on", "update" => "rc-star", "destroy" => "rc-bad"}[version.event] %>"><%= version.event.upcase %></span>
+        <span class="rc-cell <%= "rc-hot" if child %>"><%= entry[:source] %></span>
+        <span class="rc-cell <%= who ? "rc-hot" : "rc-off" %>"><%= who || "system" %></span>
+        <span class="rc-cell"><%= version.created_at.strftime("%Y-%m-%d %H:%M:%S") %></span>
+        <div class="rc-diff">
+          <% if changes.any? %>
+            <% changes.first(8).each do |change| %>
+              <div class="rc-diff-line"><span class="rc-diff-key"><%= change[:key].delete_suffix("_id") %></span>:
+                <% if change[:from].present? %><del class="rc-del"><%= truncate(change[:from].to_s, length: 60) %></del><% end %>
+                <% if change[:from].present? %> &gt; <% end %>
+                <% if change[:to].present? %><ins class="rc-add"><%= truncate(change[:to].to_s, length: 60) %></ins><% elsif change[:from].present? %><span class="console-dim">null</span><% end %></div>
+            <% end %>
+            <% if changes.size > 8 %>
+              <div class="rc-diff-line console-dim">+<%= changes.size - 8 %> more</div>
+            <% end %>
+          <% elsif version.event == "create" && !child %>
+            <div class="rc-diff-line">initial creation</div>
+          <% else %>
+            <div class="rc-diff-line">—</div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </section>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: safe_join(["type ", tag.span("back", class: "console-dim"), " or ", tag.span("edit", class: "console-dim"), " · enter · ? help"]) %>
+</div>

@@ -1,77 +1,8 @@
-<style>
-  .admin-combobox {
-    position: relative;
-  }
-  .admin-combobox-input {
-    width: 100%;
-    padding: 8px;
-    font-family: "Terminus", monospace;
-    font-size: inherit;
-    background: #0a0a0a;
-    border: 1px solid #333;
-    color: #fbbf24;
-  }
-  .admin-combobox-input:focus {
-    outline: none;
-    border-color: #fbbf24;
-  }
-  .admin-combobox-input.selected {
-    color: #34d399;
-    border-color: #34d399;
-  }
-  .admin-combobox-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    max-height: 350px;
-    overflow-y: auto;
-    background: #111;
-    border: 1px solid #333;
-    border-top: none;
-    font-family: "Terminus", monospace;
-  }
-  .admin-combobox-dropdown.open {
-    display: block;
-    border-color: #fbbf24;
-  }
-  .admin-combobox-group {
-    padding: 4px 12px;
-    color: #888;
-    font-size: 0.75em;
-    background: #0a0a0a;
-    border-top: 1px solid #1a1a1a;
-    position: sticky;
-    top: 0;
-  }
-  .admin-combobox-option {
-    padding: 5px 12px 5px 20px;
-    cursor: pointer;
-    color: #ccc;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .admin-combobox-option:hover,
-  .admin-combobox-option.active {
-    background: #1a1a1a;
-  }
-  .admin-combobox-option .cb-name {
-    color: #fbbf24;
-  }
-  .admin-combobox-option .cb-meta {
-    color: #555;
-    font-size: 0.85em;
-  }
-  .admin-combobox-empty {
-    padding: 8px 12px;
-    color: #555;
-    font-style: italic;
-  }
-</style>
-
+<%# window.AdminCombobox — the typed picker the grid forms, the warp /
+    item / tester screens and the map editor share (each caller renders
+    this partial once and calls AdminCombobox.init per field). Rules:
+    root_console.css .admin-combobox* (on tokens; the <style> left this
+    partial 2026-10-30). %>
 <script nonce="<%= content_security_policy_nonce %>">
   window.AdminCombobox = (function() {
     function esc(s) {

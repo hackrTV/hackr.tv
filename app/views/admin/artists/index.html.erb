@@ -16,7 +16,7 @@
       <%= link_to "[>] FNET", "/f/net", class: "console-bar-link" %>
     </span>
   </div>
-  <%= render "admin/music/flash" %>
+  <%= render "admin/console/flash" %>
 
   <div class="console-status">
     <div class="console-status-row">
@@ -52,8 +52,8 @@
     <% end %>
   </section>
 
-  <%= render "admin/music/destinations", except: "ARTISTS" %>
+  <%= render "admin/console/destinations", section: :music, except: "ARTISTS" %>
 
   <div class="console-rule"><span>// EVERY ACT COMMITTED TO RECORD //</span></div>
-  <%= render "shared/console_prompt", hint: root_prompt_hint(except: "ARTISTS", numbers: numbers, noun: "an artist number", extra: ["new"]) %>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:music, except: "ARTISTS", numbers: numbers, noun: "an artist number", extra: ["new"]) %>
 </div>

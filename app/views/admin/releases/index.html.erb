@@ -17,7 +17,7 @@
       <%= link_to "[>] FM", "/fm/releases", class: "console-bar-link" %>
     </span>
   </div>
-  <%= render "admin/music/flash" %>
+  <%= render "admin/console/flash" %>
 
   <div class="console-status">
     <div class="console-status-row">
@@ -52,8 +52,8 @@
     </section>
   <% end %>
 
-  <%= render "admin/music/destinations", except: "RELEASES" %>
+  <%= render "admin/console/destinations", section: :music, except: "RELEASES" %>
 
   <div class="console-rule"><span>// EVERY TRANSMISSION COMMITTED TO RECORD //</span></div>
-  <%= render "shared/console_prompt", hint: root_prompt_hint(except: "RELEASES", numbers: numbers, noun: "a release number", extra: ["new"]) %>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:music, except: "RELEASES", numbers: numbers, noun: "a release number", extra: ["new"]) %>
 </div>
