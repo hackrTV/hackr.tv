@@ -3,12 +3,14 @@
 # carrying nothing from the legacy kit — no <style> / style="", no TuiCss
 # window / button / table, no dead data-turbo-confirm (the admin has no
 # Turbo), no fallback glyphs (the Terminus subset has no arrows —
-# gotchas). The screen is the body after the chrome's </header> up to
+# gotchas) — and no leaked ERB (a `<%` on the screen: an ERB comment
+# closed early by a tag quoted inside it, as admin/console/_bar once
+# was). The screen is the body after the chrome's </header> up to
 # the layout's trailing script (admin/shared/_sortable_tables, gone with
 # Phase 6); a screen with its own inline script passes the slice it
 # wants checked instead of the whole body.
 module AdminConsoleMatchers
-  LEGACY = ["<style", 'style="', "tui-window", "tui-button", "tui-table", "data-turbo-confirm"].freeze
+  LEGACY = ["<style", 'style="', "tui-window", "tui-button", "tui-table", "data-turbo-confirm", "<%"].freeze
   GLYPHS = /[←→▾⚑✓⚠]/
 end
 
@@ -24,7 +26,7 @@ RSpec::Matchers.define :be_console_clean do
   failure_message do
     parts = []
     parts << "no .console--root under the chrome" if @missing_root
-    parts << "legacy kit on the screen: #{@hits.join(", ")}" if @hits.any?
+    parts << "on the screen: #{@hits.join(", ")}" if @hits.any?
     "expected a clean /root console screen — #{parts.join("; ")}"
   end
 end

@@ -3,14 +3,10 @@
     [+] NEW RELEASE). Tracks are added once the record exists. %>
 <% content_for :title, "/root/releases/new :: NEW RELEASE" %>
 <div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
-  <div class="console-bar">
-    <h1 class="console-bar-title">NEW RELEASE</h1>
-    <span class="console-bar-sub">ROOT · RELEASE · /root/releases/new</span>
-    <span class="console-bar-right">
-      <% if @release.artist %><%= link_to "[<] #{@release.artist.name.upcase}", edit_admin_artist_path(@release.artist), class: "console-bar-link" %><% end %>
-      <%= link_to "[<] RELEASES", admin_releases_path, class: "console-bar-link" %>
-    </span>
-  </div>
+  <%= render layout: "admin/console/bar", locals: {title: "NEW RELEASE", sub: "ROOT · RELEASE · /root/releases/new"} do %>
+    <% if @release.artist %><%= link_to "[<] #{@release.artist.name.upcase}", edit_admin_artist_path(@release.artist), class: "console-bar-link" %><% end %>
+    <%= link_to "[<] RELEASES", admin_releases_path, class: "console-bar-link" %>
+  <% end %>
   <%= render "admin/console/flash" %>
 
   <%= form_with model: @release, url: admin_releases_path, local: true do |f| %>

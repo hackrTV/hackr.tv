@@ -12,15 +12,11 @@
 <% deletable = @artist.releases.empty? && @artist.tracks.empty? %>
 <% numbers = @releases.to_a.each_index.map { |i| root_num(i) } %>
 <div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
-  <div class="console-bar">
-    <h1 class="console-bar-title"><%= @artist.name_in_database %></h1>
-    <span class="console-bar-sub">ROOT · ARTIST · /root/artists/<%= slug %></span>
-    <span class="console-bar-right">
-      <%= link_to "[<] ARTISTS", admin_artists_path, class: "console-bar-link" %>
-      <% if (pub = root_public_catalog_path(@artist)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
-      <%= link_to "[HISTORY]", history_admin_artist_path(slug), class: "console-bar-link" %>
-    </span>
-  </div>
+  <%= render layout: "admin/console/bar", locals: {title: @artist.name_in_database, sub: "ROOT · ARTIST · /root/artists/#{slug}"} do %>
+    <%= link_to "[<] ARTISTS", admin_artists_path, class: "console-bar-link" %>
+    <% if (pub = root_public_catalog_path(@artist)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_artist_path(slug), class: "console-bar-link" %>
+  <% end %>
   <%= render "admin/console/flash" %>
 
   <%= form_with model: @artist, url: admin_artist_path(slug), method: :patch, local: true do |f| %>

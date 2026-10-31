@@ -9,14 +9,10 @@
 <% numbers = @releases.to_a.each_index.map { |i| root_num(i) } %>
 <% counter = 0 %>
 <div class="console console--root" data-controller="terminal" data-boot="done">
-  <div class="console-bar">
-    <h1 class="console-bar-title">RELEASES</h1>
-    <span class="console-bar-sub">ROOT · MUSIC · /root/releases</span>
-    <span class="console-bar-right">
-      <%= link_to "[+] NEW RELEASE", new_admin_release_path, class: "console-bar-link", data: {command: "new"} %>
-      <%= link_to "[>] FM", "/fm/releases", class: "console-bar-link" %>
-    </span>
-  </div>
+  <%= render layout: "admin/console/bar", locals: {title: "RELEASES", sub: "ROOT · MUSIC · /root/releases"} do %>
+    <%= link_to "[+] NEW RELEASE", new_admin_release_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] FM", "/fm/releases", class: "console-bar-link" %>
+  <% end %>
   <%= render "admin/console/flash" %>
 
   <div class="console-status">

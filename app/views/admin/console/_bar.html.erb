@@ -1,8 +1,10 @@
 <%# A /root console screen's bar: title · sub · the right-side ghost
-    links and badges the caller yields. Rendered as a layout:
-      <%%= render layout: "admin/console/bar", locals: {title: "ROOT", sub: "ADMIN · /root"} do %>
-        <%%= link_to "[>] SITE", root_path, class: "console-bar-link" %>
-      <%% end %>
+    links and badges the caller yields. Rendered as a layout (no ERB
+    tags in this comment — a closing tag here would end it early and
+    leak the rest onto the screen):
+      render layout: "admin/console/bar", locals: {title: "ROOT", sub: "ADMIN · /root"} do
+        link_to "[>] SITE", root_path, class: "console-bar-link"
+      end
     Locals: title (text or markup — a link reads as the record's name),
     sub. %>
 <div class="console-bar">

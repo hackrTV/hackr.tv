@@ -16,6 +16,8 @@ module Admin::Versionable
         @model_class = model_class
         @back_path = url_for(action: :index, only_path: true)
         @entries = build_timeline(@record, children)
+        whodunnits = @entries.filter_map { |entry| entry[:version].whodunnit }.uniq
+        @whodunnit_aliases = GridHackr.where(id: whodunnits).pluck(:id, :hackr_alias).to_h.transform_keys(&:to_s)
 
         render "admin/shared/version_history"
       end

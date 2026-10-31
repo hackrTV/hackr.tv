@@ -7,7 +7,8 @@
     child row names its model) · BY · WHEN · the first eight changed
     keys as `key: from > to` lines, +N more), the > prompt. Assigns:
     @record, @model_name, @entries ({version:, source:, changes:},
-    newest first), @back_path. %>
+    newest first), @whodunnit_aliases (whodunnit → alias, preloaded),
+    @back_path. %>
 <% name = @record.respond_to?(:name) ? @record.name : (@record.respond_to?(:title) ? @record.title : "##{@record.id}") %>
 <% content_for :title, "/root/history :: #{name}" %>
 <% child_count = @entries.count { |entry| entry[:source] != @model_name } %>
@@ -38,7 +39,7 @@
       <% version = entry[:version] %>
       <% changes = entry[:changes] %>
       <% child = entry[:source] != @model_name %>
-      <% who = version.whodunnit.present? ? (GridHackr.find_by(id: version.whodunnit)&.hackr_alias || "hackr##{version.whodunnit}") : nil %>
+      <% who = version.whodunnit.present? ? (@whodunnit_aliases[version.whodunnit] || "hackr##{version.whodunnit}") : nil %>
       <div class="rc-row">
         <span class="console-tag">[<%= root_num(i, total: @entries.size) %>]</span>
         <span class="rc-cell <%= {"create" => "rc-on", "update" => "rc-star", "destroy" => "rc-bad"}[version.event] %>"><%= version.event.upcase %></span>
@@ -48,10 +49,12 @@
         <div class="rc-diff">
           <% if changes.any? %>
             <% changes.first(8).each do |change| %>
+              <% from_set = !change[:from].nil? && change[:from] != "" %><%# false and 0 are values, not blanks %>
+              <% to_set = !change[:to].nil? && change[:to] != "" %>
               <div class="rc-diff-line"><span class="rc-diff-key"><%= change[:key].delete_suffix("_id") %></span>:
-                <% if change[:from].present? %><del class="rc-del"><%= truncate(change[:from].to_s, length: 60) %></del><% end %>
-                <% if change[:from].present? %> &gt; <% end %>
-                <% if change[:to].present? %><ins class="rc-add"><%= truncate(change[:to].to_s, length: 60) %></ins><% elsif change[:from].present? %><span class="console-dim">null</span><% end %></div>
+                <% if from_set %><del class="rc-del"><%= truncate(change[:from].to_s, length: 60) %></del><% end %>
+                <% if from_set %> &gt; <% end %>
+                <% if to_set %><ins class="rc-add"><%= truncate(change[:to].to_s, length: 60) %></ins><% elsif from_set %><span class="console-dim">null</span><% end %></div>
             <% end %>
             <% if changes.size > 8 %>
               <div class="rc-diff-line console-dim">+<%= changes.size - 8 %> more</div>

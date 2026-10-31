@@ -38,6 +38,7 @@
 .rc-input { width: 40ch; max-width: 100%; }
 .rc-input--short { width: 12ch; }
 .rc-input--date { width: 20ch; } /* Chrome's date widget needs the room */
+.rc-input--datetime { width: 26ch; } /* date + time + AM/PM */
 .rc-input--wide { width: 72ch; }
 .rc-input::placeholder { color: var(--fg-faint); }
 .rc-select { padding-right: 4px; max-width: 100%; }

@@ -28,10 +28,12 @@ RSpec.describe ConsoleFormBuilder do
       expect(html).to have_css("input.rc-input.rc-input--short.extra")
     end
 
-    it "gives date fields the date width by default" do
+    it "gives date fields the date width and datetime fields the wider datetime width by default" do
       html = Capybara.string(builder.rc_date_field(:created_at))
       expect(html).to have_css("label.console-key", text: "CREATED AT")
       expect(html).to have_css("input.rc-input.rc-input--date[type='date']")
+      expect(Capybara.string(builder.rc_datetime_local_field(:created_at))).to have_css("input.rc-input.rc-input--datetime[type='datetime-local']")
+      expect(Capybara.string(builder.rc_time_field(:created_at))).to have_css("input.rc-input[type='time']:not([class*='rc-input--'])")
     end
 
     it "renders a hint after the input, markup kept when it is safe" do
@@ -65,6 +67,14 @@ RSpec.describe ConsoleFormBuilder do
       expect(html).to have_css("option[value='']", text: "—")
       expect(html).to have_css("option[value='ost']", text: "OST")
       expect(html).to have_css("select + span.rc-hint", text: "the directory")
+    end
+
+    it "takes include_blank / prompt as keywords too, never as select attributes" do
+      html = Capybara.string(builder.rc_select(:artist_type, [%w[BAND band]], include_blank: "—", required: true))
+      expect(html).to have_css("select.rc-select[required]:not([include_blank])")
+      expect(html).to have_css("option[value='']", text: "—")
+      prompt = Capybara.string(builder.rc_collection_select(:genre, [], :id, :name, prompt: "pick one")) # genre is blank, so the prompt shows
+      expect(prompt).to have_css("select.rc-select:not([prompt]) option[value='']", text: "pick one")
     end
 
     it "labels a *_id select by the association and shows the association's error" do

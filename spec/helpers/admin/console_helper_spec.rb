@@ -2,7 +2,7 @@ require "rails_helper"
 
 # Admin::ConsoleHelper — the /root console's shared screen helpers:
 # the section destination tables, the prompt hint, [NN], filter rows,
-# the pager, badges, errors and the hidden DELETE forms
+# the pager, badges and the hidden DELETE forms
 # (console-ui-for-all-admin Phase 0, 2026-10-30).
 RSpec.describe Admin::ConsoleHelper, type: :helper do
   # Admin::DevToolsGate#dev_tools_enabled? is a controller helper_method.
@@ -33,7 +33,8 @@ RSpec.describe Admin::ConsoleHelper, type: :helper do
       expect(rows.map(&:second)).to eq(%w[/root/grid_hackrs /root/grid_breach_sandbox/new /root/grid_npc_dialogue_tester/new /root/grid_pac_escape_tester/new])
     end
 
-    it "routes the map editor to the first region" do
+    it "routes the map editor to the first region, and drops the row while there is none" do
+      expect(helper.root_section_rows(:world).map(&:first)).not_to include("MAP")
       region = create(:grid_region)
       expect(helper.root_section_rows(:world).find { |tag_name, *| tag_name == "MAP" }[1]).to eq("/root/grid_map_editor/region/#{region.id}")
     end
@@ -113,15 +114,6 @@ RSpec.describe Admin::ConsoleHelper, type: :helper do
     it "renders a toned bar badge, the admin's cyan by default" do
       expect(helper.root_badge("DEV TOOLS ON", :warn)).to eq('<span class="console-bar-badge rc-badge--warn">DEV TOOLS ON</span>')
       expect(helper.root_badge("LIVE")).to eq('<span class="console-bar-badge rc-badge--hot">LIVE</span>')
-    end
-  end
-
-  describe "#root_errors" do
-    it "renders the attribute's messages, nothing when clean" do
-      artist = Artist.new
-      expect(helper.root_errors(artist, :name)).to be_nil
-      artist.errors.add(:name, "can't be blank")
-      expect(helper.root_errors(artist, :name)).to eq('<span class="rc-err">can&#39;t be blank</span>')
     end
   end
 

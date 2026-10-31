@@ -47,8 +47,26 @@ RSpec.describe "Admin version history", type: :request do
     expect(body).to include("&gt;")
     expect(body).to include('<ins class="rc-add">Fresher Act</ins>')
     expect(body).to match(%r{<span class="rc-diff-key">genre</span>:\s*<ins class="rc-add">Noise</ins>}) # nil → Noise: no struck value
+    expect(body).not_to include("<%") # the bar partial's comment stays a comment
     expect(body).to include("// END OF RECORD //")
     expect(body).to include('type <span class="console-dim">back</span> or <span class="console-dim">edit</span>')
+  end
+
+  it "shows a flag flipped off as true > false, not true > null" do
+    xeraen = create(:artist, :xeraen)
+    release = create(:release, artist: xeraen)
+    track = create(:track, artist: xeraen, release: release, featured: true)
+    log_in!(admin)
+    patch "/root/tracks/#{track.slug}", params: {track: {featured: "0"}}
+    patch "/root/tracks/#{track.slug}", params: {track: {featured: "1"}}
+
+    get "/root/tracks/#{track.slug}/history"
+
+    expect(response).to have_http_status(:ok)
+    body = response.body
+    expect(body).to match(%r{<span class="rc-diff-key">featured</span>:\s*<del class="rc-del">true</del>\s*&gt;\s*<ins class="rc-add">false</ins>})
+    expect(body).to match(%r{<span class="rc-diff-key">featured</span>:\s*<del class="rc-del">false</del>\s*&gt;\s*<ins class="rc-add">true</ins>})
+    expect(body).not_to include('<span class="console-dim">null</span>')
   end
 
   it "folds a child's versions in, naming the child" do

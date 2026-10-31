@@ -8,14 +8,10 @@
 <% content_for :title, "/root/artists :: ARTISTS" %>
 <% numbers = @artists.to_a.each_index.map { |i| root_num(i) } %>
 <div class="console console--root" data-controller="terminal" data-boot="done">
-  <div class="console-bar">
-    <h1 class="console-bar-title">ARTISTS</h1>
-    <span class="console-bar-sub">ROOT · MUSIC · /root/artists</span>
-    <span class="console-bar-right">
-      <%= link_to "[+] NEW ARTIST", new_admin_artist_path, class: "console-bar-link", data: {command: "new"} %>
-      <%= link_to "[>] FNET", "/f/net", class: "console-bar-link" %>
-    </span>
-  </div>
+  <%= render layout: "admin/console/bar", locals: {title: "ARTISTS", sub: "ROOT · MUSIC · /root/artists"} do %>
+    <%= link_to "[+] NEW ARTIST", new_admin_artist_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] FNET", "/f/net", class: "console-bar-link" %>
+  <% end %>
   <%= render "admin/console/flash" %>
 
   <div class="console-status">

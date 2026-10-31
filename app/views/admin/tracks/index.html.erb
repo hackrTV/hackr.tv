@@ -11,14 +11,10 @@
 <% numbers = @tracks.to_a.each_index.map { |i| root_num(i) } %>
 <% counter = 0 %>
 <div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
-  <div class="console-bar">
-    <h1 class="console-bar-title">TRACKS</h1>
-    <span class="console-bar-sub">ROOT · MUSIC · /root/tracks</span>
-    <span class="console-bar-right">
-      <%= link_to "[+] NEW TRACK", new_admin_track_path, class: "console-bar-link", data: {command: "new"} %>
-      <%= link_to "[>] VAULT", "/vault", class: "console-bar-link" %>
-    </span>
-  </div>
+  <%= render layout: "admin/console/bar", locals: {title: "TRACKS", sub: "ROOT · MUSIC · /root/tracks"} do %>
+    <%= link_to "[+] NEW TRACK", new_admin_track_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] VAULT", "/vault", class: "console-bar-link" %>
+  <% end %>
   <%= render "admin/console/flash" %>
 
   <div class="console-status">

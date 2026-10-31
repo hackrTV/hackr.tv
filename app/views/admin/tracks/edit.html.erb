@@ -16,16 +16,12 @@
 <% num = format("%02d", @track.track_number_in_database.to_i) %>
 <% sibling_numbers = @siblings.map { |t| format("%02d", t.track_number.to_i) } %>
 <div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
-  <div class="console-bar">
-    <h1 class="console-bar-title"><%= title %></h1>
-    <span class="console-bar-sub"><%= @release.artist.name %> · <%= @release.name %> · TRACK <%= num %> · /root/tracks/<%= slug %></span>
-    <span class="console-bar-right">
-      <% if @track.featured_in_database %><span class="console-bar-badge">★ FEATURED</span><% end %>
-      <%= link_to "[<] #{@release.name.upcase}", edit_admin_release_path(@release), class: "console-bar-link" %>
-      <% if (pub = root_public_track_path(@track)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
-      <%= link_to "[HISTORY]", history_admin_track_path(slug), class: "console-bar-link" %>
-    </span>
-  </div>
+  <%= render layout: "admin/console/bar", locals: {title: title, sub: "#{@release.artist.name} · #{@release.name} · TRACK #{num} · /root/tracks/#{slug}"} do %>
+    <% if @track.featured_in_database %><span class="console-bar-badge">★ FEATURED</span><% end %>
+    <%= link_to "[<] #{@release.name.upcase}", edit_admin_release_path(@release), class: "console-bar-link" %>
+    <% if (pub = root_public_track_path(@track)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_track_path(slug), class: "console-bar-link" %>
+  <% end %>
   <%= render "admin/console/flash" %>
 
   <%= form_with model: @track, url: admin_track_path(slug), method: :patch, local: true do |f| %>

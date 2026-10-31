@@ -2,14 +2,15 @@
 # (+ root_console.css; the music screens set the idiom 2026-10-30, the
 # rest of the admin follows section by section): the destination rows a
 # screen ends on, the "> " prompt's hint, the ledgers' [NN], filter rows
-# and pagers, the inline errors and the hidden DELETE forms the ghost
-# buttons submit. Admin views only (the admin layout). Music-only
-# readouts stay in Admin::MusicConsoleHelper.
+# and pagers, badges and the hidden DELETE forms the ghost buttons
+# submit (field errors are ConsoleFormBuilder's). Admin views only (the
+# admin layout). Music-only readouts stay in Admin::MusicConsoleHelper.
 module Admin::ConsoleHelper
   # One destination table per section of the admin: [TAG, route (a route
-  # helper name, or a lambda run in the view), name, description, dev]
-  # — the tag doubles as the prompt command (the terminal controller
-  # reads a[data-command]). `dev: true` rows only show while
+  # helper name, or a lambda run in the view — nil drops the row: MAP
+  # before any region exists), name, description, dev] — the tag doubles
+  # as the prompt command (the terminal controller reads
+  # a[data-command]). `dev: true` rows only show while
   # dev_tools_enabled?. Every screen's // DESTINATIONS // is its
   # section's rows + [ROOT]; the dashboard lists every section.
   ROOT_SECTIONS = {
@@ -56,7 +57,7 @@ module Admin::ConsoleHelper
       ["ROUTES", :admin_grid_transit_routes_path, "Transit routes", "Local routes and their stops"],
       ["JOURNEYS", :admin_grid_transit_journeys_path, "Journeys", "Transit journeys in progress"],
       ["SLIPSTREAM", :admin_grid_slipstream_routes_path, "Slipstream", "Region-scale routes and their legs"],
-      ["MAP", ->(view) { view.admin_grid_map_editor_region_show_path(region_id: GridRegion.first&.id || 0) }, "Map editor", "The zone map editor"],
+      ["MAP", ->(view) { (region = GridRegion.first) && view.admin_grid_map_editor_region_show_path(region_id: region.id) }, "Map editor", "The zone map editor"],
       ["EXPORT", :admin_grid_world_export_path, "World export", "The world as YAML"]
     ],
     systems: [
@@ -94,11 +95,13 @@ module Admin::ConsoleHelper
 
   ROOT_ROW = ["ROOT", :admin_root_path, "Dashboard", "Back to the /root overview"].freeze
 
-  # A section's rows as [tag, href, name, desc], dev-tool rows gated.
+  # A section's rows as [tag, href, name, desc], dev-tool rows gated,
+  # rows with no destination (a lambda's nil) dropped.
   def root_section_rows(section)
     ROOT_SECTIONS.fetch(section).filter_map do |tag_name, route, name, desc, dev|
       next if dev && !dev_tools_enabled?
-      [tag_name, route.is_a?(Proc) ? route.call(self) : public_send(route), name, desc]
+      href = route.is_a?(Proc) ? route.call(self) : public_send(route)
+      [tag_name, href, name, desc] if href
     end
   end
 
@@ -166,13 +169,6 @@ module Admin::ConsoleHelper
   # :warn (DEV TOOLS), :err.
   def root_badge(word, tone = :hot)
     tag.span(word, class: "console-bar-badge rc-badge--#{tone}")
-  end
-
-  # The inline error after a field.
-  def root_errors(record, attribute)
-    messages = record.errors[attribute]
-    return if messages.empty?
-    tag.span(messages.join(", "), class: "rc-err")
   end
 
   # A hidden DELETE form a ghost button elsewhere on the screen submits

@@ -11,9 +11,10 @@ class Admin::DashboardController < Admin::ApplicationController
       emails_sent_30d: emails_sent_last_30_days
     }
 
-    @recent_tracks = Track.includes(:artist, :release).ordered.limit(5)
-    @recent_logs = HackrLog.includes(:grid_hackr).ordered.limit(5)
-    @online_hackrs = GridHackr.online.includes(:current_room).limit(10)
+    # Loaded here so the view's size / empty? read the rows, not COUNT / EXISTS queries.
+    @recent_tracks = Track.includes(:artist, :release).ordered.limit(5).load
+    @recent_logs = HackrLog.includes(:grid_hackr).ordered.limit(5).load
+    @online_hackrs = GridHackr.online.includes(:current_room).limit(10).load
     @recent_messages = GridMessage.order(created_at: :desc).includes(:grid_hackr).limit(10)
   end
 
