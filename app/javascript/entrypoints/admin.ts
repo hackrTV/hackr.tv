@@ -5,10 +5,12 @@
 // tracks) are console screens, so the home console's terminal controller
 // (reveal + the "> " prompt — utils/visit.ts does a full load here), the
 // hover peek and the admin-only ledger-filter / file-pick / autogrow /
-// confirm-slug controllers are registered. Add a controller here when an
+// confirm-slug controllers are registered, plus site-header for the
+// sticky admin chrome's --site-header-h. Add a controller here when an
 // admin screen needs it; the public pages register everything through
 // hotwire.ts's glob.
 import { Application } from '@hotwired/stimulus'
+import SiteHeaderController from '~/controllers/site_header_controller'
 import TerminalController from '~/controllers/terminal_controller'
 import PeekController from '~/controllers/peek_controller'
 import LedgerFilterController from '~/controllers/ledger_filter_controller'
@@ -23,3 +25,4 @@ application.register('ledger-filter', LedgerFilterController)
 application.register('file-pick', FilePickController)
 application.register('autogrow', AutogrowController)
 application.register('confirm-slug', ConfirmSlugController)
+application.register('site-header', SiteHeaderController)
