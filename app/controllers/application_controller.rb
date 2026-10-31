@@ -12,10 +12,14 @@ class ApplicationController < ActionController::Base
 
   before_action :check_for_redirect
   before_action :check_for_domain_redirect
+  before_action :set_paper_trail_whodunnit
 
   helper_method :domain_stylesheet
 
-  # PaperTrail: track which hackr made changes
+  # PaperTrail: track which hackr made changes (the callback above sets
+  # PaperTrail.request.whodunnit from this per request — PaperTrail 10+
+  # no longer wires it itself, so every version read "system" until
+  # 2026-10-30; /root HISTORY's BY column).
   def user_for_paper_trail
     current_hackr&.id
   end

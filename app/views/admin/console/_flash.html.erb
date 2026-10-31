@@ -1,0 +1,9 @@
+<%# The flash as console replies under the bar — [OK] + the message after
+    a commit, [WARN] for a warning, [ERR] + the message on a rejected one
+    (flash.now). Shared by every /root console screen. %>
+<% {success: %w[OK ok], warning: %w[WARN warn], error: %w[ERR err]}.each do |key, (word, tone)| %>
+  <% next if flash[key].blank? %>
+  <div class="rc-flash rc-flash--<%= tone %> console-line" data-terminal-target="line">
+    <span class="console-tag">[<%= word %>]</span><span><%= flash[key] %></span>
+  </div>
+<% end %>

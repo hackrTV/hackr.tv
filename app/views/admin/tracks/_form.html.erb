@@ -1,11 +1,12 @@
 <%# The track record's fields on the console: the release's cover (context,
-    hover peek) beside the status rows — TITLE, SLUG, RELEASE (grouped by
-    artist; the artist follows it), TRACK #, LENGTH, RELEASED, FLAGS,
-    AUDIO (the file on record with an inline preview, [^] REPLACE /
-    UPLOAD inside this form, [x] REMOVE pointing at the hidden purge
-    form) — then // DECODED LYRICS // as one growing textarea and
-    // FREQUENCIES //. The commit row belongs to the caller. Locals: f,
-    track; @releases for the select. %>
+    hover peek) beside the status rows (ConsoleFormBuilder rc_* rows —
+    TITLE, SLUG, RELEASE (grouped by artist; the artist follows it),
+    TRACK #, LENGTH, RELEASED, FLAGS) and the hand-written AUDIO row (the
+    file on record with an inline preview, [^] REPLACE / UPLOAD inside
+    this form, [x] REMOVE pointing at the hidden purge form) — then
+    // DECODED LYRICS // as one growing textarea and // FREQUENCIES //.
+    The commit row belongs to the caller. Locals: f, track; @releases
+    for the select. %>
 <% release = track.release %>
 <% art = release && root_cover_ready?(release) %>
 <% audio = root_audio_ready?(track) %>
@@ -27,38 +28,19 @@
   </div>
 
   <div class="console-status">
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="track_title">TITLE</label>
-      <span class="console-val"><%= f.text_field :title, class: "rc-input", required: true, autocomplete: "off" %><%= root_errors(track, :title) %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="track_slug">SLUG</label>
-      <span class="console-val"><%= f.text_field :slug, class: "rc-input", required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots" %><span class="rc-hint">/<%= track.artist&.slug || "artist" %>/trackz/<%= track.slug.presence || "slug" %> · unique per artist</span><%= root_errors(track, :slug) %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="track_release_id">RELEASE</label>
-      <span class="console-val"><%= f.select :release_id, grouped_options_for_select(grouped, track.release_id), {include_blank: "— select release —"}, class: "rc-select", required: true %><span class="rc-hint">the artist follows the release</span><%= root_errors(track, :release) %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="track_track_number">TRACK #</label>
-      <span class="console-val"><%= f.number_field :track_number, class: "rc-input rc-input--short", min: 1, step: 1 %><span class="rc-hint">disc order · the public rows read NN</span></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="track_duration">LENGTH</label>
-      <span class="console-val"><%= f.text_field :duration, class: "rc-input rc-input--short", placeholder: "3:45", autocomplete: "off", pattern: "\\d+:\\d{2}(:\\d{2})?", title: "M:SS or H:MM:SS" %><span class="rc-hint">M:SS · the release length sums these</span><%= root_errors(track, :duration) %></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <label class="console-key" for="track_release_date">RELEASED</label>
-      <span class="console-val"><%= f.date_field :release_date, class: "rc-input rc-input--date" %><span class="rc-hint">blank = the release's date</span></span>
-    </div>
-    <div class="console-status-row rc-field">
-      <span class="console-key">FLAGS</span>
-      <span class="console-val">
-        <label class="rc-check"><%= f.check_box :featured %> ★ FEATURED</label>
-        <label class="rc-check"><%= f.check_box :show_in_pulse_vault %> IN THE VAULT</label>
-        <span class="rc-hint">featured sorts first on /vault · unchecked VAULT hides the track from /vault, /fm and the public catalog's counts</span>
-      </span>
-    </div>
+    <%= f.rc_text_field :title, required: true, autocomplete: "off" %>
+    <%= f.rc_text_field :slug, required: true, autocomplete: "off", pattern: "[a-z0-9\\-\\.]+", title: "lowercase letters, digits, hyphens, dots",
+      hint: "/#{track.artist&.slug || "artist"}/trackz/#{track.slug.presence || "slug"} · unique per artist" %>
+    <%= f.rc_select :release_id, grouped_options_for_select(grouped, track.release_id), {include_blank: "— select release —"}, required: true,
+      hint: "the artist follows the release" %>
+    <%= f.rc_number_field :track_number, label: "TRACK #", width: :short, min: 1, step: 1, hint: "disc order · the public rows read NN" %>
+    <%= f.rc_text_field :duration, label: "LENGTH", width: :short, placeholder: "3:45", autocomplete: "off", pattern: "\\d+:\\d{2}(:\\d{2})?", title: "M:SS or H:MM:SS",
+      hint: "M:SS · the release length sums these" %>
+    <%= f.rc_date_field :release_date, label: "RELEASED", hint: "blank = the release's date" %>
+    <%= f.rc_flags("FLAGS", hint: "featured sorts first on /vault · unchecked VAULT hides the track from /vault, /fm and the public catalog's counts") do %>
+      <%= f.rc_check_box :featured, label: "★ FEATURED" %>
+      <%= f.rc_check_box :show_in_pulse_vault, label: "IN THE VAULT" %>
+    <% end %>
     <div class="console-status-row rc-field">
       <span class="console-key">AUDIO</span>
       <span class="console-val">
@@ -85,10 +67,8 @@
   </div>
 </div>
 
-<div class="console-rule"><span>// DECODED LYRICS //</span></div>
-<%= f.text_area :lyrics, class: "rc-textarea rc-textarea--lyrics", rows: 16, spellcheck: true,
-  data: {controller: "autogrow", action: "input->autogrow#grow"} %>
-<p class="rc-sub">markdown · one line per lyric line, a blank line between verses (the public page keeps the line breaks) · [Chorus] and the like read as plain text</p>
+<%= f.rc_text_area :lyrics, label: "DECODED LYRICS", rows: 16, spellcheck: true, class: "rc-textarea--lyrics",
+  hint: "markdown · one line per lyric line, a blank line between verses (the public page keeps the line breaks) · [Chorus] and the like read as plain text" %>
 
 <%= render "admin/music/frequencies_fields", f: f, links: track.streaming_links,
   hint: "the track's own frequencies · a single's track page merges the release's under these" %>

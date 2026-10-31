@@ -82,6 +82,6 @@ RSpec.describe "Admin chrome", type: :request do
     expect(body).to include('href="/root/data_audit_flags">[&gt;] VIEW ALL</a>')
     expect(body).not_to include("⚑")
     expect(body.index("admin-nav")).to be < body.index("admin-banner--flags")
-    expect(body.index("admin-banner--flags")).to be < body.index("ADMIN DASHBOARD")
+    expect(body.index("admin-banner--flags")).to be < body.index('class="console console--root"')
   end
 end

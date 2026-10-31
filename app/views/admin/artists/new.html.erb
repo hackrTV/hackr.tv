@@ -1,12 +1,10 @@
 <%# /root/artists/new — a new artist on the record screen's shell. %>
 <% content_for :title, "/root/artists/new :: NEW ARTIST" %>
 <div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
-  <div class="console-bar">
-    <h1 class="console-bar-title">NEW ARTIST</h1>
-    <span class="console-bar-sub">ROOT · ARTIST · /root/artists/new</span>
-    <span class="console-bar-right"><%= link_to "[<] ARTISTS", admin_artists_path, class: "console-bar-link" %></span>
-  </div>
-  <%= render "admin/music/flash" %>
+  <%= render layout: "admin/console/bar", locals: {title: "NEW ARTIST", sub: "ROOT · ARTIST · /root/artists/new"} do %>
+    <%= link_to "[<] ARTISTS", admin_artists_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
   <%= form_with model: @artist, url: admin_artists_path, local: true do |f| %>
     <%= render "form", f: f, artist: @artist %>
@@ -17,7 +15,7 @@
     </div>
   <% end %>
 
-  <%= render "admin/music/destinations" %>
+  <%= render "admin/console/destinations", section: :music %>
   <div class="console-rule"><span>// END OF RECORD //</span></div>
-  <%= render "shared/console_prompt", hint: root_prompt_hint %>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:music) %>
 </div>

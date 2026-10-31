@@ -4,15 +4,11 @@
 <% content_for :title, "/root/tracks/new :: NEW TRACK" %>
 <% release = @track.release %>
 <div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
-  <div class="console-bar">
-    <h1 class="console-bar-title">NEW TRACK</h1>
-    <span class="console-bar-sub"><% if release %><%= release.artist.name %> · <%= release.name %> · <% end %>/root/tracks/new</span>
-    <span class="console-bar-right">
-      <% if release&.persisted? %><%= link_to "[<] #{release.name.upcase}", edit_admin_release_path(release), class: "console-bar-link" %><% end %>
-      <%= link_to "[<] TRACKS", admin_tracks_path, class: "console-bar-link" %>
-    </span>
-  </div>
-  <%= render "admin/music/flash" %>
+  <%= render layout: "admin/console/bar", locals: {title: "NEW TRACK", sub: [("#{release.artist.name} · #{release.name}" if release), "/root/tracks/new"].compact.join(" · ")} do %>
+    <% if release&.persisted? %><%= link_to "[<] #{release.name.upcase}", edit_admin_release_path(release), class: "console-bar-link" %><% end %>
+    <%= link_to "[<] TRACKS", admin_tracks_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
   <%= form_with model: @track, url: admin_tracks_path, local: true do |f| %>
     <%= render "form", f: f, track: @track %>
@@ -23,7 +19,7 @@
     </div>
   <% end %>
 
-  <%= render "admin/music/destinations" %>
+  <%= render "admin/console/destinations", section: :music %>
   <div class="console-rule"><span>// END OF TRANSMISSION //</span></div>
-  <%= render "shared/console_prompt", hint: root_prompt_hint %>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:music) %>
 </div>

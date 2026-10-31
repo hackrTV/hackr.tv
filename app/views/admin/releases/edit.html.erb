@@ -15,17 +15,13 @@
 <% content_for :title, "/root/releases/#{slug} :: #{name}" %>
 <% numbers = @tracks.to_a.each_index.map { |i| root_num(i) } %>
 <div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
-  <div class="console-bar">
-    <h1 class="console-bar-title"><%= name %></h1>
-    <span class="console-bar-sub"><%= @release.artist.name %> · <%= @release.release_type_in_database&.upcase || "RELEASE" %> · /root/releases/<%= slug %></span>
-    <span class="console-bar-right">
-      <% if @release.coming_soon_in_database %><span class="console-bar-badge">◌ SIGNAL INCOMING</span><% end %>
-      <%= link_to "[<] RELEASES", admin_releases_path, class: "console-bar-link" %>
-      <% if (pub = root_public_release_path(@release)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
-      <%= link_to "[HISTORY]", history_admin_release_path(slug), class: "console-bar-link" %>
-    </span>
-  </div>
-  <%= render "admin/music/flash" %>
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "#{@release.artist.name} · #{@release.release_type_in_database&.upcase || "RELEASE"} · /root/releases/#{slug}"} do %>
+    <% if @release.coming_soon_in_database %><span class="console-bar-badge">◌ SIGNAL INCOMING</span><% end %>
+    <%= link_to "[<] RELEASES", admin_releases_path, class: "console-bar-link" %>
+    <% if (pub = root_public_release_path(@release)) %><%= link_to "[>] PUBLIC", pub, class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_release_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
   <%= form_with model: @release, url: admin_release_path(slug), method: :patch, local: true do |f| %>
     <%= render "form", f: f, release: @release %>
@@ -52,10 +48,10 @@
     </div>
   </section>
 
-  <%= render "admin/music/destinations" %>
+  <%= render "admin/console/destinations", section: :music %>
 
   <div class="console-rule"><span>// END OF RECORD //</span></div>
-  <%= render "shared/console_prompt", hint: root_prompt_hint(numbers: numbers, noun: "a track number", extra: ["new"]) %>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:music, numbers: numbers, noun: "a track number", extra: ["new"]) %>
 
   <div class="rc-hidden-forms">
     <% if root_cover_ready?(@release) %>
