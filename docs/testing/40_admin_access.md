@@ -12,17 +12,22 @@ minutes: 10
 2. As the OPERATIVE (non-admin): `/root`. → Denied.
 3. As admin: `/root`. → Dashboard renders: status overview + links into
    each section. The nav is one thin row (the public menu's height) —
-   `/root` + your alias left, the sections right; while data-audit flags
-   are open a one-line RED FLAGS strip sits flush under it (no strip at
-   zero flags).
-4. The admin nav lists every section (Dashboard, Music dropdown, Logs,
-   Codex, Handbook dropdown, Streams, PulseWire, Emotes, Uplink, Grid
-   dropdown, Hackrs, Meta dropdown — Errors / Red Flags / Analytics /
-   Overlays / World Feed / Redirects / Test Guide — and ← Exit). Hover
-   each dropdown (the Grid menu fits a 900px-tall window and scrolls
-   when it doesn't), then click through each top item once. → Every
-   index page renders without error (deep testing follows in later
-   articles — this is the reachability sweep).
+   `/root` + your alias left, the sections right, Dashboard lit (tab
+   tint + cyan bar); while data-audit flags are open a one-line
+   `[!] RED FLAGS: n open | [>] VIEW ALL` strip sits flush under it (no
+   strip at zero flags). Scroll the dashboard. → Nav + strip stay pinned
+   at the top on desktop; under 768px they scroll away with the page.
+4. The admin nav lists every section (Dashboard, Music/, Logs, Codex,
+   Handbook/, Streams, PulseWire, Emotes, Uplink, Grid/, Hackrs, Meta/ —
+   Errors / Red Flags / Analytics / Overlays / World Feed / Redirects /
+   Test Guide — and `[<] EXIT`; no arrow glyphs anywhere in the chrome).
+   Hover each dropdown (the Grid menu fits a 900px-tall window and
+   scrolls when it doesn't; Meta opens inward), then click through each
+   top item once. → Every index page renders without error, and the
+   section you are in is lit — inside a dropdown the current entry is
+   barred too (Music/ → Artists on `/root/artists`); Hackrs lights
+   Hackrs, not Grid/ (deep testing follows in later articles — this is
+   the reachability sweep).
 5. Sortable tables: on any large index, click a column header. →
    Client-side sort works.
 6. Dev-tools gate: if DEV TOOLS are enabled in this environment the
