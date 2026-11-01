@@ -2,8 +2,9 @@ require "rails_helper"
 
 # /root/uplink channels: the index grouped the way the Uplink sidebar
 # renders (category headings, channels by position inside), new/create,
-# the edit form with its fixed slug, the category datalist, ↑/↓ swaps
-# inside a group and the active toggle.
+# the edit form with its fixed slug, the category datalist, [UP]/[DN]
+# swaps inside a group and the active toggle (console screens since
+# console-ui-for-all-admin Phase 2, 2026-10-31).
 RSpec.describe "Admin uplink channels", type: :request do
   let!(:admin) { create(:grid_hackr, :admin, password: "hackthegrid") }
   let!(:channel) { create(:chat_channel, slug: "ambient", name: "#ambient", category: "COMMS", position: 10) }
@@ -11,32 +12,34 @@ RSpec.describe "Admin uplink channels", type: :request do
   before { post "/grid/login", params: {hackr_alias: admin.hackr_alias, password: "hackthegrid"} }
 
   def row(name)
-    %(<strong class="cyan-255-text">#{name}</strong>)
+    %(/edit">#{name}</a>)
   end
 
   describe "the index" do
-    it "lists channels under their category headings in sidebar order, with ↑/↓ disabled at a group's edges, a toggle per row and a New Channel button" do
+    it "lists channels under their category headings in sidebar order, with [UP]/[DN] disabled at a group's edges, a toggle per row and a New Channel button" do
       create(:chat_channel, slug: "live", name: "#live", category: "BROADCAST", position: 0)
       ops = create(:chat_channel, slug: "ops", name: "#ops", category: "COMMS", position: 20, is_active: false)
 
       get "/root/uplink"
 
       body = response.body
-      expect(body).to include("▸ BROADCAST", "▸ COMMS")
-      expect([body.index("▸ BROADCAST"), body.index(row("#live")), body.index("▸ COMMS"), body.index(row("#ambient")), body.index(row("#ops"))]).to eq(
-        [body.index("▸ BROADCAST"), body.index(row("#live")), body.index("▸ COMMS"), body.index(row("#ambient")), body.index(row("#ops"))].sort
+      expect(body).to be_console_clean
+      broadcast, comms = "// BROADCAST · 1 CHANNEL //", "// COMMS · 2 CHANNELS //"
+      expect(body).to include(broadcast, comms)
+      expect([body.index(broadcast), body.index(row("#live")), body.index(comms), body.index(row("#ambient")), body.index(row("#ops"))]).to eq(
+        [body.index(broadcast), body.index(row("#live")), body.index(comms), body.index(row("#ambient")), body.index(row("#ops"))].sort
       )
-      expect(body).to include("1 channel", "2 channels", "#10", "#20")
+      expect(body).to include("[01]", "[03]", "#10", "#20", 'data-command="03"')
       expect(body).to include('href="/root/uplink/channels/new"')
-      # #live alone in BROADCAST: both arrows disabled. #ambient first of COMMS: ↑ off, ↓ on; #ops last: the reverse.
+      # #live alone in BROADCAST: both moves disabled. #ambient first of COMMS: [UP] off, [DN] on; #ops last: the reverse.
       expect(body[/<form[^>]*action="\/root\/uplink\/channels\/live\/move\?direction=up"[^>]*>.*?<\/form>/m]).to include("disabled")
       expect(body[/<form[^>]*action="\/root\/uplink\/channels\/live\/move\?direction=down"[^>]*>.*?<\/form>/m]).to include("disabled")
       expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ambient\/move\?direction=up"[^>]*>.*?<\/form>/m]).to include("disabled")
       expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ambient\/move\?direction=down"[^>]*>.*?<\/form>/m]).not_to include("disabled")
       expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ops\/move\?direction=up"[^>]*>.*?<\/form>/m]).not_to include("disabled")
       expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ops\/move\?direction=down"[^>]*>.*?<\/form>/m]).to include("disabled")
-      expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ambient\/toggle"[^>]*>.*?<\/form>/m]).to include("Deactivate")
-      expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ops\/toggle"[^>]*>.*?<\/form>/m]).to include("Activate")
+      expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ambient\/toggle"[^>]*>.*?<\/form>/m]).to include("[DEACTIVATE]")
+      expect(body[/<form[^>]*action="\/root\/uplink\/channels\/ops\/toggle"[^>]*>.*?<\/form>/m]).to include("[ACTIVATE]")
       expect(ops.reload.is_active).to be(false)
     end
   end
@@ -51,7 +54,9 @@ RSpec.describe "Admin uplink channels", type: :request do
       expect(response.body).to include('name="chat_channel[slug]"')
       expect(response.body).to include('list="channel-categories"', '<datalist id="channel-categories">', '<option value="BROADCAST">', '<option value="COMMS">')
       expect(response.body).to include('name="chat_channel[position]"').and include('value="20"')
-      expect(response.body).to include("Create Channel")
+      expect(response.body).to include("[CREATE CHANNEL]", "NEW CHANNEL", "// COMMIT //")
+      expect(response.body).to include('name="chat_channel[is_active]"', 'name="chat_channel[requires_livestream]"', 'name="chat_channel[slow_mode_seconds]"', 'name="chat_channel[minimum_role]"', 'name="chat_channel[description]"')
+      expect(response.body).to be_console_clean
     end
 
     it "creates the channel (category upcased) and the Uplink sidebar shows it under its heading" do
@@ -60,7 +65,7 @@ RSpec.describe "Admin uplink channels", type: :request do
       expect(response).to redirect_to("/root/uplink")
       expect(ChatChannel.find_by(slug: "ops")).to have_attributes(name: "#ops", category: "OPS ROOM", position: 30, minimum_role: "operator", is_active: true)
       follow_redirect!
-      expect(response.body).to include("Channel #ops created under OPS ROOM.", "▸ OPS ROOM")
+      expect(response.body).to include("[OK]", "Channel #ops created under OPS ROOM.", "// OPS ROOM · 1 CHANNEL //")
 
       get "/uplink"
       expect(response.body).to include("OPS ROOM", "#ops")
@@ -69,7 +74,9 @@ RSpec.describe "Admin uplink channels", type: :request do
     it "re-renders the form with the error on a bad or taken slug" do
       post "/root/uplink/channels", params: {chat_channel: {slug: "Bad Slug", name: "#bad"}}
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.body).to include("Failed to create channel", "only allows lowercase letters", 'name="chat_channel[slug]"')
+      expect(response.body).to include("[ERR]", "Failed to create channel", 'name="chat_channel[slug]"')
+      expect(response.body).to match(/<span class="rc-err">only allows lowercase letters/)
+      expect(response.body).to be_console_clean
 
       post "/root/uplink/channels", params: {chat_channel: {slug: "ambient", name: "#twice"}}
       expect(response).to have_http_status(:unprocessable_entity)
@@ -83,11 +90,12 @@ RSpec.describe "Admin uplink channels", type: :request do
       get "/root/uplink/channels/ambient/edit"
 
       expect(response.body).not_to include('name="chat_channel[slug]"')
-      expect(response.body).to include("/uplink?channel=ambient", "SIDEBAR CATEGORY", 'name="chat_channel[category]"', 'list="channel-categories"', '<option value="COMMS">')
-      expect(response.body).to include('name="chat_channel[position]"', "Save Changes")
+      expect(response.body).to include("/uplink?channel=ambient", "CATEGORY", 'name="chat_channel[category]"', 'list="channel-categories"', '<option value="COMMS">')
+      expect(response.body).to include('name="chat_channel[position]"', "[SAVE CHANNEL]", 'value="#ambient"')
+      expect(response.body).to be_console_clean
 
       get "/root/uplink"
-      expect(response.body).to include("▸ COMMS", "#10")
+      expect(response.body).to include("// COMMS · 1 CHANNEL //", "#10")
     end
 
     it "updates category (upcased) and position" do
@@ -101,7 +109,8 @@ RSpec.describe "Admin uplink channels", type: :request do
       patch "/root/uplink/channels/ambient", params: {chat_channel: {name: "#ambient", category: "no/slash"}}
 
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.body).to include("Failed to update channel")
+      expect(response.body).to include("[ERR]", "Failed to update channel", 'value="NO/SLASH"')
+      expect(response.body).to match(/<span class="rc-err">only allows uppercase letters/)
       expect(channel.reload.category).to eq("COMMS")
     end
 
@@ -113,7 +122,7 @@ RSpec.describe "Admin uplink channels", type: :request do
     end
   end
 
-  describe "move (↑/↓)" do
+  describe "move ([UP]/[DN])" do
     let!(:live) { create(:chat_channel, slug: "live", name: "#live", category: "BROADCAST", position: 0) }
     let!(:ops) { create(:chat_channel, slug: "ops", name: "#ops", category: "COMMS", position: 20) }
 

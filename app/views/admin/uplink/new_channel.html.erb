@@ -1,8 +1,26 @@
-<%= render TuiWindowComponent.new(title: "/root/uplink/channels/new :: NEW CHANNEL", variant: :admin, width: 800) do %>
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px;">
-        <%= tui_button "← Back to Uplink", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-      <%= render "channel_form", channel: @channel, categories: @categories %>
+<%# /root/uplink/channels/new — a new channel as a console screen
+    (2026-10-31): bar ([<] UPLINK), the fields (_channel_form; the slug
+    is typed here only), // COMMIT // ([CREATE CHANNEL] [CANCEL]),
+    destinations, the > prompt. Defaults land it at the end of the
+    sidebar. Assigns: @channel, @categories. %>
+<% content_for :title, "/root/uplink/channels/new :: NEW CHANNEL" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW CHANNEL", sub: "ROOT · UPLINK · /root/uplink/channels/new"} do %>
+    <%= link_to "[<] UPLINK", admin_uplink_index_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @channel, url: admin_uplink_channels_path, method: :post, local: true do |f| %>
+    <%= render "channel_form", f: f, channel: @channel, categories: @categories %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE CHANNEL]</button>
+      <%= link_to "[CANCEL]", admin_uplink_index_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :moderation %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation) %>
+</div>

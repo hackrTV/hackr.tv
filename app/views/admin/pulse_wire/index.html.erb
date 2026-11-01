@@ -1,226 +1,111 @@
-<%= render TuiWindowComponent.new(title: "/root/pulsewire :: MODERATE THE WIRE", variant: :admin, width: 1600) do %>
+<%# /root/pulse_wire — every pulse on the WIRE as a console ledger
+    (2026-10-31; root_console.css): bar ([>] THE WIRE), ON RECORD, the
+    // FILTER // rows (server-side: STATUS links, HACKR, SEARCH, FROM / TO
+    — [FILTER] / [x] CLEAR), the BULK row (select-all, count, [DROP
+    SELECTED] [DELETE SELECTED] — the inline script below builds the
+    POST / DELETE; ids verbatim), // PULSES // newest first ([NN] ·
+    checkbox · content over @alias / SPLICE / DROPPED · echoes · splices
+    · when · [>] VIEW [DROP] / [RESTORE] [DEL]), destinations, the >
+    prompt (NN opens the pulse on the WIRE). Assigns: @pulses. %>
+<% content_for :title, "/root/pulse_wire :: WIRE" %>
+<% pulses = @pulses.to_a %>
+<% numbers = pulses.each_index.map { |i| root_num(i, total: pulses.size) } %>
+<% status = params[:status].to_s.presence_in(%w[active dropped]).to_s %>
+<% keep = request.query_parameters.slice("username", "search", "start_date", "end_date") %>
+<% filtered = status.present? || keep.values.any?(&:present?) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "PULSEWIRE", sub: "ROOT · MODERATION · /root/pulse_wire"} do %>
+    <%= link_to "[>] THE WIRE", wire_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(pulses.size, "pulse") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· <%= pulses.count(&:pulse_dropped) %> dropped</span></span>
+    </div>
+  </div>
 
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Actions -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <div style="margin-left: auto; display: flex; gap: 10px;">
-          <%= tui_button "🗑 PulseDrops", pulse_drops_admin_pulse_wire_index_path, color: :red, style: "padding: 8px 20px;" %>
-        </div>
+  <%= form_with url: admin_pulse_wire_index_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <div class="console-status-row rc-field">
+        <span class="console-key">STATUS</span>
+        <span class="console-val">
+          <% [["ALL", ""], ["ACTIVE", "active"], ["DROPPED", "dropped"]].each do |word, value| %>
+            <%= link_to word, admin_pulse_wire_index_path(keep.merge(status: value.presence).compact), class: class_names("rc-btn", "rc-btn--on": status == value), aria: {current: status == value && "page"} %>
+          <% end %>
+        </span>
       </div>
-
-      <!-- Filters -->
-      <div style="margin-bottom: 20px; background: #1a1a1a; padding: 15px; border: 1px solid #333;">
-        <label style="color: #888; display: block; margin-bottom: 8px; font-weight: bold;">
-          FILTER PULSES
-        </label>
-
-        <%= form_with url: admin_pulse_wire_index_path, method: :get, local: true, style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
-          <!-- Status Filter -->
-          <div style="flex: 0 0 auto;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Status</label>
-            <div style="display: flex; gap: 5px;">
-              <%= tui_button "All", admin_pulse_wire_index_path(username: params[:username], search: params[:search], start_date: params[:start_date], end_date: params[:end_date]),
-                  color: (params[:status].blank? ? :cyan : :grey), style: "padding: 5px 12px;" %>
-              <%= tui_button "Active", admin_pulse_wire_index_path(status: 'active', username: params[:username], search: params[:search], start_date: params[:start_date], end_date: params[:end_date]),
-                  color: (params[:status] == 'active' ? :green : :grey), style: "padding: 5px 12px;" %>
-              <%= tui_button "Dropped", admin_pulse_wire_index_path(status: 'dropped', username: params[:username], search: params[:search], start_date: params[:start_date], end_date: params[:end_date]),
-                  color: (params[:status] == 'dropped' ? :red : :grey), style: "padding: 5px 12px;" %>
-            </div>
-          </div>
-
-          <!-- Username Filter -->
-          <div style="flex: 1 1 200px;">
-            <label for="username" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Username</label>
-            <%= f.text_field :username,
-                value: params[:username],
-                placeholder: "@username",
-                style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <!-- Content Search -->
-          <div style="flex: 1 1 200px;">
-            <label for="search" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Content Search</label>
-            <%= f.text_field :search,
-                value: params[:search],
-                placeholder: "Search pulse content...",
-                style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <!-- Date Range -->
-          <div style="flex: 0 0 auto;">
-            <label for="start_date" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Start Date</label>
-            <%= f.date_field :start_date,
-                value: params[:start_date],
-                style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <div style="flex: 0 0 auto;">
-            <label for="end_date" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">End Date</label>
-            <%= f.date_field :end_date,
-                value: params[:end_date],
-                style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <!-- Submit Buttons -->
-          <div style="flex: 0 0 auto; display: flex; gap: 5px;">
-            <%= tui_submit "Apply Filters", form: f, color: :purple, style: "padding: 8px 20px;" %>
-            <%= tui_button "Clear", admin_pulse_wire_index_path, color: :grey, style: "padding: 8px 20px;" %>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Stats -->
-      <div style="margin-bottom: 20px; color: #666;">
-        <strong><%= @pulses.count %></strong> pulse<%= @pulses.count == 1 ? '' : 's' %> found
-        <% if params[:status].present? || params[:username].present? || params[:search].present? || params[:start_date].present? || params[:end_date].present? %>
-          <span style="color: #888;"> (filtered)</span>
-        <% end %>
-      </div>
-
-      <!-- Bulk Actions -->
-      <% if @pulses.any? %>
-        <div style="margin-bottom: 15px; background: #1a1a1a; padding: 15px; border: 1px solid #333;">
-          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <label style="color: #888;">
-              <input type="checkbox" id="select-all" style="margin-right: 8px;">
-              Select All
-            </label>
-            <span id="selected-count" style="color: #666; margin-left: 10px;">0 selected</span>
-            <div style="margin-left: auto; display: flex; gap: 10px;">
-              <button id="bulk-pulse-drop"
-                      class="tui-button orange-168"
-                      style="padding: 8px 20px;"
-                      disabled>
-                Pulse-Drop Selected
-              </button>
-              <button id="bulk-delete"
-                      class="tui-button red-168"
-                      style="padding: 8px 20px;"
-                      disabled>
-                Delete Selected
-              </button>
-            </div>
-          </div>
-        </div>
+      <%= root_field("HACKR", id: "username") do %>
+        <%= text_field_tag :username, params[:username], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
       <% end %>
-
-      <!-- Pulses Table -->
-      <% if @pulses.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center; width: 5%;"></th>
-                <th style="text-align: left; width: 13%;">Hackr</th>
-                <th style="text-align: left; width: 42%;">Content</th>
-                <th style="text-align: center; width: 8%;">Echoes</th>
-                <th style="text-align: center; width: 8%;">Splices</th>
-                <th style="text-align: center; width: 10%;">Timestamp</th>
-                <th style="text-align: center; width: 14%;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @pulses.each do |pulse| %>
-                <tr class="admin-table-row"<%= " style=\"background: #1a0000;\"".html_safe if pulse.pulse_dropped %>>
-                  <td style="text-align: center;">
-                    <input type="checkbox" class="pulse-checkbox" value="<%= pulse.id %>">
-                  </td>
-                  <td>
-                    <strong class="cyan-255-text">@<%= pulse.grid_hackr.hackr_alias %></strong>
-                    <% if pulse.is_splice? %>
-                      <br>
-                      <small style="color: #888;">↪ Splice</small>
-                    <% end %>
-                  </td>
-                  <td>
-                    <div style="font-family: monospace; line-height: 1.5;">
-                      <%= pulse.content %>
-                    </div>
-                    <% if pulse.pulse_dropped %>
-                      <div style="margin-top: 8px;">
-                        <span class="red-255-text">⚠ PULSE DROPPED</span>
-                        <small style="color: #888;">
-                          <%= time_ago_in_words(pulse.pulse_dropped_at) %> ago
-                        </small>
-                      </div>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="purple-255-text"><%= pulse.echo_count %></span>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="purple-255-text"><%= pulse.splice_count %></span>
-                  </td>
-                  <td style="text-align: center;">
-                    <small style="color: #888;">
-                      <%= pulse.pulsed_at.strftime("%Y-%m-%d") %><br>
-                      <%= pulse.pulsed_at.strftime("%H:%M") %>
-                    </small>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <%= tui_button "View", wire_pulse_path(pulse.id),
-                        target: "_blank",
-                        color: :cyan,
-                        style: "padding: 2px 8px; font-size: 0.9em;" %>
-
-                    <% if pulse.pulse_dropped %>
-                      <%= tui_button_to "Restore", restore_admin_pulse_wire_path(pulse),
-                          method: :post,
-                          form: { style: "display: inline;" },
-                          color: :green,
-                          style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
-                    <% else %>
-                      <%= tui_button_to "Drop", pulse_drop_admin_pulse_wire_path(pulse),
-                          method: :post,
-                          form: { style: "display: inline;" },
-                          data: { confirm: "Pulse-drop this pulse by @#{pulse.grid_hackr.hackr_alias}?" },
-                          color: :orange,
-                          style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
-                    <% end %>
-
-                    <%= tui_button_to "Delete", admin_pulse_wire_path(pulse),
-                        method: :delete,
-                        form: { style: "display: inline;" },
-                        data: { confirm: "Permanently delete this pulse? This cannot be undone!" },
-                        color: :red,
-                        style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">
-            <% if params[:status].present? || params[:username].present? || params[:search].present? %>
-              No pulses match your filters.
-            <% else %>
-              The WIRE is empty. No pulses broadcast yet.
-            <% end %>
-          </p>
-        </div>
+      <%= root_field("SEARCH", id: "search") do %>
+        <%= text_field_tag :search, params[:search], class: "rc-input rc-input--wide", placeholder: "words in the pulse", autocomplete: "off" %>
+      <% end %>
+      <%= root_field("FROM", id: "start_date") do %>
+        <%= date_field_tag :start_date, params[:start_date], class: "rc-input rc-input--date" %>
+        <%= label_tag :end_date, "TO", class: "rc-count" %>
+        <%= date_field_tag :end_date, params[:end_date], class: "rc-input rc-input--date" %>
       <% end %>
     </div>
-<% end %>
+    <% if status.present? %><%= hidden_field_tag :status, status %><% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_pulse_wire_index_path, class: "rc-btn" %>
+    </div>
+  <% end %>
 
-<% if @pulses.any? %>
+  <section class="console-section rc-ledger rc-ledger--pulses" aria-label="Pulses">
+    <div class="console-rule"><span>// PULSES //</span></div>
+    <% if pulses.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO PULSES MATCH" : "THE WIRE IS EMPTY", hint: filtered ? "[x] CLEAR shows every pulse" : "no pulses broadcast yet" %>
+    <% else %>
+      <div class="console-status-row rc-field">
+        <span class="console-key">BULK</span>
+        <span class="console-val">
+          <label class="rc-check"><input type="checkbox" id="select-all"> SELECT ALL</label>
+          <span id="selected-count" class="rc-count">0 selected</span>
+          <button type="button" id="bulk-pulse-drop" class="rc-btn" disabled>[DROP SELECTED]</button>
+          <button type="button" id="bulk-delete" class="rc-btn rc-btn--danger" disabled>[DELETE SELECTED]</button>
+        </span>
+      </div>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>NN</span><span></span><span>PULSE</span><span>ECHO SPLICE</span><span>PULSED</span><span></span>
+      </div>
+    <% end %>
+    <% pulses.each_with_index do |pulse, i| %>
+      <% num = numbers[i] %>
+      <% author = pulse.grid_hackr.hackr_alias %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <input type="checkbox" class="pulse-checkbox rc-check-input" value="<%= pulse.id %>" aria-label="Select pulse <%= num %>">
+        <div class="cc-text">
+          <span class="<%= "rc-off" if pulse.pulse_dropped %>"><%= pulse.content %></span>
+          <div class="cc-meta">@<%= author %><% if pulse.is_splice? %> · SPLICE<% end %><% if pulse.pulse_dropped %> · <span class="rc-bad">DROPPED</span> <%= time_ago_in_words(pulse.pulse_dropped_at) %> ago<% end %></div>
+        </div>
+        <span class="rc-cell"><%= pulse.echo_count %> · <%= pulse.splice_count %></span>
+        <span class="rc-cell"><%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M") %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[>] VIEW", wire_pulse_path(pulse.id), class: "console-link", target: "_blank", rel: "noopener", data: {command: num} %>
+          <% if pulse.pulse_dropped %>
+            <%= button_to "[RESTORE]", restore_admin_pulse_wire_path(pulse), class: "rc-btn" %>
+          <% else %>
+            <%= button_to "[DROP]", pulse_drop_admin_pulse_wire_path(pulse), class: "rc-btn", form: {data: {confirm: "Pulse-drop this pulse by @#{author}?"}} %>
+          <% end %>
+          <%= button_to "[DEL]", admin_pulse_wire_path(pulse), method: :delete, class: "rc-btn rc-btn--danger", form: {data: {confirm: "Permanently delete this pulse? This cannot be undone!"}} %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :moderation, except: "WIRE" %>
+
+  <div class="console-rule"><span>// END OF WIRE //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation, except: "WIRE", numbers: numbers, noun: "a pulse number") %>
+</div>
+
+<% if pulses.any? %>
   <script nonce="<%= content_security_policy_nonce %>">
     document.addEventListener('DOMContentLoaded', function() {
       const selectAllCheckbox = document.getElementById('select-all');

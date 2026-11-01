@@ -1,79 +1,34 @@
-<%# New + edit channel (/root/uplink/channels). Locals: channel, categories
-    (every group in use, for the category field's datalist). The slug is
-    typed on create only — it keys /uplink?channel= and the live stream
-    names — and shown fixed on edit. %>
-<% if flash[:error] %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-    <p class="red-255-text">⚠ ERROR</p>
-    <p class="white-text"><%= flash[:error] %></p>
-  </div>
-<% end %>
-
-<%= form_with model: channel,
-    url: channel.new_record? ? admin_uplink_channels_path : admin_uplink_channel_path(channel.slug),
-    method: channel.new_record? ? :post : :patch, local: true do |f| %>
-  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: CHANNEL ::]</h3>
-
-  <div style="max-width: 560px;">
-    <div style="margin-bottom: 20px;">
-      <% if channel.new_record? %>
-        <%= f.tui_text_field :slug, label: "SLUG", maxlength: 32, autocomplete: "off", spellcheck: "false",
-            hint: "Lowercase letters, numbers, _ and -. Keys the channel's URL (/uplink?channel=slug) and its live streams; fixed once created." %>
-      <% else %>
-        <div class="tui-field">
-          <span class="tui-field-label">SLUG</span>
-          <div><code class="cyan-255-text" style="font-size: 1.1em;"><%= channel.slug %></code></div>
-          <small class="tui-field-hint">Fixed: it keys the channel's URL (/uplink?channel=<%= channel.slug %>) and its live streams.</small>
-        </div>
-      <% end %>
+<%# A channel's fields as console status rows (ConsoleFormBuilder rc_*
+    rows) — new + edit (/root/uplink/channels). The slug is typed on
+    create only (it keys /uplink?channel= and the live stream names) and
+    shown fixed on edit; the category field offers every group in use
+    (datalist). The commit row belongs to the caller. Locals: f, channel,
+    categories. %>
+<div class="console-rule"><span>// CHANNEL //</span></div>
+<div class="console-status">
+  <% if channel.new_record? %>
+    <%= f.rc_text_field :slug, maxlength: 32, required: true, autocomplete: "off", spellcheck: "false", pattern: "[a-z0-9_\\-]+",
+      hint: "lowercase letters, numbers, _ and - · keys /uplink?channel=slug and its live streams · fixed once created" %>
+  <% else %>
+    <div class="console-status-row">
+      <span class="console-key">SLUG</span>
+      <span class="console-val"><span class="rc-hot"><%= channel.slug_in_database %></span> <span class="console-dim">· fixed: keys /uplink?channel=<%= channel.slug_in_database %> and its live streams</span></span>
     </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_text_field :name, label: "CHANNEL NAME", hint: "Shown in the sidebar and the channel header, e.g. #ops." %>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_text_area :description, label: "DESCRIPTION", rows: 3, hint: "The topic line under the channel name." %>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_check_box :is_active, label: "ACTIVE", style: "width: 20px; height: 20px;",
-          hint: "When disabled, the channel will not be accessible." %>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_check_box :requires_livestream, label: "REQUIRES LIVESTREAM", style: "width: 20px; height: 20px;",
-          hint: "When enabled, the channel is only available during live broadcasts." %>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_number_field :slow_mode_seconds, label: "SLOW MODE (SECONDS)", min: 0, max: 300, style: "width: 150px;",
-          hint: "0 = disabled. Users must wait this many seconds between messages." %>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_text_field :category, label: "SIDEBAR CATEGORY", list: "channel-categories", maxlength: 24, autocomplete: "off", spellcheck: "false", style: "width: 250px;",
-          hint: "The heading the channel sits under in the Uplink sidebar. Pick a group in use or type a new one (auto-uppercased). Groups order by their first channel's position." %>
-      <datalist id="channel-categories">
-        <% categories.each do |category| %>
-          <option value="<%= category %>"></option>
-        <% end %>
-      </datalist>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_number_field :position, label: "SIDEBAR POSITION", min: 0, style: "width: 150px;",
-          hint: "Lower sorts first inside the group. The ↑ / ↓ on the channel list swap neighbours for you." %>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_select :minimum_role, [["Operative", "operative"], ["Operator", "operator"], ["Admin", "admin"]], {}, label: "MINIMUM ROLE",
-          hint: "Only users with this role or higher can access the channel." %>
-    </div>
-  </div>
-
-  <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= tui_submit channel.new_record? ? "Create Channel" : "Save Changes", form: f, color: :purple, style: "padding: 10px 30px;" %>
-    <%= tui_button "Cancel", admin_uplink_index_path, color: :grey, style: "padding: 10px 30px;" %>
-  </div>
-<% end %>
+  <% end %>
+  <%= f.rc_text_field :name, required: true, autocomplete: "off", hint: "the sidebar and the channel header, e.g. #ops" %>
+  <%= f.rc_flags("ACCESS", hint: "off hides the channel from everyone · live only opens it during broadcasts") do %>
+    <%= f.rc_check_box :is_active, label: "ACTIVE" %>
+    <%= f.rc_check_box :requires_livestream, label: "LIVE ONLY" %>
+  <% end %>
+  <%= f.rc_select :minimum_role, GridHackr::ROLE_LEVELS.keys.map { |role| [role.upcase, role] }, {}, label: "MIN ROLE", hint: "this role or higher can open the channel" %>
+  <%= f.rc_number_field :slow_mode_seconds, label: "SLOW MODE", width: :short, min: 0, max: 300, hint: "seconds between a hackr's packets · 0 = off" %>
+  <%= f.rc_text_field :category, list: "channel-categories", maxlength: 24, autocomplete: "off", spellcheck: "false",
+    hint: "the sidebar heading · pick a group in use or type a new one (upcased) · groups order by their first channel" %>
+  <%= f.rc_number_field :position, width: :short, min: 0, hint: "lower sorts first inside the group · [UP] / [DN] on the channel list swap neighbours" %>
+</div>
+<datalist id="channel-categories">
+  <% categories.each do |category| %>
+    <option value="<%= category %>"></option>
+  <% end %>
+</datalist>
+<%= f.rc_text_area :description, rows: 3, hint: "the topic line under the channel name" %>

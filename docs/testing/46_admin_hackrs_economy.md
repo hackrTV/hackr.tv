@@ -23,18 +23,30 @@ minutes: 20
 7. Dev tools (if enabled locally): the dev command panel on a hackr
    (xp/cred/item grants) works and logs.
 
-## Steps — broadcast
+## Steps — grid dashboard + broadcast
 
-8. Grid dashboard → system broadcast: send a TEST broadcast. → Both
-   grid sessions (terminal + tactical) see the system line live.
+8. `/root/grid` (a console screen; `[GRID]` from any moderation
+   screen): `// BROADCAST //`, type a TEST line, `[BROADCAST]` →
+   confirm. → `[OK]`; both grid sessions (terminal + tactical) see the
+   system line live, and `// RECENT MESSAGES //` ends on it as
+   `[SYSTEM]`. An empty broadcast → `[ERR]`.
+9. `// ONLINE //` lists who is active in a room right now; `// HACKRS //`
+   lists every account with ROLE / CLR / XP / GRID / LOGIN / NOW (NOW
+   is ON only for the ONLINE ledger's hackrs — active in the last 15
+   minutes and in a room; an idle hackr with a room reads OFF). On the
+   FRESH account: `[GRANT]` → confirm → `[OK]`, GRID reads GRANTED and
+   the button turns `[REVOKE]`; revoke it again. `[DISABLE]` /
+   `[ENABLE]` and `[SVC]` / `[x] SVC` confirm first (don't leave them
+   changed); your own row has no `[DISABLE]`. A hackr's number at the
+   prompt opens the inspector (step 2).
 
 ## Steps — economy
 
-9. Grid → Economy. → Dashboard renders: money supply, cache totals,
-   mint/burn stats.
-10. Grid → Transactions. → Filterable ledger; find your article-38
+10. Grid → Economy. → Dashboard renders: money supply, cache totals,
+    mint/burn stats.
+11. Grid → Transactions. → Filterable ledger; find your article-38
     transfer by hash; genesis/mint/redemption types labeled.
-11. **External debit round-trip**: with an admin Bearer token, run
+12. **External debit round-trip**: with an admin Bearer token, run
     `curl -X POST /api/grid/debit` with `hackr_alias`, `amount`, memo.
     → 200 with tx_hash + remaining balance; the debit shows in the
     ledger and the operative's CRED tab. (Insufficient balance → clean

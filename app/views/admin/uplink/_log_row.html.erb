@@ -1,0 +1,14 @@
+<%# One moderation log entry as a ledger row (the uplink screen's RECENT
+    ACTIVITY, the moderation log): when · @actor · ACTION (red for a
+    punishment, phosphor for a lift, amber for a drop, cyan for a
+    restore) · @target · the reason in full, wrapping (the log is the
+    only place to read it) or the packet · duration. Locals: log. %>
+<% tone = {"squelch" => "rc-bad", "blackout" => "rc-bad", "unsquelch" => "rc-on", "unblackout" => "rc-on", "drop_packet" => "rc-star", "restore_packet" => "rc-hot"}.fetch(log.action, "rc-off") %>
+<div class="rc-row">
+  <span class="console-tag"><%= log.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+  <span class="rc-cell rc-star">@<%= log.actor.hackr_alias %></span>
+  <span class="rc-cell <%= tone %>"><%= log.action.tr("_", " ").upcase %></span>
+  <span class="rc-cell"><%= log.target ? "@#{log.target.hackr_alias}" : "—" %></span>
+  <span class="rc-cell rc-cell--wrap"><% if log.reason.present? %>"<%= log.reason %>"<% elsif log.chat_message_id.present? %>packet #<%= log.chat_message_id %><% else %>—<% end %></span>
+  <span class="rc-cell"><% if log.duration_minutes.present? %><%= log.duration_minutes %> min<% elsif log.action.in?(%w[squelch blackout]) %><span class="rc-bad">PERMANENT</span><% else %>—<% end %></span>
+</div>

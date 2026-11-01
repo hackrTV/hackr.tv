@@ -24,11 +24,14 @@
     <%= vite_typescript_tag "admin.ts" %>
     <%= yield :head %>
     <script nonce="<%= content_security_policy_nonce %>">
-      // Rails UJS confirmation handler
+      // Rails UJS confirmation handler. The clicked button's own
+      // data-confirm wins, so one form can carry two actions with two
+      // messages (the punishments [SQUELCH] / [BLACKOUT]).
       document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('submit', function(event) {
           const form = event.target;
-          const confirmMessage = form.querySelector('[data-confirm]')?.getAttribute('data-confirm') ||
+          const confirmMessage = event.submitter?.getAttribute('data-confirm') ||
+                                 form.querySelector('[data-confirm]')?.getAttribute('data-confirm') ||
                                  form.getAttribute('data-confirm');
 
           if (confirmMessage && !confirm(confirmMessage)) {

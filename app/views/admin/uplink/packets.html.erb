@@ -1,130 +1,72 @@
-<%= render TuiWindowComponent.new(title: "/root/uplink/packets :: MODERATE PACKETS", variant: :admin, width: 1600) do %>
+<%# /root/uplink/packets — every packet on the Uplink as a console ledger
+    (2026-10-31; root_console.css): bar ([<] UPLINK), ON RECORD, the
+    // FILTER // rows (server-side: CHANNEL, STATUS links, HACKR, SEARCH
+    — [FILTER] / [x] CLEAR), // PACKETS // newest first (when · #channel
+    · content over @alias / DROPPED · [DROP] / [RESTORE] [DEL] —
+    admin/uplink/_packet_row), destinations, the > prompt. Assigns:
+    @packets. %>
+<% content_for :title, "/root/uplink/packets :: PACKETS" %>
+<% packets = @packets.to_a %>
+<% status = params[:status].to_s.presence_in(%w[active dropped]).to_s %>
+<% keep = request.query_parameters.slice("channel", "username", "search") %>
+<% filtered = status.present? || keep.values.any?(&:present?) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "PACKETS", sub: "ROOT · MODERATION · /root/uplink/packets"} do %>
+    <%= link_to "[<] UPLINK", admin_uplink_index_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(packets.size, "packet") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· <%= packets.count(&:dropped) %> dropped</span></span>
+    </div>
+  </div>
+
+  <%= form_with url: packets_admin_uplink_index_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <%= root_field("CHANNEL", id: "channel") do %>
+        <%= select_tag :channel, options_for_select(ChatChannel.pluck(:name, :slug), params[:channel]), include_blank: "ALL CHANNELS", class: "rc-select" %>
       <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
+      <div class="console-status-row rc-field">
+        <span class="console-key">STATUS</span>
+        <span class="console-val">
+          <% [["ALL", ""], ["ACTIVE", "active"], ["DROPPED", "dropped"]].each do |word, value| %>
+            <%= link_to word, packets_admin_uplink_index_path(keep.merge(status: value.presence).compact), class: class_names("rc-btn", "rc-btn--on": status == value), aria: {current: status == value && "page"} %>
+          <% end %>
+        </span>
+      </div>
+      <%= root_field("HACKR", id: "username") do %>
+        <%= text_field_tag :username, params[:username], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
       <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-        <%= tui_button "← Uplink Dashboard", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Filters -->
-      <div style="margin-bottom: 20px; background: #1a1a1a; padding: 15px; border: 1px solid #333;">
-        <label style="color: #888; display: block; margin-bottom: 8px; font-weight: bold;">FILTER PACKETS</label>
-
-        <%= form_with url: packets_admin_uplink_index_path, method: :get, local: true, style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
-          <!-- Channel Filter -->
-          <div style="flex: 0 0 auto;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Channel</label>
-            <%= f.select :channel, ChatChannel.pluck(:name, :slug).unshift(["All Channels", ""]), { selected: params[:channel] }, style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <!-- Status Filter -->
-          <div style="flex: 0 0 auto;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Status</label>
-            <div style="display: flex; gap: 5px;">
-              <%= tui_button "All", packets_admin_uplink_index_path(channel: params[:channel], username: params[:username], search: params[:search]),
-                  color: (params[:status].blank? ? :cyan : :grey), style: "padding: 5px 12px;" %>
-              <%= tui_button "Active", packets_admin_uplink_index_path(status: 'active', channel: params[:channel], username: params[:username], search: params[:search]),
-                  color: (params[:status] == 'active' ? :green : :grey), style: "padding: 5px 12px;" %>
-              <%= tui_button "Dropped", packets_admin_uplink_index_path(status: 'dropped', channel: params[:channel], username: params[:username], search: params[:search]),
-                  color: (params[:status] == 'dropped' ? :red : :grey), style: "padding: 5px 12px;" %>
-            </div>
-          </div>
-
-          <!-- Username Filter -->
-          <div style="flex: 1 1 200px;">
-            <label for="username" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Username</label>
-            <%= f.text_field :username, value: params[:username], placeholder: "@username", style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <!-- Content Search -->
-          <div style="flex: 1 1 200px;">
-            <label for="search" style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Search</label>
-            <%= f.text_field :search, value: params[:search], placeholder: "Search content...", style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <div style="flex: 0 0 auto; display: flex; gap: 5px;">
-            <%= tui_submit "Apply Filters", form: f, color: :purple, style: "padding: 8px 20px;" %>
-            <%= tui_button "Clear", packets_admin_uplink_index_path, color: :grey, style: "padding: 8px 20px;" %>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Stats -->
-      <div style="margin-bottom: 20px; color: #666;">
-        <strong><%= @packets.count %></strong> packet<%= @packets.count == 1 ? '' : 's' %> found
-      </div>
-
-      <!-- Packets Table -->
-      <% if @packets.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left; width: 10%;">Channel</th>
-                <th style="text-align: left; width: 12%;">Hackr</th>
-                <th style="text-align: left; width: 48%;">Content</th>
-                <th style="text-align: center; width: 12%;">Timestamp</th>
-                <th style="text-align: center; width: 18%;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @packets.each do |packet| %>
-                <tr class="admin-table-row"<%= " style=\"background: #1a0000;\"".html_safe if packet.dropped %>>
-                  <td>
-                    <span style="color: #7c3aed;"><%= packet.chat_channel.name %></span>
-                  </td>
-                  <td>
-                    <strong class="cyan-255-text">@<%= packet.grid_hackr.hackr_alias %></strong>
-                  </td>
-                  <td>
-                    <div style="font-family: monospace; line-height: 1.5;">
-                      <%= packet.dropped ? "[DROPPED]" : packet.content %>
-                    </div>
-                    <% if packet.dropped %>
-                      <div style="margin-top: 8px;">
-                        <span class="red-255-text">⚠ DROPPED</span>
-                        <small style="color: #888;"><%= time_ago_in_words(packet.dropped_at) %> ago</small>
-                      </div>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <small style="color: #888;">
-                      <%= packet.created_at.strftime("%Y-%m-%d") %><br>
-                      <%= packet.created_at.strftime("%H:%M") %>
-                    </small>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <% if packet.dropped %>
-                      <%= tui_button_to "Restore", admin_restore_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, color: :green, style: "padding: 2px 8px; font-size: 0.9em;" %>
-                    <% else %>
-                      <%= tui_button_to "Drop", admin_drop_uplink_packet_path(packet), method: :post, form: { style: "display: inline;" }, data: { confirm: "Drop this packet?" }, color: :orange, style: "padding: 2px 8px; font-size: 0.9em;" %>
-                    <% end %>
-                    <%= tui_button_to "Delete", admin_destroy_uplink_packet_path(packet), method: :delete, form: { style: "display: inline;" }, data: { confirm: "Permanently delete this packet? This cannot be undone!" }, color: :red, style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No packets match your filters.</p>
-        </div>
+      <%= root_field("SEARCH", id: "search") do %>
+        <%= text_field_tag :search, params[:search], class: "rc-input rc-input--wide", placeholder: "words in the packet", autocomplete: "off" %>
       <% end %>
     </div>
-<% end %>
+    <% if status.present? %><%= hidden_field_tag :status, status %><% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", packets_admin_uplink_index_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--packets" aria-label="Packets">
+    <div class="console-rule"><span>// PACKETS //</span></div>
+    <% if packets.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO PACKETS MATCH" : "NO PACKETS YET", hint: ("[x] CLEAR shows every packet" if filtered) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>SENT</span><span>CHANNEL</span><span>PACKET</span><span></span>
+      </div>
+    <% end %>
+    <% packets.each do |packet| %>
+      <%= render "admin/uplink/packet_row", packet: packet, actions: true %>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :moderation, except: "PACKETS" %>
+
+  <div class="console-rule"><span>// END OF PACKETS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation, except: "PACKETS") %>
+</div>

@@ -1,0 +1,23 @@
+<%# One packet as a ledger row (the uplink screen's RECENT PACKETS, the
+    packets ledger): when · #channel · content over @alias / DROPPED ·
+    [DROP] / [RESTORE] [DEL] when actions. Locals: packet, actions
+    (default false), truncate (a length — the uplink screen's glance;
+    the packets ledger shows every packet whole). %>
+<div class="rc-row">
+  <span class="console-tag"><%= packet.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+  <span class="rc-cell rc-hot"><%= packet.chat_channel.name %></span>
+  <div class="cc-text">
+    <span class="<%= "rc-off" if packet.dropped %>"><% if packet.dropped %>[DROPPED]<% elsif local_assigns[:truncate] %><%= truncate(packet.content, length: local_assigns[:truncate]) %><% else %><%= packet.content %><% end %></span>
+    <div class="cc-meta">@<%= packet.grid_hackr.hackr_alias %><% if packet.dropped && packet.dropped_at %> · <span class="rc-bad">DROPPED</span> <%= time_ago_in_words(packet.dropped_at) %> ago<% end %></div>
+  </div>
+  <span class="rc-cell rc-links">
+    <% if local_assigns[:actions] %>
+      <% if packet.dropped %>
+        <%= button_to "[RESTORE]", admin_restore_uplink_packet_path(packet), class: "rc-btn" %>
+      <% else %>
+        <%= button_to "[DROP]", admin_drop_uplink_packet_path(packet), class: "rc-btn", form: {data: {confirm: "Drop this packet?"}} %>
+      <% end %>
+      <%= button_to "[DEL]", admin_destroy_uplink_packet_path(packet), method: :delete, class: "rc-btn rc-btn--danger", form: {data: {confirm: "Permanently delete this packet? This cannot be undone!"}} %>
+    <% end %>
+  </span>
+</div>

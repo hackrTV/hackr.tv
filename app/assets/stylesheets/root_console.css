@@ -103,6 +103,7 @@
 .rc-row--head > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rc-cell { color: var(--fg-muted); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
 .rc-cell--r { text-align: right; }
+.rc-cell--wrap { white-space: normal; overflow-wrap: anywhere; } /* a cell read in full (the moderation log's reasons) */
 .rc-links { display: flex; align-items: center; gap: 6px; justify-content: flex-end; white-space: nowrap; }
 .rc-links .console-link, .rc-links .rc-btn { font-size: 12px; letter-spacing: 1px; }
 .rc-links form { display: inline; margin: 0; } /* a row's button_to ([GO LIVE], [DEL]) */
@@ -121,6 +122,20 @@
 .rc-ledger--events { --rc-cols: 9ch 22ch minmax(0, 1fr) 4ch; } /* the world feed: time · type · message · SIM */
 .rc-ledger--playlists { --rc-cols: 5ch minmax(0, 1fr) 10ch 14ch 10ch; } /* NN · name · tracks · crossfade · volume */
 .rc-ledger--surface { --rc-cols: 36ch minmax(0, 1fr); } /* the overlays' HUD data surface: endpoint · what it carries */
+/* Ledgers whose rows carry a varying set of buttons size the links
+ * column to the widest set, so the cells line up row to row (measured
+ * in Chrome at 1400px, 2026-10-31: widest set + ~10px; a new button
+ * in a row means re-measuring). */
+.rc-ledger--pulses { --rc-cols: 5ch 14px minmax(0, 1fr) 12ch 16ch 220px; } /* the WIRE: NN · select · pulse over @alias · echo · splice · pulsed · [>] VIEW [RESTORE] [DEL] */
+.rc-ledger--drops { --rc-cols: 5ch minmax(0, 1fr) 12ch 16ch 220px; } /* pulse drops: NN · pulse over @alias · echo · splice · dropped · links */
+.rc-ledger--channels { --rc-cols: 5ch minmax(0, 1fr) 5ch 7ch 10ch 9ch 10ch 280px; } /* uplink channels: NN · name over slug · POS · ACTIVE · LIVE ONLY · SLOW · ROLE · [UP] [DN] [DEACTIVATE] [EDIT] */
+.rc-ledger--packets { --rc-cols: 16ch 14ch minmax(0, 1fr) 160px; } /* packets: sent · channel · packet over @alias · [RESTORE] [DEL] */
+.rc-ledger--punishments { --rc-cols: 16ch minmax(0, 1fr) 9ch 16ch 16ch 8ch 72px; } /* issued · @alias over reason · TYPE · by · expires · status · [LIFT] */
+.rc-ledger--modlog { --rc-cols: 16ch 16ch 15ch 16ch minmax(0, 1fr) 10ch; } /* when · actor · ACTION · target · details · duration */
+.rc-ledger--online { --rc-cols: 5ch minmax(0, 1fr) 10ch minmax(0, 1fr) 8ch; } /* the grid's online hackrs: NN · alias · ROLE · room · room id */
+.rc-ledger--chat { --rc-cols: 9ch 24ch minmax(0, 1fr); } /* the grid's recent messages: time · room · <alias> line */
+.rc-ledger--hackrs { --rc-cols: 5ch minmax(0, 1fr) 10ch 4ch 7ch 8ch 9ch 4ch 260px; } /* NN · alias over id · ROLE · CLR · XP · GRID · LOGIN · NOW · [REVOKE] [DISABLE] [x] SVC */
+.rc-check-input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent-alt); } /* a ledger row's select box (the WIRE's bulk actions) */
 
 /* An emote as chat draws it (28px tall, wide emotes up to 4:1). */
 .rc-emote { display: block; height: 28px; width: auto; max-width: 112px; }
@@ -188,4 +203,14 @@
   .rc-stats { gap: 8px 20px; }
   .rc-ledger--events .rc-row { grid-template-columns: 9ch minmax(0, 1fr); }
   .rc-ledger--surface .rc-row { grid-template-columns: minmax(0, 1fr); }
+  .rc-ledger--pulses .rc-row { grid-template-columns: 5ch 14px minmax(0, 1fr); }
+  .rc-ledger--pulses .rc-links { grid-column: 3 / -1; justify-content: flex-start; }
+  .rc-ledger--chat .rc-row { grid-template-columns: 9ch minmax(0, 1fr); }
+  /* Time-led ledgers: the time gives way to the text; the log keeps every cell, two to a line. */
+  .rc-ledger--packets .rc-row, .rc-ledger--punishments .rc-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .rc-ledger--packets .console-tag, .rc-ledger--punishments .console-tag { display: none; }
+  .rc-ledger--modlog .rc-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .rc-ledger--modlog .rc-row .rc-cell { display: block; }
+  /* Rows with a run of buttons: the buttons drop to a line of their own under the name. */
+  .rc-ledger--drops .rc-links, .rc-ledger--channels .rc-links, .rc-ledger--hackrs .rc-links { grid-column: 2 / -1; justify-content: flex-start; flex-wrap: wrap; }
 }

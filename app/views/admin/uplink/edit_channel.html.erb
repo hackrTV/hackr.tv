@@ -1,8 +1,29 @@
-<%= render TuiWindowComponent.new(title: "/root/uplink/channels/#{@channel.slug} :: EDIT CHANNEL", variant: :admin, width: 800) do %>
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px;">
-        <%= tui_button "← Back to Uplink", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-      <%= render "channel_form", channel: @channel, categories: @categories %>
+<%# /root/uplink/channels/:slug/edit — a channel's record as a console
+    screen (2026-10-31): bar (name · ROOT · UPLINK · path; [<] UPLINK,
+    [>] OPEN on /uplink), the fields (_channel_form), // COMMIT // ([SAVE
+    CHANNEL] [CANCEL]; channels are switched off, never deleted),
+    destinations, the > prompt. A save lands on the channel list, where
+    the sidebar order shows. Assigns: @channel, @categories. %>
+<% content_for :title, "/root/uplink/channels/#{@channel.slug_in_database} :: CHANNEL" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: @channel.name_in_database, sub: "ROOT · UPLINK · /root/uplink/channels/#{@channel.slug_in_database}"} do %>
+    <% unless @channel.is_active_in_database %><%= root_badge("OFF", :warn) %><% end %>
+    <%= link_to "[>] OPEN", uplink_path(channel: @channel.slug_in_database), class: "console-bar-link" %>
+    <%= link_to "[<] UPLINK", admin_uplink_index_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @channel, url: admin_uplink_channel_path(@channel.slug_in_database), method: :patch, local: true do |f| %>
+    <%= render "channel_form", f: f, channel: @channel, categories: @categories %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE CHANNEL]</button>
+      <%= link_to "[CANCEL]", admin_uplink_index_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :moderation %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation) %>
+</div>

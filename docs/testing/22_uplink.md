@@ -19,15 +19,16 @@ minutes: 49
    shortens so the composer stays above the player bar; closing the
    player gives the room back.
 3. `[o] OPERATIVES` collapses/expands the right pane and is remembered
-   on reload. In `/root/uplink` the CHANNELS table lists the channels
-   under their category headings in sidebar order. `+ New Channel`
-   creates one (slug fixed after create; position defaults to the end);
-   the Sidebar Category field offers the groups in use to pick from, or
-   type a new one; `↑` / `↓` on a row swap it with its neighbour inside
-   its group (positions renumber in steps of 10; the arrows are off at
-   a group's edges); Activate/Deactivate flips it in place. Edit a
-   channel's category/position. → The table regroups at once; the
-   `/uplink` sidebar follows on its next load.
+   on reload. In `/root/uplink` (a console screen) the channels sit
+   under one `// <CATEGORY> · N CHANNELS //` rule per group in sidebar
+   order. `[+] NEW CHANNEL` creates one (slug fixed after create;
+   position defaults to the end); the CATEGORY field offers the groups
+   in use to pick from, or type a new one; `[UP]` / `[DN]` on a row swap
+   it with its neighbour inside its group (positions renumber in steps
+   of 10; the buttons are off at a group's edges); `[ACTIVATE]` /
+   `[DEACTIVATE]` flips it in place. Edit a channel's category/position
+   (its number at the prompt opens it). → The list regroups at once;
+   the `/uplink` sidebar follows on its next load.
 4. Narrow the window under 768px. → Rail hidden; `[#]` in the channel
    header opens the channel list as a drawer over the pane, `[o]` the
    operatives drawer; backdrop click or Escape closes; the pane behind

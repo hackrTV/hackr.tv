@@ -1,208 +1,102 @@
-<%= render TuiWindowComponent.new(title: "/root/uplink :: UPLINK CONTROL", variant: :admin, width: 1600) do %>
+<%# /root/uplink — the Uplink's channels and the moderation at a glance as
+    a console screen (2026-10-31; root_console.css): bar ([+] NEW
+    CHANNEL, [>] UPLINK), ON RECORD, one // <CATEGORY> // rule per
+    sidebar group in the order /uplink draws them (UplinkHelper#
+    uplink_channel_groups over ChatChannel.ordered), channels numbered
+    through ([NN] · name over slug · POS · ACTIVE / OFF · STREAM · SLOW ·
+    ROLE · [UP] [DN] swap inside the group, disabled at its edges ·
+    [ACTIVATE] / [DEACTIVATE] · [EDIT]), // IN FORCE // the active
+    punishments, // RECENT PACKETS // the last 20, // RECENT ACTIVITY //
+    the last 10 log entries, destinations, the > prompt (NN opens the
+    channel). Assigns: @channels, @active_punishments, @recent_packets,
+    @moderation_logs. %>
+<% content_for :title, "/root/uplink :: UPLINK" %>
+<% channels = @channels.to_a %>
+<% groups = uplink_channel_groups(channels) %>
+<% numbers = channels.each_index.map { |i| root_num(i, total: channels.size) } %>
+<% counter = 0 %>
+<% punishments = @active_punishments.to_a %>
+<% packets = @recent_packets.to_a %>
+<% logs = @moderation_logs.to_a %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "UPLINK", sub: "ROOT · MODERATION · /root/uplink"} do %>
+    <%= link_to "[+] NEW CHANNEL", admin_new_uplink_channel_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] UPLINK", uplink_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "📡 Packets", packets_admin_uplink_index_path, color: :cyan, style: "padding: 8px 20px;" %>
-        <%= tui_button "🚫 Punishments", punishments_admin_uplink_index_path, color: :orange, style: "padding: 8px 20px;" %>
-        <%= tui_button "📋 Mod Log", moderation_log_admin_uplink_index_path, color: :purple, style: "padding: 8px 20px;" %>
-        <%= tui_button "+ New Channel", admin_new_uplink_channel_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Channels Section: grouped the way the /uplink sidebar renders
-           (category headings in order of their first channel, channels by
-           position inside), so a category/position edit shows its effect
-           here. ↑/↓ swap a channel with its neighbour inside its group. -->
-      <div style="margin-bottom: 30px;">
-        <h3 style="color: #7c3aed; margin-bottom: 15px;">CHANNELS <small style="color: #666; font-weight: normal;">— as the Uplink sidebar orders them</small></h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Channel</th>
-                <th style="text-align: center;">Position</th>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: center;">Requires Stream</th>
-                <th style="text-align: center;">Slow Mode</th>
-                <th style="text-align: center;">Min Role</th>
-                <th style="text-align: center;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% uplink_channel_groups(@channels).each do |category, channels| %>
-                <tr class="uplink-admin-group">
-                  <td colspan="7" style="text-align: left; padding-top: 14px; color: #7c3aed; letter-spacing: 1px;">
-                    ▸ <%= category %>
-                    <small style="color: #666; letter-spacing: 0;"><%= pluralize(channels.size, "channel") %></small>
-                  </td>
-                </tr>
-                <% channels.each_with_index do |channel, index| %>
-                <tr>
-                  <td style="padding-left: 24px;">
-                    <strong class="cyan-255-text"><%= channel.name %></strong>
-                    <br><small style="color: #666;"><%= channel.slug %></small>
-                  </td>
-                  <td style="text-align: center;">
-                    <small style="color: #666;">#<%= channel.position %></small>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if channel.is_active %>
-                      <span class="green-255-text">● Active</span>
-                    <% else %>
-                      <span class="red-255-text">○ Inactive</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <%= channel.requires_livestream ? "Yes" : "No" %>
-                  </td>
-                  <td style="text-align: center;">
-                    <%= channel.slow_mode_seconds > 0 ? "#{channel.slow_mode_seconds}s" : "Off" %>
-                  </td>
-                  <td style="text-align: center;">
-                    <%= channel.minimum_role %>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <%= tui_button "Edit", admin_edit_uplink_channel_path(slug: channel.slug), color: :cyan, style: "padding: 4px 12px; font-size: 0.85em;" %>
-                    <%= tui_button_to "↑", admin_move_uplink_channel_path(slug: channel.slug, direction: "up"), method: :post, color: :grey,
-                        disabled: index.zero?, title: "Move up within #{category}", style: "padding: 4px 10px; font-size: 0.85em;", form: {style: "display: inline;"} %>
-                    <%= tui_button_to "↓", admin_move_uplink_channel_path(slug: channel.slug, direction: "down"), method: :post, color: :grey,
-                        disabled: index == channels.size - 1, title: "Move down within #{category}", style: "padding: 4px 10px; font-size: 0.85em;", form: {style: "display: inline;"} %>
-                    <%= tui_button_to channel.is_active ? "Deactivate" : "Activate", admin_toggle_uplink_channel_path(slug: channel.slug), method: :post,
-                        color: channel.is_active ? :orange : :green, title: channel.is_active ? "Hide the channel from everyone" : "Open the channel again",
-                        style: "padding: 4px 12px; font-size: 0.85em;", form: {style: "display: inline;"} %>
-                  </td>
-                </tr>
-                <% end %>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      </div>
-
-      <!-- Active Punishments Section -->
-      <div style="margin-bottom: 30px;">
-        <h3 style="color: #ff5555; margin-bottom: 15px;">ACTIVE PUNISHMENTS (<%= @active_punishments.count %>)</h3>
-        <% if @active_punishments.any? %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">User</th>
-                  <th style="text-align: center;">Type</th>
-                  <th style="text-align: left;">Reason</th>
-                  <th style="text-align: center;">Issued By</th>
-                  <th style="text-align: center;">Expires</th>
-                  <th style="text-align: center;">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @active_punishments.each do |punishment| %>
-                  <tr>
-                    <td>
-                      <strong class="cyan-255-text">@<%= punishment.grid_hackr.hackr_alias %></strong>
-                    </td>
-                    <td style="text-align: center;">
-                      <% if punishment.punishment_type == "blackout" %>
-                        <span class="red-255-text">BLACKOUT</span>
-                      <% else %>
-                        <span class="orange-255-text">SQUELCH</span>
-                      <% end %>
-                    </td>
-                    <td>
-                      <small><%= punishment.reason || "-" %></small>
-                    </td>
-                    <td style="text-align: center;">
-                      <small>@<%= punishment.issued_by.hackr_alias %></small>
-                    </td>
-                    <td style="text-align: center;">
-                      <% if punishment.permanent? %>
-                        <span class="red-255-text">Permanent</span>
-                      <% else %>
-                        <%= distance_of_time_in_words_to_now(punishment.expires_at) %>
-                      <% end %>
-                    </td>
-                    <td style="text-align: center;">
-                      <%= tui_button_to "Lift", admin_lift_uplink_punishment_path(punishment), method: :delete, color: :green, style: "padding: 4px 12px; font-size: 0.85em;" %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        <% else %>
-          <div style="padding: 20px; text-align: center; background: #1a1a1a; color: #666;">
-            No active punishments.
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Recent Packets Section -->
-      <div style="margin-bottom: 30px;">
-        <h3 style="color: #00d4ff; margin-bottom: 15px;">RECENT PACKETS</h3>
-        <% if @recent_packets.any? %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "max-height: 400px; overflow-y: auto;") do %>
-            <% @recent_packets.each do |packet| %>
-              <div style="padding: 8px 12px; border-bottom: 1px solid #222; <%= packet.dropped ? 'opacity: 0.5; background: rgba(255,0,0,0.05);' : '' %>">
-                <span style="color: #555; font-size: 0.75rem;"><%= packet.created_at.strftime("%H:%M") %></span>
-                <span style="color: #666; font-size: 0.75rem;">[<%= packet.chat_channel.slug %>]</span>
-                <strong style="color: #00d4ff;">@<%= packet.grid_hackr.hackr_alias %></strong>
-                <span style="color: #ccc;"><%= packet.dropped ? "[DROPPED]" : packet.content.truncate(100) %></span>
-              </div>
-            <% end %>
-          <% end %>
-          <div style="margin-top: 10px;">
-            <%= link_to "View All Packets →", packets_admin_uplink_index_path, style: "color: #7c3aed;" %>
-          </div>
-        <% else %>
-          <div style="padding: 20px; text-align: center; background: #1a1a1a; color: #666;">
-            No packets yet.
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Recent Moderation Log -->
-      <div>
-        <h3 style="color: #a78bfa; margin-bottom: 15px;">RECENT MODERATION ACTIVITY</h3>
-        <% if @moderation_logs.any? %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <% @moderation_logs.each do |log| %>
-              <div style="padding: 8px 12px; border-bottom: 1px solid #222;">
-                <span style="color: #555; font-size: 0.75rem;"><%= log.created_at.strftime("%Y-%m-%d %H:%M") %></span>
-                <strong style="color: #ffaa00;">@<%= log.actor.hackr_alias %></strong>
-                <span style="color: #888;"><%= log.action.gsub("_", " ") %></span>
-                <% if log.target %>
-                  <span style="color: #00d4ff;">@<%= log.target.hackr_alias %></span>
-                <% end %>
-                <% if log.reason %>
-                  <small style="color: #666;"> - "<%= log.reason.truncate(50) %>"</small>
-                <% end %>
-              </div>
-            <% end %>
-          <% end %>
-          <div style="margin-top: 10px;">
-            <%= link_to "View Full Log →", moderation_log_admin_uplink_index_path, style: "color: #7c3aed;" %>
-          </div>
-        <% else %>
-          <div style="padding: 20px; text-align: center; background: #1a1a1a; color: #666;">
-            No moderation activity yet.
-          </div>
-        <% end %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(channels.size, "channel") %> <span class="console-dim">· <%= channels.count(&:is_active) %> active · <%= pluralize(groups.size, "sidebar group") %> · <%= punishments.size %> in force</span></span>
     </div>
-<% end %>
+  </div>
+
+  <% if channels.empty? %>
+    <div class="console-rule"><span>// CHANNELS //</span></div>
+    <%= render "admin/console/empty", text: "NO CHANNELS ON RECORD", hint: "[+] NEW CHANNEL opens the first one" %>
+  <% end %>
+  <% groups.each do |category, rows| %>
+    <section class="console-section rc-ledger rc-ledger--channels" aria-label="<%= category %>">
+      <div class="console-rule"><span>// <%= category %> · <%= pluralize(rows.size, "channel").upcase %> //</span></div>
+      <% rows.each_with_index do |channel, index| %>
+        <% num = numbers[counter] %>
+        <% counter += 1 %>
+        <div class="rc-row">
+          <span class="console-tag">[<%= num %>]</span>
+          <div class="cc-text">
+            <%= link_to channel.name, admin_edit_uplink_channel_path(slug: channel.slug), class: "console-link cc-name", data: {command: num} %>
+            <div class="cc-meta"><%= channel.slug %><% if channel.description.present? %> · <%= truncate(channel.description, length: 60) %><% end %></div>
+          </div>
+          <span class="rc-cell">#<%= channel.position %></span>
+          <span class="rc-cell <%= channel.is_active ? "rc-on" : "rc-bad" %>"><%= channel.is_active ? "ACTIVE" : "OFF" %></span>
+          <span class="rc-cell <%= channel.requires_livestream ? "rc-hot" : "rc-off" %>"><%= channel.requires_livestream ? "LIVE ONLY" : "ALWAYS" %></span>
+          <span class="rc-cell"><%= (channel.slow_mode_seconds > 0) ? "SLOW #{channel.slow_mode_seconds}s" : "—" %></span>
+          <span class="rc-cell"><%= channel.minimum_role.upcase %></span>
+          <span class="rc-cell rc-links">
+            <%= button_to "[UP]", admin_move_uplink_channel_path(slug: channel.slug, direction: "up"), class: "rc-btn", disabled: index.zero?, title: "Move up within #{category}" %>
+            <%= button_to "[DN]", admin_move_uplink_channel_path(slug: channel.slug, direction: "down"), class: "rc-btn", disabled: index == rows.size - 1, title: "Move down within #{category}" %>
+            <%= button_to channel.is_active ? "[DEACTIVATE]" : "[ACTIVATE]", admin_toggle_uplink_channel_path(slug: channel.slug), class: class_names("rc-btn", "rc-btn--danger": channel.is_active),
+              title: channel.is_active ? "Hide the channel from everyone" : "Open the channel again" %>
+            <%= link_to "[EDIT]", admin_edit_uplink_channel_path(slug: channel.slug), class: "console-link" %>
+          </span>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--punishments" aria-label="Punishments in force">
+    <div class="console-rule"><span>// IN FORCE · <%= pluralize(punishments.size, "punishment").upcase %> //</span></div>
+    <% if punishments.empty? %>
+      <%= render "admin/console/empty", text: "NO ACTIVE PUNISHMENTS", hint: "[PUNISH] issues a squelch or a blackout" %>
+    <% end %>
+    <% punishments.each do |punishment| %>
+      <%= render "admin/uplink/punishment_row", punishment: punishment %>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--packets" aria-label="Recent packets">
+    <div class="console-rule"><span>// RECENT PACKETS //</span></div>
+    <% if packets.empty? %>
+      <%= render "admin/console/empty", text: "NO PACKETS YET" %>
+    <% end %>
+    <% packets.each do |packet| %>
+      <%= render "admin/uplink/packet_row", packet: packet, truncate: 100 %>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--modlog" aria-label="Recent moderation activity">
+    <div class="console-rule"><span>// RECENT ACTIVITY //</span></div>
+    <% if logs.empty? %>
+      <%= render "admin/console/empty", text: "NO MODERATION ACTIVITY YET" %>
+    <% end %>
+    <% logs.each do |log| %>
+      <%= render "admin/uplink/log_row", log: log %>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :moderation, except: "UPLINK" %>
+
+  <div class="console-rule"><span>// END OF UPLINK //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation, except: "UPLINK", numbers: numbers, noun: "a channel number", extra: ["new"]) %>
+</div>
