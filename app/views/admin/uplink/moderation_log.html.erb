@@ -1,113 +1,60 @@
-<%= render TuiWindowComponent.new(title: "/root/uplink/moderation_log :: AUDIT TRAIL", variant: :admin, width: 1600) do %>
+<%# /root/uplink/moderation_log — who did what to whom on the Uplink as a
+    console ledger (2026-10-31; root_console.css): bar ([<] UPLINK), ON
+    RECORD, the // FILTER // rows (server-side: ACTION, ACTOR, TARGET —
+    [FILTER] / [x] CLEAR), // LOG // newest first (admin/uplink/_log_row:
+    when · @actor · ACTION · @target · reason / packet · duration),
+    destinations, the > prompt. Assigns: @logs. %>
+<% content_for :title, "/root/uplink/moderation_log :: MODLOG" %>
+<% logs = @logs.to_a %>
+<% filtered = request.query_parameters.slice("action_type", "actor", "target").values.any?(&:present?) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "MODERATION LOG", sub: "ROOT · MODERATION · /root/uplink/moderation_log"} do %>
+    <%= link_to "[<] UPLINK", admin_uplink_index_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-        <%= tui_button "← Uplink Dashboard", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(logs.size, "entry") %><% if filtered %> <span class="console-dim">· filtered</span><% end %></span>
+    </div>
+  </div>
 
-      <!-- Filters -->
-      <div style="margin-bottom: 20px; background: #1a1a1a; padding: 15px; border: 1px solid #333;">
-        <label style="color: #888; display: block; margin-bottom: 8px; font-weight: bold;">FILTER LOG</label>
-
-        <%= form_with url: moderation_log_admin_uplink_index_path, method: :get, local: true, style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
-          <div style="flex: 0 0 auto;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Action</label>
-            <%= f.select :action_type, ModerationLog::ACTIONS.map { |a| [a.gsub("_", " ").titleize, a] }.unshift(["All Actions", ""]), { selected: params[:action_type] }, style: "padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <div style="flex: 1 1 150px;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Actor</label>
-            <%= f.text_field :actor, value: params[:actor], placeholder: "@username", style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <div style="flex: 1 1 150px;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Target</label>
-            <%= f.text_field :target, value: params[:target], placeholder: "@username", style: "width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;" %>
-          </div>
-
-          <div style="flex: 0 0 auto; display: flex; gap: 5px;">
-            <%= tui_submit "Apply Filters", form: f, color: :purple, style: "padding: 8px 20px;" %>
-            <%= tui_button "Clear", moderation_log_admin_uplink_index_path, color: :grey, style: "padding: 8px 20px;" %>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Stats -->
-      <div style="margin-bottom: 20px; color: #666;">
-        <strong><%= @logs.count %></strong> log entr<%= @logs.count == 1 ? 'y' : 'ies' %>
-      </div>
-
-      <!-- Logs Table -->
-      <% if @logs.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center; width: 15%;">Timestamp</th>
-                <th style="text-align: center; width: 15%;">Actor</th>
-                <th style="text-align: center; width: 15%;">Action</th>
-                <th style="text-align: center; width: 15%;">Target</th>
-                <th style="text-align: left; width: 25%;">Details</th>
-                <th style="text-align: center; width: 15%;">Duration</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @logs.each do |log| %>
-                <tr class="admin-table-row">
-                  <td style="text-align: center;">
-                    <small style="color: #888;">
-                      <%= log.created_at.strftime("%Y-%m-%d") %><br>
-                      <%= log.created_at.strftime("%H:%M:%S") %>
-                    </small>
-                  </td>
-                  <td style="text-align: center;">
-                    <strong class="orange-255-text">@<%= log.actor.hackr_alias %></strong>
-                  </td>
-                  <td style="text-align: center;">
-                    <% action_color = case log.action
-                      when "squelch", "blackout" then "#ff5555"
-                      when "unsquelch", "unblackout" then "#00ff00"
-                      when "drop_packet" then "#ffaa00"
-                      when "restore_packet" then "#00d4ff"
-                      else "#888"
-                    end %>
-                    <span style="color: <%= action_color %>;"><%= log.action.gsub("_", " ").upcase %></span>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if log.target %>
-                      <strong class="cyan-255-text">@<%= log.target.hackr_alias %></strong>
-                    <% else %>
-                      <span style="color: #555;">-</span>
-                    <% end %>
-                  </td>
-                  <td>
-                    <% if log.reason.present? %>
-                      <small style="color: #888;">"<%= log.reason %>"</small>
-                    <% elsif log.chat_message_id.present? %>
-                      <small style="color: #666;">Packet #<%= log.chat_message_id %></small>
-                    <% else %>
-                      <span style="color: #555;">-</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if log.duration_minutes.present? %>
-                      <%= log.duration_minutes %> min
-                    <% elsif log.action.in?(%w[squelch blackout]) %>
-                      <span class="red-255-text">Permanent</span>
-                    <% else %>
-                      <span style="color: #555;">-</span>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No moderation logs found.</p>
-        </div>
+  <%= form_with url: moderation_log_admin_uplink_index_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <%= root_field("ACTION", id: "action_type") do %>
+        <%= select_tag :action_type, options_for_select(ModerationLog::ACTIONS.map { |a| [a.tr("_", " ").upcase, a] }, params[:action_type]), include_blank: "ALL ACTIONS", class: "rc-select" %>
+      <% end %>
+      <%= root_field("ACTOR", id: "actor") do %>
+        <%= text_field_tag :actor, params[:actor], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
+      <% end %>
+      <%= root_field("TARGET", id: "target") do %>
+        <%= text_field_tag :target, params[:target], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
       <% end %>
     </div>
-<% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", moderation_log_admin_uplink_index_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--modlog" aria-label="Moderation log">
+    <div class="console-rule"><span>// LOG //</span></div>
+    <% if logs.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO ENTRIES MATCH" : "NO MODERATION ACTIVITY YET", hint: ("[x] CLEAR shows the whole log" if filtered) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>WHEN</span><span>ACTOR</span><span>ACTION</span><span>TARGET</span><span>DETAILS</span><span>DURATION</span>
+      </div>
+    <% end %>
+    <% logs.each do |log| %>
+      <%= render "admin/uplink/log_row", log: log %>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :moderation, except: "MODLOG" %>
+
+  <div class="console-rule"><span>// END OF LOG //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation, except: "MODLOG") %>
+</div>

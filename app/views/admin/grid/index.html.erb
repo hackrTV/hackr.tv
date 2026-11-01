@@ -1,190 +1,134 @@
-<%= render TuiWindowComponent.new(title: "/root/grid :: PULSE GRID ADMIN", variant: :admin) do %>
+<%# /root/grid — the PULSE GRID's operator screen as a console
+    (2026-10-31; root_console.css): bar ([>] HACKRS, [>] EXPORT), ON
+    RECORD, // BROADCAST // (one system line into every room — POST
+    broadcast), // ONLINE // ([NN] · alias · ROLE · room · room id), //
+    RECENT MESSAGES // the last 50 oldest first (time · room · <alias>
+    or [SYSTEM] · line), // HACKRS // every account ([NN] · alias over
+    id / since / SVC · ROLE · CLR · XP · GRID access · LOGIN · NOW: ON
+    while in the ONLINE set (active in the last 15 minutes and in a
+    room), not merely holding a room · [GRANT] / [REVOKE] [ENABLE] / [DISABLE] [SVC] / [x] SVC), numbered
+    through, destinations, the > prompt (NN opens the hackr inspector).
+    Assigns: @online_hackrs, @recent_messages, @all_hackrs. %>
+<% content_for :title, "/root/grid :: GRID" %>
+<% online = @online_hackrs.to_a %>
+<% online_ids = online.map(&:id).to_set %>
+<% hackrs = @all_hackrs.to_a %>
+<% messages = @recent_messages.to_a %>
+<% total = online.size + hackrs.size %>
+<% numbers = (0...total).map { |i| root_num(i, total: total) } %>
+<% granted_ids = hackrs.select { |h| h.feature_grants.any? { |fg| fg.feature == FeatureGrant::PULSE_GRID } }.to_set(&:id) %>
+<% granted = hackrs.count { |h| !h.admin? && granted_ids.include?(h.id) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "PULSE GRID", sub: "ROOT · MODERATION · /root/grid"} do %>
+    <%= link_to "[>] HACKRS", admin_grid_hackrs_path, class: "console-bar-link" %>
+    <%= link_to "[>] EXPORT", admin_grid_world_export_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Broadcast Section -->
-      <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SYSTEM BROADCAST ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-          <%= form_with url: admin_grid_broadcast_path, method: :post, local: true do |f| %>
-            <div style="margin-bottom: 15px;">
-              <%= label_tag :message, "MESSAGE", class: "white-text", style: "display: block; margin-bottom: 8px; font-weight: bold;" %>
-              <%= text_area_tag :message, nil, class: "tui-input", placeholder: "Type your broadcast message...", style: "width: 100%; min-height: 80px; font-family: monospace;" %>
-              <small style="color: #888;">This will be sent to all online hackrs across all rooms</small>
-            </div>
-            <%= tui_submit "📢 BROADCAST", color: :red, style: "padding: 10px 20px; font-weight: bold;", data: { confirm: "Send broadcast to all rooms?" } %>
-          <% end %>
-        <% end %>
-      </div>
-
-      <!-- Online Hackrs Section -->
-      <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ONLINE HACKRS (<%= @online_hackrs.count %>) ::]</h3>
-        <% if @online_hackrs.any? %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Hackr Alias</th>
-                  <th style="text-align: left;">Role</th>
-                  <th style="text-align: left;">Current Room</th>
-                  <th style="text-align: center;">Room ID</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @online_hackrs.each do |hackr| %>
-                  <tr>
-                    <td>
-                      <%= hackr.hackr_alias %>
-                      <% if hackr.id == current_hackr.id %>
-                        <span style="color: #888;">(you)</span>
-                      <% end %>
-                    </td>
-                    <td>
-                      <% if hackr.admin? %>
-                        <span class="red-255-text">[ADMIN]</span>
-                      <% else %>
-                        <span style="color: #888;">operative</span>
-                      <% end %>
-                    </td>
-                    <td><%= hackr.current_room&.name || "—" %></td>
-                    <td style="text-align: center; font-family: monospace; color: #666;">
-                      <%= hackr.current_room_id || "—" %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        <% else %>
-          <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-            <p style="color: #666;">No hackrs currently online</p>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Recent Messages Section -->
-      <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RECENT MESSAGES (Last 50) ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <% if @recent_messages.any? %>
-            <div style="max-height: 400px; overflow-y: auto; padding: 15px; font-family: monospace; font-size: 0.9em;">
-              <% @recent_messages.reverse.each do |message| %>
-                <div style="margin-bottom: 8px; padding: 5px; border-left: 2px solid <%= message.message_type == 'system' ? '#ff0000' : '#00ff00' %>; padding-left: 10px;">
-                  <span style="color: #666;">[<%= message.created_at.strftime("%H:%M:%S") %>]</span>
-                  <span style="color: #888;">[<%= message.room&.name || "Unknown" %>]</span>
-                  <% if message.message_type == "system" %>
-                    <span class="red-255-text">[SYSTEM]</span>
-                  <% else %>
-                    <span class="green-255-text">&lt;<%= message.grid_hackr&.hackr_alias || "Unknown" %>&gt;</span>
-                  <% end %>
-                  <span style="color: #ccc;"><%= message.content %></span>
-                </div>
-              <% end %>
-            </div>
-          <% else %>
-            <div style="padding: 40px; text-align: center;">
-              <p style="color: #666;">No messages yet</p>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-
-      <!-- All Hackrs Section -->
-      <div style="margin-bottom: 20px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ALL HACKRS (<%= @all_hackrs.count %>) ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">ID</th>
-                <th style="text-align: left;">Hackr Alias</th>
-                <th style="text-align: left;">Role</th>
-                <th style="text-align: center;">CLR</th>
-                <th style="text-align: center;">XP</th>
-                <th style="text-align: center;">Grid Access</th>
-                <th style="text-align: center;">Login</th>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: center;">Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @all_hackrs.each do |hackr| %>
-                <tr>
-                  <td style="font-family: monospace; color: #666;"><%= hackr.id %></td>
-                  <td style="white-space: nowrap;">
-                    <%= hackr.hackr_alias %>
-                    <% if hackr.service_account? %>
-                      <span style="color: #ff8800; font-size: 0.8em;">[SVC]</span>
-                      <%= tui_button_to "✕", admin_grid_toggle_service_account_path(hackr_id: hackr.id), method: :post, aria: {label: "Remove service account flag"}, form: { style: "display: inline;" }, style: "padding: 1px 5px; font-size: 0.7em; margin-left: 3px; background: transparent; color: #ff8800; border: 1px solid #ff8800;", data: { confirm: "Remove service account flag from #{hackr.hackr_alias}?" } %>
-                    <% else %>
-                      <%= tui_button_to "SVC", admin_grid_toggle_service_account_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, style: "padding: 1px 5px; font-size: 0.7em; margin-left: 3px; background: transparent; color: #666; border: 1px solid #444;", data: { confirm: "Mark #{hackr.hackr_alias} as a service account? API tokens will bypass login-disabled." } %>
-                    <% end %>
-                  </td>
-                  <td>
-                    <% if hackr.admin? %>
-                      <span class="red-255-text">[ADMIN]</span>
-                    <% else %>
-                      <span style="color: #888;">operative</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; font-family: monospace;" class="cyan-255-text"><%= hackr.stat("clearance") %></td>
-                  <td style="text-align: center; font-family: monospace;" class="green-255-text"><%= hackr.stat("xp") %></td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <% if hackr.admin? %>
-                      <span class="red-255-text">ADMIN</span>
-                    <% elsif hackr.feature_grants.any? { |fg| fg.feature == FeatureGrant::PULSE_GRID } %>
-                      <span class="green-255-text">GRANTED</span>
-                      <%= tui_button_to "Revoke", admin_grid_revoke_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :delete, form: { style: "display: inline;" }, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Revoke grid access from #{hackr.hackr_alias}?" } %>
-                    <% else %>
-                      <span style="color: #666;">NONE</span>
-                      <%= tui_button_to "Grant", admin_grid_grant_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :post, form: { style: "display: inline;" }, color: :green, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Grant grid access to #{hackr.hackr_alias}?" } %>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <% if hackr.login_disabled? %>
-                      <span class="red-255-text">DISABLED</span>
-                      <%= tui_button_to "Enable", admin_grid_enable_login_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, color: :green, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px;", data: { confirm: "Re-enable login for #{hackr.hackr_alias}?" } %>
-                    <% else %>
-                      <span class="green-255-text">ENABLED</span>
-                      <% unless hackr.id == current_hackr.id %>
-                        <%= tui_button_to "Disable", admin_grid_disable_login_path(hackr_id: hackr.id), method: :post, form: { style: "display: inline;" }, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 5px; background: #ff4444; color: #fff;", data: { confirm: "Disable login for #{hackr.hackr_alias}? They will be logged out immediately." } %>
-                      <% end %>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if hackr.current_room_id.present? %>
-                      <span class="green-255-text">● Online</span>
-                    <% else %>
-                      <span style="color: #444;">○ Offline</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; color: #666;"><%= hackr.created_at.strftime("%Y-%m-%d") %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      </div>
-
-      <!-- Navigation -->
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green %>
-        <%= tui_button "Export World", admin_grid_world_export_path, color: :cyan, style: "margin-left: 8px;" %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(hackrs.size, "hackr") %> <span class="console-dim">· <%= online.size %> online · <%= hackrs.count(&:admin?) %> admin · <%= granted %> granted grid access · <%= hackrs.count(&:login_disabled?) %> login disabled</span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with url: admin_grid_broadcast_path, method: :post, local: true do %>
+    <div class="console-rule"><span>// BROADCAST //</span></div>
+    <%= text_area_tag :message, nil, class: "rc-textarea", rows: 3, placeholder: "the line every room receives as [SYSTEM BROADCAST]",
+      aria: {label: "Broadcast message"}, data: {controller: "autogrow", action: "input->autogrow#grow"} %>
+    <p class="rc-sub">every room on the grid gets it, live in the terminal and the tactical grid</p>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--danger" data-confirm="Send broadcast to all rooms?">[BROADCAST]</button>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--online" aria-label="Online hackrs">
+    <div class="console-rule"><span>// ONLINE · <%= online.size %> //</span></div>
+    <% if online.empty? %>
+      <%= render "admin/console/empty", text: "NO HACKRS ONLINE" %>
+    <% end %>
+    <% online.each_with_index do |hackr, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to hackr.hackr_alias, admin_grid_hackr_path(hackr), class: "console-link cc-name", data: {command: num} %><% if hackr.id == current_hackr.id %> <span class="console-dim">(you)</span><% end %>
+        </div>
+        <span class="rc-cell <%= hackr.admin? ? "rc-bad" : "rc-off" %>"><%= hackr.admin? ? "ADMIN" : "OPERATIVE" %></span>
+        <span class="rc-cell"><%= hackr.current_room&.name || "—" %></span>
+        <span class="rc-cell rc-cell--r"><%= hackr.current_room_id ? "##{hackr.current_room_id}" : "—" %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--chat" aria-label="Recent messages">
+    <div class="console-rule"><span>// RECENT MESSAGES //</span></div>
+    <% if messages.empty? %>
+      <%= render "admin/console/empty", text: "NO MESSAGES YET" %>
+    <% end %>
+    <% messages.reverse_each do |message| %>
+      <% system = message.message_type == "system" %>
+      <div class="rc-row">
+        <span class="console-tag"><%= message.created_at.strftime("%H:%M:%S") %></span>
+        <span class="rc-cell"><%= message.room&.name || "unknown room" %></span>
+        <div class="cc-text">
+          <span><% if system %><span class="rc-bad">[SYSTEM]</span><% else %><span class="rc-on">&lt;<%= message.grid_hackr&.hackr_alias || "unknown" %>&gt;</span><% end %> <%= message.content %></span>
+        </div>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--hackrs" aria-label="Hackrs">
+    <div class="console-rule"><span>// HACKRS · <%= hackrs.size %> //</span></div>
+    <% if hackrs.empty? %>
+      <%= render "admin/console/empty", text: "NO HACKRS ON RECORD" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>NN</span><span>HACKR</span><span>ROLE</span><span>CLR</span><span>XP</span><span>GRID</span><span>LOGIN</span><span>NOW</span><span></span>
+      </div>
+    <% end %>
+    <% hackrs.each_with_index do |hackr, i| %>
+      <% num = numbers[online.size + i] %>
+      <% alias_name = hackr.hackr_alias %>
+      <% grid_access = granted_ids.include?(hackr.id) %>
+      <% now = online_ids.include?(hackr.id) %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to alias_name, admin_grid_hackr_path(hackr), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta">#<%= hackr.id %> · since <%= hackr.created_at.strftime("%Y-%m-%d") %><% if hackr.service_account? %> · <span class="rc-star">SERVICE ACCOUNT</span><% end %></div>
+        </div>
+        <span class="rc-cell <%= hackr.admin? ? "rc-bad" : "rc-off" %>"><%= hackr.admin? ? "ADMIN" : "OPERATIVE" %></span>
+        <span class="rc-cell rc-hot"><%= hackr.stat("clearance") %></span>
+        <span class="rc-cell rc-on"><%= hackr.stat("xp") %></span>
+        <span class="rc-cell <%= (hackr.admin? || grid_access) ? "rc-on" : "rc-off" %>"><%= hackr.admin? ? "ADMIN" : (grid_access ? "GRANTED" : "NONE") %></span>
+        <span class="rc-cell <%= hackr.login_disabled? ? "rc-bad" : "rc-on" %>"><%= hackr.login_disabled? ? "DISABLED" : "ENABLED" %></span>
+        <span class="rc-cell <%= now ? "rc-on" : "rc-off" %>"><%= now ? "ON" : "OFF" %></span>
+        <span class="rc-cell rc-links">
+          <% unless hackr.admin? %>
+            <% if grid_access %>
+              <%= button_to "[REVOKE]", admin_grid_revoke_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), method: :delete, class: "rc-btn rc-btn--danger", form: {data: {confirm: "Revoke grid access from #{alias_name}?"}} %>
+            <% else %>
+              <%= button_to "[GRANT]", admin_grid_grant_feature_path(hackr_id: hackr.id, feature: FeatureGrant::PULSE_GRID), class: "rc-btn", form: {data: {confirm: "Grant grid access to #{alias_name}?"}} %>
+            <% end %>
+          <% end %>
+          <% if hackr.login_disabled? %>
+            <%= button_to "[ENABLE]", admin_grid_enable_login_path(hackr_id: hackr.id), class: "rc-btn", form: {data: {confirm: "Re-enable login for #{alias_name}?"}} %>
+          <% elsif hackr.id != current_hackr.id %>
+            <%= button_to "[DISABLE]", admin_grid_disable_login_path(hackr_id: hackr.id), class: "rc-btn rc-btn--danger", form: {data: {confirm: "Disable login for #{alias_name}? They will be logged out immediately."}} %>
+          <% end %>
+          <% if hackr.service_account? %>
+            <%= button_to "[x] SVC", admin_grid_toggle_service_account_path(hackr_id: hackr.id), class: "rc-btn", title: "Remove service account flag", form: {data: {confirm: "Remove service account flag from #{alias_name}?"}} %>
+          <% else %>
+            <%= button_to "[SVC]", admin_grid_toggle_service_account_path(hackr_id: hackr.id), class: "rc-btn", title: "Mark as a service account", form: {data: {confirm: "Mark #{alias_name} as a service account? API tokens will bypass login-disabled."}} %>
+          <% end %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :moderation, except: "GRID" %>
+
+  <div class="console-rule"><span>// END OF GRID //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation, except: "GRID", numbers: numbers, noun: "a hackr number") %>
+</div>

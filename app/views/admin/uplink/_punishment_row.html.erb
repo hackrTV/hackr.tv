@@ -1,0 +1,20 @@
+<%# One punishment as a ledger row (the uplink screen's IN FORCE, the
+    punishments ledger): issued · @alias over the reason · SQUELCH /
+    BLACKOUT · by · expires · ACTIVE / EXPIRED · [LIFT] while in force.
+    Locals: punishment. %>
+<div class="rc-row">
+  <span class="console-tag"><%= punishment.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+  <div class="cc-text">
+    <span class="cc-name">@<%= punishment.grid_hackr.hackr_alias %></span>
+    <div class="cc-meta"><%= punishment.reason.presence || "no reason given" %></div>
+  </div>
+  <span class="rc-cell <%= (punishment.punishment_type == "blackout") ? "rc-bad" : "rc-star" %>"><%= punishment.punishment_type.upcase %></span>
+  <span class="rc-cell">@<%= punishment.issued_by.hackr_alias %></span>
+  <span class="rc-cell"><% if punishment.permanent? %><span class="rc-bad">PERMANENT</span><% else %><%= punishment.expires_at.strftime("%Y-%m-%d %H:%M") %><% end %></span>
+  <span class="rc-cell <%= punishment.expired? ? "rc-off" : "rc-on" %>"><%= punishment.expired? ? "EXPIRED" : "ACTIVE" %></span>
+  <span class="rc-cell rc-links">
+    <% unless punishment.expired? %>
+      <%= button_to "[LIFT]", admin_lift_uplink_punishment_path(punishment), method: :delete, class: "rc-btn" %>
+    <% end %>
+  </span>
+</div>

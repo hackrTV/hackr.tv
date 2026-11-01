@@ -1,124 +1,56 @@
-<%= render TuiWindowComponent.new(title: "/root/pulsewire/pulse_drops :: MODERATION GRAVEYARD", variant: :page, width: 1600, color: :red) do %>
+<%# /root/pulse_wire/pulse_drops — the pulses moderation took off the
+    WIRE as a console ledger (2026-10-31; root_console.css): bar ([<]
+    WIRE), ON RECORD, // DROPPED // newest first ([NN] · content over
+    @alias / SPLICE / first pulsed · echoes · splices · dropped ago · [>]
+    VIEW [RESTORE] [DEL]), destinations, the > prompt (NN opens the pulse
+    on the WIRE). Assigns: @pulses. %>
+<% content_for :title, "/root/pulse_wire/pulse_drops :: DROPS" %>
+<% pulses = @pulses.to_a %>
+<% numbers = pulses.each_index.map { |i| root_num(i, total: pulses.size) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "PULSE DROPS", sub: "ROOT · MODERATION · /root/pulse_wire/pulse_drops"} do %>
+    <%= link_to "[<] WIRE", admin_pulse_wire_index_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Actions -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "← Back to All Pulses", admin_pulse_wire_index_path, color: :cyan, style: "padding: 8px 20px;" %>
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Info Banner -->
-      <div style="background: #1a0000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-        <p class="red-255-text" style="margin: 0;">
-          ⚠ PULSE-DROPPED PULSES :: These pulses have been removed from the WIRE by admin moderation.
-        </p>
-        <p style="color: #888; margin: 10px 0 0 0; font-size: 0.9em;">
-          You can restore pulses to make them visible again, or permanently delete them.
-        </p>
-      </div>
-
-      <!-- Stats -->
-      <div style="margin-bottom: 20px; color: #666;">
-        <strong class="red-255-text"><%= @pulses.count %></strong> pulse-dropped pulse<%= @pulses.count == 1 ? '' : 's' %>
-      </div>
-
-      <!-- Pulses Table -->
-      <% if @pulses.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left; width: 15%;">Hackr</th>
-                <th style="text-align: left; width: 45%;">Content</th>
-                <th style="text-align: center; width: 10%;">Echoes</th>
-                <th style="text-align: center; width: 10%;">Splices</th>
-                <th style="text-align: center; width: 10%;">Dropped</th>
-                <th style="text-align: center; width: 10%;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @pulses.each do |pulse| %>
-                <tr style="background: #1a0000;">
-                  <td>
-                    <strong class="cyan-255-text">@<%= pulse.grid_hackr.hackr_alias %></strong>
-                    <% if pulse.is_splice? %>
-                      <br>
-                      <small style="color: #888;">↪ Splice</small>
-                    <% end %>
-                  </td>
-                  <td>
-                    <div style="font-family: monospace; line-height: 1.5;">
-                      <%= pulse.content %>
-                    </div>
-                    <div style="margin-top: 8px;">
-                      <span class="red-255-text">⚠ PULSE DROPPED</span>
-                    </div>
-                    <div style="margin-top: 5px;">
-                      <small style="color: #666;">
-                        Originally broadcast: <%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M") %>
-                      </small>
-                    </div>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="purple-255-text"><%= pulse.echo_count %></span>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="purple-255-text"><%= pulse.splice_count %></span>
-                  </td>
-                  <td style="text-align: center;">
-                    <small style="color: #888;">
-                      <%= time_ago_in_words(pulse.pulse_dropped_at) %> ago
-                    </small>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <%= tui_button "View", wire_pulse_path(pulse.id),
-                        target: "_blank",
-                        color: :cyan,
-                        style: "padding: 2px 8px; font-size: 0.9em;" %>
-
-                    <%= tui_button_to "Restore", restore_admin_pulse_wire_path(pulse),
-                        method: :post,
-                        form: { style: "display: inline;" },
-                        data: { confirm: "Restore this pulse by @#{pulse.grid_hackr.hackr_alias}?" },
-                        color: :green,
-                        style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
-
-                    <%= tui_button_to "Delete", admin_pulse_wire_path(pulse),
-                        method: :delete,
-                        form: { style: "display: inline;" },
-                        data: { confirm: "Permanently delete this pulse? This cannot be undone!" },
-                        color: :red,
-                        style: "padding: 2px 8px; font-size: 0.9em; margin-left: 4px;" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">
-            No pulse-dropped pulses. The moderation graveyard is empty.
-          </p>
-          <p style="color: #444; margin-top: 10px;">
-            All pulses on the WIRE are currently active.
-          </p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(pulses.size, "dropped pulse") %> <span class="console-dim">· off the WIRE by moderation · restore puts one back, delete is final</span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--drops" aria-label="Dropped pulses">
+    <div class="console-rule"><span>// DROPPED //</span></div>
+    <% if pulses.empty? %>
+      <%= render "admin/console/empty", text: "NO DROPPED PULSES", hint: "every pulse on the WIRE is active" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>NN</span><span>PULSE</span><span>ECHO SPLICE</span><span>DROPPED</span><span></span>
+      </div>
+    <% end %>
+    <% pulses.each_with_index do |pulse, i| %>
+      <% num = numbers[i] %>
+      <% author = pulse.grid_hackr.hackr_alias %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <span><%= pulse.content %></span>
+          <div class="cc-meta">@<%= author %><% if pulse.is_splice? %> · SPLICE<% end %> · pulsed <%= pulse.pulsed_at.strftime("%Y-%m-%d %H:%M") %></div>
+        </div>
+        <span class="rc-cell"><%= pulse.echo_count %> · <%= pulse.splice_count %></span>
+        <span class="rc-cell rc-bad"><%= time_ago_in_words(pulse.pulse_dropped_at) %> ago</span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[>] VIEW", wire_pulse_path(pulse.id), class: "console-link", target: "_blank", rel: "noopener", data: {command: num} %>
+          <%= button_to "[RESTORE]", restore_admin_pulse_wire_path(pulse), class: "rc-btn", form: {data: {confirm: "Restore this pulse by @#{author}?"}} %>
+          <%= button_to "[DEL]", admin_pulse_wire_path(pulse), method: :delete, class: "rc-btn rc-btn--danger", form: {data: {confirm: "Permanently delete this pulse? This cannot be undone!"}} %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :moderation, except: "DROPS" %>
+
+  <div class="console-rule"><span>// END OF DROPS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation, except: "DROPS", numbers: numbers, noun: "a pulse number") %>
+</div>

@@ -1,227 +1,86 @@
-<%= render TuiWindowComponent.new(title: "/root/uplink/punishments :: MANAGE PUNISHMENTS", variant: :admin, width: 1600) do %>
+<%# /root/uplink/punishments — squelches and blackouts as a console
+    screen (2026-10-31; root_console.css): bar ([<] UPLINK), // ISSUE //
+    (HACKR · MINUTES · REASON, then [SQUELCH] posts to the squelch route
+    and [BLACKOUT] to the blackout one via formaction — the controller
+    looks the hackr up by alias, the :id is a 0 placeholder; each button
+    carries its own data-confirm, which the admin layout's handler reads
+    from the submitter), ON RECORD +
+    the STATUS / TYPE rows (server-side ?status= ?type=, each keeping
+    the other), // PUNISHMENTS // newest first (admin/uplink/
+    _punishment_row: issued · @alias over reason · TYPE · by · expires ·
+    ACTIVE / EXPIRED · [LIFT]), destinations, the > prompt. Assigns:
+    @punishments. %>
+<% content_for :title, "/root/uplink/punishments :: PUNISH" %>
+<% punishments = @punishments.to_a %>
+<% status = params[:status].to_s.presence_in(%w[active expired]).to_s %>
+<% type = params[:type].to_s.presence_in(UserPunishment::PUNISHMENT_TYPES).to_s %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "PUNISHMENTS", sub: "ROOT · MODERATION · /root/uplink/punishments"} do %>
+    <%= link_to "[<] UPLINK", admin_uplink_index_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
+  <%= form_with url: admin_squelch_uplink_user_path(0), method: :post, local: true, id: "punishment-form" do %>
+    <div class="console-rule"><span>// ISSUE //</span></div>
+    <div class="console-status">
+      <%= root_field("HACKR", id: "punishment-username") do %>
+        <%= text_field_tag :username, nil, id: "punishment-username", class: "rc-input", placeholder: "alias", required: true, autocomplete: "off", spellcheck: "false" %>
       <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
+      <%= root_field("MINUTES", id: "punishment-duration") do %>
+        <%= number_field_tag :duration_minutes, nil, id: "punishment-duration", class: "rc-input rc-input--short", min: 1 %>
+        <span class="rc-hint">blank = permanent</span>
       <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-        <%= tui_button "← Uplink Dashboard", admin_uplink_index_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Issue New Punishment -->
-      <div style="margin-bottom: 30px; background: #1a1a1a; padding: 20px; border: 1px solid #333;">
-        <h3 style="color: #ff5555; margin-bottom: 15px;">ISSUE PUNISHMENT</h3>
-
-        <%= form_with url: admin_squelch_uplink_user_path(0), method: :post, local: true, id: "punishment-form", style: "display: flex; flex-wrap: wrap; gap: 15px; align-items: end;" do |f| %>
-          <div style="flex: 1 1 200px;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Username</label>
-            <input type="text" name="username" id="punishment-username" placeholder="@username" required style="width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
-          </div>
-
-          <div style="flex: 0 0 auto;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Type</label>
-            <select name="punishment_type" id="punishment-type" style="padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
-              <option value="squelch">Squelch (mute)</option>
-              <option value="blackout">Blackout (ban)</option>
-            </select>
-          </div>
-
-          <div style="flex: 0 0 auto;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Duration (minutes)</label>
-            <input type="number" name="duration_minutes" placeholder="Leave empty for permanent" min="1" style="width: 180px; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
-          </div>
-
-          <div style="flex: 1 1 300px;">
-            <label style="color: #666; display: block; margin-bottom: 5px; font-size: 0.9em;">Reason</label>
-            <input type="text" name="reason" placeholder="Optional reason" style="width: 100%; padding: 8px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace;">
-          </div>
-
-          <div style="flex: 0 0 auto;">
-            <%= tui_button "Issue Punishment", color: :red, type: "submit", style: "padding: 8px 20px;" %>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Filters -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <label style="color: #888; padding: 8px 0;">Filter:</label>
-        <%= tui_button "All", punishments_admin_uplink_index_path,
-            color: (params[:status].blank? && params[:type].blank? ? :cyan : :grey), style: "padding: 5px 12px;" %>
-        <%= tui_button "Active", punishments_admin_uplink_index_path(status: 'active'),
-            color: (params[:status] == 'active' ? :green : :grey), style: "padding: 5px 12px;" %>
-        <%= tui_button "Expired", punishments_admin_uplink_index_path(status: 'expired'),
-            color: (params[:status] == 'expired' ? :red : :grey), style: "padding: 5px 12px;" %>
-        <span style="color: #444;">|</span>
-        <%= tui_button "Squelches", punishments_admin_uplink_index_path(type: 'squelch'),
-            color: (params[:type] == 'squelch' ? :orange : :grey), style: "padding: 5px 12px;" %>
-        <%= tui_button "Blackouts", punishments_admin_uplink_index_path(type: 'blackout'),
-            color: (params[:type] == 'blackout' ? :red : :grey), style: "padding: 5px 12px;" %>
-      </div>
-
-      <!-- Stats -->
-      <div style="margin-bottom: 20px; color: #666;">
-        <strong><%= @punishments.count %></strong> punishment<%= @punishments.count == 1 ? '' : 's' %>
-      </div>
-
-      <!-- Punishments Table -->
-      <% if @punishments.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">User</th>
-                <th style="text-align: center;">Type</th>
-                <th style="text-align: left;">Reason</th>
-                <th style="text-align: center;">Issued By</th>
-                <th style="text-align: center;">Issued At</th>
-                <th style="text-align: center;">Expires</th>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: center;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @punishments.each do |punishment| %>
-                <tr class="admin-table-row">
-                  <td>
-                    <strong class="cyan-255-text">@<%= punishment.grid_hackr.hackr_alias %></strong>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if punishment.punishment_type == "blackout" %>
-                      <span class="red-255-text">BLACKOUT</span>
-                    <% else %>
-                      <span class="orange-255-text">SQUELCH</span>
-                    <% end %>
-                  </td>
-                  <td>
-                    <small><%= punishment.reason || "-" %></small>
-                  </td>
-                  <td style="text-align: center;">
-                    <small>@<%= punishment.issued_by.hackr_alias %></small>
-                  </td>
-                  <td style="text-align: center;">
-                    <small style="color: #888;">
-                      <%= punishment.created_at.strftime("%Y-%m-%d") %><br>
-                      <%= punishment.created_at.strftime("%H:%M") %>
-                    </small>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if punishment.permanent? %>
-                      <span class="red-255-text">Permanent</span>
-                    <% else %>
-                      <small><%= punishment.expires_at.strftime("%Y-%m-%d %H:%M") %></small>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if punishment.expired? %>
-                      <span style="color: #666;">Expired</span>
-                    <% else %>
-                      <span class="green-255-text">Active</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% unless punishment.expired? %>
-                      <%= tui_button_to "Lift", admin_lift_uplink_punishment_path(punishment), method: :delete, color: :green, style: "padding: 4px 12px; font-size: 0.85em;" %>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No punishments found.</p>
-        </div>
+      <%= root_field("REASON", id: "punishment-reason") do %>
+        <%= text_field_tag :reason, nil, id: "punishment-reason", class: "rc-input rc-input--wide", placeholder: "optional", autocomplete: "off" %>
       <% end %>
     </div>
-<% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--danger" data-confirm="Squelch this hackr? They keep reading the Uplink but cannot send.">[SQUELCH]</button>
+      <button type="submit" class="rc-btn rc-btn--danger" formaction="<%= admin_blackout_uplink_user_path(0) %>" data-confirm="Black out this hackr? They lose the Uplink entirely.">[BLACKOUT]</button>
+      <span class="rc-hint">squelch mutes · blackout bans from the Uplink</span>
+    </div>
+  <% end %>
 
-<script nonce="<%= content_security_policy_nonce %>">
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('punishment-form');
-    const usernameInput = document.getElementById('punishment-username');
-    const typeSelect = document.getElementById('punishment-type');
+  <div class="console-rule"><span>// ON RECORD //</span></div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(punishments.size, "punishment") %> <span class="console-dim">· <%= punishments.count { |p| !p.expired? } %> in force</span></span>
+    </div>
+    <div class="console-status-row rc-field">
+      <span class="console-key">STATUS</span>
+      <span class="console-val">
+        <% [["ALL", ""], ["ACTIVE", "active"], ["EXPIRED", "expired"]].each do |word, value| %>
+          <%= link_to word, punishments_admin_uplink_index_path({status: value.presence, type: type.presence}.compact), class: class_names("rc-btn", "rc-btn--on": status == value), aria: {current: status == value && "page"} %>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row rc-field">
+      <span class="console-key">TYPE</span>
+      <span class="console-val">
+        <% [["ALL", ""], ["SQUELCH", "squelch"], ["BLACKOUT", "blackout"]].each do |word, value| %>
+          <%= link_to word, punishments_admin_uplink_index_path({status: status.presence, type: value.presence}.compact), class: class_names("rc-btn", "rc-btn--on": type == value), aria: {current: type == value && "page"} %>
+        <% end %>
+      </span>
+    </div>
+  </div>
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+  <section class="console-section rc-ledger rc-ledger--punishments" aria-label="Punishments">
+    <div class="console-rule"><span>// PUNISHMENTS //</span></div>
+    <% if punishments.empty? %>
+      <%= render "admin/console/empty", text: "NO PUNISHMENTS FOUND" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>ISSUED</span><span>HACKR · REASON</span><span>TYPE</span><span>BY</span><span>EXPIRES</span><span>STATUS</span><span></span>
+      </div>
+    <% end %>
+    <% punishments.each do |punishment| %>
+      <%= render "admin/uplink/punishment_row", punishment: punishment %>
+    <% end %>
+  </section>
 
-      const username = usernameInput.value.replace('@', '').trim();
-      if (!username) {
-        alert('Please enter a username');
-        return;
-      }
+  <%= render "admin/console/destinations", section: :moderation, except: "PUNISH" %>
 
-      // Find user ID by username via API
-      fetch('/api/grid/current_hackr')
-        .then(r => r.json())
-        .then(data => {
-          // For now, use a simple approach - the admin controller will look up by username
-          // Update form action based on punishment type
-          const punishmentType = typeSelect.value;
-          const action = punishmentType === 'blackout' ? 'blackout' : 'squelch';
-
-          // We need to find the user ID - for simplicity, submit with username and handle server-side
-          // Create a hidden form with the correct action
-          const submitForm = document.createElement('form');
-          submitForm.method = 'POST';
-
-          // We'll use a special endpoint that accepts username
-          if (punishmentType === 'blackout') {
-            submitForm.action = '/root/uplink/users/0/blackout';
-          } else {
-            submitForm.action = '/root/uplink/users/0/squelch';
-          }
-
-          // Add CSRF token
-          const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-          const csrfInput = document.createElement('input');
-          csrfInput.type = 'hidden';
-          csrfInput.name = 'authenticity_token';
-          csrfInput.value = csrfToken;
-          submitForm.appendChild(csrfInput);
-
-          // Add username
-          const usernameHidden = document.createElement('input');
-          usernameHidden.type = 'hidden';
-          usernameHidden.name = 'username';
-          usernameHidden.value = username;
-          submitForm.appendChild(usernameHidden);
-
-          // Copy other fields
-          const duration = form.querySelector('[name="duration_minutes"]').value;
-          if (duration) {
-            const durationInput = document.createElement('input');
-            durationInput.type = 'hidden';
-            durationInput.name = 'duration_minutes';
-            durationInput.value = duration;
-            submitForm.appendChild(durationInput);
-          }
-
-          const reason = form.querySelector('[name="reason"]').value;
-          if (reason) {
-            const reasonInput = document.createElement('input');
-            reasonInput.type = 'hidden';
-            reasonInput.name = 'reason';
-            reasonInput.value = reason;
-            submitForm.appendChild(reasonInput);
-          }
-
-          document.body.appendChild(submitForm);
-          submitForm.submit();
-        });
-    });
-  });
-</script>
+  <div class="console-rule"><span>// END OF PUNISHMENTS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:moderation, except: "PUNISH") %>
+</div>
