@@ -1,0 +1,29 @@
+<%# The // GOVCORP ROOMS // pickers' script, rendered after the screen
+    (admin/shared/_combobox + one AdminCombobox.init per room field over
+    the region's rooms). Assigns: @rooms. %>
+<%= render "admin/shared/combobox" %>
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    var rooms = <%= raw json_escape(@rooms.map { |r| {id: r.id, name: r.name, zone_name: r.grid_zone.name, region_name: r.grid_zone.grid_region.name} }.to_json) %>;
+    var fields = <%= raw GridRegion::ROOM_FK_FIELDS.map { |f| f.to_s.delete_suffix("_id").dasherize }.to_json %>;
+
+    fields.forEach(function(cbId) {
+      AdminCombobox.init({
+        inputId: cbId + '-input',
+        hiddenId: cbId + '-hidden',
+        dropdownId: cbId + '-dropdown',
+        statusId: cbId + '-status',
+        items: rooms,
+        getSearchText: function(r) { return (r.name + ' ' + r.zone_name + ' ' + r.region_name).toLowerCase(); },
+        getGroupKey: function(r) { return r.region_name + ' / ' + r.zone_name; },
+        renderOption: function(r, e) {
+          return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone_name) + '</span>';
+        },
+        getId: function(r) { return String(r.id); },
+        getLabel: function(r) { return r.region_name + ' / ' + r.zone_name + ' / ' + r.name; },
+        emptyText: 'No rooms match',
+        selectedText: 'Room selected'
+      });
+    });
+  })();
+</script>

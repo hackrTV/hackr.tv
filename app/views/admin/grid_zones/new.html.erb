@@ -1,7 +1,23 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/zones/new :: NEW ZONE", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @zone], url: admin_grid_zones_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_zones/new — a new zone on the record screen's shell
+    (?grid_region_id= prefills the region — the region record's [+] NEW
+    ZONE). %>
+<% content_for :title, "/root/grid_zones/new :: NEW ZONE" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW ZONE", sub: "ROOT · ZONE · /root/grid_zones/new"} do %>
+    <%= link_to "[<] ZONES", admin_grid_zones_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @zone, url: admin_grid_zones_path, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE ZONE]</button>
+      <%= link_to "[CANCEL]", admin_grid_zones_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+</div>

@@ -1,86 +1,107 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/mobs/#{@mob.id} :: EDIT MOB", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @mob], url: admin_grid_mob_path(@mob), local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_mobs/:id/edit — the mob as a console screen (2026-10-31;
+    show redirects here). Bar (name · ROOT · MOB · path; [<] MOBS,
+    [>] ROOM, [TEST] while dev tools are on, [HISTORY]), the avatar +
+    fields + the dialogue / vendor editors, // COMMIT // ([SAVE] [CANCEL]
+    · [DELETE] — refused while listings remain); a vendor adds
+    // SHOP LISTINGS // (NN opens a listing; [x] removes one) and
+    // ADD LISTING //. Destinations, the > prompt; the purge and delete
+    forms are hidden at the end, the scripts after the screen. Assigns:
+    @mob, @rooms, @factions, @listings + @item_definitions (vendors). %>
+<% name = @mob.name_in_database %>
+<% listings = @mob.vendor? ? @listings.to_a : [] %>
+<% numbers = listings.each_index.map { |i| root_num(i) } %>
+<% room = GridRoom.find_by(id: @mob.grid_room_id_in_database) %>
+<% content_for :title, "/root/grid_mobs/#{@mob.id} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · MOB · /root/grid_mobs/#{@mob.id}"} do %>
+    <%= link_to "[<] MOBS", admin_grid_mobs_path, class: "console-bar-link" %>
+    <% if room %><%= link_to "[>] ROOM", edit_admin_grid_room_path(room), class: "console-bar-link" %><% end %>
+    <% if dev_tools_enabled? %><%= link_to "[TEST]", new_admin_grid_npc_dialogue_tester_path(mob_id: @mob.id), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_mob_path(@mob), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @mob, url: admin_grid_mob_path(@mob), method: :patch, local: true, id: "mob-form" do |f| %>
+    <%= render "form", f: f, mob: @mob %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE MOB]</button>
+      <%= link_to "[CANCEL]", admin_grid_mobs_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-mob" class="rc-btn rc-btn--danger">[DELETE MOB]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
 
-<% if @mob.vendor? %>
-<%= render TuiWindowComponent.new(title: "/root/grid/mobs/#{@mob.id}/listings :: SHOP LISTINGS", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <% if @listings.any? %>
-        <table class="tui-table" style="width: 100%; margin-bottom: 20px;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Item</th>
-              <th style="text-align: right; width: 80px;">Price</th>
-              <th style="text-align: right; width: 80px;">Sell</th>
-              <th style="text-align: center; width: 60px;">Stock</th>
-              <th style="text-align: center; width: 50px;">CL</th>
-              <th style="text-align: center; width: 50px;">Act</th>
-              <th style="text-align: center; width: 50px;">Rot</th>
-              <th style="text-align: center; width: 120px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @listings.each do |listing| %>
-              <tr>
-                <td>
-                  <span style="color: <%= listing.rarity_color %>"><%= listing.name %></span>
-                  <span style="color: #666; font-size: 0.8em;"><%= listing.item_type %></span>
-                </td>
-                <td style="text-align: right;"><span class="yellow-168-text"><%= listing.base_price %></span></td>
-                <td style="text-align: right;"><span style="color: #888;"><%= listing.sell_price %></span></td>
-                <td style="text-align: center;"><%= listing.stock.nil? ? "∞" : listing.stock %></td>
-                <td style="text-align: center;"><%= listing.min_clearance %></td>
-                <td style="text-align: center;"><%= listing.active? ? "✓" : "—" %></td>
-                <td style="text-align: center;"><%= listing.rotation_pool? ? "✓" : "—" %></td>
-                <td style="text-align: center;">
-                  <%= tui_button "Edit", edit_admin_grid_shop_listing_path(listing), style: "padding: 2px 6px; font-size: 0.8em;" %>
-                  <%= tui_button_to "×", remove_listing_admin_grid_mob_path(@mob, listing_id: listing.id), method: :delete, aria: {label: "Remove listing"}, color: :red, style: "padding: 2px 6px; font-size: 0.8em; display: inline;", data: { confirm: "Remove listing '#{listing.name}'?" } %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+  <% if @mob.vendor? %>
+    <section class="console-section rc-ledger rc-ledger--listings" aria-label="Shop listings">
+      <div class="console-rule"><span>// SHOP LISTINGS //</span></div>
+      <% if listings.empty? %>
+        <%= render "admin/console/empty", text: "NOTHING FOR SALE", hint: "ADD LISTING below stocks the shop" %>
       <% else %>
-        <p style="color: #666; margin-bottom: 15px;">No listings yet.</p>
-      <% end %>
-
-      <h3 class="cyan-255-text" style="margin: 20px 0 10px 0;">[:: ADD LISTING ::]</h3>
-      <%= form_with url: add_listing_admin_grid_mob_path(@mob), method: :post, local: true do %>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
-          <div style="flex: 2; min-width: 200px;">
-            <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.85em;">ITEM</label>
-            <select name="grid_shop_listing[grid_item_definition_id]" class="tui-input" style="width: 100%; padding: 6px;">
-              <option value="">— select item —</option>
-              <% @item_definitions.each do |defn| %>
-                <option value="<%= defn.id %>"><%= defn.name %> [<%= defn.rarity_label %>] (<%= defn.item_type %>)</option>
-              <% end %>
-            </select>
-          </div>
-          <div style="flex: 0 0 100px;">
-            <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.85em;">BASE PRICE</label>
-            <input type="number" name="grid_shop_listing[base_price]" class="tui-input" style="width: 100%; padding: 6px;" min="1" value="100">
-          </div>
-          <div style="flex: 0 0 80px;">
-            <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.85em;">STOCK</label>
-            <input type="number" name="grid_shop_listing[stock]" class="tui-input" style="width: 100%; padding: 6px;" min="0" placeholder="∞">
-          </div>
-          <div style="flex: 0 0 60px;">
-            <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.85em;">CL</label>
-            <input type="number" name="grid_shop_listing[min_clearance]" class="tui-input" style="width: 100%; padding: 6px;" min="0" value="0">
-          </div>
-          <div style="padding-bottom: 4px;">
-            <%= tui_button "+ Add", color: :green, type: "submit", style: "padding: 6px 14px; font-weight: bold;" %>
-          </div>
+        <div class="rc-row rc-row--head" aria-hidden="true">
+          <span></span><span>ITEM</span><span>RARITY</span><span class="rc-cell--r">PRICE</span><span class="rc-cell--r">SELL</span><span class="rc-cell--r">STOCK</span><span class="rc-cell--r">CL</span><span>FLAGS</span><span></span>
         </div>
       <% end %>
-
-      <div style="margin-top: 15px;">
-        <%= tui_button "Full Listing Manager →", admin_grid_shop_listings_path(mob_id: @mob.id), style: "padding: 6px 14px;" %>
+      <% listings.each_with_index do |listing, i| %>
+        <% num = numbers[i] %>
+        <div class="rc-row">
+          <span class="console-tag">[<%= num %>]</span>
+          <div class="cc-text">
+            <%= link_to listing.name, edit_admin_grid_shop_listing_path(listing), class: "console-link cc-name", data: {command: num} %>
+            <div class="cc-meta"><%= listing.item_type %></div>
+          </div>
+          <span class="rc-cell"><%= listing.rarity_label %></span>
+          <span class="rc-cell rc-cell--r rc-star"><%= listing.base_price %></span>
+          <span class="rc-cell rc-cell--r"><%= listing.sell_price %></span>
+          <span class="rc-cell rc-cell--r"><%= listing.stock.nil? ? "INF" : listing.stock %></span>
+          <span class="rc-cell rc-cell--r"><%= listing.min_clearance %></span>
+          <span class="rc-cell"><span class="<%= listing.active? ? "rc-on" : "rc-off" %>"><%= listing.active? ? "ACTIVE" : "OFF" %></span><% if listing.rotation_pool? %> · <span class="rc-hot">ROT</span><% end %></span>
+          <span class="rc-cell rc-links">
+            <%= button_to "[x]", remove_listing_admin_grid_mob_path(@mob, listing_id: listing.id), method: :delete, class: "rc-btn rc-btn--danger",
+              aria: {label: "Remove listing #{listing.name}"}, form: {data: {confirm: "Remove listing '#{listing.name}'?"}} %>
+          </span>
+        </div>
+      <% end %>
+      <div class="rc-actions">
+        <%= link_to "[>] EVERY LISTING", admin_grid_shop_listings_path(mob_id: @mob.id), class: "rc-btn" %>
       </div>
-    </div>
-<% end %>
-<% end %>
+    </section>
+
+    <div class="console-rule"><span>// ADD LISTING //</span></div>
+    <%= form_with url: add_listing_admin_grid_mob_path(@mob), method: :post, local: true do %>
+      <div class="console-status">
+        <%= root_field("ITEM", id: "listing-item") do %>
+          <%= select_tag "grid_shop_listing[grid_item_definition_id]",
+            options_for_select(@item_definitions.map { |d| ["#{d.name} [#{d.rarity_label}] (#{d.item_type})", d.id] }),
+            include_blank: "— select item —", id: "listing-item", class: "rc-select", required: true %>
+        <% end %>
+        <%= root_field("BASE PRICE", id: "listing-price") do %>
+          <%= number_field_tag "grid_shop_listing[base_price]", 100, id: "listing-price", class: "rc-input rc-input--short", min: 1 %>
+          <span class="rc-hint">sells back at half</span>
+        <% end %>
+        <%= root_field("STOCK", id: "listing-stock") do %>
+          <%= number_field_tag "grid_shop_listing[stock]", nil, id: "listing-stock", class: "rc-input rc-input--short", min: 0 %>
+          <span class="rc-hint">blank = unlimited</span>
+        <% end %>
+        <%= root_field("CLEARANCE", id: "listing-clearance") do %>
+          <%= number_field_tag "grid_shop_listing[min_clearance]", 0, id: "listing-clearance", class: "rc-input rc-input--short", min: 0 %>
+        <% end %>
+      </div>
+      <div class="rc-actions">
+        <button type="submit" class="rc-btn rc-btn--hot">[+] ADD LISTING</button>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, numbers: numbers, noun: "a listing number") %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("purge-avatar", purge_avatar_admin_grid_mob_path(@mob), confirm: "Remove the avatar from '#{name}'?") %>
+    <%= root_delete_form("delete-mob", admin_grid_mob_path(@mob), confirm: "Delete mob '#{name}'?") %>
+  </div>
+</div>
+<%= render "script" %>

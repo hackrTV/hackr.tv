@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# /root/grid_slipstream_routes — the slipstream ledger and the route
+# record (+ its legs) as console screens (2026-10-31; root_console.css).
+# Slug-keyed; the record screen is the edit screen: show redirects there
+# (the old read-only legs page folded into it), saves stay on it.
 class Admin::GridSlipstreamRoutesController < Admin::ApplicationController
   include Admin::Versionable
 
@@ -9,11 +13,11 @@ class Admin::GridSlipstreamRoutesController < Admin::ApplicationController
   before_action :load_selects, only: %i[new edit create update]
 
   def index
-    @routes = GridSlipstreamRoute.includes(:origin_region, :destination_region).ordered
+    @routes = GridSlipstreamRoute.includes(:origin_region, :destination_region, :grid_slipstream_legs).ordered
   end
 
   def show
-    @legs = @route.grid_slipstream_legs.order(:position)
+    redirect_to edit_admin_grid_slipstream_route_path(@route)
   end
 
   def new

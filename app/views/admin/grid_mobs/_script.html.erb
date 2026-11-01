@@ -1,0 +1,293 @@
+<%# The mob record's scripts, rendered after the screen: the ROOM picker
+    (admin/shared/_combobox over every room), the dialogue tree editor
+    (nested topic rows built from the stored tree, or the raw JSON), the
+    vendor config editor, and the serialization of both into the hidden
+    *_json fields when #mob-form submits. Markup: grid_mobs/_form; rules:
+    root_console.css .rc-editor / .rc-topic*. Assigns: @mob, @rooms. %>
+<%= render "admin/shared/combobox" %>
+<script nonce="<%= content_security_policy_nonce %>">
+(function() {
+  // === Dialogue Tree Editor ===
+  var dialogueData = <%= raw json_escape((@mob.dialogue_tree || {}).to_json) %>;
+  var dialogueHidden = document.getElementById('dialogue-tree-hidden');
+  var topicsRoot = document.getElementById('dialogue-topics-root');
+  var greetingInput = document.getElementById('dialogue-greeting');
+
+  // Initialize greeting
+  greetingInput.value = dialogueData.greeting || '';
+
+  // Build topic rows recursively (each level indents inside its parent's
+  // .rc-topic-children)
+  function buildTopicRow(key, node, container, depth) {
+    var row = document.createElement('div');
+    row.className = 'dialogue-topic-row rc-topic';
+    row.dataset.depth = depth;
+
+    var headerDiv = document.createElement('div');
+    headerDiv.className = 'rc-topic-head';
+
+    var depthLabel = document.createElement('span');
+    depthLabel.className = 'rc-topic-depth';
+    depthLabel.textContent = 'L' + depth;
+    headerDiv.appendChild(depthLabel);
+
+    var keyInput = document.createElement('input');
+    keyInput.type = 'text';
+    keyInput.className = 'rc-input rc-input--short dialogue-key';
+    keyInput.placeholder = 'keyword';
+    keyInput.setAttribute('aria-label', 'Topic keyword');
+    keyInput.value = key || '';
+    headerDiv.appendChild(keyInput);
+
+    var addChildBtn = document.createElement('button');
+    addChildBtn.type = 'button';
+    addChildBtn.className = 'rc-btn';
+    addChildBtn.textContent = '[+] SUB';
+    headerDiv.appendChild(addChildBtn);
+
+    var deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'rc-btn rc-btn--danger';
+    deleteBtn.textContent = '[x]';
+    deleteBtn.setAttribute('aria-label', 'Remove topic');
+    headerDiv.appendChild(deleteBtn);
+
+    row.appendChild(headerDiv);
+
+    var responseArea = document.createElement('textarea');
+    responseArea.className = 'rc-textarea dialogue-response';
+    responseArea.rows = 2;
+    responseArea.placeholder = 'Response text...';
+    responseArea.setAttribute('aria-label', 'Topic response');
+    responseArea.value = (node && node.response) || '';
+    row.appendChild(responseArea);
+
+    var childContainer = document.createElement('div');
+    childContainer.className = 'dialogue-children rc-topic-children';
+    row.appendChild(childContainer);
+
+    // Add existing children
+    if (node && node.topics && typeof node.topics === 'object') {
+      Object.keys(node.topics).forEach(function(childKey) {
+        buildTopicRow(childKey, node.topics[childKey], childContainer, depth + 1);
+      });
+    }
+
+    // Add child button handler
+    addChildBtn.addEventListener('click', function() {
+      if (depth >= 99) { alert('Maximum dialogue depth (100) reached.'); return; }
+      buildTopicRow('', null, childContainer, depth + 1);
+    });
+
+    // Delete button handler
+    deleteBtn.addEventListener('click', function() {
+      row.remove();
+    });
+
+    container.appendChild(row);
+  }
+
+  // Initialize topics
+  if (dialogueData.topics && typeof dialogueData.topics === 'object') {
+    Object.keys(dialogueData.topics).forEach(function(key) {
+      buildTopicRow(key, dialogueData.topics[key], topicsRoot, 0);
+    });
+  }
+
+  // Add root topic
+  document.getElementById('dialogue-add-root-topic').addEventListener('click', function() {
+    buildTopicRow('', null, topicsRoot, 0);
+  });
+
+  // Serialize tree from DOM
+  function serializeTopics(container) {
+    var topics = {};
+    var rows = container.children;
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (!row.classList.contains('dialogue-topic-row')) continue;
+      var key = row.querySelector('.dialogue-key').value.trim();
+      if (!key) continue;
+      var response = row.querySelector('.dialogue-response').value;
+      var children = row.querySelector('.dialogue-children');
+      var childTopics = serializeTopics(children);
+      var node = { response: response };
+      if (Object.keys(childTopics).length > 0) {
+        node.topics = childTopics;
+      }
+      topics[key] = node;
+    }
+    return topics;
+  }
+
+  function serializeDialogueTree() {
+    var tree = {};
+    var greeting = greetingInput.value.trim();
+    if (greeting) tree.greeting = greeting;
+    var topics = serializeTopics(topicsRoot);
+    if (Object.keys(topics).length > 0) tree.topics = topics;
+    return tree;
+  }
+
+  // === Mode toggle (Dialogue) ===
+  var dStructured = document.getElementById('dialogue-structured');
+  var dRaw = document.getElementById('dialogue-raw');
+  var dRawTextarea = document.getElementById('dialogue-raw-textarea');
+  var dRawError = document.getElementById('dialogue-raw-error');
+  var dBtnStructured = document.getElementById('dialogue-mode-structured');
+  var dBtnRaw = document.getElementById('dialogue-mode-raw');
+  var dialogueMode = 'structured';
+
+  dBtnRaw.addEventListener('click', function() {
+    var tree = serializeDialogueTree();
+    dRawTextarea.value = JSON.stringify(tree, null, 2);
+    dStructured.hidden = true;
+    dRaw.hidden = false;
+    dBtnRaw.classList.add('rc-btn--on');
+    dBtnStructured.classList.remove('rc-btn--on');
+    dialogueMode = 'raw';
+  });
+
+  dBtnStructured.addEventListener('click', function() {
+    if (dialogueMode === 'raw') {
+      try {
+        var parsed = JSON.parse(dRawTextarea.value || '{}');
+        dialogueData = parsed;
+        greetingInput.value = parsed.greeting || '';
+        topicsRoot.innerHTML = '';
+        if (parsed.topics && typeof parsed.topics === 'object') {
+          Object.keys(parsed.topics).forEach(function(key) {
+            buildTopicRow(key, parsed.topics[key], topicsRoot, 0);
+          });
+        }
+        dRawError.hidden = true;
+      } catch(e) {
+        dRawError.textContent = 'Invalid JSON: ' + e.message;
+        dRawError.hidden = false;
+        return;
+      }
+    }
+    dStructured.hidden = false;
+    dRaw.hidden = true;
+    dBtnStructured.classList.add('rc-btn--on');
+    dBtnRaw.classList.remove('rc-btn--on');
+    dialogueMode = 'structured';
+  });
+
+  // === Vendor Config Editor ===
+  var vendorData = <%= raw json_escape((@mob.vendor_config || {}).to_json) %>;
+  var vendorHidden = document.getElementById('vendor-config-hidden');
+  var vendorShopType = document.getElementById('vendor-shop-type');
+  var vendorRestockHours = document.getElementById('vendor-restock-hours');
+  var vendorRotationCount = document.getElementById('vendor-rotation-count');
+  var vendorRotationWrap = document.getElementById('vendor-rotation-wrap');
+
+  // Initialize vendor fields
+  vendorShopType.value = vendorData.shop_type || 'standard';
+  vendorRestockHours.value = vendorData.restock_interval_hours || 24;
+  vendorRotationCount.value = vendorData.rotation_count || 3;
+
+  function updateRotationVisibility() {
+    vendorRotationWrap.hidden = vendorShopType.value !== 'black_market';
+  }
+  updateRotationVisibility();
+  vendorShopType.addEventListener('change', updateRotationVisibility);
+
+  // === Mode toggle (Vendor) ===
+  var vStructured = document.getElementById('vendor-structured');
+  var vRaw = document.getElementById('vendor-raw');
+  var vRawTextarea = document.getElementById('vendor-raw-textarea');
+  var vRawError = document.getElementById('vendor-raw-error');
+  var vBtnStructured = document.getElementById('vendor-mode-structured');
+  var vBtnRaw = document.getElementById('vendor-mode-raw');
+  var vendorMode = 'structured';
+
+  function serializeVendorConfig() {
+    var config = {};
+    config.shop_type = vendorShopType.value;
+    config.restock_interval_hours = parseInt(vendorRestockHours.value) || 24;
+    if (vendorShopType.value === 'black_market') {
+      config.rotation_count = parseInt(vendorRotationCount.value) || 3;
+    }
+    return config;
+  }
+
+  vBtnRaw.addEventListener('click', function() {
+    var config = serializeVendorConfig();
+    vRawTextarea.value = JSON.stringify(config, null, 2);
+    vStructured.hidden = true;
+    vRaw.hidden = false;
+    vBtnRaw.classList.add('rc-btn--on');
+    vBtnStructured.classList.remove('rc-btn--on');
+    vendorMode = 'raw';
+  });
+
+  vBtnStructured.addEventListener('click', function() {
+    if (vendorMode === 'raw') {
+      try {
+        var parsed = JSON.parse(vRawTextarea.value || '{}');
+        vendorShopType.value = parsed.shop_type || 'standard';
+        vendorRestockHours.value = parsed.restock_interval_hours || 24;
+        vendorRotationCount.value = parsed.rotation_count || 3;
+        updateRotationVisibility();
+        vRawError.hidden = true;
+      } catch(e) {
+        vRawError.textContent = 'Invalid JSON: ' + e.message;
+        vRawError.hidden = false;
+        return;
+      }
+    }
+    vStructured.hidden = false;
+    vRaw.hidden = true;
+    vBtnStructured.classList.add('rc-btn--on');
+    vBtnRaw.classList.remove('rc-btn--on');
+    vendorMode = 'structured';
+  });
+
+  // === Room Combobox ===
+  AdminCombobox.init({
+    inputId: 'room-cb-input',
+    hiddenId: 'room-cb-hidden',
+    dropdownId: 'room-cb-dropdown',
+    statusId: 'room-cb-status',
+    items: <%= raw json_escape(@rooms.map { |r| {id: r.id, name: r.name, zone: r.grid_zone.name, region: r.grid_zone.grid_region.name} }.to_json) %>,
+    getSearchText: function(r) { return (r.name + ' ' + r.zone + ' ' + r.region).toLowerCase(); },
+    getGroupKey: function(r) { return r.region + ' / ' + r.zone; },
+    renderOption: function(r, e) {
+      return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone) + '</span>';
+    },
+    getId: function(r) { return String(r.id); },
+    getLabel: function(r) { return r.zone + ' / ' + r.name; },
+    emptyText: 'No rooms match',
+    selectedText: 'Room selected'
+  });
+
+  // A raw editor's JSON, or null (the error shown under it) when it
+  // doesn't parse — the submit then stops instead of posting it.
+  function rawJson(textarea, errorEl) {
+    try {
+      JSON.parse(textarea.value || '{}');
+      errorEl.hidden = true;
+      return textarea.value || '{}';
+    } catch(e) {
+      errorEl.textContent = 'Invalid JSON: ' + e.message;
+      errorEl.hidden = false;
+      return null;
+    }
+  }
+
+  // === Serialize on form submit ===
+  var form = document.getElementById('mob-form');
+  form.addEventListener('submit', function(event) {
+    var dialogueJson = dialogueMode === 'structured' ? JSON.stringify(serializeDialogueTree()) : rawJson(dRawTextarea, dRawError);
+    var vendorJson = vendorMode === 'structured' ? JSON.stringify(serializeVendorConfig()) : rawJson(vRawTextarea, vRawError);
+    if (dialogueJson === null || vendorJson === null) {
+      event.preventDefault();
+      (dialogueJson === null ? dRawTextarea : vRawTextarea).focus();
+      return;
+    }
+    dialogueHidden.value = dialogueJson;
+    vendorHidden.value = vendorJson;
+  });
+})();
+</script>

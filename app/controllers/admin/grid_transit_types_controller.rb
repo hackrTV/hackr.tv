@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# /root/grid_transit_types — the transit types ledger and the type record
+# as console screens (2026-10-31; root_console.css). Slug-keyed; saves
+# stay on the record (no show route).
 class Admin::GridTransitTypesController < Admin::ApplicationController
   include Admin::Versionable
 

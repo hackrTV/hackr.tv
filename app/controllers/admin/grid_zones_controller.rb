@@ -1,16 +1,24 @@
+# /root/grid_zones — the zones ledger and the zone record as console
+# screens (2026-10-31; root_console.css). The record screen is the edit
+# screen: show redirects there, saves stay on it; ?grid_region_id=
+# prefills a new zone (the region record's [+] NEW ZONE).
 class Admin::GridZonesController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridZone
 
-  before_action :set_zone, only: %i[edit update destroy]
+  before_action :set_zone, only: %i[show edit update destroy]
 
   def index
     @zones = GridZone.includes(:grid_region, :ambient_playlist, :grid_faction, :grid_rooms).order(:name)
   end
 
+  def show
+    redirect_to edit_admin_grid_zone_path(@zone)
+  end
+
   def new
-    @zone = GridZone.new
+    @zone = GridZone.new(grid_region_id: params[:grid_region_id])
     load_selects
   end
 
@@ -18,7 +26,7 @@ class Admin::GridZonesController < Admin::ApplicationController
     @zone = GridZone.new(zone_params)
     if @zone.save
       set_flash_success("Zone '#{@zone.name}' created.")
-      redirect_to admin_grid_zones_path
+      redirect_to edit_admin_grid_zone_path(@zone)
     else
       load_selects
       flash.now[:error] = @zone.errors.full_messages.join(", ")
@@ -33,7 +41,7 @@ class Admin::GridZonesController < Admin::ApplicationController
   def update
     if @zone.update(zone_params)
       set_flash_success("Zone '#{@zone.name}' updated.")
-      redirect_to admin_grid_zones_path
+      redirect_to edit_admin_grid_zone_path(@zone)
     else
       load_selects
       flash.now[:error] = @zone.errors.full_messages.join(", ")

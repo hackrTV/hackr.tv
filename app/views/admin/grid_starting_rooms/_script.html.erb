@@ -1,0 +1,24 @@
+<%# The starting room record's ROOM picker, rendered after the screen
+    (admin/shared/_combobox over every room; the commit is refused until
+    a room is picked). Assigns: @rooms. %>
+<%= render "admin/shared/combobox" %>
+<script nonce="<%= content_security_policy_nonce %>">
+  AdminCombobox.init({
+    inputId: 'room-cb-input',
+    hiddenId: 'room-cb-hidden',
+    dropdownId: 'room-cb-dropdown',
+    statusId: 'room-cb-status',
+    formId: 'starting-room-form',
+    items: <%= raw json_escape(@rooms.map { |r| {id: r.id, name: r.name, zone_name: r.grid_zone&.name, region_name: r.grid_zone&.grid_region&.name || "Unknown", room_type: r.room_type} }.to_json) %>,
+    getSearchText: function(r) { return (r.name + ' ' + r.zone_name + ' ' + r.region_name + ' ' + r.room_type).toLowerCase(); },
+    getGroupKey: function(r) { return r.region_name + ' / ' + r.zone_name; },
+    renderOption: function(r, e) {
+      return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.room_type) + '</span>';
+    },
+    getId: function(r) { return String(r.id); },
+    getLabel: function(r) { return r.region_name + ' / ' + r.zone_name + ' / ' + r.name; },
+    emptyText: 'No rooms match',
+    selectedText: 'Room selected',
+    submitError: 'Select a room first'
+  });
+</script>

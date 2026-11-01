@@ -1,106 +1,65 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/zones :: MANAGE GRID ZONES", variant: :admin) do %>
+<%# /root/grid_zones — the zones ledger as a console screen (2026-10-31;
+    root_console.css): bar, ON RECORD row, the FILTER row (ledger-filter:
+    name / slug / region / faction / playlist — replaces the old filter
+    script), // ZONES // rows ([NN] · name over slug · REGION · FACTION
+    · PLAYLIST · DANGER · ROOMS · [HISTORY]), destinations, the > prompt
+    (NN opens the record screen; deletes live there). Assigns: @zones. %>
+<% content_for :title, "/root/grid_zones :: ZONES" %>
+<% zones = @zones.to_a %>
+<% numbers = zones.each_index.map { |i| root_num(i, total: zones.size) } %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ZONES", sub: "ROOT · WORLD · /root/grid_zones"} do %>
+    <%= link_to "[+] NEW ZONE", new_admin_grid_zone_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green %>
-        <%= tui_button "+ New Zone", new_admin_grid_zone_path, color: :green %>
-        <span style="color: #333;">|</span>
-        <label class="white-text" style="font-weight: bold;">FILTER:</label>
-        <input type="text" id="zone-filter" class="tui-input" style="padding: 6px 10px; width: 250px;" placeholder="name, slug, region..." autocomplete="off">
-        <span id="zone-filter-status" style="color: #666; font-size: 0.85em;"><%= @zones.size %> zones</span>
-      </div>
-
-      <% if @zones.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-          <table id="zone-table" class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: left;">Slug</th>
-                <th style="text-align: left;">Region</th>
-                <th style="text-align: left;">Faction</th>
-                <th style="text-align: left;">Ambient Playlist</th>
-                <th style="text-align: center;">Danger</th>
-                <th style="text-align: center;">Rooms</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @zones.each_with_index do |zone, i| %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td class="cyan-255-text"><strong><%= zone.name %></strong></td>
-                  <td style="font-family: monospace; color: #666;">/<%= zone.slug %></td>
-                  <td><%= zone.grid_region&.name || "—" %></td>
-                  <td><%= zone.grid_faction&.name || "—" %></td>
-                  <td>
-                    <% if zone.ambient_playlist %>
-                      <span class="purple-255-text"><%= zone.ambient_playlist.name %></span>
-                    <% else %>
-                      <span style="color: #666;">—</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if zone.danger_level > 0 %>
-                      <span style="color: #ef4444;"><%= zone.danger_level %></span>
-                    <% else %>
-                      <span style="color: #666;">0</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;"><%= zone.grid_rooms.size %></td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_grid_zone_path(zone), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "History", history_admin_grid_zone_path(zone), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_grid_zone_path(zone), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{zone.name}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-
-        <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
-          <%= @zones.count %> zones
-        </p>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No zones yet.</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(zones.size, "zone") %> <span class="console-dim">· <%= pluralize(zones.sum { |z| z.grid_rooms.size }, "room") %> · <%= zones.count { |z| z.danger_level.positive? } %> dangerous</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="name · slug · region · faction · playlist" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= zones.size %> / <%= zones.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
 
-<script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    var input = document.getElementById('zone-filter');
-    var status = document.getElementById('zone-filter-status');
-    var rows = document.querySelectorAll('#zone-table tbody tr');
-    if (!input || !rows.length) return;
-    var total = rows.length;
+  <section class="console-section rc-ledger rc-ledger--zones" aria-label="Zones">
+    <div class="console-rule"><span>// ZONES //</span></div>
+    <% if zones.empty? %>
+      <%= render "admin/console/empty", text: "NO ZONES ON RECORD", hint: "[+] NEW ZONE adds one to a region" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ZONE</span><span>REGION</span><span>FACTION</span><span>PLAYLIST</span><span class="rc-cell--r">DANGER</span><span class="rc-cell--r">ROOMS</span><span></span>
+      </div>
+    <% end %>
+    <% zones.each_with_index do |zone, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [zone.name, zone.slug, zone.grid_region&.name, zone.grid_faction&.name, zone.ambient_playlist&.name].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to zone.name, edit_admin_grid_zone_path(zone), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= zone.slug %></div>
+        </div>
+        <span class="rc-cell"><%= zone.grid_region&.name || "—" %></span>
+        <span class="rc-cell"><%= zone.grid_faction&.name || "—" %></span>
+        <span class="rc-cell <%= "rc-hot" if zone.ambient_playlist %>"><%= zone.ambient_playlist&.name || "—" %></span>
+        <span class="rc-cell rc-cell--r <%= zone.danger_level.positive? ? "rc-bad" : "rc-off" %>"><%= zone.danger_level %></span>
+        <span class="rc-cell rc-cell--r"><%= zone.grid_rooms.size %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_zone_path(zone), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
 
-    input.addEventListener('input', function() {
-      var q = this.value.toLowerCase();
-      var visible = 0;
-      for (var i = 0; i < rows.length; i++) {
-        var cells = rows[i].querySelectorAll('td');
-        var text = '';
-        for (var c = 0; c < cells.length - 1; c++) text += cells[c].textContent + ' ';
-        var show = !q || text.toLowerCase().indexOf(q) !== -1;
-        rows[i].style.display = show ? '' : 'none';
-        if (show) visible++;
-      }
-      status.textContent = visible + ' of ' + total + ' zone' + (total === 1 ? '' : 's');
-    });
-  })();
-</script>
+  <%= render "admin/console/destinations", section: :world, except: "ZONES" %>
+
+  <div class="console-rule"><span>// EVERY ZONE ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "ZONES", numbers: numbers, noun: "a zone number", extra: ["new"]) %>
+</div>

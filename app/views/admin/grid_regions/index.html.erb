@@ -1,61 +1,48 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/regions :: MANAGE GRID REGIONS", variant: :admin) do %>
+<%# /root/grid_regions — the regions ledger as a console screen
+    (2026-10-31; root_console.css): bar, ON RECORD row, // REGIONS //
+    rows ([NN] · name over slug · description · ZONES · [MAP] [HISTORY]),
+    destinations, the > prompt (NN opens the record screen; deletes live
+    there). Assigns: @regions (zones preloaded). %>
+<% content_for :title, "/root/grid_regions :: REGIONS" %>
+<% regions = @regions.to_a %>
+<% numbers = regions.each_index.map { |i| root_num(i, total: regions.size) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "REGIONS", sub: "ROOT · WORLD · /root/grid_regions"} do %>
+    <%= link_to "[+] NEW REGION", new_admin_grid_region_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green %>
-        <%= tui_button "+ New Region", new_admin_grid_region_path, color: :green %>
-      </div>
-
-      <% if @regions.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: left;">Slug</th>
-                <th style="text-align: left;">Description</th>
-                <th style="text-align: center;">Zones</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @regions.each_with_index do |region, i| %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td class="cyan-255-text"><strong><%= region.name %></strong></td>
-                  <td style="font-family: monospace; color: #666;">/<%= region.slug %></td>
-                  <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= truncate(region.description, length: 60) %></td>
-                  <td style="text-align: center;"><%= region.grid_zones.size %></td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <%= tui_button "Map", admin_grid_map_editor_region_show_path(region_id: region.id), color: :cyan, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "Edit", edit_admin_grid_region_path(region), style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button "History", history_admin_grid_region_path(region), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_grid_region_path(region), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{region.name}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-
-        <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
-          <%= @regions.count %> regions
-        </p>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No regions yet.</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(regions.size, "region") %> <span class="console-dim">· <%= pluralize(regions.sum { |r| r.grid_zones.size }, "zone") %></span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--regions" aria-label="Regions">
+    <div class="console-rule"><span>// REGIONS //</span></div>
+    <% if regions.empty? %>
+      <%= render "admin/console/empty", text: "NO REGIONS ON RECORD", hint: "[+] NEW REGION starts the grid" %>
+    <% end %>
+    <% regions.each_with_index do |region, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to region.name, edit_admin_grid_region_path(region), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= region.slug %><% if region.description.present? %> · <%= truncate(region.description, length: 80) %><% end %></div>
+        </div>
+        <span class="rc-cell rc-cell--r"><%= region.grid_zones.size %> ZONE<%= "S" unless region.grid_zones.size == 1 %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[MAP]", admin_grid_map_editor_region_show_path(region_id: region.id), class: "console-link" %>
+          <%= link_to "[HISTORY]", history_admin_grid_region_path(region), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world, except: "REGIONS" %>
+
+  <div class="console-rule"><span>// EVERY REGION ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "REGIONS", numbers: numbers, noun: "a region number", extra: ["new"]) %>
+</div>

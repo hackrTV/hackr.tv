@@ -1,13 +1,21 @@
+# /root/grid_factions — the factions ledger (+ the rep-link graph) and
+# the faction record as console screens (2026-10-31; root_console.css).
+# The record screen is the edit screen: show redirects there, saves stay
+# on it.
 class Admin::GridFactionsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridFaction
 
-  before_action :set_faction, only: [:edit, :update, :destroy]
+  before_action :set_faction, only: [:show, :edit, :update, :destroy]
 
   def index
     @factions = GridFaction.ordered.includes(:parent, :incoming_rep_links, :outgoing_rep_links).to_a
     @rep_links = GridFactionRepLink.includes(:source_faction, :target_faction).to_a
+  end
+
+  def show
+    redirect_to edit_admin_grid_faction_path(@faction)
   end
 
   def new
@@ -18,7 +26,7 @@ class Admin::GridFactionsController < Admin::ApplicationController
     @faction = GridFaction.new(faction_params)
     if @faction.save
       set_flash_success("Faction '#{@faction.name}' created.")
-      redirect_to admin_grid_factions_path
+      redirect_to edit_admin_grid_faction_path(@faction)
     else
       flash.now[:error] = @faction.errors.full_messages.join(", ")
       render :new, status: :unprocessable_entity
@@ -31,7 +39,7 @@ class Admin::GridFactionsController < Admin::ApplicationController
   def update
     if @faction.update(faction_params)
       set_flash_success("Faction '#{@faction.name}' updated.")
-      redirect_to admin_grid_factions_path
+      redirect_to edit_admin_grid_faction_path(@faction)
     else
       flash.now[:error] = @faction.errors.full_messages.join(", ")
       render :edit, status: :unprocessable_entity

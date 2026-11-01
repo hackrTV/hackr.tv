@@ -1,71 +1,79 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/transit_journeys :: TRANSIT JOURNEYS", variant: :admin) do %>
+<%# /root/grid_transit_journeys — the newest 100 transit journeys as a
+    console screen (2026-10-31; root_console.css): bar, ON SCREEN row,
+    the STATE and TYPE rows (server-side ?state= / ?journey_type=, each
+    keeping the other), // JOURNEYS // rows ([NN] · hackr over #id ·
+    TYPE · route · STATE · started · [ABANDON] while active and dev tools
+    are on), destinations, the > prompt (NN opens the journey readout).
+    Assigns: @journeys, @state, @journey_type. %>
+<% content_for :title, "/root/grid_transit_journeys :: JOURNEYS" %>
+<% journeys = @journeys.to_a %>
+<% numbers = journeys.each_index.map { |i| root_num(i, total: journeys.size) } %>
+<% state_tone = {"active" => "rc-on", "completed" => "rc-off", "abandoned" => "rc-star"} %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "JOURNEYS", sub: "ROOT · WORLD · /root/grid_transit_journeys"} do %>
+    <% if dev_tools_enabled? %><%= root_badge("DEV TOOLS ON", :warn) %><% end %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= form_with url: admin_grid_transit_journeys_path, method: :get, local: true, style: "margin-bottom: 20px;" do %>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-          <%= select_tag :state, options_for_select([["All States", ""], ["active", "active"], ["completed", "completed"], ["abandoned", "abandoned"], ["ejected", "ejected"]], params[:state]), class: "tui-input", style: "font-family: monospace;", onchange: "this.form.submit()" %>
-          <%= select_tag :journey_type, options_for_select([["All Types", ""], ["slipstream", "slipstream"], ["local_public", "local_public"], ["local_private", "local_private"]], params[:journey_type]), class: "tui-input", style: "font-family: monospace;", onchange: "this.form.submit()" %>
-          <% if params[:state].present? || params[:journey_type].present? %>
-            <%= tui_button "Clear", admin_grid_transit_journeys_path, style: "padding: 2px 8px; font-size: 0.8em;" %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-        <table class="tui-table" style="width: 100%; min-width: 900px;">
-          <thead>
-            <tr>
-              <th style="text-align: center;">ID</th>
-              <th style="text-align: left;">Hackr</th>
-              <th style="text-align: center;">Type</th>
-              <th style="text-align: left;">Route</th>
-              <th style="text-align: center;">State</th>
-              <th style="text-align: center;">Started</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @journeys.each do |j| %>
-              <tr>
-                <td style="text-align: center;"><%= j.id %></td>
-                <td><%= j.grid_hackr.hackr_alias %></td>
-                <td style="text-align: center;">
-                  <% color = j.slipstream? ? "#a78bfa" : "#22d3ee" %>
-                  <span style="color: <%= color %>;"><%= j.journey_type.upcase %></span>
-                </td>
-                <td>
-                  <% if j.slipstream? %>
-                    <%= j.grid_slipstream_route&.name || "—" %>
-                  <% else %>
-                    <%= j.grid_transit_route&.name || "—" %>
-                  <% end %>
-                </td>
-                <td style="text-align: center;">
-                  <% state_color = case j.state; when "active" then "#34d399"; when "completed" then "#6b7280"; when "abandoned" then "#fbbf24"; else "#f87171"; end %>
-                  <span style="color: <%= state_color %>;"><%= j.state.upcase %></span>
-                </td>
-                <td style="text-align: center; color: #6b7280;"><%= j.started_at&.strftime("%Y-%m-%d %H:%M") %></td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "View", admin_grid_transit_journey_path(j), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <% if j.active? && dev_tools_enabled? %>
-                    <%= tui_button "Abandon", force_abandon_admin_grid_transit_journey_path(j), data: { turbo_method: :post, turbo_confirm: "Force-abandon journey ##{j.id}?" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON SCREEN</span>
+      <span class="console-val"><%= pluralize(journeys.size, "journey") %><% if @state || @journey_type %> · <%= [@state, @journey_type].compact.join(" · ").upcase %><% end %> <span class="console-dim">· newest first · at most 100</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field">
+      <span class="console-key">STATE</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_grid_transit_journeys_path(journey_type: @journey_type), class: class_names("rc-btn", "rc-btn--on": @state.nil?), aria: {current: @state.nil? && "page"} %>
+        <% GridTransitJourney::STATES.each do |state| %>
+          <%= link_to state.upcase, admin_grid_transit_journeys_path(state: state, journey_type: @journey_type), class: class_names("rc-btn", "rc-btn--on": @state == state), aria: {current: @state == state && "page"} %>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row rc-field">
+      <span class="console-key">TYPE</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_grid_transit_journeys_path(state: @state), class: class_names("rc-btn", "rc-btn--on": @journey_type.nil?), aria: {current: @journey_type.nil? && "page"} %>
+        <% GridTransitJourney::JOURNEY_TYPES.each do |type| %>
+          <%= link_to type.upcase, admin_grid_transit_journeys_path(state: @state, journey_type: type), class: class_names("rc-btn", "rc-btn--on": @journey_type == type), aria: {current: @journey_type == type && "page"} %>
+        <% end %>
+      </span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--journeys" aria-label="Journeys">
+    <div class="console-rule"><span>// JOURNEYS //</span></div>
+    <% if journeys.empty? %>
+      <%= render "admin/console/empty", text: "NO JOURNEYS ON RECORD", hint: ("clear a filter to see more" if @state || @journey_type) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>HACKR</span><span>TYPE</span><span>ROUTE</span><span>STATE</span><span>STARTED</span><span></span>
+      </div>
+    <% end %>
+    <% journeys.each_with_index do |journey, i| %>
+      <% num = numbers[i] %>
+      <% route = journey.slipstream? ? journey.grid_slipstream_route : journey.grid_transit_route %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to journey.grid_hackr.hackr_alias, admin_grid_transit_journey_path(journey), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta">#<%= journey.id %></div>
+        </div>
+        <span class="rc-cell <%= journey.slipstream? ? "rc-star" : "rc-hot" %>"><%= journey.journey_type.upcase %></span>
+        <span class="rc-cell"><%= route&.name || "—" %></span>
+        <span class="rc-cell <%= state_tone.fetch(journey.state, "rc-bad") %>"><%= journey.state.upcase %></span>
+        <span class="rc-cell"><%= journey.started_at&.strftime("%Y-%m-%d %H:%M") || "—" %></span>
+        <span class="rc-cell rc-links">
+          <% if journey.active? && dev_tools_enabled? %>
+            <%= button_to "[ABANDON]", force_abandon_admin_grid_transit_journey_path(journey), method: :post, class: "rc-btn rc-btn--danger",
+              form: {data: {confirm: "Force-abandon journey ##{journey.id}?"}} %>
+          <% end %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world, except: "JOURNEYS" %>
+
+  <div class="console-rule"><span>// NEWEST JOURNEYS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "JOURNEYS", numbers: numbers, noun: "a journey number") %>
+</div>

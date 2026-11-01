@@ -1,7 +1,39 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/exits/#{@exit.id} :: EDIT EXIT", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @exit], url: admin_grid_exit_path(@exit), local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_exits/:id/edit — the exit as a console screen (2026-10-31;
+    show redirects here). Bar (from > DIRECTION > to · ROOT · EXIT ·
+    path; [<] EXITS, [>] FROM, [>] TO, [HISTORY]), the fields,
+    // COMMIT // ([SAVE] [CANCEL] · [DELETE]), destinations, the >
+    prompt. The delete form is hidden at the end. Assigns: @exit, @rooms. %>
+<% from = GridRoom.find_by(id: @exit.from_room_id_in_database) %>
+<% to = GridRoom.find_by(id: @exit.to_room_id_in_database) %>
+<% name = "#{from&.name} > #{@exit.direction_in_database.to_s.upcase} > #{to&.name}" %>
+<% content_for :title, "/root/grid_exits/#{@exit.id} :: EXIT" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · EXIT · /root/grid_exits/#{@exit.id}"} do %>
+    <%= link_to "[<] EXITS", admin_grid_exits_path, class: "console-bar-link" %>
+    <% if from %><%= link_to "[>] FROM", edit_admin_grid_room_path(from), class: "console-bar-link" %><% end %>
+    <% if to %><%= link_to "[>] TO", edit_admin_grid_room_path(to), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_exit_path(@exit), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @exit, url: admin_grid_exit_path(@exit), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, exit_record: @exit %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE EXIT]</button>
+      <%= link_to "[CANCEL]", admin_grid_exits_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-exit" class="rc-btn rc-btn--danger">[DELETE EXIT]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-exit", admin_grid_exit_path(@exit), confirm: "Delete the exit #{name}? The return exit stays.") %>
+  </div>
+</div>

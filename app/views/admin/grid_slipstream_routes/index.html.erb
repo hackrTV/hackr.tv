@@ -1,64 +1,56 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/slipstream_routes :: SLIPSTREAM ROUTES", variant: :admin) do %>
+<%# /root/grid_slipstream_routes — the slipstream routes ledger as a
+    console screen (2026-10-31; root_console.css): bar, ON RECORD row,
+    // SLIPSTREAM // rows ([NN] · name over origin > destination · LEGS ·
+    CL · HEAT · RISK · ACTIVE · [HISTORY]), destinations, the > prompt
+    (NN opens the record screen, which holds the legs; deletes live
+    there). Assigns: @routes. %>
+<% content_for :title, "/root/grid_slipstream_routes :: SLIPSTREAM" %>
+<% routes = @routes.to_a %>
+<% numbers = routes.each_index.map { |i| root_num(i, total: routes.size) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "SLIPSTREAM", sub: "ROOT · WORLD · /root/grid_slipstream_routes"} do %>
+    <%= link_to "[+] NEW ROUTE", new_admin_grid_slipstream_route_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "+ New Slipstream Route", new_admin_grid_slipstream_route_path, color: :green %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-        <table class="tui-table" style="width: 100%; min-width: 900px;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Origin</th>
-              <th style="text-align: center;">&rarr;</th>
-              <th style="text-align: left;">Destination</th>
-              <th style="text-align: center;">Legs</th>
-              <th style="text-align: center;">CL</th>
-              <th style="text-align: center;">Heat</th>
-              <th style="text-align: center;">Risk%</th>
-              <th style="text-align: center;">Active</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @routes.each do |r| %>
-              <tr>
-                <td><%= r.name %></td>
-                <td style="color: #a78bfa;"><%= r.origin_region.name %></td>
-                <td style="text-align: center; color: #6b7280;">&rarr;</td>
-                <td style="color: #a78bfa;"><%= r.destination_region.name %></td>
-                <td style="text-align: center;"><%= r.grid_slipstream_legs.length %></td>
-                <td style="text-align: center;"><%= r.min_clearance %></td>
-                <td style="text-align: center;"><%= r.base_heat_cost %></td>
-                <td style="text-align: center;"><%= r.detection_risk_base %>%</td>
-                <td style="text-align: center;">
-                  <% if r.active? %>
-                    <span class="green-255-text">&#10003;</span>
-                  <% else %>
-                    <span style="color: #6b7280;">&mdash;</span>
-                  <% end %>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Edit", edit_admin_grid_slipstream_route_path(r), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "History", history_admin_grid_slipstream_route_path(r), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "Delete", admin_grid_slipstream_route_path(r), data: { turbo_method: :delete, turbo_confirm: "Delete route '#{r.name}'?" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(routes.size, "slipstream route") %> <span class="console-dim">· <%= routes.count(&:active?) %> active</span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--slipstream" aria-label="Slipstream routes">
+    <div class="console-rule"><span>// SLIPSTREAM //</span></div>
+    <% if routes.empty? %>
+      <%= render "admin/console/empty", text: "NO SLIPSTREAM ROUTES ON RECORD", hint: "[+] NEW ROUTE links two regions" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ROUTE</span><span class="rc-cell--r">LEGS</span><span class="rc-cell--r">CL</span><span class="rc-cell--r">HEAT</span><span class="rc-cell--r">RISK</span><span></span><span></span>
+      </div>
+    <% end %>
+    <% routes.each_with_index do |route, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to route.name, edit_admin_grid_slipstream_route_path(route), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= route.origin_region.name %> &gt; <%= route.destination_region.name %></div>
+        </div>
+        <span class="rc-cell rc-cell--r"><%= route.grid_slipstream_legs.size %></span>
+        <span class="rc-cell rc-cell--r"><%= route.min_clearance %></span>
+        <span class="rc-cell rc-cell--r"><%= route.base_heat_cost %></span>
+        <span class="rc-cell rc-cell--r"><%= route.detection_risk_base %>%</span>
+        <span class="rc-cell <%= route.active? ? "rc-on" : "rc-off" %>"><%= route.active? ? "ACTIVE" : "OFF" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_slipstream_route_path(route), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world, except: "SLIPSTREAM" %>
+
+  <div class="console-rule"><span>// EVERY SLIPSTREAM ROUTE ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "SLIPSTREAM", numbers: numbers, noun: "a route number", extra: ["new"]) %>
+</div>

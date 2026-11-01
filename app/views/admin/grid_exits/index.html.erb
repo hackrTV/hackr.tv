@@ -1,59 +1,68 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/exits :: MANAGE GRID EXITS", variant: :admin) do %>
+<%# /root/grid_exits — the exits ledger as a console screen (2026-10-31;
+    root_console.css): bar, ON RECORD row, the FILTER row (ledger-filter:
+    rooms / zones / direction; ~5,900 rows, served in full as the old
+    table was), // EXITS // rows ([NNNN] · from room over its zone ·
+    DIRECTION · to room over its zone · LOCKED · [HISTORY]),
+    destinations, the > prompt (NN opens the record screen; deletes live
+    there). Assigns: @exits. %>
+<% content_for :title, "/root/grid_exits :: EXITS" %>
+<% exits = @exits.to_a %>
+<% numbers = exits.each_index.map { |i| root_num(i, total: exits.size) } %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "EXITS", sub: "ROOT · WORLD · /root/grid_exits"} do %>
+    <%= link_to "[+] NEW EXIT", new_admin_grid_exit_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "+ New Exit", new_admin_grid_exit_path, color: :green %>
-      </div>
-
-      <% if @exits.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">From Room</th>
-                <th style="text-align: center;">Direction</th>
-                <th style="text-align: left;">To Room</th>
-                <th style="text-align: center;">Locked</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @exits.each_with_index do |exit_record, i| %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td class="cyan-255-text"><%= exit_record.from_room&.name || "—" %></td>
-                  <td style="text-align: center; font-weight: bold;"><%= exit_record.direction %></td>
-                  <td class="cyan-255-text"><%= exit_record.to_room&.name || "—" %></td>
-                  <td style="text-align: center;"><%= exit_record.locked? ? "LOCKED" : "—" %></td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_grid_exit_path(exit_record), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "History", history_admin_grid_exit_path(exit_record), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_grid_exit_path(exit_record), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete this exit?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-
-        <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
-          <%= @exits.count %> exits
-        </p>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No exits yet.</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(exits.size, "exit") %> <span class="console-dim">· <%= exits.count(&:locked?) %> locked</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="room · zone · direction · locked" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= exits.size %> / <%= exits.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--exits" aria-label="Exits">
+    <div class="console-rule"><span>// EXITS //</span></div>
+    <% if exits.empty? %>
+      <%= render "admin/console/empty", text: "NO EXITS ON RECORD", hint: "[+] NEW EXIT joins two rooms" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>FROM</span><span>DIRECTION</span><span>TO</span><span></span><span></span>
+      </div>
+    <% end %>
+    <% exits.each_with_index do |exit_record, i| %>
+      <% num = numbers[i] %>
+      <% from, to = exit_record.from_room, exit_record.to_room %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [from&.name, from&.grid_zone&.name, exit_record.direction, to&.name, to&.grid_zone&.name, ("locked" if exit_record.locked?)].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to from&.name || "—", edit_admin_grid_exit_path(exit_record), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= from&.grid_zone&.name %></div>
+        </div>
+        <span class="rc-cell rc-hot"><%= exit_record.direction.upcase %></span>
+        <div class="cc-text">
+          <span class="cc-name"><%= to&.name || "—" %></span>
+          <div class="cc-meta"><%= to&.grid_zone&.name %></div>
+        </div>
+        <span class="rc-cell <%= exit_record.locked? ? "rc-bad" : "rc-off" %>"><%= exit_record.locked? ? "LOCKED" : "OPEN" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_exit_path(exit_record), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world, except: "EXITS" %>
+
+  <div class="console-rule"><span>// EVERY EXIT ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "EXITS", numbers: numbers, noun: "an exit number", extra: ["new"]) %>
+</div>

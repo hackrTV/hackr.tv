@@ -99,8 +99,9 @@
 .rc-row { display: grid; grid-template-columns: var(--rc-cols, 5ch minmax(0, 1fr) 12ch 12ch auto); gap: 0 12px; align-items: center; padding: 2px 8px; }
 .rc-row .console-tag, .rc-track .console-tag { grid-area: auto; }
 .rc-row--cover { --rc-cols: 5ch 40px minmax(0, 1fr) 14ch auto; }
-.rc-row--head { color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
-.rc-row--head > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The head row keeps the rows' font size — --rc-cols is in ch, which resolves against the row's own font — and sets the small type on its cells. */
+.rc-row--head { color: var(--fg-faint); }
+.rc-row--head > * { font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rc-cell { color: var(--fg-muted); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
 .rc-cell--r { text-align: right; }
 .rc-cell--wrap { white-space: normal; overflow-wrap: anywhere; } /* a cell read in full (the moderation log's reasons) */
@@ -135,11 +136,49 @@
 .rc-ledger--online { --rc-cols: 5ch minmax(0, 1fr) 10ch minmax(0, 1fr) 8ch; } /* the grid's online hackrs: NN · alias · ROLE · room · room id */
 .rc-ledger--chat { --rc-cols: 9ch 24ch minmax(0, 1fr); } /* the grid's recent messages: time · room · <alias> line */
 .rc-ledger--hackrs { --rc-cols: 5ch minmax(0, 1fr) 10ch 4ch 7ch 8ch 9ch 4ch 260px; } /* NN · alias over id · ROLE · CLR · XP · GRID · LOGIN · NOW · [REVOKE] [DISABLE] [x] SVC */
+.rc-ledger--regions { --rc-cols: 5ch minmax(0, 1fr) 10ch auto; } /* NN · name over slug · description · ZONES · [MAP] [HISTORY] */
+.rc-ledger--region-zones { --rc-cols: 5ch minmax(0, 1fr) 22ch 10ch auto; } /* a region's zones: NN · name over slug · faction · DANGER · [HISTORY] */
+.rc-ledger--zones { --rc-cols: 5ch minmax(0, 1fr) 18ch 18ch 18ch 7ch 6ch 72px; } /* NN · name over slug · REGION · FACTION · PLAYLIST · DANGER · ROOMS · [HISTORY] */
+.rc-ledger--zone-rooms { --rc-cols: 5ch minmax(0, 1fr) 20ch 6ch auto; } /* a zone's rooms: NN · name over slug · TYPE · CL · [HISTORY] */
+.rc-ledger--rooms { --rc-cols: 7ch minmax(0, 1fr) 24ch 20ch 4ch 18ch 72px; } /* [NNNN] · name over slug · ZONE · TYPE · CL · PLAYLIST · [HISTORY] */
+.rc-ledger--room-exits { --rc-cols: 5ch 12ch minmax(0, 1fr) 8ch auto; } /* a room's exits: NN · DIRECTION · to room over its zone · LOCKED · [HISTORY] */
+.rc-ledger--room-mobs { --rc-cols: 5ch minmax(0, 1fr) 14ch auto; } /* a room's mobs: NN · name · TYPE · [HISTORY] */
+.rc-ledger--exits { --rc-cols: 7ch minmax(0, 1fr) 12ch minmax(0, 1fr) 8ch 72px; } /* [NNNN] · from over its zone · DIRECTION · to over its zone · LOCKED · [HISTORY] */
+.rc-ledger--starts { --rc-cols: 5ch minmax(0, 1fr) 22ch 7ch 5ch auto; } /* NN · name over zone / room · REGION · POS · LIVE · [HISTORY] */
+.rc-ledger--factions { --rc-cols: 5ch minmax(0, 1fr) 12ch 24ch 7ch auto; } /* NN · name over slug · KIND · PARENT · POS · [HISTORY] */
+.rc-ledger--replinks { --rc-cols: minmax(0, 32ch) minmax(0, 32ch) 12ch; } /* the rep-link graph form: SOURCE · TARGET · WEIGHT */
+.rc-ledger--replinks .rc-select { width: 100%; }
+.rc-input--r { text-align: right; }
+.rc-ledger--transit-types { --rc-cols: 5ch minmax(0, 1fr) 11ch 6ch 4ch 10ch 6ch 72px; } /* NN · name over slug · CATEGORY · FARE · CL · ICON · LIVE · [HISTORY] */
+.rc-ledger--type-routes { --rc-cols: 5ch minmax(0, 1fr) 22ch 7ch; } /* a type's routes: NN · name · region · ACTIVE */
+.rc-ledger--routes { --rc-cols: 5ch minmax(0, 1fr) 18ch 18ch 6ch 5ch 7ch 72px; } /* NN · name over slug · TYPE · REGION · STOPS · LOOP · ACTIVE · [HISTORY] */
+.rc-ledger--stops { --rc-cols: 5ch minmax(0, 1fr) 9ch auto; } /* a route's stops: [POS] · name over zone / room · TERMINUS · [x] */
+.rc-ledger--slipstream { --rc-cols: 5ch minmax(0, 1fr) 5ch 4ch 5ch 5ch 7ch 72px; } /* NN · name over origin > destination · LEGS · CL · HEAT · RISK · ACTIVE · [HISTORY] */
+.rc-ledger--legs { --rc-cols: 5ch minmax(0, 1fr) 9ch 24ch; } /* a route's legs: [POS] · name over its forks · FORKS · breach template */
+.rc-ledger--journeys { --rc-cols: 5ch minmax(0, 1fr) 14ch minmax(0, 1fr) 10ch 17ch 100px; } /* NN · hackr over #id · TYPE · route · STATE · started · [ABANDON] */
+.rc-ledger--mobs { --rc-cols: 5ch minmax(0, 1fr) 14ch 22ch auto; } /* NN · name over zone / room · TYPE · FACTION · [TEST] [HISTORY] */
+.rc-ledger--listings { --rc-cols: 5ch minmax(0, 1fr) 12ch 7ch 7ch 6ch 4ch 13ch 48px; } /* a vendor's listings: NN · item over type · RARITY · PRICE · SELL · STOCK · CL · ACTIVE / ROT · [x] */
 .rc-check-input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent-alt); } /* a ledger row's select box (the WIRE's bulk actions) */
 
 /* An emote as chat draws it (28px tall, wide emotes up to 4:1). */
 .rc-emote { display: block; height: 28px; width: auto; max-width: 112px; }
 .rc-emote-none { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+/* The art column's empty state when it says so in words (a mob's NO AVATAR). */
+.rc-art-none--text { font-size: 12px; letter-spacing: 1px; }
+
+/* An inline editor a record's script drives (the mob's dialogue tree /
+ * vendor config): a key line over its textarea, and the dialogue's
+ * topic rows — keyword + [+] SUB [x] over the response, each level
+ * indented inside its parent's children. */
+.rc-editor { max-width: 100ch; padding: 0 8px 4px; }
+.rc-editor > .rc-textarea { width: 100%; margin: 4px 0 6px; }
+.rc-editor-key { display: block; padding-top: 4px; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.rc-topic { margin: 6px 0; padding: 4px 0 4px 12px; border-left: 2px solid var(--edge-bright); }
+.rc-topic-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.rc-topic-depth { min-width: 3ch; color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+.rc-topic .rc-textarea { width: 100%; max-width: none; min-height: 48px; margin: 4px 0 0; }
+.rc-topic-children { margin-left: 12px; }
+
 /* A read-only block of preformatted data (an alert's JSON payload). */
 .rc-pre { margin: 4px 8px 6px; padding: 4px 6px; max-width: 100ch; border: 1px solid var(--edge); background: var(--bg-1); color: var(--fg); font: inherit; font-size: 14px; line-height: 18px; white-space: pre-wrap; overflow-x: auto; }
 
@@ -164,6 +203,7 @@
 .rc-count { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
 .rc-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 6px 8px; }
 .console-section[hidden], .rc-row[hidden], .rc-track[hidden] { display: none; }
+.console--root .console-status-row[hidden], .console--root .console-status[hidden] { display: none; } /* rows a record's script shows and hides (the vendor ROTATION row) */
 
 /* The admin combobox (admin/shared/_combobox — the typed picker the
  * grid forms, the warp / item / tester screens and the map editor
@@ -182,6 +222,10 @@
 .admin-combobox-option .cb-name { color: var(--warn); }
 .admin-combobox-option .cb-meta { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
 .admin-combobox-empty { padding: 8px 12px; color: var(--fg-faint); }
+/* A picker on a console field row (admin/console/_picker): the box at the .rc-input metrics. */
+.rc-field .admin-combobox { width: 72ch; max-width: 100%; }
+.rc-field .admin-combobox-input { height: 24px; padding: 0 6px; background: var(--bg-1); font-size: 16px; line-height: 20px; }
+.rc-field .admin-combobox-input:focus { background: var(--bg-0); }
 
 @media (max-width: 767px) {
   .console--root { padding: 8px 12px 24px; }
@@ -211,6 +255,13 @@
   .rc-ledger--packets .console-tag, .rc-ledger--punishments .console-tag { display: none; }
   .rc-ledger--modlog .rc-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .rc-ledger--modlog .rc-row .rc-cell { display: block; }
+  /* Four-digit ledgers keep the wider number column; an exit row keeps both rooms (from over to). */
+  .rc-ledger--rooms .rc-row { grid-template-columns: 7ch minmax(0, 1fr) auto; }
+  .rc-ledger--exits .rc-row { grid-template-columns: 7ch minmax(0, 1fr) auto; }
+  .rc-ledger--exits .rc-row .cc-text ~ .cc-text { grid-column: 2; }
+  .rc-ledger--exits .rc-row .rc-links { grid-row: 1; grid-column: 3; }
+  .rc-ledger--room-exits .rc-row { grid-template-columns: 5ch 8ch minmax(0, 1fr) auto; }
+  .rc-ledger--replinks .rc-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 9ch; }
   /* Rows with a run of buttons: the buttons drop to a line of their own under the name. */
   .rc-ledger--drops .rc-links, .rc-ledger--channels .rc-links, .rc-ledger--hackrs .rc-links { grid-column: 2 / -1; justify-content: flex-start; flex-wrap: wrap; }
 }

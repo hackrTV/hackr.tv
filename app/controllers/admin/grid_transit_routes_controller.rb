@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# /root/grid_transit_routes — the local routes ledger and the route record
+# (+ its stops) as console screens (2026-10-31; root_console.css).
+# Slug-keyed; the record screen is the edit screen: show redirects there
+# (the old read-only stops page folded into it), saves stay on it.
 class Admin::GridTransitRoutesController < Admin::ApplicationController
   include Admin::Versionable
 
@@ -13,7 +17,7 @@ class Admin::GridTransitRoutesController < Admin::ApplicationController
   end
 
   def show
-    @stops = @route.grid_transit_stops.includes(:grid_room).order(:position)
+    redirect_to edit_admin_grid_transit_route_path(@route)
   end
 
   def new
@@ -32,7 +36,7 @@ class Admin::GridTransitRoutesController < Admin::ApplicationController
   end
 
   def edit
-    @stops = @route.grid_transit_stops.includes(:grid_room).order(:position)
+    @stops = @route.grid_transit_stops.includes(grid_room: :grid_zone).order(:position)
   end
 
   def update
@@ -41,7 +45,7 @@ class Admin::GridTransitRoutesController < Admin::ApplicationController
       redirect_to edit_admin_grid_transit_route_path(@route)
     else
       flash.now[:error] = @route.errors.full_messages.join(", ")
-      @stops = @route.grid_transit_stops.includes(:grid_room).order(:position)
+      @stops = @route.grid_transit_stops.includes(grid_room: :grid_zone).order(:position)
       render :edit, status: :unprocessable_entity
     end
   end

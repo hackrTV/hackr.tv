@@ -1,64 +1,56 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/transit_types :: TRANSIT TYPES", variant: :admin) do %>
+<%# /root/grid_transit_types — the transit types ledger as a console
+    screen (2026-10-31; root_console.css): bar, ON RECORD row,
+    // TRANSIT TYPES // rows ([NN] · name over slug · CATEGORY · FARE ·
+    CL · ICON · LIVE / DRAFT · [HISTORY]), destinations, the > prompt (NN
+    opens the record screen; deletes live there). Assigns:
+    @transit_types. %>
+<% content_for :title, "/root/grid_transit_types :: TRANSIT TYPES" %>
+<% types = @transit_types.to_a %>
+<% numbers = types.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "TRANSIT TYPES", sub: "ROOT · WORLD · /root/grid_transit_types"} do %>
+    <%= link_to "[+] NEW TYPE", new_admin_grid_transit_type_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "+ New Transit Type", new_admin_grid_transit_type_path, color: :green %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-        <table class="tui-table" style="width: 100%; min-width: 800px;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Slug</th>
-              <th style="text-align: center;">Category</th>
-              <th style="text-align: center;">Fare</th>
-              <th style="text-align: center;">CL</th>
-              <th style="text-align: center;">Icon</th>
-              <th style="text-align: center;">Published</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @transit_types.each do |t| %>
-              <tr>
-                <td><%= t.name %></td>
-                <td style="color: #6b7280;"><%= t.slug %></td>
-                <td style="text-align: center;">
-                  <% color = case t.category; when "public" then "#34d399"; when "private" then "#fbbf24"; else "#a78bfa"; end %>
-                  <span style="color: <%= color %>;"><%= t.category.upcase %></span>
-                </td>
-                <td style="text-align: center;"><%= t.base_fare %></td>
-                <td style="text-align: center;"><%= t.min_clearance %></td>
-                <td style="text-align: center; color: #6b7280;"><%= t.icon_key %></td>
-                <td style="text-align: center;">
-                  <% if t.published? %>
-                    <span class="green-255-text">&#10003;</span>
-                  <% else %>
-                    <span style="color: #6b7280;">&mdash;</span>
-                  <% end %>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Edit", edit_admin_grid_transit_type_path(t), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "History", history_admin_grid_transit_type_path(t), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "Delete", admin_grid_transit_type_path(t), data: { turbo_method: :delete, turbo_confirm: "Delete transit type '#{t.name}'?" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(types.size, "transit type") %> <span class="console-dim">· <%= types.count(&:published?) %> live</span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--transit-types" aria-label="Transit types">
+    <div class="console-rule"><span>// TRANSIT TYPES //</span></div>
+    <% if types.empty? %>
+      <%= render "admin/console/empty", text: "NO TRANSIT TYPES ON RECORD", hint: "[+] NEW TYPE adds a vehicle" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>TYPE</span><span>CATEGORY</span><span class="rc-cell--r">FARE</span><span class="rc-cell--r">CL</span><span>ICON</span><span></span><span></span>
+      </div>
+    <% end %>
+    <% types.each_with_index do |type, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to type.name, edit_admin_grid_transit_type_path(type), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= type.slug %></div>
+        </div>
+        <span class="rc-cell <%= {"public" => "rc-on", "private" => "rc-star"}.fetch(type.category, "rc-hot") %>"><%= type.category.upcase %></span>
+        <span class="rc-cell rc-cell--r"><%= type.base_fare %></span>
+        <span class="rc-cell rc-cell--r"><%= type.min_clearance %></span>
+        <span class="rc-cell"><%= type.icon_key.presence || "—" %></span>
+        <span class="rc-cell <%= type.published? ? "rc-on" : "rc-off" %>"><%= type.published? ? "LIVE" : "DRAFT" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_transit_type_path(type), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world, except: "TRANSIT" %>
+
+  <div class="console-rule"><span>// EVERY TRANSIT TYPE ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "TRANSIT", numbers: numbers, noun: "a type number", extra: ["new"]) %>
+</div>

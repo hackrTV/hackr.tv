@@ -1,7 +1,22 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/exits/new :: NEW EXIT", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @exit], url: admin_grid_exits_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_exits/new — a new exit on the record screen's shell
+    (?from_room_id= prefills the room — the room record's [+] NEW EXIT). %>
+<% content_for :title, "/root/grid_exits/new :: NEW EXIT" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW EXIT", sub: "ROOT · EXIT · /root/grid_exits/new"} do %>
+    <%= link_to "[<] EXITS", admin_grid_exits_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @exit, url: admin_grid_exits_path, local: true do |f| %>
+    <%= render "form", f: f, exit_record: @exit %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE EXIT]</button>
+      <%= link_to "[CANCEL]", admin_grid_exits_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+</div>

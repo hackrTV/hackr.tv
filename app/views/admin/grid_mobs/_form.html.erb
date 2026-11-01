@@ -1,437 +1,95 @@
-<%= render "admin/shared/combobox" %>
-
-<% if @mob.errors.any? %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-    <p class="red-255-text">ERRORS:</p>
-    <ul style="margin: 5px 0 0 20px;">
-      <% @mob.errors.full_messages.each do |msg| %>
-        <li class="white-text"><%= msg %></li>
+<%# The mob record's fields on the console: the avatar column (art +
+    [^] REPLACE / UPLOAD inside this form, [x] REMOVE pointing at the
+    caller's hidden purge form — a button_to can't nest) beside the
+    status rows (ConsoleFormBuilder rc_* rows; ROOM is a typed picker —
+    admin/console/_picker), // DESCRIPTION //, then the two editors the
+    script after the screen drives (_script): // DIALOGUE TREE //
+    (greeting + nested topics, or the raw JSON) and // VENDOR CONFIG //
+    (shop type, restock, rotation, or the raw JSON). Both serialize into
+    the hidden *_json fields on submit; the ids are the script's. The
+    commit row belongs to the caller. Locals: f, mob; @rooms, @factions. %>
+<% avatar = mob.avatar.attached? && mob.avatar.blob.persisted? %>
+<% room = mob.grid_room %>
+<div class="cc-head">
+  <div class="rc-art-stack">
+    <div class="cc-art">
+      <% if avatar %>
+        <%= image_tag mob.avatar_panel, alt: mob.name_in_database.to_s, class: "cc-art-img" %>
+      <% else %>
+        <div class="cc-art-none rc-art-none--text">NO AVATAR</div>
       <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_text_field :name %>
-  </div>
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_select :mob_type,
-          [["Quest Giver", "quest_giver"], ["Vendor", "vendor"], ["Lore", "lore"], ["Special", "special"]],
-          { include_blank: "(none)" },
-          id: "mob-type-select" %>
-  </div>
-</div>
-
-<div style="margin-top: 15px;">
-  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
-</div>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.label :grid_room_id, "ROOM", class: "tui-field-label" %>
-    <input type="hidden" name="grid_mob[grid_room_id]" id="room-cb-hidden" value="<%= @mob.grid_room_id %>">
-    <div class="admin-combobox">
-      <input type="text" id="room-cb-input" class="admin-combobox-input<%= ' selected' if @mob.grid_room_id.present? %>" autocomplete="off"
-        placeholder="Type to search rooms..."
-        value="<%= "#{@mob.grid_room&.grid_zone&.name} / #{@mob.grid_room&.name}" if @mob.grid_room_id.present? %>">
-      <div id="room-cb-dropdown" class="admin-combobox-dropdown"></div>
     </div>
-    <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="room-cb-status">
-      <%= @rooms.size %> rooms
-    </p>
+    <span class="rc-pick" data-controller="file-pick">
+      <%= f.file_field :avatar, accept: "image/jpeg,image/png,image/webp", class: "rc-pick-input",
+        data: {file_pick_target: "input", action: "change->file-pick#changed"} %>
+      <button type="button" class="rc-btn" data-action="file-pick#open">[^] <%= avatar ? "REPLACE" : "UPLOAD" %> AVATAR</button>
+      <span class="rc-hint" data-file-pick-target="name">no file chosen</span>
+    </span>
+    <% if avatar && mob.persisted? %>
+      <span><button type="submit" form="purge-avatar" class="rc-btn rc-btn--danger">[x] REMOVE AVATAR</button></span>
+    <% end %>
+    <span class="rc-hint">square · JPEG · PNG · WEBP</span>
   </div>
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_collection_select :grid_faction_id, @factions, :id, :name, { include_blank: "(none)" }, label: "FACTION" %>
+
+  <div class="console-status">
+    <%= f.rc_text_field :name, required: true, autocomplete: "off" %>
+    <%= f.rc_select :mob_type, [["Quest Giver", "quest_giver"], ["Vendor", "vendor"], ["Lore", "lore"], ["Special", "special"]],
+      {include_blank: "(none)"}, label: "TYPE", hint: "VENDOR opens the shop listings" %>
+    <%= render "admin/console/picker", label: "ROOM", key: "room-cb", name: "grid_mob[grid_room_id]", value: mob.grid_room_id,
+      text: room && "#{room.grid_zone&.name} / #{room.name}", placeholder: "type a room or zone", status: pluralize(@rooms.length, "room"),
+      errors: f.rc_errors(:grid_room_id) %>
+    <%= f.rc_collection_select :grid_faction_id, @factions, :id, :name, {include_blank: "(none)"}, label: "FACTION" %>
   </div>
 </div>
 
-<%# ===================== DIALOGUE TREE ===================== %>
-<h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: DIALOGUE TREE ::]</h3>
+<%= f.rc_text_area :description, rows: 3, spellcheck: true %>
 
-<input type="hidden" name="grid_mob[dialogue_tree_json]" id="dialogue-tree-hidden" value="<%= h((@mob.dialogue_tree || {}).to_json) %>">
-
-<div style="display: flex; gap: 10px; margin-bottom: 15px;">
-  <%= tui_button "Structured", color: :green, type: "button", id: "dialogue-mode-structured", style: "padding: 4px 12px; font-size: 0.85em;" %>
-  <%= tui_button "Raw JSON", type: "button", id: "dialogue-mode-raw", style: "padding: 4px 12px; font-size: 0.85em;" %>
+<div class="console-rule"><span>// DIALOGUE TREE //</span></div>
+<input type="hidden" name="grid_mob[dialogue_tree_json]" id="dialogue-tree-hidden" value="<%= (mob.dialogue_tree || {}).to_json %>">
+<div class="rc-actions">
+  <button type="button" class="rc-btn rc-btn--on" id="dialogue-mode-structured">[STRUCTURED]</button>
+  <button type="button" class="rc-btn" id="dialogue-mode-raw">[RAW JSON]</button>
 </div>
-
-<div id="dialogue-structured" style="background: #0a0a0a; border: 1px solid #333; padding: 15px;">
-  <div style="margin-bottom: 15px;">
-    <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">GREETING</label>
-    <textarea id="dialogue-greeting" class="tui-input" style="width: 100%; padding: 8px; min-height: 60px;"></textarea>
-  </div>
-
-  <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">TOPICS</label>
+<div id="dialogue-structured" class="rc-editor">
+  <label class="rc-editor-key" for="dialogue-greeting">GREETING</label>
+  <textarea id="dialogue-greeting" class="rc-textarea" rows="2"></textarea>
+  <span class="rc-editor-key">TOPICS</span>
   <div id="dialogue-topics-root"></div>
-  <%= tui_button "+ Add Topic", color: :green, type: "button", id: "dialogue-add-root-topic", style: "padding: 4px 12px; font-size: 0.85em; margin-top: 10px;" %>
+  <div class="rc-actions">
+    <button type="button" class="rc-btn" id="dialogue-add-root-topic">[+] ADD TOPIC</button>
+  </div>
+</div>
+<div id="dialogue-raw" class="rc-editor" hidden>
+  <textarea id="dialogue-raw-textarea" class="rc-textarea rc-textarea--code" rows="10" spellcheck="false" aria-label="Dialogue tree JSON"></textarea>
+  <p id="dialogue-raw-error" class="rc-sub rc-bad" hidden></p>
 </div>
 
-<div id="dialogue-raw" style="display: none;">
-  <textarea id="dialogue-raw-textarea" class="tui-input" style="width: 100%; padding: 8px; min-height: 200px; font-family: monospace;"></textarea>
-  <div id="dialogue-raw-error" class="red-255-text" style="margin-top: 5px; display: none;"></div>
+<div class="console-rule"><span>// VENDOR CONFIG //</span></div>
+<input type="hidden" name="grid_mob[vendor_config_json]" id="vendor-config-hidden" value="<%= (mob.vendor_config || {}).to_json %>">
+<div class="rc-actions">
+  <button type="button" class="rc-btn rc-btn--on" id="vendor-mode-structured">[STRUCTURED]</button>
+  <button type="button" class="rc-btn" id="vendor-mode-raw">[RAW JSON]</button>
 </div>
-
-<%# ===================== VENDOR CONFIG ===================== %>
-<h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: VENDOR CONFIG ::]</h3>
-
-<input type="hidden" name="grid_mob[vendor_config_json]" id="vendor-config-hidden" value="<%= h((@mob.vendor_config || {}).to_json) %>">
-
-<div style="display: flex; gap: 10px; margin-bottom: 15px;">
-  <%= tui_button "Structured", color: :green, type: "button", id: "vendor-mode-structured", style: "padding: 4px 12px; font-size: 0.85em;" %>
-  <%= tui_button "Raw JSON", type: "button", id: "vendor-mode-raw", style: "padding: 4px 12px; font-size: 0.85em;" %>
-</div>
-
-<div id="vendor-structured" style="background: #0a0a0a; border: 1px solid #333; padding: 15px;">
-  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 200px;">
-      <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">SHOP TYPE</label>
-      <select id="vendor-shop-type" class="tui-input" style="width: 100%; padding: 8px;">
+<div id="vendor-structured" class="console-status">
+  <div class="console-status-row rc-field">
+    <label class="console-key" for="vendor-shop-type">SHOP TYPE</label>
+    <span class="console-val">
+      <select id="vendor-shop-type" class="rc-select">
         <option value="standard">Standard</option>
         <option value="black_market">Black Market</option>
       </select>
-    </div>
-    <div style="flex: 1; min-width: 200px;">
-      <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">RESTOCK INTERVAL (hours)</label>
-      <input type="number" id="vendor-restock-hours" class="tui-input" style="width: 100%; padding: 8px;" min="1" value="24">
-    </div>
-    <div id="vendor-rotation-wrap" style="flex: 1; min-width: 200px; display: none;">
-      <label class="white-text" style="display: block; margin-bottom: 5px; font-weight: bold;">ROTATION COUNT</label>
-      <input type="number" id="vendor-rotation-count" class="tui-input" style="width: 100%; padding: 8px;" min="1" value="3">
-      <small style="color: #888;">Active items per rotation cycle</small>
-    </div>
+    </span>
+  </div>
+  <div class="console-status-row rc-field">
+    <label class="console-key" for="vendor-restock-hours">RESTOCK</label>
+    <span class="console-val"><input type="number" id="vendor-restock-hours" class="rc-input rc-input--short" min="1" value="24"><span class="rc-hint">hours</span></span>
+  </div>
+  <div class="console-status-row rc-field" id="vendor-rotation-wrap" hidden>
+    <label class="console-key" for="vendor-rotation-count">ROTATION</label>
+    <span class="console-val"><input type="number" id="vendor-rotation-count" class="rc-input rc-input--short" min="1" value="3"><span class="rc-hint">active items per rotation cycle</span></span>
   </div>
 </div>
-
-<div id="vendor-raw" style="display: none;">
-  <textarea id="vendor-raw-textarea" class="tui-input" style="width: 100%; padding: 8px; min-height: 100px; font-family: monospace;"></textarea>
-  <div id="vendor-raw-error" class="red-255-text" style="margin-top: 5px; display: none;"></div>
+<div id="vendor-raw" class="rc-editor" hidden>
+  <textarea id="vendor-raw-textarea" class="rc-textarea rc-textarea--code" rows="6" spellcheck="false" aria-label="Vendor config JSON"></textarea>
+  <p id="vendor-raw-error" class="rc-sub rc-bad" hidden></p>
 </div>
-
-<%# ===================== AVATAR IMAGE ===================== %>
-<h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: AVATAR ::]</h3>
-
-<div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
-  <div>
-    <% if @mob.avatar.attached? %>
-      <%= image_tag @mob.avatar_panel, style: "width: 180px; height: 180px; object-fit: cover; border: 1px solid #333; border-radius: 4px;" %>
-    <% else %>
-      <div style="width: 180px; height: 180px; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.85em;">
-        NO AVATAR
-      </div>
-    <% end %>
-  </div>
-  <div style="flex: 1; min-width: 200px;">
-    <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">
-      <%= @mob.avatar.attached? ? "REPLACE AVATAR" : "UPLOAD AVATAR" %>
-    </label>
-    <%= f.file_field :avatar, accept: "image/jpeg,image/png,image/webp",
-          id: "avatar-image-input", style: "display: none;" %>
-    <label for="avatar-image-input" class="tui-button purple-168"
-           style="padding: 8px 20px; font-size: 0.85em; cursor: pointer; display: inline-block;">
-      CHOOSE FILE
-    </label>
-    <span id="avatar-file-name" style="color: #888; margin-left: 10px; font-size: 0.85em;"></span>
-    <p style="color: #666; margin-top: 8px; font-size: 0.8em;">
-      Recommended: 1:1 aspect ratio (square). JPG, PNG, or WebP.
-    </p>
-    <% if @mob.avatar.attached? %>
-      <%= tui_button_to "Remove Avatar", purge_avatar_admin_grid_mob_path(@mob), method: :delete,
-            color: :red,
-            style: "padding: 6px 16px; font-size: 0.85em; margin-top: 10px;",
-            data: { confirm: "Remove avatar image?" } %>
-    <% end %>
-  </div>
-</div>
-
-<div style="margin-top: 30px; display: flex; gap: 10px;">
-  <%= tui_submit @mob.new_record? ? "Create Mob" : "Update Mob", form: f, color: :green, style: "padding: 10px 20px; font-weight: bold;" %>
-  <%= tui_button "Cancel", admin_grid_mobs_path, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% if @mob.persisted? %>
-    <%= tui_button "History", history_admin_grid_mob_path(@mob), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% end %>
-</div>
-
-<script nonce="<%= content_security_policy_nonce %>">
-(function() {
-  // === Dialogue Tree Editor ===
-  var dialogueData = <%= raw json_escape((@mob.dialogue_tree || {}).to_json) %>;
-  var dialogueHidden = document.getElementById('dialogue-tree-hidden');
-  var topicsRoot = document.getElementById('dialogue-topics-root');
-  var greetingInput = document.getElementById('dialogue-greeting');
-
-  // Initialize greeting
-  greetingInput.value = dialogueData.greeting || '';
-
-  // Build topic rows recursively
-  function buildTopicRow(key, node, container, depth) {
-    var row = document.createElement('div');
-    row.className = 'dialogue-topic-row';
-    row.style.cssText = 'margin-left: ' + (depth * 24) + 'px; border-left: 2px solid #444; padding: 8px 0 8px 12px; margin-bottom: 8px;';
-    row.dataset.depth = depth;
-
-    var headerDiv = document.createElement('div');
-    headerDiv.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 6px;';
-
-    var depthLabel = document.createElement('span');
-    depthLabel.style.cssText = 'color: #666; font-size: 0.8em; min-width: 20px;';
-    depthLabel.textContent = 'L' + depth;
-    headerDiv.appendChild(depthLabel);
-
-    var keyInput = document.createElement('input');
-    keyInput.type = 'text';
-    keyInput.className = 'tui-input dialogue-key';
-    keyInput.style.cssText = 'width: 150px; padding: 4px 8px; font-family: monospace;';
-    keyInput.placeholder = 'keyword';
-    keyInput.value = key || '';
-    headerDiv.appendChild(keyInput);
-
-    var addChildBtn = document.createElement('button');
-    addChildBtn.type = 'button';
-    addChildBtn.className = 'tui-button cyan-168';
-    addChildBtn.style.cssText = 'padding: 2px 8px; font-size: 0.8em;';
-    addChildBtn.textContent = '+ Sub';
-    headerDiv.appendChild(addChildBtn);
-
-    var deleteBtn = document.createElement('button');
-    deleteBtn.type = 'button';
-    deleteBtn.className = 'tui-button red-168';
-    deleteBtn.style.cssText = 'padding: 2px 8px; font-size: 0.8em;';
-    deleteBtn.textContent = '\u00d7';
-    headerDiv.appendChild(deleteBtn);
-
-    row.appendChild(headerDiv);
-
-    var responseArea = document.createElement('textarea');
-    responseArea.className = 'tui-input dialogue-response';
-    responseArea.style.cssText = 'width: 100%; padding: 6px 8px; min-height: 50px; margin-bottom: 4px;';
-    responseArea.placeholder = 'Response text...';
-    responseArea.value = (node && node.response) || '';
-    row.appendChild(responseArea);
-
-    var childContainer = document.createElement('div');
-    childContainer.className = 'dialogue-children';
-    row.appendChild(childContainer);
-
-    // Add existing children
-    if (node && node.topics && typeof node.topics === 'object') {
-      Object.keys(node.topics).forEach(function(childKey) {
-        buildTopicRow(childKey, node.topics[childKey], childContainer, depth + 1);
-      });
-    }
-
-    // Add child button handler
-    addChildBtn.addEventListener('click', function() {
-      if (depth >= 99) { alert('Maximum dialogue depth (100) reached.'); return; }
-      buildTopicRow('', null, childContainer, depth + 1);
-    });
-
-    // Delete button handler
-    deleteBtn.addEventListener('click', function() {
-      row.remove();
-    });
-
-    container.appendChild(row);
-  }
-
-  // Initialize topics
-  if (dialogueData.topics && typeof dialogueData.topics === 'object') {
-    Object.keys(dialogueData.topics).forEach(function(key) {
-      buildTopicRow(key, dialogueData.topics[key], topicsRoot, 0);
-    });
-  }
-
-  // Add root topic
-  document.getElementById('dialogue-add-root-topic').addEventListener('click', function() {
-    buildTopicRow('', null, topicsRoot, 0);
-  });
-
-  // Serialize tree from DOM
-  function serializeTopics(container) {
-    var topics = {};
-    var rows = container.children;
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      if (!row.classList.contains('dialogue-topic-row')) continue;
-      var key = row.querySelector('.dialogue-key').value.trim();
-      if (!key) continue;
-      var response = row.querySelector('.dialogue-response').value;
-      var children = row.querySelector('.dialogue-children');
-      var childTopics = serializeTopics(children);
-      var node = { response: response };
-      if (Object.keys(childTopics).length > 0) {
-        node.topics = childTopics;
-      }
-      topics[key] = node;
-    }
-    return topics;
-  }
-
-  function serializeDialogueTree() {
-    var tree = {};
-    var greeting = greetingInput.value.trim();
-    if (greeting) tree.greeting = greeting;
-    var topics = serializeTopics(topicsRoot);
-    if (Object.keys(topics).length > 0) tree.topics = topics;
-    return tree;
-  }
-
-  // === Mode toggle (Dialogue) ===
-  var dStructured = document.getElementById('dialogue-structured');
-  var dRaw = document.getElementById('dialogue-raw');
-  var dRawTextarea = document.getElementById('dialogue-raw-textarea');
-  var dRawError = document.getElementById('dialogue-raw-error');
-  var dBtnStructured = document.getElementById('dialogue-mode-structured');
-  var dBtnRaw = document.getElementById('dialogue-mode-raw');
-  var dialogueMode = 'structured';
-
-  dBtnRaw.addEventListener('click', function() {
-    var tree = serializeDialogueTree();
-    dRawTextarea.value = JSON.stringify(tree, null, 2);
-    dStructured.style.display = 'none';
-    dRaw.style.display = 'block';
-    dBtnRaw.classList.add('green-168');
-    dBtnStructured.classList.remove('green-168');
-    dialogueMode = 'raw';
-  });
-
-  dBtnStructured.addEventListener('click', function() {
-    if (dialogueMode === 'raw') {
-      try {
-        var parsed = JSON.parse(dRawTextarea.value || '{}');
-        dialogueData = parsed;
-        greetingInput.value = parsed.greeting || '';
-        topicsRoot.innerHTML = '';
-        if (parsed.topics && typeof parsed.topics === 'object') {
-          Object.keys(parsed.topics).forEach(function(key) {
-            buildTopicRow(key, parsed.topics[key], topicsRoot, 0);
-          });
-        }
-        dRawError.style.display = 'none';
-      } catch(e) {
-        dRawError.textContent = 'Invalid JSON: ' + e.message;
-        dRawError.style.display = 'block';
-        return;
-      }
-    }
-    dStructured.style.display = 'block';
-    dRaw.style.display = 'none';
-    dBtnStructured.classList.add('green-168');
-    dBtnRaw.classList.remove('green-168');
-    dialogueMode = 'structured';
-  });
-
-  // === Vendor Config Editor ===
-  var vendorData = <%= raw json_escape((@mob.vendor_config || {}).to_json) %>;
-  var vendorHidden = document.getElementById('vendor-config-hidden');
-  var vendorShopType = document.getElementById('vendor-shop-type');
-  var vendorRestockHours = document.getElementById('vendor-restock-hours');
-  var vendorRotationCount = document.getElementById('vendor-rotation-count');
-  var vendorRotationWrap = document.getElementById('vendor-rotation-wrap');
-
-  // Initialize vendor fields
-  vendorShopType.value = vendorData.shop_type || 'standard';
-  vendorRestockHours.value = vendorData.restock_interval_hours || 24;
-  vendorRotationCount.value = vendorData.rotation_count || 3;
-
-  function updateRotationVisibility() {
-    vendorRotationWrap.style.display = vendorShopType.value === 'black_market' ? 'block' : 'none';
-  }
-  updateRotationVisibility();
-  vendorShopType.addEventListener('change', updateRotationVisibility);
-
-  // === Mode toggle (Vendor) ===
-  var vStructured = document.getElementById('vendor-structured');
-  var vRaw = document.getElementById('vendor-raw');
-  var vRawTextarea = document.getElementById('vendor-raw-textarea');
-  var vRawError = document.getElementById('vendor-raw-error');
-  var vBtnStructured = document.getElementById('vendor-mode-structured');
-  var vBtnRaw = document.getElementById('vendor-mode-raw');
-  var vendorMode = 'structured';
-
-  function serializeVendorConfig() {
-    var config = {};
-    config.shop_type = vendorShopType.value;
-    config.restock_interval_hours = parseInt(vendorRestockHours.value) || 24;
-    if (vendorShopType.value === 'black_market') {
-      config.rotation_count = parseInt(vendorRotationCount.value) || 3;
-    }
-    return config;
-  }
-
-  vBtnRaw.addEventListener('click', function() {
-    var config = serializeVendorConfig();
-    vRawTextarea.value = JSON.stringify(config, null, 2);
-    vStructured.style.display = 'none';
-    vRaw.style.display = 'block';
-    vBtnRaw.classList.add('green-168');
-    vBtnStructured.classList.remove('green-168');
-    vendorMode = 'raw';
-  });
-
-  vBtnStructured.addEventListener('click', function() {
-    if (vendorMode === 'raw') {
-      try {
-        var parsed = JSON.parse(vRawTextarea.value || '{}');
-        vendorShopType.value = parsed.shop_type || 'standard';
-        vendorRestockHours.value = parsed.restock_interval_hours || 24;
-        vendorRotationCount.value = parsed.rotation_count || 3;
-        updateRotationVisibility();
-        vRawError.style.display = 'none';
-      } catch(e) {
-        vRawError.textContent = 'Invalid JSON: ' + e.message;
-        vRawError.style.display = 'block';
-        return;
-      }
-    }
-    vStructured.style.display = 'block';
-    vRaw.style.display = 'none';
-    vBtnStructured.classList.add('green-168');
-    vBtnRaw.classList.remove('green-168');
-    vendorMode = 'structured';
-  });
-
-  // === Avatar File Name Display ===
-  var avatarInput = document.getElementById('avatar-image-input');
-  var avatarFileName = document.getElementById('avatar-file-name');
-  if (avatarInput) {
-    avatarInput.addEventListener('change', function() {
-      avatarFileName.textContent = avatarInput.files.length ? avatarInput.files[0].name : '';
-    });
-  }
-
-  // === Room Combobox ===
-  AdminCombobox.init({
-    inputId: 'room-cb-input',
-    hiddenId: 'room-cb-hidden',
-    dropdownId: 'room-cb-dropdown',
-    statusId: 'room-cb-status',
-    items: <%= raw @rooms.map { |r| { id: r.id, name: r.name, zone: r.grid_zone.name, region: r.grid_zone.grid_region.name } }.to_json %>,
-    getSearchText: function(r) { return (r.name + ' ' + r.zone + ' ' + r.region).toLowerCase(); },
-    getGroupKey: function(r) { return r.region + ' / ' + r.zone; },
-    renderOption: function(r, e) {
-      return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone) + '</span>';
-    },
-    getId: function(r) { return String(r.id); },
-    getLabel: function(r) { return r.zone + ' / ' + r.name; },
-    emptyText: 'No rooms match',
-    selectedText: 'Room selected'
-  });
-
-  // === Serialize on form submit ===
-  var form = document.querySelector('form');
-  form.addEventListener('submit', function() {
-    if (dialogueMode === 'structured') {
-      dialogueHidden.value = JSON.stringify(serializeDialogueTree());
-    } else {
-      dialogueHidden.value = dRawTextarea.value || '{}';
-    }
-
-    if (vendorMode === 'structured') {
-      vendorHidden.value = JSON.stringify(serializeVendorConfig());
-    } else {
-      vendorHidden.value = vRawTextarea.value || '{}';
-    }
-  });
-})();
-</script>

@@ -1,42 +1,16 @@
-<%= form_with model: [:admin, route], local: true do |f| %>
-  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: ROUTE INFO ::]</h3>
+<%# The transit route's fields as console status rows (ConsoleFormBuilder
+    rc_* rows), then // DESCRIPTION //. The commit row belongs to the
+    caller. Locals: f; @transit_types, @regions. %>
+<div class="console-status">
+  <%= f.rc_text_field :name, required: true, autocomplete: "off", width: :wide %>
+  <%= f.rc_text_field :slug, required: true, autocomplete: "off", pattern: "[a-z0-9\\-]+", title: "lowercase letters, digits, hyphens", hint: "unique · lowercase letters, numbers, hyphens" %>
+  <%= f.rc_select :grid_transit_type_id, @transit_types.map { |t| ["#{t.name} (#{t.category})", t.id] }, {include_blank: "-- Select --"}, label: "TYPE" %>
+  <%= f.rc_select :grid_region_id, @regions.map { |r| [r.name, r.id] }, {include_blank: "-- Select --"}, label: "REGION", hint: "stops are the region's transit rooms" %>
+  <%= f.rc_number_field :position, width: :short, min: 0 %>
+  <%= f.rc_flags("FLAGS") do %>
+    <%= f.rc_check_box :loop_route, label: "LOOP" %>
+    <%= f.rc_check_box :active, label: "ACTIVE" %>
+  <% end %>
+</div>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <div>
-      <%= f.tui_text_field :name %>
-    </div>
-    <div>
-      <%= f.tui_text_field :slug, hint: "lowercase letters, numbers, hyphens only" %>
-    </div>
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
-    <div>
-      <%= f.tui_select :grid_transit_type_id, @transit_types.map { |t| ["#{t.name} (#{t.category})", t.id] }, { include_blank: "-- Select --" }, label: "TRANSIT TYPE" %>
-    </div>
-    <div>
-      <%= f.tui_select :grid_region_id, @regions.map { |r| [r.name, r.id] }, { include_blank: "-- Select --" }, label: "REGION" %>
-    </div>
-  </div>
-
-  <div style="margin-top: 15px;">
-    <%= f.tui_text_area :description, style: "height: 80px;" %>
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
-    <div>
-      <%= f.tui_number_field :position, min: 0 %>
-    </div>
-    <div>
-      <%= f.tui_check_box :loop_route %>
-    </div>
-    <div>
-      <%= f.tui_check_box :active %>
-    </div>
-  </div>
-
-  <div style="margin-top: 25px;">
-    <%= tui_submit route.new_record? ? "Create Route" : "Update Route", form: f, color: :green, style: "padding: 8px 20px;" %>
-    <%= tui_button "Cancel", admin_grid_transit_routes_path, style: "padding: 8px 20px; margin-left: 10px;" %>
-  </div>
-<% end %>
+<%= f.rc_text_area :description, rows: 3, spellcheck: true %>

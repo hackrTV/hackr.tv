@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# /root/grid_starting_rooms — the starting rooms ledger and the start
+# record as console screens (2026-10-31; root_console.css). Saves stay
+# on the record (no show route).
 class Admin::GridStartingRoomsController < Admin::ApplicationController
   include Admin::Versionable
 
@@ -20,7 +23,7 @@ class Admin::GridStartingRoomsController < Admin::ApplicationController
     @starting_room = GridStartingRoom.new(starting_room_params)
     if @starting_room.save
       set_flash_success("Starting room '#{@starting_room.name}' created.")
-      redirect_to admin_grid_starting_rooms_path
+      redirect_to edit_admin_grid_starting_room_path(@starting_room)
     else
       flash.now[:error] = @starting_room.errors.full_messages.join(", ")
       render :new, status: :unprocessable_entity
@@ -33,7 +36,7 @@ class Admin::GridStartingRoomsController < Admin::ApplicationController
   def update
     if @starting_room.update(starting_room_params)
       set_flash_success("Starting room '#{@starting_room.name}' updated.")
-      redirect_to admin_grid_starting_rooms_path
+      redirect_to edit_admin_grid_starting_room_path(@starting_room)
     else
       flash.now[:error] = @starting_room.errors.full_messages.join(", ")
       render :edit, status: :unprocessable_entity

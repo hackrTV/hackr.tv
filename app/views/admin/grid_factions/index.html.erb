@@ -1,106 +1,74 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/factions :: FACTION DEFINITIONS", variant: :admin) do %>
+<%# /root/grid_factions — the factions ledger and the rep-link graph as a
+    console screen (2026-10-31; root_console.css): bar ([+] NEW FACTION,
+    [>] REPLOG, [>] REPUTATIONS), ON RECORD row, // FACTIONS // rows
+    ([NN] · name over slug · KIND · PARENT · POS · [HISTORY]),
+    // REP LINKS // (the whole graph as one form: source · target ·
+    weight rows plus three blank ones; a blank or zero row deletes on
+    save), destinations, the > prompt (NN opens the record screen;
+    deletes live there). Assigns: @factions, @rep_links. %>
+<% content_for :title, "/root/grid_factions :: FACTIONS" %>
+<% numbers = @factions.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "FACTIONS", sub: "ROOT · WORLD · /root/grid_factions"} do %>
+    <%= link_to "[+] NEW FACTION", new_admin_grid_faction_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] REPLOG", admin_grid_reputation_events_path, class: "console-bar-link" %>
+    <%= link_to "[>] REPUTATIONS", admin_grid_hackr_reputations_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="margin-bottom: 20px;">
-        <%= tui_button "+ New Faction", new_admin_grid_faction_path, color: :green %>
-        <%= tui_button "Rep Log →", admin_grid_reputation_events_path, style: "margin-left: 8px;" %>
-        <%= tui_button "Hackr Reps →", admin_grid_hackr_reputations_path, style: "margin-left: 8px;" %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-        <table class="tui-table" style="width: 100%;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Slug</th>
-              <th style="text-align: left;">Kind</th>
-              <th style="text-align: left;">Parent</th>
-              <th style="text-align: center;">Position</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @factions.each do |faction| %>
-              <tr>
-                <td>
-                  <span class="cyan-255-text"><%= faction.display_name %></span>
-                </td>
-                <td style="color: #666; font-family: monospace;"><%= faction.slug %></td>
-                <td style="color: #888;"><%= faction.kind %></td>
-                <td style="color: #888;"><%= faction.parent&.display_name || "—" %></td>
-                <td style="text-align: center; color: #888;"><%= faction.position %></td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Edit", edit_admin_grid_faction_path(faction), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "History", history_admin_grid_faction_path(faction), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                  <%= tui_button_to "Delete", admin_grid_faction_path(faction), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete faction '#{faction.name}'?" } %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
-      <!-- Rep Link Graph -->
-      <div style="margin-top: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: REP LINK GRAPH ::]</h3>
-        <p style="color: #888; margin-bottom: 15px;">Directed edges: adjusting <b>source</b> rep shifts computed rep for <b>target</b> by <code>weight × source_value</code>. Leave a row blank to delete it on save.</p>
-
-        <%= form_with url: update_rep_links_admin_grid_factions_path, method: :post, local: true do %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Source</th>
-                  <th style="text-align: left;">Target</th>
-                  <th style="text-align: center;">Weight</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% slots = @rep_links.size + 3 %>
-                <% slots.times do |i| %>
-                  <% link = @rep_links[i] %>
-                  <tr>
-                    <td>
-                      <%= select_tag "rep_links[#{i}][source_slug]",
-                        options_from_collection_for_select(@factions, :slug, :display_name, link&.source_faction&.slug),
-                        include_blank: "(none)",
-                        class: "tui-input", style: "padding: 4px 8px; width: 100%;" %>
-                    </td>
-                    <td>
-                      <%= select_tag "rep_links[#{i}][target_slug]",
-                        options_from_collection_for_select(@factions, :slug, :display_name, link&.target_faction&.slug),
-                        include_blank: "(none)",
-                        class: "tui-input", style: "padding: 4px 8px; width: 100%;" %>
-                    </td>
-                    <td style="text-align: center;">
-                      <%= number_field_tag "rep_links[#{i}][weight]", link&.weight, step: 0.01, class: "tui-input", style: "padding: 4px 8px; width: 100px; text-align: right;" %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-
-            <div style="margin-top: 15px;">
-              <%= tui_submit "Save Rep Links", color: :green, style: "padding: 8px 16px; font-weight: bold;" %>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Grid Admin", admin_grid_path, color: :green %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(@factions.size, "faction") %> <span class="console-dim">· <%= pluralize(@rep_links.size, "rep link") %></span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--factions" aria-label="Factions">
+    <div class="console-rule"><span>// FACTIONS //</span></div>
+    <% if @factions.empty? %>
+      <%= render "admin/console/empty", text: "NO FACTIONS ON RECORD", hint: "[+] NEW FACTION founds one" %>
+    <% end %>
+    <% @factions.each_with_index do |faction, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to faction.display_name, edit_admin_grid_faction_path(faction), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= faction.slug %></div>
+        </div>
+        <span class="rc-cell rc-hot"><%= faction.kind.upcase %></span>
+        <span class="rc-cell"><%= faction.parent&.display_name || "—" %></span>
+        <span class="rc-cell rc-cell--r">POS <%= faction.position %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_faction_path(faction), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--replinks" aria-label="Rep links">
+    <div class="console-rule"><span>// REP LINKS //</span></div>
+    <p class="rc-sub">directed edges: a change to the SOURCE's rep shifts the TARGET's computed rep by weight x source value · clear a row (or weight 0) to delete it on save</p>
+    <%= form_with url: update_rep_links_admin_grid_factions_path, method: :post, local: true do %>
+      <div class="rc-row rc-row--head" aria-hidden="true"><span>SOURCE</span><span>TARGET</span><span class="rc-cell--r">WEIGHT</span></div>
+      <% (@rep_links.size + 3).times do |i| %>
+        <% link = @rep_links[i] %>
+        <div class="rc-row">
+          <%= select_tag "rep_links[#{i}][source_slug]", options_from_collection_for_select(@factions, :slug, :display_name, link&.source_faction&.slug),
+            include_blank: "(none)", class: "rc-select", aria: {label: "Source faction #{i + 1}"} %>
+          <%= select_tag "rep_links[#{i}][target_slug]", options_from_collection_for_select(@factions, :slug, :display_name, link&.target_faction&.slug),
+            include_blank: "(none)", class: "rc-select", aria: {label: "Target faction #{i + 1}"} %>
+          <%= number_field_tag "rep_links[#{i}][weight]", link&.weight, step: 0.01, class: "rc-input rc-input--short rc-input--r", aria: {label: "Weight #{i + 1}"} %>
+        </div>
+      <% end %>
+      <div class="rc-actions">
+        <button type="submit" class="rc-btn rc-btn--hot">[SAVE REP LINKS]</button>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world, except: "FACTIONS" %>
+
+  <div class="console-rule"><span>// EVERY FACTION ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "FACTIONS", numbers: numbers, noun: "a faction number", extra: ["new"]) %>
+</div>

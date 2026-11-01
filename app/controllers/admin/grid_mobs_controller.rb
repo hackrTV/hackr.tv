@@ -1,12 +1,20 @@
+# /root/grid_mobs — the mobs ledger and the mob record (avatar, dialogue
+# tree and vendor config editors, a vendor's shop listings) as console
+# screens (2026-10-31; root_console.css). The record screen is the edit
+# screen: show redirects there, saves stay on it.
 class Admin::GridMobsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridMob
 
-  before_action :set_mob, only: %i[edit update destroy add_listing remove_listing purge_avatar]
+  before_action :set_mob, only: %i[show edit update destroy add_listing remove_listing purge_avatar]
 
   def index
-    @mobs = GridMob.includes(:grid_room, :grid_faction).order(:name)
+    @mobs = GridMob.includes({grid_room: :grid_zone}, :grid_faction).order(:name)
+  end
+
+  def show
+    redirect_to edit_admin_grid_mob_path(@mob)
   end
 
   def new
@@ -16,9 +24,9 @@ class Admin::GridMobsController < Admin::ApplicationController
 
   def create
     @mob = GridMob.new(mob_params)
-    if @mob.save
+    if json_parsed? && @mob.save
       set_flash_success("Mob '#{@mob.name}' created.")
-      redirect_to admin_grid_mobs_path
+      redirect_to edit_admin_grid_mob_path(@mob)
     else
       load_selects
       flash.now[:error] = @mob.errors.full_messages.join(", ")
@@ -32,7 +40,8 @@ class Admin::GridMobsController < Admin::ApplicationController
   end
 
   def update
-    if @mob.update(mob_params)
+    @mob.assign_attributes(mob_params)
+    if json_parsed? && @mob.save
       set_flash_success("Mob '#{@mob.name}' updated.")
       redirect_to edit_admin_grid_mob_path(@mob)
     else
@@ -106,15 +115,22 @@ class Admin::GridMobsController < Admin::ApplicationController
       :name, :description, :mob_type, :grid_room_id, :grid_faction_id,
       :avatar
     )
-    # Parse JSON fields
+    # Parse JSON fields; one that doesn't parse stays as stored and is
+    # reported by json_parsed? (never saved as {} over the real tree)
+    @unparsed_json = []
     %w[dialogue_tree vendor_config].each do |json_field|
       raw = params[:grid_mob][:"#{json_field}_json"]
-      permitted[json_field] = begin
-        raw.blank? ? {} : JSON.parse(raw)
-      rescue JSON::ParserError
-        {}
-      end
+      permitted[json_field] = raw.blank? ? {} : JSON.parse(raw)
+    rescue JSON::ParserError
+      @unparsed_json << json_field
     end
     permitted
+  end
+
+  # False (with an error per field) when mob_params couldn't parse a
+  # *_json field, so the save never runs and the screen re-renders 422.
+  def json_parsed?
+    @unparsed_json.each { |field| @mob.errors.add(field, "is not valid JSON") }
+    @unparsed_json.empty?
   end
 end

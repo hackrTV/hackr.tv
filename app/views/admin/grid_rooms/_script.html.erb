@@ -1,0 +1,44 @@
+<%# The room record's scripts, rendered after the screen: the slug that
+    follows the name until edited by hand, and the ZONE picker
+    (admin/shared/_combobox over every zone). Assigns: @zones. %>
+<%= render "admin/shared/combobox" %>
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    var nameField = document.getElementById('grid_room_name');
+    var slugField = document.getElementById('grid_room_slug');
+    var autoSlug = true;
+
+    function slugify(s) {
+      return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    if (slugField.value && slugField.value !== slugify(nameField.value)) {
+      autoSlug = false;
+    }
+
+    nameField.addEventListener('input', function() {
+      if (autoSlug) slugField.value = slugify(this.value);
+    });
+
+    slugField.addEventListener('input', function() {
+      autoSlug = false;
+    });
+  })();
+
+  AdminCombobox.init({
+    inputId: 'zone-cb-input',
+    hiddenId: 'zone-cb-hidden',
+    dropdownId: 'zone-cb-dropdown',
+    statusId: 'zone-cb-status',
+    items: <%= raw json_escape(@zones.map { |z| {id: z.id, name: z.name, region_name: z.grid_region.name} }.to_json) %>,
+    getSearchText: function(z) { return (z.name + ' ' + z.region_name).toLowerCase(); },
+    getGroupKey: function(z) { return z.region_name; },
+    renderOption: function(z, e) {
+      return '<span class="cb-name">' + e(z.name) + '</span> <span class="cb-meta">' + e(z.region_name) + '</span>';
+    },
+    getId: function(z) { return String(z.id); },
+    getLabel: function(z) { return z.region_name + ' / ' + z.name; },
+    emptyText: 'No zones match',
+    selectedText: 'Zone selected'
+  });
+</script>

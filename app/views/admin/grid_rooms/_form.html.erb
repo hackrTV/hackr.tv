@@ -1,104 +1,21 @@
-<%= render "admin/shared/combobox" %>
-
-<% if @room.errors.any? %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-    <p class="red-255-text">ERRORS:</p>
-    <ul style="margin: 5px 0 0 20px;">
-      <% @room.errors.full_messages.each do |msg| %>
-        <li class="white-text"><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_text_field :name %>
-  </div>
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_text_field :slug %>
-  </div>
+<%# The room's fields as console status rows (ConsoleFormBuilder rc_*
+    rows; ZONE is a typed picker — admin/console/_picker), then
+    // DESCRIPTION //. The slug follows the name until it is edited by
+    hand, and the zone picker's script runs after the screen (_script).
+    The commit row belongs to the caller. Locals: f, room; @zones,
+    @playlists. %>
+<% zone = room.grid_zone %>
+<div class="console-status">
+  <%= f.rc_text_field :name, required: true, autocomplete: "off", width: :wide %>
+  <%= f.rc_text_field :slug, autocomplete: "off", hint: "follows the name until edited" %>
+  <%= render "admin/console/picker", label: "ZONE", key: "zone-cb", name: "grid_room[grid_zone_id]", value: room.grid_zone_id,
+    text: zone && "#{zone.grid_region&.name} / #{zone.name}", placeholder: "type a zone or region", status: pluralize(@zones.length, "zone"),
+    errors: f.rc_errors(:grid_zone_id) %>
+  <%= f.rc_select :room_type,
+    [["Standard", "standard"], ["Hub", "hub"], ["Faction Base", "faction_base"], ["GovCorp", "govcorp"], ["Special", "special"], ["Safe Zone", "safe_zone"], ["Transit", "transit"], ["Shop", "shop"], ["Danger Zone", "danger_zone"], ["Den", "den"], ["Hospital", "hospital"], ["Firmware Vendor", "firmware_vendor"], ["Repair Service", "repair_service"], ["Rest Pod", "rest_pod"], ["Containment", "containment"], ["Impound", "impound"], ["Sally Port Anteroom", "sally_port_anteroom"], ["Sally Port", "sally_port"]],
+    {selected: room.room_type || "standard"}, label: "TYPE" %>
+  <%= f.rc_number_field :min_clearance, label: "CLEARANCE", width: :short, min: 0 %>
+  <%= f.rc_collection_select :ambient_playlist_id, @playlists, :id, :name, {include_blank: "(none)"}, label: "PLAYLIST", hint: "the room's ambient playlist" %>
 </div>
 
-<div style="margin-top: 15px;">
-  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
-</div>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_select :room_type,
-          [["Standard", "standard"], ["Hub", "hub"], ["Faction Base", "faction_base"], ["GovCorp", "govcorp"], ["Special", "special"], ["Safe Zone", "safe_zone"], ["Transit", "transit"], ["Shop", "shop"], ["Danger Zone", "danger_zone"], ["Den", "den"], ["Hospital", "hospital"], ["Firmware Vendor", "firmware_vendor"], ["Repair Service", "repair_service"], ["Rest Pod", "rest_pod"], ["Containment", "containment"], ["Impound", "impound"], ["Sally Port Anteroom", "sally_port_anteroom"], ["Sally Port", "sally_port"]],
-          { selected: @room.room_type || "standard" } %>
-  </div>
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_number_field :min_clearance, min: 0 %>
-  </div>
-</div>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.label :grid_zone_id, "ZONE", class: "tui-field-label" %>
-    <input type="hidden" name="grid_room[grid_zone_id]" id="zone-cb-hidden" value="<%= @room.grid_zone_id %>">
-    <div class="admin-combobox">
-      <input type="text" id="zone-cb-input" class="admin-combobox-input<%= ' selected' if @room.grid_zone_id.present? %>" autocomplete="off"
-        placeholder="Type to search..."
-        value="<%= @room.grid_zone&.grid_region&.name.to_s + ' / ' + @room.grid_zone&.name.to_s if @room.grid_zone_id.present? %>">
-      <div id="zone-cb-dropdown" class="admin-combobox-dropdown"></div>
-    </div>
-    <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="zone-cb-status">
-      <%= @zones.size %> zones
-    </p>
-  </div>
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_collection_select :ambient_playlist_id, @playlists, :id, :name, { include_blank: "(none)" }, label: "AMBIENT PLAYLIST" %>
-  </div>
-</div>
-
-<div style="margin-top: 30px; display: flex; gap: 10px;">
-  <%= tui_submit @room.new_record? ? "Create Room" : "Update Room", form: f, color: :green, style: "padding: 10px 20px; font-weight: bold;" %>
-  <%= tui_button "Cancel", admin_grid_rooms_path, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% if @room.persisted? %>
-    <%= tui_button "History", history_admin_grid_room_path(@room), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% end %>
-</div>
-
-<script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    var nameField = document.getElementById('grid_room_name');
-    var slugField = document.getElementById('grid_room_slug');
-    var autoSlug = true;
-
-    function slugify(s) {
-      return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    }
-
-    if (slugField.value && slugField.value !== slugify(nameField.value)) {
-      autoSlug = false;
-    }
-
-    nameField.addEventListener('input', function() {
-      if (autoSlug) slugField.value = slugify(this.value);
-    });
-
-    slugField.addEventListener('input', function() {
-      autoSlug = false;
-    });
-  })();
-
-  AdminCombobox.init({
-    inputId: 'zone-cb-input',
-    hiddenId: 'zone-cb-hidden',
-    dropdownId: 'zone-cb-dropdown',
-    statusId: 'zone-cb-status',
-    items: <%= raw @zones.map { |z| { id: z.id, name: z.name, region_name: z.grid_region.name } }.to_json %>,
-    getSearchText: function(z) { return (z.name + ' ' + z.region_name).toLowerCase(); },
-    getGroupKey: function(z) { return z.region_name; },
-    renderOption: function(z, e) {
-      return '<span class="cb-name">' + e(z.name) + '</span> <span class="cb-meta">' + e(z.region_name) + '</span>';
-    },
-    getId: function(z) { return String(z.id); },
-    getLabel: function(z) { return z.region_name + ' / ' + z.name; },
-    emptyText: 'No zones match',
-    selectedText: 'Zone selected'
-  });
-</script>
+<%= f.rc_text_area :description, rows: 4, spellcheck: true %>
