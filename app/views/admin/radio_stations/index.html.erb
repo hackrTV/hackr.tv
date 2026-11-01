@@ -1,46 +1,51 @@
-<%= render TuiWindowComponent.new(title: "RADIO STATIONS", variant: :admin) do %>
+<%# /root/radio_stations — the hackr.fm stations as a read-only console
+    ledger (2026-10-31; root_console.css): bar, ON RECORD + SOURCE rows,
+    // STATIONS // rows in dial order ([NN] · name over slug / genre ·
+    HIDDEN · playlists · [OPEN]), destinations, the > prompt (NN opens
+    the station). Stations are seeded from YAML and read-only here.
+    Assigns: @radio_stations. %>
+<% content_for :title, "/root/radio_stations :: RADIO" %>
+<% stations = @radio_stations.to_a %>
+<% numbers = stations.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "RADIO", sub: "ROOT · STREAMS · /root/radio_stations"} do %>
+    <%= link_to "[>] FM RADIO", fm_radio_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <%= tui_button "← Back to Dashboard", admin_root_path, color: :green, style: "padding: 10px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/system/radio_stations.yml</code> → <code style="color: #888;">rails data:radio_stations</code>
-        </span>
-      </div>
-
-      <% if @radio_stations.empty? %>
-        <%= render TuiWindowComponent.new(title: "No Stations", variant: :plain, color: :yellow, legend_class: nil, style: "margin: 20px 0;") do %>
-            <div style="padding: 20px; text-align: center;">
-              No radio stations found. Add them to <code>data/system/radio_stations.yml</code> and run <code>rails data:radio_stations</code>.
-            </div>
-        <% end %>
-      <% else %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr style="border-bottom: 2px solid #00ffff;">
-                <th style="padding: 10px; text-align: left;">Position</th>
-                <th style="padding: 10px; text-align: left;">Name</th>
-                <th style="padding: 10px; text-align: left;">Slug</th>
-                <th style="padding: 10px; text-align: left;">Genre</th>
-                <th style="padding: 10px; text-align: center;">Playlists</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @radio_stations.each do |station| %>
-                <tr class="admin-table-row">
-                  <td style="padding: 10px;"><%= station.position %></td>
-                  <td style="padding: 10px;"><%= station.name %></td>
-                  <td style="padding: 10px;"><code class="cyan-168-text"><%= station.slug %></code></td>
-                  <td style="padding: 10px;"><%= station.genre %></td>
-                  <td style="padding: 10px; text-align: center;">
-                    <%= link_to station.playlists.count, admin_radio_station_path(station), class: "cyan-168-text" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(stations.size, "station") %> <span class="console-dim">· <%= stations.count(&:hidden) %> hidden</span></span>
     </div>
-<% end %>
+    <div class="console-status-row">
+      <span class="console-key">SOURCE</span>
+      <span class="console-val console-dim">seeded from data/system/radio_stations.yml · rails data:radio_stations adds new slugs, never overwrites · read-only here</span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger" aria-label="Stations">
+    <div class="console-rule"><span>// STATIONS //</span></div>
+    <% if stations.empty? %>
+      <%= render "admin/console/empty", text: "NO STATIONS ON RECORD", hint: "seed data/system/radio_stations.yml with rails data:radio_stations" %>
+    <% end %>
+    <% stations.each_with_index do |station, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to station.name, admin_radio_station_path(station), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= station.slug %> · POS <%= station.position %><% if station.genre.present? %> · <%= station.genre %><% end %></div>
+        </div>
+        <span class="rc-cell <%= station.hidden ? "rc-off" : "rc-on" %>"><%= station.hidden ? "HIDDEN" : "ON THE DIAL" %></span>
+        <span class="rc-cell rc-cell--r"><%= pluralize(station.playlists.size, "playlist") %></span>
+        <span class="rc-cell rc-links"><%= link_to "[OPEN]", admin_radio_station_path(station), class: "console-link" %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :streams, except: "RADIO" %>
+
+  <div class="console-rule"><span>// END OF DIAL //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams, except: "RADIO", numbers: numbers, noun: "a station number") %>
+</div>

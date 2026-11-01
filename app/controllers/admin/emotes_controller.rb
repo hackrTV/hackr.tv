@@ -1,15 +1,20 @@
-# /root/emotes — CRUD for chat emotes (rendered in Uplink + WIRE as :slug:).
-# Slug-keyed like releases; purge_image sits outside the main form (nested
-# button_to footgun — see gotchas).
+# /root/emotes — CRUD for chat emotes (rendered in Uplink + WIRE as :slug:),
+# the ledger and the record as console screens (2026-10-31; show
+# redirects to the record). Slug-keyed like releases; purge_image sits
+# outside the main form (nested button_to footgun — see gotchas).
 class Admin::EmotesController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable Emote, find_by: :slug
 
-  before_action :set_emote, only: [:edit, :update, :destroy, :purge_image]
+  before_action :set_emote, only: [:show, :edit, :update, :destroy, :purge_image]
 
   def index
     @emotes = Emote.with_attached_image.order(:slug)
+  end
+
+  def show
+    redirect_to edit_admin_emote_path(@emote)
   end
 
   def new

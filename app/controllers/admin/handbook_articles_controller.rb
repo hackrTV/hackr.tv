@@ -1,14 +1,21 @@
+# /root/handbook_articles — the articles ledger and the article record
+# as console screens (2026-10-31; root_console.css). The record screen
+# is the edit screen: show redirects there.
 class Admin::HandbookArticlesController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable HandbookArticle, find_by: :slug
 
-  before_action :set_article, only: [:edit, :update, :destroy]
+  before_action :set_article, only: [:show, :edit, :update, :destroy]
 
   def index
     @articles = HandbookArticle.includes(:handbook_section).order("handbook_sections.position, handbook_articles.position, handbook_articles.title").references(:handbook_section)
     @articles = @articles.where(handbook_section_id: params[:section_id]) if params[:section_id].present?
     @sections = HandbookSection.ordered
+  end
+
+  def show
+    redirect_to edit_admin_handbook_article_path(@article)
   end
 
   def new
@@ -27,7 +34,7 @@ class Admin::HandbookArticlesController < Admin::ApplicationController
 
     if json_error.nil? && @article.save
       set_flash_success("Article '#{@article.title}' created.")
-      redirect_to admin_handbook_articles_path(section_id: @article.handbook_section_id)
+      redirect_to edit_admin_handbook_article_path(@article)
       return
     end
 
@@ -57,7 +64,7 @@ class Admin::HandbookArticlesController < Admin::ApplicationController
 
     if @article.update(attrs)
       set_flash_success("Article '#{@article.title}' updated.")
-      redirect_to admin_handbook_articles_path(section_id: @article.handbook_section_id)
+      redirect_to edit_admin_handbook_article_path(@article)
     else
       @sections = HandbookSection.ordered
       flash.now[:error] = @article.errors.full_messages.join(", ")

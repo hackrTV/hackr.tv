@@ -1,7 +1,21 @@
-<%= render TuiWindowComponent.new(title: "/root/hackr_logs/new :: NEW HACKR LOG", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @log, url: admin_hackr_logs_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/hackr_logs/new — a new log on the record screen's shell. %>
+<% content_for :title, "/root/hackr_logs/new :: NEW LOG" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW LOG", sub: "ROOT · LOG · /root/hackr_logs/new"} do %>
+    <%= link_to "[<] LOGS", admin_hackr_logs_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @log, url: admin_hackr_logs_path, local: true do |f| %>
+    <%= render "form", f: f, log: @log %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE LOG]</button>
+      <%= link_to "[CANCEL]", admin_hackr_logs_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content) %>
+</div>

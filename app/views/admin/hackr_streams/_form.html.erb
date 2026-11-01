@@ -1,83 +1,33 @@
-<%# Flash Messages %>
-<% if flash[:error] %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-    <p class="red-255-text">⚠ ERROR</p>
-    <p class="white-text"><%= flash[:error] %></p>
-  </div>
-<% end %>
+<%# The stream record's fields as console status rows (ConsoleFormBuilder
+    rc_* rows): the broadcast (artist, title, URLs), the schedule (a
+    cancelled stream says so; a new SCHEDULED FOR clears it on save), the
+    timing and, on a saved stream, its state. The commit row belongs to
+    the caller. Locals: f, hackr_stream; @artists for the select. %>
+<% stream = hackr_stream %>
+<div class="console-status">
+  <%= f.rc_collection_select :artist_id, @artists, :id, :name, label: "ARTIST", include_blank: "— select artist —" %>
+  <%= f.rc_text_field :title, autocomplete: "off", width: :wide, placeholder: "Live Performance - The Fracture Tour", hint: "optional · what is being streamed" %>
+  <%= f.rc_text_field :live_url, label: "LIVE URL", autocomplete: "off", width: :wide, placeholder: "YouTube watch / embed URL, Twitch embed URL",
+    hint: "YouTube URLs become embeds on save · required to go live" %>
+  <%= f.rc_text_field :vod_url, label: "VOD URL", autocomplete: "off", width: :wide, placeholder: "YouTube watch / embed URL of the archive",
+    hint: "optional · the video on demand once the stream ends" %>
+</div>
 
-<%# Stream Form %>
-<%= form_with model: [:admin, hackr_stream], local: true do |f| %>
-  <%# Basic Info Section %>
-  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: STREAM CONFIGURATION ::]</h3>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_select :artist_id,
-        options_for_select(@artists.map { |a| [a.name, a.id] }, hackr_stream.artist_id),
-        { include_blank: "Select artist..." },
-        style: "max-width: 400px;", label: "ARTIST" %>
-  </div>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_text_field :title, placeholder: "e.g., Live Performance - The Fracture Tour", label: "STREAM TITLE", hint: "Optional - describe what's being streamed" %>
-  </div>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_text_field :live_url, placeholder: "YouTube watch or embed URL, Twitch embed URL, etc.", label: "LIVE STREAM URL", hint: "YouTube URLs are automatically converted to embed format - Required when going live" %>
-  </div>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_text_field :vod_url, placeholder: "YouTube watch or embed URL for archived stream", hint: "Optional - URL for the video-on-demand version after stream ends" %>
-  </div>
-
-  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: SCHEDULING ::]</h3>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_datetime_local_field :scheduled_at, style: "max-width: 400px;", label: "SCHEDULED FOR", hint: "When this stream is planned to go live. Leave blank for on-demand streams." %>
-  </div>
-
-  <% if hackr_stream.persisted? && hackr_stream.cancelled_at.present? %>
-    <div style="margin-bottom: 20px; padding: 10px; background: #1a0000; border: 1px solid #ff4444;">
-      <span class="red-255-text" style="font-weight: bold;">CANCELLED</span>
-      <span style="color: #888;"> at <%= hackr_stream.cancelled_at.strftime("%Y-%m-%d %H:%M") %></span>
-      <small style="color: #888; display: block; margin-top: 4px;">To reschedule, set a new scheduled date and save. The cancellation will be cleared automatically.</small>
+<div class="console-rule"><span>// SCHEDULE //</span></div>
+<div class="console-status">
+  <%= f.rc_datetime_local_field :scheduled_at, label: "SCHEDULED", hint: "when it is planned to go live · blank = on demand" %>
+  <% if stream.persisted? && stream.cancelled_at.present? %>
+    <div class="console-status-row">
+      <span class="console-key">CANCELLED</span>
+      <span class="console-val"><span class="rc-bad"><%= stream.cancelled_at.strftime("%Y-%m-%d %H:%M") %></span> <span class="console-dim">· set a new SCHEDULED and save to reschedule — the cancellation clears</span></span>
     </div>
   <% end %>
-
-  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: STREAM TIMING ::]</h3>
-
-  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 200px;">
-      <%= f.tui_datetime_local_field :started_at, hint: "When the stream started (set automatically on Go Live)" %>
-    </div>
-
-    <div style="flex: 1; min-width: 200px;">
-      <%= f.tui_datetime_local_field :ended_at, hint: "When the stream ended" %>
-    </div>
-  </div>
-
-  <%# Live Status (only show for existing records) %>
-  <% if hackr_stream.persisted? %>
-    <div style="margin-top: 20px;">
-      <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">CURRENT STATUS</label>
-      <div style="padding: 15px; background: <%= hackr_stream.is_live ? '#001a00' : '#1a1a1a' %>; border: 2px solid <%= hackr_stream.is_live ? '#00ff00' : '#444' %>;">
-        <% if hackr_stream.is_live %>
-          <p class="green-255-text" style="font-size: 1.2em;">⚡ LIVE</p>
-        <% else %>
-          <p style="color: #888;">⚫ Offline</p>
-        <% end %>
-      </div>
-      <small style="color: #888;">Use "Go Live" / "End Stream" buttons on the streams list to change status</small>
+  <%= f.rc_datetime_local_field :started_at, label: "STARTED", hint: "set on GO LIVE" %>
+  <%= f.rc_datetime_local_field :ended_at, label: "ENDED", hint: "set on END" %>
+  <% if stream.persisted? %>
+    <div class="console-status-row">
+      <span class="console-key">STATE</span>
+      <span class="console-val"><%= render "admin/hackr_streams/state", stream: stream %> <span class="console-dim">· GO LIVE / END / CANCEL from the streams ledger</span></span>
     </div>
   <% end %>
-
-  <%# Actions %>
-  <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= tui_submit hackr_stream.persisted? ? "💾 Update Stream" : "➕ Create Stream", form: f,
-        color: :purple,
-        style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= tui_button "✗ Cancel", admin_hackr_streams_path,
-        color: :grey,
-        style: "padding: 10px 30px; font-size: 1.1em;" %>
-  </div>
-<% end %>
+</div>

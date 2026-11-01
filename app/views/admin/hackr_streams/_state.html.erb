@@ -1,0 +1,9 @@
+<%# A stream's display state as a console word (HackrStream#display_state):
+    LIVE lit, SCHEDULED in the admin's cyan, STARTING SOON amber,
+    CANCELLED red, the rest dim. Locals: stream, cell (render as a ledger
+    .rc-cell). %>
+<% word, tone = {
+  live: %w[LIVE rc-on], upcoming: %w[SCHEDULED rc-hot], starting_soon: ["STARTING SOON", "rc-star"],
+  cancelled: %w[CANCELLED rc-bad], expired: %w[EXPIRED rc-off], ended: %w[ENDED rc-off]
+}.fetch(stream.display_state, %w[UNSCHEDULED rc-off]) %>
+<span class="<%= class_names(tone, "rc-cell": local_assigns[:cell]) %>"><%= word %></span>

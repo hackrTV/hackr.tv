@@ -1,10 +1,33 @@
-<%= render TuiWindowComponent.new(title: "/root/redirects/#{@redirect.id} :: EDIT REDIRECT", variant: :admin, width: 800) do %>
+<%# /root/redirects/:id/edit — the redirect record as a console screen
+    (2026-10-31; show redirects here). Bar (path · ROOT · REDIRECT ·
+    path; [<] REDIRECTS), the fields, // COMMIT // ([SAVE] [CANCEL] ·
+    [DELETE]), destinations, the > prompt. The delete form is hidden at
+    the end. Assigns: @redirect. %>
+<% content_for :title, "/root/redirects/#{@redirect.id} :: REDIRECT" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: @redirect.path_in_database, sub: "ROOT · REDIRECT · /root/redirects/#{@redirect.id}"} do %>
+    <%= link_to "[<] REDIRECTS", admin_redirects_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px;">
-        <%= tui_button "← All Redirects", admin_redirects_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <%= render "form", redirect: @redirect %>
+  <%= form_with model: @redirect, url: admin_redirect_path(@redirect), method: :patch, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE REDIRECT]</button>
+      <%= link_to "[CANCEL]", admin_redirects_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-redirect" class="rc-btn rc-btn--danger">[DELETE REDIRECT]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-redirect", admin_redirect_path(@redirect), confirm: "Delete redirect '#{@redirect.path_in_database}'?") %>
+  </div>
+</div>

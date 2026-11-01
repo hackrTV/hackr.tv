@@ -1,8 +1,21 @@
-<%= render TuiWindowComponent.new(title: "/root/emotes/new :: NEW EMOTE", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <%= tui_button "← All Emotes", admin_emotes_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-      <%= render "form", emote: @emote %>
+<%# /root/emotes/new — a new emote on the record screen's shell. %>
+<% content_for :title, "/root/emotes/new :: NEW EMOTE" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW EMOTE", sub: "ROOT · EMOTE · /root/emotes/new"} do %>
+    <%= link_to "[<] EMOTES", admin_emotes_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @emote, url: admin_emotes_path, local: true do |f| %>
+    <%= render "form", f: f, emote: @emote %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE EMOTE]</button>
+      <%= link_to "[CANCEL]", admin_emotes_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content) %>
+</div>

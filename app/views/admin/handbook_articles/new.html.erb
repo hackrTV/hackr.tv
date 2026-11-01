@@ -1,12 +1,23 @@
-<%= render TuiWindowComponent.new(title: "/root/handbook/articles :: NEW ARTICLE", variant: :admin) do %>
+<%# /root/handbook_articles/new — a new handbook article on the record
+    screen's shell (?section_id= prefills the section). %>
+<% content_for :title, "/root/handbook_articles/new :: NEW ARTICLE" %>
+<% back = admin_handbook_articles_path(section_id: @article.handbook_section_id) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW ARTICLE", sub: "ROOT · ARTICLE · /root/handbook_articles/new"} do %>
+    <%= link_to "[<] ARTICLES", back, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= render "form", article: @article %>
+  <%= form_with model: @article, url: admin_handbook_articles_path, local: true do |f| %>
+    <%= render "form", f: f, article: @article %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE ARTICLE]</button>
+      <%= link_to "[CANCEL]", back, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content) %>
+</div>

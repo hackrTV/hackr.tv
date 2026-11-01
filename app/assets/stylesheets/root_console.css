@@ -46,6 +46,8 @@
 .rc-input:invalid { border-color: var(--err); }
 .rc-textarea { display: block; width: calc(100% - 16px); max-width: 100ch; height: auto; min-height: 96px; margin: 4px 8px 6px; padding: 4px 6px; resize: vertical; overflow: hidden; }
 .rc-textarea--lyrics { min-height: 320px; }
+.rc-textarea--body { min-height: 320px; } /* a log / codex / handbook article body */
+.rc-textarea--code { font-size: 14px; line-height: 18px; } /* JSON metadata / payloads */
 .rc-check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; }
 .rc-check input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent-alt); }
 .rc-hint { color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
@@ -62,6 +64,7 @@
 .rc-btn--danger:hover { border-color: var(--err); color: var(--err); }
 .rc-btn[disabled] { opacity: 0.4; cursor: default; }
 .rc-btn[disabled]:hover { border-color: var(--edge-bright); color: var(--fg-muted); }
+.rc-btn--on { border-color: var(--accent-alt); color: var(--accent-alt); } /* the active choice of a TYPE / SECTION row */
 .rc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 8px; }
 .rc-actions--end { margin-left: auto; }
 .rc-actions form { display: inline; margin: 0; }
@@ -100,8 +103,9 @@
 .rc-row--head > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rc-cell { color: var(--fg-muted); font-size: 12px; line-height: 16px; letter-spacing: 1px; white-space: nowrap; }
 .rc-cell--r { text-align: right; }
-.rc-links { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+.rc-links { display: flex; align-items: center; gap: 6px; justify-content: flex-end; white-space: nowrap; }
 .rc-links .console-link, .rc-links .rc-btn { font-size: 12px; letter-spacing: 1px; }
+.rc-links form { display: inline; margin: 0; } /* a row's button_to ([GO LIVE], [DEL]) */
 .rc-row:not(.rc-row--head):hover, .rc-track:hover { background: var(--bg-1); }
 .rc-on { color: var(--ok); }
 .rc-off { color: var(--fg-faint); }
@@ -110,6 +114,19 @@
 .rc-bad { color: var(--err); }
 .rc-ledger--recent { --rc-cols: 5ch minmax(0, 1fr) 10ch auto; } /* the dashboard's recent tracks / logs / online hackrs */
 .rc-ledger--versions { --rc-cols: 5ch 8ch 18ch 12ch 20ch minmax(0, 2fr); } /* HISTORY: NN · EVENT · SOURCE · BY · WHEN · CHANGES */
+.rc-ledger--emotes { --rc-cols: 5ch 120px minmax(0, 1fr) 10ch 12ch auto; } /* NN · preview · token · ENABLED · updated · links */
+.rc-ledger--redirects { --rc-cols: 5ch minmax(0, 1fr) minmax(0, 1fr) auto; } /* NN · path · destination · links */
+.rc-ledger--streams { --rc-cols: 5ch minmax(0, 1fr) 18ch 14ch auto; } /* NN · artist · scheduled · state · links */
+.rc-ledger--alerts { --rc-cols: 5ch minmax(0, 1fr) 10ch 18ch auto; } /* NN · title · status · created · links */
+.rc-ledger--events { --rc-cols: 9ch 22ch minmax(0, 1fr) 4ch; } /* the world feed: time · type · message · SIM */
+.rc-ledger--playlists { --rc-cols: 5ch minmax(0, 1fr) 10ch 14ch 10ch; } /* NN · name · tracks · crossfade · volume */
+.rc-ledger--surface { --rc-cols: 36ch minmax(0, 1fr); } /* the overlays' HUD data surface: endpoint · what it carries */
+
+/* An emote as chat draws it (28px tall, wide emotes up to 4:1). */
+.rc-emote { display: block; height: 28px; width: auto; max-width: 112px; }
+.rc-emote-none { color: var(--fg-faint); font-size: 12px; letter-spacing: 1px; }
+/* A read-only block of preformatted data (an alert's JSON payload). */
+.rc-pre { margin: 4px 8px 6px; padding: 4px 6px; max-width: 100ch; border: 1px solid var(--edge); background: var(--bg-1); color: var(--fg); font: inherit; font-size: 14px; line-height: 18px; white-space: pre-wrap; overflow-x: auto; }
 
 /* A version's changes (HISTORY): one `key: from > to` line per changed
  * key, the old value struck, the new one lit. */
@@ -169,4 +186,6 @@
   .rc-art-stack { width: 120px; }
   .rc-art-stack .cc-art { width: 120px; height: 120px; }
   .rc-stats { gap: 8px 20px; }
+  .rc-ledger--events .rc-row { grid-template-columns: 9ch minmax(0, 1fr); }
+  .rc-ledger--surface .rc-row { grid-template-columns: minmax(0, 1fr); }
 }

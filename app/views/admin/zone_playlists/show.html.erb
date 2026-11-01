@@ -1,75 +1,44 @@
-<%= render TuiWindowComponent.new(title: "/root/zone_playlists/#{@zone_playlist.slug} :: #{@zone_playlist.name.upcase}", variant: :admin) do %>
+<%# /root/zone_playlists/:id — a grid ambient playlist as a read-only
+    console readout (2026-10-31; root_console.css): bar ([<] PLAYLISTS),
+    the playlist's facts as status rows, // TRACKS // rows in play order
+    ([NN] position · title over artist · release), destinations, the >
+    prompt. Assigns: @zone_playlist, @tracks. %>
+<% playlist = @zone_playlist %>
+<% tracks = @tracks.to_a %>
+<% positions = playlist.zone_playlist_tracks.index_by(&:track_id) %>
+<% content_for :title, "/root/zone_playlists/#{playlist.id} :: #{playlist.name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: playlist.name, sub: "ROOT · ZONE PLAYLIST · /root/zone_playlists/#{playlist.id}"} do %>
+    <%= link_to "[<] PLAYLISTS", admin_zone_playlists_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <%= tui_button "← Back to Playlists", admin_zone_playlists_path, color: :green, style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/system/zone_playlists.yml</code> → <code style="color: #888;">rails data:zone_playlists</code>
-        </span>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">SLUG</span><span class="console-val"><%= playlist.slug %></span></div>
+    <div class="console-status-row"><span class="console-key">DESCRIPTION</span><span class="console-val"><%= playlist.description.presence || "—" %></span></div>
+    <div class="console-status-row"><span class="console-key">CROSSFADE</span><span class="console-val"><%= playlist.crossfade_duration_ms %> ms</span></div>
+    <div class="console-status-row"><span class="console-key">VOLUME</span><span class="console-val"><%= (playlist.default_volume * 100).round %>%</span></div>
+    <div class="console-status-row"><span class="console-key">SOURCE</span><span class="console-val console-dim">data/system/zone_playlists.yml · read-only here</span></div>
+  </div>
 
-      <!-- Playlist Details -->
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-bottom: 20px; padding: 20px;") do %>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-          <div>
-            <p style="color: #888; margin-bottom: 5px;">SLUG</p>
-            <p><code class="cyan-168-text"><%= @zone_playlist.slug %></code></p>
-          </div>
-          <div>
-            <p style="color: #888; margin-bottom: 5px;">DESCRIPTION</p>
-            <p><%= @zone_playlist.description || "—" %></p>
-          </div>
-          <div>
-            <p style="color: #888; margin-bottom: 5px;">CROSSFADE DURATION</p>
-            <p><%= @zone_playlist.crossfade_duration_ms %> ms</p>
-          </div>
-          <div>
-            <p style="color: #888; margin-bottom: 5px;">DEFAULT VOLUME</p>
-            <p><%= (@zone_playlist.default_volume * 100).round %>%</p>
-          </div>
-          <div>
-            <p style="color: #888; margin-bottom: 5px;">TRACK COUNT</p>
-            <p class="cyan-255-text"><%= @tracks.count %> tracks</p>
-          </div>
+  <section class="console-section rc-ledger" aria-label="Tracks">
+    <div class="console-rule"><span>// TRACKS (<%= tracks.size %>) //</span></div>
+    <% if tracks.empty? %>
+      <%= render "admin/console/empty", text: "NO TRACKS IN THIS PLAYLIST" %>
+    <% end %>
+    <% tracks.each do |track| %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= format("%02d", positions[track.id]&.position.to_i) %>]</span>
+        <div class="cc-text">
+          <%= link_to track.title, edit_admin_track_path(track), class: "console-link cc-name" %>
+          <div class="cc-meta"><%= track.artist.name %><% if track.release %> · <%= track.release.name %><% end %></div>
         </div>
-      <% end %>
-
-      <!-- Current Tracks -->
-      <div style="margin-bottom: 30px;">
-        <h3 style="color: #ccc; margin-bottom: 15px;">TRACKS</h3>
-
-        <% if @tracks.any? %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: center; width: 80px;">Position</th>
-                  <th style="text-align: left;">Track</th>
-                  <th style="text-align: left;">Artist</th>
-                  <th style="text-align: left;">Release</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @tracks.each do |track| %>
-                  <% zone_playlist_track = @zone_playlist.zone_playlist_tracks.find_by(track: track) %>
-                  <tr>
-                    <td style="text-align: center;">
-                      <span class="cyan-255-text">#<%= zone_playlist_track.position %></span>
-                    </td>
-                    <td><strong><%= track.title %></strong></td>
-                    <td><%= track.artist.name %></td>
-                    <td><%= track.release&.name || "—" %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        <% else %>
-          <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-            <p style="color: #666; font-size: 1.2em;">No tracks in this playlist.</p>
-          </div>
-        <% end %>
       </div>
-    </div>
-<% end %>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :streams %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams) %>
+</div>

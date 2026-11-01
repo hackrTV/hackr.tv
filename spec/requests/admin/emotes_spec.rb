@@ -36,6 +36,45 @@ RSpec.describe "Admin emotes", type: :request do
     expect(response.body).to include("/rails/active_storage/representations/redirect/")
   end
 
+  it "draws the ledger as a console screen: numbered rows, destinations and the prompt" do
+    create(:emote, slug: "wave")
+    create(:emote, slug: "zap")
+    log_in!(admin)
+
+    get "/root/emotes"
+
+    body = response.body
+    expect(body).to be_console_clean
+    expect(body).to include("2 emotes", "[01]", "[02]", 'data-command="02"', 'class="rc-emote"')
+    expect(body).to include("/root/emotes/zap/edit", "/root/emotes/zap/history")
+    expect(body).not_to include("[EMOTES]")
+    expect(body).to include("[CODEX]", "type an emote number")
+  end
+
+  it "redirects show to the record screen, which holds the image row and the hidden purge / delete forms" do
+    create(:emote, slug: "wave")
+    log_in!(admin)
+
+    get "/root/emotes/wave"
+    expect(response).to redirect_to("/root/emotes/wave/edit")
+
+    get "/root/emotes/wave/edit"
+    body = response.body
+    expect(body).to be_console_clean
+    expect(body).to include("in chat: :wave:", "[^] REPLACE IMAGE", 'name="emote[image]"')
+    expect(body).to include('form="purge-image"', 'id="purge-image"', 'action="/root/emotes/wave/purge_image"')
+    expect(body).to include('form="delete-emote"', 'id="delete-emote"')
+  end
+
+  it "renders the new screen on the console" do
+    log_in!(admin)
+
+    get "/root/emotes/new"
+
+    expect(response.body).to be_console_clean
+    expect(response.body).to include("[CREATE EMOTE]", "[^] UPLOAD IMAGE")
+  end
+
   it "creates an emote from an upload, normalizes the slug, and redirects to edit" do
     log_in!(admin)
 
@@ -58,6 +97,8 @@ RSpec.describe "Admin emotes", type: :request do
 
     expect(response).to have_http_status(:unprocessable_entity)
     expect(response.body).to include("must be a PNG, GIF, or WebP image")
+    expect(response.body).to include("Upload rejected — pick another file.")
+    expect(response.body).not_to include("previous image")
     expect(Emote.count).to eq(0)
   end
 

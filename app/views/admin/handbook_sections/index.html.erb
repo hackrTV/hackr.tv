@@ -1,71 +1,52 @@
-<%= render TuiWindowComponent.new(title: "/root/handbook/sections :: SECTIONS", variant: :admin) do %>
+<%# /root/handbook_sections — the Hackr Handbook's sections ledger as a
+    console screen (2026-10-31; root_console.css): bar, ON RECORD row,
+    // SECTIONS // rows in handbook order ([NN] · name over slug · icon ·
+    position · summary · articles · LIVE / DRAFT · [ARTICLES] [EDIT]
+    [HISTORY]), destinations, the > prompt (NN opens the record screen;
+    deletes live there). Assigns: @sections. %>
+<% content_for :title, "/root/handbook_sections :: SECTIONS" %>
+<% sections = @sections.to_a %>
+<% numbers = sections.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "SECTIONS", sub: "ROOT · HANDBOOK · /root/handbook_sections"} do %>
+    <%= link_to "[+] NEW SECTION", new_admin_handbook_section_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] PUBLIC", handbook_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <%= tui_button "+ New Section", new_admin_handbook_section_path, color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "Articles →", admin_handbook_articles_path, color: :cyan, style: "padding: 8px 20px;" %>
-      </div>
-
-      <% if @sections.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center;">Pos</th>
-                <th style="text-align: left;">Icon</th>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: left;">Slug</th>
-                <th style="text-align: center;">Articles</th>
-                <th style="text-align: center;">Published</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @sections.each do |section| %>
-                <tr>
-                  <td style="text-align: center; color: #888;"><%= section.position %></td>
-                  <td style="color: #fbbf24; font-family: monospace;"><%= section.icon %></td>
-                  <td class="cyan-255-text"><%= section.name %></td>
-                  <td style="color: #666; font-family: monospace;"><%= section.slug %></td>
-                  <td style="text-align: center; color: #888;"><%= section.articles.size %></td>
-                  <td style="text-align: center;">
-                    <% if section.published? %>
-                      <span class="green-255-text">YES</span>
-                    <% else %>
-                      <span style="color: #444;">-</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <%= tui_button "Articles", admin_handbook_articles_path(section_id: section.id), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "Edit", edit_admin_handbook_section_path(section), style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button "History", history_admin_handbook_section_path(section), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_handbook_section_path(section), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete section '#{section.name}' and all #{section.articles.size} articles?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No handbook sections yet.</p>
-        </div>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Admin Dashboard", admin_root_path, color: :cyan %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(sections.size, "section") %> <span class="console-dim">· <%= pluralize(sections.sum { |s| s.articles.size }, "article") %> · <%= sections.count(&:published?) %> live</span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger" aria-label="Sections">
+    <div class="console-rule"><span>// SECTIONS //</span></div>
+    <% if sections.empty? %>
+      <%= render "admin/console/empty", text: "NO SECTIONS ON RECORD", hint: "[+] NEW SECTION opens the handbook" %>
+    <% end %>
+    <% sections.each_with_index do |section, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to section.name, edit_admin_handbook_section_path(section), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= section.slug %><% if section.icon.present? %> · <%= section.icon %><% end %> · POS <%= section.position %><% if section.summary.present? %> · <%= truncate(section.summary, length: 80) %><% end %></div>
+        </div>
+        <span class="rc-cell rc-cell--r"><%= pluralize(section.articles.size, "article") %></span>
+        <span class="rc-cell <%= section.published? ? "rc-on" : "rc-off" %>"><%= section.published? ? "LIVE" : "DRAFT" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[ARTICLES]", admin_handbook_articles_path(section_id: section.id), class: "console-link" %>
+          <%= link_to "[EDIT]", edit_admin_handbook_section_path(section), class: "console-link" %>
+          <%= link_to "[HISTORY]", history_admin_handbook_section_path(section), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :content, except: "SECTIONS" %>
+
+  <div class="console-rule"><span>// THE HACKR HANDBOOK //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content, except: "SECTIONS", numbers: numbers, noun: "a section number", extra: ["new"]) %>
+</div>

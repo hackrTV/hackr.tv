@@ -1,87 +1,79 @@
-<%= render TuiWindowComponent.new(title: "/root/handbook/articles :: ARTICLES", variant: :admin) do %>
+<%# /root/handbook_articles — the Hackr Handbook's articles ledger as a
+    console screen (2026-10-31; root_console.css): bar, ON RECORD row, the
+    SECTION row (server-side ?section_id=), the FILTER row (ledger-filter:
+    title / slug / section / kind; a section group hides when none of its
+    rows match), one // <SECTION> // rule per section with its articles
+    numbered through ([NN] · title over slug · KIND · LIVE / DRAFT ·
+    [EDIT] [HISTORY]), destinations, the > prompt (NN opens the record
+    screen; deletes live there). Assigns: @articles, @sections. %>
+<% content_for :title, "/root/handbook_articles :: ARTICLES" %>
+<% articles = @articles.to_a %>
+<% groups = articles.group_by(&:handbook_section) %>
+<% numbers = articles.each_index.map { |i| root_num(i, total: articles.size) } %>
+<% counter = 0 %>
+<% current = params[:section_id].to_s %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ARTICLES", sub: "ROOT · HANDBOOK · /root/handbook_articles"} do %>
+    <%= link_to "[+] NEW ARTICLE", new_admin_handbook_article_path(section_id: params[:section_id]), class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] PUBLIC", handbook_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "+ New Article", new_admin_handbook_article_path(section_id: params[:section_id]), color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "← Sections", admin_handbook_sections_path, color: :cyan, style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin: 0 5px;">|</span>
-        <%= tui_button "All Sections", admin_handbook_articles_path, style: "padding: 6px 14px; font-size: 0.85em;" %>
-        <% @sections.each do |section| %>
-          <% active = params[:section_id].to_s == section.id.to_s %>
-          <%= tui_button section.name,
-              admin_handbook_articles_path(section_id: section.id),
-              color: (active ? :cyan : nil),
-              style: "padding: 6px 14px; font-size: 0.85em;" %>
-        <% end %>
-      </div>
-
-      <% if @articles.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Section</th>
-                <th style="text-align: center;">Pos</th>
-                <th style="text-align: left;">Title</th>
-                <th style="text-align: left;">Slug</th>
-                <th style="text-align: center;">Kind</th>
-                <th style="text-align: center;">Difficulty</th>
-                <th style="text-align: center;">Published</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @articles.each do |article| %>
-                <tr>
-                  <td style="color: #c084fc;"><%= article.handbook_section.name %></td>
-                  <td style="text-align: center; color: #888;"><%= article.position %></td>
-                  <td class="cyan-255-text"><%= article.title %></td>
-                  <td style="color: #666; font-family: monospace;"><%= article.slug %></td>
-                  <td style="text-align: center;">
-                    <% if article.kind == "tutorial" %>
-                      <span class="yellow-168-text">TUTORIAL</span>
-                    <% else %>
-                      <span style="color: #888;">REFERENCE</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; color: #888;"><%= article.difficulty.presence || "-" %></td>
-                  <td style="text-align: center;">
-                    <% if article.published? %>
-                      <span class="green-255-text">YES</span>
-                    <% else %>
-                      <span style="color: #444;">-</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_handbook_article_path(article), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "History", history_admin_handbook_article_path(article), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_handbook_article_path(article), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete article '#{article.title}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No handbook articles yet.</p>
-        </div>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Admin Dashboard", admin_root_path, color: :cyan %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(articles.size, "article") %> <span class="console-dim">· <%= articles.count { |a| a.kind == "tutorial" } %> tutorial · <%= articles.count(&:published?) %> live · <%= pluralize(groups.size, "section") %></span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field">
+      <span class="console-key">SECTION</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_handbook_articles_path, class: class_names("rc-btn", "rc-btn--on": current.blank?), aria: {current: current.blank? && "page"} %>
+        <% @sections.each do |section| %>
+          <% on = current == section.id.to_s %>
+          <%= link_to section.name.upcase, admin_handbook_articles_path(section_id: section.id), class: class_names("rc-btn", "rc-btn--on": on), aria: {current: on && "page"} %>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="title · slug · section · kind" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= articles.size %> / <%= articles.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
+
+  <% if articles.empty? %>
+    <div class="console-rule"><span>// ARTICLES //</span></div>
+    <%= render "admin/console/empty", text: "NO ARTICLES ON RECORD", hint: "[+] NEW ARTICLE writes the first one" %>
+  <% end %>
+  <% groups.each do |section, rows| %>
+    <section class="console-section rc-ledger" aria-label="<%= section.name %>" data-ledger-filter-target="group">
+      <div class="console-rule"><span>// <%= section.name.upcase %><% unless section.published? %> · DRAFT<% end %> //</span></div>
+      <% rows.each do |article| %>
+        <% num = numbers[counter] %>
+        <% counter += 1 %>
+        <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [article.title, article.slug, section.name, article.kind].join(" ").downcase %>">
+          <span class="console-tag">[<%= num %>]</span>
+          <div class="cc-text">
+            <%= link_to article.title, edit_admin_handbook_article_path(article), class: "console-link cc-name", data: {command: num} %>
+            <div class="cc-meta"><%= article.slug %> · POS <%= article.position %><% if article.difficulty.present? %> · <%= article.difficulty.upcase %><% end %></div>
+          </div>
+          <span class="rc-cell <%= (article.kind == "tutorial") ? "rc-star" : "rc-off" %>"><%= article.kind.upcase %></span>
+          <span class="rc-cell <%= article.published? ? "rc-on" : "rc-off" %>"><%= article.published? ? "LIVE" : "DRAFT" %></span>
+          <span class="rc-cell rc-links">
+            <%= link_to "[EDIT]", edit_admin_handbook_article_path(article), class: "console-link" %>
+            <%= link_to "[HISTORY]", history_admin_handbook_article_path(article), class: "console-link" %>
+          </span>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content, except: "ARTICLES" %>
+
+  <div class="console-rule"><span>// THE HACKR HANDBOOK //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content, except: "ARTICLES", numbers: numbers, noun: "an article number", extra: ["new"]) %>
+</div>

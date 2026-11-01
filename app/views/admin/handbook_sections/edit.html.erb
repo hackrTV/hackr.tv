@@ -1,12 +1,64 @@
-<%= render TuiWindowComponent.new(title: %(/root/handbook/sections :: EDIT "#{@section.name}"), variant: :admin, width: 1000) do %>
+<%# /root/handbook_sections/:slug/edit — the handbook section as a
+    console screen (2026-10-31; show redirects here). Bar (name · ROOT ·
+    SECTION · path; [<] SECTIONS, [HISTORY]), the fields, // COMMIT //
+    ([SAVE] [CANCEL] · [DELETE] — the articles go with it), // ARTICLES //
+    rows opening the article screens + [+] NEW ARTICLE prefilled,
+    destinations, the > prompt (NN opens an article). URLs use
+    slug_in_database. Assigns: @section. %>
+<% slug = @section.slug_in_database %>
+<% articles = @section.articles.to_a %>
+<% numbers = articles.each_index.map { |i| root_num(i) } %>
+<% content_for :title, "/root/handbook_sections/#{slug} :: #{@section.name_in_database}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: @section.name_in_database, sub: "ROOT · SECTION · /root/handbook_sections/#{slug}"} do %>
+    <%= link_to "[<] SECTIONS", admin_handbook_sections_path, class: "console-bar-link" %>
+    <%= link_to "[HISTORY]", history_admin_handbook_section_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= render "form", section: @section %>
+  <%= form_with model: @section, url: admin_handbook_section_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, section: @section %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE SECTION]</button>
+      <%= link_to "[CANCEL]", admin_handbook_sections_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-section" class="rc-btn rc-btn--danger">[DELETE SECTION]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section rc-ledger" aria-label="Articles">
+    <div class="console-rule"><span>// ARTICLES //</span></div>
+    <% if articles.empty? %>
+      <%= render "admin/console/empty", text: "NO ARTICLES IN THIS SECTION" %>
+    <% end %>
+    <% articles.each_with_index do |article, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to article.title, edit_admin_handbook_article_path(article), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= article.slug %> · POS <%= article.position %><% if article.difficulty.present? %> · <%= article.difficulty.upcase %><% end %></div>
+        </div>
+        <span class="rc-cell <%= (article.kind == "tutorial") ? "rc-star" : "rc-off" %>"><%= article.kind.upcase %></span>
+        <span class="rc-cell <%= article.published? ? "rc-on" : "rc-off" %>"><%= article.published? ? "LIVE" : "DRAFT" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_handbook_article_path(article), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[+] NEW ARTICLE", new_admin_handbook_article_path(section_id: @section.id), class: "rc-btn", data: {command: "new"} %>
+    </div>
+  </section>
+
+  <%= render "admin/console/destinations", section: :content %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content, numbers: numbers, noun: "an article number", extra: ["new"]) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-section", admin_handbook_section_path(slug), confirm: "Delete section '#{@section.name_in_database}' and its #{pluralize(articles.size, "article")}?") %>
+  </div>
+</div>

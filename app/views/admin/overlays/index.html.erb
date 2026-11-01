@@ -1,82 +1,55 @@
-<% content_for(:title) { "/root/overlays :: OBS Overlays" } %>
+<%# /root/overlays — the HUD's data surface as a console screen
+    (2026-10-31; root_console.css). OBS overlays are drawn by the external
+    HUD app; this screen shows what hackr.tv feeds it: // NOW PLAYING //
+    (title / artist / state, [>] NOW PLAYING edits it), // ALERTS //
+    (pending count, [ALERTS] manages the queue), // HUD DATA SURFACE //
+    (the endpoints and cable channels the HUD reads), destinations, the >
+    prompt. Assigns: @now_playing, @pending_alerts. %>
+<% content_for :title, "/root/overlays :: OVERLAYS" %>
+<% np = @now_playing %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "OVERLAYS", sub: "ROOT · STREAMS · /root/overlays"} do %>
+    <%= link_to "[>] NOW PLAYING", admin_edit_overlay_now_playing_path, class: "console-bar-link", data: {command: "playing"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/overlays :: OBS OVERLAY DATA", variant: :admin) do %>
+  <div class="console-rule"><span>// NOW PLAYING //</span></div>
+  <div class="console-status">
+    <% if np.playing? %>
+      <div class="console-status-row"><span class="console-key">TITLE</span><span class="console-val"><%= np.display_title %></span></div>
+      <div class="console-status-row"><span class="console-key">ARTIST</span><span class="console-val"><%= np.display_artist %></span></div>
+      <div class="console-status-row"><span class="console-key">STATE</span><span class="console-val"><span class="<%= np.paused ? "rc-star" : "rc-on" %>"><%= np.paused ? "PAUSED" : "PLAYING" %></span></span></div>
+    <% else %>
+      <div class="console-status-row"><span class="console-key">STATE</span><span class="console-val rc-off">NOTHING PLAYING</span></div>
+    <% end %>
+  </div>
 
-    <% if flash[:success] %>
-      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
-        <p class="green-255-text" style="margin: 0;">&#10003; SUCCESS</p>
-        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
+  <div class="console-rule"><span>// ALERTS //</span></div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">PENDING</span>
+      <span class="console-val"><span class="<%= (@pending_alerts > 0) ? "rc-star" : "rc-off" %>"><%= pluralize(@pending_alerts, "alert") %></span> <span class="console-dim">· waiting for the HUD</span></span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--surface" aria-label="HUD data surface">
+    <div class="console-rule"><span>// HUD DATA SURFACE //</span></div>
+    <% [
+      ["GET /api/overlay/now-playing", "the current track (player and admin writes)"],
+      ["GET /api/overlay/alerts/pending", "the undisplayed alert queue"],
+      ["GET /api/world_events", "the world event feed backlog"],
+      ["OverlayChannel", "live pushes: now_playing_changed, new_alert"],
+      ["WorldEventFeedChannel", "live world events"]
+    ].each do |surface, carries| %>
+      <div class="rc-row">
+        <span class="rc-hot"><%= surface %></span>
+        <span class="console-desc"><%= carries %></span>
       </div>
     <% end %>
+  </section>
 
-    <% if flash[:error] %>
-      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
-        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
-      </div>
-    <% end %>
+  <%= render "admin/console/destinations", section: :streams, except: "OVERLAYS" %>
 
-    <!-- Navigation -->
-    <div style="margin-bottom: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
-      <%= tui_button "← Dashboard", admin_root_path, color: :green %>
-      <%= tui_button "Now Playing", admin_edit_overlay_now_playing_path, color: :cyan %>
-      <%= tui_button "Alerts", admin_overlay_alerts_path, color: :cyan %>
-    </div>
-
-    <!-- Quick Status Summary -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-      <!-- Now Playing Status -->
-      <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
-        <h4 class="purple-168-text" style="margin: 0 0 10px;">NOW PLAYING</h4>
-        <% if @now_playing.playing? %>
-          <p style="margin: 0; font-size: 1.1rem;"><strong><%= @now_playing.display_title %></strong></p>
-          <p style="margin: 5px 0 0; color: #60a5fa;"><%= @now_playing.display_artist %></p>
-        <% else %>
-          <p style="margin: 0; color: #666;">Nothing playing.</p>
-        <% end %>
-        <p style="margin: 10px 0 0;"><%= link_to "Edit →", admin_edit_overlay_now_playing_path, class: "cyan-168-text" %></p>
-      </div>
-
-      <!-- Alert Status -->
-      <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
-        <h4 class="purple-168-text" style="margin: 0 0 10px;">ALERTS</h4>
-        <% if @pending_alerts > 0 %>
-          <p style="margin: 0; color: #fbbf24;"><%= @pending_alerts %> pending</p>
-        <% else %>
-          <p style="margin: 0; color: #666;">No pending alerts.</p>
-        <% end %>
-        <p style="margin: 10px 0 0;"><%= link_to "Manage →", admin_overlay_alerts_path, class: "cyan-168-text" %></p>
-      </div>
-    </div>
-
-    <!-- HUD Data Surface -->
-    <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: HUD DATA SURFACE ::]</h3>
-    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px; margin-bottom: 30px;">
-      <p style="color: #888; margin: 0 0 15px;">OBS overlays are rendered by the HUD app. hackr.tv supplies the data it reads:</p>
-      <table class="tui-table" style="width: 100%;">
-        <tbody>
-          <tr class="admin-table-row">
-            <td style="width: 320px;"><code class="cyan-168-text">GET /api/overlay/now-playing</code></td>
-            <td>Current track (player + admin writes)</td>
-          </tr>
-          <tr class="admin-table-row">
-            <td><code class="cyan-168-text">GET /api/overlay/alerts/pending</code></td>
-            <td>Undisplayed alert queue</td>
-          </tr>
-          <tr class="admin-table-row">
-            <td><code class="cyan-168-text">GET /api/world_events</code></td>
-            <td>World Event Feed backlog</td>
-          </tr>
-          <tr class="admin-table-row">
-            <td><code class="cyan-168-text">OverlayChannel</code></td>
-            <td>Live pushes: <code>now_playing_changed</code>, <code>new_alert</code></td>
-          </tr>
-          <tr class="admin-table-row">
-            <td><code class="cyan-168-text">WorldEventFeedChannel</code></td>
-            <td>Live world events</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-<% end %>
+  <div class="console-rule"><span>// END OF SURFACE //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams, except: "OVERLAYS", extra: ["playing"]) %>
+</div>

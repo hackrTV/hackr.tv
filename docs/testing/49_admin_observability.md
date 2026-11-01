@@ -34,9 +34,12 @@ minutes: 15
 
 ## Steps — world feed admin + settings
 
-6. `/root` → World Feed. → Event admin: simulator population state,
-   visibility setting (the flag article 21 toggled), manual event
-   creation (already exercised); event list renders.
+6. `/root` → World Feed. → A console screen: SIMULATOR ON / OFF (and
+   HIDDEN while invisible) badges in the bar, `// STATUS //` tiles
+   (organic rate, target, totals, simulants), `// SETTINGS //` (the
+   visibility flag article 21 toggled), `// MANUAL PUBLISH //` (already
+   exercised) and `// RECENT EVENTS //` (time · type · message over the
+   alias · SIM / ORG) all render.
 
 ## Steps — email tracking
 

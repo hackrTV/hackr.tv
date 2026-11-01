@@ -1,62 +1,47 @@
-<%= render TuiWindowComponent.new(title: "#{@radio_station.name}", variant: :admin) do %>
+<%# /root/radio_stations/:id — a hackr.fm station as a read-only console
+    readout (2026-10-31; root_console.css): bar ([<] RADIO), the
+    station's facts as status rows, // PLAYLISTS // rows in rotation order
+    ([NN] · name · tracks), destinations, the > prompt. Assigns:
+    @radio_station. %>
+<% station = @radio_station %>
+<% rotation = station.radio_station_playlists.includes(:playlist).to_a %>
+<% content_for :title, "/root/radio_stations/#{station.id} :: #{station.name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: station.name, sub: "ROOT · RADIO · /root/radio_stations/#{station.id}"} do %>
+    <% if station.hidden %><%= root_badge("HIDDEN", :warn) %><% end %>
+    <%= link_to "[<] RADIO", admin_radio_stations_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <%= tui_button "← Back to Stations", admin_radio_stations_path, color: :green, style: "padding: 10px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/system/radio_stations.yml</code> → <code style="color: #888;">rails data:radio_stations</code>
-        </span>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">SLUG</span><span class="console-val"><%= station.slug %></span></div>
+    <div class="console-status-row"><span class="console-key">GENRE</span><span class="console-val"><%= station.genre.presence || "—" %></span></div>
+    <div class="console-status-row"><span class="console-key">POSITION</span><span class="console-val"><%= station.position %></span></div>
+    <div class="console-status-row"><span class="console-key">COLOR</span><span class="console-val"><%= station.color.presence || "—" %></span></div>
+    <div class="console-status-row"><span class="console-key">STREAM URL</span><span class="console-val"><%= station.stream_url.presence || "none · plays its playlists" %></span></div>
+    <div class="console-status-row"><span class="console-key">SOURCE</span><span class="console-val console-dim">data/system/radio_stations.yml · playlists from data/playlists/key_playlists.yml · read-only here</span></div>
+  </div>
+  <% if station.description.present? %>
+    <div class="console-rule"><span>// DESCRIPTION //</span></div>
+    <p class="console-reply"><%= station.description %></p>
+  <% end %>
+
+  <section class="console-section rc-ledger" aria-label="Playlists">
+    <div class="console-rule"><span>// PLAYLISTS //</span></div>
+    <% if rotation.empty? %>
+      <%= render "admin/console/empty", text: "NO PLAYLISTS ON THIS STATION" %>
+    <% end %>
+    <% rotation.each_with_index do |rsp, i| %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= root_num(i) %>]</span>
+        <div class="cc-text"><span class="cc-name"><%= rsp.playlist.name %></span></div>
+        <span class="rc-cell rc-cell--r"><%= pluralize(rsp.playlist.track_count, "track") %></span>
       </div>
+    <% end %>
+  </section>
 
-      <%= render TuiWindowComponent.new(title: "STATION DETAILS", variant: :plain, color: :purple, legend_class: nil, style: "margin-bottom: 30px;") do %>
-          <div style="padding: 20px;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr style="border-bottom: 1px solid #444;">
-                <td style="padding: 10px; font-weight: bold; width: 200px;">Slug</td>
-                <td style="padding: 10px;"><code class="cyan-168-text"><%= @radio_station.slug %></code></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #444;">
-                <td style="padding: 10px; font-weight: bold;">Description</td>
-                <td style="padding: 10px;"><%= @radio_station.description %></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #444;">
-                <td style="padding: 10px; font-weight: bold;">Genre</td>
-                <td style="padding: 10px;"><%= @radio_station.genre %></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #444;">
-                <td style="padding: 10px; font-weight: bold;">Color</td>
-                <td style="padding: 10px;"><%= @radio_station.color %></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #444;">
-                <td style="padding: 10px; font-weight: bold;">Stream URL</td>
-                <td style="padding: 10px;"><%= @radio_station.stream_url.presence || "(none)" %></td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; font-weight: bold;">Position</td>
-                <td style="padding: 10px;"><%= @radio_station.position %></td>
-              </tr>
-            </table>
-          </div>
-      <% end %>
+  <%= render "admin/console/destinations", section: :streams %>
 
-      <%= render TuiWindowComponent.new(title: "PLAYLISTS (#{@radio_station.playlists.count})", variant: :plain, color: :green, legend_class: "cyan-255-text") do %>
-          <div style="padding: 20px; background: #0a0a0a;">
-            <% if @radio_station.playlists.any? %>
-              <% @radio_station.radio_station_playlists.includes(:playlist).order(position: :asc).each do |rsp| %>
-                <div style="background: #1a1a1a; border: 2px solid #00ff00; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <strong style="color: #00d9ff; font-size: 1.1em;"><%= rsp.playlist.name %></strong>
-                    <small style="color: #888; margin-left: 10px;">(<%= rsp.playlist.track_count %> tracks)</small>
-                  </div>
-                </div>
-              <% end %>
-            <% else %>
-              <p style="color: #888;">No playlists assigned to this station.</p>
-            <% end %>
-            <p style="color: #666; font-size: 0.9em; margin-top: 15px;">
-              Manage playlists via: <code style="color: #888;">data/playlists/key_playlists.yml</code>
-            </p>
-          </div>
-      <% end %>
-    </div>
-<% end %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams) %>
+</div>
