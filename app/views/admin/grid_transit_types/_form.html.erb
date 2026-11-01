@@ -1,45 +1,17 @@
-<%= form_with model: [:admin, transit_type], local: true do |f| %>
-  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: TYPE INFO ::]</h3>
+<%# The transit type's fields as console status rows (ConsoleFormBuilder
+    rc_* rows), then // DESCRIPTION //. The commit row belongs to the
+    caller. Locals: f. %>
+<div class="console-status">
+  <%= f.rc_text_field :name, required: true, autocomplete: "off", width: :wide %>
+  <%= f.rc_text_field :slug, required: true, autocomplete: "off", pattern: "[a-z0-9\\-]+", title: "lowercase letters, digits, hyphens", hint: "unique · lowercase letters, numbers, hyphens" %>
+  <%= f.rc_select :category, GridTransitType::CATEGORIES.map { |c| [c.upcase, c] }, {} %>
+  <%= f.rc_number_field :base_fare, label: "FARE", width: :short, min: 0, hint: "CRED" %>
+  <%= f.rc_number_field :min_clearance, label: "CLEARANCE", width: :short, min: 0, max: 99 %>
+  <%= f.rc_text_field :icon_key, label: "ICON", autocomplete: "off", width: :short, hint: "e.g. TRAIN, BUS, TAXI" %>
+  <%= f.rc_number_field :position, width: :short %>
+  <%= f.rc_flags("FLAGS", hint: "unchecked hides the type and its routes from hackrs") do %>
+    <%= f.rc_check_box :published, label: "PUBLISHED" %>
+  <% end %>
+</div>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <div>
-      <%= f.tui_text_field :name %>
-    </div>
-    <div>
-      <%= f.tui_text_field :slug, hint: "lowercase letters, numbers, hyphens only" %>
-    </div>
-  </div>
-
-  <div style="margin-top: 15px;">
-    <%= f.tui_text_area :description, style: "height: 80px;" %>
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
-    <div>
-      <%= f.tui_select :category, GridTransitType::CATEGORIES.map { |c| [c.upcase, c] }, {} %>
-    </div>
-    <div>
-      <%= f.tui_number_field :base_fare, min: 0, label: "BASE FARE (CRED)" %>
-    </div>
-    <div>
-      <%= f.tui_number_field :min_clearance, min: 0, max: 99 %>
-    </div>
-    <div>
-      <%= f.tui_text_field :icon_key, hint: "e.g. TRAIN, BUS, TAXI" %>
-    </div>
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
-    <div>
-      <%= f.tui_number_field :position, min: 0 %>
-    </div>
-    <div>
-      <%= f.tui_check_box :published %>
-    </div>
-  </div>
-
-  <div style="margin-top: 25px;">
-    <%= tui_submit transit_type.new_record? ? "Create Transit Type" : "Update Transit Type", form: f, color: :green, style: "padding: 8px 20px;" %>
-    <%= tui_button "Cancel", admin_grid_transit_types_path, style: "padding: 8px 20px; margin-left: 10px;" %>
-  </div>
-<% end %>
+<%= f.rc_text_area :description, rows: 3, spellcheck: true %>

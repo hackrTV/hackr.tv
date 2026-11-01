@@ -1,7 +1,23 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/mobs/new :: NEW MOB", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @mob], url: admin_grid_mobs_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_mobs/new — a new mob on the record screen's shell (shop
+    listings open once a vendor is saved). %>
+<% content_for :title, "/root/grid_mobs/new :: NEW MOB" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW MOB", sub: "ROOT · MOB · /root/grid_mobs/new"} do %>
+    <%= link_to "[<] MOBS", admin_grid_mobs_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @mob, url: admin_grid_mobs_path, local: true, id: "mob-form" do |f| %>
+    <%= render "form", f: f, mob: @mob %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE MOB]</button>
+      <%= link_to "[CANCEL]", admin_grid_mobs_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+</div>
+<%= render "script" %>

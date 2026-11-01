@@ -1,0 +1,22 @@
+<%# A typed picker as a console field row — admin/shared/_combobox's
+    window.AdminCombobox over a hidden id field. The caller renders that
+    partial once at the end of the screen and calls AdminCombobox.init
+    with the KEY-input / KEY-hidden / KEY-dropdown / KEY-status ids.
+    Locals: label, key (the id prefix), name (the hidden field's param),
+    value (the id on record), text (its label in the box — blank when
+    nothing is picked), placeholder, status (the note beside the box
+    until the script writes its own), errors (the field's — the form
+    builder's rc_errors, e.g. f.rc_errors(:grid_room_id)). %>
+<div class="console-status-row rc-field">
+  <label class="console-key" for="<%= key %>-input"><%= label %></label>
+  <span class="console-val">
+    <input type="hidden" name="<%= name %>" id="<%= key %>-hidden" value="<%= value %>">
+    <div class="admin-combobox">
+      <input type="text" id="<%= key %>-input" class="admin-combobox-input<%= " selected" if text.present? %>" autocomplete="off" spellcheck="false"
+        placeholder="<%= local_assigns[:placeholder] || "type to search" %>" value="<%= text %>">
+      <div id="<%= key %>-dropdown" class="admin-combobox-dropdown"></div>
+    </div>
+    <span class="rc-hint" id="<%= key %>-status"><%= local_assigns[:status] %></span>
+    <%= local_assigns[:errors] %>
+  </span>
+</div>

@@ -30,4 +30,63 @@ RSpec.describe "Admin console", type: :system do
     expect(UserPunishment.squelched?(target)).to be(true)
     expect(UserPunishment.blackedout?(target)).to be(false)
   end
+
+  # Phase 3: the mob record's editors are inline JS retargeted onto the
+  # console (ids kept, rows built as .rc-topic / .rc-btn) — the tree and
+  # the vendor config still serialize into the hidden fields on save.
+  it "builds a dialogue tree and a vendor config in the mob editors and saves them" do
+    mob = create(:grid_mob, name: "Dockhand", dialogue_tree: {"greeting" => "Hey."})
+    log_in!
+    visit "/root/grid_mobs/#{mob.id}/edit"
+
+    expect(page).to have_field("dialogue-greeting", with: "Hey.")
+    click_button "[+] ADD TOPIC"
+    within(".rc-topic") do
+      find(".dialogue-key").fill_in(with: "job")
+      find(".dialogue-response").fill_in(with: "Lift crates.")
+      click_button "[+] SUB"
+      within(".rc-topic-children .rc-topic") do
+        find(".dialogue-key").fill_in(with: "pay")
+        find(".dialogue-response").fill_in(with: "Ten CRED.")
+      end
+    end
+
+    select "Black Market", from: "vendor-shop-type"
+    expect(page).to have_field("vendor-rotation-count")
+    fill_in "vendor-rotation-count", with: "5"
+
+    click_button "[RAW JSON]", match: :first
+    expect(find("#dialogue-raw-textarea").value).to include('"pay"')
+    click_button "[STRUCTURED]", match: :first
+
+    click_button "[SAVE MOB]"
+    expect(page).to have_content("Mob 'Dockhand' updated.")
+    expect(mob.reload.dialogue_tree).to eq(
+      "greeting" => "Hey.",
+      "topics" => {"job" => {"response" => "Lift crates.", "topics" => {"pay" => {"response" => "Ten CRED."}}}}
+    )
+    expect(mob.vendor_config).to eq("shop_type" => "black_market", "restock_interval_hours" => 24, "rotation_count" => 5)
+  end
+
+  # A save from RAW JSON mode parses the textarea first: malformed JSON
+  # stops the submit with the error under it, the edit still in the box.
+  it "refuses to save a mob while a raw JSON editor holds malformed JSON" do
+    mob = create(:grid_mob, name: "Dockhand", dialogue_tree: {"greeting" => "Hey."})
+    log_in!
+    visit "/root/grid_mobs/#{mob.id}/edit"
+
+    click_button "[RAW JSON]", match: :first
+    find("#dialogue-raw-textarea").fill_in(with: '{"greeting": "Yo",}')
+    click_button "[SAVE MOB]"
+
+    expect(page).to have_css("#dialogue-raw-error", text: "Invalid JSON")
+    expect(find("#dialogue-raw-textarea").value).to eq('{"greeting": "Yo",}')
+    expect(page).to have_no_content("Mob 'Dockhand' updated.")
+    expect(mob.reload.dialogue_tree).to eq("greeting" => "Hey.")
+
+    find("#dialogue-raw-textarea").fill_in(with: '{"greeting": "Yo"}')
+    click_button "[SAVE MOB]"
+    expect(page).to have_content("Mob 'Dockhand' updated.")
+    expect(mob.reload.dialogue_tree).to eq("greeting" => "Yo")
+  end
 end

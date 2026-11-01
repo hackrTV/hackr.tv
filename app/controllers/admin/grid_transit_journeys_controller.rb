@@ -1,19 +1,22 @@
 # frozen_string_literal: true
 
+# /root/grid_transit_journeys — the newest journeys and one journey's
+# readout as console screens (2026-10-31; root_console.css). The STATE /
+# TYPE filters accept only the listed values.
 class Admin::GridTransitJourneysController < Admin::ApplicationController
   include Admin::DevToolsGate
 
+  before_action :require_dev_tools, only: :force_abandon
+
   def index
+    @state = params[:state].presence_in(GridTransitJourney::STATES)
+    @journey_type = params[:journey_type].presence_in(GridTransitJourney::JOURNEY_TYPES)
     @journeys = GridTransitJourney.includes(:grid_hackr, :grid_transit_route, :grid_slipstream_route)
       .order(created_at: :desc)
       .limit(100)
 
-    if params[:state].present?
-      @journeys = @journeys.where(state: params[:state])
-    end
-    if params[:journey_type].present?
-      @journeys = @journeys.where(journey_type: params[:journey_type])
-    end
+    @journeys = @journeys.where(state: @state) if @state
+    @journeys = @journeys.where(journey_type: @journey_type) if @journey_type
   end
 
   def show
@@ -24,7 +27,6 @@ class Admin::GridTransitJourneysController < Admin::ApplicationController
   end
 
   def force_abandon
-    require_dev_tools!
     journey = GridTransitJourney.find(params[:id])
     if journey.active?
       journey.update!(state: "abandoned", ended_at: Time.current)

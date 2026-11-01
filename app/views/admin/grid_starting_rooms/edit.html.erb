@@ -1,14 +1,39 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/starting_rooms/#{@starting_room.id} :: EDIT STARTING ROOM", variant: :admin, width: 1200) do %>
+<%# /root/grid_starting_rooms/:id/edit — the starting room as a console
+    screen (2026-10-31). Bar (name · ROOT · START · path; [<] STARTS,
+    [>] ROOM, [HISTORY]), the fields, // COMMIT // ([SAVE] [CANCEL] ·
+    [DELETE]), destinations, the > prompt. The delete form is hidden at
+    the end, the picker's script after the screen. Assigns:
+    @starting_room, @rooms. %>
+<% name = @starting_room.name_in_database %>
+<% room = GridRoom.find_by(id: @starting_room.grid_room_id_in_database) %>
+<% content_for :title, "/root/grid_starting_rooms/#{@starting_room.id} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · START · /root/grid_starting_rooms/#{@starting_room.id}"} do %>
+    <%= link_to "[<] STARTS", admin_grid_starting_rooms_path, class: "console-bar-link" %>
+    <% if room %><%= link_to "[>] ROOM", edit_admin_grid_room_path(room), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_starting_room_path(@starting_room), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= form_with(model: [:admin, @starting_room]) do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+  <%= form_with model: @starting_room, url: admin_grid_starting_room_path(@starting_room), method: :patch, local: true, id: "starting-room-form" do |f| %>
+    <%= render "form", f: f, start: @starting_room %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE START]</button>
+      <%= link_to "[CANCEL]", admin_grid_starting_rooms_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-start" class="rc-btn rc-btn--danger">[DELETE START]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-start", admin_grid_starting_room_path(@starting_room), confirm: "Delete starting room '#{name}'?") %>
+  </div>
+</div>
+<%= render "script" %>

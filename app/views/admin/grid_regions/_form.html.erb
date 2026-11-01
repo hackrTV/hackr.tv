@@ -1,91 +1,24 @@
-<%= render "admin/shared/combobox" %>
-
-<% if @region.errors.any? %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-    <p class="red-255-text">ERRORS:</p>
-    <ul style="margin: 5px 0 0 20px;">
-      <% @region.errors.full_messages.each do |msg| %>
-        <li class="white-text"><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_text_field :name %>
-  </div>
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_text_field :slug %>
-  </div>
+<%# The region's fields as console status rows (ConsoleFormBuilder rc_*
+    rows), // DESCRIPTION //, then // GOVCORP ROOMS // — the six rooms
+    capture, the facility and the restorepoint send a hackr to, each a
+    typed picker over the region's own rooms (admin/console/_picker; the
+    pickers' script is the caller's, _pickers). The commit row belongs
+    to the caller. Locals: f, region. %>
+<div class="console-status">
+  <%= f.rc_text_field :name, required: true, autocomplete: "off", width: :wide %>
+  <%= f.rc_text_field :slug, required: true, autocomplete: "off", hint: "unique · lowercase, hyphens" %>
 </div>
 
-<div style="margin-top: 15px;">
-  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
-</div>
+<%= f.rc_text_area :description, rows: 3, spellcheck: true %>
 
-<%
-  room_fields = [
-    { field: :hospital_room_id, label: "RESTOREPOINT ROOM" },
-    { field: :containment_room_id, label: "CONTAINMENT CELL" },
-    { field: :cell_block_room_id, label: "CELL BLOCK CORRIDOR" },
-    { field: :sally_port_room_id, label: "SALLY PORT ROOM" },
-    { field: :facility_exit_room_id, label: "FACILITY EXIT (SALLY PORT)" },
-    { field: :facility_bribe_exit_room_id, label: "FACILITY EXIT (BRIBE)" },
-  ]
-%>
-
-<% room_fields.each_slice(2) do |pair| %>
-  <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-    <% pair.each do |rf| %>
-      <% cb_id = rf[:field].to_s.sub(/_id$/, "").dasherize %>
-      <% current_room = @region.send(rf[:field].to_s.sub(/_id$/, "")) %>
-      <div style="flex: 1; min-width: 250px;">
-        <%= f.label rf[:field], rf[:label], class: "tui-field-label" %>
-        <input type="hidden" name="grid_region[<%= rf[:field] %>]" id="<%= cb_id %>-hidden" value="<%= @region.send(rf[:field]) %>">
-        <div class="admin-combobox">
-          <input type="text" id="<%= cb_id %>-input" class="admin-combobox-input<%= ' selected' if current_room %>" autocomplete="off"
-            placeholder="Type to search..."
-            value="<%= "#{current_room.grid_zone.grid_region.name} / #{current_room.grid_zone.name} / #{current_room.name}" if current_room %>">
-          <div id="<%= cb_id %>-dropdown" class="admin-combobox-dropdown"></div>
-        </div>
-        <p style="color: #666; margin-top: 4px; font-size: 0.85em;" id="<%= cb_id %>-status"></p>
-      </div>
-    <% end %>
-  </div>
-<% end %>
-
-<div style="margin-top: 30px; display: flex; gap: 10px;">
-  <%= tui_submit @region.new_record? ? "Create Region" : "Update Region", form: f, color: :green, style: "padding: 10px 20px; font-weight: bold;" %>
-  <%= tui_button "Cancel", admin_grid_regions_path, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% if @region.persisted? %>
-    <%= tui_button "History", history_admin_grid_region_path(@region), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
+<div class="console-rule"><span>// GOVCORP ROOMS //</span></div>
+<div class="console-status">
+  <% {hospital_room_id: "RESTOREPOINT", containment_room_id: "CONTAINMENT", cell_block_room_id: "CELL BLOCK", sally_port_room_id: "SALLY PORT",
+       facility_exit_room_id: "EXIT · SALLY", facility_bribe_exit_room_id: "EXIT · BRIBE"}.each do |field, label| %>
+    <% room = region.public_send(field.to_s.delete_suffix("_id")) %>
+    <%= render "admin/console/picker", label: label, key: field.to_s.delete_suffix("_id").dasherize, name: "grid_region[#{field}]",
+      value: region.public_send(field), text: room && "#{room.grid_zone.grid_region.name} / #{room.grid_zone.name} / #{room.name}",
+      placeholder: region.persisted? ? "type a room of this region" : "save the region first", status: ("none" unless room),
+      errors: f.rc_errors(field) %>
   <% end %>
 </div>
-
-<script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    var rooms = <%= raw @rooms.map { |r| { id: r.id, name: r.name, zone_name: r.grid_zone.name, region_name: r.grid_zone.grid_region.name } }.to_json %>;
-
-    var fields = <%= raw room_fields.map { |rf| rf[:field].to_s.sub(/_id$/, "").dasherize }.to_json %>;
-
-    fields.forEach(function(cbId) {
-      AdminCombobox.init({
-        inputId: cbId + '-input',
-        hiddenId: cbId + '-hidden',
-        dropdownId: cbId + '-dropdown',
-        statusId: cbId + '-status',
-        items: rooms,
-        getSearchText: function(r) { return (r.name + ' ' + r.zone_name + ' ' + r.region_name).toLowerCase(); },
-        getGroupKey: function(r) { return r.region_name + ' / ' + r.zone_name; },
-        renderOption: function(r, e) {
-          return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone_name) + '</span>';
-        },
-        getId: function(r) { return String(r.id); },
-        getLabel: function(r) { return r.region_name + ' / ' + r.zone_name + ' / ' + r.name; },
-        emptyText: 'No rooms match',
-        selectedText: 'Room selected'
-      });
-    });
-  })();
-</script>

@@ -144,4 +144,20 @@ describe('TerminalController', () => {
     expect(reply().textContent).toContain('CONNECTING /fm ...')
     expect(visit).toHaveBeenCalledWith('http://localhost:3000/fm')
   })
+
+  it('skips rows a ledger filter hid', async () => {
+    await start('done')
+    const row = document.querySelector<HTMLElement>('a[data-command="0"]')?.parentElement as HTMLElement
+    row.hidden = true
+
+    type('0')
+    expect(reply().textContent).toContain('UNKNOWN COMMAND: 0')
+    expect(visit).not.toHaveBeenCalled()
+    type('?')
+    expect(reply().textContent).toContain('COMMANDS: fm · clear')
+
+    row.hidden = false
+    type('0')
+    expect(visit).toHaveBeenCalledWith('http://localhost:3000/thecyberpulse')
+  })
 })

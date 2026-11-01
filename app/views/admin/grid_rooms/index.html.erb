@@ -1,98 +1,66 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/rooms :: MANAGE GRID ROOMS", variant: :admin) do %>
+<%# /root/grid_rooms — the rooms ledger as a console screen (2026-10-31;
+    root_console.css): bar, ON RECORD row, the FILTER row (ledger-filter:
+    name / slug / zone / region / type — replaces the old filter script;
+    ~2,100 rows, served in full as the old table was), // ROOMS // rows
+    ([NNNN] · name over slug · ZONE · TYPE · CL · PLAYLIST · [HISTORY]),
+    destinations, the > prompt (NN opens the record screen; deletes live
+    there). Assigns: @rooms. %>
+<% content_for :title, "/root/grid_rooms :: ROOMS" %>
+<% rooms = @rooms.to_a %>
+<% numbers = rooms.each_index.map { |i| root_num(i, total: rooms.size) } %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ROOMS", sub: "ROOT · WORLD · /root/grid_rooms"} do %>
+    <%= link_to "[+] NEW ROOM", new_admin_grid_room_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green %>
-        <%= tui_button "+ New Room", new_admin_grid_room_path, color: :green %>
-        <span style="color: #333;">|</span>
-        <label class="white-text" style="font-weight: bold;">FILTER:</label>
-        <input type="text" id="room-filter" class="tui-input" style="padding: 6px 10px; width: 250px;" placeholder="name, slug, zone, type..." autocomplete="off">
-        <span id="room-filter-status" style="color: #666; font-size: 0.85em;"><%= @rooms.size %> rooms</span>
-      </div>
-
-      <% if @rooms.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-          <table id="room-table" class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: left;">Slug</th>
-                <th style="text-align: left;">Zone</th>
-                <th style="text-align: left;">Type</th>
-                <th style="text-align: center;">Clearance</th>
-                <th style="text-align: left;">Ambient Playlist</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @rooms.each_with_index do |room, i| %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td class="cyan-255-text"><strong><%= room.name %></strong></td>
-                  <td style="font-family: monospace; color: #666;">/<%= room.slug %></td>
-                  <td style="color: #22d3ee;"><%= room.grid_zone.name %></td>
-                  <td><%= room.room_type || "—" %></td>
-                  <td style="text-align: center;"><%= room.min_clearance %></td>
-                  <td>
-                    <% if room.ambient_playlist %>
-                      <span class="purple-255-text"><%= room.ambient_playlist.name %></span>
-                    <% else %>
-                      <span style="color: #666;">—</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_grid_room_path(room), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "History", history_admin_grid_room_path(room), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_grid_room_path(room), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{room.name}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-
-        <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
-          <%= @rooms.count %> rooms
-        </p>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No rooms yet.</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(rooms.size, "room") %> <span class="console-dim">· <%= pluralize(rooms.map(&:grid_zone_id).uniq.size, "zone") %></span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="name · slug · zone · region · type" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= rooms.size %> / <%= rooms.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
 
-<script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    var input = document.getElementById('room-filter');
-    var status = document.getElementById('room-filter-status');
-    var rows = document.querySelectorAll('#room-table tbody tr');
-    if (!input || !rows.length) return;
-    var total = rows.length;
+  <section class="console-section rc-ledger rc-ledger--rooms" aria-label="Rooms">
+    <div class="console-rule"><span>// ROOMS //</span></div>
+    <% if rooms.empty? %>
+      <%= render "admin/console/empty", text: "NO ROOMS ON RECORD", hint: "[+] NEW ROOM adds one to a zone" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ROOM</span><span>ZONE</span><span>TYPE</span><span class="rc-cell--r">CL</span><span>PLAYLIST</span><span></span>
+      </div>
+    <% end %>
+    <% rooms.each_with_index do |room, i| %>
+      <% num = numbers[i] %>
+      <% type = room.room_type %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [room.name, room.slug, room.grid_zone.name, room.grid_zone.grid_region&.name, type].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to room.name, edit_admin_grid_room_path(room), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= room.slug.presence || "—" %></div>
+        </div>
+        <span class="rc-cell rc-hot"><%= room.grid_zone.name %></span>
+        <span class="rc-cell <%= "rc-off" if type == "standard" %>"><%= type.upcase %></span>
+        <span class="rc-cell rc-cell--r"><%= room.min_clearance %></span>
+        <span class="rc-cell"><%= room.ambient_playlist&.name || "—" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_room_path(room), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
 
-    input.addEventListener('input', function() {
-      var q = this.value.toLowerCase();
-      var visible = 0;
-      for (var i = 0; i < rows.length; i++) {
-        var cells = rows[i].querySelectorAll('td');
-        var text = '';
-        for (var c = 0; c < cells.length - 1; c++) text += cells[c].textContent + ' ';
-        var show = !q || text.toLowerCase().indexOf(q) !== -1;
-        rows[i].style.display = show ? '' : 'none';
-        if (show) visible++;
-      }
-      status.textContent = visible + ' of ' + total + ' room' + (total === 1 ? '' : 's');
-    });
-  })();
-</script>
+  <%= render "admin/console/destinations", section: :world, except: "ROOMS" %>
+
+  <div class="console-rule"><span>// EVERY ROOM ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "ROOMS", numbers: numbers, noun: "a room number", extra: ["new"]) %>
+</div>

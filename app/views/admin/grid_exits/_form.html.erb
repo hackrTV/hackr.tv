@@ -1,41 +1,21 @@
-<% if @exit.errors.any? %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-    <p class="red-255-text">ERRORS:</p>
-    <ul style="margin: 5px 0 0 20px;">
-      <% @exit.errors.full_messages.each do |msg| %>
-        <li class="white-text"><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_select :from_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.from_room_id), { include_blank: "(select room)" }, label: "FROM ROOM" %>
-  </div>
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_select :to_room_id, options_for_select(@rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] }, @exit.to_room_id), { include_blank: "(select room)" }, label: "TO ROOM" %>
-  </div>
-</div>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_select :direction,
-          [["North", "north"], ["South", "south"], ["East", "east"], ["West", "west"], ["Up", "up"], ["Down", "down"]],
-          { include_blank: "(select direction)" } %>
-  </div>
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_check_box :locked, style: "margin-top: 8px;" %>
-  </div>
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_collection_select :requires_item_id, GridItem.all, :id, :name, { include_blank: "(none)" }, label: "REQUIRES ITEM" %>
-  </div>
-</div>
-
-<div style="margin-top: 30px; display: flex; gap: 10px;">
-  <%= tui_submit @exit.new_record? ? "Create Exit" : "Update Exit", form: f, color: :green, style: "padding: 10px 20px; font-weight: bold;" %>
-  <%= tui_button "Cancel", admin_grid_exits_path, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% if @exit.persisted? %>
-    <%= tui_button "History", history_admin_grid_exit_path(@exit), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
+<%# The exit's fields as console status rows (ConsoleFormBuilder rc_*
+    rows): the two rooms (every room, zone first), the direction (free
+    text — the six compass words + up / down offered, diagonals and
+    named ways like "enter" kept as typed), LOCKED, the key item. The
+    commit row belongs to the caller. Locals: f, exit_record; @rooms. %>
+<% room_choices = @rooms.map { |r| ["#{r.grid_zone.name} — #{r.name}", r.id] } %>
+<div class="console-status">
+  <%= f.rc_select :from_room_id, options_for_select(room_choices, exit_record.from_room_id), {include_blank: "(select room)"}, label: "FROM" %>
+  <%= f.rc_text_field :direction, required: true, autocomplete: "off", width: :short, list: "exit-directions",
+    hint: "lowercase · hyphens · north south east west up down, diagonals, any named way" %>
+  <%= f.rc_select :to_room_id, options_for_select(room_choices, exit_record.to_room_id), {include_blank: "(select room)"}, label: "TO" %>
+  <%= f.rc_flags("FLAGS") do %>
+    <%= f.rc_check_box :locked, label: "LOCKED" %>
   <% end %>
+  <%= f.rc_collection_select :requires_item_id, GridItem.all, :id, :name, {include_blank: "(none)"}, label: "KEY ITEM" %>
 </div>
+<datalist id="exit-directions">
+  <% %w[north south east west up down northeast northwest southeast southwest].each do |direction| %>
+    <option value="<%= direction %>"></option>
+  <% end %>
+</datalist>

@@ -1,7 +1,87 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/rooms/#{@room.id} :: EDIT ROOM", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @room], url: admin_grid_room_path(@room), local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_rooms/:id/edit — the room as a console screen (2026-10-31;
+    show redirects here). Bar (name · ROOT · ROOM · path; [<] ROOMS,
+    [>] ZONE, [HISTORY]), the fields, // COMMIT // ([SAVE] [CANCEL] ·
+    [DELETE] — refused while mobs or items remain), // EXITS // (the
+    ways out, [+] NEW EXIT from here) and // MOBS // numbered through,
+    destinations, the > prompt (NN opens an exit or a mob). The delete
+    form is hidden at the end, the scripts after the screen. Assigns:
+    @room, @zones, @playlists. %>
+<% name = @room.name_in_database %>
+<% exits = GridExit.where(from_room_id: @room.id).includes(to_room: :grid_zone).order(:direction).to_a %>
+<% mobs = @room.grid_mobs.order(:name).to_a %>
+<% numbers = (exits.size + mobs.size).times.map { |i| root_num(i) } %>
+<% zone = GridZone.find_by(id: @room.grid_zone_id_in_database) %>
+<% content_for :title, "/root/grid_rooms/#{@room.id} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · ROOM · /root/grid_rooms/#{@room.id}"} do %>
+    <%= link_to "[<] ROOMS", admin_grid_rooms_path, class: "console-bar-link" %>
+    <% if zone %><%= link_to "[>] #{zone.name.upcase}", edit_admin_grid_zone_path(zone), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_room_path(@room), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @room, url: admin_grid_room_path(@room), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, room: @room %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ROOM]</button>
+      <%= link_to "[CANCEL]", admin_grid_rooms_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-room" class="rc-btn rc-btn--danger">[DELETE ROOM]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--room-exits" aria-label="Exits">
+    <div class="console-rule"><span>// EXITS //</span></div>
+    <% if exits.empty? %>
+      <%= render "admin/console/empty", text: "NO WAY OUT OF THIS ROOM" %>
+    <% end %>
+    <% exits.each_with_index do |exit_record, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <%= link_to exit_record.direction.upcase, edit_admin_grid_exit_path(exit_record), class: "console-link", data: {command: num} %>
+        <div class="cc-text">
+          <%= link_to exit_record.to_room.name, edit_admin_grid_room_path(exit_record.to_room), class: "console-link cc-name" %>
+          <div class="cc-meta"><%= exit_record.to_room.grid_zone.name %></div>
+        </div>
+        <span class="rc-cell <%= exit_record.locked? ? "rc-bad" : "rc-off" %>"><%= exit_record.locked? ? "LOCKED" : "OPEN" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_exit_path(exit_record), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[+] NEW EXIT", new_admin_grid_exit_path(from_room_id: @room.id), class: "rc-btn", data: {command: "new"} %>
+    </div>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--room-mobs" aria-label="Mobs">
+    <div class="console-rule"><span>// MOBS //</span></div>
+    <% if mobs.empty? %>
+      <%= render "admin/console/empty", text: "NO MOBS IN THIS ROOM" %>
+    <% end %>
+    <% mobs.each_with_index do |mob, i| %>
+      <% num = numbers[exits.size + i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <%= link_to mob.name, edit_admin_grid_mob_path(mob), class: "console-link cc-name", data: {command: num} %>
+        <span class="rc-cell"><%= mob.mob_type&.upcase || "—" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_mob_path(mob), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, numbers: numbers, noun: "an exit or mob number", extra: ["new"]) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-room", admin_grid_room_path(@room), confirm: "Delete room '#{name}'?") %>
+  </div>
+</div>
+<%= render "script" %>

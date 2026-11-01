@@ -1,49 +1,13 @@
-<% if @zone.errors.any? %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-    <p class="red-255-text">ERRORS:</p>
-    <ul style="margin: 5px 0 0 20px;">
-      <% @zone.errors.full_messages.each do |msg| %>
-        <li class="white-text"><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_text_field :name %>
-  </div>
-  <div style="flex: 1; min-width: 250px;">
-    <%= f.tui_text_field :slug %>
-  </div>
+<%# The zone's fields as console status rows (ConsoleFormBuilder rc_*
+    rows), then // DESCRIPTION //. The commit row belongs to the caller.
+    Locals: f; @regions, @factions, @playlists for the selects. %>
+<div class="console-status">
+  <%= f.rc_text_field :name, required: true, autocomplete: "off", width: :wide %>
+  <%= f.rc_text_field :slug, required: true, autocomplete: "off", hint: "unique" %>
+  <%= f.rc_collection_select :grid_region_id, @regions, :id, :name, {}, label: "REGION" %>
+  <%= f.rc_collection_select :grid_faction_id, @factions, :id, :name, {include_blank: "(none)"}, label: "FACTION" %>
+  <%= f.rc_collection_select :ambient_playlist_id, @playlists, :id, :name, {include_blank: "(none)"}, label: "PLAYLIST", hint: "the zone's ambient playlist" %>
+  <%= f.rc_number_field :danger_level, label: "DANGER", width: :short, min: 0, max: 10, hint: "0 = safe · 10 = max ambient encounters" %>
 </div>
 
-<div style="margin-top: 15px;">
-  <%= f.tui_text_area :description, style: "min-height: 80px;" %>
-</div>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_number_field :danger_level, min: 0, max: 10, hint: "0 = safe, 10 = max ambient encounters" %>
-  </div>
-</div>
-
-<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_collection_select :grid_region_id, @regions, :id, :name, {}, label: "REGION" %>
-  </div>
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_collection_select :grid_faction_id, @factions, :id, :name, { include_blank: "(none)" }, label: "FACTION" %>
-  </div>
-  <div style="flex: 1; min-width: 200px;">
-    <%= f.tui_collection_select :ambient_playlist_id, @playlists, :id, :name, { include_blank: "(none)" }, label: "AMBIENT PLAYLIST" %>
-  </div>
-</div>
-
-<div style="margin-top: 30px; display: flex; gap: 10px;">
-  <%= tui_submit @zone.new_record? ? "Create Zone" : "Update Zone", form: f, color: :green, style: "padding: 10px 20px; font-weight: bold;" %>
-  <%= tui_button "Cancel", admin_grid_zones_path, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% if @zone.persisted? %>
-    <%= tui_button "History", history_admin_grid_zone_path(@zone), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
-  <% end %>
-</div>
+<%= f.rc_text_area :description, rows: 3, spellcheck: true %>

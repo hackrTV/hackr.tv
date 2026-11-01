@@ -1,66 +1,56 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/transit_routes :: TRANSIT ROUTES", variant: :admin) do %>
+<%# /root/grid_transit_routes — the local transit routes ledger as a
+    console screen (2026-10-31; root_console.css): bar, ON RECORD row,
+    // ROUTES // rows ([NN] · name over slug · TYPE · REGION · STOPS ·
+    LOOP · ACTIVE · [HISTORY]), destinations, the > prompt (NN opens the
+    record screen, which holds the stops; deletes live there). Assigns:
+    @routes. %>
+<% content_for :title, "/root/grid_transit_routes :: ROUTES" %>
+<% routes = @routes.to_a %>
+<% numbers = routes.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "TRANSIT ROUTES", sub: "ROOT · WORLD · /root/grid_transit_routes"} do %>
+    <%= link_to "[+] NEW ROUTE", new_admin_grid_transit_route_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "+ New Route", new_admin_grid_transit_route_path, color: :green %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-        <table class="tui-table" style="width: 100%; min-width: 900px;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Slug</th>
-              <th style="text-align: left;">Type</th>
-              <th style="text-align: left;">Region</th>
-              <th style="text-align: center;">Stops</th>
-              <th style="text-align: center;">Loop</th>
-              <th style="text-align: center;">Active</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @routes.each do |r| %>
-              <tr>
-                <td><%= r.name %></td>
-                <td style="color: #6b7280;"><%= r.slug %></td>
-                <td style="color: #22d3ee;"><%= r.grid_transit_type.name %></td>
-                <td style="color: #a78bfa;"><%= r.grid_region.name %></td>
-                <td style="text-align: center;"><%= r.grid_transit_stops.length %></td>
-                <td style="text-align: center;">
-                  <% if r.loop_route? %>
-                    <span class="green-255-text">&#10003;</span>
-                  <% else %>
-                    <span style="color: #6b7280;">&mdash;</span>
-                  <% end %>
-                </td>
-                <td style="text-align: center;">
-                  <% if r.active? %>
-                    <span class="green-255-text">&#10003;</span>
-                  <% else %>
-                    <span style="color: #6b7280;">&mdash;</span>
-                  <% end %>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Edit", edit_admin_grid_transit_route_path(r), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "History", history_admin_grid_transit_route_path(r), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "Delete", admin_grid_transit_route_path(r), data: { turbo_method: :delete, turbo_confirm: "Delete route '#{r.name}'?" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(routes.size, "route") %> <span class="console-dim">· <%= routes.count(&:active?) %> active · <%= pluralize(routes.sum { |r| r.grid_transit_stops.size }, "stop") %></span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--routes" aria-label="Transit routes">
+    <div class="console-rule"><span>// ROUTES //</span></div>
+    <% if routes.empty? %>
+      <%= render "admin/console/empty", text: "NO ROUTES ON RECORD", hint: "[+] NEW ROUTE runs a transit type through a region" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ROUTE</span><span>TYPE</span><span>REGION</span><span class="rc-cell--r">STOPS</span><span></span><span></span><span></span>
+      </div>
+    <% end %>
+    <% routes.each_with_index do |route, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to route.name, edit_admin_grid_transit_route_path(route), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= route.slug %></div>
+        </div>
+        <span class="rc-cell rc-hot"><%= route.grid_transit_type.name %></span>
+        <span class="rc-cell"><%= route.grid_region.name %></span>
+        <span class="rc-cell rc-cell--r"><%= route.grid_transit_stops.size %></span>
+        <span class="rc-cell <%= route.loop_route? ? "rc-hot" : "rc-off" %>"><%= route.loop_route? ? "LOOP" : "LINE" %></span>
+        <span class="rc-cell <%= route.active? ? "rc-on" : "rc-off" %>"><%= route.active? ? "ACTIVE" : "OFF" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_transit_route_path(route), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world, except: "ROUTES" %>
+
+  <div class="console-rule"><span>// EVERY ROUTE ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "ROUTES", numbers: numbers, noun: "a route number", extra: ["new"]) %>
+</div>

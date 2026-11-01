@@ -1,41 +1,61 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/slipstream_routes/#{@route.slug} :: EDIT SLIPSTREAM ROUTE", variant: :admin, width: 1200) do %>
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-      <%= render "form", route: @route %>
+<%# /root/grid_slipstream_routes/:slug/edit — the slipstream route as a
+    console screen (2026-10-31; the read-only show page folded in here
+    and redirects). Bar (name · ROOT · SLIPSTREAM · path; [<] SLIPSTREAM,
+    [HISTORY]), the fields, // COMMIT // ([SAVE] [CANCEL] · [DELETE] —
+    refused while journeys reference it), // LEGS // in order with each
+    leg's fork options under it (read-only — the admin has no leg
+    editor), destinations, the > prompt. URLs use slug_in_database. The
+    delete form is hidden at the end. Assigns: @route, @legs, @regions,
+    @rooms. %>
+<% slug = @route.slug_in_database %>
+<% name = @route.name_in_database %>
+<% legs = @legs.to_a %>
+<% content_for :title, "/root/grid_slipstream_routes/#{slug} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · SLIPSTREAM · /root/grid_slipstream_routes/#{slug}"} do %>
+    <%= link_to "[<] SLIPSTREAM", admin_grid_slipstream_routes_path, class: "console-bar-link" %>
+    <%= link_to "[HISTORY]", history_admin_grid_slipstream_route_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-      <% if @legs&.any? %>
-        <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: LEGS (<%= @legs.size %>) ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center;">Pos</th>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: center;">Forks</th>
-                <th style="text-align: left;">Breach Template</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @legs.each do |leg| %>
-                <tr>
-                  <td style="text-align: center;"><%= leg.position %></td>
-                  <td><%= leg.name %></td>
-                  <td style="text-align: center;"><%= leg.fork_options&.size || 0 %></td>
-                  <td style="color: #6b7280;"><%= leg.breach_template_slug.presence || "&mdash;".html_safe %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% end %>
+  <%= form_with model: @route, url: admin_grid_slipstream_route_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ROUTE]</button>
+      <%= link_to "[CANCEL]", admin_grid_slipstream_routes_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-route" class="rc-btn rc-btn--danger">[DELETE ROUTE]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--legs" aria-label="Legs">
+    <div class="console-rule"><span>// LEGS · <%= legs.size %> //</span></div>
+    <% if legs.empty? %>
+      <%= render "admin/console/empty", text: "NO LEGS ON THIS ROUTE" %>
+    <% end %>
+    <% legs.each do |leg| %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= leg.position %>]</span>
+        <div class="cc-text">
+          <span class="cc-name"><%= leg.name %></span>
+          <% (leg.fork_options || []).each do |option| %>
+            <div class="cc-meta">[<%= option["key"] %>] <%= option["label"] %> · risk <%= option["risk_modifier"] %></div>
+          <% end %>
+        </div>
+        <span class="rc-cell rc-cell--r"><%= pluralize(leg.fork_options&.size || 0, "fork") %></span>
+        <span class="rc-cell"><%= leg.breach_template_slug.presence || "—" %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-route", admin_grid_slipstream_route_path(slug), confirm: "Delete slipstream route '#{name}' and its legs?") %>
+  </div>
+</div>

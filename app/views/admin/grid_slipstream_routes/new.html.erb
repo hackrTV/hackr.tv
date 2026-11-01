@@ -1,10 +1,22 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/slipstream_routes/new :: NEW SLIPSTREAM ROUTE", variant: :admin, width: 1200) do %>
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-      <%= render "form", route: @route %>
+<%# /root/grid_slipstream_routes/new — a new slipstream route on the
+    record screen's shell (the seed's risk defaults, last in the order). %>
+<% content_for :title, "/root/grid_slipstream_routes/new :: NEW ROUTE" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW ROUTE", sub: "ROOT · SLIPSTREAM · /root/grid_slipstream_routes/new"} do %>
+    <%= link_to "[<] SLIPSTREAM", admin_grid_slipstream_routes_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @route, url: admin_grid_slipstream_routes_path, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE ROUTE]</button>
+      <%= link_to "[CANCEL]", admin_grid_slipstream_routes_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+</div>

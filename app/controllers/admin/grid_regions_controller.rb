@@ -1,13 +1,20 @@
+# /root/grid_regions — the regions ledger and the region record as
+# console screens (2026-10-31; root_console.css). The record screen is
+# the edit screen: show redirects there, saves stay on it.
 class Admin::GridRegionsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridRegion
 
-  before_action :set_region, only: %i[edit update destroy]
+  before_action :set_region, only: %i[show edit update destroy]
   before_action :load_selects, only: %i[edit update]
 
   def index
     @regions = GridRegion.includes(:grid_zones).order(:name)
+  end
+
+  def show
+    redirect_to edit_admin_grid_region_path(@region)
   end
 
   def new
@@ -19,7 +26,7 @@ class Admin::GridRegionsController < Admin::ApplicationController
     @region = GridRegion.new(region_params)
     if @region.save
       set_flash_success("Region '#{@region.name}' created.")
-      redirect_to admin_grid_regions_path
+      redirect_to edit_admin_grid_region_path(@region)
     else
       load_selects
       flash.now[:error] = @region.errors.full_messages.join(", ")
@@ -33,7 +40,7 @@ class Admin::GridRegionsController < Admin::ApplicationController
   def update
     if @region.update(region_params)
       set_flash_success("Region '#{@region.name}' updated.")
-      redirect_to admin_grid_regions_path
+      redirect_to edit_admin_grid_region_path(@region)
     else
       flash.now[:error] = @region.errors.full_messages.join(", ")
       render :edit, status: :unprocessable_entity

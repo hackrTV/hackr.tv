@@ -1,7 +1,23 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/rooms/new :: NEW ROOM", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @room], url: admin_grid_rooms_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_rooms/new — a new room on the record screen's shell
+    (?grid_zone_id= prefills the zone — the zone record's [+] NEW ROOM). %>
+<% content_for :title, "/root/grid_rooms/new :: NEW ROOM" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW ROOM", sub: "ROOT · ROOM · /root/grid_rooms/new"} do %>
+    <%= link_to "[<] ROOMS", admin_grid_rooms_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @room, url: admin_grid_rooms_path, local: true do |f| %>
+    <%= render "form", f: f, room: @room %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE ROOM]</button>
+      <%= link_to "[CANCEL]", admin_grid_rooms_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :world %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+</div>
+<%= render "script" %>

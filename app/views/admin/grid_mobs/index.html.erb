@@ -1,90 +1,62 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/mobs :: MANAGE GRID MOBS", variant: :admin) do %>
+<%# /root/grid_mobs — the mobs ledger as a console screen (2026-10-31;
+    root_console.css): bar, ON RECORD row, the FILTER row (ledger-filter:
+    name / type / room / zone / faction — replaces the old filter
+    script), // MOBS // rows ([NN] · name over room / zone · TYPE ·
+    FACTION · [TEST] (dev tools) [HISTORY]), destinations, the > prompt
+    (NN opens the record screen; deletes live there). Assigns: @mobs. %>
+<% content_for :title, "/root/grid_mobs :: MOBS" %>
+<% mobs = @mobs.to_a %>
+<% numbers = mobs.each_index.map { |i| root_num(i, total: mobs.size) } %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "MOBS", sub: "ROOT · WORLD · /root/grid_mobs"} do %>
+    <%= link_to "[+] NEW MOB", new_admin_grid_mob_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
-        <%= tui_button "+ New Mob", new_admin_grid_mob_path, color: :green %>
-        <span style="color: #333;">|</span>
-        <label class="white-text" style="font-weight: bold;">FILTER:</label>
-        <input type="text" id="mob-filter" class="tui-input" style="padding: 6px 10px; width: 250px;" placeholder="name, type, room, faction..." autocomplete="off">
-        <span id="mob-filter-status" style="color: #666; font-size: 0.85em;"><%= @mobs.size %> mobs</span>
-      </div>
-
-      <% if @mobs.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-          <table id="mob-table" class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: left;">Mob Type</th>
-                <th style="text-align: left;">Room</th>
-                <th style="text-align: left;">Faction</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @mobs.each_with_index do |mob, i| %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td class="cyan-255-text"><strong><%= mob.name %></strong></td>
-                  <td><%= mob.mob_type || "—" %></td>
-                  <td><%= mob.grid_room&.name || "—" %></td>
-                  <td><%= mob.grid_faction&.name || "—" %></td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <% if dev_tools_enabled? %>
-                      <%= tui_button "Test", new_admin_grid_npc_dialogue_tester_path(mob_id: mob.id), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <% end %>
-                    <%= tui_button "Edit", edit_admin_grid_mob_path(mob), style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button "History", history_admin_grid_mob_path(mob), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_grid_mob_path(mob), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{mob.name}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-
-        <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
-          <%= @mobs.count %> mobs
-        </p>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No mobs yet.</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(mobs.size, "mob") %> <span class="console-dim">· <%= mobs.count(&:vendor?) %> vendors</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="name · type · room · zone · faction" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= mobs.size %> / <%= mobs.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
 
-<script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    var input = document.getElementById('mob-filter');
-    var status = document.getElementById('mob-filter-status');
-    var rows = document.querySelectorAll('#mob-table tbody tr');
-    if (!input || !rows.length) return;
-    var total = rows.length;
+  <section class="console-section rc-ledger rc-ledger--mobs" aria-label="Mobs">
+    <div class="console-rule"><span>// MOBS //</span></div>
+    <% if mobs.empty? %>
+      <%= render "admin/console/empty", text: "NO MOBS ON RECORD", hint: "[+] NEW MOB puts one in a room" %>
+    <% end %>
+    <% mobs.each_with_index do |mob, i| %>
+      <% num = numbers[i] %>
+      <% room = mob.grid_room %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [mob.name, mob.mob_type, room&.name, room&.grid_zone&.name, mob.grid_faction&.name].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to mob.name, edit_admin_grid_mob_path(mob), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= room ? "#{room.grid_zone&.name} / #{room.name}" : "—" %></div>
+        </div>
+        <span class="rc-cell <%= mob.vendor? ? "rc-star" : "rc-hot" %>"><%= mob.mob_type&.upcase || "—" %></span>
+        <span class="rc-cell"><%= mob.grid_faction&.name || "—" %></span>
+        <span class="rc-cell rc-links">
+          <% if dev_tools_enabled? %>
+            <%= link_to "[TEST]", new_admin_grid_npc_dialogue_tester_path(mob_id: mob.id), class: "console-link" %>
+          <% end %>
+          <%= link_to "[HISTORY]", history_admin_grid_mob_path(mob), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
 
-    input.addEventListener('input', function() {
-      var q = this.value.toLowerCase();
-      var visible = 0;
-      for (var i = 0; i < rows.length; i++) {
-        var cells = rows[i].querySelectorAll('td');
-        var text = '';
-        for (var c = 0; c < cells.length - 1; c++) text += cells[c].textContent + ' ';
-        var show = !q || text.toLowerCase().indexOf(q) !== -1;
-        rows[i].style.display = show ? '' : 'none';
-        if (show) visible++;
-      }
-      status.textContent = visible + ' of ' + total + ' mob' + (total === 1 ? '' : 's');
-    });
-  })();
-</script>
+  <%= render "admin/console/destinations", section: :world, except: "MOBS" %>
+
+  <div class="console-rule"><span>// EVERY MOB ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, except: "MOBS", numbers: numbers, noun: "a mob number", extra: ["new"]) %>
+</div>

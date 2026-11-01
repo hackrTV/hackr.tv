@@ -1,7 +1,66 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/zones/#{@zone.id} :: EDIT ZONE", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: [:admin, @zone], url: admin_grid_zone_path(@zone), local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_zones/:id/edit — the zone as a console screen (2026-10-31;
+    show redirects here). Bar (name · ROOT · ZONE · path; [<] ZONES,
+    [>] REGION, [HISTORY]), the fields, // COMMIT // ([SAVE] [CANCEL] ·
+    [DELETE] — refused while rooms remain), // ROOMS // rows opening the
+    room screens + [+] NEW ROOM prefilled, destinations, the > prompt (NN
+    opens a room). The delete form is hidden at the end. Assigns: @zone,
+    @regions, @factions, @playlists. %>
+<% name = @zone.name_in_database %>
+<% rooms = @zone.grid_rooms.order(:name).to_a %>
+<% numbers = rooms.each_index.map { |i| root_num(i, total: rooms.size) } %>
+<% region = GridRegion.find_by(id: @zone.grid_region_id_in_database) %>
+<% content_for :title, "/root/grid_zones/#{@zone.id} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · ZONE · /root/grid_zones/#{@zone.id}"} do %>
+    <%= link_to "[<] ZONES", admin_grid_zones_path, class: "console-bar-link" %>
+    <% if region %><%= link_to "[>] #{region.name.upcase}", edit_admin_grid_region_path(region), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_zone_path(@zone), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @zone, url: admin_grid_zone_path(@zone), method: :patch, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ZONE]</button>
+      <%= link_to "[CANCEL]", admin_grid_zones_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-zone" class="rc-btn rc-btn--danger">[DELETE ZONE]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--zone-rooms" aria-label="Rooms">
+    <div class="console-rule"><span>// ROOMS //</span></div>
+    <% if rooms.empty? %>
+      <%= render "admin/console/empty", text: "NO ROOMS IN THIS ZONE" %>
+    <% end %>
+    <% rooms.each_with_index do |room, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to room.name, edit_admin_grid_room_path(room), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= room.slug.presence || "—" %></div>
+        </div>
+        <span class="rc-cell"><%= room.room_type.upcase %></span>
+        <span class="rc-cell rc-cell--r">CL <%= room.min_clearance %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_room_path(room), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[+] NEW ROOM", new_admin_grid_room_path(grid_zone_id: @zone.id), class: "rc-btn", data: {command: "new"} %>
+    </div>
+  </section>
+
+  <%= render "admin/console/destinations", section: :world %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world, numbers: numbers, noun: "a room number", extra: ["new"]) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-zone", admin_grid_zone_path(@zone), confirm: "Delete zone '#{name}'?") %>
+  </div>
+</div>

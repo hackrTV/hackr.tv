@@ -90,12 +90,13 @@ export default class extends Controller<HTMLElement> {
     }
   }
 
-  // The rows' links, keyed by their data-command (first one wins).
+  // The rows' links, keyed by their data-command (first one wins). Rows
+  // a ledger FILTER hid (ledger-filter's row.hidden) don't answer.
   private commands (): Map<string, HTMLAnchorElement> {
     const map = new Map<string, HTMLAnchorElement>()
     this.element.querySelectorAll<HTMLAnchorElement>('a[data-command]').forEach(link => {
       const key = link.dataset.command
-      if (key && !map.has(key)) map.set(key, link)
+      if (key && !map.has(key) && !link.closest('[hidden]')) map.set(key, link)
     })
     return map
   }

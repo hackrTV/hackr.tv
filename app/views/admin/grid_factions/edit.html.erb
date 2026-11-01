@@ -1,8 +1,51 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/factions/#{@faction.slug} :: EDIT FACTION", variant: :admin, width: 900) do %>
+<%# /root/grid_factions/:id/edit — the faction as a console screen
+    (2026-10-31; show redirects here). Bar (name · ROOT · FACTION · path;
+    [<] FACTIONS, [HISTORY]), the fields, // COMMIT // ([SAVE] [CANCEL]
+    · [DELETE] — refused while zones or mobs remain), // REP LINKS // —
+    what this faction's rep shifts and what shifts it (edited on the
+    factions ledger), destinations, the > prompt. The delete form is
+    hidden at the end. Assigns: @faction. %>
+<% name = @faction.name_in_database %>
+<% outgoing = @faction.outgoing_rep_links.includes(:target_faction).to_a %>
+<% incoming = @faction.incoming_rep_links.includes(:source_faction).to_a %>
+<% content_for :title, "/root/grid_factions/#{@faction.id} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · FACTION · /root/grid_factions/#{@faction.id}"} do %>
+    <%= link_to "[<] FACTIONS", admin_grid_factions_path, class: "console-bar-link" %>
+    <%= link_to "[HISTORY]", history_admin_grid_faction_path(@faction), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%= form_with model: @faction, url: admin_grid_faction_path(@faction), method: :patch, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+  <%= form_with model: @faction, url: admin_grid_faction_path(@faction), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, faction: @faction %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE FACTION]</button>
+      <%= link_to "[CANCEL]", admin_grid_factions_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-faction" class="rc-btn rc-btn--danger">[DELETE FACTION]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <div class="console-rule"><span>// REP LINKS //</span></div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">SHIFTS</span>
+      <span class="console-val"><%= outgoing.any? ? outgoing.map { |l| "#{l.target_faction.display_name} x#{l.weight}" }.join(" · ") : "—" %></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">SHIFTED BY</span>
+      <span class="console-val"><%= incoming.any? ? incoming.map { |l| "#{l.source_faction.display_name} x#{l.weight}" }.join(" · ") : "—" %> <span class="console-dim">· edit the graph on <%= link_to "[FACTIONS]", admin_grid_factions_path, class: "console-link" %></span></span>
+    </div>
+  </div>
+
+  <%= render "admin/console/destinations", section: :world %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:world) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-faction", admin_grid_faction_path(@faction), confirm: "Delete faction '#{name}'?") %>
+  </div>
+</div>

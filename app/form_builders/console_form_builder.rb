@@ -82,6 +82,18 @@ class ConsoleFormBuilder < TuiFormBuilder
     @template.safe_join([rule, area, (@template.tag.p(@template.safe_join(note, " "), class: "rc-sub") if note.any?)].compact)
   end
 
+  # The field's own errors, plus the association's for a *_id select
+  # (a belongs_to validates on :artist, the field is :artist_id). Public
+  # for the rows the builder doesn't render (admin/console/_picker).
+  def rc_errors(method)
+    return unless object.respond_to?(:errors)
+    keys = [method]
+    keys << method.to_s.delete_suffix("_id").to_sym if method.to_s.end_with?("_id")
+    messages = keys.flat_map { |key| object.errors[key] }.uniq
+    return if messages.empty?
+    @template.tag.span(messages.join(", "), class: "rc-err")
+  end
+
   private
 
   # default_label (NAME from :name) is TuiFormBuilder's; it moves here
@@ -100,16 +112,5 @@ class ConsoleFormBuilder < TuiFormBuilder
   def rc_hint(hint)
     return if hint.blank?
     @template.tag.span(hint, class: "rc-hint")
-  end
-
-  # The field's own errors, plus the association's for a *_id select
-  # (a belongs_to validates on :artist, the field is :artist_id).
-  def rc_errors(method)
-    return unless object.respond_to?(:errors)
-    keys = [method]
-    keys << method.to_s.delete_suffix("_id").to_sym if method.to_s.end_with?("_id")
-    messages = keys.flat_map { |key| object.errors[key] }.uniq
-    return if messages.empty?
-    @template.tag.span(messages.join(", "), class: "rc-err")
   end
 end
