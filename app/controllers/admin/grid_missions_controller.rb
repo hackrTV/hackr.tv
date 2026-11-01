@@ -1,22 +1,37 @@
+# /root/grid_missions — the missions ledger and the mission record
+# (fields, the GIVER / ARC / PREREQ pickers, // OBJECTIVES // and
+# // REWARDS // as row editors) as console screens (2026-11-01;
+# root_console.css). The record screen is the edit screen: show
+# redirects there, saves stay on it; edit and a rejected save add one
+# blank objective and reward row (an objective with no type and no
+# label, or a reward with no type, is dropped on save);
+# ?grid_mission_arc_id= prefills a new mission (the arc record's [+] NEW
+# MISSION); a DIALOGUE PATH that is not a JSON array is refused with a
+# 422 instead of saving as no gate.
 class Admin::GridMissionsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridMission, find_by: :slug, children: [:grid_mission_objectives, :grid_mission_rewards]
 
-  before_action :set_mission, only: %i[edit update destroy]
+  before_action :set_mission, only: %i[show edit update destroy]
 
   def index
     @missions = GridMission.ordered
-      .includes(:grid_mission_arc, :giver_mob, :grid_mission_objectives, :grid_mission_rewards)
+      .includes(:grid_mission_arc, :giver_mob, :prereq_mission, :grid_mission_objectives, :grid_mission_rewards)
       .to_a
     @active_counts = GridHackrMission.active.group(:grid_mission_id).count
     @completed_counts = GridHackrMission.completed.group(:grid_mission_id).sum(:turn_in_count)
   end
 
+  def show
+    redirect_to edit_admin_grid_mission_path(@mission)
+  end
+
   def new
     @mission = GridMission.new(
       published: true,
-      position: (GridMission.maximum(:position) || 0) + 1
+      position: (GridMission.maximum(:position) || 0) + 1,
+      grid_mission_arc_id: params[:grid_mission_arc_id]
     )
     @mission.grid_mission_objectives.build(position: 1)
     @mission.grid_mission_rewards.build(position: 1, reward_type: "xp")
@@ -25,26 +40,30 @@ class Admin::GridMissionsController < Admin::ApplicationController
 
   def create
     @mission = GridMission.new(mission_params)
-    if @mission.save
+    if save_mission
       set_flash_success("Mission '#{@mission.name}' created.")
-      redirect_to admin_grid_missions_path
+      redirect_to edit_admin_grid_mission_path(@mission)
     else
       flash.now[:error] = @mission.errors.full_messages.join(", ")
+      build_blank_rows
       load_selects
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
+    build_blank_rows
     load_selects
   end
 
   def update
-    if @mission.update(mission_params)
+    @mission.assign_attributes(mission_params)
+    if save_mission
       set_flash_success("Mission '#{@mission.name}' updated.")
-      redirect_to admin_grid_missions_path
+      redirect_to edit_admin_grid_mission_path(@mission)
     else
       flash.now[:error] = @mission.errors.full_messages.join(", ")
+      build_blank_rows
       load_selects
       render :edit, status: :unprocessable_entity
     end
@@ -78,6 +97,23 @@ class Admin::GridMissionsController < Admin::ApplicationController
     @mission = GridMission.find_by!(slug: params[:id])
   end
 
+  # Saves unless the DIALOGUE PATH failed to parse (mission_params leaves
+  # the stored value alone and notes why), then reports it with the
+  # model's own errors.
+  def save_mission
+    return @mission.save unless @dialogue_path_error
+    @mission.valid?
+    @mission.errors.add(:dialogue_path, @dialogue_path_error)
+    false
+  end
+
+  # The one blank objective and reward row the record screen always
+  # offers, after the last position.
+  def build_blank_rows
+    @mission.grid_mission_objectives.build(position: (@mission.grid_mission_objectives.map(&:position).compact.max || 0) + 1)
+    @mission.grid_mission_rewards.build(position: (@mission.grid_mission_rewards.map(&:position).compact.max || 0) + 1)
+  end
+
   def load_selects
     @arcs = GridMissionArc.ordered
     @missions_for_prereq = GridMission.ordered.includes(:grid_mission_arc).where.not(id: @mission.id)
@@ -101,15 +137,15 @@ class Admin::GridMissionsController < Admin::ApplicationController
     )
     # Parse dialogue_path JSON (array of topic keys, or blank for no gate)
     raw_dp = params[:grid_mission][:dialogue_path_json]
-    permitted[:dialogue_path] = if raw_dp.blank?
-      nil
+    parsed = raw_dp.present? ? JSON.parse(raw_dp) : nil
+    if parsed.nil? || parsed.is_a?(Array)
+      permitted[:dialogue_path] = parsed
     else
-      parsed = JSON.parse(raw_dp)
-      parsed.is_a?(Array) ? parsed : nil
+      @dialogue_path_error = "must be a JSON array of topic keys"
     end
     permitted
-  rescue JSON::ParserError
-    permitted[:dialogue_path] = nil
+  rescue JSON::ParserError => e
+    @dialogue_path_error = "is not valid JSON: #{e.message}"
     permitted
   end
 end

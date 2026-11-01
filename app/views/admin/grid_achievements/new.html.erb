@@ -1,8 +1,22 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/achievements/new :: NEW ACHIEVEMENT", variant: :admin, width: 900) do %>
+<%# /root/grid_achievements/new — a new achievement on the record screen's
+    shell. %>
+<% content_for :title, "/root/grid_achievements/new :: NEW ACHIEVEMENT" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW ACHIEVEMENT", sub: "ROOT · ACHIEVEMENT · /root/grid_achievements/new"} do %>
+    <%= link_to "[<] ACHIEVEMENTS", admin_grid_achievements_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%= form_with model: @achievement, url: admin_grid_achievements_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+  <%= form_with model: @achievement, url: admin_grid_achievements_path, local: true do |f| %>
+    <%= render "form", f: f, achievement: @achievement %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE ACHIEVEMENT]</button>
+      <%= link_to "[CANCEL]", admin_grid_achievements_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+</div>

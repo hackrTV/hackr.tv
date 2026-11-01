@@ -1,62 +1,53 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/mission_arcs :: MISSION ARCS", variant: :admin, width: 1200) do %>
+<%# /root/grid_mission_arcs — the mission arcs ledger as a console screen
+    (2026-11-01; root_console.css): bar, ON RECORD row, // ARCS // rows
+    ([NN] · name over slug · POS · MISSIONS · LIVE / DRAFT · [HISTORY]),
+    destinations, the > prompt (NN opens the record screen; deletes live
+    there). Assigns: @arcs. %>
+<% content_for :title, "/root/grid_mission_arcs :: ARCS" %>
+<% arcs = @arcs.to_a %>
+<% numbers = arcs.each_index.map { |i| root_num(i, total: arcs.size) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "MISSION ARCS", sub: "ROOT · SYSTEMS · /root/grid_mission_arcs"} do %>
+    <%= link_to "[+] NEW ARC", new_admin_grid_mission_arc_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="margin-bottom: 20px;">
-        <%= tui_button "+ New Arc", new_admin_grid_mission_arc_path, color: :green %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-        <table class="tui-table" style="width: 100%;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Slug</th>
-              <th style="text-align: center;">Position</th>
-              <th style="text-align: center;">Missions</th>
-              <th style="text-align: center;">Published</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @arcs.each do |arc| %>
-              <tr>
-                <td class="cyan-255-text"><%= arc.name %></td>
-                <td style="color: #666; font-family: monospace;"><%= arc.slug %></td>
-                <td style="text-align: center; color: #9ca3af;"><%= arc.position %></td>
-                <td style="text-align: center; color: #888;"><%= arc.grid_missions.size %></td>
-                <td style="text-align: center;">
-                  <% if arc.published? %>
-                    <span class="green-255-text">YES</span>
-                  <% else %>
-                    <span style="color: #444;">no</span>
-                  <% end %>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Edit", edit_admin_grid_mission_arc_path(arc), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "History", history_admin_grid_mission_arc_path(arc), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                  <%= tui_button_to "Delete", admin_grid_mission_arc_path(arc), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete arc '#{arc.name}'?" } %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Grid Admin", admin_grid_path, color: :green %>
-        <%= tui_button "Missions", admin_grid_missions_path, style: "margin-left: 10px;" %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(arcs.size, "arc") %> <span class="console-dim">· <%= pluralize(arcs.sum { |a| a.grid_missions.size }, "mission") %> in arcs · <%= arcs.count(&:published?) %> live</span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--arcs" aria-label="Mission arcs">
+    <div class="console-rule"><span>// ARCS //</span></div>
+    <% if arcs.empty? %>
+      <%= render "admin/console/empty", text: "NO ARCS ON RECORD", hint: "[+] NEW ARC groups missions into a storyline" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ARC</span><span class="rc-cell--r">POS</span><span class="rc-cell--r">MISSIONS</span><span>STATE</span><span></span>
+      </div>
+    <% end %>
+    <% arcs.each_with_index do |arc, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to arc.name, edit_admin_grid_mission_arc_path(arc), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= arc.slug %></div>
+        </div>
+        <span class="rc-cell rc-cell--r"><%= arc.position %></span>
+        <span class="rc-cell rc-cell--r"><%= arc.grid_missions.size %></span>
+        <span class="rc-cell <%= arc.published? ? "rc-on" : "rc-off" %>"><%= arc.published? ? "LIVE" : "DRAFT" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_mission_arc_path(arc), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "ARCS" %>
+
+  <div class="console-rule"><span>// EVERY ARC ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "ARCS", numbers: numbers, noun: "an arc number", extra: ["new"]) %>
+</div>

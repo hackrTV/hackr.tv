@@ -1,5 +1,48 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/items :: EDIT — #{@definition.slug}", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= render "form", definition: @definition %>
+<%# /root/grid_item_definitions/:slug/edit — the item definition as a
+    console screen (2026-11-01). Bar (name · ROOT · ITEM · path;
+    [<] ITEMS, [HISTORY]), IN USE (what refuses a delete), the fields,
+    properties and salvage yields, // COMMIT // ([SAVE] [CANCEL] ·
+    [DELETE] — refused while items, listings, yields or schematics
+    reference it), destinations, the > prompt. The delete form is hidden
+    at the end, the yield script after the screen. Slug-keyed: the form
+    posts to the slug on record. Assigns: @definition, @all_definitions,
+    @sorted_yields. %>
+<% name = @definition.name_in_database %>
+<% slug = @definition.slug_in_database %>
+<% content_for :title, "/root/grid_item_definitions/#{slug} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · ITEM · /root/grid_item_definitions/#{slug}"} do %>
+    <%= link_to "[<] ITEMS", admin_grid_item_definitions_path, class: "console-bar-link" %>
+    <%= link_to "[HISTORY]", history_admin_grid_item_definition_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">IN USE</span>
+      <span class="console-val"><%= pluralize(@definition.grid_items.count, "live item") %> <span class="console-dim">· <%= pluralize(@definition.grid_shop_listings.count, "listing") %> · <%= pluralize(@definition.schematics_as_output.count + @definition.schematic_ingredients.count, "schematic use") %> · <%= pluralize(GridSalvageYield.where(output_definition_id: @definition.id).count, "salvage yield") %></span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with model: @definition, url: admin_grid_item_definition_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, definition: @definition %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ITEM]</button>
+      <%= link_to "[CANCEL]", admin_grid_item_definitions_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-item" class="rc-btn rc-btn--danger">[DELETE ITEM]</button>
+      </span>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-item", admin_grid_item_definition_path(slug), confirm: "Delete '#{name}'? This will fail if any items or listings reference it.") %>
+  </div>
+</div>
+<%= render "script" %>

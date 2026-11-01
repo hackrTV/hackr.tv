@@ -1,109 +1,86 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/shops :: SHOP LISTINGS", variant: :admin) do %>
+<%# /root/grid_shop_listings — every vendor's listings as a console screen
+    (2026-11-01; root_console.css): bar ([+] NEW LISTING — for the vendor
+    shown, [>] SALES), ON RECORD, the VENDOR row (links, server-side:
+    ?mob_id=), the FILTER row (ledger-filter: item / vendor / type /
+    rarity), // LISTINGS // rows ([NN] · item over vendor · RARITY · BUY
+    · SELL · STOCK · CL · ACTIVE / ROT · [RESTOCK] [HISTORY]),
+    destinations, the > prompt (NN opens the record screen; deletes live
+    there). Assigns: @listings, @vendors, @vendor. %>
+<% content_for :title, "/root/grid_shop_listings :: SHOPS" %>
+<% listings = @listings.to_a %>
+<% numbers = listings.each_index.map { |i| root_num(i, total: listings.size) } %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "SHOPS", sub: "ROOT · SYSTEMS · /root/grid_shop_listings"} do %>
+    <%= link_to "[+] NEW LISTING", new_admin_grid_shop_listing_path(grid_mob_id: @vendor&.id), class: "console-bar-link", data: {command: "new"} %>
+    <% if @vendor %><%= link_to "[>] VENDOR", edit_admin_grid_mob_path(@vendor), class: "console-bar-link" %><% end %>
+    <%= link_to "[>] SALES", admin_grid_shop_transactions_path(mob_id: @vendor&.id), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation & Filters -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "+ New Listing", new_admin_grid_shop_listing_path, color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "Transactions", admin_grid_shop_transactions_path, color: :purple, style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin: 0 5px;">|</span>
-        <%= tui_button "All Vendors", admin_grid_shop_listings_path, style: "padding: 6px 14px; font-size: 0.85em;" %>
-        <% @vendors.each do |vendor| %>
-          <% active = params[:mob_id].to_s == vendor.id.to_s %>
-          <%= tui_button vendor.name,
-              admin_grid_shop_listings_path(mob_id: vendor.id),
-              color: (active ? :cyan : nil),
-              style: "padding: 6px 14px; font-size: 0.85em;" %>
-        <% end %>
-      </div>
-
-      <% if @listings.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Vendor</th>
-                <th style="text-align: left;">Item</th>
-                <th style="text-align: left;">Rarity</th>
-                <th style="text-align: right;">Buy</th>
-                <th style="text-align: right;">Sell</th>
-                <th style="text-align: center;">Stock</th>
-                <th style="text-align: center;">Active</th>
-                <th style="text-align: center;">Rot.</th>
-                <th style="text-align: center;">CL</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @listings.each_with_index do |listing, i| %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td style="color: #c084fc;"><%= listing.grid_mob.name %></td>
-                  <td class="cyan-255-text"><%= listing.name %></td>
-                  <td>
-                    <% if listing.rarity %>
-                      <span style="color: <%= listing.rarity_color %>;"><%= listing.rarity_label %></span>
-                    <% else %>
-                      <span style="color: #444;">-</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: right;" class="green-255-text"><%= number_with_delimiter(listing.base_price) %></td>
-                  <td style="text-align: right; color: #888;"><%= number_with_delimiter(listing.sell_price) %></td>
-                  <td style="text-align: center;">
-                    <% if listing.unlimited_stock? %>
-                      <span style="color: #34d399;">&infin;</span>
-                    <% elsif listing.out_of_stock? %>
-                      <span class="red-255-text">0/<%= listing.max_stock %></span>
-                    <% else %>
-                      <span class="yellow-168-text"><%= listing.stock %>/<%= listing.max_stock %></span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if listing.active? %>
-                      <span class="green-255-text">ON</span>
-                    <% else %>
-                      <span style="color: #444;">OFF</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if listing.rotation_pool? %>
-                      <span class="yellow-168-text">YES</span>
-                    <% else %>
-                      <span style="color: #444;">-</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; color: #888;"><%= listing.min_clearance > 0 ? listing.min_clearance : "-" %></td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_grid_shop_listing_path(listing), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "History", history_admin_grid_shop_listing_path(listing), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <% if listing.max_stock.present? %>
-                      <%= tui_button_to "Restock", restock_admin_grid_shop_listing_path(listing), method: :post, form: { style: "display: inline;" }, color: :green, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <% end %>
-                    <%= tui_button_to "Delete", admin_grid_shop_listing_path(listing), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete listing '#{listing.name}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No shop listings found.</p>
-        </div>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Grid Admin", admin_grid_path, color: :green %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(listings.size, "listing") %> <span class="console-dim">· <%= @vendor ? @vendor.name : pluralize(@vendors.size, "vendor") %> · <%= listings.count(&:active?) %> active · <%= listings.count(&:out_of_stock?) %> sold out</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field">
+      <span class="console-key">VENDOR</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_grid_shop_listings_path, class: class_names("rc-btn", "rc-btn--on": @vendor.nil?), aria: {current: @vendor.nil? && "page"} %>
+        <% @vendors.each do |vendor| %>
+          <%= link_to vendor.name.upcase, admin_grid_shop_listings_path(mob_id: vendor.id), class: class_names("rc-btn", "rc-btn--on": @vendor == vendor), aria: {current: @vendor == vendor && "page"} %>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="item · vendor · type · rarity" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= listings.size %> / <%= listings.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--shops" aria-label="Shop listings">
+    <div class="console-rule"><span>// LISTINGS //</span></div>
+    <% if listings.empty? %>
+      <%= render "admin/console/empty", text: @vendor ? "NOTHING FOR SALE AT #{@vendor.name.upcase}" : "NO SHOP LISTINGS ON RECORD", hint: "[+] NEW LISTING stocks a vendor" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ITEM</span><span>RARITY</span><span class="rc-cell--r">BUY</span><span class="rc-cell--r">SELL</span><span class="rc-cell--r">STOCK</span><span class="rc-cell--r">CL</span><span>STATE</span><span></span>
+      </div>
+    <% end %>
+    <% listings.each_with_index do |listing, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [listing.name, listing.grid_mob.name, listing.item_type, listing.rarity_label].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to listing.name, edit_admin_grid_shop_listing_path(listing), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= listing.grid_mob.name %> · <%= listing.item_type %></div>
+        </div>
+        <span class="rc-cell"><%= listing.rarity_label || "—" %></span>
+        <span class="rc-cell rc-cell--r rc-star"><%= number_with_delimiter(listing.base_price) %></span>
+        <span class="rc-cell rc-cell--r"><%= number_with_delimiter(listing.sell_price) %></span>
+        <% if listing.unlimited_stock? %>
+          <span class="rc-cell rc-cell--r rc-on">INF</span>
+        <% else %>
+          <span class="rc-cell rc-cell--r <%= "rc-bad" if listing.out_of_stock? %>"><%= listing.stock || 0 %>/<%= listing.max_stock || "INF" %></span>
+        <% end %>
+        <span class="rc-cell rc-cell--r"><%= listing.min_clearance.positive? ? listing.min_clearance : "—" %></span>
+        <span class="rc-cell"><span class="<%= listing.active? ? "rc-on" : "rc-off" %>"><%= listing.active? ? "ACTIVE" : "OFF" %></span><% if listing.rotation_pool? %> · <span class="rc-hot">ROT</span><% end %></span>
+        <span class="rc-cell rc-links">
+          <% if listing.max_stock.present? %>
+            <%= button_to "[RESTOCK]", restock_admin_grid_shop_listing_path(listing), method: :post, class: "rc-btn" %>
+          <% end %>
+          <%= link_to "[HISTORY]", history_admin_grid_shop_listing_path(listing), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "SHOPS" %>
+
+  <div class="console-rule"><span>// EVERY LISTING ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "SHOPS", numbers: numbers, noun: "a listing number", extra: ["new"]) %>
+</div>

@@ -1,15 +1,65 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/breach_templates/#{@template.slug} :: EDIT BREACH TEMPLATE", variant: :admin, width: 1200) do %>
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-      <%= render "form", template: @template %>
+<%# /root/grid_breach_templates/:slug/edit — the BREACH template as a
+    console screen (2026-11-01). Bar (name · ROOT · BREACH · path;
+    [<] BREACH, [HISTORY]), the fields, // COMMIT // ([SAVE] [CANCEL] ·
+    [DELETE] — refused while breaches or encounters use the template),
+    // ENCOUNTERS // (the rooms it is placed in, NN opens one) +
+    [+] NEW ENCOUNTER prefilled, destinations, the > prompt. URLs use
+    slug_in_database. The delete form is hidden at the end. Assigns:
+    @template, @tiers. %>
+<% slug = @template.slug_in_database %>
+<% name = @template.name_in_database %>
+<% encounters = @template.grid_breach_encounters.includes(grid_room: :grid_zone).joins(:grid_room).order("grid_rooms.name").to_a %>
+<% numbers = encounters.each_index.map { |i| root_num(i) } %>
+<% content_for :title, "/root/grid_breach_templates/#{slug} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · BREACH · /root/grid_breach_templates/#{slug}"} do %>
+    <%= link_to "[<] BREACH", admin_grid_breach_templates_path, class: "console-bar-link" %>
+    <%= link_to "[HISTORY]", history_admin_grid_breach_template_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @template, url: admin_grid_breach_template_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, template: @template %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE TEMPLATE]</button>
+      <%= link_to "[CANCEL]", admin_grid_breach_templates_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-template" class="rc-btn rc-btn--danger">[DELETE TEMPLATE]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--template-encounters" aria-label="Encounters">
+    <div class="console-rule"><span>// ENCOUNTERS //</span></div>
+    <% if encounters.empty? %>
+      <%= render "admin/console/empty", text: "NOT PLACED IN ANY ROOM" %>
+    <% end %>
+    <% encounters.each_with_index do |encounter, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to encounter.grid_room.name, edit_admin_grid_breach_encounter_path(encounter), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= encounter.grid_room.grid_zone.name %></div>
+        </div>
+        <span class="rc-cell <%= {"available" => "rc-on", "active" => "rc-hot", "cooldown" => "rc-star"}.fetch(encounter.state, "rc-off") %>"><%= encounter.state.upcase %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_breach_encounter_path(encounter), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[+] NEW ENCOUNTER", new_admin_grid_breach_encounter_path(grid_breach_template_id: @template.id), class: "rc-btn", data: {command: "new"} %>
+    </div>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, numbers: numbers, noun: "an encounter number", extra: ["new"]) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-template", admin_grid_breach_template_path(slug), confirm: "Delete breach template '#{name}'?") %>
+  </div>
+</div>

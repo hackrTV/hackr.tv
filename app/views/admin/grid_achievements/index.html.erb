@@ -1,97 +1,94 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/achievements :: ACHIEVEMENT DEFINITIONS", variant: :admin) do %>
+<%# /root/grid_achievements — the achievements ledger as a console screen
+    (2026-11-01; root_console.css): bar, ON RECORD row, the CATEGORY row
+    (server-side ?category=), the FILTER row (ledger-filter: name / slug
+    / category / trigger), // ACHIEVEMENTS // rows ([NN] · name over
+    badge · slug · CATEGORY · TRIGGER · XP · CRED · EARNED · HIDDEN ·
+    [HISTORY]), // MANUAL AWARD // (one
+    row per manual achievement: badge · name · hackr · [AWARD]), destinations, the > prompt (NN opens the record
+    screen; deletes live there). Assigns: @achievements,
+    @category_filter, @hackrs. %>
+<% content_for :title, "/root/grid_achievements :: ACHIEVEMENTS" %>
+<% achievements = @achievements.to_a %>
+<% numbers = achievements.each_index.map { |i| root_num(i, total: achievements.size) } %>
+<% manual = achievements.select { |a| a.trigger_type == "manual" } %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ACHIEVEMENTS", sub: "ROOT · SYSTEMS · /root/grid_achievements"} do %>
+    <%= link_to "[+] NEW ACHIEVEMENT", new_admin_grid_achievement_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "+ New Achievement", new_admin_grid_achievement_path, color: :green %>
-
-        <%= form_with url: admin_grid_achievements_path, method: :get, local: true, style: "display: inline-flex; gap: 8px; align-items: center; margin-left: 20px;" do %>
-          <label class="white-text" style="font-weight: bold;">FILTER:</label>
-          <%= select_tag :category,
-                options_for_select([["ALL", ""]] + GridAchievement::CATEGORIES.map { |c| [c.upcase, c] }, @category_filter),
-                class: "tui-input", style: "padding: 4px 8px;", onchange: "this.form.submit()" %>
-          <% if @category_filter.present? %>
-            <%= tui_button "× clear", admin_grid_achievements_path, style: "padding: 4px 10px; font-size: 0.8em;" %>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-        <table class="tui-table" style="width: 100%;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Slug</th>
-              <th style="text-align: left;">Category</th>
-              <th style="text-align: left;">Trigger</th>
-              <th style="text-align: center;">XP</th>
-              <th style="text-align: center;">CRED</th>
-              <th style="text-align: center;">Earned</th>
-              <th style="text-align: center;">Hidden</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @achievements.each do |achievement| %>
-              <tr>
-                <td>
-                  <span style="color: #fbbf24;"><%= achievement.badge_icon %></span>
-                  <span class="cyan-255-text"><%= achievement.name %></span>
-                </td>
-                <td style="color: #666; font-family: monospace;"><%= achievement.slug %></td>
-                <td style="color: #a78bfa;"><%= achievement.category %></td>
-                <td style="color: #888;"><%= achievement.trigger_type %></td>
-                <td style="text-align: center;" class="green-255-text"><%= achievement.xp_reward %></td>
-                <td style="text-align: center; color: #fbbf24;"><%= achievement.cred_reward %></td>
-                <td style="text-align: center; color: #888;"><%= achievement.grid_hackr_achievements.size %></td>
-                <td style="text-align: center;">
-                  <% if achievement.hidden? %>
-                    <span class="yellow-168-text">HIDDEN</span>
-                  <% else %>
-                    <span style="color: #444;">-</span>
-                  <% end %>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Edit", edit_admin_grid_achievement_path(achievement), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "History", history_admin_grid_achievement_path(achievement), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                  <%= tui_button_to "Delete", admin_grid_achievement_path(achievement), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete achievement '#{achievement.name}'?" } %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
-      <!-- Manual Award Section -->
-      <div style="margin-top: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: MANUAL AWARD ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-          <% @achievements.select { |a| a.trigger_type == "manual" }.each do |achievement| %>
-            <%= form_with url: award_admin_grid_achievement_path(achievement), method: :post, local: true, style: "display: inline-flex; gap: 10px; align-items: center; margin-bottom: 10px;" do %>
-              <span class="cyan-255-text" style="min-width: 200px;"><%= achievement.badge_icon %> <%= achievement.name %></span>
-              <%= select_tag :hackr_id, options_from_collection_for_select(@hackrs, :id, :hackr_alias), class: "tui-input", style: "padding: 4px 8px;" %>
-              <%= tui_submit "Award", color: :green, style: "padding: 4px 12px;" %>
-            <% end %>
-          <% end %>
-          <% unless @achievements.any? { |a| a.trigger_type == "manual" } %>
-            <p style="color: #666;">No manual achievements defined. Create one with trigger_type "manual" to award here.</p>
-          <% end %>
-        <% end %>
-      </div>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Grid Admin", admin_grid_path, color: :green %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(achievements.size, "achievement") %><% if @category_filter %> · <%= @category_filter.upcase %><% end %> <span class="console-dim">· <%= pluralize(achievements.sum { |a| a.grid_hackr_achievements.size }, "award") %> earned · <%= achievements.count(&:hidden?) %> hidden · <%= manual.size %> manual</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field">
+      <span class="console-key">CATEGORY</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_grid_achievements_path, class: class_names("rc-btn", "rc-btn--on": @category_filter.nil?), aria: {current: @category_filter.nil? && "page"} %>
+        <% GridAchievement::CATEGORIES.each do |category| %>
+          <%= link_to category.upcase, admin_grid_achievements_path(category: category), class: class_names("rc-btn", "rc-btn--on": @category_filter == category), aria: {current: @category_filter == category && "page"} %>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="name · slug · category · trigger" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= achievements.size %> / <%= achievements.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--achievements" aria-label="Achievements">
+    <div class="console-rule"><span>// ACHIEVEMENTS //</span></div>
+    <% if achievements.empty? %>
+      <%= render "admin/console/empty", text: "NO ACHIEVEMENTS ON RECORD", hint: "[+] NEW ACHIEVEMENT defines one" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ACHIEVEMENT</span><span>CATEGORY</span><span>TRIGGER</span><span class="rc-cell--r">XP</span><span class="rc-cell--r">CRED</span><span class="rc-cell--r">EARNED</span><span>HIDDEN</span><span></span>
+      </div>
+    <% end %>
+    <% achievements.each_with_index do |achievement, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [achievement.name, achievement.slug, achievement.category, achievement.trigger_type].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to achievement.name, edit_admin_grid_achievement_path(achievement), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><% if achievement.badge_icon.present? %><span class="rc-star"><%= achievement.badge_icon %></span> · <% end %><%= achievement.slug %></div>
+        </div>
+        <span class="rc-cell rc-hot"><%= achievement.category.upcase %></span>
+        <span class="rc-cell"><%= achievement.trigger_type %></span>
+        <span class="rc-cell rc-cell--r rc-on"><%= achievement.xp_reward %></span>
+        <span class="rc-cell rc-cell--r rc-star"><%= achievement.cred_reward %></span>
+        <span class="rc-cell rc-cell--r"><%= achievement.grid_hackr_achievements.size %></span>
+        <span class="rc-cell <%= achievement.hidden? ? "rc-star" : "rc-off" %>"><%= achievement.hidden? ? "HIDDEN" : "—" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_achievement_path(achievement), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--awards" aria-label="Manual award">
+    <div class="console-rule"><span>// MANUAL AWARD //</span></div>
+    <% if manual.empty? %>
+      <%= render "admin/console/empty", text: "NO MANUAL ACHIEVEMENTS", hint: "a TRIGGER of manual makes one awardable here" %>
+    <% end %>
+    <% manual.each do |achievement| %>
+      <%= form_with url: award_admin_grid_achievement_path(achievement), method: :post, local: true, class: "rc-row" do %>
+        <span class="rc-star"><%= achievement.badge_icon %></span>
+        <span class="cc-name"><%= achievement.name %></span>
+        <%= select_tag :hackr_id, options_from_collection_for_select(@hackrs, :id, :hackr_alias), id: "award-#{achievement.id}-hackr", class: "rc-select", aria: {label: "Hackr to award #{achievement.name}"} %>
+        <button type="submit" class="rc-btn rc-btn--hot">[AWARD]</button>
+      <% end %>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "ACHIEVEMENTS" %>
+
+  <div class="console-rule"><span>// EVERY ACHIEVEMENT ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "ACHIEVEMENTS", numbers: numbers, noun: "an achievement number", extra: ["new"]) %>
+</div>

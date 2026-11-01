@@ -89,4 +89,85 @@ RSpec.describe "Admin console", type: :system do
     expect(page).to have_content("Mob 'Dockhand' updated.")
     expect(mob.reload.dialogue_tree).to eq("greeting" => "Yo")
   end
+
+  # Phase 4: the salvage yield rows are inline JS retargeted onto ledger
+  # rows (ids kept) — a cloned row submits under its fresh index, a saved
+  # row's [x] flags _destroy (the schematic ingredients run the same code).
+  it "adds and removes salvage yield rows on the item record and saves them" do
+    item = create(:grid_item_definition, name: "Flux GPU", slug: "flux-gpu")
+    old_output = create(:grid_item_definition, name: "Copper Wire")
+    new_output = create(:grid_item_definition, name: "Scrap Metal")
+    saved = create(:grid_salvage_yield, source_definition: item, output_definition: old_output)
+    log_in!
+    visit "/root/grid_item_definitions/flux-gpu/edit"
+
+    within("#salvage-yields-table") { first(".yield-destroy-btn").click }
+    expect(page).to have_css("#salvage-yields-table .rc-row:not(.rc-row--head)", count: 1)
+    click_button "[+] ADD YIELD"
+    within(all("#salvage-yields-table .rc-row:not(.rc-row--head)").last) do
+      find("select").select("Scrap Metal [COMMON]")
+      find("input[name$='[quantity]']").fill_in(with: "4")
+    end
+
+    click_button "[SAVE ITEM]"
+    expect(page).to have_content("Definition 'Flux GPU' updated.")
+    expect(GridSalvageYield.exists?(saved.id)).to be(false)
+    expect(item.salvage_yields.reload.map { |y| [y.output_definition_id, y.quantity] }).to eq([[new_output.id, 4]])
+  end
+
+  # Phase 4: the mission wizard's steps are client-side (hidden sections,
+  # rows built by its script). A rejected create comes back filled in;
+  # the created mission's record drops a saved reward row with [x] (the
+  # old inline onclick handlers never ran under the CSP).
+  it "walks the mission wizard, recovers a rejected create, and removes a saved reward on the record" do
+    create(:grid_mob, :quest_giver, name: "AXIOM")
+    create(:grid_mission, slug: "first-signal")
+    log_in!
+    visit "/root/grid_mission_wizard/new"
+
+    expect(page).to have_css("#step-1:not([hidden])")
+    click_button "[>] NEXT"
+    fill_in "mob-select-input", with: "AXIOM"
+    find(".admin-combobox-option", text: "AXIOM").click
+    click_button "[>] NEXT"
+    expect(page).to have_css("#step-4:not([hidden])")
+    expect(page).to have_css(".step-dot.skipped[data-step='3']")
+    fill_in "mission-name", with: "First Signal"
+    expect(page).to have_field("mission-slug", with: "first-signal")
+    click_button "[>] NEXT"
+
+    within("#objectives-tbody") do
+      find("select").select("visit_room")
+      find("input[name$='[label]']").fill_in(with: "Find the drop")
+    end
+    click_button "[+] ADD OBJECTIVE"
+    expect(page).to have_css("#objectives-tbody .rc-row", count: 2)
+    all("#objectives-tbody [data-row-remove]").last.click
+    expect(page).to have_css("#objectives-tbody .rc-row", count: 1)
+    click_button "[>] NEXT"
+    within("#rewards-tbody") { find("input[name$='[amount]']").fill_in(with: "30") }
+    click_button "[>] NEXT"
+    within("#review-content") { expect(page).to have_content("First Signal").and have_content("visit_room: Find the drop") }
+
+    click_button "[CREATE MISSION]"
+    expect(page).to have_content("Slug has already been taken")
+    expect(page).to have_css("#step-7:not([hidden])")
+    expect(page).to have_field("mission-name", with: "First Signal", visible: :all)
+    find(".step-dot[data-step='4']").click
+    fill_in "mission-slug", with: "first-signal-2"
+    3.times { click_button "[>] NEXT" }
+    click_button "[CREATE MISSION]"
+
+    expect(page).to have_content("Mission 'First Signal' created via wizard.")
+    mission = GridMission.find_by!(slug: "first-signal-2")
+    expect(mission.grid_mission_objectives.pluck(:label)).to eq(["Find the drop"])
+    expect(mission.grid_mission_rewards.pluck(:reward_type, :amount)).to eq([["xp", 30]])
+
+    within("#rewards-rows") { first("[data-row-remove]").click }
+    expect(page).to have_css("#rewards-rows .rc-row", count: 1)
+    click_button "[SAVE MISSION]"
+    expect(page).to have_content("Mission 'First Signal' updated.")
+    expect(mission.grid_mission_rewards.reload).to be_empty
+    expect(mission.grid_mission_objectives.pluck(:label)).to eq(["Find the drop"])
+  end
 end

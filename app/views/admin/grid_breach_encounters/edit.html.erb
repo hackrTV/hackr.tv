@@ -1,26 +1,57 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/breach_encounters/#{@encounter.id} :: EDIT ENCOUNTER", variant: :admin, width: 900) do %>
+<%# /root/grid_breach_encounters/:id/edit — the encounter as a console
+    screen (2026-11-01). Bar (template · ROOT · ENCOUNTER · path;
+    [<] ENCOUNTERS, [>] the template, [>] the room, [HISTORY]), the
+    placement fields, // COMMIT // ([SAVE] [CANCEL] · [DELETE] — refused
+    while a breach is active), // META // (cooldown, active breaches,
+    created), destinations, the > prompt. The delete form is hidden at
+    the end. Assigns: @encounter, @templates, @rooms. %>
+<% template = GridBreachTemplate.find_by(id: @encounter.grid_breach_template_id_in_database) %>
+<% room = GridRoom.find_by(id: @encounter.grid_room_id_in_database) %>
+<% title = template&.name || "ENCOUNTER ##{@encounter.id}" %>
+<% content_for :title, "/root/grid_breach_encounters/#{@encounter.id} :: #{title}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: title, sub: "ROOT · ENCOUNTER · /root/grid_breach_encounters/#{@encounter.id}"} do %>
+    <%= link_to "[<] ENCOUNTERS", admin_grid_breach_encounters_path, class: "console-bar-link" %>
+    <% if template %><%= link_to "[>] TEMPLATE", edit_admin_grid_breach_template_path(template), class: "console-bar-link" %><% end %>
+    <% if room %><%= link_to "[>] #{room.name.upcase}", edit_admin_grid_room_path(room), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_breach_encounter_path(@encounter), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= render "form", encounter: @encounter %>
-
-      <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
-        <p style="color: #6b7280;">
-          Room: <span style="color: #d0d0d0;"><%= @encounter.grid_room&.name %></span> &middot;
-          Template: <span style="color: #d0d0d0;"><%= @encounter.grid_breach_template&.name %></span> &middot;
-          Created: <span style="color: #d0d0d0;"><%= @encounter.created_at&.strftime("%Y-%m-%d %H:%M") %></span>
-        </p>
-      </div>
+  <%= form_with model: @encounter, url: admin_grid_breach_encounter_path(@encounter), method: :patch, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ENCOUNTER]</button>
+      <%= link_to "[CANCEL]", admin_grid_breach_encounters_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-encounter" class="rc-btn rc-btn--danger">[DELETE ENCOUNTER]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <div class="console-rule"><span>// META //</span></div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">COOLDOWN</span>
+      <span class="console-val"><%= @encounter.cooldown_until ? @encounter.cooldown_until.strftime("%Y-%m-%d %H:%M:%S") : "—" %></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">BREACHES</span>
+      <span class="console-val"><%= @encounter.grid_hackr_breaches.where(state: "active").count %> active <span class="console-dim">· <%= @encounter.grid_hackr_breaches.count %> on record</span></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">CREATED</span>
+      <span class="console-val"><%= @encounter.created_at&.strftime("%Y-%m-%d %H:%M") %></span>
+    </div>
+  </div>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-encounter", admin_grid_breach_encounter_path(@encounter), confirm: "Delete this encounter?") %>
+  </div>
+</div>

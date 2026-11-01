@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# /root/grid_breach_encounters — the encounters ledger and the encounter
+# record as console screens (2026-11-01; root_console.css). Saves stay
+# on the record (no show route); ?grid_breach_template_id= prefills a
+# new encounter (the template record's [+] NEW ENCOUNTER).
 class Admin::GridBreachEncountersController < Admin::ApplicationController
   include Admin::Versionable
 
@@ -17,7 +21,7 @@ class Admin::GridBreachEncountersController < Admin::ApplicationController
   end
 
   def new
-    @encounter = GridBreachEncounter.new(state: "available")
+    @encounter = GridBreachEncounter.new(state: "available", grid_breach_template_id: params[:grid_breach_template_id])
     load_selects
   end
 
@@ -80,7 +84,9 @@ class Admin::GridBreachEncountersController < Admin::ApplicationController
   end
 
   def load_selects
-    @templates = GridBreachTemplate.published.ordered
+    # Published templates, plus the one on record (an unpublished
+    # template's encounter would otherwise lose it on save).
+    @templates = GridBreachTemplate.published.or(GridBreachTemplate.where(id: @encounter.grid_breach_template_id)).ordered
     @rooms = GridRoom.includes(:grid_zone).joins(:grid_zone).order("grid_zones.name ASC, grid_rooms.name ASC")
   end
 

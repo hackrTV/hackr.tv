@@ -1,5 +1,42 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/schematics/#{@schematic.slug} :: EDIT SCHEMATIC", variant: :admin, width: 1200) do %>
-    <div style="padding: 20px;">
-      <%= render "form", schematic: @schematic %>
+<%# /root/grid_schematics/:slug/edit — the schematic as a console screen
+    (2026-11-01). Bar (name · ROOT · SCHEMATIC · path; [<] SCHEMATICS,
+    [>] OUTPUT — the output item's record, [HISTORY]), the fields, gates
+    and ingredients, // COMMIT // ([SAVE] [CANCEL] · [DELETE]),
+    destinations, the > prompt. The delete form is hidden at the end,
+    the ingredient script after the screen. Slug-keyed: the form posts
+    to the slug on record. Assigns: @schematic, @all_definitions,
+    @sorted_ingredients. %>
+<% name = @schematic.name_in_database %>
+<% slug = @schematic.slug_in_database %>
+<% output = GridItemDefinition.find_by(id: @schematic.output_definition_id_in_database) %>
+<% content_for :title, "/root/grid_schematics/#{slug} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · SCHEMATIC · /root/grid_schematics/#{slug}"} do %>
+    <%= link_to "[<] SCHEMATICS", admin_grid_schematics_path, class: "console-bar-link" %>
+    <% if output %><%= link_to "[>] OUTPUT", edit_admin_grid_item_definition_path(output), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_schematic_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @schematic, url: admin_grid_schematic_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, schematic: @schematic %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE SCHEMATIC]</button>
+      <%= link_to "[CANCEL]", admin_grid_schematics_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-schematic" class="rc-btn rc-btn--danger">[DELETE SCHEMATIC]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-schematic", admin_grid_schematic_path(slug), confirm: "Delete schematic '#{name}'?") %>
+  </div>
+</div>
+<%= render "script" %>

@@ -1,68 +1,73 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/items :: ITEM DEFINITIONS", variant: :admin) do %>
+<%# /root/grid_item_definitions — the item catalog as a console screen
+    (2026-11-01; root_console.css): bar, ON RECORD, the TYPE row (links,
+    server-side: ?item_type=), the FILTER row (ledger-filter: name /
+    slug / type / rarity), // ITEMS // rows ([NN] · name over slug ·
+    TYPE · RARITY · VALUE · [HISTORY]), destinations, the > prompt (NN
+    opens the record screen; deletes live there). Assigns: @definitions,
+    @type_filter. %>
+<% content_for :title, "/root/grid_item_definitions :: ITEMS" %>
+<% definitions = @definitions.to_a %>
+<% numbers = definitions.each_index.map { |i| root_num(i, total: definitions.size) } %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ITEMS", sub: "ROOT · SYSTEMS · /root/grid_item_definitions"} do %>
+    <%= link_to "[+] NEW ITEM", new_admin_grid_item_definition_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "+ New Definition", new_admin_grid_item_definition_path, color: :green %>
-
-        <%= form_with url: admin_grid_item_definitions_path, method: :get, local: true, style: "display: inline-flex; gap: 8px; align-items: center; margin-left: 20px;" do %>
-          <label class="white-text" style="font-weight: bold;">TYPE:</label>
-          <%= select_tag :item_type,
-                options_for_select([["ALL", ""]] + GridItem::ITEM_TYPES.map { |t| [t.titleize, t] }, @type_filter),
-                class: "tui-input", style: "padding: 4px 8px;", onchange: "this.form.submit()" %>
-          <% if @type_filter.present? %>
-            <%= tui_button "× clear", admin_grid_item_definitions_path, style: "padding: 4px 10px; font-size: 0.8em;" %>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-        <table class="tui-table" style="width: 100%;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Slug</th>
-              <th style="text-align: left;">Type</th>
-              <th style="text-align: left;">Rarity</th>
-              <th style="text-align: right;">Value</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @definitions.each_with_index do |defn, i| %>
-              <tr style="<%= " background: #112;" if i.odd? %>">
-                <td class="cyan-255-text"><%= defn.name %></td>
-                <td style="color: #666; font-family: monospace;"><%= defn.slug %></td>
-                <td style="color: #9ca3af;"><%= defn.item_type %></td>
-                <td style="color: <%= defn.rarity_color %>;"><%= defn.rarity_label %></td>
-                <td style="text-align: right; color: #fbbf24;"><%= defn.value %></td>
-                <td style="text-align: center; white-space: nowrap; display: flex; gap: 8px; justify-content: center; align-items: center; padding: 8px 4px;">
-                  <%= tui_button "Edit", edit_admin_grid_item_definition_path(defn), color: :cyan, style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;" %>
-                  <%= tui_button "History", history_admin_grid_item_definition_path(defn), color: :purple, style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;" %>
-                  <%= tui_button_to "Delete", admin_grid_item_definition_path(defn), method: :delete,
-                        data: {confirm: "Delete '#{defn.name}'? This will fail if any items or listings reference it."},
-                        color: :red, style: "padding: 4px 12px; font-size: 0.85em; box-shadow: none; line-height: 1;",
-                        form: {style: "display: inline; margin: 0;"} %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
-      <p style="color: #666; margin-top: 10px; font-size: 0.85em;">
-        <%= @definitions.count %> definitions
-      </p>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(definitions.size, "definition") %> <span class="console-dim">· <%= @type_filter ? @type_filter.upcase : pluralize(definitions.map(&:item_type).uniq.size, "type") %></span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field">
+      <span class="console-key">TYPE</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_grid_item_definitions_path, class: class_names("rc-btn", "rc-btn--on": @type_filter.nil?), aria: {current: @type_filter.nil? && "page"} %>
+        <% GridItem::ITEM_TYPES.each do |type| %>
+          <%= link_to type.upcase, admin_grid_item_definitions_path(item_type: type), class: class_names("rc-btn", "rc-btn--on": @type_filter == type), aria: {current: @type_filter == type && "page"} %>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="name · slug · type · rarity" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= definitions.size %> / <%= definitions.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--items" aria-label="Item definitions">
+    <div class="console-rule"><span>// ITEMS //</span></div>
+    <% if definitions.empty? %>
+      <%= render "admin/console/empty", text: @type_filter ? "NO #{@type_filter.upcase} DEFINITIONS" : "NO ITEM DEFINITIONS ON RECORD", hint: "[+] NEW ITEM adds one" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>ITEM</span><span>TYPE</span><span>RARITY</span><span class="rc-cell--r">VALUE</span><span></span>
+      </div>
+    <% end %>
+    <% definitions.each_with_index do |definition, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [definition.name, definition.slug, definition.item_type, definition.rarity_label].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to definition.name, edit_admin_grid_item_definition_path(definition), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= definition.slug %></div>
+        </div>
+        <span class="rc-cell"><%= definition.item_type.upcase %></span>
+        <span class="rc-cell"><%= definition.rarity_label %></span>
+        <span class="rc-cell rc-cell--r rc-star"><%= number_with_delimiter(definition.value) %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_item_definition_path(definition), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "ITEMS" %>
+
+  <div class="console-rule"><span>// EVERY ITEM ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "ITEMS", numbers: numbers, noun: "an item number", extra: ["new"]) %>
+</div>

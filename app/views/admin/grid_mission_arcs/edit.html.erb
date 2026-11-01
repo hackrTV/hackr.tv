@@ -1,7 +1,63 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/mission_arcs/#{@arc.slug} :: EDIT ARC", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @arc, url: admin_grid_mission_arc_path(@arc), local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_mission_arcs/:slug/edit — the arc as a console screen
+    (2026-11-01; show redirects here). Bar (name · ROOT · ARC · path;
+    [<] ARCS, [HISTORY]), the fields, // COMMIT // ([SAVE] [CANCEL] ·
+    [DELETE] — its missions stay, unlinked), // MISSIONS // rows opening
+    the mission screens + [+] NEW MISSION prefilled, destinations, the >
+    prompt (NN opens a mission). URLs carry slug_in_database (a rejected
+    slug edit must not move the form). The delete form is hidden at the
+    end. Assigns: @arc. %>
+<% slug = @arc.slug_in_database %>
+<% name = @arc.name_in_database %>
+<% missions = @arc.grid_missions.ordered.includes(:giver_mob).to_a %>
+<% numbers = missions.each_index.map { |i| root_num(i, total: missions.size) } %>
+<% content_for :title, "/root/grid_mission_arcs/#{slug} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · ARC · /root/grid_mission_arcs/#{slug}"} do %>
+    <%= link_to "[<] ARCS", admin_grid_mission_arcs_path, class: "console-bar-link" %>
+    <%= link_to "[HISTORY]", history_admin_grid_mission_arc_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @arc, url: admin_grid_mission_arc_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ARC]</button>
+      <%= link_to "[CANCEL]", admin_grid_mission_arcs_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-arc" class="rc-btn rc-btn--danger">[DELETE ARC]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--arc-missions" aria-label="Missions">
+    <div class="console-rule"><span>// MISSIONS //</span></div>
+    <% if missions.empty? %>
+      <%= render "admin/console/empty", text: "NO MISSIONS IN THIS ARC" %>
+    <% end %>
+    <% missions.each_with_index do |mission, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to mission.name, edit_admin_grid_mission_path(mission), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= mission.slug %> · <%= mission.giver_mob&.name || "no giver" %></div>
+        </div>
+        <span class="rc-cell rc-cell--r">POS <%= mission.position %></span>
+        <span class="rc-cell <%= mission.published? ? "rc-on" : "rc-off" %>"><%= mission.published? ? "LIVE" : "DRAFT" %></span>
+      </div>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[+] NEW MISSION", new_admin_grid_mission_path(grid_mission_arc_id: @arc.id), class: "rc-btn", data: {command: "new"} %>
+    </div>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, numbers: numbers, noun: "a mission number", extra: ["new"]) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-arc", admin_grid_mission_arc_path(slug), confirm: "Delete arc '#{name}'? Its missions stay, outside any arc.") %>
+  </div>
+</div>

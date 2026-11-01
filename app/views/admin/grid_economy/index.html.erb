@@ -1,206 +1,119 @@
-<%= render TuiWindowComponent.new(title: "/root/grid_economy :: CRED ECONOMY", variant: :admin) do %>
+<%# /root/grid_economy — the CRED economy as a console screen (2026-11-01;
+    root_console.css): bar ([>] TRANSACTIONS), // SUPPLY // tiles (total,
+    halving, both pools against their totals, mined, awarded, burned,
+    redeemed), // ABUSE FLAGS // (registration IPs behind more than one
+    active rig — only when any), // CACHES //, // MINING RIGS //, the
+    newest 100 // TRANSACTIONS // (time · hash · TYPE · from · to ·
+    amount · memo), destinations, the > prompt. Data ledgers: no row
+    opens anything here. Assigns: @supply, @caches, @active_rigs,
+    @recent_transactions, @flagged_ips. %>
+<% content_for :title, "/root/grid_economy :: ECONOMY" %>
+<% caches = @caches.to_a %>
+<% rigs = @active_rigs.to_a %>
+<% transactions = @recent_transactions.to_a %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ECONOMY", sub: "ROOT · SYSTEMS · /root/grid_economy"} do %>
+    <%= link_to "[>] TRANSACTIONS", admin_grid_transactions_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
+  <div class="console-rule"><span>// SUPPLY //</span></div>
+  <div class="rc-stats">
+    <div class="rc-stat"><span class="rc-stat-key">TOTAL SUPPLY</span><span class="rc-stat-val"><%= format_cred(@supply[:total]) %></span><span class="rc-stat-key">CRED</span></div>
+    <div class="rc-stat"><span class="rc-stat-key">HALVING</span><span class="rc-stat-val"><%= @supply[:halving_factor] %>x</span></div>
+    <div class="rc-stat"><span class="rc-stat-key">MINING POOL</span><span class="rc-stat-val rc-on"><%= format_cred(@supply[:mining_pool_balance]) %></span><span class="rc-stat-key">OF <%= format_cred(@supply[:mining_pool_total]) %></span></div>
+    <div class="rc-stat"><span class="rc-stat-key">MINED</span><span class="rc-stat-val"><%= format_cred(@supply[:mining_pool_mined]) %></span></div>
+    <div class="rc-stat"><span class="rc-stat-key">GAMEPLAY POOL</span><span class="rc-stat-val rc-on"><%= format_cred(@supply[:gameplay_pool_balance]) %></span><span class="rc-stat-key">OF <%= format_cred(@supply[:gameplay_pool_total]) %></span></div>
+    <div class="rc-stat"><span class="rc-stat-key">AWARDED</span><span class="rc-stat-val"><%= format_cred(@supply[:gameplay_awarded]) %></span></div>
+    <div class="rc-stat"><span class="rc-stat-key">BURNED</span><span class="rc-stat-val rc-bad"><%= format_cred(@supply[:total_burned]) %></span></div>
+    <div class="rc-stat"><span class="rc-stat-key">REDEEMED</span><span class="rc-stat-val rc-violet"><%= format_cred(@supply[:total_redeemed]) %></span></div>
+  </div>
 
-      <!-- Supply Overview -->
-      <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: SUPPLY OVERVIEW ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-          <table style="width: 100%; font-family: monospace;">
-            <tr>
-              <td style="color: #fbbf24; padding: 4px 10px;">Total Supply:</td>
-              <td class="white-text"><%= format_cred(@supply[:total]) %> CRED</td>
-              <td style="color: #fbbf24; padding: 4px 10px;">Halving Factor:</td>
-              <td class="white-text"><%= @supply[:halving_factor] %>x</td>
-            </tr>
-            <tr>
-              <td style="color: #fbbf24; padding: 4px 10px;">Mining Pool:</td>
-              <td class="green-255-text"><%= format_cred(@supply[:mining_pool_balance]) %> <span style="color: #666;">/ <%= format_cred(@supply[:mining_pool_total]) %></span></td>
-              <td style="color: #fbbf24; padding: 4px 10px;">Total Mined:</td>
-              <td class="white-text"><%= format_cred(@supply[:mining_pool_mined]) %></td>
-            </tr>
-            <tr>
-              <td style="color: #fbbf24; padding: 4px 10px;">Gameplay Pool:</td>
-              <td class="green-255-text"><%= format_cred(@supply[:gameplay_pool_balance]) %> <span style="color: #666;">/ <%= format_cred(@supply[:gameplay_pool_total]) %></span></td>
-              <td style="color: #fbbf24; padding: 4px 10px;">Gameplay Awarded:</td>
-              <td class="white-text"><%= format_cred(@supply[:gameplay_awarded]) %></td>
-            </tr>
-            <tr>
-              <td style="color: #fbbf24; padding: 4px 10px;">Total Burned:</td>
-              <td class="red-255-text"><%= format_cred(@supply[:total_burned]) %></td>
-              <td style="color: #fbbf24; padding: 4px 10px;">Total Redeemed:</td>
-              <td class="purple-168-text"><%= format_cred(@supply[:total_redeemed]) %></td>
-            </tr>
-          </table>
-        <% end %>
+  <% if @flagged_ips.any? %>
+    <section class="console-section rc-ledger rc-ledger--abuse" aria-label="Abuse flags">
+      <div class="console-rule"><span>// ABUSE FLAGS · <%= @flagged_ips.size %> //</span></div>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>REGISTRATION IP</span><span class="rc-cell--r">ACTIVE RIGS</span>
       </div>
-
-      <% if @flagged_ips.any? %>
-        <!-- Anti-Abuse Flags -->
-        <div style="margin-bottom: 40px;">
-          <h3 class="red-255-text" style="margin-bottom: 15px;">[:: ANTI-ABUSE FLAGS ::]</h3>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Registration IP</th>
-                  <th style="text-align: center;">Active Rigs</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @flagged_ips.each do |ip, count| %>
-                  <tr>
-                    <td style="font-family: monospace;"><%= ip %></td>
-                    <td style="text-align: center;" class="red-255-text"><%= count %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
+      <% @flagged_ips.each do |ip, count| %>
+        <div class="rc-row">
+          <span><%= ip %></span>
+          <span class="rc-cell rc-cell--r rc-bad"><%= count %></span>
         </div>
       <% end %>
+    </section>
+  <% end %>
 
-      <!-- All Caches -->
-      <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: CACHES (<%= @caches.count %>) ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Address</th>
-                <th style="text-align: left;">Owner</th>
-                <th style="text-align: left;">Nickname</th>
-                <th style="text-align: right;">Balance</th>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: center;">Type</th>
-                <th style="text-align: center;">Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @caches.each do |cache| %>
-                <tr>
-                  <td style="font-family: monospace;"><%= cache.address %></td>
-                  <td>
-                    <% if cache.system? %>
-                      <span style="color: #888;">[SYSTEM]</span>
-                    <% else %>
-                      <%= cache.grid_hackr&.hackr_alias || "—" %>
-                    <% end %>
-                  </td>
-                  <td style="color: #a78bfa;"><%= cache.nickname || "—" %></td>
-                  <td style="text-align: right; font-family: monospace;" class="green-255-text"><%= format_cred(cache.balance) %></td>
-                  <td style="text-align: center;">
-                    <% if cache.active? %>
-                      <span class="green-255-text">active</span>
-                    <% else %>
-                      <span style="color: #666;">abandoned</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; color: #888;"><%= cache.system_type || "player" %></td>
-                  <td style="text-align: center; color: #666;"><%= cache.created_at.strftime("%Y-%m-%d") %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
+  <section class="console-section rc-ledger rc-ledger--caches" aria-label="Caches">
+    <div class="console-rule"><span>// CACHES · <%= caches.size %> //</span></div>
+    <% if caches.empty? %>
+      <%= render "admin/console/empty", text: "NO CACHES ON RECORD", hint: "rails data:economy seeds the system caches" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>ADDRESS</span><span>OWNER</span><span>NICKNAME</span><span class="rc-cell--r">BALANCE</span><span>STATUS</span><span>TYPE</span><span>CREATED</span>
       </div>
+    <% end %>
+    <% caches.each do |cache| %>
+      <div class="rc-row">
+        <span class="rc-cell"><%= cache.address %></span>
+        <span class="rc-cell <%= "rc-off" if cache.system? %>"><%= cache.system? ? "[SYSTEM]" : (cache.grid_hackr&.hackr_alias || "—") %></span>
+        <span class="rc-cell rc-violet"><%= cache.nickname || "—" %></span>
+        <span class="rc-cell rc-cell--r rc-on"><%= format_cred(cache.balance) %></span>
+        <span class="rc-cell <%= cache.active? ? "rc-on" : "rc-off" %>"><%= cache.active? ? "ACTIVE" : "ABANDONED" %></span>
+        <span class="rc-cell"><%= (cache.system_type || "player").upcase %></span>
+        <span class="rc-cell"><%= cache.created_at.strftime("%Y-%m-%d") %></span>
+      </div>
+    <% end %>
+  </section>
 
-      <!-- Active Mining Rigs -->
-      <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ACTIVE MINING RIGS (<%= @active_rigs.count %>) ::]</h3>
-        <% if @active_rigs.any? %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Hackr</th>
-                  <th style="text-align: center;">Rate</th>
-                  <th style="text-align: center;">Multiplier</th>
-                  <th style="text-align: center;">Components</th>
-                  <th style="text-align: center;">Last Tick</th>
-                  <th style="text-align: center;">Reg IP</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @active_rigs.each do |rig| %>
-                  <tr>
-                    <td><%= rig.grid_hackr.hackr_alias %></td>
-                    <td style="text-align: center; font-family: monospace;" class="green-255-text"><%= rig.effective_rate %></td>
-                    <td style="text-align: center; font-family: monospace;">×<%= rig.total_multiplier %></td>
-                    <td style="text-align: center;"><%= rig.components.count %></td>
-                    <td style="text-align: center; color: #666;"><%= rig.last_tick_at&.strftime("%Y-%m-%d %H:%M") || "—" %></td>
-                    <td style="text-align: center; color: #666; font-family: monospace;"><%= rig.grid_hackr.registration_ip || "—" %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        <% else %>
-          <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-            <p style="color: #666;">No active mining rigs</p>
-          </div>
-        <% end %>
+  <section class="console-section rc-ledger rc-ledger--rigs" aria-label="Active mining rigs">
+    <div class="console-rule"><span>// MINING RIGS · <%= rigs.size %> ACTIVE //</span></div>
+    <% if rigs.empty? %>
+      <%= render "admin/console/empty", text: "NO ACTIVE MINING RIGS" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>HACKR</span><span class="rc-cell--r">RATE</span><span class="rc-cell--r">MULT</span><span class="rc-cell--r">PARTS</span><span>LAST TICK</span><span>REG IP</span>
       </div>
+    <% end %>
+    <% rigs.each do |rig| %>
+      <div class="rc-row">
+        <span class="rc-hot"><%= rig.grid_hackr.hackr_alias %></span>
+        <span class="rc-cell rc-cell--r rc-on"><%= rig.effective_rate %></span>
+        <span class="rc-cell rc-cell--r">x<%= rig.total_multiplier %></span>
+        <span class="rc-cell rc-cell--r"><%= rig.components.count %></span>
+        <span class="rc-cell"><%= rig.last_tick_at&.strftime("%Y-%m-%d %H:%M") || "—" %></span>
+        <span class="rc-cell"><%= rig.grid_hackr.registration_ip || "—" %></span>
+      </div>
+    <% end %>
+  </section>
 
-      <!-- Recent Transactions -->
-      <div style="margin-bottom: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">
-          [:: RECENT TRANSACTIONS (Last 100) ::]
-          <span style="float: right;">
-            <%= tui_button "View All →", admin_grid_transactions_path, color: :green, style: "padding: 4px 12px; font-size: 0.8em;" %>
-          </span>
-        </h3>
-        <% if @recent_transactions.any? %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Hash</th>
-                  <th style="text-align: left;">Type</th>
-                  <th style="text-align: left;">From</th>
-                  <th style="text-align: left;">To</th>
-                  <th style="text-align: right;">Amount</th>
-                  <th style="text-align: left;">Memo</th>
-                  <th style="text-align: center;">Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @recent_transactions.each do |tx| %>
-                  <tr>
-                    <td style="font-family: monospace; color: #666;"><%= tx.short_hash %></td>
-                    <td>
-                      <% color = case tx.tx_type
-                        when "transfer" then "#d0d0d0"
-                        when "mining_reward" then "#00ff00"
-                        when "gameplay_reward" then "#fbbf24"
-                        when "burn" then "#ff0000"
-                        when "redemption" then "#a78bfa"
-                        when "genesis" then "#00ffff"
-                        else "#888"
-                      end %>
-                      <span style="color: <%= color %>;"><%= tx.tx_type.upcase %></span>
-                    </td>
-                    <td style="font-family: monospace; font-size: 0.85em;"><%= tx.from_cache.address %></td>
-                    <td style="font-family: monospace; font-size: 0.85em;"><%= tx.to_cache.address %></td>
-                    <td style="text-align: right; font-family: monospace;" class="green-255-text"><%= format_cred(tx.amount) %></td>
-                    <td style="color: #888; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= tx.memo || "—" %></td>
-                    <td style="text-align: center; color: #666;"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        <% else %>
-          <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-            <p style="color: #666;">No transactions yet. Run <code>rails data:economy</code> to seed genesis.</p>
-          </div>
-        <% end %>
+  <section class="console-section rc-ledger rc-ledger--tx" aria-label="Recent transactions">
+    <div class="console-rule"><span>// TRANSACTIONS · NEWEST 100 //</span></div>
+    <% if transactions.empty? %>
+      <%= render "admin/console/empty", text: "NO TRANSACTIONS YET", hint: "rails data:economy seeds genesis" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>TIME</span><span>HASH</span><span>TYPE</span><span>FROM</span><span>TO</span><span class="rc-cell--r">AMOUNT</span><span>MEMO</span>
       </div>
-
-      <!-- Navigation -->
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Grid Dashboard", admin_grid_path, color: :green %>
-        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
+    <% end %>
+    <% transactions.each do |tx| %>
+      <div class="rc-row">
+        <span class="console-tag"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+        <span class="rc-cell rc-off"><%= tx.short_hash %></span>
+        <%= render "admin/grid_transactions/tx_type", tx: tx %>
+        <span class="rc-cell"><%= tx.from_cache.address %></span>
+        <span class="rc-cell"><%= tx.to_cache.address %></span>
+        <span class="rc-cell rc-cell--r rc-on"><%= format_cred(tx.amount) %></span>
+        <span class="rc-cell rc-off" title="<%= tx.memo %>"><%= tx.memo || "—" %></span>
       </div>
+    <% end %>
+    <div class="rc-actions">
+      <%= link_to "[>] EVERY TRANSACTION", admin_grid_transactions_path, class: "rc-btn" %>
     </div>
-<% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "ECONOMY" %>
+
+  <div class="console-rule"><span>// END OF LEDGER //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "ECONOMY") %>
+</div>

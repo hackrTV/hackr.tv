@@ -8,7 +8,7 @@ class Admin::GridHackrMissionsController < Admin::ApplicationController
       scope = hackr ? scope.where(grid_hackr_id: hackr.id) : GridHackrMission.none
     end
 
-    @status_filter = params[:status]
+    @status_filter = params[:status].presence_in(%w[active completed])
     @hackr_alias_filter = params[:hackr_alias]
     @hackr_missions = scope.limit(200)
   end

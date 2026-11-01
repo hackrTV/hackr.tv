@@ -1,12 +1,54 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/missions/#{@mission.slug} :: EDIT MISSION", variant: :admin, width: 1200) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @mission, url: admin_grid_mission_path(@mission), local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_missions/:slug/edit — the mission as a console screen
+    (2026-11-01; show redirects here). Bar (name · ROOT · MISSION · path;
+    [<] MISSIONS, [>] ARC, [>] GIVER, [HISTORY]), the HACKRS readout,
+    the fields + objectives + rewards (_form), // COMMIT // ([SAVE]
+    [CANCEL] · [DELETE] — refused while a hackr has it active; takes
+    every hackr's progress with it), destinations, the > prompt. URLs
+    carry slug_in_database (a rejected slug edit must not move the
+    form). The delete form is hidden at the end; the pickers and the
+    row removers run from _script after the screen. Assigns: @mission,
+    @mobs, @arcs, @missions_for_prereq, @factions. %>
+<% slug = @mission.slug_in_database %>
+<% name = @mission.name_in_database %>
+<% arc = GridMissionArc.find_by(id: @mission.grid_mission_arc_id_in_database) %>
+<% giver = GridMob.find_by(id: @mission.giver_mob_id_in_database) %>
+<% taken = @mission.grid_hackr_missions %>
+<% content_for :title, "/root/grid_missions/#{slug} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · MISSION · /root/grid_missions/#{slug}"} do %>
+    <%= link_to "[<] MISSIONS", admin_grid_missions_path, class: "console-bar-link" %>
+    <% if arc %><%= link_to "[>] #{arc.name.upcase}", edit_admin_grid_mission_arc_path(arc), class: "console-bar-link" %><% end %>
+    <% if giver %><%= link_to "[>] #{giver.name.upcase}", edit_admin_grid_mob_path(giver), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_mission_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
-        <%= tui_button "← Back to Missions", admin_grid_missions_path, color: :green, style: "padding: 6px 14px;" %>
-        <%= tui_button_to "Delete Mission", admin_grid_mission_path(@mission), method: :delete, color: :red, style: "padding: 6px 14px;", data: { confirm: "Delete mission '#{@mission.name}'? This will also delete all objectives, rewards, and player progress." } %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">HACKRS</span>
+      <span class="console-val"><%= taken.active.count %> active <span class="console-dim">· <%= taken.completed.sum(:turn_in_count) %> turned in · <%= link_to "[>] ASSIGNMENTS", admin_grid_hackr_missions_path, class: "console-link" %></span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with model: @mission, url: admin_grid_mission_path(slug), method: :patch, local: true, id: "mission-form" do |f| %>
+    <%= render "form", f: f, mission: @mission %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE MISSION]</button>
+      <%= link_to "[CANCEL]", admin_grid_missions_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-mission" class="rc-btn rc-btn--danger">[DELETE MISSION]</button>
+      </span>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-mission", admin_grid_mission_path(slug), confirm: "Delete mission '#{name}'? Its objectives, rewards and every hackr's progress go with it.") %>
+  </div>
+</div>
+<%= render "script" %>

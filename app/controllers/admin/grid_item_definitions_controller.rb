@@ -1,3 +1,7 @@
+# /root/grid_item_definitions — the item catalog ledger (?item_type=
+# narrows to a listed type) and the item record as console screens
+# (2026-11-01; root_console.css). The record screen is the edit screen;
+# saves stay on it.
 class Admin::GridItemDefinitionsController < Admin::ApplicationController
   include Admin::Versionable
 
@@ -6,9 +10,9 @@ class Admin::GridItemDefinitionsController < Admin::ApplicationController
   before_action :set_definition, only: %i[edit update destroy]
 
   def index
+    @type_filter = params[:item_type].presence_in(GridItem::ITEM_TYPES)
     scope = GridItemDefinition.all
-    scope = scope.by_item_type(params[:item_type]) if params[:item_type].present? && GridItem::ITEM_TYPES.include?(params[:item_type])
-    @type_filter = params[:item_type]
+    scope = scope.by_item_type(@type_filter) if @type_filter
     @definitions = scope.ordered
   end
 

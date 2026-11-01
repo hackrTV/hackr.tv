@@ -1,65 +1,80 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/hackr_missions :: HACKR MISSION LOG", variant: :admin) do %>
+<%# /root/grid_hackr_missions — missions taken by hackrs as a console
+    ledger (2026-11-01; root_console.css): bar ([>] MISSIONS), ON SCREEN,
+    the STATUS row (ALL / ACTIVE / COMPLETED links, keeping the hackr)
+    and the HACKR filter ([FILTER] / [x] CLEAR), // ASSIGNMENTS //
+    newest 200 ([NN] · mission over slug · HACKR · STATUS · accepted ·
+    completed · turn-ins), destinations, the > prompt (NN opens the
+    assignment's readout). Assigns: @hackr_missions, @status_filter,
+    @hackr_alias_filter. %>
+<% content_for :title, "/root/grid_hackr_missions :: ASSIGNMENTS" %>
+<% assignments = @hackr_missions.to_a %>
+<% numbers = assignments.each_index.map { |i| root_num(i, total: assignments.size) } %>
+<% status = @status_filter.to_s %>
+<% keep = {hackr_alias: @hackr_alias_filter.presence}.compact %>
+<% filtered = status.present? || keep.any? %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "ASSIGNMENTS", sub: "ROOT · SYSTEMS · /root/grid_hackr_missions"} do %>
+    <%= link_to "[>] MISSIONS", admin_grid_missions_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%= form_with url: admin_grid_hackr_missions_path, method: :get, local: true, style: "display: flex; gap: 10px; align-items: center; margin-bottom: 20px;" do %>
-        <label class="white-text" style="font-weight: bold;">STATUS:</label>
-        <%= select_tag :status,
-              options_for_select([["ALL", ""], ["ACTIVE", "active"], ["COMPLETED", "completed"]], @status_filter),
-              class: "tui-input", style: "padding: 4px 8px;", onchange: "this.form.submit()" %>
-        <label class="white-text" style="font-weight: bold; margin-left: 10px;">HACKR:</label>
-        <%= text_field_tag :hackr_alias, @hackr_alias_filter, class: "tui-input", style: "padding: 4px 8px;", placeholder: "hackr alias" %>
-        <%= tui_submit "Filter", color: :green, style: "padding: 4px 12px;" %>
-        <% if @status_filter.present? || @hackr_alias_filter.present? %>
-          <%= tui_button "× clear", admin_grid_hackr_missions_path, style: "padding: 4px 10px; font-size: 0.8em;" %>
-        <% end %>
-      <% end %>
-
-      <% if @hackr_alias_filter.present? && @hackr_missions.empty? %>
-        <p style="color: #fbbf24;">No hackr found with alias '<%= @hackr_alias_filter %>'.</p>
-      <% end %>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-        <table class="tui-table" style="width: 100%;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Hackr</th>
-              <th style="text-align: left;">Mission</th>
-              <th style="text-align: left;">Status</th>
-              <th style="text-align: left;">Accepted</th>
-              <th style="text-align: left;">Completed</th>
-              <th style="text-align: center;">Turn-ins</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @hackr_missions.each do |hm| %>
-              <tr>
-                <td style="color: #a78bfa;"><%= hm.grid_hackr.hackr_alias %></td>
-                <td>
-                  <span class="cyan-255-text"><%= hm.grid_mission.name %></span>
-                  <span style="color: #6b7280; font-family: monospace; margin-left: 6px;"><%= hm.grid_mission.slug %></span>
-                </td>
-                <td>
-                  <% if hm.active? %>
-                    <span style="color: #22d3ee;">ACTIVE</span>
-                  <% else %>
-                    <span class="green-255-text">COMPLETED</span>
-                  <% end %>
-                </td>
-                <td style="color: #9ca3af;"><%= hm.accepted_at.strftime("%Y-%m-%d %H:%M") %></td>
-                <td style="color: #9ca3af;"><%= hm.completed_at&.strftime("%Y-%m-%d %H:%M") || "—" %></td>
-                <td style="text-align: center; color: #fbbf24;"><%= hm.turn_in_count %></td>
-                <td style="text-align: right;">
-                  <%= tui_button "View", admin_grid_hackr_mission_path(hm), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Missions", admin_grid_missions_path, color: :green %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON SCREEN</span>
+      <span class="console-val"><%= pluralize(assignments.size, "assignment") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· newest first · at most 200</span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with url: admin_grid_hackr_missions_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <div class="console-status-row rc-field">
+        <span class="console-key">STATUS</span>
+        <span class="console-val">
+          <% [["ALL", ""], ["ACTIVE", "active"], ["COMPLETED", "completed"]].each do |word, value| %>
+            <%= link_to word, admin_grid_hackr_missions_path(keep.merge(status: value.presence).compact), class: class_names("rc-btn", "rc-btn--on": status == value), aria: {current: status == value && "page"} %>
+          <% end %>
+        </span>
+      </div>
+      <%= root_field("HACKR", id: "hackr_alias") do %>
+        <%= text_field_tag :hackr_alias, @hackr_alias_filter, class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
+      <% end %>
+    </div>
+    <% if status.present? %><%= hidden_field_tag :status, status %><% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_grid_hackr_missions_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--assignments" aria-label="Assignments">
+    <div class="console-rule"><span>// ASSIGNMENTS //</span></div>
+    <% if assignments.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO ASSIGNMENTS MATCH" : "NO MISSIONS TAKEN YET", hint: ("a hackr alias must match exactly · [x] CLEAR shows every assignment" if filtered) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>MISSION</span><span>HACKR</span><span>STATUS</span><span>ACCEPTED</span><span>COMPLETED</span><span class="rc-cell--r">TURN-INS</span>
+      </div>
+    <% end %>
+    <% assignments.each_with_index do |hm, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to hm.grid_mission.name, admin_grid_hackr_mission_path(hm), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= hm.grid_mission.slug %></div>
+        </div>
+        <span class="rc-cell rc-violet"><%= hm.grid_hackr.hackr_alias %></span>
+        <span class="rc-cell <%= hm.active? ? "rc-hot" : "rc-on" %>"><%= hm.status.upcase %></span>
+        <span class="rc-cell"><%= hm.accepted_at.strftime("%Y-%m-%d %H:%M") %></span>
+        <span class="rc-cell"><%= hm.completed_at&.strftime("%Y-%m-%d %H:%M") || "—" %></span>
+        <span class="rc-cell rc-cell--r rc-star"><%= hm.turn_in_count %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "ASSIGNMENTS" %>
+
+  <div class="console-rule"><span>// NEWEST ASSIGNMENTS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "ASSIGNMENTS", numbers: numbers, noun: "an assignment number") %>
+</div>

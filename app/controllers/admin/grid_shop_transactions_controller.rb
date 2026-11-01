@@ -1,3 +1,6 @@
+# /root/grid_shop_transactions — the latest 100 shop purchases and sales
+# as a console ledger (2026-11-01; root_console.css), filtered by hackr,
+# vendor and TYPE (buy / sell; an unknown value reads unfiltered).
 class Admin::GridShopTransactionsController < Admin::ApplicationController
   def index
     @transactions = GridShopTransaction.includes(:grid_hackr, :grid_mob, :grid_shop_listing).recent
@@ -15,9 +18,8 @@ class Admin::GridShopTransactionsController < Admin::ApplicationController
       @hackr_not_found = hackr.nil?
     end
 
-    if params[:transaction_type].present?
-      @transactions = @transactions.where(transaction_type: params[:transaction_type])
-    end
+    @type_filter = params[:transaction_type].presence_in(GridShopTransaction::TRANSACTION_TYPES)
+    @transactions = @transactions.where(transaction_type: @type_filter) if @type_filter
 
     @transactions = @transactions.limit(100)
     @vendors = GridMob.where(mob_type: "vendor").order(:name)

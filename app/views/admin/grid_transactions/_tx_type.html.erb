@@ -1,0 +1,4 @@
+<%# A transaction's TYPE cell, toned by kind (the economy screen's newest
+    transactions, the transactions ledger). Locals: tx. %>
+<% tone = {"mining_reward" => "rc-on", "purchase_recycle" => "rc-on", "gameplay_reward" => "rc-star", "burn" => "rc-bad", "redemption" => "rc-violet", "genesis" => "rc-hot"} %>
+<span class="rc-cell <%= tone[tx.tx_type] %>"><%= tx.tx_type.upcase %></span>

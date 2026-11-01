@@ -1,51 +1,56 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/hackr_missions/#{@hackr_mission.id} :: HACKR MISSION", variant: :admin, width: 1000) do %>
+<%# /root/grid_hackr_missions/:id — one hackr's run at a mission as a
+    console readout (2026-11-01; read-only): bar (#id · ROOT · ASSIGNMENT
+    · path; [<] ASSIGNMENTS, [>] MISSION, [>] HACKR), // ASSIGNMENT //
+    (mission, hackr, status, times, turn-ins), // OBJECTIVES // (each of
+    the mission's objectives: label · TYPE · target · progress / count ·
+    DONE), destinations, the > prompt. Assigns: @hackr_mission. %>
+<% hm = @hackr_mission %>
+<% mission = hm.grid_mission %>
+<% objectives = mission.grid_mission_objectives.to_a %>
+<% progress_by_id = hm.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id) %>
+<% content_for :title, "/root/grid_hackr_missions/#{hm.id} :: ASSIGNMENT" %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ASSIGNMENT ##{hm.id}", sub: "ROOT · ASSIGNMENT · /root/grid_hackr_missions/#{hm.id}"} do %>
+    <%= link_to "[<] ASSIGNMENTS", admin_grid_hackr_missions_path, class: "console-bar-link" %>
+    <%= link_to "[>] MISSION", edit_admin_grid_mission_path(mission), class: "console-bar-link" %>
+    <%= link_to "[>] HACKR", admin_grid_hackr_path(hm.grid_hackr), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <h3 class="cyan-255-text"><%= @hackr_mission.grid_mission.name %></h3>
-      <p style="color: #9ca3af;"><strong>Hackr:</strong> <%= @hackr_mission.grid_hackr.hackr_alias %></p>
-      <p style="color: #9ca3af;"><strong>Status:</strong> <%= @hackr_mission.status.upcase %></p>
-      <p style="color: #9ca3af;"><strong>Accepted:</strong> <%= @hackr_mission.accepted_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
-      <% if @hackr_mission.completed_at %>
-        <p style="color: #9ca3af;"><strong>Completed:</strong> <%= @hackr_mission.completed_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
-      <% end %>
-      <p style="color: #9ca3af;"><strong>Turn-in count:</strong> <%= @hackr_mission.turn_in_count %></p>
+  <div class="console-rule"><span>// ASSIGNMENT //</span></div>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">MISSION</span><span class="console-val"><%= link_to mission.name, edit_admin_grid_mission_path(mission), class: "console-link" %> <span class="console-dim">· <%= mission.slug %></span></span></div>
+    <div class="console-status-row"><span class="console-key">HACKR</span><span class="console-val rc-hot"><%= hm.grid_hackr.hackr_alias %></span></div>
+    <div class="console-status-row"><span class="console-key">STATUS</span><span class="console-val <%= hm.active? ? "rc-hot" : "rc-on" %>"><%= hm.status.upcase %></span></div>
+    <div class="console-status-row"><span class="console-key">ACCEPTED</span><span class="console-val"><%= hm.accepted_at.strftime("%Y-%m-%d %H:%M:%S") %></span></div>
+    <div class="console-status-row"><span class="console-key">COMPLETED</span><span class="console-val"><%= hm.completed_at&.strftime("%Y-%m-%d %H:%M:%S") || "—" %></span></div>
+    <div class="console-status-row"><span class="console-key">TURN-INS</span><span class="console-val"><%= hm.turn_in_count %></span></div>
+  </div>
 
-      <h3 class="cyan-255-text" style="margin-top: 25px;">[:: OBJECTIVES ::]</h3>
-      <table class="tui-table" style="width: 100%; margin-top: 10px;">
-        <thead>
-          <tr>
-            <th style="text-align: left;">Label</th>
-            <th style="text-align: left;">Type</th>
-            <th style="text-align: left;">Target</th>
-            <th style="text-align: center;">Progress</th>
-            <th style="text-align: center;">Completed</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% hobj_by_id = @hackr_mission.grid_hackr_mission_objectives.index_by(&:grid_mission_objective_id) %>
-          <% @hackr_mission.grid_mission.grid_mission_objectives.each do |obj| %>
-            <% hobj = hobj_by_id[obj.id] %>
-            <tr>
-              <td><%= obj.label %></td>
-              <td style="color: #888;"><%= obj.objective_type %></td>
-              <td style="color: #888; font-family: monospace;"><%= obj.target_slug || "—" %></td>
-              <td style="text-align: center; color: #9ca3af;">
-                <%= hobj&.progress.to_i %> / <%= obj.target_count %>
-              </td>
-              <td style="text-align: center;">
-                <% if hobj&.completed_at %>
-                  <span class="green-255-text">✓</span>
-                <% else %>
-                  <span style="color: #444;">–</span>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Hackr Missions", admin_grid_hackr_missions_path, color: :green %>
+  <section class="console-section rc-ledger rc-ledger--objectives" aria-label="Objectives">
+    <div class="console-rule"><span>// OBJECTIVES · <%= objectives.size %> //</span></div>
+    <% if objectives.empty? %>
+      <%= render "admin/console/empty", text: "THE MISSION HAS NO OBJECTIVES" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>OBJECTIVE</span><span>TYPE</span><span>TARGET</span><span class="rc-cell--r">PROGRESS</span><span>DONE</span>
       </div>
-    </div>
-<% end %>
+    <% end %>
+    <% objectives.each_with_index do |objective, i| %>
+      <% progress = progress_by_id[objective.id] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= root_num(i, total: objectives.size) %>]</span>
+        <span><%= objective.label %></span>
+        <span class="rc-cell"><%= objective.objective_type.upcase %></span>
+        <span class="rc-cell rc-off"><%= objective.target_slug || "—" %></span>
+        <span class="rc-cell rc-cell--r"><%= progress&.progress.to_i %> / <%= objective.target_count %></span>
+        <span class="rc-cell <%= progress&.completed_at ? "rc-on" : "rc-off" %>"><%= progress&.completed_at ? "DONE" : "—" %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+</div>

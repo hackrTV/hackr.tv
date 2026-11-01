@@ -1,12 +1,20 @@
+# /root/grid_mission_arcs — the arcs ledger and the arc record (its
+# missions as a ledger, [+] NEW MISSION prefilled) as console screens
+# (2026-11-01; root_console.css). The record screen is the edit screen:
+# show redirects there, saves stay on it.
 class Admin::GridMissionArcsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridMissionArc, find_by: :slug
 
-  before_action :set_arc, only: %i[edit update destroy]
+  before_action :set_arc, only: %i[show edit update destroy]
 
   def index
-    @arcs = GridMissionArc.ordered
+    @arcs = GridMissionArc.ordered.includes(:grid_missions)
+  end
+
+  def show
+    redirect_to edit_admin_grid_mission_arc_path(@arc)
   end
 
   def new
@@ -17,7 +25,7 @@ class Admin::GridMissionArcsController < Admin::ApplicationController
     @arc = GridMissionArc.new(arc_params)
     if @arc.save
       set_flash_success("Mission arc '#{@arc.name}' created.")
-      redirect_to admin_grid_mission_arcs_path
+      redirect_to edit_admin_grid_mission_arc_path(@arc)
     else
       flash.now[:error] = @arc.errors.full_messages.join(", ")
       render :new, status: :unprocessable_entity
@@ -30,7 +38,7 @@ class Admin::GridMissionArcsController < Admin::ApplicationController
   def update
     if @arc.update(arc_params)
       set_flash_success("Mission arc '#{@arc.name}' updated.")
-      redirect_to admin_grid_mission_arcs_path
+      redirect_to edit_admin_grid_mission_arc_path(@arc)
     else
       flash.now[:error] = @arc.errors.full_messages.join(", ")
       render :edit, status: :unprocessable_entity

@@ -1,0 +1,49 @@
+<%# The schematic record's script, rendered after the screen: the
+    ingredient rows of grid_schematics/_form — [+] ADD INGREDIENT clones
+    #ingredient-row-template into #ingredients-table under a fresh
+    nested-attributes index, [x] removes a new row or flags a saved one
+    _destroy and hides it. Assigns: @schematic, @all_definitions. %>
+<template id="ingredient-row-template">
+  <div class="rc-row">
+    <span><input type="number" name="grid_schematic[ingredients_attributes][__INDEX__][position]" class="rc-input" min="0" value="0" aria-label="Position"></span>
+    <span>
+      <select name="grid_schematic[ingredients_attributes][__INDEX__][input_definition_id]" class="rc-select" aria-label="Input item">
+        <option value="">— select input —</option>
+        <% @all_definitions.each do |d| %>
+          <option value="<%= d.id %>"><%= d.name %> [<%= d.rarity_label %>]</option>
+        <% end %>
+      </select>
+    </span>
+    <span><input type="number" name="grid_schematic[ingredients_attributes][__INDEX__][quantity]" class="rc-input rc-input--r" min="1" value="1" aria-label="Quantity"></span>
+    <span class="rc-links"><button type="button" class="rc-btn rc-btn--danger ingredient-destroy-btn" aria-label="Remove ingredient">[x]</button></span>
+  </div>
+</template>
+
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    var ingredientRowIndex = <%= @schematic.ingredients.size + 1000 %>;
+    var table = document.getElementById('ingredients-table');
+
+    table.addEventListener('click', function(e) {
+      var btn = e.target.closest('.ingredient-destroy-btn');
+      if (!btn) return;
+      var row = btn.closest('.rc-row');
+      if (btn.dataset.persisted) {
+        row.querySelector('.destroy-flag').value = '1';
+        row.hidden = true;
+      } else {
+        row.remove();
+      }
+    });
+
+    document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+      var template = document.getElementById('ingredient-row-template');
+      var clone = template.content.cloneNode(true);
+      clone.querySelectorAll('[name]').forEach(function(el) {
+        el.name = el.name.replace('__INDEX__', ingredientRowIndex);
+      });
+      table.appendChild(clone);
+      ingredientRowIndex++;
+    });
+  })();
+</script>

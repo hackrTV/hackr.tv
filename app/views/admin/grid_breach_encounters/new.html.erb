@@ -1,12 +1,23 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/breach_encounters/new :: PLACE ENCOUNTER", variant: :admin, width: 900) do %>
+<%# /root/grid_breach_encounters/new — a new encounter on the record
+    screen's shell (?grid_breach_template_id= prefills the template — the
+    template record's [+] NEW ENCOUNTER). %>
+<% content_for :title, "/root/grid_breach_encounters/new :: NEW ENCOUNTER" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW ENCOUNTER", sub: "ROOT · ENCOUNTER · /root/grid_breach_encounters/new"} do %>
+    <%= link_to "[<] ENCOUNTERS", admin_grid_breach_encounters_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= render "form", encounter: @encounter %>
+  <%= form_with model: @encounter, url: admin_grid_breach_encounters_path, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[PLACE ENCOUNTER]</button>
+      <%= link_to "[CANCEL]", admin_grid_breach_encounters_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+</div>
