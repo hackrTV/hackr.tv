@@ -1,9 +1,17 @@
+# /root/hackr_streams — the streams ledger and the stream record as
+# console screens (2026-10-31; root_console.css). The record screen is
+# the edit screen (show redirects there); GO LIVE / END / CANCEL stay on
+# the ledger's rows.
 class Admin::HackrStreamsController < Admin::ApplicationController
-  before_action :set_stream, only: [:edit, :update, :destroy, :go_live, :end_stream, :cancel]
+  before_action :set_stream, only: [:show, :edit, :update, :destroy, :go_live, :end_stream, :cancel]
 
   def index
     @hackr_streams = HackrStream.includes(:artist).recent
     @current_live = HackrStream.current_live
+  end
+
+  def show
+    redirect_to edit_admin_hackr_stream_path(@hackr_stream)
   end
 
   def new
@@ -16,7 +24,7 @@ class Admin::HackrStreamsController < Admin::ApplicationController
 
     if @hackr_stream.save
       set_flash_success("Stream created successfully!")
-      redirect_to admin_hackr_streams_path
+      redirect_to edit_admin_hackr_stream_path(@hackr_stream)
     else
       @artists = Artist.order(:name)
       flash.now[:error] = "Failed to create stream: #{@hackr_stream.errors.full_messages.join(", ")}"
@@ -29,17 +37,20 @@ class Admin::HackrStreamsController < Admin::ApplicationController
   end
 
   def update
-    update_params = hackr_stream_params
-    # Auto-clear cancellation only when scheduled_at actually changes (not just resubmitted)
+    previous_schedule = @hackr_stream.scheduled_at
+    @hackr_stream.assign_attributes(hackr_stream_params)
+    # Auto-clear cancellation only when scheduled_at actually changes (the
+    # datetime-local field resubmits the stored time on every save) —
+    # compared as times to the second, never as strings.
     if @hackr_stream.cancelled_at.present? &&
-        update_params[:scheduled_at].present? &&
-        update_params[:scheduled_at].to_s != @hackr_stream.scheduled_at&.to_fs(:db)
-      update_params[:cancelled_at] = nil
+        @hackr_stream.scheduled_at.present? &&
+        @hackr_stream.scheduled_at.to_i != previous_schedule.to_i
+      @hackr_stream.cancelled_at = nil
     end
 
-    if @hackr_stream.update(update_params)
+    if @hackr_stream.save
       set_flash_success("Stream updated successfully!")
-      redirect_to admin_hackr_streams_path
+      redirect_to edit_admin_hackr_stream_path(@hackr_stream)
     else
       @artists = Artist.order(:name)
       flash.now[:error] = "Failed to update stream: #{@hackr_stream.errors.full_messages.join(", ")}"

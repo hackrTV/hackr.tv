@@ -1,10 +1,21 @@
-<%= render TuiWindowComponent.new(title: "/root/redirects/new :: NEW REDIRECT", variant: :admin, width: 800) do %>
+<%# /root/redirects/new — a new redirect on the record screen's shell. %>
+<% content_for :title, "/root/redirects/new :: NEW REDIRECT" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW REDIRECT", sub: "ROOT · REDIRECT · /root/redirects/new"} do %>
+    <%= link_to "[<] REDIRECTS", admin_redirects_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <div style="margin-bottom: 20px;">
-        <%= tui_button "← All Redirects", admin_redirects_path, color: :green, style: "padding: 8px 20px;" %>
-      </div>
-
-      <%= render "form", redirect: @redirect %>
+  <%= form_with model: @redirect, url: admin_redirects_path, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE REDIRECT]</button>
+      <%= link_to "[CANCEL]", admin_redirects_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content) %>
+</div>

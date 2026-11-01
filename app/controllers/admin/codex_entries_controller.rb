@@ -1,15 +1,22 @@
+# /root/codex_entries — the codex ledger and the entry record as console
+# screens (2026-10-31; root_console.css). The record screen is the edit
+# screen: show redirects there.
 class Admin::CodexEntriesController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable CodexEntry, find_by: :slug
 
-  before_action :set_entry, only: %i[edit update destroy]
+  before_action :set_entry, only: %i[show edit update destroy]
 
   def index
+    @type_filter = params[:entry_type].presence_in(CodexEntry::ENTRY_TYPES)
     scope = CodexEntry.ordered
-    scope = scope.by_type(params[:entry_type]) if params[:entry_type].present? && CodexEntry::ENTRY_TYPES.include?(params[:entry_type])
-    @type_filter = params[:entry_type]
+    scope = scope.by_type(@type_filter) if @type_filter
     @entries = scope
+  end
+
+  def show
+    redirect_to edit_admin_codex_entry_path(@entry)
   end
 
   def new
@@ -30,7 +37,7 @@ class Admin::CodexEntriesController < Admin::ApplicationController
 
     if @entry.save
       set_flash_success("Codex entry '#{@entry.name}' created.")
-      redirect_to admin_codex_entries_path
+      redirect_to edit_admin_codex_entry_path(@entry)
     else
       flash.now[:error] = @entry.errors.full_messages.join(", ")
       render :new, status: :unprocessable_entity
@@ -53,7 +60,7 @@ class Admin::CodexEntriesController < Admin::ApplicationController
 
     if @entry.update(attrs)
       set_flash_success("Codex entry '#{@entry.name}' updated.")
-      redirect_to admin_codex_entries_path
+      redirect_to edit_admin_codex_entry_path(@entry)
     else
       flash.now[:error] = @entry.errors.full_messages.join(", ")
       render :edit, status: :unprocessable_entity

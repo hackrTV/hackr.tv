@@ -1,12 +1,22 @@
-<%= render TuiWindowComponent.new(title: "/root/handbook/sections :: NEW SECTION", variant: :admin, width: 1000) do %>
+<%# /root/handbook_sections/new — a new handbook section on the record
+    screen's shell. %>
+<% content_for :title, "/root/handbook_sections/new :: NEW SECTION" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW SECTION", sub: "ROOT · SECTION · /root/handbook_sections/new"} do %>
+    <%= link_to "[<] SECTIONS", admin_handbook_sections_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%= render "form", section: @section %>
+  <%= form_with model: @section, url: admin_handbook_sections_path, local: true do |f| %>
+    <%= render "form", f: f, section: @section %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE SECTION]</button>
+      <%= link_to "[CANCEL]", admin_handbook_sections_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content) %>
+</div>

@@ -84,12 +84,18 @@ what you touch.
 
 ## Steps — radio
 
-15. Radio (destinations `[RADIO]` or Music → Radio) → stations index with
-    playlists (still the table layout). Edit a station's playlist
-    assignment; verify `/fm/radio` reflects it; restore.
-16. Redirects (Meta → Redirects): create a test redirect, hit the source
-    path in the public site → lands on the target; delete the test
-    redirect.
+15. Radio (destinations `[RADIO]` or Music → Radio) → the `RADIO`
+    console ledger in dial order (ON THE DIAL / HIDDEN, playlist counts)
+    with a SOURCE row: stations are YAML-seeded and read-only here.
+    Type a station's number. → Its readout with `// PLAYLISTS //` in
+    rotation order; the same playlists play on `/fm/radio`. Zone
+    playlists (`[PLAYLISTS]`) read the same way, tracks in play order,
+    each opening its track record.
+16. Redirects (Meta → Redirects): the `REDIRECTS` ledger (FILTER over
+    domain / path / destination). Create a test redirect. → Its record
+    opens, `[OK] Redirect created: /src > /dest`. Hit the source path in
+    the public site → lands on the target. `[DELETE REDIRECT]` →
+    confirm.
 
 ## Cleanup
 

@@ -1,32 +1,9 @@
-<%# Flash Messages %>
-<% if flash[:error] %>
-  <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-    <p class="red-255-text">⚠ ERROR</p>
-    <p class="white-text"><%= flash[:error] %></p>
-  </div>
-<% end %>
-
-<%= form_with model: [:admin, redirect], local: true do |f| %>
-  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: REDIRECT INFO ::]</h3>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_text_field :path, placeholder: "/old-path", hint: "The incoming path to match (e.g. /old-page)" %>
-  </div>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_text_field :destination_url, placeholder: "/new-path or https://example.com/page", label: "DESTINATION", hint: "Where to redirect to (path or full URL)" %>
-  </div>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_text_field :domain, style: "max-width: 400px;", placeholder: "hackr.tv", hint: "Optional. Leave blank for all domains." %>
-  </div>
-
-  <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= tui_submit redirect.persisted? ? "Save Redirect" : "Create Redirect", form: f,
-        color: :purple,
-        style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= tui_button "Cancel", admin_redirects_path,
-        color: :grey,
-        style: "padding: 10px 30px; font-size: 1.1em;" %>
-  </div>
-<% end %>
+<%# The redirect record's fields as console status rows
+    (ConsoleFormBuilder rc_* rows). The commit row belongs to the caller.
+    Locals: f. %>
+<div class="console-status">
+  <%= f.rc_text_field :path, required: true, autocomplete: "off", placeholder: "/old-path", hint: "the incoming path to match" %>
+  <%= f.rc_text_field :destination_url, label: "DESTINATION", required: true, autocomplete: "off", width: :wide,
+    placeholder: "/new-path or https://example.com/page", hint: "a path or a full URL" %>
+  <%= f.rc_text_field :domain, autocomplete: "off", placeholder: "hackr.tv", hint: "blank = every domain" %>
+</div>

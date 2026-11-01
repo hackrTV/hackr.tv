@@ -1,8 +1,21 @@
-<%= render TuiWindowComponent.new(title: "/root/streams/new :: CREATE STREAM", variant: :admin, width: 900) do %>
+<%# /root/hackr_streams/new — a new stream on the record screen's shell. %>
+<% content_for :title, "/root/hackr_streams/new :: NEW STREAM" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW STREAM", sub: "ROOT · STREAM · /root/hackr_streams/new"} do %>
+    <%= link_to "[<] STREAMS", admin_hackr_streams_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%= tui_button "← Back to Streams", admin_hackr_streams_path, color: :green, style: "padding: 8px 20px; margin-bottom: 20px; display: inline-block;" %>
-
-      <%= render "form", hackr_stream: @hackr_stream %>
+  <%= form_with model: [:admin, @hackr_stream], local: true do |f| %>
+    <%= render "form", f: f, hackr_stream: @hackr_stream %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE STREAM]</button>
+      <%= link_to "[CANCEL]", admin_hackr_streams_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :streams %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams) %>
+</div>

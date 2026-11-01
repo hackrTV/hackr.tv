@@ -1,177 +1,72 @@
-<%= render TuiWindowComponent.new(title: "/root/streams :: MANAGE LIVESTREAMS", variant: :admin, width: 1600) do %>
+<%# /root/hackr_streams — the streams ledger as a console screen
+    (2026-10-31; root_console.css): bar (LIVE badge while a stream is
+    on), LIVE NOW + ON RECORD rows, // STREAMS // rows newest first ([NN]
+    · artist over title / started / ended / URL · scheduled · state ·
+    [GO LIVE] / [END] / [CANCEL] as the state allows · [EDIT]),
+    destinations, the > prompt (NN opens the record screen; deletes live
+    there). Assigns: @hackr_streams, @current_live. %>
+<% content_for :title, "/root/hackr_streams :: STREAMS" %>
+<% streams = @hackr_streams.to_a %>
+<% numbers = streams.each_index.map { |i| root_num(i, total: streams.size) } %>
+<% fmt = "%Y-%m-%d %H:%M" %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "STREAMS", sub: "ROOT · STREAMS · /root/hackr_streams"} do %>
+    <% if @current_live %><%= root_badge("ON AIR", :live) %><% end %>
+    <%= link_to "[+] NEW STREAM", new_admin_hackr_stream_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] SCHEDULE", streams_schedule_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Current Live Stream Status -->
-      <% if @current_live %>
-        <div style="background: #001a00; border: 2px solid #00ff00; padding: 20px; margin: 20px 0;">
-          <p class="green-255-text" style="font-size: 1.5em; margin-bottom: 10px;">⚡ LIVE NOW</p>
-          <p class="white-text"><strong><%= @current_live.artist.name %></strong></p>
-          <% if @current_live.title.present? %>
-            <p class="white-text"><%= @current_live.title %></p>
-          <% end %>
-          <p style="color: #888; margin-top: 10px;">
-            Started: <%= @current_live.started_at.strftime("%Y-%m-%d %H:%M") %>
-          </p>
-        </div>
-      <% else %>
-        <div style="background: #1a1a1a; border: 2px solid #444; padding: 20px; margin: 20px 0;">
-          <p style="color: #888; font-size: 1.2em;">⚫ No active livestream</p>
-        </div>
-      <% end %>
-
-      <!-- Actions -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <div style="margin-left: auto; display: flex; gap: 10px;">
-          <%= tui_button "➕ New Stream", new_admin_hackr_stream_path, color: :purple, style: "padding: 8px 20px;" %>
-        </div>
-      </div>
-
-      <!-- Streams Table -->
-      <% if @hackr_streams.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Artist</th>
-                <th style="text-align: left;">Title</th>
-                <th style="text-align: left;">Scheduled</th>
-                <th style="text-align: left;">Live URL</th>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: center;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @hackr_streams.each do |stream| %>
-                <tr class="admin-table-row">
-                  <td>
-                    <strong class="cyan-255-text"><%= stream.artist.name %></strong>
-                  </td>
-                  <td>
-                    <%= stream.title.presence || "—" %>
-                    <% if stream.started_at.present? %>
-                      <br>
-                      <small style="color: #666;">
-                        Started: <%= stream.started_at.strftime("%Y-%m-%d %H:%M") %>
-                      </small>
-                    <% end %>
-                    <% if stream.ended_at.present? %>
-                      <br>
-                      <small style="color: #666;">
-                        Ended: <%= stream.ended_at.strftime("%Y-%m-%d %H:%M") %>
-                      </small>
-                    <% end %>
-                  </td>
-                  <td>
-                    <% if stream.scheduled_at.present? %>
-                      <small style="color: #00d9ff;">
-                        <%= stream.scheduled_at.strftime("%Y-%m-%d %H:%M") %>
-                      </small>
-                    <% else %>
-                      <span style="color: #666;">—</span>
-                    <% end %>
-                  </td>
-                  <td>
-                    <% if stream.live_url.present? %>
-                      <small style="color: #888; font-family: monospace; word-break: break-all;">
-                        <%= truncate(stream.live_url, length: 40) %>
-                      </small>
-                    <% else %>
-                      <span style="color: #666;">—</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% case stream.display_state %>
-                    <% when :live %>
-                      <span class="green-255-text" style="font-weight: bold;">⚡ LIVE</span>
-                    <% when :upcoming %>
-                      <span style="color: #00d9ff; font-weight: bold;">📅 SCHEDULED</span>
-                    <% when :starting_soon %>
-                      <span style="color: #f59e0b; font-weight: bold;">⏳ STARTING SOON</span>
-                    <% when :cancelled %>
-                      <span style="color: #ff4444;">✗ CANCELLED</span>
-                    <% when :expired %>
-                      <span style="color: #888;">⏰ EXPIRED</span>
-                    <% when :ended %>
-                      <span style="color: #666;">✓ Ended</span>
-                    <% else %>
-                      <span style="color: #666;">⚫ Offline</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center;">
-                    <div style="display: flex; gap: 5px; justify-content: center; white-space: nowrap;">
-                      <% if stream.is_live %>
-                        <%= tui_button_to "⏸ End Stream", end_stream_admin_hackr_stream_path(stream),
-                            color: :orange,
-                            style: "padding: 2px 10px; font-size: 0.9em;",
-                            form: { style: "display: contents;" },
-                            data: { confirm: "End this livestream?" } %>
-                      <% elsif stream.ended_at.present? %>
-                        <span class="tui-button grey-168"
-                              style="padding: 2px 10px; font-size: 0.9em; opacity: 0.5; cursor: not-allowed;"
-                              title="Stream already finished. Create a new stream to go live again.">
-                          ✓ Finished
-                        </span>
-                      <% elsif stream.cancelled_at.present? %>
-                        <span class="tui-button grey-168"
-                              style="padding: 2px 10px; font-size: 0.9em; opacity: 0.5; cursor: not-allowed;">
-                          ✗ Cancelled
-                        </span>
-                      <% elsif stream.live_url.present? %>
-                        <%= tui_button_to "▶ Go Live", go_live_admin_hackr_stream_path(stream),
-                            color: :green,
-                            style: "padding: 2px 10px; font-size: 0.9em;",
-                            form: { style: "display: contents;" },
-                            data: { confirm: "Start livestream for #{stream.artist.name}?" } %>
-                      <% else %>
-                        <span class="tui-button grey-168"
-                              style="padding: 2px 10px; font-size: 0.9em; opacity: 0.5; cursor: not-allowed;"
-                              title="Set stream URL first">
-                          ▶ Go Live
-                        </span>
-                      <% end %>
-                      <% if stream.scheduled_at.present? && stream.cancelled_at.nil? && !stream.is_live? && stream.ended_at.nil? %>
-                        <%= tui_button_to "✗ Cancel", cancel_admin_hackr_stream_path(stream),
-                            color: :orange,
-                            style: "padding: 2px 10px; font-size: 0.9em;",
-                            form: { style: "display: contents;" },
-                            data: { confirm: "Cancel scheduled stream?" } %>
-                      <% end %>
-                      <%= tui_button "✎ Edit", edit_admin_hackr_stream_path(stream),
-                          color: :cyan,
-                          style: "padding: 2px 10px; font-size: 0.9em;" %>
-                      <%= tui_button_to "✗ Delete", admin_hackr_stream_path(stream),
-                          method: :delete,
-                          form: { style: "display: contents;" },
-                          data: { confirm: "Delete stream for #{stream.artist.name}?" },
-                          color: :red,
-                          style: "padding: 2px 10px; font-size: 0.9em;" %>
-                    </div>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">LIVE NOW</span>
+      <span class="console-val">
+        <% if @current_live %>
+          <span class="rc-on"><%= @current_live.artist.name %></span><% if @current_live.title.present? %> · <%= @current_live.title %><% end %>
+          <span class="console-dim">· since <%= @current_live.started_at&.strftime(fmt) %></span>
+        <% else %>
+          <span class="rc-off">NO ACTIVE LIVESTREAM</span>
         <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No streams configured yet. Create your first one!</p>
-        </div>
-      <% end %>
+      </span>
     </div>
-<% end %>
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(streams.size, "stream") %> <span class="console-dim">· <%= streams.count { |s| %i[upcoming starting_soon].include?(s.display_state) } %> scheduled · <%= streams.count(&:vod?) %> with a VOD</span></span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--streams" aria-label="Streams">
+    <div class="console-rule"><span>// STREAMS //</span></div>
+    <% if streams.empty? %>
+      <%= render "admin/console/empty", text: "NO STREAMS ON RECORD", hint: "[+] NEW STREAM schedules the first broadcast" %>
+    <% end %>
+    <% streams.each_with_index do |stream, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to stream.artist.name, edit_admin_hackr_stream_path(stream), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= stream.title.presence || "untitled" %><% if stream.started_at %> · started <%= stream.started_at.strftime(fmt) %><% end %><% if stream.ended_at %> · ended <%= stream.ended_at.strftime(fmt) %><% end %><% if stream.live_url.present? %> · <%= truncate(stream.live_url, length: 48) %><% end %></div>
+        </div>
+        <span class="rc-cell"><%= stream.scheduled_at&.strftime(fmt) || "—" %></span>
+        <%= render "admin/hackr_streams/state", stream: stream, cell: true %>
+        <span class="rc-cell rc-links">
+          <% if stream.is_live %>
+            <%= button_to "[END]", end_stream_admin_hackr_stream_path(stream), class: "rc-btn rc-btn--danger", form: {data: {confirm: "End this livestream?"}} %>
+          <% elsif stream.ended_at.nil? && stream.cancelled_at.nil? && stream.live_url.present? %>
+            <%= button_to "[GO LIVE]", go_live_admin_hackr_stream_path(stream), class: "rc-btn rc-btn--hot", form: {data: {confirm: "Start livestream for #{stream.artist.name}?"}} %>
+          <% end %>
+          <% if stream.scheduled_at.present? && stream.cancelled_at.nil? && !stream.is_live? && stream.ended_at.nil? %>
+            <%= button_to "[CANCEL]", cancel_admin_hackr_stream_path(stream), class: "rc-btn", form: {data: {confirm: "Cancel scheduled stream?"}} %>
+          <% end %>
+          <%= link_to "[EDIT]", edit_admin_hackr_stream_path(stream), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :streams, except: "STREAMS" %>
+
+  <div class="console-rule"><span>// EVERY BROADCAST ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams, except: "STREAMS", numbers: numbers, noun: "a stream number", extra: ["new"]) %>
+</div>

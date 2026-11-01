@@ -1,48 +1,16 @@
-<%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-  <% if @log.errors.any? %>
-    <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-      <p class="red-255-text"><%= @log.errors.full_messages.join(", ") %></p>
-    </div>
+<%# The log record's fields as console status rows (ConsoleFormBuilder
+    rc_* rows) and // BODY // as one growing textarea. The commit row
+    belongs to the caller. Locals: f, log; @hackrs for the author. %>
+<div class="console-status">
+  <%= f.rc_text_field :title, required: true, autocomplete: "off", width: :wide %>
+  <%= f.rc_text_field :slug, required: true, autocomplete: "off",
+    hint: "/logs/#{log.slug_in_database.presence || "slug"} · the public URL" %>
+  <%= f.rc_collection_select :grid_hackr_id, @hackrs, :id, :hackr_alias, label: "AUTHOR", include_blank: "— select author —" %>
+  <%= f.rc_text_field :timeline, width: :short, autocomplete: "off", hint: "the era the log belongs to · 2120s" %>
+  <%= f.rc_datetime_local_field :published_at, label: "PUBLISHED AT", hint: "the logs page orders by this" %>
+  <%= f.rc_flags("FLAGS", hint: "unchecked keeps the log off /logs") do %>
+    <%= f.rc_check_box :published, label: "PUBLISHED" %>
   <% end %>
+</div>
 
-  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 300px; margin-bottom: 20px;">
-      <%= f.tui_text_field :title %>
-    </div>
-    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.tui_text_field :slug %>
-    </div>
-  </div>
-
-  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.tui_collection_select :grid_hackr_id, @hackrs, :id, :hackr_alias,
-          { include_blank: "— Select Author —" },
-          label: "AUTHOR" %>
-    </div>
-    <div style="flex: 1; min-width: 150px; margin-bottom: 20px;">
-      <%= f.tui_text_field :timeline %>
-    </div>
-  </div>
-
-  <div style="margin-bottom: 20px;">
-    <%= f.tui_text_area :body, style: "min-height: 300px;" %>
-  </div>
-
-  <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
-    <div style="margin-bottom: 20px;">
-      <%= f.tui_check_box :published, style: "width: 20px; height: 20px;" %>
-    </div>
-    <div style="flex: 1; min-width: 200px; margin-bottom: 20px;">
-      <%= f.tui_datetime_field :published_at %>
-    </div>
-  </div>
-
-  <div style="margin-top: 20px;">
-    <%= tui_submit @log.new_record? ? "Create Log" : "Update Log", form: f, color: :green, style: "padding: 10px 20px; font-weight: bold;" %>
-    <%= tui_button "Cancel", admin_hackr_logs_path, style: "padding: 10px 20px; margin-left: 10px;" %>
-    <% if @log.persisted? %>
-      <%= tui_button "History", history_admin_hackr_log_path(@log), color: :purple, style: "padding: 10px 20px; margin-left: 10px;" %>
-    <% end %>
-  </div>
-<% end %>
+<%= f.rc_text_area :body, rows: 16, required: true, spellcheck: true, class: "rc-textarea--body", hint: "markdown" %>

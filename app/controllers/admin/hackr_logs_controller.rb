@@ -1,12 +1,19 @@
+# /root/hackr_logs — the logs ledger and the log record as console
+# screens (2026-10-31; root_console.css). The record screen is the edit
+# screen: show redirects there.
 class Admin::HackrLogsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable HackrLog, find_by: :slug
 
-  before_action :set_log, only: %i[edit update destroy]
+  before_action :set_log, only: %i[show edit update destroy]
 
   def index
     @logs = HackrLog.includes(:grid_hackr).ordered
+  end
+
+  def show
+    redirect_to edit_admin_hackr_log_path(@log)
   end
 
   def new
@@ -18,7 +25,7 @@ class Admin::HackrLogsController < Admin::ApplicationController
     @log = HackrLog.new(log_params)
     if @log.save
       set_flash_success("Hackr log '#{@log.title}' created.")
-      redirect_to admin_hackr_logs_path
+      redirect_to edit_admin_hackr_log_path(@log)
     else
       load_selects
       flash.now[:error] = @log.errors.full_messages.join(", ")
@@ -33,7 +40,7 @@ class Admin::HackrLogsController < Admin::ApplicationController
   def update
     if @log.update(log_params)
       set_flash_success("Hackr log '#{@log.title}' updated.")
-      redirect_to admin_hackr_logs_path
+      redirect_to edit_admin_hackr_log_path(@log)
     else
       load_selects
       flash.now[:error] = @log.errors.full_messages.join(", ")

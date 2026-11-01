@@ -1,8 +1,35 @@
-<%= render TuiWindowComponent.new(title: "/root/streams/edit :: UPDATE STREAM", variant: :admin, width: 900) do %>
+<%# /root/hackr_streams/:id/edit — the stream record as a console screen
+    (2026-10-31; show redirects here). Bar (artist · ROOT · STREAM · path;
+    [<] STREAMS; ON AIR while live), the fields, // COMMIT // ([SAVE]
+    [CANCEL] · [DELETE]), destinations, the > prompt. The delete form is
+    hidden at the end. Assigns: @hackr_stream, @artists. %>
+<% stream = @hackr_stream %>
+<% content_for :title, "/root/hackr_streams/#{stream.id} :: STREAM" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: stream.artist&.name || "STREAM", sub: "ROOT · STREAM · /root/hackr_streams/#{stream.id}"} do %>
+    <% if stream.is_live_in_database %><%= root_badge("ON AIR", :live) %><% end %>
+    <%= link_to "[<] STREAMS", admin_hackr_streams_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%= tui_button "← Back to Streams", admin_hackr_streams_path, color: :green, style: "padding: 8px 20px; margin-bottom: 20px; display: inline-block;" %>
-
-      <%= render "form", hackr_stream: @hackr_stream %>
+  <%= form_with model: [:admin, stream], local: true do |f| %>
+    <%= render "form", f: f, hackr_stream: stream %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE STREAM]</button>
+      <%= link_to "[CANCEL]", admin_hackr_streams_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-stream" class="rc-btn rc-btn--danger">[DELETE STREAM]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :streams %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-stream", admin_hackr_stream_path(stream), confirm: "Delete stream for #{stream.artist&.name}?") %>
+  </div>
+</div>

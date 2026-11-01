@@ -1,0 +1,11 @@
+<%# An alert's place in the queue as a console word: DISPLAYED (dim),
+    EXPIRED (red), PENDING (lit). Locals: alert, cell (render as a ledger
+    .rc-cell). %>
+<% word, tone = if alert.displayed?
+  %w[DISPLAYED rc-off]
+elsif alert.expired?
+  %w[EXPIRED rc-bad]
+else
+  %w[PENDING rc-on]
+end %>
+<span class="<%= class_names(tone, "rc-cell": local_assigns[:cell]) %>"><%= word %></span>

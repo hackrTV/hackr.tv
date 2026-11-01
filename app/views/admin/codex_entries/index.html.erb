@@ -1,157 +1,71 @@
-<%= render TuiWindowComponent.new(title: "/root/codex :: MANAGE CODEX ENTRIES", variant: :admin) do %>
+<%# /root/codex_entries — the codex ledger as a console screen
+    (2026-10-31; root_console.css): bar, ON RECORD row, the TYPE row
+    (server-side ?entry_type=), the FILTER row (ledger-filter: name /
+    slug / summary / type), // CODEX // rows ([NN] · name over slug ·
+    summary · TYPE · LIVE / DRAFT · [EDIT] [HISTORY]), destinations, the
+    > prompt (NN opens the record screen; deletes live there). Assigns:
+    @entries, @type_filter. %>
+<% content_for :title, "/root/codex_entries :: CODEX" %>
+<% entries = @entries.to_a %>
+<% numbers = entries.each_index.map { |i| root_num(i, total: entries.size) } %>
+<% live = entries.count(&:published) %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "CODEX", sub: "ROOT · CONTENT · /root/codex_entries"} do %>
+    <%= link_to "[+] NEW ENTRY", new_admin_codex_entry_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[>] PUBLIC", codex_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <%= tui_button "+ New", new_admin_codex_entry_path, color: :cyan, style: "padding: 8px 20px;" %>
-      </div>
-
-      <!-- Filter by Type -->
-      <% if @entries.any? %>
-        <div style="margin-bottom: 20px;">
-          <label style="color: #888; display: block; margin-bottom: 8px;">
-            FILTER BY TYPE
-          </label>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <%= tui_button "All", admin_codex_entries_path, color: (params[:entry_type].blank? ? :cyan : :grey), style: "padding: 5px 15px;" %>
-            <% CodexEntry::ENTRY_TYPES.each do |type| %>
-              <%= tui_button type.titleize, admin_codex_entries_path(entry_type: type), color: (params[:entry_type] == type ? :cyan : :grey), style: "padding: 5px 15px;" %>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Search Filter -->
-        <div style="margin-bottom: 20px;">
-          <label for="entry-search" style="color: #888; display: block; margin-bottom: 8px;">
-            SEARCH ENTRIES :: Filter by name or summary
-          </label>
-          <input
-            type="text"
-            id="entry-search"
-            placeholder="Type to filter entries..."
-            style="width: 100%; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: #ccc; font-family: monospace; font-size: 1em;"
-          />
-          <div style="margin-top: 8px; color: #666; font-size: 0.9em;">
-            <span id="entry-count"><%= @entries.count %></span> / <%= @entries.count %> entries visible
-          </div>
-        </div>
-      <% end %>
-
-      <!-- Entries Table -->
-      <% if @entries.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Name</th>
-                <th style="text-align: left;">Type</th>
-                <th style="text-align: center;">Position</th>
-                <th style="text-align: center;">Published</th>
-                <th style="text-align: center;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @entries.each_with_index do |entry, i| %>
-                <tr class="entry-row" class="admin-table-row"
-                    style="<%= " background: #112;" if i.odd? %>"
-                    data-entry-name="<%= entry.name.downcase %>"
-                    data-entry-summary="<%= entry.summary&.downcase || '' %>">
-                  <td>
-                    <strong><%= entry.name %></strong>
-                    <br>
-                    <small style="color: #666; font-family: monospace;">/<%= entry.slug %></small>
-                    <% if entry.summary.present? %>
-                      <br>
-                      <small style="color: #888;"><%= truncate(entry.summary, length: 80) %></small>
-                    <% end %>
-                  </td>
-                  <td>
-                    <span class="purple-255-text"><%= entry.entry_type.titleize %></span>
-                  </td>
-                  <td style="text-align: center;">
-                    <%= entry.position || "—" %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% if entry.published %>
-                      <span class="green-255-text">✓ Live</span>
-                    <% else %>
-                      <span style="color: #f87171;">✗ Draft</span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <%= tui_button "Edit", edit_admin_codex_entry_path(entry), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                    <%= tui_button "History", history_admin_codex_entry_path(entry), color: :purple, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button_to "Delete", admin_codex_entry_path(entry), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;", data: { confirm: "Delete '#{entry.name}'?" } %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No codex entries yet. Create your first one!</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(entries.size, "entry") %><% if @type_filter.present? %> · <%= @type_filter.upcase %><% end %> <span class="console-dim">· <%= live %> live · <%= entries.size - live %> draft</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field">
+      <span class="console-key">TYPE</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_codex_entries_path, class: class_names("rc-btn", "rc-btn--on": @type_filter.blank?), aria: {current: @type_filter.blank? && "page"} %>
+        <% CodexEntry::ENTRY_TYPES.each do |type| %>
+          <%= link_to type.upcase, admin_codex_entries_path(entry_type: type), class: class_names("rc-btn", "rc-btn--on": @type_filter == type), aria: {current: @type_filter == type && "page"} %>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="name · slug · summary · type" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= entries.size %> / <%= entries.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
 
-<% if @entries.any? %>
-  <script nonce="<%= content_security_policy_nonce %>">
-    document.addEventListener('DOMContentLoaded', function() {
-      const searchInput = document.getElementById('entry-search');
-      const entryRows = document.querySelectorAll('.entry-row');
-      const entryCountEl = document.getElementById('entry-count');
-      const totalEntries = entryRows.length;
+  <section class="console-section rc-ledger" aria-label="Codex">
+    <div class="console-rule"><span>// CODEX //</span></div>
+    <% if entries.empty? %>
+      <%= render "admin/console/empty", text: "NO ENTRIES ON RECORD", hint: "[+] NEW ENTRY starts the wiki" %>
+    <% end %>
+    <% entries.each_with_index do |entry, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [entry.name, entry.slug, entry.summary, entry.entry_type].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to entry.name, edit_admin_codex_entry_path(entry), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= entry.slug %><% if entry.position %> · POS <%= entry.position %><% end %><% if entry.summary.present? %> · <%= truncate(entry.summary, length: 80) %><% end %></div>
+        </div>
+        <span class="rc-cell rc-hot"><%= entry.entry_type.upcase %></span>
+        <span class="rc-cell <%= entry.published ? "rc-on" : "rc-off" %>"><%= entry.published ? "LIVE" : "DRAFT" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[EDIT]", edit_admin_codex_entry_path(entry), class: "console-link" %>
+          <%= link_to "[HISTORY]", history_admin_codex_entry_path(entry), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
 
-      function filterEntries() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        let visibleCount = 0;
+  <%= render "admin/console/destinations", section: :content, except: "CODEX" %>
 
-        entryRows.forEach(row => {
-          const entryName = row.dataset.entryName || '';
-          const entrySummary = row.dataset.entrySummary || '';
-
-          const matches = entryName.includes(searchTerm) ||
-                         entrySummary.includes(searchTerm);
-
-          if (matches) {
-            row.style.display = '';
-            visibleCount++;
-          } else {
-            row.style.display = 'none';
-          }
-        });
-
-        entryCountEl.textContent = visibleCount;
-      }
-
-      searchInput.addEventListener('input', filterEntries);
-
-      // Focus search on Tab key
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab' && !e.shiftKey && document.activeElement !== searchInput) {
-          e.preventDefault();
-          searchInput.focus();
-          searchInput.select();
-        }
-      });
-    });
-  </script>
-<% end %>
+  <div class="console-rule"><span>// EVERY ENTRY ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content, except: "CODEX", numbers: numbers, noun: "an entry number", extra: ["new"]) %>
+</div>

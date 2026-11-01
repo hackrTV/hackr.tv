@@ -1,74 +1,60 @@
-<% content_for(:title) { "/root/overlays/alerts :: Manage Alerts" } %>
+<%# /root/overlays/alerts — the HUD's alert queue as a console ledger
+    (2026-10-31; root_console.css): bar ([+] SEND ALERT), ON RECORD + the
+    TYPE row (server-side ?alert_type=), // ALERTS // rows newest first,
+    the last 100 ([NN] · title over type / message · PENDING / DISPLAYED
+    / EXPIRED · created · [DEL]), destinations, the > prompt (NN opens
+    the alert). Assigns: @alerts. %>
+<% content_for :title, "/root/overlays/alerts :: ALERTS" %>
+<% alerts = @alerts.to_a %>
+<% numbers = alerts.each_index.map { |i| root_num(i, total: alerts.size) } %>
+<% current = params[:alert_type].to_s %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ALERTS", sub: "ROOT · OVERLAYS · /root/overlays/alerts"} do %>
+    <%= link_to "[+] SEND ALERT", new_admin_overlay_alert_path, class: "console-bar-link", data: {command: "new"} %>
+    <%= link_to "[<] OVERLAYS", admin_overlays_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/overlays/alerts :: ALERT MANAGEMENT", variant: :admin, width: 1200) do %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(alerts.size, "alert") %><% if current.present? %> · <%= current.upcase %><% end %> <span class="console-dim">· the newest 100 · <%= alerts.count { |a| !a.displayed? && !a.expired? } %> pending</span></span>
+    </div>
+    <div class="console-status-row rc-field">
+      <span class="console-key">TYPE</span>
+      <span class="console-val">
+        <%= link_to "ALL", admin_overlay_alerts_path, class: class_names("rc-btn", "rc-btn--on": current.blank?), aria: {current: current.blank? && "page"} %>
+        <% OverlayAlert::ALERT_TYPES.each do |type| %>
+          <%= link_to type.upcase, admin_overlay_alerts_path(alert_type: type), class: class_names("rc-btn", "rc-btn--on": current == type), aria: {current: current == type && "page"} %>
+        <% end %>
+      </span>
+    </div>
+  </div>
 
-    <% if flash[:success] %>
-      <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin-bottom: 20px;">
-        <p class="green-255-text" style="margin: 0;">&#10003; SUCCESS</p>
-        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:success] %></p>
+  <section class="console-section rc-ledger rc-ledger--alerts" aria-label="Alerts">
+    <div class="console-rule"><span>// ALERTS //</span></div>
+    <% if alerts.empty? %>
+      <%= render "admin/console/empty", text: "NO ALERTS ON RECORD", hint: "[+] SEND ALERT queues one for the HUD" %>
+    <% end %>
+    <% alerts.each_with_index do |alert, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to alert.title.presence || alert.alert_type.upcase, admin_overlay_alert_path(alert), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= alert.alert_type.upcase %><% if alert.message.present? %> · <%= truncate(alert.message, length: 60) %><% end %></div>
+        </div>
+        <%= render "admin/overlay_alerts/status", alert: alert, cell: true %>
+        <span class="rc-cell"><%= alert.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+        <span class="rc-cell rc-links">
+          <%= button_to "[DEL]", admin_overlay_alert_path(alert), method: :delete, class: "rc-btn rc-btn--danger", form: {data: {confirm: "Delete this alert?"}} %>
+        </span>
       </div>
     <% end %>
+  </section>
 
-    <% if flash[:error] %>
-      <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px;">
-        <p class="red-255-text" style="margin: 0;">&#10007; ERROR</p>
-        <p class="white-text" style="margin: 5px 0 0;"><%= flash[:error] %></p>
-      </div>
-    <% end %>
+  <%= render "admin/console/destinations", section: :streams, except: "ALERTS" %>
 
-    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-      <%= tui_button "< Back to Overlays", admin_overlays_path, color: :green %>
-      <%= tui_button "+ Send Alert", new_admin_overlay_alert_path, color: :green %>
-    </div>
-
-    <!-- Type Filter -->
-    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-      <span style="color: #888;">Filter:</span>
-      <%= tui_button "All", admin_overlay_alerts_path, color: (params[:alert_type].blank? ? :green : nil), style: "padding: 4px 12px;" %>
-      <% OverlayAlert::ALERT_TYPES.each do |type| %>
-        <%= tui_button type.titleize, admin_overlay_alerts_path(alert_type: type), color: (params[:alert_type] == type ? :green : nil), style: "padding: 4px 12px;" %>
-      <% end %>
-    </div>
-
-    <table class="tui-table" style="width: 100%;">
-      <thead>
-        <tr>
-          <th style="text-align: left;">Type</th>
-          <th style="text-align: left;">Title</th>
-          <th style="text-align: left;">Message</th>
-          <th style="text-align: center;">Status</th>
-          <th style="text-align: center;">Created</th>
-          <th style="text-align: center;">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @alerts.each_with_index do |alert, i| %>
-          <tr class="admin-table-row" style="<%= "background: #112;" if i.odd? %>">
-            <td><code class="purple-168-text"><%= alert.alert_type %></code></td>
-            <td><%= alert.title || "-" %></td>
-            <td><%= truncate(alert.message, length: 50) || "-" %></td>
-            <td style="text-align: center;">
-              <% if alert.displayed? %>
-                <span style="color: #888;">Displayed</span>
-              <% elsif alert.expired? %>
-                <span class="red-168-text">Expired</span>
-              <% else %>
-                <span class="green-255-text">Pending</span>
-              <% end %>
-            </td>
-            <td style="text-align: center;"><%= alert.created_at.strftime("%Y-%m-%d %H:%M") %></td>
-            <td style="text-align: center; white-space: nowrap;">
-              <%= tui_button "View", admin_overlay_alert_path(alert), style: "padding: 4px 10px;" %>
-              <%= tui_button_to "Delete", admin_overlay_alert_path(alert), method: :delete, form: { style: "display: inline;" }, color: :red, style: "padding: 4px 10px;", data: { confirm: "Delete this alert?" } %>
-            </td>
-          </tr>
-        <% end %>
-        <% if @alerts.empty? %>
-          <tr>
-            <td colspan="6" style="text-align: center; color: #666;">No alerts found.</td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-
-<% end %>
+  <div class="console-rule"><span>// END OF QUEUE //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams, except: "ALERTS", numbers: numbers, noun: "an alert number", extra: ["new"]) %>
+</div>

@@ -1,47 +1,46 @@
-<% content_for(:title) { "/root/overlays/alerts/#{@alert.id} :: Alert Details" } %>
+<%# /root/overlays/alerts/:id — one alert as a read-only console readout
+    (2026-10-31; root_console.css): bar ([<] ALERTS), the alert's facts
+    as status rows, // MESSAGE // and // DATA // (the JSON payload),
+    // COMMIT // ([DELETE ALERT] — the hidden form at the end),
+    destinations, the > prompt. Assigns: @alert. %>
+<% alert = @alert %>
+<% content_for :title, "/root/overlays/alerts/#{alert.id} :: ALERT" %>
+<% stamp = "%Y-%m-%d %H:%M:%S" %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: alert.title.presence || alert.alert_type.upcase, sub: "ROOT · ALERT · /root/overlays/alerts/#{alert.id}"} do %>
+    <%= link_to "[<] ALERTS", admin_overlay_alerts_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/overlays/alerts/#{@alert.id} :: ALERT DETAILS", variant: :admin, width: 800) do %>
-
-    <div style="margin-bottom: 30px; display: flex; gap: 10px; align-items: center;">
-      <%= tui_button "< Back to Alerts", admin_overlay_alerts_path, color: :green %>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">TYPE</span><span class="console-val rc-hot"><%= alert.alert_type.upcase %></span></div>
+    <div class="console-status-row"><span class="console-key">TITLE</span><span class="console-val"><%= alert.title.presence || "—" %></span></div>
+    <div class="console-status-row">
+      <span class="console-key">STATUS</span>
+      <span class="console-val"><%= render "admin/overlay_alerts/status", alert: alert %><% if alert.displayed? && alert.displayed_at %> <span class="console-dim">· at <%= alert.displayed_at.strftime(stamp) %></span><% end %></span>
     </div>
+    <div class="console-status-row"><span class="console-key">CREATED</span><span class="console-val"><%= alert.created_at.strftime(stamp) %></span></div>
+    <div class="console-status-row"><span class="console-key">EXPIRES</span><span class="console-val"><%= alert.expires_at&.strftime(stamp) || "never" %></span></div>
+  </div>
 
-    <div style="background: #0a0a0a; border: 1px solid #444; padding: 20px;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div>
-          <p style="color: #888; margin: 0;">Alert Type</p>
-          <p style="margin: 5px 0 15px;"><code class="purple-168-text"><%= @alert.alert_type %></code></p>
+  <div class="console-rule"><span>// MESSAGE //</span></div>
+  <p class="console-reply"><%= alert.message.presence || "—" %></p>
+  <% if alert.data.present? %>
+    <div class="console-rule"><span>// DATA //</span></div>
+    <pre class="rc-pre"><%= JSON.pretty_generate(alert.data) %></pre>
+  <% end %>
 
-          <p style="color: #888; margin: 0;">Title</p>
-          <p style="margin: 5px 0 15px;"><%= @alert.title || "-" %></p>
+  <div class="console-rule"><span>// COMMIT //</span></div>
+  <div class="rc-actions">
+    <button type="submit" form="delete-alert" class="rc-btn rc-btn--danger">[DELETE ALERT]</button>
+  </div>
 
-          <p style="color: #888; margin: 0;">Message</p>
-          <p style="margin: 5px 0 15px;"><%= @alert.message || "-" %></p>
-        </div>
-        <div>
-          <p style="color: #888; margin: 0;">Status</p>
-          <p style="margin: 5px 0 15px;">
-            <% if @alert.displayed? %>
-              <span style="color: #888;">Displayed at <%= @alert.displayed_at&.strftime("%H:%M:%S") %></span>
-            <% elsif @alert.expired? %>
-              <span class="red-168-text">Expired</span>
-            <% else %>
-              <span class="green-255-text">Pending</span>
-            <% end %>
-          </p>
+  <%= render "admin/console/destinations", section: :streams %>
 
-          <p style="color: #888; margin: 0;">Created</p>
-          <p style="margin: 5px 0 15px;"><%= @alert.created_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams) %>
 
-          <p style="color: #888; margin: 0;">Expires</p>
-          <p style="margin: 5px 0 15px;"><%= @alert.expires_at&.strftime("%Y-%m-%d %H:%M:%S") || "Never" %></p>
-        </div>
-      </div>
-
-      <% if @alert.data.present? && @alert.data.any? %>
-        <p style="color: #888; margin: 0;">Data</p>
-        <pre style="margin: 5px 0 0; background: #111; padding: 10px; border: 1px solid #333; overflow-x: auto;"><%= JSON.pretty_generate(@alert.data) %></pre>
-      <% end %>
-    </div>
-
-<% end %>
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-alert", admin_overlay_alert_path(alert), confirm: "Delete this alert?") %>
+  </div>
+</div>

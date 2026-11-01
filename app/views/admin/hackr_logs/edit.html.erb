@@ -1,7 +1,38 @@
-<%= render TuiWindowComponent.new(title: "/root/hackr_logs/#{@log.slug} :: EDIT HACKR LOG", variant: :admin, width: 900) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @log, url: admin_hackr_log_path(@log), method: :patch, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/hackr_logs/:slug/edit — the log record as a console screen
+    (2026-10-31; show redirects here). Bar (title · ROOT · LOG · path;
+    [<] LOGS, [>] PUBLIC while published, [HISTORY]), the fields, // BODY
+    //, // COMMIT // ([SAVE] [CANCEL] · [DELETE]), destinations, the >
+    prompt. The delete form is hidden at the end; its ghost button points
+    at it (form=). URLs use slug_in_database — a rejected slug must not
+    build the form's action. Assigns: @log, @hackrs. %>
+<% slug = @log.slug_in_database %>
+<% content_for :title, "/root/hackr_logs/#{slug} :: #{@log.title_in_database}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: @log.title_in_database, sub: "ROOT · LOG · /root/hackr_logs/#{slug}"} do %>
+    <%= link_to "[<] LOGS", admin_hackr_logs_path, class: "console-bar-link" %>
+    <% if @log.published_in_database %><%= link_to "[>] PUBLIC", hackr_log_path(slug), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_hackr_log_path(slug), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @log, url: admin_hackr_log_path(slug), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, log: @log %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE LOG]</button>
+      <%= link_to "[CANCEL]", admin_hackr_logs_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-log" class="rc-btn rc-btn--danger">[DELETE LOG]</button>
+      </span>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :content %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:content) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-log", admin_hackr_log_path(slug), confirm: "Delete log '#{@log.title_in_database}'?") %>
+  </div>
+</div>

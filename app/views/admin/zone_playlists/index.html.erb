@@ -1,69 +1,49 @@
-<%= render TuiWindowComponent.new(title: "/root/zone_playlists :: MANAGE GRID AMBIENT PLAYLISTS", variant: :admin, width: 1200) do %>
+<%# /root/zone_playlists — the grid's ambient playlists as a read-only
+    console ledger (2026-10-31; root_console.css): bar, ON RECORD +
+    SOURCE rows, // PLAYLISTS // rows ([NN] · name over slug /
+    description · tracks · crossfade · volume), destinations, the >
+    prompt (NN opens the playlist). Seeded from YAML, read-only here.
+    Assigns: @zone_playlists. %>
+<% content_for :title, "/root/zone_playlists :: PLAYLISTS" %>
+<% playlists = @zone_playlists.to_a %>
+<% numbers = playlists.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "ZONE PLAYLISTS", sub: "ROOT · STREAMS · /root/zone_playlists"} do %><% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Flash Messages -->
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text">✓ SUCCESS</p>
-          <p class="white-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text">⚠ ERROR</p>
-          <p class="white-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Navigation -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <%= tui_button "← Dashboard", admin_root_path, color: :green, style: "padding: 8px 20px;" %>
-        <span style="color: #666; margin-left: 15px; font-size: 0.9em;">
-          Edit via: <code style="color: #888;">data/system/zone_playlists.yml</code> → <code style="color: #888;">rails data:zone_playlists</code>
-        </span>
-      </div>
-
-      <!-- Playlists Table -->
-      <% if @zone_playlists.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "margin-top: 20px;") do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Playlist Name</th>
-                <th style="text-align: left;">Description</th>
-                <th style="text-align: center;">Tracks</th>
-                <th style="text-align: center;">Crossfade (ms)</th>
-                <th style="text-align: center;">Volume</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @zone_playlists.each do |playlist| %>
-                <tr>
-                  <td>
-                    <strong><%= playlist.name %></strong>
-                  </td>
-                  <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    <%= playlist.description || "—" %>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="cyan-255-text"><%= playlist.tracks.count %></span>
-                  </td>
-                  <td style="text-align: center;">
-                    <%= playlist.crossfade_duration_ms %>
-                  </td>
-                  <td style="text-align: center;">
-                    <%= link_to "#{(playlist.default_volume * 100).round}%", admin_zone_playlist_path(playlist), class: "cyan-168-text" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666; font-size: 1.2em;">No zone playlists yet. Create your first one!</p>
-        </div>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(playlists.size, "playlist") %> <span class="console-dim">· <%= pluralize(playlists.sum { |p| p.tracks.size }, "track") %> placed</span></span>
     </div>
-<% end %>
+    <div class="console-status-row">
+      <span class="console-key">SOURCE</span>
+      <span class="console-val console-dim">seeded from data/system/zone_playlists.yml · rails data:zone_playlists adds new slugs, never overwrites · read-only here</span>
+    </div>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--playlists" aria-label="Zone playlists">
+    <div class="console-rule"><span>// PLAYLISTS //</span></div>
+    <% if playlists.empty? %>
+      <%= render "admin/console/empty", text: "NO ZONE PLAYLISTS ON RECORD", hint: "seed data/system/zone_playlists.yml with rails data:zone_playlists" %>
+    <% end %>
+    <% playlists.each_with_index do |playlist, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to playlist.name, admin_zone_playlist_path(playlist), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= playlist.slug %><% if playlist.description.present? %> · <%= truncate(playlist.description, length: 80) %><% end %></div>
+        </div>
+        <span class="rc-cell rc-cell--r"><%= pluralize(playlist.tracks.size, "track") %></span>
+        <span class="rc-cell rc-cell--r"><%= playlist.crossfade_duration_ms %> ms fade</span>
+        <span class="rc-cell rc-cell--r"><%= (playlist.default_volume * 100).round %>% vol</span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :streams, except: "PLAYLISTS" %>
+
+  <div class="console-rule"><span>// WHAT THE GRID PLAYS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:streams, except: "PLAYLISTS", numbers: numbers, noun: "a playlist number") %>
+</div>
