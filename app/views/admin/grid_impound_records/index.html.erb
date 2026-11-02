@@ -1,116 +1,86 @@
-<%= render TuiWindowComponent.new(title: "/root/grid_impound_records :: IMPOUND MANAGER", variant: :admin) do %>
+<%# /root/grid_impound_records — gear GovCorp holds as a console ledger
+    (2026-11-01; root_console.css): bar (the DEV TOOLS badge), ON SCREEN,
+    the // FILTER // rows (server-side: HACKR, STATUS links keeping the
+    hackr — [FILTER] / [x] CLEAR), // IMPOUND // newest 200 (#id ·
+    hackr, opening the inspector · breach · STATUS · bribe · items ·
+    created · [RECOVER] [FORFEIT] while impounded and dev tools are on,
+    each confirming first), destinations, the > prompt. Assigns:
+    @records, @hackr_not_found. %>
+<% content_for :title, "/root/grid_impound_records :: IMPOUND" %>
+<% records = @records.to_a %>
+<% status = params[:status].to_s.presence_in(GridImpoundRecord::STATUSES).to_s %>
+<% keep = request.query_parameters.slice("hackr_alias").compact_blank %>
+<% filtered = status.present? || keep.any? %>
+<% status_tone = {"impounded" => "rc-bad", "recovered" => "rc-on", "forfeited" => "rc-off"} %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "IMPOUND", sub: "ROOT · SYSTEMS · /root/grid_impound_records"} do %>
+    <% if dev_tools_enabled? %><%= root_badge("DEV TOOLS ON", :warn) %><% end %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON SCREEN</span>
+      <span class="console-val"><%= pluralize(records.size, "record") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· <%= records.count(&:impounded?) %> impounded · newest first · at most 200</span></span>
+    </div>
+  </div>
+
+  <%= form_with url: admin_grid_impound_records_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <%= root_field("HACKR", id: "hackr_alias") do %>
+        <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
       <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <% if dev_tools_enabled? %>
-        <div style="background: #332200; border: 2px solid #fbbf24; padding: 10px 15px; margin-bottom: 20px;">
-          <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
-          <span style="color: #d0d0d0;"> — Force recover/forfeit actions available</span>
-        </div>
-      <% end %>
-
-      <%# Filter form %>
-      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
-        <%= form_tag admin_grid_impound_records_path, method: :get, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do %>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Hackr Alias</label>
-            <%= text_field_tag :hackr_alias, params[:hackr_alias], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "alias" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Status</label>
-            <%= select_tag :status, options_for_select([["All Statuses", ""], "impounded", "recovered", "forfeited"], params[:status]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
-          </div>
-          <div>
-            <%= tui_button "Filter", color: :cyan, type: "submit", style: "padding: 6px 14px;" %>
-          </div>
-          <% if params[:hackr_alias].present? || params[:status].present? %>
-            <div>
-              <%= tui_button "Clear", admin_grid_impound_records_path, style: "padding: 6px 14px;" %>
-            </div>
+      <div class="console-status-row rc-field">
+        <span class="console-key">STATUS</span>
+        <span class="console-val">
+          <% [["ALL", ""]].concat(GridImpoundRecord::STATUSES.map { |s| [s.upcase, s] }).each do |word, value| %>
+            <%= link_to word, admin_grid_impound_records_path(keep.merge(status: value.presence).compact), class: class_names("rc-btn", "rc-btn--on": status == value), aria: {current: status == value && "page"} %>
           <% end %>
-        <% end %>
-      </div>
-
-      <% if @hackr_not_found %>
-        <div style="background: #332200; border: 2px solid #fbbf24; padding: 10px 15px; margin-bottom: 15px;">
-          <span class="yellow-255-text">Hackr "<%= params[:hackr_alias] %>" not found.</span>
-        </div>
-      <% end %>
-
-      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: IMPOUND RECORDS (<%= @records.size %>) ::]</h3>
-      <% if @records.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center;">ID</th>
-                <th style="text-align: left;">Hackr</th>
-                <th style="text-align: center;">Breach</th>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: right;">Bribe Cost</th>
-                <th style="text-align: center;">Items</th>
-                <th style="text-align: center;">Created</th>
-                <% if dev_tools_enabled? %>
-                  <th style="text-align: center;">Actions</th>
-                <% end %>
-              </tr>
-            </thead>
-            <tbody>
-              <% @records.each do |record| %>
-                <tr>
-                  <td style="text-align: center; color: #666;"><%= record.id %></td>
-                  <td>
-                    <%= link_to record.grid_hackr.hackr_alias, admin_grid_hackr_path(record.grid_hackr), style: "color: #00ffff; text-decoration: none;" %>
-                  </td>
-                  <td style="text-align: center; color: #666;"><%= record.grid_hackr_breach_id || "—" %></td>
-                  <td style="text-align: center;">
-                    <% status_color = case record.status
-                      when "impounded" then "#f87171"
-                      when "recovered" then "#34d399"
-                      when "forfeited" then "#666"
-                    end %>
-                    <span style="color: <%= status_color %>; font-weight: bold;"><%= record.status.upcase %></span>
-                  </td>
-                  <td style="text-align: right; font-family: monospace; color: #fbbf24;"><%= record.bribe_cost %></td>
-                  <td style="text-align: center;"><%= record.impounded_items.size %></td>
-                  <td style="text-align: center; color: #666;"><%= record.created_at.strftime("%Y-%m-%d %H:%M") %></td>
-                  <% if dev_tools_enabled? %>
-                    <td style="text-align: center;">
-                      <% if record.impounded? %>
-                        <div style="display: flex; gap: 6px; justify-content: center;">
-                          <%= tui_button_to "Recover", force_recover_admin_grid_impound_record_path(record), method: :post, color: :yellow, style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-recover impound ##{record.id}? Items return to inventory, no CRED charged." } } %>
-                          <%= tui_button_to "Forfeit", force_forfeit_admin_grid_impound_record_path(record), method: :post, color: :red, style: "padding: 3px 10px; font-size: 0.85em;", form: { style: "display: inline;", data: { turbo_confirm: "Force-forfeit impound ##{record.id}? All items will be PERMANENTLY DESTROYED." } } %>
-                        </div>
-                      <% else %>
-                        <span style="color: #333;">—</span>
-                      <% end %>
-                    </td>
-                  <% end %>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666;">No impound records found.</p>
-        </div>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Grid Dashboard", admin_grid_path, color: :green %>
-        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
+        </span>
       </div>
     </div>
-<% end %>
+    <% if status.present? %><%= hidden_field_tag :status, status %><% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_grid_impound_records_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--impound" aria-label="Impound records">
+    <div class="console-rule"><span>// IMPOUND //</span></div>
+    <% if @hackr_not_found %>
+      <%= render "admin/console/empty", text: "NO HACKR NAMED '#{params[:hackr_alias]}'", hint: "[x] CLEAR shows every record" %>
+    <% elsif records.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO RECORDS MATCH" : "NOTHING IMPOUNDED YET", hint: ("[x] CLEAR shows every record" if filtered) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>ID</span><span>HACKR</span><span>BREACH</span><span>STATUS</span><span class="rc-cell--r">BRIBE</span><span class="rc-cell--r">ITEMS</span><span>CREATED</span><span></span>
+      </div>
+    <% end %>
+    <% records.each do |record| %>
+      <div class="rc-row">
+        <span class="console-tag">#<%= record.id %></span>
+        <%= link_to record.grid_hackr.hackr_alias, admin_grid_hackr_path(record.grid_hackr), class: "console-link cc-name" %>
+        <span class="rc-cell rc-off"><%= record.grid_hackr_breach_id || "—" %></span>
+        <span class="rc-cell <%= status_tone[record.status] %>"><%= record.status.upcase %></span>
+        <span class="rc-cell rc-cell--r rc-star"><%= record.bribe_cost %></span>
+        <span class="rc-cell rc-cell--r"><%= record.impounded_items.size %></span>
+        <span class="rc-cell"><%= record.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+        <span class="rc-cell rc-links">
+          <% if record.impounded? && dev_tools_enabled? %>
+            <%= button_to "[RECOVER]", force_recover_admin_grid_impound_record_path(record), method: :post, class: "rc-btn",
+              form: {data: {confirm: "Force-recover impound ##{record.id}? Items return to inventory, no CRED charged."}} %>
+            <%= button_to "[FORFEIT]", force_forfeit_admin_grid_impound_record_path(record), method: :post, class: "rc-btn rc-btn--danger",
+              form: {data: {confirm: "Force-forfeit impound ##{record.id}? All items will be PERMANENTLY DESTROYED."}} %>
+          <% end %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "IMPOUND" %>
+
+  <div class="console-rule"><span>// NEWEST RECORDS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "IMPOUND") %>
+</div>

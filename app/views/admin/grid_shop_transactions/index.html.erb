@@ -1,71 +1,88 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/shops :: TRANSACTION LOG", variant: :admin) do %>
+<%# /root/grid_shop_transactions — the shop transaction log as a console
+    screen (2026-11-01; root_console.css): bar ([<] SHOPS), ON RECORD,
+    the // FILTER // rows (server-side: HACKR, VENDOR, TYPE links —
+    [FILTER] / [x] CLEAR), // TRANSACTIONS // newest first, the latest
+    100 (when · BUY / SELL · item over @alias · vendor · PRICE · BURN ·
+    RECYCLE — a time-led data ledger, no numbers; the item opens its
+    listing), destinations, the > prompt. Assigns: @transactions,
+    @vendors, @type_filter, @hackr_not_found. %>
+<% content_for :title, "/root/grid_shop_transactions :: SALES" %>
+<% transactions = @transactions.to_a %>
+<% keep = request.query_parameters.slice("hackr_alias", "mob_id") %>
+<% filtered = @type_filter.present? || keep.values.any?(&:present?) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "SALES", sub: "ROOT · SYSTEMS · /root/grid_shop_transactions"} do %>
+    <%= link_to "[<] SHOPS", admin_grid_shop_listings_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Filters -->
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <%= tui_button "<- Listings", admin_grid_shop_listings_path, color: :green, style: "padding: 8px 20px;" %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(transactions.size, "transaction") %> <span class="console-dim">· the latest 100<% if filtered %> · filtered<% end %> · <%= transactions.count { |tx| tx.transaction_type == "buy" } %> buys · <%= transactions.count { |tx| tx.transaction_type == "sell" } %> sells</span></span>
+    </div>
+  </div>
 
-        <%= form_tag admin_grid_shop_transactions_path, method: :get, style: "display: flex; gap: 10px; align-items: center;" do %>
-          <%= text_field_tag :hackr_alias, params[:hackr_alias], placeholder: "Hackr alias", class: "tui-input", style: "width: 150px; padding: 6px 10px;" %>
-          <%= select_tag :mob_id,
-              options_from_collection_for_select(@vendors, :id, :name, params[:mob_id]),
-              include_blank: "All Vendors", class: "tui-input", style: "padding: 6px 10px;" %>
-          <%= select_tag :transaction_type,
-              options_for_select([["All Types", ""], ["Purchases", "buy"], ["Sales", "sell"]], params[:transaction_type]),
-              class: "tui-input", style: "padding: 6px 10px;" %>
-          <%= tui_submit "Filter", color: :cyan, style: "padding: 6px 16px;" %>
-        <% end %>
-      </div>
-
-      <% if @transactions.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Time</th>
-                <th style="text-align: left;">Hackr</th>
-                <th style="text-align: center;">Type</th>
-                <th style="text-align: left;">Vendor</th>
-                <th style="text-align: left;">Item</th>
-                <th style="text-align: right;">Price</th>
-                <th style="text-align: right;">Burn</th>
-                <th style="text-align: right;">Recycle</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @transactions.each do |tx| %>
-                <tr>
-                  <td style="color: #666; font-family: monospace; font-size: 0.85em;"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></td>
-                  <td class="purple-168-text"><%= tx.grid_hackr&.hackr_alias || "<span style='color: #666;'>(deleted)</span>".html_safe %></td>
-                  <td style="text-align: center;">
-                    <% if tx.transaction_type == "buy" %>
-                      <span class="green-255-text">BUY</span>
-                    <% else %>
-                      <span class="yellow-168-text">SELL</span>
-                    <% end %>
-                  </td>
-                  <td style="color: #c084fc;"><%= tx.grid_mob&.name || "<span style='color: #666;'>(deleted)</span>".html_safe %></td>
-                  <td class="cyan-255-text"><%= tx.grid_shop_listing&.name || "(deleted)" %></td>
-                  <td style="text-align: right;" class="green-255-text"><%= number_with_delimiter(tx.price_paid) %></td>
-                  <td style="text-align: right; color: #f87171;"><%= tx.burn_amount > 0 ? number_with_delimiter(tx.burn_amount) : "-" %></td>
-                  <td style="text-align: right; color: #34d399;"><%= tx.recycle_amount > 0 ? number_with_delimiter(tx.recycle_amount) : "-" %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <% if @hackr_not_found %>
-            <p class="yellow-168-text" style="font-size: 1.2em;">No hackr found with alias '<%= h(params[:hackr_alias]) %>'.</p>
-          <% else %>
-            <p style="color: #666; font-size: 1.2em;">No shop transactions match the current filters.</p>
-          <% end %>
-        </div>
+  <%= form_with url: admin_grid_shop_transactions_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <%= root_field("HACKR", id: "hackr_alias") do %>
+        <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
       <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "<- Grid Admin", admin_grid_path, color: :green %>
+      <%= root_field("VENDOR", id: "mob_id") do %>
+        <%= select_tag :mob_id, options_from_collection_for_select(@vendors, :id, :name, params[:mob_id]), include_blank: "ALL VENDORS", class: "rc-select" %>
+      <% end %>
+      <div class="console-status-row rc-field">
+        <span class="console-key">TYPE</span>
+        <span class="console-val">
+          <% [["ALL", nil], ["BUY", "buy"], ["SELL", "sell"]].each do |word, value| %>
+            <%= link_to word, admin_grid_shop_transactions_path(keep.merge(transaction_type: value).compact_blank), class: class_names("rc-btn", "rc-btn--on": @type_filter == value), aria: {current: @type_filter == value && "page"} %>
+          <% end %>
+        </span>
       </div>
     </div>
-<% end %>
+    <% if @type_filter %><%= hidden_field_tag :transaction_type, @type_filter %><% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_grid_shop_transactions_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--sales" aria-label="Shop transactions">
+    <div class="console-rule"><span>// TRANSACTIONS //</span></div>
+    <% if transactions.empty? %>
+      <% if @hackr_not_found %>
+        <%= render "admin/console/empty", text: "NO HACKR NAMED '#{params[:hackr_alias]}'", hint: "[x] CLEAR shows every transaction" %>
+      <% else %>
+        <%= render "admin/console/empty", text: filtered ? "NO TRANSACTIONS MATCH" : "NO SHOP TRANSACTIONS YET", hint: ("[x] CLEAR shows every transaction" if filtered) %>
+      <% end %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>WHEN</span><span>TYPE</span><span>ITEM</span><span>VENDOR</span><span class="rc-cell--r">PRICE</span><span class="rc-cell--r">BURN</span><span class="rc-cell--r">RECYCLE</span>
+      </div>
+    <% end %>
+    <% transactions.each do |tx| %>
+      <div class="rc-row">
+        <span class="rc-cell"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+        <span class="rc-cell <%= tx.transaction_type == "buy" ? "rc-on" : "rc-star" %>"><%= tx.transaction_type.upcase %></span>
+        <div class="cc-text">
+          <% if tx.grid_shop_listing %>
+            <%= link_to tx.grid_shop_listing.name, edit_admin_grid_shop_listing_path(tx.grid_shop_listing), class: "console-link cc-name" %>
+          <% else %>
+            <span class="cc-name rc-off">(deleted)</span>
+          <% end %>
+          <div class="cc-meta"><%= tx.grid_hackr ? "@#{tx.grid_hackr.hackr_alias}" : "(deleted hackr)" %></div>
+        </div>
+        <span class="rc-cell"><%= tx.grid_mob&.name || "(deleted)" %></span>
+        <span class="rc-cell rc-cell--r rc-star"><%= number_with_delimiter(tx.price_paid) %></span>
+        <span class="rc-cell rc-cell--r <%= "rc-bad" if tx.burn_amount.positive? %>"><%= tx.burn_amount.positive? ? number_with_delimiter(tx.burn_amount) : "—" %></span>
+        <span class="rc-cell rc-cell--r <%= "rc-on" if tx.recycle_amount.positive? %>"><%= tx.recycle_amount.positive? ? number_with_delimiter(tx.recycle_amount) : "—" %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "SALES" %>
+
+  <div class="console-rule"><span>// END OF LOG //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "SALES") %>
+</div>

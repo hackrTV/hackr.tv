@@ -1,5 +1,23 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/shops :: NEW LISTING", variant: :admin, width: 1000) do %>
-    <div style="padding: 20px;">
-      <%= render "form", listing: @listing %>
+<%# /root/grid_shop_listings/new — a new listing on the record screen's
+    shell (?grid_mob_id= prefills the vendor — the shops ledger's
+    [+] NEW LISTING while one vendor is shown). %>
+<% content_for :title, "/root/grid_shop_listings/new :: NEW LISTING" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW LISTING", sub: "ROOT · LISTING · /root/grid_shop_listings/new"} do %>
+    <%= link_to "[<] SHOPS", admin_grid_shop_listings_path(mob_id: @listing.grid_mob_id), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @listing, url: admin_grid_shop_listings_path, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE LISTING]</button>
+      <%= link_to "[CANCEL]", admin_grid_shop_listings_path(mob_id: @listing.grid_mob_id), class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+</div>

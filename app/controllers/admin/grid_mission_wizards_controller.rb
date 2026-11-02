@@ -1,3 +1,9 @@
+# /root/grid_mission_wizard/new — a mission (and optionally its arc,
+# giver and the giver's room) in seven steps on one console screen
+# (2026-11-01; the steps are client-side). A created mission opens on
+# its record screen; a rejected one re-renders the wizard with 422 and
+# the script restores what was typed. A DIALOGUE PATH that is not a JSON
+# array is refused, as on the mission record, instead of saving as no gate.
 class Admin::GridMissionWizardsController < Admin::ApplicationController
   def new
     load_selects
@@ -37,12 +43,17 @@ class Admin::GridMissionWizardsController < Admin::ApplicationController
       mission = GridMission.new(mission_params)
       mission.giver_mob_id = result[:mob]&.id
       mission.grid_mission_arc_id = result[:arc]&.id
+      if @dialogue_path_error
+        mission.valid?
+        mission.errors.add(:dialogue_path, @dialogue_path_error)
+        raise ActiveRecord::RecordInvalid, mission
+      end
       mission.save!
       result[:mission] = mission
     end
 
     set_flash_success("Mission '#{result[:mission].name}' created via wizard.")
-    redirect_to admin_grid_missions_path
+    redirect_to edit_admin_grid_mission_path(result[:mission])
   rescue ActiveRecord::RecordInvalid => e
     flash.now[:error] = e.record.errors.full_messages.join(", ")
     load_selects
@@ -90,17 +101,18 @@ class Admin::GridMissionWizardsController < Admin::ApplicationController
       grid_mission_objectives_attributes: %i[position objective_type label target_slug target_count],
       grid_mission_rewards_attributes: %i[position reward_type amount target_slug quantity]
     )
-    # Parse dialogue_path JSON
+    # Parse dialogue_path JSON (array of topic keys, or blank for no gate);
+    # anything else is noted for create to refuse, as the mission record does
     raw_dp = params[:mission][:dialogue_path_json]
-    permitted[:dialogue_path] = if raw_dp.blank?
-      nil
+    parsed = raw_dp.present? ? JSON.parse(raw_dp) : nil
+    if parsed.nil? || parsed.is_a?(Array)
+      permitted[:dialogue_path] = parsed
     else
-      parsed = JSON.parse(raw_dp)
-      parsed.is_a?(Array) ? parsed : nil
+      @dialogue_path_error = "must be a JSON array of topic keys"
     end
     permitted
-  rescue JSON::ParserError
-    permitted[:dialogue_path] = nil
+  rescue JSON::ParserError => e
+    @dialogue_path_error = "is not valid JSON: #{e.message}"
     permitted
   end
 end

@@ -1,66 +1,56 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/schematics :: FABRICATION SCHEMATICS", variant: :admin) do %>
+<%# /root/grid_schematics — the fabrication schematics as a console screen
+    (2026-11-01; root_console.css): bar, ON RECORD, // SCHEMATICS // rows
+    in position order ([NN] · name over slug · OUTPUT · INGREDIENTS · XP
+    · CL · LIVE / DRAFT · [HISTORY]), destinations, the > prompt (NN
+    opens the record screen; deletes live there — the old row Delete
+    was a dead turbo_method link). Assigns: @schematics. %>
+<% content_for :title, "/root/grid_schematics :: SCHEMATICS" %>
+<% schematics = @schematics.to_a %>
+<% numbers = schematics.each_index.map { |i| root_num(i, total: schematics.size) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "SCHEMATICS", sub: "ROOT · SYSTEMS · /root/grid_schematics"} do %>
+    <%= link_to "[+] NEW SCHEMATIC", new_admin_grid_schematic_path, class: "console-bar-link", data: {command: "new"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-        <%= tui_button "+ New Schematic", new_admin_grid_schematic_path, color: :green %>
-      </div>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "overflow-x: auto;") do %>
-        <table class="tui-table" style="width: 100%; min-width: 900px;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Name</th>
-              <th style="text-align: left;">Slug</th>
-              <th style="text-align: left;">Output</th>
-              <th style="text-align: center;">Qty</th>
-              <th style="text-align: center;">Ingredients</th>
-              <th style="text-align: center;">XP</th>
-              <th style="text-align: center;">CL</th>
-              <th style="text-align: center;">Published</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @schematics.each do |s| %>
-              <tr>
-                <td><%= s.name %></td>
-                <td style="color: #6b7280;"><%= s.slug %></td>
-                <td>
-                  <span style="color: <%= s.output_definition.rarity_color %>;">
-                    <%= s.output_definition.name %>
-                  </span>
-                </td>
-                <td style="text-align: center;"><%= s.output_quantity %></td>
-                <td style="text-align: center;"><%= s.ingredients.size %></td>
-                <td style="text-align: center;"><%= s.xp_reward %></td>
-                <td style="text-align: center;"><%= s.required_clearance %></td>
-                <td style="text-align: center;">
-                  <% if s.published? %>
-                    <span class="green-255-text">✓</span>
-                  <% else %>
-                    <span style="color: #6b7280;">—</span>
-                  <% end %>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Edit", edit_admin_grid_schematic_path(s), style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "Delete", admin_grid_schematic_path(s), data: { turbo_method: :delete, turbo_confirm: "Delete schematic '#{s.name}'?" }, color: :red, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(schematics.size, "schematic") %> <span class="console-dim">· <%= schematics.count(&:published?) %> live · <%= schematics.count { |s| !s.published? } %> draft</span></span>
     </div>
-<% end %>
+  </div>
+
+  <section class="console-section rc-ledger rc-ledger--schematics" aria-label="Schematics">
+    <div class="console-rule"><span>// SCHEMATICS //</span></div>
+    <% if schematics.empty? %>
+      <%= render "admin/console/empty", text: "NO SCHEMATICS ON RECORD", hint: "[+] NEW SCHEMATIC adds one" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>SCHEMATIC</span><span>OUTPUT</span><span class="rc-cell--r">INGR</span><span class="rc-cell--r">XP</span><span class="rc-cell--r">CL</span><span>STATE</span><span></span>
+      </div>
+    <% end %>
+    <% schematics.each_with_index do |schematic, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to schematic.name, edit_admin_grid_schematic_path(schematic), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta"><%= schematic.slug %></div>
+        </div>
+        <span class="rc-cell"><%= schematic.output_definition.name %> <span class="rc-off">x<%= schematic.output_quantity %></span></span>
+        <span class="rc-cell rc-cell--r"><%= schematic.ingredients.size %></span>
+        <span class="rc-cell rc-cell--r"><%= schematic.xp_reward %></span>
+        <span class="rc-cell rc-cell--r"><%= schematic.required_clearance %></span>
+        <span class="rc-cell <%= schematic.published? ? "rc-on" : "rc-off" %>"><%= schematic.published? ? "LIVE" : "DRAFT" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[HISTORY]", history_admin_grid_schematic_path(schematic), class: "console-link" %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "SCHEMATICS" %>
+
+  <div class="console-rule"><span>// EVERY SCHEMATIC ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "SCHEMATICS", numbers: numbers, noun: "a schematic number", extra: ["new"]) %>
+</div>

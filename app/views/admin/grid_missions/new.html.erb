@@ -1,7 +1,25 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/missions/new :: NEW MISSION", variant: :admin, width: 1200) do %>
-    <div style="padding: 20px;">
-      <%= form_with model: @mission, url: admin_grid_missions_path, local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+<%# /root/grid_missions/new — a new mission on the record screen's shell
+    (?grid_mission_arc_id= prefills the arc — the arc record's [+] NEW
+    MISSION; the seven-step wizard is [>] WIZARD). %>
+<% content_for :title, "/root/grid_missions/new :: NEW MISSION" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NEW MISSION", sub: "ROOT · MISSION · /root/grid_missions/new"} do %>
+    <%= link_to "[<] MISSIONS", admin_grid_missions_path, class: "console-bar-link" %>
+    <%= link_to "[>] WIZARD", new_admin_grid_mission_wizard_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <%= form_with model: @mission, url: admin_grid_missions_path, local: true, id: "mission-form" do |f| %>
+    <%= render "form", f: f, mission: @mission %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[CREATE MISSION]</button>
+      <%= link_to "[CANCEL]", admin_grid_missions_path, class: "rc-btn" %>
     </div>
-<% end %>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+</div>
+<%= render "script" %>

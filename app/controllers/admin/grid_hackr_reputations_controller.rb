@@ -41,7 +41,7 @@ class Admin::GridHackrReputationsController < Admin::ApplicationController
     service = Grid::ReputationService.new(hackr)
     result = service.adjust!(faction, delta, reason: reason, source: current_hackr, note: note)
 
-    set_flash_success("#{hackr.hackr_alias} :: #{faction.display_name} #{"+" if result[:applied_delta].positive?}#{result[:applied_delta]} → #{result[:new_value]} (#{result[:tier_after][:label]}).")
+    set_flash_success("#{hackr.hackr_alias} :: #{faction.display_name} #{"+" if result[:applied_delta].positive?}#{result[:applied_delta]} > #{result[:new_value]} (#{result[:tier_after][:label]}).")
     redirect_to admin_grid_hackr_reputations_path
   rescue Grid::ReputationService::SubjectMissing
     set_flash_error("Faction not found.")

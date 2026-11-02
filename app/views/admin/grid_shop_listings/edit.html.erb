@@ -1,5 +1,47 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/shops :: EDIT LISTING", variant: :admin, width: 1000) do %>
-    <div style="padding: 20px;">
-      <%= render "form", listing: @listing %>
+<%# /root/grid_shop_listings/:id/edit — the listing as a console screen
+    (2026-11-01; show redirects here). Bar (item · ROOT · LISTING · path;
+    [<] SHOPS — the vendor's listings, [>] VENDOR, [>] ITEM, [HISTORY]),
+    NEXT RESTOCK, the fields, // COMMIT // ([SAVE] [CANCEL] · [DELETE]),
+    destinations, the > prompt. The delete form is hidden at the end.
+    Assigns: @listing, @vendors, @definitions. %>
+<% vendor = GridMob.find_by(id: @listing.grid_mob_id_in_database) %>
+<% item = GridItemDefinition.find_by(id: @listing.grid_item_definition_id_in_database) %>
+<% name = item&.name || "LISTING ##{@listing.id}" %>
+<% content_for :title, "/root/grid_shop_listings/#{@listing.id} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · LISTING · /root/grid_shop_listings/#{@listing.id}"} do %>
+    <%= link_to "[<] SHOPS", admin_grid_shop_listings_path(mob_id: vendor&.id), class: "console-bar-link" %>
+    <% if vendor %><%= link_to "[>] VENDOR", edit_admin_grid_mob_path(vendor), class: "console-bar-link" %><% end %>
+    <% if item %><%= link_to "[>] ITEM", edit_admin_grid_item_definition_path(item), class: "console-bar-link" %><% end %>
+    <%= link_to "[HISTORY]", history_admin_grid_shop_listing_path(@listing), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
+
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">NEXT RESTOCK</span>
+      <span class="console-val"><%= @listing.next_restock_at_in_database&.strftime("%Y-%m-%d %H:%M") || "—" %></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with model: @listing, url: admin_grid_shop_listing_path(@listing), method: :patch, local: true do |f| %>
+    <%= render "form", f: f %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE LISTING]</button>
+      <%= link_to "[CANCEL]", admin_grid_shop_listings_path(mob_id: vendor&.id), class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-listing" class="rc-btn rc-btn--danger">[DELETE LISTING]</button>
+      </span>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-listing", admin_grid_shop_listing_path(@listing), confirm: "Delete listing '#{name}'?") %>
+  </div>
+</div>

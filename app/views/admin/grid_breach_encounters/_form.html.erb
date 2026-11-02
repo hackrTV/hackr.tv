@@ -1,25 +1,9 @@
-<%= form_with model: [:admin, encounter], local: true do |f| %>
-  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: ENCOUNTER PLACEMENT ::]</h3>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <div>
-      <%= f.tui_select :grid_breach_template_id, @templates.map { |t| ["#{t.name} (#{t.tier_label})", t.id] }, { include_blank: "-- Select Template --" }, label: "TEMPLATE" %>
-    </div>
-    <div>
-      <%= f.tui_select :grid_room_id, @rooms.map { |r| ["#{r.grid_zone.name} :: #{r.name}", r.id] }, { include_blank: "-- Select Room --" }, label: "ROOM" %>
-    </div>
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
-    <div>
-      <%= f.tui_select :state, GridBreachEncounter::STATES.map { |s| [s.upcase, s] }, {} %>
-    </div>
-    <div>
-      <%= f.tui_number_field :instance_seed, hint: "Optional — procedural variation seed" %>
-    </div>
-  </div>
-
-  <div style="margin-top: 25px;">
-    <%= tui_submit encounter.new_record? ? "Place Encounter" : "Update Encounter", form: f, color: :green, style: "padding: 8px 20px;" %>
-  </div>
-<% end %>
+<%# The encounter's placement as console status rows (ConsoleFormBuilder
+    rc_* rows): template, room, state, seed. The commit row belongs to
+    the caller. Locals: f; @templates, @rooms for the selects. %>
+<div class="console-status">
+  <%= f.rc_select :grid_breach_template_id, @templates.map { |t| ["#{t.name} (#{t.tier_label})", t.id] }, {include_blank: "(select a template)"}, label: "TEMPLATE", required: true, hint: "published templates" %>
+  <%= f.rc_select :grid_room_id, @rooms.map { |r| ["#{r.grid_zone.name} :: #{r.name}", r.id] }, {include_blank: "(select a room)"}, label: "ROOM", required: true %>
+  <%= f.rc_select :state, GridBreachEncounter::STATES.map { |s| [s.upcase, s] }, {} %>
+  <%= f.rc_number_field :instance_seed, label: "SEED", width: :short, hint: "optional — procedural variation seed" %>
+</div>

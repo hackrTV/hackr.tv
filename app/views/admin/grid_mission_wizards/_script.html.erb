@@ -1,0 +1,600 @@
+<%# The mission wizard's script, rendered after the screen: step
+    navigation (one .wizard-step unhidden at a time; step 3 only when
+    the giver is new), per-step checks ([ERR] lines under the step's
+    rule), the mode radios, slugs that follow their names, the objective
+    / reward rows ([+] ADD, [x] removes), the review, the localStorage
+    draft ([RESTORE] / [DISCARD]) and the five pickers
+    (admin/shared/_combobox). The submitted state is kept in
+    sessionStorage so a rejected create (data-rejected on the form)
+    comes back filled in; any other load clears it. Ids and field names are the screen's
+    (grid_mission_wizards/new); classes are root_console.css's.
+    Assigns: @arcs, @mobs, @rooms, @zones, @missions_for_prereq. %>
+<%= render "admin/shared/combobox" %>
+<script nonce="<%= content_security_policy_nonce %>">
+(function() {
+  var STORAGE_KEY = 'mission_wizard_draft';
+  var SUBMITTED_KEY = 'mission_wizard_submitted';
+  var currentStep = 1;
+  var totalSteps = 7;
+  var objectiveIdx = 0;
+  var rewardIdx = 0;
+  var form = document.getElementById('wizard-form');
+
+  // === DATA for comboboxes ===
+  var arcItems = <%= raw json_escape(@arcs.map { |a| {id: a.id, name: a.name, slug: a.slug} }.to_json) %>;
+  var mobItems = <%= raw json_escape(@mobs.map { |m| {id: m.id, name: m.name, room_name: m.grid_room&.name || "—", mob_type: m.mob_type} }.to_json) %>;
+  var roomItems = <%= raw json_escape(@rooms.map { |r| {id: r.id, name: r.name, zone: r.grid_zone.name, region: r.grid_zone.grid_region.name} }.to_json) %>;
+  var zoneItems = <%= raw json_escape(@zones.map { |z| {id: z.id, name: z.name, region_name: z.grid_region.name} }.to_json) %>;
+  var prereqItems = <%= raw json_escape(@missions_for_prereq.map { |m| {id: m.id, name: m.name, slug: m.slug, arc_name: m.grid_mission_arc&.name || "—"} }.to_json) %>;
+  var objectiveTypes = <%= raw GridMission::OBJECTIVE_TYPES.to_json %>;
+  var rewardTypes = <%= raw GridMission::REWARD_TYPES.to_json %>;
+
+  // === HTML ESCAPE HELPER (must be defined early — used by row builders) ===
+  // Quotes too: the row builders put values inside value="...".
+  function esc(s) {
+    if (!s) return '';
+    var d = document.createElement('span');
+    d.textContent = String(s);
+    return d.innerHTML.replace(/"/g, '&quot;');
+  }
+
+  // === STEP NAVIGATION ===
+  function showStep(n) {
+    // If step 3 should be skipped (mob_mode != create), handle it
+    if (n === 3 && getRadio('mob_mode') !== 'create') {
+      n = (currentStep < 3) ? 4 : 2;
+    }
+    if (n < 1) n = 1;
+    if (n > totalSteps) n = totalSteps;
+    currentStep = n;
+
+    document.querySelectorAll('.wizard-step').forEach(function(el) { el.hidden = true; });
+    var target = document.getElementById('step-' + n);
+    if (target) target.hidden = false;
+
+    // Update indicator
+    document.querySelectorAll('.step-dot').forEach(function(dot) {
+      var s = parseInt(dot.dataset.step, 10);
+      dot.classList.remove('active', 'completed', 'skipped');
+      if (s === n) dot.classList.add('active');
+      else if (s < n) dot.classList.add('completed');
+      // Mark step 3 as skipped if mob_mode != create
+      if (s === 3 && getRadio('mob_mode') !== 'create') dot.classList.add('skipped');
+    });
+
+    // Nav buttons
+    document.getElementById('btn-back').hidden = !(n > 1);
+    document.getElementById('btn-next').hidden = !(n < totalSteps);
+    document.getElementById('btn-submit').hidden = !(n === totalSteps);
+
+    // Build review on step 7
+    if (n === 7) buildReview();
+
+    saveDraft();
+  }
+
+  function getRadio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  function setRadio(name, value) {
+    var el = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
+    if (el) { el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); }
+  }
+
+  // Next/Back
+  document.getElementById('btn-next').addEventListener('click', function() {
+    if (!validateStep(currentStep)) return;
+    var next = currentStep + 1;
+    // Skip step 3 if mob_mode != create
+    if (next === 3 && getRadio('mob_mode') !== 'create') next = 4;
+    showStep(next);
+  });
+
+  document.getElementById('btn-back').addEventListener('click', function() {
+    var prev = currentStep - 1;
+    if (prev === 3 && getRadio('mob_mode') !== 'create') prev = 2;
+    showStep(prev);
+  });
+
+  // Click step indicators (only allow going to completed steps)
+  document.querySelectorAll('.step-dot').forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      var target = parseInt(this.dataset.step, 10);
+      if (target < currentStep) showStep(target);
+    });
+  });
+
+  // === VALIDATION ===
+  function validateStep(step) {
+    switch (step) {
+      case 1:
+        if (getRadio('arc_mode') === 'select' && !document.getElementById('arc-select-hidden').value) {
+          flashError('Select an arc or switch to NO ARC / NEW ARC.'); return false;
+        }
+        if (getRadio('arc_mode') === 'create' && !document.getElementById('arc-name').value.trim()) {
+          flashError('Arc name is required.'); return false;
+        }
+        if (getRadio('arc_mode') === 'create' && !document.getElementById('arc-slug').value.trim()) {
+          flashError('Arc slug is required.'); return false;
+        }
+        return true;
+      case 2:
+        if (getRadio('mob_mode') === 'select' && !document.getElementById('mob-select-hidden').value) {
+          flashError('Select a giver NPC.'); return false;
+        }
+        if (getRadio('mob_mode') === 'create' && !document.getElementById('mob-name').value.trim()) {
+          flashError('NPC name is required.'); return false;
+        }
+        return true;
+      case 3:
+        if (getRadio('room_mode') === 'select' && !document.getElementById('room-select-hidden').value) {
+          flashError('Select a room for mob placement.'); return false;
+        }
+        if (getRadio('room_mode') === 'create') {
+          if (!document.getElementById('room-name').value.trim()) { flashError('Room name is required.'); return false; }
+          if (!document.getElementById('room-slug').value.trim()) { flashError('Room slug is required.'); return false; }
+          if (!document.getElementById('zone-select-hidden').value) { flashError('Zone is required for new room.'); return false; }
+        }
+        return true;
+      case 4:
+        if (!document.getElementById('mission-slug').value.trim()) { flashError('Mission slug is required.'); return false; }
+        if (!document.getElementById('mission-name').value.trim()) { flashError('Mission name is required.'); return false; }
+        return true;
+      default:
+        return true;
+    }
+  }
+
+  // An [ERR] line under the current step's rule, gone after 4s.
+  var flashTimer;
+  function flashError(msg) {
+    var existing = document.getElementById('wizard-flash');
+    if (existing) existing.remove();
+    var div = document.createElement('div');
+    div.id = 'wizard-flash';
+    div.className = 'rc-flash rc-flash--err console-line';
+    var tag = document.createElement('span');
+    tag.className = 'console-tag';
+    tag.textContent = '[ERR]';
+    var text = document.createElement('span');
+    text.textContent = msg;
+    div.appendChild(tag);
+    div.appendChild(text);
+    var rule = document.getElementById('step-' + currentStep).querySelector('.console-rule');
+    rule.parentNode.insertBefore(div, rule.nextSibling);
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(function() { if (div.parentNode) div.remove(); }, 4000);
+  }
+
+  // === RADIO TOGGLE VISIBILITY ===
+  function setupRadioToggle(radioName, sections) {
+    document.querySelectorAll('input[name="' + radioName + '"]').forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        Object.keys(sections).forEach(function(val) {
+          var el = document.getElementById(sections[val]);
+          if (el) el.hidden = !(radio.value === val && radio.checked);
+        });
+        saveDraft();
+      });
+    });
+  }
+
+  setupRadioToggle('arc_mode', { select: 'arc-select-section', create: 'arc-create-section' });
+  setupRadioToggle('mob_mode', { select: 'mob-select-section', create: 'mob-create-section' });
+  setupRadioToggle('room_mode', { select: 'room-select-section', create: 'room-create-section' });
+
+  // === AUTO-SLUG for arc and room ===
+  function autoSlug(nameId, slugId) {
+    var nameEl = document.getElementById(nameId);
+    var slugEl = document.getElementById(slugId);
+    var manual = false;
+    nameEl.addEventListener('input', function() {
+      if (!manual) slugEl.value = nameEl.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    });
+    slugEl.addEventListener('input', function() { manual = true; });
+  }
+  autoSlug('arc-name', 'arc-slug');
+  autoSlug('room-name', 'room-slug');
+  autoSlug('mission-name', 'mission-slug');
+
+  // [x] on an objective / reward row drops it (none of them is saved yet).
+  form.addEventListener('click', function(event) {
+    var button = event.target.closest('[data-row-remove]');
+    if (button) button.closest('.rc-row').remove();
+  });
+
+  var removeButton = '<span class="rc-links"><button type="button" class="rc-btn rc-btn--danger" data-row-remove aria-label="Remove row">[x]</button></span>';
+
+  // === OBJECTIVES DYNAMIC ROWS ===
+  var objTbody = document.getElementById('objectives-tbody');
+
+  function addObjectiveRow(data) {
+    data = data || {};
+    var idx = objectiveIdx++;
+    var row = document.createElement('div');
+    row.className = 'rc-row';
+    row.innerHTML =
+      '<input type="number" name="mission[grid_mission_objectives_attributes][' + idx + '][position]" class="rc-input" aria-label="Objective position" value="' + esc(String(data.position || (idx + 1))) + '">' +
+      '<select name="mission[grid_mission_objectives_attributes][' + idx + '][objective_type]" class="rc-select" aria-label="Objective type">' +
+        '<option value="">—</option>' + objectiveTypes.map(function(t) { return '<option value="' + t + '"' + (data.objective_type === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') +
+      '</select>' +
+      '<input type="text" name="mission[grid_mission_objectives_attributes][' + idx + '][label]" class="rc-input" aria-label="Objective label" value="' + esc(data.label || '') + '">' +
+      '<input type="text" name="mission[grid_mission_objectives_attributes][' + idx + '][target_slug]" class="rc-input" aria-label="Objective target slug" value="' + esc(data.target_slug || '') + '">' +
+      '<input type="number" name="mission[grid_mission_objectives_attributes][' + idx + '][target_count]" class="rc-input" aria-label="Objective count" value="' + esc(String(data.target_count || 1)) + '" min="1">' +
+      removeButton;
+    objTbody.appendChild(row);
+  }
+
+  document.getElementById('add-objective-btn').addEventListener('click', function() { addObjectiveRow(); });
+  // Start with one row
+  addObjectiveRow({ position: 1 });
+
+  // === REWARDS DYNAMIC ROWS ===
+  var rewTbody = document.getElementById('rewards-tbody');
+
+  function addRewardRow(data) {
+    data = data || {};
+    var idx = rewardIdx++;
+    var row = document.createElement('div');
+    row.className = 'rc-row';
+    row.innerHTML =
+      '<input type="number" name="mission[grid_mission_rewards_attributes][' + idx + '][position]" class="rc-input" aria-label="Reward position" value="' + esc(String(data.position || (idx + 1))) + '">' +
+      '<select name="mission[grid_mission_rewards_attributes][' + idx + '][reward_type]" class="rc-select" aria-label="Reward type">' +
+        '<option value="">—</option>' + rewardTypes.map(function(t) { return '<option value="' + t + '"' + (data.reward_type === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') +
+      '</select>' +
+      '<input type="number" name="mission[grid_mission_rewards_attributes][' + idx + '][amount]" class="rc-input rc-input--r" aria-label="Reward amount" value="' + esc(String(data.amount || 0)) + '">' +
+      '<input type="text" name="mission[grid_mission_rewards_attributes][' + idx + '][target_slug]" class="rc-input" aria-label="Reward target slug" value="' + esc(data.target_slug || '') + '">' +
+      '<input type="number" name="mission[grid_mission_rewards_attributes][' + idx + '][quantity]" class="rc-input" aria-label="Reward quantity" value="' + esc(String(data.quantity || 1)) + '" min="1">' +
+      removeButton;
+    rewTbody.appendChild(row);
+  }
+
+  document.getElementById('add-reward-btn').addEventListener('click', function() { addRewardRow(); });
+  // Start with one row
+  addRewardRow({ position: 1, reward_type: 'xp' });
+
+  // === REVIEW BUILDER ===
+  // One status row per fact: KEY · value (markup already escaped).
+  function reviewRow(key, html) {
+    return '<div class="console-status-row"><span class="console-key">' + key + '</span><span class="console-val">' + html + '</span></div>';
+  }
+
+  var missing = '<span class="rc-bad">NOT SELECTED</span>';
+  var fresh = '<span class="rc-on">[NEW]</span> ';
+
+  function buildReview() {
+    var html = '';
+
+    // Arc
+    var arcMode = getRadio('arc_mode');
+    var arcHtml;
+    if (arcMode === 'none') arcHtml = '<span class="rc-off">none</span>';
+    else if (arcMode === 'select') {
+      var arcId = document.getElementById('arc-select-hidden').value;
+      var arc = arcItems.find(function(a) { return String(a.id) === arcId; });
+      arcHtml = arc ? esc(arc.name) : missing;
+    } else {
+      arcHtml = fresh + esc(document.getElementById('arc-name').value);
+    }
+    html += reviewRow('ARC', arcHtml);
+
+    // Giver
+    var mobMode = getRadio('mob_mode');
+    if (mobMode === 'select') {
+      var mobId = document.getElementById('mob-select-hidden').value;
+      var mob = mobItems.find(function(m) { return String(m.id) === mobId; });
+      html += reviewRow('GIVER', mob ? esc(mob.name) + ' <span class="console-dim">@ ' + esc(mob.room_name) + '</span>' : missing);
+    } else {
+      html += reviewRow('GIVER', fresh + esc(document.getElementById('mob-name').value));
+      // Room
+      var roomHtml;
+      if (getRadio('room_mode') === 'select') {
+        var roomId = document.getElementById('room-select-hidden').value;
+        var room = roomItems.find(function(r) { return String(r.id) === roomId; });
+        roomHtml = room ? esc(room.zone) + ' / ' + esc(room.name) : missing;
+      } else {
+        roomHtml = fresh + esc(document.getElementById('room-name').value);
+      }
+      html += reviewRow('ROOM', roomHtml);
+    }
+
+    // Mission
+    html += reviewRow('MISSION', esc(document.getElementById('mission-name').value) +
+      ' <span class="console-dim">' + esc(document.getElementById('mission-slug').value) + '</span>');
+    var desc = document.getElementById('mission-description').value;
+    if (desc) html += reviewRow('DESCRIPTION', '<span class="console-dim">' + esc(desc).substring(0, 120) + '</span>');
+    var flags = '<span class="rc-star">CL ' + esc(document.getElementById('mission-min-cl').value || '0') + '</span>';
+    if (document.getElementById('mission-repeatable').checked) flags += ' · <span class="rc-hot">REPEATABLE</span>';
+    flags += document.getElementById('mission-published').checked ? ' · <span class="rc-on">PUBLISHED</span>' : ' · <span class="rc-bad">UNPUBLISHED</span>';
+    html += reviewRow('FLAGS', flags);
+
+    // Objectives
+    var objRows = objTbody.querySelectorAll('.rc-row');
+    html += reviewRow('OBJECTIVES', String(objRows.length));
+    objRows.forEach(function(row, i) {
+      var inputs = row.querySelectorAll('input, select');
+      var type = inputs[1].value || '?';
+      var label = inputs[2].value || '(no label)';
+      var slug = inputs[3].value;
+      var count = inputs[4].value;
+      var line = esc(type) + ': ' + esc(label);
+      if (slug) line += ' <span class="console-dim">[' + esc(slug) + ']</span>';
+      if (parseInt(count) > 1) line += ' x' + esc(count);
+      html += reviewRow('OBJ ' + (i + 1), line);
+    });
+
+    // Rewards
+    var rewRows = rewTbody.querySelectorAll('.rc-row');
+    html += reviewRow('REWARDS', String(rewRows.length));
+    rewRows.forEach(function(row, i) {
+      var inputs = row.querySelectorAll('input, select');
+      var type = inputs[1].value || '?';
+      var amount = inputs[2].value;
+      var slug = inputs[3].value;
+      var qty = inputs[4].value;
+      var line = esc(type);
+      if (parseInt(amount)) line += ' ' + esc(amount);
+      if (slug) line += ' <span class="console-dim">[' + esc(slug) + ']</span>';
+      if (parseInt(qty) > 1) line += ' x' + esc(qty);
+      html += reviewRow('RWD ' + (i + 1), line);
+    });
+
+    document.getElementById('review-content').innerHTML = html;
+  }
+
+  // === LOCALSTORAGE DRAFT ===
+  function collectState() {
+    return {
+      step: currentStep,
+      arc_mode: getRadio('arc_mode'),
+      arc_id: document.getElementById('arc-select-hidden').value,
+      arc_name: document.getElementById('arc-name').value,
+      arc_slug: document.getElementById('arc-slug').value,
+      arc_description: document.getElementById('arc-description').value,
+      arc_position: document.getElementById('arc-position').value,
+      mob_mode: getRadio('mob_mode'),
+      mob_id: document.getElementById('mob-select-hidden').value,
+      mob_name: document.getElementById('mob-name').value,
+      mob_description: document.getElementById('mob-description').value,
+      room_mode: getRadio('room_mode'),
+      room_id: document.getElementById('room-select-hidden').value,
+      room_name: document.getElementById('room-name').value,
+      room_slug: document.getElementById('room-slug').value,
+      zone_id: document.getElementById('zone-select-hidden').value,
+      room_type: document.getElementById('room-type').value,
+      room_min_cl: document.getElementById('room-min-cl').value,
+      mission_slug: document.getElementById('mission-slug').value,
+      mission_name: document.getElementById('mission-name').value,
+      mission_description: document.getElementById('mission-description').value,
+      mission_min_cl: document.getElementById('mission-min-cl').value,
+      mission_position: document.getElementById('mission-position').value,
+      mission_repeatable: document.getElementById('mission-repeatable').checked,
+      mission_published: document.getElementById('mission-published').checked,
+      prereq_id: document.getElementById('prereq-select-hidden').value,
+      mission_rep_faction: document.getElementById('mission-rep-faction').value,
+      mission_rep_value: document.getElementById('mission-rep-value').value,
+      mission_dialogue_path: document.getElementById('mission-dialogue-path').value,
+      objectives: collectTableRows(objTbody),
+      rewards: collectTableRows(rewTbody)
+    };
+  }
+
+  function collectTableRows(container) {
+    var rows = [];
+    container.querySelectorAll('.rc-row').forEach(function(row) {
+      var inputs = row.querySelectorAll('input, select');
+      var vals = [];
+      inputs.forEach(function(inp) { vals.push(inp.value); });
+      rows.push(vals);
+    });
+    return rows;
+  }
+
+  function saveDraft() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(collectState())); } catch(e) {}
+  }
+
+  function restoreDraft(state) {
+    setRadio('arc_mode', state.arc_mode || 'none');
+    document.getElementById('arc-select-hidden').value = state.arc_id || '';
+    document.getElementById('arc-name').value = state.arc_name || '';
+    document.getElementById('arc-slug').value = state.arc_slug || '';
+    document.getElementById('arc-description').value = state.arc_description || '';
+    document.getElementById('arc-position').value = state.arc_position || '';
+
+    setRadio('mob_mode', state.mob_mode || 'select');
+    document.getElementById('mob-select-hidden').value = state.mob_id || '';
+    document.getElementById('mob-name').value = state.mob_name || '';
+    document.getElementById('mob-description').value = state.mob_description || '';
+
+    setRadio('room_mode', state.room_mode || 'select');
+    document.getElementById('room-select-hidden').value = state.room_id || '';
+    document.getElementById('room-name').value = state.room_name || '';
+    document.getElementById('room-slug').value = state.room_slug || '';
+    document.getElementById('zone-select-hidden').value = state.zone_id || '';
+    document.getElementById('room-type').value = state.room_type || 'standard';
+    document.getElementById('room-min-cl').value = state.room_min_cl || '0';
+
+    document.getElementById('mission-slug').value = state.mission_slug || '';
+    document.getElementById('mission-name').value = state.mission_name || '';
+    document.getElementById('mission-description').value = state.mission_description || '';
+    document.getElementById('mission-min-cl').value = state.mission_min_cl || '0';
+    document.getElementById('mission-position').value = state.mission_position || '';
+    document.getElementById('mission-repeatable').checked = !!state.mission_repeatable;
+    document.getElementById('mission-published').checked = state.mission_published !== false;
+    document.getElementById('prereq-select-hidden').value = state.prereq_id || '';
+    document.getElementById('mission-rep-faction').value = state.mission_rep_faction || '';
+    document.getElementById('mission-rep-value').value = state.mission_rep_value || '0';
+    document.getElementById('mission-dialogue-path').value = state.mission_dialogue_path || '';
+
+    // Restore combobox display text
+    restoreComboboxDisplay('arc-select', arcItems, state.arc_id, function(a) { return a.name; });
+    restoreComboboxDisplay('mob-select', mobItems, state.mob_id, function(m) { return m.name + ' @ ' + m.room_name; });
+    restoreComboboxDisplay('room-select', roomItems, state.room_id, function(r) { return r.zone + ' / ' + r.name; });
+    restoreComboboxDisplay('prereq-select', prereqItems, state.prereq_id, function(m) { return m.name; });
+
+    // Restore zone combobox
+    if (state.zone_id) {
+      var zone = zoneItems.find(function(z) { return String(z.id) === state.zone_id; });
+      if (zone) {
+        document.getElementById('zone-select-input').value = zone.region_name + ' / ' + zone.name;
+        document.getElementById('zone-select-input').classList.add('selected');
+      }
+    }
+
+    // Restore objectives
+    objTbody.innerHTML = '';
+    objectiveIdx = 0;
+    if (state.objectives && state.objectives.length) {
+      state.objectives.forEach(function(vals) {
+        addObjectiveRow({ position: vals[0], objective_type: vals[1], label: vals[2], target_slug: vals[3], target_count: vals[4] });
+      });
+    } else {
+      addObjectiveRow({ position: 1 });
+    }
+
+    // Restore rewards
+    rewTbody.innerHTML = '';
+    rewardIdx = 0;
+    if (state.rewards && state.rewards.length) {
+      state.rewards.forEach(function(vals) {
+        addRewardRow({ position: vals[0], reward_type: vals[1], amount: vals[2], target_slug: vals[3], quantity: vals[4] });
+      });
+    } else {
+      addRewardRow({ position: 1, reward_type: 'xp' });
+    }
+
+    // Navigate to saved step
+    showStep(state.step || 1);
+  }
+
+  function restoreComboboxDisplay(prefix, items, savedId, labelFn) {
+    if (!savedId) return;
+    var item = items.find(function(i) { return String(i.id) === savedId; });
+    if (item) {
+      var input = document.getElementById(prefix + '-input');
+      input.value = labelFn(item);
+      input.classList.add('selected');
+    }
+  }
+
+  // A rejected create (422) brings back what was submitted; otherwise
+  // offer a meaningful draft.
+  var rejectedState = null;
+  try {
+    if (form.dataset.rejected === 'true') {
+      rejectedState = JSON.parse(sessionStorage.getItem(SUBMITTED_KEY) || 'null');
+    } else {
+      sessionStorage.removeItem(SUBMITTED_KEY);
+    }
+  } catch(e) {}
+
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && !rejectedState) {
+      var parsed = JSON.parse(saved);
+      // Only show banner if there's meaningful data
+      if (parsed.mission_name || parsed.mob_name || parsed.arc_name) {
+        var banner = document.getElementById('draft-banner');
+        banner.hidden = false;
+        document.getElementById('draft-restore').addEventListener('click', function() {
+          restoreDraft(parsed);
+          banner.hidden = true;
+        });
+        document.getElementById('draft-discard').addEventListener('click', function() {
+          localStorage.removeItem(STORAGE_KEY);
+          banner.hidden = true;
+        });
+      }
+    }
+  } catch(e) {}
+
+  // Keep the submitted state for a rejected create; clear the draft.
+  form.addEventListener('submit', function() {
+    try { sessionStorage.setItem(SUBMITTED_KEY, JSON.stringify(collectState())); } catch(e) {}
+    localStorage.removeItem(STORAGE_KEY);
+  });
+
+  // === COMBOBOX INITIALIZATION ===
+  AdminCombobox.init({
+    inputId: 'arc-select-input',
+    hiddenId: 'arc-select-hidden',
+    dropdownId: 'arc-select-dropdown',
+    statusId: 'arc-select-status',
+    items: arcItems,
+    getSearchText: function(a) { return (a.name + ' ' + a.slug).toLowerCase(); },
+    getGroupKey: function() { return 'Arcs'; },
+    renderOption: function(a, e) { return '<span class="cb-name">' + e(a.name) + '</span> <span class="cb-meta">' + e(a.slug) + '</span>'; },
+    getId: function(a) { return String(a.id); },
+    getLabel: function(a) { return a.name; },
+    emptyText: 'No arcs match',
+    selectedText: 'Arc selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'mob-select-input',
+    hiddenId: 'mob-select-hidden',
+    dropdownId: 'mob-select-dropdown',
+    statusId: 'mob-select-status',
+    items: mobItems,
+    getSearchText: function(m) { return (m.name + ' ' + m.room_name + ' ' + m.mob_type).toLowerCase(); },
+    getGroupKey: function(m) { return m.mob_type; },
+    renderOption: function(m, e) { return '<span class="cb-name">' + e(m.name) + '</span> <span class="cb-meta">@ ' + e(m.room_name) + '</span>'; },
+    getId: function(m) { return String(m.id); },
+    getLabel: function(m) { return m.name + ' @ ' + m.room_name; },
+    emptyText: 'No NPCs match',
+    selectedText: 'NPC selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'room-select-input',
+    hiddenId: 'room-select-hidden',
+    dropdownId: 'room-select-dropdown',
+    statusId: 'room-select-status',
+    items: roomItems,
+    getSearchText: function(r) { return (r.name + ' ' + r.zone + ' ' + r.region).toLowerCase(); },
+    getGroupKey: function(r) { return r.region + ' / ' + r.zone; },
+    renderOption: function(r, e) { return '<span class="cb-name">' + e(r.name) + '</span> <span class="cb-meta">' + e(r.zone) + '</span>'; },
+    getId: function(r) { return String(r.id); },
+    getLabel: function(r) { return r.zone + ' / ' + r.name; },
+    emptyText: 'No rooms match',
+    selectedText: 'Room selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'zone-select-input',
+    hiddenId: 'zone-select-hidden',
+    dropdownId: 'zone-select-dropdown',
+    statusId: 'zone-select-status',
+    items: zoneItems,
+    getSearchText: function(z) { return (z.name + ' ' + z.region_name).toLowerCase(); },
+    getGroupKey: function(z) { return z.region_name; },
+    renderOption: function(z, e) { return '<span class="cb-name">' + e(z.name) + '</span> <span class="cb-meta">' + e(z.region_name) + '</span>'; },
+    getId: function(z) { return String(z.id); },
+    getLabel: function(z) { return z.region_name + ' / ' + z.name; },
+    emptyText: 'No zones match',
+    selectedText: 'Zone selected'
+  });
+
+  AdminCombobox.init({
+    inputId: 'prereq-select-input',
+    hiddenId: 'prereq-select-hidden',
+    dropdownId: 'prereq-select-dropdown',
+    statusId: 'prereq-select-status',
+    items: prereqItems,
+    getSearchText: function(m) { return (m.name + ' ' + m.slug + ' ' + m.arc_name).toLowerCase(); },
+    getGroupKey: function(m) { return m.arc_name; },
+    renderOption: function(m, e) { return '<span class="cb-name">' + e(m.name) + '</span> <span class="cb-meta">' + e(m.slug) + '</span>'; },
+    getId: function(m) { return String(m.id); },
+    getLabel: function(m) { return m.name; },
+    emptyText: 'No missions match',
+    selectedText: 'Prerequisite selected'
+  });
+
+  // === INITIAL STATE ===
+  if (rejectedState) restoreDraft(rejectedState);
+  else showStep(1);
+})();
+</script>

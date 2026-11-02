@@ -1,161 +1,55 @@
-<%= form_with model: [:admin, definition], local: true do |f| %>
-  <h3 class="cyan-255-text" style="margin: 20px 0 15px 0;">[:: DEFINITION INFO ::]</h3>
+<%# The item definition's fields as console status rows (ConsoleFormBuilder
+    rc_* rows), // DESCRIPTION //, // PROPERTIES // (the JSON object as
+    typed — re-rendered from the params on a 422) and // SALVAGE YIELDS
+    // — one row per yield (POS · OUTPUT · QTY · [x]; a saved row's [x]
+    sets its _destroy flag and hides it, a new row's removes it; a row
+    already flagged comes back hidden on a rejected save) and
+    [+] ADD YIELD, both driven by grid_item_definitions/_script (the
+    #salvage-yields-table / #add-yield-btn / #yield-row-template ids).
+    The commit row belongs to the caller. Locals: f, definition;
+    @all_definitions, @sorted_yields (edit: the saved yields + one blank). %>
+<% output_options = @all_definitions.map { |d| ["#{d.name} [#{d.rarity_label}]", d.id] } %>
+<% properties_json = params.dig(:grid_item_definition, :properties_json) || (definition.properties.present? ? JSON.pretty_generate(definition.properties) : "{}") %>
+<div class="console-status">
+  <%= f.rc_text_field :name, required: true, autocomplete: "off", width: :wide %>
+  <%= f.rc_text_field :slug, required: true, autocomplete: "off", hint: "lowercase letters, numbers, hyphens only" %>
+  <%= f.rc_select :item_type, GridItem::ITEM_TYPES.map { |t| [t.titleize, t] }, {include_blank: "Select..."}, label: "TYPE" %>
+  <%= f.rc_select :rarity, GridItem::RARITIES.map { |r| [GridItem::RARITY_LABELS[r] || r.upcase, r] }, {include_blank: "Select..."} %>
+  <%= f.rc_number_field :value, label: "BASE VALUE", width: :short, min: 0, hint: "CRED" %>
+  <%= f.rc_number_field :max_stack, label: "MAX STACK", width: :short, min: 1, hint: "blank = unlimited" %>
+</div>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <div>
-      <%= f.tui_text_field :name %>
-    </div>
-    <div>
-      <%= f.tui_text_field :slug, hint: "lowercase letters, numbers, hyphens only" %>
-    </div>
+<%= f.rc_text_area :description, rows: 3, spellcheck: true %>
+
+<div class="console-rule"><span>// PROPERTIES //</span></div>
+<%= text_area_tag "grid_item_definition[properties_json]", properties_json, id: "grid_item_definition_properties_json", rows: 6,
+  class: "rc-textarea rc-textarea--code", spellcheck: false, aria: {label: "Properties (JSON)"}, data: {controller: "autogrow", action: "input->autogrow#grow"} %>
+<p class="rc-sub">JSON object. Components: {"slot": "gpu", "rate_multiplier": 1.5} · consumables: {"effect_type": "heal", "amount": 30} <%= f.rc_errors(:properties) %></p>
+
+<section id="salvage-yields-table" class="console-section rc-ledger rc-ledger--parts" aria-label="Salvage yields">
+  <div class="console-rule"><span>// SALVAGE YIELDS //</span></div>
+  <p class="rc-sub">Items produced when this item is salvaged. No yields = XP only. UNICORN items cannot be salvaged regardless.</p>
+  <div class="rc-row rc-row--head" aria-hidden="true">
+    <span>POS</span><span>OUTPUT ITEM</span><span class="rc-cell--r">QTY</span><span></span>
   </div>
-
-  <div style="margin-top: 15px;">
-    <%= f.tui_text_area :description, style: "height: 80px;" %>
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
-    <div>
-      <%= f.tui_select :item_type,
-            GridItem::ITEM_TYPES.map { |t| [t.titleize, t] },
-            { include_blank: "Select..." } %>
-    </div>
-    <div>
-      <%= f.tui_select :rarity,
-            GridItem::RARITIES.map { |r| [GridItem::RARITY_LABELS[r] || r.upcase, r] },
-            { include_blank: "Select..." } %>
-    </div>
-    <div>
-      <%= f.tui_number_field :value, min: 0, label: "BASE VALUE" %>
-    </div>
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 15px;">
-    <div>
-      <%= f.tui_number_field :max_stack, min: 1, hint: "Leave blank for unlimited" %>
-    </div>
-  </div>
-
-  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: PROPERTIES (JSON) ::]</h3>
-  <div style="margin-bottom: 20px;">
-    <%= text_area_tag "grid_item_definition[properties_json]",
-          (definition.properties.present? ? JSON.pretty_generate(definition.properties) : "{}"),
-          class: "tui-input", style: "width: 100%; font-family: monospace; height: 120px;" %>
-    <small style="color: #888;">JSON object. Components: {"slot": "gpu", "rate_multiplier": 1.5}. Consumables: {"effect_type": "heal", "amount": 30}</small>
-    <% if definition.errors[:properties].any? %>
-      <br><small class="red-255-text"><%= definition.errors[:properties].join(", ") %></small>
+  <%= f.fields_for :salvage_yields, @sorted_yields || definition.salvage_yields do |ff| %>
+    <%= tag.div class: "rc-row", hidden: ff.object.marked_for_destruction? do %>
+      <span><%= ff.number_field :position, class: "rc-input", min: 0, aria: {label: "Position"} %></span>
+      <span><%= ff.select :output_definition_id, output_options, {include_blank: "— select output —"}, class: "rc-select", aria: {label: "Output item"} %></span>
+      <span><%= ff.number_field :quantity, class: "rc-input rc-input--r", min: 1, aria: {label: "Quantity"} %></span>
+      <span class="rc-links">
+        <% if ff.object.persisted? %>
+          <%= ff.hidden_field :id %>
+          <%= ff.hidden_field :_destroy, value: ff.object.marked_for_destruction? ? "1" : "0", class: "destroy-flag" %>
+          <button type="button" class="rc-btn rc-btn--danger yield-destroy-btn" data-persisted="true" aria-label="Remove yield">[x]</button>
+        <% else %>
+          <button type="button" class="rc-btn rc-btn--danger yield-destroy-btn" aria-label="Remove yield">[x]</button>
+        <% end %>
+      </span>
     <% end %>
-  </div>
-
-  <h3 class="cyan-255-text" style="margin: 30px 0 15px 0;">[:: SALVAGE YIELDS ::]</h3>
-  <p style="color: #6b7280; font-size: 0.85em; margin-bottom: 10px;">
-    Items produced when this item is salvaged. No yields = XP only. UNICORN items cannot be salvaged regardless.
-  </p>
-  <table id="salvage-yields-table" class="tui-table" style="width: 100%; margin-bottom: 10px;">
-    <thead>
-      <tr>
-        <th style="text-align: left; width: 70px;">Pos</th>
-        <th style="text-align: left;">Output Item</th>
-        <th style="text-align: center; width: 80px;">Qty</th>
-        <th style="text-align: center; width: 50px;">&times;</th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= f.fields_for :salvage_yields, @sorted_yields || definition.salvage_yields do |ff| %>
-        <tr>
-          <td><%= ff.number_field :position, class: "tui-input", style: "width: 60px; padding: 4px;", min: 0 %></td>
-          <td>
-            <%= ff.select :output_definition_id,
-                  @all_definitions.map { |d| ["#{d.name} [#{d.rarity_label}]", d.id] },
-                  {include_blank: "— select output —"},
-                  class: "tui-input", style: "width: 100%; padding: 4px;" %>
-          </td>
-          <td style="text-align: center;">
-            <%= ff.number_field :quantity, class: "tui-input", style: "width: 70px; padding: 4px; text-align: center;", min: 1 %>
-          </td>
-          <td style="text-align: center;">
-            <% if ff.object.persisted? %>
-              <%= ff.hidden_field :id %>
-              <%= ff.hidden_field :_destroy, value: "0", class: "destroy-flag" %>
-              <button type="button" class="tui-button red-168 yield-destroy-btn" style="padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" data-persisted="true">&times;</button>
-            <% else %>
-              <%= tui_button "×", color: :red, class: "yield-destroy-btn", type: "button", style: "padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-  <% if definition.errors[:salvage_yields].any? %>
-    <small class="red-255-text"><%= definition.errors[:salvage_yields].join(", ") %></small>
   <% end %>
-  <%= tui_button "+ Add Yield", color: :green, type: "button", id: "add-yield-btn", style: "padding: 4px 12px; font-size: 0.85em; margin-top: 5px;" %>
-
-  <template id="yield-row-template">
-    <tr>
-      <td>
-        <input type="number" name="grid_item_definition[salvage_yields_attributes][__INDEX__][position]"
-          class="tui-input" style="width: 60px; padding: 4px;" min="0" value="0">
-      </td>
-      <td>
-        <select name="grid_item_definition[salvage_yields_attributes][__INDEX__][output_definition_id]"
-          class="tui-input" style="width: 100%; padding: 4px;">
-          <option value="">— select output —</option>
-          <% @all_definitions.each do |d| %>
-            <option value="<%= d.id %>"><%= d.name %> [<%= d.rarity_label %>]</option>
-          <% end %>
-        </select>
-      </td>
-      <td style="text-align: center;">
-        <input type="number" name="grid_item_definition[salvage_yields_attributes][__INDEX__][quantity]"
-          class="tui-input" style="width: 70px; padding: 4px; text-align: center;" min="1" value="1">
-      </td>
-      <td style="text-align: center;">
-        <%= tui_button "×", color: :red, class: "yield-destroy-btn", type: "button", style: "padding: 2px 6px; font-size: 0.8em; box-shadow: 4px 4px black;" %>
-      </td>
-    </tr>
-  </template>
-
-  <script nonce="<%= content_security_policy_nonce %>">
-    (function() {
-      var yieldRowIndex = <%= definition.salvage_yields.size + 1000 %>;
-      var table = document.getElementById('salvage-yields-table');
-
-      // Event delegation for all destroy buttons (current + future rows)
-      table.addEventListener('click', function(e) {
-        var btn = e.target.closest('.yield-destroy-btn');
-        if (!btn) return;
-        var row = btn.closest('tr');
-        if (btn.dataset.persisted) {
-          row.querySelector('.destroy-flag').value = '1';
-          row.style.display = 'none';
-        } else {
-          row.remove();
-        }
-      });
-
-      // Add yield row
-      document.getElementById('add-yield-btn').addEventListener('click', function() {
-        var template = document.getElementById('yield-row-template');
-        var tbody = table.querySelector('tbody');
-        var clone = template.content.cloneNode(true);
-        clone.querySelectorAll('[name]').forEach(function(el) {
-          el.name = el.name.replace('__INDEX__', yieldRowIndex);
-        });
-        tbody.appendChild(clone);
-        yieldRowIndex++;
-      });
-    })();
-  </script>
-
-  <div style="margin-top: 30px; display: flex; gap: 10px;">
-    <%= tui_submit definition.persisted? ? "Save Definition" : "Create Definition", form: f,
-          color: :purple, style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <%= tui_button "Cancel", admin_grid_item_definitions_path,
-          color: :grey, style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <% if definition.persisted? %>
-      <%= tui_button "History", history_admin_grid_item_definition_path(definition),
-            color: :purple, style: "padding: 10px 30px; font-size: 1.1em;" %>
-    <% end %>
-  </div>
-<% end %>
+</section>
+<div class="rc-actions">
+  <button type="button" id="add-yield-btn" class="rc-btn">[+] ADD YIELD</button>
+  <%= f.rc_errors(:salvage_yields) %>
+</div>

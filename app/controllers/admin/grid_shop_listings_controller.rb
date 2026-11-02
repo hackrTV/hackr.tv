@@ -1,21 +1,31 @@
+# /root/grid_shop_listings — the shops ledger (every vendor's listings,
+# ?mob_id= narrows to one vendor) and the listing record as console
+# screens (2026-11-01; root_console.css). The record screen is the edit
+# screen: show redirects there, saves stay on it.
 class Admin::GridShopListingsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridShopListing
 
-  before_action :set_listing, only: [:edit, :update, :destroy, :restock]
+  before_action :set_listing, only: [:show, :edit, :update, :destroy, :restock]
   before_action :load_selects, only: [:new, :edit]
 
   def index
+    @vendors = GridMob.where(mob_type: "vendor").includes(:grid_room).order(:name)
+    @vendor = @vendors.find { |v| v.id.to_s == params[:mob_id].to_s }
     @listings = GridShopListing.includes(:grid_mob, :grid_item_definition)
       .joins(:grid_item_definition)
       .order(:grid_mob_id, "grid_item_definitions.name")
-    @listings = @listings.where(grid_mob_id: params[:mob_id]) if params[:mob_id].present?
-    @vendors = GridMob.where(mob_type: "vendor").includes(:grid_room).order(:name)
+    @listings = @listings.where(grid_mob_id: @vendor.id) if @vendor
+  end
+
+  def show
+    redirect_to edit_admin_grid_shop_listing_path(@listing)
   end
 
   def new
     @listing = GridShopListing.new(
+      grid_mob_id: params[:grid_mob_id],
       restock_amount: 1,
       restock_interval_hours: 24,
       min_clearance: 0,
@@ -29,7 +39,7 @@ class Admin::GridShopListingsController < Admin::ApplicationController
 
     if @listing.save
       set_flash_success("Listing '#{@listing.name}' created for #{@listing.grid_mob.name}.")
-      redirect_to admin_grid_shop_listings_path(mob_id: @listing.grid_mob_id)
+      redirect_to edit_admin_grid_shop_listing_path(@listing)
     else
       load_selects
       flash.now[:error] = @listing.errors.full_messages.join(", ")
@@ -43,7 +53,7 @@ class Admin::GridShopListingsController < Admin::ApplicationController
   def update
     if @listing.update(listing_params)
       set_flash_success("Listing '#{@listing.name}' updated.")
-      redirect_to admin_grid_shop_listings_path(mob_id: @listing.grid_mob_id)
+      redirect_to edit_admin_grid_shop_listing_path(@listing)
     else
       load_selects
       flash.now[:error] = @listing.errors.full_messages.join(", ")

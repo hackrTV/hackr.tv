@@ -1,121 +1,89 @@
-<%= render TuiWindowComponent.new(title: "/root/grid_transactions :: TRANSACTION LOG", variant: :admin) do %>
+<%# /root/grid_transactions — every CRED movement as a console ledger
+    (2026-11-01; root_console.css): bar ([<] ECONOMY), ON RECORD, the
+    // FILTER // rows (server-side: TYPE links, HACKR, FROM / TO dates,
+    MEMO — [FILTER] / [x] CLEAR), // TRANSACTIONS // newest first, 100
+    a page (time · hash · TYPE · from over its address · to · amount ·
+    memo) with the pager, destinations, the > prompt. Assigns:
+    @transactions, @total_count, @offset, @per_page, @hackr_not_found. %>
+<% content_for :title, "/root/grid_transactions :: TRANSACTIONS" %>
+<% transactions = @transactions.to_a %>
+<% tx_type = params[:tx_type].to_s.presence_in(GridTransaction::TX_TYPES).to_s %>
+<% keep = request.query_parameters.slice("hackr_alias", "date_from", "date_to", "memo") %>
+<% filtered = tx_type.present? || keep.values.any?(&:present?) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "TRANSACTIONS", sub: "ROOT · SYSTEMS · /root/grid_transactions"} do %>
+    <%= link_to "[<] ECONOMY", admin_grid_economy_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%# Filter form %>
-      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
-        <%= form_tag admin_grid_transactions_path, method: :get, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do %>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Type</label>
-            <%= select_tag :tx_type, options_for_select([["All Types", ""]] + GridTransaction::TX_TYPES.map { |t| [t.upcase.gsub("_", " "), t] }, params[:tx_type]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Hackr Alias</label>
-            <%= text_field_tag :hackr_alias, params[:hackr_alias], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "alias" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">From</label>
-            <%= text_field_tag :date_from, params[:date_from], type: "date", style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">To</label>
-            <%= text_field_tag :date_to, params[:date_to], type: "date", style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Memo</label>
-            <%= text_field_tag :memo, params[:memo], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "search..." %>
-          </div>
-          <div>
-            <%= tui_button "Filter", color: :cyan, type: "submit", style: "padding: 6px 14px;" %>
-          </div>
-          <% if params.values_at(:tx_type, :hackr_alias, :date_from, :date_to, :memo).any?(&:present?) %>
-            <div>
-              <%= tui_button "Clear", admin_grid_transactions_path, style: "padding: 6px 14px;" %>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-
-      <% if @hackr_not_found %>
-        <div style="background: #332200; border: 2px solid #fbbf24; padding: 10px 15px; margin-bottom: 15px;">
-          <span class="yellow-255-text">Hackr "<%= params[:hackr_alias] %>" not found.</span>
-        </div>
-      <% end %>
-
-      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: TRANSACTIONS (<%= @total_count %> total, showing <%= @offset + 1 %>–<%= [@offset + @per_page, @total_count].min %>) ::]</h3>
-
-      <% if @transactions.any? %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center;">Time</th>
-                <th style="text-align: left;">Hash</th>
-                <th style="text-align: left;">Type</th>
-                <th style="text-align: left;">From</th>
-                <th style="text-align: left;">To</th>
-                <th style="text-align: right;">Amount</th>
-                <th style="text-align: left;">Memo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @transactions.each do |tx| %>
-                <tr>
-                  <td style="text-align: center; color: #666; white-space: nowrap;"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></td>
-                  <td style="font-family: monospace; color: #666;"><%= tx.short_hash %></td>
-                  <td>
-                    <% color = case tx.tx_type
-                      when "transfer" then "#d0d0d0"
-                      when "mining_reward" then "#00ff00"
-                      when "gameplay_reward" then "#fbbf24"
-                      when "burn" then "#ff0000"
-                      when "redemption" then "#a78bfa"
-                      when "genesis" then "#00ffff"
-                      when "purchase_recycle" then "#34d399"
-                      else "#888"
-                    end %>
-                    <span style="color: <%= color %>; white-space: nowrap;"><%= tx.tx_type.upcase %></span>
-                  </td>
-                  <td style="white-space: nowrap;">
-                    <span style="color: <%= tx.from_cache.system? ? '#888' : '#d0d0d0' %>;"><%= cache_display(tx.from_cache) %></span>
-                    <% unless tx.from_cache.system? %>
-                      <br><span style="color: #555; font-family: monospace; font-size: 0.8em;"><%= tx.from_cache.address %></span>
-                    <% end %>
-                  </td>
-                  <td style="white-space: nowrap;">
-                    <span style="color: <%= tx.to_cache.system? ? '#888' : '#d0d0d0' %>;"><%= cache_display(tx.to_cache) %></span>
-                    <% unless tx.to_cache.system? %>
-                      <br><span style="color: #555; font-family: monospace; font-size: 0.8em;"><%= tx.to_cache.address %></span>
-                    <% end %>
-                  </td>
-                  <td style="text-align: right; font-family: monospace;" class="green-255-text"><%= format_cred(tx.amount) %></td>
-                  <td style="color: #888; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<%= tx.memo %>"><%= tx.memo || "—" %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-
-        <%# Pagination %>
-        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
-          <% if @offset > 0 %>
-            <%= tui_button "← Prev", admin_grid_transactions_path(request.query_parameters.merge("offset" => [@offset - @per_page, 0].max)), color: :green, style: "padding: 6px 14px;" %>
-          <% end %>
-          <span style="color: #888;">
-            Page <%= (@offset / @per_page) + 1 %> of <%= [(@total_count.to_f / @per_page).ceil, 1].max %>
-          </span>
-          <% if @offset + @per_page < @total_count %>
-            <%= tui_button "Next →", admin_grid_transactions_path(request.query_parameters.merge("offset" => @offset + @per_page)), color: :green, style: "padding: 6px 14px;" %>
-          <% end %>
-        </div>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666;">No transactions found.</p>
-        </div>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Economy", admin_grid_economy_path, color: :green %>
-        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(@total_count, "transaction") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· newest first · <%= @per_page %> a page</span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with url: admin_grid_transactions_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <div class="console-status-row rc-field">
+        <span class="console-key">TYPE</span>
+        <span class="console-val">
+          <% [["ALL", ""]].concat(GridTransaction::TX_TYPES.map { |t| [t.upcase, t] }).each do |word, value| %>
+            <%= link_to word, admin_grid_transactions_path(keep.merge(tx_type: value.presence).compact), class: class_names("rc-btn", "rc-btn--on": tx_type == value), aria: {current: tx_type == value && "page"} %>
+          <% end %>
+        </span>
+      </div>
+      <%= root_field("HACKR", id: "hackr_alias") do %>
+        <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
+      <% end %>
+      <%= root_field("FROM", id: "date_from") do %>
+        <%= date_field_tag :date_from, params[:date_from], class: "rc-input rc-input--date" %>
+        <%= label_tag :date_to, "TO", class: "rc-count" %>
+        <%= date_field_tag :date_to, params[:date_to], class: "rc-input rc-input--date" %>
+      <% end %>
+      <%= root_field("MEMO", id: "memo") do %>
+        <%= text_field_tag :memo, params[:memo], class: "rc-input rc-input--wide", placeholder: "words in the memo", autocomplete: "off" %>
+      <% end %>
+    </div>
+    <% if tx_type.present? %><%= hidden_field_tag :tx_type, tx_type %><% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_grid_transactions_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--tx" aria-label="Transactions">
+    <div class="console-rule"><span>// TRANSACTIONS //</span></div>
+    <% if @hackr_not_found %>
+      <%= render "admin/console/empty", text: "NO HACKR NAMED '#{params[:hackr_alias]}'", hint: "[x] CLEAR shows every transaction" %>
+    <% elsif transactions.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO TRANSACTIONS MATCH" : "NO TRANSACTIONS YET", hint: (filtered ? "[x] CLEAR shows every transaction" : "rails data:economy seeds genesis") %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>TIME</span><span>HASH</span><span>TYPE</span><span>FROM</span><span>TO</span><span class="rc-cell--r">AMOUNT</span><span>MEMO</span>
+      </div>
+    <% end %>
+    <% transactions.each do |tx| %>
+      <div class="rc-row">
+        <span class="console-tag"><%= tx.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+        <span class="rc-cell rc-off"><%= tx.short_hash %></span>
+        <%= render "tx_type", tx: tx %>
+        <% [tx.from_cache, tx.to_cache].each do |cache| %>
+          <div class="cc-text">
+            <span class="<%= cache.system? ? "rc-off" : "rc-hot" %>"><%= cache_display(cache) %></span>
+            <% unless cache.system? %><div class="cc-meta"><%= cache.address %></div><% end %>
+          </div>
+        <% end %>
+        <span class="rc-cell rc-cell--r rc-on"><%= format_cred(tx.amount) %></span>
+        <span class="rc-cell rc-off" title="<%= tx.memo %>"><%= tx.memo || "—" %></span>
+      </div>
+    <% end %>
+    <%= root_pager(@offset, @per_page, @total_count) %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "TRANSACTIONS" %>
+
+  <div class="console-rule"><span>// END OF TRANSACTIONS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "TRANSACTIONS") %>
+</div>

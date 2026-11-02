@@ -1,73 +1,75 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/reputation_events :: REP LOG", variant: :admin) do %>
+<%# /root/grid_reputation_events — the faction reputation log as a console
+    ledger (2026-11-01; root_console.css): bar ([>] REPUTATIONS,
+    [>] FACTIONS), ON SCREEN, the // FILTER // rows (server-side: HACKR,
+    FACTION, REASON prefix — [FILTER] / [x] CLEAR), // EVENTS // newest
+    100 (when · hackr · faction · delta · after · reason over note ·
+    source), destinations, the > prompt. Assigns: @events, @factions,
+    @faction_map, @hackr_filter_missing. %>
+<% content_for :title, "/root/grid_reputation_events :: REP LOG" %>
+<% filtered = request.query_parameters.slice("hackr_alias", "faction_slug", "reason").values.any?(&:present?) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "REP LOG", sub: "ROOT · SYSTEMS · /root/grid_reputation_events"} do %>
+    <%= link_to "[>] REPUTATIONS", admin_grid_hackr_reputations_path, class: "console-bar-link" %>
+    <%= link_to "[>] FACTIONS", admin_grid_factions_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <!-- Filters -->
-      <%= form_with url: admin_grid_reputation_events_path, method: :get, local: true, style: "margin-bottom: 20px;" do %>
-        <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
-          <div>
-            <label class="white-text" style="display: block; margin-bottom: 5px;">Hackr alias</label>
-            <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "tui-input", style: "padding: 6px 10px;" %>
-          </div>
-          <div>
-            <label class="white-text" style="display: block; margin-bottom: 5px;">Faction</label>
-            <%= select_tag :faction_slug, options_from_collection_for_select(@factions, :slug, :display_name, params[:faction_slug]), include_blank: "(any)", class: "tui-input", style: "padding: 6px 10px;" %>
-          </div>
-          <div>
-            <label class="white-text" style="display: block; margin-bottom: 5px;">Reason prefix</label>
-            <%= text_field_tag :reason, params[:reason], class: "tui-input", style: "padding: 6px 10px;", placeholder: "talk: / buy: / admin:" %>
-          </div>
-          <%= tui_submit "Filter", color: :green, style: "padding: 6px 16px;" %>
-          <%= tui_button "Clear", admin_grid_reputation_events_path, style: "padding: 6px 16px;" %>
-        </div>
-      <% end %>
-
-      <% if @hackr_filter_missing %>
-        <p class="yellow-168-text" style="margin-bottom: 15px;">No hackr found with alias '<%= params[:hackr_alias] %>'.</p>
-      <% end %>
-
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-        <table class="tui-table" style="width: 100%;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">When</th>
-              <th style="text-align: left;">Hackr</th>
-              <th style="text-align: left;">Faction</th>
-              <th style="text-align: right;">Δ</th>
-              <th style="text-align: right;">After</th>
-              <th style="text-align: left;">Reason</th>
-              <th style="text-align: left;">Source</th>
-              <th style="text-align: left;">Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @events.each do |e| %>
-              <tr>
-                <td style="color: #888; font-family: monospace; white-space: nowrap;"><%= e.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
-                <td><span class="cyan-255-text"><%= e.grid_hackr.hackr_alias %></span></td>
-                <td style="color: #a78bfa;">
-                  <%= @faction_map[e.subject_id]&.display_name || "#{e.subject_type}##{e.subject_id}" %>
-                </td>
-                <td style="text-align: right; font-family: monospace;" class="<%= e.delta.positive? ? "green-255-text" : (e.delta.negative? ? "red-255-text" : "") %>">
-                  <%= e.delta.positive? ? "+" : "" %><%= e.delta %>
-                </td>
-                <td style="text-align: right; font-family: monospace; color: #ddd;"><%= e.value_after %></td>
-                <td style="color: #888; font-family: monospace;"><%= e.reason %></td>
-                <td style="color: #888;"><%= e.source_type.present? ? "#{e.source_type}##{e.source_id}" : "—" %></td>
-                <td style="color: #888;"><%= e.note %></td>
-              </tr>
-            <% end %>
-            <% if @events.empty? %>
-              <tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">No events match.</td></tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
-      <p style="color: #666; margin-top: 10px;">Showing most recent <%= [Admin::GridReputationEventsController::PAGE_SIZE, @events.size].min %> events.</p>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Factions", admin_grid_factions_path, color: :green %>
-        <%= tui_button "Hackr Reps →", admin_grid_hackr_reputations_path, style: "margin-left: 8px;" %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON SCREEN</span>
+      <span class="console-val"><%= pluralize(@events.size, "event") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· newest first · at most <%= Admin::GridReputationEventsController::PAGE_SIZE %></span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with url: admin_grid_reputation_events_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <%= root_field("HACKR", id: "hackr_alias") do %>
+        <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
+      <% end %>
+      <%= root_field("FACTION", id: "faction_slug") do %>
+        <%= select_tag :faction_slug, options_from_collection_for_select(@factions, :slug, :display_name, params[:faction_slug]), include_blank: "ANY FACTION", class: "rc-select" %>
+      <% end %>
+      <%= root_field("REASON", id: "reason") do %>
+        <%= text_field_tag :reason, params[:reason], class: "rc-input", placeholder: "talk: / buy: / admin:", autocomplete: "off", spellcheck: "false" %>
+        <span class="rc-hint">a prefix</span>
+      <% end %>
+    </div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_grid_reputation_events_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--replog" aria-label="Reputation events">
+    <div class="console-rule"><span>// EVENTS //</span></div>
+    <% if @hackr_filter_missing %>
+      <%= render "admin/console/empty", text: "NO HACKR NAMED '#{params[:hackr_alias]}'", hint: "[x] CLEAR shows every event" %>
+    <% elsif @events.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO EVENTS MATCH" : "NO EVENTS YET", hint: ("[x] CLEAR shows every event" if filtered) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>WHEN</span><span>HACKR</span><span>FACTION</span><span class="rc-cell--r">DELTA</span><span class="rc-cell--r">AFTER</span><span>REASON</span><span>SOURCE</span>
+      </div>
+    <% end %>
+    <% @events.each do |event| %>
+      <div class="rc-row">
+        <span class="console-tag"><%= event.created_at.strftime("%Y-%m-%d %H:%M:%S") %></span>
+        <span class="rc-cell rc-hot"><%= event.grid_hackr.hackr_alias %></span>
+        <span class="rc-cell rc-violet"><%= @faction_map[event.subject_id]&.display_name || "#{event.subject_type}##{event.subject_id}" %></span>
+        <span class="<%= class_names("rc-cell rc-cell--r", "rc-on": event.delta.positive?, "rc-bad": event.delta.negative?) %>"><%= "+" if event.delta.positive? %><%= event.delta %></span>
+        <span class="rc-cell rc-cell--r"><%= event.value_after %></span>
+        <div class="cc-text">
+          <span class="rc-cell"><%= event.reason %></span>
+          <% if event.note.present? %><div class="cc-meta"><%= event.note %></div><% end %>
+        </div>
+        <span class="rc-cell rc-off"><%= event.source_type.present? ? "#{event.source_type}##{event.source_id}" : "—" %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :systems, except: "REPLOG" %>
+
+  <div class="console-rule"><span>// NEWEST EVENTS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "REPLOG") %>
+</div>

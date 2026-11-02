@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# /root/grid_schematics — the schematics ledger and the schematic record
+# as console screens (2026-11-01; root_console.css). The record screen is
+# the edit screen; saves stay on it.
 class Admin::GridSchematicsController < Admin::ApplicationController
   include Admin::Versionable
 

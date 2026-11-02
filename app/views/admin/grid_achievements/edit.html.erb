@@ -1,8 +1,43 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/achievements/#{@achievement.slug} :: EDIT ACHIEVEMENT", variant: :admin, width: 900) do %>
+<%# /root/grid_achievements/:id/edit — the achievement as a console screen
+    (2026-11-01; show redirects here). Bar (name · ROOT · ACHIEVEMENT ·
+    path; [<] ACHIEVEMENTS, [HISTORY]), EARNED readout, the fields,
+    // COMMIT // ([SAVE] [CANCEL] · [DELETE] — takes every hackr's award
+    with it), destinations, the > prompt. The delete form is hidden at
+    the end. Assigns: @achievement. %>
+<% name = @achievement.name_in_database %>
+<% content_for :title, "/root/grid_achievements/#{@achievement.id} :: #{name}" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: name, sub: "ROOT · ACHIEVEMENT · /root/grid_achievements/#{@achievement.id}"} do %>
+    <%= link_to "[<] ACHIEVEMENTS", admin_grid_achievements_path, class: "console-bar-link" %>
+    <%= link_to "[HISTORY]", history_admin_grid_achievement_path(@achievement), class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%= form_with model: @achievement, url: admin_grid_achievement_path(@achievement), local: true do |f| %>
-        <%= render "form", f: f %>
-      <% end %>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">EARNED</span>
+      <span class="console-val"><%= pluralize(@achievement.grid_hackr_achievements.size, "hackr") %><% if @achievement.trigger_type_in_database == "manual" %> <span class="console-dim">· manual — award it from the ledger</span><% end %></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with model: @achievement, url: admin_grid_achievement_path(@achievement), method: :patch, local: true do |f| %>
+    <%= render "form", f: f, achievement: @achievement %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[SAVE ACHIEVEMENT]</button>
+      <%= link_to "[CANCEL]", admin_grid_achievements_path, class: "rc-btn" %>
+      <span class="rc-actions--end">
+        <button type="submit" form="delete-achievement" class="rc-btn rc-btn--danger">[DELETE ACHIEVEMENT]</button>
+      </span>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems) %>
+
+  <div class="rc-hidden-forms">
+    <%= root_delete_form("delete-achievement", admin_grid_achievement_path(@achievement), confirm: "Delete achievement '#{name}'? Every hackr who earned it loses it.") %>
+  </div>
+</div>

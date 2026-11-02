@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# /root/grid_breach_templates — the BREACH templates ledger and the
+# template record as console screens (2026-11-01; root_console.css).
+# Slug-keyed; saves stay on the record (no show route). The two JSON
+# textareas and the zone slugs CSV are read from the raw params.
 class Admin::GridBreachTemplatesController < Admin::ApplicationController
   include Admin::Versionable
 
@@ -73,9 +77,10 @@ class Admin::GridBreachTemplatesController < Admin::ApplicationController
     name = @template.name
     if @template.grid_hackr_breaches.exists?
       flash[:error] = "Cannot delete '#{name}' — active or historical breaches reference this template."
-    else
-      @template.destroy!
+    elsif @template.destroy
       set_flash_success("Breach template '#{name}' deleted.")
+    else
+      flash[:error] = "Cannot delete '#{name}' — #{@template.errors.full_messages.to_sentence}."
     end
     redirect_to admin_grid_breach_templates_path
   end
@@ -97,8 +102,7 @@ class Admin::GridBreachTemplatesController < Admin::ApplicationController
       :cooldown_min, :cooldown_max, :xp_reward, :cred_reward,
       :requires_mission_slug, :requires_item_slug,
       :danger_level_min,
-      :published, :position,
-      :protocol_composition_json, :reward_table_json
+      :published, :position
     )
   end
 

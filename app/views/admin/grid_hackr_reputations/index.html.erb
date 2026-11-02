@@ -1,103 +1,94 @@
-<%= render TuiWindowComponent.new(title: "/root/grid/reputations :: HACKR STANDINGS", variant: :admin) do %>
+<%# /root/grid_hackr_reputations — every hackr's standing per faction as a
+    console screen (2026-11-01; root_console.css): bar ([>] REP LOG,
+    [>] FACTIONS), ON SCREEN, the // FILTER // rows (server-side: HACKR,
+    FACTION — [FILTER] / [x] CLEAR), // STANDINGS // (hackr · faction ·
+    value · updated), // ADJUST // (the manual adjust form: HACKR,
+    FACTION — leaf factions only, DELTA, REASON, NOTE · [APPLY] — the
+    reply lands under the bar), destinations, the > prompt. Assigns:
+    @reputations, @hackrs, @factions, @adjustable_factions, @faction_map,
+    @hackr_filter_missing. %>
+<% content_for :title, "/root/grid_hackr_reputations :: REPUTATIONS" %>
+<% filtered = request.query_parameters.slice("hackr_alias", "faction_slug").values.any?(&:present?) %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "REPUTATIONS", sub: "ROOT · SYSTEMS · /root/grid_hackr_reputations"} do %>
+    <%= link_to "[>] REP LOG", admin_grid_reputation_events_path, class: "console-bar-link" %>
+    <%= link_to "[>] FACTIONS", admin_grid_factions_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <!-- Filters -->
-      <%= form_with url: admin_grid_hackr_reputations_path, method: :get, local: true, style: "margin-bottom: 20px;" do %>
-        <div style="display: flex; gap: 10px; align-items: flex-end;">
-          <div>
-            <label class="white-text" style="display: block; margin-bottom: 5px;">Hackr alias</label>
-            <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "tui-input", style: "padding: 6px 10px;" %>
-          </div>
-          <div>
-            <label class="white-text" style="display: block; margin-bottom: 5px;">Faction</label>
-            <%= select_tag :faction_slug, options_from_collection_for_select(@factions, :slug, :display_name, params[:faction_slug]), include_blank: "(any)", class: "tui-input", style: "padding: 6px 10px;" %>
-          </div>
-          <%= tui_submit "Filter", color: :green, style: "padding: 6px 16px;" %>
-          <%= tui_button "Clear", admin_grid_hackr_reputations_path, style: "padding: 6px 16px;" %>
-        </div>
-      <% end %>
-
-      <% if @hackr_filter_missing %>
-        <p class="yellow-168-text" style="margin-bottom: 15px;">No hackr found with alias '<%= params[:hackr_alias] %>'.</p>
-      <% end %>
-
-      <!-- Listing -->
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-        <table class="tui-table" style="width: 100%;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Hackr</th>
-              <th style="text-align: left;">Faction</th>
-              <th style="text-align: right;">Value</th>
-              <th style="text-align: left;">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @reputations.each do |rep| %>
-              <tr>
-                <td><span class="cyan-255-text"><%= rep.grid_hackr.hackr_alias %></span></td>
-                <td style="color: #a78bfa;"><%= @faction_map[rep.subject_id]&.display_name %></td>
-                <td style="text-align: right; font-family: monospace;" class="<%= rep.value.positive? ? "green-255-text" : (rep.value.negative? ? "red-255-text" : "") %>">
-                  <%= rep.value.positive? ? "+" : "" %><%= rep.value %>
-                </td>
-                <td style="color: #888;"><%= rep.updated_at.strftime("%Y-%m-%d %H:%M") %></td>
-              </tr>
-            <% end %>
-            <% if @reputations.empty? %>
-              <tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">No reputation records match.</td></tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
-      <!-- Manual Adjust -->
-      <div style="margin-top: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: MANUAL ADJUST ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-          <%= form_with url: adjust_admin_grid_hackr_reputations_path, method: :post, local: true do %>
-            <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 5px;">Hackr</label>
-                <%= select_tag :grid_hackr_id, options_from_collection_for_select(@hackrs, :id, :hackr_alias), class: "tui-input", style: "padding: 6px 10px; min-width: 180px;" %>
-              </div>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 5px;">Faction</label>
-                <%= select_tag :grid_faction_id, options_from_collection_for_select(@adjustable_factions, :id, :display_name), class: "tui-input", style: "padding: 6px 10px; min-width: 180px;" %>
-                <small style="color: #666; display: block; margin-top: 4px;">Aggregate factions (derived from rep-links) are hidden.</small>
-              </div>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 5px;">Delta</label>
-                <%= number_field_tag :delta, 0, class: "tui-input", style: "padding: 6px 10px; width: 90px;" %>
-              </div>
-              <div style="flex: 1; min-width: 200px;">
-                <label class="white-text" style="display: block; margin-bottom: 5px;">Reason tag</label>
-                <%= text_field_tag :reason, "admin:manual", class: "tui-input", style: "padding: 6px 10px; width: 100%;" %>
-              </div>
-              <div style="flex: 2; min-width: 260px;">
-                <label class="white-text" style="display: block; margin-bottom: 5px;">Note (optional)</label>
-                <%= text_field_tag :note, "", class: "tui-input", style: "padding: 6px 10px; width: 100%;" %>
-              </div>
-              <%= tui_submit "Apply", color: :green, style: "padding: 6px 16px;" %>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Factions", admin_grid_factions_path, color: :green %>
-        <%= tui_button "Rep Log →", admin_grid_reputation_events_path, style: "margin-left: 8px;" %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON SCREEN</span>
+      <span class="console-val"><%= pluralize(@reputations.size, "standing") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· by hackr, then faction</span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with url: admin_grid_hackr_reputations_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <%= root_field("HACKR", id: "hackr_alias") do %>
+        <%= text_field_tag :hackr_alias, params[:hackr_alias], class: "rc-input", placeholder: "alias", autocomplete: "off", spellcheck: "false" %>
+      <% end %>
+      <%= root_field("FACTION", id: "faction_slug") do %>
+        <%= select_tag :faction_slug, options_from_collection_for_select(@factions, :slug, :display_name, params[:faction_slug]), include_blank: "ANY FACTION", class: "rc-select" %>
+      <% end %>
+    </div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_grid_hackr_reputations_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--standings" aria-label="Standings">
+    <div class="console-rule"><span>// STANDINGS //</span></div>
+    <% if @hackr_filter_missing %>
+      <%= render "admin/console/empty", text: "NO HACKR NAMED '#{params[:hackr_alias]}'", hint: "[x] CLEAR shows every standing" %>
+    <% elsif @reputations.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO STANDINGS MATCH" : "NO STANDINGS YET", hint: ("[x] CLEAR shows every standing" if filtered) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>HACKR</span><span>FACTION</span><span class="rc-cell--r">VALUE</span><span>UPDATED</span>
+      </div>
+    <% end %>
+    <% @reputations.each do |rep| %>
+      <div class="rc-row">
+        <span class="rc-hot"><%= rep.grid_hackr.hackr_alias %></span>
+        <span class="rc-cell rc-violet"><%= @faction_map[rep.subject_id]&.display_name %></span>
+        <span class="<%= class_names("rc-cell rc-cell--r", "rc-on": rep.value.positive?, "rc-bad": rep.value.negative?) %>"><%= "+" if rep.value.positive? %><%= rep.value %></span>
+        <span class="rc-cell"><%= rep.updated_at.strftime("%Y-%m-%d %H:%M") %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= form_with url: adjust_admin_grid_hackr_reputations_path, method: :post, local: true do %>
+    <div class="console-rule"><span>// ADJUST //</span></div>
+    <div class="console-status">
+      <%= root_field("HACKR", id: "grid_hackr_id") do %>
+        <%= select_tag :grid_hackr_id, options_from_collection_for_select(@hackrs, :id, :hackr_alias), class: "rc-select" %>
+      <% end %>
+      <%= root_field("FACTION", id: "grid_faction_id") do %>
+        <%= select_tag :grid_faction_id, options_from_collection_for_select(@adjustable_factions, :id, :display_name), class: "rc-select" %>
+        <span class="rc-hint">aggregate factions (derived from rep-links) are not listed</span>
+      <% end %>
+      <%= root_field("DELTA", id: "delta") do %>
+        <%= number_field_tag :delta, 0, class: "rc-input rc-input--short" %>
+        <span class="rc-hint">non-zero · negative lowers</span>
+      <% end %>
+      <%= root_field("REASON", id: "reason") do %>
+        <%= text_field_tag :reason, "admin:manual", class: "rc-input", autocomplete: "off", spellcheck: "false" %>
+        <span class="rc-hint">the rep log's reason tag</span>
+      <% end %>
+      <%= root_field("NOTE", id: "note") do %>
+        <%= text_field_tag :note, "", class: "rc-input rc-input--wide", placeholder: "optional", autocomplete: "off" %>
+      <% end %>
+    </div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[APPLY]</button>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :systems, except: "REPUTATIONS" %>
+
+  <div class="console-rule"><span>// END OF STANDINGS //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:systems, except: "REPUTATIONS") %>
+</div>

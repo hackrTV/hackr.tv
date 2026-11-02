@@ -1,16 +1,25 @@
+# /root/grid_achievements — the achievements ledger (CATEGORY row, FILTER,
+# MANUAL AWARD) and the achievement record as console screens
+# (2026-11-01; root_console.css). The record screen is the edit screen:
+# show redirects there, saves stay on it; TRIGGER DATA that is not a
+# JSON object is refused with a 422 instead of saving as {}.
 class Admin::GridAchievementsController < Admin::ApplicationController
   include Admin::Versionable
 
   versionable GridAchievement
 
-  before_action :set_achievement, only: [:edit, :update, :destroy, :award]
+  before_action :set_achievement, only: [:show, :edit, :update, :destroy, :award]
 
   def index
+    @category_filter = params[:category].presence_in(GridAchievement::CATEGORIES)
     scope = GridAchievement.includes(:grid_hackr_achievements)
-    scope = scope.by_category(params[:category]) if params[:category].present? && GridAchievement::CATEGORIES.include?(params[:category])
-    @category_filter = params[:category]
+    scope = scope.by_category(@category_filter) if @category_filter
     @achievements = scope.order(:category, :trigger_type, :name)
     @hackrs = GridHackr.order(:hackr_alias)
+  end
+
+  def show
+    redirect_to edit_admin_grid_achievement_path(@achievement)
   end
 
   def new
@@ -19,9 +28,9 @@ class Admin::GridAchievementsController < Admin::ApplicationController
 
   def create
     @achievement = GridAchievement.new(achievement_params)
-    if @achievement.save
+    if save_achievement
       set_flash_success("Achievement '#{@achievement.name}' created.")
-      redirect_to admin_grid_achievements_path
+      redirect_to edit_admin_grid_achievement_path(@achievement)
     else
       flash.now[:error] = @achievement.errors.full_messages.join(", ")
       render :new, status: :unprocessable_entity
@@ -32,9 +41,10 @@ class Admin::GridAchievementsController < Admin::ApplicationController
   end
 
   def update
-    if @achievement.update(achievement_params)
+    @achievement.assign_attributes(achievement_params)
+    if save_achievement
       set_flash_success("Achievement '#{@achievement.name}' updated.")
-      redirect_to admin_grid_achievements_path
+      redirect_to edit_admin_grid_achievement_path(@achievement)
     else
       flash.now[:error] = @achievement.errors.full_messages.join(", ")
       render :edit, status: :unprocessable_entity
@@ -66,20 +76,32 @@ class Admin::GridAchievementsController < Admin::ApplicationController
     @achievement = GridAchievement.find(params[:id])
   end
 
+  # Saves unless the TRIGGER DATA failed to parse (achievement_params
+  # leaves the stored value alone and notes why), then reports it with
+  # the model's own errors.
+  def save_achievement
+    return @achievement.save unless @trigger_data_error
+    @achievement.valid?
+    @achievement.errors.add(:trigger_data, @trigger_data_error)
+    false
+  end
+
   def achievement_params
     permitted = params.require(:grid_achievement).permit(
       :slug, :name, :description, :badge_icon,
       :trigger_type, :xp_reward, :cred_reward, :category, :hidden
     )
     # Parse trigger_data from JSON string
-    permitted[:trigger_data] = if params[:grid_achievement][:trigger_data_json].present?
-      JSON.parse(params[:grid_achievement][:trigger_data_json])
+    json_source = params[:grid_achievement][:trigger_data_json]
+    parsed = json_source.present? ? JSON.parse(json_source) : {}
+    if parsed.is_a?(Hash)
+      permitted[:trigger_data] = parsed
     else
-      {}
+      @trigger_data_error = "must be a JSON object"
     end
     permitted
-  rescue JSON::ParserError
-    permitted[:trigger_data] = {}
+  rescue JSON::ParserError => e
+    @trigger_data_error = "is not valid JSON: #{e.message}"
     permitted
   end
 end

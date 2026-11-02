@@ -1,0 +1,74 @@
+<%# The mission record's scripts, rendered after the screen: the GIVER /
+    ARC / PREREQ pickers (admin/shared/_combobox) and the [x] of the
+    objective / reward rows — a saved row gets _destroy = 1 and hides, an
+    unsaved one leaves the form (the old inline onclick handlers never
+    ran: the CSP allows nonce'd scripts only). Markup: grid_missions/
+    _form. Assigns: @mobs, @arcs, @missions_for_prereq. %>
+<%= render "admin/shared/combobox" %>
+<script nonce="<%= content_security_policy_nonce %>">
+  (function() {
+    document.getElementById('mission-form').addEventListener('click', function(event) {
+      var button = event.target.closest('[data-row-remove]');
+      if (!button) return;
+      var row = button.closest('.rc-row');
+      var destroy = row.querySelector('input[name$="[_destroy]"]');
+      if (destroy) {
+        destroy.value = '1';
+        row.hidden = true;
+      } else {
+        row.remove();
+      }
+    });
+
+    AdminCombobox.init({
+      inputId: 'giver-cb-input',
+      hiddenId: 'giver-cb-hidden',
+      dropdownId: 'giver-cb-dropdown',
+      statusId: 'giver-cb-status',
+      items: <%= raw json_escape(@mobs.map { |m| {id: m.id, name: m.name, room_name: m.grid_room&.name || "—", mob_type: m.mob_type} }.to_json) %>,
+      getSearchText: function(m) { return (m.name + ' ' + m.room_name + ' ' + m.mob_type).toLowerCase(); },
+      getGroupKey: function(m) { return m.mob_type; },
+      renderOption: function(m, e) {
+        return '<span class="cb-name">' + e(m.name) + '</span> <span class="cb-meta">@ ' + e(m.room_name) + '</span>';
+      },
+      getId: function(m) { return String(m.id); },
+      getLabel: function(m) { return m.name + ' @ ' + m.room_name; },
+      emptyText: 'No NPCs match',
+      selectedText: 'NPC selected'
+    });
+
+    AdminCombobox.init({
+      inputId: 'arc-cb-input',
+      hiddenId: 'arc-cb-hidden',
+      dropdownId: 'arc-cb-dropdown',
+      statusId: 'arc-cb-status',
+      items: <%= raw json_escape(@arcs.map { |a| {id: a.id, name: a.name} }.to_json) %>,
+      getSearchText: function(a) { return a.name.toLowerCase(); },
+      getGroupKey: function() { return 'Arcs'; },
+      renderOption: function(a, e) {
+        return '<span class="cb-name">' + e(a.name) + '</span>';
+      },
+      getId: function(a) { return String(a.id); },
+      getLabel: function(a) { return a.name; },
+      emptyText: 'No arcs match',
+      selectedText: 'Arc selected'
+    });
+
+    AdminCombobox.init({
+      inputId: 'prereq-cb-input',
+      hiddenId: 'prereq-cb-hidden',
+      dropdownId: 'prereq-cb-dropdown',
+      statusId: 'prereq-cb-status',
+      items: <%= raw json_escape(@missions_for_prereq.map { |m| {id: m.id, name: m.name, slug: m.slug, arc_name: m.grid_mission_arc&.name || "—"} }.to_json) %>,
+      getSearchText: function(m) { return (m.name + ' ' + m.slug + ' ' + m.arc_name).toLowerCase(); },
+      getGroupKey: function(m) { return m.arc_name; },
+      renderOption: function(m, e) {
+        return '<span class="cb-name">' + e(m.name) + '</span> <span class="cb-meta">' + e(m.slug) + '</span>';
+      },
+      getId: function(m) { return String(m.id); },
+      getLabel: function(m) { return m.name; },
+      emptyText: 'No missions match',
+      selectedText: 'Prerequisite selected'
+    });
+  })();
+</script>
