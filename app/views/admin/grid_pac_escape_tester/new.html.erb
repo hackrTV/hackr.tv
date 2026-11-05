@@ -1,130 +1,87 @@
-<%= render "admin/shared/combobox" %>
+<%# /root/grid_pac_escape_tester/new — start a PAC escape test as a
+    console screen (2026-11-01; dev tools; root_console.css): bar (the
+    DEV TOOLS badge, [<] INSPECTOR when a hackr came in), the WARNING
+    row, // HACKR // (the HACKR picker, prefilled from ?hackr_id=, the
+    options tagging captured / in-breach hackrs; with a hackr in: its
+    room and what blocks a capture), // OPTIONS // (IMPOUND) + [CAPTURE
+    INTO PAC] confirming, destinations, the > prompt; the picker's
+    script renders after the screen (hackr-* ids). Assigns: @hackr (or
+    nil), @hackrs, @breach_hackr_ids. %>
+<% content_for :title, "/root/grid_pac_escape_tester :: PAC" %>
+<% room = @hackr&.current_room %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "PAC ESCAPE TESTER", sub: "ROOT · HACKRS · /root/grid_pac_escape_tester/new"} do %>
+    <% if @hackr %><%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link", data: {command: "back"} %><% end %>
+    <%= root_badge("DEV TOOLS ON", :warn) %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/pac-escape-tester :: PAC ESCAPE TESTER", variant: :admin) do %>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">WARNING</span><span class="console-val rc-star">one-click capture into the GovCorp Perception Alignment Center <span class="console-dim">· full state restore on end · CRED spent on bribes and items forfeited are not restored</span></span></div>
+  </div>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
-        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
-        <span style="color: #ccc;"> — One-click capture into GovCorp Perception Alignment Center. Test escape flow (containment BREACH, facility navigation, bribe, impound recovery). Full state restore on end. CRED spent on bribes and items forfeited during test are NOT restored.</span>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <% if @hackr %>
-          <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-        <% end %>
-        <%= tui_button "All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
-      </div>
-
-      <%= form_with url: admin_grid_pac_escape_tester_path, method: :post, local: true, id: "pac-tester-form" do %>
-        <%# Hackr selector %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px; margin-bottom: 20px;") do %>
-          <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">HACKR</label>
-
-          <input type="hidden" name="hackr_id" id="hackr-id" value="<%= @hackr&.id %>">
-
-          <div class="admin-combobox">
-            <input type="text" id="hackr-input" class="admin-combobox-input" autocomplete="off"
-              placeholder="Type to search hackrs..."
-              value="<%= @hackr ? "#{@hackr.hackr_alias} (CL #{@hackr.stat("clearance")})" : "" %>">
-            <div id="hackr-dropdown" class="admin-combobox-dropdown"></div>
-          </div>
-
-          <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="hackr-status">
-            <% if @hackr %>
-              <span style="color: #34d399;">Selected: <%= @hackr.hackr_alias %></span>
-            <% else %>
-              <%= @hackrs.size %> hackrs — start typing to filter
-            <% end %>
-          </p>
-        <% end %>
-
-        <%# Hackr info (shown when pre-selected) %>
-        <% if @hackr %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px; margin-bottom: 20px;") do %>
-            <span style="color: #888;">Hackr:</span>
-            <span class="cyan-255-text" style="font-weight: bold;"><%= @hackr.hackr_alias %></span>
-            <span style="color: #888;"> (CL <%= @hackr.stat("clearance") %>)</span>
-            <br>
-            <span style="color: #888;">Location:</span>
-            <% room = @hackr.current_room %>
-            <% if room %>
-              <span class="white-text"><%= room.name %></span>
-              <span style="color: #888;"> — <%= room.grid_zone&.name %>, <%= room.grid_zone&.grid_region&.name %></span>
-            <% else %>
-              <span class="red-255-text">No room</span>
-            <% end %>
-            <% if @hackr.in_breach? %>
-              <br>
-              <span class="red-255-text" style="font-weight: bold;">WARNING: Active BREACH in progress. Cannot capture.</span>
-            <% end %>
-            <% if Grid::ContainmentService.captured?(@hackr) %>
-              <br>
-              <span class="red-255-text" style="font-weight: bold;">WARNING: Already captured in PAC.</span>
-            <% end %>
+  <%= form_with url: admin_grid_pac_escape_tester_path, method: :post, local: true, id: "pac-tester-form" do %>
+    <div class="console-rule"><span>// HACKR //</span></div>
+    <div class="console-status">
+      <%= render "admin/console/picker", label: "HACKR", key: "hackr", name: "hackr_id", value: @hackr&.id,
+        text: @hackr && "#{@hackr.hackr_alias} (CL #{@hackr.stat("clearance")})", placeholder: "alias · role",
+        status: @hackr ? "Selected: #{@hackr.hackr_alias}" : "#{@hackrs.size} hackrs · type to filter" %>
+      <% if @hackr %>
+        <div class="console-status-row">
+          <span class="console-key">ROOM</span>
+          <% if room %>
+            <span class="console-val"><%= room.name %> <span class="console-dim">· <%= room.grid_zone&.name %> · <%= room.grid_zone&.grid_region&.name %></span></span>
+          <% else %>
+            <span class="console-val rc-bad">no room</span>
           <% end %>
-        <% end %>
-
-        <%# Options %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px; margin-bottom: 20px;") do %>
-          <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">OPTIONS</label>
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="checkbox" name="impound" value="1" style="width: 16px; height: 16px; accent-color: #f87171;">
-            <span style="color: #f87171;">Impound equipped gear</span>
-            <span style="color: #666; font-size: 0.85em;"> — confiscate loadout on capture (tests impound recovery / bribe forfeit)</span>
-          </label>
-        <% end %>
-
-        <div style="margin-top: 20px;">
-          <%= tui_submit "CAPTURE INTO PAC", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Force-capture hackr into PAC? (State will be restored on End Test)" } %>
         </div>
+        <% if @hackr.in_breach? %>
+          <div class="console-status-row"><span class="console-key">BREACH</span><span class="console-val rc-bad">IN PROGRESS <span class="console-dim">· a capture is refused until it ends</span></span></div>
+        <% end %>
+        <% if Grid::ContainmentService.captured?(@hackr) %>
+          <div class="console-status-row"><span class="console-key">CAPTURED</span><span class="console-val rc-bad">ALREADY IN PAC</span></div>
+        <% end %>
       <% end %>
     </div>
-<% end %>
 
+    <div class="console-rule"><span>// OPTIONS //</span></div>
+    <div class="console-status">
+      <%= root_field("IMPOUND") do %>
+        <label class="rc-check"><%= check_box_tag :impound, "1", false %> impound equipped gear</label>
+        <span class="rc-hint">confiscates the loadout on capture · tests impound recovery / bribe forfeit</span>
+      <% end %>
+    </div>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--danger" data-confirm="Force-capture hackr into PAC? (State will be restored on End Test)">[CAPTURE INTO PAC]</button>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :hackrs, except: "PAC" %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, except: "PAC", extra: (@hackr ? ["back"] : [])) %>
+</div>
+
+<%= render "admin/shared/combobox" %>
 <script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    function ready(fn) {
-      if (document.readyState !== 'loading') fn();
-      else document.addEventListener('DOMContentLoaded', fn);
-    }
-    ready(function() {
-      AdminCombobox.init({
-        inputId: 'hackr-input',
-        hiddenId: 'hackr-id',
-        dropdownId: 'hackr-dropdown',
-        statusId: 'hackr-status',
-        formId: 'pac-tester-form',
-        items: <%= raw json_escape(@hackrs.map { |h|
-          {
-            id: h.id,
-            alias: h.hackr_alias,
-            cl: h.stat("clearance"),
-            role: h.role || "hackr",
-            captured: Grid::ContainmentService.captured?(h),
-            in_breach: @breach_hackr_ids.include?(h.id)
-          }
-        }.to_json) %>,
-        getId: function(r) { return r.id; },
-        getSearchText: function(r) { return (r.alias + ' ' + r.role).toLowerCase(); },
-        getGroupKey: function(r) { return r.role.toUpperCase(); },
-        renderOption: function(r, esc) {
-          var flags = '';
-          if (r.captured) flags += ' <span style="color: #f87171;">[CAPTURED]</span>';
-          if (r.in_breach) flags += ' <span style="color: #fbbf24;">[IN BREACH]</span>';
-          return '<span class="cb-name">' + esc(r.alias) + '</span>' +
-            ' <span class="cb-meta" style="color: #9ca3af;">(CL ' + r.cl + ')</span>' + flags;
-        },
-        getLabel: function(r) { return r.alias + ' (CL ' + r.cl + ')'; },
-        emptyText: 'No hackrs match',
-        selectedText: 'Selected',
-        submitError: 'Select a hackr first'
-      });
-    });
-  })();
+  AdminCombobox.init({
+    inputId: 'hackr-input',
+    hiddenId: 'hackr-hidden',
+    dropdownId: 'hackr-dropdown',
+    statusId: 'hackr-status',
+    formId: 'pac-tester-form',
+    items: <%= raw json_escape(@hackrs.map { |h| {id: h.id, alias: h.hackr_alias, cl: h.stat("clearance"), role: h.role || "hackr", captured: Grid::ContainmentService.captured?(h), in_breach: @breach_hackr_ids.include?(h.id)} }.to_json) %>,
+    getId: function(r) { return r.id; },
+    getSearchText: function(r) { return (r.alias + ' ' + r.role).toLowerCase(); },
+    getGroupKey: function(r) { return r.role.toUpperCase(); },
+    renderOption: function(r, esc) {
+      var flags = (r.captured ? ' [CAPTURED]' : '') + (r.in_breach ? ' [IN BREACH]' : '');
+      return '<span class="cb-name">' + esc(r.alias) + '</span> <span class="cb-meta">CL ' + r.cl + flags + '</span>';
+    },
+    getLabel: function(r) { return r.alias + ' (CL ' + r.cl + ')'; },
+    emptyText: 'No hackrs match',
+    selectedText: 'Hackr selected',
+    submitError: 'Select a hackr first'
+  });
 </script>

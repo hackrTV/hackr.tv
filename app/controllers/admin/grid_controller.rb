@@ -49,10 +49,10 @@ class Admin::GridController < Admin::ApplicationController
     hackr = GridHackr.find(params[:hackr_id])
     Grid::TotpService.new(hackr).disable_admin!(acting_admin: current_hackr)
     set_flash_success("2FA disabled for #{hackr.hackr_alias}.")
-    redirect_to admin_grid_path
+    redirect_to admin_grid_hackr_path(hackr)
   rescue Grid::TotpService::NotEnabled
     set_flash_error("#{hackr.hackr_alias} does not have 2FA enabled.")
-    redirect_to admin_grid_path
+    redirect_to admin_grid_hackr_path(hackr)
   end
 
   def broadcast

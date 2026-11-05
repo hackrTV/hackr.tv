@@ -1,156 +1,80 @@
-<%= render "admin/shared/combobox" %>
+<%# /root/grid_npc_dialogue_tester/new — start an NPC dialogue test as a
+    console screen (2026-11-01; dev tools; root_console.css): bar (the
+    DEV TOOLS badge, [<] INSPECTOR when a hackr came in, [>] MOBS), the
+    WARNING row, // SESSION // (the HACKR and MOB pickers, prefilled
+    from ?hackr_id= / ?mob_id= — the mobs ledger's [TEST]) + [START
+    DIALOGUE TEST] confirming, destinations, the > prompt; the pickers'
+    script renders after the screen (hackr-* / mob-* ids). Assigns:
+    @hackr, @mob (or nil), @hackrs, @mobs. %>
+<% content_for :title, "/root/grid_npc_dialogue_tester :: NPC" %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "NPC DIALOGUE TESTER", sub: "ROOT · HACKRS · /root/grid_npc_dialogue_tester/new"} do %>
+    <% if @hackr %><%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link", data: {command: "back"} %><% end %>
+    <%= link_to "[>] MOBS", admin_grid_mobs_path, class: "console-bar-link", data: {command: "mobs"} %>
+    <%= root_badge("DEV TOOLS ON", :warn) %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/npc-dialogue-tester :: NPC DIALOGUE TESTER", variant: :admin) do %>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">WARNING</span><span class="console-val rc-star">the hackr is warped to the mob's room for the session <span class="console-dim">· no rep, stats, achievements or mission progress · buy / sell / accept run and revert</span></span></div>
+  </div>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
-        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
-        <span style="color: #ccc;"> — Test NPC dialogue as a specific hackr. Side effects suppressed (no rep, stats, achievements, or mission progress). Write commands (buy, sell, accept, etc.) execute but auto-revert. Hackr is warped to mob's room for the session.</span>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <% if @hackr %>
-          <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-        <% end %>
-        <%= tui_button "All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
-        <%= tui_button "All Mobs", admin_grid_mobs_path, style: "padding: 6px 14px;" %>
-      </div>
-
-      <%= form_with url: admin_grid_npc_dialogue_tester_path, method: :post, local: true, id: "tester-form" do %>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-          <%# Hackr selector %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-            <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">HACKR</label>
-
-            <input type="hidden" name="hackr_id" id="hackr-id" value="<%= @hackr&.id %>">
-
-            <div class="admin-combobox">
-              <input type="text" id="hackr-input" class="admin-combobox-input" autocomplete="off"
-                placeholder="Type to search hackrs..."
-                value="<%= @hackr ? "#{@hackr.hackr_alias} (CL #{@hackr.stat("clearance")})" : "" %>">
-              <div id="hackr-dropdown" class="admin-combobox-dropdown"></div>
-            </div>
-
-            <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="hackr-status">
-              <% if @hackr %>
-                <span style="color: #34d399;">Selected: <%= @hackr.hackr_alias %></span>
-              <% else %>
-                <%= @hackrs.size %> hackrs — start typing to filter
-              <% end %>
-            </p>
-          <% end %>
-
-          <%# Mob selector %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-            <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">NPC (MOB)</label>
-
-            <input type="hidden" name="mob_id" id="mob-id" value="<%= @mob&.id %>">
-
-            <div class="admin-combobox">
-              <input type="text" id="mob-input" class="admin-combobox-input" autocomplete="off"
-                placeholder="Type to search mobs..."
-                value="<%= @mob ? "#{@mob.grid_room.grid_zone.name} > #{@mob.grid_room.name} > #{@mob.name}" : "" %>">
-              <div id="mob-dropdown" class="admin-combobox-dropdown"></div>
-            </div>
-
-            <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="mob-status">
-              <% if @mob %>
-                <span style="color: #34d399;">Selected: <%= @mob.name %></span>
-              <% else %>
-                <%= @mobs.size %> mobs — start typing to filter
-              <% end %>
-            </p>
-          <% end %>
-        </div>
-
-        <div style="margin-top: 20px;">
-          <%= tui_submit "START DIALOGUE TEST", color: :yellow, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start NPC Dialogue Test? Hackr will be warped to mob's room." } %>
-        </div>
-      <% end %>
+  <%= form_with url: admin_grid_npc_dialogue_tester_path, method: :post, local: true, id: "tester-form" do %>
+    <div class="console-rule"><span>// SESSION //</span></div>
+    <div class="console-status">
+      <%= render "admin/console/picker", label: "HACKR", key: "hackr", name: "hackr_id", value: @hackr&.id,
+        text: @hackr && "#{@hackr.hackr_alias} (CL #{@hackr.stat("clearance")})", placeholder: "alias · role",
+        status: @hackr ? "Selected: #{@hackr.hackr_alias}" : "#{@hackrs.size} hackrs · type to filter" %>
+      <%= render "admin/console/picker", label: "MOB", key: "mob", name: "mob_id", value: @mob&.id,
+        text: @mob && "#{@mob.grid_room.grid_zone.name} / #{@mob.grid_room.name} / #{@mob.name}", placeholder: "name · type · room · zone",
+        status: @mob ? "Selected: #{@mob.name}" : "#{@mobs.size} mobs · type to filter" %>
     </div>
-<% end %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot" data-confirm="Start NPC Dialogue Test? Hackr will be warped to mob's room.">[START DIALOGUE TEST]</button>
+    </div>
+  <% end %>
 
+  <%= render "admin/console/destinations", section: :hackrs, except: "NPC" %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, except: "NPC", extra: (@hackr ? ["back"] : []) + ["mobs"]) %>
+</div>
+
+<%= render "admin/shared/combobox" %>
 <script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    function ready(fn) {
-      if (document.readyState !== 'loading') fn();
-      else document.addEventListener('DOMContentLoaded', fn);
-    }
-    ready(function() {
-      // --- Hackr combobox ---
-      AdminCombobox.init({
-        inputId: 'hackr-input',
-        hiddenId: 'hackr-id',
-        dropdownId: 'hackr-dropdown',
-        statusId: 'hackr-status',
-        formId: 'tester-form',
-        items: <%= raw json_escape(@hackrs.map { |h|
-          {
-            id: h.id,
-            alias: h.hackr_alias,
-            cl: h.stat("clearance"),
-            role: h.role || "hackr"
-          }
-        }.to_json) %>,
-        getId: function(r) { return r.id; },
-        getSearchText: function(r) { return (r.alias + ' ' + r.role).toLowerCase(); },
-        getGroupKey: function(r) { return r.role.toUpperCase(); },
-        renderOption: function(r, esc) {
-          return '<span class="cb-name">' + esc(r.alias) + '</span>' +
-            ' <span class="cb-meta" style="color: #9ca3af;">(CL ' + r.cl + ')</span>';
-        },
-        getLabel: function(r) { return r.alias + ' (CL ' + r.cl + ')'; },
-        emptyText: 'No hackrs match',
-        selectedText: 'Selected',
-        submitError: 'Select a hackr first'
-      });
-
-      // --- Mob combobox ---
-      var mobTypeColors = {
-        quest_giver: '#fbbf24',
-        vendor: '#34d399',
-        lore: '#c084fc',
-        special: '#22d3ee'
-      };
-      AdminCombobox.init({
-        inputId: 'mob-input',
-        hiddenId: 'mob-id',
-        dropdownId: 'mob-dropdown',
-        statusId: 'mob-status',
-        formId: 'tester-form',
-        items: <%= raw json_escape(@mobs.map { |m|
-          {
-            id: m.id,
-            name: m.name,
-            mob_type: m.mob_type || "generic",
-            room_name: m.grid_room.name,
-            zone_name: m.grid_room.grid_zone.name,
-            region_name: m.grid_room.grid_zone.grid_region&.name || "Unknown",
-            has_dialogue: m.dialogue_tree.present?
-          }
-        }.to_json) %>,
-        getId: function(r) { return r.id; },
-        getSearchText: function(r) {
-          return (r.name + ' ' + r.mob_type + ' ' + r.room_name + ' ' + r.zone_name + ' ' + r.region_name).toLowerCase();
-        },
-        getGroupKey: function(r) { return r.zone_name + ' > ' + r.room_name; },
-        renderOption: function(r, esc) {
-          var color = mobTypeColors[r.mob_type] || '#9ca3af';
-          var typeBadge = '<span style="color:' + color + ';">[' + esc(r.mob_type) + ']</span>';
-          var dlg = r.has_dialogue ? '' : ' <span style="color: #f87171;">(no dialogue)</span>';
-          return '<span class="cb-name">' + esc(r.name) + '</span> ' + typeBadge + dlg;
-        },
-        getLabel: function(r) { return r.zone_name + ' > ' + r.room_name + ' > ' + r.name; },
-        emptyText: 'No mobs match',
-        selectedText: 'Selected',
-        submitError: 'Select a mob first'
-      });
-    });
-  })();
+  AdminCombobox.init({
+    inputId: 'hackr-input',
+    hiddenId: 'hackr-hidden',
+    dropdownId: 'hackr-dropdown',
+    statusId: 'hackr-status',
+    formId: 'tester-form',
+    items: <%= raw json_escape(@hackrs.map { |h| {id: h.id, alias: h.hackr_alias, cl: h.stat("clearance"), role: h.role || "hackr"} }.to_json) %>,
+    getId: function(r) { return r.id; },
+    getSearchText: function(r) { return (r.alias + ' ' + r.role).toLowerCase(); },
+    getGroupKey: function(r) { return r.role.toUpperCase(); },
+    renderOption: function(r, esc) { return '<span class="cb-name">' + esc(r.alias) + '</span> <span class="cb-meta">CL ' + r.cl + '</span>'; },
+    getLabel: function(r) { return r.alias + ' (CL ' + r.cl + ')'; },
+    emptyText: 'No hackrs match',
+    selectedText: 'Hackr selected',
+    submitError: 'Select a hackr first'
+  });
+  AdminCombobox.init({
+    inputId: 'mob-input',
+    hiddenId: 'mob-hidden',
+    dropdownId: 'mob-dropdown',
+    statusId: 'mob-status',
+    formId: 'tester-form',
+    items: <%= raw json_escape(@mobs.map { |m| {id: m.id, name: m.name, mob_type: m.mob_type || "generic", room_name: m.grid_room.name, zone_name: m.grid_room.grid_zone.name, region_name: m.grid_room.grid_zone.grid_region&.name || "Unknown", has_dialogue: m.dialogue_tree.present?} }.to_json) %>,
+    getId: function(r) { return r.id; },
+    getSearchText: function(r) { return (r.name + ' ' + r.mob_type + ' ' + r.room_name + ' ' + r.zone_name + ' ' + r.region_name).toLowerCase(); },
+    getGroupKey: function(r) { return r.zone_name + ' / ' + r.room_name; },
+    renderOption: function(r, esc) {
+      return '<span class="cb-name">' + esc(r.name) + '</span> <span class="cb-meta">[' + esc(r.mob_type) + ']' + (r.has_dialogue ? '' : ' no dialogue') + '</span>';
+    },
+    getLabel: function(r) { return r.zone_name + ' / ' + r.room_name + ' / ' + r.name; },
+    emptyText: 'No mobs match',
+    selectedText: 'Mob selected',
+    submitError: 'Select a mob first'
+  });
 </script>

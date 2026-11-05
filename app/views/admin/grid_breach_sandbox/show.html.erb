@@ -1,52 +1,52 @@
-<%= render TuiWindowComponent.new(title: "/root/breach-sandbox/#{@breach.id} :: SANDBOX TERMINAL", variant: :admin) do %>
+<%# /root/grid_breach_sandbox/:id — the sandbox BREACH terminal as a
+    console screen (2026-11-01; dev tools; root_console.css .rc-term):
+    bar (SANDBOX #id · [<] INSPECTOR, [>] TEMPLATE, the DEV TOOLS badge),
+    the matchup rows + [ABORT] (confirming), the terminal (the output
+    pane opens on the breach's full render; the screen's own > input
+    posts to command and appends the reply — no page prompt, one > per
+    screen), the ended line the script reveals when the breach ends.
+    The script renders after the screen; ids verbatim (breach-output,
+    command-input, send-btn, command-section, breach-ended, abort-form).
+    Assigns: @breach, @hackr, @initial_display. %>
+<% template = @breach.grid_breach_template %>
+<% content_for :title, "/root/grid_breach_sandbox/#{@breach.id} :: SANDBOX" %>
+<div class="console console--root">
+  <%= render layout: "admin/console/bar", locals: {title: "SANDBOX ##{@breach.id}", sub: "ROOT · HACKRS · /root/grid_breach_sandbox/#{@breach.id}"} do %>
+    <%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link" %>
+    <%= link_to "[>] TEMPLATE", edit_admin_grid_breach_template_path(template), class: "console-bar-link" %>
+    <%= root_badge("DEV TOOLS ON", :warn) %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%# Banner %>
-      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 20px;">
-        <span class="yellow-255-text" style="font-weight: bold;">SANDBOX</span>
-        <span style="color: #ccc;"> — </span>
-        <span class="cyan-255-text"><%= @hackr.hackr_alias %></span>
-        <span style="color: #ccc;"> vs </span>
-        <span class="cyan-255-text"><%= @breach.grid_breach_template.name %></span>
-        <span style="color: #888;"> (<%= @breach.grid_breach_template.tier.upcase %>)</span>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">HACKR</span><span class="console-val rc-hot"><%= @hackr.hackr_alias %> <span class="console-dim">· CL <%= @hackr.stat("clearance") %></span></span></div>
+    <div class="console-status-row"><span class="console-key">VS</span><span class="console-val rc-hot"><%= template.name %> <span class="console-dim">· <%= template.tier.upcase %></span></span></div>
+  </div>
+  <div class="rc-actions">
+    <%= button_to "[ABORT]", abort_admin_grid_breach_sandbox_path(@breach), method: :delete, class: "rc-btn rc-btn--danger", form: {id: "abort-form", data: {confirm: "Abort sandbox breach?"}} %>
+  </div>
 
-      <%# Nav %>
-      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-        <%= tui_button_to "ABORT", abort_admin_grid_breach_sandbox_path(@breach), method: :delete, color: :red, style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "Abort sandbox breach?" }, form: { id: "abort-form" } %>
+  <div class="console-rule"><span>// TERMINAL //</span></div>
+  <div class="rc-term">
+    <div id="breach-output" class="rc-term-out"><div><%= raw @initial_display %></div></div>
+    <div id="command-section">
+      <div class="rc-term-in">
+        <label class="console-mark" for="command-input">&gt;</label>
+        <input type="text" id="command-input" class="rc-input" autocomplete="off" spellcheck="false" autofocus placeholder="a command · help lists them">
+        <button type="button" id="send-btn" class="rc-btn rc-btn--hot">[EXECUTE]</button>
       </div>
-
-      <%# Terminal output — styled to match frontend GameOutput.tsx %>
-      <div id="breach-output" style="font-family: monospace; font-size: 0.75em; line-height: 1.2; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; height: 700px; min-height: 700px; max-height: 700px; overflow-y: auto; overflow-x: hidden; padding: 10px; background: #0d0d0d; color: #d0d0d0; border: 1px solid #4b5563; border-radius: 3px; margin-bottom: 8px;">
-<div><%= raw @initial_display %></div>
-      </div>
-
-      <%# Command input — styled to match frontend CommandInput.tsx %>
-      <div id="command-section">
-        <div style="display: flex; gap: 8px; margin-bottom: 6px;">
-          <input type="text" id="command-input" autocomplete="off" autofocus
-            placeholder="Enter command (type 'help' for commands)"
-            style="flex: 1; background: #262626; color: #e0e0e0; border: 1px solid #4b5563; padding: 6px 10px; font-family: monospace; font-size: 0.9em; border-radius: 3px;">
-          <button id="send-btn" style="background: #7c3aed; color: white; border: none; padding: 6px 16px; font-size: 0.85em; cursor: pointer; border-radius: 3px; font-weight: bold; flex-shrink: 0;">EXECUTE</button>
-        </div>
-        <div style="font-size: 0.75em; color: #9ca3af; line-height: 1.3;">
-          Commands: exec, analyze, reroute, interface, use, abort, status, deck, help
-          <span style="margin-left: 10px; color: #666;">|</span>
-          <span style="margin-left: 10px;">&#x2191;/&#x2193; for history</span>
-        </div>
-      </div>
-
-      <%# Ended overlay (hidden by default) %>
-      <div id="breach-ended" style="display: none; margin-top: 15px; background: #1a1a1a; border: 2px solid #fbbf24; padding: 15px; text-align: center;">
-        <span class="yellow-255-text" style="font-weight: bold;">SANDBOX BREACH ENDED</span>
-        <span style="color: #ccc;"> — Vitals and DECK battery restored.</span>
-        <br><br>
-        <%= tui_button "Back to Inspector", admin_grid_hackr_path(@hackr), style: "padding: 8px 16px;" %>
-        <%= tui_button "New Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 8px 16px;" %>
-      </div>
+      <p class="rc-sub">exec · analyze · reroute · interface · use · abort · status · deck · help · up / down for history</p>
     </div>
-<% end %>
+  </div>
+
+  <div id="breach-ended" class="rc-flash rc-flash--warn console-line" hidden>
+    <span class="console-tag">[END]</span>
+    <span>SANDBOX BREACH ENDED <span class="console-dim">· vitals and DECK battery restored</span>
+      <%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "rc-btn" %>
+      <%= link_to "[+] NEW SANDBOX", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), class: "rc-btn rc-btn--hot" %>
+    </span>
+  </div>
+</div>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {
@@ -109,16 +109,14 @@
     }
 
     function endBreach() {
-      commandSection.style.display = 'none';
-      endedEl.style.display = 'block';
-      if (abortForm) abortForm.style.display = 'none';
+      commandSection.hidden = true;
+      endedEl.hidden = false;
+      if (abortForm) abortForm.hidden = true;
     }
 
     function setDisabled(disabled) {
       inputEl.disabled = disabled;
       sendBtn.disabled = disabled;
-      sendBtn.style.opacity = disabled ? '0.5' : '1';
-      sendBtn.style.cursor = disabled ? 'not-allowed' : 'pointer';
     }
 
     function sendCommand() {
@@ -130,7 +128,7 @@
       setDisabled(true);
       addCommand(input);
 
-      appendOutput('<span style="color: #22d3ee;">&gt; ' + input.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>');
+      appendOutput('<span class="rc-term-echo">&gt; ' + input.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>');
       inputEl.value = '';
 
       fetch(commandUrl, {
@@ -156,7 +154,13 @@
         sending = false;
       })
       .catch(function(err) {
-        appendOutput('<span style="color: #f87171;">Error: ' + err.message + '</span>');
+        var line = document.createElement('span');
+        line.className = 'rc-bad';
+        line.textContent = 'Error: ' + err.message;
+        var div = document.createElement('div');
+        div.appendChild(line);
+        outputEl.appendChild(div);
+        outputEl.scrollTop = outputEl.scrollHeight;
         setDisabled(false);
         sending = false;
       });

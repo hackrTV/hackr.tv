@@ -1,167 +1,109 @@
-<%= render "admin/shared/combobox" %>
+<%# /root/grid_hackrs/:hackr_id/items — a hackr's items as a console
+    screen (2026-11-01; prod-safe; root_console.css): bar (alias · ITEMS
+    · [<] INSPECTOR), ON HAND (slots used / capacity), // GRANT // (the
+    ITEM picker over every definition — grant-* ids, the commit refused
+    until one is picked — and QTY), // EQUIPPED // (slot · item; removal
+    waits for an unequip), // INVENTORY // ([REMOVE] per item, confirming
+    — an item has no screen of its own), destinations, the > prompt; the
+    picker's script renders after the screen. Assigns: @hackr,
+    @inventory, @equipped, @definitions. %>
+<% content_for :title, "/root/grid_hackrs/#{@hackr.id}/items :: ITEMS" %>
+<% inventory = @inventory.to_a %>
+<% equipped = @equipped.to_a %>
+<% definitions = @definitions.to_a %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: link_to(@hackr.hackr_alias, admin_grid_hackr_path(@hackr)), sub: "ROOT · ITEMS · /root/grid_hackrs/#{@hackr.id}/items"} do %>
+    <%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link", data: {command: "back"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias}/items :: INVENTORY MANAGER", variant: :admin) do %>
-
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-        <%= tui_button "All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
-      </div>
-
-      <%# === GRANT ITEM === %>
-      <div style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: GRANT ITEM ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-          <%= form_with url: admin_grant_grid_hackr_item_path(@hackr), method: :post, local: true, id: "grant-form", style: "display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;" do %>
-            <div style="flex: 1; min-width: 300px;">
-              <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">ITEM DEFINITION</label>
-
-              <input type="hidden" name="definition_id" id="grant-def-id" value="">
-
-              <div class="admin-combobox">
-                <input type="text" id="grant-input" class="admin-combobox-input" autocomplete="off"
-                  placeholder="Type to search items... (name, type, or rarity)">
-                <div id="grant-dropdown" class="admin-combobox-dropdown"></div>
-              </div>
-            </div>
-            <div style="width: 80px;">
-              <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">QTY</label>
-              <input type="number" name="quantity" value="1" min="1" max="99"
-                class="tui-input" style="width: 100%; padding: 8px;">
-            </div>
-            <div>
-              <%= tui_submit "GRANT", color: :green, style: "padding: 8px 20px; font-weight: bold;" %>
-            </div>
-          <% end %>
-          <p style="color: #666; margin-top: 8px; font-size: 0.85em;" id="grant-status">
-            Capacity: <%= @inventory.size %> / <%= @hackr.inventory_capacity %> slots used
-          </p>
-        <% end %>
-      </div>
-
-      <%# === EQUIPPED GEAR === %>
-      <% if @equipped.any? %>
-        <div style="margin-bottom: 30px;">
-          <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: EQUIPPED (<%= @equipped.size %>) ::]</h3>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Slot</th>
-                  <th style="text-align: left;">Name</th>
-                  <th style="text-align: left;">Type</th>
-                  <th style="text-align: left;">Rarity</th>
-                  <th style="text-align: center;">Value</th>
-                  <th style="text-align: right;">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @equipped.each do |item| %>
-                  <tr>
-                    <td style="color: #888;"><%= GridHackr::Loadout::GEAR_SLOT_LABELS[item.equipped_slot] || item.equipped_slot %></td>
-                    <td style="color: <%= item.rarity_color %>;"><%= item.name %></td>
-                    <td style="color: #888;"><%= item.item_type %></td>
-                    <td style="color: <%= item.rarity_color %>;"><%= item.rarity_label %></td>
-                    <td style="text-align: center; color: #888;"><%= item.value %></td>
-                    <td style="text-align: right;">
-                      <span style="color: #666; font-size: 0.8em;">EQUIPPED</span>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%# === INVENTORY === %>
-      <div style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: INVENTORY (<%= @inventory.size %> / <%= @hackr.inventory_capacity %>) ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <% if @inventory.any? %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Name</th>
-                  <th style="text-align: left;">Type</th>
-                  <th style="text-align: left;">Rarity</th>
-                  <th style="text-align: center;">Qty</th>
-                  <th style="text-align: center;">Value</th>
-                  <th style="text-align: right;">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @inventory.each do |item| %>
-                  <tr>
-                    <td style="color: <%= item.rarity_color %>;"><%= item.name %></td>
-                    <td style="color: #888;"><%= item.item_type %></td>
-                    <td style="color: <%= item.rarity_color %>;"><%= item.rarity_label %></td>
-                    <td style="text-align: center;"><%= item.quantity %></td>
-                    <td style="text-align: center; color: #888;"><%= item.value %></td>
-                    <td style="text-align: right; white-space: nowrap;">
-                      <%= tui_button_to "Remove", admin_remove_grid_hackr_item_path(@hackr, item),
-                            method: :delete,
-                            form: { style: "display: inline;" },
-                            color: :red,
-                            style: "padding: 2px 8px; font-size: 0.8em;",
-                            data: { confirm: "Remove #{item.name} (x#{item.quantity}) from #{@hackr.hackr_alias}?" } %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% else %>
-            <p style="color: #666; padding: 15px;">Inventory empty</p>
-          <% end %>
-        <% end %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON HAND</span>
+      <span class="console-val"><%= inventory.size %> / <%= @hackr.inventory_capacity %> slots <span class="console-dim">· <%= equipped.size %> equipped</span></span>
     </div>
-<% end %>
+  </div>
 
+  <%= form_with url: admin_grant_grid_hackr_item_path(@hackr), method: :post, local: true, id: "grant-form" do %>
+    <div class="console-rule"><span>// GRANT //</span></div>
+    <div class="console-status">
+      <%= render "admin/console/picker", label: "ITEM", key: "grant", name: "definition_id", value: nil, text: nil,
+        placeholder: "name · type · rarity", status: "#{definitions.size} definitions · type to filter" %>
+      <%= root_field("QTY", id: "quantity") do %>
+        <%= number_field_tag :quantity, 1, min: 1, max: 99, class: "rc-input rc-input--short" %>
+      <% end %>
+    </div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[GRANT]</button>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--equipped" aria-label="Equipped">
+    <div class="console-rule"><span>// EQUIPPED · <%= equipped.size %> //</span></div>
+    <% if equipped.empty? %>
+      <%= render "admin/console/empty", text: "NOTHING EQUIPPED" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>SLOT</span><span>ITEM</span><span>TYPE</span><span>RARITY</span><span class="rc-cell--r">VALUE</span>
+      </div>
+    <% end %>
+    <% equipped.each do |item| %>
+      <div class="rc-row">
+        <span class="rc-cell rc-hot"><%= GridHackr::Loadout::GEAR_SLOT_LABELS[item.equipped_slot] || item.equipped_slot %></span>
+        <span><%= item.name %></span>
+        <span class="rc-cell"><%= item.item_type %></span>
+        <span class="rc-cell"><%= item.rarity_label %></span>
+        <span class="rc-cell rc-cell--r"><%= item.value %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--held" aria-label="Inventory">
+    <div class="console-rule"><span>// INVENTORY · <%= inventory.size %> / <%= @hackr.inventory_capacity %> //</span></div>
+    <% if inventory.empty? %>
+      <%= render "admin/console/empty", text: "INVENTORY EMPTY", hint: "// GRANT // above puts an item in it" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>ITEM</span><span>TYPE</span><span>RARITY</span><span class="rc-cell--r">QTY</span><span class="rc-cell--r">VALUE</span><span></span>
+      </div>
+    <% end %>
+    <% inventory.each do |item| %>
+      <div class="rc-row">
+        <span><%= item.name %></span>
+        <span class="rc-cell"><%= item.item_type %></span>
+        <span class="rc-cell"><%= item.rarity_label %></span>
+        <span class="rc-cell rc-cell--r"><%= item.quantity %></span>
+        <span class="rc-cell rc-cell--r"><%= item.value %></span>
+        <span class="rc-cell rc-links">
+          <%= button_to "[REMOVE]", admin_remove_grid_hackr_item_path(@hackr, item), method: :delete, class: "rc-btn rc-btn--danger",
+            form: {data: {confirm: "Remove #{item.name} (x#{item.quantity}) from #{@hackr.hackr_alias}?"}} %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :hackrs %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, extra: ["back"]) %>
+</div>
+
+<%= render "admin/shared/combobox" %>
 <script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    function ready(fn) {
-      if (document.readyState !== 'loading') fn();
-      else document.addEventListener('DOMContentLoaded', fn);
-    }
-    ready(function() {
-      AdminCombobox.init({
-        inputId: 'grant-input',
-        hiddenId: 'grant-def-id',
-        dropdownId: 'grant-dropdown',
-        statusId: 'grant-status',
-        formId: 'grant-form',
-        items: <%= raw json_escape(@definitions.map { |d|
-          {
-            id: d.id,
-            name: d.name,
-            type: d.item_type,
-            rarity: d.rarity_label,
-            rarityColor: d.rarity_color,
-            value: d.value
-          }
-        }.to_json) %>,
-        getId: function(r) { return r.id; },
-        getSearchText: function(r) { return (r.type + ' ' + r.name + ' ' + r.rarity).toLowerCase(); },
-        getGroupKey: function(r) { return r.type; },
-        renderOption: function(r, esc) { return '<span class="cb-name" style="color:' + r.rarityColor + ';">' + esc(r.name) + '</span> <span class="cb-meta">' + esc(r.rarity) + ', ' + r.value + 'cr</span>'; },
-        getLabel: function(r) { return r.type + ' > ' + r.name; },
-        emptyText: 'No items match',
-        selectedText: 'Selected — ready to grant',
-        submitError: 'Select an item definition first'
-      });
-    });
-  })();
+  AdminCombobox.init({
+    inputId: 'grant-input',
+    hiddenId: 'grant-hidden',
+    dropdownId: 'grant-dropdown',
+    statusId: 'grant-status',
+    formId: 'grant-form',
+    items: <%= raw json_escape(definitions.map { |d| {id: d.id, name: d.name, type: d.item_type, rarity: d.rarity_label, value: d.value} }.to_json) %>,
+    getId: function(r) { return r.id; },
+    getSearchText: function(r) { return (r.type + ' ' + r.name + ' ' + r.rarity).toLowerCase(); },
+    getGroupKey: function(r) { return r.type; },
+    renderOption: function(r, esc) { return '<span class="cb-name">' + esc(r.name) + '</span> <span class="cb-meta">' + esc(r.rarity) + ' · ' + r.value + ' CRED</span>'; },
+    getLabel: function(r) { return r.type + ' / ' + r.name; },
+    emptyText: 'No items match',
+    selectedText: 'Item selected · ready to grant',
+    submitError: 'Select an item definition first'
+  });
 </script>

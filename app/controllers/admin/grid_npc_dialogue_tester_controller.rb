@@ -13,20 +13,20 @@ class Admin::GridNpcDialogueTesterController < Admin::ApplicationController
   # POST /root/grid_npc_dialogue_tester
   def create
     @hackr = GridHackr.find_by(id: params[:hackr_id])
-    mob = GridMob.find_by(id: params[:mob_id])
+    @mob = GridMob.find_by(id: params[:mob_id])
 
-    unless @hackr && mob
+    unless @hackr && @mob
       flash.now[:error] = "Hackr and Mob are both required."
       load_combobox_data
       return render :new, status: :unprocessable_entity
     end
 
     service = Grid::NpcDialogueSessionService.new(@hackr)
-    service.start!(mob: mob)
+    service.start!(mob: @mob)
 
     session[:npc_tester] = {
       "hackr_id" => @hackr.id,
-      "mob_id" => mob.id
+      "mob_id" => @mob.id
     }
 
     redirect_to admin_grid_npc_dialogue_tester_path
@@ -68,8 +68,8 @@ class Admin::GridNpcDialogueTesterController < Admin::ApplicationController
   private
 
   def preselect_from_params
-    @hackr = GridHackr.find_by(id: params[:hackr_id]) if params[:hackr_id].present?
-    @mob = GridMob.find_by(id: params[:mob_id]) if params[:mob_id].present?
+    @hackr = GridHackr.find(params[:hackr_id]) if params[:hackr_id].present?
+    @mob = GridMob.find(params[:mob_id]) if params[:mob_id].present?
   end
 
   def load_session

@@ -1,121 +1,101 @@
-<%= render "admin/shared/combobox" %>
+<%# /root/grid_breach_sandbox/new — start a sandbox BREACH as a console
+    screen (2026-11-01; dev tools; root_console.css): bar (the DEV TOOLS
+    badge, [<] INSPECTOR when a hackr came in), the WARNING row,
+    // HACKR // (the HACKR picker, prefilled from ?hackr_id=, + the
+    hackr's DECK and a BREACH that blocks the start), // TEMPLATE // (the
+    TEMPLATE picker over every template, drafts tagged) + [START
+    SANDBOX] confirming, destinations, the > prompt; the pickers' script
+    renders after the screen (sandbox-* / hackr-* ids). Assigns: @hackr
+    (or nil), @template (on a rejected start), @hackrs, @templates. %>
+<% content_for :title, "/root/grid_breach_sandbox :: SANDBOX" %>
+<% deck = @hackr&.equipped_deck %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "BREACH SANDBOX", sub: "ROOT · HACKRS · /root/grid_breach_sandbox/new"} do %>
+    <% if @hackr %><%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link", data: {command: "back"} %><% end %>
+    <%= root_badge("DEV TOOLS ON", :warn) %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/breach-sandbox :: BREACH SANDBOX", variant: :admin) do %>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">WARNING</span><span class="console-val rc-star">a dry-run BREACH past every gate <span class="console-dim">· vitals and DECK battery restored on end · exploits and consumables used are not</span></span></div>
+  </div>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
-        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
-        <span style="color: #ccc;"> — Dry-run BREACH encounter. Bypasses all gates. No consequences on end (vitals + DECK battery restored). Exploits/consumables used during breach are NOT reverted.</span>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-        <%= tui_button "All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
-      </div>
-
-      <%# Hackr info %>
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px; margin-bottom: 20px;") do %>
-        <span style="color: #888;">Hackr:</span>
-        <span class="cyan-255-text" style="font-weight: bold;"><%= @hackr.hackr_alias %></span>
-        <span style="color: #888;"> (CL <%= @hackr.stat("clearance") %>)</span>
-        <% deck = @hackr.equipped_deck %>
-        <br>
-        <span style="color: #888;">DECK:</span>
-        <% if deck %>
-          <% if deck.deck_fried? %>
-            <span class="red-255-text"><%= deck.name %> [FRIED lvl <%= deck.deck_fried_level %>]</span>
+  <%= form_with url: admin_grid_breach_sandbox_index_path, method: :post, local: true, id: "sandbox-form" do %>
+    <div class="console-rule"><span>// HACKR //</span></div>
+    <div class="console-status">
+      <%= render "admin/console/picker", label: "HACKR", key: "hackr", name: "hackr_id", value: @hackr&.id,
+        text: @hackr && "#{@hackr.hackr_alias} (CL #{@hackr.stat("clearance")})", placeholder: "alias · role",
+        status: @hackr ? "Selected: #{@hackr.hackr_alias}" : "#{@hackrs.size} hackrs · type to filter" %>
+      <% if @hackr %>
+        <div class="console-status-row">
+          <span class="console-key">DECK</span>
+          <% if deck.nil? %>
+            <span class="console-val rc-bad">none equipped</span>
+          <% elsif deck.deck_fried? %>
+            <span class="console-val rc-bad"><%= deck.name %> <span class="console-dim">· FRIED level <%= deck.deck_fried_level %></span></span>
           <% else %>
-            <span class="green-255-text"><%= deck.name %></span>
-            <span style="color: #888;"> (battery: <%= deck.deck_battery %>/<%= deck.deck_battery_max %>, slots: <%= deck.deck_slots_used %>/<%= deck.deck_slot_count %>)</span>
+            <span class="console-val rc-on"><%= deck.name %> <span class="console-dim">· battery <%= deck.deck_battery %> / <%= deck.deck_battery_max %> · slots <%= deck.deck_slots_used %> / <%= deck.deck_slot_count %></span></span>
           <% end %>
-        <% else %>
-          <span class="red-255-text">None equipped</span>
-        <% end %>
-        <% if @hackr.in_breach? %>
-          <br>
-          <span class="red-255-text" style="font-weight: bold;">WARNING: Active BREACH in progress. Cannot start sandbox.</span>
-        <% end %>
-      <% end %>
-
-      <%# Template selector %>
-      <%= form_with url: admin_grid_breach_sandbox_index_path(hackr_id: @hackr.id), method: :post, local: true, id: "sandbox-form" do %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-          <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">BREACH TEMPLATE</label>
-
-          <input type="hidden" name="template_id" id="sandbox-template-id" value="">
-
-          <div class="admin-combobox">
-            <input type="text" id="sandbox-input" class="admin-combobox-input" autocomplete="off"
-              placeholder="Type to search... (name, tier, or slug)">
-            <div id="sandbox-dropdown" class="admin-combobox-dropdown"></div>
-          </div>
-
-          <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="sandbox-status">
-            <%= @templates.size %> templates — start typing to filter
-          </p>
-        <% end %>
-
-        <div style="margin-top: 20px;">
-          <%= tui_submit "START SANDBOX", color: :yellow, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Start sandbox BREACH on #{@hackr.hackr_alias}?" } %>
         </div>
+        <% if @hackr.in_breach? %>
+          <div class="console-status-row"><span class="console-key">BREACH</span><span class="console-val rc-bad">IN PROGRESS <span class="console-dim">· a sandbox cannot start until it ends</span></span></div>
+        <% end %>
       <% end %>
     </div>
-<% end %>
 
+    <div class="console-rule"><span>// TEMPLATE //</span></div>
+    <div class="console-status">
+      <%= render "admin/console/picker", label: "TEMPLATE", key: "sandbox", name: "template_id", value: @template&.id,
+        text: @template && "#{@template.tier.upcase} / #{@template.name} (CL #{@template.min_clearance})", placeholder: "name · tier · slug",
+        status: @template ? "Selected: #{@template.name}" : "#{@templates.size} templates · type to filter" %>
+    </div>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot" data-confirm="Start a sandbox BREACH?">[START SANDBOX]</button>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :hackrs, except: "SANDBOX" %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, except: "SANDBOX", extra: (@hackr ? ["back"] : [])) %>
+</div>
+
+<%= render "admin/shared/combobox" %>
 <script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    function ready(fn) {
-      if (document.readyState !== 'loading') fn();
-      else document.addEventListener('DOMContentLoaded', fn);
-    }
-    ready(function() {
-      var tierColors = {
-        ambient: '#6b7280',
-        standard: '#34d399',
-        advanced: '#fbbf24',
-        elite: '#f87171',
-        world_event: '#a78bfa'
-      };
-      AdminCombobox.init({
-        inputId: 'sandbox-input',
-        hiddenId: 'sandbox-template-id',
-        dropdownId: 'sandbox-dropdown',
-        statusId: 'sandbox-status',
-        formId: 'sandbox-form',
-        items: <%= raw json_escape(@templates.map { |t|
-          {
-            id: t.id,
-            name: t.name,
-            slug: t.slug,
-            tier: t.tier,
-            min_cl: t.min_clearance,
-            published: t.published?,
-            protocols: t.protocols.sum { |p| (p["count"] || 1).to_i },
-            gates: t.puzzle_gate_definitions.size
-          }
-        }.to_json) %>,
-        getId: function(r) { return r.id; },
-        getSearchText: function(r) { return (r.name + ' ' + r.slug + ' ' + r.tier).toLowerCase(); },
-        getGroupKey: function(r) { return r.tier.toUpperCase(); },
-        renderOption: function(r, esc) {
-          var color = tierColors[r.tier] || '#9ca3af';
-          var pub = r.published ? '' : ' <span style="color: #f87171;">[DRAFT]</span>';
-          var info = 'CL' + r.min_cl + ' | ' + r.protocols + 'P';
-          if (r.gates > 0) info += ' ' + r.gates + 'G';
-          return '<span class="cb-name">' + esc(r.name) + '</span>' + pub +
-            ' <span class="cb-meta" style="color:' + color + ';">(' + info + ')</span>';
-        },
-        getLabel: function(r) { return r.tier.toUpperCase() + ' > ' + r.name + ' (CL' + r.min_cl + ')'; },
-        emptyText: 'No templates match',
-        selectedText: 'Selected — ready to start sandbox',
-        submitError: 'Select a breach template first'
-      });
-    });
-  })();
+  AdminCombobox.init({
+    inputId: 'hackr-input',
+    hiddenId: 'hackr-hidden',
+    dropdownId: 'hackr-dropdown',
+    statusId: 'hackr-status',
+    formId: 'sandbox-form',
+    items: <%= raw json_escape(@hackrs.map { |h| {id: h.id, alias: h.hackr_alias, cl: h.stat("clearance"), role: h.role || "hackr"} }.to_json) %>,
+    getId: function(r) { return r.id; },
+    getSearchText: function(r) { return (r.alias + ' ' + r.role).toLowerCase(); },
+    getGroupKey: function(r) { return r.role.toUpperCase(); },
+    renderOption: function(r, esc) { return '<span class="cb-name">' + esc(r.alias) + '</span> <span class="cb-meta">CL ' + r.cl + '</span>'; },
+    getLabel: function(r) { return r.alias + ' (CL ' + r.cl + ')'; },
+    emptyText: 'No hackrs match',
+    selectedText: 'Hackr selected',
+    submitError: 'Select a hackr first'
+  });
+  AdminCombobox.init({
+    inputId: 'sandbox-input',
+    hiddenId: 'sandbox-hidden',
+    dropdownId: 'sandbox-dropdown',
+    statusId: 'sandbox-status',
+    formId: 'sandbox-form',
+    items: <%= raw json_escape(@templates.map { |t| {id: t.id, name: t.name, slug: t.slug, tier: t.tier, min_cl: t.min_clearance, published: t.published?, protocols: t.protocols.sum { |p| (p["count"] || 1).to_i }, gates: t.puzzle_gate_definitions.size} }.to_json) %>,
+    getId: function(r) { return r.id; },
+    getSearchText: function(r) { return (r.name + ' ' + r.slug + ' ' + r.tier).toLowerCase(); },
+    getGroupKey: function(r) { return r.tier.toUpperCase(); },
+    renderOption: function(r, esc) {
+      var info = 'CL ' + r.min_cl + ' · ' + r.protocols + 'P' + (r.gates > 0 ? ' ' + r.gates + 'G' : '');
+      return '<span class="cb-name">' + esc(r.name) + '</span>' + (r.published ? '' : ' <span class="cb-meta">[DRAFT]</span>') + ' <span class="cb-meta">' + info + '</span>';
+    },
+    getLabel: function(r) { return r.tier.toUpperCase() + ' / ' + r.name + ' (CL ' + r.min_cl + ')'; },
+    emptyText: 'No templates match',
+    selectedText: 'Template selected · ready to start',
+    submitError: 'Select a breach template first'
+  });
 </script>

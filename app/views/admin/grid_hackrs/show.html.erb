@@ -1,327 +1,218 @@
-<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias} :: HACKR INSPECTOR", variant: :admin) do %>
+<%# /root/grid_hackrs/:id — the hackr inspector as a console readout
+    (2026-11-01; root_console.css; read-only but for RESET 2FA): bar
+    (alias · [<] HACKRS, [>] ITEMS, the DEV TOOLS badge), // DEV TOOLS //
+    ([STATS] [WARP] [RIG] [SANDBOX] [NPC] [PAC] for this hackr — their
+    commands shadow the generic SANDBOX / NPC / PAC rows below, first
+    link wins), // IDENTITY // (2FA with [RESET 2FA]), // VITALS //,
+    // LOCATION //, // ECONOMY //, // BREACH //, // LOADOUT //,
+    // INVENTORY //, // MINING RIG //, // REPUTATION //, // MISSIONS //
+    (NN opens the assignment), // FEATURES //, destinations, the >
+    prompt. Rarity reads as a word (no inline colour). Assigns: @hackr,
+    @stats, @inventory, @loadout, @cache, @cred_balance, @active_breach,
+    @mining_rig, @reputations, @active_missions, @feature_grants,
+    @impound_records. %>
+<% content_for :title, "/root/grid_hackrs/#{@hackr.id} :: #{@hackr.hackr_alias}" %>
+<% dev = dev_tools_enabled? %>
+<% room = @hackr.current_room %>
+<% missions = @active_missions.to_a %>
+<% inventory = @inventory.to_a %>
+<% reputations = @reputations.to_a %>
+<% numbers = missions.each_index.map { |i| root_num(i, total: missions.size) } %>
+<% extra = %w[back items] + (dev ? %w[stats warp] + (@mining_rig ? %w[rig] : []) : []) %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: @hackr.hackr_alias, sub: "ROOT · HACKR ##{@hackr.id} · /root/grid_hackrs/#{@hackr.id}"} do %>
+    <%= link_to "[<] HACKRS", admin_grid_hackrs_path, class: "console-bar-link", data: {command: "back"} %>
+    <%= link_to "[>] ITEMS", admin_grid_hackr_items_path(@hackr), class: "console-bar-link", data: {command: "items"} %>
+    <% if dev %><%= root_badge("DEV TOOLS ON", :warn) %><% end %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <%# === ACTION BAR === %>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-        <%= tui_button "<- All Hackrs", admin_grid_hackrs_path, style: "padding: 6px 14px;" %>
-        <%= tui_button "Items", admin_grid_hackr_items_path(@hackr), color: :green, style: "padding: 6px 14px;" %>
-        <% if dev_tools_enabled? %>
-          <%= tui_button "Edit Stats", edit_stats_admin_grid_hackr_path(@hackr), color: :yellow, style: "padding: 6px 14px;" %>
-          <%= tui_button "Warp", warp_admin_grid_hackr_path(@hackr), color: :yellow, style: "padding: 6px 14px;" %>
-          <%= tui_button "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 6px 14px;" %>
-          <%= tui_button "NPC Tester", new_admin_grid_npc_dialogue_tester_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 6px 14px;" %>
-          <%= tui_button "PAC Tester", new_admin_grid_pac_escape_tester_path(hackr_id: @hackr.id), color: :yellow, style: "padding: 6px 14px;" %>
-        <% end %>
-      </div>
-
-      <%# === SECTION NAV === %>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px; padding: 8px; border: 1px solid #333; background: #0a0a0a;">
-        <a href="#identity" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">IDENTITY</a>
-        <a href="#vitals" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">VITALS</a>
-        <a href="#location" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">LOCATION</a>
-        <a href="#economy" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">ECONOMY</a>
-        <a href="#breach" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">BREACH</a>
-        <a href="#loadout" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">LOADOUT</a>
-        <a href="#inventory" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">INVENTORY</a>
-        <a href="#mining" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">MINING</a>
-        <a href="#reputation" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">REPUTATION</a>
-        <a href="#missions" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">MISSIONS</a>
-        <a href="#features" class="cyan-168-text" style="text-decoration: none; font-size: 0.85em;">FEATURES</a>
-      </div>
-
-      <%# === IDENTITY === %>
-      <div id="identity" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: IDENTITY ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
-            <div><span style="color: #888;">ID:</span> <span class="white-text"><%= @hackr.id %></span></div>
-            <div><span style="color: #888;">Alias:</span> <span class="cyan-255-text" style="font-weight: bold;"><%= @hackr.hackr_alias %></span></div>
-            <div><span style="color: #888;">Email:</span> <span class="white-text"><%= @hackr.email || "—" %></span></div>
-            <div><span style="color: #888;">Role:</span> <span style="color: <%= @hackr.admin? ? '#fbbf24' : '#888' %>;"><%= @hackr.role.upcase %></span></div>
-            <div><span style="color: #888;">Clearance:</span> <span class="cyan-255-text" style="font-weight: bold;"><%= @stats["clearance"] %></span></div>
-            <div><span style="color: #888;">XP:</span> <span class="white-text"><%= @stats["xp"] %></span></div>
-            <div><span style="color: #888;">Registered:</span> <span style="color: #888;"><%= @hackr.created_at.strftime("%Y-%m-%d") %></span></div>
-            <div><span style="color: #888;">Last Active:</span> <span style="color: #888;"><%= @hackr.last_activity_at&.strftime("%Y-%m-%d %H:%M") || "never" %></span></div>
-            <div><span style="color: #888;">2FA:</span> <span style="color: <%= @hackr.otp_required_for_login? ? '#34d399' : '#666' %>;"><%= @hackr.otp_required_for_login? ? "ENABLED" : "off" %></span></div>
-            <div><span style="color: #888;">Login:</span> <span style="color: <%= @hackr.login_disabled? ? '#f87171' : '#34d399' %>;"><%= @hackr.login_disabled? ? "DISABLED" : "enabled" %></span></div>
-          </div>
-        <% end %>
-      </div>
-
-      <%# === VITALS === %>
-      <div id="vitals" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: VITALS ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-            <% %w[health energy psyche].each do |vital| %>
-              <% val = @stats[vital].to_i %>
-              <% max = @hackr.effective_max(vital) %>
-              <% pct = max > 0 ? (val.to_f / max * 100).round : 0 %>
-              <% color = vital == "health" ? "#f87171" : vital == "energy" ? "#fbbf24" : "#a78bfa" %>
-              <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                  <span style="color: <%= color %>; font-weight: bold;"><%= vital.upcase %></span>
-                  <span class="white-text"><%= val %> / <%= max %></span>
-                </div>
-                <div style="background: #1a1a1a; height: 12px; border: 1px solid #333;">
-                  <div style="background: <%= color %>; height: 100%; width: <%= pct %>%;"></div>
-                </div>
-              </div>
-            <% end %>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
-            <div><span style="color: #888;">Inspiration:</span> <span class="white-text"><%= @stats["inspiration"] %></span></div>
-            <div><span style="color: #888;">Bonus Inv Slots:</span> <span class="white-text"><%= @stats["bonus_inventory_slots"] %></span></div>
-          </div>
-        <% end %>
-      </div>
-
-      <%# === LOCATION === %>
-      <div id="location" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: LOCATION ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <% room = @hackr.current_room %>
-          <% if room %>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
-              <div><span style="color: #888;">Room:</span> <span class="white-text"><%= room.name %></span></div>
-              <div><span style="color: #888;">Zone:</span> <span class="white-text"><%= room.grid_zone&.name || "—" %></span></div>
-              <div><span style="color: #888;">Region:</span> <span class="white-text"><%= room.grid_zone&.grid_region&.name || "—" %></span></div>
-              <div><span style="color: #888;">Room Type:</span> <span style="color: #888;"><%= room.room_type || "—" %></span></div>
-            </div>
-          <% else %>
-            <p style="color: #666;">Not in any room (nil current_room_id)</p>
-          <% end %>
-          <% if @hackr.stat("captured") %>
-            <div style="margin-top: 10px; padding: 8px; border: 2px solid #f87171; background: #330000;">
-              <span class="red-255-text" style="font-weight: bold;">CAPTURED</span>
-              <span style="color: #888;"> | Alert Level: </span>
-              <span class="yellow-255-text"><%= @hackr.stat("facility_alert_level") %></span>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%# === ECONOMY === %>
-      <div id="economy" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ECONOMY ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <% if @cache %>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
-              <div><span style="color: #888;">CRED Balance:</span> <span class="green-255-text" style="font-weight: bold;"><%= @cred_balance %></span></div>
-              <div><span style="color: #888;">Cache Address:</span> <span style="color: #888; font-family: monospace; font-size: 0.85em;"><%= @cache.address %></span></div>
-              <div><span style="color: #888;">Cache Status:</span> <span class="white-text"><%= @cache.status %></span></div>
-            </div>
-          <% else %>
-            <p style="color: #666;">No economy cache provisioned</p>
-          <% end %>
-          <% debt = @hackr.stat("govcorp_debt").to_i %>
-          <% if debt > 0 %>
-            <div style="margin-top: 10px; padding: 8px; border: 2px solid #f87171; background: #330000;">
-              <span class="red-255-text" style="font-weight: bold;">GovCorp DEBT:</span>
-              <span class="red-255-text"><%= debt %> CRED</span>
-              <span style="color: #888;"> (50% garnishment active)</span>
-            </div>
-          <% end %>
-          <% if @impound_records.any? %>
-            <div style="margin-top: 15px;">
-              <span style="color: #888;">Impound Records:</span>
-              <span class="yellow-168-text" style="font-weight: bold;"><%= @impound_records.count %> total (<%= @impound_records.impounded.count %> active)</span>
-              <%= tui_button "View Impounds →", admin_grid_impound_records_path(hackr_alias: @hackr.hackr_alias), color: :yellow, style: "padding: 3px 10px; margin-left: 8px; font-size: 0.85em;" %>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%# === BREACH === %>
-      <div id="breach" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ACTIVE BREACH ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <% if @active_breach %>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
-              <div><span style="color: #888;">Template:</span> <span class="cyan-255-text"><%= @active_breach.grid_breach_template&.name || "—" %></span></div>
-              <div><span style="color: #888;">State:</span> <span class="yellow-255-text"><%= @active_breach.state %></span></div>
-              <div><span style="color: #888;">Round:</span> <span class="white-text"><%= @active_breach.round_number %></span></div>
-              <div><span style="color: #888;">Detection:</span> <span style="color: <%= @active_breach.detection_level > 70 ? '#f87171' : '#fbbf24' %>;"><%= @active_breach.detection_level %>/100</span></div>
-              <div><span style="color: #888;">Actions Left:</span> <span class="white-text"><%= @active_breach.actions_remaining %></span></div>
-              <div><span style="color: #888;">Started:</span> <span style="color: #888;"><%= @active_breach.created_at.strftime("%Y-%m-%d %H:%M") %></span></div>
-            </div>
-            <% if @active_breach.grid_breach_protocols.any? %>
-              <div style="margin-top: 10px;">
-                <span style="color: #888;">Protocols:</span>
-                <% @active_breach.grid_breach_protocols.each do |proto| %>
-                  <span style="color: <%= proto.state == 'destroyed' ? '#666' : '#60a5fa' %>; margin-left: 8px;"><%= proto.protocol_type.upcase %> (<%= proto.health %>hp, <%= proto.state %>)</span>
-                <% end %>
-              </div>
-            <% end %>
-          <% else %>
-            <p style="color: #666;">No active breach</p>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%# === LOADOUT === %>
-      <div id="loadout" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: LOADOUT ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px;">
-            <% GridHackr::Loadout::GEAR_SLOT_LABELS.each do |slot, label| %>
-              <% item = @loadout[slot] %>
-              <div style="padding: 6px 10px; border: 1px solid <%= item ? '#333' : '#1a1a1a' %>; background: <%= item ? '#111' : '#0a0a0a' %>;">
-                <span style="color: #666; font-size: 0.8em;"><%= label %></span>
-                <% if item %>
-                  <br><span style="color: <%= item.rarity_color %>; font-size: 0.9em;"><%= item.name %></span>
-                <% else %>
-                  <br><span style="color: #333;">EMPTY</span>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-
-      <%# === INVENTORY === %>
-      <div id="inventory" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: INVENTORY (<%= @inventory.size %> / <%= @hackr.inventory_capacity %>) ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <% if @inventory.any? %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Name</th>
-                  <th style="text-align: left;">Type</th>
-                  <th style="text-align: left;">Rarity</th>
-                  <th style="text-align: center;">Qty</th>
-                  <th style="text-align: center;">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @inventory.each do |item| %>
-                  <tr>
-                    <td style="color: <%= item.rarity_color %>;"><%= item.name %></td>
-                    <td style="color: #888;"><%= item.item_type %></td>
-                    <td style="color: <%= item.rarity_color %>;"><%= item.rarity_label %></td>
-                    <td style="text-align: center;"><%= item.quantity %></td>
-                    <td style="text-align: center; color: #888;"><%= item.value %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% else %>
-            <p style="color: #666; padding: 15px;">Inventory empty</p>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%# === MINING RIG === %>
-      <div id="mining" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: MINING RIG ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <% if @mining_rig %>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
-              <div><span style="color: #888;">Status:</span> <span style="color: <%= @mining_rig.active? ? '#34d399' : '#f87171' %>;"><%= @mining_rig.active? ? "ACTIVE" : "INACTIVE" %></span></div>
-              <div><span style="color: #888;">Effective Rate:</span> <span class="green-255-text"><%= @mining_rig.effective_rate %></span></div>
-            </div>
-            <% if @mining_rig.grid_items.any? %>
-              <div style="margin-top: 10px;">
-                <span style="color: #888;">Components:</span>
-                <% @mining_rig.grid_items.each do |comp| %>
-                  <span style="color: <%= comp.rarity_color %>; margin-left: 8px;"><%= comp.name %></span>
-                <% end %>
-              </div>
-            <% end %>
-            <% if dev_tools_enabled? %>
-              <div style="margin-top: 12px;">
-                <%= tui_button "Manage Rig →", mining_rig_admin_grid_hackr_path(@hackr), color: :yellow, style: "padding: 4px 12px; font-size: 0.85em;" %>
-              </div>
-            <% end %>
-          <% else %>
-            <p style="color: #666;">No mining rig provisioned</p>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%# === REPUTATION === %>
-      <div id="reputation" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: FACTION REPUTATION ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <% if @reputations.any? %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Faction</th>
-                  <th style="text-align: center;">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @reputations.each do |rep| %>
-                  <tr>
-                    <td><%= rep.subject&.respond_to?(:display_name) ? rep.subject.display_name : rep.subject&.name || "—" %></td>
-                    <td style="text-align: center;">
-                      <span style="color: <%= rep.value > 0 ? '#34d399' : rep.value < 0 ? '#f87171' : '#888' %>;"><%= rep.value %></span>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% else %>
-            <p style="color: #666; padding: 15px;">No faction reputation records</p>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%# === MISSIONS === %>
-      <div id="missions" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ACTIVE MISSIONS (<%= @active_missions.size %>) ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <% if @active_missions.any? %>
-            <table class="tui-table" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th style="text-align: left;">Mission</th>
-                  <th style="text-align: left;">Arc</th>
-                  <th style="text-align: left;">Accepted</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @active_missions.each do |hm| %>
-                  <tr>
-                    <td class="cyan-255-text"><%= hm.grid_mission.name %></td>
-                    <td style="color: #888;"><%= hm.grid_mission.grid_mission_arc&.name || "—" %></td>
-                    <td style="color: #888;"><%= hm.accepted_at&.strftime("%Y-%m-%d %H:%M") %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% else %>
-            <p style="color: #666; padding: 15px;">No active missions</p>
-          <% end %>
-        <% end %>
-      </div>
-
-      <%# === FEATURE GRANTS === %>
-      <div id="features" style="margin-bottom: 30px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: FEATURE GRANTS ::]</h3>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-          <% if @feature_grants.any? %>
-            <% @feature_grants.each do |grant| %>
-              <span style="display: inline-block; padding: 4px 10px; margin: 3px; border: 1px solid #333; color: #fbbf24;"><%= grant.feature %></span>
-            <% end %>
-          <% else %>
-            <p style="color: #666;">No feature grants (admin role has all features)</p>
-          <% end %>
-        <% end %>
-      </div>
+  <% if dev %>
+    <div class="console-rule"><span>// DEV TOOLS //</span></div>
+    <div class="rc-actions">
+      <%= link_to "[STATS]", edit_stats_admin_grid_hackr_path(@hackr), class: "rc-btn", data: {command: "stats"} %>
+      <%= link_to "[WARP]", warp_admin_grid_hackr_path(@hackr), class: "rc-btn", data: {command: "warp"} %>
+      <% if @mining_rig %><%= link_to "[RIG]", mining_rig_admin_grid_hackr_path(@hackr), class: "rc-btn", data: {command: "rig"} %><% end %>
+      <%= link_to "[SANDBOX]", new_admin_grid_breach_sandbox_path(hackr_id: @hackr.id), class: "rc-btn", data: {command: "sandbox"} %>
+      <%= link_to "[NPC]", new_admin_grid_npc_dialogue_tester_path(hackr_id: @hackr.id), class: "rc-btn", data: {command: "npc"} %>
+      <%= link_to "[PAC]", new_admin_grid_pac_escape_tester_path(hackr_id: @hackr.id), class: "rc-btn", data: {command: "pac"} %>
     </div>
-<% end %>
+  <% end %>
+
+  <div class="console-rule"><span>// IDENTITY //</span></div>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">ALIAS</span><span class="console-val rc-hot"><%= @hackr.hackr_alias %> <span class="console-dim">· #<%= @hackr.id %></span></span></div>
+    <div class="console-status-row"><span class="console-key">EMAIL</span><span class="console-val"><%= @hackr.email || "—" %></span></div>
+    <div class="console-status-row"><span class="console-key">ROLE</span><span class="<%= class_names("console-val", "rc-star": @hackr.admin?) %>"><%= @hackr.role&.upcase || "—" %></span></div>
+    <div class="console-status-row"><span class="console-key">CLEARANCE</span><span class="console-val rc-hot"><%= @stats["clearance"] %> <span class="console-dim">· <%= @stats["xp"] %> XP</span></span></div>
+    <div class="console-status-row"><span class="console-key">REGISTERED</span><span class="console-val"><%= @hackr.created_at.strftime("%Y-%m-%d") %></span></div>
+    <div class="console-status-row"><span class="console-key">LAST ACTIVE</span><span class="console-val"><%= @hackr.last_activity_at&.strftime("%Y-%m-%d %H:%M") || "never" %></span></div>
+    <div class="console-status-row rc-field">
+      <span class="console-key">2FA</span>
+      <span class="console-val">
+        <% if @hackr.otp_required_for_login? %>
+          <span class="rc-on">ENABLED</span>
+          <%= button_to "[RESET 2FA]", admin_grid_reset_totp_path(hackr_id: @hackr.id), class: "rc-btn rc-btn--danger", form: {data: {confirm: "Disable 2FA for #{@hackr.hackr_alias}? They sign in with the password alone until they enrol again."}} %>
+        <% else %>
+          <span class="rc-off">off</span>
+        <% end %>
+      </span>
+    </div>
+    <div class="console-status-row"><span class="console-key">LOGIN</span><span class="console-val <%= @hackr.login_disabled? ? "rc-bad" : "rc-on" %>"><%= @hackr.login_disabled? ? "DISABLED" : "enabled" %></span></div>
+  </div>
+
+  <div class="console-rule"><span>// VITALS //</span></div>
+  <div class="console-status">
+    <% %w[health energy psyche].each do |vital| %>
+      <% val = @stats[vital].to_i %>
+      <% max = @hackr.effective_max(vital) %>
+      <div class="console-status-row">
+        <span class="console-key"><%= vital.upcase %></span>
+        <span class="console-val"><%= val %> / <%= max %> <span class="console-dim">· <%= (max > 0) ? (val.to_f / max * 100).round : 0 %>%</span></span>
+      </div>
+    <% end %>
+    <div class="console-status-row"><span class="console-key">INSPIRATION</span><span class="console-val"><%= @stats["inspiration"] %></span></div>
+    <div class="console-status-row"><span class="console-key">BONUS SLOTS</span><span class="console-val"><%= @stats["bonus_inventory_slots"] %></span></div>
+  </div>
+
+  <div class="console-rule"><span>// LOCATION //</span></div>
+  <div class="console-status">
+    <% if room %>
+      <div class="console-status-row"><span class="console-key">ROOM</span><span class="console-val"><%= link_to room.name, edit_admin_grid_room_path(room), class: "console-link" %> <span class="console-dim">· <%= room.room_type || "—" %></span></span></div>
+      <div class="console-status-row"><span class="console-key">ZONE</span><span class="console-val"><%= room.grid_zone&.name || "—" %> <span class="console-dim">· <%= room.grid_zone&.grid_region&.name || "—" %></span></span></div>
+    <% else %>
+      <div class="console-status-row"><span class="console-key">ROOM</span><span class="console-val rc-off">nowhere <span class="console-dim">· no current room</span></span></div>
+    <% end %>
+    <% if @hackr.stat("captured") %>
+      <div class="console-status-row"><span class="console-key">CAPTURED</span><span class="console-val rc-bad">IN CONTAINMENT <span class="console-dim">· alert level <%= @hackr.stat("facility_alert_level") %></span></span></div>
+    <% end %>
+  </div>
+
+  <div class="console-rule"><span>// ECONOMY //</span></div>
+  <div class="console-status">
+    <% if @cache %>
+      <div class="console-status-row"><span class="console-key">CRED</span><span class="console-val rc-on"><%= @cred_balance %></span></div>
+      <div class="console-status-row"><span class="console-key">CACHE</span><span class="console-val"><%= @cache.address %> <span class="console-dim">· <%= @cache.status %></span></span></div>
+    <% else %>
+      <div class="console-status-row"><span class="console-key">CACHE</span><span class="console-val rc-off">none provisioned</span></div>
+    <% end %>
+    <% debt = @hackr.stat("govcorp_debt").to_i %>
+    <% if debt > 0 %>
+      <div class="console-status-row"><span class="console-key">DEBT</span><span class="console-val rc-bad"><%= debt %> CRED <span class="console-dim">· GovCorp · 50% garnishment active</span></span></div>
+    <% end %>
+    <% impounds = @impound_records.to_a %>
+    <% if impounds.any? %>
+      <div class="console-status-row"><span class="console-key">IMPOUND</span><span class="console-val"><span class="rc-star"><%= impounds.size %> total · <%= impounds.count(&:impounded?) %> active</span> <%= link_to "[>] IMPOUND", admin_grid_impound_records_path(hackr_alias: @hackr.hackr_alias), class: "console-link" %></span></div>
+    <% end %>
+  </div>
+
+  <div class="console-rule"><span>// BREACH //</span></div>
+  <% if @active_breach %>
+    <% protocols = @active_breach.grid_breach_protocols.to_a %>
+    <div class="console-status">
+      <div class="console-status-row"><span class="console-key">TEMPLATE</span><span class="console-val rc-hot"><%= @active_breach.grid_breach_template&.name || "—" %><% if @active_breach.sandbox? %> <span class="console-dim">· sandbox</span><% end %></span></div>
+      <div class="console-status-row"><span class="console-key">STATE</span><span class="console-val rc-star"><%= @active_breach.state.upcase %> <span class="console-dim">· round <%= @active_breach.round_number %> · <%= @active_breach.actions_remaining %> actions left</span></span></div>
+      <div class="console-status-row"><span class="console-key">DETECTION</span><span class="console-val <%= (@active_breach.detection_level > 70) ? "rc-bad" : "rc-star" %>"><%= @active_breach.detection_level %> / 100</span></div>
+      <div class="console-status-row"><span class="console-key">STARTED</span><span class="console-val"><%= @active_breach.created_at.strftime("%Y-%m-%d %H:%M") %></span></div>
+      <% if protocols.any? %>
+        <div class="console-status-row"><span class="console-key">PROTOCOLS</span><span class="console-val"><%= safe_join(protocols.map { |p| tag.span("#{p.protocol_type.upcase} #{p.health}hp #{p.state}", class: (p.state == "destroyed") ? "rc-off" : "rc-hot") }, " · ") %></span></div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "admin/console/empty", text: "NO ACTIVE BREACH" %>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--loadout" aria-label="Loadout">
+    <div class="console-rule"><span>// LOADOUT //</span></div>
+    <% GridHackr::Loadout::GEAR_SLOT_LABELS.each do |slot, label| %>
+      <% item = @loadout[slot] %>
+      <div class="rc-row">
+        <span class="rc-cell"><%= label %></span>
+        <% if item %>
+          <span><%= item.name %></span>
+          <span class="rc-cell"><%= item.rarity_label %></span>
+        <% else %>
+          <span class="rc-off">EMPTY</span>
+          <span></span>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--holdings" aria-label="Inventory">
+    <div class="console-rule"><span>// INVENTORY · <%= inventory.size %> / <%= @hackr.inventory_capacity %> //</span></div>
+    <% if inventory.empty? %>
+      <%= render "admin/console/empty", text: "INVENTORY EMPTY", hint: "[>] ITEMS grants one" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span>ITEM</span><span>TYPE</span><span>RARITY</span><span class="rc-cell--r">QTY</span><span class="rc-cell--r">VALUE</span>
+      </div>
+    <% end %>
+    <% inventory.each do |item| %>
+      <div class="rc-row">
+        <span><%= item.name %></span>
+        <span class="rc-cell"><%= item.item_type %></span>
+        <span class="rc-cell"><%= item.rarity_label %></span>
+        <span class="rc-cell rc-cell--r"><%= item.quantity %></span>
+        <span class="rc-cell rc-cell--r"><%= item.value %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <div class="console-rule"><span>// MINING RIG //</span></div>
+  <% if @mining_rig %>
+    <% components = @mining_rig.components.to_a %>
+    <div class="console-status">
+      <div class="console-status-row"><span class="console-key">STATUS</span><span class="console-val <%= @mining_rig.active? ? "rc-on" : "rc-bad" %>"><%= @mining_rig.active? ? "ACTIVE" : "INACTIVE" %> <span class="console-dim">· rate <%= @mining_rig.effective_rate %></span></span></div>
+      <div class="console-status-row"><span class="console-key">COMPONENTS</span><span class="console-val"><%= components.any? ? components.map(&:name).join(" · ") : "—" %></span></div>
+    </div>
+  <% else %>
+    <%= render "admin/console/empty", text: "NO MINING RIG PROVISIONED" %>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--standing" aria-label="Faction reputation">
+    <div class="console-rule"><span>// REPUTATION //</span></div>
+    <% if reputations.empty? %>
+      <%= render "admin/console/empty", text: "NO FACTION REPUTATION RECORDS" %>
+    <% end %>
+    <% reputations.each do |rep| %>
+      <div class="rc-row">
+        <span class="rc-violet"><%= rep.subject&.respond_to?(:display_name) ? rep.subject.display_name : rep.subject&.name || "—" %></span>
+        <span class="rc-cell rc-cell--r <%= rep.value.positive? ? "rc-on" : rep.value.negative? ? "rc-bad" : "rc-off" %>"><%= rep.value %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="console-section rc-ledger rc-ledger--hackr-missions" aria-label="Active missions">
+    <div class="console-rule"><span>// MISSIONS · <%= missions.size %> ACTIVE //</span></div>
+    <% if missions.empty? %>
+      <%= render "admin/console/empty", text: "NO ACTIVE MISSIONS" %>
+    <% end %>
+    <% missions.each_with_index do |hm, i| %>
+      <% num = numbers[i] %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= num %>]</span>
+        <%= link_to hm.grid_mission.name, admin_grid_hackr_mission_path(hm), class: "console-link", data: {command: num} %>
+        <span class="rc-cell"><%= hm.grid_mission.grid_mission_arc&.name || "—" %></span>
+        <span class="rc-cell"><%= hm.accepted_at&.strftime("%Y-%m-%d %H:%M") %></span>
+      </div>
+    <% end %>
+  </section>
+
+  <div class="console-rule"><span>// FEATURES //</span></div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">GRANTS</span>
+      <% if @feature_grants.any? %>
+        <span class="console-val rc-star"><%= @feature_grants.map(&:feature).join(" · ") %></span>
+      <% else %>
+        <span class="console-val rc-off">none <span class="console-dim">· the admin role has every feature</span></span>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render "admin/console/destinations", section: :hackrs %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, numbers: numbers, noun: "a mission number", extra: extra) %>
+</div>
