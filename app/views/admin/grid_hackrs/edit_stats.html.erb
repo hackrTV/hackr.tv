@@ -1,108 +1,69 @@
-<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias}/stats :: STAT EDITOR", variant: :admin) do %>
+<%# /root/grid_hackrs/:id/edit_stats — the stat editor as a console
+    screen (2026-11-01; dev tools; root_console.css): bar (alias · STATS
+    · [<] INSPECTOR, the DEV TOOLS badge), the warning row, // STATS //
+    (named stats[...] fields as rc-field rows — CLEARANCE and XP sync,
+    XP winning; CAPTURED with its hidden 0) + [WRITE STATS], // RAW JSON
+    // (the whole stats column; a rejected text re-renders as typed) +
+    [WRITE RAW JSON], each confirming, destinations, the > prompt.
+    Assigns: @hackr. %>
+<% content_for :title, "/root/grid_hackrs/#{@hackr.id}/edit_stats :: STATS" %>
+<% fields = {
+  "health" => [0, 999, "max #{@hackr.effective_max("health")}"],
+  "energy" => [0, 999, "max #{@hackr.effective_max("energy")}"],
+  "psyche" => [0, 999, "max #{@hackr.effective_max("psyche")}"],
+  "clearance" => [0, GridHackr::Stats::MAX_CLEARANCE, "sets XP to this level's minimum"],
+  "xp" => [0, nil, "wins over CLEARANCE when both change"],
+  "inspiration" => [0, nil, nil],
+  "bonus_inventory_slots" => [0, nil, nil],
+  "govcorp_debt" => [0, nil, "CRED"],
+  "facility_alert_level" => [0, 100, nil]
+} %>
+<% labels = {"bonus_inventory_slots" => "BONUS SLOTS", "govcorp_debt" => "GOVCORP DEBT", "facility_alert_level" => "ALERT LEVEL"} %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: link_to(@hackr.hackr_alias, admin_grid_hackr_path(@hackr)), sub: "ROOT · STATS · /root/grid_hackrs/#{@hackr.id}/edit_stats"} do %>
+    <%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link", data: {command: "back"} %>
+    <%= root_badge("DEV TOOLS ON", :warn) %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">WARNING</span><span class="console-val rc-star">direct stat writes bypass game logic <span class="console-dim">· use with care</span></span></div>
+  </div>
+
+  <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true, id: "stats-form" do %>
+    <div class="console-rule"><span>// STATS //</span></div>
+    <div class="console-status">
+      <% fields.each do |key, (min, max, hint)| %>
+        <%= root_field(labels[key] || key.upcase, id: "stats_#{key}") do %>
+          <%= number_field_tag "stats[#{key}]", @hackr.stat(key).to_i, id: "stats_#{key}", class: "rc-input rc-input--short", min: min, max: max %>
+          <% if hint %><span class="rc-hint"><%= hint %></span><% end %>
+        <% end %>
       <% end %>
-
-      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
-        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
-        <span style="color: #ccc;"> — Direct stat mutation bypasses game logic. Use with care.</span>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-      </div>
-
-      <%# === NAMED FIELDS MODE === %>
-      <div id="fields-mode">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: STAT FIELDS ::]</h3>
-        <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true do %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
-
-              <%# Vitals %>
-              <% %w[health energy psyche].each do |vital| %>
-                <div>
-                  <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;"><%= vital.upcase %></label>
-                  <input type="number" name="stats[<%= vital %>]" value="<%= @hackr.stat(vital) %>"
-                    class="tui-input" style="width: 100%; padding: 6px 10px;" min="0" max="999">
-                  <small style="color: #666;">max: <%= @hackr.effective_max(vital) %></small>
-                </div>
-              <% end %>
-
-              <%# Progression %>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">CLEARANCE</label>
-                <input type="number" name="stats[clearance]" value="<%= @hackr.stat("clearance") %>"
-                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0" max="99">
-                <small style="color: #fbbf24;">Sets XP to minimum for this level</small>
-              </div>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">XP</label>
-                <input type="number" name="stats[xp]" value="<%= @hackr.stat("xp") %>"
-                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
-                <small style="color: #fbbf24;">Overrides clearance field if both set</small>
-              </div>
-
-              <%# Other numeric %>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">INSPIRATION</label>
-                <input type="number" name="stats[inspiration]" value="<%= @hackr.stat("inspiration") %>"
-                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
-              </div>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">BONUS INV SLOTS</label>
-                <input type="number" name="stats[bonus_inventory_slots]" value="<%= @hackr.stat("bonus_inventory_slots") %>"
-                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
-              </div>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">GOVCORP DEBT</label>
-                <input type="number" name="stats[govcorp_debt]" value="<%= @hackr.stat("govcorp_debt").to_i %>"
-                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0">
-              </div>
-              <div>
-                <label class="white-text" style="display: block; margin-bottom: 4px; font-weight: bold;">ALERT LEVEL</label>
-                <input type="number" name="stats[facility_alert_level]" value="<%= @hackr.stat("facility_alert_level").to_i %>"
-                  class="tui-input" style="width: 100%; padding: 6px 10px;" min="0" max="100">
-              </div>
-            </div>
-
-            <%# Boolean: captured %>
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
-              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                <input type="hidden" name="stats[captured]" value="0">
-                <input type="checkbox" name="stats[captured]" value="1"
-                  <%= @hackr.stat("captured") ? "checked" : "" %>
-                  style="width: 18px; height: 18px;">
-                <span class="red-255-text" style="font-weight: bold;">CAPTURED</span>
-                <span style="color: #888;">(unchecking clears containment state)</span>
-              </label>
-            </div>
-          <% end %>
-
-          <div style="margin-top: 20px;">
-            <%= tui_submit "WRITE STATS", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Overwrite stats for #{@hackr.hackr_alias}?" } %>
-          </div>
-        <% end %>
-      </div>
-
-      <%# === RAW JSON MODE === %>
-      <div style="margin-top: 40px;">
-        <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: RAW JSON ::]</h3>
-        <p style="color: #888; margin-bottom: 10px;">Full stats JSON. Replaces entire stats column.</p>
-        <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true do %>
-          <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px;") do %>
-            <textarea name="raw_json" class="tui-input"
-              style="width: 100%; min-height: 200px; padding: 10px; font-family: monospace; font-size: 0.9em;"
-            ><%= JSON.pretty_generate(@hackr.current_stats) %></textarea>
-          <% end %>
-          <div style="margin-top: 15px;">
-            <%= tui_submit "WRITE RAW JSON", color: :red, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Replace ALL stats for #{@hackr.hackr_alias} with raw JSON?" } %>
-          </div>
-        <% end %>
-      </div>
+      <%= root_field("CAPTURED") do %>
+        <input type="hidden" name="stats[captured]" value="0">
+        <label class="rc-check"><%= check_box_tag "stats[captured]", "1", @hackr.stat("captured"), id: "stats_captured" %> in containment</label>
+        <span class="rc-hint">unchecking clears containment and the alert level</span>
+      <% end %>
     </div>
-<% end %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--danger" data-confirm="Overwrite stats for <%= @hackr.hackr_alias %>?">[WRITE STATS]</button>
+      <%= link_to "[CANCEL]", admin_grid_hackr_path(@hackr), class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <%= form_with url: update_stats_admin_grid_hackr_path(@hackr), method: :patch, local: true, id: "raw-stats-form" do %>
+    <div class="console-rule"><span>// RAW JSON //</span></div>
+    <%= text_area_tag :raw_json, params[:raw_json] || JSON.pretty_generate(@hackr.current_stats), class: "rc-textarea rc-textarea--code", rows: 12,
+      spellcheck: "false", aria: {label: "Raw stats JSON"}, data: {controller: "autogrow", action: "input->autogrow#grow"} %>
+    <p class="rc-sub">a JSON object · replaces the whole stats column</p>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--danger" data-confirm="Replace ALL stats for <%= @hackr.hackr_alias %> with raw JSON?">[WRITE RAW JSON]</button>
+    </div>
+  <% end %>
+
+  <%= render "admin/console/destinations", section: :hackrs %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, extra: ["back"]) %>
+</div>

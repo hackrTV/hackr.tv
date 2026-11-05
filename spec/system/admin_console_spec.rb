@@ -170,4 +170,36 @@ RSpec.describe "Admin console", type: :system do
     expect(mission.grid_mission_rewards.reload).to be_empty
     expect(mission.grid_mission_objectives.pluck(:label)).to eq(["Find the drop"])
   end
+
+  # Phase 5: a tester's terminal keeps its own fetch prompt (ids kept,
+  # the echo and the end state on classes / `hidden`): a command's reply
+  # lands in the pane, and a breach that ends swaps the input for the
+  # ended line and hides [ABORT]. The script reads the csrf-token meta,
+  # which the layout renders only with forgery protection on.
+  it "runs commands in the BREACH sandbox terminal until the breach ends" do
+    forgery = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("ADMIN_DEV_TOOLS").and_return("true")
+    runner = create(:grid_hackr, hackr_alias: "Runner", current_room: create(:grid_room))
+    deck_def = create(:grid_item_definition, :gear, slug: "test-deck", name: "Test Deck",
+      properties: {"slot" => "deck", "slot_count" => 4, "battery_max" => 64, "battery_current" => 64, "module_slot_count" => 1, "effects" => {}})
+    create(:grid_item, :in_inventory, grid_item_definition: deck_def, grid_hackr: runner).update!(equipped_slot: "deck")
+    breach = Grid::BreachService.start_sandbox!(hackr: runner, template: create(:grid_breach_template)).hackr_breach
+    log_in!
+    visit "/root/grid_breach_sandbox/#{breach.id}"
+
+    expect(page).to have_css("#abort-form")
+    expect(page).to have_no_css("#breach-ended")
+    find("#command-input").send_keys("status", :enter)
+    expect(page).to have_css("#breach-output .rc-term-echo", text: "> status")
+
+    find("#command-input").send_keys("abort", :enter)
+    expect(page).to have_css("#breach-ended", text: "SANDBOX BREACH ENDED")
+    expect(page).to have_no_css("#command-section")
+    expect(page).to have_no_css("#abort-form")
+    expect(breach.reload.active?).to be(false)
+  ensure
+    ActionController::Base.allow_forgery_protection = forgery
+  end
 end

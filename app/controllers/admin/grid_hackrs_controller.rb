@@ -9,6 +9,7 @@ class Admin::GridHackrsController < Admin::ApplicationController
   # GET /root/grid_hackrs
   def index
     @hackrs = GridHackr.includes(:current_room).order(:hackr_alias)
+    @online_ids = GridHackr.online.pluck(:id).to_set
   end
 
   # GET /root/grid_hackrs/:id
@@ -39,9 +40,13 @@ class Admin::GridHackrsController < Admin::ApplicationController
 
   # PATCH /root/grid_hackrs/:id/update_stats
   def update_stats
-    if params[:raw_json].present?
+    if params.key?(:raw_json)
       begin
         parsed = JSON.parse(params[:raw_json])
+        unless parsed.is_a?(Hash)
+          flash.now[:error] = "Invalid JSON: the stats must be a JSON object."
+          return render :edit_stats, status: :unprocessable_entity
+        end
         @hackr.update_column(:stats, parsed)
         @hackr.stats = parsed
         set_flash_success("Stats updated (raw JSON) for #{@hackr.hackr_alias}.")
@@ -83,7 +88,9 @@ class Admin::GridHackrsController < Admin::ApplicationController
     if sp.key?(:captured)
       captured = sp[:captured] == "1"
       changes["captured"] = captured
-      unless captured
+      # Only a release from containment clears it — the form always sends
+      # captured, so an uncaptured hackr's ALERT LEVEL edit must stand.
+      if !captured && @hackr.stat("captured")
         changes["captured_origin_room_id"] = nil
         changes["facility_alert_level"] = 0
       end

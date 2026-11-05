@@ -1,98 +1,79 @@
-<%= render TuiWindowComponent.new(title: "/root/hackrs :: HACKR INSPECTOR", variant: :admin) do %>
+<%# /root/grid_hackrs — every hackr as a console ledger (2026-11-01;
+    root_console.css): bar ([>] GRID, the DEV TOOLS badge), ON RECORD,
+    the FILTER row (ledger-filter: alias / role / room — replaces the old
+    filter script), // HACKRS // ([NN] · alias over #id · ROLE · CLR ·
+    XP · HP · room · NOW: ON while in the online set, the grid screen's
+    meaning · [ITEMS] + [STATS] [WARP] [SANDBOX] [NPC] [PAC] with dev
+    tools), destinations, the > prompt (NN opens the inspector).
+    Assigns: @hackrs, @online_ids. %>
+<% content_for :title, "/root/grid_hackrs :: HACKRS" %>
+<% hackrs = @hackrs.to_a %>
+<% numbers = hackrs.each_index.map { |i| root_num(i, total: hackrs.size) } %>
+<% dev = dev_tools_enabled? %>
+<div class="console console--root" data-controller="terminal ledger-filter" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "HACKRS", sub: "ROOT · HACKRS · /root/grid_hackrs"} do %>
+    <%= link_to "[>] GRID", admin_grid_path, class: "console-bar-link" %>
+    <% if dev %><%= root_badge("DEV TOOLS ON", :warn) %><% end %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #003300; border: 2px solid #00ff00; padding: 15px; margin: 20px 0;">
-          <p class="green-255-text"><%= flash[:success] %></p>
-        </div>
-      <% end %>
-
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="display: inline-flex; gap: 8px; align-items: center; margin-bottom: 20px;">
-        <label class="white-text" style="font-weight: bold;">FILTER:</label>
-        <input type="text" id="hackr-filter" class="tui-input" style="padding: 6px 10px; width: 250px;" placeholder="hackr alias..." autocomplete="off">
-        <span id="hackr-filter-status" style="color: #666; font-size: 0.85em;"><%= @hackrs.size %> hackrs</span>
-      </div>
-
-      <style>
-        .hackr-table td, .hackr-table th { padding: 6px 8px; }
-      </style>
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-        <table class="tui-table hackr-table" style="width: 100%; border-spacing: 0 2px; border-collapse: separate;">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Alias</th>
-              <th style="text-align: left;">Role</th>
-              <th style="text-align: center;">CLR</th>
-              <th style="text-align: center;">XP</th>
-              <th style="text-align: center;">HP</th>
-              <th style="text-align: left;">Location</th>
-              <th style="text-align: center;">Online</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @hackrs.each_with_index do |hackr, i| %>
-              <tr style="<%= " background: #112;" if i.odd? %>">
-                <td class="cyan-255-text"><%= link_to hackr.hackr_alias, admin_grid_hackr_path(hackr), style: "color: inherit; text-decoration: none;" %></td>
-                <td style="color: #888;"><%= hackr.role %></td>
-                <td style="text-align: center;" class="cyan-255-text"><%= hackr.stat("clearance") %></td>
-                <td style="text-align: center; color: #888;"><%= hackr.stat("xp") %></td>
-                <td style="text-align: center;">
-                  <span style="color: <%= hackr.stat("health") > 50 ? '#34d399' : '#f87171' %>;"><%= hackr.stat("health") %></span>
-                </td>
-                <td style="color: #888; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  <%= hackr.current_room&.name || "—" %>
-                </td>
-                <td style="text-align: center;">
-                  <% if hackr.last_activity_at && hackr.last_activity_at > 15.minutes.ago %>
-                    <span class="green-255-text">ON</span>
-                  <% else %>
-                    <span style="color: #444;">—</span>
-                  <% end %>
-                </td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <%= tui_button "Inspect", admin_grid_hackr_path(hackr), color: :green, style: "padding: 2px 8px; font-size: 0.8em;" %>
-                  <%= tui_button "Items", admin_grid_hackr_items_path(hackr), style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                  <% if dev_tools_enabled? %>
-                    <%= tui_button "Stats", edit_stats_admin_grid_hackr_path(hackr), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button "Warp", warp_admin_grid_hackr_path(hackr), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button "Sandbox", new_admin_grid_breach_sandbox_path(hackr_id: hackr.id), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button "NPC", new_admin_grid_npc_dialogue_tester_path(hackr_id: hackr.id), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                    <%= tui_button "PAC", new_admin_grid_pac_escape_tester_path(hackr_id: hackr.id), color: :yellow, style: "padding: 2px 8px; font-size: 0.8em; margin-left: 4px;" %>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% end %>
-
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(hackrs.size, "hackr") %> <span class="console-dim">· <%= @online_ids.size %> online · <%= hackrs.count(&:admin?) %> admin</span></span>
     </div>
-<% end %>
+    <div class="console-status-row rc-field rc-filter">
+      <label class="console-key" for="ledger-filter">FILTER</label>
+      <span class="console-val">
+        <input type="search" id="ledger-filter" class="rc-input" placeholder="alias · role · room" autocomplete="off" spellcheck="false"
+          data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+        <span class="rc-count" data-ledger-filter-target="count"><%= hackrs.size %> / <%= hackrs.size %></span>
+        <button type="button" class="rc-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+      </span>
+    </div>
+  </div>
 
-<script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    var input = document.getElementById('hackr-filter');
-    var status = document.getElementById('hackr-filter-status');
-    var rows = document.querySelectorAll('.hackr-table tbody tr');
-    var total = rows.length;
+  <section class="console-section rc-ledger rc-ledger--inspect<%= " rc-ledger--inspect-dev" if dev %>" aria-label="Hackrs">
+    <div class="console-rule"><span>// HACKRS //</span></div>
+    <% if hackrs.empty? %>
+      <%= render "admin/console/empty", text: "NO HACKRS ON RECORD" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>HACKR</span><span>ROLE</span><span class="rc-cell--r">CLR</span><span class="rc-cell--r">XP</span><span class="rc-cell--r">HP</span><span>ROOM</span><span>NOW</span><span></span>
+      </div>
+    <% end %>
+    <% hackrs.each_with_index do |hackr, i| %>
+      <% num = numbers[i] %>
+      <% health = hackr.stat("health").to_i %>
+      <div class="rc-row" data-ledger-filter-target="row" data-search="<%= [hackr.hackr_alias, hackr.role, hackr.current_room&.name].compact.join(" ").downcase %>">
+        <span class="console-tag">[<%= num %>]</span>
+        <div class="cc-text">
+          <%= link_to hackr.hackr_alias, admin_grid_hackr_path(hackr), class: "console-link cc-name", data: {command: num} %>
+          <div class="cc-meta">#<%= hackr.id %></div>
+        </div>
+        <span class="<%= class_names("rc-cell", "rc-star": hackr.admin?) %>"><%= hackr.role&.upcase || "—" %></span>
+        <span class="rc-cell rc-cell--r rc-hot"><%= hackr.stat("clearance") %></span>
+        <span class="rc-cell rc-cell--r"><%= hackr.stat("xp") %></span>
+        <span class="rc-cell rc-cell--r <%= (health > 50) ? "rc-on" : "rc-bad" %>"><%= health %></span>
+        <span class="rc-cell"><%= hackr.current_room&.name || "—" %></span>
+        <% online = @online_ids.include?(hackr.id) %>
+        <span class="rc-cell <%= online ? "rc-on" : "rc-off" %>"><%= online ? "ON" : "—" %></span>
+        <span class="rc-cell rc-links">
+          <%= link_to "[ITEMS]", admin_grid_hackr_items_path(hackr), class: "console-link" %>
+          <% if dev %>
+            <%= link_to "[STATS]", edit_stats_admin_grid_hackr_path(hackr), class: "console-link" %>
+            <%= link_to "[WARP]", warp_admin_grid_hackr_path(hackr), class: "console-link" %>
+            <%= link_to "[SANDBOX]", new_admin_grid_breach_sandbox_path(hackr_id: hackr.id), class: "console-link" %>
+            <%= link_to "[NPC]", new_admin_grid_npc_dialogue_tester_path(hackr_id: hackr.id), class: "console-link" %>
+            <%= link_to "[PAC]", new_admin_grid_pac_escape_tester_path(hackr_id: hackr.id), class: "console-link" %>
+          <% end %>
+        </span>
+      </div>
+    <% end %>
+  </section>
 
-    input.addEventListener('input', function() {
-      var q = this.value.toLowerCase();
-      var visible = 0;
-      for (var i = 0; i < rows.length; i++) {
-        var alias = rows[i].cells[0].textContent.toLowerCase();
-        var show = !q || alias.indexOf(q) !== -1;
-        rows[i].style.display = show ? '' : 'none';
-        if (show) visible++;
-      }
-      status.textContent = visible + ' of ' + total + ' hackr' + (total === 1 ? '' : 's');
-    });
-  })();
-</script>
+  <%= render "admin/console/destinations", section: :hackrs, except: "HACKRS" %>
+
+  <div class="console-rule"><span>// EVERY HACKR ON RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, except: "HACKRS", numbers: numbers, noun: "a hackr number") %>
+</div>

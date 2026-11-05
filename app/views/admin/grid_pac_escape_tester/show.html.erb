@@ -1,46 +1,44 @@
-<%= render TuiWindowComponent.new(title: "/root/pac-escape-tester :: PAC TERMINAL", variant: :admin) do %>
+<%# /root/grid_pac_escape_tester — the PAC escape terminal as a console
+    screen (2026-11-01; dev tools; root_console.css .rc-term): bar (PAC
+    TEST · [<] INSPECTOR, the ESCAPED badge the script reveals, the DEV
+    TOOLS badge), the session rows + [END TEST] (confirming; restores the
+    hackr), the terminal (opens on `look`; the screen's own > input posts
+    to command and appends the reply — no page prompt, one > per
+    screen; it stays live after an escape so the admin can look around).
+    The script renders after the screen; ids verbatim (pac-output,
+    command-input, send-btn, escaped-badge, end-form). Assigns: @hackr,
+    @initial_output. %>
+<% content_for :title, "/root/grid_pac_escape_tester :: PAC TEST" %>
+<% room = @hackr.current_room %>
+<div class="console console--root">
+  <%= render layout: "admin/console/bar", locals: {title: "PAC TEST", sub: "ROOT · HACKRS · /root/grid_pac_escape_tester"} do %>
+    <%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link" %>
+    <span id="escaped-badge" class="console-bar-badge rc-badge--live" hidden>ESCAPED</span>
+    <%= root_badge("DEV TOOLS ON", :warn) %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%# Banner %>
-      <div style="background: #330011; border: 2px solid #f87171; padding: 12px; margin-bottom: 20px;">
-        <span class="red-255-text" style="font-weight: bold;">PAC ESCAPE TESTER</span>
-        <span style="color: #ccc;"> — </span>
-        <span class="cyan-255-text"><%= @hackr.hackr_alias %></span>
-        <span style="color: #888;"> (CL <%= @hackr.stat("clearance") %>)</span>
-        <span style="color: #ccc;"> in </span>
-        <span style="color: #888;"><%= @hackr.current_room&.grid_zone&.name %> > <%= @hackr.current_room&.name %></span>
-        <span id="escaped-badge" style="display: none; margin-left: 10px; padding: 2px 8px; background: #064e3b; border: 1px solid #34d399; color: #34d399; font-weight: bold;">ESCAPED</span>
+  <div class="console-status">
+    <div class="console-status-row"><span class="console-key">HACKR</span><span class="console-val rc-hot"><%= @hackr.hackr_alias %> <span class="console-dim">· CL <%= @hackr.stat("clearance") %></span></span></div>
+    <div class="console-status-row"><span class="console-key">IN</span><span class="console-val"><%= room&.grid_zone&.name %> / <%= room&.name %></span></div>
+  </div>
+  <div class="rc-actions">
+    <%= button_to "[END TEST]", finish_admin_grid_pac_escape_tester_path, method: :delete, class: "rc-btn rc-btn--danger", form: {id: "end-form", data: {confirm: "End PAC escape test? Hackr will be restored to original state."}} %>
+  </div>
+
+  <div class="console-rule"><span>// TERMINAL //</span></div>
+  <div class="rc-term">
+    <div id="pac-output" class="rc-term-out"><div><%= raw @initial_output %></div></div>
+    <div id="command-section">
+      <div class="rc-term-in">
+        <label class="console-mark" for="command-input">&gt;</label>
+        <input type="text" id="command-input" class="rc-input" autocomplete="off" spellcheck="false" autofocus placeholder="a command · help lists them">
+        <button type="button" id="send-btn" class="rc-btn rc-btn--hot">[EXECUTE]</button>
       </div>
-
-      <%# Nav %>
-      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-        <%= tui_button_to "END TEST", finish_admin_grid_pac_escape_tester_path, method: :delete, color: :red, style: "padding: 6px 14px; font-weight: bold;", data: { confirm: "End PAC escape test? Hackr will be restored to original state." }, form: { id: "end-form" } %>
-      </div>
-
-      <%# Terminal output — styled to match frontend GameOutput.tsx %>
-      <div id="pac-output" style="font-family: monospace; font-size: 0.75em; line-height: 1.2; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; height: 700px; min-height: 700px; max-height: 700px; overflow-y: auto; overflow-x: hidden; padding: 10px; background: #0d0d0d; color: #d0d0d0; border: 1px solid #4b5563; border-radius: 3px; margin-bottom: 8px;">
-<div><%= raw @initial_output %></div>
-      </div>
-
-      <%# Command input — styled to match frontend CommandInput.tsx %>
-      <div id="command-section">
-        <div style="display: flex; gap: 8px; margin-bottom: 6px;">
-          <input type="text" id="command-input" autocomplete="off" autofocus
-            placeholder="Enter command (type 'help' for commands)"
-            style="flex: 1; background: #262626; color: #e0e0e0; border: 1px solid #4b5563; padding: 6px 10px; font-family: monospace; font-size: 0.9em; border-radius: 3px;">
-          <button id="send-btn" style="background: #7c3aed; color: white; border: none; padding: 6px 16px; font-size: 0.85em; cursor: pointer; border-radius: 3px; font-weight: bold; flex-shrink: 0;">EXECUTE</button>
-        </div>
-        <div style="font-size: 0.75em; color: #9ca3af; line-height: 1.3;">
-          Captured: look, go, breach, bribe, talk, examine, stat, inventory, who, help
-          <span style="margin-left: 10px; color: #666;">|</span>
-          <span style="margin-left: 10px;">&#x2191;/&#x2193; for history</span>
-        </div>
-      </div>
-
-      <%# No auto-end overlay — terminal stays active post-escape so admin can look around. Use END TEST button to restore. %>
+      <p class="rc-sub">captured: look · go · breach · bribe · talk · examine · stat · inventory · who · help · up / down for history</p>
     </div>
-<% end %>
+  </div>
+</div>
 
 <script nonce="<%= content_security_policy_nonce %>">
   (function() {
@@ -102,8 +100,6 @@
     function setDisabled(disabled) {
       inputEl.disabled = disabled;
       sendBtn.disabled = disabled;
-      sendBtn.style.opacity = disabled ? '0.5' : '1';
-      sendBtn.style.cursor = disabled ? 'not-allowed' : 'pointer';
     }
 
     function sendCommand() {
@@ -115,7 +111,7 @@
       setDisabled(true);
       addCommand(input);
 
-      appendOutput('<span style="color: #22d3ee;">&gt; ' + input.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>');
+      appendOutput('<span class="rc-term-echo">&gt; ' + input.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>');
       inputEl.value = '';
 
       fetch(commandUrl, {
@@ -133,14 +129,20 @@
           appendOutput(data.output);
         }
         if (data.escaped) {
-          escapedBadge.style.display = 'inline';
+          escapedBadge.hidden = false;
         }
         setDisabled(false);
         inputEl.focus();
         sending = false;
       })
       .catch(function(err) {
-        appendOutput('<span style="color: #f87171;">Error: ' + err.message + '</span>');
+        var line = document.createElement('span');
+        line.className = 'rc-bad';
+        line.textContent = 'Error: ' + err.message;
+        var div = document.createElement('div');
+        div.appendChild(line);
+        outputEl.appendChild(div);
+        outputEl.scrollTop = outputEl.scrollHeight;
         setDisabled(false);
         sending = false;
       });

@@ -67,7 +67,7 @@ class Admin::GridPacEscapeTesterController < Admin::ApplicationController
   private
 
   def preselect_from_params
-    @hackr = GridHackr.find_by(id: params[:hackr_id]) if params[:hackr_id].present?
+    @hackr = GridHackr.find(params[:hackr_id]) if params[:hackr_id].present?
   end
 
   def load_session

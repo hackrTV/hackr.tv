@@ -205,6 +205,25 @@
 .rc-ledger--assignments { --rc-cols: 5ch minmax(0, 1fr) 16ch 10ch 14ch 14ch 9ch; } /* NN · mission over slug · hackr · STATUS · accepted · completed · TURN-INS */
 .rc-ledger--objectives { --rc-cols: 5ch minmax(0, 1fr) 18ch 20ch 10ch 6ch; } /* an assignment's objectives: NN · label · TYPE · target · PROGRESS · DONE */
 .rc-ledger--impound { --rc-cols: 6ch minmax(0, 1fr) 7ch 10ch 8ch 6ch 14ch 190px; } /* #id · hackr · breach · STATUS · BRIBE · ITEMS · created · [RECOVER] [FORFEIT] */
+/* Hackrs + dev tools — the hackrs ledger, the inspector, the rig, a hackr's items, the testers' terminals. */
+.rc-ledger--inspect { --rc-cols: 5ch minmax(0, 1fr) 8ch 4ch 8ch 4ch minmax(0, 1fr) 4ch 72px; } /* NN · alias over #id · ROLE · CLR · XP · HP · room · NOW · [ITEMS] */
+.rc-ledger--inspect-dev { --rc-cols: 5ch minmax(0, 1fr) 8ch 4ch 8ch 4ch minmax(0, 1fr) 4ch 310px; } /* … · [ITEMS] [STATS] [WARP] [SANDBOX] [NPC] [PAC] (302px at 1400px) */
+.rc-ledger--inspect .rc-cell { overflow: hidden; text-overflow: ellipsis; }
+.rc-ledger--loadout { --rc-cols: 120px minmax(0, 1fr) 14ch; } /* SLOT (the status rows' key width) · item · RARITY */
+.rc-ledger--holdings { --rc-cols: minmax(0, 1fr) 18ch 14ch 6ch 8ch; } /* the inspector's inventory: item · TYPE · RARITY · QTY · VALUE */
+.rc-ledger--held { --rc-cols: minmax(0, 1fr) 18ch 14ch 6ch 8ch 90px; } /* a hackr's items: item · TYPE · RARITY · QTY · VALUE · [REMOVE] */
+.rc-ledger--equipped { --rc-cols: 120px minmax(0, 1fr) 18ch 14ch 8ch; } /* SLOT · item · TYPE · RARITY · VALUE */
+.rc-ledger--standing { --rc-cols: minmax(0, 40ch) 8ch; } /* the inspector's faction reputation: faction · VALUE */
+.rc-ledger--hackr-missions { --rc-cols: 5ch minmax(0, 1fr) 28ch 17ch; } /* NN · mission · ARC · accepted */
+.rc-ledger--rig-slots { --rc-cols: 14ch 10ch 10ch 10ch; } /* SLOT · CAPACITY · INSTALLED · FREE */
+.rc-ledger--rig-parts { --rc-cols: minmax(0, 1fr) 8ch 8ch 14ch 110px; } /* component · SLOT · MULT · RARITY · [UNINSTALL] */
+.console--root .console-bar-badge[hidden], .rc-actions form[hidden] { display: none; } /* the PAC terminal's ESCAPED badge; a terminal's [ABORT] / [END SESSION] once it ends */
+/* A tester's terminal: the game's output pane (the public grid log's pre-wrap, 16/20 Terminus on tokens) over the screen's own > input. */
+.rc-term { padding: 4px 8px 6px; }
+.rc-term-out { box-sizing: border-box; height: 640px; overflow-x: hidden; overflow-y: auto; padding: 6px 8px; border: 1px solid var(--edge); background: var(--bg-1); color: var(--fg); font-size: 16px; line-height: 20px; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
+.rc-term-in { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.rc-term-in .rc-input { flex: 1 1 auto; width: auto; }
+.rc-term-echo { color: var(--accent-alt); }
 /* Data cells that run long (memos, addresses, IPs, reasons) cut off at their column. */
 .rc-ledger--caches .rc-cell, .rc-ledger--rigs .rc-cell, .rc-ledger--tx .rc-cell, .rc-ledger--replog .rc-cell, .rc-ledger--assignments .rc-cell, .rc-ledger--objectives .rc-cell { overflow: hidden; text-overflow: ellipsis; }
 .rc-violet { color: var(--accent-bright); } /* faction names, nicknames, redemptions */
@@ -335,4 +354,14 @@
   .rc-ledger--abuse .rc-row .rc-cell, .rc-ledger--caches .rc-row .rc-cell, .rc-ledger--rigs .rc-row .rc-cell, .rc-ledger--tx .rc-row .rc-cell, .rc-ledger--replog .rc-row .rc-cell, .rc-ledger--standings .rc-row .rc-cell { display: block; }
   .rc-ledger--objectives .rc-row .rc-cell--r { display: block; }
   .rc-ledger--impound .rc-row { grid-template-columns: 6ch minmax(0, 1fr) auto; }
+  /* Hackrs + dev tools (phone): the ledger's buttons under the alias; unnumbered rows keep their label / value cells. */
+  .rc-ledger--inspect .rc-links { grid-column: 2 / -1; justify-content: flex-start; flex-wrap: wrap; }
+  .rc-ledger--loadout .rc-row, .rc-ledger--equipped .rc-row { grid-template-columns: 9ch minmax(0, 1fr); }
+  .rc-ledger--loadout .rc-row > .rc-cell:first-child, .rc-ledger--equipped .rc-row > .rc-cell:first-child { display: block; }
+  .rc-ledger--holdings .rc-row { grid-template-columns: minmax(0, 1fr); }
+  .rc-ledger--held .rc-row, .rc-ledger--rig-parts .rc-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .rc-ledger--standing .rc-row { grid-template-columns: minmax(0, 1fr) 8ch; }
+  .rc-ledger--rig-slots .rc-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .rc-ledger--standing .rc-row .rc-cell, .rc-ledger--rig-slots .rc-row .rc-cell { display: block; }
+  .rc-term-out { height: 60vh; }
 }

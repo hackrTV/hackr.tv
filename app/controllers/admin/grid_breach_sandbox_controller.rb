@@ -5,29 +5,36 @@ class Admin::GridBreachSandboxController < Admin::ApplicationController
   before_action :set_hackr, only: %i[new create]
   before_action :set_breach, only: %i[show command abort]
 
-  # GET /root/grid_breach_sandbox/new?hackr_id=N
+  # GET /root/grid_breach_sandbox/new[?hackr_id=N] — without a hackr the
+  # screen's HACKR picker chooses one (the console's SANDBOX row).
   def new
-    load_templates
+    load_pickers
   end
 
   # POST /root/grid_breach_sandbox
   def create
-    template = GridBreachTemplate.find_by(id: params[:template_id])
-    unless template
-      flash.now[:error] = "Template not found."
-      load_templates
+    unless @hackr
+      flash.now[:error] = "Hackr is required."
+      load_pickers
       return render :new, status: :unprocessable_entity
     end
 
-    result = Grid::BreachService.start_sandbox!(hackr: @hackr, template: template)
+    @template = GridBreachTemplate.find_by(id: params[:template_id])
+    unless @template
+      flash.now[:error] = "Template not found."
+      load_pickers
+      return render :new, status: :unprocessable_entity
+    end
+
+    result = Grid::BreachService.start_sandbox!(hackr: @hackr, template: @template)
     redirect_to admin_grid_breach_sandbox_path(result.hackr_breach)
   rescue Grid::BreachService::AlreadyInBreach => e
     flash.now[:error] = e.message
-    load_templates
+    load_pickers
     render :new, status: :unprocessable_entity
   rescue Grid::BreachService::NoDeckEquipped, Grid::BreachService::DeckFried => e
     flash.now[:error] = "#{@hackr.hackr_alias}: #{e.message}"
-    load_templates
+    load_pickers
     render :new, status: :unprocessable_entity
   end
 
@@ -72,7 +79,7 @@ class Admin::GridBreachSandboxController < Admin::ApplicationController
   private
 
   def set_hackr
-    @hackr = GridHackr.find(params[:hackr_id])
+    @hackr = GridHackr.find(params[:hackr_id]) if params[:hackr_id].present?
   end
 
   def set_breach
@@ -83,8 +90,9 @@ class Admin::GridBreachSandboxController < Admin::ApplicationController
     end
   end
 
-  def load_templates
+  def load_pickers
     @templates = GridBreachTemplate.order(:tier, :min_clearance, :name)
+    @hackrs = GridHackr.order(:hackr_alias)
   end
 
   def sandbox_ended_message

@@ -1,98 +1,71 @@
-<%= render "admin/shared/combobox" %>
+<%# /root/grid_hackrs/:id/warp — the admin warp as a console screen
+    (2026-11-01; dev tools; root_console.css): bar (alias · WARP ·
+    [<] INSPECTOR, the DEV TOOLS badge), // NOW // (the current room, a
+    BREACH that blocks the warp, captured state the warp clears),
+    // DESTINATION // (the ROOM picker over every room — warp-* ids, the
+    commit refused until a room is picked) + [WARP] confirming,
+    destinations, the > prompt; the picker's script renders after the
+    screen. Assigns: @hackr, @rooms. %>
+<% content_for :title, "/root/grid_hackrs/#{@hackr.id}/warp :: WARP" %>
+<% room = @hackr.current_room %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: link_to(@hackr.hackr_alias, admin_grid_hackr_path(@hackr)), sub: "ROOT · WARP · /root/grid_hackrs/#{@hackr.id}/warp"} do %>
+    <%= link_to "[<] INSPECTOR", admin_grid_hackr_path(@hackr), class: "console-bar-link", data: {command: "back"} %>
+    <%= root_badge("DEV TOOLS ON", :warn) %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<%= render TuiWindowComponent.new(title: "/root/hackrs/#{@hackr.hackr_alias}/warp :: ADMIN WARP", variant: :admin) do %>
+  <div class="console-rule"><span>// NOW //</span></div>
+  <div class="console-status">
+    <% if room %>
+      <div class="console-status-row"><span class="console-key">ROOM</span><span class="console-val"><%= room.name %> <span class="console-dim">· <%= room.grid_zone&.name %> · <%= room.grid_zone&.grid_region&.name %></span></span></div>
+    <% else %>
+      <div class="console-status-row"><span class="console-key">ROOM</span><span class="console-val rc-off">nowhere <span class="console-dim">· no current room</span></span></div>
+    <% end %>
+    <% if @hackr.in_breach? %>
+      <div class="console-status-row"><span class="console-key">BREACH</span><span class="console-val rc-bad">IN PROGRESS <span class="console-dim">· the warp is refused until it ends</span></span></div>
+    <% end %>
+    <% if @hackr.stat("captured") %>
+      <div class="console-status-row"><span class="console-key">CAPTURED</span><span class="console-val rc-star">IN CONTAINMENT <span class="console-dim">· the warp clears it</span></span></div>
+    <% end %>
+    <div class="console-status-row"><span class="console-key">WARNING</span><span class="console-val rc-star">bypasses clearance gates, locks and zone restrictions</span></div>
+  </div>
 
-    <div style="padding: 20px;">
-      <% if flash[:error] %>
-        <div style="background: #330000; border: 2px solid #ff0000; padding: 15px; margin: 20px 0;">
-          <p class="red-255-text"><%= flash[:error] %></p>
-        </div>
-      <% end %>
-
-      <div style="background: #332200; border: 2px solid #fbbf24; padding: 12px; margin-bottom: 25px;">
-        <span class="yellow-255-text" style="font-weight: bold;">DEV TOOL</span>
-        <span style="color: #ccc;"> — Bypasses clearance gates, locks, and zone restrictions. Clears containment if captured.</span>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-        <%= tui_button "<- Inspector", admin_grid_hackr_path(@hackr), style: "padding: 6px 14px;" %>
-      </div>
-
-      <%# Current location %>
-      <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 15px; margin-bottom: 20px;") do %>
-        <span style="color: #888;">Current Location:</span>
-        <% if @hackr.current_room %>
-          <span class="cyan-255-text"><%= @hackr.current_room.name %></span>
-          <span style="color: #888;"> (<%= @hackr.current_room.grid_zone&.name %>, <%= @hackr.current_room.grid_zone&.grid_region&.name %>)</span>
-        <% else %>
-          <span style="color: #666;">Nowhere (nil)</span>
-        <% end %>
-        <% if @hackr.in_breach? %>
-          <br>
-          <span class="red-255-text" style="font-weight: bold;">WARNING: Active BREACH in progress. Warp is blocked.</span>
-        <% end %>
-        <% if @hackr.stat("captured") %>
-          <br>
-          <span class="yellow-255-text">Captured — warp will clear containment state.</span>
-        <% end %>
-      <% end %>
-
-      <%# Warp form %>
-      <%= form_with url: perform_warp_admin_grid_hackr_path(@hackr), method: :post, local: true, id: "warp-form" do %>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false, style: "padding: 20px;") do %>
-          <label class="white-text" style="display: block; margin-bottom: 8px; font-weight: bold;">DESTINATION ROOM</label>
-
-          <input type="hidden" name="room_id" id="warp-room-id" value="">
-
-          <div class="admin-combobox">
-            <input type="text" id="warp-input" class="admin-combobox-input" autocomplete="off"
-              placeholder="Type to search... (region, zone, or room name)">
-            <div id="warp-dropdown" class="admin-combobox-dropdown"></div>
-          </div>
-
-          <p style="color: #666; margin-top: 6px; font-size: 0.85em;" id="warp-status">
-            <%= @rooms.size %> rooms — start typing to filter
-          </p>
-        <% end %>
-
-        <div style="margin-top: 20px;">
-          <%= tui_submit "WARP", color: :yellow, style: "padding: 10px 24px; font-weight: bold;", data: { confirm: "Warp #{@hackr.hackr_alias} to selected room?" } %>
-        </div>
-      <% end %>
+  <%= form_with url: perform_warp_admin_grid_hackr_path(@hackr), method: :post, local: true, id: "warp-form" do %>
+    <div class="console-rule"><span>// DESTINATION //</span></div>
+    <div class="console-status">
+      <%= render "admin/console/picker", label: "ROOM", key: "warp", name: "room_id", value: nil, text: nil,
+        placeholder: "region · zone · room name", status: "#{@rooms.size} rooms · type to filter" %>
     </div>
-<% end %>
+    <div class="console-rule"><span>// COMMIT //</span></div>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot" data-confirm="Warp <%= @hackr.hackr_alias %> to the selected room?">[WARP]</button>
+      <%= link_to "[CANCEL]", admin_grid_hackr_path(@hackr), class: "rc-btn" %>
+    </div>
+  <% end %>
 
+  <%= render "admin/console/destinations", section: :hackrs %>
+
+  <div class="console-rule"><span>// END OF RECORD //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:hackrs, extra: ["back"]) %>
+</div>
+
+<%= render "admin/shared/combobox" %>
 <script nonce="<%= content_security_policy_nonce %>">
-  (function() {
-    function ready(fn) {
-      if (document.readyState !== 'loading') fn();
-      else document.addEventListener('DOMContentLoaded', fn);
-    }
-    ready(function() {
-      AdminCombobox.init({
-        inputId: 'warp-input',
-        hiddenId: 'warp-room-id',
-        dropdownId: 'warp-dropdown',
-        statusId: 'warp-status',
-        formId: 'warp-form',
-        items: <%= raw json_escape(@rooms.map { |r|
-          {
-            id: r.id,
-            name: r.name,
-            type: r.room_type || "default",
-            zone: r.grid_zone.name,
-            region: r.grid_zone.grid_region&.name || "Unknown"
-          }
-        }.to_json) %>,
-        getId: function(r) { return r.id; },
-        getSearchText: function(r) { return (r.region + ' ' + r.zone + ' ' + r.name + ' ' + r.type).toLowerCase(); },
-        getGroupKey: function(r) { return r.region + ' > ' + r.zone; },
-        renderOption: function(r, esc) { return '<span class="cb-name">' + esc(r.name) + '</span> <span class="cb-meta">(' + esc(r.type) + ')</span>'; },
-        getLabel: function(r) { return r.region + ' > ' + r.zone + ' > ' + r.name; },
-        emptyText: 'No rooms match',
-        selectedText: 'Selected — ready to warp',
-        submitError: 'Select a destination room first'
-      });
-    });
-  })();
+  AdminCombobox.init({
+    inputId: 'warp-input',
+    hiddenId: 'warp-hidden',
+    dropdownId: 'warp-dropdown',
+    statusId: 'warp-status',
+    formId: 'warp-form',
+    items: <%= raw json_escape(@rooms.map { |r| {id: r.id, name: r.name, type: r.room_type || "default", zone: r.grid_zone.name, region: r.grid_zone.grid_region&.name || "Unknown"} }.to_json) %>,
+    getId: function(r) { return r.id; },
+    getSearchText: function(r) { return (r.region + ' ' + r.zone + ' ' + r.name + ' ' + r.type).toLowerCase(); },
+    getGroupKey: function(r) { return r.region + ' / ' + r.zone; },
+    renderOption: function(r, esc) { return '<span class="cb-name">' + esc(r.name) + '</span> <span class="cb-meta">' + esc(r.type) + '</span>'; },
+    getLabel: function(r) { return r.region + ' / ' + r.zone + ' / ' + r.name; },
+    emptyText: 'No rooms match',
+    selectedText: 'Room selected · ready to warp',
+    submitError: 'Select a destination room first'
+  });
 </script>
