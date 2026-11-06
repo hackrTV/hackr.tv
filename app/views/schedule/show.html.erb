@@ -1,58 +1,102 @@
 <% content_for :title, "Stream Schedule — hackr.tv" %>
+<% next_tx = @upcoming.first %>
+<% last_tx = @past.first %>
+<% destinations = [
+  ["HOME", "/", "hackr.tv", "The broadcast console"],
+  ["VIDZ", "/thecyberpulse/vidz", "Vidz", "Archived broadcasts and visual transmissions"],
+  ["TCP", "/thecyberpulse", "The.CyberPul.se", "Transmission origin and broadcast hub"],
+  ["XERAEN", "/xeraen", "XERAEN", "The operative record"]
+] %>
 
-<%= render layout: "shared/default_chrome", locals: {} do %>
-  <div class="sched-wrap">
-    <h1 class="sched-title">STREAM SCHEDULE</h1>
-    <p class="sched-subtitle">Upcoming livestreams and past broadcasts</p>
+<%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
+  <div class="console console--schedule" data-controller="terminal" data-boot="pending"
+    data-action="keydown@document->terminal#skip click->terminal#skip">
+    <div class="console-bar console-line" data-terminal-target="line">
+      <h1 class="console-bar-title">SCHEDULE</h1>
+      <span class="console-bar-sub">BROADCASTS · UPCOMING &amp; PAST</span>
+      <span class="console-bar-right">
+        <%= link_to "[<] HOME", "/", class: "console-bar-link" %>
+        <%= link_to "[>] VIDZ", "/thecyberpulse/vidz", class: "console-bar-link" %>
+      </span>
+    </div>
 
-    <h2 class="sched-heading sched-heading-upcoming">[:: UPCOMING ::]</h2>
-    <% if @upcoming.any? %>
-      <div class="sched-list">
-        <% @upcoming.each do |stream| %>
-          <% badge = ScheduleController::STATE_BADGES[stream.display_state.to_s] || ScheduleController::STATE_BADGES["upcoming"] %>
-          <div class="sched-card" style="border-left-color: <%= badge[:color] %>;">
-            <div class="sched-card-row">
-              <div>
-                <span class="sched-badge" style="color: <%= badge[:color] %>;">[<%= badge[:label] %>]</span>
-                <span class="sched-stream-title"><%= stream.title.presence || "Untitled Stream" %></span>
-                <span class="sched-sep">—</span>
-                <span class="sched-artist"><%= stream.artist.name %></span>
-              </div>
-              <div class="sched-when"><%= stream.scheduled_at ? future_datetime(stream.scheduled_at, include_time: true) : "—" %></div>
-            </div>
-          </div>
+    <div class="console-status">
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">SIGNAL</span>
+        <span class="console-val">
+          <% if @live %>
+            <span class="console-hot">● LIVE NOW</span> <span class="console-dim">·</span> <%= link_to @live.title.presence || "Untitled Stream", "/", class: "console-link" %> <span class="console-dim">· <%= @live.artist.name %></span>
+          <% else %>
+            <span class="console-dim">STANDBY</span>
+          <% end %>
+        </span>
+      </div>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">NEXT TX</span>
+        <% if next_tx %>
+          <span class="console-val" data-controller="countdown" data-countdown-deadline-value="<%= next_tx.scheduled_at.iso8601 %>">
+            <%= future_stamp(next_tx.scheduled_at) %> <span class="console-dim">·</span> <%= next_tx.title.presence || "Untitled Stream" %> <span class="console-dim">· <%= next_tx.artist.name %> ·</span> <span class="sc-countdown" data-countdown-target="label"></span>
+          </span>
+        <% else %>
+          <span class="console-val"><span class="console-dim">UNSCHEDULED</span></span>
         <% end %>
       </div>
-    <% else %>
-      <p class="sched-none">No upcoming streams scheduled.</p>
-    <% end %>
-
-    <h2 class="sched-heading sched-heading-past">[:: PAST BROADCASTS ::]</h2>
-    <% if @past.any? %>
-      <div class="sched-list">
-        <% @past.each do |stream| %>
-          <div class="sched-card sched-card-past">
-            <div class="sched-card-row">
-              <div>
-                <span class="sched-past-title"><%= stream.title.presence || "Untitled Stream" %></span>
-                <span class="sched-sep sched-sep-past">—</span>
-                <span class="sched-past-artist"><%= stream.artist.name %></span>
-              </div>
-              <div class="sched-past-meta">
-                <span class="sched-past-date"><%= stream.started_at ? future_datetime(stream.started_at, include_time: true) : "—" %></span>
-                <% if stream.started_at && stream.ended_at %>
-                  <span class="sched-past-duration">(<%= stream_duration(stream.started_at, stream.ended_at) %>)</span>
-                <% end %>
-                <% if (vod_path = vod_page_path(stream)) %>
-                  <%= link_to "[VOD]", vod_path, class: "sched-vod" %>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        <% end %>
+      <div class="console-status-row console-line" data-terminal-target="line">
+        <span class="console-key">LAST TX</span>
+        <span class="console-val">
+          <% if last_tx %>
+            <% last_vod = vod_page_path(last_tx) %>
+            <%= future_stamp(last_tx.started_at) %> <span class="console-dim">·</span> <%= link_to_if last_vod, last_tx.title.presence || "Untitled Stream", last_vod, class: "console-link" %> <span class="console-dim">· <%= last_tx.artist.name %><% if last_vod %> · VOD<% end %></span>
+          <% else %>
+            <span class="console-dim">NO RECORD</span>
+          <% end %>
+        </span>
       </div>
-    <% else %>
-      <p class="sched-none">No past broadcasts yet.</p>
-    <% end %>
+    </div>
+
+    <section class="console-section" aria-label="Upcoming broadcasts">
+      <div class="console-rule console-line" data-terminal-target="line"><span>// UPCOMING //</span></div>
+      <% if @upcoming.empty? %>
+        <p class="cc-empty console-line" data-terminal-target="line">NO TRANSMISSIONS SCHEDULED <span class="console-dim">· the signal is still forming</span></p>
+      <% end %>
+      <% @upcoming.each do |stream| %>
+        <% state = ScheduleController::STATE_BADGES.fetch(stream.display_state.to_s, ScheduleController::STATE_BADGES["upcoming"]) %>
+        <div class="sc-row console-line" data-terminal-target="line">
+          <span class="sc-stamp"><%= future_stamp(stream.scheduled_at) %></span>
+          <span class="sc-state <%= state[:tone] %>"><%= state[:label] %></span>
+          <span class="sc-title"><%= stream.title.presence || "Untitled Stream" %> <span class="console-dim">· <%= stream.artist.name %></span></span>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="console-section" aria-label="Past broadcasts">
+      <div class="console-rule console-line" data-terminal-target="line"><span>// PAST BROADCASTS //</span></div>
+      <% if @past.empty? %>
+        <p class="cc-empty console-line" data-terminal-target="line">NO BROADCASTS ON RECORD</p>
+      <% end %>
+      <% @past.each do |stream| %>
+        <% vod_path = vod_page_path(stream) %>
+        <div class="sc-row sc-row--past console-line" data-terminal-target="line">
+          <span class="sc-stamp"><%= future_stamp(stream.started_at) %></span>
+          <span class="sc-dur"><%= stream_duration(stream.started_at, stream.ended_at) if stream.ended_at %></span>
+          <span class="sc-title"><%= stream.title.presence || "Untitled Stream" %> <span class="console-dim">· <%= stream.artist.name %></span></span>
+          <span class="sc-vod"><%= link_to "[>] VOD", vod_path, class: "console-link" if vod_path %></span>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="console-section" aria-label="Destinations">
+      <div class="console-rule console-line" data-terminal-target="line"><span>// DESTINATIONS //</span></div>
+      <% destinations.each do |tag_name, href, name, desc| %>
+        <div class="console-row console-line" data-terminal-target="line">
+          <span class="console-tag">[<%= tag_name %>]</span>
+          <%= link_to name, href, class: "console-link", data: {command: tag_name.downcase} %>
+          <span class="console-desc"><%= desc %></span>
+        </div>
+      <% end %>
+    </section>
+
+    <div class="console-rule console-line" data-terminal-target="line"><span>// EVERY BROADCAST COMMITTED TO RECORD //</span></div>
+    <%= render "shared/console_prompt", hint: safe_join(["type a tag ", tag.span("(#{destinations.map { |tag_name, *| tag_name.downcase }.join(" ")})", class: "console-dim"), " · enter · ? help"]) %>
   </div>
 <% end %>

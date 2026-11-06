@@ -8,6 +8,7 @@ export default class extends Controller<HTMLElement> {
 
   declare readonly labelTarget: HTMLElement
   declare readonly sweepTarget: HTMLElement
+  declare readonly hasSweepTarget: boolean
   declare readonly deadlineValue: string
 
   private timer: number | null = null
@@ -26,7 +27,7 @@ export default class extends Controller<HTMLElement> {
     if (remaining <= 0) {
       this.labelTarget.textContent = 'STARTING SOON!'
       this.labelTarget.classList.add('scheduled-banner-soon')
-      this.sweepTarget.hidden = false
+      if (this.hasSweepTarget) this.sweepTarget.hidden = false
       if (this.timer !== null) window.clearInterval(this.timer)
       return
     }
