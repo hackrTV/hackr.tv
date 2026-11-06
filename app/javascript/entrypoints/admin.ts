@@ -1,8 +1,8 @@
 // Admin entrypoint — loaded ONLY by layouts/admin.html.erb. Stimulus
 // alone, no Turbo: the admin is plain full-page navigation and its
-// inline DOMContentLoaded scripts (sortable tables, the data-confirm
-// handler) depend on that. The /root music screens (artists / releases /
-// tracks) are console screens, so the home console's terminal controller
+// inline DOMContentLoaded scripts (the data-confirm handler, the map
+// editor) depend on that. The /root screens are console screens, so
+// the home console's terminal controller
 // (reveal + the "> " prompt — utils/visit.ts does a full load here), the
 // hover peek and the admin-only ledger-filter / file-pick / autogrow /
 // confirm-slug controllers are registered, plus site-header for the

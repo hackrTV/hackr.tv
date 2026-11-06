@@ -6,9 +6,8 @@
 # gotchas) — and no leaked ERB (a `<%` on the screen: an ERB comment
 # closed early by a tag quoted inside it, as admin/console/_bar once
 # was). The screen is the body after the chrome's </header> up to
-# the layout's trailing script (admin/shared/_sortable_tables, gone with
-# Phase 6); a screen with its own inline script passes the slice it
-# wants checked instead of the whole body.
+# the first <script>; a screen with its own inline script passes the
+# slice it wants checked instead of the whole body.
 module AdminConsoleMatchers
   LEGACY = ["<style", 'style="', "tui-window", "tui-button", "tui-table", "data-turbo-confirm", "<%"].freeze
   GLYPHS = /[←→▾⚑✓⚠]/

@@ -9,9 +9,8 @@
 #     ...body...
 #   <% end %>
 #
-# Variants: :admin (centered page wrapper, admin night-blue chrome, width
-# defaults 1400), :page (centered page wrapper, DOS black), :panel (inner
-# block panel, bg #0a0a0a), :plain (no layout class — tuicss base rendering
+# Variants: :page (centered page wrapper, DOS black), :panel (inner block
+# panel, bg #0a0a0a), :plain (no layout class — tuicss base rendering
 # only). Layout/spacing beyond the shared chrome passes through via
 # style:/class:.
 class TuiWindowComponent < ViewComponent::Base
@@ -19,7 +18,7 @@ class TuiWindowComponent < ViewComponent::Base
 
   def initialize(title: nil, variant: :panel, width: nil, color: nil,
     fieldset: true, legend_class: "center", fieldset_class: nil, **html_options)
-    unless %i[admin page panel plain].include?(variant)
+    unless %i[page panel plain].include?(variant)
       raise ArgumentError, "unknown TuiWindow variant #{variant.inspect}"
     end
     if color && !COLORS.include?(color.to_s)
@@ -30,7 +29,7 @@ class TuiWindowComponent < ViewComponent::Base
     @title = title
     @fieldset = fieldset
     @variant = variant
-    @width = width || ((variant == :admin) ? 1400 : nil)
+    @width = width
     @color = color
     @legend_class = legend_class
     @fieldset_class = fieldset_class
@@ -49,10 +48,9 @@ class TuiWindowComponent < ViewComponent::Base
     classes = ["tui-window"]
     classes << "#{color}-168" if color
     classes << "white-text"
-    classes << "admin-panel" if variant == :admin
     case variant
     when :panel then classes << "tui-window--panel"
-    when :admin, :page then classes << "tui-window--page"
+    when :page then classes << "tui-window--page"
     end
     classes << @html_options[:class] if @html_options[:class]
 
@@ -62,7 +60,6 @@ class TuiWindowComponent < ViewComponent::Base
 
   def fieldset_classes
     return @fieldset_class if @fieldset_class
-    return "admin-panel-border" if variant == :admin
     "#{color}-168-border" if color
   end
 end

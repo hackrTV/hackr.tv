@@ -8,12 +8,11 @@ class Admin::TestGuideController < Admin::ApplicationController
     @total_minutes = TestGuide.total_minutes
     @active_run = ManualTestRun.active
     @results = @active_run&.results_by_slug || {}
-    @recent_runs = ManualTestRun.order(created_at: :desc).limit(5)
   end
 
   def show
     @article = TestGuide.find(params[:slug])
-    return redirect_to admin_test_guide_path, alert: "Unknown article." unless @article
+    return redirect_to admin_test_guide_path, flash: {error: "Unknown article."} unless @article
 
     @previous_article, @next_article = TestGuide.neighbors(@article.slug)
     @active_run = ManualTestRun.active
@@ -22,10 +21,10 @@ class Admin::TestGuideController < Admin::ApplicationController
 
   def record_result
     article = TestGuide.find(params[:slug])
-    return redirect_to admin_test_guide_path, alert: "Unknown article." unless article
+    return redirect_to admin_test_guide_path, flash: {error: "Unknown article."} unless article
 
     run = ManualTestRun.active
-    return redirect_to admin_test_guide_article_path(article.slug), alert: "No open test run." unless run
+    return redirect_to admin_test_guide_article_path(article.slug), flash: {error: "No open test run."} unless run
 
     result = run.manual_test_results.find_or_initialize_by(article_slug: article.slug)
     result.status = params[:status]
@@ -33,16 +32,16 @@ class Admin::TestGuideController < Admin::ApplicationController
 
     unless result.save
       return redirect_to admin_test_guide_article_path(article.slug),
-        alert: "Could not record result: #{result.errors.full_messages.join(", ")}"
+        flash: {error: "Could not record result: #{result.errors.full_messages.join(", ")}"}
     end
 
     _, next_article = TestGuide.neighbors(article.slug)
     if next_article
       redirect_to admin_test_guide_article_path(next_article.slug),
-        notice: "#{article.title}: #{result.status.upcase} recorded."
+        flash: {success: "#{article.title}: #{result.status.upcase} recorded."}
     else
       redirect_to admin_test_run_path(run),
-        notice: "#{article.title}: #{result.status.upcase} recorded. That was the last article."
+        flash: {success: "#{article.title}: #{result.status.upcase} recorded. That was the last article."}
     end
   end
 end

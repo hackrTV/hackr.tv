@@ -9,28 +9,31 @@ class Admin::DataAuditFlagsController < Admin::ApplicationController
   def index
     @flags = DataAuditFlag.newest_first
 
-    # Filters
-    if params[:status].present? && DataAuditFlag::STATUSES.include?(params[:status])
-      @flags = @flags.where(status: params[:status])
-    end
-    @flags = @flags.for_severity(params[:severity])
-    @flags = @flags.for_domain(params[:domain])
-    @flags = @flags.for_check(params[:check_name])
-
-    if params[:search].present?
-      escaped = ActiveRecord::Base.sanitize_sql_like(params[:search])
-      @flags = @flags.where("title LIKE ?", "%#{escaped}%")
-    end
-
     # Summary counts (before pagination)
     @by_severity = DataAuditFlag.effective_open.group(:severity).count
     @by_domain = DataAuditFlag.effective_open.group(:domain).count
     @check_names = DataAuditFlag.distinct.pluck(:check_name).sort
 
-    # Pagination
+    # Filters
+    @status = params[:status].to_s.presence_in(DataAuditFlag::STATUSES).to_s
+    @severity = params[:severity].to_s.presence_in(DataAuditFlag::SEVERITIES).to_s
+    @domain = params[:domain].to_s.presence_in(DataAuditFlag::DOMAINS).to_s
+    @check_name = params[:check_name].to_s.presence_in(@check_names).to_s
+    @flags = @flags.where(status: @status) if @status.present?
+    @flags = @flags.for_severity(@severity)
+    @flags = @flags.for_domain(@domain)
+    @flags = @flags.for_check(@check_name)
+
+    @search = params[:search].is_a?(String) ? params[:search] : ""
+    if @search.present?
+      escaped = ActiveRecord::Base.sanitize_sql_like(@search)
+      @flags = @flags.where("title LIKE ?", "%#{escaped}%")
+    end
+
+    # Pagination (the offset clamped to the last page: an action's redirect_back keeps the page it was pressed on)
     @per_page = PER_PAGE
-    @offset = [params[:offset].to_i, 0].max
     @total_count = @flags.count
+    @offset = params[:offset].to_i.clamp(0, [@total_count - 1, 0].max / @per_page * @per_page)
     @flags = @flags.offset(@offset).limit(@per_page)
 
     # Batch-preload slugs for models that use slug-based to_param (avoids N+1)
@@ -54,7 +57,7 @@ class Admin::DataAuditFlagsController < Admin::ApplicationController
     DataAudit::FlagCache.invalidate!
     label = until_time ? "until #{until_time.strftime("%Y-%m-%d %H:%M")}" : "permanently"
     set_flash_success "Flag acknowledged #{label}."
-    redirect_to admin_data_audit_flags_path
+    redirect_back_or_to admin_data_audit_flags_path
   end
 
   # POST /root/data_audit_flags/:id/reopen
@@ -62,14 +65,14 @@ class Admin::DataAuditFlagsController < Admin::ApplicationController
     @flag.reopen!
     DataAudit::FlagCache.invalidate!
     set_flash_success "Flag reopened."
-    redirect_to admin_data_audit_flags_path
+    redirect_back_or_to admin_data_audit_flags_path
   end
 
   # POST /root/data_audit_flags/scan
   def scan
     DataAudit::ScanJob.perform_later
     set_flash_success "Audit scan enqueued. Results will appear shortly."
-    redirect_to admin_data_audit_flags_path
+    redirect_back_or_to admin_data_audit_flags_path
   end
 
   private

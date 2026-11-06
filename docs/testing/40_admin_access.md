@@ -53,9 +53,23 @@ minutes: 12
    folds its objectives / rewards in as cyan `SOURCE` rows and the
    readout counts the child changes. Type `back` at the prompt. → The
    ledger.
-7. Sortable tables: on any legacy TuiCss index (one not yet on the
-   console — zones, mobs …), click a column header. → Client-side sort
-   works.
+7. No legacy screen left: Meta/ → Test Guide, then Test Guide's
+   `[>] RUNS`. → Both are console screens — the guide as one `// AREA //`
+   ledger per area numbered through (`[NN] · title over slug · the
+   open run's STATUS · ~MIN`), a `// START A RUN //` form (or
+   `// ACTIVE RUN //` naming the next article with `[>] CONTINUE` /
+   `[>] RUN` while one is open), the runs as `[NN] · label over by /
+   started · OPEN / COMPLETE · recorded · PASS · FAIL · DONE`. Open an
+   article. → The console bar (`[<] PREV [>] NEXT [<] GUIDE`, also
+   `prev` / `next` / `back` at the prompt) over the serif reading body with its numbered step
+   cards and checkboxes, then — while a run is open — `// RECORD //`
+   with `// NOTES //` and `[PASS] [FAIL] [BLOCKED] [SKIP]` /
+   `[>] SKIP AHEAD`. A run's screen: `// RESULTS //` tiles,
+   `[MARK RUN COMPLETE]` / `[DELETE RUN]` (confirming), `// FAILURES //`
+   with the notes whole, `// ARTICLES //` numbered through. Outside the
+   map editor no `/root` screen shows a TuiCss window, table or button
+   (the old click-to-sort headers are gone with the tables; ledgers are
+   server-ordered and FILTER finds).
 8. Dev-tools gate: if DEV TOOLS are enabled in this environment the
    Hackrs link shows the warning state, the dashboard bar carries a
    `DEV TOOLS ON` badge and `// HACKRS //` lists `[SANDBOX] [NPC] [PAC]`;

@@ -226,6 +226,44 @@
 .rc-term-echo { color: var(--accent-alt); }
 /* Data cells that run long (memos, addresses, IPs, reasons) cut off at their column. */
 .rc-ledger--caches .rc-cell, .rc-ledger--rigs .rc-cell, .rc-ledger--tx .rc-cell, .rc-ledger--replog .rc-cell, .rc-ledger--assignments .rc-cell, .rc-ledger--objectives .rc-cell { overflow: hidden; text-overflow: ellipsis; }
+/* Meta — errors, red flags, analytics, the test guide and its runs. */
+.rc-ledger--errors { --rc-cols: 5ch 18ch minmax(0, 1fr) 9ch 6ch 5ch 16ch 16ch 230px; } /* NN · STATUS over "until MM-DD HH:MM" · title · COMPONENT · COUNT · 24H · first · last · [RESOLVE] [IGNORE 24H] */
+.rc-ledger--flags { --rc-cols: 18ch 9ch minmax(0, 1fr) 6ch 14ch 16ch 320px; } /* STATUS over "until MM-DD HH:MM" · SEVERITY · title over check + first · DOMAIN · subject · last · [ACK 24H] [ACK 7D] [ACK FOREVER] */
+.rc-ledger--errors .rc-cell:not(.rc-links), .rc-ledger--flags .rc-cell:not(.rc-links) { overflow: hidden; text-overflow: ellipsis; }
+.rc-cell--any { overflow-wrap: anywhere; } /* a readout value that may be one long token (an error group's title) */
+/* An error occurrence: the request line (time · @alias · ip · METHOD url), the exception and message, the folded BACKTRACE / METADATA / PARAMS. */
+.rc-occ { padding: 4px 8px 6px; }
+.rc-occ + .rc-occ { border-top: 1px solid var(--edge); }
+.rc-occ-head { display: flex; flex-wrap: wrap; gap: 0 12px; color: var(--fg-muted); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.rc-occ-head .console-tag { color: var(--fg-faint); }
+.rc-occ-line { overflow-wrap: anywhere; }
+.rc-details > summary { cursor: pointer; color: var(--fg-faint); font-size: 12px; line-height: 16px; letter-spacing: 1px; }
+.rc-details > summary:hover { color: var(--accent-alt); }
+.rc-details .rc-pre { margin: 4px 0 2px; max-width: none; }
+/* A day chart: one <progress> column a bucket (the value and max carry the numbers, the title the date), filled from the floor; registrations on the base --live, --hot activity, --violet the tutorial funnel, the drop-off step red. */
+.rc-chart { display: flex; align-items: flex-end; gap: 2px; height: 90px; padding: 4px 8px 6px; box-sizing: border-box; }
+.rc-chart progress { flex: 1 1 0; min-width: 0; height: 80px; writing-mode: vertical-lr; direction: rtl; appearance: none; -webkit-appearance: none; border: 0; background: var(--bg-1); color: var(--live); }
+.rc-chart progress::-webkit-progress-bar { background: var(--bg-1); }
+.rc-chart progress::-webkit-progress-value { background: var(--live); }
+.rc-chart progress::-moz-progress-bar { background: var(--live); }
+.rc-chart--hot progress { color: var(--accent-alt); }
+.rc-chart--hot progress::-webkit-progress-value { background: var(--accent-alt); }
+.rc-chart--hot progress::-moz-progress-bar { background: var(--accent-alt); }
+.rc-chart--violet progress { color: var(--accent-bright); }
+.rc-chart--violet progress::-webkit-progress-value { background: var(--accent-bright); }
+.rc-chart--violet progress::-moz-progress-bar { background: var(--accent-bright); }
+.rc-chart progress.rc-chart-drop { color: var(--err); }
+.rc-chart progress.rc-chart-drop::-webkit-progress-value { background: var(--err); }
+.rc-chart progress.rc-chart-drop::-moz-progress-bar { background: var(--err); }
+.rc-ledger--top { --rc-cols: 5ch minmax(0, 48ch) 8ch; } /* the analytics' top rooms / tracks: rank · name · count, the count beside the name */
+.rc-ledger--guide { --rc-cols: 5ch minmax(0, 1fr) 9ch 8ch; } /* the test guide: NN · title over slug · STATUS · ~MIN */
+.rc-ledger--runs { --rc-cols: 5ch minmax(0, 1fr) 10ch 10ch 6ch 6ch 6ch; } /* test runs: NN · label over by / started · STATE · RECORDED · PASS · FAIL · DONE */
+.rc-ledger--failures { --rc-cols: 6ch minmax(0, 1fr); } /* a run's failures: FAIL · article over its notes, whole */
+.rc-ledger--failures .cc-meta { white-space: pre-wrap; }
+.rc-ledger--run-articles { --rc-cols: 5ch minmax(0, 1fr) 9ch minmax(0, 1fr); } /* a run's articles: NN · title · STATUS · notes */
+.rc-ledger--run-articles .rc-cell { overflow: hidden; text-overflow: ellipsis; }
+/* The guide article's reading island (admin_test_guide.css) sits in the console's gutter. */
+.console--root .tguide-article { margin: 8px 8px 12px; }
 .rc-violet { color: var(--accent-bright); } /* faction names, nicknames, redemptions */
 .rc-check-input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent-alt); } /* a ledger row's select box (the WIRE's bulk actions) */
 
@@ -364,4 +402,31 @@
   .rc-ledger--rig-slots .rc-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .rc-ledger--standing .rc-row .rc-cell, .rc-ledger--rig-slots .rc-row .rc-cell { display: block; }
   .rc-term-out { height: 60vh; }
+  /* Meta (phone): an error row is NN · STATUS, title and its buttons stacked beside; a flag row keeps every cell two to a line (the data ledgers' rule), the title and the buttons on lines of their own; the guide and the top ledgers keep their status / count cells; the runs keep NN · label. */
+  .rc-ledger--errors .rc-row { grid-template-columns: 5ch minmax(0, 1fr); }
+  .rc-ledger--errors .rc-row > :not(.console-tag) { grid-column: 2; }
+  .rc-ledger--errors .rc-row .cc-text .rc-cell { display: inline; }
+  .rc-ledger--errors .rc-links { justify-content: flex-start; flex-wrap: wrap; }
+  .rc-ledger--flags .rc-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .rc-ledger--flags .rc-row .rc-cell { display: block; }
+  .rc-ledger--flags .rc-row > .cc-text:nth-child(3), .rc-ledger--flags .rc-links { grid-column: 1 / -1; }
+  .rc-ledger--flags .rc-links { justify-content: flex-start; flex-wrap: wrap; }
+  .rc-ledger--top .rc-row .rc-cell { display: block; }
+  .rc-ledger--guide .rc-row { grid-template-columns: 5ch minmax(0, 1fr) auto auto; }
+  .rc-ledger--guide .rc-row .rc-cell { display: block; }
+  .rc-ledger--run-articles .rc-row { grid-template-columns: 5ch minmax(0, 1fr) 9ch; }
+  .rc-ledger--run-articles .rc-row .rc-cell:nth-child(3) { display: block; }
+  .rc-ledger--failures .rc-row { grid-template-columns: 6ch minmax(0, 1fr); }
+  .rc-ledger--failures .rc-row .rc-cell { display: block; }
+  .rc-chart { height: 70px; }
+  .rc-chart progress { height: 60px; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Meta (tablet): the errors and flags ledgers drop their date columns (the errors' FIRST / LAST SEEN, the flags' DOMAIN / LAST SEEN) and their buttons wrap, so the row fits without a horizontal scroll. */
+  .rc-ledger--errors { --rc-cols: 5ch 18ch minmax(0, 1fr) 9ch 6ch 5ch 120px; }
+  .rc-ledger--errors .rc-row > :nth-child(7), .rc-ledger--errors .rc-row > :nth-child(8) { display: none; }
+  .rc-ledger--flags { --rc-cols: 18ch 9ch minmax(0, 1fr) 14ch 170px; }
+  .rc-ledger--flags .rc-row > :nth-child(4), .rc-ledger--flags .rc-row > :nth-child(6) { display: none; }
+  .rc-ledger--errors .rc-links, .rc-ledger--flags .rc-links { flex-wrap: wrap; }
 }

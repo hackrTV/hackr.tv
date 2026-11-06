@@ -1,132 +1,94 @@
-<%= render TuiWindowComponent.new(title: "/root/error_groups :: ERROR TRACKER", variant: :admin) do %>
+<%# /root/error_groups — the error tracker as a console ledger
+    (2026-11-04; root_console.css): bar, ON RECORD, the // FILTER //
+    rows (server-side: STATUS / COMPONENT / SEVERITY links keeping each
+    other and the search, SEARCH — [FILTER] / [x] CLEAR), // ERROR
+    GROUPS // newest seen first, 50 a page (NN opens the group · STATUS
+    over "until …" · title · COMPONENT · COUNT · 24H · FIRST · LAST ·
+    [RESOLVE] [IGNORE 24H] or [REOPEN]) with the pager, destinations,
+    the > prompt. Assigns: @error_groups, @total_count, @offset,
+    @per_page, @trends_24h, @status, @component, @severity. %>
+<% content_for :title, "/root/error_groups :: ERRORS" %>
+<% groups = @error_groups.to_a %>
+<% keep = {"status" => @status, "component" => @component, "severity" => @severity, "search" => @search}.compact_blank %>
+<% filtered = keep.any? %>
+<% numbers = groups.each_index.map { |i| root_num(i) } %>
+<% status_tone = {"open" => "rc-bad", "resolved" => "rc-on", "ignored" => "rc-off"} %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "ERRORS", sub: "ROOT · META · /root/error_groups"} do %>
+    <%= link_to "[>] ANALYTICS", admin_analytics_dashboard_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <% if flash[:success] %>
-        <div style="background: #002200; border: 2px solid #00ff00; padding: 10px 15px; margin-bottom: 15px;">
-          <span class="green-255-text"><%= flash[:success] %></span>
-        </div>
-      <% end %>
-      <% if flash[:error] %>
-        <div style="background: #220000; border: 2px solid #ff0000; padding: 10px 15px; margin-bottom: 15px;">
-          <span class="red-255-text"><%= flash[:error] %></span>
-        </div>
-      <% end %>
-
-      <%# Filter form %>
-      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
-        <%= form_tag admin_error_groups_path, method: :get, style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;" do %>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Status</label>
-            <%= select_tag :status, options_for_select([["All", ""]] + ErrorGroup::STATUSES.map { |s| [s.upcase, s] }, params[:status]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Component</label>
-            <%= select_tag :component, options_for_select([["All", ""]] + ErrorGroup::COMPONENTS.map { |c| [c.upcase, c] }, params[:component]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Severity</label>
-            <%= select_tag :severity, options_for_select([["All", ""]] + ErrorGroup::SEVERITIES.map { |s| [s.upcase, s] }, params[:severity]), style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;" %>
-          </div>
-          <div>
-            <label style="color: #888; font-size: 0.8em; display: block; margin-bottom: 4px;">Search</label>
-            <%= text_field_tag :search, params[:search], style: "background: #111; color: #d0d0d0; border: 1px solid #444; padding: 6px 10px; font-family: monospace;", placeholder: "error title..." %>
-          </div>
-          <div>
-            <%= tui_button "Filter", color: :cyan, type: "submit", style: "padding: 6px 14px;" %>
-          </div>
-          <% if params.values_at(:status, :component, :severity, :search).any?(&:present?) %>
-            <div>
-              <%= tui_button "Clear", admin_error_groups_path, style: "padding: 6px 14px;" %>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-
-      <h3 class="cyan-255-text" style="margin-bottom: 15px;">[:: ERROR GROUPS (<%= @total_count %> total, showing <%= @offset + 1 %>–<%= [@offset + @per_page, @total_count].min %>) ::]</h3>
-
-      <% if @error_groups.any? %>
-        <style>.error-groups-table tbody tr td, .error-groups-table thead tr th { padding: 8px 10px; }</style>
-        <%= render TuiWindowComponent.new(variant: :panel, fieldset: false) do %>
-          <table class="tui-table error-groups-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="text-align: center;">Status</th>
-                <th style="text-align: left;">Title</th>
-                <th style="text-align: center;">Component</th>
-                <th style="text-align: right;">Count</th>
-                <th style="text-align: right;">24h</th>
-                <th style="text-align: center;">First Seen</th>
-                <th style="text-align: center;">Last Seen</th>
-                <th style="text-align: center;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @error_groups.each_with_index do |group, i| %>
-                <% eff_status = group.effective_status %>
-                <tr style="<%= " background: #112;" if i.odd? %>">
-                  <td style="text-align: center;">
-                    <% color = case eff_status
-                      when "open" then "#ff0000"
-                      when "resolved" then "#00ff00"
-                      when "ignored" then "#888"
-                    end %>
-                    <span style="color: <%= color %>; font-weight: bold;"><%= eff_status.upcase %></span>
-                    <% if group.status == "ignored" && group.ignore_until %>
-                      <br><span style="color: #555; font-size: 0.75em;">until <%= group.ignore_until.strftime("%m/%d %H:%M") %></span>
-                    <% end %>
-                  </td>
-                  <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    <%= link_to group.title, admin_error_group_path(group), style: "color: #d0d0d0; text-decoration: none;", title: group.title %>
-                  </td>
-                  <td style="text-align: center;">
-                    <% comp_color = group.component == "backend" ? "#a78bfa" : "#fbbf24" %>
-                    <span style="color: <%= comp_color %>; font-size: 0.85em;"><%= group.component.upcase %></span>
-                  </td>
-                  <td style="text-align: right; font-family: monospace;"><%= group.occurrence_count %></td>
-                  <td style="text-align: right; font-family: monospace;">
-                    <% trend = @trends_24h[group.id] || 0 %>
-                    <span style="color: <%= trend > 0 ? '#ff6b6b' : '#666' %>;"><%= trend %></span>
-                  </td>
-                  <td style="text-align: center; color: #666; white-space: nowrap; font-size: 0.85em;">
-                    <%= group.first_seen_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
-                  </td>
-                  <td style="text-align: center; color: #666; white-space: nowrap; font-size: 0.85em;">
-                    <%= group.last_seen_at&.strftime("%Y-%m-%d %H:%M") || "—" %>
-                  </td>
-                  <td style="text-align: center; white-space: nowrap;">
-                    <% if eff_status == "open" %>
-                      <%= tui_button_to "Resolve", resolve_admin_error_group_path(group), method: :post, color: :green, style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
-                      <%= tui_button_to "Ignore", ignore_admin_error_group_path(group, duration: "24h"), method: :post, style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
-                    <% else %>
-                      <%= tui_button_to "Reopen", reopen_admin_error_group_path(group), method: :post, color: :red, style: "padding: 2px 8px; font-size: 0.8em;", form: {style: "display: inline;"} %>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        <% end %>
-
-        <%# Pagination %>
-        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
-          <% if @offset > 0 %>
-            <%= tui_button "← Prev", admin_error_groups_path(request.query_parameters.merge("offset" => [@offset - @per_page, 0].max)), color: :green, style: "padding: 6px 14px;" %>
-          <% end %>
-          <span style="color: #888;">
-            Page <%= (@offset / @per_page) + 1 %> of <%= [(@total_count.to_f / @per_page).ceil, 1].max %>
-          </span>
-          <% if @offset + @per_page < @total_count %>
-            <%= tui_button "Next →", admin_error_groups_path(request.query_parameters.merge("offset" => @offset + @per_page)), color: :green, style: "padding: 6px 14px;" %>
-          <% end %>
-        </div>
-      <% else %>
-        <div style="padding: 40px; text-align: center; background: #1a1a1a; border: 1px solid #333;">
-          <p style="color: #666;">No error groups found.</p>
-        </div>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(@total_count, "error group") %><% if filtered %> <span class="console-dim">· filtered</span><% end %> <span class="console-dim">· last seen first · <%= @per_page %> a page</span></span>
     </div>
-<% end %>
+  </div>
+
+  <%= form_with url: admin_error_groups_path, method: :get, local: true do %>
+    <div class="console-rule"><span>// FILTER //</span></div>
+    <div class="console-status">
+      <% {"STATUS" => [:status, @status, ErrorGroup::STATUSES], "COMPONENT" => [:component, @component, ErrorGroup::COMPONENTS], "SEVERITY" => [:severity, @severity, ErrorGroup::SEVERITIES]}.each do |label, (key, current, values)| %>
+        <div class="console-status-row rc-field">
+          <span class="console-key"><%= label %></span>
+          <span class="console-val">
+            <% [["ALL", ""]].concat(values.map { |v| [v.upcase, v] }).each do |word, value| %>
+              <%= link_to word, admin_error_groups_path(keep.merge(key.to_s => value.presence).compact), class: class_names("rc-btn", "rc-btn--on": current == value), aria: {current: current == value && "page"} %>
+            <% end %>
+          </span>
+        </div>
+      <% end %>
+      <%= root_field("SEARCH", id: "search") do %>
+        <%= text_field_tag :search, @search, class: "rc-input rc-input--wide", placeholder: "words in the title", autocomplete: "off" %>
+      <% end %>
+    </div>
+    <% keep.except("search").each do |key, value| %><%= hidden_field_tag key, value %><% end %>
+    <div class="rc-actions">
+      <button type="submit" class="rc-btn rc-btn--hot">[FILTER]</button>
+      <%= link_to "[x] CLEAR", admin_error_groups_path, class: "rc-btn" %>
+    </div>
+  <% end %>
+
+  <section class="console-section rc-ledger rc-ledger--errors" aria-label="Error groups">
+    <div class="console-rule"><span>// ERROR GROUPS //</span></div>
+    <% if groups.empty? %>
+      <%= render "admin/console/empty", text: filtered ? "NO ERROR GROUPS MATCH" : "NO ERRORS ON RECORD", hint: ("[x] CLEAR shows every group" if filtered) %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>STATUS</span><span>TITLE</span><span>COMPONENT</span><span class="rc-cell--r">COUNT</span><span class="rc-cell--r">24H</span><span>FIRST SEEN</span><span>LAST SEEN</span><span></span>
+      </div>
+    <% end %>
+    <% groups.each_with_index do |group, i| %>
+      <% eff_status = group.effective_status %>
+      <% trend = @trends_24h[group.id] || 0 %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= numbers[i] %>]</span>
+        <div class="cc-text">
+          <span class="rc-cell <%= status_tone[eff_status] %>"><%= eff_status.upcase %></span>
+          <% if group.status == "ignored" && group.ignore_until %><div class="cc-meta">until <%= group.ignore_until.strftime("%m-%d %H:%M") %></div><% end %>
+        </div>
+        <%= link_to group.title, admin_error_group_path(group), class: "console-link cc-name", title: group.title, data: {command: numbers[i]} %>
+        <span class="rc-cell <%= (group.component == "backend") ? "rc-violet" : "rc-star" %>"><%= group.component.upcase %></span>
+        <span class="rc-cell rc-cell--r"><%= group.occurrence_count %></span>
+        <span class="rc-cell rc-cell--r <%= (trend > 0) ? "rc-bad" : "rc-off" %>"><%= trend %></span>
+        <span class="rc-cell"><%= group.first_seen_at&.strftime("%Y-%m-%d %H:%M") || "—" %></span>
+        <span class="rc-cell"><%= group.last_seen_at&.strftime("%Y-%m-%d %H:%M") || "—" %></span>
+        <span class="rc-cell rc-links">
+          <% if eff_status == "open" %>
+            <%= button_to "[RESOLVE]", resolve_admin_error_group_path(group), method: :post, class: "rc-btn rc-btn--hot" %>
+            <%= button_to "[IGNORE 24H]", ignore_admin_error_group_path(group, duration: "24h"), method: :post, class: "rc-btn" %>
+          <% else %>
+            <%= button_to "[REOPEN]", reopen_admin_error_group_path(group), method: :post, class: "rc-btn rc-btn--danger" %>
+          <% end %>
+        </span>
+      </div>
+    <% end %>
+    <%= root_pager(@offset, @per_page, @total_count) %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :meta, except: "ERRORS" %>
+
+  <div class="console-rule"><span>// LAST SEEN FIRST //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:meta, except: "ERRORS", numbers: numbers, noun: "a group number") %>
+</div>

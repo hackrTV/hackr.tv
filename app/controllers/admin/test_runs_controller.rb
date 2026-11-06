@@ -1,6 +1,6 @@
 class Admin::TestRunsController < Admin::ApplicationController
   def index
-    @runs = ManualTestRun.order(created_at: :desc)
+    @runs = ManualTestRun.includes(:grid_hackr, :manual_test_results).order(created_at: :desc)
     @total_articles = TestGuide.articles.size
   end
 
@@ -9,25 +9,25 @@ class Admin::TestRunsController < Admin::ApplicationController
     run = ManualTestRun.create!(label: label, grid_hackr: current_hackr)
     first = TestGuide.articles.first
     redirect_to admin_test_guide_article_path(first.slug),
-      notice: "Run \"#{run.label}\" started."
+      flash: {success: "Run \"#{run.label}\" started."}
   end
 
   def show
     @run = ManualTestRun.find(params[:id])
     @articles = TestGuide.articles
     @results = @run.results_by_slug
-    @failures = @run.manual_test_results.failed
+    @failures = @results.values.select { |r| r.status == "fail" }
   end
 
   def update
     run = ManualTestRun.find(params[:id])
     run.update!(completed_at: Time.current)
-    redirect_to admin_test_run_path(run), notice: "Run marked complete."
+    redirect_to admin_test_run_path(run), flash: {success: "Run marked complete."}
   end
 
   def destroy
     run = ManualTestRun.find(params[:id])
     run.destroy!
-    redirect_to admin_test_runs_path, notice: "Run deleted."
+    redirect_to admin_test_runs_path, flash: {success: "Run deleted."}
   end
 end

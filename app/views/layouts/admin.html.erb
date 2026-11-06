@@ -8,7 +8,8 @@
     <%= csp_meta_tag %>
     <%# tokens first: the console family (console.css) and the /root music
         screens (root_console.css) read the semantic palette; the TuiCss
-        base + default.css admin rules follow as before. No Turbo here —
+        base + default.css follow for the map editor and the nav's
+        palette classes. No Turbo here —
         the admin is plain full-page navigation; admin.ts is Stimulus
         alone (terminal / peek / ledger-filter / file-pick / autogrow /
         confirm-slug) and the terminal controller's prompt falls back to a
@@ -53,6 +54,5 @@
       <%= render "admin/shared/data_audit_banner" %>
     </header>
     <%= yield %>
-    <%= render "admin/shared/sortable_tables" %>
   </body>
 </html>

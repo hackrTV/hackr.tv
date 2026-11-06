@@ -1,42 +1,54 @@
-<% content_for :title, "/root :: Test Runs" %>
-<% content_for :head do %>
-  <%= stylesheet_link_tag "admin_test_guide" %>
-<% end %>
+<%# /root/test_runs — every manual test run as a console ledger
+    (2026-11-04; root_console.css): bar ([<] GUIDE), ON RECORD, //
+    RUNS // newest first (NN opens the run · label over "by alias ·
+    started" · OPEN / COMPLETE · recorded n / m · PASS · FAIL · %),
+    destinations, the > prompt. Deletes live on the run screen.
+    Assigns: @runs (results and hackr loaded), @total_articles. %>
+<% content_for :title, "/root/test_runs :: TEST RUNS" %>
+<% runs = @runs.to_a %>
+<% numbers = runs.each_index.map { |i| root_num(i) } %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: "TEST RUNS", sub: "ROOT · META · /root/test_runs"} do %>
+    <%= link_to "[<] GUIDE", admin_test_guide_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<div class="tguide">
-  <div class="tguide-header">
-    <h1>Test Run History</h1>
-    <div class="tguide-sub"><%= link_to "« Test guide", admin_test_guide_path %></div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ON RECORD</span>
+      <span class="console-val"><%= pluralize(runs.size, "run") %> <span class="console-dim">· <%= runs.count { |r| !r.completed? } %> open · newest first · <%= @total_articles %> articles a pass</span></span>
+    </div>
   </div>
 
-  <% if @runs.empty? %>
-    <div class="tguide-card"><span class="tguide-meta-line">No runs yet. Start one from the test guide index.</span></div>
-  <% end %>
+  <section class="console-section rc-ledger rc-ledger--runs" aria-label="Test runs">
+    <div class="console-rule"><span>// RUNS //</span></div>
+    <% if runs.empty? %>
+      <%= render "admin/console/empty", text: "NO RUNS YET", hint: "start one from the guide" %>
+    <% else %>
+      <div class="rc-row rc-row--head" aria-hidden="true">
+        <span></span><span>RUN</span><span>STATE</span><span class="rc-cell--r">RECORDED</span><span class="rc-cell--r">PASS</span><span class="rc-cell--r">FAIL</span><span class="rc-cell--r">DONE</span>
+      </div>
+    <% end %>
+    <% runs.each_with_index do |run, i| %>
+      <% results = run.manual_test_results %>
+      <div class="rc-row">
+        <span class="console-tag">[<%= numbers[i] %>]</span>
+        <div class="cc-text">
+          <%= link_to run.label, admin_test_run_path(run), class: "console-link cc-name", data: {command: numbers[i]} %>
+          <div class="cc-meta">by <%= run.grid_hackr.hackr_alias %> · started <%= run.created_at.strftime("%Y-%m-%d %H:%M") %></div>
+        </div>
+        <span class="rc-cell <%= run.completed? ? "rc-off" : "rc-on" %>"><%= run.completed? ? "COMPLETE" : "OPEN" %></span>
+        <span class="rc-cell rc-cell--r"><%= results.size %> / <%= @total_articles %></span>
+        <span class="rc-cell rc-cell--r rc-on"><%= results.count { |r| r.status == "pass" } %></span>
+        <% fails = results.count { |r| r.status == "fail" } %>
+        <span class="rc-cell rc-cell--r <%= (fails > 0) ? "rc-bad" : "rc-off" %>"><%= fails %></span>
+        <span class="rc-cell rc-cell--r"><%= run.progress(@total_articles) %>%</span>
+      </div>
+    <% end %>
+  </section>
 
-  <% @runs.each do |run| %>
-    <% results = run.manual_test_results %>
-    <% pct = run.progress(@total_articles) %>
-    <div class="tguide-card">
-      <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
-        <%= link_to run.label, admin_test_run_path(run), style: "font-family: var(--tg-serif); font-size: 18px; font-weight: 700;" %>
-        <% if run.completed? %>
-          <span class="tguide-chip tguide-chip--pass">COMPLETE</span>
-        <% else %>
-          <span class="tguide-chip tguide-chip--blocked">OPEN</span>
-        <% end %>
-        <span class="tguide-meta-line" style="margin-left: auto;">
-          <%= run.grid_hackr.hackr_alias %> · <%= run.created_at.strftime("%Y-%m-%d %H:%M") %>
-        </span>
-      </div>
-      <div class="tguide-progress-track"><div class="tguide-progress-fill" style="width: <%= pct %>%"></div></div>
-      <div class="tguide-progress-meta">
-        <span>
-          <%= results.count %>/<%= @total_articles %> recorded ·
-          <%= results.count { |r| r.status == "pass" } %> pass ·
-          <%= results.count { |r| r.status == "fail" } %> fail
-        </span>
-        <%= button_to "Delete", admin_test_run_path(run), method: :delete, class: "tguide-btn tguide-btn--danger", form: {class: "tguide-inline-form", data: {confirm: "Delete run \"#{run.label}\" and its results?"}} %>
-      </div>
-    </div>
-  <% end %>
+  <%= render "admin/console/destinations", section: :meta, except: "RUNS" %>
+
+  <div class="console-rule"><span>// NEWEST FIRST //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:meta, except: "RUNS", numbers: numbers, noun: "a run number") %>
 </div>

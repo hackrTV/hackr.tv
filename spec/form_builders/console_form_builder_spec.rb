@@ -135,8 +135,4 @@ RSpec.describe ConsoleFormBuilder do
       expect(html).to have_css("p.rc-sub > span.rc-err", text: "is too long")
     end
   end
-
-  it "still answers the legacy tui_* family until Phase 6 retires it" do
-    expect(Capybara.string(builder.tui_text_field(:name))).to have_css("div.tui-field input.tui-input")
-  end
 end
