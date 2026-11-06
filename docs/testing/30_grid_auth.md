@@ -22,7 +22,13 @@ Use the FRESH account for registration; the operative for 2FA/identity.
 5. Log out; log in at `/grid/login` with a WRONG password. → Rejected;
    no session.
 6. Log in correctly. → Full page load (session change), logged-in nav,
-   cable reconnects (live features work after).
+   cable reconnects (live features work after). Lands in THE PULSE GRID
+   (`/grid`) — unless a stream is live: then it lands on the livestream
+   home page (`/`). Repeat once with a stream live (and once through the
+   2FA interstitial, step 10). A stream only STARTING SOON still lands in
+   the GRID. The live rule also applies when the login was forced by
+   visiting `/grid` logged out: that login lands on `/`, not back on
+   `/grid`.
 7. **Disabled account**: admin disables the fresh account (`/root` →
    Hackrs → disable login), then try to log in. → "Account disabled"
    rejection. Re-enable.

@@ -32,7 +32,7 @@ class Grid::SessionsController < ApplicationController
 
       establish_grid_session(hackr)
       Rails.logger.info("[AUTH] Login success: hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
-      redirect_to grid_path
+      redirect_to post_login_path
     else
       attempted_alias = params[:hackr_alias].to_s.truncate(50)
       reason = hackr ? "invalid_password" : "unknown_alias"
@@ -69,10 +69,19 @@ class Grid::SessionsController < ApplicationController
     establish_grid_session(hackr, tutorial_check: false)
 
     Rails.logger.info("[2FA] Login completed (#{method}): hackr_alias=#{hackr.hackr_alias} ip=#{request.remote_ip}")
-    redirect_to grid_path
+    redirect_to post_login_path
   rescue Grid::TotpService::InvalidCode
     Rails.logger.warn("[2FA] TOTP verify failed: ip=#{request.remote_ip}")
     @error = "Invalid code. Access denied."
     render :totp, status: :unauthorized
+  rescue Grid::TotpService::NotEnabled
+    clear_pending_2fa
+    redirect_to grid_login_path, flash: {error: "Two-factor authentication is no longer enabled. Log in again."}
+  end
+
+  private
+
+  def post_login_path
+    HackrStream.current_live ? root_path : grid_path
   end
 end

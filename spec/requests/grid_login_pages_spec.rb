@@ -34,6 +34,23 @@ RSpec.describe "Grid login pages", type: :request do
       expect(session[:grid_hackr_id]).to eq(hackr.id)
     end
 
+    it "redirects to the livestream home page while a stream is live" do
+      create(:hackr_stream, :live)
+
+      post "/grid/login", params: {hackr_alias: hackr.hackr_alias, password: "hackthegrid"}
+
+      expect(response).to redirect_to("/")
+      expect(session[:grid_hackr_id]).to eq(hackr.id)
+    end
+
+    it "still redirects to the grid when the next stream is only starting soon" do
+      create(:hackr_stream, :starting_soon)
+
+      post "/grid/login", params: {hackr_alias: hackr.hackr_alias, password: "hackthegrid"}
+
+      expect(response).to redirect_to("/grid")
+    end
+
     it "re-renders with the API's error copy on a wrong password" do
       post "/grid/login", params: {hackr_alias: hackr.hackr_alias, password: "wrong"}
 
@@ -92,6 +109,26 @@ RSpec.describe "Grid login pages", type: :request do
 
       expect(response).to redirect_to("/grid")
       expect(session[:grid_hackr_id]).to eq(hackr.id)
+      expect(session[:pending_2fa_hackr_id]).to be_nil
+    end
+
+    it "redirects to the livestream home page while a stream is live" do
+      create(:hackr_stream, :live)
+
+      post "/grid/login/verify", params: {totp_code: ROTP::TOTP.new(secret).now}
+
+      expect(response).to redirect_to("/")
+      expect(session[:grid_hackr_id]).to eq(hackr.id)
+    end
+
+    it "sends the hackr back to login when 2FA was cleared after the password step" do
+      hackr.clear_totp!
+
+      post "/grid/login/verify", params: {totp_code: ROTP::TOTP.new(secret).now}
+
+      expect(response).to redirect_to("/grid/login")
+      expect(flash[:error]).to include("no longer enabled")
+      expect(session[:grid_hackr_id]).to be_nil
       expect(session[:pending_2fa_hackr_id]).to be_nil
     end
 

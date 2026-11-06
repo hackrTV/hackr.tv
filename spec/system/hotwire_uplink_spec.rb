@@ -13,12 +13,12 @@ RSpec.describe "Hotwire uplink", type: :system do
   let!(:operator) { create(:grid_hackr, :operator, password: "hackthegrid") }
   let!(:channel) { create(:chat_channel, slug: "ambient", name: "#ambient") }
 
-  def log_in!(as)
+  def log_in!(as, landing: "/grid")
     visit "/grid/login"
     fill_in "hackr_alias", with: as.hackr_alias
     fill_in "password", with: "hackthegrid"
     click_button "CONNECT"
-    expect(page).to have_current_path("/grid")
+    expect(page).to have_current_path(landing)
   end
 
   def await_uplink!
@@ -820,8 +820,7 @@ RSpec.describe "Hotwire uplink", type: :system do
       is_live: true, live_url: "https://www.youtube.com/watch?v=abc123xyz00")
     create(:chat_channel, :livestream_only, slug: "live", name: "#live")
 
-    log_in!(hackr)
-    visit "/"
+    log_in!(hackr, landing: "/")
     await_uplink!
 
     expect(page).to have_css(".live-side-panel--uplink")
