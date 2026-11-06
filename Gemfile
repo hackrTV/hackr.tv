@@ -15,7 +15,7 @@ gem "jbuilder"
 gem "bcrypt", "~> 3.1.22"
 
 # TOTP two-factor authentication
-gem "rotp", "~> 6.3"
+gem "rotp", "~> 6.4"
 gem "rqrcode", "~> 3.2"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

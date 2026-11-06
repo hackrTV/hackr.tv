@@ -328,7 +328,7 @@ GEM
     request_store (1.7.0)
       rack (>= 1.4)
     rexml (3.4.4)
-    rotp (6.3.0)
+    rotp (6.4.0)
     rouge (5.1.0)
       strscan (~> 3.1)
     rqrcode (3.2.0)
@@ -494,7 +494,7 @@ DEPENDENCIES
   rails (~> 8.1.4)
   rails-controller-testing
   redcarpet
-  rotp (~> 6.3)
+  rotp (~> 6.4)
   rouge
   rqrcode (~> 3.2)
   rspec-rails (~> 8.0)
