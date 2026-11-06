@@ -72,9 +72,8 @@ RSpec.describe "Hotwire home page", type: :system do
     fill_in "hackr_alias", with: hackr.hackr_alias
     fill_in "password", with: "hackthegrid"
     click_button "CONNECT"
-    expect(page).to have_current_path("/grid")
+    expect(page).to have_current_path("/")
 
-    visit "/"
     expect(page).to have_content("LIVE TRANSMISSION")
     expect(page).to have_css(".live-video-frame iframe")
     expect(page).to have_link("OPEN UPLINK", href: "/uplink")

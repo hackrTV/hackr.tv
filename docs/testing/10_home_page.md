@@ -55,9 +55,12 @@ minutes: 15
     Esc returns to the normal layout.
 12. **Notice placement**: every top notice — the LIVE NOW banner on other
     pages, the NEXT STREAM countdown on `/` when a stream is scheduled
-    but not live, flashes — renders fully visible directly below the
-    header menu, never underneath it. Check logged out and logged in
-    (the menu wraps to more rows) and at a narrow desktop width.
+    but not live, flashes, the login page's prerelease banner, ADMIN
+    PREVIEW — renders fully visible directly below the header menu, never
+    underneath it, as the same thin strip (~28px, small type) at desktop
+    width; LIVE NOW keeps its green sweep and glow. Check logged out and
+    logged in (the menu wraps to more rows) and at a narrow desktop
+    width, where a long NEXT STREAM line wraps to two rows (expected).
 13. **Popped-out Uplink**: with the stream live, click `[^]` on the docked
     chat (normal layout, then again from theater mode). → The inline chat
     disappears and the player widens into its space (fills the viewport
