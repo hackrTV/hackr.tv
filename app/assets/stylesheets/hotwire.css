@@ -422,29 +422,28 @@
 .hb-error-body { padding: 30px; text-align: center; }
 
 /* --- Stream schedule --- */
-.sched-wrap { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-.sched-title { color: #06b6d4; font-size: 1.4em; font-weight: bold; margin-bottom: 8px; letter-spacing: 0.1em; }
-.sched-subtitle { color: var(--fg-faint); margin-bottom: 30px; font-size: 0.9em; }
-.sched-heading { font-size: 1.1em; padding-bottom: 6px; margin-bottom: 16px; }
-.sched-heading-upcoming { color: #06b6d4; border-bottom: 1px solid #06b6d4; }
-.sched-heading-past { color: var(--fg-muted); border-bottom: 1px solid var(--edge); }
-.sched-list { margin-bottom: 40px; }
-.sched-card { background: var(--bg-0); border: 1px solid var(--bg-2); border-left: 3px solid #06b6d4; padding: 14px 18px; margin-bottom: 8px; }
-.sched-card-past { border-left-color: var(--edge); }
-.sched-card-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-.sched-badge { font-weight: bold; font-size: 0.8em; margin-right: 10px; }
-.sched-stream-title { color: #e0f2fe; font-weight: bold; }
-.sched-sep { color: var(--fg-muted); margin: 0 8px; }
-.sched-sep-past { color: var(--fg-faint); }
-.sched-artist { color: #aaa; }
-.sched-when { color: #67e8f9; font-size: 0.9em; }
-.sched-past-title { color: #aaa; font-weight: bold; }
-.sched-past-artist { color: #777; }
-.sched-past-meta { display: flex; gap: 16px; align-items: center; }
-.sched-past-date { color: var(--fg-faint); font-size: 0.85em; }
-.sched-past-duration { color: var(--fg-faint); font-size: 0.85em; }
-.sched-vod { color: var(--accent); font-size: 0.85em; text-decoration: none; }
-.sched-none { color: var(--edge-bright); padding: 20px 0; margin-bottom: 40px; }
+.console--schedule { max-width: 960px; }
+.console--schedule .console-status { padding: 4px 8px 0; }
+.sc-countdown { color: var(--accent-alt); }
+.sc-row { display: grid; grid-template-columns: 16ch 14ch minmax(0, 1fr); gap: 0 12px; align-items: baseline; padding: 0 8px; }
+.sc-row--past { grid-template-columns: 16ch 8ch minmax(0, 1fr) 7ch; }
+.sc-stamp { color: var(--fg-muted); white-space: nowrap; }
+.sc-state, .sc-dur { white-space: nowrap; }
+.sc-dur { color: var(--fg-faint); }
+.sc-state--upcoming { color: var(--accent-alt); }
+.sc-state--soon { color: var(--warn); }
+.sc-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-vod { text-align: right; white-space: nowrap; }
+.sc-row--past:has(.sc-vod a):hover, .sc-row--past:focus-within { background: var(--bg-1); }
+@media (max-width: 767px) {
+  .sc-row { grid-template-columns: 16ch minmax(0, 1fr); grid-template-areas: "stamp state" "title title"; gap: 0 8px; padding: 2px 8px; }
+  .sc-row--past { grid-template-columns: 16ch minmax(0, 1fr) auto; grid-template-areas: "stamp dur vod" "title title title"; }
+  .sc-stamp { grid-area: stamp; }
+  .sc-state { grid-area: state; }
+  .sc-dur { grid-area: dur; }
+  .sc-vod { grid-area: vod; }
+  .sc-title { grid-area: title; white-space: normal; }
+}
 
 /* --- Timeline --- */
 .tl-wrap { max-width: 800px; margin: 0 auto; padding: 0 24px 80px; position: relative; }

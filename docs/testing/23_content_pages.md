@@ -46,8 +46,24 @@ minutes: 20
 
 ## Schedule (/schedule)
 
-13. Visit `/schedule`. → Upcoming streams with local-time rendering
-    (times shown in YOUR timezone — check against a known UTC value);
-    past broadcasts with durations; `[VOD]` links on past TCP / XERAEN
-    streams that have a recording (other artists' recordings have no
-    page, so no link).
+13. Visit `/schedule`. → A console screen: the lines flick on (a key
+    or click skips), bar `SCHEDULE` with `[<] HOME` / `[>] VIDZ`, no
+    ASCII banner. Status rows: SIGNAL (`● LIVE NOW` + the live title
+    linking `/`, else STANDBY), NEXT TX (stamp · title · artist ·
+    `T-MINUS …` ticking each second, else UNSCHEDULED), LAST TX (stamp ·
+    title · artist, the title linking the recording with `· VOD` when it
+    has one, else NO RECORD). Stamps read `YYYY-MM-DD HH:MM` a century
+    ahead, in the server's Central time, not the viewer's.
+14. `// UPCOMING //` rows: stamp, UPCOMING (cyan) or STARTING SOON
+    (amber, within the hour after the scheduled time), title · artist;
+    cancelled and expired streams are absent. With a stream scheduled a
+    minute out, NEXT TX flips to `STARTING SOON!` in orange at zero.
+15. `// PAST BROADCASTS //` rows: stamp, duration, title · artist,
+    `[>] VOD` on TCP / XERAEN recordings only (other artists'
+    recordings have no page, so no link). Hovering a row with a
+    `[>] VOD` (or tabbing to its link) lights the whole row; rows
+    without one stay unlit. Empty ledgers read NO
+    TRANSMISSIONS SCHEDULED / NO BROADCASTS ON RECORD.
+16. At the `>` prompt: `?` lists `home vidz tcp xeraen · clear`; `vidz`
+    Enter opens the archive with the player still playing. Under 768px
+    each row stacks (stamp + state / duration + VOD over the title).
