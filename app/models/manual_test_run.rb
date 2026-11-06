@@ -45,7 +45,7 @@ class ManualTestRun < ApplicationRecord
   end
 
   def progress(total_articles)
-    done = manual_test_results.count
+    done = manual_test_results.size
     total_articles.zero? ? 0 : ((done.to_f / total_articles) * 100).round
   end
 end

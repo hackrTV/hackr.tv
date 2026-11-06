@@ -39,12 +39,14 @@ Record one status per article when run through the wizard:
 
 ## Steps
 
-1. Open `/root/test_guide` as an admin. → The article list renders,
-   grouped by area, with this article first.
-2. Start a run (label it, e.g. "post-deploy 2026-08-28 staging"). → The
-   wizard opens article 00 with PASS/FAIL/BLOCKED/SKIP controls and a
-   notes box.
+1. Open `/root/test_guide` as an admin. → The article ledgers render,
+   one `// AREA //` per area, numbered through, with this article `[01]`.
+2. Start a run (label it, e.g. "post-deploy 2026-08-28 staging") with
+   `[START TEST RUN]`. → The wizard opens article 00 with `[OK] Run "…"
+   started.` under the bar and a `// RECORD //` section — `// NOTES //`
+   and `[PASS] [FAIL] [BLOCKED] [SKIP]` — under the article.
 3. Tick a step checkbox, reload the page. → The tick persists (per-run,
    per-browser).
-4. Mark this article PASS. → The wizard advances to the next article and
-   the progress bar moves.
+4. Mark this article PASS. → The wizard advances to the next article
+   with `[OK] … PASS recorded.`; back on `/root/test_guide` the
+   `// ACTIVE RUN //` PROGRESS row counts it and `[01]` reads PASS.

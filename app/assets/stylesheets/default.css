@@ -67,17 +67,13 @@
   background: var(--fg-muted);
 }
 
-/* Admin Panel Styles */
+/* The map editor's window chrome (admin/grid_map_editor/show), the one TuiCss admin screen left. */
 .admin-panel {
   background: #1a1a2e;
 }
 
 .admin-panel-border {
   border-color: #4a4a6a;
-}
-
-.admin-table-row {
-  border-bottom: 1px solid var(--edge);
 }
 
 /* Mobile Responsive Overrides */

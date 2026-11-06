@@ -1,146 +1,105 @@
-<%= render TuiWindowComponent.new(title: "/root/error_groups/#{@error_group.id} :: ERROR DETAIL", variant: :admin) do %>
+<%# /root/error_groups/:id — one error group as a console readout
+    (2026-11-04; root_console.css): bar (the title · ERROR #id · [<]
+    ERRORS), status rows (STATUS over "until …", COMPONENT, SEVERITY,
+    OCCURRENCES, FIRST / LAST SEEN, FINGERPRINT, RESOLVED BY), //
+    ACTIONS // ([RESOLVE] [IGNORE 1H / 24H / 7D / FOREVER] while open,
+    [REOPEN] otherwise — each lands back here), // OCCURRENCES // newest
+    first, 50 a page (time · @alias · ip · METHOD url over the exception
+    and message, BACKTRACE / METADATA / PARAMS folded under details)
+    with the pager, destinations, the > prompt. Assigns: @error_group,
+    @occurrences, @total_occurrences, @offset, @per_page. %>
+<% content_for :title, "/root/error_groups/#{@error_group.id} :: ERROR" %>
+<% eff_status = @error_group.effective_status %>
+<% status_tone = {"open" => "rc-bad", "resolved" => "rc-on", "ignored" => "rc-off"} %>
+<div class="console console--root" data-controller="terminal" data-boot="done">
+  <%= render layout: "admin/console/bar", locals: {title: @error_group.title.truncate(72), sub: "ERROR ##{@error_group.id} · ROOT · META"} do %>
+    <%= link_to "[<] ERRORS", admin_error_groups_path, class: "console-bar-link", data: {command: "back"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-    <div style="padding: 20px;">
-      <%# Group summary %>
-      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #333; background: #0a0a0a;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-          <div>
-            <span style="color: #888; font-size: 0.8em;">STATUS</span><br>
-            <% eff_status = @error_group.effective_status %>
-            <% color = case eff_status
-              when "open" then "#ff0000"
-              when "resolved" then "#00ff00"
-              when "ignored" then "#888"
-            end %>
-            <span style="color: <%= color %>; font-weight: bold; font-size: 1.2em;"><%= eff_status.upcase %></span>
-            <% if @error_group.status == "ignored" && @error_group.ignore_until %>
-              <br><span style="color: #555; font-size: 0.8em;">until <%= @error_group.ignore_until.strftime("%Y-%m-%d %H:%M") %></span>
-            <% end %>
-          </div>
-          <div>
-            <span style="color: #888; font-size: 0.8em;">COMPONENT</span><br>
-            <% comp_color = @error_group.component == "backend" ? "#a78bfa" : "#fbbf24" %>
-            <span style="color: <%= comp_color %>;"><%= @error_group.component.upcase %></span>
-          </div>
-          <div>
-            <span style="color: #888; font-size: 0.8em;">SEVERITY</span><br>
-            <span style="color: #d0d0d0;"><%= @error_group.severity.upcase %></span>
-          </div>
-          <div>
-            <span style="color: #888; font-size: 0.8em;">OCCURRENCES</span><br>
-            <span style="color: #d0d0d0; font-size: 1.2em;"><%= @error_group.occurrence_count %></span>
-          </div>
-          <div>
-            <span style="color: #888; font-size: 0.8em;">FIRST SEEN</span><br>
-            <span style="color: #666;"><%= @error_group.first_seen_at&.strftime("%Y-%m-%d %H:%M:%S") || "—" %></span>
-          </div>
-          <div>
-            <span style="color: #888; font-size: 0.8em;">LAST SEEN</span><br>
-            <span style="color: #666;"><%= @error_group.last_seen_at&.strftime("%Y-%m-%d %H:%M:%S") || "—" %></span>
-          </div>
-        </div>
-
-        <div style="margin-top: 15px;">
-          <span style="color: #888; font-size: 0.8em;">TITLE</span><br>
-          <span style="color: #d0d0d0; word-break: break-all;"><%= @error_group.title %></span>
-        </div>
-
-        <div style="margin-top: 15px;">
-          <span style="color: #888; font-size: 0.8em;">FINGERPRINT</span><br>
-          <span style="color: #555; font-family: monospace; font-size: 0.8em;"><%= @error_group.fingerprint %></span>
-        </div>
-
-        <% if @error_group.resolved_by_hackr %>
-          <div style="margin-top: 10px;">
-            <span style="color: #888; font-size: 0.8em;">RESOLVED BY</span>
-            <span style="color: #00ff00;"><%= @error_group.resolved_by_hackr.hackr_alias %></span>
-            <span style="color: #555;">at <%= @error_group.resolved_at&.strftime("%Y-%m-%d %H:%M") %></span>
-          </div>
-        <% end %>
-      </div>
-
-      <%# Actions %>
-      <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <% if eff_status == "open" %>
-          <%= tui_button_to "Resolve", resolve_admin_error_group_path(@error_group), method: :post, color: :green, style: "padding: 6px 14px;" %>
-          <%= tui_button_to "Ignore 1h", ignore_admin_error_group_path(@error_group, duration: "1h"), method: :post, style: "padding: 6px 14px;" %>
-          <%= tui_button_to "Ignore 24h", ignore_admin_error_group_path(@error_group, duration: "24h"), method: :post, style: "padding: 6px 14px;" %>
-          <%= tui_button_to "Ignore 7d", ignore_admin_error_group_path(@error_group, duration: "7d"), method: :post, style: "padding: 6px 14px;" %>
-          <%= tui_button_to "Ignore Forever", ignore_admin_error_group_path(@error_group, duration: "forever"), method: :post, style: "padding: 6px 14px;" %>
-        <% else %>
-          <%= tui_button_to "Reopen", reopen_admin_error_group_path(@error_group), method: :post, color: :red, style: "padding: 6px 14px;" %>
-        <% end %>
-      </div>
-
-      <%# Occurrences %>
-      <h3 class="cyan-255-text" style="margin-bottom: 15px;">
-        [:: OCCURRENCES (<%= @total_occurrences %> total<%= @total_occurrences > 0 ? ", showing #{@offset + 1}–#{[@offset + @per_page, @total_occurrences].min}" : "" %>) ::]
-      </h3>
-
-      <% @occurrences.each do |occ| %>
-        <div style="margin-bottom: 15px; padding: 12px; border: 1px solid #333; background: #0a0a0a;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <span style="color: #666; font-size: 0.85em;"><%= occ.occurred_at.strftime("%Y-%m-%d %H:%M:%S") %></span>
-            <span style="color: #555; font-size: 0.85em;">
-              <% if occ.hackr_alias.present? %>
-                <span style="color: #a78bfa;"><%= occ.hackr_alias %></span> |
-              <% end %>
-              <%= occ.ip_address %> |
-              <%= occ.request_method %> <%= occ.request_url %>
-            </span>
-          </div>
-
-          <div style="margin-bottom: 8px;">
-            <% if occ.exception_class.present? %>
-              <span style="color: #ff6b6b; font-weight: bold;"><%= occ.exception_class %></span>:
-            <% end %>
-            <span style="color: #d0d0d0; word-break: break-all;"><%= occ.message %></span>
-          </div>
-
-          <% bt = occ.parsed_backtrace %>
-          <% if bt.any? %>
-            <details style="margin-top: 8px;">
-              <summary style="cursor: pointer; color: #888; font-size: 0.85em;">Backtrace (<%= bt.size %> frames)</summary>
-              <pre style="margin-top: 5px; padding: 8px; background: #111; border: 1px solid #222; color: #888; font-size: 0.8em; overflow-x: auto; white-space: pre-wrap;"><%= bt.join("\n") %></pre>
-            </details>
-          <% end %>
-
-          <% meta = occ.parsed_metadata %>
-          <% if meta.any? %>
-            <details style="margin-top: 5px;">
-              <summary style="cursor: pointer; color: #888; font-size: 0.85em;">Metadata</summary>
-              <pre style="margin-top: 5px; padding: 8px; background: #111; border: 1px solid #222; color: #888; font-size: 0.8em; overflow-x: auto;"><%= JSON.pretty_generate(meta) %></pre>
-            </details>
-          <% end %>
-
-          <% req_params = occ.parsed_request_params %>
-          <% if req_params.any? %>
-            <details style="margin-top: 5px;">
-              <summary style="cursor: pointer; color: #888; font-size: 0.85em;">Request Params</summary>
-              <pre style="margin-top: 5px; padding: 8px; background: #111; border: 1px solid #222; color: #888; font-size: 0.8em; overflow-x: auto;"><%= JSON.pretty_generate(req_params) %></pre>
-            </details>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%# Pagination %>
-      <% if @total_occurrences > @per_page %>
-        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
-          <% if @offset > 0 %>
-            <%= tui_button "← Prev", admin_error_group_path(@error_group, offset: [@offset - @per_page, 0].max), color: :green, style: "padding: 6px 14px;" %>
-          <% end %>
-          <span style="color: #888;">
-            Page <%= (@offset / @per_page) + 1 %> of <%= [(@total_occurrences.to_f / @per_page).ceil, 1].max %>
-          </span>
-          <% if @offset + @per_page < @total_occurrences %>
-            <%= tui_button "Next →", admin_error_group_path(@error_group, offset: @offset + @per_page), color: :green, style: "padding: 6px 14px;" %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
-        <%= tui_button "← Error Groups", admin_error_groups_path, color: :green %>
-        <%= tui_button "← Admin Dashboard", admin_root_path, color: :green %>
-      </div>
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">STATUS</span>
+      <span class="console-val"><span class="<%= status_tone[eff_status] %>"><%= eff_status.upcase %></span><% if @error_group.status == "ignored" && @error_group.ignore_until %> <span class="console-dim">· until <%= @error_group.ignore_until.strftime("%Y-%m-%d %H:%M") %></span><% end %></span>
     </div>
-<% end %>
+    <div class="console-status-row">
+      <span class="console-key">COMPONENT</span>
+      <span class="console-val <%= (@error_group.component == "backend") ? "rc-violet" : "rc-star" %>"><%= @error_group.component.upcase %></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">SEVERITY</span>
+      <span class="console-val"><%= @error_group.severity.upcase %></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">OCCURRENCES</span>
+      <span class="console-val"><%= @error_group.occurrence_count %> <span class="console-dim">· lifetime</span></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">FIRST SEEN</span>
+      <span class="console-val"><%= @error_group.first_seen_at&.strftime("%Y-%m-%d %H:%M:%S") || "—" %></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">LAST SEEN</span>
+      <span class="console-val"><%= @error_group.last_seen_at&.strftime("%Y-%m-%d %H:%M:%S") || "—" %></span>
+    </div>
+    <div class="console-status-row rc-field">
+      <span class="console-key">TITLE</span>
+      <span class="console-val rc-cell--any"><%= @error_group.title %></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">FINGERPRINT</span>
+      <span class="console-val console-dim"><%= @error_group.fingerprint %></span>
+    </div>
+    <% if @error_group.resolved_by_hackr %>
+      <div class="console-status-row">
+        <span class="console-key">RESOLVED BY</span>
+        <span class="console-val"><span class="rc-on"><%= @error_group.resolved_by_hackr.hackr_alias %></span> <span class="console-dim">· <%= @error_group.resolved_at&.strftime("%Y-%m-%d %H:%M") %></span></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="console-rule"><span>// ACTIONS //</span></div>
+  <div class="rc-actions">
+    <% if eff_status == "open" %>
+      <%= button_to "[RESOLVE]", resolve_admin_error_group_path(@error_group), method: :post, class: "rc-btn rc-btn--hot" %>
+      <% {"1h" => "1H", "24h" => "24H", "7d" => "7D", "forever" => "FOREVER"}.each do |duration, word| %>
+        <%= button_to "[IGNORE #{word}]", ignore_admin_error_group_path(@error_group, duration: duration), method: :post, class: "rc-btn" %>
+      <% end %>
+    <% else %>
+      <%= button_to "[REOPEN]", reopen_admin_error_group_path(@error_group), method: :post, class: "rc-btn rc-btn--danger" %>
+    <% end %>
+  </div>
+
+  <section class="console-section" aria-label="Occurrences">
+    <div class="console-rule"><span>// OCCURRENCES · <%= @total_occurrences %> //</span></div>
+    <% if @occurrences.empty? %>
+      <%= render "admin/console/empty", text: "NO OCCURRENCES ON RECORD", hint: "the retention purge keeps the count, not the rows" %>
+    <% end %>
+    <% @occurrences.each do |occ| %>
+      <div class="rc-occ">
+        <div class="rc-occ-head">
+          <span class="console-tag"><%= occ.occurred_at.strftime("%Y-%m-%d %H:%M:%S") %></span>
+          <% if occ.hackr_alias.present? %><span class="rc-violet">@<%= occ.hackr_alias %></span><% end %>
+          <span><%= occ.ip_address || "—" %></span>
+          <span class="rc-cell--wrap"><%= occ.request_method %> <%= occ.request_url %></span>
+        </div>
+        <div class="rc-occ-line">
+          <% if occ.exception_class.present? %><span class="rc-bad"><%= occ.exception_class %></span>: <% end %><%= occ.message %>
+        </div>
+        <% {"BACKTRACE" => occ.parsed_backtrace, "METADATA" => occ.parsed_metadata, "PARAMS" => occ.parsed_request_params}.each do |word, data| %>
+          <% next if data.empty? %>
+          <details class="rc-details">
+            <summary><%= word %><% if data.is_a?(Array) %> <span class="console-dim">· <%= pluralize(data.size, "frame") %></span><% end %></summary>
+            <pre class="rc-pre"><%= data.is_a?(Array) ? data.join("\n") : JSON.pretty_generate(data) %></pre>
+          </details>
+        <% end %>
+      </div>
+    <% end %>
+    <%= root_pager(@offset, @per_page, @total_occurrences) %>
+  </section>
+
+  <%= render "admin/console/destinations", section: :meta, except: "ERRORS" %>
+
+  <div class="console-rule"><span>// NEWEST FIRST //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:meta, except: "ERRORS", extra: ["back"]) %>
+</div>

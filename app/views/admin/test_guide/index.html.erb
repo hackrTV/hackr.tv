@@ -1,60 +1,93 @@
-<% content_for :title, "/root :: Test Guide" %>
-<% content_for :head do %>
-  <%= stylesheet_link_tag "admin_test_guide" %>
-<% end %>
+<%# /root/test_guide — the manual testing guide's article list as a
+    console screen (2026-11-04; root_console.css): bar ([>] RUNS),
+    ARTICLES / TIME / SOURCE rows, then either // ACTIVE RUN // (the
+    run, its progress, [>] CONTINUE to the next unrecorded article, [>]
+    RUN) or // START A RUN // (LABEL + [START TEST RUN] — POST
+    test_runs), one // <AREA> // ledger per area numbered through (NN
+    opens the article · title over slug · the active run's STATUS ·
+    ~MIN), destinations, the > prompt. Assigns: @areas, @total_minutes,
+    @active_run, @results. %>
+<% content_for :title, "/root/test_guide :: TEST GUIDE" %>
+<% articles = TestGuide.articles %>
+<% numbers = articles.each_index.map { |i| root_num(i) } %>
+<% position = articles.each_with_index.to_h { |a, i| [a.slug, i] } %>
+<% status_tone = {"pass" => "rc-on", "fail" => "rc-bad", "blocked" => "rc-star", "skip" => "rc-violet"} %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: "TEST GUIDE", sub: "ROOT · META · /root/test_guide"} do %>
+    <% if @active_run %><%= root_badge("RUN OPEN", :live) %><% end %>
+    <%= link_to "[>] RUNS", admin_test_runs_path, class: "console-bar-link" %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
-<div class="tguide">
-  <div class="tguide-header">
-    <h1>Manual Testing Guide</h1>
-    <div class="tguide-sub">
-      A full manual pass over every feature — public site, THE PULSE GRID, and /root.
-      <%= TestGuide.articles.size %> articles, ~<%= @total_minutes / 60 %>h<%= @total_minutes % 60 %>m total.
-      Source: <code>docs/testing/</code> (readable offline).
+  <div class="console-status">
+    <div class="console-status-row">
+      <span class="console-key">ARTICLES</span>
+      <span class="console-val"><%= articles.size %> <span class="console-dim">· in <%= pluralize(@areas.size, "area") %> · a full pass over the public site, THE PULSE GRID and /root</span></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">TIME</span>
+      <span class="console-val">~<%= @total_minutes / 60 %>h<%= @total_minutes % 60 %>m <span class="console-dim">· summed from the articles</span></span>
+    </div>
+    <div class="console-status-row">
+      <span class="console-key">SOURCE</span>
+      <span class="console-val">docs/testing/ <span class="console-dim">· readable offline</span></span>
     </div>
   </div>
 
-  <div class="tguide-card">
-    <% if @active_run %>
-      <h2>Active run — <%= @active_run.label %></h2>
-      <% pct = @active_run.progress(TestGuide.articles.size) %>
-      <div class="tguide-progress-track"><div class="tguide-progress-fill" style="width: <%= pct %>%"></div></div>
-      <div class="tguide-progress-meta">
-        <span><%= @results.size %>/<%= TestGuide.articles.size %> recorded · <%= @results.values.count { |r| r.status == "fail" } %> failed</span>
-        <span><%= pct %>%</span>
+  <% if @active_run %>
+    <% next_unrecorded = articles.find { |a| !@results.key?(a.slug) } %>
+    <div class="console-rule"><span>// ACTIVE RUN //</span></div>
+    <div class="console-status">
+      <div class="console-status-row">
+        <span class="console-key">RUN</span>
+        <span class="console-val"><%= link_to @active_run.label, admin_test_run_path(@active_run), class: "console-link" %> <span class="console-dim">· started <%= @active_run.created_at.strftime("%Y-%m-%d %H:%M") %></span></span>
       </div>
-      <div style="margin-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-        <% next_unrecorded = TestGuide.articles.find { |a| !@results.key?(a.slug) } %>
-        <% if next_unrecorded %>
-          <%= link_to "Continue: #{next_unrecorded.title} →", admin_test_guide_article_path(next_unrecorded.slug), class: "tguide-btn tguide-btn--primary" %>
-        <% end %>
-        <%= link_to "Run dashboard", admin_test_run_path(@active_run), class: "tguide-btn" %>
-        <%= link_to "Run history", admin_test_runs_path, class: "tguide-btn" %>
+      <div class="console-status-row">
+        <span class="console-key">PROGRESS</span>
+        <span class="console-val"><%= @results.size %> / <%= articles.size %> recorded <span class="console-dim">· <%= @active_run.progress(articles.size) %>%</span> · <span class="<%= @results.values.any? { |r| r.status == "fail" } ? "rc-bad" : "rc-on" %>"><%= @results.values.count { |r| r.status == "fail" } %> failed</span><% if next_unrecorded %> <span class="console-dim">· next: <%= next_unrecorded.title.upcase %></span><% end %></span>
       </div>
-    <% else %>
-      <h2>Start a test run</h2>
-      <%= form_with url: admin_test_runs_path, method: :post, html: {style: "display: flex; gap: 10px; align-items: center; flex-wrap: wrap;"} do %>
-        <%= text_field_tag :label, nil, placeholder: "Run label (environment + date)", class: "tguide-input", style: "max-width: 340px;" %>
-        <button type="submit" class="tguide-btn tguide-btn--primary">START TEST RUN</button>
-        <%= link_to "Run history", admin_test_runs_path, class: "tguide-btn" %>
+    </div>
+    <div class="rc-actions">
+      <% if next_unrecorded %>
+        <%= link_to "[>] CONTINUE", admin_test_guide_article_path(next_unrecorded.slug), class: "rc-btn rc-btn--hot", title: next_unrecorded.title, data: {command: "continue"} %>
       <% end %>
+      <%= link_to "[>] RUN", admin_test_run_path(@active_run), class: "rc-btn", data: {command: "run"} %>
+    </div>
+  <% else %>
+    <%= form_with url: admin_test_runs_path, method: :post, local: true do %>
+      <div class="console-rule"><span>// START A RUN //</span></div>
+      <div class="console-status">
+        <%= root_field("LABEL", id: "label") do %>
+          <%= text_field_tag :label, nil, class: "rc-input rc-input--wide", placeholder: "environment + date", autocomplete: "off" %>
+          <span class="rc-hint">blank names it by the time · the run opens on the first article</span>
+        <% end %>
+      </div>
+      <div class="rc-actions">
+        <button type="submit" class="rc-btn rc-btn--hot">[START TEST RUN]</button>
+      </div>
     <% end %>
-  </div>
+  <% end %>
 
-  <% @areas.each do |area, articles| %>
-    <div class="tguide-area">
-      <h2><%= area %></h2>
-      <% articles.each do |article| %>
+  <% @areas.each do |area, area_articles| %>
+    <section class="console-section rc-ledger rc-ledger--guide" aria-label="<%= area %>">
+      <div class="console-rule"><span>// <%= area.upcase %> //</span></div>
+      <% area_articles.each do |article| %>
         <% result = @results[article.slug] %>
-        <div class="tguide-row">
-          <% if result %>
-            <span class="tguide-chip tguide-chip--<%= result.status %>"><%= result.status.upcase %></span>
-          <% else %>
-            <span class="tguide-chip">—</span>
-          <% end %>
-          <%= link_to article.title, admin_test_guide_article_path(article.slug), class: "tguide-row-title" %>
-          <span class="tguide-row-minutes">~<%= article.minutes %> min</span>
+        <div class="rc-row">
+          <span class="console-tag">[<%= numbers[position[article.slug]] %>]</span>
+          <div class="cc-text">
+            <%= link_to article.title, admin_test_guide_article_path(article.slug), class: "console-link cc-name", data: {command: numbers[position[article.slug]]} %>
+            <div class="cc-meta"><%= article.slug %></div>
+          </div>
+          <span class="rc-cell <%= result ? status_tone[result.status] : "rc-off" %>"><%= result ? result.status.upcase : "—" %></span>
+          <span class="rc-cell rc-cell--r">~<%= article.minutes %> MIN</span>
         </div>
       <% end %>
-    </div>
+    </section>
   <% end %>
+
+  <%= render "admin/console/destinations", section: :meta, except: "GUIDE" %>
+
+  <div class="console-rule"><span>// END OF GUIDE //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:meta, except: "GUIDE", numbers: numbers, noun: "an article number", extra: (@active_run ? %w[continue run] : [])) %>
 </div>

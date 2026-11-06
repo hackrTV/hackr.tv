@@ -13,11 +13,8 @@
 #   <%= f.rc_text_area :description, rows: 4 %>                       // DESCRIPTION // + growing textarea
 #   <%= f.rc_flags("FLAGS", hint: "…") { f.rc_check_box(:featured, label: "★ FEATURED") } %>
 #
-# Styling: root_console.css .rc-*. Inherits TuiFormBuilder's tui_*
-# family while the legacy admin forms still call it (gone with Phase 6
-# of console-ui-for-all-admin — then the superclass is
-# ActionView::Helpers::FormBuilder).
-class ConsoleFormBuilder < TuiFormBuilder
+# Styling: root_console.css .rc-*.
+class ConsoleFormBuilder < ActionView::Helpers::FormBuilder
   FIELD_HELPERS = %i[
     text_field number_field password_field email_field url_field
     date_field datetime_local_field time_field color_field file_field
@@ -96,8 +93,10 @@ class ConsoleFormBuilder < TuiFormBuilder
 
   private
 
-  # default_label (NAME from :name) is TuiFormBuilder's; it moves here
-  # when Phase 6 retires the superclass.
+  def default_label(method)
+    method.to_s.humanize.upcase
+  end
+
   def rc_field(method, label:, hint:)
     @template.tag.div(class: "console-status-row rc-field") do
       label(method, label || default_label(method), class: "console-key") +

@@ -1,44 +1,58 @@
-<% content_for :title, "/root :: Test Guide :: #{@article.title}" %>
+<%# /root/test_guide/:slug — one guide article inside a console shell
+    (2026-11-04; root_console.css + admin_test_guide.css): bar (the
+    title · GUIDE · area · ~MIN · n OF m · [<] PREV [>] NEXT [<] GUIDE),
+    the article body as the serif reading island it has been since
+    2026-08-28 (.tguide-article — its step checkboxes persist in
+    localStorage through the script after the screen), then while a run
+    is open // RECORD // (the run and the article's current status, //
+    NOTES //, [PASS] [FAIL] [BLOCKED] [SKIP] — POST result — and [>]
+    SKIP AHEAD), destinations, the > prompt (prev / next / back are
+    its commands). Assigns: @article, @previous_article, @next_article,
+    @active_run, @result. %>
+<% content_for :title, "/root/test_guide/#{@article.slug} :: #{@article.title}" %>
 <% content_for :head do %>
   <%= stylesheet_link_tag "admin_test_guide" %>
 <% end %>
-
-<div class="tguide">
-  <div class="tguide-topnav">
-    <span>
-      <%= link_to "« All articles", admin_test_guide_path %>
-      <% if @previous_article %> · <%= link_to "‹ #{@previous_article.title}", admin_test_guide_article_path(@previous_article.slug) %><% end %>
-    </span>
-    <span class="tguide-topnav-meta"><%= @article.area %> · ~<%= @article.minutes %> min · <%= @article.position + 1 %> of <%= TestGuide.articles.size %></span>
-    <span>
-      <% if @next_article %><%= link_to "#{@next_article.title} ›", admin_test_guide_article_path(@next_article.slug) %><% end %>
-    </span>
-  </div>
+<% status_tone = {"pass" => "rc-on", "fail" => "rc-bad", "blocked" => "rc-star", "skip" => "rc-violet"} %>
+<div class="console console--root" data-controller="terminal" data-boot="done" data-terminal-autofocus-value="false">
+  <%= render layout: "admin/console/bar", locals: {title: @article.title, sub: "GUIDE · #{@article.area.upcase} · ~#{@article.minutes} MIN · #{@article.position + 1} OF #{TestGuide.articles.size}"} do %>
+    <% if @previous_article %><%= link_to "[<] PREV", admin_test_guide_article_path(@previous_article.slug), class: "console-bar-link", title: @previous_article.title, data: {command: "prev"} %><% end %>
+    <% if @next_article %><%= link_to "[>] NEXT", admin_test_guide_article_path(@next_article.slug), class: "console-bar-link", title: @next_article.title, data: {command: "next"} %><% end %>
+    <%= link_to "[<] GUIDE", admin_test_guide_path, class: "console-bar-link", data: {command: "back"} %>
+  <% end %>
+  <%= render "admin/console/flash" %>
 
   <div class="tguide-article" id="test-guide-article" data-run-id="<%= @active_run&.id %>">
     <%= @article.body_html %>
   </div>
 
   <% if @active_run %>
-    <div class="tguide-recorder">
-      <div class="tguide-recorder-run">
-        Recording to <strong><%= @active_run.label %></strong>
-        <% if @result %> — currently <span class="tguide-chip tguide-chip--<%= @result.status %>"><%= @result.status.upcase %></span><% end %>
-      </div>
-      <%= form_with url: admin_test_guide_result_path(@article.slug), method: :post do %>
-        <%= text_area_tag :notes, @result&.notes, placeholder: "Notes (required for FAIL/BLOCKED — which step, what deviated)", rows: 2, class: "tguide-textarea" %>
-        <div class="tguide-recorder-actions">
-          <button type="submit" name="status" value="pass" class="tguide-btn tguide-btn--pass">PASS</button>
-          <button type="submit" name="status" value="fail" class="tguide-btn tguide-btn--fail">FAIL</button>
-          <button type="submit" name="status" value="blocked" class="tguide-btn tguide-btn--blocked">BLOCKED</button>
-          <button type="submit" name="status" value="skip" class="tguide-btn tguide-btn--skip">SKIP</button>
-          <% if @next_article %>
-            <%= link_to "Skip ahead ›", admin_test_guide_article_path(@next_article.slug), class: "tguide-btn", style: "margin-left: auto;" %>
-          <% end %>
+    <%= form_with url: admin_test_guide_result_path(@article.slug), method: :post, local: true do %>
+      <div class="console-rule"><span>// RECORD //</span></div>
+      <div class="console-status">
+        <div class="console-status-row">
+          <span class="console-key">RUN</span>
+          <span class="console-val"><%= link_to @active_run.label, admin_test_run_path(@active_run), class: "console-link" %><% if @result %> <span class="console-dim">· this article</span> <span class="<%= status_tone[@result.status] %>"><%= @result.status.upcase %></span><% end %></span>
         </div>
-      <% end %>
-    </div>
+      </div>
+      <div class="console-rule"><span>// NOTES //</span></div>
+      <%= text_area_tag :notes, @result&.notes, rows: 3, class: "rc-textarea", placeholder: "required for FAIL / BLOCKED — which step, what deviated", data: {controller: "autogrow", action: "input->autogrow#grow"} %>
+      <div class="rc-actions">
+        <button type="submit" name="status" value="pass" class="rc-btn rc-btn--hot">[PASS]</button>
+        <button type="submit" name="status" value="fail" class="rc-btn rc-btn--danger">[FAIL]</button>
+        <button type="submit" name="status" value="blocked" class="rc-btn">[BLOCKED]</button>
+        <button type="submit" name="status" value="skip" class="rc-btn">[SKIP]</button>
+        <% if @next_article %>
+          <%= link_to "[>] SKIP AHEAD", admin_test_guide_article_path(@next_article.slug), class: "rc-btn rc-actions--end" %>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
+
+  <%= render "admin/console/destinations", section: :meta, except: "GUIDE" %>
+
+  <div class="console-rule"><span>// END OF ARTICLE //</span></div>
+  <%= render "shared/console_prompt", hint: root_prompt_hint(:meta, except: "GUIDE", extra: [("prev" if @previous_article), ("next" if @next_article), "back"].compact) %>
 </div>
 
 <script nonce="<%= content_security_policy_nonce %>">
