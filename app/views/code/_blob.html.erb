@@ -1,30 +1,24 @@
-<%# CodeBlobView.tsx port: line-numbered rouge-highlighted source, or
-    rendered markdown for .md files. Locals: blob {content:, language:, name:, size:}. %>
-<%
-  content = blob[:content]
-  is_markdown = blob[:name].to_s.downcase.end_with?(".md")
-  lines = content.split("\n", -1)
-%>
-<div class="code-blob">
-  <div class="code-blob-header">
-    <span><%= lines.length %> lines</span>
-    <span><%= code_format_size(blob[:size]) %></span>
-  </div>
-
-  <% if is_markdown %>
-    <div class="code-md-wrap">
-      <div class="code-markdown-content">
-        <%= MarkdownRenderer.render_user(content) %>
-      </div>
+<%# The file pane (rouge cached by content sha, plain past HIGHLIGHT_MAX_SIZE) or the rendered markdown. %>
+<% content = blob[:content] %>
+<% markdown = blob[:name].to_s.downcase.end_with?(".md") %>
+<section class="console-section" aria-label="Source">
+  <div class="console-rule"><span>// <%= rule %> //</span></div>
+  <% if markdown %>
+    <div class="cb-markdown">
+      <%= Rails.cache.fetch(["code-markdown", 1, repo_slug, blob[:path], blob[:sha]]) { code_markdown(content, repo_slug, blob[:path]).to_str }.html_safe %>
     </div>
   <% else %>
-    <div class="code-blob-body">
-      <div class="code-gutter">
-        <% lines.each_index do |i| %>
-          <div><%= i + 1 %></div>
+    <div class="cb-source">
+      <div class="cb-gutter">
+        <% 1.upto(content.each_line.count) do |n| %>
+          <a href="#L<%= n %>"><%= n %></a>
         <% end %>
       </div>
-      <pre class="code-pre"><%= rouge_highlight(content, blob[:language], blob[:name]) %></pre>
+      <% if blob[:size] > CodeController::HIGHLIGHT_MAX_SIZE %>
+        <div class="cb-pre"><%= rouge_highlight(content, "plaintext", blob[:name]) %></div>
+      <% else %>
+        <div class="cb-pre"><%= Rails.cache.fetch(["code-highlight", 1, blob[:sha], blob[:language].presence || blob[:name]]) { rouge_highlight(content, blob[:language], blob[:name]).to_str }.html_safe %></div>
+      <% end %>
     </div>
   <% end %>
-</div>
+</section>

@@ -1,19 +1,18 @@
-<%# CodeBreadcrumb.tsx port. Locals: repo_slug, path (may be nil), is_blob. %>
+<%# The PATH / FILE status row's value: code / repo / dir / … with every
+    segment but the last a link. Locals: repo_slug, path (may be nil). %>
 <% segments = path.to_s.split("/").reject(&:blank?) %>
-<div class="code-breadcrumb">
-  <%= link_to "code", code_path %>
-  <span class="code-crumb-sep">/</span>
-  <% if segments.empty? && !is_blob %>
-    <span class="code-crumb-current"><%= repo_slug %></span>
+<%= link_to "code", code_path, class: "console-link" %>
+<span class="console-dim">/</span>
+<% if segments.empty? %>
+  <span><%= repo_slug %></span>
+<% else %>
+  <%= link_to repo_slug, code_repo_path(repo_slug), class: "console-link" %>
+<% end %>
+<% segments.each_with_index do |segment, i| %>
+  <span class="console-dim">/</span>
+  <% if i == segments.length - 1 %>
+    <span><%= segment %></span>
   <% else %>
-    <%= link_to repo_slug, code_repo_path(repo_slug) %>
+    <%= link_to segment, code_tree_path(repo_slug, segments[0..i].join("/")), class: "console-link" %>
   <% end %>
-  <% segments.each_with_index do |segment, i| %>
-    <span class="code-crumb-sep">/</span>
-    <% if i == segments.length - 1 %>
-      <span class="code-crumb-current"><%= segment %></span>
-    <% else %>
-      <%= link_to segment, code_tree_path(repo_slug, segments[0..i].join("/")) %>
-    <% end %>
-  <% end %>
-</div>
+<% end %>

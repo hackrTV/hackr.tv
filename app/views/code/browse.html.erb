@@ -1,32 +1,65 @@
-<% content_for :title, "#{@repo.name} — Code" %>
-<% content_for :head do %>
-  <%= stylesheet_link_tag "rouge", "data-turbo-track": "reload" %>
-<% end %>
+<%# /code/:repo, its trees and blobs: one console screen. Assigns: @repo,
+    @view_mode (:root / :tree / :blob), @path, @entries + @readme, @blob. %>
+<% content_for :title, "#{@repo.name}#{" :: #{@path}" if @path.present?} — Code" %>
+<% blob = @view_mode == :blob %>
+<% up = @path.present? ? code_up_path(@repo.slug, @path) : nil %>
+<% markdown = blob && @blob[:name].to_s.downcase.end_with?(".md") %>
+<% numbers = blob ? [] : @entries.each_index.map { |i| format("%0#{[@entries.size.to_s.size, 2].max}d", i + 1) } %>
 
 <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-  <div class="code-wrap">
-    <div class="code-panel">
-      <% if @view_mode == :root %>
-        <div class="code-repo-header">
-          <h1><%= @repo.name %></h1>
-          <% if @repo.description.present? %>
-            <p><%= @repo.description %></p>
-          <% end %>
-          <div class="code-repo-header-meta">
-            <% if @repo.language.present? %><span><%= @repo.language %></span><% end %>
-            <% if @repo.stargazers_count.to_i.positive? %><span>★ <%= @repo.stargazers_count %></span><% end %>
-            <span><%= @repo.default_branch %></span>
-          </div>
+  <%= tag.div class: "console console--code", data: {controller: blob ? "terminal" : "terminal ledger-filter", boot: "done", terminal_autofocus_value: blob ? false : nil} do %>
+    <div class="console-bar">
+      <h1 class="console-bar-title"><%= @repo.name %></h1>
+      <span class="console-bar-sub"><%= @repo.default_branch %> · <%= @path.presence || "ROOT" %></span>
+      <span class="console-bar-right">
+        <%= link_to "[<] CODE", code_path, class: "console-bar-link" %>
+        <% if up %>
+          <%= link_to "[^] UP", up, class: "console-bar-link", data: {command: ".."} %>
+        <% end %>
+      </span>
+    </div>
+
+    <div class="console-status">
+      <div class="console-status-row">
+        <span class="console-key">REPO</span>
+        <span class="console-val"><%= link_to @repo.full_name, "https://github.com/#{@repo.full_name}", class: "console-link", target: "_blank", rel: "noopener" %><% if @repo.description.present? %> <span class="console-dim">· <%= @repo.description %></span><% end %></span>
+      </div>
+      <div class="console-status-row">
+        <span class="console-key"><%= blob ? "FILE" : "PATH" %></span>
+        <span class="console-val"><%= render "breadcrumb", repo_slug: @repo.slug, path: @path %></span>
+      </div>
+      <% if blob %>
+        <div class="console-status-row">
+          <span class="console-key">SIZE</span>
+          <span class="console-val"><%= code_format_size(@blob[:size]) %> <span class="console-dim">· <%= pluralize(@blob[:content].each_line.count, "line") %> · <%= @blob[:language].to_s.upcase %><% if !markdown && @blob[:size] > CodeController::HIGHLIGHT_MAX_SIZE %> · NOT HIGHLIGHTED<% end %></span></span>
         </div>
       <% end %>
-
-      <%= render "breadcrumb", repo_slug: @repo.slug, path: @path, is_blob: @view_mode == :blob %>
-
-      <% if @view_mode == :blob %>
-        <%= render "blob", blob: @blob %>
-      <% else %>
-        <%= render "tree", repo_slug: @repo.slug, entries: @entries %>
+      <div class="console-status-row">
+        <span class="console-key">SYNC</span>
+        <span class="console-val"><%= future_stamp(@repo.last_synced_at) %><% unless blob %> <span class="console-dim">· <%= pluralize(@entries.size, "entry", plural: "entries") %></span><% end %></span>
+      </div>
+      <% unless blob %>
+        <div class="console-status-row cb-filter">
+          <label class="console-key" for="ledger-filter">FILTER</label>
+          <span class="console-val">
+            <input type="search" id="ledger-filter" class="cb-input" placeholder="name" autocomplete="off" spellcheck="false"
+              data-ledger-filter-target="input" data-action="input->ledger-filter#filter">
+            <span class="cb-count" data-ledger-filter-target="count"><%= @entries.size %> / <%= @entries.size %></span>
+            <button type="button" class="cb-btn" data-action="ledger-filter#clear">[x] CLEAR</button>
+          </span>
+        </div>
       <% end %>
     </div>
-  </div>
+
+    <% if blob %>
+      <%= render "blob", blob: @blob, repo_slug: @repo.slug, rule: (markdown ? "MARKDOWN" : "SOURCE") %>
+    <% else %>
+      <%= render "tree", repo_slug: @repo.slug, entries: @entries, numbers: numbers, up: up %>
+      <% if @readme %>
+        <%= render "blob", blob: @readme, repo_slug: @repo.slug, rule: "README" %>
+      <% end %>
+    <% end %>
+
+    <%= render "destinations", numbers: numbers, up: up.present? %>
+  <% end %>
 <% end %>

@@ -47,6 +47,8 @@ class LowercaseRedirect
     return true if path.start_with?("/grid/reset_password/")
     # Skip /grid/confirm_email_change/ paths (case-sensitive tokens)
     return true if path.start_with?("/grid/confirm_email_change/")
+    # Skip /code/ paths (git paths are case-sensitive: README.md, Gemfile)
+    return true if path.start_with?("/code/")
     # Skip asset paths
     return true if path.start_with?("/assets/")
     return true if path.start_with?("/vite-dev/")

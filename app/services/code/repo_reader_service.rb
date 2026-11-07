@@ -26,20 +26,21 @@ module Code
       @branch = repository.default_branch || "main"
     end
 
+    # One `ls-tree -l -z` per listing: "<mode> <type> <sha> <size>\t<name>\0"
+    # per entry (size is "-" on trees, names unquoted), directories first.
     def tree(path = "")
       ref = path.present? ? "#{@branch}:#{path}" : @branch
-      output, status = Open3.capture2("git", "-C", @repo_path, "ls-tree", "--name-only", ref)
+      output, status = Open3.capture2("git", "-C", @repo_path, "ls-tree", "-l", "-z", ref)
 
       raise NotFoundError, "Path not found: #{path}" unless status.success?
 
-      entries = output.strip.split("\n").filter_map do |name|
-        next if name.empty?
-        entry_path = path.present? ? "#{path}/#{name}" : name
-        type = detect_entry_type(entry_path)
-        {name: name, path: entry_path, type: type}
+      entries = output.split("\0").filter_map do |line|
+        entry = parse_entry(line)
+        next unless entry
+        entry[:path] = path.present? ? "#{path}/#{entry[:name]}" : entry[:name]
+        entry
       end
 
-      # Sort: directories first, then alphabetical
       entries.sort_by { |e| [(e[:type] == "tree") ? 0 : 1, e[:name].downcase] }
     end
 
@@ -47,16 +48,13 @@ module Code
       ext = File.extname(path).downcase
       raise BinaryFileError, "Binary file type: #{ext}" if BINARY_EXTENSIONS.include?(ext)
 
-      # Check file size
-      size_output, size_status = Open3.capture2(
-        "git", "-C", @repo_path, "cat-file", "-s", "#{@branch}:#{path}"
-      )
-      raise NotFoundError, "File not found: #{path}" unless size_status.success?
+      output, status = Open3.capture2("git", "-C", @repo_path, "ls-tree", "-l", "-z", @branch, "--", path)
+      lines = status.success? ? output.split("\0") : []
+      entry = parse_entry(lines.first) if lines.one?
+      raise NotFoundError, "File not found: #{path}" unless entry && entry[:type] == "blob" && entry[:name] == path
+      raise FileTooLargeError, "File too large: #{entry[:size]} bytes (max #{MAX_FILE_SIZE})" if entry[:size] > MAX_FILE_SIZE
 
-      size = size_output.strip.to_i
-      raise FileTooLargeError, "File too large: #{size} bytes (max #{MAX_FILE_SIZE})" if size > MAX_FILE_SIZE
-
-      output, status = Open3.capture2("git", "-C", @repo_path, "show", "#{@branch}:#{path}")
+      output, status = Open3.capture2("git", "-C", @repo_path, "cat-file", "blob", entry[:sha])
       raise NotFoundError, "File not found: #{path}" unless status.success?
 
       # Force UTF-8 encoding
@@ -70,23 +68,19 @@ module Code
         path: path,
         name: File.basename(path),
         content: content,
-        size: size,
+        size: entry[:size],
+        sha: entry[:sha],
         language: detect_language(path)
       }
     end
 
     private
 
-    def detect_entry_type(path)
-      _output, status = Open3.capture2(
-        "git", "-C", @repo_path, "cat-file", "-t", "#{@branch}:#{path}"
-      )
-      return "tree" unless status.success?
-
-      type_output, = Open3.capture2(
-        "git", "-C", @repo_path, "cat-file", "-t", "#{@branch}:#{path}"
-      )
-      (type_output.strip == "tree") ? "tree" : "blob"
+    def parse_entry(line)
+      meta, name = line.split("\t", 2)
+      return if name.blank?
+      _mode, type, sha, size = meta.split
+      {name: name, type: type, sha: sha, size: (size == "-") ? nil : size.to_i}
     end
 
     def detect_language(path)
