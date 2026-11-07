@@ -1,7 +1,17 @@
 <% content_for :title, "Cannot display — Code" %>
 
 <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-  <div class="code-wrap">
-    <div class="code-error"><%= @error_message %> <%= link_to "← Back to #{@repo.name}", code_repo_path(@repo.slug) %></div>
+  <div class="console console--code" data-controller="terminal" data-boot="done">
+    <div class="console-bar">
+      <h1 class="console-bar-title"><%= @repo.name %></h1>
+      <span class="console-bar-sub"><%= @repo.default_branch %> · <%= params[:path] %></span>
+      <span class="console-bar-right">
+        <%= link_to "[<] CODE", code_path, class: "console-bar-link" %>
+        <%= link_to "[^] UP", code_up_path(@repo.slug, params[:path].to_s), class: "console-bar-link", data: {command: ".."} %>
+      </span>
+    </div>
+    <div class="console-rule"><span>// CANNOT DISPLAY //</span></div>
+    <p class="cc-lost console-err"><%= @error_message %> <span class="console-dim">· not a text file this browser shows</span></p>
+    <%= render "destinations", up: true %>
   </div>
 <% end %>

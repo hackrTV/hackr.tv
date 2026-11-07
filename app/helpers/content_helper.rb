@@ -93,13 +93,38 @@ module ContentHelper
     "#{(bytes / (1024.0 * 1024)).round(1)} MB"
   end
 
+  def code_up_path(repo_slug, path)
+    path.include?("/") ? code_tree_path(repo_slug, path.rpartition("/").first) : code_repo_path(repo_slug)
+  end
+
+  # Repo markdown with relative links pointed at the code screens beside the
+  # file (a root README would otherwise resolve them against /code/).
+  def code_markdown(content, repo_slug, path)
+    fragment = Nokogiri::HTML5.fragment(MarkdownRenderer.render_user(content))
+    dir = File.dirname("/#{path}")
+    fragment.css("a[href]").each do |a|
+      href = a["href"].to_s
+      next if href.blank? || href.start_with?("/", "#") || href.match?(/\A[a-z][a-z0-9+.-]*:/i)
+      target, anchor = href.split("#", 2)
+      resolved = File.expand_path("./#{URI.decode_uri_component(target)}", dir).delete_prefix("/")
+      url = if resolved.empty?
+        code_repo_path(repo_slug)
+      elsif target.end_with?("/")
+        code_tree_path(repo_slug, resolved)
+      else
+        code_blob_path(repo_slug, resolved)
+      end
+      a["href"] = anchor ? "#{url}##{anchor}" : url
+    end
+    normalize_internal_links(fragment.to_html)
+  end
+
   # Rouge replaces highlight.js: lexer by service-detected language, then
-  # filename guess, then plaintext.
+  # filename guess, then plaintext; one div#L<n> per line (Code::LineFormatter).
   def rouge_highlight(content, language, filename)
     lexer = Rouge::Lexer.find(language.to_s.downcase) ||
       Rouge::Lexer.guess(filename: filename.to_s, source: content) { Rouge::Lexers::PlainText.new }
-    formatter = Rouge::Formatters::HTML.new
-    content_tag(:div, formatter.format(lexer.lex(content)).html_safe, class: "highlight")
+    content_tag(:div, Code::LineFormatter.new.format(lexer.lex(content)).html_safe, class: "highlight")
   end
 
   # Port of StreamSchedulePage formatDuration: "45m" / "2h 05m"-style.

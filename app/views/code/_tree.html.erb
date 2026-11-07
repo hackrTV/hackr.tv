@@ -1,19 +1,30 @@
-<%# CodeTreeView.tsx port. Locals: repo_slug, entries. %>
-<% if entries.empty? %>
-  <div class="code-tree-empty">Empty directory</div>
-<% else %>
-  <div class="code-tree">
-    <% entries.each do |entry| %>
-      <%
-        entry_type = entry[:type] || entry["type"]
-        entry_path = entry[:path] || entry["path"]
-        entry_name = entry[:name] || entry["name"]
-        href = (entry_type == "tree") ? code_tree_path(repo_slug, entry_path) : code_blob_path(repo_slug, entry_path)
-      %>
-      <%= link_to href, class: "code-tree-entry#{" dir" if entry_type == "tree"}" do %>
-        <span class="code-tree-icon"><%= (entry_type == "tree") ? "▸" : " " %></span>
-        <span><%= entry_name %></span>
+<%# Locals: repo_slug, entries, numbers, up (href or nil; adds the [..] row). %>
+<section class="console-section" aria-label="Tree">
+  <div class="console-rule"><span>// TREE //</span></div>
+  <% if up %>
+    <div class="cb-row cb-row--tree">
+      <span class="console-tag">[..]</span>
+      <%= link_to "../", up, class: "cb-dir", data: {command: ".."} %>
+      <span></span>
+    </div>
+  <% end %>
+  <% if entries.empty? %>
+    <p class="cc-empty">EMPTY DIRECTORY</p>
+  <% end %>
+  <% entries.each_with_index do |entry, i| %>
+    <div class="cb-row cb-row--tree" data-ledger-filter-target="row" data-search="<%= entry[:name].downcase %>">
+      <span class="console-tag">[<%= numbers[i] %>]</span>
+      <% case entry[:type] %>
+      <% when "tree" %>
+        <%= link_to "#{entry[:name]}/", code_tree_path(repo_slug, entry[:path]), class: "cb-dir", data: {command: numbers[i]} %>
+        <span></span>
+      <% when "blob" %>
+        <%= link_to entry[:name], code_blob_path(repo_slug, entry[:path]), class: "console-link", data: {command: numbers[i]} %>
+        <span class="cb-size"><%= code_format_size(entry[:size].to_i) %></span>
+      <% else %>
+        <span class="console-dim"><%= entry[:name] %> @ <%= entry[:sha].to_s.first(7) %></span>
+        <span class="cb-size console-dim">SUBMODULE</span>
       <% end %>
-    <% end %>
-  </div>
-<% end %>
+    </div>
+  <% end %>
+</section>

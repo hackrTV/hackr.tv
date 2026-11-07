@@ -1,7 +1,16 @@
 <% content_for :title, "Not found — Code" %>
 
 <%= render layout: "shared/default_chrome", locals: {ascii: false} do %>
-  <div class="code-wrap">
-    <div class="code-error">Repository or path not found. <%= link_to "← Back to code", code_path %></div>
+  <div class="console console--code" data-controller="terminal" data-boot="done">
+    <div class="console-bar">
+      <h1 class="console-bar-title"><%= @repo&.name || "CODE" %></h1>
+      <span class="console-bar-sub">SIGNAL LOST</span>
+      <span class="console-bar-right">
+        <%= link_to "[<] CODE", code_path, class: "console-bar-link" %>
+      </span>
+    </div>
+    <div class="console-rule"><span>// SIGNAL LOST //</span></div>
+    <p class="cc-lost console-err">Repository or path not found. <span class="console-dim">· nothing at this address</span></p>
+    <%= render "destinations" %>
   </div>
 <% end %>
