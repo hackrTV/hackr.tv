@@ -84,8 +84,14 @@ minutes: 20
 
 ## Steps — band directory
 
-9. Visit `/f/net`. → Band directory renders. OST-type artists (e.g.
-   TR4X 4 H4X) must NOT appear here — bands only.
+9. Visit `/f/net`. → The roster as a console screen: bar `FRACTURE
+   NETWORK` in green with `[<] FM` / `[>] VAULT`, NETWORK / ORIGIN /
+   SIGNAL rows, `// ROSTER //` of `[NN]` band tiles in name order (64px
+   newest released cover, or a `♪` box for a band with none; green name;
+   description; cyan genre · tracks · releases; `[>] PROFILE` or
+   `PROFILE COMING SOON`, `[>] RELEASES`), the about paragraph, the
+   destinations and the `>` prompt (`01` opens the first band). OST-type
+   artists (e.g. TR4X 4 H4X) must NOT appear here — bands only.
 10. Open a band profile page. → Band page renders (config-driven layout,
    colors, members/links as configured).
 11. Check `/the-pulse-grid` (band/canon page). → Renders.

@@ -62,6 +62,10 @@ class Release < ApplicationRecord
     !coming_soon && tracks.size == 1
   end
 
+  def vault_hidden?
+    tracks.any? && tracks.none?(&:show_in_pulse_vault)
+  end
+
   serialize :streaming_links, coder: JSON
 
   validates :name, presence: true

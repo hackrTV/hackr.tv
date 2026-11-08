@@ -1,10 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Easter egg ported from FmLandingPage.tsx: three clicks on the
-// "SIGNAL INCOMING" title within rolling 600ms windows opens a code
-// prompt; a valid transmission code reveals the locked coming-soon cards
-// (the server renders cards beyond the first four with `hidden` and the
-// .fm-soon-card-link--locked marker class).
+// "TRANSMISSION INCOMING" title within rolling 600ms windows opens a code
+// prompt; a valid transmission code reveals the locked coming-soon tiles
+// (the server renders tiles beyond the first four with `hidden` and the
+// .fm-locked marker class).
 const VALID_CODES = ['9915', '09092115', '992115', '9092115', '090915']
 
 export default class extends Controller {
@@ -63,7 +63,7 @@ export default class extends Controller {
   }
 
   private unlock (): void {
-    const locked = this.element.querySelectorAll<HTMLElement>('.fm-soon-card-link--locked')
+    const locked = this.element.querySelectorAll<HTMLElement>('.fm-locked')
     for (const link of Array.from(locked)) {
       link.hidden = false
     }

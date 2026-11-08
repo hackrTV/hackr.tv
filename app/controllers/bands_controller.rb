@@ -7,5 +7,10 @@ class BandsController < ApplicationController
     # Mirrors Api::ArtistsController#index (no type param => bands) plus
     # the case-insensitive name sort the React page applied client-side.
     @artists = Artist.bands.order(:name).sort_by { |artist| artist.name.to_s.downcase }
+    @releases_by_artist = Release.released.where(artist_id: @artists.map(&:id))
+      .includes(:tracks, cover_image_attachment: :blob)
+      .order(Arel.sql("release_date DESC NULLS LAST"))
+      .reject(&:vault_hidden?)
+      .group_by(&:artist_id)
   end
 end
